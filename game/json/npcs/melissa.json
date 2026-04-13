@@ -1,0 +1,104 @@
+{
+  "id": "melissa",
+  "display_name": "Melissa",
+  "role": "primary",
+  "inventory": [],
+  "schedule": {
+    "weekday": [
+      "melissa_room",
+      "melissa_room",
+      "melissa_room",
+      "melissa_room",
+      "melissa_room",
+      "melissa_room",
+      "melissa_room",
+      "melissa_room",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main",
+      "melissa_room",
+      "melissa_room",
+      "market",
+      "market",
+      "market",
+      "market"
+    ],
+    "weekend": [
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "kitchen_room",
+      "kitchen_room",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main",
+      "melissa_room",
+      "melissa_room",
+      "melissa_room",
+      "melissa_room",
+      "melissa_room",
+      "melissa_room"
+    ]
+  },
+  "source_files": [
+    "Inn/Intro.txt"
+  ],
+  "stats": {
+    "kids": 0,
+    "beauty": 55,
+    "sluttiness": 3,
+    "sexacts": 0,
+    "cum_inside": 0,
+    "pregnancy": 0,
+    "conception_chance": 15,
+    "pussy_wet_start": 10
+  },
+  "skills": {
+    "cooking": 30,
+    "cleaning": 40,
+    "waitress": 30
+  },
+  "jobs": {
+    "kitchen": 0,
+    "cleaning": 1,
+    "waitress": 1,
+    "hall_available": 1,
+    "whore_available": 0,
+    "whore": 0,
+    "gloryhole": 0
+  },
+  "default_clothing": {
+    "dress": "workdress",
+    "bra": "simplebra",
+    "panties": "simplepanties",
+    "legs": "",
+    "shoes": "simpleshoes"
+  },
+  "relationships": {
+    "player_friendship": 5
+  },
+  "custom": {
+    "notes": "Matches Amanda schedule: tavern daytime, Friday market dance, Sunday church and family dinner; otherwise in her room,ocasionally can be seen at Market,or in tailor shop,friends with Clarisse,Legarette daughter."
+  },
+  "age": 20,
+  "current_location": "TavernMain",
+  "virgin": true,
+  "description": "Amanda's sister,Melissa. There is something oriental,or mediterranean about her. Hence her look is a bit diffferent from other tavern inhabitants. She has an olive skin, pitch black shoulder lenght waivy hair, dark brown eyes ,and full melon like breast of C cap. Slim and energetic"
+}

@@ -1,0 +1,23 @@
+init 99 python:
+    gameObjects = [
+        OldAxeItem,
+        LumberItem,
+        ChoppedWoodItem,
+        MushroomItem,
+        BerriesItem,
+        HoneyCombItem,
+        TavernMainBookObject,
+        TavernMainFireplaceObject,
+        TavernMainBarObject,
+        TavernKitchenHearthObject,
+        TavernKitchenCauldronObject,
+        TavernMyRoomBedObject,
+        TavernMyRoomChestObject,
+        TavernMyRoomWindowObject,
+        TavernMyRoomAtticHatchObject,
+        TavernAmandaBedObject,
+        EllonaBirthRoomDoorObject,
+        DressShopFemaleSamplesObject,
+        DressShopMaleSamplesObject,
+        DressShopWorktableObject,
+    ]

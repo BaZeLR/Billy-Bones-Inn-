@@ -1,0 +1,111 @@
+{
+  "id": "irma",
+  "display_name": "Irma",
+  "role": "primary",
+  "knows_MC": false,
+  "schedule": {
+    "weekday": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "weekend": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "source_files": [
+    "Inn/Intro.txt"
+  ],
+  "stats": {
+    "kids": 0,
+    "beauty": 65,
+    "sluttiness": 45,
+    "sexacts": 1876,
+    "cum_inside": 948,
+    "pregnancy": 0,
+    "conception_chance": 0,
+    "pussy_wet_start": 25
+  },
+  "skills": {
+    "cooking": 30,
+    "cleaning": 30,
+    "waitress": 35
+  },
+  "jobs": {
+    "kitchen": 0,
+    "cleaning": 0,
+    "waitress": 0,
+    "hall_available": 0,
+    "whore_available": 0,
+    "whore": 0,
+    "gloryhole": 0
+  },
+  "default_clothing": {
+    "dress": "openworkdress",
+    "bra": "",
+    "panties": "simplepanties",
+    "legs": "redstockings",
+    "shoes": "simpleshoes"
+  },
+  "relationships": {
+    "player_friendship": 0
+  },
+  "custom": {
+    "irmaVar": {
+      "deniedMinetMoney": 0,
+      "knowInfertility": 0,
+      "knowDad": 0,
+      "knowMom": 0,
+      "knowSlut": 0
+    },
+    "pregfather": "",
+    "openness": 0
+  },
+  "age": 22,
+  "virgin": false,
+  "description": "Irma Farago is a fashionista with charm and lot of sex appeal who owns a small tailor shop,place of ladies depest secrets and reliable source of fresh gossips,for friends only,of course. Her delicate build, tall and very slender figure, fair, almost snow-white skin, sharp, slightly harsh facial features, and slightly pointed ears peeking out from under her light brown hair reveal her half-elf heritage."
+}

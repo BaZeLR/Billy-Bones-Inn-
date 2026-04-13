@@ -1,0 +1,88 @@
+Serious / high-priority problems
+
+Heavy abuse of globals().get() inside screen language
+Every few lines: globals().get("CurLoc", ...), globals().get("jobkitchentomorrow", {}), etc.
+Why dangerous: Screens are re-evaluated very often (on hover, on variable change, on rollback, on language switch, etc.). Reaching into globals() bypasses Ren'Py's store/persistence system → can cause:
+desync after load/rollback
+NoneType errors when dicts disappear
+performance hit (globals lookup is slower than store variables)
+
+Fix: Move all important state to default variables in store scope.renpydefault CurLoc = "TavernMain"
+default jobkitchentomorrow = {}
+default jobcleaningtomorrow = {}
+default jobwaitresstomorrow = {}
+default jobWhoreAvail = {}
+default TavernGloryHole = 0
+# ... and so on for every dict/flag you reach via globals()Then in screen just use them directly:renpy$ _jk = jobkitchentomorrow
+$ _k_slots = _tavern_load_fn(_jk) if callable(_tavern_load_fn) else 0
+
+Massive python: block at the top of the screen
+40+ lines of logic, function lookups, type checks, defaults creation
+Problems:
+Runs every redraw → performance killer when screen is complex
+Easy to get None/KeyError crashes
+Hard to debug (no line numbers in tracebacks sometimes)
+
+Better: Move almost all of that logic into init python functions or screen actions / properties.Example refactor:renpyinit python:
+    def get_current_location():
+        return CurLoc if "CurLoc" in globals() else "TavernMain"
+
+    def get_tomorrow_job_slots():
+        return {
+            "kitchen": _tavern_load_fn(jobkitchentomorrow) if callable(_tavern_load_fn) else 0,
+            "cleaning": _tavern_load_fn(jobcleaningtomorrow) if callable(_tavern_load_fn) else 0,
+            "waitress": _tavern_load_fn(jobwaitresstomorrow) if callable(_tavern_load_fn) else 0,
+        }
+
+    def safe_get_report():
+        fn = globals().get("BuildTavernReport")
+        if callable(fn):
+            return fn() or {}
+        return {}Then screen becomes much shorter:renpypython:
+    _cur_loc = get_current_location()
+    _report = safe_get_report()
+    _slots = get_tomorrow_job_slots()
+
+Very long, deeply nested conditional blocks
+The "tavern" mode block is ~150 lines of nested if callable(...) + Function(...) chains
+Very hard to maintain, easy to miss a comma or paren → silent failures
+Recommendation: Split into sub-screens (use use).renpy# in tavern mode
+use tavern_report_summary(_report)
+use tomorrow_slots_display(_slots)
+use team_assignment_list(_team_keys)Each sub-screen is 20–40 lines max → much easier to read/edit/test.
+
+Sensitive actions with deep callable() chains
+sensitive callable(_tavern_toggle_fn) and (bool(_tavern_can_toggle_fn(_jk, person, 2)) if callable(_tavern_can_toggle_fn) else True)
+This is defensive programming gone extreme → becomes unreadable and slow.
+Better: Create wrapper functions that handle all safety.renpyinit python:
+    def can_toggle_kitchen_tomorrow(person):
+        if not callable(_tavern_can_toggle_fn):
+            return True
+        return _tavern_can_toggle_fn(jobkitchentomorrow, person, 2)
+
+    def toggle_kitchen_tomorrow(person):
+        if callable(_tavern_toggle_fn):
+            _tavern_toggle_fn(jobkitchentomorrow, person, 2)Then button:renpytextbutton _k_label:
+    sensitive can_toggle_kitchen_tomorrow(person)
+    action Function(toggle_kitchen_tomorrow, person)
+
+Hardcoded character buttons
+textbutton "Sandra", "Melissa", "Amanda"
+Will break as soon as you add/remove girls
+Fix: Use dynamic listrenpydefault location_girls = ["Sandra", "Melissa", "Amanda"]   # update this when girls change location
+
+# then
+for girl in location_girls:
+    textbutton girl:
+        action [SetVariable("UI_selected_char", girl), SetVariable("UI_mode", "char"), SetVariable("UI_char_dropdown", False)]
+
+
+Quick wins / modernization steps (do in this order)
+
+Replace allglobals().get(...) with default variables
+Extract the big python: block into small helper functions in init python
+Split the "tavern" mode into 3–4 use sub-screens
+Create safety wrapper functions for every callable() chain
+Replace hardcoded girl list with dynamic one
+Add renpy.retain_after_load() if you have rollback issues later
+

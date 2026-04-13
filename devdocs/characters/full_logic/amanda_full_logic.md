@@ -1,0 +1,4152 @@
+# Full Logic Map: Аманда
+
+Source: only `game/Inn/*.txt` (authoritative content).
+
+## Core Runtime State
+
+Stable identity/runtime start from `InitAmanda`:
+- id: `amanda`
+- display names:
+  - `RealName['amanda'] = Аманда`
+  - `RealName2['amanda'] = Аманды`
+  - `RealName3['amanda'] = Аманде`
+- age: `18`
+- beauty: `52`
+- default dress: `modestworkdress`
+- start location: `TavernMain`
+
+Starting mutable stats:
+- `Friends['amanda'] = 5`
+- `sluttiness['amanda'] = 0`
+- `virginity['amanda'] = 1`
+- `sexacts['amanda'] = 0`
+- `cuminside['amanda'] = 0`
+- `pregnancy['amanda'] = 0`
+- `otkroven['amanda'] = 3`
+
+Starting work stats:
+- `cooking['amanda'] = 20`
+- `cleaning['amanda'] = 30`
+- `waitress['amanda'] = 15`
+
+Starting tavern work assignment:
+- `jobkitchen['amanda'] = 0`
+- `jobcleaning['amanda'] = 1`
+- `jobwaitress['amanda'] = 1`
+- `jobHallAvail['amanda'] = 1`
+- `jobWhoreAvail['amanda'] = 0`
+
+## AmandaVar Mechanics Map
+
+Major Amanda-specific behavior is tracked through `AmandaVar[...]`.
+
+Household / room / player relationship:
+- `kickyoufromroom`
+- `kickyoufromroomcount`
+- `kickedwithmomhelp`
+- `fuckyou`
+- `suckyou`
+- `beddeflower`
+- `knowyouseesex`
+- `knowsexactive`
+- `knownotvirgin`
+
+Liza influence thread:
+- `lizafriends`
+- `prohibitliza`
+- `askzalettoday`
+
+Legare / dance thread:
+- `alberfriends`
+- `albernowdances`
+- `alberdanceadvance`
+- `leftdances`
+- `alberprohibit`
+- `LegareGo`
+- `EscapeUnnoticed`
+- `knowlegaresex`
+- `sawlegaresex`
+- `fucklegare`
+- `sucklegare`
+- `deflowerlegare`
+- `knowdeflowerlegare`
+
+Gloryhole thread:
+- `glorytried`
+- `gloryyouknow`
+- `gloryscold`
+- `glorywalkout`
+- `glorysuck`
+- `glorysdiscover`
+- `glorydeflower`
+
+Street/lover thread:
+- `sawwithguys`
+- `prohibitwithguys`
+
+Misc:
+- `MomDressComplaint`
+- `warnnotwork`
+
+## Main Progression Axes
+
+Amanda logic is driven by four primary mutable axes:
+- `Friends['amanda']`
+- `sluttiness['amanda']`
+- `AmandaVar[...]` branch flags
+- sex-history state:
+  - `virginity`
+  - `sexacts`
+  - `cuminside`
+  - `pregnancy`
+
+These are then used to gate:
+- tavern talk content
+- room intimacy content
+- Friday dance branches
+- Legare competition path
+- gloryhole path
+- random daily sex-event scheduling
+
+## Sluttiness: Meaning and Behavioral Parts
+
+`sluttiness['amanda']` is not just a generic arousal number. In practice it is a broad willingness/sexual-openness gate that controls how Amanda reacts to:
+- touch
+- kissing
+- sexual suggestions
+- public impropriety
+- non-virgin/sex-active self-perception
+- riskier or more shameless sexual contexts
+
+In Amanda’s logic, sluttiness works together with:
+- `Friends['amanda']`
+- `virginity['amanda']`
+- `sexacts['amanda']`
+- `pregnancy['amanda']`
+- branch flags in `AmandaVar`
+
+Behaviorally, it has these main parts:
+
+1. Physical tolerance
+- whether she allows:
+  - hands on waist
+  - hands on ass
+  - squeezing
+  - kissing
+- visible in `IntAmandaDance`, tavern room intimacy, and some confrontation outcomes
+
+2. Sexual initiative tolerance
+- whether she accepts:
+  - invitations to slip away
+  - more explicit sexual offers
+  - risky/hidden sexual situations
+
+3. Shamelessness / public indecency tolerance
+- whether she can participate in:
+  - gloryhole progression
+  - risky public-sex implications
+  - “seen by others / known sex-active” states without collapsing back
+
+4. Progression ceiling for a given scene
+- many scenes use local caps through `SlutFriendsIncrease(...)`
+- so a single scene can only raise Amanda’s sluttiness up to a scene-specific threshold
+- later scenes unlock higher thresholds
+
+5. Resistance / backlash threshold
+- if sluttiness is too low for a given action:
+  - she pulls away
+  - becomes angry
+  - friendship may drop
+  - branch flags like prohibition or knowledge states may change
+
+### Important Amanda sluttiness thresholds seen in logic
+
+These are not global formal “tiers”, but recurring functional breakpoints:
+
+- `>= 13`
+  - some dance kissing/touch tolerance begins
+- `>= 16`
+  - more explicit dance/sexual responses open
+- `>= 18`
+  - stronger acceptance of ass-touching and bold contact
+- `>= 20..24`
+  - stronger kiss/grope success ranges in dance logic
+- `>= 22`
+  - early gloryhole-try gating starts to become possible
+- `>= 30..35`
+  - more permissive sexual/public outcomes
+  - stronger Legare/lover-event possibilities
+- `>= 40+`
+  - higher shamelessness/open acceptance in some aftermath logic
+- `>= 45+`
+  - stronger late permissiveness in repeated sex/public-sex contexts
+
+### What sluttiness is not
+
+It is not a complete replacement for all sexual progression.
+Amanda behavior still also depends heavily on:
+- friendship
+- virginity
+- actual sexual history (`sexacts`)
+- pregnancy status
+- whether specific acts are already known, seen, or done
+
+So the practical interpretation is:
+- `sluttiness` = general openness / permissiveness / shamelessness
+- other variables = context, history, and relationship meaning
+
+## Friday Dance / Legare Logic
+
+Key files:
+- `FridayDance`
+- `IntAmandaDance`
+- `AmandaLegareDanceSequence`
+- `EventAmandaLegareCreateDance`
+- `AfterDanceLegare`
+- `AfterDanceSexLegare`
+
+Important mechanics:
+- Amanda can be available in Friday dance only while `leftdances == 0`
+- Legare dance visibility is tracked by:
+  - `albernowdances`
+  - `alberdanceadvance`
+  - `LegareGo`
+  - `EscapeUnnoticed`
+- player interference can:
+  - reduce `Friends['amanda']`
+  - increase or decrease `AmandaVar['alberfriends']`
+  - set `alberprohibit`
+- sex/observation aftermath can flip:
+  - `knowlegaresex`
+  - `sawlegaresex`
+  - `fucklegare`
+  - `knownotvirgin`
+  - `knowsexactive`
+
+## Gloryhole Logic
+
+Key files:
+- `AmandaAtGloryHole`
+- `NextDay_NewDayEvents`
+- `NextDay_FinishDayEvents`
+
+Important thresholds:
+- first attempts are gated by `sluttiness['amanda'] >= 22`
+- later re-entry / acceptance depends on:
+  - `gloryscold`
+  - `glorywalkout`
+  - `glorysuck`
+  - `glorydeflower`
+  - `sexacts`
+  - `virginity`
+  - `knowsexactive`
+
+Gloryhole path can permanently inform other logic by setting:
+- `gloryyouknow`
+- `suckyou`
+- `fuckyou`
+- `knowsexactive`
+
+## Day-End / Daily Event Logic
+
+Amanda is re-normalized at day end in `NextDay_FinishDayEvents`:
+- `leftdances` reset
+- `kickyoufromroom` reset
+- `askzalettoday` reset
+- some knowledge flags consolidated into `knowsexactive`
+- `alberfriends` bounded to `0..20`
+- `lizafriends` bounded to `0..20`
+
+Amanda gets new daily/random sexual-event eligibility in `NextDay_NewDayEvents` through:
+- gloryhole try
+- Legare run
+- lover meet
+
+Those checks depend mainly on:
+- `sluttiness['amanda']`
+- `sexacts['amanda']`
+- `Friends['amanda']`
+- `AmandaVar['alberfriends']`
+- `AmandaVar['alberprohibit']`
+- `AmandaVar['prohibitwithguys']`
+
+## Work / Tavern Mechanics
+
+Amanda contributes to tavern quality through:
+- `cooking['amanda']`
+- `cleaning['amanda']`
+- `waitress['amanda']`
+- tomorrow/current job assignment maps
+
+In the starting state she is:
+- a weak waitress
+- a mediocre cleaner
+- a poor cook
+
+So early Amanda is not a tavern carry. Her work role matters, but her relationship/sex logic is much deeper than her economic value alone.
+
+## Scope Summary
+- Character id: amanda
+- Tokens used for discovery: amanda, AmandaVar
+- Reference files count: 59
+- Matched lines count: 1266
+
+## Reference Files
+- $menu_f.txt => Location: $menu_f
+- AdjustOtkroven.txt => Location: AdjustOtkroven
+- AfterDanceLegare.txt => Location: AfterDanceLegare
+- AfterDanceSexLegare.txt => Location: AfterDanceSexLegare
+- AmandaAtGloryHole.txt => Location: AmandaAtGloryHole
+- AmandaAtHomeCode.txt => Location: AmandaAtHomeCode
+- AmandaDynamicCommonBlocks.txt => Location: AmandaDynamicCommonBlocks
+- AmandaLegareDanceSequence.txt => Location: AmandaLegareDanceSequence
+- AmandaLoverSex.txt => Location: AmandaLoverSex
+- AmandaSexDanceStreet.txt => Location: AmandaSexDanceStreet
+- Church.txt => Location: Church
+- CreateMandatoryEvents.txt => Location: CreateMandatoryEvents
+- CreateTavernEventsPeriod.txt => Location: CreateTavernEventsPeriod
+- DailySetstatdefault.txt => Location: DailySetstatdefault
+- DisplayTavernEventShort.txt => Location: DisplayTavernEventShort
+- DressNoShow.txt => Location: DressNoShow
+- EllonaBirthPrayMenu.txt => Location: EllonaBirthPrayMenu
+- EventAmandaLegareCreateDance.txt => Location: EventAmandaLegareCreateDance
+- EventAmandaLizettTalk.txt => Location: EventAmandaLizettTalk
+- EventAmandaLizettTalk2.txt => Location: EventAmandaLizettTalk2
+- FridayDance.txt => Location: FridayDance
+- GirlDressSuggest.txt => Location: GirlDressSuggest
+- GirlsDesc.txt => Location: GirlsDesc
+- GirlSuggestDressFunc.txt => Location: GirlSuggestDressFunc
+- GiveBirth.txt => Location: GiveBirth
+- GiveBirthFinish.txt => Location: GiveBirthFinish
+- GiveBirthStep2.txt => Location: GiveBirthStep2
+- HarassDiscussImage.txt => Location: HarassDiscussImage
+- HarassShowImage.txt => Location: HarassShowImage
+- InitAmanda.txt => Location: InitAmanda
+- InitAmandaLizaTalkItems.txt => Location: InitAmandaLizaTalkItems
+- InitSecondaryNPC.txt => Location: InitSecondaryNPC
+- IntAlberTalk.txt => Location: IntAlberTalk
+- IntAmandaDance.txt => Location: IntAmandaDance
+- IntAmandaDressChange.txt => Location: IntAmandaDressChange
+- IntAmandaSex.txt => Location: IntAmandaSex
+- IntAmandaTalk.txt => Location: IntAmandaTalk
+- IntLizaDressChange.txt => Location: IntLizaDressChange
+- Intro.txt => Location: Intro
+- KidsFunctions.txt => Location: KidsFunctions
+- Loc.txt => Location: Loc
+- menu_tavernstat.txt => Location: menu_tavernstat
+- MomDressComplaint.txt => Location: MomDressComplaint
+- MorningSickness.txt => Location: MorningSickness
+- NextDay_FinishDayEvents.txt => Location: NextDay_FinishDayEvents
+- NextDay_NewDayEvents.txt => Location: NextDay_NewDayEvents
+- NextDay_TavernDaily.txt => Location: NextDay_TavernDaily
+- NextDay.txt => Location: NextDay
+- RelationshipDesc1.txt => Location: RelationshipDesc1
+- SetTavernServiceLevels.txt => Location: SetTavernServiceLevels
+- SexEventsTableCode.txt => Location: SexEventsTableCode
+- ShowAmandaPortrait.txt => Location: ShowAmandaPortrait
+- ShowCurrentSex.txt => Location: ShowCurrentSex
+- TavernAmandaRoom.txt => Location: TavernAmandaRoom
+- TavernGloryHole.txt => Location: TavernGloryHole
+- TavernMain.txt => Location: TavernMain
+- TavernShowImage.txt => Location: TavernShowImage
+- WineStore.txt => Location: WineStore
+- ZaletOpinionCalc.txt => Location: ZaletOpinionCalc
+
+## Action Logic (menus/acts)
+- AfterDanceLegare.txt:47 | act 'Вернуться на танцы':
+- AfterDanceLegare.txt:51 | act 'Дать им уйти':
+- AfterDanceLegare.txt:55 | act 'Вернуться на танцы':
+- AfterDanceLegare.txt:59 | act 'Проследить за ними, но больше не вмешиваться':
+- AfterDanceLegare.txt:62 | act 'Острожно следовать за парочкой': gt 'AfterDanceSexLegare'
+- AfterDanceLegare.txt:64 | act 'Настучать месье по мордасам':
+- AfterDanceLegare.txt:67 | act 'Звать стражу':
+- AfterDanceLegare.txt:84 | act 'Спуститься в зал':gt 'TavernMain'
+- AfterDanceLegare.txt:97 | act 'Вернуться к трактиру в расстроенных чувствах':gt 'StreetTavern'
+- AfterDanceLegare.txt:108 | act 'Дать 50 мараведи':
+- AfterDanceLegare.txt:113 | act 'Вернуться к трактиру в расстроенных чувствах':gt 'StreetTavern'
+- AfterDanceLegare.txt:116 | act 'Удивленно посмотреть':
+- AfterDanceLegare.txt:120 | act 'Понуро вернуться в трактир на утро из каталажки': gs 'NextDay','TavernMain', 1
+- AfterDanceLegare.txt:131 | act 'Вернуться к трактиру':gt 'StreetTavern'
+- AfterDanceLegare.txt:152 | act 'Дать Аманде уйти':
+- AfterDanceLegare.txt:157 | act 'Дойти до трактира':gt 'StreetTavern'
+- AfterDanceLegare.txt:163 | act 'Дать взятку 200 мараведи':
+- AfterDanceLegare.txt:168 | act 'Выйти на улицу отдышаться':gt 'StreetTavern'
+- AfterDanceSexLegare.txt:25 | act 'Прервать это непотребство':
+- AfterDanceSexLegare.txt:46 | act 'Ничего не поделаешь, смотреть дальше':
+- AfterDanceSexLegare.txt:50 | act 'Я на это смотреть не могу и пойду отсюда': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:55 | act 'Плюнуть и идти обратно в трактир': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:60 | act 'Последовать за ней':
+- AfterDanceSexLegare.txt:67 | act 'Дать знать им о том, что вы наблюдаете за ними':
+- AfterDanceSexLegare.txt:74 | act 'Ничего не поделаешь, смотреть дальше':
+- AfterDanceSexLegare.txt:80 | act 'Плюнуть и идти обратно в трактир': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:84 | act 'Я на это смотреть не могу и пойду отсюда': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:176 | act 'Послушать о чем они болтают': gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:178 | act 'Смотреть чего будет дальше': gt 'AfterDanceSexLegare', CurSexStep+2, tmpLegareSexType
+- AfterDanceSexLegare.txt:181 | act 'Смотреть чего будет дальше':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:184 | act 'Дать им кончить':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:186 | act 'Подсматривать дальше':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:190 | act 'Дать им кончить':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:192 | act 'И что дальше?': gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:194 | act 'Еще посмотреть':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:198 | act 'И что дальше?':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:200 | act 'Пойду-ка и я': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:202 | act 'Дать им кончить':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:206 | act 'Пойду-ка и я': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:208 | act 'И что дальше?':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:211 | act 'Пойду-ка и я': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:222 | act 'Ухожу, даже и не собираюсь на это смотреть': dynamic $AmandaLegareLeaveToTraktir
+- AmandaAtGloryHole.txt:53 | GS 'Menu.Add','MenuAmandaGloryHole','Осмотреть Аманду',''
+- AmandaAtGloryHole.txt:60 | GS 'Menu.Add','MenuAmandaGloryHole','Осмотреть Лизетту',''
+- AmandaAtGloryHole.txt:67 | GS 'Menu.Add','MenuAmandaGloryHole','Отругать',''
+- AmandaAtGloryHole.txt:101 | act 'Вернуться в трактир':gt 'TavernMain'
+- AmandaAtGloryHole.txt:105 | GS 'Menu.Add','MenuAmandaGloryHole','Развернуться и уйти, ничего не говоря',''
+- AmandaAtGloryHole.txt:114 | GS 'Menu.Add','MenuAmandaGloryHole','Предложить ей сделать то, что она собиралась',''
+- AmandaAtGloryHole.txt:150 | GS 'Menu.Add','MenuAmandaGloryHole','Предложить ей продолжить',''
+- AmandaAtGloryHole.txt:177 | GS 'Menu.Add','MenuAmandaGloryHole','Кончить на лицо',''
+- AmandaAtGloryHole.txt:193 | GS 'Menu.Add','MenuAmandaGloryHole','Кончить в рот',''
+- AmandaAtGloryHole.txt:218 | GS 'Menu.Add','MenuAmandaGloryHole','Поцеловать Аманду',''
+- AmandaAtGloryHole.txt:228 | GS 'Menu.Add','MenuAmandaGloryHole','Поблагодарить Аманду',''
+- AmandaAtGloryHole.txt:237 | act 'Вернуться в трактир':gt 'TavernMain'
+- AmandaAtGloryHole.txt:243 | GS 'Menu.Add','MenuAmandaGloryHole','Трахнуть сестру',''
+- AmandaAtGloryHole.txt:288 | GS 'Menu.Add','MenuAmandaGloryHole','Кончить в сестренку',''
+- AmandaAtGloryHole.txt:337 | act 'Вернуться в трактир':gt 'TavernMain'
+- AmandaAtGloryHole.txt:342 | GS 'Menu.Add','MenuAmandaGloryHole','Кончить на животик',''
+- AmandaAtGloryHole.txt:385 | act 'Вернуться в трактир':gt 'TavernMain'
+- AmandaAtHomeCode.txt:38 | act 'Плюнуть и вернуться в зал':
+- AmandaAtHomeCode.txt:47 | act 'Не обращать внимание на глупые слова, а вместо этого поцеловать ее покрепче':
+- AmandaAtHomeCode.txt:53 | act 'Взять назад слова про Лизетту':
+- AmandaAtHomeCode.txt:65 | act 'Взять назад слова про месье Легаре':
+- AmandaAtHomeCode.txt:77 | act 'Взять назад слова про глорихол':
+- AmandaAtHomeCode.txt:89 | act 'Взять назад слова про путанье с парнями':
+- AmandaAtHomeCode.txt:138 | act 'Попенять ее связью с Легаре':
+- AmandaAtHomeCode.txt:145 | act 'Попрекнуть ее активной половой жизнью':
+- AmandaAtHomeCode.txt:152 | act 'Указать на ее беременность':
+- AmandaAtHomeCode.txt:159 | act 'Указать что она уже не девочка':
+- AmandaAtHomeCode.txt:166 | act 'Вспомнить, что вы уже трахались':
+- AmandaAtHomeCode.txt:194 | act 'Снять ночнушку':
+- AmandaAtHomeCode.txt:205 | act 'Снять панталончики':
+- AmandaAtHomeCode.txt:218 | act 'Перейти к делу': dynamic $CodeAmandaSexScene
+- AmandaAtHomeCode.txt:228 | act 'Сделать сначала куни':
+- AmandaAtHomeCode.txt:236 | act 'Сломать сестре целку':
+- AmandaAtHomeCode.txt:247 | act 'Лишить Аманду девственности':
+- AmandaAtHomeCode.txt:259 | act 'Кончить на животик':
+- AmandaAtHomeCode.txt:273 | act 'Кончить в сестренку':
+- AmandaAtHomeCode.txt:296 | act 'Распрощаться и вернуться в зал':
+- AmandaAtHomeCode.txt:315 | act 'Вернуться в общий зал':
+- AmandaAtHomeCode.txt:376 | act 'Скрепя сердце и еще что-то ограничиться минетом':
+- AmandaAtHomeCode.txt:384 | act 'Распрощаться и вернуться в зал':
+- AmandaAtHomeCode.txt:393 | act 'Проигнорировать ее лепет и продолжить приставать':
+- AmandaDynamicCommonBlocks.txt:222 | act 'Вернуться за ней': gt 'StreetTavern'
+- AmandaDynamicCommonBlocks.txt:243 | act 'Проследить за ней':
+- AmandaDynamicCommonBlocks.txt:246 | act 'Оставить ее в покое':
+- AmandaDynamicCommonBlocks.txt:252 | act 'Отправить ее обратно на работу':
+- AmandaDynamicCommonBlocks.txt:271 | act 'Посмотреть поближе':
+- AmandaDynamicCommonBlocks.txt:275 | act 'Идти дальше':
+- AmandaDynamicCommonBlocks.txt:281 | act 'Посмотреть поближе':
+- AmandaDynamicCommonBlocks.txt:284 | act 'Идти дальше':
+- AmandaLegareDanceSequence.txt:105 | act 'Проследить за ними':
+- AmandaLegareDanceSequence.txt:108 | act 'Продолжить танцевать':
+- AmandaLegareDanceSequence.txt:113 | act 'Остановить их и отправить Аманду домой':
+- AmandaLoverSex.txt:103 | act 'Обернуться':
+- AmandaLoverSex.txt:109 | act 'Вернуться в трактир':
+- AmandaLoverSex.txt:147 | act 'Отправить ее обратно на работу':
+- AmandaLoverSex.txt:163 | act 'Идти за ними':
+- AmandaLoverSex.txt:168 | act 'Пусть себе балуются, а я к трактиру':
+- AmandaLoverSex.txt:179 | act 'Идти за ними':
+- AmandaLoverSex.txt:184 | act 'Пусть себе балуются, а я к трактиру':
+- AmandaLoverSex.txt:215 | act 'Послушать о чем они говорят':
+- AmandaLoverSex.txt:267 | act 'Вернуться к трактиру': gt 'StreetTavern'
+- AmandaLoverSex.txt:271 | act 'Пусть себе балуются, а я к трактиру':
+- AmandaSexDanceStreet.txt:30 | act 'Закончить и выйти из переулка':
+- Church.txt:33 | GS 'Menu.Add','ChurchServiceMenu','Найти маму',''
+- Church.txt:39 | GS 'Menu.Add','ChurchServiceMenu','Найти сестер',''
+- Church.txt:45 | GS 'Menu.Add','ChurchServiceMenu','Найти семейство Легаре',''
+- Church.txt:50 | GS 'Menu.Add','ChurchServiceMenu','Найти семейство Блэнкеншип',''
+- Church.txt:56 | GS 'Menu.Add','ChurchServiceMenu','Найти Жоржетту Брюно',''
+- Church.txt:73 | GS 'Menu.Add','ChurchServiceMenu','Предложить Жоржетте перепихнуться по быстрому',''
+- Church.txt:118 | act 'Вернуться в собор': gs 'AdvanceTime', 'Church'
+- Church.txt:137 | act 'Обсудить сомнения Бекки со святым отцом': dynamic $BeckyChurchTalk
+- Church.txt:139 | act 'Идти на исповедь':gt 'ChurchIspoved',1
+- Church.txt:143 | act 'Обойти собор':gt 'ChurchAfterCermon', 1
+- Church.txt:147 | act 'Вернуться к трактиру':gt 'StreetTavern'
+- DressNoShow.txt:14 | act 'Вот и поболтали':
+- DressNoShow.txt:43 | act 'Что хочу, то и ворочу':
+- DressNoShow.txt:49 | act 'Извиниться':
+- DressNoShow.txt:56 | act 'Платить, но не каяться':
+- EllonaBirthPrayMenu.txt:29 | act 'Оторваться от видения':
+- EllonaBirthPrayMenu.txt:52 | act 'Оторваться от видения':
+- EllonaBirthPrayMenu.txt:59 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Эллоне',''
+- EllonaBirthPrayMenu.txt:69 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Антее',''
+- EllonaBirthPrayMenu.txt:83 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Фаене',''
+- EllonaBirthPrayMenu.txt:97 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Аглае',''
+- EllonaBirthPrayMenu.txt:106 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Пасифее',''
+- EllonaBirthPrayMenu.txt:120 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Талии',''
+- EventAmandaLizettTalk.txt:37 | GS 'Menu.Add','MenuAmandaLizaTalk','Похвалить Аманду, за то, что не стала болтать с Лизеттой',''
+- EventAmandaLizettTalk.txt:41 | act 'Вернуться к своим делам':gt 'TavernMain',1
+- EventAmandaLizettTalk.txt:45 | GS 'Menu.Add','MenuAmandaLizaTalk','Строго наругать Аманду за то, та болтает с Лизеттой',''
+- EventAmandaLizettTalk.txt:52 | act 'Вернуться к своим делам':gt 'TavernMain',1
+- EventAmandaLizettTalk.txt:56 | GS 'Menu.Add','MenuAmandaLizaTalk','Сказать Аманде, чтобы не болтала с Лизеттой',''
+- EventAmandaLizettTalk.txt:62 | act 'Вернуться к своим делам':gt 'TavernMain',1
+- EventAmandaLizettTalk.txt:66 | GS 'Menu.Add','MenuAmandaLizaTalk','Сказать Аманде, что она правильно не стала болтать с Лизеттой',''
+- EventAmandaLizettTalk.txt:72 | act 'Вернуться к своим делам':gt 'TavernMain',1
+- EventAmandaLizettTalk.txt:76 | GS 'Menu.Add','MenuAmandaLizaTalk','Сказать Аманде, что вы погорячились, когда запретили ей говорить с Лизеттой',''
+- EventAmandaLizettTalk.txt:81 | act 'Вернуться к своим делам':gt 'TavernMain',1
+- EventAmandaLizettTalk.txt:85 | GS 'Menu.Add','MenuAmandaLizaTalk','Подслушать',''
+- EventAmandaLizettTalk.txt:93 | GS 'Menu.Add','MenuAmandaLizaTalk','Вернуться к своим делам',''
+- EventAmandaLizettTalk2.txt:19 | GS 'Menu.Add','MenuAmandaLizaTalk2','Строго наругать Аманду за то, та болтает с Лизеттой',''
+- EventAmandaLizettTalk2.txt:29 | GS 'Menu.Add','MenuAmandaLizaTalk2','Сказать Аманде, чтобы не болтала с Лизеттой',''
+- EventAmandaLizettTalk2.txt:37 | GS 'Menu.Add','MenuAmandaLizaTalk2','Сказать Аманде, что вы погорячились, когда запретили ей говорить с Лизеттой',''
+- EventAmandaLizettTalk2.txt:51 | act 'Вернуться к своим делам':gt 'TavernMain',1
+- FridayDance.txt:49 | GS 'Menu.Add','MenuFridayDance','Понаблюдать за танцующими',''
+- FridayDance.txt:70 | GS 'Menu.Add','MenuFridayDance','Найти Аманду',''
+- FridayDance.txt:98 | GS 'Menu.Add','MenuFridayDance','Найти Бекки Блэнкеншип',''
+- FridayDance.txt:116 | act 'Вернуться к трактиру':gt 'StreetTavern'
+- GirlSuggestDressFunc.txt:34 | act 'Подождать, пока Ирма снимет мерку':
+- GirlSuggestDressFunc.txt:40 | act 'Пройти вместе с девушками за занавеску':
+- GirlSuggestDressFunc.txt:55 | act 'Попросить разрешить вам остаться':
+- GirlSuggestDressFunc.txt:75 | act 'Покаяться и заплатить':
+- GirlSuggestDressFunc.txt:93 | act 'Предложить снять мерку прямо на месте':
+- GirlSuggestDressFunc.txt:119 | act 'Продолжить смотреть':
+- GirlSuggestDressFunc.txt:126 | act 'Подрочить на <<iif(DressBuyIsRelative=1,''маму'',iif(DressBuyIsRelative=2,''сестру'',''зрелище''  ))>>':
+- GirlSuggestDressFunc.txt:144 | act 'Пойти и подождать':
+- GirlSuggestDressFunc.txt:150 | act 'Предложить на чай 10 мараведи':
+- GirlSuggestDressFunc.txt:185 | act 'Продолжить свое грязное занятие':
+- GiveBirth.txt:48 | act 'Успокоить':
+- GiveBirth.txt:210 | act 'Идти в храм':
+- GiveBirth.txt:232 | act 'Идти внутрь':
+- GiveBirth.txt:266 | act 'Ждать дальше':
+- GiveBirth.txt:311 | act 'Родовые схватки продолжаются':
+- GiveBirthFinish.txt:28 | act 'Подождать, пока <<$RealName[$GirlName]>> отдохнет и придет в себя':
+- GiveBirthFinish.txt:45 | act 'Идти спать':
+- IntAlberTalk.txt:9 | GS 'Menu.Add','MenuAlberTalk','Поболтать со мессиром Легаре о разной всячине.',''
+- IntAlberTalk.txt:21 | GS 'Menu.Add','MenuAlberTalk','Поболтать с мессиром Легаре о более личных вещах',''
+- IntAlberTalk.txt:33 | GS 'Menu.Add','MenuAlberTalk','Спросить мессира Легаре о Лизетте',''
+- IntAlberTalk.txt:47 | GS 'Menu.Add','MenuAlberTalk','Попробовать помириться',''
+- IntAlberTalk.txt:66 | GS 'Menu.Add','MenuAlberTalk','Проигнорировать',''
+- IntAlberTalk.txt:74 | GS 'Menu.Add','MenuAlberTalk','Обругать месье',''
+- IntAlberTalk.txt:87 | GS 'Menu.Add','MenuAlberTalk','Заехать с правой',''
+- IntAmandaDance.txt:10 | GS 'Menu.Add','MenuAmandaDance','Осмотреть',''
+- IntAmandaDance.txt:16 | GS 'Menu.Add','MenuAmandaDance','Поболтать',''
+- IntAmandaDance.txt:33 | GS 'Menu.Add','MenuAmandaDance','Пригласить потанцевать',''
+- IntAmandaDance.txt:56 | GS 'Menu.Add','MenuAmandaDance','Продолжить танцевать',''
+- IntAmandaDance.txt:71 | GS 'Menu.Add','MenuAmandaDance','Положить руки на талию',''
+- IntAmandaDance.txt:98 | GS 'Menu.Add','MenuAmandaDance','Положить руки на попу',''
+- IntAmandaDance.txt:132 | GS 'Menu.Add','MenuAmandaDance','Сжать попу Аманды',''
+- IntAmandaDance.txt:163 | GS 'Menu.Add','MenuAmandaDance','Поцеловать Аманду',''
+- IntAmandaDance.txt:194 | GS 'Menu.Add','MenuAmandaDance','Предложить Аманде прогулятся',''
+- IntAmandaDance.txt:224 | GS 'Menu.Add','MenuAmandaDance','Наблюдать за Амандой и мессиром Легаре',''
+- IntAmandaDance.txt:247 | GS 'Menu.Add','MenuAmandaDance','Вмешаться и разогнать их',''
+- IntAmandaDance.txt:273 | GS 'Menu.Add','MenuAmandaDance','Отойти',''
+- IntAmandaDressChange.txt:45 | GS 'Menu.Add','MenuAmandaTalk','Предложить сестренке ходить без лифчика',''
+- IntAmandaDressChange.txt:89 | GS 'Menu.Add','MenuAmandaTalk','Предложить сестре снять панталоны',''
+- IntAmandaDressChange.txt:141 | GS 'Menu.Add','MenuAmandaTalk','Постыдить сестру за то, что ходит без лифчика',''
+- IntAmandaDressChange.txt:172 | GS 'Menu.Add','MenuAmandaTalk','Постыдить сестру за отстутсвие панталон',''
+- IntAmandaDressChange.txt:202 | GS 'Menu.Add','MenuAmandaTalk','Предложить купить сестре обновку',''
+- IntAmandaSex.txt:18 | GS 'Menu.Add','AmandaMenuSex','Осмотреть',''
+- IntAmandaSex.txt:25 | GS 'Menu.Add','AmandaMenuSex','Снять блузку',''
+- IntAmandaSex.txt:62 | GS 'Menu.Add','AmandaMenuSex','Растегнуть блузку',''
+- IntAmandaSex.txt:91 | GS 'Menu.Add','AmandaMenuSex','Снять лифчик',''
+- IntAmandaSex.txt:115 | GS 'Menu.Add','AmandaMenuSex','Задрать юбочку',''
+- IntAmandaSex.txt:117 | GS 'Menu.Add','AmandaMenuSex','Поднять подол',''
+- IntAmandaSex.txt:149 | GS 'Menu.Add','AmandaMenuSex','Снять платье',''
+- IntAmandaSex.txt:175 | GS 'Menu.Add','AmandaMenuSex','Снять панталончики',''
+- IntAmandaSex.txt:197 | GS 'Menu.Add','AmandaMenuSex','Вытереть сперму с лица',''
+- IntAmandaSex.txt:209 | GS 'Menu.Add','AmandaMenuSex','Вытереть сперму с грудей',''
+- IntAmandaSex.txt:221 | GS 'Menu.Add','AmandaMenuSex','Вытереть сперму с бедер',''
+- IntAmandaSex.txt:239 | GS 'Menu.Add','AmandaMenuSex','Целовать',''
+- IntAmandaSex.txt:266 | GS 'Menu.Add','AmandaMenuSex','Лапать',''
+- IntAmandaSex.txt:331 | GS 'Menu.Add','AmandaMenuSex','Лизать киску',''
+- IntAmandaSex.txt:359 | GS 'Menu.Add','AmandaMenuSex','Минет',''
+- IntAmandaSex.txt:415 | GS 'Menu.Add','AmandaMenuSex','Трахать',''
+- IntAmandaSex.txt:472 | GS 'Menu.Add','AmandaMenuSex','Кончить в ротик',''
+- IntAmandaSex.txt:491 | GS 'Menu.Add','AmandaMenuSex','Кончить на лицо',''
+- IntAmandaSex.txt:516 | GS 'Menu.Add','AmandaMenuSex','Кончить на груди',''
+- IntAmandaSex.txt:536 | GS 'Menu.Add','AmandaMenuSex','Кончить в сестру',''
+- IntAmandaSex.txt:568 | GS 'Menu.Add','AmandaMenuSex','Попрощаться и уйти',''
+- IntAmandaSex.txt:596 | act 'Вернуться в общий зал':gt 'TavernMain'
+- IntAmandaSex.txt:601 | GS 'Menu.Add','AmandaMenuSex','Привести себя в порядок и вернуться',''
+- IntAmandaSex.txt:629 | act 'Вернуться в общий зал':gt 'TavernMain'
+- IntAmandaTalk.txt:8 | GS 'Menu.Add','MenuAmandaTalk','Осмотреть',''
+- IntAmandaTalk.txt:13 | GS 'Menu.Add','MenuAmandaTalk','Попробовать помириться с Амандой',''
+- IntAmandaTalk.txt:27 | GS 'Menu.Add','MenuAmandaTalk','Сказать Аманде что вы передумали и она может встречаться с Альбером',''
+- IntAmandaTalk.txt:45 | GS 'Menu.Add','MenuAmandaTalk','Разрешить Аманде болтать с Лизеттой',''
+- IntAmandaTalk.txt:56 | GS 'Menu.Add','MenuAmandaTalk','Сказать Аманде что вы ошиблись и она может ходить к Лизетте в глорихолл',''
+- IntAmandaTalk.txt:67 | GS 'Menu.Add','MenuAmandaTalk','Сказать Аманде что она может встречаться с парнями',''
+- IntAmandaTalk.txt:77 | GS 'Menu.Add','MenuAmandaTalk','Сказать Аманде что она может иногда брать перерывы',''
+- IntAmandaTalk.txt:92 | GS 'Menu.Add','MenuAmandaTalk','Спросить где она потеряла девственность',''
+- IntAmandaTalk.txt:109 | GS 'Menu.Add','MenuAmandaTalk','Запретить ей <<iif(virginity[''amanda''],''гулять'',''трахаться'')>> с месье Легаре',''
+- IntAmandaTalk.txt:124 | GS 'Menu.Add','MenuAmandaTalk','Запретить ей трахаться с соседскими парнями',''
+- IntAmandaTalk.txt:134 | GS 'Menu.Add','MenuAmandaTalk','Спросить не боиться ли она залететь',''
+- IntAmandaTalk.txt:161 | GS 'Menu.Add','MenuAmandaTalk','Спросить, знает ли она от кого пузо нагуляла',''
+- IntLizaDressChange.txt:49 | GS 'Menu.Add','MenuLizaTalk','Предложить Лизетте снять панталоны',''
+- IntLizaDressChange.txt:89 | GS 'Menu.Add','MenuLizaTalk','Постыдить Лизетту за то, что ходит без лифчика',''
+- IntLizaDressChange.txt:97 | GS 'Menu.Add','MenuLizaTalk','Постыдить Лизетту за отстутсвие панталон',''
+- IntLizaDressChange.txt:127 | GS 'Menu.Add','MenuLizaTalk','Предложить купить Лизетте обновку',''
+- Intro.txt:150 | act 'Приступить к управлению трактиром':
+- KidsFunctions.txt:252 | GS 'Menu.Add','KidInteractionMenu<<KidID>>','Рассмотреть',''
+- MomDressComplaint.txt:48 | act 'А чо такого? Мне нравится':
+- MomDressComplaint.txt:58 | act 'Ага, пофигу':
+- MomDressComplaint.txt:64 | act 'Может и не пофигу':
+- MomDressComplaint.txt:70 | act 'Ты права':
+- MomDressComplaint.txt:75 | act 'Так я ей это платье и купил':
+- MomDressComplaint.txt:85 | act 'Может и стыдно':
+- MomDressComplaint.txt:90 | act 'Не, ни капельки':
+- MomDressComplaint.txt:97 | act 'Видел, тебе бы тоже не мешало так одется':
+- MomDressComplaint.txt:132 | act 'Да как ты можешь так про это говорить':
+- MomDressComplaint.txt:142 | act 'Нет, не наговариваю, все так и есть':
+- MomDressComplaint.txt:169 | act 'Может я погорячился':
+- MomDressComplaint.txt:177 | act 'Так я ей это платье и купил':
+- MorningSickness.txt:113 | act 'Месячные были?':
+- MorningSickness.txt:138 | act 'Я думаю ты залетела':
+- MorningSickness.txt:153 | act 'Да ладно, не волнуйся, это завтрак несвежий был':
+- MorningSickness.txt:170 | act 'Проверить, что это с ней':
+- MorningSickness.txt:176 | act 'Бросилась - значит надо ей':
+- NextDay.txt:225 | act 'Начать сначала':gt 'Intro'
+- NextDay.txt:227 | act 'Вернуться':gt $retlocname
+- TavernAmandaRoom.txt:34 | act 'Пристать к Аманде':
+- TavernAmandaRoom.txt:113 | act 'Идти обратно в главный зал':gt 'TavernMain'
+- TavernGloryHole.txt:150 | GS 'Menu.Add','MenuTavernGloryHole','Смотреть на клиента',''
+- TavernGloryHole.txt:174 | GS 'Menu.Add','MenuTavernGloryHole','Смотреть на девочку',''
+- TavernGloryHole.txt:216 | GS 'Menu.Add','MenuTavernGloryHole','Вставить член',''
+- TavernGloryHole.txt:231 | GS 'Menu.Add','MenuTavernGloryHole','Наслаждаться процессом',''
+- TavernGloryHole.txt:242 | GS 'Menu.Add','MenuTavernGloryHole','Кончить',''
+- TavernGloryHole.txt:268 | GS 'Menu.Add','MenuTavernGloryHole','Что-то не то, проверить кто у глорихола',''
+- TavernGloryHole.txt:287 | act 'Идти обратно в трактир':gt 'TavernMain'
+- TavernMain.txt:66 | act 'Пойти проверить отдельную комнату':gt 'TavernProstClients',1, 'georgett'
+- TavernMain.txt:72 | act 'Пойти проверить отдельную комнату':gt 'TavernProstClients',1, 'liza'
+- TavernMain.txt:84 | act 'Пойти проверить отдельную комнату':gt 'TavernProstClients',1, 'liza'
+- TavernMain.txt:95 | act 'Пойти проверить отдельную комнату':gt 'TavernProstClients',1, 'georgett'
+- TavernMain.txt:115 | act 'Выйти на улицу':gt 'StreetTavern'
+- TavernMain.txt:118 | act 'Идти к глорихолу':gt 'TavernGloryHole'
+- TavernMain.txt:121 | act 'Читать "Бабслей и Литрбол для чайников"':gt 'TavernHelp'
+- TavernMain.txt:122 | act 'Идти в вашу комнату':gt 'TavernMyRoom'
+- TavernMain.txt:124 | act 'Заглянуть в комнату Аманды':gt 'TavernAmandaRoom'
+- TavernMain.txt:126 | act 'Проверить конюшню':gt 'TavernStable'
+- WineStore.txt:18 | GS 'Menu.Add','WineBuy','Ничего не покупать',''
+- WineStore.txt:23 | GS 'Menu.Add','WineBuy','Купить один бочонок',''
+- WineStore.txt:32 | GS 'Menu.Add','WineBuy','Купить пять бочонков',''
+- WineStore.txt:41 | GS 'Menu.Add','WineBuy','Купить двадцать бочонков',''
+- WineStore.txt:50 | GS 'Menu.Add','WineBuy','Купить пятьдесят бочонков',''
+- WineStore.txt:59 | GS 'Menu.Add','WineBuy','Купить двести бочонков',''
+- WineStore.txt:73 | GS 'Menu.Add','MenuClaraTalk','Поболтать с Клариссой о разной фигне.',''
+- WineStore.txt:84 | GS 'Menu.Add','MenuClaraTalk','Заигрывать с Клариссой.',''
+- WineStore.txt:117 | act 'Вернуться на рынок':gt 'MarketPlace'
+
+## Condition Gates
+- $menu_f.txt:6 | if ARGS[0]=1:
+- $menu_f.txt:8 | elseif ARGS[0]=3:
+- $menu_f.txt:10 | elseif ARGS[0]=5:
+- AdjustOtkroven.txt:8 | if $GirlNameAOtk='georgett':
+- AdjustOtkroven.txt:9 | if Friends[$GirlNameAOtk]>=5 and otkroven[$GirlNameAOtk]<=3:otkroven[$GirlNameAOtk]=3
+- AdjustOtkroven.txt:10 | if Friends[$GirlNameAOtk]>=8 and otkroven[$GirlNameAOtk]<=5:otkroven[$GirlNameAOtk]=5
+- AdjustOtkroven.txt:11 | if Friends[$GirlNameAOtk]>=9 and otkroven[$GirlNameAOtk]<=6:otkroven[$GirlNameAOtk]=6
+- AdjustOtkroven.txt:12 | if Friends[$GirlNameAOtk]>=10 and otkroven[$GirlNameAOtk]<=7:otkroven[$GirlNameAOtk]=7
+- AdjustOtkroven.txt:13 | elseif $GirlNameAOtk='liza':
+- AdjustOtkroven.txt:14 | if Friends[$GirlNameAOtk]>=4 and otkroven[$GirlNameAOtk]<=3:otkroven[$GirlNameAOtk]=3
+- AdjustOtkroven.txt:15 | if Friends[$GirlNameAOtk]>=7 and otkroven[$GirlNameAOtk]<=5:otkroven[$GirlNameAOtk]=5
+- AdjustOtkroven.txt:16 | if Friends[$GirlNameAOtk]>=6 and otkroven[$GirlNameAOtk]<=6:otkroven[$GirlNameAOtk]=6
+- AdjustOtkroven.txt:17 | if Friends[$GirlNameAOtk]>=8 and otkroven[$GirlNameAOtk]<=7:otkroven[$GirlNameAOtk]=7
+- AdjustOtkroven.txt:18 | elseif $GirlNameAOtk='amanda' or $GirlNameAOtk='melissa' or $GirlNameAOtk='sandra':
+- AdjustOtkroven.txt:19 | if Friends[$GirlNameAOtk]>=6 and otkroven[$GirlNameAOtk]<=3:otkroven[$GirlNameAOtk]=3
+- AdjustOtkroven.txt:20 | if Friends[$GirlNameAOtk]>=8 and otkroven[$GirlNameAOtk]<=5:otkroven[$GirlNameAOtk]=5
+- AdjustOtkroven.txt:21 | if Friends[$GirlNameAOtk]>=11 and otkroven[$GirlNameAOtk]<=6:otkroven[$GirlNameAOtk]=6
+- AdjustOtkroven.txt:22 | if Friends[$GirlNameAOtk]>=13 and otkroven[$GirlNameAOtk]<=7:otkroven[$GirlNameAOtk]=7
+- AdjustOtkroven.txt:24 | if Friends[$GirlNameAOtk]>=6 and otkroven[$GirlNameAOtk]<=3:otkroven[$GirlNameAOtk]=3
+- AdjustOtkroven.txt:25 | if Friends[$GirlNameAOtk]>=8 and otkroven[$GirlNameAOtk]<=5:otkroven[$GirlNameAOtk]=5
+- AdjustOtkroven.txt:26 | if Friends[$GirlNameAOtk]>=11 and otkroven[$GirlNameAOtk]<=6:otkroven[$GirlNameAOtk]=6
+- AdjustOtkroven.txt:27 | if Friends[$GirlNameAOtk]>=13 and otkroven[$GirlNameAOtk]<=7:otkroven[$GirlNameAOtk]=7
+- AfterDanceLegare.txt:6 | if $Args[0]='Prohibit':
+- AfterDanceLegare.txt:9 | if AmandaVar['alberprohibit']=1:
+- AfterDanceLegare.txt:15 | if AmandaVar['gloryscold']>0:
+- AfterDanceLegare.txt:17 | elseif AmandaVar['glorywalkout']>0:
+- AfterDanceLegare.txt:23 | if AmandaNesluh=0:
+- AfterDanceLegare.txt:27 | elseif AmandaNesluh=1:
+- AfterDanceLegare.txt:31 | elseif AmandaNesluh=2:
+- AfterDanceLegare.txt:32 | if AmandaVar['glorydeflower']>0 or AmandaVar['fuckyou']>0:
+- AfterDanceLegare.txt:46 | if AmandaNesluh=0:
+- AfterDanceLegare.txt:74 | elseif $Args[0]='Fight':
+- AfterDanceLegare.txt:81 | if RandVar=1:
+- AfterDanceLegare.txt:89 | elseif RandVar=2:
+- AfterDanceLegare.txt:107 | if money>=50:
+- AfterDanceLegare.txt:123 | elseif $Args[0]='Police':
+- AfterDanceLegare.txt:128 | if sluttiness['amanda']<25 or (sluttiness['amanda']<=30 and Rand(1,3)<3) or (sluttiness['amanda']<=35 and Rand(1,3)=1):
+- AfterDanceLegare.txt:134 | if pregnancy['amanda']>120:
+- AfterDanceLegare.txt:136 | elseif DressPartSlut[$bottomdress['amanda']]>=4 or DressPartSlut[$topdress['amanda']]>=4:
+- AfterDanceLegare.txt:140 | if sluttiness['amanda']>=40 or (sluttiness['amanda']>=30 and Rand(1,2)):
+- AfterDanceLegare.txt:145 | if AmandaVar['alberfriends']>=11 and rand(1,3)=1:
+- AfterDanceLegare.txt:160 | if AlberBribe=0:
+- AfterDanceLegare.txt:162 | if money>=200:
+- AfterDanceSexLegare.txt:8 | if CurSexStep=0:
+- AfterDanceSexLegare.txt:10 | if tmpLegareSexType=4 and pregnancy['amanda']<=120 and Rand(1,4)<=3: tmpLegareSexType=5
+- AfterDanceSexLegare.txt:16 | if (tmpLegareSexType=0 and CurSexStep<4) or (tmpLegareSexType=1 and CurSexStep<3) or (tmpLegareSexType>=2 and CurSexStep<5):
+- AfterDanceSexLegare.txt:24 | if AmandaVar['knowyouseesex']=0:
+- AfterDanceSexLegare.txt:28 | if AmandaVar['alberprohibit']=1:
+- AfterDanceSexLegare.txt:37 | if AmandaNesluh=2:
+- AfterDanceSexLegare.txt:39 | if AmandaVar['glorydeflower']>0 or AmandaVar['fuckyou']>0:
+- AfterDanceSexLegare.txt:52 | elseif AmandaNesluh=1:
+- AfterDanceSexLegare.txt:66 | if AmandaVar['knowyousawlegaresex']:
+- AfterDanceSexLegare.txt:71 | if sluttiness['amanda']>45 or (sluttiness['amanda']>32 and Rand(1,3)=1):
+- AfterDanceSexLegare.txt:89 | if AmandaVar['knowyouseesex']:
+- AfterDanceSexLegare.txt:91 | if RandVar=1:
+- AfterDanceSexLegare.txt:93 | elseif RandVar=2:
+- AfterDanceSexLegare.txt:95 | elseif RandVar=3:
+- AfterDanceSexLegare.txt:102 | If Rand(1,2)=1:
+- AfterDanceSexLegare.txt:104 | if sluttiness['amanda']>=40 or sexacts['amanda']>12:
+- AfterDanceSexLegare.txt:119 | If Rand(1,3)<=2:
+- AfterDanceSexLegare.txt:121 | if tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:126 | if cuminside['amanda']<2:
+- AfterDanceSexLegare.txt:129 | if pregnancy['amanda']>120:
+- AfterDanceSexLegare.txt:132 | if sluttiness['amanda']>=48:
+- AfterDanceSexLegare.txt:134 | elseif tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:141 | if 	tmpLegareSexType=2 or tmpLegareSexType=3:
+- AfterDanceSexLegare.txt:143 | elseif tmpLegareSexType=4:
+- AfterDanceSexLegare.txt:153 | if cuminside['amanda']<2:
+- AfterDanceSexLegare.txt:156 | if pregnancy['amanda']>120:
+- AfterDanceSexLegare.txt:159 | if sluttiness['amanda']>=48:
+- AfterDanceSexLegare.txt:174 | if CurSexStep=0:
+- AfterDanceSexLegare.txt:175 | if AlberVar['hearabouthiswife']=0:
+- AfterDanceSexLegare.txt:180 | elseif CurSexStep=1:
+- AfterDanceSexLegare.txt:182 | elseif CurSexStep=2:
+- AfterDanceSexLegare.txt:183 | if tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:188 | elseif CurSexStep=3:
+- AfterDanceSexLegare.txt:189 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:191 | elseif tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:196 | elseif CurSexStep=4:
+- AfterDanceSexLegare.txt:197 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:199 | elseif tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:204 | elseif CurSexStep=5:
+- AfterDanceSexLegare.txt:205 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:214 | if tmpLegareSexType=0: MaxStep=5
+- AfterDanceSexLegare.txt:215 | if tmpLegareSexType=1: MaxStep=4
+- AfterDanceSexLegare.txt:217 | if  CurSexStep<MaxStep-1:
+- AfterDanceSexLegare.txt:221 | if  CurSexStep<MaxStep and AmandaVar['knowyouseesex']=0:
+- AfterDanceSexLegare.txt:227 | if CurSexStep=0:
+- AfterDanceSexLegare.txt:228 | if $args[2]='alone':
+- AfterDanceSexLegare.txt:234 | if sluttiness['amanda']>=30:
+- AfterDanceSexLegare.txt:240 | elseif CurSexStep=1:
+- AfterDanceSexLegare.txt:243 | elseif CurSexStep=2:
+- AfterDanceSexLegare.txt:244 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:245 | if pregnancy['amanda']<120:
+- AfterDanceSexLegare.txt:251 | elseif tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:255 | elseif tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:258 | elseif tmpLegareSexType=3:
+- AfterDanceSexLegare.txt:261 | elseif tmpLegareSexType=4:
+- AfterDanceSexLegare.txt:264 | elseif tmpLegareSexType=5:
+- AfterDanceSexLegare.txt:270 | elseif CurSexStep=3:
+- AfterDanceSexLegare.txt:271 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:272 | if sexacts['amanda']>0:
+- AfterDanceSexLegare.txt:279 | elseif tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:282 | elseif tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:284 | if $panties['amanda']>'':
+- AfterDanceSexLegare.txt:296 | elseif tmpLegareSexType=3:
+- AfterDanceSexLegare.txt:298 | if $panties['amanda']>'':
+- AfterDanceSexLegare.txt:307 | elseif tmpLegareSexType=4:
+- AfterDanceSexLegare.txt:311 | elseif tmpLegareSexType=5:
+- AfterDanceSexLegare.txt:313 | if $panties['amanda']>'':
+- AfterDanceSexLegare.txt:318 | if $bra['amanda']>'': *p 'Лифчик на ней тоже недолго задержался.'
+- AfterDanceSexLegare.txt:326 | elseif CurSexStep=4:
+- AfterDanceSexLegare.txt:327 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:330 | elseif tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:332 | elseif tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:335 | elseif tmpLegareSexType=3:
+- AfterDanceSexLegare.txt:336 | if pregnancy['amanda']<120:
+- AfterDanceSexLegare.txt:343 | elseif tmpLegareSexType=4:
+- AfterDanceSexLegare.txt:345 | if pregnancy['amanda']>=120:
+- AfterDanceSexLegare.txt:352 | elseif tmpLegareSexType=5:
+- AfterDanceSexLegare.txt:357 | elseif CurSexStep=5:
+- AfterDanceSexLegare.txt:358 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:360 | elseif tmpLegareSexType>=2:
+- AfterDanceSexLegare.txt:363 | if tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:368 | elseif CurSexStep=6:
+- AfterDanceSexLegare.txt:369 | if tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:371 | elseif tmpLegareSexType=3:
+- AfterDanceSexLegare.txt:373 | elseif tmpLegareSexType>=4:
+- AmandaAtGloryHole.txt:6 | if AmandaVar['gloryscold'] or AmandaVar['glorywalkout'] or AmandaVar['glorysuck'] or AmandaVar['glorydeflower']: AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:9 | if sexacts['amanda']<15: $GloryHoleYouLine1+='С некоторым удивлением вы отметили, что хоть вам делают минет и с энтузиазмом, но не очень умело.'
+- AmandaAtGloryHole.txt:10 | if AmandaVar['suckyou']: $GloryHoleYouLine1+=' Почему-то происходящее вызвало у вас чувство дежа-вю.'
+- AmandaAtGloryHole.txt:13 | if AmandaVar['gloryyouknow']: $GloryHoleYouLine2+=' Кажется, такое уже было. Неужели Лизетта опять привела помощницу?'
+- AmandaAtGloryHole.txt:17 | if AmandaVar['gloryyouknow']:
+- AmandaAtGloryHole.txt:19 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']:
+- AmandaAtGloryHole.txt:21 | elseif AmandaVar['glorywalkout']:
+- AmandaAtGloryHole.txt:25 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']:
+- AmandaAtGloryHole.txt:35 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']:
+- AmandaAtGloryHole.txt:38 | if AmandaVar['gloryyouknow']=0: $GloryGirlLine0+='При виде такого зрелища вы оторопели, равно как и она. '
+- AmandaAtGloryHole.txt:41 | if AmandaVar['gloryyouknow']:
+- AmandaAtGloryHole.txt:47 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']: $GloryGirlLine1+=' При виде вас она испуганно ойкнула и попробовала прикрыться.'
+- AmandaAtGloryHole.txt:48 | if AmandaVar['gloryyouknow']=0: $GloryGirlLine1+=' При виде такого зрелища вы оторопели, равно как и она. '
+- AmandaAtGloryHole.txt:58 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState<10,-1,0)"
+- AmandaAtGloryHole.txt:71 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']:
+- AmandaAtGloryHole.txt:76 | if (sluttiness['amanda']>=35 and Rand(1,2)=1) or sluttiness['amanda']>=45:
+- AmandaAtGloryHole.txt:78 | if AmandaVar['glorydeflower']>0 or AmandaVar['fuckyou']>0:
+- AmandaAtGloryHole.txt:80 | elseif AmandaVar['glorysuck']>0 or  AmandaVar['suckyou']>0:
+- AmandaAtGloryHole.txt:103 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState<=2 or AmandaGloryCurState=4,-1,0)"
+- AmandaAtGloryHole.txt:112 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState<=2 or AmandaGloryCurState=4,-1,0)"
+- AmandaAtGloryHole.txt:117 | if AmandaVar['glorysuck'] or AmandaVar['suckyou']:
+- AmandaAtGloryHole.txt:123 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']: *p 'Она явно обрадовалась, что вы не стали ее ругать за нарушение ваших запретов. '
+- AmandaAtGloryHole.txt:124 | if AmandaVar['glorysuck'] or AmandaVar['suckyou'] or sluttiness['amanda']>=40:
+- AmandaAtGloryHole.txt:128 | if sexacts['amanda']<15:
+- AmandaAtGloryHole.txt:133 | if AmandaVar['knowsexactive'] or HadSex['amanda']>=3 or pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:148 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=1,-1,0)"
+- AmandaAtGloryHole.txt:154 | if sexacts['amanda']<15:
+- AmandaAtGloryHole.txt:159 | if AmandaVar['knowsexactive'] or HadSex['amanda']>=3 or pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:175 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=2,-1,0)"
+- AmandaAtGloryHole.txt:181 | if sluttiness['amanda']>=40 and sexacts['amanda']>10:
+- AmandaAtGloryHole.txt:191 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=3,-1,0)"
+- AmandaAtGloryHole.txt:197 | if sluttiness['amanda']>=40 or sexacts['amanda']>12:
+- AmandaAtGloryHole.txt:204 | if sluttiness['amanda']>=45 and sexacts['amanda']>15:
+- AmandaAtGloryHole.txt:216 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=3,-1,0)"
+- AmandaAtGloryHole.txt:226 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=4,-1,0)"
+- AmandaAtGloryHole.txt:241 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=4 Or AmandaGloryCurState=5,-1,0)"
+- AmandaAtGloryHole.txt:246 | if virginity['amanda']:
+- AmandaAtGloryHole.txt:250 | if sexacts['amanda']>15 and cuminside['amanda']>=10:
+- AmandaAtGloryHole.txt:255 | if AmandaVar['glorydeflower'] or AmandaVar['beddeflower']:
+- AmandaAtGloryHole.txt:259 | if  AmandaVar['fuckyou']=0 and AmandaVar['knownotvirgin']=0:
+- AmandaAtGloryHole.txt:261 | if pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:263 | elseif (AmandaVar['knowlegaresex'] or AmandaVar['sawlegaresex']):
+- AmandaAtGloryHole.txt:265 | elseif AmandaVar['knowsexactive']:
+- AmandaAtGloryHole.txt:273 | if VirginNotKnow:
+- AmandaAtGloryHole.txt:283 | if virginity['amanda']=1:AmandaVar['glorydeflower']=1
+- AmandaAtGloryHole.txt:286 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=5,-1,0)"
+- AmandaAtGloryHole.txt:292 | if virginity['amanda']:
+- AmandaAtGloryHole.txt:298 | if sluttiness['amanda']>=45 and sexacts['amanda']>15:
+- AmandaAtGloryHole.txt:303 | if cuminside['amanda']<2:
+- AmandaAtGloryHole.txt:306 | if pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:310 | if sluttiness['amanda']>=60:
+- AmandaAtGloryHole.txt:312 | elseif tmpCumInside=0  and  cuminside['amanda']>=2:
+- AmandaAtGloryHole.txt:314 | elseif tmpCumInside=0  and  cuminside['amanda']<2:
+- AmandaAtGloryHole.txt:320 | if sluttiness['amanda']>=60 or pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:326 | if virginity['amanda']: *p ' и крови. '
+- AmandaAtGloryHole.txt:331 | if virginity['amanda']: gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 55, 1, 2
+- AmandaAtGloryHole.txt:340 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=6,-1,0)"
+- AmandaAtGloryHole.txt:346 | if sluttiness['amanda']>=45 and sexacts['amanda']>15:
+- AmandaAtGloryHole.txt:351 | if cuminside['amanda']<2:
+- AmandaAtGloryHole.txt:356 | if pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:360 | if sluttiness['amanda']>=60:
+- AmandaAtGloryHole.txt:362 | elseif tmpCumInside=0  and  cuminside['amanda']>=2:
+- AmandaAtGloryHole.txt:368 | if virginity['amanda']:
+- AmandaAtGloryHole.txt:374 | if virginity['amanda']: *p 'крови и '
+- AmandaAtGloryHole.txt:379 | if virginity['amanda']:	gs 'SlutFriendsIncrease', 'amanda', 18, 1, 1, 45, 1, 1
+- AmandaAtGloryHole.txt:387 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=6,-1,0)"
+- AmandaAtHomeCode.txt:9 | if AmandaVar['kickyoufromroomcount']>=3:
+- AmandaAtHomeCode.txt:10 | if $args[0]='afterdeny':
+- AmandaAtHomeCode.txt:21 | if $args[0]='afterdeny':
+- AmandaAtHomeCode.txt:37 | if AmandaVar['prohibitliza'] or (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5) or AmandaVar['gloryscold'] or AmandaVar['prohibitwithguys']:
+- AmandaAtHomeCode.txt:52 | if AmandaVar['prohibitliza']:
+- AmandaAtHomeCode.txt:64 | if (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5):
+- AmandaAtHomeCode.txt:76 | if AmandaVar['gloryscold']:
+- AmandaAtHomeCode.txt:88 | if AmandaVar['prohibitwithguys']:
+- AmandaAtHomeCode.txt:109 | if AmandaVar['prohibitliza']:
+- AmandaAtHomeCode.txt:112 | if (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5):
+- AmandaAtHomeCode.txt:115 | if AmandaVar['gloryscold']:
+- AmandaAtHomeCode.txt:118 | if AmandaVar['prohibitwithguys']:
+- AmandaAtHomeCode.txt:130 | if tmpSexType=0:
+- AmandaAtHomeCode.txt:132 | if virginity['amanda']:
+- AmandaAtHomeCode.txt:137 | if AmandaVar['knowlegaresex'] or AmandaVar['sawlegaresex']:
+- AmandaAtHomeCode.txt:144 | if AmandaVar['knowsexactive']:
+- AmandaAtHomeCode.txt:151 | if pregnancy['amanda']>120:
+- AmandaAtHomeCode.txt:158 | if AmandaVar['knownotvirgin']:
+- AmandaAtHomeCode.txt:165 | if AmandaVar['fuckyou']:
+- AmandaAtHomeCode.txt:172 | elseif tmpSexType=1:
+- AmandaAtHomeCode.txt:174 | if tmpSleepDress>0:
+- AmandaAtHomeCode.txt:177 | if tmpSleepDress<2:
+- AmandaAtHomeCode.txt:182 | if tmpSleepDress>0:
+- AmandaAtHomeCode.txt:193 | if tmpSleepDress=0:
+- AmandaAtHomeCode.txt:204 | if tmpSleepDress=1:
+- AmandaAtHomeCode.txt:214 | if tmpSleepDress>=2:
+- AmandaAtHomeCode.txt:215 | if tmpSexType=1:
+- AmandaAtHomeCode.txt:227 | if tmpCurSexStep=0:
+- AmandaAtHomeCode.txt:246 | elseif tmpCurSexStep=1:
+- AmandaAtHomeCode.txt:258 | elseif tmpCurSexStep=2 or tmpCurSexStep=3:
+- AmandaAtHomeCode.txt:262 | if tmpCurSexStep=3:
+- AmandaAtHomeCode.txt:276 | if tmpCurSexStep=3:
+- AmandaAtHomeCode.txt:289 | if tmpCurSexStep=4 or tmpCurSexStep=6:
+- AmandaAtHomeCode.txt:313 | if tmpSexType=0:
+- AmandaAtHomeCode.txt:330 | if virginity['amanda']:
+- AmandaAtHomeCode.txt:332 | if Friends['amanda']>=10:
+- AmandaAtHomeCode.txt:341 | if Friends['amanda']>=15:
+- AmandaAtHomeCode.txt:343 | if Rand(1,3)=1:tmpReactPush=2
+- AmandaAtHomeCode.txt:344 | elseif Friends['amanda']>=10:
+- AmandaAtHomeCode.txt:345 | if Rand(1,6)=1:
+- AmandaAtHomeCode.txt:347 | elseif Rand(1,3)<=2:
+- AmandaAtHomeCode.txt:350 | elseif Friends['amanda']>=5:
+- AmandaAtHomeCode.txt:351 | if Rand(1,2)=1:
+- AmandaAtHomeCode.txt:356 | if tmpReactPush=2:
+- AmandaAtHomeCode.txt:361 | elseif  tmpReactPush=1:
+- AmandaAtHomeCode.txt:375 | if $args[0]='minet':
+- AmandaDynamicCommonBlocks.txt:8 | if tmpRand=1:
+- AmandaDynamicCommonBlocks.txt:10 | elseif tmpRand=2:
+- AmandaDynamicCommonBlocks.txt:12 | elseif tmpRand=3:
+- AmandaDynamicCommonBlocks.txt:19 | if tmpRand=1:
+- AmandaDynamicCommonBlocks.txt:21 | elseif tmpRand=2:
+- AmandaDynamicCommonBlocks.txt:32 | if AmandaVar['prohibitliza'] or (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5) or AmandaVar['gloryscold']:
+- AmandaDynamicCommonBlocks.txt:33 | if (AmandaVar['suckyou'] or AmandaVar['fuckyou']):
+- AmandaDynamicCommonBlocks.txt:34 | if (Friends['amanda']>=12 and sluttiness['amanda']>=40) or sluttiness['amanda']>=50:
+- AmandaDynamicCommonBlocks.txt:36 | if sluttiness['amanda']>=55 and Rand(1,3)=1:tmpGropeReact=3
+- AmandaDynamicCommonBlocks.txt:37 | elseif sluttiness['amanda']<=25 and Friends['amanda']<=10:
+- AmandaDynamicCommonBlocks.txt:39 | elseif sluttiness['amanda']<=30 and Friends['amanda']<=5:
+- AmandaDynamicCommonBlocks.txt:45 | if (Friends['amanda']>=14 and sluttiness['amanda']>=45) or sluttiness['amanda']>=55:
+- AmandaDynamicCommonBlocks.txt:47 | if sluttiness['amanda']>=55 and Rand(1,3)=1:tmpGropeReact=3
+- AmandaDynamicCommonBlocks.txt:48 | elseif sluttiness['amanda']<=30 and Friends['amanda']<=12:
+- AmandaDynamicCommonBlocks.txt:50 | elseif sluttiness['amanda']<=35 and Friends['amanda']<=8:
+- AmandaDynamicCommonBlocks.txt:57 | if (AmandaVar['suckyou'] or AmandaVar['fuckyou']):
+- AmandaDynamicCommonBlocks.txt:58 | if Friends['amanda']>=2 and sluttiness['amanda']>=45:
+- AmandaDynamicCommonBlocks.txt:60 | elseif Friends['amanda']>=5 and sluttiness['amanda']>=35:
+- AmandaDynamicCommonBlocks.txt:62 | elseif Friends['amanda']>=10 and sluttiness['amanda']>=25:
+- AmandaDynamicCommonBlocks.txt:64 | elseif Friends['amanda']>=15 and sluttiness['amanda']>=21:
+- AmandaDynamicCommonBlocks.txt:66 | elseif Friends['amanda']>=2 and sluttiness['amanda']>=35:
+- AmandaDynamicCommonBlocks.txt:68 | elseif Friends['amanda']>=5 and sluttiness['amanda']>=25:
+- AmandaDynamicCommonBlocks.txt:70 | elseif Friends['amanda']>=10 and sluttiness['amanda']>=21:
+- AmandaDynamicCommonBlocks.txt:76 | if Friends['amanda']>=5 and sluttiness['amanda']>=45:
+- AmandaDynamicCommonBlocks.txt:78 | elseif Friends['amanda']>=10 and sluttiness['amanda']>=35:
+- AmandaDynamicCommonBlocks.txt:80 | elseif Friends['amanda']>=15 and sluttiness['amanda']>=25:
+- AmandaDynamicCommonBlocks.txt:82 | elseif Friends['amanda']>=5 and sluttiness['amanda']>=35:
+- AmandaDynamicCommonBlocks.txt:84 | elseif Friends['amanda']>=10 and sluttiness['amanda']>=25:
+- AmandaDynamicCommonBlocks.txt:96 | if AmandaVar['sucklegare']=0:
+- AmandaDynamicCommonBlocks.txt:99 | if AmandaVar['fucklegare']=0:
+- AmandaDynamicCommonBlocks.txt:100 | if virginity['amanda']=1:
+- AmandaDynamicCommonBlocks.txt:101 | if AmandaVar['alberfriends']>=15 and sluttiness['amanda']>=35 and sexacts['amanda']>=5:
+- AmandaDynamicCommonBlocks.txt:107 | if AmandaVar['alberfriends']>=12 and sluttiness['amanda']>=32 and sexacts['amanda']>=4:
+- AmandaDynamicCommonBlocks.txt:114 | if (AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=30) or (AmandaVar['alberfriends']>=5 and sluttiness['amanda']>=40):
+- AmandaDynamicCommonBlocks.txt:122 | if pregnancy['amanda']>=120 and tmpLegareSexType=3:tmpLegareSexType=4
+- AmandaDynamicCommonBlocks.txt:130 | if AmandaVar['glorydeflower']>0 or AmandaVar['fuckyou']>0: AmandaNesluhBonus+=6
+- AmandaDynamicCommonBlocks.txt:131 | if AmandaVar['gloryscold']>0: AmandaNesluhBonus-=3
+- AmandaDynamicCommonBlocks.txt:132 | if AmandaVar['glorysuck']>0 or AmandaVar['suckyou']>0: AmandaNesluhBonus+=3
+- AmandaDynamicCommonBlocks.txt:133 | if AmandaVar['glorywalkout']>0: AmandaNesluhBonus+=2
+- AmandaDynamicCommonBlocks.txt:135 | if AmandaVar['alberfriends']>=7: AmandaNesluhBonus+=1
+- AmandaDynamicCommonBlocks.txt:136 | if AmandaVar['alberfriends']>=9: AmandaNesluhBonus+=1
+- AmandaDynamicCommonBlocks.txt:137 | if AmandaVar['alberfriends']>=12: AmandaNesluhBonus+=2
+- AmandaDynamicCommonBlocks.txt:138 | if sluttiness['amanda']>=23: AmandaNesluhBonus+=1
+- AmandaDynamicCommonBlocks.txt:139 | if sluttiness['amanda']>=30: AmandaNesluhBonus+=2
+- AmandaDynamicCommonBlocks.txt:140 | if sluttiness['amanda']>=40: AmandaNesluhBonus+=4
+- AmandaDynamicCommonBlocks.txt:141 | if sluttiness['amanda']>=50: AmandaNesluhBonus+=3
+- AmandaDynamicCommonBlocks.txt:143 | if sluttiness['sucklegare']: AmandaNesluhBonus+=2
+- AmandaDynamicCommonBlocks.txt:144 | if sluttiness['fucklegare']: AmandaNesluhBonus+=3
+- AmandaDynamicCommonBlocks.txt:145 | if sluttiness['deflowerlegare']: AmandaNesluhBonus+=3
+- AmandaDynamicCommonBlocks.txt:149 | if Rand(1,15)<=AmandaNesluhBonus: AmandaNesluh=1
+- AmandaDynamicCommonBlocks.txt:150 | if (AmandaVar['glorydeflower'] or AmandaVar['fuckyou']) and AmandaNesluh=1 and Rand(1,4)<=3:
+- AmandaDynamicCommonBlocks.txt:153 | if (AmandaVar['glorysuck'] or AmandaVar['suckyou']) and AmandaNesluh=1 and Rand(1,4)<=1:
+- AmandaDynamicCommonBlocks.txt:161 | if $args[0]>'':
+- AmandaDynamicCommonBlocks.txt:167 | if sluttiness['amanda']>=57:
+- AmandaDynamicCommonBlocks.txt:169 | elseif pregnancy['amanda']>120:
+- AmandaDynamicCommonBlocks.txt:170 | if sluttiness['amanda']>=42:
+- AmandaDynamicCommonBlocks.txt:172 | elseif sluttiness['amanda']>=40:
+- AmandaDynamicCommonBlocks.txt:176 | if sluttiness['amanda']>=45:
+- AmandaDynamicCommonBlocks.txt:177 | if Rand(1,3)=1:
+- AmandaDynamicCommonBlocks.txt:180 | if Rand(1,9)<=4: tmpSexType=2
+- AmandaDynamicCommonBlocks.txt:182 | elseif sluttiness['amanda']>=40:
+- AmandaDynamicCommonBlocks.txt:187 | if args[1]>0: tmpSexType=args[1]
+- AmandaDynamicCommonBlocks.txt:188 | if tmpSexType=2 and Rand(1,2)=1:tmpSexType=3
+- AmandaDynamicCommonBlocks.txt:190 | if tmpSexType=3:
+- AmandaDynamicCommonBlocks.txt:193 | elseif tmpSexType=2:
+- AmandaDynamicCommonBlocks.txt:196 | elseif tmpSexType=1:
+- AmandaDynamicCommonBlocks.txt:206 | if AmandaVar['warnnotwork']:
+- AmandaDynamicCommonBlocks.txt:213 | if Rand(1,5-AmandaVar['warnnotwork']*2)=1:
+- AmandaDynamicCommonBlocks.txt:226 | if $CurLoc='TavernMain': ChanceToNotice=3
+- AmandaDynamicCommonBlocks.txt:227 | if $CurLoc='StreetTavern': ChanceToNotice=5
+- AmandaDynamicCommonBlocks.txt:228 | if $CurLoc='MarketPlace': ChanceToNotice=7
+- AmandaDynamicCommonBlocks.txt:230 | if Rand(1,ChanceToNotice)=1:
+- AmandaDynamicCommonBlocks.txt:231 | if dyneval($GetSexEventFromTable,'amanda', time,'legarerun')>0:
+- AmandaDynamicCommonBlocks.txt:234 | if $CurLoc='TavernMain':
+- AmandaDynamicCommonBlocks.txt:236 | elseif $CurLoc='MarketPlace':
+- AmandaDynamicCommonBlocks.txt:253 | if $CurLoc='TavernMain': 'Вы выскочили из трактира вслед за Амандой и увидели что она намылилась куда-то далеко.'
+- AmandaDynamicCommonBlocks.txt:265 | if Rand(1,ChanceToNotice)=1:
+- AmandaDynamicCommonBlocks.txt:266 | if dyneval($CheckIfSexEventExist,'amanda', time,'lovermeet')>0:
+- AmandaDynamicCommonBlocks.txt:270 | if Rand(1,2)=1:
+- AmandaLegareDanceSequence.txt:9 | if week=5:
+- AmandaLegareDanceSequence.txt:13 | if AmandaVar['alberprohibit']=1: AmandaVar['alberfriends']=Max(0,AmandaVar['alberfriends']-1)
+- AmandaLegareDanceSequence.txt:14 | if AmandaVar['alberprohibit']=1 and AmandaVar['alberfriends']>=12:
+- AmandaLegareDanceSequence.txt:16 | elseif AmandaVar['alberprohibit']=1 and AmandaVar['alberfriends']>=8:
+- AmandaLegareDanceSequence.txt:18 | elseif AmandaVar['alberprohibit']=1 and AmandaVar['alberfriends']>=4:
+- AmandaLegareDanceSequence.txt:19 | if Rand(1,2)=1:DanceCreated=1
+- AmandaLegareDanceSequence.txt:20 | elseif AmandaVar['alberprohibit']=1:
+- AmandaLegareDanceSequence.txt:21 | if Rand(1,4)=1:DanceCreated=1
+- AmandaLegareDanceSequence.txt:22 | elseif AmandaVar['alberfriends']>=8:
+- AmandaLegareDanceSequence.txt:30 | if (AmandaVar['alberfriends']>=11 and sluttiness['amanda']>=16) or (AmandaVar['alberfriends']>=5 and sluttiness['amanda']>=30) or (sluttiness['amanda']>=50):
+- AmandaLegareDanceSequence.txt:32 | if sluttiness['amanda']<20:
+- AmandaLegareDanceSequence.txt:35 | elseif sluttiness['amanda']<35:
+- AmandaLegareDanceSequence.txt:38 | if Rand(1,2)=1:
+- AmandaLegareDanceSequence.txt:49 | if Rand(1,Max(1,5-i))<=DanceCreated-j:
+- AmandaLegareDanceSequence.txt:52 | if AmandaVar['LegareGo']>0 and ((j>DanceCreated-1 and Rand(1,2)=1) or j=DanceCreated):
+- AmandaLegareDanceSequence.txt:62 | if i<5: jump 'loopCreateAmandaDance'
+- AmandaLegareDanceSequence.txt:66 | if args[0]=1:
+- AmandaLegareDanceSequence.txt:70 | if tmpLegareSexType=2 and Rand(1,6)<=5:tmpLegareSexType=1
+- AmandaLegareDanceSequence.txt:72 | if tmpLegareSexType<=1:
+- AmandaLegareDanceSequence.txt:77 | elseif tmpLegareSexType=2:
+- AmandaLegareDanceSequence.txt:83 | If Rand(1,3)<=2:
+- AmandaLegareDanceSequence.txt:93 | If Rand(1,3)<=2:
+- AmandaLoverSex.txt:10 | if Rand(1,4)<=3:
+- AmandaLoverSex.txt:21 | if $args[0]<>'minet':AmandaLoverBuildCumIn=Rand(2,3)
+- AmandaLoverSex.txt:24 | if AmandaLoverBuild=1:
+- AmandaLoverSex.txt:31 | if AmandaLoverBuild=1:
+- AmandaLoverSex.txt:37 | if AmandaLoverBuildGetIn=1:
+- AmandaLoverSex.txt:39 | if AmandaLoverBuild=1:
+- AmandaLoverSex.txt:46 | if AmandaLoverBuild=1:
+- AmandaLoverSex.txt:48 | if $args[0]='minet':
+- AmandaLoverSex.txt:57 | if $args[0]='minet':
+- AmandaLoverSex.txt:66 | if AmandaLoverBuildCumIn=2:
+- AmandaLoverSex.txt:68 | if pregnancy['amanda']>=120:
+- AmandaLoverSex.txt:70 | elseif sluttiness['amanda']>=52:
+- AmandaLoverSex.txt:75 | elseif AmandaLoverBuildCumIn=3:
+- AmandaLoverSex.txt:77 | if pregnancy['amanda']>=120:
+- AmandaLoverSex.txt:84 | if AmandaLoverBuild>1:
+- AmandaLoverSex.txt:90 | if AmandaLoverBuildCumIn=3:
+- AmandaLoverSex.txt:93 | elseif AmandaLoverBuildCumIn=2:
+- AmandaLoverSex.txt:101 | if AmandaLoverBuildGetIn>1 and Rand(1,7)=1:
+- AmandaLoverSex.txt:117 | if virginity['amanda']:
+- AmandaLoverSex.txt:123 | if sluttiness['amanda']<40:
+- AmandaLoverSex.txt:133 | if Rand(1,3)=1:
+- AmandaLoverSex.txt:137 | if Rand(1,3)=1:
+- AmandaLoverSex.txt:149 | if AmandaVar['prohibitwithguys']:
+- AmandaLoverSex.txt:191 | if sluttiness['amanda']>=40 and Rand(1,2)=1:
+- AmandaLoverSex.txt:197 | if tmpGuyKnown:
+- AmandaLoverSex.txt:200 | if Rand(1,5)<=3:
+- AmandaLoverSex.txt:218 | if sluttiness['amanda']>=62:
+- AmandaLoverSex.txt:222 | if pregnancy['amanda']>120:
+- AmandaLoverSex.txt:223 | if sluttiness['amanda']>37:
+- AmandaLoverSex.txt:225 | if sluttiness['amanda']>=42:
+- AmandaLoverSex.txt:236 | if sluttiness['amanda']>=57:
+- AmandaLoverSex.txt:238 | elseif sluttiness['amanda']>=45:
+- AmandaLoverSex.txt:241 | if RandVar=1:
+- AmandaLoverSex.txt:243 | elseif RandVar=2:
+- AmandaLoverSex.txt:250 | if RandVar=1:
+- AmandaLoverSex.txt:253 | elseif RandVar=2:
+- AmandaLoverSex.txt:266 | if AmandaAgreeSex=0:
+- AmandaSexDanceStreet.txt:9 | if virginity['amanda']=1:
+- AmandaSexDanceStreet.txt:12 | if AmandaVar['fuckyou'] and sluttiness['amanda']>=35:
+- AmandaSexDanceStreet.txt:14 | elseif sluttiness['amanda']>=40:
+- AmandaSexDanceStreet.txt:21 | if tmpMinetOrFull=0:
+- AmandaSexDanceStreet.txt:29 | if tmpMinetOrFull=0:
+- Church.txt:9 | if BeckyVar['GerhardBeckyTalk']=0:
+- Church.txt:14 | if BeckyVar['PriestAdvice']=3:
+- Church.txt:16 | elseif BeckyVar['GerhardBeckyTalk']=0:
+- Church.txt:26 | if week<>7 or time > 2:
+- Church.txt:31 | if time=0:
+- Church.txt:59 | if GeorgettVar['askkids']:
+- Church.txt:60 | if Friends['liza']>0:
+- Church.txt:71 | gs 'Menu.AddCondition','ChurchServiceMenu', "Result=IIF(Friends['georgett']>=2 ,-1,0)"
+- Church.txt:76 | if Friends['georgett']<6:
+- Church.txt:80 | if money<15:
+- Church.txt:85 | if GeorgettVar['askkids']:
+- Church.txt:86 | if Friends['liza']=0:
+- Church.txt:90 | if GeorgettVar['lizasawinchurch']:
+- Church.txt:97 | if GeorgettVar['askkids']=0 and Rand(1,2): $TmpChurchGeorgSex='doggy'
+- Church.txt:98 | if GeorgettVar['askkids']: $TmpChurchGeorgSex='withliza'
+- Church.txt:99 | if $TmpChurchGeorgSex='doggy':
+- Church.txt:104 | if GeorgettVar['askkids']:
+- Church.txt:110 | if GeorgettVar['askkids']:
+- Church.txt:123 | gs 'Menu.AddCondition','ChurchServiceMenu', "Result=IIF(cametoday<cancumdaily and Friends['georgett']>=2 and HadSex['georgett']>=3 and GeorgettVar['foundinchurch'] ,-1,0)"
+- Church.txt:129 | elseif time=1:
+- Church.txt:131 | IF BeckyVar['GerhardBeckyTalk']>0:
+- Church.txt:136 | if BeckyVar['PriestAdvice']>0 and BeckyVar['GerhardBeckyTalk']<2:
+- CreateMandatoryEvents.txt:9 | if week=4:
+- CreateTavernEventsPeriod.txt:15 | if TimePeriod>3: RandCreateEvent=20
+- CreateTavernEventsPeriod.txt:16 | if (TimePeriod>=3 and RandCreateEvent<=1):
+- CreateTavernEventsPeriod.txt:19 | elseif RandCreateEvent=3:
+- CreateTavernEventsPeriod.txt:22 | elseif RandCreateEvent=5 or RandCreateEvent=6 or (TimePeriod>=3 and (RandCreateEvent=7 or RandCreateEvent=8)):
+- CreateTavernEventsPeriod.txt:26 | elseif (RandCreateEvent>=9 and RandCreateEvent<=11) and (TimePeriod=2 or TimePeriod=1) and jobWhoreAvail['liza'] and (jobgloryhole['liza']=0 or TimePeriod<2) :
+- CreateTavernEventsPeriod.txt:32 | if EventsICounter<=2: jump 'loopnextCurEvent'
+- DailySetstatdefault.txt:20 | if No ($GirlName='inga' and IngaVar['Knowher']=0):
+- DailySetstatdefault.txt:21 | if pregnancy[$GirlName]>0: pregnancy[$GirlName]=pregnancy[$GirlName]+1
+- DailySetstatdefault.txt:25 | if func('Table.LinesCount', 'tmpDaddySuspectFinal'+$GirlName)=0 and  pregnancy[$GirlName]>=50:
+- DailySetstatdefault.txt:30 | if func('CheckDailyEventExists',$GirlName,'MorningSickness')=0:
+- DailySetstatdefault.txt:31 | if (pregnancy[$GirlName]>0 and pregnancy[$GirlName]<80 and Rand(1,7)=1) or (pregnancy[$GirlName]=0 and Rand(1,60)=32):
+- DailySetstatdefault.txt:39 | if func('CheckDailyEventExists',$GirlName,'GiveBirth')=0:
+- DailySetstatdefault.txt:40 | if (pregnancy[$GirlName]>240 and Rand(1,45)>Max(270-pregnancy[$GirlName],0)+10 and Rand(1,3)=1) or pregnancy[$GirlName]>=285:
+- DailySetstatdefault.txt:43 | if ($GirlName='liza' or $GirlName='georgett') and $CurrentLoc[$GirlName]<>'TavernMain':KnowAboutBirth=0
+- DailySetstatdefault.txt:44 | if ($GirlName='becky' or $GirlName='inga') and Friends['becky']<12:KnowAboutBirth=0
+- DailySetstatdefault.txt:45 | if KnowAboutBirth=0:
+- DailySetstatdefault.txt:54 | if DateOfBirth[$GirlName]=dayspassed-(year-1100)*365:
+- DailySetstatdefault.txt:56 | if $GirlName='amanda' or $GirlName='liza':
+- DailySetstatdefault.txt:65 | if $GirlName='amanda' or $GirlName='melissa':
+- DailySetstatdefault.txt:66 | if func('CheckDailyEventExists',$GirlName,'MomDressComplain')=0:
+- DailySetstatdefault.txt:67 | if DressPartSlut[$topdress[$GirlName]]+DressPartSlut[$bottomdress[$GirlName]]>=10: SlutDressTrigger=1
+- DailySetstatdefault.txt:68 | if DressPartSlut[$topdress[$GirlName]]>=6: SlutDressTrigger=1
+- DailySetstatdefault.txt:69 | if DressPartSlut[$bottomdress[$GirlName]]>=6: SlutDressTrigger=1
+- DailySetstatdefault.txt:70 | if sluttiness['sandra']<=25 and DressPartSlut[$topdress[$GirlName]]+DressPartSlut[$bottomdress[$GirlName]]>=8: SlutDressTrigger=1
+- DailySetstatdefault.txt:72 | if SlutDressTrigger=1 and Rand(1,2+TalkedBeforeTmp*15)=1:
+- DailySetstatdefault.txt:81 | if Drunk[$GirlName]>0:
+- DailySetstatdefault.txt:89 | if DaysAgeYoungKid >=0 and DaysAgeYoungKid<300: Breastfeed[$GirlName]=1
+- DailySetstatdefault.txt:90 | if Breastfeed[$GirlName] or pregnancy[$GirlName]>230: Lactate[$GirlName]=1
+- DailySetstatdefault.txt:98 | if jobwhore[$GirlName]:TotalWhoreClients[$GirlName]+=ClientsDayTotal[$GirlName]
+- DailySetstatdefault.txt:99 | if jobgloryhole[$GirlName]:TotalGloryHoleClients[$GirlName]+=ClientsDayTotal[$GirlName]
+- DisplayTavernEventShort.txt:10 | if EventsCount[10]>0:
+- DisplayTavernEventShort.txt:12 | if $CurEventCode='WineForDance':
+- DisplayTavernEventShort.txt:17 | if EventsCount[TimePeriod]>0:
+- DisplayTavernEventShort.txt:19 | if $CurEventCode='FightSmall':
+- DisplayTavernEventShort.txt:21 | elseif $CurEventCode='CleaningHarass':
+- DisplayTavernEventShort.txt:23 | elseif $CurEventCode='WaitressHarass':
+- DisplayTavernEventShort.txt:25 | elseif $CurEventCode='AmandaLizaTalk':
+- DressNoShow.txt:8 | if $GirlNameDNS='sandra':DressBuyIsRelative=1
+- DressNoShow.txt:9 | if $GirlNameDNS='melissa' or $GirlNameDNS='amanda':DressBuyIsRelative=2
+- DressNoShow.txt:19 | if $GirlNameDNS='amanda':
+- DressNoShow.txt:21 | elseif $GirlNameDNS='becky':
+- DressNoShow.txt:23 | elseif $GirlNameDNS='sandra':
+- DressNoShow.txt:25 | elseif $GirlNameDNS='melissa':
+- DressNoShow.txt:27 | elseif $GirlNameDNS='georgett':
+- DressNoShow.txt:29 | elseif $GirlNameDNS='liza':
+- DressNoShow.txt:34 | if DressBuyIsRelative=1:
+- DressNoShow.txt:36 | elseif DressBuyIsRelative=2:
+- DressNoShow.txt:44 | '"Знаешь, что, <<iif(DressBuyIsRelative=1,''мамочка'',iif(DressBuyIsRelative=2,''сестренка'',''дорогуша''  ))>>?! Я своему слову хозяин. Захотел - позвал, захотел передумал! Я тебе подарок собирался купить, а не ты мне! Так что не надо мне тут ля-ля-тополя разводить. Не будешь тут мне надоедать, может опять передумаю и все-таки куплю тебе чего." гордо сказали вы. При этом вам почему-то пришло на ум странное слово ББПЕ. На секунду удивившись причудам памяти, вы продолжили гордиться твердостью занятой вами позиции.<br>"Ты, ты, ты..." с трудом выдавила  <<$RealName[$GirlNameDNS]>>, пораженная вашим разумным, логичным и исполненным собственного достоинства ответом.<br>"Ну и козел же ты!" продолжила она, подтверждая лишний раз ту простую истину что женщинам недоступна логика, и отвернулась. Похоже, разговор с вами закончился.<br>'
+- DressNoShow.txt:50 | '"Ой, ты знаешь <<iif(DressBuyIsRelative=1,''мамусик'',iif(DressBuyIsRelative=2,''сестричка'',''котеночек''  ))>>, я забегался по делам и опоздал."<br>"По каким-таким делам ты с утра пораньше бегал?" недоуменно ответила <<$RealName[$GirlNameDNS]>>.<br>"Да, надо было там сделать кое-что." туманно объяснили вы. "Прости, я виноват. Не дуйся."<br>"Ну ладно, раз так, то давай будем считать, что мы перенесли наш поход на <<iif(week<>6,''завтра'',''понедельник'')>>." неожиданно ответила вам <<$RealName[$GirlNameDNS]>>.<br>"Ну давай, " промямли вы, будучи застигнутым врасплох таким оборотом дел.<br>"Вот и ладушки, утром, как всегда!" сказала повеселевшая <<$RealName[$GirlNameDNS]>> и убежала.<br>'
+- DressNoShow.txt:55 | if money>50:
+- DressNoShow.txt:57 | '"Ой, ты знаешь <<iif(DressBuyIsRelative=1,''мамусик'',iif(DressBuyIsRelative=2,''сестричка'',''котеночек''  ))>>, я забегался по делам и опоздал, но не унывай, вот, деньги, которые я отложил для нашего похода за покупками. " и с этими словами вы решительно вложили в руку <<$RealName3[$GirlNameDNS]>> 50 мараведи.<br>"Зашиваюсь я с делами совсем, так что давай ты купишь себе что-нибудь сама, а я побежал. Хорошо?"<br>"Ну ладно." <<$RealName[$GirlNameDNS]>> слегка повеселела.<br>'
+- EllonaBirthPrayMenu.txt:11 | if args[0]=0 and Func('SumArray','GraceBlessing')>=6 and (BlessedByEllona=0 or CursedByEllona=1):
+- EllonaBirthPrayMenu.txt:12 | if CursedByEllona=1:
+- EllonaBirthPrayMenu.txt:38 | if CursedByEllona=1:
+- EllonaBirthPrayMenu.txt:41 | elseif Rand(1,3)=1:
+- EllonaBirthPrayMenu.txt:66 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EllonaBirthPrayMenu.txt:73 | if $GirlName='liza' or $GirlName='melissa' or $GirlName='amanda':
+- EllonaBirthPrayMenu.txt:81 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EllonaBirthPrayMenu.txt:87 | if $GirlName='liza' or $GirlName='georgett':
+- EllonaBirthPrayMenu.txt:95 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EllonaBirthPrayMenu.txt:104 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EllonaBirthPrayMenu.txt:110 | if $GirlName='inga':
+- EllonaBirthPrayMenu.txt:118 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EllonaBirthPrayMenu.txt:124 | if sluttiness[$GirlName]>=60:
+- EllonaBirthPrayMenu.txt:132 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EventAmandaLegareCreateDance.txt:6 | if DanceSponsor=1: gs 'GetGirlDrunk', 'amanda'
+- EventAmandaLegareCreateDance.txt:7 | if AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=18:
+- EventAmandaLegareCreateDance.txt:10 | elseif AmandaVar['alberfriends']>=9 and sluttiness['amanda']>=15:
+- EventAmandaLegareCreateDance.txt:13 | elseif AmandaVar['alberfriends']>=7 and sluttiness['amanda']>=10:
+- EventAmandaLegareCreateDance.txt:16 | elseif AmandaVar['alberfriends']>=6 and sluttiness['amanda']>=6:
+- EventAmandaLegareCreateDance.txt:19 | elseif AmandaVar['alberfriends']>=5 and sluttiness['amanda']>=3:
+- EventAmandaLegareCreateDance.txt:32 | if AmandaVar['LegareGo']=0:
+- EventAmandaLegareCreateDance.txt:37 | if AmandaVar['alberdanceadvance']=2: $DanceWatchLine[0]+=' Торгаш нежно обнимает ее за талию.'
+- EventAmandaLegareCreateDance.txt:38 | if AmandaVar['alberdanceadvance']=3: $DanceWatchLine[0]+=' Альбер нежно но твердо держит вашу сестренку за попу.'
+- EventAmandaLegareCreateDance.txt:39 | if AmandaVar['alberdanceadvance']>=4: $DanceWatchLine[0]+=' Похотливые ручонки достопочтенного Альбера Легаре нежно сжимают упругую попку вашей сестренки через тонкую ткань ее платья. А она трется своими грудками о его грудь, потихоньку возбуждаясь.'
+- EventAmandaLegareCreateDance.txt:40 | if AmandaVar['alberdanceadvance']=5: $DanceWatchLine[0]+=' При этом он не забывает целовать малышку Аманду а та отвечает ему тем же, с трудом не сбиваясь с ритма танца.'
+- EventAmandaLegareCreateDance.txt:42 | if AmandaVar['alberfriends']<12 and Rand(1,2)=1: AmandaVar['alberfriends']+=1
+- EventAmandaLizettTalk.txt:10 | if jobWhoreAvail['liza']:
+- EventAmandaLizettTalk.txt:11 | if AmandaVar['prohibitliza']=1:
+- EventAmandaLizettTalk.txt:13 | if Rand(1,Max(2,10-AmandaVar['lizafriends']*3/2))=1:
+- EventAmandaLizettTalk.txt:19 | elseif AmandaVar['prohibitliza']=2:
+- EventAmandaLizettTalk.txt:21 | if Rand(1,Max(4,20-AmandaVar['lizafriends']*2))=1:
+- EventAmandaLizettTalk.txt:28 | if (sluttiness['amanda']<=5 and Rand(1,2)=1) or (sluttiness['amanda']<=10 and sluttiness['amanda']>5 and Rand(1,4)=1):
+- EventAmandaLizettTalk.txt:43 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']>0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk.txt:54 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']>0 and NotToSpeak=0,-1,0)"
+- EventAmandaLizettTalk.txt:64 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']=0 and NotToSpeak=0,-1,0)"
+- EventAmandaLizettTalk.txt:74 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']=0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk.txt:83 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']>0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk.txt:91 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and NotToSpeak=0,-1,0)"
+- EventAmandaLizettTalk.txt:98 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk.txt:100 | if Eyewitness>0:
+- EventAmandaLizettTalk.txt:102 | elseif NotToSpeak=0:
+- EventAmandaLizettTalk.txt:109 | if Eyewitness=0:
+- EventAmandaLizettTalk2.txt:27 | gs 'Menu.AddCondition','MenuAmandaLizaTalk2', "Result=IIF(YourReaction2=0 and AmandaVar['prohibitliza']>0,-1,0)"
+- EventAmandaLizettTalk2.txt:35 | gs 'Menu.AddCondition','MenuAmandaLizaTalk2', "Result=IIF(YourReaction2=0 and AmandaVar['prohibitliza']=0,-1,0)"
+- EventAmandaLizettTalk2.txt:42 | if Friends['amanda']<5 and Rand(1,4):
+- EventAmandaLizettTalk2.txt:47 | gs 'Menu.AddCondition','MenuAmandaLizaTalk2', "Result=IIF(YourReaction2=0 and AmandaVar['prohibitliza']>0,-1,0)"
+- EventAmandaLizettTalk2.txt:49 | if Eyewitness>0:
+- FridayDance.txt:9 | if week<>5 or time<>3: gt 'StreetTavern'
+- FridayDance.txt:12 | if dyneval($GetDanceJustLeft,'amanda','legare',FridayDancesCount)>0 or AmandaVar['LegareGo']=1:
+- FridayDance.txt:13 | if Rand(1,2)=1:
+- FridayDance.txt:27 | if FridayDancesCount<5:
+- FridayDance.txt:35 | If FridayDancesCount<5:
+- FridayDance.txt:38 | if DanceSponsor=1:
+- FridayDance.txt:45 | if GirlsCounter<arrsize('$AllGirlNames'): jump 'GDloopgirls'
+- FridayDance.txt:53 | if RandFridayDance=1:
+- FridayDance.txt:55 | elseif RandFridayDance=2:
+- FridayDance.txt:57 | elseif RandFridayDance=3 and DanceSponsor=1:
+- FridayDance.txt:59 | elseif RandFridayDance=4 and DanceSponsor=1:
+- FridayDance.txt:68 | gs 'Menu.AddCondition','MenuFridayDance', "Result=IIF(FridayDancesCount<5 and DanceStep=0,-1,0)"
+- FridayDance.txt:74 | if dyneval($GetDanceFromTable,'amanda','legare',FridayDancesCount)>0:
+- FridayDance.txt:80 | if AmandaVar['EscapeUnnoticed']=1:
+- FridayDance.txt:84 | elseif AmandaVar['albernowdances']=1:
+- FridayDance.txt:96 | gs 'Menu.AddCondition','MenuFridayDance', "Result=IIF(FridayDancesCount<5 and DanceStep=0 and AmandaVar['leftdances']=0,-1,0)"
+- FridayDance.txt:107 | gs 'Menu.AddCondition','MenuFridayDance', "Result=IIF(FridayDancesCount<5 and DanceStep=0 and BeckyVar['leftdances']=0,-1,0)"
+- FridayDance.txt:120 | if $AddDancePhraseTmp>'': '<br>'+$AddDancePhraseTmp
+- GirlDressSuggest.txt:9 | if $GirlName='sandra':DressBuyIsRelative=1
+- GirlDressSuggest.txt:10 | if $GirlName='melissa' or $GirlName='amanda':DressBuyIsRelative=2
+- GirlDressSuggest.txt:18 | if (sluttiness[$GirlName] >25 and HadSex[$GirlName]>1 and Friends[$GirlName]>10) or (sluttiness[$GirlName] >33 and HadSex[$GirlName]>0 and Friends[$GirlName]>5) : ShowOffLevel=1
+- GirlDressSuggest.txt:19 | if (sluttiness[$GirlName] >35 and HadSex[$GirlName]>3 and Friends[$GirlName]>10) or (sluttiness[$GirlName] >47 and HadSex[$GirlName]>0 and Friends[$GirlName]>5) : ShowOffLevel=2
+- GirlDressSuggest.txt:20 | if (sluttiness[$GirlName] >55  and HadSex[$GirlName]>0) or sluttiness[$GirlName] >65: ShowOffLevel=3
+- GirlDressSuggest.txt:21 | if $GirlName='georgett': ShowOffLevel=3
+- GirlDressSuggest.txt:23 | if strcomp(lcase($DressToBuy),'.*bra.*'):
+- GirlDressSuggest.txt:24 | if $GirlName='georgett':
+- GirlDressSuggest.txt:26 | elseif $GirlName='liza':
+- GirlDressSuggest.txt:31 | elseif strcomp(lcase($DressToBuy),'.*panties.*'):
+- GirlDressSuggest.txt:32 | if $GirlName='georgett':
+- GirlDressSuggest.txt:37 | elseif strcomp(lcase($DressToBuy),'.*stockings.*') :
+- GirlDressSuggest.txt:38 | if sluttiness[$GirlName] <15:
+- GirlDressSuggest.txt:40 | elseif ShowOffLevel>1:
+- GirlDressSuggest.txt:41 | if $legsdef[$GirlName]>'':
+- GirlDressSuggest.txt:43 | if $panties[$GirlName]>'':
+- GirlDressSuggest.txt:50 | if $panties[$GirlName]>'':
+- GirlDressSuggest.txt:57 | if DressBuyIsRelative=1:
+- GirlDressSuggest.txt:59 | elseif DressBuyIsRelative=2:
+- GirlDressSuggest.txt:86 | if sluttiness[$GirlName] <40 and DressPartSlut[$DressTopPart[$DressToBuy]]>=5:
+- GirlDressSuggest.txt:88 | elseif sluttiness[$GirlName] <20 and DressPartSlut[$DressTopPart[$DressToBuy]]>=3:
+- GirlDressSuggest.txt:90 | elseif sluttiness[$GirlName] <10 and DressPartSlut[$DressTopPart[$DressToBuy]]>=2:
+- GirlDressSuggest.txt:92 | elseif sluttiness[$GirlName] <55 and DressPartSlut[$DressBottomPart[$DressToBuy]]>=5:
+- GirlDressSuggest.txt:94 | elseif sluttiness[$GirlName] <35 and DressPartSlut[$DressBottomPart[$DressToBuy]]>=3:
+- GirlDressSuggest.txt:96 | elseif sluttiness[$GirlName] <20 and DressPartSlut[$DressBottomPart[$DressToBuy]]>=2:
+- GirlDressSuggest.txt:98 | elseif (sluttiness[$GirlName] >=35 and DressPartSlut[$DressTopPart[$DressToBuy]]<2) or (sluttiness[$GirlName] >=55 and DressPartSlut[$DressTopPart[$DressToBuy]]<3) or (sluttiness[$GirlName] >=70 and DressPartSlut[$DressTopPart[$DressToBuy]]<6) or  (sluttiness[$GirlName] >=45 and DressPartSlut[$DressBottomPart[$DressToBuy]]<2) or (sluttiness[$GirlName] >=60 and DressPartSlut[$DressBottomPart[$DressToBuy]]<3) or (sluttiness[$GirlName] >=75 and DressPartSlut[$DressBottomPart[$DressToBuy]]<6) :
+- GirlDressSuggest.txt:109 | if AgreeToWear>=1:
+- GirlsDesc.txt:14 | if $GirlNameGdsc='sandra':
+- GirlsDesc.txt:16 | elseif $GirlNameGdsc='melissa':
+- GirlsDesc.txt:18 | elseif $GirlNameGdsc='becky':
+- GirlsDesc.txt:20 | elseif $GirlNameGdsc='georgett':
+- GirlsDesc.txt:22 | elseif $GirlNameGdsc='liza':
+- GirlsDesc.txt:24 | elseif $GirlNameGdsc='amanda':
+- GirlsDesc.txt:26 | elseif $GirlNameGdsc='irma':
+- GirlsDesc.txt:34 | if  Lactate[$GirlNameGdsc]=1: $LactatedTitsDesc='Видно что груди <<$RealName2[$GirlNameGdsc]>> набухли, а соски увеличились. Ткань напротив них слегка промокла. '
+- GirlsDesc.txt:35 | if $topdress[$GirlNameGdsc]>'':
+- GirlsDesc.txt:37 | if $bra[$GirlNameGdsc]='':
+- GirlsDesc.txt:38 | if topraised[$GirlNameGdsc]:
+- GirlsDesc.txt:41 | if DressPartSlut[$topdress[$GirlNameGdsc]]=6:
+- GirlsDesc.txt:43 | elseif DressPartSlut[$topdress[$GirlNameGdsc]]=4:
+- GirlsDesc.txt:45 | elseif DressPartSlut[$topdress[$GirlNameGdsc]]=3:
+- GirlsDesc.txt:46 | if  Lactate[$GirlNameGdsc]=1: $LactatedTitsDesc='Видно что груди <<$RealName2[$GirlNameGdsc]>> набухли. '
+- GirlsDesc.txt:53 | if  Lactate[$GirlNameGdsc]=1: $LactatedTitsDesc='Видно что груди <<$RealName2[$GirlNameGdsc]>> набухли. '
+- GirlsDesc.txt:54 | if topraised[$GirlNameGdsc]:
+- GirlsDesc.txt:57 | if DressPartSlut[$topdress[$GirlNameGdsc]]>=4:
+- GirlsDesc.txt:59 | elseif DressPartSlut[$topdress[$GirlNameGdsc]]=3:
+- GirlsDesc.txt:66 | elseif $bra[$GirlNameGdsc]>'':
+- GirlsDesc.txt:71 | if $bottomdress[$GirlNameGdsc]>'' and $bottomdress[$GirlNameGdsc]<>'nightshirtbottom' :
+- GirlsDesc.txt:72 | if $topdress[$GirlNameGdsc]>'' or $bra[$GirlNameGdsc]>'' :
+- GirlsDesc.txt:79 | if bottomraised[$GirlNameGdsc]:
+- GirlsDesc.txt:80 | if DressPartSlut[$bottomdress[$GirlNameGdsc]]>=4:
+- GirlsDesc.txt:85 | if $panties[$GirlNameGdsc]='':
+- GirlsDesc.txt:91 | if $panties[$GirlNameGdsc]='':
+- GirlsDesc.txt:92 | if DressPartSlut[$bottomdress[$GirlNameGdsc]]=6:
+- GirlsDesc.txt:94 | elseif DressPartSlut[$bottomdress[$GirlNameGdsc]]=4:
+- GirlsDesc.txt:100 | if DressPartSlut[$bottomdress[$GirlNameGdsc]]=6:
+- GirlsDesc.txt:102 | elseif DressPartSlut[$bottomdress[$GirlNameGdsc]]=4:
+- GirlsDesc.txt:109 | elseif $panties[$GirlNameGdsc]>'' and $bottomdress[$GirlNameGdsc]<>'nightshirtbottom':
+- GirlsDesc.txt:110 | if $topdress[$GirlNameGdsc]>'' or $bra[$GirlNameGdsc]>'' :
+- GirlsDesc.txt:117 | if (bottomraised[$GirlNameGdsc] or $bottomdress[$GirlNameGdsc]='' or DressPartSlut[$bottomdress[$GirlNameGdsc]]>=4) and $legs[$GirlNameGdsc]>'':
+- GirlsDesc.txt:118 | if $legs[$GirlNameGdsc]>'':
+- GirlsDesc.txt:121 | if bottomraised[$GirlNameGdsc]=0 and $bottomdress[$GirlNameGdsc]>'' and DressPartSlut[$bottomdress[$GirlNameGdsc]]>=5:
+- GirlsDesc.txt:130 | if $shoes[$GirlNameGdsc]='simpleshoes':
+- GirlsDesc.txt:133 | if $shoes[$GirlNameGdsc]='highshoes':
+- GirlsDesc.txt:139 | if  Lactate[$GirlNameGdsc]=1:  $LactatedTitsDesc='Видно что сиськи <<$RealName2[$GirlNameGdsc]>> набухли от молока, а соски и ареолы увеличились. Капельки молока иногда выступают на сосочках. '
+- GirlsDesc.txt:141 | if TitsVisible[$GirlNameGdsc]:  pl 'Ее сиськи бесстыдно обнаженны. <<$LactatedTitsDesc>>'
+- GirlsDesc.txt:142 | if PussyVisible[$GirlNameGdsc]:  pl 'Ее влагалище ничем не прикрыто от нескромных взглядов.'
+- GirlsDesc.txt:144 | if CumFaceYou[$GirlNameGdsc]>0: pl 'На личике и волосах <<$RealName2[$GirlNameGdsc]>> видны крупные белые капли вашей спермы.'
+- GirlsDesc.txt:145 | if CumFaceYou[$GirlNameGdsc]=0 and CumFaceOthers[$GirlNameGdsc]>0: pl 'На личике и волосах <<$RealName2[$GirlNameGdsc]>> видны крупные белые капли чьей-то спермы. Шлюшка даже и не подумала их вытереть!'
+- GirlsDesc.txt:146 | if CumTitsYou[$GirlNameGdsc]>0 and TitsVisible[$GirlNameGdsc]: pl 'Груди <<$RealName2[$GirlNameGdsc]>> перемазанны в вашем семени.'
+- GirlsDesc.txt:147 | if CumTitsYou[$GirlNameGdsc]=0 and CumTitsOthers[$GirlNameGdsc]>0 and TitsVisible[$GirlNameGdsc]: pl 'Груди <<$RealName2[$GirlNameGdsc]>> перемазанны в чьем-то семени.'
+- GirlsDesc.txt:148 | if CumInsideYou[$GirlNameGdsc]>0 and PussyVisible[$GirlNameGdsc]: pl 'Из влагалища <<$RealName2[$GirlNameGdsc]>> медленно вытекает сперма.'
+- GirlsDesc.txt:149 | if CumInsideYou[$GirlNameGdsc]=0 and CumInsideOthers[$GirlNameGdsc]>0 and PussyVisible[$GirlNameGdsc]: pl 'Из влагалища <<$RealName2[$GirlNameGdsc]>> медленно вытекает сперма. Кто-то уже попробовал заделать ей ребеночка до вас.'
+- GirlsDesc.txt:150 | if CumInsideYou[$GirlNameGdsc]>0 and ShortSkirtNoPanties[$GirlNameGdsc]: pl 'Вы видите следы вашей спермы на не полностью прикрытых короткой юбочкой бедрах <<$RealName2[$GirlNameGdsc]>>. '
+- GirlsDesc.txt:151 | if CumInsideYou[$GirlNameGdsc]=0 and CumInsideOthers[$GirlNameGdsc] and ShortSkirtNoPanties[$GirlNameGdsc]: pl 'Вы видите следы чьей-то спермы на не полностью прикрытых короткой юбочкой бедрах <<$RealName2[$GirlNameGdsc]>>. '
+- GirlsDesc.txt:153 | if ($topdress[$GirlNameGdsc]='' or topraised[$GirlNameGdsc]) and pregnancy[$GirlNameGdsc]>=120:
+- GirlsDesc.txt:155 | elseif $topdress[$GirlNameGdsc]>'' and topraised[$GirlNameGdsc]=0 and DressPartSlut[$topdress[$GirlNameGdsc]]>=3 and pregnancy[$GirlNameGdsc]>=120:
+- GirlsDesc.txt:157 | elseif $topdress[$GirlNameGdsc]>'' and topraised[$GirlNameGdsc]=0 and DressPartSlut[$topdress[$GirlNameGdsc]]<3 and pregnancy[$GirlNameGdsc]>=180:
+- GirlsDesc.txt:161 | if Drunk[$GirlNameGdsc]>0:
+- GirlsDesc.txt:168 | if beauty[$GirlNameGdsc] <10:
+- GirlsDesc.txt:170 | elseif beauty[$GirlNameGdsc] <20:
+- GirlsDesc.txt:172 | elseif beauty[$GirlNameGdsc] <30:
+- GirlsDesc.txt:174 | elseif beauty[$GirlNameGdsc] <40:
+- GirlsDesc.txt:176 | elseif beauty[$GirlNameGdsc] <50:
+- GirlsDesc.txt:178 | elseif beauty[$GirlNameGdsc] <60:
+- GirlsDesc.txt:180 | elseif beauty[$GirlNameGdsc] <70:
+- GirlsDesc.txt:182 | elseif beauty[$GirlNameGdsc] <80:
+- GirlsDesc.txt:188 | if otkroven[$GirlNameGdsc]>=3:
+- GirlsDesc.txt:198 | if otkroven[$GirlNameGdsc]>=5:
+- GirlsDesc.txt:205 | if otkroven[$GirlNameGdsc]>=7:
+- GirlsDesc.txt:206 | If sexacts[$GirlNameGdsc]=0:
+- GirlsDesc.txt:208 | elseif virginity[$GirlNameGdsc]=1:
+- GirlsDesc.txt:218 | If pregnancy[$GirlNameGdsc]<120:
+- GirlsDesc.txt:221 | if DebugFlag: pl 'Она беременна на <<pregnancy[$GirlNameGdsc]/7>> неделе.'
+- GirlsDesc.txt:222 | if pregnancy[$GirlNameGdsc]>=210: pl '<<$RealName[$GirlNameGdsc]>> беременна и находится на позднем сроке. Ее живот красноречиво об этом свидетельствует.'
+- GirlsDesc.txt:223 | if pregnancy[$GirlNameGdsc]<210 and pregnancy[$GirlNameGdsc] >=150: pl 'Средних размеров беременный животик сексуально напоминает  о бурной личной жизни <<$RealName[$GirlNameGdsc]>>.'
+- GirlsDesc.txt:224 | if pregnancy[$GirlNameGdsc]>=120 and pregnancy[$GirlNameGdsc] < 150: pl 'Видно что <<$RealName[$GirlNameGdsc]>> нагуляла себе животик, но он еще не очень заметен.'
+- GirlsDesc.txt:230 | if otkroven[$GirlNameGdsc]>=6:
+- GirlsDesc.txt:231 | If kids[$GirlNameGdsc]=0:
+- GirlsDesc.txt:233 | elseIf kids[$GirlNameGdsc]=1:
+- GirlSuggestDressFunc.txt:16 | if pregnancy[$GirlName]>120:
+- GirlSuggestDressFunc.txt:43 | if $bra[$GirlName]>'':
+- GirlSuggestDressFunc.txt:49 | if ShowOffLevel>=2:
+- GirlSuggestDressFunc.txt:58 | if ShowOffLevel=0:
+- GirlSuggestDressFunc.txt:60 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:62 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:78 | *p iif($bra[$GirlName]>'','закрытые лифом сиськи','голые')
+- GirlSuggestDressFunc.txt:80 | iif(ShowOffLevel=0,'Та заметила ваш взгляд, вспыхнула, и быстро прикрыла их руками.','Она заметила ваше любопытство, но лишь улыбнулась.')
+- GirlSuggestDressFunc.txt:82 | iif(ShowOffLevel=0,'"Впредь думай, куда лезешь!" крикнула вам вслед <<$RealName[$GirlName]>>.','"Ах, уходишь... Ну ладно," немного разочарованно промолвила вам вслед <<$RealName[$GirlName]>>.')
+- GirlSuggestDressFunc.txt:99 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:101 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:106 | if $panties[$GirlName]='':
+- GirlSuggestDressFunc.txt:108 | if (sluttiness[$GirlName] >49 and HadSex[$GirlName]>0) or sluttiness[$GirlName] >62:
+- GirlSuggestDressFunc.txt:110 | if DressBuyIsRelative=1: '"Вот оттуда ты и появился!" добавила ваша разбитная мамаша.'
+- GirlSuggestDressFunc.txt:125 | if HadSex['you']>5 and cametoday<cancumdaily:
+- GirlSuggestDressFunc.txt:126 | act 'Подрочить на <<iif(DressBuyIsRelative=1,''маму'',iif(DressBuyIsRelative=2,''сестру'',''зрелище''  ))>>':
+- GirlSuggestDressFunc.txt:129 | if ShowOffLevel<3:
+- GirlSuggestDressFunc.txt:130 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:132 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:141 | if Friends['irma']<4:
+- GirlSuggestDressFunc.txt:149 | if money>=10:
+- GirlSuggestDressFunc.txt:169 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:171 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:176 | if DressBuyIsRelative>0:
+- GirlSuggestDressFunc.txt:188 | iif(DressBuyIsRelative=1,'"Сыночек, мне ж потом сперму с лица долго смывать!"',iif(DressBuyIsRelative=2,'"Братик, ты что?"', '"Ты же мне всю прическу загубишь!"'))
+- GirlSuggestDressFunc.txt:189 | if HadSex[$GirlName]>0 and Rand(1,2)=1:
+- GirlSuggestDressFunc.txt:190 | 'Так как останавливаться вы явно не собирались, <<$RealName[$GirlName]>> решила проблему кардинально: быстро наклонившись, она обхватила губами головку вашего члена. Еле успела - вы незамедлительно разрядились прямо в ротик <<iif(DressBuyIsRelative=1,''вашей маме'',iif(DressBuyIsRelative=2,''сестре'', $RealName3[$GirlName]))>>'
+- GirlSuggestDressFunc.txt:193 | elseif Friends['irma']>5 and Rand(1,2)=1:
+- GirlSuggestDressFunc.txt:198 | 'Ирма делала последний замер, <<$RealName[$GirlName]>> смотрела на Ирму, и в этот момент вы брызнули прямо на эту парочку. Основной поток приземлился на лице <<iif(DressBuyIsRelative=1,''вашей мамы'',iif(DressBuyIsRelative=2,''сестренки'', $RealName2[$GirlName]))>>, немного попало на Ирму, а отдельные капли осели на снятом для примерки платье.<br>"Что же ты делаешь!" вскричала <<$RealName[$GirlName]>>. "Как же я теперь это отмою!" <br>Однако драму предотвратила обходительная Ирма, немедленно доставшая откуда-то полотенчико и воду. Совместными усилиями следы вашего восхищения снятием мерки были убраны. После этого <<$RealName[$GirlName]>> оделась.'
+- GirlSuggestDressFunc.txt:210 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:212 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:217 | *p '"Желание клиента для меня закон," - отозвалась Ирма. Приободренная этими словами <<$RealName[$GirlName]>>, даже и не подумав зашторить окна, начала распускать шнуровку на платье. Вскоре <<iif($bra[$GirlName]>'''',''она осталась выше пояса в одном лифчике'',''ее голые сиськи вывались наружу'')>>. Поймав ваш восхищенный взгляд, она улыбнулась и окончательно стянула платье, оставшись в '
+- GirlSuggestDressFunc.txt:218 | if $bra[$GirlName]='' and $panties[$GirlName]='':
+- GirlSuggestDressFunc.txt:220 | elseif $panties[$GirlName]='':
+- GirlSuggestDressFunc.txt:222 | elseif $bra[$GirlName]='':
+- GirlSuggestDressFunc.txt:230 | if RandVar<=3:
+- GirlSuggestDressFunc.txt:234 | if RandVar=1:
+- GirlSuggestDressFunc.txt:235 | 'как какой-то пацаненок заглянул в окно, да таки и остался стоять, с открытым от удивления ртом. <br><<iif($GirlName=''georgett'' or $GirlName=''liza'',''Шлюха'',$RealName[$GirlName])>> проследила за вашим взглядом и крикнула мальчонке:'
+- GirlSuggestDressFunc.txt:236 | if $GirlName='georgett' or $GirlName='liza':
+- GirlSuggestDressFunc.txt:237 | *p '"Хочешь лишиться девственности? Ищи меня в <<iif($CurrentLoc[$GirlName]=''TavernMain'',''трактире "Дикий Жеребец"'',''порту'')>>, дам скидку!"'
+- GirlSuggestDressFunc.txt:238 | elseif $GirlName='amanda':
+- GirlSuggestDressFunc.txt:244 | elseif RandVar=2:
+- GirlSuggestDressFunc.txt:245 | 'как какой-то мужичок, по виду <<dyneval($RandomOccupCode)>> стоит у окна и с интересом наблюдает за открывшимся зрелищем.<br><<iif($GirlName=''georgett'' or $GirlName=''liza'',''Шлюха'',$RealName[$GirlName])>> проследила за вашим взглядом и крикнула ему: '
+- GirlSuggestDressFunc.txt:246 | if $GirlName='georgett' or $GirlName='liza':
+- GirlSuggestDressFunc.txt:247 | *p '"Нравиться? Хочешь трахнуть? Тогда найди меня в <<iif($CurrentLoc[$GirlName]=''TavernMain'',''трактире "Дикий Жеребец"'',''порту'')>>, возьму не дорого!"'
+- GirlSuggestDressFunc.txt:248 | elseif $GirlName='amanda':
+- GirlSuggestDressFunc.txt:253 | elseif RandVar=3:
+- GiveBirth.txt:24 | if SandraVar['knowmolodost']=0:
+- GiveBirth.txt:34 | if $GirlName='sandra':
+- GiveBirth.txt:36 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirth.txt:38 | elseif $GirlName='becky':
+- GiveBirth.txt:40 | elseif $GirlName='liza':
+- GiveBirth.txt:42 | elseif $GirlName='georgett':
+- GiveBirth.txt:44 | elseif $GirlName='inga':
+- GiveBirth.txt:52 | if $GirlName='georgett':
+- GiveBirth.txt:54 | if sluttiness['liza']<55:
+- GiveBirth.txt:61 | elseif $GirlName='liza':
+- GiveBirth.txt:62 | if kids[$GirlName]=0:
+- GiveBirth.txt:66 | if kids[$GirlName]=1:
+- GiveBirth.txt:73 | elseif $GirlName='becky':
+- GiveBirth.txt:75 | if kids[$GirlName]=5:
+- GiveBirth.txt:80 | if $DaddySuspect1='эдди':
+- GiveBirth.txt:82 | elseif $DaddySuspect1='вы':
+- GiveBirth.txt:84 | elseif strcomp(lcase($DaddySuspect1),'.*герхард.*'):
+- GiveBirth.txt:89 | elseif $GirlName='amanda' or $GirlName='melissa':
+- GiveBirth.txt:90 | if kids[$GirlName]=0:
+- GiveBirth.txt:95 | if PregTotalSuspects[$GirlName]>2:
+- GiveBirth.txt:97 | If sluttiness['sandra']<45:
+- GiveBirth.txt:99 | If sluttiness[$GirlName]>60:
+- GiveBirth.txt:108 | If sluttiness[$GirlName]>60:
+- GiveBirth.txt:110 | If sluttiness['sandra']<65:
+- GiveBirth.txt:123 | if DaddySuspect1='вы' or DaddySuspect2='вы':
+- GiveBirth.txt:124 | if PregTotalSuspects[$GirlName]>2:
+- GiveBirth.txt:130 | If sluttiness['sandra']<55:
+- GiveBirth.txt:132 | If sluttiness[$GirlName]>65:
+- GiveBirth.txt:142 | elseif strcomp(lcase($DaddySuspect1),'.*легаре.*'):
+- GiveBirth.txt:143 | if PregTotalSuspects[$GirlName]>2:
+- GiveBirth.txt:148 | If sluttiness[$GirlName]>65:
+- GiveBirth.txt:151 | if sluttiness['sandra']<55:
+- GiveBirth.txt:160 | if sluttiness['sandra']<50:
+- GiveBirth.txt:161 | if kids[$GirlName]=0:
+- GiveBirth.txt:173 | elseif $GirlName='sandra':
+- GiveBirth.txt:175 | if DaddySuspect1='вы' or DaddySuspect2='вы':
+- GiveBirth.txt:176 | if DaddySuspect1='вы' and PregTotalSuspects[$GirlName]=1:
+- GiveBirth.txt:178 | elseif DaddySuspect1='вы':
+- GiveBirth.txt:184 | if Min(sluttiness['amanda'],sluttiness['melissa'])<55:
+- GiveBirth.txt:185 | $GirlOffended=iif(sluttiness['amanda']<55,'Аманда','Мелисса')
+- GiveBirth.txt:187 | If sluttiness[$GirlName]>62:
+- GiveBirth.txt:198 | elseif $GirlName='inga':
+- GiveBirth.txt:200 | If sluttiness['becky']>30:
+- GiveBirth.txt:213 | if age[$GirlName]<=18:
+- GiveBirth.txt:215 | elseif $GirlName='sandra' or $GirlName='becky':
+- GiveBirth.txt:217 | elseif $GirlName='georgett':
+- GiveBirth.txt:219 | elseif kids[$GirlName]=0:
+- GiveBirth.txt:224 | If sluttiness[$GirlName]<48:
+- GiveBirth.txt:235 | If sluttiness[$GirlName]<44:
+- GiveBirth.txt:243 | if dyneval($GetSexNum,$GirlName,'','inside','',dayspassed-2):
+- GiveBirth.txt:246 | if $GirlName='georgett' or $GirlName='liza':
+- GiveBirth.txt:248 | elseif sluttiness[$GirlName]>58:
+- GiveBirth.txt:250 | elseif sluttiness[$GirlName]>42:
+- GiveBirth.txt:257 | if RandVar=1:
+- GiveBirth.txt:259 | elseif RandVar=2:
+- GiveBirth.txt:269 | if kids[$GirlName]=0:
+- GiveBirth.txt:275 | if PregTotalSuspects[$GirlName]<4:
+- GiveBirth.txt:277 | if age[$GirlName]<=20:
+- GiveBirth.txt:282 | if sluttiness[$GirlName]<54:
+- GiveBirth.txt:286 | if PregTotalSuspects[$GirlName]>1:
+- GiveBirth.txt:291 | if sluttiness[$GirlName]<52:
+- GiveBirth.txt:295 | if $GirlName='amanda' or $GirlName='melissa' or $GirlName='inga':
+- GiveBirth.txt:296 | $Momname=iif($GirlName='amanda' or $GirlName='melissa','sandra','becky')
+- GiveBirth.txt:297 | if sluttiness[$Momname]<42:
+- GiveBirth.txt:302 | elseif age[$GirlName]<=20:
+- GiveBirthFinish.txt:8 | if $GirlName='sandra':
+- GiveBirthFinish.txt:10 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirthFinish.txt:12 | elseif $GirlName='becky':
+- GiveBirthFinish.txt:14 | elseif $GirlName='liza':
+- GiveBirthFinish.txt:16 | elseif $GirlName='georgett':
+- GiveBirthFinish.txt:18 | elseif $GirlName='inga':
+- GiveBirthFinish.txt:27 | 'Тут <<$RealName[$GirlName]>> приподнялась с ложа и что-то прошептала на ухо Франческе. Та выслушала ее, кивнула и, подняв младенца перед статуей Эллоны, провозглосила: "Перед лицом Великой Богини Любви, Урожая и Плодородия, нарекаю тебя <<$KidName>>! Возблагодари же Эллону за свое появление в этом мире,  <<iif($KidGender=''M'',''юный'',''юная'')>> <<$KidName>>!"<br><<$KidName>> ответил<<iif($KidGender=''M'','''',''a'')>> возмущенным писком.'
+- GiveBirthFinish.txt:31 | if $GirlName='sandra':
+- GiveBirthFinish.txt:32 | 'Вместе с Мелиссой и Амандой вы проводили свою маму с <<iif($KidGender=''M'',''новоприобретенным братиком'',''новоприобретенной сестричкой'')>> домой, в трактир. '
+- GiveBirthFinish.txt:33 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirthFinish.txt:34 | 'Вместе с мамой вы помогли <<$RealName3[$GirlName]>> и ее <<iif($KidGender=''M'',''сыночку'',''дочурке'')>> добраться до трактира. '
+- GiveBirthFinish.txt:35 | elseif $GirlName='becky':
+- GiveBirthFinish.txt:37 | elseif $GirlName='liza':
+- GiveBirthFinish.txt:38 | 'Вместе с Жоржеттой вы помогли Лизетте, вместе с ее <<iif($KidGender=''M'',''нагулянным мальчиком'',''нагулянной девочкой '')>>, добраться до дому. '
+- GiveBirthFinish.txt:39 | elseif $GirlName='georgett':
+- GiveBirthFinish.txt:40 | 'Вместе с Лизеттой вы помогли ее <<iif($KidGender=''M'',''новому братику'',''новой сестричке'')>> добраться до дому. Ну и мамочку Лизкину само собой не забыли. '
+- GiveBirthFinish.txt:41 | elseif $GirlName='inga':
+- GiveBirthFinish.txt:42 | 'Ребекки поблагодарила вас за поддержку и попрощалась. Бабушка с дочкой и <<iif($KidGender=''M'',''внучком'',''внучкой'')>> направились к себе домой, а вы к себе, в трактир. '
+- GiveBirthStep2.txt:13 | if GiveBirthTimer=0:
+- GiveBirthStep2.txt:15 | elseif GiveBirthTimer=1:
+- GiveBirthStep2.txt:17 | elseif GiveBirthTimer=2:
+- GiveBirthStep2.txt:19 | elseif GiveBirthTimer=3:
+- GiveBirthStep2.txt:23 | if $GirlName='sandra':
+- GiveBirthStep2.txt:25 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirthStep2.txt:27 | elseif $GirlName='becky':
+- GiveBirthStep2.txt:29 | if $DaddySuspect1='эдди' Or $DaddySuspect2='эдди':
+- GiveBirthStep2.txt:32 | elseif $GirlName='liza':
+- GiveBirthStep2.txt:34 | elseif $GirlName='georgett':
+- GiveBirthStep2.txt:36 | elseif $GirlName='inga':
+- GiveBirthStep2.txt:44 | if GiveBirthTimer>3: gs 'GiveBirthFinish'
+- HarassDiscussImage.txt:6 | if $args[0]='melissa':
+- HarassDiscussImage.txt:7 | if args[1]=0:
+- HarassDiscussImage.txt:9 | elseif args[1]=1:
+- HarassDiscussImage.txt:14 | elseif $GirlNameHSI='amanda':
+- HarassShowImage.txt:11 | if Eyewitness>0:
+- HarassShowImage.txt:12 | if $GirlNameHSI='melissa':
+- HarassShowImage.txt:13 | if ReactionHSI=0:
+- HarassShowImage.txt:15 | elseif $ActionHSI='ass' or $ActionHSI='dress':
+- HarassShowImage.txt:16 | if ReactionHSI>=3:
+- HarassShowImage.txt:22 | if ReactionHSI>=3:
+- HarassShowImage.txt:24 | elseif ReactionHSI=2:
+- HarassShowImage.txt:30 | elseif $GirlNameHSI='amanda':
+- HarassShowImage.txt:31 | if ReactionHSI=0:
+- HarassShowImage.txt:33 | elseif $ActionHSI='ass':
+- HarassShowImage.txt:34 | if ReactionHSI>=3:
+- HarassShowImage.txt:36 | elseif ReactionHSI=2:
+- HarassShowImage.txt:41 | elseif $ActionHSI='tits':
+- HarassShowImage.txt:42 | if ReactionHSI>=3:
+- HarassShowImage.txt:44 | elseif ReactionHSI=2:
+- HarassShowImage.txt:50 | if $panties[$GirlNameHSI]='':
+- HarassShowImage.txt:51 | if ReactionHSI>=2:
+- HarassShowImage.txt:60 | elseif $GirlNameHSI='sandra':
+- HarassShowImage.txt:61 | if $GirlNameEWH>'':
+- InitAmandaLizaTalkItems.txt:12 | if func('Table.Next',$Args[0], 'tmpArr'):
+- InitAmandaLizaTalkItems.txt:14 | $CheckConditionCode='result=iif('+$CheckConditionCode+',1,0)'
+- InitAmandaLizaTalkItems.txt:16 | if CheckConditionRes=1:
+- InitAmandaLizaTalkItems.txt:27 | if PhraseNum>0:
+- InitAmandaLizaTalkItems.txt:30 | if Trim($TableCodeToExec)>'':
+- IntAlberTalk.txt:12 | if Talked['Alber']<=2 and Rand(1,2)=1 and Friends['Alber']<5:
+- IntAlberTalk.txt:16 | if Talked['Alber']>2: 'Ничего нового из разговора вы не узнали.'
+- IntAlberTalk.txt:19 | gs 'Menu.AddCondition','MenuAlberTalk', "Result=IIF(Talked['Alber']<=2 and LegareProvokeYou=0,-1,0)"
+- IntAlberTalk.txt:24 | if Talked['Alber']<=2 and Rand(1,2)=1 and Friends['Alber']<=10:
+- IntAlberTalk.txt:28 | if Talked['Alber']>2: 'Ничего нового из разговора вы не узнали.'
+- IntAlberTalk.txt:31 | gs 'Menu.AddCondition','MenuAlberTalk', "Result=IIF(Friends['Alber']>=6 and Talked['Alber']<=2 and LegareProvokeYou=0,-1,0)"
+- IntAlberTalk.txt:35 | if AlberVar['talkedaboutliza']=0:
+- IntAlberTalk.txt:45 | gs 'Menu.AddCondition','MenuAlberTalk', "Result=IIF(Friends['Alber']>=5 and AlberVar['sawwithliza'] and Talked['Alber']<=2 and LegareProvokeYou=0,-1,0)"
+- IntAlberTalk.txt:50 | if AmandaVar['fucklegare']<>0:
+- IntAlberTalk.txt:52 | elseif AmandaVar['sucklegare']<>0:
+- IntAlberTalk.txt:62 | gs 'Menu.AddCondition','MenuAlberTalk', "Result=IIF(AlberVar['FightYouAmanda']>0 and Talked['Alber']<=2 and LegareProvokeYou=0,-1,0)"
+- IntAlberTalk.txt:71 | gs 'Menu.AddCondition','MenuAlberTalk', "Result=IIF(LegareProvokeYou<>0,-1,0)"
+- IntAlberTalk.txt:84 | gs 'Menu.AddCondition','MenuAlberTalk', "Result=IIF(LegareProvokeYou<>0,-1,0)"
+- IntAlberTalk.txt:92 | if Randvar=1:
+- IntAlberTalk.txt:105 | gs 'Menu.AddCondition','MenuAlberTalk', "Result=IIF(LegareProvokeYou<>0,-1,0)"
+- IntAmandaDance.txt:14 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep<10,-1,0)"
+- IntAmandaDance.txt:19 | if Friends[$GirlNameIAD]>=7:
+- IntAmandaDance.txt:22 | if Rand(1,3)=1:
+- IntAmandaDance.txt:31 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep=1 and AmandaVar['albernowdances']=0,-1,0)"
+- IntAmandaDance.txt:39 | if Friends[$GirlNameIAD]>=8 and sluttiness[$GirlNameIAD]>15:
+- IntAmandaDance.txt:42 | elseif Friends[$GirlNameIAD]>=5 and sluttiness[$GirlNameIAD]>=5:
+- IntAmandaDance.txt:52 | if DanceStep=DanceMaxIAD: 'Танец закончился и вы вернулись к колоннаде.'
+- IntAmandaDance.txt:54 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep=1 and AmandaVar['albernowdances']=0,-1,0)"
+- IntAmandaDance.txt:59 | if $HandsDance='waist': *p ' Ваши руки нежно обнимают талию сестрички.'
+- IntAmandaDance.txt:60 | if $HandsDance='ass': *p ' Ваши руки покоятся на попе вашей младшей сестренкии.'
+- IntAmandaDance.txt:61 | if $HandsDance='ass2': *p ' Ваши руки нежно сжимают упругую попку вашей сестренки через тонкую ткань ее платья.'
+- IntAmandaDance.txt:62 | if KissDance=1: *p ' Вы нежно целуете Аманду во время танца.'
+- IntAmandaDance.txt:63 | if KissDance=2: *p ' Вы страстно, переплетаясь языками, целуете свою сестренку, прилагая все усилия чтобы не сбиться с ритма.'
+- IntAmandaDance.txt:64 | if TitsDance>0: *p ' Аманда трется своими грудками о вашу грудь, потихоньку возбуждаясь.'
+- IntAmandaDance.txt:67 | if DanceStep=DanceMaxIAD: 'Танец закончился и вы вернулись к колоннаде.'
+- IntAmandaDance.txt:69 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0,-1,0)"
+- IntAmandaDance.txt:75 | if Friends[$GirlNameIAD]>=6 and sluttiness[$GirlNameIAD]>10:
+- IntAmandaDance.txt:80 | elseif Friends[$GirlNameIAD]>=5 and sluttiness[$GirlNameIAD]>=6:
+- IntAmandaDance.txt:94 | if DanceStep=DanceMaxIAD: 'Танец закончился и вы вернулись к колоннаде.'
+- IntAmandaDance.txt:96 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and $HandsDance<>'waist',-1,0)"
+- IntAmandaDance.txt:100 | if $HandsDance='waist':
+- IntAmandaDance.txt:105 | if Friends[$GirlNameIAD]>=7 and sluttiness[$GirlNameIAD]>18:
+- IntAmandaDance.txt:110 | elseif Friends[$GirlNameIAD]>=6 and sluttiness[$GirlNameIAD]>=12:
+- IntAmandaDance.txt:115 | elseif Friends[$GirlNameIAD]>=5 and sluttiness[$GirlNameIAD]>=9:
+- IntAmandaDance.txt:128 | if DanceStep=DanceMaxIAD: 'Танец закончился и вы вернулись к колоннаде.'
+- IntAmandaDance.txt:130 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and strcomp($HandsDance,'^ass')=0,-1,0)"
+- IntAmandaDance.txt:135 | if Friends[$GirlNameIAD]>=10 and sluttiness[$GirlNameIAD]>20:
+- IntAmandaDance.txt:141 | elseif Friends[$GirlNameIAD]>=8 and sluttiness[$GirlNameIAD]>=16:
+- IntAmandaDance.txt:146 | elseif Friends[$GirlNameIAD]>=7 and sluttiness[$GirlNameIAD]>=13:
+- IntAmandaDance.txt:159 | if DanceStep=DanceMaxIAD: 'Танец закончился и вы вернулись к колоннаде.'
+- IntAmandaDance.txt:161 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and $HandsDance='ass',-1,0)"
+- IntAmandaDance.txt:166 | if Friends[$GirlNameIAD]>=10 and sluttiness[$GirlNameIAD]>21:
+- IntAmandaDance.txt:171 | elseif Friends[$GirlNameIAD]>=8 and sluttiness[$GirlNameIAD]>=16:
+- IntAmandaDance.txt:176 | elseif Friends[$GirlNameIAD]>=7 and sluttiness[$GirlNameIAD]>=13:
+- IntAmandaDance.txt:190 | if DanceStep=DanceMaxIAD: 'Танец закончился и вы вернулись к колоннаде.'
+- IntAmandaDance.txt:192 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and KissDance=0,-1,0)"
+- IntAmandaDance.txt:199 | if tmpGropeReact=2:
+- IntAmandaDance.txt:206 | elseif tmpGropeReact>=3:
+- IntAmandaDance.txt:221 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and HadSex['amanda']>0 and (strcomp($HandsDance,'^ass')>0 or KissDance>0),-1,0)"
+- IntAmandaDance.txt:226 | if DanceStep=1: 'Вы посмотрели на Аманду и мессира Легаре.'
+- IntAmandaDance.txt:227 | if DanceStep-1<=AmandaVar['alberdanceadvance']:
+- IntAmandaDance.txt:229 | elseif AmandaVar['alberdanceadvance']=0:
+- IntAmandaDance.txt:237 | if DanceStep=6 and AmandaVar['LegareGo']=1:
+- IntAmandaDance.txt:243 | if DanceStep>=DanceMaxIAD+2 : 'Музыка доиграла и Аманда с мессиром Легаре разошлись.'
+- IntAmandaDance.txt:245 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=1 and DanceStep<DanceMaxIAD+2 and AmandaVar['albernowdances']=1,-1,0)"
+- IntAmandaDance.txt:250 | if AmandaVar['alberprohibit']=1:
+- IntAmandaDance.txt:255 | if AmandaVar['alberfriends']>=7:
+- IntAmandaDance.txt:270 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=1 and DanceStep<DanceMaxIAD+2 and AmandaVar['albernowdances']=1,-1,0)"
+- IntAmandaDance.txt:282 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=DanceMaxIAD or AmandaVar['albernowdances']=1 or DanceStep=1,-1,0)"
+- IntAmandaDressChange.txt:7 | if AgreedToRedress=1 and sluttiness[$GirlNameIAT]>=50:
+- IntAmandaDressChange.txt:9 | if $CurrentLoc['liza']<>'TavernMain' and RandVar=4 :RandVar=Rand(5,7)
+- IntAmandaDressChange.txt:10 | if $CurrentLoc['georgett']<>'TavernMain' and RandVar=3 :RandVar=Rand(5,7)
+- IntAmandaDressChange.txt:11 | if RandVar=1:
+- IntAmandaDressChange.txt:13 | if sluttiness['sandra']>=35:
+- IntAmandaDressChange.txt:18 | elseif RandVar=2:
+- IntAmandaDressChange.txt:20 | if sluttiness['melissa']>=35:
+- IntAmandaDressChange.txt:25 | elseif RandVar=3:
+- IntAmandaDressChange.txt:27 | elseif RandVar=4:
+- IntAmandaDressChange.txt:29 | elseif RandVar=5:
+- IntAmandaDressChange.txt:31 | elseif RandVar=6:
+- IntAmandaDressChange.txt:33 | elseif RandVar=7:
+- IntAmandaDressChange.txt:36 | if RandVar<=2: gs 'SlutFriendsIncrease', $GirlNameIAT, 0, 0, 0, 60, 2, 1
+- IntAmandaDressChange.txt:37 | if RandVar>=5 and RandVar<=7:
+- IntAmandaDressChange.txt:49 | if DressPartSlut[$topdress[$GirlNameIAT]]<4:
+- IntAmandaDressChange.txt:50 | if sluttiness[$GirlNameIAT]<35:
+- IntAmandaDressChange.txt:55 | if sluttiness[$GirlNameIAT]<50:
+- IntAmandaDressChange.txt:56 | if Rand(1,2)=1:
+- IntAmandaDressChange.txt:67 | if sluttiness[$GirlNameIAT]<50:
+- IntAmandaDressChange.txt:71 | if $CurrentLoc['liza']='TavernMain':
+- IntAmandaDressChange.txt:78 | if AgreedToRedress=1:
+- IntAmandaDressChange.txt:86 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and $bra[$GirlNameIAT]>'' and (AmandaVar['suckyou'] or AmandaVar['fuckyou']) and Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:94 | if $CurrentLoc['liza']='TavernMain':
+- IntAmandaDressChange.txt:96 | if $pantiesdef['liza']='':
+- IntAmandaDressChange.txt:106 | if DressPartSlut[$bottomdress[$GirlNameIAT]]<4:
+- IntAmandaDressChange.txt:107 | if sluttiness[$GirlNameIAT]+tmpLizaComandoBonus<42:
+- IntAmandaDressChange.txt:112 | if sluttiness[$GirlNameIAT]<50:
+- IntAmandaDressChange.txt:113 | if Rand(1,2)=1:
+- IntAmandaDressChange.txt:123 | if sluttiness[$GirlNameIAT]+tmpLizaComandoBonus<55:
+- IntAmandaDressChange.txt:130 | if AgreedToRedress=1:
+- IntAmandaDressChange.txt:138 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and $panties[$GirlNameIAT]>'' and (AmandaVar['suckyou'] or AmandaVar['fuckyou'])  and Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:145 | if $bra[$GirlNameIAT]>'' or ($bra[$GirlNameIAT]='' and sluttiness[$GirlNameIAT]>=50 and Rand(1,2)=1):
+- IntAmandaDressChange.txt:149 | if sluttiness[$GirlNameIAT]<45:
+- IntAmandaDressChange.txt:152 | elseif sluttiness[$GirlNameIAT]<60 and Rand(1,4)<=3:
+- IntAmandaDressChange.txt:162 | if AgreedToRedress=1:
+- IntAmandaDressChange.txt:169 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and  Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:176 | if $panties[$GirlNameIAT]>'' or ($panties[$GirlNameIAT]='' and sluttiness[$GirlNameIAT]>=45 and Rand(1,2)=1):
+- IntAmandaDressChange.txt:180 | if sluttiness[$GirlNameIAT]<45:
+- IntAmandaDressChange.txt:183 | elseif sluttiness[$GirlNameIAT]<60 and Rand(1,4)<=3:
+- IntAmandaDressChange.txt:193 | if AgreedToRedress=1:
+- IntAmandaDressChange.txt:200 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and  Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:210 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Friends[$GirlNameIAT]>8 and func('CheckDailyEventExists','','BuyDressTom')=0 and func('CheckDailyEventExists',$GirlNameIAT,'BuyDress')=0 and Talked[$GirlNameIAT]<2 and week<>6,-1,0)"
+- IntAmandaSex.txt:29 | if DressPartSlut[$topdress[$GirlNameASDS]]>=4 or topraised[$GirlNameASDS]=1:
+- IntAmandaSex.txt:34 | if $bra[$GirlNameASDS]='':
+- IntAmandaSex.txt:35 | if DressPartSlut[$topdress[$GirlNameASDS]]>=4 or topraised[$GirlNameASDS]=1:
+- IntAmandaSex.txt:42 | if DressPartSlut[$topdress[$GirlNameASDS]]>=4 or topraised[$GirlNameASDS]=1:
+- IntAmandaSex.txt:48 | if DressPartSlut[$topdress[$GirlNameASDS]]<4 and topraised[$GirlNameASDS]=0 and pregnancy[$GirlNameASDS]>=120:
+- IntAmandaSex.txt:60 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF($topdress[$GirlNameASDS]>''  and SomebodyCums=0 and $GirlModeASDS<>'minet' ,-1,0)"
+- IntAmandaSex.txt:65 | if $bra[$GirlNameASDS]='':
+- IntAmandaSex.txt:66 | if DressPartSlut[$topdress[$GirlNameASDS]]>=4:
+- IntAmandaSex.txt:73 | if DressPartSlut[$topdress[$GirlNameASDS]]>=4:
+- IntAmandaSex.txt:79 | if DressPartSlut[$topdress[$GirlNameASDS]]<4 and pregnancy[$GirlNameASDS]>=120:
+- IntAmandaSex.txt:89 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(($topdress[$GirlNameASDS]>'' and topraised[$GirlNameASDS]=0) and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:94 | if $topdress[$GirlNameASDS]='':
+- IntAmandaSex.txt:99 | if (HadSex['You']>=8 and $topdress[$GirlNameASDS]='') or HadSex['You']>=16:
+- IntAmandaSex.txt:112 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF($bra[$GirlNameASDS]>'' and ($topdress[$GirlNameASDS]='' or topraised[$GirlNameASDS]) and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:114 | if DressPartSlut[$bottomdress[$GirlNameASDS]]>=4:
+- IntAmandaSex.txt:122 | if DressPartSlut[$bottomdress[$GirlNameASDS]]>=4:
+- IntAmandaSex.txt:123 | if $panties[$GirlNameASDS]>'':
+- IntAmandaSex.txt:125 | elseif $pantiesdef[$GirlNameASDS]='':
+- IntAmandaSex.txt:131 | if $panties[$GirlNameASDS]>'':
+- IntAmandaSex.txt:133 | elseif $pantiesdef[$GirlNameASDS]='':
+- IntAmandaSex.txt:146 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(($bottomdress[$GirlNameASDS]>'' and bottomraised[$GirlNameASDS]=0) and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:153 | if bottomraised[$GirlNameASDS] :
+- IntAmandaSex.txt:156 | if $panties[$GirlNameASDS]>'':
+- IntAmandaSex.txt:158 | elseif $pantiesdef[$GirlNameASDS]='':
+- IntAmandaSex.txt:172 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF($bottomdress[$GirlNameASDS]>'' and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:178 | if bottomraised[$GirlNameASDS]=0 and $bottomdress[$GirlNameASDS]>'' and DressPartSlut[$bottomdress[$GirlNameASDS]]>=4:
+- IntAmandaSex.txt:180 | elseif bottomraised[$GirlNameASDS]=0 and $bottomdress[$GirlNameASDS]>'':
+- IntAmandaSex.txt:191 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF($panties[$GirlNameASDS]>'' and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:207 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF((CumFaceYou[$GirlNameASDS] or CumFaceOthers[$GirlNameASDS])  and SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:219 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF((CumTitsYou[$GirlNameASDS] or CumTitsOthers[$GirlNameASDS]) and TitsVisible[$GirlNameASDS] and SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:231 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF((CumInsideYou[$GirlNameASDS] or CumInsideOthers[$GirlNameASDS]) and PussyVisible[$GirlNameASDS] and SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:245 | if CumFaceYou[$GirlNameASDS]>0:' На язык вам попадают капли вашего семени, которым вы обкончали девушку раньше.'
+- IntAmandaSex.txt:246 | if CumFaceYou[$GirlNameASDS]=0 and CumFaceOthers[$GirlNameASDS]>0:' Вы чувствуете солоноватый привкус чужой спермы. Ваша шебутная сестра уже успела сегодня у кого-то отсосать!'
+- IntAmandaSex.txt:247 | if Arousal[$GirlNameASDS]<50: Arousal[$GirlNameASDS]=Arousal[$GirlNameASDS]+14
+- IntAmandaSex.txt:248 | if Arousal['You']<50: Arousal['You']=Arousal['You']+9
+- IntAmandaSex.txt:253 | if $GirlLocASDS<>'street':
+- IntAmandaSex.txt:254 | if TitsVisible[$GirlNameASDS] and PussyVisible[$GirlNameASDS]:
+- IntAmandaSex.txt:262 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:270 | if TitsVisible[$GirlNameASDS]=0:
+- IntAmandaSex.txt:271 | if DressPartSlut[$topdress[$GirlNameASDS]]=3 and $bra[$GirlNameASDS]='':
+- IntAmandaSex.txt:273 | elseif DressPartSlut[$topdress[$GirlNameASDS]]>=4 and $bra[$GirlNameASDS]='':
+- IntAmandaSex.txt:275 | elseif DressPartSlut[$topdress[$GirlNameASDS]]>=4 and $bra[$GirlNameASDS]>'':
+- IntAmandaSex.txt:282 | if CumTitsYou[$GirlNameASDS]>0:
+- IntAmandaSex.txt:284 | elseif CumTitsOthers[$GirlNameASDS]>0:
+- IntAmandaSex.txt:290 | if PussyVisible[$GirlNameASDS]=1:
+- IntAmandaSex.txt:293 | if bottomraised[$GirlNameASDS]=0 and $bottomdress[$GirlNameASDS]>'':
+- IntAmandaSex.txt:294 | if DressPartSlut[$bottomdress[$GirlNameASDS]]>=4:
+- IntAmandaSex.txt:299 | if $panties[$GirlNameASDS]>'':
+- IntAmandaSex.txt:309 | if $panties[$GirlNameASDS]='':
+- IntAmandaSex.txt:310 | if CumInsideYou[$GirlNameASDS]>0:
+- IntAmandaSex.txt:312 | elseif CumInsideOthers[$GirlNameASDS]>0:
+- IntAmandaSex.txt:321 | if $GirlLocASDS<>'street':
+- IntAmandaSex.txt:322 | if TitsVisible[$GirlNameASDS] and PussyVisible[$GirlNameASDS]:
+- IntAmandaSex.txt:324 | elseif PussyVisible[$GirlNameASDS]:
+- IntAmandaSex.txt:329 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:337 | if CumInsideYou[$GirlNameASDS]>0:'Ну а вы ощущаете привкус собственной спермы, медленно вытекающей из ее влагалища.'
+- IntAmandaSex.txt:338 | if CumInsideYou[$GirlNameASDS]=0 and CumInsideOthers[$GirlNameASDS]>0:'Ну а вы ощущаете привкус чьей-то спермы, медленно вытекающей из ее влагалища. Ваша сестра уже успела сегодня кому-то дать.'
+- IntAmandaSex.txt:340 | if LickPussy[$GirlNameASDS]=6:
+- IntAmandaSex.txt:349 | if $GirlLocASDS<>'street':
+- IntAmandaSex.txt:353 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF( PussyVisible[$GirlNameASDS] and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:363 | if $GirlLocASDS='street':
+- IntAmandaSex.txt:364 | if CockInMouth[$GirlNameASDS]:
+- IntAmandaSex.txt:370 | if CockInMouth[$GirlNameASDS]:
+- IntAmandaSex.txt:377 | if Arousal['You']<20:
+- IntAmandaSex.txt:380 | elseif Arousal['You']<40:
+- IntAmandaSex.txt:383 | elseif sluttiness[$GirlNameASDS]<40:
+- IntAmandaSex.txt:386 | elseif Arousal['You']<60:
+- IntAmandaSex.txt:394 | if sluttiness[$GirlNameASDS]<40:
+- IntAmandaSex.txt:404 | if $GirlLocASDS='street':
+- IntAmandaSex.txt:412 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:419 | if $GirlLocASDS='street':
+- IntAmandaSex.txt:420 | if pregnancy[$GirlNameASDS] <130:
+- IntAmandaSex.txt:421 | if CockInPussy[$GirlNameASDS]=0:
+- IntAmandaSex.txt:429 | if CockInPussy[$GirlNameASDS]=0:
+- IntAmandaSex.txt:434 | if pregnancy[$GirlNameASDS] >120:
+- IntAmandaSex.txt:441 | if CockInPussy[$GirlNameASDS]=0:
+- IntAmandaSex.txt:446 | if pregnancy[$GirlNameASDS] >120:
+- IntAmandaSex.txt:456 | if CockInPussy[$GirlNameASDS]=0 and AmandaVar['knownotvirgin']=0:
+- IntAmandaSex.txt:466 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and SomebodyCums=0 and Arousal['You']>=20 and Arousal[$GirlNameASDS]>=20 and PussyVisible[$GirlNameASDS] and EddieCockInPussy[$GirlNameASDS]=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:483 | if $GirlLocASDS='street':
+- IntAmandaSex.txt:489 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and (CockInMouth[$GirlNameASDS] or CockInTits[$GirlNameASDS]),-1,0)"
+- IntAmandaSex.txt:495 | if CockInMouth[$GirlNameASDS]:
+- IntAmandaSex.txt:497 | elseif CockInPussy[$GirlNameASDS]:
+- IntAmandaSex.txt:507 | if $GirlLocASDS='street':
+- IntAmandaSex.txt:513 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100,-1,0)"
+- IntAmandaSex.txt:520 | if CockInMouth[$GirlNameASDS]:
+- IntAmandaSex.txt:522 | elseif CockInPussy[$GirlNameASDS]:
+- IntAmandaSex.txt:533 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and TitsVisible[$GirlNameASDS] and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:541 | if pregnancy[$GirlNameASDS]<120 and sluttiness[$GirlName]<60:
+- IntAmandaSex.txt:543 | if tmpCumInside=0  and  cuminside['amanda']>=2:
+- IntAmandaSex.txt:545 | elseif tmpCumInside>4:
+- IntAmandaSex.txt:551 | if $GirlLocASDS<>'street':	gs 'ShowImage', $GirlNameASDS, 'sexroom', 'cumpussyangry'
+- IntAmandaSex.txt:552 | elseif pregnancy[$GirlNameASDS]>=120:
+- IntAmandaSex.txt:554 | if $GirlLocASDS<>'street':	gs 'ShowImage', $GirlNameASDS, 'sexroom', 'cumpussy' +Rand(1,2)
+- IntAmandaSex.txt:557 | if $GirlLocASDS<>'street':	gs 'ShowImage', $GirlNameASDS, 'sexroom', 'cumpussy' +Rand(1,2)
+- IntAmandaSex.txt:566 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and CockInPussy[$GirlNameASDS] and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:572 | if CurGiveOrgasms=GiveOrgasms[$GirlNameASDS]:
+- IntAmandaSex.txt:576 | elseif GiveOrgasms[$GirlNameASDS]>=CurGiveOrgasms+3:
+- IntAmandaSex.txt:598 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(SomebodyCums=0 and $GirlLocASDS='home' and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:605 | if CurGiveOrgasms=GiveOrgasms[$GirlNameASDS]:
+- IntAmandaSex.txt:608 | elseif GiveOrgasms[$GirlNameASDS]>=CurGiveOrgasms+3:
+- IntAmandaSex.txt:631 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(SomebodyCums=0 and $GirlLocASDS='street' and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaTalk.txt:16 | if Rand(1,3)=1:
+- IntAmandaTalk.txt:25 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and Friends[$GirlNameIAT]<5,-1,0)"
+- IntAmandaTalk.txt:30 | if AmandaVar['alberfriends']>=9:
+- IntAmandaTalk.txt:38 | If week=5 and time<3: gs 'AmandaLegareDanceSequence'
+- IntAmandaTalk.txt:43 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['alberprohibit']>0,-1,0)"
+- IntAmandaTalk.txt:53 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['prohibitliza']>0,-1,0)"
+- IntAmandaTalk.txt:65 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['gloryscold']>0,-1,0)"
+- IntAmandaTalk.txt:75 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['prohibitwithguys']>0,-1,0)"
+- IntAmandaTalk.txt:82 | if Rand(1,5)=1:
+- IntAmandaTalk.txt:90 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['warnnotwork']>0,-1,0)"
+- IntAmandaTalk.txt:96 | if friends[$GirlNameIAT]>11 and AmandaVar['alberprohibit']=0:
+- IntAmandaTalk.txt:107 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['knownotvirgin']>0 and AmandaVar['knowdeflowerlegare']=0 and AmandaVar['deflowerlegare']>0 ,-1,0)"
+- IntAmandaTalk.txt:109 | GS 'Menu.Add','MenuAmandaTalk','Запретить ей <<iif(virginity[''amanda''],''гулять'',''трахаться'')>> с месье Легаре',''
+- IntAmandaTalk.txt:111 | if AmandaVar['sawlegaresex']:
+- IntAmandaTalk.txt:122 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['knowlegaresex']>0 and AmandaVar['alberprohibit']=0,-1,0)"
+- IntAmandaTalk.txt:132 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['sawwithguys']>0 and AmandaVar['prohibitwithguys']=0,-1,0)"
+- IntAmandaTalk.txt:137 | if AmandaVar['fuckyou']:
+- IntAmandaTalk.txt:141 | if cuminside[$GirlNameIAT]>15:
+- IntAmandaTalk.txt:143 | elseif cuminside[$GirlNameIAT]=0:
+- IntAmandaTalk.txt:148 | if sluttiness[$GirlNameIAT]>=50:
+- IntAmandaTalk.txt:159 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['knowsexactive']>0 and pregnancy[$GirlNameIAT]<120 and AmandaVar['askzalettoday']=0 and virginity['amanda']=0,-1,0)"
+- IntAmandaTalk.txt:166 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3  and Friends[$GirlNameIAT]>=8 and pregnancy[$GirlNameIAT]>=120 ,-1,0)"
+- IntLizaDressChange.txt:7 | if AgreedToRedress=1 and sluttiness[$GirlNameILT]>=50:
+- IntLizaDressChange.txt:9 | if RandVar=1:
+- IntLizaDressChange.txt:11 | if sluttiness['sandra']>=35:
+- IntLizaDressChange.txt:16 | elseif RandVar=2:
+- IntLizaDressChange.txt:18 | if sluttiness['melissa']>=35:
+- IntLizaDressChange.txt:23 | elseif RandVar=3:
+- IntLizaDressChange.txt:25 | if sluttiness['amanda']>=35:
+- IntLizaDressChange.txt:31 | elseif RandVar=4:
+- IntLizaDressChange.txt:33 | elseif RandVar=5:
+- IntLizaDressChange.txt:35 | elseif RandVar=6:
+- IntLizaDressChange.txt:37 | elseif RandVar=7:
+- IntLizaDressChange.txt:40 | if RandVar<=2: gs 'SlutFriendsIncrease', $GirlNameILT, 0, 0, 0, 60, 2, 1
+- IntLizaDressChange.txt:41 | if RandVar>=5 and RandVar<=7:
+- IntLizaDressChange.txt:54 | if DressPartSlut[$bottomdress[$GirlNameILT]]<4:
+- IntLizaDressChange.txt:55 | if sluttiness[$GirlNameILT]<40:
+- IntLizaDressChange.txt:60 | if sluttiness[$GirlNameILT]<50:
+- IntLizaDressChange.txt:61 | if Rand(1,2)=1:
+- IntLizaDressChange.txt:71 | if sluttiness[$GirlNameILT]<50:
+- IntLizaDressChange.txt:78 | if AgreedToRedress=1:
+- IntLizaDressChange.txt:86 | gs 'Menu.AddCondition','MenuLizaTalk', "Result=IIF(Friends[$GirlNameILT]>8 and $panties[$GirlNameILT]>'' and  Talked[$GirlNameILT]<2,-1,0)"
+- IntLizaDressChange.txt:95 | gs 'Menu.AddCondition','MenuLizaTalk', "Result=IIF(Friends[$GirlNameILT]>8 and  Talked[$GirlNameILT]<2,-1,0)"
+- IntLizaDressChange.txt:101 | if $panties[$GirlNameILT]>'' or ($panties[$GirlNameILT]='' and sluttiness[$GirlNameILT]>=45 and Rand(1,2)=1):
+- IntLizaDressChange.txt:105 | if sluttiness[$GirlNameILT]<45:
+- IntLizaDressChange.txt:108 | elseif sluttiness[$GirlNameILT]<60 and Rand(1,4)<=3:
+- IntLizaDressChange.txt:118 | if AgreedToRedress=1:
+- IntLizaDressChange.txt:125 | gs 'Menu.AddCondition','MenuLizaTalk', "Result=IIF(Friends[$GirlNameILT]>8 and  Talked[$GirlNameILT]<2,-1,0)"
+- IntLizaDressChange.txt:134 | gs 'Menu.AddCondition','MenuLizaTalk', "Result=IIF(Friends[$GirlNameILT]>8 and func('CheckDailyEventExists','','BuyDressTom')=0 and func('CheckDailyEventExists',$GirlNameILT,'BuyDress')=0 and Talked[$GirlNameILT]<2 and week<>6,-1,0)"
+- Intro.txt:118 | if $pantiesdef[$GirlName]>'':
+- Intro.txt:121 | if $bradef[$GirlName]>'':
+- Intro.txt:124 | if $legsdef[$GirlName]>'':
+- Intro.txt:130 | if InitGirlsCounter<arrsize('$AllGirlNames'): jump 'loopinitgirls'
+- Intro.txt:141 | if rand(1,2)=1:
+- KidsFunctions.txt:9 | $KidGender=iif(Rand(1,2)=2,'Male','Female')
+- KidsFunctions.txt:17 | if $MomName='liza' or $MomName='georgett':
+- KidsFunctions.txt:19 | elseif $MomName='becky' or $MomName='inga':
+- KidsFunctions.txt:25 | if $MomName='liza':
+- KidsFunctions.txt:26 | if strcomp(lcase($DaddyType),'.*негр.*'):
+- KidsFunctions.txt:27 | $KidRace=iif(rand(1,2)=1, 'N','M')
+- KidsFunctions.txt:29 | $KidRace=iif(rand(1,2)=1, 'M','W')
+- KidsFunctions.txt:32 | if strcomp(lcase($DadName),'.*негр.*'):
+- KidsFunctions.txt:40 | if $KidRace='N': RandKid=Rand(3,4)
+- KidsFunctions.txt:41 | if $KidRace='M' and RandKid<=2:RandKid=Rand(1,4)
+- KidsFunctions.txt:42 | $KidEyes=iif(RandKid=1,'B',iif(RandKid=2,'G',iif(RandKid=3,'D','G')))
+- KidsFunctions.txt:45 | if $KidRace='M' and RandKid<>1: RandKid=Rand(1,5)
+- KidsFunctions.txt:46 | if $KidRace='M' and RandKid<>1: RandKid=Rand(1,5)
+- KidsFunctions.txt:48 | if ($MomName='becky' or $MomName='inga') and RandKid<>4: RandKid=Rand(1,5)
+- KidsFunctions.txt:49 | if ($MomName='becky' or $MomName='inga') and RandKid<>4: RandKid=Rand(1,5)
+- KidsFunctions.txt:51 | if $KidRace='N': RandKid=1
+- KidsFunctions.txt:53 | $KidHair=iif(RandKid=1,'D',iif(RandKid=2,'P',iif(RandKid=3,'L',iif(RandKid=4,'R','B'))))
+- KidsFunctions.txt:56 | if $KidRace='N': RandKid=Rand(3,4)
+- KidsFunctions.txt:57 | if $KidRace='M' and (RandKid=3 or  RandKid=5):RandKid=Rand(1,5)
+- KidsFunctions.txt:58 | if Mid($KidGender,1,1)='M' and (RandKid=1 or  RandKid=5): RandKid=Rand(1,5)
+- KidsFunctions.txt:59 | if $KidRace='M' and (RandKid=3 or  RandKid=5):RandKid=Rand(1,5)
+- KidsFunctions.txt:60 | if Mid($KidGender,1,1)='M' and (RandKid=1 or  RandKid=5): RandKid=Rand(1,5)
+- KidsFunctions.txt:61 | $KidHairStyle=iif(RandKid=1,'L',iif(RandKid=2,'K',iif(RandKid=3,'N',iif(RandKid=4,'S','Z'))))
+- KidsFunctions.txt:72 | if $MomName='sandra' or $MomName='melissa' or $MomName='amanda':
+- KidsFunctions.txt:80 | if $MomName='georgett' or $MomName='liza':
+- KidsFunctions.txt:85 | if $MomName='becky' or $MomName='inga':
+- KidsFunctions.txt:90 | if $MomName='amanda'  or $MomName='melissa' or $MomName='sandra':
+- KidsFunctions.txt:96 | if $MomName='liza' or $MomName='georgett':
+- KidsFunctions.txt:97 | if $CurrentLoc['georgett']='TavernMain':
+- KidsFunctions.txt:126 | if KidDays<180:
+- KidsFunctions.txt:127 | $KidDescription='новорожденн<<iif($KidGender=''M'',''ый мальчик'',''ая девочка'')>>'
+- KidsFunctions.txt:128 | elseif KidDays<400:
+- KidsFunctions.txt:129 | $KidDescription='крохотн<<iif($KidGender=''M'',''ый мальчик, умеющий пока только ползать,'',''ая девочка, умеющая пока только ползать,'')>>'
+- KidsFunctions.txt:130 | elseif KidDays<700:
+- KidsFunctions.txt:131 | $KidDescription='малыш<<iif($KidGender=''M'','', недавно начавший ходить,'',''ка, недавно начавшая ходить,'')>>'
+- KidsFunctions.txt:133 | $KidDescription=iif($KidGender='M','подвижный и любознательный маленький мальчик','шустрая и любопытная маленькая девочка')
+- KidsFunctions.txt:136 | $KidDescription+='. ' + iif($KidGender='M','Ему ','Ей ')
+- KidsFunctions.txt:140 | if KidDays<30:
+- KidsFunctions.txt:142 | elseif KidDays<365:
+- KidsFunctions.txt:144 | elseif KidDays<730:
+- KidsFunctions.txt:147 | $KidDescription+='недавно исполнилось <<KidAgeYears>> '+iif(KidAgeYears<=4,'года','лет')+'. '
+- KidsFunctions.txt:150 | if $KidRace='N':
+- KidsFunctions.txt:151 | $KidDescription+=iif($KidGender='M','Он негритенок','Она негритоска')+', с угольно-черной кожей. '
+- KidsFunctions.txt:152 | elseif $KidRace='M':
+- KidsFunctions.txt:153 | $KidDescription+=iif($KidGender='M','Он мулат','Она мулатка')+', с молочнокофейной кожей, плод смешения черной и белой рас. '
+- KidsFunctions.txt:154 | elseif $KidRace='H':
+- KidsFunctions.txt:155 | $KidDescription+=iif($KidGender='M','Его','Ее')+' кожа бела, даже слишком бела, а маленькие ушки слегка заостренны, выдавая полуэльфийское происхождение. '
+- KidsFunctions.txt:156 | elseif $KidRace='D':
+- KidsFunctions.txt:157 | $KidDescription+=iif($KidGender='M','Его','Ее')+' кожа имеет цвет кофе с молоком, а ушки слегка заостренны, свидетельствуя об и эльфийской, и черной крови. '
+- KidsFunctions.txt:159 | $KidDescription+=iif($KidGender='M','Он','Она')+' обычный ребенок. '
+- KidsFunctions.txt:162 | if $KidEyes='B':
+- KidsFunctions.txt:163 | $KidDescription+='Глазенки у '+iif($KidGender='M','него','нее')+' голубые '
+- KidsFunctions.txt:164 | elseif $KidEyes='G':
+- KidsFunctions.txt:165 | $KidDescription+='У '+iif($KidGender='M','него','нее')+' зеленые глаза '
+- KidsFunctions.txt:166 | elseif $KidEyes='D':
+- KidsFunctions.txt:167 | $KidDescription+='У '+ iif($KidGender='M','него','нее')+' черные глаза '
+- KidsFunctions.txt:169 | $KidDescription+='Глазенки у '+iif($KidGender='M','него','нее')+' серые '
+- KidsFunctions.txt:173 | if KidDays<180:
+- KidsFunctions.txt:174 | $KidDescription+='волосья почти полностью отсутствуют. Что, впрочем объясняется <<iif($KidGender=''M'',''его'',''ее'')>> юным возрастом - они еще просто не успели отрасти.'
+- KidsFunctions.txt:177 | $KidDescription+=iif($KidHair='D','темные',iif($KidHair='P','платиновые',iif($KidHair='L','светлые',iif($KidHair='R','рыжие','русые'))))
+- KidsFunctions.txt:179 | $KidDescription+=iif($KidHairStyle='L','длиные',iif($KidHairStyle='K','кудрявые',iif($KidHairStyle='N','кучерявые',iif($KidHairStyle='S','короткие','в локонах'))))
+- KidsFunctions.txt:190 | if func('Table.Next', 'KidsList', 'tmpTableArray'):
+- KidsFunctions.txt:195 | if LastDayBorn=0:
+- KidsFunctions.txt:206 | if args[1]=0: args[1]=5
+- KidsFunctions.txt:207 | if Breastfeed[$args[0]]:
+- KidsFunctions.txt:210 | if func('Table.Next', 'KidsList', 'tmpTableArray'):
+- KidsFunctions.txt:211 | if dayspassed-tmpTableArray['DayBorn']<300:
+- KidsFunctions.txt:217 | if $KidName>'' and Rand(1,args[1])=1:GiveTityu=1
+- KidsFunctions.txt:220 | if GiveTityu:
+- KidsFunctions.txt:222 | *p 'Вы заметили что <<$RealName[$MomName]>> решила дать ' + iif($KidGender='M','своему сыночку','своей дочурке') + ' сисю. '
+- KidsFunctions.txt:223 | if sluttiness[$args[0]]>61:
+- KidsFunctions.txt:224 | 'Не смущаясь чужих взоров, она приспустила свое платье ' + iif($bra[$MomName]>'','и сняла лифчик','под которым ожидаемо ничего не оказалось')+'. Обнажив обе набухшие от молока сиськи, она пристроила ребенка к одной из них. Вторую грудь, с увеличившимся от кормления соском, она прикрыть не удосужилась.'
+- KidsFunctions.txt:225 | elseif sluttiness[$args[0]]>52:
+- KidsFunctions.txt:226 | 'Не смущаясь тем, что может быть не одна, она приспустила с '+ iif(Rand(1,2)=1,'левой','правой')+' стороны свое платье ' + iif($bra[$MomName]>'','а затем приспустила и лифчик','под которым ожидаемо ничего не оказалось')+'. Обнажив набухшую от молока грудь, <<$RealName[$MomName]>> пристроила к ней ребенка.'
+- KidsFunctions.txt:227 | elseif sluttiness[$args[0]]>38:
+- KidsFunctions.txt:233 | if sluttiness[$args[0]]>38:
+- KidsFunctions.txt:234 | iif($KidGender='M','Маленький','Маленькая')+' '+ dyneval($ShowKidInteractionMenu,KidId)+' довольно сосет сисю. Иногда он'+iif($KidGender='M','','а')+' выпускает сосок, но заботливая <<$RealName[$MomName]>> немедленно помогает '+iif($KidGender='M','ему','ей')+'.<br>'
+- KidsFunctions.txt:236 | iif($KidGender='M','Маленький','Маленькая')+' '+ dyneval($ShowKidInteractionMenu,KidId)+' довольно сосет сисю под шалью. Иногда из под нее раздается возмущенный писк, видимо он'+iif($KidGender='M','','а')+' выпускает сосок, но заботливая <<$RealName[$MomName]>> приходит на помощь, что-то поправляя у себя под накидкой.<br>'
+- KidsFunctions.txt:243 | $tmpShowFullKidsDescForMenu='Это <<$KidName>>, '+iif($KidGender='M','сын','дочка')+' <<$RealName2[$KidMomName]>>. '
+- KidsFunctions.txt:244 | if KidDaddySuspects>1:
+- KidsFunctions.txt:245 | $tmpShowFullKidsDescForMenu+= 'Она считает, что его отец - <<$KidAssumedDad>>, но, вообще-то, у нее есть еще <<(KidDaddySuspects-1)>> кандидат'+iif(KidDaddySuspects=2,'',iif(KidDaddySuspects>5,'ов','а'))+'. '
+- KidsFunctions.txt:247 | $tmpShowFullKidsDescForMenu+= 'Счастливая мамашка уверенна, что '+iif($KidGender='M','его','ее') +' отец - <<$KidAssumedDad>>. '
+- KidsFunctions.txt:258 | !gs 'Menu.AddCondition','KidInteractionMenu<<KidId>>', "Result=IIF(FranVar['meet']=0 and Talked[$GirlName]<3,-1,0)"
+- KidsFunctions.txt:273 | if func('Table.Next', 'KidsList', 'tmpKidsList'):
+- KidsFunctions.txt:274 | if dayspassed-tmpKidsList['DayBorn']<400 and dayspassed-tmpKidsList['DayBorn']>=180:
+- KidsFunctions.txt:276 | elseif dayspassed-tmpKidsList['DayBorn']>=400:
+- KidsFunctions.txt:283 | if arrsize('KidsIDListingAge1')=1:
+- KidsFunctions.txt:285 | elseif arrsize('KidsIDListingAge1')>1:
+- KidsFunctions.txt:291 | *p dyneval($ShowKidInteractionMenu, KidsIDListingAge1[i]) + iif(i<arrsize('KidsIDListingAge1')-1,', ','.<br>')
+- KidsFunctions.txt:294 | if arrsize('KidsIDListingAge2')>0:
+- KidsFunctions.txt:295 | if arrsize('KidsIDListingAge1')>0:
+- KidsFunctions.txt:301 | if arrsize('KidsIDListingAge2')=1:
+- KidsFunctions.txt:303 | elseif arrsize('KidsIDListingAge2')>1:
+- KidsFunctions.txt:309 | *p dyneval($ShowKidInteractionMenu, KidsIDListingAge2[i]) + iif(i<arrsize('KidsIDListingAge2')-1,', ','.<br>')
+- KidsFunctions.txt:319 | if (topraised[$args[0]]=1 or $topdress[$args[0]]='') and $bra[$args[0]]='':
+- KidsFunctions.txt:320 | if Lactate[$args[0]] and Rand(1,2)=1: 'Из разбухшего соска с большой ареолой вытекла капелька молока.'
+- KidsFunctions.txt:325 | if Lactate[$args[0]] and Arousal[$args[0]]>35:
+- KidsFunctions.txt:326 | if $Args[1]>'':
+- KidsFunctions.txt:327 | if TitsVisible[$args[0]]=0:
+- KidsFunctions.txt:328 | if bra[$args[0]]='':
+- KidsFunctions.txt:336 | if TitsVisible[$args[0]]=0:
+- KidsFunctions.txt:337 | if bra[$args[0]]='':
+- KidsFunctions.txt:349 | if Lactate[$args[0]] and Arousal[$args[0]]>45:
+- KidsFunctions.txt:350 | if $Args[1]>'':
+- KidsFunctions.txt:361 | if Lactate[$args[0]] and Arousal[$args[0]]>60 and Rand(1,3)=1:
+- KidsFunctions.txt:362 | if Rand(1,2)=1:
+- KidsFunctions.txt:363 | 'Вы заметили, что из сосков <<$RealName2[$args[0]]>> в такт <<iif($args[1]>'''',''толчкам ''+$args[1],''вашим толчкам'' )>> стало побрызгивать молоко. '
+- KidsFunctions.txt:379 | if func('Table.Next', 'KidsList', 'tmpTableArray'):
+- KidsFunctions.txt:380 | if dayspassed-tmpTableArray['DayBorn']>365*2:
+- KidsFunctions.txt:390 | BasePeekChance=iif(sluttiness[$MomName]>70,4,iif(sluttiness[$MomName]>55,8,iif(sluttiness[$MomName]>40,11,iif(sluttiness[$MomName]>30,12,iif(sluttiness[$MomName]>20,14,16)))))
+- KidsFunctions.txt:395 | PeekChance=7*BasePeekChance*iif(PeekingKidsListAge[i]>=4,1,2)
+- KidsFunctions.txt:396 | if Rand(1, PeekChance)=1:
+- KidsFunctions.txt:397 | *p '<br>Вдруг вы заметили что из-за приоткрытой двери за вами удивленно следит <<dyneval($ShowKidInteractionMenu, PeekingKidsListId[i])>>, <<$PeekingKidsList[i]>>, <<iif($PeekingKidsGenderList[i]=''M'', ''сыночек'', ''дочка'')>> <<$RealName2[$MomName]>>. '
+- KidsFunctions.txt:398 | if PeekingKidsListAge[i]>=4:
+- KidsFunctions.txt:400 | elseif PeekingKidsListAge[i]>=3:
+- KidsFunctions.txt:405 | if RandVar=1:
+- KidsFunctions.txt:406 | *p 'Наблюдая за кувырканием мамочки <<iif($PeekingKidsGenderList[i]=''M'', ''он усмехнулся и сделал'', ''она рассмеялась и сделала'')>>  пошлый жест.'
+- KidsFunctions.txt:407 | elseif RandVar=2:
+- KidsFunctions.txt:408 | *p 'На <<iif($PeekingKidsGenderList[i]=''M'', ''его лице'', ''ее личике'')>> застыло мечтательное выражение.'
+- KidsFunctions.txt:409 | elseif RandVar=3:
+- KidsFunctions.txt:410 | *p 'От увиденного <<iif($PeekingKidsGenderList[i]=''M'', ''его'', ''ее'')>> глазенки расширились а щеки стали пунцовыми.'
+- KidsFunctions.txt:412 | *p '<<iif($PeekingKidsGenderList[i]=''M'', ''Он явно удивлен'', ''Она явно удивлена'')>> происходящим.'
+- KidsFunctions.txt:414 | if $PeekingKidsGenderList[i]='M':
+- Loc.txt:8 | if $CurLoc='TavernProstClients' or $CurLoc='StreetClients' or $CurLoc='SexPort' or $CurLoc='SexProstTavern' or $CurLoc='ChurchAfterCermon' or $CurLoc='ChurchIspoved' or $CurLoc='TavernGloryHole'  or $CurLoc='FridayDance' or $CurLoc='DressTry' or $CurLoc='BeckyHomeFront'  or $CurLoc='BeckyHome' or $CurLoc='AfterDanceLegare'  or $CurLoc='TavernAmandaRoom' or $CurLoc='AfterDanceSexLegare' or $CurLoc='AmandaLoverSex' or $Curloc='SherwoodTravel':
+- Loc.txt:12 | if $CurLoc='TavernMain' and $TavernEventOngoing>'':
+- Loc.txt:16 | if SignalBlockTime:
+- Loc.txt:21 | if BlockTimeAdvance=0:
+- menu_tavernstat.txt:28 | if jobWhoreAvail['georgett']=1:
+- menu_tavernstat.txt:31 | if TavernGloryHole=2:
+- menu_tavernstat.txt:121 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobGloryHoleAvail['georgett'] and jobgloryholeTommorow['georgett']=0 and func('GloryHoleBusy','georgett')=0,-1,0)"
+- menu_tavernstat.txt:130 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobWhoreAvail['georgett'] and jobwhoreTommorow['georgett']=0,-1,0)"
+- menu_tavernstat.txt:147 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobGloryHoleAvail['liza'] and jobgloryholeTommorow['liza']=0 and func('GloryHoleBusy','liza')=0,-1,0)"
+- menu_tavernstat.txt:156 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobWhoreAvail['liza'] and jobwhoreTommorow['liza']=0,-1,0)"
+- menu_tavernstat.txt:166 | if jobWhoreAvail['georgett']:
+- menu_tavernstat.txt:169 | if jobWhoreAvail['liza']:
+- MomDressComplaint.txt:8 | $GirlSillyName=iif($GirlName='amanda','Амандочк','Меллисочк')
+- MomDressComplaint.txt:13 | if pregnancy[$GirlName]>150:KidsOrPregTmp=1
+- MomDressComplaint.txt:14 | if kids[$GirlName]>0:KidsOrPregTmp=2
+- MomDressComplaint.txt:18 | if sluttiness[$GirlName]>=60 or (sluttiness[$GirlName]>=45 and Rand(1,2)=1) or (sluttiness[$GirlName]>=35 and Rand(1,4)=1):
+- MomDressComplaint.txt:22 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- MomDressComplaint.txt:34 | if sluttiness['sandra']<50:
+- MomDressComplaint.txt:35 | 'Вы мирно и спокойно шли по своим делам, когда вас вдруг остановила ваша матушка: "Стефан, мне надо с тобой поговорить."<br>Отведя вас в сторонку, она продолжила: "<<iif(TalkedBeforeTmp>0,''Я знаю, мы уже про это говорили, но не могу дальше молчать. '','''')>>Ты видел как <<$RealName[$GirlName]>> вырядилась? Как блядь последняя, извини за выражение! Сиськи практически наружу, подол короче некуда! Мне порой кажется, что она и нижнего белья-то не одевает!'
+- MomDressComplaint.txt:36 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:38 | if $GirlName='amanda' and AmandaVar['prohibitliza']:
+- MomDressComplaint.txt:50 | if  KidsOrPregTmp>0:
+- MomDressComplaint.txt:51 | 'И связи ее повадок с тем, что она уже <<iif(KidsOrPregTmp=2,''байстрюка'',''пузо'')>> себе нагуляла ты тоже не видишь?"'
+- MomDressComplaint.txt:77 | *p '<br>"А чего бы не заметить-то?" сказали вы глядя маме в глаза. "Это ж я ей это платье и купил. Думаю оно ей идет. И посетителям нравится, смотри как они на ее <<iif(Rand(1,2)=1,''задницу'',''сиськи'')>> пялятся."<br>"Ты, ты..." потрясенно ответила вам Сандра. "Значит ты покупаешь сестре такие шмотки, чтобы на нее бухие мужили пялились и за задницу хватали?"<br>"Ага," довольно ответили вы. "Да ей и самой внимание приятно."<br>"И не стыдно тебе из сестры блядь делать? Ты же брат, ты должен ее защищать!'
+- MomDressComplaint.txt:78 | if  KidsOrPregTmp>0:
+- MomDressComplaint.txt:79 | ' Она ведь из-за твоего попустительства уже <<iif(KidsOrPregTmp=2,''байстрюка'',''пузо'')>> себе нагуляла."'
+- MomDressComplaint.txt:99 | if (sluttiness['sandra']>=20 and Rand(1,4)=1) or (sluttiness['sandra']>=38 and Rand(1,2)=1) or sluttiness['sandra']>=47:
+- MomDressComplaint.txt:104 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:110 | if RandVar=1:
+- MomDressComplaint.txt:113 | elseif RandVar=2:
+- MomDressComplaint.txt:121 | if RandVar2>0:
+- MomDressComplaint.txt:123 | 'ОТ ПЕРЕНЕСЕННОЙ ОБИДЫ ЕЕ НАВЫКИ <<$TmpProfDesc>> УПАЛИ НА <<RandVar2>> <<iif(RandVar2=1,''ЕДИНИЦУ'',''ЕДИНИЦЫ'')>>'
+- MomDressComplaint.txt:130 | 'Вы шли себе по своим делам, и пересеклись с вашей матушкой. Увидев вас та заметила: "<<iif(TalkedBeforeTmp>0,''Я уже про это говорила, но все таки '','''')>> <<$GirlSillyName>>a наша совсем большая стала. Уже одевается, как взрослая, знает как себя подать. Смотри как на нее не то, что мальчишки всякие, а даже взрослые мужики у нас в трактире смотрят. Умничка!"'
+- MomDressComplaint.txt:134 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:144 | if $GirlName='amanda':
+- MomDressComplaint.txt:145 | 'Заодно вы <<iif(AmandaVar[''prohibitliza'']=1,''еще раз '','''')>>запретили ей болтать с Лизеттой, источником грязи и разврата.'
+- MomDressComplaint.txt:149 | if sluttiness[$GirlName]>=60 or (sluttiness[$GirlName]>=45 and Rand(1,2)=1) or (sluttiness[$GirlName]>=35 and Rand(1,4)=1):
+- MomDressComplaint.txt:150 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:157 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- MomDressComplaint.txt:178 | *p '"Да, оно ей очень идет," отозвались вы. "Это ж я ей этот наряд и купил. И посетителям нравится, смотри как они на ее <<iif(Rand(1,2)=1,''задницу'',''сиськи'')>> пялятся. Даже щипают порой, вот как она им нравится."<br>
+- MomDressComplaint.txt:180 | if  KidsOrPregTmp>0:
+- MomDressComplaint.txt:181 | 'Она ведь действительно взрослая, уже <<iif(KidsOrPregTmp=2,''байстрюка'',''пузо'')>> успела себе нагулять."'
+- MorningSickness.txt:9 | if pregnancy[$GirlName]>14:
+- MorningSickness.txt:11 | elseif pregnancy[$GirlName]>0:
+- MorningSickness.txt:16 | if rand(1,3)=1:
+- MorningSickness.txt:23 | if kids[$GirlName]>0:
+- MorningSickness.txt:24 | if CumInsideLastDays>2+Rand(1,8):
+- MorningSickness.txt:25 | if Zaderzhka=0:
+- MorningSickness.txt:27 | elseif Zaderzhka>=3+Rand(1,5):
+- MorningSickness.txt:32 | elseif CumInsideLastDays=0:
+- MorningSickness.txt:33 | if Zaderzhka=0:
+- MorningSickness.txt:39 | if Zaderzhka=0:
+- MorningSickness.txt:41 | elseif Zaderzhka>=10+Rand(1,8):
+- MorningSickness.txt:43 | elseif Zaderzhka>=8:
+- MorningSickness.txt:50 | if CumInsideLastDays>6+Rand(3,12):
+- MorningSickness.txt:51 | if Zaderzhka<5:
+- MorningSickness.txt:53 | elseif Zaderzhka>=10+Rand(2,10):
+- MorningSickness.txt:58 | elseif cuminside[$GirlName]=0:
+- MorningSickness.txt:60 | elseif CumInsideLastDays=0:
+- MorningSickness.txt:61 | if Zaderzhka<7:
+- MorningSickness.txt:67 | if Zaderzhka>=10+Rand(2,10):
+- MorningSickness.txt:78 | if MSickZaletCommentMade=0:
+- MorningSickness.txt:79 | if CumInsideLastDays>15+Rand(1,10):
+- MorningSickness.txt:84 | if $GirlName='amanda' or $GirlName='melissa':
+- MorningSickness.txt:102 | if ZaletOpinion=3:
+- MorningSickness.txt:104 | elseif ZaletOpinion=2:
+- MorningSickness.txt:106 | elseif ZaletOpinion=1:
+- MorningSickness.txt:115 | if Zaderzhka>20+Rand(1,8):
+- MorningSickness.txt:117 | if Rand(1,2)=1:ZaletOpinion=Min(3,ZaletOpinion+1)
+- MorningSickness.txt:118 | elseif ZaletOpinion=3:
+- MorningSickness.txt:120 | elseif Zaderzhka>10+Rand(1,4):
+- MorningSickness.txt:122 | if Rand(1,4)=1:ZaletOpinion=Min(3,ZaletOpinion+1)
+- MorningSickness.txt:127 | if ZaletOpinion<=1:
+- MorningSickness.txt:129 | elseif ZaletOpinion<3:
+- MorningSickness.txt:140 | if ZaletOpinion=3:
+- MorningSickness.txt:143 | elseif ZaletOpinion=0:
+- MorningSickness.txt:155 | if ZaletOpinion=3:
+- MorningSickness.txt:157 | elseif ZaletOpinion=0:
+- NextDay_FinishDayEvents.txt:6 | if GeorgettVar['TalkChurchAfterCermonLiza'] and LizaVar['ProstStart']=0: LizaVar['ProstStart']=1
+- NextDay_FinishDayEvents.txt:9 | if ChurchAfterCermon['becky']<4 and week=7 and BeckyVar['PriestAdvice']>0:
+- NextDay_FinishDayEvents.txt:10 | if BeckyVar['PriestAdvice']=1 or BeckyVar['PriestAdvice']=2:
+- NextDay_FinishDayEvents.txt:12 | if Rand(1,70)*30<=ChurchDonatedAmount:	BeckyVar['PriestAdvice']=3
+- NextDay_FinishDayEvents.txt:14 | if BeckyVar['PriestAdvice']=3:
+- NextDay_FinishDayEvents.txt:15 | if BeckyVar['visitedhome']<7 and BeckyVar['EddieTryToFuck']>=4:BeckyVar['visitedhome']=7
+- NextDay_FinishDayEvents.txt:23 | if func('Table.Next','TodaySexEvents', 'tmpArray'):
+- NextDay_FinishDayEvents.txt:24 | if $tmpArray['GirlName']='georgett' and tmpArray['EventType']=99 and $tmpArray['Place']='Prostitution':
+- NextDay_FinishDayEvents.txt:26 | elseif $tmpArray['GirlName']='georgett' and $tmpArray['Place']='EddieHomeVisit':
+- NextDay_FinishDayEvents.txt:28 | elseif $tmpArray['GirlName']='liza' and tmpArray['EventType']=99:
+- NextDay_FinishDayEvents.txt:30 | elseif $tmpArray['GirlName']='inga' and $tmpArray['Place']='Lucas':
+- NextDay_FinishDayEvents.txt:31 | gs 'PregnancyCheck', $tmpArray['GirlName'], iif(Rand(1,3)<=2,'inside','mouth'), 1, 'Лукас'
+- NextDay_FinishDayEvents.txt:32 | elseif $tmpArray['Place']='Glory':
+- NextDay_FinishDayEvents.txt:34 | if sluttiness[$tmpArray['GirlName']]>=80:
+- NextDay_FinishDayEvents.txt:35 | if Rand(1,15)=1: $GloryHoleInside='inside'
+- NextDay_FinishDayEvents.txt:36 | elseif sluttiness[$tmpArray['GirlName']]>=60:
+- NextDay_FinishDayEvents.txt:37 | if Rand(1,30)=1: $GloryHoleInside='inside'
+- NextDay_FinishDayEvents.txt:38 | elseif sluttiness[$tmpArray['GirlName']]>=50:
+- NextDay_FinishDayEvents.txt:39 | if Rand(1,60)=1: $GloryHoleInside='inside'
+- NextDay_FinishDayEvents.txt:42 | if tmpArray['EventType']=1:
+- NextDay_FinishDayEvents.txt:44 | elseif tmpArray['EventType']=2:
+- NextDay_FinishDayEvents.txt:46 | elseif GloryHoleLook=3:
+- NextDay_FinishDayEvents.txt:48 | elseif tmpArray['EventType']=4:
+- NextDay_FinishDayEvents.txt:53 | elseif $tmpArray['GirlName']='amanda' and $tmpArray['Place']='glorytry':
+- NextDay_FinishDayEvents.txt:56 | elseif $tmpArray['GirlName']='amanda' and $tmpArray['Place']='legarerun':
+- NextDay_FinishDayEvents.txt:58 | elseif $tmpArray['GirlName']='amanda' and $tmpArray['Place']='lovermeet':
+- NextDay_FinishDayEvents.txt:60 | elseif $tmpArray['Place']='Priest':
+- NextDay_FinishDayEvents.txt:62 | if $tmpArray['GirlName']='becky' and Rand(1,2)=1: DayLastOrgasmGiven['becky']=dayspassed
+- NextDay_FinishDayEvents.txt:63 | elseif $tmpArray['GirlName']='becky':
+- NextDay_FinishDayEvents.txt:64 | if $tmpArray['Place']='StoreLover':
+- NextDay_FinishDayEvents.txt:65 | if tmpArray['EventType']=1: gs 'PregnancyCheck', 'becky', 'inside', 1, 'Легаре'
+- NextDay_FinishDayEvents.txt:66 | if tmpArray['EventType']=2: gs 'PregnancyCheck', 'becky', 'inside', 1, '', 1, 'Неизвестный грузчик'
+- NextDay_FinishDayEvents.txt:68 | elseif $tmpArray['Place']='EddieMom':
+- NextDay_FinishDayEvents.txt:69 | if cametoday['eddie']=0:
+- NextDay_FinishDayEvents.txt:70 | gs 'PregnancyCheck', $tmpArray['GirlName'], iif(Rand(1,2)=1,'inside','mouth'), 1, 'eddie'
+- NextDay_FinishDayEvents.txt:71 | if Rand(1,5)=1: DayLastOrgasmGiven['becky']=dayspassed
+- NextDay_FinishDayEvents.txt:84 | if func('Table.Next','GirlDance', 'tmpArray'):
+- NextDay_FinishDayEvents.txt:86 | if tmpArray['GoOut']=1:
+- NextDay_FinishDayEvents.txt:94 | if AmandaVar['gloryscold'] or AmandaVar['glorywalkout'] or AmandaVar['glorysuck'] or AmandaVar['glorydeflower']: AmandaVar['gloryyouknow']=1
+- NextDay_FinishDayEvents.txt:95 | if AmandaVar['glorysuck']:AmandaVar['suckyou']=1
+- NextDay_FinishDayEvents.txt:96 | if AmandaVar['glorydeflower']:AmandaVar['fuckyou']=1
+- NextDay_FinishDayEvents.txt:97 | if AmandaVar['glorydeflower'] or AmandaVar['fuckyou'] or AmandaVar['sawlegaresex'] or AmandaVar['sawwithguys'] or AmandaVar['knowlegaresex'] or AmandaVar['knownotvirgin']: AmandaVar['knowsexactive']=1
+- NextDay_FinishDayEvents.txt:113 | if func('Table.Next','DailyEventsList', 'tmpArray'):
+- NextDay_FinishDayEvents.txt:115 | if tmpArray['KeepNextDay']=<0:
+- NextDay_FinishDayEvents.txt:119 | if $tmpArray['EventType']='DressNoShow':gs 'Table.SetValue', 'DailyEventsList','id:'+LineNum,'Time',-1
+- NextDay_FinishDayEvents.txt:121 | if $tmpArray['EventType']='BuyDressTom' and week<>6:
+- NextDay_FinishDayEvents.txt:122 | gs 'Table.NewLine', 'DailyEventsList', $tmpArray['GirlName'],'dressshop',0,'=',1,iif(week=6,1,0),'BuyDress','gs ''GirlDressBuy'''
+- NextDay_FinishDayEvents.txt:143 | if CursedByEllona>0: CursedByEllonaDays-=1
+- NextDay_FinishDayEvents.txt:144 | if StolenHorseDays>0: StolenHorseDays-=1
+- NextDay_NewDayEvents.txt:7 | if SloganFixed=1: SloganFixed=2
+- NextDay_NewDayEvents.txt:8 | if TavernGloryHole=1: TavernGloryHole=2
+- NextDay_NewDayEvents.txt:13 | if BeckyVar['EddieGeorg']>0:
+- NextDay_NewDayEvents.txt:15 | if BeckyVar['EddieWhoreHome']=2 or BeckyVar['EddieWhoreHome']=3:
+- NextDay_NewDayEvents.txt:17 | elseif BeckyVar['EddieWhoreHome']=4:
+- NextDay_NewDayEvents.txt:22 | if Rand(1,EddieVar['WhoreVisitFreq'])=1 and week<>5:
+- NextDay_NewDayEvents.txt:23 | if BeckyVar['visitedhome']>=5 and EddieVar['SawMomSex']>0 and BeckyVar['HomeSex']>0:
+- NextDay_NewDayEvents.txt:24 | if Rand(1,10)<=1+BeckyVar['EddieWhoreHome']*5+iif(BeckyVar['EddieGeorg']>1,3,0):
+- NextDay_NewDayEvents.txt:34 | if BeckyVar['EddieWhoreHome']=2 or BeckyVar['EddieWhoreHome']=3:
+- NextDay_NewDayEvents.txt:37 | elseif EddieVar['TalkedAboutWhores']=1 and $CurrentLoc['georgett']='TavernMain':
+- NextDay_NewDayEvents.txt:38 | if Rand(1,EddieVar['WhoreVisitFreq'])=1 and week<>5:
+- NextDay_NewDayEvents.txt:43 | if BeckyVar['EddieWhoreHome']=4:
+- NextDay_NewDayEvents.txt:48 | if Rand(1,AlberVar['WhoreVisitFreq'])=1 and week<>5 and LizaVar['ProstStart']:
+- NextDay_NewDayEvents.txt:52 | if BeckyVar['husbandtalk']=0 and GiveOrgasms['becky']>0 and HadSex['becky']>0: BeckyVar['husbandtalk']=1
+- NextDay_NewDayEvents.txt:53 | if BeckyVar['GerhardBeckyTalk']=2:BeckyVar['GerhardBeckyTalk']=1
+- NextDay_NewDayEvents.txt:58 | if sluttiness['becky']>=35 and (DayLastOrgasmGiven['becky'] + 2) <= dayspassed and BeckyVar['visitedhome']>=2 and week <> 7:
+- NextDay_NewDayEvents.txt:59 | if sluttiness['becky']>=55 or Rand(1,2)=1:
+- NextDay_NewDayEvents.txt:64 | if BeckyVar['visitedhome']>=7 and Rand(1,3)<=2 and dyneval($CheckIfEventAlreadyExist,'georgett', 99)<=0:
+- NextDay_NewDayEvents.txt:68 | if week=7:
+- NextDay_NewDayEvents.txt:69 | if BeckyVar['PriestAdvice']>0: gs 'Table.NewLine', 'TodaySexEvents', 'becky', 99, 99, 'Priest'
+- NextDay_NewDayEvents.txt:70 | if GeorgettVar['churchgeorgettadmit']>0: gs 'Table.NewLine', 'TodaySexEvents', 'georgett', 99, 99, 'Priest'
+- NextDay_NewDayEvents.txt:71 | if GeorgettVar['churchlizaadmit']>0: gs 'Table.NewLine', 'TodaySexEvents', 'liza', 99, 99, 'Priest'
+- NextDay_NewDayEvents.txt:74 | if IngaVar['Knowher']>0: gs 'Table.NewLine', 'TodaySexEvents', 'inga', 99, 99, 'Lucas'
+- NextDay_NewDayEvents.txt:78 | if sluttiness['amanda']>=22 and TavernGloryHole=2 and func('GetRandomGirlByJob','jobgloryhole')='liza':
+- NextDay_NewDayEvents.txt:79 | if AmandaVar['glorytried']=0:
+- NextDay_NewDayEvents.txt:80 | if Rand(1,3)=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 99, 99, 'glorytry'
+- NextDay_NewDayEvents.txt:83 | if AmandaVar['gloryscold']=1: GloryChanceDecrease+=9
+- NextDay_NewDayEvents.txt:84 | if AmandaVar['glorywalkout']=1: GloryChanceDecrease+=3
+- NextDay_NewDayEvents.txt:85 | if AmandaVar['glorysuck']=1: GloryChanceDecrease-=2
+- NextDay_NewDayEvents.txt:86 | if AmandaVar['glorydeflower']=1: GloryChanceDecrease-=3
+- NextDay_NewDayEvents.txt:87 | if sluttiness['amanda']>=35:  GloryChanceDecrease-=3
+- NextDay_NewDayEvents.txt:88 | if virginity['amanda']=0:  GloryChanceDecrease-=2
+- NextDay_NewDayEvents.txt:89 | if sexacts['amanda']>15: GloryChanceDecrease+=2
+- NextDay_NewDayEvents.txt:90 | if sexacts['amanda']>35: GloryChanceDecrease+=3
+- NextDay_NewDayEvents.txt:91 | if sexacts['amanda']>50: GloryChanceDecrease+=5
+- NextDay_NewDayEvents.txt:92 | if Rand(1,Max(3, 4+GloryChanceDecrease))=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 99, 99, 'glorytry'
+- NextDay_NewDayEvents.txt:96 | if AmandaVar['fucklegare']=1 and AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=35 and week<>5:
+- NextDay_NewDayEvents.txt:98 | if AmandaVar['alberfriends']>=15:ChanceVar-=1
+- NextDay_NewDayEvents.txt:99 | if sluttiness['alberfriends']>=50:ChanceVar-=1
+- NextDay_NewDayEvents.txt:100 | if sluttiness['alberfriends']>=70:ChanceVar-=1
+- NextDay_NewDayEvents.txt:101 | if AmandaVar['alberprohibit']:ChanceVar+=5
+- NextDay_NewDayEvents.txt:102 | if Friends['amanda']>=15:ChanceVar+=2
+- NextDay_NewDayEvents.txt:103 | if Rand(1,ChanceVar)=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 3, 99, 'legarerun'
+- NextDay_NewDayEvents.txt:106 | if sexacts['amanda']>=5 and sluttiness['amanda']>=35 and week<>5:
+- NextDay_NewDayEvents.txt:108 | if sluttiness['amanda']>=45:ChanceVar-=1
+- NextDay_NewDayEvents.txt:109 | if sluttiness['amanda']>=55:ChanceVar-=1
+- NextDay_NewDayEvents.txt:110 | if AmandaVar['prohibitwithguys']: ChanceVar+=5
+- NextDay_NewDayEvents.txt:111 | if Rand(1,ChanceVar)=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 2, 99, 'lovermeet'
+- NextDay_NewDayEvents.txt:115 | if $MyStallion>'' and $retlocname<>'TavernStable' and StolenHorseDays=0 and Rand(1,40)=25:MongolVar['WillTryToSteal']=1
+- NextDay_NewDayEvents.txt:118 | if BeckyVar['visitedhome']>=5 and Friends['becky']>=15 and BeckyVar['EddieRobbed']=0 and dayspassed>0 and Rand(1,6)=1:
+- NextDay_NewDayEvents.txt:119 | if func('CheckDailyEventExists','becky','SherwoodQuest')=0:
+- NextDay_NewDayEvents.txt:129 | if Rand(1,3)=1:FranBusy[i]=1
+- NextDay_NewDayEvents.txt:134 | if LizaVar['ProstStart']:
+- NextDay_NewDayEvents.txt:135 | gs 'WhoreNextDayClients','liza',3+iif($pantiesdef['liza']='',1,0), tavernvisitors/6
+- NextDay_TavernDaily.txt:9 | if week=5:CurDay['visitors']=CurDay['visitors']/2
+- NextDay_TavernDaily.txt:10 | if week=7:CurDay['visitors']=CurDay['visitors']*3/4
+- NextDay_TavernDaily.txt:12 | if Rand(1,15)=1:
+- NextDay_TavernDaily.txt:19 | if CurDay['wine']>winenum:
+- NextDay_TavernDaily.txt:25 | if CurDay['products']>productnum:
+- NextDay_TavernDaily.txt:35 | if CurDay['fameaten']>productnum:
+- NextDay_TavernDaily.txt:46 | if CurDay['happy']>=0:
+- NextDay_TavernDaily.txt:47 | if tavernwaitress<10 or tavernclean <10 or tavernkitchen<10:
+- NextDay_TavernDaily.txt:51 | if tavernlevel>CurDay['visitors']*4:
+- NextDay_TavernDaily.txt:59 | If SloganFixed<2 and Rand(1,3)=1:CurDay['happy']-=1
+- NextDay_TavernDaily.txt:60 | If func('GetRandomGirlByJob','jobwhore')>'' and Rand(1,4)=1:CurDay['happy']+=1
+- NextDay_TavernDaily.txt:61 | If func('GetRandomGirlByJob','jobgloryhole')>'' and Rand(1,3)=1:CurDay['happy']+=1
+- NextDay_TavernDaily.txt:64 | if week>5 and DanceSponsor=1:
+- NextDay_TavernDaily.txt:68 | if CurDay['happy']>0 and Rand(1,5)<=CurDay['happy']:CurDay['loyalty']+=1
+- NextDay_TavernDaily.txt:69 | if CurDay['happy']<0:CurDay['loyalty']+=CurDay['happy']
+- NextDay_TavernDaily.txt:80 | if week=7:TotalDay['KidsMoney']+=15*KidsPosobie
+- NextDay_TavernDaily.txt:82 | if $MyStallion>'':TotalDay['HorseFood']+=3
+- NextDay_TavernDaily.txt:84 | if MongolVar['WillTryToSteal']:
+- NextDay.txt:37 | if iDaysCount<timepassed: jump 'loopnextday'
+- NextDay.txt:43 | money=money+TotalDay['revenue']-TotalDay['dineout']-TotalDay['fixedcost']+TotalDay['whorerevenue']+TotalDay['gloryholerevenue']+TotalDay['KidsMoney']+iif($KidBirthPosobie>'',600,0)
+- NextDay.txt:46 | if $DressProduced>'':
+- NextDay.txt:47 | if $DressBuyer='You':
+- NextDay.txt:52 | if money>=50:
+- NextDay.txt:63 | if TotalDay['happy']/timepassed > 3:
+- NextDay.txt:65 | elseif TotalDay['happy']/timepassed > 2:
+- NextDay.txt:67 | elseif TotalDay['happy']/timepassed > 1:
+- NextDay.txt:69 | elseif TotalDay['happy']/timepassed > 0:
+- NextDay.txt:71 | elseif TotalDay['happy']/timepassed > -1:
+- NextDay.txt:73 | elseif TotalDay['happy']/timepassed > -2:
+- NextDay.txt:75 | elseif TotalDay['happy']/timepassed > -3:
+- NextDay.txt:84 | if $ExtraEvents>'': *pl $ExtraEvents
+- NextDay.txt:90 | if TotalDay['HorseFood']>0:
+- NextDay.txt:91 | if $TotalDay['HorseStolen']='':
+- NextDay.txt:100 | if TotalDay['dineout'] > 0:
+- NextDay.txt:104 | if $KidBirthPosobie>'':
+- NextDay.txt:108 | if TotalDay['KidsMoney']>0:
+- NextDay.txt:114 | if TotalWhoreClients[$GirlName] > 0:
+- NextDay.txt:118 | if TotalWhoreClients[$GirlName] > 0:
+- NextDay.txt:121 | if TotalDay['whorerevenue'] > 0:
+- NextDay.txt:128 | if TotalGloryHoleClients[$GirlName] > 0:
+- NextDay.txt:132 | if TotalGloryHoleClients[$GirlName] > 0:
+- NextDay.txt:135 | if TotalDay['gloryholerevenue'] > 0:
+- NextDay.txt:145 | if CursedByEllona>0 and CursedByEllonaDays<=0:
+- NextDay.txt:153 | if $NewDressCame>'':
+- NextDay.txt:163 | if TotalDay['loyalty']>0:
+- NextDay.txt:165 | elseif TotalDay['loyalty']<0:
+- NextDay.txt:168 | if tavernfame>=10:
+- NextDay.txt:175 | elseif tavernfame<=-10:
+- NextDay.txt:198 | if tavernvisitors<0: tavernvisitors=0
+- NextDay.txt:199 | if money<0:money=0
+- NextDay.txt:201 | if money=0:
+- NextDay.txt:208 | if tavernvisitors=0:
+- NextDay.txt:218 | if money=0 or tavernvisitors=0:
+- RelationshipDesc1.txt:9 | if $GirlNameRD1='sandra':
+- RelationshipDesc1.txt:11 | elseif $GirlNameRD1='amanda' or $GirlNameRD1='melissa':
+- SetTavernServiceLevels.txt:9 | if sandradiv=0:sandradiv=1
+- SetTavernServiceLevels.txt:10 | if melissadiv=0:melissadiv=1
+- SetTavernServiceLevels.txt:11 | if amandadiv=0:amandadiv=1
+- SetTavernServiceLevels.txt:16 | if tavernkitchen >90:
+- SetTavernServiceLevels.txt:18 | elseif tavernkitchen >70:
+- SetTavernServiceLevels.txt:20 | elseif tavernkitchen >60:
+- SetTavernServiceLevels.txt:22 | elseif tavernkitchen >50:
+- SetTavernServiceLevels.txt:24 | elseif tavernkitchen >30:
+- SetTavernServiceLevels.txt:26 | elseif tavernkitchen >14:
+- SetTavernServiceLevels.txt:35 | if tavernclean >90:
+- SetTavernServiceLevels.txt:37 | elseif tavernclean >80:
+- SetTavernServiceLevels.txt:39 | elseif tavernclean >55:
+- SetTavernServiceLevels.txt:41 | elseif tavernclean >45:
+- SetTavernServiceLevels.txt:43 | elseif tavernclean >34:
+- SetTavernServiceLevels.txt:45 | elseif tavernclean >20:
+- SetTavernServiceLevels.txt:47 | elseif tavernclean >5:
+- SetTavernServiceLevels.txt:56 | if tavernwaitress >90:
+- SetTavernServiceLevels.txt:58 | elseif tavernwaitress >80:
+- SetTavernServiceLevels.txt:60 | elseif tavernwaitress >70:
+- SetTavernServiceLevels.txt:62 | elseif tavernwaitress >55:
+- SetTavernServiceLevels.txt:64 | elseif tavernwaitress >40:
+- SetTavernServiceLevels.txt:66 | elseif tavernwaitress >25:
+- SetTavernServiceLevels.txt:68 | elseif tavernwaitress >15:
+- SetTavernServiceLevels.txt:70 | elseif tavernwaitress >1:
+- SexEventsTableCode.txt:12 | if timeSE<99:
+- SexEventsTableCode.txt:18 | if $args[2]>'':
+- SexEventsTableCode.txt:24 | if func('Table.Next','tempTable2'):
+- SexEventsTableCode.txt:48 | if LineNum>0:
+- SexEventsTableCode.txt:57 | if lcase($Args[1])='you': $Args[1]='Вы'
+- SexEventsTableCode.txt:58 | if lcase($Args[1])='eddie': $Args[1]='Эдди'
+- SexEventsTableCode.txt:59 | if lcase($Args[1])='legare': $Args[1]='Мессир Легаре'
+- SexEventsTableCode.txt:65 | if $Args[1]>'':
+- SexEventsTableCode.txt:68 | if $Args[2]>'' and $Args[3]='<>':
+- SexEventsTableCode.txt:70 | elseif $Args[2]>'':
+- SexEventsTableCode.txt:78 | if func('Table.Next', 'SexHistoryList'+$Args[0], 'tmpTableArray'):
+- SexEventsTableCode.txt:80 | if $Args[1]>'' and lcase($tmpTableArray['DudeName'])<>$Args[1]:tmpLineMatch=0
+- SexEventsTableCode.txt:81 | if $Args[2]>'' and $Args[3]='<>' and lcase($tmpTableArray['CumTarget'])=$Args[2]:tmpLineMatch=0
+- SexEventsTableCode.txt:82 | if $Args[2]>'' and $Args[3]<>'<>' and lcase($tmpTableArray['CumTarget'])<>$Args[2]:tmpLineMatch=0
+- SexEventsTableCode.txt:84 | if tmpLineMatch:
+- SexEventsTableCode.txt:90 | if tmpCurDay>0:
+- SexEventsTableCode.txt:102 | if lcase($Args[1])='you': $Args[1]='Вы'
+- SexEventsTableCode.txt:103 | if lcase($Args[1])='eddie': $Args[1]='Эдди'
+- SexEventsTableCode.txt:104 | if lcase($Args[1])='legare': $Args[1]='Месье Легаре'
+- SexEventsTableCode.txt:109 | if $Args[1]>'':
+- SexEventsTableCode.txt:112 | if $Args[2]>'' and $Args[3]='<>':
+- SexEventsTableCode.txt:114 | elseif $Args[2]>'':
+- SexEventsTableCode.txt:123 | if func('Table.Next', 'SexHistoryList'+$Args[0], 'tmpTableArray'):
+- SexEventsTableCode.txt:125 | if $Args[1]>'' and lcase($tmpTableArray['DudeName'])<>$Args[1]:tmpLineMatch=0
+- SexEventsTableCode.txt:126 | if $Args[2]>'' and $Args[3]='<>' and lcase($tmpTableArray['CumTarget'])=$Args[2]:tmpLineMatch=0
+- SexEventsTableCode.txt:127 | if $Args[2]>'' and $Args[3]<>'<>' and lcase($tmpTableArray['CumTarget'])<>$Args[2]:tmpLineMatch=0
+- SexEventsTableCode.txt:128 | if Args[4]>0 and tmpTableArray['Day']<Args[4]+1:tmpLineMatch=0
+- SexEventsTableCode.txt:130 | if tmpLineMatch: CountSex+=1
+- SexEventsTableCode.txt:144 | if func('Table.Next','tempTable2'): Result=func('Table.Value','tempTable2','ID строки')
+- SexEventsTableCode.txt:152 | if LineNum>0:
+- SexEventsTableCode.txt:153 | if $Args[0]='amanda':
+- SexEventsTableCode.txt:165 | if LineNum>0:
+- SexEventsTableCode.txt:167 | if $Args[0]='amanda' and func('Table.GetValue','GirlDance','id:'+LineNum,'GoOut')=1:
+- ShowAmandaPortrait.txt:9 | if TitsVisible[$GirlName] and PussyVisible[$GirlName] and $CurLoc='TavernAmandaRoom':
+- ShowAmandaPortrait.txt:10 | if Arousal['You']<20:
+- ShowCurrentSex.txt:10 | if (no($GirlNameSCS='georgett' and $GirlLocIGSS<>'tavern')) and (no($GirlNameSCS='amanda' and $GirlLocASDS='street')):
+- ShowCurrentSex.txt:14 | if (Arousal['You']>=100):
+- ShowCurrentSex.txt:15 | if CockInPussy[$GirlNameSCS]=1:
+- ShowCurrentSex.txt:16 | if $GirlNameSCS='liza' and sluttiness[$GirlNameSCS]<50 and pregnancy[$GirlNameSCS]<120:
+- ShowCurrentSex.txt:19 | elseif $GirlNameSCS='becky' and EddieCockInMouth[$GirlNameSCS]=1:
+- ShowCurrentSex.txt:21 | elseif $GirlNameSCS='becky':
+- ShowCurrentSex.txt:24 | elseif $GirlNameSCS='amanda' and sluttiness[$GirlNameSCS]<60 and pregnancy[$GirlNameSCS]<120:
+- ShowCurrentSex.txt:26 | if cuminside['amanda']>=4:
+- ShowCurrentSex.txt:29 | elseif $GirlNameSCS='amanda' and sluttiness[$GirlNameSCS]>=60 and pregnancy[$GirlNameSCS]<120:
+- ShowCurrentSex.txt:39 | if GrupenSex['eddie']>0:
+- ShowCurrentSex.txt:41 | if (Arousal['eddie']>=100):
+- ShowCurrentSex.txt:42 | if EddieCockInPussy[$GirlNameSCS]=1:
+- ShowCurrentSex.txt:43 | if CockInMouth[$GirlNameSCS]=1:
+- ShowCurrentSex.txt:45 | if sluttiness[$GirlNameSCS]<65:
+- ShowCurrentSex.txt:52 | if pregnancy[$GirlNameSCS]>=120:
+- ShowCurrentSex.txt:54 | elseif sluttiness[$GirlNameSCS]<65:
+- ShowCurrentSex.txt:60 | elseif EddieCockInMouth[$GirlNameSCS]=1:
+- ShowCurrentSex.txt:66 | if (Arousal[$GirlNameSCS]<20): PL 'Киска <<$RealName2[$GirlNameSCS]>> суха и зажата. Проникновение не доставит ей удовольствия.'
+- ShowCurrentSex.txt:67 | if (Arousal[$GirlNameSCS]>=20 and Arousal[$GirlNameSCS]<40): PL '<<$RealName[$GirlNameSCS]>> возбуждена. Её влагалище увлажнилось.'
+- ShowCurrentSex.txt:68 | if (Arousal[$GirlNameSCS]>=40 and Arousal[$GirlNameSCS]<65): PL '<<$RealName[$GirlNameSCS]>> хорошо возбуждена. Её киска обильна смазана собственным "соком"'
+- ShowCurrentSex.txt:69 | if (Arousal[$GirlNameSCS]>=65 and Arousal[$GirlNameSCS]<85): PL '<<$RealName[$GirlNameSCS]>> близка к оргазму. Её стоны становятся всё чаще и чаще.'
+- ShowCurrentSex.txt:70 | if (Arousal[$GirlNameSCS]>=85 and Arousal[$GirlNameSCS]<100): PL '<<$RealName[$GirlNameSCS]>> на грани оргазма. Каждая клеточка её киски ритмично пульсирует, а на теле местами появляются красные пятна.'
+- ShowCurrentSex.txt:71 | if (Arousal[$GirlNameSCS]>=100):
+- ShowCurrentSex.txt:75 | if $GirlNameSCS='georgett':
+- ShowCurrentSex.txt:76 | if GiveOrgasms[$GirlNameSCS]=2:
+- ShowCurrentSex.txt:81 | if $GirlNameSCS='liza':
+- ShowCurrentSex.txt:82 | if GiveOrgasms[$GirlNameSCS]=3:
+- ShowCurrentSex.txt:87 | if $GirlNameSCS='becky':
+- ShowCurrentSex.txt:88 | if GiveOrgasms[$GirlNameSCS]=5:
+- ShowCurrentSex.txt:94 | if $GirlNameSCS='amanda':
+- ShowCurrentSex.txt:95 | if GiveOrgasms[$GirlNameSCS]=4:
+- ShowCurrentSex.txt:101 | if CockInPussy[$GirlNameSCS] or EddieCockInPussy[$GirlNameSCS]:
+- ShowCurrentSex.txt:112 | if Arousal[Ilist]>=100:SomebodyCums=1
+- ShowCurrentSex.txt:114 | if IList<arrsize('Arousal'): jump 'loopSumbodyComes'
+- TavernAmandaRoom.txt:7 | if time<4: *p 'Как вы и ожидали, ее самой там не оказалось. '
+- TavernAmandaRoom.txt:11 | if time>=4:
+- TavernAmandaRoom.txt:15 | if virginity['amanda']=0:
+- TavernAmandaRoom.txt:16 | if sluttiness['amanda']>=30:tmpSleepDress=1
+- TavernAmandaRoom.txt:17 | if sluttiness['amanda']>=50:tmpSleepDress=2
+- TavernAmandaRoom.txt:19 | if Rand(1,3)<=2:
+- TavernAmandaRoom.txt:24 | if tmpSleepDress=2:
+- TavernAmandaRoom.txt:27 | elseif tmpSleepDress=1:
+- TavernAmandaRoom.txt:33 | if cametoday<cancumdaily:
+- TavernAmandaRoom.txt:36 | if tmpSleepDress=2:
+- TavernAmandaRoom.txt:38 | elseif tmpSleepDress=1:
+- TavernAmandaRoom.txt:44 | if tmpSleepDress>=2:
+- TavernAmandaRoom.txt:55 | if virginity['amanda']:
+- TavernAmandaRoom.txt:56 | if (AmandaVar['suckyou'] or AmandaVar['fuckyou']) and sluttiness['amanda']>=30:tmpSexType=1
+- TavernAmandaRoom.txt:57 | if sluttiness['amanda']>=38:tmpSexType=1
+- TavernAmandaRoom.txt:59 | if (AmandaVar['suckyou'] or AmandaVar['fuckyou']) and sluttiness['amanda']>=20:tmpSexType=2
+- TavernAmandaRoom.txt:60 | if sluttiness['amanda']>=30:tmpSexType=2
+- TavernAmandaRoom.txt:64 | if tmpGropeReact=1:
+- TavernAmandaRoom.txt:67 | if tmpRand=1:
+- TavernAmandaRoom.txt:69 | elseif tmpRand=2:
+- TavernAmandaRoom.txt:76 | if tmpRand=1:
+- TavernAmandaRoom.txt:78 | elseif tmpRand=2:
+- TavernAmandaRoom.txt:87 | elseif tmpGropeReact=2:
+- TavernAmandaRoom.txt:95 | elseif tmpGropeReact=3:
+- TavernAmandaRoom.txt:101 | elseif tmpGropeReact=4:
+- TavernGloryHole.txt:31 | if GloryHoleWorks and AmandaAtGlory=0:
+- TavernGloryHole.txt:32 | if sluttiness[$GirlNameTGH]>=80:
+- TavernGloryHole.txt:33 | if Rand(1,4)=1: GloryHoleInside=1
+- TavernGloryHole.txt:34 | elseif sluttiness[$GirlNameTGH]>=50:
+- TavernGloryHole.txt:35 | if Rand(1,8)=1: GloryHoleInside=1
+- TavernGloryHole.txt:38 | if GloryHoleInside=0 and Rand(1,3)=1 and sluttiness[$GirlNameTGH]>=40: GloryHoleInsideOnce=1
+- TavernGloryHole.txt:41 | if GloryHoleInside or GloryHoleInsideOnce:
+- TavernGloryHole.txt:43 | if GloryHoleInside:
+- TavernGloryHole.txt:55 | if (Time=2 or time=3) and $GirlNameTGH>'': GloryHoleWorks=1
+- TavernGloryHole.txt:57 | if dyneval($GetSexEventFromTable,'amanda', 99,'glorytry')>0: AmandaAtGlory=1
+- TavernGloryHole.txt:66 | if GloryHoleWorks:
+- TavernGloryHole.txt:72 | if pregnancy[$GirlNameTGH] >120: $GloryGirlLine0+=' Над задранным подолом из под расстегнутой блузки виднеется беременное пузико ' + $RealName2[$GirlNameTGH] + '.'
+- TavernGloryHole.txt:77 | if GloryHoleInside or GloryHoleInsideOnce:
+- TavernGloryHole.txt:79 | if pregnancy[$GirlNameTGH] >120: $GloryGirlLine2+=' Беременность ей в этом ничуть не мешает и не смущает!'
+- TavernGloryHole.txt:80 | if GloryHoleInside:
+- TavernGloryHole.txt:91 | if pregnancy[$GirlNameTGH] >120:
+- TavernGloryHole.txt:100 | if dyneval($CheckIfSexEventExist,$GirlNameTGH, time)>0 and Rand(1,2)=1 and AmandaAtGlory=0:
+- TavernGloryHole.txt:104 | if GloryHoleLook=1:
+- TavernGloryHole.txt:108 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, 'Мастер Драупнир'
+- TavernGloryHole.txt:109 | elseif GloryHoleLook=2:
+- TavernGloryHole.txt:113 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, 'Эдди'
+- TavernGloryHole.txt:114 | elseif GloryHoleLook=3:
+- TavernGloryHole.txt:118 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, 'Месье Легаре'
+- TavernGloryHole.txt:119 | elseif GloryHoleLook=4:
+- TavernGloryHole.txt:123 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, 'Отец Герхард'
+- TavernGloryHole.txt:124 | elseif GloryHoleLook>=5 and GloryHoleLook<=7:
+- TavernGloryHole.txt:128 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, '',1,'Неизвестный моряк'
+- TavernGloryHole.txt:129 | elseif GloryHoleLook>=8 and GloryHoleLook<=10:
+- TavernGloryHole.txt:133 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, '',1,'Неизвестный стражник'
+- TavernGloryHole.txt:138 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, '',1,'Неизвестный горожанин'
+- TavernGloryHole.txt:145 | if AmandaAtGlory=1:
+- TavernGloryHole.txt:153 | if GloryHoleCurrentStep=0:
+- TavernGloryHole.txt:158 | if GloryHoleCurrentStep=0:
+- TavernGloryHole.txt:160 | elseif GloryHoleCurrentStep=1:
+- TavernGloryHole.txt:166 | if GloryHoleCurrentStep>=3:
+- TavernGloryHole.txt:172 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(GloryHoleLook>0 and GloryHoleCurrentStep<=3 and BlockGloryHoleMenu=0,-1,0)"
+- TavernGloryHole.txt:177 | if AmandaAtGlory=1: *clr
+- TavernGloryHole.txt:178 | if GloryHoleCurrentStep=0 or GloryHoleLook=0:
+- TavernGloryHole.txt:183 | if GloryHoleLook=0:
+- TavernGloryHole.txt:185 | elseif GloryHoleCurrentStep=0:
+- TavernGloryHole.txt:187 | elseif GloryHoleCurrentStep=1:
+- TavernGloryHole.txt:192 | if GloryHoleLook:
+- TavernGloryHole.txt:194 | if GloryHoleCurrentStep>=3:
+- TavernGloryHole.txt:199 | if AmandaAtGlory=1:
+- TavernGloryHole.txt:208 | if $GirlNameTGH='georgett' and GloryHoleWorks:
+- TavernGloryHole.txt:210 | elseif GloryHoleWorks=0:
+- TavernGloryHole.txt:214 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(CockInGloryHole=0  and BlockGloryHoleMenu=0,-1,0)"
+- TavernGloryHole.txt:223 | if GloryHoleWorks:
+- TavernGloryHole.txt:229 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(CockInGloryHole=0 and GloryHoleLook=0 and cametoday<cancumdaily and GloryHoleCurrentStep=0 and BlockGloryHoleMenu=0,-1,0)"
+- TavernGloryHole.txt:236 | if GloryHoleWorks: GloryHoleCurrentStep+=1
+- TavernGloryHole.txt:239 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(CockInGloryHole=1 and GloryHoleLook=0 and cametoday<cancumdaily and GloryHoleCurrentStep=1 and BlockGloryHoleMenu=0,-1,0)"
+- TavernGloryHole.txt:245 | if AmandaAtGlory=1: *clr
+- TavernGloryHole.txt:247 | if GloryHoleWorks: GloryHoleCurrentStep+=1
+- TavernGloryHole.txt:248 | if AmandaAtGlory=1:
+- TavernGloryHole.txt:256 | if GloryHoleInside:
+- TavernGloryHole.txt:266 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(CockInGloryHole=1 and GloryHoleLook=0 and cametoday<cancumdaily and GloryHoleCurrentStep=2 and BlockGloryHoleMenu=0,-1,0)"
+- TavernGloryHole.txt:279 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(AmandaAtGlory=1 and BlockGloryHoleMenu=0 and CockInGloryHole=1,-1,0)"
+- TavernMain.txt:16 | if (week=7 and time<3):
+- TavernMain.txt:18 | elseif (week=5 and time=3):
+- TavernMain.txt:20 | elseif time>3:
+- TavernMain.txt:26 | if (Rand(1,2)=1 and BlockEvents<>1) or EventsCount[10]>0:
+- TavernMain.txt:38 | If $TavernClosed='':
+- TavernMain.txt:47 | if $TavernEventOngoing='' and $TavernClosed='':
+- TavernMain.txt:54 | if $CurrentLoc[$GirlNameTS1]=$CurLoc and time>2:
+- TavernMain.txt:55 | if time=3: gs 'AddOthersSperm', $GirlNameTS1, 7
+- TavernMain.txt:56 | if time=3: gs 'AddOthersSperm', $GirlNameTS2, 8
+- TavernMain.txt:60 | if jobwhore['liza']=1 and jobwhore['georgett']=1:
+- TavernMain.txt:62 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS1, time)>0:
+- TavernMain.txt:65 | if TavernHole:
+- TavernMain.txt:68 | elseif randvarPS=2 and dyneval($CheckIfSexEventExist,$GirlNameTS2, time)>0:
+- TavernMain.txt:71 | if TavernHole:
+- TavernMain.txt:79 | elseif jobwhore['liza']=1:
+- TavernMain.txt:81 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS2, time)>0:
+- TavernMain.txt:83 | if TavernHole:
+- TavernMain.txt:90 | elseif jobwhore['georgett']=1:
+- TavernMain.txt:92 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS1, time)>0 :
+- TavernMain.txt:94 | if TavernHole:
+- TavernMain.txt:104 | if TavernGloryHole=1:
+- TavernMain.txt:107 | elseif TavernGloryHole=2:
+- TavernMain.txt:114 | if $TavernEventOngoing='':
+- TavernMain.txt:116 | if $TavernClosed='':
+- TavernMain.txt:117 | if TavernGloryHole=2:
+- TavernMain.txt:123 | if AmandaVar['kickyoufromroom']=0:
+- TavernMain.txt:130 | if $TavernClosed='':
+- TavernMain.txt:138 | if GeorgettAvail=1: dynamic $DescribeBreastFeeding, 'georgett'
+- TavernMain.txt:139 | if LizaAvail=1: dynamic $DescribeBreastFeeding, 'liza'
+- TavernMain.txt:141 | if $CurrentLoc['georgett']='TavernMain':
+- TavernMain.txt:146 | if GeorgettAvail=1 or ($CurrentLoc['georgett']=$CurLoc and time<2): gs 'CheckDailyEvent', 'georgett'
+- TavernMain.txt:147 | if LizaAvail=1 or ($CurrentLoc['liza']=$CurLoc and time<2): gs 'CheckDailyEvent', 'liza'
+- TavernShowImage.txt:8 | if RandVar=4 and jobwhore['liza']=0: jump ImageTavernLoop
+- TavernShowImage.txt:9 | if RandVar=5 and jobwhore['georgett']=0: jump ImageTavernLoop
+- TavernShowImage.txt:11 | if RandVar=1:
+- TavernShowImage.txt:13 | elseif RandVar=2:
+- TavernShowImage.txt:15 | elseif RandVar=3:
+- TavernShowImage.txt:19 | elseif RandVar=5:
+- WineStore.txt:6 | if week = 7 or time>=3:
+- WineStore.txt:11 | if time=0:
+- WineStore.txt:30 | gs 'Menu.AddCondition','WineBuy', "Result=IIF(money>=14,-1,0)"
+- WineStore.txt:39 | gs 'Menu.AddCondition','WineBuy', "Result=IIF(money>=14*5,-1,0)"
+- WineStore.txt:48 | gs 'Menu.AddCondition','WineBuy', "Result=IIF(money>=14*20,-1,0)"
+- WineStore.txt:57 | gs 'Menu.AddCondition','WineBuy', "Result=IIF(money>=14*50,-1,0)"
+- WineStore.txt:66 | gs 'Menu.AddCondition','WineBuy', "Result=IIF(money>=14*200,-1,0)"
+- WineStore.txt:71 | if time=0:
+- WineStore.txt:76 | dynamic 'if Talked[''Clara'']<=2 and Rand(1,2)=1 and Friends[''Clara'']<=5:
+- WineStore.txt:80 | if Talked[''Clara'']>2: ''Ничего нового из разговора вы не узнали.'''
+- WineStore.txt:87 | dynamic 'if Talked[''Clara'']<=2 and Rand(1,2)=1 and Friends[''Clara'']<=10:
+- WineStore.txt:91 | if Talked[''Clara'']>2: ''Ничего нового из разговора вы не узнали.'''
+- WineStore.txt:94 | gs 'Menu.AddCondition','MenuClaraTalk', "Result=IIF(Friends['Clara']>=5,-1,0)"
+- WineStore.txt:97 | if dayspassed>40 and dayspassed<=90:
+- WineStore.txt:99 | elseif	dayspassed>90:
+- WineStore.txt:106 | if AlberVar['FightYouAmanda']=0:
+- WineStore.txt:109 | 'За прилавком стоит сам хозяин, месье Легаре. И он очень мрачно смотрит на вас. Похоже, он принял <<iif(AlberVar[''FightYouAmanda'']=2,''вашу ругань'', ''ваш с ним небольшой дружеский спарринг'')>> близко к сердцу. '
+- ZaletOpinionCalc.txt:11 | if func('Table.Next', 'SexHistoryList'+$Args[0], 'tmpTableArray'):
+- ZaletOpinionCalc.txt:12 | if tmpTableArray['zalet']:
+- ZaletOpinionCalc.txt:13 | if tmpTableArray['Day']>tmpCurDay:
+- ZaletOpinionCalc.txt:28 | if func('Table.Next', 'SexHistoryList'+$Args[0], 'tmpTableArray'):
+- ZaletOpinionCalc.txt:29 | if tmpTableArray['zalet']:
+- ZaletOpinionCalc.txt:30 | if tmpTableArray['Day']>tmpCurDay:
+- ZaletOpinionCalc.txt:45 | if args[1]=0:args[1]=15
+- ZaletOpinionCalc.txt:46 | if ZaletDay>0:
+- ZaletOpinionCalc.txt:50 | if func('Table.Next', 'SexHistoryList'+$Args[0], 'tmpTableArray'):
+- ZaletOpinionCalc.txt:51 | if lcase($tmpTableArray['CumTarget'])='inside' and tmpTableArray['Day']>ZaletDay-args[1] and tmpTableArray['Day']<ZaletDay+args[1]:
+- ZaletOpinionCalc.txt:53 | if tmpTableArray['IsDudeRandom']=0:SuspectGrade+=2
+- ZaletOpinionCalc.txt:54 | if $tmpTableArray['DudeNameType']='NPC':SuspectGrade+=3
+- ZaletOpinionCalc.txt:55 | if lcase($tmpTableArray['DudeName'])='вы':SuspectGrade+=2
+- ZaletOpinionCalc.txt:57 | if $args[0]='amanda' and lcase($tmpTableArray['DudeName'])='вы':SuspectGrade+=2
+- ZaletOpinionCalc.txt:58 | if $args[0]='becky' and lcase($tmpTableArray['DudeName'])='эдди':SuspectGrade+=5
+- ZaletOpinionCalc.txt:75 | if func('Table.Next', 'tmpDaddySuspect'+$Args[0], 'tmpTableArray'):
+- ZaletOpinionCalc.txt:76 | if $tmpPrevTableArray['MatchField']=$tmpTableArray['MatchField'] or tmpFirst:
+- ZaletOpinionCalc.txt:79 | if tmpTableArray['Zalet']:tmpZalet=1
+- ZaletOpinionCalc.txt:84 | if tmpTableArray['Zalet']:tmpZalet=1
+- ZaletOpinionCalc.txt:105 | if strcomp(lcase($args[2]),'неизвестный.*'):
+- ZaletOpinionCalc.txt:107 | if RandVar=1:
+- ZaletOpinionCalc.txt:109 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:111 | elseif RandVar=3:
+- ZaletOpinionCalc.txt:116 | elseif  strcomp(lcase($args[2]),'.*парень.*'):
+- ZaletOpinionCalc.txt:118 | if RandVar=1:
+- ZaletOpinionCalc.txt:120 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:125 | elseif $args[0]='amanda' and lcase($args[1])='вы':
+- ZaletOpinionCalc.txt:127 | if RandVar=1:
+- ZaletOpinionCalc.txt:129 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:134 | elseif $args[0]='becky' and lcase($args[1])='вы':
+- ZaletOpinionCalc.txt:136 | if RandVar=1:
+- ZaletOpinionCalc.txt:138 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:143 | elseif $args[0]='liza' and lcase($args[1])='вы':
+- ZaletOpinionCalc.txt:145 | if RandVar=1:
+- ZaletOpinionCalc.txt:147 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:152 | elseif $args[0]='georgett' and lcase($args[1])='вы':
+- ZaletOpinionCalc.txt:154 | if RandVar=1:
+- ZaletOpinionCalc.txt:156 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:161 | elseif $args[0]='becky' and lcase($args[1])='эдди':
+- ZaletOpinionCalc.txt:163 | if RandVar=1:
+- ZaletOpinionCalc.txt:165 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:170 | elseif $args[0]='amanda' and strcomp(lcase($args[1]),'.*легаре.*'):
+- ZaletOpinionCalc.txt:172 | if RandVar=1:
+- ZaletOpinionCalc.txt:174 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:179 | elseif strcomp(lcase($args[1]),'.*легаре.*'):
+- ZaletOpinionCalc.txt:181 | if RandVar=1:
+- ZaletOpinionCalc.txt:183 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:188 | elseif strcomp(lcase($args[1]),'.*герхард.*'):
+- ZaletOpinionCalc.txt:190 | if RandVar=1:
+- ZaletOpinionCalc.txt:192 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:197 | elseif $args[0]='inga' and strcomp(lcase($args[1]),'.*лукас.*'):
+- ZaletOpinionCalc.txt:199 | if RandVar=1:
+- ZaletOpinionCalc.txt:201 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:206 | elseif strcomp(lcase($args[1]),'.*эдди.*'):
+- ZaletOpinionCalc.txt:208 | if RandVar=1:
+- ZaletOpinionCalc.txt:210 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:223 | if args[0]=0:
+- ZaletOpinionCalc.txt:225 | elseif args[0]=1:
+- ZaletOpinionCalc.txt:227 | elseif args[0]<=4:
+- ZaletOpinionCalc.txt:229 | elseif args[0]<=10:
+- ZaletOpinionCalc.txt:231 | elseif args[0]<=25:
+- ZaletOpinionCalc.txt:244 | if func('Table.Next', 'tmpDaddySuspectFinal'+$Args[0], 'tmpTableArray'):
+- ZaletOpinionCalc.txt:247 | if tmpTableArray['Times']>MaxDaddyTimes:MaxDaddyTimes=tmpTableArray['Times']
+- ZaletOpinionCalc.txt:255 | if PregTotalSuspects[$args[0]]=0:
+- ZaletOpinionCalc.txt:257 | elseif PregTotalSuspects[$args[0]]=1:
+- ZaletOpinionCalc.txt:259 | elseif PregTotalSuspects[$args[0]]=2:
+- ZaletOpinionCalc.txt:261 | elseif PregTotalSuspects[$args[0]]=3:
+
+## Schedule/Location/Availability Logic
+- AmandaDynamicCommonBlocks.txt:231 | if dyneval($GetSexEventFromTable,'amanda', time,'legarerun')>0:
+- AmandaDynamicCommonBlocks.txt:266 | if dyneval($CheckIfSexEventExist,'amanda', time,'lovermeet')>0:
+- AmandaDynamicCommonBlocks.txt:280 | tmp=dyneval($GetSexEventFromTable,'amanda', time,'lovermeet')
+- Church.txt:26 | if week<>7 or time > 2:
+- Church.txt:31 | if time=0:
+- Church.txt:129 | elseif time=1:
+- Church.txt:143 | act 'Обойти собор':gt 'ChurchAfterCermon', 1
+- DressNoShow.txt:50 | '"Ой, ты знаешь <<iif(DressBuyIsRelative=1,''мамусик'',iif(DressBuyIsRelative=2,''сестричка'',''котеночек''  ))>>, я забегался по делам и опоздал."<br>"По каким-таким делам ты с утра пораньше бегал?" недоуменно ответила <<$RealName[$GirlNameDNS]>>.<br>"Да, надо было там сделать кое-что." туманно объяснили вы. "Прости, я виноват. Не дуйся."<br>"Ну ладно, раз так, то давай будем считать, что мы перенесли наш поход на <<iif(week<>6,''завтра'',''понедельник'')>>." неожиданно ответила вам <<$RealName[$GirlNameDNS]>>.<br>"Ну давай, " промямли вы, будучи застигнутым врасплох таким оборотом дел.<br>"Вот и ладушки, утром, как всегда!" сказала повеселевшая <<$RealName[$GirlNameDNS]>> и убежала.<br>'
+- InitAmanda.txt:20 | $CurrentLoc[$GirlName]='TavernMain'
+- InitAmanda.txt:39 | jobkitchen[$GirlName]=0
+- InitAmanda.txt:40 | jobcleaning[$GirlName]=1
+- InitAmanda.txt:41 | jobwaitress[$GirlName]=1
+- InitAmanda.txt:44 | jobWhoreAvail[$GirlName]=0
+- InitAmanda.txt:45 | jobwhore[$GirlName]=0
+- InitAmanda.txt:46 | jobgloryhole[$GirlName]=0
+- IntAmandaDressChange.txt:9 | if $CurrentLoc['liza']<>'TavernMain' and RandVar=4 :RandVar=Rand(5,7)
+- IntAmandaDressChange.txt:10 | if $CurrentLoc['georgett']<>'TavernMain' and RandVar=3 :RandVar=Rand(5,7)
+- IntAmandaDressChange.txt:71 | if $CurrentLoc['liza']='TavernMain':
+- IntAmandaDressChange.txt:94 | if $CurrentLoc['liza']='TavernMain':
+- IntAmandaDressChange.txt:210 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Friends[$GirlNameIAT]>8 and func('CheckDailyEventExists','','BuyDressTom')=0 and func('CheckDailyEventExists',$GirlNameIAT,'BuyDress')=0 and Talked[$GirlNameIAT]<2 and week<>6,-1,0)"
+- IntAmandaSex.txt:624 | time+=1
+- IntAmandaTalk.txt:38 | If week=5 and time<3: gs 'AmandaLegareDanceSequence'
+- IntLizaDressChange.txt:134 | gs 'Menu.AddCondition','MenuLizaTalk', "Result=IIF(Friends[$GirlNameILT]>8 and func('CheckDailyEventExists','','BuyDressTom')=0 and func('CheckDailyEventExists',$GirlNameILT,'BuyDress')=0 and Talked[$GirlNameILT]<2 and week<>6,-1,0)"
+- Intro.txt:43 | time=0
+- Intro.txt:46 | week=1
+- Intro.txt:98 | gs 'Table.Create', 'TodaySexEvents', 'GirlName, Time, EventType, Place'
+- Intro.txt:101 | gs 'Table.Create', 'DailyEventsList', 'GirlName, Location, Time, TimeCheckExpr, ChanceToMeet, KeepNextDay, EventType, EventCode'
+- Intro.txt:109 | jobkitchentomorrow[$AllGirlNames[InitGirlsCounter]]=jobkitchen[$AllGirlNames[InitGirlsCounter]]
+- Intro.txt:110 | jobcleaningtomorrow[$AllGirlNames[InitGirlsCounter]]=jobcleaning[$AllGirlNames[InitGirlsCounter]]
+- Intro.txt:111 | jobwaitresstomorrow[$AllGirlNames[InitGirlsCounter]]=jobwaitress[$AllGirlNames[InitGirlsCounter]]
+- Loc.txt:8 | if $CurLoc='TavernProstClients' or $CurLoc='StreetClients' or $CurLoc='SexPort' or $CurLoc='SexProstTavern' or $CurLoc='ChurchAfterCermon' or $CurLoc='ChurchIspoved' or $CurLoc='TavernGloryHole'  or $CurLoc='FridayDance' or $CurLoc='DressTry' or $CurLoc='BeckyHomeFront'  or $CurLoc='BeckyHome' or $CurLoc='AfterDanceLegare'  or $CurLoc='TavernAmandaRoom' or $CurLoc='AfterDanceSexLegare' or $CurLoc='AmandaLoverSex' or $Curloc='SherwoodTravel':
+- menu_tavernstat.txt:85 | GS 'Menu.Add',$GirlMenuName,'<<func(''JobMenuDesc'',jobkitchentomorrow[''amanda''],1)>>',''
+- menu_tavernstat.txt:87 | jobkitchentomorrow['amanda']=(jobkitchentomorrow['amanda']+1) mod 2
+- menu_tavernstat.txt:90 | GS 'Menu.Add',$GirlMenuName,'<<func(''JobMenuDesc'',jobcleaningtomorrow[''amanda''],2)>>',''
+- menu_tavernstat.txt:92 | jobcleaningtomorrow['amanda']=(jobcleaningtomorrow['amanda']+1) mod 2
+- menu_tavernstat.txt:96 | GS 'Menu.Add',$GirlMenuName,'<<func(''JobMenuDesc'',jobwaitresstomorrow[''amanda''],3)>>',''
+- menu_tavernstat.txt:98 | jobwaitresstomorrow['amanda']=(jobwaitresstomorrow['amanda']+1) mod 2
+- MomDressComplaint.txt:22 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- MomDressComplaint.txt:157 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- NextDay_NewDayEvents.txt:78 | if sluttiness['amanda']>=22 and TavernGloryHole=2 and func('GetRandomGirlByJob','jobgloryhole')='liza':
+- NextDay_NewDayEvents.txt:96 | if AmandaVar['fucklegare']=1 and AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=35 and week<>5:
+- NextDay_NewDayEvents.txt:106 | if sexacts['amanda']>=5 and sluttiness['amanda']>=35 and week<>5:
+- SetTavernServiceLevels.txt:8 | amandadiv=jobkitchen['amanda']+jobcleaning['amanda']+jobwaitress['amanda']
+- SetTavernServiceLevels.txt:13 | tavernkitchen=jobkitchen['sandra']*cooking['sandra']/sandradiv+jobkitchen['melissa']*cooking['melissa']/melissadiv+jobkitchen['amanda']*cooking['amanda']/amandadiv
+- SetTavernServiceLevels.txt:14 | tavernkitchen=Min(tavernkitchen,Max(jobkitchen['sandra']*cooking['sandra'],jobkitchen['melissa']*cooking['melissa'],jobkitchen['amanda']*cooking['amanda']))
+- SetTavernServiceLevels.txt:33 | tavernclean=jobcleaning['sandra']*cleaning['sandra']/sandradiv+jobcleaning['melissa']*cleaning['melissa']/melissadiv+jobcleaning['amanda']*cleaning['amanda']/amandadiv
+- SetTavernServiceLevels.txt:53 | tavernwaitress=jobwaitress['sandra']*waitress['sandra']/sandradiv+jobwaitress['melissa']*waitress['melissa']/melissadiv+jobwaitress['amanda']*waitress['amanda']/amandadiv
+- SetTavernServiceLevels.txt:54 | tavernwaitress=Min(tavernwaitress,Max(jobwaitress['sandra']*waitress['sandra'],jobwaitress['melissa']*waitress['melissa'],jobwaitress['amanda']*waitress['amanda']))
+- TavernAmandaRoom.txt:7 | if time<4: *p 'Как вы и ожидали, ее самой там не оказалось. '
+- TavernAmandaRoom.txt:11 | if time>=4:
+- TavernGloryHole.txt:6 | $GirlNameTGH=func('GetRandomGirlByJob','jobgloryhole')
+- TavernGloryHole.txt:55 | if (Time=2 or time=3) and $GirlNameTGH>'': GloryHoleWorks=1
+- TavernGloryHole.txt:67 | !dyneval($CheckIfSexEventExist,$GirlNameTGH, time)
+- TavernGloryHole.txt:100 | if dyneval($CheckIfSexEventExist,$GirlNameTGH, time)>0 and Rand(1,2)=1 and AmandaAtGlory=0:
+- TavernGloryHole.txt:101 | GloryHoleLook=dyneval($GetSexEventFromTable,$GirlNameTGH, time)
+- TavernMain.txt:16 | if (week=7 and time<3):
+- TavernMain.txt:18 | elseif (week=5 and time=3):
+- TavernMain.txt:20 | elseif time>3:
+- TavernMain.txt:27 | $TavernEventOngoing=func('DisplayTavernEventShort',time, 1)
+- TavernMain.txt:34 | $kitchenlist=func('NamesList','jobkitchen')
+- TavernMain.txt:35 | $cleaninglist=func('NamesList','jobcleaning')
+- TavernMain.txt:36 | $waitresslist=func('NamesList','jobwaitress')
+- TavernMain.txt:54 | if $CurrentLoc[$GirlNameTS1]=$CurLoc and time>2:
+- TavernMain.txt:55 | if time=3: gs 'AddOthersSperm', $GirlNameTS1, 7
+- TavernMain.txt:56 | if time=3: gs 'AddOthersSperm', $GirlNameTS2, 8
+- TavernMain.txt:60 | if jobwhore['liza']=1 and jobwhore['georgett']=1:
+- TavernMain.txt:62 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS1, time)>0:
+- TavernMain.txt:68 | elseif randvarPS=2 and dyneval($CheckIfSexEventExist,$GirlNameTS2, time)>0:
+- TavernMain.txt:79 | elseif jobwhore['liza']=1:
+- TavernMain.txt:81 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS2, time)>0:
+- TavernMain.txt:90 | elseif jobwhore['georgett']=1:
+- TavernMain.txt:92 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS1, time)>0 :
+- TavernMain.txt:141 | if $CurrentLoc['georgett']='TavernMain':
+- TavernMain.txt:146 | if GeorgettAvail=1 or ($CurrentLoc['georgett']=$CurLoc and time<2): gs 'CheckDailyEvent', 'georgett'
+- TavernMain.txt:147 | if LizaAvail=1 or ($CurrentLoc['liza']=$CurLoc and time<2): gs 'CheckDailyEvent', 'liza'
+- TavernShowImage.txt:8 | if RandVar=4 and jobwhore['liza']=0: jump ImageTavernLoop
+- TavernShowImage.txt:9 | if RandVar=5 and jobwhore['georgett']=0: jump ImageTavernLoop
+- WineStore.txt:6 | if week = 7 or time>=3:
+- WineStore.txt:11 | if time=0:
+- WineStore.txt:71 | if time=0:
+
+## State Updates (character store-focused)
+- AfterDanceLegare.txt:9 | if AmandaVar['alberprohibit']=1:
+- AfterDanceLegare.txt:25 | AmandaVar['alberfriends']-=2
+- AfterDanceLegare.txt:29 | AmandaVar['alberfriends']+=1
+- AfterDanceLegare.txt:40 | AmandaVar['alberfriends']+=2
+- AfterDanceLegare.txt:44 | AmandaVar['alberprohibit']=1
+- AfterDanceLegare.txt:92 | AmandaVar['alberfriends']+=2
+- AfterDanceLegare.txt:101 | AmandaVar['alberfriends']+=1
+- AfterDanceLegare.txt:145 | if AmandaVar['alberfriends']>=11 and rand(1,3)=1:
+- AfterDanceSexLegare.txt:24 | if AmandaVar['knowyouseesex']=0:
+- AfterDanceSexLegare.txt:28 | if AmandaVar['alberprohibit']=1:
+- AfterDanceSexLegare.txt:31 | AmandaVar['alberprohibit']=1
+- AfterDanceSexLegare.txt:32 | AmandaVar['knowyousawlegaresex']=1
+- AfterDanceSexLegare.txt:33 | AmandaVar['knowyouseesex']=1
+- AfterDanceSexLegare.txt:34 | AmandaVar['alberfriends']-=1
+- AfterDanceSexLegare.txt:58 | AmandaVar['alberfriends']-=2
+- AfterDanceSexLegare.txt:69 | AmandaVar['knowyouseesex']=1
+- AfterDanceSexLegare.txt:112 | AmandaVar['sucklegare']=1
+- AfterDanceSexLegare.txt:113 | AmandaVar['alberfriends']+=1
+- AfterDanceSexLegare.txt:149 | AmandaVar['alberfriends']+=1
+- AfterDanceSexLegare.txt:166 | AmandaVar['alberfriends']+=2
+- AfterDanceSexLegare.txt:169 | AmandaVar['fucklegare']=1
+- AfterDanceSexLegare.txt:221 | if  CurSexStep<MaxStep and AmandaVar['knowyouseesex']=0:
+- AfterDanceSexLegare.txt:254 | AmandaVar['sucklegare']=1
+- AfterDanceSexLegare.txt:268 | AmandaVar['knowlegaresex']=1
+- AfterDanceSexLegare.txt:269 | AmandaVar['sawlegaresex']=1
+- AfterDanceSexLegare.txt:278 | AmandaVar['sucklegare']=1
+- AfterDanceSexLegare.txt:290 | AmandaVar['fucklegare']=1
+- AfterDanceSexLegare.txt:292 | AmandaVar['deflowerlegare']=1
+- AfterDanceSexLegare.txt:293 | AmandaVar['knowdeflowerlegare']=1
+- AfterDanceSexLegare.txt:294 | AmandaVar['knownotvirgin']=1
+- AfterDanceSexLegare.txt:304 | AmandaVar['fucklegare']=1
+- AfterDanceSexLegare.txt:305 | AmandaVar['knownotvirgin']=1
+- AfterDanceSexLegare.txt:309 | AmandaVar['sucklegare']=1
+- AfterDanceSexLegare.txt:321 | AmandaVar['knownotvirgin']=1
+- AfterDanceSexLegare.txt:322 | AmandaVar['fucklegare']=1
+- AfterDanceSexLegare.txt:349 | AmandaVar['knownotvirgin']=1
+- AfterDanceSexLegare.txt:350 | AmandaVar['fucklegare']=1
+- AfterDanceSexLegare.txt:364 | AmandaVar['alberfriends']+=2
+- AmandaAtGloryHole.txt:6 | if AmandaVar['gloryscold'] or AmandaVar['glorywalkout'] or AmandaVar['glorysuck'] or AmandaVar['glorydeflower']: AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:10 | if AmandaVar['suckyou']: $GloryHoleYouLine1+=' Почему-то происходящее вызвало у вас чувство дежа-вю.'
+- AmandaAtGloryHole.txt:13 | if AmandaVar['gloryyouknow']: $GloryHoleYouLine2+=' Кажется, такое уже было. Неужели Лизетта опять привела помощницу?'
+- AmandaAtGloryHole.txt:38 | if AmandaVar['gloryyouknow']=0: $GloryGirlLine0+='При виде такого зрелища вы оторопели, равно как и она. '
+- AmandaAtGloryHole.txt:47 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']: $GloryGirlLine1+=' При виде вас она испуганно ойкнула и попробовала прикрыться.'
+- AmandaAtGloryHole.txt:48 | if AmandaVar['gloryyouknow']=0: $GloryGirlLine1+=' При виде такого зрелища вы оторопели, равно как и она. '
+- AmandaAtGloryHole.txt:56 | AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:63 | AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:97 | AmandaVar['gloryscold']=1
+- AmandaAtGloryHole.txt:98 | AmandaVar['glorywalkout']=0
+- AmandaAtGloryHole.txt:109 | AmandaVar['glorywalkout']=1
+- AmandaAtGloryHole.txt:124 | if AmandaVar['glorysuck'] or AmandaVar['suckyou'] or sluttiness['amanda']>=40:
+- AmandaAtGloryHole.txt:133 | if AmandaVar['knowsexactive'] or HadSex['amanda']>=3 or pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:141 | AmandaVar['glorysuck']=1
+- AmandaAtGloryHole.txt:142 | AmandaVar['suckyou']=1
+- AmandaAtGloryHole.txt:143 | AmandaVar['gloryscold']=0
+- AmandaAtGloryHole.txt:144 | AmandaVar['glorywalkout']=0
+- AmandaAtGloryHole.txt:159 | if AmandaVar['knowsexactive'] or HadSex['amanda']>=3 or pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:168 | AmandaVar['glorysuck']=1
+- AmandaAtGloryHole.txt:169 | AmandaVar['suckyou']=1
+- AmandaAtGloryHole.txt:170 | AmandaVar['gloryscold']=0
+- AmandaAtGloryHole.txt:171 | AmandaVar['glorywalkout']=0
+- AmandaAtGloryHole.txt:186 | AmandaVar['glorysuck']=1
+- AmandaAtGloryHole.txt:187 | AmandaVar['suckyou']=1
+- AmandaAtGloryHole.txt:211 | AmandaVar['glorysuck']=1
+- AmandaAtGloryHole.txt:212 | AmandaVar['suckyou']=1
+- AmandaAtGloryHole.txt:223 | AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:236 | AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:259 | if  AmandaVar['fuckyou']=0 and AmandaVar['knownotvirgin']=0:
+- AmandaAtGloryHole.txt:281 | AmandaVar['fuckyou']=1
+- AmandaAtGloryHole.txt:282 | AmandaVar['knownotvirgin']=1
+- AmandaAtGloryHole.txt:283 | if virginity['amanda']=1:AmandaVar['glorydeflower']=1
+- AmandaAtHomeCode.txt:9 | if AmandaVar['kickyoufromroomcount']>=3:
+- AmandaAtHomeCode.txt:16 | AmandaVar['kickedwithmomhelp']=1
+- AmandaAtHomeCode.txt:28 | AmandaVar['kickyoufromroomcount']+=1
+- AmandaAtHomeCode.txt:29 | AmandaVar['kickyoufromroom']=1
+- AmandaAtHomeCode.txt:37 | if AmandaVar['prohibitliza'] or (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5) or AmandaVar['gloryscold'] or AmandaVar['prohibitwithguys']:
+- AmandaAtHomeCode.txt:42 | AmandaVar['kickyoufromroom']=1
+- AmandaAtHomeCode.txt:59 | AmandaVar['prohibitliza']=0
+- AmandaAtHomeCode.txt:64 | if (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5):
+- AmandaAtHomeCode.txt:71 | AmandaVar['alberprohibit']=0
+- AmandaAtHomeCode.txt:83 | AmandaVar['gloryscold']=0
+- AmandaAtHomeCode.txt:95 | AmandaVar['prohibitwithguys']=0
+- AmandaAtHomeCode.txt:112 | if (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5):
+- AmandaAtHomeCode.txt:127 | AmandaVar['kickyoufromroom']=0
+- AmandaAtHomeCode.txt:239 | AmandaVar['fuckyou']=1
+- AmandaAtHomeCode.txt:240 | AmandaVar['knownotvirgin']=1
+- AmandaAtHomeCode.txt:242 | AmandaVar['beddeflower']=1
+- AmandaAtHomeCode.txt:251 | AmandaVar['fuckyou']=1
+- AmandaAtHomeCode.txt:252 | AmandaVar['knownotvirgin']=1
+- AmandaAtHomeCode.txt:254 | AmandaVar['beddeflower']=1
+- AmandaAtHomeCode.txt:300 | AmandaVar['kickyoufromroom']=1
+- AmandaAtHomeCode.txt:316 | AmandaVar['kickyoufromroom']=1
+- AmandaAtHomeCode.txt:388 | AmandaVar['kickyoufromroom']=1
+- AmandaDynamicCommonBlocks.txt:32 | if AmandaVar['prohibitliza'] or (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5) or AmandaVar['gloryscold']:
+- AmandaDynamicCommonBlocks.txt:96 | if AmandaVar['sucklegare']=0:
+- AmandaDynamicCommonBlocks.txt:99 | if AmandaVar['fucklegare']=0:
+- AmandaDynamicCommonBlocks.txt:101 | if AmandaVar['alberfriends']>=15 and sluttiness['amanda']>=35 and sexacts['amanda']>=5:
+- AmandaDynamicCommonBlocks.txt:107 | if AmandaVar['alberfriends']>=12 and sluttiness['amanda']>=32 and sexacts['amanda']>=4:
+- AmandaDynamicCommonBlocks.txt:114 | if (AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=30) or (AmandaVar['alberfriends']>=5 and sluttiness['amanda']>=40):
+- AmandaDynamicCommonBlocks.txt:130 | if AmandaVar['glorydeflower']>0 or AmandaVar['fuckyou']>0: AmandaNesluhBonus+=6
+- AmandaDynamicCommonBlocks.txt:131 | if AmandaVar['gloryscold']>0: AmandaNesluhBonus-=3
+- AmandaDynamicCommonBlocks.txt:132 | if AmandaVar['glorysuck']>0 or AmandaVar['suckyou']>0: AmandaNesluhBonus+=3
+- AmandaDynamicCommonBlocks.txt:133 | if AmandaVar['glorywalkout']>0: AmandaNesluhBonus+=2
+- AmandaDynamicCommonBlocks.txt:135 | if AmandaVar['alberfriends']>=7: AmandaNesluhBonus+=1
+- AmandaDynamicCommonBlocks.txt:136 | if AmandaVar['alberfriends']>=9: AmandaNesluhBonus+=1
+- AmandaDynamicCommonBlocks.txt:137 | if AmandaVar['alberfriends']>=12: AmandaNesluhBonus+=2
+- AmandaDynamicCommonBlocks.txt:150 | if (AmandaVar['glorydeflower'] or AmandaVar['fuckyou']) and AmandaNesluh=1 and Rand(1,4)<=3:
+- AmandaDynamicCommonBlocks.txt:153 | if (AmandaVar['glorysuck'] or AmandaVar['suckyou']) and AmandaNesluh=1 and Rand(1,4)<=1:
+- AmandaDynamicCommonBlocks.txt:212 | AmandaVar['warnnotwork']=1
+- AmandaDynamicCommonBlocks.txt:213 | if Rand(1,5-AmandaVar['warnnotwork']*2)=1:
+- AmandaLegareDanceSequence.txt:8 | AmandaVar['EscapeUnnoticed']=0
+- AmandaLegareDanceSequence.txt:13 | if AmandaVar['alberprohibit']=1: AmandaVar['alberfriends']=Max(0,AmandaVar['alberfriends']-1)
+- AmandaLegareDanceSequence.txt:14 | if AmandaVar['alberprohibit']=1 and AmandaVar['alberfriends']>=12:
+- AmandaLegareDanceSequence.txt:16 | elseif AmandaVar['alberprohibit']=1 and AmandaVar['alberfriends']>=8:
+- AmandaLegareDanceSequence.txt:18 | elseif AmandaVar['alberprohibit']=1 and AmandaVar['alberfriends']>=4:
+- AmandaLegareDanceSequence.txt:20 | elseif AmandaVar['alberprohibit']=1:
+- AmandaLegareDanceSequence.txt:22 | elseif AmandaVar['alberfriends']>=8:
+- AmandaLegareDanceSequence.txt:28 | AmandaVar['LegareGo']=0
+- AmandaLegareDanceSequence.txt:30 | if (AmandaVar['alberfriends']>=11 and sluttiness['amanda']>=16) or (AmandaVar['alberfriends']>=5 and sluttiness['amanda']>=30) or (sluttiness['amanda']>=50):
+- AmandaLegareDanceSequence.txt:31 | AmandaVar['LegareGo']=1
+- AmandaLegareDanceSequence.txt:34 | AmandaVar['LegareGo']=2
+- AmandaLegareDanceSequence.txt:52 | if AmandaVar['LegareGo']>0 and ((j>DanceCreated-1 and Rand(1,2)=1) or j=DanceCreated):
+- AmandaLegareDanceSequence.txt:54 | AmandaVar['LegareGo']=0
+- AmandaLegareDanceSequence.txt:73 | AmandaVar['sucklegare']=1
+- AmandaLegareDanceSequence.txt:74 | AmandaVar['alberfriends']+=1
+- AmandaLegareDanceSequence.txt:78 | AmandaVar['fucklegare']=1
+- AmandaLegareDanceSequence.txt:80 | AmandaVar['deflowerlegare']=1
+- AmandaLegareDanceSequence.txt:81 | AmandaVar['alberfriends']+=2
+- AmandaLegareDanceSequence.txt:84 | AmandaVar['alberfriends']+=1
+- AmandaLegareDanceSequence.txt:87 | AmandaVar['alberfriends']+=2
+- AmandaLegareDanceSequence.txt:91 | AmandaVar['fucklegare']=1
+- AmandaLegareDanceSequence.txt:94 | AmandaVar['alberfriends']+=1
+- AmandaLegareDanceSequence.txt:97 | AmandaVar['alberfriends']+=2
+- AmandaLegareDanceSequence.txt:104 | AmandaVar['leftdances']=1
+- AmandaLoverSex.txt:162 | AmandaVar['sawwithguys']=1
+- AmandaLoverSex.txt:178 | AmandaVar['sawwithguys']=1
+- AmandaSexDanceStreet.txt:12 | if AmandaVar['fuckyou'] and sluttiness['amanda']>=35:
+- EventAmandaLegareCreateDance.txt:7 | if AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=18:
+- EventAmandaLegareCreateDance.txt:9 | AmandaVar['alberdanceadvance']=5
+- EventAmandaLegareCreateDance.txt:10 | elseif AmandaVar['alberfriends']>=9 and sluttiness['amanda']>=15:
+- EventAmandaLegareCreateDance.txt:12 | AmandaVar['alberdanceadvance']=4
+- EventAmandaLegareCreateDance.txt:13 | elseif AmandaVar['alberfriends']>=7 and sluttiness['amanda']>=10:
+- EventAmandaLegareCreateDance.txt:15 | AmandaVar['alberdanceadvance']=3
+- EventAmandaLegareCreateDance.txt:16 | elseif AmandaVar['alberfriends']>=6 and sluttiness['amanda']>=6:
+- EventAmandaLegareCreateDance.txt:18 | AmandaVar['alberdanceadvance']=2
+- EventAmandaLegareCreateDance.txt:19 | elseif AmandaVar['alberfriends']>=5 and sluttiness['amanda']>=3:
+- EventAmandaLegareCreateDance.txt:21 | AmandaVar['alberdanceadvance']=1
+- EventAmandaLegareCreateDance.txt:24 | AmandaVar['alberdanceadvance']=0
+- EventAmandaLegareCreateDance.txt:32 | if AmandaVar['LegareGo']=0:
+- EventAmandaLegareCreateDance.txt:37 | if AmandaVar['alberdanceadvance']=2: $DanceWatchLine[0]+=' Торгаш нежно обнимает ее за талию.'
+- EventAmandaLegareCreateDance.txt:38 | if AmandaVar['alberdanceadvance']=3: $DanceWatchLine[0]+=' Альбер нежно но твердо держит вашу сестренку за попу.'
+- EventAmandaLegareCreateDance.txt:39 | if AmandaVar['alberdanceadvance']>=4: $DanceWatchLine[0]+=' Похотливые ручонки достопочтенного Альбера Легаре нежно сжимают упругую попку вашей сестренки через тонкую ткань ее платья. А она трется своими грудками о его грудь, потихоньку возбуждаясь.'
+- EventAmandaLegareCreateDance.txt:40 | if AmandaVar['alberdanceadvance']=5: $DanceWatchLine[0]+=' При этом он не забывает целовать малышку Аманду а та отвечает ему тем же, с трудом не сбиваясь с ритма танца.'
+- EventAmandaLegareCreateDance.txt:42 | if AmandaVar['alberfriends']<12 and Rand(1,2)=1: AmandaVar['alberfriends']+=1
+- EventAmandaLizettTalk.txt:11 | if AmandaVar['prohibitliza']=1:
+- EventAmandaLizettTalk.txt:13 | if Rand(1,Max(2,10-AmandaVar['lizafriends']*3/2))=1:
+- EventAmandaLizettTalk.txt:19 | elseif AmandaVar['prohibitliza']=2:
+- EventAmandaLizettTalk.txt:21 | if Rand(1,Max(4,20-AmandaVar['lizafriends']*2))=1:
+- EventAmandaLizettTalk.txt:43 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']>0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk.txt:48 | AmandaVar['prohibitliza']=2
+- EventAmandaLizettTalk.txt:54 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']>0 and NotToSpeak=0,-1,0)"
+- EventAmandaLizettTalk.txt:59 | AmandaVar['prohibitliza']=1
+- EventAmandaLizettTalk.txt:64 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']=0 and NotToSpeak=0,-1,0)"
+- EventAmandaLizettTalk.txt:69 | AmandaVar['prohibitliza']=1
+- EventAmandaLizettTalk.txt:74 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']=0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk.txt:79 | AmandaVar['prohibitliza']=0
+- EventAmandaLizettTalk.txt:83 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']>0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk2.txt:22 | AmandaVar['prohibitliza']=2
+- EventAmandaLizettTalk2.txt:27 | gs 'Menu.AddCondition','MenuAmandaLizaTalk2', "Result=IIF(YourReaction2=0 and AmandaVar['prohibitliza']>0,-1,0)"
+- EventAmandaLizettTalk2.txt:32 | AmandaVar['prohibitliza']=1
+- EventAmandaLizettTalk2.txt:35 | gs 'Menu.AddCondition','MenuAmandaLizaTalk2', "Result=IIF(YourReaction2=0 and AmandaVar['prohibitliza']=0,-1,0)"
+- EventAmandaLizettTalk2.txt:40 | AmandaVar['prohibitliza']=0
+- EventAmandaLizettTalk2.txt:47 | gs 'Menu.AddCondition','MenuAmandaLizaTalk2', "Result=IIF(YourReaction2=0 and AmandaVar['prohibitliza']>0,-1,0)"
+- EventAmandaLizettTalk2.txt:57 | !$Result+=sluttiness['amanda'] + '???' + AmandaVar['lizafriends']+'????'
+- FridayDance.txt:12 | if dyneval($GetDanceJustLeft,'amanda','legare',FridayDancesCount)>0 or AmandaVar['LegareGo']=1:
+- FridayDance.txt:14 | AmandaVar['leftdances']=1
+- FridayDance.txt:20 | AmandaVar['EscapeUnnoticed']=1
+- FridayDance.txt:73 | AmandaVar['albernowdances']=0
+- FridayDance.txt:75 | AmandaVar['albernowdances']=1
+- FridayDance.txt:80 | if AmandaVar['EscapeUnnoticed']=1:
+- FridayDance.txt:82 | AmandaVar['leftdances']=1
+- FridayDance.txt:84 | elseif AmandaVar['albernowdances']=1:
+- FridayDance.txt:96 | gs 'Menu.AddCondition','MenuFridayDance', "Result=IIF(FridayDancesCount<5 and DanceStep=0 and AmandaVar['leftdances']=0,-1,0)"
+- InitAmanda.txt:50 | AmandaVar['lizafriends']=0
+- InitAmanda.txt:51 | AmandaVar['prohibitliza']=0
+- InitAmanda.txt:52 | AmandaVar['alberfriends']=0
+- InitAmanda.txt:53 | AmandaVar['albernowdances']=0
+- InitAmanda.txt:54 | AmandaVar['alberdanceadvance']=0
+- InitAmanda.txt:55 | AmandaVar['leftdances']=0
+- InitAmanda.txt:56 | AmandaVar['alberprohibit']=0
+- InitAmanda.txt:57 | AmandaVar['LegareGo']=0
+- InitAmanda.txt:58 | AmandaVar['EscapeUnnoticed']=0
+- InitAmanda.txt:60 | AmandaVar['glorytried']=0
+- InitAmanda.txt:61 | AmandaVar['gloryyouknow']=0
+- InitAmanda.txt:62 | AmandaVar['gloryscold']=0
+- InitAmanda.txt:63 | AmandaVar['glorywalkout']=0
+- InitAmanda.txt:64 | AmandaVar['glorysuck']=0
+- InitAmanda.txt:65 | AmandaVar['glorydeflower']=0
+- InitAmanda.txt:67 | AmandaVar['suckyou']=0
+- InitAmanda.txt:68 | AmandaVar['fuckyou']=0
+- InitAmanda.txt:70 | AmandaVar['knowsexactive']=0
+- InitAmanda.txt:71 | AmandaVar['knownotvirgin']=0
+- InitAmanda.txt:73 | AmandaVar['knowlegaresex']=0
+- InitAmanda.txt:74 | AmandaVar['sawlegaresex']=0
+- InitAmanda.txt:75 | AmandaVar['sucklegare']=0
+- InitAmanda.txt:76 | AmandaVar['fucklegare']=0
+- InitAmanda.txt:77 | AmandaVar['deflowerlegare']=0
+- InitAmanda.txt:78 | AmandaVar['knowdeflowerlegare']=0
+- InitAmanda.txt:80 | AmandaVar['beddeflower']=0
+- InitAmanda.txt:82 | AmandaVar['kickyoufromroom']=0
+- InitAmanda.txt:83 | AmandaVar['kickyoufromroomcount']=0
+- InitAmanda.txt:84 | AmandaVar['kickedwithmomhelp']=0
+- InitAmanda.txt:86 | AmandaVar['knowyousawlegaresex']=0
+- InitAmanda.txt:87 | AmandaVar['knowyouseesex']=0
+- InitAmanda.txt:89 | AmandaVar['warnnotwork']=0
+- InitAmanda.txt:91 | AmandaVar['sawwithguys']=0
+- InitAmanda.txt:92 | AmandaVar['prohibitwithguys']=0
+- InitAmanda.txt:94 | AmandaVar['askzalettoday']=0
+- InitAmanda.txt:95 | AmandaVar['MomDressComplaint']=0
+- InitAmandaLizaTalkItems.txt:112 | "sluttiness['amanda']>=20 and AmandaVar['glorytried'] and  AmandaVar['glorysuck']=0 and AmandaVar['gloryscold']=0 and AmandaVar['glorywalkout']=0", _
+- InitAmandaLizaTalkItems.txt:117 | "sluttiness['amanda']>=20 and AmandaVar['glorysuck']=0 and AmandaVar['gloryscold']=0 and AmandaVar['glorywalkout']=1", _
+- InitAmandaLizaTalkItems.txt:122 | "sluttiness['amanda']>=20 and AmandaVar['glorysuck']=0 and AmandaVar['gloryscold']=1", _
+- InitAmandaLizaTalkItems.txt:127 | "sluttiness['amanda']>=20 and AmandaVar['glorysuck'] and AmandaVar['fuckyou']=0 and AmandaVar['gloryscold']=0 and AmandaVar['glorywalkout']=1", _
+- InitAmandaLizaTalkItems.txt:132 | "sluttiness['amanda']>=20 and AmandaVar['glorysuck'] and AmandaVar['fuckyou']=0 and AmandaVar['gloryscold']=1", _
+- InitAmandaLizaTalkItems.txt:137 | "sluttiness['amanda']>=20 and AmandaVar['glorysuck'] and AmandaVar['fuckyou']=0 and AmandaVar['gloryscold']=0 and AmandaVar['glorywalkout']=0", _
+- InitAmandaLizaTalkItems.txt:156 | "AmandaVar['fuckyou']=0 and AmandaVar['kickedwithmomhelp']", _
+- InitAmandaLizaTalkItems.txt:161 | "AmandaVar['fuckyou']=0 and AmandaVar['kickedwithmomhelp']=0 and AmandaVar['kickyoufromroom']>0", _
+- InitAmandaLizaTalkItems.txt:173 | "sluttiness['amanda']>=25 and  AmandaVar['alberprohibit']", _
+- InitAmandaLizaTalkItems.txt:194 | "AmandaVar['sucklegare'] and AmandaVar['fucklegare']=0", _
+- InitAmandaLizaTalkItems.txt:199 | "AmandaVar['alberfriends']>10 and AmandaVar['sucklegare']=0 and AmandaVar['fucklegare']=0", _
+- IntAmandaDance.txt:31 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep=1 and AmandaVar['albernowdances']=0,-1,0)"
+- IntAmandaDance.txt:54 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep=1 and AmandaVar['albernowdances']=0,-1,0)"
+- IntAmandaDance.txt:69 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0,-1,0)"
+- IntAmandaDance.txt:96 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and $HandsDance<>'waist',-1,0)"
+- IntAmandaDance.txt:130 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and strcomp($HandsDance,'^ass')=0,-1,0)"
+- IntAmandaDance.txt:161 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and $HandsDance='ass',-1,0)"
+- IntAmandaDance.txt:192 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and KissDance=0,-1,0)"
+- IntAmandaDance.txt:207 | AmandaVar['leftdances']=1
+- IntAmandaDance.txt:221 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and HadSex['amanda']>0 and (strcomp($HandsDance,'^ass')>0 or KissDance>0),-1,0)"
+- IntAmandaDance.txt:227 | if DanceStep-1<=AmandaVar['alberdanceadvance']:
+- IntAmandaDance.txt:229 | elseif AmandaVar['alberdanceadvance']=0:
+- IntAmandaDance.txt:237 | if DanceStep=6 and AmandaVar['LegareGo']=1:
+- IntAmandaDance.txt:240 | AmandaVar['LegareGo']=0
+- IntAmandaDance.txt:245 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=1 and DanceStep<DanceMaxIAD+2 and AmandaVar['albernowdances']=1,-1,0)"
+- IntAmandaDance.txt:250 | if AmandaVar['alberprohibit']=1:
+- IntAmandaDance.txt:255 | if AmandaVar['alberfriends']>=7:
+- IntAmandaDance.txt:257 | AmandaVar['alberfriends']+=3
+- IntAmandaDance.txt:261 | AmandaVar['alberfriends']-=1
+- IntAmandaDance.txt:264 | AmandaVar['alberprohibit']=1
+- IntAmandaDance.txt:265 | AmandaVar['leftdances']=1
+- IntAmandaDance.txt:267 | AmandaVar['albernowdances']=0
+- IntAmandaDance.txt:270 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=1 and DanceStep<DanceMaxIAD+2 and AmandaVar['albernowdances']=1,-1,0)"
+- IntAmandaDance.txt:282 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=DanceMaxIAD or AmandaVar['albernowdances']=1 or DanceStep=1,-1,0)"
+- IntAmandaDressChange.txt:86 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and $bra[$GirlNameIAT]>'' and (AmandaVar['suckyou'] or AmandaVar['fuckyou']) and Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:98 | tmpLizaComandoBonus=Min(10,AmandaVar['lizafriends']/2)
+- IntAmandaDressChange.txt:101 | tmpLizaComandoBonus=-Min(10,AmandaVar['lizafriends']/4)
+- IntAmandaDressChange.txt:138 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and $panties[$GirlNameIAT]>'' and (AmandaVar['suckyou'] or AmandaVar['fuckyou'])  and Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaSex.txt:399 | AmandaVar['suckyou']=1
+- IntAmandaSex.txt:456 | if CockInPussy[$GirlNameASDS]=0 and AmandaVar['knownotvirgin']=0:
+- IntAmandaSex.txt:458 | AmandaVar['knownotvirgin']=1
+- IntAmandaSex.txt:460 | AmandaVar['fuckyou']=1
+- IntAmandaSex.txt:588 | AmandaVar['kickyoufromroom']=1
+- IntAmandaSex.txt:618 | AmandaVar['kickyoufromroom']=1
+- IntAmandaTalk.txt:30 | if AmandaVar['alberfriends']>=9:
+- IntAmandaTalk.txt:40 | AmandaVar['alberprohibit']=0
+- IntAmandaTalk.txt:43 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['alberprohibit']>0,-1,0)"
+- IntAmandaTalk.txt:51 | AmandaVar['prohibitliza']=0
+- IntAmandaTalk.txt:53 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['prohibitliza']>0,-1,0)"
+- IntAmandaTalk.txt:62 | AmandaVar['gloryscold']=0
+- IntAmandaTalk.txt:63 | AmandaVar['glorywalkout']=0
+- IntAmandaTalk.txt:65 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['gloryscold']>0,-1,0)"
+- IntAmandaTalk.txt:73 | AmandaVar['prohibitwithguys']=0
+- IntAmandaTalk.txt:75 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['prohibitwithguys']>0,-1,0)"
+- IntAmandaTalk.txt:88 | AmandaVar['warnnotwork']=0
+- IntAmandaTalk.txt:90 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['warnnotwork']>0,-1,0)"
+- IntAmandaTalk.txt:96 | if friends[$GirlNameIAT]>11 and AmandaVar['alberprohibit']=0:
+- IntAmandaTalk.txt:99 | AmandaVar['knowdeflowerlegare']=1
+- IntAmandaTalk.txt:100 | AmandaVar['knowlegaresex']=1
+- IntAmandaTalk.txt:107 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['knownotvirgin']>0 and AmandaVar['knowdeflowerlegare']=0 and AmandaVar['deflowerlegare']>0 ,-1,0)"
+- IntAmandaTalk.txt:120 | AmandaVar['alberprohibit']=1
+- IntAmandaTalk.txt:122 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['knowlegaresex']>0 and AmandaVar['alberprohibit']=0,-1,0)"
+- IntAmandaTalk.txt:130 | AmandaVar['prohibitwithguys']=1
+- IntAmandaTalk.txt:132 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['sawwithguys']>0 and AmandaVar['prohibitwithguys']=0,-1,0)"
+- IntAmandaTalk.txt:157 | AmandaVar['askzalettoday']=1
+- IntAmandaTalk.txt:159 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['knowsexactive']>0 and pregnancy[$GirlNameIAT]<120 and AmandaVar['askzalettoday']=0 and virginity['amanda']=0,-1,0)"
+- MomDressComplaint.txt:24 | AmandaVar['prohibitliza']=1
+- MomDressComplaint.txt:38 | if $GirlName='amanda' and AmandaVar['prohibitliza']:
+- MomDressComplaint.txt:145 | 'Заодно вы <<iif(AmandaVar[''prohibitliza'']=1,''еще раз '','''')>>запретили ей болтать с Лизеттой, источником грязи и разврата.'
+- MomDressComplaint.txt:146 | AmandaVar['prohibitliza']=1
+- MomDressComplaint.txt:159 | AmandaVar['prohibitliza']=1
+- NextDay_FinishDayEvents.txt:54 | AmandaVar['glorytried']=1
+- NextDay_FinishDayEvents.txt:94 | if AmandaVar['gloryscold'] or AmandaVar['glorywalkout'] or AmandaVar['glorysuck'] or AmandaVar['glorydeflower']: AmandaVar['gloryyouknow']=1
+- NextDay_FinishDayEvents.txt:95 | if AmandaVar['glorysuck']:AmandaVar['suckyou']=1
+- NextDay_FinishDayEvents.txt:96 | if AmandaVar['glorydeflower']:AmandaVar['fuckyou']=1
+- NextDay_FinishDayEvents.txt:97 | if AmandaVar['glorydeflower'] or AmandaVar['fuckyou'] or AmandaVar['sawlegaresex'] or AmandaVar['sawwithguys'] or AmandaVar['knowlegaresex'] or AmandaVar['knownotvirgin']: AmandaVar['knowsexactive']=1
+- NextDay_FinishDayEvents.txt:100 | AmandaVar['knowyouseesex']=0
+- NextDay_FinishDayEvents.txt:101 | AmandaVar['kickyoufromroom']=0
+- NextDay_FinishDayEvents.txt:102 | AmandaVar['askzalettoday']=0
+- NextDay_FinishDayEvents.txt:105 | AmandaVar['leftdances']=0
+- NextDay_FinishDayEvents.txt:107 | AmandaVar['alberfriends']=Max(0,Min(AmandaVar['alberfriends'],20))
+- NextDay_FinishDayEvents.txt:108 | AmandaVar['lizafriends']=Max(0,Min(AmandaVar['lizafriends'],20))
+- NextDay_NewDayEvents.txt:79 | if AmandaVar['glorytried']=0:
+- NextDay_NewDayEvents.txt:83 | if AmandaVar['gloryscold']=1: GloryChanceDecrease+=9
+- NextDay_NewDayEvents.txt:84 | if AmandaVar['glorywalkout']=1: GloryChanceDecrease+=3
+- NextDay_NewDayEvents.txt:85 | if AmandaVar['glorysuck']=1: GloryChanceDecrease-=2
+- NextDay_NewDayEvents.txt:86 | if AmandaVar['glorydeflower']=1: GloryChanceDecrease-=3
+- NextDay_NewDayEvents.txt:96 | if AmandaVar['fucklegare']=1 and AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=35 and week<>5:
+- NextDay_NewDayEvents.txt:98 | if AmandaVar['alberfriends']>=15:ChanceVar-=1
+- NextDay_NewDayEvents.txt:101 | if AmandaVar['alberprohibit']:ChanceVar+=5
+- NextDay_NewDayEvents.txt:110 | if AmandaVar['prohibitwithguys']: ChanceVar+=5
+- SexEventsTableCode.txt:155 | AmandaVar['LegareGo']=func('Table.GetValue','GirlDance','id:'+LineNum,'GoOut')
+- TavernAmandaRoom.txt:56 | if (AmandaVar['suckyou'] or AmandaVar['fuckyou']) and sluttiness['amanda']>=30:tmpSexType=1
+- TavernAmandaRoom.txt:59 | if (AmandaVar['suckyou'] or AmandaVar['fuckyou']) and sluttiness['amanda']>=20:tmpSexType=2
+- TavernAmandaRoom.txt:84 | AmandaVar['kickyoufromroom']=1
+- TavernAmandaRoom.txt:91 | AmandaVar['kickyoufromroom']=1
+- TavernGloryHole.txt:203 | AmandaVar['glorysdiscover']=1
+- TavernGloryHole.txt:253 | AmandaVar['glorysuck']=1
+- TavernMain.txt:123 | if AmandaVar['kickyoufromroom']=0:
+
+## Full Matched Line Index (exhaustive)
+- $menu_f.txt:11 | gs 'GirlsDesc','amanda'
+- AdjustOtkroven.txt:18 | elseif $GirlNameAOtk='amanda' or $GirlNameAOtk='melissa' or $GirlNameAOtk='sandra':
+- AfterDanceLegare.txt:9 | if AmandaVar['alberprohibit']=1:
+- AfterDanceLegare.txt:15 | if AmandaVar['gloryscold']>0:
+- AfterDanceLegare.txt:17 | elseif AmandaVar['glorywalkout']>0:
+- AfterDanceLegare.txt:21 | AmandaNesluh=dyneval($AmandaNesluhCalc)
+- AfterDanceLegare.txt:23 | if AmandaNesluh=0:
+- AfterDanceLegare.txt:25 | AmandaVar['alberfriends']-=2
+- AfterDanceLegare.txt:26 | gs 'SlutFriendsIncrease', 'amanda', 3, 1, -2, 20, 1, -3
+- AfterDanceLegare.txt:27 | elseif AmandaNesluh=1:
+- AfterDanceLegare.txt:29 | AmandaVar['alberfriends']+=1
+- AfterDanceLegare.txt:30 | gs 'SlutFriendsIncrease', 'amanda', 5, 1, -1, 25, 1, 2
+- AfterDanceLegare.txt:31 | elseif AmandaNesluh=2:
+- AfterDanceLegare.txt:32 | if AmandaVar['glorydeflower']>0 or AmandaVar['fuckyou']>0:
+- AfterDanceLegare.txt:33 | $AmandaArgue1='с тобой трахнулась'
+- AfterDanceLegare.txt:34 | $AmandaArgue2='присунул'
+- AfterDanceLegare.txt:36 | $AmandaArgue1='тебе отсосала'
+- AfterDanceLegare.txt:37 | $AmandaArgue2='в рот запихал'
+- AfterDanceLegare.txt:39 | *pl 'Нагло смотря вам в глаза ваша сестренка процедила: "Да ты ревнуешь, Стефан! Думаешь что раз я <<$AmandaArgue1>>, то теперь на других и смотреть не могу? Чем меня учить и указывать с кем я могу гулять а с кем нет, лучше бы на себя бы посмотрел, родной сестре свой хрен <<$AmandaArgue2>> и теперь ее жизни учит, тоже мне, учитель выискался!"<br>С этими словами она выдернула руку и потянула Альбера за собой.'
+- AfterDanceLegare.txt:40 | AmandaVar['alberfriends']+=2
+- AfterDanceLegare.txt:41 | gs 'SlutFriendsIncrease', 'amanda', 5, 1, -1, 30, 1, 3
+- AfterDanceLegare.txt:44 | AmandaVar['alberprohibit']=1
+- AfterDanceLegare.txt:46 | if AmandaNesluh=0:
+- AfterDanceLegare.txt:52 | dynamic $LegareAmandaLetGoCode
+- AfterDanceLegare.txt:78 | AlberVar['FightYouAmanda']=1
+- AfterDanceLegare.txt:87 | Friends['amanda']=Max(Friends['amanda']-4,0)
+- AfterDanceLegare.txt:88 | sluttiness['amanda']=Max(sluttiness['amanda']-6,0)
+- AfterDanceLegare.txt:91 | Friends['amanda']=Max(Friends['amanda']-2,0)
+- AfterDanceLegare.txt:92 | AmandaVar['alberfriends']+=2
+- AfterDanceLegare.txt:93 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 32, 1, 1
+- AfterDanceLegare.txt:94 | dynamic $LegareAmandaLetGoCode
+- AfterDanceLegare.txt:100 | Friends['amanda']=Max(Friends['amanda']-1,0)
+- AfterDanceLegare.txt:101 | AmandaVar['alberfriends']+=1
+- AfterDanceLegare.txt:102 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 32, 1, 1
+- AfterDanceLegare.txt:106 | dynamic $LegareAmandaLetGoCode
+- AfterDanceLegare.txt:127 | Friends['amanda']=Max(Friends['amanda']-2,0)
+- AfterDanceLegare.txt:128 | if sluttiness['amanda']<25 or (sluttiness['amanda']<=30 and Rand(1,3)<3) or (sluttiness['amanda']<=35 and Rand(1,3)=1):
+- AfterDanceLegare.txt:130 | sluttiness['amanda']=Max(sluttiness['amanda']-3,0)
+- AfterDanceLegare.txt:134 | if pregnancy['amanda']>120:
+- AfterDanceLegare.txt:136 | elseif DressPartSlut[$bottomdress['amanda']]>=4 or DressPartSlut[$topdress['amanda']]>=4:
+- AfterDanceLegare.txt:140 | if sluttiness['amanda']>=40 or (sluttiness['amanda']>=30 and Rand(1,2)):
+- AfterDanceLegare.txt:142 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 44, 1, 1
+- AfterDanceLegare.txt:145 | if AmandaVar['alberfriends']>=11 and rand(1,3)=1:
+- AfterDanceLegare.txt:154 | dynamic $LegareAmandaLetGoCode
+- AfterDanceLegare.txt:156 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 32, 1, 2
+- AfterDanceLegare.txt:166 | sluttiness['amanda']=Max(sluttiness['amanda']-2,0)
+- AfterDanceSexLegare.txt:9 | tmpLegareSexType=dyneval($AmandaLegareSetSexType)
+- AfterDanceSexLegare.txt:10 | if tmpLegareSexType=4 and pregnancy['amanda']<=120 and Rand(1,4)<=3: tmpLegareSexType=5
+- AfterDanceSexLegare.txt:15 | $AmandaLegareLeaveToTraktir={
+- AfterDanceSexLegare.txt:17 | dynamic $LegareAmandaLetGoCode, 1, tmpLegareSexType
+- AfterDanceSexLegare.txt:23 | $AmandaLegareSexInterrupt={
+- AfterDanceSexLegare.txt:24 | if AmandaVar['knowyouseesex']=0:
+- AfterDanceSexLegare.txt:28 | if AmandaVar['alberprohibit']=1:
+- AfterDanceSexLegare.txt:31 | AmandaVar['alberprohibit']=1
+- AfterDanceSexLegare.txt:32 | AmandaVar['knowyousawlegaresex']=1
+- AfterDanceSexLegare.txt:33 | AmandaVar['knowyouseesex']=1
+- AfterDanceSexLegare.txt:34 | AmandaVar['alberfriends']-=1
+- AfterDanceSexLegare.txt:36 | AmandaNesluh=dyneval($AmandaNesluhCalc)
+- AfterDanceSexLegare.txt:37 | if AmandaNesluh=2:
+- AfterDanceSexLegare.txt:39 | if AmandaVar['glorydeflower']>0 or AmandaVar['fuckyou']>0:
+- AfterDanceSexLegare.txt:45 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 60, 1, 3
+- AfterDanceSexLegare.txt:50 | act 'Я на это смотреть не могу и пойду отсюда': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:52 | elseif AmandaNesluh=1:
+- AfterDanceSexLegare.txt:54 | gs 'SlutFriendsIncrease', 'amanda', 7, 1, -1, 55, 1, 2
+- AfterDanceSexLegare.txt:55 | act 'Плюнуть и идти обратно в трактир': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:58 | AmandaVar['alberfriends']-=2
+- AfterDanceSexLegare.txt:59 | gs 'SlutFriendsIncrease', 'amanda', 3, 1, -2, 20, 1, -3
+- AfterDanceSexLegare.txt:66 | if AmandaVar['knowyousawlegaresex']:
+- AfterDanceSexLegare.txt:69 | AmandaVar['knowyouseesex']=1
+- AfterDanceSexLegare.txt:71 | if sluttiness['amanda']>45 or (sluttiness['amanda']>32 and Rand(1,3)=1):
+- AfterDanceSexLegare.txt:73 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 55, 1, 2
+- AfterDanceSexLegare.txt:80 | act 'Плюнуть и идти обратно в трактир': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:84 | act 'Я на это смотреть не могу и пойду отсюда': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:88 | $AmandaLegareReactOnYouSee={
+- AfterDanceSexLegare.txt:89 | if AmandaVar['knowyouseesex']:
+- AfterDanceSexLegare.txt:101 | $AmandaLegareSexMinetFinish={
+- AfterDanceSexLegare.txt:104 | if sluttiness['amanda']>=40 or sexacts['amanda']>12:
+- AfterDanceSexLegare.txt:112 | AmandaVar['sucklegare']=1
+- AfterDanceSexLegare.txt:113 | AmandaVar['alberfriends']+=1
+- AfterDanceSexLegare.txt:114 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 40, 1, 1
+- AfterDanceSexLegare.txt:115 | gs 'PregnancyCheck', 'amanda', 'mouthface', 1, 'legare'
+- AfterDanceSexLegare.txt:118 | $AmandaLegareSexFinish={
+- AfterDanceSexLegare.txt:126 | if cuminside['amanda']<2:
+- AfterDanceSexLegare.txt:129 | if pregnancy['amanda']>120:
+- AfterDanceSexLegare.txt:132 | if sluttiness['amanda']>=48:
+- AfterDanceSexLegare.txt:142 | gs 'ShowImage', 'amanda', 'albersex', 'cuminside' +Rand(1,2)
+- AfterDanceSexLegare.txt:144 | gs 'ShowImage', 'amanda', 'albersex', 'spermpussymouth'
+- AfterDanceSexLegare.txt:146 | gs 'ShowImage', 'amanda', 'albersex', 'spermpussy'
+- AfterDanceSexLegare.txt:148 | gs 'PregnancyCheck', 'amanda', 'inside', 1, 'legare'
+- AfterDanceSexLegare.txt:149 | AmandaVar['alberfriends']+=1
+- AfterDanceSexLegare.txt:150 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 50, 1, 2
+- AfterDanceSexLegare.txt:153 | if cuminside['amanda']<2:
+- AfterDanceSexLegare.txt:156 | if pregnancy['amanda']>120:
+- AfterDanceSexLegare.txt:159 | if sluttiness['amanda']>=48:
+- AfterDanceSexLegare.txt:165 | gs 'PregnancyCheck', 'amanda', 'outside', 1, 'legare'
+- AfterDanceSexLegare.txt:166 | AmandaVar['alberfriends']+=2
+- AfterDanceSexLegare.txt:167 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 50, 1, 2
+- AfterDanceSexLegare.txt:169 | AmandaVar['fucklegare']=1
+- AfterDanceSexLegare.txt:172 | $AmandaLegareSexCreateButtons={
+- AfterDanceSexLegare.txt:200 | act 'Пойду-ка и я': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:206 | act 'Пойду-ка и я': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:211 | act 'Пойду-ка и я': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:218 | dynamic $AmandaLegareSexInterrupt
+- AfterDanceSexLegare.txt:221 | if  CurSexStep<MaxStep and AmandaVar['knowyouseesex']=0:
+- AfterDanceSexLegare.txt:222 | act 'Ухожу, даже и не собираюсь на это смотреть': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:234 | if sluttiness['amanda']>=30:
+- AfterDanceSexLegare.txt:239 | gs 'ShowImage', 'amanda', 'albersex', 'kiss'
+- AfterDanceSexLegare.txt:245 | if pregnancy['amanda']<120:
+- AfterDanceSexLegare.txt:247 | gs 'ShowImage', 'amanda', 'alberseduce', 'showcock'
+- AfterDanceSexLegare.txt:253 | gs 'ShowImage', 'amanda', 'alberseduce', 'suck'
+- AfterDanceSexLegare.txt:254 | AmandaVar['sucklegare']=1
+- AfterDanceSexLegare.txt:257 | gs 'ShowImage', 'amanda', 'albersex', 'grope' + Rand(1,2)
+- AfterDanceSexLegare.txt:260 | gs 'ShowImage', 'amanda', 'albersex', 'grope' + Rand(1,2)
+- AfterDanceSexLegare.txt:263 | gs 'ShowImage', 'amanda', 'albersex', 'gropenaked'
+- AfterDanceSexLegare.txt:266 | gs 'ShowImage', 'amanda', 'albersex', 'grope' + Rand(1,2)
+- AfterDanceSexLegare.txt:268 | AmandaVar['knowlegaresex']=1
+- AfterDanceSexLegare.txt:269 | AmandaVar['sawlegaresex']=1
+- AfterDanceSexLegare.txt:272 | if sexacts['amanda']>0:
+- AfterDanceSexLegare.txt:277 | gs 'ShowImage', 'amanda', 'alberseduce', 'suck'
+- AfterDanceSexLegare.txt:278 | AmandaVar['sucklegare']=1
+- AfterDanceSexLegare.txt:281 | dynamic $AmandaLegareSexMinetFinish
+- AfterDanceSexLegare.txt:284 | if $panties['amanda']>'':
+- AfterDanceSexLegare.txt:290 | AmandaVar['fucklegare']=1
+- AfterDanceSexLegare.txt:291 | virginity['amanda']=0
+- AfterDanceSexLegare.txt:292 | AmandaVar['deflowerlegare']=1
+- AfterDanceSexLegare.txt:293 | AmandaVar['knowdeflowerlegare']=1
+- AfterDanceSexLegare.txt:294 | AmandaVar['knownotvirgin']=1
+- AfterDanceSexLegare.txt:295 | gs 'ShowImage', 'amanda', 'albersex', 'fuckbarrelstart'
+- AfterDanceSexLegare.txt:298 | if $panties['amanda']>'':
+- AfterDanceSexLegare.txt:304 | AmandaVar['fucklegare']=1
+- AfterDanceSexLegare.txt:305 | AmandaVar['knownotvirgin']=1
+- AfterDanceSexLegare.txt:306 | gs 'ShowImage', 'amanda', 'albersex', 'fuckbarrelstart'
+- AfterDanceSexLegare.txt:309 | AmandaVar['sucklegare']=1
+- AfterDanceSexLegare.txt:310 | dynamic $AmandaLegareSexMinetFinish
+- AfterDanceSexLegare.txt:313 | if $panties['amanda']>'':
+- AfterDanceSexLegare.txt:318 | if $bra['amanda']>'': *p 'Лифчик на ней тоже недолго задержался.'
+- AfterDanceSexLegare.txt:321 | AmandaVar['knownotvirgin']=1
+- AfterDanceSexLegare.txt:322 | AmandaVar['fucklegare']=1
+- AfterDanceSexLegare.txt:323 | gs 'ShowImage', 'amanda', 'albersex', 'fuckwall'
+- AfterDanceSexLegare.txt:325 | dynamic $AmandaLegareReactOnYouSee
+- AfterDanceSexLegare.txt:329 | dynamic $AmandaLegareSexMinetFinish
+- AfterDanceSexLegare.txt:334 | gs 'ShowImage', 'amanda', 'albersex', 'fuckbarrel' +Rand(1,3)
+- AfterDanceSexLegare.txt:336 | if pregnancy['amanda']<120:
+- AfterDanceSexLegare.txt:342 | gs 'ShowImage', 'amanda', 'albersex', 'fuckbarrel' +Rand(1,3)
+- AfterDanceSexLegare.txt:345 | if pregnancy['amanda']>=120:
+- AfterDanceSexLegare.txt:349 | AmandaVar['knownotvirgin']=1
+- AfterDanceSexLegare.txt:350 | AmandaVar['fucklegare']=1
+- AfterDanceSexLegare.txt:351 | gs 'ShowImage', 'amanda', 'albersex', 'fuck' +Rand(1,2)
+- AfterDanceSexLegare.txt:354 | gs 'ShowImage', 'amanda', 'albersex', 'fuck' +Rand(1,2)
+- AfterDanceSexLegare.txt:356 | dynamic $AmandaLegareReactOnYouSee
+- AfterDanceSexLegare.txt:361 | dynamic $AmandaLegareSexFinish
+- AfterDanceSexLegare.txt:362 | dynamic $AmandaLegareReactOnYouSee
+- AfterDanceSexLegare.txt:364 | AmandaVar['alberfriends']+=2
+- AfterDanceSexLegare.txt:365 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 50, 1, 2
+- AfterDanceSexLegare.txt:377 | dynamic $AmandaLegareSexCreateButtons
+- AmandaAtGloryHole.txt:1 | Location: "AmandaAtGloryHole"
+- AmandaAtGloryHole.txt:6 | if AmandaVar['gloryscold'] or AmandaVar['glorywalkout'] or AmandaVar['glorysuck'] or AmandaVar['glorydeflower']: AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:9 | if sexacts['amanda']<15: $GloryHoleYouLine1+='С некоторым удивлением вы отметили, что хоть вам делают минет и с энтузиазмом, но не очень умело.'
+- AmandaAtGloryHole.txt:10 | if AmandaVar['suckyou']: $GloryHoleYouLine1+=' Почему-то происходящее вызвало у вас чувство дежа-вю.'
+- AmandaAtGloryHole.txt:13 | if AmandaVar['gloryyouknow']: $GloryHoleYouLine2+=' Кажется, такое уже было. Неужели Лизетта опять привела помощницу?'
+- AmandaAtGloryHole.txt:17 | if AmandaVar['gloryyouknow']:
+- AmandaAtGloryHole.txt:19 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']:
+- AmandaAtGloryHole.txt:21 | elseif AmandaVar['glorywalkout']:
+- AmandaAtGloryHole.txt:25 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']:
+- AmandaAtGloryHole.txt:35 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']:
+- AmandaAtGloryHole.txt:38 | if AmandaVar['gloryyouknow']=0: $GloryGirlLine0+='При виде такого зрелища вы оторопели, равно как и она. '
+- AmandaAtGloryHole.txt:41 | if AmandaVar['gloryyouknow']:
+- AmandaAtGloryHole.txt:47 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']: $GloryGirlLine1+=' При виде вас она испуганно ойкнула и попробовала прикрыться.'
+- AmandaAtGloryHole.txt:48 | if AmandaVar['gloryyouknow']=0: $GloryGirlLine1+=' При виде такого зрелища вы оторопели, равно как и она. '
+- AmandaAtGloryHole.txt:50 | AmandaGloryCurState=0
+- AmandaAtGloryHole.txt:52 | GS 'Menu.Create','MenuAmandaGloryHole'
+- AmandaAtGloryHole.txt:53 | GS 'Menu.Add','MenuAmandaGloryHole','Осмотреть Аманду',''
+- AmandaAtGloryHole.txt:54 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:55 | gs 'GirlsDesc','amanda'
+- AmandaAtGloryHole.txt:56 | AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:58 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState<10,-1,0)"
+- AmandaAtGloryHole.txt:60 | GS 'Menu.Add','MenuAmandaGloryHole','Осмотреть Лизетту',''
+- AmandaAtGloryHole.txt:61 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:63 | AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:67 | GS 'Menu.Add','MenuAmandaGloryHole','Отругать',''
+- AmandaAtGloryHole.txt:68 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:71 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']:
+- AmandaAtGloryHole.txt:76 | if (sluttiness['amanda']>=35 and Rand(1,2)=1) or sluttiness['amanda']>=45:
+- AmandaAtGloryHole.txt:78 | if AmandaVar['glorydeflower']>0 or AmandaVar['fuckyou']>0:
+- AmandaAtGloryHole.txt:80 | elseif AmandaVar['glorysuck']>0 or  AmandaVar['suckyou']>0:
+- AmandaAtGloryHole.txt:86 | sluttiness['amanda']-=1
+- AmandaAtGloryHole.txt:91 | sluttiness['amanda']-=5
+- AmandaAtGloryHole.txt:96 | CumFaceYou['amanda']=0
+- AmandaAtGloryHole.txt:97 | AmandaVar['gloryscold']=1
+- AmandaAtGloryHole.txt:98 | AmandaVar['glorywalkout']=0
+- AmandaAtGloryHole.txt:99 | friends['amanda']=max(0,friends['amanda']-5)
+- AmandaAtGloryHole.txt:100 | AmandaGloryCurState=10
+- AmandaAtGloryHole.txt:103 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState<=2 or AmandaGloryCurState=4,-1,0)"
+- AmandaAtGloryHole.txt:105 | GS 'Menu.Add','MenuAmandaGloryHole','Развернуться и уйти, ничего не говоря',''
+- AmandaAtGloryHole.txt:106 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:108 | CumFaceYou['amanda']=0
+- AmandaAtGloryHole.txt:109 | AmandaVar['glorywalkout']=1
+- AmandaAtGloryHole.txt:112 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState<=2 or AmandaGloryCurState=4,-1,0)"
+- AmandaAtGloryHole.txt:114 | GS 'Menu.Add','MenuAmandaGloryHole','Предложить ей сделать то, что она собиралась',''
+- AmandaAtGloryHole.txt:115 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:117 | if AmandaVar['glorysuck'] or AmandaVar['suckyou']:
+- AmandaAtGloryHole.txt:123 | if AmandaVar['gloryscold'] or AmandaVar['prohibitliza']: *p 'Она явно обрадовалась, что вы не стали ее ругать за нарушение ваших запретов. '
+- AmandaAtGloryHole.txt:124 | if AmandaVar['glorysuck'] or AmandaVar['suckyou'] or sluttiness['amanda']>=40:
+- AmandaAtGloryHole.txt:128 | if sexacts['amanda']<15:
+- AmandaAtGloryHole.txt:133 | if AmandaVar['knowsexactive'] or HadSex['amanda']>=3 or pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:135 | gs 'SlutFriendsIncrease', 'amanda', 15, 1, 1, 45, 1, 1
+- AmandaAtGloryHole.txt:139 | gs 'SlutFriendsIncrease', 'amanda', 15, 1, 3, 45, 1, 3
+- AmandaAtGloryHole.txt:141 | AmandaVar['glorysuck']=1
+- AmandaAtGloryHole.txt:142 | AmandaVar['suckyou']=1
+- AmandaAtGloryHole.txt:143 | AmandaVar['gloryscold']=0
+- AmandaAtGloryHole.txt:144 | AmandaVar['glorywalkout']=0
+- AmandaAtGloryHole.txt:145 | AmandaGloryCurState=3
+- AmandaAtGloryHole.txt:146 | gs 'ShowImageSeq', 'amanda', 'gloryfirst', 'minet',3
+- AmandaAtGloryHole.txt:148 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=1,-1,0)"
+- AmandaAtGloryHole.txt:150 | GS 'Menu.Add','MenuAmandaGloryHole','Предложить ей продолжить',''
+- AmandaAtGloryHole.txt:151 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:154 | if sexacts['amanda']<15:
+- AmandaAtGloryHole.txt:159 | if AmandaVar['knowsexactive'] or HadSex['amanda']>=3 or pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:161 | gs 'SlutFriendsIncrease', 'amanda', 15, 1, 1, 45, 1, 1
+- AmandaAtGloryHole.txt:165 | gs 'SlutFriendsIncrease', 'amanda', 15, 1, 3, 45, 1, 3
+- AmandaAtGloryHole.txt:168 | AmandaVar['glorysuck']=1
+- AmandaAtGloryHole.txt:169 | AmandaVar['suckyou']=1
+- AmandaAtGloryHole.txt:170 | AmandaVar['gloryscold']=0
+- AmandaAtGloryHole.txt:171 | AmandaVar['glorywalkout']=0
+- AmandaAtGloryHole.txt:172 | AmandaGloryCurState=3
+- AmandaAtGloryHole.txt:173 | gs 'ShowImageSeq', 'amanda', 'gloryfirst', 'minet',3
+- AmandaAtGloryHole.txt:175 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=2,-1,0)"
+- AmandaAtGloryHole.txt:177 | GS 'Menu.Add','MenuAmandaGloryHole','Кончить на лицо',''
+- AmandaAtGloryHole.txt:178 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:181 | if sluttiness['amanda']>=40 and sexacts['amanda']>10:
+- AmandaAtGloryHole.txt:185 | gs 'PregnancyCheck', 'amanda', 'mouthface', 1, 'Вы'
+- AmandaAtGloryHole.txt:186 | AmandaVar['glorysuck']=1
+- AmandaAtGloryHole.txt:187 | AmandaVar['suckyou']=1
+- AmandaAtGloryHole.txt:188 | AmandaGloryCurState=4
+- AmandaAtGloryHole.txt:189 | gs 'ShowImage', 'amanda', 'gloryfirst', 'cummouth'
+- AmandaAtGloryHole.txt:191 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=3,-1,0)"
+- AmandaAtGloryHole.txt:193 | GS 'Menu.Add','MenuAmandaGloryHole','Кончить в рот',''
+- AmandaAtGloryHole.txt:194 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:197 | if sluttiness['amanda']>=40 or sexacts['amanda']>12:
+- AmandaAtGloryHole.txt:204 | if sluttiness['amanda']>=45 and sexacts['amanda']>15:
+- AmandaAtGloryHole.txt:210 | gs 'PregnancyCheck', 'amanda', 'mouthface', 1, 'Вы'
+- AmandaAtGloryHole.txt:211 | AmandaVar['glorysuck']=1
+- AmandaAtGloryHole.txt:212 | AmandaVar['suckyou']=1
+- AmandaAtGloryHole.txt:213 | AmandaGloryCurState=4
+- AmandaAtGloryHole.txt:214 | gs 'ShowImage', 'amanda', 'gloryfirst', 'cummouth'
+- AmandaAtGloryHole.txt:216 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=3,-1,0)"
+- AmandaAtGloryHole.txt:218 | GS 'Menu.Add','MenuAmandaGloryHole','Поцеловать Аманду',''
+- AmandaAtGloryHole.txt:219 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:222 | AmandaGloryCurState=5
+- AmandaAtGloryHole.txt:223 | AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:224 | gs 'ShowImage', 'amanda', 'gloryfirst', 'kiss' + Rand(1,2)
+- AmandaAtGloryHole.txt:226 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=4,-1,0)"
+- AmandaAtGloryHole.txt:228 | GS 'Menu.Add','MenuAmandaGloryHole','Поблагодарить Аманду',''
+- AmandaAtGloryHole.txt:229 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:232 | gs 'SlutFriendsIncrease', 'amanda', 15, 1, 1, 0, 0, 0
+- AmandaAtGloryHole.txt:233 | AmandaGloryCurState=10
+- AmandaAtGloryHole.txt:234 | CumFaceYou['amanda']=0
+- AmandaAtGloryHole.txt:235 | AmandaGloryCurState=10
+- AmandaAtGloryHole.txt:236 | AmandaVar['gloryyouknow']=1
+- AmandaAtGloryHole.txt:238 | gs 'ShowImage', 'amanda', 'gloryfirst', 'ambush'
+- AmandaAtGloryHole.txt:241 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=4 Or AmandaGloryCurState=5,-1,0)"
+- AmandaAtGloryHole.txt:243 | GS 'Menu.Add','MenuAmandaGloryHole','Трахнуть сестру',''
+- AmandaAtGloryHole.txt:244 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:246 | if virginity['amanda']:
+- AmandaAtGloryHole.txt:250 | if sexacts['amanda']>15 and cuminside['amanda']>=10:
+- AmandaAtGloryHole.txt:255 | if AmandaVar['glorydeflower'] or AmandaVar['beddeflower']:
+- AmandaAtGloryHole.txt:259 | if  AmandaVar['fuckyou']=0 and AmandaVar['knownotvirgin']=0:
+- AmandaAtGloryHole.txt:261 | if pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:263 | elseif (AmandaVar['knowlegaresex'] or AmandaVar['sawlegaresex']):
+- AmandaAtGloryHole.txt:265 | elseif AmandaVar['knowsexactive']:
+- AmandaAtGloryHole.txt:279 | GiveOrgasms['amanda']+=1
+- AmandaAtGloryHole.txt:280 | AmandaGloryCurState=6
+- AmandaAtGloryHole.txt:281 | AmandaVar['fuckyou']=1
+- AmandaAtGloryHole.txt:282 | AmandaVar['knownotvirgin']=1
+- AmandaAtGloryHole.txt:283 | if virginity['amanda']=1:AmandaVar['glorydeflower']=1
+- AmandaAtGloryHole.txt:284 | gs 'ShowImageSeq', 'amanda', 'gloryfirst', 'fuck',6
+- AmandaAtGloryHole.txt:286 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=5,-1,0)"
+- AmandaAtGloryHole.txt:288 | GS 'Menu.Add','MenuAmandaGloryHole','Кончить в сестренку',''
+- AmandaAtGloryHole.txt:289 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:292 | if virginity['amanda']:
+- AmandaAtGloryHole.txt:298 | if sluttiness['amanda']>=45 and sexacts['amanda']>15:
+- AmandaAtGloryHole.txt:303 | if cuminside['amanda']<2:
+- AmandaAtGloryHole.txt:306 | if pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:309 | tmpCumInside=dyneval($GetSexNum,'amanda','you','inside')
+- AmandaAtGloryHole.txt:310 | if sluttiness['amanda']>=60:
+- AmandaAtGloryHole.txt:312 | elseif tmpCumInside=0  and  cuminside['amanda']>=2:
+- AmandaAtGloryHole.txt:314 | elseif tmpCumInside=0  and  cuminside['amanda']<2:
+- AmandaAtGloryHole.txt:320 | if sluttiness['amanda']>=60 or pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:326 | if virginity['amanda']: *p ' и крови. '
+- AmandaAtGloryHole.txt:330 | gs 'SlutFriendsIncrease', 'amanda', 18, 1, 2, 55, 1, 2
+- AmandaAtGloryHole.txt:331 | if virginity['amanda']: gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 55, 1, 2
+- AmandaAtGloryHole.txt:333 | gs 'PregnancyCheck', 'amanda', 'inside', 1, 'Вы'
+- AmandaAtGloryHole.txt:334 | CumFaceYou['amanda']=0
+- AmandaAtGloryHole.txt:335 | virginity['amanda']=0
+- AmandaAtGloryHole.txt:336 | AmandaGloryCurState=10
+- AmandaAtGloryHole.txt:338 | gs 'ShowImage', 'amanda', 'gloryfirst', 'cumpussy' + Rand(1,2)
+- AmandaAtGloryHole.txt:340 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=6,-1,0)"
+- AmandaAtGloryHole.txt:342 | GS 'Menu.Add','MenuAmandaGloryHole','Кончить на животик',''
+- AmandaAtGloryHole.txt:343 | GS 'Menu.AddModule','MenuAmandaGloryHole',{
+- AmandaAtGloryHole.txt:346 | if sluttiness['amanda']>=45 and sexacts['amanda']>15:
+- AmandaAtGloryHole.txt:351 | if cuminside['amanda']<2:
+- AmandaAtGloryHole.txt:356 | if pregnancy['amanda']>120:
+- AmandaAtGloryHole.txt:359 | tmpCumInside=dyneval($GetSexNum,'amanda','you','inside')
+- AmandaAtGloryHole.txt:360 | if sluttiness['amanda']>=60:
+- AmandaAtGloryHole.txt:362 | elseif tmpCumInside=0  and  cuminside['amanda']>=2:
+- AmandaAtGloryHole.txt:368 | if virginity['amanda']:
+- AmandaAtGloryHole.txt:374 | if virginity['amanda']: *p 'крови и '
+- AmandaAtGloryHole.txt:378 | gs 'SlutFriendsIncrease', 'amanda', 18, 1, 2, 45, 1, 1
+- AmandaAtGloryHole.txt:379 | if virginity['amanda']:	gs 'SlutFriendsIncrease', 'amanda', 18, 1, 1, 45, 1, 1
+- AmandaAtGloryHole.txt:381 | AmandaGloryCurState=10
+- AmandaAtGloryHole.txt:382 | gs 'PregnancyCheck', 'amanda', 'outside', 1, 'Вы'
+- AmandaAtGloryHole.txt:383 | CumFaceYou['amanda']=0
+- AmandaAtGloryHole.txt:384 | virginity['amanda']=0
+- AmandaAtGloryHole.txt:387 | gs 'Menu.AddCondition','MenuAmandaGloryHole', "Result=IIF(AmandaGloryCurState=6,-1,0)"
+- AmandaAtGloryHole.txt:389 | ------------ End of location: "AmandaAtGloryHole" ------------
+- AmandaAtHomeCode.txt:1 | Location: "AmandaAtHomeCode"
+- AmandaAtHomeCode.txt:8 | $CodeAmandaKickFromRoom={
+- AmandaAtHomeCode.txt:9 | if AmandaVar['kickyoufromroomcount']>=3:
+- AmandaAtHomeCode.txt:16 | AmandaVar['kickedwithmomhelp']=1
+- AmandaAtHomeCode.txt:17 | gs 'SlutFriendsIncrease', 'amanda', 0, 1, -3, 0, 0, 0
+- AmandaAtHomeCode.txt:28 | AmandaVar['kickyoufromroomcount']+=1
+- AmandaAtHomeCode.txt:29 | AmandaVar['kickyoufromroom']=1
+- AmandaAtHomeCode.txt:30 | gs 'SlutFriendsIncrease', 'amanda', 0, 1, -5, 18, 1, -3
+- AmandaAtHomeCode.txt:35 | $CodeAmandaSorryChoices={
+- AmandaAtHomeCode.txt:37 | if AmandaVar['prohibitliza'] or (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5) or AmandaVar['gloryscold'] or AmandaVar['prohibitwithguys']:
+- AmandaAtHomeCode.txt:41 | gs 'SlutFriendsIncrease', 'amanda', 10, 1, -1, 25, 1, -1
+- AmandaAtHomeCode.txt:42 | AmandaVar['kickyoufromroom']=1
+- AmandaAtHomeCode.txt:49 | dynamic $CodeAmandaKickFromRoom,'afterdeny'
+- AmandaAtHomeCode.txt:52 | if AmandaVar['prohibitliza']:
+- AmandaAtHomeCode.txt:56 | dynamic $CodeAmandaHappyConfirm
+- AmandaAtHomeCode.txt:57 | gs 'SlutFriendsIncrease', 'amanda', 18, 1, 1, 45, 2, 1
+- AmandaAtHomeCode.txt:59 | AmandaVar['prohibitliza']=0
+- AmandaAtHomeCode.txt:60 | dynamic $CodeAmandaSorryChoices
+- AmandaAtHomeCode.txt:64 | if (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5):
+- AmandaAtHomeCode.txt:68 | dynamic $CodeAmandaHappyConfirm
+- AmandaAtHomeCode.txt:69 | gs 'SlutFriendsIncrease', 'amanda', 18, 1, 1, 45, 2, 1
+- AmandaAtHomeCode.txt:71 | AmandaVar['alberprohibit']=0
+- AmandaAtHomeCode.txt:72 | dynamic $CodeAmandaSorryChoices
+- AmandaAtHomeCode.txt:76 | if AmandaVar['gloryscold']:
+- AmandaAtHomeCode.txt:80 | dynamic $CodeAmandaHappyConfirm
+- AmandaAtHomeCode.txt:81 | gs 'SlutFriendsIncrease', 'amanda', 18, 1, 1, 45, 2, 1
+- AmandaAtHomeCode.txt:83 | AmandaVar['gloryscold']=0
+- AmandaAtHomeCode.txt:84 | dynamic $CodeAmandaSorryChoices
+- AmandaAtHomeCode.txt:88 | if AmandaVar['prohibitwithguys']:
+- AmandaAtHomeCode.txt:92 | dynamic $CodeAmandaHappyConfirm
+- AmandaAtHomeCode.txt:93 | gs 'SlutFriendsIncrease', 'amanda', 18, 1, 1, 45, 2, 1
+- AmandaAtHomeCode.txt:95 | AmandaVar['prohibitwithguys']=0
+- AmandaAtHomeCode.txt:96 | dynamic $CodeAmandaSorryChoices
+- AmandaAtHomeCode.txt:102 | dynamic $CodeAmandaSexStart
+- AmandaAtHomeCode.txt:108 | $CodeAmandaListScold={
+- AmandaAtHomeCode.txt:109 | if AmandaVar['prohibitliza']:
+- AmandaAtHomeCode.txt:112 | if (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5):
+- AmandaAtHomeCode.txt:115 | if AmandaVar['gloryscold']:
+- AmandaAtHomeCode.txt:118 | if AmandaVar['prohibitwithguys']:
+- AmandaAtHomeCode.txt:126 | $CodeAmandaSexStart={
+- AmandaAtHomeCode.txt:127 | AmandaVar['kickyoufromroom']=0
+- AmandaAtHomeCode.txt:132 | if virginity['amanda']:
+- AmandaAtHomeCode.txt:137 | if AmandaVar['knowlegaresex'] or AmandaVar['sawlegaresex']:
+- AmandaAtHomeCode.txt:140 | dynamic $CodeAmandaSexPush
+- AmandaAtHomeCode.txt:144 | if AmandaVar['knowsexactive']:
+- AmandaAtHomeCode.txt:147 | dynamic $CodeAmandaSexPush
+- AmandaAtHomeCode.txt:151 | if pregnancy['amanda']>120:
+- AmandaAtHomeCode.txt:154 | dynamic $CodeAmandaSexPush
+- AmandaAtHomeCode.txt:158 | if AmandaVar['knownotvirgin']:
+- AmandaAtHomeCode.txt:161 | dynamic $CodeAmandaSexPush
+- AmandaAtHomeCode.txt:165 | if AmandaVar['fuckyou']:
+- AmandaAtHomeCode.txt:168 | dynamic $CodeAmandaSexPush
+- AmandaAtHomeCode.txt:171 | dynamic $CodeAmandaSexAgreeLeave, 'minet'
+- AmandaAtHomeCode.txt:178 | dynamic $CodeAmandaSexBedUndress
+- AmandaAtHomeCode.txt:181 | gs 'SlutFriendsIncrease', 'amanda', 20, 1, 1, 50, 5, 1
+- AmandaAtHomeCode.txt:185 | dynamic $CodeAmandaSexBedUndress
+- AmandaAtHomeCode.txt:191 | $CodeAmandaSexBedUndress={
+- AmandaAtHomeCode.txt:200 | dynamic $CodeAmandaSexBedUndress
+- AmandaAtHomeCode.txt:208 | $panties['amanda']=''
+- AmandaAtHomeCode.txt:210 | dynamic $CodeAmandaSexBedUndress
+- AmandaAtHomeCode.txt:216 | dynamic $CodeAmandaSexBedDeflower, 0
+- AmandaAtHomeCode.txt:218 | act 'Перейти к делу': dynamic $CodeAmandaSexScene
+- AmandaAtHomeCode.txt:224 | $CodeAmandaSexBedDeflower={
+- AmandaAtHomeCode.txt:231 | gs 'SlutFriendsIncrease', 'amanda', 20, 1, 1, 50, 1, 1
+- AmandaAtHomeCode.txt:232 | LickPussy['amanda']+=1
+- AmandaAtHomeCode.txt:233 | dynamic $CodeAmandaSexBedDeflower, 1
+- AmandaAtHomeCode.txt:239 | AmandaVar['fuckyou']=1
+- AmandaAtHomeCode.txt:240 | AmandaVar['knownotvirgin']=1
+- AmandaAtHomeCode.txt:241 | virginity['amanda']=0
+- AmandaAtHomeCode.txt:242 | AmandaVar['beddeflower']=1
+- AmandaAtHomeCode.txt:243 | gs 'SlutFriendsIncrease', 'amanda', 12, 1, 1, 30, 1, 1
+- AmandaAtHomeCode.txt:244 | dynamic $CodeAmandaSexBedDeflower, 2
+- AmandaAtHomeCode.txt:250 | GiveOrgasms['amanda']+=1
+- AmandaAtHomeCode.txt:251 | AmandaVar['fuckyou']=1
+- AmandaAtHomeCode.txt:252 | AmandaVar['knownotvirgin']=1
+- AmandaAtHomeCode.txt:253 | virginity['amanda']=0
+- AmandaAtHomeCode.txt:254 | AmandaVar['beddeflower']=1
+- AmandaAtHomeCode.txt:255 | gs 'SlutFriendsIncrease', 'amanda', 20, 1, 3, 55, 1, 3
+- AmandaAtHomeCode.txt:256 | dynamic $CodeAmandaSexBedDeflower, 3
+- AmandaAtHomeCode.txt:269 | gs 'SlutFriendsIncrease', 'amanda', 20, 1, 1, 0, 0, 0
+- AmandaAtHomeCode.txt:270 | gs 'PregnancyCheck', 'amanda', 'mouthface', 1, 'Вы'
+- AmandaAtHomeCode.txt:271 | dynamic $CodeAmandaSexBedDeflower, tmpCurSexStep+4
+- AmandaAtHomeCode.txt:283 | gs 'SlutFriendsIncrease', 'amanda', 10, 1, -1, 55, 1, 1
+- AmandaAtHomeCode.txt:284 | gs 'PregnancyCheck', 'amanda', 'inside', 1, 'Вы'
+- AmandaAtHomeCode.txt:285 | dynamic $CodeAmandaSexBedDeflower, tmpCurSexStep+2
+- AmandaAtHomeCode.txt:293 | gs 'SlutFriendsIncrease', 'amanda', 20, 1, 2, 55, 1, 3
+- AmandaAtHomeCode.txt:300 | AmandaVar['kickyoufromroom']=1
+- AmandaAtHomeCode.txt:309 | $CodeAmandaSexScene={
+- AmandaAtHomeCode.txt:312 | 'Движимый неуемной похотью, вы прокрались в комнату своей сестры Аманды среди ночи и разбудили ее грязными приставаниями. К вашему удивлению она вас не выгнала, а наоборот, с радостью приняла, расточая авансы и делая недвусмысленные намеки. Что вы будете <a href="exec: GS ''Menu.Call'',''AmandaMenuSex''">делать</a>?'
+- AmandaAtHomeCode.txt:314 | gs 'IntAmandaSex', 'amanda', 'home','minet'
+- AmandaAtHomeCode.txt:316 | AmandaVar['kickyoufromroom']=1
+- AmandaAtHomeCode.txt:320 | gs 'IntAmandaSex', 'amanda', 'home'
+- AmandaAtHomeCode.txt:323 | gs 'GirlsDesc','amanda'
+- AmandaAtHomeCode.txt:326 | $CodeAmandaSexPush={
+- AmandaAtHomeCode.txt:330 | if virginity['amanda']:
+- AmandaAtHomeCode.txt:332 | if Friends['amanda']>=10:
+- AmandaAtHomeCode.txt:334 | dynamic $CodeAmandaSexAgreeLeave, 'minet'
+- AmandaAtHomeCode.txt:337 | dynamic $CodeAmandaSexAgreeLeave
+- AmandaAtHomeCode.txt:339 | gs 'SlutFriendsIncrease', 'amanda', 2, 1, -1, 35, 1, -1
+- AmandaAtHomeCode.txt:341 | if Friends['amanda']>=15:
+- AmandaAtHomeCode.txt:344 | elseif Friends['amanda']>=10:
+- AmandaAtHomeCode.txt:350 | elseif Friends['amanda']>=5:
+- AmandaAtHomeCode.txt:358 | gs 'SlutFriendsIncrease', 'amanda', 2, 1, -1, 50, 3, 1
+- AmandaAtHomeCode.txt:360 | dynamic $CodeAmandaSexBedUndress
+- AmandaAtHomeCode.txt:363 | gs 'SlutFriendsIncrease', 'amanda', 2, 1, -1, 0, 0, 0
+- AmandaAtHomeCode.txt:364 | dynamic $CodeAmandaSexAgreeLeave, 'minet'
+- AmandaAtHomeCode.txt:367 | gs 'SlutFriendsIncrease', 'amanda', 2, 1, -1, 30, 1, -1
+- AmandaAtHomeCode.txt:368 | dynamic $CodeAmandaSexAgreeLeave
+- AmandaAtHomeCode.txt:374 | $CodeAmandaSexAgreeLeave={
+- AmandaAtHomeCode.txt:378 | gs 'SlutFriendsIncrease', 'amanda', 20, 3, 1, 35, 5, 1
+- AmandaAtHomeCode.txt:379 | gs 'ShowImageSeq', 'amanda', 'sexroom', 'minet',12
+- AmandaAtHomeCode.txt:380 | dynamic $CodeAmandaSexScene
+- AmandaAtHomeCode.txt:387 | gs 'SlutFriendsIncrease', 'amanda', 10, 1, -1, 25, 1, -1
+- AmandaAtHomeCode.txt:388 | AmandaVar['kickyoufromroom']=1
+- AmandaAtHomeCode.txt:396 | dynamic $CodeAmandaKickFromRoom, 'afterdeny'
+- AmandaAtHomeCode.txt:400 | ------------ End of location: "AmandaAtHomeCode" ------------
+- AmandaDynamicCommonBlocks.txt:1 | Location: "AmandaDynamicCommonBlocks"
+- AmandaDynamicCommonBlocks.txt:6 | $CodeAmandaHappyConfirm={
+- AmandaDynamicCommonBlocks.txt:29 | $AmandaSexOfferReaction={
+- AmandaDynamicCommonBlocks.txt:32 | if AmandaVar['prohibitliza'] or (AmandaVar['alberprohibit'] and AmandaVar['alberfriends']>=5) or AmandaVar['gloryscold']:
+- AmandaDynamicCommonBlocks.txt:33 | if (AmandaVar['suckyou'] or AmandaVar['fuckyou']):
+- AmandaDynamicCommonBlocks.txt:34 | if (Friends['amanda']>=12 and sluttiness['amanda']>=40) or sluttiness['amanda']>=50:
+- AmandaDynamicCommonBlocks.txt:36 | if sluttiness['amanda']>=55 and Rand(1,3)=1:tmpGropeReact=3
+- AmandaDynamicCommonBlocks.txt:37 | elseif sluttiness['amanda']<=25 and Friends['amanda']<=10:
+- AmandaDynamicCommonBlocks.txt:39 | elseif sluttiness['amanda']<=30 and Friends['amanda']<=5:
+- AmandaDynamicCommonBlocks.txt:45 | if (Friends['amanda']>=14 and sluttiness['amanda']>=45) or sluttiness['amanda']>=55:
+- AmandaDynamicCommonBlocks.txt:47 | if sluttiness['amanda']>=55 and Rand(1,3)=1:tmpGropeReact=3
+- AmandaDynamicCommonBlocks.txt:48 | elseif sluttiness['amanda']<=30 and Friends['amanda']<=12:
+- AmandaDynamicCommonBlocks.txt:50 | elseif sluttiness['amanda']<=35 and Friends['amanda']<=8:
+- AmandaDynamicCommonBlocks.txt:57 | if (AmandaVar['suckyou'] or AmandaVar['fuckyou']):
+- AmandaDynamicCommonBlocks.txt:58 | if Friends['amanda']>=2 and sluttiness['amanda']>=45:
+- AmandaDynamicCommonBlocks.txt:60 | elseif Friends['amanda']>=5 and sluttiness['amanda']>=35:
+- AmandaDynamicCommonBlocks.txt:62 | elseif Friends['amanda']>=10 and sluttiness['amanda']>=25:
+- AmandaDynamicCommonBlocks.txt:64 | elseif Friends['amanda']>=15 and sluttiness['amanda']>=21:
+- AmandaDynamicCommonBlocks.txt:66 | elseif Friends['amanda']>=2 and sluttiness['amanda']>=35:
+- AmandaDynamicCommonBlocks.txt:68 | elseif Friends['amanda']>=5 and sluttiness['amanda']>=25:
+- AmandaDynamicCommonBlocks.txt:70 | elseif Friends['amanda']>=10 and sluttiness['amanda']>=21:
+- AmandaDynamicCommonBlocks.txt:76 | if Friends['amanda']>=5 and sluttiness['amanda']>=45:
+- AmandaDynamicCommonBlocks.txt:78 | elseif Friends['amanda']>=10 and sluttiness['amanda']>=35:
+- AmandaDynamicCommonBlocks.txt:80 | elseif Friends['amanda']>=15 and sluttiness['amanda']>=25:
+- AmandaDynamicCommonBlocks.txt:82 | elseif Friends['amanda']>=5 and sluttiness['amanda']>=35:
+- AmandaDynamicCommonBlocks.txt:84 | elseif Friends['amanda']>=10 and sluttiness['amanda']>=25:
+- AmandaDynamicCommonBlocks.txt:94 | $AmandaLegareSetSexType={
+- AmandaDynamicCommonBlocks.txt:96 | if AmandaVar['sucklegare']=0:
+- AmandaDynamicCommonBlocks.txt:99 | if AmandaVar['fucklegare']=0:
+- AmandaDynamicCommonBlocks.txt:100 | if virginity['amanda']=1:
+- AmandaDynamicCommonBlocks.txt:101 | if AmandaVar['alberfriends']>=15 and sluttiness['amanda']>=35 and sexacts['amanda']>=5:
+- AmandaDynamicCommonBlocks.txt:107 | if AmandaVar['alberfriends']>=12 and sluttiness['amanda']>=32 and sexacts['amanda']>=4:
+- AmandaDynamicCommonBlocks.txt:114 | if (AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=30) or (AmandaVar['alberfriends']>=5 and sluttiness['amanda']>=40):
+- AmandaDynamicCommonBlocks.txt:122 | if pregnancy['amanda']>=120 and tmpLegareSexType=3:tmpLegareSexType=4
+- AmandaDynamicCommonBlocks.txt:126 | $AmandaNesluhCalc={
+- AmandaDynamicCommonBlocks.txt:127 | AmandaNesluh=0
+- AmandaDynamicCommonBlocks.txt:128 | AmandaNesluhBonus=0
+- AmandaDynamicCommonBlocks.txt:130 | if AmandaVar['glorydeflower']>0 or AmandaVar['fuckyou']>0: AmandaNesluhBonus+=6
+- AmandaDynamicCommonBlocks.txt:131 | if AmandaVar['gloryscold']>0: AmandaNesluhBonus-=3
+- AmandaDynamicCommonBlocks.txt:132 | if AmandaVar['glorysuck']>0 or AmandaVar['suckyou']>0: AmandaNesluhBonus+=3
+- AmandaDynamicCommonBlocks.txt:133 | if AmandaVar['glorywalkout']>0: AmandaNesluhBonus+=2
+- AmandaDynamicCommonBlocks.txt:135 | if AmandaVar['alberfriends']>=7: AmandaNesluhBonus+=1
+- AmandaDynamicCommonBlocks.txt:136 | if AmandaVar['alberfriends']>=9: AmandaNesluhBonus+=1
+- AmandaDynamicCommonBlocks.txt:137 | if AmandaVar['alberfriends']>=12: AmandaNesluhBonus+=2
+- AmandaDynamicCommonBlocks.txt:138 | if sluttiness['amanda']>=23: AmandaNesluhBonus+=1
+- AmandaDynamicCommonBlocks.txt:139 | if sluttiness['amanda']>=30: AmandaNesluhBonus+=2
+- AmandaDynamicCommonBlocks.txt:140 | if sluttiness['amanda']>=40: AmandaNesluhBonus+=4
+- AmandaDynamicCommonBlocks.txt:141 | if sluttiness['amanda']>=50: AmandaNesluhBonus+=3
+- AmandaDynamicCommonBlocks.txt:143 | if sluttiness['sucklegare']: AmandaNesluhBonus+=2
+- AmandaDynamicCommonBlocks.txt:144 | if sluttiness['fucklegare']: AmandaNesluhBonus+=3
+- AmandaDynamicCommonBlocks.txt:145 | if sluttiness['deflowerlegare']: AmandaNesluhBonus+=3
+- AmandaDynamicCommonBlocks.txt:147 | !AmandaNesluhBonus=20
+- AmandaDynamicCommonBlocks.txt:148 | AmandaNesluhBonus=Min(14,Max(1,AmandaNesluhBonus))
+- AmandaDynamicCommonBlocks.txt:149 | if Rand(1,15)<=AmandaNesluhBonus: AmandaNesluh=1
+- AmandaDynamicCommonBlocks.txt:150 | if (AmandaVar['glorydeflower'] or AmandaVar['fuckyou']) and AmandaNesluh=1 and Rand(1,4)<=3:
+- AmandaDynamicCommonBlocks.txt:151 | AmandaNesluh=2
+- AmandaDynamicCommonBlocks.txt:153 | if (AmandaVar['glorysuck'] or AmandaVar['suckyou']) and AmandaNesluh=1 and Rand(1,4)<=1:
+- AmandaDynamicCommonBlocks.txt:154 | AmandaNesluh=2
+- AmandaDynamicCommonBlocks.txt:157 | Result=AmandaNesluh
+- AmandaDynamicCommonBlocks.txt:160 | $AmandaLoverSexCalc={
+- AmandaDynamicCommonBlocks.txt:167 | if sluttiness['amanda']>=57:
+- AmandaDynamicCommonBlocks.txt:169 | elseif pregnancy['amanda']>120:
+- AmandaDynamicCommonBlocks.txt:170 | if sluttiness['amanda']>=42:
+- AmandaDynamicCommonBlocks.txt:172 | elseif sluttiness['amanda']>=40:
+- AmandaDynamicCommonBlocks.txt:176 | if sluttiness['amanda']>=45:
+- AmandaDynamicCommonBlocks.txt:182 | elseif sluttiness['amanda']>=40:
+- AmandaDynamicCommonBlocks.txt:191 | gs 'PregnancyCheck', 'amanda', 'outside', 1, $tmpGuyName,0,'Соседский парень'
+- AmandaDynamicCommonBlocks.txt:192 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 62, 1, 1
+- AmandaDynamicCommonBlocks.txt:194 | gs 'PregnancyCheck', 'amanda', 'inside', 1, $tmpGuyName,0,'Соседский парень'
+- AmandaDynamicCommonBlocks.txt:195 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 65, 1, 1
+- AmandaDynamicCommonBlocks.txt:197 | gs 'PregnancyCheck', 'amanda', 'mouth', 1, $tmpGuyName,0,'Соседский парень'
+- AmandaDynamicCommonBlocks.txt:198 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 48, 1, 1
+- AmandaDynamicCommonBlocks.txt:203 | $AmandaYellNotWork={
+- AmandaDynamicCommonBlocks.txt:206 | if AmandaVar['warnnotwork']:
+- AmandaDynamicCommonBlocks.txt:212 | AmandaVar['warnnotwork']=1
+- AmandaDynamicCommonBlocks.txt:213 | if Rand(1,5-AmandaVar['warnnotwork']*2)=1:
+- AmandaDynamicCommonBlocks.txt:215 | cooking['amanda']=Max(10,cooking['amanda']-3)
+- AmandaDynamicCommonBlocks.txt:216 | cleaning['amanda']=Max(10,cleaning['amanda']-3)
+- AmandaDynamicCommonBlocks.txt:217 | waitress['amanda']=Max(10,waitress['amanda']-3)
+- AmandaDynamicCommonBlocks.txt:221 | gs 'SlutFriendsIncrease', 'amanda', 6, 1, -2, 0, 0, 0
+- AmandaDynamicCommonBlocks.txt:231 | if dyneval($GetSexEventFromTable,'amanda', time,'legarerun')>0:
+- AmandaDynamicCommonBlocks.txt:241 | gs 'ShowImage', 'amanda', '', 'portrait'
+- AmandaDynamicCommonBlocks.txt:248 | dynamic $LegareAmandaLetGoCode
+- AmandaDynamicCommonBlocks.txt:254 | dynamic $AmandaYellNotWork
+- AmandaDynamicCommonBlocks.txt:266 | if dyneval($CheckIfSexEventExist,'amanda', time,'lovermeet')>0:
+- AmandaDynamicCommonBlocks.txt:280 | tmp=dyneval($GetSexEventFromTable,'amanda', time,'lovermeet')
+- AmandaDynamicCommonBlocks.txt:282 | gt 'AmandaLoverSex'
+- AmandaDynamicCommonBlocks.txt:290 | !gs 'ShowImage', 'amanda', '', 'portrait'
+- AmandaDynamicCommonBlocks.txt:297 | ------------ End of location: "AmandaDynamicCommonBlocks" ------------
+- AmandaLegareDanceSequence.txt:1 | Location: "AmandaLegareDanceSequence"
+- AmandaLegareDanceSequence.txt:8 | AmandaVar['EscapeUnnoticed']=0
+- AmandaLegareDanceSequence.txt:13 | if AmandaVar['alberprohibit']=1: AmandaVar['alberfriends']=Max(0,AmandaVar['alberfriends']-1)
+- AmandaLegareDanceSequence.txt:14 | if AmandaVar['alberprohibit']=1 and AmandaVar['alberfriends']>=12:
+- AmandaLegareDanceSequence.txt:16 | elseif AmandaVar['alberprohibit']=1 and AmandaVar['alberfriends']>=8:
+- AmandaLegareDanceSequence.txt:18 | elseif AmandaVar['alberprohibit']=1 and AmandaVar['alberfriends']>=4:
+- AmandaLegareDanceSequence.txt:20 | elseif AmandaVar['alberprohibit']=1:
+- AmandaLegareDanceSequence.txt:22 | elseif AmandaVar['alberfriends']>=8:
+- AmandaLegareDanceSequence.txt:28 | AmandaVar['LegareGo']=0
+- AmandaLegareDanceSequence.txt:30 | if (AmandaVar['alberfriends']>=11 and sluttiness['amanda']>=16) or (AmandaVar['alberfriends']>=5 and sluttiness['amanda']>=30) or (sluttiness['amanda']>=50):
+- AmandaLegareDanceSequence.txt:31 | AmandaVar['LegareGo']=1
+- AmandaLegareDanceSequence.txt:32 | if sluttiness['amanda']<20:
+- AmandaLegareDanceSequence.txt:34 | AmandaVar['LegareGo']=2
+- AmandaLegareDanceSequence.txt:35 | elseif sluttiness['amanda']<35:
+- AmandaLegareDanceSequence.txt:48 | :loopCreateAmandaDance
+- AmandaLegareDanceSequence.txt:52 | if AmandaVar['LegareGo']>0 and ((j>DanceCreated-1 and Rand(1,2)=1) or j=DanceCreated):
+- AmandaLegareDanceSequence.txt:53 | gs 'Table.NewLine', 'GirlDance','amanda','legare', i+1,AmandaVar['LegareGo'],$GoPhrase
+- AmandaLegareDanceSequence.txt:54 | AmandaVar['LegareGo']=0
+- AmandaLegareDanceSequence.txt:58 | gs 'Table.NewLine', 'GirlDance','amanda','legare', i+1, 0,''
+- AmandaLegareDanceSequence.txt:62 | if i<5: jump 'loopCreateAmandaDance'
+- AmandaLegareDanceSequence.txt:65 | $LegareAmandaLetGoCode={
+- AmandaLegareDanceSequence.txt:69 | tmpLegareSexType=dyneval($AmandaLegareSetSexType)
+- AmandaLegareDanceSequence.txt:73 | AmandaVar['sucklegare']=1
+- AmandaLegareDanceSequence.txt:74 | AmandaVar['alberfriends']+=1
+- AmandaLegareDanceSequence.txt:75 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 40, 1, 1
+- AmandaLegareDanceSequence.txt:76 | gs 'PregnancyCheck', 'amanda', 'mouth', 1, 'legare'
+- AmandaLegareDanceSequence.txt:78 | AmandaVar['fucklegare']=1
+- AmandaLegareDanceSequence.txt:79 | virginity['amanda']=0
+- AmandaLegareDanceSequence.txt:80 | AmandaVar['deflowerlegare']=1
+- AmandaLegareDanceSequence.txt:81 | AmandaVar['alberfriends']+=2
+- AmandaLegareDanceSequence.txt:82 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 50, 1, 4
+- AmandaLegareDanceSequence.txt:84 | AmandaVar['alberfriends']+=1
+- AmandaLegareDanceSequence.txt:85 | gs 'PregnancyCheck', 'amanda', 'inside', 1, 'legare'
+- AmandaLegareDanceSequence.txt:87 | AmandaVar['alberfriends']+=2
+- AmandaLegareDanceSequence.txt:88 | gs 'PregnancyCheck', 'amanda', 'outside', 1, 'legare'
+- AmandaLegareDanceSequence.txt:91 | AmandaVar['fucklegare']=1
+- AmandaLegareDanceSequence.txt:92 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 50, 1, 2
+- AmandaLegareDanceSequence.txt:94 | AmandaVar['alberfriends']+=1
+- AmandaLegareDanceSequence.txt:95 | gs 'PregnancyCheck', 'amanda', 'inside', 1, 'legare'
+- AmandaLegareDanceSequence.txt:97 | AmandaVar['alberfriends']+=2
+- AmandaLegareDanceSequence.txt:98 | gs 'PregnancyCheck', 'amanda', 'outside', 1, 'legare'
+- AmandaLegareDanceSequence.txt:102 | $LegareAmandaGoCode={
+- AmandaLegareDanceSequence.txt:104 | AmandaVar['leftdances']=1
+- AmandaLegareDanceSequence.txt:110 | dynamic $LegareAmandaLetGoCode
+- AmandaLegareDanceSequence.txt:120 | ------------ End of location: "AmandaLegareDanceSequence" ------------
+- AmandaLoverSex.txt:1 | Location: "AmandaLoverSex"
+- AmandaLoverSex.txt:14 | AmandaAgreeSex=0
+- AmandaLoverSex.txt:16 | $AmandaLoverShowSexScene={
+- AmandaLoverSex.txt:18 | AmandaLoverBuild=Rand(1,2)
+- AmandaLoverSex.txt:19 | AmandaLoverBuildGetIn=Rand(1,3)
+- AmandaLoverSex.txt:20 | AmandaLoverBuildCumIn=1
+- AmandaLoverSex.txt:21 | if $args[0]<>'minet':AmandaLoverBuildCumIn=Rand(2,3)
+- AmandaLoverSex.txt:24 | if AmandaLoverBuild=1:
+- AmandaLoverSex.txt:31 | if AmandaLoverBuild=1:
+- AmandaLoverSex.txt:37 | if AmandaLoverBuildGetIn=1:
+- AmandaLoverSex.txt:39 | if AmandaLoverBuild=1:
+- AmandaLoverSex.txt:46 | if AmandaLoverBuild=1:
+- AmandaLoverSex.txt:50 | gs 'ShowImageSeq', 'amanda', 'RandomSex', 'minet',5
+- AmandaLoverSex.txt:53 | gs 'ShowImage', 'amanda', 'RandomSex', 'sex'
+- AmandaLoverSex.txt:59 | gs 'ShowImageSeq', 'amanda', 'RandomSex', 'minet',5
+- AmandaLoverSex.txt:62 | gs 'ShowImage', 'amanda', 'RandomSex', 'sex'
+- AmandaLoverSex.txt:66 | if AmandaLoverBuildCumIn=2:
+- AmandaLoverSex.txt:68 | if pregnancy['amanda']>=120:
+- AmandaLoverSex.txt:70 | elseif sluttiness['amanda']>=52:
+- AmandaLoverSex.txt:75 | elseif AmandaLoverBuildCumIn=3:
+- AmandaLoverSex.txt:77 | if pregnancy['amanda']>=120:
+- AmandaLoverSex.txt:84 | if AmandaLoverBuild>1:
+- AmandaLoverSex.txt:90 | if AmandaLoverBuildCumIn=3:
+- AmandaLoverSex.txt:91 | gs 'PregnancyCheck', 'amanda', 'outside', 1, $tmpGuyName,0,'Соседский парень'
+- AmandaLoverSex.txt:92 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 62, 1, 1
+- AmandaLoverSex.txt:93 | elseif AmandaLoverBuildCumIn=2:
+- AmandaLoverSex.txt:94 | gs 'PregnancyCheck', 'amanda', 'inside', 1, $tmpGuyName,0,'Соседский парень'
+- AmandaLoverSex.txt:95 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 65, 1, 1
+- AmandaLoverSex.txt:97 | gs 'PregnancyCheck', 'amanda', 'mouth', 1, $tmpGuyName,0,'Соседский парень'
+- AmandaLoverSex.txt:98 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 48, 1, 1
+- AmandaLoverSex.txt:101 | if AmandaLoverBuildGetIn>1 and Rand(1,7)=1:
+- AmandaLoverSex.txt:117 | if virginity['amanda']:
+- AmandaLoverSex.txt:123 | if sluttiness['amanda']<40:
+- AmandaLoverSex.txt:127 | dynamic $AmandaLoverAskMinetAgree
+- AmandaLoverSex.txt:141 | dynamic $AmandaLoverAskSexAgree
+- AmandaLoverSex.txt:146 | $AmandaLoverCreateYellButton={
+- AmandaLoverSex.txt:148 | dynamic $AmandaYellNotWork
+- AmandaLoverSex.txt:149 | if AmandaVar['prohibitwithguys']:
+- AmandaLoverSex.txt:158 | $AmandaLoverAskMinetAgree={
+- AmandaLoverSex.txt:161 | AmandaAgreeSex=1
+- AmandaLoverSex.txt:162 | AmandaVar['sawwithguys']=1
+- AmandaLoverSex.txt:164 | dynamic $AmandaLoverShowSexScene, 'minet', $tmpGuyName
+- AmandaLoverSex.txt:167 | dynamic $AmandaLoverCreateYellButton
+- AmandaLoverSex.txt:169 | dynamic $AmandaLoverSexCalc, $tmpGuyName, AmandaAgreeSex
+- AmandaLoverSex.txt:175 | $AmandaLoverAskSexAgree={
+- AmandaLoverSex.txt:177 | AmandaAgreeSex=2
+- AmandaLoverSex.txt:178 | AmandaVar['sawwithguys']=1
+- AmandaLoverSex.txt:180 | dynamic $AmandaLoverShowSexScene, 'sex', $tmpGuyName
+- AmandaLoverSex.txt:183 | dynamic $AmandaLoverCreateYellButton
+- AmandaLoverSex.txt:185 | dynamic $AmandaLoverSexCalc, $tmpGuyName, AmandaAgreeSex
+- AmandaLoverSex.txt:191 | if sluttiness['amanda']>=40 and Rand(1,2)=1:
+- AmandaLoverSex.txt:212 | dynamic $AmandaLoverCreateYellButton
+- AmandaLoverSex.txt:218 | if sluttiness['amanda']>=62:
+- AmandaLoverSex.txt:220 | dynamic $AmandaLoverAskSexAgree
+- AmandaLoverSex.txt:222 | if pregnancy['amanda']>120:
+- AmandaLoverSex.txt:223 | if sluttiness['amanda']>37:
+- AmandaLoverSex.txt:225 | if sluttiness['amanda']>=42:
+- AmandaLoverSex.txt:227 | dynamic $AmandaLoverAskSexAgree
+- AmandaLoverSex.txt:236 | if sluttiness['amanda']>=57:
+- AmandaLoverSex.txt:238 | elseif sluttiness['amanda']>=45:
+- AmandaLoverSex.txt:255 | dynamic $AmandaLoverAskMinetAgree
+- AmandaLoverSex.txt:266 | if AmandaAgreeSex=0:
+- AmandaLoverSex.txt:272 | dynamic $AmandaLoverSexCalc, $tmpGuyName
+- AmandaLoverSex.txt:276 | ------------ End of location: "AmandaLoverSex" ------------
+- AmandaSexDanceStreet.txt:1 | Location: "AmandaSexDanceStreet"
+- AmandaSexDanceStreet.txt:9 | if virginity['amanda']=1:
+- AmandaSexDanceStreet.txt:12 | if AmandaVar['fuckyou'] and sluttiness['amanda']>=35:
+- AmandaSexDanceStreet.txt:14 | elseif sluttiness['amanda']>=40:
+- AmandaSexDanceStreet.txt:23 | gs 'IntAmandaSex', 'amanda', 'street','minet'
+- AmandaSexDanceStreet.txt:25 | gs 'IntAmandaSex', 'amanda', 'street'
+- AmandaSexDanceStreet.txt:27 | 'Вы находитесь в какой-то подворотне. Рядом с вами ваша любимая <a href="exec: GS ''Menu.Call'',''AmandaMenuSex''">сестренка</a>.
+- AmandaSexDanceStreet.txt:40 | ------------ End of location: "AmandaSexDanceStreet" ------------
+- Church.txt:42 | gs 'ShowImage', 'amanda', 'church', 'cermon'
+- CreateMandatoryEvents.txt:14 | gs 'AmandaLegareDanceSequence'
+- CreateTavernEventsPeriod.txt:27 | $NewEvents[TimePeriod + '_' + EventsCount[TimePeriod]]='AmandaLizaTalk'
+- DailySetstatdefault.txt:56 | if $GirlName='amanda' or $GirlName='liza':
+- DailySetstatdefault.txt:57 | gs 'InitAmandaLizaTalkItems'
+- DailySetstatdefault.txt:65 | if $GirlName='amanda' or $GirlName='melissa':
+- DisplayTavernEventShort.txt:25 | elseif $CurEventCode='AmandaLizaTalk':
+- DisplayTavernEventShort.txt:26 | $CurEventDescFin=func('EventAmandaLizettTalk',Eyewitness)
+- DressNoShow.txt:9 | if $GirlNameDNS='melissa' or $GirlNameDNS='amanda':DressBuyIsRelative=2
+- DressNoShow.txt:19 | if $GirlNameDNS='amanda':
+- EllonaBirthPrayMenu.txt:73 | if $GirlName='liza' or $GirlName='melissa' or $GirlName='amanda':
+- EventAmandaLegareCreateDance.txt:1 | Location: "EventAmandaLegareCreateDance"
+- EventAmandaLegareCreateDance.txt:6 | if DanceSponsor=1: gs 'GetGirlDrunk', 'amanda'
+- EventAmandaLegareCreateDance.txt:7 | if AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=18:
+- EventAmandaLegareCreateDance.txt:9 | AmandaVar['alberdanceadvance']=5
+- EventAmandaLegareCreateDance.txt:10 | elseif AmandaVar['alberfriends']>=9 and sluttiness['amanda']>=15:
+- EventAmandaLegareCreateDance.txt:12 | AmandaVar['alberdanceadvance']=4
+- EventAmandaLegareCreateDance.txt:13 | elseif AmandaVar['alberfriends']>=7 and sluttiness['amanda']>=10:
+- EventAmandaLegareCreateDance.txt:15 | AmandaVar['alberdanceadvance']=3
+- EventAmandaLegareCreateDance.txt:16 | elseif AmandaVar['alberfriends']>=6 and sluttiness['amanda']>=6:
+- EventAmandaLegareCreateDance.txt:18 | AmandaVar['alberdanceadvance']=2
+- EventAmandaLegareCreateDance.txt:19 | elseif AmandaVar['alberfriends']>=5 and sluttiness['amanda']>=3:
+- EventAmandaLegareCreateDance.txt:21 | AmandaVar['alberdanceadvance']=1
+- EventAmandaLegareCreateDance.txt:24 | AmandaVar['alberdanceadvance']=0
+- EventAmandaLegareCreateDance.txt:32 | if AmandaVar['LegareGo']=0:
+- EventAmandaLegareCreateDance.txt:37 | if AmandaVar['alberdanceadvance']=2: $DanceWatchLine[0]+=' Торгаш нежно обнимает ее за талию.'
+- EventAmandaLegareCreateDance.txt:38 | if AmandaVar['alberdanceadvance']=3: $DanceWatchLine[0]+=' Альбер нежно но твердо держит вашу сестренку за попу.'
+- EventAmandaLegareCreateDance.txt:39 | if AmandaVar['alberdanceadvance']>=4: $DanceWatchLine[0]+=' Похотливые ручонки достопочтенного Альбера Легаре нежно сжимают упругую попку вашей сестренки через тонкую ткань ее платья. А она трется своими грудками о его грудь, потихоньку возбуждаясь.'
+- EventAmandaLegareCreateDance.txt:40 | if AmandaVar['alberdanceadvance']=5: $DanceWatchLine[0]+=' При этом он не забывает целовать малышку Аманду а та отвечает ему тем же, с трудом не сбиваясь с ритма танца.'
+- EventAmandaLegareCreateDance.txt:42 | if AmandaVar['alberfriends']<12 and Rand(1,2)=1: AmandaVar['alberfriends']+=1
+- EventAmandaLegareCreateDance.txt:43 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 21, 2, 1
+- EventAmandaLegareCreateDance.txt:45 | ------------ End of location: "EventAmandaLegareCreateDance" ------------
+- EventAmandaLizettTalk.txt:1 | Location: "EventAmandaLizettTalk"
+- EventAmandaLizettTalk.txt:11 | if AmandaVar['prohibitliza']=1:
+- EventAmandaLizettTalk.txt:13 | if Rand(1,Max(2,10-AmandaVar['lizafriends']*3/2))=1:
+- EventAmandaLizettTalk.txt:19 | elseif AmandaVar['prohibitliza']=2:
+- EventAmandaLizettTalk.txt:21 | if Rand(1,Max(4,20-AmandaVar['lizafriends']*2))=1:
+- EventAmandaLizettTalk.txt:28 | if (sluttiness['amanda']<=5 and Rand(1,2)=1) or (sluttiness['amanda']<=10 and sluttiness['amanda']>5 and Rand(1,4)=1):
+- EventAmandaLizettTalk.txt:36 | GS 'Menu.Create','MenuAmandaLizaTalk'
+- EventAmandaLizettTalk.txt:37 | GS 'Menu.Add','MenuAmandaLizaTalk','Похвалить Аманду, за то, что не стала болтать с Лизеттой',''
+- EventAmandaLizettTalk.txt:38 | GS 'Menu.AddModule','MenuAmandaLizaTalk',{
+- EventAmandaLizettTalk.txt:43 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']>0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk.txt:45 | GS 'Menu.Add','MenuAmandaLizaTalk','Строго наругать Аманду за то, та болтает с Лизеттой',''
+- EventAmandaLizettTalk.txt:46 | GS 'Menu.AddModule','MenuAmandaLizaTalk',{
+- EventAmandaLizettTalk.txt:48 | AmandaVar['prohibitliza']=2
+- EventAmandaLizettTalk.txt:51 | gs 'SlutFriendsIncrease', 'amanda', 4, 1, -1, 0, 0, 0
+- EventAmandaLizettTalk.txt:54 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']>0 and NotToSpeak=0,-1,0)"
+- EventAmandaLizettTalk.txt:56 | GS 'Menu.Add','MenuAmandaLizaTalk','Сказать Аманде, чтобы не болтала с Лизеттой',''
+- EventAmandaLizettTalk.txt:57 | GS 'Menu.AddModule','MenuAmandaLizaTalk',{
+- EventAmandaLizettTalk.txt:59 | AmandaVar['prohibitliza']=1
+- EventAmandaLizettTalk.txt:64 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']=0 and NotToSpeak=0,-1,0)"
+- EventAmandaLizettTalk.txt:66 | GS 'Menu.Add','MenuAmandaLizaTalk','Сказать Аманде, что она правильно не стала болтать с Лизеттой',''
+- EventAmandaLizettTalk.txt:67 | GS 'Menu.AddModule','MenuAmandaLizaTalk',{
+- EventAmandaLizettTalk.txt:69 | AmandaVar['prohibitliza']=1
+- EventAmandaLizettTalk.txt:74 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']=0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk.txt:76 | GS 'Menu.Add','MenuAmandaLizaTalk','Сказать Аманде, что вы погорячились, когда запретили ей говорить с Лизеттой',''
+- EventAmandaLizettTalk.txt:77 | GS 'Menu.AddModule','MenuAmandaLizaTalk',{
+- EventAmandaLizettTalk.txt:79 | AmandaVar['prohibitliza']=0
+- EventAmandaLizettTalk.txt:83 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and AmandaVar['prohibitliza']>0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk.txt:85 | GS 'Menu.Add','MenuAmandaLizaTalk','Подслушать',''
+- EventAmandaLizettTalk.txt:86 | GS 'Menu.AddModule','MenuAmandaLizaTalk',{
+- EventAmandaLizettTalk.txt:89 | *pl Func('EventAmandaLizettTalk2',Eyewitness)
+- EventAmandaLizettTalk.txt:91 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and NotToSpeak=0,-1,0)"
+- EventAmandaLizettTalk.txt:93 | GS 'Menu.Add','MenuAmandaLizaTalk','Вернуться к своим делам',''
+- EventAmandaLizettTalk.txt:94 | GS 'Menu.AddModule','MenuAmandaLizaTalk',{
+- EventAmandaLizettTalk.txt:98 | gs 'Menu.AddCondition','MenuAmandaLizaTalk', "Result=IIF(YourReaction1=0 and NotToSpeak=1,-1,0)"
+- EventAmandaLizettTalk.txt:101 | $Result+='<br><br>Что вы намеренны <a href="exec: GS ''Menu.Call'',''MenuAmandaLizaTalk''">предпринять</a>?'
+- EventAmandaLizettTalk.txt:103 | $Result+=Func('EventAmandaLizettTalk2',Eyewitness)
+- EventAmandaLizettTalk.txt:112 | gs 'ShowImage', 'amanda', 'tavern', 'lizatalk'+Rand(1,2)
+- EventAmandaLizettTalk.txt:115 | ------------ End of location: "EventAmandaLizettTalk" ------------
+- EventAmandaLizettTalk2.txt:1 | Location: "EventAmandaLizettTalk2"
+- EventAmandaLizettTalk2.txt:14 | $Result=dyneval( $GetRandomTalkPhraseFromTable, 'AmandaLizaTalk')
+- EventAmandaLizettTalk2.txt:18 | GS 'Menu.Create','MenuAmandaLizaTalk2'
+- EventAmandaLizettTalk2.txt:19 | GS 'Menu.Add','MenuAmandaLizaTalk2','Строго наругать Аманду за то, та болтает с Лизеттой',''
+- EventAmandaLizettTalk2.txt:20 | GS 'Menu.AddModule','MenuAmandaLizaTalk2',{
+- EventAmandaLizettTalk2.txt:22 | AmandaVar['prohibitliza']=2
+- EventAmandaLizettTalk2.txt:24 | gs 'SlutFriendsIncrease', 'amanda', 3, 1, -1, 0, 0, 0
+- EventAmandaLizettTalk2.txt:27 | gs 'Menu.AddCondition','MenuAmandaLizaTalk2', "Result=IIF(YourReaction2=0 and AmandaVar['prohibitliza']>0,-1,0)"
+- EventAmandaLizettTalk2.txt:29 | GS 'Menu.Add','MenuAmandaLizaTalk2','Сказать Аманде, чтобы не болтала с Лизеттой',''
+- EventAmandaLizettTalk2.txt:30 | GS 'Menu.AddModule','MenuAmandaLizaTalk2',{
+- EventAmandaLizettTalk2.txt:32 | AmandaVar['prohibitliza']=1
+- EventAmandaLizettTalk2.txt:35 | gs 'Menu.AddCondition','MenuAmandaLizaTalk2', "Result=IIF(YourReaction2=0 and AmandaVar['prohibitliza']=0,-1,0)"
+- EventAmandaLizettTalk2.txt:37 | GS 'Menu.Add','MenuAmandaLizaTalk2','Сказать Аманде, что вы погорячились, когда запретили ей говорить с Лизеттой',''
+- EventAmandaLizettTalk2.txt:38 | GS 'Menu.AddModule','MenuAmandaLizaTalk2',{
+- EventAmandaLizettTalk2.txt:40 | AmandaVar['prohibitliza']=0
+- EventAmandaLizettTalk2.txt:42 | if Friends['amanda']<5 and Rand(1,4):
+- EventAmandaLizettTalk2.txt:44 | gs 'SlutFriendsIncrease', 'amanda', 6, 1, 1, 0, 0, 0
+- EventAmandaLizettTalk2.txt:47 | gs 'Menu.AddCondition','MenuAmandaLizaTalk2', "Result=IIF(YourReaction2=0 and AmandaVar['prohibitliza']>0,-1,0)"
+- EventAmandaLizettTalk2.txt:50 | $Result+='<br><br>После разговора Аманда с Лизеттой разошлись. Намеренны ли вы что-то <a href="exec: GS ''Menu.Call'',''MenuAmandaLizaTalk2''">сказать</a> проходящей мимо Аманде?'
+- EventAmandaLizettTalk2.txt:57 | !$Result+=sluttiness['amanda'] + '???' + AmandaVar['lizafriends']+'????'
+- EventAmandaLizettTalk2.txt:59 | ------------ End of location: "EventAmandaLizettTalk2" ------------
+- FridayDance.txt:11 | $CheckIfAmandaGoneDance={
+- FridayDance.txt:12 | if dyneval($GetDanceJustLeft,'amanda','legare',FridayDancesCount)>0 or AmandaVar['LegareGo']=1:
+- FridayDance.txt:14 | AmandaVar['leftdances']=1
+- FridayDance.txt:15 | dynamic $LegareAmandaGoCode
+- FridayDance.txt:19 | dynamic $LegareAmandaLetGoCode
+- FridayDance.txt:20 | AmandaVar['EscapeUnnoticed']=1
+- FridayDance.txt:32 | dynamic $CheckIfAmandaGoneDance
+- FridayDance.txt:72 | gs 'IntAmandaDance'
+- FridayDance.txt:73 | AmandaVar['albernowdances']=0
+- FridayDance.txt:74 | if dyneval($GetDanceFromTable,'amanda','legare',FridayDancesCount)>0:
+- FridayDance.txt:75 | AmandaVar['albernowdances']=1
+- FridayDance.txt:76 | gs 'EventAmandaLegareCreateDance'
+- FridayDance.txt:80 | if AmandaVar['EscapeUnnoticed']=1:
+- FridayDance.txt:82 | AmandaVar['leftdances']=1
+- FridayDance.txt:84 | elseif AmandaVar['albernowdances']=1:
+- FridayDance.txt:85 | 'Вы прошлись по площади, ища свою сестренку <a href="exec: GS ''Menu.Call'',''MenuAmandaDance''">Аманду</a>, и обнаружили ее c мессиром Легаре.'
+- FridayDance.txt:86 | gs 'ShowImage', 'amanda', 'dance', 'alberdanceStep0'
+- FridayDance.txt:90 | 'Вы прошлись по площади, ища свою сестренку <a href="exec: GS ''Menu.Call'',''MenuAmandaDance''">Аманду</a>, и нашли ее скромно стоящей около одной из колонн.'
+- FridayDance.txt:91 | gs 'ShowImage', 'amanda', 'dance', 'wait' + Rand(1,2)
+- FridayDance.txt:96 | gs 'Menu.AddCondition','MenuFridayDance', "Result=IIF(FridayDancesCount<5 and DanceStep=0 and AmandaVar['leftdances']=0,-1,0)"
+- GirlDressSuggest.txt:10 | if $GirlName='melissa' or $GirlName='amanda':DressBuyIsRelative=2
+- GirlsDesc.txt:24 | elseif $GirlNameGdsc='amanda':
+- GirlsDesc.txt:25 | gs 'ShowAmandaPortrait'
+- GirlSuggestDressFunc.txt:238 | elseif $GirlName='amanda':
+- GirlSuggestDressFunc.txt:248 | elseif $GirlName='amanda':
+- GiveBirth.txt:36 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirth.txt:89 | elseif $GirlName='amanda' or $GirlName='melissa':
+- GiveBirth.txt:184 | if Min(sluttiness['amanda'],sluttiness['melissa'])<55:
+- GiveBirth.txt:185 | $GirlOffended=iif(sluttiness['amanda']<55,'Аманда','Мелисса')
+- GiveBirth.txt:295 | if $GirlName='amanda' or $GirlName='melissa' or $GirlName='inga':
+- GiveBirth.txt:296 | $Momname=iif($GirlName='amanda' or $GirlName='melissa','sandra','becky')
+- GiveBirthFinish.txt:10 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirthFinish.txt:33 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirthStep2.txt:25 | elseif $GirlName='melissa' or $GirlName='amanda':
+- HarassDiscussImage.txt:14 | elseif $GirlNameHSI='amanda':
+- HarassShowImage.txt:30 | elseif $GirlNameHSI='amanda':
+- InitAmanda.txt:1 | Location: "InitAmanda"
+- InitAmanda.txt:6 | $GirlName='amanda'
+- InitAmanda.txt:50 | AmandaVar['lizafriends']=0
+- InitAmanda.txt:51 | AmandaVar['prohibitliza']=0
+- InitAmanda.txt:52 | AmandaVar['alberfriends']=0
+- InitAmanda.txt:53 | AmandaVar['albernowdances']=0
+- InitAmanda.txt:54 | AmandaVar['alberdanceadvance']=0
+- InitAmanda.txt:55 | AmandaVar['leftdances']=0
+- InitAmanda.txt:56 | AmandaVar['alberprohibit']=0
+- InitAmanda.txt:57 | AmandaVar['LegareGo']=0
+- InitAmanda.txt:58 | AmandaVar['EscapeUnnoticed']=0
+- InitAmanda.txt:60 | AmandaVar['glorytried']=0
+- InitAmanda.txt:61 | AmandaVar['gloryyouknow']=0
+- InitAmanda.txt:62 | AmandaVar['gloryscold']=0
+- InitAmanda.txt:63 | AmandaVar['glorywalkout']=0
+- InitAmanda.txt:64 | AmandaVar['glorysuck']=0
+- InitAmanda.txt:65 | AmandaVar['glorydeflower']=0
+- InitAmanda.txt:67 | AmandaVar['suckyou']=0
+- InitAmanda.txt:68 | AmandaVar['fuckyou']=0
+- InitAmanda.txt:70 | AmandaVar['knowsexactive']=0
+- InitAmanda.txt:71 | AmandaVar['knownotvirgin']=0
+- InitAmanda.txt:73 | AmandaVar['knowlegaresex']=0
+- InitAmanda.txt:74 | AmandaVar['sawlegaresex']=0
+- InitAmanda.txt:75 | AmandaVar['sucklegare']=0
+- InitAmanda.txt:76 | AmandaVar['fucklegare']=0
+- InitAmanda.txt:77 | AmandaVar['deflowerlegare']=0
+- InitAmanda.txt:78 | AmandaVar['knowdeflowerlegare']=0
+- InitAmanda.txt:80 | AmandaVar['beddeflower']=0
+- InitAmanda.txt:82 | AmandaVar['kickyoufromroom']=0
+- InitAmanda.txt:83 | AmandaVar['kickyoufromroomcount']=0
+- InitAmanda.txt:84 | AmandaVar['kickedwithmomhelp']=0
+- InitAmanda.txt:86 | AmandaVar['knowyousawlegaresex']=0
+- InitAmanda.txt:87 | AmandaVar['knowyouseesex']=0
+- InitAmanda.txt:89 | AmandaVar['warnnotwork']=0
+- InitAmanda.txt:91 | AmandaVar['sawwithguys']=0
+- InitAmanda.txt:92 | AmandaVar['prohibitwithguys']=0
+- InitAmanda.txt:94 | AmandaVar['askzalettoday']=0
+- InitAmanda.txt:95 | AmandaVar['MomDressComplaint']=0
+- InitAmanda.txt:97 | ------------ End of location: "InitAmanda" ------------
+- InitAmandaLizaTalkItems.txt:1 | Location: "InitAmandaLizaTalkItems"
+- InitAmandaLizaTalkItems.txt:41 | $TableTMPName='AmandaLizaTalk'
+- InitAmandaLizaTalkItems.txt:46 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',5,4,10)', _
+- InitAmandaLizaTalkItems.txt:47 | 'sluttiness[''amanda'']<=8 and sexacts[''amanda'']=0 and pregnancy[''liza''] <120', _
+- InitAmandaLizaTalkItems.txt:51 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',5,4,10)', _
+- InitAmandaLizaTalkItems.txt:52 | 'sluttiness[''amanda'']<=8 and sexacts[''amanda'']=0 and pregnancy[''liza''] <120', _
+- InitAmandaLizaTalkItems.txt:56 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',5,4,10)', _
+- InitAmandaLizaTalkItems.txt:57 | 'sluttiness[''amanda'']<=8 and sexacts[''amanda'']=0 and pregnancy[''liza''] >=120', _
+- InitAmandaLizaTalkItems.txt:61 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',5,4,10)', _
+- InitAmandaLizaTalkItems.txt:62 | 'sluttiness[''amanda'']<=8 and sexacts[''amanda'']=0', _
+- InitAmandaLizaTalkItems.txt:66 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',5,4,10)', _
+- InitAmandaLizaTalkItems.txt:67 | 'sluttiness[''amanda'']<=8 and sexacts[''amanda'']=0', _
+- InitAmandaLizaTalkItems.txt:71 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',5,4,10)', _
+- InitAmandaLizaTalkItems.txt:72 | 'sluttiness[''amanda'']<=8 and sexacts[''amanda'']=0', _
+- InitAmandaLizaTalkItems.txt:78 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',16,9,19)', _
+- InitAmandaLizaTalkItems.txt:79 | 'sluttiness[''amanda'']>8 and sexacts[''amanda'']=0', _
+- InitAmandaLizaTalkItems.txt:83 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',16,9,19)', _
+- InitAmandaLizaTalkItems.txt:84 | 'sluttiness[''amanda'']>8 and sexacts[''amanda'']=0', _
+- InitAmandaLizaTalkItems.txt:88 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',16,9,19)', _
+- InitAmandaLizaTalkItems.txt:89 | 'sluttiness[''amanda'']>8 and sexacts[''amanda'']=0', _
+- InitAmandaLizaTalkItems.txt:94 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',16,9,19)', _
+- InitAmandaLizaTalkItems.txt:95 | 'sluttiness[''amanda'']>8 and sexacts[''amanda'']=0 and pregnancy[''liza''] < 120', _
+- InitAmandaLizaTalkItems.txt:99 | 'func(''PartEventGirlReactionTalk'', ''amanda'',''liza'',''AmandaVar[''''lizafriends'''']'',16,9,19)', _
+- InitAmandaLizaTalkItems.txt:100 | 'sluttiness[''amanda'']>8 and sexacts[''amanda'']=0 and pregnancy[''liza''] >= 120', _
+- InitAmandaLizaTalkItems.txt:107 | 'sluttiness[''amanda'']>=22 and TavernGloryHole=2  and sexacts[''amanda'']=0', _
+- InitAmandaLizaTalkItems.txt:112 | "sluttiness['amanda']>=20 and AmandaVar['glorytried'] and  AmandaVar['glorysuck']=0 and AmandaVar['gloryscold']=0 and AmandaVar['glorywalkout']=0", _
+- InitAmandaLizaTalkItems.txt:117 | "sluttiness['amanda']>=20 and AmandaVar['glorysuck']=0 and AmandaVar['gloryscold']=0 and AmandaVar['glorywalkout']=1", _
+- InitAmandaLizaTalkItems.txt:122 | "sluttiness['amanda']>=20 and AmandaVar['glorysuck']=0 and AmandaVar['gloryscold']=1", _
+- InitAmandaLizaTalkItems.txt:127 | "sluttiness['amanda']>=20 and AmandaVar['glorysuck'] and AmandaVar['fuckyou']=0 and AmandaVar['gloryscold']=0 and AmandaVar['glorywalkout']=1", _
+- InitAmandaLizaTalkItems.txt:132 | "sluttiness['amanda']>=20 and AmandaVar['glorysuck'] and AmandaVar['fuckyou']=0 and AmandaVar['gloryscold']=1", _
+- InitAmandaLizaTalkItems.txt:137 | "sluttiness['amanda']>=20 and AmandaVar['glorysuck'] and AmandaVar['fuckyou']=0 and AmandaVar['gloryscold']=0 and AmandaVar['glorywalkout']=0", _
+- InitAmandaLizaTalkItems.txt:140 | gs 'Table.NewLine', $TableTMPName, '"Лизетта! Меня родной брат женщиной сделал! И ты ему помогала! Сначала я ему отсосала, а потом он меня трахнул! В глорихоле! У меня в голове не укладывается!" - обеспокоенно говорит Аманда Лизетте.<br>"Ну и что? Да и ты и так, между нами девочками, засиделась в девках. Тебе ведь уже целых <<age[''amanda'']>> лет! Тебе понравилось, ему понравилось, что ты так переживаешь? Успокойся. Можешь, кстати, еще прийти если хочешь, в мою смену, конечно," отвечает ей Лизетта, <br>"Ну не знаю, может оно конечно и приду."',  _
+- InitAmandaLizaTalkItems.txt:142 | "sexacts['amanda']<20 and AmandaVar['glorydeflower']", _
+- InitAmandaLizaTalkItems.txt:148 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',40,24,32)", _
+- InitAmandaLizaTalkItems.txt:149 | "sexacts['amanda']<20 and AmandaVar['beddeflower']", _
+- InitAmandaLizaTalkItems.txt:155 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',40,20,24)", _
+- InitAmandaLizaTalkItems.txt:156 | "AmandaVar['fuckyou']=0 and AmandaVar['kickedwithmomhelp']", _
+- InitAmandaLizaTalkItems.txt:160 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',40,20,24)", _
+- InitAmandaLizaTalkItems.txt:161 | "AmandaVar['fuckyou']=0 and AmandaVar['kickedwithmomhelp']=0 and AmandaVar['kickyoufromroom']>0", _
+- InitAmandaLizaTalkItems.txt:167 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',20,10,14)", _
+- InitAmandaLizaTalkItems.txt:168 | "sluttiness['amanda']<25 and  AmandaVar['alberprohibit']", _
+- InitAmandaLizaTalkItems.txt:172 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',25,16,20)", _
+- InitAmandaLizaTalkItems.txt:173 | "sluttiness['amanda']>=25 and  AmandaVar['alberprohibit']", _
+- InitAmandaLizaTalkItems.txt:177 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',15,10,14)", _
+- InitAmandaLizaTalkItems.txt:178 | "AmandaVar['prohibitliza']", _
+- InitAmandaLizaTalkItems.txt:182 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',45,20,46)", _
+- InitAmandaLizaTalkItems.txt:183 | " AmandaVar['prohibitwithguys']", _
+- InitAmandaLizaTalkItems.txt:187 | gs 'Table.NewLine', $TableTMPName, '"Лизетточка! Я больше не девочка! Альберчик, он такой, такой, в общем он меня  женщиной сделал! Так здорово было! Поздравь меня! Я такая довольная!" - радостно говорит Аманда Лизетте.<br>"Ну поздравляю, наконец-то! Да и ты и так, между нами девочками, засиделась в девках. Тебе ведь уже целых <<age[''amanda'']>> лет! Ну, теперь все? Он хорош был?"<br>"Да, очень, я так счастлива!"',  _
+- InitAmandaLizaTalkItems.txt:189 | "sexacts['amanda']<20 and AmandaVar['deflowerlegare']", _
+- InitAmandaLizaTalkItems.txt:193 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',35,20,26)", _
+- InitAmandaLizaTalkItems.txt:194 | "AmandaVar['sucklegare'] and AmandaVar['fucklegare']=0", _
+- InitAmandaLizaTalkItems.txt:198 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',35,14,20)", _
+- InitAmandaLizaTalkItems.txt:199 | "AmandaVar['alberfriends']>10 and AmandaVar['sucklegare']=0 and AmandaVar['fucklegare']=0", _
+- InitAmandaLizaTalkItems.txt:204 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',50,20,55)", _
+- InitAmandaLizaTalkItems.txt:205 | "pregnancy['amanda']>120 and pregnancy['liza']<=120", _
+- InitAmandaLizaTalkItems.txt:209 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',50,20,55)", _
+- InitAmandaLizaTalkItems.txt:210 | "pregnancy['amanda']>120 and pregnancy['liza']>120", _
+- InitAmandaLizaTalkItems.txt:214 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',50,14,30)", _
+- InitAmandaLizaTalkItems.txt:215 | "sexacts['amanda']>0 and pregnancy['liza'] >= 120", _
+- InitAmandaLizaTalkItems.txt:219 | gs 'Table.NewLine', $TableTMPName, '"Лизочка! Я вот члены уже сосала, но пока еще девочка! А ведь хочется попробовать внутрь, но боязно. А вдруг залечу?" - интересуется Аманда у подружки.<br>"Конечно, давай. Ты еще девочка, а тебе ведь уже целых <<age[''amanda'']>> лет! Я пораньше тебя целку потеряла и ничуть не жалею. Не бойся, ничего страшного нет, наоборот, очень приятно будет!" подбадривает свою подругу Лизетта.',  _
+- InitAmandaLizaTalkItems.txt:220 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',40,14,30)", _
+- InitAmandaLizaTalkItems.txt:221 | "sexacts['amanda']>0 and virginity['amanda']=1 ", _
+- InitAmandaLizaTalkItems.txt:227 | "sluttiness['amanda']>=50 and virginity['amanda']=0 ", _
+- InitAmandaLizaTalkItems.txt:232 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',35,20,32)", _
+- InitAmandaLizaTalkItems.txt:233 | "sluttiness['amanda']<50 and virginity['amanda']=0 ", _
+- InitAmandaLizaTalkItems.txt:237 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',55,20,44)", _
+- InitAmandaLizaTalkItems.txt:238 | "AmandaVar['fuckyou'] ", _
+- InitAmandaLizaTalkItems.txt:242 | "func('PartEventGirlReactionTalk', 'amanda','liza','AmandaVar[''lizafriends'']',40,20,35)", _
+- InitAmandaLizaTalkItems.txt:243 | "AmandaVar['fucklegare'] ", _
+- InitAmandaLizaTalkItems.txt:246 | ------------ End of location: "InitAmandaLizaTalkItems" ------------
+- InitSecondaryNPC.txt:35 | AlberVar['FightYouAmanda']=0
+- IntAlberTalk.txt:50 | if AmandaVar['fucklegare']<>0:
+- IntAlberTalk.txt:52 | elseif AmandaVar['sucklegare']<>0:
+- IntAlberTalk.txt:59 | AlberVar['FightYouAmanda']=0
+- IntAlberTalk.txt:62 | gs 'Menu.AddCondition','MenuAlberTalk', "Result=IIF(AlberVar['FightYouAmanda']>0 and Talked['Alber']<=2 and LegareProvokeYou=0,-1,0)"
+- IntAlberTalk.txt:80 | AlberVar['FightYouAmanda']=2
+- IntAlberTalk.txt:101 | AlberVar['FightYouAmanda']=1
+- IntAmandaDance.txt:1 | Location: "IntAmandaDance"
+- IntAmandaDance.txt:6 | $GirlNameIAD='amanda'
+- IntAmandaDance.txt:9 | GS 'Menu.Create','MenuAmandaDance'
+- IntAmandaDance.txt:10 | GS 'Menu.Add','MenuAmandaDance','Осмотреть',''
+- IntAmandaDance.txt:11 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:12 | gs 'GirlsDesc','amanda'
+- IntAmandaDance.txt:14 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep<10,-1,0)"
+- IntAmandaDance.txt:16 | GS 'Menu.Add','MenuAmandaDance','Поболтать',''
+- IntAmandaDance.txt:17 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:31 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep=1 and AmandaVar['albernowdances']=0,-1,0)"
+- IntAmandaDance.txt:33 | GS 'Menu.Add','MenuAmandaDance','Пригласить потанцевать',''
+- IntAmandaDance.txt:34 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:54 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep=1 and AmandaVar['albernowdances']=0,-1,0)"
+- IntAmandaDance.txt:56 | GS 'Menu.Add','MenuAmandaDance','Продолжить танцевать',''
+- IntAmandaDance.txt:57 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:69 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0,-1,0)"
+- IntAmandaDance.txt:71 | GS 'Menu.Add','MenuAmandaDance','Положить руки на талию',''
+- IntAmandaDance.txt:72 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:96 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and $HandsDance<>'waist',-1,0)"
+- IntAmandaDance.txt:98 | GS 'Menu.Add','MenuAmandaDance','Положить руки на попу',''
+- IntAmandaDance.txt:99 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:130 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and strcomp($HandsDance,'^ass')=0,-1,0)"
+- IntAmandaDance.txt:132 | GS 'Menu.Add','MenuAmandaDance','Сжать попу Аманды',''
+- IntAmandaDance.txt:133 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:161 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and $HandsDance='ass',-1,0)"
+- IntAmandaDance.txt:163 | GS 'Menu.Add','MenuAmandaDance','Поцеловать Аманду',''
+- IntAmandaDance.txt:164 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:192 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and KissDance=0,-1,0)"
+- IntAmandaDance.txt:194 | GS 'Menu.Add','MenuAmandaDance','Предложить Аманде прогулятся',''
+- IntAmandaDance.txt:195 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:197 | tmpGropeReact=dyneval($AmandaSexOfferReaction)
+- IntAmandaDance.txt:207 | AmandaVar['leftdances']=1
+- IntAmandaDance.txt:208 | gs 'Table.DeleteLines', 'GirlDance','GirlName','=','amanda'
+- IntAmandaDance.txt:210 | gt 'AmandaSexDanceStreet'
+- IntAmandaDance.txt:221 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=2 and DanceStep<DanceMaxIAD and AmandaVar['albernowdances']=0 and HadSex['amanda']>0 and (strcomp($HandsDance,'^ass')>0 or KissDance>0),-1,0)"
+- IntAmandaDance.txt:224 | GS 'Menu.Add','MenuAmandaDance','Наблюдать за Амандой и мессиром Легаре',''
+- IntAmandaDance.txt:225 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:227 | if DanceStep-1<=AmandaVar['alberdanceadvance']:
+- IntAmandaDance.txt:229 | elseif AmandaVar['alberdanceadvance']=0:
+- IntAmandaDance.txt:235 | gs 'ShowImage', 'amanda', 'dance', 'alberdanceStep' + Min(DanceStep,3)
+- IntAmandaDance.txt:237 | if DanceStep=6 and AmandaVar['LegareGo']=1:
+- IntAmandaDance.txt:238 | dynamic $LegareAmandaGoCode
+- IntAmandaDance.txt:240 | AmandaVar['LegareGo']=0
+- IntAmandaDance.txt:245 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=1 and DanceStep<DanceMaxIAD+2 and AmandaVar['albernowdances']=1,-1,0)"
+- IntAmandaDance.txt:247 | GS 'Menu.Add','MenuAmandaDance','Вмешаться и разогнать их',''
+- IntAmandaDance.txt:248 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:250 | if AmandaVar['alberprohibit']=1:
+- IntAmandaDance.txt:255 | if AmandaVar['alberfriends']>=7:
+- IntAmandaDance.txt:257 | AmandaVar['alberfriends']+=3
+- IntAmandaDance.txt:258 | gs 'SlutFriendsIncrease', 'amanda', 3, 1, -5, 0, 0, 0
+- IntAmandaDance.txt:261 | AmandaVar['alberfriends']-=1
+- IntAmandaDance.txt:262 | gs 'SlutFriendsIncrease', 'amanda', 3, 1, -2, 15, 1, -4
+- IntAmandaDance.txt:264 | AmandaVar['alberprohibit']=1
+- IntAmandaDance.txt:265 | AmandaVar['leftdances']=1
+- IntAmandaDance.txt:267 | AmandaVar['albernowdances']=0
+- IntAmandaDance.txt:268 | gs 'Table.DeleteLines', 'GirlDance','GirlName','=','amanda'
+- IntAmandaDance.txt:270 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=1 and DanceStep<DanceMaxIAD+2 and AmandaVar['albernowdances']=1,-1,0)"
+- IntAmandaDance.txt:273 | GS 'Menu.Add','MenuAmandaDance','Отойти',''
+- IntAmandaDance.txt:274 | GS 'Menu.AddModule','MenuAmandaDance',{
+- IntAmandaDance.txt:282 | gs 'Menu.AddCondition','MenuAmandaDance', "Result=IIF(DanceStep>=DanceMaxIAD or AmandaVar['albernowdances']=1 or DanceStep=1,-1,0)"
+- IntAmandaDance.txt:284 | ------------ End of location: "IntAmandaDance" ------------
+- IntAmandaDressChange.txt:1 | Location: "IntAmandaDressChange"
+- IntAmandaDressChange.txt:6 | $OtherSawAmandaCode={
+- IntAmandaDressChange.txt:45 | GS 'Menu.Add','MenuAmandaTalk','Предложить сестренке ходить без лифчика',''
+- IntAmandaDressChange.txt:46 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaDressChange.txt:83 | dynamic $OtherSawAmandaCode
+- IntAmandaDressChange.txt:86 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and $bra[$GirlNameIAT]>'' and (AmandaVar['suckyou'] or AmandaVar['fuckyou']) and Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:89 | GS 'Menu.Add','MenuAmandaTalk','Предложить сестре снять панталоны',''
+- IntAmandaDressChange.txt:90 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaDressChange.txt:98 | tmpLizaComandoBonus=Min(10,AmandaVar['lizafriends']/2)
+- IntAmandaDressChange.txt:101 | tmpLizaComandoBonus=-Min(10,AmandaVar['lizafriends']/4)
+- IntAmandaDressChange.txt:135 | dynamic $OtherSawAmandaCode
+- IntAmandaDressChange.txt:138 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and $panties[$GirlNameIAT]>'' and (AmandaVar['suckyou'] or AmandaVar['fuckyou'])  and Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:141 | GS 'Menu.Add','MenuAmandaTalk','Постыдить сестру за то, что ходит без лифчика',''
+- IntAmandaDressChange.txt:142 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaDressChange.txt:169 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and  Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:172 | GS 'Menu.Add','MenuAmandaTalk','Постыдить сестру за отстутсвие панталон',''
+- IntAmandaDressChange.txt:173 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaDressChange.txt:200 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and  Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:202 | GS 'Menu.Add','MenuAmandaTalk','Предложить купить сестре обновку',''
+- IntAmandaDressChange.txt:203 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaDressChange.txt:210 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Friends[$GirlNameIAT]>8 and func('CheckDailyEventExists','','BuyDressTom')=0 and func('CheckDailyEventExists',$GirlNameIAT,'BuyDress')=0 and Talked[$GirlNameIAT]<2 and week<>6,-1,0)"
+- IntAmandaDressChange.txt:212 | ------------ End of location: "IntAmandaDressChange" ------------
+- IntAmandaSex.txt:1 | Location: "IntAmandaSex"
+- IntAmandaSex.txt:14 | $AmandaOthersObserve={
+- IntAmandaSex.txt:17 | GS 'Menu.Create','AmandaMenuSex'
+- IntAmandaSex.txt:18 | GS 'Menu.Add','AmandaMenuSex','Осмотреть',''
+- IntAmandaSex.txt:19 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:21 | gs 'ShowImage', $GirlNameASDS, 'sexroom', 'amanda'
+- IntAmandaSex.txt:25 | GS 'Menu.Add','AmandaMenuSex','Снять блузку',''
+- IntAmandaSex.txt:26 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:57 | dynamic $AmandaOthersObserve,0
+- IntAmandaSex.txt:58 | gs 'ShowAmandaPortrait', $GirlLocASDS
+- IntAmandaSex.txt:60 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF($topdress[$GirlNameASDS]>''  and SomebodyCums=0 and $GirlModeASDS<>'minet' ,-1,0)"
+- IntAmandaSex.txt:62 | GS 'Menu.Add','AmandaMenuSex','Растегнуть блузку',''
+- IntAmandaSex.txt:63 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:86 | dynamic $AmandaOthersObserve,0
+- IntAmandaSex.txt:87 | gs 'ShowAmandaPortrait', $GirlLocASDS
+- IntAmandaSex.txt:89 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(($topdress[$GirlNameASDS]>'' and topraised[$GirlNameASDS]=0) and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:91 | GS 'Menu.Add','AmandaMenuSex','Снять лифчик',''
+- IntAmandaSex.txt:92 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:109 | dynamic $AmandaOthersObserve,0
+- IntAmandaSex.txt:110 | gs 'ShowAmandaPortrait', $GirlLocASDS
+- IntAmandaSex.txt:112 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF($bra[$GirlNameASDS]>'' and ($topdress[$GirlNameASDS]='' or topraised[$GirlNameASDS]) and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:115 | GS 'Menu.Add','AmandaMenuSex','Задрать юбочку',''
+- IntAmandaSex.txt:117 | GS 'Menu.Add','AmandaMenuSex','Поднять подол',''
+- IntAmandaSex.txt:119 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:143 | dynamic $AmandaOthersObserve,1
+- IntAmandaSex.txt:144 | gs 'ShowAmandaPortrait', $GirlLocASDS
+- IntAmandaSex.txt:146 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(($bottomdress[$GirlNameASDS]>'' and bottomraised[$GirlNameASDS]=0) and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:149 | GS 'Menu.Add','AmandaMenuSex','Снять платье',''
+- IntAmandaSex.txt:150 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:169 | dynamic $AmandaOthersObserve,1
+- IntAmandaSex.txt:170 | gs 'ShowAmandaPortrait', $GirlLocASDS
+- IntAmandaSex.txt:172 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF($bottomdress[$GirlNameASDS]>'' and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:175 | GS 'Menu.Add','AmandaMenuSex','Снять панталончики',''
+- IntAmandaSex.txt:176 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:188 | dynamic $AmandaOthersObserve,1
+- IntAmandaSex.txt:189 | gs 'ShowAmandaPortrait', $GirlLocASDS
+- IntAmandaSex.txt:191 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF($panties[$GirlNameASDS]>'' and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:197 | GS 'Menu.Add','AmandaMenuSex','Вытереть сперму с лица',''
+- IntAmandaSex.txt:198 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:205 | gs 'ShowAmandaPortrait', $GirlLocASDS
+- IntAmandaSex.txt:207 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF((CumFaceYou[$GirlNameASDS] or CumFaceOthers[$GirlNameASDS])  and SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:209 | GS 'Menu.Add','AmandaMenuSex','Вытереть сперму с грудей',''
+- IntAmandaSex.txt:210 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:217 | gs 'ShowAmandaPortrait', $GirlLocASDS
+- IntAmandaSex.txt:219 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF((CumTitsYou[$GirlNameASDS] or CumTitsOthers[$GirlNameASDS]) and TitsVisible[$GirlNameASDS] and SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:221 | GS 'Menu.Add','AmandaMenuSex','Вытереть сперму с бедер',''
+- IntAmandaSex.txt:222 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:229 | gs 'ShowAmandaPortrait', $GirlLocASDS
+- IntAmandaSex.txt:231 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF((CumInsideYou[$GirlNameASDS] or CumInsideOthers[$GirlNameASDS]) and PussyVisible[$GirlNameASDS] and SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:239 | GS 'Menu.Add','AmandaMenuSex','Целовать',''
+- IntAmandaSex.txt:240 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:262 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:266 | GS 'Menu.Add','AmandaMenuSex','Лапать',''
+- IntAmandaSex.txt:267 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:329 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:331 | GS 'Menu.Add','AmandaMenuSex','Лизать киску',''
+- IntAmandaSex.txt:332 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:353 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF( PussyVisible[$GirlNameASDS] and SomebodyCums=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:359 | GS 'Menu.Add','AmandaMenuSex','Минет',''
+- IntAmandaSex.txt:360 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:399 | AmandaVar['suckyou']=1
+- IntAmandaSex.txt:412 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and SomebodyCums=0,-1,0)"
+- IntAmandaSex.txt:415 | GS 'Menu.Add','AmandaMenuSex','Трахать',''
+- IntAmandaSex.txt:416 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:456 | if CockInPussy[$GirlNameASDS]=0 and AmandaVar['knownotvirgin']=0:
+- IntAmandaSex.txt:458 | AmandaVar['knownotvirgin']=1
+- IntAmandaSex.txt:460 | AmandaVar['fuckyou']=1
+- IntAmandaSex.txt:466 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and SomebodyCums=0 and Arousal['You']>=20 and Arousal[$GirlNameASDS]>=20 and PussyVisible[$GirlNameASDS] and EddieCockInPussy[$GirlNameASDS]=0 and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:472 | GS 'Menu.Add','AmandaMenuSex','Кончить в ротик',''
+- IntAmandaSex.txt:473 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:489 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and (CockInMouth[$GirlNameASDS] or CockInTits[$GirlNameASDS]),-1,0)"
+- IntAmandaSex.txt:491 | GS 'Menu.Add','AmandaMenuSex','Кончить на лицо',''
+- IntAmandaSex.txt:492 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:513 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100,-1,0)"
+- IntAmandaSex.txt:516 | GS 'Menu.Add','AmandaMenuSex','Кончить на груди',''
+- IntAmandaSex.txt:517 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:533 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and TitsVisible[$GirlNameASDS] and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:536 | GS 'Menu.Add','AmandaMenuSex','Кончить в сестру',''
+- IntAmandaSex.txt:537 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:540 | tmpCumInside=dyneval($GetSexNum,'amanda','you','inside')
+- IntAmandaSex.txt:543 | if tmpCumInside=0  and  cuminside['amanda']>=2:
+- IntAmandaSex.txt:566 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and CockInPussy[$GirlNameASDS] and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:568 | GS 'Menu.Add','AmandaMenuSex','Попрощаться и уйти',''
+- IntAmandaSex.txt:569 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:588 | AmandaVar['kickyoufromroom']=1
+- IntAmandaSex.txt:591 | gs 'Menu.Destroy','AmandaMenuSex'
+- IntAmandaSex.txt:598 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(SomebodyCums=0 and $GirlLocASDS='home' and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:601 | GS 'Menu.Add','AmandaMenuSex','Привести себя в порядок и вернуться',''
+- IntAmandaSex.txt:602 | GS 'Menu.AddModule','AmandaMenuSex',{
+- IntAmandaSex.txt:618 | AmandaVar['kickyoufromroom']=1
+- IntAmandaSex.txt:620 | gs 'Menu.Destroy','AmandaMenuSex'
+- IntAmandaSex.txt:631 | gs 'Menu.AddCondition','AmandaMenuSex', "Result=IIF(SomebodyCums=0 and $GirlLocASDS='street' and $GirlModeASDS<>'minet',-1,0)"
+- IntAmandaSex.txt:636 | ------------ End of location: "IntAmandaSex" ------------
+- IntAmandaTalk.txt:1 | Location: "IntAmandaTalk"
+- IntAmandaTalk.txt:6 | $GirlNameIAT='amanda'
+- IntAmandaTalk.txt:7 | GS 'Menu.Create','MenuAmandaTalk'
+- IntAmandaTalk.txt:8 | GS 'Menu.Add','MenuAmandaTalk','Осмотреть',''
+- IntAmandaTalk.txt:9 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:13 | GS 'Menu.Add','MenuAmandaTalk','Попробовать помириться с Амандой',''
+- IntAmandaTalk.txt:14 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:25 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and Friends[$GirlNameIAT]<5,-1,0)"
+- IntAmandaTalk.txt:27 | GS 'Menu.Add','MenuAmandaTalk','Сказать Аманде что вы передумали и она может встречаться с Альбером',''
+- IntAmandaTalk.txt:28 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:30 | if AmandaVar['alberfriends']>=9:
+- IntAmandaTalk.txt:38 | If week=5 and time<3: gs 'AmandaLegareDanceSequence'
+- IntAmandaTalk.txt:40 | AmandaVar['alberprohibit']=0
+- IntAmandaTalk.txt:43 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['alberprohibit']>0,-1,0)"
+- IntAmandaTalk.txt:45 | GS 'Menu.Add','MenuAmandaTalk','Разрешить Аманде болтать с Лизеттой',''
+- IntAmandaTalk.txt:46 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:51 | AmandaVar['prohibitliza']=0
+- IntAmandaTalk.txt:53 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['prohibitliza']>0,-1,0)"
+- IntAmandaTalk.txt:56 | GS 'Menu.Add','MenuAmandaTalk','Сказать Аманде что вы ошиблись и она может ходить к Лизетте в глорихолл',''
+- IntAmandaTalk.txt:57 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:62 | AmandaVar['gloryscold']=0
+- IntAmandaTalk.txt:63 | AmandaVar['glorywalkout']=0
+- IntAmandaTalk.txt:65 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['gloryscold']>0,-1,0)"
+- IntAmandaTalk.txt:67 | GS 'Menu.Add','MenuAmandaTalk','Сказать Аманде что она может встречаться с парнями',''
+- IntAmandaTalk.txt:68 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:73 | AmandaVar['prohibitwithguys']=0
+- IntAmandaTalk.txt:75 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['prohibitwithguys']>0,-1,0)"
+- IntAmandaTalk.txt:77 | GS 'Menu.Add','MenuAmandaTalk','Сказать Аманде что она может иногда брать перерывы',''
+- IntAmandaTalk.txt:78 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:88 | AmandaVar['warnnotwork']=0
+- IntAmandaTalk.txt:90 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['warnnotwork']>0,-1,0)"
+- IntAmandaTalk.txt:92 | GS 'Menu.Add','MenuAmandaTalk','Спросить где она потеряла девственность',''
+- IntAmandaTalk.txt:93 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:96 | if friends[$GirlNameIAT]>11 and AmandaVar['alberprohibit']=0:
+- IntAmandaTalk.txt:99 | AmandaVar['knowdeflowerlegare']=1
+- IntAmandaTalk.txt:100 | AmandaVar['knowlegaresex']=1
+- IntAmandaTalk.txt:107 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['knownotvirgin']>0 and AmandaVar['knowdeflowerlegare']=0 and AmandaVar['deflowerlegare']>0 ,-1,0)"
+- IntAmandaTalk.txt:109 | GS 'Menu.Add','MenuAmandaTalk','Запретить ей <<iif(virginity[''amanda''],''гулять'',''трахаться'')>> с месье Легаре',''
+- IntAmandaTalk.txt:110 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:111 | if AmandaVar['sawlegaresex']:
+- IntAmandaTalk.txt:120 | AmandaVar['alberprohibit']=1
+- IntAmandaTalk.txt:122 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['knowlegaresex']>0 and AmandaVar['alberprohibit']=0,-1,0)"
+- IntAmandaTalk.txt:124 | GS 'Menu.Add','MenuAmandaTalk','Запретить ей трахаться с соседскими парнями',''
+- IntAmandaTalk.txt:125 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:130 | AmandaVar['prohibitwithguys']=1
+- IntAmandaTalk.txt:132 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['sawwithguys']>0 and AmandaVar['prohibitwithguys']=0,-1,0)"
+- IntAmandaTalk.txt:134 | GS 'Menu.Add','MenuAmandaTalk','Спросить не боиться ли она залететь',''
+- IntAmandaTalk.txt:135 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:137 | if AmandaVar['fuckyou']:
+- IntAmandaTalk.txt:157 | AmandaVar['askzalettoday']=1
+- IntAmandaTalk.txt:159 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3 and AmandaVar['knowsexactive']>0 and pregnancy[$GirlNameIAT]<120 and AmandaVar['askzalettoday']=0 and virginity['amanda']=0,-1,0)"
+- IntAmandaTalk.txt:161 | GS 'Menu.Add','MenuAmandaTalk','Спросить, знает ли она от кого пузо нагуляла',''
+- IntAmandaTalk.txt:162 | GS 'Menu.AddModule','MenuAmandaTalk',{
+- IntAmandaTalk.txt:166 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Talked[$GirlNameIAT]<3  and Friends[$GirlNameIAT]>=8 and pregnancy[$GirlNameIAT]>=120 ,-1,0)"
+- IntAmandaTalk.txt:168 | gs 'IntAmandaDressChange'
+- IntAmandaTalk.txt:170 | ------------ End of location: "IntAmandaTalk" ------------
+- IntLizaDressChange.txt:25 | if sluttiness['amanda']>=35:
+- IntLizaDressChange.txt:29 | gs 'SlutFriendsIncrease', 'amanda', 0, 0, 0, 21, 1, 1
+- Intro.txt:84 | $AllGirlNames[2]='amanda'
+- Intro.txt:132 | gs 'InitAmandaLizaTalkItems'
+- Intro.txt:133 | gs 'AmandaDynamicCommonBlocks'
+- KidsFunctions.txt:72 | if $MomName='sandra' or $MomName='melissa' or $MomName='amanda':
+- KidsFunctions.txt:75 | gs 'Table.DeleteLines','TodaySexEvents', 'GirlName','=','amanda'
+- KidsFunctions.txt:90 | if $MomName='amanda'  or $MomName='melissa' or $MomName='sandra':
+- Loc.txt:8 | if $CurLoc='TavernProstClients' or $CurLoc='StreetClients' or $CurLoc='SexPort' or $CurLoc='SexProstTavern' or $CurLoc='ChurchAfterCermon' or $CurLoc='ChurchIspoved' or $CurLoc='TavernGloryHole'  or $CurLoc='FridayDance' or $CurLoc='DressTry' or $CurLoc='BeckyHomeFront'  or $CurLoc='BeckyHome' or $CurLoc='AfterDanceLegare'  or $CurLoc='TavernAmandaRoom' or $CurLoc='AfterDanceSexLegare' or $CurLoc='AmandaLoverSex' or $Curloc='SherwoodTravel':
+- menu_tavernstat.txt:82 | $GirlMenuName='MenuAmandaJob'
+- menu_tavernstat.txt:85 | GS 'Menu.Add',$GirlMenuName,'<<func(''JobMenuDesc'',jobkitchentomorrow[''amanda''],1)>>',''
+- menu_tavernstat.txt:87 | jobkitchentomorrow['amanda']=(jobkitchentomorrow['amanda']+1) mod 2
+- menu_tavernstat.txt:90 | GS 'Menu.Add',$GirlMenuName,'<<func(''JobMenuDesc'',jobcleaningtomorrow[''amanda''],2)>>',''
+- menu_tavernstat.txt:92 | jobcleaningtomorrow['amanda']=(jobcleaningtomorrow['amanda']+1) mod 2
+- menu_tavernstat.txt:96 | GS 'Menu.Add',$GirlMenuName,'<<func(''JobMenuDesc'',jobwaitresstomorrow[''amanda''],3)>>',''
+- menu_tavernstat.txt:98 | jobwaitresstomorrow['amanda']=(jobwaitresstomorrow['amanda']+1) mod 2
+- menu_tavernstat.txt:165 | pl '<a href="exec: GS ''Menu.Call'',''MenuAmandaJob''">Аманда</a>'
+- MomDressComplaint.txt:8 | $GirlSillyName=iif($GirlName='amanda','Амандочк','Меллисочк')
+- MomDressComplaint.txt:22 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- MomDressComplaint.txt:24 | AmandaVar['prohibitliza']=1
+- MomDressComplaint.txt:38 | if $GirlName='amanda' and AmandaVar['prohibitliza']:
+- MomDressComplaint.txt:144 | if $GirlName='amanda':
+- MomDressComplaint.txt:145 | 'Заодно вы <<iif(AmandaVar[''prohibitliza'']=1,''еще раз '','''')>>запретили ей болтать с Лизеттой, источником грязи и разврата.'
+- MomDressComplaint.txt:146 | AmandaVar['prohibitliza']=1
+- MomDressComplaint.txt:157 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- MomDressComplaint.txt:159 | AmandaVar['prohibitliza']=1
+- MorningSickness.txt:84 | if $GirlName='amanda' or $GirlName='melissa':
+- NextDay_FinishDayEvents.txt:53 | elseif $tmpArray['GirlName']='amanda' and $tmpArray['Place']='glorytry':
+- NextDay_FinishDayEvents.txt:54 | AmandaVar['glorytried']=1
+- NextDay_FinishDayEvents.txt:56 | elseif $tmpArray['GirlName']='amanda' and $tmpArray['Place']='legarerun':
+- NextDay_FinishDayEvents.txt:57 | dynamic $LegareAmandaLetGoCode
+- NextDay_FinishDayEvents.txt:58 | elseif $tmpArray['GirlName']='amanda' and $tmpArray['Place']='lovermeet':
+- NextDay_FinishDayEvents.txt:59 | dynamic $AmandaLoverSexCalc
+- NextDay_FinishDayEvents.txt:83 | :loopnextAmandaDance
+- NextDay_FinishDayEvents.txt:85 | gs 'EventAmandaLegareCreateDance'
+- NextDay_FinishDayEvents.txt:87 | dynamic $LegareAmandaLetGoCode
+- NextDay_FinishDayEvents.txt:91 | jump 'loopnextAmandaDance'
+- NextDay_FinishDayEvents.txt:94 | if AmandaVar['gloryscold'] or AmandaVar['glorywalkout'] or AmandaVar['glorysuck'] or AmandaVar['glorydeflower']: AmandaVar['gloryyouknow']=1
+- NextDay_FinishDayEvents.txt:95 | if AmandaVar['glorysuck']:AmandaVar['suckyou']=1
+- NextDay_FinishDayEvents.txt:96 | if AmandaVar['glorydeflower']:AmandaVar['fuckyou']=1
+- NextDay_FinishDayEvents.txt:97 | if AmandaVar['glorydeflower'] or AmandaVar['fuckyou'] or AmandaVar['sawlegaresex'] or AmandaVar['sawwithguys'] or AmandaVar['knowlegaresex'] or AmandaVar['knownotvirgin']: AmandaVar['knowsexactive']=1
+- NextDay_FinishDayEvents.txt:100 | AmandaVar['knowyouseesex']=0
+- NextDay_FinishDayEvents.txt:101 | AmandaVar['kickyoufromroom']=0
+- NextDay_FinishDayEvents.txt:102 | AmandaVar['askzalettoday']=0
+- NextDay_FinishDayEvents.txt:105 | AmandaVar['leftdances']=0
+- NextDay_FinishDayEvents.txt:107 | AmandaVar['alberfriends']=Max(0,Min(AmandaVar['alberfriends'],20))
+- NextDay_FinishDayEvents.txt:108 | AmandaVar['lizafriends']=Max(0,Min(AmandaVar['lizafriends'],20))
+- NextDay_NewDayEvents.txt:78 | if sluttiness['amanda']>=22 and TavernGloryHole=2 and func('GetRandomGirlByJob','jobgloryhole')='liza':
+- NextDay_NewDayEvents.txt:79 | if AmandaVar['glorytried']=0:
+- NextDay_NewDayEvents.txt:80 | if Rand(1,3)=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 99, 99, 'glorytry'
+- NextDay_NewDayEvents.txt:83 | if AmandaVar['gloryscold']=1: GloryChanceDecrease+=9
+- NextDay_NewDayEvents.txt:84 | if AmandaVar['glorywalkout']=1: GloryChanceDecrease+=3
+- NextDay_NewDayEvents.txt:85 | if AmandaVar['glorysuck']=1: GloryChanceDecrease-=2
+- NextDay_NewDayEvents.txt:86 | if AmandaVar['glorydeflower']=1: GloryChanceDecrease-=3
+- NextDay_NewDayEvents.txt:87 | if sluttiness['amanda']>=35:  GloryChanceDecrease-=3
+- NextDay_NewDayEvents.txt:88 | if virginity['amanda']=0:  GloryChanceDecrease-=2
+- NextDay_NewDayEvents.txt:89 | if sexacts['amanda']>15: GloryChanceDecrease+=2
+- NextDay_NewDayEvents.txt:90 | if sexacts['amanda']>35: GloryChanceDecrease+=3
+- NextDay_NewDayEvents.txt:91 | if sexacts['amanda']>50: GloryChanceDecrease+=5
+- NextDay_NewDayEvents.txt:92 | if Rand(1,Max(3, 4+GloryChanceDecrease))=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 99, 99, 'glorytry'
+- NextDay_NewDayEvents.txt:96 | if AmandaVar['fucklegare']=1 and AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=35 and week<>5:
+- NextDay_NewDayEvents.txt:98 | if AmandaVar['alberfriends']>=15:ChanceVar-=1
+- NextDay_NewDayEvents.txt:101 | if AmandaVar['alberprohibit']:ChanceVar+=5
+- NextDay_NewDayEvents.txt:102 | if Friends['amanda']>=15:ChanceVar+=2
+- NextDay_NewDayEvents.txt:103 | if Rand(1,ChanceVar)=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 3, 99, 'legarerun'
+- NextDay_NewDayEvents.txt:106 | if sexacts['amanda']>=5 and sluttiness['amanda']>=35 and week<>5:
+- NextDay_NewDayEvents.txt:108 | if sluttiness['amanda']>=45:ChanceVar-=1
+- NextDay_NewDayEvents.txt:109 | if sluttiness['amanda']>=55:ChanceVar-=1
+- NextDay_NewDayEvents.txt:110 | if AmandaVar['prohibitwithguys']: ChanceVar+=5
+- NextDay_NewDayEvents.txt:111 | if Rand(1,ChanceVar)=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 2, 99, 'lovermeet'
+- NextDay_TavernDaily.txt:106 | gs 'ChangeTommorowHallJob', 'amanda'
+- NextDay.txt:186 | gs 'DescribeSkillIncrease', 'amanda'
+- RelationshipDesc1.txt:11 | elseif $GirlNameRD1='amanda' or $GirlNameRD1='melissa':
+- SetTavernServiceLevels.txt:8 | amandadiv=jobkitchen['amanda']+jobcleaning['amanda']+jobwaitress['amanda']
+- SetTavernServiceLevels.txt:11 | if amandadiv=0:amandadiv=1
+- SetTavernServiceLevels.txt:13 | tavernkitchen=jobkitchen['sandra']*cooking['sandra']/sandradiv+jobkitchen['melissa']*cooking['melissa']/melissadiv+jobkitchen['amanda']*cooking['amanda']/amandadiv
+- SetTavernServiceLevels.txt:14 | tavernkitchen=Min(tavernkitchen,Max(jobkitchen['sandra']*cooking['sandra'],jobkitchen['melissa']*cooking['melissa'],jobkitchen['amanda']*cooking['amanda']))
+- SetTavernServiceLevels.txt:33 | tavernclean=jobcleaning['sandra']*cleaning['sandra']/sandradiv+jobcleaning['melissa']*cleaning['melissa']/melissadiv+jobcleaning['amanda']*cleaning['amanda']/amandadiv
+- SetTavernServiceLevels.txt:53 | tavernwaitress=jobwaitress['sandra']*waitress['sandra']/sandradiv+jobwaitress['melissa']*waitress['melissa']/melissadiv+jobwaitress['amanda']*waitress['amanda']/amandadiv
+- SetTavernServiceLevels.txt:54 | tavernwaitress=Min(tavernwaitress,Max(jobwaitress['sandra']*waitress['sandra'],jobwaitress['melissa']*waitress['melissa'],jobwaitress['amanda']*waitress['amanda']))
+- SexEventsTableCode.txt:153 | if $Args[0]='amanda':
+- SexEventsTableCode.txt:155 | AmandaVar['LegareGo']=func('Table.GetValue','GirlDance','id:'+LineNum,'GoOut')
+- SexEventsTableCode.txt:167 | if $Args[0]='amanda' and func('Table.GetValue','GirlDance','id:'+LineNum,'GoOut')=1:
+- ShowAmandaPortrait.txt:1 | Location: "ShowAmandaPortrait"
+- ShowAmandaPortrait.txt:6 | $GirlName='amanda'
+- ShowAmandaPortrait.txt:9 | if TitsVisible[$GirlName] and PussyVisible[$GirlName] and $CurLoc='TavernAmandaRoom':
+- ShowAmandaPortrait.txt:19 | ------------ End of location: "ShowAmandaPortrait" ------------
+- ShowCurrentSex.txt:10 | if (no($GirlNameSCS='georgett' and $GirlLocIGSS<>'tavern')) and (no($GirlNameSCS='amanda' and $GirlLocASDS='street')):
+- ShowCurrentSex.txt:24 | elseif $GirlNameSCS='amanda' and sluttiness[$GirlNameSCS]<60 and pregnancy[$GirlNameSCS]<120:
+- ShowCurrentSex.txt:26 | if cuminside['amanda']>=4:
+- ShowCurrentSex.txt:29 | elseif $GirlNameSCS='amanda' and sluttiness[$GirlNameSCS]>=60 and pregnancy[$GirlNameSCS]<120:
+- ShowCurrentSex.txt:94 | if $GirlNameSCS='amanda':
+- TavernAmandaRoom.txt:1 | Location: "TavernAmandaRoom"
+- TavernAmandaRoom.txt:12 | gs 'AmandaAtHomeCode'
+- TavernAmandaRoom.txt:15 | if virginity['amanda']=0:
+- TavernAmandaRoom.txt:16 | if sluttiness['amanda']>=30:tmpSleepDress=1
+- TavernAmandaRoom.txt:17 | if sluttiness['amanda']>=50:tmpSleepDress=2
+- TavernAmandaRoom.txt:26 | gs 'ShowImage', 'amanda', 'room', 'amandanaked'
+- TavernAmandaRoom.txt:32 | gs 'DressForNight', 'amanda', tmpSleepDress
+- TavernAmandaRoom.txt:45 | gs 'ShowImage', 'amanda', 'room', 'wakenaked'
+- TavernAmandaRoom.txt:47 | gs 'ShowImage', 'amanda', 'room', 'wakedress'
+- TavernAmandaRoom.txt:51 | tmpGropeReact=dyneval($AmandaSexOfferReaction)
+- TavernAmandaRoom.txt:55 | if virginity['amanda']:
+- TavernAmandaRoom.txt:56 | if (AmandaVar['suckyou'] or AmandaVar['fuckyou']) and sluttiness['amanda']>=30:tmpSexType=1
+- TavernAmandaRoom.txt:57 | if sluttiness['amanda']>=38:tmpSexType=1
+- TavernAmandaRoom.txt:59 | if (AmandaVar['suckyou'] or AmandaVar['fuckyou']) and sluttiness['amanda']>=20:tmpSexType=2
+- TavernAmandaRoom.txt:60 | if sluttiness['amanda']>=30:tmpSexType=2
+- TavernAmandaRoom.txt:84 | AmandaVar['kickyoufromroom']=1
+- TavernAmandaRoom.txt:89 | dynamic $CodeAmandaListScold
+- TavernAmandaRoom.txt:91 | AmandaVar['kickyoufromroom']=1
+- TavernAmandaRoom.txt:92 | gs 'SlutFriendsIncrease', 'amanda', 5, 1, -1, 30, 1, -1
+- TavernAmandaRoom.txt:93 | gs 'SlutFriendsIncrease', 'amanda', 5, 1, -1, 0, 0, 0
+- TavernAmandaRoom.txt:98 | dynamic $CodeAmandaListScold
+- TavernAmandaRoom.txt:100 | dynamic $CodeAmandaSorryChoices
+- TavernAmandaRoom.txt:104 | dynamic $CodeAmandaSexStart
+- TavernAmandaRoom.txt:106 | dynamic $CodeAmandaKickFromRoom,''
+- TavernAmandaRoom.txt:111 | gs 'ShowImage', 'amanda', 'room', 'emptyroom'
+- TavernAmandaRoom.txt:115 | ------------ End of location: "TavernAmandaRoom" ------------
+- TavernGloryHole.txt:26 | AmandaAtGlory=0
+- TavernGloryHole.txt:31 | if GloryHoleWorks and AmandaAtGlory=0:
+- TavernGloryHole.txt:57 | if dyneval($GetSexEventFromTable,'amanda', 99,'glorytry')>0: AmandaAtGlory=1
+- TavernGloryHole.txt:100 | if dyneval($CheckIfSexEventExist,$GirlNameTGH, time)>0 and Rand(1,2)=1 and AmandaAtGlory=0:
+- TavernGloryHole.txt:145 | if AmandaAtGlory=1:
+- TavernGloryHole.txt:146 | gs 'AmandaAtGloryHole'
+- TavernGloryHole.txt:177 | if AmandaAtGlory=1: *clr
+- TavernGloryHole.txt:199 | if AmandaAtGlory=1:
+- TavernGloryHole.txt:202 | AmandaGloryCurState=1
+- TavernGloryHole.txt:203 | AmandaVar['glorysdiscover']=1
+- TavernGloryHole.txt:204 | 'Ваша <a href="exec: GS ''Menu.Call'',''MenuAmandaGloryHole''">реакция</a>?'
+- TavernGloryHole.txt:206 | gs 'ShowImage', 'amanda', 'gloryfirst', 'ambush'
+- TavernGloryHole.txt:245 | if AmandaAtGlory=1: *clr
+- TavernGloryHole.txt:248 | if AmandaAtGlory=1:
+- TavernGloryHole.txt:250 | 'Ваша <a href="exec: GS ''Menu.Call'',''MenuAmandaGloryHole''">реакция</a>?'
+- TavernGloryHole.txt:252 | gs 'PregnancyCheck', 'amanda', 'mouthface', 1, 'Вы'
+- TavernGloryHole.txt:253 | AmandaVar['glorysuck']=1
+- TavernGloryHole.txt:254 | AmandaGloryCurState=4
+- TavernGloryHole.txt:273 | AmandaGloryCurState=2
+- TavernGloryHole.txt:275 | 'Ваша <a href="exec: GS ''Menu.Call'',''MenuAmandaGloryHole''">реакция</a>?'
+- TavernGloryHole.txt:277 | gs 'ShowImage', 'amanda', 'gloryfirst', 'ambush'
+- TavernGloryHole.txt:279 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(AmandaAtGlory=1 and BlockGloryHoleMenu=0 and CockInGloryHole=1,-1,0)"
+- TavernMain.txt:50 | gs 'IntAmandaTalk'
+- TavernMain.txt:52 | 'Вы можете пообщаться с участницами своей команды: <a href="exec: GS ''Menu.Call'',''MenuSandraTalk''">Сандрой</a>, <a href="exec: GS ''Menu.Call'',''MenuMelissaTalk''">Мелиссой</a> и <a href="exec: GS ''Menu.Call'',''MenuAmandaTalk''">Амандой</a>.'
+- TavernMain.txt:123 | if AmandaVar['kickyoufromroom']=0:
+- TavernMain.txt:124 | act 'Заглянуть в комнату Аманды':gt 'TavernAmandaRoom'
+- TavernMain.txt:131 | gs 'CheckDailyEvent', 'amanda'
+- TavernMain.txt:136 | dynamic $DescribeBreastFeeding, 'amanda'
+- TavernMain.txt:142 | dynamic $ShowFullKidsListByAge, 'sandra','amanda','melissa','georgett','liza'
+- TavernMain.txt:144 | dynamic $ShowFullKidsListByAge, 'sandra','amanda','melissa'
+- TavernShowImage.txt:14 | gs 'ShowImage', 'amanda', 'tavern', 'waitress' + Rand(1,5)
+- WineStore.txt:106 | if AlberVar['FightYouAmanda']=0:
+- WineStore.txt:109 | 'За прилавком стоит сам хозяин, месье Легаре. И он очень мрачно смотрит на вас. Похоже, он принял <<iif(AlberVar[''FightYouAmanda'']=2,''вашу ругань'', ''ваш с ним небольшой дружеский спарринг'')>> близко к сердцу. '
+- ZaletOpinionCalc.txt:57 | if $args[0]='amanda' and lcase($tmpTableArray['DudeName'])='вы':SuspectGrade+=2
+- ZaletOpinionCalc.txt:125 | elseif $args[0]='amanda' and lcase($args[1])='вы':
+- ZaletOpinionCalc.txt:170 | elseif $args[0]='amanda' and strcomp(lcase($args[1]),'.*легаре.*'):
+call SlutFriendsIncrease(
+    girl,
+    limit_friend,
+    friend_chance,
+    inc_decr_friends,
+    limit_sluttiness,
+    sluttiness_chance,
+    inc_decr_sluttiness
+)
+Meaning of each number:
+
+limit_friend
+target boundary for Friends[girl]
+if increasing:
+only increases while Friends[girl] < limit_friend
+if decreasing:
+only decreases while Friends[girl] > limit_friend
+friend_chance
+random chance denominator for each friendship step
+1 means always
+5 means 1 in 5 chance each step
+inc_decr_friends
+how many friendship steps to try
+positive = increase
+negative = decrease
+magnitude = how many times it recursively retries
+limit_sluttiness
+target boundary for sluttiness[girl]
+if increasing:
+only while sluttiness[girl] < limit_sluttiness
+if decreasing:
+only while sluttiness[girl] > limit_sluttiness
+sluttiness_chance
+random chance denominator for each sluttiness step
+same logic as friendship chance
+inc_decr_sluttiness
+how many sluttiness steps to try
+positive = increase
+negative = decrease    call SlutFriendsIncrease("amanda", 11, 4, 1, 24, 3, 1)  does not mean “increase both by 1”.
+It means:
+
+maybe +1 friendship
+maybe +1 sluttiness
+each with different random chances
+only if under limits
+diff --git a/c:\Users\blank\Documents\RenPy_Projects\Tractir\devdocs\characters\full_logic\amanda_full_logic.md b/c:\Users\blank\Documents\RenPy_Projects\Tractir\devdocs\characters\full_logic\amanda_full_logic.md
+--- a/c:\Users\blank\Documents\RenPy_Projects\Tractir\devdocs\characters\full_logic\amanda_full_logic.md
++++ b/c:\Users\blank\Documents\RenPy_Projects\Tractir\devdocs\characters\full_logic\amanda_full_logic.md
+@@ -110,2 +110,89 @@
+ 
++## Sluttiness: Meaning and Behavioral Parts
++
++`sluttiness['amanda']` is not just a generic arousal number. In practice it is a broad willingness/sexual-openness gate that controls how Amanda reacts to:
++- touch
++- kissing
++- sexual suggestions
++- public impropriety
++- non-virgin/sex-active self-perception
++- riskier or more shameless sexual contexts
++
++In Amanda’s logic, sluttiness works together with:
++- `Friends['amanda']`
++- `virginity['amanda']`
++- `sexacts['amanda']`
++- `pregnancy['amanda']`
++- branch flags in `AmandaVar`
++
++Behaviorally, it has these main parts:
++
++1. Physical tolerance
++- whether she allows:
++  - hands on waist
++  - hands on ass
++  - squeezing
++  - kissing
++- visible in `IntAmandaDance`, tavern room intimacy, and some confrontation outcomes
++
++2. Sexual initiative tolerance
++- whether she accepts:
++  - invitations to slip away
++  - more explicit sexual offers
++  - risky/hidden sexual situations
++
++3. Shamelessness / public indecency tolerance
++- whether she can participate in:
++  - gloryhole progression
++  - risky public-sex implications
++  - “seen by others / known sex-active” states without collapsing back
++
++4. Progression ceiling for a given scene
++- many scenes use local caps through `SlutFriendsIncrease(...)`
++- so a single scene can only raise Amanda’s sluttiness up to a scene-specific threshold
++- later scenes unlock higher thresholds
++
++5. Resistance / backlash threshold
++- if sluttiness is too low for a given action:
++  - she pulls away
++  - becomes angry
++  - friendship may drop
++  - branch flags like prohibition or knowledge states may change
++
++### Important Amanda sluttiness thresholds seen in logic
++
++These are not global formal “tiers”, but recurring functional breakpoints:
++
++- `>= 13`
++  - some dance kissing/touch tolerance begins
++- `>= 16`
++  - more explicit dance/sexual responses open
++- `>= 18`
++  - stronger acceptance of ass-touching and bold contact
++- `>= 20..24`
++  - stronger kiss/grope success ranges in dance logic
++- `>= 22`
++  - early gloryhole-try gating starts to become possible
++- `>= 30..35`
++  - more permissive sexual/public outcomes
++  - stronger Legare/lover-event possibilities
++- `>= 40+`
++  - higher shamelessness/open acceptance in some aftermath logic
++- `>= 45+`
++  - stronger late permissiveness in repeated sex/public-sex contexts
++
++### What sluttiness is not
++
++It is not a complete replacement for all sexual progression.
++Amanda behavior still also depends heavily on:
++- friendship
++- virginity
++- actual sexual history (`sexacts`)
++- pregnancy status
++- whether specific acts are already known, seen, or done
++
++So the practical interpretation is:
++- `sluttiness` = general openness / permissiveness / shamelessness
++- other variables = context, history, and relationship meaning
++
+ ## Friday Dance / Legare Logic

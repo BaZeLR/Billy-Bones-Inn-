@@ -1,0 +1,75 @@
+{
+  "id": "eddie",
+  "display_name": "Eddie",
+  "knows_MC": false,
+  "role": "secondary",
+  "description": "Eddie is a lanky young man with a mop of unruly redrown hair about your age,pale skin, and a mischievous grin. Helps his landlady Becky with her errands around town, grocery store, and leaves at her house.",
+  "native_genitive": null,
+  "native_dative": null,
+  "schedule": {
+    "weekday": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "grocery_shop",
+      "grocery_shop",
+      "grocery_shop",
+      "grocery_shop",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "port_street",
+      "port_street",
+      null,
+      null
+    ],
+    "weekend": [
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "port_street",
+      "port_street",
+      null,
+      null
+    ]
+  },
+  "source_files": [
+    "Inn/Intro.txt"
+  ],
+  "stats": {},
+  "custom": {
+    "travel_cycle": "Leaves town every other week; covers full-day shift when Becky away",
+    "whore_visits": "Port Street visits on Mon/Wed/Fri/Sat 20-21"
+  },
+  "relationships": {
+    "player_friendship": 0,
+    "player_trust": 0
+  }
+}

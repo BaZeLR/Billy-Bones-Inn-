@@ -1,0 +1,37 @@
+WORKSPACE LOCK (NON-NEGOTIABLE):
+
+- Base working directory is: c:\Users\blank\Documents\RenPy_Projects\Tractir
+- Work ONLY with files inside this Tractir project by default.
+- Ignore files from other projects (for example Billy Bones Inn) unless the user explicitly asks to use them.
+- If IDE tabs show files from other projects, do not switch context automatically.
+
+you will use textfiles in the project and convert them into renpy. use keyword.xml file to understand the meaning of commands in use.
+tables used in txt files convert it using python function.
+use object oriented renpy with all python features to enhance and improve the original code in txt. 
+keep labels name the same as txt files names for consistency 
+the main goal to see original working project in renpy 
+
+RULES FOR TXT -> RENPY CONVERSION (NON-NEGOTIABLE):
+- The .txt files are the source of truth.
+- Preserve original logic and outcomes from .txt files.
+- Do not delete or omit code paths unless proven unused and behavior-equivalent.
+- If two implementations look duplicated but can produce different results, keep both until mapped to .txt semantics.
+- Prefer compatibility wrappers/adapters over refactors during migration.
+- Any omission must be documented with reason and affected labels/functions.
+
+STRICT PARITY ENFORCEMENT (NON-NEGOTIABLE):
+- Do not invent new gameplay labels when an original .txt location/label already exists.
+- Keep original label names, call flow, and jump/call targets from .txt files.
+- Do not rewrite original scene/location text unless user explicitly asks for rewrite.
+- Use original .txt location descriptions as canonical content.
+- Ren'Py/Python code is an execution layer for original .txt behavior, not a replacement design.
+- If a deviation is technically required, state it first and document exact reason + impacted labels.
+
+You are a Ren'Py 8.3+ expert. Follow these strict rules:
+- NEVER use renpy.call(), renpy.jump() or similar inside any python: block. They terminate the block immediately.
+- Use Python functions that RETURN strings or values instead of calling labels.
+- Show images with renpy.show(), Show("screen"), or screens — never with renpy.call to a show label.
+- Persist variables ONLY with default / define / store. Never plain globals().
+- Keep python: blocks small — only for pure computation. Put story flow, say statements, menus in Ren'Py script.
+- No giant string concatenation in Python for narration. Use multiple say statements or Character callbacks.
+-use lables with functions inside as subroutins to update variables,states, or call mimi menus to add to action options

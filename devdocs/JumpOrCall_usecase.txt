@@ -1,0 +1,93 @@
+Goal / Situation,Preferred construct,Why / Typical pattern,Example code snippet
+"Update variables, evaluate conditions, choose different image/dialogue branch, then continue in the same context (most common for ""methods"")",call,Keeps the call stack → returns automatically after return → perfect for subroutines that prepare data / show variation / then hand back control,"call UpdateArousal(target, amount=15)
+call ShowGirlReaction(girl, ""flirt"")"
+"Permanently change location / scene / major story phase (navigation, big plot jump)",jump,"No return needed → cleans up stack → used for room changes, day advances, scene transitions","jump enter_room
+jump next_day_events"
+"Show one picture / variation + small narration, then immediately continue (no menu / no further choices inside)",Inline show + say (no label),"Fastest, cleanest, no label overhead","show sandra happy
+sandra ""That tickles!"""
+"Show variation + offer choices inside the ""function"" (mini-menu)",call to label with menu inside,"Lets you branch locally, then return to caller after choice",call FlirtMenu(girl)
+Reusable logic that sometimes needs parameters and return value,call + use _return,"Classic way to get ""function return value"" from label",$ result = _return after call
+
+
+
+label IncreaseArousal(target, amount=10):
+    $ Arousal[target] += amount
+    if Arousal[target] > 80:
+        show expression target + " very_aroused"
+        "[target] is breathing heavily..."
+    elif Arousal[target] > 40:
+        show expression target + " aroused"
+        "[target] bites her lip."
+    else:
+        show expression target + " normal"
+    return
+
+
+usage :
+" You squeeze her thigh."
+call IncreaseArousal("sandra", 25)
+sandra "Mmm... careful there..."
+
+pattern #2 
+
+return string flag or value
+
+label GetReactionMood(girl, action_type):
+    $ slut = sluttiness.get(girl, 0)
+
+    if action_type == "grope" and slut < 30:
+        $ _return = "angry"
+        show expression girl + " angry"
+        "[girl] slaps your hand away!"
+    elif action_type == "grope" and slut > 70:
+        $ _return = "eager"
+        show expression girl + " eager"
+        "[girl] presses closer..."
+    else:
+        $ _return = "neutral"
+        show expression girl + " neutral"
+
+    return
+
+
+    usage: 
+    call GetReactionMood("melissa", "grope")
+$ mood = _return
+
+if mood == "angry":
+    "She storms off..."
+elif mood == "eager":
+    melissa "Do it again..."
+
+
+pattern number 3 ; mini interactive subroutine:
+
+label HarassChoice(girl):
+    menu:
+        "Grab breasts":
+            $ harass_type = 1
+            show expression girl + " tits_grabbed"
+            $ _return = "tits"
+        "Slap ass":
+            $ harass_type = 2
+            show expression girl + " ass_slapped"
+            $ _return = "ass"
+        "Force kiss":
+            $ harass_type = 3
+            show expression girl + " forced_kiss"
+            $ _return = "kiss"
+
+    return
+
+
+    then use it: 
+
+    "You approach [girl] from behind."
+call HarassChoice(girl)
+$ chosen_part = _return
+
+if chosen_part == "tits":
+    # continue with tits-specific story
+
+
+those are hypothetic examples but use the patterns to port from text files! 

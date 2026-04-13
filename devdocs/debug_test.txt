@@ -1,0 +1,36 @@
+# 1) deterministic setup
+renpy.random.seed(123)
+time = 0
+week = 1
+day = 1
+
+# ensure core maps exist
+if "EventsCount" not in globals(): EventsCount = {}
+if "NewEvents" not in globals(): NewEvents = {}
+
+# 2) build queue
+renpy.call_in_new_context("CreateTavernEvents")
+
+# 3) verify queue exists
+assert isinstance(EventsCount, dict)
+assert isinstance(NewEvents, dict)
+assert EventsCount.get(time, 0) > 0 or EventsCount.get(10, 0) > 0
+
+# 4) dispatch one event and verify decrement
+b_t = int(EventsCount.get(time, 0))
+b_m = int(EventsCount.get(10, 0))
+_ = DisplayTavernEventShort(time, 1)
+a_t = int(EventsCount.get(time, 0))
+a_m = int(EventsCount.get(10, 0))
+assert (a_t == b_t - 1) or (a_m == b_m - 1)
+
+
+
+renpy.random.seed(1)
+time = 0
+week = 4
+renpy.call_in_new_context("CreateTavernEvents")
+assert EventsCount.get(10, 0) > 0
+b10 = EventsCount.get(10, 0)
+_ = DisplayTavernEventShort(time, 1)
+assert EventsCount.get(10, 0) == b10 - 1

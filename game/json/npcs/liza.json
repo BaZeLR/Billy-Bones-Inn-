@@ -1,0 +1,120 @@
+{
+  "id": "liza",
+  "display_name": "Liza",
+  "role": "primary",
+  "inventory": [],
+  "schedule": {
+    "weekday": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "weekend": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "source_files": [
+    "Inn/Intro.txt"
+  ],
+  "stats": {
+    "kids": 0,
+    "beauty": 72,
+    "sluttiness": 35,
+    "sexacts": 89,
+    "cum_inside": 7,
+    "pregnancy": 0,
+    "conception_chance": 10,
+    "pussy_wet_start": 20
+  },
+  "skills": {
+    "cooking": 20,
+    "cleaning": 20,
+    "waitress": 25
+  },
+  "jobs": {
+    "kitchen": 0,
+    "cleaning": 0,
+    "waitress": 0,
+    "hall_available": 0,
+    "whore_available": 0,
+    "whore": 0,
+    "gloryhole": 0
+  },
+  "default_clothing": {
+    "dress": "minidress",
+    "bra": "simplebra",
+    "panties": "simplepanties",
+    "legs": "blackstockings",
+    "shoes": "highshoes"
+  },
+  "relationships": {
+    "player_friendship": 0
+  },
+  "custom": {
+    "LizaVar": {
+      "SawChurchAfterCermon": 0,
+      "TalkChurchAfterCermon": 0,
+      "TalkChurchAfterCermonGeorgett": 0,
+      "ProstStart": 0,
+      "seeclients": 0,
+      "askclients": 0,
+      "askpregnancy": 0,
+      "asksex": 0,
+      "GloryHoleMentioned": 0,
+      "GloryHoleAsked": 0
+    },
+    "pregfather": "",
+    "openness": 0,
+    "jobGloryHoleAvail": 0,
+    "jobwhoreTommorow": 0,
+    "jobgloryholeTommorow": 0
+  },
+  "age": 14,
+  "current_location": "PortStreets",
+  "virgin": false,
+  "description": "Lizette Brunoult is just under 160 centimeters tall.sassy creole with chocolate skin, green eyes, and small breasts. Her long dark hair is pulled back into two braids. She has slender, long legs and a slightly protruding butt, which attracts men's glances."
+}

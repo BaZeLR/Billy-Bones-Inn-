@@ -1,0 +1,129 @@
+{
+  "id": "georgetta",
+  "display_name": "Georgette",
+  "knows_MC": true,
+  "role": "primary",
+  "schedule": {
+    "weekday": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "weekend": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "source_files": [
+    "Inn/Intro.txt"
+  ],
+  "stats": {
+    "kids": 4,
+    "beauty": 67,
+    "sluttiness": 80,
+    "sexacts": 6452,
+    "cum_inside": 3276,
+    "pregnancy": 0,
+    "conception_chance": 5,
+    "pussy_wet_start": 30
+  },
+  "skills": {
+    "cooking": 50,
+    "cleaning": 20,
+    "waitress": 50
+  },
+  "jobs": {
+    "kitchen": 0,
+    "cleaning": 0,
+    "waitress": 0,
+    "hall_available": 0,
+    "whore_available": 0,
+    "whore": 0,
+    "gloryhole": 0
+  },
+  "default_clothing": {
+    "dress": "slutdress",
+    "bra": "",
+    "panties": "",
+    "legs": "blackstockings",
+    "shoes": "highshoes"
+  },
+  "relationships": {
+    "player_friendship": 0
+  },
+  "custom": {
+    "GeorgettVar": {
+      "seeClients": 0,
+      "askClients": 0,
+      "askKids": 0,
+      "askParents": 0,
+      "askPregnancy": 0,
+      "askSex": 0,
+      "tellAboutEddieFetish": 0,
+      "foundinChurch": 0,
+      "fuckinChurch": 0,
+      "lizasawinChurch": 0,
+      "georgettAdmit": 0,
+      "churchGeorgettAdmit": 0,
+      "churchLizaAdmit": 0,
+      "sawChurchAfterCermon": 0,
+      "talkChurchAfterCermon": 0,
+      "talkChurchAfterCermonLiza": 0,
+      "gloryHoleExplained": 0,
+      "gloryHoleAgreed": 0
+    },
+    "pregfather": "",
+    "openness": 0,
+    "jobGloryHoleAvail": 0,
+    "jobwhoreTommorow": 0,
+    "jobgloryholeTommorow": 0
+  },
+  "age": 35,
+  "tavernRelocateAgree": false,
+  "current_location": "PortStreets",
+  "virgin": false,
+  "description": "Georgette- a mid aged perfection,tall stature, slightly plump with large full breasts. She is blonde and has brown eyes. Her appearance and manners leave no doubt that she has chosen a path far from that of a nun.  "
+}

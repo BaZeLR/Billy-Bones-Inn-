@@ -1,0 +1,55 @@
+# Character Worklist: Сандра
+
+## Identity
+- Canonical id: sandra
+- Legacy keys/tokens: sandra, SandraVar
+- Init source: InitSandra.txt
+- Main var store: SandraVar
+
+## Presence/Schedule (TXT-driven notes)
+- Основная локация старта: TavernMain.
+- Ключевой кухонный работник в стартовой конфигурации.
+
+## Flags/Variables (Init authority)
+- knowmolodost
+
+## Primary Scenes/Dialogs/Features (TXT files)
+- InitSandra.txt -> InitSandra.rpy (rpy_exists)
+- IntSandraTalk.txt -> IntSandraTalk.rpy (rpy_exists)
+- IntSandraDressChange.txt -> IntSandraDressChange.rpy (rpy_exists)
+
+## Full TXT Coverage (anti-omission list)
+- $menu_f.txt
+- AdjustOtkroven.txt
+- AmandaAtHomeCode.txt
+- Church.txt
+- DailySetstatdefault.txt
+- DressNoShow.txt
+- GirlDressSuggest.txt
+- GirlsDesc.txt
+- GiveBirth.txt
+- GiveBirthFinish.txt
+- GiveBirthStep2.txt
+- HarassShowImage.txt
+- InitSandra.txt
+- IntAmandaDressChange.txt
+- IntLizaDressChange.txt
+- Intro.txt
+- IntSandraDressChange.txt
+- IntSandraTalk.txt
+- KidsFunctions.txt
+- menu_tavernstat.txt
+- MomDressComplaint.txt
+- NextDay_TavernDaily.txt
+- NextDay.txt
+- RelationshipDesc1.txt
+- SetTavernServiceLevels.txt
+- TavernMain.txt
+- TavernShowImage.txt
+
+## Port TODO
+- [ ] Confirm schedule conditions per location/time against source TXT lines.
+- [ ] Map every visible non-sex action into character dialog UI buttons.
+- [ ] Keep sex/special-event actions excluded in first pass (hide, do not delete).
+- [ ] Verify all referenced flags are initialized before first interaction.
+- [ ] Add/verify compatibility aliases for legacy calls.

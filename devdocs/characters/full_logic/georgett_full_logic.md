@@ -1,0 +1,2106 @@
+# Full Logic Map: Жоржетта
+
+Source: only `game/Inn/*.txt` (authoritative content).
+
+## Scope Summary
+- Character id: georgett
+- Tokens used for discovery: georgett, GeorgettVar
+- Reference files count: 48
+- Matched lines count: 367
+
+## Reference Files
+- AdjustOtkroven.txt => Location: AdjustOtkroven
+- Church.txt => Location: Church
+- ChurchAfterCermon.txt => Location: ChurchAfterCermon
+- ChurchIspoved.txt => Location: ChurchIspoved
+- DailySetstatdefault.txt => Location: DailySetstatdefault
+- DressNoShow.txt => Location: DressNoShow
+- EllonaBirthPrayMenu.txt => Location: EllonaBirthPrayMenu
+- GeorgettBeckyVisit.txt => Location: GeorgettBeckyVisit
+- GirlDressSuggest.txt => Location: GirlDressSuggest
+- GirlsDesc.txt => Location: GirlsDesc
+- GirlSuggestDressFunc.txt => Location: GirlSuggestDressFunc
+- GiveBirth.txt => Location: GiveBirth
+- GiveBirthFinish.txt => Location: GiveBirthFinish
+- GiveBirthStep2.txt => Location: GiveBirthStep2
+- GloryHoleBusy.txt => Location: GloryHoleBusy
+- InitGeorgett.txt => Location: InitGeorgett
+- InitLiza.txt => Location: InitLiza
+- InitSecondaryNPC.txt => Location: InitSecondaryNPC
+- IntAmandaDressChange.txt => Location: IntAmandaDressChange
+- IntBeckyGuest.txt => Location: IntBeckyGuest
+- IntBeckyTalk.txt => Location: IntBeckyTalk
+- IntEddieTalk.txt
+- IntGeorgettAfterCermon.txt => Location: IntGeorgettAfterCermon
+- IntGeorgettDressChange.txt => Location: IntGeorgettDressChange
+- IntGeorgettSex.txt => Location: IntGeorgettSex
+- IntGeorgettTalk.txt => Location: IntGeorgettTalk
+- IntLizaTalk.txt
+- IntLizettAfterCermon.txt => Location: IntLizettAfterCermon
+- Intro.txt => Location: Intro
+- KidsFunctions.txt => Location: KidsFunctions
+- menu_tavernstat.txt => Location: menu_tavernstat
+- MomDressComplaint.txt => Location: MomDressComplaint
+- NextDay_FinishDayEvents.txt => Location: NextDay_FinishDayEvents
+- NextDay_NewDayEvents.txt => Location: NextDay_NewDayEvents
+- NextDay_TavernDaily.txt => Location: NextDay_TavernDaily
+- NextDay.txt => Location: NextDay
+- PortStreets.txt => Location: PortStreets
+- SexPort.txt => Location: SexPort
+- SexProstTavern.txt => Location: SexProstTavern
+- ShowCurrentSex.txt => Location: ShowCurrentSex
+- ShowGeorgettPortrait.txt => Location: ShowGeorgettPortrait
+- StolyarWorkshop.txt => Location: StolyarWorkshop
+- StreetClients.txt => Location: StreetClients
+- TavernGloryHole.txt => Location: TavernGloryHole
+- TavernMain.txt => Location: TavernMain
+- TavernProstClients.txt => Location: TavernProstClients
+- TavernShowImage.txt => Location: TavernShowImage
+- ZaletOpinionCalc.txt => Location: ZaletOpinionCalc
+
+## Action Logic (menus/acts)
+- Church.txt:33 | GS 'Menu.Add','ChurchServiceMenu','Найти маму',''
+- Church.txt:39 | GS 'Menu.Add','ChurchServiceMenu','Найти сестер',''
+- Church.txt:45 | GS 'Menu.Add','ChurchServiceMenu','Найти семейство Легаре',''
+- Church.txt:50 | GS 'Menu.Add','ChurchServiceMenu','Найти семейство Блэнкеншип',''
+- Church.txt:56 | GS 'Menu.Add','ChurchServiceMenu','Найти Жоржетту Брюно',''
+- Church.txt:73 | GS 'Menu.Add','ChurchServiceMenu','Предложить Жоржетте перепихнуться по быстрому',''
+- Church.txt:118 | act 'Вернуться в собор': gs 'AdvanceTime', 'Church'
+- Church.txt:137 | act 'Обсудить сомнения Бекки со святым отцом': dynamic $BeckyChurchTalk
+- Church.txt:139 | act 'Идти на исповедь':gt 'ChurchIspoved',1
+- Church.txt:143 | act 'Обойти собор':gt 'ChurchAfterCermon', 1
+- Church.txt:147 | act 'Вернуться к трактиру':gt 'StreetTavern'
+- ChurchAfterCermon.txt:32 | act 'Вернуться в собор':gt 'Church'
+- ChurchIspoved.txt:9 | GS 'Menu.Add','ChurchIspovedMenu','В разных пустяках',''
+- ChurchIspoved.txt:14 | GS 'Menu.Add','ChurchIspovedMenu','В том, что совокуплялись с Жоржеттой',''
+- ChurchIspoved.txt:22 | GS 'Menu.Add','ChurchIspovedMenu','В том, что совокуплялись с Жоржеттой прямо во время службы',''
+- ChurchIspoved.txt:30 | GS 'Menu.Add','ChurchIspovedMenu','В том, что совокуплялись с Жоржеттой прямо во время службы на глазах у ее дочки',''
+- ChurchIspoved.txt:45 | act 'Вернуться в собор':gs 'AdvanceTime', 'Church'
+- DressNoShow.txt:14 | act 'Вот и поболтали':
+- DressNoShow.txt:43 | act 'Что хочу, то и ворочу':
+- DressNoShow.txt:49 | act 'Извиниться':
+- DressNoShow.txt:56 | act 'Платить, но не каяться':
+- EllonaBirthPrayMenu.txt:29 | act 'Оторваться от видения':
+- EllonaBirthPrayMenu.txt:52 | act 'Оторваться от видения':
+- EllonaBirthPrayMenu.txt:59 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Эллоне',''
+- EllonaBirthPrayMenu.txt:69 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Антее',''
+- EllonaBirthPrayMenu.txt:83 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Фаене',''
+- EllonaBirthPrayMenu.txt:97 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Аглае',''
+- EllonaBirthPrayMenu.txt:106 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Пасифее',''
+- EllonaBirthPrayMenu.txt:120 | GS 'Menu.Add','EllonaMenuBirthPray','Помолиться Талии',''
+- GeorgettBeckyVisit.txt:44 | GS 'Menu.Add','MenuGuestBecky','Осмотреть Жоржетту',''
+- GeorgettBeckyVisit.txt:51 | GS 'Menu.Add','MenuGuestBecky','Смотреть что будет дальше',''
+- GeorgettBeckyVisit.txt:65 | GS 'Menu.Add','MenuGuestBecky','Расстегнуть штаны и позвать Бекки',''
+- GeorgettBeckyVisit.txt:116 | GS 'Menu.Add','MenuGuestBecky','Кончить на лицо',''
+- GeorgettBeckyVisit.txt:127 | GS 'Menu.Add','MenuGuestBecky','Кончить в ротик',''
+- GirlSuggestDressFunc.txt:34 | act 'Подождать, пока Ирма снимет мерку':
+- GirlSuggestDressFunc.txt:40 | act 'Пройти вместе с девушками за занавеску':
+- GirlSuggestDressFunc.txt:55 | act 'Попросить разрешить вам остаться':
+- GirlSuggestDressFunc.txt:75 | act 'Покаяться и заплатить':
+- GirlSuggestDressFunc.txt:93 | act 'Предложить снять мерку прямо на месте':
+- GirlSuggestDressFunc.txt:119 | act 'Продолжить смотреть':
+- GirlSuggestDressFunc.txt:126 | act 'Подрочить на <<iif(DressBuyIsRelative=1,''маму'',iif(DressBuyIsRelative=2,''сестру'',''зрелище''  ))>>':
+- GirlSuggestDressFunc.txt:144 | act 'Пойти и подождать':
+- GirlSuggestDressFunc.txt:150 | act 'Предложить на чай 10 мараведи':
+- GirlSuggestDressFunc.txt:185 | act 'Продолжить свое грязное занятие':
+- GiveBirth.txt:48 | act 'Успокоить':
+- GiveBirth.txt:210 | act 'Идти в храм':
+- GiveBirth.txt:232 | act 'Идти внутрь':
+- GiveBirth.txt:266 | act 'Ждать дальше':
+- GiveBirth.txt:311 | act 'Родовые схватки продолжаются':
+- GiveBirthFinish.txt:28 | act 'Подождать, пока <<$RealName[$GirlName]>> отдохнет и придет в себя':
+- GiveBirthFinish.txt:45 | act 'Идти спать':
+- IntAmandaDressChange.txt:45 | GS 'Menu.Add','MenuAmandaTalk','Предложить сестренке ходить без лифчика',''
+- IntAmandaDressChange.txt:89 | GS 'Menu.Add','MenuAmandaTalk','Предложить сестре снять панталоны',''
+- IntAmandaDressChange.txt:141 | GS 'Menu.Add','MenuAmandaTalk','Постыдить сестру за то, что ходит без лифчика',''
+- IntAmandaDressChange.txt:172 | GS 'Menu.Add','MenuAmandaTalk','Постыдить сестру за отстутсвие панталон',''
+- IntAmandaDressChange.txt:202 | GS 'Menu.Add','MenuAmandaTalk','Предложить купить сестре обновку',''
+- IntBeckyGuest.txt:36 | GS 'Menu.Add','MenuGuestBecky','Осмотреть Ребекку',''
+- IntBeckyGuest.txt:43 | GS 'Menu.Add','MenuGuestBecky','Осмотреть Ингенборг',''
+- IntBeckyGuest.txt:50 | GS 'Menu.Add','MenuGuestBecky','Выставить на стол вино и еду из вашего трактира',''
+- IntBeckyGuest.txt:77 | GS 'Menu.Add','MenuGuestBecky','Кушать',''
+- IntBeckyGuest.txt:130 | GS 'Menu.Add','MenuGuestBecky','Полапать под столом Бекки',''
+- IntBeckyGuest.txt:178 | GS 'Menu.Add','MenuGuestBecky','Взять Бекки под руку и идти наверх в спальню',''
+- IntBeckyGuest.txt:241 | GS 'Menu.Add','MenuGuestBecky','Идти в спальню вместе с Бекки и Эдди',''
+- IntBeckyGuest.txt:277 | GS 'Menu.Add','MenuGuestBecky','Попрощаться и идти домой',''
+- IntBeckyTalk.txt:10 | GS 'Menu.Add','MenuBeckyTalk','Осмотреть',''
+- IntBeckyTalk.txt:16 | GS 'Menu.Add','MenuBeckyTalk','Поболтать со вдовой Блэнкеншип о разной фигне',''
+- IntBeckyTalk.txt:27 | GS 'Menu.Add','MenuBeckyTalk','Поболтать с Бекки о более личных вещах',''
+- IntBeckyTalk.txt:39 | GS 'Menu.Add','MenuBeckyTalk','Спросить Бекки про дочку с женихом',''
+- IntBeckyTalk.txt:48 | GS 'Menu.Add','MenuBeckyTalk','Распросить еще про дочку',''
+- IntBeckyTalk.txt:57 | GS 'Menu.Add','MenuBeckyTalk','Распросить про Лукаса, жениха Ингенборг',''
+- IntBeckyTalk.txt:66 | GS 'Menu.Add','MenuBeckyTalk','Распросить Бекки про ее покойного мужа',''
+- IntBeckyTalk.txt:75 | GS 'Menu.Add','MenuBeckyTalk','Распросить еще про Эрика',''
+- IntBeckyTalk.txt:84 | GS 'Menu.Add','MenuBeckyTalk','Узнать что сталось с другими подружками Эрика',''
+- IntBeckyTalk.txt:93 | GS 'Menu.Add','MenuBeckyTalk','Спросить про остальных подружек Эрика',''
+- IntBeckyTalk.txt:102 | GS 'Menu.Add','MenuBeckyTalk','Спросить про ее сына Эдди',''
+- IntBeckyTalk.txt:111 | GS 'Menu.Add','MenuBeckyTalk','Рассказать про игру Эдди и Жоржетты',''
+- IntBeckyTalk.txt:137 | GS 'Menu.Add','MenuBeckyTalk','Попробовать напросится в гости',''
+- IntBeckyTalk.txt:192 | GS 'Menu.Add','MenuBeckyTalk','Спросить о прошлом визите в гости',''
+- IntBeckyTalk.txt:240 | GS 'Menu.Add','MenuBeckyTalk','Указать Бекки на поведение ее сына',''
+- IntBeckyTalk.txt:263 | GS 'Menu.Add','MenuBeckyTalk','Рассказать что Эдди требует, чтобы Жоржетта изображала Бекки',''
+- IntBeckyTalk.txt:283 | GS 'Menu.Add','MenuBeckyTalk','Возмутиться поведением Эдди',''
+- IntBeckyTalk.txt:309 | GS 'Menu.Add','MenuBeckyTalk','Посоветовать Бекки быть повнимательнее к любым нуждам сына',''
+- IntBeckyTalk.txt:355 | GS 'Menu.Add','MenuBeckyTalk','Поговорить с Бекки об Эдди',''
+- IntBeckyTalk.txt:370 | GS 'Menu.Add','MenuBeckyTalk','Спросить, знает ли она от кого затяжелела',''
+- IntGeorgettAfterCermon.txt:10 | GS 'Menu.Add','AfterCermonGeorgett','Посмотреть',''
+- IntGeorgettAfterCermon.txt:30 | GS 'Menu.Add','AfterCermonGeorgett','Посмотреть еще',''
+- IntGeorgettAfterCermon.txt:48 | GS 'Menu.Add','AfterCermonGeorgett','Смотреть дальше',''
+- IntGeorgettAfterCermon.txt:71 | GS 'Menu.Add','AfterCermonGeorgett','Смотреть не отрываясь',''
+- IntGeorgettAfterCermon.txt:91 | act 'Вернуться':gs 'AdvanceTime', 'Church'
+- IntGeorgettDressChange.txt:6 | GS 'Menu.Add','MenuGeorgettTalk','Постыдить Жоржетту за то, что она ходит без лифчика',''
+- IntGeorgettDressChange.txt:13 | GS 'Menu.Add','MenuGeorgettTalk','Постыдить Жоржетту за отстутсвие панталон',''
+- IntGeorgettDressChange.txt:21 | GS 'Menu.Add','MenuGeorgettTalk','Предложить купить Жоржетте обновку',''
+- IntGeorgettSex.txt:11 | GS 'Menu.Add','GeorgettMenuSex','Осмотреть',''
+- IntGeorgettSex.txt:16 | GS 'Menu.Add','GeorgettMenuSex','Снять блузку',''
+- IntGeorgettSex.txt:28 | GS 'Menu.Add','GeorgettMenuSex','Растегнуть блузку',''
+- IntGeorgettSex.txt:40 | GS 'Menu.Add','GeorgettMenuSex','Задрать юбочку',''
+- IntGeorgettSex.txt:52 | GS 'Menu.Add','GeorgettMenuSex','Вытереть сперму с лица',''
+- IntGeorgettSex.txt:64 | GS 'Menu.Add','GeorgettMenuSex','Вытереть сперму с грудей',''
+- IntGeorgettSex.txt:76 | GS 'Menu.Add','GeorgettMenuSex','Вытереть сперму с бедер',''
+- IntGeorgettSex.txt:90 | GS 'Menu.Add','GeorgettMenuSex','Целовать',''
+- IntGeorgettSex.txt:104 | GS 'Menu.Add','GeorgettMenuSex','Лапать',''
+- IntGeorgettSex.txt:138 | GS 'Menu.Add','GeorgettMenuSex','Лизать киску',''
+- IntGeorgettSex.txt:164 | GS 'Menu.Add','GeorgettMenuSex','Предложить отсосать',''
+- IntGeorgettSex.txt:193 | GS 'Menu.Add','GeorgettMenuSex','Трахать между грудей',''
+- IntGeorgettSex.txt:219 | GS 'Menu.Add','GeorgettMenuSex','Трахать',''
+- IntGeorgettSex.txt:263 | GS 'Menu.Add','GeorgettMenuSex','Кончить в ротик',''
+- IntGeorgettSex.txt:275 | GS 'Menu.Add','GeorgettMenuSex','Кончить на лицо',''
+- IntGeorgettSex.txt:288 | GS 'Menu.Add','GeorgettMenuSex','Кончить на груди',''
+- IntGeorgettSex.txt:300 | GS 'Menu.Add','GeorgettMenuSex','Кончить внутрь',''
+- IntGeorgettTalk.txt:9 | GS 'Menu.Add','MenuGeorgettTalk','Осмотреть',''
+- IntGeorgettTalk.txt:14 | GS 'Menu.Add','MenuGeorgettTalk','Болтать',''
+- IntGeorgettTalk.txt:31 | GS 'Menu.Add','MenuGeorgettTalk','Спросить о клиентах',''
+- IntGeorgettTalk.txt:43 | GS 'Menu.Add','MenuGeorgettTalk','Спросить о сексе',''
+- IntGeorgettTalk.txt:55 | GS 'Menu.Add','MenuGeorgettTalk','Спросить о семье',''
+- IntGeorgettTalk.txt:67 | GS 'Menu.Add','MenuGeorgettTalk','Спросить о беременности',''
+- IntGeorgettTalk.txt:79 | GS 'Menu.Add','MenuGeorgettTalk','Спросить о детях',''
+- IntGeorgettTalk.txt:96 | GS 'Menu.Add','MenuGeorgettTalk','Спросить об отце Герхарде',''
+- IntGeorgettTalk.txt:109 | GS 'Menu.Add','MenuGeorgettTalk','Рассказать про Лизетту и отца Герхарда',''
+- IntGeorgettTalk.txt:117 | act 'Вернуться к трактиру':gt 'StreetTavern'
+- IntGeorgettTalk.txt:126 | GS 'Menu.Add','MenuGeorgettTalk','Предложить работать у себя в трактире',''
+- IntGeorgettTalk.txt:144 | act 'Вернуться в трактир':gs 'NextDay','TavernMain', 1
+- IntGeorgettTalk.txt:150 | GS 'Menu.Add','MenuGeorgettTalk','Спросить как работается у вас в трактире',''
+- IntGeorgettTalk.txt:164 | GS 'Menu.Add','MenuGeorgettTalk','Спросить про работу в "Пьяном Пирате"',''
+- IntGeorgettTalk.txt:173 | GS 'Menu.Add','MenuGeorgettTalk','Договорится об условиях работы у глорихола',''
+- IntGeorgettTalk.txt:184 | GS 'Menu.Add','MenuGeorgettTalk','Обсудить Эдди',''
+- IntGeorgettTalk.txt:198 | GS 'Menu.Add','MenuGeorgettTalk','Предложить Жоржетте проспонсировать ее визит к Эдди домой',''
+- IntGeorgettTalk.txt:218 | GS 'Menu.Add','MenuGeorgettTalk','Спросить, не приходил ли Эдди',''
+- IntGeorgettTalk.txt:265 | GS 'Menu.Add','MenuGeorgettTalk','Снять',''
+- IntGeorgettTalk.txt:277 | GS 'Menu.Add','MenuGeorgettTalk','Лапать',''
+- IntGeorgettTalk.txt:297 | GS 'Menu.Add','MenuGeorgettTalk','Поинтересоваться, знает ли она от кого залетела',''
+- IntLizettAfterCermon.txt:10 | GS 'Menu.Add','AfterCermonLizett','Посмотреть',''
+- IntLizettAfterCermon.txt:38 | GS 'Menu.Add','AfterCermonLizett','Посмотреть еще',''
+- IntLizettAfterCermon.txt:62 | GS 'Menu.Add','AfterCermonLizett','Смотреть дальше',''
+- IntLizettAfterCermon.txt:94 | GS 'Menu.Add','AfterCermonLizett','Смотреть не отрываясь',''
+- IntLizettAfterCermon.txt:117 | act 'Вернуться':gs 'AdvanceTime', 'Church'
+- Intro.txt:150 | act 'Приступить к управлению трактиром':
+- KidsFunctions.txt:252 | GS 'Menu.Add','KidInteractionMenu<<KidID>>','Рассмотреть',''
+- MomDressComplaint.txt:48 | act 'А чо такого? Мне нравится':
+- MomDressComplaint.txt:58 | act 'Ага, пофигу':
+- MomDressComplaint.txt:64 | act 'Может и не пофигу':
+- MomDressComplaint.txt:70 | act 'Ты права':
+- MomDressComplaint.txt:75 | act 'Так я ей это платье и купил':
+- MomDressComplaint.txt:85 | act 'Может и стыдно':
+- MomDressComplaint.txt:90 | act 'Не, ни капельки':
+- MomDressComplaint.txt:97 | act 'Видел, тебе бы тоже не мешало так одется':
+- MomDressComplaint.txt:132 | act 'Да как ты можешь так про это говорить':
+- MomDressComplaint.txt:142 | act 'Нет, не наговариваю, все так и есть':
+- MomDressComplaint.txt:169 | act 'Может я погорячился':
+- MomDressComplaint.txt:177 | act 'Так я ей это платье и купил':
+- NextDay.txt:225 | act 'Начать сначала':gt 'Intro'
+- NextDay.txt:227 | act 'Вернуться':gt $retlocname
+- PortStreets.txt:25 | act 'Заговорить с ней': gt $CurLoc,'FirstTalk'
+- PortStreets.txt:37 | act 'Пойти проверить подворотню':gt 'StreetClients',1, 'georgett'
+- PortStreets.txt:41 | act 'Пойти проверить подворотню':gt 'StreetClients',1, 'liza'
+- PortStreets.txt:62 | act 'Идти в храм Эллоны':gt 'EllonaTemple'
+- PortStreets.txt:63 | act 'Вернуться к трактиру':gt 'StreetTavern'
+- SexPort.txt:29 | act 'Закончить и выйти из переулка':
+- SexProstTavern.txt:29 | act 'Закончить и вернуться в трактир':
+- StolyarWorkshop.txt:14 | GS 'Menu.Add','DraupnirShop','Осмотреть',''
+- StolyarWorkshop.txt:21 | GS 'Menu.Add','DraupnirShop','Поболтать с гномом',''
+- StolyarWorkshop.txt:29 | GS 'Menu.Add','DraupnirShop','Спросить о ремонте вывески',''
+- StolyarWorkshop.txt:39 | GS 'Menu.Add','DraupnirShop','Заплатить 200 мараведи за ремонт вывески',''
+- StolyarWorkshop.txt:50 | GS 'Menu.Add','DraupnirShop','Спросить о дырке в стене',''
+- StolyarWorkshop.txt:59 | GS 'Menu.Add','DraupnirShop','Заплатить 100 мараведи за обзорное отверстие',''
+- StolyarWorkshop.txt:70 | GS 'Menu.Add','DraupnirShop','Спросить о глорихоле',''
+- StolyarWorkshop.txt:79 | GS 'Menu.Add','DraupnirShop','Заплатить 700 мараведи за устройство глорихола',''
+- StolyarWorkshop.txt:105 | act 'Вернуться в квартал ремесленников':gt 'ArtisansQuarter'
+- StreetClients.txt:63 | act 'Вернуться в переулок': gt 'PortStreets'
+- TavernGloryHole.txt:150 | GS 'Menu.Add','MenuTavernGloryHole','Смотреть на клиента',''
+- TavernGloryHole.txt:174 | GS 'Menu.Add','MenuTavernGloryHole','Смотреть на девочку',''
+- TavernGloryHole.txt:216 | GS 'Menu.Add','MenuTavernGloryHole','Вставить член',''
+- TavernGloryHole.txt:231 | GS 'Menu.Add','MenuTavernGloryHole','Наслаждаться процессом',''
+- TavernGloryHole.txt:242 | GS 'Menu.Add','MenuTavernGloryHole','Кончить',''
+- TavernGloryHole.txt:268 | GS 'Menu.Add','MenuTavernGloryHole','Что-то не то, проверить кто у глорихола',''
+- TavernGloryHole.txt:287 | act 'Идти обратно в трактир':gt 'TavernMain'
+- TavernMain.txt:66 | act 'Пойти проверить отдельную комнату':gt 'TavernProstClients',1, 'georgett'
+- TavernMain.txt:72 | act 'Пойти проверить отдельную комнату':gt 'TavernProstClients',1, 'liza'
+- TavernMain.txt:84 | act 'Пойти проверить отдельную комнату':gt 'TavernProstClients',1, 'liza'
+- TavernMain.txt:95 | act 'Пойти проверить отдельную комнату':gt 'TavernProstClients',1, 'georgett'
+- TavernMain.txt:115 | act 'Выйти на улицу':gt 'StreetTavern'
+- TavernMain.txt:118 | act 'Идти к глорихолу':gt 'TavernGloryHole'
+- TavernMain.txt:121 | act 'Читать "Бабслей и Литрбол для чайников"':gt 'TavernHelp'
+- TavernMain.txt:122 | act 'Идти в вашу комнату':gt 'TavernMyRoom'
+- TavernMain.txt:124 | act 'Заглянуть в комнату Аманды':gt 'TavernAmandaRoom'
+- TavernMain.txt:126 | act 'Проверить конюшню':gt 'TavernStable'
+- TavernProstClients.txt:79 | act 'Вернуться в трактир': gt 'TavernMain'
+
+## Condition Gates
+- AdjustOtkroven.txt:8 | if $GirlNameAOtk='georgett':
+- AdjustOtkroven.txt:9 | if Friends[$GirlNameAOtk]>=5 and otkroven[$GirlNameAOtk]<=3:otkroven[$GirlNameAOtk]=3
+- AdjustOtkroven.txt:10 | if Friends[$GirlNameAOtk]>=8 and otkroven[$GirlNameAOtk]<=5:otkroven[$GirlNameAOtk]=5
+- AdjustOtkroven.txt:11 | if Friends[$GirlNameAOtk]>=9 and otkroven[$GirlNameAOtk]<=6:otkroven[$GirlNameAOtk]=6
+- AdjustOtkroven.txt:12 | if Friends[$GirlNameAOtk]>=10 and otkroven[$GirlNameAOtk]<=7:otkroven[$GirlNameAOtk]=7
+- AdjustOtkroven.txt:13 | elseif $GirlNameAOtk='liza':
+- AdjustOtkroven.txt:14 | if Friends[$GirlNameAOtk]>=4 and otkroven[$GirlNameAOtk]<=3:otkroven[$GirlNameAOtk]=3
+- AdjustOtkroven.txt:15 | if Friends[$GirlNameAOtk]>=7 and otkroven[$GirlNameAOtk]<=5:otkroven[$GirlNameAOtk]=5
+- AdjustOtkroven.txt:16 | if Friends[$GirlNameAOtk]>=6 and otkroven[$GirlNameAOtk]<=6:otkroven[$GirlNameAOtk]=6
+- AdjustOtkroven.txt:17 | if Friends[$GirlNameAOtk]>=8 and otkroven[$GirlNameAOtk]<=7:otkroven[$GirlNameAOtk]=7
+- AdjustOtkroven.txt:18 | elseif $GirlNameAOtk='amanda' or $GirlNameAOtk='melissa' or $GirlNameAOtk='sandra':
+- AdjustOtkroven.txt:19 | if Friends[$GirlNameAOtk]>=6 and otkroven[$GirlNameAOtk]<=3:otkroven[$GirlNameAOtk]=3
+- AdjustOtkroven.txt:20 | if Friends[$GirlNameAOtk]>=8 and otkroven[$GirlNameAOtk]<=5:otkroven[$GirlNameAOtk]=5
+- AdjustOtkroven.txt:21 | if Friends[$GirlNameAOtk]>=11 and otkroven[$GirlNameAOtk]<=6:otkroven[$GirlNameAOtk]=6
+- AdjustOtkroven.txt:22 | if Friends[$GirlNameAOtk]>=13 and otkroven[$GirlNameAOtk]<=7:otkroven[$GirlNameAOtk]=7
+- AdjustOtkroven.txt:24 | if Friends[$GirlNameAOtk]>=6 and otkroven[$GirlNameAOtk]<=3:otkroven[$GirlNameAOtk]=3
+- AdjustOtkroven.txt:25 | if Friends[$GirlNameAOtk]>=8 and otkroven[$GirlNameAOtk]<=5:otkroven[$GirlNameAOtk]=5
+- AdjustOtkroven.txt:26 | if Friends[$GirlNameAOtk]>=11 and otkroven[$GirlNameAOtk]<=6:otkroven[$GirlNameAOtk]=6
+- AdjustOtkroven.txt:27 | if Friends[$GirlNameAOtk]>=13 and otkroven[$GirlNameAOtk]<=7:otkroven[$GirlNameAOtk]=7
+- Church.txt:9 | if BeckyVar['GerhardBeckyTalk']=0:
+- Church.txt:14 | if BeckyVar['PriestAdvice']=3:
+- Church.txt:16 | elseif BeckyVar['GerhardBeckyTalk']=0:
+- Church.txt:26 | if week<>7 or time > 2:
+- Church.txt:31 | if time=0:
+- Church.txt:59 | if GeorgettVar['askkids']:
+- Church.txt:60 | if Friends['liza']>0:
+- Church.txt:71 | gs 'Menu.AddCondition','ChurchServiceMenu', "Result=IIF(Friends['georgett']>=2 ,-1,0)"
+- Church.txt:76 | if Friends['georgett']<6:
+- Church.txt:80 | if money<15:
+- Church.txt:85 | if GeorgettVar['askkids']:
+- Church.txt:86 | if Friends['liza']=0:
+- Church.txt:90 | if GeorgettVar['lizasawinchurch']:
+- Church.txt:97 | if GeorgettVar['askkids']=0 and Rand(1,2): $TmpChurchGeorgSex='doggy'
+- Church.txt:98 | if GeorgettVar['askkids']: $TmpChurchGeorgSex='withliza'
+- Church.txt:99 | if $TmpChurchGeorgSex='doggy':
+- Church.txt:104 | if GeorgettVar['askkids']:
+- Church.txt:110 | if GeorgettVar['askkids']:
+- Church.txt:123 | gs 'Menu.AddCondition','ChurchServiceMenu', "Result=IIF(cametoday<cancumdaily and Friends['georgett']>=2 and HadSex['georgett']>=3 and GeorgettVar['foundinchurch'] ,-1,0)"
+- Church.txt:129 | elseif time=1:
+- Church.txt:131 | IF BeckyVar['GerhardBeckyTalk']>0:
+- Church.txt:136 | if BeckyVar['PriestAdvice']>0 and BeckyVar['GerhardBeckyTalk']<2:
+- ChurchAfterCermon.txt:6 | if args[0]<>1: gt 'Church'
+- ChurchAfterCermon.txt:15 | if BeckyVar['PriestAdvice']=1 or BeckyVar['PriestAdvice']=2: randvar=3
+- ChurchAfterCermon.txt:16 | if randvar=1 and GeorgettVar['churchgeorgettadmit'] and AlreadySawChurchAfterCermon=0:
+- ChurchAfterCermon.txt:19 | elseif randvar=2 and GeorgettVar['churchlizaadmit']  and AlreadySawChurchAfterCermon=0:
+- ChurchAfterCermon.txt:22 | elseif randvar=3 and BeckyVar['PriestAdvice']>0:
+- ChurchAfterCermon.txt:31 | if BeckyVar['PriestAdvice']=0 or BeckyVar['PriestAdvice']>2:
+- ChurchIspoved.txt:6 | if args[0]<>1: gt 'Church'
+- ChurchIspoved.txt:20 | gs 'Menu.AddCondition','ChurchIspovedMenu', "Result=IIF(HadSex['georgett']>0 ,-1,0)"
+- ChurchIspoved.txt:28 | gs 'Menu.AddCondition','ChurchIspovedMenu', "Result=IIF(HadSex['georgett']>0 and GeorgettVar['fuckinchurch'] and GeorgettVar['georgettadmit']=1,-1,0)"
+- ChurchIspoved.txt:36 | gs 'Menu.AddCondition','ChurchIspovedMenu', "Result=IIF(HadSex['georgett']>0 and GeorgettVar['fuckinchurch'] and GeorgettVar['lizasawinchurch'] and GeorgettVar['churchgeorgettadmit'],-1,0)"
+- DailySetstatdefault.txt:20 | if No ($GirlName='inga' and IngaVar['Knowher']=0):
+- DailySetstatdefault.txt:21 | if pregnancy[$GirlName]>0: pregnancy[$GirlName]=pregnancy[$GirlName]+1
+- DailySetstatdefault.txt:25 | if func('Table.LinesCount', 'tmpDaddySuspectFinal'+$GirlName)=0 and  pregnancy[$GirlName]>=50:
+- DailySetstatdefault.txt:30 | if func('CheckDailyEventExists',$GirlName,'MorningSickness')=0:
+- DailySetstatdefault.txt:31 | if (pregnancy[$GirlName]>0 and pregnancy[$GirlName]<80 and Rand(1,7)=1) or (pregnancy[$GirlName]=0 and Rand(1,60)=32):
+- DailySetstatdefault.txt:39 | if func('CheckDailyEventExists',$GirlName,'GiveBirth')=0:
+- DailySetstatdefault.txt:40 | if (pregnancy[$GirlName]>240 and Rand(1,45)>Max(270-pregnancy[$GirlName],0)+10 and Rand(1,3)=1) or pregnancy[$GirlName]>=285:
+- DailySetstatdefault.txt:43 | if ($GirlName='liza' or $GirlName='georgett') and $CurrentLoc[$GirlName]<>'TavernMain':KnowAboutBirth=0
+- DailySetstatdefault.txt:44 | if ($GirlName='becky' or $GirlName='inga') and Friends['becky']<12:KnowAboutBirth=0
+- DailySetstatdefault.txt:45 | if KnowAboutBirth=0:
+- DailySetstatdefault.txt:54 | if DateOfBirth[$GirlName]=dayspassed-(year-1100)*365:
+- DailySetstatdefault.txt:56 | if $GirlName='amanda' or $GirlName='liza':
+- DailySetstatdefault.txt:65 | if $GirlName='amanda' or $GirlName='melissa':
+- DailySetstatdefault.txt:66 | if func('CheckDailyEventExists',$GirlName,'MomDressComplain')=0:
+- DailySetstatdefault.txt:67 | if DressPartSlut[$topdress[$GirlName]]+DressPartSlut[$bottomdress[$GirlName]]>=10: SlutDressTrigger=1
+- DailySetstatdefault.txt:68 | if DressPartSlut[$topdress[$GirlName]]>=6: SlutDressTrigger=1
+- DailySetstatdefault.txt:69 | if DressPartSlut[$bottomdress[$GirlName]]>=6: SlutDressTrigger=1
+- DailySetstatdefault.txt:70 | if sluttiness['sandra']<=25 and DressPartSlut[$topdress[$GirlName]]+DressPartSlut[$bottomdress[$GirlName]]>=8: SlutDressTrigger=1
+- DailySetstatdefault.txt:72 | if SlutDressTrigger=1 and Rand(1,2+TalkedBeforeTmp*15)=1:
+- DailySetstatdefault.txt:81 | if Drunk[$GirlName]>0:
+- DailySetstatdefault.txt:89 | if DaysAgeYoungKid >=0 and DaysAgeYoungKid<300: Breastfeed[$GirlName]=1
+- DailySetstatdefault.txt:90 | if Breastfeed[$GirlName] or pregnancy[$GirlName]>230: Lactate[$GirlName]=1
+- DailySetstatdefault.txt:98 | if jobwhore[$GirlName]:TotalWhoreClients[$GirlName]+=ClientsDayTotal[$GirlName]
+- DailySetstatdefault.txt:99 | if jobgloryhole[$GirlName]:TotalGloryHoleClients[$GirlName]+=ClientsDayTotal[$GirlName]
+- DressNoShow.txt:8 | if $GirlNameDNS='sandra':DressBuyIsRelative=1
+- DressNoShow.txt:9 | if $GirlNameDNS='melissa' or $GirlNameDNS='amanda':DressBuyIsRelative=2
+- DressNoShow.txt:19 | if $GirlNameDNS='amanda':
+- DressNoShow.txt:21 | elseif $GirlNameDNS='becky':
+- DressNoShow.txt:23 | elseif $GirlNameDNS='sandra':
+- DressNoShow.txt:25 | elseif $GirlNameDNS='melissa':
+- DressNoShow.txt:27 | elseif $GirlNameDNS='georgett':
+- DressNoShow.txt:29 | elseif $GirlNameDNS='liza':
+- DressNoShow.txt:34 | if DressBuyIsRelative=1:
+- DressNoShow.txt:36 | elseif DressBuyIsRelative=2:
+- DressNoShow.txt:44 | '"Знаешь, что, <<iif(DressBuyIsRelative=1,''мамочка'',iif(DressBuyIsRelative=2,''сестренка'',''дорогуша''  ))>>?! Я своему слову хозяин. Захотел - позвал, захотел передумал! Я тебе подарок собирался купить, а не ты мне! Так что не надо мне тут ля-ля-тополя разводить. Не будешь тут мне надоедать, может опять передумаю и все-таки куплю тебе чего." гордо сказали вы. При этом вам почему-то пришло на ум странное слово ББПЕ. На секунду удивившись причудам памяти, вы продолжили гордиться твердостью занятой вами позиции.<br>"Ты, ты, ты..." с трудом выдавила  <<$RealName[$GirlNameDNS]>>, пораженная вашим разумным, логичным и исполненным собственного достоинства ответом.<br>"Ну и козел же ты!" продолжила она, подтверждая лишний раз ту простую истину что женщинам недоступна логика, и отвернулась. Похоже, разговор с вами закончился.<br>'
+- DressNoShow.txt:50 | '"Ой, ты знаешь <<iif(DressBuyIsRelative=1,''мамусик'',iif(DressBuyIsRelative=2,''сестричка'',''котеночек''  ))>>, я забегался по делам и опоздал."<br>"По каким-таким делам ты с утра пораньше бегал?" недоуменно ответила <<$RealName[$GirlNameDNS]>>.<br>"Да, надо было там сделать кое-что." туманно объяснили вы. "Прости, я виноват. Не дуйся."<br>"Ну ладно, раз так, то давай будем считать, что мы перенесли наш поход на <<iif(week<>6,''завтра'',''понедельник'')>>." неожиданно ответила вам <<$RealName[$GirlNameDNS]>>.<br>"Ну давай, " промямли вы, будучи застигнутым врасплох таким оборотом дел.<br>"Вот и ладушки, утром, как всегда!" сказала повеселевшая <<$RealName[$GirlNameDNS]>> и убежала.<br>'
+- DressNoShow.txt:55 | if money>50:
+- DressNoShow.txt:57 | '"Ой, ты знаешь <<iif(DressBuyIsRelative=1,''мамусик'',iif(DressBuyIsRelative=2,''сестричка'',''котеночек''  ))>>, я забегался по делам и опоздал, но не унывай, вот, деньги, которые я отложил для нашего похода за покупками. " и с этими словами вы решительно вложили в руку <<$RealName3[$GirlNameDNS]>> 50 мараведи.<br>"Зашиваюсь я с делами совсем, так что давай ты купишь себе что-нибудь сама, а я побежал. Хорошо?"<br>"Ну ладно." <<$RealName[$GirlNameDNS]>> слегка повеселела.<br>'
+- EllonaBirthPrayMenu.txt:11 | if args[0]=0 and Func('SumArray','GraceBlessing')>=6 and (BlessedByEllona=0 or CursedByEllona=1):
+- EllonaBirthPrayMenu.txt:12 | if CursedByEllona=1:
+- EllonaBirthPrayMenu.txt:38 | if CursedByEllona=1:
+- EllonaBirthPrayMenu.txt:41 | elseif Rand(1,3)=1:
+- EllonaBirthPrayMenu.txt:66 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EllonaBirthPrayMenu.txt:73 | if $GirlName='liza' or $GirlName='melissa' or $GirlName='amanda':
+- EllonaBirthPrayMenu.txt:81 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EllonaBirthPrayMenu.txt:87 | if $GirlName='liza' or $GirlName='georgett':
+- EllonaBirthPrayMenu.txt:95 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EllonaBirthPrayMenu.txt:104 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EllonaBirthPrayMenu.txt:110 | if $GirlName='inga':
+- EllonaBirthPrayMenu.txt:118 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- EllonaBirthPrayMenu.txt:124 | if sluttiness[$GirlName]>=60:
+- EllonaBirthPrayMenu.txt:132 | gs 'Menu.AddCondition','EllonaMenuBirthPray', "Result=IIF(money>=10,-1,0)"
+- GeorgettBeckyVisit.txt:10 | if BeckyVar['EddieGeorg']=1:
+- GeorgettBeckyVisit.txt:21 | if KidsWatch<=3:
+- GeorgettBeckyVisit.txt:23 | if KidsWatch=1:
+- GeorgettBeckyVisit.txt:25 | elseif KidsWatch=2:
+- GeorgettBeckyVisit.txt:32 | if rand(1,2)=1:
+- GeorgettBeckyVisit.txt:37 | if rand(1,2)=1:
+- GeorgettBeckyVisit.txt:49 | !gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(georgedinnersex>0,-1,0)"
+- GeorgettBeckyVisit.txt:63 | gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(georgedinnersex=1,-1,0)"
+- GeorgettBeckyVisit.txt:69 | if sluttiness['becky']<40:
+- GeorgettBeckyVisit.txt:71 | elseif BeckyVar['BeckyOpenMinet']>0 and sluttiness['becky']+dinnerbeckyorgasm*5>44:
+- GeorgettBeckyVisit.txt:73 | elseif sluttiness['becky']+dinnerbeckyorgasm*5>46 and beckyminetagree=2:
+- GeorgettBeckyVisit.txt:75 | elseif sluttiness['becky']>50:
+- GeorgettBeckyVisit.txt:78 | if sluttiness['becky']<=55:
+- GeorgettBeckyVisit.txt:80 | if beckyminetagree>1:
+- GeorgettBeckyVisit.txt:83 | if BeckyVar['BeckyOpenMinet']>0:
+- GeorgettBeckyVisit.txt:114 | gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(georgedinnersex=1 and cametoday<cancumdaily,-1,0)"
+- GeorgettBeckyVisit.txt:125 | gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(georgedinnersex=2 and cametoday<cancumdaily,-1,0)"
+- GeorgettBeckyVisit.txt:136 | gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(georgedinnersex=2 and cametoday<cancumdaily,-1,0)"
+- GirlDressSuggest.txt:9 | if $GirlName='sandra':DressBuyIsRelative=1
+- GirlDressSuggest.txt:10 | if $GirlName='melissa' or $GirlName='amanda':DressBuyIsRelative=2
+- GirlDressSuggest.txt:18 | if (sluttiness[$GirlName] >25 and HadSex[$GirlName]>1 and Friends[$GirlName]>10) or (sluttiness[$GirlName] >33 and HadSex[$GirlName]>0 and Friends[$GirlName]>5) : ShowOffLevel=1
+- GirlDressSuggest.txt:19 | if (sluttiness[$GirlName] >35 and HadSex[$GirlName]>3 and Friends[$GirlName]>10) or (sluttiness[$GirlName] >47 and HadSex[$GirlName]>0 and Friends[$GirlName]>5) : ShowOffLevel=2
+- GirlDressSuggest.txt:20 | if (sluttiness[$GirlName] >55  and HadSex[$GirlName]>0) or sluttiness[$GirlName] >65: ShowOffLevel=3
+- GirlDressSuggest.txt:21 | if $GirlName='georgett': ShowOffLevel=3
+- GirlDressSuggest.txt:23 | if strcomp(lcase($DressToBuy),'.*bra.*'):
+- GirlDressSuggest.txt:24 | if $GirlName='georgett':
+- GirlDressSuggest.txt:26 | elseif $GirlName='liza':
+- GirlDressSuggest.txt:31 | elseif strcomp(lcase($DressToBuy),'.*panties.*'):
+- GirlDressSuggest.txt:32 | if $GirlName='georgett':
+- GirlDressSuggest.txt:37 | elseif strcomp(lcase($DressToBuy),'.*stockings.*') :
+- GirlDressSuggest.txt:38 | if sluttiness[$GirlName] <15:
+- GirlDressSuggest.txt:40 | elseif ShowOffLevel>1:
+- GirlDressSuggest.txt:41 | if $legsdef[$GirlName]>'':
+- GirlDressSuggest.txt:43 | if $panties[$GirlName]>'':
+- GirlDressSuggest.txt:50 | if $panties[$GirlName]>'':
+- GirlDressSuggest.txt:57 | if DressBuyIsRelative=1:
+- GirlDressSuggest.txt:59 | elseif DressBuyIsRelative=2:
+- GirlDressSuggest.txt:86 | if sluttiness[$GirlName] <40 and DressPartSlut[$DressTopPart[$DressToBuy]]>=5:
+- GirlDressSuggest.txt:88 | elseif sluttiness[$GirlName] <20 and DressPartSlut[$DressTopPart[$DressToBuy]]>=3:
+- GirlDressSuggest.txt:90 | elseif sluttiness[$GirlName] <10 and DressPartSlut[$DressTopPart[$DressToBuy]]>=2:
+- GirlDressSuggest.txt:92 | elseif sluttiness[$GirlName] <55 and DressPartSlut[$DressBottomPart[$DressToBuy]]>=5:
+- GirlDressSuggest.txt:94 | elseif sluttiness[$GirlName] <35 and DressPartSlut[$DressBottomPart[$DressToBuy]]>=3:
+- GirlDressSuggest.txt:96 | elseif sluttiness[$GirlName] <20 and DressPartSlut[$DressBottomPart[$DressToBuy]]>=2:
+- GirlDressSuggest.txt:98 | elseif (sluttiness[$GirlName] >=35 and DressPartSlut[$DressTopPart[$DressToBuy]]<2) or (sluttiness[$GirlName] >=55 and DressPartSlut[$DressTopPart[$DressToBuy]]<3) or (sluttiness[$GirlName] >=70 and DressPartSlut[$DressTopPart[$DressToBuy]]<6) or  (sluttiness[$GirlName] >=45 and DressPartSlut[$DressBottomPart[$DressToBuy]]<2) or (sluttiness[$GirlName] >=60 and DressPartSlut[$DressBottomPart[$DressToBuy]]<3) or (sluttiness[$GirlName] >=75 and DressPartSlut[$DressBottomPart[$DressToBuy]]<6) :
+- GirlDressSuggest.txt:109 | if AgreeToWear>=1:
+- GirlsDesc.txt:14 | if $GirlNameGdsc='sandra':
+- GirlsDesc.txt:16 | elseif $GirlNameGdsc='melissa':
+- GirlsDesc.txt:18 | elseif $GirlNameGdsc='becky':
+- GirlsDesc.txt:20 | elseif $GirlNameGdsc='georgett':
+- GirlsDesc.txt:22 | elseif $GirlNameGdsc='liza':
+- GirlsDesc.txt:24 | elseif $GirlNameGdsc='amanda':
+- GirlsDesc.txt:26 | elseif $GirlNameGdsc='irma':
+- GirlsDesc.txt:34 | if  Lactate[$GirlNameGdsc]=1: $LactatedTitsDesc='Видно что груди <<$RealName2[$GirlNameGdsc]>> набухли, а соски увеличились. Ткань напротив них слегка промокла. '
+- GirlsDesc.txt:35 | if $topdress[$GirlNameGdsc]>'':
+- GirlsDesc.txt:37 | if $bra[$GirlNameGdsc]='':
+- GirlsDesc.txt:38 | if topraised[$GirlNameGdsc]:
+- GirlsDesc.txt:41 | if DressPartSlut[$topdress[$GirlNameGdsc]]=6:
+- GirlsDesc.txt:43 | elseif DressPartSlut[$topdress[$GirlNameGdsc]]=4:
+- GirlsDesc.txt:45 | elseif DressPartSlut[$topdress[$GirlNameGdsc]]=3:
+- GirlsDesc.txt:46 | if  Lactate[$GirlNameGdsc]=1: $LactatedTitsDesc='Видно что груди <<$RealName2[$GirlNameGdsc]>> набухли. '
+- GirlsDesc.txt:53 | if  Lactate[$GirlNameGdsc]=1: $LactatedTitsDesc='Видно что груди <<$RealName2[$GirlNameGdsc]>> набухли. '
+- GirlsDesc.txt:54 | if topraised[$GirlNameGdsc]:
+- GirlsDesc.txt:57 | if DressPartSlut[$topdress[$GirlNameGdsc]]>=4:
+- GirlsDesc.txt:59 | elseif DressPartSlut[$topdress[$GirlNameGdsc]]=3:
+- GirlsDesc.txt:66 | elseif $bra[$GirlNameGdsc]>'':
+- GirlsDesc.txt:71 | if $bottomdress[$GirlNameGdsc]>'' and $bottomdress[$GirlNameGdsc]<>'nightshirtbottom' :
+- GirlsDesc.txt:72 | if $topdress[$GirlNameGdsc]>'' or $bra[$GirlNameGdsc]>'' :
+- GirlsDesc.txt:79 | if bottomraised[$GirlNameGdsc]:
+- GirlsDesc.txt:80 | if DressPartSlut[$bottomdress[$GirlNameGdsc]]>=4:
+- GirlsDesc.txt:85 | if $panties[$GirlNameGdsc]='':
+- GirlsDesc.txt:91 | if $panties[$GirlNameGdsc]='':
+- GirlsDesc.txt:92 | if DressPartSlut[$bottomdress[$GirlNameGdsc]]=6:
+- GirlsDesc.txt:94 | elseif DressPartSlut[$bottomdress[$GirlNameGdsc]]=4:
+- GirlsDesc.txt:100 | if DressPartSlut[$bottomdress[$GirlNameGdsc]]=6:
+- GirlsDesc.txt:102 | elseif DressPartSlut[$bottomdress[$GirlNameGdsc]]=4:
+- GirlsDesc.txt:109 | elseif $panties[$GirlNameGdsc]>'' and $bottomdress[$GirlNameGdsc]<>'nightshirtbottom':
+- GirlsDesc.txt:110 | if $topdress[$GirlNameGdsc]>'' or $bra[$GirlNameGdsc]>'' :
+- GirlsDesc.txt:117 | if (bottomraised[$GirlNameGdsc] or $bottomdress[$GirlNameGdsc]='' or DressPartSlut[$bottomdress[$GirlNameGdsc]]>=4) and $legs[$GirlNameGdsc]>'':
+- GirlsDesc.txt:118 | if $legs[$GirlNameGdsc]>'':
+- GirlsDesc.txt:121 | if bottomraised[$GirlNameGdsc]=0 and $bottomdress[$GirlNameGdsc]>'' and DressPartSlut[$bottomdress[$GirlNameGdsc]]>=5:
+- GirlsDesc.txt:130 | if $shoes[$GirlNameGdsc]='simpleshoes':
+- GirlsDesc.txt:133 | if $shoes[$GirlNameGdsc]='highshoes':
+- GirlsDesc.txt:139 | if  Lactate[$GirlNameGdsc]=1:  $LactatedTitsDesc='Видно что сиськи <<$RealName2[$GirlNameGdsc]>> набухли от молока, а соски и ареолы увеличились. Капельки молока иногда выступают на сосочках. '
+- GirlsDesc.txt:141 | if TitsVisible[$GirlNameGdsc]:  pl 'Ее сиськи бесстыдно обнаженны. <<$LactatedTitsDesc>>'
+- GirlsDesc.txt:142 | if PussyVisible[$GirlNameGdsc]:  pl 'Ее влагалище ничем не прикрыто от нескромных взглядов.'
+- GirlsDesc.txt:144 | if CumFaceYou[$GirlNameGdsc]>0: pl 'На личике и волосах <<$RealName2[$GirlNameGdsc]>> видны крупные белые капли вашей спермы.'
+- GirlsDesc.txt:145 | if CumFaceYou[$GirlNameGdsc]=0 and CumFaceOthers[$GirlNameGdsc]>0: pl 'На личике и волосах <<$RealName2[$GirlNameGdsc]>> видны крупные белые капли чьей-то спермы. Шлюшка даже и не подумала их вытереть!'
+- GirlsDesc.txt:146 | if CumTitsYou[$GirlNameGdsc]>0 and TitsVisible[$GirlNameGdsc]: pl 'Груди <<$RealName2[$GirlNameGdsc]>> перемазанны в вашем семени.'
+- GirlsDesc.txt:147 | if CumTitsYou[$GirlNameGdsc]=0 and CumTitsOthers[$GirlNameGdsc]>0 and TitsVisible[$GirlNameGdsc]: pl 'Груди <<$RealName2[$GirlNameGdsc]>> перемазанны в чьем-то семени.'
+- GirlsDesc.txt:148 | if CumInsideYou[$GirlNameGdsc]>0 and PussyVisible[$GirlNameGdsc]: pl 'Из влагалища <<$RealName2[$GirlNameGdsc]>> медленно вытекает сперма.'
+- GirlsDesc.txt:149 | if CumInsideYou[$GirlNameGdsc]=0 and CumInsideOthers[$GirlNameGdsc]>0 and PussyVisible[$GirlNameGdsc]: pl 'Из влагалища <<$RealName2[$GirlNameGdsc]>> медленно вытекает сперма. Кто-то уже попробовал заделать ей ребеночка до вас.'
+- GirlsDesc.txt:150 | if CumInsideYou[$GirlNameGdsc]>0 and ShortSkirtNoPanties[$GirlNameGdsc]: pl 'Вы видите следы вашей спермы на не полностью прикрытых короткой юбочкой бедрах <<$RealName2[$GirlNameGdsc]>>. '
+- GirlsDesc.txt:151 | if CumInsideYou[$GirlNameGdsc]=0 and CumInsideOthers[$GirlNameGdsc] and ShortSkirtNoPanties[$GirlNameGdsc]: pl 'Вы видите следы чьей-то спермы на не полностью прикрытых короткой юбочкой бедрах <<$RealName2[$GirlNameGdsc]>>. '
+- GirlsDesc.txt:153 | if ($topdress[$GirlNameGdsc]='' or topraised[$GirlNameGdsc]) and pregnancy[$GirlNameGdsc]>=120:
+- GirlsDesc.txt:155 | elseif $topdress[$GirlNameGdsc]>'' and topraised[$GirlNameGdsc]=0 and DressPartSlut[$topdress[$GirlNameGdsc]]>=3 and pregnancy[$GirlNameGdsc]>=120:
+- GirlsDesc.txt:157 | elseif $topdress[$GirlNameGdsc]>'' and topraised[$GirlNameGdsc]=0 and DressPartSlut[$topdress[$GirlNameGdsc]]<3 and pregnancy[$GirlNameGdsc]>=180:
+- GirlsDesc.txt:161 | if Drunk[$GirlNameGdsc]>0:
+- GirlsDesc.txt:168 | if beauty[$GirlNameGdsc] <10:
+- GirlsDesc.txt:170 | elseif beauty[$GirlNameGdsc] <20:
+- GirlsDesc.txt:172 | elseif beauty[$GirlNameGdsc] <30:
+- GirlsDesc.txt:174 | elseif beauty[$GirlNameGdsc] <40:
+- GirlsDesc.txt:176 | elseif beauty[$GirlNameGdsc] <50:
+- GirlsDesc.txt:178 | elseif beauty[$GirlNameGdsc] <60:
+- GirlsDesc.txt:180 | elseif beauty[$GirlNameGdsc] <70:
+- GirlsDesc.txt:182 | elseif beauty[$GirlNameGdsc] <80:
+- GirlsDesc.txt:188 | if otkroven[$GirlNameGdsc]>=3:
+- GirlsDesc.txt:198 | if otkroven[$GirlNameGdsc]>=5:
+- GirlsDesc.txt:205 | if otkroven[$GirlNameGdsc]>=7:
+- GirlsDesc.txt:206 | If sexacts[$GirlNameGdsc]=0:
+- GirlsDesc.txt:208 | elseif virginity[$GirlNameGdsc]=1:
+- GirlsDesc.txt:218 | If pregnancy[$GirlNameGdsc]<120:
+- GirlsDesc.txt:221 | if DebugFlag: pl 'Она беременна на <<pregnancy[$GirlNameGdsc]/7>> неделе.'
+- GirlsDesc.txt:222 | if pregnancy[$GirlNameGdsc]>=210: pl '<<$RealName[$GirlNameGdsc]>> беременна и находится на позднем сроке. Ее живот красноречиво об этом свидетельствует.'
+- GirlsDesc.txt:223 | if pregnancy[$GirlNameGdsc]<210 and pregnancy[$GirlNameGdsc] >=150: pl 'Средних размеров беременный животик сексуально напоминает  о бурной личной жизни <<$RealName[$GirlNameGdsc]>>.'
+- GirlsDesc.txt:224 | if pregnancy[$GirlNameGdsc]>=120 and pregnancy[$GirlNameGdsc] < 150: pl 'Видно что <<$RealName[$GirlNameGdsc]>> нагуляла себе животик, но он еще не очень заметен.'
+- GirlsDesc.txt:230 | if otkroven[$GirlNameGdsc]>=6:
+- GirlsDesc.txt:231 | If kids[$GirlNameGdsc]=0:
+- GirlsDesc.txt:233 | elseIf kids[$GirlNameGdsc]=1:
+- GirlSuggestDressFunc.txt:16 | if pregnancy[$GirlName]>120:
+- GirlSuggestDressFunc.txt:43 | if $bra[$GirlName]>'':
+- GirlSuggestDressFunc.txt:49 | if ShowOffLevel>=2:
+- GirlSuggestDressFunc.txt:58 | if ShowOffLevel=0:
+- GirlSuggestDressFunc.txt:60 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:62 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:78 | *p iif($bra[$GirlName]>'','закрытые лифом сиськи','голые')
+- GirlSuggestDressFunc.txt:80 | iif(ShowOffLevel=0,'Та заметила ваш взгляд, вспыхнула, и быстро прикрыла их руками.','Она заметила ваше любопытство, но лишь улыбнулась.')
+- GirlSuggestDressFunc.txt:82 | iif(ShowOffLevel=0,'"Впредь думай, куда лезешь!" крикнула вам вслед <<$RealName[$GirlName]>>.','"Ах, уходишь... Ну ладно," немного разочарованно промолвила вам вслед <<$RealName[$GirlName]>>.')
+- GirlSuggestDressFunc.txt:99 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:101 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:106 | if $panties[$GirlName]='':
+- GirlSuggestDressFunc.txt:108 | if (sluttiness[$GirlName] >49 and HadSex[$GirlName]>0) or sluttiness[$GirlName] >62:
+- GirlSuggestDressFunc.txt:110 | if DressBuyIsRelative=1: '"Вот оттуда ты и появился!" добавила ваша разбитная мамаша.'
+- GirlSuggestDressFunc.txt:125 | if HadSex['you']>5 and cametoday<cancumdaily:
+- GirlSuggestDressFunc.txt:126 | act 'Подрочить на <<iif(DressBuyIsRelative=1,''маму'',iif(DressBuyIsRelative=2,''сестру'',''зрелище''  ))>>':
+- GirlSuggestDressFunc.txt:129 | if ShowOffLevel<3:
+- GirlSuggestDressFunc.txt:130 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:132 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:141 | if Friends['irma']<4:
+- GirlSuggestDressFunc.txt:149 | if money>=10:
+- GirlSuggestDressFunc.txt:169 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:171 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:176 | if DressBuyIsRelative>0:
+- GirlSuggestDressFunc.txt:188 | iif(DressBuyIsRelative=1,'"Сыночек, мне ж потом сперму с лица долго смывать!"',iif(DressBuyIsRelative=2,'"Братик, ты что?"', '"Ты же мне всю прическу загубишь!"'))
+- GirlSuggestDressFunc.txt:189 | if HadSex[$GirlName]>0 and Rand(1,2)=1:
+- GirlSuggestDressFunc.txt:190 | 'Так как останавливаться вы явно не собирались, <<$RealName[$GirlName]>> решила проблему кардинально: быстро наклонившись, она обхватила губами головку вашего члена. Еле успела - вы незамедлительно разрядились прямо в ротик <<iif(DressBuyIsRelative=1,''вашей маме'',iif(DressBuyIsRelative=2,''сестре'', $RealName3[$GirlName]))>>'
+- GirlSuggestDressFunc.txt:193 | elseif Friends['irma']>5 and Rand(1,2)=1:
+- GirlSuggestDressFunc.txt:198 | 'Ирма делала последний замер, <<$RealName[$GirlName]>> смотрела на Ирму, и в этот момент вы брызнули прямо на эту парочку. Основной поток приземлился на лице <<iif(DressBuyIsRelative=1,''вашей мамы'',iif(DressBuyIsRelative=2,''сестренки'', $RealName2[$GirlName]))>>, немного попало на Ирму, а отдельные капли осели на снятом для примерки платье.<br>"Что же ты делаешь!" вскричала <<$RealName[$GirlName]>>. "Как же я теперь это отмою!" <br>Однако драму предотвратила обходительная Ирма, немедленно доставшая откуда-то полотенчико и воду. Совместными усилиями следы вашего восхищения снятием мерки были убраны. После этого <<$RealName[$GirlName]>> оделась.'
+- GirlSuggestDressFunc.txt:210 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:212 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:217 | *p '"Желание клиента для меня закон," - отозвалась Ирма. Приободренная этими словами <<$RealName[$GirlName]>>, даже и не подумав зашторить окна, начала распускать шнуровку на платье. Вскоре <<iif($bra[$GirlName]>'''',''она осталась выше пояса в одном лифчике'',''ее голые сиськи вывались наружу'')>>. Поймав ваш восхищенный взгляд, она улыбнулась и окончательно стянула платье, оставшись в '
+- GirlSuggestDressFunc.txt:218 | if $bra[$GirlName]='' and $panties[$GirlName]='':
+- GirlSuggestDressFunc.txt:220 | elseif $panties[$GirlName]='':
+- GirlSuggestDressFunc.txt:222 | elseif $bra[$GirlName]='':
+- GirlSuggestDressFunc.txt:230 | if RandVar<=3:
+- GirlSuggestDressFunc.txt:234 | if RandVar=1:
+- GirlSuggestDressFunc.txt:235 | 'как какой-то пацаненок заглянул в окно, да таки и остался стоять, с открытым от удивления ртом. <br><<iif($GirlName=''georgett'' or $GirlName=''liza'',''Шлюха'',$RealName[$GirlName])>> проследила за вашим взглядом и крикнула мальчонке:'
+- GirlSuggestDressFunc.txt:236 | if $GirlName='georgett' or $GirlName='liza':
+- GirlSuggestDressFunc.txt:237 | *p '"Хочешь лишиться девственности? Ищи меня в <<iif($CurrentLoc[$GirlName]=''TavernMain'',''трактире "Дикий Жеребец"'',''порту'')>>, дам скидку!"'
+- GirlSuggestDressFunc.txt:238 | elseif $GirlName='amanda':
+- GirlSuggestDressFunc.txt:244 | elseif RandVar=2:
+- GirlSuggestDressFunc.txt:245 | 'как какой-то мужичок, по виду <<dyneval($RandomOccupCode)>> стоит у окна и с интересом наблюдает за открывшимся зрелищем.<br><<iif($GirlName=''georgett'' or $GirlName=''liza'',''Шлюха'',$RealName[$GirlName])>> проследила за вашим взглядом и крикнула ему: '
+- GirlSuggestDressFunc.txt:246 | if $GirlName='georgett' or $GirlName='liza':
+- GirlSuggestDressFunc.txt:247 | *p '"Нравиться? Хочешь трахнуть? Тогда найди меня в <<iif($CurrentLoc[$GirlName]=''TavernMain'',''трактире "Дикий Жеребец"'',''порту'')>>, возьму не дорого!"'
+- GirlSuggestDressFunc.txt:248 | elseif $GirlName='amanda':
+- GirlSuggestDressFunc.txt:253 | elseif RandVar=3:
+- GiveBirth.txt:24 | if SandraVar['knowmolodost']=0:
+- GiveBirth.txt:34 | if $GirlName='sandra':
+- GiveBirth.txt:36 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirth.txt:38 | elseif $GirlName='becky':
+- GiveBirth.txt:40 | elseif $GirlName='liza':
+- GiveBirth.txt:42 | elseif $GirlName='georgett':
+- GiveBirth.txt:44 | elseif $GirlName='inga':
+- GiveBirth.txt:52 | if $GirlName='georgett':
+- GiveBirth.txt:54 | if sluttiness['liza']<55:
+- GiveBirth.txt:61 | elseif $GirlName='liza':
+- GiveBirth.txt:62 | if kids[$GirlName]=0:
+- GiveBirth.txt:66 | if kids[$GirlName]=1:
+- GiveBirth.txt:73 | elseif $GirlName='becky':
+- GiveBirth.txt:75 | if kids[$GirlName]=5:
+- GiveBirth.txt:80 | if $DaddySuspect1='эдди':
+- GiveBirth.txt:82 | elseif $DaddySuspect1='вы':
+- GiveBirth.txt:84 | elseif strcomp(lcase($DaddySuspect1),'.*герхард.*'):
+- GiveBirth.txt:89 | elseif $GirlName='amanda' or $GirlName='melissa':
+- GiveBirth.txt:90 | if kids[$GirlName]=0:
+- GiveBirth.txt:95 | if PregTotalSuspects[$GirlName]>2:
+- GiveBirth.txt:97 | If sluttiness['sandra']<45:
+- GiveBirth.txt:99 | If sluttiness[$GirlName]>60:
+- GiveBirth.txt:108 | If sluttiness[$GirlName]>60:
+- GiveBirth.txt:110 | If sluttiness['sandra']<65:
+- GiveBirth.txt:123 | if DaddySuspect1='вы' or DaddySuspect2='вы':
+- GiveBirth.txt:124 | if PregTotalSuspects[$GirlName]>2:
+- GiveBirth.txt:130 | If sluttiness['sandra']<55:
+- GiveBirth.txt:132 | If sluttiness[$GirlName]>65:
+- GiveBirth.txt:142 | elseif strcomp(lcase($DaddySuspect1),'.*легаре.*'):
+- GiveBirth.txt:143 | if PregTotalSuspects[$GirlName]>2:
+- GiveBirth.txt:148 | If sluttiness[$GirlName]>65:
+- GiveBirth.txt:151 | if sluttiness['sandra']<55:
+- GiveBirth.txt:160 | if sluttiness['sandra']<50:
+- GiveBirth.txt:161 | if kids[$GirlName]=0:
+- GiveBirth.txt:173 | elseif $GirlName='sandra':
+- GiveBirth.txt:175 | if DaddySuspect1='вы' or DaddySuspect2='вы':
+- GiveBirth.txt:176 | if DaddySuspect1='вы' and PregTotalSuspects[$GirlName]=1:
+- GiveBirth.txt:178 | elseif DaddySuspect1='вы':
+- GiveBirth.txt:184 | if Min(sluttiness['amanda'],sluttiness['melissa'])<55:
+- GiveBirth.txt:185 | $GirlOffended=iif(sluttiness['amanda']<55,'Аманда','Мелисса')
+- GiveBirth.txt:187 | If sluttiness[$GirlName]>62:
+- GiveBirth.txt:198 | elseif $GirlName='inga':
+- GiveBirth.txt:200 | If sluttiness['becky']>30:
+- GiveBirth.txt:213 | if age[$GirlName]<=18:
+- GiveBirth.txt:215 | elseif $GirlName='sandra' or $GirlName='becky':
+- GiveBirth.txt:217 | elseif $GirlName='georgett':
+- GiveBirth.txt:219 | elseif kids[$GirlName]=0:
+- GiveBirth.txt:224 | If sluttiness[$GirlName]<48:
+- GiveBirth.txt:235 | If sluttiness[$GirlName]<44:
+- GiveBirth.txt:243 | if dyneval($GetSexNum,$GirlName,'','inside','',dayspassed-2):
+- GiveBirth.txt:246 | if $GirlName='georgett' or $GirlName='liza':
+- GiveBirth.txt:248 | elseif sluttiness[$GirlName]>58:
+- GiveBirth.txt:250 | elseif sluttiness[$GirlName]>42:
+- GiveBirth.txt:257 | if RandVar=1:
+- GiveBirth.txt:259 | elseif RandVar=2:
+- GiveBirth.txt:269 | if kids[$GirlName]=0:
+- GiveBirth.txt:275 | if PregTotalSuspects[$GirlName]<4:
+- GiveBirth.txt:277 | if age[$GirlName]<=20:
+- GiveBirth.txt:282 | if sluttiness[$GirlName]<54:
+- GiveBirth.txt:286 | if PregTotalSuspects[$GirlName]>1:
+- GiveBirth.txt:291 | if sluttiness[$GirlName]<52:
+- GiveBirth.txt:295 | if $GirlName='amanda' or $GirlName='melissa' or $GirlName='inga':
+- GiveBirth.txt:296 | $Momname=iif($GirlName='amanda' or $GirlName='melissa','sandra','becky')
+- GiveBirth.txt:297 | if sluttiness[$Momname]<42:
+- GiveBirth.txt:302 | elseif age[$GirlName]<=20:
+- GiveBirthFinish.txt:8 | if $GirlName='sandra':
+- GiveBirthFinish.txt:10 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirthFinish.txt:12 | elseif $GirlName='becky':
+- GiveBirthFinish.txt:14 | elseif $GirlName='liza':
+- GiveBirthFinish.txt:16 | elseif $GirlName='georgett':
+- GiveBirthFinish.txt:18 | elseif $GirlName='inga':
+- GiveBirthFinish.txt:27 | 'Тут <<$RealName[$GirlName]>> приподнялась с ложа и что-то прошептала на ухо Франческе. Та выслушала ее, кивнула и, подняв младенца перед статуей Эллоны, провозглосила: "Перед лицом Великой Богини Любви, Урожая и Плодородия, нарекаю тебя <<$KidName>>! Возблагодари же Эллону за свое появление в этом мире,  <<iif($KidGender=''M'',''юный'',''юная'')>> <<$KidName>>!"<br><<$KidName>> ответил<<iif($KidGender=''M'','''',''a'')>> возмущенным писком.'
+- GiveBirthFinish.txt:31 | if $GirlName='sandra':
+- GiveBirthFinish.txt:32 | 'Вместе с Мелиссой и Амандой вы проводили свою маму с <<iif($KidGender=''M'',''новоприобретенным братиком'',''новоприобретенной сестричкой'')>> домой, в трактир. '
+- GiveBirthFinish.txt:33 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirthFinish.txt:34 | 'Вместе с мамой вы помогли <<$RealName3[$GirlName]>> и ее <<iif($KidGender=''M'',''сыночку'',''дочурке'')>> добраться до трактира. '
+- GiveBirthFinish.txt:35 | elseif $GirlName='becky':
+- GiveBirthFinish.txt:37 | elseif $GirlName='liza':
+- GiveBirthFinish.txt:38 | 'Вместе с Жоржеттой вы помогли Лизетте, вместе с ее <<iif($KidGender=''M'',''нагулянным мальчиком'',''нагулянной девочкой '')>>, добраться до дому. '
+- GiveBirthFinish.txt:39 | elseif $GirlName='georgett':
+- GiveBirthFinish.txt:40 | 'Вместе с Лизеттой вы помогли ее <<iif($KidGender=''M'',''новому братику'',''новой сестричке'')>> добраться до дому. Ну и мамочку Лизкину само собой не забыли. '
+- GiveBirthFinish.txt:41 | elseif $GirlName='inga':
+- GiveBirthFinish.txt:42 | 'Ребекки поблагодарила вас за поддержку и попрощалась. Бабушка с дочкой и <<iif($KidGender=''M'',''внучком'',''внучкой'')>> направились к себе домой, а вы к себе, в трактир. '
+- GiveBirthStep2.txt:13 | if GiveBirthTimer=0:
+- GiveBirthStep2.txt:15 | elseif GiveBirthTimer=1:
+- GiveBirthStep2.txt:17 | elseif GiveBirthTimer=2:
+- GiveBirthStep2.txt:19 | elseif GiveBirthTimer=3:
+- GiveBirthStep2.txt:23 | if $GirlName='sandra':
+- GiveBirthStep2.txt:25 | elseif $GirlName='melissa' or $GirlName='amanda':
+- GiveBirthStep2.txt:27 | elseif $GirlName='becky':
+- GiveBirthStep2.txt:29 | if $DaddySuspect1='эдди' Or $DaddySuspect2='эдди':
+- GiveBirthStep2.txt:32 | elseif $GirlName='liza':
+- GiveBirthStep2.txt:34 | elseif $GirlName='georgett':
+- GiveBirthStep2.txt:36 | elseif $GirlName='inga':
+- GiveBirthStep2.txt:44 | if GiveBirthTimer>3: gs 'GiveBirthFinish'
+- GloryHoleBusy.txt:10 | if $GirlNameGHB = 'liza':
+- GloryHoleBusy.txt:11 | if jobgloryholeTommorow['georgett']=1: Result=1
+- GloryHoleBusy.txt:14 | if $GirlNameGHB = 'georgett':
+- GloryHoleBusy.txt:15 | if jobgloryholeTommorow['liza']=1: Result=1
+- IntAmandaDressChange.txt:7 | if AgreedToRedress=1 and sluttiness[$GirlNameIAT]>=50:
+- IntAmandaDressChange.txt:9 | if $CurrentLoc['liza']<>'TavernMain' and RandVar=4 :RandVar=Rand(5,7)
+- IntAmandaDressChange.txt:10 | if $CurrentLoc['georgett']<>'TavernMain' and RandVar=3 :RandVar=Rand(5,7)
+- IntAmandaDressChange.txt:11 | if RandVar=1:
+- IntAmandaDressChange.txt:13 | if sluttiness['sandra']>=35:
+- IntAmandaDressChange.txt:18 | elseif RandVar=2:
+- IntAmandaDressChange.txt:20 | if sluttiness['melissa']>=35:
+- IntAmandaDressChange.txt:25 | elseif RandVar=3:
+- IntAmandaDressChange.txt:27 | elseif RandVar=4:
+- IntAmandaDressChange.txt:29 | elseif RandVar=5:
+- IntAmandaDressChange.txt:31 | elseif RandVar=6:
+- IntAmandaDressChange.txt:33 | elseif RandVar=7:
+- IntAmandaDressChange.txt:36 | if RandVar<=2: gs 'SlutFriendsIncrease', $GirlNameIAT, 0, 0, 0, 60, 2, 1
+- IntAmandaDressChange.txt:37 | if RandVar>=5 and RandVar<=7:
+- IntAmandaDressChange.txt:49 | if DressPartSlut[$topdress[$GirlNameIAT]]<4:
+- IntAmandaDressChange.txt:50 | if sluttiness[$GirlNameIAT]<35:
+- IntAmandaDressChange.txt:55 | if sluttiness[$GirlNameIAT]<50:
+- IntAmandaDressChange.txt:56 | if Rand(1,2)=1:
+- IntAmandaDressChange.txt:67 | if sluttiness[$GirlNameIAT]<50:
+- IntAmandaDressChange.txt:71 | if $CurrentLoc['liza']='TavernMain':
+- IntAmandaDressChange.txt:78 | if AgreedToRedress=1:
+- IntAmandaDressChange.txt:86 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and $bra[$GirlNameIAT]>'' and (AmandaVar['suckyou'] or AmandaVar['fuckyou']) and Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:94 | if $CurrentLoc['liza']='TavernMain':
+- IntAmandaDressChange.txt:96 | if $pantiesdef['liza']='':
+- IntAmandaDressChange.txt:106 | if DressPartSlut[$bottomdress[$GirlNameIAT]]<4:
+- IntAmandaDressChange.txt:107 | if sluttiness[$GirlNameIAT]+tmpLizaComandoBonus<42:
+- IntAmandaDressChange.txt:112 | if sluttiness[$GirlNameIAT]<50:
+- IntAmandaDressChange.txt:113 | if Rand(1,2)=1:
+- IntAmandaDressChange.txt:123 | if sluttiness[$GirlNameIAT]+tmpLizaComandoBonus<55:
+- IntAmandaDressChange.txt:130 | if AgreedToRedress=1:
+- IntAmandaDressChange.txt:138 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and $panties[$GirlNameIAT]>'' and (AmandaVar['suckyou'] or AmandaVar['fuckyou'])  and Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:145 | if $bra[$GirlNameIAT]>'' or ($bra[$GirlNameIAT]='' and sluttiness[$GirlNameIAT]>=50 and Rand(1,2)=1):
+- IntAmandaDressChange.txt:149 | if sluttiness[$GirlNameIAT]<45:
+- IntAmandaDressChange.txt:152 | elseif sluttiness[$GirlNameIAT]<60 and Rand(1,4)<=3:
+- IntAmandaDressChange.txt:162 | if AgreedToRedress=1:
+- IntAmandaDressChange.txt:169 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and  Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:176 | if $panties[$GirlNameIAT]>'' or ($panties[$GirlNameIAT]='' and sluttiness[$GirlNameIAT]>=45 and Rand(1,2)=1):
+- IntAmandaDressChange.txt:180 | if sluttiness[$GirlNameIAT]<45:
+- IntAmandaDressChange.txt:183 | elseif sluttiness[$GirlNameIAT]<60 and Rand(1,4)<=3:
+- IntAmandaDressChange.txt:193 | if AgreedToRedress=1:
+- IntAmandaDressChange.txt:200 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(GiveOrgasms[$GirlNameIAT]>=2 and Friends[$GirlNameIAT]>8 and  Talked[$GirlNameIAT]<2,-1,0)"
+- IntAmandaDressChange.txt:210 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Friends[$GirlNameIAT]>8 and func('CheckDailyEventExists','','BuyDressTom')=0 and func('CheckDailyEventExists',$GirlNameIAT,'BuyDress')=0 and Talked[$GirlNameIAT]<2 and week<>6,-1,0)"
+- IntBeckyGuest.txt:14 | if KidsWatch<=3:
+- IntBeckyGuest.txt:16 | if KidsWatch=1:
+- IntBeckyGuest.txt:18 | elseif KidsWatch=2:
+- IntBeckyGuest.txt:28 | if Drunk['becky']=1:
+- IntBeckyGuest.txt:41 | !gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(dinnertime<=5,-1,0)"
+- IntBeckyGuest.txt:48 | !gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(dinnertime<=5,-1,0)"
+- IntBeckyGuest.txt:54 | if pregnancy['becky']<=30:
+- IntBeckyGuest.txt:60 | if pregnancy['inga']<=30:
+- IntBeckyGuest.txt:74 | gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(dinnertime=0 and winenum>=30 and productnum>=30 and IngaVar['Knowher']>=2,-1,0)"
+- IntBeckyGuest.txt:81 | if dinnerbecky>0:
+- IntBeckyGuest.txt:85 | if Rand(1,4)=1:
+- IntBeckyGuest.txt:87 | elseif Rand(1,4)=1:
+- IntBeckyGuest.txt:93 | if BeckyVar['visitedhome']=4 and Rand(1,7)=1:
+- IntBeckyGuest.txt:98 | if BeckyVar['visitedhome']>=5 and dinneringaminet=0 and dinnertime<=2 and Rand(1,6)=1:
+- IntBeckyGuest.txt:103 | if dinneringaminet>0 and dinneringaminet<=3:
+- IntBeckyGuest.txt:105 | if Rand(1,5)=1:
+- IntBeckyGuest.txt:108 | if Rand(1,5)=1:
+- IntBeckyGuest.txt:115 | if dinneringaminet=4:
+- IntBeckyGuest.txt:122 | if BeckyVar['EddieWhoreHome']=4 and dinnertime=5:
+- IntBeckyGuest.txt:128 | gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(dinnertime<=5 and georgedinnersex=0,-1,0)"
+- IntBeckyGuest.txt:134 | if dinnerbecky=0:
+- IntBeckyGuest.txt:136 | elseif dinnerbecky=1:
+- IntBeckyGuest.txt:138 | if $panties['becky']>'':
+- IntBeckyGuest.txt:148 | if (dinnerbecky>=3 or ($panties['becky']='' and dinnerbecky>2)) and Rand(1,3)=1: dinnerbeckyorgasm=1
+- IntBeckyGuest.txt:149 | if dinnerbeckyorgasm=1:
+- IntBeckyGuest.txt:154 | If Rand(1,4)=1:
+- IntBeckyGuest.txt:158 | if Rand(1,2)=3 and BeckyVar['EddieGeorg']=0: *p ' Как-то Эдди пошловато смотрит на свою маму, надо будет рассказать это Жоржи.'
+- IntBeckyGuest.txt:159 | elseif Rand(1,4)=1:
+- IntBeckyGuest.txt:165 | if dinnertime=5 and dinnerbeckyorgasm=0:
+- IntBeckyGuest.txt:169 | if BeckyVar['EddieWhoreHome']=4 and dinnertime=5 :
+- IntBeckyGuest.txt:176 | gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(dinnertime<=5 and dinnerbeckyorgasm=0 and georgedinnersex=0,-1,0)"
+- IntBeckyGuest.txt:182 | if BeckyVar['visitedhome']<4:
+- IntBeckyGuest.txt:186 | elseif BeckyVar['visitedhome']<=6 and BeckyVar['visitedhome']>=4:
+- IntBeckyGuest.txt:187 | if BeckyVar['visitedhome']>=5 and (sluttiness['becky']+Rand(1,5)+dinnerbeckyorgasm*5>=48 or BeckyVar['HomeSex']=1):
+- IntBeckyGuest.txt:191 | if BeckyVar['EddieTryToFuck']=4:
+- IntBeckyGuest.txt:196 | if BeckyVar['EddieWhoreHome']=4:
+- IntBeckyGuest.txt:201 | if KidsWatch>3 and Rand(1,2)=1 and BeckyVar['EddieGeorg']=0:
+- IntBeckyGuest.txt:209 | elseif BeckyVar['visitedhome']>=7:
+- IntBeckyGuest.txt:212 | if (EddieVar['RidiculeFollow']>0 and Rand(1,10)=1) or (EddieVar['RidiculeFollow']=0 and Rand(1,2)=1):
+- IntBeckyGuest.txt:214 | if Rand(1,3)=1:
+- IntBeckyGuest.txt:222 | if BeckyVar['EddieWhoreHome']=4:
+- IntBeckyGuest.txt:238 | gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(dinnertime=6 and georgedinnersex=0,-1,0)"
+- IntBeckyGuest.txt:248 | if sluttiness[$GirlName]>=60:
+- IntBeckyGuest.txt:250 | if EddieVar['OthersSawWithMom']>0:
+- IntBeckyGuest.txt:261 | if BeckyVar['EddieWhoreHome']=4:
+- IntBeckyGuest.txt:265 | if sluttiness[$GirlName]>=60:
+- IntBeckyGuest.txt:273 | gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(dinnertime=6 and georgedinnersex=0 and BeckyVar['visitedhome']>=7,-1,0)"
+- IntBeckyGuest.txt:284 | gs 'Menu.AddCondition','MenuGuestBecky', "Result=IIF(dinnertime>5 and georgedinnersex=0,-1,0)"
+- IntBeckyTalk.txt:19 | dynamic 'if Talked[$GirlName]<=2 and Rand(1,2)=1 and Friends[$GirlName]<3:
+- IntBeckyTalk.txt:23 | if Talked[$GirlName]>2: ''Ничего нового из разговора вы не узнали.'''
+- IntBeckyTalk.txt:30 | dynamic 'if Talked[$GirlName]<=2 and Rand(1,2)=1 and Friends[$GirlName]<=5:
+- IntBeckyTalk.txt:34 | if Talked[$GirlName]>2: ''Ничего нового из разговора вы не узнали.'''
+- IntBeckyTalk.txt:37 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(Friends[$GirlName]>=3,-1,0)"
+- IntBeckyTalk.txt:46 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['SawIngaFuck']=1 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:55 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['SawIngaFuck']=2 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:64 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['SawIngaFuck']=3 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:73 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['husbandtalk']=1 and Friends[$GirlName]>13 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:82 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['husbandtalk']=2 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:91 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['husbandtalk']=3 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:100 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['husbandtalk']=4 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:109 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['eddietalk']=0 and Friends[$GirlName]>6 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:115 | if tmpRnd=1:
+- IntBeckyTalk.txt:122 | if tmpRnd=1:
+- IntBeckyTalk.txt:124 | elseif tmpRnd=2:
+- IntBeckyTalk.txt:132 | if BeckyVar['eddietalk']<2: BeckyVar['eddietalk']=2
+- IntBeckyTalk.txt:135 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(EddieVar['TalkedAboutGeorgett']>0 and BeckyVar['husbandtalk']>0 and BeckyVar['eddietalk']>0 and Friends[$GirlName]>8 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:141 | if BeckyVar['husbandtalk']=0:
+- IntBeckyTalk.txt:146 | if BeckyVar['eddietalk']>=2:
+- IntBeckyTalk.txt:153 | if BeckyVar['SawIngaFuck']>=4:
+- IntBeckyTalk.txt:160 | if BeckyVar['husbandtalk']>=3:
+- IntBeckyTalk.txt:167 | if $MyCurDress='citydress':
+- IntBeckyTalk.txt:172 | if Func('HasThisDress', 'MyDresses','citydress'):
+- IntBeckyTalk.txt:180 | If InvitePoints>=4:
+- IntBeckyTalk.txt:182 | if BeckyVar['visitedhome']<3:BeckyVar['visitedhome']=3
+- IntBeckyTalk.txt:190 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['visitedhome']=2 and Friends[$GirlName]>12 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:194 | if BeckyVar['visitedhome']>=6:
+- IntBeckyTalk.txt:196 | if Rand(1,3+BeckyVar['BeckyOpenMinet'])=1:
+- IntBeckyTalk.txt:198 | elseif BeckyVar['BeckyOpenMinet']>0:
+- IntBeckyTalk.txt:199 | if sluttiness['becky']<48:
+- IntBeckyTalk.txt:203 | if RandVar=1:
+- IntBeckyTalk.txt:205 | elseif RandVar=2:
+- IntBeckyTalk.txt:207 | elseif RandVar=3:
+- IntBeckyTalk.txt:218 | if BeckyVar['TimesVisited']<=2:
+- IntBeckyTalk.txt:220 | elseif BeckyVar['HomeSex']=1:
+- IntBeckyTalk.txt:221 | if Rand(1,2)=1:
+- IntBeckyTalk.txt:222 | if sluttiness['becky']>=42:
+- IntBeckyTalk.txt:230 | elseif BeckyVar['HomeSex']=0 and BeckyVar['visitedhome']>=5:
+- IntBeckyTalk.txt:238 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['TimesVisited']>0 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:243 | if sluttiness['becky']>=50:
+- IntBeckyTalk.txt:244 | if BeckyVar['TalkAboutEddie']=0:
+- IntBeckyTalk.txt:250 | if BeckyVar['TalkAboutEddie']=0:
+- IntBeckyTalk.txt:260 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['visitedhome']>=3 and (EddieVar['SawMomSex']>0 or BeckyVar['HomeSex']>0)  and BeckyVar['visitedhome']<7 and BeckyVar['EddieTryToFuck']<4 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:268 | if sluttiness['becky']<=35:
+- IntBeckyTalk.txt:270 | elseif sluttiness['becky']<=50:
+- IntBeckyTalk.txt:273 | if Rand(1,2)=1:
+- IntBeckyTalk.txt:281 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['EddieGeorg']>1 and BeckyVar['visitedhome']<7 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:288 | if BeckyVar['EddieIntrReact']=2: ChangeMind=1
+- IntBeckyTalk.txt:289 | if BeckyVar['EddieIntrReact']=1: ChangeMind=2
+- IntBeckyTalk.txt:291 | if sluttiness['becky']<=35:
+- IntBeckyTalk.txt:293 | if 	ChangeMind<2: gs 'SlutFriendsIncrease', 'becky', 15, 2, 1, 35, 2, -1
+- IntBeckyTalk.txt:294 | elseif sluttiness['becky']<=52:
+- IntBeckyTalk.txt:296 | if 	ChangeMind<2: gs 'SlutFriendsIncrease', 'becky', 0, 0, 0, 35, 2, -1
+- IntBeckyTalk.txt:301 | if ChangeMind=1:
+- IntBeckyTalk.txt:307 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['GeorgMention']=1 and BeckyVar['visitedhome']<7 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:312 | if sluttiness['becky']<=35: cls
+- IntBeckyTalk.txt:315 | if BeckyVar['EddieIntrReact']=2: ChangeMind=2
+- IntBeckyTalk.txt:316 | if BeckyVar['EddieIntrReact']=1: ChangeMind=1
+- IntBeckyTalk.txt:318 | if sluttiness['becky']<=35 and BeckyVar['PriestAdvice']=0:
+- IntBeckyTalk.txt:322 | elseif sluttiness['becky']<=48:
+- IntBeckyTalk.txt:324 | if 	ChangeMind<2: gs 'SlutFriendsIncrease', 'becky', 12, 4, -1, 35, 4, -1
+- IntBeckyTalk.txt:326 | if BeckyVar['PriestAdvice']<=1:
+- IntBeckyTalk.txt:327 | if pregnancy['becky']>60:
+- IntBeckyTalk.txt:329 | if 	ChangeMind<2: gs 'SlutFriendsIncrease', 'becky', 17, 2, 1, 56, 1, 1
+- IntBeckyTalk.txt:331 | elseif sluttiness['becky']<=52:
+- IntBeckyTalk.txt:333 | if 	ChangeMind<2: gs 'SlutFriendsIncrease', 'becky', 17, 2, 1, 54, 1, 1
+- IntBeckyTalk.txt:336 | if 	ChangeMind<2: gs 'SlutFriendsIncrease', 'becky', 17, 2, 1, 58, 1, 1
+- IntBeckyTalk.txt:339 | elseif BeckyVar['PriestAdvice']=2:
+- IntBeckyTalk.txt:346 | if ChangeMind=1:
+- IntBeckyTalk.txt:352 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(BeckyVar['GeorgMention']=1 and BeckyVar['visitedhome']<7 and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:358 | if  BeckyVar['visitedhome']<7:
+- IntBeckyTalk.txt:368 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(((BeckyVar['EddieTryToFuck']=4 and BeckyVar['AskedEddieFuck']=0) or (BeckyVar['visitedhome']>=7 and BeckyVar['AskedEddieFuck']<2)) and Talked[$GirlName]<2,-1,0)"
+- IntBeckyTalk.txt:375 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(Talked[$GirlName]<2  and Friends[$GirlName]>=8 and pregnancy[$GirlName]>=120 ,-1,0)"
+- IntEddieTalk.txt:8 | if Talked.get(GirlName, 0) <= 2 and renpy.random.randint(1, 2) == 1 and Friends.get(GirlName, 0) <= 5:
+- IntEddieTalk.txt:18 | if Talked.get(GirlName, 0) <= 2 and renpy.random.randint(1, 2) == 1 and Friends.get(GirlName, 0) <= 10:
+- IntEddieTalk.txt:42 | if BeckyVar.get('EddieTryToFuck', 0) == 0:
+- IntEddieTalk.txt:44 | if Friends.get(GirlName, 0) < 9:
+- IntEddieTalk.txt:55 | if Friends.get(GirlName, 0) < 10:
+- IntEddieTalk.txt:63 | if BeckyVar.get('EddieTryToFuck', 0) == 3:
+- IntEddieTalk.txt:95 | if BeckyVar.get('visitedhome', 0) >= 7 and Friends.get(GirlName, 0) >= 9:
+- IntEddieTalk.txt:102 | if Friends.get(GirlName, 0) >= 5:
+- IntGeorgettAfterCermon.txt:16 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:27 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=0 ,-1,0)"
+- IntGeorgettAfterCermon.txt:34 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:45 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=1 ,-1,0)"
+- IntGeorgettAfterCermon.txt:52 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:59 | if CumInsideYou[$GirlNameAC] or CumInsideOthers[$GirlNameAC]:
+- IntGeorgettAfterCermon.txt:68 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=2 ,-1,0)"
+- IntGeorgettAfterCermon.txt:78 | if GeorgettVar['TalkChurchAfterCermonLiza']:
+- IntGeorgettAfterCermon.txt:81 | if kids['liza']=0:
+- IntGeorgettAfterCermon.txt:93 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=3 ,-1,0)"
+- IntGeorgettDressChange.txt:11 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(Friends[$GirlNameIGT]>8 and  Talked[$GirlNameIGT]<2,-1,0)"
+- IntGeorgettDressChange.txt:19 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(Friends[$GirlNameIGT]>8 and  Talked[$GirlNameIGT]<2,-1,0)"
+- IntGeorgettDressChange.txt:28 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(Friends[$GirlNameIGT]>8 and func('CheckDailyEventExists','','BuyDressTom')=0 and func('CheckDailyEventExists',$GirlNameIGT,'BuyDress')=0 and Talked[$GirlNameIGT]<2 and week<>6,-1,0)"
+- IntGeorgettSex.txt:26 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF($topdress[$GirlNameIGSS]>''  and SomebodyCums=0  ,-1,0)"
+- IntGeorgettSex.txt:38 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(($topdress[$GirlNameIGSS]>'' and topraised[$GirlNameIGSS]=0) and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:49 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(($bottomdress[$GirlNameIGSS]>'' and bottomraised[$GirlNameIGSS]=0) and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:62 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF((CumFaceYou[$GirlNameIGSS] or CumFaceOthers[$GirlNameIGSS])  and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:74 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF((CumTitsYou[$GirlNameIGSS] or CumTitsOthers[$GirlNameIGSS]) and TitsVisible[$GirlNameIGSS] and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:86 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF((CumInsideYou[$GirlNameIGSS] or CumInsideOthers[$GirlNameIGSS]) and PussyVisible[$GirlNameIGSS] and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:94 | if CumFaceYou[$GirlNameIGSS]>0:' На язык вам попадают капли вашего семени, которым вы обкончали ее раньше.'
+- IntGeorgettSex.txt:95 | if CumFaceYou[$GirlNameIGSS]=0 and CumFaceOthers[$GirlNameIGSS]>0:' Вы чувствуете солоноватый привкус чужой спермы. Шалунья уже успела у кого-то отсосать до вас!'
+- IntGeorgettSex.txt:96 | if Arousal[$GirlNameIGSS]<50: Arousal[$GirlNameIGSS]=Arousal[$GirlNameIGSS]+7
+- IntGeorgettSex.txt:97 | if Arousal['You']<50: Arousal['You']=Arousal['You']+7
+- IntGeorgettSex.txt:101 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:107 | if TitsVisible[$GirlNameIGSS]=0:
+- IntGeorgettSex.txt:111 | if CumTitsYou[$GirlNameIGSS]>0:
+- IntGeorgettSex.txt:113 | elseif CumTitsOthers[$GirlNameIGSS]>0:
+- IntGeorgettSex.txt:120 | if PussyVisible[$GirlNameIGSS]=1:
+- IntGeorgettSex.txt:126 | if CumInsideYou[$GirlNameIGSS]>0:
+- IntGeorgettSex.txt:128 | elseif CumInsideOthers[$GirlNameIGSS]>0:
+- IntGeorgettSex.txt:131 | if TitsVisible[$GirlNameIGSS]=0 and PussyVisible[$GirlNameIGSS]=0: gs 'ShowImage', $GirlNameIGSS, 'sex', 'grope'
+- IntGeorgettSex.txt:136 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:141 | if $GirlLocIGSS='tavern':
+- IntGeorgettSex.txt:146 | if CumInsideYou[$GirlNameIGSS]>0:'Вы ощущаете привкус собственной спермы, медленно вытекающей из влагалища <<$RealName2[$GirlNameIGSS]>>.'
+- IntGeorgettSex.txt:147 | if CumInsideYou[$GirlNameIGSS]=0 and CumInsideOthers[$GirlNameIGSS]>0:'Вы ощущаете привкус чьей-то спермы, медленно вытекающей из влагалища <<$RealName2[$GirlNameIGSS]>>, кто-то уже успел оттрахать эту куколку до вас.'
+- IntGeorgettSex.txt:150 | if LickPussy[$GirlNameIGSS]=4:
+- IntGeorgettSex.txt:158 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF( PussyVisible[$GirlNameIGSS] and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:167 | if CockInMouth[$GirlNameIGSS]:
+- IntGeorgettSex.txt:172 | if Arousal['You']<20:
+- IntGeorgettSex.txt:174 | elseif Arousal['You']<40:
+- IntGeorgettSex.txt:176 | elseif Arousal['You']<60:
+- IntGeorgettSex.txt:181 | if CockInMouth[$GirlNameIGSS]:
+- IntGeorgettSex.txt:190 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:197 | if $GirlLocIGSS='tavern':
+- IntGeorgettSex.txt:198 | if CockInTits[$GirlNameIGSS]:
+- IntGeorgettSex.txt:204 | if CockInTits[$GirlNameIGSS]:
+- IntGeorgettSex.txt:217 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and SomebodyCums=0 and Arousal['You']>=20 and TitsVisible[$GirlNameIGSS] and pregnancy[$GirlNameIGSS] <150 ,-1,0)"
+- IntGeorgettSex.txt:223 | if $GirlLocIGSS='tavern':
+- IntGeorgettSex.txt:224 | if CockInPussy[$GirlNameIGSS]=0:
+- IntGeorgettSex.txt:226 | if $topdress[$GirlNameIGSS]='':
+- IntGeorgettSex.txt:233 | if $topdress[$GirlNameIGSS]='':
+- IntGeorgettSex.txt:240 | if CockInPussy[$GirlNameIGSS]=0:
+- IntGeorgettSex.txt:249 | if pregnancy[$GirlNameIGSS] >=150: ' Вы чувствуете как ребенок в животе у <<$RealName2[$GirlNameIGSS]>> двигается каждый раз когда ваш член входит во влагалище его или ее развратной мамочки.'
+- IntGeorgettSex.txt:256 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and SomebodyCums=0 and Arousal['You']>=20 and Arousal[$GirlNameIGSS]>=20 and PussyVisible[$GirlNameIGSS],-1,0)"
+- IntGeorgettSex.txt:273 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and (CockInMouth[$GirlNameIGSS] or CockInTits[$GirlNameIGSS]),-1,0)"
+- IntGeorgettSex.txt:285 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100,-1,0)"
+- IntGeorgettSex.txt:297 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and TitsVisible[$GirlNameIGSS],-1,0)"
+- IntGeorgettSex.txt:312 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and CockInPussy[$GirlNameIGSS],-1,0)"
+- IntGeorgettTalk.txt:17 | if Talked[$GirlNameIGT]<=2 and Rand(1,2)=1:
+- IntGeorgettTalk.txt:18 | if Friends[$GirlNameIGT]<3 or (LickPussy[$GirlNameIGT]>=4 and Friends[$GirlNameIGT]<5) or (GiveOrgasms[$GirlNameIGT]>=2 and LickPussy[$GirlNameIGT]>=4 and Friends[$GirlNameIGT]<7):
+- IntGeorgettTalk.txt:22 | if Friends[$GirlNameIGT]<7:
+- IntGeorgettTalk.txt:27 | if Talked[$GirlNameIGT]>2: 'Ничего нового из разговора вы не узнали.'
+- IntGeorgettTalk.txt:34 | if GeorgettVar['askclients']=0:
+- IntGeorgettTalk.txt:41 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['seeclients'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 ,-1,0)"
+- IntGeorgettTalk.txt:46 | if GeorgettVar['asksex']=0:
+- IntGeorgettTalk.txt:53 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['askclients'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=3 ,-1,0)"
+- IntGeorgettTalk.txt:58 | if GeorgettVar['askparents']=0:
+- IntGeorgettTalk.txt:65 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['asksex'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=4 ,-1,0)"
+- IntGeorgettTalk.txt:70 | if GeorgettVar['askpregnancy']=0:
+- IntGeorgettTalk.txt:77 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['askparents'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=4 ,-1,0)"
+- IntGeorgettTalk.txt:82 | if LizaVar['ProstStart']=0:
+- IntGeorgettTalk.txt:87 | if GeorgettVar['askkids']=0:
+- IntGeorgettTalk.txt:94 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['askpregnancy'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=5 ,-1,0)"
+- IntGeorgettTalk.txt:99 | if GeorgettVar['TalkChurchAfterCermon']=0:
+- IntGeorgettTalk.txt:106 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['SawChurchAfterCermon'] and Talked[$GirlNameIGT]<2  ,-1,0)"
+- IntGeorgettTalk.txt:111 | if GeorgettVar['TalkChurchAfterCermonLiza']=0:
+- IntGeorgettTalk.txt:123 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(LizaVar['SawChurchAfterCermon'] and Talked[$GirlNameIGT]<2 ,-1,0)"
+- IntGeorgettTalk.txt:129 | if Friends[$GirlNameIGT]<10:
+- IntGeorgettTalk.txt:131 | elseif Friends['liza']<8:
+- IntGeorgettTalk.txt:148 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(AlberVar['talkedaboutliza'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and $CurrentLoc[$GirlNameIGT]='PortStreets' ,-1,0)"
+- IntGeorgettTalk.txt:153 | if TavernGloryHole=2:
+- IntGeorgettTalk.txt:155 | elseif GeorgettVar['GloryHoleExplained']=1:
+- IntGeorgettTalk.txt:162 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 ,-1,0)"
+- IntGeorgettTalk.txt:171 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 and LizaVar['GloryHoleAsked']=1 and GeorgettVar['GloryHoleExplained']=0,-1,0)"
+- IntGeorgettTalk.txt:182 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 and TavernGloryHole=2 and GeorgettVar['GloryHoleAgreed']=0,-1,0)"
+- IntGeorgettTalk.txt:187 | if BeckyVar['EddieTryToFuck']=4 or BeckyVar['visitedhome']>=7:
+- IntGeorgettTalk.txt:196 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(((GeorgettVar['TellAboutEddieMomSex']=0 and (BeckyVar['EddieTryToFuck']=4 or BeckyVar['visitedhome']>=7)) or (BeckyVar['EddieGeorg']=0 and EddieVar['TalkedAboutGeorgett']=1 and BeckyVar['visitedhome']>=3 and (EddieVar['SawMomSex']>0 or BeckyVar['HomeSex']>0)) ) and Talked[$GirlNameIGT]<2,-1,0)"
+- IntGeorgettTalk.txt:201 | if BeckyVar['EddieGeorg']=1:
+- IntGeorgettTalk.txt:204 | elseif BeckyVar['EddieGeorg']=2 and	BeckyVar['visitedhome']=5:
+- IntGeorgettTalk.txt:207 | elseif BeckyVar['EddieGeorg']=2 and	BeckyVar['visitedhome']>5:
+- IntGeorgettTalk.txt:216 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(BeckyVar['EddieGeorg']>0 and BeckyVar['EddieWhoreHome']=0 and (money>25 or (BeckyVar['EddieGeorg']>1 and money>10)) and Talked[$GirlNameIGT]<2,-1,0)"
+- IntGeorgettTalk.txt:223 | if BeckyVar['EddieWhoreHome']<=1:
+- IntGeorgettTalk.txt:224 | if BeckyVar['visitedhome']>=7:
+- IntGeorgettTalk.txt:229 | elseif BeckyVar['EddieWhoreHome']>=2:
+- IntGeorgettTalk.txt:231 | if BeckyVar['EddieGeorg']=1:
+- IntGeorgettTalk.txt:232 | if BeckyVar['EddieWhoreHome']=4:
+- IntGeorgettTalk.txt:233 | if BeckyVar['visitedhome']>=7:
+- IntGeorgettTalk.txt:241 | if BeckyVar['visitedhome']<5:
+- IntGeorgettTalk.txt:243 | elseif EddieVar['SawMomSex']=0 or BeckyVar['HomeSex']=0:
+- IntGeorgettTalk.txt:245 | elseif BeckyVar['EddieWhoreHome']=2:
+- IntGeorgettTalk.txt:252 | if BeckyVar['EddieWhoreHome']=4:
+- IntGeorgettTalk.txt:261 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(BeckyVar['EddieGeorg']>0 and time<=3,-1,0)"
+- IntGeorgettTalk.txt:267 | if $GirlLocIGT='tavern':
+- IntGeorgettTalk.txt:275 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF((money>=8 or (money>=4 and $GirlLocIGT='tavern')) and cametoday<cancumdaily ,-1,0)"
+- IntGeorgettTalk.txt:281 | if Friends[$GirlNameIGT]>=10:
+- IntGeorgettTalk.txt:284 | if CumInsideYou[$GirlNameIGT]>0:
+- IntGeorgettTalk.txt:286 | elseif CumInsideOthers[$GirlNameIGT]>0:
+- IntGeorgettTalk.txt:302 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(Talked[$GirlNameIGT]<2  and Friends[$GirlNameIGT]>=8 and pregnancy[$GirlNameIGT]>=120 ,-1,0)"
+- IntGeorgettTalk.txt:305 | if $GirlLocIGT='tavern':
+- IntLizaTalk.txt:13 | if Talked.get(GirlName, 0) <= 2 and renpy.random.randint(1, 2) == 1:
+- IntLizaTalk.txt:14 | if Friends.get(GirlName, 0) < 3 or (LickPussy.get(GirlName, 0) >= 7 and Friends.get(GirlName, 0) < 4) or (GiveOrgasms.get(GirlName, 0) >= 3 and LickPussy.get(GirlName, 0) >= 7 and Friends.get(GirlName, 0) < 5):
+- IntLizaTalk.txt:27 | if sluttiness.get(GirlName, 0) < 50 and pregnancy.get(GirlName, 0) < 120:
+- IntLizaTalk.txt:32 | if LizaVar.get('askclients', 0) == 0:
+- IntLizaTalk.txt:43 | if LizaVar.get('asksex', 0) == 0:
+- IntLizaTalk.txt:52 | if sluttiness.get(GirlName, 0) < 50 and pregnancy.get(GirlName, 0) < 120 and kids.get(GirlName, 0) > 0:
+- IntLizaTalk.txt:61 | if LizaVar.get('askpregnancy', 0) == 0:
+- IntLizaTalk.txt:72 | if LizaVar.get('TalkChurchAfterCermonGeorgett', 0) == 0:
+- IntLizaTalk.txt:82 | if TavernGloryHole == 2:
+- IntLizaTalk.txt:102 | if GirlLoc == 'tavern':
+- IntLizaTalk.txt:111 | if Friends.get(GirlName, 0) >= 5:
+- IntLizaTalk.txt:114 | if panties.get(GirlName, '') != '':
+- IntLizaTalk.txt:119 | if panties.get(GirlName, '') == '':
+- IntLizaTalk.txt:120 | if CumInsideYou.get(GirlName, 0) > 0:
+- IntLizaTalk.txt:136 | if GirlLoc == 'tavern':
+- IntLizettAfterCermon.txt:15 | if lizaVar['SawChurchAfterCermon']=0:
+- IntLizettAfterCermon.txt:21 | if LizaVar['ProstStart']:
+- IntLizettAfterCermon.txt:26 | if sluttiness[$GirlNameAC]<50 and pregnancy[$GirlNameAC]<120:
+- IntLizettAfterCermon.txt:35 | gs 'Menu.AddCondition','AfterCermonLizett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=0 ,-1,0)"
+- IntLizettAfterCermon.txt:42 | if LizaVar['SawChurchAfterCermon']=0:
+- IntLizettAfterCermon.txt:59 | gs 'Menu.AddCondition','AfterCermonLizett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=1 ,-1,0)"
+- IntLizettAfterCermon.txt:66 | if LizaVar['SawChurchAfterCermon']=0:
+- IntLizettAfterCermon.txt:80 | if CumInsideYou[$GirlNameAC] or CumInsideOthers[$GirlNameAC]:
+- IntLizettAfterCermon.txt:91 | gs 'Menu.AddCondition','AfterCermonLizett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=2 ,-1,0)"
+- IntLizettAfterCermon.txt:99 | if sluttiness[$GirlNameAC]<50 and pregnancy[$GirlNameAC]<120:
+- IntLizettAfterCermon.txt:110 | if LizaVar['TalkChurchAfterCermonGeorgett']:
+- IntLizettAfterCermon.txt:120 | gs 'Menu.AddCondition','AfterCermonLizett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=3 ,-1,0)"
+- Intro.txt:118 | if $pantiesdef[$GirlName]>'':
+- Intro.txt:121 | if $bradef[$GirlName]>'':
+- Intro.txt:124 | if $legsdef[$GirlName]>'':
+- Intro.txt:130 | if InitGirlsCounter<arrsize('$AllGirlNames'): jump 'loopinitgirls'
+- Intro.txt:141 | if rand(1,2)=1:
+- KidsFunctions.txt:9 | $KidGender=iif(Rand(1,2)=2,'Male','Female')
+- KidsFunctions.txt:17 | if $MomName='liza' or $MomName='georgett':
+- KidsFunctions.txt:19 | elseif $MomName='becky' or $MomName='inga':
+- KidsFunctions.txt:25 | if $MomName='liza':
+- KidsFunctions.txt:26 | if strcomp(lcase($DaddyType),'.*негр.*'):
+- KidsFunctions.txt:27 | $KidRace=iif(rand(1,2)=1, 'N','M')
+- KidsFunctions.txt:29 | $KidRace=iif(rand(1,2)=1, 'M','W')
+- KidsFunctions.txt:32 | if strcomp(lcase($DadName),'.*негр.*'):
+- KidsFunctions.txt:40 | if $KidRace='N': RandKid=Rand(3,4)
+- KidsFunctions.txt:41 | if $KidRace='M' and RandKid<=2:RandKid=Rand(1,4)
+- KidsFunctions.txt:42 | $KidEyes=iif(RandKid=1,'B',iif(RandKid=2,'G',iif(RandKid=3,'D','G')))
+- KidsFunctions.txt:45 | if $KidRace='M' and RandKid<>1: RandKid=Rand(1,5)
+- KidsFunctions.txt:46 | if $KidRace='M' and RandKid<>1: RandKid=Rand(1,5)
+- KidsFunctions.txt:48 | if ($MomName='becky' or $MomName='inga') and RandKid<>4: RandKid=Rand(1,5)
+- KidsFunctions.txt:49 | if ($MomName='becky' or $MomName='inga') and RandKid<>4: RandKid=Rand(1,5)
+- KidsFunctions.txt:51 | if $KidRace='N': RandKid=1
+- KidsFunctions.txt:53 | $KidHair=iif(RandKid=1,'D',iif(RandKid=2,'P',iif(RandKid=3,'L',iif(RandKid=4,'R','B'))))
+- KidsFunctions.txt:56 | if $KidRace='N': RandKid=Rand(3,4)
+- KidsFunctions.txt:57 | if $KidRace='M' and (RandKid=3 or  RandKid=5):RandKid=Rand(1,5)
+- KidsFunctions.txt:58 | if Mid($KidGender,1,1)='M' and (RandKid=1 or  RandKid=5): RandKid=Rand(1,5)
+- KidsFunctions.txt:59 | if $KidRace='M' and (RandKid=3 or  RandKid=5):RandKid=Rand(1,5)
+- KidsFunctions.txt:60 | if Mid($KidGender,1,1)='M' and (RandKid=1 or  RandKid=5): RandKid=Rand(1,5)
+- KidsFunctions.txt:61 | $KidHairStyle=iif(RandKid=1,'L',iif(RandKid=2,'K',iif(RandKid=3,'N',iif(RandKid=4,'S','Z'))))
+- KidsFunctions.txt:72 | if $MomName='sandra' or $MomName='melissa' or $MomName='amanda':
+- KidsFunctions.txt:80 | if $MomName='georgett' or $MomName='liza':
+- KidsFunctions.txt:85 | if $MomName='becky' or $MomName='inga':
+- KidsFunctions.txt:90 | if $MomName='amanda'  or $MomName='melissa' or $MomName='sandra':
+- KidsFunctions.txt:96 | if $MomName='liza' or $MomName='georgett':
+- KidsFunctions.txt:97 | if $CurrentLoc['georgett']='TavernMain':
+- KidsFunctions.txt:126 | if KidDays<180:
+- KidsFunctions.txt:127 | $KidDescription='новорожденн<<iif($KidGender=''M'',''ый мальчик'',''ая девочка'')>>'
+- KidsFunctions.txt:128 | elseif KidDays<400:
+- KidsFunctions.txt:129 | $KidDescription='крохотн<<iif($KidGender=''M'',''ый мальчик, умеющий пока только ползать,'',''ая девочка, умеющая пока только ползать,'')>>'
+- KidsFunctions.txt:130 | elseif KidDays<700:
+- KidsFunctions.txt:131 | $KidDescription='малыш<<iif($KidGender=''M'','', недавно начавший ходить,'',''ка, недавно начавшая ходить,'')>>'
+- KidsFunctions.txt:133 | $KidDescription=iif($KidGender='M','подвижный и любознательный маленький мальчик','шустрая и любопытная маленькая девочка')
+- KidsFunctions.txt:136 | $KidDescription+='. ' + iif($KidGender='M','Ему ','Ей ')
+- KidsFunctions.txt:140 | if KidDays<30:
+- KidsFunctions.txt:142 | elseif KidDays<365:
+- KidsFunctions.txt:144 | elseif KidDays<730:
+- KidsFunctions.txt:147 | $KidDescription+='недавно исполнилось <<KidAgeYears>> '+iif(KidAgeYears<=4,'года','лет')+'. '
+- KidsFunctions.txt:150 | if $KidRace='N':
+- KidsFunctions.txt:151 | $KidDescription+=iif($KidGender='M','Он негритенок','Она негритоска')+', с угольно-черной кожей. '
+- KidsFunctions.txt:152 | elseif $KidRace='M':
+- KidsFunctions.txt:153 | $KidDescription+=iif($KidGender='M','Он мулат','Она мулатка')+', с молочнокофейной кожей, плод смешения черной и белой рас. '
+- KidsFunctions.txt:154 | elseif $KidRace='H':
+- KidsFunctions.txt:155 | $KidDescription+=iif($KidGender='M','Его','Ее')+' кожа бела, даже слишком бела, а маленькие ушки слегка заостренны, выдавая полуэльфийское происхождение. '
+- KidsFunctions.txt:156 | elseif $KidRace='D':
+- KidsFunctions.txt:157 | $KidDescription+=iif($KidGender='M','Его','Ее')+' кожа имеет цвет кофе с молоком, а ушки слегка заостренны, свидетельствуя об и эльфийской, и черной крови. '
+- KidsFunctions.txt:159 | $KidDescription+=iif($KidGender='M','Он','Она')+' обычный ребенок. '
+- KidsFunctions.txt:162 | if $KidEyes='B':
+- KidsFunctions.txt:163 | $KidDescription+='Глазенки у '+iif($KidGender='M','него','нее')+' голубые '
+- KidsFunctions.txt:164 | elseif $KidEyes='G':
+- KidsFunctions.txt:165 | $KidDescription+='У '+iif($KidGender='M','него','нее')+' зеленые глаза '
+- KidsFunctions.txt:166 | elseif $KidEyes='D':
+- KidsFunctions.txt:167 | $KidDescription+='У '+ iif($KidGender='M','него','нее')+' черные глаза '
+- KidsFunctions.txt:169 | $KidDescription+='Глазенки у '+iif($KidGender='M','него','нее')+' серые '
+- KidsFunctions.txt:173 | if KidDays<180:
+- KidsFunctions.txt:174 | $KidDescription+='волосья почти полностью отсутствуют. Что, впрочем объясняется <<iif($KidGender=''M'',''его'',''ее'')>> юным возрастом - они еще просто не успели отрасти.'
+- KidsFunctions.txt:177 | $KidDescription+=iif($KidHair='D','темные',iif($KidHair='P','платиновые',iif($KidHair='L','светлые',iif($KidHair='R','рыжие','русые'))))
+- KidsFunctions.txt:179 | $KidDescription+=iif($KidHairStyle='L','длиные',iif($KidHairStyle='K','кудрявые',iif($KidHairStyle='N','кучерявые',iif($KidHairStyle='S','короткие','в локонах'))))
+- KidsFunctions.txt:190 | if func('Table.Next', 'KidsList', 'tmpTableArray'):
+- KidsFunctions.txt:195 | if LastDayBorn=0:
+- KidsFunctions.txt:206 | if args[1]=0: args[1]=5
+- KidsFunctions.txt:207 | if Breastfeed[$args[0]]:
+- KidsFunctions.txt:210 | if func('Table.Next', 'KidsList', 'tmpTableArray'):
+- KidsFunctions.txt:211 | if dayspassed-tmpTableArray['DayBorn']<300:
+- KidsFunctions.txt:217 | if $KidName>'' and Rand(1,args[1])=1:GiveTityu=1
+- KidsFunctions.txt:220 | if GiveTityu:
+- KidsFunctions.txt:222 | *p 'Вы заметили что <<$RealName[$MomName]>> решила дать ' + iif($KidGender='M','своему сыночку','своей дочурке') + ' сисю. '
+- KidsFunctions.txt:223 | if sluttiness[$args[0]]>61:
+- KidsFunctions.txt:224 | 'Не смущаясь чужих взоров, она приспустила свое платье ' + iif($bra[$MomName]>'','и сняла лифчик','под которым ожидаемо ничего не оказалось')+'. Обнажив обе набухшие от молока сиськи, она пристроила ребенка к одной из них. Вторую грудь, с увеличившимся от кормления соском, она прикрыть не удосужилась.'
+- KidsFunctions.txt:225 | elseif sluttiness[$args[0]]>52:
+- KidsFunctions.txt:226 | 'Не смущаясь тем, что может быть не одна, она приспустила с '+ iif(Rand(1,2)=1,'левой','правой')+' стороны свое платье ' + iif($bra[$MomName]>'','а затем приспустила и лифчик','под которым ожидаемо ничего не оказалось')+'. Обнажив набухшую от молока грудь, <<$RealName[$MomName]>> пристроила к ней ребенка.'
+- KidsFunctions.txt:227 | elseif sluttiness[$args[0]]>38:
+- KidsFunctions.txt:233 | if sluttiness[$args[0]]>38:
+- KidsFunctions.txt:234 | iif($KidGender='M','Маленький','Маленькая')+' '+ dyneval($ShowKidInteractionMenu,KidId)+' довольно сосет сисю. Иногда он'+iif($KidGender='M','','а')+' выпускает сосок, но заботливая <<$RealName[$MomName]>> немедленно помогает '+iif($KidGender='M','ему','ей')+'.<br>'
+- KidsFunctions.txt:236 | iif($KidGender='M','Маленький','Маленькая')+' '+ dyneval($ShowKidInteractionMenu,KidId)+' довольно сосет сисю под шалью. Иногда из под нее раздается возмущенный писк, видимо он'+iif($KidGender='M','','а')+' выпускает сосок, но заботливая <<$RealName[$MomName]>> приходит на помощь, что-то поправляя у себя под накидкой.<br>'
+- KidsFunctions.txt:243 | $tmpShowFullKidsDescForMenu='Это <<$KidName>>, '+iif($KidGender='M','сын','дочка')+' <<$RealName2[$KidMomName]>>. '
+- KidsFunctions.txt:244 | if KidDaddySuspects>1:
+- KidsFunctions.txt:245 | $tmpShowFullKidsDescForMenu+= 'Она считает, что его отец - <<$KidAssumedDad>>, но, вообще-то, у нее есть еще <<(KidDaddySuspects-1)>> кандидат'+iif(KidDaddySuspects=2,'',iif(KidDaddySuspects>5,'ов','а'))+'. '
+- KidsFunctions.txt:247 | $tmpShowFullKidsDescForMenu+= 'Счастливая мамашка уверенна, что '+iif($KidGender='M','его','ее') +' отец - <<$KidAssumedDad>>. '
+- KidsFunctions.txt:258 | !gs 'Menu.AddCondition','KidInteractionMenu<<KidId>>', "Result=IIF(FranVar['meet']=0 and Talked[$GirlName]<3,-1,0)"
+- KidsFunctions.txt:273 | if func('Table.Next', 'KidsList', 'tmpKidsList'):
+- KidsFunctions.txt:274 | if dayspassed-tmpKidsList['DayBorn']<400 and dayspassed-tmpKidsList['DayBorn']>=180:
+- KidsFunctions.txt:276 | elseif dayspassed-tmpKidsList['DayBorn']>=400:
+- KidsFunctions.txt:283 | if arrsize('KidsIDListingAge1')=1:
+- KidsFunctions.txt:285 | elseif arrsize('KidsIDListingAge1')>1:
+- KidsFunctions.txt:291 | *p dyneval($ShowKidInteractionMenu, KidsIDListingAge1[i]) + iif(i<arrsize('KidsIDListingAge1')-1,', ','.<br>')
+- KidsFunctions.txt:294 | if arrsize('KidsIDListingAge2')>0:
+- KidsFunctions.txt:295 | if arrsize('KidsIDListingAge1')>0:
+- KidsFunctions.txt:301 | if arrsize('KidsIDListingAge2')=1:
+- KidsFunctions.txt:303 | elseif arrsize('KidsIDListingAge2')>1:
+- KidsFunctions.txt:309 | *p dyneval($ShowKidInteractionMenu, KidsIDListingAge2[i]) + iif(i<arrsize('KidsIDListingAge2')-1,', ','.<br>')
+- KidsFunctions.txt:319 | if (topraised[$args[0]]=1 or $topdress[$args[0]]='') and $bra[$args[0]]='':
+- KidsFunctions.txt:320 | if Lactate[$args[0]] and Rand(1,2)=1: 'Из разбухшего соска с большой ареолой вытекла капелька молока.'
+- KidsFunctions.txt:325 | if Lactate[$args[0]] and Arousal[$args[0]]>35:
+- KidsFunctions.txt:326 | if $Args[1]>'':
+- KidsFunctions.txt:327 | if TitsVisible[$args[0]]=0:
+- KidsFunctions.txt:328 | if bra[$args[0]]='':
+- KidsFunctions.txt:336 | if TitsVisible[$args[0]]=0:
+- KidsFunctions.txt:337 | if bra[$args[0]]='':
+- KidsFunctions.txt:349 | if Lactate[$args[0]] and Arousal[$args[0]]>45:
+- KidsFunctions.txt:350 | if $Args[1]>'':
+- KidsFunctions.txt:361 | if Lactate[$args[0]] and Arousal[$args[0]]>60 and Rand(1,3)=1:
+- KidsFunctions.txt:362 | if Rand(1,2)=1:
+- KidsFunctions.txt:363 | 'Вы заметили, что из сосков <<$RealName2[$args[0]]>> в такт <<iif($args[1]>'''',''толчкам ''+$args[1],''вашим толчкам'' )>> стало побрызгивать молоко. '
+- KidsFunctions.txt:379 | if func('Table.Next', 'KidsList', 'tmpTableArray'):
+- KidsFunctions.txt:380 | if dayspassed-tmpTableArray['DayBorn']>365*2:
+- KidsFunctions.txt:390 | BasePeekChance=iif(sluttiness[$MomName]>70,4,iif(sluttiness[$MomName]>55,8,iif(sluttiness[$MomName]>40,11,iif(sluttiness[$MomName]>30,12,iif(sluttiness[$MomName]>20,14,16)))))
+- KidsFunctions.txt:395 | PeekChance=7*BasePeekChance*iif(PeekingKidsListAge[i]>=4,1,2)
+- KidsFunctions.txt:396 | if Rand(1, PeekChance)=1:
+- KidsFunctions.txt:397 | *p '<br>Вдруг вы заметили что из-за приоткрытой двери за вами удивленно следит <<dyneval($ShowKidInteractionMenu, PeekingKidsListId[i])>>, <<$PeekingKidsList[i]>>, <<iif($PeekingKidsGenderList[i]=''M'', ''сыночек'', ''дочка'')>> <<$RealName2[$MomName]>>. '
+- KidsFunctions.txt:398 | if PeekingKidsListAge[i]>=4:
+- KidsFunctions.txt:400 | elseif PeekingKidsListAge[i]>=3:
+- KidsFunctions.txt:405 | if RandVar=1:
+- KidsFunctions.txt:406 | *p 'Наблюдая за кувырканием мамочки <<iif($PeekingKidsGenderList[i]=''M'', ''он усмехнулся и сделал'', ''она рассмеялась и сделала'')>>  пошлый жест.'
+- KidsFunctions.txt:407 | elseif RandVar=2:
+- KidsFunctions.txt:408 | *p 'На <<iif($PeekingKidsGenderList[i]=''M'', ''его лице'', ''ее личике'')>> застыло мечтательное выражение.'
+- KidsFunctions.txt:409 | elseif RandVar=3:
+- KidsFunctions.txt:410 | *p 'От увиденного <<iif($PeekingKidsGenderList[i]=''M'', ''его'', ''ее'')>> глазенки расширились а щеки стали пунцовыми.'
+- KidsFunctions.txt:412 | *p '<<iif($PeekingKidsGenderList[i]=''M'', ''Он явно удивлен'', ''Она явно удивлена'')>> происходящим.'
+- KidsFunctions.txt:414 | if $PeekingKidsGenderList[i]='M':
+- menu_tavernstat.txt:28 | if jobWhoreAvail['georgett']=1:
+- menu_tavernstat.txt:31 | if TavernGloryHole=2:
+- menu_tavernstat.txt:121 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobGloryHoleAvail['georgett'] and jobgloryholeTommorow['georgett']=0 and func('GloryHoleBusy','georgett')=0,-1,0)"
+- menu_tavernstat.txt:130 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobWhoreAvail['georgett'] and jobwhoreTommorow['georgett']=0,-1,0)"
+- menu_tavernstat.txt:147 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobGloryHoleAvail['liza'] and jobgloryholeTommorow['liza']=0 and func('GloryHoleBusy','liza')=0,-1,0)"
+- menu_tavernstat.txt:156 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobWhoreAvail['liza'] and jobwhoreTommorow['liza']=0,-1,0)"
+- menu_tavernstat.txt:166 | if jobWhoreAvail['georgett']:
+- menu_tavernstat.txt:169 | if jobWhoreAvail['liza']:
+- MomDressComplaint.txt:8 | $GirlSillyName=iif($GirlName='amanda','Амандочк','Меллисочк')
+- MomDressComplaint.txt:13 | if pregnancy[$GirlName]>150:KidsOrPregTmp=1
+- MomDressComplaint.txt:14 | if kids[$GirlName]>0:KidsOrPregTmp=2
+- MomDressComplaint.txt:18 | if sluttiness[$GirlName]>=60 or (sluttiness[$GirlName]>=45 and Rand(1,2)=1) or (sluttiness[$GirlName]>=35 and Rand(1,4)=1):
+- MomDressComplaint.txt:22 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- MomDressComplaint.txt:34 | if sluttiness['sandra']<50:
+- MomDressComplaint.txt:35 | 'Вы мирно и спокойно шли по своим делам, когда вас вдруг остановила ваша матушка: "Стефан, мне надо с тобой поговорить."<br>Отведя вас в сторонку, она продолжила: "<<iif(TalkedBeforeTmp>0,''Я знаю, мы уже про это говорили, но не могу дальше молчать. '','''')>>Ты видел как <<$RealName[$GirlName]>> вырядилась? Как блядь последняя, извини за выражение! Сиськи практически наружу, подол короче некуда! Мне порой кажется, что она и нижнего белья-то не одевает!'
+- MomDressComplaint.txt:36 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:38 | if $GirlName='amanda' and AmandaVar['prohibitliza']:
+- MomDressComplaint.txt:50 | if  KidsOrPregTmp>0:
+- MomDressComplaint.txt:51 | 'И связи ее повадок с тем, что она уже <<iif(KidsOrPregTmp=2,''байстрюка'',''пузо'')>> себе нагуляла ты тоже не видишь?"'
+- MomDressComplaint.txt:77 | *p '<br>"А чего бы не заметить-то?" сказали вы глядя маме в глаза. "Это ж я ей это платье и купил. Думаю оно ей идет. И посетителям нравится, смотри как они на ее <<iif(Rand(1,2)=1,''задницу'',''сиськи'')>> пялятся."<br>"Ты, ты..." потрясенно ответила вам Сандра. "Значит ты покупаешь сестре такие шмотки, чтобы на нее бухие мужили пялились и за задницу хватали?"<br>"Ага," довольно ответили вы. "Да ей и самой внимание приятно."<br>"И не стыдно тебе из сестры блядь делать? Ты же брат, ты должен ее защищать!'
+- MomDressComplaint.txt:78 | if  KidsOrPregTmp>0:
+- MomDressComplaint.txt:79 | ' Она ведь из-за твоего попустительства уже <<iif(KidsOrPregTmp=2,''байстрюка'',''пузо'')>> себе нагуляла."'
+- MomDressComplaint.txt:99 | if (sluttiness['sandra']>=20 and Rand(1,4)=1) or (sluttiness['sandra']>=38 and Rand(1,2)=1) or sluttiness['sandra']>=47:
+- MomDressComplaint.txt:104 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:110 | if RandVar=1:
+- MomDressComplaint.txt:113 | elseif RandVar=2:
+- MomDressComplaint.txt:121 | if RandVar2>0:
+- MomDressComplaint.txt:123 | 'ОТ ПЕРЕНЕСЕННОЙ ОБИДЫ ЕЕ НАВЫКИ <<$TmpProfDesc>> УПАЛИ НА <<RandVar2>> <<iif(RandVar2=1,''ЕДИНИЦУ'',''ЕДИНИЦЫ'')>>'
+- MomDressComplaint.txt:130 | 'Вы шли себе по своим делам, и пересеклись с вашей матушкой. Увидев вас та заметила: "<<iif(TalkedBeforeTmp>0,''Я уже про это говорила, но все таки '','''')>> <<$GirlSillyName>>a наша совсем большая стала. Уже одевается, как взрослая, знает как себя подать. Смотри как на нее не то, что мальчишки всякие, а даже взрослые мужики у нас в трактире смотрят. Умничка!"'
+- MomDressComplaint.txt:134 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:144 | if $GirlName='amanda':
+- MomDressComplaint.txt:145 | 'Заодно вы <<iif(AmandaVar[''prohibitliza'']=1,''еще раз '','''')>>запретили ей болтать с Лизеттой, источником грязи и разврата.'
+- MomDressComplaint.txt:149 | if sluttiness[$GirlName]>=60 or (sluttiness[$GirlName]>=45 and Rand(1,2)=1) or (sluttiness[$GirlName]>=35 and Rand(1,4)=1):
+- MomDressComplaint.txt:150 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:157 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- MomDressComplaint.txt:178 | *p '"Да, оно ей очень идет," отозвались вы. "Это ж я ей этот наряд и купил. И посетителям нравится, смотри как они на ее <<iif(Rand(1,2)=1,''задницу'',''сиськи'')>> пялятся. Даже щипают порой, вот как она им нравится."<br>
+- MomDressComplaint.txt:180 | if  KidsOrPregTmp>0:
+- MomDressComplaint.txt:181 | 'Она ведь действительно взрослая, уже <<iif(KidsOrPregTmp=2,''байстрюка'',''пузо'')>> успела себе нагулять."'
+- NextDay_FinishDayEvents.txt:6 | if GeorgettVar['TalkChurchAfterCermonLiza'] and LizaVar['ProstStart']=0: LizaVar['ProstStart']=1
+- NextDay_FinishDayEvents.txt:9 | if ChurchAfterCermon['becky']<4 and week=7 and BeckyVar['PriestAdvice']>0:
+- NextDay_FinishDayEvents.txt:10 | if BeckyVar['PriestAdvice']=1 or BeckyVar['PriestAdvice']=2:
+- NextDay_FinishDayEvents.txt:12 | if Rand(1,70)*30<=ChurchDonatedAmount:	BeckyVar['PriestAdvice']=3
+- NextDay_FinishDayEvents.txt:14 | if BeckyVar['PriestAdvice']=3:
+- NextDay_FinishDayEvents.txt:15 | if BeckyVar['visitedhome']<7 and BeckyVar['EddieTryToFuck']>=4:BeckyVar['visitedhome']=7
+- NextDay_FinishDayEvents.txt:23 | if func('Table.Next','TodaySexEvents', 'tmpArray'):
+- NextDay_FinishDayEvents.txt:24 | if $tmpArray['GirlName']='georgett' and tmpArray['EventType']=99 and $tmpArray['Place']='Prostitution':
+- NextDay_FinishDayEvents.txt:26 | elseif $tmpArray['GirlName']='georgett' and $tmpArray['Place']='EddieHomeVisit':
+- NextDay_FinishDayEvents.txt:28 | elseif $tmpArray['GirlName']='liza' and tmpArray['EventType']=99:
+- NextDay_FinishDayEvents.txt:30 | elseif $tmpArray['GirlName']='inga' and $tmpArray['Place']='Lucas':
+- NextDay_FinishDayEvents.txt:31 | gs 'PregnancyCheck', $tmpArray['GirlName'], iif(Rand(1,3)<=2,'inside','mouth'), 1, 'Лукас'
+- NextDay_FinishDayEvents.txt:32 | elseif $tmpArray['Place']='Glory':
+- NextDay_FinishDayEvents.txt:34 | if sluttiness[$tmpArray['GirlName']]>=80:
+- NextDay_FinishDayEvents.txt:35 | if Rand(1,15)=1: $GloryHoleInside='inside'
+- NextDay_FinishDayEvents.txt:36 | elseif sluttiness[$tmpArray['GirlName']]>=60:
+- NextDay_FinishDayEvents.txt:37 | if Rand(1,30)=1: $GloryHoleInside='inside'
+- NextDay_FinishDayEvents.txt:38 | elseif sluttiness[$tmpArray['GirlName']]>=50:
+- NextDay_FinishDayEvents.txt:39 | if Rand(1,60)=1: $GloryHoleInside='inside'
+- NextDay_FinishDayEvents.txt:42 | if tmpArray['EventType']=1:
+- NextDay_FinishDayEvents.txt:44 | elseif tmpArray['EventType']=2:
+- NextDay_FinishDayEvents.txt:46 | elseif GloryHoleLook=3:
+- NextDay_FinishDayEvents.txt:48 | elseif tmpArray['EventType']=4:
+- NextDay_FinishDayEvents.txt:53 | elseif $tmpArray['GirlName']='amanda' and $tmpArray['Place']='glorytry':
+- NextDay_FinishDayEvents.txt:56 | elseif $tmpArray['GirlName']='amanda' and $tmpArray['Place']='legarerun':
+- NextDay_FinishDayEvents.txt:58 | elseif $tmpArray['GirlName']='amanda' and $tmpArray['Place']='lovermeet':
+- NextDay_FinishDayEvents.txt:60 | elseif $tmpArray['Place']='Priest':
+- NextDay_FinishDayEvents.txt:62 | if $tmpArray['GirlName']='becky' and Rand(1,2)=1: DayLastOrgasmGiven['becky']=dayspassed
+- NextDay_FinishDayEvents.txt:63 | elseif $tmpArray['GirlName']='becky':
+- NextDay_FinishDayEvents.txt:64 | if $tmpArray['Place']='StoreLover':
+- NextDay_FinishDayEvents.txt:65 | if tmpArray['EventType']=1: gs 'PregnancyCheck', 'becky', 'inside', 1, 'Легаре'
+- NextDay_FinishDayEvents.txt:66 | if tmpArray['EventType']=2: gs 'PregnancyCheck', 'becky', 'inside', 1, '', 1, 'Неизвестный грузчик'
+- NextDay_FinishDayEvents.txt:68 | elseif $tmpArray['Place']='EddieMom':
+- NextDay_FinishDayEvents.txt:69 | if cametoday['eddie']=0:
+- NextDay_FinishDayEvents.txt:70 | gs 'PregnancyCheck', $tmpArray['GirlName'], iif(Rand(1,2)=1,'inside','mouth'), 1, 'eddie'
+- NextDay_FinishDayEvents.txt:71 | if Rand(1,5)=1: DayLastOrgasmGiven['becky']=dayspassed
+- NextDay_FinishDayEvents.txt:84 | if func('Table.Next','GirlDance', 'tmpArray'):
+- NextDay_FinishDayEvents.txt:86 | if tmpArray['GoOut']=1:
+- NextDay_FinishDayEvents.txt:94 | if AmandaVar['gloryscold'] or AmandaVar['glorywalkout'] or AmandaVar['glorysuck'] or AmandaVar['glorydeflower']: AmandaVar['gloryyouknow']=1
+- NextDay_FinishDayEvents.txt:95 | if AmandaVar['glorysuck']:AmandaVar['suckyou']=1
+- NextDay_FinishDayEvents.txt:96 | if AmandaVar['glorydeflower']:AmandaVar['fuckyou']=1
+- NextDay_FinishDayEvents.txt:97 | if AmandaVar['glorydeflower'] or AmandaVar['fuckyou'] or AmandaVar['sawlegaresex'] or AmandaVar['sawwithguys'] or AmandaVar['knowlegaresex'] or AmandaVar['knownotvirgin']: AmandaVar['knowsexactive']=1
+- NextDay_FinishDayEvents.txt:113 | if func('Table.Next','DailyEventsList', 'tmpArray'):
+- NextDay_FinishDayEvents.txt:115 | if tmpArray['KeepNextDay']=<0:
+- NextDay_FinishDayEvents.txt:119 | if $tmpArray['EventType']='DressNoShow':gs 'Table.SetValue', 'DailyEventsList','id:'+LineNum,'Time',-1
+- NextDay_FinishDayEvents.txt:121 | if $tmpArray['EventType']='BuyDressTom' and week<>6:
+- NextDay_FinishDayEvents.txt:122 | gs 'Table.NewLine', 'DailyEventsList', $tmpArray['GirlName'],'dressshop',0,'=',1,iif(week=6,1,0),'BuyDress','gs ''GirlDressBuy'''
+- NextDay_FinishDayEvents.txt:143 | if CursedByEllona>0: CursedByEllonaDays-=1
+- NextDay_FinishDayEvents.txt:144 | if StolenHorseDays>0: StolenHorseDays-=1
+- NextDay_NewDayEvents.txt:7 | if SloganFixed=1: SloganFixed=2
+- NextDay_NewDayEvents.txt:8 | if TavernGloryHole=1: TavernGloryHole=2
+- NextDay_NewDayEvents.txt:13 | if BeckyVar['EddieGeorg']>0:
+- NextDay_NewDayEvents.txt:15 | if BeckyVar['EddieWhoreHome']=2 or BeckyVar['EddieWhoreHome']=3:
+- NextDay_NewDayEvents.txt:17 | elseif BeckyVar['EddieWhoreHome']=4:
+- NextDay_NewDayEvents.txt:22 | if Rand(1,EddieVar['WhoreVisitFreq'])=1 and week<>5:
+- NextDay_NewDayEvents.txt:23 | if BeckyVar['visitedhome']>=5 and EddieVar['SawMomSex']>0 and BeckyVar['HomeSex']>0:
+- NextDay_NewDayEvents.txt:24 | if Rand(1,10)<=1+BeckyVar['EddieWhoreHome']*5+iif(BeckyVar['EddieGeorg']>1,3,0):
+- NextDay_NewDayEvents.txt:34 | if BeckyVar['EddieWhoreHome']=2 or BeckyVar['EddieWhoreHome']=3:
+- NextDay_NewDayEvents.txt:37 | elseif EddieVar['TalkedAboutWhores']=1 and $CurrentLoc['georgett']='TavernMain':
+- NextDay_NewDayEvents.txt:38 | if Rand(1,EddieVar['WhoreVisitFreq'])=1 and week<>5:
+- NextDay_NewDayEvents.txt:43 | if BeckyVar['EddieWhoreHome']=4:
+- NextDay_NewDayEvents.txt:48 | if Rand(1,AlberVar['WhoreVisitFreq'])=1 and week<>5 and LizaVar['ProstStart']:
+- NextDay_NewDayEvents.txt:52 | if BeckyVar['husbandtalk']=0 and GiveOrgasms['becky']>0 and HadSex['becky']>0: BeckyVar['husbandtalk']=1
+- NextDay_NewDayEvents.txt:53 | if BeckyVar['GerhardBeckyTalk']=2:BeckyVar['GerhardBeckyTalk']=1
+- NextDay_NewDayEvents.txt:58 | if sluttiness['becky']>=35 and (DayLastOrgasmGiven['becky'] + 2) <= dayspassed and BeckyVar['visitedhome']>=2 and week <> 7:
+- NextDay_NewDayEvents.txt:59 | if sluttiness['becky']>=55 or Rand(1,2)=1:
+- NextDay_NewDayEvents.txt:64 | if BeckyVar['visitedhome']>=7 and Rand(1,3)<=2 and dyneval($CheckIfEventAlreadyExist,'georgett', 99)<=0:
+- NextDay_NewDayEvents.txt:68 | if week=7:
+- NextDay_NewDayEvents.txt:69 | if BeckyVar['PriestAdvice']>0: gs 'Table.NewLine', 'TodaySexEvents', 'becky', 99, 99, 'Priest'
+- NextDay_NewDayEvents.txt:70 | if GeorgettVar['churchgeorgettadmit']>0: gs 'Table.NewLine', 'TodaySexEvents', 'georgett', 99, 99, 'Priest'
+- NextDay_NewDayEvents.txt:71 | if GeorgettVar['churchlizaadmit']>0: gs 'Table.NewLine', 'TodaySexEvents', 'liza', 99, 99, 'Priest'
+- NextDay_NewDayEvents.txt:74 | if IngaVar['Knowher']>0: gs 'Table.NewLine', 'TodaySexEvents', 'inga', 99, 99, 'Lucas'
+- NextDay_NewDayEvents.txt:78 | if sluttiness['amanda']>=22 and TavernGloryHole=2 and func('GetRandomGirlByJob','jobgloryhole')='liza':
+- NextDay_NewDayEvents.txt:79 | if AmandaVar['glorytried']=0:
+- NextDay_NewDayEvents.txt:80 | if Rand(1,3)=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 99, 99, 'glorytry'
+- NextDay_NewDayEvents.txt:83 | if AmandaVar['gloryscold']=1: GloryChanceDecrease+=9
+- NextDay_NewDayEvents.txt:84 | if AmandaVar['glorywalkout']=1: GloryChanceDecrease+=3
+- NextDay_NewDayEvents.txt:85 | if AmandaVar['glorysuck']=1: GloryChanceDecrease-=2
+- NextDay_NewDayEvents.txt:86 | if AmandaVar['glorydeflower']=1: GloryChanceDecrease-=3
+- NextDay_NewDayEvents.txt:87 | if sluttiness['amanda']>=35:  GloryChanceDecrease-=3
+- NextDay_NewDayEvents.txt:88 | if virginity['amanda']=0:  GloryChanceDecrease-=2
+- NextDay_NewDayEvents.txt:89 | if sexacts['amanda']>15: GloryChanceDecrease+=2
+- NextDay_NewDayEvents.txt:90 | if sexacts['amanda']>35: GloryChanceDecrease+=3
+- NextDay_NewDayEvents.txt:91 | if sexacts['amanda']>50: GloryChanceDecrease+=5
+- NextDay_NewDayEvents.txt:92 | if Rand(1,Max(3, 4+GloryChanceDecrease))=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 99, 99, 'glorytry'
+- NextDay_NewDayEvents.txt:96 | if AmandaVar['fucklegare']=1 and AmandaVar['alberfriends']>=10 and sluttiness['amanda']>=35 and week<>5:
+- NextDay_NewDayEvents.txt:98 | if AmandaVar['alberfriends']>=15:ChanceVar-=1
+- NextDay_NewDayEvents.txt:99 | if sluttiness['alberfriends']>=50:ChanceVar-=1
+- NextDay_NewDayEvents.txt:100 | if sluttiness['alberfriends']>=70:ChanceVar-=1
+- NextDay_NewDayEvents.txt:101 | if AmandaVar['alberprohibit']:ChanceVar+=5
+- NextDay_NewDayEvents.txt:102 | if Friends['amanda']>=15:ChanceVar+=2
+- NextDay_NewDayEvents.txt:103 | if Rand(1,ChanceVar)=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 3, 99, 'legarerun'
+- NextDay_NewDayEvents.txt:106 | if sexacts['amanda']>=5 and sluttiness['amanda']>=35 and week<>5:
+- NextDay_NewDayEvents.txt:108 | if sluttiness['amanda']>=45:ChanceVar-=1
+- NextDay_NewDayEvents.txt:109 | if sluttiness['amanda']>=55:ChanceVar-=1
+- NextDay_NewDayEvents.txt:110 | if AmandaVar['prohibitwithguys']: ChanceVar+=5
+- NextDay_NewDayEvents.txt:111 | if Rand(1,ChanceVar)=1: gs 'Table.NewLine', 'TodaySexEvents', 'amanda', 2, 99, 'lovermeet'
+- NextDay_NewDayEvents.txt:115 | if $MyStallion>'' and $retlocname<>'TavernStable' and StolenHorseDays=0 and Rand(1,40)=25:MongolVar['WillTryToSteal']=1
+- NextDay_NewDayEvents.txt:118 | if BeckyVar['visitedhome']>=5 and Friends['becky']>=15 and BeckyVar['EddieRobbed']=0 and dayspassed>0 and Rand(1,6)=1:
+- NextDay_NewDayEvents.txt:119 | if func('CheckDailyEventExists','becky','SherwoodQuest')=0:
+- NextDay_NewDayEvents.txt:129 | if Rand(1,3)=1:FranBusy[i]=1
+- NextDay_NewDayEvents.txt:134 | if LizaVar['ProstStart']:
+- NextDay_NewDayEvents.txt:135 | gs 'WhoreNextDayClients','liza',3+iif($pantiesdef['liza']='',1,0), tavernvisitors/6
+- NextDay_TavernDaily.txt:9 | if week=5:CurDay['visitors']=CurDay['visitors']/2
+- NextDay_TavernDaily.txt:10 | if week=7:CurDay['visitors']=CurDay['visitors']*3/4
+- NextDay_TavernDaily.txt:12 | if Rand(1,15)=1:
+- NextDay_TavernDaily.txt:19 | if CurDay['wine']>winenum:
+- NextDay_TavernDaily.txt:25 | if CurDay['products']>productnum:
+- NextDay_TavernDaily.txt:35 | if CurDay['fameaten']>productnum:
+- NextDay_TavernDaily.txt:46 | if CurDay['happy']>=0:
+- NextDay_TavernDaily.txt:47 | if tavernwaitress<10 or tavernclean <10 or tavernkitchen<10:
+- NextDay_TavernDaily.txt:51 | if tavernlevel>CurDay['visitors']*4:
+- NextDay_TavernDaily.txt:59 | If SloganFixed<2 and Rand(1,3)=1:CurDay['happy']-=1
+- NextDay_TavernDaily.txt:60 | If func('GetRandomGirlByJob','jobwhore')>'' and Rand(1,4)=1:CurDay['happy']+=1
+- NextDay_TavernDaily.txt:61 | If func('GetRandomGirlByJob','jobgloryhole')>'' and Rand(1,3)=1:CurDay['happy']+=1
+- NextDay_TavernDaily.txt:64 | if week>5 and DanceSponsor=1:
+- NextDay_TavernDaily.txt:68 | if CurDay['happy']>0 and Rand(1,5)<=CurDay['happy']:CurDay['loyalty']+=1
+- NextDay_TavernDaily.txt:69 | if CurDay['happy']<0:CurDay['loyalty']+=CurDay['happy']
+- NextDay_TavernDaily.txt:80 | if week=7:TotalDay['KidsMoney']+=15*KidsPosobie
+- NextDay_TavernDaily.txt:82 | if $MyStallion>'':TotalDay['HorseFood']+=3
+- NextDay_TavernDaily.txt:84 | if MongolVar['WillTryToSteal']:
+- NextDay.txt:37 | if iDaysCount<timepassed: jump 'loopnextday'
+- NextDay.txt:43 | money=money+TotalDay['revenue']-TotalDay['dineout']-TotalDay['fixedcost']+TotalDay['whorerevenue']+TotalDay['gloryholerevenue']+TotalDay['KidsMoney']+iif($KidBirthPosobie>'',600,0)
+- NextDay.txt:46 | if $DressProduced>'':
+- NextDay.txt:47 | if $DressBuyer='You':
+- NextDay.txt:52 | if money>=50:
+- NextDay.txt:63 | if TotalDay['happy']/timepassed > 3:
+- NextDay.txt:65 | elseif TotalDay['happy']/timepassed > 2:
+- NextDay.txt:67 | elseif TotalDay['happy']/timepassed > 1:
+- NextDay.txt:69 | elseif TotalDay['happy']/timepassed > 0:
+- NextDay.txt:71 | elseif TotalDay['happy']/timepassed > -1:
+- NextDay.txt:73 | elseif TotalDay['happy']/timepassed > -2:
+- NextDay.txt:75 | elseif TotalDay['happy']/timepassed > -3:
+- NextDay.txt:84 | if $ExtraEvents>'': *pl $ExtraEvents
+- NextDay.txt:90 | if TotalDay['HorseFood']>0:
+- NextDay.txt:91 | if $TotalDay['HorseStolen']='':
+- NextDay.txt:100 | if TotalDay['dineout'] > 0:
+- NextDay.txt:104 | if $KidBirthPosobie>'':
+- NextDay.txt:108 | if TotalDay['KidsMoney']>0:
+- NextDay.txt:114 | if TotalWhoreClients[$GirlName] > 0:
+- NextDay.txt:118 | if TotalWhoreClients[$GirlName] > 0:
+- NextDay.txt:121 | if TotalDay['whorerevenue'] > 0:
+- NextDay.txt:128 | if TotalGloryHoleClients[$GirlName] > 0:
+- NextDay.txt:132 | if TotalGloryHoleClients[$GirlName] > 0:
+- NextDay.txt:135 | if TotalDay['gloryholerevenue'] > 0:
+- NextDay.txt:145 | if CursedByEllona>0 and CursedByEllonaDays<=0:
+- NextDay.txt:153 | if $NewDressCame>'':
+- NextDay.txt:163 | if TotalDay['loyalty']>0:
+- NextDay.txt:165 | elseif TotalDay['loyalty']<0:
+- NextDay.txt:168 | if tavernfame>=10:
+- NextDay.txt:175 | elseif tavernfame<=-10:
+- NextDay.txt:198 | if tavernvisitors<0: tavernvisitors=0
+- NextDay.txt:199 | if money<0:money=0
+- NextDay.txt:201 | if money=0:
+- NextDay.txt:208 | if tavernvisitors=0:
+- NextDay.txt:218 | if money=0 or tavernvisitors=0:
+- PortStreets.txt:12 | if $Args[0]='FirstTalk':
+- PortStreets.txt:18 | if $CurrentLoc[$GirlNamePS1]=$CurLoc and time=3 and week<>5 and No(GeorgettVar['TalkChurchAfterCermonLiza']!0 and LizaVar['ProstStart']=0):
+- PortStreets.txt:19 | if Friends[$GirlNamePS1]=0:
+- PortStreets.txt:21 | if pregnancy[$GirlNamePS1]>=210: 'Она беременна и находится на позднем сроке. Ее живот красноречиво об этом свидетельствует.'
+- PortStreets.txt:22 | if pregnancy[$GirlNamePS1]<210 and pregnancy[$GirlNamePS1] >=150: 'Средних размеров беременный животик сексуально напоминает  о ее бурной личной жизни.'
+- PortStreets.txt:23 | if pregnancy[$GirlNamePS1]>120 and pregnancy[$GirlNamePS1] < 150: 'Видно что она нагуляла себе животик, но он еще не очень заметен.'
+- PortStreets.txt:27 | if time=3: gs 'AddOthersSperm', $GirlNamePS1, 6
+- PortStreets.txt:32 | if LizaVar['ProstStart']:
+- PortStreets.txt:33 | if time=3: gs 'AddOthersSperm', $GirlNamePS2, 8
+- PortStreets.txt:35 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNamePS1, time)>0 :
+- PortStreets.txt:38 | elseif randvarPS=2 and dyneval($CheckIfSexEventExist,$GirlNamePS1, time)>0 :
+- PortStreets.txt:46 | if Rand(1,3)=1:
+- PortStreets.txt:48 | if HadSex[$GirlNamePS1]>0: act 'Пойти проверить подворотню':gt 'StreetClients',1, 'georgett'
+- SexPort.txt:7 | if args[0]<>1: gt 'PortStreets'
+- SexPort.txt:10 | if $GirlNameSP='georgett':
+- SexPort.txt:23 | if $GirlNameSP='georgett':
+- SexProstTavern.txt:7 | if args[0]<>1: gt 'TavernMain'
+- SexProstTavern.txt:10 | if $GirlNameSP='georgett':
+- SexProstTavern.txt:23 | if $GirlNameSP='georgett':
+- ShowCurrentSex.txt:10 | if (no($GirlNameSCS='georgett' and $GirlLocIGSS<>'tavern')) and (no($GirlNameSCS='amanda' and $GirlLocASDS='street')):
+- ShowCurrentSex.txt:14 | if (Arousal['You']>=100):
+- ShowCurrentSex.txt:15 | if CockInPussy[$GirlNameSCS]=1:
+- ShowCurrentSex.txt:16 | if $GirlNameSCS='liza' and sluttiness[$GirlNameSCS]<50 and pregnancy[$GirlNameSCS]<120:
+- ShowCurrentSex.txt:19 | elseif $GirlNameSCS='becky' and EddieCockInMouth[$GirlNameSCS]=1:
+- ShowCurrentSex.txt:21 | elseif $GirlNameSCS='becky':
+- ShowCurrentSex.txt:24 | elseif $GirlNameSCS='amanda' and sluttiness[$GirlNameSCS]<60 and pregnancy[$GirlNameSCS]<120:
+- ShowCurrentSex.txt:26 | if cuminside['amanda']>=4:
+- ShowCurrentSex.txt:29 | elseif $GirlNameSCS='amanda' and sluttiness[$GirlNameSCS]>=60 and pregnancy[$GirlNameSCS]<120:
+- ShowCurrentSex.txt:39 | if GrupenSex['eddie']>0:
+- ShowCurrentSex.txt:41 | if (Arousal['eddie']>=100):
+- ShowCurrentSex.txt:42 | if EddieCockInPussy[$GirlNameSCS]=1:
+- ShowCurrentSex.txt:43 | if CockInMouth[$GirlNameSCS]=1:
+- ShowCurrentSex.txt:45 | if sluttiness[$GirlNameSCS]<65:
+- ShowCurrentSex.txt:52 | if pregnancy[$GirlNameSCS]>=120:
+- ShowCurrentSex.txt:54 | elseif sluttiness[$GirlNameSCS]<65:
+- ShowCurrentSex.txt:60 | elseif EddieCockInMouth[$GirlNameSCS]=1:
+- ShowCurrentSex.txt:66 | if (Arousal[$GirlNameSCS]<20): PL 'Киска <<$RealName2[$GirlNameSCS]>> суха и зажата. Проникновение не доставит ей удовольствия.'
+- ShowCurrentSex.txt:67 | if (Arousal[$GirlNameSCS]>=20 and Arousal[$GirlNameSCS]<40): PL '<<$RealName[$GirlNameSCS]>> возбуждена. Её влагалище увлажнилось.'
+- ShowCurrentSex.txt:68 | if (Arousal[$GirlNameSCS]>=40 and Arousal[$GirlNameSCS]<65): PL '<<$RealName[$GirlNameSCS]>> хорошо возбуждена. Её киска обильна смазана собственным "соком"'
+- ShowCurrentSex.txt:69 | if (Arousal[$GirlNameSCS]>=65 and Arousal[$GirlNameSCS]<85): PL '<<$RealName[$GirlNameSCS]>> близка к оргазму. Её стоны становятся всё чаще и чаще.'
+- ShowCurrentSex.txt:70 | if (Arousal[$GirlNameSCS]>=85 and Arousal[$GirlNameSCS]<100): PL '<<$RealName[$GirlNameSCS]>> на грани оргазма. Каждая клеточка её киски ритмично пульсирует, а на теле местами появляются красные пятна.'
+- ShowCurrentSex.txt:71 | if (Arousal[$GirlNameSCS]>=100):
+- ShowCurrentSex.txt:75 | if $GirlNameSCS='georgett':
+- ShowCurrentSex.txt:76 | if GiveOrgasms[$GirlNameSCS]=2:
+- ShowCurrentSex.txt:81 | if $GirlNameSCS='liza':
+- ShowCurrentSex.txt:82 | if GiveOrgasms[$GirlNameSCS]=3:
+- ShowCurrentSex.txt:87 | if $GirlNameSCS='becky':
+- ShowCurrentSex.txt:88 | if GiveOrgasms[$GirlNameSCS]=5:
+- ShowCurrentSex.txt:94 | if $GirlNameSCS='amanda':
+- ShowCurrentSex.txt:95 | if GiveOrgasms[$GirlNameSCS]=4:
+- ShowCurrentSex.txt:101 | if CockInPussy[$GirlNameSCS] or EddieCockInPussy[$GirlNameSCS]:
+- ShowCurrentSex.txt:112 | if Arousal[Ilist]>=100:SomebodyCums=1
+- ShowCurrentSex.txt:114 | if IList<arrsize('Arousal'): jump 'loopSumbodyComes'
+- ShowGeorgettPortrait.txt:8 | if TitsVisible[$GirlName]=0 and PussyVisible[$GirlName]=0:
+- ShowGeorgettPortrait.txt:10 | elseif TitsVisible[$GirlName]=0 and PussyVisible[$GirlName]=1:
+- ShowGeorgettPortrait.txt:12 | elseif TitsVisible[$GirlName]=1 and PussyVisible[$GirlName]=0:
+- ShowGeorgettPortrait.txt:14 | elseif TitsVisible[$GirlName]=1 and PussyVisible[$GirlName]=1:
+- ShowGeorgettPortrait.txt:18 | if CurSperm[0]=0 and CurSperm[1]>0 and CurSperm[2]=0:
+- ShowGeorgettPortrait.txt:20 | elseif CurSperm[0]=0 and CurSperm[1]>0 and CurSperm[2]>0:
+- ShowGeorgettPortrait.txt:22 | elseif CurSperm[0]>0 and CurSperm[1]>0 and CurSperm[2]>0:
+- ShowGeorgettPortrait.txt:24 | elseif CurSperm[0]=0 and CurSperm[1]=0 and CurSperm[2]=0:
+- StolyarWorkshop.txt:6 | if (week = 7 or time>=3):
+- StolyarWorkshop.txt:9 | if SloganFixed=1 Or TavernGloryHole=1:
+- StolyarWorkshop.txt:37 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(SloganFixed=0 and DraupnirVar['SloganAsked']=0,-1,0)"
+- StolyarWorkshop.txt:48 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(SloganFixed=0 and DraupnirVar['SloganAsked']>0 and money>=200,-1,0)"
+- StolyarWorkshop.txt:57 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['HoleAsked']=0 and TavernHole=0,-1,0)"
+- StolyarWorkshop.txt:68 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['HoleAsked']>0 and TavernHole=0 and money>=100 and  time=0,-1,0)"
+- StolyarWorkshop.txt:77 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['GloryHoleAsked']=0 and TavernGloryHole=0 and GeorgettVar['GloryHoleExplained']=1,-1,0)"
+- StolyarWorkshop.txt:88 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['GloryHoleAsked']>0 and TavernGloryHole=0 and money>=700 and  time=0,-1,0)"
+- StolyarWorkshop.txt:94 | if (DraupnirVar['GloryHoleAsked']>0 and TavernGloryHole=0) or (DraupnirVar['HoleAsked']>0 and TavernHole=0 ) or (SloganFixed=0 and DraupnirVar['SloganAsked']>0):
+- StolyarWorkshop.txt:96 | if (SloganFixed=0 and DraupnirVar['SloganAsked']>0):'Ремонт вывески за 200 мараведи'
+- StolyarWorkshop.txt:97 | if (DraupnirVar['HoleAsked']>0 and TavernHole=0):'Дырку для подглядывания за 100 мараведи'
+- StolyarWorkshop.txt:98 | if (DraupnirVar['GloryHoleAsked']>0 and TavernGloryHole=0):'Глорихол за 700 мараведи'
+- StreetClients.txt:7 | if args[0]<>1: gt 'PortStreets'
+- StreetClients.txt:10 | if $args[1]='liza':
+- StreetClients.txt:14 | if SexEventType=1:
+- StreetClients.txt:18 | elseif SexEventType=2:
+- StreetClients.txt:22 | elseif SexEventType=99:
+- StreetClients.txt:23 | if AlberVar['sawwithliza']=0:
+- StreetClients.txt:41 | if SexEventType=1:
+- StreetClients.txt:45 | elseif SexEventType=2:
+- StreetClients.txt:50 | elseif SexEventType=3:
+- TavernGloryHole.txt:31 | if GloryHoleWorks and AmandaAtGlory=0:
+- TavernGloryHole.txt:32 | if sluttiness[$GirlNameTGH]>=80:
+- TavernGloryHole.txt:33 | if Rand(1,4)=1: GloryHoleInside=1
+- TavernGloryHole.txt:34 | elseif sluttiness[$GirlNameTGH]>=50:
+- TavernGloryHole.txt:35 | if Rand(1,8)=1: GloryHoleInside=1
+- TavernGloryHole.txt:38 | if GloryHoleInside=0 and Rand(1,3)=1 and sluttiness[$GirlNameTGH]>=40: GloryHoleInsideOnce=1
+- TavernGloryHole.txt:41 | if GloryHoleInside or GloryHoleInsideOnce:
+- TavernGloryHole.txt:43 | if GloryHoleInside:
+- TavernGloryHole.txt:55 | if (Time=2 or time=3) and $GirlNameTGH>'': GloryHoleWorks=1
+- TavernGloryHole.txt:57 | if dyneval($GetSexEventFromTable,'amanda', 99,'glorytry')>0: AmandaAtGlory=1
+- TavernGloryHole.txt:66 | if GloryHoleWorks:
+- TavernGloryHole.txt:72 | if pregnancy[$GirlNameTGH] >120: $GloryGirlLine0+=' Над задранным подолом из под расстегнутой блузки виднеется беременное пузико ' + $RealName2[$GirlNameTGH] + '.'
+- TavernGloryHole.txt:77 | if GloryHoleInside or GloryHoleInsideOnce:
+- TavernGloryHole.txt:79 | if pregnancy[$GirlNameTGH] >120: $GloryGirlLine2+=' Беременность ей в этом ничуть не мешает и не смущает!'
+- TavernGloryHole.txt:80 | if GloryHoleInside:
+- TavernGloryHole.txt:91 | if pregnancy[$GirlNameTGH] >120:
+- TavernGloryHole.txt:100 | if dyneval($CheckIfSexEventExist,$GirlNameTGH, time)>0 and Rand(1,2)=1 and AmandaAtGlory=0:
+- TavernGloryHole.txt:104 | if GloryHoleLook=1:
+- TavernGloryHole.txt:108 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, 'Мастер Драупнир'
+- TavernGloryHole.txt:109 | elseif GloryHoleLook=2:
+- TavernGloryHole.txt:113 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, 'Эдди'
+- TavernGloryHole.txt:114 | elseif GloryHoleLook=3:
+- TavernGloryHole.txt:118 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, 'Месье Легаре'
+- TavernGloryHole.txt:119 | elseif GloryHoleLook=4:
+- TavernGloryHole.txt:123 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, 'Отец Герхард'
+- TavernGloryHole.txt:124 | elseif GloryHoleLook>=5 and GloryHoleLook<=7:
+- TavernGloryHole.txt:128 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, '',1,'Неизвестный моряк'
+- TavernGloryHole.txt:129 | elseif GloryHoleLook>=8 and GloryHoleLook<=10:
+- TavernGloryHole.txt:133 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, '',1,'Неизвестный стражник'
+- TavernGloryHole.txt:138 | gs 'PregnancyCheck', $GirlNameTGH, iif(GloryHoleInside, 'inside','mouth'), 1, '',1,'Неизвестный горожанин'
+- TavernGloryHole.txt:145 | if AmandaAtGlory=1:
+- TavernGloryHole.txt:153 | if GloryHoleCurrentStep=0:
+- TavernGloryHole.txt:158 | if GloryHoleCurrentStep=0:
+- TavernGloryHole.txt:160 | elseif GloryHoleCurrentStep=1:
+- TavernGloryHole.txt:166 | if GloryHoleCurrentStep>=3:
+- TavernGloryHole.txt:172 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(GloryHoleLook>0 and GloryHoleCurrentStep<=3 and BlockGloryHoleMenu=0,-1,0)"
+- TavernGloryHole.txt:177 | if AmandaAtGlory=1: *clr
+- TavernGloryHole.txt:178 | if GloryHoleCurrentStep=0 or GloryHoleLook=0:
+- TavernGloryHole.txt:183 | if GloryHoleLook=0:
+- TavernGloryHole.txt:185 | elseif GloryHoleCurrentStep=0:
+- TavernGloryHole.txt:187 | elseif GloryHoleCurrentStep=1:
+- TavernGloryHole.txt:192 | if GloryHoleLook:
+- TavernGloryHole.txt:194 | if GloryHoleCurrentStep>=3:
+- TavernGloryHole.txt:199 | if AmandaAtGlory=1:
+- TavernGloryHole.txt:208 | if $GirlNameTGH='georgett' and GloryHoleWorks:
+- TavernGloryHole.txt:210 | elseif GloryHoleWorks=0:
+- TavernGloryHole.txt:214 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(CockInGloryHole=0  and BlockGloryHoleMenu=0,-1,0)"
+- TavernGloryHole.txt:223 | if GloryHoleWorks:
+- TavernGloryHole.txt:229 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(CockInGloryHole=0 and GloryHoleLook=0 and cametoday<cancumdaily and GloryHoleCurrentStep=0 and BlockGloryHoleMenu=0,-1,0)"
+- TavernGloryHole.txt:236 | if GloryHoleWorks: GloryHoleCurrentStep+=1
+- TavernGloryHole.txt:239 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(CockInGloryHole=1 and GloryHoleLook=0 and cametoday<cancumdaily and GloryHoleCurrentStep=1 and BlockGloryHoleMenu=0,-1,0)"
+- TavernGloryHole.txt:245 | if AmandaAtGlory=1: *clr
+- TavernGloryHole.txt:247 | if GloryHoleWorks: GloryHoleCurrentStep+=1
+- TavernGloryHole.txt:248 | if AmandaAtGlory=1:
+- TavernGloryHole.txt:256 | if GloryHoleInside:
+- TavernGloryHole.txt:266 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(CockInGloryHole=1 and GloryHoleLook=0 and cametoday<cancumdaily and GloryHoleCurrentStep=2 and BlockGloryHoleMenu=0,-1,0)"
+- TavernGloryHole.txt:279 | gs 'Menu.AddCondition','MenuTavernGloryHole', "Result=IIF(AmandaAtGlory=1 and BlockGloryHoleMenu=0 and CockInGloryHole=1,-1,0)"
+- TavernMain.txt:16 | if (week=7 and time<3):
+- TavernMain.txt:18 | elseif (week=5 and time=3):
+- TavernMain.txt:20 | elseif time>3:
+- TavernMain.txt:26 | if (Rand(1,2)=1 and BlockEvents<>1) or EventsCount[10]>0:
+- TavernMain.txt:38 | If $TavernClosed='':
+- TavernMain.txt:47 | if $TavernEventOngoing='' and $TavernClosed='':
+- TavernMain.txt:54 | if $CurrentLoc[$GirlNameTS1]=$CurLoc and time>2:
+- TavernMain.txt:55 | if time=3: gs 'AddOthersSperm', $GirlNameTS1, 7
+- TavernMain.txt:56 | if time=3: gs 'AddOthersSperm', $GirlNameTS2, 8
+- TavernMain.txt:60 | if jobwhore['liza']=1 and jobwhore['georgett']=1:
+- TavernMain.txt:62 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS1, time)>0:
+- TavernMain.txt:65 | if TavernHole:
+- TavernMain.txt:68 | elseif randvarPS=2 and dyneval($CheckIfSexEventExist,$GirlNameTS2, time)>0:
+- TavernMain.txt:71 | if TavernHole:
+- TavernMain.txt:79 | elseif jobwhore['liza']=1:
+- TavernMain.txt:81 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS2, time)>0:
+- TavernMain.txt:83 | if TavernHole:
+- TavernMain.txt:90 | elseif jobwhore['georgett']=1:
+- TavernMain.txt:92 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS1, time)>0 :
+- TavernMain.txt:94 | if TavernHole:
+- TavernMain.txt:104 | if TavernGloryHole=1:
+- TavernMain.txt:107 | elseif TavernGloryHole=2:
+- TavernMain.txt:114 | if $TavernEventOngoing='':
+- TavernMain.txt:116 | if $TavernClosed='':
+- TavernMain.txt:117 | if TavernGloryHole=2:
+- TavernMain.txt:123 | if AmandaVar['kickyoufromroom']=0:
+- TavernMain.txt:130 | if $TavernClosed='':
+- TavernMain.txt:138 | if GeorgettAvail=1: dynamic $DescribeBreastFeeding, 'georgett'
+- TavernMain.txt:139 | if LizaAvail=1: dynamic $DescribeBreastFeeding, 'liza'
+- TavernMain.txt:141 | if $CurrentLoc['georgett']='TavernMain':
+- TavernMain.txt:146 | if GeorgettAvail=1 or ($CurrentLoc['georgett']=$CurLoc and time<2): gs 'CheckDailyEvent', 'georgett'
+- TavernMain.txt:147 | if LizaAvail=1 or ($CurrentLoc['liza']=$CurLoc and time<2): gs 'CheckDailyEvent', 'liza'
+- TavernProstClients.txt:7 | if args[0]<>1: gt 'TavernMain'
+- TavernProstClients.txt:14 | if $args[1]='liza':
+- TavernProstClients.txt:16 | if SexEventType=1:
+- TavernProstClients.txt:20 | elseif SexEventType=2:
+- TavernProstClients.txt:24 | elseif SexEventType=99:
+- TavernProstClients.txt:36 | if SexEventType=1:
+- TavernProstClients.txt:40 | elseif SexEventType=2:
+- TavernProstClients.txt:45 | elseif SexEventType=3:
+- TavernProstClients.txt:49 | elseif SexEventType=99:
+- TavernProstClients.txt:50 | if BeckyVar['visitedhome']<7:
+- TavernProstClients.txt:51 | if EddieVar['SawWithGeorgett']=0:
+- TavernShowImage.txt:8 | if RandVar=4 and jobwhore['liza']=0: jump ImageTavernLoop
+- TavernShowImage.txt:9 | if RandVar=5 and jobwhore['georgett']=0: jump ImageTavernLoop
+- TavernShowImage.txt:11 | if RandVar=1:
+- TavernShowImage.txt:13 | elseif RandVar=2:
+- TavernShowImage.txt:15 | elseif RandVar=3:
+- TavernShowImage.txt:19 | elseif RandVar=5:
+- ZaletOpinionCalc.txt:11 | if func('Table.Next', 'SexHistoryList'+$Args[0], 'tmpTableArray'):
+- ZaletOpinionCalc.txt:12 | if tmpTableArray['zalet']:
+- ZaletOpinionCalc.txt:13 | if tmpTableArray['Day']>tmpCurDay:
+- ZaletOpinionCalc.txt:28 | if func('Table.Next', 'SexHistoryList'+$Args[0], 'tmpTableArray'):
+- ZaletOpinionCalc.txt:29 | if tmpTableArray['zalet']:
+- ZaletOpinionCalc.txt:30 | if tmpTableArray['Day']>tmpCurDay:
+- ZaletOpinionCalc.txt:45 | if args[1]=0:args[1]=15
+- ZaletOpinionCalc.txt:46 | if ZaletDay>0:
+- ZaletOpinionCalc.txt:50 | if func('Table.Next', 'SexHistoryList'+$Args[0], 'tmpTableArray'):
+- ZaletOpinionCalc.txt:51 | if lcase($tmpTableArray['CumTarget'])='inside' and tmpTableArray['Day']>ZaletDay-args[1] and tmpTableArray['Day']<ZaletDay+args[1]:
+- ZaletOpinionCalc.txt:53 | if tmpTableArray['IsDudeRandom']=0:SuspectGrade+=2
+- ZaletOpinionCalc.txt:54 | if $tmpTableArray['DudeNameType']='NPC':SuspectGrade+=3
+- ZaletOpinionCalc.txt:55 | if lcase($tmpTableArray['DudeName'])='вы':SuspectGrade+=2
+- ZaletOpinionCalc.txt:57 | if $args[0]='amanda' and lcase($tmpTableArray['DudeName'])='вы':SuspectGrade+=2
+- ZaletOpinionCalc.txt:58 | if $args[0]='becky' and lcase($tmpTableArray['DudeName'])='эдди':SuspectGrade+=5
+- ZaletOpinionCalc.txt:75 | if func('Table.Next', 'tmpDaddySuspect'+$Args[0], 'tmpTableArray'):
+- ZaletOpinionCalc.txt:76 | if $tmpPrevTableArray['MatchField']=$tmpTableArray['MatchField'] or tmpFirst:
+- ZaletOpinionCalc.txt:79 | if tmpTableArray['Zalet']:tmpZalet=1
+- ZaletOpinionCalc.txt:84 | if tmpTableArray['Zalet']:tmpZalet=1
+- ZaletOpinionCalc.txt:105 | if strcomp(lcase($args[2]),'неизвестный.*'):
+- ZaletOpinionCalc.txt:107 | if RandVar=1:
+- ZaletOpinionCalc.txt:109 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:111 | elseif RandVar=3:
+- ZaletOpinionCalc.txt:116 | elseif  strcomp(lcase($args[2]),'.*парень.*'):
+- ZaletOpinionCalc.txt:118 | if RandVar=1:
+- ZaletOpinionCalc.txt:120 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:125 | elseif $args[0]='amanda' and lcase($args[1])='вы':
+- ZaletOpinionCalc.txt:127 | if RandVar=1:
+- ZaletOpinionCalc.txt:129 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:134 | elseif $args[0]='becky' and lcase($args[1])='вы':
+- ZaletOpinionCalc.txt:136 | if RandVar=1:
+- ZaletOpinionCalc.txt:138 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:143 | elseif $args[0]='liza' and lcase($args[1])='вы':
+- ZaletOpinionCalc.txt:145 | if RandVar=1:
+- ZaletOpinionCalc.txt:147 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:152 | elseif $args[0]='georgett' and lcase($args[1])='вы':
+- ZaletOpinionCalc.txt:154 | if RandVar=1:
+- ZaletOpinionCalc.txt:156 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:161 | elseif $args[0]='becky' and lcase($args[1])='эдди':
+- ZaletOpinionCalc.txt:163 | if RandVar=1:
+- ZaletOpinionCalc.txt:165 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:170 | elseif $args[0]='amanda' and strcomp(lcase($args[1]),'.*легаре.*'):
+- ZaletOpinionCalc.txt:172 | if RandVar=1:
+- ZaletOpinionCalc.txt:174 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:179 | elseif strcomp(lcase($args[1]),'.*легаре.*'):
+- ZaletOpinionCalc.txt:181 | if RandVar=1:
+- ZaletOpinionCalc.txt:183 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:188 | elseif strcomp(lcase($args[1]),'.*герхард.*'):
+- ZaletOpinionCalc.txt:190 | if RandVar=1:
+- ZaletOpinionCalc.txt:192 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:197 | elseif $args[0]='inga' and strcomp(lcase($args[1]),'.*лукас.*'):
+- ZaletOpinionCalc.txt:199 | if RandVar=1:
+- ZaletOpinionCalc.txt:201 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:206 | elseif strcomp(lcase($args[1]),'.*эдди.*'):
+- ZaletOpinionCalc.txt:208 | if RandVar=1:
+- ZaletOpinionCalc.txt:210 | elseif RandVar=2:
+- ZaletOpinionCalc.txt:223 | if args[0]=0:
+- ZaletOpinionCalc.txt:225 | elseif args[0]=1:
+- ZaletOpinionCalc.txt:227 | elseif args[0]<=4:
+- ZaletOpinionCalc.txt:229 | elseif args[0]<=10:
+- ZaletOpinionCalc.txt:231 | elseif args[0]<=25:
+- ZaletOpinionCalc.txt:244 | if func('Table.Next', 'tmpDaddySuspectFinal'+$Args[0], 'tmpTableArray'):
+- ZaletOpinionCalc.txt:247 | if tmpTableArray['Times']>MaxDaddyTimes:MaxDaddyTimes=tmpTableArray['Times']
+- ZaletOpinionCalc.txt:255 | if PregTotalSuspects[$args[0]]=0:
+- ZaletOpinionCalc.txt:257 | elseif PregTotalSuspects[$args[0]]=1:
+- ZaletOpinionCalc.txt:259 | elseif PregTotalSuspects[$args[0]]=2:
+- ZaletOpinionCalc.txt:261 | elseif PregTotalSuspects[$args[0]]=3:
+
+## Schedule/Location/Availability Logic
+- Church.txt:26 | if week<>7 or time > 2:
+- Church.txt:31 | if time=0:
+- Church.txt:129 | elseif time=1:
+- Church.txt:143 | act 'Обойти собор':gt 'ChurchAfterCermon', 1
+- ChurchAfterCermon.txt:1 | Location: "ChurchAfterCermon"
+- ChurchAfterCermon.txt:12 | AlreadySawChurchAfterCermon=Func('SumArray','ChurchAfterCermon')
+- ChurchAfterCermon.txt:16 | if randvar=1 and GeorgettVar['churchgeorgettadmit'] and AlreadySawChurchAfterCermon=0:
+- ChurchAfterCermon.txt:19 | elseif randvar=2 and GeorgettVar['churchlizaadmit']  and AlreadySawChurchAfterCermon=0:
+- ChurchAfterCermon.txt:37 | ------------ End of location: "ChurchAfterCermon" ------------
+- DailySetstatdefault.txt:43 | if ($GirlName='liza' or $GirlName='georgett') and $CurrentLoc[$GirlName]<>'TavernMain':KnowAboutBirth=0
+- DressNoShow.txt:50 | '"Ой, ты знаешь <<iif(DressBuyIsRelative=1,''мамусик'',iif(DressBuyIsRelative=2,''сестричка'',''котеночек''  ))>>, я забегался по делам и опоздал."<br>"По каким-таким делам ты с утра пораньше бегал?" недоуменно ответила <<$RealName[$GirlNameDNS]>>.<br>"Да, надо было там сделать кое-что." туманно объяснили вы. "Прости, я виноват. Не дуйся."<br>"Ну ладно, раз так, то давай будем считать, что мы перенесли наш поход на <<iif(week<>6,''завтра'',''понедельник'')>>." неожиданно ответила вам <<$RealName[$GirlNameDNS]>>.<br>"Ну давай, " промямли вы, будучи застигнутым врасплох таким оборотом дел.<br>"Вот и ладушки, утром, как всегда!" сказала повеселевшая <<$RealName[$GirlNameDNS]>> и убежала.<br>'
+- GloryHoleBusy.txt:11 | if jobgloryholeTommorow['georgett']=1: Result=1
+- InitGeorgett.txt:20 | $CurrentLoc[$GirlName]='PortStreets'
+- InitGeorgett.txt:40 | jobkitchen[$GirlName]=0
+- InitGeorgett.txt:41 | jobcleaning[$GirlName]=0
+- InitGeorgett.txt:42 | jobwaitress[$GirlName]=0
+- InitGeorgett.txt:46 | jobWhoreAvail[$GirlName]=0
+- InitGeorgett.txt:47 | jobGloryHoleAvail[$GirlName]=0
+- InitGeorgett.txt:48 | jobwhore[$GirlName]=0
+- InitGeorgett.txt:49 | jobgloryhole[$GirlName]=0
+- InitGeorgett.txt:51 | jobwhoreTommorow[$GirlName]=0
+- InitGeorgett.txt:52 | jobgloryholeTommorow[$GirlName]=0
+- InitGeorgett.txt:75 | ChurchAfterCermon[$GirlNameAC]=0
+- InitGeorgett.txt:76 | GeorgettVar['SawChurchAfterCermon']=0
+- InitGeorgett.txt:77 | GeorgettVar['TalkChurchAfterCermon']=0
+- InitGeorgett.txt:78 | GeorgettVar['TalkChurchAfterCermonLiza']=0
+- InitLiza.txt:20 | $CurrentLoc[$GirlName]='PortStreets'
+- InitLiza.txt:40 | jobkitchen[$GirlName]=0
+- InitLiza.txt:41 | jobcleaning[$GirlName]=0
+- InitLiza.txt:42 | jobwaitress[$GirlName]=0
+- InitLiza.txt:47 | jobWhoreAvail[$GirlName]=0
+- InitLiza.txt:48 | jobGloryHoleAvail[$GirlName]=0
+- InitLiza.txt:49 | jobwhore[$GirlName]=0
+- InitLiza.txt:50 | jobgloryhole[$GirlName]=0
+- InitLiza.txt:52 | jobwhoreTommorow[$GirlName]=0
+- InitLiza.txt:53 | jobgloryholeTommorow[$GirlName]=0
+- InitLiza.txt:58 | ChurchAfterCermon[$GirlNameAC]=0
+- InitLiza.txt:59 | LizaVar['SawChurchAfterCermon']=0
+- InitLiza.txt:60 | LizaVar['TalkChurchAfterCermon']=0
+- InitLiza.txt:61 | LizaVar['TalkChurchAfterCermonGeorgett']=0
+- IntAmandaDressChange.txt:9 | if $CurrentLoc['liza']<>'TavernMain' and RandVar=4 :RandVar=Rand(5,7)
+- IntAmandaDressChange.txt:10 | if $CurrentLoc['georgett']<>'TavernMain' and RandVar=3 :RandVar=Rand(5,7)
+- IntAmandaDressChange.txt:71 | if $CurrentLoc['liza']='TavernMain':
+- IntAmandaDressChange.txt:94 | if $CurrentLoc['liza']='TavernMain':
+- IntAmandaDressChange.txt:210 | gs 'Menu.AddCondition','MenuAmandaTalk', "Result=IIF(Friends[$GirlNameIAT]>8 and func('CheckDailyEventExists','','BuyDressTom')=0 and func('CheckDailyEventExists',$GirlNameIAT,'BuyDress')=0 and Talked[$GirlNameIAT]<2 and week<>6,-1,0)"
+- IntBeckyGuest.txt:281 | time+=1
+- IntEddieTalk.txt:26 | "Рассказать Эдди о том, что у вас теперь работают девочки." if Friends.get(GirlName, 0) >= 5 and CurrentLoc.get('georgett', '') == 'TavernMain' and EddieVar.get('TalkedAboutWhores', 0) == 0 and Talked.get(GirlName, 0) < 2:
+- IntEddieTalk.txt:33 | "Поинтересоваться у Эдди как ему ваши девочки." if Friends.get(GirlName, 0) >= 5 and CurrentLoc.get('georgett', '') == 'TavernMain' and EddieVar.get('SawWithGeorgett', 0) > 0 and EddieVar.get('TalkedAboutGeorgett', 0) == 0 and Talked.get(GirlName, 0) < 2:
+- IntGeorgettAfterCermon.txt:16 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:24 | ChurchAfterCermon[$GirlNameAC]+=1
+- IntGeorgettAfterCermon.txt:27 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=0 ,-1,0)"
+- IntGeorgettAfterCermon.txt:34 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:42 | ChurchAfterCermon[$GirlNameAC]=ChurchAfterCermon[$GirlNameAC]+1
+- IntGeorgettAfterCermon.txt:45 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=1 ,-1,0)"
+- IntGeorgettAfterCermon.txt:52 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:64 | GeorgettVar['SawChurchAfterCermon']=1
+- IntGeorgettAfterCermon.txt:65 | ChurchAfterCermon[$GirlNameAC]=ChurchAfterCermon[$GirlNameAC]+1
+- IntGeorgettAfterCermon.txt:68 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=2 ,-1,0)"
+- IntGeorgettAfterCermon.txt:78 | if GeorgettVar['TalkChurchAfterCermonLiza']:
+- IntGeorgettAfterCermon.txt:89 | ChurchAfterCermon[$GirlNameAC]=ChurchAfterCermon[$GirlNameAC]+1
+- IntGeorgettAfterCermon.txt:93 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=3 ,-1,0)"
+- IntGeorgettAfterCermon.txt:94 | !GeorgettVar['SawChurchAfterCermon']
+- IntGeorgettDressChange.txt:28 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(Friends[$GirlNameIGT]>8 and func('CheckDailyEventExists','','BuyDressTom')=0 and func('CheckDailyEventExists',$GirlNameIGT,'BuyDress')=0 and Talked[$GirlNameIGT]<2 and week<>6,-1,0)"
+- IntGeorgettTalk.txt:99 | if GeorgettVar['TalkChurchAfterCermon']=0:
+- IntGeorgettTalk.txt:101 | GeorgettVar['TalkChurchAfterCermon']=1
+- IntGeorgettTalk.txt:106 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['SawChurchAfterCermon'] and Talked[$GirlNameIGT]<2  ,-1,0)"
+- IntGeorgettTalk.txt:111 | if GeorgettVar['TalkChurchAfterCermonLiza']=0:
+- IntGeorgettTalk.txt:115 | GeorgettVar['TalkChurchAfterCermonLiza']=1
+- IntGeorgettTalk.txt:123 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(LizaVar['SawChurchAfterCermon'] and Talked[$GirlNameIGT]<2 ,-1,0)"
+- IntGeorgettTalk.txt:137 | $CurrentLoc['georgett']='TavernMain'
+- IntGeorgettTalk.txt:138 | $CurrentLoc['liza']='TavernMain'
+- IntGeorgettTalk.txt:139 | jobWhoreAvail['georgett']=1
+- IntGeorgettTalk.txt:140 | jobwhore['georgett']=1
+- IntGeorgettTalk.txt:141 | jobWhoreAvail['liza']=1
+- IntGeorgettTalk.txt:142 | jobwhore['liza']=1
+- IntGeorgettTalk.txt:148 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(AlberVar['talkedaboutliza'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and $CurrentLoc[$GirlNameIGT]='PortStreets' ,-1,0)"
+- IntGeorgettTalk.txt:162 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 ,-1,0)"
+- IntGeorgettTalk.txt:171 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 and LizaVar['GloryHoleAsked']=1 and GeorgettVar['GloryHoleExplained']=0,-1,0)"
+- IntGeorgettTalk.txt:178 | jobGloryHoleAvail['georgett']=1
+- IntGeorgettTalk.txt:179 | jobGloryHoleAvail['liza']=1
+- IntGeorgettTalk.txt:182 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 and TavernGloryHole=2 and GeorgettVar['GloryHoleAgreed']=0,-1,0)"
+- IntGeorgettTalk.txt:261 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(BeckyVar['EddieGeorg']>0 and time<=3,-1,0)"
+- IntLizaTalk.txt:72 | if LizaVar.get('TalkChurchAfterCermonGeorgett', 0) == 0:
+- IntLizaTalk.txt:74 | LizaVar['TalkChurchAfterCermonGeorgett'] = 1
+- IntLizettAfterCermon.txt:15 | if lizaVar['SawChurchAfterCermon']=0:
+- IntLizettAfterCermon.txt:32 | ChurchAfterCermon[$GirlNameAC]=ChurchAfterCermon[$GirlNameAC]+1
+- IntLizettAfterCermon.txt:35 | gs 'Menu.AddCondition','AfterCermonLizett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=0 ,-1,0)"
+- IntLizettAfterCermon.txt:42 | if LizaVar['SawChurchAfterCermon']=0:
+- IntLizettAfterCermon.txt:56 | ChurchAfterCermon[$GirlNameAC]=ChurchAfterCermon[$GirlNameAC]+1
+- IntLizettAfterCermon.txt:59 | gs 'Menu.AddCondition','AfterCermonLizett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=1 ,-1,0)"
+- IntLizettAfterCermon.txt:66 | if LizaVar['SawChurchAfterCermon']=0:
+- IntLizettAfterCermon.txt:87 | LizaVar['SawChurchAfterCermon']=1
+- IntLizettAfterCermon.txt:88 | ChurchAfterCermon[$GirlNameAC]=ChurchAfterCermon[$GirlNameAC]+1
+- IntLizettAfterCermon.txt:91 | gs 'Menu.AddCondition','AfterCermonLizett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=2 ,-1,0)"
+- IntLizettAfterCermon.txt:110 | if LizaVar['TalkChurchAfterCermonGeorgett']:
+- IntLizettAfterCermon.txt:116 | ChurchAfterCermon[$GirlNameAC]=ChurchAfterCermon[$GirlNameAC]+1
+- IntLizettAfterCermon.txt:120 | gs 'Menu.AddCondition','AfterCermonLizett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=3 ,-1,0)"
+- IntLizettAfterCermon.txt:121 | !LizaVar['SawChurchAfterCermon']
+- Intro.txt:43 | time=0
+- Intro.txt:46 | week=1
+- Intro.txt:98 | gs 'Table.Create', 'TodaySexEvents', 'GirlName, Time, EventType, Place'
+- Intro.txt:101 | gs 'Table.Create', 'DailyEventsList', 'GirlName, Location, Time, TimeCheckExpr, ChanceToMeet, KeepNextDay, EventType, EventCode'
+- Intro.txt:109 | jobkitchentomorrow[$AllGirlNames[InitGirlsCounter]]=jobkitchen[$AllGirlNames[InitGirlsCounter]]
+- Intro.txt:110 | jobcleaningtomorrow[$AllGirlNames[InitGirlsCounter]]=jobcleaning[$AllGirlNames[InitGirlsCounter]]
+- Intro.txt:111 | jobwaitresstomorrow[$AllGirlNames[InitGirlsCounter]]=jobwaitress[$AllGirlNames[InitGirlsCounter]]
+- KidsFunctions.txt:97 | if $CurrentLoc['georgett']='TavernMain':
+- menu_tavernstat.txt:28 | if jobWhoreAvail['georgett']=1:
+- menu_tavernstat.txt:117 | jobgloryholeTommorow['georgett']=1
+- menu_tavernstat.txt:118 | jobwhoreTommorow['georgett']=0
+- menu_tavernstat.txt:121 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobGloryHoleAvail['georgett'] and jobgloryholeTommorow['georgett']=0 and func('GloryHoleBusy','georgett')=0,-1,0)"
+- menu_tavernstat.txt:126 | jobgloryholeTommorow['georgett']=0
+- menu_tavernstat.txt:127 | jobwhoreTommorow['georgett']=1
+- menu_tavernstat.txt:130 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobWhoreAvail['georgett'] and jobwhoreTommorow['georgett']=0,-1,0)"
+- menu_tavernstat.txt:166 | if jobWhoreAvail['georgett']:
+- MomDressComplaint.txt:22 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- MomDressComplaint.txt:36 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:104 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:134 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:150 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:157 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- NextDay_FinishDayEvents.txt:6 | if GeorgettVar['TalkChurchAfterCermonLiza'] and LizaVar['ProstStart']=0: LizaVar['ProstStart']=1
+- NextDay_NewDayEvents.txt:12 | !EddieGeorg -0-no idea, 1-georgetta will offer for first time time or less, 2 - second time or more
+- NextDay_NewDayEvents.txt:37 | elseif EddieVar['TalkedAboutWhores']=1 and $CurrentLoc['georgett']='TavernMain':
+- NextDay_TavernDaily.txt:97 | jobwhore['georgett']=0
+- NextDay_TavernDaily.txt:98 | jobgloryhole['georgett']=0
+- PortStreets.txt:18 | if $CurrentLoc[$GirlNamePS1]=$CurLoc and time=3 and week<>5 and No(GeorgettVar['TalkChurchAfterCermonLiza']!0 and LizaVar['ProstStart']=0):
+- PortStreets.txt:27 | if time=3: gs 'AddOthersSperm', $GirlNamePS1, 6
+- PortStreets.txt:33 | if time=3: gs 'AddOthersSperm', $GirlNamePS2, 8
+- PortStreets.txt:35 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNamePS1, time)>0 :
+- PortStreets.txt:38 | elseif randvarPS=2 and dyneval($CheckIfSexEventExist,$GirlNamePS1, time)>0 :
+- StolyarWorkshop.txt:57 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['HoleAsked']=0 and TavernHole=0,-1,0)"
+- StolyarWorkshop.txt:68 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['HoleAsked']>0 and TavernHole=0 and money>=100 and  time=0,-1,0)"
+- StolyarWorkshop.txt:77 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['GloryHoleAsked']=0 and TavernGloryHole=0 and GeorgettVar['GloryHoleExplained']=1,-1,0)"
+- StolyarWorkshop.txt:88 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['GloryHoleAsked']>0 and TavernGloryHole=0 and money>=700 and  time=0,-1,0)"
+- StreetClients.txt:9 | SexEventType=dyneval($GetSexEventFromTable,$args[1], time)
+- TavernGloryHole.txt:6 | $GirlNameTGH=func('GetRandomGirlByJob','jobgloryhole')
+- TavernGloryHole.txt:55 | if (Time=2 or time=3) and $GirlNameTGH>'': GloryHoleWorks=1
+- TavernGloryHole.txt:67 | !dyneval($CheckIfSexEventExist,$GirlNameTGH, time)
+- TavernGloryHole.txt:100 | if dyneval($CheckIfSexEventExist,$GirlNameTGH, time)>0 and Rand(1,2)=1 and AmandaAtGlory=0:
+- TavernGloryHole.txt:101 | GloryHoleLook=dyneval($GetSexEventFromTable,$GirlNameTGH, time)
+- TavernMain.txt:16 | if (week=7 and time<3):
+- TavernMain.txt:18 | elseif (week=5 and time=3):
+- TavernMain.txt:20 | elseif time>3:
+- TavernMain.txt:27 | $TavernEventOngoing=func('DisplayTavernEventShort',time, 1)
+- TavernMain.txt:34 | $kitchenlist=func('NamesList','jobkitchen')
+- TavernMain.txt:35 | $cleaninglist=func('NamesList','jobcleaning')
+- TavernMain.txt:36 | $waitresslist=func('NamesList','jobwaitress')
+- TavernMain.txt:54 | if $CurrentLoc[$GirlNameTS1]=$CurLoc and time>2:
+- TavernMain.txt:55 | if time=3: gs 'AddOthersSperm', $GirlNameTS1, 7
+- TavernMain.txt:56 | if time=3: gs 'AddOthersSperm', $GirlNameTS2, 8
+- TavernMain.txt:60 | if jobwhore['liza']=1 and jobwhore['georgett']=1:
+- TavernMain.txt:62 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS1, time)>0:
+- TavernMain.txt:68 | elseif randvarPS=2 and dyneval($CheckIfSexEventExist,$GirlNameTS2, time)>0:
+- TavernMain.txt:79 | elseif jobwhore['liza']=1:
+- TavernMain.txt:81 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS2, time)>0:
+- TavernMain.txt:90 | elseif jobwhore['georgett']=1:
+- TavernMain.txt:92 | if randvarPS=1 and dyneval($CheckIfSexEventExist,$GirlNameTS1, time)>0 :
+- TavernMain.txt:141 | if $CurrentLoc['georgett']='TavernMain':
+- TavernMain.txt:146 | if GeorgettAvail=1 or ($CurrentLoc['georgett']=$CurLoc and time<2): gs 'CheckDailyEvent', 'georgett'
+- TavernMain.txt:147 | if LizaAvail=1 or ($CurrentLoc['liza']=$CurLoc and time<2): gs 'CheckDailyEvent', 'liza'
+- TavernProstClients.txt:12 | SexEventType=dyneval($GetSexEventFromTable,$args[1], time)
+- TavernShowImage.txt:8 | if RandVar=4 and jobwhore['liza']=0: jump ImageTavernLoop
+- TavernShowImage.txt:9 | if RandVar=5 and jobwhore['georgett']=0: jump ImageTavernLoop
+
+## State Updates (character store-focused)
+- Church.txt:6 | GeorgettVar['foundinchurch']=0
+- Church.txt:69 | GeorgettVar['foundinchurch']=1
+- Church.txt:97 | if GeorgettVar['askkids']=0 and Rand(1,2): $TmpChurchGeorgSex='doggy'
+- Church.txt:98 | if GeorgettVar['askkids']: $TmpChurchGeorgSex='withliza'
+- Church.txt:107 | GeorgettVar['lizasawinchurch']=1
+- Church.txt:114 | GeorgettVar['fuckinchurch']=1
+- Church.txt:123 | gs 'Menu.AddCondition','ChurchServiceMenu', "Result=IIF(cametoday<cancumdaily and Friends['georgett']>=2 and HadSex['georgett']>=3 and GeorgettVar['foundinchurch'] ,-1,0)"
+- ChurchAfterCermon.txt:16 | if randvar=1 and GeorgettVar['churchgeorgettadmit'] and AlreadySawChurchAfterCermon=0:
+- ChurchAfterCermon.txt:19 | elseif randvar=2 and GeorgettVar['churchlizaadmit']  and AlreadySawChurchAfterCermon=0:
+- ChurchIspoved.txt:18 | GeorgettVar['georgettadmit']=1
+- ChurchIspoved.txt:26 | GeorgettVar['churchgeorgettadmit']=1
+- ChurchIspoved.txt:28 | gs 'Menu.AddCondition','ChurchIspovedMenu', "Result=IIF(HadSex['georgett']>0 and GeorgettVar['fuckinchurch'] and GeorgettVar['georgettadmit']=1,-1,0)"
+- ChurchIspoved.txt:34 | GeorgettVar['churchlizaadmit']=1
+- ChurchIspoved.txt:36 | gs 'Menu.AddCondition','ChurchIspovedMenu', "Result=IIF(HadSex['georgett']>0 and GeorgettVar['fuckinchurch'] and GeorgettVar['lizasawinchurch'] and GeorgettVar['churchgeorgettadmit'],-1,0)"
+- InitGeorgett.txt:59 | GeorgettVar['seeclients']=0
+- InitGeorgett.txt:60 | GeorgettVar['askclients']=0
+- InitGeorgett.txt:61 | GeorgettVar['askkids']=0
+- InitGeorgett.txt:62 | GeorgettVar['askparents']=0
+- InitGeorgett.txt:63 | GeorgettVar['askpregnancy']=0
+- InitGeorgett.txt:64 | GeorgettVar['asksex']=0
+- InitGeorgett.txt:65 | GeorgettVar['TellAboutEddieMomSex']=0
+- InitGeorgett.txt:68 | GeorgettVar['foundinchurch']=0
+- InitGeorgett.txt:69 | GeorgettVar['fuckinchurch']=0
+- InitGeorgett.txt:70 | GeorgettVar['lizasawinchurch']=0
+- InitGeorgett.txt:71 | GeorgettVar['georgettadmit']=0
+- InitGeorgett.txt:72 | GeorgettVar['churchgeorgettadmit']=0
+- InitGeorgett.txt:73 | GeorgettVar['churchlizaadmit']=0
+- InitGeorgett.txt:76 | GeorgettVar['SawChurchAfterCermon']=0
+- InitGeorgett.txt:77 | GeorgettVar['TalkChurchAfterCermon']=0
+- InitGeorgett.txt:78 | GeorgettVar['TalkChurchAfterCermonLiza']=0
+- InitGeorgett.txt:80 | GeorgettVar['GloryHoleExplained']=0
+- InitGeorgett.txt:81 | GeorgettVar['GloryHoleAgreed']=0
+- IntGeorgettAfterCermon.txt:16 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:34 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:52 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:64 | GeorgettVar['SawChurchAfterCermon']=1
+- IntGeorgettTalk.txt:34 | if GeorgettVar['askclients']=0:
+- IntGeorgettTalk.txt:36 | GeorgettVar['askclients']=1
+- IntGeorgettTalk.txt:41 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['seeclients'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 ,-1,0)"
+- IntGeorgettTalk.txt:46 | if GeorgettVar['asksex']=0:
+- IntGeorgettTalk.txt:48 | GeorgettVar['asksex']=1
+- IntGeorgettTalk.txt:53 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['askclients'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=3 ,-1,0)"
+- IntGeorgettTalk.txt:58 | if GeorgettVar['askparents']=0:
+- IntGeorgettTalk.txt:60 | GeorgettVar['askparents']=1
+- IntGeorgettTalk.txt:65 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['asksex'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=4 ,-1,0)"
+- IntGeorgettTalk.txt:70 | if GeorgettVar['askpregnancy']=0:
+- IntGeorgettTalk.txt:72 | GeorgettVar['askpregnancy']=1
+- IntGeorgettTalk.txt:77 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['askparents'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=4 ,-1,0)"
+- IntGeorgettTalk.txt:87 | if GeorgettVar['askkids']=0:
+- IntGeorgettTalk.txt:89 | GeorgettVar['askkids']=1
+- IntGeorgettTalk.txt:94 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['askpregnancy'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=5 ,-1,0)"
+- IntGeorgettTalk.txt:99 | if GeorgettVar['TalkChurchAfterCermon']=0:
+- IntGeorgettTalk.txt:101 | GeorgettVar['TalkChurchAfterCermon']=1
+- IntGeorgettTalk.txt:106 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['SawChurchAfterCermon'] and Talked[$GirlNameIGT]<2  ,-1,0)"
+- IntGeorgettTalk.txt:111 | if GeorgettVar['TalkChurchAfterCermonLiza']=0:
+- IntGeorgettTalk.txt:115 | GeorgettVar['TalkChurchAfterCermonLiza']=1
+- IntGeorgettTalk.txt:155 | elseif GeorgettVar['GloryHoleExplained']=1:
+- IntGeorgettTalk.txt:168 | GeorgettVar['GloryHoleExplained']=1
+- IntGeorgettTalk.txt:171 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 and LizaVar['GloryHoleAsked']=1 and GeorgettVar['GloryHoleExplained']=0,-1,0)"
+- IntGeorgettTalk.txt:177 | GeorgettVar['GloryHoleAgreed']=1
+- IntGeorgettTalk.txt:182 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 and TavernGloryHole=2 and GeorgettVar['GloryHoleAgreed']=0,-1,0)"
+- IntGeorgettTalk.txt:189 | GeorgettVar['TellAboutEddieMomSex']=1
+- IntGeorgettTalk.txt:196 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(((GeorgettVar['TellAboutEddieMomSex']=0 and (BeckyVar['EddieTryToFuck']=4 or BeckyVar['visitedhome']>=7)) or (BeckyVar['EddieGeorg']=0 and EddieVar['TalkedAboutGeorgett']=1 and BeckyVar['visitedhome']>=3 and (EddieVar['SawMomSex']>0 or BeckyVar['HomeSex']>0)) ) and Talked[$GirlNameIGT]<2,-1,0)"
+- NextDay_FinishDayEvents.txt:6 | if GeorgettVar['TalkChurchAfterCermonLiza'] and LizaVar['ProstStart']=0: LizaVar['ProstStart']=1
+- NextDay.txt:191 | GeorgettVar['foundinchurch']=0
+- PortStreets.txt:18 | if $CurrentLoc[$GirlNamePS1]=$CurLoc and time=3 and week<>5 and No(GeorgettVar['TalkChurchAfterCermonLiza']!0 and LizaVar['ProstStart']=0):
+- StolyarWorkshop.txt:77 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['GloryHoleAsked']=0 and TavernGloryHole=0 and GeorgettVar['GloryHoleExplained']=1,-1,0)"
+- StreetClients.txt:40 | GeorgettVar['seeclients']=1
+- TavernProstClients.txt:35 | GeorgettVar['seeclients']=1
+
+## Full Matched Line Index (exhaustive)
+- AdjustOtkroven.txt:8 | if $GirlNameAOtk='georgett':
+- Church.txt:6 | GeorgettVar['foundinchurch']=0
+- Church.txt:59 | if GeorgettVar['askkids']:
+- Church.txt:65 | gs 'ShowImage', 'georgett', 'church', 'cermonliza'
+- Church.txt:67 | gs 'ShowImage', 'georgett', 'church', 'cermon'
+- Church.txt:69 | GeorgettVar['foundinchurch']=1
+- Church.txt:71 | gs 'Menu.AddCondition','ChurchServiceMenu', "Result=IIF(Friends['georgett']>=2 ,-1,0)"
+- Church.txt:76 | if Friends['georgett']<6:
+- Church.txt:85 | if GeorgettVar['askkids']:
+- Church.txt:90 | if GeorgettVar['lizasawinchurch']:
+- Church.txt:97 | if GeorgettVar['askkids']=0 and Rand(1,2): $TmpChurchGeorgSex='doggy'
+- Church.txt:98 | if GeorgettVar['askkids']: $TmpChurchGeorgSex='withliza'
+- Church.txt:104 | if GeorgettVar['askkids']:
+- Church.txt:107 | GeorgettVar['lizasawinchurch']=1
+- Church.txt:110 | if GeorgettVar['askkids']:
+- Church.txt:114 | GeorgettVar['fuckinchurch']=1
+- Church.txt:115 | gs 'PregnancyCheck', 'georgett', 'inside', 1, 'Вы'
+- Church.txt:116 | gs 'ShowImageSeq', 'georgett', 'church', $TmpChurchGeorgSex, 6
+- Church.txt:123 | gs 'Menu.AddCondition','ChurchServiceMenu', "Result=IIF(cametoday<cancumdaily and Friends['georgett']>=2 and HadSex['georgett']>=3 and GeorgettVar['foundinchurch'] ,-1,0)"
+- ChurchAfterCermon.txt:16 | if randvar=1 and GeorgettVar['churchgeorgettadmit'] and AlreadySawChurchAfterCermon=0:
+- ChurchAfterCermon.txt:17 | gs 'IntGeorgettAfterCermon'
+- ChurchAfterCermon.txt:18 | 'За кабинками для исповеди вы заметили неприметную дверь, ведущую внутрь храма. Из-за нее слышаться приглушенные голоса. Вы замечаете большую замочную скважину, через которую вы можете <a href="exec: GS ''Menu.Call'',''AfterCermonGeorgett''">посмотреть</a>, что там происходит. '
+- ChurchAfterCermon.txt:19 | elseif randvar=2 and GeorgettVar['churchlizaadmit']  and AlreadySawChurchAfterCermon=0:
+- ChurchIspoved.txt:18 | GeorgettVar['georgettadmit']=1
+- ChurchIspoved.txt:20 | gs 'Menu.AddCondition','ChurchIspovedMenu', "Result=IIF(HadSex['georgett']>0 ,-1,0)"
+- ChurchIspoved.txt:26 | GeorgettVar['churchgeorgettadmit']=1
+- ChurchIspoved.txt:28 | gs 'Menu.AddCondition','ChurchIspovedMenu', "Result=IIF(HadSex['georgett']>0 and GeorgettVar['fuckinchurch'] and GeorgettVar['georgettadmit']=1,-1,0)"
+- ChurchIspoved.txt:34 | GeorgettVar['churchlizaadmit']=1
+- ChurchIspoved.txt:36 | gs 'Menu.AddCondition','ChurchIspovedMenu', "Result=IIF(HadSex['georgett']>0 and GeorgettVar['fuckinchurch'] and GeorgettVar['lizasawinchurch'] and GeorgettVar['churchgeorgettadmit'],-1,0)"
+- DailySetstatdefault.txt:43 | if ($GirlName='liza' or $GirlName='georgett') and $CurrentLoc[$GirlName]<>'TavernMain':KnowAboutBirth=0
+- DressNoShow.txt:27 | elseif $GirlNameDNS='georgett':
+- EllonaBirthPrayMenu.txt:87 | if $GirlName='liza' or $GirlName='georgett':
+- GeorgettBeckyVisit.txt:1 | Location: "GeorgettBeckyVisit"
+- GeorgettBeckyVisit.txt:47 | gs 'GirlsDesc','georgett'
+- GeorgettBeckyVisit.txt:57 | gs 'PregnancyCheck', 'georgett', 'mouthface', 1, 'eddie'
+- GeorgettBeckyVisit.txt:60 | gs 'SlutFriendsIncrease', 'georgett', 0, 0, 0, 60, 1, 1
+- GeorgettBeckyVisit.txt:92 | gs 'PregnancyCheck', 'georgett', 'mouthface', 1, 'eddie'
+- GeorgettBeckyVisit.txt:94 | gs 'SlutFriendsIncrease', 'georgett', 0, 0, 0, 60, 1, 1
+- GeorgettBeckyVisit.txt:109 | gs 'PregnancyCheck', 'georgett', 'mouthface', 1, 'eddie'
+- GeorgettBeckyVisit.txt:111 | gs 'SlutFriendsIncrease', 'georgett', 0, 0, 0, 65, 1, 1
+- GeorgettBeckyVisit.txt:138 | ------------ End of location: "GeorgettBeckyVisit" ------------
+- GirlDressSuggest.txt:21 | if $GirlName='georgett': ShowOffLevel=3
+- GirlDressSuggest.txt:24 | if $GirlName='georgett':
+- GirlDressSuggest.txt:32 | if $GirlName='georgett':
+- GirlsDesc.txt:20 | elseif $GirlNameGdsc='georgett':
+- GirlsDesc.txt:21 | gs 'ShowGeorgettPortrait'
+- GirlSuggestDressFunc.txt:235 | 'как какой-то пацаненок заглянул в окно, да таки и остался стоять, с открытым от удивления ртом. <br><<iif($GirlName=''georgett'' or $GirlName=''liza'',''Шлюха'',$RealName[$GirlName])>> проследила за вашим взглядом и крикнула мальчонке:'
+- GirlSuggestDressFunc.txt:236 | if $GirlName='georgett' or $GirlName='liza':
+- GirlSuggestDressFunc.txt:245 | 'как какой-то мужичок, по виду <<dyneval($RandomOccupCode)>> стоит у окна и с интересом наблюдает за открывшимся зрелищем.<br><<iif($GirlName=''georgett'' or $GirlName=''liza'',''Шлюха'',$RealName[$GirlName])>> проследила за вашим взглядом и крикнула ему: '
+- GirlSuggestDressFunc.txt:246 | if $GirlName='georgett' or $GirlName='liza':
+- GiveBirth.txt:42 | elseif $GirlName='georgett':
+- GiveBirth.txt:52 | if $GirlName='georgett':
+- GiveBirth.txt:63 | '"Как же не волноваться," захныкала <<$RealName[$GirlName]>>. "Мне ведь всего-то <<age[$GirlName]>>, годочков а я уже мамой стану.<br>"Ха, мамой она станет!" воскликнула Жоржетта. "А я в <<age[''georgett'']>> бабушкой получается стану! Меня девки будут "Бабой Жоржи" подкалывать, знаю я их."<br>"Все ты мама только о себе и думаешь," упрекнула Жоржетту дочка. "Нет, чтобы посочуствовать!"<br>"Ха, а чего ты ожидала? Ты у меня уже созревшая девочка. В тебя мужики каждый день спускают. И платят, между прочим, за это не так уж и плохо. Сразу понятно было что ты пузо себе быстро нагуляешь. Так и вышло! Не реви и не хнычь, а пошли скорее в храм, а то прямо здесь родишь."<br>Впрочем, несмотря на все свое красноречие, старшая шлюха так до конца и не смогла убедить молоденькую: <<$RealName[$GirlName]>> продолжала всхлипывать.'
+- GiveBirth.txt:217 | elseif $GirlName='georgett':
+- GiveBirth.txt:246 | if $GirlName='georgett' or $GirlName='liza':
+- GiveBirthFinish.txt:16 | elseif $GirlName='georgett':
+- GiveBirthFinish.txt:39 | elseif $GirlName='georgett':
+- GiveBirthStep2.txt:34 | elseif $GirlName='georgett':
+- GloryHoleBusy.txt:11 | if jobgloryholeTommorow['georgett']=1: Result=1
+- GloryHoleBusy.txt:14 | if $GirlNameGHB = 'georgett':
+- InitGeorgett.txt:1 | Location: "InitGeorgett"
+- InitGeorgett.txt:6 | $GirlName='georgett'
+- InitGeorgett.txt:59 | GeorgettVar['seeclients']=0
+- InitGeorgett.txt:60 | GeorgettVar['askclients']=0
+- InitGeorgett.txt:61 | GeorgettVar['askkids']=0
+- InitGeorgett.txt:62 | GeorgettVar['askparents']=0
+- InitGeorgett.txt:63 | GeorgettVar['askpregnancy']=0
+- InitGeorgett.txt:64 | GeorgettVar['asksex']=0
+- InitGeorgett.txt:65 | GeorgettVar['TellAboutEddieMomSex']=0
+- InitGeorgett.txt:68 | GeorgettVar['foundinchurch']=0
+- InitGeorgett.txt:69 | GeorgettVar['fuckinchurch']=0
+- InitGeorgett.txt:70 | GeorgettVar['lizasawinchurch']=0
+- InitGeorgett.txt:71 | GeorgettVar['georgettadmit']=0
+- InitGeorgett.txt:72 | GeorgettVar['churchgeorgettadmit']=0
+- InitGeorgett.txt:73 | GeorgettVar['churchlizaadmit']=0
+- InitGeorgett.txt:76 | GeorgettVar['SawChurchAfterCermon']=0
+- InitGeorgett.txt:77 | GeorgettVar['TalkChurchAfterCermon']=0
+- InitGeorgett.txt:78 | GeorgettVar['TalkChurchAfterCermonLiza']=0
+- InitGeorgett.txt:80 | GeorgettVar['GloryHoleExplained']=0
+- InitGeorgett.txt:81 | GeorgettVar['GloryHoleAgreed']=0
+- InitGeorgett.txt:83 | ------------ End of location: "InitGeorgett" ------------
+- InitLiza.txt:61 | LizaVar['TalkChurchAfterCermonGeorgett']=0
+- InitSecondaryNPC.txt:18 | EddieVar['SawWithGeorgett']=0
+- InitSecondaryNPC.txt:19 | EddieVar['TalkedAboutGeorgett']=0
+- IntAmandaDressChange.txt:10 | if $CurrentLoc['georgett']<>'TavernMain' and RandVar=3 :RandVar=Rand(5,7)
+- IntBeckyGuest.txt:123 | gs 'GeorgettBeckyVisit'
+- IntBeckyGuest.txt:170 | gs 'GeorgettBeckyVisit'
+- IntBeckyTalk.txt:135 | gs 'Menu.AddCondition','MenuBeckyTalk', "Result=IIF(EddieVar['TalkedAboutGeorgett']>0 and BeckyVar['husbandtalk']>0 and BeckyVar['eddietalk']>0 and Friends[$GirlName]>8 and Talked[$GirlName]<2,-1,0)"
+- IntEddieTalk.txt:26 | "Рассказать Эдди о том, что у вас теперь работают девочки." if Friends.get(GirlName, 0) >= 5 and CurrentLoc.get('georgett', '') == 'TavernMain' and EddieVar.get('TalkedAboutWhores', 0) == 0 and Talked.get(GirlName, 0) < 2:
+- IntEddieTalk.txt:33 | "Поинтересоваться у Эдди как ему ваши девочки." if Friends.get(GirlName, 0) >= 5 and CurrentLoc.get('georgett', '') == 'TavernMain' and EddieVar.get('SawWithGeorgett', 0) > 0 and EddieVar.get('TalkedAboutGeorgett', 0) == 0 and Talked.get(GirlName, 0) < 2:
+- IntEddieTalk.txt:37 | EddieVar['TalkedAboutGeorgett'] = 1
+- IntEddieTalk.txt:41 | "Предложить помочь подкатится к его мамаше." if Friends.get(GirlName, 0) >= 3 and BeckyVar.get('HomeSex', 0) > 0 and EddieVar.get('SawMomSex', 0) > 0 and EddieVar.get('SawWithGeorgett', 0) > 0 and BeckyVar.get('EddieTryToFuck', 0) != 1 and Talked.get(GirlName, 0) < 2:
+- IntGeorgettAfterCermon.txt:1 | Location: "IntGeorgettAfterCermon"
+- IntGeorgettAfterCermon.txt:6 | $GirlNameAC='georgett'
+- IntGeorgettAfterCermon.txt:8 | gS 'Menu.Create','AfterCermonGeorgett'
+- IntGeorgettAfterCermon.txt:10 | GS 'Menu.Add','AfterCermonGeorgett','Посмотреть',''
+- IntGeorgettAfterCermon.txt:11 | GS 'Menu.AddModule','AfterCermonGeorgett',{
+- IntGeorgettAfterCermon.txt:16 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:27 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=0 ,-1,0)"
+- IntGeorgettAfterCermon.txt:30 | GS 'Menu.Add','AfterCermonGeorgett','Посмотреть еще',''
+- IntGeorgettAfterCermon.txt:31 | GS 'Menu.AddModule','AfterCermonGeorgett',{
+- IntGeorgettAfterCermon.txt:34 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:45 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=1 ,-1,0)"
+- IntGeorgettAfterCermon.txt:48 | GS 'Menu.Add','AfterCermonGeorgett','Смотреть дальше',''
+- IntGeorgettAfterCermon.txt:49 | GS 'Menu.AddModule','AfterCermonGeorgett',{
+- IntGeorgettAfterCermon.txt:52 | if GeorgettVar['SawChurchAfterCermon']=0:
+- IntGeorgettAfterCermon.txt:64 | GeorgettVar['SawChurchAfterCermon']=1
+- IntGeorgettAfterCermon.txt:68 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=2 ,-1,0)"
+- IntGeorgettAfterCermon.txt:71 | GS 'Menu.Add','AfterCermonGeorgett','Смотреть не отрываясь',''
+- IntGeorgettAfterCermon.txt:72 | GS 'Menu.AddModule','AfterCermonGeorgett',{
+- IntGeorgettAfterCermon.txt:78 | if GeorgettVar['TalkChurchAfterCermonLiza']:
+- IntGeorgettAfterCermon.txt:93 | gs 'Menu.AddCondition','AfterCermonGeorgett', "Result=IIF(ChurchAfterCermon[$GirlNameAC]=3 ,-1,0)"
+- IntGeorgettAfterCermon.txt:94 | !GeorgettVar['SawChurchAfterCermon']
+- IntGeorgettAfterCermon.txt:96 | ------------ End of location: "IntGeorgettAfterCermon" ------------
+- IntGeorgettDressChange.txt:1 | Location: "IntGeorgettDressChange"
+- IntGeorgettDressChange.txt:6 | GS 'Menu.Add','MenuGeorgettTalk','Постыдить Жоржетту за то, что она ходит без лифчика',''
+- IntGeorgettDressChange.txt:7 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettDressChange.txt:11 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(Friends[$GirlNameIGT]>8 and  Talked[$GirlNameIGT]<2,-1,0)"
+- IntGeorgettDressChange.txt:13 | GS 'Menu.Add','MenuGeorgettTalk','Постыдить Жоржетту за отстутсвие панталон',''
+- IntGeorgettDressChange.txt:14 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettDressChange.txt:19 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(Friends[$GirlNameIGT]>8 and  Talked[$GirlNameIGT]<2,-1,0)"
+- IntGeorgettDressChange.txt:21 | GS 'Menu.Add','MenuGeorgettTalk','Предложить купить Жоржетте обновку',''
+- IntGeorgettDressChange.txt:22 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettDressChange.txt:28 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(Friends[$GirlNameIGT]>8 and func('CheckDailyEventExists','','BuyDressTom')=0 and func('CheckDailyEventExists',$GirlNameIGT,'BuyDress')=0 and Talked[$GirlNameIGT]<2 and week<>6,-1,0)"
+- IntGeorgettDressChange.txt:30 | ------------ End of location: "IntGeorgettDressChange" ------------
+- IntGeorgettSex.txt:1 | Location: "IntGeorgettSex"
+- IntGeorgettSex.txt:10 | GS 'Menu.Create','GeorgettMenuSex'
+- IntGeorgettSex.txt:11 | GS 'Menu.Add','GeorgettMenuSex','Осмотреть',''
+- IntGeorgettSex.txt:12 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:16 | GS 'Menu.Add','GeorgettMenuSex','Снять блузку',''
+- IntGeorgettSex.txt:17 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:24 | gs 'ShowGeorgettPortrait'
+- IntGeorgettSex.txt:26 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF($topdress[$GirlNameIGSS]>''  and SomebodyCums=0  ,-1,0)"
+- IntGeorgettSex.txt:28 | GS 'Menu.Add','GeorgettMenuSex','Растегнуть блузку',''
+- IntGeorgettSex.txt:29 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:36 | gs 'ShowGeorgettPortrait'
+- IntGeorgettSex.txt:38 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(($topdress[$GirlNameIGSS]>'' and topraised[$GirlNameIGSS]=0) and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:40 | GS 'Menu.Add','GeorgettMenuSex','Задрать юбочку',''
+- IntGeorgettSex.txt:41 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:47 | gs 'ShowGeorgettPortrait'
+- IntGeorgettSex.txt:49 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(($bottomdress[$GirlNameIGSS]>'' and bottomraised[$GirlNameIGSS]=0) and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:52 | GS 'Menu.Add','GeorgettMenuSex','Вытереть сперму с лица',''
+- IntGeorgettSex.txt:53 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:60 | gs 'ShowGeorgettPortrait'
+- IntGeorgettSex.txt:62 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF((CumFaceYou[$GirlNameIGSS] or CumFaceOthers[$GirlNameIGSS])  and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:64 | GS 'Menu.Add','GeorgettMenuSex','Вытереть сперму с грудей',''
+- IntGeorgettSex.txt:65 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:72 | gs 'ShowGeorgettPortrait'
+- IntGeorgettSex.txt:74 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF((CumTitsYou[$GirlNameIGSS] or CumTitsOthers[$GirlNameIGSS]) and TitsVisible[$GirlNameIGSS] and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:76 | GS 'Menu.Add','GeorgettMenuSex','Вытереть сперму с бедер',''
+- IntGeorgettSex.txt:77 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:84 | gs 'ShowGeorgettPortrait'
+- IntGeorgettSex.txt:86 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF((CumInsideYou[$GirlNameIGSS] or CumInsideOthers[$GirlNameIGSS]) and PussyVisible[$GirlNameIGSS] and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:90 | GS 'Menu.Add','GeorgettMenuSex','Целовать',''
+- IntGeorgettSex.txt:91 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:101 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:104 | GS 'Menu.Add','GeorgettMenuSex','Лапать',''
+- IntGeorgettSex.txt:105 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:136 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:138 | GS 'Menu.Add','GeorgettMenuSex','Лизать киску',''
+- IntGeorgettSex.txt:139 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:158 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF( PussyVisible[$GirlNameIGSS] and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:164 | GS 'Menu.Add','GeorgettMenuSex','Предложить отсосать',''
+- IntGeorgettSex.txt:165 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:190 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and SomebodyCums=0,-1,0)"
+- IntGeorgettSex.txt:193 | GS 'Menu.Add','GeorgettMenuSex','Трахать между грудей',''
+- IntGeorgettSex.txt:194 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:217 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and SomebodyCums=0 and Arousal['You']>=20 and TitsVisible[$GirlNameIGSS] and pregnancy[$GirlNameIGSS] <150 ,-1,0)"
+- IntGeorgettSex.txt:219 | GS 'Menu.Add','GeorgettMenuSex','Трахать',''
+- IntGeorgettSex.txt:220 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:256 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and SomebodyCums=0 and Arousal['You']>=20 and Arousal[$GirlNameIGSS]>=20 and PussyVisible[$GirlNameIGSS],-1,0)"
+- IntGeorgettSex.txt:263 | GS 'Menu.Add','GeorgettMenuSex','Кончить в ротик',''
+- IntGeorgettSex.txt:264 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:273 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and (CockInMouth[$GirlNameIGSS] or CockInTits[$GirlNameIGSS]),-1,0)"
+- IntGeorgettSex.txt:275 | GS 'Menu.Add','GeorgettMenuSex','Кончить на лицо',''
+- IntGeorgettSex.txt:276 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:285 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100,-1,0)"
+- IntGeorgettSex.txt:288 | GS 'Menu.Add','GeorgettMenuSex','Кончить на груди',''
+- IntGeorgettSex.txt:289 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:297 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and TitsVisible[$GirlNameIGSS],-1,0)"
+- IntGeorgettSex.txt:300 | GS 'Menu.Add','GeorgettMenuSex','Кончить внутрь',''
+- IntGeorgettSex.txt:301 | GS 'Menu.AddModule','GeorgettMenuSex',{
+- IntGeorgettSex.txt:312 | gs 'Menu.AddCondition','GeorgettMenuSex', "Result=IIF(cametoday<cancumdaily and Arousal['You']>=100 and CockInPussy[$GirlNameIGSS],-1,0)"
+- IntGeorgettSex.txt:318 | ------------ End of location: "IntGeorgettSex" ------------
+- IntGeorgettTalk.txt:1 | Location: "IntGeorgettTalk"
+- IntGeorgettTalk.txt:8 | gS 'Menu.Create','MenuGeorgettTalk'
+- IntGeorgettTalk.txt:9 | GS 'Menu.Add','MenuGeorgettTalk','Осмотреть',''
+- IntGeorgettTalk.txt:10 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:14 | GS 'Menu.Add','MenuGeorgettTalk','Болтать',''
+- IntGeorgettTalk.txt:15 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:31 | GS 'Menu.Add','MenuGeorgettTalk','Спросить о клиентах',''
+- IntGeorgettTalk.txt:32 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:34 | if GeorgettVar['askclients']=0:
+- IntGeorgettTalk.txt:36 | GeorgettVar['askclients']=1
+- IntGeorgettTalk.txt:41 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['seeclients'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 ,-1,0)"
+- IntGeorgettTalk.txt:43 | GS 'Menu.Add','MenuGeorgettTalk','Спросить о сексе',''
+- IntGeorgettTalk.txt:44 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:46 | if GeorgettVar['asksex']=0:
+- IntGeorgettTalk.txt:48 | GeorgettVar['asksex']=1
+- IntGeorgettTalk.txt:53 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['askclients'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=3 ,-1,0)"
+- IntGeorgettTalk.txt:55 | GS 'Menu.Add','MenuGeorgettTalk','Спросить о семье',''
+- IntGeorgettTalk.txt:56 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:58 | if GeorgettVar['askparents']=0:
+- IntGeorgettTalk.txt:60 | GeorgettVar['askparents']=1
+- IntGeorgettTalk.txt:65 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['asksex'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=4 ,-1,0)"
+- IntGeorgettTalk.txt:67 | GS 'Menu.Add','MenuGeorgettTalk','Спросить о беременности',''
+- IntGeorgettTalk.txt:68 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:70 | if GeorgettVar['askpregnancy']=0:
+- IntGeorgettTalk.txt:72 | GeorgettVar['askpregnancy']=1
+- IntGeorgettTalk.txt:77 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['askparents'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=4 ,-1,0)"
+- IntGeorgettTalk.txt:79 | GS 'Menu.Add','MenuGeorgettTalk','Спросить о детях',''
+- IntGeorgettTalk.txt:80 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:87 | if GeorgettVar['askkids']=0:
+- IntGeorgettTalk.txt:89 | GeorgettVar['askkids']=1
+- IntGeorgettTalk.txt:94 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['askpregnancy'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and GiveOrgasms[$GirlNameIGT]>=5 ,-1,0)"
+- IntGeorgettTalk.txt:96 | GS 'Menu.Add','MenuGeorgettTalk','Спросить об отце Герхарде',''
+- IntGeorgettTalk.txt:97 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:99 | if GeorgettVar['TalkChurchAfterCermon']=0:
+- IntGeorgettTalk.txt:101 | GeorgettVar['TalkChurchAfterCermon']=1
+- IntGeorgettTalk.txt:106 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(GeorgettVar['SawChurchAfterCermon'] and Talked[$GirlNameIGT]<2  ,-1,0)"
+- IntGeorgettTalk.txt:109 | GS 'Menu.Add','MenuGeorgettTalk','Рассказать про Лизетту и отца Герхарда',''
+- IntGeorgettTalk.txt:110 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:111 | if GeorgettVar['TalkChurchAfterCermonLiza']=0:
+- IntGeorgettTalk.txt:115 | GeorgettVar['TalkChurchAfterCermonLiza']=1
+- IntGeorgettTalk.txt:123 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(LizaVar['SawChurchAfterCermon'] and Talked[$GirlNameIGT]<2 ,-1,0)"
+- IntGeorgettTalk.txt:126 | GS 'Menu.Add','MenuGeorgettTalk','Предложить работать у себя в трактире',''
+- IntGeorgettTalk.txt:127 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:137 | $CurrentLoc['georgett']='TavernMain'
+- IntGeorgettTalk.txt:139 | jobWhoreAvail['georgett']=1
+- IntGeorgettTalk.txt:140 | jobwhore['georgett']=1
+- IntGeorgettTalk.txt:148 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(AlberVar['talkedaboutliza'] and Talked[$GirlNameIGT]<2 and Friends[$GirlNameIGT]>=7 and $CurrentLoc[$GirlNameIGT]='PortStreets' ,-1,0)"
+- IntGeorgettTalk.txt:150 | GS 'Menu.Add','MenuGeorgettTalk','Спросить как работается у вас в трактире',''
+- IntGeorgettTalk.txt:151 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:155 | elseif GeorgettVar['GloryHoleExplained']=1:
+- IntGeorgettTalk.txt:162 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 ,-1,0)"
+- IntGeorgettTalk.txt:164 | GS 'Menu.Add','MenuGeorgettTalk','Спросить про работу в "Пьяном Пирате"',''
+- IntGeorgettTalk.txt:165 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:168 | GeorgettVar['GloryHoleExplained']=1
+- IntGeorgettTalk.txt:171 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 and LizaVar['GloryHoleAsked']=1 and GeorgettVar['GloryHoleExplained']=0,-1,0)"
+- IntGeorgettTalk.txt:173 | GS 'Menu.Add','MenuGeorgettTalk','Договорится об условиях работы у глорихола',''
+- IntGeorgettTalk.txt:174 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:177 | GeorgettVar['GloryHoleAgreed']=1
+- IntGeorgettTalk.txt:178 | jobGloryHoleAvail['georgett']=1
+- IntGeorgettTalk.txt:182 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(jobWhoreAvail[$GirlNameIGT] and Talked[$GirlNameIGT]<2 and TavernGloryHole=2 and GeorgettVar['GloryHoleAgreed']=0,-1,0)"
+- IntGeorgettTalk.txt:184 | GS 'Menu.Add','MenuGeorgettTalk','Обсудить Эдди',''
+- IntGeorgettTalk.txt:185 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:189 | GeorgettVar['TellAboutEddieMomSex']=1
+- IntGeorgettTalk.txt:196 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(((GeorgettVar['TellAboutEddieMomSex']=0 and (BeckyVar['EddieTryToFuck']=4 or BeckyVar['visitedhome']>=7)) or (BeckyVar['EddieGeorg']=0 and EddieVar['TalkedAboutGeorgett']=1 and BeckyVar['visitedhome']>=3 and (EddieVar['SawMomSex']>0 or BeckyVar['HomeSex']>0)) ) and Talked[$GirlNameIGT]<2,-1,0)"
+- IntGeorgettTalk.txt:198 | GS 'Menu.Add','MenuGeorgettTalk','Предложить Жоржетте проспонсировать ее визит к Эдди домой',''
+- IntGeorgettTalk.txt:199 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:216 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(BeckyVar['EddieGeorg']>0 and BeckyVar['EddieWhoreHome']=0 and (money>25 or (BeckyVar['EddieGeorg']>1 and money>10)) and Talked[$GirlNameIGT]<2,-1,0)"
+- IntGeorgettTalk.txt:218 | GS 'Menu.Add','MenuGeorgettTalk','Спросить, не приходил ли Эдди',''
+- IntGeorgettTalk.txt:219 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:261 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(BeckyVar['EddieGeorg']>0 and time<=3,-1,0)"
+- IntGeorgettTalk.txt:265 | GS 'Menu.Add','MenuGeorgettTalk','Снять',''
+- IntGeorgettTalk.txt:266 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:269 | gt 'SexProstTavern',1, 'georgett'
+- IntGeorgettTalk.txt:272 | gt 'SexPort',1, 'georgett'
+- IntGeorgettTalk.txt:275 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF((money>=8 or (money>=4 and $GirlLocIGT='tavern')) and cametoday<cancumdaily ,-1,0)"
+- IntGeorgettTalk.txt:277 | GS 'Menu.Add','MenuGeorgettTalk','Лапать',''
+- IntGeorgettTalk.txt:278 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:297 | GS 'Menu.Add','MenuGeorgettTalk','Поинтересоваться, знает ли она от кого залетела',''
+- IntGeorgettTalk.txt:298 | GS 'Menu.AddModule','MenuGeorgettTalk',{
+- IntGeorgettTalk.txt:302 | gs 'Menu.AddCondition','MenuGeorgettTalk', "Result=IIF(Talked[$GirlNameIGT]<2  and Friends[$GirlNameIGT]>=8 and pregnancy[$GirlNameIGT]>=120 ,-1,0)"
+- IntGeorgettTalk.txt:306 | gs 'IntGeorgettDressChange'
+- IntGeorgettTalk.txt:309 | ------------ End of location: "IntGeorgettTalk" ------------
+- IntLizaTalk.txt:72 | if LizaVar.get('TalkChurchAfterCermonGeorgett', 0) == 0:
+- IntLizaTalk.txt:74 | LizaVar['TalkChurchAfterCermonGeorgett'] = 1
+- IntLizettAfterCermon.txt:110 | if LizaVar['TalkChurchAfterCermonGeorgett']:
+- Intro.txt:85 | $AllGirlNames[3]='georgett'
+- KidsFunctions.txt:17 | if $MomName='liza' or $MomName='georgett':
+- KidsFunctions.txt:80 | if $MomName='georgett' or $MomName='liza':
+- KidsFunctions.txt:81 | gs 'Table.DeleteLines','TodaySexEvents', 'GirlName','=','georgett'
+- KidsFunctions.txt:96 | if $MomName='liza' or $MomName='georgett':
+- KidsFunctions.txt:97 | if $CurrentLoc['georgett']='TavernMain':
+- menu_tavernstat.txt:28 | if jobWhoreAvail['georgett']=1:
+- menu_tavernstat.txt:107 | $GirlMenuName='MenuGeorgettJob'
+- menu_tavernstat.txt:112 | gs 'GirlsDesc','georgett'
+- menu_tavernstat.txt:117 | jobgloryholeTommorow['georgett']=1
+- menu_tavernstat.txt:118 | jobwhoreTommorow['georgett']=0
+- menu_tavernstat.txt:121 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobGloryHoleAvail['georgett'] and jobgloryholeTommorow['georgett']=0 and func('GloryHoleBusy','georgett')=0,-1,0)"
+- menu_tavernstat.txt:126 | jobgloryholeTommorow['georgett']=0
+- menu_tavernstat.txt:127 | jobwhoreTommorow['georgett']=1
+- menu_tavernstat.txt:130 | gs 'Menu.AddCondition',$GirlMenuName, "Result=IIF(jobWhoreAvail['georgett'] and jobwhoreTommorow['georgett']=0,-1,0)"
+- menu_tavernstat.txt:166 | if jobWhoreAvail['georgett']:
+- menu_tavernstat.txt:167 | pl '<a href="exec: GS ''Menu.Call'',''MenuGeorgettJob''">Жоржетта</a>'
+- MomDressComplaint.txt:22 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- MomDressComplaint.txt:36 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:104 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:134 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:150 | if $CurrentLoc['georgett']='TavernMain':
+- MomDressComplaint.txt:157 | if $CurrentLoc['georgett']='TavernMain' and $GirlName='amanda':
+- NextDay_FinishDayEvents.txt:6 | if GeorgettVar['TalkChurchAfterCermonLiza'] and LizaVar['ProstStart']=0: LizaVar['ProstStart']=1
+- NextDay_FinishDayEvents.txt:24 | if $tmpArray['GirlName']='georgett' and tmpArray['EventType']=99 and $tmpArray['Place']='Prostitution':
+- NextDay_FinishDayEvents.txt:26 | elseif $tmpArray['GirlName']='georgett' and $tmpArray['Place']='EddieHomeVisit':
+- NextDay_NewDayEvents.txt:12 | !EddieGeorg -0-no idea, 1-georgetta will offer for first time time or less, 2 - second time or more
+- NextDay_NewDayEvents.txt:35 | gs 'Table.NewLine', 'TodaySexEvents', 'georgett', 3, 99, 'Prostitution'
+- NextDay_NewDayEvents.txt:37 | elseif EddieVar['TalkedAboutWhores']=1 and $CurrentLoc['georgett']='TavernMain':
+- NextDay_NewDayEvents.txt:39 | gs 'Table.NewLine', 'TodaySexEvents', 'georgett', 3, 99, 'Prostitution'
+- NextDay_NewDayEvents.txt:44 | gs 'Table.NewLine', 'TodaySexEvents', 'georgett', 99, 99, 'EddieHomeVisit'
+- NextDay_NewDayEvents.txt:64 | if BeckyVar['visitedhome']>=7 and Rand(1,3)<=2 and dyneval($CheckIfEventAlreadyExist,'georgett', 99)<=0:
+- NextDay_NewDayEvents.txt:70 | if GeorgettVar['churchgeorgettadmit']>0: gs 'Table.NewLine', 'TodaySexEvents', 'georgett', 99, 99, 'Priest'
+- NextDay_NewDayEvents.txt:71 | if GeorgettVar['churchlizaadmit']>0: gs 'Table.NewLine', 'TodaySexEvents', 'liza', 99, 99, 'Priest'
+- NextDay_NewDayEvents.txt:133 | gs 'WhoreNextDayClients', 'georgett',5, tavernvisitors/6
+- NextDay_TavernDaily.txt:97 | jobwhore['georgett']=0
+- NextDay_TavernDaily.txt:98 | jobgloryhole['georgett']=0
+- NextDay_TavernDaily.txt:101 | gs 'ChangeTommorowWhoreJob', 'georgett'
+- NextDay.txt:39 | TotalDay['whorerevenue']=TotalWhoreClients['georgett']*3+TotalWhoreClients['liza']*3
+- NextDay.txt:40 | TotalDay['gloryholerevenue']=TotalGloryHoleClients['georgett']*2+TotalGloryHoleClients['liza']*2
+- NextDay.txt:112 | $GirlName='georgett'
+- NextDay.txt:127 | $GirlName='georgett'
+- NextDay.txt:191 | GeorgettVar['foundinchurch']=0
+- PortStreets.txt:9 | $GirlNamePS1='georgett'
+- PortStreets.txt:18 | if $CurrentLoc[$GirlNamePS1]=$CurLoc and time=3 and week<>5 and No(GeorgettVar['TalkChurchAfterCermonLiza']!0 and LizaVar['ProstStart']=0):
+- PortStreets.txt:24 | gs 'ShowImage', 'georgett', 'port', 'wait'
+- PortStreets.txt:29 | gs 'IntGeorgettTalk', $GirlNamePS1
+- PortStreets.txt:37 | act 'Пойти проверить подворотню':gt 'StreetClients',1, 'georgett'
+- PortStreets.txt:39 | 'На углу стоит <a href="exec: GS ''Menu.Call'',''MenuGeorgettTalk''">Жоржетта</a> и ждет клиентов. А вот ее старшую дочку, судя по всему, уже кто-то снял.'
+- PortStreets.txt:40 | gs 'ShowImage', 'georgett', 'port', 'lizaminet'
+- PortStreets.txt:43 | 'На углу стоит <a href="exec: GS ''Menu.Call'',''MenuGeorgettTalk''">Жоржетта</a> со своей дочкой <a href="exec: GS ''Menu.Call'',''MenuLizaTalk''">Лизеттой</a> и ждут клиентов.'
+- PortStreets.txt:48 | if HadSex[$GirlNamePS1]>0: act 'Пойти проверить подворотню':gt 'StreetClients',1, 'georgett'
+- PortStreets.txt:50 | 'На углу стоит <a href="exec: GS ''Menu.Call'',''MenuGeorgettTalk''">Жоржетта</a> и ждет клиентов.'
+- PortStreets.txt:51 | gs 'ShowImage', 'georgett', 'port', 'wait'
+- PortStreets.txt:57 | gs 'ShowImageSeq', 'georgett', 'port', 'port',3
+- SexPort.txt:10 | if $GirlNameSP='georgett':
+- SexPort.txt:12 | gs 'IntGeorgettSex',$GirlNameSP
+- SexPort.txt:23 | if $GirlNameSP='georgett':
+- SexPort.txt:24 | 'Вы находитесь в переулке. Рядом с вами страстная <a href="exec: GS ''Menu.Call'',''GeorgettMenuSex''">Жоржетта</a>.'
+- SexProstTavern.txt:10 | if $GirlNameSP='georgett':
+- SexProstTavern.txt:12 | gs 'IntGeorgettSex',$GirlNameSP, 'tavern'
+- SexProstTavern.txt:23 | if $GirlNameSP='georgett':
+- SexProstTavern.txt:24 | 'Вы находитесь в скромно обставленной комнате вашего трактира. Вместе с вами в ней страстная <a href="exec: GS ''Menu.Call'',''GeorgettMenuSex''">Жоржетта</a>.'
+- ShowCurrentSex.txt:10 | if (no($GirlNameSCS='georgett' and $GirlLocIGSS<>'tavern')) and (no($GirlNameSCS='amanda' and $GirlLocASDS='street')):
+- ShowCurrentSex.txt:75 | if $GirlNameSCS='georgett':
+- ShowGeorgettPortrait.txt:1 | Location: "ShowGeorgettPortrait"
+- ShowGeorgettPortrait.txt:6 | $GirlName='georgett'
+- ShowGeorgettPortrait.txt:29 | ------------ End of location: "ShowGeorgettPortrait" ------------
+- StolyarWorkshop.txt:57 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['HoleAsked']=0 and TavernHole=0,-1,0)"
+- StolyarWorkshop.txt:68 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['HoleAsked']>0 and TavernHole=0 and money>=100 and  time=0,-1,0)"
+- StolyarWorkshop.txt:77 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['GloryHoleAsked']=0 and TavernGloryHole=0 and GeorgettVar['GloryHoleExplained']=1,-1,0)"
+- StolyarWorkshop.txt:88 | gs 'Menu.AddCondition','DraupnirShop', "Result=IIF(jobWhoreAvail['georgett'] and DraupnirVar['GloryHoleAsked']>0 and TavernGloryHole=0 and money>=700 and  time=0,-1,0)"
+- StreetClients.txt:40 | GeorgettVar['seeclients']=1
+- TavernGloryHole.txt:208 | if $GirlNameTGH='georgett' and GloryHoleWorks:
+- TavernGloryHole.txt:209 | gs 'ShowImageSeq', 'georgett', 'glory', 'glory',2
+- TavernMain.txt:12 | GeorgettAvail=0
+- TavernMain.txt:31 | $GirlNameTS1='georgett'
+- TavernMain.txt:58 | gs 'IntGeorgettTalk', $GirlNameTS1, 'tavern'
+- TavernMain.txt:60 | if jobwhore['liza']=1 and jobwhore['georgett']=1:
+- TavernMain.txt:66 | act 'Пойти проверить отдельную комнату':gt 'TavernProstClients',1, 'georgett'
+- TavernMain.txt:69 | 'В правом углу трактира сидит <a href="exec: GS ''Menu.Call'',''MenuGeorgettTalk''">Жоржетта</a> и ждет клиентов. А вот ее старшую дочку, судя по всему, уже кто-то снял.'
+- TavernMain.txt:70 | GeorgettAvail=1
+- TavernMain.txt:75 | 'В правом углу трактира сидят <a href="exec: GS ''Menu.Call'',''MenuGeorgettTalk''">Жоржетта</a> со своей дочкой <a href="exec: GS ''Menu.Call'',''MenuLizaTalk''">Лизеттой</a> и ждут клиентов.'
+- TavernMain.txt:77 | GeorgettAvail=1
+- TavernMain.txt:90 | elseif jobwhore['georgett']=1:
+- TavernMain.txt:95 | act 'Пойти проверить отдельную комнату':gt 'TavernProstClients',1, 'georgett'
+- TavernMain.txt:98 | 'В правом углу трактира сидит <a href="exec: GS ''Menu.Call'',''MenuGeorgettTalk''">Жоржетта</a> и ждет клиентов.'
+- TavernMain.txt:99 | GeorgettAvail=1
+- TavernMain.txt:138 | if GeorgettAvail=1: dynamic $DescribeBreastFeeding, 'georgett'
+- TavernMain.txt:141 | if $CurrentLoc['georgett']='TavernMain':
+- TavernMain.txt:142 | dynamic $ShowFullKidsListByAge, 'sandra','amanda','melissa','georgett','liza'
+- TavernMain.txt:146 | if GeorgettAvail=1 or ($CurrentLoc['georgett']=$CurLoc and time<2): gs 'CheckDailyEvent', 'georgett'
+- TavernProstClients.txt:35 | GeorgettVar['seeclients']=1
+- TavernProstClients.txt:51 | if EddieVar['SawWithGeorgett']=0:
+- TavernProstClients.txt:53 | EddieVar['SawWithGeorgett']=1
+- TavernShowImage.txt:9 | if RandVar=5 and jobwhore['georgett']=0: jump ImageTavernLoop
+- TavernShowImage.txt:20 | gs 'ShowImage', 'georgett', 'tavern', 'waitress' + Rand(1,4) }
+- ZaletOpinionCalc.txt:152 | elseif $args[0]='georgett' and lcase($args[1])='вы':

@@ -1,0 +1,109 @@
+{
+  "id": "sandra",
+  "display_name": "Sandra",
+  "role": "primary",
+  "inventory": [],
+  "schedule": {
+    "weekday": [
+      "sandra_room",
+      "sandra_room",
+      "sandra_room",
+      "sandra_room",
+      "sandra_room",
+      "sandra_room",
+      "MC_room",
+      "MC_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "becky_home",
+      "becky_home",
+      "sandra_room",
+      "sandra_room",
+      "tavern_main",
+      "tavern_main"
+    ],
+    "weekend": [
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "kitchen_room",
+      "becky_home",
+      "becky_home",
+      "becky_home",
+      "tavern_main",
+      "tavern_main",
+      "tavern_main"
+    ]
+  },
+  "source_files": [
+    "Inn/Intro.txt"
+  ],
+  "stats": {
+    "kids": 0,
+    "beauty": 65,
+    "sluttiness": 20,
+    "sexacts": 4352,
+    "cum_inside": 2593,
+    "pregnancy": 0,
+    "conception_chance": 5,
+    "pussy_wet_start": 20
+  },
+  "skills": {
+    "cooking": 90,
+    "cleaning": 70,
+    "waitress": 20
+  },
+  "jobs": {
+    "kitchen": 1,
+    "cleaning": 0,
+    "waitress": 0,
+    "hall_available": 1,
+    "whore_available": 0,
+    "kitchenJobTomorrow": 0,
+    "cleaningJobTomorrow": 0,
+    "waitressJobTomorrow": 0,
+    "jobwhoreTomorrow": 0,
+    "jobgloryholeTomorrow": 0,
+    "whore": 0,
+    "gloryhole": 0
+  },
+  "default_clothing": {
+    "dress": "workdreswest",
+    "bra": "simplebra",
+    "panties": "simplepanties",
+    "legs": "",
+    "shoes": "simpleshoes"
+  },
+  "relationships": {
+    "player_friendship": 5
+  },
+  "custom": {
+    "notes": "Sandra works kitchen 8-18 weekdays, visits Becky evenings,some time Weekends, Fridays in own room or out, Sundays church AM, occasional MC room Saturday morning."
+  },
+  "age": 34,
+  "current_location": "TavernMain",
+  "virgin": false,
+  "description": "Your tavern keeper Sandra is a woman in her prime. She has dark hair, green eyes, and full breasts,with pear shaped figure.She walks with confidence and grace.Auntie of two beautiful nieces,Amanda and Melissa."
+}

@@ -1,0 +1,342 @@
+# Full Logic Map: Ирма
+
+Source: only `game/Inn/*.txt` (authoritative content).
+
+## Scope Summary
+- Character id: irma
+- Tokens used for discovery: irma, IrmaVar
+- Reference files count: 10
+- Matched lines count: 44
+
+## Reference Files
+- DressShop.txt => Location: DressShop
+- DressTry.txt => Location: DressTry
+- GirlDressBuy.txt => Location: GirlDressBuy
+- GirlDressSuggest.txt => Location: GirlDressSuggest
+- GirlsDesc.txt => Location: GirlsDesc
+- GirlSuggestDressFunc.txt => Location: GirlSuggestDressFunc
+- InitIrma.txt => Location: InitIrma
+- Intro.txt => Location: Intro
+- IrmaShortStories.txt => Location: IrmaShortStories
+- NextDay.txt => Location: NextDay
+
+## Action Logic (menus/acts)
+- DressShop.txt:21 | GS 'Menu.Add','TalkDressShop','Осмотреть',''
+- DressShop.txt:25 | GS 'Menu.Add','TalkDressShop','Спросить, когда будет готово',''
+- DressShop.txt:48 | act 'Вернуться в квартал ремесленников':gt 'ArtisansQuarter'
+- DressTry.txt:11 | act 'Промолчать и оплатить':
+- DressTry.txt:17 | act 'Одеться и уйти':gt 'ArtisansQuarter'
+- DressTry.txt:20 | act 'Возмутиться':
+- DressTry.txt:26 | act 'Одеться и уйти':gt 'ArtisansQuarter'
+- DressTry.txt:38 | GS 'Menu.Add','DressTryMeMenu','Раздеться до белья',''
+- DressTry.txt:42 | act 'Одеться и уйти':gt 'ArtisansQuarter'
+- DressTry.txt:46 | GS 'Menu.Add','DressTryMeMenu','Полностью раздется и думать о высоком',''
+- DressTry.txt:50 | act 'Одеться и уйти':gt 'ArtisansQuarter'
+- DressTry.txt:55 | GS 'Menu.Add','DressTryMeMenu','Полностью раздется и представить, как вы имеете Ирму',''
+- DressTry.txt:62 | act 'Одеться и уйти':gt 'ArtisansQuarter'
+- DressTry.txt:66 | act 'Кончить на лицо':
+- DressTry.txt:70 | act 'Кончить в рот':
+- GirlDressBuy.txt:19 | GS 'Menu.Add','MenuDressGirlBuy','Осмотреть портниху',''
+- GirlDressBuy.txt:23 | GS 'Menu.Add','MenuDressGirlBuy','Посмотреть во что одета <<$RealName[$GirlName]>>',''
+- GirlDressBuy.txt:43 | act 'Уйти из лавки':
+- GirlDressBuy.txt:48 | act 'Ну мало ли что на ком и где я обещал!':
+- GirlDressBuy.txt:55 | act 'Ну если ты так считаешь...':
+- GirlSuggestDressFunc.txt:34 | act 'Подождать, пока Ирма снимет мерку':
+- GirlSuggestDressFunc.txt:40 | act 'Пройти вместе с девушками за занавеску':
+- GirlSuggestDressFunc.txt:55 | act 'Попросить разрешить вам остаться':
+- GirlSuggestDressFunc.txt:75 | act 'Покаяться и заплатить':
+- GirlSuggestDressFunc.txt:93 | act 'Предложить снять мерку прямо на месте':
+- GirlSuggestDressFunc.txt:119 | act 'Продолжить смотреть':
+- GirlSuggestDressFunc.txt:126 | act 'Подрочить на <<iif(DressBuyIsRelative=1,''маму'',iif(DressBuyIsRelative=2,''сестру'',''зрелище''  ))>>':
+- GirlSuggestDressFunc.txt:144 | act 'Пойти и подождать':
+- GirlSuggestDressFunc.txt:150 | act 'Предложить на чай 10 мараведи':
+- GirlSuggestDressFunc.txt:185 | act 'Продолжить свое грязное занятие':
+- Intro.txt:150 | act 'Приступить к управлению трактиром':
+- NextDay.txt:225 | act 'Начать сначала':gt 'Intro'
+- NextDay.txt:227 | act 'Вернуться':gt $retlocname
+
+## Condition Gates
+- DressShop.txt:7 | if (week = 7 or time>=3):
+- DressShop.txt:11 | if $DressProduced='':
+- DressShop.txt:31 | gs 'Menu.AddCondition','TalkDressShop', "Result=IIF($DressProduced>'' ,-1,0)"
+- DressShop.txt:42 | gs ''Menu.AddCondition'',''TalkDressShop'', "Result=IIF(money >= ' + DressCost[$CurDressName] +' and Func(''HasThisDress'', ''MyDresses'',''' + $CurDressName + ''')=0 and $DressProduced='''',-1,0)"
+- DressShop.txt:45 | if MenuDressCounter<arrsize('$MaleDressCodes'): jump 'loopdressshoptalk'
+- DressTry.txt:10 | if money>=20:
+- DressTry.txt:44 | gs 'Menu.AddCondition','DressTryMeMenu', "Result=IIF(DressTryStep=0 ,-1,0)"
+- DressTry.txt:53 | gs 'Menu.AddCondition','DressTryMeMenu', "Result=IIF(DressTryStep=0 and HadSex['You']>=3,-1,0)"
+- DressTry.txt:58 | if friends['irma']<3 or cametoday>=cancumdaily or IrmaVar['DeniedMinetMoney']=1:
+- DressTry.txt:77 | gs 'Menu.AddCondition','DressTryMeMenu', "Result=IIF(DressTryStep=0 and HadSex['You']>=5 and cametoday<cancumdaily,-1,0)"
+- GirlDressBuy.txt:32 | if $CurDressName<>'nightshirt':
+- GirlDressBuy.txt:37 | gs ''Menu.AddCondition'',''MenuDressGirlBuy'', "Result=IIF(money >= ' + DressCost[$CurDressName] +' and Func(''HasThisDress'', ''<<$GirlName>>Dresses'',''' + $CurDressName + ''')=0 and $DressProduced='''' and GirlDressBlock=0,-1,0)"
+- GirlDressBuy.txt:44 | if GirlDressesBought=0:
+- GirlDressSuggest.txt:9 | if $GirlName='sandra':DressBuyIsRelative=1
+- GirlDressSuggest.txt:10 | if $GirlName='melissa' or $GirlName='amanda':DressBuyIsRelative=2
+- GirlDressSuggest.txt:18 | if (sluttiness[$GirlName] >25 and HadSex[$GirlName]>1 and Friends[$GirlName]>10) or (sluttiness[$GirlName] >33 and HadSex[$GirlName]>0 and Friends[$GirlName]>5) : ShowOffLevel=1
+- GirlDressSuggest.txt:19 | if (sluttiness[$GirlName] >35 and HadSex[$GirlName]>3 and Friends[$GirlName]>10) or (sluttiness[$GirlName] >47 and HadSex[$GirlName]>0 and Friends[$GirlName]>5) : ShowOffLevel=2
+- GirlDressSuggest.txt:20 | if (sluttiness[$GirlName] >55  and HadSex[$GirlName]>0) or sluttiness[$GirlName] >65: ShowOffLevel=3
+- GirlDressSuggest.txt:21 | if $GirlName='georgett': ShowOffLevel=3
+- GirlDressSuggest.txt:23 | if strcomp(lcase($DressToBuy),'.*bra.*'):
+- GirlDressSuggest.txt:24 | if $GirlName='georgett':
+- GirlDressSuggest.txt:26 | elseif $GirlName='liza':
+- GirlDressSuggest.txt:31 | elseif strcomp(lcase($DressToBuy),'.*panties.*'):
+- GirlDressSuggest.txt:32 | if $GirlName='georgett':
+- GirlDressSuggest.txt:37 | elseif strcomp(lcase($DressToBuy),'.*stockings.*') :
+- GirlDressSuggest.txt:38 | if sluttiness[$GirlName] <15:
+- GirlDressSuggest.txt:40 | elseif ShowOffLevel>1:
+- GirlDressSuggest.txt:41 | if $legsdef[$GirlName]>'':
+- GirlDressSuggest.txt:43 | if $panties[$GirlName]>'':
+- GirlDressSuggest.txt:50 | if $panties[$GirlName]>'':
+- GirlDressSuggest.txt:57 | if DressBuyIsRelative=1:
+- GirlDressSuggest.txt:59 | elseif DressBuyIsRelative=2:
+- GirlDressSuggest.txt:86 | if sluttiness[$GirlName] <40 and DressPartSlut[$DressTopPart[$DressToBuy]]>=5:
+- GirlDressSuggest.txt:88 | elseif sluttiness[$GirlName] <20 and DressPartSlut[$DressTopPart[$DressToBuy]]>=3:
+- GirlDressSuggest.txt:90 | elseif sluttiness[$GirlName] <10 and DressPartSlut[$DressTopPart[$DressToBuy]]>=2:
+- GirlDressSuggest.txt:92 | elseif sluttiness[$GirlName] <55 and DressPartSlut[$DressBottomPart[$DressToBuy]]>=5:
+- GirlDressSuggest.txt:94 | elseif sluttiness[$GirlName] <35 and DressPartSlut[$DressBottomPart[$DressToBuy]]>=3:
+- GirlDressSuggest.txt:96 | elseif sluttiness[$GirlName] <20 and DressPartSlut[$DressBottomPart[$DressToBuy]]>=2:
+- GirlDressSuggest.txt:98 | elseif (sluttiness[$GirlName] >=35 and DressPartSlut[$DressTopPart[$DressToBuy]]<2) or (sluttiness[$GirlName] >=55 and DressPartSlut[$DressTopPart[$DressToBuy]]<3) or (sluttiness[$GirlName] >=70 and DressPartSlut[$DressTopPart[$DressToBuy]]<6) or  (sluttiness[$GirlName] >=45 and DressPartSlut[$DressBottomPart[$DressToBuy]]<2) or (sluttiness[$GirlName] >=60 and DressPartSlut[$DressBottomPart[$DressToBuy]]<3) or (sluttiness[$GirlName] >=75 and DressPartSlut[$DressBottomPart[$DressToBuy]]<6) :
+- GirlDressSuggest.txt:109 | if AgreeToWear>=1:
+- GirlsDesc.txt:14 | if $GirlNameGdsc='sandra':
+- GirlsDesc.txt:16 | elseif $GirlNameGdsc='melissa':
+- GirlsDesc.txt:18 | elseif $GirlNameGdsc='becky':
+- GirlsDesc.txt:20 | elseif $GirlNameGdsc='georgett':
+- GirlsDesc.txt:22 | elseif $GirlNameGdsc='liza':
+- GirlsDesc.txt:24 | elseif $GirlNameGdsc='amanda':
+- GirlsDesc.txt:26 | elseif $GirlNameGdsc='irma':
+- GirlsDesc.txt:34 | if  Lactate[$GirlNameGdsc]=1: $LactatedTitsDesc='Видно что груди <<$RealName2[$GirlNameGdsc]>> набухли, а соски увеличились. Ткань напротив них слегка промокла. '
+- GirlsDesc.txt:35 | if $topdress[$GirlNameGdsc]>'':
+- GirlsDesc.txt:37 | if $bra[$GirlNameGdsc]='':
+- GirlsDesc.txt:38 | if topraised[$GirlNameGdsc]:
+- GirlsDesc.txt:41 | if DressPartSlut[$topdress[$GirlNameGdsc]]=6:
+- GirlsDesc.txt:43 | elseif DressPartSlut[$topdress[$GirlNameGdsc]]=4:
+- GirlsDesc.txt:45 | elseif DressPartSlut[$topdress[$GirlNameGdsc]]=3:
+- GirlsDesc.txt:46 | if  Lactate[$GirlNameGdsc]=1: $LactatedTitsDesc='Видно что груди <<$RealName2[$GirlNameGdsc]>> набухли. '
+- GirlsDesc.txt:53 | if  Lactate[$GirlNameGdsc]=1: $LactatedTitsDesc='Видно что груди <<$RealName2[$GirlNameGdsc]>> набухли. '
+- GirlsDesc.txt:54 | if topraised[$GirlNameGdsc]:
+- GirlsDesc.txt:57 | if DressPartSlut[$topdress[$GirlNameGdsc]]>=4:
+- GirlsDesc.txt:59 | elseif DressPartSlut[$topdress[$GirlNameGdsc]]=3:
+- GirlsDesc.txt:66 | elseif $bra[$GirlNameGdsc]>'':
+- GirlsDesc.txt:71 | if $bottomdress[$GirlNameGdsc]>'' and $bottomdress[$GirlNameGdsc]<>'nightshirtbottom' :
+- GirlsDesc.txt:72 | if $topdress[$GirlNameGdsc]>'' or $bra[$GirlNameGdsc]>'' :
+- GirlsDesc.txt:79 | if bottomraised[$GirlNameGdsc]:
+- GirlsDesc.txt:80 | if DressPartSlut[$bottomdress[$GirlNameGdsc]]>=4:
+- GirlsDesc.txt:85 | if $panties[$GirlNameGdsc]='':
+- GirlsDesc.txt:91 | if $panties[$GirlNameGdsc]='':
+- GirlsDesc.txt:92 | if DressPartSlut[$bottomdress[$GirlNameGdsc]]=6:
+- GirlsDesc.txt:94 | elseif DressPartSlut[$bottomdress[$GirlNameGdsc]]=4:
+- GirlsDesc.txt:100 | if DressPartSlut[$bottomdress[$GirlNameGdsc]]=6:
+- GirlsDesc.txt:102 | elseif DressPartSlut[$bottomdress[$GirlNameGdsc]]=4:
+- GirlsDesc.txt:109 | elseif $panties[$GirlNameGdsc]>'' and $bottomdress[$GirlNameGdsc]<>'nightshirtbottom':
+- GirlsDesc.txt:110 | if $topdress[$GirlNameGdsc]>'' or $bra[$GirlNameGdsc]>'' :
+- GirlsDesc.txt:117 | if (bottomraised[$GirlNameGdsc] or $bottomdress[$GirlNameGdsc]='' or DressPartSlut[$bottomdress[$GirlNameGdsc]]>=4) and $legs[$GirlNameGdsc]>'':
+- GirlsDesc.txt:118 | if $legs[$GirlNameGdsc]>'':
+- GirlsDesc.txt:121 | if bottomraised[$GirlNameGdsc]=0 and $bottomdress[$GirlNameGdsc]>'' and DressPartSlut[$bottomdress[$GirlNameGdsc]]>=5:
+- GirlsDesc.txt:130 | if $shoes[$GirlNameGdsc]='simpleshoes':
+- GirlsDesc.txt:133 | if $shoes[$GirlNameGdsc]='highshoes':
+- GirlsDesc.txt:139 | if  Lactate[$GirlNameGdsc]=1:  $LactatedTitsDesc='Видно что сиськи <<$RealName2[$GirlNameGdsc]>> набухли от молока, а соски и ареолы увеличились. Капельки молока иногда выступают на сосочках. '
+- GirlsDesc.txt:141 | if TitsVisible[$GirlNameGdsc]:  pl 'Ее сиськи бесстыдно обнаженны. <<$LactatedTitsDesc>>'
+- GirlsDesc.txt:142 | if PussyVisible[$GirlNameGdsc]:  pl 'Ее влагалище ничем не прикрыто от нескромных взглядов.'
+- GirlsDesc.txt:144 | if CumFaceYou[$GirlNameGdsc]>0: pl 'На личике и волосах <<$RealName2[$GirlNameGdsc]>> видны крупные белые капли вашей спермы.'
+- GirlsDesc.txt:145 | if CumFaceYou[$GirlNameGdsc]=0 and CumFaceOthers[$GirlNameGdsc]>0: pl 'На личике и волосах <<$RealName2[$GirlNameGdsc]>> видны крупные белые капли чьей-то спермы. Шлюшка даже и не подумала их вытереть!'
+- GirlsDesc.txt:146 | if CumTitsYou[$GirlNameGdsc]>0 and TitsVisible[$GirlNameGdsc]: pl 'Груди <<$RealName2[$GirlNameGdsc]>> перемазанны в вашем семени.'
+- GirlsDesc.txt:147 | if CumTitsYou[$GirlNameGdsc]=0 and CumTitsOthers[$GirlNameGdsc]>0 and TitsVisible[$GirlNameGdsc]: pl 'Груди <<$RealName2[$GirlNameGdsc]>> перемазанны в чьем-то семени.'
+- GirlsDesc.txt:148 | if CumInsideYou[$GirlNameGdsc]>0 and PussyVisible[$GirlNameGdsc]: pl 'Из влагалища <<$RealName2[$GirlNameGdsc]>> медленно вытекает сперма.'
+- GirlsDesc.txt:149 | if CumInsideYou[$GirlNameGdsc]=0 and CumInsideOthers[$GirlNameGdsc]>0 and PussyVisible[$GirlNameGdsc]: pl 'Из влагалища <<$RealName2[$GirlNameGdsc]>> медленно вытекает сперма. Кто-то уже попробовал заделать ей ребеночка до вас.'
+- GirlsDesc.txt:150 | if CumInsideYou[$GirlNameGdsc]>0 and ShortSkirtNoPanties[$GirlNameGdsc]: pl 'Вы видите следы вашей спермы на не полностью прикрытых короткой юбочкой бедрах <<$RealName2[$GirlNameGdsc]>>. '
+- GirlsDesc.txt:151 | if CumInsideYou[$GirlNameGdsc]=0 and CumInsideOthers[$GirlNameGdsc] and ShortSkirtNoPanties[$GirlNameGdsc]: pl 'Вы видите следы чьей-то спермы на не полностью прикрытых короткой юбочкой бедрах <<$RealName2[$GirlNameGdsc]>>. '
+- GirlsDesc.txt:153 | if ($topdress[$GirlNameGdsc]='' or topraised[$GirlNameGdsc]) and pregnancy[$GirlNameGdsc]>=120:
+- GirlsDesc.txt:155 | elseif $topdress[$GirlNameGdsc]>'' and topraised[$GirlNameGdsc]=0 and DressPartSlut[$topdress[$GirlNameGdsc]]>=3 and pregnancy[$GirlNameGdsc]>=120:
+- GirlsDesc.txt:157 | elseif $topdress[$GirlNameGdsc]>'' and topraised[$GirlNameGdsc]=0 and DressPartSlut[$topdress[$GirlNameGdsc]]<3 and pregnancy[$GirlNameGdsc]>=180:
+- GirlsDesc.txt:161 | if Drunk[$GirlNameGdsc]>0:
+- GirlsDesc.txt:168 | if beauty[$GirlNameGdsc] <10:
+- GirlsDesc.txt:170 | elseif beauty[$GirlNameGdsc] <20:
+- GirlsDesc.txt:172 | elseif beauty[$GirlNameGdsc] <30:
+- GirlsDesc.txt:174 | elseif beauty[$GirlNameGdsc] <40:
+- GirlsDesc.txt:176 | elseif beauty[$GirlNameGdsc] <50:
+- GirlsDesc.txt:178 | elseif beauty[$GirlNameGdsc] <60:
+- GirlsDesc.txt:180 | elseif beauty[$GirlNameGdsc] <70:
+- GirlsDesc.txt:182 | elseif beauty[$GirlNameGdsc] <80:
+- GirlsDesc.txt:188 | if otkroven[$GirlNameGdsc]>=3:
+- GirlsDesc.txt:198 | if otkroven[$GirlNameGdsc]>=5:
+- GirlsDesc.txt:205 | if otkroven[$GirlNameGdsc]>=7:
+- GirlsDesc.txt:206 | If sexacts[$GirlNameGdsc]=0:
+- GirlsDesc.txt:208 | elseif virginity[$GirlNameGdsc]=1:
+- GirlsDesc.txt:218 | If pregnancy[$GirlNameGdsc]<120:
+- GirlsDesc.txt:221 | if DebugFlag: pl 'Она беременна на <<pregnancy[$GirlNameGdsc]/7>> неделе.'
+- GirlsDesc.txt:222 | if pregnancy[$GirlNameGdsc]>=210: pl '<<$RealName[$GirlNameGdsc]>> беременна и находится на позднем сроке. Ее живот красноречиво об этом свидетельствует.'
+- GirlsDesc.txt:223 | if pregnancy[$GirlNameGdsc]<210 and pregnancy[$GirlNameGdsc] >=150: pl 'Средних размеров беременный животик сексуально напоминает  о бурной личной жизни <<$RealName[$GirlNameGdsc]>>.'
+- GirlsDesc.txt:224 | if pregnancy[$GirlNameGdsc]>=120 and pregnancy[$GirlNameGdsc] < 150: pl 'Видно что <<$RealName[$GirlNameGdsc]>> нагуляла себе животик, но он еще не очень заметен.'
+- GirlsDesc.txt:230 | if otkroven[$GirlNameGdsc]>=6:
+- GirlsDesc.txt:231 | If kids[$GirlNameGdsc]=0:
+- GirlsDesc.txt:233 | elseIf kids[$GirlNameGdsc]=1:
+- GirlSuggestDressFunc.txt:16 | if pregnancy[$GirlName]>120:
+- GirlSuggestDressFunc.txt:43 | if $bra[$GirlName]>'':
+- GirlSuggestDressFunc.txt:49 | if ShowOffLevel>=2:
+- GirlSuggestDressFunc.txt:58 | if ShowOffLevel=0:
+- GirlSuggestDressFunc.txt:60 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:62 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:78 | *p iif($bra[$GirlName]>'','закрытые лифом сиськи','голые')
+- GirlSuggestDressFunc.txt:80 | iif(ShowOffLevel=0,'Та заметила ваш взгляд, вспыхнула, и быстро прикрыла их руками.','Она заметила ваше любопытство, но лишь улыбнулась.')
+- GirlSuggestDressFunc.txt:82 | iif(ShowOffLevel=0,'"Впредь думай, куда лезешь!" крикнула вам вслед <<$RealName[$GirlName]>>.','"Ах, уходишь... Ну ладно," немного разочарованно промолвила вам вслед <<$RealName[$GirlName]>>.')
+- GirlSuggestDressFunc.txt:99 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:101 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:106 | if $panties[$GirlName]='':
+- GirlSuggestDressFunc.txt:108 | if (sluttiness[$GirlName] >49 and HadSex[$GirlName]>0) or sluttiness[$GirlName] >62:
+- GirlSuggestDressFunc.txt:110 | if DressBuyIsRelative=1: '"Вот оттуда ты и появился!" добавила ваша разбитная мамаша.'
+- GirlSuggestDressFunc.txt:125 | if HadSex['you']>5 and cametoday<cancumdaily:
+- GirlSuggestDressFunc.txt:126 | act 'Подрочить на <<iif(DressBuyIsRelative=1,''маму'',iif(DressBuyIsRelative=2,''сестру'',''зрелище''  ))>>':
+- GirlSuggestDressFunc.txt:129 | if ShowOffLevel<3:
+- GirlSuggestDressFunc.txt:130 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:132 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:141 | if Friends['irma']<4:
+- GirlSuggestDressFunc.txt:149 | if money>=10:
+- GirlSuggestDressFunc.txt:169 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:171 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:176 | if DressBuyIsRelative>0:
+- GirlSuggestDressFunc.txt:188 | iif(DressBuyIsRelative=1,'"Сыночек, мне ж потом сперму с лица долго смывать!"',iif(DressBuyIsRelative=2,'"Братик, ты что?"', '"Ты же мне всю прическу загубишь!"'))
+- GirlSuggestDressFunc.txt:189 | if HadSex[$GirlName]>0 and Rand(1,2)=1:
+- GirlSuggestDressFunc.txt:190 | 'Так как останавливаться вы явно не собирались, <<$RealName[$GirlName]>> решила проблему кардинально: быстро наклонившись, она обхватила губами головку вашего члена. Еле успела - вы незамедлительно разрядились прямо в ротик <<iif(DressBuyIsRelative=1,''вашей маме'',iif(DressBuyIsRelative=2,''сестре'', $RealName3[$GirlName]))>>'
+- GirlSuggestDressFunc.txt:193 | elseif Friends['irma']>5 and Rand(1,2)=1:
+- GirlSuggestDressFunc.txt:198 | 'Ирма делала последний замер, <<$RealName[$GirlName]>> смотрела на Ирму, и в этот момент вы брызнули прямо на эту парочку. Основной поток приземлился на лице <<iif(DressBuyIsRelative=1,''вашей мамы'',iif(DressBuyIsRelative=2,''сестренки'', $RealName2[$GirlName]))>>, немного попало на Ирму, а отдельные капли осели на снятом для примерки платье.<br>"Что же ты делаешь!" вскричала <<$RealName[$GirlName]>>. "Как же я теперь это отмою!" <br>Однако драму предотвратила обходительная Ирма, немедленно доставшая откуда-то полотенчико и воду. Совместными усилиями следы вашего восхищения снятием мерки были убраны. После этого <<$RealName[$GirlName]>> оделась.'
+- GirlSuggestDressFunc.txt:210 | if DressBuyIsRelative=1:
+- GirlSuggestDressFunc.txt:212 | elseif DressBuyIsRelative=2:
+- GirlSuggestDressFunc.txt:217 | *p '"Желание клиента для меня закон," - отозвалась Ирма. Приободренная этими словами <<$RealName[$GirlName]>>, даже и не подумав зашторить окна, начала распускать шнуровку на платье. Вскоре <<iif($bra[$GirlName]>'''',''она осталась выше пояса в одном лифчике'',''ее голые сиськи вывались наружу'')>>. Поймав ваш восхищенный взгляд, она улыбнулась и окончательно стянула платье, оставшись в '
+- GirlSuggestDressFunc.txt:218 | if $bra[$GirlName]='' and $panties[$GirlName]='':
+- GirlSuggestDressFunc.txt:220 | elseif $panties[$GirlName]='':
+- GirlSuggestDressFunc.txt:222 | elseif $bra[$GirlName]='':
+- GirlSuggestDressFunc.txt:230 | if RandVar<=3:
+- GirlSuggestDressFunc.txt:234 | if RandVar=1:
+- GirlSuggestDressFunc.txt:235 | 'как какой-то пацаненок заглянул в окно, да таки и остался стоять, с открытым от удивления ртом. <br><<iif($GirlName=''georgett'' or $GirlName=''liza'',''Шлюха'',$RealName[$GirlName])>> проследила за вашим взглядом и крикнула мальчонке:'
+- GirlSuggestDressFunc.txt:236 | if $GirlName='georgett' or $GirlName='liza':
+- GirlSuggestDressFunc.txt:237 | *p '"Хочешь лишиться девственности? Ищи меня в <<iif($CurrentLoc[$GirlName]=''TavernMain'',''трактире "Дикий Жеребец"'',''порту'')>>, дам скидку!"'
+- GirlSuggestDressFunc.txt:238 | elseif $GirlName='amanda':
+- GirlSuggestDressFunc.txt:244 | elseif RandVar=2:
+- GirlSuggestDressFunc.txt:245 | 'как какой-то мужичок, по виду <<dyneval($RandomOccupCode)>> стоит у окна и с интересом наблюдает за открывшимся зрелищем.<br><<iif($GirlName=''georgett'' or $GirlName=''liza'',''Шлюха'',$RealName[$GirlName])>> проследила за вашим взглядом и крикнула ему: '
+- GirlSuggestDressFunc.txt:246 | if $GirlName='georgett' or $GirlName='liza':
+- GirlSuggestDressFunc.txt:247 | *p '"Нравиться? Хочешь трахнуть? Тогда найди меня в <<iif($CurrentLoc[$GirlName]=''TavernMain'',''трактире "Дикий Жеребец"'',''порту'')>>, возьму не дорого!"'
+- GirlSuggestDressFunc.txt:248 | elseif $GirlName='amanda':
+- GirlSuggestDressFunc.txt:253 | elseif RandVar=3:
+- Intro.txt:118 | if $pantiesdef[$GirlName]>'':
+- Intro.txt:121 | if $bradef[$GirlName]>'':
+- Intro.txt:124 | if $legsdef[$GirlName]>'':
+- Intro.txt:130 | if InitGirlsCounter<arrsize('$AllGirlNames'): jump 'loopinitgirls'
+- Intro.txt:141 | if rand(1,2)=1:
+- IrmaShortStories.txt:7 | if args[0]>0 or (args[1]=1 and Rand(1,2)=1):
+- IrmaShortStories.txt:8 | if RandVar=1:
+- IrmaShortStories.txt:11 | elseif RandVar=2:
+- IrmaShortStories.txt:19 | if RandVar=1:
+- IrmaShortStories.txt:22 | elseif RandVar=2:
+- NextDay.txt:37 | if iDaysCount<timepassed: jump 'loopnextday'
+- NextDay.txt:43 | money=money+TotalDay['revenue']-TotalDay['dineout']-TotalDay['fixedcost']+TotalDay['whorerevenue']+TotalDay['gloryholerevenue']+TotalDay['KidsMoney']+iif($KidBirthPosobie>'',600,0)
+- NextDay.txt:46 | if $DressProduced>'':
+- NextDay.txt:47 | if $DressBuyer='You':
+- NextDay.txt:52 | if money>=50:
+- NextDay.txt:63 | if TotalDay['happy']/timepassed > 3:
+- NextDay.txt:65 | elseif TotalDay['happy']/timepassed > 2:
+- NextDay.txt:67 | elseif TotalDay['happy']/timepassed > 1:
+- NextDay.txt:69 | elseif TotalDay['happy']/timepassed > 0:
+- NextDay.txt:71 | elseif TotalDay['happy']/timepassed > -1:
+- NextDay.txt:73 | elseif TotalDay['happy']/timepassed > -2:
+- NextDay.txt:75 | elseif TotalDay['happy']/timepassed > -3:
+- NextDay.txt:84 | if $ExtraEvents>'': *pl $ExtraEvents
+- NextDay.txt:90 | if TotalDay['HorseFood']>0:
+- NextDay.txt:91 | if $TotalDay['HorseStolen']='':
+- NextDay.txt:100 | if TotalDay['dineout'] > 0:
+- NextDay.txt:104 | if $KidBirthPosobie>'':
+- NextDay.txt:108 | if TotalDay['KidsMoney']>0:
+- NextDay.txt:114 | if TotalWhoreClients[$GirlName] > 0:
+- NextDay.txt:118 | if TotalWhoreClients[$GirlName] > 0:
+- NextDay.txt:121 | if TotalDay['whorerevenue'] > 0:
+- NextDay.txt:128 | if TotalGloryHoleClients[$GirlName] > 0:
+- NextDay.txt:132 | if TotalGloryHoleClients[$GirlName] > 0:
+- NextDay.txt:135 | if TotalDay['gloryholerevenue'] > 0:
+- NextDay.txt:145 | if CursedByEllona>0 and CursedByEllonaDays<=0:
+- NextDay.txt:153 | if $NewDressCame>'':
+- NextDay.txt:163 | if TotalDay['loyalty']>0:
+- NextDay.txt:165 | elseif TotalDay['loyalty']<0:
+- NextDay.txt:168 | if tavernfame>=10:
+- NextDay.txt:175 | elseif tavernfame<=-10:
+- NextDay.txt:198 | if tavernvisitors<0: tavernvisitors=0
+- NextDay.txt:199 | if money<0:money=0
+- NextDay.txt:201 | if money=0:
+- NextDay.txt:208 | if tavernvisitors=0:
+- NextDay.txt:218 | if money=0 or tavernvisitors=0:
+
+## Schedule/Location/Availability Logic
+- DressShop.txt:7 | if (week = 7 or time>=3):
+- InitIrma.txt:20 | !$CurrentLoc[$GirlName]='TavernMain'
+- InitIrma.txt:40 | jobkitchen[$GirlName]=0
+- InitIrma.txt:41 | jobcleaning[$GirlName]=0
+- InitIrma.txt:42 | jobwaitress[$GirlName]=0
+- InitIrma.txt:46 | jobWhoreAvail[$GirlName]=0
+- InitIrma.txt:47 | jobwhore[$GirlName]=0
+- InitIrma.txt:48 | jobgloryhole[$GirlName]=0
+- Intro.txt:43 | time=0
+- Intro.txt:46 | week=1
+- Intro.txt:98 | gs 'Table.Create', 'TodaySexEvents', 'GirlName, Time, EventType, Place'
+- Intro.txt:101 | gs 'Table.Create', 'DailyEventsList', 'GirlName, Location, Time, TimeCheckExpr, ChanceToMeet, KeepNextDay, EventType, EventCode'
+- Intro.txt:109 | jobkitchentomorrow[$AllGirlNames[InitGirlsCounter]]=jobkitchen[$AllGirlNames[InitGirlsCounter]]
+- Intro.txt:110 | jobcleaningtomorrow[$AllGirlNames[InitGirlsCounter]]=jobcleaning[$AllGirlNames[InitGirlsCounter]]
+- Intro.txt:111 | jobwaitresstomorrow[$AllGirlNames[InitGirlsCounter]]=jobwaitress[$AllGirlNames[InitGirlsCounter]]
+
+## State Updates (character store-focused)
+- DressTry.txt:24 | IrmaVar['DeniedMinetMoney']=1
+- DressTry.txt:58 | if friends['irma']<3 or cametoday>=cancumdaily or IrmaVar['DeniedMinetMoney']=1:
+- GirlSuggestDressFunc.txt:18 | IrmaVar['KnowInfertility']=Max(IrmaVar['KnowInfertility'],1)
+- InitIrma.txt:50 | IrmaVar['DeniedMinetMoney']=0
+- InitIrma.txt:52 | IrmaVar['KnowInfertility']=0
+- InitIrma.txt:53 | IrmaVar['KnowDad']=0
+- InitIrma.txt:54 | IrmaVar['KnowMom']=0
+- InitIrma.txt:55 | IrmaVar['KnowSlut']=0
+- IrmaShortStories.txt:10 | IrmaVar['KnowMom']=Max(IrmaVar['KnowMom'],1)
+- IrmaShortStories.txt:13 | IrmaVar['KnowSlut']=Max(IrmaVar['KnowSlut'],1)
+- IrmaShortStories.txt:16 | IrmaVar['KnowInfertility']=Max(IrmaVar['KnowInfertility'],1)
+- IrmaShortStories.txt:21 | IrmaVar['KnowDad']=Max(IrmaVar['KnowDad'],1)
+- IrmaShortStories.txt:24 | IrmaVar['KnowMom']=Max(IrmaVar['KnowMom'],1)
+- IrmaShortStories.txt:27 | IrmaVar['KnowSlut']=Max(IrmaVar['KnowSlut'],1)
+
+## Full Matched Line Index (exhaustive)
+- DressShop.txt:16 | gs 'ShowImage', 'irma', 'portraits', 'portrait'+Rand(1,2)
+- DressShop.txt:23 | gs 'GirlsDesc','irma'
+- DressTry.txt:7 | gs 'PregnancyCheck', 'irma', 'mouth', 1, 'Вы'
+- DressTry.txt:13 | gs 'SlutFriendsIncrease', 'irma', 10, 1, 1, 0, 0, 0
+- DressTry.txt:22 | gs 'ShowImage', 'irma', 'portraits', 'angry'
+- DressTry.txt:23 | friends['irma']=Max(friends['irma']-3,0)
+- DressTry.txt:24 | IrmaVar['DeniedMinetMoney']=1
+- DressTry.txt:49 | gs 'SlutFriendsIncrease', 'irma', 0, 1, -1, 0, 0, 0
+- DressTry.txt:58 | if friends['irma']<3 or cametoday>=cancumdaily or IrmaVar['DeniedMinetMoney']=1:
+- DressTry.txt:60 | gs 'ShowImage', 'irma', 'portraits', 'smile'
+- DressTry.txt:61 | gs 'SlutFriendsIncrease', 'irma', 5, 1, 1, 0, 0, 0
+- DressTry.txt:65 | gs 'ShowImage', 'irma', 'sex', 'topless'
+- GirlDressBuy.txt:21 | gs 'GirlsDesc','irma'
+- GirlDressBuy.txt:51 | gs 'SlutFriendsIncrease', 'irma', 0, 2, -1, 0, 0, 0
+- GirlDressSuggest.txt:66 | gs 'SlutFriendsIncrease', 'irma', 5, 1, 1, 0, 0, 0
+- GirlDressSuggest.txt:85 | !Georget-80 (6/6), liza - 35(3/4), becky-25(4/2),irma-45(4/2)
+- GirlsDesc.txt:26 | elseif $GirlNameGdsc='irma':
+- GirlSuggestDressFunc.txt:18 | IrmaVar['KnowInfertility']=Max(IrmaVar['KnowInfertility'],1)
+- GirlSuggestDressFunc.txt:141 | if Friends['irma']<4:
+- GirlSuggestDressFunc.txt:153 | gs 'SlutFriendsIncrease', 'irma', 5, 2, 1, 0, 0, 0
+- GirlSuggestDressFunc.txt:167 | gs 'SlutFriendsIncrease', 'irma', 10, 1, 1, 50, 2, 1
+- GirlSuggestDressFunc.txt:182 | gs 'IrmaShortStories',DressBuyIsRelative
+- GirlSuggestDressFunc.txt:193 | elseif Friends['irma']>5 and Rand(1,2)=1:
+- GirlSuggestDressFunc.txt:195 | gs 'PregnancyCheck', 'irma', 'mouth', 1, 'Вы'
+- GirlSuggestDressFunc.txt:196 | gs 'SlutFriendsIncrease', 'irma', 8, 2, 1, 50, 1, 1
+- GirlSuggestDressFunc.txt:258 | gs 'SlutFriendsIncrease', 'irma', 10, 1, 1, 45, 1, 1
+- InitIrma.txt:1 | Location: "InitIrma"
+- InitIrma.txt:6 | $GirlName='irma'
+- InitIrma.txt:50 | IrmaVar['DeniedMinetMoney']=0
+- InitIrma.txt:52 | IrmaVar['KnowInfertility']=0
+- InitIrma.txt:53 | IrmaVar['KnowDad']=0
+- InitIrma.txt:54 | IrmaVar['KnowMom']=0
+- InitIrma.txt:55 | IrmaVar['KnowSlut']=0
+- InitIrma.txt:57 | ------------ End of location: "InitIrma" ------------
+- Intro.txt:88 | $AllGirlNames[6]='irma'
+- IrmaShortStories.txt:1 | Location: "IrmaShortStories"
+- IrmaShortStories.txt:10 | IrmaVar['KnowMom']=Max(IrmaVar['KnowMom'],1)
+- IrmaShortStories.txt:13 | IrmaVar['KnowSlut']=Max(IrmaVar['KnowSlut'],1)
+- IrmaShortStories.txt:16 | IrmaVar['KnowInfertility']=Max(IrmaVar['KnowInfertility'],1)
+- IrmaShortStories.txt:21 | IrmaVar['KnowDad']=Max(IrmaVar['KnowDad'],1)
+- IrmaShortStories.txt:24 | IrmaVar['KnowMom']=Max(IrmaVar['KnowMom'],1)
+- IrmaShortStories.txt:27 | IrmaVar['KnowSlut']=Max(IrmaVar['KnowSlut'],1)
+- IrmaShortStories.txt:32 | ------------ End of location: "IrmaShortStories" ------------
+- NextDay.txt:57 | Friends['irma']=Max(0,Friends['irma']-1)

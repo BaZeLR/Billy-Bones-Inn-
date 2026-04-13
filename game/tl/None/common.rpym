@@ -1,0 +1,3 @@
+# Intentionally left empty.
+# The generated common translation mirror was causing Ren'Py common defaults
+# to execute twice during startup.

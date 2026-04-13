@@ -1,0 +1,182 @@
+init python:
+    # Main state
+    current_media = "bg cafe"
+    current_text = "You are standing in the cozy café."
+    current_location = "cafe"
+    
+    # Mode control
+    ui_mode = "normal"          # "normal", "event", "npc_interact", "object_interact"
+    current_event = None        # "event_a", etc.
+    event_step = 0
+    
+    previous_media = None
+    previous_text = None
+
+    def start_event(event_name):
+        global ui_mode, current_event, event_step, previous_media, previous_text
+        previous_media = current_media
+        previous_text = current_text
+        ui_mode = "event"
+        current_event = event_name
+        event_step = 0
+
+    def end_event():
+        global ui_mode, current_event, event_step, current_media, current_text
+        ui_mode = "normal"
+        current_event = None
+        event_step = 0
+        current_media = previous_media
+        current_text = previous_text or ""
+
+    def start_npc_interact(npc_name):
+        global ui_mode, current_media, current_text
+        ui_mode = "npc_interact"
+        current_media = "npc_card_" + npc_name.lower()
+        current_text = "You are talking to " + npc_name + "."
+
+    def end_interaction():
+        global ui_mode
+        ui_mode = "normal"
+
+# ================================================
+# CONTENT SCREENS (change only the content, not layout)
+# ================================================
+
+screen media_area():
+    if ui_mode == "event":
+        if current_event == "event_a":
+            if event_step == 0:
+                add "images/event_a/start.jpg" xalign 0.5 yalign 0.5 zoom 0.9
+            elif event_step == 1:
+                add "images/event_a/after_choice.jpg" xalign 0.5 yalign 0.5 zoom 0.9
+            elif event_step == 2:
+                add "images/event_a/final.jpg" xalign 0.5 yalign 0.5 zoom 0.9
+    elif ui_mode == "npc_interact":
+        add current_media xalign 0.5 yalign 0.5 zoom 0.85   # NPC card or portrait
+    else:
+        # Normal location background / scene
+        add current_media xalign 0.5 yalign 0.5 zoom 0.9
+
+screen text_area():
+    frame:
+        background "#111"
+        xfill True yfill True
+        padding (30, 25)
+        vbox:
+            spacing 15
+            if ui_mode == "event":
+                if current_event == "event_a":
+                    if event_step == 0:
+                        text "You hear a strange noise behind the counter..." size 34 color "#eee"
+                    elif event_step == 1:
+                        text "You decided to investigate.\n\nThe room darkens. A hooded figure appears:\n\"I've been waiting for you.\"" size 32 color "#ddd"
+                    elif event_step == 2:
+                        text "The figure offers you an old map." size 32 color "#ddd"
+            elif ui_mode == "npc_interact":
+                text current_text size 32 color "#ddd"
+            else:
+                text current_text size 32 color "#ddd"
+
+screen dynamic_navigation():   # ← This is your "menu choice section"
+    hbox:
+        xfill True
+        spacing 12
+        if ui_mode == "event":
+            if current_event == "event_a":
+                if event_step == 0:      # First 3 choices
+                    textbutton "Investigate the noise":
+                        action [SetVariable("event_step", 1)]
+                        text_size 27 xfill True
+                    textbutton "Call for help":
+                        action [SetVariable("event_step", 1)]
+                        text_size 27 xfill True
+                    textbutton "Ignore and leave":
+                        action [SetVariable("event_step", 1)]
+                        text_size 27 xfill True
+
+                elif event_step == 1:    # Continue button
+                    textbutton "Continue →":
+                        action SetVariable("event_step", 2)
+                        text_size 32 color "#ffcc00" xfill True
+
+                elif event_step == 2:    # Second set of choices
+                    textbutton "Take the map":
+                        action [SetVariable("event_step", 3), SetVariable("current_text", "You took the map!")]
+                        text_size 27 xfill True
+                    textbutton "Ask who they are":
+                        action [SetVariable("event_step", 3)]
+                        text_size 27 xfill True
+                    textbutton "End Event":
+                        action end_event
+                        text_size 27 xfill True
+
+        elif ui_mode == "npc_interact":
+            # NPC conversation choices
+            textbutton "Ask about the rumor":
+                action SetVariable("current_text", "They tell you an interesting rumor...")
+                text_size 27 xfill True
+            textbutton "Flirt":
+                action SetVariable("current_text", "You try to flirt...")
+                text_size 27 xfill True
+            textbutton "Leave":
+                action end_interaction
+                text_size 27 xfill True
+
+        else:
+            # Normal location navigation / actions
+            for label, act in dynamic_actions:
+                textbutton label:
+                    action NullAction()   # your real actions here
+                    text_size 27 xfill True
+
+# ================================================
+# THE MAIN PERSISTENT SCREEN (layout never changes)
+# ================================================
+
+screen main_game_ui():
+    add "#000"                                 # Pitch black background - always here
+
+    hbox:
+        xfill True
+        yfill True
+
+        # LEFT SIDE - always same division
+        vbox:
+            xsize int(0.66 * config.screen_width)
+            yfill True
+
+            fixed:                             # Media area - top 2/3
+                ysize int(0.66 * config.screen_height)
+                use media_area
+
+            fixed:                             # Text area - bottom 1/3
+                ysize int(0.33 * config.screen_height)
+                use text_area
+
+        # RIGHT SIDE - all sections stay in place
+        vbox:
+            xsize int(0.34 * config.screen_width)
+            yfill True
+            spacing 15
+
+            use time_calendar_and_buttons
+            use counters_grid
+            use dynamic_navigation          # ← choices always appear here
+            use currloc_npc_buttons
+
+# ================================================
+# USAGE EXAMPLES
+# ================================================
+
+label start:
+    show screen main_game_ui
+    $ current_media = "bg cafe"
+    $ ui_mode = "normal"
+    "Welcome. The full UI is now active and will never be hidden."
+
+    # Trigger an event
+    $ start_event("event_a")
+    "Event started. Layout stays exactly the same."
+
+    # Later, from NPC button:
+    # $ start_npc_interact("Alice")

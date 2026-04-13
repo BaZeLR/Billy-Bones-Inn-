@@ -1,0 +1,232 @@
+# Full Logic Map: Кларисса (Clara)
+
+Source: only `game/Inn/*.txt` (authoritative content).
+
+## Scope Summary
+- Character id: clarisse
+- Tokens used for discovery: Clara, Кларисса, clara
+- Reference files count: 4
+- Matched lines count: 23
+
+## Reference Files
+- AfterDanceSexLegare.txt => Location: AfterDanceSexLegare
+- Church.txt => Location: Church
+- InitSecondaryNPC.txt => Location: InitSecondaryNPC
+- WineStore.txt => Location: WineStore
+
+## Action Logic (menus/acts)
+- AfterDanceSexLegare.txt:25 | act 'Прервать это непотребство':
+- AfterDanceSexLegare.txt:46 | act 'Ничего не поделаешь, смотреть дальше':
+- AfterDanceSexLegare.txt:50 | act 'Я на это смотреть не могу и пойду отсюда': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:55 | act 'Плюнуть и идти обратно в трактир': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:60 | act 'Последовать за ней':
+- AfterDanceSexLegare.txt:67 | act 'Дать знать им о том, что вы наблюдаете за ними':
+- AfterDanceSexLegare.txt:74 | act 'Ничего не поделаешь, смотреть дальше':
+- AfterDanceSexLegare.txt:80 | act 'Плюнуть и идти обратно в трактир': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:84 | act 'Я на это смотреть не могу и пойду отсюда': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:176 | act 'Послушать о чем они болтают': gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:178 | act 'Смотреть чего будет дальше': gt 'AfterDanceSexLegare', CurSexStep+2, tmpLegareSexType
+- AfterDanceSexLegare.txt:181 | act 'Смотреть чего будет дальше':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:184 | act 'Дать им кончить':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:186 | act 'Подсматривать дальше':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:190 | act 'Дать им кончить':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:192 | act 'И что дальше?': gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:194 | act 'Еще посмотреть':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:198 | act 'И что дальше?':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:200 | act 'Пойду-ка и я': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:202 | act 'Дать им кончить':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:206 | act 'Пойду-ка и я': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:208 | act 'И что дальше?':gt 'AfterDanceSexLegare', CurSexStep+1, tmpLegareSexType
+- AfterDanceSexLegare.txt:211 | act 'Пойду-ка и я': dynamic $AmandaLegareLeaveToTraktir
+- AfterDanceSexLegare.txt:222 | act 'Ухожу, даже и не собираюсь на это смотреть': dynamic $AmandaLegareLeaveToTraktir
+- Church.txt:33 | GS 'Menu.Add','ChurchServiceMenu','Найти маму',''
+- Church.txt:39 | GS 'Menu.Add','ChurchServiceMenu','Найти сестер',''
+- Church.txt:45 | GS 'Menu.Add','ChurchServiceMenu','Найти семейство Легаре',''
+- Church.txt:50 | GS 'Menu.Add','ChurchServiceMenu','Найти семейство Блэнкеншип',''
+- Church.txt:56 | GS 'Menu.Add','ChurchServiceMenu','Найти Жоржетту Брюно',''
+- Church.txt:73 | GS 'Menu.Add','ChurchServiceMenu','Предложить Жоржетте перепихнуться по быстрому',''
+- Church.txt:118 | act 'Вернуться в собор': gs 'AdvanceTime', 'Church'
+- Church.txt:137 | act 'Обсудить сомнения Бекки со святым отцом': dynamic $BeckyChurchTalk
+- Church.txt:139 | act 'Идти на исповедь':gt 'ChurchIspoved',1
+- Church.txt:143 | act 'Обойти собор':gt 'ChurchAfterCermon', 1
+- Church.txt:147 | act 'Вернуться к трактиру':gt 'StreetTavern'
+- WineStore.txt:18 | GS 'Menu.Add','WineBuy','Ничего не покупать',''
+- WineStore.txt:23 | GS 'Menu.Add','WineBuy','Купить один бочонок',''
+- WineStore.txt:32 | GS 'Menu.Add','WineBuy','Купить пять бочонков',''
+- WineStore.txt:41 | GS 'Menu.Add','WineBuy','Купить двадцать бочонков',''
+- WineStore.txt:50 | GS 'Menu.Add','WineBuy','Купить пятьдесят бочонков',''
+- WineStore.txt:59 | GS 'Menu.Add','WineBuy','Купить двести бочонков',''
+- WineStore.txt:73 | GS 'Menu.Add','MenuClaraTalk','Поболтать с Клариссой о разной фигне.',''
+- WineStore.txt:84 | GS 'Menu.Add','MenuClaraTalk','Заигрывать с Клариссой.',''
+- WineStore.txt:117 | act 'Вернуться на рынок':gt 'MarketPlace'
+
+## Condition Gates
+- AfterDanceSexLegare.txt:8 | if CurSexStep=0:
+- AfterDanceSexLegare.txt:10 | if tmpLegareSexType=4 and pregnancy['amanda']<=120 and Rand(1,4)<=3: tmpLegareSexType=5
+- AfterDanceSexLegare.txt:16 | if (tmpLegareSexType=0 and CurSexStep<4) or (tmpLegareSexType=1 and CurSexStep<3) or (tmpLegareSexType>=2 and CurSexStep<5):
+- AfterDanceSexLegare.txt:24 | if AmandaVar['knowyouseesex']=0:
+- AfterDanceSexLegare.txt:28 | if AmandaVar['alberprohibit']=1:
+- AfterDanceSexLegare.txt:37 | if AmandaNesluh=2:
+- AfterDanceSexLegare.txt:39 | if AmandaVar['glorydeflower']>0 or AmandaVar['fuckyou']>0:
+- AfterDanceSexLegare.txt:52 | elseif AmandaNesluh=1:
+- AfterDanceSexLegare.txt:66 | if AmandaVar['knowyousawlegaresex']:
+- AfterDanceSexLegare.txt:71 | if sluttiness['amanda']>45 or (sluttiness['amanda']>32 and Rand(1,3)=1):
+- AfterDanceSexLegare.txt:89 | if AmandaVar['knowyouseesex']:
+- AfterDanceSexLegare.txt:91 | if RandVar=1:
+- AfterDanceSexLegare.txt:93 | elseif RandVar=2:
+- AfterDanceSexLegare.txt:95 | elseif RandVar=3:
+- AfterDanceSexLegare.txt:102 | If Rand(1,2)=1:
+- AfterDanceSexLegare.txt:104 | if sluttiness['amanda']>=40 or sexacts['amanda']>12:
+- AfterDanceSexLegare.txt:119 | If Rand(1,3)<=2:
+- AfterDanceSexLegare.txt:121 | if tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:126 | if cuminside['amanda']<2:
+- AfterDanceSexLegare.txt:129 | if pregnancy['amanda']>120:
+- AfterDanceSexLegare.txt:132 | if sluttiness['amanda']>=48:
+- AfterDanceSexLegare.txt:134 | elseif tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:141 | if 	tmpLegareSexType=2 or tmpLegareSexType=3:
+- AfterDanceSexLegare.txt:143 | elseif tmpLegareSexType=4:
+- AfterDanceSexLegare.txt:153 | if cuminside['amanda']<2:
+- AfterDanceSexLegare.txt:156 | if pregnancy['amanda']>120:
+- AfterDanceSexLegare.txt:159 | if sluttiness['amanda']>=48:
+- AfterDanceSexLegare.txt:174 | if CurSexStep=0:
+- AfterDanceSexLegare.txt:175 | if AlberVar['hearabouthiswife']=0:
+- AfterDanceSexLegare.txt:180 | elseif CurSexStep=1:
+- AfterDanceSexLegare.txt:182 | elseif CurSexStep=2:
+- AfterDanceSexLegare.txt:183 | if tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:188 | elseif CurSexStep=3:
+- AfterDanceSexLegare.txt:189 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:191 | elseif tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:196 | elseif CurSexStep=4:
+- AfterDanceSexLegare.txt:197 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:199 | elseif tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:204 | elseif CurSexStep=5:
+- AfterDanceSexLegare.txt:205 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:214 | if tmpLegareSexType=0: MaxStep=5
+- AfterDanceSexLegare.txt:215 | if tmpLegareSexType=1: MaxStep=4
+- AfterDanceSexLegare.txt:217 | if  CurSexStep<MaxStep-1:
+- AfterDanceSexLegare.txt:221 | if  CurSexStep<MaxStep and AmandaVar['knowyouseesex']=0:
+- AfterDanceSexLegare.txt:227 | if CurSexStep=0:
+- AfterDanceSexLegare.txt:228 | if $args[2]='alone':
+- AfterDanceSexLegare.txt:234 | if sluttiness['amanda']>=30:
+- AfterDanceSexLegare.txt:240 | elseif CurSexStep=1:
+- AfterDanceSexLegare.txt:243 | elseif CurSexStep=2:
+- AfterDanceSexLegare.txt:244 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:245 | if pregnancy['amanda']<120:
+- AfterDanceSexLegare.txt:251 | elseif tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:255 | elseif tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:258 | elseif tmpLegareSexType=3:
+- AfterDanceSexLegare.txt:261 | elseif tmpLegareSexType=4:
+- AfterDanceSexLegare.txt:264 | elseif tmpLegareSexType=5:
+- AfterDanceSexLegare.txt:270 | elseif CurSexStep=3:
+- AfterDanceSexLegare.txt:271 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:272 | if sexacts['amanda']>0:
+- AfterDanceSexLegare.txt:279 | elseif tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:282 | elseif tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:284 | if $panties['amanda']>'':
+- AfterDanceSexLegare.txt:296 | elseif tmpLegareSexType=3:
+- AfterDanceSexLegare.txt:298 | if $panties['amanda']>'':
+- AfterDanceSexLegare.txt:307 | elseif tmpLegareSexType=4:
+- AfterDanceSexLegare.txt:311 | elseif tmpLegareSexType=5:
+- AfterDanceSexLegare.txt:313 | if $panties['amanda']>'':
+- AfterDanceSexLegare.txt:318 | if $bra['amanda']>'': *p 'Лифчик на ней тоже недолго задержался.'
+- AfterDanceSexLegare.txt:326 | elseif CurSexStep=4:
+- AfterDanceSexLegare.txt:327 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:330 | elseif tmpLegareSexType=1:
+- AfterDanceSexLegare.txt:332 | elseif tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:335 | elseif tmpLegareSexType=3:
+- AfterDanceSexLegare.txt:336 | if pregnancy['amanda']<120:
+- AfterDanceSexLegare.txt:343 | elseif tmpLegareSexType=4:
+- AfterDanceSexLegare.txt:345 | if pregnancy['amanda']>=120:
+- AfterDanceSexLegare.txt:352 | elseif tmpLegareSexType=5:
+- AfterDanceSexLegare.txt:357 | elseif CurSexStep=5:
+- AfterDanceSexLegare.txt:358 | if tmpLegareSexType=0:
+- AfterDanceSexLegare.txt:360 | elseif tmpLegareSexType>=2:
+- AfterDanceSexLegare.txt:363 | if tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:368 | elseif CurSexStep=6:
+- AfterDanceSexLegare.txt:369 | if tmpLegareSexType=2:
+- AfterDanceSexLegare.txt:371 | elseif tmpLegareSexType=3:
+- AfterDanceSexLegare.txt:373 | elseif tmpLegareSexType>=4:
+- Church.txt:9 | if BeckyVar['GerhardBeckyTalk']=0:
+- Church.txt:14 | if BeckyVar['PriestAdvice']=3:
+- Church.txt:16 | elseif BeckyVar['GerhardBeckyTalk']=0:
+- Church.txt:26 | if week<>7 or time > 2:
+- Church.txt:31 | if time=0:
+- Church.txt:59 | if GeorgettVar['askkids']:
+- Church.txt:60 | if Friends['liza']>0:
+- Church.txt:71 | gs 'Menu.AddCondition','ChurchServiceMenu', "Result=IIF(Friends['georgett']>=2 ,-1,0)"
+- Church.txt:76 | if Friends['georgett']<6:
+- Church.txt:80 | if money<15:
+- Church.txt:85 | if GeorgettVar['askkids']:
+- Church.txt:86 | if Friends['liza']=0:
+- Church.txt:90 | if GeorgettVar['lizasawinchurch']:
+- Church.txt:97 | if GeorgettVar['askkids']=0 and Rand(1,2): $TmpChurchGeorgSex='doggy'
+- Church.txt:98 | if GeorgettVar['askkids']: $TmpChurchGeorgSex='withliza'
+- Church.txt:99 | if $TmpChurchGeorgSex='doggy':
+- Church.txt:104 | if GeorgettVar['askkids']:
+- Church.txt:110 | if GeorgettVar['askkids']:
+- Church.txt:123 | gs 'Menu.AddCondition','ChurchServiceMenu', "Result=IIF(cametoday<cancumdaily and Friends['georgett']>=2 and HadSex['georgett']>=3 and GeorgettVar['foundinchurch'] ,-1,0)"
+- Church.txt:129 | elseif time=1:
+- Church.txt:131 | IF BeckyVar['GerhardBeckyTalk']>0:
+- Church.txt:136 | if BeckyVar['PriestAdvice']>0 and BeckyVar['GerhardBeckyTalk']<2:
+- WineStore.txt:6 | if week = 7 or time>=3:
+- WineStore.txt:11 | if time=0:
+- WineStore.txt:30 | gs 'Menu.AddCondition','WineBuy', "Result=IIF(money>=14,-1,0)"
+- WineStore.txt:39 | gs 'Menu.AddCondition','WineBuy', "Result=IIF(money>=14*5,-1,0)"
+- WineStore.txt:48 | gs 'Menu.AddCondition','WineBuy', "Result=IIF(money>=14*20,-1,0)"
+- WineStore.txt:57 | gs 'Menu.AddCondition','WineBuy', "Result=IIF(money>=14*50,-1,0)"
+- WineStore.txt:66 | gs 'Menu.AddCondition','WineBuy', "Result=IIF(money>=14*200,-1,0)"
+- WineStore.txt:71 | if time=0:
+- WineStore.txt:76 | dynamic 'if Talked[''Clara'']<=2 and Rand(1,2)=1 and Friends[''Clara'']<=5:
+- WineStore.txt:80 | if Talked[''Clara'']>2: ''Ничего нового из разговора вы не узнали.'''
+- WineStore.txt:87 | dynamic 'if Talked[''Clara'']<=2 and Rand(1,2)=1 and Friends[''Clara'']<=10:
+- WineStore.txt:91 | if Talked[''Clara'']>2: ''Ничего нового из разговора вы не узнали.'''
+- WineStore.txt:94 | gs 'Menu.AddCondition','MenuClaraTalk', "Result=IIF(Friends['Clara']>=5,-1,0)"
+- WineStore.txt:97 | if dayspassed>40 and dayspassed<=90:
+- WineStore.txt:99 | elseif	dayspassed>90:
+- WineStore.txt:106 | if AlberVar['FightYouAmanda']=0:
+- WineStore.txt:109 | 'За прилавком стоит сам хозяин, месье Легаре. И он очень мрачно смотрит на вас. Похоже, он принял <<iif(AlberVar[''FightYouAmanda'']=2,''вашу ругань'', ''ваш с ним небольшой дружеский спарринг'')>> близко к сердцу. '
+
+## Schedule/Location/Availability Logic
+- Church.txt:26 | if week<>7 or time > 2:
+- Church.txt:31 | if time=0:
+- Church.txt:129 | elseif time=1:
+- Church.txt:143 | act 'Обойти собор':gt 'ChurchAfterCermon', 1
+- WineStore.txt:6 | if week = 7 or time>=3:
+- WineStore.txt:11 | if time=0:
+- WineStore.txt:71 | if time=0:
+
+## State Updates (character store-focused)
+- InitSecondaryNPC.txt:8 | Friends['Clara']=0
+- WineStore.txt:76 | dynamic 'if Talked[''Clara'']<=2 and Rand(1,2)=1 and Friends[''Clara'']<=5:
+- WineStore.txt:78 | Friends[''Clara'']=Friends[''Clara'']+1
+- WineStore.txt:81 | Talked['Clara']=Talked['Clara']+1
+- WineStore.txt:87 | dynamic 'if Talked[''Clara'']<=2 and Rand(1,2)=1 and Friends[''Clara'']<=10:
+- WineStore.txt:89 | Friends[''Clara'']=Friends[''Clara'']+1
+- WineStore.txt:92 | Talked['Clara']=Talked['Clara']+1
+- WineStore.txt:94 | gs 'Menu.AddCondition','MenuClaraTalk', "Result=IIF(Friends['Clara']>=5,-1,0)"
+- WineStore.txt:102 | 'Вы можете с ней <a href="exec: GS ''Menu.Call'',''MenuClaraTalk''">поболтать</a>.'
+
+## Full Matched Line Index (exhaustive)
+- AfterDanceSexLegare.txt:241 | '"Ой, а как же ваша жена, как дети, что если они нас увидят?" спросила виноторговца ваша осторожная сестра.<br>"А что они? Женушка моя, Элоиза, как и Кларисса - те еще шлюхи, так что не волнуйся, никто нам не помешает, даже если вдруг нас кто и увидит."<br>"Ох, неужели это правда? Девчонки про вашу жену болтали разное, ну да я во внимание не принимала, думала сплетни дурные."<br>"Хе, почему же сплетна? Элоизка моя служаночкой работала. Так когда я ее первый раз повстречал, у нее уже была малютка Кларисса. Приданное у нее было неплохое, в постели она хороша была, вот мы и поженились, лавку открыли."<br>"Ох, так Кларисса не ваша дочь? А чья?!"<br>"Не думаю что даже Элоиза знает. Может хозяина, может других слуг, может одного из гостей. Ну да мы отвлеклись, сама видишь, что нам бояться нечего. Можно даже и ко мне домой зайти, если ты с Элоизкой и Кларой поболтать хочешь."<br>Предложение Альбера почему-то не обрадовало Аманду: "Да не, не очень, давай здесь!" ответила она.'
+- Church.txt:47 | 'Мессир Легаре в черном камзоле стоит около одной из колонн и внимательно слушает службу. Рядом с ним стоит его жена Элоиза, маленькая шатенка средних лет, а за ними все их дети - Кларисса, Жерар, Жан-Жак, Полина и малыш Реми.'
+- InitSecondaryNPC.txt:8 | Friends['Clara']=0
+- WineStore.txt:12 | $GrocerName='Кларисса'
+- WineStore.txt:72 | GS 'Menu.Create','MenuClaraTalk'
+- WineStore.txt:73 | GS 'Menu.Add','MenuClaraTalk','Поболтать с Клариссой о разной фигне.',''
+- WineStore.txt:74 | GS 'Menu.AddModule','MenuClaraTalk',{
+- WineStore.txt:76 | dynamic 'if Talked[''Clara'']<=2 and Rand(1,2)=1 and Friends[''Clara'']<=5:
+- WineStore.txt:78 | Friends[''Clara'']=Friends[''Clara'']+1
+- WineStore.txt:80 | if Talked[''Clara'']>2: ''Ничего нового из разговора вы не узнали.'''
+- WineStore.txt:81 | Talked['Clara']=Talked['Clara']+1
+- WineStore.txt:84 | GS 'Menu.Add','MenuClaraTalk','Заигрывать с Клариссой.',''
+- WineStore.txt:85 | GS 'Menu.AddModule','MenuClaraTalk',{
+- WineStore.txt:87 | dynamic 'if Talked[''Clara'']<=2 and Rand(1,2)=1 and Friends[''Clara'']<=10:
+- WineStore.txt:88 | ''Вам кажется, что Кларисса вами немного заинтересовалась.''
+- WineStore.txt:89 | Friends[''Clara'']=Friends[''Clara'']+1
+- WineStore.txt:91 | if Talked[''Clara'']>2: ''Ничего нового из разговора вы не узнали.'''
+- WineStore.txt:92 | Talked['Clara']=Talked['Clara']+1
+- WineStore.txt:94 | gs 'Menu.AddCondition','MenuClaraTalk', "Result=IIF(Friends['Clara']>=5,-1,0)"
+- WineStore.txt:96 | 'Сейчас утро, и за прилавком стоит Кларисса, старшая дочь мессира Легаре. Это привлекательная блондинка чуть младше вас. '
+- WineStore.txt:102 | 'Вы можете с ней <a href="exec: GS ''Menu.Call'',''MenuClaraTalk''">поболтать</a>.'
+- WineStore.txt:103 | gs 'ShowImage', 'clara', '', 'portrait'+Rand(1,7)
+- WineStore.txt:107 | 'За прилавком стоит сам хозяин погребка, мессир Альбер Легаре. Это высокий импозантный мужчина тридцати с лишним лет. Вы знаете, что он женат и у него семья. Его старшая дочка, Кларисса, помогает ему в погребке по утрам.'
