@@ -1,10 +1,64 @@
 init python:
-    def tavern_amanda_room_picture():
-        if household_morning_issue_type("amanda") == "sleepy" and int(hour or 0) < 12:
-            return "images/amanda/Room/amanda_sleeps_3.png"
-        if int(time or 0) >= 4:
-            return "images/amanda/Room/amanda_sleeps_3.png"
-        return "bg amanda_room"
+    def tavern_amanda_room_sleep_dress():
+        sleep_dress = 0
+        if int(virginity.get("amanda", 1) or 1) == 0:
+            if int(sluttiness.get("amanda", 0) or 0) >= 30:
+                sleep_dress = 1
+            if int(sluttiness.get("amanda", 0) or 0) >= 50:
+                sleep_dress = 2
+        return sleep_dress
+
+    def tavern_amanda_room_pick_picture(candidates, fallback=""):
+        for candidate in list(candidates or []):
+            candidate_ref = str(candidate or "").strip()
+            if candidate_ref and renpy.loadable(candidate_ref):
+                return candidate_ref
+        return str(fallback or "")
+
+    def tavern_amanda_room_picture(sleep_dress=None):
+        dress_state = tavern_amanda_room_sleep_dress() if sleep_dress is None else int(sleep_dress or 0)
+        room_issue = str(household_morning_issue_type("amanda") or "")
+        is_sleep_scene = int(time or 0) >= 4 or (room_issue == "sleepy" and int(hour or 0) < 12)
+        if is_sleep_scene:
+            if dress_state >= 2:
+                return tavern_amanda_room_pick_picture([
+                    "images/amanda/Room/amandanaked.jpg",
+                    "images/amanda/Room/amanda_sleeps_11.png",
+                    "images/amanda/Room/amanda_sleeps_10.png",
+                ], "images/amanda/Room/amandanaked.jpg")
+            if dress_state == 1:
+                return tavern_amanda_room_pick_picture([
+                    "images/amanda/Room/amanda_sleeps_10.png",
+                    "images/amanda/Room/amanda_sleep_6.png",
+                    "images/amanda/Room/amandaInbed_004.jpeg",
+                    "images/amanda/Room/amanda_sleeps_9.png",
+                ], "images/amanda/Room/amanda_sleeps_10.png")
+            return tavern_amanda_room_pick_picture([
+                "images/amanda/Room/amanda_sleeps_3.png",
+                "images/amanda/Room/amanda_sleeps_4.png",
+                "images/amanda/Room/amanda_sleeps_1.jpg",
+                "images/amanda/Room/amanda_bedroom_003.jpeg",
+            ], "bg amanda_room")
+        if not tavern_amanda_room_amanda_visible():
+            return tavern_amanda_room_pick_picture([
+                "images/amanda/Room/emptyroom.jpg",
+            ], "bg amanda_room")
+        return tavern_amanda_room_pick_picture([
+            "images/amanda/Room/amanda_bedroom_003.jpeg",
+            "images/amanda/Room/amanda_bedroom_002.jpeg",
+            "images/amanda/Room/amanda_bedroom.jpeg",
+        ], "bg amanda_room")
+
+    def tavern_amanda_room_apply_picture(sleep_dress=None, preview=False):
+        picture_ref = tavern_amanda_room_picture(sleep_dress)
+        globals()["scene_image"] = picture_ref or None
+        globals()["_layout_last_picture"] = picture_ref or ""
+        if preview and str(picture_ref or "").strip():
+            try:
+                ShowImage("", "", picture_ref)
+            except Exception:
+                pass
+        return picture_ref
 
     def tavern_amanda_room_amanda_visible():
         if int(time or 0) >= 4:
@@ -14,8 +68,65 @@ init python:
         except Exception:
             return False
 
+    def tavern_amanda_room_melissa_visible():
+        try:
+            melissa_sync_room_problem_state()
+        except Exception:
+            pass
+        try:
+            return _tavern_is_in_room("melissa", "TavernAmandaRoom")
+        except Exception:
+            return False
+
+    def tavern_amanda_room_issue_text():
+        issue_code = str(household_morning_issue_type("amanda") or "").strip()
+        if int(time or 0) >= 4:
+            return ""
+        if issue_code == "sick":
+            return "Аманда с утра расклеилась и так и осталась у себя в комнате. Похоже, ей бы не помешало лечебное зелье."
+        if issue_code == "sleepy":
+            if household_morning_issue_indecent("amanda"):
+                return "Аманда проспала общий подъем и до сих пор валяется в постели, раскрывшись куда сильнее приличного."
+            return "Аманда проспала общий подъем и до сих пор спит у себя в комнате."
+        if not tavern_amanda_room_amanda_visible():
+            return "Как вы и ожидали, ее самой там не оказалось."
+        return ""
+
+    def tavern_amanda_room_sleep_text(sleep_dress=0):
+        dress_state = int(sleep_dress or 0)
+        if dress_state >= 2:
+            return "Аманда спит голой и, похоже, даже во сне не оставляет себя совсем уж без ласки."
+        if dress_state == 1:
+            return "Аманда спит в одних панталончиках, и ее маленькая грудь остается совсем открытой."
+        return "Аманда спит в длинной ночной рубашке до пят."
+
+    def tavern_amanda_room_main_text(room_obj=None, sleep_dress=0):
+        room_ref = room_obj if room_obj is not None else TavernAmandaRoomRoom
+        desc_rows = list(room_ref.visible_descriptions() or [])
+        issue_text = tavern_amanda_room_issue_text()
+        parts = []
+
+        if len(desc_rows) > 0:
+            parts.append(str(desc_rows[0].text or "").strip())
+
+        if int(time or 0) >= 4:
+            parts.append(tavern_amanda_room_sleep_text(sleep_dress))
+        elif str(issue_text or "").strip():
+            parts.append(str(issue_text or "").strip())
+            if len(desc_rows) > 1:
+                parts.append(str(desc_rows[1].text or "").strip())
+        elif len(desc_rows) > 1:
+            parts.append(str(desc_rows[1].text or "").strip())
+
+        if tavern_amanda_room_melissa_visible():
+            parts.append("Похоже, Мелисса пока ночует здесь, у Аманды: у стены лежит ее узел с вещами, а по комнате заметно, что место теперь делят две девушки.")
+
+        parts = [row for row in parts if str(row or "").strip()]
+        return "\n\n".join(parts) if len(parts) > 0 else "Комната Аманды."
+
     TavernAmandaRoomRoom = Room(
         code_name="TavernAmandaRoom",
+        group_name=ROOM_GROUP_TAVERN,
         display_name="Комната Аманды",
         bg_picture="bg amanda_room",
         descriptions=[
@@ -32,6 +143,7 @@ init python:
             RoomExit(label="Вернуться в коридор", target="TavernUpstairs"),
         ],
         game_items=[
+            bedroom_door_object("amanda_room_door_001", "TavernAmandaRoom", "Аманды"),
             "bed_002",
             "night_bowl_001",
             GameObject(
@@ -63,6 +175,7 @@ init python:
         ],
         npcs=[
             {"npc_id": "amanda", "name": "Аманда", "condition": tavern_amanda_room_amanda_visible, "talk_label": "IntAmandaTalk", "auto_card": True},
+            {"npc_id": "melissa", "name": "Мелисса", "condition": tavern_amanda_room_melissa_visible, "talk_label": "IntMelissaTalk", "auto_card": True},
         ],
         custom_properties={
             "object_menu_label": "tavern_amanda_room_object_menu",
@@ -80,78 +193,20 @@ init python:
 
 label TavernAmandaRoom:
     hide screen main_ui
-    scene black
     call EnterLocation("TavernAmandaRoom")
     $ _room = TavernAmandaRoomRoom
     $ CurrentRoom = _room
     $ CurrentRoom.npcs = TavernAmandaRoomRoom.npcs
     $ CurLoc = "TavernAmandaRoom"
     $ location = CurLoc
-    $ scene_image = tavern_amanda_room_picture() or _room.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-        if str(scene_image).startswith("bg "):
-            show expression scene_image at master
-    $ _room_desc_rows = _room.visible_descriptions()
-    if len(_room_desc_rows) > 0:
-        "[_room_desc_rows[0].text]"
-    if time < 4 and household_morning_issue_type("amanda") == "":
-        "Как вы и ожидали, ее самой там не оказалось."
-    if len(_room_desc_rows) > 1:
-        "[_room_desc_rows[1].text]"
-    if household_morning_issue_type("amanda") == "sick":
-        "Похоже, Аманда сегодня расклеилась и осталась в комнате. По ее виду ясно, что без лечебного зелья ей быстро не подняться."
-    elif household_morning_issue_type("amanda") == "sleepy" and time < 4:
-        if household_morning_issue_indecent("amanda"):
-            "Аманда до сих пор сладко спит у себя в кровати, совсем не чувствуя, что уже давно пора вставать. Во сне она раскрылась куда сильнее приличного и теперь выглядит куда менее невинно, чем сама хотела бы казаться днем."
-        else:
-            "Аманда до сих пор спит у себя в кровати, завернувшись в одеяло и явно проспав общий подъем."
+    call CheckDailyEvent("", "_story_enter", CurLoc, time)
+    $ tmpSleepDress = tavern_amanda_room_sleep_dress()
+    $ tavern_amanda_room_apply_picture(tmpSleepDress, True)
     $ _room.mark_visited()
-
-    if time >= 4:
+    if int(time or 0) >= 4:
         call AmandaAtHomeCode
-        $ tmpSleepDress = 0
-        if virginity['amanda'] == 0:
-            if sluttiness['amanda'] >= 30:
-                $ tmpSleepDress = 1
-            if sluttiness['amanda'] >= 50:
-                $ tmpSleepDress = 2
-        python:
-            import random
-            if random.randint(1,3) <= 2:
-                renpy.say(None, "Аманда сладко спит у себя в кровати под покрывалом. Пока вы смотрели, сестренка повернулась во сне, частично раскрывшись.")
-            else:
-                renpy.say(None, "Аманда сладко спит у себя в кровати, скинув во сне покрывало.")
-        if tmpSleepDress == 2:
-            "Оба-на! Ваше сестренка, оказывается, предпочитает спать голенькой. И во сне теребить себя там, внизу, видно сон уж очень приятный."
-            call ShowImage("amanda", "room", "amandanaked")
-        elif tmpSleepDress == 1:
-            "Вы увидели, что спит она в одних панталончиках, ее маленькие острые грудки задорно обнаженны."
-        else:
-            "Вы увидели, что она одета в длинную ночную рубашку до пят."
         call DressForNight("amanda", tmpSleepDress)
-    else:
-        call ShowImage("amanda", "room", "emptyroom")
-    if time >= 4:
-        if tmpSleepDress == 2:
-            $ MainTxt = "Оба-на! Ваше сестренка, оказывается, предпочитает спать голенькой. И во сне теребить себя там, внизу, видно сон уж очень приятный."
-        elif tmpSleepDress == 1:
-            $ MainTxt = "Вы увидели, что спит она в одних панталончиках, ее маленькие острые грудки задорно обнаженны."
-        else:
-            $ MainTxt = "Вы увидели, что она одета в длинную ночную рубашку до пят."
-    elif household_morning_issue_type("amanda") == "sleepy":
-        if household_morning_issue_indecent("amanda"):
-            $ MainTxt = "Аманда проспала общий подъем и до сих пор валяется в постели, раскрывшись куда сильнее приличного."
-        else:
-            $ MainTxt = "Аманда проспала общий подъем и до сих пор спит у себя в комнате."
-    elif household_morning_issue_type("amanda") == "sick":
-        $ MainTxt = "Аманда с утра расклеилась и так и осталась у себя в комнате. Похоже, ей бы не помешало лечебное зелье."
-    elif len(_room_desc_rows) > 1:
-        $ MainTxt = _room_desc_rows[1].text
-    elif len(_room_desc_rows) > 0:
-        $ MainTxt = _room_desc_rows[0].text
-    else:
-        $ MainTxt = "Комната Аманды."
+    $ MainTxt = tavern_amanda_room_main_text(_room, tmpSleepDress)
     $ CurLocDesc = MainTxt
     call TavernAmandaRoomBuildActions
     jump TavernAmandaRoomView
@@ -161,13 +216,14 @@ label TavernAmandaRoomBuildActions:
     $ current_action_title = "Комната Аманды"
     $ current_action_content = None
     $ current_action_items = []
-    if household_morning_issue_type("amanda") == "sick" and int(_player_item_count_by_id("healing_potion_001") or 0) > 0:
-        $ current_action_items.append(MenuItem("Принести Аманде лечебное зелье", Call("HouseholdMorningIssueCure", "amanda")))
-    elif household_morning_issue_type("amanda") == "sleepy":
-        $ current_action_items.append(MenuItem("Разбудить Аманду", Call("HouseholdWakeSleepyGirl", "amanda")))
+    python:
+        for _issue_action in list(household_room_issue_action_specs("amanda") or []):
+            current_action_items.append(MenuItem(str(_issue_action.get("label", "") or ""), Call(str(_issue_action.get("target", "") or ""), *tuple(_issue_action.get("args", ()) or ()))))
     if tavern_upstairs_can_clean_rooms():
         $ current_action_items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernAmandaRoom", "", "")))
     $ current_action_items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernAmandaRoom", "TavernAmandaRoomBuildActions")))
+    if story_event_available("TavernAmandaRoom", "melissa_bats"):
+        $ current_action_items.append(MenuItem(melissa_bat_drawings_event_caption(), Call("checkTriggers", "TavernAmandaRoom", "melissa_bats", 0)))
     python:
         for _room_object in TavernAmandaRoomRoom.visible_game_items():
             current_action_items.append(MenuItem(_room_object.name, Call("tavern_amanda_room_object_menu", _room_object.object_id)))
@@ -182,7 +238,7 @@ label TavernAmandaRoomView:
     jump TavernAmandaRoomView
 
 
-label tavern_amanda_room_object_menu(object_id=""):
+label tavern_amanda_room_object_menu(object_id="", refresh_only=False):
     if str(object_id or "") != "":
         $ tavern_amanda_room_object_menu_id = object_id
     $ object_id = tavern_amanda_room_object_menu_id
@@ -192,7 +248,7 @@ label tavern_amanda_room_object_menu(object_id=""):
         return
 
     $ current_object_id = object_id
-    $ MainTxt = str(_room_object.description or "")
+    $ MainTxt = bedroom_door_object_text(_room_object)
     $ CurLocDesc = MainTxt
     $ current_action_title = str(_room_object.name or "Комната Аманды")
     $ current_action_content = None
@@ -230,19 +286,15 @@ label tavern_amanda_room_object_text(object_id="", action_id=""):
 
 
 label TavernAmandaRoomRestore:
-    $ _room_desc_rows = TavernAmandaRoomRoom.visible_descriptions()
-    if len(_room_desc_rows) > 1 and time < 4:
-        $ MainTxt = _room_desc_rows[1].text
-    elif len(_room_desc_rows) > 0:
-        $ MainTxt = _room_desc_rows[0].text
-    else:
-        $ MainTxt = "Комната Аманды."
+    $ tavern_amanda_room_apply_picture(tmpSleepDress if int(time or 0) >= 4 else None, False)
+    $ MainTxt = tavern_amanda_room_main_text(TavernAmandaRoomRoom, tmpSleepDress if int(time or 0) >= 4 else 0)
     $ CurLocDesc = MainTxt
     call TavernAmandaRoomBuildActions
     return
 
 
 label TavernAmandaRoomGropeAction:
+    hide screen main_ui
     "\nОтбросив сомнения вы подошли к спящей девушке и поцеловали ее прямо в губы."
     if tmpSleepDress == 2:
         "Одной рукой вы начали массировать ее обнаженный клитор, а другой ласкать сисечки."
@@ -270,7 +322,7 @@ label TavernAmandaRoomGropeAction:
         python:
             tmpRand = random.randint(1,3)
             if tmpRand == 1:
-                renpy.say(None, 'За стенкой мама, сестра спят, да и я спать хочу, намаялась за день.')
+                renpy.say(None, 'За стенкой Сандра, сестра спят, да и я спать хочу, намаялась за день.')
             elif tmpRand == 2:
                 renpy.say(None, 'Ты что это такое удумал?')
             else:
@@ -287,9 +339,10 @@ label TavernAmandaRoomGropeAction:
         $ AmandaVar['kickyoufromroom'] = 1
         jump TavernMain
     elif tmpGropeReact == 2:
-        "Аманда, почувствовав ваши прикосновения, раскрыла глаза. 'Ага, заявился, подонок,' не очень-то романтично огорошила вас сестренка."
+        "Аманда, почувствовав ваши прикосновения, раскрыла глаза. 'Ага, заявился, подонок,' не очень-то романтично огорошила вас своенравная девица
+        ."
         call CodeAmandaListScold
-        "<br>Вы открыли рот чтобы оправдаться, но такого шанса вам не дали, не став слушать ваших оправданий Аманда твердо и решительно произнесла: 'Вон отсюда, пока я не закричала.'<br>Вы попробовали еще что-то сказать, но в ответ услышали лишь снова 'Вон!'. Почуствовав твердость в голосе девушки, вы решили попробовать сделать свой заход позже, а пока временно отступить в главный зал.<br>"
+        "Вы открыли рот чтобы оправдаться, но такого шанса вам не дали, не став слушать ваших оправданий Аманда твердо и решительно произнесла: 'Вон отсюда, пока я не закричала.'<br>Вы попробовали еще что-то сказать, но в ответ услышали лишь снова 'Вон!'. Почуствовав твердость в голосе девушки, вы решили попробовать сделать свой заход позже, а пока временно отступить в главный зал.<br>"
         $ AmandaVar['kickyoufromroom'] = 1
         call SlutFriendsIncrease('amanda', 5, 1, -1, 30, 1, -1)
         call SlutFriendsIncrease('amanda', 5, 1, -1, 0, 0, 0)
@@ -298,11 +351,11 @@ label TavernAmandaRoomGropeAction:
         call CleanScreenOverflow
         "Аманда, почувствовав ваши прикосновения, раскрыла глаза. 'Ага, братик, явился не запылился,' легко разобралась она в ситуации. Однако последующая ее речь вас не сильно обрадовала: 'Значит днем, на людях, ты меня ругаешь, шлюхой походя обзываешь, учишь духовности и целомудрию. А ночью приперся в мою комнату? И зачем приперся? Стихи читать или цены на базаре обсудить? Что-то мне подсказывает что нет,' решительно обличила ваши грязные помыслы Аманда."
         call CodeAmandaListScold
-        "<br>Крыть ее аргументы вам было нечем, но вы все-таки решили попробовать: 'Амандочка, послушай, все совсем не так, на самом деле....'\n'На самом деле что?' и, воспользовавшись тем, что сразу вы не нашлись с ответом, она продолжила: <br>'Нет, это ты меня послушай! Либо ты сейчас берешь свои слова обратно, либо же ты, такой весь из себя правильный, идешь себе восвояси, будем считать что ты приходил проверять не дует ли из окна.'"
+        "Крыть ее аргументы вам было нечем, но вы все-таки решили попробовать: 'Амандочка, послушай, все совсем не так, на самом деле....'\n'На самом деле что?' и, воспользовавшись тем, что сразу вы не нашлись с ответом, она продолжила: \n-'Нет, это ты меня послушай! Либо ты сейчас берешь свои слова обратно, либо же ты, такой весь из себя правильный, идешь себе восвояси, будем считать что ты приходил проверять не дует ли из окна.'"
         call CodeAmandaSorryChoices
     elif tmpGropeReact == 4:
         call CleanScreenOverflow
-        "Ваш поцелуй ничуть не обескуражил Аманду. Проснувшись и поняв что это вы, она не замедлила вернуть вам ваш отнюдь не братский поцелуй. И не просто вернуть, а вернуть с душой, чувством и языком."
+        "Ваш поцелуй ничуть не обескуражил Аманду. Проснувшись и поняв, что это вы, она не замедлила вернуть вам ваш отнюдь не монашеский поцелуй. И не просто вернуть, а вернуть с душой, чувством и языком."
         call CodeAmandaSexStart
     else:
         call CodeAmandaKickFromRoom

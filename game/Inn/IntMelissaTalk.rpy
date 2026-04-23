@@ -1,3 +1,60 @@
+init python:
+    def melissa_start_scene_count():
+        if int(MelissaVar.get("StartDay", -1) or -1) != int(dayspassed or 0):
+            return 0
+        return max(0, min(5, int(MelissaVar.get("StartCount", 0) or 0)))
+
+    def melissa_start_scene_remaining():
+        return max(0, 5 - melissa_start_scene_count())
+
+    def melissa_start_honey_bonus_active():
+        try:
+            return bool(tavern_kitchen_honey_bonus_active())
+        except Exception:
+            return False
+
+    def melissa_start_action_available(girl_name="melissa", action_code=""):
+        key = str(girl_name or "melissa").strip().lower()
+        action_key = str(action_code or "").strip().lower()
+        current_count = melissa_start_scene_count()
+        if current_count >= 5:
+            return False
+
+        friend_value = int(Friends.get(key, 0) or 0)
+        slut_value = int(sluttiness.get(key, 0) or 0)
+        open_value = int(otkroven.get(key, 0) or 0)
+        mood_bonus = 2 if melissa_start_honey_bonus_active() else 0
+
+        if action_key == "caress":
+            return True
+        if action_key == "kiss":
+            return current_count >= 1 or friend_value >= 13 or open_value + mood_bonus >= 8
+        if action_key == "deepkiss":
+            return current_count >= 1 and (friend_value >= 14 or open_value + mood_bonus >= 10 or slut_value + mood_bonus >= 12)
+        if action_key == "fondle":
+            return current_count >= 2 and (friend_value >= 15 or slut_value + mood_bonus >= 14)
+        if action_key == "underclothes":
+            return current_count >= 3 and (friend_value >= 16 or slut_value + mood_bonus >= 18 or open_value + mood_bonus >= 12)
+        return False
+
+    def melissa_start_intro_text(girl_name="melissa"):
+        key = str(girl_name or "melissa").strip().lower()
+        current_count = melissa_start_scene_count()
+        lines = []
+        if current_count <= 0:
+            lines.append("Мелисса задерживает на вас взгляд дольше обычного. Между вами уже достаточно доверия, чтобы не сводить разговор только к делам, но торопиться все равно не стоит.")
+        else:
+            lines.append("Мелисса уже не так шарахается от вашей близости, как раньше. Похоже, сегодня она готова пройти с вами еще несколько осторожных шагов, если вы не будете давить.")
+        lines.append("На сегодня у вас осталось %s спокойных, но все более смелых шага." % melissa_start_scene_remaining())
+        if melissa_start_honey_bonus_active():
+            lines.append("После сладких кухонных угощений Мелисса кажется чуть мягче и отзывчивее обычного.")
+        if melissa_bats_stage() >= 4 and melissa_bats_stage() < 8:
+            lines.append("Она все еще заметно лучше держится рядом с вами, когда разговор заходит о ее комнате и чердаке над ней.")
+        if int(Friends.get(key, 0) or 0) >= 15:
+            lines.append("Доверия между вами уже достаточно, чтобы Мелисса не принимала каждое прикосновение за угрозу.")
+        return "\n\n".join(lines)
+
+
 label IntMelissaTalk(girl_name="melissa"):
     $ main_ui_begin_talk_state("Разговор с Мелиссой", girl_name)
     $ current_action_title = "Разговор с Мелиссой"
@@ -14,7 +71,7 @@ label IntMelissaTalkRefresh(girl_name="melissa"):
     $ current_action_title = "Разговор с Мелиссой"
     $ current_action_content = None
     $ current_action_items = []
-    $ current_action_items.append(MenuItem("Осмотреть", Function(show_girl_card_main_ui_state, girl_name)))
+    $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
     if TalkedToday.get(girl_name, 0) == 0:
         $ current_action_items.append(MenuItem("Поболтать", Function(main_ui_call_label, "IntMelissaTalkApply", girl_name, "talk")))
     if FlirtedToday.get(girl_name, 0) == 0 and family_social_threshold_met(girl_name, "flirt"):
@@ -25,8 +82,14 @@ label IntMelissaTalkRefresh(girl_name="melissa"):
             $ current_action_items.append(MenuItem("Поделиться угощением", Function(main_ui_call_label, "PlayerCardShareToFixedTargetMenu", girl_name)))
     if melissa_storage_thanks_available():
         $ current_action_items.append(MenuItem("Послушать, что Мелисса скажет о кладовой", Function(main_ui_call_label, "IntMelissaTalkApply", girl_name, "storage_thanks")))
-    if melissa_room_problem_available():
-        $ current_action_items.append(MenuItem("Спросить Мелиссу о проблеме в ее комнате", Function(main_ui_call_label, "IntMelissaTalkApply", girl_name, "room_problem")))
+    if melissa_drawings_return_ready() and int(AskedToday.get(girl_name, 0) or 0) == 0:
+        $ current_action_items.append(MenuItem("Показать Мелиссе найденные рисунки", Function(main_ui_call_label, "MelissaReturnDrawingsScene")))
+    if story_event_available(str(CurLoc or ""), "melissa_talk"):
+        $ current_action_items.append(MenuItem(melissa_bat_completion_talk_caption(), Call("checkTriggers", CurLoc, "melissa_talk", 0)))
+    if melissa_sex_available(girl_name):
+        $ current_action_items.append(MenuItem("Уединиться с Мелиссой", Function(main_ui_call_label, "IntMelissaSex", girl_name, CurLoc)))
+    elif int(Friends.get(girl_name, 0) or 0) > 10 and int(MelissaVar.get("StartDay", -1) or -1) != int(dayspassed or 0):
+        $ current_action_items.append(MenuItem("Начать с Мелиссой", Function(main_ui_call_label, "IntMelissaStartMenu", girl_name)))
     if str(CurLoc or "") == "TavernMain" and clara_visible_in_location("TavernMain") and int(MelissaVar.get("AskedAboutClaraDay", -1) or -1) != int(dayspassed or 0) and int(AskedToday.get(girl_name, 0) or 0) == 0:
         $ current_action_items.append(MenuItem("Спросить Мелиссу о Клариссе", Function(main_ui_call_label, "IntMelissaTalkApply", girl_name, "ask_clara")))
     if int(AskedToday.get(girl_name, 0) or 0) == 0 and household_special_talk_available(girl_name):
@@ -100,9 +163,16 @@ label IntMelissaTalkApply(girl_name="melissa", choice_code=""):
         return
 
     if str(choice_code or "") == "room_problem":
-        $ MelissaVar["RoomProblemAskDay"] = int(dayspassed or 0)
+        call IntMelissaRoomProblemAdviceMenu(girl_name)
+        return
+
+    if str(choice_code or "") == "attic_findings":
+        $ MelissaVar["AtticFindingsDay"] = int(dayspassed or 0)
+        $ AskedToday[girl_name] = int(AskedToday.get(girl_name, 0) or 0) + 1
+        $ MelissaVar["bat_recipe_unlocked"] = 1
         $ Friends[girl_name] = min(20, int(Friends.get(girl_name, 0) or 0) + 1)
-        $ MainTxt = "Стоит вам спросить, как Мелисса почти сразу принимается жаловаться на свою комнату: то под потолком опять шуршат летучие мыши, то в углу висит свежая паутина, то ночью кажется, будто по балкам кто-то скребется нарочно. \"Если это снова начнется, я тебя еще попрошу помочь,\" говорит она уже вполне прямо. Похоже, теперь ей проще не копить раздражение, а сразу звать вас."
+        $ otkroven[girl_name] = min(20, int(otkroven.get(girl_name, 0) or 0) + 1)
+        $ MainTxt = "Вы рассказываете Мелиссе, что на чердаке над ее комнатой нашли старое гнездовище: помет, клочья сухого мха и целую дрянную колонию под самой крышей. Мелисса заметно бледнеет, но теперь хотя бы слышит не пустое утешение, а понятный ответ.\n\n\"Значит, я не выдумывала,\" тихо говорит она. Потом, уже чуть спокойнее, добавляет: \"Если их можно выкурить дымом из трав, лаванды и мха, так и сделаем. Только потом щели надо будет заделать по-настоящему, иначе все вернется.\""
         $ CurLocDesc = MainTxt
         call IntMelissaTalkRefresh(girl_name)
         return
@@ -132,6 +202,131 @@ label IntMelissaTalkApply(girl_name="melissa", choice_code=""):
         call IntMelissaTalkRefresh(girl_name)
         return
 
+    return
+
+
+label IntMelissaStartMenu(girl_name="melissa"):
+    $ main_ui_begin_talk_state("Разговор с Мелиссой", girl_name)
+    $ current_action_title = "Мелисса"
+    $ current_action_content = None
+    $ current_action_items = []
+    $ MainTxt = melissa_start_intro_text(girl_name)
+    $ CurLocDesc = MainTxt
+    if melissa_start_scene_remaining() <= 0:
+        $ current_action_items.append(MenuItem("На сегодня хватит", Function(main_ui_call_label, "IntMelissaTalkRefresh", girl_name)))
+        return
+    if melissa_start_action_available(girl_name, "caress"):
+        $ current_action_items.append(MenuItem("Осторожно приласкать ее", Call("IntMelissaStartApply", girl_name, "caress")))
+    if melissa_start_action_available(girl_name, "kiss"):
+        $ current_action_items.append(MenuItem("Поцеловать ее", Call("IntMelissaStartApply", girl_name, "kiss")))
+    if melissa_start_action_available(girl_name, "deepkiss"):
+        $ current_action_items.append(MenuItem("Поцеловать ее глубже", Call("IntMelissaStartApply", girl_name, "deepkiss")))
+    if melissa_start_action_available(girl_name, "fondle"):
+        $ current_action_items.append(MenuItem("Позволить рукам стать смелее", Call("IntMelissaStartApply", girl_name, "fondle")))
+    if melissa_start_action_available(girl_name, "underclothes"):
+        $ current_action_items.append(MenuItem("Пустить руки под одежду", Call("IntMelissaStartApply", girl_name, "underclothes")))
+    $ current_action_items.append(MenuItem("Остановиться на сегодня", Function(main_ui_call_label, "IntMelissaTalkRefresh", girl_name)))
+    return
+
+
+label IntMelissaStartApply(girl_name="melissa", start_action=""):
+    $ _melissa_start_action = str(start_action or "").strip()
+    $ _melissa_scene_count = melissa_start_scene_count() + 1
+    $ MelissaVar["StartDay"] = int(dayspassed or 0)
+    $ MelissaVar["StartCount"] = _melissa_scene_count
+    if _melissa_start_action == "underclothes":
+        $ Friends[girl_name] = min(20, int(Friends.get(girl_name, 0) or 0) + 1)
+        $ sluttiness[girl_name] = min(100, int(sluttiness.get(girl_name, 0) or 0) + 3)
+        $ otkroven[girl_name] = min(20, int(otkroven.get(girl_name, 0) or 0) + 2)
+        $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
+        $ MainTxt = "Ваши руки скользят уже смелее, под ткань и вдоль теплой кожи. Мелисса вздрагивает, судорожно выдыхает вам в плечо и все же не останавливает, только шепотом просит не заходить дальше, чем она сейчас готова выдержать."
+    elif _melissa_start_action == "deepkiss":
+        $ Friends[girl_name] = min(20, int(Friends.get(girl_name, 0) or 0) + 1)
+        $ sluttiness[girl_name] = min(100, int(sluttiness.get(girl_name, 0) or 0) + 2)
+        $ otkroven[girl_name] = min(20, int(otkroven.get(girl_name, 0) or 0) + 2)
+        $ fun = _player_clamp(int(fun or 0) + 2, 0, 100)
+        $ MainTxt = "Поцелуй становится заметно глубже и дольше. Мелисса отвечает уже не из одной только осторожности: сперва несмело, потом все горячее, будто сама удивляется тому, как быстро перестает считать секунды."
+    elif _melissa_start_action == "kiss":
+        $ Friends[girl_name] = min(20, int(Friends.get(girl_name, 0) or 0) + 1)
+        $ sluttiness[girl_name] = min(100, int(sluttiness.get(girl_name, 0) or 0) + 1)
+        $ otkroven[girl_name] = min(20, int(otkroven.get(girl_name, 0) or 0) + 1)
+        $ fun = _player_clamp(int(fun or 0) + 2, 0, 100)
+        $ MainTxt = "Вы не спешите и сначала просто касаетесь ее руки. Мелисса не отстраняется, а когда вы осторожно целуете ее, отвечает коротко, неловко, но уже без прежней настороженности."
+    elif _melissa_start_action == "fondle":
+        $ Friends[girl_name] = min(20, int(Friends.get(girl_name, 0) or 0) + 1)
+        $ sluttiness[girl_name] = min(100, int(sluttiness.get(girl_name, 0) or 0) + 2)
+        $ otkroven[girl_name] = min(20, int(otkroven.get(girl_name, 0) or 0) + 1)
+        $ fun = _player_clamp(int(fun or 0) + 2, 0, 100)
+        $ MainTxt = "Вы держитесь мягко, но позволяете себе чуть больше близости, чем раньше. Мелисса краснеет, шепотом просит не давить на нее и все же остается рядом, явно запоминая это как шаг, который она сама разрешила."
+    else:
+        $ sluttiness[girl_name] = min(100, int(sluttiness.get(girl_name, 0) or 0) + 1)
+        $ otkroven[girl_name] = min(20, int(otkroven.get(girl_name, 0) or 0) + 1)
+        $ fun = _player_clamp(int(fun or 0) + 1, 0, 100)
+        $ MainTxt = "Вы осторожно прикасаетесь к Мелиссе, будто заранее давая ей возможность остановить вас. Она тихо выдыхает, смотрит в сторону и почти неслышно говорит, что так можно."
+    if melissa_start_honey_bonus_active():
+        $ sluttiness[girl_name] = min(100, int(sluttiness.get(girl_name, 0) or 0) + 1)
+        $ MainTxt = str(MainTxt or "") + "\n\nПохоже, медовые сладости за общим столом все еще делают ее заметно мягче и отзывчивее."
+    if _melissa_scene_count < 5:
+        $ MainTxt = str(MainTxt or "") + "\n\nНа сегодня между вами остается место еще для нескольких осторожных шагов, если не ломать этот ритм."
+    else:
+        $ MainTxt = str(MainTxt or "") + "\n\nПосле нескольких таких шагов подряд вы оба все же останавливаетесь на сегодня, чтобы не спугнуть то доверие, которое только-только между вами укрепилось."
+    $ CurLocDesc = MainTxt
+    if _melissa_scene_count < 5:
+        call IntMelissaStartMenu(girl_name)
+    else:
+        call IntMelissaTalkRefresh(girl_name)
+    return
+
+
+label IntMelissaRoomProblemAdviceMenu(girl_name="melissa"):
+    $ MelissaVar["RoomProblemAskDay"] = int(dayspassed or 0)
+    $ Friends[girl_name] = min(20, int(Friends.get(girl_name, 0) or 0) + 1)
+    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []
+    $ _stage = melissa_bats_stage()
+    $ _holes_seen = 1 if _stage >= 3 else 0
+    $ _temp_room = str(MelissaVar.get("temp_room", "") or "").strip()
+    if _holes_seen <= 0:
+        $ MainTxt = "Ночью, когда в трактире наконец становится тихо, вы спрашиваете Мелиссу о том, что творится у нее под крышей. Она сперва молчит, будто решает, не отмахнуться ли и на этот раз, но потом устало выдыхает и все-таки рассказывает все как есть.\n\nПод потолком снова шуршат летучие мыши, по балкам будто кто-то бегает почти до рассвета, а в щелях и пыли все сильнее чувствуется затхлая сырость. \"Я уже не знаю, что бесит сильнее: шум, вонь или то, что после такой ночи утром стоишь как пьяная,\" признается она.\n\nНа этот раз Мелисса не уходит в сторону и не язвит. Она смотрит прямо на вас, явно ожидая не пустого утешения, а нормального ответа."
+        $ MainTxt = str(MainTxt or "") + "\n\nСначала надо осмотреть ее комнату как следует, а уже потом лезть на чердак."
+        $ current_action_items.append(MenuItem("Сказать, что вы сами разберетесь с этим", Function(main_ui_call_label, "IntMelissaRoomProblemAdviceApply", girl_name, "solve")))
+    else:
+        $ MainTxt = "После осмотра комнаты все выглядит куда хуже, чем Мелиссе хотелось бы признавать вслух. Под самым потолком видны щели, доски местами подгнили, а из-за перекосившейся обшивки тянет сыростью прямо сверху.\n\n\"Вот видишь? Я же не выдумывала,\" тихо говорит Мелисса. Теперь вопрос уже не в том, есть ли там дрянь под крышей, а в том, где ей ночевать, пока вы не доберетесь до чердака и не разберетесь с этим как следует."
+    if _holes_seen > 0 and _temp_room == "" and _stage < 4:
+        $ current_action_items.append(MenuItem("Предложить пока ночевать у вас", Function(main_ui_call_label, "IntMelissaRoomProblemAdviceApply", girl_name, "mc_room")))
+        $ current_action_items.append(MenuItem("Предложить перебраться к Аманде", Function(main_ui_call_label, "IntMelissaRoomProblemAdviceApply", girl_name, "amanda_room")))
+        $ current_action_items.append(MenuItem("Предложить занять пустую комнату", Function(main_ui_call_label, "IntMelissaRoomProblemAdviceApply", girl_name, "empty_room")))
+    elif _holes_seen > 0 and _temp_room != "":
+        $ MainTxt = str(MainTxt or "") + "\n\nПока что Мелисса уже устроилась временно в другом месте. Теперь остается утром полезть на чердак и проверить, что творится над ее потолком."
+    $ current_action_items.append(MenuItem("Назад", Function(main_ui_call_label, "IntMelissaTalkRefresh", girl_name)))
+    $ CurLocDesc = MainTxt
+    return
+
+
+label IntMelissaRoomProblemAdviceApply(girl_name="melissa", advice_code=""):
+    $ _melissa_advice = str(advice_code or "").strip()
+    if _melissa_advice == "mc_room":
+        $ MelissaVar["temp_room"] = "TavernMyRoom"
+        $ sluttiness[girl_name] = min(100, int(sluttiness.get(girl_name, 0) or 0) + 1)
+        $ MainTxt = "На предложение перебраться пока к вам Мелисса сперва вспыхивает до самых ушей, но отказываться не спешит. \"Это... может и лучше, чем слушать эту дрянь под крышей. Только временно, пока ты не разберешься с комнатой. И без глупостей,\" добавляет она уже тише.\n\nВы подтверждаете, что сначала проверите ее комнату, потом чердак, и не оставите это на словах."
+    elif _melissa_advice == "amanda_room":
+        $ MelissaVar["temp_room"] = "TavernAmandaRoom"
+        $ MainTxt = "На предложение уйти к Аманде Мелисса кривится почти сразу. \"Она храпит, как пьяный матрос, и пинается во сне не хуже жеребца,\" бурчит она. Но после короткой паузы все же соглашается, что это лучше, чем снова лежать под шорохом и писком.\n\nВы обещаете, что это только временная мера, пока не выясните, что именно творится под крышей."
+    elif _melissa_advice == "empty_room":
+        $ MelissaVar["temp_room"] = "TavernEmptyRoom"
+        $ MainTxt = "Пустая комната Мелиссе совсем не по душе. \"Там холодно, сыро и так уныло, будто сразу в камеру посадили,\" признается она. Но если других вариантов не останется, она готова переждать там несколько ночей.\n\nВы говорите, что это лишь временно, а сами собираетесь осмотреть ее комнату и разобраться с чердаком."
+    else:
+        $ MelissaVar["AskedMCToSolveRoomProblem"] = 1
+        $ MelissaVar["bats_episode"] = max(int(MelissaVar.get("bats_episode", 0) or 0), 2)
+        $ MelissaVar["bat_attic_check_day"] = max(int(MelissaVar.get("bat_attic_check_day", -1) or -1), int(dayspassed or 0) + 1)
+        $ MainTxt = "Вы обещаете не замазывать дело словами, а сначала проверить ее комнату, потом утром внимательно осмотреть чердак над ней, а уже после этого думать, чем выкуривать тварей и как по-настоящему заделывать щели. Услышав такой ответ, Мелисса заметно успокаивается.\n\n\"Вот это уже похоже на дело,\" тихо говорит она. \"Ладно. Если ты и правда туда полезешь, я хотя бы буду знать, что мне не чудится.\""
+    $ Friends[girl_name] = min(20, int(Friends.get(girl_name, 0) or 0) + 1)
+    if _melissa_advice in ("mc_room", "amanda_room", "empty_room"):
+        $ MelissaVar["bats_episode"] = max(int(MelissaVar.get("bats_episode", 0) or 0), 3)
+        $ MainTxt = str(MainTxt or "") + "\n\nВы желаете Мелиссе спокойной ночи и решаете, что утром пора наконец проверить чердак над ее комнатой."
+    $ CurLocDesc = MainTxt
+    call IntMelissaTalkRefresh(girl_name)
     return
 
 

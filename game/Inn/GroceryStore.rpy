@@ -1,13 +1,53 @@
 # GroceryStore location - converted from legacy script
+init 4 python:
+    MilkPitcherItem = GameItem(
+        object_id="milk_pitcher_001",
+        name="крынка молока",
+        description="Свежая крынка молока из утреннего надоя. Ее можно сразу пустить на общий стол или отдать на кухню.",
+        price=6,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "grocery_good",
+            "grocery_kind": "milk",
+        },
+    )
+
 init python:
     import random
     import renpy.exports as renpy
 
+    def grocery_store_npc_on_shift(npc_id="", weekday_value=None, time_slot=None):
+        npc_key = str(npc_id or "").strip().lower()
+        if npc_key == "":
+            return False
+        week_now = int(week if weekday_value is None else weekday_value or 0)
+        time_now = int(time if time_slot is None else time_slot or 0)
+        scheduled_location = str(npc_schedule_location(npc_key, week_now, time_now) or "")
+        if scheduled_location:
+            return scheduled_location == "GroceryStore"
+        return str(CurrentLoc.get(npc_key, "") or "") == "GroceryStore"
+
+    def grocery_store_active_grocer_id():
+        if grocery_store_npc_on_shift("eddie"):
+            return "eddie"
+        if grocery_store_npc_on_shift("inga"):
+            return "inga"
+        if grocery_store_npc_on_shift("becky"):
+            return "becky"
+        return ""
+
     def grocery_store_eddie_visible():
-        return time == 0
+        return grocery_store_active_grocer_id() == "eddie"
 
     def grocery_store_becky_visible():
-        return time != 0
+        return grocery_store_active_grocer_id() == "becky"
+
+    def grocery_store_inga_visible():
+        return grocery_store_active_grocer_id() == "inga"
+
+    def grocery_store_service_available(_obj=None):
+        return grocery_store_active_grocer_id() != ""
 
     def grocery_store_lard_visible(_obj=None):
         return player_has_soap_recipe_book()
@@ -15,16 +55,31 @@ init python:
     def grocery_store_fancy_night_bowl_visible(_obj=None):
         return int(AmandaVar.get("gave_night_bowl", 0) or 0) == 1 and int(AmandaVar.get("got_fancy_night_bowl", 0) or 0) == 0
 
+    def grocery_store_lard_action_visible(_obj=None):
+        return grocery_store_service_available() and grocery_store_lard_visible()
+
+    def grocery_store_fancy_night_bowl_action_visible(_obj=None):
+        return grocery_store_service_available() and grocery_store_fancy_night_bowl_visible()
+
     def grocery_store_background_picture():
-        if int(time or 0) == 0:
+        active_grocer = grocery_store_active_grocer_id()
+        if active_grocer == "eddie":
             picture = grocery_store_eddie_picture()
-        else:
+        elif active_grocer == "inga":
+            picture = grocery_store_inga_picture()
+        elif active_grocer == "becky":
             picture = grocery_store_becky_picture()
+        else:
+            picture = ""
         if str(picture or "").strip():
             return picture
-        if int(time or 0) == 0:
+        if active_grocer == "eddie":
             return "images/eddie/portraits/portrait_0.png"
-        return "images/becky/portraits/portrait_1.png"
+        if active_grocer == "inga":
+            return "images/inga/StreetSex/minet1.jpg"
+        if active_grocer == "becky":
+            return "images/becky/portraits/portrait_1.png"
+        return "images/general/becky_inStore.png"
 
     def grocery_store_eddie_picture():
         candidates = []
@@ -57,21 +112,35 @@ init python:
         loadable = [row for row in candidates if renpy.loadable(row)]
         return random.choice(loadable) if len(loadable) > 0 else ""
 
+    def grocery_store_inga_picture():
+        candidates = [
+            str(girl_card_portrait_path("inga") or ""),
+            "images/inga/StreetSex/minet1.jpg",
+        ]
+        loadable = [row for row in candidates if str(row or "").strip() and renpy.loadable(row)]
+        return random.choice(loadable) if len(loadable) > 0 else ""
+
     def grocery_store_main_text():
         parts = [str(GroceryStoreRoom.descriptions[0].text or "").strip()]
+        active_grocer = grocery_store_active_grocer_id()
 
-        if time == 0:
+        if active_grocer == "eddie":
             parts.append("Сейчас утро, и за прилавком стоит Эдди, старший сын вдовы. Это здоровый рыжий парень примерно вашего возраста.")
             if BeckyVar.get("EddieRobbedDay", 0) > 0 and BeckyVar.get("EddieRobbedDay", 0) + 12 >= dayspassed:
                 parts.append("Вы заметили, что у Эдди красуется большой синяк под глазом и распухло ухо.")
             parts.append("Вы можете с ним поболтать.")
-        else:
+        elif active_grocer == "inga":
+            parts.append("Утреннюю смену у прилавка сегодня держит Ингенборг. Старшая дочка Бекки выглядит как молодая копия своей матери и уверенно распоряжается в семейной лавке.")
+            parts.append("Вы можете с ней поболтать.")
+        elif active_grocer == "becky":
             parts.append("За прилавком стоит сама Бекки Блэнкеншип. Это высокая рыжая женщина с полной грудью, ей на вид немного меньше сорока. Ее муж умер от болезни примерно за год до того, как ваш отец купил \"Дикого Жеребца\".")
             parts.append("Вы можете с ней поболтать.")
             if dayspassed > 30 and dayspassed <= 70:
                 parts.append("Вы знаете, что ваша мама с ней недавно подружилась.")
             elif dayspassed > 70:
                 parts.append("Она с вашей мамой - лучшие подруги.")
+        else:
+            parts.append("Лавка открыта, но за прилавком сейчас никого нет: видно, хозяйка и ее сын заняты в другом месте.")
 
         return "\n\n".join([row for row in parts if str(row or "").strip()])
 
@@ -125,6 +194,7 @@ init python:
 
     GroceryStoreRoom = Room(
         code_name="GroceryStore",
+        group_name=ROOM_GROUP_CITY,
         display_name="Продуктовая лавка",
         bg_picture="images/general/becky_inStore.png",
         descriptions=[
@@ -142,9 +212,10 @@ init python:
                 name="Провизия",
                 description="Мешки с овощами, мясо и прочая снедь для торговли и поставок в трактир.",
                 actions=[
-                    ObjectAction(action_id="buy_provisions", label="Купить провизию", hook="call", target="GroceryStoreBuyMenu"),
-                    ObjectAction(action_id="buy_lard", label="Купить свиное сало", hook="call", target="GroceryStoreBuyLard", condition=grocery_store_lard_visible),
-                    ObjectAction(action_id="buy_fancy_night_bowl", label="Купить красивую ночную миску", hook="call", target="GroceryStoreBuyFancyNightBowl", condition=grocery_store_fancy_night_bowl_visible),
+                    ObjectAction(action_id="buy_provisions", label="Купить провизию", hook="call", target="GroceryStoreBuyMenu", condition=grocery_store_service_available),
+                    ObjectAction(action_id="buy_lard", label="Купить свиное сало", hook="call", target="GroceryStoreBuyLard", condition=grocery_store_lard_action_visible),
+                    ObjectAction(action_id="buy_milk", label="Купить крынку молока", hook="call", target="GroceryStoreBuyMilk", condition=grocery_store_service_available),
+                    ObjectAction(action_id="buy_fancy_night_bowl", label="Купить красивую ночную миску", hook="call", target="GroceryStoreBuyFancyNightBowl", condition=grocery_store_fancy_night_bowl_action_visible),
                     ObjectAction(action_id="examine_food_stock", label="Осмотреть товар", hook="text", target="Мешки, капуста, туши в леднике. Все как и положено в приличной продуктовой лавке."),
                 ],
             ),
@@ -159,11 +230,12 @@ init python:
         ],
         npcs=[
             {"npc_id": "eddie", "name": "Эдди", "condition": grocery_store_eddie_visible, "talk_label": "IntEddieTalk"},
+            {"npc_id": "inga", "name": "Ингенборг", "condition": grocery_store_inga_visible, "talk_label": "IntIngaTalk"},
             {"npc_id": "becky", "name": "Бекки", "condition": grocery_store_becky_visible, "talk_label": "IntBeckyTalk"},
         ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
-            time_slots=[0, 1, 2],
+            time_slots=[0, 1, 2, 3],
             closed_text="В это время лавка закрыта.",
         ),
         custom_properties={
@@ -187,7 +259,6 @@ label GroceryStore:
     $ current_girl_key = ""
     $ current_object_id = ""
     $ BeckyVar.setdefault("EddieRobbedDay", 0)
-    $ CurrentLoc["eddie"] = "GroceryStore"
     $ _grocery_room = GroceryStoreRoom
     # Check if the store is closed
     if not _grocery_room.is_open(week, time):
@@ -206,17 +277,19 @@ label GroceryStore:
         jump GroceryStoreView
     
     # Assign grocer name
-    if time == 0:
+    if grocery_store_active_grocer_id() == "eddie":
         $ GrocerName = 'Эдди'
-    else:
+    elif grocery_store_active_grocer_id() == "becky":
         $ GrocerName = 'Бекки'
+    else:
+        $ GrocerName = 'хозяин лавки'
     
     # Character interaction
-    if time == 0:
+    if grocery_store_active_grocer_id() == "eddie":
         $ _grocery_picture = grocery_store_eddie_picture()
         if str(_grocery_picture or "").strip():
             call ShowImage("", "", _grocery_picture)
-    else:
+    elif grocery_store_active_grocer_id() == "becky":
         call BeckyLoversInStore
         $ _grocery_picture = grocery_store_becky_picture()
         if str(_grocery_picture or "").strip():
@@ -246,9 +319,9 @@ label GroceryStoreBuildActions:
         for _grocery_object in GroceryStoreRoom.visible_objects():
             current_action_items.append(MenuItem(_grocery_object.name, Call("GroceryStoreObjectMenu", _grocery_object.object_id)))
 
-    if time == 0:
+    if grocery_store_active_grocer_id() == "eddie":
         $ current_action_items.append(MenuItem("Поговорить с Эдди", Call("IntEddieTalk")))
-    else:
+    elif grocery_store_active_grocer_id() == "becky":
         $ current_action_items.append(MenuItem("Поговорить с Бекки", Call("IntBeckyTalk")))
 
     $ current_action_items.append(MenuItem("Вернуться на рынок", Jump("MarketPlace")))
@@ -364,6 +437,19 @@ label GroceryStoreBuyLard:
         $ money -= 5
         $ _player_add_item_by_id("pig_lard_001", 1)
         $ MainTxt = "Вы покупаете у [GrocerName] кусок свиного сала. Его можно пустить на стряпню или на мыло."
+        call stat
+    $ CurLocDesc = MainTxt
+    call GroceryStoreBuildActions
+    return
+
+
+label GroceryStoreBuyMilk:
+    if int(money or 0) < 6:
+        $ MainTxt = "[GrocerName] говорит, что свежая крынка молока стоит 6 мараведи, а сейчас у вас таких денег под рукой нет."
+    else:
+        $ money -= 6
+        $ _player_add_item_by_id("milk_pitcher_001", 1)
+        $ MainTxt = "Вы покупаете у [GrocerName] свежую крынку молока. Такое молоко сразу просится на кухню: с медом и кашей из него выйдет особенно мягкий общий стол."
         call stat
     $ CurLocDesc = MainTxt
     call GroceryStoreBuildActions

@@ -1,5 +1,8 @@
 # TODOs
 
+Current pass-by-pass control board:
+- [PROJECT_CONTROL_BOARD.md](/c:/Users/blank/Documents/RenPy_Projects/Tractir/devdocs/PROJECT_CONTROL_BOARD.md)
+
 This file now tracks three separate things:
 
 1. new gameplay/runtime features added on the Ren'Py side and the exact conditions that drive them;

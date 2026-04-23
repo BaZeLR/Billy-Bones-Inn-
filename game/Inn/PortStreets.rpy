@@ -11,9 +11,6 @@ init python:
     def port_streets_liza_can_talk():
         return liza_can_talk == 1
 
-    def port_streets_georgett_known():
-        return int(Friends.get("georgett", 0) or 0) > 0
-
     def port_streets_prepare_bottle_spawn():
         current_day = int(dayspassed or 0)
         if int(PortStreetsBottleSpawnDay or -1) == current_day:
@@ -26,6 +23,7 @@ init python:
 
     PortStreetsRoom = Room(
         code_name="PortStreets",
+        group_name=ROOM_GROUP_CITY,
         display_name="Портовые переулки",
         bg_picture="images/georgett/Port/port1.jpg",
         descriptions=[
@@ -87,8 +85,8 @@ init python:
             ),
         ],
         npcs=[
-            {"npc_id": "georgett", "name": "Жоржетта", "condition": port_streets_georgett_can_talk, "talk_label": "IntGeorgettTalk", "auto_card": 0, "known_condition": port_streets_georgett_known, "unknown_name": "Молодая женщина", "hide_examine_until_known": True},
-            {"npc_id": "liza", "name": "Лизетта", "condition": port_streets_liza_can_talk, "talk_label": "IntLizaTalk", "auto_card": 0},
+            {"npc_id": "georgett", "condition": port_streets_georgett_can_talk, "unknown_name": "Молодая женщина", "gender": "woman", "can_examine_unknown": False, "talk_args": ("georgett", "street")},
+            {"npc_id": "liza", "condition": port_streets_liza_can_talk, "talk_label": "IntLizaTalk", "auto_card": 0},
         ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6, 7],
@@ -220,14 +218,6 @@ label PortStreetsBuildActions:
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
-
-    if georgett_can_talk:
-        if int(Friends.get("georgett", 0) or 0) <= 0:
-            $ current_action_items.append(MenuItem("Заговорить с ней", Jump("IntGeorgettTalk")))
-        else:
-            $ current_action_items.append(MenuItem("Жоржетта", Jump("IntGeorgettTalk")))
-    if liza_can_talk:
-        $ current_action_items.append(MenuItem("Лизетта", Jump("IntLizaTalk")))
     if dog_is_here("PortStreets"):
         $ current_action_items.append(MenuItem(dog_room_action_caption("PortStreets"), Call("IntDogTalk", "PortStreets")))
 

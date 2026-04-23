@@ -5,6 +5,7 @@ default ShedBucketFound = 0
 init 6 python:
     ShedRoom = Room(
         code_name="Shed",
+        group_name=ROOM_GROUP_TAVERN,
         display_name="Сарай",
         bg_picture="images/tavern/backyard/shed/shed.png",
         descriptions=[
@@ -36,6 +37,17 @@ init 6 python:
             target_room = ShedRoom
         return _room_has_item_by_id(target_room, "lumber_001")
 
+    def shed_sync_room_state(room_obj=None):
+        target_room = room_obj if room_obj is not None else CurrentRoom
+        if target_room is None:
+            target_room = ShedRoom
+
+        if _player_has_item_by_id("old_axe_001"):
+            while _room_has_item_by_id(target_room, "old_axe_001"):
+                _room_remove_item_by_id(target_room, "old_axe_001")
+
+        return target_room
+
     def build_shed_description(include_notice=True, intro_text=""):
         room_obj = CurrentRoom if CurrentRoom is not None else ShedRoom
         room_item_ids = [get_object_id(row) for row in list(getattr(room_obj, "game_items", []) or [])]
@@ -53,9 +65,9 @@ init 6 python:
         if chopped_count > 0:
             chopped_name = str(chopped_item.name).strip()
             if chopped_count == 1:
-                text_parts.append("В сарае лежат {}. Всего: 1 единица.".format(chopped_name))
+                text_parts.append("В сарае лежат {}. Всего: одна охапка.".format(chopped_name))
             else:
-                text_parts.append("В сарае лежат {}. Всего: {} единиц.".format(chopped_name, chopped_count))
+                text_parts.append("В сарае лежат {}. Всего: {} охапок.".format(chopped_name, chopped_count))
         else:
             text_parts.append("Поленница пуста.")
 
@@ -104,8 +116,12 @@ init 6 python:
                 elif item_action.hook == "text":
                     items.append(MenuItem(item_action.label, Call("Examine", object_id, "Shed", item_action.target, object_id)))
 
-        if _player_has_item_by_id("lumber_001"):
-            items.append(MenuItem("Сложить бревно в сарае", Call("Drop", "lumber_001", "Shed", "Вы заносите бревно в сарай и складываете его к остальным запасам.", "lumber_001")))
+        _carried_lumber = int(_player_item_count_by_id("lumber_001") or 0)
+        if _carried_lumber > 0:
+            if _carried_lumber == 1:
+                items.append(MenuItem("Сложить бревно в сарае", Call("ShedStoreLumber")))
+            else:
+                items.append(MenuItem("Сложить бревна в сарае x{}".format(_carried_lumber), Call("ShedStoreLumber")))
 
         if not shed_has_lumber(room_obj):
             items.append(MenuItem("Сходить в лес за бревнами", Call("TravelToForest", "Shed")))
@@ -117,6 +133,7 @@ init 6 python:
 label Shed:
     call EnterLocation("Shed")
     $ CurrentRoom = ShedRoom
+    $ shed_sync_room_state(CurrentRoom)
     $ CurLoc = "Shed"
     $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
@@ -147,6 +164,39 @@ label ShedRoomActions:
     $ current_action_title = "Сарай"
     $ current_action_content = None
     $ current_action_items = build_shed_action_items()
+    return
+
+
+label ShedStoreLumber:
+    $ _shed_lumber_count = int(_player_item_count_by_id("lumber_001") or 0)
+    if _shed_lumber_count <= 0:
+        $ MainTxt = "У вас нет бревен, которые можно сложить в сарае."
+        $ CurLocDesc = MainTxt
+        call ShedRoomActions
+        return
+
+    $ _shed_added_lumber = 0
+    python:
+        for _shed_lumber_unit in range(_shed_lumber_count):
+            if not _player_remove_item_by_id("lumber_001", 1):
+                break
+            if _room_add_item_by_id(CurrentRoom, "lumber_001"):
+                _shed_added_lumber += 1
+            else:
+                _player_add_item_by_id("lumber_001", 1)
+                break
+    if _shed_added_lumber > 0:
+        $ _pc_register_chore_success("bring_woods")
+        if _shed_added_lumber == 1:
+            $ ShedNoticeText = "Вы заносите бревно в сарай и складываете его к остальным запасам."
+        else:
+            $ ShedNoticeText = "Вы заносите {} бревна в сарай и складываете их в общую кучу.".format(_shed_added_lumber)
+        $ ShedNoticePending = True
+        $ MainTxt = build_shed_description(True, "")
+    else:
+        $ MainTxt = "Сейчас не получается сложить бревна в сарае."
+    $ CurLocDesc = MainTxt
+    call ShedRoomActions
     return
 
 

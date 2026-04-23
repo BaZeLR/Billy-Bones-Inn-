@@ -29,9 +29,28 @@ init python:
             flags = SandraVar if isinstance(SandraVar, dict) else {}
         except Exception:
             flags = {}
-        if int(week or 0) == 5 and int(time or 0) == 0:
-            if int(flags.get("Week5WakePending", 0) or 0) > 0 and int(flags.get("WeeklyChoreCheckScore", 0) or 0) >= 4:
+
+        try:
+            current_week = int(week or 0)
+        except Exception:
+            current_week = 0
+
+        try:
+            current_time = int(time or 0)
+        except Exception:
+            current_time = 0
+
+        if (
+            current_week == 1
+            and current_time == 0
+            and int(flags.get("Week5WakePending", 0) or 0) > 0
+            and int(flags.get("WeeklyChoreCheckScore", 0) or 0) >= 4
+        ):
+            try:
+                return str(sandra_weekly_wake_target_label() or "SandraWeek5WakeEvent")
+            except Exception:
                 return "SandraWeek5WakeEvent"
+
         return ""
 
 label NextDay(retlocname, timepassed):
@@ -258,9 +277,9 @@ label NextDay(retlocname, timepassed):
         $ _nextday_return_label = str(retlocname or "TavernMain")
         if int(time or 0) == 0 and _nextday_return_label == "TavernMain":
             $ _nextday_return_label = "TavernMyRoom"
-        $ _nextday_post_sleep_event = str(nextday_pick_post_sleep_event_label() or "")
-        if _nextday_post_sleep_event != "":
-            call expression _nextday_post_sleep_event pass (_nextday_return_label,)
+        $ _nextday_post_sleep_label = str(nextday_pick_post_sleep_event_label() or "")
+        if _nextday_post_sleep_label != "":
+            call expression _nextday_post_sleep_label pass (_nextday_return_label,)
         jump expression _nextday_return_label
     return
 

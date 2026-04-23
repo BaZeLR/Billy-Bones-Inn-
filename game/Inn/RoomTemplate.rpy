@@ -1,18 +1,109 @@
 default roomFirstVisit = {}
 
 init -40 python:
+    roomRegistry = {}
+    ROOM_GROUP_TAVERN = "tavern"
+    ROOM_GROUP_CITY = "city"
+    ROOM_GROUP_FOREST = "forest"
+    ROOM_GROUP_OTHER = "other"
+
+    roomGroupOverrides = {
+        "Backyard": ROOM_GROUP_TAVERN,
+        "Shed": ROOM_GROUP_TAVERN,
+        "StreetTavern": ROOM_GROUP_CITY,
+        "MarketPlace": ROOM_GROUP_CITY,
+        "PortStreets": ROOM_GROUP_CITY,
+        "Church": ROOM_GROUP_CITY,
+        "BarberShop": ROOM_GROUP_CITY,
+        "DressShop": ROOM_GROUP_CITY,
+        "GroceryStore": ROOM_GROUP_CITY,
+        "HunterClub": ROOM_GROUP_CITY,
+        "WineStore": ROOM_GROUP_CITY,
+        "BeckyHome": ROOM_GROUP_CITY,
+        "BeckyHomeFront": ROOM_GROUP_CITY,
+        "EllonaTemple": ROOM_GROUP_CITY,
+        "TempleCloister": ROOM_GROUP_CITY,
+        "Cemetery": ROOM_GROUP_CITY,
+        "StolyarWorkshop": ROOM_GROUP_CITY,
+        "FridayDance": ROOM_GROUP_CITY,
+        "Forest": ROOM_GROUP_FOREST,
+        "ForestClearing": ROOM_GROUP_FOREST,
+        "ForestLake": ROOM_GROUP_FOREST,
+        "ForestSpring": ROOM_GROUP_FOREST,
+        "ForestWaterfall": ROOM_GROUP_FOREST,
+        "ForestHiddenPath": ROOM_GROUP_FOREST,
+        "ForestDarkWoods": ROOM_GROUP_FOREST,
+        "ForestCave": ROOM_GROUP_FOREST,
+    }
+
+    def infer_room_group(room_code=""):
+        room_key = str(room_code or "").strip()
+        if room_key == "":
+            return ROOM_GROUP_OTHER
+        if room_key in roomGroupOverrides:
+            return str(roomGroupOverrides.get(room_key, ROOM_GROUP_OTHER) or ROOM_GROUP_OTHER)
+        if room_key.startswith("Tavern"):
+            return ROOM_GROUP_TAVERN
+        if room_key.startswith("Forest"):
+            return ROOM_GROUP_FOREST
+        return ROOM_GROUP_OTHER
+
+    def room_group(room_code=""):
+        room_key = str(room_code or "").strip()
+        if room_key == "":
+            return ROOM_GROUP_OTHER
+        room_obj = get_registered_room(room_key)
+        if room_obj is not None:
+            group_value = str(getattr(room_obj, "group_name", "") or "").strip().lower()
+            if group_value:
+                return group_value
+            props = getattr(room_obj, "custom_properties", None)
+            if isinstance(props, dict):
+                group_value = str(props.get("group_name", "") or "").strip().lower()
+                if group_value:
+                    return group_value
+        return infer_room_group(room_key)
+
+    def current_room_group():
+        room_key = str(getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip()
+        return room_group(room_key)
+
+    def room_in_group(room_code="", group_name=""):
+        expected = str(group_name or "").strip().lower()
+        if expected == "":
+            return False
+        return room_group(room_code) == expected
+
+    def rooms_in_group(group_name=""):
+        expected = str(group_name or "").strip().lower()
+        if expected == "":
+            return []
+        out = []
+        for room_key in list(roomRegistry.keys()):
+            if room_in_group(room_key, expected):
+                out.append(room_key)
+        return sorted(out)
+
+    def register_room_runtime(room_obj=None):
+        global roomRegistry
+
+        if room_obj is None:
+            return None
+
+        room_code = str(getattr(room_obj, "code_name", "") or "").strip()
+        if room_code == "":
+            return room_obj
+
+        roomRegistry[room_code] = room_obj
+        return room_obj
+
     def get_registered_room(room_code=""):
+        global roomRegistry
+
         room_key = str(room_code or "").strip()
         if room_key == "":
             return None
-        for maybe_room in list(globals().values()):
-            try:
-                maybe_code = object.__getattribute__(maybe_room, "code_name")
-            except Exception:
-                continue
-            if str(maybe_code or "").strip() == room_key:
-                return maybe_room
-        return None
+        return roomRegistry.get(room_key, None)
 
 
     def restore_room_runtime(room_code="", payload=None):
@@ -22,7 +113,14 @@ init -40 python:
 
         payload = dict(payload or {})
         if "custom_properties" in payload:
-            restored.custom_properties = dict(payload.get("custom_properties", {}) or {})
+            merged_properties = dict(getattr(restored, "custom_properties", {}) or {})
+            merged_properties.update(dict(payload.get("custom_properties", {}) or {}))
+            restored.custom_properties = merged_properties
+        if "game_items" in payload:
+            restored.game_items = list(payload.get("game_items", []) or [])
+            restored.objects = restored.game_items
+        if "npcs" in payload:
+            restored.npcs = list(payload.get("npcs", []) or [])
         return restored
 
     class RoomExit(object):
@@ -146,6 +244,7 @@ init -40 python:
             scenes=None,
             triggers=None,
             custom_properties=None,
+            group_name="",
         ):
             self.code_name = str(code_name or "").strip()
             self.room_id = self.code_name
@@ -162,6 +261,10 @@ init -40 python:
             self.scenes = list(scenes or [])
             self.triggers = list(triggers or [])
             self.custom_properties = dict(custom_properties or {})
+            self.group_name = str(group_name or self.custom_properties.get("group_name", "") or infer_room_group(self.code_name)).strip().lower()
+            if self.group_name:
+                self.custom_properties["group_name"] = self.group_name
+            register_room_runtime(self)
 
         def is_first_visit(self):
             return not bool(roomFirstVisit.get(self.code_name, False))
@@ -273,7 +376,6 @@ init -40 python:
                 if isinstance(npc, dict):
                     npc_state = dict(npc)
                     npc_state["condition"] = room_rule_serialize(npc_state.get("condition", None))
-                    npc_state["known_condition"] = room_rule_serialize(npc_state.get("known_condition", None))
                     serialized_npcs.append(npc_state)
                 else:
                     serialized_npcs.append(npc)
@@ -290,10 +392,14 @@ init -40 python:
 
         def __setstate__(self, state):
             self.__dict__.update(dict(state or {}))
+            register_room_runtime(self)
 
         def __reduce__(self):
+            state = self.__getstate__()
             payload = {
-                "custom_properties": dict(getattr(self, "custom_properties", {}) or {}),
+                "custom_properties": dict(state.get("custom_properties", {}) or {}),
+                "game_items": list(state.get("game_items", []) or []),
+                "npcs": list(state.get("npcs", []) or []),
             }
             return (restore_room_runtime, (str(getattr(self, "code_name", "") or ""), payload))
 label MoveToRoom(target_label="", movement_minutes=0):

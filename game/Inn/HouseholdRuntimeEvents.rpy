@@ -1,5 +1,8 @@
 default HouseholdRuntimeEventSeen = {}
 default HouseholdInsightState = {}
+default HouseholdSoapRequestLastDay = {}
+default HouseholdBarberRequestLastDay = {}
+default HouseholdWarmDrinkLastDay = {}
 
 init python:
     import random
@@ -120,14 +123,48 @@ init python:
         )
 
     def melissa_room_problem_available():
+        try:
+            melissa_sync_room_problem_state()
+        except Exception:
+            pass
+        stage = melissa_bats_stage()
+        temp_room = str(MelissaVar.get("temp_room", "") or "").strip()
         return (
             str(CurLoc or "") == "TavernMelissaRoom"
+            and int(time or 0) >= 4
+            and int(MelissaVar.get("storage_rat_last_help_day", -1) or -1) >= 0
+            and stage >= 2
+            and stage < 4
             and (
-                int(MelissaVar.get("room_pests_last_help_day", -1) or -1) >= 0
-                or int(MelissaVar.get("room_pests_cleared", 0) or 0) > 0
+                int(MelissaVar.get("RoomProblemAskDay", -1) or -1) != int(dayspassed or 0)
+                or (stage >= 3 and temp_room == "")
             )
-            and int(MelissaVar.get("RoomProblemAskDay", -1) or -1) != int(dayspassed or 0)
+            and (stage < 2 or stage >= 3 or temp_room == "")
         )
+
+    def melissa_temp_room_text():
+        try:
+            melissa_sync_room_problem_state()
+        except Exception:
+            pass
+        temp_room = str(MelissaVar.get("temp_room", "") or "")
+        repair_day = int(MelissaVar.get("roof_repair_complete_day", -1) or -1)
+        waiting_for_repair = repair_day >= 0
+        if temp_room == "" or melissa_bats_stage() >= 8:
+            return ""
+        if temp_room == "TavernMyRoom":
+            if waiting_for_repair:
+                return "Из-за летучих мышей и щелей под крышей Мелисса пока держит часть вещей у вас и временно ночует в вашей комнате, пока не закончится заказанная починка крыши."
+            return "Из-за летучих мышей и паутины Мелисса пока держит часть вещей у вас и готова временно ночевать в вашей комнате, пока вы не решите проблему."
+        if temp_room == "TavernAmandaRoom":
+            if waiting_for_repair:
+                return "Из-за летучих мышей и щелей под крышей Мелисса пока ночует у Аманды и ждет, пока закончится заказанная починка крыши."
+            return "Из-за летучих мышей и паутины Мелисса пока собирается ночевать у Аманды, пока вы не решите проблему."
+        if temp_room == "TavernEmptyRoom":
+            if waiting_for_repair:
+                return "Из-за летучих мышей и щелей под крышей Мелисса пока перебралась в пустую комнату и ждет, пока закончится заказанная починка крыши."
+            return "Из-за летучих мышей и паутины Мелисса пока присматривается к пустующей комнате, пока вы не решите проблему."
+        return ""
 
     def household_dress_revealing_score(dress_code=""):
         dress_name = str(dress_code or "").strip()
@@ -172,6 +209,98 @@ init python:
             and int(TalkedToday.get("sandra", 0) or 0) == 0
         )
 
+    def household_soap_request_ready(girl_name=""):
+        girl = str(girl_name or "").strip().lower()
+        if girl == "":
+            return False
+        if not isinstance(SoapRequestQueue, dict):
+            return False
+        if int(SoapRequestQueue.get(girl, 0) or 0) <= 0:
+            return False
+        if int(TalkedToday.get(girl, 0) or 0) != 0:
+            return False
+        if soap_total_piece_count() > 0:
+            return False
+        last_day = int(HouseholdSoapRequestLastDay.get(girl, -14) or -14)
+        return int(dayspassed or 0) - last_day >= 5
+
+    def household_warm_drink_ready(girl_name=""):
+        girl = str(girl_name or "").strip().lower()
+        if girl == "":
+            return False
+        if household_morning_issue_type(girl) != "sick":
+            return False
+        if int(_player_item_count_by_id("libido_tincture_001") or 0) <= 0:
+            return False
+        if int(TalkedToday.get(girl, 0) or 0) != 0:
+            return False
+        return int(dayspassed or 0) - int(HouseholdWarmDrinkLastDay.get(girl, -7) or -7) >= 1
+
+    def household_room_issue_action_specs(girl_name=""):
+        girl = str(girl_name or "").strip().lower()
+        issue_code = str(household_morning_issue_type(girl) or "").strip()
+        rows = []
+        if girl == "":
+            return rows
+        if issue_code == "sick":
+            if int(_player_item_count_by_id("healing_potion_001") or 0) > 0:
+                rows.append({
+                    "label": "Принести %s лечебное зелье" % _action_display_name(girl),
+                    "target": "HouseholdMorningIssueCure",
+                    "args": (girl,),
+                })
+            if household_warm_drink_ready(girl):
+                rows.append({
+                    "label": "Согреть %s пряной настойкой" % _action_display_name(girl),
+                    "target": "HouseholdMorningIssueWarmDrink",
+                    "args": (girl,),
+                })
+            return rows
+        if issue_code == "sleepy":
+            rows.append({
+                "label": "Разбудить %s" % _action_display_name(girl),
+                "target": "HouseholdWakeSleepyGirl",
+                "args": (girl,),
+            })
+        return rows
+
+    def household_barber_request_ready(girl_name="", request_context=""):
+        girl = str(girl_name or "").strip().lower()
+        context_key = str(request_context or "").strip().lower()
+        if girl == "":
+            return False
+        if context_key != "breakfast":
+            return False
+        if girl not in list(household_breakfast_attendee_ids() or []):
+            return False
+        if int(TalkedToday.get(girl, 0) or 0) != 0:
+            return False
+        if not isinstance(BarberInvitePending, dict):
+            return False
+        if int(BarberInvitePending.get(girl, 0) or 0) == 1:
+            return False
+        if int(dayspassed or 0) - int(BarberVisitLastDay.get(girl, -14) or -14) < 14:
+            return False
+        if int(dayspassed or 0) - int(HouseholdBarberRequestLastDay.get(girl, -14) or -14) < 14:
+            return False
+        friend_thresholds = {"sandra": 7, "melissa": 6, "amanda": 5}
+        openness_thresholds = {"sandra": 2, "melissa": 2, "amanda": 1}
+        if int(Friends.get(girl, 0) or 0) < int(friend_thresholds.get(girl, 99) or 99):
+            return False
+        return int(otkroven.get(girl, 0) or 0) >= int(openness_thresholds.get(girl, 99) or 99)
+
+    def household_pending_request_girl(current_room=""):
+        room_code = str(current_room or CurLoc or "").strip()
+        room_girls = []
+        if room_code == "TavernMain":
+            room_girls = [girl for girl in ("amanda", "melissa", "sandra") if _tavern_is_in_room(girl, "TavernMain")]
+        elif room_code == "TavernKitchen":
+            room_girls = [girl for girl in ("amanda", "melissa", "sandra") if _tavern_is_in_room(girl, "TavernKitchen")]
+        for girl in room_girls:
+            if household_soap_request_ready(girl):
+                return ("soap", girl)
+        return ("", "")
+
     def melissa_revealing_dress_request_ready():
         return (
             int(SandraVar.get("revealing_dress_ordered", 0) or 0) == 1
@@ -198,8 +327,8 @@ init python:
     def melissa_clara_overhear_ready():
         return (
             str(CurLoc or "") == "TavernMain"
-            and clara_visible_in_location("TavernMain")
             and _tavern_is_in_room("melissa", "TavernMain")
+            and int(time or 0) == 2
             and not household_runtime_event_seen_today("melissa_clara_overhear")
         )
 
@@ -214,11 +343,7 @@ init python:
         )
 
     def tavern_melissa_room_pests_event_ready():
-        return (
-            str(CurLoc or "") == "TavernMelissaRoom"
-            and _tavern_is_in_room("melissa", "TavernMelissaRoom")
-            and not household_runtime_event_seen_today("melissa_room_pests")
-        )
+        return False
 
     def melissa_night_wake_event_ready(return_location=""):
         return (
@@ -238,6 +363,109 @@ init python:
 label HouseholdReturnCurrentRoom:
     $ _household_return_room = household_return_current_room_label()
     jump expression _household_return_room
+
+
+label HouseholdSoapRequestEvent(girl_name=""):
+    $ _soap_girl = str(girl_name or "").strip().lower()
+    if _soap_girl == "":
+        call HouseholdReturnCurrentRoom
+    $ HouseholdSoapRequestLastDay[_soap_girl] = int(dayspassed or 0)
+    $ TalkedToday[_soap_girl] = max(1, int(TalkedToday.get(_soap_girl, 0) or 0))
+    $ _soap_preferred = household_soap_preferred_aroma_text(_soap_girl)
+    $ _soap_last_label = soap_last_batch_label()
+    if _soap_girl == "sandra":
+        $ MainTxt = "Сандра перехватывает вас на минуту и, чуть понизив голос, признает, что хорошее мыло в доме уже распробовали все. \"Если опять надумаешь варить, отложи мне кусок получше. Мне бы что-нибудь %s. После того %s и на кухне приятнее, и самой будто легче дышится,\" говорит она без обычной суровости." % (_soap_preferred, _soap_last_label)
+    elif _soap_girl == "melissa":
+        $ MainTxt = "Мелисса, чуть смутившись, спрашивает, не найдется ли у вас еще хорошего мыла. \"После того куска я как-то совсем отвыкла от обычной серой дряни. Если снова сваришь, мне бы %s мыло... вроде того %s. Отложи мне один, ладно?\"" % (_soap_preferred, _soap_last_label)
+    else:
+        $ MainTxt = "Аманда быстро переходит на заговорщический тон: \"Стефан, если у тебя опять будет %s мыло, не забудь про меня. После того %s и волосы лучше лежат, и сама чувствуешь себя совсем по-другому.\"" % (_soap_preferred, _soap_last_label)
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Ваш ответ"
+    $ current_action_content = None
+    $ current_action_items = []
+    if int(_player_item_count_by_id("luxury_soap_001") or 0) > 0:
+        $ current_action_items.append(MenuItem("Сразу отдать роскошное мыло", Call("HouseholdSoapRequestGiveNow", _soap_girl, "luxury_soap_001")))
+    if int(_player_item_count_by_id("soap_001") or 0) > 0:
+        $ current_action_items.append(MenuItem("Сразу отдать обычное мыло", Call("HouseholdSoapRequestGiveNow", _soap_girl, "soap_001")))
+    $ current_action_items.append(MenuItem("Пообещать достать мыло позже", Call("HouseholdSoapRequestAcknowledge", _soap_girl, 1)))
+    $ current_action_items.append(MenuItem("Отмахнуться пока что", Call("HouseholdSoapRequestAcknowledge", _soap_girl, 0)))
+    return
+
+
+label HouseholdSoapRequestGiveNow(girl_name="", item_id="soap_001"):
+    $ _soap_girl = str(girl_name or "").strip().lower()
+    $ _soap_item = str(item_id or "soap_001").strip()
+    if int(_player_item_count_by_id(_soap_item) or 0) <= 0:
+        $ MainTxt = "У вас этого больше нет."
+        $ CurLocDesc = MainTxt
+        call HouseholdReturnCurrentRoom
+        return
+    $ _player_remove_item_by_id(_soap_item, 1)
+    $ _soap_effect = player_apply_item_social_effects(_soap_girl, _soap_item, True)
+    $ MainTxt = "{} принимает подарок сразу, не скрывая удовольствия. {}".format(str(RealName.get(_soap_girl, _soap_girl) or _soap_girl), str(_soap_effect.get("text", "") or "").strip())
+    $ CurLocDesc = MainTxt
+    call stat
+    call HouseholdReturnCurrentRoom
+    return
+
+
+label HouseholdSoapRequestAcknowledge(girl_name="", agree=0):
+    $ _soap_girl = str(girl_name or "").strip().lower()
+    if int(agree or 0) == 1:
+        $ MainTxt = "Вы обещаете, что не забудете о просьбе. Похоже, это заметно поднимает ей настроение."
+        $ Friends[_soap_girl] = min(20, int(Friends.get(_soap_girl, 0) or 0) + 1)
+    else:
+        $ MainTxt = "Вы отвечаете, что пока вам не до мыла. Просьбу принимают без скандала, но без особой радости."
+    $ CurLocDesc = MainTxt
+    call HouseholdReturnCurrentRoom
+    return
+
+
+label HouseholdBarberRequestEvent(girl_name=""):
+    $ _barber_girl = str(girl_name or "").strip().lower()
+    if _barber_girl == "":
+        call HouseholdReturnCurrentRoom
+    $ HouseholdBarberRequestLastDay[_barber_girl] = int(dayspassed or 0)
+    $ TalkedToday[_barber_girl] = max(1, int(TalkedToday.get(_barber_girl, 0) or 0))
+    if _barber_girl == "sandra":
+        $ MainTxt = "За завтраком вы сами поднимаете разговор о Серджио и предлагаете Сандре сходить к цирюльнику. Она сперва щурится с привычным недоверием, а потом все же кивает: \"Если уж ты решил тянуть трактир вверх, дом тоже должен выглядеть аккуратнее. И да, для трактира это тоже не пустяк: ухоженная хозяйка кухни дому только на пользу.\""
+    elif _barber_girl == "melissa":
+        $ MainTxt = "За завтраком вы осторожно предлагаете Мелиссе сходить к Серджио. Она заметно смущается, но не отказывается: \"После хорошей стрижки и всех его притираний, наверное, даже чувствуешь себя иначе. И если я буду выглядеть аккуратнее, то и в зале, и по дому держаться проще.\""
+    else:
+        $ MainTxt = "За завтраком вы предлагаете Аманде заглянуть к Серджио. Она оживляется почти сразу: \"Это было бы отлично! Он не только стрижет, он еще знает кучу смешных историй про чулки, нижнее белье и всякие женские хитрости. После такого и в трактире выглядеть веселее, и гостей держать на себе проще.\""
+    $ CurLocDesc = MainTxt
+    if TavernBreakfastEventActive:
+        $ tavern_breakfast_restore_ui_state(MainTxt)
+        $ _barber_items = [
+            MenuItem("Пообещать визит к Серджио", Call("HouseholdBarberRequestChoice", _barber_girl, 1)),
+            MenuItem("Сказать, что пока не до этого", Call("HouseholdBarberRequestChoice", _barber_girl, 0)),
+        ]
+        call QueuePagedPanelText(MainTxt, "Ваш ответ", _barber_items, "plain")
+        call ReturnToMainUI
+        return
+    "[MainTxt]"
+    menu:
+        "Пообещать визит к Серджио":
+            call HouseholdBarberRequestChoice(_barber_girl, 1)
+            return
+        "Сказать, что пока не до этого":
+            call HouseholdBarberRequestChoice(_barber_girl, 0)
+            return
+    return
+
+
+label HouseholdBarberRequestChoice(girl_name="", agree=0):
+    $ _barber_girl = str(girl_name or "").strip().lower()
+    if int(agree or 0) == 1:
+        $ BarberInvitePending[_barber_girl] = 1
+        $ Friends[_barber_girl] = min(20, int(Friends.get(_barber_girl, 0) or 0) + 1)
+        $ MainTxt = "Вы обещаете, что при первом удобном открытом дне Серджио отведете ее к цирюльнику. Просьбу явно услышали с удовольствием."
+    else:
+        $ MainTxt = "Вы отвечаете, что пока у трактира и без того хватает расходов. На этом разговор сворачивается."
+    $ CurLocDesc = MainTxt
+    if not TavernBreakfastEventActive:
+        call HouseholdReturnCurrentRoom
+    return
 
 
 label SandraDressInitiativeEvent:
@@ -313,19 +541,6 @@ label HouseholdRevealDressRequestChoice(girl_name="", agree=0):
     call HouseholdReturnCurrentRoom
 
 
-label MelissaClaraOverhearEvent:
-    $ household_mark_runtime_event_seen("melissa_clara_overhear")
-    if melissa_clara_overhear_variant() == 0:
-        $ MainTxt = "Вы невольно задерживаетесь у соседнего стола и успеваете услышать, как Кларисса, давясь смехом, шепчет Мелиссе: \"У старой водокачки за лесом, где беседка, играли две собачки, как папа и соседка\".\n\nМелисса сначала краснеет до самых ушей, потом тоже не выдерживает и тихо прыскает. Похоже, такая пошлая прибаутка оседает у нее в голове куда глубже, чем она хотела бы признать."
-        $ sluttiness["melissa"] = min(100, int(sluttiness.get("melissa", 0) or 0) + 3)
-    else:
-        $ MainTxt = "Проходя через зал, вы замечаете, как Мелисса с Клариссой о чем-то переговариваются в стороне от общего шума. Разобрать слова не удается, зато до вас вполне отчетливо доносятся тихие хихиканья, влажные чмокающие звуки и приглушенные стоны. Когда вы оборачиваетесь, обе уже делают вид, что обсуждали что-то совершенно невинное."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Действия в трактире"
-    $ current_action_content = None
-    return
-
-
 label TavernStorageRatEvent:
     $ household_mark_runtime_event_seen("melissa_storage_rat")
     if renpy.loadable("game/images/melissa/tavern/rat_in_basement_melissa.png"):
@@ -347,10 +562,13 @@ label TavernStorageRatChoice(kill_rat=0):
     if int(kill_rat or 0) == 1:
         $ MelissaVar["storage_rat_cleared"] = 1
         $ MelissaVar["storage_rat_last_help_day"] = int(dayspassed or 0)
+        $ WerecatVar["rat_carcass_cached"] = 1
+        $ WerecatVar["rats_problem_active"] = 1
+        $ WerecatVar["rat_food_loss_next_day"] = int(dayspassed or 0) + 7
         $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
         $ cleaning["melissa"] = min(100, int(cleaning.get("melissa", 0) or 0) + 1)
         $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
-        $ MainTxt = "Вы быстро расправляетесь с крысой, и Мелисса заметно расслабляется. \"Вот теперь другое дело,\" тихо говорит она, уже без прежнего раздражения. Похоже, такая помощь только укрепляет ее привычку относиться к хозяйству всерьез."
+        $ MainTxt = "Вы быстро расправляетесь с крысой, и Мелисса заметно расслабляется. \"Вот теперь другое дело,\" тихо говорит она, уже без прежнего раздражения. На всякий случай вы решаете не выбрасывать тушку сразу: такая приманка еще может сгодиться, если в лесу и правда водится тот необычный кошачий охотник, о котором судачат по трактирам."
     else:
         $ MainTxt = "Вы решаете не возиться с крысой прямо сейчас. Мелисса поджимает губы и берется переставлять мешки подальше от шороха, явно недовольная тем, что проблему придется терпеть еще какое-то время."
     $ CurLocDesc = MainTxt
@@ -371,13 +589,25 @@ label MelissaRoomPestsEvent:
 
 
 label MelissaRoomPestsChoice(help_pests=0):
+    $ _melissa_bats_active = melissa_bats_stage() > 0 and melissa_bats_stage() < 8
     if int(help_pests or 0) == 1:
-        $ MelissaVar["room_pests_cleared"] = 1
-        $ MelissaVar["room_pests_last_help_day"] = int(dayspassed or 0)
-        $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
-        $ cleaning["melissa"] = min(100, int(cleaning.get("melissa", 0) or 0) + 1)
-        $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
-        $ MainTxt = "Вы быстро смахиваете паутину, шумом поднимаете с балок летучих мышей и выпроваживаете их наружу. Мелисса облегченно выдыхает: похоже, порядок в ее комнате для нее и правда важен."
+        if _melissa_bats_active:
+            $ MelissaVar["room_pests_last_help_day"] = int(dayspassed or 0)
+            $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
+            $ cleaning["melissa"] = min(100, int(cleaning.get("melissa", 0) or 0) + 1)
+            $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+            $ MainTxt = "Вы быстро выметаете свежую паутину и наводите в комнате хоть какой-то порядок, но сразу понимаете, что настоящая беда никуда не делась. Под крышей по-прежнему шуршит и скребется вся та дрянь, с которой придется разбираться уже через чердак и щели под кровлей."
+        else:
+            $ MelissaVar["bats_episode"] = max(int(MelissaVar.get("bats_episode", 0) or 0), 8)
+            $ MelissaVar["room_pests_last_help_day"] = int(dayspassed or 0)
+            $ MelissaVar["temp_room"] = ""
+            $ MelissaVar["roof_repair_order_day"] = -1
+            $ MelissaVar["roof_repair_complete_day"] = -1
+            $ MelissaVar["AskedMCToSolveRoomProblem"] = 0
+            $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
+            $ cleaning["melissa"] = min(100, int(cleaning.get("melissa", 0) or 0) + 1)
+            $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+            $ MainTxt = "Вы быстро смахиваете паутину, шумом поднимаете с балок летучих мышей и выпроваживаете их наружу. Мелисса облегченно выдыхает: похоже, порядок в ее комнате для нее и правда важен."
     else:
         $ MainTxt = "Вы решаете пока не возиться с пауками и мышами. Мелисса кривится и недовольно косится на потолок, понимая, что вечером ей снова придется слушать это шуршание."
     $ CurLocDesc = MainTxt
@@ -404,6 +634,28 @@ label HouseholdMorningIssueCure(girl_name=""):
     return
 
 
+label HouseholdMorningIssueWarmDrink(girl_name=""):
+    $ _issue_girl = str(girl_name or "").strip().lower()
+    if not household_warm_drink_ready(_issue_girl):
+        call HouseholdReturnCurrentRoom
+        return
+    $ _player_remove_item_by_id("libido_tincture_001", 1)
+    $ HouseholdWarmDrinkLastDay[_issue_girl] = int(dayspassed or 0)
+    $ TalkedToday[_issue_girl] = max(1, int(TalkedToday.get(_issue_girl, 0) or 0))
+    $ Friends[_issue_girl] = min(20, int(Friends.get(_issue_girl, 0) or 0) + 1)
+    $ otkroven[_issue_girl] = min(20, int(otkroven.get(_issue_girl, 0) or 0) + 1)
+    $ sluttiness[_issue_girl] = min(100, int(sluttiness.get(_issue_girl, 0) or 0) + 1)
+    if _issue_girl == "sandra":
+        $ MainTxt = "Сандра сначала кривится на саму идею пряной настойки с утра, но все же делает несколько осторожных глотков. Напиток быстро разгоняет холод по телу, и хозяйка уже не так сурово ворчит, признавая, что от такого внимания ей и правда легче."
+    elif _issue_girl == "melissa":
+        $ MainTxt = "Мелисса принимает пряную настойку обеими руками и пьет медленно, будто растягивает не столько тепло, сколько саму вашу заботу. Через несколько минут она выглядит живее, хотя и признает, что ей все равно лучше отлежаться еще немного."
+    else:
+        $ MainTxt = "Аманда с готовностью хватается за пряную настойку и почти сразу оживляется. \"Ну вот, совсем другое дело,\" заявляет она, явно наслаждаясь не только теплом в груди, но и самим поводом получить от вас чуть больше внимания."
+    $ CurLocDesc = MainTxt
+    call HouseholdReturnCurrentRoom
+    return
+
+
 label HouseholdWakeSleepyGirl(girl_name=""):
     $ _wake_girl = str(girl_name or "").strip().lower()
     if household_morning_issue_type(_wake_girl) != "sleepy":
@@ -417,36 +669,36 @@ label HouseholdWakeSleepyGirl(girl_name=""):
     if _wake_girl == "sandra":
         $ MainTxt = "Вы осторожно будите Сандру. Та сначала недовольно морщится, потом резко собирается, будто сама сердится не на вас, а на то, что дала себе лишнюю слабину."
         if _wake_indecent:
-            $ MainTxt = str(MainTxt or "") + "\n\nПока Сандра поднималась, вы невольно успели заметить, что рубаха на ней сбилась куда выше приличного. Поймав ваш взгляд, она без лишней суеты поправляет ткань, но в ее лице на миг мелькает совсем не хозяйская, а женская неловкость."
+            $ MainTxt = str(MainTxt or "") + "\nПока Сандра поднималась, вы невольно успели заметить, что рубаха на ней сбилась куда выше приличного. Поймав ваш взгляд, она без лишней суеты поправляет ткань, но в ее лице на миг мелькает совсем не хозяйская, а женская неловкость."
             $ sluttiness["sandra"] = min(100, int(sluttiness.get("sandra", 0) or 0) + 1)
         if _wake_bulge:
             if int(Friends.get("sandra", 0) or 0) >= 10 or int(sluttiness.get("sandra", 0) or 0) >= 20:
-                $ MainTxt = str(MainTxt or "") + "\n\nСандра успевает заметить и вашу слишком уж явную выпуклость под одеждой. Вместо скандала она только сухо хмыкает: \"Вот и думай после этого, кто тут проспал по-настоящему.\""
+                $ MainTxt = str(MainTxt or "") + "\nСандра успевает заметить и вашу слишком уж явную выпуклость под одеждой. Вместо скандала она только сухо хмыкает: \"Вот и думай после этого, кто тут проспал по-настоящему.\""
                 $ otkroven["sandra"] = min(20, int(otkroven.get("sandra", 0) or 0) + 1)
             else:
-                $ MainTxt = str(MainTxt or "") + "\n\nКогда Сандра замечает, что у вас под одеждой все слишком уж на виду, она мгновенно щурится и велит вам сперва привести себя в порядок, а уже потом лезть кого-то будить."
+                $ MainTxt = str(MainTxt or "") + "\nКогда Сандра замечает, что у вас под одеждой все слишком уж на виду, она мгновенно щурится и велит вам сперва привести себя в порядок, а уже потом лезть кого-то будить."
     elif _wake_girl == "melissa":
         $ MainTxt = "Вы будите Мелиссу тихо, но настойчиво. Она вздрагивает, садится на кровати и явно с трудом возвращается в явь, потом понимает, который час, и недовольно выдыхает себе под нос."
         if _wake_indecent:
-            $ MainTxt = str(MainTxt or "") + "\n\nВо сне одеяло успело сползти, и вам открывается куда больше, чем Мелисса обычно позволяет увидеть днем. Осознав это, она быстро оправляется, но вместо злости в ее лице остается скорее смущенное раздражение."
+            $ MainTxt = str(MainTxt or "") + "\nВо сне одеяло успело сползти, и вам открывается куда больше, чем Мелисса обычно позволяет увидеть днем. Осознав это, она быстро оправляется, но вместо злости в ее лице остается скорее смущенное раздражение."
             $ sluttiness["melissa"] = min(100, int(sluttiness.get("melissa", 0) or 0) + 1)
         if _wake_bulge:
             if int(Friends.get("melissa", 0) or 0) >= 10 or int(sluttiness.get("melissa", 0) or 0) >= 18:
-                $ MainTxt = str(MainTxt or "") + "\n\nМелисса замечает вашу выпуклость под штанами, замолкает на полуслове и опускает взгляд. Потом, уже тише, чем прежде, бросает: \"Ну... в следующий раз хоть стучи чуть дольше.\""
+                $ MainTxt = str(MainTxt or "") + "\nМелисса замечает вашу выпуклость под штанами, замолкает на полуслове и опускает взгляд. Потом, уже тише, чем прежде, бросает: \"Ну... в следующий раз хоть стучи чуть дольше.\""
                 $ otkroven["melissa"] = min(20, int(otkroven.get("melissa", 0) or 0) + 1)
             else:
-                $ MainTxt = str(MainTxt or "") + "\n\nКогда Мелисса замечает, что вы явились будить ее в слишком уж красноречивом состоянии, она вспыхивает и немедленно отворачивается, явно желая закончить разговор как можно быстрее."
+                $ MainTxt = str(MainTxt or "") + "\nКогда Мелисса замечает, что вы явились будить ее в слишком уж красноречивом состоянии, она вспыхивает и немедленно отворачивается, явно желая закончить разговор как можно быстрее."
     else:
         $ MainTxt = "Вы будите Аманду, и та сперва лишь что-то недовольно бурчит в подушку. Но стоит ей понять, что утренний стол уже давно собирается без нее, как она мигом оживает и принимается оправдываться."
         if _wake_indecent:
-            $ MainTxt = str(MainTxt or "") + "\n\nВо сне Аманда успела раскрыться куда сильнее приличного, и вам открывается достаточно, чтобы понять: спать скромницей она умеет не всегда. Поняв по вашему лицу, что вы успели увидеть лишнее, она сперва краснеет, а потом упрямо делает вид, будто это пустяк."
+            $ MainTxt = str(MainTxt or "") + "\nВо сне Аманда успела раскрыться куда сильнее приличного, и вам открывается достаточно, чтобы понять: спать скромницей она умеет не всегда. Поняв по вашему лицу, что вы успели увидеть лишнее, она сперва краснеет, а потом упрямо делает вид, будто это пустяк."
             $ sluttiness["amanda"] = min(100, int(sluttiness.get("amanda", 0) or 0) + 1)
         if _wake_bulge:
             if int(Friends.get("amanda", 0) or 0) >= 10 or int(sluttiness.get("amanda", 0) or 0) >= 30:
-                $ MainTxt = str(MainTxt or "") + "\n\nАманда быстро замечает и вашу предательскую выпуклость. Вместо того чтобы смутиться, она хихикает, бросает на вас хитрый взгляд и только потом начинает поспешно поправлять одежду."
+                $ MainTxt = str(MainTxt or "") + "\nАманда быстро замечает и вашу предательскую выпуклость. Вместо того чтобы смутиться, она хихикает, бросает на вас хитрый взгляд и только потом начинает поспешно поправлять одежду."
                 $ sluttiness["amanda"] = min(100, int(sluttiness.get("amanda", 0) or 0) + 1)
             else:
-                $ MainTxt = str(MainTxt or "") + "\n\nСтоит Аманде заметить ваш слишком уж выразительный стояк, как она фыркает, закатывает глаза и тут же прикрывается одеялом уже куда тщательнее."
+                $ MainTxt = str(MainTxt or "") + "\nСтоит Аманде заметить ваш слишком уж выразительный стояк, как она фыркает, закатывает глаза и тут же прикрывается одеялом уже куда тщательнее."
     $ CurLocDesc = MainTxt
     call HouseholdReturnCurrentRoom
     return

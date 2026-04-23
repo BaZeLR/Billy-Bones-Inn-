@@ -1,12 +1,17 @@
 init python:
+    def marketplace_blind_pirate_event_available():
+        return (
+            int(BlindPirateMarketEventSeen or 0) == 0
+            and int(dayspassed or 0) < 7
+            and int(week or 0) != 7
+            and int(time or 0) in (0, 1, 2)
+        )
+
     def marketplace_becky_home_visible():
         return BeckyVar.get("visitedhome", 0) >= 2 and week != 5 and time == 3
 
     def marketplace_mongol_visible():
         return MyStallion == ""
-
-    def marketplace_mongol_known():
-        return int(KnowMongol or 0) != 0
 
     def marketplace_clara_visible():
         return clara_visible_in_location("MarketPlace")
@@ -29,14 +34,13 @@ init python:
                 items.append(MenuItem("Подойти к Монголу", Call("MarketPlaceApproachMongol", "repeat")))
 
         for market_exit in MarketPlaceRoom.visible_exits():
-            if str(getattr(market_exit, "target", "") or "") in ("CityGuard",):
-                continue
             items.append(MenuItem(market_exit.label, Jump(market_exit.target)))
 
         return items
 
     MarketPlaceRoom = Room(
         code_name="MarketPlace",
+        group_name=ROOM_GROUP_CITY,
         display_name="Рыночная площадь",
         bg_picture="images/market/LocMarketPlace1.jpg",
         descriptions=[
@@ -106,12 +110,12 @@ init python:
             ),
         ],
         npcs=[
-            {"npc_id": "clara", "name": "Кларисса", "condition": marketplace_clara_visible, "talk_label": "IntClaraTalk"},
-            {"npc_id": "mongol", "name": "Монгол", "condition": marketplace_mongol_visible, "talk_label": "MarketPlaceTalkMongol", "known_condition": marketplace_mongol_known, "unknown_name": "Мужик в красной рубахе", "hide_examine_until_known": True},
+            {"npc_id": "clara", "condition": marketplace_clara_visible},
+            {"npc_id": "mongol", "condition": marketplace_mongol_visible, "unknown_name": "Мужик в красной рубахе", "gender": "man", "can_examine_unknown": False},
         ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
-            time_slots=[0, 1, 2],
+            time_slots=[0, 1, 2, 3],
             closed_text="Сейчас уже поздно и рынок закрыт.",
         ),
         custom_properties={
@@ -119,6 +123,9 @@ init python:
             "object_menu_label": "MarketPlaceObjectMenu",
         },
     )
+
+default BlindPirateMarketEventSeen = 0
+default BlindPirateBreakfastPending = 0
 
 label MarketPlace:
     scene black
@@ -141,6 +148,7 @@ label MarketPlace:
     $ market_mongol_mode = ""
     $ market_mongol_alley_girl = ""
     $ MarketPlaceSavedText = ""
+    call CheckDailyEvent("", "_story_enter", CurLoc, time)
 
     # Check if it's Friday and time for the dance
     if friday_dance_market_entry_is_active():
@@ -149,18 +157,26 @@ label MarketPlace:
     # Check if it's Sunday or too late
     if week == 7:
         $ MainTxt = "Сегодня воскресенье и рынок закрыт."
+        if marketplace_becky_home_visible():
+            $ MainTxt += "\n\nЛавка Бекки уже закрыта, но к этому часу вы можете пройти к ней домой через боковую улочку."
         $ CurLocDesc = MainTxt
         call ShowImage("general", "", "LocMarketPlaceClosed")
         $ current_action_items = []
+        if (int(MongolVar.get("StocksSeen", 0) or 0) == 1 and int(MongolVar.get("StocksFoodDay", -1) or -1) < 0 and int(time or 0) >= 4) or (int(DraupnirVar.get("MongolLockpickOrderDay", -1) or -1) >= 0 and int(MongolVar.get("StocksReleased", 0) or 0) == 0 and int(time or 0) >= 4 and int(dayspassed or 0) > int(MongolVar.get("StocksFoodDay", -1) or -1)):
+            $ current_action_items.append(MenuItem("Подойти к караулке и колодкам", Jump("CityGuard")))
         if marketplace_becky_home_visible():
             $ current_action_items.append(MenuItem("Идти в гости в дом к вдове Блэнкеншип", Jump("BeckyHomeFront")))
         $ current_action_items.append(MenuItem("Вернуться к трактиру", Jump("StreetTavern")))
         jump MarketPlaceView
     elif not _market_room.is_open(week, time):
         $ MainTxt = _market_room.schedule.closed_text
+        if marketplace_becky_home_visible():
+            $ MainTxt += "\n\nЛавка Бекки уже закрыта, но к этому часу вы можете пройти к ней домой через боковую улочку."
         $ CurLocDesc = MainTxt
         call ShowImage("general", "", "LocMarketPlaceClosed")
         $ current_action_items = []
+        if (int(MongolVar.get("StocksSeen", 0) or 0) == 1 and int(MongolVar.get("StocksFoodDay", -1) or -1) < 0 and int(time or 0) >= 4) or (int(DraupnirVar.get("MongolLockpickOrderDay", -1) or -1) >= 0 and int(MongolVar.get("StocksReleased", 0) or 0) == 0 and int(time or 0) >= 4 and int(dayspassed or 0) > int(MongolVar.get("StocksFoodDay", -1) or -1)):
+            $ current_action_items.append(MenuItem("Подойти к караулке и колодкам", Jump("CityGuard")))
         if marketplace_becky_home_visible():
             $ current_action_items.append(MenuItem("Идти в гости в дом к вдове Блэнкеншип", Jump("BeckyHomeFront")))
         $ current_action_items.append(MenuItem("Вернуться к трактиру", Jump("StreetTavern")))
@@ -175,7 +191,9 @@ label MarketPlace:
     $ CurLocDesc = MainTxt
     call ShowImageSeq("general", "", "LocMarketPlace", 2)
 
-    call CheckDailyEvent("", "_story_enter", CurLoc, time)
+    if marketplace_blind_pirate_event_available():
+        call MarketPlaceBlindPirateEvent
+        call ShowImageSeq("general", "", "LocMarketPlace", 2)
 
     if navigation_only_mode_enabled():
         $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
@@ -216,6 +234,26 @@ label MarketPlace:
     $ MarketPlaceSavedText = MainTxt
     call MarketPlaceBuildActions
     jump MarketPlaceView
+
+
+label MarketPlaceBlindPirateEvent:
+    $ BlindPirateMarketEventSeen = 1
+    $ BlindPirateBreakfastPending = 1
+    python:
+        _blind_pirate_picture = "images/market/blindPirate.png"
+        if renpy.loadable(_blind_pirate_picture):
+            scene_image = _blind_pirate_picture
+            _layout_last_picture = _blind_pirate_picture
+        MainTxt = 'Рыночный шум вдруг меняет голос. Там, где еще секунду назад спорили о цене муки и бранились из-за тухлой рыбы, толпа сама собой расползается в стороны, словно кто-то провел по ней тяжелым ножом. Меж плеч и корзин медленно выкатывается телега с железной клеткой. Колеса стучат по камню так глухо и тяжело, будто везут не человека, а уже готовую беду.\n\nВнутри, скорчившись на сырой соломе, сидит мужчина. Лицо у него серое, провалившееся, жалкое; не лицо хозяина, а лицо человека, с которого разом содрали и достаток, и честь, и сон. В клетку летят гнилые репы, мятые кочаны, склизкие огрызки. Кто-то хохочет, кто-то орет проклятья, кто-то, напротив, отворачивается, словно стыдясь чужого несчастья, но все равно идет следом смотреть. А позади клетки, спотыкаясь и заливаясь плачем, бегут две женщины: одна совсем молоденькая, другая постарше, лет тридцати с небольшим. Обе уже выбились из сил, но все еще не могут оторвать глаз от телеги, как будто одним этим взглядом можно удержать человека от дороги к портовым галерам.\n\n«Эх, вот она как судьба-то ломает», - говорит кто-то рядом, уже без злобы, вполголоса, будто в церкви. - «Еще вчера был хозяином "Слепого Пирата" - самого бойкого трактира в городе. У него столы ломились, клиенты дрались за место, а теперь его самого гонят на галеры герцогини Кончиты за долги. Трактир выгорел до головешек, дом разорен, а весь его бабий и дворовый люд пошел по миру.»\n\nВы слушаете и чувствуете, как холодок проходит по спине. Рыночный гам снова становится просто шумом, но теперь в нем слышится уже не одно веселье. Слишком ясно становится, на какой тонкой доске стоит любой трактир и как легко под хорошим хозяином вдруг может разверзнуться пустота.'
+        CurLocDesc = MainTxt
+        current_action_title = "Случай на рынке"
+        current_action_content = None
+        current_action_items = [MenuItem("Осмотреться на рынке", Return())]
+    $ _paged_text = str(MainTxt or "")
+    call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
+    show screen main_ui
+    $ renpy.pause(hard=True)
+    return
 
 
 label MarketPlaceView:
@@ -285,15 +323,15 @@ label MarketPlaceObjectText(object_id="", action_id=""):
 
 
 label MarketPlaceApproachMongol(mode_code=""):
+    if renpy.loadable("images/mongol/gipsy.png"):
+        call ShowImage("", "", "images/mongol/gipsy.png")
     if mode_code == "first":
         $ KnowMongol = 1
         $ MainTxt = "Увидев, что вы направляетесь к нему, мужик обрадовался еще больше, хлопнул себя по ляжкам и воскликнул: 'Ай-нэ-нэ!'\n\nПротянув вам руку он представился: 'Монголом меня кличут. Я тут парувэла, в смысле коняшку продаю.'\n\n'Купишь ты коня прекрасного очень дешево, всего за [MongolVar['HorsePrice']] мараведи! Ну что, по рукам?'"
         $ CurLocDesc = MainTxt
-        call ShowImageSeq("mongol", "", "portrait", 3)
     else:
         $ MainTxt = "'Стефан, друг мой, посмотри какой у меня замечательный конь! Тебе я его всего за [MongolVar['HorsePrice']] мараведи отдам!'"
         $ CurLocDesc = MainTxt
-        call ShowImageSeq("mongol", "", "portrait", 3)
     call MongolTalk
     return
 

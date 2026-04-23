@@ -8,7 +8,6 @@ default ArriveMode = ""
 default RandIngaFuck = 1
 default _becky_home_front_resume = False
 default IngaVar = {"SawLucassex": 0, "Knowher": 0}
-default Age = {"Becky": 40}  # Example default, adjust as needed
 
 init python:
     def becky_homefront_withbecky_picture():
@@ -286,7 +285,7 @@ label becky_homefront_share_with_becky:
 label becky_homefront_ignore:
     "Вы вернулись к вдове Блэнкеншип: \"А, кошка пробежала, ерунда\", сказали вы ей."
     if BeckyVar["visitedhome"] < 5:
-        "\"А, ну тогда пошли скорее в дом, пока дети мои не вернулись,\" ответила вам Бекки, \"а то увидят, смеяться будут, мол мамке уже [Age['Becky']] лет, а она все с парнями гуляет.\""
+        "\"А, ну тогда пошли скорее в дом, пока дети мои не вернулись,\" ответила вам Бекки, \"а то увидят, смеяться будут, мол мамке уже [age_girls.get('becky', 36)] лет, а она все с парнями гуляет.\""
     else:
         "\"А, ну тогда пошли скорее в дом, я уже и стол накрыла,\" ответила вам Бекки."
     $ ViewIngaSex = 10
@@ -295,7 +294,7 @@ label becky_homefront_ignore:
 label becky_homefront_suggest_approach:
     if BeckyVar["visitedhome"] < 5:
         "Вы обернулись к вдове Блэнкеншип: \"Может подойдем к ним?\" спросили вы ее."
-        "\"Да ты что, ведь тогда дочка меня с тобой увидит, вдруг смеяться будет, мол мамке уже [Age['Becky']] лет, а она все с парнями гуляет. Пошли лучше скорее в дом, пока они тут заняты.\""
+        "\"Да ты что, ведь тогда дочка меня с тобой увидит, вдруг смеяться будет, мол мамке уже [age_girls.get('becky', 36)] лет, а она все с парнями гуляет. Пошли лучше скорее в дом, пока они тут заняты.\""
         "И с этими словами она настойчиво потянула вас в сторону двери."
         $ ViewIngaSex = 10
     else:

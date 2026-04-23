@@ -157,6 +157,11 @@ init python:
         return int(player_recent_sex_count(2) or 0) > 2
 
     def household_breakfast_attendee_ids():
+        if int(dayspassed or 0) <= 0:
+            attendees = ["sandra", "melissa", "amanda"]
+            if int(BeckyKitchenVisitActive or 0) == 1:
+                attendees.append("becky")
+            return attendees
         attendees = []
         for npc_id in ("sandra", "melissa", "amanda"):
             if household_morning_issue_type(npc_id) != "":
@@ -183,12 +188,25 @@ init python:
 
     def household_room_issue_notice_text(person=""):
         key = str(person or "").strip().lower()
+        lines = []
+        if key == "melissa":
+            try:
+                melissa_sync_room_problem_state()
+            except Exception:
+                pass
+            if melissa_bats_stage() >= 7 and melissa_bats_stage() < 8:
+                repair_day = int(MelissaVar.get("roof_repair_complete_day", -1) or -1)
+                if repair_day > int(dayspassed or 0):
+                    days_left = repair_day - int(dayspassed or 0)
+                    lines.append("Над комнатой Мелиссы уже заказана починка крыши. Мастерам осталось еще примерно %s дн., прежде чем можно будет окончательно считать дело закрытым." % days_left)
+                elif melissa_bats_repair_complete():
+                    lines.append("Похоже, мастера уже закончили с крышей: над комнатой стало тихо, щели подлатаны, и теперь можно сказать Мелиссе, что она может окончательно возвращаться к себе.")
         issue_code = household_morning_issue_type(key)
         if issue_code == "sick":
-            return "%s выглядит нездорово и явно не собирается сегодня вставать без посторонней помощи." % _tavern_name(key)
-        if issue_code == "sleepy":
-            return "%s все еще валяется в постели и явно проспала общий подъем." % _tavern_name(key)
-        return ""
+            lines.append("%s выглядит нездорово и явно не собирается сегодня вставать без посторонней помощи." % _tavern_name(key))
+        elif issue_code == "sleepy":
+            lines.append("%s все еще валяется в постели и явно проспала общий подъем." % _tavern_name(key))
+        return "\n\n".join([line for line in lines if str(line or "").strip() != ""])
 
     def _tavern_household_seed(person, hour_value=None, day_marker=None, weekday=None):
         key = str(person or "").strip().lower()
@@ -315,6 +333,25 @@ init python:
             return explicit_loc
 
         slot = _tavern_int(time if time_value is None else time_value, 0)
+        if key == "melissa":
+            try:
+                melissa_sync_room_problem_state()
+                if melissa_temp_room_active("TavernMyRoom", slot):
+                    return "TavernMyRoom"
+                if melissa_temp_room_active("TavernAmandaRoom", slot):
+                    return "TavernAmandaRoom"
+                if melissa_temp_room_active("TavernEmptyRoom", slot):
+                    return "TavernEmptyRoom"
+            except Exception:
+                pass
+        morning_issue = household_morning_issue_type(key, slot, hour)
+        if morning_issue in ("sick", "sleepy"):
+            return _tavern_private_room(key)
+
+        schedule_loc = str(npc_schedule_location(key, _tavern_int(week, 1), slot) or "")
+        if schedule_loc:
+            return schedule_loc
+
         sunday_loc = _tavern_household_sunday_location(key, slot)
         if sunday_loc:
             return sunday_loc
@@ -322,10 +359,6 @@ init python:
         friday_evening_loc = _tavern_household_friday_evening_location(key, slot)
         if friday_evening_loc:
             return friday_evening_loc
-
-        morning_issue = household_morning_issue_type(key, slot, hour)
-        if morning_issue in ("sick", "sleepy"):
-            return _tavern_private_room(key)
 
         preopening_loc = _tavern_household_preopening_location(key, slot)
         if preopening_loc:
@@ -529,7 +562,7 @@ init python:
         avail = _tavern_int(_tavern_dict_value(jobGloryHoleAvail).get(person, 0), 0)
         tomorrow = _tavern_int(_tavern_dict_value(jobgloryholeTommorow).get(person, 0), 0)
         busy = 0
-        if renpy_module.has_label("GloryHoleBusy"):
+        if renpy.game.script.has_label("GloryHoleBusy"):
             try:
                 busy = _tavern_int(renpy_module.call("GloryHoleBusy", person), 0)
             except Exception:
@@ -711,7 +744,7 @@ init python:
     def _tavern_worker_action_items(person, return_label=""):
         items = []
 
-        if renpy_module.has_label("ShowGirlCard"):
+        if renpy.game.script.has_label("ShowGirlCard"):
             items.append(MenuItem("Осмотреть", [Hide("tavern_report_card_overlay"), Call("ShowGirlCard", person, "")]))
 
         items.append(MenuItem(JobMenuDesc(jobkitchentomorrow.get(person, 0), 1), Call("TavernReportApplyAction", person, "kitchen", return_label)))

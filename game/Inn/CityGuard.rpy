@@ -79,6 +79,9 @@ label CityGuard:
     $ CityGuardSavedText = MainTxt
     $ CityGuardRoom.mark_visited()
 
+    if story_event_available("CityGuard", "enter"):
+        call checkTriggers("CityGuard", "enter", 0)
+
     if CityGuardRoom.is_open(week, time):
         call ShowImage("Zimmer", "", "Portrait1")
     else:

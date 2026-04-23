@@ -38,6 +38,7 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
         $ MainTxt = "-Привет красавчик! Не хочешь ли поразвлечься? Всего восемь мараведи!\n\nВы поговорили с ней и узнали, что ее зовут Жоржетта Брюно, она шлюха и промышляет здесь уже давно."
         $ CurLocDesc = MainTxt
         $ Friends["georgett"] = int(Friends.get("georgett", 0) or 0) + 1
+        $ knowsMC["georgett"] = True
 
     $ main_ui_begin_talk_state("Разговор с Жоржеттой", girl_name)
     $ current_action_title = "Разговор с Жоржеттой"
@@ -59,7 +60,7 @@ label IntGeorgettTalkRefresh(girl_name="georgett", girl_loc="street"):
     $ current_action_title = "Разговор с Жоржеттой"
     $ current_action_content = None
     $ current_action_items = []
-    $ current_action_items.append(MenuItem("Осмотреть", Function(show_girl_card_main_ui_state, girl_name)))
+    $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
     $ current_action_items.append(MenuItem("Болтать", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "smalltalk")))
 
     if GeorgettVar.get("seeclients", 0) and Talked.get(girl_name, 0) < 2 and Friends.get(girl_name, 0) >= 7:
@@ -246,6 +247,7 @@ label IntGeorgettTalkApply(girl_name="georgett", girl_loc="street", choice_code=
         $ jobwhore["georgett"] = 1
         $ jobWhoreAvail["liza"] = 1
         $ jobwhore["liza"] = 1
+        $ TavernBreakfastGeorgetteLizaPending = 1
         $ householdmembers = int(householdmembers) + 2 + int(ProstitutesKids)
         $ Talked[girl_name] = Talked.get(girl_name, 0) + 1
         call NextDay("TavernMain", 1)
@@ -384,9 +386,5 @@ label IntGeorgettTalkApply(girl_name="georgett", girl_loc="street", choice_code=
 
 
 label IntGeorgettTalkRestore(girl_loc="street"):
-    if str(girl_loc or "") == "street":
-        jump PortStreets
-    elif str(girl_loc or "") == "tavern":
-        jump TavernMain
     $ main_ui_end_talk_state()
     return

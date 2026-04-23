@@ -10,6 +10,7 @@ init 6 python:
 
     TavernUpstairsRoom = Room(
         code_name="TavernUpstairs",
+        group_name=ROOM_GROUP_TAVERN,
         display_name="Коридор наверху",
         bg_picture="images/tavern/secondfloor/second_floor.png",
         descriptions=[
@@ -22,7 +23,7 @@ init 6 python:
             RoomExit(label="Спуститься в главный зал", target="TavernMain"),
             RoomExit(label="Зайти в вашу комнату", target="TavernMyRoom"),
             RoomExit(label="Заглянуть в комнату Аманды", target="TavernAmandaRoom", condition=tavern_upstairs_can_enter_amanda_room),
-            RoomExit(label="Зайти в комнату Сандры", target="TavernSandraRoom", condition=tavern_upstairs_can_enter_sandra_room),
+            RoomExit(label="Зайти в комнату Сандры", target="TavernSandraRoom"),
             RoomExit(label="Зайти в комнату Мелиссы", target="TavernMelissaRoom"),
             RoomExit(label="Осмотреть пустую комнату", target="TavernEmptyRoom"),
             RoomExit(label="Спуститься в подвал", target="TavernStorage"),
@@ -44,6 +45,7 @@ label TavernUpstairs:
         $ _layout_last_picture = scene_image
     else:
         $ _layout_last_picture = ""
+    call CheckDailyEvent("", "_story_enter", CurLoc, time)
     $ MainTxt = TavernUpstairsRoom.descriptions[0].text
     $ CurLocDesc = MainTxt
     call TavernUpstairsBuildActions
@@ -56,6 +58,8 @@ label TavernUpstairsBuildActions:
     $ current_action_items = []
     if tavern_upstairs_can_clean_rooms():
         $ current_action_items.append(MenuItem("Убрать комнаты наверху", Call("DoChore", "clean_upstairs_rooms", "TavernUpstairs", "", "")))
+    if melissa_night_noise_ready() and story_event_available("TavernUpstairs", "enter"):
+        $ current_action_items.append(MenuItem("Проверить шум в комнате Мелиссы", Call("checkTriggers", "TavernUpstairs", "enter", 0)))
     python:
         for _upstairs_exit in TavernUpstairsRoom.visible_exits():
             current_action_items.append(MenuItem(_upstairs_exit.label, Call("AdvanceMovementTime", _upstairs_exit.target)))

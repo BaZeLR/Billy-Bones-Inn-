@@ -51,9 +51,11 @@ label IntClaraTalkRefresh(girl_name="clara"):
     $ current_action_content = None
     $ current_action_items = []
     $ update_stat_state()
-    $ current_action_items.append(MenuItem("Осмотреть", Function(show_girl_card_main_ui_state, girl_name)))
+    $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
     if TalkedToday.get("clara", 0) == 0:
         $ current_action_items.append(MenuItem("Поболтать с Клариссой о разной фигне.", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "smalltalk")))
+    if str(CurLoc or "") == "WineStore" and story_event_available("WineStore", "clara_talk"):
+        $ current_action_items.append(MenuItem("Осторожно заговорить о ее вечерних делах", Call("checkTriggers", "WineStore", "clara_talk", 0)))
 
     if FlirtedToday.get("clara", 0) == 0 and clara_can_start_social_events():
         $ current_action_items.append(MenuItem("Заигрывать с Клариссой.", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "flirt")))
@@ -62,8 +64,8 @@ label IntClaraTalkRefresh(girl_name="clara"):
     if int(AskedToday.get("clara", 0) or 0) == 0 and int(Friends.get("clara", 0) or 0) >= 6:
         $ current_action_items.append(MenuItem("Спросить Клариссу о семье", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_family")))
         $ current_action_items.append(MenuItem("Спросить Клариссу о ней самой", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_self")))
-        if str(CurLoc or "") == "MarketPlace" and int(effective_player_exploration() or 0) >= 100:
-            $ current_action_items.append(MenuItem("Проследить за Клариссой по рынку", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "follow_market")))
+        if int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1 or int(MelissaVar.get("drawings_found", 0) or 0) == 1:
+            $ current_action_items.append(MenuItem("Осторожно заговорить о ее тайных рисунках", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_drawings")))
     if clara_can_accept_horse_ride(CurLoc):
         $ current_action_items.append(MenuItem("Предложить подвезти Клариссу на коне.", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "horse_ride")))
 
@@ -199,15 +201,11 @@ label IntClaraTalkApply(girl_name="clara", choice_code=""):
         call IntClaraTalkRefresh(girl_name)
         return
 
-    if str(choice_code or "") == "follow_market":
+    if str(choice_code or "") == "ask_drawings":
         $ AskedToday["clara"] = int(AskedToday.get("clara", 0) or 0) + 1
+        $ ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 2)
         $ Friends["clara"] = min(20, int(Friends.get("clara", 0) or 0) + 1)
-        $ ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 1)
-        $ _clara_follow_picture = clara_wine_store_talk_picture()
-        if str(_clara_follow_picture or "").strip():
-            $ ShowImage("", "", _clara_follow_picture)
-        $ CurrentLoc["clara"] = "WineStore"
-        $ MainTxt = "Вы незаметно держитесь за Клариссой на рыночной площади и быстро понимаете, что она двигается здесь куда увереннее, чем любит показывать. Девушка останавливается у нескольких прилавков, обменивается короткими репликами с продавцами, а затем заглядывает в винную лавку, где чувствует себя явно как дома.\n\nПохоже, Кларисса не просто гуляет по рынку от скуки: она внимательно слушает людей, запоминает их привычки и явно собирает собственные выводы о каждом, кто ей интересен."
+        $ MainTxt = "Вы осторожно даете Клариссе понять, что знаете о ее тайных непристойных рисунках и не собираетесь поднимать из-за этого шум. Она сперва цепенеет, но потом, поняв ваш тон, только шумно выдыхает.\n\n\"Дома за такое меня бы живьем съели,\" признается она. \"Отец требует приличий, мать — судьбы по правилам, а мне иногда хочется хотя бы на бумаге жить не так, как велено. Потому я и наблюдаю за людьми, и слушаю лишнее. Иначе совсем задохнешься в чужих ожиданиях.\""
         $ CurLocDesc = MainTxt
         call IntClaraTalkRefresh(girl_name)
         return

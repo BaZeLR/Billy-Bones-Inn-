@@ -81,8 +81,8 @@ label InitSecondaryNPC:
             RealName[npc_key] = n1
             RealName2[npc_key] = n2
             RealName3[npc_key] = n3
-            DateOfBirth[npc_key] = renpy.random.randint(15, 350)
             age_girls[npc_key] = int(npc_cfg["age"])
+            DateOfBirth[npc_key] = calendar_make_birth_record(age_girls[npc_key])
             kids[npc_key] = int(kids.get(npc_key, 0) or 0)
             beauty[npc_key] = int(beauty.get(npc_key, 0) or 0)
             sluttiness[npc_key] = int(sluttiness.get(npc_key, 0) or 0)
@@ -115,6 +115,7 @@ label InitSecondaryNPC:
             legacy_key = npc_key.capitalize()
             Friends[legacy_key] = int(Friends.get(legacy_key, Friends.get(npc_key, 0)) or 0)
             Talked[legacy_key] = int(Talked.get(legacy_key, Talked.get(npc_key, 0)) or 0)
+            knowsMC[npc_key] = npc_key not in ("fran", "mongol")
 
         FightLevel["legare"] = 1
 
@@ -122,6 +123,7 @@ label InitSecondaryNPC:
         DraupnirVar["HoleAsked"] = 0
         DraupnirVar["GloryHoleAsked"] = 0
         DraupnirVar["SoapBarrelAsked"] = 0
+        DraupnirVar["MongolLockpickOrderDay"] = -1
 
         EddieVar["TalkedAboutWhores"] = 0
         EddieVar["SawWithGeorgett"] = 0
@@ -144,6 +146,36 @@ label InitSecondaryNPC:
 
         # Eddie is scoped to grocery/location systems.
         CurrentLoc["eddie"] = "GroceryStore"
+        npc_schedule_set("eddie", [
+            NPCScheduleEntry(
+                location="GroceryStore",
+                weekdays=[1, 2, 3, 4, 5, 6],
+                time_slots=[0],
+                awake=True,
+                talkable=True,
+                priority=220,
+                label="eddie_grocery_morning",
+            ),
+            NPCScheduleEntry(
+                location="BeckyHome",
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                time_slots=[1, 2, 3],
+                awake=True,
+                talkable=False,
+                priority=20,
+                label="eddie_home_day",
+            ),
+            NPCScheduleEntry(
+                location="BeckyHome",
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                time_slots=[4],
+                awake=False,
+                talkable=False,
+                priority=10,
+                label="eddie_home_sleep",
+            ),
+        ])
+        npc_schedule_sync_currentloc("eddie")
 
         AlberVar["sawwithliza"] = 0
         AlberVar["talkedaboutliza"] = 0
@@ -172,6 +204,12 @@ label InitSecondaryNPC:
         MongolVar["SawStolen"] = 0
         MongolVar["WillTryToSteal"] = 0
         MongolVar["HorsesBought"] = 0
+        MongolVar["StocksArrestDay"] = -1
+        MongolVar["StocksSeen"] = 0
+        MongolVar["StocksFoodDay"] = -1
+        MongolVar["GuardGiftSent"] = 0
+        MongolVar["GuardCaptainKnown"] = 0
+        MongolVar["StocksReleased"] = 0
         KnowMongol = 0
 
         ZimmerVar["ComplainHorse"] = 0
@@ -186,6 +224,7 @@ label InitSecondaryNPC:
         RobinVar["RobbedNum"] = 0
         RobinVar["Negotiate"] = 0
         RobinVar["KnowBigTitsVillage"] = 0
+        RobinVar["MongolSafePass"] = 0
 
     $ FranBusy[0] = 0
     $ FranBusy[1] = 0

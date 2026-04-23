@@ -3,6 +3,8 @@ default TavernClosed = ""
 default TavernEventOngoing = ""
 default GeorgettAvail = 0
 default LizaAvail = 0
+default TavernMainExtraDesc = ""
+default TavernMainGloryDesc = ""
 
 
 init python:    
@@ -103,7 +105,10 @@ init python:
         return TavernClosed == "" and clara_visible_in_location("TavernMain")
 
     def tavern_main_becky_visible():
-        return TavernClosed == "" and becky_tavern_visit_active()
+        return TavernClosed == "" and _tavern_is_in_room("becky", "TavernMain")
+
+    def tavern_main_werecat_visible():
+        return TavernClosed == "" and werecat_npc_present("TavernMain")
 
     def tavern_main_morning_routine_text():
         routine_pool = [
@@ -125,8 +130,44 @@ init python:
     def tavern_main_morning_event_text():
         return str(tavern_main_morning_event_data().get("text", "") or "")
 
+    def tavern_main_build_description():
+        if str(TavernEventOngoing or "").strip():
+            return str(TavernEventOngoing or "")
+
+        base_desc = str(TavernMainRoom.descriptions[0].text or "")
+        desc_parts = [base_desc]
+
+        if str(TavernClosed or "").strip():
+            desc_parts.append(str(TavernClosed or ""))
+        else:
+            if tavern_preopening_mode():
+                desc_parts.append("Утро в трактире еще не перешло в обычный рабочий ритм. До полудня вы и ваши домочадцы только готовите зал, кухню и припасы к дневной суете.")
+                desc_parts.append(tavern_main_morning_routine_text())
+                desc_parts.append(tavern_main_morning_event_text())
+                desc_parts.append("На кухне с утра возятся: " + str(tavern_household_present_names("TavernKitchen") or "никто") + ".")
+                desc_parts.append("В зале сейчас видны: " + str(tavern_household_present_names("TavernMain") or "никто") + ".")
+                desc_parts.append("По двору и кладовым шныряют: " + str(_tavern_join_names([name for name in ("sandra", "melissa", "amanda") if _tavern_is_in_room(name, "Backyard") or _tavern_is_in_room(name, "TavernStorage")]) or "никто") + ".")
+                desc_parts.append("Сейчас как раз удобное время перекинуться с домашними парой слов, прежде чем начнется обычная работа.")
+            else:
+                desc_parts.append("На кухне в вашем трактире работают: " + str(NamesList("jobkitchen", "TavernKitchen") or "никто") + ".")
+                desc_parts.append("За чистоту и порядок отвечают: " + str(NamesList("jobcleaning", "TavernMain") or "никто") + ".")
+                desc_parts.append("Еду и выпивку пьяным, трезвым, похотливым, скромным и прочим посетителям разносят: " + str(NamesList("jobwaitress", "TavernMain") or "никто") + ".")
+                desc_parts.append("Вы можете пообщаться с участницами своей команды через список персонажей справа.")
+
+            if clara_visible_in_location("TavernMain"):
+                desc_parts.append("Кларисса заглянула в трактир и держится поближе к Мелиссе, о чем-то оживленно переговариваясь с ней между столами.")
+            if _tavern_is_in_room("becky", "TavernMain"):
+                desc_parts.append("Бекки Блэнкеншип на этот раз сама заглянула к вам в трактир и присматривается к залу цепким хозяйским взглядом.")
+            if str(TavernMainExtraDesc or "").strip():
+                desc_parts.append(str(TavernMainExtraDesc or ""))
+            if str(TavernMainGloryDesc or "").strip():
+                desc_parts.append(str(TavernMainGloryDesc or ""))
+
+        return "\n\n".join([part for part in desc_parts if str(part or "").strip()])
+
     TavernMainRoom = Room(
         code_name="TavernMain",
+        group_name=ROOM_GROUP_TAVERN,
         display_name="Главная зала трактира",
         bg_picture="bg TavernMain",
         descriptions=[
@@ -151,10 +192,11 @@ init python:
             {"npc_id": "sandra", "name": "Сандра", "condition": tavern_main_sandra_visible, "talk_label": "IntSandraTalk", "auto_card": True},
             {"npc_id": "melissa", "name": "Мелисса", "condition": tavern_main_melissa_visible, "talk_label": "IntMelissaTalk", "auto_card": True},
             {"npc_id": "amanda", "name": "Аманда", "condition": tavern_main_amanda_visible, "talk_label": "IntAmandaTalk", "auto_card": True},
-            {"npc_id": "georgett", "name": "Жоржетта", "condition": tavern_main_georgett_visible, "talk_label": "IntGeorgettTalk", "auto_card": True},
+            {"npc_id": "georgett", "name": "Жоржетта", "condition": tavern_main_georgett_visible, "talk_label": "IntGeorgettTalk", "talk_args": ("georgett", "tavern"), "auto_card": True},
             {"npc_id": "liza", "name": "Лизетта", "condition": tavern_main_liza_visible, "talk_label": "IntLizaTalk", "auto_card": True},
             {"npc_id": "clara", "name": "Кларисса", "condition": tavern_main_clara_visible, "talk_label": "IntClaraTalk", "auto_card": True},
             {"npc_id": "becky", "name": "Бекки", "condition": tavern_main_becky_visible, "talk_label": "IntBeckyTalk", "auto_card": True},
+            {"npc_id": "werecat", "name": "Луна", "condition": tavern_main_werecat_visible, "talk_label": "IntWerecatTalk", "auto_card": True},
         ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
@@ -182,9 +224,7 @@ label TavernMain:
     if tavern_preopening_mode():
         $ _layout_last_picture = tavern_main_preopening_background()
     $ CurrentRoom = TavernMainRoom
-    $ room_menu = CurrentRoom.build_menu_sections()
-    #$ current_exit_items = room_menu["movement"]
-    $ current_action_items = room_menu["movement"] + room_menu["actions"]
+    $ current_action_items = []
     #$ current_action_title = "Действия в трактире"####### OLD CODE 
     #$ current_action_content = None
     #$ current_action_items = []
@@ -331,10 +371,7 @@ label TavernMain:
                 call CheckDailyEvent('georgett')
             if LizaAvail == 1 or (CurrentLoc['liza'] == CurLoc and time < 2):
                 call CheckDailyEvent('liza')
-        $ current_action_title = "Действия в трактире"
-        $ current_action_content = None
-        if TavernClosed == "" and not tavern_preopening_mode() and melissa_clara_overhear_ready():
-            $ current_action_items.append(MenuItem("Подслушать разговор Мелиссы и Клариссы", Call("MelissaClaraOverhearEvent")))
+        call TavernMainBuildActions
         
     else:
         $ CurLocDesc = TavernEventOngoing
@@ -343,47 +380,41 @@ label TavernMain:
         $ current_action_content = None
 
     if TavernEventOngoing == "":
-        python:
-            _tavern_desc_parts = [_tavern_main_base_desc]
-            if TavernClosed != "":
-                _tavern_desc_parts.append(TavernClosed)
-            else:
-                if tavern_preopening_mode():
-                    _tavern_desc_parts.append("Утро в трактире еще не перешло в обычный рабочий ритм. До полудня вы и ваши домочадцы только готовите зал, кухню и припасы к дневной суете.")
-                    _tavern_desc_parts.append(tavern_main_morning_routine_text())
-                    _tavern_desc_parts.append(tavern_main_morning_event_text())
-                    _tavern_desc_parts.append("На кухне с утра возятся: " + str(tavern_household_present_names("TavernKitchen") or "никто") + ".")
-                    _tavern_desc_parts.append("В зале сейчас видны: " + str(tavern_household_present_names("TavernMain") or "никто") + ".")
-                    _tavern_desc_parts.append("По двору и кладовым шныряют: " + str(_tavern_join_names([name for name in ("sandra", "melissa", "amanda") if _tavern_is_in_room(name, "Backyard") or _tavern_is_in_room(name, "TavernStorage")]) or "никто") + ".")
-                    _tavern_desc_parts.append("Сейчас как раз удобное время перекинуться с домашними парой слов, прежде чем начнется обычная работа.")
-                else:
-                    _tavern_desc_parts.append("На кухне в вашем трактире работают: " + str(kitchenlist or "никто") + ".")
-                    _tavern_desc_parts.append("За чистоту и порядок отвечают: " + str(cleaninglist or "никто") + ".")
-                    _tavern_desc_parts.append("Еду и выпивку пьяным, трезвым, похотливым, скромным и прочим посетителям разносят: " + str(waitresslist or "никто") + ".")
-                    _tavern_desc_parts.append("Вы можете пообщаться с участницами своей команды через список персонажей справа.")
-                if clara_visible_in_location("TavernMain"):
-                    _tavern_desc_parts.append("Кларисса заглянула в трактир и держится поближе к Мелиссе, о чем-то оживленно переговариваясь с ней между столами.")
-                if becky_tavern_visit_active():
-                    _tavern_desc_parts.append("Бекки Блэнкеншип на этот раз сама заглянула к вам в трактир и присматривается к залу цепким хозяйским взглядом.")
-                if TavernMainExtraDesc != "":
-                    _tavern_desc_parts.append(TavernMainExtraDesc)
-                if TavernMainGloryDesc != "":
-                    _tavern_desc_parts.append(TavernMainGloryDesc)
-            CurLocDesc = "\n\n".join([part for part in _tavern_desc_parts if str(part or "").strip()])
-            MainTxt = CurLocDesc
+        $ CurLocDesc = tavern_main_build_description()
+        $ MainTxt = CurLocDesc
 
     if TavernEventOngoing == "" and TavernClosed == "":
         if amanda_revealing_dress_request_ready() and _tavern_is_in_room("amanda", "TavernMain"):
             call AmandaDressRequestEvent
         elif melissa_revealing_dress_request_ready() and _tavern_is_in_room("melissa", "TavernMain"):
             call MelissaDressRequestEvent
+        else:
+            python:
+                _household_request_type, _household_request_girl = household_pending_request_girl("TavernMain")
+            if str(_household_request_type or "") == "soap":
+                call HouseholdSoapRequestEvent(_household_request_girl)
 
+    jump TavernMainView
+
+
+label TavernMainView:
     show screen main_ui
     $ renpy.pause(hard=True)
+    jump TavernMainView
+
+
+label TavernMainBuildActions:
+    $ tavern_main_fireplace_wood_stock()
+    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ _tavern_room_menu = CurrentRoom.build_menu_sections() if CurrentRoom is not None and hasattr(CurrentRoom, "build_menu_sections") else {"movement": [], "actions": []}
+    $ current_action_items = list(_tavern_room_menu.get("movement", [])) + list(_tavern_room_menu.get("actions", []))
+    if TavernClosed == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "overheard"):
+        $ current_action_items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
     return
 
 
-label TavernMainObjectMenu(object_id=""):
+label TavernMainObjectMenu(object_id="", refresh_only=False):
     $ tavern_main_fireplace_wood_stock()
     if str(object_id or "") != "":
         $ TavernMainObjectMenuId = object_id
@@ -392,7 +423,8 @@ label TavernMainObjectMenu(object_id=""):
     $ object_id = TavernMainObjectMenuId
     $ _tavern_object = None
     python:
-        for _room_object in TavernMainRoom.visible_objects():
+        _tavern_room = CurrentRoom if CurrentRoom is not None else TavernMainRoom
+        for _room_object in _tavern_room.visible_objects():
             if getattr(_room_object, "object_id", "") == str(object_id or ""):
                 _tavern_object = _room_object
                 break
@@ -423,8 +455,6 @@ label TavernMainObjectMenu(object_id=""):
             elif _tavern_action.hook == "jump" and str(_tavern_action.target or "") != "":
                 current_action_items.append(MenuItem(_tavern_action.label, Jump(_tavern_action.target)))
         current_action_items.append(MenuItem("Назад", Call("TavernMainRestore")))
-    # Added to keep UI interactive (fix throw to main menu)
-    $ renpy.pause(hard=True)
     return
 
 
@@ -432,7 +462,8 @@ label TavernMainObjectText(object_id="", action_id=""):
     python:
         _tavern_text = ""
         _tavern_name = ""
-        for _room_object in TavernMainRoom.visible_objects():
+        _tavern_room = CurrentRoom if CurrentRoom is not None else TavernMainRoom
+        for _room_object in _tavern_room.visible_objects():
             if getattr(_room_object, "object_id", "") != str(object_id or ""):
                 continue
             _tavern_name = str(getattr(_room_object, "name", "") or "")
@@ -450,4 +481,12 @@ label TavernMainObjectText(object_id="", action_id=""):
 
 
 label TavernMainRestore:
-    jump TavernMain
+    $ scene_image = CurrentRoom.bg_picture or None
+    if tavern_preopening_mode():
+        $ _layout_last_picture = tavern_main_preopening_background()
+    elif scene_image:
+        $ _layout_last_picture = scene_image
+    $ MainTxt = tavern_main_build_description()
+    $ CurLocDesc = MainTxt
+    call TavernMainBuildActions
+    return

@@ -1,13 +1,14 @@
 label InitMelissa:
     python:
+        knowsMC["melissa"] = True
         # Initialize Melissa's attributes
         GirlName = 'melissa'
 
         RealName[GirlName] = 'Мелисса'
         RealName2[GirlName] = 'Мелиссы'
         RealName3[GirlName] = 'Мелиссе'
-        DateOfBirth[GirlName] = renpy.random.randint(15, 350)
         age_girls[GirlName] = 18
+        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 0
         beauty[GirlName] = 55
         sluttiness[GirlName] = 3
@@ -49,6 +50,44 @@ label InitMelissa:
         # Custom variables
         MelissaVar['MomDressComplaint'] = 0
         MelissaVar['AskedAboutClaraDay'] = -1
+        MelissaVar['StartDay'] = -1
+        MelissaVar['StartCount'] = 0
+        MelissaVar['RoomProblemAskDay'] = -1
+        MelissaVar['StorageThanksDay'] = -1
+        MelissaVar['AtticFindingsDay'] = -1
+        MelissaVar['bats_episode'] = 0
+        MelissaVar['temp_room'] = ''
+        MelissaVar['storage_rat_last_help_day'] = -1
+        MelissaVar['room_pests_last_help_day'] = -1
+        MelissaVar['AskedMCToSolveRoomProblem'] = 0
+        MelissaVar['bat_attic_check_day'] = -1
+        MelissaVar['drawings_ready_day'] = -1
+        MelissaVar['drawings_found'] = 0
+        MelissaVar['drawings_returned'] = 0
+        MelissaVar['bat_recipe_unlocked'] = 0
+        MelissaVar['roof_repair_order_day'] = -1
+        MelissaVar['roof_repair_complete_day'] = -1
         GiftPreferences[GirlName] = ["soap_001", "lavender_001", "wild_rose_001", "energy_tea_001", "drink_ale_001", "libido_tincture_001"]
+        bodymodel_sync_character(GirlName, RealName[GirlName], "female")
+        npc_schedule_set(
+            GirlName,
+            [
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="TavernMain", mode="morning"), priority=300, label="morning_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="TavernKitchen", mode="morning"), priority=300, label="morning_kitchen"),
+                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="TavernStorage", mode="morning"), priority=300, label="morning_storage"),
+                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="Backyard", mode="morning"), priority=300, label="morning_backyard"),
+                NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="TavernMelissaRoom", mode="morning"), priority=300, label="morning_room"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[1, 2], awake=True, talkable=True, priority=200, label="working_hall"),
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="FridayDance", mode="friday_evening"), priority=250, label="friday_dance"),
+                NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="TavernMelissaRoom", mode="friday_evening"), priority=240, label="friday_room"),
+                NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=260, label="sunday_church"),
+                NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="TavernMelissaRoom", mode="sunday"), priority=240, label="sunday_room"),
+                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="Backyard", mode="sunday"), priority=240, label="sunday_backyard"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="TavernMain", mode="sunday"), priority=240, label="sunday_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="melissa", location="TavernKitchen", mode="sunday"), priority=240, label="sunday_kitchen"),
+                NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[4], awake=False, talkable=False, priority=10, label="sleep"),
+            ],
+        )
+        npc_schedule_sync_currentloc(GirlName)
 
     return

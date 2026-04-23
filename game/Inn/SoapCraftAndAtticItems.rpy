@@ -5,12 +5,22 @@ default SoapPendingBatches = []
 default SoapStoredBatches = []
 default SoapLookBonusUntilDay = -1
 default SoapRequestQueue = {}
+default HouseholdSoapSampleIntroDone = 0
+default HouseholdSoapSampleGiven = {}
+default HouseholdSoapLastBatchProfile = {}
 default AtticLootFound = 0
 default AtticSupplyLootFound = 0
 default UpstairsRoomSearchState = {}
 default RustyHunterRifleLoadedAmmo = ""
 
 init 4 python:
+    SOAP_HOUSEHOLD_IDS = ("sandra", "melissa", "amanda")
+    SOAP_PREFERRED_AROMAS = {
+        "sandra": "лавандово-травяной",
+        "melissa": "лавандово-розовый",
+        "amanda": "розово-медовый",
+    }
+
     def attic_room_picture_path():
         picture_path = "images/tavern/myroom/playr_room attic.png"
         if renpy.loadable(picture_path):
@@ -51,6 +61,12 @@ init 4 python:
         return ""
 
     def rusty_hunter_rifle_item():
+        try:
+            _direct_item = RustyHunterRifleItem
+        except Exception:
+            _direct_item = None
+        if _direct_item is not None:
+            return _direct_item
         return get_game_item("rusty_hunter_rifle_001")
 
     def rusty_hunter_rifle_is_cleaned():
@@ -158,6 +174,71 @@ init 4 python:
             return "wild_rose_001"
         return ""
 
+    def soap_available_piece_count():
+        return max(0, int(_player_item_count_by_id("soap_001") or 0))
+
+    def soap_total_piece_count():
+        return max(0, int(_player_item_count_by_id("soap_001") or 0)) + max(0, int(_player_item_count_by_id("luxury_soap_001") or 0))
+
+    def household_soap_preferred_aroma_text(girl_name=""):
+        girl = str(girl_name or "").strip().lower()
+        return str(SOAP_PREFERRED_AROMAS.get(girl, "душистый") or "душистый")
+
+    def soap_batch_profile(additive_ids=None):
+        aroma_ids = []
+        for item_id in list(additive_ids or []):
+            item_key = str(item_id or "").strip()
+            if item_key != "" and item_key not in aroma_ids:
+                aroma_ids.append(item_key)
+
+        notes = []
+        craft_parts = []
+        if "lavender_001" in aroma_ids:
+            craft_parts.append("лавандой")
+        if "wild_rose_001" in aroma_ids:
+            craft_parts.append("дикой розой")
+        if "special_herbs_001" in aroma_ids:
+            craft_parts.append("редкими душистыми травами")
+            notes.append("с терпкой травяной нотой")
+        if "honey_comb_001" in aroma_ids:
+            craft_parts.append("медовой сладостью")
+            notes.append("с медовой сладостью")
+        if "olive_oil_001" in aroma_ids:
+            notes.append("на более мягкой масляной основе")
+
+        scent_core = "травяной"
+        if "lavender_001" in aroma_ids and "wild_rose_001" in aroma_ids:
+            scent_core = "лавандово-розовый"
+        elif "lavender_001" in aroma_ids:
+            scent_core = "лавандовый"
+        elif "wild_rose_001" in aroma_ids:
+            scent_core = "розовый"
+        elif "special_herbs_001" in aroma_ids:
+            scent_core = "травяной"
+
+        label = scent_core
+        if len(notes) > 0:
+            label = label + " " + ", ".join(notes)
+
+        if len(craft_parts) <= 0:
+            craft_text = "травами"
+        elif len(craft_parts) == 1:
+            craft_text = craft_parts[0]
+        elif len(craft_parts) == 2:
+            craft_text = craft_parts[0] + " и " + craft_parts[1]
+        else:
+            craft_text = ", ".join(craft_parts[:-1]) + " и " + craft_parts[-1]
+
+        return {
+            "aroma_ids": tuple(aroma_ids),
+            "label": label,
+            "craft_text": craft_text,
+        }
+
+    def soap_last_batch_label():
+        profile = dict(HouseholdSoapLastBatchProfile or {})
+        return str(profile.get("label", "душистое домашнее") or "душистое домашнее")
+
     def soap_ash_barrel_is_ready():
         if int(SoapAshBarrelInstalled or 0) != 1:
             return False
@@ -263,23 +344,41 @@ init 4 python:
         }
 
     def soap_recipe_craft_handler():
+        global fun, SoapExpireDay, SoapAshBarrelReadyDay, HouseholdSoapLastBatchProfile
+
         soap_flower = soap_selected_flower_item()
         soap_flower_name = str(get_game_item(soap_flower).name if get_game_item(soap_flower) else "травы")
+        soap_additives = [soap_flower]
+        if _player_item_count_by_id("special_herbs_001") > 0:
+            soap_additives.append("special_herbs_001")
+        if _player_item_count_by_id("honey_comb_001") > 0:
+            soap_additives.append("honey_comb_001")
+        if _player_item_count_by_id("olive_oil_001") > 0:
+            soap_additives.append("olive_oil_001")
+        batch_profile = soap_batch_profile(soap_additives)
         _player_remove_item_by_id("pig_lard_001", 1)
         _player_remove_item_by_id(soap_flower, 1)
-        globals()["fun"] = _player_clamp(fun + 20, 0, 100)
+        if "special_herbs_001" in list(batch_profile.get("aroma_ids", ()) or ()):
+            _player_remove_item_by_id("special_herbs_001", 1)
+        if "honey_comb_001" in list(batch_profile.get("aroma_ids", ()) or ()):
+            _player_remove_item_by_id("honey_comb_001", 1)
+        if "olive_oil_001" in list(batch_profile.get("aroma_ids", ()) or ()):
+            _player_remove_item_by_id("olive_oil_001", 1)
+        fun = _player_clamp(fun + 20, 0, 100)
         calendar_advance_minutes(120)
+        HouseholdSoapLastBatchProfile = dict(batch_profile)
         SoapPendingBatches.append({
             "quantity": 4,
             "ready_day": int(dayspassed or 0) + 7,
             "expire_day": int(dayspassed or 0) + 21,
+            "profile": dict(batch_profile),
         })
-        globals()["SoapExpireDay"] = 0
-        globals()["SoapAshBarrelReadyDay"] = int(dayspassed or 0) + 7
+        SoapExpireDay = 0
+        SoapAshBarrelReadyDay = int(dayspassed or 0) + 7
         update_stat_state()
         return {
             "ok": True,
-            "text": "Вы разводите огонь во дворе, готовите щелочную воду, кипятите ее с {} и затем раскладываете густую массу по формам. Теперь мылу нужно как следует вылежаться: партия будет готова примерно через {{b}}неделю{{/b}}.".format(soap_flower_name),
+            "text": "Вы разводите огонь во дворе, готовите щелочную воду, кипятите ее с {} и затем раскладываете густую массу по формам. Запах у будущего мыла выходит {}. Теперь мылу нужно как следует вылежаться: партия будет готова примерно через {{b}}неделю{{/b}}.".format(batch_profile.get("craft_text", soap_flower_name), batch_profile.get("label", soap_flower_name)),
             "recipe_id": "soap_recipe",
             "item_result": "soap_001",
             "quantity": 4,
@@ -429,15 +528,36 @@ init 4 python:
             "quantity": 1,
         }
 
+    def bat_repellent_recipe_craft_handler():
+        _player_remove_item_by_id("dried_moss_001", 1)
+        _player_remove_item_by_id("special_herbs_001", 1)
+        _player_remove_item_by_id("lavender_001", 1)
+        _player_remove_item_by_id("empty_bottle_001", 1)
+        _player_add_item_by_id("bat_repellent_001", 1)
+        calendar_advance_minutes(35)
+        update_stat_state()
+        return {
+            "ok": True,
+            "text": "Вы перетираете сушеный мох с лавандой и редкими травами, завариваете густую душную смесь и разливаете ее в бутылку. Получается едкий дымный состав, которым можно выкуривать дрянь из-под крыши.",
+            "recipe_id": "bat_repellent_recipe",
+            "item_result": "bat_repellent_001",
+            "quantity": 1,
+        }
+
     def player_can_use_soap():
         return _player_item_count_by_id("soap_001") > 0
 
     def soap_sync_batches():
-        global SoapExpireDay
-        if not isinstance(SoapPendingBatches, list):
-            globals()["SoapPendingBatches"] = []
-        if not isinstance(SoapStoredBatches, list):
-            globals()["SoapStoredBatches"] = []
+        global SoapPendingBatches, SoapStoredBatches, SoapExpireDay
+
+        if SoapPendingBatches is None:
+            SoapPendingBatches = []
+        elif not hasattr(SoapPendingBatches, "append"):
+            SoapPendingBatches = list(SoapPendingBatches or [])
+        if SoapStoredBatches is None:
+            SoapStoredBatches = []
+        elif not hasattr(SoapStoredBatches, "append"):
+            SoapStoredBatches = list(SoapStoredBatches or [])
 
         current_day = int(dayspassed or 0)
         remaining_pending = []
@@ -452,14 +572,16 @@ init 4 python:
                 SoapStoredBatches.append({
                     "quantity": quantity,
                     "expire_day": max(current_day, expire_day),
+                    "profile": dict(dict(batch or {}).get("profile", {}) or {}),
                 })
             else:
                 remaining_pending.append({
                     "quantity": quantity,
                     "ready_day": ready_day,
                     "expire_day": expire_day,
+                    "profile": dict(dict(batch or {}).get("profile", {}) or {}),
                 })
-        globals()["SoapPendingBatches"] = remaining_pending
+        SoapPendingBatches = remaining_pending
 
         if len(list(SoapStoredBatches or [])) > 0:
             remaining_stored = []
@@ -476,14 +598,17 @@ init 4 python:
                     remaining_stored.append({
                         "quantity": quantity,
                         "expire_day": expire_day,
+                        "profile": dict(dict(batch or {}).get("profile", {}) or {}),
                     })
-            globals()["SoapStoredBatches"] = remaining_stored
-            globals()["SoapExpireDay"] = min([int(dict(batch).get("expire_day", 0) or 0) for batch in list(SoapStoredBatches or [])] or [0])
+            SoapStoredBatches = remaining_stored
+            SoapExpireDay = min([int(dict(batch).get("expire_day", 0) or 0) for batch in list(SoapStoredBatches or [])] or [0])
             return
 
-        globals()["SoapExpireDay"] = int(SoapExpireDay or 0)
+        SoapExpireDay = int(SoapExpireDay or 0)
 
     def soap_expire_if_needed():
+        global SoapExpireDay
+
         soap_sync_batches()
         expire_day = int(SoapExpireDay or 0)
         if expire_day <= 0:
@@ -496,7 +621,7 @@ init 4 python:
         if soap_count > 0:
             for _soap_idx in range(soap_count):
                 _player_remove_item_by_id("soap_001")
-        globals()["SoapExpireDay"] = 0
+        SoapExpireDay = 0
 
     def sync_soap_batches_with_day():
         soap_sync_batches()
@@ -519,6 +644,12 @@ init 4 python:
         if room_key == "TavernSandraRoom":
             return "Вы осматриваете комнату Сандры. Здесь все сложено аккуратно, так что поиски не приносят ничего, кроме уважения к ее хозяйственности."
         if room_key == "TavernMelissaRoom":
+            if int(effective_player_exploration() or 0) >= 100 and int(MelissaVar.get("bats_episode", 0) or 0) >= 2 and int(MelissaVar.get("bats_episode", 0) or 0) < 3:
+                return "Вы осматриваете комнату Мелиссы внимательнее и замечаете под самым потолком несколько совсем маленьких щелей и норок в старом дереве. Оттуда тянет пылью и затхлым чердаком. Похоже, часть дряни лезет сюда не из самой комнаты, а сверху, через старую крышу и балки."
+            if int(MelissaVar.get("bats_episode", 0) or 0) >= 3 and int(MelissaVar.get("bats_episode", 0) or 0) < 4:
+                return "Теперь, когда вы знаете про щели под крышей, становится ясно: без осмотра чердака над комнатой Мелиссы эта история не закончится."
+            if int(MelissaVar.get("bats_episode", 0) or 0) >= 4 and int(MelissaVar.get("bats_episode", 0) or 0) < 8:
+                return "Вы еще раз осматриваете комнату Мелиссы и убеждаетесь, что без чистки чердака и заделки крыши мелкая дрянь будет возвращаться снова и снова."
             return "Вы осматриваете комнату Мелиссы. Ничего ценного не находится, зато становится ясно, что она старается держать свои пожитки в порядке."
         if room_key == "TavernEmptyRoom":
             return "Вы внимательно осматриваете пустую комнату. В углах только пыль, паутина и несколько забытых щепок."
@@ -708,6 +839,36 @@ init 4 python:
         },
     )
 
+    OliveOilItem = GameItem(
+        object_id="olive_oil_001",
+        name="оливковое масло",
+        description="Маленький пузырек хорошего оливкового масла. Его можно пустить в дело у цирюльника или в более тонкие хозяйственные смеси.",
+        price=11,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "ingredient",
+            "ingredient_kind": "olive_oil",
+        },
+    )
+
+    LuxurySoapItem = GameItem(
+        object_id="luxury_soap_001",
+        name="роскошное мыло",
+        description="Брусок улучшенного мыла, в которое втерли оливковое масло. Оно пахнет мягче, выглядит дороже и ценится выше обычного домашнего.",
+        price=18,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "crafted_good",
+            "crafted_kind": "luxury_soap",
+            "gift_value": 2,
+            "attraction_bonus": 2,
+            "social_fun_bonus": 1,
+            "social_openness_bonus": 1,
+        },
+    )
+
     EthanolItem = GameItem(
         object_id="ethanol_001",
         name="бутылка крепкого спирта",
@@ -734,15 +895,22 @@ init 4 python:
         usable=True,
         actions=[
             ObjectAction(
-                action_id="drink_energy_tea",
+                action_id="drink",
                 label="Выпить чай",
                 hook="call",
-                target="UseEnergyTeaItem",
+                target="UseDrinkItem",
+                args=("energy_tea_001",),
             ),
         ],
         custom_properties={
             "item_kind": "drink",
             "drink_kind": "energy_tea",
+            "consume_action": "drink",
+            "consume_minutes": 30,
+            "consume_energy": 20,
+            "consume_fun": 0,
+            "consume_text": "Вы выпиваете крепкий бодрящий чай. Тело понемногу отпускает усталость, а в голове проясняется. После этого у вас остаются пустая бутылка и пробка.",
+            "consume_outputs": (("empty_bottle_001", 1), ("cork_001", 1)),
             "gift_value": 1,
             "social_fun_bonus": 1,
             "social_openness_bonus": 1,
@@ -759,15 +927,22 @@ init 4 python:
         usable=True,
         actions=[
             ObjectAction(
-                action_id="drink_libido_tincture",
+                action_id="drink",
                 label="Выпить настойку",
                 hook="call",
-                target="UseLibidoTinctureItem",
+                target="UseDrinkItem",
+                args=("libido_tincture_001",),
             ),
         ],
         custom_properties={
             "item_kind": "drink",
             "drink_kind": "libido_tincture",
+            "consume_action": "drink",
+            "consume_minutes": 40,
+            "consume_energy": 8,
+            "consume_fun": 8,
+            "consume_text": "Пряная настойка мягко ударяет в голову, разогревает кровь и заметно развязывает язык. После этого у вас остаются пустая бутылка и пробка.",
+            "consume_outputs": (("empty_bottle_001", 1), ("cork_001", 1)),
             "gift_value": 2,
             "social_friend_bonus": 1,
             "social_fun_bonus": 3,
@@ -787,6 +962,20 @@ init 4 python:
         custom_properties={
             "item_kind": "hunter_supply",
             "supply_kind": "fire_bomb",
+        },
+    )
+
+    BatRepellentItem = GameItem(
+        object_id="bat_repellent_001",
+        name="дымная смесь от мышей и летучих тварей",
+        description="Бутылка с едкой душной смесью из сушеного мха, лаванды и трав. Если разжечь ее в тесном чердаке, мерзкая пакость там долго не усидит.",
+        price=18,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "crafted_good",
+            "crafted_kind": "bat_repellent",
+            "supply_kind": "smoke_mix",
         },
     )
 
@@ -894,7 +1083,7 @@ init 4 python:
                 "quantity": 1,
                 "unit": "пучок",
                 "alternatives": ["lavender_001", "wild_rose_001"],
-                "note": "Для запаха берут лаванду или дикую розу.",
+                "note": "Для запаха берут лаванду или дикую розу. Если под рукой есть редкие травы, мед или оливковое масло, мастер пустит их в ту же партию.",
             },
         },
         unlocked=False,
@@ -1100,6 +1289,26 @@ init 4 python:
         craft_handler=fire_bomb_recipe_craft_handler,
     )
     register_recipe_page(FireBombRecipePage)
+
+    BatRepellentRecipePage = RecipePage(
+        recipe_id="bat_repellent_recipe",
+        title="Дымная смесь от летучих тварей",
+        image="images/recipe_book/recipe_book_attick.png",
+        item_result="bat_repellent_001",
+        ingredients={
+            "dried_moss_001": {"quantity": 1, "unit": "порция"},
+            "special_herbs_001": {"quantity": 1, "unit": "пучок"},
+            "lavender_001": {"quantity": 1, "unit": "веточка"},
+            "empty_bottle_001": {"quantity": 1, "unit": "бутылка"},
+        },
+        unlock_condition=bat_repellent_recipe_unlocked,
+        result_quantity=1,
+        notes=[
+            "Смесь годится не для лечения, а чтобы выкуривать из-под крыши мелкую дрянь и летучих тварей.",
+        ],
+        craft_handler=bat_repellent_recipe_craft_handler,
+    )
+    register_recipe_page(BatRepellentRecipePage)
 
 
 label AtticInventoryMenu(return_context="attic", room_code="TavernAtic"):
@@ -1320,7 +1529,6 @@ label AtticInventoryRifleLoadAmmo(ammo_code="arrows", return_context="attic", ro
     $ RustyHunterRifleLoadedAmmo = _ammo_code
     $ MainTxt = "Вы заряжаете оружие {} и осторожно ставите механизм наготове.".format(rusty_hunter_rifle_ammo_name(_ammo_code))
     $ CurLocDesc = MainTxt
-    call stat
     call AtticInventoryItemMenu("rusty_hunter_rifle_001", return_context, room_code, True)
     return
 
@@ -1340,7 +1548,6 @@ label AtticInventoryRifleUnload(return_context="attic", room_code="TavernAtic"):
     $ RustyHunterRifleLoadedAmmo = ""
     $ MainTxt = "Вы осторожно разряжаете оружие и убираете заряд."
     $ CurLocDesc = MainTxt
-    call stat
     call AtticInventoryItemMenu("rusty_hunter_rifle_001", return_context, room_code, True)
     return
 
@@ -1360,6 +1567,8 @@ label UpstairsRoomSearch(room_code="", restore_label=""):
     $ _up_room_code = str(room_code or CurLoc or "")
     $ MainTxt = upstairs_room_search_text(_up_room_code)
     $ CurLocDesc = MainTxt
+    if str(_up_room_code or "") == "TavernMelissaRoom" and int(effective_player_exploration() or 0) >= 100 and int(MelissaVar.get("bats_episode", 0) or 0) >= 2 and int(MelissaVar.get("bats_episode", 0) or 0) < 3:
+        $ MelissaVar["bats_episode"] = 3
     $ upstairs_room_mark_searched(_up_room_code)
     if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
         call expression str(restore_label or "")
@@ -1370,7 +1579,7 @@ label UpstairsRoomSearch(room_code="", restore_label=""):
 
 label BackyardCookSoap:
     if not soap_can_cook_at_backyard():
-        $ MainTxt = "Сейчас у вас не хватает нужных вещей, чтобы сварить мыло."
+        $ MainTxt = "У вас нет необходимых ингредиентов, чтобы сварить мыло."
         $ CurLocDesc = MainTxt
         call BackyardBuildActions
         return
@@ -1421,7 +1630,6 @@ label ShootingPracticeLoadAmmo(ammo_code="arrows", room_code=""):
     $ RustyHunterRifleLoadedAmmo = _ammo_code
     $ MainTxt = "Вы спокойно заряжаете оружие {} для тренировки.".format(rusty_hunter_rifle_ammo_name(_ammo_code))
     $ CurLocDesc = MainTxt
-    call stat
     call ShootingPracticeMenu(room_code)
     return
 
@@ -1441,7 +1649,6 @@ label ShootingPracticeUnload(room_code=""):
     $ RustyHunterRifleLoadedAmmo = ""
     $ MainTxt = "Вы снимаете заряд и снова оставляете оружие разряженным."
     $ CurLocDesc = MainTxt
-    call stat
     call ShootingPracticeMenu(room_code)
     return
 
@@ -1474,7 +1681,7 @@ label ShootingPracticeReturn(room_code=""):
     if _shoot_room_code == "Forest":
         call ForestRestore
         return
-    if _shoot_room_code.startswith("Forest"):
+    if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
         call ForestSubroomRestore
         return
     call RefreshCurrentActionMenu(_shoot_room_code, "", True)
@@ -1482,30 +1689,10 @@ label ShootingPracticeReturn(room_code=""):
 
 
 label UseEnergyTeaItem:
-    if int(_player_item_count_by_id("energy_tea_001") or 0) <= 0:
-        $ MainTxt = "У вас сейчас нет бодрящего чая."
-        $ CurLocDesc = MainTxt
-        return
-    $ _player_remove_item_by_id("energy_tea_001", 1)
-    $ energy = _player_clamp(energy + 20, 0, 100)
-    $ fun = _player_clamp(fun + 2, 0, 100)
-    $ MainTxt = "Вы выпиваете крепкий бодрящий чай. Тело понемногу отпускает усталость, а в голове проясняется."
-    $ CurLocDesc = MainTxt
+    call UseDrinkItem("energy_tea_001")
     return
 
 
 label UseLibidoTinctureItem:
-    if int(_player_item_count_by_id("libido_tincture_001") or 0) <= 0:
-        $ MainTxt = "У вас сейчас нет пряной настойки."
-        $ CurLocDesc = MainTxt
-        call PlayerCardInventoryMenu
-        return
-    $ _player_remove_item_by_id("libido_tincture_001", 1)
-    $ _drink_result = player_drink_item("libido_tincture_001")
-    $ _player_add_item_by_id("empty_bottle_001", 1)
-    $ _player_add_item_by_id("cork_001", 1)
-    $ MainTxt = str((_drink_result or {}).get("text", "") or "") + " После этого у вас остаются пустая бутылка и пробка."
-    $ CurLocDesc = MainTxt
-    call stat
-    call PlayerCardInventoryMenu
+    call UseDrinkItem("libido_tincture_001")
     return

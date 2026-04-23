@@ -7,31 +7,22 @@ init python:
         week_value = int(week if weekday is None else weekday or 0)
         time_value = int(time if time_slot is None else time_slot or 0)
         parity = (day_value + week_value) % 2
-        route = (day_value + week_value) % 3
 
         if week_value == 5 and time_value == 3:
             return "FridayDance" if parity == 0 else ""
 
-        if time_value == 1:
-            if route == 0:
-                return "DressShop"
-            if route == 1:
-                return "MarketPlace"
-            return "ForestClearing"
+        if clara_melissa_visit_active(day_value, week_value, time_value):
+            return "TavernMelissaRoom"
 
-        if time_value == 2:
-            if route == 0:
-                return "MarketPlace"
-            if route == 1:
-                return "DressShop"
-            return "ForestLake"
+        if clara_market_visit_active(day_value, week_value, time_value):
+            return "MarketPlace"
 
         return ""
 
     def clara_visible_in_location(location_code=""):
         location_key = str(location_code or "").strip()
         if location_key == "WineStore":
-            return int(time or 0) == 0
+            return clara_wine_store_shift_active()
         if location_key == "TavernMain":
             return clara_tavern_visit_active()
         return clara_extra_location_code() == location_key
@@ -110,11 +101,49 @@ init python:
         loadable = [row for row in candidates if renpy.loadable(row)]
         return random.choice(loadable) if len(loadable) > 0 else ""
 
+    def clara_wine_store_shift_active(weekday=None, time_slot=None):
+        week_value = int(week if weekday is None else weekday or 0)
+        time_value = int(time if time_slot is None else time_slot or 0)
+        if week_value == 7:
+            return False
+        return time_value in (0, 1)
+
+    def clara_market_visit_active(day_marker=None, weekday=None, time_slot=None):
+        day_value = int(dayspassed if day_marker is None else day_marker or 0)
+        week_value = int(week if weekday is None else weekday or 0)
+        time_value = int(time if time_slot is None else time_slot or 0)
+        if time_value == 2:
+            if week_value == 7:
+                return False
+            if ((day_value + week_value) % 3) != 0:
+                return False
+            return True
+        return clara_mongol_evening_market_active(day_value, week_value, time_value)
+
+    def clara_mongol_evening_market_active(day_marker=None, weekday=None, time_slot=None):
+        day_value = int(dayspassed if day_marker is None else day_marker or 0)
+        week_value = int(week if weekday is None else weekday or 0)
+        time_value = int(time if time_slot is None else time_slot or 0)
+        if week_value in (5, 7) or time_value != 3:
+            return False
+        return True
+
+    def clara_melissa_visit_active(day_marker=None, weekday=None, time_slot=None):
+        week_value = int(week if weekday is None else weekday or 0)
+        time_value = int(time if time_slot is None else time_slot or 0)
+        if int(WerecatVar.get("adopted", 0) or 0) != 1:
+            return False
+        if time_value != 4:
+            return False
+        return week_value in (5, 6, 7)
+
     def clara_tavern_visit_active(day_marker=None, weekday=None, time_slot=None):
         day_value = int(dayspassed if day_marker is None else day_marker or 0)
         week_value = int(week if weekday is None else weekday or 0)
         time_value = int(time if time_slot is None else time_slot or 0)
         if time_value != 2:
+            return False
+        if week_value == 7:
             return False
         if ((day_value + week_value) % 4) != 0:
             return False
@@ -142,7 +171,7 @@ init python:
     def clara_giftable_entries():
         entries = []
 
-        item_ids = ("soap_001", "special_mushroom_001", "lavender_001")
+        item_ids = ("soap_001", "special_mushroom_001", "lavender_001","luxury_soap_001", "libido_tincture_001")
         for item_id in item_ids:
             if _player_item_count_by_id(item_id) <= 0:
                 continue
@@ -234,12 +263,13 @@ init python:
 
 label InitClara:
     python:
+        knowsMC["clara"] = True
         GirlName = "clara"
         RealName[GirlName] = "Кларисса"
         RealName2[GirlName] = "Клариссы"
         RealName3[GirlName] = "Клариссе"
-        DateOfBirth[GirlName] = renpy.random.randint(15, 350)
         age_girls[GirlName] = 19
+        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 0
         beauty[GirlName] = 62
         sluttiness[GirlName] = 10
@@ -280,6 +310,13 @@ label InitClara:
         ClaraVar["neutral"] = 0
         ClaraVar["negative"] = 0
         ClaraVar["lastsocial"] = ""
+        ClaraVar["booklet_market_seen"] = 0
+        ClaraVar["market_intro_seen"] = 0
+        ClaraVar["market_evening_intro_seen"] = 0
+        ClaraVar["mongol_theft_seen"] = 0
+        ClaraVar["escape_confessed"] = 0
+        ClaraVar["merchant_contact_unlocked"] = 0
+        ClaraVar["merchant_contact_month_key"] = -1
         GiftPreferences[GirlName] = [
             "dress_thiefdress",
             "soap_001",
@@ -294,5 +331,18 @@ label InitClara:
         # Uppercase compatibility for legacy references.
         Friends["Clara"] = Friends[GirlName]
         Talked["Clara"] = Talked[GirlName]
+        bodymodel_sync_character(GirlName, RealName[GirlName], "female")
+        npc_schedule_set(
+            GirlName,
+            [
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=clara_visible_at_friday_dance, priority=220, label="friday_dance"),
+                NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[5, 6, 7], time_slots=[4], awake=True, talkable=True, condition=clara_melissa_visit_active, priority=210, label="melissa_room_visit"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[2], awake=True, talkable=True, condition=clara_tavern_visit_active, priority=200, label="tavern_visit"),
+                NPCScheduleEntry(location="MarketPlace", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[2, 3], awake=True, talkable=False, condition=clara_market_visit_active, priority=190, label="extra_market"),
+                NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0, 1], awake=True, talkable=True, condition=clara_wine_store_shift_active, priority=180, label="wine_store"),
+                NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[4], awake=False, talkable=False, priority=10, label="sleep"),
+            ],
+        )
+        npc_schedule_sync_currentloc(GirlName)
 
     return
