@@ -200,6 +200,8 @@ label TavernAmandaRoom:
     $ CurLoc = "TavernAmandaRoom"
     $ location = CurLoc
     call CheckDailyEvent("", "_story_enter", CurLoc, time)
+    if story_event_available(CurLoc, "melissa_bats"):
+        call checkTriggers(CurLoc, "melissa_bats", 0)
     $ tmpSleepDress = tavern_amanda_room_sleep_dress()
     $ tavern_amanda_room_apply_picture(tmpSleepDress, True)
     $ _room.mark_visited()

@@ -84,7 +84,9 @@ label IntMelissaTalkRefresh(girl_name="melissa"):
         $ current_action_items.append(MenuItem("Послушать, что Мелисса скажет о кладовой", Function(main_ui_call_label, "IntMelissaTalkApply", girl_name, "storage_thanks")))
     if melissa_drawings_return_ready() and int(AskedToday.get(girl_name, 0) or 0) == 0:
         $ current_action_items.append(MenuItem("Показать Мелиссе найденные рисунки", Function(main_ui_call_label, "MelissaReturnDrawingsScene")))
-    if story_event_available(str(CurLoc or ""), "melissa_talk"):
+    if melissa_bats_completion_ready():
+        $ current_action_items.append(MenuItem(melissa_bat_completion_talk_caption(), Function(main_ui_call_label, "MelissaBatsCompletionScene")))
+    elif story_event_available(str(CurLoc or ""), "melissa_talk"):
         $ current_action_items.append(MenuItem(melissa_bat_completion_talk_caption(), Call("checkTriggers", CurLoc, "melissa_talk", 0)))
     if melissa_sex_available(girl_name):
         $ current_action_items.append(MenuItem("Уединиться с Мелиссой", Function(main_ui_call_label, "IntMelissaSex", girl_name, CurLoc)))

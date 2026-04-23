@@ -333,6 +333,11 @@ init python:
         text_value = str(panel_text or TavernBreakfastBaseText or TavernKitchenSavedText or MainTxt or "Вы все еще сидите за общим утренним столом.")
         renpy.store.MainTxt = text_value
         renpy.store.CurLocDesc = text_value
+        renpy.store.UI_mode = "scene"
+        renpy.store.UI_selected_char = ""
+        renpy.store.current_girl_key = ""
+        renpy.store.current_object_id = ""
+        renpy.store.action_menu_specs = []
         renpy.store.current_action_title = "Завтрак"
         renpy.store.current_action_content = None
         renpy.store.current_action_items = list(tavern_breakfast_menu_items() or [])
@@ -1126,24 +1131,18 @@ label TavernKitchenBreakfastMenu:
         show screen main_ui
         call TavernKitchenBuildActions
         return
-    $ _breakfast_menu_text = tavern_breakfast_restore_ui_state()
+    $ tavern_breakfast_restore_ui_state()
     if int(TavernBreakfastBaseShownDay or -1) != int(dayspassed or 0):
         $ TavernBreakfastBaseShownDay = int(dayspassed or 0)
-        call QueuePagedPanelText(str(_breakfast_menu_text or ""), current_action_title, list(current_action_items or []), "plain")
     call ReturnToMainUI
     return
 
 
 label TavernKitchenBreakfastShowText(text="", return_label="TavernKitchenBreakfastMenu"):
-    $ TavernBreakfastTextPages = build_breakfast_text_pages(text)
+    $ TavernBreakfastTextPages = []
     $ TavernBreakfastTextPageIndex = 0
     $ TavernBreakfastTextReturnLabel = str(return_label or "TavernKitchenBreakfastMenu")
-    $ current_action_title = "Завтрак"
-    $ current_action_content = None
-    $ current_action_items = list(tavern_breakfast_menu_items() or [])
-    $ MainTxt = str(text or "")
-    $ CurLocDesc = MainTxt
-    call QueuePagedPanelText(str(text or ""), current_action_title, list(current_action_items or []), "plain")
+    $ tavern_breakfast_restore_ui_state(text)
     call ReturnToMainUI
     return
 

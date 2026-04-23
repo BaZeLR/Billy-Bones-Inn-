@@ -79,7 +79,9 @@ label CityGuard:
     $ CityGuardSavedText = MainTxt
     $ CityGuardRoom.mark_visited()
 
-    if story_event_available("CityGuard", "enter"):
+    if int(MongolVar.get("StocksArrestDay", -1) or -1) >= 0 and int(MongolVar.get("StocksSeen", 0) or 0) == 0:
+        call story_clara_market_booklet_city_guard_direct
+    elif story_event_available("CityGuard", "enter"):
         call checkTriggers("CityGuard", "enter", 0)
 
     if CityGuardRoom.is_open(week, time):
@@ -114,6 +116,12 @@ label CityGuardBuildActions:
 
     if CityGuardRoom.is_open(week, time):
         $ current_action_items.append(MenuItem("Десятник Циммерман", Call("IntZimmerTalk")))
+    if (not CityGuardRoom.is_open(week, time)) and int(MongolVar.get("StocksArrestDay", -1) or -1) >= 0 and int(MongolVar.get("StocksSeen", 0) or 0) == 0:
+        $ current_action_items.append(MenuItem("Подойти к колодкам у караулки", Call("story_clara_market_booklet_city_guard_direct")))
+    if int(MongolVar.get("StocksSeen", 0) or 0) == 1 and int(MongolVar.get("StocksFoodDay", -1) or -1) < 0 and int(time or 0) >= 4 and int(productnum or 0) > 0:
+        $ current_action_items.append(MenuItem("Передать Монголу еду из трактира", Call("story_clara_market_booklet_feed_mongol_direct")))
+    if int(DraupnirVar.get("MongolLockpickOrderDay", -1) or -1) >= 0 and int(MongolVar.get("StocksReleased", 0) or 0) == 0 and int(time or 0) >= 4 and int(dayspassed or 0) > int(MongolVar.get("StocksFoodDay", -1) or -1) and int(productnum or 0) > 0 and int(winenum or 0) > 0:
+        $ current_action_items.append(MenuItem("Послать стражникам вино и угощение, а затем освободить Монгола", Call("story_clara_market_booklet_release_mongol_direct")))
 
     $ current_action_items.append(MenuItem("Вернуться на рынок", Jump("MarketPlace")))
     return

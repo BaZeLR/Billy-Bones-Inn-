@@ -612,7 +612,12 @@ init -25 python:
         global eventLocations, eventPeople, eventTalk, eventOptions, eventItems
         global story_events
 
-        eval_key = (_story_num_day(), _story_named_number("week", 1), _story_named_number("time", 0))
+        eval_key = (
+            _story_num_day(),
+            _story_named_number("week", 1),
+            _story_named_number("time", 0),
+            str(_story_named_value("CurLoc", "") or ""),
+        )
         if (not forced) and evalTime == eval_key:
             return
         evalTime = eval_key
@@ -847,8 +852,8 @@ define melissaThreadList = [
         ("story_melissa_bat_problem_1", None, None, None, 1, None, "household_pests_bats_problem_night_talk_ready()", None, "TavernUpstairs", "enter", 1),
         ("story_melissa_bat_problem_2", None, None, None, 1, None, "household_pests_bats_attic_colony_ready()", None, "TavernAtic", "melissa_bats", 2),
         ("story_melissa_bat_problem_3", None, None, None, 1, None, "household_pests_bats_attic_window_ready()", None, "TavernAtic", "melissa_bats", 3),
-        ("story_melissa_bat_problem_4", None, None, None, 1, None, "household_pests_clarissa_booklet_under_bed_ready()", None, "TavernAmandaRoom", "melissa_bats", 4),
-        ("story_melissa_bat_problem_5", None, None, None, 1, None, "household_pests_bats_cleanup_ready()", None, "TavernAtic", "melissa_bats", 5),
+        ("story_melissa_bat_problem_4", None, None, None, 1, None, "household_pests_bats_cleanup_ready()", None, "TavernAtic", "melissa_bats", 4),
+        ("story_melissa_bat_problem_5", None, None, None, 1, None, "household_pests_clarissa_booklet_under_bed_ready()", None, "TavernAmandaRoom", "melissa_bats", 5),
         ("story_melissa_bat_problem_6", None, None, None, 1, None, "household_pests_bats_completion_talk_ready()", None, "TavernMain", "melissa_talk", 6),
     ], highlight=False, threaded=True),
     # clarissa_booklet_thread lead
@@ -868,8 +873,8 @@ define sandraThreadList = [
 ]
 define claraThreadList = [
     LThreadData(0, "clara", "BookletMarket", None, [
-        ("story_clara_market_booklet_0", None, None, None, 1, None, "str(_story_current_location() or '') == 'MarketPlace' and bool(clara_market_visit_active()) and int(_story_named_number('time', 0) or 0) == 2 and int(ClaraVar.get('market_intro_seen', 0) or 0) == 0", None, "MarketPlace", "enter", 0),
-        ("story_clara_market_booklet_1", None, None, None, 1, None, "str(_story_current_location() or '') == 'MarketPlace' and bool(clara_market_visit_active()) and int(_story_named_number('time', 0) or 0) == 2 and int(ClaraVar.get('market_intro_seen', 0) or 0) == 1 and int(ClaraVar.get('booklet_market_seen', 0) or 0) == 0", None, "MarketPlace", "enter", 1),
+        ("story_clara_market_booklet_0", None, None, None, 1, None, "str(_story_current_location() or '') == 'MarketPlace' and bool(clara_market_visit_active()) and (((int(_story_named_number('time', 0) or 0) == 2) and int(ClaraVar.get('booklet_market_seen', 0) or 0) == 0) or ((int(_story_named_number('time', 0) or 0) == 3) and int(ClaraVar.get('drawings_secret_known', 0) or 0) == 1 and int(ClaraVar.get('booklet_market_seen', 0) or 0) == 0))", None, "MarketPlace", "enter", 0),
+        ("story_clara_market_booklet_1", None, None, None, 1, None, "str(_story_current_location() or '') == 'MarketPlace' and bool(clara_market_visit_active()) and (((int(_story_named_number('time', 0) or 0) == 2) and int(ClaraVar.get('market_intro_seen', 0) or 0) == 1) or ((int(_story_named_number('time', 0) or 0) == 3) and int(ClaraVar.get('drawings_secret_known', 0) or 0) == 1)) and int(ClaraVar.get('booklet_market_seen', 0) or 0) == 0", None, "MarketPlace", "enter", 1),
         ("story_clara_market_booklet_2", None, None, None, 1, None, "str(_story_current_location() or '') == 'MarketPlace' and bool(clara_market_visit_active()) and int(_story_named_number('time', 0) or 0) == 3 and int(ClaraVar.get('booklet_market_seen', 0) or 0) == 1 and int(ClaraVar.get('market_evening_intro_seen', 0) or 0) == 0", None, "MarketPlace", "enter", 2),
         ("story_clara_market_booklet_3", None, None, None, 1, None, "str(_story_current_location() or '') == 'MarketPlace' and bool(clara_market_visit_active()) and int(_story_named_number('time', 0) or 0) == 3 and int(ClaraVar.get('market_evening_intro_seen', 0) or 0) == 1 and int(ClaraVar.get('mongol_theft_seen', 0) or 0) == 0", None, "MarketPlace", "enter", 3),
         ("story_clara_market_booklet_4", None, None, None, 1, None, "str(_story_current_location() or '') == 'WineStore' and int(ClaraVar.get('mongol_theft_seen', 0) or 0) == 1 and int(ClaraVar.get('escape_confessed', 0) or 0) == 0", None, "WineStore", "clara_talk", 4),
@@ -1068,17 +1073,38 @@ label story_amanda_market_entry:
 
 label story_clara_market_booklet_0:
     $ SignalBlockTime = 1
-    $ ClaraVar["market_intro_seen"] = 1
-    $ MainTxt = "На дневном рынке вы замечаете очаровательную дочку своего винного поставщика. Вы уже собираетесь приветственно махнуть ей рукой, но Кларисса, едва встретившись с вами взглядом, поспешно набрасывает на голову капюшон плаща и тут же исчезает между рядами лавок.\n\nПохоже, у нее здесь какие-то совсем частные дела, и узнавать себя она сейчас не хочет. Вы решаете выяснить, что это за тайны."
-    $ CurLocDesc = MainTxt
-    if renpy.loadable("images/clara/market_day.png"):
-        call ShowImage("", "", "images/clara/market_day.png")
+    $ _clara_evening_booklet_follow = int(time or 0) == 3 and int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1
+    $ _clara_market_intro_seen = int(ClaraVar.get("market_intro_seen", 0) or 0) == 1
+    if _clara_evening_booklet_follow:
+        $ ClaraVar["market_evening_intro_seen"] = 1
+        $ MainTxt = "Вечером вы замечаете Клариссу на рынке и уже знаете, что ее секрет связан не только с болтовней, но и с непристойными рисунками. Девушка быстро скользит мимо лавок, будто проверяя, нет ли за ней слежки, а затем сворачивает к неприметному закутку между рядами.\n\nЕсли сейчас держаться достаточно тихо, можно не только проследить за Клариссой, но и подслушать, с кем именно она ведет свои тайные дела."
+        $ CurLocDesc = MainTxt
+        if renpy.loadable("images/clara/market_night.png"):
+            call ShowImage("", "", "images/clara/market_night.png")
+        elif renpy.loadable("images/market/LocMarketPlace2.jpg"):
+            call ShowImage("", "", "images/market/LocMarketPlace2.jpg")
     else:
-        call ShowImageSeq("general", "", "LocMarketPlace", 2)
+        if _clara_market_intro_seen:
+            $ MainTxt = "В следующий раз, заметив Клариссу на дневном рынке, вы уже не торопитесь окликнуть ее, а стараетесь держаться чуть поодаль. Девушка идет быстро и уверенно, но все равно время от времени проверяет, не узнал ли кто ее в толпе.\n\nЕсли уж вы хотите узнать, чем она занимается, сейчас самое время попробовать проследить за ней."
+        else:
+            $ ClaraVar["market_intro_seen"] = 1
+            $ MainTxt = "На дневном рынке вы замечаете очаровательную дочку своего винного поставщика. Вы уже собираетесь приветственно махнуть ей рукой, но Кларисса, едва встретившись с вами взглядом, поспешно набрасывает на голову капюшон плаща и тут же исчезает между рядами лавок.\n\nПохоже, у нее здесь какие-то совсем частные дела, и узнавать себя она сейчас не хочет. Вы решаете выяснить, что это за тайны."
+        $ CurLocDesc = MainTxt
+        if renpy.loadable("images/clara/market_day.png"):
+            call ShowImage("", "", "images/clara/market_day.png")
+        else:
+            call ShowImageSeq("general", "", "LocMarketPlace", 2)
     menu:
         "Что сделать?"
-        "Попробовать проследить":
-            if int(effective_player_exploration() or 0) < 80:
+        "[('Проследить за Клариссой и подслушать разговор') if _clara_evening_booklet_follow else ('Проследить за Клариссой')]":
+            if _clara_evening_booklet_follow and int(effective_player_exploration() or 0) < 100:
+                $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам зацепить чей-то ящик или лишний раз оглянуться, как Кларисса успевает скрыться в темном закутке и растворяется среди поздних покупателей.\n\nБез лучшей сноровки вы только выдадите себя и ничего не услышите."
+                $ CurLocDesc = MainTxt
+                $ current_action_title = "Вечерний рынок"
+                $ current_action_content = None
+                $ current_action_items = [MenuItem("Вернуться к своим делам", Call("MarketPlaceRestore"))]
+                jump MarketPlaceView
+            if (not _clara_evening_booklet_follow) and int(effective_player_exploration() or 0) < 80:
                 $ MainTxt = "Вы стараетесь не отстать, но дневной рынок слишком шумный и тесный. Стоит вам замешкаться на пару шагов, как Кларисса ускользает между рядами и будто растворяется среди чужих спин.\n\nПохоже, без лучшей сноровки в слежке вы просто потеряете ее снова."
                 $ CurLocDesc = MainTxt
                 $ current_action_title = "Рынок"
@@ -1086,37 +1112,63 @@ label story_clara_market_booklet_0:
                 $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
                 jump MarketPlaceView
             $ ClaraVar["booklet_market_seen"] = 1
-            $ MainTxt = "На этот раз вы не теряете Клариссу в толпе. Держась в стороне, вы видите, как она сворачивает к неприметному торговцу, которого почти не видно с центральных рядов. Обмен короткий и явно привычный: Кларисса по одной передает ему тонкие книжечки, похожие на небольшие буклеты, а тот быстро сует их в сумку и так же быстро отсчитывает ей деньги.\n\nТеперь уже ясно, что речь идет не о простой прогулке по рынку. Кларисса что-то сбывает через этого таинственного торговца."
+            if _clara_evening_booklet_follow:
+                $ MainTxt = "На этот раз вы не теряете Клариссу даже в вечерней толпе. Держась в тени, вы видите, как она подходит к неприметному торговцу, которому уже прежде, похоже, приносила товар. Несколько свернутых листков быстро переходят из ее рук в его ладонь, а потом вы успеваете расслышать главное: торговец ворчит, что непристойные книжечки у него разбирают быстрее обычного, и просит в следующий раз принести еще, пока у клиентов снова не кончились деньги.\n\nТеперь у вас нет сомнений. Кларисса действительно тайком сбывает через рынок свои непристойные рисунки и маленькие книжечки, а делает это давно и вполне уверенно."
+            else:
+                $ MainTxt = "На этот раз вы не теряете Клариссу в толпе. Держась в стороне, вы видите, как она сворачивает к неприметному торговцу, которого почти не видно с центральных рядов. Обмен короткий и явно привычный: Кларисса по одной передает ему тонкие книжечки, похожие на небольшие буклеты, а тот быстро сует их в сумку и так же быстро отсчитывает ей деньги.\n\nТеперь уже ясно, что речь идет не о простой прогулке по рынку. Кларисса что-то сбывает через этого таинственного торговца."
             $ CurLocDesc = MainTxt
             if renpy.loadable("images/clara/market_bookletDeal.png"):
                 call ShowImage("", "", "images/clara/market_bookletDeal.png")
             $ current_action_title = "Слежка на рынке"
             $ current_action_content = None
             $ current_action_items = [MenuItem("Тихо уйти", Call("MarketPlaceRestore"))]
-            if int(MelissaVar.get("drawings_found", 0) or 0) == 1:
+            if (not _clara_evening_booklet_follow) and (int(MelissaVar.get("drawings_found", 0) or 0) == 1 or int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1):
                 $ current_action_items.insert(0, MenuItem("Подойти к Клариссе и торговцу", Call("story_clara_market_booklet_confront")))
             $ story_thread_advance_current()
             $ story_thread_advance_current()
+            if _clara_evening_booklet_follow:
+                $ story_thread_advance_current()
             jump MarketPlaceView
         "Не вмешиваться":
-            $ current_action_title = "Рынок"
+            if _clara_evening_booklet_follow:
+                $ current_action_title = "Вечерний рынок"
+                $ current_action_items = [MenuItem("Вернуться к своим делам", Call("MarketPlaceRestore"))]
+            else:
+                $ current_action_title = "Рынок"
+                $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
             $ current_action_content = None
-            $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
             jump MarketPlaceView
 
 
 label story_clara_market_booklet_1:
     $ SignalBlockTime = 1
-    $ MainTxt = "В следующий раз, заметив Клариссу на дневном рынке, вы уже не торопитесь окликнуть ее, а стараетесь держаться чуть поодаль. Девушка идет быстро и уверенно, но все равно время от времени проверяет, не узнал ли кто ее в толпе.\n\nЕсли уж вы хотите узнать, чем она занимается, сейчас самое время попробовать проследить за ней."
-    $ CurLocDesc = MainTxt
-    if renpy.loadable("images/clara/market_day.png"):
-        call ShowImage("", "", "images/clara/market_day.png")
+    $ _clara_evening_booklet_follow = int(time or 0) == 3 and int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1
+    if _clara_evening_booklet_follow:
+        $ ClaraVar["market_evening_intro_seen"] = 1
+        $ MainTxt = "Вечером вы замечаете Клариссу на рынке и уже знаете, что ее секрет связан не только с болтовней, но и с непристойными рисунками. Девушка быстро скользит мимо лавок, будто проверяя, нет ли за ней слежки, а затем сворачивает к неприметному закутку между рядами.\n\nЕсли сейчас держаться достаточно тихо, можно не только проследить за Клариссой, но и подслушать, с кем именно она ведет свои тайные дела."
+        $ CurLocDesc = MainTxt
+        if renpy.loadable("images/clara/market_night.png"):
+            call ShowImage("", "", "images/clara/market_night.png")
+        elif renpy.loadable("images/market/LocMarketPlace2.jpg"):
+            call ShowImage("", "", "images/market/LocMarketPlace2.jpg")
     else:
-        call ShowImageSeq("general", "", "LocMarketPlace", 2)
+        $ MainTxt = "В следующий раз, заметив Клариссу на дневном рынке, вы уже не торопитесь окликнуть ее, а стараетесь держаться чуть поодаль. Девушка идет быстро и уверенно, но все равно время от времени проверяет, не узнал ли кто ее в толпе.\n\nЕсли уж вы хотите узнать, чем она занимается, сейчас самое время попробовать проследить за ней."
+        $ CurLocDesc = MainTxt
+        if renpy.loadable("images/clara/market_day.png"):
+            call ShowImage("", "", "images/clara/market_day.png")
+        else:
+            call ShowImageSeq("general", "", "LocMarketPlace", 2)
     menu:
         "Что сделать?"
-        "Попробовать проследить":
-            if int(effective_player_exploration() or 0) < 80:
+        "[('Проследить за Клариссой и подслушать разговор') if _clara_evening_booklet_follow else ('Проследить за Клариссой')]":
+            if _clara_evening_booklet_follow and int(effective_player_exploration() or 0) < 100:
+                $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам зацепить чей-то ящик или лишний раз оглянуться, как Кларисса успевает скрыться в темном закутке и растворяется среди поздних покупателей.\n\nБез лучшей сноровки вы только выдадите себя и ничего не услышите."
+                $ CurLocDesc = MainTxt
+                $ current_action_title = "Вечерний рынок"
+                $ current_action_content = None
+                $ current_action_items = [MenuItem("Вернуться к своим делам", Call("MarketPlaceRestore"))]
+                jump MarketPlaceView
+            if (not _clara_evening_booklet_follow) and int(effective_player_exploration() or 0) < 80:
                 $ MainTxt = "Вы стараетесь не отстать, но дневной рынок слишком шумный и тесный. Стоит вам замешкаться на пару шагов, как Кларисса ускользает между рядами и будто растворяется среди чужих спин.\n\nПохоже, без лучшей сноровки в слежке вы просто потеряете ее снова."
                 $ CurLocDesc = MainTxt
                 $ current_action_title = "Рынок"
@@ -1124,19 +1176,30 @@ label story_clara_market_booklet_1:
                 $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
                 jump MarketPlaceView
             $ ClaraVar["booklet_market_seen"] = 1
-            $ MainTxt = "На этот раз вы не теряете Клариссу в толпе. Держась в стороне, вы видите, как она сворачивает к неприметному торговцу, которого почти не видно с центральных рядов. Обмен короткий и явно привычный: Кларисса по одной передает ему тонкие книжечки, похожие на небольшие буклеты, а тот быстро сует их в сумку и так же быстро отсчитывает ей деньги.\n\nТеперь уже ясно, что речь идет не о простой прогулке по рынку. Кларисса что-то сбывает через этого таинственного торговца."
+            if _clara_evening_booklet_follow:
+                $ MainTxt = "На этот раз вы не теряете Клариссу даже в вечерней толпе. Держась в тени, вы видите, как она подходит к неприметному торговцу, которому уже прежде, похоже, приносила товар. Несколько свернутых листков быстро переходят из ее рук в его ладонь, а потом вы успеваете расслышать главное: торговец ворчит, что непристойные книжечки у него разбирают быстрее обычного, и просит в следующий раз принести еще, пока у клиентов снова не кончились деньги.\n\nТеперь у вас нет сомнений. Кларисса действительно тайком сбывает через рынок свои непристойные рисунки и маленькие книжечки, а делает это давно и вполне уверенно."
+            else:
+                $ MainTxt = "На этот раз вы не теряете Клариссу в толпе. Держась в стороне, вы видите, как она сворачивает к неприметному торговцу, которого почти не видно с центральных рядов. Обмен короткий и явно привычный: Кларисса по одной передает ему тонкие книжечки, похожие на небольшие буклеты, а тот быстро сует их в сумку и так же быстро отсчитывает ей деньги.\n\nТеперь уже ясно, что речь идет не о простой прогулке по рынку. Кларисса что-то сбывает через этого таинственного торговца."
             $ CurLocDesc = MainTxt
+            if renpy.loadable("images/clara/market_bookletDeal.png"):
+                call ShowImage("", "", "images/clara/market_bookletDeal.png")
             $ current_action_title = "Слежка на рынке"
             $ current_action_content = None
             $ current_action_items = [MenuItem("Тихо уйти", Call("MarketPlaceRestore"))]
-            if int(MelissaVar.get("drawings_found", 0) or 0) == 1:
+            if (not _clara_evening_booklet_follow) and (int(MelissaVar.get("drawings_found", 0) or 0) == 1 or int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1):
                 $ current_action_items.insert(0, MenuItem("Подойти к Клариссе и торговцу", Call("story_clara_market_booklet_confront")))
             $ story_thread_advance_current()
+            if _clara_evening_booklet_follow:
+                $ story_thread_advance_current()
             jump MarketPlaceView
         "Не вмешиваться":
-            $ current_action_title = "Рынок"
+            if _clara_evening_booklet_follow:
+                $ current_action_title = "Вечерний рынок"
+                $ current_action_items = [MenuItem("Вернуться к своим делам", Call("MarketPlaceRestore"))]
+            else:
+                $ current_action_title = "Рынок"
+                $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
             $ current_action_content = None
-            $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
             jump MarketPlaceView
 
 
@@ -1162,6 +1225,109 @@ label story_clara_market_booklet_confront:
     $ current_action_content = None
     $ current_action_items = [MenuItem("Отойти и оставить их", Jump("MarketPlaceView"))]
     jump MarketPlaceView
+
+
+label story_clara_market_action_direct:
+    call preEvent("claraBookletMarket")
+    python:
+        _clara_target = ""
+        _clara_thread = thread if 'thread' in globals() else None
+        _booklet_seen = int(ClaraVar.get("booklet_market_seen", 0) or 0)
+        _market_intro_seen = int(ClaraVar.get("market_intro_seen", 0) or 0)
+        _market_evening_intro_seen = int(ClaraVar.get("market_evening_intro_seen", 0) or 0)
+        _drawings_secret_known = int(ClaraVar.get("drawings_secret_known", 0) or 0)
+        _mongol_theft_seen = int(ClaraVar.get("mongol_theft_seen", 0) or 0)
+        _time_value = int(time or 0)
+
+        if _time_value == 2 and _booklet_seen == 0:
+            _clara_target = "story_clara_market_booklet_1_direct_follow"
+            if _clara_thread is not None and int(_clara_thread.num or 0) < 1:
+                if len(list(_clara_thread.done or [])) > 0:
+                    _clara_thread.done[0] = True
+                _clara_thread.num = 1
+            if _market_intro_seen == 0:
+                ClaraVar["market_intro_seen"] = 1
+        elif _time_value == 3 and _booklet_seen == 0 and _drawings_secret_known == 1:
+            _clara_target = "story_clara_market_booklet_1_direct_follow"
+            if _clara_thread is not None and int(_clara_thread.num or 0) < 1:
+                if len(list(_clara_thread.done or [])) > 0:
+                    _clara_thread.done[0] = True
+                _clara_thread.num = 1
+        elif _time_value == 3 and _booklet_seen == 1 and _market_evening_intro_seen == 0:
+            _clara_target = "story_clara_market_booklet_2_direct_follow"
+            if _clara_thread is not None and int(_clara_thread.num or 0) < 2:
+                if len(list(_clara_thread.done or [])) > 0:
+                    _clara_thread.done[0] = True
+                if len(list(_clara_thread.done or [])) > 1:
+                    _clara_thread.done[1] = True
+                _clara_thread.num = 2
+        elif _time_value == 3 and _market_evening_intro_seen == 1 and _mongol_theft_seen == 0:
+            _clara_target = "story_clara_market_booklet_3"
+            if _clara_thread is not None and int(_clara_thread.num or 0) < 3:
+                if len(list(_clara_thread.done or [])) > 0:
+                    _clara_thread.done[0] = True
+                if len(list(_clara_thread.done or [])) > 1:
+                    _clara_thread.done[1] = True
+                if len(list(_clara_thread.done or [])) > 2:
+                    _clara_thread.done[2] = True
+                _clara_thread.num = 3
+        evalTime = None
+        findAvailableEvents(True)
+    if str(_clara_target or "") == "":
+        call MarketPlaceRestore
+        return
+    jump expression _clara_target
+
+
+label story_clara_market_booklet_1_direct_follow:
+    $ SignalBlockTime = 1
+    $ _clara_evening_booklet_follow = int(time or 0) == 3 and int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1
+    if _clara_evening_booklet_follow and int(effective_player_exploration() or 0) < 100:
+        $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам зацепить чей-то ящик или лишний раз оглянуться, как Кларисса успевает скрыться в темном закутке и растворяется среди поздних покупателей.\n\nБез лучшей сноровки вы только выдадите себя и ничего не услышите."
+        $ CurLocDesc = MainTxt
+        $ current_action_title = "Вечерний рынок"
+        $ current_action_content = None
+        $ current_action_items = [MenuItem("Вернуться к своим делам", Call("MarketPlaceRestore"))]
+        jump MarketPlaceView
+    if (not _clara_evening_booklet_follow) and int(effective_player_exploration() or 0) < 80:
+        $ MainTxt = "Вы стараетесь не отстать, но дневной рынок слишком шумный и тесный. Стоит вам замешкаться на пару шагов, как Кларисса ускользает между рядами и будто растворяется среди чужих спин.\n\nПохоже, без лучшей сноровки в слежке вы просто потеряете ее снова."
+        $ CurLocDesc = MainTxt
+        $ current_action_title = "Рынок"
+        $ current_action_content = None
+        $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
+        jump MarketPlaceView
+    $ ClaraVar["booklet_market_seen"] = 1
+    if _clara_evening_booklet_follow:
+        $ ClaraVar["market_evening_intro_seen"] = 1
+        $ MainTxt = "На этот раз вы не теряете Клариссу даже в вечерней толпе. Держась в тени, вы видите, как она подходит к неприметному торговцу, которому уже прежде, похоже, приносила товар. Несколько свернутых листков быстро переходят из ее рук в его ладонь, а потом вы успеваете расслышать главное: торговец ворчит, что непристойные книжечки у него разбирают быстрее обычного, и просит в следующий раз принести еще, пока у клиентов снова не кончились деньги.\n\nТеперь у вас нет сомнений. Кларисса действительно тайком сбывает через рынок свои непристойные рисунки и маленькие книжечки, а делает это давно и вполне уверенно."
+    else:
+        $ MainTxt = "На этот раз вы не теряете Клариссу в толпе. Держась в стороне, вы видите, как она сворачивает к неприметному торговцу, которого почти не видно с центральных рядов. Обмен короткий и явно привычный: Кларисса по одной передает ему тонкие книжечки, похожие на небольшие буклеты, а тот быстро сует их в сумку и так же быстро отсчитывает ей деньги.\n\nТеперь уже ясно, что речь идет не о простой прогулке по рынку. Кларисса что-то сбывает через этого таинственного торговца."
+    $ CurLocDesc = MainTxt
+    if renpy.loadable("images/clara/market_bookletDeal.png"):
+        call ShowImage("", "", "images/clara/market_bookletDeal.png")
+    $ current_action_title = "Слежка на рынке"
+    $ current_action_content = None
+    $ current_action_items = [MenuItem("Тихо уйти", Call("MarketPlaceRestore"))]
+    if (not _clara_evening_booklet_follow) and (int(MelissaVar.get("drawings_found", 0) or 0) == 1 or int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1):
+        $ current_action_items.insert(0, MenuItem("Подойти к Клариссе и торговцу", Call("story_clara_market_booklet_confront")))
+    $ story_thread_advance_current()
+    if _clara_evening_booklet_follow:
+        $ story_thread_advance_current()
+    jump MarketPlaceView
+
+
+label story_clara_market_booklet_2_direct_follow:
+    $ SignalBlockTime = 1
+    $ ClaraVar["market_evening_intro_seen"] = 1
+    if int(effective_player_exploration() or 0) < 100:
+        $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам задеть чью-то корзину и чуть замешкаться, как Кларисса вместе с Монголом растворяются в темном закутке между пустеющими рядами. Без лучшей сноровки здесь их не удержать."
+        $ CurLocDesc = MainTxt
+        $ current_action_title = "Вечерний рынок"
+        $ current_action_content = None
+        $ current_action_items = [MenuItem("Вернуться к своим делам", Call("MarketPlaceRestore"))]
+        jump MarketPlaceView
+    $ story_thread_advance_current()
+    jump story_clara_market_booklet_3
 
 
 label story_clara_market_booklet_2:
@@ -1235,6 +1401,25 @@ label story_clara_market_booklet_4:
     return
 
 
+label story_clara_market_booklet_wine_talk_direct:
+    call preEvent("claraBookletMarket")
+    python:
+        _clara_thread = thread if 'thread' in globals() else None
+        if _clara_thread is not None and int(_clara_thread.num or 0) < 4:
+            if len(list(_clara_thread.done or [])) > 0:
+                _clara_thread.done[0] = True
+            if len(list(_clara_thread.done or [])) > 1:
+                _clara_thread.done[1] = True
+            if len(list(_clara_thread.done or [])) > 2:
+                _clara_thread.done[2] = True
+            if len(list(_clara_thread.done or [])) > 3:
+                _clara_thread.done[3] = True
+            _clara_thread.num = 4
+        evalTime = None
+        findAvailableEvents(True)
+    jump story_clara_market_booklet_4
+
+
 label story_clara_market_booklet_5:
     $ SignalBlockTime = 1
     $ MongolVar["StocksArrestDay"] = int(dayspassed or 0)
@@ -1251,6 +1436,19 @@ label story_clara_market_booklet_5:
     return
 
 
+label story_clara_market_booklet_hunter_direct:
+    call preEvent("claraBookletMarket")
+    python:
+        _clara_thread = thread if 'thread' in globals() else None
+        if _clara_thread is not None and int(_clara_thread.num or 0) < 5:
+            for _clara_index in range(min(5, len(list(_clara_thread.done or [])))):
+                _clara_thread.done[_clara_index] = True
+            _clara_thread.num = 5
+        evalTime = None
+        findAvailableEvents(True)
+    jump story_clara_market_booklet_5
+
+
 label story_clara_market_booklet_6:
     $ SignalBlockTime = 1
     $ MongolVar["StocksSeen"] = 1
@@ -1265,6 +1463,19 @@ label story_clara_market_booklet_6:
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
     $ story_thread_advance_current()
     return
+
+
+label story_clara_market_booklet_city_guard_direct:
+    call preEvent("claraBookletMarket")
+    python:
+        _clara_thread = thread if 'thread' in globals() else None
+        if _clara_thread is not None and int(_clara_thread.num or 0) < 6:
+            for _clara_index in range(min(6, len(list(_clara_thread.done or [])))):
+                _clara_thread.done[_clara_index] = True
+            _clara_thread.num = 6
+        evalTime = None
+        findAvailableEvents(True)
+    jump story_clara_market_booklet_6
 
 
 label story_clara_market_booklet_7:
@@ -1297,6 +1508,19 @@ label story_clara_market_booklet_feed_mongol:
     return
 
 
+label story_clara_market_booklet_feed_mongol_direct:
+    call preEvent("claraBookletMarket")
+    python:
+        _clara_thread = thread if 'thread' in globals() else None
+        if _clara_thread is not None and int(_clara_thread.num or 0) < 7:
+            for _clara_index in range(min(7, len(list(_clara_thread.done or [])))):
+                _clara_thread.done[_clara_index] = True
+            _clara_thread.num = 7
+        evalTime = None
+        findAvailableEvents(True)
+    jump story_clara_market_booklet_feed_mongol
+
+
 label story_clara_market_booklet_8:
     $ SignalBlockTime = 1
     $ MainTxt = "Вы находите Драупнира за верстаком и без лишней прямоты объясняете, что вам нужны очень тонкие отмычки. Гном сперва косится на вас с подозрением, потом только фыркает.\n\n\"Ничего не знаю и знать не хочу, для какой двери тебе такая железяка,\" ворчит он. \"Но если работа тонкая и молчаливая, то это ко мне. За сорок мараведи сделаю хороший набор, который и в сапог спрятать не стыдно.\""
@@ -1323,6 +1547,19 @@ label story_clara_market_booklet_lockpicks_order:
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
     $ story_thread_advance_current()
     return
+
+
+label story_clara_market_booklet_lockpicks_order_direct:
+    call preEvent("claraBookletMarket")
+    python:
+        _clara_thread = thread if 'thread' in globals() else None
+        if _clara_thread is not None and int(_clara_thread.num or 0) < 8:
+            for _clara_index in range(min(8, len(list(_clara_thread.done or [])))):
+                _clara_thread.done[_clara_index] = True
+            _clara_thread.num = 8
+        evalTime = None
+        findAvailableEvents(True)
+    jump story_clara_market_booklet_lockpicks_order
 
 
 label story_clara_market_booklet_9:
@@ -1362,10 +1599,22 @@ label story_clara_market_booklet_release_mongol:
     return
 
 
+label story_clara_market_booklet_release_mongol_direct:
+    call preEvent("claraBookletMarket")
+    python:
+        _clara_thread = thread if 'thread' in globals() else None
+        if _clara_thread is not None and int(_clara_thread.num or 0) < 9:
+            for _clara_index in range(min(9, len(list(_clara_thread.done or [])))):
+                _clara_thread.done[_clara_index] = True
+            _clara_thread.num = 9
+        evalTime = None
+        findAvailableEvents(True)
+    jump story_clara_market_booklet_release_mongol
+
+
 label story_melissa_werecat_intro_0:
     $ SignalBlockTime = 1
-    $ WerecatVar["rat_breakfast_seen"] = 1
-    call MelissaBatBreakfastScene
+    call MelissaRatBreakfastScene
     $ story_thread_advance_current()
     jump TavernKitchen
 
@@ -1415,6 +1664,7 @@ label story_melissa_bat_problem_2:
     $ SignalBlockTime = 1
     call MelissaAtticColonySearch
     $ story_thread_advance_current()
+    call TavernAticBuildActions
     jump TavernAticView
 
 
@@ -1426,15 +1676,20 @@ label story_melissa_bat_problem_3:
 
 label story_melissa_bat_problem_4:
     $ SignalBlockTime = 1
-    call MelissaFindDrawingsScene
-    $ story_thread_advance_current()
-    jump TavernAmandaRoomView
+    if melissa_bats_stage() < 7 and int(_player_item_count_by_id("bat_repellent_001") or 0) > 0:
+        call MelissaBurnAtticColony
+    elif melissa_bats_stage() >= 7:
+        call MelissaOrderRoofRepair
+    else:
+        call MelissaAtticCleanupScene
+    jump TavernAticView
 
 
 label story_melissa_bat_problem_5:
     $ SignalBlockTime = 1
-    call MelissaAtticCleanupScene
-    jump TavernAticView
+    call MelissaFindDrawingsScene
+    $ story_thread_advance_current()
+    jump TavernAmandaRoomView
 
 
 label story_melissa_bat_problem_6:

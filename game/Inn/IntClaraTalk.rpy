@@ -54,8 +54,10 @@ label IntClaraTalkRefresh(girl_name="clara"):
     $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
     if TalkedToday.get("clara", 0) == 0:
         $ current_action_items.append(MenuItem("Поболтать с Клариссой о разной фигне.", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "smalltalk")))
-    if str(CurLoc or "") == "WineStore" and story_event_available("WineStore", "clara_talk"):
-        $ current_action_items.append(MenuItem("Осторожно заговорить о ее вечерних делах", Call("checkTriggers", "WineStore", "clara_talk", 0)))
+    if str(CurLoc or "") == "MarketPlace" and int(exploration or 0) >= 100 and int(AskedToday.get("clara", 0) or 0) == 0:
+        $ current_action_items.append(MenuItem("Проследить за Клариссой по рынку", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "follow_market")))
+    if str(CurLoc or "") == "WineStore" and (story_event_available("WineStore", "clara_talk") or (int(ClaraVar.get("mongol_theft_seen", 0) or 0) == 1 and int(ClaraVar.get("escape_confessed", 0) or 0) == 0)):
+        $ current_action_items.append(MenuItem("Осторожно заговорить о ее вечерних делах", Call("story_clara_market_booklet_wine_talk_direct")))
 
     if FlirtedToday.get("clara", 0) == 0 and clara_can_start_social_events():
         $ current_action_items.append(MenuItem("Заигрывать с Клариссой.", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "flirt")))
@@ -207,6 +209,15 @@ label IntClaraTalkApply(girl_name="clara", choice_code=""):
         $ Friends["clara"] = min(20, int(Friends.get("clara", 0) or 0) + 1)
         $ MainTxt = "Вы осторожно даете Клариссе понять, что знаете о ее тайных непристойных рисунках и не собираетесь поднимать из-за этого шум. Она сперва цепенеет, но потом, поняв ваш тон, только шумно выдыхает.\n\n\"Дома за такое меня бы живьем съели,\" признается она. \"Отец требует приличий, мать — судьбы по правилам, а мне иногда хочется хотя бы на бумаге жить не так, как велено. Потому я и наблюдаю за людьми, и слушаю лишнее. Иначе совсем задохнешься в чужих ожиданиях.\""
         $ CurLocDesc = MainTxt
+        call IntClaraTalkRefresh(girl_name)
+        return
+
+    if str(choice_code or "") == "follow_market":
+        $ AskedToday["clara"] = int(AskedToday.get("clara", 0) or 0) + 1
+        $ ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 1)
+        $ MainTxt = "Вы не навязываетесь Клариссе разговором, а просто держитесь чуть поодаль и смотрите, куда она направится дальше. Девушка делает круг по рыночным рядам, будто проверяя, нет ли за ней чужих глаз, а затем уверенно уходит к знакомому входу в винную лавку Легаре.\n\nПохоже, даже на рынке Кларисса все время держит в уме путь обратно в винную лавку семьи."
+        $ CurLocDesc = MainTxt
+        $ CurrentLoc["clara"] = "WineStore"
         call IntClaraTalkRefresh(girl_name)
         return
 

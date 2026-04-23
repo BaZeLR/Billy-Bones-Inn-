@@ -36,7 +36,7 @@ init python:
             current_time = 0
 
         if (
-            and current_time == 0
+            current_time == 0
             and int(flags.get("Week5WakePending", 0) or 0) > 0
         ):
             try:

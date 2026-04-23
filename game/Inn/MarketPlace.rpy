@@ -1,5 +1,10 @@
 init python:
     def marketplace_blind_pirate_event_available():
+        try:
+            if story_event_available("MarketPlace", "enter") or str(clara_market_story_label() or "").strip():
+                return False
+        except Exception:
+            pass
         return (
             int(BlindPirateMarketEventSeen or 0) == 0
             and int(dayspassed or 0) < 7
@@ -31,6 +36,11 @@ init python:
             ):
                 continue
             items.append(MenuItem(market_object.name, Call("MarketPlaceObjectMenu", market_object.object_id)))
+
+        _clara_story_caption = str(clara_market_story_caption() or "")
+        _clara_story_label = str(clara_market_story_label() or "")
+        if _clara_story_caption != "" and _clara_story_label != "" and renpy.has_label(_clara_story_label):
+            items.append(MenuItem(_clara_story_caption, Call(_clara_story_label)))
 
         if market_mongol_visible:
             if market_mongol_mode == "first":

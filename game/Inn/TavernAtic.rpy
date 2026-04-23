@@ -197,6 +197,7 @@ label MelissaOrderRoofRepair:
     $ MelissaVar["roof_repair_complete_day"] = int(dayspassed or 0) + 2
     $ MainTxt = "Вы договариваетесь о починке старой крыши и отдаете за работу тысячу монет. Теперь остается только дождаться, пока мастера перетянут гнилые доски, забьют щели и приведут верх трактира в порядок. Обещают управиться за пару дней."
     $ CurLocDesc = MainTxt
+    $ story_thread_advance_current()
     call stat
     call TavernAticBuildActions
     return

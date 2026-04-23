@@ -127,6 +127,8 @@ label StolyarWorkshopBuildActions:
         $ current_action_items.append(MenuItem("Спросить о собачьей будке", Call("StolyarWorkshopApply", "ask_dog_booth")))
     if can_pay_dog_booth:
         $ current_action_items.append(MenuItem("Заплатить 100 мараведи за собачью будку", Call("StolyarWorkshopApply", "pay_dog_booth")))
+    if int(MongolVar.get("StocksFoodDay", -1) or -1) >= 0 and int(DraupnirVar.get("MongolLockpickOrderDay", -1) or -1) < 0 and int(time or 0) < 3 and int(week or 0) != 7 and int(money or 0) >= 40:
+        $ current_action_items.append(MenuItem("Заплатить 40 мараведи за тонкие отмычки", Call("story_clara_market_booklet_lockpicks_order_direct")))
     $ current_action_items.append(MenuItem("Вернуться в квартал ремесленников", Jump("ArtisansQuarter")))
     return
 

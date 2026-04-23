@@ -45,8 +45,7 @@ init python:
         room_obj = CurrentRoom
         room_code = str(getattr(room_obj, "code_name", "") or CurLoc or "").strip()
         if room_code == "TavernKitchen" and bool(TavernBreakfastEventActive):
-            current_action_title = ""
-            current_action_items = []
+            tavern_breakfast_restore_ui_state()
             return
         refresh_targets = {}
         try:
@@ -207,6 +206,8 @@ screen current_action_panel():
     elif current_action_items:
         use choice_panel(current_action_items)
     elif str(UI_mode or "") in ("mc", "char", "dog", "fight", "event"):
+        null
+    elif str(getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip() == "TavernKitchen" and bool(TavernBreakfastEventActive):
         null
     elif CurrentRoom is not None:
         $ action_items = build_room_action_items(CurrentRoom)

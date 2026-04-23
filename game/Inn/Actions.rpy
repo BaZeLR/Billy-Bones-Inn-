@@ -18,6 +18,7 @@ init -46 python:
         "TavernAtic": {"build": "TavernAticBuildActions", "object": "TavernAticObjectMenu"},
         "TavernUpstairs": {"build": "TavernUpstairsBuildActions", "object": ""},
         "TavernMain": {"build": "TavernMainBuildActions", "object": "TavernMainObjectMenu"},
+        "HunterClub": {"build": "HunterClubBuildActions", "object": "HunterClubObjectMenu"},
         "PortStreets": {"build": "PortStreetsBuildActions", "object": "PortStreetsObjectMenu"},
         "Forest": {"build": "ForestBuildActions", "object": "ForestObjectMenu"},
     }
@@ -331,7 +332,7 @@ init -46 python:
         current_slot = int(time or 0)
         current_hour = int(hour or 0)
 
-        return current_slot >= 4 or current_hour >= 23
+        return current_slot >= 3 or current_hour >= 20
 
     def _room_add_item_units(room_obj, item_id, units=1):
         added = False
@@ -964,20 +965,6 @@ label RefreshCurrentActionMenu(where_id="", object_id="", preserve_text=False):
 
     if _refresh_build_label != "":
         call expression _refresh_build_label
-        $ renpy.restart_interaction()
-        return
-
-    if _refresh_room == "TavernMain":
-        if _refresh_object != "":
-            call TavernMainObjectMenu(_refresh_object, True)
-            if preserve_text:
-                $ MainTxt = _refresh_saved_main
-                $ CurLocDesc = _refresh_saved_desc
-        else:
-            $ current_action_title = "Действия в трактире"
-            $ current_action_content = None
-            $ _refresh_room_menu = CurrentRoom.build_menu_sections() if CurrentRoom is not None and hasattr(CurrentRoom, "build_menu_sections") else {"movement": [], "actions": []}
-            $ current_action_items = list(_refresh_room_menu.get("movement", [])) + list(_refresh_room_menu.get("actions", []))
         $ renpy.restart_interaction()
         return
 

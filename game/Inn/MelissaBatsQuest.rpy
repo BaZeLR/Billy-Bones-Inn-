@@ -60,8 +60,6 @@ init 3 python:
             MelissaVar["temp_room"] = ""
             MelissaVar["roof_repair_complete_day"] = -1
             MelissaVar["roof_repair_order_day"] = -1
-        elif melissa_bats_repair_complete():
-            MelissaVar["temp_room"] = ""
         MelissaVar["bats_episode"] = stage
         return stage >= 8 or melissa_bats_repair_complete()
 
@@ -120,7 +118,6 @@ init 3 python:
     def melissa_bat_attic_cleanup_event_ready():
         return (
             str(CurLoc or "") == "TavernAtic"
-            and int(MelissaVar.get("drawings_found", 0) or 0) == 1
             and melissa_bats_stage() >= 6
             and melissa_bats_stage() < 8
         )
@@ -163,6 +160,7 @@ init 3 python:
         return (
             melissa_bats_stage() == 7
             and melissa_bats_repair_complete()
+            and int(MelissaVar.get("drawings_returned", 0) or 0) == 1
         )
 
     def melissa_bat_breakfast_ready():
@@ -335,10 +333,8 @@ label MelissaFindDrawingsScene:
     ]
     if len(_drawings_picture_paths) > 0:
         call ShowImage("", "", _drawings_picture_paths[0])
-    "[_drawings_scene_lines[0]]"
     if len(_drawings_picture_paths) > 1:
         call ShowImage("", "", _drawings_picture_paths[1])
-    "[_drawings_scene_lines[1]]"
     if len(_drawings_picture_paths) > 2:
         call ShowImage("", "", _drawings_picture_paths[2])
     $ MainTxt = "\n\n".join(_drawings_scene_lines)
@@ -407,13 +403,28 @@ label MelissaReturnDrawingsScene:
         return
     $ MelissaVar["drawings_returned"] = 1
     $ ClaraVar["drawings_secret_known"] = 1
+    python:
+        try:
+            _clara_booklet_thread = threads.get("claraBookletMarket", None)
+            if _clara_booklet_thread is not None and not bool(_clara_booklet_thread.completed) and int(_clara_booklet_thread.num or 0) < 1:
+                if len(list(_clara_booklet_thread.done or [])) > 0:
+                    _clara_booklet_thread.done[0] = True
+                _clara_booklet_thread.num = 1
+        except Exception:
+            pass
     $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 3)
     $ otkroven["melissa"] = min(20, int(otkroven.get("melissa", 0) or 0) + 2)
     $ MainTxt = "Вы молча показываете Мелиссе найденные рисунки и спрашиваете, не их ли она так нервно искала утром. Она сначала бледнеет, потом заливается краской и, поколебавшись, все же признается:\n\n\"Да... эти. Только они не мои. Это Клариссины рисунки. Она иногда тайком продает такие листки тем, кто любит покупать непристойности не на виду. Не говори никому, хорошо?\"\n\nПосле этого в голосе Мелиссы почти исчезает прежняя злость. Кажется, этот неловкий секрет наконец перевешивает тот дурацкий позорный случай с чердаком."
     $ CurLocDesc = MainTxt
+    python:
+        try:
+            evalTime = None
+            findAvailableEvents(True)
+        except Exception:
+            pass
     call IntMelissaTalkRefresh("melissa")
-    $ _paged_text = str(MainTxt or "")
-    call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
+    if melissa_bats_completion_ready() and not any(str(getattr(item, "caption", "") or "") == melissa_bat_completion_talk_caption() for item in list(current_action_items or [])):
+        $ current_action_items.insert(max(0, len(list(current_action_items or [])) - 1), MenuItem(melissa_bat_completion_talk_caption(), Function(main_ui_call_label, "MelissaBatsCompletionScene")))
     return
 
 
@@ -426,6 +437,18 @@ label MelissaBatsCompletionScene:
     $ MelissaVar["temp_room"] = ""
     $ MelissaVar["roof_repair_complete_day"] = -1
     $ MelissaVar["roof_repair_order_day"] = -1
+    python:
+        try:
+            _melissa_bat_thread = threads.get("melissaBatProblem", None)
+            if _melissa_bat_thread is not None:
+                _melissa_bat_thread.complete()
+        except Exception:
+            pass
+        try:
+            evalTime = None
+            findAvailableEvents(True)
+        except Exception:
+            pass
     $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 3)
     $ otkroven["melissa"] = min(20, int(otkroven.get("melissa", 0) or 0) + 2)
     $ MainTxt = "Вы говорите Мелиссе, что на этот раз все действительно закончено: чердачное гнездовище выжжено, щели под крышей забиты, а над ее комнатой теперь наконец тихо. Она сперва смотрит на вас с привычной настороженностью, будто все еще ждет подвоха, но потом сама коротко выдыхает и впервые за все это время заметно расслабляется.\n\n\"Значит, можно снова спать у себя и не ждать, что ночью над головой начнут бегать, пищать и сыпать трухой...\" Она качает головой, будто сама до конца не верит в удачу, а потом уже тише добавляет: \"Спасибо. Не за слова — за то, что ты и правда довел дело до конца.\"\n\nПохоже, история с летучими мышами и чердаком для Мелиссы наконец действительно закрыта."

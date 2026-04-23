@@ -460,7 +460,9 @@ label HunterClub:
 
     $ MainTxt = hunter_club_main_text()
     $ CurLocDesc = MainTxt
-    if story_event_available("HunterClub", "overheard"):
+    if int(ClaraVar.get("escape_confessed", 0) or 0) == 1 and int(MongolVar.get("StocksArrestDay", -1) or -1) < 0:
+        call story_clara_market_booklet_hunter_direct
+    elif story_event_available("HunterClub", "overheard"):
         call checkTriggers("HunterClub", "overheard", 0)
     call HunterClubBuildActions
     jump HunterClubView
@@ -481,7 +483,9 @@ label HunterClubBuildActions:
     python:
         for _club_object in HunterClubRoom.visible_objects():
             current_action_items.append(MenuItem(_club_object.name, Call("HunterClubObjectMenu", _club_object.object_id)))
-        if story_event_available("HunterClub", "overheard"):
+        if int(ClaraVar.get("escape_confessed", 0) or 0) == 1 and int(MongolVar.get("StocksArrestDay", -1) or -1) < 0:
+            current_action_items.append(MenuItem("Подслушать охотников у стены", Call("story_clara_market_booklet_hunter_direct")))
+        elif story_event_available("HunterClub", "overheard"):
             current_action_items.append(MenuItem("Подслушать охотников у стены", Call("checkTriggers", "HunterClub", "overheard", 0)))
         for _club_exit in HunterClubRoom.visible_exits():
             current_action_items.append(MenuItem(_club_exit.label, Jump(_club_exit.target)))

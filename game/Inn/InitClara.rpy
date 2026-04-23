@@ -115,8 +115,6 @@ init python:
         if time_value == 2:
             if week_value == 7:
                 return False
-            if ((day_value + week_value) % 3) != 0:
-                return False
             return True
         return clara_mongol_evening_market_active(day_value, week_value, time_value)
 
@@ -127,6 +125,42 @@ init python:
         if week_value in (5, 7) or time_value != 3:
             return False
         return True
+
+    def clara_market_story_label():
+        time_value = int(time or 0)
+        booklet_seen = int(ClaraVar.get("booklet_market_seen", 0) or 0)
+        market_evening_intro_seen = int(ClaraVar.get("market_evening_intro_seen", 0) or 0)
+        drawings_secret_known = int(ClaraVar.get("drawings_secret_known", 0) or 0)
+        mongol_theft_seen = int(ClaraVar.get("mongol_theft_seen", 0) or 0)
+
+        if str(CurLoc or "") != "MarketPlace":
+            return ""
+        if not clara_market_visit_active(dayspassed, week, time_value):
+            return ""
+        if time_value == 2 and booklet_seen == 0:
+            return "story_clara_market_action_direct"
+        if time_value == 3 and booklet_seen == 0 and drawings_secret_known == 1:
+            return "story_clara_market_action_direct"
+        if time_value == 3 and booklet_seen == 1 and market_evening_intro_seen == 0:
+            return "story_clara_market_action_direct"
+        if time_value == 3 and market_evening_intro_seen == 1 and mongol_theft_seen == 0:
+            return "story_clara_market_action_direct"
+        return ""
+
+    def clara_market_story_caption():
+        if str(clara_market_story_label() or "") == "":
+            return ""
+        time_value = int(time or 0)
+        booklet_seen = int(ClaraVar.get("booklet_market_seen", 0) or 0)
+        market_evening_intro_seen = int(ClaraVar.get("market_evening_intro_seen", 0) or 0)
+        mongol_theft_seen = int(ClaraVar.get("mongol_theft_seen", 0) or 0)
+        drawings_secret_known = int(ClaraVar.get("drawings_secret_known", 0) or 0)
+
+        if time_value == 3 and booklet_seen == 1 and mongol_theft_seen == 0:
+            return "Тихо проследить за Клариссой"
+        if time_value == 3 and booklet_seen == 0 and drawings_secret_known == 1:
+            return "Проследить за Клариссой и подслушать разговор"
+        return "Проследить за Клариссой"
 
     def clara_melissa_visit_active(day_marker=None, weekday=None, time_slot=None):
         week_value = int(week if weekday is None else weekday or 0)
