@@ -1,8 +1,16 @@
 init 6 python:
+    def forest_cave_picture():
+        if int(time or 0) >= 4 and renpy.loadable("images/forest/cave_night.png"):
+            return "images/forest/cave_night.png"
+        if renpy.loadable("images/forest/cave_day.png"):
+            return "images/forest/cave_day.png"
+        return ""
+
     ForestCaveRoom = Room(
         code_name="ForestCave",
+        group_name=ROOM_GROUP_FOREST,
         display_name="Пещера",
-        bg_picture="",
+        bg_picture="images/forest/cave_day.png",
         descriptions=[
             RoomDescription(
                 text="В глубине темного леса темнеет невысокий вход в пещеру. Внутри тянет сыростью и прохладой, а дальше все скрывает полумрак.",
@@ -30,7 +38,7 @@ label ForestCave:
     $ CurrentRoom = ForestCaveRoom
     $ CurLoc = "ForestCave"
     $ location = CurLoc
-    $ scene_image = CurrentRoom.bg_picture or None
+    $ scene_image = forest_cave_picture() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
     else:

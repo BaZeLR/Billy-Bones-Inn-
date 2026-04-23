@@ -1,69 +1,46 @@
 label IntLizaDressChange(GirlNameILT="liza"):
     python:
-        def _call_slut_friends_increase(*args):
-            if renpy.has_label("SlutFriendsIncrease"):
-                renpy.call("SlutFriendsIncrease", *args)
-
-        def _call_dress_up(girl_name):
-            if renpy.has_label("DressUp"):
-                renpy.call("DressUp", girl_name)
-            elif renpy.has_label("dress_up"):
-                renpy.call("dress_up", girl_name)
-
-        def _say(text):
-            renpy.say(None, text)
-
         def OtherSawLizaCode(AgreedToRedress):
             global tavernfame
-            if AgreedToRedress == 1 and sluttiness.get(GirlNameILT, 0) >= 50:
-                RandVar = renpy.random.randint(1, 9)
-                if RandVar == 1:
-                    _say("Обернувшись, вы вдруг встретились взглядом с вашей мамой, наблюдаещей за этой сценкой.")
-                    if sluttiness.get("sandra", 0) >= 35:
-                        _say("Но она всего лишь усмехнулась, покачала головой и пошла по своим делам.")
-                    else:
-                        _say("И увиденное ей явно не понравилось. Она подошла и сердито сказала: \"Стефан, я понимаю что без этих шлюх мы можем концы с концами не свести, но хоть крупицу стыда иметь надо?\"\nВы еле смогли успокоить маму и заболтать тему.")
-                elif RandVar == 2:
-                    _say("Вы заметили, что за вами наблюдала Мелисса.")
-                    if sluttiness.get("melissa", 0) >= 35:
-                        _say("Но увиденное ее совсем не шокировало, скорее позабавило.")
-                    else:
-                        _say("И этот стриптиз ее немного шокировал. Она подошла и выговорила вам: \"Знаешь, что, Стефан, держи своих шлюх так, чтобы по крайней мере твоим сестрам не приходилось пялится на их прелести. У тебя ведь и младшая сестра есть, она еще мала на такое смотреть!\"")
-                elif RandVar == 3:
-                    _say("Вы заметили, что за вами наблюдала Аманда.")
-                    if sluttiness.get("amanda", 0) >= 35:
-                        _say("Стриптиз подруги ее позабавил, она даже от возбуждения слегка потерла у себя между ножек.")
-                    else:
-                        _say("Причем наблюдала с открытым ртом, публичное раздевание для нее явно было в новинку и шокируеще. \"Пусть учиться смотреть на вещи шире,\" подумали вы.")
-                        _call_slut_friends_increase("amanda", 0, 0, 0, 21, 1, 1)
-                elif RandVar == 4:
-                    _say("Вы заметили, что за снимающей на людех панталоны дочкой с улыбкой наблюдала Жоржетта, одобрительно кивая.")
-                elif RandVar == 5:
-                    _say("Из-за ближайшего стола послышался одобрительный свист, посетителям стриптиз Лизетты пришелся по душе.")
-                elif RandVar == 6:
-                    _say("Один из увидевших это непотребство посетителей не выдержал, подскочил к Лизетте и крепко ее поцеловал, а рукой залез под ее подол, лаская пальцами киску. Его друзья встретили такой поступок одобрительным улюлюканием.")
-                elif RandVar == 7:
-                    _say("Один из посетителей наблюдал за этой сценкой с отвалившей челюстью. Лизетта весело подмигнула ему и сказала: \"Десять мараведи, красавчик!\" смутив скромнягу еще больше.")
+            if AgreedToRedress != 1 or int(sluttiness.get(GirlNameILT, 0) or 0) < 50:
+                return ""
+            RandVar = renpy.random.randint(1, 9)
+            if RandVar == 1:
+                if sluttiness.get("sandra", 0) >= 35:
+                    text = "Обернувшись, вы вдруг встретились взглядом с Сандрой, наблюдающей за этой сценкой. Но она всего лишь усмехнулась, покачала головой и пошла по своим делам."
+                else:
+                    text = 'Обернувшись, вы вдруг встретились взглядом с Сандрой, наблюдающей за этой сценкой. И увиденное ей явно не понравилось. Она подошла и сердито сказала: "Стефан, я понимаю что без этих шлюх мы можем концы с концами не свести, но хоть крупицу стыда иметь надо?"\nВы еле смогли успокоить Сандру и заболтать тему.'
+            elif RandVar == 2:
+                if sluttiness.get("melissa", 0) >= 35:
+                    text = "Вы заметили, что за вами наблюдала Мелисса. Но увиденное ее совсем не шокировало, скорее позабавило."
+                else:
+                    text = 'Вы заметили, что за вами наблюдала Мелисса. И этот стриптиз ее немного шокировал. Она подошла и выговорила вам: "Знаешь что, Стефан, держи своих шлюх так, чтобы по крайней мере девочкам не приходилось пялиться на их прелести. У тебя ведь и младшая есть, она еще мала на такое смотреть!"'
+            elif RandVar == 3:
+                if sluttiness.get("amanda", 0) >= 35:
+                    text = "Вы заметили, что за вами наблюдала Аманда. Стриптиз подруги ее позабавил, она даже от возбуждения слегка потерла у себя между ножек."
+                else:
+                    text = 'Вы заметили, что за вами наблюдала Аманда. Причем наблюдала с открытым ртом, публичное раздевание для нее явно было в новинку и шокировало. "Пусть учится смотреть на вещи шире," подумали вы.'
+                    slut_friends_increase("amanda", 0, 0, 0, 21, 1, 1)
+            elif RandVar == 4:
+                text = "Вы заметили, что за снимающей на людях панталоны дочкой с улыбкой наблюдала Жоржетта, одобрительно кивая."
+            elif RandVar == 5:
+                text = "Из-за ближайшего стола послышался одобрительный свист, посетителям стриптиз Лизетты пришелся по душе."
+            elif RandVar == 6:
+                text = "Один из увидевших это непотребство посетителей не выдержал, подскочил к Лизетте и крепко ее поцеловал, а рукой залез под ее подол, лаская пальцами киску. Его друзья встретили такой поступок одобрительным улюлюканием."
+            elif RandVar == 7:
+                text = 'Один из посетителей наблюдал за этой сценкой с отвалившей челюстью. Лизетта весело подмигнула ему и сказала: "Десять мараведи, красавчик!" смутив скромнягу еще больше.'
+            else:
+                text = ""
+            if RandVar <= 2:
+                slut_friends_increase(GirlNameILT, 0, 0, 0, 60, 2, 1)
+            if RandVar >= 5 and RandVar <= 7:
+                slut_friends_increase(GirlNameILT, 0, 0, 0, 60, 1, 1)
+                tavernfame += 1
+            return text
 
-                if RandVar <= 2:
-                    _call_slut_friends_increase(GirlNameILT, 0, 0, 0, 60, 2, 1)
-                if RandVar >= 5 and RandVar <= 7:
-                    _call_slut_friends_increase(GirlNameILT, 0, 0, 0, 60, 1, 1)
-                    tavernfame += 1
-
-        _can_remove_panties = (
-            Friends.get(GirlNameILT, 0) > 8
-            and panties.get(GirlNameILT, "") != ""
-            and Talked.get(GirlNameILT, 0) < 2
-        )
+        _can_remove_panties = Friends.get(GirlNameILT, 0) > 8 and panties.get(GirlNameILT, "") != "" and Talked.get(GirlNameILT, 0) < 2
         _can_shame = Friends.get(GirlNameILT, 0) > 8 and Talked.get(GirlNameILT, 0) < 2
-        _can_buy = (
-            Friends.get(GirlNameILT, 0) > 8
-            and CheckDailyEventExists("", "BuyDressTom", "") == 0
-            and CheckDailyEventExists(GirlNameILT, "BuyDress", "") == 0
-            and Talked.get(GirlNameILT, 0) < 2
-            and week != 6
-        )
+        _can_buy = Friends.get(GirlNameILT, 0) > 8 and CheckDailyEventExists("", "BuyDressTom", "") == 0 and CheckDailyEventExists(GirlNameILT, "BuyDress", "") == 0 and Talked.get(GirlNameILT, 0) < 2 and week != 6
 
     if not (_can_remove_panties or _can_shame or _can_buy):
         return
@@ -95,12 +72,12 @@ label IntLizaDressChange(GirlNameILT="liza"):
 
             if AgreedToRedress == 1:
                 $ pantiesdef[GirlNameILT] = ""
-                python:
-                    _call_slut_friends_increase(GirlNameILT, 0, 0, 0, 60, 2, 1)
-                    _call_dress_up(GirlNameILT)
+                $ slut_friends_increase(GirlNameILT, 0, 0, 0, 60, 2, 1)
+                $ dress_change_sync_layers(GirlNameILT)
 
-            python:
-                OtherSawLizaCode(AgreedToRedress)
+            $ _other_saw = OtherSawLizaCode(AgreedToRedress)
+            if str(_other_saw or "").strip() != "":
+                "[_other_saw]"
             $ Talked[GirlNameILT] = Talked.get(GirlNameILT, 0) + 1
             return
 
@@ -123,18 +100,15 @@ label IntLizaDressChange(GirlNameILT="liza"):
                 elif sluttiness.get(GirlNameILT, 0) < 60 and renpy.random.randint(1, 4) <= 3:
                     "\"Ага, то сам говорил, посмотри на маму, посмотри на маму, так тебе удобнее мол будет, а теперь стыдит. Приличное у него видите ли заведение. Ладно, не плачь, ща пойду наверх одену.\""
                     $ AgreedToRedress = 1
-                    python:
-                        _call_slut_friends_increase(GirlNameILT, 7, 1, -1, 0, 0, 0)
+                    $ slut_friends_increase(GirlNameILT, 7, 1, -1, 0, 0, 0)
                 else:
                     "\"А ты вот мамашке моей эту байку расскажи! То-то она в коротюлечком платье без них шляется. Не, ей ты ни слова не сказал, только ко мне придираешься.\" отбрила вас Лизетта. \"А мне, между прочим, так клиентов больше набегает. Так что не учи меня, дяденька.\""
-                    python:
-                        _call_slut_friends_increase(GirlNameILT, 7, 1, -1, 0, 0, 0)
+                    $ slut_friends_increase(GirlNameILT, 7, 1, -1, 0, 0, 0)
 
             if AgreedToRedress == 1:
                 $ pantiesdef[GirlNameILT] = "simplepanties"
-                python:
-                    _call_slut_friends_increase(GirlNameILT, 0, 0, 0, 30, 1, -1)
-                    _call_dress_up(GirlNameILT)
+                $ slut_friends_increase(GirlNameILT, 0, 0, 0, 30, 1, -1)
+                $ dress_change_sync_layers(GirlNameILT)
 
             $ Talked[GirlNameILT] = Talked.get(GirlNameILT, 0) + 1
             return

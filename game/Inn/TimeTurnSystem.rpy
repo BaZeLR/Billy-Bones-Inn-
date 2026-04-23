@@ -17,14 +17,16 @@ init -115 python:
         return True
 
     def _apply_movement_time_cost_without_sleep(minutes_to_add):
+        global hour, minute, time
+
         ensure_calendar_state()
         current_minutes = (_turn_i(hour, 0) * 60) + _turn_i(minute, 0)
         target_minutes = current_minutes + max(0, _turn_i(minutes_to_add, 0))
         if target_minutes >= 1440:
             # Movement is never allowed to roll the calendar into the next day.
-            globals()["hour"] = 23
-            globals()["minute"] = 59
-            globals()["time"] = 4
+            hour = 23
+            minute = 59
+            time = 4
             calendar_sync_state()
             return False
         calendar_advance_minutes(max(0, _turn_i(minutes_to_add, 0)))

@@ -27,6 +27,7 @@ init python:
 
     TavernHelpRoom = Room(
         code_name="TavernHelp",
+        group_name=ROOM_GROUP_TAVERN,
         display_name="Бабслей и Литрбол для чайников",
         bg_picture="bg book",
         descriptions=[],
@@ -133,5 +134,4 @@ label TavernHelpTakeStash:
         $ _book.state["stash_amount"] = 0
         call stat
     return
-
 

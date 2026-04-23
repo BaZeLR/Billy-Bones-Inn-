@@ -1,5 +1,52 @@
+init python:
+    import renpy.exports as renpy
+
+    for _dress_runtime_helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
+        try:
+            if hasattr(renpy.store, _dress_runtime_helper_name):
+                delattr(renpy.store, _dress_runtime_helper_name)
+        except Exception:
+            pass
+
+    def dressup_ensure_dress_catalog_entry(code):
+        key = str(code or "").strip()
+        if not key:
+            return
+        try:
+            catalog = item_catalog if isinstance(item_catalog, dict) else {}
+        except Exception:
+            catalog = {}
+        if key not in ShortDressName:
+            _item = catalog.get("dress_" + key, {})
+            ShortDressName[key] = str(_item.get("name", key) or key)
+        if key not in FullDressDesc:
+            _item = catalog.get("dress_" + key, {})
+            FullDressDesc[key] = str(_item.get("description", "") or "")
+
+    def dressup_ensure_dress_parts(code):
+        key = str(code or "").strip()
+        if not key:
+            return
+        if key not in DressTopPart:
+            DressTopPart[key] = ""
+        if key not in DressBottomPart:
+            DressBottomPart[key] = ""
+
+    def dressup_prune_legacy_runtime_helpers():
+        for helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
+            try:
+                if hasattr(renpy.store, helper_name):
+                    delattr(renpy.store, helper_name)
+            except Exception:
+                pass
+
+
 label DressUp(GirlNameDress="", IsNewDayForDress=0):
+    $ GirlNameDress = str(GirlNameDress or "").strip()
+    if not GirlNameDress:
+        return
     python:
+        dressup_prune_legacy_runtime_helpers()
         try:
             topdressdef
         except NameError:
@@ -12,29 +59,6 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
             item_catalog
         except NameError:
             item_catalog = {}
-
-        def _ensure_dress_catalog_entry(code):
-            key = str(code or "").strip()
-            if not key:
-                return
-            if key not in ShortDressName:
-                _item = item_catalog.get("dress_" + key, {})
-                ShortDressName[key] = str(_item.get("name", key) or key)
-            if key not in FullDressDesc:
-                _item = item_catalog.get("dress_" + key, {})
-                FullDressDesc[key] = str(_item.get("description", "") or "")
-
-        def _ensure_dress_parts(code):
-            key = str(code or "").strip()
-            if not key:
-                return
-            if key not in DressTopPart:
-                DressTopPart[key] = ""
-            if key not in DressBottomPart:
-                DressBottomPart[key] = ""
-
-        if not GirlNameDress:
-            pass
 
         dressdefault.setdefault(GirlNameDress, "")
         topdressdef.setdefault(GirlNameDress, "")
@@ -162,8 +186,8 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
                 pantiesdef[GirlNameDress] = TMPPantiesArray[renpy.random.randint(0, len(TMPPantiesArray) - 1)]
 
         cur_default = dressdefault.get(GirlNameDress, "")
-        _ensure_dress_catalog_entry(cur_default)
-        _ensure_dress_parts(cur_default)
+        dressup_ensure_dress_catalog_entry(cur_default)
+        dressup_ensure_dress_parts(cur_default)
         topdressdef[GirlNameDress] = DressTopPart.get(cur_default, "")
         bottomdressdef[GirlNameDress] = DressBottomPart.get(cur_default, "")
 
@@ -173,11 +197,12 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
         panties[GirlNameDress] = pantiesdef.get(GirlNameDress, "")
         legs[GirlNameDress] = legsdef.get(GirlNameDress, "")
         shoes[GirlNameDress] = shoesdef.get(GirlNameDress, "")
-        _ensure_dress_catalog_entry(bradef.get(GirlNameDress, ""))
-        _ensure_dress_catalog_entry(pantiesdef.get(GirlNameDress, ""))
-        _ensure_dress_catalog_entry(legsdef.get(GirlNameDress, ""))
+        dressup_ensure_dress_catalog_entry(bradef.get(GirlNameDress, ""))
+        dressup_ensure_dress_catalog_entry(pantiesdef.get(GirlNameDress, ""))
+        dressup_ensure_dress_catalog_entry(legsdef.get(GirlNameDress, ""))
         topraised[GirlNameDress] = 0
         bottomraised[GirlNameDress] = 0
+        bodymodel_sync_character(GirlNameDress)
     return
 
 

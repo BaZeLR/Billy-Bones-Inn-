@@ -1,4 +1,29 @@
 init python:
+    def dress_change_sync_layers(girl_name=""):
+        girl = str(girl_name or "").strip()
+        if girl == "":
+            return
+        topdress.setdefault(girl, "")
+        bottomdress.setdefault(girl, "")
+        bra.setdefault(girl, "")
+        panties.setdefault(girl, "")
+        legs.setdefault(girl, "")
+        shoes.setdefault(girl, "")
+        topdressdef.setdefault(girl, topdress.get(girl, ""))
+        bottomdressdef.setdefault(girl, bottomdress.get(girl, ""))
+        bradef.setdefault(girl, bra.get(girl, ""))
+        pantiesdef.setdefault(girl, panties.get(girl, ""))
+        legsdef.setdefault(girl, legs.get(girl, ""))
+        shoesdef.setdefault(girl, shoes.get(girl, ""))
+        topdress[girl] = topdressdef.get(girl, "")
+        bottomdress[girl] = bottomdressdef.get(girl, "")
+        bra[girl] = bradef.get(girl, "")
+        panties[girl] = pantiesdef.get(girl, "")
+        legs[girl] = legsdef.get(girl, "")
+        shoes[girl] = shoesdef.get(girl, "")
+        topraised[girl] = 0
+        bottomraised[girl] = 0
+
     def becky_dress_change_flags(girl_name="becky"):
         girl_key = str(girl_name or "becky")
         can_offer_bra_off = (
@@ -36,42 +61,30 @@ init python:
         flags = becky_dress_change_flags(girl_name)
         return any(bool(value) for value in flags.values())
 
+    def becky_dress_change_other_saw_text(girl_name="becky", agreed_to_redress=0):
+        girl = str(girl_name or "becky")
+        if int(agreed_to_redress or 0) != 1 or int(sluttiness.get(girl, 0) or 0) < 45:
+            return ""
+        randvar = renpy.random.randint(1, 6)
+        if randvar == 1:
+            text = "Какой-то мужик, зашедший за чем-то в лавку, наблюдал за этой сценкой с отвалившей челюстью. Бекки подмигнула ему и стала перекладывать овощи на прилавке как ни в чем не бывало."
+        elif randvar == 2:
+            text = "Глаза у какой-то девицы, заглянувшей в лавку за покупками, расширились от такого зрелища, но под конец она с одобрением кивнула вдове."
+        elif randvar == 3:
+            text = 'Какая-то мать семейства, заглянувшая в лавку миссис Блэнкеншип за зеленью, назидательно сказала своим двум дочкам, указывая на Бекки: "Вот видите как нужно парней привлекать, а вы все \'это платье слишком смелое\' и прочую чушь, так у меня в девках и проходите, коли за ум не возьметесь."'
+        else:
+            text = ""
+        if randvar <= 3:
+            slut_friends_increase("becky", 0, 0, 0, 60, 2, 1)
+        return text
+
 
 label IntBeckyDressChange(GirlName="becky"):
-    python:
-        def _call_slut_friends_increase(*args):
-            if renpy.has_label("SlutFriendsIncrease"):
-                renpy.call("SlutFriendsIncrease", *args)
-            elif renpy.has_label("slut_friends_increase"):
-                renpy.call("slut_friends_increase", *args)
-
-        def _call_dress_up(girl_name):
-            if renpy.has_label("DressUp"):
-                renpy.call("DressUp", girl_name)
-            elif renpy.has_label("dress_up"):
-                renpy.call("dress_up", girl_name)
-
-        def _say(text):
-            renpy.say(None, text)
-
-        def OtherSawBeckyCode(AgreedToRedress):
-            if AgreedToRedress == 1 and sluttiness.get(GirlName, 0) >= 45:
-                RandVar = renpy.random.randint(1, 6)
-                if RandVar == 1:
-                    _say("Какой-то мужик, зашедший за чем-то в лавку, наблюдал за этой сценкой с отвалившей челюстью. Бекки подмигнула ему и стала перекладывать овощи на прилавке как ни в чем не бывало.")
-                elif RandVar == 2:
-                    _say("Глаза у какой-то девицы, заглянувшей в лавку за покупками, расширились от такого зрелища, но под конец она с одобрением кивнула вдове.")
-                elif RandVar == 3:
-                    _say("Какая-то мать семейства, заглянувшая в лавку миссис Блэнкеншип за зеленью, назидательно сказала своим двум дочкам, указывая на Бекки: \"Вот видите как нужно парней привлекать, а вы все 'это платье слишком смелое мама' и прочую чушь, так у меня в девках и проходите, коли за ум не возьметесь.\"")
-
-                if RandVar <= 3:
-                    _call_slut_friends_increase("becky", 0, 0, 0, 60, 2, 1)
-
-        _dress_flags = becky_dress_change_flags(GirlName)
-        _can_offer_bra_off = bool(_dress_flags.get("can_offer_bra_off", False))
-        _can_offer_panties_off = bool(_dress_flags.get("can_offer_panties_off", False))
-        _can_shame = bool(_dress_flags.get("can_shame", False))
-        _can_buy = bool(_dress_flags.get("can_buy", False))
+    $ _dress_flags = becky_dress_change_flags(GirlName)
+    $ _can_offer_bra_off = bool(_dress_flags.get("can_offer_bra_off", False))
+    $ _can_offer_panties_off = bool(_dress_flags.get("can_offer_panties_off", False))
+    $ _can_shame = bool(_dress_flags.get("can_shame", False))
+    $ _can_buy = bool(_dress_flags.get("can_buy", False))
 
     if not (_can_offer_bra_off or _can_offer_panties_off or _can_shame or _can_buy):
         return
@@ -103,12 +116,12 @@ label IntBeckyDressChange(GirlName="becky"):
 
             if AgreedToRedress == 1:
                 $ bradef[GirlName] = ""
-                python:
-                    _call_slut_friends_increase("becky", 0, 0, 0, 60, 2, 1)
-                    _call_dress_up(GirlName)
+                $ slut_friends_increase("becky", 0, 0, 0, 60, 2, 1)
+                $ dress_change_sync_layers(GirlName)
 
-            python:
-                OtherSawBeckyCode(AgreedToRedress)
+            $ _other_saw = becky_dress_change_other_saw_text(GirlName, AgreedToRedress)
+            if str(_other_saw or "").strip() != "":
+                "[_other_saw]"
             $ Talked[GirlName] = Talked.get(GirlName, 0) + 1
             return
 
@@ -137,12 +150,12 @@ label IntBeckyDressChange(GirlName="becky"):
 
             if AgreedToRedress == 1:
                 $ pantiesdef[GirlName] = ""
-                python:
-                    _call_slut_friends_increase("becky", 0, 0, 0, 60, 2, 1)
-                    _call_dress_up(GirlName)
+                $ slut_friends_increase("becky", 0, 0, 0, 60, 2, 1)
+                $ dress_change_sync_layers(GirlName)
 
-            python:
-                OtherSawBeckyCode(AgreedToRedress)
+            $ _other_saw = becky_dress_change_other_saw_text(GirlName, AgreedToRedress)
+            if str(_other_saw or "").strip() != "":
+                "[_other_saw]"
             $ Talked[GirlName] = Talked.get(GirlName, 0) + 1
             return
 
@@ -159,18 +172,15 @@ label IntBeckyDressChange(GirlName="becky"):
                 elif sluttiness.get(GirlName, 0) < 60 and renpy.random.randint(1, 4) <= 3:
                     "\"А раньше тебе нравилось...\" обиженно протянула Бекки, \"хорошо, одену как только доберусь до комода.\""
                     $ AgreedToRedress = 1
-                    python:
-                        _call_slut_friends_increase("becky", 10, 2, -1, 0, 0, 0)
+                    $ slut_friends_increase("becky", 10, 2, -1, 0, 0, 0)
                 else:
                     "\"Что это на тебя нашло, когда это ты таким скромником-то заделался?!\" с удивлением спросила Бекки. \"Знаешь, я подольше тебя живу на свете, так что обойдусь я и без твоих советов, как мне одеваться.\""
-                    python:
-                        _call_slut_friends_increase("becky", 10, 1, -1, 0, 0, 0)
+                    $ slut_friends_increase("becky", 10, 1, -1, 0, 0, 0)
 
             if AgreedToRedress == 1:
                 $ bradef[GirlName] = "simplebra"
-                python:
-                    _call_slut_friends_increase("becky", 0, 0, 0, 30, 1, -1)
-                    _call_dress_up(GirlName)
+                $ slut_friends_increase("becky", 0, 0, 0, 30, 1, -1)
+                $ dress_change_sync_layers(GirlName)
 
             $ Talked[GirlName] = Talked.get(GirlName, 0) + 1
             return
@@ -188,18 +198,15 @@ label IntBeckyDressChange(GirlName="becky"):
                 elif sluttiness.get(GirlName, 0) < 60 and renpy.random.randint(1, 4) <= 3:
                     "\"А раньше тебе нравилось...\" обиженно протянула Бекки, \"хорошо, одену как только доберусь до комода.\""
                     $ AgreedToRedress = 1
-                    python:
-                        _call_slut_friends_increase("becky", 10, 2, -1, 0, 0, 0)
+                    $ slut_friends_increase("becky", 10, 2, -1, 0, 0, 0)
                 else:
                     "\"Что это на тебя нашло, когда это ты таким скромником-то заделался?!\" с удивлением спросила Бекки. \"Знаешь, я подольше тебя живу на свете, так что обойдусь я и без твоих советов, как мне одеваться.\""
-                    python:
-                        _call_slut_friends_increase("becky", 10, 1, -1, 0, 0, 0)
+                    $ slut_friends_increase("becky", 10, 1, -1, 0, 0, 0)
 
             if AgreedToRedress == 1:
                 $ pantiesdef[GirlName] = "simplepanties"
-                python:
-                    _call_slut_friends_increase("becky", 0, 0, 0, 30, 1, -1)
-                    _call_dress_up(GirlName)
+                $ slut_friends_increase("becky", 0, 0, 0, 30, 1, -1)
+                $ dress_change_sync_layers(GirlName)
 
             $ Talked[GirlName] = Talked.get(GirlName, 0) + 1
             return

@@ -204,7 +204,13 @@ init 4 python:
         visible_ids = list(visible_recipe_pages() or [])
         if len(visible_ids) <= 0:
             return "Вы листаете старую книгу, но пока не можете разобрать ни одного полезного рецепта."
-        return "Вы осторожно перелистываете очень старую книгу с рецептами.\n\n" + str(recipe_page_text(recipe_book_resolved_selected_id()) or "")
+        extra_line = ""
+        try:
+            if int(effective_player_exploration() or 0) < 100:
+                extra_line = "\n\nМежду читаемыми страницами заметно, что в книге есть и другие записи, но чернила выцвели, а рука автора слишком неровная. Пока вы разбираете лишь самые понятные рецепты."
+        except Exception:
+            extra_line = ""
+        return "Вы осторожно перелистываете очень старую книгу с рецептами.\n\n" + str(recipe_page_text(recipe_book_resolved_selected_id()) or "") + str(extra_line or "")
 
     def recipe_book_page_text(recipe_id):
         resolved_id = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()

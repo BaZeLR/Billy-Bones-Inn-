@@ -4,23 +4,8 @@ label ShowGirlSexHistory(args0=""):
         table_rows = ["<table border=1>"]
 
         def _day_to_text_local(day_number):
-            DayToTransform = int(day_number or 0) + 1
-            WeekToTransform = DayToTransform % 7
-            YearToTransform = 1100 + (DayToTransform - (DayToTransform % 365)) // 365
-            DayToTransform = DayToTransform % 365
-
-            MonthToTransf = 1
-            days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-            for days in days_in_month:
-                if DayToTransform > days:
-                    MonthToTransf += 1
-                    DayToTransform -= days
-                else:
-                    break
-
-            week_names = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]
-            month_names = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"]
-            return f"{week_names[WeekToTransform]}, {DayToTransform} {month_names[MonthToTransf - 1]} {YearToTransform} года"
+            parts = calendar_day_number_to_parts(day_number)
+            return calendar_format_date_ru(parts["day"], parts["month"], parts["year"], parts["week"], True)
 
         def _append_history_rows(history_rows):
             for tmpSexActShow in history_rows:

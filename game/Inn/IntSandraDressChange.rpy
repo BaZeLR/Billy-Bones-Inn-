@@ -23,7 +23,7 @@ label IntSandraDressChangeRefresh(GirlNameIST="sandra"):
     $ current_action_items = []
 
     if sandra_dress_change_can_buy(GirlNameIST):
-        $ current_action_items.append(MenuItem("Предложить купить мамуле обновку", Call("IntSandraDressChangeApply", GirlNameIST, "buy_dress")))
+        $ current_action_items.append(MenuItem("Предложить купить Сандре обновку", Call("IntSandraDressChangeApply", GirlNameIST, "buy_dress")))
 
     $ current_action_items.append(MenuItem("Назад", Call("IntSandraTalkRefresh", GirlNameIST)))
     return
@@ -38,7 +38,7 @@ label IntSandraDressChangeApply(GirlNameIST="sandra", choice_code=""):
         call IntSandraTalkRefresh(GirlNameIST)
         return
 
-    $ MainTxt = "\"Мамочка, дорогая, я хочу тебе что нибудь подарить! Ты у меня такая замечательная! Давай я тебе какой-нибудь наряд подарю! Хочешь?\" - порадовали вы маму.\n\"Какой ты у меня хороший сыночек! Не могу на тебя нарадоваться!\" засмеялась мама. \"Конечно хочу!\"\n\"Ну давай тогда завтра, с утра пораньше, встретимся у Ирмы Фараго, я буду тебя там ждать, вместе и выберем!\" заверили вы маму."
+    $ MainTxt = "\"Сандра, дорогая, я хочу тебе что-нибудь подарить! Ты у меня такая замечательная! Давай я тебе какой-нибудь наряд подарю! Хочешь?\" - порадовали вы Сандру.\n\n\"Какой ты у меня хороший, Стефан! Не могу на тебя нарадоваться!\" засмеялась Сандра. \"Конечно хочу!\"\n\n\"Ну давай тогда завтра, с утра пораньше, встретимся у Ирмы Фараго, я буду тебя там ждать, вместе и выберем!\" заверили вы ее."
     $ DailyEventsList_Add(GirlNameIST, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy")
     $ Talked[GirlNameIST] = Talked.get(GirlNameIST, 0) + 1
     $ CurLocDesc = MainTxt

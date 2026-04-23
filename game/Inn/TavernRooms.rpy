@@ -14,5 +14,5 @@ init 7 python:
         "TavernSandraRoom",
         "TavernMelissaRoom",
         "TavernEmptyRoom",
-        "TavernAtic",
+        "TavernAtic"
     ]

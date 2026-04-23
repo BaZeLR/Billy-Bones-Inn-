@@ -52,5 +52,13 @@ label ChurchIspovedChoice(choice_code=""):
 
 
 label ChurchReturnAfterConfession:
+    $ ensure_calendar_state()
+    if int(time or 0) < 4:
+        $ calendar_set_time_slot(int(time or 0) + 1)
+        call stat
+        $ checkpoint_tractir_progress("church_confession_return")
+        call ChurchRestore
+        $ renpy.restart_interaction()
+        return
     call AdvanceTime("Church")
     return

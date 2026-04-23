@@ -352,8 +352,6 @@ init -45 python:
             return preview
         if time_value < 3:
             return preview
-        if time_value >= 4 and hour_now is not None and _pc_to_int(hour_now, 23) < 22:
-            return preview
         if str(last_stamp or "") == stamp:
             return preview
 

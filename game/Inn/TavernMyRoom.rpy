@@ -1,6 +1,7 @@
 init python:
     TavernMyRoomRoom = Room(
         code_name="TavernMyRoom",
+        group_name=ROOM_GROUP_TAVERN,
         display_name="Моя комната",
         bg_picture="bg myroom",
         descriptions=[
@@ -35,6 +36,9 @@ init python:
 
     def tavern_my_room_has_floor_item(item_id):
         return _room_has_item_by_id(TavernMyRoomRoom, str(item_id or "").strip())
+
+    def tavern_my_room_has_recipe_book_access():
+        return tavern_my_room_has_floor_item("recipe_book_001") or _player_item_count_by_id("recipe_book_001") > 0
 
     def tavern_my_room_table_link_markup():
         return "{a=call:TavernMyRoomTableMenu}{color=#245b2b}стол{/color}{/a}"
@@ -73,10 +77,21 @@ init python:
         if tavern_my_room_has_floor_item("rusty_hunter_rifle_001"):
             _rifle_name = str(runtime_item_display_name("rusty_hunter_rifle_001") or "оружие")
             extra_rows.append("В углу у стены прислонена {}. Пускай она и старая, но вид у нее все еще внушительный.".format(_rifle_name))
+        if tavern_my_room_has_floor_item("old_leather_cuirass_001"):
+            _cuirass_name = str(runtime_item_display_name("old_leather_cuirass_001") or "кираса")
+            extra_rows.append("У стены аккуратно оставлена {}. Кожа потемнела от времени, но вещь все еще выглядит крепкой.".format(_cuirass_name))
+        if melissa_temp_room_active("TavernMyRoom"):
+            extra_rows.append("Пока в комнате Мелиссы под крышей все еще живет дрянь, часть ее вещей лежит и у вас. Похоже, по ночам она действительно рассчитывает на это убежище.")
 
         if len(extra_rows) > 0:
-            return base_text + "\n\n" + "\n".join(extra_rows)
+            return base_text + "\n" + "\n".join(extra_rows)
         return base_text
+
+    def tavern_my_room_melissa_visible():
+        try:
+            return melissa_temp_room_active("TavernMyRoom")
+        except Exception:
+            return False
 
     def tavern_my_room_apply_scene_state():
         picture_path = tavern_my_room_dynamic_picture()
@@ -91,8 +106,13 @@ init python:
 label TavernMyRoom:
     $ dog_prepare_current_spawn()
     $ CurrentRoom = TavernMyRoomRoom
+    $ TavernMyRoomRoom.npcs = []
+    if tavern_my_room_melissa_visible():
+        $ TavernMyRoomRoom.npcs.append({"npc_id": "melissa", "name": "Мелисса", "condition": tavern_my_room_melissa_visible, "talk_label": "IntMelissaTalk", "auto_card": True})
+    $ CurrentRoom.npcs = TavernMyRoomRoom.npcs
     $ CurLoc = "TavernMyRoom"
     $ location = CurLoc
+    call CheckDailyEvent("", "_story_enter", CurLoc, time)
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
@@ -115,6 +135,10 @@ label TavernMyRoomView:
 
 label TavernMyRoomBuildActions:
     $ tavern_my_room_apply_scene_state()
+    $ TavernMyRoomRoom.npcs = []
+    if tavern_my_room_melissa_visible():
+        $ TavernMyRoomRoom.npcs.append({"npc_id": "melissa", "name": "Мелисса", "condition": tavern_my_room_melissa_visible, "talk_label": "IntMelissaTalk", "auto_card": True})
+    $ CurrentRoom.npcs = TavernMyRoomRoom.npcs
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ room_menu = CurrentRoom.build_menu_sections()
@@ -124,7 +148,7 @@ label TavernMyRoomBuildActions:
     if dog_is_available_here("TavernMyRoom"):
         $ current_action_items.append(MenuItem(dog_room_action_caption("TavernMyRoom"), Call("IntDogTalk", "TavernMyRoom")))
     python:
-        for _room_item_id in ("recipe_book_001", "rusty_hunter_rifle_001"):
+        for _room_item_id in ("recipe_book_001", "rusty_hunter_rifle_001", "old_leather_cuirass_001"):
             if _room_has_item_by_id(TavernMyRoomRoom, _room_item_id):
                 _room_item_obj = get_game_item(_room_item_id, TavernMyRoomRoom)
                 if _room_item_obj is not None:
@@ -133,7 +157,7 @@ label TavernMyRoomBuildActions:
     return
 
 
-label TavernMyRoomObjectMenu(object_id=""):
+label TavernMyRoomObjectMenu(object_id="", refresh_only=False):
     if str(object_id or "") != "":
         $ current_object_id = str(object_id or "")
     $ object_id = str(current_object_id or "")
@@ -163,16 +187,23 @@ label TavernMyRoomObjectMenu(object_id=""):
     $ current_action_content = None
     $ current_action_items = []
     python:
+        _room_floor_item = _room_has_item_by_id(TavernMyRoomRoom, object_id)
+        _takeable_floor_item = _room_floor_item and object_id in ("recipe_book_001", "rusty_hunter_rifle_001", "old_leather_cuirass_001")
         for _room_action in _room_object.visible_actions():
             _room_args = tuple(getattr(_room_action, "args", ()) or ())
             if _room_action.hook == "text":
                 current_action_items.append(MenuItem(_room_action.label, Call("TavernMyRoomObjectText", object_id, _room_action.action_id)))
-            elif _room_action.hook == "call" and str(_room_action.target or "") != "":
+            elif not _takeable_floor_item and _room_action.hook == "call" and str(_room_action.target or "") != "":
                 current_action_items.append(MenuItem(_room_action.label, Call(_room_action.target, *_room_args)))
-            elif _room_action.hook == "jump" and str(_room_action.target or "") != "":
+            elif not _takeable_floor_item and _room_action.hook == "jump" and str(_room_action.target or "") != "":
                 current_action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
+        if _takeable_floor_item:
+            if object_id == "recipe_book_001":
+                current_action_items.append(MenuItem("Сесть за стол", Call("TavernMyRoomTableMenu")))
+            current_action_items.append(MenuItem("Взять", Call("TavernMyRoomTakeFloorItem", object_id)))
         current_action_items.append(MenuItem("Назад", Call("TavernMyRoomRestore")))
-    $ renpy.pause(hard=True)
+    if not refresh_only:
+        $ renpy.pause(hard=True)
     return
 
 
@@ -202,11 +233,23 @@ label TavernMyRoomRestore:
     return
 
 
+label TavernMyRoomTakeFloorItem(item_id=""):
+    $ _item_id = str(item_id or "").strip()
+    $ _take_result = take(TavernMyRoomRoom, _item_id)
+    call TavernMyRoomBuildActions
+    $ MainTxt = str((_take_result or {}).get("text", "") or "Вы забираете вещь.")
+    $ CurLocDesc = MainTxt
+    show screen main_ui
+    $ renpy.restart_interaction()
+    $ renpy.pause(hard=True)
+    return
+
+
 label TavernMyRoomOpenChest:
     $ _room_object = tavern_my_room_get_object("chest_001")
     if _room_object is not None:
         $ _room_object.state["open"] = 1
-    $ MainTxt = "Вы открываете ларь. Внутри хранится ваша одежда и прочие личные вещи."
+    $ MainTxt = "Вы открываете ларь. Внутри хранится ваша одежда."
     $ CurLocDesc = MainTxt
     $ current_action_title = "Ларь"
     $ current_action_content = None
@@ -224,8 +267,6 @@ label TavernMyRoomOpenChest:
                 current_action_items.append(MenuItem("Надеть " + _short, Call("TavernMyRoomWearDress", _dress)))
                 if player_can_tear_wardrobe_dress(_dress):
                     current_action_items.append(MenuItem("Порвать " + _short + " на лоскуты", Call("TavernMyRoomTearDressToCloth", _dress)))
-        if player_has_attic_manageable_items():
-            current_action_items.append(MenuItem("Проверить вещи", Call("AtticInventoryMenu", "chest", "TavernMyRoom")))
     $ current_action_items.append(MenuItem("Закрыть ларь", Call("TavernMyRoomCloseChest")))
     show screen main_ui
     $ renpy.pause(hard=True)
@@ -247,18 +288,32 @@ label TavernMyRoomSleepAction:
 
 
 label TavernMyRoomTableMenu:
-    $ _table_picture = tavern_my_room_table_picture()
-    $ scene_image = _table_picture or None
-    if _table_picture:
-        $ _layout_last_picture = _table_picture
-    $ MainTxt = "На столе можно спокойно разложить книгу рецептов, ингредиенты и всякую мелочь для нехитрой работы руками. Отсюда удобно и читать записи, и сразу что-нибудь мастерить."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Стол"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_action_items.append(MenuItem("Читать книгу рецептов", Call("TavernMyRoomTableRead")))
-    $ current_action_items.append(MenuItem("Создать предмет", Call("TavernMyRoomTableCraftMenu")))
-    $ current_action_items.append(MenuItem("Назад", Call("TavernMyRoomRestore")))
+    if not tavern_my_room_has_recipe_book_access():
+        $ _default_picture = tavern_my_room_dynamic_picture()
+        $ scene_image = _default_picture or None
+        if _default_picture:
+            $ _layout_last_picture = _default_picture
+        $ MainTxt = "Вам сейчас нечем здесь заняться."
+        $ CurLocDesc = MainTxt
+        $ current_action_title = "Стол"
+        $ current_action_content = None
+        $ current_action_items = [MenuItem("Назад", Call("TavernMyRoomRestore"))]
+    else:
+        $ _table_picture = tavern_my_room_table_picture()
+        $ scene_image = _table_picture or None
+        if _table_picture:
+            $ _layout_last_picture = _table_picture
+        if tavern_my_room_has_floor_item("recipe_book_001"):
+            $ MainTxt = "На столе уже лежит старая книга с рецептами. Здесь можно спокойно читать записи и сразу пробовать что-нибудь мастерить."
+        else:
+            $ MainTxt = "Вы раскладываете на столе книгу с рецептами, ингредиенты и всякую мелочь для нехитрой работы руками. Отсюда удобно и читать записи, и сразу что-нибудь мастерить."
+        $ CurLocDesc = MainTxt
+        $ current_action_title = "Стол"
+        $ current_action_content = None
+        $ current_action_items = []
+        $ current_action_items.append(MenuItem("Читать книгу рецептов", Call("TavernMyRoomTableRead")))
+        $ current_action_items.append(MenuItem("Создать предмет", Call("TavernMyRoomTableCraftMenu")))
+        $ current_action_items.append(MenuItem("Назад", Call("TavernMyRoomRestore")))
     show screen main_ui
     $ renpy.restart_interaction()
     $ renpy.pause(hard=True)
@@ -267,6 +322,9 @@ label TavernMyRoomTableMenu:
 
 
 label TavernMyRoomTableRead(recipe_id=""):
+    if not tavern_my_room_has_recipe_book_access():
+        call TavernMyRoomTableMenu
+        return
     $ _table_recipe_id = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()
     $ _table_picture = recipe_page_image_path(_table_recipe_id) or tavern_my_room_table_picture()
     $ scene_image = _table_picture or None
@@ -298,6 +356,9 @@ label TavernMyRoomTableRead(recipe_id=""):
 
 
 label TavernMyRoomTableCraftMenu:
+    if not tavern_my_room_has_recipe_book_access():
+        call TavernMyRoomTableMenu
+        return
     $ _table_picture = tavern_my_room_table_picture()
     $ scene_image = _table_picture or None
     if _table_picture:

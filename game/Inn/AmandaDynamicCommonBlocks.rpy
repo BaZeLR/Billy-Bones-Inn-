@@ -208,13 +208,13 @@ init python:
 
         if tmpSexType == 3:
             PregnancyCheck("amanda", "outside", 1, tmpGuyName, 0, "Соседский парень")
-            SlutFriendsIncrease("amanda", 0, 0, 0, 62, 1, 1)
+            slut_friends_increase("amanda", 0, 0, 0, 62, 1, 1)
         elif tmpSexType == 2:
             PregnancyCheck("amanda", "inside", 1, tmpGuyName, 0, "Соседский парень")
-            SlutFriendsIncrease("amanda", 0, 0, 0, 65, 1, 1)
+            slut_friends_increase("amanda", 0, 0, 0, 65, 1, 1)
         elif tmpSexType == 1:
             PregnancyCheck("amanda", "mouth", 1, tmpGuyName, 0, "Соседский парень")
-            SlutFriendsIncrease("amanda", 0, 0, 0, 48, 1, 1)
+            slut_friends_increase("amanda", 0, 0, 0, 48, 1, 1)
 
         Result = tmpSexType
         return tmpSexType
@@ -242,7 +242,7 @@ init python:
         else:
             renpy.say(None, "Расстроившись, но не найдя что вам возразить, Аманда пошлепала обратно в трактир.")
 
-        SlutFriendsIncrease("amanda", 6, 1, -2, 0, 0, 0)
+        slut_friends_increase("amanda", 6, 1, -2, 0, 0, 0)
         AmandaDynamicNextJump = "StreetTavern"
         return 0
 

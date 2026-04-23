@@ -55,6 +55,7 @@ init python:
 
     BeckyHomeFrontRoom = Room(
         code_name="BeckyHomeFront",
+        group_name=ROOM_GROUP_CITY,
         display_name="Черный ход дома Бекки",
         bg_picture="images/becky/Home/house2.jpg",
         descriptions=[
@@ -151,6 +152,10 @@ label BeckyHomeFront(arrive_mode=""):
         if BeckyVar["TodayFrontSexCheck"] == 1 and RandIngaFuck <= 2:
             $ RandIngaFuck = 3
         $ BeckyVar["TodayFrontSexCheck"] = 1
+        if RandIngaFuck == 1:
+            $ PregnancyCheck("inga", "mouthface", 1, "Лукас")
+        elif RandIngaFuck == 2:
+            $ PregnancyCheck("inga", "inside", 1, "Лукас")
 
     if ArriveMode == "FromDances":
         if BeckyVar["visitedhome"] == 0:

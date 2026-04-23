@@ -1,4 +1,5 @@
 label IntZimmerTalk:
+    $ main_ui_begin_talk_state("Разговор с Циммерманом", "zimmer")
     $ current_action_title = "Разговор с Циммерманом"
     $ current_action_content = None
     $ MainTxt = "Десятник Циммерман внимательно смотрит на вас, ожидая, что вы скажете."
@@ -8,34 +9,35 @@ label IntZimmerTalk:
 
 
 label IntZimmerTalkRefresh:
+    $ main_ui_begin_talk_state("Разговор с Циммерманом", "zimmer")
     $ current_action_title = "Разговор с Циммерманом"
     $ current_action_content = None
     $ current_action_items = []
-    $ current_action_items.append(MenuItem("Посмотреть на десятника", Call("IntZimmerTalkApply", "look")))
+    $ current_action_items.append(MenuItem("Посмотреть на десятника", Function(main_ui_call_label, "IntZimmerTalkApply", "look")))
 
     if Talked.get("Zimmer", 0) < 2 and StolenHorseDays > 0 and ZimmerVar.get("ComplainHorse", 0) == 0:
-        $ current_action_items.append(MenuItem("Сообщить о краже лошади", Call("IntZimmerTalkApply", "horse_report")))
+        $ current_action_items.append(MenuItem("Сообщить о краже лошади", Function(main_ui_call_label, "IntZimmerTalkApply", "horse_report")))
 
     if Talked.get("Zimmer", 0) < 2 and StolenHorseDays > 0 and ZimmerVar.get("ComplainHorse", 0) == 1:
-        $ current_action_items.append(MenuItem("Узнать, как продвигаются поиски украденной лошади", Call("IntZimmerTalkApply", "horse_progress")))
+        $ current_action_items.append(MenuItem("Узнать, как продвигаются поиски украденной лошади", Function(main_ui_call_label, "IntZimmerTalkApply", "horse_progress")))
 
     if Talked.get("Zimmer", 0) < 2 and BeckyVar.get("KnowSherwood", 0) == 1 and ZimmerVar.get("SherwoodStory", 0) == 0:
-        $ current_action_items.append(MenuItem("Спросить о Шервудском лесе", Call("IntZimmerTalkApply", "sherwood_story_1")))
+        $ current_action_items.append(MenuItem("Спросить о Шервудском лесе", Function(main_ui_call_label, "IntZimmerTalkApply", "sherwood_story_1")))
 
     if Talked.get("Zimmer", 0) < 2 and BeckyVar.get("KnowSherwood", 0) == 1 and ZimmerVar.get("SherwoodStory", 0) == 1:
-        $ current_action_items.append(MenuItem("И что с лесом теперь?", Call("IntZimmerTalkApply", "sherwood_story_2")))
+        $ current_action_items.append(MenuItem("И что с лесом теперь?", Function(main_ui_call_label, "IntZimmerTalkApply", "sherwood_story_2")))
 
     if Talked.get("Zimmer", 0) < 2 and RobinVar.get("RobbedNum", 0) > 0 and ZimmerVar.get("ComplainRobin", 0) == 0:
-        $ current_action_items.append(MenuItem("Пожаловаться на Робин Гуда", Call("IntZimmerTalkApply", "robin_report")))
+        $ current_action_items.append(MenuItem("Пожаловаться на Робин Гуда", Function(main_ui_call_label, "IntZimmerTalkApply", "robin_report")))
 
     if Talked.get("Zimmer", 0) < 2 and ZimmerVar.get("ComplainRobin", 0) == 1 and money >= 100:
-        $ current_action_items.append(MenuItem("Отдать сотню мараведи", Call("IntZimmerTalkApply", "pay_100")))
-        $ current_action_items.append(MenuItem("Поторговаться", Call("IntZimmerTalkApply", "haggle")))
+        $ current_action_items.append(MenuItem("Отдать сотню мараведи", Function(main_ui_call_label, "IntZimmerTalkApply", "pay_100")))
+        $ current_action_items.append(MenuItem("Поторговаться", Function(main_ui_call_label, "IntZimmerTalkApply", "haggle")))
 
     if Talked.get("Zimmer", 0) < 2 and ZimmerVar.get("ComplainRobin", 0) == 2:
-        $ current_action_items.append(MenuItem("Узнать как там расследование", Call("IntZimmerTalkApply", "investigation")))
+        $ current_action_items.append(MenuItem("Узнать как там расследование", Function(main_ui_call_label, "IntZimmerTalkApply", "investigation")))
 
-    $ current_action_items.append(MenuItem("Закончить разговор", Call("CityGuardRestore")))
+    $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
     return
 
 

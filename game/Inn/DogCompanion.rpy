@@ -207,7 +207,7 @@ init -5 python:
             return True
         if d.owned and (not bool(d.in_company)) and (not bool(d.booth_built)) and room_key in ("Backyard", "TavernMyRoom"):
             return True
-        if d.owned and d.in_company and room_key.startswith("Forest"):
+        if d.owned and d.in_company and room_in_group(room_key, ROOM_GROUP_FOREST):
             return True
         return False
 
@@ -270,7 +270,7 @@ init -5 python:
         room_key = str(room_code or CurLoc or "").strip()
         if not d.owned:
             return "images/tavern/myroom/no_colar.png"
-        if bool(d.booth_built) and (not bool(d.in_company)) and room_key.startswith("Backyard"):
+        if bool(d.booth_built) and (not bool(d.in_company)) and room_key == "Backyard":
             return "images/tavern/myroom/dog_booth.png"
         return "images/tavern/myroom/dog.png"
 
@@ -279,9 +279,9 @@ init -5 python:
         room_key = str(room_code or CurLoc or "").strip()
         if not d.owned:
             return "Небольшой, но крепкий бродячий пес держится настороженно, однако уже не шарахается от людей и явно присматривается к вам."
-        if bool(d.booth_built) and (not bool(d.in_company)) and room_key.startswith("Backyard"):
+        if bool(d.booth_built) and (not bool(d.in_company)) and room_key == "Backyard":
             return "Пес выглядывает из своей будки, шевелит ушами и сразу узнает вас. Увидев хозяина, он оживляется и ждет, что вы ему прикажете."
-        if bool(d.in_company) and room_key.startswith("Forest"):
+        if bool(d.in_company) and room_in_group(room_key, ROOM_GROUP_FOREST):
             return "Пес держится рядом с вами, постоянно принюхивается к лесу и готов сорваться вперед по вашему знаку."
         return "Пес сразу оживляется при вашем появлении, настораживает уши и внимательно следит, что вы собираетесь делать."
 
@@ -304,7 +304,7 @@ init -5 python:
             return "Позвать пса из будки"
         if d.owned and room_key in ("Backyard", "TavernMyRoom"):
             return "Пес"
-        if d.owned and d.in_company and str(room_code or CurLoc or "").startswith("Forest"):
+        if d.owned and d.in_company and room_in_group(str(room_code or CurLoc or ""), ROOM_GROUP_FOREST):
             return "Пес"
         return "Подозвать пса"
 

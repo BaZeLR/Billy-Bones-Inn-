@@ -1,13 +1,14 @@
 label InitLiza:
     python:
+        knowsMC["liza"] = True
         # Initialize Liza's attributes
         GirlName = 'liza'
 
         RealName[GirlName] = 'Лизетта'
         RealName2[GirlName] = 'Лизетты'
         RealName3[GirlName] = 'Лизетте'
-        DateOfBirth[GirlName] = renpy.random.randint(15, 350)
         age_girls[GirlName] = 18
+        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 0
         beauty[GirlName] = 72
         sluttiness[GirlName] = 35

@@ -77,14 +77,15 @@ init 4 python:
 
 label InitAmanda:
     python:
+        knowsMC["amanda"] = True
         # Initialize Amanda's attributes
         GirlName = 'amanda'
 
         RealName[GirlName] = 'Аманда'
         RealName2[GirlName] = 'Аманды'
         RealName3[GirlName] = 'Аманде'
-        DateOfBirth[GirlName] = renpy.random.randint(15, 350)
         age_girls[GirlName] = 18
+        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 0
         beauty[GirlName] = 52
         sluttiness[GirlName] = 0
@@ -169,5 +170,24 @@ label InitAmanda:
         AmandaVar['got_fancy_night_bowl'] = 0
         AmandaVar['prefers_backyard_relief'] = -1
         GiftPreferences[GirlName] = ["wild_rose_001", "soap_001", "berries_001", "energy_tea_001", "drink_ale_001"]
+        npc_schedule_set(
+            GirlName,
+            [
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernMain", mode="morning"), priority=300, label="morning_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernKitchen", mode="morning"), priority=300, label="morning_kitchen"),
+                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernStorage", mode="morning"), priority=300, label="morning_storage"),
+                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="Backyard", mode="morning"), priority=300, label="morning_backyard"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernAmandaRoom", mode="morning"), priority=300, label="morning_room"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[1, 2, 3], awake=True, talkable=True, priority=200, label="working_hall"),
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="FridayDance", mode="friday_evening"), priority=250, label="friday_dance"),
+                NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=260, label="sunday_church"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernAmandaRoom", mode="sunday"), priority=240, label="sunday_room"),
+                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="Backyard", mode="sunday"), priority=240, label="sunday_backyard"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernMain", mode="sunday"), priority=240, label="sunday_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernKitchen", mode="sunday"), priority=240, label="sunday_kitchen"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[4], awake=False, talkable=False, priority=10, label="sleep"),
+            ],
+        )
+        npc_schedule_sync_currentloc(GirlName)
 
     return

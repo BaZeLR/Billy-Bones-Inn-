@@ -41,8 +41,7 @@ init python:
     def tavern_breakfast_can_offer_dance_sponsorship():
         return (
             int(hour or 0) < 12
-            and int(week or 0) == 3
-            and "sandra" in list(tavern_breakfast_present_ids() or [])
+            and int(week or 0) == 4
             and int(EventsCount.get(10, 0) or 0) > 0
             and str(NewEvents.get("10_" + str(int(EventsCount.get(10, 0) or 0) - 1), "") or "") == "WineForDance"
         )
@@ -109,6 +108,9 @@ label EventWineForDanceApply(reaction_code=1):
             $ MainTxt = str(MainTxt or "") + "\n\nЗа столом решение встречают заметно теплее. Домашние переглядываются с одобрением: щедрый жест явно поднимает всем настроение."
             $ CurLocDesc = MainTxt
     call stat
+    if str(CurLoc or "") == "TavernKitchen" and bool(TavernBreakfastEventActive):
+        $ TavernKitchenSavedText = MainTxt
+        return
     $ current_action_title = ""
     $ current_action_content = None
     $ current_action_items = [MenuItem("Вернуться к своим делам", Call("EventWineForDanceFinish"))]

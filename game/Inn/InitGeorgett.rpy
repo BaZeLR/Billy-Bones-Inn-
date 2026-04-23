@@ -1,13 +1,14 @@
 label InitGeorgett:
     python:
+        knowsMC["georgett"] = False
         # Initialize Georgett's attributes
         GirlName = 'georgett'
 
         RealName[GirlName] = 'Жоржетта'
         RealName2[GirlName] = 'Жоржетты'
         RealName3[GirlName] = 'Жоржетте'
-        DateOfBirth[GirlName] = renpy.random.randint(15, 350)
         age_girls[GirlName] = 28
+        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 4
         beauty[GirlName] = 67
         sluttiness[GirlName] = 80

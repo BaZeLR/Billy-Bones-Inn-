@@ -1,5 +1,6 @@
 label IntAlberTalk:
     $ LegareProvokeYou = 0
+    $ main_ui_begin_talk_state("Разговор с Альбером", "alber")
     $ current_action_title = "Разговор с Альбером"
     $ current_action_content = None
     $ MainTxt = "Альбер Легаре вопросительно смотрит на вас, ожидая продолжения разговора."
@@ -9,28 +10,29 @@ label IntAlberTalk:
 
 
 label IntAlberTalkRefresh:
+    $ main_ui_begin_talk_state("Разговор с Альбером", "alber")
     $ current_action_title = "Разговор с Альбером"
     $ current_action_content = None
     $ current_action_items = []
 
     if Talked.get("Alber", 0) <= 2 and LegareProvokeYou == 0:
-        $ current_action_items.append(MenuItem("Поболтать со мессиром Легаре о разной всячине.", Call("IntAlberTalkApply", "smalltalk")))
+        $ current_action_items.append(MenuItem("Поболтать со мессиром Легаре о разной всячине.", Function(main_ui_call_label, "IntAlberTalkApply", "smalltalk")))
 
     if Friends.get("Alber", 0) >= 6 and Talked.get("Alber", 0) <= 2 and LegareProvokeYou == 0:
-        $ current_action_items.append(MenuItem("Поболтать с мессиром Легаре о более личных вещах", Call("IntAlberTalkApply", "personal")))
+        $ current_action_items.append(MenuItem("Поболтать с мессиром Легаре о более личных вещах", Function(main_ui_call_label, "IntAlberTalkApply", "personal")))
 
     if Friends.get("Alber", 0) >= 5 and AlberVar.get("sawwithliza", 0) and Talked.get("Alber", 0) <= 2 and LegareProvokeYou == 0:
-        $ current_action_items.append(MenuItem("Спросить мессира Легаре о Лизетте", Call("IntAlberTalkApply", "lizett")))
+        $ current_action_items.append(MenuItem("Спросить мессира Легаре о Лизетте", Function(main_ui_call_label, "IntAlberTalkApply", "lizett")))
 
     if AlberVar.get("FightYouAmanda", 0) > 0 and Talked.get("Alber", 0) <= 2 and LegareProvokeYou == 0:
-        $ current_action_items.append(MenuItem("Попробовать помириться", Call("IntAlberTalkApply", "reconcile")))
+        $ current_action_items.append(MenuItem("Попробовать помириться", Function(main_ui_call_label, "IntAlberTalkApply", "reconcile")))
 
     if LegareProvokeYou != 0:
-        $ current_action_items.append(MenuItem("Проигнорировать", Call("IntAlberTalkApply", "ignore")))
-        $ current_action_items.append(MenuItem("Обругать месье", Call("IntAlberTalkApply", "insult")))
-        $ current_action_items.append(MenuItem("Заехать с правой", Call("IntAlberTalkApply", "punch")))
+        $ current_action_items.append(MenuItem("Проигнорировать", Function(main_ui_call_label, "IntAlberTalkApply", "ignore")))
+        $ current_action_items.append(MenuItem("Обругать месье", Function(main_ui_call_label, "IntAlberTalkApply", "insult")))
+        $ current_action_items.append(MenuItem("Заехать с правой", Function(main_ui_call_label, "IntAlberTalkApply", "punch")))
 
-    $ current_action_items.append(MenuItem("Закончить разговор", Call("WineStoreRestore")))
+    $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
     return
 
 

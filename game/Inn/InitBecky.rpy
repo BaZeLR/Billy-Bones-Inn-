@@ -1,13 +1,14 @@
 label InitBecky:
     python:
+        knowsMC["becky"] = True
         # Initialize Becky's attributes
         GirlName = 'becky'
 
         RealName[GirlName] = 'Бекки'
         RealName2[GirlName] = 'Бекки'
         RealName3[GirlName] = 'Бекки'
-        DateOfBirth[GirlName] = renpy.random.randint(15, 350)
         age_girls[GirlName] = 36
+        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 5
         beauty[GirlName] = 45
         sluttiness[GirlName] = 25
@@ -82,14 +83,94 @@ label InitBecky:
         BeckyVar['SandraKitchenVisitMonth'] = 0
         GiftPreferences[GirlName] = ["soap_001", "wild_rose_001", "pig_lard_001", "libido_tincture_001", "drink_ale_001"]
 
+        npc_schedule_set(GirlName, [
+            NPCScheduleEntry(
+                location="Church",
+                weekdays=[7],
+                time_slots=[0, 1],
+                awake=True,
+                talkable=False,
+                priority=340,
+                label="becky_sunday_church",
+            ),
+            NPCScheduleEntry(
+                location="TavernKitchen",
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                time_slots=[3],
+                awake=True,
+                talkable=True,
+                condition=becky_kitchen_visit_active,
+                priority=320,
+                label="becky_special_kitchen_visit",
+            ),
+            NPCScheduleEntry(
+                location="TavernMain",
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                time_slots=[3],
+                awake=True,
+                talkable=True,
+                condition=becky_tavern_visit_active,
+                priority=260,
+                label="becky_tavern_visit",
+            ),
+            NPCScheduleEntry(
+                location="GroceryStore",
+                weekdays=[1, 2, 3, 4, 5, 6],
+                time_slots=[1, 2, 3],
+                awake=True,
+                talkable=True,
+                condition=becky_grocery_store_active,
+                priority=220,
+                label="becky_grocery_shift",
+            ),
+            NPCScheduleEntry(
+                location="BeckyHome",
+                weekdays=[1, 2, 3, 4, 5, 6],
+                time_slots=[0],
+                awake=True,
+                talkable=False,
+                priority=20,
+                label="becky_home_awake",
+            ),
+            NPCScheduleEntry(
+                location="BeckyHome",
+                weekdays=[7],
+                time_slots=[2, 3],
+                awake=True,
+                talkable=False,
+                priority=20,
+                label="becky_sunday_home_awake",
+            ),
+            NPCScheduleEntry(
+                location="BeckyHome",
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                time_slots=[4],
+                awake=False,
+                talkable=False,
+                priority=10,
+                label="becky_home_sleep",
+            ),
+        ])
+        npc_schedule_sync_currentloc(GirlName)
+
     return
 
 init python:
+    def becky_sandra_social_visit_allowed():
+        return int(Friends.get("sandra", 0) or 0) >= 5
+
+    def becky_kitchen_visit_active(month_value=None, day_value=None, time_slot=None):
+        if not becky_sandra_social_visit_allowed():
+            return False
+        if not becky_monthly_sandra_kitchen_visit_due(month_value, day_value, time_slot):
+            return False
+        return _tavern_is_in_room("sandra", "TavernKitchen")
+
     def becky_monthly_sandra_kitchen_visit_due(month_value=None, day_value=None, time_slot=None):
         month_now = int(month if month_value is None else month_value or 0)
         day_now = int(day if day_value is None else day_value or 0)
         time_now = int(time if time_slot is None else time_slot or 0)
-        if time_now != 1 or day_now != 12:
+        if time_now != 3 or day_now != 12:
             return False
         return int(BeckyVar.get("SandraKitchenVisitMonth", 0) or 0) != month_now
 
@@ -97,6 +178,23 @@ init python:
         month_now = int(month if month_value is None else month_value or 0)
         day_now = int(day if day_value is None else day_value or 0)
         time_now = int(time if time_slot is None else time_slot or 0)
-        if time_now != 2:
+        if time_now != 3:
+            return False
+        if not becky_sandra_social_visit_allowed():
+            return False
+        if becky_kitchen_visit_active(month_now, day_now, time_now):
             return False
         return ((day_now + month_now) % 6) == 0
+
+    def becky_grocery_store_active(weekday_value=None, month_value=None, day_value=None, time_slot=None):
+        week_now = int(week if weekday_value is None else weekday_value or 0)
+        month_now = int(month if month_value is None else month_value or 0)
+        day_now = int(day if day_value is None else day_value or 0)
+        time_now = int(time if time_slot is None else time_slot or 0)
+        if week_now == 7 or time_now not in (1, 2, 3):
+            return False
+        if becky_kitchen_visit_active(month_now, day_now, time_now):
+            return False
+        if becky_tavern_visit_active(month_now, day_now, time_now):
+            return False
+        return True

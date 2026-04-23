@@ -19,6 +19,12 @@ label NextDay_TavernDaily():
             record_weekly_tavern_visitors(CurDay['visitors'])
         CurDay['wine'] = CurDay['visitors']
         CurDay['products'] = CurDay['visitors']
+        CurDay['kitchen_stock_used'] = 0
+        _kitchen_stock_used = tavern_kitchen_daily_product_savings(CurDay['products'])
+        CurDay['kitchen_stock_used'] = _kitchen_stock_used
+        CurDay['products'] = max(0, CurDay['products'] - _kitchen_stock_used)
+        if tavern_kitchen_boar_bonus_active():
+            CurDay['wine'] = max(0, (CurDay['wine'] * 105 + 99) // 100)
         if CurDay['wine'] > winenum:
             CurDay['happy'] -= 1
             CurDay['wine'] = winenum
@@ -28,13 +34,32 @@ label NextDay_TavernDaily():
             CurDay['products'] = productnum
         productnum -= CurDay['products']
         CurDay['revenue'] = 1 * CurDay['products'] + 2 * CurDay['wine']
+        if tavern_kitchen_boar_bonus_active():
+            CurDay['revenue'] = (CurDay['revenue'] * 115 + 99) // 100
+        _kitchen_effect_lines = tavern_kitchen_apply_daily_food_effects()
+        if len(list(_kitchen_effect_lines or [])) > 0:
+            ExtraEvents += "<br>".join(list(_kitchen_effect_lines or [])) + "<br>"
         CurDay['dineout'] = 0
         CurDay['fameaten'] = householdmembers
+        CurDay['rat_food_loss'] = 0
         if CurDay['fameaten'] > productnum:
             CurDay['dineout'] = (CurDay['fameaten'] - productnum) * 3
             CurDay['fameaten'] = productnum
             CurDay['happy'] -= 1
         productnum -= CurDay['fameaten']
+        _rat_food_loss_due_day = int(WerecatVar.get('rat_food_loss_next_day', -1) or -1)
+        if int(WerecatVar.get('rats_problem_active', 0) or 0) == 1 and _rat_food_loss_due_day >= 0 and int(dayspassed or 0) >= _rat_food_loss_due_day:
+            CurDay['rat_food_loss'] = min(3, int(productnum or 0))
+            productnum = max(0, int(productnum or 0) - CurDay['rat_food_loss'])
+            WerecatVar['rat_food_loss_next_day'] = int(dayspassed or 0) + 7
+            if CurDay['rat_food_loss'] == 1:
+                ExtraEvents += 'Крысы снова добрались до кладовой и испортили 1 мешок припасов.<br>'
+            elif CurDay['rat_food_loss'] == 2:
+                ExtraEvents += 'Крысы снова добрались до кладовой и испортили 2 мешка припасов.<br>'
+            elif CurDay['rat_food_loss'] >= 3:
+                ExtraEvents += 'Крысы снова добрались до кладовой и испортили 3 мешка припасов.<br>'
+            else:
+                ExtraEvents += 'Крысы опять шуршали в кладовой, но брать там уже почти нечего.<br>'
         CurDay['fixedcost'] = householdmembers * 1 + 10
         # Service level effects
         if CurDay['happy'] >= 0:
@@ -75,9 +100,19 @@ label NextDay_TavernDaily():
             TotalDay['HorseFood'] += 3
         if MongolVar['WillTryToSteal']:
             _dog_theft_result = None
-            if callable(globals().get("ensure_dog_runtime")):
+            try:
                 ensure_dog_runtime()
-            if callable(globals().get("dog_catch_delinquent_apply")) and hasattr(globals().get("dog", None), "prevents_theft") and dog.prevents_theft("horse"):
+            except Exception:
+                pass
+            try:
+                _dog_guard = dog
+            except Exception:
+                _dog_guard = None
+            try:
+                _dog_catch_apply = dog_catch_delinquent_apply
+            except Exception:
+                _dog_catch_apply = None
+            if callable(_dog_catch_apply) and hasattr(_dog_guard, "prevents_theft") and _dog_guard.prevents_theft("horse"):
                 _dog_theft_result = dog_catch_delinquent_apply("horse")
             if _dog_theft_result and bool(_dog_theft_result.get("ok", False)):
                 TotalDay['HorseStolen'] = '<br>Ночью какой-то негодяй попытался увести вашего коня, но пес поднял лай, сбил вора с ног и не дал ему уйти. %s' % str(_dog_theft_result.get("text", "") or "")
@@ -89,6 +124,7 @@ label NextDay_TavernDaily():
             else:
                 TotalDay['HorseStolen'] = '<br>НЕГОДЯИ ПОД ПОКРОВОМ НОЧИ УКРАЛИ У ВАС ВАШЕГО КОНИКА, ВАШЕГО НЕНАГЛЯДНОГО %s. УТРОМ ВЫ ОБНАРУЖИЛИ ЧТО ЗАМОК НА ВОРОТАХ КОНЮШНИ ВЗЛОМАН, А ЛОШАДИ И СЛЕД ПРОСТЫЛ. НИКТО НИЧЕГО НЕ ВИДЕЛ И НЕ СЛЫШАЛ.' % MyStallion.upper()
                 MyStallion = ''
+                HorsePurchasePrice = 0
                 StolenHorseDays = 14
                 MongolVar['TheftAsk'] = 0
                 MongolVar['AskSawStolen'] = 0

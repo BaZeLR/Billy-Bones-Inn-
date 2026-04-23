@@ -22,6 +22,7 @@ init 6 python:
 
     TavernStorageRoom = Room(
         code_name="TavernStorage",
+        group_name=ROOM_GROUP_TAVERN,
         display_name="Кладовая",
         bg_picture="bg StolyarWorkshop",
         descriptions=[
@@ -45,6 +46,7 @@ label TavernStorage:
     $ CurrentRoom = TavernStorageRoom
     $ CurLoc = "TavernStorage"
     $ location = CurLoc
+    call CheckDailyEvent("", "_story_enter", CurLoc, time)
     $ scene_image = tavern_storage_picture() or TavernStorageRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -58,8 +60,6 @@ label TavernStorage:
     python:
         for _storage_exit in TavernStorageRoom.visible_exits():
             current_action_items.append(MenuItem(_storage_exit.label, Call("AdvanceMovementTime", _storage_exit.target)))
-    if tavern_storage_rat_event_ready():
-        call TavernStorageRatEvent
     jump TavernStorageView
 
 

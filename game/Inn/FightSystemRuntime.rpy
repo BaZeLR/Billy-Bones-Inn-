@@ -865,9 +865,32 @@ init -20 python:
         return {"ok": True, "text": "Ловушка помогла вам завалить кабана. Вы успеваете взять мясо и клык.", "loot": {"boar_meat_001": 1, "boar_fang_001": 1}}
 
     def dog_catch_delinquent_apply(event_kind="horse"):
+        global money, notoriety, tavernfame
         ensure_dog_runtime()
         if not dog.prevents_theft(event_kind):
             return {"ok": False, "text": "Пса рядом нет или он пока не может вам помочь."}
+        event_key = str(event_kind or "").strip()
+        if event_key == "horse":
+            roll = random.randint(1, 100)
+            if roll > 70:
+                return {
+                    "ok": False,
+                    "text": "Пес учуял возню у конюшни и поднял лай, но вор все-таки успел вырваться в темноту и увести коня.",
+                    "money_gain": 0,
+                }
+            paid_price = max(0, int(HorsePurchasePrice or 0))
+            ransom = max(0, (paid_price * 2) // 3)
+            if ransom > 0:
+                money += ransom
+            for girl_key in ("sandra", "melissa", "amanda"):
+                Friends[girl_key] = int(Friends.get(girl_key, 0) or 0) + 2
+            notoriety = min(100, int(notoriety or 0) + 3)
+            tavernfame = int(tavernfame or 0) + 2
+            return {
+                "ok": True,
+                "text": "Ночью Монгол все-таки полез за вашим конем, но пес вовремя поднял лай, бросился на него и повалил прямо у ворот. Прижатый к земле и изрядно перепуганный барышник предпочитает откупиться за свою шкуру и свободу: возвращает вам {} мараведи, то есть две трети цены, что вы когда-то отдали за коня.".format(ransom),
+                "money_gain": ransom,
+            }
         loot_table = [
             {"item_id": "rope_001", "qty": 1, "money": 8},
             {"item_id": "drink_ale_001", "qty": 1, "money": 10},

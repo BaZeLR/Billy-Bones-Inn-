@@ -328,6 +328,7 @@ init python:
         return (
             str(CurLoc or "") == "TavernMain"
             and _tavern_is_in_room("melissa", "TavernMain")
+            and clara_visible_in_location("TavernMain")
             and int(time or 0) == 2
             and not household_runtime_event_seen_today("melissa_clara_overhear")
         )
@@ -435,7 +436,6 @@ label HouseholdBarberRequestEvent(girl_name=""):
         $ MainTxt = "За завтраком вы предлагаете Аманде заглянуть к Серджио. Она оживляется почти сразу: \"Это было бы отлично! Он не только стрижет, он еще знает кучу смешных историй про чулки, нижнее белье и всякие женские хитрости. После такого и в трактире выглядеть веселее, и гостей держать на себе проще.\""
     $ CurLocDesc = MainTxt
     if TavernBreakfastEventActive:
-        $ tavern_breakfast_restore_ui_state(MainTxt)
         $ _barber_items = [
             MenuItem("Пообещать визит к Серджио", Call("HouseholdBarberRequestChoice", _barber_girl, 1)),
             MenuItem("Сказать, что пока не до этого", Call("HouseholdBarberRequestChoice", _barber_girl, 0)),
@@ -463,7 +463,9 @@ label HouseholdBarberRequestChoice(girl_name="", agree=0):
     else:
         $ MainTxt = "Вы отвечаете, что пока у трактира и без того хватает расходов. На этом разговор сворачивается."
     $ CurLocDesc = MainTxt
-    if not TavernBreakfastEventActive:
+    if TavernBreakfastEventActive:
+        call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
+    else:
         call HouseholdReturnCurrentRoom
     return
 

@@ -317,6 +317,10 @@ label InitClara:
         ClaraVar["escape_confessed"] = 0
         ClaraVar["merchant_contact_unlocked"] = 0
         ClaraVar["merchant_contact_month_key"] = -1
+        ClaraVar["tavern_melissa_visit_count"] = 0
+        ClaraVar["tavern_melissa_visit_day"] = -1
+        ClaraVar["tavern_melissa_overheard_2_seen"] = 0
+        ClaraVar["tavern_melissa_overheard_3_seen"] = 0
         GiftPreferences[GirlName] = [
             "dress_thiefdress",
             "soap_001",

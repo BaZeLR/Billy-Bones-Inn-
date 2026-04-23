@@ -19,6 +19,7 @@ label dress_for_night(girl_name, mode):
     else:
         $ topdress[girl_name] = ''
         $ bottomdress[girl_name] = ''
+    $ bodymodel_sync_character(girl_name)
     return
 
 # Usage: call dress_for_night('liza', 0)  # 0=nightshirt, 1=panties, 2=naked

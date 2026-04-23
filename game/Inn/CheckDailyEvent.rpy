@@ -230,8 +230,16 @@ init -25 python:
 label check_daily_event(girlname=None, eventtype=None, curloc=None, checktime=None):
     $ _story_event_type = str(eventtype or "")
     if _story_event_type.startswith("_story_"):
-        $ findAvailableEvents(True)
-        call checkTriggers(curloc if curloc is not None else CurLoc, _story_event_type[7:], 0)
+        python:
+            try:
+                _story_find_available = findAvailableEvents
+            except NameError:
+                _story_find_available = None
+            _story_triggers_label_exists = renpy.has_label("checkTriggers")
+            if callable(_story_find_available):
+                _story_find_available(True)
+        if _story_triggers_label_exists:
+            call checkTriggers(curloc if curloc is not None else CurLoc, _story_event_type[7:], 0)
         return 0
 
     python:

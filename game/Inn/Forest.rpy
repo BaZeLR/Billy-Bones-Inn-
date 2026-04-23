@@ -145,6 +145,7 @@ init python:
 
     ForestRoom = Forest(
         code_name="Forest",
+        group_name=ROOM_GROUP_FOREST,
         display_name="Лес",
         bg_picture="images/forest/forest_1.png",
         descriptions=[
@@ -269,6 +270,8 @@ label ForestBuildActions:
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
+    if werecat_can_search("Forest"):
+        $ current_action_items.append(MenuItem("Осмотреть лес внимательнее", Call("WerecatForestSearch", "Forest")))
     if fight_can_hunt_here("Forest"):
         $ current_action_items.append(MenuItem("Выслеживать добычу", Call("FightStartHuntCurrentRoom")))
     if player_can_train_shooting():
@@ -277,6 +280,10 @@ label ForestBuildActions:
         $ current_action_items.append(MenuItem("Поставить ловушку", Call("ForestSetTrap")))
     elif forest_trap_can_check("Forest"):
         $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap")))
+    if werecat_can_set_bait("Forest"):
+        $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", "Forest")))
+    elif werecat_can_check_bait("Forest"):
+        $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", "Forest")))
 
     python:
         for _forest_object in ForestRoom.visible_objects():
@@ -356,6 +363,26 @@ label ForestRestore:
     return
 
 
+label WerecatForestSearch(room_code=""):
+    $ _werecat_room = str(room_code or CurLoc or "").strip()
+    if not werecat_can_search(_werecat_room):
+        call RefreshCurrentActionMenu(_werecat_room, "", True)
+        return
+    $ _werecat_search = werecat_register_search(_werecat_room)
+    if str(_werecat_room or "") == "Forest":
+        $ ForestSavedText = str(_werecat_search.get("text", "") or "")
+    else:
+        $ ForestSubroomSavedText = str(_werecat_search.get("text", "") or "")
+    $ MainTxt = str(_werecat_search.get("text", "") or "")
+    $ CurLocDesc = MainTxt
+    if bool(_werecat_search.get("found_tracks", False)) and str(werecat_info_picture_path() or "").strip():
+        hide screen main_ui
+        vscene werecat_info_picture_path()
+        "[MainTxt]"
+    call RefreshCurrentActionMenu(_werecat_room, "", True)
+    return
+
+
 label ForestSpawnedItemMenu(item_id=""):
     $ _spawn_item = get_game_item(item_id, ForestRoom)
     if _spawn_item is None:
@@ -405,6 +432,10 @@ label ForestSubroomBuildActions:
     $ current_action_items = [
         MenuItem("Осмотреться", Call("ForestSubroomExplore")),
     ]
+    if werecat_can_set_bait(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
+    elif werecat_can_check_bait(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
     if fight_can_hunt_here(str(getattr(CurrentRoom, "code_name", "") or "")):
         $ current_action_items.append(MenuItem("Выслеживать добычу", Call("FightStartHuntCurrentRoom")))
     if player_can_train_shooting():
@@ -437,11 +468,19 @@ label ForestSubroomBuildActions:
 
 label ForestSubroomExplore:
     $ _spawned_now = forest_room_get_spawned_items(CurrentRoom)
-    if len(_spawned_now) > 0:
+    if werecat_can_search(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ _werecat_search = werecat_register_search(str(getattr(CurrentRoom, "code_name", "") or ""))
+        $ MainTxt = str(ForestSubroomSavedText or "")
+        if str(_werecat_search.get("text", "") or "").strip():
+            $ MainTxt = str(MainTxt or "") + "\n\n" + str(_werecat_search.get("text", "") or "")
+        if bool(_werecat_search.get("found_tracks", False)) and str(werecat_info_picture_path() or "").strip():
+            call ShowImage("", "", werecat_info_picture_path())
+    elif len(_spawned_now) > 0:
         $ MainTxt = ForestSubroomSavedText + "\n\nВнимательно осмотревшись, вы замечаете, что здесь можно кое-что собрать."
     else:
         $ MainTxt = ForestSubroomSavedText + "\n\nВы внимательно осматриваете окрестности, но ничего особенно полезного на глаза не попадается."
     $ CurLocDesc = MainTxt
+    $ ForestSubroomSavedText = MainTxt
     call ForestSubroomBuildActions
     return
 

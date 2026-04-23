@@ -37,17 +37,6 @@ init 6 python:
             target_room = ShedRoom
         return _room_has_item_by_id(target_room, "lumber_001")
 
-    def shed_sync_room_state(room_obj=None):
-        target_room = room_obj if room_obj is not None else CurrentRoom
-        if target_room is None:
-            target_room = ShedRoom
-
-        if _player_has_item_by_id("old_axe_001"):
-            while _room_has_item_by_id(target_room, "old_axe_001"):
-                _room_remove_item_by_id(target_room, "old_axe_001")
-
-        return target_room
-
     def build_shed_description(include_notice=True, intro_text=""):
         room_obj = CurrentRoom if CurrentRoom is not None else ShedRoom
         room_item_ids = [get_object_id(row) for row in list(getattr(room_obj, "game_items", []) or [])]
@@ -133,7 +122,6 @@ init 6 python:
 label Shed:
     call EnterLocation("Shed")
     $ CurrentRoom = ShedRoom
-    $ shed_sync_room_state(CurrentRoom)
     $ CurLoc = "Shed"
     $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None

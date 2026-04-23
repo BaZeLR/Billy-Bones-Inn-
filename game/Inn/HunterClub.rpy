@@ -290,6 +290,7 @@ init python:
 
     HunterClubRoom = Room(
         code_name="HunterClub",
+        group_name=ROOM_GROUP_CITY,
         display_name="Охотничий клуб",
         bg_picture="images/general/hunter_store.jpg",
         descriptions=[
@@ -459,6 +460,8 @@ label HunterClub:
 
     $ MainTxt = hunter_club_main_text()
     $ CurLocDesc = MainTxt
+    if story_event_available("HunterClub", "overheard"):
+        call checkTriggers("HunterClub", "overheard", 0)
     call HunterClubBuildActions
     jump HunterClubView
 
@@ -478,6 +481,8 @@ label HunterClubBuildActions:
     python:
         for _club_object in HunterClubRoom.visible_objects():
             current_action_items.append(MenuItem(_club_object.name, Call("HunterClubObjectMenu", _club_object.object_id)))
+        if story_event_available("HunterClub", "overheard"):
+            current_action_items.append(MenuItem("Подслушать охотников у стены", Call("checkTriggers", "HunterClub", "overheard", 0)))
         for _club_exit in HunterClubRoom.visible_exits():
             current_action_items.append(MenuItem(_club_exit.label, Jump(_club_exit.target)))
     return

@@ -1,4 +1,5 @@
 label IntEddieTalk:
+    $ main_ui_begin_talk_state("Разговор с Эдди", "eddie")
     $ current_action_title = "Разговор с Эдди"
     $ current_action_content = None
     $ MainTxt = "Эдди вопросительно смотрит на вас, ожидая, о чем вы заговорите."
@@ -9,36 +10,37 @@ label IntEddieTalk:
 
 label IntEddieTalkRefresh:
     $ _eddie_name = "eddie"
+    $ main_ui_begin_talk_state("Разговор с Эдди", _eddie_name)
     $ current_action_title = "Разговор с Эдди"
     $ current_action_content = None
     $ current_action_items = []
-    $ current_action_items.append(MenuItem("Поболтать с Эдди о разной фигне.", Call("IntEddieTalkApply", "smalltalk")))
+    $ current_action_items.append(MenuItem("Поболтать с Эдди о разной фигне.", Function(main_ui_call_label, "IntEddieTalkApply", "smalltalk")))
 
     if Friends.get(_eddie_name, 0) >= 5:
-        $ current_action_items.append(MenuItem("Поболтать с Эдди о личных вещах.", Call("IntEddieTalkApply", "personal")))
+        $ current_action_items.append(MenuItem("Поболтать с Эдди о личных вещах.", Function(main_ui_call_label, "IntEddieTalkApply", "personal")))
 
     if Friends.get(_eddie_name, 0) >= 5 and CurrentLoc.get("georgett", "") == "TavernMain" and EddieVar.get("TalkedAboutWhores", 0) == 0 and Talked.get(_eddie_name, 0) < 2:
-        $ current_action_items.append(MenuItem("Рассказать Эдди о том, что у вас теперь работают девочки.", Call("IntEddieTalkApply", "whores")))
+        $ current_action_items.append(MenuItem("Рассказать Эдди о том, что у вас теперь работают девочки.", Function(main_ui_call_label, "IntEddieTalkApply", "whores")))
 
     if Friends.get(_eddie_name, 0) >= 5 and CurrentLoc.get("georgett", "") == "TavernMain" and EddieVar.get("SawWithGeorgett", 0) > 0 and EddieVar.get("TalkedAboutGeorgett", 0) == 0 and Talked.get(_eddie_name, 0) < 2:
-        $ current_action_items.append(MenuItem("Поинтересоваться у Эдди как ему ваши девочки.", Call("IntEddieTalkApply", "girls")))
+        $ current_action_items.append(MenuItem("Поинтересоваться у Эдди как ему ваши девочки.", Function(main_ui_call_label, "IntEddieTalkApply", "girls")))
 
     if Friends.get(_eddie_name, 0) >= 3 and BeckyVar.get("HomeSex", 0) > 0 and EddieVar.get("SawMomSex", 0) > 0 and EddieVar.get("SawWithGeorgett", 0) > 0 and BeckyVar.get("EddieTryToFuck", 0) != 1 and Talked.get(_eddie_name, 0) < 2:
-        $ current_action_items.append(MenuItem("Предложить помочь подкатится к его мамаше.", Call("IntEddieTalkApply", "mom_helper")))
+        $ current_action_items.append(MenuItem("Предложить помочь подкатится к его мамаше.", Function(main_ui_call_label, "IntEddieTalkApply", "mom_helper")))
 
     if Friends.get(_eddie_name, 0) >= 3 and Talked.get(_eddie_name, 0) < 2 and BeckyVar.get("EddieRobbedDay", 0) > 0 and BeckyVar.get("EddieRobbedDay", 0) + 12 >= dayspassed and EddieVar.get("FingalTalk", 0) == 0:
-        $ current_action_items.append(MenuItem("Спросить о синяке.", Call("IntEddieTalkApply", "bruise")))
+        $ current_action_items.append(MenuItem("Спросить о синяке.", Function(main_ui_call_label, "IntEddieTalkApply", "bruise")))
 
     if Friends.get(_eddie_name, 0) >= 7 and Talked.get(_eddie_name, 0) < 2 and BeckyVar.get("EddieRobbedDay", 0) > 0 and BeckyVar.get("EddieRobbedDay", 0) + 12 >= dayspassed and EddieVar.get("FingalTalk", 0) == 1:
-        $ current_action_items.append(MenuItem("А все таки расскажи, кто это тебе так вмазал?", Call("IntEddieTalkApply", "who_hit")) )
+        $ current_action_items.append(MenuItem("А все таки расскажи, кто это тебе так вмазал?", Function(main_ui_call_label, "IntEddieTalkApply", "who_hit")) )
 
     if Friends.get(_eddie_name, 0) >= 7 and Talked.get(_eddie_name, 0) < 2 and BeckyVar.get("EddieRobbedDay", 0) > 0 and BeckyVar.get("EddieRobbedDay", 0) + 12 >= dayspassed and EddieVar.get("FingalTalk", 0) == 2 and EddieVar.get("FingalTalkDestination", 0) == 0:
-        $ current_action_items.append(MenuItem("А куда это ты ездил?", Call("IntEddieTalkApply", "destination")))
+        $ current_action_items.append(MenuItem("А куда это ты ездил?", Function(main_ui_call_label, "IntEddieTalkApply", "destination")))
 
     if Friends.get(_eddie_name, 0) >= 7 and Talked.get(_eddie_name, 0) < 2 and BeckyVar.get("EddieRobbedDay", 0) > 0 and BeckyVar.get("EddieRobbedDay", 0) + 12 >= dayspassed and EddieVar.get("FingalTalk", 0) == 2 and EddieVar.get("FingalTalkComplain", 0) == 0:
-        $ current_action_items.append(MenuItem("Страже жаловался?", Call("IntEddieTalkApply", "complain")))
+        $ current_action_items.append(MenuItem("Страже жаловался?", Function(main_ui_call_label, "IntEddieTalkApply", "complain")))
 
-    $ current_action_items.append(MenuItem("Закончить разговор", Call("GroceryStoreRestore")))
+    $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
     return
 
 

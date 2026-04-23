@@ -15,6 +15,18 @@ default cuminside = {}
 init python:
     import renpy
 
+    def pregnancy_conception_bonus(girl_name=""):
+        girl = str(girl_name or "").strip().lower()
+        if girl not in ("sandra", "melissa", "amanda"):
+            return 0
+        try:
+            if callable(tavern_kitchen_fertility_bonus_active) and tavern_kitchen_fertility_bonus_active():
+                base_chance = int(ConceptionChance.get(girl, 0) or 0)
+                return max(4, int(base_chance * 0.5))
+        except Exception:
+            return 0
+        return 0
+
     def PregnancyCheck(girl_name, cum_place, repeat_count, dad_name='', is_dude_random=0, dad_name_type=''):
         """
         girl_name: str - name of the girl
@@ -120,6 +132,7 @@ init python:
             if cum_place == 'inside':
                 cuminside[girl] = cuminside.get(girl, 0) + 1
                 if pregnancy.get(girl, 0) == 0:
+                    cur_conc += int(pregnancy_conception_bonus(girl) or 0)
                     cur_conc = Min(cur_conc, 800)
                     if renpy.random.randint(1, 1000) <= cur_conc:
                         pregnancy[girl] = 1

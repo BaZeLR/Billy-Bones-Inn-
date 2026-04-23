@@ -354,6 +354,10 @@ init python:
         except Exception:
             pass
         try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+        try:
             soap_expire_if_needed()
         except Exception:
             pass

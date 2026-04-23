@@ -20,7 +20,7 @@ label IntBeckyTalkRefresh(girl_name="becky"):
     $ current_action_title = "Разговор с Бекки"
     $ current_action_content = None
     $ current_action_items = []
-    $ current_action_items.append(MenuItem("Осмотреть", Function(show_girl_card_main_ui_state, girl_name)))
+    $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
     $ current_action_items.append(MenuItem("Поболтать со вдовой Блэнкеншип о разной фигне", Function(main_ui_call_label, "IntBeckyTalkApply", girl_name, "smalltalk")))
 
     if Friends.get(girl_name, 0) >= 3:

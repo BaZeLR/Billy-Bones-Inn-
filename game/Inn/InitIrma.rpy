@@ -61,14 +61,15 @@ init python:
 
 label InitIrma:
     python:
+        knowsMC["irma"] = True
         # Initialize Irma's attributes
         GirlName = 'irma'
 
         RealName[GirlName] = 'Ирма'
         RealName2[GirlName] = 'Ирмы'
         RealName3[GirlName] = 'Ирме'
-        DateOfBirth[GirlName] = renpy.random.randint(15, 350)
         age_girls[GirlName] = 22
+        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 0
         beauty[GirlName] = 65
         sluttiness[GirlName] = 45

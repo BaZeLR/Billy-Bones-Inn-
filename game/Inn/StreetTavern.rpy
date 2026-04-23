@@ -13,6 +13,7 @@ init python:
 
     StreetTavernRoom = Room(
         code_name="StreetTavern",
+        group_name=ROOM_GROUP_CITY,
         display_name="Улица Мясников",
         bg_picture="bg StreetTavern",
         descriptions=[

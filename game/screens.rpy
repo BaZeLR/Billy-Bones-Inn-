@@ -144,7 +144,10 @@ init python:
             return text
 
     def ensure_ui_translation_callable():
-        return ui_tr
+        return True
+
+    def repair_store_translation_callable():
+        return True
 
     def menu_background_path():
         candidates = [
@@ -355,6 +358,8 @@ screen quick_menu():
             textbutton ui_tr("Q.Save") action QuickSave()
             textbutton ui_tr("Q.Load") action QuickLoad()
             textbutton ui_tr("Prefs") action ShowMenu('preferences')
+            if config.developer:
+                textbutton "Dev: Report" action Jump("dev_after_report_checkpoint")
 
 
 ## This code ensures that the quick_menu screen is displayed in-game, whenever
@@ -384,8 +389,6 @@ style quick_button_text:
 ## to other menus, and to start the game.
 
 screen navigation():
-    $ ensure_ui_translation_callable()
-
     vbox:
         style_prefix "navigation"
 
@@ -417,6 +420,9 @@ screen navigation():
             textbutton ui_tr("Main Menu") action MainMenu()
 
         textbutton ui_tr("About") action ShowMenu("about")
+
+        if config.developer and not main_menu:
+            textbutton "Dev: After Report" action Jump("dev_after_report_checkpoint")
 
         if renpy.variant("pc") or (renpy.variant("web") and not renpy.variant("mobile")):
 

@@ -18,45 +18,18 @@ label IntBeckyGuest:
     $ dinnerbeckyorgasm = 0
     $ dinneringaminet = 0
     $ georgedinnersex = 0
-
-    python:
-        import random
-
-        GirlName = "becky"
-        KidsWatchState = {"value": 0}
-
-        def _say(text):
-            renpy.say(None, text)
-
-        def KidsWatchStepsCode():
-            KidsWatch = random.randint(1, 8)
-            KidsWatchState["value"] = KidsWatch
-            if KidsWatch <= 3:
-                _say("Поднимаясь вслед за вдовой по лестнице, вы заметили что из-за угла за вами кто-то подсматривает.")
-                if KidsWatch == 1:
-                    _say("Это был Ивар, младший сын вдовы. Встретившись с вами взглядом он усмехнулся и сделал пошлый жест.")
-                elif KidsWatch == 2:
-                    _say("Это была юная Эмма, средняя дочка Бекки. На ее лице застыло мечтательное выражение.")
-                else:
-                    _say("Это была Эмма с маленькой Лаурой, младшей дочкой Бекки. Лаура была явно удивлена происходящим, но Эмма наклонилась к ней и прошептала что-то такое, отчего глазенки Лауры расширились, а щеки стали пунцовыми.")
-
-        def ShowDinnerImage():
-            if Drunk.get("becky", 0) == 1:
-                renpy.call("ShowImage", "becky", "dinner", "drink" + str(random.randint(1, 3)))
-            else:
-                renpy.call("ShowImage", "becky", "dinner", "eat")
+    $ GirlName = "becky"
 
     label int_becky_guest_menu:
-        python:
-            _has_actions = (
-                (dinnertime <= 5)
-                or (dinnertime == 0 and winenum >= 30 and productnum >= 30 and IngaVar.get("Knowher", 0) >= 2)
-                or (dinnertime <= 5 and georgedinnersex == 0)
-                or (dinnertime <= 5 and dinnerbeckyorgasm == 0 and georgedinnersex == 0)
-                or (dinnertime == 6 and georgedinnersex == 0)
-                or (dinnertime == 6 and georgedinnersex == 0 and BeckyVar.get("visitedhome", 0) >= 7)
-                or (dinnertime > 5 and georgedinnersex == 0)
-            )
+        $ _has_actions = (
+            (dinnertime <= 5)
+            or (dinnertime == 0 and winenum >= 30 and productnum >= 30 and IngaVar.get("Knowher", 0) >= 2)
+            or (dinnertime <= 5 and georgedinnersex == 0)
+            or (dinnertime <= 5 and dinnerbeckyorgasm == 0 and georgedinnersex == 0)
+            or (dinnertime == 6 and georgedinnersex == 0)
+            or (dinnertime == 6 and georgedinnersex == 0 and BeckyVar.get("visitedhome", 0) >= 7)
+            or (dinnertime > 5 and georgedinnersex == 0)
+        )
         if not _has_actions:
             return
 
@@ -83,13 +56,12 @@ label IntBeckyGuest:
                     call GetGirlDrunk("inga")
                 else:
                     "Инга отодвинула стакан, сказав что ей и так весело."
-                python:
-                    renpy.call("SlutFriendsIncrease", "becky", 11, 1, 2, 0, 0, 0)
-                    winenum -= 5
-                    productnum -= 5
-                    dinnertime += 1
-                    renpy.call("stat")
-                    renpy.call("ShowImage", "becky", "dinner", "tabledrink")
+                call SlutFriendsIncrease("becky", 11, 1, 2, 0, 0, 0)
+                $ winenum -= 5
+                $ productnum -= 5
+                $ dinnertime += 1
+                call stat
+                call ShowImage("becky", "dinner", "tabledrink")
                 jump int_becky_guest_menu
 
             "Кушать" if (dinnertime <= 5 and georgedinnersex == 0):
@@ -97,9 +69,8 @@ label IntBeckyGuest:
                 if dinnerbecky > 0:
                     $ dinnerbecky = 0
                     "Вытянув руку из-под стола, вы решили вернуться к еде."
-                python:
-                    r1 = random.randint(1, 4)
-                    r2 = random.randint(1, 4)
+                $ r1 = renpy.random.randint(1, 4)
+                $ r2 = renpy.random.randint(1, 4)
                 if r1 == 1:
                     "Вы напряженно работаете ложкой, а то что выпадает, подбираете пальцами."
                 elif r2 == 1:
@@ -126,10 +97,9 @@ label IntBeckyGuest:
 
                 if dinneringaminet == 4:
                     "Инга наконец вылезла из-под стола. На уголках губ у нее что-то поблескивало."
-                    python:
-                        renpy.call("SlutFriendsIncrease", "inga", 0, 1, 0, 40, 2, 1)
-                        PregnancyCheck("inga", "mouth", 1, "Лукас")
-                        dinneringaminet += 1
+                    call SlutFriendsIncrease("inga", 0, 1, 0, 40, 2, 1)
+                    call PregnancyCheck("inga", "mouth", 1, "Лукас")
+                    $ dinneringaminet += 1
 
                 if BeckyVar.get("EddieWhoreHome", 0) == 4 and dinnertime == 5:
                     call GeorgettBeckyVisit
@@ -158,9 +128,8 @@ label IntBeckyGuest:
                     if dinnerbeckyorgasm == 1:
                         "По телу Бекки пробежала дрожь оргазма. Она крепко сжала вашу руку ногами."
                         $ GiveOrgasms["becky"] = GiveOrgasms.get("becky", 0) + 1
-                        python:
-                            renpy.call("SlutFriendsIncrease", "becky", 16, 1, 1, 40, 2, 1)
-                            BeckyVar["visitedhome"] = max(BeckyVar.get("visitedhome", 0), 4)
+                        call SlutFriendsIncrease("becky", 16, 1, 1, 40, 2, 1)
+                        $ BeckyVar["visitedhome"] = max(BeckyVar.get("visitedhome", 0), 4)
                         if renpy.random.randint(1, 4) == 1:
                             "Ваши игры не остались незамеченными: Эдди нырнул под стол и все понял."
                             call ShowImage("becky", "dinner", "gropeeddie")
@@ -179,8 +148,11 @@ label IntBeckyGuest:
 
                 $ dinnerbecky += 1
                 $ dinnertime += 1
-                python:
-                    ShowDinnerImage()
+                if Drunk.get("becky", 0) == 1:
+                    $ _dinner_picture = "drink" + str(renpy.random.randint(1, 3))
+                    call ShowImage("becky", "dinner", _dinner_picture)
+                else:
+                    call ShowImage("becky", "dinner", "eat")
                 jump int_becky_guest_menu
 
             "Взять Бекки под руку и идти наверх в спальню" if (dinnertime == 6 and georgedinnersex == 0):
@@ -201,9 +173,9 @@ label IntBeckyGuest:
                         if BeckyVar.get("EddieWhoreHome", 0) == 4:
                             "Жоржетта весело подмигнула вам."
                         $ BeckyVar["HomeSex"] = 1
-                        python:
-                            KidsWatchStepsCode()
-                        if KidsWatchState["value"] > 3 and renpy.random.randint(1, 2) == 1 and BeckyVar.get("EddieGeorg", 0) == 0:
+                        $ _kids_watch = renpy.random.randint(1, 8)
+                        call BeckyGuestKidsWatchStepsCode(_kids_watch)
+                        if _kids_watch > 3 and renpy.random.randint(1, 2) == 1 and BeckyVar.get("EddieGeorg", 0) == 0:
                             "Хм, Эдди слишком уж возбужден вашим походом в спальню. Надо это обсудить с Жоржи."
                         call BeckyHome("FromDinner")
                         return
@@ -230,8 +202,8 @@ label IntBeckyGuest:
                         "Эдди огорчился, что его не взяли, но последовать не попытался."
                         call SlutFriendsIncrease("eddie", 5, 5, -1, 0, 0, 0)
                     "Вы поднялись со вдовой наверх, в ее уютную спальню."
-                    python:
-                        KidsWatchStepsCode()
+                    $ _kids_watch = renpy.random.randint(1, 8)
+                    call BeckyGuestKidsWatchStepsCode(_kids_watch)
                     $ _becky_ladder_picture = becky_home_detail_picture("ladder" + str(renpy.random.randint(1, 2)))
                     call ShowImage("", "", _becky_ladder_picture)
                     call BeckyHome("FromDinner")
@@ -255,8 +227,8 @@ label IntBeckyGuest:
                     "Вы хотели позвать его явно, но Бекки одернула вас: \"Ну не так явно же!\" Вы незаметно кивнули Эдди."
                 if BeckyVar.get("EddieWhoreHome", 0) == 4:
                     "Жоржетта показала Эдди поднятые вверх большие пальцы."
-                python:
-                    KidsWatchStepsCode()
+                $ _kids_watch = renpy.random.randint(1, 8)
+                call BeckyGuestKidsWatchStepsCode(_kids_watch)
                 if sluttiness.get(GirlName, 0) >= 60:
                     "Втроем вы ввалились в спальню миссис Блэнкеншип."
                 else:
@@ -276,4 +248,16 @@ label int_becky_guest:
 
 label menu_guest_becky:
     call IntBeckyGuest
+    return
+
+
+label BeckyGuestKidsWatchStepsCode(kids_watch=0):
+    if kids_watch <= 3:
+        "Поднимаясь вслед за вдовой по лестнице, вы заметили что из-за угла за вами кто-то подсматривает."
+        if kids_watch == 1:
+            "Это был Ивар, младший сын вдовы. Встретившись с вами взглядом он усмехнулся и сделал пошлый жест."
+        elif kids_watch == 2:
+            "Это была юная Эмма, средняя дочка Бекки. На ее лице застыло мечтательное выражение."
+        else:
+            "Это была Эмма с маленькой Лаурой, младшей дочкой Бекки. Лаура была явно удивлена происходящим, но Эмма наклонилась к ней и прошептала что-то такое, отчего глазенки Лауры расширились, а щеки стали пунцовыми."
     return

@@ -1,6 +1,7 @@
 init 6 python:
     ForestClearingRoom = Room(
         code_name="ForestClearing",
+        group_name=ROOM_GROUP_FOREST,
         display_name="Малая поляна",
         bg_picture="",
         descriptions=[

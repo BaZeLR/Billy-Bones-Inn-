@@ -1,4 +1,5 @@
 default HorseSaddled = 0
+default HorsePurchasePrice = 0
 
 init python:
     def tavern_stable_horse_present(_obj=None):
@@ -13,8 +14,18 @@ init python:
     def tavern_stable_can_unsaddle(_obj=None):
         return MyStallion != "" and int(HorseSaddled or 0) == 1
 
+    def tavern_stable_can_start_becky_trade(_obj=None):
+        return int(BeckyVar.get('TradeOffer', 0) or 0) == 1 and int(time or 0) == 0 and int(week or 0) != 7
+
+    def tavern_stable_can_ride_to_kunidell(_obj=None):
+        return tavern_stable_can_start_becky_trade() and MyStallion != "" and int(money or 0) >= 200
+
+    def tavern_stable_can_walk_to_kunidell(_obj=None):
+        return tavern_stable_can_start_becky_trade() and int(BeckyVar.get('SherwoodSuspect', 0) or 0) >= 5
+
     TavernStableRoom = Room(
         code_name="TavernStable",
+        group_name=ROOM_GROUP_TAVERN,
         display_name="Конюшня",
         bg_picture="bg stable",
         descriptions=[
@@ -152,6 +163,10 @@ label TavernStableBuildActions:
     python:
         for _room_object in TavernStableRoom.visible_game_items():
             current_action_items.append(MenuItem(_room_object.name, Call("tavern_stable_object_menu", _room_object.object_id)))
+        if tavern_stable_can_ride_to_kunidell():
+            current_action_items.append(MenuItem("Купить провизию для эльфов у Бекки и отправится в Куниделл верхом", Call("TavernStableRideToKunidell")))
+        if tavern_stable_can_walk_to_kunidell():
+            current_action_items.append(MenuItem("Пойти в Куниделл пешком и налегке", Call("TavernStableWalkToKunidell")))
         for _room_exit in TavernStableRoom.visible_exits():
             current_action_items.append(MenuItem(_room_exit.label, Call("AdvanceMovementTime", _room_exit.target)))
     return
@@ -244,4 +259,25 @@ label TavernStableUnsaddleHorse:
     $ MainTxt = "Вы снимаете с [MyStallion] седло и аккуратно развешиваете сбрую на стене."
     $ CurLocDesc = MainTxt
     call tavern_stable_object_menu("tack")
+    return
+
+
+label TavernStableRideToKunidell:
+    if not tavern_stable_can_ride_to_kunidell():
+        call TavernStableRestore
+        return
+    "С утра пораньше вы, 200 мараведи и [MyStallion] отправились к Бекки. Навьючив мешки с овощами на бедную лошадь, вы отправились в путь."
+    $ money -= 200
+    call ShowImageSeq("general", "", "vorota", 2)
+    call SherwoodTravel(1)
+    return
+
+
+label TavernStableWalkToKunidell:
+    if not tavern_stable_can_walk_to_kunidell():
+        call TavernStableRestore
+        return
+    "Что-то все это предложение Бекки выглядит подозрительно. Решив все как следует выяснить, вы направились в путь пешком."
+    call ShowImageSeq("general", "", "vorota", 2)
+    call SherwoodTravel(0)
     return

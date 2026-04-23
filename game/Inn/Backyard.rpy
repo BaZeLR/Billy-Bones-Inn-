@@ -54,8 +54,25 @@ init 6 python:
             return base_text + "\n\n" + ash_barrel_text
         return base_text
 
+    def build_backyard_npc_entries():
+        entries = []
+        for npc_key in ("sandra", "melissa", "amanda"):
+            if not _tavern_is_in_room(npc_key, "Backyard"):
+                continue
+            entries.append({
+                "npc_id": npc_key,
+                "name": _tavern_name(npc_key),
+                "talk_label": "Int" + str(npc_key).capitalize() + "Talk",
+                "auto_card": True,
+            })
+        _werecat_entry = werecat_npc_entry("Backyard")
+        if isinstance(_werecat_entry, dict):
+            entries.append(dict(_werecat_entry))
+        return entries
+
     BackyardRoom = Room(
         code_name="Backyard",
+        group_name=ROOM_GROUP_TAVERN,
         display_name="Задний двор",
         bg_picture="images/tavern/backyard/backyard_1.png",
         descriptions=[
@@ -148,6 +165,8 @@ label Backyard:
     $ MainTxt = backyard_dynamic_text()
     $ CurLocDesc = MainTxt
     $ BackyardSavedText = MainTxt
+    $ BackyardRoom.npcs = build_backyard_npc_entries()
+    $ CurrentRoom.npcs = BackyardRoom.npcs
     $ current_action_title = "Задний двор"
     $ current_action_content = None
     $ current_action_items = []
@@ -163,6 +182,8 @@ label BackyardView:
 
 label BackyardBuildActions:
     $ BackyardSavedText = backyard_dynamic_text()
+    $ BackyardRoom.npcs = build_backyard_npc_entries()
+    $ CurrentRoom.npcs = BackyardRoom.npcs
     $ current_action_title = "Задний двор"
     $ current_action_content = None
     $ current_action_items = []
@@ -180,7 +201,7 @@ label BackyardBuildActions:
     return
 
 
-label BackyardObjectMenu(object_id=""):
+label BackyardObjectMenu(object_id="", refresh_only=False):
     if str(object_id or "") == "backyard_dog_booth":
         call BackyardInspectDogBooth
         return

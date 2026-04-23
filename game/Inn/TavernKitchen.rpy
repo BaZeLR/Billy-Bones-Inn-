@@ -8,8 +8,14 @@ default BeckyKitchenVisitActive = 0
 default BreakfastToday = False
 default TavernBreakfastLastDay = -1
 default TavernBreakfastDay = -1
+default TavernBreakfastBaseText = ""
 default TavernBreakfastSoapAnnouncedDay = -1
 default TavernBreakfastBarberTalkDay = -1
+default TavernBreakfastListenDay = -1
+default TavernBreakfastMarketTalkDay = -1
+default TavernBreakfastMotivationDay = -1
+default TavernBreakfastAbsentTalkDay = -1
+default TavernBreakfastBaseShownDay = -1
 default TavernBreakfastEventActive = False
 default TavernSundayDinnerLastDay = -1
 default TavernSundayDinnerBarberTalkDay = -1
@@ -296,11 +302,11 @@ init python:
 
     def tavern_breakfast_menu_items():
         items = []
-        if tavern_breakfast_can_listen():
+        if tavern_breakfast_can_listen() and int(TavernBreakfastListenDay or -1) != int(dayspassed or 0):
             items.append(MenuItem("Послушать разговор за столом", Jump("TavernKitchenBreakfastHearDialogue")))
-        if tavern_breakfast_has_market_topic():
+        if tavern_breakfast_has_market_topic() and int(TavernBreakfastMarketTalkDay or -1) != int(dayspassed or 0):
             items.append(MenuItem("Рассказать, что вы видели на рынке", Jump("TavernKitchenBreakfastMarketTalk")))
-        if tavern_breakfast_can_make_speech():
+        if tavern_breakfast_can_make_speech() and int(TavernBreakfastMotivationDay or -1) != int(dayspassed or 0):
             items.append(MenuItem("Сказать пару слов перед работой", Jump("TavernKitchenBreakfastMotivation")))
         if tavern_breakfast_can_serve_spicy_tincture():
             items.append(MenuItem("Подать к столу пряную настойку", Jump("TavernKitchenBreakfastServeSpicyDrink")))
@@ -312,7 +318,7 @@ init python:
             items.append(MenuItem("Предложить Аманде сходить к Серджио", Call("HouseholdBarberRequestEvent", "amanda")))
         if int(TavernBreakfastGeorgetteLizaPending or 0) == 1:
             items.append(MenuItem("Объявить о Жоржетте и Лизетте", Jump("TavernKitchenBreakfastAnnounceGeorgetteLiza")))
-        if str(tavern_breakfast_absent_prompt() or "").strip():
+        if str(tavern_breakfast_absent_prompt() or "").strip() and int(TavernBreakfastAbsentTalkDay or -1) != int(dayspassed or 0):
             items.append(MenuItem("Поговорить об отсутствующих", Jump("TavernKitchenBreakfastTalkAbsent")))
         if "sandra" in list(tavern_breakfast_present_ids() or []) and tavern_kitchen_sandra_can_discuss_breakfasts():
             items.append(MenuItem("Попросить Сандру почаще собирать всех на общий завтрак", Jump("TavernKitchenAskSandraBreakfasts")))
@@ -324,10 +330,9 @@ init python:
         return items
 
     def tavern_breakfast_restore_ui_state(panel_text=""):
-        text_value = str(panel_text or TavernKitchenSavedText or MainTxt or "Вы все еще сидите за общим утренним столом.")
+        text_value = str(panel_text or TavernBreakfastBaseText or TavernKitchenSavedText or MainTxt or "Вы все еще сидите за общим утренним столом.")
         renpy.store.MainTxt = text_value
         renpy.store.CurLocDesc = text_value
-        renpy.store.TavernKitchenSavedText = text_value
         renpy.store.current_action_title = "Завтрак"
         renpy.store.current_action_content = None
         renpy.store.current_action_items = list(tavern_breakfast_menu_items() or [])
@@ -1104,7 +1109,9 @@ label TavernKitchenBreakfast:
         $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
     if len(list(tavern_recent_barber_ids() or [])) > 0:
         $ TavernBreakfastBarberTalkDay = int(dayspassed or 0)
-    $ TavernKitchenSavedText = MainTxt
+    $ TavernBreakfastBaseText = str(MainTxt or "")
+    $ TavernBreakfastBaseShownDay = -1
+    $ TavernKitchenSavedText = str(MainTxt or "")
     $ TavernBreakfastEventActive = True
     call stat
     $ TavernKitchenRoom.npcs = tavern_breakfast_present_entries()
@@ -1119,8 +1126,10 @@ label TavernKitchenBreakfastMenu:
         show screen main_ui
         call TavernKitchenBuildActions
         return
-    $ tavern_breakfast_restore_ui_state(str(MainTxt or TavernKitchenSavedText or "Вы все еще сидите за общим утренним столом."))
-    call QueuePagedPanelText(str(MainTxt or ""), current_action_title, list(current_action_items or []), "plain")
+    $ _breakfast_menu_text = tavern_breakfast_restore_ui_state()
+    if int(TavernBreakfastBaseShownDay or -1) != int(dayspassed or 0):
+        $ TavernBreakfastBaseShownDay = int(dayspassed or 0)
+        call QueuePagedPanelText(str(_breakfast_menu_text or ""), current_action_title, list(current_action_items or []), "plain")
     call ReturnToMainUI
     return
 
@@ -1129,7 +1138,11 @@ label TavernKitchenBreakfastShowText(text="", return_label="TavernKitchenBreakfa
     $ TavernBreakfastTextPages = build_breakfast_text_pages(text)
     $ TavernBreakfastTextPageIndex = 0
     $ TavernBreakfastTextReturnLabel = str(return_label or "TavernKitchenBreakfastMenu")
-    $ tavern_breakfast_restore_ui_state(str(text or ""))
+    $ current_action_title = "Завтрак"
+    $ current_action_content = None
+    $ current_action_items = list(tavern_breakfast_menu_items() or [])
+    $ MainTxt = str(text or "")
+    $ CurLocDesc = MainTxt
     call QueuePagedPanelText(str(text or ""), current_action_title, list(current_action_items or []), "plain")
     call ReturnToMainUI
     return
@@ -1156,6 +1169,7 @@ label TavernKitchenBreakfastTextPage:
 
 
 label TavernKitchenBreakfastHearDialogue:
+    $ TavernBreakfastListenDay = int(dayspassed or 0)
     $ _talk_result = tavern_breakfast_talk_result()
     $ _banter_text = str(_talk_result.get("text", "") or "")
     $ _talk_arousal = int(_talk_result.get("arousal_gain", 0) or 0)
@@ -1167,7 +1181,6 @@ label TavernKitchenBreakfastHearDialogue:
         $ Arousal["You"] = max(0, min(100, int(Arousal.get("You", 0) or 0) + int(_talk_arousal or 0)))
         $ MainTxt = str(MainTxt or "") + "\nЭтот разговор слишком легко цепляет и вас самих: утреннее возбуждение только сильнее мешает делать вид, будто вы слушаете все это совсем спокойно."
     $ CurLocDesc = MainTxt
-    $ TavernKitchenSavedText = MainTxt
     if int(_talk_arousal or 0) > 0:
         call stat
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
@@ -1175,33 +1188,33 @@ label TavernKitchenBreakfastHearDialogue:
 
 
 label TavernKitchenBreakfastTalkAbsent:
+    $ TavernBreakfastAbsentTalkDay = int(dayspassed or 0)
     $ _absence_prompt = tavern_breakfast_absent_prompt()
     if str(_absence_prompt or "").strip():
         $ MainTxt = str(_absence_prompt or "") + "\n" + tavern_breakfast_absent_talk_text()
     else:
         $ MainTxt = tavern_breakfast_absent_talk_text()
     $ CurLocDesc = MainTxt
-    $ TavernKitchenSavedText = MainTxt
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
     return
 
 
 label TavernKitchenBreakfastMarketTalk:
+    $ TavernBreakfastMarketTalkDay = int(dayspassed or 0)
     if int(BlindPirateBreakfastPending or 0) == 1:
         call TavernKitchenBreakfastBlindPirateStory
         return
     $ MainTxt = tavern_breakfast_market_story_text()
     $ CurLocDesc = MainTxt
-    $ TavernKitchenSavedText = MainTxt
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
     return
 
 
 label TavernKitchenBreakfastMotivation:
+    $ TavernBreakfastMotivationDay = int(dayspassed or 0)
     $ MainTxt = tavern_breakfast_motivation_text()
     $ fun = _player_clamp(int(fun or 0) + 1, 0, 100)
     $ CurLocDesc = MainTxt
-    $ TavernKitchenSavedText = MainTxt
     call stat
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
     return
@@ -1213,7 +1226,6 @@ label TavernKitchenBreakfastServeSpicyDrink:
     $ TavernBreakfastSpicyDrinkDay = int(dayspassed or 0)
     $ MainTxt = tavern_kitchen_spicy_tincture_apply(tavern_breakfast_present_ids())
     $ CurLocDesc = MainTxt
-    $ TavernKitchenSavedText = MainTxt
     call stat
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
     return
@@ -1221,8 +1233,7 @@ label TavernKitchenBreakfastServeSpicyDrink:
 
 label TavernKitchenBreakfastBlindPirateStory:
     $ BlindPirateBreakfastPending = 0
-    $ MainTxt = str(TavernKitchenSavedText or "")
-    $ MainTxt = str(MainTxt or "") + "\nВы пересказываете за столом, как на рынке в клетке везли бывшего хозяина трактира «Слепой Пират» на галеры герцогини Кончиты, а следом за телегой, захлебываясь слезами, бежали женщины из его дома."
+    $ MainTxt = "Вы пересказываете за столом, как на рынке в клетке везли бывшего хозяина трактира «Слепой Пират» на галеры герцогини Кончиты, а следом за телегой, захлебываясь слезами, бежали женщины из его дома."
     if "sandra" in list(tavern_breakfast_present_ids() or []):
         $ MainTxt = str(MainTxt or "") + "\nСандра сразу мрачнеет. \"Трактир валится не за один день,\" тихо говорит она. \"Сперва уходит запас, потом честь, потом люди, а под конец уже и стены некому удержать.\""
     if "melissa" in list(tavern_breakfast_present_ids() or []):
@@ -1232,7 +1243,6 @@ label TavernKitchenBreakfastBlindPirateStory:
     if "becky" in list(tavern_breakfast_present_ids() or []):
         $ MainTxt = str(MainTxt or "") + "\nБекки тяжело вздыхает и признает, что вдовьи и долговые истории в этом городе всегда заканчиваются одинаково скверно, если рядом не находится кто-то достаточно упрямый, чтобы удержать дом на плаву."
     $ CurLocDesc = MainTxt
-    $ TavernKitchenSavedText = MainTxt
     $ fun = _player_clamp(int(fun or 0) + 5, 0, 100)
     call stat
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
@@ -1241,9 +1251,21 @@ label TavernKitchenBreakfastBlindPirateStory:
 
 label TavernKitchenBreakfastAnnounceGeorgetteLiza:
     $ TavernBreakfastGeorgetteLizaPending = 0
-    $ MainTxt = "Вы объявляете за столом, что Жоржетта с Лизеттой согласились работать у вас в трактире. Сандра принимает новость жестко, но без споров, только сразу начинает прикидывать, как вписать новых работниц в домашний распорядок. Аманда заметно оживляется от одних только будущих слухов, а Мелисса слушает внимательнее обычного, явно понимая, что с этого дня в доме станет заметно шумнее."
+    $ MainTxt = "Вы даете за столом договорить всем до конца, а затем коротко объявляете, что Жоржетта с Лизеттой отныне будут жить и работать у вас в трактире.\n\nКогда по кухне проходит первый тяжелый шум, вы тут же пресекаете его и холодно напоминаете, чем закончилась судьба «Слепого Пирата». Если кому-то из присутствующих хочется проверить, не ждет ли ее галера, долговая яма или продажа в блудный дом, вы не станете никого удерживать. Но пока дом держится на вас, порядок здесь решаете вы.\n\nПосле этих слов разговор за столом резко остывает."
+    if "sandra" in list(tavern_breakfast_present_ids() or []):
+        $ MainTxt = str(MainTxt or "") + "\n\nСандра первая берет себя в руки. Она явно недовольна, но вместо скандала только сухо замечает, что тогда новых баб надо сразу встраивать в хозяйственный распорядок и следить, чтобы они не развалили дом изнутри."
+    if "melissa" in list(tavern_breakfast_present_ids() or []):
+        $ MainTxt = str(MainTxt or "") + "\n\nМелисса заметно бледнеет от вашей жесткости, но спорить не решается. По ее лицу видно, что она поняла сказанное слишком хорошо и теперь старается только не выдать своего страха лишним словом."
+    if "amanda" in list(tavern_breakfast_present_ids() or []):
+        $ MainTxt = str(MainTxt or "") + "\n\nАманда сперва открывает рот для колкости, но, встретившись с вашим взглядом, только отводит глаза и начинает нервно вертеть ложку в пальцах."
+    if "becky" in list(tavern_breakfast_present_ids() or []):
+        $ MainTxt = str(MainTxt or "") + "\n\nБекки хмуро косится на остальных и, похоже, предпочитает не подливать масла в огонь: вдова слишком хорошо знает, как быстро в городе рушатся дома, где хозяин теряет хватку."
+    $ MainTxt = str(MainTxt or "") + "\n\nЖоржетта держится с показным достоинством, а Лизетта жмется к матери чуть ближе обычного. Вы же на этом обрываете завтрак и даете понять, что разговор окончен."
     $ CurLocDesc = MainTxt
-    $ TavernKitchenSavedText = MainTxt
+    $ rebellion = max(0, int(rebellion or 0) - 1)
+    $ neshlush["sandra"] = max(0, int(neshlush.get("sandra", 0) or 0) - 1)
+    $ neshlush["melissa"] = max(0, int(neshlush.get("melissa", 0) or 0) - 1)
+    $ neshlush["amanda"] = max(0, int(neshlush.get("amanda", 0) or 0) - 1)
     $ fun = _player_clamp(int(fun or 0) + 1, 0, 100)
     call stat
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
@@ -1272,6 +1294,8 @@ label TavernKitchenRefreshBreakfastEvent:
 
 label TavernKitchenFinishBreakfastEvent:
     $ TavernBreakfastEventActive = False
+    $ TavernBreakfastBaseText = ""
+    $ TavernBreakfastBaseShownDay = -1
     $ _kitchen_scene = tavern_kitchen_picture() or getattr(CurrentRoom, "bg_picture", "") or ""
     if str(_kitchen_scene or "").strip():
         vscene _kitchen_scene

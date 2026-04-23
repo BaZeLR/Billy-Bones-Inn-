@@ -155,7 +155,7 @@ init python:
                 desc_parts.append("Вы можете пообщаться с участницами своей команды через список персонажей справа.")
 
             if clara_visible_in_location("TavernMain"):
-                desc_parts.append("Кларисса заглянула в трактир и держится поближе к Мелиссе, о чем-то оживленно переговариваясь с ней между столами.")
+                desc_parts.append("Кларисса снова заглянула в трактир и, похоже, в последнее время заметно сдружилась с Мелиссой: обе держатся рядом, перешептываются между столами и временами вместе прыскают со смеху.")
             if _tavern_is_in_room("becky", "TavernMain"):
                 desc_parts.append("Бекки Блэнкеншип на этот раз сама заглянула к вам в трактир и присматривается к залу цепким хозяйским взглядом.")
             if str(TavernMainExtraDesc or "").strip():
@@ -351,6 +351,10 @@ label TavernMain:
         call TavernShowImage
 
     if TavernEventOngoing == "":
+        if TavernClosed == "" and not tavern_preopening_mode() and clara_visible_in_location("TavernMain"):
+            if int(ClaraVar.get("tavern_melissa_visit_day", -1) or -1) != int(dayspassed or 0):
+                $ ClaraVar["tavern_melissa_visit_day"] = int(dayspassed or 0)
+                $ ClaraVar["tavern_melissa_visit_count"] = int(ClaraVar.get("tavern_melissa_visit_count", 0) or 0) + 1
         call CheckDailyEvent("", "_story_enter", CurLoc, time)
         if TavernClosed == "" and not tavern_preopening_mode() and int(week or 0) != 7:
             call CheckDailyEvent('amanda')

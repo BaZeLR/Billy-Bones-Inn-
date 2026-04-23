@@ -17,11 +17,9 @@ init python:
     def ellona_fran_visible():
         return FranBusy.get(time, 0) == 0
 
-    def ellona_fran_known():
-        return int(FranVar.get("meet", 0) or 0) != 0
-
     EllonaTempleRoom = Room(
         code_name="EllonaTemple",
+        group_name=ROOM_GROUP_CITY,
         display_name="Храм Эллоны",
         bg_picture="images/ellona/Fran1.jpg",
         descriptions=[
@@ -66,7 +64,7 @@ init python:
             "birth_room_door_001",
         ],
         npcs=[
-            {"npc_id": "fran", "name": "Франческа", "condition": ellona_fran_visible, "talk_label": "FrancheskaTalk", "known_condition": ellona_fran_known, "unknown_name": "Старая жрица", "hide_examine_until_known": True},
+            {"npc_id": "fran", "condition": ellona_fran_visible, "unknown_name": "Старая жрица", "gender": "woman", "can_examine_unknown": False},
         ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
@@ -100,7 +98,7 @@ init python:
             ),
         ],
         npcs=[
-            {"npc_id": "fran", "name": "Франческа", "condition": ellona_fran_visible, "talk_label": "FrancheskaTalk", "known_condition": ellona_fran_known, "unknown_name": "Старая жрица", "hide_examine_until_known": True},
+            {"npc_id": "fran", "condition": ellona_fran_visible, "unknown_name": "Старая жрица", "gender": "woman", "can_examine_unknown": False},
         ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
@@ -219,7 +217,8 @@ label EllonaBuildActions(room_code="EllonaTemple"):
             current_action_items.append(MenuItem(_room_object.name, Call("ellona_room_object_menu", room_code, _room_object.object_id)))
         for _room_npc in _room.visible_npcs():
             if isinstance(_room_npc, dict):
-                _npc_name = _character_action_npc_display_name(_room_npc)
+                _npc_id = str(_room_npc.get("npc_id", "") or "").strip()
+                _npc_name = entity_presented_name("npc", _npc_id, _room_npc)
                 current_action_items.append(MenuItem(_npc_name, Call("FrancheskaTalk")))
         for _room_exit in _room.visible_exits():
             current_action_items.append(MenuItem(_room_exit.label, Jump(_room_exit.target)))

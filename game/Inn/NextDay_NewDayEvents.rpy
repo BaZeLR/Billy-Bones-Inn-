@@ -61,6 +61,7 @@ label NextDay_NewDayEvents():
         TavernGloryHole = int(_nd_ensure_scalar("TavernGloryHole", 0) or 0)
         week = int(_nd_ensure_scalar("week", 1) or 1)
         dayspassed = int(_nd_ensure_scalar("dayspassed", 0) or 0)
+        _nd_ensure_scalar("BreakfastToday", False)
 
         BeckyVar.setdefault("EddieGeorg", 0)
         BeckyVar.setdefault("EddieWhoreHome", 0)
@@ -78,6 +79,7 @@ label NextDay_NewDayEvents():
         EddieVar.setdefault("TalkedAboutWhores", 0)
 
         CurrentLoc.setdefault("georgett", "")
+        CurrentLoc.setdefault("werecat", "")
         CurrentLoc.setdefault("eddie", "GroceryStore")
         AlberVar.setdefault("WhoreVisitFreq", 6)
         LizaVar.setdefault("ProstStart", 0)
@@ -105,6 +107,7 @@ label NextDay_NewDayEvents():
         virginity.setdefault("amanda", 1)
         sexacts.setdefault("amanda", 0)
         pantiesdef.setdefault("liza", "")
+        store.BreakfastToday = False
 
         # --- Заканчиваем делать то, что начали в течении дня.
         if SloganFixed == 1:
@@ -226,9 +229,6 @@ label NextDay_NewDayEvents():
                 BeckyVar['EddieRobbedDay'] = dayspassed
                 DailyEventsList_Add("becky", "GroceryStore", 1, ">=", 1, 9999, "SherwoodQuest", "BeckyQuestInit")
 
-        # Keep Eddie discoverable only in grocery-related UI/schedule logic.
-        CurrentLoc['eddie'] = "GroceryStore"
-
         # Francheska in temple (per-time-slot availability map)
         for i in range(5):
             FranBusy[i] = 1 if renpy.random.randint(1, 3) == 1 else 0
@@ -243,6 +243,8 @@ label NextDay_NewDayEvents():
         if LizaVar['ProstStart']:
             _run_liza_nextday_clients = 1
             _liza_nextday_clients_max = 3 + (1 if pantiesdef['liza'] == '' else 0)
+        npc_schedule_sync_all()
+        werecat_sync_profile()
     if _run_georgett_nextday_clients:
         call WhoreNextDayClients('georgett', _georgett_nextday_clients_max, _georgett_nextday_glory_max)
     if _run_liza_nextday_clients:

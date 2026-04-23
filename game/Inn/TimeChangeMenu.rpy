@@ -22,7 +22,7 @@ init python:
             "Сейчас: %02d:%02d." % (int(hour or 0), int(minute or 0)),
             "Время суток: %s." % str(calendar_time_slot_name_ru or _time_label(time)),
             "День недели: %s." % str(week_name or ""),
-            "Дата: %d %s %d." % (int(day or 1), str(month_name or ""), int(year or 0)),
+            "Дата: %s." % str(calendar_format_date_ru(day, month, year, week, False) or ""),
         ]
 
     def _time_change_body_text():

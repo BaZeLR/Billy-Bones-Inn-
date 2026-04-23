@@ -14,6 +14,8 @@ label AdvanceTime(return_location=None):
 
     if int(time or 0) < 4:
         $ calendar_set_time_slot(int(time or 0) + 1)
+        $ npc_schedule_sync_all()
+        $ werecat_sync_profile()
         call stat
         $ checkpoint_tractir_progress("advance_time")
         jump expression retlocname

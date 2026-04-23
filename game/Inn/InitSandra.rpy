@@ -1,13 +1,14 @@
 label InitSandra:
     python:
+        knowsMC["sandra"] = True
         # Initialize Sandra's attributes
         GirlName = 'sandra'
 
         RealName[GirlName] = 'Сандра'
         RealName2[GirlName] = 'Сандры'
         RealName3[GirlName] = 'Сандре'
-        DateOfBirth[GirlName] = renpy.random.randint(15, 350)
         age_girls[GirlName] = 34
+        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 3
         beauty[GirlName] = 65
         sluttiness[GirlName] = 20
@@ -53,6 +54,29 @@ label InitSandra:
         SandraVar['Week5WakePending'] = 0
         SandraVar['WeeklyChoreCheckEval'] = ''
         SandraVar['RoomUnlocked'] = 0
+        SandraVar['MCVisitFirstReady'] = 0
+        SandraVar['MCVisitFirstPending'] = 0
+        SandraVar['MCVisitFirstDone'] = 0
         GiftPreferences[GirlName] = ["soap_001", "wild_rose_001", "lavender_001", "berries_001", "mushroom_001", "honey_comb_001", "energy_tea_001", "drink_ale_001"]
+        npc_schedule_set(
+            GirlName,
+            [
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="TavernMain", mode="morning"), priority=300, label="morning_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="TavernKitchen", mode="morning"), priority=300, label="morning_kitchen"),
+                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="TavernStorage", mode="morning"), priority=300, label="morning_storage"),
+                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="Backyard", mode="morning"), priority=300, label="morning_backyard"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="TavernSandraRoom", mode="morning"), priority=300, label="morning_room"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 6], time_slots=[1, 2, 3], awake=True, talkable=True, priority=200, label="working_kitchen"),
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="FridayDance", mode="friday_evening"), priority=250, label="friday_dance"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="TavernSandraRoom", mode="friday_evening"), priority=240, label="friday_room"),
+                NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=260, label="sunday_church"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="TavernSandraRoom", mode="sunday"), priority=240, label="sunday_room"),
+                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="Backyard", mode="sunday"), priority=240, label="sunday_backyard"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="TavernMain", mode="sunday"), priority=240, label="sunday_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="sandra", location="TavernKitchen", mode="sunday"), priority=240, label="sunday_kitchen"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[4], awake=False, talkable=False, priority=10, label="sleep"),
+            ],
+        )
+        npc_schedule_sync_currentloc(GirlName)
 
     return

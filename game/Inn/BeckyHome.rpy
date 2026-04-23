@@ -3,16 +3,45 @@
 # Arguments: arrive_mode (str)
 
 init python:
-    def becky_home_picture():
-        candidates = [
-            "images/becky/Home/withbecky.jpg",
-            "images/becky/Home/house1.jpg",
-            "images/becky/Home/house2.jpg",
-        ]
+    def becky_home_picture(arrive_mode=""):
+        mode_key = str(arrive_mode or ArriveMode or "").strip()
+        if mode_key in ("FromDances", "FromDinner", "SvalnyiGreh"):
+            candidates = [
+                "images/becky/sex/inroom1.jpg",
+                "images/becky/sex/inroom2.jpg",
+                "images/becky/sex/inroom3.jpg",
+                "images/becky/Home/withbecky.jpg",
+            ]
+        else:
+            candidates = [
+                "images/becky/Home/withbecky.jpg",
+                "images/becky/Home/house1.jpg",
+                "images/becky/Home/house2.jpg",
+            ]
         for candidate in candidates:
             if renpy.loadable(candidate):
                 return candidate
-        return "images/becky/Home/withbecky.jpg"
+        return candidates[0]
+
+    def becky_home_restore_text():
+        mode_key = str(ArriveMode or "").strip()
+        if mode_key == "FromDances":
+            return "Вы и миссис Блэнкеншип находитесь в ее спальне."
+        if mode_key == "FromDinner":
+            return "Вы и миссис Блэнкеншип находитесь в ее спальне."
+        if mode_key == "SvalnyiGreh":
+            return "Вы и миссис Блэнкеншип находитесь в ее спальне.\nВместе с вами находится сын Бекки Эдди, им движут к матери отнюдь не сыновьи чувства."
+        return "Итак, вы сидите за столом в гостях у вдовы Блэнкеншип и наслаждаетесь аппетитной домашней кухней."
+
+    def becky_home_after_sex_text():
+        mode_key = str(ArriveMode or "").strip()
+        if mode_key == "FromDances":
+            return "Вы и миссис Блэнкеншип находитесь в ее спальне."
+        if mode_key == "FromDinner":
+            return "Вы и миссис Блэнкеншип находитесь в ее спальне."
+        if mode_key == "SvalnyiGreh":
+            return "Вы и миссис Блэнкеншип находитесь в ее спальне.\nВместе с вами находится сын Бекки Эдди, им движут к матери отнюдь не сыновьи чувства."
+        return "Итак, вы сидите за столом в гостях у вдовы Блэнкеншип и наслаждаетесь аппетитной домашней кухней."
 
     def becky_home_desc_default():
         return ArriveMode == ""
@@ -40,6 +69,7 @@ init python:
 
     BeckyHomeRoom = Room(
         code_name="BeckyHome",
+        group_name=ROOM_GROUP_CITY,
         display_name="Дом Бекки",
         bg_picture="images/becky/Home/withbecky.jpg",
         descriptions=[
@@ -103,11 +133,12 @@ init python:
 
 label BeckyHome(arrive_mode=""):
     call EnterLocation("BeckyHome")
+    $ ArriveMode = arrive_mode
     $ _becky_home_room = BeckyHomeRoom
     $ CurrentRoom = _becky_home_room
     $ CurLoc = "BeckyHome"
     $ location = CurLoc
-    $ scene_image = becky_home_picture()
+    $ scene_image = becky_home_picture(ArriveMode)
     if str(scene_image or "").strip():
         $ _layout_last_picture = scene_image
     if navigation_only_mode_enabled():
@@ -226,10 +257,10 @@ label BeckyHomeRestore:
     $ CurrentRoom = BeckyHomeRoom
     $ CurLoc = "BeckyHome"
     $ location = CurLoc
-    $ scene_image = becky_home_picture()
+    $ scene_image = becky_home_picture(ArriveMode)
     if str(scene_image or "").strip():
         $ _layout_last_picture = scene_image
-    $ MainTxt = "Вы находитесь в доме Бекки. Из спальни можно либо вернуться к трактиру, либо еще немного осмотреться."
+    $ MainTxt = becky_home_restore_text()
     $ CurLocDesc = MainTxt
     call BeckyHomeBuildActions
     return
@@ -237,7 +268,7 @@ label BeckyHomeRestore:
 
 label BeckyHomeAfterSex:
     $ BeckyVar["visitedhome"] = max(int(BeckyVar.get("visitedhome", 0) or 0), 2)
-    $ MainTxt = "После близости вы остаетесь в доме Бекки. Можно перевести дух, осмотреться или уже уходить."
+    $ MainTxt = becky_home_after_sex_text()
     $ CurLocDesc = MainTxt
     call BeckyHomeBuildActions
     jump BeckyHomeView

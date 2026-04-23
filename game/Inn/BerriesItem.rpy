@@ -5,10 +5,11 @@ init 4 python:
         description="На лесных кустах можно насобирать горсть спелых ягод.",
         actions=[
             ObjectAction(
-                action_id="eat_berries",
+                action_id="eat",
                 label="Съесть ягоды",
                 hook="call",
-                target="UseBerriesItem",
+                target="UseFoodItem",
+                args=("berries_001",),
             ),
         ],
         price=2,
@@ -21,25 +22,13 @@ init 4 python:
         custom_properties={
             "item_kind": "forest_resource",
             "resource_kind": "berries",
+            "consume_action": "eat",
+            "consume_minutes": 10,
+            "consume_energy": 5,
+            "consume_fun": 3,
+            "consume_text": "Вы съедаете горсть ягод. Сладкая лесная кислинка слегка бодрит вас и поднимает настроение.",
             "gift_value": 1,
             "social_fun_bonus": 1,
             "curLoc": "Forest",
         },
     )
-
-
-label UseBerriesItem:
-    if int(_player_item_count_by_id("berries_001") or 0) <= 0:
-        $ MainTxt = "Ягод у вас при себе не осталось."
-        $ CurLocDesc = MainTxt
-        call PlayerCardInventoryMenu
-        return
-
-    $ _player_remove_item_by_id("berries_001", 1)
-    $ energy = _player_clamp(int(energy or 0) + 5, 0, 100)
-    $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
-    $ MainTxt = "Вы съедаете горсть ягод. Сладкая лесная кислинка слегка бодрит вас и поднимает настроение."
-    $ CurLocDesc = MainTxt
-    call stat
-    call PlayerCardInventoryItemMenu("berries_001", True)
-    return

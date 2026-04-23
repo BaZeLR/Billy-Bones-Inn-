@@ -34,10 +34,10 @@ init python:
         return str(table.get(key, key))
 
     def _gds_relative_type(girl_name):
-        g = str(girl_name or "")
-        if g == "sandra":
+        girl = str(girl_name or "").strip().lower()
+        if girl == "sandra":
             return 1
-        if g in ("melissa", "amanda"):
+        if girl in ("melissa", "amanda"):
             return 2
         return 0
 
@@ -151,6 +151,16 @@ init python:
             return int(value.get("You", value.get("you", 0)) or 0)
         return int(value or 0)
 
+    def _gds_relative_callout_name(girl_name):
+        girl = str(girl_name or "").strip().lower()
+        if girl == "sandra":
+            return "Сандра"
+        if girl == "amanda":
+            return "Аманда"
+        if girl == "melissa":
+            return "Мелисса"
+        return str(_gds_name("RealName", girl_name))
+
 
 label GirlDressSuggest(GirlName="", DressToBuy=""):
     if str(GirlName or "") == "" or str(DressToBuy or "") == "":
@@ -219,9 +229,9 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
 
             'Портниха, с улыбкой наблюдавшая за этой сценой, заметила: "Похоже ваша дама из тех, кто ценит подарки и умеет их примерять. Молодец!"'
             if DressBuyIsRelative == 1:
-                '"Я ему не дама, а мама!" вырвалось у вашей родительницы. Потом она поняла, что сказала лишнее и щеки ее стали пунцовыми.'
+                '"Я ему не дама, а Сандра!" вырвалось у Сандры. Потом она поняла, что сказала лишнее и щеки ее стали пунцовыми.'
             elif DressBuyIsRelative == 2:
-                '"Я ему не дама, а сестра!" воскликнула [_rn]. "Ах, сестра," протянула Ирма, улыбнувшись. "Вижу, что очень, очень любяшая сестра. Всем бы таких сестричек, не правда, ли, Стефан?"'
+                '"Я ему не дама, а [_gds_relative_callout_name(GirlName)]!" воскликнула [_rn]. "Ах, вот как," протянула Ирма, улыбнувшись. "Вижу, что очень, очень любящая девушка. Всем бы таких, не правда ли, Стефан?"'
             else:
                 'Та зарделась от комплимента.'
 
@@ -234,7 +244,8 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
             return
 
         '"Ой, какие хорошенькие чулочки," восхитилась [_rn]. "Они мне?! Спасибочки!" С этими словами она взяла ваш подарочек, явно намереваясь одеть его позже.'
-        'К вашему разочарованию, посмотреть на примерку чулочков вам не удалось.'
+        '"А примерить? Вдруг не подойдут?" попробовали вы подначить одариваемую, однако та лишь отмахнулась: "Конечно же подойдут, я и так вижу. Дома примерю!"'
+        "Делать нечего, хоть вы и надеялись на большее, но посмотреть на примерку чулочков вам не удалось. Слегка огорченный, вы направили свои стопы к Ирме и выложили перед ней от щедрот своих [_gds_dress_cost(DressToBuy)] мараведи."
         call SlutFriendsIncrease(GirlName, 20, 1, 1, 0, 0, 0)
         $ _gds_apply_purchase(GirlName, DressToBuy, set_legsdef=True, set_legs=False, set_produced=False)
         call stat

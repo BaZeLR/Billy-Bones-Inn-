@@ -1,6 +1,7 @@
 init 6 python:
     TavernEmptyRoomRoom = Room(
         code_name="TavernEmptyRoom",
+        group_name=ROOM_GROUP_TAVERN,
         display_name="Пустая комната",
         bg_picture="bg amanda_room",
         descriptions=[

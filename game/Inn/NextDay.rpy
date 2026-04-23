@@ -31,20 +31,13 @@ init python:
             flags = {}
 
         try:
-            current_week = int(week or 0)
-        except Exception:
-            current_week = 0
-
-        try:
             current_time = int(time or 0)
         except Exception:
             current_time = 0
 
         if (
-            current_week == 1
             and current_time == 0
             and int(flags.get("Week5WakePending", 0) or 0) > 0
-            and int(flags.get("WeeklyChoreCheckScore", 0) or 0) >= 4
         ):
             try:
                 return str(sandra_weekly_wake_target_label() or "SandraWeek5WakeEvent")

@@ -14,7 +14,7 @@ label IntAmandaTalkRefresh(girl_name="amanda"):
     $ current_action_title = "Разговор с Амандой"
     $ current_action_content = None
     $ current_action_items = []
-    $ current_action_items.append(MenuItem("Осмотреть", Function(show_girl_card_main_ui_state, girl_name)))
+    $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
     if TalkedToday.get(girl_name, 0) == 0:
         $ current_action_items.append(MenuItem("Поболтать", Function(main_ui_call_label, "IntAmandaTalkApply", girl_name, "talk")))
     if FlirtedToday.get(girl_name, 0) == 0 and family_social_threshold_met(girl_name, "flirt"):

@@ -36,7 +36,7 @@ label DailySetstatdefault(girl_name):
             else:
                 $ DailyEventsList_Add(girl_name, "alllocs", -1, ">", 1, 9999, "GiveBirth", "GiveBirth")
 
-    if DateOfBirth.get(girl_name, -1) == dayspassed - (year - 1100) * 365:
+    if calendar_birth_matches_today(DateOfBirth.get(girl_name, -1), age_girls.get(girl_name, 0)):
         $ age_girls[girl_name] = age_girls.get(girl_name, 0) + 1
 
     call DressUp(girl_name, 1)

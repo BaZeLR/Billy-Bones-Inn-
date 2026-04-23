@@ -14,6 +14,6 @@ label DisplayTavernEventsSummary(day, month, year):
         $ TimePeriodEvents += 1
     if TodayEventsSummary == '':
         $ TodayEventsSummary = '\n\nНичего не произошло!'
-    $ TodayEventsSummary = "\n\n{i}События за [day] [month] [year] года{/i}" + TodayEventsSummary
+    $ TodayEventsSummary = "\n\n{i}События за [calendar_format_date_ru(day, month, year, None, False)]{/i}" + TodayEventsSummary
     $ Result = TodayEventsSummary
     return Result

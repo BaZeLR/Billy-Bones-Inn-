@@ -279,6 +279,8 @@ label GroceryStore:
     # Assign grocer name
     if grocery_store_active_grocer_id() == "eddie":
         $ GrocerName = 'Эдди'
+    elif grocery_store_active_grocer_id() == "inga":
+        $ GrocerName = 'Ингенборг'
     elif grocery_store_active_grocer_id() == "becky":
         $ GrocerName = 'Бекки'
     else:
@@ -287,6 +289,10 @@ label GroceryStore:
     # Character interaction
     if grocery_store_active_grocer_id() == "eddie":
         $ _grocery_picture = grocery_store_eddie_picture()
+        if str(_grocery_picture or "").strip():
+            call ShowImage("", "", _grocery_picture)
+    elif grocery_store_active_grocer_id() == "inga":
+        $ _grocery_picture = grocery_store_inga_picture()
         if str(_grocery_picture or "").strip():
             call ShowImage("", "", _grocery_picture)
     elif grocery_store_active_grocer_id() == "becky":
@@ -321,6 +327,8 @@ label GroceryStoreBuildActions:
 
     if grocery_store_active_grocer_id() == "eddie":
         $ current_action_items.append(MenuItem("Поговорить с Эдди", Call("IntEddieTalk")))
+    elif grocery_store_active_grocer_id() == "inga":
+        $ current_action_items.append(MenuItem("Поговорить с Ингенборг", Call("IntIngaTalk")))
     elif grocery_store_active_grocer_id() == "becky":
         $ current_action_items.append(MenuItem("Поговорить с Бекки", Call("IntBeckyTalk")))
 

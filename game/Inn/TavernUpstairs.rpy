@@ -56,10 +56,10 @@ label TavernUpstairsBuildActions:
     $ current_action_title = "Наверху"
     $ current_action_content = None
     $ current_action_items = []
+    if story_event_available("TavernUpstairs", "enter"):
+        $ current_action_items.append(MenuItem("Проверить шум из комнаты Мелиссы", Call("checkTriggers", "TavernUpstairs", "enter", 0)))
     if tavern_upstairs_can_clean_rooms():
         $ current_action_items.append(MenuItem("Убрать комнаты наверху", Call("DoChore", "clean_upstairs_rooms", "TavernUpstairs", "", "")))
-    if melissa_night_noise_ready() and story_event_available("TavernUpstairs", "enter"):
-        $ current_action_items.append(MenuItem("Проверить шум в комнате Мелиссы", Call("checkTriggers", "TavernUpstairs", "enter", 0)))
     python:
         for _upstairs_exit in TavernUpstairsRoom.visible_exits():
             current_action_items.append(MenuItem(_upstairs_exit.label, Call("AdvanceMovementTime", _upstairs_exit.target)))

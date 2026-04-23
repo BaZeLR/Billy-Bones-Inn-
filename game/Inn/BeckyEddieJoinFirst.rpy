@@ -1,28 +1,4 @@
 init python:
-    def _bejf_show_image(*args):
-        try:
-            return ShowImage(*args)
-        except Exception:
-            if renpy.has_label("ShowImage"):
-                return renpy.call("ShowImage", *args)
-        return None
-
-    def _bejf_slut_friends_increase(*args):
-        try:
-            return slut_friends_increase(*args)
-        except Exception:
-            if renpy.has_label("SlutFriendsIncrease"):
-                return renpy.call("SlutFriendsIncrease", *args)
-        return None
-
-    def _bejf_pregnancy_check(*args):
-        try:
-            return PregnancyCheck(*args)
-        except Exception:
-            if renpy.has_label("PregnancyCheck"):
-                return renpy.call("PregnancyCheck", *args)
-        return None
-
     def _bejf_home_picture(image_name=""):
         image_key = str(image_name or "").strip()
         if image_key == "":
@@ -39,7 +15,8 @@ init python:
 
 label BeckyEddieJoinFirst:
     "Вдова, как обычно, закрыла дверь на засов и потянула вас к кровати. Вы вспомнили о разговоре с Эдди."
-    $ _bejf_show_image("", "", _bejf_home_picture("doorclose"))
+    $ _bejf_picture = _bejf_home_picture("doorclose")
+    call ShowImage("", "", _bejf_picture)
 
     menu:
         "Поцеловать Бекки и незаметно открыть засов":
@@ -50,10 +27,11 @@ label BeckyEddieJoinFirst:
                 return
             else:
                 "Одной рукой вы обняли вдовушку, а другой незаметно отодвинули засов."
-                $ _bejf_show_image("", "", _bejf_home_picture("dooropen"))
+                $ _bejf_picture = _bejf_home_picture("dooropen")
+                call ShowImage("", "", _bejf_picture)
                 "Продолжая целоваться, вы подошли к кровати и вместе упали на нее, сбрасывая с себя одежду. Усевшись на кровати, вы показали вдове на ваш стоящий, как корабельная мачта, член. Бекки не потребовалось что-либо объяснять, она наклонилась над вами и стала ласкать ваш член своими монументальными дойками."
                 "И тут дверь скрипнула и в комнату зашел Эдди. Парень предусмотрительно разделся, а его член был направлен прямо на киску его мамашки."
-                $ _bejf_show_image("becky", "sexeddie", "eddieentry")
+                call ShowImage("becky", "sexeddie", "eddieentry")
 
                 if BeckyVar.get("PriestAdvice", 0) < 3:
                     if BeckyVar.get("EddieFailures", 0) == 0:
@@ -113,9 +91,9 @@ label BeckyEddieJoinFirst_EddieFailureCode:
 
     $ BeckyVar["EddieTryToFuck"] = 3
     $ Friends["eddie"] = max(Friends.get("eddie", 0) - 2, 0)
-    $ _bejf_slut_friends_increase("becky", 0, 0, 0, 35, 1, -1)
+    call SlutFriendsIncrease("becky", 0, 0, 0, 35, 1, -1)
     "Вы и миссис Блэнкеншип находитесь в ее спальне."
-    $ _bejf_show_image("becky", "sexeddie", "eddiespy")
+    call ShowImage("becky", "sexeddie", "eddiespy")
     if renpy.has_label("AddCleanScreen"):
         call AddCleanScreen
     elif renpy.has_label("add_clean_screen"):
@@ -132,8 +110,8 @@ label BeckyEddieJoinFirst_EddieFirstCumCode:
     "Услышав, что будет следующий раз, Эдди от счастья не сразу нашел слова. В конце концов он все же буркнул: \"Обещаю\"."
     "В любом случае, это не ваше дело, да и время уже позднее, так что вы пожали руку Эдди, поцеловали вдову и отправились домой."
 
-    $ _bejf_pregnancy_check("becky", "inside", 1, "eddie")
-    $ _bejf_pregnancy_check("becky", "mouthface", 1, "Вы")
+    call PregnancyCheck("becky", "inside", 1, "eddie")
+    call PregnancyCheck("becky", "mouthface", 1, "Вы")
     $ sluttiness["becky"] = sluttiness.get("becky", 0) + 5
     $ Friends["becky"] = Friends.get("becky", 0) + 1
     $ Friends["eddie"] = Friends.get("eddie", 0) + 5

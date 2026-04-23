@@ -12,11 +12,5 @@ label ShowBeckyPortrait():
     elif PussyVisible.get(GirlName, 0):
         call ShowImage(GirlName, "portraits", "nakedpussy" + str(renpy.random.randint(1, 2)))
     else:
-        $ _becky_portrait = renpy.random.choice([
-            "images/becky/portraits/portrait_1.png",
-            "images/becky/portraits/portrait_2.png",
-            "images/becky/portraits/portrait_3.png",
-            "images/becky/portraits/portrait_4.png",
-        ])
-        call ShowImage("", "", _becky_portrait)
+        call ShowImage(GirlName, "portraits", "portrait" + str(renpy.random.randint(1, 3)))
     return

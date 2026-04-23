@@ -1,6 +1,7 @@
 init 6 python:
     ForestSpringRoom = Room(
         code_name="ForestSpring",
+        group_name=ROOM_GROUP_FOREST,
         display_name="Родник",
         bg_picture="images/forest/seclude_lake_1.png",
         descriptions=[

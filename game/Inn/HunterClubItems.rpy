@@ -5,10 +5,11 @@ init 4 python:
         description="Бутылка крепкого эля, которой можно подкрепиться в дороге или продать обратно торговцу.",
         actions=[
             ObjectAction(
-                action_id="drink_ale",
+                action_id="drink",
                 label="Выпить эль",
                 hook="call",
-                target="UseAleItem",
+                target="UseDrinkItem",
+                args=("drink_ale_001",),
             ),
         ],
         price=2,
@@ -18,6 +19,12 @@ init 4 python:
         custom_properties={
             "item_kind": "drink",
             "drink_kind": "ale",
+            "consume_action": "drink",
+            "consume_minutes": 30,
+            "consume_energy": 0,
+            "consume_fun": 10,
+            "consume_text": "Вы аккуратно вынимаете пробку, не выбрасываете ее и неторопливо допиваете бутылку эля. После этого в вещах у вас остаются пустая бутылка и пробка.",
+            "consume_outputs": (("empty_bottle_001", 1), ("cork_001", 1)),
             "gift_value": 1,
             "social_fun_bonus": 2,
             "social_openness_bonus": 1,
@@ -377,25 +384,6 @@ init 4 python:
             "spawn_rarity": "обычный во влажных местах",
         },
     )
-
-
-label UseAleItem:
-    if int(_player_item_count_by_id("drink_ale_001") or 0) <= 0:
-        $ MainTxt = "При себе у вас больше нет бутылки эля."
-        $ CurLocDesc = MainTxt
-        call PlayerCardInventoryMenu
-        return
-
-    $ _player_remove_item_by_id("drink_ale_001", 1)
-    $ _drink_result = player_drink_item("drink_ale_001")
-    $ _player_add_item_by_id("empty_bottle_001", 1)
-    $ _player_add_item_by_id("cork_001", 1)
-    $ MainTxt = "Вы аккуратно вынимаете пробку, не выбрасываете ее и неторопливо допиваете бутылку эля. После этого в вещах у вас остаются пустая бутылка и пробка. %s" % str((_drink_result or {}).get("text", "") or "")
-    $ CurLocDesc = MainTxt
-    call stat
-    call PlayerCardInventoryMenu
-    return
-
 
 label UseBandageItem:
     if int(_player_item_count_by_id("bandage_001") or 0) <= 0:

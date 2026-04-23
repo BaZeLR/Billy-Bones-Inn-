@@ -22,7 +22,47 @@ label MongolTalk:
     if MongolVar['AskSawStolen'] == 0 and MongolVar['SawStolen'] == 1 and StolenHorseDays > 0:
         $ current_action_items.append(MenuItem("Спросить, почему он до этого скрылся при виде вас", Call("MongolTalkApply", "saw_stolen")))
 
+    if int(ClaraVar.get("merchant_contact_unlocked", 0) or 0) == 1 and int(ClaraVar.get("merchant_contact_month_key", -1) or -1) != (int(year or 0) * 100 + int(month or 0)):
+        $ current_action_items.append(MenuItem("Спросить про особый товар", Call("ClaraSecretMerchantMenu")))
+
     $ current_action_items.append(MenuItem("Закончить разговор", Call("MarketPlaceRestore")))
+    return
+
+
+label ClaraSecretMerchantMenu:
+    $ current_action_title = "Тайный товар"
+    $ current_action_content = None
+    $ MainTxt = "Монгол сразу перестает лыбиться так широко и чуть косится по сторонам. \"Если ты от Клариссы, то кое-что редкое у меня для своих есть. Но не шуми, чувэрло. Такое добро показываю только раз в месяц и не каждому подряд.\""
+    $ CurLocDesc = MainTxt
+    $ current_action_items = [
+        MenuItem("Купить роскошное мыло за 45", Call("ClaraSecretMerchantBuy", "luxury_soap_001", 45)),
+        MenuItem("Купить пряную настойку за 60", Call("ClaraSecretMerchantBuy", "libido_tincture_001", 60)),
+        MenuItem("Купить особый гриб за 35", Call("ClaraSecretMerchantBuy", "special_mushroom_001", 35)),
+        MenuItem("Назад", Call("MongolTalk")),
+    ]
+    return
+
+
+label ClaraSecretMerchantBuy(item_id="", price_value=0):
+    $ _secret_item = str(item_id or "").strip()
+    $ _secret_price = max(0, int(price_value or 0))
+    if int(ClaraVar.get("merchant_contact_unlocked", 0) or 0) != 1 or int(ClaraVar.get("merchant_contact_month_key", -1) or -1) == (int(year or 0) * 100 + int(month or 0)):
+        $ MainTxt = "Монгол разводит руками: \"На этот месяц все. В другой раз приходи, когда новый товар подвезу.\""
+        $ CurLocDesc = MainTxt
+        call MongolTalk
+        return
+    if int(money or 0) < _secret_price:
+        $ MainTxt = "На такой товар у вас сейчас не хватает денег."
+        $ CurLocDesc = MainTxt
+        call ClaraSecretMerchantMenu
+        return
+    $ money = int(money or 0) - _secret_price
+    $ _player_add_item_by_id(_secret_item, 1)
+    $ ClaraVar["merchant_contact_month_key"] = int(year or 0) * 100 + int(month or 0)
+    $ MainTxt = "Монгол быстро прячет деньги и столь же быстро передает вам сверток. \"На этот месяц хватит. Дальше только в следующий раз,\" предупреждает он."
+    $ CurLocDesc = MainTxt
+    call stat
+    call MongolTalk
     return
 
 
@@ -62,6 +102,7 @@ label MongolTalkApply(topic_code=""):
                 $ CurLocDesc = MainTxt
                 $ MongolVar['HorsePrice'] -= 200
                 $ money -= MongolVar['HorsePrice']
+                $ HorsePurchasePrice = int(MongolVar['HorsePrice'] or 0)
                 $ MyStallion = renpy.python.py_eval("RandomStallionNameCode()")
                 $ HorseSaddled = 1
                 $ MongolVar['HorsesBought'] += 1
@@ -84,6 +125,7 @@ label MongolTalkApply(topic_code=""):
         $ MainTxt = "Отсчитав Монголу нужное количество лавэ, вы стали счастливым обладателем коняшки со всей сбруей. И не просто коняшки, а голодной коняшки, так как едва очутившись на конюшне лошадка жадно набросилась на овес и сено.\n\n\"А овес ведь нынче дорог,\" запоздало вспомнили вы."
         $ CurLocDesc = MainTxt
         $ money -= MongolVar['HorsePrice']
+        $ HorsePurchasePrice = int(MongolVar['HorsePrice'] or 0)
         $ MyStallion = renpy.python.py_eval("RandomStallionNameCode()")
         $ HorseSaddled = 1
         $ MongolVar['HorsesBought'] += 1

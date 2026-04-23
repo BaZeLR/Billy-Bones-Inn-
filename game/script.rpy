@@ -50,12 +50,13 @@
             renpy.notify(f"Error loading intro sequence: {e}")
             return default_intro_sequence
 
-
+# explicit picture are allowed in this project
 init -95 python:
     # Unified in-script game calendar/time engine.
     # Keeps legacy globals while adding total counters.
 
-    CALENDAR_START_YEAR = 1100
+    CALENDAR_START_CYCLE = 1100
+    CALENDAR_START_YEAR = CALENDAR_START_CYCLE
 
     WEEKDAY_NAMES_EN = (
         "Monday",
@@ -76,32 +77,34 @@ init -95 python:
         "Воскресенье",
     )
     MONTH_NAMES_EN = (
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
+        "First Moon Period",
+        "Second Moon Period",
+        "Third Moon Period",
+        "Fourth Moon Period",
+        "Fifth Moon Period",
+        "Sixth Moon Period",
+        "Seventh Moon Period",
+        "Eighth Moon Period",
+        "Ninth Moon Period",
+        "Tenth Moon Period",
+        "Eleventh Moon Period",
+        "Twelfth Moon Period",
+        "Thirteenth Moon Period",
     )
     MONTH_NAMES_RU = (
-        "Января",
-        "Февраля",
-        "Марта",
-        "Апреля",
-        "Мая",
-        "Июня",
-        "Июля",
-        "Августа",
-        "Сентября",
-        "Октября",
-        "Ноября",
-        "Декабря",
+        "Первый лунный период",
+        "Второй лунный период",
+        "Третий лунный период",
+        "Четвертый лунный период",
+        "Пятый лунный период",
+        "Шестой лунный период",
+        "Седьмой лунный период",
+        "Восьмой лунный период",
+        "Девятый лунный период",
+        "Десятый лунный период",
+        "Одиннадцатый лунный период",
+        "Двенадцатый лунный период",
+        "Тринадцатый лунный период",
     )
 
     TIME_SLOT_INFO = {
@@ -118,21 +121,156 @@ init -95 python:
         except Exception:
             return default
 
+    def _cal_is_long_cycle(cycle):
+        cycle = _cal_int(cycle, CALENDAR_START_CYCLE)
+        return ((cycle - CALENDAR_START_CYCLE + 1) % 4) == 0
+
+    def _cal_periods_in_cycle(cycle):
+        return 13 if _cal_is_long_cycle(cycle) else 12
+
     def _cal_days_in_month(month, year):
-        if month == 2:
+        month = _cal_int(month, 1)
+        year = _cal_int(year, CALENDAR_START_CYCLE)
+        if month < 1:
             return 28
-        if month in (4, 6, 9, 11):
-            return 30
-        return 31
+        if month == 13:
+            return 29 if _cal_is_long_cycle(year) else 28
+        return 28
 
     def _cal_days_before_month(month, year):
-        month = max(1, min(12, _cal_int(month, 1)))
+        year = _cal_int(year, CALENDAR_START_CYCLE)
+        month = max(1, min(_cal_periods_in_cycle(year), _cal_int(month, 1)))
         total = 0
         m = 1
         while m < month:
             total += _cal_days_in_month(m, year)
             m += 1
         return total
+
+    def _cal_days_in_cycle(cycle):
+        total = 0
+        periods = _cal_periods_in_cycle(cycle)
+        period = 1
+        while period <= periods:
+            total += _cal_days_in_month(period, cycle)
+            period += 1
+        return total
+
+    def _cal_days_before_cycle(cycle):
+        cycle = _cal_int(cycle, CALENDAR_START_CYCLE)
+        total = 0
+        current = CALENDAR_START_CYCLE
+        while current < cycle:
+            total += _cal_days_in_cycle(current)
+            current += 1
+        return total
+
+    def _cal_periods_before_cycle(cycle):
+        cycle = _cal_int(cycle, CALENDAR_START_CYCLE)
+        total = 0
+        current = CALENDAR_START_CYCLE
+        while current < cycle:
+            total += _cal_periods_in_cycle(current)
+            current += 1
+        return total
+
+    def calendar_day_number_to_parts(day_number):
+        day_index = max(0, _cal_int(day_number, 0))
+        cycle = CALENDAR_START_CYCLE
+        remaining = day_index
+
+        while remaining >= _cal_days_in_cycle(cycle):
+            remaining -= _cal_days_in_cycle(cycle)
+            cycle += 1
+
+        month = 1
+        while remaining >= _cal_days_in_month(month, cycle):
+            remaining -= _cal_days_in_month(month, cycle)
+            month += 1
+
+        day_value = remaining + 1
+        week_value = (day_index % 7) + 1
+        return {
+            "day": day_value,
+            "month": month,
+            "year": cycle,
+            "week": week_value,
+        }
+
+    def calendar_format_date_ru(day_value=None, month_value=None, year_value=None, week_value=None, include_weekday=True):
+        cycle = _cal_int(year if year_value is None else year_value, CALENDAR_START_CYCLE)
+        period = _cal_int(month if month_value is None else month_value, 1)
+        day_num = _cal_int(day if day_value is None else day_value, 1)
+        weekday = _cal_int(week if week_value is None else week_value, 1)
+
+        period = max(1, min(_cal_periods_in_cycle(cycle), period))
+        weekday = max(1, min(7, weekday))
+
+        base = "%d %s, цикл %d" % (day_num, MONTH_NAMES_RU[period - 1], cycle)
+        if include_weekday:
+            return "%s, %s" % (WEEKDAY_NAMES_RU[weekday - 1], base)
+        return base
+
+    def calendar_format_date_en(day_value=None, month_value=None, year_value=None, week_value=None, include_weekday=True):
+        cycle = _cal_int(year if year_value is None else year_value, CALENDAR_START_CYCLE)
+        period = _cal_int(month if month_value is None else month_value, 1)
+        day_num = _cal_int(day if day_value is None else day_value, 1)
+        weekday = _cal_int(week if week_value is None else week_value, 1)
+
+        period = max(1, min(_cal_periods_in_cycle(cycle), period))
+        weekday = max(1, min(7, weekday))
+
+        base = "%d %s, Cycle %d" % (day_num, MONTH_NAMES_EN[period - 1], cycle)
+        if include_weekday:
+            return "%s, %s" % (WEEKDAY_NAMES_EN[weekday - 1], base)
+        return base
+
+    def calendar_birth_record_from_ordinal(day_ordinal, cycle=None, birth_cycle=None):
+        cycle_value = _cal_int(year if cycle is None else cycle, CALENDAR_START_CYCLE)
+        ordinal = max(0, _cal_int(day_ordinal, 0))
+        cycle_days = _cal_days_in_cycle(cycle_value)
+        if cycle_days <= 0:
+            cycle_days = 336
+        ordinal = ordinal % cycle_days
+        parts = calendar_day_number_to_parts(_cal_days_before_cycle(cycle_value) + ordinal)
+        return {
+            "day": int(parts["day"]),
+            "month": int(parts["month"]),
+            "year": _cal_int(cycle_value if birth_cycle is None else birth_cycle, cycle_value),
+        }
+
+    def calendar_make_birth_record(age_years=0, day_value=None, month_value=None, cycle_value=None):
+        current_cycle = _cal_int(year, CALENDAR_START_CYCLE)
+        birth_cycle = _cal_int(current_cycle - max(0, _cal_int(age_years, 0)) if cycle_value is None else cycle_value, current_cycle)
+        periods = _cal_periods_in_cycle(birth_cycle)
+        birth_month = _cal_int(month if month_value is None else month_value, 1)
+        birth_month = max(1, min(periods, birth_month))
+        max_days = _cal_days_in_month(birth_month, birth_cycle)
+        if day_value is None:
+            birth_day = renpy.random.randint(1, max_days)
+        else:
+            birth_day = max(1, min(max_days, _cal_int(day_value, 1)))
+        return {
+            "day": int(birth_day),
+            "month": int(birth_month),
+            "year": int(birth_cycle),
+        }
+
+    def calendar_birth_record(value, fallback_age=None):
+        if isinstance(value, dict):
+            birth_cycle = _cal_int(value.get("year", _cal_int(year, CALENDAR_START_CYCLE) - max(0, _cal_int(fallback_age, 0))), _cal_int(year, CALENDAR_START_CYCLE))
+            birth_month = max(1, min(_cal_periods_in_cycle(birth_cycle), _cal_int(value.get("month", 1), 1)))
+            birth_day = max(1, min(_cal_days_in_month(birth_month, birth_cycle), _cal_int(value.get("day", 1), 1)))
+            return {
+                "day": int(birth_day),
+                "month": int(birth_month),
+                "year": int(birth_cycle),
+            }
+        return calendar_birth_record_from_ordinal(value, _cal_int(year, CALENDAR_START_CYCLE), _cal_int(year, CALENDAR_START_CYCLE) - max(0, _cal_int(fallback_age, 0)))
+
+    def calendar_birth_matches_today(value, fallback_age=None):
+        birth = calendar_birth_record(value, fallback_age)
+        return int(birth.get("day", 0) or 0) == _cal_int(day, 1) and int(birth.get("month", 0) or 0) == _cal_int(month, 1)
 
     def _cal_sync_slot_from_hour():
         global time, hour
@@ -178,20 +316,20 @@ init -95 python:
         except Exception:
             month = 1
         try:
-            year = _cal_int(year, CALENDAR_START_YEAR)
+            year = _cal_int(year, CALENDAR_START_CYCLE)
         except Exception:
-            year = CALENDAR_START_YEAR
+            year = CALENDAR_START_CYCLE
         try:
             week = _cal_int(week, 1)
         except Exception:
             week = 1
 
-        if year < CALENDAR_START_YEAR:
-            year = CALENDAR_START_YEAR
+        if year < CALENDAR_START_CYCLE:
+            year = CALENDAR_START_CYCLE
         if month < 1:
             month = 1
-        while month > 12:
-            month -= 12
+        while month > _cal_periods_in_cycle(year):
+            month -= _cal_periods_in_cycle(year)
             year += 1
             try:
                 age
@@ -233,9 +371,10 @@ init -95 python:
         global month_name, week_name, month_name_en, week_name_en
         global calendar_month_name_ru, calendar_weekday_name_ru
         global calendar_month_name_en, calendar_weekday_name_en
+        global calendar_cycle_name_ru, calendar_cycle_name_en
         global calendar_time_slot_name_ru, calendar_time_slot_name_en
 
-        _year = _cal_int(year, CALENDAR_START_YEAR)
+        _year = _cal_int(year, CALENDAR_START_CYCLE)
         _month = _cal_int(month, 1)
         _day = _cal_int(day, 1)
         _week = _cal_int(week, 1)
@@ -243,8 +382,8 @@ init -95 python:
 
         if _month < 1:
             _month = 1
-        if _month > 12:
-            _month = 12
+        if _month > _cal_periods_in_cycle(_year):
+            _month = _cal_periods_in_cycle(_year)
         if _week < 1:
             _week = 1
         if _week > 7:
@@ -254,13 +393,13 @@ init -95 python:
         if _slot > 4:
             _slot = 4
 
-        dayspassed = (_year - CALENDAR_START_YEAR) * 365 + _cal_days_before_month(_month, _year) + (_day - 1)
+        dayspassed = _cal_days_before_cycle(_year) + _cal_days_before_month(_month, _year) + (_day - 1)
         if dayspassed < 0:
             dayspassed = 0
 
         game_days_count = dayspassed
-        game_months_count = (_year - CALENDAR_START_YEAR) * 12 + (_month - 1)
-        game_years_count = _year - CALENDAR_START_YEAR
+        game_months_count = _cal_periods_before_cycle(_year) + (_month - 1)
+        game_years_count = _year - CALENDAR_START_CYCLE
         day_of_year = _cal_days_before_month(_month, _year) + _day
 
         week_name = WEEKDAY_NAMES_RU[_week - 1]
@@ -271,10 +410,12 @@ init -95 python:
         calendar_month_name_ru = month_name
         calendar_weekday_name_en = week_name_en
         calendar_month_name_en = month_name_en
+        calendar_cycle_name_ru = "Цикл %d" % _year
+        calendar_cycle_name_en = "Cycle %d" % _year
         calendar_time_slot_name_ru = TIME_SLOT_INFO[_slot]["name_ru"]
         calendar_time_slot_name_en = TIME_SLOT_INFO[_slot]["name_en"]
 
-        datestr = "%s, %d %s %d" % (week_name_en, _day, month_name_en, _year)
+        datestr = calendar_format_date_en(_day, _month, _year, _week, True)
 
     def calendar_sync_state():
         global hour, minute, day, month, year, week, location, time
@@ -289,7 +430,7 @@ init -95 python:
         try:
             year
         except Exception:
-            year = CALENDAR_START_YEAR
+            year = CALENDAR_START_CYCLE
         try:
             week
         except Exception:
@@ -614,5 +755,3 @@ label cinematic_intro:
         "Introduction sequence is not available yet."
     jump Intro
     return
-
-

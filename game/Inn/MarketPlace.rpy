@@ -23,7 +23,12 @@ init python:
             items.append(MenuItem(dog_room_action_caption("MarketPlace"), Call("IntDogTalk", "MarketPlace")))
 
         for market_object in MarketPlaceRoom.visible_objects():
-            if str(getattr(market_object, "object_id", "") or "") in ("grocery_route", "wine_route"):
+            if str(getattr(market_object, "object_id", "") or "") in (
+                "grocery_route",
+                "wine_route",
+                "guard_office",
+                "hunter_club_route",
+            ):
                 continue
             items.append(MenuItem(market_object.name, Call("MarketPlaceObjectMenu", market_object.object_id)))
 

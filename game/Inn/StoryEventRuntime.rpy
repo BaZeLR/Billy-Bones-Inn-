@@ -777,7 +777,7 @@ init python:
         return werecat_month_thanks_ready()
 
     def household_pests_cat_solution_hunter_rumor_ready():
-        return werecat_hunter_tease_offer_ready()
+        return werecat_hunter_tease_ready()
 
     def household_pests_bats_problem_breakfast_ready():
         return melissa_bat_breakfast_ready()
@@ -853,7 +853,8 @@ define melissaThreadList = [
     ], highlight=False, threaded=True),
     # clarissa_booklet_thread lead
     LThreadData(0, "melissa", "ClaraOverheard", None, [
-        ("melissaClaraOverheard_0", None, None, None, 1, None, "household_pests_clarissa_booklet_overheard_ready()", None, "TavernMain", "overheard", 0),
+        ("melissaClaraOverheard_0", None, None, None, 1, None, "household_pests_clarissa_booklet_overheard_ready() and int(ClaraVar.get('tavern_melissa_visit_count', 0) or 0) >= 2 and int(ClaraVar.get('tavern_melissa_overheard_2_seen', 0) or 0) == 0", None, "TavernMain", "overheard", 0),
+        ("melissaClaraOverheard_1", None, None, None, 1, None, "household_pests_clarissa_booklet_overheard_ready() and int(ClaraVar.get('tavern_melissa_overheard_2_seen', 0) or 0) == 1 and int(ClaraVar.get('tavern_melissa_overheard_3_seen', 0) or 0) == 0 and int(ClaraVar.get('tavern_melissa_visit_count', 0) or 0) >= 3 and int(MelissaVar.get('bats_episode', 0) or 0) >= 6", None, "TavernMain", "overheard", 1),
     ], highlight=False, threaded=True),
 ]
 
@@ -1011,15 +1012,32 @@ label story_amanda_street_entry:
 
 label melissaClaraOverheard_0:
     $ household_mark_runtime_event_seen("melissa_clara_overhear")
-    if melissa_clara_overhear_variant() == 0:
-        $ MainTxt = "Вы невольно задерживаетесь у соседнего стола и успеваете услышать, как Кларисса, давясь смехом, шепчет Мелиссе: \"У старой водокачки за лесом, где беседка, играли две собачки, как папа и соседка\".\n\nМелисса сначала краснеет до самых ушей, потом тоже не выдерживает и тихо прыскает. Похоже, такая пошлая прибаутка оседает у нее в голове куда глубже, чем она хотела бы признать."
-        $ sluttiness["melissa"] = min(100, int(sluttiness.get("melissa", 0) or 0) + 3)
-    else:
-        $ MainTxt = "Проходя через зал, вы замечаете, как Мелисса с Клариссой о чем-то переговариваются в стороне от общего шума. Разобрать слова не удается, зато до вас вполне отчетливо доносятся тихие хихиканья, влажные чмокающие звуки и приглушенные стоны. Когда вы оборачиваетесь, обе уже делают вид, что обсуждали что-то совершенно невинное."
+    $ ClaraVar["tavern_melissa_overheard_2_seen"] = 1
+    $ MainTxt = "Проходя мимо, вы слышите, как Мелисса, едва сдерживая смех, говорит Клариссе: \"Девчонка утром рано встала, песду о лавку почесала и села у окошка сечь, как бобик Жучку станет ебсть\".\n\nКларисса тут же подхватывает, уже совсем не скрывая довольной ухмылки: \"А бобик жарил Жучку раком, чего стесняться им, собакам!\" После этого обе разом заливаются таким дружным хохотом, будто давно уже спелись на этой пошлой волне."
+    $ sluttiness["melissa"] = min(100, int(sluttiness.get("melissa", 0) or 0) + 3)
+    $ otkroven["clara"] = min(20, int(otkroven.get("clara", 0) or 0) + 1)
     $ CurLocDesc = MainTxt
+    if renpy.loadable("images/clara/tavern_visit.png"):
+        call ShowImage("", "", "images/clara/tavern_visit.png")
     $ current_action_title = "Действия в трактире"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Отойти от чужого разговора", Call("TavernMainRestore"))]
+    $ story_thread_advance_current()
+    jump TavernMainView
+
+
+label melissaClaraOverheard_1:
+    $ household_mark_runtime_event_seen("melissa_clara_overhear")
+    $ ClaraVar["tavern_melissa_overheard_3_seen"] = 1
+    $ MainTxt = "Вы делаете вид, что заняты у барной стойки, но слух сам цепляет веселый шепот за спиной. Мелисса, уже откровенно дурачась, декламирует: \"Если б я была царица, говорит одна девица, я б пизду покрыла лаком и давала только раком\".\n\n\"Ой-ёй,\" тут же тянет Клара с ехидной ухмылкой, \"царь наш был мужичок скромный, у него был хуй огромный...\" Мелисса шутливо хлопает подружку по плечу и отвечает: \"Да говорю же, вот такой\", после чего раздвигает ладони сантиметров на двадцать.\n\nОбе многозначительно косятся на вас, а потом прыскают от смеха, пока вы изо всех сил делаете вид, будто целиком поглощены стойкой и делами трактира."
+    $ sluttiness["melissa"] = min(100, int(sluttiness.get("melissa", 0) or 0) + 4)
+    $ otkroven["clara"] = min(20, int(otkroven.get("clara", 0) or 0) + 2)
+    $ CurLocDesc = MainTxt
+    if renpy.loadable("images/clara/tavern_visit_size.png"):
+        call ShowImage("", "", "images/clara/tavern_visit_size.png")
+    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = [MenuItem("Сделать вид, что ничего не услышали", Call("TavernMainRestore"))]
     $ story_thread_advance_current()
     jump TavernMainView
 
@@ -1051,45 +1069,74 @@ label story_amanda_market_entry:
 label story_clara_market_booklet_0:
     $ SignalBlockTime = 1
     $ ClaraVar["market_intro_seen"] = 1
-    $ MainTxt = "На дневном рынке вы замечаете вашу очаровательную дочку винного поставщика. Вы уже собираетесь помахать ей, но Кларисса, едва встретившись с вами взглядом, поспешно набрасывает на голову капюшон плаща и тут же исчезает между рядами лавок.\n\nПохоже, у нее тут какие-то совсем частные дела, и узнавать себя она сейчас не хочет. Вы решаете выяснить, что это за тайны."
+    $ MainTxt = "На дневном рынке вы замечаете очаровательную дочку своего винного поставщика. Вы уже собираетесь приветственно махнуть ей рукой, но Кларисса, едва встретившись с вами взглядом, поспешно набрасывает на голову капюшон плаща и тут же исчезает между рядами лавок.\n\nПохоже, у нее здесь какие-то совсем частные дела, и узнавать себя она сейчас не хочет. Вы решаете выяснить, что это за тайны."
     $ CurLocDesc = MainTxt
-    call ShowImageSeq("general", "", "LocMarketPlace", 2)
-    $ current_action_title = "Кларисса на рынке"
-    $ current_action_content = None
-    $ current_action_items = [MenuItem("Продолжить идти по рынку", Jump("MarketPlaceView"))]
-    $ story_thread_advance_current()
-    jump MarketPlaceView
-
-
-label story_clara_market_booklet_1:
-    $ SignalBlockTime = 1
-    $ MainTxt = "В следующий раз, заметив Клариссу на рынке, вы уже заранее держитесь ближе и стараетесь не терять ее из виду. Девушка идет уверенно, но все равно время от времени проверяет, не узнал ли кто ее в толпе.\n\nНаконец она сворачивает к неприметному торговцу, которого не видно с центральных рядов. Судя по виду, тот торгует не совсем обычным товаром."
-    $ CurLocDesc = MainTxt
-    call ShowImageSeq("general", "", "LocMarketPlace", 2)
+    if renpy.loadable("images/clara/market_day.png"):
+        call ShowImage("", "", "images/clara/market_day.png")
+    else:
+        call ShowImageSeq("general", "", "LocMarketPlace", 2)
     menu:
         "Что сделать?"
-        "Проследить за Клариссой" if int(effective_player_exploration() or 0) >= 80:
+        "Попробовать проследить":
+            if int(effective_player_exploration() or 0) < 80:
+                $ MainTxt = "Вы стараетесь не отстать, но дневной рынок слишком шумный и тесный. Стоит вам замешкаться на пару шагов, как Кларисса ускользает между рядами и будто растворяется среди чужих спин.\n\nПохоже, без лучшей сноровки в слежке вы просто потеряете ее снова."
+                $ CurLocDesc = MainTxt
+                $ current_action_title = "Рынок"
+                $ current_action_content = None
+                $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
+                jump MarketPlaceView
             $ ClaraVar["booklet_market_seen"] = 1
-            $ MainTxt = "На этот раз вы не теряете Клариссу в толпе. Из укрытия видно достаточно: она обменивается с подозрительным торговцем короткими фразами и по одной передает ему тонкие книжечки, похожие на небольшие буклеты. Тот быстро сует их в сумку и так же быстро передает ей деньги.\n\nТеперь уже ясно, что речь идет не о простой прогулке по рынку. Кларисса что-то сбывает через этого таинственного торговца."
+            $ MainTxt = "На этот раз вы не теряете Клариссу в толпе. Держась в стороне, вы видите, как она сворачивает к неприметному торговцу, которого почти не видно с центральных рядов. Обмен короткий и явно привычный: Кларисса по одной передает ему тонкие книжечки, похожие на небольшие буклеты, а тот быстро сует их в сумку и так же быстро отсчитывает ей деньги.\n\nТеперь уже ясно, что речь идет не о простой прогулке по рынку. Кларисса что-то сбывает через этого таинственного торговца."
             $ CurLocDesc = MainTxt
+            if renpy.loadable("images/clara/market_bookletDeal.png"):
+                call ShowImage("", "", "images/clara/market_bookletDeal.png")
             $ current_action_title = "Слежка на рынке"
             $ current_action_content = None
-            $ current_action_items = [MenuItem("Тихо уйти", Jump("MarketPlaceView"))]
+            $ current_action_items = [MenuItem("Тихо уйти", Call("MarketPlaceRestore"))]
             if int(MelissaVar.get("drawings_found", 0) or 0) == 1:
                 $ current_action_items.insert(0, MenuItem("Подойти к Клариссе и торговцу", Call("story_clara_market_booklet_confront")))
             $ story_thread_advance_current()
-            jump MarketPlaceView
-        "Попробовать проследить":
-            $ MainTxt = "Вы пытаетесь не отстать, но рынок слишком шумный и тесный. Стоит вам задержаться на пару шагов, как Кларисса ускользает между рядами и будто растворяется среди чужих спин. Похоже, без лучшей сноровки в слежке вы просто потеряете ее снова."
-            $ CurLocDesc = MainTxt
-            $ current_action_title = "Рынок"
-            $ current_action_content = None
-            $ current_action_items = [MenuItem("Продолжить идти по рынку", Jump("MarketPlaceView"))]
+            $ story_thread_advance_current()
             jump MarketPlaceView
         "Не вмешиваться":
             $ current_action_title = "Рынок"
             $ current_action_content = None
-            $ current_action_items = [MenuItem("Продолжить идти по рынку", Jump("MarketPlaceView"))]
+            $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
+            jump MarketPlaceView
+
+
+label story_clara_market_booklet_1:
+    $ SignalBlockTime = 1
+    $ MainTxt = "В следующий раз, заметив Клариссу на дневном рынке, вы уже не торопитесь окликнуть ее, а стараетесь держаться чуть поодаль. Девушка идет быстро и уверенно, но все равно время от времени проверяет, не узнал ли кто ее в толпе.\n\nЕсли уж вы хотите узнать, чем она занимается, сейчас самое время попробовать проследить за ней."
+    $ CurLocDesc = MainTxt
+    if renpy.loadable("images/clara/market_day.png"):
+        call ShowImage("", "", "images/clara/market_day.png")
+    else:
+        call ShowImageSeq("general", "", "LocMarketPlace", 2)
+    menu:
+        "Что сделать?"
+        "Попробовать проследить":
+            if int(effective_player_exploration() or 0) < 80:
+                $ MainTxt = "Вы стараетесь не отстать, но дневной рынок слишком шумный и тесный. Стоит вам замешкаться на пару шагов, как Кларисса ускользает между рядами и будто растворяется среди чужих спин.\n\nПохоже, без лучшей сноровки в слежке вы просто потеряете ее снова."
+                $ CurLocDesc = MainTxt
+                $ current_action_title = "Рынок"
+                $ current_action_content = None
+                $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
+                jump MarketPlaceView
+            $ ClaraVar["booklet_market_seen"] = 1
+            $ MainTxt = "На этот раз вы не теряете Клариссу в толпе. Держась в стороне, вы видите, как она сворачивает к неприметному торговцу, которого почти не видно с центральных рядов. Обмен короткий и явно привычный: Кларисса по одной передает ему тонкие книжечки, похожие на небольшие буклеты, а тот быстро сует их в сумку и так же быстро отсчитывает ей деньги.\n\nТеперь уже ясно, что речь идет не о простой прогулке по рынку. Кларисса что-то сбывает через этого таинственного торговца."
+            $ CurLocDesc = MainTxt
+            $ current_action_title = "Слежка на рынке"
+            $ current_action_content = None
+            $ current_action_items = [MenuItem("Тихо уйти", Call("MarketPlaceRestore"))]
+            if int(MelissaVar.get("drawings_found", 0) or 0) == 1:
+                $ current_action_items.insert(0, MenuItem("Подойти к Клариссе и торговцу", Call("story_clara_market_booklet_confront")))
+            $ story_thread_advance_current()
+            jump MarketPlaceView
+        "Не вмешиваться":
+            $ current_action_title = "Рынок"
+            $ current_action_content = None
+            $ current_action_items = [MenuItem("Продолжить идти по рынку", Call("MarketPlaceRestore"))]
             jump MarketPlaceView
 
 
@@ -1105,10 +1152,12 @@ label story_clara_market_booklet_confront:
     $ otkroven["clara"] = min(20, int(otkroven.get("clara", 0) or 0) + _clara_market_bonus)
     $ Friends["clara"] = min(20, int(Friends.get("clara", 0) or 0) + max(1, _clara_market_bonus - 1))
     if str(MyCurDress or "") == "thiefdress" and int(Friends.get("clara", 0) or 0) >= 7:
-        $ MainTxt = "Вы выходите из-за лотка без лишней суеты и даете Клариссе понять, что уже видели похожие непристойные рисунки у Мелиссы. На секунду она белеет, но, заметив ваш бандитский костюм и поняв, что вы не собираетесь устраивать сцену, быстро берет себя в руки.\n\n\"Значит, ты уже все понял,\" тихо говорит она. \"Тогда не ори на весь рынок. Да, это мои буклеты. И да, через него я их иногда сбываю. Если хочешь говорить об этом дальше, говори как человек, который умеет держать язык за зубами.\"\n\nТорговец только ухмыляется и, прищурившись, кивает вам уже без прежней настороженности. Похоже, с этого дня он готов показывать вам свой особый товар — но не чаще раза в месяц."
+        $ MainTxt = "Вы выходите из-за лотка без лишней суеты и даете Клариссе понять, что уже видели похожие непристойные рисунки у Мелиссы. На секунду она белеет, но, заметив ваш бандитский костюм и поняв, что вы не собираетесь устраивать сцену, быстро берет себя в руки.\n\nКларисса коротко просит не устраивать разговор прямо здесь, а таинственный торговец запоминает вас уже без прежней враждебности. Похоже, с этого дня он готов показывать вам свой особый товар не чаще раза в месяц, а сама Кларисса становится с вами заметно откровеннее."
     else:
-        $ MainTxt = "Вы подходите ближе и спокойно даете понять Клариссе, что уже видели похожие непристойные рисунки и догадываетесь, чем она тут занимается. Девушка сразу напрягается, но, услышав, что вы не собираетесь ее выдавать, все же выдыхает.\n\n\"Ладно... ты не слепой,\" признается она тихо. \"Но если хочешь, чтобы я и дальше говорила откровенно, без шума и нравоучений.\" Торговец рядом молча запоминает вас взглядом. Похоже, теперь и он будет считать вас своим человеком — хотя слишком доверять этому все равно не стоит."
+        $ MainTxt = "Вы подходите ближе и спокойно даете понять Клариссе, что уже видели похожие непристойные рисунки и догадываетесь, чем она тут занимается. Девушка сразу напрягается, но, услышав, что вы не собираетесь ее выдавать, все же выдыхает.\n\nБез долгих разговоров Кларисса просит не поднимать шум на рынке. Торговец рядом молча запоминает вас взглядом. Похоже, теперь и он будет считать вас своим человеком, а сама Кларисса станет откровеннее лишь если решит, что вам действительно можно доверять."
     $ CurLocDesc = MainTxt
+    if renpy.loadable("images/clara/market_bookletDeal.png"):
+        call ShowImage("", "", "images/clara/market_bookletDeal.png")
     $ current_action_title = "Кларисса и тайный торговец"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Отойти и оставить их", Jump("MarketPlaceView"))]
@@ -1118,47 +1167,48 @@ label story_clara_market_booklet_confront:
 label story_clara_market_booklet_2:
     $ SignalBlockTime = 1
     $ ClaraVar["market_evening_intro_seen"] = 1
-    $ MainTxt = "Вечером вы снова замечаете Клариссу на рынке. Днем она хотя бы пыталась выглядеть так, будто просто гуляет между рядами, но сейчас видно, что она идет с конкретной целью. Стоит ей заметить ваш взгляд, как девушка чуть сильнее натягивает капюшон и быстро уходит в сторону закутка у конного торга.\n\nПохоже, на этот раз дело идет уже не о книжечках, а о чем-то более грязном. Вы решаете в следующий раз подойти к слежке куда осторожнее."
+    $ MainTxt = "Вечером вы снова замечаете Клариссу на рынке. На этот раз видно, что она идет с конкретной целью. Стоит ей заметить ваш взгляд, как девушка чуть сильнее натягивает капюшон и быстро уходит в сторону закутка у конного торга.\n\nПохоже, на этот раз дело идет уже не о книжечках, а о чем-то более грязном."
     $ CurLocDesc = MainTxt
-    if renpy.loadable("images/market/LocMarketPlace2.jpg"):
+    if renpy.loadable("images/clara/market_night.png"):
+        call ShowImage("", "", "images/clara/market_night.png")
+    elif renpy.loadable("images/market/LocMarketPlace2.jpg"):
         call ShowImage("", "", "images/market/LocMarketPlace2.jpg")
-    $ current_action_title = "Кларисса на вечернем рынке"
-    $ current_action_content = None
-    $ current_action_items = [MenuItem("Остаться пока в стороне", Jump("MarketPlaceView"))]
-    $ story_thread_advance_current()
-    jump MarketPlaceView
+    menu:
+        "Что сделать?"
+        "Тихо проследить за Клариссой":
+            if int(effective_player_exploration() or 0) < 100:
+                $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам задеть чью-то корзину и чуть замешкаться, как Кларисса вместе с Монголом растворяются в темном закутке между пустеющими рядами. Без лучшей сноровки здесь их не удержать."
+                $ CurLocDesc = MainTxt
+                $ current_action_title = "Вечерний рынок"
+                $ current_action_content = None
+                $ current_action_items = [MenuItem("Вернуться к своим делам", Call("MarketPlaceRestore"))]
+                jump MarketPlaceView
+            $ story_thread_advance_current()
+            jump expression "story_clara_market_booklet_3"
+        "Не рисковать":
+            $ current_action_title = "Вечерний рынок"
+            $ current_action_content = None
+            $ current_action_items = [MenuItem("Вернуться к своим делам", Call("MarketPlaceRestore"))]
+            jump MarketPlaceView
 
 
 label story_clara_market_booklet_3:
     $ SignalBlockTime = 1
-    $ MainTxt = "На этот раз вы заранее занимаете место в тени лавок и ждете, когда Кларисса снова уйдет к дальнему краю площади. Там, где днем снуют покупатели, вечером остается куда больше темных пятен и укромных проходов. Если уж следить за ней сейчас, то нужна куда лучшая сноровка, чем средь бела дня."
+    $ MainTxt = "На этот раз вы держитесь достаточно далеко и не выдаете себя ни шагом, ни тенью. Кларисса уводит вас к самому краю рынка, где ее уже ждет Монгол. Разговор идет быстро и вполголоса, но вы успеваете разобрать главное.\n\nКларисса велит ему взять не первую попавшуюся клячу, а хорошую лошадь, чтобы потом продать ее с наваром. Деньги она требует делить честно, потому что именно она нашла покупателя и подсказала, где можно взять товар так, чтобы шум поднялся не сразу. Монгол в ответ ухмыляется, обещает свою долю и, будто нарочно, поддевает ее, что в ее любимом бандитском костюме она выглядела бы среди его людей вовсе как своя.\n\nТеперь уже ясно, что Кларисса не просто прячет от вас книжечки. Она сознательно полезла в настоящую грязь."
     $ CurLocDesc = MainTxt
-    if renpy.loadable("images/market/mistery_merchant.png"):
+    if renpy.loadable("images/clara/market_night.png"):
+        call ShowImage("", "", "images/clara/market_night.png")
+    elif renpy.loadable("images/market/mistery_merchant.png"):
         call ShowImage("", "", "images/market/mistery_merchant.png")
-    menu:
-        "Что сделать?"
-        "Тихо проследить за Клариссой" if int(effective_player_exploration() or 0) >= 100:
-            $ ClaraVar["mongol_theft_seen"] = 1
-            $ otkroven["clara"] = min(20, int(otkroven.get("clara", 0) or 0) + 1)
-            $ MainTxt = "На этот раз вы держитесь достаточно далеко и не выдаете себя ни шагом, ни тенью. Кларисса уводит вас к самому краю рынка, где ее уже ждет Монгол. Разговор идет быстро и вполголоса, но вы успеваете разобрать главное.\n\nКларисса велит ему взять не первую попавшуюся клячу, а хорошую лошадь, чтобы потом продать ее с наваром. Деньги она требует делить честно, потому что именно она нашла покупателя и подсказала, где можно взять товар так, чтобы шум поднялся не сразу. Монгол в ответ ухмыляется, обещает свою долю и, будто нарочно, поддевает ее, что в ее любимом бандитском костюме она выглядела бы среди его людей вовсе как своя.\n\nТеперь уже ясно, что Кларисса не просто прячет от вас книжечки. Она сознательно полезла в настоящую грязь."
-            $ CurLocDesc = MainTxt
-            $ current_action_title = "Подслушанный сговор"
-            $ current_action_content = None
-            $ current_action_items = [MenuItem("Запомнить услышанное и уйти", Jump("MarketPlaceView"))]
-            $ story_thread_advance_current()
-            jump MarketPlaceView
-        "Попробовать проследить":
-            $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам задеть чью-то корзину и чуть замешкаться, как Кларисса вместе с Монголом растворяются в темном закутке между пустеющими рядами. Без лучшей сноровки здесь их не удержать."
-            $ CurLocDesc = MainTxt
-            $ current_action_title = "Вечерний рынок"
-            $ current_action_content = None
-            $ current_action_items = [MenuItem("Вернуться к своим делам", Jump("MarketPlaceView"))]
-            jump MarketPlaceView
-        "Не рисковать":
-            $ current_action_title = "Вечерний рынок"
-            $ current_action_content = None
-            $ current_action_items = [MenuItem("Вернуться к своим делам", Jump("MarketPlaceView"))]
-            jump MarketPlaceView
+    $ ClaraVar["mongol_theft_seen"] = 1
+    $ otkroven["clara"] = min(20, int(otkroven.get("clara", 0) or 0) + 1)
+    if renpy.loadable("images/clara/mongolTalk.png"):
+        call ShowImage("", "", "images/clara/mongolTalk.png")
+    $ current_action_title = "Подслушанный сговор"
+    $ current_action_content = None
+    $ current_action_items = [MenuItem("Запомнить услышанное и уйти", Call("MarketPlaceRestore"))]
+    $ story_thread_advance_current()
+    jump MarketPlaceView
 
 
 label story_clara_market_booklet_4:
@@ -1174,13 +1224,14 @@ label story_clara_market_booklet_4:
     $ Friends["clara"] = min(20, int(Friends.get("clara", 0) or 0) + max(1, _clara_escape_bonus - 1))
     $ MainTxt = "Вы дожидаетесь удобного момента и без окриков говорите Клариссе, что видели ее вечерний разговор с Монголом. Девушка сначала белеет, потом зло сжимает губы, но быстро понимает, что вы пришли не сдавать ее отцу.\n\n\"Да, это я его подбила,\" признается она наконец. \"Мне нужны деньги. Отец уже подбирает мне старого хрыча в столице, и весь этот брак будет не для меня, а для его торговли. Я не собираюсь ехать туда смирной куклой.\" Она нервно усмехается и добавляет, что книжечки, рисунки и все разговоры про свободу для нее давно перестали быть просто романтической чушью. \"Хочется хоть раз жить не по чужому счету. А Монгол обещал, что если я соберу достаточно денег, то в его тайном кругу мне найдут место. Хоть кем. Хоть рисовальщицей, хоть этой их девкой для сценок. Знаю, звучит грязно. Но это все равно лучше, чем лечь под старого вонючего дурака по приказу отца.\"\n\nСказав это, Кларисса смотрит на вас уже не как на случайного покупателя, а как на человека, который теперь знает слишком много."
     $ CurLocDesc = MainTxt
+    if renpy.loadable("images/clara/mongolTalk.png"):
+        call ShowImage("", "", "images/clara/mongolTalk.png")
     $ current_action_title = "Откровение Клариссы"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Оставить услышанное между вами", Call("IntClaraTalkRefresh", "clara"))]
     $ _paged_text = str(MainTxt or "")
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
     $ story_thread_advance_current()
-    call IntClaraTalkRefresh("clara")
     return
 
 
@@ -1193,11 +1244,11 @@ label story_clara_market_booklet_5:
         call ShowImage("", "", "images/general/hunter_store_catInfo.png")
     $ current_action_title = "Охотничьи слухи"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Идти проверить колодки у караулки", Jump("MarketPlace"))]
+    $ current_action_items = [MenuItem("Идти проверить колодки у караулки", Jump("CityGuard")), MenuItem("Остаться в охотничьем клубе", Call("HunterClubRestore"))]
     $ _paged_text = str(MainTxt or "")
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
     $ story_thread_advance_current()
-    jump HunterClub
+    return
 
 
 label story_clara_market_booklet_6:
@@ -1209,11 +1260,11 @@ label story_clara_market_booklet_6:
         call ShowImage("", "", "images/mongolStock.png")
     $ current_action_title = "Монгол в колодках"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Запомнить его просьбу", Return())]
+    $ current_action_items = [MenuItem("Запомнить его просьбу", Call("CityGuardRestore"))]
     $ _paged_text = str(MainTxt or "")
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
     $ story_thread_advance_current()
-    jump CityGuard
+    return
 
 
 label story_clara_market_booklet_7:
@@ -1224,12 +1275,12 @@ label story_clara_market_booklet_7:
         call ShowImage("", "", "images/mongolStock.png")
     $ current_action_title = "Ночная караулка"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Уйти и вернуться позже", Return())]
+    $ current_action_items = [MenuItem("Уйти и вернуться позже", Call("CityGuardRestore"))]
     if int(productnum or 0) > 0:
         $ current_action_items.insert(0, MenuItem("Передать Монголу еду из трактира", Call("story_clara_market_booklet_feed_mongol")))
     $ _paged_text = str(MainTxt or "")
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
-    jump CityGuard
+    return
 
 
 label story_clara_market_booklet_feed_mongol:
@@ -1239,11 +1290,11 @@ label story_clara_market_booklet_feed_mongol:
     $ CurLocDesc = MainTxt
     $ current_action_title = "Ночная караулка"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Оставить Монгола жевать в темноте", Return())]
+    $ current_action_items = [MenuItem("Оставить Монгола жевать в темноте", Call("CityGuardRestore"))]
     $ _paged_text = str(MainTxt or "")
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
     $ story_thread_advance_current()
-    jump CityGuard
+    return
 
 
 label story_clara_market_booklet_8:
@@ -1252,12 +1303,12 @@ label story_clara_market_booklet_8:
     $ CurLocDesc = MainTxt
     $ current_action_title = "Заказ у Драупнира"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Не заказывать пока", Return())]
+    $ current_action_items = [MenuItem("Не заказывать пока", Call("StolyarWorkshopBuildActions"))]
     if int(money or 0) >= 40:
         $ current_action_items.insert(0, MenuItem("Заплатить 40 мараведи за тонкие отмычки", Call("story_clara_market_booklet_lockpicks_order")))
     $ _paged_text = str(MainTxt or "")
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
-    jump StolyarWorkshop
+    return
 
 
 label story_clara_market_booklet_lockpicks_order:
@@ -1267,11 +1318,11 @@ label story_clara_market_booklet_lockpicks_order:
     $ CurLocDesc = MainTxt
     $ current_action_title = "Заказ у Драупнира"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Спрятать сверток и уйти", Return())]
+    $ current_action_items = [MenuItem("Спрятать сверток и уйти", Call("StolyarWorkshopBuildActions"))]
     $ _paged_text = str(MainTxt or "")
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
     $ story_thread_advance_current()
-    jump StolyarWorkshop
+    return
 
 
 label story_clara_market_booklet_9:
@@ -1282,12 +1333,12 @@ label story_clara_market_booklet_9:
         call ShowImage("", "", "images/mongolStock.png")
     $ current_action_title = "Побег Монгола"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Передумать и уйти", Return())]
+    $ current_action_items = [MenuItem("Передумать и уйти", Call("CityGuardRestore"))]
     if int(productnum or 0) > 0 and int(winenum or 0) > 0:
         $ current_action_items.insert(0, MenuItem("Послать стражникам вино и угощение, а затем освободить Монгола", Call("story_clara_market_booklet_release_mongol")))
     $ _paged_text = str(MainTxt or "")
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
-    jump CityGuard
+    return
 
 
 label story_clara_market_booklet_release_mongol:
@@ -1304,16 +1355,17 @@ label story_clara_market_booklet_release_mongol:
     $ CurLocDesc = MainTxt
     $ current_action_title = "Побег Монгола"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Раствориться в ночи", Return())]
+    $ current_action_items = [MenuItem("Раствориться в ночи", Call("CityGuardRestore"))]
     $ _paged_text = str(MainTxt or "")
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
     $ story_thread_advance_current()
-    jump CityGuard
+    return
 
 
 label story_melissa_werecat_intro_0:
     $ SignalBlockTime = 1
-    call MelissaRatBreakfastScene
+    $ WerecatVar["rat_breakfast_seen"] = 1
+    call MelissaBatBreakfastScene
     $ story_thread_advance_current()
     jump TavernKitchen
 

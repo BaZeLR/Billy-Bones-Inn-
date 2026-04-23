@@ -13,6 +13,7 @@ init python:
 
     DressShopRoom = Room(
         code_name="DressShop",
+        group_name=ROOM_GROUP_CITY,
         display_name="Лавка портнихи",
         bg_picture="images/irma/Irma_working_portrait.png",
         descriptions=[
@@ -189,9 +190,21 @@ label DressShopBuildActions:
     $ current_action_items.append(MenuItem("Рабочий стол Ирмы", [Hide("dress_shop_male_catalog_overlay"), Hide("dress_shop_female_catalog_overlay"), Call("DressShopOpenWorktable")]))
     $ current_action_items.append(MenuItem("Карточка Ирмы", [Hide("dress_shop_male_catalog_overlay"), Hide("dress_shop_female_catalog_overlay"), Call("ShowGirlCard", "irma", "DressShopRestore")]))
     $ current_action_items.append(MenuItem("Поговорить с Ирмой", [Hide("dress_shop_male_catalog_overlay"), Hide("dress_shop_female_catalog_overlay"), Call("IntIrmaTalk")]))
+    if str(DressProduced or "") != "":
+        $ current_action_items.append(MenuItem("Спросить, когда будет готово", [Hide("dress_shop_male_catalog_overlay"), Hide("dress_shop_female_catalog_overlay"), Call("DressShopAskReady")]))
     python:
         for _room_exit in DressShopRoom.visible_exits():
             current_action_items.append(MenuItem(_room_exit.label, [Hide("dress_shop_male_catalog_overlay"), Hide("dress_shop_female_catalog_overlay"), Jump(_room_exit.target)]))
+    return
+
+
+label DressShopAskReady:
+    hide screen dress_shop_male_catalog_overlay
+    hide screen dress_shop_female_catalog_overlay
+    hide screen girl_card_overlay
+    "Вы осведомились у Ирмы, скоро ли будет готов ваш заказ."
+    "Она подняла на вас удивленный взгляд и ответила, что, как она и говорила, закончит работу она к завтрашнему утру."
+    call DressShopRestore
     return
 
 

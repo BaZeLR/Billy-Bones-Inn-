@@ -1,6 +1,7 @@
 init 6 python:
     ForestHiddenPathRoom = Room(
         code_name="ForestHiddenPath",
+        group_name=ROOM_GROUP_FOREST,
         display_name="Скрытая тропа",
         bg_picture="images/forest/hidden_path.png",
         descriptions=[

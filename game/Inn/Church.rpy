@@ -36,6 +36,7 @@ init python:
 
     ChurchRoom = Room(
         code_name="Church",
+        group_name=ROOM_GROUP_CITY,
         display_name="Собор Ильматера",
         bg_picture="images/general/LocChurchClosed1.jpg",
         descriptions=[

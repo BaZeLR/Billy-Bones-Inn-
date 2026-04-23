@@ -5,10 +5,11 @@ init 4 python:
         description="Среди мха и сырой листвы можно набрать съедобных лесных грибов.",
         actions=[
             ObjectAction(
-                action_id="eat_mushroom",
+                action_id="eat",
                 label="Съесть грибы",
                 hook="call",
-                target="UseMushroomItem",
+                target="UseFoodItem",
+                args=("mushroom_001",),
             ),
         ],
         price=3,
@@ -21,25 +22,13 @@ init 4 python:
         custom_properties={
             "item_kind": "forest_resource",
             "resource_kind": "mushroom",
+            "consume_action": "eat",
+            "consume_minutes": 15,
+            "consume_energy": 6,
+            "consume_fun": 1,
+            "consume_text": "Вы быстро прожариваете на углях пару грибов и съедаете их. Это не пир, но силы заметно прибавляются.",
             "gift_value": 1,
             "social_fun_bonus": 1,
             "curLoc": "Forest",
         },
     )
-
-
-label UseMushroomItem:
-    if int(_player_item_count_by_id("mushroom_001") or 0) <= 0:
-        $ MainTxt = "Грибов у вас при себе не осталось."
-        $ CurLocDesc = MainTxt
-        call PlayerCardInventoryMenu
-        return
-
-    $ _player_remove_item_by_id("mushroom_001", 1)
-    $ energy = _player_clamp(int(energy or 0) + 6, 0, 100)
-    $ fun = _player_clamp(int(fun or 0) + 1, 0, 100)
-    $ MainTxt = "Вы быстро прожариваете на углях пару грибов и съедаете их. Это не пир, но силы заметно прибавляются."
-    $ CurLocDesc = MainTxt
-    call stat
-    call PlayerCardInventoryItemMenu("mushroom_001", True)
-    return

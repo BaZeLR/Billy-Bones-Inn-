@@ -397,14 +397,34 @@ label Intro:
             HarassInstructions[_intro_girl_name] = ""
 
     call AmandaDynamicCommonBlocks
-    $ initStoryEventRuntime(True)
+    python:
+        try:
+            _story_runtime_init = initStoryEventRuntime
+        except NameError:
+            _story_runtime_init = None
+        if callable(_story_runtime_init):
+            _story_runtime_init(True)
+        try:
+            _relationship_runtime_init = init_relationship_levels_runtime
+        except NameError:
+            _relationship_runtime_init = None
+        if callable(_relationship_runtime_init):
+            _relationship_runtime_init(True)
 
     "[MainTxt]"
     menu:
         "Приступить к управлению трактиром":
-           
-            call NextDay_NewDayEvents
-            call CreateTavernEvents
-            $ revision = 5
-            jump TavernMain
+            jump dev_after_report_checkpoint
     return
+
+
+label dev_after_report_checkpoint:
+    call NextDay_NewDayEvents
+    call CreateTavernEvents
+    $ revision = 5
+    $ current_action_title = "Действия"
+    $ current_action_content = None
+    $ current_action_items = []
+    $ current_girl_key = ""
+    $ current_object_id = ""
+    jump TavernMain

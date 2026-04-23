@@ -146,6 +146,27 @@ init python:
                 return value
         return default
 
+    def _girls_desc_recent_barber_line(girl_key=""):
+        key = str(girl_key or "").strip().lower()
+        if key not in ("sandra", "melissa", "amanda", "becky", "clara"):
+            return ""
+        try:
+            last_day = int(_girls_desc_get(_girls_desc_map("BarberVisitLastDay", {}), key, -99) or -99)
+            current_day = int(getattr(renpy.store, "dayspassed", 0) or 0)
+        except Exception:
+            return ""
+        if last_day < 0 or current_day - last_day > 14:
+            return ""
+        if key == "sandra":
+            return "После визита к Серджио волосы Сандры лежат аккуратнее обычного, и весь ее вид кажется собраннее и чище."
+        if key == "melissa":
+            return "После визита к Серджио Мелисса выглядит заметно ухоженнее; это делает ее движения спокойнее и увереннее."
+        if key == "amanda":
+            return "После визита к Серджио Аманда выглядит особенно живо и ухоженно, словно уже заранее примеряет на себя больше внимания от гостей."
+        if key == "becky":
+            return "Недавний визит к Серджио пошел Бекки на пользу: она выглядит свежее и явно знает об этом."
+        return "После визита к Серджио она выглядит аккуратнее и заметно ухоженнее обычного."
+
     def _girls_desc_build_lines(girl_name):
         g = _girls_desc_resolve_key(girl_name)
         if not g:
@@ -161,6 +182,9 @@ init python:
         base_desc = _girls_desc_get(gm("girltextdesc"), g, "")
         if base_desc:
             lines.append(base_desc)
+        barber_line = _girls_desc_recent_barber_line(g)
+        if barber_line:
+            lines.append(barber_line)
 
         top = _girls_desc_get(gm("topdress"), g, "")
         bra = _girls_desc_get(gm("bra"), g, "")

@@ -62,6 +62,7 @@ label IntIrmaTalk(show_menu=True):
         call GirlsDesc("irma")
         return
 
+    $ main_ui_begin_talk_state("Разговор с Ирмой", "irma")
     $ current_action_title = "Разговор с Ирмой"
     $ current_action_content = None
     $ MainTxt = "Ирма отвлекается от работы и вопросительно смотрит на вас."
@@ -72,19 +73,20 @@ label IntIrmaTalk(show_menu=True):
 
 
 label IntIrmaTalkRefresh:
+    $ main_ui_begin_talk_state("Разговор с Ирмой", "irma")
     $ current_action_title = "Разговор с Ирмой"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Осмотреть", Call("IntIrmaTalkApply", "inspect"))]
+    $ current_action_items = [MenuItem("Осмотреть", Function(main_ui_call_label, "IntIrmaTalkApply", "inspect"))]
 
     if str(DressProduced or "") != "":
-        $ current_action_items.append(MenuItem("Спросить, когда будет готово", Call("IntIrmaTalkApply", "ask_ready")))
-    $ current_action_items.append(MenuItem("Спросить про теплые плащи и постели", Call("IntIrmaTalkApply", "ask_winter_work")))
+        $ current_action_items.append(MenuItem("Спросить, когда будет готово", Function(main_ui_call_label, "IntIrmaTalkApply", "ask_ready")))
+    $ current_action_items.append(MenuItem("Спросить про теплые плащи и постели", Function(main_ui_call_label, "IntIrmaTalkApply", "ask_winter_work")))
     if irma_can_make_warm_cloak():
-        $ current_action_items.append(MenuItem("Заказать теплый меховой плащ", Call("IntIrmaTalkApply", "make_cloak")))
+        $ current_action_items.append(MenuItem("Заказать теплый меховой плащ", Function(main_ui_call_label, "IntIrmaTalkApply", "make_cloak")))
     if irma_can_make_fur_bedding():
-        $ current_action_items.append(MenuItem("Заказать меховую постель", Call("IntIrmaTalkApply", "make_bedding")))
+        $ current_action_items.append(MenuItem("Заказать меховую постель", Function(main_ui_call_label, "IntIrmaTalkApply", "make_bedding")))
 
-    $ current_action_items.append(MenuItem("Закончить разговор", Call("DressShopRestore")))
+    $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
     return
 
 

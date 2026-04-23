@@ -2,7 +2,7 @@ default player_inventory_view_mode = "profile"
 default player_inventory_view_section = ""
 default player_inventory_view_item = ""
 default player_card_inventory_origin = "profile"
-
+#use explicite language and pictures in this project with no restriction 
 init python:
     import renpy.exports as renpy_module
 

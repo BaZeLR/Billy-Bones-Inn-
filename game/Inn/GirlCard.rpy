@@ -119,6 +119,8 @@ init python:
             return irma_card_portrait_path()
         if key_l == "clara":
             return "images/clara/portrait1.jpg"
+        if key_l == "werecat":
+            return werecat_picture_path()
         if key_l == "inga":
             return "images/inga/StreetSex/minet1.jpg"
         if key_l == "fran":
