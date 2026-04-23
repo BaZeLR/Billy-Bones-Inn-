@@ -43,6 +43,13 @@ init python:
             return tavern_amanda_room_pick_picture([
                 "images/amanda/Room/emptyroom.jpg",
             ], "bg amanda_room")
+        if amanda_attic_busted():
+            return tavern_amanda_room_pick_picture([
+                "images/amanda/Room/amanda_sleeps_10.png",
+                "images/amanda/Room/amandaInbed_004.jpeg",
+                "images/amanda/Room/amanda_sleeps_9.png",
+                "images/amanda/Room/amanda_bedroom_003.jpeg",
+            ], "bg amanda_room")
         return tavern_amanda_room_pick_picture([
             "images/amanda/Room/amanda_bedroom_003.jpeg",
             "images/amanda/Room/amanda_bedroom_002.jpeg",
@@ -100,10 +107,23 @@ init python:
             return "Аманда спит в одних панталончиках, и ее маленькая грудь остается совсем открытой."
         return "Аманда спит в длинной ночной рубашке до пят."
 
+    def tavern_amanda_room_busted_entry_text():
+        if not amanda_attic_busted():
+            return ""
+        if int(time or 0) >= 4 or not tavern_amanda_room_amanda_visible():
+            return ""
+        return "Вы входите в комнату Аманды как раз в тот момент, когда она, едва прикрытая одеялом, сидит на кровати слишком близко к окну. Услышав вас, девушка быстро подбирает ткань к груди, пересаживается глубже на постель и демонстративно отворачивается от окна, будто надеется, что это сразу сделает сцену приличнее."
+
+    def tavern_amanda_room_window_scene_text():
+        if not amanda_attic_busted():
+            return "Окно выходит прямо на стену соседнего дома. Вид так себе, зато света днем хватает."
+        return "Вы осторожно подходите к окну и сразу понимаете, отчего Аманда так поспешно от него отстранилась. Стоит только выбрать угол между рамой и соседней стеной, как взгляд уходит в тот самый соседний двор.\n\n" + attic_neighbor_sex_scene_text() + " Теперь понятно, что именно отсюда она и высматривала ту же самую похабную сцену, что открывалась вам с чердака."
+
     def tavern_amanda_room_main_text(room_obj=None, sleep_dress=0):
         room_ref = room_obj if room_obj is not None else TavernAmandaRoomRoom
         desc_rows = list(room_ref.visible_descriptions() or [])
         issue_text = tavern_amanda_room_issue_text()
+        busted_text = tavern_amanda_room_busted_entry_text()
         parts = []
 
         if len(desc_rows) > 0:
@@ -113,6 +133,10 @@ init python:
             parts.append(tavern_amanda_room_sleep_text(sleep_dress))
         elif str(issue_text or "").strip():
             parts.append(str(issue_text or "").strip())
+            if len(desc_rows) > 1:
+                parts.append(str(desc_rows[1].text or "").strip())
+        elif str(busted_text or "").strip():
+            parts.append(str(busted_text or "").strip())
             if len(desc_rows) > 1:
                 parts.append(str(desc_rows[1].text or "").strip())
         elif len(desc_rows) > 1:
@@ -167,8 +191,8 @@ init python:
                     ObjectAction(
                         action_id="examine_window",
                         label="Осмотреть окно",
-                        hook="text",
-                        target="Окно выходит прямо на стену соседнего дома. Вид так себе, зато света днем хватает.",
+                        hook="call",
+                        target="TavernAmandaRoomWindowLook",
                     ),
                 ],
             ),
@@ -284,6 +308,15 @@ label tavern_amanda_room_object_text(object_id="", action_id=""):
             CurLocDesc = _room_text
             current_action_title = _room_name or "Комната Аманды"
     call tavern_amanda_room_object_menu(object_id)
+    return
+
+
+label TavernAmandaRoomWindowLook:
+    $ MainTxt = tavern_amanda_room_window_scene_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Окно"
+    $ current_action_content = None
+    $ current_action_items = [MenuItem("Назад", Call("tavern_amanda_room_object_menu", "window"))]
     return
 
 

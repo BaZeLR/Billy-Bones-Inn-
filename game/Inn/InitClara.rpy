@@ -165,11 +165,15 @@ init python:
     def clara_melissa_visit_active(day_marker=None, weekday=None, time_slot=None):
         week_value = int(week if weekday is None else weekday or 0)
         time_value = int(time if time_slot is None else time_slot or 0)
-        if int(WerecatVar.get("adopted", 0) or 0) != 1:
+        if melissa_bats_stage() < 8:
             return False
+        if time_value == 3:
+            if week_value == 5:
+                return False
+            return int(MongolVar.get("StocksReleased", 0) or 0) == 1 or int(RobinVar.get("MongolSafePass", 0) or 0) == 1
         if time_value != 4:
             return False
-        return week_value in (5, 6, 7)
+        return week_value in (1, 2, 3, 4, 5, 6, 7)
 
     def clara_tavern_visit_active(day_marker=None, weekday=None, time_slot=None):
         day_value = int(dayspassed if day_marker is None else day_marker or 0)

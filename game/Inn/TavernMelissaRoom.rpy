@@ -1,5 +1,57 @@
 init 6 python:
+    def tavern_melissa_room_npc_entries():
+        return [
+            {"npc_id": "melissa", "name": "Мелисса", "condition": tavern_melissa_room_visible, "talk_label": "IntMelissaTalk", "auto_card": True},
+            {"npc_id": "clara", "name": "Кларисса", "condition": tavern_melissa_room_clara_visible, "talk_label": "IntClaraTalk", "auto_card": True},
+        ]
+
+    def tavern_melissa_room_clara_scene_paths():
+        return [
+            picture_path
+            for picture_path in (
+                "images/clara/melissa Pillow fight.png",
+                "images/clara/melissa_doodleTimes.png",
+                "images/clara/melissa_doodles.png",
+            )
+            if renpy.loadable(picture_path)
+        ]
+
+    def tavern_melissa_room_clara_visit_active():
+        return tavern_melissa_room_clara_visible() and melissa_bats_stage() >= 8
+
+    def tavern_melissa_room_register_clara_visit():
+        if not tavern_melissa_room_clara_visit_active():
+            return
+        if int(ClaraVar.get("tavern_melissa_visit_day", -1) or -1) == int(dayspassed or 0):
+            return
+        ClaraVar["tavern_melissa_visit_day"] = int(dayspassed or 0)
+        ClaraVar["tavern_melissa_visit_count"] = int(ClaraVar.get("tavern_melissa_visit_count", 0) or 0) + 1
+
+    def tavern_melissa_room_clara_visit_index():
+        scene_count = len(tavern_melissa_room_clara_scene_paths())
+        if scene_count <= 0:
+            return 0
+        visit_count = max(1, int(ClaraVar.get("tavern_melissa_visit_count", 0) or 0))
+        return (visit_count - 1) % scene_count
+
+    def tavern_melissa_room_clara_visit_picture():
+        scene_paths = tavern_melissa_room_clara_scene_paths()
+        if len(scene_paths) <= 0:
+            return ""
+        return scene_paths[tavern_melissa_room_clara_visit_index()]
+
+    def tavern_melissa_room_clara_visit_text():
+        scene_index = tavern_melissa_room_clara_visit_index()
+        if scene_index == 0:
+            return "Вы заглядываете в комнату и тут же понимаете, что пришли не вовремя: Кларисса с Мелиссой уже устроили на кровати полушутливую драку подушками, а по полу летят перья и обрывки смеха. Обе резко замирают, увидев вас в дверях, и Мелисса первой просит вас не торчать у порога."
+        if scene_index == 1:
+            return "Сегодня девушки сидят совсем близко друг к другу на кровати и, склонившись над коленями, возятся с листками и угольком. Кларисса что-то быстро дорисовывает, а Мелисса смеется шепотом и тут же прикрывает рисунки ладонью, заметив вас."
+        return "Кларисса с Мелиссой так увлечены своими непристойными каракулями и перешептыванием, что сперва даже не сразу замечают вас. Когда же замечают, обе смотрят одинаково красноречиво: вам здесь сейчас делать нечего."
+
     def tavern_melissa_room_picture():
+        clara_picture = tavern_melissa_room_clara_visit_picture() if tavern_melissa_room_clara_visit_active() else ""
+        if str(clara_picture or "").strip():
+            return clara_picture
         if household_morning_issue_type("melissa") == "sleepy" and int(hour or 0) < 12:
             picture_cycle = [
                 "images/melissa/tavern/melissa_sleeps_0.jpg",
@@ -56,10 +108,7 @@ init 6 python:
         game_items=[
             bedroom_door_object("melissa_room_door_001", "TavernMelissaRoom", "Мелиссы"),
         ],
-        npcs=[
-            {"npc_id": "melissa", "name": "Мелисса", "condition": tavern_melissa_room_visible, "talk_label": "IntMelissaTalk", "auto_card": True},
-            {"npc_id": "clara", "name": "Кларисса", "condition": tavern_melissa_room_clara_visible, "talk_label": "IntClaraTalk", "auto_card": True},
-        ],
+        npcs=tavern_melissa_room_npc_entries(),
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "object_menu_label": "TavernMelissaRoomObjectMenu",
@@ -72,12 +121,17 @@ label TavernMelissaRoom:
     $ CurrentRoom = TavernMelissaRoomRoom
     $ CurLoc = "TavernMelissaRoom"
     $ location = CurLoc
+    $ tavern_melissa_room_register_clara_visit()
+    if tavern_melissa_room_clara_visit_active():
+        $ CurrentRoom.npcs = []
+    else:
+        $ CurrentRoom.npcs = tavern_melissa_room_npc_entries()
     $ scene_image = tavern_melissa_room_picture() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
     $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
-    if tavern_melissa_room_clara_visible():
-        $ MainTxt = str(MainTxt or "") + "\n\nСегодня у Мелиссы гостит Кларисса. Девушки явно давно о чем-то шепчутся, и при вашем появлении разговор у них на миг сбивается."
+    if tavern_melissa_room_clara_visit_active():
+        $ MainTxt = str(MainTxt or "") + "\n\n" + tavern_melissa_room_clara_visit_text() + "\n\nОставаться в комнате они вам явно не дадут: максимум извиниться и закрыть за собой дверь."
     $ _melissa_room_notice = household_room_issue_notice_text("melissa")
     if str(_melissa_room_notice or "").strip() != "":
         $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_room_notice or "")
@@ -95,6 +149,9 @@ label TavernMelissaRoomBuildActions:
     $ current_action_title = "Комната Мелиссы"
     $ current_action_content = None
     $ current_action_items = []
+    if tavern_melissa_room_clara_visit_active():
+        $ current_action_items = [MenuItem("Извиниться и выйти в коридор", Call("AdvanceMovementTime", "TavernUpstairs"))]
+        return
     python:
         for _issue_action in list(household_room_issue_action_specs("melissa") or []):
             current_action_items.append(MenuItem(str(_issue_action.get("label", "") or ""), Call(str(_issue_action.get("target", "") or ""), *tuple(_issue_action.get("args", ()) or ()))))
@@ -156,8 +213,8 @@ label TavernMelissaRoomObjectText(object_id="", action_id=""):
 
 label TavernMelissaRoomRestore:
     $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
-    if tavern_melissa_room_clara_visible():
-        $ MainTxt = str(MainTxt or "") + "\n\nСегодня у Мелиссы гостит Кларисса. Девушки явно давно о чем-то шепчутся, и при вашем появлении разговор у них на миг сбивается."
+    if tavern_melissa_room_clara_visit_active():
+        $ MainTxt = str(MainTxt or "") + "\n\n" + tavern_melissa_room_clara_visit_text() + "\n\nОставаться в комнате они вам явно не дадут: максимум извиниться и закрыть за собой дверь."
     $ _melissa_room_notice = household_room_issue_notice_text("melissa")
     if str(_melissa_room_notice or "").strip() != "":
         $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_room_notice or "")

@@ -179,6 +179,8 @@ init python:
         present_ids = set(tavern_breakfast_present_ids())
         absent_ids = tavern_breakfast_absent_ids()
         if "amanda" in present_ids and "melissa" in absent_ids:
+            if amanda_attic_busted():
+                return "Аманда на удивление не торопится цеплять Мелиссу привычной колкостью. Она только косится в сторону лестницы и слишком уж старательно делает вид, будто ее куда больше интересует каша, чем чужая спальня."
             return "Аманда фыркает: \"Вот же соня. Опять дрыхнет у себя, а я потом за двоих носись.\""
         if "melissa" in present_ids and "amanda" in absent_ids:
             return "Мелисса тихо замечает: \"Аманда опять решила, что работа сама себя сделает. Любит она проспать самый удобный час.\""
@@ -262,6 +264,28 @@ init python:
             "tier": talk_tier,
             "speaker": talk_npc,
         }
+
+    def tavern_breakfast_amanda_alt_cure_possible():
+        if not amanda_attic_busted():
+            return False
+        if "amanda" not in list(tavern_breakfast_present_ids() or []):
+            return False
+        if int(AmandaVar.get("attic_window_breakfast_bj_day", -1) or -1) == int(dayspassed or 0):
+            return False
+        wetness = max(int(PussyWetStart.get("amanda", 0) or 0), int(Arousal.get("amanda", 0) or 0))
+        return wetness >= 25 or int(sluttiness.get("amanda", 0) or 0) >= 28
+
+    def tavern_breakfast_amanda_alt_cure_ready():
+        if not tavern_breakfast_amanda_alt_cure_possible():
+            return False
+        wetness = max(int(PussyWetStart.get("amanda", 0) or 0), int(Arousal.get("amanda", 0) or 0))
+        sluttiness_value = int(sluttiness.get("amanda", 0) or 0)
+        chance = 15 + max(0, wetness - 25) * 2 + max(0, sluttiness_value - 28)
+        if "melissa" in list(tavern_breakfast_present_ids() or []):
+            chance += 8
+        chance = max(15, min(70, int(chance or 0)))
+        roll = (int(dayspassed or 0) * 17 + int(week or 0) * 13 + int(hour or 0) * 5 + wetness + sluttiness_value * 3) % 100
+        return roll < chance
 
     def tavern_breakfast_market_story_text():
         if int(week or 0) == 3:
@@ -352,6 +376,7 @@ init python:
             werecat_rat_breakfast_ready()
             or melissa_bat_breakfast_ready()
             or werecat_month_thanks_ready()
+            or tavern_breakfast_amanda_alt_cure_possible()
         )
 
     def tavern_breakfast_has_market_topic():
@@ -1169,6 +1194,9 @@ label TavernKitchenBreakfastTextPage:
 
 label TavernKitchenBreakfastHearDialogue:
     $ TavernBreakfastListenDay = int(dayspassed or 0)
+    if tavern_breakfast_amanda_alt_cure_ready():
+        call TavernKitchenBreakfastAmandaAltCure1
+        return
     $ _talk_result = tavern_breakfast_talk_result()
     $ _banter_text = str(_talk_result.get("text", "") or "")
     $ _talk_arousal = int(_talk_result.get("arousal_gain", 0) or 0)
@@ -1182,6 +1210,20 @@ label TavernKitchenBreakfastHearDialogue:
     $ CurLocDesc = MainTxt
     if int(_talk_arousal or 0) > 0:
         call stat
+    call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
+    return
+
+
+label TavernKitchenBreakfastAmandaAltCure1:
+    $ AmandaVar["attic_window_breakfast_bj_day"] = int(dayspassed or 0)
+    $ Arousal["You"] = max(35, int(Arousal.get("You", 0) or 0))
+    $ Arousal["amanda"] = max(30, int(Arousal.get("amanda", 0) or 0))
+    $ MainTxt = "За общим столом Аманда сегодня на редкость притихла. Несколько раз она украдкой встречается с вами взглядом, потом криво улыбается и будто невзначай касается вашей ноги под столом. Колкость про Мелиссу так и не срывается с ее языка.\n\nЧерез пару минут ее ступня уже гладит вас куда смелее, а сама она наклоняется ближе и почти беззвучно шепчет, что после той неловкой истории с окном ей почему-то самой теперь труднее делать вид, будто ничего такого в доме не бывает.\n\nПока остальные заняты едой и разговорами, Аманда незаметно скользит ниже под край стола и решает загладить свою дерзость способом куда приятнее обычных извинений."
+    $ CurLocDesc = MainTxt
+    call IntAmandaSex("amanda", "home", "minet")
+    $ MainTxt = "Когда все заканчивается, Аманда так же тихо возвращается на свое место, поправляет волосы и берется за ложку так невинно, будто под столом только что не происходило ничего предосудительного. На вас она смотрит уже без прежней насмешки: скорее с довольным сговором, чем с привычным желанием поддеть."
+    $ CurLocDesc = MainTxt
+    call stat
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
     return
 

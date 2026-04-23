@@ -351,10 +351,6 @@ label TavernMain:
         call TavernShowImage
 
     if TavernEventOngoing == "":
-        if TavernClosed == "" and not tavern_preopening_mode() and clara_visible_in_location("TavernMain"):
-            if int(ClaraVar.get("tavern_melissa_visit_day", -1) or -1) != int(dayspassed or 0):
-                $ ClaraVar["tavern_melissa_visit_day"] = int(dayspassed or 0)
-                $ ClaraVar["tavern_melissa_visit_count"] = int(ClaraVar.get("tavern_melissa_visit_count", 0) or 0) + 1
         call CheckDailyEvent("", "_story_enter", CurLoc, time)
         if TavernClosed == "" and not tavern_preopening_mode() and int(week or 0) != 7:
             call CheckDailyEvent('amanda')

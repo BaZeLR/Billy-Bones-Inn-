@@ -169,6 +169,8 @@ label InitAmanda:
         AmandaVar['night_bowl_window_seen_day'] = -1
         AmandaVar['got_fancy_night_bowl'] = 0
         AmandaVar['prefers_backyard_relief'] = -1
+        AmandaVar['attic_window_busted'] = 0
+        AmandaVar['attic_window_breakfast_bj_day'] = -1
         GiftPreferences[GirlName] = ["wild_rose_001", "soap_001", "berries_001", "energy_tea_001", "drink_ale_001"]
         npc_schedule_set(
             GirlName,

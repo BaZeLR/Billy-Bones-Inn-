@@ -46,6 +46,12 @@ init 3 python:
             if renpy.loadable(picture_path)
         ]
 
+    def attic_neighbor_sex_scene_text():
+        return "Там, не особенно заботясь о чужих глазах, молочник грубо и с явным азартом имеет собственную жену. До вас долетают приглушенные стоны, хлесткий ритм тел и влажный блеск обнаженной кожи."
+
+    def amanda_attic_busted():
+        return int(AmandaVar.get("attic_window_busted", 0) or 0) == 1 and melissa_bats_stage() >= 6
+
     def melissa_bats_repair_complete():
         repair_day = int(MelissaVar.get("roof_repair_complete_day", -1) or -1)
         return (
@@ -303,6 +309,7 @@ label MelissaAtticFallScene:
     $ MelissaVar["bats_episode"] = max(int(MelissaVar.get("bats_episode", 0) or 0), 6)
     $ MelissaVar["drawings_ready_day"] = int(dayspassed or 0) + 2
     $ MelissaVar["temp_room"] = "TavernAmandaRoom"
+    $ AmandaVar["attic_window_busted"] = 1
     $ Friends["melissa"] = max(0, int(Friends.get("melissa", 0) or 0) - 7)
     $ Friends["amanda"] = max(0, int(Friends.get("amanda", 0) or 0) - 5)
     $ notoriety = min(100, int(notoriety or 0) + 10)
