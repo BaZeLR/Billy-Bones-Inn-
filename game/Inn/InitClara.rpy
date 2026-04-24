@@ -150,17 +150,7 @@ init python:
     def clara_market_story_caption():
         if str(clara_market_story_label() or "") == "":
             return ""
-        time_value = int(time or 0)
-        booklet_seen = int(ClaraVar.get("booklet_market_seen", 0) or 0)
-        market_evening_intro_seen = int(ClaraVar.get("market_evening_intro_seen", 0) or 0)
-        mongol_theft_seen = int(ClaraVar.get("mongol_theft_seen", 0) or 0)
-        drawings_secret_known = int(ClaraVar.get("drawings_secret_known", 0) or 0)
-
-        if time_value == 3 and booklet_seen == 1 and mongol_theft_seen == 0:
-            return "Тихо проследить за Клариссой"
-        if time_value == 3 and booklet_seen == 0 and drawings_secret_known == 1:
-            return "Проследить за Клариссой и подслушать разговор"
-        return "Проследить за Клариссой"
+        return "Понаблюдать за фигурой в плаще"
 
     def clara_melissa_visit_active(day_marker=None, weekday=None, time_slot=None):
         week_value = int(week if weekday is None else weekday or 0)
