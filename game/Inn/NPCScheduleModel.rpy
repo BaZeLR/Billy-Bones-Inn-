@@ -3,7 +3,11 @@ default NPCSchedules = {}
 init python:
     def _npc_schedule_store():
         global NPCSchedules
-        schedules = NPCSchedules
+        try:
+            schedules = NPCSchedules
+        except NameError:
+            schedules = {}
+            NPCSchedules = schedules
         if not isinstance(schedules, dict):
             schedules = {}
             NPCSchedules = schedules
