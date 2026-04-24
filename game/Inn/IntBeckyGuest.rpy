@@ -242,15 +242,6 @@ label IntBeckyGuest:
                 jump MarketPlace
                 return
 
-label int_becky_guest:
-    call IntBeckyGuest
-    return
-
-label menu_guest_becky:
-    call IntBeckyGuest
-    return
-
-
 label BeckyGuestKidsWatchStepsCode(kids_watch=0):
     if kids_watch <= 3:
         "Поднимаясь вслед за вдовой по лестнице, вы заметили что из-за угла за вами кто-то подсматривает."

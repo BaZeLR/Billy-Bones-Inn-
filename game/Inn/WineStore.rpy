@@ -154,6 +154,7 @@ label WineStoreBuildActions:
     python:
         for _wine_object in WineStoreRoom.visible_objects():
             current_action_items.append(MenuItem(_wine_object.name, Call("WineStoreObjectMenu", _wine_object.object_id)))
+        current_action_items.append(MenuItem("Купить вино", Call("WineStoreBuyMenu")))
 
     if time == 0:
         $ current_action_items.append(MenuItem("Поговорить с Клариссой", Call("IntClaraTalk")))

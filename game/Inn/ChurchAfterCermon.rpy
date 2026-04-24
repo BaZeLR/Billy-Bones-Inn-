@@ -66,6 +66,7 @@ label ChurchAfterCermon(entry_arg=0):
         call IntBeckyAfterCermon
         $ MainTxt = MainTxt + "\n\nВы заметили, как миссис Блэнкеншип направилась было к кабинке для исповеди, но отец Герхард взял ее за руку и повел к неприметной двери, которую он отпер висящим у него на поясе ключом. Как только вдова проследовала за ним, дверь захлопнулась и послышался стук задвигаемого засова. Хотя вы можете попробовать {a=call:AfterCermonBecky}{color=#245b2b}посмотреть{/color}{/a}, что там происходит через замочную скважину."
         $ CurLocDesc = MainTxt
+        $ current_action_items.append(MenuItem("Посмотреть", Call("AfterCermonBecky")))
     else:
         $ MainTxt = MainTxt + "\n\nНичего интересного вы не нашли."
         $ CurLocDesc = MainTxt

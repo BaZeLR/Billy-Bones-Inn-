@@ -120,8 +120,3 @@ label BeckyEddieJoinFirst_EddieFirstCumCode:
     if renpy.has_label("MarketPlace"):
         jump MarketPlace
     return
-
-
-label becky_eddie_join_first:
-    call BeckyEddieJoinFirst
-    return

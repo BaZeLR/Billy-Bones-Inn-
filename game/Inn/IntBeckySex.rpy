@@ -131,8 +131,27 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 call ShowBeckyPortrait
                 jump int_becky_sex_menu
 
-            "Поднять подол" if bottomdress.get(GirlNameIBS, "") != "" and bottomraised.get(GirlNameIBS, 0) == 0 and SomebodyCums == 0:
-                "Вы задрали подол платья, открывая ее бедра и нижнее белье для нескромного осмотра."
+            "Задрать юбочку" if bottomdress.get(GirlNameIBS, "") != "" and DressPartSlut.get(bottomdress.get(GirlNameIBS, ""), 0) >= 4 and bottomraised.get(GirlNameIBS, 0) == 0 and SomebodyCums == 0:
+                if panties.get(GirlNameIBS, "") != "":
+                    "Вы впились поцелуем в губы [RealName2.get(GirlNameIBS, GirlNameIBS)]. Тем временем ваши шаловливые ручки задрали и без того короткую юбочку до пояса, выставив ее кружевные панталончики на ваше обозрение."
+                else:
+                    "Вы прошептали свое нескромное пожелание на ухо разбитной вдовушке. [RealName.get(GirlNameIBS, GirlNameIBS)], даже не покраснев заткнула за пояс и без того короткий подол своего платья. Никакого нижнего белья под ним разумеется не оказалось."
+                $ bottomraised[GirlNameIBS] = 1
+                $ _ibs_update_visibility(GirlNameIBS)
+                $ _ibs_observe_text, _ibs_eddie_delta = _ibs_eddie_observe_state(GirlNameIBS, 1)
+                if str(_ibs_observe_text or "").strip():
+                    "[_ibs_observe_text]"
+                $ _ibs_inc_arousal("eddie", _ibs_eddie_delta)
+                call ShowBeckyPortrait
+                jump int_becky_sex_menu
+
+            "Поднять подол" if bottomdress.get(GirlNameIBS, "") != "" and DressPartSlut.get(bottomdress.get(GirlNameIBS, ""), 0) < 4 and bottomraised.get(GirlNameIBS, 0) == 0 and SomebodyCums == 0:
+                if panties.get(GirlNameIBS, "") != "":
+                    "Вы впились поцелуем в губы [RealName2.get(GirlNameIBS, GirlNameIBS)]. Тем временем ваши шаловливые ручки постепенно подняли длинный подол и завернули его за пояс, выставив ее кружевные панталончики на ваше обозрение."
+                elif pantiesdef.get(GirlNameIBS, "") == "":
+                    "Вы прошептали свое пошлое пожелание на ухо разбитной вдовушке. [RealName.get(GirlNameIBS, GirlNameIBS)], немного покраснев, приподняла и заткнула за пояс длинный подол своего платья. Вы были приятно удивленны, не обнаружив и следов нижнего белья под внешне скромным платьем."
+                else:
+                    "Вы впились поцелуем в губы [RealName2.get(GirlNameIBS, GirlNameIBS)]. Тем временем ваши шаловливые ручки постепенно подняли длинный подол и завернули его за пояс, выставив ее мокренькое влагалище на ваше обозрение."
                 $ bottomraised[GirlNameIBS] = 1
                 $ _ibs_update_visibility(GirlNameIBS)
                 $ _ibs_observe_text, _ibs_eddie_delta = _ibs_eddie_observe_state(GirlNameIBS, 1)
@@ -509,8 +528,3 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 if str(GirlLocIBS or "").strip().lower() == "home":
                     jump BeckyHomeAfterSex
                 return
-
-
-label int_becky_sex(girl_name="becky"):
-    call IntBeckySex(girl_name)
-    return

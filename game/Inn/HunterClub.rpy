@@ -141,11 +141,11 @@ init python:
         hunter_club_trade_set_qty(item_id, hunter_club_trade_selected_qty(item_id) + int(delta or 0), trade_mode)
 
     def hunter_club_trade_reset(mode="buy"):
-        store = renpy.store
-        store.HunterClubTradeMode = str(mode or "buy").strip().lower()
-        store.HunterClubTradeSelection = {}
-        for entry in list(hunter_club_trade_entries(store.HunterClubTradeMode) or []):
-            store.HunterClubTradeSelection[str(entry.get("item_id", "") or "")] = 0
+        global HunterClubTradeMode, HunterClubTradeSelection
+        HunterClubTradeMode = str(mode or "buy").strip().lower()
+        HunterClubTradeSelection = {}
+        for entry in list(hunter_club_trade_entries(HunterClubTradeMode) or []):
+            HunterClubTradeSelection[str(entry.get("item_id", "") or "")] = 0
 
     def hunter_club_trade_total(mode="buy"):
         total = 0
@@ -223,12 +223,12 @@ init python:
         )
 
     def hunter_club_restore_scene_state():
-        store = renpy.store
+        global MainTxt, CurLocDesc, HunterClubTradeMode, HunterClubTradeSelection
         room_text = hunter_club_main_text()
-        store.MainTxt = room_text
-        store.CurLocDesc = room_text
-        store.HunterClubTradeMode = ""
-        store.HunterClubTradeSelection = {}
+        MainTxt = room_text
+        CurLocDesc = room_text
+        HunterClubTradeMode = ""
+        HunterClubTradeSelection = {}
         renpy.hide_screen("hunter_club_trade_overlay")
         main_ui_restore_room_scene_state()
 
@@ -461,7 +461,14 @@ label HunterClub:
     $ MainTxt = hunter_club_main_text()
     $ CurLocDesc = MainTxt
     if int(ClaraVar.get("escape_confessed", 0) or 0) == 1 and int(MongolVar.get("StocksArrestDay", -1) or -1) < 0:
-        call story_clara_market_booklet_hunter_direct
+        call preEvent("claraBookletMarket")
+        if thread is not None and int(thread.num or 0) < 5:
+            $ thread.done = [True, True, True, True, True] + [False] * max(0, len(list(thread.done or [])) - 5)
+            $ thread.num = 5
+            $ thread.completed = False
+            $ thread.aborted = False
+            $ thread.metconds = True
+        call story_clara_market_booklet_5
     elif story_event_available("HunterClub", "overheard"):
         call checkTriggers("HunterClub", "overheard", 0)
     call HunterClubBuildActions
@@ -479,13 +486,12 @@ label HunterClubBuildActions:
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
+    $ findAvailableEvents(True)
 
     python:
         for _club_object in HunterClubRoom.visible_objects():
             current_action_items.append(MenuItem(_club_object.name, Call("HunterClubObjectMenu", _club_object.object_id)))
-        if int(ClaraVar.get("escape_confessed", 0) or 0) == 1 and int(MongolVar.get("StocksArrestDay", -1) or -1) < 0:
-            current_action_items.append(MenuItem("Подслушать охотников у стены", Call("story_clara_market_booklet_hunter_direct")))
-        elif story_event_available("HunterClub", "overheard"):
+        if story_event_available("HunterClub", "overheard"):
             current_action_items.append(MenuItem("Подслушать охотников у стены", Call("checkTriggers", "HunterClub", "overheard", 0)))
         for _club_exit in HunterClubRoom.visible_exits():
             current_action_items.append(MenuItem(_club_exit.label, Jump(_club_exit.target)))

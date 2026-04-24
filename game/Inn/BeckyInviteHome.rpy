@@ -2,8 +2,7 @@
 # Converted from legacy script. Handles Becky inviting the player home after dancing.
 # All logic, conditions, and dev notes preserved.
 
-# --- MAIN LABEL ---
-label becky_invite_home(girl_name):
+label BeckyInviteHome(girl_name="becky"):
     # girl_name: string from legacy flow (often "Becky" with capital B)
     python:
         _girl_key = str(girl_name or "becky")
@@ -21,10 +20,6 @@ label becky_invite_home(girl_name):
         elif BeckyVar['visitedhome'] > 0 and HadSex[_girl_key] > 0:
             "Стефан, милый, а может пойдем ко мне, ну, помнишь, как в прошлый раз?" # Бекки, глядя прямо в глаза
         else:
-            "Стефан, а может ко мне в гости зайдешь, вина немного выпьем?" # неожиданно приглашает вдовушка
+        "Стефан, а может ко мне в гости зайдешь, вина немного выпьем?" # неожиданно приглашает вдовушка
         $ BeckyVar['danceinvitehome'] = 1
     return
-
-# --- END ---
-# This label can be called with e.g. `call becky_invite_home("Becky")` after a dance event.
-# All logic and text are preserved and mapped to Ren'Py idioms.

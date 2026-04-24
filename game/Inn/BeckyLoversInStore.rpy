@@ -2,12 +2,7 @@
 # Converted from legacy script. Handles Becky lovers event in the grocery store.
 # All logic, conditions, and dev notes preserved.
 
-# --- MAIN LABEL ---
 label BeckyLoversInStore:
-    call becky_lovers_in_store
-    return
-
-label becky_lovers_in_store():
     # Assumes all required variables are defaulted: sluttiness, friends, BeckyStoreSexType, ChooseOption, dayspassed, DayLastOrgasmGiven, etc.
     if dyneval(CheckIfSexEventExist, 'becky', 99, 'StoreLover') > 0 and renpy.random.randint(1,3) == 1:
         $ BeckyStoreSexType = dyneval(GetSexEventFromTable, 'becky', 99, 'StoreLover')
@@ -37,6 +32,3 @@ label becky_lovers_in_store():
                 "Стоило вам зайти в лавку, как миссис Блэнкеншип резко дернулась, но, увидив вас, вернулась к прежнему занятию. Вдова развалясь сидела на стуле, ее платье было задранно, нижнее белье отсутствовало и она орудовала у себя между ног большим огурцом. Ребекка целиком сосредоточилась на своих ощущениях, игнорируя вас.\nЕще пара минут - и волна оргазма прошла по ее телу, она вытащила огурец, одернула платье и сказала: 'Ох, Стефанчик, одинокой девушке нужно порой и расслабиться. Так зачем ты приходил?' Вы начали выбирать еду для трактира, но огурец продолжал занимать ваши мысли.\nВы запомнили куда его положила вдова, чтобы при покупке его случайно не купить. Или наоборот, стоит купить именно его?"
         $ DayLastOrgasmGiven['becky'] = dayspassed
     return
-
-# --- END ---
-# This label can be called with `call becky_lovers_in_store` to trigger the event. All logic and text are preserved and mapped to Ren'Py idioms.

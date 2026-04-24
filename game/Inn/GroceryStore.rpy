@@ -145,10 +145,10 @@ init python:
         return "\n\n".join([row for row in parts if str(row or "").strip()])
 
     def grocery_store_restore_scene_state():
-        store = renpy.store
+        global MainTxt, CurLocDesc
         room_text = grocery_store_main_text()
-        store.MainTxt = room_text
-        store.CurLocDesc = room_text
+        MainTxt = room_text
+        CurLocDesc = room_text
         main_ui_restore_room_scene_state()
 
     def grocery_store_find_visible_object(object_id):
@@ -378,6 +378,7 @@ label GroceryStoreBuyMenu:
         $ current_action_items.append(MenuItem("Купить пятьдесят мешков", Call("GroceryStoreBuyApply", 6 * 50, 500, 50)))
     if money >= 6 * 200:
         $ current_action_items.append(MenuItem("Купить двести мешков", Call("GroceryStoreBuyApply", 6 * 200, 2000, 200)))
+
     $ current_action_items.append(MenuItem("Назад", Call("GroceryStoreRestore")))
     return
 

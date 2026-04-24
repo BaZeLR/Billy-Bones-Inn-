@@ -1,13 +1,14 @@
 label IntBeckyTalk(girl_name="becky"):
     $ _becky_name = str(girl_name or "becky")
+    if str(CurLoc or "") == "GroceryStore":
+        $ _becky_picture = str(grocery_store_becky_picture() or "").strip()
+    else:
+        $ _becky_picture = str(girl_card_portrait_path(_becky_name) or "").strip()
+    if str(_becky_picture or "").strip():
+        call ShowImage("", "", _becky_picture)
     $ main_ui_begin_talk_state("Разговор с Бекки", _becky_name)
     $ current_action_title = "Разговор с Бекки"
     $ current_action_content = None
-    python:
-        _becky_picture = str(girl_card_portrait_path(_becky_name) or "").strip()
-        if _becky_picture and renpy.loadable(_becky_picture):
-            scene_image = _becky_picture
-            _layout_last_picture = _becky_picture
     if str(MainTxt or "").strip() == "":
         $ MainTxt = "Бекки внимательно смотрит на вас, ожидая, что вы захотите обсудить."
         $ CurLocDesc = MainTxt

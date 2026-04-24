@@ -354,17 +354,20 @@ init python:
         return items
 
     def tavern_breakfast_restore_ui_state(panel_text=""):
+        global MainTxt, CurLocDesc, UI_mode, UI_selected_char
+        global current_girl_key, current_object_id, action_menu_specs
+        global current_action_title, current_action_content, current_action_items
         text_value = str(panel_text or TavernBreakfastBaseText or TavernKitchenSavedText or MainTxt or "Вы все еще сидите за общим утренним столом.")
-        renpy.store.MainTxt = text_value
-        renpy.store.CurLocDesc = text_value
-        renpy.store.UI_mode = "scene"
-        renpy.store.UI_selected_char = ""
-        renpy.store.current_girl_key = ""
-        renpy.store.current_object_id = ""
-        renpy.store.action_menu_specs = []
-        renpy.store.current_action_title = "Завтрак"
-        renpy.store.current_action_content = None
-        renpy.store.current_action_items = list(tavern_breakfast_menu_items() or [])
+        MainTxt = text_value
+        CurLocDesc = text_value
+        UI_mode = "scene"
+        UI_selected_char = ""
+        current_girl_key = ""
+        current_object_id = ""
+        action_menu_specs = []
+        current_action_title = "Завтрак"
+        current_action_content = None
+        current_action_items = list(tavern_breakfast_menu_items() or [])
         try:
             renpy.restart_interaction()
         except Exception:
@@ -447,6 +450,7 @@ init python:
         )
 
     def tavern_kitchen_spicy_tincture_apply(present_ids=None):
+        global fun
         rows = list(present_ids or [])
         if len(rows) <= 0:
             return ""
@@ -457,7 +461,7 @@ init python:
                 otkroven[npc_id] = min(20, int(otkroven.get(npc_id, 0) or 0) + 1)
             if npc_id in ("sandra", "melissa", "amanda"):
                 sluttiness[npc_id] = min(100, int(sluttiness.get(npc_id, 0) or 0) + 1)
-        globals()["fun"] = _player_clamp(int(fun or 0) + 2, 0, 100)
+        fun = _player_clamp(int(fun or 0) + 2, 0, 100)
         lines = [
             "Вы подаете к столу пряную настойку с медовой сладостью. По комнате сразу идет теплый, терпкий запах, и общий разговор делается заметно живее.",
         ]
@@ -1164,10 +1168,15 @@ label TavernKitchenBreakfastMenu:
 
 
 label TavernKitchenBreakfastShowText(text="", return_label="TavernKitchenBreakfastMenu"):
-    $ TavernBreakfastTextPages = []
+    $ TavernBreakfastTextPages = build_breakfast_text_pages(text)
     $ TavernBreakfastTextPageIndex = 0
     $ TavernBreakfastTextReturnLabel = str(return_label or "TavernKitchenBreakfastMenu")
-    $ tavern_breakfast_restore_ui_state(text)
+    $ current_action_title = "Завтрак"
+    $ current_action_content = None
+    $ current_action_items = list(tavern_breakfast_menu_items() or [])
+    $ MainTxt = str(text or "")
+    $ CurLocDesc = MainTxt
+    call QueuePagedPanelText(str(text or ""), current_action_title, list(current_action_items or []), "plain")
     call ReturnToMainUI
     return
 

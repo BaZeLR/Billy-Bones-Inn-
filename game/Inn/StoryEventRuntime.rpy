@@ -1229,50 +1229,41 @@ label story_clara_market_booklet_confront:
 
 label story_clara_market_action_direct:
     call preEvent("claraBookletMarket")
-    python:
-        _clara_target = ""
-        _clara_thread = thread if 'thread' in globals() else None
-        _booklet_seen = int(ClaraVar.get("booklet_market_seen", 0) or 0)
-        _market_intro_seen = int(ClaraVar.get("market_intro_seen", 0) or 0)
-        _market_evening_intro_seen = int(ClaraVar.get("market_evening_intro_seen", 0) or 0)
-        _drawings_secret_known = int(ClaraVar.get("drawings_secret_known", 0) or 0)
-        _mongol_theft_seen = int(ClaraVar.get("mongol_theft_seen", 0) or 0)
-        _time_value = int(time or 0)
-
-        if _time_value == 2 and _booklet_seen == 0:
-            _clara_target = "story_clara_market_booklet_1_direct_follow"
-            if _clara_thread is not None and int(_clara_thread.num or 0) < 1:
-                if len(list(_clara_thread.done or [])) > 0:
-                    _clara_thread.done[0] = True
-                _clara_thread.num = 1
-            if _market_intro_seen == 0:
-                ClaraVar["market_intro_seen"] = 1
-        elif _time_value == 3 and _booklet_seen == 0 and _drawings_secret_known == 1:
-            _clara_target = "story_clara_market_booklet_1_direct_follow"
-            if _clara_thread is not None and int(_clara_thread.num or 0) < 1:
-                if len(list(_clara_thread.done or [])) > 0:
-                    _clara_thread.done[0] = True
-                _clara_thread.num = 1
-        elif _time_value == 3 and _booklet_seen == 1 and _market_evening_intro_seen == 0:
-            _clara_target = "story_clara_market_booklet_2_direct_follow"
-            if _clara_thread is not None and int(_clara_thread.num or 0) < 2:
-                if len(list(_clara_thread.done or [])) > 0:
-                    _clara_thread.done[0] = True
-                if len(list(_clara_thread.done or [])) > 1:
-                    _clara_thread.done[1] = True
-                _clara_thread.num = 2
-        elif _time_value == 3 and _market_evening_intro_seen == 1 and _mongol_theft_seen == 0:
-            _clara_target = "story_clara_market_booklet_3"
-            if _clara_thread is not None and int(_clara_thread.num or 0) < 3:
-                if len(list(_clara_thread.done or [])) > 0:
-                    _clara_thread.done[0] = True
-                if len(list(_clara_thread.done or [])) > 1:
-                    _clara_thread.done[1] = True
-                if len(list(_clara_thread.done or [])) > 2:
-                    _clara_thread.done[2] = True
-                _clara_thread.num = 3
-        evalTime = None
-        findAvailableEvents(True)
+    $ _clara_target = ""
+    if int(time or 0) == 2 and int(ClaraVar.get("booklet_market_seen", 0) or 0) == 0:
+        $ _clara_target = "story_clara_market_booklet_1_direct_follow"
+        if thread is not None and int(thread.num or 0) < 1:
+            if len(list(thread.done or [])) > 0:
+                $ thread.done[0] = True
+            $ thread.num = 1
+        if int(ClaraVar.get("market_intro_seen", 0) or 0) == 0:
+            $ ClaraVar["market_intro_seen"] = 1
+    elif int(time or 0) == 3 and int(ClaraVar.get("booklet_market_seen", 0) or 0) == 0 and int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1:
+        $ _clara_target = "story_clara_market_booklet_1_direct_follow"
+        if thread is not None and int(thread.num or 0) < 1:
+            if len(list(thread.done or [])) > 0:
+                $ thread.done[0] = True
+            $ thread.num = 1
+    elif int(time or 0) == 3 and int(ClaraVar.get("booklet_market_seen", 0) or 0) == 1 and int(ClaraVar.get("market_evening_intro_seen", 0) or 0) == 0:
+        $ _clara_target = "story_clara_market_booklet_2_direct_follow"
+        if thread is not None and int(thread.num or 0) < 2:
+            if len(list(thread.done or [])) > 0:
+                $ thread.done[0] = True
+            if len(list(thread.done or [])) > 1:
+                $ thread.done[1] = True
+            $ thread.num = 2
+    elif int(time or 0) == 3 and int(ClaraVar.get("market_evening_intro_seen", 0) or 0) == 1 and int(ClaraVar.get("mongol_theft_seen", 0) or 0) == 0:
+        $ _clara_target = "story_clara_market_booklet_3"
+        if thread is not None and int(thread.num or 0) < 3:
+            if len(list(thread.done or [])) > 0:
+                $ thread.done[0] = True
+            if len(list(thread.done or [])) > 1:
+                $ thread.done[1] = True
+            if len(list(thread.done or [])) > 2:
+                $ thread.done[2] = True
+            $ thread.num = 3
+    $ evalTime = None
+    $ findAvailableEvents(True)
     if str(_clara_target or "") == "":
         call MarketPlaceRestore
         return
@@ -1403,20 +1394,18 @@ label story_clara_market_booklet_4:
 
 label story_clara_market_booklet_wine_talk_direct:
     call preEvent("claraBookletMarket")
-    python:
-        _clara_thread = thread if 'thread' in globals() else None
-        if _clara_thread is not None and int(_clara_thread.num or 0) < 4:
-            if len(list(_clara_thread.done or [])) > 0:
-                _clara_thread.done[0] = True
-            if len(list(_clara_thread.done or [])) > 1:
-                _clara_thread.done[1] = True
-            if len(list(_clara_thread.done or [])) > 2:
-                _clara_thread.done[2] = True
-            if len(list(_clara_thread.done or [])) > 3:
-                _clara_thread.done[3] = True
-            _clara_thread.num = 4
-        evalTime = None
-        findAvailableEvents(True)
+    if thread is not None and int(thread.num or 0) < 4:
+        if len(list(thread.done or [])) > 0:
+            $ thread.done[0] = True
+        if len(list(thread.done or [])) > 1:
+            $ thread.done[1] = True
+        if len(list(thread.done or [])) > 2:
+            $ thread.done[2] = True
+        if len(list(thread.done or [])) > 3:
+            $ thread.done[3] = True
+        $ thread.num = 4
+    $ evalTime = None
+    $ findAvailableEvents(True)
     jump story_clara_market_booklet_4
 
 
@@ -1434,19 +1423,6 @@ label story_clara_market_booklet_5:
     call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
     $ story_thread_advance_current()
     return
-
-
-label story_clara_market_booklet_hunter_direct:
-    call preEvent("claraBookletMarket")
-    python:
-        _clara_thread = thread if 'thread' in globals() else None
-        if _clara_thread is not None and int(_clara_thread.num or 0) < 5:
-            for _clara_index in range(min(5, len(list(_clara_thread.done or [])))):
-                _clara_thread.done[_clara_index] = True
-            _clara_thread.num = 5
-        evalTime = None
-        findAvailableEvents(True)
-    jump story_clara_market_booklet_5
 
 
 label story_clara_market_booklet_6:
@@ -1467,14 +1443,11 @@ label story_clara_market_booklet_6:
 
 label story_clara_market_booklet_city_guard_direct:
     call preEvent("claraBookletMarket")
-    python:
-        _clara_thread = thread if 'thread' in globals() else None
-        if _clara_thread is not None and int(_clara_thread.num or 0) < 6:
-            for _clara_index in range(min(6, len(list(_clara_thread.done or [])))):
-                _clara_thread.done[_clara_index] = True
-            _clara_thread.num = 6
-        evalTime = None
-        findAvailableEvents(True)
+    if thread is not None and int(thread.num or 0) < 6:
+        $ thread.done = [True] * 6 + [False] * max(0, len(list(thread.done or [])) - 6)
+        $ thread.num = 6
+    $ evalTime = None
+    $ findAvailableEvents(True)
     jump story_clara_market_booklet_6
 
 
@@ -1510,14 +1483,11 @@ label story_clara_market_booklet_feed_mongol:
 
 label story_clara_market_booklet_feed_mongol_direct:
     call preEvent("claraBookletMarket")
-    python:
-        _clara_thread = thread if 'thread' in globals() else None
-        if _clara_thread is not None and int(_clara_thread.num or 0) < 7:
-            for _clara_index in range(min(7, len(list(_clara_thread.done or [])))):
-                _clara_thread.done[_clara_index] = True
-            _clara_thread.num = 7
-        evalTime = None
-        findAvailableEvents(True)
+    if thread is not None and int(thread.num or 0) < 7:
+        $ thread.done = [True] * 7 + [False] * max(0, len(list(thread.done or [])) - 7)
+        $ thread.num = 7
+    $ evalTime = None
+    $ findAvailableEvents(True)
     jump story_clara_market_booklet_feed_mongol
 
 
@@ -1551,14 +1521,11 @@ label story_clara_market_booklet_lockpicks_order:
 
 label story_clara_market_booklet_lockpicks_order_direct:
     call preEvent("claraBookletMarket")
-    python:
-        _clara_thread = thread if 'thread' in globals() else None
-        if _clara_thread is not None and int(_clara_thread.num or 0) < 8:
-            for _clara_index in range(min(8, len(list(_clara_thread.done or [])))):
-                _clara_thread.done[_clara_index] = True
-            _clara_thread.num = 8
-        evalTime = None
-        findAvailableEvents(True)
+    if thread is not None and int(thread.num or 0) < 8:
+        $ thread.done = [True] * 8 + [False] * max(0, len(list(thread.done or [])) - 8)
+        $ thread.num = 8
+    $ evalTime = None
+    $ findAvailableEvents(True)
     jump story_clara_market_booklet_lockpicks_order
 
 
@@ -1601,14 +1568,11 @@ label story_clara_market_booklet_release_mongol:
 
 label story_clara_market_booklet_release_mongol_direct:
     call preEvent("claraBookletMarket")
-    python:
-        _clara_thread = thread if 'thread' in globals() else None
-        if _clara_thread is not None and int(_clara_thread.num or 0) < 9:
-            for _clara_index in range(min(9, len(list(_clara_thread.done or [])))):
-                _clara_thread.done[_clara_index] = True
-            _clara_thread.num = 9
-        evalTime = None
-        findAvailableEvents(True)
+    if thread is not None and int(thread.num or 0) < 9:
+        $ thread.done = [True] * 9 + [False] * max(0, len(list(thread.done or [])) - 9)
+        $ thread.num = 9
+    $ evalTime = None
+    $ findAvailableEvents(True)
     jump story_clara_market_booklet_release_mongol
 
 

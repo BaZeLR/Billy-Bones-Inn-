@@ -114,7 +114,7 @@ label int_becky_dance():
             if TitsDance > 0:
                 "Бекки трется своей огромной грудью о вас, потихоньку возбуждаясь."
             $ DanceStep += 1
-            call becky_invite_home('Becky')
+            call BeckyInviteHome('Becky')
             if DanceStep == DanceMaxIBD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump int_becky_dance
@@ -138,7 +138,7 @@ label int_becky_dance():
                 call SlutFriendsIncrease(GirlNameIBD, 2, 2, -1, 0, 0, 0)
                 $ HandsDance = ''
             $ DanceStep += 1
-            call becky_invite_home('Becky')
+            call BeckyInviteHome('Becky')
             if DanceStep == DanceMaxIBD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump int_becky_dance
@@ -170,7 +170,7 @@ label int_becky_dance():
                 call SlutFriendsIncrease(GirlNameIBD, 0, 1, -1, 0, 1, -1)
                 $ HandsDance = ''
             $ DanceStep += 1
-            call becky_invite_home('Becky')
+            call BeckyInviteHome('Becky')
             if DanceStep == DanceMaxIBD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump int_becky_dance
@@ -200,7 +200,7 @@ label int_becky_dance():
                 call SlutFriendsIncrease(GirlNameIBD, 0, 1, -1, 0, 1, -1)
                 $ HandsDance = ''
             $ DanceStep += 1
-            call becky_invite_home('Becky')
+            call BeckyInviteHome('Becky')
             if DanceStep == DanceMaxIBD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump int_becky_dance
@@ -229,7 +229,7 @@ label int_becky_dance():
                 call SlutFriendsIncrease(GirlNameIBD, 0, 1, -1, 0, 1, -1)
                 $ KissDance = 0
             $ DanceStep += 1
-            call becky_invite_home('Becky')
+            call BeckyInviteHome('Becky')
             if DanceStep == DanceMaxIBD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump int_becky_dance
@@ -256,10 +256,6 @@ label becky_home_front_from_dances:
 
 # label slut_friends_increase(girl, a, b, c, d, e, f):
 #     # ...logic for increasing slut friends...
-#     return
-
-# label becky_invite_home(girl):
-#     # ...logic for Becky inviting home...
 #     return
 
 # label clean_screen_overflow():

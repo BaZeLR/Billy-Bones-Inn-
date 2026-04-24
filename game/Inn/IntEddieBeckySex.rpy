@@ -287,8 +287,3 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
                 return
 
     return
-
-
-label int_eddie_becky_sex(girl_name="becky"):
-    call IntEddieBeckySex(girl_name)
-    return

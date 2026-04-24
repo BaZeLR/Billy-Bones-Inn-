@@ -168,13 +168,13 @@ label BeckyHome(arrive_mode=""):
         $ _start_becky_sex = True
     elif arrive_mode == 'SvalnyiGreh':
         $ GrupenSex['eddie'] = 1
-        call int_eddie_becky_sex
+        call IntEddieBeckySex
         "[_becky_home_room.descriptions[2].text] <br>Вы и миссис Блэнкеншип находитесь в ее спальне.<br>Вместе с вами находится сын Бекки Эдди, им движут к матери отнюдь не сыновьи чувства."
         $ _start_becky_sex = True
     elif arrive_mode == 'FromDinner':
         "<br><br>[_becky_home_room.descriptions[2].text] "
         if BeckyVar['EddieTryToFuck'] == 1 and BeckyVar['visitedhome'] < 7:
-            call becky_eddie_join_first
+            call BeckyEddieJoinFirst
         else:
             if BeckyVar['visitedhome'] < 7:
                 "Дав вам зайти, вдова закрыла дверь на ключ и обернулась к вам, сказав: 'Если детишки мои развлекаются, то почему в конце концов я не могу себе такого позволить? Иди же ко мне!' "
@@ -226,13 +226,13 @@ label BeckyHome(arrive_mode=""):
                     renpy.say(None, ' Вы присмотрелись к Инге и заметили, что перед ужином времени она не теряла, на ее рыжей шевелюре были видны следы спермы.')
             if pregnancy.get('inga', 0) >= 120:
                 " Одного взгляда на круглый живот Инги было достаточно, чтобы понять что она ведет активную половую жизнь."
-            call int_becky_guest
+            call IntBeckyGuest
             " Итак, вы сидите за столом в гостях у вдовы Блэнкеншип и наслаждаетесь аппетитной домашней кухней."
     if _start_becky_sex:
         $ Arousal[GirlName] = PussyWetStart[GirlName]
         call cock_position(GirlName, 0)
         call check_visibility(GirlName)
-        call int_becky_sex(GirlName)
+        call IntBeckySex(GirlName)
         return
     call BeckyHomeRestore
     jump BeckyHomeView
@@ -326,61 +326,4 @@ label BeckyHomeObjectText(object_id="", action_id=""):
             current_action_title = _becky_name or "Дом Бекки"
     call BeckyHomeObjectMenu(object_id)
     return
-
-# # Helper labels for event chaining
-# label cock_position(girl, pos):
-#     # ...logic for cock position...
-#     return
-
-# label check_visibility(girl):
-#     # ...logic for check visibility...
-#     return
-
-# label int_becky_sex(girl):
-#     # ...Becky sex event...
-#     return
-
-# label becky_menu_sex():
-#     # ...Becky menu sex event...
-#     return
-
-# label show_image_seq(girl, context, subcontext, count):
-#     # ...show image sequence...
-#     return
-
-# label int_eddie_becky_sex():
-#     # ...Eddie/Becky sex event...
-#     return
-
-# label eddie_menu_sex():
-#     # ...Eddie menu sex event...
-#     return
-
-# label becky_eddie_join_first():
-#     # ...Becky/Eddie join first event...
-#     return
-
-# label show_image(girl, context, subcontext):
-#     # ...show image...
-#     return
-
-# label slut_friends_increase(girl, a, b, c, d, e, f):
-#     # ...logic for increasing slut friends...
-#     return
-
-# label int_becky_guest():
-#     # ...Becky guest event...
-#     return
-
-# label menu_guest_becky():
-#     # ...menu for guest at Becky...
-#     return
-
-# label add_clean_screen():
-#     # ...logic for cleaning screen...
-#     return
-
-# label street_tavern():
-#     # ...main tavern street...
-#     return
 

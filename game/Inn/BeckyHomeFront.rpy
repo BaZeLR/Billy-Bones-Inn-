@@ -194,7 +194,7 @@ label BeckyHomeFront(arrive_mode=""):
                 call becky_homefront_peek
                 jump BeckyHomeFrontMenu
                 
-            "Поделиться с вдовой своим открытием" if (ViewIngaSex == 1 and ArriveMode == "FromDances"):
+            "Поделится с вдовой своим открытием" if (ViewIngaSex == 1 and ArriveMode == "FromDances"):
                 call becky_homefront_share_with_becky
                 jump BeckyHomeFrontMenu
                 
@@ -206,7 +206,7 @@ label BeckyHomeFront(arrive_mode=""):
                 call becky_homefront_suggest_approach
                 jump BeckyHomeFrontMenu
                 
-            "Посмотреть как они кончат" if (ViewIngaSex == 2 and ArriveMode == "FromDances"):
+            "Посмотреть как они кончат" if ViewIngaSex == 3:
                 call becky_homefront_watch_cum
                 jump BeckyHomeFrontMenu
                 
