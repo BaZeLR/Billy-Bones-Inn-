@@ -225,6 +225,9 @@ label InitSecondaryNPC:
         RobinVar["Negotiate"] = 0
         RobinVar["KnowBigTitsVillage"] = 0
         RobinVar["MongolSafePass"] = 0
+        RobinVar["MongolSafePassUsed"] = 0
+        RobinVar["KunidellOpened"] = 0
+        RobinVar["KunidellDeliveries"] = 0
 
     $ FranBusy[0] = 0
     $ FranBusy[1] = 0

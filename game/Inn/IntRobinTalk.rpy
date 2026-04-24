@@ -4,7 +4,7 @@ label IntRobinTalk:
             call CleanScreenOverflow
             $ RobinTmpDesc = "Робин Гуд, " if RobinVar.get("KnowHim", 0) else ""
             "Мужики в трико, вооруженные как луками, так и самыми разными колюще-режущими предметами. Ими командует [RobinTmpDesc]здоровенный негр с золотой цепью на шее. На голове у него капюшон, частично скрывающий лицо."
-            call ShowImageSeq("Robin", "", "portrait", 2)
+            call ShowImageSeq("Robin", "", "robin", 2)
             return
 
         "Да кто вы вообще такие?" if RobinVar.get("KnowHim", 0) == 0:
