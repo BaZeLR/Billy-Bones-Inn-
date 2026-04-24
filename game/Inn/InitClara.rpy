@@ -157,6 +157,8 @@ init python:
         time_value = int(time if time_slot is None else time_slot or 0)
         if melissa_bats_stage() < 8:
             return False
+        if not werecat_is_living_with_household():
+            return False
         if time_value == 3:
             if week_value == 5:
                 return False

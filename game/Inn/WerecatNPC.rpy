@@ -5,8 +5,11 @@ default WerecatNPCState = {
 }
 
 init -8 python:
-    def werecat_is_active():
+    def werecat_is_living_with_household():
         return int(WerecatVar.get("adopted", 0) or 0) == 1 and int(WerecatVar.get("sold", 0) or 0) == 0
+
+    def werecat_is_active():
+        return werecat_is_living_with_household()
 
     def werecat_sleep_location():
         return "Backyard"
