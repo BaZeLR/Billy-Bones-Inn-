@@ -58,6 +58,15 @@ init -25 python:
             if str(key or "").startswith("_"):
                 continue
             scope[key] = value
+        scope.update({
+            "bool": bool,
+            "float": float,
+            "int": int,
+            "len": len,
+            "max": max,
+            "min": min,
+            "str": str,
+        })
         return scope
 
     def _story_level_enabled(level):
