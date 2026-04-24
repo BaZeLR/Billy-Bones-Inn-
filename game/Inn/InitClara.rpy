@@ -360,7 +360,7 @@ label InitClara:
             GirlName,
             [
                 NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=clara_visible_at_friday_dance, priority=220, label="friday_dance"),
-                NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[5, 6, 7], time_slots=[4], awake=True, talkable=True, condition=clara_melissa_visit_active, priority=210, label="melissa_room_visit"),
+                NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[4], awake=True, talkable=True, condition=clara_melissa_visit_active, priority=210, label="melissa_room_visit"),
                 NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[2], awake=True, talkable=True, condition=clara_tavern_visit_active, priority=200, label="tavern_visit"),
                 NPCScheduleEntry(location="MarketPlace", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[2, 3], awake=True, talkable=False, condition=clara_market_visit_active, priority=190, label="extra_market"),
                 NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0, 1], awake=True, talkable=True, condition=clara_wine_store_shift_active, priority=180, label="wine_store"),
