@@ -1,23 +1,25 @@
-init python:
-    def RobbedHorseTakeCode():
-        global MyStallion, MongolVar, RobinVar
-        MyStallion = ''
-        MongolVar['WillTryToSteal'] = 0
-        RobinVar['KnowBigTitsVillage'] = max(RobinVar['KnowBigTitsVillage'], 1)
+label SherwoodRobbedHorseTakeCode:
+    $ MyStallion = ""
+    $ MongolVar["WillTryToSteal"] = 0
+    $ RobinVar["KnowBigTitsVillage"] = max(RobinVar.get("KnowBigTitsVillage", 0), 1)
+    return
 
-    def RobbedAndGoCode():
-        global money, BeckyVar, time, RobinVar
-        renpy.say(None, 'Идти дальше в Куниделл смысла не было никакого и вы направили свои стопы обратно домой.')
-        money = max(0, money-50)
-        BeckyVar['RobbedByRobin'] = max(1, BeckyVar['RobbedByRobin'])
-        calendar_set_time_slot(4)
-        if RobinVar['Negotiate'] == 1:
-            RobinVar['Negotiate'] += 1
-        RobinVar['RobbedNum'] += 1
-        renpy.call('stat')
-        renpy.call('TavernMain')
 
-label SherwoodTravel:
+label SherwoodRobbedAndGoCode:
+    "Идти дальше в Куниделл смысла не было никакого и вы направили свои стопы обратно домой."
+    $ money = max(0, money - 50)
+    $ BeckyVar["RobbedByRobin"] = max(1, BeckyVar.get("RobbedByRobin", 0))
+    $ calendar_set_time_slot(4)
+    if RobinVar.get("Negotiate", 0) == 1:
+        $ RobinVar["Negotiate"] = RobinVar.get("Negotiate", 0) + 1
+    $ RobinVar["RobbedNum"] = RobinVar.get("RobbedNum", 0) + 1
+    call stat
+    menu:
+        "Домой":
+            jump TavernMain
+
+
+label SherwoodTravel(OnHorse=0):
     call EnterLocation("SherwoodTravel")
     if navigation_only_mode_enabled():
         "Насвистывая, вы идете по дороге к Куниделлу через вырубку Шервуда."
@@ -27,79 +29,79 @@ label SherwoodTravel:
             "Вернутся обратно в Коитополис":
                 jump TavernMain
         return
-    # OnHorse is passed as an argument
-    python:
-        _arg_list = _args or ()
-        OnHorse = _arg_list[0] if len(_arg_list) > 0 else 0
-        RobbersHeadNameTmp = 'Робин Гуд' if RobinVar['KnowHim'] else 'предводитель'
-    $ travel_action = 'Ехать' if OnHorse == 1 else 'Идти'
-    $ travel_verb = 'едете' if OnHorse == 1 else 'идете'
+
+    $ OnHorse = int(OnHorse or 0)
+    $ RobbersHeadNameTmp = "Робин Гуд" if RobinVar.get("KnowHim", 0) else "предводитель"
+    $ travel_action = "Ехать" if OnHorse == 1 else "Идти"
+    $ travel_verb = "едете" if OnHorse == 1 else "идете"
+
     "Насвистывая, вы [travel_verb] по дороге к Куниделлу. Через несколько часов поля и перелески уступают место вырубке. И так не сильно наезженная, дорога превращается практически в тропинку, петляющую между пнями и зарослями молодого кустарника."
-    if RobinVar['RobbedNum'] == 0:
+    if RobinVar.get("RobbedNum", 0) == 0:
         "Вдруг вдалеке вы замечаете группу мужчин в зеленых трико."
-    elif RobinVar['KnowHim'] == 0:
+    elif RobinVar.get("KnowHim", 0) == 0:
         "Вдруг вдалеке вы замечаете уже знакомых вам грабителей."
     else:
         "Вдруг вдалеке вы замечаете ваших старых знакомых, несчастных безработных лесорубов, во главе с Робин Гудом."
+
     menu:
         "[travel_action] дальше":
             call IntRobinTalk
-            python:
-                renpy.hide_screen('all')
-            if RobinVar['RobbedNum'] == 0:
-                "Семь бед - один ответ! ... (сюжетный текст)"
+            if RobinVar.get("RobbedNum", 0) == 0:
+                "\"Семь бед - один ответ!\" подумали вы и продолжили свой путь как ни в чем ни бывало. Мужики в трико при виде вас заметно оживились, в руках у них появились луки, стрелы и разнообразные колюще-режущие предметы."
+                "Когда вы приблизились, их [RobbersHeadNameTmp], негр с золотой цепью на шее и накинутом на голову капюшоне, вышел навстречу вам и спросил, широко улыбаясь: \"Йо, браза! Куда идешь?\""
+                "\"В Куниделл,\" скромно ответили вы."
                 if OnHorse == 1:
-                    "Ну и лошадь конечно, она нам тоже пригодится."
+                    "После этого обмена любезностями лицо вашего собеседника вдруг стало серьезным и он заявил: \"Хей, мэн, я и мои браза - простые лесорубы, доведенные обстоятельствами,\" тут он обвел рукой обширную вырубку, \"до отчаяния. Я вижу ты нам тоже браза, и хочешь сделать добровольное пожертвование на наше благое дело. Йо, я вижу ты щедрый чувак и хочешь пожертвовать все имеющиеся у тебя деньги. Ну и лошадь конечно, она нам тоже пригодится.\""
+                else:
+                    "После этого обмена любезностями лицо вашего собеседника вдруг стало серьезным и он заявил: \"Хей, мэн, я и мои браза - простые лесорубы, доведенные обстоятельствами,\" тут он обвел рукой обширную вырубку, \"до отчаяния. Я вижу ты нам тоже браза, и хочешь сделать добровольное пожертвование на наше благое дело. Йо, я вижу ты щедрый чувак и хочешь пожертвовать все имеющиеся у тебя деньги.\""
+                "Вы попробовали было осторожно отказаться, но ваш визави сразу отмел все возражения: \"Йо мэн, ты конечно хочешь к нам присоединиться и поучаствовать в нашей борьбе. Но не, сорри чувак, в настоящий момент мы не принимаем добровольцев. Только пожертвования.\""
+                $ BeckyVar["SherwoodSuspect"] = BeckyVar.get("SherwoodSuspect", 0) + 10
+                $ BeckyVar["KnowSherwood"] = 1
                 menu:
                     "Попрощаться":
-                        python:
-                            renpy.hide_screen('all')
-                        "Ну ладно, с вами поговорить - одно удовольствие, ... (сюжетный текст)"
+                        call CleanScreenOverflow
+                        "\"Ну ладно, с вами поговорить - одно удовольствие,\" заметили вы и непринужденно пошли своей дорогой."
+                        "\"Йо, браза, ты же о пожертвовании забыл,\" напомнил вам [RobbersHeadNameTmp]. И тут же чьи то трудовые мозолистые руки разлучили вас с вашим кошельком."
                         if money >= 50:
                             "Хорошо еще что вы взяли с собой только 50 мараведи!"
                         if OnHorse == 1:
-                            "Еще один лесоруб заботливо взял из ваших рук поводья вашей лошади. ... (сюжетный текст)"
-                            python:
-                                RobbedHorseTakeCode()
-                        python:
-                            RobbedAndGoCode()
+                            "Еще один лесоруб заботливо взял из ваших рук поводья вашей лошади."
+                            "\"Йо, бразас, в Большие Сиськи теперь легче будет добраться!\" обрадованно вскричал он."
+                            call SherwoodRobbedHorseTakeCode
+                        call SherwoodRobbedAndGoCode
             else:
-                "При виде вас [RobbersHeadNameTmp] и его друзья очень удивились. ... (сюжетный текст)"
+                "При виде вас [RobbersHeadNameTmp] и его друзья очень удивились. \"Слышь мужики, а я думал что он трактирщик,\" недоуменно пробормотал главарь. Обернушись к вам, он сменил тон на преувеличенно радостный: \"Йо, бразар, ты нам донату занес? Ты кул, бразар, видно что не мазафака.\""
                 menu:
                     "Ага, вот ваши денежки":
-                        python:
-                            renpy.hide_screen('all')
+                        call CleanScreenOverflow
                         "Широко, хотя и немного вымученно, улыбаясь, вы вывернули карманы."
                         if money >= 50:
                             "Хорошо еще что вы взяли с собой только 50 мараведи!"
-                        "Обездоленные радостно переглянулись. ... (сюжетный текст)"
+                        "Обездоленные радостно переглянулись. Тут [RobbersHeadNameTmp] прокашлялся и сказал: \"Йо спасибо бразар, а теперь иди себе обратно. Нам с бразами надо перетереть за социяльную справедливость. Но ты приходи еще, завтра там.\""
+                        "Совету, подкрепленному мечами, пришлось последовать и вы отправились обратно."
                         if OnHorse == 1:
-                            "В последний момент один из разбойников выхватил у вас повод, ... (сюжетный текст)"
-                            python:
-                                RobbedHorseTakeCode()
-                        "Да, как-то глупо получилось, подумали вы. И зачем я еще раз сюда поперся?"
+                            "В последний момент один из разбойников выхватил у вас повод, заявив: \"Эй, бразар, коняшку то оставь. Здесь недалеко, на своих дотопаешь.\""
+                            call SherwoodRobbedHorseTakeCode
                         if OnHorse == 1:
-                            "Да еще и с конем?"
-                        python:
-                            RobbedAndGoCode()
-            show Robin portrait2
+                            "\"Да, как-то глупо получилось,\" подумали вы. \"И зачем я еще раз сюда поперся? Да еще и с конем?\""
+                        else:
+                            "\"Да, как-то глупо получилось,\" подумали вы. \"И зачем я еще раз сюда поперся?\""
+                        call SherwoodRobbedAndGoCode
+
+            call ShowImage("Robin", "", "portrait2")
             call AddCleanScreen
-    menu:
+
         "Вернутся обратно в Коитополис":
-            if RobinVar['RobbedNum'] == 0:
-                $ BeckyVar['SherwoodSuspect'] += 2
-                $ BeckyVar['KnowSherwood'] = 1
+            if RobinVar.get("RobbedNum", 0) == 0:
+                $ BeckyVar["SherwoodSuspect"] = BeckyVar.get("SherwoodSuspect", 0) + 2
+                $ BeckyVar["KnowSherwood"] = 1
                 "Решив что встреча со странными мужиками в трико на пустынной вырубке"
-            elif RobinVar['KnowHim'] == 0:
+            elif RobinVar.get("KnowHim", 0) == 0:
                 "Решив что, по здравому размышлению, встреча с грабителями"
             else:
                 "Решив что новая встреча с вашим старым другом Робином, да еще и на пустынной вырубке,"
             "ничего хорошего вам не принесет, вы развернулись и пустились в обратный путь. Может вас преследовали, может нет, но вы благополучно выбрались с вырубки на обжитую местность. Уже смеркалось, поэтому вам ничего не оставалось, как направиться обратно в Коитополис, куда вы и добрались без приключений. На сегодня ваше путешествие закончено."
             $ calendar_set_time_slot(4)
-            python:
-                renpy.hide_screen('all')
             menu:
                 "Домой":
                     jump TavernMain
-    return
-# ...existing code...
