@@ -318,7 +318,7 @@ init -5 python:
             if int(Friends.get(npc_id, 0) or 0) < 15:
                 continue
             try:
-                if not _tavern_is_in_room(npc_id, room_key):
+                if str(getLocation(npc_id) or "") != room_key:
                     continue
             except Exception:
                 continue

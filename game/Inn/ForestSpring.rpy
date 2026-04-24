@@ -39,7 +39,7 @@ label ForestSpring:
     else:
         $ _layout_last_picture = ""
     $ MainTxt = ForestSpringRoom.descriptions[0].text
-    if clara_visible_in_location("ForestSpring"):
+    if str(getLocation("clara") or "") == "ForestSpring":
         $ _clara_forest_picture = clara_forest_picture("ForestSpring")
         if str(_clara_forest_picture or "").strip():
             $ _layout_last_picture = _clara_forest_picture

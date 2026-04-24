@@ -157,20 +157,11 @@ init python:
         return int(player_recent_sex_count(2) or 0) > 2
 
     def household_breakfast_attendee_ids():
-        if int(dayspassed or 0) <= 0:
-            attendees = ["sandra", "melissa", "amanda"]
-            if int(BeckyKitchenVisitActive or 0) == 1:
-                attendees.append("becky")
-            return attendees
         attendees = []
-        for npc_id in ("sandra", "melissa", "amanda"):
-            if household_morning_issue_type(npc_id) != "":
-                continue
-            if household_needs_reconcile(npc_id):
+        for npc_id in ("sandra", "melissa", "amanda", "becky"):
+            if str(getLocation(npc_id) or "") != "TavernKitchen":
                 continue
             attendees.append(npc_id)
-        if int(BeckyKitchenVisitActive or 0) == 1:
-            attendees.append("becky")
         return attendees
 
     def household_breakfast_absence_lines():
@@ -311,7 +302,7 @@ init python:
 
     def tavern_household_present_names(room_code=""):
         room_key = str(room_code or "").strip()
-        keys = [name for name in ("sandra", "melissa", "amanda") if _tavern_is_in_room(name, room_key)]
+        keys = [name for name in ("sandra", "melissa", "amanda") if str(getLocation(name) or "") == room_key]
         return _tavern_join_names(keys)
 
     def _tavern_effective_location(person, time_value=None):
@@ -328,9 +319,6 @@ init python:
             "TavernMelissaRoom",
             "TavernAmandaRoom",
         }
-
-        if explicit_loc and explicit_loc not in tavern_rooms:
-            return explicit_loc
 
         slot = _tavern_int(time if time_value is None else time_value, 0)
         if key == "melissa":
@@ -351,6 +339,9 @@ init python:
         schedule_loc = str(npc_schedule_location(key, _tavern_int(week, 1), slot) or "")
         if schedule_loc:
             return schedule_loc
+
+        if explicit_loc and explicit_loc not in tavern_rooms:
+            return explicit_loc
 
         sunday_loc = _tavern_household_sunday_location(key, slot)
         if sunday_loc:
@@ -380,9 +371,6 @@ init python:
 
         return explicit_loc
 
-    def _tavern_is_in_room(person, room_code, time_value=None):
-        return str(_tavern_effective_location(person, time_value) or "") == str(room_code or "")
-
     def _tavern_job_room(job_type):
         return {
             "jobkitchen": "TavernKitchen",
@@ -403,7 +391,7 @@ init python:
         target_room = str(room_code or _tavern_job_room(job_type) or "")
         if not target_room:
             return keys
-        return [name for name in keys if _tavern_is_in_room(name, target_room)]
+        return [name for name in keys if str(getLocation(name) or "") == target_room]
 
     def NamesList(job_type, room_code=None):
         """Строка имен для выбранного типа работы."""

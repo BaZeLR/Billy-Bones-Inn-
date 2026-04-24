@@ -293,9 +293,9 @@ init python:
         room_code = str(current_room or CurLoc or "").strip()
         room_girls = []
         if room_code == "TavernMain":
-            room_girls = [girl for girl in ("amanda", "melissa", "sandra") if _tavern_is_in_room(girl, "TavernMain")]
+            room_girls = [girl for girl in ("amanda", "melissa", "sandra") if str(getLocation(girl) or "") == "TavernMain"]
         elif room_code == "TavernKitchen":
-            room_girls = [girl for girl in ("amanda", "melissa", "sandra") if _tavern_is_in_room(girl, "TavernKitchen")]
+            room_girls = [girl for girl in ("amanda", "melissa", "sandra") if str(getLocation(girl) or "") == "TavernKitchen"]
         for girl in room_girls:
             if household_soap_request_ready(girl):
                 return ("soap", girl)
@@ -327,8 +327,8 @@ init python:
     def melissa_clara_overhear_ready():
         return (
             str(CurLoc or "") == "TavernMain"
-            and _tavern_is_in_room("melissa", "TavernMain")
-            and clara_visible_in_location("TavernMain")
+            and str(getLocation("melissa") or "") == "TavernMain"
+            and str(getLocation("clara") or "") == "TavernMain"
             and int(time or 0) == 2
             and not household_runtime_event_seen_today("melissa_clara_overhear")
         )
@@ -339,7 +339,7 @@ init python:
     def tavern_storage_rat_event_ready():
         return (
             str(CurLoc or "") == "TavernStorage"
-            and _tavern_is_in_room("melissa", "TavernStorage")
+            and str(getLocation("melissa") or "") == "TavernStorage"
             and not household_runtime_event_seen_today("melissa_storage_rat")
         )
 

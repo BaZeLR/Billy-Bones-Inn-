@@ -24,7 +24,7 @@ init 6 python:
 
     def backyard_dynamic_picture():
         if int(hour or 0) < 12 and int(week or 0) != 7:
-            if _tavern_is_in_room("melissa", "Backyard"):
+            if str(getLocation("melissa") or "") == "Backyard":
                 melissa_backyard = [
                     "images/melissa/tavern/backyard_0.png",
                     "images/melissa/tavern/backyard_1.png",
@@ -32,7 +32,7 @@ init 6 python:
                 melissa_backyard = [row for row in melissa_backyard if renpy.loadable(row)]
                 if len(melissa_backyard) > 0:
                     return melissa_backyard[int((dayspassed or 0) + (hour or 0) + (minute or 0)) % len(melissa_backyard)]
-            if _tavern_is_in_room("amanda", "Backyard") and renpy.loadable("images/tavern/backyard/backyard_chop_woods.png"):
+            if str(getLocation("amanda") or "") == "Backyard" and renpy.loadable("images/tavern/backyard/backyard_chop_woods.png"):
                 return "images/tavern/backyard/backyard_chop_woods.png"
         if backyard_has_ash_barrel() and renpy.loadable("images/tavern/backyard/soap_backyard.png"):
             return "images/tavern/backyard/soap_backyard.png"
@@ -57,7 +57,7 @@ init 6 python:
     def build_backyard_npc_entries():
         entries = []
         for npc_key in ("sandra", "melissa", "amanda"):
-            if not _tavern_is_in_room(npc_key, "Backyard"):
+            if str(getLocation(npc_key) or "") != "Backyard":
                 continue
             entries.append({
                 "npc_id": npc_key,
@@ -65,9 +65,13 @@ init 6 python:
                 "talk_label": "Int" + str(npc_key).capitalize() + "Talk",
                 "auto_card": True,
             })
-        _werecat_entry = werecat_npc_entry("Backyard")
-        if isinstance(_werecat_entry, dict):
-            entries.append(dict(_werecat_entry))
+        if str(getLocation("werecat") or "") == "Backyard":
+            entries.append({
+                "npc_id": "werecat",
+                "name": str(werecat_display_name() or "Луна"),
+                "talk_label": "IntWerecatTalk",
+                "auto_card": True,
+            })
         return entries
 
     BackyardRoom = Room(

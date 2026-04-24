@@ -1,8 +1,8 @@
 init 6 python:
     def tavern_melissa_room_npc_entries():
         return [
-            {"npc_id": "melissa", "name": "Мелисса", "condition": tavern_melissa_room_visible, "talk_label": "IntMelissaTalk", "auto_card": True},
-            {"npc_id": "clara", "name": "Кларисса", "condition": tavern_melissa_room_clara_visible, "talk_label": "IntClaraTalk", "auto_card": True},
+            {"npc_id": "melissa", "name": "Мелисса", "talk_label": "IntMelissaTalk", "auto_card": True},
+            {"npc_id": "clara", "name": "Кларисса", "talk_label": "IntClaraTalk", "auto_card": True},
         ]
 
     def tavern_melissa_room_clara_scene_paths():
@@ -17,7 +17,7 @@ init 6 python:
         ]
 
     def tavern_melissa_room_clara_visit_active():
-        return tavern_melissa_room_clara_visible() and melissa_bats_stage() >= 8
+        return str(getLocation("clara") or "") == "TavernMelissaRoom" and melissa_bats_stage() >= 8
 
     def tavern_melissa_room_register_clara_visit():
         if not tavern_melissa_room_clara_visit_active():
@@ -77,12 +77,6 @@ init 6 python:
             if len(picture_cycle) > 0:
                 return picture_cycle[int(dayspassed or 0) % len(picture_cycle)]
         return "images/tavern/secondfloor/girls_room_day.png"
-
-    def tavern_melissa_room_visible():
-        return _tavern_is_in_room("melissa", "TavernMelissaRoom")
-
-    def tavern_melissa_room_clara_visible():
-        return clara_visible_in_location("TavernMelissaRoom")
 
     def tavern_melissa_room_get_object(object_id):
         object_key = str(object_id or "").strip()

@@ -12,13 +12,13 @@ init python:
     def tavern_main_morning_event_data():
         event_pool = []
 
-        if _tavern_is_in_room("sandra", "TavernMain") and renpy.loadable("images/sandra/tavern/cleaning1.jpg"):
+        if str(getLocation("sandra") or "") == "TavernMain" and renpy.loadable("images/sandra/tavern/cleaning1.jpg"):
             event_pool.append({
                 "picture": "images/sandra/tavern/cleaning1.jpg",
                 "text": "Сандра уже выбралась в главный зал и сразу находит себе дело: поправляет лавки, оглядывает половицы и ворчит, что к полудню все должно выглядеть так, будто дом сам себя держит в порядке.",
             })
 
-        if _tavern_is_in_room("melissa", "TavernMain"):
+        if str(getLocation("melissa") or "") == "TavernMain":
             melissa_hall_candidates = [
                 "images/melissa/tavern/melissa_cleans_0.png",
                 "images/melissa/tavern/melissa_cleans_1.png",
@@ -30,7 +30,7 @@ init python:
                     "text": "Мелисса тихо возится в зале, протирая столы и выправляя мелочи, которые вечером никто бы уже не заметил, а утром они сразу бросаются в глаза.",
                 })
 
-        if _tavern_is_in_room("amanda", "TavernMain"):
+        if str(getLocation("amanda") or "") == "TavernMain":
             amanda_hall_candidates = [
                 "images/amanda/tavern/cleaning1.jpg",
                 "images/amanda/tavern/cleaning2.jpg",
@@ -42,19 +42,19 @@ init python:
                     "text": "Аманда носится по залу с утренней торопливостью, словно первые посетители уже вот-вот ввалятся с улицы, хотя до настоящей работы еще остается время.",
                 })
 
-        if _tavern_is_in_room("amanda", "TavernMain") or _tavern_is_in_room("melissa", "TavernMain"):
+        if str(getLocation("amanda") or "") == "TavernMain" or str(getLocation("melissa") or "") == "TavernMain":
             event_pool.append({
                 "picture": "images/tavern/mainhall/bar_mainHall.png",
                 "text": "Пока до открытия еще далеко, в зале больше всего возни у стойки: кто-то переставляет кружки и кувшины, кто-то протирает доски, а Аманда успевает суетиться сразу в нескольких местах.",
             })
 
-        if _tavern_is_in_room("sandra", "TavernMain"):
+        if str(getLocation("sandra") or "") == "TavernMain":
             event_pool.append({
                 "picture": "images/tavern/mainhall/camin_mainHall.png",
                 "text": "Сандра заглядывает в зал и сразу замечает любую мелочь: где лавка стоит криво, где пепел не убран, а где к полудню понадобится еще дров и горячей воды.",
             })
 
-        if _tavern_is_in_room("sandra", "TavernStorage") or _tavern_is_in_room("melissa", "Backyard") or _tavern_is_in_room("amanda", "Backyard"):
+        if str(getLocation("sandra") or "") == "TavernStorage" or str(getLocation("melissa") or "") == "Backyard" or str(getLocation("amanda") or "") == "Backyard":
             event_pool.append({
                 "picture": "images/tavern/mainhall/tavern_crew.jpg",
                 "text": "Утренние хлопоты пока разбросаны по всему хозяйству: кто-то возится с припасами, кто-то занят двором, и весь дом живет скорее общим бытом, чем трактирной работой.",
@@ -86,30 +86,6 @@ init python:
 
     def tavern_main_glory_hole_visible():
         return TavernClosed == "" and TavernGloryHole == 2
-
-    def tavern_main_sandra_visible():
-        return TavernClosed == "" and _tavern_is_in_room("sandra", "TavernMain")
-
-    def tavern_main_melissa_visible():
-        return TavernClosed == "" and _tavern_is_in_room("melissa", "TavernMain")
-
-    def tavern_main_amanda_visible():
-        return TavernClosed == "" and _tavern_is_in_room("amanda", "TavernMain")
-
-    def tavern_main_georgett_visible():
-        return TavernClosed == "" and GeorgettAvail == 1
-
-    def tavern_main_liza_visible():
-        return TavernClosed == "" and LizaAvail == 1
-
-    def tavern_main_clara_visible():
-        return TavernClosed == "" and clara_visible_in_location("TavernMain")
-
-    def tavern_main_becky_visible():
-        return TavernClosed == "" and _tavern_is_in_room("becky", "TavernMain")
-
-    def tavern_main_werecat_visible():
-        return TavernClosed == "" and werecat_npc_present("TavernMain")
 
     def tavern_main_morning_routine_text():
         routine_pool = [
@@ -147,7 +123,7 @@ init python:
                 desc_parts.append(tavern_main_morning_event_text())
                 desc_parts.append("На кухне с утра возятся: " + str(tavern_household_present_names("TavernKitchen") or "никто") + ".")
                 desc_parts.append("В зале сейчас видны: " + str(tavern_household_present_names("TavernMain") or "никто") + ".")
-                desc_parts.append("По двору и кладовым шныряют: " + str(_tavern_join_names([name for name in ("sandra", "melissa", "amanda") if _tavern_is_in_room(name, "Backyard") or _tavern_is_in_room(name, "TavernStorage")]) or "никто") + ".")
+                desc_parts.append("По двору и кладовым шныряют: " + str(_tavern_join_names([name for name in ("sandra", "melissa", "amanda") if str(getLocation(name) or "") in ("Backyard", "TavernStorage")]) or "никто") + ".")
                 desc_parts.append("Сейчас как раз удобное время перекинуться с домашними парой слов, прежде чем начнется обычная работа.")
             else:
                 desc_parts.append("На кухне в вашем трактире работают: " + str(NamesList("jobkitchen", "TavernKitchen") or "никто") + ".")
@@ -155,9 +131,9 @@ init python:
                 desc_parts.append("Еду и выпивку пьяным, трезвым, похотливым, скромным и прочим посетителям разносят: " + str(NamesList("jobwaitress", "TavernMain") or "никто") + ".")
                 desc_parts.append("Вы можете пообщаться с участницами своей команды через список персонажей справа.")
 
-            if clara_visible_in_location("TavernMain"):
+            if str(getLocation("clara") or "") == "TavernMain":
                 desc_parts.append("Кларисса снова заглянула в трактир и, похоже, в последнее время заметно сдружилась с Мелиссой: обе держатся рядом, перешептываются между столами и временами вместе прыскают со смеху.")
-            if _tavern_is_in_room("becky", "TavernMain"):
+            if str(getLocation("becky") or "") == "TavernMain":
                 desc_parts.append("Бекки Блэнкеншип на этот раз сама заглянула к вам в трактир и присматривается к залу цепким хозяйским взглядом.")
             if str(TavernMainExtraDesc or "").strip():
                 desc_parts.append(str(TavernMainExtraDesc or ""))
@@ -190,14 +166,14 @@ init python:
             "bar_001",
         ],
         npcs=[
-            {"npc_id": "sandra", "name": "Сандра", "condition": tavern_main_sandra_visible, "talk_label": "IntSandraTalk", "auto_card": True},
-            {"npc_id": "melissa", "name": "Мелисса", "condition": tavern_main_melissa_visible, "talk_label": "IntMelissaTalk", "auto_card": True},
-            {"npc_id": "amanda", "name": "Аманда", "condition": tavern_main_amanda_visible, "talk_label": "IntAmandaTalk", "auto_card": True},
-            {"npc_id": "georgett", "name": "Жоржетта", "condition": tavern_main_georgett_visible, "talk_label": "IntGeorgettTalk", "talk_args": ("georgett", "tavern"), "auto_card": True},
-            {"npc_id": "liza", "name": "Лизетта", "condition": tavern_main_liza_visible, "talk_label": "IntLizaTalk", "auto_card": True},
-            {"npc_id": "clara", "name": "Кларисса", "condition": tavern_main_clara_visible, "talk_label": "IntClaraTalk", "auto_card": True},
-            {"npc_id": "becky", "name": "Бекки", "condition": tavern_main_becky_visible, "talk_label": "IntBeckyTalk", "auto_card": True},
-            {"npc_id": "werecat", "name": "Луна", "condition": tavern_main_werecat_visible, "talk_label": "IntWerecatTalk", "auto_card": True},
+            {"npc_id": "sandra", "name": "Сандра", "talk_label": "IntSandraTalk", "auto_card": True},
+            {"npc_id": "melissa", "name": "Мелисса", "talk_label": "IntMelissaTalk", "auto_card": True},
+            {"npc_id": "amanda", "name": "Аманда", "talk_label": "IntAmandaTalk", "auto_card": True},
+            {"npc_id": "georgett", "name": "Жоржетта", "talk_label": "IntGeorgettTalk", "talk_args": ("georgett", "tavern"), "auto_card": True},
+            {"npc_id": "liza", "name": "Лизетта", "talk_label": "IntLizaTalk", "auto_card": True},
+            {"npc_id": "clara", "name": "Кларисса", "talk_label": "IntClaraTalk", "auto_card": True},
+            {"npc_id": "becky", "name": "Бекки", "talk_label": "IntBeckyTalk", "auto_card": True},
+            {"npc_id": "werecat", "name": "Луна", "talk_label": "IntWerecatTalk", "auto_card": True},
         ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
@@ -312,7 +288,7 @@ label TavernMain:
 
     # Main event and interaction logic
     if TavernEventOngoing == "" and TavernClosed == "":
-        if CurrentLoc[GirlNameTS1] == CurLoc and time > 2:
+        if str(getLocation(GirlNameTS1) or "") == CurLoc and time > 2:
             if time == 3:
                 call AddOthersSperm(GirlNameTS1, 7)
                 call AddOthersSperm(GirlNameTS2, 8)
@@ -322,33 +298,43 @@ label TavernMain:
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит юная Лизетта и ждет клиентов. А вот ее мамаша клиента уже похоже нашла."
                     $ LizaAvail = 1
+                    $ CurrentLoc[GirlNameTS1] = "TavernClientRoom"
+                    $ CurrentLoc[GirlNameTS2] = "TavernMain"
                     $ TavernMainClientRoomGirl = "georgett"
                 elif randvarPS == 2 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Жоржетта и ждет клиентов. А вот ее старшую дочку, судя по всему, уже кто-то снял."
                     $ GeorgettAvail = 1
+                    $ CurrentLoc[GirlNameTS1] = "TavernMain"
+                    $ CurrentLoc[GirlNameTS2] = "TavernClientRoom"
                     $ TavernMainClientRoomGirl = "liza"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидят Жоржетта со своей дочкой Лизеттой и ждут клиентов."
                     $ LizaAvail = 1
                     $ GeorgettAvail = 1
+                    $ CurrentLoc[GirlNameTS1] = "TavernMain"
+                    $ CurrentLoc[GirlNameTS2] = "TavernMain"
             elif jobwhore["liza"] == 1:
                 python:
                     randvarPS = renpy.random.randint(1, 3)
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу, где обычно сидит Лизетта, пусто. Похоже что ветренную девчонку уже кто-то снял."
+                    $ CurrentLoc[GirlNameTS2] = "TavernClientRoom"
                     $ TavernMainClientRoomGirl = "liza"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Лизетта и ждет клиентов."
                     $ LizaAvail = 1
+                    $ CurrentLoc[GirlNameTS2] = "TavernMain"
             elif jobwhore["georgett"] == 1:
                 python:
                     randvarPS = renpy.random.randint(1, 3)
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу, где обычно сидит Жоржетта, пусто. Похоже что шлюшку уже кто-то снял."
+                    $ CurrentLoc[GirlNameTS1] = "TavernClientRoom"
                     $ TavernMainClientRoomGirl = "georgett"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Жоржетта и ждет клиентов."
                     $ GeorgettAvail = 1
+                    $ CurrentLoc[GirlNameTS1] = "TavernMain"
         $ _glory_quest_started = int(DraupnirVar.get("GloryHoleAsked", 0) or 0) > 0
         if TavernGloryHole == 1 and _glory_quest_started:
             $ TavernMainGloryDesc = "В дальнем углу трактира мастера Драупнир что-то строгает и пилит. Работа кипит. Еще несколько часов и вы сможете насладиться построенным глорихолом."
@@ -369,13 +355,13 @@ label TavernMain:
                 $ _tmp_bf_georgett = DescribeBreastFeeding('georgett')
             if LizaAvail == 1:
                 $ _tmp_bf_liza = DescribeBreastFeeding('liza')
-            if CurrentLoc['georgett'] == 'TavernMain':
+            if str(getLocation("georgett") or "") == "TavernMain":
                 $ _tmp_kids_list = ShowFullKidsListByAge('sandra','amanda','melissa','georgett','liza')
             else:
                 $ _tmp_kids_list = ShowFullKidsListByAge('sandra','amanda','melissa')
-            if GeorgettAvail == 1 or (CurrentLoc['georgett'] == CurLoc and time < 2):
+            if GeorgettAvail == 1 or (str(getLocation("georgett") or "") == CurLoc and time < 2):
                 call CheckDailyEvent('georgett')
-            if LizaAvail == 1 or (CurrentLoc['liza'] == CurLoc and time < 2):
+            if LizaAvail == 1 or (str(getLocation("liza") or "") == CurLoc and time < 2):
                 call CheckDailyEvent('liza')
         call TavernMainBuildActions
         
@@ -390,9 +376,9 @@ label TavernMain:
         $ MainTxt = CurLocDesc
 
     if TavernEventOngoing == "" and TavernClosed == "":
-        if amanda_revealing_dress_request_ready() and _tavern_is_in_room("amanda", "TavernMain"):
+        if amanda_revealing_dress_request_ready() and str(getLocation("amanda") or "") == "TavernMain":
             call AmandaDressRequestEvent
-        elif melissa_revealing_dress_request_ready() and _tavern_is_in_room("melissa", "TavernMain"):
+        elif melissa_revealing_dress_request_ready() and str(getLocation("melissa") or "") == "TavernMain":
             call MelissaDressRequestEvent
         else:
             python:

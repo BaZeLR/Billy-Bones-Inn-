@@ -60,9 +60,9 @@ init python:
     def wine_for_dance_breakfast_appreciation():
         present_ids = []
         for npc_id in ("sandra", "melissa", "amanda"):
-            if _kitchen_worker_is_present(npc_id):
+            if str(getLocation(npc_id) or "") == "TavernKitchen":
                 present_ids.append(npc_id)
-        if int(BeckyKitchenVisitActive or 0) == 1:
+        if str(getLocation("becky") or "") == "TavernKitchen":
             present_ids.append("becky")
         for npc_id in present_ids:
             Friends[npc_id] = min(20, int(Friends.get(npc_id, 0) or 0) + 1)

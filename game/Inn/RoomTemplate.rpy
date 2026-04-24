@@ -298,6 +298,9 @@ init -40 python:
             out = []
             for npc in self.npcs:
                 if isinstance(npc, dict):
+                    npc_id = str(npc.get("npc_id", "") or "").strip()
+                    if npc_id and str(getLocation(npc_id) or "") != str(self.code_name or ""):
+                        continue
                     if room_rule_true(npc.get("condition", None)):
                         out.append(npc)
                     continue
@@ -306,7 +309,8 @@ init -40 python:
                         out.append(npc)
                     continue
                 if isinstance(npc, str) and str(npc).strip():
-                    out.append(npc)
+                    if str(getLocation(npc) or "") == str(self.code_name or ""):
+                        out.append(npc)
             return out
 
         def visible_actions(self):

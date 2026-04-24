@@ -3,9 +3,9 @@ init 6 python:
 
     def tavern_storage_picture():
         if int(hour or 0) < 12 and int(week or 0) != 7:
-            if _tavern_is_in_room("amanda", "TavernStorage") and renpy.loadable("images/amanda/tavern/amanda_storage.png"):
+            if str(getLocation("amanda") or "") == "TavernStorage" and renpy.loadable("images/amanda/tavern/amanda_storage.png"):
                 return "images/amanda/tavern/amanda_storage.png"
-            if _tavern_is_in_room("melissa", "TavernStorage"):
+            if str(getLocation("melissa") or "") == "TavernStorage":
                 if renpy.loadable("images/melissa/tavern/basement.png"):
                     return "images/melissa/tavern/basement.png"
                 if renpy.loadable("images/amanda/melissa_in storage.mp4"):

@@ -48,11 +48,11 @@ init python:
         return random.choice(candidates)
 
     def tavern_kitchen_picture():
-        if _kitchen_worker_is_present("sandra"):
+        if str(getLocation("sandra") or "") == "TavernKitchen":
             sandra_scene = tavern_kitchen_random_sandra_scene()
             if sandra_scene:
                 return sandra_scene
-        if _kitchen_worker_is_present("melissa"):
+        if str(getLocation("melissa") or "") == "TavernKitchen":
             if random.randint(1, 4) == 1:
                 if renpy.loadable("images/melissa/tavern/basement.png"):
                     return "images/melissa/tavern/basement.png"
@@ -119,7 +119,6 @@ init python:
                     "name": "Бекки",
                     "talk_label": "IntBeckyTalk",
                     "auto_card": True,
-                    "condition": kitchen_becky_visit_visible,
                 })
             else:
                 entries.append({
@@ -629,7 +628,7 @@ init python:
         return present_ids
 
     def tavern_kitchen_can_share_tea_with_sandra_and_becky():
-        return int(BeckyKitchenVisitActive or 0) == 1 and _kitchen_worker_is_present("sandra") and int(_player_item_count_by_id("energy_tea_001") or 0) > 0
+        return int(BeckyKitchenVisitActive or 0) == 1 and str(getLocation("sandra") or "") == "TavernKitchen" and int(_player_item_count_by_id("energy_tea_001") or 0) > 0
 
     def tavern_kitchen_depositable_food_ids():
         return ("berries_001", "mushroom_001", "honey_comb_001", "boar_meat_001", "milk_pitcher_001")
@@ -831,10 +830,10 @@ init python:
         return lines
 
     def tavern_kitchen_sandra_can_discuss_breakfasts():
-        return _kitchen_worker_is_present("sandra") and tavern_kitchen_food_stock_count() > 0 and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0
+        return str(getLocation("sandra") or "") == "TavernKitchen" and tavern_kitchen_food_stock_count() > 0 and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0
 
     def tavern_kitchen_sandra_can_discuss_clients():
-        return _kitchen_worker_is_present("sandra") and tavern_kitchen_food_stock_count() > 0 and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0
+        return str(getLocation("sandra") or "") == "TavernKitchen" and tavern_kitchen_food_stock_count() > 0 and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0
 
     TavernKitchenRoom = Room(
         code_name="TavernKitchen",
@@ -866,13 +865,6 @@ init python:
         custom_properties={"object_menu_label": "TavernKitchenObjectMenu"},
     )
 
-    def _kitchen_has_job(npc_id):
-        mapping = jobkitchen if isinstance(jobkitchen, dict) else {}
-        return int(mapping.get(npc_id, 0) or 0) != 0
-
-    def _kitchen_worker_is_present(npc_id):
-        return _kitchen_has_job(npc_id) and _tavern_is_in_room(npc_id, "TavernKitchen")
-
     def _kitchen_display_name(npc_id):
         try:
             return _tavern_name(npc_id)
@@ -885,9 +877,6 @@ init python:
             return label
         return ""
 
-    def kitchen_becky_visit_visible():
-        return int(BeckyKitchenVisitActive or 0) == 1
-
     def build_kitchen_npc_entries():
         if bool(TavernBreakfastEventActive):
             return tavern_breakfast_present_entries()
@@ -895,23 +884,26 @@ init python:
         for npc_key in ("sandra", "melissa", "amanda"):
             if not npc_key:
                 continue
-            if _tavern_is_in_room(npc_key, "TavernKitchen"):
+            if str(getLocation(npc_key) or "") == "TavernKitchen":
                 entries.append({
                     "npc_id": npc_key,
                     "name": _kitchen_display_name(npc_key),
                     "talk_label": _kitchen_talk_label(npc_key),
                     "auto_card": True,
                 })
-        _werecat_entry = werecat_npc_entry("TavernKitchen")
-        if isinstance(_werecat_entry, dict):
-            entries.append(dict(_werecat_entry))
-        if int(BeckyKitchenVisitActive or 0) == 1:
+        if str(getLocation("werecat") or "") == "TavernKitchen":
+            entries.append({
+                "npc_id": "werecat",
+                "name": str(werecat_display_name() or "Луна"),
+                "talk_label": "IntWerecatTalk",
+                "auto_card": True,
+            })
+        if str(getLocation("becky") or "") == "TavernKitchen":
             entries.append({
                 "npc_id": "becky",
                 "name": "Бекки",
                 "talk_label": "IntBeckyTalk",
                 "auto_card": True,
-                "condition": kitchen_becky_visit_visible,
             })
         return entries
 
@@ -1018,7 +1010,7 @@ label TavernKitchen:
 
     $ _kitchen_wine_event_text = ""
     $ _kitchen_pending_event = tavern_kitchen_pending_mandatory_event_code()
-    if str(_kitchen_pending_event or "") == "WineForDance" and _tavern_is_in_room("sandra", "TavernKitchen") and not tavern_breakfast_available():
+    if str(_kitchen_pending_event or "") == "WineForDance" and str(getLocation("sandra") or "") == "TavernKitchen" and not tavern_breakfast_available():
         $ _kitchen_event_picture = tavern_kitchen_wine_donation_picture()
         if str(_kitchen_event_picture or "").strip():
             $ scene_image = _kitchen_event_picture
@@ -1429,7 +1421,7 @@ label TavernKitchenShareTeaWithSandraAndBecky:
     $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
     $ Friends["becky"] = min(20, int(Friends.get("becky", 0) or 0) + 1)
     $ fun = _player_clamp(int(fun or 0) + 1, 0, 100)
-    if _kitchen_worker_is_present("sandra"):
+    if str(getLocation("sandra") or "") == "TavernKitchen":
         $ _tea_scene = tavern_kitchen_random_sandra_scene()
         if str(_tea_scene or "").strip():
             $ _layout_last_picture = _tea_scene
@@ -1466,7 +1458,7 @@ label TavernKitchenDepositApply(item_id=""):
         $ MainTxt = "Нечего отдавать."
     else:
         $ MainTxt = "Вы оставляете на кухне %s x%s." % (_kitchen_item_name, _kitchen_deposited)
-        if _kitchen_worker_is_present("sandra"):
+        if str(getLocation("sandra") or "") == "TavernKitchen":
             $ MainTxt = str(MainTxt or "") + "\nСандра деловито осматривает припасы, одобрительно кивает и сразу начинает прикидывать, как лучше пустить их в дело."
         $ _kitchen_deposit_effect_text = tavern_kitchen_deposit_effect_text(_kitchen_item_id)
         if str(_kitchen_deposit_effect_text or "").strip():

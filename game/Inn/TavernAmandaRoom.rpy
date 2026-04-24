@@ -39,7 +39,7 @@ init python:
                 "images/amanda/Room/amanda_sleeps_1.jpg",
                 "images/amanda/Room/amanda_bedroom_003.jpeg",
             ], "bg amanda_room")
-        if not tavern_amanda_room_amanda_visible():
+        if str(getLocation("amanda") or "") != "TavernAmandaRoom":
             return tavern_amanda_room_pick_picture([
                 "images/amanda/Room/emptyroom.jpg",
             ], "bg amanda_room")
@@ -56,35 +56,6 @@ init python:
             "images/amanda/Room/amanda_bedroom.jpeg",
         ], "bg amanda_room")
 
-    def tavern_amanda_room_apply_picture(sleep_dress=None, preview=False):
-        picture_ref = tavern_amanda_room_picture(sleep_dress)
-        globals()["scene_image"] = picture_ref or None
-        globals()["_layout_last_picture"] = picture_ref or ""
-        if preview and str(picture_ref or "").strip():
-            try:
-                ShowImage("", "", picture_ref)
-            except Exception:
-                pass
-        return picture_ref
-
-    def tavern_amanda_room_amanda_visible():
-        if int(time or 0) >= 4:
-            return True
-        try:
-            return _tavern_is_in_room("amanda", "TavernAmandaRoom")
-        except Exception:
-            return False
-
-    def tavern_amanda_room_melissa_visible():
-        try:
-            melissa_sync_room_problem_state()
-        except Exception:
-            pass
-        try:
-            return _tavern_is_in_room("melissa", "TavernAmandaRoom")
-        except Exception:
-            return False
-
     def tavern_amanda_room_issue_text():
         issue_code = str(household_morning_issue_type("amanda") or "").strip()
         if int(time or 0) >= 4:
@@ -95,7 +66,7 @@ init python:
             if household_morning_issue_indecent("amanda"):
                 return "Аманда проспала общий подъем и до сих пор валяется в постели, раскрывшись куда сильнее приличного."
             return "Аманда проспала общий подъем и до сих пор спит у себя в комнате."
-        if not tavern_amanda_room_amanda_visible():
+        if str(getLocation("amanda") or "") != "TavernAmandaRoom":
             return "Как вы и ожидали, ее самой там не оказалось."
         return ""
 
@@ -110,7 +81,7 @@ init python:
     def tavern_amanda_room_busted_entry_text():
         if not amanda_attic_busted():
             return ""
-        if int(time or 0) >= 4 or not tavern_amanda_room_amanda_visible():
+        if int(time or 0) >= 4 or str(getLocation("amanda") or "") != "TavernAmandaRoom":
             return ""
         return "Вы входите в комнату Аманды как раз в тот момент, когда она, едва прикрытая одеялом, сидит на кровати слишком близко к окну. Услышав вас, девушка быстро подбирает ткань к груди, пересаживается глубже на постель и демонстративно отворачивается от окна, будто надеется, что это сразу сделает сцену приличнее."
 
@@ -142,7 +113,11 @@ init python:
         elif len(desc_rows) > 1:
             parts.append(str(desc_rows[1].text or "").strip())
 
-        if tavern_amanda_room_melissa_visible():
+        try:
+            melissa_sync_room_problem_state()
+        except Exception:
+            pass
+        if str(getLocation("melissa") or "") == "TavernAmandaRoom":
             parts.append("Похоже, Мелисса пока ночует здесь, у Аманды: у стены лежит ее узел с вещами, а по комнате заметно, что место теперь делят две девушки.")
 
         parts = [row for row in parts if str(row or "").strip()]
@@ -198,8 +173,8 @@ init python:
             ),
         ],
         npcs=[
-            {"npc_id": "amanda", "name": "Аманда", "condition": tavern_amanda_room_amanda_visible, "talk_label": "IntAmandaTalk", "auto_card": True},
-            {"npc_id": "melissa", "name": "Мелисса", "condition": tavern_amanda_room_melissa_visible, "talk_label": "IntMelissaTalk", "auto_card": True},
+            {"npc_id": "amanda", "name": "Аманда", "talk_label": "IntAmandaTalk", "auto_card": True},
+            {"npc_id": "melissa", "name": "Мелисса", "talk_label": "IntMelissaTalk", "auto_card": True},
         ],
         custom_properties={
             "object_menu_label": "tavern_amanda_room_object_menu",
@@ -227,7 +202,11 @@ label TavernAmandaRoom:
     if story_event_available(CurLoc, "melissa_bats"):
         call checkTriggers(CurLoc, "melissa_bats", 0)
     $ tmpSleepDress = tavern_amanda_room_sleep_dress()
-    $ tavern_amanda_room_apply_picture(tmpSleepDress, True)
+    $ _amanda_room_picture = tavern_amanda_room_picture(tmpSleepDress)
+    $ scene_image = _amanda_room_picture or None
+    $ _layout_last_picture = _amanda_room_picture or ""
+    if str(_amanda_room_picture or "").strip():
+        call ShowImage("", "", _amanda_room_picture)
     $ _room.mark_visited()
     if int(time or 0) >= 4:
         call AmandaAtHomeCode
@@ -321,7 +300,9 @@ label TavernAmandaRoomWindowLook:
 
 
 label TavernAmandaRoomRestore:
-    $ tavern_amanda_room_apply_picture(tmpSleepDress if int(time or 0) >= 4 else None, False)
+    $ _amanda_room_picture = tavern_amanda_room_picture(tmpSleepDress if int(time or 0) >= 4 else None)
+    $ scene_image = _amanda_room_picture or None
+    $ _layout_last_picture = _amanda_room_picture or ""
     $ MainTxt = tavern_amanda_room_main_text(TavernAmandaRoomRoom, tmpSleepDress if int(time or 0) >= 4 else 0)
     $ CurLocDesc = MainTxt
     call TavernAmandaRoomBuildActions

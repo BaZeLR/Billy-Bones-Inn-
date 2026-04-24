@@ -13,15 +13,15 @@ init python:
                 return default
 
     def _dtes_events_count():
-        return renpy.store.EventsCount
+        return EventsCount
 
     def _dtes_new_events():
-        return renpy.store.NewEvents
+        return NewEvents
 
     def _dtes_mandatory_event_allowed(event_code, room_code=""):
         code = str(event_code or "")
         if code == "WineForDance":
-            return bool(_tavern_is_in_room("sandra", str(room_code or CurLoc or "")))
+            return str(getLocation("sandra") or "") == str(room_code or CurLoc or "")
         return True
 
     def tavern_event_pop_code(time_period, require_room_match=False, room_code=""):
@@ -52,6 +52,7 @@ init python:
         Dequeues one event from mandatory slot 10 first, then from current slot.
         This path is side-effect-light and used by debug/unit helpers.
         """
+        global CurEventCode, Result
         EventsCount = _dtes_events_count()
         NewEvents = _dtes_new_events()
 
@@ -61,11 +62,10 @@ init python:
         _event_pick = tavern_event_pop_code(tp)
         CurEventCode = str(_event_pick.get("code", "") or "")
         if CurEventCode:
-            renpy.store.CurEventCode = CurEventCode
-            renpy.store.Result = text
+            Result = text
             return text if text else CurEventCode
 
-        renpy.store.Result = ""
+        Result = ""
         return ""
 
 label DisplayTavernEventShort(time_period, eyewitness):

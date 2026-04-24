@@ -92,7 +92,7 @@ label IntMelissaTalkRefresh(girl_name="melissa"):
         $ current_action_items.append(MenuItem("Уединиться с Мелиссой", Function(main_ui_call_label, "IntMelissaSex", girl_name, CurLoc)))
     elif int(Friends.get(girl_name, 0) or 0) > 10 and int(MelissaVar.get("StartDay", -1) or -1) != int(dayspassed or 0):
         $ current_action_items.append(MenuItem("Начать с Мелиссой", Function(main_ui_call_label, "IntMelissaStartMenu", girl_name)))
-    if str(CurLoc or "") == "TavernMain" and clara_visible_in_location("TavernMain") and int(MelissaVar.get("AskedAboutClaraDay", -1) or -1) != int(dayspassed or 0) and int(AskedToday.get(girl_name, 0) or 0) == 0:
+    if str(CurLoc or "") == "TavernMain" and str(getLocation("clara") or "") == "TavernMain" and int(MelissaVar.get("AskedAboutClaraDay", -1) or -1) != int(dayspassed or 0) and int(AskedToday.get(girl_name, 0) or 0) == 0:
         $ current_action_items.append(MenuItem("Спросить Мелиссу о Клариссе", Function(main_ui_call_label, "IntMelissaTalkApply", girl_name, "ask_clara")))
     if int(AskedToday.get(girl_name, 0) or 0) == 0 and household_special_talk_available(girl_name):
         $ _melissa_special_entry = household_special_talk_entry(girl_name)

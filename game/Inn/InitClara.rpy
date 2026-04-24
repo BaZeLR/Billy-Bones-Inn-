@@ -19,14 +19,6 @@ init python:
 
         return ""
 
-    def clara_visible_in_location(location_code=""):
-        location_key = str(location_code or "").strip()
-        if location_key == "WineStore":
-            return clara_wine_store_shift_active()
-        if location_key == "TavernMain":
-            return clara_tavern_visit_active()
-        return clara_extra_location_code() == location_key
-
     def clara_can_start_social_events():
         try:
             update_stat_state()
@@ -178,13 +170,11 @@ init python:
         if ((day_value + week_value) % 4) != 0:
             return False
         try:
-            return _tavern_is_in_room("melissa", "TavernMain")
+            return str(getLocation("melissa") or "") == "TavernMain"
         except Exception:
             return True
 
     def clara_visible_at_friday_dance():
-        if not clara_visible_in_location("FridayDance"):
-            return False
         try:
             return int(CheckIfDanceExist("amanda", "legare", int(FridayDancesCount or 0)) or 0) <= 0
         except Exception:
@@ -194,7 +184,7 @@ init python:
         location_key = str(location_code or CurLoc or "").strip()
         if location_key not in ("ForestClearing", "ForestLake"):
             return False
-        if not clara_visible_in_location(location_key):
+        if str(getLocation("clara") or "") != str(location_key or ""):
             return False
         return bool(str(MyStallion or "").strip()) and int(HorseSaddled or 0) == 1
 

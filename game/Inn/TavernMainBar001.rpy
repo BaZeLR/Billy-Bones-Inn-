@@ -1,16 +1,16 @@
 init python:
     def tavern_bar_invite_targets():
         targets = []
-        if tavern_main_clara_visible() and int(GiftedToday.get("clara", 0) or 0) == 0:
+        if str(getLocation("clara") or "") == "TavernMain" and int(GiftedToday.get("clara", 0) or 0) == 0:
             targets.append(("clara", "Клариссу"))
-        if tavern_main_becky_visible() and int(GiftedToday.get("becky", 0) or 0) == 0:
+        if str(getLocation("becky") or "") == "TavernMain" and int(GiftedToday.get("becky", 0) or 0) == 0:
             targets.append(("becky", "Бекки"))
         for npc_id, caption in (
             ("sandra", "Сандру"),
             ("melissa", "Мелиссу"),
             ("amanda", "Аманду"),
         ):
-            if _tavern_is_in_room(npc_id, "TavernMain") and int(GiftedToday.get(npc_id, 0) or 0) == 0:
+            if str(getLocation(npc_id) or "") == "TavernMain" and int(GiftedToday.get(npc_id, 0) or 0) == 0:
                 targets.append((npc_id, caption))
         return targets
 

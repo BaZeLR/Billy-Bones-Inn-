@@ -17,34 +17,14 @@ init python:
     import random
     import renpy.exports as renpy
 
-    def grocery_store_npc_on_shift(npc_id="", weekday_value=None, time_slot=None):
-        npc_key = str(npc_id or "").strip().lower()
-        if npc_key == "":
-            return False
-        week_now = int(week if weekday_value is None else weekday_value or 0)
-        time_now = int(time if time_slot is None else time_slot or 0)
-        scheduled_location = str(npc_schedule_location(npc_key, week_now, time_now) or "")
-        if scheduled_location:
-            return scheduled_location == "GroceryStore"
-        return str(CurrentLoc.get(npc_key, "") or "") == "GroceryStore"
-
     def grocery_store_active_grocer_id():
-        if grocery_store_npc_on_shift("eddie"):
+        if str(getLocation("eddie") or "") == "GroceryStore":
             return "eddie"
-        if grocery_store_npc_on_shift("inga"):
+        if str(getLocation("inga") or "") == "GroceryStore":
             return "inga"
-        if grocery_store_npc_on_shift("becky"):
+        if str(getLocation("becky") or "") == "GroceryStore":
             return "becky"
         return ""
-
-    def grocery_store_eddie_visible():
-        return grocery_store_active_grocer_id() == "eddie"
-
-    def grocery_store_becky_visible():
-        return grocery_store_active_grocer_id() == "becky"
-
-    def grocery_store_inga_visible():
-        return grocery_store_active_grocer_id() == "inga"
 
     def grocery_store_service_available(_obj=None):
         return grocery_store_active_grocer_id() != ""
@@ -229,9 +209,9 @@ init python:
             ),
         ],
         npcs=[
-            {"npc_id": "eddie", "name": "Эдди", "condition": grocery_store_eddie_visible, "talk_label": "IntEddieTalk"},
-            {"npc_id": "inga", "name": "Ингенборг", "condition": grocery_store_inga_visible, "talk_label": "IntIngaTalk"},
-            {"npc_id": "becky", "name": "Бекки", "condition": grocery_store_becky_visible, "talk_label": "IntBeckyTalk"},
+            {"npc_id": "eddie", "name": "Эдди", "talk_label": "IntEddieTalk"},
+            {"npc_id": "inga", "name": "Ингенборг", "talk_label": "IntIngaTalk"},
+            {"npc_id": "becky", "name": "Бекки", "talk_label": "IntBeckyTalk"},
         ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],

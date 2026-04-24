@@ -448,7 +448,7 @@ label ForestSubroomBuildActions:
         $ current_action_items.append(MenuItem("Искупаться в озере", Call("ForestLakeBath")))
         if forest_has_horse():
             $ current_action_items.append(MenuItem("Искупать коня", Call("ForestLakeWashHorse")))
-    if clara_visible_in_location(str(getattr(CurrentRoom, "code_name", "") or "")):
+    if str(getLocation("clara") or "") == str(getattr(CurrentRoom, "code_name", "") or ""):
         $ current_action_items.append(MenuItem("Кларисса", Call("IntClaraTalk", "clara")))
     python:
         for _spawn_entry in forest_room_get_spawned_items(CurrentRoom):

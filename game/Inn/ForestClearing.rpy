@@ -40,7 +40,7 @@ label ForestClearing:
     else:
         $ _layout_last_picture = ""
     $ MainTxt = ForestClearingRoom.descriptions[0].text
-    if clara_visible_in_location("ForestClearing"):
+    if str(getLocation("clara") or "") == "ForestClearing":
         $ _clara_forest_picture = clara_forest_picture("ForestClearing")
         if str(_clara_forest_picture or "").strip():
             $ _layout_last_picture = _clara_forest_picture

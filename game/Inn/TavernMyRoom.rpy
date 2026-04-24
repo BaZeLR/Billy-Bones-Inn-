@@ -87,28 +87,17 @@ init python:
             return base_text + "\n" + "\n".join(extra_rows)
         return base_text
 
-    def tavern_my_room_melissa_visible():
-        try:
-            return melissa_temp_room_active("TavernMyRoom")
-        except Exception:
-            return False
-
-    def tavern_my_room_apply_scene_state():
+    def tavern_my_room_scene_state():
         picture_path = tavern_my_room_dynamic_picture()
-        globals()["scene_image"] = picture_path or None
-        if picture_path:
-            globals()["_layout_last_picture"] = picture_path
         room_text = tavern_my_room_dynamic_text()
-        globals()["MainTxt"] = room_text
-        globals()["CurLocDesc"] = room_text
-        return room_text
+        return picture_path, room_text
 
 label TavernMyRoom:
     $ dog_prepare_current_spawn()
     $ CurrentRoom = TavernMyRoomRoom
     $ TavernMyRoomRoom.npcs = []
-    if tavern_my_room_melissa_visible():
-        $ TavernMyRoomRoom.npcs.append({"npc_id": "melissa", "name": "Мелисса", "condition": tavern_my_room_melissa_visible, "talk_label": "IntMelissaTalk", "auto_card": True})
+    if str(getLocation("melissa") or "") == "TavernMyRoom":
+        $ TavernMyRoomRoom.npcs.append({"npc_id": "melissa", "name": "Мелисса", "talk_label": "IntMelissaTalk", "auto_card": True})
     $ CurrentRoom.npcs = TavernMyRoomRoom.npcs
     $ CurLoc = "TavernMyRoom"
     $ location = CurLoc
@@ -119,7 +108,12 @@ label TavernMyRoom:
     $ current_girl_key = ""
     $ current_object_id = ""
     call LOC("TavernMyRoom")
-    $ tavern_my_room_apply_scene_state()
+    $ _my_room_picture, _my_room_text = tavern_my_room_scene_state()
+    $ scene_image = _my_room_picture or None
+    if _my_room_picture:
+        $ _layout_last_picture = _my_room_picture
+    $ MainTxt = _my_room_text
+    $ CurLocDesc = _my_room_text
     $ CurrentRoom.mark_visited()
     call TavernMyRoomBuildActions
     show screen main_ui
@@ -134,10 +128,15 @@ label TavernMyRoomView:
 
 
 label TavernMyRoomBuildActions:
-    $ tavern_my_room_apply_scene_state()
+    $ _my_room_picture, _my_room_text = tavern_my_room_scene_state()
+    $ scene_image = _my_room_picture or None
+    if _my_room_picture:
+        $ _layout_last_picture = _my_room_picture
+    $ MainTxt = _my_room_text
+    $ CurLocDesc = _my_room_text
     $ TavernMyRoomRoom.npcs = []
-    if tavern_my_room_melissa_visible():
-        $ TavernMyRoomRoom.npcs.append({"npc_id": "melissa", "name": "Мелисса", "condition": tavern_my_room_melissa_visible, "talk_label": "IntMelissaTalk", "auto_card": True})
+    if str(getLocation("melissa") or "") == "TavernMyRoom":
+        $ TavernMyRoomRoom.npcs.append({"npc_id": "melissa", "name": "Мелисса", "talk_label": "IntMelissaTalk", "auto_card": True})
     $ CurrentRoom.npcs = TavernMyRoomRoom.npcs
     $ current_action_title = "Действия"
     $ current_action_content = None
@@ -228,7 +227,12 @@ label TavernMyRoomObjectText(object_id="", action_id=""):
 
 
 label TavernMyRoomRestore:
-    $ tavern_my_room_apply_scene_state()
+    $ _my_room_picture, _my_room_text = tavern_my_room_scene_state()
+    $ scene_image = _my_room_picture or None
+    if _my_room_picture:
+        $ _layout_last_picture = _my_room_picture
+    $ MainTxt = _my_room_text
+    $ CurLocDesc = _my_room_text
     call TavernMyRoomBuildActions
     return
 

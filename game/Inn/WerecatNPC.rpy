@@ -8,9 +8,6 @@ init -8 python:
     def werecat_is_living_with_household():
         return int(WerecatVar.get("adopted", 0) or 0) == 1 and int(WerecatVar.get("sold", 0) or 0) == 0
 
-    def werecat_is_active():
-        return werecat_is_living_with_household()
-
     def werecat_sleep_location():
         return "Backyard"
 
@@ -21,8 +18,8 @@ init -8 python:
         age_girls["werecat"] = int(age_girls.get("werecat", 19) or 19)
         DateOfBirth["werecat"] = DateOfBirth.get("werecat", calendar_make_birth_record(age_girls["werecat"]))
         girltextdesc["werecat"] = "Невысокая гибкая кошкодевочка с внимательными золотистыми глазами, мягкими ушами и пушистым хвостом. Двигается бесшумно, настороженно и слишком ловко для обычной домашней любимицы."
-        knowsMC["werecat"] = True if werecat_is_active() else bool(knowsMC.get("werecat", False))
-        if not werecat_is_active():
+        knowsMC["werecat"] = True if werecat_is_living_with_household() else bool(knowsMC.get("werecat", False))
+        if not werecat_is_living_with_household():
             CurrentLoc["werecat"] = ""
             return ""
         try:
@@ -30,16 +27,6 @@ init -8 python:
         except Exception:
             CurrentLoc["werecat"] = "Backyard"
             return "Backyard"
-
-    def werecat_npc_present(room_code=""):
-        if not werecat_is_active():
-            return False
-        room_key = str(room_code or CurLoc or "").strip()
-        try:
-            current_room = str(getLocation("werecat") or "")
-        except Exception:
-            current_room = str(CurrentLoc.get("werecat", "") or "")
-        return current_room == room_key
 
     def werecat_picture_path():
         for picture_path in (
@@ -75,11 +62,11 @@ init -8 python:
         ]
         if int(WerecatVar.get("rats_problem_active", 0) or 0) == 0:
             lines.append("С тех пор в кладовой стало заметно тише: крысы больше не хозяйничают, как раньше.")
-        if werecat_npc_present("TavernKitchen"):
+        if str(getLocation("werecat") or "") == "TavernKitchen":
             lines.append("Сейчас держится поближе к теплу кухни и временами лакает оставленное для нее молоко.")
-        elif werecat_npc_present("TavernMain"):
+        elif str(getLocation("werecat") or "") == "TavernMain":
             lines.append("Сейчас осваивается в общем зале и любит дремать поближе к камину.")
-        elif werecat_npc_present("Backyard"):
+        elif str(getLocation("werecat") or "") == "Backyard":
             lines.append("Сейчас предпочитает двор, где можно и спрятаться, и выбрать удобный угол.")
         return lines
 
@@ -103,16 +90,6 @@ init -8 python:
             ("Состояние", trust_text),
             ("Дом", str(CurrentLoc.get("werecat", "нет") or "нет")),
         ]
-
-    def werecat_npc_entry(room_code=""):
-        if not werecat_npc_present(room_code):
-            return None
-        return {
-            "npc_id": "werecat",
-            "name": str(werecat_display_name() or "Луна"),
-            "talk_label": "IntWerecatTalk",
-            "auto_card": True,
-        }
 
     def show_werecat_card_main_ui_state():
         import renpy as renpy_pkg
@@ -184,7 +161,7 @@ init 2 python:
 
 label IntWerecatTalk(room_code=""):
     $ werecat_sync_profile()
-    if not werecat_is_active():
+    if not werecat_is_living_with_household():
         return
     $ _werecat_room = str(room_code or CurLoc or "").strip()
     $ main_ui_begin_talk_state(str(werecat_display_name() or "Луна"), "werecat")
@@ -201,7 +178,7 @@ label IntWerecatTalk(room_code=""):
 
 label IntWerecatTalkRefresh(room_code=""):
     $ werecat_sync_profile()
-    if not werecat_is_active():
+    if not werecat_is_living_with_household():
         $ main_ui_end_talk_state()
         return
     $ _werecat_room = str(room_code or CurLoc or "").strip()

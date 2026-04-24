@@ -5,9 +5,6 @@ init 6 python:
     def tavern_sandra_room_door_locked():
         return bedroom_door_locked("TavernSandraRoom")
 
-    def tavern_sandra_room_visible():
-        return _tavern_is_in_room("sandra", "TavernSandraRoom")
-
     def tavern_sandra_room_picture():
         slot = int(time or 0)
         if slot >= 4:
@@ -25,7 +22,7 @@ init 6 python:
             ):
                 if renpy.loadable(picture_path):
                     return picture_path
-        if tavern_sandra_room_visible():
+        if str(getLocation("sandra") or "") == "TavernSandraRoom":
             for picture_path in (
                 "images/sandra/talk_0.png",
                 "images/sandra/player_room_sandra_0.jpg",
@@ -69,7 +66,7 @@ init 6 python:
             bedroom_door_object("sandra_room_door_001", "TavernSandraRoom", "Сандры"),
         ],
         npcs=[
-            {"npc_id": "sandra", "name": "Сандра", "condition": tavern_sandra_room_visible, "talk_label": "IntSandraTalk", "auto_card": True},
+            {"npc_id": "sandra", "name": "Сандра", "talk_label": "IntSandraTalk", "auto_card": True},
         ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
@@ -112,7 +109,7 @@ label TavernSandraRoomBuildActions:
     python:
         for _issue_action in list(household_room_issue_action_specs("sandra") or []):
             current_action_items.append(MenuItem(str(_issue_action.get("label", "") or ""), Call(str(_issue_action.get("target", "") or ""), *tuple(_issue_action.get("args", ()) or ()))))
-    if _tavern_is_in_room("sandra", "TavernSandraRoom") and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0:
+    if str(getLocation("sandra") or "") == "TavernSandraRoom" and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0:
         $ current_action_items.append(MenuItem("Сесть с Сандрой над трактирной книгой", Call("TavernSandraLedgerScene")))
     if tavern_upstairs_can_clean_rooms():
         $ current_action_items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernSandraRoom", "", "")))

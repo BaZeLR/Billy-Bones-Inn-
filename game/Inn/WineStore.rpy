@@ -3,9 +3,6 @@
 # Handles the wine store location and menu logic
 
 init python:
-    def wine_store_clara_visible():
-        return clara_visible_in_location("WineStore")
-
     def wine_store_alber_visible():
         return time != 0
 
@@ -51,7 +48,7 @@ init python:
             ),
         ],
         npcs=[
-            {"npc_id": "clara", "name": "Кларисса", "condition": wine_store_clara_visible, "talk_label": "IntClaraTalk"},
+            {"npc_id": "clara", "name": "Кларисса", "talk_label": "IntClaraTalk"},
             {"npc_id": "alber", "name": "Альбер", "condition": wine_store_alber_visible, "talk_label": "IntAlberTalk"},
         ],
         schedule=RoomSchedule(

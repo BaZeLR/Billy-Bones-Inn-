@@ -2,10 +2,11 @@ default NPCSchedules = {}
 
 init python:
     def _npc_schedule_store():
-        schedules = globals().get("NPCSchedules", None)
+        global NPCSchedules
+        schedules = NPCSchedules
         if not isinstance(schedules, dict):
             schedules = {}
-            globals()["NPCSchedules"] = schedules
+            NPCSchedules = schedules
         return schedules
 
     def npc_schedule_rule(kind="", **kwargs):
@@ -23,13 +24,11 @@ init python:
                     str(rule.get("location", "") or ""),
                     str(rule.get("mode", "morning") or "morning"),
                 )
-            if rule_kind == "clara_visible_in_location":
-                return bool(clara_visible_in_location(str(rule.get("location", "") or "")))
             if rule_kind == "clara_extra_location":
                 return str(clara_extra_location_code() or "") == str(rule.get("location", "") or "")
             if rule_kind == "werecat_active":
                 try:
-                    return bool(werecat_is_active())
+                    return bool(werecat_is_living_with_household())
                 except Exception:
                     return False
         return room_rule_true(rule)
@@ -178,9 +177,7 @@ init python:
         if not key:
             return ""
         try:
-            effective = globals().get("_tavern_effective_location")
-            if callable(effective):
-                return str(effective(key, time_value) or "")
+            return str(_tavern_effective_location(key, time_value) or "")
         except Exception:
             pass
         return str(npc_schedule_location(key, weekday_value, time_value) or CurrentLoc.get(key, "") or "")
@@ -207,19 +204,16 @@ init python:
         mode_key = str(mode or "morning").strip().lower()
         if not npc_id or not target:
             return False
-        resolver = None
-        if mode_key == "morning":
-            resolver = globals().get("_tavern_household_preopening_location")
-        elif mode_key == "sunday":
-            resolver = globals().get("_tavern_household_sunday_location")
-        elif mode_key == "friday_evening":
-            resolver = globals().get("_tavern_household_friday_evening_location")
-        if not callable(resolver):
-            return False
         try:
-            return str(resolver(npc_id) or "") == target
+            if mode_key == "morning":
+                return str(_tavern_household_preopening_location(npc_id) or "") == target
+            if mode_key == "sunday":
+                return str(_tavern_household_sunday_location(npc_id) or "") == target
+            if mode_key == "friday_evening":
+                return str(_tavern_household_friday_evening_location(npc_id) or "") == target
         except Exception:
-            return False
+            pass
+        return False
 
     def tavern_team_default_schedule_entries(work_location="TavernMain", sleep_location="TavernMyRoom", weekend_location="TavernMain"):
         return [

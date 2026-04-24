@@ -134,7 +134,7 @@ label NextDay_NewDayEvents():
                     BeckyVar['EddieWhoreHome'] += 2
             if BeckyVar['EddieWhoreHome'] in (2, 3):
                 TodaySexEvents_Add('georgett', 3, 99, 'Prostitution')
-        elif EddieVar['TalkedAboutWhores'] == 1 and CurrentLoc['georgett'] == 'TavernMain':
+        elif EddieVar['TalkedAboutWhores'] == 1 and str(getLocation("georgett") or "") == "TavernMain":
             if renpy.random.randint(1, EddieVar['WhoreVisitFreq']) == 1 and week != 5:
                 TodaySexEvents_Add('georgett', 3, 99, 'Prostitution')
         if BeckyVar['EddieWhoreHome'] == 4:

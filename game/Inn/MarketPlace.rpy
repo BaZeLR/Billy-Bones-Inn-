@@ -18,9 +18,6 @@ init python:
     def marketplace_mongol_visible():
         return MyStallion == ""
 
-    def marketplace_clara_visible():
-        return clara_visible_in_location("MarketPlace")
-
     def marketplace_closed_picture():
         for picture_path in (
             "images/market/LocMarketPlaceClosed.jpg",

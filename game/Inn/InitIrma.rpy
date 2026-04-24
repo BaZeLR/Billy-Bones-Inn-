@@ -114,5 +114,10 @@ label InitIrma:
         IrmaVar['KnowMom'] = 0
         IrmaVar['KnowSlut'] = 0
         GiftPreferences[GirlName] = ["lavender_001", "wild_rose_001", "soap_001"]
+        CurrentLoc[GirlName] = "DressShop"
+        npc_schedule_set(GirlName, [
+            NPCScheduleEntry(location="DressShop", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0, 1, 2], awake=True, talkable=True, priority=100, label="tailor_shop"),
+        ])
+        npc_schedule_sync_currentloc(GirlName)
 
     return

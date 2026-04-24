@@ -164,7 +164,7 @@ init python:
             return False
         if not becky_monthly_sandra_kitchen_visit_due(month_value, day_value, time_slot):
             return False
-        return _tavern_is_in_room("sandra", "TavernKitchen")
+        return str(getLocation("sandra") or "") == "TavernKitchen"
 
     def becky_monthly_sandra_kitchen_visit_due(month_value=None, day_value=None, time_slot=None):
         month_now = int(month if month_value is None else month_value or 0)

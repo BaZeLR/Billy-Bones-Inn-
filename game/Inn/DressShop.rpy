@@ -5,12 +5,6 @@ default DressShopFemaleCatalogItemIds = []
 default DressShopSavedText = ""
 
 init python:
-    def dress_shop_irma_visible():
-        return True
-
-    def dress_shop_clara_visible():
-        return clara_visible_in_location("DressShop")
-
     DressShopRoom = Room(
         code_name="DressShop",
         group_name=ROOM_GROUP_CITY,
@@ -31,8 +25,8 @@ init python:
             "worktable_001",
         ],
         npcs=[
-            {"npc_id": "irma", "name": "Ирма", "condition": dress_shop_irma_visible, "talk_label": "IntIrmaTalk"},
-            {"npc_id": "clara", "name": "Кларисса", "condition": dress_shop_clara_visible, "talk_label": "IntClaraTalk"},
+            {"npc_id": "irma", "name": "Ирма", "talk_label": "IntIrmaTalk"},
+            {"npc_id": "clara", "name": "Кларисса", "talk_label": "IntClaraTalk"},
         ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
@@ -150,7 +144,7 @@ label DressShop:
         $ MainTxt += "\n\nувлеченно кроит какой-то костюм."
     else:
         $ MainTxt += "\n\nсосредоточенно работает над вашим заказом."
-    if dress_shop_clara_visible():
+    if str(getLocation("clara") or "") == "DressShop":
         $ MainTxt += "\n\nСегодня здесь крутится и Кларисса Легаре: она перебирает отрезы ткани и вполголоса что-то обсуждает с Ирмой."
     $ CurLocDesc = MainTxt
     $ DressShopSavedText = MainTxt
