@@ -9,7 +9,7 @@ label EventAmandaLizettTalk2(eyewitness=0):
             if _return:
                 $ Result += str(_return)
     else:
-        $ Result = "[Случайная фраза из AmandaLizaTalk]"
+        $ Result = ""
 
     if eyewitness > 0:
         $ current_action_title = "Что сказать"

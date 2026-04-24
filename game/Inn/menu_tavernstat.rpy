@@ -13,16 +13,16 @@ init python:
             fn()
 
     def show_tavern_report_main_ui_state(person=""):
-        store = renpy.store
-        store.TavernReportSelectedPerson = str(person or "")
-        store.UI_mode = "tavern"
-        store.current_action_content = None
-        if store.TavernReportSelectedPerson:
-            store.current_action_title = "Назначения: " + _tavern_name(store.TavernReportSelectedPerson)
-            store.current_action_items = _tavern_worker_action_items(store.TavernReportSelectedPerson, "__main_ui__")
+        global TavernReportSelectedPerson, UI_mode, current_action_content, current_action_title, current_action_items
+        TavernReportSelectedPerson = str(person or "")
+        UI_mode = "tavern"
+        current_action_content = None
+        if TavernReportSelectedPerson:
+            current_action_title = "Назначения: " + _tavern_name(TavernReportSelectedPerson)
+            current_action_items = _tavern_worker_action_items(TavernReportSelectedPerson, "__main_ui__")
         else:
-            store.current_action_title = "Трактир"
-            store.current_action_items = _tavern_report_action_items("__main_ui__")
+            current_action_title = "Трактир"
+            current_action_items = _tavern_report_action_items("__main_ui__")
         _tavern_restart_interaction()
 
     def _tavern_int(value, default=0):
@@ -562,11 +562,10 @@ init python:
         avail = _tavern_int(_tavern_dict_value(jobGloryHoleAvail).get(person, 0), 0)
         tomorrow = _tavern_int(_tavern_dict_value(jobgloryholeTommorow).get(person, 0), 0)
         busy = 0
-        if renpy.game.script.has_label("GloryHoleBusy"):
-            try:
-                busy = _tavern_int(renpy_module.call("GloryHoleBusy", person), 0)
-            except Exception:
-                busy = 0
+        try:
+            busy = 1 if glory_hole_busy(person) else 0
+        except Exception:
+            busy = 0
         return bool(avail and tomorrow == 0 and busy == 0)
 
     def _tavern_can_assign_whore(person):

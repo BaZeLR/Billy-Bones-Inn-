@@ -5,6 +5,7 @@ default GeorgettAvail = 0
 default LizaAvail = 0
 default TavernMainExtraDesc = ""
 default TavernMainGloryDesc = ""
+default TavernMainClientRoomGirl = ""
 
 
 init python:    
@@ -268,6 +269,7 @@ label TavernMain:
             TavernMainBlockEvents = 0
             TavernEventOngoing = ""
             TavernMainExtraDesc = ""
+            TavernMainClientRoomGirl = ""
             TavernMainGloryDesc = ""
             ShouldDispatchTavernEvent = (
                 int(week or 0) != 7
@@ -320,9 +322,11 @@ label TavernMain:
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит юная Лизетта и ждет клиентов. А вот ее мамаша клиента уже похоже нашла."
                     $ LizaAvail = 1
+                    $ TavernMainClientRoomGirl = "georgett"
                 elif randvarPS == 2 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Жоржетта и ждет клиентов. А вот ее старшую дочку, судя по всему, уже кто-то снял."
                     $ GeorgettAvail = 1
+                    $ TavernMainClientRoomGirl = "liza"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидят Жоржетта со своей дочкой Лизеттой и ждут клиентов."
                     $ LizaAvail = 1
@@ -332,6 +336,7 @@ label TavernMain:
                     randvarPS = renpy.random.randint(1, 3)
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу, где обычно сидит Лизетта, пусто. Похоже что ветренную девчонку уже кто-то снял."
+                    $ TavernMainClientRoomGirl = "liza"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Лизетта и ждет клиентов."
                     $ LizaAvail = 1
@@ -340,6 +345,7 @@ label TavernMain:
                     randvarPS = renpy.random.randint(1, 3)
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу, где обычно сидит Жоржетта, пусто. Похоже что шлюшку уже кто-то снял."
+                    $ TavernMainClientRoomGirl = "georgett"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Жоржетта и ждет клиентов."
                     $ GeorgettAvail = 1
@@ -409,6 +415,8 @@ label TavernMainBuildActions:
     $ current_action_content = None
     $ _tavern_room_menu = CurrentRoom.build_menu_sections() if CurrentRoom is not None and hasattr(CurrentRoom, "build_menu_sections") else {"movement": [], "actions": []}
     $ current_action_items = list(_tavern_room_menu.get("movement", [])) + list(_tavern_room_menu.get("actions", []))
+    if TavernClosed == "" and int(TavernHole or 0) > 0 and str(TavernMainClientRoomGirl or "") != "":
+        $ current_action_items.append(MenuItem("Пойти проверить отдельную комнату", Call("TavernProstClients", 1, TavernMainClientRoomGirl)))
     if TavernClosed == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "overheard"):
         $ current_action_items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
     return

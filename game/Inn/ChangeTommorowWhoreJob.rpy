@@ -54,7 +54,19 @@ init python:
     def get_random_girl_by_job(job_dict_name):
         """Возвращает случайное имя девушки, назначенной на работу из указанного словаря."""
         all_names = AllGirlNames
-        job_dict = getattr(renpy_module.store, str(job_dict_name or ''), {})
+        job_dict_key = str(job_dict_name or "")
+        if job_dict_key == "jobwhore":
+            job_dict = jobwhore
+        elif job_dict_key == "jobgloryhole":
+            job_dict = jobgloryhole
+        elif job_dict_key == "jobkitchen":
+            job_dict = jobkitchen
+        elif job_dict_key == "jobcleaning":
+            job_dict = jobcleaning
+        elif job_dict_key == "jobwaitress":
+            job_dict = jobwaitress
+        else:
+            job_dict = {}
         if not isinstance(job_dict, dict):
             return ''
         eligible = [name for name in all_names if job_dict.get(name, 0)]
@@ -79,7 +91,7 @@ label GetRandomGirlByJob(job_dict_name=None):
         if job_dict_name is None:
             job_dict_name = jobtype if 'jobtype' in locals() else None
         if job_dict_name:
-            renpy_module.store.RESULT = get_random_girl_by_job(job_dict_name)
+            RESULT = get_random_girl_by_job(job_dict_name)
         else:
-            renpy_module.store.RESULT = ''
+            RESULT = ''
     return
