@@ -1077,7 +1077,7 @@ label story_clara_market_booklet_0:
     $ _clara_market_intro_seen = int(ClaraVar.get("market_intro_seen", 0) or 0) == 1
     if _clara_evening_booklet_follow:
         $ ClaraVar["market_evening_intro_seen"] = 1
-        $ MainTxt = "Вечером вы замечаете Клариссу на рынке и уже знаете, что ее секрет связан не только с болтовней, но и с непристойными рисунками. Девушка быстро скользит мимо лавок, будто проверяя, нет ли за ней слежки, а затем сворачивает к неприметному закутку между рядами.\n\nЕсли сейчас держаться достаточно тихо, можно не только проследить за Клариссой, но и подслушать, с кем именно она ведет свои тайные дела."
+        $ MainTxt = "Вечером рынок уже закрыт. На площади остаются только несколько поздних прохожих, и среди них вы замечаете фигуру в плаще. Человек идет быстро, но когда фонарь на мгновение выхватывает лицо из-под капюшона, вы узнаете Клариссу.\n\nДевушка тоже замечает ваш взгляд, тут же глубже натягивает капюшон и ускоряет шаг между закрытыми лавками. Хм. Очень интересно, что она делает здесь в такое время.\n\nЕсли сейчас держаться достаточно тихо, можно не только проследить за Клариссой, но и подслушать, с кем именно она ведет свои тайные дела."
         $ CurLocDesc = MainTxt
         if renpy.loadable("images/clara/market_night.png"):
             call ShowImage("", "", "images/clara/market_night.png")
@@ -1085,10 +1085,10 @@ label story_clara_market_booklet_0:
             call ShowImage("", "", "images/market/LocMarketPlace2.jpg")
     else:
         if _clara_market_intro_seen:
-            $ MainTxt = "В следующий раз, заметив Клариссу на дневном рынке, вы уже не торопитесь окликнуть ее, а стараетесь держаться чуть поодаль. Девушка идет быстро и уверенно, но все равно время от времени проверяет, не узнал ли кто ее в толпе.\n\nЕсли уж вы хотите узнать, чем она занимается, сейчас самое время попробовать проследить за ней."
+            $ MainTxt = "Днем на рынке снова мелькает фигура в легком плаще. Вы узнаете Клариссу раньше, чем она успевает скрыть лицо. Девушка замечает вас, поспешно натягивает капюшон и идет быстрее, будто совершенно не хочет, чтобы ее здесь окликали.\n\nЕсли уж вы хотите узнать, чем она занимается, сейчас самое время попробовать проследить за ней."
         else:
             $ ClaraVar["market_intro_seen"] = 1
-            $ MainTxt = "На дневном рынке вы замечаете очаровательную дочку своего винного поставщика. Вы уже собираетесь приветственно махнуть ей рукой, но Кларисса, едва встретившись с вами взглядом, поспешно набрасывает на голову капюшон плаща и тут же исчезает между рядами лавок.\n\nПохоже, у нее здесь какие-то совсем частные дела, и узнавать себя она сейчас не хочет. Вы решаете выяснить, что это за тайны."
+            $ MainTxt = "На дневном рынке среди покупателей вы замечаете фигуру в плаще. Сначала это просто случайный силуэт в толпе, но затем вы узнаете Клариссу, дочку своего винного поставщика.\n\nВы уже собираетесь окликнуть ее, но Кларисса, едва встретившись с вами взглядом, поспешно набрасывает на голову капюшон и сразу идет быстрее между рядами лавок. Похоже, у нее здесь какие-то совсем частные дела, и узнавать себя она сейчас не хочет."
         $ CurLocDesc = MainTxt
         if renpy.loadable("images/clara/market_day.png"):
             call ShowImage("", "", "images/clara/market_day.png")
@@ -1098,7 +1098,7 @@ label story_clara_market_booklet_0:
         "Что сделать?"
         "[('Проследить за Клариссой и подслушать разговор') if _clara_evening_booklet_follow else ('Проследить за Клариссой')]":
             if _clara_evening_booklet_follow and int(effective_player_exploration() or 0) < 100:
-                $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам зацепить чей-то ящик или лишний раз оглянуться, как Кларисса успевает скрыться в темном закутке и растворяется среди поздних покупателей.\n\nБез лучшей сноровки вы только выдадите себя и ничего не услышите."
+                $ MainTxt = "Закрытый вечерний рынок куда опаснее для слежки, чем дневная толпа. Стоит вам зацепить чей-то ящик или лишний раз оглянуться, как Кларисса успевает скрыться в темном закутке и растворяется среди редких прохожих.\n\nБез лучшей сноровки вы только выдадите себя и ничего не услышите."
                 $ CurLocDesc = MainTxt
                 $ current_action_title = "Вечерний рынок"
                 $ current_action_content = None
@@ -1145,14 +1145,14 @@ label story_clara_market_booklet_1:
     $ _clara_evening_booklet_follow = int(time or 0) == 3 and int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1
     if _clara_evening_booklet_follow:
         $ ClaraVar["market_evening_intro_seen"] = 1
-        $ MainTxt = "Вечером вы замечаете Клариссу на рынке и уже знаете, что ее секрет связан не только с болтовней, но и с непристойными рисунками. Девушка быстро скользит мимо лавок, будто проверяя, нет ли за ней слежки, а затем сворачивает к неприметному закутку между рядами.\n\nЕсли сейчас держаться достаточно тихо, можно не только проследить за Клариссой, но и подслушать, с кем именно она ведет свои тайные дела."
+        $ MainTxt = "Вечером рынок уже закрыт. На площади остаются только несколько поздних прохожих, и среди них вы замечаете фигуру в плаще. Человек идет быстро, но когда фонарь на мгновение выхватывает лицо из-под капюшона, вы узнаете Клариссу.\n\nДевушка тоже замечает ваш взгляд, тут же глубже натягивает капюшон и ускоряет шаг между закрытыми лавками. Хм. Очень интересно, что она делает здесь в такое время.\n\nЕсли сейчас держаться достаточно тихо, можно не только проследить за Клариссой, но и подслушать, с кем именно она ведет свои тайные дела."
         $ CurLocDesc = MainTxt
         if renpy.loadable("images/clara/market_night.png"):
             call ShowImage("", "", "images/clara/market_night.png")
         elif renpy.loadable("images/market/LocMarketPlace2.jpg"):
             call ShowImage("", "", "images/market/LocMarketPlace2.jpg")
     else:
-        $ MainTxt = "В следующий раз, заметив Клариссу на дневном рынке, вы уже не торопитесь окликнуть ее, а стараетесь держаться чуть поодаль. Девушка идет быстро и уверенно, но все равно время от времени проверяет, не узнал ли кто ее в толпе.\n\nЕсли уж вы хотите узнать, чем она занимается, сейчас самое время попробовать проследить за ней."
+        $ MainTxt = "Днем на рынке снова мелькает фигура в легком плаще. Вы узнаете Клариссу раньше, чем она успевает скрыть лицо. Девушка замечает вас, поспешно натягивает капюшон и идет быстрее, будто совершенно не хочет, чтобы ее здесь окликали.\n\nЕсли уж вы хотите узнать, чем она занимается, сейчас самое время попробовать проследить за ней."
         $ CurLocDesc = MainTxt
         if renpy.loadable("images/clara/market_day.png"):
             call ShowImage("", "", "images/clara/market_day.png")
@@ -1162,7 +1162,7 @@ label story_clara_market_booklet_1:
         "Что сделать?"
         "[('Проследить за Клариссой и подслушать разговор') if _clara_evening_booklet_follow else ('Проследить за Клариссой')]":
             if _clara_evening_booklet_follow and int(effective_player_exploration() or 0) < 100:
-                $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам зацепить чей-то ящик или лишний раз оглянуться, как Кларисса успевает скрыться в темном закутке и растворяется среди поздних покупателей.\n\nБез лучшей сноровки вы только выдадите себя и ничего не услышите."
+                $ MainTxt = "Закрытый вечерний рынок куда опаснее для слежки, чем дневная толпа. Стоит вам зацепить чей-то ящик или лишний раз оглянуться, как Кларисса успевает скрыться в темном закутке и растворяется среди редких прохожих.\n\nБез лучшей сноровки вы только выдадите себя и ничего не услышите."
                 $ CurLocDesc = MainTxt
                 $ current_action_title = "Вечерний рынок"
                 $ current_action_content = None
@@ -1231,21 +1231,25 @@ label story_clara_market_action_direct:
     call preEvent("claraBookletMarket")
     $ _clara_target = ""
     if int(time or 0) == 2 and int(ClaraVar.get("booklet_market_seen", 0) or 0) == 0:
-        $ _clara_target = "story_clara_market_booklet_1_direct_follow"
-        if thread is not None and int(thread.num or 0) < 1:
+        if int(ClaraVar.get("market_intro_seen", 0) or 0) == 0:
+            $ _clara_target = "story_clara_market_booklet_0"
+        else:
+            $ _clara_target = "story_clara_market_booklet_1"
+        if _clara_target == "story_clara_market_booklet_1" and thread is not None and int(thread.num or 0) < 1:
             if len(list(thread.done or [])) > 0:
                 $ thread.done[0] = True
             $ thread.num = 1
-        if int(ClaraVar.get("market_intro_seen", 0) or 0) == 0:
-            $ ClaraVar["market_intro_seen"] = 1
     elif int(time or 0) == 3 and int(ClaraVar.get("booklet_market_seen", 0) or 0) == 0 and int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1:
-        $ _clara_target = "story_clara_market_booklet_1_direct_follow"
-        if thread is not None and int(thread.num or 0) < 1:
+        if int(ClaraVar.get("market_intro_seen", 0) or 0) == 0:
+            $ _clara_target = "story_clara_market_booklet_0"
+        else:
+            $ _clara_target = "story_clara_market_booklet_1"
+        if _clara_target == "story_clara_market_booklet_1" and thread is not None and int(thread.num or 0) < 1:
             if len(list(thread.done or [])) > 0:
                 $ thread.done[0] = True
             $ thread.num = 1
     elif int(time or 0) == 3 and int(ClaraVar.get("booklet_market_seen", 0) or 0) == 1 and int(ClaraVar.get("market_evening_intro_seen", 0) or 0) == 0:
-        $ _clara_target = "story_clara_market_booklet_2_direct_follow"
+        $ _clara_target = "story_clara_market_booklet_2"
         if thread is not None and int(thread.num or 0) < 2:
             if len(list(thread.done or [])) > 0:
                 $ thread.done[0] = True
@@ -1253,15 +1257,13 @@ label story_clara_market_action_direct:
                 $ thread.done[1] = True
             $ thread.num = 2
     elif int(time or 0) == 3 and int(ClaraVar.get("market_evening_intro_seen", 0) or 0) == 1 and int(ClaraVar.get("mongol_theft_seen", 0) or 0) == 0:
-        $ _clara_target = "story_clara_market_booklet_3"
-        if thread is not None and int(thread.num or 0) < 3:
+        $ _clara_target = "story_clara_market_booklet_2"
+        if thread is not None:
             if len(list(thread.done or [])) > 0:
                 $ thread.done[0] = True
             if len(list(thread.done or [])) > 1:
                 $ thread.done[1] = True
-            if len(list(thread.done or [])) > 2:
-                $ thread.done[2] = True
-            $ thread.num = 3
+            $ thread.num = 2
     $ evalTime = None
     $ findAvailableEvents(True)
     if str(_clara_target or "") == "":
@@ -1311,7 +1313,7 @@ label story_clara_market_booklet_2_direct_follow:
     $ SignalBlockTime = 1
     $ ClaraVar["market_evening_intro_seen"] = 1
     if int(effective_player_exploration() or 0) < 100:
-        $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам задеть чью-то корзину и чуть замешкаться, как Кларисса вместе с Монголом растворяются в темном закутке между пустеющими рядами. Без лучшей сноровки здесь их не удержать."
+        $ MainTxt = "Закрытый вечерний рынок куда опаснее для слежки, чем дневная толпа. Стоит вам задеть чью-то корзину и чуть замешкаться, как Кларисса вместе с Монголом растворяются в темном закутке между пустеющими рядами. Без лучшей сноровки здесь их не удержать."
         $ CurLocDesc = MainTxt
         $ current_action_title = "Вечерний рынок"
         $ current_action_content = None
@@ -1324,7 +1326,7 @@ label story_clara_market_booklet_2_direct_follow:
 label story_clara_market_booklet_2:
     $ SignalBlockTime = 1
     $ ClaraVar["market_evening_intro_seen"] = 1
-    $ MainTxt = "Вечером вы снова замечаете Клариссу на рынке. На этот раз видно, что она идет с конкретной целью. Стоит ей заметить ваш взгляд, как девушка чуть сильнее натягивает капюшон и быстро уходит в сторону закутка у конного торга.\n\nПохоже, на этот раз дело идет уже не о книжечках, а о чем-то более грязном."
+    $ MainTxt = "Вечером рынок закрыт, и площадь выглядит почти пустой. У закрытых лавок задержались лишь несколько человек, поэтому фигура в плаще сразу бросается в глаза. Когда она проходит ближе к фонарю, вы узнаете Клариссу.\n\nСтоит ей заметить ваш взгляд, как девушка глубже натягивает капюшон и быстро уходит в сторону закутка у конного торга. Хм. Очень интересно, что она делает здесь в такое время.\n\nПохоже, на этот раз дело идет уже не о книжечках, а о чем-то более грязном."
     $ CurLocDesc = MainTxt
     if renpy.loadable("images/clara/market_night.png"):
         call ShowImage("", "", "images/clara/market_night.png")
@@ -1334,7 +1336,7 @@ label story_clara_market_booklet_2:
         "Что сделать?"
         "Тихо проследить за Клариссой":
             if int(effective_player_exploration() or 0) < 100:
-                $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам задеть чью-то корзину и чуть замешкаться, как Кларисса вместе с Монголом растворяются в темном закутке между пустеющими рядами. Без лучшей сноровки здесь их не удержать."
+                $ MainTxt = "Закрытый вечерний рынок куда опаснее для слежки, чем дневная толпа. Стоит вам задеть чью-то корзину и чуть замешкаться, как Кларисса вместе с Монголом растворяются в темном закутке между пустеющими рядами. Без лучшей сноровки здесь их не удержать."
                 $ CurLocDesc = MainTxt
                 $ current_action_title = "Вечерний рынок"
                 $ current_action_content = None

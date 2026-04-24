@@ -21,6 +21,23 @@ init python:
     def marketplace_clara_visible():
         return clara_visible_in_location("MarketPlace")
 
+    def marketplace_closed_action_items():
+        items = []
+
+        _clara_story_caption = str(clara_market_story_caption() or "")
+        _clara_story_label = str(clara_market_story_label() or "")
+        if _clara_story_caption != "" and _clara_story_label != "" and renpy.has_label(_clara_story_label):
+            items.append(MenuItem(_clara_story_caption, Call(_clara_story_label)))
+
+        if (int(MongolVar.get("StocksSeen", 0) or 0) == 1 and int(MongolVar.get("StocksFoodDay", -1) or -1) < 0 and int(time or 0) >= 4) or (int(DraupnirVar.get("MongolLockpickOrderDay", -1) or -1) >= 0 and int(MongolVar.get("StocksReleased", 0) or 0) == 0 and int(time or 0) >= 4 and int(dayspassed or 0) > int(MongolVar.get("StocksFoodDay", -1) or -1)):
+            items.append(MenuItem("Подойти к караулке и колодкам", Jump("CityGuard")))
+
+        if marketplace_becky_home_visible():
+            items.append(MenuItem("Идти в гости в дом к вдове Блэнкеншип", Jump("BeckyHomeFront")))
+
+        items.append(MenuItem("Вернуться к трактиру", Jump("StreetTavern")))
+        return items
+
     def marketplace_action_items():
         items = []
 
@@ -125,12 +142,11 @@ init python:
             ),
         ],
         npcs=[
-            {"npc_id": "clara", "condition": marketplace_clara_visible},
             {"npc_id": "mongol", "condition": marketplace_mongol_visible, "unknown_name": "Мужик в красной рубахе", "gender": "man", "can_examine_unknown": False},
         ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
-            time_slots=[0, 1, 2, 3],
+            time_slots=[0, 1, 2],
             closed_text="Сейчас уже поздно и рынок закрыт.",
         ),
         custom_properties={
@@ -176,33 +192,23 @@ label MarketPlace:
             $ MainTxt += "\n\nЛавка Бекки уже закрыта, но к этому часу вы можете пройти к ней домой через боковую улочку."
         $ CurLocDesc = MainTxt
         call ShowImage("general", "", "LocMarketPlaceClosed")
-        $ current_action_items = []
-        if (int(MongolVar.get("StocksSeen", 0) or 0) == 1 and int(MongolVar.get("StocksFoodDay", -1) or -1) < 0 and int(time or 0) >= 4) or (int(DraupnirVar.get("MongolLockpickOrderDay", -1) or -1) >= 0 and int(MongolVar.get("StocksReleased", 0) or 0) == 0 and int(time or 0) >= 4 and int(dayspassed or 0) > int(MongolVar.get("StocksFoodDay", -1) or -1)):
-            $ current_action_items.append(MenuItem("Подойти к караулке и колодкам", Jump("CityGuard")))
-        if marketplace_becky_home_visible():
-            $ current_action_items.append(MenuItem("Идти в гости в дом к вдове Блэнкеншип", Jump("BeckyHomeFront")))
-        $ current_action_items.append(MenuItem("Вернуться к трактиру", Jump("StreetTavern")))
+        $ current_action_items = marketplace_closed_action_items()
         jump MarketPlaceView
     elif not _market_room.is_open(week, time):
         $ MainTxt = _market_room.schedule.closed_text
+        if int(time or 0) == 3 and str(clara_market_story_label() or "") != "":
+            $ MainTxt += "\n\nНа почти пустой площади остаются только несколько поздних прохожих. Между закрытыми лавками мелькает фигура в плаще, старающаяся не привлекать внимания."
         if marketplace_becky_home_visible():
             $ MainTxt += "\n\nЛавка Бекки уже закрыта, но к этому часу вы можете пройти к ней домой через боковую улочку."
         $ CurLocDesc = MainTxt
         call ShowImage("general", "", "LocMarketPlaceClosed")
-        $ current_action_items = []
-        if (int(MongolVar.get("StocksSeen", 0) or 0) == 1 and int(MongolVar.get("StocksFoodDay", -1) or -1) < 0 and int(time or 0) >= 4) or (int(DraupnirVar.get("MongolLockpickOrderDay", -1) or -1) >= 0 and int(MongolVar.get("StocksReleased", 0) or 0) == 0 and int(time or 0) >= 4 and int(dayspassed or 0) > int(MongolVar.get("StocksFoodDay", -1) or -1)):
-            $ current_action_items.append(MenuItem("Подойти к караулке и колодкам", Jump("CityGuard")))
-        if marketplace_becky_home_visible():
-            $ current_action_items.append(MenuItem("Идти в гости в дом к вдове Блэнкеншип", Jump("BeckyHomeFront")))
-        $ current_action_items.append(MenuItem("Вернуться к трактиру", Jump("StreetTavern")))
+        $ current_action_items = marketplace_closed_action_items()
         jump MarketPlaceView
 
     # Main marketplace description
     $ MainTxt = _market_room.descriptions[0].text + "\n\n" + _market_room.descriptions[1].text
     if dog_is_here("MarketPlace"):
         $ MainTxt += "\n\nУ одной из лавок вертится бродячий пес, внимательно следящий за руками торговцев и покупателей."
-    if marketplace_clara_visible():
-        $ MainTxt += "\n\nСреди покупателей и лавочников вы замечаете Клариссу Легаре. Похоже, она вышла на рынок по каким-то своим делам."
     $ CurLocDesc = MainTxt
     call ShowImageSeq("general", "", "LocMarketPlace", 2)
 
