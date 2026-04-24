@@ -21,6 +21,15 @@ init python:
     def marketplace_clara_visible():
         return clara_visible_in_location("MarketPlace")
 
+    def marketplace_closed_picture():
+        for picture_path in (
+            "images/market/LocMarketPlaceClosed.jpg",
+            "images/general/LocMarketPlaceClosed.jpg",
+        ):
+            if renpy.loadable(picture_path):
+                return picture_path
+        return "images/market/LocMarketPlaceClosed.jpg"
+
     def marketplace_closed_action_items():
         items = []
 
@@ -191,7 +200,9 @@ label MarketPlace:
         if marketplace_becky_home_visible():
             $ MainTxt += "\n\nЛавка Бекки уже закрыта, но к этому часу вы можете пройти к ней домой через боковую улочку."
         $ CurLocDesc = MainTxt
-        call ShowImage("general", "", "LocMarketPlaceClosed")
+        $ scene_image = marketplace_closed_picture()
+        $ _layout_last_picture = scene_image
+        call ShowImage("", "", scene_image)
         $ current_action_items = marketplace_closed_action_items()
         jump MarketPlaceView
     elif not _market_room.is_open(week, time):
@@ -201,7 +212,9 @@ label MarketPlace:
         if marketplace_becky_home_visible():
             $ MainTxt += "\n\nЛавка Бекки уже закрыта, но к этому часу вы можете пройти к ней домой через боковую улочку."
         $ CurLocDesc = MainTxt
-        call ShowImage("general", "", "LocMarketPlaceClosed")
+        $ scene_image = marketplace_closed_picture()
+        $ _layout_last_picture = scene_image
+        call ShowImage("", "", scene_image)
         $ current_action_items = marketplace_closed_action_items()
         jump MarketPlaceView
 
