@@ -24,10 +24,6 @@ init python:
             "male_samples_001",
             "worktable_001",
         ],
-        npcs=[
-            {"npc_id": "irma", "name": "Ирма", "talk_label": "IntIrmaTalk"},
-            {"npc_id": "clara", "name": "Кларисса", "talk_label": "IntClaraTalk"},
-        ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
             time_slots=[0, 1, 2],

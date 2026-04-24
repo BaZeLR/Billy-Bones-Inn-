@@ -63,9 +63,6 @@ init python:
             ),
             "birth_room_door_001",
         ],
-        npcs=[
-            {"npc_id": "fran", "condition": ellona_fran_visible, "unknown_name": "Старая жрица", "gender": "woman", "can_examine_unknown": False},
-        ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "temple_open_always": True,
@@ -97,9 +94,6 @@ init python:
                 ],
             ),
         ],
-        npcs=[
-            {"npc_id": "fran", "condition": ellona_fran_visible, "unknown_name": "Старая жрица", "gender": "woman", "can_examine_unknown": False},
-        ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "birth_room": True,
@@ -126,6 +120,7 @@ label EllonaTemple:
     $ CurrentRoom = EllonaTempleRoom
     $ CurLoc = "EllonaTemple"
     $ location = CurLoc
+    $ CurrentLoc["fran"] = "EllonaTemple"
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -165,6 +160,7 @@ label EllonaBirthRoom:
     $ CurrentRoom = EllonaBirthRoomRoom
     $ CurLoc = "EllonaBirthRoom"
     $ location = CurLoc
+    $ CurrentLoc["fran"] = "EllonaBirthRoom"
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image

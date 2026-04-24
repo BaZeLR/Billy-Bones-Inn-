@@ -1,10 +1,4 @@
 init 6 python:
-    def tavern_melissa_room_npc_entries():
-        return [
-            {"npc_id": "melissa", "name": "Мелисса", "talk_label": "IntMelissaTalk", "auto_card": True},
-            {"npc_id": "clara", "name": "Кларисса", "talk_label": "IntClaraTalk", "auto_card": True},
-        ]
-
     def tavern_melissa_room_clara_scene_paths():
         return [
             picture_path
@@ -102,7 +96,6 @@ init 6 python:
         game_items=[
             bedroom_door_object("melissa_room_door_001", "TavernMelissaRoom", "Мелиссы"),
         ],
-        npcs=tavern_melissa_room_npc_entries(),
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "object_menu_label": "TavernMelissaRoomObjectMenu",
@@ -116,10 +109,6 @@ label TavernMelissaRoom:
     $ CurLoc = "TavernMelissaRoom"
     $ location = CurLoc
     $ tavern_melissa_room_register_clara_visit()
-    if tavern_melissa_room_clara_visit_active():
-        $ CurrentRoom.npcs = []
-    else:
-        $ CurrentRoom.npcs = tavern_melissa_room_npc_entries()
     $ scene_image = tavern_melissa_room_picture() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image

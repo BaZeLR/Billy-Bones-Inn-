@@ -103,7 +103,6 @@ init python:
             RoomExit(label="Вернуться в квартал ремесленников", target="ArtisansQuarter"),
         ],
         game_items=[],
-        npcs=[],
         schedule=RoomSchedule(
             closed_text="Сейчас цирюльня закрыта.",
             condition=barber_shop_is_open,

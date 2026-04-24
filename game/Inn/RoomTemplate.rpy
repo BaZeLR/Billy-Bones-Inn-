@@ -119,8 +119,6 @@ init -40 python:
         if "game_items" in payload:
             restored.game_items = list(payload.get("game_items", []) or [])
             restored.objects = restored.game_items
-        if "npcs" in payload:
-            restored.npcs = list(payload.get("npcs", []) or [])
         return restored
 
     class RoomExit(object):
@@ -238,7 +236,6 @@ init -40 python:
             exits=None,
             objects=None,
             game_items=None,
-            npcs=None,
             action_menus=None,
             schedule=None,
             scenes=None,
@@ -255,7 +252,6 @@ init -40 python:
             self.exits = list(exits or [])
             self.game_items = list(game_items or objects or [])
             self.objects = self.game_items
-            self.npcs = list(npcs or [])
             self.action_menus = list(action_menus or [])
             self.schedule = schedule
             self.scenes = list(scenes or [])
@@ -296,21 +292,10 @@ init -40 python:
 
         def visible_npcs(self):
             out = []
-            for npc in self.npcs:
-                if isinstance(npc, dict):
-                    npc_id = str(npc.get("npc_id", "") or "").strip()
-                    if npc_id and str(getLocation(npc_id) or "") != str(self.code_name or ""):
-                        continue
-                    if room_rule_true(npc.get("condition", None)):
-                        out.append(npc)
-                    continue
-                if hasattr(npc, "condition"):
-                    if room_rule_true(getattr(npc, "condition", None)):
-                        out.append(npc)
-                    continue
-                if isinstance(npc, str) and str(npc).strip():
-                    if str(getLocation(npc) or "") == str(self.code_name or ""):
-                        out.append(npc)
+            for npc_id in getNPCids(self.code_name):
+                row = npc_action_data_for_room(npc_id, self.code_name)
+                if isinstance(row, dict):
+                    out.append(row)
             return out
 
         def visible_actions(self):

@@ -51,9 +51,6 @@ init python:
                 ],
             ),
         ],
-        npcs=[
-            {"npc_id": "zimmer", "name": "Десятник Циммерман", "condition": city_guard_open_now, "talk_label": "IntZimmerTalk"},
-        ],
         schedule=RoomSchedule(
             closed_text="Прием посетителей производится только во вторник днем и в пятницу утром.",
             condition=city_guard_open_now,

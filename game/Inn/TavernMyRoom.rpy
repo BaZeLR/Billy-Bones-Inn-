@@ -95,10 +95,6 @@ init python:
 label TavernMyRoom:
     $ dog_prepare_current_spawn()
     $ CurrentRoom = TavernMyRoomRoom
-    $ TavernMyRoomRoom.npcs = []
-    if str(getLocation("melissa") or "") == "TavernMyRoom":
-        $ TavernMyRoomRoom.npcs.append({"npc_id": "melissa", "name": "Мелисса", "talk_label": "IntMelissaTalk", "auto_card": True})
-    $ CurrentRoom.npcs = TavernMyRoomRoom.npcs
     $ CurLoc = "TavernMyRoom"
     $ location = CurLoc
     call CheckDailyEvent("", "_story_enter", CurLoc, time)
@@ -134,10 +130,6 @@ label TavernMyRoomBuildActions:
         $ _layout_last_picture = _my_room_picture
     $ MainTxt = _my_room_text
     $ CurLocDesc = _my_room_text
-    $ TavernMyRoomRoom.npcs = []
-    if str(getLocation("melissa") or "") == "TavernMyRoom":
-        $ TavernMyRoomRoom.npcs.append({"npc_id": "melissa", "name": "Мелисса", "talk_label": "IntMelissaTalk", "auto_card": True})
-    $ CurrentRoom.npcs = TavernMyRoomRoom.npcs
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ room_menu = CurrentRoom.build_menu_sections()

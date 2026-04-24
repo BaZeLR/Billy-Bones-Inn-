@@ -110,25 +110,6 @@ init python:
             names.append(_action_display_name(npc_id))
         return names
 
-    def tavern_breakfast_present_entries():
-        entries = []
-        for npc_key in tavern_breakfast_present_ids():
-            if str(npc_key or "") == "becky":
-                entries.append({
-                    "npc_id": "becky",
-                    "name": "Бекки",
-                    "talk_label": "IntBeckyTalk",
-                    "auto_card": True,
-                })
-            else:
-                entries.append({
-                    "npc_id": npc_key,
-                    "name": _kitchen_display_name(npc_key),
-                    "talk_label": _kitchen_talk_label(npc_key),
-                    "auto_card": True,
-                })
-        return entries
-
     def tavern_breakfast_absent_ids():
         present_ids = set(tavern_breakfast_present_ids())
         return [npc_id for npc_id in ("sandra", "melissa", "amanda") if npc_id not in present_ids]
@@ -860,52 +841,9 @@ init python:
             "hearth_001",
             "cauldron_001",
         ],
-        npcs=[],  # Filled dynamically from jobkitchen
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={"object_menu_label": "TavernKitchenObjectMenu"},
     )
-
-    def _kitchen_display_name(npc_id):
-        try:
-            return _tavern_name(npc_id)
-        except Exception:
-            return str(npc_id).capitalize()
-
-    def _kitchen_talk_label(npc_id):
-        label = "Int" + str(npc_id).capitalize() + "Talk"
-        if renpy.has_label(label):
-            return label
-        return ""
-
-    def build_kitchen_npc_entries():
-        if bool(TavernBreakfastEventActive):
-            return tavern_breakfast_present_entries()
-        entries = []
-        for npc_key in ("sandra", "melissa", "amanda"):
-            if not npc_key:
-                continue
-            if str(getLocation(npc_key) or "") == "TavernKitchen":
-                entries.append({
-                    "npc_id": npc_key,
-                    "name": _kitchen_display_name(npc_key),
-                    "talk_label": _kitchen_talk_label(npc_key),
-                    "auto_card": True,
-                })
-        if str(getLocation("werecat") or "") == "TavernKitchen":
-            entries.append({
-                "npc_id": "werecat",
-                "name": str(werecat_display_name() or "Луна"),
-                "talk_label": "IntWerecatTalk",
-                "auto_card": True,
-            })
-        if str(getLocation("becky") or "") == "TavernKitchen":
-            entries.append({
-                "npc_id": "becky",
-                "name": "Бекки",
-                "talk_label": "IntBeckyTalk",
-                "auto_card": True,
-            })
-        return entries
 
     def build_kitchen_description(include_notice=True, intro_text=""):
         room_obj = CurrentRoom if CurrentRoom is not None else TavernKitchenRoom
@@ -997,16 +935,11 @@ label TavernKitchen:
         else:
             $ MainTxt = "Вы все еще сидите за общим утренним столом."
         $ CurLocDesc = MainTxt
-        $ TavernKitchenRoom.npcs = tavern_breakfast_present_entries()
-        $ CurrentRoom.npcs = TavernKitchenRoom.npcs
         hide screen main_ui
         jump TavernKitchenBreakfastMenu
     $ BeckyKitchenVisitActive = 1 if becky_kitchen_visit_active() else 0
     if BeckyKitchenVisitActive:
         $ BeckyVar["SandraKitchenVisitMonth"] = int(month or 0)
-
-    $ TavernKitchenRoom.npcs = build_kitchen_npc_entries()
-    $ CurrentRoom.npcs = TavernKitchenRoom.npcs
 
     $ _kitchen_wine_event_text = ""
     $ _kitchen_pending_event = tavern_kitchen_pending_mandatory_event_code()
@@ -1050,8 +983,6 @@ label TavernKitchenBuildActions:
     if TavernBreakfastEventActive:
         return
     $ tavern_kitchen_hearth_wood_stock()
-    $ TavernKitchenRoom.npcs = build_kitchen_npc_entries()
-    $ CurrentRoom.npcs = TavernKitchenRoom.npcs
     $ current_action_title = "Кухня"
     $ current_action_content = None
     $ room_menu = CurrentRoom.build_menu_sections()
@@ -1140,8 +1071,6 @@ label TavernKitchenBreakfast:
     $ TavernKitchenSavedText = str(MainTxt or "")
     $ TavernBreakfastEventActive = True
     call stat
-    $ TavernKitchenRoom.npcs = tavern_breakfast_present_entries()
-    $ CurrentRoom.npcs = TavernKitchenRoom.npcs
     hide screen main_ui
     call TavernKitchenBreakfastMenu
     return

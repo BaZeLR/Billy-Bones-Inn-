@@ -14,7 +14,6 @@ init 6 python:
             RoomExit(label="Вернуться в коридор", target="TavernUpstairs"),
         ],
         game_items=[],
-        npcs=[],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={},
     )

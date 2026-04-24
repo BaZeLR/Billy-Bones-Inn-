@@ -65,9 +65,6 @@ init 6 python:
         game_items=[
             bedroom_door_object("sandra_room_door_001", "TavernSandraRoom", "Сандры"),
         ],
-        npcs=[
-            {"npc_id": "sandra", "name": "Сандра", "talk_label": "IntSandraTalk", "auto_card": True},
-        ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "object_menu_label": "TavernSandraRoomObjectMenu",

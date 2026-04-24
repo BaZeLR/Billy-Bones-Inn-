@@ -81,7 +81,6 @@ init python:
                 ],
             ),
         ],
-        npcs=[],
     )
 
     def street_tavern_get_object(object_id):

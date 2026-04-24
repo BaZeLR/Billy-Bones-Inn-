@@ -331,7 +331,6 @@ init python:
                 ],
             ),
         ],
-        npcs=[],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 6],
             time_slots=[0, 1, 2, 3],

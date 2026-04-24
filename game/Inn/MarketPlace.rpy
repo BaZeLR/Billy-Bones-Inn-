@@ -147,9 +147,6 @@ init python:
                 ],
             ),
         ],
-        npcs=[
-            {"npc_id": "mongol", "condition": marketplace_mongol_visible, "unknown_name": "Мужик в красной рубахе", "gender": "man", "can_examine_unknown": False},
-        ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
             time_slots=[0, 1, 2],

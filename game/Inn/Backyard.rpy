@@ -54,26 +54,6 @@ init 6 python:
             return base_text + "\n\n" + ash_barrel_text
         return base_text
 
-    def build_backyard_npc_entries():
-        entries = []
-        for npc_key in ("sandra", "melissa", "amanda"):
-            if str(getLocation(npc_key) or "") != "Backyard":
-                continue
-            entries.append({
-                "npc_id": npc_key,
-                "name": _tavern_name(npc_key),
-                "talk_label": "Int" + str(npc_key).capitalize() + "Talk",
-                "auto_card": True,
-            })
-        if str(getLocation("werecat") or "") == "Backyard":
-            entries.append({
-                "npc_id": "werecat",
-                "name": str(werecat_display_name() or "Луна"),
-                "talk_label": "IntWerecatTalk",
-                "auto_card": True,
-            })
-        return entries
-
     BackyardRoom = Room(
         code_name="Backyard",
         group_name=ROOM_GROUP_TAVERN,
@@ -144,7 +124,6 @@ init 6 python:
                 condition=backyard_has_dog_booth,
             ),
         ],
-        npcs=[],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "object_menu_label": "BackyardObjectMenu",
@@ -169,8 +148,6 @@ label Backyard:
     $ MainTxt = backyard_dynamic_text()
     $ CurLocDesc = MainTxt
     $ BackyardSavedText = MainTxt
-    $ BackyardRoom.npcs = build_backyard_npc_entries()
-    $ CurrentRoom.npcs = BackyardRoom.npcs
     $ current_action_title = "Задний двор"
     $ current_action_content = None
     $ current_action_items = []
@@ -186,8 +163,6 @@ label BackyardView:
 
 label BackyardBuildActions:
     $ BackyardSavedText = backyard_dynamic_text()
-    $ BackyardRoom.npcs = build_backyard_npc_entries()
-    $ CurrentRoom.npcs = BackyardRoom.npcs
     $ current_action_title = "Задний двор"
     $ current_action_content = None
     $ current_action_items = []

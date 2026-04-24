@@ -55,18 +55,6 @@ init python:
     def becky_home_table_visible():
         return ArriveMode == ""
 
-    def becky_home_becky_visible():
-        return True
-
-    def becky_home_eddie_visible():
-        return ArriveMode in ("SvalnyiGreh", "")
-
-    def becky_home_inga_visible():
-        return IngaVar.get("Knowher", 0) >= 1 and ArriveMode == ""
-
-    def becky_home_lucas_visible():
-        return IngaVar.get("Knowher", 0) >= 1 and ArriveMode == ""
-
     BeckyHomeRoom = Room(
         code_name="BeckyHome",
         group_name=ROOM_GROUP_CITY,
@@ -117,12 +105,6 @@ init python:
                     ObjectAction(action_id="examine_table", label="Осмотреть стол", hook="text", target="Для обычного домашнего ужина здесь все устроено удивительно щедро.", condition=becky_home_table_visible),
                 ],
             ),
-        ],
-        npcs=[
-            {"npc_id": "becky", "name": "Бекки", "condition": becky_home_becky_visible, "talk_label": "IntBeckyTalk"},
-            {"npc_id": "eddie", "name": "Эдди", "condition": becky_home_eddie_visible, "talk_label": "IntEddieTalk"},
-            {"npc_id": "inga", "name": "Ингенборг", "condition": becky_home_inga_visible, "talk_label": "IntIngaTalk"},
-            {"npc_id": "lucas", "name": "Лукас", "condition": becky_home_lucas_visible},
         ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={

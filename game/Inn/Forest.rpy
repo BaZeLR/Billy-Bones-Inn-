@@ -194,7 +194,6 @@ init python:
                 ],
             ),
         ],
-        npcs=[],
         spawn_rules=[
             {"item_id": "lumber_001", "frequency": 1, "units": 1},
             {"item_id": "mushroom_001", "frequency": 2, "units": 3},

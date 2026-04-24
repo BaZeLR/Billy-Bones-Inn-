@@ -54,6 +54,34 @@ init -40 python:
             "actions": ["look", "talk", "gift", "flirt"],
             "auto_card": True,
         },
+        "eddie": {
+            "unknown_name": "Someone",
+            "talk_label": "IntEddieTalk",
+            "talk_args": (),
+            "examine_label": "",
+            "actions": ["look", "talk"],
+            "gender": "man",
+            "auto_card": False,
+        },
+        "inga": {
+            "unknown_name": "Someone",
+            "talk_label": "IntIngaTalk",
+            "talk_args": (),
+            "examine_label": "",
+            "actions": ["look", "talk"],
+            "gender": "woman",
+            "auto_card": False,
+        },
+        "lucas": {
+            "unknown_name": "Лукас",
+            "talk_label": "",
+            "talk_args": (),
+            "examine_label": "",
+            "actions": ["look"],
+            "gender": "man",
+            "auto_card": False,
+            "can_examine_unknown": False,
+        },
         "georgett": {
             "unknown_name": "Молодая женщина",
             "talk_label": "IntGeorgettTalk",
@@ -79,6 +107,24 @@ init -40 python:
             "examine_label": "ShowIrmaCard",
             "actions": ["look", "talk", "gift", "flirt"],
             "auto_card": True,
+        },
+        "alber": {
+            "unknown_name": "Альбер",
+            "talk_label": "IntAlberTalk",
+            "talk_args": (),
+            "examine_label": "",
+            "actions": ["look", "talk"],
+            "gender": "man",
+            "auto_card": False,
+        },
+        "zimmer": {
+            "unknown_name": "Десятник Циммерман",
+            "talk_label": "IntZimmerTalk",
+            "talk_args": (),
+            "examine_label": "",
+            "actions": ["look", "talk"],
+            "gender": "man",
+            "auto_card": False,
         },
         "werecat": {
             "unknown_name": "Кошкодевочка",
@@ -139,6 +185,58 @@ init -40 python:
 
     def npc_action_ids(npc_id):
         return list(npc_meta(npc_id).get("actions", []) or [])
+
+    def npc_room_interaction_visible(npc_id="", room_code=""):
+        key = str(npc_id or "").strip().lower()
+        room_key = str(room_code or "").strip()
+        if not key or not room_key:
+            return False
+        if key == "clara" and room_key == "MarketPlace":
+            return False
+        try:
+            if key == "mongol" and room_key == "MarketPlace":
+                return bool(marketplace_mongol_visible())
+            if key == "georgett" and room_key == "PortStreets":
+                return bool(port_streets_georgett_can_talk())
+            if key == "liza" and room_key == "PortStreets":
+                return bool(port_streets_liza_can_talk())
+            if key == "fran" and room_key in ("EllonaTemple", "EllonaBirthRoom"):
+                return bool(ellona_fran_visible())
+            if room_key == "TavernMelissaRoom" and tavern_melissa_room_clara_visit_active():
+                return False
+            if key == "zimmer" and room_key == "CityGuard":
+                return bool(city_guard_open_now())
+            if key == "alber" and room_key == "WineStore":
+                return int(time or 0) != 0
+            if room_key == "BeckyHome":
+                if key == "becky":
+                    return True
+                if key == "eddie":
+                    return ArriveMode in ("SvalnyiGreh", "")
+                if key in ("inga", "lucas"):
+                    return IngaVar.get("Knowher", 0) >= 1 and ArriveMode == ""
+            if room_key == "BeckyHomeFront":
+                if key == "becky":
+                    return ArriveMode == "FromDances"
+                if key in ("inga", "lucas"):
+                    return ViewIngaSex > 0
+        except Exception:
+            return False
+        return True
+
+    def npc_action_data_for_room(npc_id="", room_code=""):
+        key = str(npc_id or "").strip().lower()
+        room_key = str(room_code or "").strip()
+        if not npc_room_interaction_visible(key, room_key):
+            return None
+        data = npc_meta(key)
+        data["npc_id"] = key
+        if key == "georgett":
+            if room_key == "PortStreets":
+                data["talk_args"] = ("georgett", "street")
+            elif room_key == "TavernMain":
+                data["talk_args"] = ("georgett", "tavern")
+        return data
 
     def dog_action_data(where_id=""):
         room_code = str(where_id or CurLoc or "").strip()

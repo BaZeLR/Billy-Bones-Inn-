@@ -172,10 +172,6 @@ init python:
                 ],
             ),
         ],
-        npcs=[
-            {"npc_id": "amanda", "name": "Аманда", "talk_label": "IntAmandaTalk", "auto_card": True},
-            {"npc_id": "melissa", "name": "Мелисса", "talk_label": "IntMelissaTalk", "auto_card": True},
-        ],
         custom_properties={
             "object_menu_label": "tavern_amanda_room_object_menu",
         },
@@ -195,7 +191,6 @@ label TavernAmandaRoom:
     call EnterLocation("TavernAmandaRoom")
     $ _room = TavernAmandaRoomRoom
     $ CurrentRoom = _room
-    $ CurrentRoom.npcs = TavernAmandaRoomRoom.npcs
     $ CurLoc = "TavernAmandaRoom"
     $ location = CurLoc
     call CheckDailyEvent("", "_story_enter", CurLoc, time)

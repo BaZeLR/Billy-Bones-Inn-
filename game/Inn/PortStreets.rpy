@@ -86,10 +86,6 @@ init python:
                 condition=port_streets_empty_bottle_visible,
             ),
         ],
-        npcs=[
-            {"npc_id": "georgett", "condition": port_streets_georgett_can_talk, "unknown_name": "Молодая женщина", "gender": "woman", "can_examine_unknown": False, "talk_args": ("georgett", "street")},
-            {"npc_id": "liza", "condition": port_streets_liza_can_talk, "talk_label": "IntLizaTalk", "auto_card": 0},
-        ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6, 7],
             time_slots=[0, 1, 2, 3, 4],

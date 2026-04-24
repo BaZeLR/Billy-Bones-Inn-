@@ -47,10 +47,6 @@ init python:
                 ],
             ),
         ],
-        npcs=[
-            {"npc_id": "clara", "name": "Кларисса", "talk_label": "IntClaraTalk"},
-            {"npc_id": "alber", "name": "Альбер", "condition": wine_store_alber_visible, "talk_label": "IntAlberTalk"},
-        ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
             time_slots=[0, 1, 2],

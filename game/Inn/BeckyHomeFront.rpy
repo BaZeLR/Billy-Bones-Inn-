@@ -44,15 +44,6 @@ init python:
     def becky_homefront_peek_available():
         return ViewIngaSex == 0
 
-    def becky_homefront_becky_visible():
-        return ArriveMode == "FromDances"
-
-    def becky_homefront_inga_visible():
-        return ViewIngaSex > 0
-
-    def becky_homefront_lucas_visible():
-        return ViewIngaSex > 0
-
     BeckyHomeFrontRoom = Room(
         code_name="BeckyHomeFront",
         group_name=ROOM_GROUP_CITY,
@@ -91,11 +82,6 @@ init python:
                     ObjectAction(action_id="peek_corner", label="Осторожно заглянуть за угол", hook="call", target="becky_homefront_peek", condition=becky_homefront_peek_available),
                 ],
             ),
-        ],
-        npcs=[
-            {"npc_id": "becky", "name": "Бекки", "condition": becky_homefront_becky_visible, "talk_label": "IntBeckyTalk"},
-            {"npc_id": "inga", "name": "Ингенборг", "condition": becky_homefront_inga_visible, "talk_label": "IntIngaTalk"},
-            {"npc_id": "lucas", "name": "Лукас", "condition": becky_homefront_lucas_visible},
         ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={

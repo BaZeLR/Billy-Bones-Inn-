@@ -165,16 +165,6 @@ init python:
             "fireplace_001",
             "bar_001",
         ],
-        npcs=[
-            {"npc_id": "sandra", "name": "Сандра", "talk_label": "IntSandraTalk", "auto_card": True},
-            {"npc_id": "melissa", "name": "Мелисса", "talk_label": "IntMelissaTalk", "auto_card": True},
-            {"npc_id": "amanda", "name": "Аманда", "talk_label": "IntAmandaTalk", "auto_card": True},
-            {"npc_id": "georgett", "name": "Жоржетта", "talk_label": "IntGeorgettTalk", "talk_args": ("georgett", "tavern"), "auto_card": True},
-            {"npc_id": "liza", "name": "Лизетта", "talk_label": "IntLizaTalk", "auto_card": True},
-            {"npc_id": "clara", "name": "Кларисса", "talk_label": "IntClaraTalk", "auto_card": True},
-            {"npc_id": "becky", "name": "Бекки", "talk_label": "IntBeckyTalk", "auto_card": True},
-            {"npc_id": "werecat", "name": "Луна", "talk_label": "IntWerecatTalk", "auto_card": True},
-        ],
         schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "hall_staff_jobs": ["jobkitchen", "jobcleaning", "jobwaitress"],

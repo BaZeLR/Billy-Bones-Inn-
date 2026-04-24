@@ -208,11 +208,6 @@ init python:
                 ],
             ),
         ],
-        npcs=[
-            {"npc_id": "eddie", "name": "Эдди", "talk_label": "IntEddieTalk"},
-            {"npc_id": "inga", "name": "Ингенборг", "talk_label": "IntIngaTalk"},
-            {"npc_id": "becky", "name": "Бекки", "talk_label": "IntBeckyTalk"},
-        ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
             time_slots=[0, 1, 2, 3],

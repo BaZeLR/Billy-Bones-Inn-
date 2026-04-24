@@ -43,7 +43,6 @@ init python:
                 ],
             ),
         ],
-        npcs=[],
     )
 
 
