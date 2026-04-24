@@ -12,11 +12,13 @@ init python:
         return liza_can_talk == 1
 
     def port_streets_prepare_bottle_spawn():
+        global PortStreetsBottleSpawnDay
+        global PortStreetsBottlePresent
         current_day = int(dayspassed or 0)
         if int(PortStreetsBottleSpawnDay or -1) == current_day:
             return
-        globals()["PortStreetsBottleSpawnDay"] = current_day
-        globals()["PortStreetsBottlePresent"] = 1 if random.randint(1, 3) == 1 else 0
+        PortStreetsBottleSpawnDay = current_day
+        PortStreetsBottlePresent = 1 if random.randint(1, 3) == 1 else 0
 
     def port_streets_empty_bottle_visible():
         return int(PortStreetsBottlePresent or 0) == 1

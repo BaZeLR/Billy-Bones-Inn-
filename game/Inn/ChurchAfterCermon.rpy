@@ -58,10 +58,12 @@ label ChurchAfterCermon(entry_arg=0):
         call IntGeorgettAfterCermon
         $ MainTxt = MainTxt + "\n\nЗа кабинками для исповеди вы заметили неприметную дверь, ведущую внутрь храма. Из-за нее слышаться приглушенные голоса. Вы замечаете большую замочную скважину, через которую вы можете {a=call:AfterCermonGeorgett}{color=#245b2b}посмотреть{/color}{/a}, что там происходит."
         $ CurLocDesc = MainTxt
+        $ current_action_items.append(MenuItem("Посмотреть", Call("AfterCermonGeorgett")))
     elif _church_scene_code == "liza":
         call IntLizettAfterCermon
         $ MainTxt = MainTxt + "\n\nЗа кабинками для исповеди вы заметили неприметную дверь, ведущую внутрь храма. Из-за нее слышаться приглушенные голоса. Вы замечаете большую замочную скважину, через которую вы можете {a=call:AfterCermonLizett}{color=#245b2b}посмотреть{/color}{/a}, что там происходит."
         $ CurLocDesc = MainTxt
+        $ current_action_items.append(MenuItem("Посмотреть", Call("AfterCermonLizett")))
     elif _church_scene_code == "becky":
         call IntBeckyAfterCermon
         $ MainTxt = MainTxt + "\n\nВы заметили, как миссис Блэнкеншип направилась было к кабинке для исповеди, но отец Герхард взял ее за руку и повел к неприметной двери, которую он отпер висящим у него на поясе ключом. Как только вдова проследовала за ним, дверь захлопнулась и послышался стук задвигаемого засова. Хотя вы можете попробовать {a=call:AfterCermonBecky}{color=#245b2b}посмотреть{/color}{/a}, что там происходит через замочную скважину."
