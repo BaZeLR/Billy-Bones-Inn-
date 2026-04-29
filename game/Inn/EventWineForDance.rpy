@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init python:
     def wine_for_dance_costs():
         return {"wine": 50, "products": 40, "money": 20}
@@ -41,7 +44,7 @@ init python:
     def tavern_breakfast_can_offer_dance_sponsorship():
         return (
             int(hour or 0) < 12
-            and int(week or 0) == 4
+            and int(week or 0) in (3, 4)
             and int(EventsCount.get(10, 0) or 0) > 0
             and str(NewEvents.get("10_" + str(int(EventsCount.get(10, 0) or 0) - 1), "") or "") == "WineForDance"
         )
@@ -70,7 +73,7 @@ init python:
 
 label EventWineForDance(eyewitness=0):
     $ YourReaction1 = 0
-    $ Result = "К вам подошла ваша мать, Сандра, и сказала:\n\"Стефан, дорогой, ты помнишь же что завтра вечером будут гуляния и танцы? Мы можем тоже поучаствовать и выставить на них выпивку и угощение за счет нашего трактира. Это конечно обойдется в копеечку, так как, если уж мы за это возьмемся то придется выставить 5 бочонков вина и наготовить закуски из 4 мешков продуктов, да еще на шатер уйдет 20 мараведи. Но, с другой, стороны, такая щедрость привлечет к нам людей.\""
+    $ Result = "К вам подошла Сандра, ваша кухарка и фактическая распорядительница трактирного хозяйства, и сказала:\n\"Стефан, дорогой, ты помнишь же, что в пятницу вечером будут гуляния и танцы? Мы можем тоже поучаствовать и выставить на них выпивку и угощение за счет нашего трактира. Это конечно обойдется в копеечку, так как, если уж мы за это возьмемся то придется выставить 5 бочонков вина и наготовить закуски из 4 мешков продуктов, да еще на шатер уйдет 20 мараведи. Но, с другой, стороны, такая щедрость привлечет к нам людей.\""
 
     if eyewitness > 0:
         $ current_action_title = "Ваше решение"
@@ -110,6 +113,7 @@ label EventWineForDanceApply(reaction_code=1):
     call stat
     if str(CurLoc or "") == "TavernKitchen" and bool(TavernBreakfastEventActive):
         $ TavernKitchenSavedText = MainTxt
+        call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
         return
     $ current_action_title = ""
     $ current_action_content = None

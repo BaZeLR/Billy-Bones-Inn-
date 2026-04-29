@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init 6 python:
     import renpy.exports as renpy
 
@@ -8,8 +11,8 @@ init 6 python:
             if str(getLocation("melissa") or "") == "TavernStorage":
                 if renpy.loadable("images/melissa/tavern/basement.png"):
                     return "images/melissa/tavern/basement.png"
-                if renpy.loadable("images/amanda/melissa_in storage.mp4"):
-                    return "images/amanda/melissa_in storage.mp4"
+                if renpy.loadable("images/tavern/storage/storage_room.png"):
+                    return "images/tavern/storage/storage_room.png"
         return str(TavernStorageRoom.bg_picture or "")
 
     def tavern_storage_text():
@@ -18,6 +21,7 @@ init 6 python:
             names_here = tavern_household_present_names("TavernStorage")
             if str(names_here or "").strip() and str(names_here or "") != "никто":
                 text_parts.append("До полудня в кладовой возятся: %s." % str(names_here))
+        text_parts.append(werecat_visible_text("TavernStorage"))
         return "\n\n".join([row for row in text_parts if str(row or "").strip()])
 
     TavernStorageRoom = Room(
@@ -53,16 +57,14 @@ label TavernStorage:
         $ _layout_last_picture = ""
     $ MainTxt = tavern_storage_text()
     $ CurLocDesc = MainTxt
-    $ current_action_title = "Кладовая"
-    $ current_action_content = None
-    $ current_action_items = []
     python:
+        _storage_items = []
         for _storage_exit in TavernStorageRoom.visible_exits():
-            current_action_items.append(MenuItem(_storage_exit.label, Call("AdvanceMovementTime", _storage_exit.target)))
-    jump TavernStorageView
+            _storage_items.append(MenuItem(_storage_exit.label, Call("AdvanceMovementTime", _storage_exit.target)))
+    if werecat_is_in_room("TavernStorage"):
+        $ _storage_items.append(MenuItem(werecat_action_caption("TavernStorage"), Call("IntWerecatTalk", "TavernStorage")))
+    $ main_ui_set_action_panel("Кладовая", _storage_items, None, "scene", restart=False)
+    call screen main_ui
+    jump TavernStorage
 
 
-label TavernStorageView:
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    jump TavernStorageView

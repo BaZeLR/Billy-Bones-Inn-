@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 # Placeholder functions for compatibility
 
 label InitSecondaryNPC_stub:
@@ -56,7 +59,3 @@ label Church_stub:
             jump TavernMain
     return
 
-# Placeholder for the TavernMain label
-label TavernMain_stub:
-    "Welcome to the Wild Stallion Inn! This is a placeholder for the main tavern functionality."
-    return

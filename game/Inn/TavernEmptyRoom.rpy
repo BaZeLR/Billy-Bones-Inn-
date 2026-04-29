@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init 6 python:
     TavernEmptyRoomRoom = Room(
         code_name="TavernEmptyRoom",
@@ -30,7 +33,11 @@ label TavernEmptyRoom:
     $ MainTxt = TavernEmptyRoomRoom.descriptions[0].text
     $ CurLocDesc = MainTxt
     call TavernEmptyRoomBuildActions
-    jump TavernEmptyRoomView
+    $ _empty_room_ui_return = None
+    while _empty_room_ui_return is None:
+        call screen main_ui
+        $ _empty_room_ui_return = _return
+    jump TavernEmptyRoom
 
 
 label TavernEmptyRoomBuildActions:
@@ -46,7 +53,3 @@ label TavernEmptyRoomBuildActions:
     return
 
 
-label TavernEmptyRoomView:
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    jump TavernEmptyRoomView

@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init 5 python:
     def tavern_my_room_can_sleep(obj=None):
         return bool(_player_can_sleep_now())

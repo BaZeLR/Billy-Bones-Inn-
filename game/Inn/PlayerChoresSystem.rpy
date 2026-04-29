@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init -45 python:
     import renpy.exports as renpy
 
@@ -462,6 +465,10 @@ init -45 python:
         preview_rebel = dict(preview.get("rebel", {}) or {})
         for girl in PLAYER_CORE_OTHER_GIRLS:
             neshlush[girl] = max(0, _pc_to_int(preview_rebel.get(girl, neshlush.get(girl, 0)), 0))
+        try:
+            relationship_apply_weekly_chore_evaluation(preview)
+        except Exception:
+            pass
 
         preview_chores = dict(preview.get("chores", {}) or {})
         for key in PLAYER_CHORE_KEYS:

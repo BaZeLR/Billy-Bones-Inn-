@@ -1,6 +1,9 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init 6 python:
     def tavern_upstairs_can_enter_amanda_room():
-        return AmandaVar["kickyoufromroom"] == 0
+        return int(AmandaVar.get("kickyoufromroom", 0) or 0) == 0
 
     def tavern_upstairs_can_clean_rooms():
         try:
@@ -48,24 +51,23 @@ label TavernUpstairs:
     $ MainTxt = TavernUpstairsRoom.descriptions[0].text
     $ CurLocDesc = MainTxt
     call TavernUpstairsBuildActions
-    jump TavernUpstairsView
+    $ _upstairs_ui_return = None
+    while _upstairs_ui_return is None:
+        call screen main_ui
+        $ _upstairs_ui_return = _return
+    jump TavernUpstairs
 
 
 label TavernUpstairsBuildActions:
-    $ current_action_title = "Наверху"
-    $ current_action_content = None
-    $ current_action_items = []
+    $ _upstairs_items = []
     if story_event_available("TavernUpstairs", "enter"):
-        $ current_action_items.append(MenuItem("Проверить шум из комнаты Мелиссы", Call("checkTriggers", "TavernUpstairs", "enter", 0)))
+        $ _upstairs_items.append(MenuItem("Проверить шум из комнаты Мелиссы", Call("checkTriggers", "TavernUpstairs", "enter", 0)))
     if tavern_upstairs_can_clean_rooms():
-        $ current_action_items.append(MenuItem("Убрать комнаты наверху", Call("DoChore", "clean_upstairs_rooms", "TavernUpstairs", "", "")))
+        $ _upstairs_items.append(MenuItem("Убрать комнаты наверху", Call("DoChore", "clean_upstairs_rooms", "TavernUpstairs", "", "")))
     python:
         for _upstairs_exit in TavernUpstairsRoom.visible_exits():
-            current_action_items.append(MenuItem(_upstairs_exit.label, Call("AdvanceMovementTime", _upstairs_exit.target)))
+            _upstairs_items.append(MenuItem(_upstairs_exit.label, Call("AdvanceMovementTime", _upstairs_exit.target)))
+    $ main_ui_set_action_panel("Наверху", _upstairs_items, None, "scene", restart=False)
     return
 
 
-label TavernUpstairsView:
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    jump TavernUpstairsView

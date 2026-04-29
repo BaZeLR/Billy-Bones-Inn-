@@ -1,4 +1,7 @@
-﻿init python:
+﻿# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+init python:
     # Base style for the button itself
     style.warning_button = Style(style.default)
     style.warning_button.background = "#FFFFFF"

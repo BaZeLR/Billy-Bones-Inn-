@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init 6 python:
     def backyard_has_ash_barrel():
         return int(SoapAshBarrelInstalled or 0) == 1
@@ -49,6 +52,9 @@ init 6 python:
                 base_text += "\n\nДо полудня во дворе возятся: %s." % str(names_here)
         if backyard_has_dog_booth():
             base_text += "\n\nУ стены возле сарая стоит крепкая собачья будка, которую сколотил Драупнир."
+        werecat_text = werecat_visible_text("Backyard")
+        if str(werecat_text or "").strip():
+            base_text += "\n\n" + str(werecat_text or "").strip()
         ash_barrel_text = backyard_ash_barrel_description_text()
         if ash_barrel_text:
             return base_text + "\n\n" + ash_barrel_text
@@ -152,13 +158,11 @@ label Backyard:
     $ current_action_content = None
     $ current_action_items = []
     call BackyardBuildActions
-    jump BackyardView
-
-
-label BackyardView:
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    jump BackyardView
+    $ _backyard_ui_return = None
+    while _backyard_ui_return is None:
+        call screen main_ui
+        $ _backyard_ui_return = _return
+    jump Backyard
 
 
 label BackyardBuildActions:
@@ -167,11 +171,15 @@ label BackyardBuildActions:
     $ current_action_content = None
     $ current_action_items = []
     if soap_can_cook_at_backyard():
-        $ current_action_items.append(MenuItem("Варить мыло", Call("BackyardCookSoap")))
+        $ current_action_items.append(MenuItem("Варить хозяйственное мыло", Call("BackyardCookSoap", "soap_recipe")))
+    if soap_can_cook_luxury_at_backyard():
+        $ current_action_items.append(MenuItem("Варить туалетное мыло с оливковым маслом", Call("BackyardCookSoap", "luxury_soap_recipe")))
     if player_can_train_shooting():
         $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", "Backyard")))
     if dog_is_available_here("Backyard"):
         $ current_action_items.append(MenuItem(dog_room_action_caption("Backyard"), Call("IntDogTalk", "Backyard")))
+    if werecat_is_in_room("Backyard"):
+        $ current_action_items.append(MenuItem(werecat_action_caption("Backyard"), Call("IntWerecatTalk", "Backyard")))
     python:
         for _yard_object in BackyardRoom.visible_objects():
             current_action_items.append(MenuItem(_yard_object.name, Call("BackyardObjectMenu", _yard_object.object_id)))

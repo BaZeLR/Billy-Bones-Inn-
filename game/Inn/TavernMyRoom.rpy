@@ -1,4 +1,18 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init python:
+    def tavern_my_room_dress_short_name(dress_code=""):
+        code = str(dress_code or "").strip()
+        names = globals().get("ShortDressName", {}) or {}
+        return str(names.get(code, code) or code).lower()
+
+    def tavern_my_room_dress_full_desc(dress_code=""):
+        code = str(dress_code or "").strip()
+        full_descs = globals().get("FullDressDesc", {}) or {}
+        descs = globals().get("DressDesc", {}) or {}
+        return str(full_descs.get(code, descs.get(code, "")) or "").strip()
+
     TavernMyRoomRoom = Room(
         code_name="TavernMyRoom",
         group_name=ROOM_GROUP_TAVERN,
@@ -82,6 +96,9 @@ init python:
             extra_rows.append("У стены аккуратно оставлена {}. Кожа потемнела от времени, но вещь все еще выглядит крепкой.".format(_cuirass_name))
         if melissa_temp_room_active("TavernMyRoom"):
             extra_rows.append("Пока в комнате Мелиссы под крышей все еще живет дрянь, часть ее вещей лежит и у вас. Похоже, по ночам она действительно рассчитывает на это убежище.")
+        werecat_text = werecat_visible_text("TavernMyRoom")
+        if str(werecat_text or "").strip():
+            extra_rows.append(str(werecat_text or "").strip())
 
         if len(extra_rows) > 0:
             return base_text + "\n" + "\n".join(extra_rows)
@@ -112,15 +129,11 @@ label TavernMyRoom:
     $ CurLocDesc = _my_room_text
     $ CurrentRoom.mark_visited()
     call TavernMyRoomBuildActions
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    return
-
-
-label TavernMyRoomView:
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    return
+    $ _my_room_ui_return = None
+    while _my_room_ui_return is None:
+        call screen main_ui
+        $ _my_room_ui_return = _return
+    jump TavernMyRoom
 
 
 label TavernMyRoomBuildActions:
@@ -138,6 +151,8 @@ label TavernMyRoomBuildActions:
         $ current_action_items.append(MenuItem("Идти в лес", Call("TravelToForest", "TavernMyRoom")))
     if dog_is_available_here("TavernMyRoom"):
         $ current_action_items.append(MenuItem(dog_room_action_caption("TavernMyRoom"), Call("IntDogTalk", "TavernMyRoom")))
+    if werecat_is_in_room("TavernMyRoom"):
+        $ current_action_items.append(MenuItem(werecat_action_caption("TavernMyRoom"), Call("IntWerecatTalk", "TavernMyRoom")))
     python:
         for _room_item_id in ("recipe_book_001", "rusty_hunter_rifle_001", "old_leather_cuirass_001"):
             if _room_has_item_by_id(TavernMyRoomRoom, _room_item_id):
@@ -194,7 +209,7 @@ label TavernMyRoomObjectMenu(object_id="", refresh_only=False):
             current_action_items.append(MenuItem("Взять", Call("TavernMyRoomTakeFloorItem", object_id)))
         current_action_items.append(MenuItem("Назад", Call("TavernMyRoomRestore")))
     if not refresh_only:
-        $ renpy.pause(hard=True)
+        $ renpy.restart_interaction()
     return
 
 
@@ -235,37 +250,43 @@ label TavernMyRoomTakeFloorItem(item_id=""):
     call TavernMyRoomBuildActions
     $ MainTxt = str((_take_result or {}).get("text", "") or "Вы забираете вещь.")
     $ CurLocDesc = MainTxt
-    show screen main_ui
     $ renpy.restart_interaction()
-    $ renpy.pause(hard=True)
     return
 
 
-label TavernMyRoomOpenChest:
+label TavernMyRoomOpenChest(preserve_text=False):
     $ _room_object = tavern_my_room_get_object("chest_001")
     if _room_object is not None:
         $ _room_object.state["open"] = 1
-    $ MainTxt = "Вы открываете ларь. Внутри хранится ваша одежда."
-    $ CurLocDesc = MainTxt
+    if not bool(preserve_text):
+        $ MainTxt = "Вы открываете ларь. Внутри хранится ваша одежда."
+        $ CurLocDesc = MainTxt
     $ current_action_title = "Ларь"
     $ current_action_content = None
     $ current_action_items = []
     python:
-        _all_dresses = [str(_dress or "") for _dress in list(MyDresses or []) if str(_dress or "").strip()]
+        _all_dresses = []
+        for _dress in list(MyDresses or []):
+            _dress_key = str(_dress or "").strip()
+            if _dress_key and _dress_key not in _all_dresses:
+                _all_dresses.append(_dress_key)
         _current_dress = str(MyCurDress or "").strip()
-        _available_dresses = [d for d in _all_dresses if d != _current_dress]
-        if len(_available_dresses) <= 0:
+        if _current_dress and _current_dress in list(MyDresses or []) and _current_dress not in _all_dresses:
+            _all_dresses.append(_current_dress)
+        if len(_all_dresses) <= 0 and not bool(preserve_text):
             MainTxt = "В ларе пока пусто."
             CurLocDesc = MainTxt
         else:
-            for _dress in _available_dresses:
-                _short = str(ShortDressName.get(_dress, _dress)).lower()
-                current_action_items.append(MenuItem("Надеть " + _short, Call("TavernMyRoomWearDress", _dress)))
-                if player_can_tear_wardrobe_dress(_dress):
-                    current_action_items.append(MenuItem("Порвать " + _short + " на лоскуты", Call("TavernMyRoomTearDressToCloth", _dress)))
+            for _dress in _all_dresses:
+                _short = tavern_my_room_dress_short_name(_dress)
+                if _dress != _current_dress:
+                    current_action_items.append(MenuItem("Надеть " + _short, Call("TavernMyRoomWearDress", _dress)))
+                    if player_can_tear_wardrobe_dress(_dress):
+                        current_action_items.append(MenuItem("Порвать " + _short + " на лоскуты", Call("TavernMyRoomTearDressToCloth", _dress)))
+                else:
+                    current_action_items.append(MenuItem("Снять " + _short, Call("TavernMyRoomRemoveDress", _dress)))
     $ current_action_items.append(MenuItem("Закрыть ларь", Call("TavernMyRoomCloseChest")))
-    show screen main_ui
-    $ renpy.pause(hard=True)
+    $ renpy.restart_interaction()
     return
 
 
@@ -274,8 +295,7 @@ label TavernMyRoomCloseChest:
     if _room_object is not None:
         $ _room_object.state["open"] = 0
     call TavernMyRoomRestore
-    show screen main_ui
-    $ renpy.pause(hard=True)
+    $ renpy.restart_interaction()
     return
 
 
@@ -310,9 +330,7 @@ label TavernMyRoomTableMenu:
         $ current_action_items.append(MenuItem("Читать книгу рецептов", Call("TavernMyRoomTableRead")))
         $ current_action_items.append(MenuItem("Создать предмет", Call("TavernMyRoomTableCraftMenu")))
         $ current_action_items.append(MenuItem("Назад", Call("TavernMyRoomRestore")))
-    show screen main_ui
     $ renpy.restart_interaction()
-    $ renpy.pause(hard=True)
     return
 
 
@@ -321,6 +339,7 @@ label TavernMyRoomTableRead(recipe_id=""):
     if not tavern_my_room_has_recipe_book_access():
         call TavernMyRoomTableMenu
         return
+    $ recipe_book_mark_read()
     $ _table_recipe_id = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()
     $ _table_picture = recipe_page_image_path(_table_recipe_id) or tavern_my_room_table_picture()
     $ scene_image = _table_picture or None
@@ -347,7 +366,9 @@ label TavernMyRoomTableRead(recipe_id=""):
             if str(_recipe_id or "") == str(_table_recipe_id or ""):
                 _title += " (открыто)"
             current_action_items.append(MenuItem(_title, Call("TavernMyRoomTableRead", _recipe_id)))
+        recipe_book_append_secret_actions("TavernMyRoom", "recipe_book_001", "table")
     $ current_action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
+    $ renpy.restart_interaction()
     return
 
 
@@ -364,16 +385,16 @@ label TavernMyRoomTableCraftMenu:
     $ current_action_title = "Верстак"
     $ current_action_content = None
     $ current_action_items = []
+    $ _craftable_count = 0
     python:
-        for _recipe_id in list(visible_recipe_pages() or []):
-            if not recipe_page_can_craft(_recipe_id):
-                continue
+        for _recipe_id in list(craftable_recipe_pages() or []):
             _page = get_recipe_page(_recipe_id)
-            _result_item = get_game_item(str(getattr(_page, "item_result", "") or "").strip()) if _page is not None else None
-            _result_name = str(getattr(_result_item, "name", getattr(_page, "item_result", "предмет")) or getattr(_page, "item_result", "предмет"))
-            current_action_items.append(MenuItem("Сделать: " + _result_name, Call("TavernMyRoomTableCraftItem", _recipe_id)))
-    if len(list(current_action_items or [])) <= 0:
-        $ MainTxt = MainTxt + "\n\nСейчас для ваших рецептов не хватает нужных вещей."
+            if _page is None:
+                continue
+            _craftable_count += 1
+            current_action_items.append(MenuItem("Сделать: " + recipe_result_display_name(_recipe_id), Call("TavernMyRoomTableCraftItem", _recipe_id)))
+    if int(_craftable_count or 0) <= 0:
+        $ MainTxt = MainTxt + "\n\nСейчас ни один рецепт не готов полностью. Откройте нужную запись, чтобы проверить, чего не хватает."
         $ CurLocDesc = MainTxt
     $ current_action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
     return
@@ -413,8 +434,8 @@ label TavernMyRoomWearDress(dress_code=""):
         if _dress not in PlayerDressDaySt:
             $ PlayerDressDaySt[_dress] = int(dayspassed or 0)
         call stat
-        $ _short = str(ShortDressName.get(_dress, _dress) or _dress).lower()
-        $ _desc = str(FullDressDesc.get(_dress, DressDesc.get(_dress, "")) or "").strip()
+        $ _short = tavern_my_room_dress_short_name(_dress)
+        $ _desc = tavern_my_room_dress_full_desc(_dress)
         if _desc:
             $ MainTxt = "Вы надели [_short]. " + _desc
         else:
@@ -424,9 +445,24 @@ label TavernMyRoomWearDress(dress_code=""):
     return
 
 
+label TavernMyRoomRemoveDress(dress_code=""):
+    $ _dress = str(dress_code or "").strip()
+    if _dress != "" and _dress == str(MyCurDress or "").strip():
+        $ MyCurDress = ""
+        call stat
+        $ _short = tavern_my_room_dress_short_name(_dress)
+        $ MainTxt = "Вы сняли [_short] и положили в ларь."
+        $ CurLocDesc = MainTxt
+    else:
+        $ MainTxt = "Сейчас эта одежда на вас не надета."
+        $ CurLocDesc = MainTxt
+    call TavernMyRoomOpenChest(True)
+    return
+
+
 label TavernMyRoomTearDressToCloth(dress_code=""):
     $ _tear_result = player_tear_wardrobe_dress(dress_code)
     $ MainTxt = str((_tear_result or {}).get("text", "") or "Вы откладываете одежду в сторону.")
     $ CurLocDesc = MainTxt
-    call TavernMyRoomOpenChest
+    call TavernMyRoomOpenChest(True)
     return

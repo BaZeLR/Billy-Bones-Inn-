@@ -1,0 +1,460 @@
+FIX MAP — ACTION HUB + ACTION EXECUTION REFACTOR
+
+==================================================
+A) FILE 1 — NPC / ENTITY ACTION HUB
+==================================================
+
+GOAL:
+Turn this file into ONE generic entity-action menu router.
+It should NOT own NPC truth, special-case knowledge rules, or duplicated menu state.
+
+----------------------------------------
+A1. DELETE / MERGE DUPLICATED MENU FLOWS
+----------------------------------------
+
+MERGE THESE:
+- CharacterActionHub(...)
+- CharacterActionHubResume
+- NPCActionMenu(...)
+- NPCActionMenuExamine
+- NPCActionMenuTalk
+- NPCActionMenuBack
+
+INTO:
+- OpenEntityActionMenu(entity_type="", entity_id="", where_id="", entity_data=None)
+- ActionMenuHandleTalk
+- ActionMenuHandleLook
+- ActionMenuHandleBack
+
+WHY:
+There are currently two parallel menu systems doing the same NPC action work.
+
+ACTION:
+- Keep one menu loop only.
+- Remove the second pipeline entirely after callers are migrated.
+
+----------------------------------------
+A2. DELETE DUPLICATED STATE TRANSPORT
+----------------------------------------
+
+REMOVE:
+- cah_character_id
+- cah_talk_label
+- cah_talk_args
+- cah_examine_id
+- cah_can_examine
+- cah_can_talk
+
+REMOVE OR REPLACE:
+- npc_menu_character_id
+- npc_menu_display_name
+- npc_menu_talk_label
+- npc_menu_talk_args
+- npc_menu_examine_id
+- npc_menu_where
+- npc_menu_auto_card
+- npc_menu_prev_picture
+- npc_menu_prev_scene
+
+REPLACE WITH:
+- action_menu_entity_type
+- action_menu_entity_id
+- action_menu_where
+- action_menu_title
+- action_menu_entity_data
+- action_menu_actions
+- action_menu_selected
+
+WHY:
+Two separate state bundles are carrying the same menu payload.
+
+----------------------------------------
+A3. MERGE DUPLICATED TALK ARGUMENT DISPATCH
+----------------------------------------
+
+MERGE THESE REPEATED BLOCKS:
+- talk call block inside CharacterActionHub
+- talk call block inside NPCActionMenuTalk
+
+INTO ONE HELPER:
+- call_label_with_args(label_name, args=())
+
+WHY:
+The same len(args) ladder is duplicated.
+
+----------------------------------------
+A4. MOVE KNOWLEDGE / NAME RULES OUT OF HUB
+----------------------------------------
+
+MOVE OUT OR REWRITE:
+- _character_action_npc_known
+- _character_action_npc_display_name
+- _character_action_npc_can_examine
+
+REPLACE WITH SIMPLE CENTRAL RULE:
+- knowsMC[npc_id] decides known/unknown
+- one resolver:
+  presented_name = RealName[npc_id] if knowsMC[npc_id] else "Someone"
+
+WHY:
+The hub currently contains a second mini-NPC rules engine.
+
+----------------------------------------
+A5. SIMPLIFY GRID ENTRY BUILDING
+----------------------------------------
+
+FIX:
+- _character_action_grid_entries(room)
+
+CHANGE:
+- stop storing both "name" and "display_name" if they are identical
+- resolve display name once per NPC, not twice
+- return one normalized entity row shape:
+  {
+    "entity_type": "npc",
+    "id": npc_id,
+    "title": shown_name,
+    "actions": [...],
+    "talk_label": ...,
+    "talk_args": ...,
+    "examine_id": ...
+  }
+
+WHY:
+Current rows duplicate values and mix presentation with transport.
+
+----------------------------------------
+A6. KEEP ONLY MEDIA AS A HOOK
+----------------------------------------
+
+KEEP BUT THIN:
+- show_npc_picture_main_ui_state(...)
+- show_npc_examine_main_ui_state(...)
+
+REMOVE HARDCODED RULE BLOAT FROM:
+- npc_context_picture_path(...)
+- _character_action_room_picture_tokens(...)
+- _character_action_picture_penalties(...)
+
+MOVE SPECIAL CASES INTO DATA IF NEEDED:
+- per-NPC media hints
+- per-room picture hints
+
+WHY:
+The generic hub is polluted with character-specific and room-specific media rules.
+
+----------------------------------------
+A7. KEEP THESE, BUT AS THIN HELPERS
+----------------------------------------
+
+KEEP:
+- CallGirlCardModal
+- CallPlayerCardModal
+- _character_action_show_portrait (only if still needed as compatibility hook)
+
+OPTIONAL:
+- _character_action_display_name only if it becomes a very small RealName wrapper
+
+
+==================================================
+B) FILE 2 — ACTION EXECUTION / ITEM / ROOM ACTIONS
+==================================================
+
+GOAL:
+Turn this file into ONE generic action executor + ONE generic post-action UI updater.
+Remove wrapper duplication and hardcoded room dispatch ladders.
+
+----------------------------------------
+B1. REPLACE ROOM REFRESH IF-LADDER WITH A DISPATCH TABLE
+----------------------------------------
+
+REFACTOR:
+- RefreshCurrentActionMenu(...)
+
+CURRENT PROBLEM:
+Huge repeated room-by-room if chain.
+
+REPLACE WITH DATA:
+ROOM_ACTION_REFRESH = {
+  "Backyard": {
+    "object_menu": "BackyardObjectMenu",
+    "build_menu": "BackyardBuildActions",
+  },
+  "TavernMyRoom": {
+    "object_menu": "TavernMyRoomObjectMenu",
+    "build_menu": "TavernMyRoomBuildActions",
+  },
+  ...
+}
+
+NEW FLOW:
+- look up room code in dispatch table
+- if object_id exists -> call object menu label
+- else -> call build menu label
+- preserve text if requested
+
+WHY:
+This is the biggest structural redundancy in file 2.
+
+----------------------------------------
+B2. MERGE ITEM CONSUME WRAPPERS
+----------------------------------------
+
+MERGE PYTHON FUNCTIONS:
+- player_drink_item
+- player_eat_item
+- player_consume_food_item
+- player_consume_drink_item
+
+INTO:
+- player_apply_item_action(item_id, action_key, consume_from_inventory=False)
+
+KEEP:
+- _player_apply_item_consume_profile(...) as the core engine
+
+WHY:
+All four wrappers are thin aliases around the same function.
+
+----------------------------------------
+B3. MERGE LABEL WRAPPERS FOR ITEM USE
+----------------------------------------
+
+MERGE LABELS:
+- Drink
+- UseDrinkItem
+- Eat
+- UseFoodItem
+
+INTO:
+- ApplyItemAction(what_id="", action_key="", consume_from_inventory=False, where_id="", object_id="", ui_mode="room")
+
+UI MODES:
+- room -> refresh current room actions
+- inventory -> reopen player inventory/item state
+
+WHY:
+Right now the same consume logic is split between room-use and inventory-use wrappers.
+
+----------------------------------------
+B4. DELETE ACTION ALIAS DUPLICATION
+----------------------------------------
+
+MERGE:
+- take(...)
+- player_pick_up_item(...)
+
+KEEP ONLY:
+- take(...) OR rename to player_take_item(...)
+
+WHY:
+player_pick_up_item only calls take and rewrites action_key.
+
+----------------------------------------
+B5. EXTRACT GENERIC POST-ACTION UI HANDLER
+----------------------------------------
+
+CURRENT REPEATED TAIL:
+- MainTxt = result["text"]
+- CurLocDesc = MainTxt
+- call stat or update_stat_state()
+- checkpoint_tractir_progress(...)
+- RefreshCurrentActionMenu(...) or inventory UI refresh
+
+EXTRACT TO:
+- apply_action_result_to_ui(result, checkpoint_key="", where_id="", object_id="", preserve_text=False, ui_mode="room")
+
+USE IN:
+- Examine
+- Take
+- Drop
+- Drink
+- Eat
+- Wash
+- DoChore
+- Rest
+- MakeFire
+- Clean
+- Chop
+- BoilWater
+
+WHY:
+This repeated tail is all over the file and is already drifting.
+
+----------------------------------------
+B6. MERGE SHARED SOCIAL INTERACTION STATE UPDATES
+----------------------------------------
+
+CURRENT DUPLICATION ACROSS:
+- player_talk_to
+- player_flirt_with
+- player_gift_to
+- player_share_item_with
+
+EXTRACT SHARED HELPER:
+- apply_social_interaction_base(char_name, interaction_type, friend_delta=0, fun_delta=0)
+
+IT SHOULD HANDLE:
+- Talked[key] increment
+- daily counters
+- Friends[key] change
+- openness sync
+- fun clamp
+
+WHY:
+These functions repeat the same relationship-state mutations in slightly different mixes.
+
+----------------------------------------
+B7. MOVE ITEM/NPC SPECIAL CASES OUT OF GENERIC FUNCTION
+----------------------------------------
+
+CURRENT HOTSPOTS:
+- player_apply_item_social_effects(...)
+- player_share_item_with(...)
+
+PROBLEM:
+Generic social functions contain many hardcoded item/NPC branches.
+
+MOVE TO DATA TABLES:
+SOCIAL_ITEM_EFFECT_RULES = {
+  "soap_001": {...},
+  "drink_ale_001": {...},
+  ...
+}
+
+OPTIONAL:
+NPC_ITEM_TEXT_RULES = {
+  ("soap_001", "sandra"): "...",
+  ("soap_001", "melissa"): "...",
+  ...
+}
+
+WHY:
+This is story/data logic embedded in generic code.
+
+----------------------------------------
+B8. NORMALIZE CLAMPING HELPERS
+----------------------------------------
+
+CURRENT PROBLEM:
+Many repeated:
+- max(0, min(20, ...))
+- max(0, min(100, ...))
+
+ADD HELPERS:
+- clamp_stat(value, low, high)
+- add_to_stat_dict(table, key, delta, low, high)
+
+USE FOR:
+- Friends
+- sluttiness
+- beauty
+- otkroven
+- ClaraVar["trust"]
+- neshlush
+
+WHY:
+Manual inline clamps are repeated all over the file.
+
+----------------------------------------
+B9. KEEP THESE HELPERS
+----------------------------------------
+
+KEEP:
+- _ensure_player_inventory_store
+- _player_item_count_by_id
+- _player_add_item_by_id
+- _player_remove_item_by_id
+- _room_remove_item_by_id
+- _room_add_item_by_id
+- _room_item_count_by_id
+- _player_can_sleep_now
+- _object_state_int
+- _set_object_state_int
+- _add_object_state_int
+
+OPTIONAL CLEANUP:
+- _room_has_item_by_id can remain as convenience wrapper
+- _player_has_item_by_id can remain as convenience wrapper
+
+
+==================================================
+C) CROSS-FILE CONFLICTS TO FIX FIRST
+==================================================
+
+1. ONE ACTION MENU SYSTEM ONLY
+- File 1 currently has two NPC menu systems.
+- Fix this first.
+
+2. ONE GENERIC LABEL CALLER ONLY
+- The repeated "call expression label with args" logic must exist in one place only.
+
+3. ONE KNOWN/UNKNOWN RULE ONLY
+- Use knowsMC[npc_id] everywhere.
+- Do not let file 1 invent its own known logic.
+
+4. ONE GENERIC RESULT-TO-UI PIPELINE
+- File 2 should stop hand-writing the same UI tail in every label.
+
+5. GENERIC LAYERS MUST STOP CARRYING HARD-CODED STORY RULES
+- File 1: media/name special cases
+- File 2: item/NPC special-case social effects
+- move these into data tables
+
+
+==================================================
+D) SAFE REFACTOR ORDER
+==================================================
+
+STEP 1
+- Merge CharacterActionHub + NPCActionMenu into one menu system.
+
+STEP 2
+- Extract one call_label_with_args helper.
+
+STEP 3
+- Replace known/unknown name logic with knowsMC[npc_id].
+
+STEP 4
+- Replace RefreshCurrentActionMenu if-ladder with dispatch table.
+
+STEP 5
+- Extract apply_action_result_to_ui helper.
+
+STEP 6
+- Merge drink/eat/use wrappers into one generic consume flow.
+
+STEP 7
+- Extract shared social interaction base helper.
+
+STEP 8
+- Move item/NPC special-case effects into data tables.
+
+
+==================================================
+E) KEEP / MERGE / DELETE SUMMARY
+==================================================
+
+KEEP
+- inventory helpers
+- room item helpers
+- card modal labels
+- core consume profile engine
+
+MERGE
+- CharacterActionHub + NPCActionMenu*
+- duplicated talk arg dispatch
+- drink/eat/use wrappers
+- repeated post-action UI tails
+- repeated social interaction state updates
+
+DELETE
+- cah_* state bundle
+- duplicate npc_menu_* fields that become obsolete
+- player_pick_up_item alias if unused
+- hardcoded duplicate menu paths once unified
+
+MOVE TO DATA
+- known/unknown presentation rules
+- NPC media hints
+- room refresh dispatch mapping
+- item/NPC special social effect rules

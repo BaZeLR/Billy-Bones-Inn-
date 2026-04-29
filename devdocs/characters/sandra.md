@@ -50,6 +50,7 @@
 ## Port TODO
 - [ ] Confirm schedule conditions per location/time against source TXT lines.
 - [ ] Map every visible non-sex action into character dialog UI buttons.
-- [ ] Keep sex/special-event actions excluded in first pass (hide, do not delete).
+- [ ] Keep sex/special-event actions included -new sex engine as In Clarissa,Melissa. 
 - [ ] Verify all referenced flags are initialized before first interaction.
 - [ ] Add/verify compatibility aliases for legacy calls.
+-[] In active developmnt. At this moment character is too authoritarian-which is boring, how ever she has influence on her nephews Amanda and Melissa, so her dialog options and pictures should reflect that. -further details TBD

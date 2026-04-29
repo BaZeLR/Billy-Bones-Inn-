@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 #
 #
 # Creator-defined statement:
@@ -25,6 +28,8 @@ default sceneFullScreen = False
 
 python early:
 
+    VSCENE_MOVIE_EXTENSIONS = (".webm", ".mkv", ".ogv", ".ogg", ".avi", ".mp4", ".m4v", ".mpg", ".mpeg")
+
     def vscene_parse(lex):
         expression = lex.simple_expression()
         fullscreen = lex.keyword("fullscreen")
@@ -49,7 +54,7 @@ python early:
             return
 
         filename = renpy.python.py_eval(expression)
-        movie = filename.endswith(".webm")
+        movie = str(filename or "").lower().endswith(VSCENE_MOVIE_EXTENSIONS)
 
         if (movie):
             renpy.music.set_volume(0.0 if preferences.mute['music'] else preferences.volumes['music'], channel="movie")
@@ -73,6 +78,8 @@ python early:
     def vscene_predict(obj):
         expression, fullscreen = obj
         filename = renpy.python.py_eval(expression)
+        if str(filename or "").lower().endswith(VSCENE_MOVIE_EXTENSIONS):
+            return []
         image = renpy.easy.displayable(filename)
         return [image]
 

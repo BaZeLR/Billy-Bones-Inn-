@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 label TavernProstClients(client_type=1, girl_name=""):
     if int(client_type or 0) != 1:
         jump TavernMain
@@ -49,7 +52,7 @@ label TavernProstClients(client_type=1, girl_name=""):
                     $ EddieVar["SawWithGeorgett"] = 1
                 else:
                     "Вы видите Жоржетту с вашим знакомцем Эдди, играющих в уже знакомую вам игру."
-                "\"Что это, негодный мальчишка? Неужто это из-за меня?!\" - восклицает Жоржетта. Эдди смущенно отвечает, и через минуту эта игра заканчивается его бурной разрядкой."
+                "\"Что это, негодный мальчишка? Неужто строгая леди-босс тебя так распалила?!\" - восклицает Жоржетта. Эдди смущенно отвечает, и через минуту эта игра заканчивается его бурной разрядкой."
                 ""
                 "\"Хм, какой он озорник и фантазер,\" подумали вы и вернулись в зал трактира."
             else:

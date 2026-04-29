@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init python:
     def TavernHelpBuildPages():
         book_text = str(TavernMainBookObject.custom_properties.get("help_text", [""])[0] or "")
@@ -58,12 +61,8 @@ label TavernHelp:
     $ current_object_id = "book_001"
     $ TavernHelpPage = 0
     call TavernHelpShowPage
-    jump TavernHelpView
-
-
-label TavernHelpView:
     call screen main_ui
-    jump TavernHelpView
+    jump TavernHelp
 
 
 label TavernHelpApply(choice_code=""):
@@ -81,17 +80,20 @@ label TavernHelpApply(choice_code=""):
         $ MainTxt = "У вас пока достаточно денег. Заначку можно оставить на действительно черный день."
         $ CurLocDesc = MainTxt
         call TavernHelpShowPage
-        jump TavernHelpView
+        call screen main_ui
+        jump TavernHelp
     elif _choice == "stash_empty" and int(CheatMoneyGrab or 0) == 1:
         $ MainTxt = "Вы уже забрали деньги из семейной заначки."
         $ CurLocDesc = MainTxt
         call TavernHelpShowPage
-        jump TavernHelpView
+        call screen main_ui
+        jump TavernHelp
     elif _choice == "leave":
         jump TavernMain
 
     call TavernHelpShowPage
-    jump TavernHelpView
+    call screen main_ui
+    jump TavernHelp
 
 
 label TavernHelpShowPage:
@@ -134,4 +136,3 @@ label TavernHelpTakeStash:
         $ _book.state["stash_amount"] = 0
         call stat
     return
-

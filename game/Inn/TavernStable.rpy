@@ -1,3 +1,7 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+default MyStallion = ""
 default HorseSaddled = 0
 default HorsePurchasePrice = 0
 
@@ -152,7 +156,11 @@ label TavernStable:
     if MongolVar.get('WillTryToSteal', 0) and time == 4:
         $ MongolVar['WillTryToSteal'] = 0
     call TavernStableBuildActions
-    jump TavernStableView
+    $ _stable_ui_return = None
+    while _stable_ui_return is None:
+        call screen main_ui
+        $ _stable_ui_return = _return
+    jump TavernStable
 
 
 label TavernStableBuildActions:
@@ -169,12 +177,6 @@ label TavernStableBuildActions:
         for _room_exit in TavernStableRoom.visible_exits():
             current_action_items.append(MenuItem(_room_exit.label, Call("AdvanceMovementTime", _room_exit.target)))
     return
-
-
-label TavernStableView:
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    jump TavernStableView
 
 
 label tavern_stable_object_menu(object_id=""):

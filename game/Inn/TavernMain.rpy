@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 default TavernClosed = ""
 #default TavernGloryHole = 0
 default TavernEventOngoing = ""
@@ -9,6 +12,20 @@ default TavernMainClientRoomGirl = ""
 
 
 init python:    
+    def tavern_main_register_clara_melissa_visit():
+        if str(CurLoc or "") != "TavernMain":
+            return
+        if str(getLocation("melissa") or "") != "TavernMain":
+            return
+        if str(getLocation("clara") or "") != "TavernMain":
+            return
+        if int(time or 0) != 2:
+            return
+        if int(ClaraVar.get("tavern_melissa_visit_day", -1) or -1) == int(dayspassed or 0):
+            return
+        ClaraVar["tavern_melissa_visit_day"] = int(dayspassed or 0)
+        ClaraVar["tavern_melissa_visit_count"] = int(ClaraVar.get("tavern_melissa_visit_count", 0) or 0) + 1
+
     def tavern_main_morning_event_data():
         event_pool = []
 
@@ -131,14 +148,16 @@ init python:
                 desc_parts.append("Еду и выпивку пьяным, трезвым, похотливым, скромным и прочим посетителям разносят: " + str(NamesList("jobwaitress", "TavernMain") or "никто") + ".")
                 desc_parts.append("Вы можете пообщаться с участницами своей команды через список персонажей справа.")
 
-            if str(getLocation("clara") or "") == "TavernMain":
-                desc_parts.append("Кларисса снова заглянула в трактир и, похоже, в последнее время заметно сдружилась с Мелиссой: обе держатся рядом, перешептываются между столами и временами вместе прыскают со смеху.")
+            if str(getLocation("clara") or "") == "TavernMain" and str(getLocation("melissa") or "") == "TavernMain":
+                desc_parts.append("Сегодня к Мелиссе в трактир заглянула Кларисса. Похоже, за последнее время они успели по-настоящему сдружиться: девушки явно давно о чем-то шепчутся, и при вашем появлении разговор у них на миг сбивается.")
             if str(getLocation("becky") or "") == "TavernMain":
                 desc_parts.append("Бекки Блэнкеншип на этот раз сама заглянула к вам в трактир и присматривается к залу цепким хозяйским взглядом.")
             if str(TavernMainExtraDesc or "").strip():
                 desc_parts.append(str(TavernMainExtraDesc or ""))
             if str(TavernMainGloryDesc or "").strip():
                 desc_parts.append(str(TavernMainGloryDesc or ""))
+
+        desc_parts.append(werecat_visible_text("TavernMain"))
 
         return "\n\n".join([part for part in desc_parts if str(part or "").strip()])
 
@@ -184,6 +203,7 @@ label TavernMain:
     $ CurrentRoom = TavernMainRoom
     $ CurLoc = "TavernMain"
     $ location = CurLoc
+    $ tavern_main_register_clara_melissa_visit()
     $ tavern_main_fireplace_wood_stock()
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
@@ -273,7 +293,7 @@ label TavernMain:
             ]
             CurLocDesc = "\n\n".join([part for part in _nav_desc_parts if str(part or "").strip()])
             MainTxt = CurLocDesc
-        $ renpy.pause(hard=True)
+        call screen main_ui
         jump TavernMain
 
     # Main event and interaction logic
@@ -333,6 +353,11 @@ label TavernMain:
         call TavernShowImage
 
     if TavernEventOngoing == "":
+        if TavernClosed == "" and not tavern_preopening_mode() and int(week or 0) != 7:
+            $ _amanda_dynamic_result = CheckIfRunToLegare()
+            $ _amanda_dynamic_jump = str(AmandaDynamicTakeNextJump() or "")
+            if _amanda_dynamic_jump != "" and renpy.has_label(_amanda_dynamic_jump):
+                jump expression _amanda_dynamic_jump
         call CheckDailyEvent("", "_story_enter", CurLoc, time)
         if TavernClosed == "" and not tavern_preopening_mode() and int(week or 0) != 7:
             call CheckDailyEvent('amanda')
@@ -376,13 +401,11 @@ label TavernMain:
             if str(_household_request_type or "") == "soap":
                 call HouseholdSoapRequestEvent(_household_request_girl)
 
-    jump TavernMainView
-
-
-label TavernMainView:
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    jump TavernMainView
+    $ _main_ui_return = None
+    while _main_ui_return is None:
+        call screen main_ui
+        $ _main_ui_return = _return
+    jump TavernMain
 
 
 label TavernMainBuildActions:
@@ -395,6 +418,10 @@ label TavernMainBuildActions:
         $ current_action_items.append(MenuItem("Пойти проверить отдельную комнату", Call("TavernProstClients", 1, TavernMainClientRoomGirl)))
     if TavernClosed == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "overheard"):
         $ current_action_items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
+    if TavernClosed == "" and story_event_available("TavernMain", "clara_paintings"):
+        $ current_action_items.append(MenuItem(clara_paintings_tavern_caption(), Call("checkTriggers", "TavernMain", "clara_paintings", 0)))
+    if werecat_is_in_room("TavernMain"):
+        $ current_action_items.append(MenuItem(werecat_action_caption("TavernMain"), Call("IntWerecatTalk", "TavernMain")))
     return
 
 

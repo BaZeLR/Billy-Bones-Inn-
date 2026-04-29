@@ -1,0 +1,59 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+label InitAmandaDance:
+    # Initialize Amanda's dance menu
+    $ GirlNameIAD = 'amanda'
+    $ DanceMaxIAD = 6
+
+    menu:
+        "Осмотреть":
+            "Вы осматриваете Аманду."
+            # Placeholder for description logic
+
+        "Поболтать":
+            "Вы подошли к Аманде и начали с ней весело болтать о разной ерунде. За разговором незаметно пролетело время."
+            if Friends[GirlNameIAD] >= 7:
+                "Вы подумали, что зря вы стали болтать с Амандой о ерунде. Ничего нового вы не узнали, а доверяет вам она и без пустого трепа."
+            else:
+                if renpy.random.randint(1, 3) == 1:
+                    "Кажется, Аманда стала еще больше восхищаться вами!"
+                    $ Friends[GirlNameIAD] += 1
+            $ DanceStep = DanceMaxIAD
+
+        "Пригласить потанцевать":
+            "Вы подошли к Аманде и пригласили ее потанцевать."
+            $ HandsDance = ''
+            $ KissDance = 0
+            $ TitsDance = 0
+            if Friends[GirlNameIAD] >= 8 and sluttiness[GirlNameIAD] > 15:
+                "Она с радостью согласилась, вы взяли ее под руку и вскоре вы закружились в танце."
+            elif Friends[GirlNameIAD] >= 5 and sluttiness[GirlNameIAD] >= 5:
+                "Она с сомнением сказала: 'Ты же мой хозяин, зачем это мне с тобой танцевать?', но все-таки взяла вашу руку и вскоре вы закружились в танце."
+            else:
+                "'Ты что, Стефан, сдурел?!' ответила вам Аманда. Расстроенный отказом, вы отправились восвояси."
+                $ DanceStep = DanceMaxIAD
+
+        "Продолжить танцевать":
+            "Вы продолжили кружиться в танце с Амандой."
+            if HandsDance == 'waist':
+                "Ваши руки нежно обнимают талию Аманды."
+            elif HandsDance == 'ass':
+                "Ваши руки покоятся на попе Аманды."
+            elif HandsDance == 'ass2':
+                "Ваши руки нежно сжимают упругую попку Аманды через тонкую ткань ее платья."
+            if KissDance == 1:
+                "Вы нежно целуете Аманду во время танца."
+            elif KissDance == 2:
+                "Вы страстно, переплетаясь языками, целуете Аманду, прилагая все усилия чтобы не сбиться с ритма."
+            if TitsDance > 0:
+                "Аманда трется своими грудками о вашу грудь, потихоньку возбуждаясь."
+            $ DanceStep += 1
+            if DanceStep == DanceMaxIAD:
+                "Танец закончился и вы вернулись к колоннаде."
+
+        "Отойти":
+            "Вы решили отойти и оставить Аманду."
+            $ DanceStep = 0
+
+    return

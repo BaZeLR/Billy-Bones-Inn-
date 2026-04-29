@@ -39,6 +39,8 @@
 ## Port TODO
 - [ ] Confirm schedule conditions per location/time against source TXT lines.
 - [ ] Map every visible non-sex action into character dialog UI buttons.
-- [ ] Keep sex/special-event actions excluded in first pass (hide, do not delete).
+- [ ] Keep sex/special-event actions included
 - [ ] Verify all referenced flags are initialized before first interaction.
 - [ ] Add/verify compatibility aliases for legacy calls.
+- [ ] Add Irma-specific dialog options and pictures based on flags.
+- [ ] Implement Irma's short story interactions and dress-buying mechanics. -further details TBD 

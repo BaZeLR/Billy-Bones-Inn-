@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 # Converted from TavernShowImage.txt
 
 label TavernShowImage:
@@ -9,8 +12,12 @@ label TavernShowImage:
             if renpy.random.randint(1, 4) == 1:
                 if renpy.loadable("images/melissa/tavern/basement.png"):
                     call ShowImage("", "", "images/melissa/tavern/basement.png")
+                elif renpy.loadable("images/tavern/storage/storage_room.png"):
+                    call ShowImage("", "", "images/tavern/storage/storage_room.png")
+                elif renpy.loadable("images/tavern/kitchen/kitchen_room.png"):
+                    call ShowImage("", "", "images/tavern/kitchen/kitchen_room.png")
                 else:
-                    call ShowImage("", "", "images/amanda/melissa_in storage.mp4")
+                    pass
             else:
                 if renpy.random.randint(0, 1) == 0:
                     call ShowImage("", "", "images/melissa/tavern/melissa_kitchen_0.png")

@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 default HouseholdRuntimeEventSeen = {}
 default HouseholdInsightState = {}
 default HouseholdSoapRequestLastDay = {}
@@ -243,6 +246,12 @@ init python:
         if girl == "":
             return rows
         if issue_code == "sick":
+            if girl == "amanda":
+                rows.append({
+                    "label": "Проверить, не притворяется ли Аманда",
+                    "target": "HouseholdAmandaFakeSicknessWake",
+                    "args": (),
+                })
             if int(_player_item_count_by_id("healing_potion_001") or 0) > 0:
                 rows.append({
                     "label": "Принести %s лечебное зелье" % _action_display_name(girl),
@@ -339,7 +348,7 @@ init python:
     def tavern_storage_rat_event_ready():
         return (
             str(CurLoc or "") == "TavernStorage"
-            and str(getLocation("melissa") or "") == "TavernStorage"
+            and int(MelissaVar.get("storage_rat_cleared", 0) or 0) == 0
             and not household_runtime_event_seen_today("melissa_storage_rat")
         )
 
@@ -362,6 +371,10 @@ init python:
 
 
 label HouseholdReturnCurrentRoom:
+    if TavernBreakfastEventActive:
+        $ TavernKitchenSavedText = str(MainTxt or "")
+        call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
+        return
     $ _household_return_room = household_return_current_room_label()
     jump expression _household_return_room
 
@@ -390,6 +403,9 @@ label HouseholdSoapRequestEvent(girl_name=""):
         $ current_action_items.append(MenuItem("Сразу отдать обычное мыло", Call("HouseholdSoapRequestGiveNow", _soap_girl, "soap_001")))
     $ current_action_items.append(MenuItem("Пообещать достать мыло позже", Call("HouseholdSoapRequestAcknowledge", _soap_girl, 1)))
     $ current_action_items.append(MenuItem("Отмахнуться пока что", Call("HouseholdSoapRequestAcknowledge", _soap_girl, 0)))
+    if TavernBreakfastEventActive:
+        call QueuePagedPanelText(MainTxt, "Ваш ответ", list(current_action_items or []), "plain")
+        call ReturnToMainUI
     return
 
 
@@ -406,7 +422,10 @@ label HouseholdSoapRequestGiveNow(girl_name="", item_id="soap_001"):
     $ MainTxt = "{} принимает подарок сразу, не скрывая удовольствия. {}".format(str(RealName.get(_soap_girl, _soap_girl) or _soap_girl), str(_soap_effect.get("text", "") or "").strip())
     $ CurLocDesc = MainTxt
     call stat
-    call HouseholdReturnCurrentRoom
+    if TavernBreakfastEventActive:
+        call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
+    else:
+        call HouseholdReturnCurrentRoom
     return
 
 
@@ -418,7 +437,10 @@ label HouseholdSoapRequestAcknowledge(girl_name="", agree=0):
     else:
         $ MainTxt = "Вы отвечаете, что пока вам не до мыла. Просьбу принимают без скандала, но без особой радости."
     $ CurLocDesc = MainTxt
-    call HouseholdReturnCurrentRoom
+    if TavernBreakfastEventActive:
+        call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
+    else:
+        call HouseholdReturnCurrentRoom
     return
 
 
@@ -483,6 +505,9 @@ label SandraDressInitiativeEvent:
         MenuItem("Пообещать подобрать Сандре более смелый наряд", Call("HouseholdRevealDressRequestChoice", "sandra", 1)),
         MenuItem("Сказать, что пока не время", Call("HouseholdRevealDressRequestChoice", "sandra", 0)),
     ]
+    if TavernBreakfastEventActive:
+        call QueuePagedPanelText(MainTxt, "Ваш ответ", list(current_action_items or []), "plain")
+        call ReturnToMainUI
     return
 
 
@@ -498,6 +523,9 @@ label MelissaDressRequestEvent:
         MenuItem("Согласиться подобрать Мелиссе похожий наряд", Call("HouseholdRevealDressRequestChoice", "melissa", 1)),
         MenuItem("Посоветовать ей пока не спешить", Call("HouseholdRevealDressRequestChoice", "melissa", 0)),
     ]
+    if TavernBreakfastEventActive:
+        call QueuePagedPanelText(MainTxt, "Ваш ответ", list(current_action_items or []), "plain")
+        call ReturnToMainUI
     return
 
 
@@ -513,6 +541,9 @@ label AmandaDressRequestEvent:
         MenuItem("Пообещать подобрать Аманде такой же смелый наряд", Call("HouseholdRevealDressRequestChoice", "amanda", 1)),
         MenuItem("Сказать, что пока хватит и чужих обновок", Call("HouseholdRevealDressRequestChoice", "amanda", 0)),
     ]
+    if TavernBreakfastEventActive:
+        call QueuePagedPanelText(MainTxt, "Ваш ответ", list(current_action_items or []), "plain")
+        call ReturnToMainUI
     return
 
 
@@ -540,7 +571,11 @@ label HouseholdRevealDressRequestChoice(girl_name="", agree=0):
         else:
             $ MainTxt = "Вы осаживаете Аманду и говорите, что пока хватит и тех обновок, что уже обсуждаются в доме. Аманда недовольно надувает губы, но спорить не продолжает."
     $ CurLocDesc = MainTxt
-    call HouseholdReturnCurrentRoom
+    if TavernBreakfastEventActive:
+        call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
+    else:
+        call HouseholdReturnCurrentRoom
+    return
 
 
 label TavernStorageRatEvent:
@@ -570,6 +605,7 @@ label TavernStorageRatChoice(kill_rat=0):
         $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
         $ cleaning["melissa"] = min(100, int(cleaning.get("melissa", 0) or 0) + 1)
         $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+        $ story_thread_advance_current()
         $ MainTxt = "Вы быстро расправляетесь с крысой, и Мелисса заметно расслабляется. \"Вот теперь другое дело,\" тихо говорит она, уже без прежнего раздражения. На всякий случай вы решаете не выбрасывать тушку сразу: такая приманка еще может сгодиться, если в лесу и правда водится тот необычный кошачий охотник, о котором судачат по трактирам."
     else:
         $ MainTxt = "Вы решаете не возиться с крысой прямо сейчас. Мелисса поджимает губы и берется переставлять мешки подальше от шороха, явно недовольная тем, что проблему придется терпеть еще какое-то время."
@@ -600,12 +636,8 @@ label MelissaRoomPestsChoice(help_pests=0):
             $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
             $ MainTxt = "Вы быстро выметаете свежую паутину и наводите в комнате хоть какой-то порядок, но сразу понимаете, что настоящая беда никуда не делась. Под крышей по-прежнему шуршит и скребется вся та дрянь, с которой придется разбираться уже через чердак и щели под кровлей."
         else:
-            $ MelissaVar["bats_episode"] = max(int(MelissaVar.get("bats_episode", 0) or 0), 8)
+            $ melissa_apply_bats_completion_rewards()
             $ MelissaVar["room_pests_last_help_day"] = int(dayspassed or 0)
-            $ MelissaVar["temp_room"] = ""
-            $ MelissaVar["roof_repair_order_day"] = -1
-            $ MelissaVar["roof_repair_complete_day"] = -1
-            $ MelissaVar["AskedMCToSolveRoomProblem"] = 0
             $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
             $ cleaning["melissa"] = min(100, int(cleaning.get("melissa", 0) or 0) + 1)
             $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
@@ -653,6 +685,25 @@ label HouseholdMorningIssueWarmDrink(girl_name=""):
         $ MainTxt = "Мелисса принимает пряную настойку обеими руками и пьет медленно, будто растягивает не столько тепло, сколько саму вашу заботу. Через несколько минут она выглядит живее, хотя и признает, что ей все равно лучше отлежаться еще немного."
     else:
         $ MainTxt = "Аманда с готовностью хватается за пряную настойку и почти сразу оживляется. \"Ну вот, совсем другое дело,\" заявляет она, явно наслаждаясь не только теплом в груди, но и самим поводом получить от вас чуть больше внимания."
+    $ CurLocDesc = MainTxt
+    call HouseholdReturnCurrentRoom
+    return
+
+
+label HouseholdAmandaFakeSicknessWake:
+    if household_morning_issue_type("amanda") != "sick":
+        call HouseholdReturnCurrentRoom
+        return
+    $ calendar_advance_minutes(15)
+    if int(Friends.get("amanda", 0) or 0) >= 6 or int(Talked.get("amanda", 0) or 0) >= 2:
+        $ household_clear_morning_issue("amanda")
+        $ MainTxt = "Вы не спорите у двери, а спокойно садитесь рядом и просите Аманду хотя бы раз сказать честно, плохо ей или просто не хочется вставать. Она сперва обиженно сопит, потом все же сдается: \"Ладно... больше лени, чем болезни.\" Через несколько минут она уже нехотя натягивает платье и обещает выйти к общему столу."
+        $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
+        $ otkroven["amanda"] = min(20, int(otkroven.get("amanda", 0) or 0) + 1)
+    else:
+        $ household_clear_morning_issue("amanda")
+        $ MainTxt = "Вы резко пресекаете Амандину \"болезнь\" и велите ей подниматься. Она фыркает, жалуется на жестокость и нарочно долго возится с одеждой, но все же встает. Похоже, сегодня это было скорее представление, чем настоящая слабость."
+        $ Friends["amanda"] = max(0, int(Friends.get("amanda", 0) or 0) - 1)
     $ CurLocDesc = MainTxt
     call HouseholdReturnCurrentRoom
     return

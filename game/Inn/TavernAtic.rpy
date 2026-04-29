@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init 6 python:
     def tavern_atic_search_available():
         return int(AtticLootFound or 0) == 0
@@ -76,13 +79,11 @@ label TavernAtic:
     $ MainTxt = TavernAticRoom.descriptions[0].text
     $ CurLocDesc = MainTxt
     call TavernAticBuildActions
-    jump TavernAticView
-
-
-label TavernAticView:
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    jump TavernAticView
+    $ _atic_ui_return = None
+    while _atic_ui_return is None:
+        call screen main_ui
+        $ _atic_ui_return = _return
+    jump TavernAtic
 
 
 label TavernAticBuildActions:

@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 default ShedNoticeText = ""
 default ShedNoticePending = False
 default ShedBucketFound = 0
@@ -138,13 +141,11 @@ label Shed:
     $ ShedNoticePending = False
     $ CurrentRoom.mark_visited()
     call ShedRoomActions
-    jump ShedView
-
-
-label ShedView:
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    jump ShedView
+    $ _shed_ui_return = None
+    while _shed_ui_return is None:
+        call screen main_ui
+        $ _shed_ui_return = _return
+    jump Shed
 
 
 label ShedRoomActions:
@@ -173,7 +174,9 @@ label ShedStoreLumber:
                 _player_add_item_by_id("lumber_001", 1)
                 break
     if _shed_added_lumber > 0:
-        $ _pc_register_chore_success("bring_woods")
+        python:
+            for _shed_chore_count in range(int(_shed_added_lumber or 0)):
+                _pc_register_chore_success("bring_woods")
         if _shed_added_lumber == 1:
             $ ShedNoticeText = "Вы заносите бревно в сарай и складываете его к остальным запасам."
         else:

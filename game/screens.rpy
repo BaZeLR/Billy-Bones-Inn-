@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 ################################################################################
 ## Initialization
 ################################################################################
@@ -264,22 +267,24 @@ init python:
             self.action = action
 
         def __getstate__(self):
-            return {"caption": str(self.caption or "")}
+            return {"caption": str(self.caption or ""), "action": self.action}
 
         def __setstate__(self, state):
             state = dict(state or {})
             self.caption = str(state.get("caption", "") or "")
-            self.action = None
+            self.action = state.get("action", None)
 
         def __reduce__(self):
-            return (restore_menu_item_runtime, (str(self.caption or ""), None))
+            return (restore_menu_item_runtime, (str(self.caption or ""), self.action))
 
 screen choice_panel(items, label=None):
     vbox:
         if label:
             text label size 20
-        for i in items:
+        for _choice_index, i in enumerate(items):
             textbutton i.caption action i.action:
+                id "choice_panel_button_%d" % int(_choice_index)
+                alt "choice_panel_button_%d" % int(_choice_index)
                 text_size 20
 
 screen choice(items, label=None, menu_name=None):

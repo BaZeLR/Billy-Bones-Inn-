@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init 6 python:
     def tavern_melissa_room_clara_scene_paths():
         return [
@@ -12,6 +15,9 @@ init 6 python:
 
     def tavern_melissa_room_clara_visit_active():
         return str(getLocation("clara") or "") == "TavernMelissaRoom" and melissa_bats_stage() >= 8
+
+    def tavern_melissa_room_locked_from_inside():
+        return tavern_melissa_room_clara_visit_active()
 
     def tavern_melissa_room_register_clara_visit():
         if not tavern_melissa_room_clara_visit_active():
@@ -42,34 +48,40 @@ init 6 python:
             return "Сегодня девушки сидят совсем близко друг к другу на кровати и, склонившись над коленями, возятся с листками и угольком. Кларисса что-то быстро дорисовывает, а Мелисса смеется шепотом и тут же прикрывает рисунки ладонью, заметив вас."
         return "Кларисса с Мелиссой так увлечены своими непристойными каракулями и перешептыванием, что сперва даже не сразу замечают вас. Когда же замечают, обе смотрят одинаково красноречиво: вам здесь сейчас делать нечего."
 
+    def tavern_melissa_room_sleep_picture():
+        picture_cycle = [
+            "images/melissa/tavern/melissa_sleeps_0.jpg",
+            "images/melissa/tavern/melissa_sleeps_1.png",
+            "images/melissa/tavern/melissa_sleeps_2.png",
+            "images/melissa/tavern/melissa_sleeps_3.png",
+            "images/melissa/tavern/melissa_sleeps_4.png",
+            "images/melissa/tavern/melissa_sleeps.png",
+        ]
+        picture_cycle = [row for row in picture_cycle if renpy.loadable(row)]
+        if len(picture_cycle) > 0:
+            return picture_cycle[int(dayspassed or 0) % len(picture_cycle)]
+        return ""
+
+    def tavern_melissa_room_can_show_sleeping():
+        try:
+            melissa_sync_room_problem_state()
+        except Exception:
+            pass
+        temp_room = str(MelissaVar.get("temp_room", "") or "").strip()
+        if temp_room and melissa_bats_stage() < 8:
+            return False
+        if str(getLocation("melissa") or "") != "TavernMelissaRoom":
+            return False
+        return int(time or 0) >= 4 or (household_morning_issue_type("melissa") == "sleepy" and int(hour or 0) < 12)
+
     def tavern_melissa_room_picture():
         clara_picture = tavern_melissa_room_clara_visit_picture() if tavern_melissa_room_clara_visit_active() else ""
         if str(clara_picture or "").strip():
             return clara_picture
-        if household_morning_issue_type("melissa") == "sleepy" and int(hour or 0) < 12:
-            picture_cycle = [
-                "images/melissa/tavern/melissa_sleeps_0.jpg",
-                "images/melissa/tavern/melissa_sleeps_1.png",
-                "images/melissa/tavern/melissa_sleeps_2.png",
-                "images/melissa/tavern/melissa_sleeps_3.png",
-                "images/melissa/tavern/melissa_sleeps_4.png",
-                "images/melissa/tavern/melissa_sleeps.png",
-            ]
-            picture_cycle = [row for row in picture_cycle if renpy.loadable(row)]
-            if len(picture_cycle) > 0:
-                return picture_cycle[int(dayspassed or 0) % len(picture_cycle)]
-        if int(time or 0) >= 4:
-            picture_cycle = [
-                "images/melissa/tavern/melissa_sleeps_0.jpg",
-                "images/melissa/tavern/melissa_sleeps_1.png",
-                "images/melissa/tavern/melissa_sleeps_2.png",
-                "images/melissa/tavern/melissa_sleeps_3.png",
-                "images/melissa/tavern/melissa_sleeps_4.png",
-                "images/melissa/tavern/melissa_sleeps.png",
-            ]
-            picture_cycle = [row for row in picture_cycle if renpy.loadable(row)]
-            if len(picture_cycle) > 0:
-                return picture_cycle[int(dayspassed or 0) % len(picture_cycle)]
+        if tavern_melissa_room_can_show_sleeping():
+            sleep_picture = tavern_melissa_room_sleep_picture()
+            if str(sleep_picture or "").strip():
+                return sleep_picture
         return "images/tavern/secondfloor/girls_room_day.png"
 
     def tavern_melissa_room_get_object(object_id):
@@ -112,28 +124,43 @@ label TavernMelissaRoom:
     $ scene_image = tavern_melissa_room_picture() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
+        call ShowImage("", "", scene_image)
+    if tavern_melissa_room_locked_from_inside():
+        $ MainTxt = "Дверь закрыта изнутри. За ней слышны приглушенные голоса, шорох и короткий смешок."
+        $ CurLocDesc = MainTxt
+        $ current_action_title = "Комната Мелиссы"
+        $ current_action_content = None
+        $ current_action_items = [MenuItem("Вернуться в коридор", Call("AdvanceMovementTime", "TavernUpstairs"))]
+        $ _melissa_locked_ui_return = None
+        while _melissa_locked_ui_return is None:
+            call screen main_ui
+            $ _melissa_locked_ui_return = _return
+        jump TavernMelissaRoom
     $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
-    if tavern_melissa_room_clara_visit_active():
-        $ MainTxt = str(MainTxt or "") + "\n\n" + tavern_melissa_room_clara_visit_text() + "\n\nОставаться в комнате они вам явно не дадут: максимум извиниться и закрыть за собой дверь."
     $ _melissa_room_notice = household_room_issue_notice_text("melissa")
     if str(_melissa_room_notice or "").strip() != "":
         $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_room_notice or "")
     $ _melissa_temp_room_notice = melissa_temp_room_text()
     if str(_melissa_temp_room_notice or "").strip() != "":
         $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_temp_room_notice or "")
+    $ MainTxt = werecat_append_visible_text(MainTxt, "TavernMelissaRoom")
     $ CurLocDesc = MainTxt
     call TavernMelissaRoomBuildActions
     if tavern_melissa_room_pests_event_ready():
         call MelissaRoomPestsEvent
-    jump TavernMelissaRoomView
+    $ _melissa_room_ui_return = None
+    while _melissa_room_ui_return is None:
+        call screen main_ui
+        $ _melissa_room_ui_return = _return
+    jump TavernMelissaRoom
 
 
 label TavernMelissaRoomBuildActions:
     $ current_action_title = "Комната Мелиссы"
     $ current_action_content = None
     $ current_action_items = []
-    if tavern_melissa_room_clara_visit_active():
-        $ current_action_items = [MenuItem("Извиниться и выйти в коридор", Call("AdvanceMovementTime", "TavernUpstairs"))]
+    if tavern_melissa_room_locked_from_inside():
+        $ current_action_items = [MenuItem("Вернуться в коридор", Call("AdvanceMovementTime", "TavernUpstairs"))]
         return
     python:
         for _issue_action in list(household_room_issue_action_specs("melissa") or []):
@@ -141,6 +168,10 @@ label TavernMelissaRoomBuildActions:
     if tavern_upstairs_can_clean_rooms():
         $ current_action_items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernMelissaRoom", "", "")))
     $ current_action_items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernMelissaRoom", "TavernMelissaRoomBuildActions")))
+    if werecat_is_in_room("TavernMelissaRoom"):
+        $ current_action_items.append(MenuItem(werecat_action_caption("TavernMelissaRoom"), Call("IntWerecatTalk", "TavernMelissaRoom")))
+    if story_event_available("TavernMelissaRoom", "clara_paintings"):
+        $ current_action_items.append(MenuItem("Выслушать Клариссу и Мелиссу", Call("checkTriggers", "TavernMelissaRoom", "clara_paintings", 0)))
     python:
         for _room_object in TavernMelissaRoomRoom.visible_game_items():
             current_action_items.append(MenuItem(_room_object.name, Call("TavernMelissaRoomObjectMenu", _room_object.object_id)))
@@ -195,21 +226,20 @@ label TavernMelissaRoomObjectText(object_id="", action_id=""):
 
 
 label TavernMelissaRoomRestore:
+    $ scene_image = tavern_melissa_room_picture() or TavernMelissaRoomRoom.bg_picture or None
+    if scene_image:
+        $ _layout_last_picture = scene_image
+        call ShowImage("", "", scene_image)
     $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
-    if tavern_melissa_room_clara_visit_active():
-        $ MainTxt = str(MainTxt or "") + "\n\n" + tavern_melissa_room_clara_visit_text() + "\n\nОставаться в комнате они вам явно не дадут: максимум извиниться и закрыть за собой дверь."
     $ _melissa_room_notice = household_room_issue_notice_text("melissa")
     if str(_melissa_room_notice or "").strip() != "":
         $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_room_notice or "")
     $ _melissa_temp_room_notice = melissa_temp_room_text()
     if str(_melissa_temp_room_notice or "").strip() != "":
         $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_temp_room_notice or "")
+    $ MainTxt = werecat_append_visible_text(MainTxt, "TavernMelissaRoom")
     $ CurLocDesc = MainTxt
     call TavernMelissaRoomBuildActions
     return
 
 
-label TavernMelissaRoomView:
-    show screen main_ui
-    $ renpy.pause(hard=True)
-    jump TavernMelissaRoomView

@@ -1,3 +1,6 @@
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 default HouseholdMorningState = {}
 
 init python:
@@ -159,6 +162,16 @@ init python:
     def household_breakfast_attendee_ids():
         attendees = []
         for npc_id in ("sandra", "melissa", "amanda", "becky"):
+            if npc_id == "becky":
+                if str(getLocation(npc_id) or "") != "TavernKitchen":
+                    continue
+                attendees.append(npc_id)
+                continue
+            if household_morning_issue_type(npc_id) in ("sick", "sleepy"):
+                continue
+            if int(week or 0) != 7 and int(time or 0) == 0 and int(hour or 0) < 12:
+                attendees.append(npc_id)
+                continue
             if str(getLocation(npc_id) or "") != "TavernKitchen":
                 continue
             attendees.append(npc_id)
@@ -173,8 +186,6 @@ init python:
                 lines.append("%s с утра расклеилась и осталась в своей комнате. Без лечебного зелья сегодня ее к столу не вытащить." % npc_name)
             elif issue_code == "sleepy":
                 lines.append("%s все еще отсыпается у себя и пока не явилась к общему столу." % npc_name)
-            elif household_needs_reconcile(npc_id):
-                lines.append("%s держится в стороне и не спешит садиться с вами за один стол, пока вы не сгладите напряжение между вами." % npc_name)
         return lines
 
     def household_room_issue_notice_text(person=""):
