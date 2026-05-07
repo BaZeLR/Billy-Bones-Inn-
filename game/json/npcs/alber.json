@@ -1,0 +1,82 @@
+{
+  "id": "alber",
+  "display_name": "Albert",
+  "role": "secondary",
+  "native_genitive": null,
+  "native_dative": null,
+  "schedule": {
+    "weekday": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "wine_cellar",
+      "wine_cellar",
+      "wine_cellar",
+      "wine_cellar",
+      "wine_cellar",
+      "wine_cellar",
+      null,
+      "market",
+      "market",
+      "market",
+      "market"
+    ],
+    "weekend": [
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "church",
+      "wine_cellar",
+      "wine_cellar",
+      "wine_cellar",
+      "wine_cellar",
+      "wine_cellar",
+      "wine_cellar",
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "source_files": [
+    "Inn/Intro.txt"
+  ],
+  "stats": {},
+  "custom": {
+    "AlberVar": {
+      "hasmet_MC": 0,      
+      "sawwithliza": 0,
+      "talkedaboutliza": 0,
+      "WhoreVisitFreq": 3,
+      "hearAboutHisWife": 0,
+      "FightYouAmanda": 0
+    }
+  },
+  "relationships": {
+    "player_friendship": 0,
+    "liza_friendship": -20,
+    "amanda_friendship": -10,
+    "player_trust": 0
+
+  }
+}

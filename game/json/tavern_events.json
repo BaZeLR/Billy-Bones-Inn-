@@ -1,0 +1,139 @@
+{
+  "defaults": {
+    "max_events": 5,
+    "category_cycle": [
+      "general",
+      "harassment",
+      "malicious",
+      "guest"
+    ]
+  },
+  "categories": {
+    "general": [
+      {
+        "id": "wine_for_dance",
+        "label": "Wine For Dance",
+        "weight": 1,
+        "repeatable": true,
+        "requires_presence": false,
+        "note":  "every wednesday, Sandra will ask Player if they want to sponsor Friday dance event,upon player's decision:yes need to contribute 4 barrels of Ale or wine and six sacks of food.No will skip event for the week, minus 2 point of tavern fame.",
+        
+      },
+      { "id": "doubleVisitors",
+        "label": "Double Visitors",
+        "weight": 4,
+        "repeatable": true,
+        "note": "chance dependance +fame points, if tavern fame is above 50, chance of event increase significantly.",
+        "requires_presence": false,
+        "summary": "there is alot of merchant ships in port today. The tavern saw twice the usual number of visitors today, boosting profits."
+      },
+      {
+        "id": "church_notice",
+        "label": "Church Notice",
+        "weight": 2,
+        "repeatable": true,
+        "requires_presence": false,
+        "summary": "A visiting priest left notices inviting patrons to Sunday service."
+      }
+    ],
+    "harassment": [
+      {
+        "id": "harass",
+        "first_occurrence_only": false,
+        "victim_job": ["cleaning","waitress","wench"],
+        "typeOfaction": ["grab butt","hug waist","grab breasts","kiss cheek","lift skirt","tickle","spank butt","yell at","wissle","slap face","pull hair","pushed","bullied", "bragged to others about sexual conquest","called names","threatened with violence","exposed themselves","made indecent gestures","tried to lure into private area"], 
+        "label": "Harassment",
+        "reaction_bad": ["shocked","angry","embarrassed","upset","scared","confused","disgusted","humiliated","frightened","nervous","uneasy","disturbed","uncomfortable","worried","annoyed"],
+        "reaction_good": ["flattered","excited","aroused","happy","pleased","thrilled","delighted","cheerful","joyful","content","satisfied","overjoyed","elated","gleeful","jovial"],
+        "reaction_nutral": ["indifferent","unfazed","unmoved","apathetic","detached","dispassionate","nonchalant","stoic","reserved","calm","collected","composed","serene","placid","tranquil"],
+        "event_place": ["tidying up near the bar","cleaning tables in the main hall","mopping the floor by the entrance","washing dishes in the kitchen","sweeping the back room","dusting shelves in the storage area","taking out the trash","restocking supplies in the pantry","cleaning windows in the dining area","scrubbing the bathrooms"],
+        "event_result_good": ["butterflies in her stomach","a warm blush spreading across her cheeks","a spark of excitement in her eyes","a playful smile tugging at her lips","a giggle escaping her throat","a fluttering sensation in her chest","a twinkle of mischief in her gaze","a lightness in her step","a cheerful laugh bubbling up","a radiant glow about her"],
+        "event_result_bad": [
+          "a furrowed brow of concern",
+          "a tightness in her chest",
+          "tears welling up in her eyes",
+          "a trembling in her hands",
+          "a look of fear on her face",
+          "a shiver running down her spine",
+          "a sense of dread",
+          "a feeling of helplessness",
+          "a lump in her throat",
+          "a cold sweat breaking out",
+          "runned away crying",
+          "yelled at the harasser",
+          "called youfor help",
+          "complained about to you(if present)"
+        ],
+        "event_result_neutral": [
+          "a blank expression",
+          "a slight shrug of the shoulders",
+          "a casual glance around the room",
+          "a nonchalant sip of her drink",
+          "a disinterested look",
+          "a bored yawn",
+          "a detached demeanor",
+          "a lack of reaction",
+          "a neutral stance",
+          "a calm acceptance",
+          "continued working as if nothing happened",
+          "ignored the incident",
+          "shrugged it off",
+          "kept a professional attitude","walking away hip swaying", 
+          "smirking while looking at you(if present)"
+        ],
+        "bottom _line":["her [current_job] skills improved slightly, ","the cleaner seems more cautious now, ","the waitress appears more confident, ","she seems more aware of her surroundings, ","her demeanor has changed a bit, "],
+        "requires_presence": true,
+        "comprise_event_text_pattern": {
+        "note_1": "While [event_place], [victim_name] was [typeOfaction] by an unruly patron, resulting in [event_result],[bottom_line]. ",
+        "note_2": "description text goes like this : While tidying up near the bar, [cleaner_name] was approached by a group of unruly patrons who began making inappropriate comments and gestures.",
+        "note_3": "fully event mechanics in separate text file."
+      }
+      }
+      
+    ],
+    "malicious": [
+      {
+        "id": "fight_small",
+        "label": "Small Tavern Fight",
+        "weight": 3,
+        "repeatable": true,
+        "requires_presence": true,
+        "summary": "A scuffle broke out near the bar."
+      },
+      {
+        "id": "fight_big",
+        "label": "Big Tavern Fight",
+        "weight": 5,
+        "repeatable": true,
+        "requires_presence": true,
+        "summary": "A large brawl erupted, drawing the attention of everyone in the tavern."
+      },
+      {
+        "id": "slogan_fail",
+        "label": "Slogan Complaint",
+        "weight": 2,
+        "repeatable": true,
+        "requires_presence": false,
+        "summary": "Patrons grumbled that the tavern slogan still isn't posted."
+      }
+    ],
+    "guest": [
+      {
+        "id": "dance_invitation",
+        "label": "Dance Invitation",
+        "weight": 2,
+        "repeatable": true,
+        "requires_presence": false,
+        "summary": "Festival organisers asked us to sponsor the next dance night."
+      },
+      {
+        "id": "loyal_customer",
+        "label": "Loyal Customer",
+        "weight": 3,
+        "repeatable": true,
+        "requires_presence": false,
+        "summary": "A regular complimented the staff and promised to return with friends."
+      }
+    ]
+  }
+}
