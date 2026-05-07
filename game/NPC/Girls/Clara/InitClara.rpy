@@ -36,6 +36,9 @@ init python:
             pass
         return int(charisma or 0) >= 70 and int(Friends.get("clara", 0) or 0) >= 7
 
+    def clara_has_caught_cat_gift():
+        return werecat_second_gift_available() and int(WerecatVar.get("caught", 0) or 0) == 1
+
     def clara_wine_store_talk_picture():
         candidates = [
             "images/clara/wineSellar_clara_talk.png",
@@ -147,10 +150,14 @@ init python:
         market_evening_intro_seen = int(ClaraVar.get("market_evening_intro_seen", 0) or 0)
         drawings_secret_known = int(ClaraVar.get("drawings_secret_known", 0) or 0)
         mongol_theft_seen = int(ClaraVar.get("mongol_theft_seen", 0) or 0)
+        failed_day = int(ClaraVar.get("market_follow_failed_day", -1) or -1)
+        failed_time = int(ClaraVar.get("market_follow_failed_time", -1) or -1)
 
         if str(CurLoc or "") != "MarketPlace":
             return ""
-        if not clara_market_visit_active(dayspassed, week, time_value):
+        if str(getLocation("clara") or "") != "MarketPlace":
+            return ""
+        if failed_day == int(dayspassed or 0) and failed_time == time_value:
             return ""
         if time_value == 2 and booklet_seen == 0:
             return "story_clara_market_action_direct"
@@ -246,6 +253,13 @@ init python:
                 "dress_code": str(dress_code),
             })
 
+        if clara_has_caught_cat_gift():
+            entries.append({
+                "source": "werecat",
+                "gift_id": "werecat_caught_cat",
+                "gift_name": "пойманная лесная кошка",
+            })
+
         return entries
 
     def clara_has_giftable_entries():
@@ -254,6 +268,11 @@ init python:
     def clara_remove_gift_entry(entry):
         row = dict(entry or {})
         source = str(row.get("source", "") or "")
+        if source == "werecat":
+            if not werecat_second_gift_available() or int(WerecatVar.get("caught", 0) or 0) != 1:
+                return False
+            werecat_apply_clara_gift_bonus()
+            return True
         if source == "dress":
             dress_code = str(row.get("dress_code", "") or "")
             if dress_code == "" or dress_code not in list(MyDresses or []):
@@ -289,7 +308,9 @@ init python:
         elif interaction == "gift":
             score += 1
             score -= int(GiftedToday.get("clara", 0) or 0) * 3
-            if gift_id in tuple(preferred_gift_item_ids("clara")):
+            if gift_id == "werecat_caught_cat":
+                score += 4
+            elif gift_id in tuple(preferred_gift_item_ids("clara")):
                 score += 3
             elif gift_id != "":
                 score -= 2
@@ -406,16 +427,116 @@ label InitClara:
             "dress_blackstockings",
             "dress_redstockings",
             "libido_tincture_001",
+            "werecat_caught_cat",
         ]
 
         # Uppercase compatibility for legacy references.
         Friends["Clara"] = Friends[GirlName]
         Talked["Clara"] = Talked[GirlName]
         bodymodel_sync_character(GirlName, RealName[GirlName], "female")
+        npc_daily_schedule_set(
+            GirlName,
+            default_slots=[
+                npc_daily_schedule_slot(0, "WineStore", True, True, "morning_wine_store"),
+                dict(npc_daily_schedule_slot(0, "Church", True, False, "sunday_church"), weekdays=[7]),
+                npc_daily_schedule_slot(4, "WineStore", False, False, "sleep_home"),
+            ],
+            random_slots=[
+                npc_daily_schedule_random_slot(
+                    1,
+                    weekdays=[1, 2, 3, 4, 5, 6],
+                    label="noon",
+                    choices=[
+                        npc_daily_schedule_choice("WineStore", 5, True, True, "wine_store_with_legare"),
+                        npc_daily_schedule_choice("ForestClearing", 1, True, True, "forest_clearing"),
+                        npc_daily_schedule_choice("ForestLake", 1, True, True, "forest_lake"),
+                        npc_daily_schedule_choice("ForestSpring", 1, True, True, "forest_spring"),
+                    ],
+                ),
+                npc_daily_schedule_random_slot(
+                    1,
+                    weekdays=[7],
+                    label="sunday_noon",
+                    choices=[
+                        npc_daily_schedule_choice("WineStore", 3, True, True, "home_after_church"),
+                        npc_daily_schedule_choice("TavernMain", 2, True, True, "sunday_tavern_visit"),
+                        npc_daily_schedule_choice("ForestClearing", 1, True, True, "sunday_forest_walk"),
+                        npc_daily_schedule_choice("ForestLake", 1, True, True, "sunday_forest_lake"),
+                    ],
+                ),
+                npc_daily_schedule_random_slot(
+                    2,
+                    weekdays=[1, 2, 3, 4, 5, 6],
+                    label="day",
+                    choices=[
+                        npc_daily_schedule_choice("MarketPlace", 5, True, False, "market_drawings"),
+                        npc_daily_schedule_choice("BarberShop", 1, True, True, "monthly_barber", monthly_key="clara_barber", monthly_limit=1),
+                        npc_daily_schedule_choice("DressShop", 1, True, True, "tailor_visit", monthly_key="clara_tailor", monthly_limit=2),
+                        npc_daily_schedule_choice("TavernMain", 2, True, True, "tavern_visit"),
+                        npc_daily_schedule_choice("ForestClearing", 1, True, True, "forest_walk"),
+                        npc_daily_schedule_choice("ForestLake", 1, True, True, "forest_lake"),
+                        npc_daily_schedule_choice("WineStore", 2, True, True, "wine_store_day"),
+                    ],
+                ),
+                npc_daily_schedule_random_slot(
+                    2,
+                    weekdays=[7],
+                    label="sunday_day",
+                    choices=[
+                        npc_daily_schedule_choice("TavernMain", 3, True, True, "sunday_tavern_visit"),
+                        npc_daily_schedule_choice("ForestClearing", 2, True, True, "sunday_forest_walk"),
+                        npc_daily_schedule_choice("ForestLake", 1, True, True, "sunday_forest_lake"),
+                        npc_daily_schedule_choice("WineStore", 2, True, True, "home_sunday_day"),
+                    ],
+                ),
+                npc_daily_schedule_random_slot(
+                    3,
+                    weekdays=[1, 2, 3, 4, 6],
+                    label="evening",
+                    choices=[
+                        npc_daily_schedule_choice("MarketPlace", 4, True, False, "evening_market_mongol"),
+                        npc_daily_schedule_choice("TavernMelissaRoom", 2, True, True, "melissa_room_evening", condition=npc_schedule_rule("clara_melissa_visit", slot=3)),
+                        npc_daily_schedule_choice("TavernMain", 1, True, True, "tavern_evening"),
+                        npc_daily_schedule_choice("WineStore", 2, True, True, "home_evening"),
+                    ],
+                ),
+                npc_daily_schedule_random_slot(
+                    3,
+                    weekdays=[5],
+                    label="friday_evening",
+                    choices=[
+                        npc_daily_schedule_choice("FridayDance", 4, True, True, "friday_dance", condition=npc_schedule_rule("clara_visible_friday_dance")),
+                        npc_daily_schedule_choice("TavernMelissaRoom", 2, True, True, "melissa_room_friday"),
+                        npc_daily_schedule_choice("WineStore", 1, True, True, "home_friday_evening"),
+                    ],
+                ),
+                npc_daily_schedule_random_slot(
+                    3,
+                    weekdays=[7],
+                    label="sunday_evening",
+                    choices=[
+                        npc_daily_schedule_choice("TavernMelissaRoom", 2, True, True, "melissa_room_sunday", condition=npc_schedule_rule("clara_melissa_visit", slot=3)),
+                        npc_daily_schedule_choice("TavernMain", 2, True, True, "sunday_tavern_evening"),
+                        npc_daily_schedule_choice("WineStore", 3, True, True, "home_sunday_evening"),
+                    ],
+                ),
+                npc_daily_schedule_random_slot(
+                    4,
+                    weekdays=[1, 2, 3, 4, 5, 6, 7],
+                    label="late_night",
+                    choices=[
+                        npc_daily_schedule_choice("WineStore", 8, False, False, "sleep_home"),
+                        npc_daily_schedule_choice("TavernMelissaRoom", 1, True, True, "late_melissa_room", condition=npc_schedule_rule("clara_melissa_visit", slot=4)),
+                    ],
+                ),
+            ],
+        )
         npc_schedule_set(
             GirlName,
             [
                 NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=clara_visible_at_friday_dance, priority=220, label="friday_dance"),
+                NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[3], awake=True, talkable=True, condition=npc_schedule_rule("clara_paintings_evening_watch"), priority=280, label="clara_paintings_evening_watch"),
+                NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[3, 4], awake=True, talkable=True, condition=npc_schedule_rule("clara_paintings_confession"), priority=270, label="clara_paintings_confession"),
                 NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[3, 4], awake=True, talkable=True, condition=clara_melissa_visit_active, priority=210, label="melissa_room_visit"),
                 NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[2], awake=True, talkable=True, condition=clara_tavern_visit_active, priority=200, label="tavern_visit"),
                 NPCScheduleEntry(location="MarketPlace", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[2, 3], awake=True, talkable=False, condition=clara_market_visit_active, priority=190, label="extra_market"),
@@ -423,6 +544,7 @@ label InitClara:
                 NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[4], awake=False, talkable=False, priority=10, label="sleep"),
             ],
         )
+        npc_daily_schedule_build_all(True)
         npc_schedule_sync_currentloc(GirlName)
 
     return

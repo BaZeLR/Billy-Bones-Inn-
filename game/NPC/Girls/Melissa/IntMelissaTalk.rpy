@@ -69,9 +69,13 @@ init python:
         if action_key == "talk":
             return True
         if action_key in ("gift", "share"):
-            return stage >= 1 or family_social_threshold_met(girl_name, action_key)
+            if action_key == "gift":
+                return relationship_any_gift_allowed(girl_name)
+            allowed, reason = relationship_social_action_allowed(girl_name, action_key)
+            return bool(allowed)
         if action_key == "flirt":
-            return stage >= 1
+            allowed, reason = relationship_social_action_allowed(girl_name, action_key)
+            return bool(allowed)
         if action_key == "start":
             return stage >= 2
         if action_key == "intimacy":
@@ -207,14 +211,7 @@ label IntMelissaTalkRefresh(girl_name="melissa"):
     $ current_action_content = None
     $ current_action_items = []
     $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
-    if social_has_visible_topics(girl_name, "talk"):
-        $ current_action_items.append(MenuItem("Поговорить о...", Function(main_ui_call_label, "SocialTalkTopicMenu", girl_name, "talk", "IntMelissaTalkRefresh")))
-    if social_has_visible_topics(girl_name, "flirt") and melissa_relationship_allows(girl_name, "flirt"):
-        $ current_action_items.append(MenuItem("Флиртовать...", Function(main_ui_call_label, "SocialTalkTopicMenu", girl_name, "flirt", "IntMelissaTalkRefresh")))
-    if GiftedToday.get(girl_name, 0) == 0 and melissa_relationship_allows(girl_name, "gift"):
-        $ current_action_items.append(MenuItem("Подарить что-нибудь", Function(main_ui_call_label, "PlayerCardGiftToFixedTargetMenu", girl_name)))
-        if player_card_has_shareable_items() and melissa_relationship_allows(girl_name, "share"):
-            $ current_action_items.append(MenuItem("Поделиться угощением", Function(main_ui_call_label, "PlayerCardShareToFixedTargetMenu", girl_name)))
+    $ current_action_items.extend(social_core_action_items(girl_name, "IntMelissaTalkRefresh"))
     if melissa_storage_thanks_available():
         $ current_action_items.append(MenuItem("Послушать, что Мелисса скажет о кладовой", Function(main_ui_call_label, "IntMelissaTalkApply", girl_name, "storage_thanks")))
     if clara_paintings_melissa_question_ready() and int(AskedToday.get(girl_name, 0) or 0) == 0:
@@ -228,7 +225,7 @@ label IntMelissaTalkRefresh(girl_name="melissa"):
     elif melissa_relationship_allows(girl_name, "intimacy") and bool(melissa_private_place_offer(girl_name, CurLoc).get("ok", False)):
         $ current_action_items.append(MenuItem("Найти укромное место с Мелиссой", Function(main_ui_call_label, "IntMelissaFindPrivatePlace", girl_name, CurLoc)))
     elif melissa_relationship_allows(girl_name, "start") and int(MelissaVar.get("StartDay", -1) or -1) != int(dayspassed or 0):
-        $ current_action_items.append(MenuItem("Начать с Мелиссой", Function(main_ui_call_label, "IntMelissaStartMenu", girl_name)))
+        $ current_action_items.append(MenuItem("Сблизиться с Мелиссой", Function(main_ui_call_label, "IntMelissaStartMenu", girl_name)))
     if str(CurLoc or "") == "TavernMain" and str(getLocation("clara") or "") == "TavernMain" and int(MelissaVar.get("AskedAboutClaraDay", -1) or -1) != int(dayspassed or 0) and int(AskedToday.get(girl_name, 0) or 0) == 0:
         $ current_action_items.append(MenuItem("Спросить Мелиссу о Клариссе", Function(main_ui_call_label, "IntMelissaTalkApply", girl_name, "ask_clara")))
     if int(AskedToday.get(girl_name, 0) or 0) == 0 and household_special_talk_available(girl_name):
@@ -346,7 +343,7 @@ label IntMelissaTalkApply(girl_name="melissa", choice_code=""):
 
 label IntMelissaStartMenu(girl_name="melissa"):
     $ main_ui_begin_talk_state("Разговор с Мелиссой", girl_name)
-    $ current_action_title = "Мелисса"
+    $ current_action_title = "Сближение с Мелиссой"
     $ current_action_content = None
     $ current_action_items = []
     $ MainTxt = melissa_start_intro_text(girl_name)

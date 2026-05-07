@@ -38,6 +38,9 @@ default TavernBreakfastDrinkPerkDay = -1
 default TavernBreakfastLewdSeriesDay = -1
 default TavernBreakfastAppearancePerkDay = -1
 default TavernBreakfastSweetPerkDay = -1
+default TavernBreakfastBlindPirateTeamPledge = 0
+default TavernBreakfastMilkTeamTalkDone = 0
+default TavernBreakfastAleTeamTalkDone = 0
 
 init 4 python:
     def tavern_kitchen_has_worker(worker_name):
@@ -118,9 +121,28 @@ init python:
         )
 
     def tavern_breakfast_present_ids():
+        present = []
         if bool(TavernBreakfastEventActive) and isinstance(TavernBreakfastPresentIds, list):
-            return list(TavernBreakfastPresentIds)
-        return list(household_breakfast_attendee_ids() or [])
+            present.extend(list(TavernBreakfastPresentIds or []))
+        else:
+            present.extend(list(household_breakfast_attendee_ids() or []))
+
+        try:
+            present.extend(list(getNPCids("TavernKitchen") or []))
+        except Exception:
+            pass
+
+        rows = []
+        seen = set()
+        for npc_id in present:
+            key = str(npc_id or "").strip().lower()
+            if key not in ("sandra", "melissa", "amanda", "becky"):
+                continue
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append(key)
+        return rows
 
     def tavern_breakfast_present_names():
         names = []
@@ -175,6 +197,8 @@ init python:
 
     def tavern_breakfast_morning_issue_girl():
         for npc_id in ("sandra", "melissa", "amanda"):
+            if npc_id in list(tavern_breakfast_present_ids() or []):
+                continue
             issue_code = str(household_morning_issue_type(npc_id) or "").strip()
             if issue_code not in ("sick", "sleepy"):
                 continue
@@ -420,7 +444,7 @@ init python:
             score += 1
         if int(TavernBreakfastSpicyDrinkDay or -1) == int(dayspassed or 0):
             score += 2
-        share_perks = globals().get("TavernBreakfastSharePerks", {}) or {}
+        share_perks = TavernBreakfastSharePerks or {}
         if isinstance(share_perks, dict):
             share_data = share_perks.get(key, {})
             if isinstance(share_data, dict) and int(dayspassed or 0) - int(share_data.get("day", -99) or -99) <= 7:
@@ -458,7 +482,7 @@ init python:
         ]
         if int(ClaraVar.get("booklet_market_seen", 0) or 0) == 1 or int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1:
             lines.append("После разговоров о непристойных рисунках и книжечках Клариссы даже обычные шутки за столом цепляют сильнее: все слишком хорошо понимают, какие картинки теперь стоят за невинными словами.")
-        share_perks = globals().get("TavernBreakfastSharePerks", {}) or {}
+        share_perks = TavernBreakfastSharePerks or {}
         recent_shared = []
         if isinstance(share_perks, dict):
             for npc_id in present_ids:
@@ -472,7 +496,50 @@ init python:
         return lines
 
     def tavern_breakfast_core_present_ids():
-        return [npc_id for npc_id in list(tavern_breakfast_present_ids() or []) if npc_id in ("sandra", "melissa", "amanda")]
+        rows = []
+        for npc_id in list(tavern_breakfast_present_ids() or []):
+            key = str(npc_id or "").strip().lower()
+            if key in ("sandra", "melissa", "amanda"):
+                rows.append(key)
+        return rows
+
+    def tavern_breakfast_look_picture(npc_id=""):
+        key = str(npc_id or "").strip().lower()
+        candidates = {
+            "sandra": [
+                "images/sandra/tavern/kitchen_sandra_0.jpg",
+                "images/sandra/sandra_kitchen.png",
+                "images/tavern/kitchen/sandra.png",
+                "images/tavern/kitchen/kitchen_sandra_0.jpg",
+            ],
+            "melissa": [
+                "images/melissa/tavern/kitchen_0.png",
+                "images/melissa/tavern/kitchen_1.png",
+                "images/melissa/tavern/portrait.png",
+            ],
+            "amanda": [
+                "images/amanda/kitchen_help.png",
+                "images/amanda/amanda_card.jpg",
+                "images/amanda/amanda_portrait.jpg",
+            ],
+        }.get(key, [])
+        for picture_path in candidates:
+            if renpy.loadable(picture_path):
+                return picture_path
+        return tavern_kitchen_breakfast_picture()
+
+    def tavern_breakfast_look_text(npc_id=""):
+        key = str(npc_id or "").strip().lower()
+        name = _action_display_name(key)
+        if key not in list(tavern_breakfast_present_ids() or []):
+            return "%s сейчас не сидит за завтраком, так что разглядывать за столом некого." % name
+        if key == "sandra":
+            return "Вы внимательнее смотрите на Сандру за завтраком. Она держит стол в хозяйском порядке даже тогда, когда молчит: взглядом поправляет ленивых, замечает пустую миску раньше остальных и одним своим присутствием не дает кухне развалиться в балаган."
+        if key == "melissa":
+            return "Вы присматриваетесь к Мелиссе за завтраком. Если она пришла к столу, значит старается держаться вместе с домом: ест аккуратно, слушает больше, чем говорит, и слишком быстро опускает глаза, когда разговор становится личным."
+        if key == "amanda":
+            return "Вы смотрите, как Аманда ведет себя за завтраком. Она будто специально занимает чуть больше места за столом, лениво играет ложкой и ловит чужие реакции, проверяя, кто первым сорвется на замечание."
+        return "%s сидит за общим столом, и этого уже достаточно, чтобы разговоры и настроение завтрака шли иначе." % name
 
     def tavern_breakfast_record_group_perk(item_id="", score=1, targets=None):
         global TavernBreakfastSharePerks
@@ -560,27 +627,81 @@ init python:
             (int(TavernBreakfastFoodPerkDay or -1) != day_value and tavern_breakfast_food_perk_item_available())
             or (int(TavernBreakfastDrinkPerkDay or -1) != day_value and tavern_breakfast_drink_perk_item_available())
             or (int(TavernBreakfastLewdSeriesDay or -1) != day_value and tavern_breakfast_lewd_series_available())
-            or (int(TavernBreakfastAppearancePerkDay or -1) != day_value and tavern_breakfast_appearance_perk_available())
         )
 
     def tavern_breakfast_perk_menu_items():
         items = []
         day_value = int(dayspassed or 0)
-        if int(TavernBreakfastFoodPerkDay or -1) != day_value and tavern_breakfast_food_perk_item_available():
+        special_milk_ready = False
+        special_ale_ready = False
+        if int(TavernBreakfastBlindPirateTeamPledge or 0) == 1 and int(TavernBreakfastMilkTeamTalkDone or 0) == 0 and int(TavernBreakfastFoodPerkDay or -1) != day_value:
+            if tavern_kitchen_food_stock_count("milk_pitcher_001") > 0 or int(_player_item_count_by_id("milk_pitcher_001") or 0) > 0:
+                special_milk_ready = True
+                items.append(MenuItem("Поделиться молоком", Call("TavernKitchenBreakfastPerkFood", "milk_pitcher_001")))
+        if int(TavernBreakfastBlindPirateTeamPledge or 0) == 1 and int(TavernBreakfastMilkTeamTalkDone or 0) == 1 and int(TavernBreakfastAleTeamTalkDone or 0) == 0 and int(TavernBreakfastDrinkPerkDay or -1) != day_value:
+            if int(_player_item_count_by_id("drink_ale_001") or 0) > 0:
+                special_ale_ready = True
+                items.append(MenuItem("Поделиться элем за команду", Call("TavernKitchenBreakfastPerkDrink", "drink_ale_001")))
+        if not special_milk_ready and int(TavernBreakfastFoodPerkDay or -1) != day_value and tavern_breakfast_food_perk_item_available():
             items.append(MenuItem("Поставить на стол лучшие припасы", Jump("TavernKitchenBreakfastPerkFood")))
-        if int(TavernBreakfastDrinkPerkDay or -1) != day_value and tavern_breakfast_drink_perk_item_available():
-            items.append(MenuItem("Разлить общий напиток", Jump("TavernKitchenBreakfastPerkDrink")))
+        if not special_ale_ready and int(TavernBreakfastDrinkPerkDay or -1) != day_value and tavern_breakfast_drink_perk_item_available():
+            items.append(MenuItem("Поделиться напитком", Jump("TavernKitchenBreakfastPerkDrink")))
         if int(TavernBreakfastLewdSeriesDay or -1) != day_value and tavern_breakfast_lewd_series_available():
             items.append(MenuItem("Подкинуть тему про новые непристойные листки", Jump("TavernKitchenBreakfastPerkLewdSeries")))
-        if int(TavernBreakfastAppearancePerkDay or -1) != day_value and tavern_breakfast_appearance_perk_available():
-            items.append(MenuItem("Отметить домашний вид и обновки", Jump("TavernKitchenBreakfastPerkAppearance")))
         items.append(MenuItem("Назад к завтраку", Jump("TavernKitchenBreakfastMenu")))
         return items
 
-    def tavern_breakfast_apply_food_perk():
-        global TavernBreakfastFoodPerkDay, TavernBreakfastSweetPerkDay
+    def tavern_breakfast_blind_pirate_team_present():
+        present_ids = list(tavern_breakfast_present_ids() or [])
+        return "sandra" in present_ids and "melissa" in present_ids and "amanda" in present_ids
 
-        item_key = tavern_breakfast_take_perk_item(("honey_comb_001", "berries_001", "milk_pitcher_001", "boar_meat_001", "mushroom_001"))
+    def tavern_breakfast_blind_pirate_story_text():
+        present_ids = list(tavern_breakfast_present_ids() or [])
+        if "sandra" in present_ids and "melissa" in present_ids and "amanda" in present_ids:
+            return "\n\n".join([
+                "Вы пересказываете за столом, что видели на рынке: бывшего хозяина трактира «Слепой Пират» в клетке, дорогу на галеры герцогини Кончиты и женщин из его дома, которые бежали следом уже без дома, денег и защиты.",
+                "На кухне становится тихо. Даже ложки стучат осторожнее: всем понятно, что такая беда начинается не с одной ошибки, а с того дня, когда дом перестает держаться вместе.",
+                "Сандра первой мрачно кивает. \"Вот так трактиры и гибнут. Сперва хозяин думает, что как-нибудь выкрутится, потом продукты уходят, люди разбегаются, а под конец уже поздно молиться.\"",
+                "Мелисса опускает глаза к миске. \"Значит, если дом провалится, никто нас потом красиво спасать не станет,\" тихо говорит она. \"Просто уведут, продадут или забудут.\"",
+                "Именно это молчание Аманда и ломает. Она хмыкает, оглядывает всех и нарочно говорит бодрее: \"Слушайте, я от одной девки слышала про цирюльню Серджио. Там и волосы приводят в порядок, и девок делают такими, что люди в зале смотрят совсем иначе. Он еще, говорят, милый. Может, мессир Стефан будет так добр и когда-нибудь сводит нас туда?\"",
+                "Вы смотрите на нее достаточно долго, чтобы шутка перестала быть просто шуткой. \"Если дела пойдут ровно, и вы будете стараться, почему бы и нет. Но сперва дом, работа и порядок. Хорошие вещи будут наградой для тех, кто помогает трактиру не стать вторым «Слепым Пиратом».\"",
+                "Аманда только пожимает плечами и улыбается так, будто услышала ровно то, что хотела: не отказ, а условие. Сандра ворчит для порядка, Мелисса уже украдкой смотрит на Аманду с новым любопытством, а завтрак снова начинает шуметь.",
+            ])
+        lines = [
+            "Вы пересказываете за столом, что видели на рынке: бывшего хозяина трактира «Слепой Пират» в клетке, дорогу на галеры герцогини Кончиты и женщин из его дома, которые бежали следом уже без дома, денег и защиты.",
+            "Эта история ложится на кухню тяжело. Сегодня она звучит не как слух, а как предупреждение: если дом перестанет держаться вместе, город быстро найдет, как разделить тех, кто останется без защиты.",
+        ]
+        if "amanda" in present_ids:
+            lines.append("Аманда после паузы все равно пытается увести разговор к цирюльне Серджио и женским хитростям, но вы отвечаете ей прямо: хорошие вещи появятся только тогда, когда дом будет работать ровно.")
+        return "\n\n".join(lines)
+
+    def tavern_breakfast_blind_pirate_milk_text():
+        return "\n\n".join([
+            "Вы ставите на стол свежую крынку молока. После разговора о «Слепом Пирате» это выглядит почти вызывающе просто: не обещание богатства, а знак, что сегодня в вашем доме есть чем поделиться.",
+            "Аманда первой тянется к кружке и довольно щурится. \"Ох, молоко... свежее и славное. Ах, прямо туда попало, куда надо. Спасибо, мессир Стефан.\"",
+            "Мелисса тут же оживляется: \"С медом было бы еще лучше. Я слышала, от молока с медом грудь растет. Аманде как раз надо.\"",
+            "Аманда вскидывает подбородок. \"С моей грудью все в порядке.\"",
+            "Мелисса невинно хлопает глазами. \"Тогда зачем ты корсет рваными тряпками набиваешь, м-м?\"",
+            "Сандра резко ставит кружку на стол. \"Замолчите обе. Вы сейчас мессиру Стефану уши в кашу уроните от стыда.\"",
+            "Мелисса только пожимает плечами: \"Мы же все здесь команда, разве нет?\" Аманда сразу кивает: \"Да. Он один из нас. Верно?\"",
+            "Сандра вздыхает, но уже мягче. \"Может, и верно. По крайней мере, сегодня у нас есть что поставить на стол. Дай бог, чтобы так и осталось.\"",
+            "Вы спокойно отвечаете: \"Я сделаю все, что потребуется, чтобы мы не закончили как «Слепой Пират».\" После этих слов молоко уже не просто угощение, а первый настоящий знак общего дома.",
+        ])
+
+    def tavern_breakfast_blind_pirate_ale_text():
+        return "\n\n".join([
+            "Вы достаете эль и разливаете его малыми кружками, не для пьянства, а за общий стол. После молока, шуток и тяжелой рыночной истории это звучит почти как маленькая клятва.",
+            "\"За команду,\" говорите вы. \"За трактир. И за то, чтобы этот дом не пошел вслед за «Слепым Пиратом».\"",
+            "Сандра, Мелисса и Аманда переглядываются. На лицах у них нет полного доверия, но уже нет и прежней холодной осторожности.",
+            "\"Посмотрим,\" отвечают они почти одновременно.",
+            "И в этом коротком ответе слышится не отказ. Скорее испытательный срок: они готовы смотреть, что вы сделаете дальше.",
+        ])
+
+    def tavern_breakfast_apply_food_perk(preferred_ids=None):
+        global TavernBreakfastFoodPerkDay, TavernBreakfastSweetPerkDay, TavernBreakfastMilkTeamTalkDone
+
+        preferred = preferred_ids or ("honey_comb_001", "berries_001", "milk_pitcher_001", "boar_meat_001", "mushroom_001")
+        item_key = tavern_breakfast_take_perk_item(preferred)
         if str(item_key or "").strip() == "":
             return "На кухне не находится ничего достаточно хорошего, чтобы сделать из этого особое утреннее угощение."
         TavernBreakfastFoodPerkDay = int(dayspassed or 0)
@@ -592,17 +713,20 @@ init python:
             score = 2
         targets = tavern_breakfast_record_group_perk(item_key, score)
         tavern_breakfast_apply_group_social(targets, 1, 0, 1 if item_key in ("honey_comb_001", "boar_meat_001") else 0, 2)
+        if item_key == "milk_pitcher_001" and int(TavernBreakfastBlindPirateTeamPledge or 0) == 1 and int(TavernBreakfastMilkTeamTalkDone or 0) == 0 and tavern_breakfast_blind_pirate_team_present():
+            TavernBreakfastMilkTeamTalkDone = 1
+            return tavern_breakfast_blind_pirate_milk_text()
         item_name = tavern_kitchen_food_item_name(item_key)
         text = "Вы не просто завтракаете, а ставите на стол %s как отдельное угощение для своих. Домочадцы быстро понимают разницу: это уже не казенная миска, а знак, что хорошие припасы идут тем, кто держит дом рядом с вами." % item_name
         if item_key in ("honey_comb_001", "berries_001", "milk_pitcher_001"):
             text += "\n\nСладкое сразу меняет тон завтрака. Девочки отвечают мягче, чаще улыбаются и позволяют себе более ленивые, домашние позы за столом."
         return text
 
-    def tavern_breakfast_apply_drink_perk():
-        global TavernBreakfastDrinkPerkDay, TavernBreakfastSpicyDrinkDay
+    def tavern_breakfast_apply_drink_perk(preferred_ids=None):
+        global TavernBreakfastDrinkPerkDay, TavernBreakfastSpicyDrinkDay, TavernBreakfastAleTeamTalkDone
 
         item_key = ""
-        for candidate in ("energy_tea_001", "drink_ale_001", "libido_tincture_001"):
+        for candidate in list(preferred_ids or ("energy_tea_001", "drink_ale_001", "libido_tincture_001")):
             if int(_player_item_count_by_id(candidate) or 0) > 0 and _player_remove_item_by_id(candidate, 1):
                 item_key = candidate
                 break
@@ -618,10 +742,13 @@ init python:
         targets = tavern_breakfast_record_group_perk(item_key, score)
         tavern_breakfast_apply_group_social(targets, 1, 1, 1 if item_key in ("drink_ale_001", "libido_tincture_001") else 0, 2)
         if item_key == "energy_tea_001":
-            return "Вы завариваете бодрящий чай на всех. Теплая кружка в руках делает утренний разговор ровнее, а девочки заметно легче принимают ваши замечания и распоряжения."
+            return "Вы делитесь бодрящим чаем со всеми, кто сейчас сидит за столом. Теплая кружка в руках делает утренний разговор ровнее, а девочки заметно легче принимают ваши замечания и распоряжения."
         if item_key == "drink_ale_001":
-            return "Вы открываете эль и делите его за завтраком малыми кружками. Это не пьянка, но общий стол сразу становится свободнее: шутки идут смелее, взгляды держатся дольше."
-        return "Вы подаете к завтраку пряную настойку. Она расходится по кружкам совсем понемногу, зато эффект виден быстро: голоса теплеют, щеки розовеют, а обычные фразы начинают звучать двусмысленно."
+            if int(TavernBreakfastBlindPirateTeamPledge or 0) == 1 and int(TavernBreakfastMilkTeamTalkDone or 0) == 1 and int(TavernBreakfastAleTeamTalkDone or 0) == 0 and tavern_breakfast_blind_pirate_team_present():
+                TavernBreakfastAleTeamTalkDone = 1
+                return tavern_breakfast_blind_pirate_ale_text()
+            return "Вы делитесь элем за завтраком, разливая его малыми кружками. Это не пьянка, но общий стол сразу становится свободнее: шутки идут смелее, взгляды держатся дольше."
+        return "Вы делитесь за завтраком пряной настойкой. Она расходится по кружкам совсем понемногу, зато эффект виден быстро: голоса теплеют, щеки розовеют, а обычные фразы начинают звучать двусмысленно."
 
     def tavern_breakfast_apply_lewd_series_perk():
         global TavernBreakfastLewdSeriesDay
@@ -665,7 +792,7 @@ init python:
             return "Вы напоминаете, что день надо вытянуть ровно и без лишней ругани. Сандра сперва хмыкает, но потом одобрительно кивает: тон задан правильно, и остальные тоже собираются заметно бодрее."
         return "Вы находите пару крепких слов перед началом дня. Даже если никто не спешит это признавать вслух, общий стол после такого расходится собраннее."
 
-    def build_breakfast_text_pages(text="", min_paragraphs=2, max_paragraphs=3, page_limit=900):
+    def build_breakfast_text_pages(text="", min_paragraphs=1, max_paragraphs=2, page_limit=650):
         normalized = str(text or "").replace("\r\n", "\n").strip()
         if not normalized:
             return [""]
@@ -678,9 +805,9 @@ init python:
         current_parts = []
         for paragraph in paragraphs:
             candidate_parts = list(current_parts) + [paragraph]
-            candidate_text = "\n".join(candidate_parts)
-            if current_parts and (len(candidate_parts) > int(max_paragraphs or 3) or (len(candidate_text) > int(page_limit or 900) and len(current_parts) >= int(min_paragraphs or 2))):
-                pages.append("\n".join(current_parts))
+            candidate_text = "\n\n".join(candidate_parts)
+            if current_parts and (len(candidate_parts) > int(max_paragraphs or 2) or (len(candidate_text) > int(page_limit or 650) and len(current_parts) >= int(min_paragraphs or 1))):
+                pages.append("\n\n".join(current_parts))
                 current_parts = [paragraph]
             else:
                 current_parts = candidate_parts
@@ -699,15 +826,19 @@ init python:
         if tavern_breakfast_can_make_speech() and int(TavernBreakfastMotivationDay or -1) != int(dayspassed or 0):
             items.append(MenuItem("Сказать пару слов перед работой", Jump("TavernKitchenBreakfastMotivation")))
         if tavern_breakfast_can_offer_perk_menu():
-            items.append(MenuItem("Раздать утренние привилегии", Jump("TavernKitchenBreakfastPerkMenu")))
-        if tavern_breakfast_can_serve_spicy_tincture():
-            items.append(MenuItem("Подать к столу пряную настойку", Jump("TavernKitchenBreakfastServeSpicyDrink")))
+            items.append(MenuItem("Поделиться едой и напитками", Jump("TavernKitchenBreakfastPerkMenu")))
+        for look_girl in tavern_breakfast_core_present_ids():
+            items.append(MenuItem("Посмотреть на %s за завтраком" % _action_display_name(look_girl), Call("TavernKitchenBreakfastLookAtGirl", look_girl)))
         if tavern_breakfast_amanda_attic_mock_ready():
             items.append(MenuItem("Ответить Аманде про чердак", Jump("TavernKitchenBreakfastAmandaAtticMock")))
         if tavern_breakfast_melissa_amanda_gerhard_ready():
             items.append(MenuItem("Разобрать спор Мелиссы и Аманды", Jump("TavernKitchenBreakfastMelissaAmandaGerhard")))
         if tavern_breakfast_tease_ready():
             items.append(MenuItem("Заметить провокацию за столом", Jump("TavernKitchenBreakfastTease")))
+        if bool(globals().get("AmandaAIIntegrationEnabled", False)) and "amanda_ai_breakfast_intent_code" in globals():
+            amanda_intent = amanda_ai_breakfast_intent_code()
+            if amanda_intent:
+                items.append(MenuItem(amanda_ai_menu_label(amanda_intent), Call("AmandaAIIntentBreakfastEvent", amanda_intent)))
         soap_request_girl = tavern_breakfast_soap_request_girl()
         if soap_request_girl:
             items.append(MenuItem("Выслушать просьбу о мыле", Call("HouseholdSoapRequestEvent", soap_request_girl)))
@@ -937,6 +1068,8 @@ init python:
         return lines
 
     def tavern_breakfast_dialogue_lines():
+        global TavernBreakfastDanceSponsorAnnouncedDay
+
         lines = []
         present_ids = tavern_breakfast_present_ids()
         lines.extend(list(tavern_breakfast_relaxed_appearance_lines() or []))
@@ -968,6 +1101,9 @@ init python:
             lines.append("За завтраком Сандра напоминает, что к середине недели надо бы пополнить запасы вина и хорошей еды, иначе в трактире скоро станет совсем уныло.")
         if tavern_breakfast_can_offer_dance_sponsorship() and "sandra" in present_ids:
             lines.append("Сандра заодно осторожно спрашивает, не хотите ли вы и в этом году скинуться на пятничные танцы от лица трактира.")
+        if int(DanceSponsor or 0) == 1 and int(TavernBreakfastDanceSponsorAnnouncedDay or -1) != int(dayspassed or 0):
+            TavernBreakfastDanceSponsorAnnouncedDay = int(dayspassed or 0)
+            lines.append("За завтраком вы объявляете, что трактир уже выставит вино и закуски к пятничным танцам. Сандра довольно кивает: такой взнос сразу делает дом заметнее в городе, а девки начинают переглядываться куда живее обычного.")
         if soap_available_piece_count() > 0 and int(TavernBreakfastSoapAnnouncedDay or -1) != int(dayspassed or 0):
             if int(HouseholdSoapSampleIntroDone or 0) == 0:
                 lines.append("За столом вы объявляете, что новая партия %s мыла наконец вылежалась и уже готова. Домашние заметно оживляются от этой новости." % soap_last_batch_label())
@@ -1341,7 +1477,7 @@ label TavernKitchen:
         $ _layout_last_picture = scene_image
     else:
         $ _layout_last_picture = ""
-    call CheckDailyEvent("", "_story_enter", CurLoc, time)
+    call RoomEnterEventGate(CurLoc, False)
     $ current_object_id = ""
     $ current_girl_key = ""
     if TavernBreakfastEventActive:
@@ -1352,13 +1488,15 @@ label TavernKitchen:
         $ CurLocDesc = MainTxt
         hide screen main_ui
         jump TavernKitchenBreakfastMenu
+    if bool(AmandaAIIntegrationEnabled):
+        call AmandaMiniEventTry(CurLoc, "room")
     $ BeckyKitchenVisitActive = 1 if becky_kitchen_visit_active() else 0
     if BeckyKitchenVisitActive:
         $ BeckyVar["SandraKitchenVisitMonth"] = int(month or 0)
 
     $ _kitchen_wine_event_text = ""
     $ _kitchen_pending_event = tavern_kitchen_pending_mandatory_event_code()
-    if str(_kitchen_pending_event or "") == "WineForDance" and str(getLocation("sandra") or "") == "TavernKitchen" and not tavern_breakfast_available():
+    if str(_kitchen_pending_event or "") == "WineForDance" and not tavern_breakfast_available():
         $ _kitchen_event_picture = tavern_kitchen_wine_donation_picture()
         if str(_kitchen_event_picture or "").strip():
             $ scene_image = _kitchen_event_picture
@@ -1371,7 +1509,8 @@ label TavernKitchen:
         $ CurLocDesc = MainTxt
         $ TavernKitchenSavedText = MainTxt
         $ current_action_content = None
-        call TavernKitchenBuildActions
+        if str(CurEventCode or "") != "WineForDance" or len(list(current_action_items or [])) <= 0:
+            call TavernKitchenBuildActions
     else:
         $ MainTxt = build_kitchen_description()
         $ CurLocDesc = MainTxt
@@ -1441,6 +1580,8 @@ label TavernKitchenBreakfast:
     $ _breakfast_morning_sick_girl = str(tavern_breakfast_morning_sickness_girl() or "")
     $ calendar_advance_minutes(30)
     vscene tavern_kitchen_breakfast_picture()
+    if bool(AmandaAIIntegrationEnabled):
+        call AmandaMiniEventTry("TavernKitchen", "breakfast")
     python:
         _breakfast_lines = [
             tavern_breakfast_intro_line(),
@@ -1452,10 +1593,15 @@ label TavernKitchenBreakfast:
             or tavern_breakfast_has_market_topic()
             or tavern_breakfast_can_make_speech()
             or tavern_breakfast_can_offer_perk_menu()
-            or tavern_breakfast_can_serve_spicy_tincture()
+            or len(tavern_breakfast_core_present_ids()) > 0
             or tavern_breakfast_amanda_attic_mock_ready()
             or tavern_breakfast_melissa_amanda_gerhard_ready()
             or tavern_breakfast_tease_ready()
+            or (
+                bool(globals().get("AmandaAIIntegrationEnabled", False))
+                and "amanda_ai_breakfast_intent_code" in globals()
+                and str(amanda_ai_breakfast_intent_code() or "").strip() != ""
+            )
             or str(tavern_breakfast_soap_request_girl() or "").strip() != ""
             or str(tavern_breakfast_dress_request_girl() or "").strip() != ""
             or household_barber_request_ready("sandra", "breakfast")
@@ -1472,20 +1618,22 @@ label TavernKitchenBreakfast:
             _breakfast_lines.append("За столом уже чувствуется, что утро может вытянуть за собой и разговор, и новости, и чьи-нибудь старые счеты.")
         else:
             _breakfast_lines.append("Ничего особенного за столом пока не происходит: обычное домашнее утро без лишней суеты.")
-        MainTxt = "\n".join([row for row in _breakfast_lines if str(row or "").strip()])
+        MainTxt = "\n\n".join([row for row in _breakfast_lines if str(row or "").strip()])
         CurLocDesc = MainTxt
+    if int(DanceSponsor or 0) == 1 and int(TavernBreakfastDanceSponsorAnnouncedDay or -1) != int(dayspassed or 0):
+        $ TavernBreakfastDanceSponsorAnnouncedDay = int(dayspassed or 0)
     $ _eat_result = player_eat_meal("утреннюю кашу и свежий хлеб", 16)
     if str(_eat_result.get("text", "") or "").strip():
-        $ MainTxt = str(MainTxt or "") + "\n" + str(_eat_result.get("text", "") or "")
+        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_eat_result.get("text", "") or "")
         $ CurLocDesc = MainTxt
     $ _breakfast_social_ids = tavern_breakfast_apply_social_bonus()
     if len(list(_breakfast_social_ids or [])) > 0:
-        $ MainTxt = str(MainTxt or "") + "\nСовместный завтрак заметно сближает вас с теми, кто сидит с вами за столом."
+        $ MainTxt = str(MainTxt or "") + "\n\nСовместный завтрак заметно сближает вас с теми, кто сидит с вами за столом."
         $ CurLocDesc = MainTxt
     if tavern_breakfast_can_give_first_soap_samples():
         $ _soap_intro_text = tavern_breakfast_apply_first_soap_samples()
         if str(_soap_intro_text or "").strip():
-            $ MainTxt = str(MainTxt or "") + "\n" + str(_soap_intro_text or "")
+            $ MainTxt = str(MainTxt or "") + "\n\n" + str(_soap_intro_text or "")
             $ CurLocDesc = MainTxt
     elif soap_available_piece_count() > 0 and int(TavernBreakfastSoapAnnouncedDay or -1) != int(dayspassed or 0):
         $ TavernBreakfastSoapAnnouncedDay = int(dayspassed or 0)
@@ -1500,7 +1648,7 @@ label TavernKitchenBreakfast:
         hide screen main_ui
         call CheckDailyEvent(_breakfast_morning_sick_girl, "MorningSickness", "TavernKitchen", 0)
     hide screen main_ui
-    call TavernKitchenBreakfastMenu
+    call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
     return
 
 
@@ -1758,24 +1906,39 @@ label TavernKitchenBreakfastMotivation:
 label TavernKitchenBreakfastPerkMenu:
     if not tavern_breakfast_can_offer_perk_menu():
         jump TavernKitchenBreakfastMenu
-    $ _perk_text = "Вы решаете, какую привилегию дать за завтраком. Это не просто милость: такие вещи закрепляют, что рядом с вами дом получает лучшие припасы, напитки, обновки и опасные городские темы."
+    $ _perk_text = "Вы решаете, чем именно поделиться за общим столом, чтобы завтрак был не просто обязательной кашей, а живым домашним утром."
     $ tavern_breakfast_restore_ui_state(_perk_text)
     $ _perk_items = list(tavern_breakfast_perk_menu_items() or [])
-    call QueuePagedPanelText(_perk_text, "Утренние привилегии", _perk_items, "plain")
+    call QueuePagedPanelText(_perk_text, "Общий стол", _perk_items, "plain")
     call ReturnToMainUI
     return
 
 
-label TavernKitchenBreakfastPerkFood:
-    $ MainTxt = tavern_breakfast_apply_food_perk()
+label TavernKitchenBreakfastLookAtGirl(girl_name=""):
+    $ _breakfast_look_girl = str(girl_name or "").strip().lower()
+    if _breakfast_look_girl not in list(tavern_breakfast_present_ids() or []):
+        jump TavernKitchenBreakfastMenu
+    $ _breakfast_look_picture = tavern_breakfast_look_picture(_breakfast_look_girl)
+    if str(_breakfast_look_picture or "").strip():
+        vscene _breakfast_look_picture
+    $ MainTxt = tavern_breakfast_look_text(_breakfast_look_girl)
+    $ CurLocDesc = MainTxt
+    call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
+    return
+
+
+label TavernKitchenBreakfastPerkFood(item_id=""):
+    $ _breakfast_food_choice = [str(item_id or "").strip()] if str(item_id or "").strip() else None
+    $ MainTxt = tavern_breakfast_apply_food_perk(_breakfast_food_choice)
     $ CurLocDesc = MainTxt
     call stat
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
     return
 
 
-label TavernKitchenBreakfastPerkDrink:
-    $ MainTxt = tavern_breakfast_apply_drink_perk()
+label TavernKitchenBreakfastPerkDrink(item_id=""):
+    $ _breakfast_drink_choice = [str(item_id or "").strip()] if str(item_id or "").strip() else None
+    $ MainTxt = tavern_breakfast_apply_drink_perk(_breakfast_drink_choice)
     $ CurLocDesc = MainTxt
     call stat
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
@@ -1811,15 +1974,11 @@ label TavernKitchenBreakfastServeSpicyDrink:
 
 label TavernKitchenBreakfastBlindPirateStory:
     $ BlindPirateBreakfastPending = 0
-    $ MainTxt = "Вы пересказываете за столом, как на рынке в клетке везли бывшего хозяина трактира «Слепой Пират» на галеры герцогини Кончиты, а следом за телегой, захлебываясь слезами, бежали женщины из его дома."
-    if "sandra" in list(tavern_breakfast_present_ids() or []):
-        $ MainTxt = str(MainTxt or "") + "\nСандра сразу мрачнеет. \"Трактир валится не за один день,\" тихо говорит она. \"Сперва уходит запас, потом честь, потом люди, а под конец уже и стены некому удержать.\""
-    if "melissa" in list(tavern_breakfast_present_ids() or []):
-        $ MainTxt = str(MainTxt or "") + "\nМелисса заметно притихает и только спрашивает, неужели у того дома и правда не осталось никого, кто успел бы удержать все от такой пропасти."
-    if "amanda" in list(tavern_breakfast_present_ids() or []):
-        $ MainTxt = str(MainTxt or "") + "\nДаже Аманда не спешит шутить. Она лишь морщится и бормочет, что от таких историй сразу как-то зябко, будто беда и сама уже стоит у дверей."
-    if "becky" in list(tavern_breakfast_present_ids() or []):
-        $ MainTxt = str(MainTxt or "") + "\nБекки тяжело вздыхает и признает, что вдовьи и долговые истории в этом городе всегда заканчиваются одинаково скверно, если рядом не находится кто-то достаточно упрямый, чтобы удержать дом на плаву."
+    $ TavernBreakfastBlindPirateTeamPledge = 1
+    $ AmandaVar["barber_request_interest"] = 1
+    $ AmandaVar["beauty_help_terms_accepted"] = 1
+    $ AmandaVar["beauty_help_approved_day"] = int(dayspassed or 0)
+    $ MainTxt = tavern_breakfast_blind_pirate_story_text()
     $ CurLocDesc = MainTxt
     $ fun = _player_clamp(int(fun or 0) + 5, 0, 100)
     call stat
@@ -2087,12 +2246,15 @@ label TavernKitchenObjectMenu(object_id="", refresh_only=False):
     python:
         for _kitchen_action in _kitchen_object.visible_actions():
             _kitchen_args = tuple(getattr(_kitchen_action, "args", ()) or ())
+            _kitchen_label = str(_kitchen_action.label or "")
+            if str(getattr(_kitchen_action, "action_id", "") or "") == "make_fire" and _pc_fire_is_active(TavernKitchenHearthObject):
+                _kitchen_label = "Подложить дрова"
             if _kitchen_action.hook == "text":
-                current_action_items.append(MenuItem(_kitchen_action.label, Call("TavernKitchenObjectText", object_id, _kitchen_action.action_id)))
+                current_action_items.append(MenuItem(_kitchen_label, Call("TavernKitchenObjectText", object_id, _kitchen_action.action_id)))
             elif _kitchen_action.hook == "call" and str(_kitchen_action.target or "") != "":
-                current_action_items.append(MenuItem(_kitchen_action.label, Call(_kitchen_action.target, *_kitchen_args)))
+                current_action_items.append(MenuItem(_kitchen_label, Call(_kitchen_action.target, *_kitchen_args)))
             elif _kitchen_action.hook == "jump" and str(_kitchen_action.target or "") != "":
-                current_action_items.append(MenuItem(_kitchen_action.label, Jump(_kitchen_action.target)))
+                current_action_items.append(MenuItem(_kitchen_label, Jump(_kitchen_action.target)))
         current_action_items.append(MenuItem("Назад", Call("TavernKitchenRestore")))
     return
 

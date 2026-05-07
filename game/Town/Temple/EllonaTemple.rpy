@@ -20,6 +20,16 @@ init python:
     def ellona_fran_visible():
         return FranBusy.get(time, 0) == 0
 
+    def ellona_fran_sunday_stories_now():
+        return int(week or 0) == 7 and int(time or 0) in (1, 2) and ellona_fran_visible()
+
+    def ellona_fran_sunday_stories_text():
+        return (
+            "Во дворике храма Франческа сегодня не одна. Вокруг нее устроилась ребятня, и старая жрица, размахивая руками, рассказывает им воскресные легенды об Эллоне, Грациях и давних временах.\n\n"
+            "\"...и звали их пионеры... А когда вожатые занимались тем, чем велела им Эллона и Грации, они били в барабаны и трубили в горны...\"\n\n"
+            "Вы решили не мешать Франческе."
+        )
+
     EllonaTempleRoom = Room(
         code_name="EllonaTemple",
         group_name=ROOM_GROUP_CITY,
@@ -77,7 +87,7 @@ init python:
     EllonaBirthRoomRoom = Room(
         code_name="EllonaBirthRoom",
         display_name="Родильная зала",
-        bg_picture="images/ellona/Fran1.jpg",
+        bg_picture="images/ellona/ante2.jpg",
         descriptions=[
             RoomDescription(
                 text="Вы заходите в родильную залу. У стены стоит ложе для рожениц, рядом аккуратно сложены чистые полотенца и подготовлены кувшины с водой. На стенах видны фрески и картины, посвященные дочерям Эллоны.",
@@ -150,8 +160,29 @@ label EllonaTemple:
 
     $ _room.mark_visited()
 
-    if FranBusy.get(time, 0) == 0:
-        call ShowImageSeq("ellona", "", "fran", 4)
+    if ellona_fran_sunday_stories_now():
+        $ scene_image = "images/ellona/Fran5.png"
+        $ _layout_last_picture = scene_image
+        call ShowImage("", "", scene_image)
+        $ MainTxt = ellona_fran_sunday_stories_text()
+        $ CurLocDesc = MainTxt
+        $ current_action_title = "Воскресные истории"
+        $ current_action_content = None
+        $ current_action_items = [MenuItem("Уйти домой", Jump("StreetTavern"))]
+        $ _ellona_stories_ui_return = None
+        while _ellona_stories_ui_return is None:
+            call screen main_ui
+            $ _ellona_stories_ui_return = _return
+        jump EllonaTemple
+
+    if FranBusy.get(time, 0) != 0:
+        $ scene_image = "images/ellona/afterBirth.png"
+        $ _layout_last_picture = scene_image
+        call ShowImage("", "", scene_image)
+        $ MainTxt = CurLocDesc + "\n\nДверь родильной на миг открывается. Усталая Франческа выходит наружу с тазом испачканных тряпок, не задерживаясь ни на разговоры, ни на объяснения. Затем дверь снова закрывается. Франческа занята, и в родильную сейчас не пройти."
+        $ CurLocDesc = MainTxt
+    else:
+        call ShowImageSeq("ellona", "", "Fran", 4)
 
     call EllonaBuildActions("EllonaTemple")
     $ _ellona_temple_ui_return = None
@@ -163,6 +194,8 @@ label EllonaTemple:
 
 label EllonaBirthRoom:
     scene black
+    if FranBusy.get(time, 0) != 0:
+        jump EllonaTemple
     call EnterLocation("EllonaBirthRoom")
     $ CurrentRoom = EllonaBirthRoomRoom
     $ CurLoc = "EllonaBirthRoom"
@@ -187,7 +220,7 @@ label EllonaBirthRoom:
     $ MainTxt = CurLocDesc
     $ _room.mark_visited()
     if FranBusy.get(time, 0) == 0:
-        call ShowImageSeq("ellona", "", "fran", 4)
+        call ShowImageSeq("ellona", "", "Fran", 4)
 
     call EllonaBuildActions("EllonaBirthRoom")
     $ _ellona_birth_ui_return = None
@@ -274,10 +307,15 @@ label EllonaRoomObjectText(room_code="", object_id="", action_id=""):
                     _object_text = str(_room_action.target or "")
                     break
             break
+        if str(object_id or "") == "birth_room_door_001" and str(action_id or "") == "examine_birth_room_door" and FranBusy.get(time, 0) != 0:
+            _object_text = "Дверь родильной закрыта. За ней слышны стоны и короткие распоряжения Франчески: жрица занята родами, и внутрь сейчас не пройти."
         if _object_text:
             MainTxt = _object_text
             CurLocDesc = _object_text
             current_action_title = _object_name or "Действия"
+
+    if str(object_id or "") == "birth_room_door_001" and str(action_id or "") == "examine_birth_room_door" and FranBusy.get(time, 0) != 0:
+        call ShowImage("", "", "images/ellona/afterBirth.png")
 
     call ellona_room_object_menu(room_code, object_id)
     return

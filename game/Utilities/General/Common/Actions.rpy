@@ -4,6 +4,8 @@
 default action_override_text = ""
 
 init -46 python:
+    import renpy.store as store
+
     _SANDRA_FORAGED_ITEM_IDS = ("berries_001", "mushroom_001", "honey_comb_001")
     _SANDRA_FORAGED_EFFECT_TEXT = "Сандра сразу прикидывает, как пустить это в дело на кухне, и обещает сварить что-нибудь вкусное для всей трактирной челяди."
     _SANDRA_FORAGED_SHARE_TEXT = "Вы отдаете {} {}. Сандра сразу думает, как пустить находку в дело и обещает приготовить для всей трактирной челяди что-нибудь вкусное."
@@ -113,10 +115,10 @@ init -46 python:
         if key not in ("sandra", "melissa", "amanda"):
             return
 
-        perks = globals().setdefault("TavernBreakfastSharePerks", {})
+        perks = getattr(store, "TavernBreakfastSharePerks", {})
         if not isinstance(perks, dict):
             perks = {}
-            globals()["TavernBreakfastSharePerks"] = perks
+            store.TavernBreakfastSharePerks = perks
 
         score = 1
         if item_key in ("honey_comb_001", "berries_001", "milk_pitcher_001"):
@@ -169,7 +171,11 @@ init -46 python:
     def append_social_score_message(text="", score_delta=0, notify=True):
         if bool(notify):
             notify_social_score(score_delta)
-        return str(text or "").strip()
+        base_text = str(text or "").strip()
+        score_text = social_score_message(score_delta)
+        if base_text:
+            return base_text + "\n\n" + score_text
+        return score_text
 
     def _player_clamp(value, low, high):
         return clamp_stat(value, low, high)
@@ -1172,19 +1178,15 @@ init -46 python:
         interaction = str(interaction_type or "").strip().lower()
         if key not in ("amanda", "melissa", "sandra"):
             return 0
-        if interaction == "flirt":
-            return 5
-        if interaction in ("gift", "share"):
-            return 3
-        return 0
+        return relationship_requirement_value(key, interaction, "score")
 
     def family_social_threshold_met(girl_name="", interaction_type=""):
-        threshold = int(family_social_threshold(girl_name, interaction_type) or 0)
-        if threshold <= 0:
-            return True
         key = str(girl_name or "").strip()
+        interaction = str(interaction_type or "").strip().lower()
+        if interaction == "gift":
+            return relationship_any_gift_allowed(key)
         allowed, reason = relationship_social_action_allowed(key, interaction_type)
-        return int(Friends.get(key, 0) or 0) >= threshold and bool(allowed)
+        return bool(allowed)
 
     def player_flirt_with(char_name):
         key = str(char_name or "").strip()
@@ -1513,7 +1515,7 @@ label Chop(what_id="", where_id="", fallback_text="", object_id=""):
         update_stat_state()
         fun = _player_clamp(fun + 5, 0, 100)
         energy = _player_clamp(energy - 20, 0, 100)
-        exploration = max(0, int(exploration or 0) + 3)
+        exploration = max(0, int(exploration or 0) + 15)
         ShedNoticeText = "Вы нарубили  {}. В сарае теперь есть {}. Всего: {} охапок.".format(str(_chop_item.name).strip(), str(_chopped_item.name).strip(), _chopped_total)
         ShedNoticePending = True
     if _current_room_code == "Shed":

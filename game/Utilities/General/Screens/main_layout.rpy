@@ -117,6 +117,23 @@ init python:
         player_card_set_inventory_origin("room")
         player_card_show_inventory_section_state(section_id)
 
+    def main_ui_action_items_with_entities(items=None):
+        out = list(items or [])
+        try:
+            room_code = str(getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip()
+            if room_code and str(UI_selected_char or "").strip().lower() != "dog" and dog_is_available_here(room_code):
+                dog_caption = str(dog_display_name() or "Пес")
+                has_dog_item = False
+                for item in out:
+                    if str(getattr(item, "caption", "") or "") == dog_caption:
+                        has_dog_item = True
+                        break
+                if not has_dog_item:
+                    out.insert(0, MenuItem(dog_caption, Call("IntDogTalk", room_code)))
+        except Exception:
+            pass
+        return out
+
     def main_ui_entity_button_spec(entity_type="", entity_id="", entity_data=None):
         entity_key = str(entity_type or "").strip().lower()
         npc_key = str(entity_id or "").strip()
@@ -256,13 +273,13 @@ screen current_action_panel():
     elif current_action_content:
         use expression current_action_content
     elif current_action_items:
-        use choice_panel(current_action_items)
+        use choice_panel(main_ui_action_items_with_entities(current_action_items))
     elif str(UI_mode or "") in ("mc", "char", "dog", "fight", "event"):
         null
     elif str(getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip() == "TavernKitchen" and bool(TavernBreakfastEventActive):
         null
     elif CurrentRoom is not None:
-        $ action_items = build_room_action_items(CurrentRoom)
+        $ action_items = main_ui_action_items_with_entities(build_room_action_items(CurrentRoom))
         use choice_panel(action_items)
     else:
         text "Выберите действие." size 20
@@ -1022,5 +1039,36 @@ label ActionMenuRunSpec(spec_id="", entity_type="", entity_id="", where_id=""):
             call IntClaraGiftMenu(_entity_id)
         else:
             call PlayerCardGiftToFixedTargetMenu(_entity_id)
+        return
+    if _spec_key.startswith("amanda_ai:") and _entity_id == "amanda":
+        $ action_menu_specs = []
+        if not bool(globals().get("AmandaAIIntegrationEnabled", False)):
+            return
+        $ _amanda_ai_intent = _spec_key.split(":", 1)[1]
+        call AmandaAIIntentRoomEvent(_where_id, _amanda_ai_intent)
+        return
+    if _spec_key == "dog_bone":
+        $ action_menu_specs = []
+        call IntDogTalkApply(_where_id, "bone")
+        return
+    if _spec_key == "dog_call":
+        $ action_menu_specs = []
+        call IntDogTalkApply(_where_id, "call_stray")
+        return
+    if _spec_key == "dog_pet":
+        $ action_menu_specs = []
+        call IntDogTalkApply(_where_id, "pet_stray")
+        return
+    if _spec_key == "dog_play_stray":
+        $ action_menu_specs = []
+        call IntDogTalkApply(_where_id, "play_stray")
+        return
+    if _spec_key == "dog_stray_bone":
+        $ action_menu_specs = []
+        call IntDogTalkApply(_where_id, "stray_bone")
+        return
+    if _spec_key == "dog_adopt":
+        $ action_menu_specs = []
+        call IntDogTalkApply(_where_id, "adopt")
         return
     return

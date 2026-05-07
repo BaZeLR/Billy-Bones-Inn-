@@ -45,6 +45,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
         Arousal.setdefault("You", 0)
         Arousal.setdefault(GirlNameASDS, 0)
         GiveOrgasms.setdefault(GirlNameASDS, 0)
+        CurGiveOrgasms = GiveOrgasms.get(GirlNameASDS, 0)
         LickPussy.setdefault(GirlNameASDS, 0)
         Friends.setdefault(GirlNameASDS, 0)
         EddieCockInPussy.setdefault(GirlNameASDS, 0)

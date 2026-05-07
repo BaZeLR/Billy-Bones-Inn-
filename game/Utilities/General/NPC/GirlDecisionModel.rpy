@@ -5,6 +5,7 @@ default GirlDecisionLast = {}
 
 init -34 python:
     import math
+    import renpy.store as store
 
     GIRL_DECISION_CORE_IDS = ("amanda", "melissa", "sandra")
     GIRL_DECISION_CYCLE_IDS = ("amanda", "melissa", "sandra", "clara", "irma", "inga", "becky")
@@ -127,6 +128,29 @@ init -34 python:
                 "church_obey": -0.4,
             },
         },
+        "intimate_help": {
+            "good": {
+                "trust": 1.7,
+                "openness": 1.3,
+                "sexual_openness": 2.4,
+                "arousal": 1.5,
+                "wetness": 1.2,
+                "player_history": 1.5,
+                "oral_pref": 0.8,
+                "teasing_pref": 0.6,
+                "cycle_horny": 0.7,
+                "anger": -2.2,
+                "rebel": -0.5,
+            },
+            "bad": {
+                "anger": 2.0,
+                "rebel": 1.1,
+                "trust": -1.0,
+                "openness": -0.7,
+                "sexual_openness": -1.0,
+                "church_obey": 0.8,
+            },
+        },
     }
 
     def girl_decision_int(value, default=0):
@@ -156,7 +180,7 @@ init -34 python:
 
     def girl_decision_map_value(map_name="", key="", default=0):
         try:
-            mapping = globals().get(str(map_name or ""), {})
+            mapping = getattr(store, str(map_name or ""), {})
             if isinstance(mapping, dict):
                 return mapping.get(str(key or "").strip().lower(), default)
         except Exception:
@@ -236,7 +260,7 @@ init -34 python:
     def girl_decision_breakfast_perk(girl_name=""):
         girl = str(girl_name or "").strip().lower()
         try:
-            score_fn = globals().get("tavern_breakfast_player_perk_score", None)
+            score_fn = getattr(store, "tavern_breakfast_player_perk_score", None)
             if callable(score_fn):
                 return girl_decision_clamp(float(score_fn(girl)) / 20.0)
         except Exception:
@@ -247,7 +271,7 @@ init -34 python:
         girl = str(girl_name or "").strip().lower()
         score = 0.0
         try:
-            issue_fn = globals().get("household_morning_issue_type", None)
+            issue_fn = getattr(store, "household_morning_issue_type", None)
             if callable(issue_fn):
                 issue = str(issue_fn(girl) or "")
                 if issue == "sick":
@@ -287,7 +311,8 @@ init -34 python:
         slut_value = girl_decision_int(sluttiness.get(girl, 0), 0) if isinstance(sluttiness, dict) else 0
         arousal_value = girl_decision_int(Arousal.get(girl, 0), 0) if isinstance(Arousal, dict) else 0
         wet_value = max(girl_decision_int(PussyWetStart.get(girl, 0), 0) if isinstance(PussyWetStart, dict) else 0, arousal_value)
-        anger_value = relationship_anger(girl) if "relationship_anger" in globals() else 0
+        anger_fn = getattr(store, "relationship_anger", None)
+        anger_value = anger_fn(girl) if callable(anger_fn) else 0
         rebel_value = girl_decision_int(neshlush.get(girl, 0), 0) if isinstance(neshlush, dict) else 0
 
         player_history = 0

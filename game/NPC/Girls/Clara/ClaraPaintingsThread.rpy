@@ -97,12 +97,25 @@ init -1 python:
             and int(time or 0) == 3
         )
 
+    def clara_paintings_evening_watch_schedule_active():
+        return (
+            clara_paintings_flag("commission_followup_done", 0) == 1
+            and clara_paintings_flag("peek_done", 0) == 0
+            and int(time or 0) == 3
+        )
+
     def clara_paintings_confession_ready():
         return (
             clara_paintings_flag("peek_done", 0) == 1
             and clara_paintings_flag("confession_done", 0) == 0
             and str(getLocation("clara") or "") == "TavernMelissaRoom"
             and str(getLocation("melissa") or "") == "TavernMelissaRoom"
+        )
+
+    def clara_paintings_confession_schedule_active():
+        return (
+            clara_paintings_flag("peek_done", 0) == 1
+            and clara_paintings_flag("confession_done", 0) == 0
         )
 
     def clara_paintings_murder_ready():
@@ -294,6 +307,8 @@ label story_clara_paintings_commission_followup_7:
 label story_clara_paintings_evening_peek_8:
     $ ClaraVar["peek_done"] = 1
     $ ClaraVar["murder_day"] = int(dayspassed or 0) + 1
+    $ CurrentLoc["clara"] = "TavernMelissaRoom"
+    $ CurrentLoc["melissa"] = "TavernMelissaRoom"
     $ MainTxt = "Вечером вы с Клариссой держитесь в тени напротив цирюльни. Когда боковая дверь снова открывается, она успевает увидеть достаточно: столичного жениха, Серджио, их осторожные жесты и ту особую близость, которую нельзя объяснить случайным визитом.\n\nКларисса сперва каменеет, потом почти злится на себя за облегчение. \"Значит, он тоже живет не той жизнью, которую ему продают,\" шепчет она. \"А меня собирались сделать ширмой для чужих приличий.\""
     $ CurLocDesc = MainTxt
     $ current_action_title = "Вечерняя слежка"

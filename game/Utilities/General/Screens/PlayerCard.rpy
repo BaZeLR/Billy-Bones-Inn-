@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default player_inventory_view_mode = "profile"
 default player_inventory_view_section = ""
@@ -116,8 +116,9 @@ init python:
             exploration_text += " (с псом)"
         return [
             ("Возраст", str(age)),
-            ("Деньги", str(money)),
-            ("Репутация", str(notoriety)),
+            ("Мараведи", str(money)),
+            ("Известность", str(reputation)),
+            ("Дурная слава", str(notoriety)),
             ("Слава трактира", str(tavernfame)),
             ("Внешность", str(look)),
             ("Харизма", str(charisma)),
@@ -126,12 +127,21 @@ init python:
         ]
 
     def player_card_stat_rows_right():
+        last_sex_text = "нет"
+        try:
+            _last_day = int(LastDaySex)
+            if _last_day >= 0:
+                last_sex_text = str(max(0, int(dayspassed or 0) - _last_day)) + " дн. назад"
+        except Exception:
+            last_sex_text = "нет"
         return [
             ("Энергия", str(energy)),
-            ("Веселье", str(fun)),
+            ("Настроение", str(fun)),
             ("Секс", str(HadSex.get("You", 0))),
             ("Раз за день", str(cancumdaily)),
             ("Сегодня", str(cametoday)),
+            ("Без секса", last_sex_text),
+            ("Возбуждение", str(Arousal.get("You", 0) if isinstance(Arousal, dict) else 0)),
         ]
 
     def player_card_dress_lines():
@@ -272,11 +282,11 @@ init python:
         if _item_id == "berries_001" and not player_card_has_menu_caption("Съесть ягоды"):
             current_action_items.append(MenuItem("Съесть ягоды", Call("UseFoodItem", "berries_001")))
         elif _item_id == "drink_ale_001" and not player_card_has_menu_caption("Выпить эль"):
-            current_action_items.append(MenuItem("Выпить эль", Call("UseDrinkItem", "drink_ale_001")))
+            current_action_items.append(MenuItem("Выпить эля", Call("UseDrinkItem", "drink_ale_001")))
         elif _item_id == "libido_tincture_001" and not player_card_has_menu_caption("Выпить настойку"):
-            current_action_items.append(MenuItem("Выпить настойку", Call("UseDrinkItem", "libido_tincture_001")))
+            current_action_items.append(MenuItem("Выпить настойки", Call("UseDrinkItem", "libido_tincture_001")))
         elif _item_id == "energy_tea_001" and not player_card_has_menu_caption("Выпить чай"):
-            current_action_items.append(MenuItem("Выпить чай", Call("UseDrinkItem", "energy_tea_001")))
+            current_action_items.append(MenuItem("Выпить чаю", Call("UseDrinkItem", "energy_tea_001")))
 
     def player_card_extra_item_actions(item_id):
         _item_id = str(item_id or "").strip()
@@ -322,6 +332,10 @@ init python:
             lines.append("Рядом с вами держится верный пес, и вместе с ним вы чувствуете себя в лесу заметно увереннее.")
         lines.extend(player_card_equipment_lines())
         lines.extend(player_card_dress_lines())
+        try:
+            lines.extend(player_body_state_lines())
+        except Exception:
+            pass
         if str(EquippedWeapon or "").strip() != "":
             lines.append("Вооружение: %s." % player_card_inventory_menu_caption(EquippedWeapon))
         else:
@@ -1114,7 +1128,9 @@ label PlayerCardShareToFixedTargetMenu(char_name=""):
     $ player_card_begin_fixed_target_social_menu("Поделиться", _char_name, "Чем вы хотите поделиться с {}?".format(_action_display_name(_char_name)))
     python:
         for _item_id in list(player_card_shareable_item_ids() or []):
-            current_action_items.append(MenuItem(player_card_inventory_menu_caption(_item_id), Call("PlayerCardShareItemTo", _item_id, _char_name)))
+            _share_allowed, _share_reason = relationship_social_action_allowed(_char_name, "share", _item_id)
+            if _share_allowed:
+                current_action_items.append(MenuItem(player_card_inventory_menu_caption(_item_id), Call("PlayerCardShareItemTo", _item_id, _char_name)))
         if len(current_action_items) <= 0:
             MainTxt = "Сейчас вам нечем делиться с {}.".format(_action_display_name(_char_name))
             CurLocDesc = MainTxt
@@ -1142,7 +1158,8 @@ label PlayerCardGiftToFixedTargetMenu(char_name=""):
         $ player_card_return_to_active_talk()
         return
     $ player_card_begin_fixed_target_social_menu("Подарок", _char_name, "Что вы хотите подарить {}?".format(_action_display_name(_char_name)))
-    $ _gift_menu_allowed, _gift_menu_reason = relationship_social_action_allowed(_char_name, "gift")
+    $ _gift_menu_allowed = relationship_any_gift_allowed(_char_name)
+    $ _gift_reason_allowed, _gift_menu_reason = relationship_social_action_allowed(_char_name, "gift")
     if not bool(_gift_menu_allowed):
         $ MainTxt = str(_gift_menu_reason or relationship_block_text(_char_name, "gift"))
         $ CurLocDesc = MainTxt
@@ -1150,7 +1167,9 @@ label PlayerCardGiftToFixedTargetMenu(char_name=""):
         return
     python:
         for _item_id in list(player_card_giftable_item_ids() or []):
-            current_action_items.append(MenuItem(player_card_inventory_menu_caption(_item_id), Call("PlayerCardGiftItemTo", _item_id, _char_name)))
+            _item_gift_allowed, _item_gift_reason = relationship_social_action_allowed(_char_name, "gift", _item_id)
+            if _item_gift_allowed:
+                current_action_items.append(MenuItem(player_card_inventory_menu_caption(_item_id), Call("PlayerCardGiftItemTo", _item_id, _char_name)))
         if len(current_action_items) <= 0:
             MainTxt = "{} пока нечего вручить.".format(_action_display_name(_char_name))
             CurLocDesc = MainTxt

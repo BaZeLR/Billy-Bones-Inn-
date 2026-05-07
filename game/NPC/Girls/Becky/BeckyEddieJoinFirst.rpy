@@ -97,10 +97,7 @@ label BeckyEddieJoinFirst_EddieFailureCode:
     call SlutFriendsIncrease("becky", 0, 0, 0, 35, 1, -1)
     "Вы и миссис Блэнкеншип находитесь в ее спальне."
     call ShowImage("becky", "sexeddie", "eddiespy")
-    if renpy.has_label("AddCleanScreen"):
-        call AddCleanScreen
-    elif renpy.has_label("add_clean_screen"):
-        call add_clean_screen
+    
     return
 
 

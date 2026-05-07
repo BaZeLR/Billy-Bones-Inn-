@@ -11,52 +11,111 @@ init python:
 
     def irma_default_portrait_path():
         return irma_pick_image_path(
-            "images/irma/Irma_portrait.png",
+            "images/irma/portraits/portrait1.png",
             "images/irma/portraits/portrait1.jpg",
+            "images/irma/Irma_portrait.png",
         )
 
     def irma_card_portrait_path():
         if int(Friends.get("irma", 0) or 0) >= 5:
             return irma_pick_image_path(
+                "images/irma/portraits/portrait2.png",
+                "images/irma/portraits/portrait2.jpg",
+                "images/irma/portraits/portrait3.png",
                 "images/irma/Irma_sitting _portrait.png",
                 "images/irma/Irma_portrait.png",
-                "images/irma/portraits/portrait2.jpg",
             )
         return irma_default_portrait_path()
 
     def irma_working_picture_path():
         return irma_pick_image_path(
+            "images/irma/portraits/portrait1.png",
+            "images/irma/portraits/portrait1.jpg",
+            "images/irma/talks.png",
             "images/irma/Irma_working_portrait.png",
             "images/irma/Irma_portrait.png",
-            "images/irma/portraits/portrait1.jpg",
         )
 
     def irma_talk_picture_path():
         return irma_pick_image_path(
+            "images/irma/talks.png",
             "images/irma/Irma_talks.png",
             "images/irma/Irma_portrait.png",
+            "images/irma/portraits/portrait1.png",
             "images/irma/portraits/portrait1.jpg",
         )
 
     def irma_measuring_picture_path():
         return irma_pick_image_path(
+            "images/irma/measure/measure0.png",
             "images/irma/Irma_mesure_standing.png",
             "images/irma/irma_measuring.png",
             "images/irma/Irma_working_portrait.png",
+            "images/irma/portraits/portrait1.png",
             "images/irma/portraits/portrait1.jpg",
+        )
+
+    def irma_measure_picture_path(stage=0):
+        try:
+            stage_id = int(stage or 0)
+        except Exception:
+            stage_id = 0
+        stage_id = max(0, min(stage_id, 3))
+        return irma_pick_image_path(
+            "images/irma/measure/measure" + str(stage_id) + ".png",
+            "images/irma/measure/measure" + str(stage_id) + ".jpg",
+            "images/irma/tailor_measures_" + str(stage_id) + ".jpg",
+            irma_measuring_picture_path(),
         )
 
     def irma_flirting_picture_path():
         return irma_pick_image_path(
+            "images/irma/flirts.png",
             "images/irma/Irma_flirting pose.png",
+            "images/irma/talks.png",
             "images/irma/Irma_talks.png",
             "images/irma/portraits/smile.jpg",
             "images/irma/portraits/portrait2.jpg",
         )
 
+    def irma_sex_picture_path(stage=0):
+        try:
+            stage_id = int(stage or 0)
+        except Exception:
+            stage_id = 0
+        return irma_pick_image_path(
+            "images/irma/sex/sex" + str(stage_id) + ".png",
+            "images/irma/sex/sex" + str(stage_id) + ".jpg",
+            "images/irma/sex/topless.jpg",
+            irma_flirting_picture_path(),
+        )
+
+    def irma_clara_fitting_picture_path(stage=0):
+        try:
+            stage_id = int(stage or 0)
+        except Exception:
+            stage_id = 0
+        return irma_pick_image_path(
+            "images/irma/clara_visit/tailorShop_clara" + ("_" + str(stage_id) if stage_id > 0 else "") + ".png",
+            "images/irma/clara_visit/tailor_shop_clara_" + str(stage_id) + ".png",
+            "images/irma/clara_visit/tailorShop_clara.png",
+            "images/irma/clara_visit/tailorShop_clara_1.png",
+            irma_working_picture_path(),
+        )
+
+    def irma_shop_end_picture_path():
+        return irma_pick_image_path(
+            "images/irma/flirts.png",
+            "images/irma/talks.png",
+            "images/irma/portraits/smile.jpg",
+            "images/irma/portraits/portrait2.png",
+            irma_working_picture_path(),
+        )
+
     def irma_angry_picture_path():
         return irma_pick_image_path(
             "images/irma/portraits/angry.jpg",
+            "images/irma/talks.png",
             "images/irma/Irma_talks.png",
             "images/irma/Irma_portrait.png",
             "images/irma/portraits/portrait1.jpg",

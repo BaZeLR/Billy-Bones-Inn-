@@ -10,7 +10,6 @@ label IntIngaTalk(show_menu=True):
             call ShowImage("", "", _inga_talk_picture)
 
     if not bool(show_menu):
-        call CleanScreenOverflow(3)
         call GirlsDesc("inga")
         return
 

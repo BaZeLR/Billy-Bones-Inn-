@@ -18,14 +18,7 @@ label IntAmandaTalkRefresh(girl_name="amanda"):
     $ current_action_content = None
     $ current_action_items = []
     $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
-    if social_has_visible_topics(girl_name, "talk"):
-        $ current_action_items.append(MenuItem("Поговорить о...", Function(main_ui_call_label, "SocialTalkTopicMenu", girl_name, "talk", "IntAmandaTalkRefresh")))
-    if social_has_visible_topics(girl_name, "flirt") and family_social_threshold_met(girl_name, "flirt"):
-        $ current_action_items.append(MenuItem("Флиртовать...", Function(main_ui_call_label, "SocialTalkTopicMenu", girl_name, "flirt", "IntAmandaTalkRefresh")))
-    if GiftedToday.get(girl_name, 0) == 0 and family_social_threshold_met(girl_name, "gift"):
-        $ current_action_items.append(MenuItem("Подарить что-нибудь", Function(main_ui_call_label, "PlayerCardGiftToFixedTargetMenu", girl_name)))
-        if player_card_has_shareable_items() and family_social_threshold_met(girl_name, "share"):
-            $ current_action_items.append(MenuItem("Поделиться угощением", Function(main_ui_call_label, "PlayerCardShareToFixedTargetMenu", girl_name)))
+    $ current_action_items.extend(social_core_action_items(girl_name, "IntAmandaTalkRefresh"))
     $ _legare_text = "Запретить ей %s с месье Легаре" % ("гулять" if virginity.get("amanda", 0) else "трахаться")
     $ _can_dress_change = amanda_dress_change_has_options(girl_name)
 

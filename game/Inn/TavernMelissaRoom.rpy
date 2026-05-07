@@ -17,7 +17,14 @@ init 6 python:
         return str(getLocation("clara") or "") == "TavernMelissaRoom" and melissa_bats_stage() >= 8
 
     def tavern_melissa_room_locked_from_inside():
-        return tavern_melissa_room_clara_visit_active()
+        if not tavern_melissa_room_clara_visit_active():
+            return False
+        try:
+            if story_event_available("TavernMelissaRoom", "clara_paintings"):
+                return False
+        except Exception:
+            pass
+        return True
 
     def tavern_melissa_room_register_clara_visit():
         if not tavern_melissa_room_clara_visit_active():
@@ -136,6 +143,7 @@ label TavernMelissaRoom:
             call screen main_ui
             $ _melissa_locked_ui_return = _return
         jump TavernMelissaRoom
+    call RoomEnterEventGate(CurLoc, False)
     $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
     $ _melissa_room_notice = household_room_issue_notice_text("melissa")
     if str(_melissa_room_notice or "").strip() != "":

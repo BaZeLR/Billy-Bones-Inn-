@@ -54,18 +54,20 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
     label int_liza_sex_menu:
         python:
             if isinstance(cametoday, (int, float)):
-                _cametoday = cametoday
+                _cametoday = int(cametoday)
             elif isinstance(cametoday, dict):
-                _cametoday = cametoday.get("You", cametoday.get("you", 0))
+                _cametoday = int(cametoday.get("You", cametoday.get("you", 0)) or 0)
             else:
                 _cametoday = 0
 
             if isinstance(cancumdaily, (int, float)):
                 _cancumdaily = int(cancumdaily)
             elif isinstance(cancumdaily, dict):
-                _cancumdaily = cancumdaily.get("You", cancumdaily.get("you", 1))
+                _cancumdaily = int(cancumdaily.get("You", cancumdaily.get("you", 1)) or 1)
             else:
                 _cancumdaily = 1
+            _player_ready_to_cum = int(Arousal.get("You", Arousal.get("you", 0)) or 0) >= 100
+            _can_player_cum = _cametoday < _cancumdaily or _player_ready_to_cum
 
             _sex_ctx = "sextraktir" if GirlLocILSS == "tavern" else "sexstreet"
 
@@ -197,7 +199,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         call ShowImage(GirlNameILSS, "sexstreet", "lick" + str(renpy.random.randint(1, 3)))
                 jump int_liza_sex_menu
 
-            "Предложить отсосать" if _cametoday < _cancumdaily and SomebodyCums == 0:
+            "Предложить отсосать" if _can_player_cum and SomebodyCums == 0:
                 if CockInMouth.get(GirlNameILSS, 0):
                     "[RealName.get(GirlNameILSS, GirlNameILSS)] сидит перед вами на коленках и продолжает "
                 else:
@@ -227,7 +229,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         call ShowImage(GirlNameILSS, "sexstreet", "minet" + str(renpy.random.randint(1, 3)))
                 jump int_liza_sex_menu
 
-            "Трахать" if _cametoday < _cancumdaily and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and Arousal.get(GirlNameILSS, 0) >= 20 and PussyVisible.get(GirlNameILSS, 0):
+            "Трахать" if _can_player_cum and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and Arousal.get(GirlNameILSS, 0) >= 20 and PussyVisible.get(GirlNameILSS, 0):
                 if pregnancy.get(GirlNameILSS, 0) < 130:
                     if CockInPussy.get(GirlNameILSS, 0) == 0:
                         "Вы впились в губы девушки и насадили ее на вздыбленный член."
@@ -267,7 +269,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                 call ShowCurrentSex(GirlNameILSS)
                 jump int_liza_sex_menu
 
-            "Кончить в ротик" if _cametoday < _cancumdaily and Arousal.get("You", 0) >= 100 and (CockInMouth.get(GirlNameILSS, 0) or CockInTits.get(GirlNameILSS, 0)):
+            "Кончить в ротик" if _can_player_cum and Arousal.get("You", 0) >= 100 and (CockInMouth.get(GirlNameILSS, 0) or CockInTits.get(GirlNameILSS, 0)):
                 "Вы прижали голову мулатки к себе и разрядились ей в рот, залив горло и подбородок семенем."
                 $ Arousal["You"] = 0
                 if renpy.has_label("PregnancyCheck"):
@@ -282,7 +284,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         call ShowImage(GirlNameILSS, "sexstreet", "cummouth")
                 jump int_liza_sex_menu
 
-            "Кончить на лицо" if _cametoday < _cancumdaily and Arousal.get("You", 0) >= 100:
+            "Кончить на лицо" if _can_player_cum and Arousal.get("You", 0) >= 100:
                 "Вы вытащили член и несколькими струями залили лицо девушки."
                 $ Arousal["You"] = 0
                 if renpy.has_label("PregnancyCheck"):
@@ -294,7 +296,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                     call ShowImage(GirlNameILSS, "sexstreet", "cumface")
                 jump int_liza_sex_menu
 
-            "Кончить на груди" if _cametoday < _cancumdaily and Arousal.get("You", 0) >= 100 and TitsVisible.get(GirlNameILSS, 0):
+            "Кончить на груди" if _can_player_cum and Arousal.get("You", 0) >= 100 and TitsVisible.get(GirlNameILSS, 0):
                 "Вы вытащили член и залили спермой ее маленькие грудки."
                 $ Arousal["You"] = 0
                 if renpy.has_label("PregnancyCheck"):
@@ -306,7 +308,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                     call ShowImage(GirlNameILSS, "sexstreet", "cumtits")
                 jump int_liza_sex_menu
 
-            "Кончить внутрь" if _cametoday < _cancumdaily and Arousal.get("You", 0) >= 100 and CockInPussy.get(GirlNameILSS, 0):
+            "Кончить внутрь" if _can_player_cum and Arousal.get("You", 0) >= 100 and CockInPussy.get(GirlNameILSS, 0):
                 if sluttiness.get(GirlNameILSS, 0) < 50 and pregnancy.get(GirlNameILSS, 0) < 120:
                     "Вы проигнорировали просьбу и начали заливать ее киску семенем."
                     "\"Дяденька Стефан, и вы тоже меня не послушали!\" — обреченно проговорила девушка."

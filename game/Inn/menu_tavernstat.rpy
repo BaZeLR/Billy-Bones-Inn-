@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default HouseholdMorningState = {}
 
@@ -160,26 +160,31 @@ init python:
         return int(player_recent_sex_count(2) or 0) > 2
 
     def household_breakfast_attendee_ids():
-        attendees = []
-        for npc_id in ("sandra", "melissa", "amanda", "becky"):
-            if npc_id == "becky":
-                if str(getLocation(npc_id) or "") != "TavernKitchen":
-                    continue
-                attendees.append(npc_id)
-                continue
-            if household_morning_issue_type(npc_id) in ("sick", "sleepy"):
-                continue
-            if int(week or 0) != 7 and int(time or 0) == 0 and int(hour or 0) < 12:
-                attendees.append(npc_id)
-                continue
-            if str(getLocation(npc_id) or "") != "TavernKitchen":
-                continue
-            attendees.append(npc_id)
-        return attendees
+        if bool(TavernBreakfastEventActive) and isinstance(TavernBreakfastPresentIds, list):
+            return [str(row or "").strip().lower() for row in list(TavernBreakfastPresentIds or []) if str(row or "").strip()]
+
+        try:
+            visible_ids = set([str(row or "").strip().lower() for row in list(getNPCids("TavernKitchen") or [])])
+        except Exception:
+            visible_ids = set()
+            for npc_id in ("sandra", "melissa", "amanda", "becky"):
+                if str(getLocation(npc_id) or "") == "TavernKitchen":
+                    visible_ids.add(npc_id)
+
+        return [npc_id for npc_id in ("sandra", "melissa", "amanda", "becky") if npc_id in visible_ids]
 
     def household_breakfast_absence_lines():
         lines = []
+        absent_ids = set()
+        try:
+            absent_ids = set(tavern_breakfast_absent_ids() or [])
+        except Exception:
+            absent_ids = set()
         for npc_id in ("sandra", "melissa", "amanda"):
+            if absent_ids and npc_id not in absent_ids:
+                continue
+            if str(getLocation(npc_id) or "") == "TavernKitchen":
+                continue
             npc_name = _tavern_name(npc_id)
             issue_code = household_morning_issue_type(npc_id)
             if issue_code == "sick":
@@ -343,6 +348,8 @@ init python:
                     return "TavernEmptyRoom"
             except Exception:
                 pass
+        if explicit_loc == "TavernKitchen" and slot == 0 and _tavern_int(hour, 8) < 12:
+            return explicit_loc
         morning_issue = household_morning_issue_type(key, slot, hour)
         if morning_issue in ("sick", "sleepy"):
             return _tavern_private_room(key)
@@ -586,16 +593,16 @@ init python:
                 total += 1
         return total
 
-    def _tavern_can_toggle_hall_job(job_dict, person, max_slots=2):
+    def _tavern_can_toggle_hall_job(job_dict, person, max_slots=3):
         current = _tavern_int(job_dict.get(person, 0), 0)
         if current != 0:
             return True
-        return _tavern_job_load(job_dict) < _tavern_int(max_slots, 2)
+        return _tavern_job_load(job_dict) < _tavern_int(max_slots, 3)
 
-    def toggle_hall_job_with_limit(job_dict, person, max_slots=2):
+    def toggle_hall_job_with_limit(job_dict, person, max_slots=3):
         """
         Переключает назначение на завтра по работе в зале с лимитом слотов.
-        По умолчанию лимит = 2 человека на позицию.
+        По умолчанию лимит = 3 человека на позицию.
         """
         if not isinstance(job_dict, dict) or not person:
             return
@@ -606,8 +613,8 @@ init python:
             _tavern_restart_interaction()
             return
 
-        if _tavern_job_load(job_dict) >= _tavern_int(max_slots, 2):
-            renpy.notify("Лимит: %d/%d на этой позиции." % (_tavern_job_load(job_dict), _tavern_int(max_slots, 2)))
+        if _tavern_job_load(job_dict) >= _tavern_int(max_slots, 3):
+            renpy.notify("Лимит: %d/%d на этой позиции." % (_tavern_job_load(job_dict), _tavern_int(max_slots, 3)))
             return
 
         job_dict[person] = 1
@@ -711,7 +718,7 @@ init python:
             lines.append("У глорихола трудится: %s" % report["gloryhole_list"])
 
         lines.extend([
-            "Слоты на завтра: кухня %d/2, уборка %d/2, обслуживание %d/2." % (
+            "Слоты на завтра: кухня %d/3, уборка %d/3, обслуживание %d/3." % (
                 report["kitchen_slots"],
                 report["cleaning_slots"],
                 report["waitress_slots"],

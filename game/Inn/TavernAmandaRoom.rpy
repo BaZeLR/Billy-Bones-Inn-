@@ -257,7 +257,7 @@ label TavernAmandaRoom:
             call screen main_ui
             $ _amanda_locked_ui_return = _return
         jump TavernAmandaRoom
-    call CheckDailyEvent("", "_story_enter", CurLoc, time)
+    call RoomEnterEventGate(CurLoc, False)
     if story_event_available(CurLoc, "melissa_bats"):
         call checkTriggers(CurLoc, "melissa_bats", 0)
     $ _amanda_room_picture = tavern_amanda_room_picture(tmpSleepDress)
@@ -271,6 +271,8 @@ label TavernAmandaRoom:
         call DressForNight("amanda", tmpSleepDress)
     $ MainTxt = tavern_amanda_room_main_text(_room, tmpSleepDress)
     $ CurLocDesc = MainTxt
+    if bool(AmandaAIIntegrationEnabled):
+        call AmandaMiniEventTry(CurLoc, "room")
     call TavernAmandaRoomBuildActions
     $ _amanda_room_ui_return = None
     while _amanda_room_ui_return is None:
@@ -426,7 +428,7 @@ label TavernAmandaRoomGropeAction:
             $ tmpSexType = 2
         if sluttiness['amanda'] >= 30:
             $ tmpSexType = 2
-    call AddCleanScreen
+    
     if tmpGropeReact == 1:
         "Проснувшаяся от вашего поцелуя Аманда не казалась через чур уж обескураженной вашим пылом. Тем не менее она все-таки оттолкнула вас, прошептав: 'Стефан, ты что?'"
         python:
@@ -458,13 +460,13 @@ label TavernAmandaRoomGropeAction:
         call SlutFriendsIncrease('amanda', 5, 1, -1, 0, 0, 0)
         jump TavernMain
     elif tmpGropeReact == 3:
-        call CleanScreenOverflow
+        
         "Аманда, почувствовав ваши прикосновения, раскрыла глаза. 'Ага, хозяин, явился не запылился,' легко разобралась она в ситуации. Однако последующая ее речь вас не сильно обрадовала: 'Значит днем, на людях, ты меня ругаешь, шлюхой походя обзываешь, учишь духовности и целомудрию. А ночью приперся в мою комнату? И зачем приперся? Стихи читать или цены на базаре обсудить? Что-то мне подсказывает что нет,' решительно обличила ваши грязные помыслы Аманда."
         call CodeAmandaListScold
         "Крыть ее аргументы вам было нечем, но вы все-таки решили попробовать: 'Амандочка, послушай, все совсем не так, на самом деле....'\n'На самом деле что?' и, воспользовавшись тем, что сразу вы не нашлись с ответом, она продолжила: \n-'Нет, это ты меня послушай! Либо ты сейчас берешь свои слова обратно, либо же ты, такой весь из себя правильный, идешь себе восвояси, будем считать что ты приходил проверять не дует ли из окна.'"
         call CodeAmandaSorryChoices
     elif tmpGropeReact == 4:
-        call CleanScreenOverflow
+        
         "Ваш поцелуй ничуть не обескуражил Аманду. Проснувшись и поняв, что это вы, она не замедлила вернуть вам ваш отнюдь не монашеский поцелуй. И не просто вернуть, а вернуть с душой, чувством и языком."
         call CodeAmandaSexStart
     else:

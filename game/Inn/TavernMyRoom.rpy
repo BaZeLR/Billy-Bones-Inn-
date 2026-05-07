@@ -1,16 +1,31 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE: THE STRUCTURE, THE MECHANICS. THE WORDING OF CODE BASE FILE WITHOUT EXPLICIT PERMISSION IN in your request for a change, YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     def tavern_my_room_dress_short_name(dress_code=""):
         code = str(dress_code or "").strip()
-        names = globals().get("ShortDressName", {}) or {}
+        try:
+            names = ShortDressName
+        except Exception:
+            names = {}
+        if not isinstance(names, dict):
+            names = {}
         return str(names.get(code, code) or code).lower()
 
     def tavern_my_room_dress_full_desc(dress_code=""):
         code = str(dress_code or "").strip()
-        full_descs = globals().get("FullDressDesc", {}) or {}
-        descs = globals().get("DressDesc", {}) or {}
+        try:
+            full_descs = FullDressDesc
+        except Exception:
+            full_descs = {}
+        try:
+            descs = DressDesc
+        except Exception:
+            descs = {}
+        if not isinstance(full_descs, dict):
+            full_descs = {}
+        if not isinstance(descs, dict):
+            descs = {}
         return str(full_descs.get(code, descs.get(code, "")) or "").strip()
 
     TavernMyRoomRoom = Room(
@@ -63,6 +78,9 @@ init python:
         return str(TavernMyRoomRoom.bg_picture or "")
 
     def tavern_my_room_dynamic_picture():
+        if "amanda" in list(getNPCids("TavernMyRoom") or []):
+            if renpy.loadable("images/amanda/mc_room_exposure.png"):
+                return "images/amanda/mc_room_exposure.png"
         if tavern_my_room_has_floor_item("rusty_hunter_rifle_001"):
             if renpy.loadable("images/tavern/myroom/rifle.png"):
                 return "images/tavern/myroom/rifle.png"
@@ -99,6 +117,12 @@ init python:
         werecat_text = werecat_visible_text("TavernMyRoom")
         if str(werecat_text or "").strip():
             extra_rows.append(str(werecat_text or "").strip())
+        if "amanda" in list(getNPCids("TavernMyRoom") or []):
+            extra_rows.append("Аманда сейчас в вашей комнате.")
+        if int(PlayerRoomLightClosed or 0) == 1:
+            extra_rows.append("В комнате погашен свет, и все кажется теснее и личнее.")
+        if str(PlayerWakeStateNotice or "").strip() and int(PlayerMorningArousalDay or -1) == int(dayspassed or 0):
+            extra_rows.append(str(PlayerWakeStateNotice or ""))
 
         if len(extra_rows) > 0:
             return base_text + "\n" + "\n".join(extra_rows)
@@ -114,13 +138,15 @@ label TavernMyRoom:
     $ CurrentRoom = TavernMyRoomRoom
     $ CurLoc = "TavernMyRoom"
     $ location = CurLoc
-    call CheckDailyEvent("", "_story_enter", CurLoc, time)
+    call RoomEnterEventGate(CurLoc, False)
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
     $ current_girl_key = ""
     $ current_object_id = ""
     call LOC("TavernMyRoom")
+    $ player_apply_morning_state("TavernMyRoom")
+    $ _amanda_ai_room_intent = amanda_ai_room_intent_code("TavernMyRoom", True) if bool(globals().get("AmandaAIIntegrationEnabled", False)) and "amanda_ai_room_intent_code" in globals() else ""
     $ _my_room_picture, _my_room_text = tavern_my_room_scene_state()
     $ scene_image = _my_room_picture or None
     if _my_room_picture:
@@ -128,6 +154,8 @@ label TavernMyRoom:
     $ MainTxt = _my_room_text
     $ CurLocDesc = _my_room_text
     $ CurrentRoom.mark_visited()
+    if bool(AmandaAIIntegrationEnabled):
+        call AmandaMiniEventTry(CurLoc, "room")
     call TavernMyRoomBuildActions
     $ _my_room_ui_return = None
     while _my_room_ui_return is None:
@@ -149,12 +177,14 @@ label TavernMyRoomBuildActions:
     $ current_action_items = list(room_menu["movement"])
     if tavern_my_room_can_go_forest():
         $ current_action_items.append(MenuItem("Идти в лес", Call("TravelToForest", "TavernMyRoom")))
-    if dog_is_available_here("TavernMyRoom"):
-        $ current_action_items.append(MenuItem(dog_room_action_caption("TavernMyRoom"), Call("IntDogTalk", "TavernMyRoom")))
     if werecat_is_in_room("TavernMyRoom"):
         $ current_action_items.append(MenuItem(werecat_action_caption("TavernMyRoom"), Call("IntWerecatTalk", "TavernMyRoom")))
+    if int(PlayerRoomLightClosed or 0) == 0:
+        $ current_action_items.append(MenuItem("Погасить свет", Call("TavernMyRoomToggleLight", 1)))
+    else:
+        $ current_action_items.append(MenuItem("Зажечь свет", Call("TavernMyRoomToggleLight", 0)))
     python:
-        for _room_item_id in ("recipe_book_001", "rusty_hunter_rifle_001", "old_leather_cuirass_001"):
+        for _room_item_id in ("rusty_hunter_rifle_001", "old_leather_cuirass_001"):
             if _room_has_item_by_id(TavernMyRoomRoom, _room_item_id):
                 _room_item_obj = get_game_item(_room_item_id, TavernMyRoomRoom)
                 if _room_item_obj is not None:
@@ -256,6 +286,7 @@ label TavernMyRoomTakeFloorItem(item_id=""):
 
 label TavernMyRoomOpenChest(preserve_text=False):
     $ _room_object = tavern_my_room_get_object("chest_001")
+    $ player_ensure_nightwear_in_chest()
     if _room_object is not None:
         $ _room_object.state["open"] = 1
     if not bool(preserve_text):
@@ -285,6 +316,12 @@ label TavernMyRoomOpenChest(preserve_text=False):
                         current_action_items.append(MenuItem("Порвать " + _short + " на лоскуты", Call("TavernMyRoomTearDressToCloth", _dress)))
                 else:
                     current_action_items.append(MenuItem("Снять " + _short, Call("TavernMyRoomRemoveDress", _dress)))
+        if not player_is_in_nightwear():
+            current_action_items.append(MenuItem("Надеть ночную рубашку", Call("TavernMyRoomSetSleepLayer", "nightwear")))
+        if not player_is_naked():
+            current_action_items.append(MenuItem("Раздеться для сна", Call("TavernMyRoomSetSleepLayer", "nothing")))
+        if player_is_naked() or player_is_in_nightwear():
+            current_action_items.append(MenuItem("Надеть дневную одежду", Call("TavernMyRoomSetSleepLayer", "daywear")))
     $ current_action_items.append(MenuItem("Закрыть ларь", Call("TavernMyRoomCloseChest")))
     $ renpy.restart_interaction()
     return
@@ -300,7 +337,34 @@ label TavernMyRoomCloseChest:
 
 
 label TavernMyRoomSleepAction:
+    if str(PlayerSleepBottomLayer or "") == "daywear":
+        $ player_set_sleep_layer("nightwear")
     call Sleep("TavernMyRoom", 1, "Вы ложитесь на кровать и быстро проваливаетесь в сон.", "TavernMyRoom", "bed_001")
+
+
+label TavernMyRoomToggleLight(closed=1):
+    $ PlayerRoomLightClosed = 1 if int(closed or 0) == 1 else 0
+    if int(PlayerRoomLightClosed or 0) == 1:
+        $ player_apply_arousal_trigger("light_closed", 8)
+        $ MainTxt = "Вы гасите свет. Комната сразу становится тише, темнее и слишком подходящей для мыслей, которые днем проще отогнать."
+    else:
+        $ MainTxt = "Вы снова зажигаете свет."
+    $ CurLocDesc = MainTxt
+    call TavernMyRoomBuildActions
+    return
+
+
+label TavernMyRoomSetSleepLayer(mode="daywear"):
+    $ _sleep_mode = player_set_sleep_layer(mode)
+    if _sleep_mode == "nightwear":
+        $ MainTxt = "Вы надеваете ночную рубашку из ларя. Для сна этого достаточно."
+    elif _sleep_mode == "nothing":
+        $ MainTxt = "Вы снимаете одежду и оставляете ее в ларе. Для сна так удобно, но дальше второго этажа в таком виде идти нельзя."
+    else:
+        $ MainTxt = "Вы приводите себя в порядок и надеваете дневную одежду."
+    $ CurLocDesc = MainTxt
+    call TavernMyRoomOpenChest(True)
+    return
 
 
 label TavernMyRoomTableMenu:

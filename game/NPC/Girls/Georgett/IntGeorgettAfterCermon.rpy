@@ -68,6 +68,6 @@ label AfterCermonGeorgett:
     $ CurLocDesc = MainTxt
     call ShowImage("georgett", "ispoved", "ispovedstep4")
     $ ChurchAfterCermon[GirlNameAC] = 4
-    $ current_action_items.append(MenuItem("Вернуться", Call("AdvanceTime", "Church")))
+    $ current_action_items.append(MenuItem("Вернуться", Function(main_ui_call_label, "AdvanceTimeAndRestore", "ChurchRestore")))
     $ renpy.restart_interaction()
     return

@@ -24,7 +24,7 @@ init python:
     def _dtes_mandatory_event_allowed(event_code, room_code=""):
         code = str(event_code or "")
         if code == "WineForDance":
-            return str(getLocation("sandra") or "") == str(room_code or CurLoc or "")
+            return str(room_code or CurLoc or "") == "TavernKitchen"
         return True
 
     def tavern_event_pop_code(time_period, require_room_match=False, room_code=""):

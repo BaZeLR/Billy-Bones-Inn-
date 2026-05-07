@@ -33,7 +33,7 @@ label AmandaAtGloryHole_menu:
             jump AmandaAtGloryHole_menu
 
         "Отругать" if AmandaGloryCurState <= 2 or AmandaGloryCurState == 4:
-            call CleanScreenOverflow
+            
             if AmandaVar.get("gloryscold", 0) or AmandaVar.get("prohibitliza", 0):
                 "Ах ты шлюха! Я тебе что, непонятно объяснил чтобы ты с Лизкой не шарилась? У тебя мозги вообще есть, шмакодявка тупая?! Или у тебя в одно ухо влетело, в другое вылетело?"
             else:
@@ -65,13 +65,13 @@ label AmandaAtGloryHole_menu:
             jump TavernMain
 
         "Развернуться и уйти, ничего не говоря" if AmandaGloryCurState <= 2 or AmandaGloryCurState == 4:
-            call CleanScreenOverflow
+            
             $ CumFaceYou["amanda"] = 0
             $ AmandaVar["glorywalkout"] = 1
             jump TavernMain
 
         "Предложить ей сделать то, что она собиралась" if AmandaGloryCurState <= 2 or AmandaGloryCurState == 4:
-            call CleanScreenOverflow
+            
             if AmandaVar.get("glorysuck", 0) or AmandaVar.get("suckyou", 0):
                 "\"Ах, Амандочка,\" сказали вы, \"если ты уж так настроенна сделать минет, то начинай, тебе же не в первой!\""
             else:
@@ -104,7 +104,7 @@ label AmandaAtGloryHole_menu:
             jump AmandaAtGloryHole_menu
 
         "Предложить ей продолжить" if AmandaGloryCurState == 1:
-            call CleanScreenOverflow
+            
             "\"Ах, Аманда, Аманда,\" сказали вы. \"Это ведь ты только что у меня отсасывала? Так что же ты остановилась, продолжай же!\" С этими словами вы придвинули свой член, на котором уже блестели капли слюны Аманды к ее губкам."
             if sexacts.get("amanda", 0) < 15:
                 "В ее глазах мелькнуло сомнение, испуг, стыд, но в следующую секунду это все сменилось выражением решимости. Аманда опять заглотила ваш член и, постепенно распаляясь, продолжила делать вам минет."
@@ -127,7 +127,7 @@ label AmandaAtGloryHole_menu:
             jump AmandaAtGloryHole_menu
 
         "Кончить на лицо" if AmandaGloryCurState == 2:
-            call CleanScreenOverflow
+            
             "Перед самым оргазмом вы вытащили член изо рта Аманды и кончили ей на лицо. Крупные белые капли потекли по ее щечкам и подбородку, одна струйка попала ей в левый глаз, отчего она зажмурилась, а пара капель осталась в ее белокурых локонах."
             "Лизетта, которая надрачивала себя глядя на вас, подскочила, слизала несколько капель с лица Аманды, сказав \"ням-ням\"."
             if sluttiness.get("amanda", 0) >= 40 and sexacts.get("amanda", 0) > 10:
@@ -141,7 +141,7 @@ label AmandaAtGloryHole_menu:
             jump AmandaAtGloryHole_menu
 
         "Кончить в рот" if AmandaGloryCurState == 3:
-            call CleanScreenOverflow
+            
             "Вы и не подумали вытащить член изо рта Аманды когда начали кончать."
             if sluttiness.get("amanda", 0) >= 40 or sexacts.get("amanda", 0) > 12:
                 "Впрочем, врасплох вы ее не застали, Аманда без смущения и с готовностью приняла вашу кончину."
@@ -161,7 +161,7 @@ label AmandaAtGloryHole_menu:
             jump AmandaAtGloryHole_menu
 
         "Поцеловать Аманду" if AmandaGloryCurState == 4:
-            call CleanScreenOverflow
+            
             "Не говоря ни слова, вы наклонились и поцеловали Аманду, чувствуя на ее губах и языке привкус собственной спермы. Аманда с радостью ответила на ваш поцелуй, переплетя ваш язык своим. Продолжая целоваться вы вдруг почуствовали жаркий ротик Лизетты на своем обмякшем было члене. Поцелуи Аманды и лизеттин ротик начали быстро приводить вас обратно в полную готовность."
             $ AmandaGloryCurState = 5
             $ AmandaVar["gloryyouknow"] = 1
@@ -171,7 +171,7 @@ label AmandaAtGloryHole_menu:
             jump AmandaAtGloryHole_menu
 
         "Поблагодарить Аманду" if AmandaGloryCurState == 4:
-            call CleanScreenOverflow
+            
             "Вы пылко поблагодарили Аманду, сказав что вам было очень приятно и вы ей очень признательны. Аманда зарделась, пробормотала \"Я тоже люблю тебя, Стефанчик\" и убежала."
             call SlutFriendsIncrease("amanda", 15, 1, 1, 0, 0, 0)
             $ CumFaceYou["amanda"] = 0
@@ -182,7 +182,7 @@ label AmandaAtGloryHole_menu:
             jump TavernMain
 
         "Трахнуть Аманду" if AmandaGloryCurState == 4 or AmandaGloryCurState == 5:
-            call CleanScreenOverflow
+            
             if virginity.get("amanda", 0):
                 "Преодолев слабое сопротивление вы уложили Аманду на лавочку. Она поняла, что сейчас произойдет, но и не подумала возразить, наоборот, сама раздвинула ножки, только сказала: \"Стефанчик, я еще девушка, будь нежным\". Лизетта направила своей рукой ваш стоящий колом член прямо в киску своей подруги. Резкий толчок, вскрик Аманды и вот Аманда уже больше не девочка."
                 "Вы замерли на пару минут, давая ей привыкнуть к вашему члену внутри нее, а потом начали двигаться, постепенно наращивая темп. Вскрики от боли вскоре утихли, сменившись совсем другими ощущениями. Аманда начала стонать все громче и громче, потом закинула свои стройные ножки вам за спину и прижала вас к себе."
@@ -222,7 +222,7 @@ label AmandaAtGloryHole_menu:
             jump AmandaAtGloryHole_menu
 
         "Кончить в Аманду" if AmandaGloryCurState == 6:
-            call CleanScreenOverflow
+            
             "Даже и не подумав вытащить свой член из Аманды вы начали кончать. Струи вашего семени ударили в маточку Аманды, заполняя ее до краев. Когда ваш обмякший член в конце концов вывалился из Аманды, то из влагалища девушки медленно начало вытекать ваше семя."
             if virginity.get("amanda", 0):
                 "Оно перемешалось с ее девственной кровью и собственным соком."
@@ -270,7 +270,6 @@ label AmandaAtGloryHole_menu:
             jump TavernMain
 
         "Кончить на животик" if AmandaGloryCurState == 6:
-            call CleanScreenOverflow
             "Не желая рисковать вы в последний момент вытащили свой член и кончили Аманде на животик. С трудом пришедшая в себя после оргазма Аманда собрала пару капель пальцем."
             if sluttiness.get("amanda", 0) >= 45 and sexacts.get("amanda", 0) > 15:
                 "Она с аппетитом скушала их, похотливо улыбнувшись."

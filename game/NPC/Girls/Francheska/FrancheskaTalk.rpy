@@ -28,14 +28,21 @@ init python:
             return text
 
         # Fallback to direct filesystem read.
-        path = os.path.join(renpy.config.gamedir, "Inn", "FrancheskaTalk.txt")
-        for enc in ("utf-8", "utf-8-sig", "cp1251"):
-            try:
-                with open(path, "r", encoding=enc) as fh:
-                    text = fh.read()
+        root_dir = os.path.dirname(renpy.config.gamedir)
+        for path in (
+            os.path.join(renpy.config.gamedir, "Inn", "FrancheskaTalk.txt"),
+            os.path.join(root_dir, "textLocRef", "FrancheskaTalk.txt"),
+            os.path.join(renpy.config.gamedir, "textLocRef", "FrancheskaTalk.txt"),
+        ):
+            for enc in ("utf-8", "utf-8-sig", "cp1251"):
+                try:
+                    with open(path, "r", encoding=enc) as fh:
+                        text = fh.read()
+                    break
+                except Exception:
+                    text = ""
+            if text:
                 break
-            except Exception:
-                text = ""
         return text
 
     def _fran_normalize_text(raw):
@@ -166,6 +173,38 @@ init python:
         _fran_publish_location_text(second_text, main_text)
         _fran_inc_talk()
 
+    def _fran_show_picture_path(picture_paths):
+        for picture_path in list(picture_paths or []):
+            if renpy.loadable(str(picture_path or "")):
+                ShowImage("", "", str(picture_path or ""))
+                return
+        try:
+            ShowImageSeq("ellona", "", "Fran", 4)
+        except Exception:
+            pass
+
+    def _fran_show_topic_picture(topic_code=""):
+        code = str(topic_code or "")
+        if code == "meet":
+            _fran_show_picture_path(("images/ellona/Fran2.jpg", "images/ellona/Fran1.jpg"))
+            return
+        if code in ("ellona", "grace"):
+            _fran_show_picture_path(("images/ellona/stories.png", "images/ellona/statue1.jpg"))
+            return
+        if code == "grace_more":
+            _fran_show_picture_path(("images/ellona/agla1.jpg", "images/ellona/agla2.jpg", "images/ellona/alga3.jpg"))
+            return
+        if code in ("conchita", "duke", "stark", "state", "king", "rebel"):
+            _fran_show_picture_path(("images/ellona/Fran4.jpg", "images/ellona/Fran2.jpg"))
+            return
+        if code == "alien":
+            _fran_show_picture_path(("images/ellona/aliens.png", "images/ellona/Fran4.jpg"))
+            return
+        if code == "random":
+            _fran_show_picture_path(("images/ellona/Fran4.jpg", "images/ellona/stories.png", "images/ellona/Fran2.jpg"))
+            return
+        _fran_show_picture_path(("images/ellona/Fran1.jpg",))
+
     def _fran_prepare_state():
         global FranVar
         global Talked
@@ -200,10 +239,7 @@ init python:
         code = str(topic_code or "")
 
         # Keep the location picture synced with dialog actions.
-        try:
-            ShowImageSeq("ellona", "", "fran", 4)
-        except Exception:
-            pass
+        _fran_show_topic_picture(code)
 
         if code == "meet":
             _fran_topic(0, 0, 3, "meet", 1)

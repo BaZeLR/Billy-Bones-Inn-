@@ -71,7 +71,7 @@ label IntGeorgettSexSetup(GirlNameIGSS="georgett", GirlLocIGSS="street"):
             and str(shoes.get(GirlNameIGSS, "") or "") == ""
             and str(dressdefault.get(GirlNameIGSS, "") or "") != ""):
         call DressUp(GirlNameIGSS)
-    call CockPosition(GirlLocIGSS, 0, "You")
+    call CockPosition(GirlNameIGSS, 0, "You")
     call CheckVisibility(GirlNameIGSS)
     return
 
@@ -124,6 +124,8 @@ label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
                 _cancumdaily = int(cancumdaily.get("You", cancumdaily.get("you", 1)) or 1)
             else:
                 _cancumdaily = 1
+            _player_ready_to_cum = int(Arousal.get("You", Arousal.get("you", 0)) or 0) >= 100
+            _can_player_cum = _cametoday < _cancumdaily or _player_ready_to_cum
 
         menu:
             "Осмотреть":
@@ -233,7 +235,7 @@ label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
                 call ShowCurrentSex(GirlNameIGSS)
                 jump int_georgett_sex_menu
 
-            "Предложить отсосать" if _cametoday < _cancumdaily and SomebodyCums == 0:
+            "Предложить отсосать" if _can_player_cum and SomebodyCums == 0:
                 if CockInMouth.get(GirlNameIGSS, 0):
                     "[RealName.get(GirlNameIGSS, GirlNameIGSS)] сидит перед вами на корточках и продолжает "
                     if renpy.has_label("ShowImage"):
@@ -257,7 +259,7 @@ label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
                 call ShowCurrentSex(GirlNameIGSS)
                 jump int_georgett_sex_menu
 
-            "Трахать между грудей" if _cametoday < _cancumdaily and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and TitsVisible.get(GirlNameIGSS, 0) and pregnancy.get(GirlNameIGSS, 0) < 150:
+            "Трахать между грудей" if _can_player_cum and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and TitsVisible.get(GirlNameIGSS, 0) and pregnancy.get(GirlNameIGSS, 0) < 150:
                 if GirlLocIGSS == "tavern":
                     if CockInTits.get(GirlNameIGSS, 0):
                         "[RealName.get(GirlNameIGSS, GirlNameIGSS)] лежит изогнувшись на кровати, выставив вперед оба своих выдающихся достоинства, чтобы вы могли их трахнуть. Вы сношаете ее между упругих грудок. В конце каждого вашего движения [RealName.get(GirlNameIGSS, GirlNameIGSS)] ловко ловит головку вашего члена своим страстным ротиком."
@@ -280,7 +282,7 @@ label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
                 call ShowCurrentSex(GirlNameIGSS)
                 jump int_georgett_sex_menu
 
-            "Трахать" if _cametoday < _cancumdaily and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and Arousal.get(GirlNameIGSS, 0) >= 20 and PussyVisible.get(GirlNameIGSS, 0):
+            "Трахать" if _can_player_cum and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and Arousal.get(GirlNameIGSS, 0) >= 20 and PussyVisible.get(GirlNameIGSS, 0):
                 if GirlLocIGSS == "tavern":
                     if CockInPussy.get(GirlNameIGSS, 0) == 0:
                         "Вы легли на кровать и усадили девицу прямо на возбужденный член, засадив по самые яйца."
@@ -318,7 +320,7 @@ label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
                 call ShowCurrentSex(GirlNameIGSS)
                 jump int_georgett_sex_menu
 
-            "Кончить в ротик" if _cametoday < _cancumdaily and Arousal.get("You", 0) >= 100 and (CockInMouth.get(GirlNameIGSS, 0) or CockInTits.get(GirlNameIGSS, 0)):
+            "Кончить в ротик" if _can_player_cum and Arousal.get("You", 0) >= 100 and (CockInMouth.get(GirlNameIGSS, 0) or CockInTits.get(GirlNameIGSS, 0)):
                 "Ваш дружок напрягся и струя за струей заполнил ее ротик семенем."
                 "[RealName.get(GirlNameIGSS, GirlNameIGSS)] судорожно заглатывала сперму и высунула язычок, показывая, что проглотила все."
                 $ Arousal["You"] = 0
@@ -330,7 +332,7 @@ label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
                     call ShowImage(GirlNameIGSS, "sex", "cummouth")
                 jump int_georgett_sex_menu
 
-            "Кончить на лицо" if _cametoday < _cancumdaily and Arousal.get("You", 0) >= 100:
+            "Кончить на лицо" if _can_player_cum and Arousal.get("You", 0) >= 100:
                 "Вы вытащили дружка в последний момент и густые струи семени ударили по ее щечкам и кудрям."
                 $ Arousal["You"] = 0
                 if renpy.has_label("PregnancyCheck"):
@@ -341,7 +343,7 @@ label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
                     call ShowImage(GirlNameIGSS, "sex", "cummouth")
                 jump int_georgett_sex_menu
 
-            "Кончить на груди" if _cametoday < _cancumdaily and Arousal.get("You", 0) >= 100 and TitsVisible.get(GirlNameIGSS, 0):
+            "Кончить на груди" if _can_player_cum and Arousal.get("You", 0) >= 100 and TitsVisible.get(GirlNameIGSS, 0):
                 "Вы вытащили член и немедленно разрядились на ее груди и живот."
                 "[RealName.get(GirlNameIGSS, GirlNameIGSS)] провела пальцем по груди и облизала его, глядя вам в глаза."
                 $ Arousal["You"] = 0
@@ -351,7 +353,7 @@ label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
                 $ SomebodyCums = 1
                 jump int_georgett_sex_menu
 
-            "Кончить внутрь" if _cametoday < _cancumdaily and Arousal.get("You", 0) >= 100 and CockInPussy.get(GirlNameIGSS, 0):
+            "Кончить внутрь" if _can_player_cum and Arousal.get("You", 0) >= 100 and CockInPussy.get(GirlNameIGSS, 0):
                 "Вы зарычали и кончили. Густые струи вашего семени хлынули в ее влагалище."
                 "[RealName.get(GirlNameIGSS, GirlNameIGSS)] сладострастно застонала: \"Да, милый, прямо в маточку твое семя ударило, сладко-то как.\""
                 "Обмякший член вывалился из ненасытной щелки, и из нее потекла вязкая белая струйка."

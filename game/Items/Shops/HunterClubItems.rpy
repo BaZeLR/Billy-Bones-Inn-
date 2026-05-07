@@ -47,6 +47,19 @@ init 4 python:
         },
     )
 
+    DogCollarItem = GameItem(
+        object_id="dog_collar_001",
+        name="собачий ошейник",
+        description="Простой крепкий ошейник. С ним можно забрать прирученного пса домой.",
+        price=10,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "hunter_supply",
+            "supply_kind": "dog_collar",
+        },
+    )
+
     HuntingTrapItem = GameItem(
         object_id="hunting_trap_001",
         name="охотничья ловушка",

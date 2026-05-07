@@ -286,6 +286,70 @@ init -8 python:
 
 
 init 2 python:
+    npc_daily_schedule_set(
+        "werecat",
+        default_slots=[],
+        random_slots=[
+            npc_daily_schedule_random_slot(
+                0,
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                label="morning_roam",
+                choices=[
+                    npc_daily_schedule_choice("TavernKitchen", 3, True, True, "warm_hearth", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernStorage", 3, True, True, "rat_watch", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernMain", 1, True, True, "main_hall", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("Backyard", 1, True, True, "yard_roam", condition=npc_schedule_rule("werecat_active")),
+                ],
+            ),
+            npc_daily_schedule_random_slot(
+                1,
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                label="noon_roam",
+                choices=[
+                    npc_daily_schedule_choice("Backyard", 3, True, True, "sun_yard", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernKitchen", 2, True, True, "kitchen_corner", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernStorage", 2, True, True, "storage_watch", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernMelissaRoom", 1, True, True, "melissa_room", condition=npc_schedule_rule("werecat_active")),
+                ],
+            ),
+            npc_daily_schedule_random_slot(
+                2,
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                label="day_roam",
+                choices=[
+                    npc_daily_schedule_choice("Backyard", 2, True, True, "yard_hunt", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernStorage", 3, True, True, "storage_hunt", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernMelissaRoom", 1, True, True, "melissa_room", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernAmandaRoom", 1, True, True, "amanda_room", condition=npc_schedule_rule("werecat_active")),
+                ],
+            ),
+            npc_daily_schedule_random_slot(
+                3,
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                label="evening_roam",
+                choices=[
+                    npc_daily_schedule_choice("TavernKitchen", 2, True, True, "evening_kitchen", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("Backyard", 2, True, True, "evening_yard", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernStorage", 2, True, True, "evening_storage", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernMain", 1, True, True, "evening_hall", condition=npc_schedule_rule("werecat_active")),
+                ],
+            ),
+            npc_daily_schedule_random_slot(
+                4,
+                weekdays=[1, 2, 3, 4, 5, 6, 7],
+                label="night_roam",
+                choices=[
+                    npc_daily_schedule_choice("TavernMyRoom", 2, True, True, "player_room_corner", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernMelissaRoom", 2, True, True, "melissa_room_nest", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernAmandaRoom", 1, True, True, "amanda_room_nest", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernSandraRoom", 1, True, True, "sandra_room_nest", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("TavernStorage", 2, True, True, "night_storage", condition=npc_schedule_rule("werecat_active")),
+                    npc_daily_schedule_choice("Backyard", 1, True, True, "night_yard", condition=npc_schedule_rule("werecat_active")),
+                ],
+            ),
+        ],
+    )
+
     _werecat_schedule_entries = []
     for _werecat_slot, _werecat_rooms in WERECAT_ROAM_ROOMS.items():
         for _werecat_room in _werecat_rooms:

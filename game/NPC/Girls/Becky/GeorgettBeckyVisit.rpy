@@ -72,12 +72,11 @@ label GeorgettBeckyVisit_menu:
 
     menu:
         "Осмотреть Жоржетту" if georgedinnersex > 0:
-            call CleanScreenOverflow(10)
             call GirlsDesc("georgett")
             jump GeorgettBeckyVisit_menu
 
         "Смотреть что будет дальше" if georgedinnersex == 1:
-            call CleanScreenOverflow(10)
+            
             "Ваш взгляд перебегал с Жоржетты на Ингенборг, с Инги на Бекки. Лукас и Эдди млели от того, что с ними вытворяли их дамы."
             "Первым кончил Эдди, выдернул член в последний момент и залил лицо Жоржетты. Та без смущения дочистила его ртом."
             "За Эдди настал черед Лукаса. Прижав голову Инги к своей промежности, он накончал ей полный рот."
@@ -93,7 +92,6 @@ label GeorgettBeckyVisit_menu:
             return
 
         "Расстегнуть штаны и позвать Бекки" if georgedinnersex == 1 and cametoday < cancumdaily:
-            call CleanScreenOverflow(10)
             $ beckyminetagree = renpy.random.randint(1, 3)
 
             if sluttiness.get("becky", 0) < 40:
@@ -145,7 +143,7 @@ label GeorgettBeckyVisit_menu:
             jump GeorgettBeckyVisit_menu
 
         "Кончить на лицо" if georgedinnersex == 2 and cametoday < cancumdaily:
-            call CleanScreenOverflow(10)
+            
             "Вытащив в последний момент член изо рта любовницы, вы залили спермой ей все лицо."
             $ renpy.say(None, BeckyGuestSexDesc)
             "Вдова, не смущаясь, встретилась взглядом с Ингой и Эдди, подмигнула им и только затем вытерла лицо от белых капель вашего семени."
@@ -155,7 +153,7 @@ label GeorgettBeckyVisit_menu:
             return
 
         "Кончить в ротик" if georgedinnersex == 2 and cametoday < cancumdaily:
-            call CleanScreenOverflow(10)
+            
             "Ощутив приближающийся оргазм, вы не стали вытаскивать член из горячего ротика Ребекки и даже не предупредили ее."
             "Вдова не смутилась: не поперхнувшись, сглотнула ваше семя и только тогда отпустила начавший обмякать член."
             $ renpy.say(None, BeckyGuestSexDesc)

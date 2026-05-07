@@ -9,6 +9,35 @@ default ChurchPurityReport = {}
 init python:
     import random
 
+    def church_call_label(label_name="", *label_args):
+        label = str(label_name or "").strip()
+        if label == "" or not renpy.has_label(label):
+            return
+        return renpy.call_in_new_context(label, *tuple(label_args or ()))
+
+    def church_hyperlink_handler(value=""):
+        parts = [str(row or "").strip() for row in str(value or "").split(":")]
+        action_key = parts[0] if len(parts) > 0 else ""
+        action_arg = parts[1] if len(parts) > 1 else ""
+        if action_key == "service":
+            return church_call_label("ChurchServiceMenu", action_arg != "0")
+        if action_key == "confession":
+            return church_call_label("ChurchIspoved", 1)
+        if action_key == "confession_menu":
+            return church_call_label("ChurchIspovedMenu")
+        if action_key == "after_cermon":
+            return church_call_label("ChurchAfterCermon", 1)
+        if action_key == "draupnir":
+            return church_call_label("ShowChurchDraupnirList")
+        if action_key == "after_georgett":
+            return church_call_label("AfterCermonGeorgett")
+        if action_key == "after_liza":
+            return church_call_label("AfterCermonLizett")
+        if action_key == "after_becky":
+            return church_call_label("AfterCermonBecky")
+
+    config.hyperlink_handlers["church"] = church_hyperlink_handler
+
     def church_pick_picture(candidates=None):
         loadable = [str(row or "").strip() for row in list(candidates or []) if str(row or "").strip() != "" and renpy.loadable(str(row or "").strip())]
         return random.choice(loadable) if len(loadable) > 0 else ""
@@ -38,6 +67,39 @@ init python:
 
     def church_service_description_visible():
         return week == 7 and time <= 2
+
+    def church_closed_time_visible():
+        return week != 7 or time > 2
+
+    def church_time_slot_visible(slot_value=0):
+        return week == 7 and int(time or 0) == int(slot_value or 0)
+
+    def church_service_action_visible():
+        return church_time_slot_visible(0)
+
+    def church_confession_action_visible():
+        return church_time_slot_visible(1)
+
+    def church_after_cermon_action_visible():
+        return church_time_slot_visible(2)
+
+    def church_becky_priest_talk_visible():
+        return (
+            church_time_slot_visible(1)
+            and BeckyVar.get("PriestAdvice", 0) > 0
+            and BeckyVar.get("GerhardBeckyTalk", 0) < 2
+        )
+
+    def church_draupnir_note_visible():
+        return church_time_slot_visible(1) and BeckyVar.get("GerhardBeckyTalk", 0) > 0
+
+    def church_georgett_quick_sex_visible():
+        return (
+            church_service_action_visible()
+            and int(cametoday or 0) < int(cancumdaily or 0)
+            and int(Friends.get("georgett", 0) or 0) >= 6
+            and int(HadSex.get("georgett", 0) or 0) >= 3
+        )
 
     def _church_to_int(value, default=0):
         try:
@@ -155,6 +217,27 @@ init python:
             return ""
         return "Воскресная служба укрепила нравственный настрой прихожанок. " + "; ".join(changed) + "."
 
+    def church_service_attendees_text():
+        lines = [
+            "Вы осматриваете собор во время воскресной службы.",
+            "Отец Герхард ведет мессу, а в нефе и у колонн стоят знакомые семьи, городские торговцы, ремесленники и простые прихожане.",
+        ]
+        present = list(getNPCids("Church") or [])
+        if len(present) > 0:
+            names = []
+            for npc_id in present:
+                key = str(npc_id or "").strip()
+                if key == "":
+                    continue
+                names.append(str(RealName.get(key, _action_display_name(key)) or _action_display_name(key)))
+            if len(names) > 0:
+                lines.append("Среди тех, кого вы можете узнать: " + ", ".join(names) + ".")
+        lines.append("Если хотите присмотреться внимательнее, выберите кого искать среди прихожан.")
+        purity_text = church_purity_report_text()
+        if str(purity_text or "").strip():
+            lines.append(str(purity_text or ""))
+        return "\n\n".join(lines)
+
     ChurchRoom = Room(
         code_name="Church",
         group_name=ROOM_GROUP_CITY,
@@ -174,6 +257,13 @@ init python:
         ],
         exits=[
             RoomExit(label="Вернуться к трактиру", target="StreetTavern"),
+        ],
+        action_menus=[
+            RoomAction(action_id="service_attendees", label="Прихожане", hook="ui_call", target="ChurchServiceMenu", args=(True,), condition=church_service_action_visible),
+            RoomAction(action_id="becky_priest_talk", label="Обсудить сомнения Бекки со святым отцом", hook="ui_call", target="becky_church_talk", condition=church_becky_priest_talk_visible),
+            RoomAction(action_id="confession", label="Идти на исповедь", hook="ui_call", target="ChurchIspoved", args=(1,), condition=church_confession_action_visible),
+            RoomAction(action_id="draupnir_note", label="Посмотреть листок Драупнира", hook="ui_call", target="ShowChurchDraupnirList", condition=church_draupnir_note_visible),
+            RoomAction(action_id="after_cermon_walk", label="Обойти собор", hook="ui_call", target="ChurchAfterCermon", args=(1,), condition=church_after_cermon_action_visible),
         ],
         schedule=RoomSchedule(
             weekdays=[7],
@@ -214,21 +304,21 @@ label ChurchRestore:
         $ MainTxt = ChurchRoom.schedule.closed_text
         $ CurLocDesc = MainTxt
         call ShowImageSeq("general", "", "LocChurchClosed", 2)
-        $ current_action_items.append(MenuItem("Вернуться к трактиру", Jump("StreetTavern")))
+        call ChurchBuildActions
         return
 
     if time == 0:
-        $ MainTxt = "Вы пришли в великий городской собор Ильматера на воскресную службу.\n\nКажется, здесь собралось полгорода. Отец Герхард, жрец Ильматера, ведет службу. Ее вы видели и слышали уже сотни раз. Ваш взор обегает собор и {a=call:ChurchServiceMenu}{color=#245b2b}прихожан{/color}{/a}."
+        $ MainTxt = "Вы пришли в великий городской собор Ильматера на воскресную службу.\n\nКажется, здесь собралось полгорода. Отец Герхард, жрец Ильматера, ведет службу. Ее вы видели и слышали уже сотни раз. Ваш взор обегает собор и {a=church:service:1}{color=#245b2b}прихожан{/color}{/a}."
         $ CurLocDesc = MainTxt
         call ShowImage("gerhard", "", "gerhard")
     elif time == 1:
-        $ MainTxt = "Служба закончилась, люди понемногу начали расходиться. Вы можете или пойти домой или пойти к отцу Герхарду на исповедь."
+        $ MainTxt = "Служба закончилась, люди понемногу начали расходиться. Вы можете или пойти домой или пойти к отцу Герхарду на {a=church:confession:1}{color=#245b2b}исповедь{/color}{/a}."
         if BeckyVar.get("GerhardBeckyTalk", 0) > 0:
-            $ MainTxt = MainTxt + "\nНа небольшом столике в углу лежит {a=call:ShowChurchDraupnirList}{color=#245b2b}листок{/color}{/a}, на котором что-то накорябанно."
+            $ MainTxt = MainTxt + "\nНа небольшом столике в углу лежит {a=church:draupnir:1}{color=#245b2b}листок{/color}{/a}, на котором что-то накорябанно."
         $ CurLocDesc = MainTxt
         call ShowImage("general", "", "LocChurchIspoved1")
     else:
-        $ MainTxt = "Почти все прихожане уже разошлись, однако собор еще открыт. Вы можете его обойти и посмотреть нет ли чего интересного."
+        $ MainTxt = "Почти все прихожане уже разошлись, однако собор еще открыт. Вы можете его {a=church:after_cermon:1}{color=#245b2b}обойти{/color}{/a} и посмотреть нет ли чего интересного."
         $ CurLocDesc = MainTxt
         call ShowImage("general", "", "LocChurchIspoved2")
 
@@ -246,48 +336,50 @@ label ChurchBuildActions:
     $ current_action_items = []
 
     if week != 7 or time > 2:
-        $ current_action_items.append(MenuItem("Вернуться к трактиру", Jump("StreetTavern")))
+        python:
+            for _church_exit in ChurchRoom.visible_exits():
+                current_action_items.append(MenuItem(_church_exit.label, Call("MoveToRoom", _church_exit.target, getattr(_church_exit, "minutes_to_pass", 5))))
         return
 
-    if time == 0:
-        pass
-    elif time == 1:
-        if BeckyVar.get("PriestAdvice", 0) > 0 and BeckyVar.get("GerhardBeckyTalk", 0) < 2:
-            $ current_action_items.append(MenuItem("Обсудить сомнения Бекки со святым отцом", Call("becky_church_talk")))
-        $ current_action_items.append(MenuItem("Идти на исповедь", Call("ChurchIspoved", 1)))
-    else:
-        $ current_action_items.append(MenuItem("Обойти собор", Call("ChurchAfterCermon", 1)))
-
-    $ current_action_items.append(MenuItem("Вернуться к трактиру", Jump("StreetTavern")))
+    python:
+        for _church_action in ChurchRoom.visible_actions():
+            _church_menu_item = room_action_menu_item(_church_action)
+            if _church_menu_item is not None:
+                current_action_items.append(_church_menu_item)
+        for _church_exit in ChurchRoom.visible_exits():
+            current_action_items.append(MenuItem(_church_exit.label, Call("MoveToRoom", _church_exit.target, getattr(_church_exit, "minutes_to_pass", 5))))
     return
 
 
-label ChurchServiceMenu:
+label ChurchServiceMenu(show_attendees=True):
+    if show_attendees:
+        $ MainTxt = church_service_attendees_text()
+        $ CurLocDesc = MainTxt
     $ current_action_title = "Прихожане"
     $ current_action_content = None
     $ current_action_items = []
-    $ current_action_items.append(MenuItem("Найти Сандру", Call("ChurchServiceMother")))
-    $ current_action_items.append(MenuItem("Найти сестричек", Call("ChurchServiceSisters")))
-    $ current_action_items.append(MenuItem("Найти семейство Легаре", Call("ChurchServiceLegare")))
-    $ current_action_items.append(MenuItem("Найти семейство Блэнкеншип", Call("ChurchServiceBlanken")))
+    $ current_action_items.append(MenuItem("Найти Сандру", Function(main_ui_call_label, "ChurchServiceMother")))
+    $ current_action_items.append(MenuItem("Найти сестричек", Function(main_ui_call_label, "ChurchServiceSisters")))
+    $ current_action_items.append(MenuItem("Найти семейство Легаре", Function(main_ui_call_label, "ChurchServiceLegare")))
+    $ current_action_items.append(MenuItem("Найти семейство Блэнкеншип", Function(main_ui_call_label, "ChurchServiceBlanken")))
     if Friends.get("georgett", 0) >= 2:
-        $ current_action_items.append(MenuItem("Найти Жоржетту Брюно", Call("ChurchServiceGeorgett")))
-    if cametoday < cancumdaily and Friends.get("georgett", 0) >= 2 and HadSex.get("georgett", 0) >= 3 and GeorgettVar.get("foundinchurch", 0):
-        $ current_action_items.append(MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("church_georgett_sex")))
-    $ current_action_items.append(MenuItem("Вернуться к службе", Call("ChurchRestore")))
+        $ current_action_items.append(MenuItem("Найти Жоржетту Брюно", Function(main_ui_call_label, "ChurchServiceGeorgett")))
+    if church_georgett_quick_sex_visible():
+        $ current_action_items.append(MenuItem("Предложить Жоржетте перепихнуться по быстрому", Function(main_ui_call_label, "church_georgett_sex")))
+    $ current_action_items.append(MenuItem("Вернуться к службе", Function(main_ui_call_label, "ChurchRestore")))
     $ renpy.restart_interaction()
     return
 
 
 label ChurchServiceMother:
-    $ MainTxt = "Сандра,одетая , в своё строгое платье внимательно слушает службу."
+    $ MainTxt = "Сандра, одетая в своё строгое платье, внимательно слушает службу."
     $ CurLocDesc = MainTxt
     $ _church_picture = church_sandra_picture()
     if str(_church_picture or "").strip():
         call ShowImage("", "", _church_picture)
     else:
         call ShowImage("sandra", "church", "cermon")
-    call ChurchServiceMenu
+    call ChurchServiceMenu(False)
     return
 
 
@@ -299,7 +391,7 @@ label ChurchServiceSisters:
         call ShowImage("", "", _church_picture)
     else:
         call ShowImage("amanda", "church", "cermon")
-    call ChurchServiceMenu
+    call ChurchServiceMenu(False)
     return
 
 
@@ -311,7 +403,7 @@ label ChurchServiceLegare:
     $ MainTxt = "Мессир Легаре в черном камзоле стоит около одной из колонн и внимательно слушает службу. Рядом с ним стоит его жена Элоиза, маленькая шатенка средних лет, а за ними все их дети - Кларисса, Жерар, Жан-Жак, Полина и малыш Реми."
     $ CurLocDesc = MainTxt
     call ShowImageSeq("alber", "church", "cermon", 2)
-    call ChurchServiceMenu
+    call ChurchServiceMenu(False)
     return
 
 
@@ -323,7 +415,7 @@ label ChurchServiceBlanken:
         call ShowImage("", "", _church_picture)
     else:
         call ShowImage("becky", "church", "cermon")
-    call ChurchServiceMenu
+    call ChurchServiceMenu(False)
     return
 
 
@@ -339,7 +431,7 @@ label ChurchServiceGeorgett:
         call ShowImage("georgett", "church", "cermon")
     $ CurLocDesc = MainTxt
     $ GeorgettVar["foundinchurch"] = 1
-    call ChurchServiceMenu
+    call ChurchServiceMenu(False)
     return
 
 
@@ -394,9 +486,9 @@ label church_georgett_sex:
             "Жоржетта поворачивается к молоденькой мулатке-шоколадке, стоящей рядом с ней: «Стефан, познакомься, это моя старшая доченька Лизетта, я тебе про нее рассказывала. Лизетта, познакомься, это дядя Стефан.»"
             $ Friends["liza"] = 1
         if GeorgettVar.get("lizasawinchurch", 0):
-            "«Лизетточка, мы сейчас с дядей Стефаном пойдем потрахаемся», - без тени смущения говорит ваша подруга своей дочке. «Оставайся здесь, или, если хочешь, можешь посмотреть. Только тихо.»"
+            "«Лизетточка, мы сейчас с г-ном Стефаном пойдем потрахаемся», - без тени смущения говорит ваша подруга своей дочке. «Оставайся здесь, или, если хочешь, можешь посмотреть. Только тихо.»"
         else:
-            "«Лизетточка, мы сейчас с дядей Стефаном отойдем поговорить, а ты нас здесь подожди, хорошо?» - говорит ваша подруга своей дочке. «Хорошо, мама.»"
+            "«Лизетточка, мы сейчас с г-ном Стефаном отойдем поговорить, а ты нас здесь подожди, хорошо?» - говорит ваша подруга своей дочке. «Хорошо, мама.»"
 
     if str(TmpChurchGeorgSex or "") == "doggy":
         "Вы отдаете деньги Жоржетте и она ведет вас к одной из скамей в дальнем темном углу собора. Вы внимательно осматриваетесь и замечаете, что скамья, колонны, сложенная утварь и прочее барахло заслоняют вас от взглядов толпы. Судя по всему к таким же выводам приходит и Жоржетта, так как она решительным движением снимает с себя юбку под которой, как вы и ожидали, ничего не оказалось. А сняв, Жоржетта наклоняется, опираясь о скамью, приглашающе выставив свою киску. Поняв намек, вы, не теряя времени, спускаете штаны и одним движением входите в развратницу."
@@ -405,7 +497,7 @@ label church_georgett_sex:
 
     if GeorgettVar.get("askkids", 0):
         "Вдруг вы замечаете, как кто-то наблюдает за вами из тени. Вы извещаете об этом свою подругу, та всматривается в тени и вдруг призывно машет рукой. Наблюдателем оказывается Лизетта, она выходит из своего укрытия и садится рядом с вами."
-        "«Лизетточка, доченька, видишь, мы с дядей Стефаном трахаемся. Если хочешь посмотреть - то смотри. Только тихо». С этими словами ваша подруга возобновила свои движения. Лизетта же, смотря на вас, медленно возбуждается и начинает ласкать себя через одежду."
+        "«Лизетточка, доченька, видишь, мы с г-ном Стефаном трахаемся. Если хочешь посмотреть - то смотри. Только тихо». С этими словами ваша подруга возобновила свои движения. Лизетта же, смотря на вас, медленно возбуждается и начинает ласкать себя через одежду."
         $ GeorgettVar["lizasawinchurch"] = 1
 
     "Вы сношаетесь минут десять, когда ваша подружка не выдерживает, и сжав зубы, чтобы не застонать, кончает. Сразу следом за ней кончаете и вы, заполняя ее незащищенную матку своей спермой. Жоржетта встает с вашего члена и протирает лобок подолом платья, вы же быстро натягиваете приспущенные штаны."
@@ -417,5 +509,5 @@ label church_georgett_sex:
     $ GeorgettVar["fuckinchurch"] = 1
     $ PregnancyCheck("georgett", "inside", 1, "Вы")
     call ShowImageSeq("georgett", "church", TmpChurchGeorgSex, 6)
-    call AdvanceTime("Church")
+    call AdvanceTimeAndRestore("ChurchRestore")
     return

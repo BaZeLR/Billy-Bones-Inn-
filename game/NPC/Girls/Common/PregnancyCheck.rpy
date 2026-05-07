@@ -107,6 +107,11 @@ init python:
                     renpy.store.fun = max(0, min(100, int(getattr(renpy.store, "fun", 0) or 0) + 30))
                     fun_awarded = 1
                 renpy.store.cametoday = int(getattr(renpy.store, 'cametoday', 0) or 0) + 1
+                try:
+                    renpy.store.LastDaySex = int(getattr(renpy.store, "dayspassed", 0) or 0)
+                    renpy.store.PlayerLastCumDay = int(getattr(renpy.store, "dayspassed", 0) or 0)
+                except Exception:
+                    pass
                 if cum_place == 'inside':
                     CumInsideYou[girl] = 1
                 elif cum_place == 'tits':

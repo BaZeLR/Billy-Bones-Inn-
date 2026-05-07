@@ -18,14 +18,7 @@ label IntSandraTalkRefresh(girl_name="sandra"):
     $ current_action_content = None
     $ current_action_items = []
     $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
-    if social_has_visible_topics(girl_name, "talk"):
-        $ current_action_items.append(MenuItem("Поговорить о...", Function(main_ui_call_label, "SocialTalkTopicMenu", girl_name, "talk", "IntSandraTalkRefresh")))
-    if social_has_visible_topics(girl_name, "flirt") and family_social_threshold_met(girl_name, "flirt"):
-        $ current_action_items.append(MenuItem("Флиртовать...", Function(main_ui_call_label, "SocialTalkTopicMenu", girl_name, "flirt", "IntSandraTalkRefresh")))
-    if GiftedToday.get(girl_name, 0) == 0 and family_social_threshold_met(girl_name, "gift"):
-        $ current_action_items.append(MenuItem("Подарить что-нибудь", Function(main_ui_call_label, "PlayerCardGiftToFixedTargetMenu", girl_name)))
-        if player_card_has_shareable_items() and family_social_threshold_met(girl_name, "share"):
-            $ current_action_items.append(MenuItem("Поделиться угощением", Function(main_ui_call_label, "PlayerCardShareToFixedTargetMenu", girl_name)))
+    $ current_action_items.extend(social_core_action_items(girl_name, "IntSandraTalkRefresh"))
 
     if Talked.get(girl_name, 0) < 3 and Friends.get(girl_name, 0) < 5:
         $ current_action_items.append(MenuItem("Попробовать помириться с Сандрой", Function(main_ui_call_label, "IntSandraTalkApply", girl_name, "reconcile")))

@@ -111,7 +111,6 @@ label FridayDance(add_dance_phrase_tmp=""):
             jump StreetTavern
             
     # Clean up screen and show any additional phrase
-    call add_clean_screen
     
     if AddDancePhraseTmp != "":
         "[AddDancePhraseTmp]"

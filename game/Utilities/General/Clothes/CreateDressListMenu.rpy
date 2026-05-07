@@ -22,7 +22,6 @@ label male_dress_shop:
     if _md_choice == "back" or str(_md_choice or "") == "":
         return
 
-    call CleanScreenOverflow
     $ _desc = str(_gds_get_dict("FullDressDesc").get(_md_choice, ""))
     $ _cost = _gds_dress_cost(_md_choice)
     '[_desc], обойдется он вам в [_cost] мараведи.'
@@ -48,7 +47,6 @@ label female_dress_shop:
     if _fd_choice == "back" or str(_fd_choice or "") == "":
         return
 
-    call CleanScreenOverflow
     $ _desc = str(_gds_get_dict("FullDressDesc").get(_fd_choice, ""))
     $ _cost = _gds_dress_cost(_fd_choice)
     '[_desc], обойдется оно вам в [_cost] мараведи.'

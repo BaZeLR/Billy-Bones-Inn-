@@ -71,7 +71,7 @@ init -40 python:
             "talk_label": "IntIngaTalk",
             "talk_args": (),
             "examine_label": "",
-            "actions": ["look", "talk"],
+            "actions": ["look", "talk", "gift", "flirt"],
             "gender": "woman",
             "auto_card": False,
         },
@@ -90,7 +90,7 @@ init -40 python:
             "talk_label": "IntGeorgettTalk",
             "talk_args": (),
             "examine_label": "",
-            "actions": ["look", "talk"],
+            "actions": ["look", "talk", "gift", "flirt"],
             "gender": "woman",
             "can_examine_unknown": False,
             "auto_card": False,
@@ -100,7 +100,7 @@ init -40 python:
             "talk_label": "IntLizaTalk",
             "talk_args": (),
             "examine_label": "",
-            "actions": ["look", "talk"],
+            "actions": ["look", "talk", "gift", "flirt"],
             "auto_card": False,
         },
         "irma": {
@@ -276,13 +276,10 @@ init -40 python:
             return False
         if int(GiftedToday.get(key, 0) or 0) > 0:
             return False
-        allowed, reason = relationship_social_action_allowed(key, "gift")
-        if not allowed:
+        if not relationship_any_gift_allowed(key):
             return False
         try:
             if key == "melissa" and not melissa_relationship_allows(key, "gift"):
-                return False
-            if key in ("amanda", "sandra") and not family_social_threshold_met(key, "gift"):
                 return False
             if key == "clara" and (not clara_can_receive_gifts() or not clara_has_giftable_entries()):
                 return False
@@ -447,6 +444,7 @@ init -40 python:
             "TavernKitchen": ("kitchen", "tavern"),
             "TavernStorage": ("storage", "basement", "tavern"),
             "Backyard": ("backyard", "tavern"),
+            "TavernMyRoom": ("mc_room", "room", "bedroom", "tavern"),
             "TavernSandraRoom": ("room", "bedroom", "home", "comfy"),
             "TavernMelissaRoom": ("room", "bedroom", "home", "comfy"),
             "TavernAmandaRoom": ("room", "bedroom", "home", "comfy"),
@@ -615,6 +613,10 @@ init -40 python:
         if not npc_key:
             return
         show_npc_picture_main_ui_state(npc_key, where_key, "idle", normalized)
+        try:
+            player_observe_npc_body(npc_key, where_key)
+        except Exception:
+            pass
         examine_label = str(normalized.get("examine_label", "") or "").strip()
         if examine_label and renpy.has_label(examine_label):
             call_label_with_args(examine_label, ())
@@ -656,6 +658,13 @@ init -40 python:
             store.action_menu_specs.append({"id": "flirt", "text": "Флиртовать", "entity_type": "npc", "entity_id": npc_key, "where_id": where_key})
         if "gift" in actions and npc_gift_action_available(npc_key, where_key):
             store.action_menu_specs.append({"id": "gift", "text": "Подарить", "entity_type": "npc", "entity_id": npc_key, "where_id": where_key})
+        if npc_key == "amanda" and bool(globals().get("AmandaAIIntegrationEnabled", False)):
+            try:
+                _amanda_ai_intent = amanda_ai_room_intent_code(where_key)
+            except Exception:
+                _amanda_ai_intent = ""
+            if str(_amanda_ai_intent or "") != "":
+                store.action_menu_specs.append({"id": "amanda_ai:%s" % str(_amanda_ai_intent), "text": amanda_ai_menu_label(_amanda_ai_intent), "entity_type": "npc", "entity_id": npc_key, "where_id": where_key})
         store.action_menu_specs.append({"id": "back", "text": "Назад"})
 
         store.current_action_title = store.action_menu_title
@@ -690,6 +699,20 @@ init -40 python:
 
         store.action_menu_specs.append({"id": "look", "text": "Осмотреть", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
         store.action_menu_specs.append({"id": "talk", "text": "Поговорить", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
+        _dog_state = ensure_dog_runtime()
+        if bool(_dog_state.owned):
+            if player_has_bone():
+                store.action_menu_specs.append({"id": "dog_bone", "text": "Дать кость", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
+        else:
+            if not bool(_dog_state.met):
+                store.action_menu_specs.append({"id": "dog_call", "text": "Позвать пса", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
+            else:
+                store.action_menu_specs.append({"id": "dog_pet", "text": "Попробовать погладить", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
+                store.action_menu_specs.append({"id": "dog_play_stray", "text": "Попробовать поиграть", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
+                if player_has_bone():
+                    store.action_menu_specs.append({"id": "dog_stray_bone", "text": "Дать кость", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
+                if dog_can_adopt_stray():
+                    store.action_menu_specs.append({"id": "dog_adopt", "text": "Надеть ошейник и забрать домой", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
         store.action_menu_specs.append({"id": "back", "text": "Назад"})
 
         store.current_action_title = store.action_menu_title
@@ -797,6 +820,10 @@ init -40 python:
             store.action_menu_specs.append({"id": "look", "text": "Осмотреть", "entity_type": entity_type_value, "entity_id": entity_id_value, "where_id": entity_where})
         if can_talk:
             store.action_menu_specs.append({"id": "talk", "text": "Поговорить", "entity_type": entity_type_value, "entity_id": entity_id_value, "where_id": entity_where})
+        if entity_type_value == "npc" and "flirt" in actions and npc_flirt_action_available(entity_id_value, entity_where):
+            store.action_menu_specs.append({"id": "flirt", "text": "Флиртовать", "entity_type": entity_type_value, "entity_id": entity_id_value, "where_id": entity_where})
+        if entity_type_value == "npc" and "gift" in actions and npc_gift_action_available(entity_id_value, entity_where):
+            store.action_menu_specs.append({"id": "gift", "text": "Подарить", "entity_type": entity_type_value, "entity_id": entity_id_value, "where_id": entity_where})
         store.action_menu_specs.append({"id": "back", "text": "Назад"})
 
         store.current_action_title = store.action_menu_title

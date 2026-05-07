@@ -2,11 +2,76 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default RelationshipMoodState = {}
+default RelationshipInteractionScore = {}
 
 init -42 python:
     RELATIONSHIP_HOUSEHOLD_NPCS = ("amanda", "melissa", "sandra")
-    RELATIONSHIP_CORE_NPCS = ("amanda", "melissa", "sandra", "clara")
+    RELATIONSHIP_CORE_NPCS = ("amanda", "melissa", "sandra", "clara", "becky", "irma", "inga", "liza", "georgett")
     RELATIONSHIP_CARE_GIFTS = ("soap_001", "luxury_soap_001", "energy_tea_001", "berries_001", "lavender_001", "wild_rose_001")
+    RELATIONSHIP_ACTION_REQUIREMENTS = {
+        "_default": {
+            "talk": {"score": 0, "friend": 0, "open": 0, "slut": 0},
+            "private_talk": {"score": 10, "friend": 3, "open": 2, "slut": 0},
+            "care_gift": {"score": 0, "friend": 0, "open": 0, "slut": 0},
+            "gift": {"score": 8, "friend": 3, "open": 0, "slut": 0},
+            "share": {"score": 5, "friend": 2, "open": 0, "slut": 0},
+            "flirt": {"score": 25, "friend": 5, "open": 1, "slut": 0},
+        },
+        "amanda": {
+            "private_talk": {"score": 12, "friend": 4, "open": 2, "slut": 0},
+            "gift": {"score": 8, "friend": 3, "open": 0, "slut": 0},
+            "share": {"score": 5, "friend": 2, "open": 0, "slut": 0},
+            "flirt": {"score": 25, "friend": 5, "open": 1, "slut": 0},
+        },
+        "melissa": {
+            "private_talk": {"score": 10, "friend": 4, "open": 2, "slut": 0},
+            "gift": {"score": 8, "friend": 3, "open": 0, "slut": 0},
+            "share": {"score": 5, "friend": 2, "open": 0, "slut": 0},
+            "flirt": {"score": 25, "friend": 5, "open": 1, "slut": 0},
+        },
+        "sandra": {
+            "private_talk": {"score": 15, "friend": 5, "open": 3, "slut": 0},
+            "gift": {"score": 10, "friend": 4, "open": 0, "slut": 0},
+            "share": {"score": 6, "friend": 3, "open": 0, "slut": 0},
+            "flirt": {"score": 30, "friend": 7, "open": 2, "slut": 0},
+        },
+        "clara": {
+            "private_talk": {"score": 10, "friend": 3, "open": 2, "slut": 0},
+            "gift": {"score": 12, "friend": 4, "open": 1, "slut": 0},
+            "share": {"score": 7, "friend": 3, "open": 0, "slut": 0},
+            "flirt": {"score": 20, "friend": 5, "open": 2, "slut": 0},
+        },
+        "becky": {
+            "private_talk": {"score": 8, "friend": 2, "open": 1, "slut": 0},
+            "gift": {"score": 5, "friend": 2, "open": 0, "slut": 0},
+            "share": {"score": 4, "friend": 1, "open": 0, "slut": 0},
+            "flirt": {"score": 15, "friend": 4, "open": 1, "slut": 0},
+        },
+        "irma": {
+            "private_talk": {"score": 8, "friend": 2, "open": 1, "slut": 0},
+            "gift": {"score": 5, "friend": 2, "open": 0, "slut": 0},
+            "share": {"score": 4, "friend": 1, "open": 0, "slut": 0},
+            "flirt": {"score": 15, "friend": 4, "open": 1, "slut": 0},
+        },
+        "inga": {
+            "private_talk": {"score": 8, "friend": 2, "open": 1, "slut": 0},
+            "gift": {"score": 5, "friend": 2, "open": 0, "slut": 0},
+            "share": {"score": 4, "friend": 1, "open": 0, "slut": 0},
+            "flirt": {"score": 15, "friend": 4, "open": 1, "slut": 0},
+        },
+        "liza": {
+            "private_talk": {"score": 8, "friend": 2, "open": 1, "slut": 0},
+            "gift": {"score": 5, "friend": 2, "open": 0, "slut": 0},
+            "share": {"score": 4, "friend": 1, "open": 0, "slut": 0},
+            "flirt": {"score": 15, "friend": 4, "open": 1, "slut": 0},
+        },
+        "georgett": {
+            "private_talk": {"score": 8, "friend": 2, "open": 1, "slut": 0},
+            "gift": {"score": 5, "friend": 2, "open": 0, "slut": 0},
+            "share": {"score": 4, "friend": 1, "open": 0, "slut": 0},
+            "flirt": {"score": 15, "friend": 4, "open": 1, "slut": 0},
+        },
+    }
 
     def relationship_int(value, default=0):
         try:
@@ -33,6 +98,98 @@ init -42 python:
         row.setdefault("anger_reason", "")
         row.setdefault("last_bad_action_day", -1)
         return row
+
+    def relationship_interaction_score(person=""):
+        key = relationship_key(person)
+        if not key:
+            return 0
+        friend_value = relationship_int(Friends.get(key, 0), 0) if isinstance(Friends, dict) else 0
+        open_value = relationship_int(otkroven.get(key, 0), 0) if isinstance(otkroven, dict) else 0
+        talked_value = relationship_int(Talked.get(key, 0), 0) if isinstance(Talked, dict) else 0
+        inferred = max(0, friend_value * 3 + open_value + min(10, talked_value * 2))
+        if not isinstance(RelationshipInteractionScore, dict):
+            return inferred
+        return max(inferred, relationship_int(RelationshipInteractionScore.get(key, 0), 0))
+
+    def relationship_add_interaction_score(person="", action="", raw_score=0):
+        global RelationshipInteractionScore
+        key = relationship_key(person)
+        if not key:
+            return 0
+        if not isinstance(RelationshipInteractionScore, dict):
+            RelationshipInteractionScore = {}
+        action_key = str(action or "").strip().lower()
+        score = max(0, relationship_int(raw_score, 0))
+        if score <= 0:
+            return relationship_interaction_score(key)
+        gain = max(1, score)
+        RelationshipInteractionScore[key] = min(999, relationship_interaction_score(key) + gain)
+        return relationship_interaction_score(key)
+
+    def relationship_action_requirement_key(action="", item_id=""):
+        action_key = str(action or "").strip().lower()
+        item_key = str(item_id or "").strip()
+        if action_key == "gift" and item_key in RELATIONSHIP_CARE_GIFTS:
+            return "care_gift"
+        return action_key
+
+    def relationship_action_requirement(person="", action="", item_id=""):
+        key = relationship_key(person)
+        requirement_key = relationship_action_requirement_key(action, item_id)
+        base = dict(RELATIONSHIP_ACTION_REQUIREMENTS.get("_default", {}).get(requirement_key, {}) or {})
+        personal = dict(RELATIONSHIP_ACTION_REQUIREMENTS.get(key, {}).get(requirement_key, {}) or {})
+        base.update(personal)
+        base.setdefault("score", 0)
+        base.setdefault("friend", 0)
+        base.setdefault("open", 0)
+        base.setdefault("slut", 0)
+        return base
+
+    def relationship_requirement_block_text(person="", action="", item_id=""):
+        key = relationship_key(person)
+        action_key = str(action or "").strip().lower()
+        name = _action_display_name(key)
+        requirement = relationship_action_requirement(key, action_key, item_id)
+        score_need = relationship_int(requirement.get("score", 0), 0)
+        friend_need = relationship_int(requirement.get("friend", 0), 0)
+        open_need = relationship_int(requirement.get("open", 0), 0)
+        slut_need = relationship_int(requirement.get("slut", 0), 0)
+        score_value = relationship_interaction_score(key)
+        friend_value = relationship_int(Friends.get(key, 0), 0) if isinstance(Friends, dict) else 0
+        open_value = relationship_int(otkroven.get(key, 0), 0) if isinstance(otkroven, dict) else 0
+        slut_value = relationship_int(sluttiness.get(key, 0), 0) if isinstance(sluttiness, dict) else 0
+        if score_value < score_need:
+            return "Сначала нужны обычные разговоры с %s. Сейчас между вами еще мало накопленного доверия." % name
+        if friend_value < friend_need:
+            return "%s пока держит дистанцию. Нужны более теплые отношения." % name
+        if open_value < open_need:
+            return "%s пока не готова говорить и реагировать так откровенно." % name
+        if slut_value < slut_need:
+            return "%s пока не готова к такому тону." % name
+        return relationship_block_text(key, action_key)
+
+    def relationship_requirement_met(person="", action="", item_id=""):
+        key = relationship_key(person)
+        if not key:
+            return False, "Некого выбрать."
+        requirement = relationship_action_requirement(key, action, item_id)
+        score_value = relationship_interaction_score(key)
+        friend_value = relationship_int(Friends.get(key, 0), 0) if isinstance(Friends, dict) else 0
+        open_value = relationship_int(otkroven.get(key, 0), 0) if isinstance(otkroven, dict) else 0
+        slut_value = relationship_int(sluttiness.get(key, 0), 0) if isinstance(sluttiness, dict) else 0
+        if score_value < relationship_int(requirement.get("score", 0), 0):
+            return False, relationship_requirement_block_text(key, action, item_id)
+        if friend_value < relationship_int(requirement.get("friend", 0), 0):
+            return False, relationship_requirement_block_text(key, action, item_id)
+        if open_value < relationship_int(requirement.get("open", 0), 0):
+            return False, relationship_requirement_block_text(key, action, item_id)
+        if slut_value < relationship_int(requirement.get("slut", 0), 0):
+            return False, relationship_requirement_block_text(key, action, item_id)
+        return True, ""
+
+    def relationship_requirement_value(person="", action="", field="score", item_id=""):
+        requirement = relationship_action_requirement(person, action, item_id)
+        return relationship_int(requirement.get(str(field or "score"), 0), 0)
 
     def relationship_anger(person=""):
         row = relationship_state(person)
@@ -140,9 +297,6 @@ init -42 python:
             return False, relationship_block_text(key, action_key)
 
         friend_value = relationship_int(Friends.get(key, 0), 0) if isinstance(Friends, dict) else 0
-        open_value = relationship_int(otkroven.get(key, 0), 0) if isinstance(otkroven, dict) else 0
-        talked_today = relationship_has_talked_today(key)
-        stage = relationship_social_stage(key)
         weekly_eval = relationship_weekly_chore_eval()
 
         if key in RELATIONSHIP_HOUSEHOLD_NPCS and weekly_eval == "bad" and friend_value < 10:
@@ -150,27 +304,34 @@ init -42 python:
                 return False, "После плохой недели по хозяйству домочадцы не готовы к таким жестам. Сначала нужно вернуть уважение делом."
 
         if action_key == "gift":
-            if item_key in RELATIONSHIP_CARE_GIFTS and (talked_today or friend_value >= 3 or stage >= 1):
-                return True, ""
-            if not talked_today and friend_value < 5:
-                return False, relationship_block_text(key, action_key)
-            if stage < 1:
-                return False, relationship_block_text(key, action_key)
-            return True, ""
+            return relationship_requirement_met(key, action_key, item_key)
 
         if action_key == "share":
-            if talked_today or friend_value >= 3 or stage >= 1:
-                return True, ""
-            return False, relationship_block_text(key, action_key)
+            return relationship_requirement_met(key, action_key, item_key)
 
         if action_key == "flirt":
-            if friend_value < 5 or open_value < 1:
-                return False, relationship_block_text(key, action_key)
-            if not talked_today and friend_value < 8:
-                return False, relationship_block_text(key, action_key)
-            return True, ""
+            return relationship_requirement_met(key, action_key, item_key)
+
+        if action_key == "private_talk":
+            return relationship_requirement_met(key, action_key, item_key)
 
         return True, ""
+
+    def relationship_any_gift_allowed(person=""):
+        key = relationship_key(person)
+        if not key:
+            return False
+        allowed, reason = relationship_social_action_allowed(key, "gift")
+        if allowed:
+            return True
+        try:
+            for item_id in list(player_card_giftable_item_ids() or []):
+                item_allowed, item_reason = relationship_social_action_allowed(key, "gift", item_id)
+                if item_allowed:
+                    return True
+        except Exception:
+            pass
+        return False
 
     def relationship_adjust_social_score(person="", action="", score=0):
         key = relationship_key(person)
@@ -201,6 +362,7 @@ init -42 python:
                 neshlush[key] = max(0, relationship_int(neshlush.get(key, 0), 0) + 1)
         elif score > 0:
             relationship_calm(key, 1)
+            relationship_add_interaction_score(key, action_key, score)
             if key in RELATIONSHIP_HOUSEHOLD_NPCS and isinstance(neshlush, dict):
                 neshlush[key] = max(0, relationship_int(neshlush.get(key, 0), 0) - 1)
         try:

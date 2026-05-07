@@ -125,7 +125,8 @@ init -1 python:
         return (
             str(CurLoc or "") == "HunterClub"
             and int(WerecatVar.get("rats_problem_active", 0) or 0) == 1
-            and int(WerecatVar.get("rat_breakfast_seen", 0) or 0) == 1
+            and int(MelissaVar.get("storage_rat_cleared", 0) or 0) == 1
+            and int(MelissaVar.get("storage_rat_last_help_day", -1) or -1) >= 0
             and int(WerecatVar.get("adopted", 0) or 0) == 0
             and int(WerecatVar.get("sold", 0) or 0) == 0
             and not werecat_hunter_rumor_seen()
@@ -380,7 +381,6 @@ label WerecatAdoptChoice(choice_code="adopt"):
         $ werecat_sync_profile()
         $ money = int(money or 0) + 5000
         $ tavernfame = int(tavernfame or 0) - 3
-        $ notoriety = min(100, int(notoriety or 0) + 12)
         $ Friends["sandra"] = max(0, int(Friends.get("sandra", 0) or 0) - 2)
         $ Friends["melissa"] = max(0, int(Friends.get("melissa", 0) or 0) - 3)
         $ Friends["amanda"] = max(0, int(Friends.get("amanda", 0) or 0) - 2)
@@ -421,6 +421,7 @@ label WerecatAdoptChoice(choice_code="adopt"):
     $ neshlush["amanda"] = max(0, int(neshlush.get("amanda", 0) or 0) - 1)
     $ WerecatNPCState["trust"] = max(6, int(WerecatNPCState.get("trust", 0) or 0))
     $ WerecatNPCState["comfort"] = max(8, int(WerecatNPCState.get("comfort", 0) or 0))
+    $ npc_daily_schedule_build_all(True)
     $ werecat_sync_profile()
     $ MainTxt = "Вы не тянете поводок, не орете и не делаете резких движений. Просто тихо уводите странную лесную кошку с собой, будто она сама уже наполовину решила вам довериться. Дом быстро принимает ее как новую, немного диковатую, но полезную тварь. В кладовых с этого дня становится спокойнее: теперь у крыс появился настоящий враг."
     $ CurLocDesc = MainTxt

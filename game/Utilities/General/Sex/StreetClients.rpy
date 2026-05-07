@@ -14,7 +14,7 @@ label street_clients(client_type, girl_name, event_time):
     if int(client_type or 0) != 1:
         jump PortStreets
 
-    $ SexEventType = int(GetSexEventFromTable(girl_name, event_time) or 0)
+    $ SexEventType = int(GetSexEventFromTable(girl_name, event_time, "Prostitution") or 0)
     if girl_name == "liza":
         "Вы уверенным шагом пошли к знакомой подворотне. Как вы и ожидали, вскоре стали слышны приглушенные девичьи стоны. Как можно тише и аккуратнее вы преодолели оставшееся расстояние и осторожно заглянули за угол. Открывшаяся вам картина послужила вполне достойным вознаграждением за ваши хлопоты."
         ""

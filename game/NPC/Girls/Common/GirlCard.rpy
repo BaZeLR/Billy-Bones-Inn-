@@ -109,6 +109,20 @@ init python:
         if int(_girls_desc_get(CumInsideYou, key, 0) or 0) or int(_girls_desc_get(CumInsideOthers, key, 0) or 0):
             lines.append("На бедрах и у лона заметны следы недавнего секса.")
 
+        try:
+            cycle = girl_decision_cycle_state(key)
+            phase = str(cycle.get("phase", "") or "")
+            if phase == "critical":
+                lines.append("Цикл: тело уязвимее обычного, настроение сдержаннее.")
+            elif phase == "fertile":
+                lines.append("Цикл: плодородные дни, тело реагирует живее.")
+            elif phase == "restless":
+                lines.append("Цикл: беспокойная фаза, возбуждение приходит легче.")
+            elif phase == "steady":
+                lines.append("Цикл: ровное состояние.")
+        except Exception:
+            pass
+
         return lines
 
     def girl_card_resolved_key(girl_name):

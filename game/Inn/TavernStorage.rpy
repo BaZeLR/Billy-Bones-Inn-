@@ -49,7 +49,7 @@ label TavernStorage:
     $ CurrentRoom = TavernStorageRoom
     $ CurLoc = "TavernStorage"
     $ location = CurLoc
-    call CheckDailyEvent("", "_story_enter", CurLoc, time)
+    call RoomEnterEventGate(CurLoc, False)
     $ scene_image = tavern_storage_picture() or TavernStorageRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -57,6 +57,8 @@ label TavernStorage:
         $ _layout_last_picture = ""
     $ MainTxt = tavern_storage_text()
     $ CurLocDesc = MainTxt
+    if bool(AmandaAIIntegrationEnabled):
+        call AmandaMiniEventTry(CurLoc, "room")
     python:
         _storage_items = []
         for _storage_exit in TavernStorageRoom.visible_exits():

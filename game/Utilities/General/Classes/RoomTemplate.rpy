@@ -346,8 +346,14 @@ init -40 python:
             return items
 
         def build_extra_action_items(self):
-            # Hook for room-specific additions.
-            return []
+            items = []
+            for room_action in self.visible_actions():
+                if "room_action_menu_item" not in globals():
+                    continue
+                menu_item = room_action_menu_item(room_action)
+                if menu_item is not None:
+                    items.append(menu_item)
+            return items
 
         def build_action_items(self):
             items = []

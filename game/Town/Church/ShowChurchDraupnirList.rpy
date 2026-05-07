@@ -24,9 +24,9 @@ label ShowChurchDraupnirList:
     python:
         for IList in range(len(ChurchRepairDesc)):
             if money > ChurchRepairCost[IList] and ChurchDonatedToday == 0 and ChurchDonated[IList] == 0 and SawDraupnirChurchList > 0:
-                current_action_items.append(MenuItem("Пожертвовать {} мараведи на {}".format(ChurchRepairCost[IList], ChurchRepairDonat[IList]), Call("ChurchDonate", IList)))
+                current_action_items.append(MenuItem("Пожертвовать {} мараведи на {}".format(ChurchRepairCost[IList], ChurchRepairDonat[IList]), Function(main_ui_call_label, "ChurchDonate", IList)))
 
-    $ current_action_items.append(MenuItem("Назад", Call("ChurchRestore")))
+    $ current_action_items.append(MenuItem("Назад", Function(main_ui_call_label, "ChurchRestore")))
     $ renpy.restart_interaction()
     return
 
@@ -49,5 +49,5 @@ label ChurchDonate(donation_idx=0):
     call stat
     $ current_action_title = "Пожертвование"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Вернуться в собор", Call("ChurchRestore"))]
+    $ current_action_items = [MenuItem("Вернуться в собор", Function(main_ui_call_label, "ChurchRestore"))]
     return

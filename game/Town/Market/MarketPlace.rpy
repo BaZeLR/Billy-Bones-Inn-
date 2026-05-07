@@ -33,6 +33,9 @@ init python:
     def marketplace_closed_action_items():
         items = []
 
+        if dog_is_here("MarketPlace"):
+            items.append(MenuItem(dog_display_name(), Call("IntDogTalk", "MarketPlace")))
+
         _clara_story_caption = str(clara_market_story_caption() or "")
         _clara_story_label = str(clara_market_story_label() or "")
         if _clara_story_caption != "" and _clara_story_label != "" and renpy.has_label(_clara_story_label):
@@ -54,7 +57,7 @@ init python:
         items = []
 
         if dog_is_here("MarketPlace"):
-            items.append(MenuItem(dog_room_action_caption("MarketPlace"), Call("IntDogTalk", "MarketPlace")))
+            items.append(MenuItem(dog_display_name(), Call("IntDogTalk", "MarketPlace")))
 
         for market_object in MarketPlaceRoom.visible_objects():
             if str(getattr(market_object, "object_id", "") or "") in (
@@ -199,7 +202,7 @@ label MarketPlace:
     $ _amanda_dynamic_jump = str(AmandaDynamicTakeNextJump() or "")
     if _amanda_dynamic_jump != "" and renpy.has_label(_amanda_dynamic_jump):
         jump expression _amanda_dynamic_jump
-    call CheckDailyEvent("", "_story_enter", CurLoc, time)
+    call RoomEnterEventGate(CurLoc, False)
 
     # Check if it's Friday and time for the dance
     if friday_dance_market_entry_is_active():

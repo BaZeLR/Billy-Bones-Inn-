@@ -1282,24 +1282,6 @@ define melissaThreadList = [
             0,
         ),
         (
-            "story_melissa_werecat_intro_0",
-            (1, 7), 0, None,
-            1,
-            None,
-            [
-                "#int(WerecatVar.get('rats_problem_active', 0) or 0) == 1",
-                "#int(WerecatVar.get('rat_breakfast_seen', 0) or 0) == 0",
-                "#int(MelissaVar.get('storage_rat_cleared', 0) or 0) == 1",
-                "#int(MelissaVar.get('storage_rat_last_help_day', -1) or -1) >= 0",
-                "#int(dayspassed or 0) >= int(MelissaVar.get('storage_rat_last_help_day', -1) or -1) + 1",
-                "#not bool(BreakfastToday)",
-            ],
-            None,
-            "TavernKitchen",
-            "enter",
-            1,
-        ),
-        (
             "story_melissa_werecat_rumor_0",
             None, None, None,
             1,
@@ -1307,7 +1289,8 @@ define melissaThreadList = [
             [
                 "#not (int(WerecatVar.get('sold', 0) or 0) == 0 and int(WerecatVar.get('adopted_count', 0) or 0) >= 1)",
                 "#int(WerecatVar.get('rats_problem_active', 0) or 0) == 1",
-                "#int(WerecatVar.get('rat_breakfast_seen', 0) or 0) == 1",
+                "#int(MelissaVar.get('storage_rat_cleared', 0) or 0) == 1",
+                "#int(MelissaVar.get('storage_rat_last_help_day', -1) or -1) >= 0",
                 "#int(WerecatVar.get('adopted', 0) or 0) == 0",
                 "#int(WerecatVar.get('sold', 0) or 0) == 0",
                 "#int(WerecatVar.get('hunter_tease_day', -1) or -1) < 0",
@@ -1315,6 +1298,22 @@ define melissaThreadList = [
             None,
             "HunterClub",
             "overheard",
+            1,
+        ),
+        (
+            "story_melissa_werecat_intro_0",
+            (1, 7), 0, None,
+            1,
+            None,
+            [
+                "#int(WerecatVar.get('rats_problem_active', 0) or 0) == 1",
+                "#int(WerecatVar.get('rat_breakfast_seen', 0) or 0) == 0",
+                "#int(WerecatVar.get('hunter_tease_day', -1) or -1) >= 0",
+                "#not bool(BreakfastToday)",
+            ],
+            None,
+            "TavernKitchen",
+            "enter",
             2,
         ),
         (
@@ -1413,20 +1412,6 @@ define melissaThreadList = [
             3,
         ),
         (
-            "story_melissa_bat_problem_4",
-            None, None, None,
-            1,
-            None,
-            [
-                "#melissa_bats_stage() >= 6",
-                "#melissa_bats_stage() < 8",
-            ],
-            None,
-            "TavernAtic",
-            "melissa_bats",
-            4,
-        ),
-        (
             "story_melissa_bat_problem_5",
             None, None, None,
             1,
@@ -1441,6 +1426,20 @@ define melissaThreadList = [
             None,
             "TavernMelissaRoom",
             "room_search",
+            4,
+        ),
+        (
+            "story_melissa_bat_problem_4",
+            None, None, None,
+            1,
+            None,
+            [
+                "#melissa_bats_stage() >= 6",
+                "#melissa_bats_stage() < 8",
+            ],
+            None,
+            "TavernAtic",
+            "melissa_bats",
             5,
         ),
         (
@@ -1473,7 +1472,7 @@ define melissaThreadList = [
                 "#str(getLocation('melissa') or '') == 'TavernMain'",
                 "#str(getLocation('clara') or '') == 'TavernMain'",
                 "#not household_runtime_event_seen_today('melissa_clara_overhear')",
-                "#int(ClaraVar.get('tavern_melissa_visit_count', 0) or 0) >= 2",
+                "#int(ClaraVar.get('tavern_melissa_visit_count', 0) or 0) >= 1",
                 "#int(ClaraVar.get('tavern_melissa_overheard_2_seen', 0) or 0) == 0",
             ],
             None,
@@ -1492,7 +1491,7 @@ define melissaThreadList = [
                 "#not household_runtime_event_seen_today('melissa_clara_overhear')",
                 "#int(ClaraVar.get('tavern_melissa_overheard_2_seen', 0) or 0) == 1",
                 "#int(ClaraVar.get('tavern_melissa_overheard_3_seen', 0) or 0) == 0",
-                "#int(ClaraVar.get('tavern_melissa_visit_count', 0) or 0) >= 3",
+                "#int(ClaraVar.get('tavern_melissa_visit_count', 0) or 0) >= 2",
                 "#int(AmandaVar.get('attic_window_busted', 0) or 0) == 1",
                 "#int(MelissaVar.get('bats_episode', 0) or 0) >= 6",
             ],
@@ -2131,8 +2130,8 @@ default threads = createThreads()
 
 
 label checkTriggers(location, action, numpop=0):
-    $ _story_location = str(location or "")
-    $ _story_action = str(action or "")
+    $ _story_location = str(location or "").strip()
+    $ _story_action = str(action or "").strip()
     $ findAvailableEvents(True)
     if _story_location not in availEvents:
         return False
@@ -2178,7 +2177,7 @@ label melissaClaraOverheard_0:
     $ current_action_content = None
     $ current_action_items = [MenuItem("Отойти от чужого разговора", Call("TavernMainRestore"))]
     $ story_thread_advance_current()
-    jump TavernMain
+    return
 
 
 label melissaClaraOverheard_1:
@@ -2194,7 +2193,7 @@ label melissaClaraOverheard_1:
     $ current_action_content = None
     $ current_action_items = [MenuItem("Сделать вид, что ничего не услышали", Call("TavernMainRestore"))]
     $ story_thread_advance_current()
-    jump TavernMain
+    return
 
 
 label story_clara_market_booklet_0:
@@ -2335,6 +2334,8 @@ label story_clara_market_booklet_1_direct_follow:
     $ SignalBlockTime = 1
     $ _clara_evening_booklet_follow = int(time or 0) == 3 and int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1
     if _clara_evening_booklet_follow and int(effective_player_exploration() or 0) < 100:
+        $ ClaraVar["market_follow_failed_day"] = int(dayspassed or 0)
+        $ ClaraVar["market_follow_failed_time"] = int(time or 0)
         $ MainTxt = "Вечерний рынок куда опаснее для слежки, чем дневной. Стоит вам зацепить чей-то ящик или лишний раз оглянуться, как Кларисса успевает скрыться в темном закутке и растворяется среди поздних покупателей.\n\nБез лучшей сноровки вы только выдадите себя и ничего не услышите."
         $ CurLocDesc = MainTxt
         $ current_action_title = "Вечерний рынок"
@@ -2343,6 +2344,8 @@ label story_clara_market_booklet_1_direct_follow:
         call screen main_ui
         jump MarketPlace
     if (not _clara_evening_booklet_follow) and int(effective_player_exploration() or 0) < 80:
+        $ ClaraVar["market_follow_failed_day"] = int(dayspassed or 0)
+        $ ClaraVar["market_follow_failed_time"] = int(time or 0)
         $ MainTxt = "Вы стараетесь не отстать, но дневной рынок слишком шумный и тесный. Стоит вам замешкаться на пару шагов, как Кларисса ускользает между рядами и будто растворяется среди чужих спин.\n\nПохоже, без лучшей сноровки в слежке вы просто потеряете ее снова."
         $ CurLocDesc = MainTxt
         $ current_action_title = "Рынок"
@@ -2379,6 +2382,8 @@ label story_clara_market_booklet_2_direct_follow:
     $ SignalBlockTime = 1
     $ ClaraVar["market_evening_intro_seen"] = 1
     if int(effective_player_exploration() or 0) < 100:
+        $ ClaraVar["market_follow_failed_day"] = int(dayspassed or 0)
+        $ ClaraVar["market_follow_failed_time"] = int(time or 0)
         $ MainTxt = "Закрытый вечерний рынок куда опаснее для слежки, чем дневная толпа. Стоит вам задеть чью-то корзину и чуть замешкаться, как Кларисса вместе с Монголом растворяются в темном закутке между пустеющими рядами. Без лучшей сноровки здесь их не удержать."
         $ CurLocDesc = MainTxt
         $ current_action_title = "Вечерний рынок"
@@ -2607,7 +2612,6 @@ label story_clara_market_booklet_release_mongol:
     $ productnum = max(0, int(productnum or 0) - 1)
     $ winenum = max(0, int(winenum or 0) - 1)
     $ tavernfame = int(tavernfame or 0) + 2
-    $ notoriety = min(100, int(notoriety or 0) + 2)
     $ Friends["zimmer"] = min(20, int(Friends.get("zimmer", 0) or 0) + 1)
     $ MongolVar["GuardGiftSent"] = 1
     $ MongolVar["GuardCaptainKnown"] = 1
@@ -2679,7 +2683,7 @@ label story_melissa_bat_problem_1:
     $ SignalBlockTime = 1
     call MelissaNightNoiseScene
     call screen main_ui
-    jump TavernUpstairs
+    jump TavernMelissaRoom
 
 
 label story_melissa_bat_problem_2:
@@ -2713,7 +2717,6 @@ label story_melissa_bat_problem_4:
 label story_melissa_bat_problem_5:
     $ SignalBlockTime = 1
     call MelissaFindDrawingsScene
-    $ story_thread_advance_current()
     call screen main_ui
     jump TavernAmandaRoom
 

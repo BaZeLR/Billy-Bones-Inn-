@@ -18,6 +18,7 @@ init 5 python:
             HoneyCombItem,
             AleItem,
             DogBoneItem,
+            DogCollarItem,
             HuntingTrapItem,
             ArrowsItem,
             ShotDropletsItem,

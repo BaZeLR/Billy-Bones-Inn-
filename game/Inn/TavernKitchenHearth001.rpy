@@ -17,15 +17,18 @@ init python:
         ash_dirty = _object_state_int(TavernKitchenHearthObject, "ash_dirty", 0)
         wood_stock = tavern_kitchen_hearth_wood_stock()
         if fire_active and ash_dirty > 0:
-            description = "В очаге горит огонь, и жара должно хватить еще на несколько часов. Внизу уже собирается зола."
+            description = "В очаге горит огонь, и жара должно хватить еще примерно на {b}%s{/b} ч. Можно подложить дрова, чтобы снова получить полный двенадцатичасовой жар. Внизу уже собирается зола." % str(max(1, int((_pc_fire_remaining_minutes(TavernKitchenHearthObject) + 59) / 60)))
         elif fire_active:
-            description = "В очаге горит огонь. Одной порции дров должно хватить еще на несколько часов."
+            description = "В очаге горит огонь. Жара должно хватить еще примерно на {b}%s{/b} ч. Можно подложить дрова, чтобы снова получить полный двенадцатичасовой жар." % str(max(1, int((_pc_fire_remaining_minutes(TavernKitchenHearthObject) + 59) / 60)))
         elif ash_dirty > 0:
             description = "Очаг остыл, но в нем скопилась зола после прошлой топки."
         else:
             description = "Большой очаг, на котором готовят пищу. Сейчас он не разожжен."
         if wood_stock > 0:
             description += "\n\nРядом с очагом сложены колотые дрова: {b}%s{/b} шт." % str(wood_stock)
+        carried_wood = int(_player_item_count_by_id("chopped_wood_001") or 0)
+        if carried_wood > 0:
+            description += "\nПри себе у вас колотые дрова: {b}%s{/b} шт." % str(carried_wood)
         return description
 
     TavernKitchenHearthObject = GameObject(
@@ -64,7 +67,7 @@ init python:
                 args=("hearth_001", "TavernKitchen", "Большой очаг, на котором готовят пищу. Он может долго держать жар.", "hearth_001"),
             ),
         ],
-        state={"fire_until_minute": 0, "fire_units": 0, "ash_dirty": 0, "chopped_wood_stock": 0},
+        state={"fire_started_minute": 0, "fire_until_minute": 0, "fire_units": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0},
         carriable=False,
         stackable=False,
     )

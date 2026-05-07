@@ -51,7 +51,7 @@ label ChurchAfterCermon(entry_arg=0):
     if navigation_only_mode_enabled():
         $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
         $ CurLocDesc = MainTxt
-        $ current_action_items.append(MenuItem("Вернуться в собор", Call("ChurchRestore")))
+        $ current_action_items.append(MenuItem("Вернуться в собор", Function(main_ui_call_label, "ChurchRestore")))
         return
 
     python:
@@ -59,24 +59,24 @@ label ChurchAfterCermon(entry_arg=0):
 
     if _church_scene_code == "georgett":
         call IntGeorgettAfterCermon
-        $ MainTxt = MainTxt + "\n\nЗа кабинками для исповеди вы заметили неприметную дверь, ведущую внутрь храма. Из-за нее слышаться приглушенные голоса. Вы замечаете большую замочную скважину, через которую вы можете {a=call:AfterCermonGeorgett}{color=#245b2b}посмотреть{/color}{/a}, что там происходит."
+        $ MainTxt = MainTxt + "\n\nЗа кабинками для исповеди вы заметили неприметную дверь, ведущую внутрь храма. Из-за нее слышаться приглушенные голоса. Вы замечаете большую замочную скважину, через которую вы можете {a=church:after_georgett:1}{color=#245b2b}посмотреть{/color}{/a}, что там происходит."
         $ CurLocDesc = MainTxt
-        $ current_action_items.append(MenuItem("Посмотреть", Call("AfterCermonGeorgett")))
+        $ current_action_items.append(MenuItem("Посмотреть", Function(main_ui_call_label, "AfterCermonGeorgett")))
     elif _church_scene_code == "liza":
         call IntLizettAfterCermon
-        $ MainTxt = MainTxt + "\n\nЗа кабинками для исповеди вы заметили неприметную дверь, ведущую внутрь храма. Из-за нее слышаться приглушенные голоса. Вы замечаете большую замочную скважину, через которую вы можете {a=call:AfterCermonLizett}{color=#245b2b}посмотреть{/color}{/a}, что там происходит."
+        $ MainTxt = MainTxt + "\n\nЗа кабинками для исповеди вы заметили неприметную дверь, ведущую внутрь храма. Из-за нее слышаться приглушенные голоса. Вы замечаете большую замочную скважину, через которую вы можете {a=church:after_liza:1}{color=#245b2b}посмотреть{/color}{/a}, что там происходит."
         $ CurLocDesc = MainTxt
-        $ current_action_items.append(MenuItem("Посмотреть", Call("AfterCermonLizett")))
+        $ current_action_items.append(MenuItem("Посмотреть", Function(main_ui_call_label, "AfterCermonLizett")))
     elif _church_scene_code == "becky":
         call IntBeckyAfterCermon
-        $ MainTxt = MainTxt + "\n\nВы заметили, как миссис Блэнкеншип направилась было к кабинке для исповеди, но отец Герхард взял ее за руку и повел к неприметной двери, которую он отпер висящим у него на поясе ключом. Как только вдова проследовала за ним, дверь захлопнулась и послышался стук задвигаемого засова. Хотя вы можете попробовать {a=call:AfterCermonBecky}{color=#245b2b}посмотреть{/color}{/a}, что там происходит через замочную скважину."
+        $ MainTxt = MainTxt + "\n\nВы заметили, как миссис Блэнкеншип направилась было к кабинке для исповеди, но отец Герхард взял ее за руку и повел к неприметной двери, которую он отпер висящим у него на поясе ключом. Как только вдова проследовала за ним, дверь захлопнулась и послышался стук задвигаемого засова. Хотя вы можете попробовать {a=church:after_becky:1}{color=#245b2b}посмотреть{/color}{/a}, что там происходит через замочную скважину."
         $ CurLocDesc = MainTxt
-        $ current_action_items.append(MenuItem("Посмотреть", Call("AfterCermonBecky")))
+        $ current_action_items.append(MenuItem("Посмотреть", Function(main_ui_call_label, "AfterCermonBecky")))
     else:
         $ MainTxt = MainTxt + "\n\nНичего интересного вы не нашли."
         $ CurLocDesc = MainTxt
 
     if BeckyVar.get("PriestAdvice", 0) == 0 or BeckyVar.get("PriestAdvice", 0) > 2:
-        $ current_action_items.append(MenuItem("Вернуться в собор", Call("ChurchRestore")))
+        $ current_action_items.append(MenuItem("Вернуться в собор", Function(main_ui_call_label, "ChurchRestore")))
     $ renpy.restart_interaction()
     return

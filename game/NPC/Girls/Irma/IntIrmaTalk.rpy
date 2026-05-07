@@ -89,7 +89,7 @@ label IntIrmaTalk(show_menu=True):
     return
 
 
-label IntIrmaTalkRefresh:
+label IntIrmaTalkRefresh(girl_name="irma"):
     $ main_ui_begin_talk_state("Разговор с Ирмой", "irma")
     $ current_action_title = "Разговор с Ирмой"
     $ current_action_content = None

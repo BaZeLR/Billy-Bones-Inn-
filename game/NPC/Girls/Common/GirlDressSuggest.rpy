@@ -177,8 +177,6 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
     $ DressBuyIsRelative = _gds_relative_type(GirlName)
     $ ShowOffLevel = _gds_showoff_level(GirlName)
 
-    if renpy.has_label("CleanScreenOverflow"):
-        call CleanScreenOverflow
 
     $ _rn = _gds_name("RealName", GirlName)
     $ _short_name = str(_gds_get_dict("ShortDressName").get(DressToBuy, DressToBuy)).lower()

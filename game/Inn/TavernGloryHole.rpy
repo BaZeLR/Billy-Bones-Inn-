@@ -160,7 +160,6 @@ label TavernGloryHole:
 
         menu:
             "Смотреть на клиента" if GloryHoleLook > 0 and GloryHoleCurrentStep <= 3 and BlockGloryHoleMenu == 0:
-                call CleanScreenOverflow(3)
                 if GloryHoleCurrentStep == 0:
                     "Вспомнив про сделанную мастеровитым гномом возможность обзора, вы решили посмотреть на происходящее инкогнито."
                 else:
@@ -183,7 +182,7 @@ label TavernGloryHole:
                 jump TavernGloryHole_menu
 
             "Смотреть на девочку" if CockInGloryHole == 0 and BlockGloryHoleMenu == 0:
-                call CleanScreenOverflow(3)
+                
                 if GloryHoleCurrentStep == 0 or GloryHoleLook == 0:
                     "Вы решили аккуратно заглянуть за ширмочку и посмотреть на девочку за работой."
                 else:
@@ -221,7 +220,7 @@ label TavernGloryHole:
                 jump TavernGloryHole_menu
 
             "Вставить член" if CockInGloryHole == 0 and GloryHoleLook == 0 and cametoday < cancumdaily and GloryHoleCurrentStep == 0 and BlockGloryHoleMenu == 0:
-                call CleanScreenOverflow(3)
+                
                 python:
                     _set_gloryhole_inside()
                 $ CockInGloryHole = 1
@@ -234,7 +233,7 @@ label TavernGloryHole:
                 jump TavernGloryHole_menu
 
             "Наслаждаться процессом" if CockInGloryHole == 1 and GloryHoleLook == 0 and cametoday < cancumdaily and GloryHoleCurrentStep == 1 and BlockGloryHoleMenu == 0:
-                call CleanScreenOverflow(3)
+                
                 "[GloryHoleYouLine2]"
                 if GloryHoleWorks:
                     $ GloryHoleCurrentStep += 1
@@ -243,7 +242,7 @@ label TavernGloryHole:
                 jump TavernGloryHole_menu
 
             "Кончить" if CockInGloryHole == 1 and GloryHoleLook == 0 and cametoday < cancumdaily and GloryHoleCurrentStep == 2 and BlockGloryHoleMenu == 0:
-                call CleanScreenOverflow(3)
+                
                 "[GloryHoleYouLine3]"
                 if GloryHoleWorks:
                     $ GloryHoleCurrentStep += 1
@@ -268,7 +267,7 @@ label TavernGloryHole:
                 jump TavernGloryHole_menu
 
             "Что-то не то, проверить кто у глорихола" if AmandaAtGlory == 1 and BlockGloryHoleMenu == 0 and CockInGloryHole == 1:
-                call CleanScreenOverflow(3)
+                
                 "[GloryGirlLine1]"
                 $ AmandaGloryCurState = 2
                 $ BlockGloryHoleMenu = 1

@@ -6,6 +6,7 @@ default PlayerSocialConditionLast = {}
 
 init python:
     import renpy.exports as renpy_module
+    import renpy.store as store
 
     def _player_int(value, default=0):
         try:
@@ -28,7 +29,7 @@ init python:
             return _player_int(dress_map.get(code, 15), 15)
         if code == "nightshirt":
             return 8
-        if code in tuple(globals().get("MaleDressCodes", []) or []):
+        if code in tuple(getattr(store, "MaleDressCodes", []) or []):
             return 20
         return 24
 
@@ -72,10 +73,10 @@ init python:
             return 0
         try:
             if not isinstance(PlayerDressDaySt, dict):
-                globals()["PlayerDressDaySt"] = {}
+                store.PlayerDressDaySt = {}
             dress_days = PlayerDressDaySt
         except Exception:
-            globals()["PlayerDressDaySt"] = {}
+            store.PlayerDressDaySt = {}
             dress_days = PlayerDressDaySt
         if code not in dress_days:
             dress_days[code] = _player_int(dayspassed, 0)
@@ -530,23 +531,27 @@ init python:
         children_score = min(100, player_children_count() * 20)
         exploration_score = min(100, effective_player_exploration() * 5)
         horse_score = 5 if bool(str(MyStallion or "").strip()) else 0
+        hunter_score = min(20, max(0, _player_int(globals().get("HunterClubVar", {}).get("reputation", 0), 0)))
         reputation_value = _player_clamp_stat(round(
             (look_value * 0.60)
             + (quest_score * 0.15)
             + (exploration_score * 0.15)
             + (children_score * 0.10)
-        ) + horse_score, 0, 100)
+        ) + horse_score + hunter_score, 0, 100)
         return {
             "look": look_value,
             "quest": quest_score,
             "children": children_score,
             "exploration": exploration_score,
             "horse": horse_score,
+            "hunter": hunter_score,
             "reputation": reputation_value,
             "children_count": player_children_count(),
         }
 
     def update_stat_state():
+        global dayssincehaircut, costumecondition, look, reputation, charisma
+
         calendar_sync_state()
         try:
             fight_sync_level_from_exploration()
@@ -561,11 +566,11 @@ init python:
             soap_expire_if_needed()
         except Exception:
             pass
-        globals()["dayssincehaircut"] = _player_int(player_haircut_elapsed_days(), 0)
-        globals()["costumecondition"] = _player_int(player_dress_condition_from_age(player_current_dress_age_days(MyCurDress)), 0)
-        globals()["look"] = _player_int(player_look_breakdown().get("look", 0), 0)
-        globals()["notoriety"] = _player_int(player_reputation_breakdown().get("reputation", 0), 0)
-        globals()["charisma"] = _player_int(player_charisma_breakdown().get("charisma", 0), 0)
+        dayssincehaircut = _player_int(player_haircut_elapsed_days(), 0)
+        costumecondition = _player_int(player_dress_condition_from_age(player_current_dress_age_days(MyCurDress)), 0)
+        look = _player_int(player_look_breakdown().get("look", 0), 0)
+        reputation = _player_int(player_reputation_breakdown().get("reputation", 0), 0)
+        charisma = _player_int(player_charisma_breakdown().get("charisma", 0), 0)
         player_condition_maybe_notify()
 
 

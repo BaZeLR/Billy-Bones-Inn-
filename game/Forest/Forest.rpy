@@ -320,7 +320,6 @@ label ForestBuildActions:
         $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", "Forest")))
     elif werecat_can_check_bait("Forest"):
         $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", "Forest")))
-
     python:
         for _forest_object in ForestRoom.visible_objects():
             current_action_items.append(MenuItem(_forest_object.name, Call("ForestObjectMenu", _forest_object.object_id)))

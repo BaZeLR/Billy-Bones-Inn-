@@ -44,7 +44,7 @@ init python:
     def tavern_breakfast_can_offer_dance_sponsorship():
         return (
             int(hour or 0) < 12
-            and int(week or 0) in (3, 4)
+            and int(week ==3)
             and int(EventsCount.get(10, 0) or 0) > 0
             and str(NewEvents.get("10_" + str(int(EventsCount.get(10, 0) or 0) - 1), "") or "") == "WineForDance"
         )
@@ -70,6 +70,9 @@ init python:
         for npc_id in present_ids:
             Friends[npc_id] = min(20, int(Friends.get(npc_id, 0) or 0) + 1)
         return present_ids
+
+default DanceSponsorPledgeDay = -1
+default TavernBreakfastDanceSponsorAnnouncedDay = -1
 
 label EventWineForDance(eyewitness=0):
     $ YourReaction1 = 0
@@ -101,12 +104,14 @@ label EventWineForDanceApply(reaction_code=1):
     $ MainTxt = str(_wine_outcome.get("text", "") or "")
     $ CurLocDesc = MainTxt
     $ DanceSponsor = int(_wine_outcome.get("dance_sponsor", 0) or 0)
+    if int(DanceSponsor or 0) == 1:
+        $ DanceSponsorPledgeDay = int(dayspassed or 0)
     $ winenum += int(_wine_outcome.get("wine_delta", 0) or 0)
     $ productnum += int(_wine_outcome.get("product_delta", 0) or 0)
     $ money += int(_wine_outcome.get("money_delta", 0) or 0)
     if int(DanceSponsor or 0) == 1 and str(CurLoc or "") == "TavernKitchen" and int(hour or 0) < 12:
         $ _crew_appreciation = wine_for_dance_breakfast_appreciation()
-        $ fun = _player_clamp(int(fun or 0) + 2, 0, 100)
+        $ fun = _player_clamp(int(fun or 0) + 20, 0, 100)
         if len(list(_crew_appreciation or [])) > 0:
             $ MainTxt = str(MainTxt or "") + "\n\nЗа столом решение встречают заметно теплее. Домашние переглядываются с одобрением: щедрый жест явно поднимает всем настроение."
             $ CurLocDesc = MainTxt

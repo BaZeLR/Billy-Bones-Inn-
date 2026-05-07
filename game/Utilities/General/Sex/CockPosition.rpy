@@ -47,10 +47,10 @@ init python:
 
 
 label CockPosition(girl_name="", position_=0, other_dude_name=""):
-    $ _tmp_cock_position_apply = cock_position_apply(girl_name, position, other_dude_name)
+    $ _tmp_cock_position_apply = cock_position_apply(girl_name, position_, other_dude_name)
     return
 
 
 label cock_position(girl_name="", position_=0, other_dude_name=""):
-    $ _tmp_cock_position_apply2 = cock_position_apply(girl_name, position, other_dude_name)
+    $ _tmp_cock_position_apply2 = cock_position_apply(girl_name, position_, other_dude_name)
     return

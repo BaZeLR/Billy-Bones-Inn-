@@ -7,6 +7,7 @@ label GiveBirthFinish:
 
     $ real_name = RealName.get(GirlName, GirlName)
     $ real_name3 = RealName3.get(GirlName, real_name)
+    call ShowImage("", "", "images/ellona/afterBirth.png")
 
     "Вдруг храм огласил пронзительный детский крик: [real_name] наконец-то разрешилась от бремени."
 

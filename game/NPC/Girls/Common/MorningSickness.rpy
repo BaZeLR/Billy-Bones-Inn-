@@ -24,6 +24,8 @@ init python:
             return ""
         for girl in ("sandra", "melissa", "amanda"):
             girl_key = str(girl or "").strip()
+            if str(getLocation(girl_key) or "") != "TavernKitchen":
+                continue
             if morning_sickness_daily_event_ready(girl_key, "TavernKitchen", time):
                 return girl_key
         return ""

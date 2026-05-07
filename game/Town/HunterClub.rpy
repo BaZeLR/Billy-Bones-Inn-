@@ -6,9 +6,45 @@ init python:
 
     HUNTER_CLUB_TRADE_MAX_QTY = 99
 
+    HUNTER_CLUB_CHALLENGES = [
+        {
+            "id": "wolf_skin",
+            "label": "Принести серую волчью шкуру",
+            "item_id": "wolf_skin_001",
+            "qty": 1,
+            "rep": 2,
+            "text": "Луиза принимает серую волчью шкуру, щупает мех и одобрительно хмыкает. Для начала вы доказали, что в лесу не только гуляете.",
+        },
+        {
+            "id": "boar_fang",
+            "label": "Принести кабаний клык",
+            "item_id": "boar_fang_001",
+            "qty": 1,
+            "rep": 3,
+            "text": "Кабаний клык быстро переходит из ваших рук к Луизе. Она показывает его паре охотников у стены, и те смотрят на вас уже внимательнее.",
+        },
+        {
+            "id": "white_wolf",
+            "label": "Принести белую волчью шкуру",
+            "item_id": "white_wolf_skin_001",
+            "qty": 1,
+            "rep": 5,
+            "text": "Белая волчья шкура производит в клубе настоящий шум. Луиза больше не шутит: такой трофей здесь уважают.",
+        },
+        {
+            "id": "bear_claw",
+            "label": "Принести медвежий коготь",
+            "item_id": "bear_claw_001",
+            "qty": 1,
+            "rep": 6,
+            "text": "Медвежий коготь ложится на прилавок тяжело и убедительно. После такого трофея охотники начинают запоминать ваше имя.",
+        },
+    ]
+
     HUNTER_CLUB_BUY_STOCK = [
         {"item_id": "drink_ale_001", "price": 2},
         {"item_id": "dog_bone_001", "price": 1},
+        {"item_id": "dog_collar_001", "price": 10},
         {"item_id": "hunting_trap_001", "price": 18},
         {"item_id": "lumber_001", "price": 8},
         {"item_id": "arrows_001", "price": 6},
@@ -177,6 +213,98 @@ init python:
             return "Отметьте добычу и укажите количество для продажи."
         return "К продаже отмечено %s ед. товара. Луиза заплатит: %s мараведи." % (selected_count, total_price)
 
+    def hunter_club_seen_first_visit():
+        return int(HunterClubVar.get("first_visit_seen", 0) or 0) > 0
+
+    def hunter_club_reputation():
+        return max(0, int(HunterClubVar.get("reputation", 0) or 0))
+
+    def hunter_club_completed_challenges():
+        return dict(HunterClubVar.get("completed_challenges", {}) or {})
+
+    def hunter_club_challenge_row(challenge_id=""):
+        challenge_key = str(challenge_id or "").strip()
+        for row in list(HUNTER_CLUB_CHALLENGES or []):
+            if str(row.get("id", "") or "") == challenge_key:
+                return dict(row)
+        return {}
+
+    def hunter_club_challenge_completed(challenge_id=""):
+        return int(hunter_club_completed_challenges().get(str(challenge_id or "").strip(), 0) or 0) > 0
+
+    def hunter_club_challenge_available(row):
+        data = dict(row or {})
+        if hunter_club_challenge_completed(data.get("id", "")):
+            return False
+        item_id = str(data.get("item_id", "") or "")
+        qty = max(1, int(data.get("qty", 1) or 1))
+        return int(_player_item_count_by_id(item_id) or 0) >= qty
+
+    def hunter_club_reputation_title():
+        value = hunter_club_reputation()
+        if value >= 16:
+            return "уважаемый клубный охотник"
+        if value >= 9:
+            return "заметный добытчик"
+        if value >= 4:
+            return "подающий надежды следопыт"
+        return "новичок клуба"
+
+    def hunter_club_news_text():
+        rows = [
+            "На доске клуба висят свежие заметки о лесных тропах, зверье и городских слухах.",
+            "Ваша репутация в клубе: %s (%s)." % (hunter_club_reputation(), hunter_club_reputation_title()),
+        ]
+        try:
+            if fight_can_hunt_here("Forest"):
+                rows.append("Охотники говорят, что в обычном лесу снова видели волчьи следы.")
+            if fight_can_hunt_here("ForestDarkWoods"):
+                rows.append("У темных троп неспокойно: там попадаются звери покрупнее.")
+            if int(effective_player_exploration() or 0) >= 100:
+                rows.append("Луиза советует не ходить далеко без бинтов, ловушек и заряженного оружия.")
+        except Exception:
+            pass
+        if int(MongolVar.get("StocksArrestDay", -1) or -1) >= 0:
+            rows.append("У стойки снова обсуждают арест конокрада: городская стража теперь смотрит на рынок строже.")
+        return "\n\n".join(rows)
+
+    def hunter_club_challenge_caption(row):
+        data = dict(row or {})
+        item_id = str(data.get("item_id", "") or "")
+        item_obj = get_game_item(item_id)
+        item_name = str(getattr(item_obj, "name", item_id) or item_id)
+        qty = max(1, int(data.get("qty", 1) or 1))
+        rep = max(0, int(data.get("rep", 0) or 0))
+        if hunter_club_challenge_completed(data.get("id", "")):
+            return "%s (выполнено)" % str(data.get("label", "") or item_name)
+        return "%s: %s x%s, репутация +%s" % (str(data.get("label", "") or item_name), item_name, qty, rep)
+
+    def hunter_club_apply_challenge(challenge_id=""):
+        global reputation
+
+        row = hunter_club_challenge_row(challenge_id)
+        if not row:
+            return {"ok": False, "text": "Такого вызова на доске нет."}
+        challenge_key = str(row.get("id", "") or "")
+        if hunter_club_challenge_completed(challenge_key):
+            return {"ok": False, "text": "Этот вызов уже закрыт."}
+        item_id = str(row.get("item_id", "") or "")
+        qty = max(1, int(row.get("qty", 1) or 1))
+        if int(_player_item_count_by_id(item_id) or 0) < qty:
+            return {"ok": False, "text": "Для этого вызова у вас пока нет нужного трофея."}
+        for _unused in range(qty):
+            _player_remove_item_by_id(item_id)
+        completed = hunter_club_completed_challenges()
+        completed[challenge_key] = 1
+        HunterClubVar["completed_challenges"] = completed
+        rep_gain = max(0, int(row.get("rep", 0) or 0))
+        HunterClubVar["reputation"] = hunter_club_reputation() + rep_gain
+        try:
+            reputation = min(100, max(int(reputation or 0), int(reputation or 0) + rep_gain))
+        except Exception:
+            pass
+        return {"ok": True, "text": "%s\n\nРепутация в клубе: +%s." % (str(row.get("text", "") or "Луиза принимает трофей."), rep_gain)}
+
     def hunter_club_apply_trade(mode="buy"):
         global money
 
@@ -334,6 +462,15 @@ init python:
                     ObjectAction(action_id="inspect_trophies", label="Осмотреть трофеи", hook="text", target="На стенах развешаны старые волчьи шкуры, облезлые кабаньи головы и громадные медвежьи когти. Вид у них внушительный, даже если лучшие времена давно прошли."),
                 ],
             ),
+            GameObject(
+                object_id="hunter_board",
+                name="Доска клуба",
+                description="На доске прибиты новости, заметки о звериных следах и небольшие вызовы для тех, кто хочет, чтобы его имя запомнили охотники.",
+                actions=[
+                    ObjectAction(action_id="club_news", label="Почитать новости", hook="call", target="HunterClubNewsMenu"),
+                    ObjectAction(action_id="club_challenges", label="Посмотреть охотничьи вызовы", hook="call", target="HunterClubChallengesMenu"),
+                ],
+            ),
         ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 6],
@@ -352,6 +489,7 @@ init python:
 
 default HunterClubTradeMode = ""
 default HunterClubTradeSelection = {}
+default HunterClubVar = {}
 
 
 screen hunter_club_trade_overlay():
@@ -467,7 +605,9 @@ label HunterClub:
 
     $ MainTxt = hunter_club_main_text()
     $ CurLocDesc = MainTxt
-    if int(ClaraVar.get("escape_confessed", 0) or 0) == 1 and int(MongolVar.get("StocksArrestDay", -1) or -1) < 0:
+    if not hunter_club_seen_first_visit():
+        call HunterClubFirstVisit
+    elif int(ClaraVar.get("escape_confessed", 0) or 0) == 1 and int(MongolVar.get("StocksArrestDay", -1) or -1) < 0:
         call preEvent("claraBookletMarket")
         if thread is not None and int(thread.num or 0) < 5:
             $ thread.advanceTo(5, force_active=True)
@@ -480,6 +620,13 @@ label HunterClub:
         call screen main_ui
         $ _hunter_ui_return = _return
     jump HunterClub
+
+
+label HunterClubFirstVisit:
+    $ HunterClubVar["first_visit_seen"] = 1
+    $ MainTxt = "А ты, вы уважаемый хер... ммм, случайно не родственник покойного Лонгкока?\n\n\"Да,\" отвечаете вы, \"покойный был моим дядей.\"\n\n\"О! То-то я смотрю, похож. Вылитый Лонгкок в молодости. Мдэ,\" выдохнула толстуха. \"Покойничек-то лес любил, да и ружьишко у него, помнится, чудное имелось... фамильное... ну, как говорится, земля ему пухом. И вообще, синька зло!\" - подытожила она. \"А ты, это... заходи, если что надо, тут все свои. Милости просим, да... уж.\""
+    $ CurLocDesc = MainTxt
+    return
 
 
 label HunterClubBuildActions:
@@ -563,6 +710,59 @@ label HunterClubLuiseTalk:
         MenuItem("Открыть список продажи", Call("HunterClubSellMenu")),
         MenuItem("Назад", Call("HunterClubRestore")),
     ]
+    return
+
+
+label HunterClubNewsMenu:
+    $ current_action_title = "Новости клуба"
+    $ current_action_content = None
+    $ MainTxt = hunter_club_news_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_items = [
+        MenuItem("Посмотреть охотничьи вызовы", Call("HunterClubChallengesMenu")),
+        MenuItem("Назад", Call("HunterClubRestore")),
+    ]
+    return
+
+
+label HunterClubChallengesMenu(result_text=""):
+    $ current_action_title = "Охотничьи вызовы"
+    $ current_action_content = None
+    $ MainTxt = str(result_text or "").strip()
+    if MainTxt == "":
+        $ MainTxt = "Луиза кивает на доску: \"Кто приносит трофеи, того тут запоминают. Деньги деньгами, а имя среди охотников тоже чего-то стоит.\""
+    $ CurLocDesc = MainTxt
+    $ current_action_items = []
+    python:
+        for _challenge in list(HUNTER_CLUB_CHALLENGES or []):
+            _caption = hunter_club_challenge_caption(_challenge)
+            _challenge_id = str(_challenge.get("id", "") or "")
+            if hunter_club_challenge_available(_challenge):
+                current_action_items.append(MenuItem(_caption, Call("HunterClubChallengeApply", _challenge_id)))
+            elif not hunter_club_challenge_completed(_challenge_id):
+                current_action_items.append(MenuItem(_caption, Call("HunterClubChallengeMissing", _challenge_id)))
+        if len(current_action_items) <= 0:
+            current_action_items.append(MenuItem("Все доступные вызовы уже закрыты", Call("HunterClubNewsMenu")))
+        current_action_items.append(MenuItem("Назад", Call("HunterClubRestore")))
+    return
+
+
+label HunterClubChallengeMissing(challenge_id=""):
+    $ _challenge = hunter_club_challenge_row(challenge_id)
+    $ MainTxt = "Для этого вызова у вас пока нет нужного трофея."
+    if _challenge:
+        $ MainTxt = "Луиза смотрит на доску и качает головой: \"Сначала принеси то, что там написано. Тут словам не верят, тут трофеи кладут на стол.\""
+    $ CurLocDesc = MainTxt
+    call HunterClubChallengesMenu(MainTxt)
+    return
+
+
+label HunterClubChallengeApply(challenge_id=""):
+    $ _challenge_result = hunter_club_apply_challenge(challenge_id)
+    $ MainTxt = str(_challenge_result.get("text", "") or "")
+    $ CurLocDesc = MainTxt
+    call stat
+    call HunterClubChallengesMenu(MainTxt)
     return
 
 

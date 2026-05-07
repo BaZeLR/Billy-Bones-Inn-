@@ -83,8 +83,8 @@ label CityGuard:
 
     if int(MongolVar.get("StocksArrestDay", -1) or -1) >= 0 and int(MongolVar.get("StocksSeen", 0) or 0) == 0:
         call story_clara_market_booklet_city_guard_direct
-    elif story_event_available("CityGuard", "enter"):
-        call checkTriggers("CityGuard", "enter", 0)
+    else:
+        call RoomEnterEventGate(CurLoc, False)
 
     if CityGuardRoom.is_open(week, time):
         call ShowImage("Zimmer", "", "Portrait1")

@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     def street_tavern_sign_broken():
@@ -125,7 +125,7 @@ label StreetTavern:
             $ _amanda_dynamic_jump = str(AmandaDynamicTakeNextJump() or "")
             if _amanda_dynamic_jump != "" and renpy.has_label(_amanda_dynamic_jump):
                 jump expression _amanda_dynamic_jump
-        call CheckDailyEvent("", "_story_enter", CurLoc, time)
+        call RoomEnterEventGate(CurLoc, False)
 
     python:
         _street_desc_rows = StreetTavernRoom.visible_descriptions()
@@ -137,7 +137,7 @@ label StreetTavern:
             CurLocDesc += "\n\nНеподалеку от входа крутится бродячий пес, время от времени принюхиваясь к прохожим."
         MainTxt = CurLocDesc
         if dog_is_here("StreetTavern"):
-            current_action_items.append(MenuItem(dog_room_action_caption("StreetTavern"), Call("IntDogTalk", "StreetTavern")))
+            current_action_items.append(MenuItem(dog_display_name(), Function(main_ui_call_label, "IntDogTalk", "StreetTavern")))
         for _street_exit in StreetTavernRoom.visible_exits():
             current_action_items.append(MenuItem(_street_exit.label, Jump(_street_exit.target)))
     $ StreetTavernRoom.mark_visited()

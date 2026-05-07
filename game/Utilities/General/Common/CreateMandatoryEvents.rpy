@@ -5,7 +5,7 @@ label CreateMandatoryEvents:
     $ TimePeriod = 10
     $ EventsCount[TimePeriod] = 0
 
-    if week in (3, 4):
+    if week ==3:
         $ NewEvents[str(TimePeriod) + '_' + str(EventsCount[TimePeriod])] = 'WineForDance'
         $ EventsCount[TimePeriod] += 1
 

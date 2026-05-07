@@ -242,7 +242,8 @@ label int_becky_dance():
             return
         "Отойти" if DanceStep >= DanceMaxIBD or DanceStep == 1:
             $ CounterToClean = MaxCounterToClean
-            call CleanScreenOverflow(CounterToClean)
+            $ FridayDancesCount += 1
+            "Вы решили отойти от Бекки и вернуться к колоннаде."
             $ DanceStep = 0
             # dynamic $CurrentActions
             # dynamic $FridayDanceCounterShow

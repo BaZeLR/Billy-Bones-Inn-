@@ -30,6 +30,7 @@ default fun = 50
 default energy = 100
 default health = 100
 default notoriety = 0
+default reputation = 0
 default exploration = 0
 default charisma = 0
 default rebellion = 0
@@ -308,6 +309,15 @@ label Intro:
         CumTitsOthers = {}
         CumInsideYou = {}
         CumInsideOthers = {}
+        LastDaySex = -1
+        PlayerLastCumDay = -1
+        PlayerSleepBottomLayer = "daywear"
+        PlayerRoomLightClosed = 0
+        PlayerMorningArousalDay = -1
+        PlayerWakeStateNotice = ""
+        PlayerArousalReasons = []
+        PlayerObservedNakedNpcDay = {}
+        PlayerLastHelpResult = {}
         cancumdaily = 2
         cametoday = 0
         BlessedByEllona = 0
@@ -343,12 +353,12 @@ label Intro:
             pass
 
         try:
-            TavernMainFireplaceObject.state = {"fire_until_minute": 0, "fire_units": 0, "ash_dirty": 0, "chopped_wood_stock": 0}
+            TavernMainFireplaceObject.state = {"fire_started_minute": 0, "fire_until_minute": 0, "fire_units": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0}
         except Exception:
             pass
 
         try:
-            TavernKitchenHearthObject.state = {"fire_until_minute": 0, "fire_units": 0, "ash_dirty": 0, "chopped_wood_stock": 0}
+            TavernKitchenHearthObject.state = {"fire_started_minute": 0, "fire_until_minute": 0, "fire_units": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0}
         except Exception:
             pass
 

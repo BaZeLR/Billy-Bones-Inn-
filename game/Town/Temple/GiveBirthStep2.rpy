@@ -7,6 +7,7 @@ label GiveBirthStep2:
 
     $ real_name = RealName.get(GirlName, GirlName)
     $ real_name2 = RealName2.get(GirlName, real_name)
+    call ShowImage("", "", "images/ellona/ante2.jpg")
 
     "Вы находитесь в храме, посвященном богине любви и плодородия Эллоне, в комнате для родов."
     "На ложе, широко раздвинув ноги, лежит голая рожающая [real_name]."

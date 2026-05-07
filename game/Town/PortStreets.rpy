@@ -4,15 +4,23 @@
 # PortStreets location - converted from legacy script
 default PortStreetsBottleSpawnDay = -1
 default PortStreetsBottlePresent = 0
+default georgett_can_talk = 0
+default liza_can_talk = 0
 
 init python:
     import random
 
     def port_streets_georgett_can_talk():
-        return georgett_can_talk == 1
+        try:
+            return int(georgett_can_talk or 0) == 1
+        except Exception:
+            return False
 
     def port_streets_liza_can_talk():
-        return liza_can_talk == 1
+        try:
+            return int(liza_can_talk or 0) == 1
+        except Exception:
+            return False
 
     def port_streets_prepare_bottle_spawn():
         global PortStreetsBottleSpawnDay
@@ -109,6 +117,7 @@ label PortStreets:
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
+        call ShowImage("", "", scene_image)
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
@@ -135,15 +144,15 @@ label PortStreets:
             $ _port_nav_ui_return = _return
         jump PortStreets
 
-    call CheckDailyEvent("", "_story_enter", CurLoc, time)
+    call RoomEnterEventGate(CurLoc, False)
 
     $ GirlNamePS1 = "georgett"
     $ GirlNamePS2 = "liza"
     $ _port_street_clients_target = ""
     $ _port_street_clients_girl = ""
     $ _port_street_clients_extra = []
-    $ _port_georgett_event_available = CheckIfSexEventExist(GirlNamePS1, time) > 0
-    $ _port_liza_event_available = CheckIfSexEventExist(GirlNamePS2, time) > 0
+    $ _port_georgett_event_available = CheckIfSexEventExist(GirlNamePS1, time, "Prostitution") > 0
+    $ _port_liza_event_available = CheckIfSexEventExist(GirlNamePS2, time, "Prostitution") > 0
 
     # Main street logic (TXT-authoritative conditions/visibility)
     if (CurrentLoc.get(GirlNamePS1, "") == CurLoc or _port_georgett_event_available or _port_liza_event_available) and time == 3 and week != 5 and not (GeorgettVar.get("TalkChurchAfterCermonLiza", 0) != 0 and LizaVar.get("ProstStart", 0) == 0):
@@ -211,10 +220,17 @@ label PortStreets:
                     $ georgett_can_talk = 1
                     $ liza_can_talk = 0
     else:
-        call ShowImageSeq("georgett", "port", "port", 3)
+        if time in (0, 1, 2):
+            $ _port_temple_road_pics = ["images/ellona/toTemple.png", "images/ellona/toTemple1.png"]
+            $ _port_temple_road_pic = _port_temple_road_pics[renpy.random.randint(0, len(_port_temple_road_pics) - 1)]
+            call ShowImage("", "", _port_temple_road_pic)
+        else:
+            call ShowImageSeq("georgett", "port", "port", 3)
         $ georgett_can_talk = 0
         $ liza_can_talk = 0
         $ CurLocDesc = PortStreetsRoom.descriptions[0].text
+        if time in (0, 1, 2):
+            $ CurLocDesc += "\n\nНа дороге к храму Эллоны встречаются беременные женщины: кто-то идет за благословением, кто-то уже почти у самых дверей родильной."
         $ MainTxt = CurLocDesc
 
     if dog_is_here("PortStreets"):
@@ -235,8 +251,7 @@ label PortStreetsBuildActions:
     $ current_action_content = None
     $ current_action_items = []
     if dog_is_here("PortStreets"):
-        $ current_action_items.append(MenuItem(dog_room_action_caption("PortStreets"), Call("IntDogTalk", "PortStreets")))
-
+        $ current_action_items.append(MenuItem(dog_display_name(), Call("IntDogTalk", "PortStreets")))
     python:
         for _port_object in PortStreetsRoom.visible_objects():
             current_action_items.append(MenuItem(_port_object.name, Call("PortStreetsObjectMenu", _port_object.object_id)))

@@ -59,8 +59,7 @@ label IntClaraTalkRefresh(girl_name="clara"):
     $ current_action_items = []
     $ update_stat_state()
     $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
-    if social_has_visible_topics(girl_name, "talk"):
-        $ current_action_items.append(MenuItem("Поговорить о...", Function(main_ui_call_label, "SocialTalkTopicMenu", girl_name, "talk", "IntClaraTalkRefresh")))
+    $ current_action_items.extend(social_core_action_items(girl_name, "IntClaraTalkRefresh"))
     if str(CurLoc or "") == "MarketPlace" and int(exploration or 0) >= 100 and int(AskedToday.get("clara", 0) or 0) == 0:
         $ current_action_items.append(MenuItem("Проследить за Клариссой по рынку", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "follow_market")))
     if str(CurLoc or "") == "WineStore" and (story_event_available("WineStore", "clara_talk") or (int(ClaraVar.get("mongol_theft_seen", 0) or 0) == 1 and int(ClaraVar.get("escape_confessed", 0) or 0) == 0)):
@@ -70,10 +69,6 @@ label IntClaraTalkRefresh(girl_name="clara"):
     if clara_paintings_second_ask_ready():
         $ current_action_items.append(MenuItem("Снова спросить о тайных рисунках", Call("story_clara_paintings_second_ask_3")))
 
-    if social_has_visible_topics(girl_name, "flirt") and clara_can_start_social_events():
-        $ current_action_items.append(MenuItem("Флиртовать...", Function(main_ui_call_label, "SocialTalkTopicMenu", girl_name, "flirt", "IntClaraTalkRefresh")))
-    if GiftedToday.get("clara", 0) == 0 and clara_can_receive_gifts() and clara_has_giftable_entries():
-        $ current_action_items.append(MenuItem("Сделать Клариссе подарок.", Function(main_ui_call_label, "IntClaraGiftMenu", girl_name)))
     if int(AskedToday.get("clara", 0) or 0) == 0 and int(Friends.get("clara", 0) or 0) >= 6:
         $ current_action_items.append(MenuItem("Спросить Клариссу о семье", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_family")))
         $ current_action_items.append(MenuItem("Спросить Клариссу о ней самой", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_self")))
@@ -138,7 +133,10 @@ label IntClaraGiftApply(girl_name="clara", gift_id=""):
                     _effect = player_apply_item_social_effects("clara", _gift_id, True)
                 else:
                     _effect = {"text": ""}
-                MainTxt = social_gift_text("clara", _gift_name, _gift_id, _gift_score)
+                if _gift_id == "werecat_caught_cat":
+                    MainTxt = "Кларисса принимает пойманную лесную кошку не как безделушку, а как редкий и опасный знак доверия. Она долго смотрит на зверя, потом на вас, и в ее улыбке появляется куда больше тепла и дерзкого любопытства, чем раньше."
+                else:
+                    MainTxt = social_gift_text("clara", _gift_name, _gift_id, _gift_score)
                 if str(_effect.get("text", "") or "").strip():
                     MainTxt = str(MainTxt or "") + " " + str(_effect.get("text", "") or "").strip()
                 MainTxt = append_social_score_message(MainTxt, social_score_delta_for("clara", _friends_before))

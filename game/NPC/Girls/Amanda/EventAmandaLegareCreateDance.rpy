@@ -22,6 +22,7 @@ init python:
         else:
             AmandaVar["alberdanceadvance"] = 0
 
+        legare_go_phrase = str(DanceWatchLine.get(6, "") or "")
         DanceWatchLine.clear()
         DanceWatchLine[1] = "Аманда весело болтает с импозантным виноторговцем."
         DanceWatchLine[2] = "Расторопный виноторговец галантно приглашает Аманду на танец. После секундных раздумий та берет его за руку и вот они уже кружатся в танце."
@@ -31,6 +32,8 @@ init python:
 
         if int(AmandaVar.get("LegareGo", 0) or 0) == 0:
             DanceWatchLine[6] = "И вдруг женатый торговец наклоняется к губам Аманды и страстно ее целует. Аманда же не находит ничего лучшего, кроме как ответить ему со всем пылом юности."
+        elif legare_go_phrase != "":
+            DanceWatchLine[6] = legare_go_phrase
 
         DanceWatchLine[0] = "Аманда продолжает свой танец с мессиром Легаре."
         if AmandaVar["alberdanceadvance"] == 2:

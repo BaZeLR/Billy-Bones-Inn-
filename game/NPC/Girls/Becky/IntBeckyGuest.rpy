@@ -38,7 +38,6 @@ label IntBeckyGuest:
 
         menu:
             "Осмотреть Ребекку" if dinnertime <= 5:
-                call CleanScreenOverflow(3)
                 call GirlsDesc("becky")
                 jump int_becky_guest_menu
 
@@ -47,7 +46,6 @@ label IntBeckyGuest:
                 jump int_becky_guest_menu
 
             "Выставить на стол вино и еду из вашего трактира" if (dinnertime == 0 and winenum >= 30 and productnum >= 30 and IngaVar.get("Knowher", 0) >= 2):
-                call CleanScreenOverflow(3)
                 "Вы решили принести кувшин красного вина и закуски из запасов трактира. Вино явно пришлось по вкусу присутствующим."
                 if pregnancy.get("becky", 0) <= 30:
                     "Вместе с остальными накатила и Бекки, ее лицо сразу раскраснелось."
@@ -68,7 +66,7 @@ label IntBeckyGuest:
                 jump int_becky_guest_menu
 
             "Кушать" if (dinnertime <= 5 and georgedinnersex == 0):
-                call CleanScreenOverflow(3)
+                
                 if dinnerbecky > 0:
                     $ dinnerbecky = 0
                     "Вытянув руку из-под стола, вы решили вернуться к еде."
@@ -112,7 +110,6 @@ label IntBeckyGuest:
                 jump int_becky_guest_menu
 
             "Полапать под столом Бекки" if (dinnertime <= 5 and dinnerbeckyorgasm == 0 and georgedinnersex == 0):
-                call CleanScreenOverflow(3)
                 if dinnerbecky == 0:
                     "Как можно более незаметно вы запустили руку под стол и положили ее на колено Бекки."
                 elif dinnerbecky == 1:

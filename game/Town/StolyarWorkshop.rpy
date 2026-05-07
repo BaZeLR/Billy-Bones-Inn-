@@ -55,8 +55,7 @@ label StolyarWorkshop:
             $ _stolyar_order_ui_return = _return
         jump StolyarWorkshop
 
-    if story_event_available("StolyarWorkshop", "enter"):
-        call checkTriggers("StolyarWorkshop", "enter", 0)
+    call RoomEnterEventGate(CurLoc, False)
 
     $ MainTxt = "Вы находитесь в мастерской известного столяра Драупнира. Всему городу известно что гном Драупнир хоть и дерет дорого, но работу свою исполняет не за страх, а за совесть. Мало кто, а точнее никто, может сравниться с ним в столярном ремесле. В его лавке приятно пахнет деревом и всюду висят рубанки, пилы, стамески, топоры и прочий инструмент. В глубине мастерской, за верстаком, что-то тачает сам хозяин - приземистый и крепко сбитый гном."
     if has_pending_orders:

@@ -1733,6 +1733,7 @@ label AtticInventoryReturn(return_context="attic", room_code="TavernAtic"):
 
 label UpstairsRoomSearch(room_code="", restore_label=""):
     $ _up_room_code = str(room_code or CurLoc or "")
+    $ findAvailableEvents(True)
     if story_event_available(_up_room_code, "room_search"):
         call checkTriggers(_up_room_code, "room_search", 0)
         return

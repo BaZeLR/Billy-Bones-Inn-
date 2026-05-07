@@ -47,7 +47,6 @@ label IntAmandaDance():
             else:
                 '"Ты что, Стефан, сдурел?!" ответила вам Аманда. Расстроенный отказом, вы отправились восвояси.'
                 $ DanceStep = DanceMaxIAD
-                $ FridayDancesCount += 1
                 call ShowImage(GirlNameIAD, "dance", "YouInvite1")
             $ DanceStep += 1
             if DanceStep == DanceMaxIAD:
@@ -86,7 +85,6 @@ label IntAmandaDance():
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда. Вы попробовали объяснить, что так обычно танцуют, но обнаружили что разговариваете с пустотой, Аманда ушла.'
                 $ DanceStep = DanceMaxIAD
-                $ FridayDancesCount += 1
                 call SlutFriendsIncrease(GirlNameIAD, 2, 2, -1, 0, 0, 0)
                 $ HandsDance = ''
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
@@ -117,7 +115,6 @@ label IntAmandaDance():
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда, с размаху дала вам смачную пощечину, развернулась и ушла, оставив вас в одиночестве.'
                 $ DanceStep = DanceMaxIAD
-                $ FridayDancesCount += 1
                 call SlutFriendsIncrease(GirlNameIAD, 0, 1, -1, 0, 1, -1)
                 $ HandsDance = ''
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
@@ -146,7 +143,6 @@ label IntAmandaDance():
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда, с размаху дала вам смачную пощечину, развернулась и ушла, оставив вас в одиночестве.'
                 $ DanceStep = DanceMaxIAD
-                $ FridayDancesCount += 1
                 call SlutFriendsIncrease(GirlNameIAD, 0, 1, -1, 0, 1, -1)
                 $ HandsDance = ''
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
@@ -174,7 +170,6 @@ label IntAmandaDance():
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда, с размаху дала вам смачную пощечину, развернулась и ушла, оставив вас в одиночестве.'
                 $ DanceStep = DanceMaxIAD
-                $ FridayDancesCount += 1
                 call SlutFriendsIncrease(GirlNameIAD, 0, 1, -1, 0, 1, -1)
                 $ KissDance = 0
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
@@ -188,7 +183,6 @@ label IntAmandaDance():
                 "Продолжая танцевать, вы вдруг прошептали Аманде на ушко: 'Милая, а может прогуляемся немного?'"
                 '"Ага, значит то ты меня ругаешь, шлюхой обзываешь, учишь скромности и всякому возвышенному да? Ф как танцы - так все мигом забыл и мало что за задницу лапаешь, так еще и в подворотню тащищь?" обругала ваше двуличие Аманда.{p}"Знаешь что, иди себе сам в свою подворотню и сам с собою там что хочешь то и делай. Впрочем, ты только одного и хочешь. А я пока пойду!" гневно сказала Аманда, слово с делом у нее не разошлись и она развернулась и ушла, оставив вас в одиночестве.'
                 $ DanceStep = DanceMaxIAD
-                $ FridayDancesCount += 1
                 call SlutFriendsIncrease(GirlNameIAD, 0, 3, -1, 0, 3, -1)
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
             elif tmpGropeReact >= 3:
@@ -201,7 +195,6 @@ label IntAmandaDance():
                 "Продолжая танцевать, вы вдруг прошептали Аманде на ушко: 'Милая, а может прогуляемся немного?'"
                 '"Стефан, ты что, предлагаешь мне пойти с тобой в какую-то подворотню? Мне?!" гневно сказала Аманда, развернулась и ушла, оставив вас в одиночестве.'
                 $ DanceStep = DanceMaxIAD
-                $ FridayDancesCount += 1
                 call SlutFriendsIncrease(GirlNameIAD, 0, 1, -1, 0, 1, -1)
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
             jump IntAmandaDance
@@ -222,13 +215,14 @@ label IntAmandaDance():
             
             "[dance_message]"
             call ShowImage("amanda", "dance", "alberdanceStep" + str(min(DanceStep, 3)))
-            $ DanceStep += 1
             
             if DanceStep == 6 and AmandaVar.get('LegareGo', 0) == 1:
-                call LegareAmandaGoMenu
-                $ dance_message = DanceWatchLine[DanceStep]
-                "[dance_message]"
+                $ legare_go_message = str(DanceWatchLine.get(6, "") or "")
+                if legare_go_message != "" and dance_message != legare_go_message:
+                    "[legare_go_message]"
                 $ AmandaVar['LegareGo'] = 0
+                call LegareAmandaGoMenu
+            $ DanceStep += 1
                 
             if DanceStep >= DanceMaxIAD + 2:
                 "Музыка доиграла и Аманда с мессиром Легаре разошлись."
@@ -259,7 +253,6 @@ label IntAmandaDance():
             jump IntAmandaDance
         "Отойти" if DanceStep >= DanceMaxIAD or AmandaVar['albernowdances'] == 1 or DanceStep == 1:
             $ CounterToClean = MaxCounterToClean
-            call CleanScreenOverflow
             $ DanceStep = 0
             call ShowImage(GirlNameIAD, "dance", "wait" + str(renpy.random.randint(1, 2)))
             return
@@ -281,4 +274,3 @@ label IntAmandaDance():
 # label amanda_sex_dance_street():
 #     # ...Amanda sex dance street event...
 #     return
-

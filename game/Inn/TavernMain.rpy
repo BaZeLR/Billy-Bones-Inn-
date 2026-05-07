@@ -358,11 +358,16 @@ label TavernMain:
             $ _amanda_dynamic_jump = str(AmandaDynamicTakeNextJump() or "")
             if _amanda_dynamic_jump != "" and renpy.has_label(_amanda_dynamic_jump):
                 jump expression _amanda_dynamic_jump
-        call CheckDailyEvent("", "_story_enter", CurLoc, time)
+        call RoomEnterEventGate(CurLoc, False)
+        if bool(AmandaAIIntegrationEnabled):
+            call AmandaMiniEventTry(CurLoc, "room")
         if TavernClosed == "" and not tavern_preopening_mode() and int(week or 0) != 7:
-            call CheckDailyEvent('amanda')
-            call CheckDailyEvent('sandra')
-            call CheckDailyEvent('melissa')
+            if str(getLocation('amanda') or "") == CurLoc:
+                call CheckDailyEvent('amanda', None, CurLoc, time)
+            if str(getLocation('sandra') or "") == CurLoc:
+                call CheckDailyEvent('sandra', None, CurLoc, time)
+            if str(getLocation('melissa') or "") == CurLoc:
+                call CheckDailyEvent('melissa', None, CurLoc, time)
             $ _tmp_bf_sandra = DescribeBreastFeeding('sandra')
             $ _tmp_bf_amanda = DescribeBreastFeeding('amanda')
             $ _tmp_bf_melissa = DescribeBreastFeeding('melissa')
@@ -375,9 +380,9 @@ label TavernMain:
             else:
                 $ _tmp_kids_list = ShowFullKidsListByAge('sandra','amanda','melissa')
             if GeorgettAvail == 1 or (str(getLocation("georgett") or "") == CurLoc and time < 2):
-                call CheckDailyEvent('georgett')
+                call CheckDailyEvent('georgett', None, CurLoc, time)
             if LizaAvail == 1 or (str(getLocation("liza") or "") == CurLoc and time < 2):
-                call CheckDailyEvent('liza')
+                call CheckDailyEvent('liza', None, CurLoc, time)
         call TavernMainBuildActions
         
     else:
@@ -459,12 +464,15 @@ label TavernMainObjectMenu(object_id="", refresh_only=False):
     python:
         for _tavern_action in _tavern_object.visible_actions():
             _tavern_args = tuple(getattr(_tavern_action, "args", ()) or ())
+            _tavern_label = str(_tavern_action.label or "")
+            if str(getattr(_tavern_action, "action_id", "") or "") == "make_fire" and _pc_fire_is_active(TavernMainFireplaceObject):
+                _tavern_label = "Подложить дрова"
             if _tavern_action.hook == "text":
-                current_action_items.append(MenuItem(_tavern_action.label, Call("TavernMainObjectText", object_id, _tavern_action.action_id)))
+                current_action_items.append(MenuItem(_tavern_label, Call("TavernMainObjectText", object_id, _tavern_action.action_id)))
             elif _tavern_action.hook == "call" and str(_tavern_action.target or "") != "":
-                current_action_items.append(MenuItem(_tavern_action.label, Call(_tavern_action.target, *_tavern_args)))
+                current_action_items.append(MenuItem(_tavern_label, Call(_tavern_action.target, *_tavern_args)))
             elif _tavern_action.hook == "jump" and str(_tavern_action.target or "") != "":
-                current_action_items.append(MenuItem(_tavern_action.label, Jump(_tavern_action.target)))
+                current_action_items.append(MenuItem(_tavern_label, Jump(_tavern_action.target)))
         current_action_items.append(MenuItem("Назад", Call("TavernMainRestore")))
     return
 

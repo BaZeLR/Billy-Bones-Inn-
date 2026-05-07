@@ -285,16 +285,26 @@ init python:
         if not profile_id:
             return {}
 
+        def scene_value_or_default(scene_map, default_map, default_value=""):
+            if isinstance(scene_map, dict) and profile_id in scene_map:
+                return str(scene_map.get(profile_id, "") or "")
+            if isinstance(default_map, dict):
+                return str(default_map.get(profile_id, default_value) or default_value or "")
+            return str(default_value or "")
+
         resolved_name = str(display_name or RealName.get(profile_id, profile_id) or profile_id)
         profile = bodymodel_register_character(profile_id, resolved_name, body_type)
         bodymodel_clear_clothing(profile)
 
-        top_item = str(topdress.get(profile_id, "") or topdressdef.get(profile_id, "") or DressTopPart.get(dressdefault.get(profile_id, ""), "") or "")
-        bottom_item = str(bottomdress.get(profile_id, "") or bottomdressdef.get(profile_id, "") or DressBottomPart.get(dressdefault.get(profile_id, ""), "") or "")
-        bra_item = str(bra.get(profile_id, "") or bradef.get(profile_id, "") or "")
-        panties_item = str(panties.get(profile_id, "") or pantiesdef.get(profile_id, "") or "")
-        legs_item = str(legs.get(profile_id, "") or legsdef.get(profile_id, "") or "")
-        shoes_item = str(shoes.get(profile_id, "") or shoesdef.get(profile_id, "") or "")
+        default_dress = str(dressdefault.get(profile_id, "") or "")
+        top_default = str(topdressdef.get(profile_id, "") or DressTopPart.get(default_dress, "") or "")
+        bottom_default = str(bottomdressdef.get(profile_id, "") or DressBottomPart.get(default_dress, "") or "")
+        top_item = scene_value_or_default(topdress, topdressdef, top_default)
+        bottom_item = scene_value_or_default(bottomdress, bottomdressdef, bottom_default)
+        bra_item = scene_value_or_default(bra, bradef, "")
+        panties_item = scene_value_or_default(panties, pantiesdef, "")
+        legs_item = scene_value_or_default(legs, legsdef, "")
+        shoes_item = scene_value_or_default(shoes, shoesdef, "")
 
         bodymodel_set_item(profile, top_item, "lifted" if int(topraised.get(profile_id, 0) or 0) == 1 else "worn")
         bodymodel_set_item(profile, bottom_item, "lifted" if int(bottomraised.get(profile_id, 0) or 0) == 1 else "worn")
@@ -302,6 +312,14 @@ init python:
         bodymodel_set_item(profile, panties_item, "worn")
         bodymodel_set_item(profile, legs_item, "worn")
         bodymodel_set_item(profile, shoes_item, "worn")
+        profile["scene_clothing_state"] = {
+            "top_removed": bool(isinstance(topdress, dict) and profile_id in topdress and top_item == "" and top_default != ""),
+            "bottom_removed": bool(isinstance(bottomdress, dict) and profile_id in bottomdress and bottom_item == "" and bottom_default != ""),
+            "bra_removed": bool(isinstance(bra, dict) and profile_id in bra and bra_item == "" and str(bradef.get(profile_id, "") or "") != ""),
+            "panties_removed": bool(isinstance(panties, dict) and profile_id in panties and panties_item == "" and str(pantiesdef.get(profile_id, "") or "") != ""),
+            "top_lifted": bool(top_item != "" and int(topraised.get(profile_id, 0) or 0) == 1),
+            "bottom_lifted": bool(bottom_item != "" and int(bottomraised.get(profile_id, 0) or 0) == 1),
+        }
 
         bodymodel_update_container_states(profile)
         bodymodel_compute_access(profile)
@@ -371,12 +389,54 @@ init python:
                     if state_name == "lifted":
                         item_name = item_name + " (приподнято)"
                     part_slots.append("%s: %s" % (BODYMODEL_LAYER_LABELS.get(layer_name, layer_name), item_name))
+                scene_state = dict(profile.get("scene_clothing_state", {}) or {})
+                if part_name == "upper":
+                    upper_notes = []
+                    if bool(scene_state.get("top_removed", False)):
+                        upper_notes.append("одежда снята")
+                    elif bool(scene_state.get("top_lifted", False)):
+                        upper_notes.append("одежда приподнята")
+                    if bool(scene_state.get("bra_removed", False)):
+                        upper_notes.append("белье снято")
+                    if upper_notes:
+                        part_slots = upper_notes + part_slots
+                elif part_name == "pelvis":
+                    pelvis_notes = []
+                    if bool(scene_state.get("bottom_removed", False)):
+                        pelvis_notes.append("нижняя одежда снята")
+                    elif bool(scene_state.get("bottom_lifted", False)):
+                        pelvis_notes.append("нижняя одежда приподнята")
+                    if bool(scene_state.get("panties_removed", False)):
+                        pelvis_notes.append("белье снято")
+                    if pelvis_notes:
+                        part_slots = pelvis_notes + part_slots
                 if part_slots:
                     lines.append("%s: %s." % (BODYMODEL_PART_LABELS.get(part_name, part_name), ", ".join(part_slots)))
+                elif part_name == "upper":
+                    lines.append("Верх: одежда снята, грудь открыта.")
+                elif part_name == "pelvis":
+                    lines.append("Таз: нижняя одежда снята или отведена, доступ ничем не закрыт.")
         lines.append("Соски: %s." % str(profile.get("features", {}).get("nipples", "soft") or "soft"))
-        lines.append("Рот: %s." % str(profile.get("containers", {}).get("mouth", {}).get("state", "dry") or "dry"))
-        lines.append("Киска: %s." % str(profile.get("containers", {}).get("pussy", {}).get("state", "dry") or "dry"))
-        lines.append("Попка: %s." % str(profile.get("containers", {}).get("ass", {}).get("state", "dry") or "dry"))
+        block_nipples = bodymodel_target_block_state(profile, "nipples")
+        block_pussy = bodymodel_target_block_state(profile, "pussy")
+        block_ass = bodymodel_target_block_state(profile, "ass")
+        access_labels = {0: "открыт", 1: "через белье", 2: "через верхнюю одежду"}
+        lines.append("Доступ к груди: %s." % access_labels.get(int(block_nipples.get("level", 0) or 0), "закрыт"))
+        lines.append("Доступ между ног: %s." % access_labels.get(int(block_pussy.get("level", 0) or 0), "закрыт"))
+        lines.append("Доступ к попке: %s." % access_labels.get(int(block_ass.get("level", 0) or 0), "закрыт"))
+        state_labels = {
+            "dry": "сухо",
+            "wet": "влажно",
+            "itchy": "зудит",
+            "itchy and wet": "зудит и влажно",
+            "slurping": "очень мокро",
+        }
+        mouth_state = str(profile.get("containers", {}).get("mouth", {}).get("state", "dry") or "dry")
+        pussy_state = str(profile.get("containers", {}).get("pussy", {}).get("state", "dry") or "dry")
+        ass_state = str(profile.get("containers", {}).get("ass", {}).get("state", "dry") or "dry")
+        lines.append("Рот: %s." % state_labels.get(mouth_state, mouth_state))
+        lines.append("Киска: %s." % state_labels.get(pussy_state, pussy_state))
+        lines.append("Попка: %s." % state_labels.get(ass_state, ass_state))
         return "\n".join([row for row in lines if str(row or "").strip() != ""])
 
     def bodymodel_action_effect(profile, target_id="", action_id=""):

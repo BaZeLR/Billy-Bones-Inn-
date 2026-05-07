@@ -157,12 +157,12 @@ label BarberShop:
 
     if not BarberShopRoom.is_open(week, time):
         $ current_action_items = [MenuItem("Вернуться в квартал ремесленников", Jump("ArtisansQuarter"))]
-        call screen main_ui
-        jump BarberShop
+        while True:
+            call screen main_ui
 
     call BarberShopBuildActions
-    call screen main_ui
-    jump BarberShop
+    while True:
+        call screen main_ui
 
 
 label BarberShopBuildActions:

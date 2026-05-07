@@ -280,7 +280,7 @@ init python:
             return False
         if context_key != "breakfast":
             return False
-        if girl not in list(household_breakfast_attendee_ids() or []):
+        if girl not in list(tavern_breakfast_present_ids() or []):
             return False
         if int(TalkedToday.get(girl, 0) or 0) != 0:
             return False
@@ -348,6 +348,9 @@ init python:
     def tavern_storage_rat_event_ready():
         return (
             str(CurLoc or "") == "TavernStorage"
+            and int(time or 0) == 0
+            and int(week or 0) != 7
+            and str(getLocation("melissa") or "") == "TavernStorage"
             and int(MelissaVar.get("storage_rat_cleared", 0) or 0) == 0
             and not household_runtime_event_seen_today("melissa_storage_rat")
         )

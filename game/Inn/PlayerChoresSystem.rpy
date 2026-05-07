@@ -71,16 +71,38 @@ init -45 python:
         calendar_sync_state()
         return max(0, _pc_to_int(dayspassed, 0)) * 1440 + (_pc_to_int(hour, 0) * 60) + _pc_to_int(minute, 0)
 
+    def _pc_fire_duration_minutes():
+        return 12 * 60
+
     def _pc_fire_until_minute(fire_object):
         if fire_object is None:
             return 0
         until_minute = _object_state_int(fire_object, "fire_until_minute", 0)
         legacy_units = _object_state_int(fire_object, "fire_units", 0)
         if until_minute <= 0 and legacy_units > 0:
-            until_minute = _pc_calendar_total_minutes() + (legacy_units * 8 * 60)
+            until_minute = _pc_calendar_total_minutes() + (legacy_units * _pc_fire_duration_minutes())
             _set_object_state_int(fire_object, "fire_until_minute", until_minute)
             _set_object_state_int(fire_object, "fire_units", 0)
         return until_minute
+
+    def _pc_fire_started_minute(fire_object):
+        if fire_object is None:
+            return 0
+        started_minute = _object_state_int(fire_object, "fire_started_minute", 0)
+        until_minute = _pc_fire_until_minute(fire_object)
+        if started_minute <= 0 and until_minute > _pc_calendar_total_minutes():
+            started_minute = max(0, until_minute - _pc_fire_duration_minutes())
+            _set_object_state_int(fire_object, "fire_started_minute", started_minute)
+        return started_minute
+
+    def _pc_fire_elapsed_minutes(fire_object):
+        started_minute = _pc_fire_started_minute(fire_object)
+        if started_minute <= 0:
+            return 0
+        return max(0, _pc_calendar_total_minutes() - started_minute)
+
+    def _pc_fire_remaining_minutes(fire_object):
+        return max(0, _pc_fire_until_minute(fire_object) - _pc_calendar_total_minutes())
 
     def _pc_hot_water_until_minute(water_object):
         if water_object is None:
@@ -151,6 +173,9 @@ init -45 python:
             if not _room_has_item_by_id(ShedRoom, "lumber_001") and not _pc_player_has_item("lumber_001"):
                 return False, "Сначала нужно принести бревна."
         if key == "make_fire" and not _pc_fire_fuel_available(where_id, object_id):
+            room_obj = _pc_room_by_code(where_id)
+            if _pc_player_has_item("lumber_001") or _room_has_item_by_id(room_obj, "lumber_001") or _room_has_item_by_id(ShedRoom, "lumber_001"):
+                return False, "Сначала нужно наколоть бревна на дрова."
             return False, "Нечем топить камин."
         if key == "boil_water":
             if not _pc_fire_is_active(_pc_fire_object(where_id, object_id)):
@@ -236,19 +261,29 @@ init -45 python:
         elif key == "make_fire":
             _fire_object = _pc_fire_object(where_id, object_id)
             _fuel_room = _pc_room_by_code(where_id)
+            _fire_was_active = _pc_fire_is_active(_fire_object)
+            _fire_now = _pc_calendar_total_minutes()
             if _pc_player_has_item("chopped_wood_001"):
                 _player_remove_item_by_id("chopped_wood_001")
             elif _object_state_int(_fire_object, "chopped_wood_stock", 0) > 0:
                 _add_object_state_int(_fire_object, "chopped_wood_stock", -1, 0)
-            else:
+            elif _room_has_item_by_id(_fuel_room, "chopped_wood_001"):
                 _room_remove_item_by_id(_fuel_room, "chopped_wood_001")
-            _set_object_state_int(_fire_object, "fire_until_minute", _pc_calendar_total_minutes() + (8 * 60))
+            _set_object_state_int(_fire_object, "fire_started_minute", _fire_now)
+            _set_object_state_int(_fire_object, "fire_until_minute", _fire_now + _pc_fire_duration_minutes())
             _set_object_state_int(_fire_object, "fire_units", 0)
             _set_object_state_int(_fire_object, "ash_dirty", 1)
+            if _fire_was_active:
+                _add_object_state_int(_fire_object, "fire_adds", 1, 0)
+            else:
+                _set_object_state_int(_fire_object, "fire_adds", 0)
             fun = _pc_clamp(fun + 5, 0, 100)
             energy = _pc_clamp(energy - 5, 0, 100)
             exploration = max(0, _pc_to_int(exploration, 0) + 1)
-            result_text = "Вы подкладываете колотые дрова и разводите огонь. В {b}%s{/b} тепла должно хватить примерно на {b}восемь часов{/b}." % str(_fire_object.name).strip().lower()
+            if _fire_was_active:
+                result_text = "Вы подкладываете колотые дрова в {b}%s{/b}. Огонь снова будет держаться примерно {b}двенадцать часов{/b}." % str(_fire_object.name).strip().lower()
+            else:
+                result_text = "Вы подкладываете колотые дрова и разводите огонь. В {b}%s{/b} тепла должно хватить примерно на {b}двенадцать часов{/b}." % str(_fire_object.name).strip().lower()
         elif key == "clean_ashes":
             _fire_object = _pc_fire_object(where_id, object_id)
             _set_object_state_int(_fire_object, "ash_dirty", 0)

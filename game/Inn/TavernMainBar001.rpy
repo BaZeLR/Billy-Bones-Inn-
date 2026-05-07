@@ -2,6 +2,15 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
+    def tavern_bar_clara_melissa_gossip_available():
+        return (
+            str(CurLoc or "") == "TavernMain"
+            and str(getLocation("clara") or "") == "TavernMain"
+            and str(getLocation("melissa") or "") == "TavernMain"
+            and int(time or 0) == 2
+            and story_event_available("TavernMain", "overheard")
+        )
+
     def tavern_bar_invite_targets():
         targets = []
         if str(getLocation("clara") or "") == "TavernMain" and int(GiftedToday.get("clara", 0) or 0) == 0:
@@ -103,6 +112,9 @@ label TavernMainBarInviteApply(target_npc=""):
 
 
 label TavernMainBarPlaceholderEvent:
+    if tavern_bar_clara_melissa_gossip_available():
+        call checkTriggers("TavernMain", "overheard", 0)
+        return
     python:
         _bar_events = [
             "Вы задерживаетесь у стойки и ловите себя на мысли, что у бара всегда скапливаются самые удобные слухи: кто с кем поссорился, кто кому должен и у кого язык развязывается после второй кружки.",

@@ -146,6 +146,7 @@ label Backyard:
     $ CurrentRoom = BackyardRoom
     $ CurLoc = "Backyard"
     $ location = CurLoc
+    call RoomEnterEventGate(CurLoc, False)
     $ scene_image = backyard_dynamic_picture() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -176,8 +177,6 @@ label BackyardBuildActions:
         $ current_action_items.append(MenuItem("Варить туалетное мыло с оливковым маслом", Call("BackyardCookSoap", "luxury_soap_recipe")))
     if player_can_train_shooting():
         $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", "Backyard")))
-    if dog_is_available_here("Backyard"):
-        $ current_action_items.append(MenuItem(dog_room_action_caption("Backyard"), Call("IntDogTalk", "Backyard")))
     if werecat_is_in_room("Backyard"):
         $ current_action_items.append(MenuItem(werecat_action_caption("Backyard"), Call("IntWerecatTalk", "Backyard")))
     python:

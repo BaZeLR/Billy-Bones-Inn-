@@ -87,7 +87,7 @@ label ArtisansQuarter:
             $ _artisans_nav_ui_return = _return
         jump ArtisansQuarter
 
-    call CheckDailyEvent("", "_story_enter", CurLoc, time)
+    call RoomEnterEventGate(CurLoc, False)
 
     call ArtisansQuarterBuildActions
     $ _artisans_ui_return = None
@@ -101,10 +101,10 @@ label ArtisansQuarterBuildActions:
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
+    if dog_is_here("ArtisansQuarter"):
+        $ current_action_items.append(MenuItem(dog_display_name(), Call("IntDogTalk", "ArtisansQuarter")))
 
     python:
-        if dog_is_here("ArtisansQuarter"):
-            current_action_items.append(MenuItem(dog_room_action_caption("ArtisansQuarter"), Call("IntDogTalk", "ArtisansQuarter")))
         for _artisans_object in ArtisansQuarterRoom.visible_objects():
             current_action_items.append(MenuItem(_artisans_object.name, Call("ArtisansQuarterObjectMenu", _artisans_object.object_id)))
         for _artisans_exit in ArtisansQuarterRoom.visible_exits():
