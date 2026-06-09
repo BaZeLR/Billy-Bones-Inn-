@@ -38,7 +38,7 @@ init -45 python:
 
     def _pc_fire_object(where_id="", object_id=""):
         object_key = get_object_id(object_id)
-        if object_key == "kitchen_hearth_001" or str(where_id or "") == "TavernKitchen":
+        if object_key in ("kitchen_hearth_001", "hearth_001", "cauldron_001") or str(where_id or "") == "TavernKitchen":
             return TavernKitchenHearthObject
         return TavernMainFireplaceObject
 

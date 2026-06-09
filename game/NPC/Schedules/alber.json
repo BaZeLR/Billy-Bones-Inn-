@@ -24,9 +24,19 @@
     },
     {
       "label": "wine_store_shift_after_clarissa",
-      "weekdays": [1, 2, 3, 4, 5, 6],
+      "weekdays": [1, 2, 3, 4, 6],
       "start": "12:00",
       "end": "12:59",
+      "location": "WineStore",
+      "awake": true,
+      "talkable": true,
+      "priority": 710
+    },
+    {
+      "label": "wine_store_shift_after_clarissa_friday",
+      "weekdays": [5],
+      "start": "12:00",
+      "end": "15:00",
       "location": "WineStore",
       "awake": true,
       "talkable": true,
@@ -64,9 +74,9 @@
     },
     {
       "label": "wine_store_default_day",
-      "weekdays": [1, 2, 3, 4, 5, 6],
+      "weekdays": [1, 2, 3, 4, 6],
       "start": "13:00",
-      "end": "18:59",
+      "end": "17:00",
       "location": "WineStore",
       "awake": true,
       "talkable": true,

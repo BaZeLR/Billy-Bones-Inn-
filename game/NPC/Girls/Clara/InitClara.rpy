@@ -103,10 +103,10 @@ init python:
 
     def clara_wine_store_shift_active(weekday=None, time_slot=None):
         week_value = int(week if weekday is None else weekday or 0)
-        time_value = int(time if time_slot is None else time_slot or 0)
+        clock_value = int(clock_minutes or 0) % 1440
         if week_value == 7:
             return False
-        return time_value in (0, 1)
+        return 8 * 60 <= clock_value <= 11 * 60 + 59
 
     def clara_market_visit_active(day_marker=None, weekday=None, time_slot=None):
         day_value = int(dayspassed if day_marker is None else day_marker or 0)
@@ -517,7 +517,7 @@ label InitClara:
                 NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[3, 4], awake=True, talkable=True, condition=clara_melissa_visit_active, priority=210, label="melissa_room_visit"),
                 NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[2], awake=True, talkable=True, condition=clara_tavern_visit_active, priority=200, label="tavern_visit"),
                 NPCScheduleEntry(location="MarketPlace", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[2, 3], awake=True, talkable=False, condition=clara_market_visit_active, priority=190, label="extra_market"),
-                NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0, 1], awake=True, talkable=True, condition=clara_wine_store_shift_active, priority=180, label="wine_store"),
+                NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[1, 2], awake=True, talkable=True, condition=clara_wine_store_shift_active, priority=180, label="wine_store"),
                 NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
             ],
         )

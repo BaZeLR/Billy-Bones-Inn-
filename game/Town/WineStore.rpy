@@ -14,6 +14,15 @@ init python:
     def wine_store_alber_visible():
         return str(getLocation("alber") or "") == "WineStore" and bool(npc_can_talk_now("alber"))
 
+    def wine_store_open_now():
+        current_week = int(week or 0)
+        current_minutes = int(clock_minutes or 0) % 1440
+        if current_week == 7:
+            return False
+        if current_week == 5:
+            return 8 * 60 <= current_minutes <= 15 * 60
+        return 8 * 60 <= current_minutes <= 17 * 60
+
     def clara_stable_wine_store_talk_picture():
         candidates = [
             "images/clara/wineSellar_clara_talk.png",
@@ -92,7 +101,9 @@ init python:
         ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
-            time_slots=[0, 1, 2],
+            start="08:00",
+            end="17:00",
+            condition=wine_store_open_now,
             closed_text="В это время погребок закрыт.",
         ),
         custom_properties={
@@ -122,7 +133,7 @@ label WineStore:
     $ WineStoreSavedText = ""
 
     # Check if the store is closed
-    if not _wine_room.is_open(week, time):
+    if not _wine_room.is_open():
         $ MainTxt = _wine_room.schedule.closed_text
         $ CurLocDesc = MainTxt
         $ current_action_items = WineStoreRoom.build_exit_items()
