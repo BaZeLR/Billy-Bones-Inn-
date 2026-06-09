@@ -39,6 +39,21 @@ init python:
     }
 
     STORY_BOARD_TARGET_TITLES = {
+        "story_clara_market_booklet_0": "Clarissa market booklet: first sighting",
+        "story_clara_market_booklet_2": "Clarissa market booklet: evening market",
+        "story_clara_market_booklet_3": "Clarissa market booklet: Mongol deal",
+        "story_clara_market_booklet_4": "Clarissa market booklet: confession",
+        "story_clara_market_booklet_5": "Clarissa market booklet: arrest rumor",
+        "story_clara_market_booklet_6": "Clarissa market booklet: stocks",
+        "story_clara_market_booklet_7": "Clarissa market booklet: feed Mongol",
+        "story_clara_market_booklet_8": "Clarissa market booklet: lockpicks",
+        "story_clara_market_booklet_9": "Clarissa market booklet: release plan",
+        "story_clara_tavern_visit_bar_0": "Clarissa tavern visit: jokes at the bar",
+        "story_clara_tavern_visit_bar_1": "Clarissa tavern visit: after attic fall",
+        "story_clara_tavern_visit_bar_2": "Clarissa tavern visit: almost caught",
+        "story_clara_melissa_room_visit_0": "Clarissa and Melissa room: pillow fight",
+        "story_clara_melissa_room_visit_1": "Clarissa and Melissa room: drawings",
+        "story_clara_melissa_room_visit_2": "Clarissa and Melissa room: private doodles",
         "story_georgett_church_service_bench": "Georgette church: quiet bench",
         "story_georgett_church_service_doggy": "Georgette church: risky service",
         "story_georgett_church_service_with_liza": "Georgette church: Liza witnesses",
@@ -47,6 +62,8 @@ init python:
     }
 
     STORY_BOARD_ACTION_TITLES = {
+        "clara_tavern_visit": "Clarissa tavern visit",
+        "clara_room_visit": "Clarissa visits Melissa room",
         "georgett_church_service_bench": "Georgette church / quiet place",
         "georgett_church_service_doggy": "Georgette church / right here",
         "georgett_church_service_with_liza": "Georgette church / with Lizette",
@@ -56,6 +73,21 @@ init python:
     }
 
     STORY_BOARD_TARGET_FILES = {
+        "story_clara_market_booklet_0": "game/NPC/Girls/Clara/ClaraBookletMarketThread.rpy",
+        "story_clara_market_booklet_2": "game/NPC/Girls/Clara/ClaraBookletMarketThread.rpy",
+        "story_clara_market_booklet_3": "game/NPC/Girls/Clara/ClaraBookletMarketThread.rpy",
+        "story_clara_market_booklet_4": "game/NPC/Girls/Clara/ClaraBookletMarketThread.rpy",
+        "story_clara_market_booklet_5": "game/NPC/Girls/Clara/ClaraBookletMarketThread.rpy",
+        "story_clara_market_booklet_6": "game/NPC/Girls/Clara/ClaraBookletMarketThread.rpy",
+        "story_clara_market_booklet_7": "game/NPC/Girls/Clara/ClaraBookletMarketThread.rpy",
+        "story_clara_market_booklet_8": "game/NPC/Girls/Clara/ClaraBookletMarketThread.rpy",
+        "story_clara_market_booklet_9": "game/NPC/Girls/Clara/ClaraBookletMarketThread.rpy",
+        "story_clara_tavern_visit_bar_0": "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy",
+        "story_clara_tavern_visit_bar_1": "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy",
+        "story_clara_tavern_visit_bar_2": "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy",
+        "story_clara_melissa_room_visit_0": "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy",
+        "story_clara_melissa_room_visit_1": "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy",
+        "story_clara_melissa_room_visit_2": "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy",
         "story_georgett_church_service_bench": "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy",
         "story_georgett_church_service_doggy": "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy",
         "story_georgett_church_service_with_liza": "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy",
@@ -65,6 +97,7 @@ init python:
 
     STORY_BOARD_COLORS = {
         "done": "#32c46a",
+        "active": "#38bdf8",
         "available": "#ffffff",
         "waiting": "#d7a925",
         "future": "#666666",
@@ -215,8 +248,19 @@ init python:
         if status == "blocked":
             return STORY_BOARD_COLORS["blocked"]
         if status == "active":
-            return STORY_BOARD_COLORS["available"]
+            return STORY_BOARD_COLORS["active"]
         return STORY_BOARD_COLORS["future"]
+
+    def story_board_thread_status_label(tinfo):
+        status = story_board_thread_status(tinfo)
+        labels = {
+            "active": "Active",
+            "complete": "Complete",
+            "aborted": "Aborted",
+            "blocked": "Blocked",
+            "future": "Future",
+        }
+        return labels.get(status, "Unknown")
 
     def story_board_event_available(tinfo, index):
         try:
@@ -266,6 +310,8 @@ init python:
             "overheard": "Overheard",
             "room_search": "Room search",
             "clara_paintings": "Clara paintings",
+            "clara_tavern_visit": "Clara tavern visit",
+            "clara_room_visit": "Clara visits Melissa room",
             "clara_talk": "Talk Clarissa",
             "clara_fiance": "Clarissa fiance",
             "_story_enter": "Enter",
@@ -548,6 +594,7 @@ screen story_thread_screen(tinfo):
         ysize 200
         vbox:
             text "Thread: " + tinfo.data.name
+            text "Status: " + story_board_thread_status_label(tinfo) color story_board_thread_color(tinfo)
             text "Conditions:"
             for _cond_line in story_board_condition_lines(tinfo.data.conds):
                 text _cond_line
@@ -611,3 +658,4 @@ screen story_board_help():
         spacing 10
         text "Threads are story lines. Each row is a thread, and each box is one event in that thread." size 24 color "#cc9900"
         text "Hover a thread name to see thread conditions. Hover an event box to see the event fields: target, location/action, item, minimum date, day, hour, stats, conditions, and random chance." size 24 color "#cc9900"
+        text "Thread colors: active blue, complete green, blocked purple, aborted red, future gray. Event boxes: available white, waiting gold, done green." size 24 color "#cc9900"

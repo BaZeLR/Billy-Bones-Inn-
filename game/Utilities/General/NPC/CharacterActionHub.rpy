@@ -245,8 +245,6 @@ init -40 python:
                 return bool(port_streets_liza_can_talk())
             if key == "fran" and room_key in ("EllonaTemple", "EllonaBirthRoom"):
                 return bool(ellona_fran_visible())
-            if room_key == "TavernMelissaRoom" and tavern_melissa_room_clara_visit_active():
-                return False
             if key == "zimmer" and room_key == "CityGuard":
                 return bool(city_guard_open_now())
             if key == "alber" and room_key == "WineStore":
@@ -340,7 +338,7 @@ init -40 python:
         try:
             if key == "melissa" and not melissa_relationship_allows(key, "gift"):
                 return False
-            if key == "clara" and (not clara_can_receive_gifts() or not clara_has_giftable_entries()):
+            if key == "clara" and (not Clara.can_receive_gifts() or not Clara.has_giftable_entries()):
                 return False
         except Exception:
             pass

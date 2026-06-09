@@ -7,6 +7,7 @@ WINESTORE_ROOM = PROJECT_ROOT / "game" / "Town" / "WineStore.rpy"
 CLARA_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Clara" / "InitClara.rpy"
 CLARA_SCHEDULE = PROJECT_ROOT / "game" / "NPC" / "Schedules" / "clara.json"
 ALBER_SCHEDULE = PROJECT_ROOT / "game" / "NPC" / "Schedules" / "alber.json"
+SECONDARY_INIT = PROJECT_ROOT / "game" / "NPC" / "Secondary" / "InitSecondaryNPC.rpy"
 
 
 def _source(path):
@@ -67,8 +68,8 @@ def test_winestore_room_open_hours_are_clock_based_0800_to_1700_with_friday_1500
 def test_winestore_npc_presence_uses_hour_intervals_not_display_slots():
     clara = _source(CLARA_INIT)
 
-    assert "clock_value = int(clock_minutes or 0) % 1440" in clara
-    assert "return 8 * 60 <= clock_value <= 11 * 60 + 59" in clara
+    assert "def clara_wine_store_shift_active" not in clara
+    assert "npc_interval_schedule_load_file(name)" in clara
     assert "return time_value in (0, 1)" not in clara
 
     assert _wine_matches(CLARA_SCHEDULE, 1, "08:00")
@@ -85,3 +86,15 @@ def test_winestore_npc_presence_uses_hour_intervals_not_display_slots():
 
     assert _wine_matches(ALBER_SCHEDULE, 5, "15:00")
     assert not _wine_matches(ALBER_SCHEDULE, 5, "15:01")
+
+
+def test_alber_portrait_source_is_secondary_npc_not_clara_or_wine_store_duplicate():
+    clara = _source(CLARA_INIT)
+    wine_store = _source(WINESTORE_ROOM)
+    secondary = _source(SECONDARY_INIT)
+
+    assert "def alber_random_portrait():" in secondary
+    assert "images/Alber/portrait1.png" in secondary
+    assert "alber_random_portrait()" not in clara
+    assert "def alber_stable_portrait" not in wine_store
+    assert "alber_random_portrait()" in wine_store

@@ -39,31 +39,18 @@ init python:
         if wine_store_clara_visible():
             picture = clara_stable_wine_store_talk_picture()
         elif wine_store_alber_visible():
-            picture = alber_stable_portrait()
+            picture = alber_random_portrait()
         else:
             picture = clara_stable_wine_store_talk_picture()
         if str(picture or "").strip():
             return picture
         return "images/clara/wineSellar_clara_talk.png"
 
-    def alber_stable_portrait():
-        candidates = [
-            "images/Alber/portrait1.png",
-            "images/Alber/portrat2.png",
-            "images/Alber/portrait3.png",
-            "images/Alber/portrait4.png",
-            "images/Alber/portrait5.jpg",
-            "images/Alber/portrait6.jpg",
-            "images/Alber/portrait7.jpg",
-        ]
-        loadable = [row for row in candidates if renpy.loadable(row)]
-        return loadable[0] if len(loadable) > 0 else ""
-
     def wine_store_room_action_items():
         items = []
         items.extend(WineStoreRoom.build_object_items())
         if story_event_available("WineStore", "clara_paintings"):
-            items.append(MenuItem(clara_paintings_wine_caption(), Call("checkTriggers", "WineStore", "clara_paintings", 0)))
+            items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "WineStore", "clara_paintings", 0)))
         items.extend(WineStoreRoom.build_exit_items())
         return items
 
@@ -175,7 +162,7 @@ label WineStore:
         elif dayspassed > 90:
             $ MainTxt += "\n\nОна с Мелиссой - лучшие подруги."
         $ MainTxt += "\n\nВы можете с ней поболтать."
-        if not clara_can_start_social_events():
+        if not Clara.can_start_social_events():
             $ MainTxt += "\n\nПравда, вам кажется, что Кларисса относится к вам пока лишь как к знакомому покупателю."
         # Show Clara's image
         $ _clara_picture = clara_stable_wine_store_talk_picture()
@@ -190,7 +177,7 @@ label WineStore:
             $ MainTxt += "\n\nЗа прилавком стоит сам хозяин, месье Легаре. И он очень мрачно смотрит на вас. Похоже, он принял [fight_text] близко к сердцу."
         $ MainTxt += "\n\nВы можете с ним поболтать."
         # Show Alber's image
-        $ _alber_picture = alber_stable_portrait()
+        $ _alber_picture = alber_random_portrait()
         if str(_alber_picture or "").strip():
             call ShowImage("", "", _alber_picture)
     else:

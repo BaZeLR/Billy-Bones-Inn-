@@ -37,3 +37,13 @@ def test_story_board_conditions_use_familylife_style_rows():
     assert "for _cond_line in story_board_condition_lines(evt.conds):" in source
     assert 'text "Checks:' not in source
     assert "def story_board_show_event_checks" not in source
+
+
+def test_story_board_marks_active_threads_with_distinct_color():
+    source = BOARD_PATH.read_text(encoding="utf-8-sig")
+
+    assert '"active": "#38bdf8"' in source
+    assert 'return STORY_BOARD_COLORS["active"]' in source
+    assert "def story_board_thread_status_label" in source
+    assert 'text "Status: " + story_board_thread_status_label(tinfo) color story_board_thread_color(tinfo)' in source
+    assert "Thread colors: active blue" in source

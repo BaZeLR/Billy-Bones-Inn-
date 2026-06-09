@@ -629,8 +629,6 @@ init python:
                     str(rule.get("location", "") or ""),
                     str(rule.get("mode", "morning") or "morning"),
                 )
-            if rule_kind == "clara_extra_location":
-                return str(clara_extra_location_code() or "") == str(rule.get("location", "") or "")
             if rule_kind == "clara_visible_friday_dance":
                 try:
                     return bool(clara_visible_at_friday_dance())
@@ -645,12 +643,20 @@ init python:
                     return False
             if rule_kind == "clara_paintings_confession":
                 try:
-                    return bool(clara_paintings_confession_schedule_active())
+                    return (
+                        int(ClaraVar.get("peek_done", 0) or 0) == 1
+                        and int(ClaraVar.get("confession_done", 0) or 0) == 0
+                    )
                 except Exception:
                     return False
             if rule_kind == "clara_paintings_evening_watch":
                 try:
-                    return bool(clara_paintings_evening_watch_schedule_active())
+                    clock_value = int(clock_minutes or 0) % 1440
+                    return (
+                        int(ClaraVar.get("commission_followup_done", 0) or 0) == 1
+                        and int(ClaraVar.get("peek_done", 0) or 0) == 0
+                        and 960 <= clock_value <= 1379
+                    )
                 except Exception:
                     return False
             if rule_kind == "werecat_active":

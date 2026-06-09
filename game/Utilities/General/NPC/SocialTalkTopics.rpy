@@ -430,7 +430,7 @@ init -39 python:
             return False
         if key == "clara" and mode_key == "flirt":
             try:
-                if not clara_can_start_social_events():
+                if not Clara.can_start_social_events():
                     return False
             except Exception:
                 return False
@@ -665,14 +665,14 @@ init -39 python:
         if key == "clara":
             if action_key == "flirt":
                 try:
-                    return bool(clara_can_start_social_events()) and social_external_requirement_met(key, "flirt")
+                    return bool(Clara.can_start_social_events()) and social_external_requirement_met(key, "flirt")
                 except Exception:
                     return False
             if action_key == "gift":
                 if int(FlirtedToday.get(key, 0) or 0) <= 0:
                     return False
                 try:
-                    return bool((clara_can_receive_gifts() or clara_has_caught_cat_gift()) and clara_has_giftable_entries())
+                    return bool((Clara.can_receive_gifts() or Clara.has_caught_cat_gift()) and Clara.has_giftable_entries())
                 except Exception:
                     return False
             if action_key == "share":

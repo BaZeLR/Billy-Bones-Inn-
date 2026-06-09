@@ -108,6 +108,7 @@ label NextDay(retlocname, timepassed):
         $ calendar_v2.hour = 6
         $ calendar_v2.minute = 0
         $ calendar_v2.sync_state()
+        $ Clara.prepare_daily_event_rolls()
         $ player_state(False).daily_maintenance(1)
         
         call NextDay_NewDayEvents

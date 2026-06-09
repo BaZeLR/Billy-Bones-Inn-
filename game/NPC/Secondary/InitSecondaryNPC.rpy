@@ -136,6 +136,19 @@ init python:
                 self.var = AlberVar
                 self.promote_from_var(AlberVar)
 
+    def alber_random_portrait():
+        candidates = [
+            "images/Alber/portrait1.png",
+            "images/Alber/portrat2.png",
+            "images/Alber/portrait3.png",
+            "images/Alber/portrait4.png",
+            "images/Alber/portrait5.jpg",
+            "images/Alber/portrait6.jpg",
+            "images/Alber/portrait7.jpg",
+        ]
+        loadable = [row for row in candidates if renpy.loadable(row)]
+        return loadable[renpy.random.randint(0, len(loadable) - 1)] if len(loadable) > 0 else ""
+
     class Francheska(BaseNPC):
         """Francheska (Ellona temple priestess, talk and birth-room scenes)."""
         def __init__(self, name="fran", **kwargs):

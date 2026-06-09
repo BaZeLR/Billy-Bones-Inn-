@@ -375,9 +375,8 @@ label ChurchServiceSisters:
 
 
 label ChurchServiceLegare:
-    if clara_paintings_church_fiance_ready():
-        call preEvent("claraPaintingsPath")
-        call story_clara_paintings_church_4
+    if story_event_available("Church", "clara_paintings"):
+        call checkTriggers("Church", "clara_paintings", 0)
         return
     $ MainTxt = "Мессир Легаре в черном камзоле стоит около одной из колонн и внимательно слушает службу. Рядом с ним стоит его жена Элоиза, маленькая шатенка средних лет, а за ними все их дети - Кларисса, Жерар, Жан-Жак, Полина и малыш Реми."
     $ CurLocDesc = MainTxt

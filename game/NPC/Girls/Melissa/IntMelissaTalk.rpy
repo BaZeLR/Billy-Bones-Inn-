@@ -214,8 +214,8 @@ label IntMelissaTalkRefresh(girl_name="melissa"):
     $ current_action_items.extend(social_core_action_items(girl_name, "IntMelissaTalkRefresh"))
     if melissa_storage_thanks_available():
         $ current_action_items.append(MenuItem("Послушать, что Мелисса скажет о кладовой", Function(main_ui_call_label, "IntMelissaTalkApply", girl_name, "storage_thanks")))
-    if clara_paintings_melissa_question_ready() and int(AskedToday.get(girl_name, 0) or 0) == 0:
-        $ current_action_items.append(MenuItem("Спросить Мелиссу о найденных рисунках", Call("story_clara_paintings_melissa_0")))
+    if story_event_available("talk_melissa", "clara_paintings"):
+        $ current_action_items.append(MenuItem("Спросить Мелиссу о найденных рисунках", Call("checkTriggers", "talk_melissa", "clara_paintings", 0)))
     if story_event_available(str(CurLoc or ""), "melissa_talk"):
         $ current_action_items.append(MenuItem(Melissa.bat_completion_talk_caption(), Call("checkTriggers", CurLoc, "melissa_talk", 0)))
     if melissa_relationship_allows(girl_name, "intimacy") and melissa_room_is_private(CurLoc):

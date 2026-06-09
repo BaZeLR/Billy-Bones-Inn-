@@ -278,7 +278,6 @@ Main APIs:
 The model supports conditional schedule rules:
 
 - `tavern_team_match`
-- `clara_extra_location`
 - `werecat_active`
 - `werecat_roam_match`
 

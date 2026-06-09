@@ -96,7 +96,7 @@ label FridayDance(add_dance_phrase_tmp=""):
                 jump FridayDance
             "Заметить Мелиссу и Клариссу среди танцующих" if FridayDancesCount < 5 and DanceStep == 0 and clara_visible_at_friday_dance():
                 $ FridayDancesCount += 1
-                if clara_can_start_social_events():
+                if Clara.can_start_social_events():
                     $ result = "Среди танцующих вы замечаете Мелиссу и Клариссу. Девушки смеются, кружатся под музыку и явно чувствуют себя на празднике совершенно свободно. Кларисса, заметив ваш взгляд, на миг улыбается вам поверх плеча подруги."
                 else:
                     $ result = "Среди танцующих вы замечаете Мелиссу и Клариссу. Девушки весело кружатся под музыку и о чем-то шепчутся между собой, а вы пока лишь наблюдаете за ними со стороны."

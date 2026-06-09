@@ -1,41 +1,6 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-init python:
-    def clara_apply_result_counters(result_code):
-        result_key = str(result_code or "neutral").strip().lower()
-        ClaraVar["lastsocial"] = result_key
-        ClaraVar[result_key] = int(ClaraVar.get(result_key, 0) or 0) + 1
-
-    def clara_apply_social_result(interaction_type="talk", gift_item_id=""):
-        interaction = str(interaction_type or "talk").strip().lower()
-        gift_id = str(gift_item_id or "").strip()
-        result_key = clara_social_outcome(interaction, gift_id)
-
-        if interaction == "talk":
-            Talked["clara"] = int(Talked.get("clara", 0) or 0) + 1
-            TalkedToday["clara"] = int(TalkedToday.get("clara", 0) or 0) + 1
-        elif interaction == "flirt":
-            Talked["clara"] = int(Talked.get("clara", 0) or 0) + 1
-            FlirtedToday["clara"] = int(FlirtedToday.get("clara", 0) or 0) + 1
-            ClaraVar["flirt"] = int(ClaraVar.get("flirt", 0) or 0) + 1
-        elif interaction == "gift":
-            Talked["clara"] = int(Talked.get("clara", 0) or 0) + 1
-            GiftedToday["clara"] = int(GiftedToday.get("clara", 0) or 0) + 1
-
-        if result_key == "positive":
-            Friends["clara"] = min(20, int(Friends.get("clara", 0) or 0) + (2 if interaction == "gift" else 1))
-            ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 1)
-            if interaction == "flirt":
-                sluttiness["clara"] = min(100, int(sluttiness.get("clara", 0) or 0) + 1)
-        elif result_key == "negative":
-            Friends["clara"] = max(0, int(Friends.get("clara", 0) or 0) - (1 if interaction == "flirt" else 0))
-            ClaraVar["trust"] = max(0, int(ClaraVar.get("trust", 0) or 0) - 1)
-
-        clara_apply_result_counters(result_key)
-        return result_key
-
-
 label IntClaraTalk(girl_name="clara"):
     if str(CurLoc or "") == "WineStore":
         $ _clara_talk_picture = str(clara_wine_store_talk_picture() or "").strip()
@@ -64,10 +29,8 @@ label IntClaraTalkRefresh(girl_name="clara"):
         $ current_action_items.append(MenuItem("Проследить за Клариссой по рынку", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "follow_market")))
     if str(CurLoc or "") == "WineStore" and (story_event_available("WineStore", "clara_talk") or (int(ClaraVar.get("mongol_theft_seen", 0) or 0) == 1 and int(ClaraVar.get("escape_confessed", 0) or 0) == 0)):
         $ current_action_items.append(MenuItem("Осторожно заговорить о ее вечерних делах", Call("story_clara_market_booklet_wine_talk_direct")))
-    if clara_paintings_comfort_ready():
-        $ current_action_items.append(MenuItem("Поддержать Клариссу после разговора с отцом", Call("story_clara_paintings_comfort_2")))
-    if clara_paintings_second_ask_ready():
-        $ current_action_items.append(MenuItem("Снова спросить о тайных рисунках", Call("story_clara_paintings_second_ask_3")))
+    if story_event_available("WineStore", "clara_paintings"):
+        $ current_action_items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "WineStore", "clara_paintings", 0)))
 
     if int(AskedToday.get("clara", 0) or 0) == 0 and int(Friends.get("clara", 0) or 0) >= 6:
         $ current_action_items.append(MenuItem("Спросить Клариссу о семье", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_family")))
@@ -76,7 +39,7 @@ label IntClaraTalkRefresh(girl_name="clara"):
             $ current_action_items.append(MenuItem("Спросить Клариссу об укромных местах", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_water_pump")))
         if int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1 or int(MelissaVar.get("drawings_found", 0) or 0) == 1:
             $ current_action_items.append(MenuItem("Осторожно заговорить о ее тайных рисунках", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_drawings")))
-    if clara_can_accept_horse_ride(CurLoc):
+    if Clara.can_accept_horse_ride(CurLoc):
         $ current_action_items.append(MenuItem("Предложить подвезти Клариссу на коне.", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "horse_ride")))
 
     $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
@@ -91,7 +54,7 @@ label IntClaraGiftMenu(girl_name="clara"):
     $ MainTxt = "Вы прикидываете, что из имеющегося при себе может понравиться Клариссе."
     $ CurLocDesc = MainTxt
     python:
-        for _gift_row in clara_giftable_entries():
+        for _gift_row in Clara.giftable_entries():
             _gift_caption = str(_gift_row.get("gift_name", "") or "")
             _gift_id = str(_gift_row.get("gift_id", "") or "")
             current_action_items.append(MenuItem(_gift_caption, Function(main_ui_call_label, "IntClaraGiftApply", girl_name, _gift_id)))
@@ -105,7 +68,7 @@ label IntClaraGiftMenu(girl_name="clara"):
 label IntClaraGiftApply(girl_name="clara", gift_id=""):
     python:
         _selected = None
-        for _gift_row in clara_giftable_entries():
+        for _gift_row in Clara.giftable_entries():
             if str(_gift_row.get("gift_id", "") or "") == str(gift_id or ""):
                 _selected = dict(_gift_row)
                 break
@@ -121,7 +84,7 @@ label IntClaraGiftApply(girl_name="clara", gift_id=""):
             if not _accepts:
                 _gift_result = player_gift_to("clara", _gift_name, _gift_base, _gift_id, False)
                 MainTxt = append_social_score_message(str(_gift_result.get("text", "") or ""), social_score_delta_for("clara", _friends_before))
-            elif not clara_remove_gift_entry(_selected):
+            elif not Clara.remove_gift_entry(_selected):
                 MainTxt = "Подарок уже недоступен."
             else:
                 apply_social_interaction_base("clara", "gift", _gift_score, 0, 0, 1, 0, 1, 0, True)
@@ -156,7 +119,7 @@ label IntClaraTalkApply(girl_name="clara", choice_code=""):
             if str(_clara_picture or "").strip():
                 $ ShowImage("", "", _clara_picture)
         python:
-            _result = clara_apply_social_result("talk")
+            _result = Clara.apply_social_result("talk")
             if _result == "positive":
                 MainTxt = "Вы некоторое время болтаете с Клариссой о городских новостях, покупателях и последних сплетнях. Разговор выходит удивительно живым, и Кларисса заметно теплеет к вам."
             elif _result == "neutral":
@@ -168,7 +131,7 @@ label IntClaraTalkApply(girl_name="clara", choice_code=""):
         return
 
     if str(choice_code or "") == "flirt":
-        if not clara_can_start_social_events():
+        if not Clara.can_start_social_events():
             $ MainTxt = "Вы ловите себя на мысли, что, прежде чем всерьез заигрывать с Клариссой, вам стоит выглядеть и держаться куда увереннее."
             $ CurLocDesc = MainTxt
             call IntClaraTalkRefresh(girl_name)
@@ -183,7 +146,7 @@ label IntClaraTalkApply(girl_name="clara", choice_code=""):
                 $ ShowImage("", "", _clara_picture)
 
         python:
-            _result = clara_apply_social_result("flirt")
+            _result = Clara.apply_social_result("flirt")
             if _result == "positive":
                 MainTxt = "Вы позволяете себе чуть более смелый и игривый тон. Кларисса отвечает вам лукавой улыбкой и, кажется, начинает смотреть на вас заметно внимательнее."
             elif _result == "neutral":

@@ -4,162 +4,11 @@
 default ClaraPaintingsThreadDoc = "Clara paintings / Legare pressure / fiance investigation thread"
 
 init -1 python:
-    def clara_paintings_flag(name, default=0):
-        try:
-            return int(ClaraVar.get(str(name or ""), default) or default)
-        except Exception:
-            return default
-
-    def clara_paintings_set(name, value=1):
-        ClaraVar[str(name or "")] = value
-
-    def clara_paintings_melissa_question_ready():
-        MelissaVar_safe = getattr(renpy.store, 'MelissaVar', {})
-        ClaraVar_safe = getattr(renpy.store, 'ClaraVar', {})
-        return (
-            int(MelissaVar_safe.get("drawings_found", 0) or 0) == 1
-            and clara_paintings_flag("paintings_melissa_asked", 0) == 0
-        )
-
-    def clara_paintings_cellar_ready():
-        ClaraVar_safe = getattr(renpy.store, 'ClaraVar', {})
-        time_safe = getattr(renpy.store, 'time', 0)
-        return (
-            clara_paintings_flag("paintings_melissa_asked", 0) == 1
-            and clara_paintings_flag("cellar_seen", 0) == 0
-            and int(ClaraVar_safe.get("flirt", 0) or 0) > 0
-            and str(_story_current_location() or "") == "WineStore"
-            and int(time_safe or 0) in (1, 2)
-        )
-
-    def clara_paintings_comfort_ready():
-        time_safe = getattr(renpy.store, 'time', 0)
-        return (
-            clara_paintings_flag("comfort_pending", 0) == 1
-            and clara_paintings_flag("comfort_done", 0) == 0
-            and str(getLocation("clara") or "") == "WineStore"
-            and int(time_safe or 0) == 0
-        )
-
-    def clara_paintings_second_ask_ready():
-        return (
-            clara_paintings_flag("second_ask_unlocked", 0) == 1
-            and clara_paintings_flag("source_known", 0) == 0
-        )
-
-    def clara_paintings_church_fiance_ready():
-        week_safe = getattr(renpy.store, 'week', 0)
-        time_safe = getattr(renpy.store, 'time', 0)
-        return (
-            clara_paintings_flag("source_known", 0) == 1
-            and clara_paintings_flag("fiance_church_seen", 0) == 0
-            and int(week_safe or 0) == 7
-            and int(time_safe or 0) <= 2
-        )
-
-    def clara_paintings_barber_fiance_ready():
-        time_safe = getattr(renpy.store, 'time', 0)
-        if clara_paintings_flag("fiance_church_seen", 0) != 1:
-            return False
-        if clara_paintings_flag("fiance_barber_seen", 0) == 1:
-            return False
-        if str(_story_current_location() or "") != "BarberShop":
-            return False
-        if int(time_safe or 0) == 0:
-            return True
-        if int(time or 0) >= 4:
-            today = int(dayspassed or 0)
-            if clara_paintings_flag("fiance_barber_night_roll_day", -1) != today:
-                ClaraVar["fiance_barber_night_roll_day"] = today
-                try:
-                    ClaraVar["fiance_barber_night_roll"] = 1 if renpy.random.randint(1, 3) == 1 else 0
-                except Exception:
-                    ClaraVar["fiance_barber_night_roll"] = 1
-            try:
-                return clara_paintings_flag("fiance_barber_night_roll", 0) == 1
-            except Exception:
-                return True
-        return False
-
-    def clara_paintings_commission_ready():
-        return (
-            clara_paintings_flag("fiance_barber_seen", 0) == 1
-            and clara_paintings_flag("commission_started", 0) == 0
-            and str(getLocation("clara") or "") == "TavernMain"
-        )
-
-    def clara_paintings_commission_followup_ready():
-        dayspassed_safe = getattr(renpy.store, 'dayspassed', 0)
-        time_safe = getattr(renpy.store, 'time', 0)
-        return (
-            clara_paintings_flag("commission_started", 0) == 1
-            and clara_paintings_flag("commission_followup_done", 0) == 0
-            and int(dayspassed_safe or 0) >= clara_paintings_flag("commission_followup_day", 999999)
-            and str(getLocation("clara") or "") == "WineStore"
-            and int(time_safe or 0) == 0
-        )
-
-    def clara_paintings_evening_peek_ready():
-        time_safe = getattr(renpy.store, 'time', 0)
-        return (
-            clara_paintings_flag("commission_followup_done", 0) == 1
-            and clara_paintings_flag("peek_done", 0) == 0
-            and str(getLocation("clara") or "") == "WineStore"
-            and int(time_safe or 0) == 3
-        )
-
-    def clara_paintings_evening_watch_schedule_active():
-        return (
-            clara_paintings_flag("commission_followup_done", 0) == 1
-            and clara_paintings_flag("peek_done", 0) == 0
-            and int(time or 0) == 3
-        )
-
-    def clara_paintings_confession_ready():
-        return (
-            clara_paintings_flag("peek_done", 0) == 1
-            and clara_paintings_flag("confession_done", 0) == 0
-            and str(getLocation("clara") or "") == "TavernMelissaRoom"
-            and str(getLocation("melissa") or "") == "TavernMelissaRoom"
-        )
-
-    def clara_paintings_confession_schedule_active():
-        return (
-            clara_paintings_flag("peek_done", 0) == 1
-            and clara_paintings_flag("confession_done", 0) == 0
-        )
-
-    def clara_paintings_murder_ready():
-        dayspassed_safe = getattr(renpy.store, 'dayspassed', 0)
-        return (
-            clara_paintings_flag("confession_done", 0) == 1
-            and clara_paintings_flag("murder_seen", 0) == 0
-            and int(dayspassed_safe or 0) >= clara_paintings_flag("murder_day", 999999)
-            and str(_story_current_location() or "") == "CityGuard"
-        )
-
     def clara_paintings_special_cream_recipe_unlocked():
-        return clara_paintings_flag("special_cream_recipe_unlocked", 0) == 1
-
-    def clara_paintings_tavern_caption():
-        if clara_paintings_commission_ready():
-            return "Сказать Клариссе, что у вас есть материал для рисунка"
-        return "Поговорить с Клариссой о рисунках"
-
-    def clara_paintings_wine_caption():
-        if clara_paintings_cellar_ready():
-            return "Спуститься на шум в подвале"
-        if clara_paintings_comfort_ready():
-            return "Поддержать Клариссу после разговора с отцом"
-        if clara_paintings_commission_followup_ready():
-            return "Обсудить с Клариссой материал для рисунка"
-        if clara_paintings_evening_peek_ready():
-            return "Проверить лавку вместе с Клариссой вечером"
-        return "Поговорить о рисунках"
+        return int(Clara.var.get("special_cream_recipe_unlocked", 0) or 0) == 1
 
 
 label story_clara_paintings_melissa_0:
-    call preEvent("claraPaintingsPath")
     $ ClaraVar["paintings_melissa_asked"] = 1
     $ ClaraVar["drawings_secret_known"] = 1
     $ MelissaVar["drawings_returned"] = 1
@@ -174,7 +23,8 @@ label story_clara_paintings_melissa_0:
             findAvailableEvents(True)
         except Exception:
             pass
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     call IntMelissaTalkRefresh("melissa")
     return
 
@@ -221,12 +71,12 @@ label story_clara_paintings_wait_comfort:
     $ current_action_title = "Винная лавка"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Уйти", Jump("WineStore"))]
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     return
 
 
 label story_clara_paintings_comfort_2:
-    call preEvent("claraPaintingsPath")
     $ ClaraVar["comfort_done"] = 1
     $ ClaraVar["second_ask_unlocked"] = 1
     $ ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 2)
@@ -236,12 +86,12 @@ label story_clara_paintings_comfort_2:
     $ current_action_title = "Кларисса"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Дать ей прийти в себя", Call("IntClaraTalkRefresh", "clara"))]
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     return
 
 
 label story_clara_paintings_second_ask_3:
-    call preEvent("claraPaintingsPath")
     $ ClaraVar["source_known"] = 1
     $ ClaraVar["sex_engine_unlocked"] = 1
     $ ClaraVar["necking_unlocked"] = 1
@@ -250,18 +100,19 @@ label story_clara_paintings_second_ask_3:
     $ otkroven["clara"] = min(20, int(otkroven.get("clara", 0) or 0) + 2)
     $ MainTxt = "Когда вы второй раз возвращаетесь к теме рисунков, Кларисса уже не отшучивается. Она признает, что иногда делает портреты для знатных заказчиков, а иногда видит куда больше, чем люди думают.\n\n\"Многие любят, когда их рисуют красивее, смелее или опаснее, чем они есть,\" говорит она. \"А некоторые забывают, что художник сначала смотрит. Я делаю вид, будто вижу только позу и ткань, но на самом деле замечаю взгляды, тайные жесты, встречи за дверью. Оттуда и берутся сюжеты.\"\n\nТеперь между вами появляется другое доверие: не только разговорное, но и телесное. Кларисса уже понимает, что вы знаете ее тайну и не собираетесь использовать ее против нее."
     $ CurLocDesc = MainTxt
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     call IntClaraTalkRefresh("clara")
     return
 
 
 label story_clara_paintings_church_4:
-    call preEvent("claraPaintingsPath")
     $ ClaraVar["fiance_church_seen"] = 1
     $ ClaraVar["fiance_seen_day"] = int(dayspassed or 0)
     $ MainTxt = "У колонны рядом с семьей Легаре сегодня стоит незнакомый молодой дворянин из столицы. Кларисса держится рядом с ним так ровно, что это выглядит почти болезненно. Легаре, напротив, доволен: он представляет гостя как человека из хорошего дома и будущего союзника семьи.\n\nКларисса не произносит слова \"жених\", но оно и так висит между ними. Теперь понятно, что столичная договоренность уже не слух и не отдаленная угроза."
     $ CurLocDesc = MainTxt
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     call ChurchServiceMenu
     return
 
@@ -279,7 +130,8 @@ label story_clara_paintings_barber_5:
     $ CurLocDesc = MainTxt
     $ current_action_title = "Цирюльня"
     $ current_action_content = None
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     return
 
 
@@ -301,7 +153,8 @@ label story_clara_paintings_commission_6:
     $ current_action_title = "Кларисса"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Кивнуть и не продолжать при людях", Call("TavernMainRestore"))]
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     return
 
 
@@ -312,7 +165,8 @@ label story_clara_paintings_commission_followup_7:
     $ current_action_title = "Кларисса"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Договориться на вечер", Jump("WineStore"))]
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     return
 
 
@@ -326,7 +180,8 @@ label story_clara_paintings_evening_peek_8:
     $ current_action_title = "Вечерняя слежка"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Отвести Клариссу к Мелиссе", Jump("TavernMelissaRoom"))]
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     return
 
 
@@ -340,7 +195,8 @@ label story_clara_paintings_confession_9:
     $ current_action_title = "Комната Мелиссы"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Оставить девушек поговорить", Call("TavernMelissaRoomRestore"))]
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     return
 
 
@@ -354,7 +210,8 @@ label story_clara_paintings_murder_10:
         MenuItem("Ответить: цирюльник держит лезвие, но не обязательно вину", Call("story_clara_paintings_solve_murder")),
         MenuItem("Промолчать и уйти", Call("CityGuardRestore")),
     ]
-    $ story_thread_advance_current()
+    if thread is not None:
+        $ thread.advance()
     return
 
 

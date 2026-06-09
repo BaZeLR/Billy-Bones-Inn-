@@ -12,20 +12,6 @@ default TavernMainClientRoomGirl = ""
 
 
 init python:    
-    def tavern_main_register_clara_melissa_visit():
-        if str(CurLoc or "") != "TavernMain":
-            return
-        if str(getLocation("melissa") or "") != "TavernMain":
-            return
-        if str(getLocation("clara") or "") != "TavernMain":
-            return
-        if int(time or 0) != 2:
-            return
-        if int(ClaraVar.get("tavern_melissa_visit_day", -1) or -1) == int(dayspassed or 0):
-            return
-        ClaraVar["tavern_melissa_visit_day"] = int(dayspassed or 0)
-        ClaraVar["tavern_melissa_visit_count"] = int(ClaraVar.get("tavern_melissa_visit_count", 0) or 0) + 1
-
     def tavern_main_morning_event_data():
         event_pool = []
 
@@ -170,8 +156,6 @@ init python:
                 desc_parts.append("Еду и выпивку пьяным, трезвым, похотливым, скромным и прочим посетителям разносят: " + str(NamesList("jobwaitress", "TavernMain") or "никто") + ".")
                 desc_parts.append("Вы можете пообщаться с участницами своей команды через список персонажей справа.")
 
-            if str(getLocation("clara") or "") == "TavernMain" and str(getLocation("melissa") or "") == "TavernMain":
-                desc_parts.append("Сегодня к Мелиссе в трактир заглянула Кларисса. Похоже, за последнее время они успели по-настоящему сдружиться: девушки явно давно о чем-то шепчутся, и при вашем появлении разговор у них на миг сбивается.")
             if str(getLocation("becky") or "") == "TavernMain":
                 desc_parts.append("Бекки Блэнкеншип на этот раз сама заглянула к вам в трактир и присматривается к залу цепким хозяйским взглядом.")
             if str(TavernMainExtraDesc or "").strip():
@@ -187,7 +171,7 @@ init python:
         code_name="TavernMain",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Главная зала трактира",
-        bg_picture="bg TavernMain",
+        bg_picture="images/tavern/mainhall/main_hall.png",
         descriptions=[
             RoomDescription(
                 text="Главная зала трактира 'Дикий Жеребец'. В тускло освещенном зале стоят грубые, сбитые из досок столы и такие же скамьи. У дальнего конца виднеется барная стойка, а за ней проход на кухню. Слева двери ведущие в комнаты, где живут и отдыхают работники трактира. За вашей спиной выход на улицу. На стойке лежит большой и древний том, озаглавленный 'Бабслей и Литрбол для чайников'.",
@@ -220,14 +204,12 @@ label TavernMain:
     $ _tavern_main_base_desc = TavernMainRoom.descriptions[0].text
     $ MainTxt = _tavern_main_base_desc
     $ CurLocDesc = _tavern_main_base_desc
-    scene black
-    show bg TavernMain at master
     $ CurrentRoom = TavernMainRoom
     $ CurLoc = "TavernMain"
     $ location = CurLoc
-    $ tavern_main_register_clara_melissa_visit()
     $ tavern_main_fireplace_wood_stock()
-    $ scene_image = CurrentRoom.bg_picture or None
+    $ calendar_v2.sync_state()
+    $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
     if scene_image:
         $ _layout_last_picture = scene_image
     if tavern_preopening_mode():
@@ -238,7 +220,7 @@ label TavernMain:
     #$ current_action_content = None
     #$ current_action_items = []
     $ current_girl_key = ""
-    #$ current_object_id = ""
+    $ current_object_id = ""
     python:
         # Force TavernMain base intro text in the left panel; prevents stale/conditional text bleed.
         _glory_quest_started = 0
@@ -298,7 +280,9 @@ label TavernMain:
 
     if navigation_only_mode_enabled():
         if not tavern_preopening_mode():
-            call TavernShowImage
+            $ calendar_v2.sync_state()
+            $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+            $ _layout_last_picture = scene_image
         else:
             $ _layout_last_picture = tavern_main_preopening_background()
         python:
@@ -371,7 +355,9 @@ label TavernMain:
             $ TavernMainGloryDesc = "В дальнем углу трактира мастера Драупнир что-то строгает и пилит. Работа кипит. Еще несколько часов и вы сможете насладиться построенным глорихолом."
         elif TavernGloryHole == 2 and _glory_quest_started:
             $ TavernMainGloryDesc = "В дальнем углу трактира располагается ширмочка, а за ней, как вы знаете, глорихол - место где, за умеренную плату, а для вас, как вы надеетесь, и вовсе бесплатно, любой страждущий может получить полностью анонимный минет. Ну, если с другой стороны ширмы есть кто-то, желающий его сделать."
-        call TavernShowImage
+        $ calendar_v2.sync_state()
+        $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+        $ _layout_last_picture = scene_image
 
     if TavernEventOngoing == "":
         if TavernClosed == "" and not tavern_preopening_mode() and int(week or 0) != 7:
@@ -442,10 +428,12 @@ label TavernMainBuildActions:
     $ current_action_items = list(_tavern_room_menu.get("movement", [])) + list(_tavern_room_menu.get("actions", []))
     if TavernClosed == "" and int(TavernHole or 0) > 0 and str(TavernMainClientRoomGirl or "") != "":
         $ current_action_items.append(MenuItem("Пойти проверить отдельную комнату", Call("TavernProstClients", 1, TavernMainClientRoomGirl)))
+    if TavernClosed == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "clara_tavern_visit"):
+        $ current_action_items.append(MenuItem("Прислушаться к историям у стойки", Call("checkTriggers", "TavernMain", "clara_tavern_visit", 0)))
     if TavernClosed == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "overheard"):
         $ current_action_items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
     if TavernClosed == "" and story_event_available("TavernMain", "clara_paintings"):
-        $ current_action_items.append(MenuItem(clara_paintings_tavern_caption(), Call("checkTriggers", "TavernMain", "clara_paintings", 0)))
+        $ current_action_items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "TavernMain", "clara_paintings", 0)))
     return
 
 
@@ -519,7 +507,8 @@ label TavernMainObjectText(object_id="", action_id=""):
 
 
 label TavernMainRestore:
-    $ scene_image = CurrentRoom.bg_picture or None
+    $ calendar_v2.sync_state()
+    $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
     if tavern_preopening_mode():
         $ _layout_last_picture = tavern_main_preopening_background()
     elif scene_image:
