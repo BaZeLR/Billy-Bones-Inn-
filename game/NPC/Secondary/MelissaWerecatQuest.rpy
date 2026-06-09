@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default WerecatVar = {
-    "rats_problem_active": 0,
+    "rats_problem_active": 1,
     "rat_breakfast_seen": 0,
     "adoption_breakfast_seen": 0,
     "woods_exploration": 0,
@@ -26,7 +26,7 @@ default WerecatVar = {
     "hunter_tease_offer_day": -1,
     "hunter_tease_offer_ready": 0,
     "rat_carcass_cached": 0,
-    "rat_food_loss_next_day": -1,
+    "rat_food_loss_next_day": 7,
 }
 
 init -1 python:
@@ -94,7 +94,7 @@ init -1 python:
             int(WerecatVar.get("adopted", 0) or 0) == 1
             and int(WerecatVar.get("adoption_breakfast_seen", 0) or 0) == 1
             and adopted_day >= 0
-            and int(dayspassed or 0) >= adopted_day + 30
+            and day_delta_ready(adopted_day, 30)
             and int(WerecatVar.get("first_month_thanks_day", -1) or -1) < adopted_day + 30
             and not bool(BreakfastToday)
         )
@@ -105,7 +105,7 @@ init -1 python:
             int(WerecatVar.get("adopted", 0) or 0) == 1
             and int(WerecatVar.get("adoption_breakfast_seen", 0) or 0) == 0
             and adopted_day >= 0
-            and int(dayspassed or 0) > adopted_day
+            and day_delta_ready(adopted_day, 1)
             and not bool(BreakfastToday)
         )
 
@@ -113,9 +113,9 @@ init -1 python:
         return (
             int(WerecatVar.get("rats_problem_active", 0) or 0) == 1
             and int(WerecatVar.get("rat_breakfast_seen", 0) or 0) == 0
-            and int(MelissaVar.get("storage_rat_cleared", 0) or 0) == 1
-            and int(MelissaVar.get("storage_rat_last_help_day", -1) or -1) >= 0
-            and int(dayspassed or 0) >= int(MelissaVar.get("storage_rat_last_help_day", -1) or -1) + 1
+            and int(Melissa.var.get("storage_rat_cleared", 0) or 0) == 1
+            and int(Melissa.var.get("storage_rat_last_help_day", -1) or -1) >= 0
+            and day_delta_ready(Melissa.var.get("storage_rat_last_help_day", -1), 1)
             and not bool(BreakfastToday)
         )
 
@@ -125,8 +125,8 @@ init -1 python:
         return (
             str(CurLoc or "") == "HunterClub"
             and int(WerecatVar.get("rats_problem_active", 0) or 0) == 1
-            and int(MelissaVar.get("storage_rat_cleared", 0) or 0) == 1
-            and int(MelissaVar.get("storage_rat_last_help_day", -1) or -1) >= 0
+            and int(Melissa.var.get("storage_rat_cleared", 0) or 0) == 1
+            and int(Melissa.var.get("storage_rat_last_help_day", -1) or -1) >= 0
             and int(WerecatVar.get("adopted", 0) or 0) == 0
             and int(WerecatVar.get("sold", 0) or 0) == 0
             and not werecat_hunter_rumor_seen()
@@ -154,6 +154,7 @@ init -1 python:
             return int(WerecatVar.get("gifted_clara", 0) or 0) == 0
         return (
             int(WerecatVar.get("rats_problem_active", 0) or 0) == 1
+            and int(Melissa.var.get("storage_rat_cleared", 0) or 0) == 1
             and int(WerecatVar.get("adopted", 0) or 0) == 0
             and int(WerecatVar.get("sold", 0) or 0) == 0
         )
@@ -253,7 +254,7 @@ label MelissaRatBreakfastScene:
     $ CurLocDesc = MainTxt
     $ fun = _player_clamp(int(fun or 0) + 5, 0, 100)
     $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
-    $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+    $ Melissa.add_trust(1)
     $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
     $ TavernKitchenSavedText = MainTxt
     call stat
@@ -273,7 +274,7 @@ label WerecatAdoptionBreakfastScene:
     $ CurLocDesc = MainTxt
     $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
     $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
-    $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+    $ Melissa.add_trust(1)
     $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
     $ TavernKitchenSavedText = MainTxt
     return
@@ -289,11 +290,11 @@ label WerecatMonthThanksScene:
     hide screen main_ui
     vscene tavern_kitchen_breakfast_picture()
     $ MainTxt = "За общим столом сегодня куда спокойнее обычного. В кладовой уже давно не слышно прежней возни, а у самого очага, свернувшись теплым клубком, дремлет ваша необычная кошка.\n\nСандра первой нарушает молчание: \"Эта малышка и правда спасла нам припасы. Если бы не она, мы бы еще долго слушали шорох в мешках и считали, сколько еды уходит в никуда.\" Потом она смотрит уже прямо на вас и говорит мягче: \"Хорошее дело вы все-таки сделали. Такой зверь дому в радость.\"\n\nОстальные тоже заметно теплеют. Даже обычная утренняя суета сегодня кажется куда уютнее."
-    if int(MelissaVar.get("bats_episode", 0) or 0) >= 6:
+    if Melissa.bats_stage() >= 6:
         $ MainTxt = str(MainTxt or "") + "\n\nПосле короткой паузы Сандра добавляет уже совсем иначе: \"А ту глупую историю с чердаком пора бы и отпустить. Дом у нас старый, люди живые, а дурных случаев без того хватает. Главное, что теперь ты не отмахнулся от настоящей беды и довел дело до ума.\" Похоже, за столом наконец начинают считать тот позорный случай скорее нелепостью, чем клеймом."
     $ CurLocDesc = MainTxt
     $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
-    $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+    $ Melissa.add_trust(1)
     $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
     $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
     $ TavernKitchenSavedText = MainTxt
@@ -317,7 +318,10 @@ label WerecatSetTrap(room_code=""):
     if not werecat_can_set_bait(_werecat_room):
         $ MainTxt = "Сейчас вы не можете устроить здесь такую приманку."
         $ CurLocDesc = MainTxt
-        call RefreshCurrentActionMenu(_werecat_room, "", True)
+        if _werecat_room == "Forest":
+            call ForestBuildActions
+        else:
+            call ForestSubroomBuildActions
         return
     $ _player_remove_item_by_id("hunting_trap_001", 1)
     $ _werecat_trap_rooms = werecat_trap_rooms()
@@ -328,7 +332,10 @@ label WerecatSetTrap(room_code=""):
     $ WerecatVar["trap_day"] = int(dayspassed or 0)
     $ MainTxt = "Вы ставите охотничью ловушку там, где нашли странные следы, и тщательно маскируете ее листвой. Если слухи не врут, сюда должно прийти нечто куда умнее обычного зверя."
     $ CurLocDesc = MainTxt
-    call RefreshCurrentActionMenu(_werecat_room, "", True)
+    if _werecat_room == "Forest":
+        call ForestBuildActions
+    else:
+        call ForestSubroomBuildActions
     return
 
 
@@ -337,7 +344,10 @@ label WerecatCheckTrap(room_code=""):
     if not werecat_can_check_bait(_werecat_room):
         $ MainTxt = "Проверять здесь пока нечего."
         $ CurLocDesc = MainTxt
-        call RefreshCurrentActionMenu(_werecat_room, "", True)
+        if _werecat_room == "Forest":
+            call ForestBuildActions
+        else:
+            call ForestSubroomBuildActions
         return
     $ _werecat_trap_rooms = werecat_trap_rooms()
     $ _werecat_trap_rooms.pop(_werecat_room, None)
@@ -348,7 +358,10 @@ label WerecatCheckTrap(room_code=""):
     if renpy.random.randint(1, 100) > werecat_trap_success_chance():
         $ MainTxt = "К приманке кто-то подходил: земля примята, кости растащены, на ветке опять висит мягкий блестящий клочок шерсти. Но сама тварь оказалась слишком осторожной и ушла, едва вы приблизились."
         $ CurLocDesc = MainTxt
-        call RefreshCurrentActionMenu(_werecat_room, "", True)
+        if _werecat_room == "Forest":
+            call ForestBuildActions
+        else:
+            call ForestSubroomBuildActions
         return
     $ WerecatVar["caught"] = 1
     $ MainTxt = "В тени между деревьями вы замечаете ее почти сразу. Не зверя и не женщину, а странную, тревожно красивую смесь обоих. Кошачьи уши вздрагивают от каждого звука, пушистый хвост нервно ходит из стороны в сторону, по плечам и бедрам легли тонкие узоры мягкой шерсти, а глаза у нее золотые, настороженные и слишком умные для простой лесной твари. Она явно напугана, но не шипит и не бросается, только смотрит так, будто еще сама не решила, считать ли вас охотником или спасением."
@@ -382,7 +395,7 @@ label WerecatAdoptChoice(choice_code="adopt"):
         $ money = int(money or 0) + 5000
         $ tavernfame = int(tavernfame or 0) - 3
         $ Friends["sandra"] = max(0, int(Friends.get("sandra", 0) or 0) - 2)
-        $ Friends["melissa"] = max(0, int(Friends.get("melissa", 0) or 0) - 3)
+        $ Melissa.add_trust(-3)
         $ Friends["amanda"] = max(0, int(Friends.get("amanda", 0) or 0) - 2)
         $ MainTxt = "Вы выбираете самый жесткий и самый выгодный путь. За такую необычную добычу быстро дают большие деньги, но запах этой сделки остается при вас надолго. Крысы в доме от этого, разумеется, никуда не деваются."
         $ CurLocDesc = MainTxt
@@ -414,7 +427,7 @@ label WerecatAdoptChoice(choice_code="adopt"):
     $ charisma = min(100, int(charisma or 0) + 15)
     $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
     $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
-    $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+    $ Melissa.add_trust(1)
     $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
     $ neshlush["sandra"] = max(0, int(neshlush.get("sandra", 0) or 0) - 1)
     $ neshlush["melissa"] = max(0, int(neshlush.get("melissa", 0) or 0) - 1)

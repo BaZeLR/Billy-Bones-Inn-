@@ -4,23 +4,15 @@
 init -45 python:
     import renpy.exports as renpy
 
-    PLAYER_CHORE_KEYS = (
-        "bring_woods",
-        "chop_wood",
-        "make_fire",
-        "clean_ashes",
-        "boil_water",
-        "clean_upstairs_rooms",
-    )
-    PLAYER_CHORE_TARGET = 3
-    PLAYER_CHORE_TARGETS = {
-        "bring_woods": 3,
-        "chop_wood": 3,
-        "make_fire": 3,
-        "clean_ashes": 3,
-        "boil_water": 7,
-        "clean_upstairs_rooms": 3,
-    }
+    # Chore keys + targets are defined in Actions.rpy (action/restriction system)
+    # We pull them here for the implementation (weekly tracking, Sandra eval).
+    try:
+        PLAYER_CHORE_KEYS = renpy.store.PLAYER_CHORE_KEYS
+        PLAYER_CHORE_TARGETS = renpy.store.PLAYER_CHORE_TARGETS
+    except Exception:
+        PLAYER_CHORE_KEYS = ("bring_woods", "chop_wood", "make_fire", "clean_ashes", "boil_water", "clean_upstairs_rooms")
+        PLAYER_CHORE_TARGETS = {k: (7 if k == "boil_water" else 3) for k in PLAYER_CHORE_KEYS}
+
     PLAYER_CORE_OTHER_GIRLS = ("amanda", "melissa")
 
     def _pc_to_int(value, default=0):
@@ -40,7 +32,7 @@ init -45 python:
 
     def _pc_advance_minutes(minutes_to_add):
         try:
-            calendar_advance_minutes(_pc_to_int(minutes_to_add, 0))
+            calendar_v2.advance_minutes(_pc_to_int(minutes_to_add, 0))
         except Exception:
             pass
 
@@ -68,7 +60,7 @@ init -45 python:
         return CurrentRoom
 
     def _pc_calendar_total_minutes():
-        calendar_sync_state()
+        calendar_v2.sync_state()
         return max(0, _pc_to_int(dayspassed, 0)) * 1440 + (_pc_to_int(hour, 0) * 60) + _pc_to_int(minute, 0)
 
     def _pc_fire_duration_minutes():
@@ -133,6 +125,8 @@ init -45 python:
     def _pc_sync_ui_chores():
         UI_chores.clear()
         UI_chores.update({key: int(PlayerChoresWeek.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
+        if "sync_player_state_from_store" in globals():
+            sync_player_state_from_store()
 
     def _pc_chore_display_name(chore_key):
         names = {
@@ -147,7 +141,7 @@ init -45 python:
 
     def player_chore_target(chore_key):
         key = str(chore_key or "").strip()
-        return max(1, _pc_to_int(PLAYER_CHORE_TARGETS.get(key, PLAYER_CHORE_TARGET), PLAYER_CHORE_TARGET))
+        return max(1, _pc_to_int(PLAYER_CHORE_TARGETS.get(key, 3), 3))
 
     def _pc_register_chore_success(chore_key):
         key = str(chore_key or "").strip()
@@ -161,6 +155,9 @@ init -45 python:
         key = str(chore_key or "").strip()
         if key not in PLAYER_CHORE_KEYS:
             return False, "Такого дела сейчас нет."
+        restriction = str(action_restriction_message("chore") or "").strip()
+        if restriction:
+            return False, restriction
         if _pc_to_int(fun, 0) < 26:
             return False, "У вас слишком плохое настроение для такой работы."
         if _pc_to_int(energy, 0) <= 0:
@@ -185,6 +182,7 @@ init -45 python:
     def _ensure_player_chores_state():
         global PlayerChoresWeek, UI_chores, WeeklyVisitorsTrack, WeeklyChoresLastEvalStamp
         global Friends, SandraVar, otkroven, neshlush
+
         if not isinstance(PlayerChoresWeek, dict):
             PlayerChoresWeek = {}
         for key in PLAYER_CHORE_KEYS:
@@ -204,7 +202,7 @@ init -45 python:
             WeeklyVisitorsTrack["prev_avg"] = 0.0
 
         if not isinstance(WeeklyChoresLastEvalStamp, str):
-            WeeklyChoresLastEvalStamp = str(WeeklyChoresLastEvalStamp)
+            WeeklyChoresLastEvalStamp = str(WeeklyChoresLastEvalStamp or "")
 
         if not isinstance(Friends, dict):
             Friends = {}
@@ -217,8 +215,17 @@ init -45 python:
             neshlush = {}
         for girl in PLAYER_CORE_OTHER_GIRLS:
             if girl not in neshlush:
-                # Rebel baseline: inverse of current openness (otkroven), clamped.
                 neshlush[girl] = max(0, 5 - _pc_to_int(otkroven.get(girl, 0), 0))
+
+            # Sync to girl object (girls are classes now, not just dict entries)
+            try:
+                info = peopleInfo.get(girl)
+                if isinstance(info, PeopleInfo):
+                    info.openness = otkroven.get(girl, info.openness)
+                    if not hasattr(info, "rebel_baseline"):
+                        info.rebel_baseline = neshlush[girl]
+            except Exception:
+                pass
 
     def get_player_chores_ui_state():
         _ensure_player_chores_state()
@@ -226,7 +233,7 @@ init -45 python:
 
     def do_player_chore(chore_key, where_id="", object_id=""):
         global fun, energy, exploration, taverncleanliness
-        global ashesdirtydays, upstairsroomsdirty, FightLevel, dayssincewash
+        global ashesdirtydays, upstairsroomsdirty, FightLevel
         _ensure_player_chores_state()
         key = str(chore_key or "").strip()
         allowed, reason = can_do_player_chore(key, where_id, object_id)
@@ -291,7 +298,8 @@ init -45 python:
             _pc_advance_minutes(30)
             fun = _pc_clamp(fun - 10, 0, 100)
             energy = _pc_clamp(energy - 20, 0, 100)
-            dayssincewash = max(0, _pc_to_int(dayssincewash, 0) + 1)
+            player_state().appearance.increment_wash_days(1)
+            player_state().appearance.apply_to_store()
             exploration = max(0, _pc_to_int(exploration, 0) + 1)
             result_text = "Вы выгребаете золу и приводите очаг в порядок."
         elif key == "boil_water":
@@ -308,7 +316,8 @@ init -45 python:
         elif key == "clean_upstairs_rooms":
             fun = _pc_clamp(fun - 25, 0, 100)
             energy = _pc_clamp(energy - 15, 0, 100)
-            dayssincewash = max(0, _pc_to_int(dayssincewash, 0) + 1)
+            player_state().appearance.increment_wash_days(1)
+            player_state().appearance.apply_to_store()
             exploration = max(0, _pc_to_int(exploration, 0) + 1)
             upstairsroomsdirty = 0
             result_text = "Вы тратите время на уборку комнат наверху и к концу работы валитесь с ног."
@@ -319,7 +328,10 @@ init -45 python:
         return {"ok": True, "text": result_text, "chore_key": key}
 
     def record_weekly_tavern_visitors(visitors_count):
+        global WeeklyVisitorsTrack
         _ensure_player_chores_state()
+        if not isinstance(WeeklyVisitorsTrack, dict):
+            WeeklyVisitorsTrack = {}
         WeeklyVisitorsTrack["sum"] = max(0, _pc_to_int(WeeklyVisitorsTrack.get("sum", 0), 0)) + max(0, _pc_to_int(visitors_count, 0))
         WeeklyVisitorsTrack["days"] = max(0, _pc_to_int(WeeklyVisitorsTrack.get("days", 0), 0)) + 1
 
@@ -466,9 +478,14 @@ init -45 python:
         return preview
 
     def evaluate_weekly_chores_and_rewards():
-        global week, time, year, month, day, WeeklyChoresLastEvalStamp
-        global PlayerChoresWeek, WeeklyVisitorsTrack, neshlush, SandraVar, Friends, UI_chores
+        global WeeklyChoresLastEvalStamp, PlayerChoresWeek, WeeklyVisitorsTrack
+        global neshlush, SandraVar, Friends, UI_chores
+
         _ensure_player_chores_state()
+        Sandra.var = SandraVar
+        Sandra.ensure_story_defaults()
+        Sandra.sync_from_sandra_maps()
+
         preview = weekly_chores_evaluation_preview(
             week_now=week,
             time_now=time,
@@ -479,27 +496,44 @@ init -45 python:
             last_stamp=WeeklyChoresLastEvalStamp,
             chores_state=PlayerChoresWeek,
             visitors_track=WeeklyVisitorsTrack,
-            sandra_friend=(Friends or {}).get("sandra", 0),
-            sandra_flags=SandraVar,
+            sandra_friend=Sandra.rel,
+            sandra_flags=Sandra.var,
             rebel_state=neshlush,
         )
         if not bool(preview.get("applied", False)):
             return ""
 
         WeeklyChoresLastEvalStamp = str(preview.get("stamp", "") or WeeklyChoresLastEvalStamp)
-        Friends["sandra"] = max(0, _pc_to_int(preview.get("sandra_friend", 0), 0))
-
         preview_flags = dict(preview.get("sandra_flags", {}) or {})
-        SandraVar["MCVisitFirstReady"] = max(0, _pc_to_int(preview_flags.get("MCVisitFirstReady", 0), 0))
-        SandraVar["MCVisitFirstPending"] = max(0, _pc_to_int(preview_flags.get("MCVisitFirstPending", 0), 0))
-        SandraVar["WeeklyChoreCheckScore"] = max(0, _pc_to_int(preview_flags.get("WeeklyChoreCheckScore", 0), 0))
-        SandraVar["WeeklyChoreCheckCounter"] = max(0, _pc_to_int(preview_flags.get("WeeklyChoreCheckCounter", 0), 0))
-        SandraVar["Week5WakePending"] = max(0, _pc_to_int(preview_flags.get("Week5WakePending", 0), 0))
-        SandraVar["WeeklyChoreCheckEval"] = str(preview_flags.get("WeeklyChoreCheckEval", "") or "")
+        Sandra.weekly_report_finished(
+            score=preview_flags.get("WeeklyChoreCheckScore", 0),
+            evaluation=preview_flags.get("WeeklyChoreCheckEval", ""),
+            counter=preview_flags.get("WeeklyChoreCheckCounter", 0),
+            wake_pending=preview_flags.get("Week5WakePending", 0),
+            visit_first_ready=preview_flags.get("MCVisitFirstReady", 0),
+            visit_first_pending=preview_flags.get("MCVisitFirstPending", 0),
+            friend_value=preview.get("sandra_friend", Sandra.rel),
+        )
+        SandraVar = Sandra.var
+        if Sandra.weekly_wake_pending and "sandraWeeklyEvaluation" in threads:
+            threads["sandraWeeklyEvaluation"].advanceTo(Sandra.weekly_wake_num, force_active=True)
 
         preview_rebel = dict(preview.get("rebel", {}) or {})
         for girl in PLAYER_CORE_OTHER_GIRLS:
             neshlush[girl] = max(0, _pc_to_int(preview_rebel.get(girl, neshlush.get(girl, 0)), 0))
+
+            # Respect that girls are now class instances (PeopleInfo/Girl), not just dict keys
+            try:
+                info = peopleInfo.get(girl)
+                if isinstance(info, PeopleInfo):
+                    info.openness = otkroven.get(girl, info.openness)
+                    # Store rebel baseline on the object as well for consistency with OOP layer
+                    if not hasattr(info, "rebel_baseline"):
+                        info.rebel_baseline = 0
+                    info.rebel_baseline = neshlush.get(girl, info.rebel_baseline)
+            except Exception:
+                pass
+
         try:
             relationship_apply_weekly_chore_evaluation(preview)
         except Exception:
@@ -514,5 +548,7 @@ init -45 python:
         WeeklyVisitorsTrack["prev_avg"] = float(preview_visitors.get("prev_avg", 0.0) or 0.0)
         WeeklyVisitorsTrack["sum"] = max(0, _pc_to_int(preview_visitors.get("sum", 0), 0))
         WeeklyVisitorsTrack["days"] = max(0, _pc_to_int(preview_visitors.get("days", 0), 0))
+        if "sync_player_state_from_store" in globals():
+            sync_player_state_from_store()
 
         return str(preview.get("message", "") or "")

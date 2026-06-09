@@ -34,6 +34,49 @@ init python:
         except Exception:
             return default
 
+    def ensure_default_tavern_jobs(sync_tomorrow=True):
+        hall_workers = {
+            "sandra": {"kitchen": 1, "cleaning": 0, "waitress": 0},
+            "melissa": {"kitchen": 0, "cleaning": 1, "waitress": 1},
+            "amanda": {"kitchen": 0, "cleaning": 1, "waitress": 1},
+        }
+        optional_workers = ("georgett", "liza", "becky", "irma", "inga", "clara")
+
+        for person, jobs in hall_workers.items():
+            jobHallAvail.setdefault(person, 1)
+            jobWhoreAvail.setdefault(person, 0)
+            jobGloryHoleAvail.setdefault(person, 0)
+            jobkitchen.setdefault(person, jobs["kitchen"])
+            jobcleaning.setdefault(person, jobs["cleaning"])
+            jobwaitress.setdefault(person, jobs["waitress"])
+            jobwhore.setdefault(person, 0)
+            jobgloryhole.setdefault(person, 0)
+            CurrentLoc.setdefault(person, "TavernMain")
+            if sync_tomorrow:
+                jobkitchentomorrow.setdefault(person, jobkitchen.get(person, 0))
+                jobcleaningtomorrow.setdefault(person, jobcleaning.get(person, 0))
+                jobwaitresstomorrow.setdefault(person, jobwaitress.get(person, 0))
+                jobwhoreTommorow.setdefault(person, jobwhore.get(person, 0))
+                jobgloryholeTommorow.setdefault(person, jobgloryhole.get(person, 0))
+
+        for person in optional_workers:
+            jobHallAvail.setdefault(person, 0)
+            jobWhoreAvail.setdefault(person, 0)
+            jobGloryHoleAvail.setdefault(person, 0)
+            jobkitchen.setdefault(person, 0)
+            jobcleaning.setdefault(person, 0)
+            jobwaitress.setdefault(person, 0)
+            jobwhore.setdefault(person, 0)
+            jobgloryhole.setdefault(person, 0)
+            if sync_tomorrow:
+                jobkitchentomorrow.setdefault(person, jobkitchen.get(person, 0))
+                jobcleaningtomorrow.setdefault(person, jobcleaning.get(person, 0))
+                jobwaitresstomorrow.setdefault(person, jobwaitress.get(person, 0))
+                jobwhoreTommorow.setdefault(person, jobwhore.get(person, 0))
+                jobgloryholeTommorow.setdefault(person, jobgloryhole.get(person, 0))
+
+        return True
+
     def _tavern_get_stat(mapping, person, default=0):
         mapping = _tavern_dict_value(mapping)
         if person in mapping:
@@ -160,7 +203,7 @@ init python:
         return int(player_recent_sex_count(2) or 0) > 2
 
     def household_breakfast_attendee_ids():
-        if bool(TavernBreakfastEventActive) and isinstance(TavernBreakfastPresentIds, list):
+        if bool(TavernBreakfastEventActive) and TavernBreakfastPresentIds is not None:
             return [str(row or "").strip().lower() for row in list(TavernBreakfastPresentIds or []) if str(row or "").strip()]
 
         try:
@@ -198,15 +241,15 @@ init python:
         lines = []
         if key == "melissa":
             try:
-                melissa_sync_room_problem_state()
+                Melissa.sync_room_problem_state()
             except Exception:
                 pass
-            if melissa_bats_stage() >= 7 and melissa_bats_stage() < 8:
+            if Melissa.bats_stage() >= 7 and Melissa.bats_stage() < 8:
                 repair_day = int(MelissaVar.get("roof_repair_complete_day", -1) or -1)
                 if repair_day > int(dayspassed or 0):
                     days_left = repair_day - int(dayspassed or 0)
                     lines.append("Над комнатой Мелиссы уже заказана починка крыши. Мастерам осталось еще примерно %s дн., прежде чем можно будет окончательно считать дело закрытым." % days_left)
-                elif melissa_bats_repair_complete():
+                elif Melissa.bats_repair_complete():
                     lines.append("Похоже, мастера уже закончили с крышей: над комнатой стало тихо, щели подлатаны, и теперь можно сказать Мелиссе, что она может окончательно возвращаться к себе.")
         issue_code = household_morning_issue_type(key)
         if issue_code == "sick":
@@ -339,12 +382,12 @@ init python:
         slot = _tavern_int(time if time_value is None else time_value, 0)
         if key == "melissa":
             try:
-                melissa_sync_room_problem_state()
-                if melissa_temp_room_active("TavernMyRoom", slot):
+                Melissa.sync_room_problem_state()
+                if Melissa.temp_room_active("TavernMyRoom", slot):
                     return "TavernMyRoom"
-                if melissa_temp_room_active("TavernAmandaRoom", slot):
+                if Melissa.temp_room_active("TavernAmandaRoom", slot):
                     return "TavernAmandaRoom"
-                if melissa_temp_room_active("TavernEmptyRoom", slot):
+                if Melissa.temp_room_active("TavernEmptyRoom", slot):
                     return "TavernEmptyRoom"
             except Exception:
                 pass
@@ -354,7 +397,8 @@ init python:
         if morning_issue in ("sick", "sleepy"):
             return _tavern_private_room(key)
 
-        schedule_loc = str(npc_schedule_location(key, _tavern_int(week, 1), slot) or "")
+        schedule_time_value = None if time_value is None else slot
+        schedule_loc = str(npc_schedule_location(key, _tavern_int(week, 1), schedule_time_value) or "")
         if schedule_loc:
             return schedule_loc
 
@@ -397,12 +441,19 @@ init python:
         }.get(str(job_type or ""), "")
 
     def _tavern_job_keys(job_type, room_code=None):
+        # Safe access to tavern job parameter dicts (these are store globals, not locals)
+        jk = _tavern_dict_value(getattr(renpy.store, 'jobkitchen', None))
+        jc = _tavern_dict_value(getattr(renpy.store, 'jobcleaning', None))
+        jw = _tavern_dict_value(getattr(renpy.store, 'jobwaitress', None))
+        jwh = _tavern_dict_value(getattr(renpy.store, 'jobwhore', None))
+        jgh = _tavern_dict_value(getattr(renpy.store, 'jobgloryhole', None))
+
         mapping = {
-            "jobkitchen": _tavern_dict_value(jobkitchen),
-            "jobcleaning": _tavern_dict_value(jobcleaning),
-            "jobwaitress": _tavern_dict_value(jobwaitress),
-            "jobwhore": _tavern_dict_value(jobwhore),
-            "jobgloryhole": _tavern_dict_value(jobgloryhole),
+            "jobkitchen": jk,
+            "jobcleaning": jc,
+            "jobwaitress": jw,
+            "jobwhore": jwh,
+            "jobgloryhole": jgh,
         }
         source = mapping.get(job_type, {})
         keys = [name for name, assigned in source.items() if _tavern_int(assigned, 0) != 0]
@@ -468,16 +519,22 @@ init python:
         waitress_value = _tavern_int(_tavern_get_stat(waitress, person, 0), 0)
         friends_value = _tavern_int(_tavern_get_stat(Friends, person, 0), 0)
 
+        jk = _tavern_dict_value(getattr(renpy.store, 'jobkitchen', None))
+        jc = _tavern_dict_value(getattr(renpy.store, 'jobcleaning', None))
+        jw = _tavern_dict_value(getattr(renpy.store, 'jobwaitress', None))
+        jwh = _tavern_dict_value(getattr(renpy.store, 'jobwhore', None))
+        jgh = _tavern_dict_value(getattr(renpy.store, 'jobgloryhole', None))
+
         current_jobs = []
-        if _tavern_int(_tavern_dict_value(jobkitchen).get(person, 0), 0):
+        if _tavern_int(jk.get(person, 0), 0):
             current_jobs.append("кухня")
-        if _tavern_int(_tavern_dict_value(jobcleaning).get(person, 0), 0):
+        if _tavern_int(jc.get(person, 0), 0):
             current_jobs.append("уборка")
-        if _tavern_int(_tavern_dict_value(jobwaitress).get(person, 0), 0):
+        if _tavern_int(jw.get(person, 0), 0):
             current_jobs.append("зал")
-        if _tavern_int(_tavern_dict_value(jobwhore).get(person, 0), 0):
+        if _tavern_int(jwh.get(person, 0), 0):
             current_jobs.append("интим")
-        if _tavern_int(_tavern_dict_value(jobgloryhole).get(person, 0), 0):
+        if _tavern_int(jgh.get(person, 0), 0):
             current_jobs.append("глорихол")
 
         jobs_text = ", ".join(current_jobs) if current_jobs else "без смены"

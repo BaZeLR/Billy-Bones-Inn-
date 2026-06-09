@@ -203,17 +203,47 @@ init -40 python:
 
 
     class RoomSchedule(object):
-        def __init__(self, weekdays=None, time_slots=None, closed_text="", condition=None):
+        def __init__(self, weekdays=None, time_slots=None, closed_text="", condition=None, start="", end=""):
             self.weekdays = list(weekdays or [])
             self.time_slots = list(time_slots or [])
             self.closed_text = str(closed_text or "")
             self.condition = condition
+            self.start = str(start or "")
+            self.end = str(end or "")
+
+        def _minute_value(self, value, default=0):
+            text = str(value or "").strip()
+            if ":" not in text:
+                try:
+                    return max(0, min(1439, int(text)))
+                except Exception:
+                    return int(default or 0)
+            try:
+                h_text, m_text = text.split(":", 1)
+                return max(0, min(23, int(h_text or 0))) * 60 + max(0, min(59, int(m_text or 0)))
+            except Exception:
+                return int(default or 0)
 
         def is_open(self, week_value, time_value):
             if not room_rule_true(self.condition):
                 return False
             if self.weekdays and int(week_value or 0) not in self.weekdays:
                 return False
+            start_text = str(getattr(self, "start", "") or "")
+            end_text = str(getattr(self, "end", "") or "")
+            if start_text or end_text:
+                try:
+                    minute_value = int(clock_minutes or 0) % 1440
+                except Exception:
+                    minute_value = 0
+                start_value = self._minute_value(start_text, 0)
+                end_value = self._minute_value(end_text, 1439)
+                if start_value <= end_value:
+                    if not (start_value <= minute_value <= end_value):
+                        return False
+                else:
+                    if not (minute_value >= start_value or minute_value <= end_value):
+                        return False
             if self.time_slots and int(time_value or 0) not in self.time_slots:
                 return False
             return True
@@ -223,6 +253,8 @@ init -40 python:
             state["condition"] = room_rule_serialize(state.get("condition", None))
             state["weekdays"] = list(state.get("weekdays", []) or [])
             state["time_slots"] = list(state.get("time_slots", []) or [])
+            state["start"] = str(state.get("start", "") or "")
+            state["end"] = str(state.get("end", "") or "")
             return state
 
         def __setstate__(self, state):
@@ -286,6 +318,8 @@ init -40 python:
                 room_object = row
                 if isinstance(row, str):
                     room_object = get_game_object(row)
+                    if room_object is None:
+                        room_object = get_game_item(row)
                 if room_object is not None and hasattr(room_object, "is_visible") and room_object.is_visible():
                     out.append(room_object)
             return out
@@ -405,9 +439,9 @@ label MoveToRoom(target_label="", movement_minutes=0):
     $ move_cost = int(movement_minutes or 0)
 
     if _time_advancement_allowed():
-        $ ensure_calendar_state()
+        $ calendar_v2.sync_state()
         if move_cost > 0:
-            $ calendar_advance_minutes(move_cost)
+            $ calendar_v2.advance_minutes(move_cost)
 
     $ CurLoc = movement_target
     $ location = movement_target

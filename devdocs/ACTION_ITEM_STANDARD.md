@@ -1,6 +1,12 @@
 # Action And Item Standard
 
-FamilyLife uses `actions.rpy` as the common action method file. Tractir now follows the same idea through `game/Inn/Actions.rpy`, while preserving its existing `main_ui` right panel.
+Family Life uses `actions.rpy` as a simple file of real Ren'Py action labels.
+Those labels show/select pictures, write text, mutate stats/time/items/state,
+and return. The owning room/location label then jumps or calls back to itself.
+
+Tractir should follow that design while keeping its existing `main_ui` shell.
+The active current file is `game/Utilities/General/Common/Actions.rpy`, but its
+current shape is not the target architecture.
 
 ## Core Structures
 
@@ -22,16 +28,16 @@ FamilyLife uses `actions.rpy` as the common action method file. Tractir now foll
   - Stored on room objects.
   - Helper methods in `Actions.rpy` move items between room and player inventory.
 
-## Common Action Methods
+## Desired Common Action Labels
 
-`game/Inn/Actions.rpy` is the standard place for common actions.
+The common actions file should contain clear basic action labels, not a central
+dispatcher or UI refresh system.
 
 Important labels:
 
 - `Examine`
 - `Take`
 - `Drop`
-- `ApplyItemAction`
 - `Drink`
 - `Eat`
 - `UseDrinkItem`
@@ -44,20 +50,47 @@ Important labels:
 - `Clean`
 - `Chop`
 
-Important Python helpers:
+The label is the executor. It may directly:
+
+- set `MainTxt` / scene text
+- select a picture or use `vscene` for an authored scene
+- mutate player stats
+- mutate inventory or room/object state
+- advance time
+- call `stat` or another tiny status update helper
+- return
+
+Screens are allowed as actual UI surfaces, but basic action labels should not
+route through refresh/apply/renew labels just to redraw a menu.
+
+Tiny Python helpers are acceptable only when they remove real duplication and
+do not hide the action's meaning.
+
+Possible tiny helpers:
 
 - `action_restriction_message()`
 - `action_restriction_result()`
-- `player_pick_up_item()`
-- `player_drop_item()`
-- `player_apply_item_action()`
-- `player_share_item_with()`
-- `player_gift_to()`
-- `apply_social_interaction_base()`
+- item count/add/remove helpers
+- clamp/stat helpers
 
-## Standard ObjectAction Factories
+NPC-specific social gift/share effects do not belong in the common basic action
+file. They belong with the NPC or item ownership layer.
 
-New object/item definitions should use these factories when possible:
+## Action Definition Metadata
+
+Action definitions may carry display metadata close to the owner:
+
+- caption
+- target label
+- picture
+- description/result text
+- condition
+- small custom properties when needed
+
+This lets an object or room show the right text and picture without making the
+common action file know every object in the game.
+
+Example object definition:
 
 ```renpy
 actions=[
@@ -74,7 +107,10 @@ actions=[
 ]
 ```
 
-Available factories:
+Factories can exist if they build these simple action rows. They must not become
+dispatchers that hide the real label.
+
+Current factories in Tractir include:
 
 - `make_standard_object_action(action_key, label="", args=None, condition=None, custom_properties=None, action_id="", target="", hook="")`
 - `make_examine_action(object_id, where_id="", text_value="", label="", condition=None)`
@@ -85,6 +121,8 @@ Available factories:
 - `make_sleep_action(return_location="TavernMain", days=1, label="", fallback_text="", where_id="", object_id="", condition=None)`
 - `make_rest_action(return_location="", minutes_passed=120, energy_gain=15, label="", fallback_text="", where_id="", object_id="", condition=None)`
 - `make_simple_target_action(action_key, object_id="", where_id="", label="", fallback_text="", condition=None)`
+
+These are acceptable only if they produce direct calls to real labels.
 
 ## Standard Action Keys
 
@@ -106,32 +144,62 @@ These keys are registered in `STANDARD_ACTION_METHODS`:
 
 ## Rule For New Content
 
-Do not put repeated basic logic inside room labels.
+Do not add refresh/apply/renew/rebuild wrappers.
 
-Good room label structure:
+Preferred flow:
+
+```text
+room/object/NPC exposes action
+-> button calls real label
+-> label performs effect and returns
+-> owning room/object/NPC flow is restored directly
+```
+
+Good room/location style:
 
 ```renpy
-label TavernExampleBuildActions:
-    $ current_action_items = []
-    $ current_action_items.append(MenuItem("Прибрать", Call("DoChore", "clean_upstairs_rooms", "TavernExample", "", "")))
-    $ current_action_items.append(MenuItem("Назад", Call("TavernExampleRestore")))
-    show screen main_ui
+label TavernExample:
+    $ CurrentRoom = TavernExampleRoom
+    $ MainTxt = TavernExampleRoom.descriptions[0].text
+    call screen main_ui
     return
 ```
 
-Better item/object definition:
+Good action style:
 
 ```renpy
-ExampleItem = GameItem(
-    object_id="example_item_001",
-    name="предмет",
-    description="Описание предмета.",
-    actions=[
-        make_examine_action("example_item_001", "TavernExample", "Вы осматриваете предмет."),
-        make_take_action("example_item_001", "TavernExample", "Вы берете предмет."),
-    ],
-    carriable=True,
-)
+label TavernExampleClean:
+    $ MainTxt = "Вы прибираете комнату."
+    $ energy -= 5
+    $ taverncleanliness += 1
+    $ calendar_advance_minutes(20)
+    call stat
+    return
 ```
 
-The label should display content and route choices. Common state mutation belongs in `Actions.rpy`.
+The caller should return to the owning room or object directly, not through a
+generic refresh label.
+
+## Present Tractir Code Comparison
+
+Current `game/Utilities/General/Common/Actions.rpy` is bloated because it mixes:
+
+- real basic action labels
+- inventory storage helpers
+- social gift/share rules
+- NPC-specific item effects
+- UI refresh routing
+- result applier wrappers
+- room-specific refresh maps
+
+Classify current symbols this way:
+
+- KEEP: `Examine`, `Take`, `Drop`, `Drink`, `Eat`, `Wash`, `DoChore`, `Sleep`,
+  `Rest`, `MakeFire`, `Clean`, `Chop`, `BoilWater`, after simplifying them.
+- KEEP CAREFULLY: small inventory/stat/restriction helpers.
+- MOVE: social item rules and NPC-specific effects to item/NPC ownership.
+- REMOVE/BYPASS: `ROOM_ACTION_REFRESH`, `RefreshCurrentActionMenu`,
+  `ApplyActionResultToUI`, and generic apply/renew/rebuild labels.
+
+The target is not "more dispatch tables." The target is fewer layers and clearer
+labels.

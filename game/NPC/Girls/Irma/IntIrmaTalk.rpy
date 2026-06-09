@@ -84,6 +84,7 @@ label IntIrmaTalk(show_menu=True):
     $ current_action_content = None
     $ MainTxt = "Ирма отвлекается от работы и вопросительно смотрит на вас."
     $ CurLocDesc = MainTxt
+    $ _layout_last_picture = irma_talk_picture_path()
     call ShowImage("", "", irma_talk_picture_path())
     call IntIrmaTalkRefresh
     return
@@ -109,12 +110,13 @@ label IntIrmaTalkRefresh(girl_name="irma"):
 
 label IntIrmaTalkApply(choice_code="", dress_code=""):
     if str(choice_code or "") == "inspect":
-        call ShowGirlCard("irma", "DressShopRestore")
+        call ShowGirlCard("irma", "DressShopRoomActions")
         return
 
     if str(choice_code or "") == "ask_ready":
         $ MainTxt = "Вы осведомились у Ирмы, скоро ли будет готов ваш заказ.\n\nОна подняла на вас удивленный взгляд и ответила, что, как она и говорила, закончит работу она к завтрашнему утру."
         $ CurLocDesc = MainTxt
+        $ _layout_last_picture = irma_talk_picture_path()
         call ShowImage("", "", irma_talk_picture_path())
         call IntIrmaTalkRefresh
         return
@@ -122,6 +124,7 @@ label IntIrmaTalkApply(choice_code="", dress_code=""):
     if str(choice_code or "") == "ask_winter_work":
         $ MainTxt = "Вы спрашиваете Ирму, что она может сделать из шкур и меха к холодам. Швея сразу оживляется и начинает перечислять без лишней лирики.\n\n\"На теплый меховой плащ мне либо один хороший медвежий мех нужен, либо две волчьи шкуры. За работу возьму 35 мараведи. А если хочешь теплую постель в комнату или для гостевой, то неси два медвежьих меха. В крайнем случае сгодится один медвежий и две волчьи шкуры, или четыре волчьи. За такую работу возьму 55 мараведи,\" деловито говорит Ирма."
         $ CurLocDesc = MainTxt
+        $ _layout_last_picture = irma_talk_picture_path()
         call ShowImage("", "", irma_talk_picture_path())
         call IntIrmaTalkRefresh
         return
@@ -132,6 +135,7 @@ label IntIrmaTalkApply(choice_code="", dress_code=""):
         else:
             $ MainTxt = "Вы договариваетесь с Ирмой о работе, отдаете ей мех и серебро, и спустя некоторое время получаете добротный теплый меховой плащ. Такая вещь пригодится и в хозяйстве, и как дорогой подарок."
         $ CurLocDesc = MainTxt
+        $ _layout_last_picture = irma_talk_picture_path()
         call ShowImage("", "", irma_talk_picture_path())
         call IntIrmaTalkRefresh
         return
@@ -142,9 +146,10 @@ label IntIrmaTalkApply(choice_code="", dress_code=""):
         else:
             $ MainTxt = "Ирма быстро прикидывает раскрой, принимает мех и через некоторое время выдает вам плотную меховую постель. Ее можно оставить себе, пристроить в гостевую комнату или выгодно сбыть."
         $ CurLocDesc = MainTxt
+        $ _layout_last_picture = irma_talk_picture_path()
         call ShowImage("", "", irma_talk_picture_path())
         call IntIrmaTalkRefresh
         return
 
-    call DressShopRestore
+    call DressShopRoomActions
     return

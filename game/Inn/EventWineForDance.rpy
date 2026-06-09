@@ -45,20 +45,11 @@ init python:
         return (
             int(hour or 0) < 12
             and int(week ==3)
-            and int(EventsCount.get(10, 0) or 0) > 0
-            and str(NewEvents.get("10_" + str(int(EventsCount.get(10, 0) or 0) - 1), "") or "") == "WineForDance"
+            and tavern_work_pending_mandatory_code("WineForDance", "TavernKitchen") == "WineForDance"
         )
 
     def consume_wine_for_dance_breakfast_event():
-        mandatory_count = int(EventsCount.get(10, 0) or 0)
-        if mandatory_count <= 0:
-            return 0
-        event_idx = mandatory_count - 1
-        event_key = "10_" + str(event_idx)
-        if str(NewEvents.get(event_key, "") or "") != "WineForDance":
-            return 0
-        EventsCount[10] = event_idx
-        return 1
+        return 1 if tavern_work_pop_mandatory_code("WineForDance", "TavernKitchen") == "WineForDance" else 0
 
     def wine_for_dance_breakfast_appreciation():
         present_ids = []

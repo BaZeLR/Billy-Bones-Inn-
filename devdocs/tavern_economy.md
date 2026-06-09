@@ -91,7 +91,7 @@ Week modifiers:
 - week `5`
   - normal prostitution is forced to `0` clients
 - week `7`
-  - prostitution client count is not directly zeroed, but other event timing shifts still apply elsewhere
+  - - normal prostitution is forced to `0` clients
 
 Gloryhole:
 - upper bound argument is:
@@ -100,7 +100,7 @@ Gloryhole:
   - `GloryHoleMax = Min(10, tavernvisitors / 6)`
 - week modifiers then reduce that cap:
   - week `5`: `GloryHoleMax = GloryHoleMax / 2`
-  - week `7`: `GloryHoleMax = (GloryHoleMax * 3) / 4`
+  - week `7`: is day off
 
 If the girl is assigned to gloryhole tomorrow:
 - actual total gloryhole clients:

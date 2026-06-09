@@ -146,12 +146,12 @@ label _int_becky_talk_invite(girl_name="becky"):
             $ InvitePoints += 1
         else:
             "Вам представился суровый дух усопшего мужа и вы пристыженно примолкли."
-        if MyCurDress == "citydress":
+        if player_state().appearance.current_dress == "citydress":
             "\"Одно хорошо\", отметила Бекки. - \"Ты хотя бы прилично одет.\""
             $ InvitePoints += 1
         else:
             "\"А костюмчик-то у тебя приличный и в меру скромный есть?\" поинтересовалась благонравная вдовица."
-            if "citydress" in list(MyDresses):
+            if player_state().appearance.has_dress("citydress"):
                 "\"За кого ты меня принимаешь?! Конечно есть.\" ответили вы."
                 $ InvitePoints += 1
             else:

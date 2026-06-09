@@ -7,7 +7,7 @@
 
 init python:
     def friday_dance_slot_is_active():
-        calendar_sync_state()
+        calendar_v2.sync_state()
         return int(week or 0) == 5 and int(time or 0) == 3
 
     def friday_dance_market_entry_is_active():

@@ -25,7 +25,7 @@ label male_dress_shop:
     $ _desc = str(_gds_get_dict("FullDressDesc").get(_md_choice, ""))
     $ _cost = _gds_dress_cost(_md_choice)
     '[_desc], обойдется он вам в [_cost] мараведи.'
-    if str(_md_choice) in list(_gds_get_list("MyDresses")):
+    if player_state().appearance.has_dress(str(_md_choice)):
         'Впрочем, этот костюм у вас уже есть.'
     jump male_dress_shop
 

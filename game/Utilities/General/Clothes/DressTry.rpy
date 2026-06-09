@@ -3,6 +3,16 @@
 # ================================================================================
 default DressTryStep = 0
 
+init python:
+    def dress_try_display_name(dress_code=""):
+        code = str(dress_code or "").strip()
+        item_obj = get_game_item("dress_" + code) if "get_game_item" in globals() else None
+        item_name = str(getattr(item_obj, "name", "") or "").strip() if item_obj is not None else ""
+        if item_name:
+            return item_name
+        legacy_names = globals().get("ShortDressName", {}) or {}
+        return str(legacy_names.get(code, code) or code)
+
 label DressTry(dress_buyer="You", dress_code=""):
     hide screen dress_shop_male_catalog_overlay
     hide screen dress_shop_female_catalog_overlay
@@ -14,7 +24,7 @@ label DressTry(dress_buyer="You", dress_code=""):
     $ HadSex.setdefault("You", 0)
     $ DressTryStep = 0
     $ _layout_last_picture = irma_measure_picture_path(0)
-    $ MainTxt = "Не говоря ни слова, вы подходите к Ирме и вываливаете перед ней на стол горку монет. Ловя на себе ее удивленный взгляд, вы говорите ей, что это не подарок, а вы просто хотите у нее заказать " + ShortDressName.get(DressProduced, DressProduced).lower() + ". Портниха тщательно пересчитывает деньги, и, удостоверившись что все правильно, ведет вас за ширмочку, дабы снять мерку. Как вы хотите, чтобы с вас сняли мерку?"
+    $ MainTxt = "Не говоря ни слова, вы подходите к Ирме и вываливаете перед ней на стол горку монет. Ловя на себе ее удивленный взгляд, вы говорите ей, что это не подарок, а вы просто хотите у нее заказать " + dress_try_display_name(DressProduced).lower() + ". Портниха тщательно пересчитывает деньги, и, удостоверившись что все правильно, ведет вас за ширмочку, дабы снять мерку. Как вы хотите, чтобы с вас сняли мерку?"
     $ CurLocDesc = MainTxt
     $ current_action_title = "Снятие мерки"
     $ current_action_content = None
@@ -23,7 +33,7 @@ label DressTry(dress_buyer="You", dress_code=""):
         $ current_action_items.append(MenuItem("Полностью раздеться и думать о высоком", Call("DressTryNakedThink")))
     if HadSex.get("You", 0) >= 5 and cametoday < cancumdaily:
         $ current_action_items.append(MenuItem("Полностью раздеться и представить Ирму", Call("DressTryNakedFantasy")))
-    $ current_action_items.append(MenuItem("Назад в лавку", Call("DressShopRestore")))
+    $ current_action_items.append(MenuItem("Назад в лавку", Call("DressShopRoomActions")))
     return
 
 
@@ -34,7 +44,7 @@ label DressTryUnderwear:
     $ DressTryStep += 1
     $ current_action_title = "Снятие мерки"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRestore"))]
+    $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRoomActions"))]
     return
 
 
@@ -46,7 +56,7 @@ label DressTryNakedThink:
     $ DressTryStep += 1
     $ current_action_title = "Снятие мерки"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRestore"))]
+    $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRoomActions"))]
     return
 
 
@@ -59,7 +69,7 @@ label DressTryNakedFantasy:
         $ DressTryStep += 1
         $ current_action_title = "Снятие мерки"
         $ current_action_content = None
-        $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRestore"))]
+        $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRoomActions"))]
     else:
         $ MainTxt = "Пока с вас снимали мерку вы, как обычно, закрыли глаза и начали представлять себе Ирму в непотребном виде. Вдруг, с удивлением и радостью, вы ощутили чей-то горячий ротик на своем эрегированном друге. Вы открыли глаза и обнаружили что портниха решила сделать процесс снятия мерки более приятным. Ирма на секунду выпустила свою игрушку изо рта и сказала: \"Для постоянных и щедрых клиентов - особое обслуживание!\", после чего вернулась к своему занятию. Вы просто стояли и балдели, пока полуэльфийка отсасывала у вас. Делала она это умело, можно сказать с огоньком, и вскоре вы почувствовали что кончаете."
         $ CurLocDesc = MainTxt
@@ -108,7 +118,7 @@ label DressTryPayExtra:
     call stat
     $ current_action_title = "Счет Ирмы"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRestore"))]
+    $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRoomActions"))]
     return
 
 
@@ -120,5 +130,5 @@ label DressTryRefuseExtra:
     $ IrmaVar["DeniedMinetMoney"] = 1
     $ current_action_title = "Счет Ирмы"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRestore"))]
+    $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRoomActions"))]
     return

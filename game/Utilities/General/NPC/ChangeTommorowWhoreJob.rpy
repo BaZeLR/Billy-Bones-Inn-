@@ -47,12 +47,7 @@ init python:
 
     def change_tomorrow_hall_job(girl_name):
         """Копирует завтрашние назначения по кухне, уборке и залу."""
-        if not girl_name:
-            return
-
-        job_kitchen[girl_name] = job_kitchen_tomorrow.get(girl_name, 0)
-        job_cleaning[girl_name] = job_cleaning_tomorrow.get(girl_name, 0)
-        job_waitress[girl_name] = job_waitress_tomorrow.get(girl_name, 0)
+        apply_tomorrow_hall_job(girl_name)
 
     def get_random_girl_by_job(job_dict_name):
         """Возвращает случайное имя девушки, назначенной на работу из указанного словаря."""

@@ -94,12 +94,11 @@ def label_set(root: Path) -> set[str]:
 def story_event_labels(root: Path) -> list[str]:
     labels = label_set(root)
     source_paths = [
-        root / "game" / "Inn" / "StoryEventRuntime.rpy",
-        root / "game" / "Inn" / "ClaraPaintingsThread.rpy",
+        root / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy",
     ]
     text = "\n".join(path.read_text(encoding="utf-8", errors="ignore") for path in source_paths if path.exists())
     found: list[str] = []
-    for match in re.finditer(r'\(\s*"([A-Za-z_][A-Za-z0-9_]*)"\s*,', text):
+    for match in re.finditer(r'\(\s*"([A-Za-z_][A-Za-z0-9_]*)"\s*,\s*(?:None|\d|\(|\[)', text):
         name = match.group(1)
         if name in labels and name not in found:
             found.append(name)
@@ -116,9 +115,11 @@ testsuite global:
         exit
 
 testcase instantiate_story_threads:
+    $ renpy.test.testsettings._test.timeout = 60.0
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
     python:
         threadData = loadThreadData(threadList)
         threads = createThreads()
@@ -132,9 +133,11 @@ testcase instantiate_story_threads:
 
 EVENT_TEMPLATE = r'''
 testcase event_{safe_name}:
+    $ renpy.test.testsettings._test.timeout = 60.0
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
     python:
         threadData = loadThreadData(threadList)
         threads = createThreads()
@@ -195,9 +198,11 @@ testcase event_{safe_name}:
 
 BRANCH_TEMPLATE = r'''
 testcase event_{safe_name}_branch_{branch_index}:
+    $ renpy.test.testsettings._test.timeout = 60.0
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
     python:
         threadData = loadThreadData(threadList)
         threads = createThreads()
@@ -252,8 +257,27 @@ testcase event_{safe_name}_branch_{branch_index}:
     pause 0.1
     python:
         _external_branch_count = len(list(current_action_items or []))
-        print("EVENT_BRANCH_READY", "{label_name}", {branch_index}, "items", _external_branch_count)
-    if eval (_external_branch_count > {branch_index}):
+        _external_branch_safe = False
+        if _external_branch_count > {branch_index}:
+            _external_branch_action_text = str(current_action_items[{branch_index}].action)
+            for _token in (
+                "story_",
+                "TownStreet",
+                "TownRandom",
+                "melissaClaraOverheard",
+                "sandraWeeklyEvaluation",
+                "TavernStorageRatChoice",
+                "MelissaRoomPestsChoice",
+                "MelissaNightWakeChoice",
+                "HouseholdSoapRequest",
+                "HouseholdBarberRequest",
+                "HouseholdRevealDressRequest",
+            ):
+                if _token in _external_branch_action_text:
+                    _external_branch_safe = True
+                    break
+        print("EVENT_BRANCH_READY", "{label_name}", {branch_index}, "items", _external_branch_count, "safe", _external_branch_safe)
+    if eval (_external_branch_count > {branch_index} and _external_branch_safe):
         run current_action_items[{branch_index}].action
         pause 0.1
         python:

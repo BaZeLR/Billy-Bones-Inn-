@@ -118,7 +118,7 @@ label GeorgettBeckyVisit_menu:
                     $ PregnancyCheck("georgett", "mouthface", 1, "eddie")
                     call SlutFriendsIncrease("inga", 0, 0, 0, 50, 1, 1)
                     call SlutFriendsIncrease("georgett", 0, 0, 0, 60, 1, 1)
-                    $ calendar_advance_slots(1)
+                    $ calendar_v2.advance_minutes(60)
                     $ georgedinnersex = 0
                     jump MarketPlace
                     return

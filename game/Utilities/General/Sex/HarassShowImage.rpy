@@ -1,23 +1,24 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+
 label HarassShowImage(GirlNameHSI="", ActionHSI="", ReactionHSI=0, EyewitnessHSI=0, JobTypeHSI=""):
     if EyewitnessHSI > 0:
         if GirlNameHSI == "melissa":
             if ReactionHSI == 0:
-                call ShowImage(GirlNameHSI, "grope", "inter")
+                call ShowImage(GirlNameHSI, "Grope", "inter")
             elif ActionHSI in ("ass", "dress"):
                 if ReactionHSI >= 3:
-                    call ShowImageSeq(GirlNameHSI, "grope", "assok", 2)
+                    call ShowImageSeq(GirlNameHSI, "Grope", "assok", 2)
                 else:
-                    call ShowImage(GirlNameHSI, "grope", "assangry")
+                    call ShowImage(GirlNameHSI, "Grope", "assangry")
             else:
                 if ReactionHSI >= 3:
-                    call ShowImage(GirlNameHSI, "grope", "titok")
+                    call ShowImage(GirlNameHSI, "Grope", "titok")
                 elif ReactionHSI == 2:
-                    call ShowImageSeq(GirlNameHSI, "grope", "titshy", 2)
+                    call ShowImageSeq(GirlNameHSI, "Grope", "titshy", 2)
                 else:
-                    call ShowImageSeq(GirlNameHSI, "grope", "titangry", 2)
+                    call ShowImageSeq(GirlNameHSI, "Grope", "titangry", 2)
         elif GirlNameHSI == "amanda":
             if ReactionHSI == 0:
                 call ShowImage(GirlNameHSI, "grope", "inter")

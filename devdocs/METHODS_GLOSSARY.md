@@ -1,6 +1,6 @@
 # Methods Glossary
 
-Last updated: 2026-04-21
+Last updated: 2026-06-06
 
 This is a living glossary for canonical method and label names in the current project.
 
@@ -18,7 +18,7 @@ Update rule:
 ## Core Naming Rules
 
 - Prefer the existing project owner method instead of creating a second helper with the same meaning.
-- Room/UI flow should use room labels and room-aware refresh labels, not Python-only flow wrappers.
+- Room/UI flow should use room labels and direct room/object/NPC labels. Refresh/apply/renew/rebuild labels are compatibility/bloat, not target architecture.
 - Inventory browsing is HUD/category-owned, not player-card-owned.
 - Player card is profile/state/equipment summary UI, even if current code still contains mixed inventory paths.
 - Gift flows must show giftable items only.
@@ -38,7 +38,7 @@ Update rule:
 | `main_ui_end_talk_state()` | Exit talk UI mode back to room scene state. | `game/Inn/my_layouts/main_layout.rpy` |
 | `main_ui_begin_native_scene_state(title="")` | Enter event/native-scene UI mode. | `game/Inn/my_layouts/main_layout.rpy` |
 | `main_ui_end_native_scene_state()` | Exit event/native-scene UI mode back to room scene state. | `game/Inn/my_layouts/main_layout.rpy` |
-| `RefreshCurrentActionMenu(where_id="", object_id="", preserve_text=False)` | Rebuild the correct room/object action menu after a local action. | `game/Inn/Actions.rpy` |
+| `RefreshCurrentActionMenu(where_id="", object_id="", preserve_text=False)` | Compatibility/bloat: room/action refresh dispatcher to remove as slices migrate. | `game/Inn/Actions.rpy` |
 | `current_room_object_menu_label()` | Resolve the room’s object-menu label from the current room template. | `game/Inn/Actions.rpy` |
 
 Notes:
@@ -96,11 +96,11 @@ Redundancy rule:
 
 | Name | Canonical Use | Source |
 | --- | --- | --- |
-| `apply_social_interaction_base(...)` | Shared mutation block for social actions. | `game/Inn/Actions.rpy` |
-| `player_talk_to(char_name)` | Canonical talk mutation. | `game/Inn/Actions.rpy` |
-| `player_gift_to(char_name, ..., gift_item_id="")` | Canonical gift mutation. | `game/Inn/Actions.rpy` |
-| `player_share_item_with(char_name, item_id)` | Canonical share mutation. | `game/Inn/Actions.rpy` |
-| `player_flirt_with(char_name)` | Canonical flirt mutation. | `game/Inn/Actions.rpy` |
+| `apply_social_interaction_base(...)` | Compatibility helper for shared social mutation; do not hide authored talk/gift/flirt consequences behind it in new content. | `game/Inn/Actions.rpy` |
+| `player_talk_to(char_name)` | Compatibility helper for generic talk mutation; NPC talk labels should own visible choices and direct consequences. | `game/Inn/Actions.rpy` |
+| `player_gift_to(char_name, ..., gift_item_id="")` | Compatibility helper for generic gift mutation; NPC gift labels should own visible choices and direct consequences. | `game/Inn/Actions.rpy` |
+| `player_share_item_with(char_name, item_id)` | Compatibility helper for generic share mutation. | `game/Inn/Actions.rpy` |
+| `player_flirt_with(char_name)` | Compatibility helper for generic flirt mutation; NPC talk labels should own visible flirt choices and direct consequences. | `game/Inn/Actions.rpy` |
 | `_social_item_rule(item_id="", char_name="")` | Social item-effect rule resolver. | `game/Inn/Actions.rpy` |
 | `player_apply_item_social_effects(char_name="", item_id="", from_gift=False)` | Apply item-based relationship effects. | `game/Inn/Actions.rpy` |
 

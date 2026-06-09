@@ -63,7 +63,9 @@ init python:
     def main_ui_restore_room_scene_state():
         global UI_mode, UI_selected_char, current_girl_key, current_action_content
         global current_action_title, current_action_items, current_object_id, CurrentRoom, CurLoc
-        global main_ui_inventory_dropdown_open, action_menu_specs
+        global main_ui_inventory_dropdown_open, action_menu_specs, action_menu_entity_type
+        global action_menu_entity_id, action_menu_where, action_menu_title, action_menu_entity_data
+        global action_menu_actions, action_menu_selected
 
         UI_mode = "scene"
         UI_selected_char = ""
@@ -71,6 +73,13 @@ init python:
         current_action_content = None
         current_object_id = ""
         main_ui_inventory_dropdown_open = False
+        action_menu_entity_type = ""
+        action_menu_entity_id = ""
+        action_menu_where = ""
+        action_menu_title = ""
+        action_menu_entity_data = {}
+        action_menu_actions = []
+        action_menu_selected = ""
         action_menu_specs = []
 
         room_obj = CurrentRoom
@@ -87,14 +96,8 @@ init python:
             main_ui_call_label("RefreshCurrentActionMenu", room_code, "", True)
             return
         current_action_title = "Действия в трактире" if room_code == "TavernMain" else "Действия"
-        if room_code == "MarketPlace":
-            try:
-                current_action_items = list(marketplace_action_items() or [])
-            except Exception:
-                current_action_items = []
-        else:
-            room_sections = room_obj.build_menu_sections() if room_obj is not None and hasattr(room_obj, "build_menu_sections") else {"movement": [], "actions": []}
-            current_action_items = list(room_sections.get("movement", [])) + list(room_sections.get("actions", []))
+        room_sections = room_obj.build_menu_sections() if room_obj is not None and hasattr(room_obj, "build_menu_sections") else {"movement": [], "actions": []}
+        current_action_items = list(room_sections.get("movement", [])) + list(room_sections.get("actions", []))
 
         main_ui_restart_interaction()
 
@@ -116,23 +119,6 @@ init python:
         main_ui_inventory_dropdown_open = False
         player_card_set_inventory_origin("room")
         player_card_show_inventory_section_state(section_id)
-
-    def main_ui_action_items_with_entities(items=None):
-        out = list(items or [])
-        try:
-            room_code = str(getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip()
-            if room_code and str(UI_selected_char or "").strip().lower() != "dog" and dog_is_available_here(room_code):
-                dog_caption = str(dog_display_name() or "Пес")
-                has_dog_item = False
-                for item in out:
-                    if str(getattr(item, "caption", "") or "") == dog_caption:
-                        has_dog_item = True
-                        break
-                if not has_dog_item:
-                    out.insert(0, MenuItem(dog_caption, Call("IntDogTalk", room_code)))
-        except Exception:
-            pass
-        return out
 
     def main_ui_entity_button_spec(entity_type="", entity_id="", entity_data=None):
         entity_key = str(entity_type or "").strip().lower()
@@ -273,13 +259,13 @@ screen current_action_panel():
     elif current_action_content:
         use expression current_action_content
     elif current_action_items:
-        use choice_panel(main_ui_action_items_with_entities(current_action_items))
+        use choice_panel(current_action_items)
     elif str(UI_mode or "") in ("mc", "char", "dog", "fight", "event"):
         null
     elif str(getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip() == "TavernKitchen" and bool(TavernBreakfastEventActive):
         null
     elif CurrentRoom is not None:
-        $ action_items = main_ui_action_items_with_entities(build_room_action_items(CurrentRoom))
+        $ action_items = build_room_action_items(CurrentRoom)
         use choice_panel(action_items)
     else:
         text "Выберите действие." size 20
@@ -335,6 +321,80 @@ screen BGIMAGE(media_ref=None):
     else:
         add Solid("#000000")
 
+screen debug_builder_state_controls(chores):
+    frame:
+        xfill True
+        padding (10, 8)
+        background "#101010ff"
+
+        vbox:
+            spacing 6
+            text "DEBUG STATE" size 18 bold True xalign 0.5
+
+            hbox:
+                spacing 6
+                text "Time" size 15 xsize 58
+                for _slot_id in range(0, 8):
+                    textbutton str(_slot_id):
+                        id "debug_builder_time_slot_%d" % _slot_id
+                        alt "debug_builder_time_slot_%d" % _slot_id
+                        text_size 14
+                        selected int(time or 0) == _slot_id
+                        action Function(debug_builder_set_time_slot_control, _slot_id)
+
+            hbox:
+                spacing 8
+                text "Weekday" size 15 xsize 72
+                textbutton "<":
+                    id "debug_builder_week_prev"
+                    alt "debug_builder_week_prev"
+                    text_size 16
+                    action Function(debug_builder_step_weekday, -1)
+                text str(week_name or week or "") size 15 xminimum 120
+                textbutton ">":
+                    id "debug_builder_week_next"
+                    alt "debug_builder_week_next"
+                    text_size 16
+                    action Function(debug_builder_step_weekday, 1)
+
+            hbox:
+                spacing 8
+                text "Period" size 15 xsize 72
+                textbutton "<":
+                    id "debug_builder_month_prev"
+                    alt "debug_builder_month_prev"
+                    text_size 16
+                    action Function(debug_builder_step_month, -1)
+                text str(month_name or month or "") size 15 xminimum 160
+                textbutton ">":
+                    id "debug_builder_month_next"
+                    alt "debug_builder_month_next"
+                    text_size 16
+                    action Function(debug_builder_step_month, 1)
+
+            viewport:
+                xfill True
+                ymaximum 120
+                draggable True
+                mousewheel True
+
+                vbox:
+                    spacing 3
+                    for _chore_key in PLAYER_CHORE_KEYS:
+                        hbox:
+                            spacing 5
+                            text str(_pc_chore_display_name(_chore_key)) size 14 xsize 130
+                            text "[int(chores.get(_chore_key, 0) or 0)]/[player_chore_target(_chore_key)]" size 14 xsize 45
+                            textbutton "-":
+                                id "debug_builder_chore_dec_%s" % _chore_key
+                                alt "debug_builder_chore_dec_%s" % _chore_key
+                                text_size 14
+                                action Function(debug_builder_step_chore, _chore_key, -1)
+                            textbutton "+":
+                                id "debug_builder_chore_inc_%s" % _chore_key
+                                alt "debug_builder_chore_inc_%s" % _chore_key
+                                text_size 14
+                                action Function(debug_builder_step_chore, _chore_key, 1)
 
 
 
@@ -366,6 +426,7 @@ screen main_ui():
     $ _textbox_h = int(getattr(gui, "textbox_height", 278))
     $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
     $ _chores = get_player_chores_ui_state()
+    $ _calendar_hud = calendar_v2.hud_data()
 
     fixed:
         xfill True
@@ -407,7 +468,7 @@ screen main_ui():
 
                             hbox:
                                 xfill True
-                                text "LOCATION / TIME" size 21 bold True
+                                text "TIME" size 21 bold True
                                 null width 12
                                 text "TAVERN" size 23 bold True xalign 1.0
 
@@ -420,12 +481,12 @@ screen main_ui():
                                 vbox:
                                     xsize 160
                                     spacing 4
-                                    use main_ui_status_item("location", CurLoc)
-                                    use main_ui_status_item("time", calendar_time_slot_name_ru)
-                                    use main_ui_status_item("weekday", week_name)
-                                    use main_ui_status_item("day", day)
-                                    use main_ui_status_item("period", month_name)
-                                    use main_ui_status_item("cycle", year)
+                                    use main_ui_status_item("time", _calendar_hud["time_name_ru"])
+                                    use main_ui_status_item("weekday", _calendar_hud["week_name_ru"])
+                                    use main_ui_status_item("day", _calendar_hud["day"])
+                                    use main_ui_status_item("days in game", _calendar_hud["days_in_game"])
+                                    use main_ui_status_item("period", _calendar_hud["period_name_ru"])
+                                    use main_ui_status_item("cycle", _calendar_hud["cycle"])
                                     null height 4
                                     use main_ui_status_item("money", money, "#f0d08a")
 
@@ -461,6 +522,9 @@ screen main_ui():
                             text "дрова [int(_chores.get('bring_woods', 0) or 0)]/[player_chore_target('bring_woods')]   колка [int(_chores.get('chop_wood', 0) or 0)]/[player_chore_target('chop_wood')]   огонь [int(_chores.get('make_fire', 0) or 0)]/[player_chore_target('make_fire')]" size 17 xalign 0.5 color "#aaaaaa"
                             text "зола [int(_chores.get('clean_ashes', 0) or 0)]/[player_chore_target('clean_ashes')]   вода [int(_chores.get('boil_water', 0) or 0)]/[player_chore_target('boil_water')]   комнаты [int(_chores.get('clean_upstairs_rooms', 0) or 0)]/[player_chore_target('clean_upstairs_rooms')]" size 17 xalign 0.5 color "#aaaaaa"
 
+                    if str(CurLoc or "") == "DebugBuilderRoom":
+                        use debug_builder_state_controls(_chores)
+
                     frame:
                         xfill True
                         yminimum 300
@@ -480,61 +544,68 @@ screen main_ui():
                                 spacing 6
                                 use current_action_panel
 
-                    frame:
-                        xfill True
-                        yminimum 230
-                        padding (10, 8)
-                        background "#000000ff"
-                        vbox:
-                            spacing 8
-                            text "Персонажи" size 20
+                    if str(UI_mode or "") != "event":
+                        frame:
+                            xfill True
+                            yminimum 230
+                            padding (10, 8)
+                            background "#000000ff"
+                            vbox:
+                                spacing 8
+                                text "Персонажи" size 20
 
-                            if _char_entries:
-                                grid 3 3:
-                                    spacing 6
-                                    for _entry_index, _entry in enumerate(_char_slots):
-                                        if _entry:
-                                            $ _npc_name = str(_entry.get("title", "") or "")
-                                            $ _npc_id = str(_entry.get("id", "") or "")
-                                            $ _entity_type = str(_entry.get("entity_type", "npc") or "npc")
-                                            $ _entity_data = dict(_entry.get("entity_data", {}) or {})
-                                            $ _npc_spec = main_ui_entity_button_spec(_entity_type, _npc_id, _entity_data)
-                                            if str(_npc_spec.get("id", "") or "") == "open_player_card":
-                                                textbutton _npc_name:
-                                                    xminimum 150
-                                                    text_size 18
-                                                    action [
-                                                        Function(main_ui_close_inventory_dropdown),
-                                                        Hide("girl_card_overlay"),
-                                                        Hide("player_card_overlay"),
-                                                        Hide("tavern_report_card_overlay"),
-                                                        Function(show_player_card_main_ui_state),
-                                                    ]
-                                            elif str(_npc_spec.get("id", "") or "") == "open_dog_menu":
-                                                textbutton _npc_name:
-                                                    xminimum 150
-                                                    text_size 18
-                                                    action [
-                                                        Function(main_ui_close_inventory_dropdown),
-                                                        Hide("girl_card_overlay"),
-                                                        Hide("player_card_overlay"),
-                                                        Call("OpenEntityActionMenu", str(_npc_spec.get("entity_type", "") or ""), str(_npc_spec.get("entity_id", "") or ""), str(_npc_spec.get("where_id", "") or ""), dict(_npc_spec.get("entity_data", {}) or {})),
-                                                    ]
+                                if _char_entries:
+                                    grid 3 3:
+                                        spacing 6
+                                        for _entry_index, _entry in enumerate(_char_slots):
+                                            if _entry:
+                                                $ _npc_name = str(_entry.get("title", "") or "")
+                                                $ _npc_id = str(_entry.get("id", "") or "")
+                                                $ _entity_type = str(_entry.get("entity_type", "npc") or "npc")
+                                                $ _entity_data = dict(_entry.get("entity_data", {}) or {})
+                                                $ _npc_spec = main_ui_entity_button_spec(_entity_type, _npc_id, _entity_data)
+                                                if str(_npc_spec.get("id", "") or "") == "open_player_card":
+                                                    textbutton _npc_name:
+                                                        id "main_ui_entity_button_player_you"
+                                                        alt "main_ui_entity_button_player_you"
+                                                        xminimum 150
+                                                        text_size 18
+                                                        action [
+                                                            Function(main_ui_close_inventory_dropdown),
+                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),
+                                                            Hide("tavern_report_card_overlay"),
+                                                            Function(show_player_card_main_ui_state),
+                                                        ]
+                                                elif str(_npc_spec.get("id", "") or "") == "open_dog_menu":
+                                                    textbutton _npc_name:
+                                                        id "main_ui_entity_button_dog_dog"
+                                                        alt "main_ui_entity_button_dog_dog"
+                                                        xminimum 150
+                                                        text_size 18
+                                                        action [
+                                                            Function(main_ui_close_inventory_dropdown),
+                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),
+                                                            Call("OpenEntityActionMenu", str(_npc_spec.get("entity_type", "") or ""), str(_npc_spec.get("entity_id", "") or ""), str(_npc_spec.get("where_id", "") or ""), dict(_npc_spec.get("entity_data", {}) or {})),
+                                                        ]
+                                                else:
+                                                    textbutton _npc_name:
+                                                        id "main_ui_entity_button_{}_{}".format(_entity_type, _npc_id)
+                                                        alt "main_ui_entity_button_{}_{}".format(_entity_type, _npc_id)
+                                                        xminimum 150
+                                                        text_size 18
+                                                        action [
+                                                            Function(main_ui_close_inventory_dropdown),
+                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),
+                                                            Call("OpenNpcActionMenu", str(_npc_spec.get("entity_id", "") or ""), str(_npc_spec.get("where_id", "") or ""), dict(_npc_spec.get("entity_data", {}) or {})),
+                                                        ]
                                             else:
-                                                textbutton _npc_name:
-                                                    xminimum 150
-                                                    text_size 18
-                                                    action [
-                                                        Function(main_ui_close_inventory_dropdown),
-                                                        Hide("girl_card_overlay"),
-                                                        Hide("player_card_overlay"),
-                                                        Call("OpenNpcActionMenu", str(_npc_spec.get("entity_id", "") or ""), str(_npc_spec.get("where_id", "") or ""), dict(_npc_spec.get("entity_data", {}) or {})),
-                                                    ]
-                                        else:
-                                            # Move null outside textbutton block
-                                            null width 150 height 34
-                            else:
-                                text "Никого нет." size 20
+                                                # Move null outside textbutton block
+                                                null width 150 height 34
+                                else:
+                                    text "Никого нет." size 20
 
     if str(main_ui_overlay or "") == "story":
         use story_thread_board_panel
@@ -579,7 +650,17 @@ screen main_ui_left_panel(room_name, desc, picture):
                 padding (12, 10)
                 background "#000000ff"
 
-                text desc size 20
+                if str(CurLoc or "") == "DebugBuilderRoom":
+                    viewport:
+                        xfill True
+                        yfill True
+                        draggable True
+                        mousewheel True
+                        scrollbars "vertical"
+
+                        text desc size 20
+                else:
+                    text desc size 20
 
 
 screen main_ui_player_card_panel():

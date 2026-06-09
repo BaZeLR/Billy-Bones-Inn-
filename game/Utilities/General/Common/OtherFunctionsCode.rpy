@@ -115,16 +115,17 @@ label OtherFunctionsCode:
 
 label ArrestCode:
     $ BribeSize = 50
-    if MyCurDress == "thiefdress":
+    $ _arrest_dress = str(player_state().appearance.current_dress or "")
+    if _arrest_dress == "thiefdress":
         "\"Ага, так мы тебе и поверили, ворюга! А ну пошли!\" похоже ваша манера одеваться не прибавила вам убедительности."
         $ BribeSize = 500
-    elif MyCurDress == "nobbledress":
+    elif _arrest_dress == "nobbledress":
         "\"А может это благородный?\" шепотом спросил один стражник другого. \"Не похоже, говорит не так. Но может лучше не рисковать.\""
         $ BribeSize = 10
-    elif MyCurDress == "citydress":
+    elif _arrest_dress == "citydress":
         "\"Что буржуйчик, деньги кончились и решил у соседей натырить? Ну да мы тебя закатаем, чтоб неповадно было.\""
         $ BribeSize = 100
-    elif MyCurDress == "sailordress":
+    elif _arrest_dress == "sailordress":
         "\"Ага, морячок, с корабля и сразу на бал! Думаешь натыришь чего, ну а завтра в море и мы тебя не найдем! Так по твоему?\""
         $ BribeSize = 80
     else:

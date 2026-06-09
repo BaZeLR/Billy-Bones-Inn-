@@ -5,36 +5,19 @@
 # Converted from QSP AdvanceTime to Ren'Py
 
 default LastAdvancedMinutes = 0
-default LastAdvancedTimeSlots = 0
 
 init python:
-    def calendar_total_minutes_runtime():
-        try:
-            calendar_sync_state()
-        except Exception:
-            pass
-        return (int(dayspassed or 0) * 1440) + (int(hour or 0) * 60) + int(minute or 0)
+    def advance_time_runtime(minutes_to_add=60):
+        global LastAdvancedMinutes
 
-    def advance_time_slot_runtime(slots_to_add=1):
-        global LastAdvancedMinutes, LastAdvancedTimeSlots
-
-        ensure_calendar_state()
-        before_minutes = calendar_total_minutes_runtime()
-        slots = max(1, int(slots_to_add or 1))
-        advanced_slots = 0
-
-        while advanced_slots < slots and int(time or 0) < 4:
-            calendar_set_time_slot(int(time or 0) + 1)
-            advanced_slots += 1
-
-        after_minutes = calendar_total_minutes_runtime()
-        LastAdvancedMinutes = max(0, after_minutes - before_minutes)
-        LastAdvancedTimeSlots = advanced_slots
+        calendar_v2.sync_state()
+        LastAdvancedMinutes = max(0, int(minutes_to_add or 60))
+        calendar_v2.advance_minutes(LastAdvancedMinutes)
         return LastAdvancedMinutes
 
 
-label AdvanceTimeOnly(slots_to_add=1):
-    $ _advance_minutes = advance_time_slot_runtime(slots_to_add)
+label AdvanceTimeOnly(minutes_to_add=60):
+    $ _advance_minutes = advance_time_runtime(minutes_to_add)
     if int(_advance_minutes or 0) > 0:
         $ npc_schedule_sync_all()
         $ werecat_sync_profile()
@@ -44,7 +27,7 @@ label AdvanceTimeOnly(slots_to_add=1):
 
 
 label AdvanceTimeAndRestore(restore_label=""):
-    call AdvanceTimeOnly(1)
+    call AdvanceTimeOnly(60)
     $ _advance_minutes = _return
     $ _restore_label = str(restore_label or "").strip()
     if _restore_label != "" and renpy.has_label(_restore_label):
@@ -60,8 +43,8 @@ label AdvanceTime(return_location=None):
     """
     $ retlocname = return_location if return_location else "TavernMain"
     
-    if int(time or 0) < 4:
-        call AdvanceTimeOnly(1)
+    if int(clock_minutes or 0) + 60 < 1440:
+        call AdvanceTimeOnly(60)
         jump expression retlocname
     else:
         call NextDay(retlocname, 1)

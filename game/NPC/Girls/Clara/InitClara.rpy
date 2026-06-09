@@ -1,14 +1,13 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     import random
     import renpy.exports as renpy
 
-    def clara_extra_location_code(day_marker=None, weekday=None, time_slot=None):
+    def clara_extra_location_code(day_marker=None, weekday=None):
         day_value = int(dayspassed if day_marker is None else day_marker or 0)
         week_value = int(week if weekday is None else weekday or 0)
-        time_value = int(time if time_slot is None else time_slot or 0)
         parity = (day_value + week_value) % 2
 
         if week_value == 5 and time_value == 3:
@@ -34,10 +33,13 @@ init python:
             update_stat_state()
         except Exception:
             pass
-        return int(charisma or 0) >= 70 and int(Friends.get("clara", 0) or 0) >= 7
+        charisma_safe = getattr(renpy.store, 'charisma', 0)
+        Friends_safe = getattr(renpy.store, 'Friends', {})
+        return int(charisma_safe or 0) >= 70 and int(Friends_safe.get("clara", 0) or 0) >= 7
 
     def clara_has_caught_cat_gift():
-        return werecat_second_gift_available() and int(WerecatVar.get("caught", 0) or 0) == 1
+        WerecatVar_safe = getattr(renpy.store, 'WerecatVar', {})
+        return werecat_second_gift_available() and int(WerecatVar_safe.get("caught", 0) or 0) == 1
 
     def clara_wine_store_talk_picture():
         candidates = [
@@ -144,55 +146,32 @@ init python:
             ClaraVar["market_evening_roll"] = 1 if renpy.random.randint(1, 3) == 1 else 0
         return int(ClaraVar.get("market_evening_roll", 0) or 0) == 1
 
-    def clara_market_story_label():
-        time_value = int(time or 0)
-        booklet_seen = int(ClaraVar.get("booklet_market_seen", 0) or 0)
-        market_evening_intro_seen = int(ClaraVar.get("market_evening_intro_seen", 0) or 0)
-        drawings_secret_known = int(ClaraVar.get("drawings_secret_known", 0) or 0)
-        mongol_theft_seen = int(ClaraVar.get("mongol_theft_seen", 0) or 0)
-        failed_day = int(ClaraVar.get("market_follow_failed_day", -1) or -1)
-        failed_time = int(ClaraVar.get("market_follow_failed_time", -1) or -1)
-
-        if str(CurLoc or "") != "MarketPlace":
-            return ""
-        if str(getLocation("clara") or "") != "MarketPlace":
-            return ""
-        if failed_day == int(dayspassed or 0) and failed_time == time_value:
-            return ""
-        if time_value == 2 and booklet_seen == 0:
-            return "story_clara_market_action_direct"
-        if time_value == 3 and booklet_seen == 0 and drawings_secret_known == 1:
-            return "story_clara_market_action_direct"
-        if time_value == 3 and booklet_seen == 1 and market_evening_intro_seen == 0:
-            return "story_clara_market_action_direct"
-        if time_value == 3 and market_evening_intro_seen == 1 and mongol_theft_seen == 0:
-            return "story_clara_market_action_direct"
-        return ""
-
-    def clara_market_story_caption():
-        if str(clara_market_story_label() or "") == "":
-            return ""
-        return "Понаблюдать за фигурой в плаще"
-
     def clara_melissa_visit_active(day_marker=None, weekday=None, time_slot=None):
-        week_value = int(week if weekday is None else weekday or 0)
-        time_value = int(time if time_slot is None else time_slot or 0)
-        if melissa_bats_stage() < 8:
+        week_safe = getattr(renpy.store, 'week', 0)
+        time_safe = getattr(renpy.store, 'time', 0)
+        week_value = int(week_safe if weekday is None else weekday or 0)
+        time_value = int(time_safe if time_slot is None else time_slot or 0)
+        if Melissa.bats_stage() < 8:
             return False
         if not werecat_is_living_with_household():
             return False
         if time_value == 3:
             if week_value == 5:
                 return False
-            return int(MongolVar.get("StocksReleased", 0) or 0) == 1 or int(RobinVar.get("MongolSafePass", 0) or 0) == 1
+            MongolVar_safe = getattr(renpy.store, 'MongolVar', {})
+            RobinVar_safe = getattr(renpy.store, 'RobinVar', {})
+            return int(MongolVar_safe.get("StocksReleased", 0) or 0) == 1 or int(RobinVar_safe.get("MongolSafePass", 0) or 0) == 1
         if time_value != 4:
             return False
         return week_value in (1, 2, 3, 4, 5, 6, 7)
 
     def clara_tavern_visit_active(day_marker=None, weekday=None, time_slot=None):
-        day_value = int(dayspassed if day_marker is None else day_marker or 0)
-        week_value = int(week if weekday is None else weekday or 0)
-        time_value = int(time if time_slot is None else time_slot or 0)
+        dayspassed_safe = getattr(renpy.store, 'dayspassed', 0)
+        week_safe = getattr(renpy.store, 'week', 0)
+        time_safe = getattr(renpy.store, 'time', 0)
+        day_value = int(dayspassed_safe if day_marker is None else day_marker or 0)
+        week_value = int(week_safe if weekday is None else weekday or 0)
+        time_value = int(time_safe if time_slot is None else time_slot or 0)
         if time_value != 2:
             return False
         if week_value == 7:
@@ -242,9 +221,9 @@ init python:
             "redstockings",
         )
         for dress_code in dress_codes:
-            if str(dress_code or "") not in list(MyDresses or []):
+            if not player_state().appearance.has_dress(dress_code):
                 continue
-            if str(MyCurDress or "") == str(dress_code or ""):
+            if str(player_state().appearance.current_dress or "") == str(dress_code or ""):
                 continue
             entries.append({
                 "source": "dress",
@@ -275,15 +254,14 @@ init python:
             return True
         if source == "dress":
             dress_code = str(row.get("dress_code", "") or "")
-            if dress_code == "" or dress_code not in list(MyDresses or []):
+            if dress_code == "" or not player_state().appearance.has_dress(dress_code):
                 return False
-            if dress_code == str(MyCurDress or ""):
+            if dress_code == str(player_state().appearance.current_dress or ""):
                 return False
-            try:
-                MyDresses.remove(dress_code)
-            except Exception:
-                return False
-            return True
+            appearance = player_state().appearance
+            result = appearance.remove_dress(dress_code)
+            appearance.apply_to_store()
+            return result
 
         item_id = str(row.get("gift_id", "") or "")
         if item_id == "":
@@ -299,7 +277,7 @@ init python:
         score += int(ClaraVar.get("trust", 0) or 0) // 3
         score += int(sluttiness.get("clara", 0) or 0) // 10
 
-        if str(MyCurDress or "") == "thiefdress":
+        if str(player_state().appearance.current_dress or "") == "thiefdress":
             score += 1
 
         if interaction == "flirt":
@@ -333,7 +311,6 @@ label InitClara:
         RealName2[GirlName] = "Клариссы"
         RealName3[GirlName] = "Клариссе"
         age_girls[GirlName] = 19
-        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 0
         beauty[GirlName] = 62
         sluttiness[GirlName] = 10
@@ -541,10 +518,32 @@ label InitClara:
                 NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[2], awake=True, talkable=True, condition=clara_tavern_visit_active, priority=200, label="tavern_visit"),
                 NPCScheduleEntry(location="MarketPlace", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[2, 3], awake=True, talkable=False, condition=clara_market_visit_active, priority=190, label="extra_market"),
                 NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0, 1], awake=True, talkable=True, condition=clara_wine_store_shift_active, priority=180, label="wine_store"),
-                NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[4], awake=False, talkable=False, priority=10, label="sleep"),
+                NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
             ],
         )
         npc_daily_schedule_build_all(True)
         npc_schedule_sync_currentloc(GirlName)
 
     return
+
+# Auto-attach .var for PeopleInfo consistency (requested)
+init python:
+    if 'peopleInfo' not in dir() or not isinstance(peopleInfo, dict):
+        peopleInfo = {}
+    # Per user request: class Clara(Girl) defined in game/NPC/Girls/Clara/InitClara.rpy
+    if 'clara' not in peopleInfo or not isinstance(peopleInfo.get('clara'), Clara):
+        class Clara(Girl):
+            """Clara (paintings, lunar fertility)."""
+            def __init__(self, name="clara", **kwargs):
+                super().__init__(name, **kwargs)
+                if 'ClaraVar' in dir() and isinstance(ClaraVar, dict):
+                    self.var = ClaraVar
+                    self.promote_from_var(ClaraVar)
+        peopleInfo['clara'] = Clara(var=ClaraVar if 'ClaraVar' in dir() else {})
+    else:
+        if 'ClaraVar' in dir() and isinstance(ClaraVar, dict):
+            peopleInfo['clara'].var = ClaraVar
+    if 'girls' not in dir() or not isinstance(girls, list):
+        girls = []
+    if peopleInfo.get('clara') not in girls:
+        girls.append(peopleInfo['clara'])

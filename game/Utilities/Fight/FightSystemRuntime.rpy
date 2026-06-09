@@ -4,10 +4,92 @@
 default FightLoadedAmmo = ""
 default FightTargetIndex = 1
 default FightVictoryLoot = {}
+default FightLevel = {"you": 1}
+default company_list = []
+default PlayerFightSupply = {"arrows": 0, "droplets": 0, "gunpowder": 0, "bees_bomb": 0, "fire_bomb": 0, "bandage": 0, "energy_tea": 0, "healing_potion": 0}
+default FightWeaponLoaded = 0
+default FightRetreatUsed = 0
+default FightEnemyState = {}
+default HuntUnlocked = False
+default HuntLastResult = {}
+default FightSideLog = []
+default FightEnemyParty = []
+default FightEnemyId = ""
+default FightReturnRoomCode = ""
+default FightReturnPicture = ""
+default FightStatusState = {}
+default ForestTrapState = {"active": 0, "room": "", "day": -1, "armed_count": 0}
+default ForestTrapRooms = {}
 
 init -20 python:
     import random
     import renpy.exports as renpy_module
+
+    class FightEnemyDefinition(object):
+        def __init__(
+            self,
+            object_id,
+            display_name,
+            enemy_type="beast",
+            health=30,
+            attack_min=5,
+            attack_max=10,
+            defence_min=3,
+            defence_max=8,
+            moves=None,
+            skills=None,
+            weapon="",
+            tactics="",
+            company_min=1,
+            company_max=1,
+            loot=None,
+            money_min=0,
+            money_max=0,
+            exploration_reward=0,
+        ):
+            self.object_id = str(object_id or "")
+            self.display_name = str(display_name or self.object_id)
+            self.enemy_type = str(enemy_type or "beast")
+            self.health = int(health or 0)
+            self.attack_min = int(attack_min or 0)
+            self.attack_max = int(attack_max or 0)
+            self.defence_min = int(defence_min or 0)
+            self.defence_max = int(defence_max or 0)
+            self.moves = list(moves or [])
+            self.skills = list(skills or [])
+            self.weapon = str(weapon or "")
+            self.tactics = str(tactics or "")
+            self.company_min = max(1, int(company_min or 1))
+            self.company_max = max(self.company_min, int(company_max or self.company_min))
+            self.loot = dict(loot or {})
+            self.money_min = max(0, int(money_min or 0))
+            self.money_max = max(self.money_min, int(money_max or self.money_min))
+            self.exploration_reward = max(0, int(exploration_reward or 0))
+
+        def get(self, key, default=None):
+            return self.as_dict().get(key, default)
+
+        def as_dict(self):
+            return {
+                "id": self.object_id,
+                "name": self.display_name,
+                "enemy_type": self.enemy_type,
+                "health": self.health,
+                "attack_min": self.attack_min,
+                "attack_max": self.attack_max,
+                "defence_min": self.defence_min,
+                "defence_max": self.defence_max,
+                "moves": list(self.moves or []),
+                "skills": list(self.skills or []),
+                "weapon": self.weapon,
+                "tactics": self.tactics,
+                "company_min": self.company_min,
+                "company_max": self.company_max,
+                "loot": dict(self.loot or {}),
+                "money_min": self.money_min,
+                "money_max": self.money_max,
+                "exploration_reward": self.exploration_reward,
+            }
 
     FIGHT_SUPPLY_DEFAULTS = {
         "arrows": 0,
@@ -50,95 +132,111 @@ init -20 python:
         ],
     }
 
-    ANIMAL_FIGHT_TABLE = {
-        "wolf": {
-            "id": "wolf",
-            "name": "Волк",
-            "health": 35,
-            "attack_min": 8,
-            "attack_max": 15,
-            "defence_min": 4,
-            "defence_max": 10,
-            "moves": ["dodge", "bite", "surround", "howl", "dead_lock"],
-            "loot": {"wolf_skin_001": 1},
-        },
-        "white_wolf": {
-            "id": "white_wolf",
-            "name": "Белый вожак",
-            "health": 48,
-            "attack_min": 10,
-            "attack_max": 18,
-            "defence_min": 6,
-            "defence_max": 12,
-            "moves": ["dodge", "bite", "howl", "dead_lock"],
-            "loot": {"white_wolf_skin_001": 1},
-            "exploration_reward": 7,
-        },
-        "boar": {
-            "id": "boar",
-            "name": "Кабан",
-            "health": 55,
-            "attack_min": 11,
-            "attack_max": 20,
-            "defence_min": 6,
-            "defence_max": 13,
-            "moves": ["ram", "bite", "attack", "defend"],
-            "loot": {"boar_fang_001": 1, "boar_meat_001": 1},
-        },
-        "brown_bear": {
-            "id": "brown_bear",
-            "name": "Бурый медведь",
-            "health": 90,
-            "attack_min": 16,
-            "attack_max": 28,
-            "defence_min": 10,
-            "defence_max": 18,
-            "moves": ["bite", "claws", "strike", "roar"],
-            "loot": {"bear_fur_brown_001": 1, "bear_claw_001": 1},
-            "exploration_reward": 4,
-        },
-        "giant_grizzly": {
-            "id": "giant_grizzly",
-            "name": "Гигантский гризли",
-            "health": 115,
-            "attack_min": 20,
-            "attack_max": 34,
-            "defence_min": 12,
-            "defence_max": 22,
-            "moves": ["bite", "claws", "strike", "roar"],
-            "loot": {"bear_fur_grizzly_001": 1, "bear_claw_001": 1},
-            "exploration_reward": 6,
-        },
+    FIGHT_ENEMY_DEFINITIONS = {
+        "wolf": FightEnemyDefinition(
+            "wolf", "Волк", "beast", 35, 8, 15, 4, 10,
+            moves=["dodge", "bite", "surround", "howl", "dead_lock"],
+            skills=["pack_hunt", "fear"],
+            tactics="pack",
+            company_min=1,
+            company_max=5,
+            loot={"wolf_skin_001": 1},
+        ),
+        "white_wolf": FightEnemyDefinition(
+            "white_wolf", "Белый вожак", "beast", 48, 10, 18, 6, 12,
+            moves=["dodge", "bite", "howl", "dead_lock"],
+            skills=["pack_leader", "fear"],
+            tactics="stalk",
+            loot={"white_wolf_skin_001": 1},
+            exploration_reward=7,
+        ),
+        "boar": FightEnemyDefinition(
+            "boar", "Кабан", "beast", 55, 11, 20, 6, 13,
+            moves=["ram", "bite", "attack", "defend"],
+            skills=["charge"],
+            tactics="charge",
+            company_min=1,
+            company_max=3,
+            loot={"boar_fang_001": 1, "boar_meat_001": 1},
+        ),
+        "brown_bear": FightEnemyDefinition(
+            "brown_bear", "Бурый медведь", "beast", 90, 16, 28, 10, 18,
+            moves=["bite", "claws", "strike", "roar"],
+            skills=["maul", "fear"],
+            tactics="press",
+            loot={"bear_fur_brown_001": 1, "bear_claw_001": 1},
+            exploration_reward=4,
+        ),
+        "giant_grizzly": FightEnemyDefinition(
+            "giant_grizzly", "Гигантский гризли", "beast", 115, 20, 34, 12, 22,
+            moves=["bite", "claws", "strike", "roar"],
+            skills=["maul", "terror"],
+            tactics="break_line",
+            loot={"bear_fur_grizzly_001": 1, "bear_claw_001": 1},
+            exploration_reward=6,
+        ),
+        "street_crook": FightEnemyDefinition(
+            "street_crook", "Уличный громила", "human", 42, 8, 16, 5, 11,
+            moves=["attack", "strike", "defend"],
+            skills=["brawl"],
+            weapon="дубинка",
+            tactics="pressure",
+            company_min=1,
+            company_max=3,
+            money_min=2,
+            money_max=8,
+            exploration_reward=3,
+        ),
+        "street_thief": FightEnemyDefinition(
+            "street_thief", "Уличный вор", "human", 32, 7, 14, 7, 13,
+            moves=["dodge", "strike", "attack"],
+            skills=["knife", "escape"],
+            weapon="нож",
+            tactics="hit_and_run",
+            company_min=1,
+            company_max=2,
+            loot={"rope_001": 1},
+            money_min=4,
+            money_max=14,
+            exploration_reward=4,
+        ),
+        "patrol_guard": FightEnemyDefinition(
+            "patrol_guard", "Патрульный стражник", "guard", 58, 11, 20, 9, 16,
+            moves=["attack", "strike", "defend"],
+            skills=["formation", "arrest"],
+            weapon="алебарда",
+            tactics="formation",
+            company_min=2,
+            company_max=4,
+            money_min=1,
+            money_max=5,
+            exploration_reward=2,
+        ),
     }
+    ANIMAL_FIGHT_TABLE = FIGHT_ENEMY_DEFINITIONS
 
     def fight_supply_default_state():
         return dict(FIGHT_SUPPLY_DEFAULTS)
 
     def fight_ensure_runtime():
-        globals().setdefault("FightLevel", {"you": 1})
-        globals().setdefault("health", 100)
-        globals().setdefault("company_list", [])
-        globals().setdefault("PlayerFightSupply", fight_supply_default_state())
-        globals().setdefault("FightWeaponLoaded", 0)
-        globals().setdefault("FightLoadedAmmo", "")
-        globals().setdefault("FightTargetIndex", 1)
-        globals().setdefault("FightRetreatUsed", 0)
-        globals().setdefault("SickDays", 0)
-        globals().setdefault("FightEnemyState", {})
-        globals().setdefault("HuntUnlocked", False)
-        globals().setdefault("HuntLastResult", {})
-        globals().setdefault("FightSideLog", [])
-        globals().setdefault("FightEnemyParty", [])
-        globals().setdefault("FightEnemyId", "")
-        globals().setdefault("FightReturnRoomCode", "")
-        globals().setdefault("FightReturnPicture", "")
-        globals().setdefault("FightStatusState", {})
-        globals().setdefault("ForestTrapState", {"active": 0, "room": "", "day": -1, "armed_count": 0})
-        globals().setdefault("ForestTrapRooms", {})
+        if not isinstance(FightLevel, dict):
+            globals()["FightLevel"] = {"you": 1}
+        if not isinstance(company_list, list):
+            globals()["company_list"] = []
         if not isinstance(PlayerFightSupply, dict):
             globals()["PlayerFightSupply"] = fight_supply_default_state()
         for _key, _value in FIGHT_SUPPLY_DEFAULTS.items():
             PlayerFightSupply.setdefault(_key, _value)
+        if not isinstance(FightEnemyState, dict):
+            globals()["FightEnemyState"] = {}
+        if not isinstance(HuntLastResult, dict):
+            globals()["HuntLastResult"] = {}
+        if not isinstance(FightSideLog, list):
+            globals()["FightSideLog"] = []
+        if not isinstance(FightEnemyParty, list):
+            globals()["FightEnemyParty"] = []
+        if not isinstance(FightStatusState, dict):
+            globals()["FightStatusState"] = {}
         globals()["health"] = _player_clamp_stat(globals().get("health", 100), 0, 100)
         if not isinstance(ForestTrapState, dict):
             globals()["ForestTrapState"] = {"active": 0, "room": "", "day": -1, "armed_count": 0}
@@ -281,7 +379,10 @@ init -20 python:
         return max(0, int(defence_total))
 
     def fight_enemy_template(enemy_id="wolf"):
-        return dict(ANIMAL_FIGHT_TABLE.get(str(enemy_id or "").strip(), ANIMAL_FIGHT_TABLE["wolf"]))
+        definition = ANIMAL_FIGHT_TABLE.get(str(enemy_id or "").strip(), ANIMAL_FIGHT_TABLE["wolf"])
+        if hasattr(definition, "as_dict"):
+            return definition.as_dict()
+        return dict(definition or ANIMAL_FIGHT_TABLE["wolf"].as_dict())
 
     def fight_build_enemy_party(enemy_id="wolf", enemy_count=1):
         template = fight_enemy_template(enemy_id)
@@ -299,7 +400,14 @@ init -20 python:
                 "defence_min": int(template["defence_min"]),
                 "defence_max": int(template["defence_max"]),
                 "moves": list(template.get("moves", []) or []),
+                "skills": list(template.get("skills", []) or []),
+                "weapon": str(template.get("weapon", "") or ""),
+                "tactics": str(template.get("tactics", "") or ""),
+                "enemy_type": str(template.get("enemy_type", "") or ""),
                 "loot": dict(template.get("loot", {}) or {}),
+                "money_min": int(template.get("money_min", 0) or 0),
+                "money_max": int(template.get("money_max", 0) or 0),
+                "exploration_reward": int(template.get("exploration_reward", 0) or 0),
                 "status": {},
             })
         return party
@@ -465,6 +573,24 @@ init -20 python:
         attack_total = max(0, int(attack_roll + extra_attack))
         return {"damage": attack_total, "text": move_text, "move": move_code}
 
+    def fight_retreat_success():
+        active_rows = list(fight_active_enemy_rows() or [])
+        if len(active_rows) <= 0:
+            return True
+        fight_level = int(fight_sync_level_from_exploration() or 1)
+        score = int(exploration or 0) // 2 + fight_level * 12 + random.randint(1, 60)
+        difficulty = 40 + len(active_rows) * 10
+        for enemy in active_rows:
+            enemy_type = str(enemy.get("enemy_type", "") or "")
+            tactics = str(enemy.get("tactics", "") or "")
+            if enemy_type == "guard":
+                difficulty += 18
+            if tactics in ("formation", "pack"):
+                difficulty += 8
+            if "escape" in list(enemy.get("skills", []) or []):
+                difficulty += 5
+        return score >= difficulty
+
     def fight_tick_statuses():
         total_dot = 0
         for enemy in fight_active_enemy_rows():
@@ -499,13 +625,21 @@ init -20 python:
 
     def fight_collect_victory_loot():
         loot_rows = {}
+        money_gain = 0
         for enemy in list(FightEnemyParty or []):
             if int(enemy.get("health", 0) or 0) > 0:
                 continue
             for item_id, qty in dict(enemy.get("loot", {}) or {}).items():
                 loot_rows[item_id] = int(loot_rows.get(item_id, 0) or 0) + int(qty or 0)
+            money_min = max(0, int(enemy.get("money_min", 0) or 0))
+            money_max = max(money_min, int(enemy.get("money_max", money_min) or money_min))
+            if money_max > 0:
+                money_gain += random.randint(money_min, money_max)
         for item_id, qty in dict(loot_rows or {}).items():
             _player_add_item_by_id(item_id, int(qty or 0))
+        if money_gain > 0:
+            renpy.store.money = max(0, int(getattr(renpy.store, "money", 0) or 0) + money_gain)
+            loot_rows["money"] = money_gain
         exploration_gain = fight_dead_enemy_exploration_reward()
         if exploration_gain > 0:
             renpy.store.exploration = max(0, int(getattr(renpy.store, "exploration", 0) or 0) + exploration_gain)
@@ -515,6 +649,9 @@ init -20 python:
     def fight_loot_text():
         rows = []
         for item_id, qty in dict(getattr(renpy.store, "FightVictoryLoot", {}) or {}).items():
+            if str(item_id or "") == "money":
+                rows.append("{} мараведи".format(int(qty or 0)))
+                continue
             item_obj = get_game_item(item_id)
             item_name = str(getattr(item_obj, "name", item_id) or item_id)
             rows.append("{} x{}".format(item_name, int(qty or 0)))
@@ -577,6 +714,7 @@ init -20 python:
         fight_refresh_ui_actions()
 
     def fight_finish_to_room(text):
+        return_room = str(FightReturnRoomCode or CurLoc or "").strip()
         globals()["UI_mode"] = "scene"
         globals()["FightEnemyState"] = {}
         globals()["FightEnemyParty"] = []
@@ -585,6 +723,9 @@ init -20 python:
         globals()["FightLoadedAmmo"] = ""
         globals()["FightWeaponLoaded"] = 0
         globals()["FightTargetIndex"] = 1
+        if return_room:
+            globals()["CurLoc"] = return_room
+            globals()["location"] = return_room
         globals()["MainTxt"] = str(text or "")
         globals()["CurLocDesc"] = globals()["MainTxt"]
 
@@ -824,10 +965,16 @@ init -20 python:
                 if enemy_text:
                     result_lines.append(enemy_text)
         elif action == "retreat":
-            globals()["notoriety"] = max(0, int(notoriety or 0) - 6)
-            if int(health or 0) <= 20:
-                globals()["SickDays"] = max(2, int(SickDays or 0))
-            return {"done": "retreat", "text": "Вы решаете прекратить охоту и отступаете. Такой исход бьет по вашей репутации."}
+            if fight_retreat_success():
+                globals()["notoriety"] = max(0, int(notoriety or 0) - 6)
+                if int(health or 0) <= 20:
+                    globals()["SickDays"] = max(2, int(SickDays or 0))
+                return {"done": "retreat", "text": "Вы выбираете момент и отступаете из схватки. Такой исход бьет по вашей репутации, но вы уходите на своих ногах."}
+            result_lines.append("Вы пытаетесь отступить, но противники не дают вам разорвать дистанцию.")
+            fight_decay_player_statuses()
+            enemy_text = fight_apply_enemy_phase("normal")
+            if enemy_text:
+                result_lines.append(enemy_text)
         else:
             result_lines.append("Вы медлите, и момент оказывается упущен.")
             enemy_text = fight_apply_enemy_phase("normal")

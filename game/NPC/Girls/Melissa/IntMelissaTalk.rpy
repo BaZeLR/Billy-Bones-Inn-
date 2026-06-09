@@ -53,7 +53,7 @@ init python:
         if (
             _melissa_int(MelissaVar.get("sex_engine_unlocked", 0), 0) == 1
             or (
-                melissa_bats_stage() >= 8
+                Melissa.bats_stage() >= 8
                 and start_progress >= 5
                 and friend_value >= 15
                 and open_value >= 9
@@ -187,7 +187,7 @@ init python:
         lines.append("На сегодня у вас осталось %s спокойных, но все более смелых шага." % melissa_start_scene_remaining())
         if melissa_start_honey_bonus_active():
             lines.append("После сладких кухонных угощений Мелисса кажется чуть мягче и отзывчивее обычного.")
-        if melissa_bats_stage() >= 4 and melissa_bats_stage() < 8:
+        if Melissa.bats_stage() >= 4 and Melissa.bats_stage() < 8:
             lines.append("Она все еще заметно лучше держится рядом с вами, когда разговор заходит о ее комнате и чердаке над ней.")
         if int(Friends.get(key, 0) or 0) >= 15:
             lines.append("Доверия между вами уже достаточно, чтобы Мелисса не принимала каждое прикосновение за угрозу.")
@@ -216,10 +216,8 @@ label IntMelissaTalkRefresh(girl_name="melissa"):
         $ current_action_items.append(MenuItem("Послушать, что Мелисса скажет о кладовой", Function(main_ui_call_label, "IntMelissaTalkApply", girl_name, "storage_thanks")))
     if clara_paintings_melissa_question_ready() and int(AskedToday.get(girl_name, 0) or 0) == 0:
         $ current_action_items.append(MenuItem("Спросить Мелиссу о найденных рисунках", Call("story_clara_paintings_melissa_0")))
-    if melissa_bats_completion_ready():
-        $ current_action_items.append(MenuItem(melissa_bat_completion_talk_caption(), Function(main_ui_call_label, "MelissaBatsCompletionScene")))
-    elif story_event_available(str(CurLoc or ""), "melissa_talk"):
-        $ current_action_items.append(MenuItem(melissa_bat_completion_talk_caption(), Call("checkTriggers", CurLoc, "melissa_talk", 0)))
+    if story_event_available(str(CurLoc or ""), "melissa_talk"):
+        $ current_action_items.append(MenuItem(Melissa.bat_completion_talk_caption(), Call("checkTriggers", CurLoc, "melissa_talk", 0)))
     if melissa_relationship_allows(girl_name, "intimacy") and melissa_room_is_private(CurLoc):
         $ current_action_items.append(MenuItem("Уединиться с Мелиссой", Function(main_ui_call_label, "IntMelissaSex", girl_name, CurLoc)))
     elif melissa_relationship_allows(girl_name, "intimacy") and bool(melissa_private_place_offer(girl_name, CurLoc).get("ok", False)):
@@ -437,7 +435,7 @@ label IntMelissaRoomProblemAdviceMenu(girl_name="melissa"):
     $ current_action_title = "Комната Мелиссы"
     $ current_action_content = None
     $ current_action_items = []
-    $ _stage = melissa_bats_stage()
+    $ _stage = Melissa.bats_stage()
     $ _holes_seen = 1 if _stage >= 3 else 0
     $ _temp_room = str(MelissaVar.get("temp_room", "") or "").strip()
     if _holes_seen <= 0:

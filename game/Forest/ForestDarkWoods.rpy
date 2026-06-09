@@ -19,7 +19,7 @@ init 6 python:
             RoomExit(label="Вернуться к трактиру", target="StreetTavern"),
         ],
         game_items=[],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
+        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], start="06:00", end="19:29", condition=forest_open_hours_visible),
         custom_properties={
             "spawn_rules": [
                 {"item_id": "mushroom_001", "frequency": 2, "units": 3},

@@ -9,6 +9,7 @@ init python:
         object_id="worktable_001",
         name="Рабочий стол Ирмы",
         description="Большой рабочий стол, заваленный тканями, кружевами и выкройками.",
+        picture="images/irma/portraits/portrait2.png",
         actions=[
             ObjectAction(
                 action_id="ask_order_status",

@@ -8,6 +8,11 @@
 label DisplayTavernEventsSummary(day, month, year):
     $ TimePeriodEvents = 0
     $ TodayEventsSummary = ''
+    while EventsCount.get(10, 0) > 0:
+        call DisplayTavernEventShort(10, 0)
+        $ TodayEventsSummaryTmp = _return
+        if TodayEventsSummaryTmp != '':
+            $ TodayEventsSummary += '\n\n' + TodayEventsSummaryTmp
     while TimePeriodEvents < 5:
         while EventsCount.get(TimePeriodEvents, 0) > 0:
             call DisplayTavernEventShort(TimePeriodEvents, 0)
@@ -17,6 +22,6 @@ label DisplayTavernEventsSummary(day, month, year):
         $ TimePeriodEvents += 1
     if TodayEventsSummary == '':
         $ TodayEventsSummary = '\n\nНичего не произошло!'
-    $ TodayEventsSummary = "\n\n{i}События за [calendar_format_date_ru(day, month, year, None, False)]{/i}" + TodayEventsSummary
+    $ TodayEventsSummary = "\n\n{i}События за [calendar_v2.format_date_ru(day, month, year, None, False)]{/i}" + TodayEventsSummary
     $ Result = TodayEventsSummary
     return Result

@@ -33,13 +33,6 @@ init python:
         picture="images/tavern/mainhall/bar_mainHall.png",
         actions=[
             ObjectAction(
-                action_id="examine_bar",
-                label="Осмотреть стойку",
-                hook="call",
-                target="Examine",
-                args=("bar_001", "TavernMain", "Стойка видавшая виды, но все еще крепкая. На ней немало следов бурной трактирной жизни.", "bar_001"),
-            ),
-            ObjectAction(
                 action_id="drink_ale",
                 label="Выпить эля",
                 hook="call",
@@ -91,7 +84,7 @@ label TavernMainBarInviteApply(target_npc=""):
         call TavernMainBarInviteMenu
         return
     $ money = int(money or 0) - 2
-    $ calendar_advance_minutes(30)
+    $ calendar_v2.advance_minutes(30)
     $ Talked[_bar_target] = int(Talked.get(_bar_target, 0) or 0) + 1
     $ TalkedToday[_bar_target] = int(TalkedToday.get(_bar_target, 0) or 0) + 1
     $ GiftedToday[_bar_target] = int(GiftedToday.get(_bar_target, 0) or 0) + 1

@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default ClaraPaintingsThreadDoc = "Clara paintings / Legare pressure / fiance investigation thread"
 
@@ -14,26 +14,31 @@ init -1 python:
         ClaraVar[str(name or "")] = value
 
     def clara_paintings_melissa_question_ready():
+        MelissaVar_safe = getattr(renpy.store, 'MelissaVar', {})
+        ClaraVar_safe = getattr(renpy.store, 'ClaraVar', {})
         return (
-            int(MelissaVar.get("drawings_found", 0) or 0) == 1
+            int(MelissaVar_safe.get("drawings_found", 0) or 0) == 1
             and clara_paintings_flag("paintings_melissa_asked", 0) == 0
         )
 
     def clara_paintings_cellar_ready():
+        ClaraVar_safe = getattr(renpy.store, 'ClaraVar', {})
+        time_safe = getattr(renpy.store, 'time', 0)
         return (
             clara_paintings_flag("paintings_melissa_asked", 0) == 1
             and clara_paintings_flag("cellar_seen", 0) == 0
-            and int(ClaraVar.get("flirt", 0) or 0) > 0
+            and int(ClaraVar_safe.get("flirt", 0) or 0) > 0
             and str(_story_current_location() or "") == "WineStore"
-            and int(time or 0) in (1, 2)
+            and int(time_safe or 0) in (1, 2)
         )
 
     def clara_paintings_comfort_ready():
+        time_safe = getattr(renpy.store, 'time', 0)
         return (
             clara_paintings_flag("comfort_pending", 0) == 1
             and clara_paintings_flag("comfort_done", 0) == 0
             and str(getLocation("clara") or "") == "WineStore"
-            and int(time or 0) == 0
+            and int(time_safe or 0) == 0
         )
 
     def clara_paintings_second_ask_ready():
@@ -43,21 +48,24 @@ init -1 python:
         )
 
     def clara_paintings_church_fiance_ready():
+        week_safe = getattr(renpy.store, 'week', 0)
+        time_safe = getattr(renpy.store, 'time', 0)
         return (
             clara_paintings_flag("source_known", 0) == 1
             and clara_paintings_flag("fiance_church_seen", 0) == 0
-            and int(week or 0) == 7
-            and int(time or 0) <= 2
+            and int(week_safe or 0) == 7
+            and int(time_safe or 0) <= 2
         )
 
     def clara_paintings_barber_fiance_ready():
+        time_safe = getattr(renpy.store, 'time', 0)
         if clara_paintings_flag("fiance_church_seen", 0) != 1:
             return False
         if clara_paintings_flag("fiance_barber_seen", 0) == 1:
             return False
         if str(_story_current_location() or "") != "BarberShop":
             return False
-        if int(time or 0) == 0:
+        if int(time_safe or 0) == 0:
             return True
         if int(time or 0) >= 4:
             today = int(dayspassed or 0)
@@ -81,20 +89,23 @@ init -1 python:
         )
 
     def clara_paintings_commission_followup_ready():
+        dayspassed_safe = getattr(renpy.store, 'dayspassed', 0)
+        time_safe = getattr(renpy.store, 'time', 0)
         return (
             clara_paintings_flag("commission_started", 0) == 1
             and clara_paintings_flag("commission_followup_done", 0) == 0
-            and int(dayspassed or 0) >= clara_paintings_flag("commission_followup_day", 999999)
+            and int(dayspassed_safe or 0) >= clara_paintings_flag("commission_followup_day", 999999)
             and str(getLocation("clara") or "") == "WineStore"
-            and int(time or 0) == 0
+            and int(time_safe or 0) == 0
         )
 
     def clara_paintings_evening_peek_ready():
+        time_safe = getattr(renpy.store, 'time', 0)
         return (
             clara_paintings_flag("commission_followup_done", 0) == 1
             and clara_paintings_flag("peek_done", 0) == 0
             and str(getLocation("clara") or "") == "WineStore"
-            and int(time or 0) == 3
+            and int(time_safe or 0) == 3
         )
 
     def clara_paintings_evening_watch_schedule_active():
@@ -119,10 +130,11 @@ init -1 python:
         )
 
     def clara_paintings_murder_ready():
+        dayspassed_safe = getattr(renpy.store, 'dayspassed', 0)
         return (
             clara_paintings_flag("confession_done", 0) == 1
             and clara_paintings_flag("murder_seen", 0) == 0
-            and int(dayspassed or 0) >= clara_paintings_flag("murder_day", 999999)
+            and int(dayspassed_safe or 0) >= clara_paintings_flag("murder_day", 999999)
             and str(_story_current_location() or "") == "CityGuard"
         )
 

@@ -504,7 +504,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 call ShowCurrentSex(GirlNameIBS)
                 call DressUp(GirlNameIBS)
                 $ SomebodyCums = 0
-                $ calendar_advance_slots(1)
+                $ calendar_v2.advance_minutes(60)
                 if str(GirlLocIBS or "").strip().lower() == "home":
                     jump BeckyHomeAfterSex
                 menu:

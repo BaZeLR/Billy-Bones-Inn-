@@ -9,7 +9,6 @@ label InitInga:
         RealName2[GirlName] = 'Ингенборг'
         RealName3[GirlName] = 'Ингенборг'
         age_girls[GirlName] = 22
-        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 0
         beauty[GirlName] = 55
         sluttiness[GirlName] = 30
@@ -79,7 +78,7 @@ label InitInga:
             NPCScheduleEntry(
                 location="BeckyHome",
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
-                time_slots=[4],
+                time_slots=[7],
                 awake=False,
                 talkable=False,
                 priority=10,
@@ -96,3 +95,25 @@ init python:
         if week_now == 7 or time_now != 0:
             return False
         return str(npc_schedule_location("eddie", week_now, time_now) or "") != "GroceryStore"
+
+# Auto-attach .var for PeopleInfo consistency (requested)
+init python:
+    if 'peopleInfo' not in dir() or not isinstance(peopleInfo, dict):
+        peopleInfo = {}
+    # Per user request: class Inga(Girl) defined in game/NPC/Girls/Inga/InitInga.rpy
+    if 'inga' not in peopleInfo or not isinstance(peopleInfo.get('inga'), Inga):
+        class Inga(Girl):
+            """Inga."""
+            def __init__(self, name="inga", **kwargs):
+                super().__init__(name, **kwargs)
+                if 'IngaVar' in dir() and isinstance(IngaVar, dict):
+                    self.var = IngaVar
+                    self.promote_from_var(IngaVar)
+        peopleInfo['inga'] = Inga(var=IngaVar if 'IngaVar' in dir() else {})
+    else:
+        if 'IngaVar' in dir() and isinstance(IngaVar, dict):
+            peopleInfo['inga'].var = IngaVar
+    if 'girls' not in dir() or not isinstance(girls, list):
+        girls = []
+    if peopleInfo.get('inga') not in girls:
+        girls.append(peopleInfo['inga'])

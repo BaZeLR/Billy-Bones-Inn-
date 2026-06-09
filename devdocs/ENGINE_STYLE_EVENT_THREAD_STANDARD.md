@@ -6,6 +6,8 @@ Use the reference-engine shape for new story content:
 2. The target label owns the media, text, menus, state mutation, and thread advance.
 3. Room code only offers or calls the trigger. It must not hide extra story conditions.
 
+For the content-authoring form of this rule, including ordinary Ren'Py menus, direct variable updates, room-entry checks, and anger/apology examples, see `devdocs/STORY_LABEL_EVENT_FLOW_STANDARD.md`.
+
 ## Thread Row Shape
 
 Use the existing `LThreadData` / `RThreadData` / `UThreadData` classes in `game/Inn/StoryEventRuntime.rpy`.
@@ -108,7 +110,7 @@ label story_person_arc_0:
             jump story_person_arc_0_choice_a
 
         "Leave":
-            $ story_thread_advance_current()
+            $ thread.advance()
             jump TavernKitchen
 ```
 
@@ -127,12 +129,93 @@ label story_person_arc_panel_0:
     return
 ```
 
-## Advance And Complete
+This right-panel pattern is only acceptable when the result matches the Family
+Life event-menu rule: the event picture/text remains visible and the choices
+appear in the active event panel. It must not become a queued panel, popup,
+refresh/apply/renew wrapper, or distant dispatcher.
 
-Advance the active thread in the event label, after the player has accepted the consequence:
+Preferred authored source for story and sex event choices is still classic
+Ren'Py menu inside the event label:
 
 ```renpy
-$ story_thread_advance_current()
+label story_person_arc_menu_0:
+    vscene "images/person/arc/scene_0.jpg"
+    "Narrative text."
+
+    menu:
+        "Choice A":
+            $ SomeVar["state"] = 1
+            jump story_person_arc_choice_a
+
+        "Leave":
+            jump TavernKitchen
+```
+
+## Consequence Visibility
+
+Threaded event labels must keep consequences visible in the label.
+
+Preferred:
+
+- direct assignment for simple stats, flags, counters, and thread state
+- `call` to established helper labels for shared mechanics such as
+  `SlutFriendsIncrease` or `PregnancyCheck`
+- a short comment block before choice-heavy labels explaining the event purpose
+  and branch outcomes
+
+Avoid:
+
+- `jump` to helper labels that only apply a consequence
+- Python evaluator methods that hide the outcome
+- generic apply handlers for one event choice
+- dispatcher labels that obscure which branch changed which stat
+
+The reader should be able to inspect the event label and understand what each
+choice changes without chasing a handler chain.
+
+## Multi-Picture Beats
+
+Threaded events may contain several pictures. Keep those pictures as authored
+beats in the target label:
+
+```renpy
+label story_person_arc_1:
+    vscene "images/person/arc/1.jpg"
+    "Beat one."
+
+    vscene "images/person/arc/2.jpg"
+    "Beat two."
+
+    menu:
+        "Continue":
+            pass
+
+    vscene "images/person/arc/3.jpg"
+    "Beat three."
+
+    $ thread.advance()
+    jump TavernKitchen
+```
+
+Do not use a queue/paging/proceed subsystem for authored story or sex scenes
+when a direct sequence of `vscene`, text, and a simple `Continue` menu is enough.
+
+## Advance And Complete
+
+Family Life sets the active `thread` in `preEvent(thread_name)` before jumping
+to the event label. Advance, complete, or abort that active thread directly in
+the event label, after the player has accepted the consequence:
+
+```renpy
+$ thread.advance()
+```
+
+```renpy
+$ thread.complete()
+```
+
+```renpy
+$ thread.abort()
 ```
 
 Do not advance in the room entry code. Room entry only triggers:

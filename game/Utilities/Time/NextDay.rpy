@@ -11,7 +11,7 @@ init python:
 
     def nextday_started_after_midnight():
         try:
-            calendar_sync_state()
+            calendar_v2.sync_state()
         except Exception:
             pass
 
@@ -29,9 +29,9 @@ init python:
 
     def nextday_pick_post_sleep_event_label():
         try:
-            flags = SandraVar if isinstance(SandraVar, dict) else {}
+            Sandra.ensure_story_defaults()
         except Exception:
-            flags = {}
+            return ""
 
         try:
             current_time = int(time or 0)
@@ -40,12 +40,12 @@ init python:
 
         if (
             current_time == 0
-            and int(flags.get("Week5WakePending", 0) or 0) > 0
+            and Sandra.weekly_thanks_event_ready()
         ):
             try:
-                return str(sandra_weekly_wake_target_label() or "SandraWeek5WakeEvent")
+                return str(Sandra.weekly_thanks_target_label() or "")
             except Exception:
-                return "SandraWeek5WakeEvent"
+                return ""
 
         return ""
 
@@ -79,6 +79,7 @@ label NextDay(retlocname, timepassed):
                 ExtraEvents += _weekly_msg
 
         call NextDay_FinishDayEvents
+        $ CurDay = {}
         call NextDay_TavernDaily
 
         call DisplayTavernEventsSummary(day, month, year)
@@ -87,8 +88,27 @@ label NextDay(retlocname, timepassed):
             $ TotalEventsSummary += _nextday_summary_text
         
         if not (_nextday_skip_first_calendar_roll and iDaysCount == 0):
-            $ calendar_advance_days(1)
-        $ calendar_set_time_slot(0)
+            python:
+                calendar_v2.day += 1
+                calendar_v2.week += 1
+                calendar_v2.daysInGame += 1
+
+                if calendar_v2.week > 7:
+                    calendar_v2.week = 1
+
+                if calendar_v2.day > 28:
+                    calendar_v2.day = 1
+                    calendar_v2.period += 1
+
+                if calendar_v2.period > 13:
+                    calendar_v2.period = 1
+                    calendar_v2.cycle += 1
+
+                calendar_v2.sync_state()
+        $ calendar_v2.hour = 6
+        $ calendar_v2.minute = 0
+        $ calendar_v2.sync_state()
+        $ player_state(False).daily_maintenance(1)
         
         call NextDay_NewDayEvents
         call CreateTavernEvents
@@ -113,13 +133,8 @@ label NextDay(retlocname, timepassed):
             if DressBuyer == 'You':
                 dress_name = ShortDressName.get(DressProduced, DressProduced).lower()
                 NewDressCame = f'Утром прибежал посыльный из лавки Фараго и принес вам ваш заказ - {dress_name}.'
-                _wardrobe = _normalize_dress_list_var("MyDresses")
-                if DressProduced not in _wardrobe:
-                    _wardrobe.append(DressProduced)
-                MyDresses = _wardrobe
-                if not isinstance(PlayerDressDaySt, dict):
-                    PlayerDressDaySt = {}
-                PlayerDressDaySt[DressProduced] = int(dayspassed or 0)
+                player_state().appearance.add_dress(DressProduced, int(dayspassed or 0))
+                player_state().appearance.apply_to_store()
                 
             if money >= 50:
                 NewDressCame += f' Вы поблагодарили мальчишку, дав ему 5 мараведи, и положили обнову в ларь.'
@@ -245,6 +260,7 @@ label NextDay(retlocname, timepassed):
     call TractirCheckAchievements
     call TractirShowPendingAchievements
     $ notoriety = 0
+    $ sync_player_state_from_store()
     
     # Ensure minimums
     if tavernvisitors < 0:

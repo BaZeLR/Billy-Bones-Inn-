@@ -1,15 +1,7 @@
 # ================================================================================
 # Player intimacy, sleep layer, and arousal state.
+# (Defaults centralized in script.rpy to avoid duplicate default errors)
 # ================================================================================
-default LastDaySex = -1
-default PlayerLastCumDay = -1
-default PlayerSleepBottomLayer = "daywear"
-default PlayerRoomLightClosed = 0
-default PlayerMorningArousalDay = -1
-default PlayerWakeStateNotice = ""
-default PlayerArousalReasons = []
-default PlayerObservedNakedNpcDay = {}
-default PlayerLastHelpResult = {}
 
 init python:
     def player_intimacy_int(value, default=0):
@@ -79,14 +71,9 @@ init python:
         return max(0, today - last_day)
 
     def player_ensure_nightwear_in_chest():
-        global MyDresses, PlayerDressDaySt
-        if not isinstance(MyDresses, list):
-            MyDresses = []
-        if "nightshirt" not in MyDresses:
-            MyDresses.append("nightshirt")
-        if not isinstance(PlayerDressDaySt, dict):
-            PlayerDressDaySt = {}
-        PlayerDressDaySt.setdefault("nightshirt", player_intimacy_int(dayspassed, 0))
+        appearance = player_state().appearance
+        appearance.ensure_nightwear(player_intimacy_int(dayspassed, 0))
+        appearance.apply_to_store()
         return True
 
     def player_sync_body_state():
@@ -99,13 +86,14 @@ init python:
         shoes.setdefault(key, "")
         topraised[key] = 0
         bottomraised[key] = 0
-        if str(PlayerSleepBottomLayer or "") == "nothing" or str(MyCurDress or "") == "":
+        appearance = player_state().appearance
+        if appearance.is_naked():
             topdress[key] = ""
             bottomdress[key] = ""
             legs[key] = ""
             shoes[key] = ""
         else:
-            dress_code = "nightshirt" if str(PlayerSleepBottomLayer or "") == "nightwear" else str(MyCurDress or "")
+            dress_code = "nightshirt" if appearance.is_nightwear() else str(appearance.current_dress or "")
             topdress[key] = str(DressTopPart.get(dress_code, "") or "")
             bottomdress[key] = str(DressBottomPart.get(dress_code, "") or "")
         try:
@@ -114,27 +102,17 @@ init python:
             return {}
 
     def player_set_sleep_layer(mode="daywear"):
-        global MyCurDress, PlayerSleepBottomLayer
-        mode_key = str(mode or "daywear").strip().lower()
-        if mode_key in ("naked", "nothing", "none"):
-            MyCurDress = ""
-            PlayerSleepBottomLayer = "nothing"
-        elif mode_key in ("night", "nightwear", "sleep"):
-            player_ensure_nightwear_in_chest()
-            MyCurDress = "nightshirt"
-            PlayerSleepBottomLayer = "nightwear"
-        else:
-            PlayerSleepBottomLayer = "daywear"
-            if str(MyCurDress or "").strip() in ("", "nightshirt"):
-                MyCurDress = "villagedress"
+        appearance = player_state().appearance
+        appearance.set_sleep_layer(mode, player_intimacy_int(dayspassed, 0))
+        appearance.apply_to_store()
         player_sync_body_state()
-        return PlayerSleepBottomLayer
+        return appearance.sleep_bottom_layer
 
     def player_is_naked():
-        return str(PlayerSleepBottomLayer or "") == "nothing" or str(MyCurDress or "").strip() == ""
+        return player_state().appearance.is_naked()
 
     def player_is_in_nightwear():
-        return str(PlayerSleepBottomLayer or "") == "nightwear" or str(MyCurDress or "") == "nightshirt"
+        return player_state().appearance.is_nightwear()
 
     def player_public_movement_block_text():
         if player_is_naked():
@@ -177,8 +155,6 @@ init python:
         days_wait = player_days_without_sex()
         if days_wait >= 2:
             lines.append("Без секса уже %s дня; тело реагирует быстрее обычного." % days_wait)
-        if int(PlayerRoomLightClosed or 0) == 1:
-            lines.append("В вашей комнате погашен свет.")
         if str(PlayerWakeStateNotice or "").strip() and player_intimacy_int(PlayerMorningArousalDay, -1) == player_intimacy_int(dayspassed, 0):
             lines.append(str(PlayerWakeStateNotice))
         try:
@@ -217,7 +193,7 @@ init python:
             return str(PlayerWakeStateNotice or "")
         PlayerMorningArousalDay = today
         days_wait = player_days_without_sex()
-        seed = (today * 37 + player_intimacy_int(hour, 0) * 11 + player_intimacy_int(time, 0) * 19 + (17 if int(PlayerRoomLightClosed or 0) else 0)) % 100
+        seed = (today * 37 + player_intimacy_int(hour, 0) * 11 + player_intimacy_int(time, 0) * 19) % 100
         should_rise = int(time or 0) == 0 and (days_wait >= 2 or seed < 18 or player_is_naked() or player_is_in_nightwear())
         if not should_rise:
             PlayerWakeStateNotice = ""
@@ -225,8 +201,6 @@ init python:
         amount = 18 + min(35, days_wait * 8)
         if player_is_naked() or player_is_in_nightwear():
             amount += 7
-        if int(PlayerRoomLightClosed or 0) == 1:
-            amount += 5
         player_apply_arousal_trigger("wake", amount)
         PlayerWakeStateNotice = "Вы проснулись с заметным утренним стояком."
         return PlayerWakeStateNotice

@@ -146,10 +146,7 @@ init -5 python:
             self.name = chosen_name if chosen_name in dog_name_options() else dog_random_name()
             self.health = self.max_health
             self.gain_loyalty(3)
-            if "dog" not in list(player_company or []):
-                player_company.append("dog")
-            if "dog" not in list(company_list or []):
-                company_list.append("dog")
+            player_state().add_party_member("dog")
             self.spawn_location = None
             try:
                 npc_daily_schedule_build_all(True)
@@ -764,10 +761,7 @@ label IntDogTalkApply(room_code="", choice_code=""):
 
     if str(choice_code or "") == "hunt":
         $ dog.in_company = True
-        if "dog" not in list(player_company or []):
-            $ player_company.append("dog")
-        if "dog" not in list(company_list or []):
-            $ company_list.append("dog")
+        $ player_state().add_party_member("dog")
         $ npc_daily_schedule_build_all(True)
         $ dog_sync_profile()
         $ MainTxt = "Теперь пес идет вместе с вами и будет считаться спутником в охотничьих и боевых событиях."
@@ -777,18 +771,7 @@ label IntDogTalkApply(room_code="", choice_code=""):
 
     if str(choice_code or "") == "stay":
         $ dog.in_company = False
-        if "dog" in list(player_company or []):
-            python:
-                try:
-                    player_company.remove("dog")
-                except ValueError:
-                    pass
-        if "dog" in list(company_list or []):
-            python:
-                try:
-                    company_list.remove("dog")
-                except ValueError:
-                    pass
+        $ player_state().remove_party_member("dog")
         if dog.booth_built:
             $ MainTxt = "Вы оставляете пса сторожить дом и двор. Он послушно устраивается у будки и принимается внимательно следить за всем вокруг."
         else:

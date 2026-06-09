@@ -99,7 +99,29 @@ init python:
         return dict(loadable_pool[event_index] or {})
 
     def tavern_preopening_mode():
-        return str(TavernClosed or "") == "" and int(week or 0) != 7 and int(time or 0) < 4 and int(hour or 0) < 12
+        return str(TavernClosed or "") == "" and int(week or 0) != 7 and 6 <= int(hour or 0) < 12
+
+    def tavern_main_late_closed():
+        current_hour = int(hour or 0)
+        return current_hour >= 23 or current_hour < 6
+
+    def tavern_main_sunday_service_closed():
+        return int(week or 0) == 7
+
+    def tavern_main_friday_dance_closed():
+        return int(week or 0) == 5 and 18 <= int(hour or 0) < 22
+
+    def tavern_main_open_hours_visible():
+        return int(week or 0) != 7 and not tavern_main_late_closed()
+
+    def tavern_main_closed_text():
+        if tavern_main_late_closed():
+            return "Сейчас поздняя ночь и трактир закрыт, все спят. Ну а кто не спит - тот отдыхает. Но не в главной зале."
+        if tavern_main_sunday_service_closed():
+            return "Сейчас трактир закрыт, все ушли на службу в храм. Может вам тоже стоит пойти?"
+        if tavern_main_friday_dance_closed():
+            return "Сейчас трактир закрыт, все ушли пятничное общегородское празднование. Может вам тоже стоит пойти?"
+        return ""
 
     def tavern_main_glory_hole_visible():
         return TavernClosed == "" and TavernGloryHole == 2
@@ -184,7 +206,7 @@ init python:
             "fireplace_001",
             "bar_001",
         ],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
+        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], start="06:00", end="22:59", condition=tavern_main_open_hours_visible),
         custom_properties={
             "hall_staff_jobs": ["jobkitchen", "jobcleaning", "jobwaitress"],
             "object_menu_label": "TavernMainObjectMenu",
@@ -236,19 +258,19 @@ label TavernMain:
     
 
     # Startup safety: no Glory Hole stage before the quest/dialog branch starts.
+    # Safe access (Draupnir may not be initialized yet in early startup / before secondary OOP init)
     if int(week or 1) == 1 and int(day or 1) == 1:
-        if int(DraupnirVar.get("GloryHoleAsked", 0) or 0) == 0:
+        python:
+            try:
+                _draupnir_gh_asked = int(DraupnirVar.get("GloryHoleAsked", 0) or 0)
+            except (NameError, AttributeError):
+                _draupnir_gh_asked = 0
+        if _draupnir_gh_asked == 0:
             $ TavernGloryHole = 0
             $ TavernHole = 0
     # Determine if tavern is closed
-    $ TavernClosed = ""
-    if week == 7 and time < 3:
-        $ TavernClosed = "Сейчас трактир закрыт, все ушли на службу в храм. Может вам тоже стоит пойти?"
-    elif week == 5 and time == 3:
-        $ TavernClosed = "Сейчас трактир закрыт, все ушли пятничное общегородское празднование. Может вам тоже стоит пойти?"
-    elif time > 3:
-        $ TavernClosed = "Сейчас поздняя ночь и трактир закрыт, все спят. Ну а кто не спит - тот отдыхает. Но не в главной зале."
-    else:
+    $ TavernClosed = tavern_main_closed_text()
+    if TavernClosed == "":
         python:
             _arg_list = _args or ()
             BlockEvents = _arg_list[0] if len(_arg_list) > 0 else TavernMainBlockEvents
@@ -260,19 +282,13 @@ label TavernMain:
             ShouldDispatchTavernEvent = (
                 int(week or 0) != 7
                 and not tavern_preopening_mode()
-                and (
-                    int(EventsCount.get(10, 0) or 0) > 0
-                    or (
-                        int(BlockEvents or 0) != 1
-                        and renpy.random.randint(1, 2) == 1
-                        and int(EventsCount.get(time, 0) or 0) > 0
-                    )
-                )
+                and int(BlockEvents or 0) != 1
             )
 
         if ShouldDispatchTavernEvent:
-            call DisplayTavernEventShort(time, 1)
-            $ TavernEventOngoing = _return
+            call checkTriggers("TavernMain", "tavern_work", 0)
+            if _return:
+                jump TavernMain
     
     $ GirlNameTS1 = "georgett"
     $ GirlNameTS2 = "liza"
@@ -298,11 +314,12 @@ label TavernMain:
 
     # Main event and interaction logic
     if TavernEventOngoing == "" and TavernClosed == "":
-        if str(getLocation(GirlNameTS1) or "") == CurLoc and time > 2:
+        if str(getLocation(GirlNameTS1) or "") == CurLoc:
             if time == 3:
                 call AddOthersSperm(GirlNameTS1, 7)
                 call AddOthersSperm(GirlNameTS2, 8)
-            if jobwhore["liza"] == 1 and jobwhore["georgett"] == 1:
+            $ _jobwhore = getattr(renpy.store, 'jobwhore', {})
+            if _jobwhore.get("liza", 0) == 1 and _jobwhore.get("georgett", 0) == 1:
                 python:
                     randvarPS = renpy.random.randint(1, 5)
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
@@ -323,7 +340,7 @@ label TavernMain:
                     $ GeorgettAvail = 1
                     $ CurrentLoc[GirlNameTS1] = "TavernMain"
                     $ CurrentLoc[GirlNameTS2] = "TavernMain"
-            elif jobwhore["liza"] == 1:
+            elif _jobwhore.get("liza", 0) == 1:
                 python:
                     randvarPS = renpy.random.randint(1, 3)
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
@@ -334,7 +351,7 @@ label TavernMain:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Лизетта и ждет клиентов."
                     $ LizaAvail = 1
                     $ CurrentLoc[GirlNameTS2] = "TavernMain"
-            elif jobwhore["georgett"] == 1:
+            elif _jobwhore.get("georgett", 0) == 1:
                 python:
                     randvarPS = renpy.random.randint(1, 3)
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
@@ -345,7 +362,11 @@ label TavernMain:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Жоржетта и ждет клиентов."
                     $ GeorgettAvail = 1
                     $ CurrentLoc[GirlNameTS1] = "TavernMain"
-        $ _glory_quest_started = int(DraupnirVar.get("GloryHoleAsked", 0) or 0) > 0
+        python:
+            try:
+                _glory_quest_started = int(DraupnirVar.get("GloryHoleAsked", 0) or 0) > 0
+            except (NameError, AttributeError):
+                _glory_quest_started = 0
         if TavernGloryHole == 1 and _glory_quest_started:
             $ TavernMainGloryDesc = "В дальнем углу трактира мастера Драупнир что-то строгает и пилит. Работа кипит. Еще несколько часов и вы сможете насладиться построенным глорихолом."
         elif TavernGloryHole == 2 and _glory_quest_started:
@@ -425,8 +446,6 @@ label TavernMainBuildActions:
         $ current_action_items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
     if TavernClosed == "" and story_event_available("TavernMain", "clara_paintings"):
         $ current_action_items.append(MenuItem(clara_paintings_tavern_caption(), Call("checkTriggers", "TavernMain", "clara_paintings", 0)))
-    if werecat_is_in_room("TavernMain"):
-        $ current_action_items.append(MenuItem(werecat_action_caption("TavernMain"), Call("IntWerecatTalk", "TavernMain")))
     return
 
 

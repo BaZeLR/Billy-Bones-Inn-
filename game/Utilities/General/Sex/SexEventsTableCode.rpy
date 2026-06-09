@@ -4,6 +4,12 @@
 label SexEventsTableCode:
     return
 
+# Core daily and history tables for sex events (RPy equivalent of original QSP TodaySexEvent tables)
+# These must exist for any girl. Used for daily prostitution/glory events in tavern and side effects.
+default TodaySexEvents = []
+default GirlDance = []
+default sex_history_by_girl = {}
+
 init -44 python:
     import renpy
 

@@ -1,20 +1,20 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
 default TownStreetEventsToday = 0
 default TownStreetPatrolsToday = 0
 default TownStreetFightToday = 0
 default TownCurfewCaughtToday = 0
 default TownStreetStorySeenKeys = []
+default TownStreetDailyPlan = {}
 default TownStreetLastEventText = ""
 default TownStreetContext = {}
+default TownStreetFiredLabelsToday = []
+default TownStreetFiredLocationsToday = []
+default TownStreetCooldowns = {}
 
 default GuardCaptainVar = {}
 default TavernBlackworkers = []
 default TavernBlackworkerCandidates = []
 
 init -20 python:
-    import renpy.store as store
 
     class TownStreetRuntime(object):
         LOCATIONS = ("StreetTavern", "MarketPlace", "PortStreets", "ArtisansQuarter")
@@ -103,7 +103,7 @@ init -20 python:
 
         def _get(self, name, default=None):
             try:
-                return getattr(store, name, default)
+                return globals().get(name, default)
             except Exception:
                 return default
 
@@ -115,6 +115,9 @@ init -20 python:
                     return int(float(value))
                 except Exception:
                     return default
+
+        def _screen_text(self, value):
+            return str(value).replace("[", "[[").replace("{", "{{")
 
         def _call_name(self, gender=None):
             fn = self._get("RandomNameCode", None)
@@ -146,22 +149,130 @@ init -20 python:
         def location_allowed(self, location_name=""):
             return str(location_name or self._get("CurLoc", "") or "") in self.LOCATIONS
 
-        def event_key(self, location_name=""):
+        def event_key(self, location_name="", label_name=""):
             return "%s:%s:%s" % (
                 self._int(self._get("dayspassed", 0), 0),
                 str(location_name or self._get("CurLoc", "") or ""),
-                self._int(self._get("time", 0), 0),
+                str(label_name or "day"),
             )
 
-        def random_seen_this_slot(self, location_name=""):
-            keys = self._get("TownStreetStorySeenKeys", [])
-            return self.event_key(location_name) in list(keys or [])
+        def probability_roll(self, label_name="", location_name="", chance=0):
+            chance_value = max(0, min(100, self._int(chance, 0)))
+            if chance_value <= 0:
+                return False
+            if chance_value >= 100:
+                return True
+            key = "town_event_%s_%s_%s_%s_%s" % (
+                str(label_name or ""),
+                str(location_name or self._get("CurLoc", "") or ""),
+                self._int(self._get("dayspassed", 0), 0),
+                self._int(self._get("clock_minutes", 0), 0),
+                self._int(self._get("notoriety", 0), 0),
+            )
+            return procedural_randint(1, 100, key) <= chance_value
 
-        def mark_seen(self, location_name=""):
+        def beggar_chance(self):
+            return 10
+
+        def thug_chance(self):
+            return 10
+
+        def patrol_chance(self):
+            return min(100, 25 + max(0, self._int(self._get("notoriety", 0), 0) // 2))
+
+        def chronicle_chance(self):
+            return 25
+
+        def curfew_active(self):
+            clock_value = self._int(self._get("clock_minutes", -1), -1)
+            hour_value = self._int(self._get("hour", -1), -1)
+            minute_part = self._int(self._get("minute", 0), 0) % 60
+            if 0 <= hour_value <= 23:
+                visible_minutes = (hour_value * 60) + minute_part
+                # Location/event code sometimes sets legacy hour/minute before the
+                # canonical clock mirror is synced. For curfew, visible time wins.
+                if clock_value < 0 or abs((clock_value % 1440) - visible_minutes) > 1:
+                    minute_value = visible_minutes
+                else:
+                    minute_value = clock_value % 1440
+            else:
+                minute_value = clock_value % 1440
+            return minute_value >= 21 * 60 + 30 or minute_value <= 5 * 60 + 30
+
+        def random_seen_this_slot(self, location_name="", label_name=""):
             keys = self._get("TownStreetStorySeenKeys", [])
-            key = self.event_key(location_name)
-            if key not in keys:
-                keys.append(key)
+            location_key = str(location_name or self._get("CurLoc", "") or "")
+            label_key = str(label_name or self.planned_label(location_key) or "day")
+            return (
+                self.event_key(location_key, "day") in list(keys or [])
+                or self.event_key(location_key, label_key) in list(keys or [])
+                or location_key in list(self._get("TownStreetFiredLocationsToday", []) or [])
+                or (label_key != "day" and label_key in list(self._get("TownStreetFiredLabelsToday", []) or []))
+            )
+
+        def mark_seen(self, location_name="", label_name=""):
+            keys = self._get("TownStreetStorySeenKeys", [])
+            location_key = str(location_name or self._get("CurLoc", "") or "")
+            label_key = str(label_name or self.planned_label(location_key) or "day")
+            for key in (self.event_key(location_key, "day"), self.event_key(location_key, label_key)):
+                if key not in keys:
+                    keys.append(key)
+
+            fired_locations = self._get("TownStreetFiredLocationsToday", [])
+            if location_key and location_key not in fired_locations:
+                fired_locations.append(location_key)
+
+            fired_labels = self._get("TownStreetFiredLabelsToday", [])
+            if label_key and label_key != "day" and label_key not in fired_labels:
+                fired_labels.append(label_key)
+
+            cooldowns = self._get("TownStreetCooldowns", {})
+            if isinstance(cooldowns, dict) and label_key and label_key != "day":
+                cooldowns[label_key] = max(
+                    self._int(cooldowns.get(label_key, -1), -1),
+                    self._int(self._get("dayspassed", 0), 0),
+                )
+
+        def event_on_cooldown(self, label_name="", cooldown_days=1):
+            label_key = str(label_name or "")
+            cooldowns = self._get("TownStreetCooldowns", {})
+            if not isinstance(cooldowns, dict) or not label_key:
+                return False
+            last_day = self._int(cooldowns.get(label_key, -9999), -9999)
+            return day_delta_since(last_day) < self._int(cooldown_days, 1)
+
+        def ensure_daily_plan(self):
+            plan = self._get("TownStreetDailyPlan", {})
+            if not isinstance(plan, dict):
+                globals()["TownStreetDailyPlan"] = {}
+                plan = globals()["TownStreetDailyPlan"]
+            plan["day"] = self._int(self._get("dayspassed", 0), 0)
+            plan["model"] = "probability"
+            plan["events"] = {
+                "beggar": self.beggar_chance(),
+                "thugs": self.thug_chance(),
+                "patrol": self.patrol_chance(),
+                "patrol_base": 25,
+                "patrol_notoriety_bonus": max(0, self._int(self._get("notoriety", 0), 0) // 2),
+                "chronicle": self.chronicle_chance(),
+                "chronicle_cooldown_days": 3,
+            }
+            return dict(plan["events"])
+
+        def planned_label(self, location_name=""):
+            return ""
+
+        def planned_for(self, location_name="", label_name=""):
+            label_key = str(label_name or "")
+            if label_key == "TownStreetPatrolEvent":
+                return self.patrol_allowed(location_name)
+            if label_key == "TownStreetThugsEvent":
+                return self.thug_allowed(location_name)
+            if label_key == "TownStreetHelpEvent":
+                return self.help_allowed(location_name)
+            if label_key == "TownRandomChronicleEvent":
+                return self.chronicle_allowed(location_name)
+            return False
 
         def time_event_key(self):
             if self._int(self._get("week", 1), 1) in (6, 7):
@@ -201,7 +312,6 @@ init -20 python:
             return (
                 self.location_allowed(location_name)
                 and self._int(self._get("TownStreetEventsToday", 0), 0) < 2
-                and not self.random_seen_this_slot(location_name)
             )
 
         def patrol_pass_active(self):
@@ -214,39 +324,38 @@ init -20 python:
         def patrol_allowed(self, location_name=""):
             if not self.interactive_allowed(location_name):
                 return False
-            if self._int(self._get("time", 0), 0) < 3:
+            if not self.curfew_active():
                 return False
             if self.patrol_pass_active():
                 return False
-            base = 12 if self._int(self._get("time", 0), 0) == 3 else 30
-            heat = min(45, max(0, self._int(self._get("notoriety", 0), 0) // 2))
-            loc_bonus = 8 if str(location_name or self._get("CurLoc", "") or "") in ("PortStreets", "ArtisansQuarter") else 0
-            chance = max(5, min(80, base + heat + loc_bonus))
-            seed = (
-                self._int(self._get("dayspassed", 0), 0) * 37
-                + self._int(self._get("time", 0), 0) * 17
-                + len(str(location_name or self._get("CurLoc", "") or "")) * 11
-                + self._int(self._get("notoriety", 0), 0)
-            )
-            return ((seed % 100) + 1) <= chance
+            if self.random_seen_this_slot(location_name, "TownStreetPatrolEvent"):
+                return False
+            return self.probability_roll("TownStreetPatrolEvent", location_name, self.patrol_chance())
 
         def thug_allowed(self, location_name=""):
             if not self.interactive_allowed(location_name):
                 return False
             if self._int(self._get("TownStreetFightToday", 0), 0) > 0:
                 return False
-            if self._int(self._get("time", 0), 0) < 2:
+            if self.random_seen_this_slot(location_name, "TownStreetThugsEvent"):
                 return False
-            seed = self._int(self._get("dayspassed", 0), 0) * 19 + self._int(self._get("time", 0), 0) * 23 + len(str(location_name or self._get("CurLoc", "") or ""))
-            return ((seed % 100) + 1) <= (20 if self._int(self._get("time", 0), 0) < 4 else 35)
+            return self.probability_roll("TownStreetThugsEvent", location_name, self.thug_chance())
 
         def help_allowed(self, location_name=""):
             if not self.interactive_allowed(location_name):
                 return False
-            if self._int(self._get("time", 0), 0) == 4:
+            if self.random_seen_this_slot(location_name, "TownStreetHelpEvent"):
                 return False
-            seed = self._int(self._get("dayspassed", 0), 0) * 13 + self._int(self._get("time", 0), 0) * 7 + len(str(location_name or self._get("CurLoc", "") or ""))
-            return ((seed % 100) + 1) <= 12
+            return self.probability_roll("TownStreetHelpEvent", location_name, self.beggar_chance())
+
+        def chronicle_allowed(self, location_name=""):
+            if not self.interactive_allowed(location_name):
+                return False
+            if self.random_seen_this_slot(location_name, "TownRandomChronicleEvent"):
+                return False
+            if self.event_on_cooldown("TownRandomChronicleEvent", 3):
+                return False
+            return self.probability_roll("TownRandomChronicleEvent", location_name, self.chronicle_chance())
 
         def fine_amount(self, reason="fight"):
             if str(reason or "") == "counter_bribe":
@@ -270,12 +379,14 @@ init -20 python:
             return score >= (self._int(enemy_level, 2) * 30 + 30)
 
         def apply_cloth_damage(self, amount=15):
-            store.costumecondition = max(0, self._int(self._get("costumecondition", 100), 100) - self._int(amount, 15))
+            appearance = player_state().appearance
+            appearance.costume_condition = max(0, self._int(appearance.costume_condition, 100) - self._int(amount, 15))
+            appearance.apply_to_store()
 
         def apply_health_damage(self, amount=15):
             amount_int = self._int(amount, 15)
-            store.health = max(0, self._int(self._get("health", 100), 100) - amount_int)
-            store.energy = max(0, self._int(self._get("energy", 100), 100) - max(5, amount_int // 2))
+            globals()["health"] = max(0, self._int(self._get("health", 100), 100) - amount_int)
+            globals()["energy"] = max(0, self._int(self._get("energy", 100), 100) - max(5, amount_int // 2))
 
         def make_help_context(self):
             ctx = self._get("TownStreetContext", {})
@@ -306,21 +417,25 @@ init -20 python:
 label TownRandomChronicleEvent:
     $ SignalBlockTime = 1
     $ TownStreetEventsToday = int(TownStreetEventsToday or 0) + 1
-    $ town_street.mark_seen(CurLoc)
+    $ town_street.mark_seen(CurLoc, "TownRandomChronicleEvent")
+    $ town_street.mark_seen(location, "TownRandomChronicleEvent")
+    $ town_street.mark_seen(getattr(CurrentRoom, "code_name", ""), "TownRandomChronicleEvent")
     $ TownStreetLastEventText = town_street.random_chronicle(town_street.time_event_key())
     $ MainTxt = TownStreetLastEventText
     $ CurLocDesc = MainTxt
     $ current_action_title = "Городские слухи"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Идти дальше", Jump(CurLoc))]
+    $ current_action_items = [MenuItem("Идти дальше", Function(renpy.return_statement, True))]
     call screen main_ui
-    jump expression CurLoc
+    return True
 
 
 label TownStreetHelpEvent:
     $ SignalBlockTime = 1
     $ TownStreetEventsToday = int(TownStreetEventsToday or 0) + 1
-    $ town_street.mark_seen(CurLoc)
+    $ town_street.mark_seen(CurLoc, "TownStreetHelpEvent")
+    $ town_street.mark_seen(location, "TownStreetHelpEvent")
+    $ town_street.mark_seen(getattr(CurrentRoom, "code_name", ""), "TownStreetHelpEvent")
     $ _town_ctx = town_street.make_help_context()
     $ MainTxt = "У стены сидит измученный человек. По виду это %s - %s. Он просит не денег, а куска еды и места, где можно переждать ночь. Рядом двое прохожих делают вид, что не слышат." % (_town_ctx.get("help_name", "бродяга"), _town_ctx.get("help_job", "без ремесла"))
     $ CurLocDesc = MainTxt
@@ -329,10 +444,10 @@ label TownStreetHelpEvent:
     $ current_action_items = [
         MenuItem("Дать еды и предложить грязную работу при трактире", Call("TownStreetHelpRecruit")),
         MenuItem("Дать пару мараведи", Call("TownStreetHelpMoney")),
-        MenuItem("Пройти мимо", Jump(CurLoc)),
+        MenuItem("Пройти мимо", Function(renpy.return_statement, True)),
     ]
     call screen main_ui
-    jump expression CurLoc
+    return True
 
 
 label TownStreetHelpRecruit:
@@ -342,7 +457,7 @@ label TownStreetHelpRecruit:
     $ tavernfame += 1
     $ MainTxt = "Вы обещаете еду, угол в конюшне и простую грязную работу. Человек хватается за это предложение так, будто вы протянули ему не хлеб, а целую жизнь. Если он не сбежит от страха, утром у трактира появится новый чернорабочий."
     $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Идти дальше", Jump(CurLoc))]
+    $ current_action_items = [MenuItem("Идти дальше", Function(renpy.return_statement, True))]
     return
 
 
@@ -350,11 +465,12 @@ label TownStreetHelpMoney:
     if money >= 2:
         $ money -= 2
         $ exploration += 3
+        $ notoriety = max(0, int(notoriety or 0) - 10)
         $ MainTxt = "Вы даете пару мараведи. Благодарность выходит тихой и неловкой, но несколько прохожих это замечают."
     else:
         $ MainTxt = "Вы хлопаете по пустому кошелю и понимаете, что сейчас вам самому впору просить милостыню."
     $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Идти дальше", Jump(CurLoc))]
+    $ current_action_items = [MenuItem("Идти дальше", Function(renpy.return_statement, True))]
     return
 
 
@@ -362,7 +478,9 @@ label TownStreetThugsEvent:
     $ SignalBlockTime = 1
     $ TownStreetEventsToday = int(TownStreetEventsToday or 0) + 1
     $ TownStreetFightToday = int(TownStreetFightToday or 0) + 1
-    $ town_street.mark_seen(CurLoc)
+    $ town_street.mark_seen(CurLoc, "TownStreetThugsEvent")
+    $ town_street.mark_seen(location, "TownStreetThugsEvent")
+    $ town_street.mark_seen(getattr(CurrentRoom, "code_name", ""), "TownStreetThugsEvent")
     $ MainTxt = "Из бокового переулка вы слышите короткий вскрик. Двое крепких парней прижимают к стене растерянного горожанина и выворачивают ему руки. Увидев вас, один ухмыляется: «Проходи мимо, трактирщик. Не твое дело»."
     $ CurLocDesc = MainTxt
     $ current_action_title = "Уличные громилы"
@@ -370,28 +488,19 @@ label TownStreetThugsEvent:
     $ current_action_items = [
         MenuItem("Вмешаться и драться", Call("TownStreetThugsFight")),
         MenuItem("Попробовать спугнуть их криком", Call("TownStreetThugsShout")),
-        MenuItem("Пройти мимо", Jump(CurLoc)),
+        MenuItem("Пройти мимо", Function(renpy.return_statement, True)),
     ]
     call screen main_ui
-    jump expression CurLoc
+    return True
 
 
 label TownStreetThugsFight:
-    if town_street.fight_success(2):
-        $ exploration += renpy.random.randint(8, 15)
-        $ tavernfame += 2
-        $ notoriety += 3
-        $ money += renpy.random.randint(3, 10)
-        $ MainTxt = "Драка выходит короткой и грязной. Один получает локтем в зубы, второй спотыкается о бочку и решает, что добыча не стоит сломанных ребер. Спасенный горожанин сует вам несколько монет и сбивчиво благодарит."
-    else:
-        $ town_street.apply_health_damage(25)
-        $ town_street.apply_cloth_damage(30)
-        $ SickDays += 1 if renpy.random.randint(1, 3) == 1 else 0
-        $ notoriety += 2
-        $ MainTxt = "Вы лезете в драку, но громилы оказываются слаженнее. Вас валят на мостовую, пару раз бьют ногами и исчезают в переулке. Одежда порвана, тело ноет, а свидетели делают вид, что смотрели в другую сторону."
-    $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Подняться и идти дальше", Jump(CurLoc))]
-    return
+    $ notoriety = min(100, int(notoriety or 0) + 3)
+    $ _thug_return_room = str(CurLoc or location or "StreetTavern")
+    $ _thug_picture = str(_layout_last_picture or scene_image or "")
+    $ _thug_intro = "Вы встаете между жертвой и громилами. Один сплевывает на мостовую и перехватывает дубинку: теперь разговор закончится только дракой."
+    $ fight_begin("street_crook", 2, _thug_return_room, _thug_picture, _thug_intro)
+    return True
 
 
 label TownStreetThugsShout:
@@ -402,15 +511,19 @@ label TownStreetThugsShout:
         $ town_street.apply_health_damage(12)
         $ MainTxt = "Ваш крик только злит громил. Один толкает вас плечом в стену, второй шипит, что в следующий раз разговор будет длиннее. Потом они все же уходят."
     $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Идти дальше", Jump(CurLoc))]
+    $ current_action_items = [MenuItem("Идти дальше", Function(renpy.return_statement, True))]
     return
 
 
 label TownStreetPatrolEvent:
+    if not town_street.curfew_active():
+        return False
     $ SignalBlockTime = 1
     $ TownStreetEventsToday = int(TownStreetEventsToday or 0) + 1
     $ TownStreetPatrolsToday = int(TownStreetPatrolsToday or 0) + 1
-    $ town_street.mark_seen(CurLoc)
+    $ town_street.mark_seen(CurLoc, "TownStreetPatrolEvent")
+    $ town_street.mark_seen(location, "TownStreetPatrolEvent")
+    $ town_street.mark_seen(getattr(CurrentRoom, "code_name", ""), "TownStreetPatrolEvent")
     $ MainTxt = "Из темноты выступает ночной патруль капитана Циммера. Старший лениво поднимает фонарь к вашему лицу: «Комендантский час, добрый человек. Документы, пропуск или деньги. А если нет - пройдем до колодок»."
     $ CurLocDesc = MainTxt
     $ current_action_title = "Ночной патруль"
@@ -424,7 +537,7 @@ label TownStreetPatrolEvent:
         MenuItem("Драться со стражей", Call("TownStreetPatrolFight")),
     ]
     call screen main_ui
-    jump expression CurLoc
+    return True
 
 
 label TownStreetPatrolPass:
@@ -434,7 +547,7 @@ label TownStreetPatrolPass:
     else:
         $ MainTxt = "Никакого пропуска у вас нет. Старший патруля смотрит на пустые руки с усталой усмешкой."
     $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Идти дальше", Jump(CurLoc))]
+    $ current_action_items = [MenuItem("Идти дальше", Function(renpy.return_statement, True))]
     return
 
 
@@ -447,7 +560,7 @@ label TownStreetPatrolBribe:
     else:
         jump TownStreetPatrolStocks
     $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Идти дальше", Jump(CurLoc))]
+    $ current_action_items = [MenuItem("Идти дальше", Function(renpy.return_statement, True))]
     return
 
 
@@ -459,7 +572,7 @@ label TownStreetPatrolHide:
         $ MainTxt = "Вы пробуете уйти дворами, но задеваете ведро. Патруль мгновенно разворачивается на шум."
         jump TownStreetPatrolStocks
     $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Идти дальше", Jump(CurLoc))]
+    $ current_action_items = [MenuItem("Идти дальше", Function(renpy.return_statement, True))]
     return
 
 
@@ -471,25 +584,18 @@ label TownStreetPatrolRun:
         $ MainTxt = "Вы бросаетесь бежать, но улица оказывается слишком открытой. Вас сбивают древком алебарды и поднимают уже под смех патрульных."
         jump TownStreetPatrolStocks
     $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Идти дальше", Jump(CurLoc))]
+    $ current_action_items = [MenuItem("Идти дальше", Function(renpy.return_statement, True))]
     return
 
 
 label TownStreetPatrolFight:
-    if town_street.fight_success(4):
-        $ exploration += 15
-        $ notoriety += 12
-        $ tavernfame -= 2
-        $ MainTxt = "Вы бьете первым и на несколько секунд ошеломляете патруль. Этого хватает, чтобы уйти. Но теперь вас точно запомнили."
-    else:
-        $ town_street.apply_health_damage(35)
-        $ town_street.apply_cloth_damage(45)
-        $ notoriety += 8
-        $ MainTxt = "Драться со стражей оказалось плохой мыслью. Вас валят древками, связывают и волокут к колодкам."
-        jump TownStreetPatrolStocks
-    $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Скрыться", Jump(CurLoc))]
-    return
+    $ notoriety = min(100, int(notoriety or 0) + 12)
+    $ tavernfame -= 2
+    $ _patrol_return_room = str(CurLoc or location or "StreetTavern")
+    $ _patrol_picture = str(_layout_last_picture or scene_image or "")
+    $ _patrol_intro = "Вы решаете не платить и не прятаться. Стражники переглядываются, опускают алебарды и берут вас в клещи. Теперь это настоящая драка с патрулем."
+    $ fight_begin("patrol_guard", 2, _patrol_return_room, _patrol_picture, _patrol_intro)
+    return True
 
 
 label TownStreetPatrolStocks:
@@ -501,4 +607,41 @@ label TownStreetPatrolStocks:
     $ CurLocDesc = MainTxt
     $ current_action_title = "Колодки"
     $ current_action_items = [MenuItem("Дождаться утра", Call("NextDay", "StreetTavern", 1))]
+    return
+
+
+label DebugTownRandomEvents:
+    $ CurLoc = "StreetTavern"
+    $ location = CurLoc
+    $ CurrentRoom = StreetTavernRoom
+    $ _debug_town_plan = town_street.ensure_daily_plan()
+    $ MainTxt = "День: %s\nСлот времени: %s\nСобытий сегодня: %s/2\nПлан: %s\nСработали локации: %s\nСработали события: %s\nКлючи: %s\nКулдауны: %s" % (dayspassed, time, TownStreetEventsToday, town_street._screen_text(_debug_town_plan), town_street._screen_text(TownStreetFiredLocationsToday), town_street._screen_text(TownStreetFiredLabelsToday), town_street._screen_text(TownStreetStorySeenKeys), town_street._screen_text(TownStreetCooldowns))
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Отладка городских случайных событий"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Обновить экран", Jump("DebugTownRandomEvents")),
+        MenuItem("Сбросить события дня", Call("DebugTownRandomEventsResetToday")),
+        MenuItem("Форсировать городскую хронику", Call("TownRandomChronicleEvent")),
+        MenuItem("Форсировать просьбу на улице", Call("TownStreetHelpEvent")),
+        MenuItem("Форсировать громил", Call("TownStreetThugsEvent")),
+        MenuItem("Форсировать патруль", Call("TownStreetPatrolEvent")),
+        MenuItem("Выйти на улицу трактира", Jump("StreetTavern")),
+    ]
+    call screen main_ui
+    jump DebugTownRandomEvents
+
+
+label DebugTownRandomEventsResetToday:
+    $ TownStreetEventsToday = 0
+    $ TownStreetPatrolsToday = 0
+    $ TownStreetFightToday = 0
+    $ TownCurfewCaughtToday = 0
+    $ TownStreetStorySeenKeys = []
+    $ TownStreetDailyPlan = {}
+    $ TownStreetLastEventText = ""
+    $ TownStreetContext = {}
+    $ TownStreetFiredLabelsToday = []
+    $ TownStreetFiredLocationsToday = []
+    $ TownStreetCooldowns = {}
     return

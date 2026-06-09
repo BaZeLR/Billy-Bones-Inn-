@@ -193,7 +193,9 @@ init -44 python:
             TodaySexEvents_DeleteGirl("becky")
 
         if MomName in ["amanda", "melissa", "sandra"]:
-            _kids_set("KidsPosobie", _kids_int(_kids_get("KidsPosobie", 0), 0) + 1)
+            player_state().economy.sync_from_store()
+            player_state().economy.add_child_support(1)
+            player_state().economy.apply_to_store()
             _kids_set("householdmembers", _kids_int(_kids_get("householdmembers", 0), 0) + 1)
             _kids_set("KidBirthPosobie", "Так как " + str(_kids_get("RealName", {}).get(MomName, MomName)) + " родила без мужа, то именем герцогини Кончитты Дель Семени вашей семье, тоесть вам, было выплаченно единовременно 600 мараведи воспоможения. Также вы будете получать дополнительно по 15 мараведи каждое воскресенье.")
         if MomName in ["liza", "georgett"]:

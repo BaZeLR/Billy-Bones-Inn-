@@ -289,7 +289,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                     "Я на это смотреть не могу и пойду отсюда":
                         if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                             $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
-                        $ calendar_advance_slots(1)
+                        $ calendar_v2.advance_minutes(60)
                         if renpy.has_label("StreetTavern"):
                             jump StreetTavern
                         return
@@ -299,7 +299,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                 $ slut_friends_increase("amanda", 7, 1, -1, 55, 1, 2)
                 if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                     $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
-                $ calendar_advance_slots(1)
+                $ calendar_v2.advance_minutes(60)
                 if renpy.has_label("StreetTavern"):
                     jump StreetTavern
                 return
@@ -308,7 +308,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                 "Аманда пугается вашего крика, спешно одевается и убегает в трактир."
                 $ AmandaVar["alberfriends"] = _adsl_i(AmandaVar.get("alberfriends", 0), 0) - 2
                 $ slut_friends_increase("amanda", 3, 1, -2, 20, 1, -3)
-                $ calendar_advance_slots(1)
+                $ calendar_v2.advance_minutes(60)
                 if renpy.has_label("StreetTavern"):
                     jump StreetTavern
                 return
@@ -327,7 +327,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                     "Плюнуть и идти обратно в трактир":
                         if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                             $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
-                        $ calendar_advance_slots(1)
+                        $ calendar_v2.advance_minutes(60)
                         if renpy.has_label("StreetTavern"):
                             jump StreetTavern
                         return
@@ -335,7 +335,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                 "После небольшой заминки Аманда заявляет, что так не может, потому что вдруг это действительно Стефан и ей стыдно. С этими словами она утягивает немного ошалевшего Альбера в дом. Почему-то ваша идея обернулась вам не на пользу."
                 if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                     $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
-                $ calendar_advance_slots(1)
+                $ calendar_v2.advance_minutes(60)
                 if renpy.has_label("StreetTavern"):
                     jump StreetTavern
                 return
@@ -343,7 +343,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
         "Я на это смотреть не могу и пойду отсюда" if CurSexStep < MaxStep - 1 and AmandaVar.get("knowyouseesex", 0) == 1:
             if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                 $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
-            $ calendar_advance_slots(1)
+            $ calendar_v2.advance_minutes(60)
             if renpy.has_label("StreetTavern"):
                 jump StreetTavern
             return
@@ -351,7 +351,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
         "Ухожу, даже и не собираюсь на это смотреть" if CurSexStep < MaxStep and AmandaVar.get("knowyouseesex", 0) == 0:
             if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                 $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
-            $ calendar_advance_slots(1)
+            $ calendar_v2.advance_minutes(60)
             if renpy.has_label("StreetTavern"):
                 jump StreetTavern
             return
@@ -359,7 +359,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
         "Пойду-ка и я" if (CurSexStep == 4 and tmpLegareSexType == 1) or (CurSexStep == 5 and tmpLegareSexType == 0) or (CurSexStep >= 6):
             if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                 $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
-            $ calendar_advance_slots(1)
+            $ calendar_v2.advance_minutes(60)
             if renpy.has_label("StreetTavern"):
                 jump StreetTavern
             return

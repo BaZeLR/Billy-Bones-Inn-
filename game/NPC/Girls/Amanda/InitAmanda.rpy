@@ -5,78 +5,97 @@ init 4 python:
     import random
 
     def amanda_has_given_night_bowl():
-        return int(AmandaVar.get("gave_night_bowl", 0) or 0) == 1
+        AmandaVar_safe = getattr(renpy.store, 'AmandaVar', {})
+        return int(AmandaVar_safe.get("gave_night_bowl", 0) or 0) == 1
 
     def amanda_can_be_asked_for_night_bowl():
+        AmandaVar_safe = getattr(renpy.store, 'AmandaVar', {})
+        dayspassed_safe = getattr(renpy.store, 'dayspassed', 0)
         return (
             player_has_soap_recipe_book()
             and not amanda_has_given_night_bowl()
             and _player_item_count_by_id("night_bowl_001") <= 0
-            and int(AmandaVar.get("night_bowl_request_day", -1) or -1) != int(dayspassed or 0)
+            and int(AmandaVar_safe.get("night_bowl_request_day", -1) or -1) != int(dayspassed_safe or 0)
         )
 
     def amanda_can_be_asked_for_night_bowl_favor():
+        Friends_safe = getattr(renpy.store, 'Friends', {})
+        Drunk_safe = getattr(renpy.store, 'Drunk', {})
         return (
             amanda_can_be_asked_for_night_bowl()
-            and int(Friends.get("amanda", 0) or 0) >= 7
-            and int(Drunk.get("amanda", 0) or 0) > 0
+            and int(Friends_safe.get("amanda", 0) or 0) >= 7
+            and int(Drunk_safe.get("amanda", 0) or 0) > 0
         )
 
     def amanda_night_bowl_success_chance(from_dance=False):
-        friendship_value = int(Friends.get("amanda", 0) or 0)
+        Friends_safe = getattr(renpy.store, 'Friends', {})
+        Drunk_safe = getattr(renpy.store, 'Drunk', {})
+        friendship_value = int(Friends_safe.get("amanda", 0) or 0)
         chance_value = 20 + max(0, friendship_value - 4) * 8
-        if from_dance and int(Drunk.get("amanda", 0) or 0) > 0:
+        if from_dance and int(Drunk_safe.get("amanda", 0) or 0) > 0:
             chance_value += 20
         if friendship_value >= 10:
             chance_value = 100
         return max(5, min(100, int(chance_value or 0)))
 
     def amanda_night_bowl_request_result(from_dance=False):
+        AmandaVar_safe = getattr(renpy.store, 'AmandaVar', {})
+        Friends_safe = getattr(renpy.store, 'Friends', {})
+        Drunk_safe = getattr(renpy.store, 'Drunk', {})
+        dayspassed_safe = getattr(renpy.store, 'dayspassed', 0)
         if not amanda_can_be_asked_for_night_bowl():
             return {"ok": False, "granted": False, "reason": "unavailable"}
 
-        AmandaVar["night_bowl_request_day"] = int(dayspassed or 0)
-        friendship_value = int(Friends.get("amanda", 0) or 0)
+        AmandaVar_safe["night_bowl_request_day"] = int(dayspassed_safe or 0)
+        friendship_value = int(Friends_safe.get("amanda", 0) or 0)
         chance_value = amanda_night_bowl_success_chance(from_dance)
         granted = friendship_value >= 10 or random.randint(1, 100) <= chance_value
         if granted:
             _player_add_item_by_id("night_bowl_001", 1)
-            AmandaVar["gave_night_bowl"] = 1
-            AmandaVar["night_bowl_window_seen_day"] = -1
+            AmandaVar_safe["gave_night_bowl"] = 1
+            AmandaVar_safe["night_bowl_window_seen_day"] = -1
             return {"ok": True, "granted": True, "chance": chance_value}
         return {"ok": True, "granted": False, "chance": chance_value}
 
     def amanda_night_bowl_window_event_ready():
+        AmandaVar_safe = getattr(renpy.store, 'AmandaVar', {})
+        time_safe = getattr(renpy.store, 'time', 0)
+        dayspassed_safe = getattr(renpy.store, 'dayspassed', 0)
         return (
             amanda_has_given_night_bowl()
             and _player_item_count_by_id("night_bowl_001") > 0
             and (
-                int(AmandaVar.get("got_fancy_night_bowl", 0) or 0) == 0
-                or int(AmandaVar.get("prefers_backyard_relief", -1) or -1) == 1
+                int(AmandaVar_safe.get("got_fancy_night_bowl", 0) or 0) == 0
+                or int(AmandaVar_safe.get("prefers_backyard_relief", -1) or -1) == 1
             )
-            and int(time or 0) >= 4
-            and int(AmandaVar.get("night_bowl_window_seen_day", -1) or -1) != int(dayspassed or 0)
+            and int(time_safe or 0) >= 4
+            and int(AmandaVar_safe.get("night_bowl_window_seen_day", -1) or -1) != int(dayspassed_safe or 0)
         )
 
     def amanda_can_receive_fancy_night_bowl():
+        AmandaVar_safe = getattr(renpy.store, 'AmandaVar', {})
         return (
             amanda_has_given_night_bowl()
-            and int(AmandaVar.get("got_fancy_night_bowl", 0) or 0) == 0
+            and int(AmandaVar_safe.get("got_fancy_night_bowl", 0) or 0) == 0
             and _player_item_count_by_id("fancy_night_bowl_001") > 0
         )
 
     def amanda_prefers_backyard_relief():
-        return int(AmandaVar.get("prefers_backyard_relief", -1) or -1) == 1
+        AmandaVar_safe = getattr(renpy.store, 'AmandaVar', {})
+        return int(AmandaVar_safe.get("prefers_backyard_relief", -1) or -1) == 1
 
     def amanda_pick_backyard_relief_preference():
-        friendship_value = int(Friends.get("amanda", 0) or 0)
-        sluttiness_value = int(sluttiness.get("amanda", 0) or 0)
+        Friends_safe = getattr(renpy.store, 'Friends', {})
+        sluttiness_safe = getattr(renpy.store, 'sluttiness', {})
+        AmandaVar_safe = getattr(renpy.store, 'AmandaVar', {})
+        friendship_value = int(Friends_safe.get("amanda", 0) or 0)
+        sluttiness_value = int(sluttiness_safe.get("amanda", 0) or 0)
         chance_value = 20 + friendship_value * 4 + int(sluttiness_value / 5)
-        if int(AmandaVar.get("gave_night_bowl", 0) or 0) == 1:
+        if int(AmandaVar_safe.get("gave_night_bowl", 0) or 0) == 1:
             chance_value += 10
         chance_value = max(5, min(90, chance_value))
-        AmandaVar["prefers_backyard_relief"] = 1 if random.randint(1, 100) <= chance_value else 0
-        return int(AmandaVar.get("prefers_backyard_relief", 0) or 0)
+        AmandaVar_safe["prefers_backyard_relief"] = 1 if random.randint(1, 100) <= chance_value else 0
+        return int(AmandaVar_safe.get("prefers_backyard_relief", 0) or 0)
 
 label InitAmanda:
     python:
@@ -88,7 +107,6 @@ label InitAmanda:
         RealName2[GirlName] = 'Аманды'
         RealName3[GirlName] = 'Аманде'
         age_girls[GirlName] = 18
-        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 0
         beauty[GirlName] = 52
         sluttiness[GirlName] = 0
@@ -195,7 +213,7 @@ label InitAmanda:
                 NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="Backyard", mode="sunday"), priority=240, label="sunday_backyard"),
                 NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernMain", mode="sunday"), priority=240, label="sunday_hall"),
                 NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernKitchen", mode="sunday"), priority=240, label="sunday_kitchen"),
-                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[4], awake=False, talkable=False, priority=10, label="sleep"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
             ],
         )
         npc_schedule_sync_currentloc(GirlName)

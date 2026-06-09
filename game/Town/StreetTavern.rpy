@@ -136,8 +136,6 @@ label StreetTavern:
         if dog_is_here("StreetTavern"):
             CurLocDesc += "\n\nНеподалеку от входа крутится бродячий пес, время от времени принюхиваясь к прохожим."
         MainTxt = CurLocDesc
-        if dog_is_here("StreetTavern"):
-            current_action_items.append(MenuItem(dog_display_name(), Function(main_ui_call_label, "IntDogTalk", "StreetTavern")))
         for _street_exit in StreetTavernRoom.visible_exits():
             current_action_items.append(MenuItem(_street_exit.label, Jump(_street_exit.target)))
     $ StreetTavernRoom.mark_visited()

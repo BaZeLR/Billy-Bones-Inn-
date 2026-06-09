@@ -98,7 +98,7 @@ label NextDay_TavernDaily():
         TotalDay['happy'] += CurDay['happy']
         TotalDay['loyalty'] += CurDay['loyalty']
         if week == 7:
-            TotalDay['KidsMoney'] += 15 * KidsPosobie
+            TotalDay['KidsMoney'] += player_state().economy.weekly_child_support_money()
         if MyStallion:
             TotalDay['HorseFood'] += 3
         if MongolVar['WillTryToSteal']:

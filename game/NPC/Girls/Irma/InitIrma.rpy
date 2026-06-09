@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     def irma_pick_image_path(*candidates):
@@ -7,53 +7,24 @@ init python:
             path = str(candidate or "").strip()
             if path and renpy.loadable(path):
                 return path
-        return "images/irma/portraits/portrait1.jpg"
+        return "images/irma/portraits/portrait3.png"
 
     def irma_default_portrait_path():
-        return irma_pick_image_path(
-            "images/irma/portraits/portrait1.png",
-            "images/irma/portraits/portrait1.jpg",
-            "images/irma/Irma_portrait.png",
-        )
+        return "images/irma/portraits/portrait2.png"
 
     def irma_card_portrait_path():
         if int(Friends.get("irma", 0) or 0) >= 5:
-            return irma_pick_image_path(
-                "images/irma/portraits/portrait2.png",
-                "images/irma/portraits/portrait2.jpg",
-                "images/irma/portraits/portrait3.png",
-                "images/irma/Irma_sitting _portrait.png",
-                "images/irma/Irma_portrait.png",
-            )
+            return "images/irma/portraits/flirts.png"
         return irma_default_portrait_path()
 
     def irma_working_picture_path():
-        return irma_pick_image_path(
-            "images/irma/portraits/portrait1.png",
-            "images/irma/portraits/portrait1.jpg",
-            "images/irma/talks.png",
-            "images/irma/Irma_working_portrait.png",
-            "images/irma/Irma_portrait.png",
-        )
+        return "images/irma/portraits/portrait3.png"
 
     def irma_talk_picture_path():
-        return irma_pick_image_path(
-            "images/irma/talks.png",
-            "images/irma/Irma_talks.png",
-            "images/irma/Irma_portrait.png",
-            "images/irma/portraits/portrait1.png",
-            "images/irma/portraits/portrait1.jpg",
-        )
+        return "images/irma/talks.png"
 
     def irma_measuring_picture_path():
-        return irma_pick_image_path(
-            "images/irma/measure/measure0.png",
-            "images/irma/Irma_mesure_standing.png",
-            "images/irma/irma_measuring.png",
-            "images/irma/Irma_working_portrait.png",
-            "images/irma/portraits/portrait1.png",
-            "images/irma/portraits/portrait1.jpg",
-        )
+        return "images/irma/measure/measure0.png"
 
     def irma_measure_picture_path(stage=0):
         try:
@@ -61,22 +32,16 @@ init python:
         except Exception:
             stage_id = 0
         stage_id = max(0, min(stage_id, 3))
-        return irma_pick_image_path(
-            "images/irma/measure/measure" + str(stage_id) + ".png",
-            "images/irma/measure/measure" + str(stage_id) + ".jpg",
-            "images/irma/tailor_measures_" + str(stage_id) + ".jpg",
-            irma_measuring_picture_path(),
-        )
+        measure_paths = [
+            "images/irma/measure/measure0.png",
+            "images/irma/measure/measure1.png",
+            "images/irma/measure/measure2.jpg",
+            "images/irma/measure/measure3.jpg",
+        ]
+        return measure_paths[stage_id]
 
     def irma_flirting_picture_path():
-        return irma_pick_image_path(
-            "images/irma/flirts.png",
-            "images/irma/Irma_flirting pose.png",
-            "images/irma/talks.png",
-            "images/irma/Irma_talks.png",
-            "images/irma/portraits/smile.jpg",
-            "images/irma/portraits/portrait2.jpg",
-        )
+        return "images/irma/flirts.png"
 
     def irma_sex_picture_path(stage=0):
         try:
@@ -87,7 +52,6 @@ init python:
             "images/irma/sex/sex" + str(stage_id) + ".png",
             "images/irma/sex/sex" + str(stage_id) + ".jpg",
             "images/irma/sex/topless.jpg",
-            irma_flirting_picture_path(),
         )
 
     def irma_clara_fitting_picture_path(stage=0):
@@ -95,31 +59,19 @@ init python:
             stage_id = int(stage or 0)
         except Exception:
             stage_id = 0
-        return irma_pick_image_path(
-            "images/irma/clara_visit/tailorShop_clara" + ("_" + str(stage_id) if stage_id > 0 else "") + ".png",
-            "images/irma/clara_visit/tailor_shop_clara_" + str(stage_id) + ".png",
+        clara_paths = [
             "images/irma/clara_visit/tailorShop_clara.png",
             "images/irma/clara_visit/tailorShop_clara_1.png",
-            irma_working_picture_path(),
-        )
+            "images/irma/clara_visit/tailor_shop_clara_2.png",
+            "images/irma/clara_visit/tailor_shop_clara_3.png",
+        ]
+        return clara_paths[max(0, min(stage_id, len(clara_paths) - 1))]
 
     def irma_shop_end_picture_path():
-        return irma_pick_image_path(
-            "images/irma/flirts.png",
-            "images/irma/talks.png",
-            "images/irma/portraits/smile.jpg",
-            "images/irma/portraits/portrait2.png",
-            irma_working_picture_path(),
-        )
+        return "images/irma/portraits/portrait2.png"
 
     def irma_angry_picture_path():
-        return irma_pick_image_path(
-            "images/irma/portraits/angry.jpg",
-            "images/irma/talks.png",
-            "images/irma/Irma_talks.png",
-            "images/irma/Irma_portrait.png",
-            "images/irma/portraits/portrait1.jpg",
-        )
+        return "images/irma/portraits/portrait1.png"
 
 label InitIrma:
     python:
@@ -131,7 +83,6 @@ label InitIrma:
         RealName2[GirlName] = 'Ирмы'
         RealName3[GirlName] = 'Ирме'
         age_girls[GirlName] = 22
-        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 0
         beauty[GirlName] = 65
         sluttiness[GirlName] = 45
@@ -183,3 +134,25 @@ label InitIrma:
         npc_schedule_sync_currentloc(GirlName)
 
     return
+
+# Auto-attach .var for PeopleInfo consistency (requested)
+init python:
+    if 'peopleInfo' not in dir() or not isinstance(peopleInfo, dict):
+        peopleInfo = {}
+    # Per user request: class Irma(Girl) defined in game/NPC/Girls/Irma/InitIrma.rpy
+    if 'irma' not in peopleInfo or not isinstance(peopleInfo.get('irma'), Irma):
+        class Irma(Girl):
+            """Irma."""
+            def __init__(self, name="irma", **kwargs):
+                super().__init__(name, **kwargs)
+                if 'IrmaVar' in dir() and isinstance(IrmaVar, dict):
+                    self.var = IrmaVar
+                    self.promote_from_var(IrmaVar)
+        peopleInfo['irma'] = Irma(var=IrmaVar if 'IrmaVar' in dir() else {})
+    else:
+        if 'IrmaVar' in dir() and isinstance(IrmaVar, dict):
+            peopleInfo['irma'].var = IrmaVar
+    if 'girls' not in dir() or not isinstance(girls, list):
+        girls = []
+    if peopleInfo.get('irma') not in girls:
+        girls.append(peopleInfo['irma'])

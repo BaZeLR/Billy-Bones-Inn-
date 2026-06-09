@@ -1,4 +1,39 @@
-FIX MAP — ACTION HUB + ACTION EXECUTION REFACTOR
+SUPERSEDED ROADMAP — DO NOT USE AS CURRENT ARCHITECTURE
+
+This file is preserved as historical audit evidence only.
+
+The current architecture decision is documented in:
+- devdocs/ARCHITECTURE.md
+- devdocs/ACTION_ITEM_STANDARD.md
+- devdocs/STORY_LABEL_EVENT_FLOW_STANDARD.md
+- devdocs/LOCATION_LOCATE_TALK_RESET_STANDARD.md
+- devdocs/CURRENT_ARCHITECTURE_AUDIT_AND_RESCUE_PLAN_2026-06-06.md
+
+The plan below recommended consolidating wrappers into cleaner wrappers:
+- one generic entity-action router;
+- central post-action UI updater;
+- room refresh dispatch tables;
+- generic apply labels;
+- shared social dispatcher helpers.
+
+That direction is now rejected.
+
+Current target:
+- real room entry labels;
+- real object menus and object action labels;
+- basic actions as direct Ren'Py labels;
+- NPC talk/flirt/gift as event-like `Int<Npc>Talk` label choices;
+- story/sex events as authored labels with visible classic menu choices;
+- direct state mutation at the chosen branch/action point;
+- small helpers only for real reusable calculations or established consequence labels;
+- no refresh/apply/renew/rebuild labels;
+- no dispatcher layers for one action;
+- no Python methods duplicating simple Ren'Py labels;
+- no recursive menu loops.
+
+Use the old notes below only to find existing duplicate symbols and bloat, not as a migration target.
+
+OLD FIX MAP — ACTION HUB + ACTION EXECUTION REFACTOR
 
 ==================================================
 A) FILE 1 — NPC / ENTITY ACTION HUB

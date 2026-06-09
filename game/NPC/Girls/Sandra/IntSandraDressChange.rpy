@@ -1,6 +1,7 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+
 init python:
     def sandra_dress_change_can_buy(girl_name="sandra"):
         girl = str(girl_name or "sandra")
@@ -13,42 +14,26 @@ init python:
         )
 
 
-label IntSandraDressChange(GirlNameIST="sandra"):
+label IntSandraOfferBuyDress(GirlNameIST="sandra"):
+    $ GirlNameIST = str(GirlNameIST or "sandra")
     $ current_action_title = "Одежда Сандры"
     $ current_action_content = None
-    call IntSandraDressChangeRefresh(GirlNameIST)
-    return
-
-
-label IntSandraDressChangeRefresh(GirlNameIST="sandra"):
-    $ current_action_title = "Одежда Сандры"
-    $ current_action_content = None
-    $ current_action_items = []
-
-    if sandra_dress_change_can_buy(GirlNameIST):
-        $ current_action_items.append(MenuItem("Предложить купить Сандре обновку", Call("IntSandraDressChangeApply", GirlNameIST, "buy_dress")))
-
-    $ current_action_items.append(MenuItem("Назад", Call("IntSandraTalkRefresh", GirlNameIST)))
-    return
-
-
-label IntSandraDressChangeApply(GirlNameIST="sandra", choice_code=""):
-    if str(choice_code or "") != "buy_dress":
-        call IntSandraDressChangeRefresh(GirlNameIST)
-        return
 
     if not sandra_dress_change_can_buy(GirlNameIST):
-        call IntSandraTalkRefresh(GirlNameIST)
+        $ MainTxt = "Сандра сейчас не готова обсуждать покупку нового наряда."
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [
+            MenuItem("Вернуться к разговору", Function(main_ui_call_label, "IntSandraTalk", GirlNameIST)),
+            MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
+        ]
         return
 
     $ MainTxt = "\"Сандра, дорогая, я хочу тебе что-нибудь подарить! Ты у меня такая замечательная! Давай я тебе какой-нибудь наряд подарю! Хочешь?\" - порадовали вы Сандру.\n\n\"Какой ты у меня хороший, Стефан! Не могу на тебя нарадоваться!\" засмеялась Сандра. \"Конечно хочу!\"\n\n\"Ну давай тогда завтра, с утра пораньше, встретимся у Ирмы Фараго, я буду тебя там ждать, вместе и выберем!\" заверили вы ее."
     $ DailyEventsList_Add(GirlNameIST, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy")
-    $ Talked[GirlNameIST] = Talked.get(GirlNameIST, 0) + 1
+    $ Talked[GirlNameIST] = int(Talked.get(GirlNameIST, 0) or 0) + 1
     $ CurLocDesc = MainTxt
-    call IntSandraTalkRefresh(GirlNameIST)
-    return
-
-
-label int_sandra_dress_change():
-    call IntSandraDressChange("sandra")
+    $ current_action_items = [
+        MenuItem("Вернуться к разговору", Function(main_ui_call_label, "IntSandraTalk", GirlNameIST)),
+        MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
+    ]
     return

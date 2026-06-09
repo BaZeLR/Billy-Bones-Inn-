@@ -133,6 +133,7 @@ label EllonaTemple:
     $ CurrentRoom = EllonaTempleRoom
     $ CurLoc = "EllonaTemple"
     $ location = CurLoc
+    $ notoriety = max(0, int(notoriety or 0) // 2)
     $ CurrentLoc["fran"] = "EllonaTemple"
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:

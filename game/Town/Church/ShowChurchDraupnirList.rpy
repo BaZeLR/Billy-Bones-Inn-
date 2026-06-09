@@ -16,7 +16,7 @@ label ShowChurchDraupnirList:
     if ChurchDonatedToday > 0:
         $ MainTxt = MainTxt + "\n\nВы сегодня уже сделали пожертвование святой церкви и на душе у вас благостно и возвышенно, а карманы малость полегчали."
     $ CurLocDesc = MainTxt
-    call ShowImage("general", "", "LocChurchIspoved1")
+    vscene "images/church/confessionEntry.png"
     $ current_action_title = "Листок на столике"
     $ current_action_content = None
     $ current_action_items = []
@@ -26,7 +26,7 @@ label ShowChurchDraupnirList:
             if money > ChurchRepairCost[IList] and ChurchDonatedToday == 0 and ChurchDonated[IList] == 0 and SawDraupnirChurchList > 0:
                 current_action_items.append(MenuItem("Пожертвовать {} мараведи на {}".format(ChurchRepairCost[IList], ChurchRepairDonat[IList]), Function(main_ui_call_label, "ChurchDonate", IList)))
 
-    $ current_action_items.append(MenuItem("Назад", Function(main_ui_call_label, "ChurchRestore")))
+    $ current_action_items.append(MenuItem("Назад", Jump("Church")))
     $ renpy.restart_interaction()
     return
 
@@ -38,6 +38,7 @@ label ChurchDonate(donation_idx=0):
     $ ChurchDonatedToday = 1
     $ ChurchDonatedAmount += cost
     $ money -= cost
+    $ notoriety = 0
 
     $ MainTxt = "Решив, что грех будет не помочь святому отцу, вы полезли в кошелек и с радостным сердцем отсчитали {} мараведи.\n\n\"Вот, святой отец,\" сказали вы, \"жертвую на {}\"".format(cost, ChurchRepairDonat[idx])
     if cost < 100:
@@ -49,5 +50,5 @@ label ChurchDonate(donation_idx=0):
     call stat
     $ current_action_title = "Пожертвование"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Вернуться в собор", Function(main_ui_call_label, "ChurchRestore"))]
+    $ current_action_items = [MenuItem("Вернуться в собор", Jump("Church"))]
     return

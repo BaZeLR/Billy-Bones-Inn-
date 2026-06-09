@@ -127,10 +127,10 @@ init python:
 
     def melissa_room_problem_available():
         try:
-            melissa_sync_room_problem_state()
+            Melissa.sync_room_problem_state()
         except Exception:
             pass
-        stage = melissa_bats_stage()
+        stage = Melissa.bats_stage()
         temp_room = str(MelissaVar.get("temp_room", "") or "").strip()
         return (
             str(CurLoc or "") == "TavernMelissaRoom"
@@ -147,13 +147,13 @@ init python:
 
     def melissa_temp_room_text():
         try:
-            melissa_sync_room_problem_state()
+            Melissa.sync_room_problem_state()
         except Exception:
             pass
         temp_room = str(MelissaVar.get("temp_room", "") or "")
         repair_day = int(MelissaVar.get("roof_repair_complete_day", -1) or -1)
         waiting_for_repair = repair_day >= 0
-        if temp_room == "" or melissa_bats_stage() >= 8:
+        if temp_room == "" or Melissa.bats_stage() >= 8:
             return ""
         if temp_room == "TavernMyRoom":
             if waiting_for_repair:
@@ -311,10 +311,17 @@ init python:
         return ("", "")
 
     def melissa_revealing_dress_request_ready():
+        # Respect classes: girls are objects now. Use .var (which holds the story flags dict)
+        # Fall back to legacy bare global only for compatibility.
+        sandra_info = peopleInfo.get("sandra") if 'peopleInfo' in dir() else None
+        sandra_dict = sandra_info.var if sandra_info and hasattr(sandra_info, "var") and isinstance(sandra_info.var, dict) else (SandraVar if 'SandraVar' in dir() else {})
+        melissa_info = peopleInfo.get("melissa") if 'peopleInfo' in dir() else None
+        melissa_dict = melissa_info.var if melissa_info and hasattr(melissa_info, "var") and isinstance(melissa_info.var, dict) else (MelissaVar if 'MelissaVar' in dir() else {})
+
         return (
-            int(SandraVar.get("revealing_dress_ordered", 0) or 0) == 1
-            and int(MelissaVar.get("revealing_dress_ordered", 0) or 0) == 0
-            and int(MelissaVar.get("revealing_dress_request_seen", 0) or 0) == 0
+            int(sandra_dict.get("revealing_dress_ordered", 0) or 0) == 1
+            and int(melissa_dict.get("revealing_dress_ordered", 0) or 0) == 0
+            and int(melissa_dict.get("revealing_dress_request_seen", 0) or 0) == 0
             and CheckDailyEventExists("", "BuyDressTom", "") == 0
             and CheckDailyEventExists("melissa", "BuyDress", "") == 0
             and int(Friends.get("melissa", 0) or 0) >= 6
@@ -322,11 +329,20 @@ init python:
         )
 
     def amanda_revealing_dress_request_ready():
+        # Respect classes: girls are objects now. Use .var (which holds the story flags dict)
+        # Fall back to legacy bare global only for compatibility.
+        sandra_info = peopleInfo.get("sandra") if 'peopleInfo' in dir() else None
+        sandra_dict = sandra_info.var if sandra_info and hasattr(sandra_info, "var") and isinstance(sandra_info.var, dict) else (SandraVar if 'SandraVar' in dir() else {})
+        melissa_info = peopleInfo.get("melissa") if 'peopleInfo' in dir() else None
+        melissa_dict = melissa_info.var if melissa_info and hasattr(melissa_info, "var") and isinstance(melissa_info.var, dict) else (MelissaVar if 'MelissaVar' in dir() else {})
+        amanda_info = peopleInfo.get("amanda") if 'peopleInfo' in dir() else None
+        amanda_dict = amanda_info.var if amanda_info and hasattr(amanda_info, "var") and isinstance(amanda_info.var, dict) else (AmandaVar if 'AmandaVar' in dir() else {})
+
         return (
-            int(SandraVar.get("revealing_dress_ordered", 0) or 0) == 1
-            and int(MelissaVar.get("revealing_dress_ordered", 0) or 0) == 1
-            and int(AmandaVar.get("revealing_dress_ordered", 0) or 0) == 0
-            and int(AmandaVar.get("revealing_dress_request_seen", 0) or 0) == 0
+            int(sandra_dict.get("revealing_dress_ordered", 0) or 0) == 1
+            and int(melissa_dict.get("revealing_dress_ordered", 0) or 0) == 1
+            and int(amanda_dict.get("revealing_dress_ordered", 0) or 0) == 0
+            and int(amanda_dict.get("revealing_dress_request_seen", 0) or 0) == 0
             and CheckDailyEventExists("", "BuyDressTom", "") == 0
             and CheckDailyEventExists("amanda", "BuyDress", "") == 0
             and int(Friends.get("amanda", 0) or 0) >= 5
@@ -630,7 +646,7 @@ label MelissaRoomPestsEvent:
 
 
 label MelissaRoomPestsChoice(help_pests=0):
-    $ _melissa_bats_active = melissa_bats_stage() > 0 and melissa_bats_stage() < 8
+    $ _melissa_bats_active = Melissa.bats_stage() > 0 and Melissa.bats_stage() < 8
     if int(help_pests or 0) == 1:
         if _melissa_bats_active:
             $ MelissaVar["room_pests_last_help_day"] = int(dayspassed or 0)
@@ -639,7 +655,7 @@ label MelissaRoomPestsChoice(help_pests=0):
             $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
             $ MainTxt = "Вы быстро выметаете свежую паутину и наводите в комнате хоть какой-то порядок, но сразу понимаете, что настоящая беда никуда не делась. Под крышей по-прежнему шуршит и скребется вся та дрянь, с которой придется разбираться уже через чердак и щели под кровлей."
         else:
-            $ melissa_apply_bats_completion_rewards()
+            $ Melissa.complete_bats_problem()
             $ MelissaVar["room_pests_last_help_day"] = int(dayspassed or 0)
             $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
             $ cleaning["melissa"] = min(100, int(cleaning.get("melissa", 0) or 0) + 1)
@@ -697,7 +713,7 @@ label HouseholdAmandaFakeSicknessWake:
     if household_morning_issue_type("amanda") != "sick":
         call HouseholdReturnCurrentRoom
         return
-    $ calendar_advance_minutes(15)
+    $ calendar_v2.advance_minutes(15)
     if int(Friends.get("amanda", 0) or 0) >= 6 or int(Talked.get("amanda", 0) or 0) >= 2:
         $ household_clear_morning_issue("amanda")
         $ MainTxt = "Вы не спорите у двери, а спокойно садитесь рядом и просите Аманду хотя бы раз сказать честно, плохо ей или просто не хочется вставать. Она сперва обиженно сопит, потом все же сдается: \"Ладно... больше лени, чем болезни.\" Через несколько минут она уже нехотя натягивает платье и обещает выйти к общему столу."
@@ -719,7 +735,7 @@ label HouseholdWakeSleepyGirl(girl_name=""):
         return
     $ _wake_indecent = household_morning_issue_indecent(_wake_girl)
     $ _wake_bulge = 1 if _wake_indecent and player_has_visible_morning_bulge() else 0
-    $ calendar_advance_minutes(20)
+    $ calendar_v2.advance_minutes(20)
     $ household_clear_morning_issue(_wake_girl)
     $ Friends[_wake_girl] = min(20, int(Friends.get(_wake_girl, 0) or 0) + 1)
     if _wake_girl == "sandra":
@@ -777,12 +793,12 @@ label MelissaNightWakeEvent:
 label MelissaNightWakeChoice(choice_value=0):
     $ _melissa_night_choice = int(choice_value or 0)
     if _melissa_night_choice == 1:
-        $ calendar_advance_minutes(20)
+        $ calendar_v2.advance_minutes(20)
         $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
         $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
         $ MainTxt = "Вы поднимаетесь вместе с Мелиссой, быстро прогоняете ночную дрянь из ее комнаты и помогаете ей успокоиться. На прощание она благодарит вас уже куда мягче обычного: видно, что такая помощь ей важна."
     elif _melissa_night_choice == 2:
-        $ calendar_advance_minutes(30)
+        $ calendar_v2.advance_minutes(30)
         $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
         $ otkroven["melissa"] = min(20, int(otkroven.get("melissa", 0) or 0) + 1)
         $ sluttiness["melissa"] = min(100, int(sluttiness.get("melissa", 0) or 0) + 2)

@@ -1,0 +1,35 @@
+{
+  "npc_id": "irma",
+  "entries": [
+    {
+      "label": "tailor_shop",
+      "weekdays": [1, 2, 3, 4, 5, 6],
+      "start": "06:00",
+      "end": "12:59",
+      "location": "DressShop",
+      "awake": true,
+      "talkable": true,
+      "priority": 600
+    },
+    {
+      "label": "tailor_backroom",
+      "weekdays": [1, 2, 3, 4, 5, 6],
+      "start": "13:00",
+      "end": "22:59",
+      "location": "DressShop",
+      "awake": true,
+      "talkable": false,
+      "priority": 500
+    },
+    {
+      "label": "home",
+      "weekdays": [7],
+      "start": "00:00",
+      "end": "23:59",
+      "location": "DressShop",
+      "awake": false,
+      "talkable": false,
+      "priority": 100
+    }
+  ]
+}

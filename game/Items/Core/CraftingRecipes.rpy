@@ -89,12 +89,9 @@ init 4 python:
 
     def recipe_book_bat_thread_started():
         try:
-            return int(melissa_bats_stage() or 0) >= 1
+            return int(Melissa.bats_stage() or 0) >= 1
         except Exception:
-            try:
-                return int(MelissaVar.get("bats_episode", 0) or 0) >= 1
-            except Exception:
-                return False
+            return False
 
     def recipe_book_can_notice_hidden_note():
         return (
@@ -559,9 +556,7 @@ label RecipeBookRevealHiddenRecipes(where_id="", object_id="", return_context="b
         $ RecipeBookHiddenRecipesRevealed = 1
         $ RecipeBookSelectedId = "bat_repellent_recipe"
         $ MainTxt = "Вы держите пергамент над ровным теплом, пока старые волокна не начинают едва темнеть, потом смачиваете край тряпки вином и осторожно проводите по полям. Через несколько минут под выцветшей желтизной проступают новые строки.\n\nАвтор прятал часть записей намеренно. Среди них есть дымная смесь из сухого мха, лаванды и резких трав - как раз то, чем можно выкурить летучих тварей из-под крыши."
-        python:
-            if isinstance(MelissaVar, dict):
-                MelissaVar["bat_recipe_unlocked"] = 1
+        $ Melissa.var["bat_recipe_unlocked"] = 1
     $ CurLocDesc = MainTxt
     if str(return_context or "") == "table":
         $ current_action_title = "Книга рецептов"

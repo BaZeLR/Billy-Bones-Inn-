@@ -9,23 +9,37 @@ init python:
             return str(item_obj.custom_properties.get("dress_code", "") or "")
         return str(getattr(item_obj, "code_name", "") or "")
 
+    def dress_shop_item_depreciated(item_obj):
+        dress_code = dress_shop_item_code(item_obj)
+        if not dress_code:
+            return False
+        if not player_state().appearance.has_dress(dress_code):
+            return False
+        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
+            return False
+        return int(player_dress_condition_from_age(player_current_dress_age_days(dress_code)) or 0) <= 0
+
     def dress_shop_can_buy_item(item_obj):
         dress_code = dress_shop_item_code(item_obj)
         item_price = int(getattr(item_obj, "price", 0) or 0)
-        return bool(dress_code) and item_price <= int(money or 0) and dress_code not in list(MyDresses or [])
+        if str(DressProduced or "") != "":
+            return False
+        if not bool(dress_code) or item_price > int(money or 0):
+            return False
+        return not player_state().appearance.has_dress(dress_code) or dress_shop_item_depreciated(item_obj)
 
     def dress_shop_item_owned(item_obj):
         dress_code = dress_shop_item_code(item_obj)
-        return bool(dress_code) and dress_code in list(MyDresses or [])
+        return bool(dress_code) and player_state().appearance.has_dress(dress_code) and not dress_shop_item_depreciated(item_obj)
 
-    def dress_shop_build_dress_item(dress_code, female_rack=False):
+    def dress_shop_prepare_dress_item(dress_code, female_rack=False):
         dress_id = str(dress_code or "").strip()
         if not dress_id:
             return None
 
-        short_name = str(_gds_get_dict("ShortDressName").get(dress_id, dress_id)).strip()
-        full_desc = str(_gds_get_dict("FullDressDesc").get(dress_id, dress_id)).strip()
-        price = _gds_dress_cost(dress_id)
+        item_obj = get_game_item("dress_" + dress_id)
+        if item_obj is None:
+            return None
 
         actions = []
         if female_rack:
@@ -34,7 +48,7 @@ init python:
                     action_id="female_dress_info_" + dress_id,
                     label="Спросить Ирму о платье",
                     hook="text",
-                    target="Ирма говорит, что это " + short_name.lower() + ", и обойдется оно в " + str(price) + " мараведи.",
+                    target="Ирма говорит, что это " + str(getattr(item_obj, "name", dress_id) or dress_id).lower() + ", и обойдется оно в " + str(int(getattr(item_obj, "price", 0) or 0)) + " мараведи.",
                 )
             )
         else:
@@ -58,46 +72,31 @@ init python:
                 )
             )
 
-        return GameObject(
-            object_id="dress_" + dress_id,
-            name=short_name,
-            description=full_desc,
-            actions=actions,
-            picture="",
-            price=price,
-            carriable=True,
-            wearable=True,
-            stackable=False,
-            custom_properties={
-                "dress_code": dress_id,
-                "female_rack": bool(female_rack),
-                "wear_target": "female" if female_rack else "player",
-            },
-        )
+        item_obj.actions = actions
+        item_obj.custom_properties["female_rack"] = bool(female_rack)
+        item_obj.custom_properties["wear_target"] = "female" if female_rack else "player"
+        return item_obj
 
     def dress_shop_rack_items(rack_type):
+        if "ensure_game_item_registry" in globals():
+            ensure_game_item_registry()
         items = []
         if str(rack_type or "") == "female":
-            for dress_code in list(_gds_get_list("FemaleDressCodes")):
-                code = str(dress_code or "").strip()
-                if not code or code == "nightshirt":
+            for item_id in list(womenDress or []):
+                item_obj = get_game_item(item_id)
+                code = dress_shop_item_code(item_obj)
+                if not item_obj or not code or code == "nightshirt":
                     continue
-                dress_item = dress_shop_build_dress_item(code, True)
+                dress_item = dress_shop_prepare_dress_item(code, True)
                 if dress_item is not None:
                     items.append(dress_item)
         else:
-            for dress_code in list(_gds_get_list("MaleDressCodes")):
-                code = str(dress_code or "").strip()
+            for item_id in list(menDress or []):
+                item_obj = get_game_item(item_id)
+                code = dress_shop_item_code(item_obj)
                 if not code:
                     continue
-                dress_item = dress_shop_build_dress_item(code, False)
+                dress_item = dress_shop_prepare_dress_item(code, False)
                 if dress_item is not None:
                     items.append(dress_item)
         return items
-
-    def dress_shop_get_item(item_id, female_rack=False):
-        target_id = str(item_id or "").strip()
-        for dress_item in dress_shop_rack_items("female" if female_rack else "male"):
-            if getattr(dress_item, "object_id", "") == target_id:
-                return dress_item
-        return None

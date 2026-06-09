@@ -59,13 +59,6 @@ init python:
                 target="Clean",
                 args=("ashes", "TavernKitchen", "", "hearth_001"),
             ),
-            ObjectAction(
-                action_id="examine_hearth",
-                label="Осмотреть очаг",
-                hook="call",
-                target="Examine",
-                args=("hearth_001", "TavernKitchen", "Большой очаг, на котором готовят пищу. Он может долго держать жар.", "hearth_001"),
-            ),
         ],
         state={"fire_started_minute": 0, "fire_until_minute": 0, "fire_units": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0},
         carriable=False,

@@ -59,13 +59,6 @@ init python:
                 target="Clean",
                 args=("ashes", "TavernMain", "", "fireplace_001"),
             ),
-            ObjectAction(
-                action_id="examine_fireplace",
-                label="Осмотреть камин",
-                hook="call",
-                target="Examine",
-                args=("fireplace_001", "TavernMain", "Старый, но добротный камин. Без него в зале было бы куда менее уютно.", "fireplace_001"),
-            ),
         ],
         state={"fire_started_minute": 0, "fire_until_minute": 0, "fire_units": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0},
         carriable=False,

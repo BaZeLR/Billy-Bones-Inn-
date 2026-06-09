@@ -527,7 +527,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                 $ AmandaVar["kickyoufromroom"] = 1
                 call ShowCurrentSex(GirlNameASDS)
                 call DressUp(GirlNameASDS)
-                $ calendar_advance_slots(1)
+                $ calendar_v2.advance_minutes(60)
                 $ SomebodyCums = 0
                 jump TavernMain
 

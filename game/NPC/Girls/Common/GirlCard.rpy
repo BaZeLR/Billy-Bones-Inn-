@@ -136,12 +136,22 @@ init python:
         key = girl_card_resolved_key(girl_name)
         key_l = str(key or "").lower()
 
+        card_candidates = [
+            "images/%s/%s_card.jpg" % (key_l, key_l),
+            "images/%s/%s_card.png" % (key_l, key_l),
+            "images/%s/card.jpg" % key_l,
+            "images/%s/card.png" % key_l,
+        ]
+        for card_path in card_candidates:
+            if renpy.loadable(card_path):
+                return card_path
+
         if key_l == "sandra":
-            return "images/sandra/sandra_0.png"
+            return "images/sandra/sandra_card.jpg" if renpy.loadable("images/sandra/sandra_card.jpg") else "images/sandra/sandra_0.png"
         if key_l == "melissa":
-            return "images/melissa/tavern/melissa_portrait.png"
+            return "images/melissa/melissa_card.jpg" if renpy.loadable("images/melissa/melissa_card.jpg") else "images/melissa/tavern/melissa_portrait.png"
         if key_l == "amanda":
-            return "images/amanda/amanda_portrait.jpg"
+            return "images/amanda/amanda_card.jpg" if renpy.loadable("images/amanda/amanda_card.jpg") else "images/amanda/amanda_portrait.jpg"
         if key_l == "becky":
             return "images/becky/portraits/portrait_1.png"
         if key_l == "georgett":
@@ -163,13 +173,50 @@ init python:
 
     def girl_card_stat_rows(girl_name):
         key = girl_card_resolved_key(girl_name)
+        info = None
+        try:
+            info = peopleInfo.get(key, None)
+        except Exception:
+            info = None
+        if info is None:
+            info = getPersonInfo(key)
+        data = getPersonData(key)
+        info_stats = getattr(info, "stats", {}) if info is not None else {}
+        info_skills = getattr(info, "skills", {}) if info is not None else {}
+        if not isinstance(info_stats, dict):
+            info_stats = {}
+        if not isinstance(info_skills, dict):
+            info_skills = {}
+        current_location = ""
+        known_value = False
+        if info is not None:
+            try:
+                current_location = str(info.getLocation() or "")
+            except Exception:
+                current_location = str(getattr(info, "location", "") or "")
+            known_value = bool(getattr(info, "known", False))
+        if not current_location:
+            try:
+                current_location = str(getLocation(key) or "")
+            except Exception:
+                current_location = str(CurrentLoc.get(key, "") or "")
+        age_value = getattr(info, "age", None) if info is not None else None
+        if age_value is None or int(age_value or 0) <= 0:
+            age_value = getattr(data, "age", 0) if data is not None else _girls_desc_stat_value(key, "age_girls", "age", default=0)
         rows = [
-            ("Возраст", str(_girls_desc_stat_value(key, "age_girls", "age", default=0))),
-            ("Дружба", str(_girls_desc_stat_value(key, "Friends", "friends", default=0))),
-            ("Распущенность", str(_girls_desc_stat_value(key, "sluttiness", default=0))),
-            ("Кухня", str(_girls_desc_stat_value(key, "cooking", default=0))),
-            ("Уборка", str(_girls_desc_stat_value(key, "cleaning", default=0))),
-            ("Зал", str(_girls_desc_stat_value(key, "waitress", default=0))),
+            ("Локация", current_location),
+            ("Знакома", "да" if known_value else "нет"),
+            ("Возраст", str(age_value)),
+            ("Дружба", str(getattr(info, "rel", _girls_desc_stat_value(key, "Friends", "friends", default=0)) if info is not None else _girls_desc_stat_value(key, "Friends", "friends", default=0))),
+            ("Откровенность", str(getattr(info, "openness", _girls_desc_stat_value(key, "otkroven", default=0)) if info is not None else _girls_desc_stat_value(key, "otkroven", default=0))),
+            ("Распущенность", str(getattr(info, "corruption", _girls_desc_stat_value(key, "sluttiness", default=0)) if info is not None else _girls_desc_stat_value(key, "sluttiness", default=0))),
+            ("Красота", str(info_stats.get("beauty", _girls_desc_stat_value(key, "beauty", default=0)))),
+            ("Дети", str(info_stats.get("kids", _girls_desc_stat_value(key, "kids", default=0)))),
+            ("Беременность", str(info_stats.get("pregnancy", _girls_desc_stat_value(key, "pregnancy", default=0)))),
+            ("Секс", str(info_stats.get("sexacts", _girls_desc_stat_value(key, "sexacts", default=0)))),
+            ("Кухня", str(info_skills.get("cooking", _girls_desc_stat_value(key, "cooking", default=0)))),
+            ("Уборка", str(info_skills.get("cleaning", _girls_desc_stat_value(key, "cleaning", default=0)))),
+            ("Зал", str(info_skills.get("waitress", _girls_desc_stat_value(key, "waitress", default=0)))),
         ]
         try:
             status_line = relationship_card_status_line(key)

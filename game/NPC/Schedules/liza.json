@@ -1,0 +1,72 @@
+{
+  "npc_id": "liza",
+  "entries": [
+    {
+      "label": "sunday_mass_with_georgett",
+      "weekdays": [7],
+      "start": "06:00",
+      "end": "07:59",
+      "location": "Church",
+      "awake": true,
+      "talkable": true,
+      "priority": 820,
+      "condition": {
+        "rule": "liza_church_with_georgett_visible"
+      }
+    },
+    {
+      "label": "sunday_after_mass_with_georgett",
+      "weekdays": [7],
+      "start": "11:00",
+      "end": "12:59",
+      "location": "Church",
+      "awake": true,
+      "talkable": false,
+      "priority": 810,
+      "condition": {
+        "rule": "liza_church_with_georgett_visible"
+      }
+    },
+    {
+      "label": "tavern_whore_shift",
+      "weekdays": [1, 2, 3, 4, 6],
+      "start": "12:00",
+      "end": "22:30",
+      "location": "TavernMain",
+      "awake": true,
+      "talkable": true,
+      "priority": 760,
+      "condition": {
+        "rule": "tavern_whore_work_active",
+        "person": "liza"
+      }
+    },
+    {
+      "label": "friday_tavern_whore_shift_before_dance",
+      "weekdays": [5],
+      "start": "12:00",
+      "end": "18:59",
+      "location": "TavernMain",
+      "awake": true,
+      "talkable": true,
+      "priority": 760,
+      "condition": {
+        "rule": "tavern_whore_work_active",
+        "person": "liza"
+      }
+    },
+    {
+      "label": "portstreets_work",
+      "weekdays": [1, 2, 3, 4, 6],
+      "start": "19:00",
+      "end": "22:30",
+      "location": "PortStreets",
+      "awake": true,
+      "talkable": true,
+      "priority": 700,
+      "condition": {
+        "rule": "liza_portstreets_work_active"
+      }
+    }
+  ]
+}

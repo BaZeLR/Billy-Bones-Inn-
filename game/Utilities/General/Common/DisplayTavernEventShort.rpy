@@ -28,26 +28,7 @@ init python:
         return True
 
     def tavern_event_pop_code(time_period, require_room_match=False, room_code=""):
-        EventsCount = _dtes_events_count()
-        NewEvents = _dtes_new_events()
-        tp = _dtes_i(time_period, 0)
-
-        mandatory_count = _dtes_i(EventsCount.get(10, 0), 0)
-        if mandatory_count > 0:
-            event_idx = mandatory_count - 1
-            event_code = str(NewEvents.get("10_" + str(event_idx), "") or "")
-            if (not require_room_match) or _dtes_mandatory_event_allowed(event_code, room_code):
-                EventsCount[10] = event_idx
-                return {"code": event_code, "slot": 10}
-
-        current_count = _dtes_i(EventsCount.get(tp, 0), 0)
-        if current_count > 0:
-            event_idx = current_count - 1
-            event_code = str(NewEvents.get(str(tp) + "_" + str(event_idx), "") or "")
-            EventsCount[tp] = event_idx
-            return {"code": event_code, "slot": tp}
-
-        return {"code": "", "slot": tp}
+        return tavern_work_pop_planned_event(time_period, require_room_match, room_code)
 
     def DisplayTavernEventShort(time_period, eyewitness):
         """

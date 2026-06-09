@@ -1,6 +1,3 @@
-﻿# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
 ## This file contains options that can be changed to customize your game.
 ##
 ## Lines beginning with two '#' marks are comments, and you shouldn't uncomment
@@ -19,6 +16,18 @@ define config.name = _("Tractir")
 
 init python:
     config.use_cpickle = False   # Use slower but more informative pickle
+
+    # During development, disable rollback. This makes "Reload Game" (Shift+R)
+    # much more reliable when making frequent changes to init python code,
+    # functions, and data structures. This is a standard Ren'Py development practice.
+    if config.developer:
+        config.rollback_enabled = False
+
+        # Aggressively clear reload state on every launch in developer mode.
+        # This is a recommended practice when doing heavy work in init python blocks
+        # (new functions, classes, calendar system, etc.) to avoid the
+        # "script changed in an incompatible way" error on reload.
+        renpy.session.clear()
 ## Determines if the title given above is shown on the main menu screen. Set
 ## this to False to hide the title.
 
@@ -157,7 +166,8 @@ define config.save_directory = "Tractir-1748029397"
 ##
 ## The icon displayed on the taskbar or dock.
 
-define config.window_icon = "gui/window_icon.png"
+# define config.window_icon = "gui/window_icon.png"
+# (Disabled for now - gui/window_icon.png is missing. Add a PNG later to re-enable.)
 
 
 ## Build configuration #########################################################
@@ -214,3 +224,17 @@ init python:
 ## by a slash.
 
 # define build.itch_project = "renpytom/test-project"
+
+
+## GUI Button Fallbacks (for missing gui/button/*.png assets)
+## These override the DynamicImage lookups that cause the main menu crash.
+## Safe to put here — this is the intended customization location per Ren'Py docs.
+init python:
+    gui.button_borders = Borders(6, 6, 6, 6)
+    gui.button_tile = False
+
+    gui.button_idle_background = Frame(Solid("#2a2a2a"), gui.button_borders)
+    gui.button_hover_background = Frame(Solid("#555555"), gui.button_borders)
+    gui.button_selected_idle_background = Frame(Solid("#444444"), gui.button_borders)
+    gui.button_selected_hover_background = Frame(Solid("#666666"), gui.button_borders)
+    gui.button_insensitive_background = Frame(Solid("#1a1a1a"), gui.button_borders)

@@ -238,7 +238,7 @@ label IntBeckyGuest:
 
             "Попрощаться и идти домой" if (dinnertime > 5 and georgedinnersex == 0):
                 "Вы вежливо попрощались с семейством Блэнкеншип и направились на улицу."
-                $ calendar_advance_slots(1)
+                $ calendar_v2.advance_minutes(60)
                 jump MarketPlace
                 return
 

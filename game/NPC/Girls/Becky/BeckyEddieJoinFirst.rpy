@@ -53,7 +53,7 @@ label BeckyEddieJoinFirst:
                     "Как вы очутились на улице вы и сами не очень хорошо поняли, но все-таки вы там очутились. Что-то вы в вашем плане явно не учли..."
                     $ BeckyVar["EddieTryToFuck"] = 2
                     $ BeckyVar["EddieFailures"] = BeckyVar.get("EddieFailures", 0) + 1
-                    $ calendar_advance_slots(1)
+                    $ calendar_v2.advance_minutes(60)
                     if renpy.has_label("MarketPlace"):
                         jump MarketPlace
                     return
@@ -116,7 +116,7 @@ label BeckyEddieJoinFirst_EddieFirstCumCode:
     $ Friends["becky"] = Friends.get("becky", 0) + 1
     $ Friends["eddie"] = Friends.get("eddie", 0) + 5
     $ BeckyVar["EddieTryToFuck"] = 4
-    $ calendar_advance_slots(1)
+    $ calendar_v2.advance_minutes(60)
     if renpy.has_label("MarketPlace"):
         jump MarketPlace
     return

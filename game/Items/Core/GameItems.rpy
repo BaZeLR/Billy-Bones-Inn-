@@ -67,6 +67,7 @@ init 5 python:
             MilkPitcherItem,
             WineBarrelItem,
             TavernHelpBookItem,
+            MelissaBookletItem,
             PeasantCostumeItem,
             BourgeoisCostumeItem,
             SailorCostumeItem,

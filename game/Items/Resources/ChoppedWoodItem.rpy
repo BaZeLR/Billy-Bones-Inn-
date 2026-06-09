@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 4 python:
     def chopped_wood_in_shed(_obj=None):
@@ -10,13 +10,6 @@ init 4 python:
         name="колотые дрова",
         description="Охапка колотых дров для растопки и кипячения воды.",
         actions=[
-            ObjectAction(
-                action_id="examine_chopped_wood",
-                label="Осмотреть дрова",
-                hook="call",
-                target="Examine",
-                args=("chopped_wood_001", "Shed", "Колотые дрова для печи и камина.", "chopped_wood_001"),
-            ),
             ObjectAction(
                 action_id="take_chopped_wood",
                 label="Взять дрова",

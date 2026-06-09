@@ -125,7 +125,6 @@ Examples:
 - fireplace
 - bar
 - room door
-- toilet door
 - chest
 - signboard
 

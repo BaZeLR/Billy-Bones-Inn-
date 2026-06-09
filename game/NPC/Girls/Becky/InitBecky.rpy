@@ -11,7 +11,6 @@ label InitBecky:
         RealName2[GirlName] = 'Бекки'
         RealName3[GirlName] = 'Бекки'
         age_girls[GirlName] = 36
-        DateOfBirth[GirlName] = calendar_make_birth_record(age_girls[GirlName])
         kids[GirlName] = 5
         beauty[GirlName] = 45
         sluttiness[GirlName] = 25
@@ -156,7 +155,7 @@ label InitBecky:
             NPCScheduleEntry(
                 location="BeckyHome",
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
-                time_slots=[4],
+                time_slots=[7],
                 awake=False,
                 talkable=False,
                 priority=10,
@@ -171,47 +170,73 @@ init python:
     def becky_sandra_social_visit_allowed():
         return int(Friends.get("sandra", 0) or 0) >= 5
 
-    def becky_kitchen_visit_active(month_value=None, day_value=None, time_slot=None):
+    def becky_kitchen_visit_active(month_value=None, day_value=None):
         if not becky_sandra_social_visit_allowed():
             return False
-        if not becky_monthly_sandra_kitchen_visit_due(month_value, day_value, time_slot):
+        if not becky_monthly_sandra_kitchen_visit_due(month_value, day_value):
             return False
         return str(getLocation("sandra") or "") == "TavernKitchen"
 
-    def becky_monthly_sandra_kitchen_visit_due(month_value=None, day_value=None, time_slot=None):
+    def becky_monthly_sandra_kitchen_visit_due(month_value=None, day_value=None):
         month_now = int(month if month_value is None else month_value or 0)
         day_now = int(day if day_value is None else day_value or 0)
-        time_now = int(time if time_slot is None else time_slot or 0)
         if int(week or 0) == 5:
             return False
-        if time_now != 3 or day_now != 12:
+        if time != 3 or day_now != 12:
             return False
         return int(BeckyVar.get("SandraKitchenVisitMonth", 0) or 0) != month_now
 
-    def becky_tavern_visit_active(month_value=None, day_value=None, time_slot=None):
+    def becky_tavern_visit_active(month_value=None, day_value=None):
         week_now = int(week or 0)
         month_now = int(month if month_value is None else month_value or 0)
         day_now = int(day if day_value is None else day_value or 0)
-        time_now = int(time if time_slot is None else time_slot or 0)
         if week_now == 5:
             return False
-        if time_now != 3:
+        if time != 3:
             return False
         if not becky_sandra_social_visit_allowed():
             return False
-        if becky_kitchen_visit_active(month_now, day_now, time_now):
+        if becky_kitchen_visit_active(month_now, day_now):
             return False
         return ((day_now + month_now) % 6) == 0
 
-    def becky_grocery_store_active(weekday_value=None, month_value=None, day_value=None, time_slot=None):
+    def becky_grocery_store_active(weekday_value=None, month_value=None, day_value=None):
         week_now = int(week if weekday_value is None else weekday_value or 0)
         month_now = int(month if month_value is None else month_value or 0)
         day_now = int(day if day_value is None else day_value or 0)
-        time_now = int(time if time_slot is None else time_slot or 0)
-        if week_now == 7 or time_now not in (1, 2, 3):
+        if week_now == 7 or time not in (1, 2, 3):
             return False
-        if becky_kitchen_visit_active(month_now, day_now, time_now):
+        if becky_kitchen_visit_active(month_now, day_now):
             return False
-        if becky_tavern_visit_active(month_now, day_now, time_now):
+        if becky_tavern_visit_active(month_now, day_now):
             return False
         return True
+
+# Auto-attach .var for PeopleInfo consistency (requested)
+init python:
+    # Per user request: class Becky(Girl) defined in its own Init file (see game/NPC/Girls/Becky/InitBecky.rpy)
+    # All data from BeckyVar (story flags, daily counters, sex history etc.) promoted to the instance.
+    # .var kept for the 879+ legacy references across the project (agent.txt compat rule).
+    if 'peopleInfo' not in dir() or not isinstance(peopleInfo, dict):
+        peopleInfo = {}
+    class Becky(Girl):
+        """Becky-specific (Georgett crossover, Eddie, pregnancy, Blackwood quest hooks, home visits)."""
+        def __init__(self, name="becky", **kwargs):
+            super().__init__(name, **kwargs)
+            if 'BeckyVar' in dir() and isinstance(BeckyVar, dict):
+                self.var = BeckyVar
+                self.promote_from_var(BeckyVar)
+                # Promote key story fields used in IntBeckyGuest / GeorgettBeckyVisit / BeckyEvents
+                for k in ("visitedhome", "HomeSex", "EddieGeorg", "TradeOfferText", "SvalnyiGreh"):
+                    if k in BeckyVar:
+                        self.story_flags[k] = BeckyVar[k]
+    if 'becky' not in peopleInfo or not isinstance(peopleInfo.get('becky'), Becky):
+        peopleInfo['becky'] = Becky(var=BeckyVar if 'BeckyVar' in dir() else {})
+    else:
+        if 'BeckyVar' in dir() and isinstance(BeckyVar, dict):
+            peopleInfo['becky'].var = BeckyVar
+    # girls list (populated here + via _register_people_lists in PeopleRuntime.rpy)
+    if 'girls' not in dir() or not isinstance(girls, list):
+        girls = []
+    if peopleInfo.get('becky') not in girls:
+        girls.append(peopleInfo['becky'])

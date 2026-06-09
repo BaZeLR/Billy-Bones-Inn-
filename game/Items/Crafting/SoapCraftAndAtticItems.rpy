@@ -363,28 +363,24 @@ init 4 python:
         dress_name = str(dress_code or "").strip()
         if dress_name == "":
             return False
-        if not bool(allow_worn) and dress_name == str(MyCurDress or "").strip():
+        appearance = player_state().appearance
+        if not bool(allow_worn) and dress_name == str(appearance.current_dress or "").strip():
             return False
         if cloth_scrap_yield_for_dress(dress_name) <= 0:
             return False
-        return dress_name in list(MyDresses or [])
+        return appearance.has_dress(dress_name)
 
     def player_tear_wardrobe_dress(dress_code="", allow_worn=False, context_text=""):
-        global MyCurDress
-
+        appearance = player_state().appearance
         dress_name = str(dress_code or "").strip()
-        worn_now = dress_name == str(MyCurDress or "").strip()
+        worn_now = dress_name == str(appearance.current_dress or "").strip()
         if worn_now and not bool(allow_worn):
             return {"ok": False, "text": "Сначала снимите одежду. Рвать можно только то, что уже лежит в ларе."}
         if not player_can_tear_wardrobe_dress(dress_name, allow_worn):
             return {"ok": False, "text": "Эту одежду сейчас нельзя пустить на лоскуты."}
         scrap_qty = cloth_scrap_yield_for_dress(dress_name)
-        if dress_name in list(MyDresses or []):
-            MyDresses.remove(dress_name)
-        if isinstance(PlayerDressDaySt, dict) and dress_name in PlayerDressDaySt:
-            del PlayerDressDaySt[dress_name]
-        if worn_now:
-            MyCurDress = ""
+        appearance.remove_dress(dress_name)
+        appearance.apply_to_store()
         _player_add_item_by_id("cloth_scrap_001", scrap_qty)
         try:
             update_stat_state()
@@ -406,7 +402,7 @@ init 4 python:
         }
 
     def player_tear_worn_dress_context(context_text=""):
-        current_dress = str(MyCurDress or "").strip()
+        current_dress = str(player_state().appearance.current_dress or "").strip()
         if current_dress == "":
             return {"ok": False, "text": "На вас уже нечему рваться."}
         return player_tear_wardrobe_dress(current_dress, True, context_text)
@@ -435,7 +431,7 @@ init 4 python:
         if "honey_comb_001" in list(batch_profile.get("aroma_ids", ()) or ()):
             _player_remove_item_by_id("honey_comb_001", 1)
         fun = _player_clamp(fun + 20, 0, 100)
-        calendar_advance_minutes(120)
+        calendar_v2.advance_minutes(120)
         HouseholdSoapLastBatchProfile = dict(batch_profile)
         SoapPendingBatches.append({
             "item_id": item_result,
@@ -466,7 +462,7 @@ init 4 python:
         if not bool(consume_result.get("ok", False)):
             return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для спирта."), "recipe_id": "ethanol_recipe"}
         _player_add_item_by_id("ethanol_001", 1)
-        calendar_advance_minutes(90)
+        calendar_v2.advance_minutes(90)
         update_stat_state()
         return {
             "ok": True,
@@ -481,7 +477,7 @@ init 4 python:
         if not bool(consume_result.get("ok", False)):
             return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для чая."), "recipe_id": "energy_tea_recipe"}
         _player_add_item_by_id("energy_tea_001", 1)
-        calendar_advance_minutes(30)
+        calendar_v2.advance_minutes(30)
         update_stat_state()
         return {
             "ok": True,
@@ -510,7 +506,7 @@ init 4 python:
                 "recipe_id": "libido_recipe",
             }
         _player_add_item_by_id("libido_tincture_001", 1)
-        calendar_advance_minutes(50)
+        calendar_v2.advance_minutes(50)
         update_stat_state()
         flavor_name = "терпкие травы" if flavor_item == "special_herbs_001" else "раздавленные ягоды"
         return {
@@ -526,7 +522,7 @@ init 4 python:
         if not bool(consume_result.get("ok", False)):
             return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять сырой мох."), "recipe_id": "dry_moss_recipe"}
         _player_add_item_by_id("dried_moss_001", 1)
-        calendar_advance_minutes(30)
+        calendar_v2.advance_minutes(30)
         update_stat_state()
         return {
             "ok": True,
@@ -541,7 +537,7 @@ init 4 python:
         if not bool(consume_result.get("ok", False)):
             return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять сушеный мох."), "recipe_id": "moss_gunpowder_recipe"}
         _player_add_item_by_id("gunpowder_001", 1)
-        calendar_advance_minutes(40)
+        calendar_v2.advance_minutes(40)
         update_stat_state()
         return {
             "ok": True,
@@ -556,7 +552,7 @@ init 4 python:
         if not bool(consume_result.get("ok", False)):
             return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для зелья."), "recipe_id": "healing_potion_recipe"}
         _player_add_item_by_id("healing_potion_001", 1)
-        calendar_advance_minutes(45)
+        calendar_v2.advance_minutes(45)
         update_stat_state()
         return {
             "ok": True,
@@ -571,7 +567,7 @@ init 4 python:
         if not bool(consume_result.get("ok", False)):
             return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять материалы для бинта."), "recipe_id": "bandage_recipe"}
         _player_add_item_by_id("bandage_001", 1)
-        calendar_advance_minutes(20)
+        calendar_v2.advance_minutes(20)
         update_stat_state()
         return {
             "ok": True,
@@ -586,7 +582,7 @@ init 4 python:
         if not bool(consume_result.get("ok", False)):
             return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять лоскуты для веревки."), "recipe_id": "cloth_rope_recipe"}
         _player_add_item_by_id("rope_001", 1)
-        calendar_advance_minutes(40)
+        calendar_v2.advance_minutes(40)
         update_stat_state()
         return {
             "ok": True,
@@ -601,7 +597,7 @@ init 4 python:
         if not bool(consume_result.get("ok", False)):
             return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для огненной бутылки."), "recipe_id": "fire_bomb_recipe"}
         _player_add_item_by_id("fire_bomb_001", 1)
-        calendar_advance_minutes(30)
+        calendar_v2.advance_minutes(30)
         update_stat_state()
         return {
             "ok": True,
@@ -616,7 +612,7 @@ init 4 python:
         if not bool(consume_result.get("ok", False)):
             return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для дымной смеси."), "recipe_id": "bat_repellent_recipe"}
         _player_add_item_by_id("bat_repellent_001", 1)
-        calendar_advance_minutes(35)
+        calendar_v2.advance_minutes(35)
         update_stat_state()
         return {
             "ok": True,
@@ -720,11 +716,11 @@ init 4 python:
         if room_key == "TavernSandraRoom":
             return "Вы осматриваете комнату Сандры. Здесь все сложено аккуратно, так что поиски не приносят ничего, кроме уважения к ее хозяйственности."
         if room_key == "TavernMelissaRoom":
-            if int(effective_player_exploration() or 0) >= 100 and int(MelissaVar.get("bats_episode", 0) or 0) >= 2 and int(MelissaVar.get("bats_episode", 0) or 0) < 3:
+            if int(effective_player_exploration() or 0) >= 100 and int(Melissa.var.get("bats_episode", 0) or 0) >= 2 and int(Melissa.var.get("bats_episode", 0) or 0) < 3:
                 return "Вы осматриваете комнату Мелиссы внимательнее и замечаете под самым потолком несколько совсем маленьких щелей и норок в старом дереве. Оттуда тянет пылью и затхлым чердаком. Похоже, часть дряни лезет сюда не из самой комнаты, а сверху, через старую крышу и балки."
-            if int(MelissaVar.get("bats_episode", 0) or 0) >= 3 and int(MelissaVar.get("bats_episode", 0) or 0) < 4:
+            if int(Melissa.var.get("bats_episode", 0) or 0) >= 3 and int(Melissa.var.get("bats_episode", 0) or 0) < 4:
                 return "Теперь, когда вы знаете про щели под крышей, становится ясно: без осмотра чердака над комнатой Мелиссы эта история не закончится."
-            if int(MelissaVar.get("bats_episode", 0) or 0) >= 4 and int(MelissaVar.get("bats_episode", 0) or 0) < 8:
+            if int(Melissa.var.get("bats_episode", 0) or 0) >= 4 and int(Melissa.var.get("bats_episode", 0) or 0) < 8:
                 return "Вы еще раз осматриваете комнату Мелиссы и убеждаетесь, что без чистки чердака и заделки крыши мелкая дрянь будет возвращаться снова и снова."
             return "Вы осматриваете комнату Мелиссы. Ничего ценного не находится, зато становится ясно, что она старается держать свои пожитки в порядке."
         if room_key == "TavernEmptyRoom":
@@ -1467,7 +1463,7 @@ init 4 python:
             "lavender_001": {"quantity": 1, "unit": "веточка"},
             "empty_bottle_001": {"quantity": 1, "unit": "бутылка"},
         },
-        unlock_condition=bat_repellent_recipe_unlocked,
+        unlock_condition=lambda: Melissa.bat_repellent_recipe_unlocked(),
         result_quantity=1,
         notes=[
             "Смесь годится не для лечения, а чтобы выкуривать из-под крыши мелкую дрянь и летучих тварей.",
@@ -1617,7 +1613,8 @@ label AtticInventoryUseSoap(item_id="", return_context="attic", room_code="Taver
         call AtticInventoryMenu(return_context, room_code)
         return
     $ _player_remove_item_by_id("soap_001", 1)
-    $ dayssincewash = 0
+    $ player_state().appearance.wash()
+    $ player_state().appearance.apply_to_store()
     $ SoapLookBonusUntilDay = int(dayspassed or 0) + 1
     $ fun = _player_clamp(fun + 2, 0, 100)
     call stat
@@ -1739,8 +1736,8 @@ label UpstairsRoomSearch(room_code="", restore_label=""):
         return
     $ MainTxt = upstairs_room_search_text(_up_room_code)
     $ CurLocDesc = MainTxt
-    if str(_up_room_code or "") == "TavernMelissaRoom" and int(effective_player_exploration() or 0) >= 100 and int(MelissaVar.get("bats_episode", 0) or 0) >= 2 and int(MelissaVar.get("bats_episode", 0) or 0) < 3:
-        $ MelissaVar["bats_episode"] = 3
+    if str(_up_room_code or "") == "TavernMelissaRoom" and int(effective_player_exploration() or 0) >= 100 and int(Melissa.var.get("bats_episode", 0) or 0) >= 2 and int(Melissa.var.get("bats_episode", 0) or 0) < 3:
+        $ Melissa.var["bats_episode"] = 3
     $ upstairs_room_mark_searched(_up_room_code)
     if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
         call expression str(restore_label or "")
@@ -1835,7 +1832,7 @@ label ShootingPracticeFire(room_code=""):
         return
     python:
         global fun, energy
-        calendar_advance_minutes(30)
+        calendar_v2.advance_minutes(30)
         fun = _player_clamp(fun + 3, 0, 100)
         energy = _player_clamp(energy - 4, 0, 100)
     $ MainTxt = shooting_practice_fire_text(_loaded_ammo, room_code)

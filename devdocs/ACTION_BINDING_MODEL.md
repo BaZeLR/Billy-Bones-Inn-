@@ -1,8 +1,11 @@
 # Action Binding Model
 
-Purpose: describe how actions actually work in the current Ren'Py port.
+Purpose: describe how actions should be bound in the current Ren'Py port after
+the Family Life-style architecture correction.
 
-This is the canonical model to use for refactoring and for new content.
+This is the canonical model to use for refactoring and for new content. Older
+references to generic hubs, refresh labels, apply labels, or dispatcher
+consolidation are compatibility evidence only.
 
 ---
 
@@ -114,7 +117,7 @@ Each NPC entry typically provides:
 
 Then the current room decides which NPCs are visible.
 
-The hub provides actions like:
+The current hub provides actions like:
 
 - inspect
 - talk
@@ -123,9 +126,14 @@ So NPC interactions are:
 
 - room-bound
 - entity-bound
-- then passed through a generic interaction hub
+- currently passed through a generic interaction hub
 
-This is a good architecture.
+Target correction:
+
+- the hub may remain only as a thin selector while callers are migrated;
+- it must not own NPC truth, social mechanics, story consequences, or dialogue menus;
+- `talk` must open the NPC's real `Int<Npc>Talk` label;
+- talk/flirt/gift/questions are event-like choices owned by that talk label or real sublabels called by it.
 
 ---
 
@@ -154,6 +162,8 @@ The real organization model is:
 - bound actions for that entity
 
 The generic labels are implementation helpers used when an entity action needs them.
+They must stay as real labels or tiny shared calculation helpers. They must not
+become refresh/apply/renew/rebuild dispatch layers.
 
 ---
 
@@ -169,7 +179,6 @@ Examples:
 - wash
 - chores
 - time skip / wait
-- flirt / gift / talk helper actions
 
 Files:
 
@@ -191,7 +200,6 @@ These actions directly affect player stats such as:
 - `hotwaterready`
 - `upstairsroomsdirty`
 - inventory / carried items
-- friendship values in some social actions
 
 So the full action model is not only:
 
@@ -215,7 +223,7 @@ Good pattern:
 - room menu exposes self action
 - self action label performs state change
 - `call stat` refreshes UI
-- room rebuild label restores current menu
+- caller returns to the owning room/object/NPC flow directly
 
 Examples already in code:
 
@@ -256,6 +264,7 @@ For new work, prefer this hierarchy:
 3. room may also expose MC-owned self actions
 4. builder assembles current menu
 5. action label performs the actual logic
+6. caller returns to the owning room/object/NPC directly
 
 That means:
 
@@ -263,6 +272,7 @@ That means:
 - object/NPC/item = action owner
 - MC self-state = another valid action owner
 - label = action executor
+- refresh/apply/renew wrappers are not action ownership
 
 ---
 
@@ -286,7 +296,7 @@ That means:
 
 - `Actions.rpy`
 - `ShowImage.rpy`
-- `CharacterActionHub.rpy`
+- `CharacterActionHub.rpy` as current compatibility/thin selector only
 
 ---
 

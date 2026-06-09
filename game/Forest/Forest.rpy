@@ -135,7 +135,7 @@ init python:
 
     def forest_can_depart_now():
         try:
-            calendar_sync_state()
+            calendar_v2.sync_state()
         except Exception:
             pass
         try:
@@ -148,13 +148,17 @@ init python:
 
     def forest_after_dusk():
         try:
-            calendar_sync_state()
+            calendar_v2.sync_state()
         except Exception:
             pass
         try:
-            return int(time or 0) >= 3 or int(hour or 0) >= 18
+            current_minutes = int(clock_minutes or 0) % 1440
+            return current_minutes >= ((19 * 60) + 30)
         except Exception:
             return False
+
+    def forest_open_hours_visible():
+        return not forest_after_dusk()
 
     def forest_after_dusk_return_text():
         return "Смеркается. В лесу уже нельзя задерживаться: нужно возвращаться к трактиру."
@@ -231,6 +235,7 @@ init python:
         custom_properties={
             "object_menu_label": "ForestObjectMenu",
         },
+        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], start="06:00", end="19:29", condition=forest_open_hours_visible),
     ) 
 
 default ForestSavedText = ""
@@ -245,8 +250,8 @@ label TravelToForest(return_target="StreetTavern"):
         $ CurLocDesc = MainTxt
         call RefreshCurrentActionMenu(ForestReturnTarget, "", True)
         return
-    $ ensure_calendar_state()
-    $ calendar_advance_minutes(forest_travel_cost_minutes())
+    $ calendar_v2.sync_state()
+    $ calendar_v2.advance_minutes(forest_travel_cost_minutes())
     call stat
     jump Forest
     return
@@ -401,7 +406,10 @@ label ForestRestore:
 label WerecatForestSearch(room_code=""):
     $ _werecat_room = str(room_code or CurLoc or "").strip()
     if not werecat_can_search(_werecat_room):
-        call RefreshCurrentActionMenu(_werecat_room, "", True)
+        if _werecat_room == "Forest":
+            call ForestBuildActions
+        else:
+            call ForestSubroomBuildActions
         return
     $ _werecat_search = werecat_register_search(_werecat_room)
     if str(_werecat_room or "") == "Forest":
@@ -414,7 +422,10 @@ label WerecatForestSearch(room_code=""):
         hide screen main_ui
         vscene werecat_info_picture_path()
         "[MainTxt]"
-    call RefreshCurrentActionMenu(_werecat_room, "", True)
+    if _werecat_room == "Forest":
+        call ForestBuildActions
+    else:
+        call ForestSubroomBuildActions
     return
 
 
@@ -569,9 +580,10 @@ label ForestSubroomTakeSpawnedItem(item_id=""):
 
 label ForestLakeBath:
     python:
-        global dayssincewash, fun
-        calendar_advance_minutes(60)
-        dayssincewash = 0
+        global fun
+        calendar_v2.advance_minutes(60)
+        player_state().appearance.wash()
+        player_state().appearance.apply_to_store()
         fun = _player_clamp(fun + 10, 0, 100)
         update_stat_state()
     $ MainTxt = "Вы раздеваетесь, заходите в прохладную воду и хорошенько смываете с себя дорожную пыль и пот. После купания вы чувствуете себя заметно свежее."
@@ -587,7 +599,7 @@ label ForestLakeWashHorse:
         call ForestSubroomBuildActions
         return
     python:
-        calendar_advance_minutes(60)
+        calendar_v2.advance_minutes(60)
         tavernfame = _player_clamp(tavernfame + 1, -20, 20)
         update_stat_state()
     $ MainTxt = "Вы осторожно заводите [MyStallion] в воду и тщательно смываете с него дорожную грязь и пыль. Конь фыркает, встряхивает гривой и выглядит заметно бодрее."

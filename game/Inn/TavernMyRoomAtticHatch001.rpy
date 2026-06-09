@@ -5,13 +5,13 @@ default TavernMyRoomAtticHatchFound = 0
 
 init 5 python:
     def tavern_my_room_attic_hatch_visible():
-        return int(exploration or 0) >= 15 or melissa_bats_stage() >= 3
+        return int(exploration or 0) >= 15 or Melissa.bats_stage() >= 3
 
     def tavern_my_room_attic_hatch_can_search(_obj=None):
         return tavern_my_room_attic_hatch_visible() and int(TavernMyRoomAtticHatchFound or 0) == 0
 
     def tavern_my_room_attic_hatch_can_enter(_obj=None):
-        return tavern_my_room_attic_hatch_visible() and (int(TavernMyRoomAtticHatchFound or 0) == 1 or melissa_bats_stage() >= 3)
+        return tavern_my_room_attic_hatch_visible() and (int(TavernMyRoomAtticHatchFound or 0) == 1 or Melissa.bats_stage() >= 3)
 
     TavernMyRoomAtticHatchObject = GameObject(
         object_id="myroom_attic_hatch_001",

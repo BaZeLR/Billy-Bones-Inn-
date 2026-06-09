@@ -7,13 +7,6 @@ init 4 python:
         name="старый топор",
         description="Старый, но еще годный топор для рубки и колки дров.",
         actions=[
-            ObjectAction(
-                action_id="examine_old_axe",
-                label="Осмотреть топор",
-                hook="call",
-                target="Examine",
-                args=("old_axe_001", "Shed", "Лезвие затупилось, древко потрескалось, но для колки дров этот топор еще годится."),
-            ),
             ObjectAction(action_id="take_old_axe", label="Взять топор", hook="call", target="Take", args=("old_axe_001", "Shed", "Вы снимаете со стены старый топор и забираете его с собой.")),
         ],
         price=12,

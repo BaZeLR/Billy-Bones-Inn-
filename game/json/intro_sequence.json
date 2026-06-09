@@ -1,30 +1,14 @@
 [
-    {
-        "image": "images/general/intro_letter_scene.png",
-        "text": "Stephan's fingers trembled as he unfolded the letter, its parchment worn at the edges. The candle beside him flickered softly, casting shadows that danced along the wooden table and the rough walls of the ship's mess hall."
-    },
-    {
-        "image": "images/general/intro_letter_scene.png",
-        "text": "Dear Stephan,\n\nI write to you with a heavy heart. Your poor uncle Jerry has left this world. His love of rum, indulgences, and reckless ways caught up with him at last. They found him belly-up in one of the canals near the port, like a rotting fish cast off by the tide.\n\nBy law, the Wild Stallion Inn is yours now—what's left of it, at least. Times have been harsh, and your uncle left the place in shambles. I've done what I could to keep it afloat, but it's not enough. I took in my two nieces—girls orphaned by the plague that swept their village—and we've struggled to keep things together. But we're overwhelmed. We don't know how much longer we can manage.\n\nPlease, Stephan, come home. The Inn waits for you.\n\nWith hope,\nSandra"
-    },
-    {
-        "image": "images/general/memory_uncle_throws_stephan.png",
-        "text": "Memories flooded his mind. He saw himself—just a boy—standing soaked and shivering as Uncle Jerry's drunken rage hurled him into the rain, out of the only home he'd ever known."
-    },
-    {
-        "image": "images/general/memory_ship_deck.png",
-        "text": "Then he saw himself aboard the merchant ships of Duchess Alotta Cummingo, just a lad scrubbing decks, listening to sailors' tales of riches and ruin. Seven years had passed since that night he was cast aside."
-    },
-    {
-        "image": "images/general/intro_letter_scene.png",
-        "text": "Now, holding Sandra's letter—the woman who had once been his uncle's confidante and companion—he realized he was no longer a helpless boy. The Inn—his inheritance, his burden, his chance to make things right—was calling him back."
-    },
-    {
-        "image": "images/general/butchery_street.png",
-        "text": "Stephan stepped off the merchant ship onto the grim Butchery street. The air reeked of fish guts and rotting meat, mingling with the curses of port workers. The ground was slick with brine and the stench of the docks clung to his clothes."
-    },
-    {
-        "image": "images/general/wild_stallion_inn_front.png",
-        "text": "He stood before the Wild Stallion Inn. The sign, once proud, now swung with a tortured creak in the sea breeze. Crumbling walls and boarded windows gave the building a haunted look. This was his inheritance: broken, forgotten, and waiting for him."
-    }
+  {
+    "image": "images/general/intro1.png",
+    "text": "Welcome to Tractir!"
+  },
+  {
+    "image": "images/general/intro2.png",
+    "text": "A game of adventure and intrigue..."
+  },
+  {
+    "image": "images/general/intro3.png",
+    "text": "Your journey begins now!"
+  }
 ]

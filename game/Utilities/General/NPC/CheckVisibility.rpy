@@ -7,6 +7,13 @@
 
 init python:
     def check_visibility(girl_name):
+        global TitsVisible, PussyVisible, ShortSkirtNoPanties
+        if not isinstance(globals().get("TitsVisible", None), dict):
+            TitsVisible = {}
+        if not isinstance(globals().get("PussyVisible", None), dict):
+            PussyVisible = {}
+        if not isinstance(globals().get("ShortSkirtNoPanties", None), dict):
+            ShortSkirtNoPanties = {}
         dress_part_slut = globals().get("DressPartSlut", {}) or {}
         TitsVisible[girl_name] = 0
         PussyVisible[girl_name] = 0

@@ -1,7 +1,10 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+default DebugBuilderRepairNotesPath = ""
+
 init python:
+    import os
     import renpy.exports as renpy
 
     def _dbg_i(v, d=0):
@@ -37,17 +40,56 @@ init python:
             return default
         return default
 
+    # Debug/test positioning only. Calendar runtime intentionally has no date-jump setter.
+    def _dbg_calendar_set_fields(day_value=None, month_value=None, year_value=None, hour_value=None, minute_value=None):
+        day_i = max(1, min(28, _dbg_i(day if day_value is None else day_value, 1)))
+        month_i = max(1, min(13, _dbg_i(month if month_value is None else month_value, 1)))
+        year_i = max(CALENDAR_START_CYCLE, _dbg_i(year if year_value is None else year_value, CALENDAR_START_CYCLE))
+        day_number_i = max(0, ((year_i - CALENDAR_START_CYCLE) * 364) + ((month_i - 1) * 28) + day_i - 1)
+
+        calendar_v2.day = day_i
+        calendar_v2.period = month_i
+        calendar_v2.cycle = year_i
+        calendar_v2.week = (day_number_i % 7) + 1
+        calendar_v2.daysInGame = day_number_i
+        calendar_v2.hour = _dbg_i(hour if hour_value is None else hour_value, 8) % 24
+        calendar_v2.minute = _dbg_i(minute if minute_value is None else minute_value, 0) % 60
+        calendar_v2.sync_state()
+        return True
+
+    # Debug/test fixture setup only. Gameplay never changes weekday directly.
+    def _dbg_calendar_set_weekday(weekday_value=1):
+        target_week = max(1, min(7, _dbg_i(weekday_value, 1)))
+        calendar_v2.sync_state()
+        steps = (target_week - max(1, min(7, _dbg_i(week, 1)))) % 7
+        while steps > 0:
+            calendar_v2.day += 1
+            calendar_v2.week += 1
+            calendar_v2.daysInGame += 1
+            if calendar_v2.week > 7:
+                calendar_v2.week = 1
+            if calendar_v2.day > 28:
+                calendar_v2.day = 1
+                calendar_v2.period += 1
+            if calendar_v2.period > 13:
+                calendar_v2.period = 1
+                calendar_v2.cycle += 1
+            steps -= 1
+        calendar_v2.sync_state()
+        return True
+
     def _dbg_set(name, value):
         global time, week, day, EventsCount, NewEvents
         key = str(name or "")
         if key == "time":
-            calendar_set_time_slot(value)
+            _slot = max(0, min(7, int(value or 0)))
+            calendar_v2.hour = (6, 8, 11, 13, 16, 18, 21, 23)[_slot]
+            calendar_v2.minute = 0
+            calendar_v2.sync_state()
         elif key == "week":
-            week = value
-            calendar_sync_state()
+            _dbg_calendar_set_weekday(value)
         elif key == "day":
-            day = value
-            calendar_sync_state()
+            _dbg_calendar_set_fields(value, month, year, hour, minute)
         elif key == "EventsCount":
             EventsCount = value
         elif key == "NewEvents":
@@ -179,7 +221,7 @@ init python:
             image_checks = [
                 ("Grocery image", _dbg_image_exists("images/eddie/portraits/portrait_1.png", "images/becky/portraits/portrait_1.png")),
                 ("Wine image", _dbg_image_exists("images/clara/portrait1.jpg", "images/Alber/portrait7.jpg", "images/alber/portrait7.jpg")),
-                ("Tailor image", _dbg_image_exists("images/irma/portraits/portrait1.jpg")),
+                ("Tailor image", _dbg_image_exists("images/irma/portraits/portrait3.png")),
                 ("Carpenter image", _dbg_image_exists("images/draupnir/dwarf1.jpg")),
             ]
             for title, ok in image_checks:
@@ -194,6 +236,827 @@ init python:
             _dbg_set("time", prev_time)
             _dbg_set("week", prev_week)
         return result
+
+    DEBUG_BUILDER_ROOM_KEYS = [
+        "TavernMain",
+        "TavernKitchen",
+        "TavernAmandaRoom",
+        "TavernMelissaRoom",
+        "TavernSandraRoom",
+        "StreetTavern",
+        "MarketPlace",
+        "DressShop",
+        "WineStore",
+        "GroceryStore",
+        "HunterClub",
+        "PortStreets",
+        "Church",
+        "Forest",
+    ]
+
+    DEBUG_BUILDER_IMAGE_PATHS = [
+        "images/general/player_card.jpg",
+        "images/amanda/amanda_card.jpg",
+        "images/melissa/melissa_card.jpg",
+        "images/sandra/sandra_card.jpg",
+        "images/irma/portraits/portrait1.png",
+        "images/irma/portraits/portrait2.png",
+        "images/irma/portraits/portrait3.png",
+        "images/irma/measure/measure1.png",
+        "images/irma/measure/measure2.png",
+        "images/irma/measure/measure3.png",
+        "images/irma/measure/measure4.png",
+        "images/irma/talks.png",
+        "images/irma/flirts.png",
+        "images/market/LocMarketPlace1.jpg",
+        "images/townLifeRandomPic.jpg",
+    ]
+
+    def debug_builder_escape_text(value):
+        return str(value or "").replace("[", "[[").replace("{", "{{")
+
+    def debug_builder_room_keys():
+        keys = []
+        for key in DEBUG_BUILDER_ROOM_KEYS:
+            if get_registered_room(key) is not None and key not in keys:
+                keys.append(key)
+        for key in sorted(list(roomRegistry.keys())):
+            if key not in keys:
+                keys.append(key)
+        return keys
+
+    def debug_builder_main_text():
+        try:
+            room_count = len(list(roomRegistry.keys()))
+        except Exception:
+            room_count = 0
+        try:
+            people_count = len(list(peopleInfo.keys()))
+        except Exception:
+            people_count = 0
+        try:
+            event_count = len(list(story_event_projection_rows() or []))
+        except Exception:
+            event_count = 0
+        return (
+            "Debug builder room.\n"
+            "Current time slot: %s, weekday: %s, day: %s.\n"
+            "Registered rooms: %s.\n"
+            "Registered peopleInfo objects: %s.\n"
+            "Projected story events now: %s.\n\n"
+            "Use this room to inspect actual engine outputs: loadable pictures, room descriptions, room objects/exits, story event checks, NPC schedules, and card images."
+            % (time, week, dayspassed, room_count, people_count, event_count)
+        )
+
+    def debug_builder_refresh_runtime():
+        try:
+            calendar_v2.sync_state()
+        except Exception:
+            pass
+        try:
+            npc_daily_schedule_build_all(True)
+        except Exception:
+            pass
+        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass
+        try:
+            _ensure_player_chores_state()
+        except Exception:
+            pass
+        return True
+
+    def debug_builder_set_time_slot_control(slot_id):
+        slot_i = max(0, min(7, int(slot_id or 0)))
+        calendar_v2.hour = (6, 8, 11, 13, 16, 18, 21, 23)[slot_i]
+        calendar_v2.minute = 0
+        calendar_v2.sync_state()
+        debug_builder_refresh_runtime()
+        main_ui_restart_interaction()
+        return int(time or 0)
+
+    def debug_builder_step_weekday(delta):
+        target = int(week or 1) + int(delta or 0)
+        while target < 1:
+            target += 7
+        while target > 7:
+            target -= 7
+        _dbg_calendar_set_weekday(target)
+        debug_builder_refresh_runtime()
+        main_ui_restart_interaction()
+        return int(week or 1)
+
+    def debug_builder_step_month(delta):
+        target_month = int(month or 1) + int(delta or 0)
+        target_year = int(year or CALENDAR_START_CYCLE)
+        while target_month < 1:
+            target_year -= 1
+            if target_year < CALENDAR_START_CYCLE:
+                target_year = CALENDAR_START_CYCLE
+                target_month = 1
+                break
+            target_month += 13
+        while target_month > 13:
+            target_month -= 13
+            target_year += 1
+        _dbg_calendar_set_fields(day, target_month, target_year, hour, minute)
+        debug_builder_refresh_runtime()
+        main_ui_restart_interaction()
+        return int(month or 1)
+
+    def debug_builder_step_chore(chore_key="", delta=1):
+        key = str(chore_key or "").strip()
+        if not key:
+            return 0
+        _ensure_player_chores_state()
+        PlayerChoresWeek[key] = max(0, int(PlayerChoresWeek.get(key, 0) or 0) + int(delta or 0))
+        _pc_sync_ui_chores()
+        main_ui_restart_interaction()
+        return int(PlayerChoresWeek.get(key, 0) or 0)
+
+    def debug_builder_room_report(room_code=""):
+        room_key = str(room_code or "").strip()
+        room_obj = get_registered_room(room_key)
+        if room_obj is None:
+            return "Room not registered: %s" % room_key
+
+        lines = [
+            "Room: %s / %s" % (room_key, getattr(room_obj, "display_name", room_key)),
+            "Group: %s" % str(getattr(room_obj, "group_name", "") or ""),
+            "Picture: %s | loadable=%s" % (str(getattr(room_obj, "bg_picture", "") or ""), str(renpy.loadable(str(getattr(room_obj, "bg_picture", "") or "")))),
+            "Open now: %s" % str(room_obj.is_open(week, time)),
+            "",
+            "Descriptions:",
+        ]
+        descs = list(room_obj.visible_descriptions() or [])
+        if descs:
+            for row in descs:
+                lines.append("- p%s first=%s: %s" % (getattr(row, "priority", 0), getattr(row, "first_time", False), getattr(row, "text", "")))
+        else:
+            lines.append("- <none visible>")
+
+        lines.append("")
+        lines.append("Objects:")
+        objects = list(room_obj.visible_objects() or [])
+        if objects:
+            for obj in objects:
+                lines.append("- %s: %s" % (getattr(obj, "object_id", ""), getattr(obj, "name", "")))
+        else:
+            lines.append("- <none visible>")
+
+        lines.append("")
+        lines.append("Exits:")
+        exits = list(room_obj.visible_exits() or [])
+        if exits:
+            for ex in exits:
+                lines.append("- %s -> %s" % (getattr(ex, "label", ""), getattr(ex, "target", "")))
+        else:
+            lines.append("- <none visible>")
+
+        lines.append("")
+        lines.append("Visible NPCs from schedule:")
+        npcs = list(room_obj.visible_npcs() or [])
+        if npcs:
+            for npc in npcs:
+                lines.append("- %s / %s" % (npc.get("id", ""), npc.get("display_name", "")))
+        else:
+            lines.append("- <none visible>")
+
+        return debug_builder_escape_text("\n".join(lines))
+
+    def debug_builder_picture_report():
+        paths = []
+        for path in DEBUG_BUILDER_IMAGE_PATHS:
+            if path not in paths:
+                paths.append(path)
+        for key in debug_builder_room_keys()[:30]:
+            room_obj = get_registered_room(key)
+            path = str(getattr(room_obj, "bg_picture", "") or "") if room_obj is not None else ""
+            if path and path not in paths:
+                paths.append(path)
+        lines = ["Picture path checks:"]
+        for path in paths:
+            lines.append("[%s] %s" % ("OK" if renpy.loadable(path) else "MISS", path))
+        return debug_builder_escape_text("\n".join(lines))
+
+    def debug_builder_schedule_report():
+        lines = [
+            "NPC schedule at week=%s time=%s clock=%02d:%02d:" % (week, time, hour, minute),
+            "",
+            "Time slots:",
+        ]
+        lines.extend(debug_builder_time_slot_lines())
+        lines.append("")
+        lines.append("Resolved NPC locations:")
+        seen = {}
+        keys = []
+        try:
+            keys.extend([str(k or "") for k in peopleInfo.keys()])
+        except Exception:
+            pass
+        try:
+            keys.extend([str(k or "") for k in CurrentLoc.keys()])
+        except Exception:
+            pass
+        keys = sorted(set([k for k in keys if k]))
+        for key in keys:
+            try:
+                loc = str(getLocation(key) or "")
+            except Exception:
+                loc = ""
+            try:
+                cur_loc = str(CurrentLoc.get(key, "") or "")
+            except Exception:
+                cur_loc = ""
+            try:
+                entry = npc_schedule_resolve(key)
+            except Exception:
+                entry = None
+            if entry is not None:
+                if hasattr(entry, "start_minute") and hasattr(entry, "end_minute"):
+                    interval_text = "%s-%s" % (npc_schedule_minutes_to_time(getattr(entry, "start_minute", 0)), npc_schedule_minutes_to_time(getattr(entry, "end_minute", 0)))
+                else:
+                    interval_text = "slots=" + (",".join([str(row) for row in list(getattr(entry, "time_slots", []) or [])]) or "*")
+                entry_text = "entry=%s %s awake=%s talk=%s p=%s source=%s" % (
+                    str(getattr(entry, "label", "") or ""),
+                    interval_text,
+                    str(bool(getattr(entry, "awake", True))),
+                    str(bool(getattr(entry, "talkable", True))),
+                    str(getattr(entry, "priority", "")),
+                    str(getattr(entry, "source", "rpy") or "rpy"),
+                )
+            else:
+                entry_text = "entry=<none>"
+            if loc:
+                seen.setdefault(loc, []).append(key)
+                lines.append("- %s -> getLocation=%s CurrentLoc=%s %s" % (key, loc, cur_loc, entry_text))
+        lines.append("")
+        lines.append("Rooms with NPCs:")
+        for loc in sorted(seen.keys()):
+            try:
+                room_obj = get_registered_room(loc)
+                visible_rows = list(room_obj.visible_npcs() or []) if room_obj is not None else []
+                visible_ids = [str(row.get("npc_id", row.get("id", "")) or "") for row in visible_rows]
+            except Exception:
+                visible_ids = []
+            lines.append("- %s: getNPCids=%s | visible_npcs=%s" % (loc, ", ".join(sorted(seen.get(loc, []))), ", ".join(sorted(visible_ids))))
+        lines.append("")
+        lines.append("Duplicate/source checks:")
+        try:
+            missing_data = [k for k in keys if k in peopleInfo and k not in peopleData]
+            lines.append("- peopleInfo without peopleData: %s" % (", ".join(missing_data) if missing_data else "<none>"))
+        except Exception as ex:
+            lines.append("- people source check error: %s" % ex)
+        return debug_builder_escape_text("\n".join(lines))
+
+    def debug_builder_time_slot_lines():
+        rows = []
+        slot_ranges = {
+            0: "06:00-07:59",
+            1: "08:00-10:59",
+            2: "11:00-12:59",
+            3: "13:00-15:59",
+            4: "16:00-17:59",
+            5: "18:00-20:59",
+            6: "21:00-22:59",
+            7: "23:00-05:59",
+        }
+        try:
+            info = TIME_SLOT_INFO
+        except Exception:
+            info = {}
+        for slot_id in range(0, 8):
+            row = dict(info.get(slot_id, {}) or {})
+            marker = " <==" if int(time or 0) == slot_id else ""
+            rows.append(
+                "- %s: %s / %s, %s%s"
+                % (
+                    slot_id,
+                    str(row.get("name_en", "") or ""),
+                    str(row.get("name_ru", "") or ""),
+                    slot_ranges.get(slot_id, ""),
+                    marker,
+                )
+            )
+        return rows
+
+    def debug_builder_set_time_slot(slot_id):
+        slot_i = max(0, min(7, int(slot_id or 0)))
+        calendar_v2.hour = (6, 8, 11, 13, 16, 18, 21, 23)[slot_i]
+        calendar_v2.minute = 0
+        calendar_v2.sync_state()
+        try:
+            npc_daily_schedule_build_all(True)
+        except Exception:
+            pass
+        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass
+        return int(time or 0)
+
+    def debug_builder_schedule_room_report(room_code=""):
+        room_key = str(room_code or "").strip()
+        room_obj = get_registered_room(room_key)
+        lines = [
+            "Schedule room probe: %s" % room_key,
+            "Time: week=%s slot=%s %02d:%02d" % (week, time, hour, minute),
+        ]
+        if room_obj is None:
+            lines.append("Room is not registered.")
+            return debug_builder_escape_text("\n".join(lines))
+        try:
+            ids = list(getNPCids(room_key) or [])
+        except Exception as ex:
+            ids = []
+            lines.append("getNPCids error: %s" % ex)
+        try:
+            visible_rows = list(room_obj.visible_npcs() or [])
+        except Exception as ex:
+            visible_rows = []
+            lines.append("visible_npcs error: %s" % ex)
+        visible_ids = [str(row.get("npc_id", row.get("id", "")) or "") for row in visible_rows]
+        lines.append("getNPCids: %s" % (", ".join(ids) if ids else "<none>"))
+        lines.append("Room.visible_npcs: %s" % (", ".join(visible_ids) if visible_ids else "<none>"))
+        lines.append("")
+        lines.append("Rows:")
+        for npc_id in sorted(set(ids + visible_ids)):
+            try:
+                state = npc_schedule_state(npc_id)
+            except Exception:
+                state = {}
+            lines.append(
+                "- %s loc=%s awake=%s talk=%s label=%s interval=%s source=%s"
+                % (
+                    npc_id,
+                    str(state.get("location", "") or ""),
+                    str(state.get("awake", "")),
+                    str(state.get("talkable", "")),
+                    str(state.get("label", "") or ""),
+                    str(state.get("interval", "") or ""),
+                    str(state.get("source", "") or ""),
+                )
+            )
+        if not ids and not visible_ids:
+            lines.append("- <none>")
+        return debug_builder_escape_text("\n".join(lines))
+
+    def debug_builder_schedule_room_items():
+        items = []
+        for room_key in ["TavernMain", "TavernKitchen", "TavernAmandaRoom", "TavernMelissaRoom", "TavernSandraRoom", "DressShop", "WineStore", "MarketPlace", "PortStreets", "GroceryStore"]:
+            items.append(MenuItem(room_key, Call("DebugBuilderScheduleRoom", room_key)))
+        return items
+
+    def debug_builder_story_report():
+        try:
+            story_board_refresh()
+        except Exception:
+            pass
+        lines = ["Projected story events now:"]
+        try:
+            lines.extend(list(story_board_projection_lines(20) or []))
+        except Exception as ex:
+            lines.append("Projection error: %s" % ex)
+        return debug_builder_escape_text("\n".join(lines))
+
+    def debug_builder_media_sequence_report():
+        probes = [
+            ("MarketPlace", "general", "", "LocMarketPlace", 4),
+            ("ArtisansQuarter", "general", "", "LocArtisansQuarter", 4),
+            ("StreetTavern", "general", "", "LocStreetTavern", 4),
+            ("Forest", "forest", "", "forest_", 4),
+            ("Irma measure", "irma", "measure", "measure", 4),
+        ]
+        lines = ["Picture sequence probes:"]
+        for title, folder, subfolder, prefix, count in probes:
+            found = []
+            missing = []
+            for idx in range(1, int(count or 0) + 1):
+                try:
+                    path = build_media_ref(folder, subfolder, prefix + str(idx))
+                except Exception:
+                    path = ""
+                if path and renpy.loadable(path):
+                    found.append(path)
+                else:
+                    missing.append(path or "%s/%s/%s%s" % (folder, subfolder, prefix, idx))
+            lines.append("")
+            lines.append("%s:" % title)
+            lines.append("- found %s/%s" % (len(found), int(count or 0)))
+            for row in found[:6]:
+                lines.append("  OK   %s" % row)
+            for row in missing[:6]:
+                lines.append("  MISS %s" % row)
+        return debug_builder_escape_text("\n".join(lines))
+
+    def debug_builder_room_menu_report(room_code=""):
+        room_key = str(room_code or "").strip()
+        room_obj = get_registered_room(room_key)
+        if room_obj is None:
+            return "Room not registered: %s" % room_key
+
+        lines = [
+            "Room/menu probe: %s / %s" % (room_key, str(getattr(room_obj, "display_name", room_key) or room_key)),
+            "Object menu label: %s" % str(getattr(room_obj, "custom_properties", {}).get("object_menu_label", "") or ""),
+            "",
+            "Visible generated menu items:",
+        ]
+        try:
+            menu_items = list(build_room_action_items(room_obj) or [])
+        except Exception as ex:
+            menu_items = []
+            lines.append("- build error: %s" % ex)
+        if menu_items:
+            for item in menu_items:
+                lines.append("- %s" % str(getattr(item, "caption", "") or ""))
+        else:
+            lines.append("- <none>")
+
+        lines.append("")
+        lines.append("Objects and object actions:")
+        try:
+            objects = list(room_obj.visible_objects() or [])
+        except Exception:
+            objects = []
+        if objects:
+            for obj in objects:
+                lines.append("- %s / %s" % (str(getattr(obj, "object_id", "") or ""), str(getattr(obj, "name", "") or "")))
+                try:
+                    actions = list(getattr(obj, "actions", []) or [])
+                except Exception:
+                    actions = []
+                for action in actions:
+                    lines.append("  action: %s -> %s" % (str(getattr(action, "label", "") or ""), str(getattr(action, "target", "") or "")))
+        else:
+            lines.append("- <none>")
+
+        lines.append("")
+        lines.append("Room actions:")
+        try:
+            actions = list(room_obj.visible_actions() or [])
+        except Exception:
+            actions = []
+        if actions:
+            for action in actions:
+                lines.append("- %s hook=%s target=%s" % (
+                    str(getattr(action, "label", "") or ""),
+                    str(getattr(action, "hook", "") or ""),
+                    str(getattr(action, "target", "") or ""),
+                ))
+        else:
+            lines.append("- <none>")
+
+        lines.append("")
+        lines.append("Exits:")
+        try:
+            exits = list(room_obj.visible_exits() or [])
+        except Exception:
+            exits = []
+        if exits:
+            for ex in exits:
+                lines.append("- %s -> %s" % (str(getattr(ex, "label", "") or ""), str(getattr(ex, "target", "") or "")))
+        else:
+            lines.append("- <none>")
+        return debug_builder_escape_text("\n".join(lines))
+
+    def debug_builder_event_probe_report():
+        try:
+            initStoryEventRuntime(True)
+            findAvailableEvents(True)
+        except Exception:
+            pass
+        rows = []
+        try:
+            for location_key, action_map in sorted(dict(availEvents or {}).items()):
+                for action_key, evt in sorted(dict(action_map or {}).items()):
+                    if evt is None:
+                        continue
+                    rows.append((str(location_key or ""), str(action_key or ""), evt))
+        except Exception:
+            rows = []
+        lines = [
+            "Event condition probes:",
+            "Current location=%s week=%s time=%s day=%s" % (str(CurLoc or ""), week, time, dayspassed),
+            "",
+            "Available events from availEvents[location][action]:",
+        ]
+        if rows:
+            for location_key, action_key, evt in rows[:40]:
+                lines.append("- %s / %s -> thread=%s target=%s p=%s" % (
+                    location_key,
+                    action_key,
+                    str(getattr(evt, "thread_name", "") or ""),
+                    str(getattr(evt, "target", "") or ""),
+                    str(getattr(evt, "priority", "") or ""),
+                ))
+        else:
+            lines.append("- <none>")
+        if len(rows) > 40:
+            lines.append("...and %s more" % (len(rows) - 40))
+        return debug_builder_escape_text("\n".join(lines))
+
+    def debug_builder_event_probe_items():
+        items = []
+        try:
+            initStoryEventRuntime(True)
+            findAvailableEvents(True)
+            for location_key, action_map in sorted(dict(availEvents or {}).items()):
+                for action_key, evt in sorted(dict(action_map or {}).items()):
+                    if evt is None:
+                        continue
+                    caption = "%s / %s" % (str(location_key or ""), str(action_key or ""))
+                    items.append(MenuItem(caption, Call("DebugBuilderEventProbe", str(location_key or ""), str(action_key or ""))))
+                    if len(items) >= 18:
+                        return items
+        except Exception:
+            pass
+        return items
+
+    def debug_builder_event_condition_report(location_key="", action_key=""):
+        loc = str(location_key or "").strip()
+        action = str(action_key or "").strip()
+        try:
+            initStoryEventRuntime(True)
+            findAvailableEvents(True)
+        except Exception:
+            pass
+        evt = None
+        try:
+            evt = dict(dict(availEvents or {}).get(loc, {}) or {}).get(action, None)
+        except Exception:
+            evt = None
+        if evt is None:
+            return debug_builder_escape_text("No available event for %s / %s." % (loc, action))
+        lines = [
+            "Event probe: %s / %s" % (loc, action),
+            "Thread: %s" % str(getattr(evt, "thread_name", "") or ""),
+            "Target: %s" % str(getattr(evt, "target", "") or ""),
+            "Priority: %s" % str(getattr(evt, "priority", "") or ""),
+            "Item: %s" % str(getattr(evt, "item", "") or ""),
+            "",
+            "Checks:",
+        ]
+        try:
+            tinfo = dict(threads or {}).get(str(getattr(evt, "thread_name", "") or ""), None)
+            check_text = story_board_show_event_checks(evt, tinfo)
+            lines.append(str(check_text or "No checks"))
+        except Exception as ex:
+            lines.append("Check report error: %s" % ex)
+            try:
+                for row in list(evt.auditChecks(0) or []):
+                    lines.append("- %s ok=%s value=%s" % (str(row.get("field", "") or ""), str(row.get("ok", "")), str(row.get("value", "") or "")))
+            except Exception:
+                pass
+        return debug_builder_escape_text("\n".join(lines))
+
+    def debug_builder_correction_notes():
+        return debug_builder_escape_text(
+            "Correction ownership notes:\n\n"
+            "Room text and room picture paths:\n"
+            "- patch the Room object definition that owns the room.\n"
+            "- do not duplicate text inside the location label.\n\n"
+            "Object menu items:\n"
+            "- patch the GameObject actions or the room object's object_menu_label path.\n"
+            "- do not add dispatch labels for one simple action.\n\n"
+            "NPC schedules:\n"
+            "- patch the owning Init*.rpy schedule entries or NPCDailyScheduleTemplates.\n"
+            "- the debug schedule page shows the matched entry label, slots, awake/talkable, and priority.\n\n"
+            "Story/event conditions:\n"
+            "- patch the Event tuple/class definition or its condition function.\n"
+            "- test through checkTriggers(location, action, 0), not direct label jumps.\n\n"
+            "Picture sequences:\n"
+            "- patch the media path builder input or the concrete folder/file names.\n"
+            "- use the media probe to verify loadable paths before patching labels."
+        )
+
+    def debug_builder_feature_templates_text():
+        return "\n".join([
+            "Use these templates for concrete repair notes. Keep one feature per filled block.",
+            "",
+            "### Room Feature",
+            "",
+            "- Feature name:",
+            "- Room code_name:",
+            "- Room object variable:",
+            "- Room owner file:",
+            "- Room label:",
+            "- Expected room text:",
+            "- Actual room text:",
+            "- Expected picture path:",
+            "- Actual picture path / loadable:",
+            "- Exits expected:",
+            "- Exits actual:",
+            "- Objects expected:",
+            "- Objects actual:",
+            "- Menu title expected:",
+            "- Menu items expected:",
+            "- Menu items actual:",
+            "- Suspected duplicate/bloat labels to remove or bypass:",
+            "- Direct debug path:",
+            "- External test name:",
+            "",
+            "### Event / Thread Feature",
+            "",
+            "- Feature name:",
+            "- Thread id / object:",
+            "- Event id / target:",
+            "- Event owner file:",
+            "- Event label:",
+            "- Trigger location:",
+            "- Trigger action:",
+            "- Conditions expected:",
+            "- Conditions actual from event probe:",
+            "- Required variables/state:",
+            "- Variables changed by label:",
+            "- Expected menu title:",
+            "- Expected menu items:",
+            "- Actual menu items:",
+            "- Expected return flow:",
+            "- Actual return flow:",
+            "- Picture path / sequence:",
+            "- Direct debug path:",
+            "- External test name:",
+            "",
+            "### NPC Presence / Schedule Feature",
+            "",
+            "- Feature name:",
+            "- NPC id:",
+            "- PeopleData object:",
+            "- PeopleInfo/runtime object:",
+            "- Schedule owner file or JSON:",
+            "- Expected weekday/time interval:",
+            "- Expected location:",
+            "- Actual getLocation():",
+            "- Actual Room.visible_npcs():",
+            "- Expected awake/talkable:",
+            "- Actual awake/talkable:",
+            "- Expected HUD name:",
+            "- Actual HUD name:",
+            "- Default NPC action label/menu:",
+            "- Direct debug path:",
+            "- External test name:",
+            "",
+            "### Object / Action Menu Feature",
+            "",
+            "- Feature name:",
+            "- Room code_name:",
+            "- GameObject id:",
+            "- GameObject owner file:",
+            "- Object menu label:",
+            "- Action label/function:",
+            "- Expected object description:",
+            "- Actual object description:",
+            "- Expected menu title:",
+            "- Expected menu items:",
+            "- Actual menu items:",
+            "- State variables changed by function/method:",
+            "- Text/picture presented by label:",
+            "- Direct debug path:",
+            "- External test name:",
+            "",
+            "### Picture / Sequence Feature",
+            "",
+            "- Feature name:",
+            "- Owner label/object/event:",
+            "- Expected base path:",
+            "- Expected files:",
+            "- Actual resolved paths:",
+            "- Missing files:",
+            "- vscene/show helper used:",
+            "- Direct debug path:",
+            "- External test name:",
+            "",
+            "### Shop / Item Feature",
+            "",
+            "- Feature name:",
+            "- Room code_name:",
+            "- Container GameObject id:",
+            "- GameItem ids expected:",
+            "- GameItem owner file:",
+            "- Catalog/list owner:",
+            "- Expected item display names:",
+            "- Expected descriptions:",
+            "- Expected prices:",
+            "- Expected buy/action label:",
+            "- Expected depreciation/wear state:",
+            "- Actual menu/screen items:",
+            "- State variables changed by buy/apply function:",
+            "- Direct debug path:",
+            "- External test name:",
+        ])
+
+    def debug_builder_repair_document_text():
+        sections = []
+        sections.append("# Debug Builder Repair Notes")
+        sections.append("")
+        sections.append("Generated from the current runtime state. This report is evidence for source patches; it is not a source patch itself.")
+        sections.append("")
+        sections.append("## Current State")
+        sections.append("")
+        sections.append("- CurLoc: `%s`" % str(CurLoc or ""))
+        sections.append("- Time slot: `%s`, clock `%02d:%02d`, weekday `%s`, day `%s`" % (str(time or ""), hour, minute, str(week or ""), str(dayspassed or "")))
+        sections.append("")
+
+        sections.append("## Expected Vs Reality Checklist")
+        sections.append("")
+        sections.append("- Expected: room text and picture are owned by the Room object. Reality: inspect room reports below for missing/duplicated text or bad paths.")
+        sections.append("- Expected: object actions are owned by room GameObjects/GameItems. Reality: inspect menu reports below for missing or redundant menu items.")
+        sections.append("- Expected: NPC presence resolves from schedule and agrees with Room.visible_npcs(). Reality: inspect schedule report below.")
+        sections.append("- Expected: events are exposed by Event/Thread checks and fired through checkTriggers. Reality: inspect event probes below.")
+        sections.append("- Expected: image sequences resolve to loadable files. Reality: inspect media sequence report below.")
+        sections.append("")
+
+        sections.append("## Manual Notes From Play Debug Session")
+        sections.append("")
+        sections.append("Write concrete notes here after using the visual builder:")
+        sections.append("")
+        sections.append("- Expected:")
+        sections.append("- Reality:")
+        sections.append("- Screen/path used:")
+        sections.append("- Suspected owner file:")
+        sections.append("- Requested repair wording:")
+        sections.append("")
+
+        sections.append("## Feature Repair Templates")
+        sections.append("")
+        sections.append(debug_builder_feature_templates_text())
+        sections.append("")
+
+        sections.append("## Picture Paths")
+        sections.append("")
+        sections.append(debug_builder_picture_report())
+        sections.append("")
+
+        sections.append("## Picture Sequences")
+        sections.append("")
+        sections.append(debug_builder_media_sequence_report())
+        sections.append("")
+
+        sections.append("## NPC Schedules")
+        sections.append("")
+        sections.append(debug_builder_schedule_report())
+        sections.append("")
+
+        sections.append("## Event Probes")
+        sections.append("")
+        sections.append(debug_builder_event_probe_report())
+        sections.append("")
+
+        sections.append("## Priority Room/Menu Probes")
+        for room_key in ["TavernMain", "TavernKitchen", "TavernAmandaRoom", "TavernMelissaRoom", "DressShop", "WineStore", "MarketPlace"]:
+            sections.append("")
+            sections.append("### %s" % room_key)
+            sections.append("")
+            sections.append(debug_builder_room_menu_report(room_key))
+        sections.append("")
+
+        sections.append("## Repair Wording Template")
+        sections.append("")
+        sections.append("Use this wording when filing a concrete repair item:")
+        sections.append("")
+        sections.append("> Expected: `<what the Room/GameObject/Schedule/Event definition says should happen>`")
+        sections.append("> Reality: `<what the debug builder shows instead>`")
+        sections.append("> Owner file: `<exact .rpy file and object/label/function>`")
+        sections.append("> Repair: `<change the owner definition only; do not add duplicate wrappers>`")
+        sections.append("> Test: `<debug builder path plus external click test name>`")
+        sections.append("")
+        sections.append("## Ownership Notes")
+        sections.append("")
+        sections.append(debug_builder_correction_notes())
+        sections.append("")
+        return "\n".join([str(row or "") for row in sections])
+
+    def debug_builder_write_repair_document():
+        try:
+            base_dir = str(getattr(config, "basedir", "") or "")
+            if not base_dir:
+                base_dir = str(getattr(config, "gamedir", "") or "")
+            reports_dir = os.path.join(base_dir, "reports")
+            if not os.path.isdir(reports_dir):
+                os.makedirs(reports_dir)
+            path = os.path.join(reports_dir, "debug_builder_repair_notes.md")
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write(debug_builder_repair_document_text())
+            return path
+        except Exception as ex:
+            return "ERROR: %s" % ex
+
+    def debug_builder_main_items():
+        return [
+            MenuItem("Picture path checks", Jump("DebugBuilderPictures")),
+            MenuItem("Picture sequence probes", Jump("DebugBuilderSequences")),
+            MenuItem("Room descriptions / objects / exits", Jump("DebugBuilderRooms")),
+            MenuItem("Room menu probes", Jump("DebugBuilderMenuRooms")),
+            MenuItem("Story events / thread board", Jump("DebugBuilderStoryEvents")),
+            MenuItem("Event condition probes", Jump("DebugBuilderEventProbes")),
+            MenuItem("NPC schedules / visible NPCs", Jump("DebugBuilderSchedules")),
+            MenuItem("Correction ownership notes", Jump("DebugBuilderCorrectionNotes")),
+            MenuItem("Cards", Jump("DebugBuilderCards")),
+            MenuItem("Random town events", Jump("DebugTownRandomEvents")),
+            MenuItem("Legacy tavern debug", Jump("DebugTestRoomLegacy")),
+            MenuItem("Return to tavern", Jump("TavernMain")),
+        ]
 
     def debug_tavern_events_strict_assert():
         """
@@ -552,7 +1415,395 @@ label debug_tavern_events_dispatch_once:
     return
 
 
+define DebugBuilderRoomObject = Room(
+    code_name="DebugBuilderRoom",
+    group_name=ROOM_GROUP_OTHER,
+    display_name="Debug Builder",
+    bg_picture="images/rpg_message_bg.png",
+    descriptions=[
+        RoomDescription(text="Debug builder room for visual testing engine outputs.", priority=100),
+    ],
+)
+
+
+label DebugBuilderRoom:
+    call EnterLocation("DebugBuilderRoom")
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ UI_mode = "scene"
+    $ UI_selected_char = ""
+    $ main_ui_overlay = ""
+    $ _layout_last_picture = DebugBuilderRoomObject.bg_picture
+    $ MainTxt = debug_builder_main_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Debug Builder"
+    $ current_action_content = None
+    $ current_action_items = debug_builder_main_items()
+    call screen main_ui
+    jump DebugBuilderRoom
+
+
+label DebugBuilderPictures:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = debug_builder_picture_report()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Picture paths"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Player card", Call("DebugBuilderShowPicture", "images/general/player_card.jpg")),
+        MenuItem("Amanda card", Call("DebugBuilderShowPicture", "images/amanda/amanda_card.jpg")),
+        MenuItem("Melissa card", Call("DebugBuilderShowPicture", "images/melissa/melissa_card.jpg")),
+        MenuItem("Sandra card", Call("DebugBuilderShowPicture", "images/sandra/sandra_card.jpg")),
+        MenuItem("Irma talks", Call("DebugBuilderShowPicture", "images/irma/talks.png")),
+        MenuItem("Irma flirts", Call("DebugBuilderShowPicture", "images/irma/flirts.png")),
+        MenuItem("Back", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderPictures
+
+
+label DebugBuilderShowPicture(picture_path=""):
+    $ _debug_picture_path = str(picture_path or "")
+    if renpy.loadable(_debug_picture_path):
+        call ShowImage("", "", _debug_picture_path)
+        $ _layout_last_picture = _debug_picture_path
+        $ MainTxt = "Showing picture:\n" + _debug_picture_path
+    else:
+        $ MainTxt = "Missing picture:\n" + _debug_picture_path
+    $ CurLocDesc = MainTxt
+    return
+
+
+label DebugBuilderSequences:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = debug_builder_media_sequence_report()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Picture sequences"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("MarketPlace sequence", Call("DebugBuilderShowSequence", "general", "", "LocMarketPlace", 4)),
+        MenuItem("Artisans sequence", Call("DebugBuilderShowSequence", "general", "", "LocArtisansQuarter", 4)),
+        MenuItem("StreetTavern sequence", Call("DebugBuilderShowSequence", "general", "", "LocStreetTavern", 2)),
+        MenuItem("Irma measure sequence", Call("DebugBuilderShowSequence", "irma", "measure", "measure", 4)),
+        MenuItem("Back", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderSequences
+
+
+label DebugBuilderShowSequence(folder1="", folder2="", image_name="", variants=0):
+    $ _dbg_seq_folder1 = str(folder1 or "")
+    $ _dbg_seq_folder2 = str(folder2 or "")
+    $ _dbg_seq_name = str(image_name or "")
+    $ _dbg_seq_variants = int(variants or 0)
+    call ShowImageSeq(_dbg_seq_folder1, _dbg_seq_folder2, _dbg_seq_name, _dbg_seq_variants)
+    $ MainTxt = "Showing sequence:\nfolder1=%s\nfolder2=%s\nimage_name=%s\nvariants=%s" % (_dbg_seq_folder1, _dbg_seq_folder2, _dbg_seq_name, _dbg_seq_variants)
+    $ CurLocDesc = MainTxt
+    return
+
+
+label DebugBuilderRooms:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = "Select a room to inspect its actual Room object output: picture, visible descriptions, visible objects, visible exits, and schedule-driven NPCs."
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Rooms"
+    $ current_action_content = None
+    $ current_action_items = []
+    python:
+        for _debug_room_key in debug_builder_room_keys()[:24]:
+            current_action_items.append(MenuItem(_debug_room_key, Call("DebugBuilderInspectRoom", _debug_room_key)))
+        current_action_items.append(MenuItem("Back", Jump("DebugBuilderRoom")))
+    call screen main_ui
+    jump DebugBuilderRooms
+
+
+label DebugBuilderInspectRoom(room_code=""):
+    $ _debug_room_code = str(room_code or "")
+    $ _debug_room_obj = get_registered_room(_debug_room_code)
+    $ MainTxt = debug_builder_room_report(_debug_room_code)
+    $ CurLocDesc = MainTxt
+    if _debug_room_obj is not None and renpy.loadable(str(getattr(_debug_room_obj, "bg_picture", "") or "")):
+        $ _layout_last_picture = str(getattr(_debug_room_obj, "bg_picture", "") or "")
+    $ current_action_title = "Room: " + _debug_room_code
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Show room picture", Call("DebugBuilderShowRoomPicture", _debug_room_code)),
+        MenuItem("Jump to room", Jump(_debug_room_code)),
+        MenuItem("Back to rooms", Jump("DebugBuilderRooms")),
+        MenuItem("Back to builder", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderRooms
+
+
+label DebugBuilderShowRoomPicture(room_code=""):
+    $ _debug_room_obj = get_registered_room(str(room_code or ""))
+    $ _debug_room_pic = str(getattr(_debug_room_obj, "bg_picture", "") or "") if _debug_room_obj is not None else ""
+    if renpy.loadable(_debug_room_pic):
+        call ShowImage("", "", _debug_room_pic)
+        $ _layout_last_picture = _debug_room_pic
+        $ MainTxt = "Showing room picture:\n" + _debug_room_pic
+    else:
+        $ MainTxt = "Room picture missing:\n" + _debug_room_pic
+    $ CurLocDesc = MainTxt
+    return
+
+
+label DebugBuilderMenuRooms:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = "Select a room to inspect generated menu items, object actions, room actions, and exits."
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Room menu probes"
+    $ current_action_content = None
+    $ current_action_items = []
+    python:
+        for _debug_room_key in debug_builder_room_keys()[:24]:
+            current_action_items.append(MenuItem(_debug_room_key, Call("DebugBuilderMenuRoom", _debug_room_key)))
+        current_action_items.append(MenuItem("Back", Jump("DebugBuilderRoom")))
+    call screen main_ui
+    jump DebugBuilderMenuRooms
+
+
+label DebugBuilderMenuRoom(room_code=""):
+    $ _debug_room_code = str(room_code or "")
+    $ MainTxt = debug_builder_room_menu_report(_debug_room_code)
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Menu: " + _debug_room_code
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Jump to room", Jump(_debug_room_code)),
+        MenuItem("Back to menu probes", Jump("DebugBuilderMenuRooms")),
+        MenuItem("Back to builder", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderMenuRooms
+
+
+label DebugBuilderStoryEvents:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = debug_builder_story_report()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Story events"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Open story board overlay", [Function(story_board_refresh), SetVariable("main_ui_overlay", "story")]),
+        MenuItem("Refresh event checks", Jump("DebugBuilderStoryEvents")),
+        MenuItem("Back", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderStoryEvents
+
+
+label DebugBuilderEventProbes:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = debug_builder_event_probe_report()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Event condition probes"
+    $ current_action_content = None
+    $ current_action_items = debug_builder_event_probe_items() + [
+        MenuItem("Refresh event checks", Jump("DebugBuilderEventProbes")),
+        MenuItem("Open story board overlay", [Function(story_board_refresh), SetVariable("main_ui_overlay", "story")]),
+        MenuItem("Back", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderEventProbes
+
+
+label DebugBuilderEventProbe(location_key="", action_key=""):
+    $ _debug_event_location = str(location_key or "")
+    $ _debug_event_action = str(action_key or "")
+    $ MainTxt = debug_builder_event_condition_report(_debug_event_location, _debug_event_action)
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Event: " + _debug_event_location + " / " + _debug_event_action
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Fire through checkTriggers", Call("DebugBuilderFireEvent", _debug_event_location, _debug_event_action)),
+        MenuItem("Back to event probes", Jump("DebugBuilderEventProbes")),
+        MenuItem("Back to builder", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderEventProbes
+
+
+label DebugBuilderFireEvent(location_key="", action_key=""):
+    $ _debug_event_location = str(location_key or "")
+    $ _debug_event_action = str(action_key or "")
+    call checkTriggers(_debug_event_location, _debug_event_action, 0)
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = "Returned from checkTriggers(%s, %s, 0)." % (_debug_event_location, _debug_event_action)
+    $ CurLocDesc = MainTxt
+    return
+
+
+label DebugBuilderSchedules:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ npc_schedule_sync_all()
+    $ MainTxt = debug_builder_schedule_report()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "NPC schedules"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("06:00 Early morning", [Function(debug_builder_set_time_slot, 0), Jump("DebugBuilderSchedules")]),
+        MenuItem("08:00 Morning", [Function(debug_builder_set_time_slot, 1), Jump("DebugBuilderSchedules")]),
+        MenuItem("11:00 Noon", [Function(debug_builder_set_time_slot, 2), Jump("DebugBuilderSchedules")]),
+        MenuItem("13:00 Afternoon", [Function(debug_builder_set_time_slot, 3), Jump("DebugBuilderSchedules")]),
+        MenuItem("16:00 Day", [Function(debug_builder_set_time_slot, 4), Jump("DebugBuilderSchedules")]),
+        MenuItem("18:00 Evening", [Function(debug_builder_set_time_slot, 5), Jump("DebugBuilderSchedules")]),
+        MenuItem("21:00 Late evening", [Function(debug_builder_set_time_slot, 6), Jump("DebugBuilderSchedules")]),
+        MenuItem("23:00 Night", [Function(debug_builder_set_time_slot, 7), Jump("DebugBuilderSchedules")]),
+        MenuItem("Probe rooms", Jump("DebugBuilderScheduleRooms")),
+        MenuItem("Back", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderSchedules
+
+
+label DebugBuilderScheduleRooms:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = "Choose a room. The probe compares getNPCids(room) with Room.visible_npcs() for the current calendar time."
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Schedule room probes"
+    $ current_action_content = None
+    $ current_action_items = debug_builder_schedule_room_items() + [MenuItem("Back", Jump("DebugBuilderSchedules"))]
+    call screen main_ui
+    jump DebugBuilderScheduleRooms
+
+
+label DebugBuilderScheduleRoom(room_code=""):
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = debug_builder_schedule_room_report(room_code)
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Schedule: " + str(room_code or "")
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Jump to room", Jump(str(room_code or ""))),
+        MenuItem("Back to probes", Jump("DebugBuilderScheduleRooms")),
+        MenuItem("Back to schedules", Jump("DebugBuilderSchedules")),
+    ]
+    call screen main_ui
+    jump DebugBuilderScheduleRooms
+
+
+label DebugBuilderCorrectionNotes:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = debug_builder_correction_notes()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Correction notes"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Write repair notes document", Jump("DebugBuilderWriteRepairNotes")),
+        MenuItem("Preview full repair document", Jump("DebugBuilderRepairDocumentPreview")),
+        MenuItem("Back", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderCorrectionNotes
+
+
+label DebugBuilderRepairDocumentPreview:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = debug_builder_repair_document_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Repair notes preview"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Write document", Jump("DebugBuilderWriteRepairNotes")),
+        MenuItem("Back to notes", Jump("DebugBuilderCorrectionNotes")),
+        MenuItem("Back to builder", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderCorrectionNotes
+
+
+label DebugBuilderWriteRepairNotes:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ DebugBuilderRepairNotesPath = debug_builder_write_repair_document()
+    $ MainTxt = "Repair notes document written:\n" + str(DebugBuilderRepairNotesPath or "")
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Repair notes written"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Preview document", Jump("DebugBuilderRepairDocumentPreview")),
+        MenuItem("Back to notes", Jump("DebugBuilderCorrectionNotes")),
+        MenuItem("Back to builder", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderCorrectionNotes
+
+
+label DebugBuilderCards:
+    $ CurLoc = "DebugBuilderRoom"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ MainTxt = "Open card panels and verify that stats and _card pictures come from the current runtime state."
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Cards"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Player", Function(show_player_card_main_ui_state)),
+        MenuItem("Amanda", Function(show_girl_card_main_ui_state, "amanda")),
+        MenuItem("Melissa", Function(show_girl_card_main_ui_state, "melissa")),
+        MenuItem("Sandra", Function(show_girl_card_main_ui_state, "sandra")),
+        MenuItem("Clara", Function(show_girl_card_main_ui_state, "clara")),
+        MenuItem("Becky", Function(show_girl_card_main_ui_state, "becky")),
+        MenuItem("Irma", Function(show_girl_card_main_ui_state, "irma")),
+        MenuItem("Back", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderCards
+
+
 label DebugTestRoom:
+    jump DebugBuilderRoom
+
+
+label RoomDebugBuilder:
+    jump DebugBuilderRoom
+
+
+label DebugRoomBuilder:
+    jump DebugBuilderRoom
+
+
+label VisualDebugRoom:
+    jump DebugBuilderRoom
+
+
+label debug_builder_room:
+    jump DebugBuilderRoom
+
+
+label debug_room_builder:
+    jump DebugBuilderRoom
+
+
+label DebugTestRoomLegacy:
     call EnterLocation("DebugTestRoom")
     python:
         _dbg_desc = "Тестовая комната. Здесь можно проверять таверн-события, показывать картинки и запускать диалоги."
@@ -593,20 +1844,28 @@ label DebugTestRoom:
                 call debug_shop_flow_check
                 jump debug_test_room_menu
             "Тест: продуктовая лавка (утро)":
-                $ week = 1
-                $ calendar_set_time_slot(0)
+                $ _dbg_calendar_set_weekday(1)
+                $ calendar_v2.hour = 6
+                $ calendar_v2.minute = 0
+                $ calendar_v2.sync_state()
                 jump GroceryStore
             "Тест: винный погребок (утро)":
-                $ week = 1
-                $ calendar_set_time_slot(0)
+                $ _dbg_calendar_set_weekday(1)
+                $ calendar_v2.hour = 6
+                $ calendar_v2.minute = 0
+                $ calendar_v2.sync_state()
                 jump WineStore
             "Тест: лавка Ирмы":
-                $ week = 1
-                $ calendar_set_time_slot(1)
+                $ _dbg_calendar_set_weekday(1)
+                $ calendar_v2.hour = 8
+                $ calendar_v2.minute = 0
+                $ calendar_v2.sync_state()
                 jump DressShop
             "Тест: мастерская Драупнира":
-                $ week = 1
-                $ calendar_set_time_slot(1)
+                $ _dbg_calendar_set_weekday(1)
+                $ calendar_v2.hour = 8
+                $ calendar_v2.minute = 0
+                $ calendar_v2.sync_state()
                 jump StolyarWorkshop
             "Показать портрет Сандры":
                 call ShowImageSeq("sandra", "portraits", "portrait", 4)
@@ -631,7 +1890,7 @@ label DebugTestRoom:
 
 
 label debug_test_room:
-    jump DebugTestRoom
+    jump DebugBuilderRoom
 
 
 label debug_tavern_events_snapshot:

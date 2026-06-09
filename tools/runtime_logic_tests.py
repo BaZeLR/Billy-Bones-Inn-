@@ -42,6 +42,7 @@ THREAD_RUNTIME_STATE_ASSIGN_RE = re.compile(
     r"\b(?:thread|tinfo|_clara_booklet_thread|_melissa_bat_thread|threads\[[^\]]+\])"
     r"\.(?:done|num|completed|aborted|metconds|blocks|blocked)\s*=(?!=)"
 )
+CALL_HYPERLINK_RE = re.compile(r"\{a=call:([^}]+)\}")
 
 
 @dataclass
@@ -351,8 +352,8 @@ def valid_reqs(value: object) -> bool:
 def validate_event_schema(events: list[StoryEvent], report: RuntimeLogicReport) -> None:
     for event in events:
         name = event_type_name(event)
-        if event.raw_len < 11:
-            report.fail("event_schema", f"{name}: event tuple has {event.raw_len} fields, expected at least 11")
+        if event.raw_len != 11:
+            report.fail("event_schema", f"{name}: event tuple has {event.raw_len} fields, expected exactly 11")
         if not event.target:
             report.fail("event_schema", f"{name}: empty target label")
         if not valid_time_spec(event.day):
@@ -374,6 +375,54 @@ def validate_event_schema(events: list[StoryEvent], report: RuntimeLogicReport) 
         if not isinstance(event.priority, int):
             report.fail("event_schema", f"{name}: priority must be an int")
     report.pass_("event_schema", f"validated {len(events)} event tuple field sets")
+
+
+def check_event_audit_methods(project_root: Path, report: RuntimeLogicReport) -> None:
+    events_path = project_root / "game" / "Utilities" / "General" / "Events" / "events.rpy"
+    threads_path = project_root / "game" / "Utilities" / "General" / "Events" / "threads.rpy"
+    board_path = project_root / "game" / "Utilities" / "General" / "Screens" / "StoryThreadBoard.rpy"
+    story_source = ""
+    for path in (events_path, threads_path):
+        if path.exists():
+            story_source += "\n" + read_text(path)
+    board_source = read_text(board_path) if board_path.exists() else ""
+    required_runtime_tokens = (
+        "def auditChecks",
+        "def canTrigger",
+        "def checkBlocks",
+        '"target"',
+        '"binding"',
+        '"day"',
+        '"hour"',
+        '"delay"',
+        '"requirements"',
+        '"conditions"',
+        '"item"',
+        '"location_open"',
+        '"probability"',
+    )
+    for token in required_runtime_tokens:
+        if token not in story_source:
+            report.fail("event_audit", f"split story runtime missing audit token: {token}")
+    required_board_tokens = (
+        "def story_board_condition_lines",
+        "rows.append(str(cond.show()).replace(\"[\", \"[[\"))",
+        "for _cond_line in story_board_condition_lines(tinfo.data.conds):",
+        "for _cond_line in story_board_condition_lines(evt.conds):",
+        'text "Conditions:"',
+    )
+    for token in required_board_tokens:
+        if token not in board_source:
+            report.fail("event_audit", f"StoryThreadBoard missing audit token: {token}")
+    forbidden_board_tokens = (
+        "def story_board_show_event_checks",
+        "story_board_show_event_checks(evt, tinfo)",
+        'text "Checks: "',
+    )
+    for token in forbidden_board_tokens:
+        if token in board_source:
+            report.fail("event_audit", f"StoryThreadBoard keeps old confusing audit display token: {token}")
+    report.pass_("event_audit", "event audit methods remain runtime-only; board uses FamilyLife condition rows")
 
 
 def extract_python_assignment(source: str, name: str) -> str:
@@ -433,6 +482,7 @@ def check_thread_events(project_root: Path, report: RuntimeLogicReport) -> None:
         report.fail("events", "no story events parsed")
         return
     validate_event_schema(events, report)
+    check_event_audit_methods(project_root, report)
 
     missing_labels = [event for event in events if event.target not in labels]
     for event in missing_labels:
@@ -557,7 +607,7 @@ def check_recipe_items(project_root: Path, report: RuntimeLogicReport) -> None:
 def check_required_hooks(project_root: Path, report: RuntimeLogicReport) -> None:
     checks = {
         "projection": (
-            project_root / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy",
+            project_root / "game" / "Utilities" / "General" / "Events" / "events.rpy",
             ("eventProjectionRows", "eventRouteHints", "story_event_projection_rows", "story_event_path_targets"),
         ),
         "player_condition": (
@@ -582,7 +632,7 @@ def check_required_hooks(project_root: Path, report: RuntimeLogicReport) -> None
                 "story_board_show_day(evt.day)",
                 "story_board_show_hour(evt.hour)",
                 "story_board_show_stats(evt.reqs)",
-                "story_board_show_conds(evt.conds)",
+                "story_board_condition_lines(evt.conds)",
                 "done",
                 "available",
                 "waiting",
@@ -657,6 +707,73 @@ def check_thread_runtime_api_usage(project_root: Path, report: RuntimeLogicRepor
         report.pass_("thread_api", "gameplay code uses ThreadInfo methods for runtime state changes")
 
 
+def check_call_hyperlinks(project_root: Path, report: RuntimeLogicReport) -> None:
+    labels = collect_labels(project_root / "game")
+    checked = 0
+    for path in iter_rpy_files(project_root / "game"):
+        source = read_text(path)
+        for match in CALL_HYPERLINK_RE.finditer(source):
+            checked += 1
+            target = match.group(1).strip()
+            line_no = source.count("\n", 0, match.start()) + 1
+            location = f"{path.relative_to(project_root)}:{line_no}"
+            if not re.match(r"^[A-Za-z_]\w*$", target):
+                report.fail("hyperlink", f"call hyperlink target is not a plain label at {location}: {target}")
+                continue
+            if target not in labels:
+                report.fail("hyperlink", f"call hyperlink target label is missing at {location}: {target}")
+    report.pass_("hyperlink", f"checked {checked} call hyperlinks")
+
+
+def check_room_enter_gates(project_root: Path, report: RuntimeLogicReport) -> None:
+    checks = {
+        "TavernMelissaRoom": project_root / "game" / "Inn" / "TavernMelissaRoom.rpy",
+    }
+    for label, path in checks.items():
+        if not path.exists():
+            report.fail("room_enter", f"{path.relative_to(project_root)} is missing")
+            continue
+        source = read_text(path)
+        if f"label {label}:" not in source:
+            report.fail("room_enter", f"{label} label is missing")
+        if "call RoomEnterEventGate(CurLoc, False)" not in source:
+            report.fail("room_enter", f"{label} does not call RoomEnterEventGate")
+    report.pass_("room_enter", f"checked {len(checks)} room enter gates")
+
+
+def check_random_helpers(project_root: Path, report: RuntimeLogicReport) -> None:
+    path = project_root / "game" / "script.rpy"
+    if not path.exists():
+        report.fail("random_helpers", "script.rpy is missing")
+        return
+    source = read_text(path)
+    for token in (
+        "def procedural_seed(",
+        "def procedural_index(",
+        "def procedural_choice(",
+        "def procedural_randint(",
+    ):
+        if token not in source:
+            report.fail("random_helpers", f"{token} is missing from script.rpy")
+    if "renpy.random.choices" in source:
+        report.fail("random_helpers", "script.rpy uses renpy.random.choices instead of local helper selection")
+    direct_random_re = re.compile(r"renpy\.random\.(?:randint|choice|uniform|random)\(")
+    direct_random_rows: list[str] = []
+    for other_path in iter_rpy_files(project_root / "game"):
+        if other_path == path:
+            continue
+        other_source = read_text(other_path)
+        for match in direct_random_re.finditer(other_source):
+            line_no = other_source.count("\n", 0, match.start()) + 1
+            direct_random_rows.append(f"{other_path.relative_to(project_root)}:{line_no}")
+    if direct_random_rows:
+        report.warn(
+            "random_helpers",
+            f"{len(direct_random_rows)} direct renpy.random calls remain outside script helpers; first: {direct_random_rows[0]}",
+        )
+    report.pass_("random_helpers", "script.rpy procedural random helper API is present")
+
+
 def run_checks(project_root: Path) -> RuntimeLogicReport:
     report = RuntimeLogicReport()
     check_thread_events(project_root, report)
@@ -664,6 +781,9 @@ def run_checks(project_root: Path) -> RuntimeLogicReport:
     check_recipe_items(project_root, report)
     check_required_hooks(project_root, report)
     check_thread_runtime_api_usage(project_root, report)
+    check_call_hyperlinks(project_root, report)
+    check_room_enter_gates(project_root, report)
+    check_random_helpers(project_root, report)
     return report
 
 

@@ -24,6 +24,18 @@ init python:
         "draupnir": "Драупнир",
     }
 
+    AllGirlNames = [
+        "sandra",
+        "melissa",
+        "amanda",
+        "georgett",
+        "liza",
+        "becky",
+        "irma",
+        "inga",
+        "clara",
+    ]
+
     RealName2 = {
         "sandra": "Сандры",
         "melissa": "Мелиссы",

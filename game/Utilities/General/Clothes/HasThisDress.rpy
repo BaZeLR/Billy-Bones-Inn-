@@ -2,8 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # HasThisDress.rpy
-# QSP parity: checks whether dress code exists in an array variable by name.
-# Example from TXT: Func('HasThisDress', 'MyDresses', 'citydress')
+# QSP parity: checks whether dress code exists in a named wardrobe/list.
 
 init python:
     def _dress_key_sort(value):
@@ -53,14 +52,16 @@ init python:
         setattr(renpy.store, key, out)
         return out
 
-    def HasThisDress(array_var_name="MyDresses", dress_code=""):
+    def HasThisDress(array_var_name="player", dress_code=""):
         dress = str(dress_code or "").strip()
         if not dress:
             return 0
+        if _dress_list_attr_name(array_var_name) in ("", "player"):
+            return 1 if player_state().appearance.has_dress(dress) else 0
         wardrobe = _normalize_dress_list_var(array_var_name)
         return 1 if dress in wardrobe else 0
 
-    def has_this_dress(array_var_name="MyDresses", dress_code=""):
+    def has_this_dress(array_var_name="player", dress_code=""):
         return HasThisDress(array_var_name, dress_code)
 
     def has_this_dress_for_character(character_name, dress_code):
@@ -68,11 +69,11 @@ init python:
         return HasThisDress(key, dress_code)
 
 
-label HasThisDress(array_var_name="MyDresses", dress_code=""):
+label HasThisDress(array_var_name="player", dress_code=""):
     $ Result = HasThisDress(array_var_name, dress_code)
     return Result
 
 
-label has_this_dress(array_var_name="MyDresses", dress_code=""):
+label has_this_dress(array_var_name="player", dress_code=""):
     $ Result = HasThisDress(array_var_name, dress_code)
     return Result

@@ -118,7 +118,6 @@ label StolyarWorkshopBuildActions:
     $ current_action_content = None
     $ current_action_items = []
     $ current_action_items.append(MenuItem("Осмотреть", Call("StolyarWorkshopApply", "look")))
-    $ current_action_items.append(MenuItem("Поболтать с гномом", Call("IntDraupnirTalk")))
     if can_ask_slogan:
         $ current_action_items.append(MenuItem("Спросить о ремонте вывески", Call("StolyarWorkshopApply", "ask_slogan")))
     if can_pay_slogan:
@@ -178,7 +177,9 @@ label StolyarWorkshopApply(choice_code=""):
         $ MainTxt = "Скрепя сердце вы отсчитали 100 мараведи мастеру Драупниру. Взяв с собой дрель, стамески, пилу и еще пару инструментов, работящий гном отправился к вашему трактиру. Впрочем, долго он там не задержался, вернувшись и отрапортовав что все сделанно, потайное окошко готово."
         $ TavernHole = 1
         $ money -= 100
-        $ calendar_set_time_slot(1)
+        $ calendar_v2.hour = 8
+        $ calendar_v2.minute = 0
+        $ calendar_v2.sync_state()
         $ CurLocDesc = MainTxt
         call StolyarWorkshopBuildActions
         return

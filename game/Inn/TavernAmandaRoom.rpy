@@ -147,7 +147,7 @@ init python:
             parts.append(str(desc_rows[1].text or "").strip())
 
         try:
-            melissa_sync_room_problem_state()
+            Melissa.sync_room_problem_state()
         except Exception:
             pass
         if str(getLocation("melissa") or "") == "TavernAmandaRoom":
@@ -159,15 +159,15 @@ init python:
 
     def tavern_amanda_room_locked_for_melissa_booklet():
         try:
-            melissa_sync_room_problem_state()
+            Melissa.sync_room_problem_state()
         except Exception:
             pass
         return (
             int(time or 0) >= 4
             and str(MelissaVar.get("temp_room", "") or "") == "TavernAmandaRoom"
             and int(MelissaVar.get("drawings_found", 0) or 0) == 0
-            and melissa_bats_stage() >= 6
-            and melissa_bats_stage() < 8
+            and Melissa.bats_stage() >= 6
+            and Melissa.bats_stage() < 8
         )
 
     TavernAmandaRoomRoom = Room(
@@ -267,7 +267,7 @@ label TavernAmandaRoom:
         call ShowImage("", "", _amanda_room_picture)
     $ _room.mark_visited()
     if int(time or 0) >= 4:
-        call AmandaAtHomeCode
+        call AmandaAtHomeStateDefaults
         call DressForNight("amanda", tmpSleepDress)
     $ MainTxt = tavern_amanda_room_main_text(_room, tmpSleepDress)
     $ CurLocDesc = MainTxt
@@ -294,9 +294,7 @@ label TavernAmandaRoomBuildActions:
         $ current_action_items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernAmandaRoom", "", "")))
     $ current_action_items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernAmandaRoom", "TavernAmandaRoomBuildActions")))
     if story_event_available("TavernAmandaRoom", "melissa_bats"):
-        $ current_action_items.append(MenuItem(melissa_bat_drawings_event_caption(), Call("checkTriggers", "TavernAmandaRoom", "melissa_bats", 0)))
-    if werecat_is_in_room("TavernAmandaRoom"):
-        $ current_action_items.append(MenuItem(werecat_action_caption("TavernAmandaRoom"), Call("IntWerecatTalk", "TavernAmandaRoom")))
+        $ current_action_items.append(MenuItem(Melissa.bat_drawings_event_caption(), Call("checkTriggers", "TavernAmandaRoom", "melissa_bats", 0)))
     python:
         for _room_object in TavernAmandaRoomRoom.visible_game_items():
             current_action_items.append(MenuItem(_room_object.name, Call("tavern_amanda_room_object_menu", _room_object.object_id)))
@@ -367,7 +365,7 @@ label TavernAmandaRoomMorningWindowEpisode:
         return
     $ AmandaVar["attic_window_morning_day"] = int(dayspassed or 0)
     $ _amanda_window_outcome = tavern_amanda_morning_window_outcome()
-    $ calendar_advance_minutes(20)
+    $ calendar_v2.advance_minutes(20)
     $ household_clear_morning_issue("amanda")
     $ CurrentLoc["amanda"] = "TavernAmandaRoom"
     $ MainTxt = "Аманда не спит. Вы застаете ее у окна ровно в тот момент, когда она резко отдергивает руку от занавески и пытается сделать вид, будто просто смотрела во двор.\n\n\"Ну что, Аманда? Кто у нас теперь извращенец?\" спрашиваете вы.\n\nОна вспыхивает, но не уходит от ответа: \"Ничего не могу поделать... иногда так зудит, что хоть на стену лезь.\" Вы спокойно отвечаете: \"Могу помочь, если хочешь.\""

@@ -38,6 +38,31 @@ init python:
         "city": "Town life",
     }
 
+    STORY_BOARD_TARGET_TITLES = {
+        "story_georgett_church_service_bench": "Georgette church: quiet bench",
+        "story_georgett_church_service_doggy": "Georgette church: risky service",
+        "story_georgett_church_service_with_liza": "Georgette church: Liza witnesses",
+        "story_georgett_church_after_sermon": "Georgette church: after-sermon spy scene",
+        "story_liza_church_after_sermon": "Lizette church: after-sermon scene",
+    }
+
+    STORY_BOARD_ACTION_TITLES = {
+        "georgett_church_service_bench": "Georgette church / quiet place",
+        "georgett_church_service_doggy": "Georgette church / right here",
+        "georgett_church_service_with_liza": "Georgette church / with Lizette",
+        "after_cermon_walk": "After-sermon walk",
+        "street_clients_georgett": "Georgette street clients",
+        "street_clients_liza": "Lizette street clients",
+    }
+
+    STORY_BOARD_TARGET_FILES = {
+        "story_georgett_church_service_bench": "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy",
+        "story_georgett_church_service_doggy": "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy",
+        "story_georgett_church_service_with_liza": "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy",
+        "story_georgett_church_after_sermon": "game/NPC/Girls/Georgett/IntGeorgettAfterCermon.rpy",
+        "story_liza_church_after_sermon": "game/NPC/Girls/Liza/IntLizettAfterCermon.rpy",
+    }
+
     STORY_BOARD_COLORS = {
         "done": "#32c46a",
         "available": "#ffffff",
@@ -224,6 +249,9 @@ init python:
         return "{color=#%s}%s{/color}" % ("0f0" if is_ok else "f00", story_board_safe_text(msg))
 
     def story_board_show_target(target):
+        key = str(target or "")
+        if key in STORY_BOARD_TARGET_TITLES:
+            return story_board_safe_text(STORY_BOARD_TARGET_TITLES[key])
         fields = str(target or "").split("_")
         if len(fields) > 1:
             return story_board_safe_text(fields[0] + " " + fields[1])
@@ -242,6 +270,12 @@ init python:
             "clara_fiance": "Clarissa fiance",
             "_story_enter": "Enter",
         }
+        if action in STORY_BOARD_ACTION_TITLES:
+            try:
+                name = people_locate_room_name(loc)
+            except Exception:
+                name = loc
+            return story_board_safe_text("%s / %s" % (name or loc, STORY_BOARD_ACTION_TITLES[action]))
         if loc.startswith("menu_"):
             loc = loc[5:]
         if loc.startswith("talk"):
@@ -312,20 +346,23 @@ init python:
     def story_board_show_hour(evt_hour):
         if evt_hour is None:
             return "Any"
-        current_hour = int(time or 0)
-        def _slot_name(value):
+        current_hour = int(hour or 0)
+        def _hour_name(value):
             try:
-                slot_info = TIME_SLOT_INFO.get(int(value), None) if "TIME_SLOT_INFO" in globals() else None
-                if slot_info is not None:
-                    return str(slot_info.get("name_ru", slot_info.get("name_en", value)) or value)
+                return "%02d:00" % (int(value) % 24)
             except Exception:
-                pass
-            return str(value)
+                return str(value)
+        def _hour_range_ok(first, last):
+            first_i = int(first)
+            last_i = int(last)
+            if first_i <= last_i:
+                return first_i <= current_hour <= last_i
+            return current_hour >= first_i or current_hour <= last_i
         if isinstance(evt_hour, list):
             return ",".join([story_board_show_hour(row) for row in evt_hour])
         if isinstance(evt_hour, tuple):
-            return story_board_colorize("%s-%s" % (_slot_name(evt_hour[0]), _slot_name(evt_hour[1])), int(evt_hour[0]) <= current_hour <= int(evt_hour[1]))
-        return story_board_colorize(_slot_name(evt_hour), current_hour == int(evt_hour))
+            return story_board_colorize("%s-%s" % (_hour_name(evt_hour[0]), _hour_name(evt_hour[1])), _hour_range_ok(evt_hour[0], evt_hour[1]))
+        return story_board_colorize(_hour_name(evt_hour), current_hour == int(evt_hour))
 
     def story_board_show_item(item_id):
         if item_id is None:
@@ -359,67 +396,20 @@ init python:
         return ", ".join(msg) if msg else "None"
 
     def story_board_show_conds(conds):
+        return " and ".join(story_board_condition_lines(conds))
+
+    def story_board_condition_lines(conds):
         if conds is None:
-            return "None"
+            return ["None"]
         rows = []
         for cond in list(conds or []):
             try:
-                rows.append(cond.show())
+                rows.append(str(cond.show()).replace("[", "[["))
             except Exception:
-                rows.append(str(cond))
+                rows.append(story_board_safe_text(cond))
         if not rows:
-            return "None"
-        return story_board_safe_text(" and ".join(rows))
-
-    def story_board_show_scene(tinfo, i):
-        try:
-            target = tinfo.getTarget(i)
-        except Exception:
-            return
-        if not target:
-            return
-        try:
-            renpy.hide_screen("story_event_screen")
-            renpy.call_replay(target, {"thread": tinfo, "location": CurLoc})
-        except Exception:
-            pass
-
-    def story_board_force_enable(thread_name=""):
-        key = str(thread_name or "").strip()
-        if key in threads:
-            try:
-                threads[key].forceEnable()
-            except Exception:
-                pass
-        story_board_refresh()
-
-    def story_board_abort(thread_name=""):
-        key = str(thread_name or "").strip()
-        if key in threads:
-            try:
-                threads[key].abort()
-            except Exception:
-                pass
-        story_board_refresh()
-
-    def story_board_reactivate(thread_name=""):
-        key = str(thread_name or "").strip()
-        if key in threads:
-            try:
-                threads[key].reactivate()
-            except Exception:
-                pass
-        story_board_refresh()
-
-    def story_board_reset(thread_name=""):
-        key = str(thread_name or "").strip()
-        if key in threads:
-            try:
-                threads[key].reset()
-            except Exception:
-                threads[key] = createThread(threads[key].data)
-        story_board_refresh()
-
+            return ["None"]
+        return rows
 
 init -5:
     style scene is button
@@ -528,7 +518,7 @@ screen story_thread_board_panel(person=None, standalone=False):
                             text_color story_board_thread_color(_tinfo)
                             text_size 16
                             text_hover_color "#ffff00"
-                            action Show("story_thread_control", None, _thread_name, _pos)
+                            action NullAction()
                             hovered Show("story_thread_screen", None, _tinfo)
                             unhovered Hide("story_thread_screen")
                         hbox:
@@ -537,17 +527,14 @@ screen story_thread_board_panel(person=None, standalone=False):
                                 button style "scene":
                                     idle_background Solid(story_board_event_color(_tinfo, _idx))
                                     hover_background Solid("#ffff00")
-                                    action Function(story_board_show_scene, _tinfo, _idx)
+                                    action NullAction()
                                     hovered Show("story_event_screen", None, _tinfo, _idx, _tinfo.getevent(_idx))
                                     unhovered Hide("story_event_screen")
                     $ _pos += 1
 
 
 screen story_board_toggle_highlight(tinfo):
-    textbutton ("[[x]" if getattr(tinfo, "highlight", False) else "[[ ]"):
-        text_size 16
-        xsize 40
-        action ToggleField(tinfo, "highlight")
+    text ("[[x]" if getattr(tinfo, "highlight", False) else "[[ ]") size 16 xsize 40
 
 
 screen story_thread_screen(tinfo):
@@ -561,7 +548,9 @@ screen story_thread_screen(tinfo):
         ysize 200
         vbox:
             text "Thread: " + tinfo.data.name
-            text "Conditions: " + story_board_show_conds(tinfo.data.conds)
+            text "Conditions:"
+            for _cond_line in story_board_condition_lines(tinfo.data.conds):
+                text _cond_line
 
 
 screen story_event_screen(tinfo, i, evt):
@@ -581,12 +570,18 @@ screen story_event_screen(tinfo, i, evt):
                     text "Event: " + story_board_show_target(evt.target)
                     text "Location: " + story_board_show_location(tinfo.data.person, evt.location, evt.action)
                     text "Item: " + story_board_show_item(evt.item)
+                    text "Label: " + story_board_safe_text(evt.target)
+                    text "Action: " + story_board_safe_text(evt.action)
+                    if evt.target in STORY_BOARD_TARGET_FILES:
+                        text "File: " + STORY_BOARD_TARGET_FILES[evt.target]
                 vbox:
                     text "Min.Date: " + story_board_show_min_date(evt.evtDay, tinfo.day)
                     text "Day: " + story_board_show_day(evt.day)
                     text "Hour: " + story_board_show_hour(evt.hour)
             text "Stats: " + story_board_show_stats(evt.reqs)
-            text "Conditions: " + story_board_show_conds(evt.conds)
+            text "Conditions:"
+            for _cond_line in story_board_condition_lines(evt.conds):
+                text _cond_line
             if evt.prob is not None and evt.prob < 1:
                 text "Random: %d%%" % int(evt.prob * 100)
 
@@ -597,35 +592,6 @@ screen story_event_detail(tinfo, event_index=0):
 
 screen story_event_detail_panel(tinfo, event_index=0):
     use story_event_screen(tinfo, event_index, tinfo.getevent(event_index))
-
-
-screen story_thread_control(thread_name="", pos=0):
-    use story_thread_control_panel(thread_name, pos)
-
-
-screen story_thread_control_panel(thread_name="", pos=0):
-    style_prefix "threadmenu"
-    modal True
-    zorder 212
-    $ _tinfo = threads.get(str(thread_name or ""), None) if isinstance(threads, dict) else None
-
-    if _tinfo is not None:
-        frame:
-            background Solid("#000000")
-            xpos 50
-            ypos 80 + 21 * int(pos or 0)
-            has vbox
-            if _tinfo.blocked:
-                textbutton "Force enabled [story_board_thread_title(_tinfo)]":
-                    action [Function(story_board_force_enable, thread_name), Hide("story_thread_control")]
-            if _tinfo.aborted:
-                textbutton "Reactivate thread [story_board_thread_title(_tinfo)]":
-                    action [Function(story_board_reactivate, thread_name), Hide("story_thread_control")]
-            else:
-                textbutton "Abort thread [story_board_thread_title(_tinfo)]":
-                    action [Function(story_board_abort, thread_name), Hide("story_thread_control")]
-            textbutton "Leave the thread status unchanged":
-                action Hide("story_thread_control")
 
 
 screen story_board_help():
@@ -645,4 +611,3 @@ screen story_board_help():
         spacing 10
         text "Threads are story lines. Each row is a thread, and each box is one event in that thread." size 24 color "#cc9900"
         text "Hover a thread name to see thread conditions. Hover an event box to see the event fields: target, location/action, item, minimum date, day, hour, stats, conditions, and random chance." size 24 color "#cc9900"
-        text "Click a thread name to force, reactivate, or abort that thread. Click an event box to try replaying that event without changing current progress." size 24 color "#cc9900"

@@ -63,8 +63,6 @@ label TavernStorage:
         _storage_items = []
         for _storage_exit in TavernStorageRoom.visible_exits():
             _storage_items.append(MenuItem(_storage_exit.label, Call("AdvanceMovementTime", _storage_exit.target)))
-    if werecat_is_in_room("TavernStorage"):
-        $ _storage_items.append(MenuItem(werecat_action_caption("TavernStorage"), Call("IntWerecatTalk", "TavernStorage")))
     $ main_ui_set_action_panel("Кладовая", _storage_items, None, "scene", restart=False)
     call screen main_ui
     jump TavernStorage

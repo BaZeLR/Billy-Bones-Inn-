@@ -878,7 +878,6 @@
 "WineStoreBuyApply"	"game\Inn\WineStore.rpy"	"234"	"24"	""	"$ MainTxt = ""Вы решили пока ничего не покупать."" || $ MainTxt = ""Вы купили бочонок вина. [GrocerName] говорит вам, что ваш заказ будет доставлен в \""Дикий жеребец\"" немедленно."" || $ MainTxt = ""Вы купили пять бочонков вина. [GrocerName] говорит вам, что ваш заказ будет доставлен в \""Дикий жеребец\"" немедленно."""	""	""
 "WineStoreRestore"	"game\Inn\WineStore.rpy"	"258"	"5"	""	"$ MainTxt = WineStoreSavedText or WineStoreRoom.descriptions[0].text || $ CurLocDesc = MainTxt"	""	""
 "ZaletOpinionCalc"	"game\Inn\ZaletOpinionCalc.rpy"	"298"	"2"	""	""	""	""
-"qsp_reference"	"game\qsp_reference.rpy"	"112"	"3"	""	""	""	""
 "splashscreen"	"game\script.rpy"	"724"	"4"	""	""	""	""
 "start"	"game\script.rpy"	"728"	"6"	""	""	""	""
 "introduction"	"game\script.rpy"	"734"	"8"	""	""	""	""

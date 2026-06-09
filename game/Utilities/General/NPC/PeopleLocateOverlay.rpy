@@ -49,7 +49,7 @@ init python:
             try:
                 loc = str(info.getLocation() if info is not None else getLocation(key) or "").strip()
             except Exception:
-                loc = str(people_get_map("CurrentLoc").get(key, "") or "").strip()
+                loc = ""
             if not loc:
                 loc = "неизвестно"
             rows.append({

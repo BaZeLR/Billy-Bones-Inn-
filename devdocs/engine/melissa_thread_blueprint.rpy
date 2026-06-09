@@ -1,4 +1,4 @@
-default MelissaThreadBlueprint = []
+
 default MelissaLThreadBlueprint = []
 
 init 100 python:

@@ -6,8 +6,17 @@ init python:
         object_id="female_samples_001",
         name="Женские образцы",
         description="Женские платья и прочие образцы одежды висят вдоль левой стены.",
+        picture="images/irma/portraits/portrait3.png",
+        actions=[
+            ObjectAction(
+                action_id="open_female_catalog",
+                label="Посмотреть женские платья",
+                hook="call",
+                target="DressShopOpenCatalog",
+                args=("female",),
+            ),
+        ],
         container=True,
         carriable=False,
         stackable=False,
-        custom_properties={"rack_type": "female"},
     )

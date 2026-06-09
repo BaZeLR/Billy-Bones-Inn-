@@ -12,7 +12,9 @@ label SherwoodRobbedAndGoCode:
     "Идти дальше в Куниделл смысла не было никакого и вы направили свои стопы обратно домой."
     $ money = max(0, money - 50)
     $ BeckyVar["RobbedByRobin"] = max(1, BeckyVar.get("RobbedByRobin", 0))
-    $ calendar_set_time_slot(4)
+    $ calendar_v2.hour = 16
+    $ calendar_v2.minute = 0
+    $ calendar_v2.sync_state()
     if RobinVar.get("Negotiate", 0) == 1:
         $ RobinVar["Negotiate"] = RobinVar.get("Negotiate", 0) + 1
     $ RobinVar["RobbedNum"] = RobinVar.get("RobbedNum", 0) + 1
@@ -25,7 +27,9 @@ label SherwoodRobbedAndGoCode:
 label SherwoodKunidellOpenedCode(OnHorse=0):
     $ RobinVar["MongolSafePassUsed"] = 1
     $ RobinVar["KunidellOpened"] = 1
-    $ calendar_set_time_slot(4)
+    $ calendar_v2.hour = 16
+    $ calendar_v2.minute = 0
+    $ calendar_v2.sync_state()
     if OnHorse == 1:
         $ _sherwood_trade_profit = renpy.random.randint(50, 300)
         $ money += 200 + _sherwood_trade_profit
@@ -132,7 +136,9 @@ label SherwoodTravel(OnHorse=0):
             else:
                 "Решив что новая встреча с вашим старым другом Робином, да еще и на пустынной вырубке,"
             "ничего хорошего вам не принесет, вы развернулись и пустились в обратный путь. Может вас преследовали, может нет, но вы благополучно выбрались с вырубки на обжитую местность. Уже смеркалось, поэтому вам ничего не оставалось, как направиться обратно в Коитополис, куда вы и добрались без приключений. На сегодня ваше путешествие закончено."
-            $ calendar_set_time_slot(4)
+            $ calendar_v2.hour = 16
+            $ calendar_v2.minute = 0
+            $ calendar_v2.sync_state()
             menu:
                 "Домой":
                     jump TavernMain

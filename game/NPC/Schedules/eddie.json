@@ -1,0 +1,70 @@
+{
+  "npc_id": "eddie",
+  "entries": [
+    {
+      "label": "monthly_absence",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "00:00",
+      "end": "23:59",
+      "location": "OutOfTown",
+      "awake": false,
+      "talkable": false,
+      "priority": 900,
+      "condition": {
+        "rule": "eddie_absent_week"
+      }
+    },
+    {
+      "label": "sleep_home",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "23:00",
+      "end": "05:59",
+      "location": "BeckyHome",
+      "awake": false,
+      "talkable": false,
+      "priority": 700,
+      "condition": {
+        "rule": "eddie_in_town"
+      }
+    },
+    {
+      "label": "grocery_morning_shift",
+      "weekdays": [1, 2, 3, 4, 5, 6],
+      "start": "08:00",
+      "end": "12:30",
+      "location": "GroceryStore",
+      "awake": true,
+      "talkable": true,
+      "priority": 760,
+      "condition": {
+        "rule": "eddie_in_town"
+      }
+    },
+    {
+      "label": "port_whores_evening",
+      "weekdays": [2, 4],
+      "start": "20:00",
+      "end": "22:59",
+      "location": "PortStreets",
+      "awake": true,
+      "talkable": false,
+      "priority": 730,
+      "condition": {
+        "rule": "eddie_in_town"
+      }
+    },
+    {
+      "label": "home_awake",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "06:00",
+      "end": "22:59",
+      "location": "BeckyHome",
+      "awake": true,
+      "talkable": false,
+      "priority": 100,
+      "condition": {
+        "rule": "eddie_in_town"
+      }
+    }
+  ]
+}

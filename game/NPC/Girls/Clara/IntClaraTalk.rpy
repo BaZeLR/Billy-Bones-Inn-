@@ -72,7 +72,7 @@ label IntClaraTalkRefresh(girl_name="clara"):
     if int(AskedToday.get("clara", 0) or 0) == 0 and int(Friends.get("clara", 0) or 0) >= 6:
         $ current_action_items.append(MenuItem("Спросить Клариссу о семье", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_family")))
         $ current_action_items.append(MenuItem("Спросить Клариссу о ней самой", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_self")))
-        if int(ClaraVar.get("old_water_pump_hint_seen", 0) or 0) == 0 and melissa_bats_stage() >= 5:
+        if int(ClaraVar.get("old_water_pump_hint_seen", 0) or 0) == 0 and Melissa.bats_stage() >= 5:
             $ current_action_items.append(MenuItem("Спросить Клариссу об укромных местах", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_water_pump")))
         if int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1 or int(MelissaVar.get("drawings_found", 0) or 0) == 1:
             $ current_action_items.append(MenuItem("Осторожно заговорить о ее тайных рисунках", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_drawings")))

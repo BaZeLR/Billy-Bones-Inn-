@@ -10,7 +10,7 @@ label ChurchIspoved(entry_arg=0):
     call ShowImage("gerhard", "", "gerhardispoved")
     $ current_action_title = "Исповедь"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Вернуться в собор", Function(main_ui_call_label, "ChurchReturnAfterConfession"))]
+    $ current_action_items = [MenuItem("Вернуться в собор", [SetVariable("LastAdvancedMinutes", 60), Function(calendar_v2.sync_state), Function(calendar_v2.advance_minutes, 60), Function(npc_schedule_sync_all), Jump("Church")])]
     $ renpy.restart_interaction()
     return
 
@@ -23,10 +23,12 @@ label ChurchIspovedMenu:
     $ current_action_items.append(MenuItem("В разных пустяках", Function(main_ui_call_label, "ChurchIspovedChoice", "small")))
     if HadSex.get("georgett", 0) > 0:
         $ current_action_items.append(MenuItem("В том, что совокуплялись с Жоржеттой", Function(main_ui_call_label, "ChurchIspovedChoice", "georgett")))
-    if HadSex.get("georgett", 0) > 0 and GeorgettVar.get("fuckinchurch", 0) and GeorgettVar.get("georgettadmit", 0) == 1:
-        $ current_action_items.append(MenuItem("В том, что совокуплялись с Жоржеттой прямо во время службы", Function(main_ui_call_label, "ChurchIspovedChoice", "church")))
-    if HadSex.get("georgett", 0) > 0 and GeorgettVar.get("fuckinchurch", 0) and GeorgettVar.get("lizasawinchurch", 0) and GeorgettVar.get("churchgeorgettadmit", 0):
-        $ current_action_items.append(MenuItem("В том, что совокуплялись с Жоржеттой прямо во время службы на глазах у ее дочки", Function(main_ui_call_label, "ChurchIspovedChoice", "church_liza")))
+    if HadSex.get("georgett", 0) > 0 and Georgett.story_value("church_bench_seen", 0):
+        $ current_action_items.append(MenuItem("В том, что уединились с Жоржеттой во время службы", Function(main_ui_call_label, "ChurchIspovedChoice", "church_bench")))
+    if HadSex.get("georgett", 0) > 0 and Georgett.story_value("church_doggy_seen", 0):
+        $ current_action_items.append(MenuItem("В том, что рискнули с Жоржеттой прямо во время службы", Function(main_ui_call_label, "ChurchIspovedChoice", "church_doggy")))
+    if HadSex.get("georgett", 0) > 0 and Georgett.story_value("church_liza_seen", 0):
+        $ current_action_items.append(MenuItem("В том, что Лизетта видела вас с Жоржеттой во время службы", Function(main_ui_call_label, "ChurchIspovedChoice", "church_liza")))
     $ current_action_items.append(MenuItem("Назад", Function(main_ui_call_label, "ChurchIspoved", 1)))
     $ renpy.restart_interaction()
     return
@@ -37,24 +39,21 @@ label ChurchIspovedChoice(choice_code=""):
         $ MainTxt = "Вы покаялись в том, что ругались и пару раз обсчитали пьяных в своем трактире на один-два мараведи.\n\n\"Это небольшой грех сын мой и я его тебе отпускаю\" - прозвучал ответ."
     elif str(choice_code or "") == "georgett":
         $ MainTxt = "Вы покаялись в том, что сношались с проституткой Жоржеттой. Отец Герхард вас подробно распросил обо всех обстоятельствах и как именно и сколько раз вы имели дело с Жоржеттой. Потом он сказал:\n\n\"Великий бог Ильматер завещал нам плодиться и размножаться. Коль обе стороны желают соития, то не грех это сын мой!\""
-        $ GeorgettVar["georgettadmit"] = 1
-    elif str(choice_code or "") == "church":
-        $ MainTxt = "Вы покаялись в том, что трахнули Жоржетту в соборе прямо во время службы. Отец Герхард вас подробно распросил обо всех обстоятельствах, о том, как вам удалось остаться незамеченными и как все прошло. Потом он сказал:\n\n\"Великий бог Ильматер завещал нам плодиться и размножаться. Конечно нужно это делать вне храма, а в храме смиренно слушать службу. А ты, сын мой, не утерпел. Грех это, но не великий. Коль покаялся ты в нем и рассказал все честно, без утайки, то отпускаю я его тебе!\""
-        $ GeorgettVar["churchgeorgettadmit"] = 1
+        $ Georgett.set_story_value("georgettadmit", 1)
+    elif str(choice_code or "") == "church_bench":
+        $ MainTxt = "Вы рассказали отцу Герхарду, что во время службы уединились с Жоржеттой в темном углу собора. Священник подробно расспросил вас об обстоятельствах, затем строго напомнил, что в храме следует думать о молитве, а не о плотских желаниях."
+        $ Georgett.set_story_value("churchgeorgettadmit", 1)
+    elif str(choice_code or "") == "church_doggy":
+        $ MainTxt = "Вы признались, что рискнули с Жоржеттой прямо во время службы, почти не скрываясь. Отец Герхард долго молчал, потом сказал, что честное покаяние лучше утаивания."
+        $ Georgett.set_story_value("churchgeorgettadmit", 1)
     else:
-        $ MainTxt = "Вы сказали что вы рассказали не все. Пока вы имели Жоржетту, за вами наблюдала, лаская себя, ее дочка Лизетта. Отец Герхард заметно оживился и стал расспрашивать вас о подробностях, как Лизетта вела себя, что сказала на это ей мать, и прочем. Потом он сказал:\n\n\"Великий бог Ильматер завещал родителям передавать все свои знания и умения детям. Так что отдельного греха в том нет, разве что, как я уже говорил тебе, в храме нужно смиренно слушать службу. Но тот грех я тебе уже отпустил, так что иди с миром\""
-        $ GeorgettVar["churchlizaadmit"] = 1
+        $ MainTxt = "Вы добавили, что Лизетта видела вас с Жоржеттой во время службы. Отец Герхард стал расспрашивать уже не о вас, а о том, как на это смотрели мать и дочь, после чего отпустил вас с необычайно задумчивым видом."
+        $ Georgett.set_story_value("churchlizaadmit", 1)
 
     $ CurLocDesc = MainTxt
     call ShowImage("gerhard", "", "gerhardispoved")
     $ current_action_title = "Исповедь"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Вернуться в собор", Function(main_ui_call_label, "ChurchReturnAfterConfession"))]
-    $ renpy.restart_interaction()
-    return
-
-
-label ChurchReturnAfterConfession:
-    call AdvanceTimeAndRestore("ChurchRestore")
+    $ current_action_items = [MenuItem("Вернуться в собор", [SetVariable("LastAdvancedMinutes", 60), Function(calendar_v2.sync_state), Function(calendar_v2.advance_minutes, 60), Function(npc_schedule_sync_all), Jump("Church")])]
     $ renpy.restart_interaction()
     return

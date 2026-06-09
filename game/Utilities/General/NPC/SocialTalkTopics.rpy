@@ -51,11 +51,6 @@ init -39 python:
             ],
         },
         "sandra": {
-            "talk": [
-                {"id": "sandra_household", "label": "О порядке в доме", "min_friend": 2, "min_open": 0},
-                {"id": "sandra_tavern_plan", "label": "О будущем трактира", "min_friend": 6, "min_open": 2},
-                {"id": "sandra_burden", "label": "О том, что она тянет на себе", "min_friend": 9, "min_open": 3, "private": True},
-            ],
             "flirt": [
                 {"id": "sandra_respect", "label": "Сделать уважительный комплимент", "min_friend": 7, "min_open": 2, "min_slut": 0},
                 {"id": "sandra_warmth", "label": "Поблагодарить ее теплее обычного", "min_friend": 10, "min_open": 4, "min_slut": 0},
@@ -96,7 +91,7 @@ init -39 python:
             "flirt": {"joke": 1, "kino": 2, "flirt": 1, "sex_topics": -2, "melissa_gentle": 4, "melissa_private_place": 3},
         },
         "sandra": {
-            "talk": {"job_routine": 4, "chat": 0, "dances": -1, "gossip": 1, "forest": 1, "stories": 0, "food": 4, "fashion": 2, "money": 3, "family_life": 4, "sandra_household": 4, "sandra_tavern_plan": 4, "sandra_burden": 3},
+            "talk": {"job_routine": 4, "chat": 0, "dances": -1, "gossip": 1, "forest": 1, "stories": 0, "food": 4, "fashion": 2, "money": 3, "family_life": 4},
             "flirt": {"joke": 0, "kino": -1, "flirt": -2, "sex_topics": -4, "sandra_respect": 3, "sandra_warmth": 2},
         },
         "clara": {
@@ -255,21 +250,6 @@ init -39 python:
                 "neutral": "Мелисса слушает вопрос о тайнах с настороженной улыбкой. Она отвечает уклончиво, но без холода.",
                 "bad": "Вы заходите слишком далеко. Мелисса закрывается и дает понять, что доверие нельзя вытянуть силой.",
             },
-            "sandra_household": {
-                "good": "Вы обсуждаете порядок в доме как общее дело. Сандра отвечает деловито, но в голосе появляется больше уважения.",
-                "neutral": "Сандра спокойно говорит о хозяйстве. Разговор полезный, хотя без особого тепла.",
-                "bad": "Разговор о порядке звучит как придирка. Сандра устало смотрит на вас и отвечает коротко.",
-            },
-            "sandra_tavern_plan": {
-                "good": "Вы говорите о будущем трактира и признаете вклад Сандры. Это попадает точно: она любит, когда планы подкреплены делом.",
-                "neutral": "Сандра слушает ваши планы по трактиру и задает несколько практичных вопросов.",
-                "bad": "Планы звучат пустовато. Сандра не спорит, но явно ждет не слов, а работы.",
-            },
-            "sandra_burden": {
-                "good": "Вы замечаете, сколько Сандра тянет на себе. Она не размякает, но благодарность слышна даже в сдержанном ответе.",
-                "neutral": "Сандра принимает ваши слова о ее нагрузке, хотя привычно отмахивается: дела сами себя не сделают.",
-                "bad": "Попытка поговорить о ее усталости выходит неуклюжей. Сандра воспринимает это как жалость.",
-            },
             "clara_wine_trade": {
                 "good": "Вы обсуждаете с Клариссой винную лавку и рынок. Она оживляется: в этой теме есть и расчет, и игра, которые ей нравятся.",
                 "neutral": "Кларисса отвечает о торговле охотно, но держит разговор на безопасной светской дистанции.",
@@ -343,7 +323,7 @@ init -39 python:
         if key == "melissa":
             return "IntMelissaTalkRefresh"
         if key == "sandra":
-            return "IntSandraTalkRefresh"
+            return "IntSandraTalk"
         if key == "clara":
             return "IntClaraTalkRefresh"
         if key == "becky":
@@ -437,6 +417,11 @@ init -39 python:
         profile.update(dict(dict(SOCIAL_TALK_PROFILES.get(key, {}) or {}).get(mode_key, {}) or {}))
         return profile
 
+    def social_favorite_topic_ids(girl_name=""):
+        info = getPersonInfo(girl_name)
+        preferences = getattr(info, "talk_preferences", {}) if info is not None else {}
+        return [str(row or "").strip() for row in list(dict(preferences or {}).get("favorite_topics", []) or []) if str(row or "").strip()]
+
     def social_topic_visible(girl_name="", mode="talk", topic_id=""):
         key = social_topic_key(girl_name)
         mode_key = str(mode or "talk").strip().lower()
@@ -492,6 +477,8 @@ init -39 python:
         topic_key = str(topic_id or "").strip()
         base = int(social_topic_profile(key, mode_key).get(topic_key, 0) or 0)
         mood = 0
+        if mode_key == "talk" and topic_key in social_favorite_topic_ids(key):
+            mood += 2
         if int(Friends.get(key, 0) or 0) >= 10:
             mood += 1
         if int(otkroven.get(key, 0) or 0) >= 8:
@@ -661,6 +648,13 @@ init -39 python:
         item_key = str(item_id or "").strip()
         if key == "":
             return False
+        try:
+            info = getPersonInfo(key)
+            if info is not None and hasattr(info, "social_action_allowed"):
+                if not info.social_action_allowed(action_key, item_key):
+                    return False
+        except Exception:
+            pass
         if key == "melissa" and action_key in ("flirt", "gift", "share"):
             if action_key in ("gift", "share") and int(FlirtedToday.get(key, 0) or 0) <= 0:
                 return False

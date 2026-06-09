@@ -12,7 +12,7 @@ init python:
         return PregnancyCheck(girl, place, count, dad)
 
 
-label AmandaAtHomeCode:
+label AmandaAtHomeStateDefaults:
     python:
         AmandaVar.setdefault("kickyoufromroomcount", 0)
         AmandaVar.setdefault("kickyoufromroom", 0)
@@ -42,6 +42,11 @@ label AmandaAtHomeCode:
         topdress.setdefault("amanda", "")
         bottomdress.setdefault("amanda", "")
         panties.setdefault("amanda", "")
+    return
+
+
+label AmandaAtHomeCode:
+    call AmandaAtHomeStateDefaults
     return
 
 

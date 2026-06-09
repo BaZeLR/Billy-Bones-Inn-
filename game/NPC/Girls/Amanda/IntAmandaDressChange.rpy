@@ -19,9 +19,9 @@ init python:
         if int(agreed_to_redress or 0) != 1 or int(sluttiness.get(girl, 0) or 0) < 50:
             return ""
         randvar = random.randint(1, 9)
-        if CurrentLoc.get("liza", "") != "TavernMain" and randvar == 4:
+        if str(getLocation("liza") or "") != "TavernMain" and randvar == 4:
             randvar = random.randint(5, 7)
-        if CurrentLoc.get("georgett", "") != "TavernMain" and randvar == 3:
+        if str(getLocation("georgett") or "") != "TavernMain" and randvar == 3:
             randvar = random.randint(5, 7)
         if randvar == 1:
             if sluttiness.get("sandra", 0) >= 35:
@@ -109,7 +109,7 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
                 $ MainTxt += '\n\n"Да ты что?" удивилась Аманда вашему предложению. "Только парень мог такое предложить. Ты же видишь, что у меня глубокое декольте. Я подкладываю в лиф вату, чтобы моя грудь казалась больше. А если я его уберу, то моя грудь будет во-первых смотреться чуть меньше, а во вторых, и это самое главное, любой кто мне туда заглянет увидет мои груди вплоть до сосков, ведь платье-то чуть больше чем надо. Сам видишь, твоя идея не сработает."'
             else:
                 $ MainTxt += '\n\n"Хм, Стефан," удивилась Аманда. "Ты действительно так думаешь? Не помню, говорила я тебе или нет, у меня платье чуть больше чем мой размер, а декольте глубокое. Так любой сможет заглянуть и увидеть даже соски."\n"Так в этом и вся идея!" не растерялись вы. "Могут увидеть, так ты еще соблазнительней покажешься, разве нет?'
-                if CurrentLoc.get("liza", "") == "TavernMain":
+                if str(getLocation("liza") or "") == "TavernMain":
                     $ MainTxt += ' Ты ведь хочешь чтобы тебя хотели, вон на Лизетту посмотри, она ничего не носит!'
                 $ MainTxt += '"\n"Ну, наверное ты прав," после небольшого колебания согласилась с вами Аманда, "помоги тогда."\nВы не замедлили оказать ей помощь, запустив руки под платье, расстегнув и затем вытащив лиф. Лишь потом вы поняли что даже и не попробовали отойти куда в сторонку.'
                 $ AgreedToRedress = 1
@@ -127,7 +127,7 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
 
     if str(choice_code or "") == "offer_panties":
         $ MainTxt = '"Аманда, а чего ты в панталонах-то ходишь?" - поинтересовались вы как бы между делом у Аманды. "Они только тебя стесняют, без них ты и работу будешь сноровистей выполнять, да и сама себя будешь ощущать сексуальнее.'
-        if CurrentLoc.get("liza", "") == "TavernMain":
+        if str(getLocation("liza") or "") == "TavernMain":
             $ MainTxt += ' Разве ты не знаешь, что Лизетта, твоя лучшая подруга, без них ходит?" добавили вы для пущей убедительности. '
             if pantiesdef.get("liza", "") == "":
                 $ MainTxt += '\n\n"И то правда," задумчиво сказала Аманда.'

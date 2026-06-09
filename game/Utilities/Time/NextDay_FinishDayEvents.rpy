@@ -16,6 +16,17 @@ init python:
         global FridayDancesCount
         global CursedByEllonaDays
         global StolenHorseDays
+        global TownStreetEventsToday
+        global TownStreetPatrolsToday
+        global TownStreetFightToday
+        global TownCurfewCaughtToday
+        global TownStreetStorySeenKeys
+        global TownStreetDailyPlan
+        global TownStreetLastEventText
+        global TownStreetContext
+        global TownStreetFiredLabelsToday
+        global TownStreetFiredLocationsToday
+        global TownStreetCooldowns
 
         if "TalkChurchAfterCermonLiza" not in GeorgettVar:
             GeorgettVar["TalkChurchAfterCermonLiza"] = 0
@@ -146,8 +157,12 @@ init python:
         TownStreetFightToday = 0
         TownCurfewCaughtToday = 0
         TownStreetStorySeenKeys = []
+        TownStreetDailyPlan = {}
         TownStreetLastEventText = ""
         TownStreetContext = {}
+        TownStreetFiredLabelsToday = []
+        TownStreetFiredLocationsToday = []
+        TownStreetCooldowns = {}
 
         DailyEventsList_EndDayUpdate(week_val)
 
@@ -194,12 +209,5 @@ label NextDay_FinishDayEvents:
             MelissaVar["private_place_heat"] = 0
         Talked.clear()
         ChurchAfterCermon.clear()
-        if isinstance(TalkedToday, dict):
-            TalkedToday.clear()
-        if isinstance(FlirtedToday, dict):
-            FlirtedToday.clear()
-        if isinstance(GiftedToday, dict):
-            GiftedToday.clear()
-        if isinstance(AskedToday, dict):
-            AskedToday.clear()
+        people_sync_all()
     return

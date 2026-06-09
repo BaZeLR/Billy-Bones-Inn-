@@ -1,0 +1,209 @@
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SANDRA_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "InitSandra.rpy"
+SANDRA_ROOM = PROJECT_ROOT / "game" / "Inn" / "TavernSandraRoom.rpy"
+SANDRA_TALK = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "IntSandraTalk.rpy"
+SANDRA_DRESS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "IntSandraDressChange.rpy"
+SANDRA_EVENTS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "SandraEvents.rpy"
+PLAYER_CHORES = PROJECT_ROOT / "game" / "Inn" / "PlayerChoresSystem.rpy"
+STORY_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy"
+SOCIAL_TOPICS = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "SocialTalkTopics.rpy"
+
+
+def test_sandra_uses_data_info_runtime_shape():
+    source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+
+    assert "class SandraData(PeopleData):" in source
+    assert "class SandraInfo(Girl):" in source
+    assert "define SandraStaticData = SandraData()" in source
+    assert "default Sandra = SandraInfo()" in source
+    assert 'peopleData["sandra"] = SandraStaticData' in source
+    assert 'peopleInfo["sandra"] = Sandra' in source
+    assert "register_sandra_runtime" not in source
+
+
+def test_sandra_data_keeps_only_immutable_identity_references():
+    source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+    data_block = source.split("class SandraData(PeopleData):", 1)[1].split("class SandraInfo(Girl):", 1)[0]
+
+    assert "code_name" in data_block
+    assert "fullname=\"Сандра\"" in data_block
+    assert "birth_date" in data_block
+    assert "card_image" in data_block
+    assert "schedule_source" in data_block
+    assert "self.stats" not in data_block
+    assert "self.clothing" not in data_block
+    assert "self.jobs" not in data_block
+    assert "self.story_defaults" not in data_block
+    assert "starting_age" not in data_block
+    assert "gift_preferences=" not in data_block
+
+
+def test_sandra_story_defaults_cover_live_sandravar_keys():
+    source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+    required_keys = [
+        "knowmolodost",
+        "WeeklyChoreCheckScore",
+        "WeeklyChoreCheckCounter",
+        "Week5WakePending",
+        "WeeklyChoreCheckEval",
+        "RoomUnlocked",
+        "MCVisitFirstReady",
+        "MCVisitFirstPending",
+        "MCVisitFirstDone",
+        "FinalRewardDone",
+        "NightThanksReady",
+        "NightThanksLastDay",
+        "SandraSex",
+        "revealing_dress_ordered",
+        "revealing_dress_code",
+        "revealing_dress_initiative_seen",
+        "MaidRevengeEnding",
+    ]
+
+    for key in required_keys:
+        assert f'"{key}"' in source
+
+
+def test_sandra_is_instantiated_from_init_label_not_eager_init_block():
+    source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+    init_block = source.split("init python:", 1)[1]
+
+    assert 'peopleInfo["sandra"] = Sandra' in source
+    assert "default Sandra = SandraInfo()" in source
+    assert "SandraNPC" not in source
+    assert "current =" not in init_block
+    assert "current = Sandra(" not in init_block
+    assert "peopleInfo['sandra'] = Sandra" not in init_block
+
+
+def test_people_runtime_preserves_class_data_without_sandra_specific_overwrite():
+    runtime = (PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
+
+    assert "existing_people_data = peopleData if isinstance(peopleData, dict) else {}" in runtime
+    assert "data.__class__ is not PeopleData" in runtime
+    assert '"SandraStaticData" in globals()' not in runtime
+    assert 'peopleData["sandra"] = SandraStaticData' not in runtime
+
+
+def test_sandra_runtime_has_hidden_reaction_state_and_methods():
+    source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+
+    for token in [
+        "self.energy = 100",
+        "self.rebellion = 0",
+        "self.anger_with_player = 0",
+        "self.trust = 0",
+        "self.fear = 0",
+        "self.mana = 10",
+        "self.mana_corrupted = False",
+        "self.reaction_log = []",
+        "def change_mana",
+        "def change_fear",
+        "def daily_mana_update",
+        "def reaction_score",
+        "self.weekly_chore_score = 0",
+        "self.weekly_wake_pending = 0",
+        "self.night_thanks_ready_flag = 0",
+        "self.sandraSex = False",
+        "def weekly_report_finished",
+        "def weekly_thanks_wake_seen",
+        "def night_thanks_seen",
+        "def weekly_thanks_event_ready",
+        "def weekly_thanks_target_label",
+        "def sex_available",
+        "def reset_daily",
+    ]:
+        assert token in source
+
+
+def test_sandra_night_thanks_uses_current_late_night_time_contract():
+    init_source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+    room_source = SANDRA_ROOM.read_text(encoding="utf-8-sig")
+
+    assert "time_slots=[6, 7]" in init_source
+    assert "int(time or 0) == 3" not in room_source
+    assert "int(hour or 0) >= 22" in room_source
+    assert "int(hour or 0) <= 23" in room_source
+
+
+def test_sandra_topics_use_existing_general_topic_ids_only():
+    init_source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+    social_source = SOCIAL_TOPICS.read_text(encoding="utf-8-sig")
+
+    assert '"favorite_topics": ["job_routine", "food", "money", "family_life", "fashion"]' in init_source
+    assert "sandra_household" not in init_source
+    assert "sandra_tavern_plan" not in init_source
+    assert "sandra_burden" not in init_source
+    assert "sandra_household" not in social_source
+    assert "sandra_tavern_plan" not in social_source
+    assert "sandra_burden" not in social_source
+
+
+def test_sandra_dress_change_is_direct_action_not_refresh_dispatcher():
+    dress_source = SANDRA_DRESS.read_text(encoding="utf-8-sig")
+    talk_source = SANDRA_TALK.read_text(encoding="utf-8-sig")
+
+    assert "def sandra_dress_change_can_buy" in dress_source
+    assert "label IntSandraOfferBuyDress" in dress_source
+    assert "label IntSandraDressChangeRefresh" not in dress_source
+    assert "label IntSandraDressChangeApply" not in dress_source
+    assert "label IntSandraDressChange(" not in dress_source
+    assert "label int_sandra_dress_change" not in dress_source
+    assert "IntSandraOfferBuyDress" in talk_source
+    assert "IntSandraDressChangeApply" not in talk_source
+
+
+def test_sandra_talk_is_direct_entry_not_refresh_apply_dispatcher():
+    talk_source = SANDRA_TALK.read_text(encoding="utf-8-sig")
+    dress_source = SANDRA_DRESS.read_text(encoding="utf-8-sig")
+    social_source = SOCIAL_TOPICS.read_text(encoding="utf-8-sig")
+
+    assert "label IntSandraTalk(" in talk_source
+    assert "label IntSandraReconcile(" in talk_source
+    assert "label IntSandraHouseholdInsight(" in talk_source
+    assert "label IntSandraHouseholdPriorities(" in talk_source
+    assert "label IntSandraTalkRefresh" not in talk_source
+    assert "label IntSandraTalkApply" not in talk_source
+    assert "label IntSandraTalkRestore" not in talk_source
+    assert "call IntSandraTalkRefresh" not in talk_source
+    assert '"IntSandraTalkApply"' not in talk_source
+    assert '"IntSandraTalkRefresh"' not in dress_source
+    assert 'return "IntSandraTalk"' in social_source
+    assert 'return "IntSandraTalkRefresh"' not in social_source
+
+
+def test_sandra_weekly_rewards_use_sandra_info_state_methods():
+    init_source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+    chores_source = PLAYER_CHORES.read_text(encoding="utf-8-sig")
+    events_source = SANDRA_EVENTS.read_text(encoding="utf-8-sig")
+    room_source = SANDRA_ROOM.read_text(encoding="utf-8-sig")
+    story_source = STORY_RUNTIME.read_text(encoding="utf-8-sig")
+
+    assert "def weekly_report_finished" in init_source
+    assert "def weekly_thanks_wake_seen" in init_source
+    assert "def night_thanks_seen" in init_source
+    assert "Sandra.weekly_report_finished(" in chores_source
+    assert "sandra_friend=Sandra.rel" in chores_source
+    assert "sandra_flags=Sandra.var" in chores_source
+    assert "threads[\"sandraWeeklyEvaluation\"].advanceTo(Sandra.weekly_wake_num, force_active=True)" in chores_source
+    assert 'Friends["sandra"] = max(0, _pc_to_int(preview.get("sandra_friend", 0), 0))' not in chores_source
+    assert 'SandraVar["WeeklyChoreCheckCounter"]' not in chores_source
+    assert "Sandra.weekly_thanks_wake_seen(" in events_source
+    assert "def sandra_week5_apply_step_gains" not in events_source
+    assert 'SandraVar["Week5WakePending"] = 0' not in events_source
+    assert 'SandraVar["NightThanksReady"] = 1' not in events_source
+    assert "Sandra.night_thanks_seen()" in events_source
+    assert 'call PregnancyCheck("sandra", "inside", 1, "Вы")' in events_source
+    assert 'call PregnancyCheck(girl_name, "inside", 1, "Вы")' in events_source
+    assert '["#Sandra.weekly_thanks_event_ready()"]' in story_source
+    assert 'SandraVar["NightThanksReady"] = 0' not in room_source
+    assert 'Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 2)' not in room_source
+    assert 'self.stats["sexacts"] = people_to_int(self.stats.get("sexacts", 0), 0) + 1' not in init_source
+    assert 'Sandra.stats["sexacts"] = int(Sandra.stats.get("sexacts", 0) or 0) + 1' not in events_source
+    assert "apply_to_sandra_maps" not in init_source
+    assert "Sandra.apply" not in chores_source
+    assert "Sandra.apply" not in events_source
+    assert "Sandra.apply" not in room_source

@@ -57,7 +57,7 @@ label NextDay_NewDayEvents():
         MongolVar = _nd_ensure_dict("MongolVar")
 
         retlocname = _nd_ensure_scalar("retlocname", "")
-        tavernvisitors = int(_nd_ensure_scalar("tavernvisitors", 0) or 0)
+        tavernvisitors = int(_nd_ensure_scalar("tavernvisitors", 40) or 0)
         MyStallion = _nd_ensure_scalar("MyStallion", "")
         StolenHorseDays = int(_nd_ensure_scalar("StolenHorseDays", 0) or 0)
         SloganFixed = int(_nd_ensure_scalar("SloganFixed", 0) or 0)
@@ -120,8 +120,8 @@ label NextDay_NewDayEvents():
             TavernGloryHole = 2
 
         # Выберем, снимет ли Эдди Жоржи себе домой сегодня.
-        _georgett_work_location = str(CurrentLoc.get("georgett", "") or "")
-        _liza_work_location = str(CurrentLoc.get("liza", "") or "")
+        _georgett_work_location = str(getLocation("georgett", week, 19 * 60) or "")
+        _liza_work_location = str(getLocation("liza", week, 19 * 60) or "")
 
         if BeckyVar['EddieGeorg'] > 0:
             # Сначала сбросим предыдущее состояние
@@ -167,9 +167,9 @@ label NextDay_NewDayEvents():
         if week == 7:
             if BeckyVar['PriestAdvice'] > 0:
                 TodaySexEvents_Add('becky', 99, 99, 'Priest')
-            if GeorgettVar['churchgeorgettadmit'] > 0:
+            if Georgett.can_trigger_after_sermon_event():
                 TodaySexEvents_Add('georgett', 99, 99, 'Priest')
-            if GeorgettVar['churchlizaadmit'] > 0:
+            if Liza.can_trigger_church_service_event():
                 TodaySexEvents_Add('liza', 99, 99, 'Priest')
         if IngaVar['Knowher'] > 0:
             TodaySexEvents_Add('inga', 99, 99, 'Lucas')

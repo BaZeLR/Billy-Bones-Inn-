@@ -145,17 +145,22 @@ label PortStreets:
         jump PortStreets
 
     call RoomEnterEventGate(CurLoc, False)
+    $ Georgett.sync_from_georgett_maps()
+    $ Liza.sync_from_liza_maps()
 
     $ GirlNamePS1 = "georgett"
     $ GirlNamePS2 = "liza"
     $ _port_street_clients_target = ""
     $ _port_street_clients_girl = ""
     $ _port_street_clients_extra = []
-    $ _port_georgett_event_available = CheckIfSexEventExist(GirlNamePS1, time, "Prostitution") > 0
-    $ _port_liza_event_available = CheckIfSexEventExist(GirlNamePS2, time, "Prostitution") > 0
+    $ _port_georgett_event_available = Georgett.portstreet_client_event_available()
+    $ _port_liza_event_available = Liza.portstreet_client_event_available()
+    $ _port_georgett_scheduled_here = Georgett.portstreet_work_active()
+    $ _port_liza_scheduled_here = Liza.portstreet_work_active()
+    $ _port_work_active = _port_georgett_scheduled_here or _port_liza_scheduled_here or _port_georgett_event_available or _port_liza_event_available
 
-    # Main street logic (TXT-authoritative conditions/visibility)
-    if (CurrentLoc.get(GirlNamePS1, "") == CurLoc or _port_georgett_event_available or _port_liza_event_available) and time == 3 and week != 5 and not (GeorgettVar.get("TalkChurchAfterCermonLiza", 0) != 0 and LizaVar.get("ProstStart", 0) == 0):
+    # Main street logic.
+    if _port_work_active and Georgett.portstreet_story_unblocked():
         if Friends.get(GirlNamePS1, 0) == 0:
             $ CurLocDesc = "На углу стоит {b}молодая женщина{/b}, не очень высокого роста, чуть пухленькая и с большой налитой грудью, одетая в прозрачную блузку и короткую юбку. Она белокура и кареглаза. Ее внешность и повадки не дают никаких сомнений в том, что она выбрала себе путь отнюдь не монашки."
             if pregnancy.get(GirlNamePS1, 0) >= 210:
@@ -169,12 +174,10 @@ label PortStreets:
             $ georgett_can_talk = 1
             $ liza_can_talk = 0
         else:
-            if time == 3:
-                call AddOthersSperm(GirlNamePS1, 6)
+            call AddOthersSperm(GirlNamePS1, 6)
 
-            if LizaVar.get("ProstStart", 0):
-                if time == 3:
-                    call AddOthersSperm(GirlNamePS2, 8)
+            if Liza.can_work_portstreets():
+                call AddOthersSperm(GirlNamePS2, 8)
                 $ randvarPS = renpy.random.randint(1, 5)
                 if _port_georgett_event_available and _port_liza_event_available:
                     $ CurLocDesc = "На обычном углу Жоржетты и Лизетты сейчас пусто. Судя по тихим звукам из соседних подворотен, обе уже нашли клиентов."
@@ -220,7 +223,7 @@ label PortStreets:
                     $ georgett_can_talk = 1
                     $ liza_can_talk = 0
     else:
-        if time in (0, 1, 2):
+        if int(clock_minutes or 0) < (13 * 60):
             $ _port_temple_road_pics = ["images/ellona/toTemple.png", "images/ellona/toTemple1.png"]
             $ _port_temple_road_pic = _port_temple_road_pics[renpy.random.randint(0, len(_port_temple_road_pics) - 1)]
             call ShowImage("", "", _port_temple_road_pic)
@@ -229,7 +232,7 @@ label PortStreets:
         $ georgett_can_talk = 0
         $ liza_can_talk = 0
         $ CurLocDesc = PortStreetsRoom.descriptions[0].text
-        if time in (0, 1, 2):
+        if int(clock_minutes or 0) < (13 * 60):
             $ CurLocDesc += "\n\nНа дороге к храму Эллоны встречаются беременные женщины: кто-то идет за благословением, кто-то уже почти у самых дверей родильной."
         $ MainTxt = CurLocDesc
 
@@ -250,18 +253,18 @@ label PortStreetsBuildActions:
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
-    if dog_is_here("PortStreets"):
-        $ current_action_items.append(MenuItem(dog_display_name(), Call("IntDogTalk", "PortStreets")))
     python:
         for _port_object in PortStreetsRoom.visible_objects():
             current_action_items.append(MenuItem(_port_object.name, Call("PortStreetsObjectMenu", _port_object.object_id)))
 
     if _port_street_clients_target != "" and _port_street_clients_girl != "":
-        $ current_action_items.append(MenuItem(_port_street_clients_target, Call("StreetClients", 1, _port_street_clients_girl, time)))
+        $ _port_clients_action = "street_clients_liza" if _port_street_clients_girl == "liza" else "street_clients_georgett"
+        $ current_action_items.append(MenuItem(_port_street_clients_target, Call("checkTriggers", "PortStreets", _port_clients_action, 0)))
     python:
         for _port_extra_label, _port_extra_girl in list(_port_street_clients_extra or []):
             if str(_port_extra_label or "").strip() and str(_port_extra_girl or "").strip():
-                current_action_items.append(MenuItem(str(_port_extra_label), Call("StreetClients", 1, str(_port_extra_girl), time)))
+                _port_clients_action = "street_clients_liza" if str(_port_extra_girl) == "liza" else "street_clients_georgett"
+                current_action_items.append(MenuItem(str(_port_extra_label), Call("checkTriggers", "PortStreets", _port_clients_action, 0)))
 
     python:
         for _port_exit in PortStreetsRoom.visible_exits():

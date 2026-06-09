@@ -9,6 +9,59 @@ default player_card_inventory_origin = "profile"
 init python:
     import renpy.exports as renpy_module
 
+    def player_card_state():
+        if "player_state" in globals():
+            return player_state(True)
+        return globals().get("player", None)
+
+    def player_card_equipped_weapon():
+        state = player_card_state()
+        try:
+            return str(state.equipment.weapon or "")
+        except Exception:
+            return str(EquippedWeapon or "")
+
+    def player_card_equipped_armor():
+        state = player_card_state()
+        try:
+            return str(state.equipment.armor or "")
+        except Exception:
+            return str(EquippedArmor or "")
+
+    def player_card_inventory_count(item_id=""):
+        state = player_card_state()
+        try:
+            return int(state.inventory.count(item_id) or 0)
+        except Exception:
+            return int(_player_item_count_by_id(item_id) or 0)
+
+    def player_card_inventory_ids(expand_stacks=False):
+        state = player_card_state()
+        try:
+            return list(state.inventory.ids(expand_stacks) or [])
+        except Exception:
+            return list(_player_inventory_item_ids(expand_stacks) or [])
+
+    def player_card_owned_dresses():
+        state = player_card_state()
+        try:
+            return list(state.appearance.owned_dresses or [])
+        except Exception:
+            return []
+
+    def player_card_effective_exploration():
+        state = player_card_state()
+        try:
+            value = int(state.stats.exploration or 0)
+        except Exception:
+            value = int(effective_player_exploration() or 0)
+        try:
+            if bool(getattr(dog, "owned", False)):
+                value += 25
+        except Exception:
+            pass
+        return max(0, value)
+
     def player_card_main_menu_items():
         return [
             MenuItem("Проверить вещи", Call("PlayerCardInventoryMenu")),
@@ -63,7 +116,11 @@ init python:
             restart_fn()
 
     def player_card_hygiene_text():
-        wash_days = int(dayssincewash or 0)
+        state = player_card_state()
+        try:
+            wash_days = int(state.appearance.days_since_wash or 0)
+        except Exception:
+            wash_days = 0
 
         if wash_days <= 0:
             return "свежий"
@@ -76,13 +133,21 @@ init python:
         return "грязный"
 
     def player_card_current_dress_code():
-        return str(MyCurDress or "")
+        state = player_card_state()
+        try:
+            return str(state.appearance.current_dress or "")
+        except Exception:
+            return ""
 
     def player_card_display_name():
-        return "Стефан Лонгкок"
+        state = player_card_state()
+        try:
+            return str(state.display_name or "Стефан Лонгкок")
+        except Exception:
+            return "Стефан Лонгкок"
 
     def player_card_exploration_title():
-        exploration_value = int(effective_player_exploration() or 0)
+        exploration_value = int(player_card_effective_exploration() or 0)
         if exploration_value >= 150:
             return "матерый охотник и лесной следопыт"
         if exploration_value >= 100:
@@ -97,9 +162,9 @@ init python:
 
     def player_card_equipment_lines():
         lines = []
-        if str(EquippedArmor or "") == "old_leather_cuirass_001":
+        if player_card_equipped_armor() == "old_leather_cuirass_001":
             lines.append("Поверх одежды на вас затянута старая кожаная кираса, придающая вам суровый и дорожный вид.")
-        if str(EquippedWeapon or "") == "rusty_hunter_rifle_001":
+        if player_card_equipped_weapon() == "rusty_hunter_rifle_001":
             if rusty_hunter_rifle_is_oiled() and rusty_hunter_rifle_is_cleaned():
                 lines.append("За плечом у вас висит уже приведенная в порядок старая охотничья винтовка, придавая вам почти настоящий охотничий облик.")
             else:
@@ -107,41 +172,50 @@ init python:
         return lines
 
     def player_card_portrait_path():
+        for picture_path in (
+            "images/general/player_card.jpg",
+            "images/player_room/player_card.jpg",
+            "images/tavern/myroom/player_card.jpg",
+        ):
+            if renpy.loadable(picture_path):
+                return picture_path
         return "images/rpg_message_bg.png"
 
     def player_card_stat_rows_left():
-        exploration_value = int(effective_player_exploration() or 0)
+        state = player_card_state()
+        exploration_value = int(player_card_effective_exploration() or 0)
         exploration_text = str(exploration_value)
         if bool(getattr(dog, "owned", False)):
             exploration_text += " (с псом)"
         return [
-            ("Возраст", str(age)),
-            ("Мараведи", str(money)),
-            ("Известность", str(reputation)),
-            ("Дурная слава", str(notoriety)),
-            ("Слава трактира", str(tavernfame)),
-            ("Внешность", str(look)),
-            ("Харизма", str(charisma)),
+            ("Возраст", str(state.identity.age)),
+            ("Мараведи", str(state.economy.money)),
+            ("Известность", str(state.stats.reputation)),
+            ("Дурная слава", str(state.stats.notoriety)),
+            ("Слава трактира", str(state.economy.tavern_fame)),
+            ("Внешность", str(state.stats.look)),
+            ("Харизма", str(state.stats.charisma)),
             ("Исследование", exploration_text),
             ("Гигиена", player_card_hygiene_text()),
         ]
 
     def player_card_stat_rows_right():
+        state = player_card_state()
         last_sex_text = "нет"
         try:
-            _last_day = int(LastDaySex)
+            _last_day = int(state.intimacy.last_sex_day)
             if _last_day >= 0:
                 last_sex_text = str(max(0, int(dayspassed or 0) - _last_day)) + " дн. назад"
         except Exception:
             last_sex_text = "нет"
         return [
-            ("Энергия", str(energy)),
-            ("Настроение", str(fun)),
-            ("Секс", str(HadSex.get("You", 0))),
-            ("Раз за день", str(cancumdaily)),
-            ("Сегодня", str(cametoday)),
+            ("Энергия", str(state.condition.energy)),
+            ("Настроение", str(state.condition.fun)),
+            ("Секс", str(state.intimacy.had_sex_count)),
+            ("Раз за день", str(state.intimacy.can_cum_daily)),
+            ("Сегодня", str(state.intimacy.came_today)),
             ("Без секса", last_sex_text),
-            ("Возбуждение", str(Arousal.get("You", 0) if isinstance(Arousal, dict) else 0)),
+            ("Возбуждение", str(state.intimacy.arousal.get("You", state.intimacy.arousal.get("you", 0)) if isinstance(state.intimacy.arousal, dict) else 0)),
         ]
 
     def player_card_dress_lines():
@@ -168,7 +242,7 @@ init python:
         except Exception:
             pass
 
-        if len(list(_player_inventory_item_ids(False) or [])) <= 0:
+        if len(list(player_card_inventory_ids(False) or [])) <= 0:
             return ["В инвентаре сейчас ничего нет."]
 
         lines = ["При себе:"]
@@ -197,9 +271,9 @@ init python:
     def player_card_inventory_menu_caption(item_id):
         _item_id = str(item_id or "").strip()
         _item_name = player_card_item_display_name(_item_id)
-        _item_count = int(_player_item_count_by_id(_item_id) or 0)
+        _item_count = int(player_card_inventory_count(_item_id) or 0)
         _suffixes = []
-        if str(_item_id) == str(EquippedWeapon or ""):
+        if str(_item_id) == player_card_equipped_weapon():
             if _item_id == "rusty_hunter_rifle_001":
                 _loaded_ammo = rusty_hunter_rifle_loaded_ammo()
                 if _loaded_ammo != "":
@@ -208,7 +282,7 @@ init python:
                     _suffixes.append("экипировано")
             else:
                 _suffixes.append("экипировано")
-        if str(_item_id) == str(EquippedArmor or ""):
+        if str(_item_id) == player_card_equipped_armor():
             _suffixes.append("надето")
 
         _caption = _item_name
@@ -225,15 +299,15 @@ init python:
             return []
 
         _lines = []
-        _item_count = int(_player_item_count_by_id(_item_id) or 0)
+        _item_count = int(player_card_inventory_count(_item_id) or 0)
         if _item_count > 1:
             _lines.append("Сейчас у вас при себе %s единицы этого добра." % _item_count)
         elif _item_count == 1:
             _lines.append("Сейчас у вас при себе только одна такая вещь.")
 
-        if str(_item_id) == str(EquippedWeapon or ""):
+        if str(_item_id) == player_card_equipped_weapon():
             _lines.append("Сейчас это оружие у вас при себе и готово к делу.")
-        if str(_item_id) == str(EquippedArmor or ""):
+        if str(_item_id) == player_card_equipped_armor():
             _lines.append("Эта вещь сейчас на вас.")
         if _item_id == "rusty_hunter_rifle_001":
             _lines.extend(list(rusty_hunter_rifle_status_lines() or []))
@@ -297,12 +371,12 @@ init python:
             _items.append(MenuItem("Поделиться", Call("PlayerCardShareItemMenu", _item_id)))
         _item_kind = str(player_card_item_kind(_item_id) or "").strip()
         if _item_kind == "weapon":
-            if str(_item_id) == str(EquippedWeapon or ""):
+            if str(_item_id) == player_card_equipped_weapon():
                 _items.append(MenuItem("Убрать оружие", Call("PlayerCardUnequipItem", _item_id)))
             else:
                 _items.append(MenuItem("Вооружиться", Call("PlayerCardEquipItem", _item_id)))
         if _item_kind == "armor":
-            if str(_item_id) == str(EquippedArmor or ""):
+            if str(_item_id) == player_card_equipped_armor():
                 _items.append(MenuItem("Снять", Call("PlayerCardUnequipItem", _item_id)))
             else:
                 _items.append(MenuItem("Надеть", Call("PlayerCardEquipItem", _item_id)))
@@ -336,17 +410,19 @@ init python:
             lines.extend(player_body_state_lines())
         except Exception:
             pass
-        if str(EquippedWeapon or "").strip() != "":
-            lines.append("Вооружение: %s." % player_card_inventory_menu_caption(EquippedWeapon))
+        equipped_weapon = player_card_equipped_weapon()
+        equipped_armor = player_card_equipped_armor()
+        if equipped_weapon != "":
+            lines.append("Вооружение: %s." % player_card_inventory_menu_caption(equipped_weapon))
         else:
             lines.append("Вооружение: сейчас ничего не экипировано.")
-        if str(EquippedArmor or "").strip() != "":
-            lines.append("Защита: %s." % player_card_inventory_menu_caption(EquippedArmor))
+        if equipped_armor != "":
+            lines.append("Защита: %s." % player_card_inventory_menu_caption(equipped_armor))
         else:
             lines.append("Защита: ничего не надето поверх обычной одежды.")
         lines.extend(player_condition_warning_lines())
         lines.append("Отдельно проверить вещи можно через раздел инвентаря справа, без вывода всего списка прямо в карточке.")
-        lines.append("В вашем гардеробе %s костюмов." % str(len(list(MyDresses or []))))
+        lines.append("В вашем гардеробе %s костюмов." % str(len(player_card_owned_dresses())))
         return [line for line in lines if str(line or "").strip()]
 
     def player_card_section_view_lines(section_id=""):
@@ -555,7 +631,7 @@ init python:
             pass
         item_key = str(item_id or "").strip()
         item_obj = get_game_item(item_key)
-        if item_obj is None or int(_player_item_count_by_id(item_key) or 0) <= 0:
+        if item_obj is None or int(player_card_inventory_count(item_key) or 0) <= 0:
             player_card_show_inventory_section_state(player_card_inventory_primary_section(item_key), True)
             return
 
@@ -692,14 +768,14 @@ label PlayerCardInventoryItemMenu(item_id="", preserve_text=False):
 label PlayerCardEquipItem(item_id=""):
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
-    if _item_obj is None or int(_player_item_count_by_id(_item_id) or 0) <= 0:
+    if _item_obj is None or int(player_card_inventory_count(_item_id) or 0) <= 0:
         call PlayerCardInventoryMenu
         return
     if str(player_card_item_kind(_item_id) or "") == "weapon":
-        $ EquippedWeapon = _item_id
+        $ player_state().equip(_item_id, "weapon")
         $ MainTxt = "Вы берете при себе " + player_card_item_display_name(_item_id) + "."
     elif str(player_card_item_kind(_item_id) or "") == "armor":
-        $ EquippedArmor = _item_id
+        $ player_state().equip(_item_id, "armor")
         $ MainTxt = "Вы надеваете " + player_card_item_display_name(_item_id) + "."
     else:
         $ MainTxt = "Сейчас это нельзя экипировать."
@@ -715,11 +791,11 @@ label PlayerCardUnequipItem(item_id=""):
     if _item_obj is None:
         call PlayerCardInventoryMenu
         return
-    if _item_id == str(EquippedWeapon or ""):
-        $ EquippedWeapon = ""
+    if _item_id == player_card_equipped_weapon():
+        $ player_state().unequip("weapon")
         $ MainTxt = "Вы убираете " + player_card_item_display_name(_item_id) + "."
-    elif _item_id == str(EquippedArmor or ""):
-        $ EquippedArmor = ""
+    elif _item_id == player_card_equipped_armor():
+        $ player_state().unequip("armor")
         $ MainTxt = "Вы снимаете " + player_card_item_display_name(_item_id) + "."
     else:
         $ MainTxt = "Сейчас эта вещь и так не экипирована."
@@ -736,10 +812,10 @@ label PlayerCardStoreItemInMyRoom(item_id=""):
         $ CurLocDesc = MainTxt
         call PlayerCardInventoryItemMenu(_item_id, True)
         return
-    if _item_id == str(EquippedWeapon or ""):
-        $ EquippedWeapon = ""
-    if _item_id == str(EquippedArmor or ""):
-        $ EquippedArmor = ""
+    if _item_id == player_card_equipped_weapon():
+        $ player_state().unequip("weapon")
+    if _item_id == player_card_equipped_armor():
+        $ player_state().unequip("armor")
     $ _drop_result = player_drop_item(TavernMyRoomRoom, _item_id)
     $ MainTxt = str((_drop_result or {}).get("text", "") or "Вы оставляете вещь в комнате.")
     $ CurLocDesc = MainTxt
@@ -782,7 +858,7 @@ label PlayerCardItemTextAction(item_id="", action_id=""):
 
 label PlayerCardRifleCleanRust:
     $ _rifle_item = rusty_hunter_rifle_item()
-    if _rifle_item is None or _player_item_count_by_id("rusty_hunter_rifle_001") <= 0:
+    if _rifle_item is None or player_card_inventory_count("rusty_hunter_rifle_001") <= 0:
         call PlayerCardInventoryMenu
         return
     if rusty_hunter_rifle_is_cleaned():
@@ -797,14 +873,14 @@ label PlayerCardRifleCleanRust:
 
 label PlayerCardRifleOil:
     $ _rifle_item = rusty_hunter_rifle_item()
-    if _rifle_item is None or _player_item_count_by_id("rusty_hunter_rifle_001") <= 0:
+    if _rifle_item is None or player_card_inventory_count("rusty_hunter_rifle_001") <= 0:
         call PlayerCardInventoryMenu
         return
     if not rusty_hunter_rifle_is_cleaned():
         $ MainTxt = "Сначала нужно счистить ржавчину, иначе толку от масла будет мало."
     elif rusty_hunter_rifle_is_oiled():
         $ MainTxt = "Механизм уже смазан и ходит заметно мягче."
-    elif _player_item_count_by_id("weapon_oil_001") <= 0:
+    elif player_card_inventory_count("weapon_oil_001") <= 0:
         $ MainTxt = "У вас нет оружейного масла."
     else:
         $ _player_remove_item_by_id("weapon_oil_001", 1)
@@ -939,7 +1015,7 @@ init python:
 
     def player_card_is_shareable_item(item_id=""):
         item_key = str(item_id or "").strip()
-        return int(_player_item_count_by_id(item_key) or 0) > 0 and (player_card_is_loot_item(item_key) or player_card_is_crafted_item(item_key))
+        return int(player_card_inventory_count(item_key) or 0) > 0 and (player_card_is_loot_item(item_key) or player_card_is_crafted_item(item_key))
 
     def player_card_inventory_primary_section(item_id=""):
         item_key = str(item_id or "").strip()
@@ -954,9 +1030,9 @@ init python:
     def player_card_inventory_section_item_ids(section_id=""):
         section_key = str(section_id or "").strip()
         item_ids = []
-        for item_id in list(_player_inventory_item_ids(False) or []):
+        for item_id in list(player_card_inventory_ids(False) or []):
             item_key = str(item_id or "").strip()
-            if item_key == "" or int(_player_item_count_by_id(item_key) or 0) <= 0:
+            if item_key == "" or int(player_card_inventory_count(item_key) or 0) <= 0:
                 continue
             if player_card_inventory_primary_section(item_key) == section_key:
                 item_ids.append(item_key)
@@ -1000,15 +1076,15 @@ init python:
 
     def player_card_shareable_item_ids():
         shareable = []
-        for item_id in list(_player_inventory_item_ids(False) or []):
+        for item_id in list(player_card_inventory_ids(False) or []):
             if player_card_is_shareable_item(item_id):
                 shareable.append(str(item_id))
         return shareable
 
     def player_card_giftable_item_ids():
         giftable = []
-        for item_id in list(_player_inventory_item_ids(False) or []):
-            if player_card_is_gift_item(item_id) and int(_player_item_count_by_id(item_id) or 0) > 0:
+        for item_id in list(player_card_inventory_ids(False) or []):
+            if player_card_is_gift_item(item_id) and int(player_card_inventory_count(item_id) or 0) > 0:
                 giftable.append(str(item_id))
         return giftable
 
@@ -1019,7 +1095,7 @@ init python:
 label PlayerCardGiftItemMenu(item_id=""):
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
-    if _item_obj is None or int(_player_item_count_by_id(_item_id) or 0) <= 0:
+    if _item_obj is None or int(player_card_inventory_count(_item_id) or 0) <= 0:
         call PlayerCardInventoryMenu
         return
     $ MainTxt = "Кому вы хотите вручить {}?".format(player_card_item_display_name(_item_id))
@@ -1046,7 +1122,7 @@ label PlayerCardGiftItemTo(item_id="", char_name=""):
     $ _item_id = str(item_id or "").strip()
     $ _char_name = str(char_name or "").strip()
     $ _item_obj = get_game_item(_item_id)
-    if _item_obj is None or _char_name == "" or int(_player_item_count_by_id(_item_id) or 0) <= 0:
+    if _item_obj is None or _char_name == "" or int(player_card_inventory_count(_item_id) or 0) <= 0:
         call PlayerCardInventoryMenu
         return
     $ _gift_name = player_card_item_display_name(_item_id)
@@ -1100,7 +1176,7 @@ label PlayerCardGiftItemTo(item_id="", char_name=""):
 label PlayerCardShareItemMenu(item_id=""):
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
-    if _item_obj is None or int(_player_item_count_by_id(_item_id) or 0) <= 0:
+    if _item_obj is None or int(player_card_inventory_count(_item_id) or 0) <= 0:
         call PlayerCardInventoryMenu
         return
     $ MainTxt = "С кем вы хотите разделить {}?".format(player_card_item_display_name(_item_id))

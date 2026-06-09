@@ -8,6 +8,18 @@ Source: only `game/Inn/*.txt` (authoritative content).
 - Reference files count: 28
 - Matched lines count: 70
 
+## Runtime Development Rule: Romance / Intimacy Gates
+- Melissa may allow flirting when relationship/openness and daily social limits permit it.
+- Flirting is not enough to unlock make-out, sex-engine access, or deeper sexual actions.
+- Deeper intimacy is gated by completed story trust/safety progression:
+  - rat problem completed;
+  - bat/roof problem completed far enough that Melissa's room problem is solved;
+  - booklet branch resolved by either taking/keeping the booklet or leaving it in place and unlocking spy follow-up.
+- Taking the booklet should leave the player with `melissa_drawings_booklet_001` as a real inventory `GameItem`.
+- Leaving the booklet should set `Melissa.var["drawings_spy_option_unlocked"] = 1` and make the later spy/seduction branch possible.
+- Sex-engine access for Melissa should come from the story/event path after it is seen/allowed, not from a generic high-relationship flirt button.
+- The checks belong on `MelissaInfo` methods or Melissa event/thread conditions. Event labels present scenes and update state; they must not duplicate a second gate system.
+
 ## Reference Files
 - $menu_f.txt => Location: $menu_f
 - AdjustOtkroven.txt => Location: AdjustOtkroven

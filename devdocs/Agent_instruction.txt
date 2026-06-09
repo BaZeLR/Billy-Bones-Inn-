@@ -1,0 +1,253 @@
+WORKSPACE LOCK (NON-NEGOTIABLE):
+
+- Base working directory is: c:\Users\blank\Documents\RenPy_Projects\Tractir
+- Work ONLY with files inside this Tractir project by default.
+- Ignore files from other projects (for example Billy Bones Inn) unless the user explicitly asks to use them.
+- If IDE tabs show files from other projects, do not switch context automatically.
+
+you will use textfiles in the project and convert them into renpy. use keyword.xml file to understand the meaning of commands in use.
+tables used in txt files convert it using python function.
+use object oriented renpy with all python features to enhance and improve the original code in txt. 
+keep labels name the same as txt files names for consistency 
+the main goal to see original working project in renpy 
+
+RULES FOR TXT -> RENPY CONVERSION (NON-NEGOTIABLE):
+- The .txt files are the source of truth.
+- Preserve original logic and outcomes from .txt files.
+- Do not delete or omit code paths unless proven unused and behavior-equivalent.
+- If two implementations look duplicated but can produce different results, keep both until mapped to .txt semantics.
+- Prefer compatibility wrappers/adapters over refactors during migration.
+- Any omission must be documented with reason and affected labels/functions.
+
+STRICT PARITY ENFORCEMENT (NON-NEGOTIABLE):
+- Do not invent new gameplay labels when an original .txt location/label already exists.
+- Keep original label names, call flow, and jump/call targets from .txt files.
+- Do not rewrite original scene/location text unless user explicitly asks for rewrite.
+- Use original .txt location descriptions as canonical content.
+- Ren'Py/Python code is an execution layer for original .txt behavior, not a replacement design.
+- If a deviation is technically required, state it first and document exact reason + impacted labels.
+
+You are a Ren'Py 8.3+ expert. Follow these strict rules:
+- NEVER use renpy.call(), renpy.jump() or similar inside any python: block. They terminate the block immediately.
+- Use Python functions that RETURN strings or values instead of calling labels.
+- Show images with renpy.show(), Show("screen"), or screens — never with renpy.call to a show label.
+- Persist variables ONLY with default / define / store. Never plain globals().
+- Keep python: blocks small — only for pure computation. Put story flow, say statements, menus in Ren'Py script.
+- No giant string concatenation in Python for narration. Use multiple say statements or Character callbacks.
+-use lables with functions inside as subroutins to update variables,states, or call mimi menus to add to action options 
+
+
+PROJECT RULES — MUST FOLLOW EXACTLY
+Lean Code Rule
+
+Prefer deleting code over adding code.
+
+Before adding any helper/wrapper:
+1. Show the exact duplicated callsite it replaces.
+2. Show the exact bug it prevents.
+3. Show why direct Ren'Py label flow is not enough.
+
+If it cannot prove those three things, do not add the helper.
+
+You are working inside an existing game architecture.
+Your job is to COMPLETE and FIX the project in one or two passes, not to redesign it.
+
+For canonical event/thread/scene presentation rules, also follow:
+- devdocs/architecture.md
+- devdocs/METHODS_GLOSSARY.md
+- devdocs/VARIABLES_GLOSSARY.md
+- devdocs/GAME_VARIABLES_INDEX.md
+
+NON-NEGOTIABLE RULES
+
+1. Respect the existing architecture exactly.
+Do not replace the project structure with your own abstraction style.
+Do not convert the project into a new paradigm.
+Do not invent new core systems if equivalent systems already exist.
+
+2. Existing structures are authoritative.
+You must preserve and work with:
+- Room class template
+- game_item structures
+- NPC dict-table architecture
+- per-NPC custom variable tables
+- actions system
+- engines
+- events
+- quests
+- room object lists
+- room NPC lists
+- existing label-based flow
+
+3. No fake generic abstractions.
+Forbidden:
+- normalization blobs like normalize_* or merged dict state helpers
+- duplicate wrapper aliases that only rename the same call
+- generic managers that hide precedence rules
+- hidden fallback behavior
+- broad catch-all exception swallowing
+- duplicate code paths for the same behavior
+
+4. No store-backed temporary menu transport.
+Forbidden:
+- renpy.store transport state for action menus
+- default action-menu context variables used only to carry current selection
+- global menu state used instead of direct argument passing
+
+5. Use direct argument flow.
+Action menus must pass entity_type, entity_id, room_id, action_id, args directly.
+Do not copy that state into shared transport variables first.
+
+6. One router only.
+There must be one action hub/router.
+NPCs, player, dog, items, objects, and interactables may have different action labels, but they must not use parallel duplicated menu systems.
+
+7. Explicit action routing only.
+Every action must route to its own clear label/function.
+Examples:
+- talk -> NPC talk label
+- look -> examine label or card label
+- gift -> gift flow
+- flirt -> flirt flow
+- train dog -> dog training flow
+Different actions are expected to mutate different variables.
+Do not try to unify their internal game logic.
+Only unify menu routing.
+
+8. Preserve current game truth.
+Do not invent second truth layers.
+Use existing state tables directly.
+Examples:
+- knowsMC[npc_id]
+- RealName[npc_id]
+- Friends[npc_id]
+- CurrentLoc[npc_id]
+- AmandaVar / MelissaVar / SandraVar / etc.
+If a value already exists in project data, use it.
+Do not duplicate it in a menu-state object.
+
+9. Knowledge rule is simple.
+- Talking to NPC marks knowsMC[npc_id] = True
+- Looking does NOT mark known
+- Unknown NPC name display comes from unknown_name or a simple fallback
+- Known NPC name display comes from RealName[npc_id]
+
+10. Picture logic must stay simple.
+Do not implement token-scored media discovery unless explicitly requested.
+Prefer this order:
+- explicit action picture
+- explicit NPC picture
+- known NPC portrait fallback
+- unknown_picture or blank
+No hidden portrait leak for unknown NPCs.
+
+11. Preserve room and action behavior.
+Room class template, room build actions, room object menus, room NPC lists, and current room-specific behavior must remain intact.
+Refactor only to reduce duplication, not to erase room-specific behavior.
+
+12. Respect item/object/NPC action ownership.
+The hub only chooses and dispatches.
+The called label/function mutates the actual variables.
+Do not move quest, event, social, or training logic into the hub.
+
+13. Full-project mindset.
+Do not patch one file in isolation while breaking the surrounding architecture.
+Cross-check all touched files against:
+- room templates
+- action labels
+- item systems
+- NPC tables
+- quests/events
+- engine expectations
+
+14. Minimal, readable code only.
+Code must be plain and explicit.
+Prefer:
+- small direct getters
+- explicit branches
+- direct Ren'Py labels and small named helpers
+- direct labels/functions
+Avoid:
+- clever abstractions
+- over-generalized inheritance
+- state packing/unpacking helpers
+- abstraction for abstraction’s sake
+
+15. No argument or policy debate in output.
+Do not explain why you want to redesign the system.
+Do not argue with architecture choices.
+Do not brag.
+Do not produce long meta-commentary.
+Just comply with the structure and fix the code.
+
+WORKING METHOD
+
+PASS 1:
+- Read the existing files
+- Identify the exact existing architecture
+- Fix conflicts and redundancies without changing the architecture
+- Keep labels, room flows, and table-driven data intact
+- Remove duplicated action/menu paths
+- Remove fake transport state
+- Preserve functionality
+
+PASS 2:
+- Only if needed, finish integration and repair remaining broken callers
+- Verify all touched routes still match the existing project structure
+
+ABSOLUTE FORBIDDEN CHANGES
+
+Do not:
+- rewrite the project into classes if it is dict-table based
+- replace label-based flow with an incompatible system
+- introduce store/global action menu state
+- introduce normalize_* merge helpers
+- duplicate NPC-specific and generic action flows
+- move story/event logic into the action router
+- silently change variable semantics
+- remove room-specific menus unless replaced by equivalent direct room/object labels
+- invent new names for old concepts unless necessary for compatibility
+
+TARGET RESULT
+
+Deliver working code that:
+- fits the existing project
+- respects all existing structures
+- reduces duplication
+- keeps behavior explicit
+- works in one coherent architecture
+- can be understood by reading the file directly without chasing hidden state
+
+CURRENT KNOWN PROBLEMS TO FIX
+
+1. Character hub currently keeps a partially separate NPC path instead of one clear router.
+2. Some helper logic overwrites passed entity/NPC overrides.
+3. Examine flow must not mark NPC as known.
+4. Unknown NPC portraits must not leak into known portrait fallback.
+5. Dog and other non-human entities still need explicit action rows.
+6. Actions file must stay centralized and table-driven without reintroducing wrapper clutter.
+7. Menu routing must expose declared actions instead of hardcoding only look/talk where richer actions exist.
+
+SUCCESS CRITERIA
+
+The patch is acceptable only if:
+- no duplicate action hub path remains
+- no store/global action menu transport remains
+- no normalize/merge blob remains
+- action routing is explicit
+- room template and project data structures are preserved
+- NPC tables and per-NPC custom vars are respected
+- actions, engines, events, and quests still work with the existing design
+
+
+
+or your project, this is the cleanest pattern:
+
+menu is a dict
+actions are a list of dicts
+each action has id, label, call
+visibility is controlled by show_if
+router only calls labels
+labels mutate real game state
+
+That keeps the hub simple and keeps action logic where it belongs

@@ -14,23 +14,27 @@ init python:
                 return room_code
         return str(CurLoc or "TavernMain")
 
-    def _time_label(value):
-        labels = {
-            0: "утро",
-            1: "полдень",
-            2: "день",
-            3: "вечер",
-            4: "ночь",
-        }
-        return labels.get(int(value or 0), str(value))
+    TIME_CHANGE_PERIOD_TARGETS = (
+        (1, 8, "Дождаться утра"),
+        (2, 11, "Дождаться полудня"),
+        (4, 16, "Дождаться дня"),
+        (5, 18, "Дождаться вечера"),
+        (7, 23, "Дождаться ночи"),
+    )
+
+    def _time_current_slot():
+        calendar_v2.sync_state()
+        return int(calendar_v2.time_slot())
 
     def _time_overview_lines():
-        ensure_calendar_state()
+        calendar_v2.sync_state()
+        hud = calendar_v2.hud_data()
         return [
-            "Сейчас: %02d:%02d." % (int(hour or 0), int(minute or 0)),
-            "Время суток: %s." % str(calendar_time_slot_name_ru or _time_label(time)),
-            "День недели: %s." % str(week_name or ""),
-            "Дата: %s." % str(calendar_format_date_ru(day, month, year, week, False) or ""),
+            "Сейчас: %s." % calendar_v2.clock_text(calendar_v2.hour, calendar_v2.minute),
+            "Время суток: %s." % str(hud["time_name_ru"]),
+            "День недели: %s." % str(hud["week_name_ru"]),
+            "Дата: %s." % str(calendar_v2.format_date_ru(hud["day"], calendar_v2.period, calendar_v2.cycle, calendar_v2.week, False) or ""),
+            "Дней в игре: %s." % str(hud["days_in_game"]),
         ]
 
     def _time_change_body_text():
@@ -45,16 +49,12 @@ init python:
     def _time_change_items(return_label=""):
         items = []
         block_advance = int(BlockTimeAdvance or 0)
-        current_time = int(time or 0)
+        current_slot = _time_current_slot()
 
-        if block_advance == 0 and current_time == 0:
-            items.append(MenuItem("Дождаться полудня", [_time_change_close_action(return_label), Call("ApplyTimeSlotChange", 1)]))
-        if block_advance == 0 and current_time < 2:
-            items.append(MenuItem("Дождаться дня", [_time_change_close_action(return_label), Call("ApplyTimeSlotChange", 2)]))
-        if block_advance == 0 and current_time < 3:
-            items.append(MenuItem("Дождаться вечера", [_time_change_close_action(return_label), Call("ApplyTimeSlotChange", 3)]))
-        if block_advance == 0 and current_time < 4:
-            items.append(MenuItem("Дождаться ночи", [_time_change_close_action(return_label), Call("ApplyTimeSlotChange", 4)]))
+        if block_advance == 0:
+            for slot_id, target_hour, caption in TIME_CHANGE_PERIOD_TARGETS:
+                if current_slot < slot_id:
+                    items.append(MenuItem(caption, [_time_change_close_action(return_label), Call("ApplyTimePeriodChange", slot_id, target_hour)]))
 
         if block_advance == 0:
             items.append(MenuItem("Дождаться следующего утра", [_time_change_close_action(return_label), Call("NextDay", _time_return_label(), 1)]))
@@ -89,10 +89,14 @@ label HideTimeChangeMenu(return_label=""):
     return
 
 
-label ApplyTimeSlotChange(target_time=0):
+label ApplyTimePeriodChange(target_time=0, target_hour=8):
     $ target_time = int(target_time or 0)
-    if int(BlockTimeAdvance or 0) == 0 and int(time or 0) < target_time:
-        $ calendar_set_time_slot(target_time)
+    $ target_hour = int(target_hour or 8) % 24
+    $ calendar_v2.sync_state()
+    if int(BlockTimeAdvance or 0) == 0 and int(calendar_v2.time_slot()) < target_time:
+        $ calendar_v2.hour = target_hour
+        $ calendar_v2.minute = 0
+        $ calendar_v2.sync_state()
         call stat
     $ return_loc = _time_return_label()
     if renpy.has_label(return_loc):

@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label WhoreNextDayClients(girl_name="", max_clients=0, glory_hole_max=0):
     python:
@@ -17,8 +17,11 @@ label WhoreNextDayClients(girl_name="", max_clients=0, glory_hole_max=0):
         except Exception:
             glory_max_i = 0
 
-        week_val = int(week or 1)
-        current_time = int(time or 0)
+        # === SIMPLE & CLEAN - This is what should have been done ===
+        calendar_v2.sync_state()        # This updates all your calendar variables properly
+
+        week_val = int(week)         # direct access after sync
+        current_time = int(time)     # direct access after sync
 
         glory_max_i = min(10, max(0, glory_max_i))
         if week_val == 5:

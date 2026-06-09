@@ -29,8 +29,6 @@ init python:
             return church_call_label("ChurchAfterCermon", 1)
         if action_key == "draupnir":
             return church_call_label("ShowChurchDraupnirList")
-        if action_key == "after_georgett":
-            return church_call_label("AfterCermonGeorgett")
         if action_key == "after_liza":
             return church_call_label("AfterCermonLizett")
         if action_key == "after_becky":
@@ -62,44 +60,50 @@ init python:
             "images/becky/church/talk2.jpg",
         ])
 
+    def church_minutes_now():
+        try:
+            return int(clock_minutes or 0) % 1440
+        except Exception:
+            return 0
+
+    def church_minutes_between(start_value=0, end_value=0):
+        minute_value = church_minutes_now()
+        start_minute = int(start_value or 0)
+        end_minute = int(end_value or 0)
+        if start_minute <= end_minute:
+            return start_minute <= minute_value <= end_minute
+        return minute_value >= start_minute or minute_value <= end_minute
+
+    def church_open_hours_visible():
+        return week == 7 and church_minutes_between(8 * 60, 12 * 60 + 59)
+
     def church_closed_description_visible():
-        return week != 7 or time > 2
+        return not church_open_hours_visible()
 
     def church_service_description_visible():
-        return week == 7 and time <= 2
+        return church_open_hours_visible()
 
     def church_closed_time_visible():
-        return week != 7 or time > 2
-
-    def church_time_slot_visible(slot_value=0):
-        return week == 7 and int(time or 0) == int(slot_value or 0)
+        return not church_open_hours_visible()
 
     def church_service_action_visible():
-        return church_time_slot_visible(0)
+        return week == 7 and church_minutes_between(8 * 60, 9 * 60 + 29)
 
     def church_confession_action_visible():
-        return church_time_slot_visible(1)
+        return week == 7 and church_minutes_between(9 * 60 + 30, 10 * 60 + 59)
 
     def church_after_cermon_action_visible():
-        return church_time_slot_visible(2)
+        return week == 7 and church_minutes_between(11 * 60, 12 * 60 + 59)
 
     def church_becky_priest_talk_visible():
         return (
-            church_time_slot_visible(1)
+            church_confession_action_visible()
             and BeckyVar.get("PriestAdvice", 0) > 0
             and BeckyVar.get("GerhardBeckyTalk", 0) < 2
         )
 
     def church_draupnir_note_visible():
-        return church_time_slot_visible(1) and BeckyVar.get("GerhardBeckyTalk", 0) > 0
-
-    def church_georgett_quick_sex_visible():
-        return (
-            church_service_action_visible()
-            and int(cametoday or 0) < int(cancumdaily or 0)
-            and int(Friends.get("georgett", 0) or 0) >= 6
-            and int(HadSex.get("georgett", 0) or 0) >= 3
-        )
+        return church_confession_action_visible() and BeckyVar.get("GerhardBeckyTalk", 0) > 0
 
     def _church_to_int(value, default=0):
         try:
@@ -151,7 +155,7 @@ init python:
     def church_apply_sunday_purity():
         global ChurchPurityLastDay, ChurchPurityReport
 
-        if _church_to_int(week, 0) != 7 or _church_to_int(time, 0) > 2:
+        if not church_open_hours_visible():
             return {}
 
         today = _church_to_int(dayspassed, 0)
@@ -242,7 +246,7 @@ init python:
         code_name="Church",
         group_name=ROOM_GROUP_CITY,
         display_name="Собор Ильматера",
-        bg_picture="images/general/LocChurchClosed1.jpg",
+        bg_picture="images/church/locChurchClosed_day.png",
         descriptions=[
             RoomDescription(
                 text="Перед вами возвышается величественное здание городского собора, посвященного великому богу Ильматеру. Величественными башенками, шпилями, колоннами собор устремляется вверх, в небо. По воскресным утрам здесь собирается почти весь город. Однако сейчас собор закрыт.",
@@ -267,7 +271,8 @@ init python:
         ],
         schedule=RoomSchedule(
             weekdays=[7],
-            time_slots=[0, 1, 2],
+            start="08:00",
+            end="12:59",
             closed_text="Перед вами возвышается величественное здание городского собора, посвященного великому богу Ильматеру. Величественными башенками, шпилями, колоннами собор устремляется вверх, в небо. По воскресным утрам здесь собирается почти весь город. Однако сейчас собор закрыт.",
         ),
         custom_properties={"service_location": True},
@@ -288,67 +293,43 @@ label Church:
     $ current_action_items = []
     $ current_girl_key = ""
     $ current_object_id = ""
-    $ GeorgettVar["foundinchurch"] = 0
     $ church_apply_sunday_purity()
-    call ChurchRestore
-    call screen main_ui
-    jump Church
 
-
-label ChurchRestore:
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-
-    if week != 7 or time > 2:
+    if not ChurchRoom.is_open(week, time):
         $ MainTxt = ChurchRoom.schedule.closed_text
         $ CurLocDesc = MainTxt
-        call ShowImageSeq("general", "", "LocChurchClosed", 2)
-        call ChurchBuildActions
-        return
-
-    if time == 0:
-        $ MainTxt = "Вы пришли в великий городской собор Ильматера на воскресную службу.\n\nКажется, здесь собралось полгорода. Отец Герхард, жрец Ильматера, ведет службу. Ее вы видели и слышали уже сотни раз. Ваш взор обегает собор и {a=church:service:1}{color=#245b2b}прихожан{/color}{/a}."
-        $ CurLocDesc = MainTxt
-        call ShowImage("gerhard", "", "gerhard")
-    elif time == 1:
-        $ MainTxt = "Служба закончилась, люди понемногу начали расходиться. Вы можете или пойти домой или пойти к отцу Герхарду на {a=church:confession:1}{color=#245b2b}исповедь{/color}{/a}."
-        if BeckyVar.get("GerhardBeckyTalk", 0) > 0:
-            $ MainTxt = MainTxt + "\nНа небольшом столике в углу лежит {a=church:draupnir:1}{color=#245b2b}листок{/color}{/a}, на котором что-то накорябанно."
-        $ CurLocDesc = MainTxt
-        call ShowImage("general", "", "LocChurchIspoved1")
+        vscene "images/church/locChurchClosed_day.png"
     else:
-        $ MainTxt = "Почти все прихожане уже разошлись, однако собор еще открыт. Вы можете его {a=church:after_cermon:1}{color=#245b2b}обойти{/color}{/a} и посмотреть нет ли чего интересного."
-        $ CurLocDesc = MainTxt
-        call ShowImage("general", "", "LocChurchIspoved2")
+        if church_service_action_visible():
+            $ MainTxt = "Вы пришли в великий городской собор Ильматера на воскресную службу.\n\nКажется, здесь собралось полгорода. Отец Герхард, жрец Ильматера, ведет службу. Ее вы видели и слышали уже сотни раз. Ваш взор обегает собор и прихожан."
+            $ CurLocDesc = MainTxt
+            vscene "images/church/churchEntryDay.png"
+        elif church_confession_action_visible():
+            $ MainTxt = "Служба закончилась, люди понемногу начали расходиться. Вы можете или пойти домой или пойти к отцу Герхарду на исповедь."
+            if BeckyVar.get("GerhardBeckyTalk", 0) > 0:
+                $ MainTxt = MainTxt + "\nНа небольшом столике в углу лежит листок, на котором что-то накорябанно."
+            $ CurLocDesc = MainTxt
+            vscene "images/church/confessionEntry.png"
+        else:
+            $ MainTxt = "Почти все прихожане уже разошлись, однако собор еще открыт. Вы можете его обойти и посмотреть нет ли чего интересного."
+            $ CurLocDesc = MainTxt
+            vscene "images/church/confessionEntry.png"
 
     if navigation_only_mode_enabled():
         $ MainTxt = MainTxt + "\n" + navigation_only_message() + "\n" + navigation_only_time_note()
         $ CurLocDesc = MainTxt
 
-    call ChurchBuildActions
-    return
-
-
-label ChurchBuildActions:
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-
-    if week != 7 or time > 2:
-        python:
-            for _church_exit in ChurchRoom.visible_exits():
-                current_action_items.append(MenuItem(_church_exit.label, Call("MoveToRoom", _church_exit.target, getattr(_church_exit, "minutes_to_pass", 5))))
-        return
-
     python:
-        for _church_action in ChurchRoom.visible_actions():
-            _church_menu_item = room_action_menu_item(_church_action)
-            if _church_menu_item is not None:
-                current_action_items.append(_church_menu_item)
+        if ChurchRoom.is_open(week, time):
+            for _church_action in ChurchRoom.visible_actions():
+                _church_menu_item = room_action_menu_item(_church_action)
+                if _church_menu_item is not None:
+                    current_action_items.append(_church_menu_item)
         for _church_exit in ChurchRoom.visible_exits():
             current_action_items.append(MenuItem(_church_exit.label, Call("MoveToRoom", _church_exit.target, getattr(_church_exit, "minutes_to_pass", 5))))
-    return
+
+    call screen main_ui
+    jump Church
 
 
 label ChurchServiceMenu(show_attendees=True):
@@ -362,11 +343,9 @@ label ChurchServiceMenu(show_attendees=True):
     $ current_action_items.append(MenuItem("Найти сестричек", Function(main_ui_call_label, "ChurchServiceSisters")))
     $ current_action_items.append(MenuItem("Найти семейство Легаре", Function(main_ui_call_label, "ChurchServiceLegare")))
     $ current_action_items.append(MenuItem("Найти семейство Блэнкеншип", Function(main_ui_call_label, "ChurchServiceBlanken")))
-    if Friends.get("georgett", 0) >= 2:
+    if (bool(Georgett.known) or bool(knowsMC.get("georgett", False)) or people_to_int(Georgett.rel, 0) > 0) and people_to_int(Friends.get("georgett", Georgett.rel), 0) >= 2:
         $ current_action_items.append(MenuItem("Найти Жоржетту Брюно", Function(main_ui_call_label, "ChurchServiceGeorgett")))
-    if church_georgett_quick_sex_visible():
-        $ current_action_items.append(MenuItem("Предложить Жоржетте перепихнуться по быстрому", Function(main_ui_call_label, "church_georgett_sex")))
-    $ current_action_items.append(MenuItem("Вернуться к службе", Function(main_ui_call_label, "ChurchRestore")))
+    $ current_action_items.append(MenuItem("Вернуться к службе", Jump("Church")))
     $ renpy.restart_interaction()
     return
 
@@ -410,27 +389,11 @@ label ChurchServiceLegare:
 label ChurchServiceBlanken:
     $ MainTxt = "Вдова Блэнкеншип, высокая рыжая женщина с полной грудью, чуть младше сорока лет. Она на первый взгляд слушает отца Герхарда, но если присмотреться, то видно, что ее мысли витают где-то далеко. Рядом с ней стоит Эдди, ее рыжий управляющий лавкой и ваш ровесник. Поблизости ее дети - Ингенборг, Ивар, Эмма и Лаура."
     $ CurLocDesc = MainTxt
-    $ _church_picture = church_blanken_picture()
+    $ _church_picture = church_blacken_picture()
     if str(_church_picture or "").strip():
         call ShowImage("", "", _church_picture)
     else:
         call ShowImage("becky", "church", "cermon")
-    call ChurchServiceMenu(False)
-    return
-
-
-label ChurchServiceGeorgett:
-    $ MainTxt = "В одном из углов собора вы находите вашу ветренную знакомую - Жоржетту Брюно, шлюху из портового квартала. Это молодая белокурая и кареглазая женщина, среднего роста, чуть пухленькая и с большой налитой грудью. В собор она нарядилась чуть скромнее, чем обычно, но не слишком: на ней красное платье до колен и блузка с глубоким декольте, на этот раз хотя бы не прозрачная. Вы замечаете, что прихожане-мужчины обращают на нее гораздо больше внимания, чем на проповедь с амвона."
-    if GeorgettVar.get("askkids", 0):
-        if Friends.get("liza", 0) > 0:
-            $ MainTxt = MainTxt + "\n\nРядом с ней вы видите ее старшую дочь Лизетту - молоденькую мулатку, на вид - ровесницу Аманды. Ее волосы забранны в две косички а груди только начали расти. Ее шоколадное тело закрывают юбка и блузка, такие же как у ее мамы."
-        else:
-            $ MainTxt = MainTxt + "\n\nРядом с ней вы видите молоденькую мулатку, на вид - ровесницу Аманды. Ее волосы забранны в две косички а груди только начали расти. Судя по всему это Лизетта - старшая дочь Жоржетты. Ее шоколадное тело закрывают юбка и блузка, такие же как у ее мамы."
-        call ShowImage("georgett", "church", "cermonliza")
-    else:
-        call ShowImage("georgett", "church", "cermon")
-    $ CurLocDesc = MainTxt
-    $ GeorgettVar["foundinchurch"] = 1
     call ChurchServiceMenu(False)
     return
 
@@ -449,65 +412,6 @@ label becky_church_talk:
         $ MainTxt = MainTxt + "\n\n\"Да как ты смеешь, молодой человек, на тайну исповеди посягать?! Я по твоему кто, настоятель этого великого храма или сплетник с базарной площади?\" разгневался достопочтенный.\n\nПолучив такую отповедь вы уже собрались было отправиться восвояси, как отец Герхард заметил:\n\n\"Эх, что за люди нынче? Раньше к падре с благовением обращались. А сейчас? Одному тайну исповеди раскрой, а этот шельмец, Драупнир, все деньги требует по счету. А откуда же я их возьму, коли никто не жертвует?\""
 
     $ CurLocDesc = MainTxt
-    call ShowImage("general", "", "LocChurchIspoved1")
+    vscene "images/church/confessionEntry.png"
     $ BeckyVar["GerhardBeckyTalk"] = 2
-    call ChurchBuildActions
-    return
-
-
-label church_georgett_sex:
-    hide screen main_ui
-    "В одном из углов собора вы находите вашу ветренную знакомую и шепчете ей на ухо ваше нескромное предложение."
-
-    if Friends.get("georgett", 0) < 6:
-        "«Ты что, сдурел!» - отвечает вам она. «Это же собор!»"
-        call ChurchRestore
-        return
-
-    "«Какой ты пошлый! Поиметь меня прямо на церковной службе!» - смеется Жоржетта. «Это обойдется тебе в 15 мараведи!»"
-
-    if int(money or 0) < 15:
-        "«Ой, а у меня столько нет», говорите вы."
-        "«Ну нет так нет», следует резонный ответ."
-        call ChurchRestore
-        return
-
-    python:
-        import random as _random
-        _TmpChurchGeorgSex = "bench"
-        if int(GeorgettVar.get("askkids", 0) or 0) == 0 and _random.randint(1, 2) == 1:
-            _TmpChurchGeorgSex = "doggy"
-        if int(GeorgettVar.get("askkids", 0) or 0) != 0:
-            _TmpChurchGeorgSex = "withliza"
-        renpy.store.TmpChurchGeorgSex = _TmpChurchGeorgSex
-
-    if GeorgettVar.get("askkids", 0):
-        if Friends.get("liza", 0) == 0:
-            "Жоржетта поворачивается к молоденькой мулатке-шоколадке, стоящей рядом с ней: «Стефан, познакомься, это моя старшая доченька Лизетта, я тебе про нее рассказывала. Лизетта, познакомься, это дядя Стефан.»"
-            $ Friends["liza"] = 1
-        if GeorgettVar.get("lizasawinchurch", 0):
-            "«Лизетточка, мы сейчас с г-ном Стефаном пойдем потрахаемся», - без тени смущения говорит ваша подруга своей дочке. «Оставайся здесь, или, если хочешь, можешь посмотреть. Только тихо.»"
-        else:
-            "«Лизетточка, мы сейчас с г-ном Стефаном отойдем поговорить, а ты нас здесь подожди, хорошо?» - говорит ваша подруга своей дочке. «Хорошо, мама.»"
-
-    if str(TmpChurchGeorgSex or "") == "doggy":
-        "Вы отдаете деньги Жоржетте и она ведет вас к одной из скамей в дальнем темном углу собора. Вы внимательно осматриваетесь и замечаете, что скамья, колонны, сложенная утварь и прочее барахло заслоняют вас от взглядов толпы. Судя по всему к таким же выводам приходит и Жоржетта, так как она решительным движением снимает с себя юбку под которой, как вы и ожидали, ничего не оказалось. А сняв, Жоржетта наклоняется, опираясь о скамью, приглашающе выставив свою киску. Поняв намек, вы, не теряя времени, спускаете штаны и одним движением входите в развратницу."
-    else:
-        "Вы отдаете деньги Жоржетте и она ведет вас к одной из скамей в дальнем темном углу собора. Вы оба садитесь на нее. Видно, что колонны и прислоненная к ним церковная утварь заслоняют вас от взглядов толпы. Жоржетта быстро приспускает ваши штаны, выпуская на волю ваш уже вставший член. Затем она садится вам на колени, ловко заправляя ваш член в себя. Вы с удовлетворением отмечаете, что Жоржетта даже в церкви не изменила своей привычке ходить без нижнего белья. Оперевшись на следующую скамью ваша подружка начинает плавно двигаться, осторожно но уверенно доводя вас обеих до разрядки."
-
-    if GeorgettVar.get("askkids", 0):
-        "Вдруг вы замечаете, как кто-то наблюдает за вами из тени. Вы извещаете об этом свою подругу, та всматривается в тени и вдруг призывно машет рукой. Наблюдателем оказывается Лизетта, она выходит из своего укрытия и садится рядом с вами."
-        "«Лизетточка, доченька, видишь, мы с г-ном Стефаном трахаемся. Если хочешь посмотреть - то смотри. Только тихо». С этими словами ваша подруга возобновила свои движения. Лизетта же, смотря на вас, медленно возбуждается и начинает ласкать себя через одежду."
-        $ GeorgettVar["lizasawinchurch"] = 1
-
-    "Вы сношаетесь минут десять, когда ваша подружка не выдерживает, и сжав зубы, чтобы не застонать, кончает. Сразу следом за ней кончаете и вы, заполняя ее незащищенную матку своей спермой. Жоржетта встает с вашего члена и протирает лобок подолом платья, вы же быстро натягиваете приспущенные штаны."
-
-    if GeorgettVar.get("askkids", 0):
-        "«Мама, он что, в тебя кончил?» - вдруг раздается голосок. «Шшш, доченька, ну конечно в меня, я же тебе говорила что ничего в этом страшного нет.»"
-
-    $ money -= 15
-    $ GeorgettVar["fuckinchurch"] = 1
-    $ PregnancyCheck("georgett", "inside", 1, "Вы")
-    call ShowImageSeq("georgett", "church", TmpChurchGeorgSex, 6)
-    call AdvanceTimeAndRestore("ChurchRestore")
-    return
+    jump Church

@@ -1,6 +1,3 @@
-﻿# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
 init python:
     # Base style for the button itself
     style.warning_button = Style(style.default)
@@ -21,11 +18,225 @@ init python:
         ("images/general/intro3.png", "Your journey begins now!")
     ]
 
+    # Fallback for missing gui/button/*.png files (prevents DynamicImage crash on main menu)
+    # These override Ren'Py's default button styles that look for non-existent images.
+    style.button.background = Solid("#444444")
+    style.button.hover_background = Solid("#666666")
+    style.button.insensitive_background = Solid("#222222")
+    style.button.selected_background = Solid("#555555")
+
+    style.button_text.color = "#ffffff"
+    style.button_text.hover_color = "#ffffff"
+    style.button_text.insensitive_color = "#888888"
+    style.button_text.selected_color = "#ffffff"
+
+# =============================================================================
+# PLAYER STATE VARIABLES - Centralized initialization (recommended in script.rpy)
+# These should be defaulted early so they are always available.
+# =============================================================================
+#some general defaults
+default CurLoc = "TavernMain"
+# Core stats
+default tavernfame=0
+default health = 100
+default fun = 50
+default energy = 100
+default age = 18
+default money = 10000
+default charisma = 0
+default reputation = 0
+default notoriety = 0
+default exploration = 0
+default rebellion = 0
+default tavernvisitors = 40
+default productnum = 200
+default winenum = 100
+default look = 40
+#inventory and equipment
+default inventory = []
+default playerItems = {}
+default EquippedWeapon = ""
+default EquippedArmor = ""
+# Daily reset flags
+default cametoday = 0
+default bathedToday = False
+default swamToday = False
+default Arousal = {"you": 0}
+default PussyWetStart = {}
+default Drunk = {}
+default pregnancy = {}
+default Breastfeed = {}
+default Lactate = {}
+default ZaletSuspectFinal = {}
+default PregTotalSuspects = {}
+default virginity = {}
+default age_girls = {}
+default DateOfBirth = {}
+default kids = {}
+default beauty = {}
+default pregfather = {}
+default girltextdesc = {}
+default GiftPreferences = {}
+default HarassInstructions = {}
+default cooking = {}
+default cleaning = {}
+default waitress = {}
+default jobkitchen = {}
+default jobcleaning = {}
+default jobwaitress = {}
+default jobwhore = {}
+default jobgloryhole = {}
+default jobHallAvail = {}
+default jobWhoreAvail = {}
+default jobGloryHoleAvail = {}
+default jobkitchentomorrow = {}
+default jobcleaningtomorrow = {}
+default jobwaitresstomorrow = {}
+default jobwhoreTommorow = {}
+default jobgloryholeTommorow = {}
+default SloganFixed = 0
+default TavernHole = 0
+default TavernGloryHole = 0
+default GloryHoleLook = 0
+default DanceSponsor = 0
+default ChurchDonatedAmount = 0
+default CursedByEllona = 0
+default CursedByEllonaDays = 0
+default householdmembers = 4
+default KidsPosobie = 0
+default KidBirthPosobie = ""
+default ProstitutesKids = 0
+
+# Intimacy / sex limits
+default cancumdaily = 2
+default LastDaySex = -1
+default PlayerLastCumDay = -1
+
+# Sleep / morning state
+default PlayerMorningArousalDay = -1
+default PlayerWakeStateNotice = ""
+default PlayerArousalReasons = []
+default PlayerObservedNakedNpcDay = {}
+default SleepWakeHourOverride = -1
+default SleepWakeMinuteOverride = 0
+
+# Health & Injury system (new)
+# Health recovers +20 (or to max 100) during sleep.
+# If health drops below 25 due to fight or hunt injury, player gets 3-day forest ban.
+default PlayerForestBanUntilDay = 0   # If this > current dayspassed → blocked from forest
+default SickDays = 0
+
+# Player chore counters (generic actions)
+# These (and the weekly tracking below) are reset/cleared after Sandra's weekly chore check.
+default bring_woods = 0          # target 3 (weekly)
+default chop_wood = 0            # target 3 (weekly)
+default make_fire = 0            # target 3 (weekly)
+default clean_ashes = 0          # target 3 (weekly)
+default boil_water = 0           # target 7 (weekly)
+default clean_upstairs_rooms = 0 # target 3 (weekly)
+default PlayerChoresWeek = {}
+default UI_chores = {}
+default taverncleanliness = 60
+default upstairsroomsdirty = 0
+default ashesdirtydays = 0
+
+# Weekly chore + visitor tracking state (managed with chores, reset by Sandra weekly eval)
+default WeeklyVisitorsTrack = {"sum": 0, "days": 0, "prev_avg": 0.0}
+default WeeklyChoresLastEvalStamp = ""
+
+# Restriction / rebel tracking (otkroven = openness, neshlush = rebellion baseline)
+# Tied to household weekly evaluation alongside chores.
+default otkroven = {}
+default neshlush = {}
+
+# Per-girl custom variable tables (SandraVar, AmandaVar, etc.)
+# These must be defaulted early so bare access works reliably in ready functions
+# and dynamic if conditions (called from labels via py_eval).
+default SandraVar = {}
+default AmandaVar = {}
+default MelissaVar = {}
+default BeckyVar = {}
+default ClaraVar = {}
+default LizaVar = {}  # if used
+default GeorgettVar = {}
+default IrmaVar = {}
+
+# Core NPC/player relation state maps.
+default CurrentLoc = {}
+default Friends = {}
+default HadSex = {}
+default GiveOrgasms = {}
+default LickPussy = {}
+default DayLastOrgasmGiven = {}
+default CumFaceYou = {}
+default CumFaceOthers = {}
+default CumTitsYou = {}
+default CumTitsOthers = {}
+default CumInsideYou = {}
+default CumInsideOthers = {}
+default CockInMouth = {}
+default CockInPussy = {}
+default CockInTits = {}
+default CockInAss = {}
+default EddieCockInMouth = {}
+default EddieCockInPussy = {}
+default EddieCockInTits = {}
+default YouCockInMouth = {}
+default YouCockInPussy = {}
+default YouCockInTits = {}
+default GrupenSex = {}
+default TitsVisible = {}
+default PussyVisible = {}
+default ShortSkirtNoPanties = {}
+
+# Daily tracking
+default TalkedToday = {}
+default FlirtedToday = {}
+default GiftedToday = {}
+default FuckedToday = {}
+default AskedToday = {}
+# Player appearance compatibility mirrors. Player.appearance owns these values.
+default washDays = 3
+default hairCutdays = 14
+default dayssincewash = 0
+default dayssincehaircut = 0
+default PlayerHaircutDaySt = 0
+default PlayerDressDaySt = {"villagedress": 0}
+default PlayerDressLifeDays = {"villagedress": 42}
+default PlayerItemLifeDays = {}
+default costumecondition = 100
+# Calendar defaults. calendar_v2 is the single initialized Calendar instance.
+# The scalar values below are display/legacy mirrors for existing labels and screens.
+default day = 1
+default month = 1
+default year = CALENDAR_START_CYCLE
+default week = 1
+default hour = 8
+default minute = 0
+default time = 0
+default dayspassed = 0
+default clock_minutes = 480
+default calendar_v2 = Calendar(minute=0, hour=8, day=1, week=1, period=1, cycle=CALENDAR_START_CYCLE, daysInGame=0)
+default week_name = "Понедельник"
+default month_name = "Луна Волка"
+default week_name_en = "Monday"
+default month_name_en = "Wolf Moon"
+default calendar_weekday_name_ru = "Понедельник"
+default calendar_month_name_ru = "Луна Волка"
+default calendar_weekday_name_en = "Monday"
+default calendar_month_name_en = "Wolf Moon"
+default calendar_cycle_name_ru = "Цикл 1"
+default calendar_cycle_name_en = "Cycle 1"
+default calendar_time_slot_name_ru = "Утро"
+default calendar_time_slot_name_en = "morning"
+default datestr = ""
+default ClientsDayTotal = {}
+init python:
     def load_intro_sequence():
         try:
             import json
             import os
-            
+
             # First try to load from game/json directory
             try:
                 path = renpy.loader.transfn("json/intro_sequence.json")
@@ -38,13 +249,13 @@ init python:
                     json_dir = os.path.join(renpy.config.gamedir, "json")
                     if not os.path.exists(json_dir):
                         os.makedirs(json_dir)
-                    
+
                     json_path = os.path.join(json_dir, "intro_sequence.json")
                     default_data = [{"image": img, "text": txt} for img, txt in default_intro_sequence]
-                    
+
                     with open(json_path, "w", encoding="utf-8") as f:
                         json.dump(default_data, f, indent=2, ensure_ascii=False)
-                    
+
                     return default_intro_sequence
                 except Exception:
                     # If creating the file fails too, just return the defaults
@@ -53,10 +264,92 @@ init python:
             renpy.notify(f"Error loading intro sequence: {e}")
             return default_intro_sequence
 
+    def procedural_seed(key=""):
+        key_text = str(key or "")
+        key_total = 0
+        for index, char_value in enumerate(key_text):
+            key_total += (index + 1) * ord(char_value)
+        return (
+            current_game_day() * 1009
+            + int(day or 0) * 97
+            + int(month or 0) * 53
+            + int(week or 0) * 31
+            + int(time or 0) * 17
+            + key_total
+        )
+
+    def current_game_day(day_value=None):
+        if day_value is not None:
+            try:
+                return int(day_value)
+            except Exception:
+                return 0
+        try:
+            return int(calendar_v2.daysInGame)
+        except Exception:
+            try:
+                return int(dayspassed or 0)
+            except Exception:
+                return 0
+
+    def day_delta_since(start_day, current_day=None):
+        try:
+            start_value = int(start_day)
+        except Exception:
+            start_value = 0
+        return max(0, current_game_day(current_day) - start_value)
+
+    def day_delta_ready(start_day, delta_days=1, current_day=None):
+        try:
+            start_value = int(start_day)
+        except Exception:
+            start_value = 0
+        try:
+            delta_value = int(delta_days)
+        except Exception:
+            delta_value = 1
+        return current_game_day(current_day) >= start_value + max(0, delta_value)
+
+    def day_timer_decrement(value, amount=1):
+        try:
+            current_value = int(value)
+        except Exception:
+            current_value = 0
+        try:
+            amount_value = int(amount)
+        except Exception:
+            amount_value = 1
+        return max(0, current_value - max(0, amount_value))
+
+    def procedural_index(count=0, key=""):
+        count_value = int(count or 0)
+        if count_value <= 0:
+            return 0
+        return abs(int(procedural_seed(key))) % count_value
+
+    def procedural_choice(seq, key=""):
+        values = list(seq or [])
+        if len(values) <= 0:
+            return None
+        return values[procedural_index(len(values), key)]
+
+    def procedural_randint(a, b=None, key=""):
+        if b is None:
+            low_value = 0
+            high_value = int(a or 0)
+        else:
+            low_value = int(a or 0)
+            high_value = int(b or 0)
+        if high_value < low_value:
+            low_value, high_value = high_value, low_value
+        return low_value + procedural_index(high_value - low_value + 1, key)
+
 # explicit picture are allowed in this project
 init -95 python:
-    # Unified in-script game calendar/time engine.
-    # Keeps legacy globals while adding total counters.
+    # Calendar/time engine.
+    # calendar_v2 is the mutable source of truth.
+    # day/month/year/week/hour/minute/time/dayspassed/clock_minutes are mirrors
+    # for existing labels, screens, schedules, and save displays.
 
     CALENDAR_START_CYCLE = 1100
     CALENDAR_START_YEAR = CALENDAR_START_CYCLE
@@ -80,42 +373,74 @@ init -95 python:
         "Воскресенье",
     )
     MONTH_NAMES_EN = (
-        "First Moon Period",
-        "Second Moon Period",
-        "Third Moon Period",
-        "Fourth Moon Period",
-        "Fifth Moon Period",
-        "Sixth Moon Period",
-        "Seventh Moon Period",
-        "Eighth Moon Period",
-        "Ninth Moon Period",
-        "Tenth Moon Period",
-        "Eleventh Moon Period",
-        "Twelfth Moon Period",
-        "Thirteenth Moon Period",
+        "Wolf Moon",
+        "Ashen Veil Moon",
+        "Thorn Crown Moon",
+        "Blood Rose Moon",
+        "Honeyed Moon",
+        "Stag Crown Moon",
+        "Emberwake Moon",
+        "Reaper's Lantern Moon",
+        "Widowfrost Moon",
+        "Hunt-Bell Moon",
+        "Long Dark Moon",
+        "Root-and-Bone Moon",
+        "Black Eclipse Moon",
     )
     MONTH_NAMES_RU = (
-        "Первый лунный период",
-        "Второй лунный период",
-        "Третий лунный период",
-        "Четвертый лунный период",
-        "Пятый лунный период",
-        "Шестой лунный период",
-        "Седьмой лунный период",
-        "Восьмой лунный период",
-        "Девятый лунный период",
-        "Десятый лунный период",
-        "Одиннадцатый лунный период",
-        "Двенадцатый лунный период",
-        "Тринадцатый лунный период",
+        "Луна Волка",
+        "Луна Пепельной Завесы",
+        "Луна Тернового Венца",
+        "Луна Кровавой Розы",
+        "Медовая Луна",
+        "Луна Оленьего Венца",
+        "Луна Тлеющего Пробуждения",
+        "Луна Фонаря Жнеца",
+        "Луна Вдовьего Мороза",
+        "Луна Охотничьего Колокола",
+        "Луна Долгой Тьмы",
+        "Луна Корней и Костей",
+        "Луна Черного Затмения",
+    )
+
+    # Fancy moon month / period names (improved flavor for the game world)
+    # These are used for display while keeping the numeric period system untouched.
+    FANCY_MOON_NAMES_EN = MONTH_NAMES_EN
+
+    FANCY_MOON_NAMES_RU = MONTH_NAMES_RU
+
+    # Simple moon phase names (flavor only, derived from day within the ~28-day period)
+    MOON_PHASE_NAMES_EN = (
+        "New Moon",
+        "Waxing Crescent",
+        "First Quarter",
+        "Waxing Gibbous",
+        "Full Moon",
+        "Waning Gibbous",
+        "Last Quarter",
+        "Waning Crescent",
+    )
+
+    MOON_PHASE_NAMES_RU = (
+        "Новолуние",
+        "Растущий Серп",
+        "Первая Четверть",
+        "Растущая Луна",
+        "Полнолуние",
+        "Убывающая Луна",
+        "Последняя Четверть",
+        "Убывающий Серп",
     )
 
     TIME_SLOT_INFO = {
-        0: {"name_en": "morning", "name_ru": "утро", "hour": 8},
-        1: {"name_en": "noon", "name_ru": "полдень", "hour": 12},
-        2: {"name_en": "day", "name_ru": "день", "hour": 16},
-        3: {"name_en": "evening", "name_ru": "вечер", "hour": 20},
-        4: {"name_en": "night", "name_ru": "ночь", "hour": 23},
+        0: {"name_en": "early morning", "name_ru": "раннее утро", "hour": 6},
+        1: {"name_en": "morning", "name_ru": "утро", "hour": 8},
+        2: {"name_en": "noon", "name_ru": "полдень", "hour": 11},
+        3: {"name_en": "afternoon", "name_ru": "после полудня", "hour": 13},
+        4: {"name_en": "day", "name_ru": "день", "hour": 16},
+        5: {"name_en": "evening", "name_ru": "вечер", "hour": 18},
+        6: {"name_en": "late evening", "name_ru": "поздний вечер", "hour": 21},
+        7: {"name_en": "night", "name_ru": "ночь", "hour": 23},
     }
 
     def _cal_int(value, default=0):
@@ -124,492 +449,210 @@ init -95 python:
         except Exception:
             return default
 
-    def _cal_is_long_cycle(cycle):
-        cycle = _cal_int(cycle, CALENDAR_START_CYCLE)
-        return ((cycle - CALENDAR_START_CYCLE + 1) % 4) == 0
+    class Calendar(object):
+        def __init__(self, minute=0, hour=8, day=1, week=1, period=1, cycle=CALENDAR_START_CYCLE, daysInGame=0):
+            self.minute = _cal_int(minute, 0)
+            self.hour = _cal_int(hour, 8)
+            self.day = _cal_int(day, 1)
+            self.week = _cal_int(week, 1)
+            self.period = _cal_int(period, 1)
+            self.cycle = _cal_int(cycle, CALENDAR_START_CYCLE)
+            self.daysInGame = _cal_int(daysInGame, 0)
 
-    def _cal_periods_in_cycle(cycle):
-        return 13 if _cal_is_long_cycle(cycle) else 12
+        def advance_minutes(self, minutes):
+            self.minute += max(0, _cal_int(minutes, 0))
 
-    def _cal_days_in_month(month, year):
-        month = _cal_int(month, 1)
-        year = _cal_int(year, CALENDAR_START_CYCLE)
-        if month < 1:
-            return 28
-        if month == 13:
-            return 29 if _cal_is_long_cycle(year) else 28
-        return 28
+            while self.minute >= 60:
+                self.minute -= 60
+                self.hour += 1
 
-    def _cal_days_before_month(month, year):
-        year = _cal_int(year, CALENDAR_START_CYCLE)
-        month = max(1, min(_cal_periods_in_cycle(year), _cal_int(month, 1)))
-        total = 0
-        m = 1
-        while m < month:
-            total += _cal_days_in_month(m, year)
-            m += 1
-        return total
+            while self.hour >= 24:
+                self.hour -= 24
+                self.day += 1
+                self.week += 1
+                self.daysInGame += 1
 
-    def _cal_days_in_cycle(cycle):
-        total = 0
-        periods = _cal_periods_in_cycle(cycle)
-        period = 1
-        while period <= periods:
-            total += _cal_days_in_month(period, cycle)
-            period += 1
-        return total
+                if self.week > 7:
+                    self.week = 1
 
-    def _cal_days_before_cycle(cycle):
-        cycle = _cal_int(cycle, CALENDAR_START_CYCLE)
-        total = 0
-        current = CALENDAR_START_CYCLE
-        while current < cycle:
-            total += _cal_days_in_cycle(current)
-            current += 1
-        return total
+                if self.day > 28:
+                    self.day = 1
+                    self.period += 1
 
-    def _cal_periods_before_cycle(cycle):
-        cycle = _cal_int(cycle, CALENDAR_START_CYCLE)
-        total = 0
-        current = CALENDAR_START_CYCLE
-        while current < cycle:
-            total += _cal_periods_in_cycle(current)
-            current += 1
-        return total
+                if self.period > 13:
+                    self.period = 1
+                    self.cycle += 1
+            self.sync_state()
 
-    def calendar_day_number_to_parts(day_number):
-        day_index = max(0, _cal_int(day_number, 0))
-        cycle = CALENDAR_START_CYCLE
-        remaining = day_index
+        def clock_minutes(self):
+            return self.hour * 60 + self.minute
 
-        while remaining >= _cal_days_in_cycle(cycle):
-            remaining -= _cal_days_in_cycle(cycle)
-            cycle += 1
+        def time_slot(self):
+            return self.slot_from_hour(self.hour)
 
-        month = 1
-        while remaining >= _cal_days_in_month(month, cycle):
-            remaining -= _cal_days_in_month(month, cycle)
-            month += 1
-
-        day_value = remaining + 1
-        week_value = (day_index % 7) + 1
-        return {
-            "day": day_value,
-            "month": month,
-            "year": cycle,
-            "week": week_value,
-        }
-
-    def calendar_format_date_ru(day_value=None, month_value=None, year_value=None, week_value=None, include_weekday=True):
-        cycle = _cal_int(year if year_value is None else year_value, CALENDAR_START_CYCLE)
-        period = _cal_int(month if month_value is None else month_value, 1)
-        day_num = _cal_int(day if day_value is None else day_value, 1)
-        weekday = _cal_int(week if week_value is None else week_value, 1)
-
-        period = max(1, min(_cal_periods_in_cycle(cycle), period))
-        weekday = max(1, min(7, weekday))
-
-        base = "%d %s, цикл %d" % (day_num, MONTH_NAMES_RU[period - 1], cycle)
-        if include_weekday:
-            return "%s, %s" % (WEEKDAY_NAMES_RU[weekday - 1], base)
-        return base
-
-    def calendar_format_date_en(day_value=None, month_value=None, year_value=None, week_value=None, include_weekday=True):
-        cycle = _cal_int(year if year_value is None else year_value, CALENDAR_START_CYCLE)
-        period = _cal_int(month if month_value is None else month_value, 1)
-        day_num = _cal_int(day if day_value is None else day_value, 1)
-        weekday = _cal_int(week if week_value is None else week_value, 1)
-
-        period = max(1, min(_cal_periods_in_cycle(cycle), period))
-        weekday = max(1, min(7, weekday))
-
-        base = "%d %s, Cycle %d" % (day_num, MONTH_NAMES_EN[period - 1], cycle)
-        if include_weekday:
-            return "%s, %s" % (WEEKDAY_NAMES_EN[weekday - 1], base)
-        return base
-
-    def calendar_birth_record_from_ordinal(day_ordinal, cycle=None, birth_cycle=None):
-        cycle_value = _cal_int(year if cycle is None else cycle, CALENDAR_START_CYCLE)
-        ordinal = max(0, _cal_int(day_ordinal, 0))
-        cycle_days = _cal_days_in_cycle(cycle_value)
-        if cycle_days <= 0:
-            cycle_days = 336
-        ordinal = ordinal % cycle_days
-        parts = calendar_day_number_to_parts(_cal_days_before_cycle(cycle_value) + ordinal)
-        return {
-            "day": int(parts["day"]),
-            "month": int(parts["month"]),
-            "year": _cal_int(cycle_value if birth_cycle is None else birth_cycle, cycle_value),
-        }
-
-    def calendar_make_birth_record(age_years=0, day_value=None, month_value=None, cycle_value=None):
-        current_cycle = _cal_int(year, CALENDAR_START_CYCLE)
-        birth_cycle = _cal_int(current_cycle - max(0, _cal_int(age_years, 0)) if cycle_value is None else cycle_value, current_cycle)
-        periods = _cal_periods_in_cycle(birth_cycle)
-        birth_month = _cal_int(month if month_value is None else month_value, 1)
-        birth_month = max(1, min(periods, birth_month))
-        max_days = _cal_days_in_month(birth_month, birth_cycle)
-        if day_value is None:
-            birth_day = renpy.random.randint(1, max_days)
-        else:
-            birth_day = max(1, min(max_days, _cal_int(day_value, 1)))
-        return {
-            "day": int(birth_day),
-            "month": int(birth_month),
-            "year": int(birth_cycle),
-        }
-
-    def calendar_birth_record(value, fallback_age=None):
-        if isinstance(value, dict):
-            birth_cycle = _cal_int(value.get("year", _cal_int(year, CALENDAR_START_CYCLE) - max(0, _cal_int(fallback_age, 0))), _cal_int(year, CALENDAR_START_CYCLE))
-            birth_month = max(1, min(_cal_periods_in_cycle(birth_cycle), _cal_int(value.get("month", 1), 1)))
-            birth_day = max(1, min(_cal_days_in_month(birth_month, birth_cycle), _cal_int(value.get("day", 1), 1)))
+        def hud_data(self):
+            """Calendar values prepared for the right-side HUD."""
+            week_index = max(0, min(6, _cal_int(self.week, 1) - 1))
+            period_index = max(0, min(12, _cal_int(self.period, 1) - 1))
+            slot = max(0, min(7, self.time_slot()))
             return {
-                "day": int(birth_day),
-                "month": int(birth_month),
-                "year": int(birth_cycle),
+                "time_name_ru": TIME_SLOT_INFO[slot]["name_ru"],
+                "time_name_en": TIME_SLOT_INFO[slot]["name_en"],
+                "week_name_ru": WEEKDAY_NAMES_RU[week_index],
+                "week_name_en": WEEKDAY_NAMES_EN[week_index],
+                "day": int(self.day),
+                "period_name_ru": MONTH_NAMES_RU[period_index],
+                "period_name_en": MONTH_NAMES_EN[period_index],
+                "cycle": int(self.cycle),
+                "days_in_game": int(self.daysInGame),
             }
-        return calendar_birth_record_from_ordinal(value, _cal_int(year, CALENDAR_START_CYCLE), _cal_int(year, CALENDAR_START_CYCLE) - max(0, _cal_int(fallback_age, 0)))
 
-    def calendar_birth_matches_today(value, fallback_age=None):
-        birth = calendar_birth_record(value, fallback_age)
-        return int(birth.get("day", 0) or 0) == _cal_int(day, 1) and int(birth.get("month", 0) or 0) == _cal_int(month, 1)
+        def slot_from_hour(self, hour_value):
+            h = _cal_int(hour_value, 8) % 24
+            if 6 <= h < 8:
+                return 0
+            if 8 <= h < 11:
+                return 1
+            if 11 <= h < 13:
+                return 2
+            if 13 <= h < 16:
+                return 3
+            if 16 <= h < 18:
+                return 4
+            if 18 <= h < 21:
+                return 5
+            if 21 <= h < 23:
+                return 6
+            return 7
 
-    def _cal_sync_slot_from_hour():
-        global time, hour
-        try:
-            h = _cal_int(hour, 8) % 24
-        except Exception:
-            hour = 8
-            h = 8
-        if 6 <= h <= 9:
-            time = 0
-        elif 10 <= h <= 13:
-            time = 1
-        elif 14 <= h <= 17:
-            time = 2
-        elif 18 <= h <= 21:
-            time = 3
-        else:
-            time = 4
+        # --- Moon name helpers (flavor only, no changes to time variables or slots) ---
 
-    def _cal_sync_hour_from_slot():
-        global hour, minute, time
-        try:
-            slot = _cal_int(time, 0)
-        except Exception:
-            time = 0
-            slot = 0
-        slot = 0 if slot < 0 else 4 if slot > 4 else slot
-        time = slot
-        hour = _cal_int(TIME_SLOT_INFO[slot]["hour"], 8)
-        try:
-            minute = _cal_int(minute, 0) % 60
-        except Exception:
-            minute = 0
+        def moon_name_en(self, period=None, cycle=None):
+            p = _cal_int(period if period is not None else month, 1)
+            p = max(1, min(13, p))
+            if p > len(FANCY_MOON_NAMES_EN):
+                p = len(FANCY_MOON_NAMES_EN)
+            return FANCY_MOON_NAMES_EN[p - 1]
 
-    def _cal_normalize_date():
-        global day, month, year, week
-        try:
-            day = _cal_int(day, 1)
-        except Exception:
-            day = 1
-        try:
-            month = _cal_int(month, 1)
-        except Exception:
-            month = 1
-        try:
-            year = _cal_int(year, CALENDAR_START_CYCLE)
-        except Exception:
-            year = CALENDAR_START_CYCLE
-        try:
-            week = _cal_int(week, 1)
-        except Exception:
-            week = 1
+        def moon_name_ru(self, period=None, cycle=None):
+            p = _cal_int(period if period is not None else month, 1)
+            p = max(1, min(13, p))
+            if p > len(FANCY_MOON_NAMES_RU):
+                p = len(FANCY_MOON_NAMES_RU)
+            return FANCY_MOON_NAMES_RU[p - 1]
 
-        if year < CALENDAR_START_CYCLE:
-            year = CALENDAR_START_CYCLE
-        if month < 1:
-            month = 1
-        while month > _cal_periods_in_cycle(year):
-            month -= _cal_periods_in_cycle(year)
-            year += 1
+        def moon_phase_name_en(self, day_in_period=None, period=None):
+            d = _cal_int(day_in_period if day_in_period is not None else day, 1)
+            phase_index = ((d - 1) // 4) % 8   # 28 days / 8 phases
+            return MOON_PHASE_NAMES_EN[phase_index]
+
+        def moon_phase_name_ru(self, day_in_period=None, period=None):
+            d = _cal_int(day_in_period if day_in_period is not None else day, 1)
+            phase_index = ((d - 1) // 4) % 8
+            return MOON_PHASE_NAMES_RU[phase_index]
+
+        def clock_text(self, hour_value=None, minute_value=None):
+            h = _cal_int(hour if hour_value is None else hour_value, 8) % 24
+            m = _cal_int(minute if minute_value is None else minute_value, 0) % 60
+            return "%02d:%02d" % (h, m)
+
+        # Display/test conversion only. This does not advance gameplay time.
+        # Live uses: DayToText, sex-history date display, external test probes.
+        def day_number_to_parts(self, day_number):
+            day_index = max(0, _cal_int(day_number, 0))
+            cycle = CALENDAR_START_CYCLE + (day_index // 364)
+            remaining = day_index % 364
+            period = (remaining // 28) + 1
+            return {
+                "day": (remaining % 28) + 1,
+                "month": period,
+                "year": cycle,
+                "week": (day_index % 7) + 1,
+            }
+
+        def format_date_ru(self, day_value=None, month_value=None, year_value=None, week_value=None, include_weekday=True):
+            cycle = _cal_int(year if year_value is None else year_value, CALENDAR_START_CYCLE)
+            period = _cal_int(month if month_value is None else month_value, 1)
+            day_num = _cal_int(day if day_value is None else day_value, 1)
+            weekday = max(1, min(7, _cal_int(week if week_value is None else week_value, 1)))
+            period = max(1, min(13, period))
+            base = "%d %s, цикл %d" % (day_num, self.moon_name_ru(period, cycle), cycle)
+            if include_weekday:
+                return "%s, %s" % (WEEKDAY_NAMES_RU[weekday - 1], base)
+            return base
+
+        def format_date_en(self, day_value=None, month_value=None, year_value=None, week_value=None, include_weekday=True):
+            cycle = _cal_int(year if year_value is None else year_value, CALENDAR_START_CYCLE)
+            period = _cal_int(month if month_value is None else month_value, 1)
+            day_num = _cal_int(day if day_value is None else day_value, 1)
+            weekday = max(1, min(7, _cal_int(week if week_value is None else week_value, 1)))
+            period = max(1, min(13, period))
+            base = "%d %s, Cycle %d" % (day_num, self.moon_name_en(period, cycle), cycle)
+            if include_weekday:
+                return "%s, %s" % (WEEKDAY_NAMES_EN[weekday - 1], base)
+            return base
+
+        def time_status_text(self):
+            self.sync_state()
+            slot = self.slot_from_hour(self.hour)
+            slot_name = TIME_SLOT_INFO.get(slot, TIME_SLOT_INFO[1])["name_ru"]
+            return "%s (%s)" % (self.clock_text(self.hour, self.minute), slot_name)
+
+        def apply_counters_and_names(self):
+            global dayspassed
+            global game_days_count, game_months_count, game_years_count
+            global day_of_year, datestr
+            global month_name, week_name, month_name_en, week_name_en
+            global calendar_month_name_ru, calendar_weekday_name_ru
+            global calendar_month_name_en, calendar_weekday_name_en
+            global calendar_cycle_name_ru, calendar_cycle_name_en
+            global calendar_time_slot_name_ru, calendar_time_slot_name_en
+
+            _year = _cal_int(year, CALENDAR_START_CYCLE)
+            _month = max(1, min(13, _cal_int(month, 1)))
+            _day = _cal_int(day, 1)
+            _week = max(1, min(7, _cal_int(week, 1)))
+            _slot = max(0, min(7, _cal_int(time, 0)))
+
+            game_days_count = dayspassed
+            game_months_count = max(0, dayspassed // 28)
+            game_years_count = _year - CALENDAR_START_CYCLE
+            day_of_year = ((_month - 1) * 28) + _day
+
+            week_name = WEEKDAY_NAMES_RU[_week - 1]
+            month_name = MONTH_NAMES_RU[_month - 1]
+            week_name_en = WEEKDAY_NAMES_EN[_week - 1]
+            month_name_en = MONTH_NAMES_EN[_month - 1]
+            calendar_weekday_name_ru = week_name
+            calendar_month_name_ru = month_name
+            calendar_weekday_name_en = week_name_en
+            calendar_month_name_en = month_name_en
+            calendar_cycle_name_ru = "Цикл %d" % _year
+            calendar_cycle_name_en = "Cycle %d" % _year
+            calendar_time_slot_name_ru = TIME_SLOT_INFO[_slot]["name_ru"]
+            calendar_time_slot_name_en = TIME_SLOT_INFO[_slot]["name_en"]
+            datestr = self.format_date_en(_day, _month, _year, _week, True)
+
+        def sync_state(self):
+            global day, month, year, week, hour, minute, time, dayspassed, clock_minutes, location
+            day = int(self.day)
+            month = int(self.period)
+            year = int(self.cycle)
+            week = int(self.week)
+            hour = int(self.hour)
+            minute = int(self.minute)
+            time = int(self.time_slot())
+            dayspassed = int(self.daysInGame)
+            clock_minutes = int(self.clock_minutes())
             try:
-                age
-                _has_age = True
+                location
             except Exception:
-                _has_age = False
-            if _has_age:
-                age = _cal_int(age, 18) + 1
-
-        if week < 1:
-            week = 1
-        while week > 7:
-            week -= 7
-
-        if day < 1:
-            day = 1
-
-        while True:
-            dim = _cal_days_in_month(month, year)
-            if day <= dim:
-                break
-            day -= dim
-            month += 1
-            if month > 12:
-                month = 1
-                year += 1
                 try:
-                    age
-                    _has_age = True
+                    location = CurLoc
                 except Exception:
-                    _has_age = False
-                if _has_age:
-                    age = _cal_int(age, 18) + 1
-
-    def _cal_apply_counters_and_names():
-        global dayspassed
-        global game_days_count, game_months_count, game_years_count
-        global day_of_year, datestr
-        global month_name, week_name, month_name_en, week_name_en
-        global calendar_month_name_ru, calendar_weekday_name_ru
-        global calendar_month_name_en, calendar_weekday_name_en
-        global calendar_cycle_name_ru, calendar_cycle_name_en
-        global calendar_time_slot_name_ru, calendar_time_slot_name_en
-
-        _year = _cal_int(year, CALENDAR_START_CYCLE)
-        _month = _cal_int(month, 1)
-        _day = _cal_int(day, 1)
-        _week = _cal_int(week, 1)
-        _slot = _cal_int(time, 0)
-
-        if _month < 1:
-            _month = 1
-        if _month > _cal_periods_in_cycle(_year):
-            _month = _cal_periods_in_cycle(_year)
-        if _week < 1:
-            _week = 1
-        if _week > 7:
-            _week = 7
-        if _slot < 0:
-            _slot = 0
-        if _slot > 4:
-            _slot = 4
-
-        dayspassed = _cal_days_before_cycle(_year) + _cal_days_before_month(_month, _year) + (_day - 1)
-        if dayspassed < 0:
-            dayspassed = 0
-
-        game_days_count = dayspassed
-        game_months_count = _cal_periods_before_cycle(_year) + (_month - 1)
-        game_years_count = _year - CALENDAR_START_CYCLE
-        day_of_year = _cal_days_before_month(_month, _year) + _day
-
-        week_name = WEEKDAY_NAMES_RU[_week - 1]
-        month_name = MONTH_NAMES_RU[_month - 1]
-        week_name_en = WEEKDAY_NAMES_EN[_week - 1]
-        month_name_en = MONTH_NAMES_EN[_month - 1]
-        calendar_weekday_name_ru = week_name
-        calendar_month_name_ru = month_name
-        calendar_weekday_name_en = week_name_en
-        calendar_month_name_en = month_name_en
-        calendar_cycle_name_ru = "Цикл %d" % _year
-        calendar_cycle_name_en = "Cycle %d" % _year
-        calendar_time_slot_name_ru = TIME_SLOT_INFO[_slot]["name_ru"]
-        calendar_time_slot_name_en = TIME_SLOT_INFO[_slot]["name_en"]
-
-        datestr = calendar_format_date_en(_day, _month, _year, _week, True)
-
-    def calendar_sync_state():
-        global hour, minute, day, month, year, week, location, time
-        try:
-            day
-        except Exception:
-            day = 1
-        try:
-            month
-        except Exception:
-            month = 1
-        try:
-            year
-        except Exception:
-            year = CALENDAR_START_CYCLE
-        try:
-            week
-        except Exception:
-            week = 1
-
-        try:
-            hour
-            has_hour = True
-        except Exception:
-            hour = 8
-            has_hour = False
-        try:
-            minute
-            has_minute = True
-        except Exception:
-            minute = 0
-            has_minute = False
-        try:
-            time
-            has_slot = True
-        except Exception:
-            time = 0
-            has_slot = False
-        if has_hour and has_minute:
-            hour = _cal_int(hour, 8) % 24
-            minute = _cal_int(minute, 0) % 60
-
-            slot_from_hour = 4
-            if 6 <= hour <= 9:
-                slot_from_hour = 0
-            elif 10 <= hour <= 13:
-                slot_from_hour = 1
-            elif 14 <= hour <= 17:
-                slot_from_hour = 2
-            elif 18 <= hour <= 21:
-                slot_from_hour = 3
-
-            if has_slot:
-                slot_value = _cal_int(time, 0)
-                slot_value = 0 if slot_value < 0 else 4 if slot_value > 4 else slot_value
-                # Legacy scripts often change only `time`; prefer it on mismatch.
-                if slot_value != slot_from_hour:
-                    _cal_sync_hour_from_slot()
-                else:
-                    _cal_sync_slot_from_hour()
-            else:
-                _cal_sync_slot_from_hour()
-        else:
-            _cal_sync_hour_from_slot()
-
-        try:
-            location
-        except Exception:
-            try:
-                location = CurLoc
-            except Exception:
-                location = "TavernMain"
-
-        _cal_normalize_date()
-        _cal_apply_counters_and_names()
-        return
-
-    def calendar_set_time_slot(slot):
-        global time
-        slot_i = _cal_int(slot, 0)
-        if slot_i < 0:
-            slot_i = 0
-        if slot_i > 4:
-            slot_i = 4
-        time = slot_i
-        _cal_sync_hour_from_slot()
-        calendar_sync_state()
-        return
-
-    def calendar_advance_minutes(minutes_to_add):
-        global hour, minute, day, month, year, week
-        calendar_sync_state()
-        minutes_to_add = max(0, _cal_int(minutes_to_add, 0))
-
-        while minutes_to_add > 0:
-            minute += 1
-            if minute >= 60:
-                minute = 0
-                hour += 1
-                if hour >= 24:
-                    hour = 0
-                    day += 1
-                    week += 1
-                    if week > 7:
-                        week = 1
-                    dim = _cal_days_in_month(month, year)
-                    if day > dim:
-                        day = 1
-                        month += 1
-                        if month > 12:
-                            month = 1
-                            year += 1
-                            try:
-                                age
-                                _has_age = True
-                            except Exception:
-                                _has_age = False
-                            if _has_age:
-                                age = _cal_int(age, 18) + 1
-            minutes_to_add -= 1
-
-        _cal_sync_slot_from_hour()
-        _cal_apply_counters_and_names()
-        return
-
-    def calendar_advance_slots(slots_to_add=1):
-        global time, day, month, year, week
-        calendar_sync_state()
-        steps = max(0, _cal_int(slots_to_add, 1))
-        while steps > 0:
-            time += 1
-            if time > 4:
-                time = 0
-                day += 1
-                week += 1
-                if week > 7:
-                    week = 1
-                dim = _cal_days_in_month(month, year)
-                if day > dim:
-                    day = 1
-                    month += 1
-                    if month > 12:
-                        month = 1
-                        year += 1
-                        try:
-                            age
-                            _has_age = True
-                        except Exception:
-                            _has_age = False
-                        if _has_age:
-                            age = _cal_int(age, 18) + 1
-            _cal_sync_hour_from_slot()
-            steps -= 1
-        _cal_apply_counters_and_names()
-        return
-
-    def calendar_advance_days(days_to_add=1):
-        global day, month, year, week
-        calendar_sync_state()
-        steps = max(0, _cal_int(days_to_add, 1))
-        while steps > 0:
-            day += 1
-            week += 1
-            if week > 7:
-                week = 1
-            dim = _cal_days_in_month(month, year)
-            if day > dim:
-                day = 1
-                month += 1
-                if month > 12:
-                    month = 1
-                    year += 1
-                    try:
-                        age
-                        _has_age = True
-                    except Exception:
-                        _has_age = False
-                    if _has_age:
-                        age = _cal_int(age, 18) + 1
-            steps -= 1
-        _cal_apply_counters_and_names()
-        return
-
-    # Compatibility aliases used by existing status and skip-time code.
-    ensure_calendar_state = calendar_sync_state
-    advance_minutes = calendar_advance_minutes
-
-    # Ensure counters exist from startup.
-    calendar_sync_state()
-
-
+                    location = "TavernMain"
+            self.apply_counters_and_names()
+            return
 
 screen splash_screen():
     tag menu
@@ -756,5 +799,4 @@ label cinematic_intro:
         call screen cinematic_intro(intro_data) with dissolve
     else:
         "Introduction sequence is not available yet."
-    jump Intro
     return

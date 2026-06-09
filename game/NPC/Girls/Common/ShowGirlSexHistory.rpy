@@ -7,8 +7,8 @@ label ShowGirlSexHistory(args0=""):
         table_rows = ["<table border=1>"]
 
         def _day_to_text_local(day_number):
-            parts = calendar_day_number_to_parts(day_number)
-            return calendar_format_date_ru(parts["day"], parts["month"], parts["year"], parts["week"], True)
+            parts = calendar_v2.day_number_to_parts(day_number)
+            return calendar_v2.format_date_ru(parts["day"], parts["month"], parts["year"], parts["week"], True)
 
         def _append_history_rows(history_rows):
             for tmpSexActShow in history_rows:

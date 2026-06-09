@@ -22,10 +22,10 @@ label IntEddieTalk(preserve_text=False):
     if Friends.get(_eddie_name, 0) >= 5:
         $ current_action_items.append(MenuItem("Поболтать с Эдди о личных вещах.", Call("IntEddieTalkApply", "personal")))
 
-    if Friends.get(_eddie_name, 0) >= 5 and CurrentLoc.get("georgett", "") == "TavernMain" and EddieVar.get("TalkedAboutWhores", 0) == 0 and Talked.get(_eddie_name, 0) < 2:
+    if Friends.get(_eddie_name, 0) >= 5 and str(getLocation("georgett") or "") == "TavernMain" and EddieVar.get("TalkedAboutWhores", 0) == 0 and Talked.get(_eddie_name, 0) < 2:
         $ current_action_items.append(MenuItem("Рассказать Эдди о том, что у вас теперь работают девочки.", Call("IntEddieTalkApply", "whores")))
 
-    if Friends.get(_eddie_name, 0) >= 5 and CurrentLoc.get("georgett", "") == "TavernMain" and EddieVar.get("SawWithGeorgett", 0) > 0 and EddieVar.get("TalkedAboutGeorgett", 0) == 0 and Talked.get(_eddie_name, 0) < 2:
+    if Friends.get(_eddie_name, 0) >= 5 and str(getLocation("georgett") or "") == "TavernMain" and EddieVar.get("SawWithGeorgett", 0) > 0 and EddieVar.get("TalkedAboutGeorgett", 0) == 0 and Talked.get(_eddie_name, 0) < 2:
         $ current_action_items.append(MenuItem("Поинтересоваться у Эдди как ему ваши девочки.", Call("IntEddieTalkApply", "girls")))
 
     if Friends.get(_eddie_name, 0) >= 3 and BeckyVar.get("HomeSex", 0) > 0 and EddieVar.get("SawMomSex", 0) > 0 and EddieVar.get("SawWithGeorgett", 0) > 0 and BeckyVar.get("EddieTryToFuck", 0) != 1 and Talked.get(_eddie_name, 0) < 2:

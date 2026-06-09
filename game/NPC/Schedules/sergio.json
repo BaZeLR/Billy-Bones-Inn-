@@ -1,0 +1,35 @@
+{
+  "npc_id": "sergio",
+  "entries": [
+    {
+      "label": "barber_shop_monday_noon",
+      "weekdays": [1],
+      "start": "11:00",
+      "end": "12:59",
+      "location": "BarberShop",
+      "awake": true,
+      "talkable": true,
+      "priority": 700
+    },
+    {
+      "label": "barber_shop_wednesday_noon",
+      "weekdays": [3],
+      "start": "11:00",
+      "end": "12:59",
+      "location": "BarberShop",
+      "awake": true,
+      "talkable": true,
+      "priority": 700
+    },
+    {
+      "label": "barber_shop_saturday_morning",
+      "weekdays": [6],
+      "start": "08:00",
+      "end": "10:59",
+      "location": "BarberShop",
+      "awake": true,
+      "talkable": true,
+      "priority": 700
+    }
+  ]
+}

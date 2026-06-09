@@ -85,11 +85,7 @@ init python:
         return resolve_room_background_media(TavernKitchenRoom)
 
     def tavern_kitchen_pending_mandatory_event_code():
-        mandatory_count = int(EventsCount.get(10, 0) or 0)
-        if mandatory_count <= 0:
-            return ""
-        event_idx = mandatory_count - 1
-        return str(NewEvents.get("10_" + str(event_idx), "") or "")
+        return tavern_work_pending_mandatory_code("", "TavernKitchen")
 
     def tavern_kitchen_wine_donation_picture():
         sandra_scene = tavern_kitchen_random_sandra_scene()
@@ -122,7 +118,7 @@ init python:
 
     def tavern_breakfast_present_ids():
         present = []
-        if bool(TavernBreakfastEventActive) and isinstance(TavernBreakfastPresentIds, list):
+        if bool(TavernBreakfastEventActive) and TavernBreakfastPresentIds is not None:
             present.extend(list(TavernBreakfastPresentIds or []))
         else:
             present.extend(list(household_breakfast_attendee_ids() or []))
@@ -355,8 +351,8 @@ init python:
     def tavern_breakfast_melissa_amanda_gerhard_ready():
         present_ids = list(tavern_breakfast_present_ids() or [])
         return (
-            melissa_bats_stage() >= 6
-            and melissa_bats_stage() < 8
+            Melissa.bats_stage() >= 6
+            and Melissa.bats_stage() < 8
             and str(MelissaVar.get("temp_room", "") or "") == "TavernAmandaRoom"
             and amanda_attic_busted()
             and "melissa" in present_ids
@@ -1556,8 +1552,6 @@ label TavernKitchenBuildActions:
         $ current_action_items.append(MenuItem("Попросить Сандру почаще собирать всех на общий завтрак", Call("TavernKitchenAskSandraBreakfasts")))
     if tavern_kitchen_sandra_can_discuss_clients():
         $ current_action_items.append(MenuItem("Попросить Сандру мягче настроить домочадцев к гостям", Call("TavernKitchenAskSandraClients")))
-    if werecat_is_in_room("TavernKitchen"):
-        $ current_action_items.append(MenuItem(werecat_action_caption("TavernKitchen"), Call("IntWerecatTalk", "TavernKitchen")))
     python:
         try:
             renpy.restart_interaction()
@@ -1578,7 +1572,7 @@ label TavernKitchenBreakfast:
     $ TavernBreakfastDay = int(dayspassed or 0)
     $ TavernBreakfastEventActive = True
     $ _breakfast_morning_sick_girl = str(tavern_breakfast_morning_sickness_girl() or "")
-    $ calendar_advance_minutes(30)
+    $ calendar_v2.advance_minutes(30)
     vscene tavern_kitchen_breakfast_picture()
     if bool(AmandaAIIntegrationEnabled):
         call AmandaMiniEventTry("TavernKitchen", "breakfast")
@@ -2075,7 +2069,7 @@ label TavernKitchenSundayDinner(serve_spicy=0):
         return
     hide screen main_ui
     $ TavernSundayDinnerLastDay = int(dayspassed or 0)
-    $ calendar_advance_minutes(45)
+    $ calendar_v2.advance_minutes(45)
     vscene tavern_kitchen_sunday_dinner_picture()
     python:
         _sunday_lines = [

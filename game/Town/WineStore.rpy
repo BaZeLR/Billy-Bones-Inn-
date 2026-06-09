@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # WineStore.rpy
 # Converted from WineStore.txt
@@ -8,8 +8,11 @@
 default WineStoreSavedText = ""
 
 init python:
+    def wine_store_clara_visible():
+        return str(getLocation("clara") or "") == "WineStore" and bool(npc_can_talk_now("clara"))
+
     def wine_store_alber_visible():
-        return time != 0
+        return str(getLocation("alber") or "") == "WineStore" and bool(npc_can_talk_now("alber"))
 
     def clara_stable_wine_store_talk_picture():
         candidates = [
@@ -24,10 +27,12 @@ init python:
         return loadable[0] if len(loadable) > 0 else ""
 
     def wine_store_background_picture():
-        if int(time or 0) == 0:
+        if wine_store_clara_visible():
             picture = clara_stable_wine_store_talk_picture()
-        else:
+        elif wine_store_alber_visible():
             picture = alber_stable_portrait()
+        else:
+            picture = clara_stable_wine_store_talk_picture()
         if str(picture or "").strip():
             return picture
         return "images/clara/wineSellar_clara_talk.png"
@@ -44,6 +49,14 @@ init python:
         ]
         loadable = [row for row in candidates if renpy.loadable(row)]
         return loadable[0] if len(loadable) > 0 else ""
+
+    def wine_store_room_action_items():
+        items = []
+        items.extend(WineStoreRoom.build_object_items())
+        if story_event_available("WineStore", "clara_paintings"):
+            items.append(MenuItem(clara_paintings_wine_caption(), Call("checkTriggers", "WineStore", "clara_paintings", 0)))
+        items.extend(WineStoreRoom.build_exit_items())
+        return items
 
     WineStoreRoom = Room(
         code_name="WineStore",
@@ -112,18 +125,23 @@ label WineStore:
     if not _wine_room.is_open(week, time):
         $ MainTxt = _wine_room.schedule.closed_text
         $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        $ current_action_items = WineStoreRoom.build_exit_items()
         $ _wine_ui_return = None
         while _wine_ui_return is None:
             call screen main_ui
             $ _wine_ui_return = _return
         jump WineStore
     
-    # Assign grocer name
-    if time == 0:
+    $ _wine_clara_visible = wine_store_clara_visible()
+    $ _wine_alber_visible = wine_store_alber_visible()
+
+    # Assign grocer name from the NPC schedule, not the display-only time slot.
+    if _wine_clara_visible:
         $ GrocerName = 'Кларисса'
-    else:
+    elif _wine_alber_visible:
         $ GrocerName = 'Альбер'
+    else:
+        $ GrocerName = 'продавец'
     
     $ MainTxt = _wine_room.descriptions[0].text
     $ CurLocDesc = MainTxt
@@ -131,7 +149,7 @@ label WineStore:
     if navigation_only_mode_enabled():
         $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
         $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        $ current_action_items = WineStoreRoom.build_exit_items()
         $ _wine_ui_return = None
         while _wine_ui_return is None:
             call screen main_ui
@@ -139,7 +157,7 @@ label WineStore:
         jump WineStore
     
     # Character interaction
-    if time == 0:
+    if _wine_clara_visible:
         $ MainTxt += "\n\nСейчас утро, и за прилавком стоит Кларисса, старшая дочь мессира Легаре. Это привлекательная блондинка чуть младше вас."
         if dayspassed > 40 and dayspassed <= 90:
             $ MainTxt += "\n\nВы знаете, что Мелисса с ней недавно подружилась."
@@ -152,7 +170,7 @@ label WineStore:
         $ _clara_picture = clara_stable_wine_store_talk_picture()
         if str(_clara_picture or "").strip():
             call ShowImage("", "", _clara_picture)
-    else:
+    elif _wine_alber_visible:
         # Alber is present
         if AlberVar['FightYouAmanda'] == 0:
             $ MainTxt += "\n\nЗа прилавком стоит сам хозяин погребка, мессир Альбер Легаре. Это высокий импозантный мужчина тридцати с лишним лет. Вы знаете, что он женат и у него семья. Его старшая дочка, Кларисса, помогает ему в погребке по утрам."
@@ -164,10 +182,12 @@ label WineStore:
         $ _alber_picture = alber_stable_portrait()
         if str(_alber_picture or "").strip():
             call ShowImage("", "", _alber_picture)
+    else:
+        $ MainTxt += "\n\nСейчас у прилавка никого нет."
 
     $ CurLocDesc = MainTxt
     $ WineStoreSavedText = MainTxt
-    call WineStoreBuildActions
+    call WineStoreRoomActions
     $ _wine_ui_return = None
     while _wine_ui_return is None:
         call screen main_ui
@@ -175,24 +195,11 @@ label WineStore:
     jump WineStore
 
 
-label WineStoreBuildActions:
+label WineStoreRoomActions:
     $ current_action_title = "Действия"
     $ current_action_content = None
+    $ current_action_items = wine_store_room_action_items()
     $ action_menu_specs = []
-    $ current_action_items = []
-
-    python:
-        for _wine_object in WineStoreRoom.visible_objects():
-            current_action_items.append(MenuItem(_wine_object.name, Call("WineStoreObjectMenu", _wine_object.object_id)))
-        if story_event_available("WineStore", "clara_paintings"):
-            current_action_items.append(MenuItem(clara_paintings_wine_caption(), Call("checkTriggers", "WineStore", "clara_paintings", 0)))
-
-    if time == 0:
-        $ current_action_items.append(MenuItem("Поговорить с Клариссой", Call("IntClaraTalk")))
-    else:
-        $ current_action_items.append(MenuItem("Поговорить с Альбером", Call("IntAlberTalk")))
-
-    $ current_action_items.append(MenuItem("Вернуться на рынок", Jump("MarketPlace")))
     return
 
 
@@ -205,7 +212,7 @@ label WineStoreObjectMenu(object_id="", preserve_text=False):
                 break
 
     if _wine_object is None:
-        call WineStoreBuildActions
+        call WineStoreRoomActions
         return
 
     if not preserve_text:
@@ -225,7 +232,7 @@ label WineStoreObjectMenu(object_id="", preserve_text=False):
                 _wine_args = tuple(getattr(_wine_action, "args", ()) or ())
                 current_action_items.append(MenuItem(_wine_action.label, Call(_wine_action.target, *_wine_args)))
 
-    $ current_action_items.append(MenuItem("Назад", Jump("WineStore")))
+    $ current_action_items.append(MenuItem("Назад", Call("WineStoreRoomActions")))
     return
 
 
@@ -268,7 +275,7 @@ label WineStoreBuyMenu:
         $ current_action_items.append(MenuItem("Купить пятьдесят бочонков", Call("WineStoreBuyApply", 14 * 50, 500, 50)))
     if money >= 14 * 200:
         $ current_action_items.append(MenuItem("Купить двести бочонков", Call("WineStoreBuyApply", 14 * 200, 2000, 200)))
-    $ current_action_items.append(MenuItem("Назад", Jump("WineStore")))
+    $ current_action_items.append(MenuItem("Назад", Call("WineStoreRoomActions")))
     return
 
 
@@ -292,6 +299,6 @@ label WineStoreBuyApply(cost=0, add_amount=0, barrel_count=0):
         call stat
     $ CurLocDesc = MainTxt
     $ WineStoreSavedText = MainTxt
-    call WineStoreBuildActions
+    call WineStoreRoomActions
     return
 

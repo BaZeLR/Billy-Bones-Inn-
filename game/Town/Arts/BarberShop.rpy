@@ -169,7 +169,6 @@ label BarberShopBuildActions:
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
-    $ current_action_items.append(MenuItem("Поговорить с Серджио", Call("BarberShopTalk")))
     $ current_action_items.append(MenuItem("Подстричься за %d мараведи" % int(barber_shop_player_haircut_price() or 0), Call("BarberShopHaircut")))
     if barber_shop_can_buy_olive_oil():
         $ current_action_items.append(MenuItem("Купить оливковое масло за %d мараведи" % int(barber_shop_discounted_price(BARBER_OLIVE_OIL_PRICE) or 0), Call("BarberShopBuyOliveOil")))
@@ -220,9 +219,9 @@ label BarberShopHaircut:
         return
 
     $ money -= _barber_price
-    $ calendar_advance_minutes(30)
-    $ PlayerHaircutDaySt = int(dayspassed or 0)
-    $ dayssincehaircut = 0
+    $ calendar_v2.advance_minutes(30)
+    $ player_state().appearance.mark_haircut(int(dayspassed or 0))
+    $ player_state().appearance.apply_to_store()
     $ update_stat_state()
     $ MainTxt = "Серджио долго щелкает ножницами, приглаживает волосы душистой водой и, не умолкая, пересказывает вам свежие городские сплетни. Когда он заканчивает, вы выглядите куда опрятнее, а карман худеет на %d мараведи." % _barber_price
     $ CurLocDesc = MainTxt
@@ -258,7 +257,7 @@ label BarberShopRefineLuxurySoap:
     $ _player_remove_item_by_id("soap_001", 1)
     $ _player_remove_item_by_id("olive_oil_001", 1)
     $ _player_add_item_by_id("luxury_soap_001", 1)
-    $ calendar_advance_minutes(20)
+    $ calendar_v2.advance_minutes(20)
     $ MainTxt = "Серджио показывает, как осторожно втереть оливковое масло в уже готовое мыло. Брусок становится глаже, пахнет мягче и выглядит куда дороже простого домашнего куска. У вас теперь есть роскошное мыло."
     $ CurLocDesc = MainTxt
     call stat
@@ -300,7 +299,7 @@ label BarberShopServePendingGuest:
         call BarberShopBuildActions
         return
     $ money -= _barber_guest_price
-    $ calendar_advance_minutes(45)
+    $ calendar_v2.advance_minutes(45)
     $ BarberInvitePending[_barber_guest] = 0
     $ BarberVisitLastDay[_barber_guest] = int(dayspassed or 0)
     $ Friends[_barber_guest] = min(20, int(Friends.get(_barber_guest, 0) or 0) + 1)

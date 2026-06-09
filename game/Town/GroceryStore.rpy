@@ -310,13 +310,6 @@ label GroceryStoreBuildActions:
         for _grocery_object in GroceryStoreRoom.visible_objects():
             current_action_items.append(MenuItem(_grocery_object.name, Call("GroceryStoreObjectMenu", _grocery_object.object_id)))
 
-    if grocery_store_active_grocer_id() == "eddie":
-        $ current_action_items.append(MenuItem("Поговорить с Эдди", Call("IntEddieTalk")))
-    elif grocery_store_active_grocer_id() == "inga":
-        $ current_action_items.append(MenuItem("Поговорить с Ингенборг", Call("IntIngaTalk")))
-    elif grocery_store_active_grocer_id() == "becky":
-        $ current_action_items.append(MenuItem("Поговорить с Бекки", Call("IntBeckyTalk")))
-
     $ current_action_items.append(MenuItem("Вернуться на рынок", Jump("MarketPlace")))
     return
 

@@ -120,13 +120,13 @@ label TavernSandraRoomBuildActions:
             current_action_items.append(MenuItem(str(_issue_action.get("label", "") or ""), Call(str(_issue_action.get("target", "") or ""), *tuple(_issue_action.get("args", ()) or ()))))
     if str(getLocation("sandra") or "") == "TavernSandraRoom" and npc_can_talk_now("sandra") and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0:
         $ current_action_items.append(MenuItem("Сесть с Сандрой над трактирной книгой", Call("TavernSandraLedgerScene")))
-    if int(SandraVar.get("NightThanksReady", 0) or 0) > 0 and int(time or 0) == 3 and int(SandraVar.get("NightThanksLastDay", -1) or -1) != int(dayspassed or 0):
+    if Sandra.night_thanks_ready() and int(hour or 0) >= 22 and int(hour or 0) <= 23 and int(Sandra.night_thanks_last_day or -1) != int(dayspassed or 0):
         $ current_action_items.append(MenuItem("Принять ночную благодарность Сандры", Call("TavernSandraNightThanksScene")))
+    if Sandra.sex_available():
+        $ current_action_items.append(MenuItem("Уединиться с Сандрой", Call("SandraSexEngine", "sandra", "TavernSandraRoom")))
     if tavern_upstairs_can_clean_rooms():
         $ current_action_items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernSandraRoom", "", "")))
     $ current_action_items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernSandraRoom", "TavernSandraRoomBuildActions")))
-    if werecat_is_in_room("TavernSandraRoom"):
-        $ current_action_items.append(MenuItem(werecat_action_caption("TavernSandraRoom"), Call("IntWerecatTalk", "TavernSandraRoom")))
     python:
         for _room_object in TavernSandraRoomRoom.visible_game_items():
             current_action_items.append(MenuItem(_room_object.name, Call("TavernSandraRoomObjectMenu", _room_object.object_id)))
@@ -200,7 +200,7 @@ label TavernSandraLedgerScene:
     $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
     $ otkroven["sandra"] = min(20, int(otkroven.get("sandra", 0) or 0) + 1)
     $ fun = _player_clamp(int(fun or 0) + 1, 0, 100)
-    $ calendar_advance_minutes(30)
+    $ calendar_v2.advance_minutes(30)
     $ _sandra_ledger_picture = str(tavern_sandra_ledger_picture() or "")
     if _sandra_ledger_picture != "":
         $ scene_image = _sandra_ledger_picture
@@ -215,35 +215,5 @@ label TavernSandraLedgerScene:
         _ledger_idx = int((dayspassed or 0) + (hour or 0) + int(Friends.get("sandra", 0) or 0)) % len(_ledger_stories)
         MainTxt = _ledger_stories[_ledger_idx]
         CurLocDesc = MainTxt
-    call TavernSandraRoomBuildActions
-    return
-
-
-label TavernSandraNightThanksScene:
-    if int(SandraVar.get("NightThanksReady", 0) or 0) <= 0 or int(time or 0) != 3:
-        call TavernSandraRoomBuildActions
-        return
-    $ SandraVar["NightThanksReady"] = 0
-    $ SandraVar["NightThanksLastDay"] = int(dayspassed or 0)
-    $ SandraVar["MCVisitFirstDone"] = 1
-    $ SandraVar["RoomUnlocked"] = 1
-    $ AskedToday["sandra"] = int(AskedToday.get("sandra", 0) or 0) + 1
-    $ Talked["sandra"] = int(Talked.get("sandra", 0) or 0) + 1
-    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 2)
-    $ otkroven["sandra"] = min(20, int(otkroven.get("sandra", 0) or 0) + 2)
-    $ sluttiness["sandra"] = min(100, int(sluttiness.get("sandra", 0) or 0) + 3)
-    $ sexacts["sandra"] = int(sexacts.get("sandra", 0) or 0) + 1
-    $ _sandra_secured_future_now = tractir_apply_sandra_secured_future()
-    $ fun = _player_clamp(int(fun or 0) + 8, 0, 100)
-    $ calendar_advance_slots(1)
-    $ _sandra_thanks_picture = str(sandra_week5_scene_picture_path(3) or tavern_sandra_room_picture() or "")
-    if _sandra_thanks_picture != "":
-        $ scene_image = _sandra_thanks_picture
-        $ _layout_last_picture = _sandra_thanks_picture
-        call ShowImage("", "", _sandra_thanks_picture)
-    $ MainTxt = "Сандра встречает вас без обычной деловитой брони. Она закрывает дверь, коротко напоминает, что хорошая неделя в трактире заслуживает не только сухой похвалы, и сама делает шаг ближе.\n\nРазговор быстро становится тише и личнее. Сандра не торопится, но и не отступает: этой ночью она действительно благодарит вас как женщина, а не как строгая хозяйка кухни.\n\nКогда все заканчивается, она поправляет платье, смотрит на вас уже спокойнее и предупреждает, что завтра утром снова будет требовать порядка как ни в чем не бывало. Но теперь между вами остается куда более ясное понимание."
-    if _sandra_secured_future_now:
-        $ MainTxt += "\n\nПосле первого выдержанного месяца Сандра явно понимает, что может закрепиться рядом с вами не только через кухню и счета. Она мягко, но очень уверенно забирает часть вашего внимания на себя, и это уже чувствуется даже телом: на чужие постели сил остается меньше."
-    $ CurLocDesc = MainTxt
     call TavernSandraRoomBuildActions
     return

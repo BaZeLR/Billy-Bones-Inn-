@@ -101,8 +101,6 @@ label ArtisansQuarterBuildActions:
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
-    if dog_is_here("ArtisansQuarter"):
-        $ current_action_items.append(MenuItem(dog_display_name(), Call("IntDogTalk", "ArtisansQuarter")))
 
     python:
         for _artisans_object in ArtisansQuarterRoom.visible_objects():

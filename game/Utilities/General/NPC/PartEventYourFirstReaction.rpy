@@ -237,3 +237,8 @@ label PartEventYourFirstReactionApply(GirlNamePEYFR, SecondPartFuncName, Eyewitn
     call QueuePagedPanelTextFromStore
     call ReturnToMainUI
     return
+
+
+label PartEventYourFirstReactionShow(GirlNamePEYFR, SecondPartFuncName, EyewitnessPEYFR=0, HarassTypePEYFR=1, reaction_code=1):
+    call PartEventYourFirstReactionApply(GirlNamePEYFR, SecondPartFuncName, EyewitnessPEYFR, HarassTypePEYFR, reaction_code)
+    return

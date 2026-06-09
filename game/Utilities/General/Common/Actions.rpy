@@ -26,7 +26,7 @@ init -46 python:
         "HunterClub": {"build": "HunterClubBuildActions", "object": "HunterClubObjectMenu"},
         "MarketPlace": {"build": "MarketPlaceBuildActions", "object": "MarketPlaceObjectMenu"},
         "GroceryStore": {"build": "GroceryStoreBuildActions", "object": "GroceryStoreObjectMenu"},
-        "WineStore": {"build": "WineStoreBuildActions", "object": "WineStoreObjectMenu"},
+        "WineStore": {"build": "WineStoreRoomActions", "object": "WineStoreObjectMenu"},
         "PortStreets": {"build": "PortStreetsBuildActions", "object": "PortStreetsObjectMenu"},
         "Forest": {"build": "ForestBuildActions", "object": "ForestObjectMenu"},
     }
@@ -225,8 +225,26 @@ init -46 python:
         "fun60": {"energy_floor": 10, "late_hour_range": (4, 5), "fun_floor": 60},
     }
 
+    # Chore action identifiers + weekly targets (counters live in PlayerChoresWeek, defaulted in script.rpy)
+    # These are the "chores" that have energy/time restrictions above and are tracked for Sandra's weekly review.
+    PLAYER_CHORE_KEYS = (
+        "bring_woods",
+        "chop_wood",
+        "make_fire",
+        "clean_ashes",
+        "boil_water",
+        "clean_upstairs_rooms",
+    )
+    PLAYER_CHORE_TARGETS = {
+        "bring_woods": 3,
+        "chop_wood": 3,
+        "make_fire": 3,
+        "clean_ashes": 3,
+        "boil_water": 7,
+        "clean_upstairs_rooms": 3,
+    }
+
     STANDARD_ACTION_METHODS = {
-        "examine": {"hook": "call", "target": "Examine", "label": "Осмотреть"},
         "take": {"hook": "call", "target": "Take", "label": "Взять"},
         "drop": {"hook": "call", "target": "Drop", "label": "Оставить"},
         "drink": {"hook": "call", "target": "ApplyItemAction", "label": "Выпить"},
@@ -278,15 +296,6 @@ init -46 python:
             args=action_args,
             condition=condition,
             custom_properties=props,
-        )
-
-    def make_examine_action(object_id="", where_id="", text_value="", label="", condition=None):
-        return make_standard_object_action(
-            "examine",
-            label or "Осмотреть",
-            (object_id, where_id, text_value),
-            condition,
-            {"object_id": str(object_id or ""), "where_id": str(where_id or "")},
         )
 
     def make_take_action(object_id="", where_id="", fallback_text="", label="", condition=None):
@@ -521,11 +530,23 @@ init -46 python:
         return _room_item_count_by_id(room_obj, item_id) > 0
 
     def _player_can_sleep_now():
-        calendar_sync_state()
+        calendar_v2.sync_state()
         current_slot = int(time or 0)
         current_hour = int(hour or 0)
 
         return current_slot >= 3 or current_hour >= 20
+
+    def player_sleep_wake_time():
+        calendar_v2.sync_state()
+        current_hour = int(hour or 0)
+        current_minute = int(minute or 0)
+        if int(SleepWakeHourOverride or -1) >= 0:
+            return (int(SleepWakeHourOverride or 0) % 24, int(SleepWakeMinuteOverride or 0) % 60)
+        if current_hour >= 23:
+            return (6, 0)
+        if current_hour < 6:
+            return (max(7, min(9, current_hour + 5)), current_minute)
+        return (6, 0)
 
     def _room_add_item_units(room_obj, item_id, units=1):
         added = False
@@ -576,6 +597,8 @@ init -46 python:
             inventory[item_id] = current_count - remove_count
 
         playerItems = dict(inventory)
+        if "sync_player_state_from_store" in globals():
+            sync_player_state_from_store()
         return True
 
     def _player_add_item_by_id(item_id, quantity=1):
@@ -589,6 +612,8 @@ init -46 python:
         add_count = max(1, int(quantity or 1))
         inventory[item_id] = max(0, int(inventory.get(item_id, 0) or 0)) + add_count
         playerItems = dict(inventory)
+        if "sync_player_state_from_store" in globals():
+            sync_player_state_from_store()
         return True
 
     def _player_has_item_by_id(item_id):
@@ -688,7 +713,7 @@ init -46 python:
 
         minutes_cost = max(0, int(profile.get("minutes", 0) or 0))
         if minutes_cost > 0:
-            calendar_advance_minutes(minutes_cost)
+            calendar_v2.advance_minutes(minutes_cost)
 
         energy = _player_clamp(int(energy or 0) + int(profile.get("energy_gain", 0) or 0), 0, 100)
         fun = _player_clamp(int(fun or 0) + int(profile.get("fun_gain", 0) or 0), 0, 100)
@@ -828,7 +853,7 @@ init -46 python:
             return
 
         if int(minutes_cost or 0) > 0:
-            calendar_advance_minutes(int(minutes_cost or 0))
+            calendar_v2.advance_minutes(int(minutes_cost or 0))
             update_stat_state()
 
         if int(talked_delta or 0) != 0:
@@ -1019,7 +1044,7 @@ init -46 python:
         item_label = str(item_name or "еду").strip() or "еду"
         energy_gain = max(0, int(item_energy or 0))
 
-        calendar_advance_minutes(30)
+        calendar_v2.advance_minutes(30)
         update_stat_state()
         energy = _player_clamp(energy + energy_gain, 0, 100)
         fun = _player_clamp(fun + 5, 0, 100)
@@ -1033,10 +1058,11 @@ init -46 python:
         }
 
     def player_wash_with_rainwater():
-        global dayssincewash, energy
+        global energy
 
-        calendar_advance_minutes(30)
-        dayssincewash = 0
+        calendar_v2.advance_minutes(30)
+        player_state().appearance.wash()
+        player_state().appearance.apply_to_store()
         update_stat_state()
         energy = _player_clamp(energy - 5, 0, 100)
 
@@ -1294,13 +1320,6 @@ label ApplyItemAction(what_id="", action_key="", consume_from_inventory=False, w
     return
 
 
-label Examine(what_id="", where_id="", text_value="", object_id=""):
-    $ MainTxt = str(text_value or "")
-    $ CurLocDesc = MainTxt
-    call RefreshCurrentActionMenu(where_id, object_id or what_id, True)
-    return
-
-
 label Take(what_id="", where_id="", fallback_text="", object_id=""):
     $ item_id = get_object_id(what_id)
     $ _current_room_code = str(getattr(CurrentRoom, "code_name", "") or CurLoc or "")
@@ -1411,7 +1430,7 @@ label Sleep(return_location="TavernMain", timepassed=1, fallback_text="", where_
     $ _sleep_days = max(1, int(timepassed or 1))
     $ _sleep_where = str(where_id or CurLoc or _sleep_target or "TavernMain")
     $ _sleep_object = str(object_id or current_object_id or "")
-    $ calendar_sync_state()
+    $ calendar_v2.sync_state()
     if not _player_can_sleep_now():
         $ MainTxt = "Еще слишком рано ложиться спать."
         $ CurLocDesc = MainTxt
@@ -1443,7 +1462,7 @@ label Rest(return_location="", minutes_passed=120, energy_gain=15, fallback_text
         $ _rest_text = "You feel rested and refreshed!"
     $ action_override_text = _rest_text
     if _rest_minutes > 0:
-        $ calendar_advance_minutes(_rest_minutes)
+        $ calendar_v2.advance_minutes(_rest_minutes)
     $ update_stat_state()
     $ energy = _player_clamp(energy + _rest_energy, 0, 100)
     call ApplyActionResultToUI({"text": _rest_text}, "", "rest_player", where_id or _rest_target, object_id, True, "room")
@@ -1451,12 +1470,56 @@ label Rest(return_location="", minutes_passed=120, energy_gain=15, fallback_text
 
 
 label MakeFire(what_id="", where_id="", fallback_text="", object_id=""):
-    $ _fire_block = action_restriction_result("chore", "make_fire")
-    if not _fire_block.get("ok", False):
-        call ApplyActionResultToUI(_fire_block, fallback_text, "", where_id, object_id or what_id, True, "room")
+    # Simple label for the player action "make fire" (per spec)
+    $ _block = action_restriction_result("chore", "make_fire")
+    if not _block.get("ok", False):
+        call ApplyActionResultToUI(_block, fallback_text, "", where_id, object_id or what_id, True, "room")
         return
-    $ _fire_result = do_player_chore("make_fire", where_id, object_id or what_id)
-    call ApplyActionResultToUI(_fire_result, fallback_text, "", where_id, object_id or what_id, True, "room")
+
+    # Daily limit example ("you can only make fire X times a day")
+    $ _current = int(PlayerChoresWeek.get("make_fire", 0) or 0)
+    if _current >= 2:
+        $ MainTxt = "Вы уже разжигали огонь достаточно раз сегодня."
+        $ CurLocDesc = MainTxt
+        call RefreshCurrentActionMenu(where_id or CurLoc, object_id or what_id, True)
+        return
+
+    # === Direct effects on resources and the target object (hearth/fireplace) ===
+    $ _obj = None
+    python:
+        try:
+            _obj = _pc_fire_object(where_id, object_id or what_id)
+        except:
+            _obj = None
+
+    # Consume chopped wood
+    if _player_has_item_by_id("chopped_wood_001"):
+        $ _player_remove_item_by_id("chopped_wood_001")
+    elif _obj and _object_state_int(_obj, "chopped_wood_stock", 0) > 0:
+        $ _add_object_state_int(_obj, "chopped_wood_stock", -1, 0)
+
+    # Update the hearth object state directly
+    $ _now = (int(dayspassed or 0) * 1440) + int(clock_minutes or 0)
+    $ _until = _now + (12 * 60)
+    if _obj:
+        $ _set_object_state_int(_obj, "fire_started_minute", _now)
+        $ _set_object_state_int(_obj, "fire_until_minute", _until)
+        $ _set_object_state_int(_obj, "ash_dirty", 1)
+        $ _set_object_state_int(_obj, "fire_units", 0)
+
+    # Resource and time effects
+    $ energy = max(0, energy - 5)
+    $ fun = min(100, fun + 5)
+    $ exploration = max(0, exploration + 1)
+    $ calendar_v2.advance_minutes(10)
+
+    # This action counts as doing the chore
+    $ _pc_register_chore_success("make_fire")
+
+    $ MainTxt = "Вы разожгли огонь. Тепла должно хватить примерно на двенадцать часов."
+    $ CurLocDesc = MainTxt
+    call stat
+    call RefreshCurrentActionMenu(where_id or CurLoc, object_id or what_id, True)
     return
 
 
@@ -1511,7 +1574,7 @@ label Chop(what_id="", where_id="", fallback_text="", object_id=""):
             _pc_register_chore_success("chop_wood")
         except (AttributeError, NameError, TypeError, ValueError):
             pass
-        calendar_advance_minutes(60)
+        calendar_v2.advance_minutes(60)
         update_stat_state()
         fun = _player_clamp(fun + 5, 0, 100)
         energy = _player_clamp(energy - 20, 0, 100)

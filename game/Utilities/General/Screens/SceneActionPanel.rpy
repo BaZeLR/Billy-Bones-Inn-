@@ -107,7 +107,7 @@ label SceneActionPanelApply(mode="call", target="", args=(), mutations=None, min
             scene_panel_mutate(_scene_mutation)
 
     if _scene_minutes > 0:
-        $ calendar_advance_minutes(_scene_minutes)
+        $ calendar_v2.advance_minutes(_scene_minutes)
 
     if str(picture or "").strip():
         vscene picture

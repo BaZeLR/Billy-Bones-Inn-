@@ -177,8 +177,6 @@ label BackyardBuildActions:
         $ current_action_items.append(MenuItem("Варить туалетное мыло с оливковым маслом", Call("BackyardCookSoap", "luxury_soap_recipe")))
     if player_can_train_shooting():
         $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", "Backyard")))
-    if werecat_is_in_room("Backyard"):
-        $ current_action_items.append(MenuItem(werecat_action_caption("Backyard"), Call("IntWerecatTalk", "Backyard")))
     python:
         for _yard_object in BackyardRoom.visible_objects():
             current_action_items.append(MenuItem(_yard_object.name, Call("BackyardObjectMenu", _yard_object.object_id)))

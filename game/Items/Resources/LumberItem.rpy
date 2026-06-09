@@ -14,13 +14,6 @@ init 4 python:
         description="Тяжелое бревно, которое можно принести из леса и сложить в сарае.",
         actions=[
             ObjectAction(
-                action_id="examine_lumber",
-                label="Осмотреть бревно",
-                hook="call",
-                target="Examine",
-                args=("lumber_001", "Shed", "Тяжелое бревно для колки дров.", "lumber_001"),
-            ),
-            ObjectAction(
                 action_id="chop_lumber",
                 label="Колоть бревно",
                 hook="call",

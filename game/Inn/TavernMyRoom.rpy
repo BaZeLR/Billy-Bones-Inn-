@@ -112,15 +112,13 @@ init python:
         if tavern_my_room_has_floor_item("old_leather_cuirass_001"):
             _cuirass_name = str(runtime_item_display_name("old_leather_cuirass_001") or "кираса")
             extra_rows.append("У стены аккуратно оставлена {}. Кожа потемнела от времени, но вещь все еще выглядит крепкой.".format(_cuirass_name))
-        if melissa_temp_room_active("TavernMyRoom"):
+        if Melissa.temp_room_active("TavernMyRoom"):
             extra_rows.append("Пока в комнате Мелиссы под крышей все еще живет дрянь, часть ее вещей лежит и у вас. Похоже, по ночам она действительно рассчитывает на это убежище.")
         werecat_text = werecat_visible_text("TavernMyRoom")
         if str(werecat_text or "").strip():
             extra_rows.append(str(werecat_text or "").strip())
         if "amanda" in list(getNPCids("TavernMyRoom") or []):
             extra_rows.append("Аманда сейчас в вашей комнате.")
-        if int(PlayerRoomLightClosed or 0) == 1:
-            extra_rows.append("В комнате погашен свет, и все кажется теснее и личнее.")
         if str(PlayerWakeStateNotice or "").strip() and int(PlayerMorningArousalDay or -1) == int(dayspassed or 0):
             extra_rows.append(str(PlayerWakeStateNotice or ""))
 
@@ -177,12 +175,6 @@ label TavernMyRoomBuildActions:
     $ current_action_items = list(room_menu["movement"])
     if tavern_my_room_can_go_forest():
         $ current_action_items.append(MenuItem("Идти в лес", Call("TravelToForest", "TavernMyRoom")))
-    if werecat_is_in_room("TavernMyRoom"):
-        $ current_action_items.append(MenuItem(werecat_action_caption("TavernMyRoom"), Call("IntWerecatTalk", "TavernMyRoom")))
-    if int(PlayerRoomLightClosed or 0) == 0:
-        $ current_action_items.append(MenuItem("Погасить свет", Call("TavernMyRoomToggleLight", 1)))
-    else:
-        $ current_action_items.append(MenuItem("Зажечь свет", Call("TavernMyRoomToggleLight", 0)))
     python:
         for _room_item_id in ("rusty_hunter_rifle_001", "old_leather_cuirass_001"):
             if _room_has_item_by_id(TavernMyRoomRoom, _room_item_id):
@@ -297,12 +289,13 @@ label TavernMyRoomOpenChest(preserve_text=False):
     $ current_action_items = []
     python:
         _all_dresses = []
-        for _dress in list(MyDresses or []):
+        _appearance = player_state().appearance
+        for _dress in list(_appearance.owned_dresses or []):
             _dress_key = str(_dress or "").strip()
             if _dress_key and _dress_key not in _all_dresses:
                 _all_dresses.append(_dress_key)
-        _current_dress = str(MyCurDress or "").strip()
-        if _current_dress and _current_dress in list(MyDresses or []) and _current_dress not in _all_dresses:
+        _current_dress = str(_appearance.current_dress or "").strip()
+        if _current_dress and _appearance.has_dress(_current_dress) and _current_dress not in _all_dresses:
             _all_dresses.append(_current_dress)
         if len(_all_dresses) <= 0 and not bool(preserve_text):
             MainTxt = "В ларе пока пусто."
@@ -337,21 +330,9 @@ label TavernMyRoomCloseChest:
 
 
 label TavernMyRoomSleepAction:
-    if str(PlayerSleepBottomLayer or "") == "daywear":
+    if str(player_state().appearance.sleep_bottom_layer or "") == "daywear":
         $ player_set_sleep_layer("nightwear")
     call Sleep("TavernMyRoom", 1, "Вы ложитесь на кровать и быстро проваливаетесь в сон.", "TavernMyRoom", "bed_001")
-
-
-label TavernMyRoomToggleLight(closed=1):
-    $ PlayerRoomLightClosed = 1 if int(closed or 0) == 1 else 0
-    if int(PlayerRoomLightClosed or 0) == 1:
-        $ player_apply_arousal_trigger("light_closed", 8)
-        $ MainTxt = "Вы гасите свет. Комната сразу становится тише, темнее и слишком подходящей для мыслей, которые днем проще отогнать."
-    else:
-        $ MainTxt = "Вы снова зажигаете свет."
-    $ CurLocDesc = MainTxt
-    call TavernMyRoomBuildActions
-    return
 
 
 label TavernMyRoomSetSleepLayer(mode="daywear"):
@@ -492,11 +473,7 @@ label TavernMyRoomTableCraftItem(recipe_id=""):
 label TavernMyRoomWearDress(dress_code=""):
     $ _dress = str(dress_code or "")
     if _dress != "":
-        $ MyCurDress = _dress
-        if not isinstance(PlayerDressDaySt, dict):
-            $ PlayerDressDaySt = {}
-        if _dress not in PlayerDressDaySt:
-            $ PlayerDressDaySt[_dress] = int(dayspassed or 0)
+        $ player_state().wear_dress(_dress)
         call stat
         $ _short = tavern_my_room_dress_short_name(_dress)
         $ _desc = tavern_my_room_dress_full_desc(_dress)
@@ -511,8 +488,8 @@ label TavernMyRoomWearDress(dress_code=""):
 
 label TavernMyRoomRemoveDress(dress_code=""):
     $ _dress = str(dress_code or "").strip()
-    if _dress != "" and _dress == str(MyCurDress or "").strip():
-        $ MyCurDress = ""
+    if _dress != "" and _dress == str(player_state().appearance.current_dress or "").strip():
+        $ player_state().remove_current_dress(_dress)
         call stat
         $ _short = tavern_my_room_dress_short_name(_dress)
         $ MainTxt = "Вы сняли [_short] и положили в ларь."

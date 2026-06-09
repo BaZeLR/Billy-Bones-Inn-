@@ -1,0 +1,72 @@
+{
+  "npc_id": "georgett",
+  "entries": [
+    {
+      "label": "sunday_mass",
+      "weekdays": [7],
+      "start": "06:00",
+      "end": "07:59",
+      "location": "Church",
+      "awake": true,
+      "talkable": true,
+      "priority": 820,
+      "condition": {
+        "rule": "georgett_church_visible"
+      }
+    },
+    {
+      "label": "sunday_after_mass",
+      "weekdays": [7],
+      "start": "11:00",
+      "end": "12:59",
+      "location": "Church",
+      "awake": true,
+      "talkable": false,
+      "priority": 810,
+      "condition": {
+        "rule": "georgett_church_visible"
+      }
+    },
+    {
+      "label": "tavern_whore_shift",
+      "weekdays": [1, 2, 3, 4, 6],
+      "start": "12:00",
+      "end": "22:30",
+      "location": "TavernMain",
+      "awake": true,
+      "talkable": true,
+      "priority": 760,
+      "condition": {
+        "rule": "tavern_hired",
+        "person": "georgett"
+      }
+    },
+    {
+      "label": "friday_shift",
+      "weekdays": [5],
+      "start": "12:00",
+      "end": "18:59",
+      "location": "TavernMain",
+      "awake": true,
+      "talkable": true,
+      "priority": 760,
+      "condition": {
+        "rule": "tavern_hired",
+        "person": "georgett"
+      }
+    },
+    {
+      "label": "portstreets_work",
+      "weekdays": [1, 2, 3, 4, 6],
+      "start": "19:00",
+      "end": "22:30",
+      "location": "PortStreets",
+      "awake": true,
+      "talkable": true,
+      "priority": 700,
+      "condition": {
+        "rule": "georgett_portstreets"
+      }
+    }
+  ]
+}

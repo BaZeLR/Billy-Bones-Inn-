@@ -39,9 +39,6 @@ label DailySetstatdefault(girl_name):
             else:
                 $ DailyEventsList_Add(girl_name, "alllocs", -1, ">", 1, 9999, "GiveBirth", "GiveBirth")
 
-    if calendar_birth_matches_today(DateOfBirth.get(girl_name, -1), age_girls.get(girl_name, 0)):
-        $ age_girls[girl_name] = age_girls.get(girl_name, 0) + 1
-
     call DressUp(girl_name, 1)
 
     if girl_name == "amanda" or girl_name == "melissa":
@@ -67,6 +64,17 @@ label DailySetstatdefault(girl_name):
     $ FlirtedToday[girl_name] = 0
     $ GiftedToday[girl_name] = 0
     $ AskedToday[girl_name] = 0
+    $ FuckedToday[girl_name] = 0
+
+    # Also reset on the OOP girl object if present (daily flags belong to the girl)
+    python:
+        try:
+            if "peopleInfo" in globals() and isinstance(peopleInfo, dict):
+                info = peopleInfo.get(girl_name)
+                if hasattr(info, "reset_daily"):
+                    info.reset_daily(False)
+        except Exception:
+            pass
     if Drunk.get(girl_name, 0) > 0:
         $ sluttiness[girl_name] = max(0, sluttiness.get(girl_name, 0) - 4)
         $ Friends[girl_name] = max(0, Friends.get(girl_name, 0) - 2)

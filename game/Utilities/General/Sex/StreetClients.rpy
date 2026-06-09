@@ -12,13 +12,13 @@ label street_clients(client_type, girl_name, event_time):
     hide screen main_ui
     scene black
     if int(client_type or 0) != 1:
-        jump PortStreets
+        return False
 
-    $ SexEventType = int(GetSexEventFromTable(girl_name, event_time, "Prostitution") or 0)
+    $ SexEventType = int(GetSexEventFromTable(girl_name, 3, "Prostitution") or 0)
     if girl_name == "liza":
         "Вы уверенным шагом пошли к знакомой подворотне. Как вы и ожидали, вскоре стали слышны приглушенные девичьи стоны. Как можно тише и аккуратнее вы преодолели оставшееся расстояние и осторожно заглянули за угол. Открывшаяся вам картина послужила вполне достойным вознаграждением за ваши хлопоты."
         ""
-        $ LizaVar["seeclients"] = 1
+        $ Liza.mark_portstreet_clients_seen()
         if SexEventType == 1:
             "Вы видите юную мулатку отсасывающей у какого-то старика. Однако похотливый старикашка не удовлетворяется минетом и предлагает Лизетте наклониться и опереться о стену. Когда же девушка его послушалась, старый козел не колеблясь задрал ей платьице, спустил панталончики до колен и загнал свой член в юную податливую плоть. Однако девчонке, судя по всему, такое пришлось по нраву, и она с энтузиазмом подмахивает своему любовнику. Ее усилия не пропали даром. Вскоре кончает она, а следом и старик. Мулаточка смотрит на капающую из нее сперму и на ее мордашке отражается озабоченность возможными последствиями."
             $ PregnancyCheck(girl_name, "inside", 1, "", 1, "Неизвестный торговец")
@@ -43,7 +43,7 @@ label street_clients(client_type, girl_name, event_time):
     else:
         "Вы решили пойти и проверить подворотню, где вы сношали Жоржетту в прошлый раз. Не доходя до нее нескольких шагов вы услышали приглушенные стоны. Желая остаться незамеченным, вы как можно тише преодолели оставшееся расстояние и осторожно заглянули за угол. Открывшаяся вам картина послужила вполне достойным вознаграждением за ваши хлопоты."
         ""
-        $ GeorgettVar["seeclients"] = 1
+        $ Georgett.mark_portstreet_clients_seen()
         if SexEventType == 1:
             "Вы видите стоящую раком Жоржетту. Ее короткая юбчонка задрана до пояса, а сзади ее наяривает огромный мужик, судя по одежде портовый грузчик. Шлюшка жалобно попискивает при каждом движении его огромного шланга. Наконец грузчик разряжается прямо в киску Жоржетты."
             $ PregnancyCheck(girl_name, "inside", 1, "", 1, "Неизвестный грузчик")
@@ -80,6 +80,15 @@ label street_clients(client_type, girl_name, event_time):
     $ CleanSpermRandom(girl_name)
     menu:
         "Вернуться в переулок":
-            jump PortStreets
-    return
+            return True
+
+
+label story_georgett_portstreet_clients:
+    call street_clients(1, "georgett", 3)
+    return True
+
+
+label story_liza_portstreet_clients:
+    call street_clients(1, "liza", 3)
+    return True
 

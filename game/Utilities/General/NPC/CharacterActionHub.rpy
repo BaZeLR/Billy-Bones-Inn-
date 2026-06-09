@@ -18,7 +18,7 @@ init -40 python:
     _npc_picture_cache = {}
     NPC_META = {
         "amanda": {
-            "unknown_name": "Someone",
+            "unknown_name": "Незнакомка",
             "talk_label": "IntAmandaTalk",
             "talk_args": (),
             "examine_label": "ShowAmandaCard",
@@ -26,7 +26,7 @@ init -40 python:
             "auto_card": True,
         },
         "melissa": {
-            "unknown_name": "Someone",
+            "unknown_name": "Незнакомка",
             "talk_label": "IntMelissaTalk",
             "talk_args": (),
             "examine_label": "ShowMelissaCard",
@@ -34,7 +34,7 @@ init -40 python:
             "auto_card": True,
         },
         "sandra": {
-            "unknown_name": "Someone",
+            "unknown_name": "Незнакомка",
             "talk_label": "IntSandraTalk",
             "talk_args": (),
             "examine_label": "ShowSandraCard",
@@ -42,7 +42,7 @@ init -40 python:
             "auto_card": True,
         },
         "clara": {
-            "unknown_name": "Someone",
+            "unknown_name": "Незнакомка",
             "talk_label": "IntClaraTalk",
             "talk_args": (),
             "examine_label": "ShowClaraCard",
@@ -50,7 +50,7 @@ init -40 python:
             "auto_card": True,
         },
         "becky": {
-            "unknown_name": "Someone",
+            "unknown_name": "Незнакомка",
             "talk_label": "IntBeckyTalk",
             "talk_args": (),
             "examine_label": "ShowBeckyCard",
@@ -58,7 +58,7 @@ init -40 python:
             "auto_card": True,
         },
         "eddie": {
-            "unknown_name": "Someone",
+            "unknown_name": "Незнакомец",
             "talk_label": "IntEddieTalk",
             "talk_args": (),
             "examine_label": "",
@@ -67,7 +67,7 @@ init -40 python:
             "auto_card": False,
         },
         "inga": {
-            "unknown_name": "Someone",
+            "unknown_name": "Незнакомка",
             "talk_label": "IntIngaTalk",
             "talk_args": (),
             "examine_label": "",
@@ -96,7 +96,7 @@ init -40 python:
             "auto_card": False,
         },
         "liza": {
-            "unknown_name": "Someone",
+            "unknown_name": "Молодая женщина",
             "talk_label": "IntLizaTalk",
             "talk_args": (),
             "examine_label": "",
@@ -104,7 +104,7 @@ init -40 python:
             "auto_card": False,
         },
         "irma": {
-            "unknown_name": "Someone",
+            "unknown_name": "Незнакомка",
             "talk_label": "IntIrmaTalk",
             "talk_args": (),
             "examine_label": "ShowIrmaCard",
@@ -114,6 +114,24 @@ init -40 python:
         "alber": {
             "unknown_name": "Альбер",
             "talk_label": "IntAlberTalk",
+            "talk_args": (),
+            "examine_label": "",
+            "actions": ["look", "talk"],
+            "gender": "man",
+            "auto_card": False,
+        },
+        "draupnir": {
+            "unknown_name": "Драупнир",
+            "talk_label": "IntDraupnirTalk",
+            "talk_args": (),
+            "examine_label": "",
+            "actions": ["look", "talk"],
+            "gender": "man",
+            "auto_card": False,
+        },
+        "sergio": {
+            "unknown_name": "Серджио",
+            "talk_label": "BarberShopTalk",
             "talk_args": (),
             "examine_label": "",
             "actions": ["look", "talk"],
@@ -166,15 +184,37 @@ init -40 python:
         key = str(npc_id or "").strip().lower()
         if not key:
             return False
+        try:
+            info = getPersonInfo(key)
+            if info is not None:
+                return bool(getattr(info, "known", False))
+        except Exception:
+            pass
         return bool(knowsMC.get(key, False))
+
+    def _is_generic_unknown_name(value=""):
+        return str(value or "").strip().lower() in ("", "someone", "somebody")
+
+    def _unknown_role_name(meta=None, fallback=""):
+        data = dict(meta or {})
+        gender = str(data.get("gender", "") or "").strip().lower()
+        if gender == "man":
+            return "Незнакомец"
+        if gender == "woman" or "flirt" in [str(row or "").strip().lower() for row in list(data.get("actions", []) or [])]:
+            return "Незнакомка"
+        return str(fallback or "Персонаж")
 
     def npc_display_name(npc_id):
         key = str(npc_id or "").strip().lower()
         if not key:
             return ""
         if npc_is_known(key):
-            return str(RealName.get(key, key) or key)
-        return str(npc_meta(key).get("unknown_name", "Someone") or "Someone")
+            return str(people_display_name(key) or key)
+        meta = npc_meta(key)
+        unknown_name = str(meta.get("unknown_name", "") or "").strip()
+        if not _is_generic_unknown_name(unknown_name):
+            return unknown_name
+        return _unknown_role_name(meta, key)
 
     def npc_talk_label(npc_id):
         return str(npc_meta(npc_id).get("talk_label", "") or "")
@@ -210,7 +250,7 @@ init -40 python:
             if key == "zimmer" and room_key == "CityGuard":
                 return bool(city_guard_open_now())
             if key == "alber" and room_key == "WineStore":
-                return int(time or 0) != 0
+                return str(getLocation("alber") or "") == "WineStore" and bool(npc_can_talk_now("alber"))
             if room_key == "BeckyHome":
                 if key == "becky":
                     return True
@@ -251,14 +291,27 @@ init -40 python:
                 return key in [str(row or "").strip().lower() for row in list(tavern_breakfast_present_ids() or [])]
         except Exception:
             pass
-        return bool(npc_can_talk_now(key)) and str(getLocation(key) or "") == room_key
+        if not (bool(npc_can_talk_now(key)) and str(getLocation(key) or "") == room_key):
+            return False
+        try:
+            info = getPersonInfo(key)
+            if info is not None and hasattr(info, "social_action_allowed"):
+                return bool(info.social_action_allowed("talk"))
+        except Exception:
+            pass
+        return True
 
     def npc_flirt_action_available(npc_id="", room_code=""):
         key = str(npc_id or "").strip().lower()
         if not npc_social_actions_available_in_room(key, room_code):
             return False
-        allowed, reason = relationship_social_action_allowed(key, "flirt")
-        if not allowed:
+        try:
+            info = getPersonInfo(key)
+            if info is not None and hasattr(info, "social_action_allowed") and not info.social_action_allowed("flirt"):
+                return False
+        except Exception:
+            pass
+        if not social_interaction_allowed_for_npc(key, "flirt"):
             return False
         try:
             if key == "melissa" and not melissa_relationship_allows(key, "flirt"):
@@ -276,6 +329,12 @@ init -40 python:
             return False
         if int(GiftedToday.get(key, 0) or 0) > 0:
             return False
+        try:
+            info = getPersonInfo(key)
+            if info is not None and hasattr(info, "social_action_allowed") and not info.social_action_allowed("gift"):
+                return False
+        except Exception:
+            pass
         if not relationship_any_gift_allowed(key):
             return False
         try:
@@ -364,8 +423,11 @@ init -40 python:
 
     def _entity_unknown_title(entity_data=None):
         if not isinstance(entity_data, dict):
-            return "Someone"
-        return _character_action_text(entity_data.get("unknown_name", "Someone"), "Someone")
+            return "Персонаж"
+        unknown_name = _character_action_text(entity_data.get("unknown_name", ""), "")
+        if not _is_generic_unknown_name(unknown_name):
+            return unknown_name
+        return _unknown_role_name(entity_data, entity_data.get("entity_id", "Персонаж"))
 
     def entity_presented_name(entity_type="", entity_id="", entity_data=None):
         entity_key = str(entity_type or "").strip().lower()

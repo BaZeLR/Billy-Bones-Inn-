@@ -390,6 +390,7 @@ Example:
 
 ```renpy
 label eventTavernHarassment:
+     vscene "images/tavern/harassment.jpg"
     "A drunk customer is getting handsy with Amanda."
     menu:
         "Interrupt":
@@ -401,7 +402,7 @@ label eventTavernHarassment:
         $ thread.complete()
     jump main_hall
 ```
-
+### NOTE we can continue with sublabels on action menus with same manner.
 For a multi-step chain:
 
 ```renpy

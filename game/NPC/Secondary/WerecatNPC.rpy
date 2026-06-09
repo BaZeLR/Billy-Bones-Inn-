@@ -26,12 +26,12 @@ init -8 python:
     WERECAT_MILK_ITEM_IDS = ("milk_pitcher_001",)
 
     def werecat_sleep_location():
-        return werecat_roam_location(4) or "Backyard"
+        return werecat_roam_location() or "Backyard"
 
-    def werecat_roam_location(time_slot=None):
+    def werecat_roam_location():
         if not werecat_is_living_with_household():
             return ""
-        slot_value = int(time if time_slot is None else time_slot or 0)
+        slot_value = int(time or 0)
         rooms = list(WERECAT_ROAM_ROOMS.get(slot_value, WERECAT_ROAM_ROOMS.get(1, ("Backyard",))))
         if not rooms:
             return "Backyard"
@@ -108,9 +108,6 @@ init -8 python:
                 return result + "\n\n" + visible_text
             return visible_text
         return result
-
-    def werecat_action_caption(room_code=""):
-        return "Подойти к %s" % str(RealName3.get("werecat", "Луне") or "Луне")
 
     def werecat_can_play_with_dog(room_code=""):
         room_key = str(room_code or CurLoc or "").strip()
@@ -189,9 +186,23 @@ init -8 python:
         RealName["werecat"] = str(werecat_display_name() or "Луна")
         RealName2["werecat"] = str(werecat_display_name() or "Луны")
         RealName3["werecat"] = str(werecat_display_name() or "Луне")
+        # Defensive init for age_girls (not always present at early NextDay init time)
+        if 'age_girls' not in globals() or not isinstance(age_girls, dict):
+            globals()["age_girls"] = {}
         age_girls["werecat"] = int(age_girls.get("werecat", 19) or 19)
-        DateOfBirth["werecat"] = DateOfBirth.get("werecat", calendar_make_birth_record(age_girls["werecat"]))
-        girltextdesc["werecat"] = "Невысокая гибкая кошкодевочка с внимательными золотистыми глазами, мягкими ушами и пушистым хвостом. Двигается бесшумно, настороженно и слишком ловко для обычной домашней любимицы."
+        # werecat is a creature/animal (pet), not a human girl — skip DateOfBirth entirely
+        # (no birth records, pregnancy logic, etc. for non-human entities)
+        desc = "Невысокая гибкая кошкодевочка с внимательными золотистыми глазами, мягкими ушами и пушистым хвостом. Двигается бесшумно, настороженно и слишком ловко для обычной домашней любимицы."
+
+        # Use the object model only for werecat (creature/pet). Do NOT write to legacy girltextdesc here —
+        # that dict may not exist this early in NextDay init, and werecat is now a BaseNPC object.
+        # Set description directly on the instance so .description / self.description works everywhere.
+        if "werecat" in peopleInfo:
+            info = peopleInfo["werecat"]
+            if hasattr(info, "data") and info.data is not None:
+                info.data.description = desc
+            # Direct attribute for code that does werecat.description or info.description
+            info.description = desc
         knowsMC["werecat"] = True if werecat_is_living_with_household() else bool(knowsMC.get("werecat", False))
         if not werecat_is_living_with_household():
             CurrentLoc["werecat"] = ""
