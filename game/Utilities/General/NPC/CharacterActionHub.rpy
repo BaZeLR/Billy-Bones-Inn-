@@ -3,15 +3,6 @@
 # ================================================================================
 default knowsMC = {}
 
-default action_menu_entity_type = ""
-default action_menu_entity_id = ""
-default action_menu_where = ""
-default action_menu_title = ""
-default action_menu_entity_data = {}
-default action_menu_actions = []
-default action_menu_specs = []
-default action_menu_selected = ""
-
 init -40 python:
     import renpy.exports as renpy
 
@@ -19,7 +10,7 @@ init -40 python:
     NPC_META = {
         "amanda": {
             "unknown_name": "Незнакомка",
-            "talk_label": "IntAmandaTalk",
+            "talk_label": "AmandaTalkHubEventEntry",
             "talk_args": (),
             "examine_label": "ShowAmandaCard",
             "actions": ["look", "talk", "gift", "flirt"],
@@ -208,8 +199,23 @@ init -40 python:
         key = str(npc_id or "").strip().lower()
         if not key:
             return ""
+        info = None
+        try:
+            info = getPersonInfo(key)
+        except Exception:
+            info = None
         if npc_is_known(key):
+            if info is not None and hasattr(info, "display_name"):
+                try:
+                    return str(info.display_name() or key)
+                except Exception:
+                    pass
             return str(people_display_name(key) or key)
+        class_unknown_name = ""
+        if info is not None:
+            class_unknown_name = str(getattr(info, "unknown_name", "") or "").strip()
+        if not _is_generic_unknown_name(class_unknown_name):
+            return class_unknown_name
         meta = npc_meta(key)
         unknown_name = str(meta.get("unknown_name", "") or "").strip()
         if not _is_generic_unknown_name(unknown_name):
@@ -244,7 +250,7 @@ init -40 python:
             if key == "liza" and room_key == "PortStreets":
                 return bool(port_streets_liza_can_talk())
             if key == "fran" and room_key in ("EllonaTemple", "EllonaBirthRoom"):
-                return bool(ellona_fran_visible())
+                return bool(Francheska.visible_now())
             if key == "zimmer" and room_key == "CityGuard":
                 return bool(city_guard_open_now())
             if key == "alber" and room_key == "WineStore":
@@ -270,6 +276,18 @@ init -40 python:
         room_key = str(room_code or "").strip()
         if not npc_room_interaction_visible(key, room_key):
             return None
+        if room_key == "GroceryStore" and key in ("eddie", "becky", "inga"):
+            data = npc_meta(key)
+            data["npc_id"] = key
+            data["unknown_name"] = "Торговец"
+            if not npc_is_known(key):
+                data["title"] = "Торговец"
+            try:
+                data["picture_path"] = grocery_store_grocer_picture(key)
+                data["talk_picture"] = data["picture_path"]
+            except (NameError, AttributeError, TypeError, ValueError):
+                pass
+            return data
         data = npc_meta(key)
         data["npc_id"] = key
         if key == "georgett":
@@ -347,40 +365,10 @@ init -40 python:
         except Exception:
             return True
 
-    def dog_action_data(where_id=""):
-        room_code = str(where_id or CurLoc or "").strip()
-        return {
-            "entity_type": "dog",
-            "entity_id": "dog",
-            "title": str(dog_display_name() or "Пес"),
-            "talk_label": "IntDogTalk",
-            "talk_args": (room_code,),
-            "examine_id": "dog",
-            "examine_label": "",
-            "actions": ["look", "talk"],
-            "can_examine": True,
-            "auto_card": True,
-        }
-
     def npc_unique_state(npc_id):
-        key = str(npc_id or "").strip().lower()
-        if key == "amanda":
-            return AmandaVar
-        if key == "melissa":
-            return MelissaVar
-        if key == "sandra":
-            return SandraVar
-        if key == "clara":
-            return ClaraVar
-        if key == "becky":
-            return BeckyVar
-        if key == "georgett":
-            return GeorgettVar
-        if key == "liza":
-            return LizaVar
-        if key == "irma":
-            return IrmaVar
-        return {}
+        info = getPersonInfo(str(npc_id or "").strip().lower())
+        state = getattr(info, "var", None) if info is not None else None
+        return state if isinstance(state, dict) else {}
 
     def _npc_explicit_picture(npc_data=None, action_hint=""):
         if not isinstance(npc_data, dict):
@@ -392,143 +380,18 @@ init -40 python:
                 return explicit
         return str(npc_data.get("picture_path", "") or "").strip()
 
-    def _character_action_text(value, default=""):
-        if callable(value):
-            try:
-                value = value()
-            except TypeError:
-                value = default
-            except Exception:
-                value = default
-        return str(value or default or "")
-
-    def _character_action_display_name(character_id):
-        key = str(character_id or "").strip()
-        if not key:
-            return ""
-        return str(RealName.get(key, key) or key)
-
     def mark_entity_known(entity_id=""):
         key = str(entity_id or "").strip().lower()
-        if key:
-            knowsMC[key] = True
-
-    def entity_knows_mc(entity_id="", entity_data=None):
-        key = str(entity_id or "").strip().lower()
-        if not key or key in ("you", "dog"):
-            return True
-        return npc_is_known(key)
-
-    def _entity_unknown_title(entity_data=None):
-        if not isinstance(entity_data, dict):
-            return "Персонаж"
-        unknown_name = _character_action_text(entity_data.get("unknown_name", ""), "")
-        if not _is_generic_unknown_name(unknown_name):
-            return unknown_name
-        return _unknown_role_name(entity_data, entity_data.get("entity_id", "Персонаж"))
-
-    def entity_presented_name(entity_type="", entity_id="", entity_data=None):
-        entity_key = str(entity_type or "").strip().lower()
-        entity_id_value = str(entity_id or "").strip()
-        if entity_key == "player":
-            return "Стефан"
-        if entity_key == "dog":
-            return str(dog_display_name() or "Пес")
-        if not entity_id_value:
-            return ""
-        if entity_key == "npc":
-            return npc_display_name(entity_id_value)
-        if entity_knows_mc(entity_id_value, entity_data):
-            return _character_action_display_name(entity_id_value)
-        return _entity_unknown_title(entity_data)
-
-    def _entity_action_can_examine(entity_type="", entity_id="", entity_data=None):
-        entity_key = str(entity_type or "").strip().lower()
-        if entity_key in ("player", "dog"):
-            return True
-        if entity_key == "npc":
-            actions = set([str(action or "").strip().lower() for action in npc_action_ids(entity_id)])
-            if "look" not in actions:
-                return False
-            examine_target = npc_examine_label(entity_id)
-            if examine_target:
-                return renpy.has_label(examine_target)
-            return True
-        if not isinstance(entity_data, dict):
-            return bool(str(entity_id or "").strip())
-        examine_target = _character_action_text(entity_data.get("examine_label", entity_data.get("examine_id", entity_id)), entity_id)
-        if not str(examine_target or "").strip():
-            return False
-        return room_rule_true(entity_data.get("can_examine", True))
-
-    def _character_action_entity_talk_args(entity_data=None):
-        if not isinstance(entity_data, dict):
-            return ()
-        talk_args = entity_data.get("talk_args", ())
-        if callable(talk_args):
-            try:
-                talk_args = talk_args()
-            except (AttributeError, TypeError, ValueError):
-                talk_args = ()
-        return tuple(talk_args or ())
-
-    def _character_action_picture_files(character_id):
-        key = str(character_id or "").strip().lower()
         if not key:
-            return []
-        if key in _npc_picture_cache:
-            return list(_npc_picture_cache.get(key, []))
-        prefix = "images/%s/" % key
-        files = []
+            return False
         try:
-            for rel_path in list(renpy.list_files() or []):
-                rel_value = str(rel_path or "").replace("\\", "/")
-                if rel_value.lower().startswith(prefix.lower()):
-                    files.append(rel_value)
+            info = getPersonInfo(key)
+            if info is not None and hasattr(info, "mark_known"):
+                return bool(info.mark_known())
         except Exception:
-            files = []
-        _npc_picture_cache[key] = list(files)
-        return files
-
-    def _character_action_room_picture_tokens(where_id="", entity_data=None, action_hint=""):
-        room_code = str(where_id or CurLoc or "").strip()
-        action_key = str(action_hint or "").strip().lower()
-        tokens = []
-        if isinstance(entity_data, dict):
-            for raw_hint in list(entity_data.get("media_hints", ()) or ()):
-                hint_value = str(raw_hint or "").strip().lower()
-                if hint_value:
-                    tokens.append(hint_value)
-        room_hint_map = {
-            "TavernMain": ("tavern", "hall", "waitress"),
-            "TavernKitchen": ("kitchen", "tavern"),
-            "TavernStorage": ("storage", "basement", "tavern"),
-            "Backyard": ("backyard", "tavern"),
-            "TavernMyRoom": ("mc_room", "room", "bedroom", "tavern"),
-            "TavernSandraRoom": ("room", "bedroom", "home", "comfy"),
-            "TavernMelissaRoom": ("room", "bedroom", "home", "comfy"),
-            "TavernAmandaRoom": ("room", "bedroom", "home", "comfy"),
-            "WineStore": ("wine", "cellar", "sellar"),
-            "MarketPlace": ("market", "town"),
-            "Church": ("church",),
-            "GroceryStore": ("shop", "town"),
-            "DressShop": ("shop", "town"),
-            "BarberShop": ("shop", "town"),
-            "HunterClub": ("club", "town"),
-        }
-        for raw_hint in tuple(room_hint_map.get(room_code, ())):
-            hint_value = str(raw_hint or "").strip().lower()
-            if hint_value:
-                tokens.append(hint_value)
-        if room_in_group(room_code, ROOM_GROUP_FOREST):
-            tokens.append("forest")
-        if action_key:
-            tokens.insert(0, action_key)
-        seen = []
-        for token in tokens:
-            if token and token not in seen:
-                seen.append(token)
-        return seen
+            pass
+        knowsMC[key] = True
+        return True
 
     def npc_context_picture_path(character_id="", where_id="", action_hint="", entity_data=None):
         key = str(character_id or "").strip().lower()
@@ -536,8 +399,6 @@ init -40 python:
             return ""
         if key == "you":
             return str(player_card_portrait_path() or "")
-        if key == "dog":
-            return str(dog_card_portrait_path() or "")
 
         if isinstance(entity_data, dict):
             fixed_path = _npc_explicit_picture(entity_data, action_hint)
@@ -551,29 +412,6 @@ init -40 python:
                     resolved = ""
                 if resolved:
                     return resolved
-
-        files = list(_character_action_picture_files(key) or [])
-        tokens = _character_action_room_picture_tokens(where_id, entity_data, action_hint)
-        best_score = -999
-        best_paths = []
-        for rel_path in files:
-            rel_lower = str(rel_path or "").lower()
-            score = 0
-            for token in tokens:
-                if token in rel_lower:
-                    score += 4
-            if "card" in rel_lower:
-                score -= 3
-            if "/tavern/" in rel_lower and room_in_group(where_id, ROOM_GROUP_TAVERN):
-                score += 2
-            if score > best_score:
-                best_score = score
-                best_paths = [rel_path]
-            elif score == best_score:
-                best_paths.append(rel_path)
-
-        if len(best_paths) > 0 and best_score > 0:
-            return str(sorted(best_paths)[0] or "")
 
         return str(girl_card_portrait_path(key) or "")
 
@@ -599,25 +437,6 @@ init -40 python:
 
         return str(npc_data.get("unknown_picture", "") or "")
 
-    def call_label_with_args(label_name="", args=()):
-        target_label = str(label_name or "").strip()
-        target_args = tuple(args or ())
-        if not target_label or not renpy.has_label(target_label):
-            return
-        if len(target_args) <= 0:
-            renpy.call(target_label)
-        elif len(target_args) == 1:
-            renpy.call(target_label, target_args[0])
-        elif len(target_args) == 2:
-            renpy.call(target_label, target_args[0], target_args[1])
-        elif len(target_args) == 3:
-            renpy.call(target_label, target_args[0], target_args[1], target_args[2])
-        else:
-            renpy.call(target_label, target_args[0], target_args[1], target_args[2], target_args[3])
-
-    def _character_action_call_label(target_label="", target_args=()):
-        call_label_with_args(target_label, target_args)
-
     def show_npc_picture_main_ui_state(character_id="", where_id="", action_hint="", entity_data=None):
         npc_data = dict(entity_data or {})
         if character_id and "npc_id" not in npc_data:
@@ -633,28 +452,8 @@ init -40 python:
             global _layout_last_picture
             _layout_last_picture = picture_path
 
-    def show_entity_examine_main_ui_state(entity_type="", entity_id="", where_id="", entity_data=None):
-        entity_key = str(entity_type or "").strip().lower()
-        entity_id_value = str(entity_id or "").strip()
-        entity_state = dict(entity_data or {})
-        if entity_key == "player" or entity_id_value.lower() == "you":
-            show_player_card_main_ui_state()
-            return
-        if entity_key == "dog" or entity_id_value.lower() == "dog":
-            show_dog_card_main_ui_state()
-            return
-        mark_entity_known(entity_id_value)
-        examine_label = str(entity_state.get("examine_label", "") or "").strip()
-        if examine_label != "" and renpy.has_label(examine_label):
-            call_label_with_args(examine_label, ())
-            return
-        show_npc_picture_main_ui_state(entity_id_value, where_id, "idle", entity_state)
-
-    def action_menu_handle_back_state():
-        main_ui_restore_room_scene_state()
-
     def NpcActionTalkState(npc_id="", where_id="", entity_data=None):
-        normalized = _normalize_entity_action_data("npc", npc_id, where_id, entity_data)
+        normalized = npc_action_data(npc_id, where_id, entity_data)
         npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
         where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
         if not npc_key:
@@ -663,11 +462,11 @@ init -40 python:
         target_label = str(normalized.get("talk_label", "") or "").strip()
         target_args = tuple(normalized.get("talk_args", ()) or ())
         if target_label and renpy.has_label(target_label):
-            call_label_with_args(target_label, target_args)
+            renpy.call_in_new_context(target_label, *target_args)
             mark_entity_known(npc_key)
 
     def NpcActionLookState(npc_id="", where_id="", entity_data=None):
-        normalized = _normalize_entity_action_data("npc", npc_id, where_id, entity_data)
+        normalized = npc_action_data(npc_id, where_id, entity_data)
         npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
         where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
         if not npc_key:
@@ -679,323 +478,76 @@ init -40 python:
             pass
         examine_label = str(normalized.get("examine_label", "") or "").strip()
         if examine_label and renpy.has_label(examine_label):
-            call_label_with_args(examine_label, ())
-
-    def DogActionTalkState(where_id=""):
-        where_key = str(where_id or CurLoc or "").strip()
-        show_npc_picture_main_ui_state("dog", where_key, "talk", dog_action_data(where_key))
-        call_label_with_args("IntDogTalk", (where_key,))
-
-    def DogActionLookState(where_id=""):
-        show_dog_card_main_ui_state(where_id)
+            renpy.call_in_new_context(examine_label)
 
     def open_npc_action_menu_state(npc_id="", where_id="", entity_data=None):
-        store = renpy.store
-        normalized = _normalize_entity_action_data("npc", npc_id, where_id, entity_data)
-        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
-        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
-        if not npc_key:
-            return
+        global current_action_title, current_action_content, current_action_items
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip()
+        room_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
 
-        store.action_menu_entity_type = "npc"
-        store.action_menu_entity_id = npc_key
-        store.action_menu_where = where_key
-        store.action_menu_title = str(normalized.get("title", "") or npc_display_name(npc_key))
-        store.action_menu_entity_data = dict(normalized)
-        store.action_menu_selected = npc_key
-        store.action_menu_actions = []
-        store.action_menu_specs = []
+        if npc_key:
+            show_npc_picture_main_ui_state(npc_key, room_key, "idle", normalized)
 
-        show_npc_picture_main_ui_state(npc_key, where_key, "idle", normalized)
+        actions = set([str(action or "").strip().lower() for action in list(normalized.get("actions", []) or []) if str(action or "").strip()])
+        social_available = npc_social_actions_available_in_room(npc_key, room_key)
+        can_talk = social_available and ("talk" in actions) and bool(str(normalized.get("talk_label", "") or "").strip() and renpy.has_label(str(normalized.get("talk_label", "") or "").strip()))
+        can_examine = ("look" in actions) and bool(normalized.get("can_examine", False))
 
-        actions = set([str(action or "").strip().lower() for action in list(normalized.get("actions", []) or [])])
-        social_available = npc_social_actions_available_in_room(npc_key, where_key)
-        if "look" in actions:
-            store.action_menu_specs.append({"id": "look", "text": "Осмотреть", "entity_type": "npc", "entity_id": npc_key, "where_id": where_key})
-        if social_available and "talk" in actions and str(normalized.get("talk_label", "") or "").strip() and renpy.has_label(str(normalized.get("talk_label", "") or "").strip()):
-            store.action_menu_specs.append({"id": "talk", "text": "Поговорить", "entity_type": "npc", "entity_id": npc_key, "where_id": where_key})
-        if "flirt" in actions and npc_flirt_action_available(npc_key, where_key):
-            store.action_menu_specs.append({"id": "flirt", "text": "Флиртовать", "entity_type": "npc", "entity_id": npc_key, "where_id": where_key})
-        if "gift" in actions and npc_gift_action_available(npc_key, where_key):
-            store.action_menu_specs.append({"id": "gift", "text": "Подарить", "entity_type": "npc", "entity_id": npc_key, "where_id": where_key})
-        if npc_key == "amanda" and bool(globals().get("AmandaAIIntegrationEnabled", False)):
+        menu_items = []
+        if can_examine:
+            menu_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, npc_key, room_key, dict(normalized))))
+        if can_talk:
+            menu_items.append(MenuItem("Поговорить", Function(NpcActionTalkState, npc_key, room_key, dict(normalized))))
+        if "flirt" in actions and npc_flirt_action_available(npc_key, room_key):
+            menu_items.append(MenuItem("Флиртовать", Call("SocialTalkTopicMenu", npc_key, "flirt", social_topic_return_label(npc_key))))
+        if "gift" in actions and npc_gift_action_available(npc_key, room_key):
+            if npc_key == "clara":
+                menu_items.append(MenuItem("Подарить", Call("IntClaraGiftMenu", npc_key)))
+            else:
+                menu_items.append(MenuItem("Подарить", Call("PlayerCardGiftToFixedTargetMenu", npc_key)))
+        try:
+            _amanda_ai_enabled = bool(AmandaAIIntegrationEnabled)
+        except NameError:
+            _amanda_ai_enabled = False
+        if npc_key == "amanda" and _amanda_ai_enabled:
             try:
-                _amanda_ai_intent = amanda_ai_room_intent_code(where_key)
+                _amanda_ai_intent = amanda_ai_room_intent_code(room_key)
             except Exception:
                 _amanda_ai_intent = ""
             if str(_amanda_ai_intent or "") != "":
-                store.action_menu_specs.append({"id": "amanda_ai:%s" % str(_amanda_ai_intent), "text": amanda_ai_menu_label(_amanda_ai_intent), "entity_type": "npc", "entity_id": npc_key, "where_id": where_key})
-        store.action_menu_specs.append({"id": "back", "text": "Назад"})
+                menu_items.append(MenuItem(amanda_ai_menu_label(_amanda_ai_intent), Call("AmandaAIIntentRoomEvent", room_key, _amanda_ai_intent)))
 
-        store.current_action_title = store.action_menu_title
-        store.current_action_content = None
-        store.current_action_items = [
-            MenuItem(str(spec.get("text", "") or ""), Call("ActionMenuRunSpec", str(spec.get("id", "") or ""), str(spec.get("entity_type", "") or ""), str(spec.get("entity_id", "") or ""), str(spec.get("where_id", "") or "")))
-            for spec in list(store.action_menu_specs or [])
-            if str(spec.get("id", "") or "") != "back"
-        ]
-        store.current_action_items.append(MenuItem("Назад", Function(action_menu_handle_back_state)))
-        store.action_menu_specs = []
+        current_action_title = str(normalized.get("title", "") or "Персонаж")
+        current_action_content = None
+        current_action_items = menu_items
+        current_action_items.append(MenuItem("Назад", Jump(str(CurLoc or ""))))
 
         restart_fn = getattr(renpy, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
 
-    def open_dog_action_menu_state(where_id=""):
-        store = renpy.store
-        where_key = str(where_id or CurLoc or "").strip()
-        dog_data = dog_action_data(where_key)
-
-        store.action_menu_entity_type = "dog"
-        store.action_menu_entity_id = "dog"
-        store.action_menu_where = where_key
-        store.action_menu_title = str(dog_data.get("title", "") or "Пес")
-        store.action_menu_entity_data = dict(dog_data)
-        store.action_menu_selected = "dog"
-        store.action_menu_actions = []
-        store.action_menu_specs = []
-
-        show_npc_picture_main_ui_state("dog", where_key, "idle", dog_data)
-
-        store.action_menu_specs.append({"id": "look", "text": "Осмотреть", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
-        store.action_menu_specs.append({"id": "talk", "text": "Поговорить", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
-        _dog_state = ensure_dog_runtime()
-        if bool(_dog_state.owned):
-            if player_has_bone():
-                store.action_menu_specs.append({"id": "dog_bone", "text": "Дать кость", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
-        else:
-            if not bool(_dog_state.met):
-                store.action_menu_specs.append({"id": "dog_call", "text": "Позвать пса", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
-            else:
-                store.action_menu_specs.append({"id": "dog_pet", "text": "Попробовать погладить", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
-                store.action_menu_specs.append({"id": "dog_play_stray", "text": "Попробовать поиграть", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
-                if player_has_bone():
-                    store.action_menu_specs.append({"id": "dog_stray_bone", "text": "Дать кость", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
-                if dog_can_adopt_stray():
-                    store.action_menu_specs.append({"id": "dog_adopt", "text": "Надеть ошейник и забрать домой", "entity_type": "dog", "entity_id": "dog", "where_id": where_key})
-        store.action_menu_specs.append({"id": "back", "text": "Назад"})
-
-        store.current_action_title = store.action_menu_title
-        store.current_action_content = None
-        store.current_action_items = [
-            MenuItem(str(spec.get("text", "") or ""), Call("ActionMenuRunSpec", str(spec.get("id", "") or ""), str(spec.get("entity_type", "") or ""), str(spec.get("entity_id", "") or ""), str(spec.get("where_id", "") or "")))
-            for spec in list(store.action_menu_specs or [])
-            if str(spec.get("id", "") or "") != "back"
-        ]
-        store.current_action_items.append(MenuItem("Назад", Function(action_menu_handle_back_state)))
-        store.action_menu_specs = []
-
-        restart_fn = getattr(renpy, "restart_interaction", None)
-        if callable(restart_fn):
-            restart_fn()
-
-    def action_menu_handle_talk_state():
-        entity_state = dict(action_menu_entity_data or {})
-        entity_id_value = str(action_menu_entity_id or "").strip()
-        entity_where = str(action_menu_where or CurLoc or "").strip()
-        entity_type_value = str(action_menu_entity_type or "").strip().lower()
-        if entity_type_value == "npc":
-            NpcActionTalkState(entity_id_value, entity_where)
-            return
-        if entity_type_value == "dog":
-            DogActionTalkState(entity_where)
-            return
-        if entity_id_value:
-            mark_entity_known(entity_id_value)
-            show_npc_picture_main_ui_state(entity_id_value, entity_where, "talk", entity_state)
-        call_label_with_args(entity_state.get("talk_label", ""), entity_state.get("talk_args", ()))
-
-    def action_menu_handle_look_state():
-        entity_type_value = str(action_menu_entity_type or "").strip().lower()
-        if entity_type_value == "npc":
-            NpcActionLookState(action_menu_entity_id, action_menu_where)
-            return
-        if entity_type_value == "dog":
-            DogActionLookState(action_menu_where)
-            return
-        show_entity_examine_main_ui_state(action_menu_entity_type, action_menu_entity_id, action_menu_where, action_menu_entity_data)
-
-    def _normalize_entity_action_data(entity_type="", entity_id="", where_id="", entity_data=None):
-        normalized = npc_meta(entity_id) if str(entity_type or "").strip().lower() == "npc" else {}
+    def npc_action_data(npc_id="", where_id="", entity_data=None):
+        normalized = npc_meta(npc_id)
         normalized.update(dict(entity_data or {}))
-        normalized["entity_type"] = str(entity_type or normalized.get("entity_type", "npc") or "npc").strip().lower()
-        normalized["entity_id"] = str(entity_id or normalized.get("entity_id", "") or "").strip()
+        normalized["entity_type"] = "npc"
+        normalized["entity_id"] = str(npc_id or normalized.get("entity_id", "") or normalized.get("npc_id", "") or "").strip()
+        normalized["npc_id"] = normalized["entity_id"]
         normalized["where_id"] = str(where_id or normalized.get("where_id", "") or CurLoc or "").strip()
-        if normalized["entity_type"] == "npc":
-            if not str(normalized.get("talk_label", "") or "").strip():
-                normalized["talk_label"] = npc_talk_label(normalized["entity_id"])
-            normalized["talk_args"] = tuple(normalized.get("talk_args", npc_talk_args(normalized["entity_id"])) or ())
-            if not str(normalized.get("examine_label", "") or "").strip():
-                normalized["examine_label"] = npc_examine_label(normalized["entity_id"])
-            if not list(normalized.get("actions", []) or []):
-                normalized["actions"] = npc_action_ids(normalized["entity_id"])
-        elif normalized["entity_type"] == "dog":
-            _dog_data = dog_action_data(normalized["where_id"])
-            normalized.update(dict(_dog_data))
-        else:
-            normalized["talk_label"] = str(normalized.get("talk_label", "") or "").strip()
-            normalized["talk_args"] = tuple(_character_action_entity_talk_args(normalized))
-            normalized["examine_label"] = str(normalized.get("examine_label", "") or "").strip()
-            normalized["actions"] = list(normalized.get("actions", []) or [])
-        normalized["examine_id"] = _character_action_text(normalized.get("examine_id", normalized["entity_id"]), normalized["entity_id"])
+        if not str(normalized.get("talk_label", "") or "").strip():
+            normalized["talk_label"] = npc_talk_label(normalized["entity_id"])
+        normalized["talk_args"] = tuple(normalized.get("talk_args", npc_talk_args(normalized["entity_id"])) or ())
+        if not str(normalized.get("examine_label", "") or "").strip():
+            normalized["examine_label"] = npc_examine_label(normalized["entity_id"])
+        if not list(normalized.get("actions", []) or []):
+            normalized["actions"] = npc_action_ids(normalized["entity_id"])
+        normalized["examine_id"] = str(normalized.get("examine_id", normalized["entity_id"]) or normalized["entity_id"])
         normalized["auto_card"] = bool(normalized.get("auto_card", False))
-        normalized["can_examine"] = bool(_entity_action_can_examine(normalized["entity_type"], normalized["entity_id"], normalized))
-        normalized["title"] = str(normalized.get("title", "") or entity_presented_name(normalized["entity_type"], normalized["entity_id"], normalized))
+        actions = set([str(action or "").strip().lower() for action in list(normalized.get("actions", []) or [])])
+        examine_target = str(normalized.get("examine_label", "") or "").strip()
+        normalized["can_examine"] = bool("look" in actions and (not examine_target or renpy.has_label(examine_target)))
+        normalized["title"] = str(normalized.get("title", "") or npc_display_name(normalized["entity_id"]))
         return normalized
-
-    def open_entity_action_menu_state(entity_type="", entity_id="", where_id="", entity_data=None):
-        entity_type_value = str(entity_type or "").strip().lower()
-        if entity_type_value == "dog":
-            open_dog_action_menu_state(where_id)
-            return
-        store = renpy.store
-        normalized = _normalize_entity_action_data(entity_type, entity_id, where_id, entity_data)
-        entity_id_value = str(normalized.get("entity_id", "") or "").strip()
-        entity_type_value = str(normalized.get("entity_type", "npc") or "npc").strip().lower()
-        entity_where = str(normalized.get("where_id", "") or CurLoc or "").strip()
-
-        store.action_menu_entity_type = entity_type_value
-        store.action_menu_entity_id = entity_id_value
-        store.action_menu_where = entity_where
-        store.action_menu_title = str(normalized.get("title", "") or "Персонаж")
-        store.action_menu_entity_data = dict(normalized)
-        store.action_menu_selected = entity_id_value
-        store.action_menu_actions = []
-        store.action_menu_specs = []
-
-        if entity_type_value == "player":
-            show_player_card_main_ui_state()
-            return
-
-        if entity_id_value:
-            show_npc_picture_main_ui_state(entity_id_value, entity_where, "idle", normalized)
-
-        actions = set([str(action or "").strip().lower() for action in list(normalized.get("actions", []) or []) if str(action or "").strip()])
-        social_available = True
-        if entity_type_value == "npc":
-            social_available = npc_social_actions_available_in_room(entity_id_value, entity_where)
-        can_talk = social_available and ("talk" in actions) and bool(str(normalized.get("talk_label", "") or "").strip() and renpy.has_label(str(normalized.get("talk_label", "") or "").strip()))
-        can_examine = ("look" in actions) and bool(normalized.get("can_examine", False))
-        if can_examine:
-            store.action_menu_specs.append({"id": "look", "text": "Осмотреть", "entity_type": entity_type_value, "entity_id": entity_id_value, "where_id": entity_where})
-        if can_talk:
-            store.action_menu_specs.append({"id": "talk", "text": "Поговорить", "entity_type": entity_type_value, "entity_id": entity_id_value, "where_id": entity_where})
-        if entity_type_value == "npc" and "flirt" in actions and npc_flirt_action_available(entity_id_value, entity_where):
-            store.action_menu_specs.append({"id": "flirt", "text": "Флиртовать", "entity_type": entity_type_value, "entity_id": entity_id_value, "where_id": entity_where})
-        if entity_type_value == "npc" and "gift" in actions and npc_gift_action_available(entity_id_value, entity_where):
-            store.action_menu_specs.append({"id": "gift", "text": "Подарить", "entity_type": entity_type_value, "entity_id": entity_id_value, "where_id": entity_where})
-        store.action_menu_specs.append({"id": "back", "text": "Назад"})
-
-        store.current_action_title = store.action_menu_title
-        store.current_action_content = None
-        store.current_action_items = [
-            MenuItem(str(spec.get("text", "") or ""), Call("ActionMenuRunSpec", str(spec.get("id", "") or ""), str(spec.get("entity_type", "") or ""), str(spec.get("entity_id", "") or ""), str(spec.get("where_id", "") or "")))
-            for spec in list(store.action_menu_specs or [])
-            if str(spec.get("id", "") or "") != "back"
-        ]
-        store.current_action_items.append(MenuItem("Назад", Function(action_menu_handle_back_state)))
-        store.action_menu_specs = []
-
-        restart_fn = getattr(renpy, "restart_interaction", None)
-        if callable(restart_fn):
-            restart_fn()
-
-    def _character_action_grid_entries(room):
-        entries = [{
-            "entity_type": "player",
-            "id": "you",
-            "title": "Стефан",
-            "where_id": str(getattr(room, "code_name", "") or CurLoc or ""),
-            "entity_data": {
-                "entity_type": "player",
-                "entity_id": "you",
-                "title": "Стефан",
-                "examine_id": "you",
-                "can_examine": True,
-            },
-        }]
-        if room is None or not hasattr(room, "visible_npcs"):
-            return entries
-
-        room_code = str(getattr(room, "code_name", "") or "")
-        seen_ids = set()
-        for npc in room.visible_npcs():
-            if not isinstance(npc, dict):
-                continue
-            npc_id = str(npc.get("npc_id", "") or "").strip()
-            if not npc_id:
-                continue
-            seen_ids.add(npc_id)
-            row_data = _normalize_entity_action_data("npc", npc_id, room_code, npc)
-            entries.append({
-                "entity_type": "npc",
-                "id": npc_id,
-                "title": str(row_data.get("title", "") or npc_id),
-                "where_id": room_code,
-                "entity_data": row_data,
-            })
-
-        if room_code == "TavernKitchen" and bool(TavernBreakfastEventActive):
-            for npc_id in list(tavern_breakfast_present_ids() or []):
-                npc_key = str(npc_id or "").strip().lower()
-                if not npc_key or npc_key in seen_ids:
-                    continue
-                row_data = _normalize_entity_action_data("npc", npc_key, room_code, npc_action_data_for_room(npc_key, room_code) or {})
-                entries.append({
-                    "entity_type": "npc",
-                    "id": npc_key,
-                    "title": str(row_data.get("title", "") or npc_key),
-                    "where_id": room_code,
-                    "entity_data": row_data,
-                })
-                seen_ids.add(npc_key)
-
-        if room_code and dog_is_available_here(room_code):
-            dog_data = _normalize_entity_action_data("dog", "dog", room_code, {})
-            entries.append({
-                "entity_type": "dog",
-                "id": "dog",
-                "title": str(dog_data.get("title", "") or "Пес"),
-                "where_id": room_code,
-                "entity_data": dog_data,
-            })
-        return entries[:9]
-
-
-label OpenEntityActionMenu(entity_type="", entity_id="", where_id="", entity_data=None):
-    $ open_entity_action_menu_state(entity_type, entity_id, where_id, entity_data)
-    return
-
-
-label OpenNpcActionMenu(npc_id="", where_id="", entity_data=None):
-    $ open_npc_action_menu_state(npc_id, where_id, entity_data)
-    return
-
-
-label NpcActionTalk(npc_id="", where_id="", entity_data=None):
-    $ NpcActionTalkState(npc_id, where_id, entity_data)
-    return
-
-
-label NpcActionLook(npc_id="", where_id="", entity_data=None):
-    $ NpcActionLookState(npc_id, where_id, entity_data)
-    return
-
-
-label ActionMenuHandleTalk:
-    $ action_menu_handle_talk_state()
-    return
-
-
-label ActionMenuHandleLook:
-    $ action_menu_handle_look_state()
-    return
-
-
-label ActionMenuHandleBack:
-    $ action_menu_handle_back_state()
-    return
-
 
 label ShowAmandaCard:
     $ show_girl_card_main_ui_state("amanda")

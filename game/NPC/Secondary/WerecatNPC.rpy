@@ -422,14 +422,14 @@ label IntWerecatTalkRefresh(room_code=""):
         MenuItem("Осмотреть", Function(show_werecat_card_main_ui_state)),
     ]
     if int(WerecatNPCState.get("pet_day", -1) or -1) != int(dayspassed or 0):
-        $ current_action_items.append(MenuItem("Погладить кошку", Function(main_ui_call_label, "IntWerecatTalkApply", _werecat_room, "pet")))
+        $ current_action_items.append(MenuItem("Погладить кошку", Call("IntWerecatTalkApply", _werecat_room, "pet")))
     if int(WerecatNPCState.get("milk_day", -1) or -1) != int(dayspassed or 0) and werecat_has_milk_available(_werecat_room):
-        $ current_action_items.append(MenuItem("Дать молока", Function(main_ui_call_label, "IntWerecatTalkApply", _werecat_room, "milk")))
+        $ current_action_items.append(MenuItem("Дать молока", Call("IntWerecatTalkApply", _werecat_room, "milk")))
     if int(WerecatNPCState.get("play_day", -1) or -1) != int(dayspassed or 0):
-        $ current_action_items.append(MenuItem("Поиграть с кошкой", Function(main_ui_call_label, "IntWerecatTalkApply", _werecat_room, "play")))
-    $ current_action_items.append(MenuItem("Понаблюдать за кошкой", Function(main_ui_call_label, "IntWerecatTalkApply", _werecat_room, "observe")))
+        $ current_action_items.append(MenuItem("Поиграть с кошкой", Call("IntWerecatTalkApply", _werecat_room, "play")))
+    $ current_action_items.append(MenuItem("Понаблюдать за кошкой", Call("IntWerecatTalkApply", _werecat_room, "observe")))
     if werecat_can_play_with_dog(_werecat_room):
-        $ current_action_items.append(MenuItem("Поиграть с кошкой и псом", Function(main_ui_call_label, "IntWerecatTalkApply", _werecat_room, "dog_play")))
+        $ current_action_items.append(MenuItem("Поиграть с кошкой и псом", Call("IntWerecatTalkApply", _werecat_room, "dog_play")))
     $ current_action_items.append(MenuItem("Назад", Function(main_ui_end_talk_state)))
     return
 
@@ -515,7 +515,9 @@ label ShowWerecatCard(return_label=""):
 
 label HideWerecatCard(return_label=""):
     if str(return_label or "") == "__main_ui__":
-        $ main_ui_restore_room_scene_state()
+        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+        if _room_label:
+            jump expression _room_label
         return
     hide screen werecat_card_overlay
     if str(return_label or "") != "":

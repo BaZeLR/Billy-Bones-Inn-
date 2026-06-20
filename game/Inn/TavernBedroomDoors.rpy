@@ -10,17 +10,7 @@ init -20 python:
     def bedroom_door_default_locked(room_code=""):
         room_key = str(room_code or "").strip()
         if room_key == "TavernSandraRoom":
-            try:
-                friends_map = Friends if isinstance(Friends, dict) else {}
-            except Exception:
-                friends_map = {}
-            try:
-                sandra_flags = SandraVar if isinstance(SandraVar, dict) else {}
-            except Exception:
-                sandra_flags = {}
-            if not friends_map and not sandra_flags:
-                return True
-            return not (int(friends_map.get("sandra", 0) or 0) >= 10 or int(sandra_flags.get("RoomUnlocked", 0) or 0) == 1)
+            return not (int(Sandra.rel or 0) >= 10 or Sandra.room_unlocked())
         return False
 
     def bedroom_door_locked(room_code="", default_locked=None):
@@ -54,7 +44,7 @@ init -20 python:
         return GameObject(
             object_id=object_key,
             name="Дверь",
-            description=bedroom_door_status_text(room_key, owner),
+            description="Дверь в комнату %s." % owner,
             actions=[
                 ObjectAction(
                     action_id="inspect_door",
@@ -64,7 +54,7 @@ init -20 python:
                     args=(room_key, owner, object_key),
                 ),
             ],
-            locked=bedroom_door_locked(room_key),
+            locked=False,
             custom_properties={"room_code": room_key, "owner_name": owner},
         )
 

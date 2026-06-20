@@ -1,11 +1,14 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default CityGuardSavedText = ""
-
 init python:
     def city_guard_open_now():
-        return (week == 2 and time == 2) or (week == 5 and time == 0)
+        current_weekday = int(calendar_v2.week or 0)
+        if current_weekday == 2:
+            return calendar_v2.is_between_clock(11, 0, 12, 59)
+        if current_weekday == 5:
+            return calendar_v2.is_between_clock(6, 0, 7, 59)
+        return False
 
     def city_guard_closed_now():
         return not city_guard_open_now()
@@ -78,18 +81,14 @@ label CityGuard:
     else:
         $ MainTxt = "Вы зашли в приемную городской стражи."
     $ CurLocDesc = MainTxt
-    $ CityGuardSavedText = MainTxt
     $ CityGuardRoom.mark_visited()
 
-    if int(MongolVar.get("StocksArrestDay", -1) or -1) >= 0 and int(MongolVar.get("StocksSeen", 0) or 0) == 0:
-        call story_clara_market_booklet_city_guard_direct
-    else:
-        call RoomEnterEventGate(CurLoc, False)
+    call RoomEnterEventGate(CurLoc, False)
 
     if CityGuardRoom.is_open(week, time):
-        call ShowImage("Zimmer", "", "Portrait1")
+        vscene "images/zimmer/Portrait1.jpg"
     else:
-        call ShowImage("general", "", "cityguard")
+        vscene "images/general/cityguard.jpg"
 
     if navigation_only_mode_enabled():
         $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
@@ -108,95 +107,26 @@ label CityGuardBuildActions:
     $ current_action_content = None
     $ current_action_items = []
 
-    python:
-        for _guard_object in CityGuardRoom.visible_objects():
-            current_action_items.append(MenuItem(_guard_object.name, Call("CityGuardObjectMenu", _guard_object.object_id)))
+    if len(CityGuardRoom.visible_objects()) > 0:
+        $ current_action_items.append(MenuItem("Расписные доски", Call("CityGuardShowPlacat")))
 
     if CityGuardRoom.is_open(week, time):
         $ current_action_items.append(MenuItem("Десятник Циммерман", Call("IntZimmerTalk")))
-    if (not CityGuardRoom.is_open(week, time)) and int(MongolVar.get("StocksArrestDay", -1) or -1) >= 0 and int(MongolVar.get("StocksSeen", 0) or 0) == 0:
-        $ current_action_items.append(MenuItem("Подойти к колодкам у караулки", Call("story_clara_market_booklet_city_guard_direct")))
-    if int(MongolVar.get("StocksSeen", 0) or 0) == 1 and int(MongolVar.get("StocksFoodDay", -1) or -1) < 0 and int(time or 0) >= 4 and int(productnum or 0) > 0:
-        $ current_action_items.append(MenuItem("Передать Монголу еду из трактира", Call("story_clara_market_booklet_feed_mongol_direct")))
-    if int(DraupnirVar.get("MongolLockpickOrderDay", -1) or -1) >= 0 and int(MongolVar.get("StocksReleased", 0) or 0) == 0 and int(time or 0) >= 4 and int(dayspassed or 0) > int(MongolVar.get("StocksFoodDay", -1) or -1) and int(productnum or 0) > 0 and int(winenum or 0) > 0:
-        $ current_action_items.append(MenuItem("Послать стражникам вино и угощение, а затем освободить Монгола", Call("story_clara_market_booklet_release_mongol_direct")))
+    if story_event_available("CityGuard", "enter"):
+        $ current_action_items.append(MenuItem("Осмотреть колодки у караулки", Call("checkTriggers", "CityGuard", "enter", 0)))
 
     $ current_action_items.append(MenuItem("Вернуться на рынок", Jump("MarketPlace")))
     return
 
 
-label CityGuardObjectMenu(object_id=""):
-    $ _city_guard_object = None
-    python:
-        for _room_object in CityGuardRoom.visible_objects():
-            if getattr(_room_object, "object_id", "") == str(object_id or ""):
-                _city_guard_object = _room_object
-                break
-
-    if _city_guard_object is None:
-        call CityGuardBuildActions
-        return
-
-    $ MainTxt = _city_guard_object.description
-    $ CurLocDesc = MainTxt
-    $ current_action_title = _city_guard_object.name
-    $ current_action_content = None
-    $ current_action_items = []
-
-    python:
-        for _guard_action in _city_guard_object.visible_actions():
-            if _guard_action.hook == "text":
-                current_action_items.append(MenuItem(_guard_action.label, Call("CityGuardObjectText", object_id, _guard_action.action_id)))
-            elif _guard_action.hook == "call" and str(_guard_action.target or "") != "":
-                _guard_args = tuple(getattr(_guard_action, "args", ()) or ())
-                current_action_items.append(MenuItem(_guard_action.label, Call(_guard_action.target, *_guard_args)))
-            elif _guard_action.hook == "jump" and str(_guard_action.target or "") != "":
-                current_action_items.append(MenuItem(_guard_action.label, Jump(_guard_action.target)))
-
-    $ current_action_items.append(MenuItem("Назад", Call("CityGuardRestore")))
-    return
-
-
-label CityGuardObjectText(object_id="", action_id=""):
-    python:
-        _guard_text = ""
-        _guard_name = ""
-        for _room_object in CityGuardRoom.visible_objects():
-            if getattr(_room_object, "object_id", "") != str(object_id or ""):
-                continue
-            _guard_name = str(getattr(_room_object, "name", "") or "")
-            for _room_action in _room_object.visible_actions():
-                if getattr(_room_action, "action_id", "") == str(action_id or ""):
-                    _guard_text = str(_room_action.target or "")
-                    break
-            break
-        if _guard_text:
-            MainTxt = _guard_text
-            CurLocDesc = _guard_text
-            current_action_title = _guard_name or "Действия"
-    call CityGuardObjectMenu(object_id)
-    return
-
-
 label CityGuardShowPlacat:
-    $ RandVar = renpy.random.randint(1, 8)
+    $ RandVar = procedural_randint(1, 8, "city_guard_placard_%s_%s" % (dayspassed, int(clock_minutes or 0)))
     $ MainTxt = CityGuardPlacat[RandVar]
     $ CurLocDesc = MainTxt
-    call ShowImage("general", "soldierplakat", "plakat" + str(RandVar))
+    vscene "images/general/soldierplakat/plakat[RandVar].jpg"
     $ current_action_title = "Расписные доски"
     $ current_action_content = None
     $ current_action_items = []
     $ current_action_items.append(MenuItem("Посмотреть на другую доску", Call("CityGuardShowPlacat")))
-    $ current_action_items.append(MenuItem("Назад", Call("CityGuardRestore")))
-    return
-
-
-label CityGuardRestore:
-    $ MainTxt = CityGuardSavedText
-    $ CurLocDesc = MainTxt
-    if CityGuardRoom.is_open(week, time):
-        call ShowImage("Zimmer", "", "Portrait1")
-    else:
-        call ShowImage("general", "", "cityguard")
-    call CityGuardBuildActions
+    $ current_action_items.append(MenuItem("Назад", Jump("CityGuard")))
     return

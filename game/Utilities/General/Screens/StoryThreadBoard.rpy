@@ -59,6 +59,7 @@ init python:
         "story_georgett_church_service_with_liza": "Georgette church: Liza witnesses",
         "story_georgett_church_after_sermon": "Georgette church: after-sermon spy scene",
         "story_liza_church_after_sermon": "Lizette church: after-sermon scene",
+        "story_becky_church_after_sermon": "Becky church: after-sermon confession",
     }
 
     STORY_BOARD_ACTION_TITLES = {
@@ -93,6 +94,7 @@ init python:
         "story_georgett_church_service_with_liza": "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy",
         "story_georgett_church_after_sermon": "game/NPC/Girls/Georgett/IntGeorgettAfterCermon.rpy",
         "story_liza_church_after_sermon": "game/NPC/Girls/Liza/IntLizettAfterCermon.rpy",
+        "story_becky_church_after_sermon": "game/NPC/Girls/Becky/IntBeckyAfterCermon.rpy",
     }
 
     STORY_BOARD_COLORS = {

@@ -10,7 +10,7 @@ label ChurchServiceGeorgett:
         vscene "images/georgett/church/cermon.jpg"
     $ CurLocDesc = MainTxt
     $ Georgett.set_story_value("foundinchurch", 1)
-    $ findAvailableEvents(True)
+    $ findAvailableEvents(False)
     menu:
         "Предложить найти тихое место" if story_event_available("Church", "georgett_church_service_bench"):
             call checkTriggers("Church", "georgett_church_service_bench", 0)

@@ -124,7 +124,4 @@ label EventWineForDanceFinish:
         jump TavernKitchen
     elif _wine_return_room == "TavernMain":
         jump TavernMain
-    call RefreshCurrentActionMenu(_wine_return_room, "", True)
-    $ main_ui_restore_room_scene_state()
-    call ReturnToMainUI
-    return
+    jump expression _wine_return_room

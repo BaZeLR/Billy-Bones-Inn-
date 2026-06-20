@@ -91,11 +91,7 @@ init -20 python:
         if day_count >= 28:
             tractir_activate_achievement("first_month_survived")
 
-        try:
-            sandra_flags = SandraVar if isinstance(SandraVar, dict) else {}
-        except Exception:
-            sandra_flags = {}
-        if _tractir_progress_int(sandra_flags.get("SecuredFuture", 0), 0) > 0:
+        if _tractir_progress_int(Sandra.var.get("SecuredFuture", 0), 0) > 0:
             tractir_activate_achievement("sandra_secured_future")
 
         if notoriety_value >= 25:
@@ -111,30 +107,23 @@ init -20 python:
             return "bankrupt"
         if _tractir_progress_int(globals().get("tavernvisitors", 0), 0) <= 0:
             return "empty_tavern"
+        if _tractir_progress_int(Sandra.var.get("MaidRevengeEnding", 0), 0) > 0:
+            return "maid_revenge"
         try:
-            if _tractir_progress_int(SandraVar.get("MaidRevengeEnding", 0), 0) > 0:
-                return "maid_revenge"
-        except Exception:
-            pass
-        try:
-            if _tractir_progress_int(FightEnemyState.get("fatal_loss", 0), 0) > 0:
+            if _tractir_progress_int(fight_info().enemy_state.get("fatal_loss", 0), 0) > 0:
                 return "boss_death"
         except Exception:
             pass
         return ""
 
     def tractir_mark_maid_revenge_ready(reason=""):
-        try:
-            sandra_flags = SandraVar if isinstance(SandraVar, dict) else {}
-        except Exception:
-            return False
-        sandra_flags["MaidRevengeEnding"] = 1
-        sandra_flags["MaidRevengeReason"] = str(reason or "")
+        Sandra.var["MaidRevengeEnding"] = 1
+        Sandra.var["MaidRevengeReason"] = str(reason or "")
         return True
 
     def tractir_mark_boss_fatal_loss(enemy_id=""):
         try:
-            fight_state = FightEnemyState if isinstance(FightEnemyState, dict) else {}
+            fight_state = fight_info().enemy_state
         except Exception:
             return False
         fight_state["fatal_loss"] = 1
@@ -143,16 +132,12 @@ init -20 python:
 
     def tractir_apply_sandra_secured_future():
         global cancumdaily
-        try:
-            sandra_flags = SandraVar if isinstance(SandraVar, dict) else {}
-        except Exception:
-            return False
         if _tractir_progress_int(globals().get("dayspassed", 0), 0) < 28:
             return False
-        if _tractir_progress_int(sandra_flags.get("SecuredFuture", 0), 0) > 0:
+        if _tractir_progress_int(Sandra.var.get("SecuredFuture", 0), 0) > 0:
             return False
-        sandra_flags["SecuredFuture"] = 1
-        sandra_flags["SecuredFutureDay"] = _tractir_progress_int(globals().get("dayspassed", 0), 0)
+        Sandra.var["SecuredFuture"] = 1
+        Sandra.var["SecuredFutureDay"] = _tractir_progress_int(globals().get("dayspassed", 0), 0)
         cancumdaily = max(1, _tractir_progress_int(cancumdaily, 2) - 1)
         tractir_activate_achievement("sandra_secured_future")
         try:

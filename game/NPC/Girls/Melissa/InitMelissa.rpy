@@ -104,32 +104,15 @@ init -1 python:
         npc_daily_schedule_build_all(True)
         npc_schedule_sync_currentloc(schedule_name)
 
-    def melissa_after_load_schedule():
-        try:
-            if "melissa" in list(RealName.keys()):
-                peopleData["melissa"] = MelissaStaticData
-                Melissa.var = MelissaVar
-                Melissa.sync_from_melissa_maps()
-                Melissa.ensure_story_defaults()
-                peopleInfo["melissa"] = Melissa
-                if Melissa not in girls:
-                    girls.append(Melissa)
-                melissa_install_schedule("melissa")
-        except Exception:
-            pass
-
-    config.after_load_callbacks.append(melissa_after_load_schedule)
-
 label InitMelissa:
     python:
         GirlName = Melissa.code_name
         peopleData[GirlName] = MelissaStaticData
-        Melissa.var = MelissaVar
         Melissa.initialize_new_game_state()
         peopleInfo[GirlName] = Melissa
         if Melissa not in girls:
             girls.append(Melissa)
-        bodymodel_sync_character(GirlName, RealName[GirlName], "female")
+        bodymodel_sync_character(GirlName, Melissa.data.fullname, "female")
         Melissa.install_schedule()
 
     return
@@ -174,6 +157,8 @@ init python:
             "roof_repair_order_day": -1,
             "roof_repair_complete_day": -1,
             "breakfast_tease_day": -1,
+            "sex_times_today": 0,
+            "harass_instruction": "",
         }
 
     class MelissaData(PeopleData):
@@ -194,9 +179,12 @@ init python:
 
     class MelissaInfo(Girl):
         """Melissa runtime: tavern work, bats quest, social state, body state."""
+        unknown_name = "Незнакомка"
+
         def __init__(self):
             super().__init__("melissa")
             self.code_name = "melissa"
+            self.uses_own_var_state = True
             self.data = MelissaStaticData
             self.age = 18
             self.rel = 5
@@ -279,10 +267,10 @@ init python:
             self.ensure_story_defaults()
 
         def update(self):
-            super(MelissaInfo, self).update()
+            self.name = self.code_name
             self.data = MelissaStaticData
             self.relationship = self.rel
-            self.sync_from_melissa_maps()
+            self.ensure_story_defaults()
             return self
 
         def ensure_story_defaults(self):
@@ -292,116 +280,20 @@ init python:
                 self.var.setdefault(key, value)
             return self.var
 
-        def sync_from_melissa_maps(self):
-            self.rel = people_to_int(Friends.get("melissa", self.rel), self.rel)
-            self.relationship = self.rel
-            self.openness = people_to_int(otkroven.get("melissa", self.openness), self.openness)
-            self.corruption = people_to_int(sluttiness.get("melissa", self.corruption), self.corruption)
-            self.drunk = people_to_int(Drunk.get("melissa", self.drunk), self.drunk)
-            self.talked_today = people_to_int(TalkedToday.get("melissa", self.talked_today), self.talked_today)
-            self.flirted_today = people_to_int(FlirtedToday.get("melissa", self.flirted_today), self.flirted_today)
-            self.gifted_today = people_to_int(GiftedToday.get("melissa", self.gifted_today), self.gifted_today)
-            self.asked_today = people_to_int(AskedToday.get("melissa", self.asked_today), self.asked_today)
-            self.fucked_today = people_to_int(FuckedToday.get("melissa", self.fucked_today), self.fucked_today)
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                if "melissa" in table:
-                    self.stats[stat_key] = table.get("melissa")
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                if "melissa" in table:
-                    self.jobs[job_key] = table.get("melissa")
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                if "melissa" in table:
-                    self.skills[skill_key] = table.get("melissa")
-            self.ensure_story_defaults()
-            return self
-
-        def sync_melissa_maps(self):
-            name = self.code_name
-            RealName[name] = self.data.fullname
-            RealName2[name] = self.data.genitive
-            RealName3[name] = self.data.dative
-            age_girls[name] = people_to_int(self.age, 18)
-            DateOfBirth[name] = dict(self.data.birth_date)
-            girltextdesc[name] = self.data.description
-            knowsMC[name] = bool(self.known)
-            Friends[name] = people_to_int(self.rel, 0)
-            otkroven[name] = people_to_int(self.openness, 0)
-            sluttiness[name] = people_to_int(self.corruption, 0)
-            Drunk[name] = people_to_int(self.drunk, 0)
-            TalkedToday[name] = people_to_int(self.talked_today, 0)
-            FlirtedToday[name] = people_to_int(self.flirted_today, 0)
-            GiftedToday[name] = people_to_int(self.gifted_today, 0)
-            AskedToday[name] = people_to_int(self.asked_today, 0)
-            FuckedToday[name] = people_to_int(self.fucked_today, 0)
-            CurrentLoc[name] = str(self.current_location or "TavernMain")
-            GiftPreferences[name] = list(self.gift_preferences)
-            dressdefault[name] = self.wardrobe["current_dress"]
-            bradef[name] = self.wardrobe["current_underwear"]["bra"]
-            pantiesdef[name] = self.wardrobe["current_underwear"]["panties"]
-            legsdef[name] = self.wardrobe["current_underwear"]["legs"]
-            shoesdef[name] = self.wardrobe["current_underwear"]["shoes"]
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                table[name] = self.stats.get(stat_key)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                table[name] = self.skills.get(skill_key, 0)
-            self.ensure_story_defaults()
-            return self
-
         def initialize_new_game_state(self):
-            self.var = MelissaVar
+            self.data = MelissaStaticData
+            self.known = True
             self.ensure_story_defaults()
-            self.sync_melissa_maps()
             return self
 
         def reset_daily(self, full=False):
             super(MelissaInfo, self).reset_daily(full)
-            self.talked_today = 0
-            self.flirted_today = 0
-            self.gifted_today = 0
-            self.asked_today = 0
-            self.fucked_today = 0
-            self.drunk = 0
-            self.sync_melissa_maps()
+            self.ensure_story_defaults()
+            self.var["private_context_day"] = -1
+            self.var["private_context_origin"] = ""
+            self.var["private_context_place"] = ""
+            self.var["private_place_heat"] = 0
+            self.var["sex_times_today"] = 0
             return self
 
         def install_schedule(self):
@@ -426,7 +318,6 @@ init python:
                 self.var["roof_repair_complete_day"] = -1
                 self.var["roof_repair_order_day"] = -1
             self.var["bats_episode"] = stage
-            self.sync_melissa_maps()
             return stage >= 8 or self.bats_repair_complete()
 
         def temp_room_active(self, room_code="", time_value=None):
@@ -537,18 +428,15 @@ init python:
             self.var["roof_repair_order_day"] = -1
             self.var["AskedMCToSolveRoomProblem"] = 0
             self.current_location = "TavernMelissaRoom"
-            self.sync_melissa_maps()
             return True
 
         def add_trust(self, amount, cap=20):
             self.rel = min(people_to_int(cap, 20), max(0, people_to_int(self.rel, 0) + people_to_int(amount, 0)))
             self.relationship = self.rel
-            self.sync_melissa_maps()
             return self.rel
 
         def add_openness(self, amount, cap=20):
             self.openness = min(people_to_int(cap, 20), max(0, people_to_int(self.openness, 0) + people_to_int(amount, 0)))
-            self.sync_melissa_maps()
             return self.openness
 
 define MelissaStaticData = MelissaData()

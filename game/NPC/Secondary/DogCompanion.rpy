@@ -269,6 +269,20 @@ init -5 python:
         def is_alive(self):
             return int(self.health or 0) > 0
 
+        @property
+        def state_key(self):
+            if self.owned:
+                return "adopted"
+            return "stray"
+
+        @property
+        def state_label(self):
+            if self.owned:
+                return "приученный пес"
+            if self.met:
+                return "знакомый бродячий пес"
+            return "бродячий пес"
+
     def ensure_dog_runtime():
         global dog
         if isinstance(dog, DogCompanion):
@@ -364,9 +378,24 @@ init -5 python:
 
     def dog_display_name():
         d = ensure_dog_runtime()
-        if d.owned:
+        if d.state_key == "adopted":
             return str(d.name or "Пес")
         return "Бродячий пес"
+
+    def dog_action_data(where_id=""):
+        room_code = str(where_id or CurLoc or "").strip()
+        return {
+            "entity_type": "dog",
+            "entity_id": "dog",
+            "title": str(dog_display_name() or "Пес"),
+            "talk_label": "IntDogTalk",
+            "talk_args": (room_code,),
+            "examine_id": "dog",
+            "examine_label": "",
+            "actions": ["look", "talk"],
+            "can_examine": True,
+            "auto_card": True,
+        }
 
     def dog_sync_profile():
         d = ensure_dog_runtime()
@@ -399,6 +428,7 @@ init -5 python:
     def dog_card_stat_rows():
         d = ensure_dog_runtime()
         return [
+            ("Состояние", str(d.state_label)),
             ("Уровень", str(d.level)),
             ("Лояльность", "%s / %s" % (str(d.loyalty), str(d.max_loyalty))),
             ("Здоровье", "%s / %s" % (str(d.health), str(d.max_health))),
@@ -410,7 +440,7 @@ init -5 python:
     def dog_card_lines():
         d = ensure_dog_runtime()
         lines = []
-        if not d.owned:
+        if d.state_key == "stray":
             lines.append("Бродячий пес, который пока держится настороженно и не подпускает к себе кого попало.")
             if player_has_bone():
                 lines.append("Похоже, его можно попробовать приманить костью.")
@@ -432,7 +462,7 @@ init -5 python:
     def dog_talk_picture_path(room_code=""):
         d = ensure_dog_runtime()
         room_key = str(room_code or CurLoc or "").strip()
-        if not d.owned:
+        if d.state_key == "stray":
             return dog_card_portrait_path()
         if bool(d.booth_built) and (not bool(d.in_company)) and room_key == "Backyard":
             return dog_card_portrait_path()
@@ -443,7 +473,7 @@ init -5 python:
     def dog_talk_intro_text(room_code=""):
         d = ensure_dog_runtime()
         room_key = str(room_code or CurLoc or "").strip()
-        if not d.owned:
+        if d.state_key == "stray":
             if not bool(d.met):
                 return "Небольшой, но крепкий бродячий пес держится настороженно и смотрит на вас издалека. Его можно осторожно позвать, но без кости он может не довериться."
             if int(d.bones_given or 0) <= 0:
@@ -466,44 +496,77 @@ init -5 python:
             return items
         if bool(include_card):
             items.append(MenuItem("Осмотреть", Function(show_dog_card_main_ui_state, room_key)))
-        if not d.owned:
+        if d.state_key == "stray":
             if not bool(d.met):
-                items.append(MenuItem("Позвать пса", Function(main_ui_call_label, "IntDogTalkApply", room_key, "call_stray")))
+                items.append(MenuItem("Позвать пса", Call("IntDogTalkApply", room_key, "call_stray")))
             else:
-                items.append(MenuItem("Попробовать погладить", Function(main_ui_call_label, "IntDogTalkApply", room_key, "pet_stray")))
-                items.append(MenuItem("Попробовать поиграть", Function(main_ui_call_label, "IntDogTalkApply", room_key, "play_stray")))
+                items.append(MenuItem("Попробовать погладить", Call("IntDogTalkApply", room_key, "pet_stray")))
+                items.append(MenuItem("Попробовать поиграть", Call("IntDogTalkApply", room_key, "play_stray")))
                 if player_has_bone():
-                    items.append(MenuItem("Дать кость", Function(main_ui_call_label, "IntDogTalkApply", room_key, "stray_bone")))
+                    items.append(MenuItem("Дать кость", Call("IntDogTalkApply", room_key, "stray_bone")))
                 if dog_can_adopt_stray():
-                    items.append(MenuItem("Надеть ошейник и забрать домой", Function(main_ui_call_label, "IntDogTalkApply", room_key, "adopt")))
+                    items.append(MenuItem("Надеть ошейник и забрать домой", Call("IntDogTalkApply", room_key, "adopt")))
         else:
             if int(d.last_play_day or -1) != int(dayspassed or 0):
-                items.append(MenuItem("Поиграть с псом", Function(main_ui_call_label, "IntDogTalkApply", room_key, "play")))
+                items.append(MenuItem("Поиграть с псом", Call("IntDogTalkApply", room_key, "play")))
             if int(d.last_train_day or -1) != int(dayspassed or 0):
-                items.append(MenuItem("Позаниматься дрессировкой", Function(main_ui_call_label, "IntDogTalkApply", room_key, "train")))
+                items.append(MenuItem("Позаниматься дрессировкой", Call("IntDogTalkApply", room_key, "train")))
             if player_has_bone():
-                items.append(MenuItem("Угостить пса костью", Function(main_ui_call_label, "IntDogTalkApply", room_key, "bone")))
-                items.append(MenuItem("Наградить костью за дрессировку", Function(main_ui_call_label, "IntDogTalkApply", room_key, "train_bone")))
+                items.append(MenuItem("Угостить пса костью", Call("IntDogTalkApply", room_key, "bone")))
+                items.append(MenuItem("Наградить костью за дрессировку", Call("IntDogTalkApply", room_key, "train_bone")))
             if d.in_company:
-                items.append(MenuItem("Оставить сторожить дом", Function(main_ui_call_label, "IntDogTalkApply", room_key, "stay")))
+                items.append(MenuItem("Оставить сторожить дом", Call("IntDogTalkApply", room_key, "stay")))
             else:
-                items.append(MenuItem("Взять пса на охоту", Function(main_ui_call_label, "IntDogTalkApply", room_key, "hunt")))
+                items.append(MenuItem("Взять пса на охоту", Call("IntDogTalkApply", room_key, "hunt")))
                 if d.booth_built and room_key.startswith("Backyard"):
-                    items.append(MenuItem("Оставить сторожить дом", Function(main_ui_call_label, "IntDogTalkApply", room_key, "stay")))
+                    items.append(MenuItem("Оставить сторожить дом", Call("IntDogTalkApply", room_key, "stay")))
                 for household_id in dog_household_walk_candidates(room_key):
-                    items.append(MenuItem("Попросить %s погулять с псом" % _action_display_name(household_id), Function(main_ui_call_label, "IntDogTalkApply", room_key, "household_walk:" + str(household_id))))
+                    items.append(MenuItem("Попросить %s погулять с псом" % _action_display_name(household_id), Call("IntDogTalkApply", room_key, "household_walk:" + str(household_id))))
         items.append(MenuItem("Назад", Function(main_ui_end_talk_state)))
         return items
 
     def show_dog_card_main_ui_state(room_code=""):
-        import renpy as renpy_pkg
-        store = renpy_pkg.store
+        global UI_mode, UI_selected_char, current_action_title, current_action_content, current_action_items
         room_key = str(room_code or CurLoc or "").strip()
-        store.UI_mode = "dog"
-        store.UI_selected_char = "dog"
-        store.current_action_title = dog_card_title()
-        store.current_action_content = None
-        store.current_action_items = dog_main_ui_action_items(room_key, include_card=False)
+        UI_mode = "dog"
+        UI_selected_char = "dog"
+        current_action_title = dog_card_title()
+        current_action_content = None
+        current_action_items = dog_main_ui_action_items(room_key, include_card=False)
+        restart_fn = getattr(renpy_module, "restart_interaction", None)
+        if callable(restart_fn):
+            restart_fn()
+
+    def dog_action_talk_state(room_code=""):
+        room_key = str(room_code or CurLoc or "").strip()
+        picture_path = str(dog_talk_picture_path(room_key) or "").strip()
+        if picture_path:
+            try:
+                ShowImage("", "", picture_path)
+            except (AttributeError, NameError, TypeError, ValueError):
+                global _layout_last_picture
+                _layout_last_picture = picture_path
+        renpy_module.call_in_new_context("IntDogTalk", room_key)
+
+    def dog_action_look_state(room_code=""):
+        show_dog_card_main_ui_state(room_code)
+
+    def dog_open_action_menu_state(room_code=""):
+        global _layout_last_picture, current_action_title, current_action_content, current_action_items
+        room_key = str(room_code or CurLoc or "").strip()
+        dog_data = dog_action_data(room_key)
+
+        picture_path = str(dog_talk_picture_path(room_key) or "").strip()
+        if picture_path:
+            try:
+                ShowImage("", "", picture_path)
+            except (AttributeError, NameError, TypeError, ValueError):
+                _layout_last_picture = picture_path
+
+        current_action_title = str(dog_data.get("title", "") or "Пес")
+        current_action_content = None
+        current_action_items = dog_main_ui_action_items(room_key, include_card=True)
+
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
@@ -613,7 +676,9 @@ label ShowDogCard(return_label=""):
 
 label HideDogCard(return_label=""):
     if str(return_label or "") == "__main_ui__":
-        $ main_ui_restore_room_scene_state()
+        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+        if _room_label:
+            jump expression _room_label
         return
     hide screen dog_card_overlay
     if str(return_label or "") != "":
@@ -797,8 +862,8 @@ label IntDogAdoptNameMenu(room_code=""):
     $ current_action_items = []
     python:
         for _dog_name_option in dog_name_options():
-            current_action_items.append(MenuItem(str(_dog_name_option), Function(main_ui_call_label, "IntDogTalkApply", _dog_room, "adopt_name:" + str(_dog_name_option))))
-        current_action_items.append(MenuItem("Назад", Function(main_ui_call_label, "IntDogTalkRefresh", _dog_room)))
+            current_action_items.append(MenuItem(str(_dog_name_option), Call("IntDogTalkApply", _dog_room, "adopt_name:" + str(_dog_name_option))))
+        current_action_items.append(MenuItem("Назад", Call("IntDogTalkRefresh", _dog_room)))
     return
 
 

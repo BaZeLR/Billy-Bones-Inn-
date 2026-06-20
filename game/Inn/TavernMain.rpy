@@ -302,7 +302,7 @@ label TavernMain:
             if time == 3:
                 call AddOthersSperm(GirlNameTS1, 7)
                 call AddOthersSperm(GirlNameTS2, 8)
-            $ _jobwhore = getattr(renpy.store, 'jobwhore', {})
+            $ _jobwhore = jobwhore if isinstance(jobwhore, dict) else {}
             if _jobwhore.get("liza", 0) == 1 and _jobwhore.get("georgett", 0) == 1:
                 python:
                     randvarPS = renpy.random.randint(1, 5)

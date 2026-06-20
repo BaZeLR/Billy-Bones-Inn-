@@ -32,7 +32,8 @@ label event_waitress_harrass_part2(girl_name, eyewitness=0, your_reaction1=0, ha
 
     if GirlRunAway == 0:
         $ CurEventDescPart2 += "\n"
-        $ girl_slut = sluttiness.get(girl_name, 0)
+        $ _girl_info = getPersonInfo(girl_name)
+        $ girl_slut = int(getattr(_girl_info, "corruption", 0) or 0)
 
         if girl_slut < 50:
             if harass_type == 1:

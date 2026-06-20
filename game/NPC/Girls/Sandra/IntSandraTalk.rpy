@@ -17,19 +17,19 @@ label IntSandraTalk(girl_name="sandra"):
         $ CurLocDesc = MainTxt
     $ current_action_items.extend(social_core_action_items(girl_name, "IntSandraTalk"))
 
-    if Talked.get(girl_name, 0) < 3 and Friends.get(girl_name, 0) < 5:
-        $ current_action_items.append(MenuItem("Попробовать помириться с Сандрой", Function(main_ui_call_label, "IntSandraReconcile", girl_name)))
+    if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:
+        $ current_action_items.append(MenuItem("Попробовать помириться с Сандрой", Call("IntSandraReconcile", girl_name)))
 
     if sandra_dress_change_can_buy(girl_name):
-        $ current_action_items.append(MenuItem("Предложить купить Сандре обновку", Function(main_ui_call_label, "IntSandraOfferBuyDress", girl_name)))
-    if AskedToday.get(girl_name, 0) == 0 and household_special_talk_available(girl_name):
+        $ current_action_items.append(MenuItem("Предложить купить Сандре обновку", Call("IntSandraOfferBuyDress", girl_name)))
+    if int(Sandra.asked_today or 0) == 0 and household_special_talk_available(girl_name):
         $ _sandra_special_entry = household_special_talk_entry(girl_name)
         if _sandra_special_entry is not None:
-            $ current_action_items.append(MenuItem(str(_sandra_special_entry.get("label", "Спросить о чем-то важном") or "Спросить о чем-то важном"), Function(main_ui_call_label, "IntSandraHouseholdInsight", girl_name)))
-    if AskedToday.get(girl_name, 0) == 0 and int(Friends.get(girl_name, 0) or 0) >= 15:
-        $ current_action_items.append(MenuItem("Спросить, что для нее сейчас важнее всего по хозяйству", Function(main_ui_call_label, "IntSandraHouseholdPriorities", girl_name)))
+            $ current_action_items.append(MenuItem(str(_sandra_special_entry.get("label", "Спросить о чем-то важном") or "Спросить о чем-то важном"), Call("IntSandraHouseholdInsight", girl_name)))
+    if int(Sandra.asked_today or 0) == 0 and int(Sandra.rel or 0) >= 15:
+        $ current_action_items.append(MenuItem("Спросить, что для нее сейчас важнее всего по хозяйству", Call("IntSandraHouseholdPriorities", girl_name)))
     if Sandra.sex_available() and str(CurLoc or "") == "TavernSandraRoom":
-        $ current_action_items.append(MenuItem("Уединиться с Сандрой", Function(main_ui_call_label, "SandraSexEngine", girl_name, CurLoc)))
+        $ current_action_items.append(MenuItem("Уединиться с Сандрой", Call("SandraSexEngine", girl_name, CurLoc)))
 
     $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
     return
@@ -42,12 +42,12 @@ label IntSandraReconcile(girl_name="sandra"):
         call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)
     else:
         $ MainTxt += "\n\nСандра холодно выслушала вас, отвернулась и пошла прочь, не говоря ни слова."
-    $ Talked[girl_name] = Talked.get(girl_name, 0) + 1
+    $ Sandra.mark_talked()
     $ CurLocDesc = MainTxt
     $ current_action_title = "Разговор с Сандрой"
     $ current_action_content = None
     $ current_action_items = [
-        MenuItem("Вернуться к разговору", Function(main_ui_call_label, "IntSandraTalk", girl_name)),
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
         MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
     ]
     return
@@ -61,37 +61,35 @@ label IntSandraHouseholdInsight(girl_name="sandra"):
         $ current_action_title = "Разговор с Сандрой"
         $ current_action_content = None
         $ current_action_items = [
-            MenuItem("Вернуться к разговору", Function(main_ui_call_label, "IntSandraTalk", girl_name)),
+            MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
             MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
         ]
         return
-    $ AskedToday[girl_name] = int(AskedToday.get(girl_name, 0) or 0) + 1
-    $ Talked[girl_name] = int(Talked.get(girl_name, 0) or 0) + 1
-    $ Friends[girl_name] = min(20, int(Friends.get(girl_name, 0) or 0) + 1)
-    $ otkroven[girl_name] = min(20, int(otkroven.get(girl_name, 0) or 0) + 1)
+    $ Sandra.mark_asked()
+    $ Sandra.mark_talked()
+    $ Sandra.change_social(friend_delta=1, open_delta=1)
     $ household_advance_special_talk(girl_name)
     $ MainTxt = str(_special_entry.get("text", "") or "")
     $ CurLocDesc = MainTxt
     $ current_action_title = "Разговор с Сандрой"
     $ current_action_content = None
     $ current_action_items = [
-        MenuItem("Вернуться к разговору", Function(main_ui_call_label, "IntSandraTalk", girl_name)),
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
         MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
     ]
     return
 
 
 label IntSandraHouseholdPriorities(girl_name="sandra"):
-    $ AskedToday[girl_name] = int(AskedToday.get(girl_name, 0) or 0) + 1
-    $ Talked[girl_name] = int(Talked.get(girl_name, 0) or 0) + 1
-    $ Friends[girl_name] = min(20, int(Friends.get(girl_name, 0) or 0) + 1)
-    $ otkroven[girl_name] = min(20, int(otkroven.get(girl_name, 0) or 0) + 1)
+    $ Sandra.mark_asked()
+    $ Sandra.mark_talked()
+    $ Sandra.change_social(friend_delta=1, open_delta=1)
     $ MainTxt = "Вы прямо спрашиваете Сандру, что для нее сейчас важнее всего в доме. Сандра не сразу отвечает, потом складывает руки на груди и говорит уже без обычного раздражения.\n\n\"Чтобы в трактире был порядок, утром люди не шарахались голодными по углам, а работа шла без лишней дури. Если домочадцы сыты, умыты и знают свое дело, дальше уже и с гостями проще. А еще мне важно, чтобы ты не забывал: хозяйство держится не на одних приказах, а на том, что люди видят в тебе хозяина, который умеет думать наперед.\""
     $ CurLocDesc = MainTxt
     $ current_action_title = "Разговор с Сандрой"
     $ current_action_content = None
     $ current_action_items = [
-        MenuItem("Вернуться к разговору", Function(main_ui_call_label, "IntSandraTalk", girl_name)),
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
         MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
     ]
     return

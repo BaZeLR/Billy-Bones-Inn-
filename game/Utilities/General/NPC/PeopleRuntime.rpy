@@ -46,18 +46,22 @@ init -999 python:
             "alber": "WineStore",
             "fran": "EllonaTemple",
             "gerhard": "Church",
-            "robin": "Forest",
+            "lucas": "BeckyHome",
+            "clara_fiance": "",
+            "robin": "BlackwoodRoad",
             "mongol": "",
             "zimmer": "CityGuard",
             "draupnir": "StolyarWorkshop",
-            "sergio": "",
+            "luisa": "HunterClub",
+            "sergio": "ArtisansQuarter",
+            "sergio_pet": "BarberShop",
         }.get(people_normalize_id(person), "")
 
     class PeopleData(object):
         def __init__(self, name, cname="", fullname="", genitive="", dative="",
-                     topics=None, num_icons=0, low_icon="", med_icon="", portrait="",
-                     default_location="", description="", age=0, schedule_entries=None,
-                     gift_preferences=None):
+                    topics=None, num_icons=0, low_icon="", med_icon="", portrait="",
+                    default_location="", description="", age=0, schedule_entries=None,
+                    gift_preferences=None):
             self.name = people_normalize_id(name)
             self.cname = str(cname or fullname or self.name)
             self.fullname = str(fullname or cname or self.name)
@@ -121,7 +125,7 @@ init -999 python:
 
     class PeopleInfo(object):
         def __init__(self, name, rel=0, talkToday=None, flirtToday=False, giftToday=False,
-                     gifts=None, var=None):
+                    gifts=None, var=None, unknown_name=""):
             self.name = people_normalize_id(name)
             self.rel = people_to_int(rel, 0)
             self.talkToday = set(talkToday or [])
@@ -137,6 +141,7 @@ init -999 python:
             self.openness = 0
             self.corruption = 0
             self.known = False
+            self.unknown_name = str(unknown_name or getattr(self.__class__, "unknown_name", "") or "")
             self.location = ""
             self.data = None
             self.var = var if var is not None else {}
@@ -145,6 +150,8 @@ init -999 python:
 
         def update(self):
             self.name = people_normalize_id(self.name)
+            if not getattr(self, "unknown_name", ""):
+                self.unknown_name = str(getattr(self.__class__, "unknown_name", "") or "")
             try:
                 self.data = peopleData.get(self.name, PeopleData(self.name))
             except Exception:
@@ -154,23 +161,19 @@ init -999 python:
 
         def sync_from_maps(self):
             try:
-                fmap = globals().get("Friends", {}) or {}
-                self.rel = people_to_int(fmap.get(self.name, self.rel), self.rel)
+                self.rel = people_to_int(people_get_map("Friends").get(self.name, self.rel), self.rel)
             except Exception:
                 pass
             try:
-                smap = globals().get("sluttiness", {}) or {}
-                self.corruption = people_to_int(smap.get(self.name, self.corruption), self.corruption)
+                self.corruption = people_to_int(people_get_map("sluttiness").get(self.name, self.corruption), self.corruption)
             except Exception:
                 pass
             try:
-                omap = globals().get("otkroven", {}) or {}
-                self.openness = people_to_int(omap.get(self.name, self.openness), self.openness)
+                self.openness = people_to_int(people_get_map("otkroven").get(self.name, self.openness), self.openness)
             except Exception:
                 pass
             try:
-                kmap = globals().get("knowsMC", {}) or {}
-                self.known = people_to_bool(kmap.get(self.name, self.known), self.known)
+                self.known = people_to_bool(people_get_map("knowsMC").get(self.name, self.known), self.known)
             except Exception:
                 pass
             try:
@@ -205,6 +208,72 @@ init -999 python:
                 people_get_map("CurrentLoc")[self.name] = str(self.location)
             return self
 
+        def mark_talked(self, amount=1):
+            value = people_to_int(amount, 1)
+            if hasattr(self, "talked_today"):
+                self.talked_today = people_to_int(getattr(self, "talked_today", 0), 0) + value
+            self.talkCountToday = people_to_int(getattr(self, "talkCountToday", 0), 0) + value
+            return self
+
+        def mark_asked(self, amount=1):
+            value = people_to_int(amount, 1)
+            if hasattr(self, "asked_today"):
+                self.asked_today = people_to_int(getattr(self, "asked_today", 0), 0) + value
+            self.askedCountToday = people_to_int(getattr(self, "askedCountToday", 0), 0) + value
+            return self
+
+        def mark_fucked(self, amount=1):
+            value = people_to_int(amount, 1)
+            if hasattr(self, "fucked_today"):
+                self.fucked_today = people_to_int(getattr(self, "fucked_today", 0), 0) + value
+            self.fuckedCountToday = people_to_int(getattr(self, "fuckedCountToday", 0), 0) + value
+            return self
+
+        def change_social(self, friend_delta=0, open_delta=0, corruption_delta=0):
+            self.rel = max(0, min(20, people_to_int(getattr(self, "rel", 0), 0) + people_to_int(friend_delta, 0)))
+            if hasattr(self, "relationship"):
+                self.relationship = self.rel
+            self.openness = max(0, min(20, people_to_int(getattr(self, "openness", 0), 0) + people_to_int(open_delta, 0)))
+            self.corruption = max(0, min(100, people_to_int(getattr(self, "corruption", 0), 0) + people_to_int(corruption_delta, 0)))
+            return self
+
+        def change_rebellion(self, amount=0, reason=""):
+            self.rebellion = max(0, min(100, people_to_int(getattr(self, "rebellion", 0), 0) + people_to_int(amount, 0)))
+            if isinstance(getattr(self, "reaction_state", None), dict):
+                self.reaction_state["last_rebellion_reason"] = str(reason or "")
+            return self.rebellion
+
+        def change_anger(self, amount=0, reason=""):
+            self.anger_with_player = max(0, min(100, people_to_int(getattr(self, "anger_with_player", 0), 0) + people_to_int(amount, 0)))
+            if isinstance(getattr(self, "reaction_state", None), dict):
+                self.reaction_state["last_anger_reason"] = str(reason or "")
+            return self.anger_with_player
+
+        def change_fear(self, amount=0, reason=""):
+            self.fear = max(0, min(100, people_to_int(getattr(self, "fear", 0), 0) + people_to_int(amount, 0)))
+            if isinstance(getattr(self, "reaction_state", None), dict):
+                self.reaction_state["last_fear_reason"] = str(reason or "")
+            return self.fear
+
+        def change_mana(self, amount=0, reason=""):
+            before = people_to_int(getattr(self, "mana", 0), 0)
+            self.mana = max(0, min(100, before + people_to_int(amount, 0)))
+            if isinstance(getattr(self, "reaction_state", None), dict):
+                self.reaction_state["last_mana_delta"] = self.mana - before
+                self.reaction_state["last_mana_reasons"] = [str(reason or "")] if str(reason or "") else []
+            return self.mana
+
+        def harass_instruction(self):
+            if not isinstance(getattr(self, "var", None), dict):
+                self.var = {}
+            return str(self.var.get("harass_instruction", "") or "")
+
+        def set_harass_instruction(self, value=""):
+            if not isinstance(getattr(self, "var", None), dict):
+                self.var = {}
+            self.var["harass_instruction"] = str(value or "")
+            return self.var["harass_instruction"]
+
         def reset_daily(self, full=False):
             """Reset per-girl daily interaction counters.
             Called from people_reset_daily_interactions() during sleep/NextDay.
@@ -219,20 +288,28 @@ init -999 python:
             self.drunk = 0
             self.flirtToday = False
             self.giftToday = False
+            if hasattr(self, "talked_today"):
+                self.talked_today = 0
+            if hasattr(self, "flirted_today"):
+                self.flirted_today = 0
+            if hasattr(self, "gifted_today"):
+                self.gifted_today = 0
+            if hasattr(self, "asked_today"):
+                self.asked_today = 0
+            if hasattr(self, "fucked_today"):
+                self.fucked_today = 0
 
-            # Keep legacy global dicts in sync for compatibility (most code still uses them directly)
-            for dname, attr in [
-                ("TalkedToday", "talkCountToday"),
-                ("FlirtedToday", "flirtCountToday"),
-                ("GiftedToday", "giftCountToday"),
-                ("AskedToday", "askedCountToday"),
-                ("FuckedToday", "fuckedCountToday"),
-                ("Drunk", "drunk"),
+            # Keep legacy store dicts in sync for compatibility (most code still uses them directly)
+            for dname in [
+                "TalkedToday",
+                "FlirtedToday",
+                "GiftedToday",
+                "AskedToday",
+                "FuckedToday",
+                "Drunk",
             ]:
                 try:
-                    d = globals().get(dname)
-                    if isinstance(d, dict):
-                        d[self.name] = 0
+                    people_get_map(dname)[self.name] = 0
                 except Exception:
                     pass
 
@@ -268,6 +345,8 @@ init -999 python:
         """Base for all NPCs (secondaries + simple). Keeps .var for legacy XXXVar tables."""
         def __init__(self, name, **kwargs):
             super().__init__(name, **kwargs)
+            if not self.unknown_name:
+                self.unknown_name = str(getattr(self.__class__, "unknown_name", "") or "")
             self.jobs = {}
             self.skills = {}
             self.clothing = {}
@@ -282,12 +361,26 @@ init -999 python:
                 return self
             for key in list(v.keys()):
                 if key.lower() in ("knowhim", "knowcomplaint", "mongolsafepass", "playerhandledrobin",
-                                   "missionupdatedbyplayer", "stocksreleased", "sawmomsex", "visitedhome",
-                                   "homesex", "eddiegeorg"):
+                                "missionupdatedbyplayer", "stocksreleased", "sawmomsex", "visitedhome",
+                                "homesex", "eddiegeorg"):
                     self.story_flags[key] = v[key]
             if "napVars" in v and isinstance(v["napVars"], dict):
                 self.story_flags.update(v["napVars"])
             return self
+
+        def mark_known(self):
+            self.known = True
+            people_get_map("knowsMC")[self.name] = True
+            try:
+                self.apply_to_maps()
+            except Exception:
+                pass
+            return True
+
+        def display_name(self):
+            if self.known:
+                return str(people_display_name(self.name) or self.name)
+            return str(getattr(self, "unknown_name", "") or self.name)
 
     class Girl(BaseNPC):
         """Girls with body layers, pregnancy, detailed history, lunar fertility."""
@@ -318,9 +411,9 @@ init -999 python:
         if not isinstance(secondary_npcs, list):
             secondary_npcs = []
         try:
-            pinfo = globals().get("peopleInfo", {}) or {}
-            girl_keys = set([people_normalize_id(row) for row in list(globals().get("AllGirlNames", []) or [])])
-            secondary_keys = set([people_normalize_id(row) for row in list(globals().get("SECONDARY_NPC_KEYS", []) or [])])
+            pinfo = peopleInfo if isinstance(peopleInfo, dict) else {}
+            girl_keys = set([people_normalize_id(row) for row in list(getattr(renpy.store, "AllGirlNames", []) or [])])
+            secondary_keys = set([people_normalize_id(row) for row in list(getattr(renpy.store, "SECONDARY_NPC_KEYS", []) or [])])
             for key, info in pinfo.items():
                 norm_key = people_normalize_id(key)
                 if (norm_key in girl_keys or isinstance(info, Girl)) and info not in girls:
@@ -335,7 +428,7 @@ init -999 python:
 init python:
     def people_get_map(name, default=None):
         try:
-            value = globals().get(name, default)
+            value = getattr(renpy.store, str(name or ""), default)
             if isinstance(value, dict):
                 return value
         except Exception:
@@ -436,8 +529,9 @@ init python:
             # Attach the legacy per-NPC dict (AmandaVar, RobinVar, etc.) as .var
             # so that old code using XXXVar[...] can gradually move to info.var[...]
             var_name = person[0].upper() + person[1:] + "Var"
-            if var_name in globals() and isinstance(globals()[var_name], dict):
-                info.var = globals()[var_name]
+            legacy_var = getattr(renpy.store, var_name, None)
+            if isinstance(legacy_var, dict) and not getattr(info, "uses_own_var_state", False):
+                info.var = legacy_var
 
             people_get_map("Friends").setdefault(person, info.rel)
             people_get_map("otkroven").setdefault(person, info.openness)
@@ -458,11 +552,11 @@ init python:
             pass
         # Also direct append for anything that registered itself in its Init*.rpy
         try:
-            if 'girls' in globals() and isinstance(girls, list):
+            if isinstance(girls, list):
                 for k, info in peopleInfo.items():
                     if isinstance(info, Girl) and info not in girls:
                         girls.append(info)
-            if 'secondary_npcs' in globals() and isinstance(secondary_npcs, list):
+            if isinstance(secondary_npcs, list):
                 for k, info in peopleInfo.items():
                     if isinstance(info, BaseNPC) and not isinstance(info, Girl) and info not in secondary_npcs:
                         secondary_npcs.append(info)
@@ -524,7 +618,7 @@ init python:
             known_now = people_known_ids_from_current_state()
             if not peopleInfo or not peopleData or any(row not in peopleData for row in known_now):
                 initPeople()
-            for sec_key in [people_normalize_id(row) for row in list(globals().get("SECONDARY_NPC_KEYS", []) or [])]:
+            for sec_key in [people_normalize_id(row) for row in list(getattr(renpy.store, "SECONDARY_NPC_KEYS", []) or [])]:
                 if sec_key and sec_key not in peopleInfo:
                     peopleInfo[sec_key] = BaseNPC(sec_key)
             for person in list(peopleInfo.keys()):
@@ -586,20 +680,24 @@ label InitGameNPCs:
     call InitGeorgett
     call InitLiza
     call InitInga
+    call register_inga_secondary
     $ init_secondary_npc_profiles()
-    call register_robin_secondary
-    call register_zimmer_secondary
-    call register_eddie_secondary
+    call InitRobin
+    call InitZimmer
+    call InitEddie
     call register_alber_secondary
-    call register_francheska_secondary
+    call InitFrancheska
     call register_luisa_secondary
     call register_sergio_secondary
-    call register_draupnir_secondary
-    call register_mongol_secondary
+    call register_gerhard_secondary
+    call register_lucas_secondary
+    call register_clara_fiance_secondary
+    call register_sergio_pet_secondary
+    call InitDraupnir
+    call InitMongol
     python:
         for _girl_id in list(AllGirlNames or []):
             _girl_key = str(_girl_id or "").strip().lower()
-            HarassInstructions.setdefault(_girl_key, "")
             Drunk.setdefault(_girl_key, 0)
     $ initPeople()
     $ people_sync_all()

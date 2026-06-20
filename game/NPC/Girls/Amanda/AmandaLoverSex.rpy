@@ -18,7 +18,7 @@ label AmandaLoverSex:
     # Main scene intro
     "Вы подошли поближе и точно: это Аманда "
     
-    if sluttiness.get("amanda", 0) >= 40 and renpy.random.randint(1, 2) == 1:
+    if Amanda.corruption >= 40 and renpy.random.randint(1, 2) == 1:
         extend "идет под ручку "
     else:
         extend "болтает "
@@ -38,7 +38,7 @@ label AmandaLoverSex:
     menu:
         "Отправить ее обратно на работу":
             $ AmandaYellNotWork()
-            if AmandaVar.get("prohibitwithguys", 0):
+            if Amanda.var_int("prohibitwithguys", 0):
                 "\"И это не говоря уже о том, что я запретил тебе приключения на свою манду искать!\" крикнули вы ей вслед."
             
             "А огорченный парень пошел куда-то своей дорогой. Хоть счастье было так близко и доступно, но уплыло из под носа."
@@ -49,10 +49,10 @@ label AmandaLoverSex:
         "Послушать о чем они говорят":
             "Вы прислушались к дискуссии:"
             
-            if sluttiness.get("amanda", 0) >= 62:
+            if Amanda.corruption >= 62:
                 "\"Да дам я тебе [tmp_guy_name], зачем же отказывать,\" говорит Аманда своему приятелю. \"Только быстрее, я не могу долго отлучаться. Пошли на старое место!\" и парочка следует куда-то в переулки."
                 $ amanda_agree_sex = 2
-                $ AmandaVar["sawwithguys"] = 1
+                $ Amanda.set_var_int("sawwithguys", 1)
                 
                 menu:
                     "Идти за ними":
@@ -62,14 +62,14 @@ label AmandaLoverSex:
                         jump StreetTavern
             
             else:
-                if pregnancy.get("amanda", 0) > 120:
-                    if sluttiness.get("amanda", 0) > 37:
+                if int(Amanda.stats.get("pregnancy", 0) or 0) > 120:
+                    if Amanda.corruption > 37:
                         "\"Знаешь что, [tmp_guy_name],\" улыбаясь заявляет Аманда своему дружку. \"Ты похоже станешь папой! Задержка, тошнота по утрам, пузо растет, сомнений нет.\"\n\"Да ладно тебе, Амандочка,\" отвечает тот, \"ты со мной одним что ли кувыркалась?\"\n\"Да может и не ты, вот родится, тогда посмотрим. Я так, чтобы ты если вдруг что не удивлялся.\"\n\"Да я и не удивляюсь. Ну, раз ты уже у нас залетная, то от лишних потрахушек второй раз не залетишь!\" и парень заржал над собственной шуткой. \"Пошли?\""
 
-                        if sluttiness.get("amanda", 0) >= 42:
+                        if Amanda.corruption >= 42:
                             "\"Семь бед один ответ! Пошли!\" и парочка следует куда-то в переулки."
                             $ amanda_agree_sex = 2
-                            $ AmandaVar["sawwithguys"] = 1
+                            $ Amanda.set_var_int("sawwithguys", 1)
 
                             menu:
                                 "Идти за ними":
@@ -82,10 +82,10 @@ label AmandaLoverSex:
                 else:
                     "\"[tmp_guy_name], ну я не уверена!\"\n\"Амандочка, что ж ты ломаешься, давай, соглашайся! Я тут и место рядом неплохое знаю.\" делает свой заход новоявленный ухажер."
 
-                    if sluttiness.get("amanda", 0) >= 57:
+                    if Amanda.corruption >= 57:
                         "\"Так я и не ломаюсь, с чего бы это мне от перепихона отказываться? Пошли скорее,\" и парочка следует куда-то в переулки."
                         $ amanda_agree_sex = 2
-                        $ AmandaVar["sawwithguys"] = 1
+                        $ Amanda.set_var_int("sawwithguys", 1)
 
                         menu:
                             "Идти за ними":
@@ -94,7 +94,7 @@ label AmandaLoverSex:
                                 $ AmandaLoverSexCalc(tmp_guy_name, amanda_agree_sex)
                                 jump StreetTavern
 
-                    elif sluttiness.get("amanda", 0) >= 45:
+                    elif Amanda.corruption >= 45:
                         "\"Место он знает! Тоже мне, герой-соблазнитель!\"\n\"А что, я вот тебе, этого, цветочек принес,\" галантно парирует [tmp_guy_name], даря Аманде "
 
                         $ rand_var = renpy.random.randint(1, 4)
@@ -180,9 +180,9 @@ label amanda_lover_show_sex_scene(scene_type, guy_name):
         if amanda_lover_build_cum_in == 2:
             "[guy_name] даже и не озаботился вытащить свой член из Аманды и кончил прямо в нее."
             
-            if pregnancy.get("amanda", 0) >= 120:
+            if int(Amanda.stats.get("pregnancy", 0) or 0) >= 120:
                 "Впрочем, более беременной чем сейчас он ее вряд ли сделает, так что можно считать что молодежь достаточна осторожна в сексе."
-            elif sluttiness.get("amanda", 0) >= 52:
+            elif Amanda.corruption >= 52:
                 "Парень похоже ожидал нагоняя за свой поступок, но Аманда на это и внимания не обратила."
             else:
                 "\n\"Блин, [guy_name], ты же обещал!\" воскликнула Аманда пытаясь пальцами убрать как можно семени из своего влагалища.\n\"Ну мало ли что я на ком обещал!\" расхототался в ответ молодой подонок, но через секунду все-таки сбавил тон: \"Ну ладно, Амандочка, миласик, я не нарошно, это случайно вышло, ты не подумай чего!\""
@@ -190,7 +190,7 @@ label amanda_lover_show_sex_scene(scene_type, guy_name):
         elif amanda_lover_build_cum_in == 3:
             "[guy_name] на всякий случай в последний момент вышел из Аманды и излился ей на живот."
             
-            if pregnancy.get("amanda", 0) >= 120:
+            if int(Amanda.stats.get("pregnancy", 0) or 0) >= 120:
                 "\"Да мог бы и внутрь, разницы уже нет,\" сказала ему Аманда, размазывая семя по надутому животу. Но можно и так, девчонки говорят, что семя коже полезно и от растяжек помогает.\""
             else:
                 "\"О, крем!\" сказала Аманда, размазывая сперму по коже. \"Девчонки говорят, что семя для кожи очень полезно!\""
@@ -202,14 +202,14 @@ label amanda_lover_show_sex_scene(scene_type, guy_name):
     
     # Pregnancy check based on cum location
     if amanda_lover_build_cum_in == 3:
-        $ PregnancyCheck("amanda", "outside", 1, guy_name, 0, "Соседский парень")
-        $ slut_friends_increase("amanda", 0, 0, 0, 62, 1, 1)
+        $ Amanda.pregnancy_check("outside", 1, guy_name, 0, "Соседский парень")
+        $ Amanda.change_social(corruption_delta=1)
     elif amanda_lover_build_cum_in == 2:
-        $ PregnancyCheck("amanda", "inside", 1, guy_name, 0, "Соседский парень")
-        $ slut_friends_increase("amanda", 0, 0, 0, 65, 1, 1)
+        $ Amanda.pregnancy_check("inside", 1, guy_name, 0, "Соседский парень")
+        $ Amanda.change_social(corruption_delta=1)
     else:
-        $ PregnancyCheck("amanda", "mouth", 1, guy_name, 0, "Соседский парень")
-        $ slut_friends_increase("amanda", 0, 0, 0, 48, 1, 1)
+        $ Amanda.pregnancy_check("mouth", 1, guy_name, 0, "Соседский парень")
+        $ Amanda.change_social(corruption_delta=1)
     
     # Potential arrest scenario
     if amanda_lover_build_get_in > 1 and renpy.random.randint(1, 7) == 1:
@@ -226,12 +226,12 @@ label amanda_lover_show_sex_scene(scene_type, guy_name):
 
 # Amanda responds shyly
 label amanda_lover_ask_shy_code:
-    if virginity.get("amanda", True):
+    if Amanda.stats.get("virginity", True):
         "\"Дурак, я же тебе говорила что я еще девушка и берегу пока себя,\" отбривает наглеца Аманда."
     else:
         "\"Я тебе уже говорила, что нет. Не за ту ты меня принимаешь,\" отбривает наглеца Аманда."
     
-    if sluttiness.get("amanda", 0) < 40:
+    if Amanda.corruption < 40:
         "\"Иди поищи кого еще, поподатливей!\"\nИ с этими словами она гордо разворачивается и идет обратно к трактиру."
     else:
         "Но тут же все портит, добавляя: \"могу только ротиком.\""
@@ -259,7 +259,7 @@ label amanda_lover_ask_minet_agree:
     "\"Ну ладно, пошли,\" соглашается довольный [tmp_guy_name]\n\"Только быстро, а то мне опять на работу пора,\" малость приумеряет его радость Аманда и парочка следует куда-то в переулки."
     
     $ amanda_agree_sex = 1
-    $ AmandaVar["sawwithguys"] = 1
+    $ Amanda.set_var_int("sawwithguys", 1)
     
     menu:
         "Идти за ними":
@@ -271,7 +271,7 @@ label amanda_lover_ask_minet_agree:
         
         "Отправить ее обратно на работу":
             $ AmandaYellNotWork()
-            if AmandaVar.get("prohibitwithguys", 0):
+            if Amanda.var_int("prohibitwithguys", 0):
                 "\"И это не говоря уже о том, что я запретил тебе приключения на свою манду искать!\" крикнули вы ей вслед."
             
             "А огорченный парень пошел куда-то своей дорогой. Хоть счастье было так близко и доступно, но уплыло из под носа."
@@ -283,7 +283,7 @@ label amanda_lover_ask_minet_agree:
 # Amanda agrees to sex
 label amanda_lover_ask_sex_agree:
     $ amanda_agree_sex = 2
-    $ AmandaVar["sawwithguys"] = 1
+    $ Amanda.set_var_int("sawwithguys", 1)
     
     menu:
         "Идти за ними":
@@ -295,7 +295,7 @@ label amanda_lover_ask_sex_agree:
             
         "Отправить ее обратно на работу":
             $ AmandaYellNotWork()
-            if AmandaVar.get("prohibitwithguys", 0):
+            if Amanda.var_int("prohibitwithguys", 0):
                 "\"И это не говоря уже о том, что я запретил тебе приключения на свою манду искать!\" крикнули вы ей вслед."
             
             "А огорченный парень пошел куда-то своей дорогой. Хоть счастье было так близко и доступно, но уплыло из под носа."

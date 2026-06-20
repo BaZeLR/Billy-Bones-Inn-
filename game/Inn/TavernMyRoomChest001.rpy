@@ -18,6 +18,7 @@ init 5 python:
         object_id="chest_001",
         name="Ларь",
         description="Старый ларь, в котором хранится ваша одежда.",
+        picture="images/player_room/player_room.png",
         container=True,
         state={"open": 0, "visible": 1, "locked": 0},
         actions=[

@@ -89,6 +89,9 @@ label InitInga:
     return
 
 init python:
+    if 'IngaVar' not in dir() or not isinstance(IngaVar, dict):
+        IngaVar = {"SawLucassex": 0, "Knowher": 0}
+
     def inga_grocery_store_active(weekday_value=None, time_slot=None):
         week_now = int(week if weekday_value is None else weekday_value or 0)
         time_now = int(time if time_slot is None else time_slot or 0)
@@ -96,24 +99,60 @@ init python:
             return False
         return str(npc_schedule_location("eddie", week_now, time_now) or "") != "GroceryStore"
 
-# Auto-attach .var for PeopleInfo consistency (requested)
-init python:
-    if 'peopleInfo' not in dir() or not isinstance(peopleInfo, dict):
-        peopleInfo = {}
-    # Per user request: class Inga(Girl) defined in game/NPC/Girls/Inga/InitInga.rpy
-    if 'inga' not in peopleInfo or not isinstance(peopleInfo.get('inga'), Inga):
-        class Inga(Girl):
-            """Inga."""
-            def __init__(self, name="inga", **kwargs):
-                super().__init__(name, **kwargs)
-                if 'IngaVar' in dir() and isinstance(IngaVar, dict):
-                    self.var = IngaVar
-                    self.promote_from_var(IngaVar)
-        peopleInfo['inga'] = Inga(var=IngaVar if 'IngaVar' in dir() else {})
-    else:
-        if 'IngaVar' in dir() and isinstance(IngaVar, dict):
-            peopleInfo['inga'].var = IngaVar
-    if 'girls' not in dir() or not isinstance(girls, list):
-        girls = []
-    if peopleInfo.get('inga') not in girls:
-        girls.append(peopleInfo['inga'])
+    if 'SECONDARY_NPC_KEYS' not in dir():
+        SECONDARY_NPC_KEYS = []
+    if "inga" not in SECONDARY_NPC_KEYS:
+        SECONDARY_NPC_KEYS.append("inga")
+
+    class IngaData(PeopleData):
+        code_name = "inga"
+
+        def __init__(self):
+            super().__init__(
+                self.code_name,
+                cname="Ингенборг",
+                fullname="Ингенборг Блэнкеншип",
+                genitive="Ингенборг",
+                dative="Ингенборг",
+                default_location="BeckyHome",
+                description="Старшей дочке вдовы Блэнкеншип в привлекательности не откажешь. Рыжая, высокая, зеленоглазая, с большой налитой грудью, Ингенборг выглядит как молодая и еще более привлекательная копия своей матушки.",
+                age=22,
+                portrait="images/inga/StreetSex/minet1.jpg",
+            )
+
+    class IngaInfo(BaseNPC):
+        """Inga Blankenship: secondary NPC with Becky-home story state."""
+        unknown_name = "Незнакомка"
+
+        def __init__(self, name="inga", **kwargs):
+            super().__init__(name, **kwargs)
+            self.var = kwargs.get("var", IngaVar)
+            for k, v in {
+                "SawLucassex": 0,
+                "Knowher": 0,
+            }.items():
+                self.var.setdefault(k, v)
+            self.location = "BeckyHome"
+            self.promote_from_var(self.var)
+
+define IngaStaticData = IngaData()
+default Inga = IngaInfo()
+
+
+label register_inga_secondary:
+    $ knowsMC.setdefault("inga", False)
+    python:
+        if "peopleData" in dir() and isinstance(peopleData, dict):
+            peopleData["inga"] = IngaStaticData
+        if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
+            Inga.var = IngaVar
+            Inga.location = "BeckyHome"
+            Inga.update()
+            peopleInfo["inga"] = Inga
+        if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
+            secondary_npcs = []
+        if peopleInfo.get("inga") and peopleInfo["inga"] not in secondary_npcs:
+            secondary_npcs.append(peopleInfo["inga"])
+        if 'girls' in dir() and isinstance(girls, list):
+            girls[:] = [row for row in girls if str(getattr(row, "name", "") or "") != "inga"]
+    return

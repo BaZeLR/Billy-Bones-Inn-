@@ -61,7 +61,6 @@ init 6 python:
             RoomExit(label="Спуститься обратно в комнату", target="TavernMyRoom"),
         ],
         game_items=[],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={},
     )
 

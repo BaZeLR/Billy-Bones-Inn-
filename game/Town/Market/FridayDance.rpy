@@ -8,7 +8,7 @@
 init python:
     def friday_dance_slot_is_active():
         calendar_v2.sync_state()
-        return int(week or 0) == 5 and int(time or 0) == 3
+        return int(calendar_v2.week or 0) == 5 and calendar_v2.is_between_clock(18, 0, 21, 59)
 
     def friday_dance_market_entry_is_active():
         return friday_dance_slot_is_active() and int(FridayDancesCount or 0) < 5
@@ -20,10 +20,11 @@ label FridayDance(add_dance_phrase_tmp=""):
     $ GirlsCounter = 0
     $ CurrentActions = ""
     $ AddDancePhraseTmp = add_dance_phrase_tmp
-    $ BeckyVar["danceinvitehome"] = 0
 
     if not friday_dance_slot_is_active():
         jump StreetTavern
+
+    call checkTriggers("FridayDance", "enter", 0)
 
     call ShowImage("", "", "images/market/LocFridayDance.jpg")
 
@@ -64,35 +65,16 @@ label FridayDance(add_dance_phrase_tmp=""):
                 "[result]"
                 call FridayDanceCounterShow
                 jump FridayDance
-            "Найти Аманду" if FridayDancesCount < 5 and DanceStep == 0 and AmandaVar.get('leftdances',0) == 0:
-                $ AmandaVar['albernowdances'] = 0
+            "Найти Аманду" if FridayDancesCount < 5 and DanceStep == 0 and Amanda.var_int("leftdances", 0) == 0:
+                $ Amanda.set_var_int("legare_dance_pending", 0)
                 if GetDanceFromTable('amanda', 'legare', FridayDancesCount) > 0:
-                    $ AmandaVar['albernowdances'] = 1
-                    call EventAmandaLegareCreateDance
-                $ FridayDancesCount += 1
-                if AmandaVar.get('EscapeUnnoticed',0) == 1:
-                    $ result = "Вы попробовали найти Аманду, но к своему удивлению не смогли этого сделать. На площади ее не было. Вокруг площади тоже. Может она отправилась домой, а может ее этот хрен Легаре за собой уволок, а может еще что стряслось, но так или иначе вы упустили Аманду."
-                    $ AmandaVar['leftdances'] = 1
-                elif AmandaVar.get('albernowdances',0) == 1:
-                    $ result = "Вы прошлись по площади, ища Аманду, и обнаружили ее c мессиром Легаре."
-                    call ShowImage("amanda", "dance", "legare_step_0")
-                    $ DanceStep = 1
+                    $ Amanda.set_var_int("legare_dance_pending", 1)
+                    call checkTriggers("FridayDance", "amanda_dance_legare", 0)
                 else:
-                    $ result = "Вы прошлись по площади, ища Аманду, и нашли ее скромно стоящей около одной из колонн."
-                    call ShowImage("amanda", "dance", "wait" + str(renpy.random.randint(1, 2)))
-                    $ DanceStep = 1
-                "[result]"
-                if AmandaVar.get('EscapeUnnoticed',0) == 1:
-                    call FridayDanceCounterShow
-                    jump FridayDance
-                call IntAmandaDance
+                    call checkTriggers("FridayDance", "amanda_dance_mc", 0)
                 jump FridayDance
-            "Найти Бекки Блэнкеншип" if FridayDancesCount < 5 and DanceStep == 0 and BeckyVar.get('leftdances',0) == 0:
-                "Вы прошлись по площади, ища вдовушку Блэнкеншип, и нашли ее болтающей с другими торговками."
-                call ShowImage("becky", "dance", "wait")
-                $ DanceStep = 1
-                $ FridayDancesCount += 1
-                call int_becky_dance
+            "Найти Бекки Блэнкеншип" if FridayDancesCount < 5 and DanceStep == 0 and Becky.var.get("leftdances", 0) == 0:
+                call checkTriggers("FridayDance", "becky_dance_mc", 0)
                 jump FridayDance
             "Заметить Мелиссу и Клариссу среди танцующих" if FridayDancesCount < 5 and DanceStep == 0 and clara_visible_at_friday_dance():
                 $ FridayDancesCount += 1
@@ -118,14 +100,17 @@ label FridayDance(add_dance_phrase_tmp=""):
     return
 
 label CheckIfAmandaGoneDance:
-    if GetDanceJustLeft("amanda", "legare", FridayDancesCount) > 0 or AmandaVar["LegareGo"] == 1:
+    if int(FridayDancesCount or 0) <= 0:
+        return
+    if GetDanceJustLeft("amanda", "legare", FridayDancesCount) > 0 or Amanda.var_int("LegareGo", 0) == 1:
+        $ Amanda.set_var_int("LegareGo", 0)
         if renpy.random.randint(1, 2) == 1:
-            $ AmandaVar["leftdances"] = 1
+            $ Amanda.set_var_int("leftdances", 1)
             "Неожиданно вы заметили, что Аманда торопиться куда-то прочь под ручку с мессиром Легаре."
             call LegareAmandaGoMenu
         else:
             $ apply_legare_amanda_let_go_code()
-            $ AmandaVar["EscapeUnnoticed"] = 1
+            $ Amanda.set_var_int("EscapeUnnoticed", 1)
     return
 
 

@@ -18,6 +18,8 @@ default FightEnemyId = ""
 default FightReturnRoomCode = ""
 default FightReturnPicture = ""
 default FightStatusState = {}
+default FightOutcomeText = ""
+default FightOutcomeKind = ""
 default ForestTrapState = {"active": 0, "room": "", "day": -1, "armed_count": 0}
 default ForestTrapRooms = {}
 
@@ -46,11 +48,13 @@ init -20 python:
             money_min=0,
             money_max=0,
             exploration_reward=0,
+            energy=0,
         ):
             self.object_id = str(object_id or "")
             self.display_name = str(display_name or self.object_id)
             self.enemy_type = str(enemy_type or "beast")
             self.health = int(health or 0)
+            self.energy = int(energy or 0) if int(energy or 0) > 0 else max(20, int(health or 0))
             self.attack_min = int(attack_min or 0)
             self.attack_max = int(attack_max or 0)
             self.defence_min = int(defence_min or 0)
@@ -75,6 +79,7 @@ init -20 python:
                 "name": self.display_name,
                 "enemy_type": self.enemy_type,
                 "health": self.health,
+                "energy": self.energy,
                 "attack_min": self.attack_min,
                 "attack_max": self.attack_max,
                 "defence_min": self.defence_min,
@@ -90,6 +95,47 @@ init -20 python:
                 "money_max": self.money_max,
                 "exploration_reward": self.exploration_reward,
             }
+
+    class FightRuntimeView(object):
+        @property
+        def enemy_id(self):
+            return str(FightEnemyId or "")
+
+        @property
+        def enemy_party(self):
+            return FightEnemyParty
+
+        @property
+        def level(self):
+            return FightLevel
+
+        @level.setter
+        def level(self, value):
+            FightLevel.clear()
+            FightLevel.update(dict(value or {}))
+
+        @property
+        def weapon_loaded(self):
+            return int(FightWeaponLoaded or 0)
+
+        @property
+        def loaded_ammo(self):
+            return str(FightLoadedAmmo or "")
+
+        @property
+        def supply(self):
+            return PlayerFightSupply
+
+        @property
+        def outcome_popup(self):
+            return {"kind": str(FightOutcomeKind or ""), "text": str(FightOutcomeText or "")}
+
+        @property
+        def return_picture(self):
+            return str(FightReturnPicture or "")
+
+    def fight_info():
+        return FightRuntimeView()
 
     FIGHT_SUPPLY_DEFAULTS = {
         "arrows": 0,
@@ -219,42 +265,46 @@ init -20 python:
         return dict(FIGHT_SUPPLY_DEFAULTS)
 
     def fight_ensure_runtime():
+        global FightLevel, company_list, PlayerFightSupply, FightEnemyState, HuntLastResult
+        global FightSideLog, FightEnemyParty, FightStatusState, health, ForestTrapState, ForestTrapRooms
         if not isinstance(FightLevel, dict):
-            globals()["FightLevel"] = {"you": 1}
+            FightLevel = {"you": 1}
         if not isinstance(company_list, list):
-            globals()["company_list"] = []
+            company_list = []
         if not isinstance(PlayerFightSupply, dict):
-            globals()["PlayerFightSupply"] = fight_supply_default_state()
+            PlayerFightSupply = fight_supply_default_state()
         for _key, _value in FIGHT_SUPPLY_DEFAULTS.items():
             PlayerFightSupply.setdefault(_key, _value)
         if not isinstance(FightEnemyState, dict):
-            globals()["FightEnemyState"] = {}
+            FightEnemyState = {}
         if not isinstance(HuntLastResult, dict):
-            globals()["HuntLastResult"] = {}
+            HuntLastResult = {}
         if not isinstance(FightSideLog, list):
-            globals()["FightSideLog"] = []
+            FightSideLog = []
         if not isinstance(FightEnemyParty, list):
-            globals()["FightEnemyParty"] = []
+            FightEnemyParty = []
         if not isinstance(FightStatusState, dict):
-            globals()["FightStatusState"] = {}
-        globals()["health"] = _player_clamp_stat(globals().get("health", 100), 0, 100)
+            FightStatusState = {}
+        health = _player_clamp_stat(health, 0, 100)
         if not isinstance(ForestTrapState, dict):
-            globals()["ForestTrapState"] = {"active": 0, "room": "", "day": -1, "armed_count": 0}
+            ForestTrapState = {"active": 0, "room": "", "day": -1, "armed_count": 0}
         if not isinstance(ForestTrapRooms, dict):
-            globals()["ForestTrapRooms"] = {}
+            ForestTrapRooms = {}
 
     def fight_sync_loaded_weapon_state_from_inventory():
+        global FightLoadedAmmo, FightWeaponLoaded
         fight_ensure_runtime()
         loaded_ammo = ""
         if str(EquippedWeapon or "").strip() == "rusty_hunter_rifle_001":
             loaded_ammo = str(RustyHunterRifleLoadedAmmo or "").strip()
-        globals()["FightLoadedAmmo"] = loaded_ammo
-        globals()["FightWeaponLoaded"] = 1 if loaded_ammo else 0
+        FightLoadedAmmo = loaded_ammo
+        FightWeaponLoaded = 1 if loaded_ammo else 0
         return loaded_ammo
 
     def fight_store_loaded_weapon_state():
+        global RustyHunterRifleLoadedAmmo
         if str(EquippedWeapon or "").strip() == "rusty_hunter_rifle_001":
-            globals()["RustyHunterRifleLoadedAmmo"] = str(FightLoadedAmmo or "").strip()
+            RustyHunterRifleLoadedAmmo = str(FightLoadedAmmo or "").strip()
 
     def fight_loaded_ammo_name(ammo_code=""):
         ammo_key = str(ammo_code or "").strip()
@@ -265,13 +315,15 @@ init -20 python:
         return "нет"
 
     def fight_sync_level_from_exploration():
+        global HuntUnlocked
         fight_ensure_runtime()
         level = 1 + max(0, int(effective_player_exploration() or 0)) // 50
         FightLevel["you"] = max(1, int(level))
-        globals()["HuntUnlocked"] = int(effective_player_exploration() or 0) >= 50
+        HuntUnlocked = int(effective_player_exploration() or 0) >= 50
         return FightLevel["you"]
 
     def fight_sync_supply_from_inventory():
+        global PlayerFightSupply
         fight_ensure_runtime()
         synced = fight_supply_default_state()
         for supply_key, item_id in FIGHT_SUPPLY_ITEM_MAP.items():
@@ -281,15 +333,17 @@ init -20 python:
                 synced[supply_key] = 0
         for supply_key in ("bees_bomb",):
             synced[supply_key] = int(PlayerFightSupply.get(supply_key, 0) or 0)
-        globals()["PlayerFightSupply"] = synced
+        PlayerFightSupply = synced
         return dict(PlayerFightSupply)
 
     def fight_spend_energy(amount):
-        globals()["energy"] = max(0, int(energy or 0) - max(0, int(amount or 0)))
+        global energy
+        energy = max(0, int(energy or 0) - max(0, int(amount or 0)))
         return int(energy or 0)
 
     def fight_restore_energy(amount):
-        globals()["energy"] = min(100, int(energy or 0) + max(0, int(amount or 0)))
+        global energy
+        energy = min(100, int(energy or 0) + max(0, int(amount or 0)))
         return int(energy or 0)
 
     def fight_player_status_labels():
@@ -322,6 +376,9 @@ init -20 python:
             return 0
         return int(getattr(item_obj, "custom_properties", {}).get("attack_points", 0) or 0)
 
+    def fight_rifle_equipped():
+        return str(EquippedWeapon or "").strip() == "rusty_hunter_rifle_001"
+
     def fight_armor_defence_points():
         item_id = str(EquippedArmor or "").strip()
         if not item_id:
@@ -332,9 +389,73 @@ init -20 python:
         props = getattr(item_obj, "custom_properties", {}) or {}
         return int(props.get("defence_points", props.get("armor_points", 0)) or 0)
 
+    def fight_item_name(item_id="", fallback=""):
+        item_key = str(item_id or "").strip()
+        if not item_key:
+            return str(fallback or "")
+        item_obj = get_game_item(item_key)
+        if item_obj is not None:
+            return str(getattr(item_obj, "name", "") or getattr(item_obj, "display_name", "") or item_key)
+        names = {
+            "old_axe_001": "старый топор",
+            "rusty_hunter_rifle_001": "ржавое охотничье ружье",
+            "old_leather_cuirass_001": "старая кожаная кираса",
+        }
+        return str(names.get(item_key, fallback or item_key))
+
+    def fight_player_weapon_name():
+        weapon_key = str(EquippedWeapon or "").strip()
+        if weapon_key:
+            return fight_item_name(weapon_key, weapon_key)
+        return "кулаки"
+
+    def fight_player_armor_name():
+        armor_key = str(EquippedArmor or "").strip()
+        if armor_key:
+            return fight_item_name(armor_key, armor_key)
+        return "без брони"
+
+    def fight_attack_action_caption():
+        weapon_key = str(EquippedWeapon or "").strip()
+        if weapon_key == "rusty_hunter_rifle_001":
+            return "Бить прикладом"
+        if weapon_key:
+            return "Атаковать: {}".format(fight_player_weapon_name())
+        return "Атаковать кулаками"
+
+    def fight_player_attack_preview_text():
+        fight_ensure_runtime()
+        level = int(fight_sync_level_from_exploration() or 1)
+        dog_state = fight_dog_support_state()
+        attack_min = 5 + level * 5 + fight_weapon_attack_points() + int(dog_state.get("attack", 0) or 0)
+        attack_max = attack_min + level * 3
+        if int(energy or 0) < 20:
+            attack_min -= 4
+            attack_max -= 4
+        if int(FightStatusState.get("locked_turns", 0) or 0) > 0:
+            attack_min -= 5
+            attack_max -= 5
+        if int(FightStatusState.get("fear_turns", 0) or 0) > 0:
+            attack_min -= 3
+            attack_max -= 3
+        return "{}-{}".format(max(0, int(attack_min)), max(0, int(attack_max)))
+
+    def fight_player_defence_preview_text():
+        fight_ensure_runtime()
+        level = int(fight_sync_level_from_exploration() or 1)
+        dog_state = fight_dog_support_state()
+        defence_min = 5 + level * 4 + fight_armor_defence_points() + int(dog_state.get("defence", 0) or 0)
+        defence_max = defence_min + level * 2
+        if int(energy or 0) < 15:
+            defence_min -= 3
+            defence_max -= 3
+        if int(FightStatusState.get("stagger_turns", 0) or 0) > 0:
+            defence_min -= 5
+            defence_max -= 5
+        return "{}-{}".format(max(0, int(defence_min)), max(0, int(defence_max)))
+
     def fight_dog_support_state():
-        if "dog" not in globals():
-            return {"active": False, "attack": 0, "defence": 0, "moves": []}
+        ensure_dog_runtime()
         try:
             if not dog.owned or not dog.in_company or not dog.is_alive():
                 return {"active": False, "attack": 0, "defence": 0, "moves": []}
@@ -384,6 +505,20 @@ init -20 python:
             return definition.as_dict()
         return dict(definition or ANIMAL_FIGHT_TABLE["wolf"].as_dict())
 
+    def fight_selected_enemy_image():
+        enemy_id = str(FightEnemyId or "").strip()
+        image_map = {
+            "street_crook": "images/fight/thug.png",
+            "street_thief": "images/fight/thief.png",
+            "patrol_guard": "images/fight/patrol_guard.png",
+            "wolf": "images/hunt/lonely_wolf_attack.png",
+            "white_wolf": "images/hunt/lonely_wolf_attack.png",
+            "boar": "images/hunt/boars.png",
+            "brown_bear": "images/hunt/bear.png",
+            "giant_grizzly": "images/hunt/bear_2.png",
+        }
+        return image_map.get(enemy_id, "images/fight/default_enemy.png")
+
     def fight_build_enemy_party(enemy_id="wolf", enemy_count=1):
         template = fight_enemy_template(enemy_id)
         count = max(1, int(enemy_count or 1))
@@ -395,6 +530,8 @@ init -20 python:
                 "index": idx + 1,
                 "health": int(template["health"]),
                 "health_max": int(template["health"]),
+                "energy": int(template.get("energy", 0) or max(20, int(template["health"]))),
+                "energy_max": int(template.get("energy", 0) or max(20, int(template["health"]))),
                 "attack_min": int(template["attack_min"]),
                 "attack_max": int(template["attack_max"]),
                 "defence_min": int(template["defence_min"]),
@@ -416,6 +553,7 @@ init -20 python:
         return [row for row in list(FightEnemyParty or []) if int(row.get("health", 0) or 0) > 0]
 
     def fight_selected_target():
+        global FightTargetIndex
         rows = fight_active_enemy_rows()
         if len(rows) <= 0:
             return None
@@ -423,21 +561,22 @@ init -20 python:
         for row in rows:
             if int(row.get("index", 0) or 0) == selected_index:
                 return row
-        globals()["FightTargetIndex"] = int(rows[0].get("index", 1) or 1)
+        FightTargetIndex = int(rows[0].get("index", 1) or 1)
         return rows[0]
 
     def fight_cycle_target():
+        global FightTargetIndex
         rows = fight_active_enemy_rows()
         if len(rows) <= 1:
             return None
         indices = [int(row.get("index", 0) or 0) for row in rows]
         current_index = max(1, int(FightTargetIndex or indices[0]))
         if current_index not in indices:
-            globals()["FightTargetIndex"] = indices[0]
+            FightTargetIndex = indices[0]
             return fight_selected_target()
         pos = indices.index(current_index)
         next_index = indices[(pos + 1) % len(indices)]
-        globals()["FightTargetIndex"] = next_index
+        FightTargetIndex = next_index
         return fight_selected_target()
 
     def fight_append_log(line):
@@ -449,8 +588,9 @@ init -20 python:
             del FightSideLog[:-8]
 
     def fight_refresh_ui_actions():
+        global current_action_items
         if len(fight_active_enemy_rows()) <= 0:
-            globals()["current_action_items"] = [MenuItem("Вернуться", Call("FightReturnToScene"))]
+            current_action_items = [MenuItem("Вернуться", Call("FightReturnToScene"))]
             return
         target_row = fight_selected_target()
         target_name = str(target_row.get("name", "цель") or "цель") if target_row is not None else "цель"
@@ -458,12 +598,12 @@ init -20 python:
             MenuItem("Цель: {}".format(target_name), Call("FightDoAction", "cycle_target")) if len(fight_active_enemy_rows()) > 1 else None,
             MenuItem("Уклониться", Call("FightDoAction", "dodge")),
             MenuItem("Блокировать", Call("FightDoAction", "block")),
-            MenuItem("Атаковать вблизи", Call("FightDoAction", "attack")),
+            MenuItem(fight_attack_action_caption(), Call("FightDoAction", "attack")),
         ]
         items = [row for row in items if row is not None]
-        if int(FightWeaponLoaded or 0) == 1 and str(FightLoadedAmmo or "").strip() != "":
+        if fight_rifle_equipped() and int(FightWeaponLoaded or 0) == 1 and str(FightLoadedAmmo or "").strip() != "":
             items.append(MenuItem("Выстрелить ({})".format(fight_loaded_ammo_name(FightLoadedAmmo)), Call("FightDoAction", "shoot")))
-        else:
+        elif fight_rifle_equipped():
             if int(PlayerFightSupply.get("arrows", 0) or 0) > 0:
                 items.append(MenuItem("Перезарядить стрелой", Call("FightDoAction", "reload_arrows")))
             if int(PlayerFightSupply.get("droplets", 0) or 0) > 0:
@@ -482,7 +622,7 @@ init -20 python:
         if bool(fight_dog_support_state().get("active", False)):
             items.append(MenuItem("Командовать псом", Call("FightDoAction", "dog")))
         items.append(MenuItem("Отступить", Call("FightDoAction", "retreat")))
-        globals()["current_action_items"] = items
+        current_action_items = items
 
     def fight_random_target():
         return fight_selected_target()
@@ -528,6 +668,7 @@ init -20 python:
         attack_roll = random.randint(int(enemy.get("attack_min", 0) or 0), int(enemy.get("attack_max", 0) or 0))
         extra_attack = 0
         move_text = ""
+        move_energy_cost = 5
         if move_code == "paralyzed":
             return {"damage": 0, "text": "{} дергается, но боль и яд не дают ему толком двинуться.".format(enemy_name), "move": move_code}
         if move_code == "dodge":
@@ -535,27 +676,34 @@ init -20 python:
             enemy["status"]["evade_turns"] = 1
             move_text = "{} резко меняет траекторию и выжидает удобный миг.".format(enemy_name)
             attack_roll = max(0, attack_roll - 6)
+            move_energy_cost = 4
         elif move_code == "bite":
             extra_attack = 2
             move_text = "{} бросается вперед, стараясь вцепиться клыками.".format(enemy_name)
+            move_energy_cost = 7
         elif move_code == "surround":
             pack_bonus = max(1, len(fight_active_enemy_rows()) - 1)
             extra_attack = 2 + pack_bonus
             move_text = "{} вместе с остальными зверями старается зайти с боков и окружить вас.".format(enemy_name)
+            move_energy_cost = 6
         elif move_code == "howl":
             move_text = "{} вскидывает голову и воет. От этого по спине пробегает холодок.".format(enemy_name)
             fight_apply_player_status("fear_turns", 1)
             attack_roll = max(0, attack_roll - 4)
+            move_energy_cost = 3
         elif move_code == "dead_lock":
             extra_attack = 4
             move_text = "{} пытается вцепиться намертво и повалить вас на месте.".format(enemy_name)
+            move_energy_cost = 9
         elif move_code == "ram":
             extra_attack = 6
             move_text = "{} резко опускает голову и идет на таран.".format(enemy_name)
+            move_energy_cost = 10
         elif move_code == "defend":
             enemy["status"] = dict(enemy.get("status", {}) or {})
             enemy["status"]["guard_turns"] = 1
             move_text = "{} на миг уходит в оборону, прикрываясь массивным корпусом.".format(enemy_name)
+            move_energy_cost = 3
             attack_roll = max(0, attack_roll - 7)
         elif move_code == "claws":
             extra_attack = 6
@@ -567,9 +715,25 @@ init -20 python:
             move_text = "{} оглашает лес оглушительным рыком. На миг становится по-настоящему не по себе.".format(enemy_name)
             fight_apply_player_status("fear_turns", 2)
             attack_roll = max(0, attack_roll - 5)
+            move_energy_cost = 5
         else:
             move_text = "{} идет в простую звериную атаку.".format(enemy_name)
 
+        enemy["energy"] = max(0, int(enemy.get("energy", 0) or 0) - int(move_energy_cost or 0))
+        health_now = max(0, int(enemy.get("health", 0) or 0))
+        health_max = max(1, int(enemy.get("health_max", 1) or 1))
+        if health_now * 4 <= health_max:
+            attack_roll = max(0, attack_roll - 5)
+            extra_attack = max(0, extra_attack - 3)
+            move_text += " Раны заметно мешают ему бить в полную силу."
+        if health_now * 10 <= health_max:
+            attack_roll = max(0, attack_roll - 6)
+            extra_attack = max(0, extra_attack - 4)
+            move_text += " Он едва держится на ногах."
+        if int(enemy.get("energy", 0) or 0) <= 0:
+            attack_roll = max(0, attack_roll - 8)
+            extra_attack = max(0, extra_attack - 4)
+            move_text += " Он уже выдыхается."
         attack_total = max(0, int(attack_roll + extra_attack))
         return {"damage": attack_total, "text": move_text, "move": move_code}
 
@@ -624,6 +788,7 @@ init -20 python:
         return int(reward or 0)
 
     def fight_collect_victory_loot():
+        global money, exploration, FightVictoryLoot
         loot_rows = {}
         money_gain = 0
         for enemy in list(FightEnemyParty or []):
@@ -638,17 +803,17 @@ init -20 python:
         for item_id, qty in dict(loot_rows or {}).items():
             _player_add_item_by_id(item_id, int(qty or 0))
         if money_gain > 0:
-            renpy.store.money = max(0, int(getattr(renpy.store, "money", 0) or 0) + money_gain)
+            money = max(0, int(money or 0) + money_gain)
             loot_rows["money"] = money_gain
         exploration_gain = fight_dead_enemy_exploration_reward()
         if exploration_gain > 0:
-            renpy.store.exploration = max(0, int(getattr(renpy.store, "exploration", 0) or 0) + exploration_gain)
-        renpy.store.FightVictoryLoot = dict(loot_rows or {})
+            exploration = max(0, int(exploration or 0) + exploration_gain)
+        FightVictoryLoot = dict(loot_rows or {})
         return dict(loot_rows or {})
 
     def fight_loot_text():
         rows = []
-        for item_id, qty in dict(getattr(renpy.store, "FightVictoryLoot", {}) or {}).items():
+        for item_id, qty in dict(FightVictoryLoot or {}).items():
             if str(item_id or "") == "money":
                 rows.append("{} мараведи".format(int(qty or 0)))
                 continue
@@ -656,6 +821,29 @@ init -20 python:
             item_name = str(getattr(item_obj, "name", item_id) or item_id)
             rows.append("{} x{}".format(item_name, int(qty or 0)))
         return ", ".join(rows)
+
+    def fight_apply_end_consequences(outcome=""):
+        global HuntLastResult
+        result_key = str(outcome or "").strip()
+        minutes = 20
+        if result_key == "retreat":
+            minutes = 10
+        elif result_key == "defeat":
+            minutes = 60
+        try:
+            calendar_v2.advance_minutes(minutes)
+        except Exception:
+            pass
+        HuntLastResult = {
+            "outcome": result_key,
+            "enemy_id": str(FightEnemyId or ""),
+            "enemy_count": len(list(FightEnemyParty or [])),
+            "loot": dict(FightVictoryLoot or {}),
+            "minutes": int(minutes or 0),
+            "day": int(dayspassed or 0),
+        }
+        update_stat_state()
+        return minutes
 
     def fight_hunt_candidates(room_code=""):
         room_key = str(room_code or CurLoc or "").strip()
@@ -687,49 +875,62 @@ init -20 python:
         }
 
     def fight_begin(enemy_id="wolf", enemy_count=1, return_room="", picture="", intro_text=""):
+        global FightEnemyId, FightEnemyParty, FightEnemyState, FightReturnRoomCode, FightReturnPicture
+        global FightVictoryLoot, FightOutcomeText, FightOutcomeKind, FightStatusState, FightSideLog, FightTargetIndex
+        global UI_mode, current_action_title, current_action_content, scene_image, _layout_last_picture, MainTxt, CurLocDesc
         fight_ensure_runtime()
         fight_sync_level_from_exploration()
         fight_sync_supply_from_inventory()
-        globals()["FightEnemyId"] = str(enemy_id or "wolf")
-        globals()["FightEnemyParty"] = fight_build_enemy_party(enemy_id, enemy_count)
-        globals()["FightEnemyState"] = {
+        FightEnemyId = str(enemy_id or "wolf")
+        FightEnemyParty = fight_build_enemy_party(enemy_id, enemy_count)
+        FightEnemyState = {
             "enemy_id": str(enemy_id or "wolf"),
             "enemy_count": max(1, int(enemy_count or 1)),
             "active": 1,
         }
-        globals()["FightReturnRoomCode"] = str(return_room or CurLoc or "").strip()
-        globals()["FightReturnPicture"] = str(picture or _layout_last_picture or scene_image or "").strip()
-        renpy.store.FightVictoryLoot = {}
-        globals()["FightStatusState"] = {}
-        globals()["FightSideLog"] = []
-        globals()["FightTargetIndex"] = 1
-        globals()["UI_mode"] = "fight"
-        globals()["current_action_title"] = "Бой"
-        globals()["current_action_content"] = None
-        globals()["scene_image"] = str(picture or "images/forest/forest_1.png")
-        globals()["_layout_last_picture"] = globals()["scene_image"]
-        globals()["MainTxt"] = str(intro_text or fight_preview_text())
-        globals()["CurLocDesc"] = globals()["MainTxt"]
+        FightReturnRoomCode = str(return_room or CurLoc or "").strip()
+        FightReturnPicture = str(picture or _layout_last_picture or scene_image or "").strip()
+        FightVictoryLoot = {}
+        FightOutcomeText = ""
+        FightOutcomeKind = ""
+        FightStatusState = {}
+        FightSideLog = []
+        FightTargetIndex = 1
+        UI_mode = "fight"
+        current_action_title = "Бой"
+        current_action_content = "fight_action_panel"
+        scene_image = str(picture or "images/forest/forest_1.png")
+        _layout_last_picture = scene_image
+        MainTxt = str(intro_text or fight_preview_text())
+        CurLocDesc = MainTxt
         fight_sync_loaded_weapon_state_from_inventory()
         fight_refresh_ui_actions()
 
     def fight_finish_to_room(text):
+        global UI_mode, FightEnemyState, FightEnemyParty, FightEnemyId, FightSideLog, FightLoadedAmmo, FightWeaponLoaded
+        global FightTargetIndex, FightOutcomeText, FightOutcomeKind, current_action_content, current_action_title
+        global CurLoc, location, MainTxt, CurLocDesc
         return_room = str(FightReturnRoomCode or CurLoc or "").strip()
-        globals()["UI_mode"] = "scene"
-        globals()["FightEnemyState"] = {}
-        globals()["FightEnemyParty"] = []
-        globals()["FightEnemyId"] = ""
-        globals()["FightSideLog"] = []
-        globals()["FightLoadedAmmo"] = ""
-        globals()["FightWeaponLoaded"] = 0
-        globals()["FightTargetIndex"] = 1
+        UI_mode = "scene"
+        FightEnemyState = {}
+        FightEnemyParty = []
+        FightEnemyId = ""
+        FightSideLog = []
+        FightLoadedAmmo = ""
+        FightWeaponLoaded = 0
+        FightTargetIndex = 1
+        FightOutcomeText = ""
+        FightOutcomeKind = ""
+        current_action_content = None
+        current_action_title = "Действия"
         if return_room:
-            globals()["CurLoc"] = return_room
-            globals()["location"] = return_room
-        globals()["MainTxt"] = str(text or "")
-        globals()["CurLocDesc"] = globals()["MainTxt"]
+            CurLoc = return_room
+            location = return_room
+        MainTxt = str(text or "")
+        CurLocDesc = MainTxt
 
     def fight_apply_enemy_phase(defence_mode="normal"):
+        global health
         active_rows = list(fight_active_enemy_rows() or [])
         if len(active_rows) <= 0:
             return "С вашей добычей покончено."
@@ -765,7 +966,7 @@ init -20 python:
                 elif move_code in ("ram", "strike"):
                     fight_apply_player_status("stagger_turns", 1)
 
-        globals()["health"] = max(0, int(health or 0) - total_damage)
+        health = max(0, int(health or 0) - total_damage)
         if total_damage <= 0:
             phase_lines.append("Вы выдерживаете натиск и не получаете заметного урона.")
         else:
@@ -773,6 +974,7 @@ init -20 python:
         return "\n\n".join([row for row in phase_lines if str(row or "").strip() != ""])
 
     def fight_apply_player_action(action_code=""):
+        global FightWeaponLoaded, FightLoadedAmmo, health, notoriety, SickDays
         fight_ensure_runtime()
         action = str(action_code or "").strip().lower()
         result_lines = []
@@ -804,7 +1006,9 @@ init -20 python:
                 result_lines.append("Вы переводите внимание на цель: {}.".format(str(target.get("name", "") or "враг")))
         elif action == "shoot":
             loaded_ammo = str(FightLoadedAmmo or "").strip()
-            if int(FightWeaponLoaded or 0) != 1 or loaded_ammo == "":
+            if not fight_rifle_equipped():
+                result_lines.append("У вас не экипировано ружье.")
+            elif int(FightWeaponLoaded or 0) != 1 or loaded_ammo == "":
                 result_lines.append("Оружие еще не заряжено.")
             else:
                 fight_spend_energy(5)
@@ -822,8 +1026,8 @@ init -20 python:
                         status["bleed_damage"] = max(1, int(target.get("health_max", 1) or 1) // 10)
                         target["status"] = status
                     result_lines.append("Вы выпускаете стрелу и наносите {} урона. Рана начинает кровоточить.".format(int(dealt or 0)))
-                globals()["FightWeaponLoaded"] = 0
-                globals()["FightLoadedAmmo"] = ""
+                FightWeaponLoaded = 0
+                FightLoadedAmmo = ""
                 fight_store_loaded_weapon_state()
                 fight_decay_player_statuses()
                 enemy_text = fight_apply_enemy_phase("normal")
@@ -831,7 +1035,9 @@ init -20 python:
                     result_lines.append(enemy_text)
         elif action == "reload_arrows" or action == "reload_droplets":
             reload_ammo = "arrows" if action == "reload_arrows" else "droplets"
-            if int(FightWeaponLoaded or 0) == 1 and str(FightLoadedAmmo or "").strip() != "":
+            if not fight_rifle_equipped():
+                result_lines.append("Перезаряжать нечего: ружье не экипировано.")
+            elif int(FightWeaponLoaded or 0) == 1 and str(FightLoadedAmmo or "").strip() != "":
                 result_lines.append("Оружие уже заряжено.")
             elif int(PlayerFightSupply.get(reload_ammo, 0) or 0) <= 0:
                 result_lines.append("Нужного боеприпаса при себе не осталось.")
@@ -846,8 +1052,8 @@ init -20 python:
                     _player_remove_item_by_id("droplets_001", 1)
                     PlayerFightSupply["gunpowder"] = max(0, int(PlayerFightSupply.get("gunpowder", 0) or 0) - 1)
                     _player_remove_item_by_id("gunpowder_001", 1)
-                globals()["FightWeaponLoaded"] = 1
-                globals()["FightLoadedAmmo"] = reload_ammo
+                FightWeaponLoaded = 1
+                FightLoadedAmmo = reload_ammo
                 fight_store_loaded_weapon_state()
                 result_lines.append("Вы быстро перезаряжаете оружие: {}.".format(fight_loaded_ammo_name(reload_ammo)))
             fight_decay_player_statuses()
@@ -875,7 +1081,7 @@ init -20 python:
                 fight_spend_energy(2)
                 _player_remove_item_by_id("bandage_001", 1)
                 PlayerFightSupply["bandage"] = max(0, int(PlayerFightSupply.get("bandage", 0) or 0) - 1)
-                globals()["health"] = min(100, int(health or 0) + 12)
+                health = min(100, int(health or 0) + 12)
                 result_lines.append("Вы торопливо перевязываете раны и восстанавливаете немного сил.")
                 fight_decay_player_statuses()
                 enemy_text = fight_apply_enemy_phase("normal")
@@ -899,7 +1105,7 @@ init -20 python:
             else:
                 _player_remove_item_by_id("healing_potion_001", 1)
                 PlayerFightSupply["healing_potion"] = max(0, int(PlayerFightSupply.get("healing_potion", 0) or 0) - 1)
-                globals()["health"] = min(100, int(health or 0) + 25)
+                health = min(100, int(health or 0) + 25)
                 result_lines.append("Вы выпиваете зелье и чувствуете, как возвращаются силы.")
                 fight_decay_player_statuses()
                 enemy_text = fight_apply_enemy_phase("normal")
@@ -966,9 +1172,9 @@ init -20 python:
                     result_lines.append(enemy_text)
         elif action == "retreat":
             if fight_retreat_success():
-                globals()["notoriety"] = max(0, int(notoriety or 0) - 6)
+                notoriety = max(0, int(notoriety or 0) - 6)
                 if int(health or 0) <= 20:
-                    globals()["SickDays"] = max(2, int(SickDays or 0))
+                    SickDays = max(2, int(SickDays or 0))
                 return {"done": "retreat", "text": "Вы выбираете момент и отступаете из схватки. Такой исход бьет по вашей репутации, но вы уходите на своих ногах."}
             result_lines.append("Вы пытаетесь отступить, но противники не дают вам разорвать дистанцию.")
             fight_decay_player_statuses()
@@ -982,9 +1188,9 @@ init -20 python:
                 result_lines.append(enemy_text)
 
         if int(health or 0) <= 0:
-            globals()["health"] = 1
-            globals()["SickDays"] = max(2, int(SickDays or 0))
-            globals()["notoriety"] = max(0, int(notoriety or 0) - 6)
+            health = 1
+            SickDays = max(2, int(SickDays or 0))
+            notoriety = max(0, int(notoriety or 0) - 6)
             return {"done": "defeat", "text": "\n\n".join(result_lines + ["Вас жестоко помяли. Вы еле уносите ноги и потом будете болеть несколько дней."])}
 
         if len(fight_active_enemy_rows()) <= 0:
@@ -1001,13 +1207,14 @@ init -20 python:
         return {"done": "continue", "text": "\n\n".join(result_lines)}
 
     def forest_trap_can_place(room_code=""):
+        global ForestTrapRooms
         fight_ensure_runtime()
         room_key = str(room_code or CurLoc or "").strip()
         active_rooms = ForestTrapRooms if isinstance(ForestTrapRooms, dict) else {}
         legacy_room = str(ForestTrapState.get("room", "") or "")
         if legacy_room and int(ForestTrapState.get("active", 0) or 0) == 1 and legacy_room not in active_rooms:
             active_rooms[legacy_room] = {"day": int(ForestTrapState.get("day", -1) or -1), "armed_count": max(1, int(ForestTrapState.get("armed_count", 1) or 1))}
-            globals()["ForestTrapRooms"] = active_rooms
+            ForestTrapRooms = active_rooms
         return bool(fight_can_hunt_here(room_key)) and int(_player_item_count_by_id("hunting_trap_001") or 0) > 0 and room_key not in active_rooms
 
     def forest_trap_can_check(room_code=""):
@@ -1019,6 +1226,7 @@ init -20 python:
         return int(ForestTrapState.get("active", 0) or 0) == 1 and str(ForestTrapState.get("room", "") or "") == room_key and int(dayspassed or 0) > int(ForestTrapState.get("day", -1) or -1)
 
     def forest_trap_set(room_code=""):
+        global ForestTrapRooms, ForestTrapState
         fight_ensure_runtime()
         room_key = str(room_code or CurLoc or "").strip()
         if not forest_trap_can_place(room_key):
@@ -1026,11 +1234,12 @@ init -20 python:
         _player_remove_item_by_id("hunting_trap_001", 1)
         active_rooms = ForestTrapRooms if isinstance(ForestTrapRooms, dict) else {}
         active_rooms[room_key] = {"day": int(dayspassed or 0), "armed_count": 1}
-        globals()["ForestTrapRooms"] = active_rooms
-        globals()["ForestTrapState"] = {"active": 1, "room": room_key, "day": int(dayspassed or 0), "armed_count": len(active_rooms)}
+        ForestTrapRooms = active_rooms
+        ForestTrapState = {"active": 1, "room": room_key, "day": int(dayspassed or 0), "armed_count": len(active_rooms)}
         return {"ok": True, "text": "Вы тщательно ставите охотничью ловушку и маскируете ее листвой. Проверить ее лучше не раньше завтрашнего дня."}
 
     def forest_trap_check(room_code=""):
+        global ForestTrapRooms, ForestTrapState
         fight_ensure_runtime()
         room_key = str(room_code or CurLoc or "").strip()
         if not forest_trap_can_check(room_key):
@@ -1038,13 +1247,13 @@ init -20 python:
         active_rooms = ForestTrapRooms if isinstance(ForestTrapRooms, dict) else {}
         if room_key in active_rooms:
             active_rooms.pop(room_key, None)
-        globals()["ForestTrapRooms"] = active_rooms
+        ForestTrapRooms = active_rooms
         if active_rooms:
             next_room = sorted(active_rooms.keys())[0]
             next_row = dict(active_rooms.get(next_room, {}) or {})
-            globals()["ForestTrapState"] = {"active": 1, "room": next_room, "day": int(next_row.get("day", -1) or -1), "armed_count": len(active_rooms)}
+            ForestTrapState = {"active": 1, "room": next_room, "day": int(next_row.get("day", -1) or -1), "armed_count": len(active_rooms)}
         else:
-            globals()["ForestTrapState"] = {"active": 0, "room": "", "day": -1, "armed_count": 0}
+            ForestTrapState = {"active": 0, "room": "", "day": -1, "armed_count": 0}
         roll = random.randint(1, 100)
         if roll <= 35:
             return {"ok": True, "text": "Вы проверяете ловушку, но она сработала впустую. Добыча ушла.", "loot": {}}
@@ -1094,11 +1303,11 @@ init -20 python:
         money_gain = max(0, int(loot_row.get("money", 0) or 0))
         if item_id:
             _player_add_item_by_id(item_id, qty)
-        globals()["money"] = int(money or 0) + money_gain
+        money = int(money or 0) + money_gain
         for girl_key in ("sandra", "melissa", "amanda"):
             Friends[girl_key] = int(Friends.get(girl_key, 0) or 0) + 2
-        globals()["notoriety"] = min(100, int(notoriety or 0) + 3)
-        globals()["tavernfame"] = int(tavernfame or 0) + 2
+        notoriety = min(100, int(notoriety or 0) + 3)
+        tavernfame = int(tavernfame or 0) + 2
         item_name = str(getattr(get_game_item(item_id), "name", item_id) or item_id)
         return {
             "ok": True,
@@ -1171,7 +1380,20 @@ init -20 python:
             "health_max": 100,
             "energy": int(energy or 0),
             "energy_max": 100,
-            "subtitle": "уровень боя {}".format(int(FightLevel.get("you", 1) or 1)),
+            "subtitle": "уровень боя {} | репутация {} | дурная слава {} | исследование {}".format(
+                int(FightLevel.get("you", 1) or 1),
+                int(reputation or 0),
+                int(notoriety or 0),
+                int(exploration or 0),
+            ),
+            "fight_level": int(FightLevel.get("you", 1) or 1),
+            "reputation": int(reputation or 0),
+            "notoriety": int(notoriety or 0),
+            "exploration": int(exploration or 0),
+            "tavernfame": int(tavernfame or 0),
+            "money": int(money or 0),
+            "sick_days": int(SickDays or 0),
+            "fun": int(fun or 0),
             "status": fight_player_status_labels(),
         }]
 
@@ -1224,40 +1446,48 @@ init -20 python:
                 "name": str(enemy.get("name", "") or ""),
                 "health": int(enemy.get("health", 0) or 0),
                 "health_max": int(enemy.get("health_max", 0) or 0),
-                "energy": int(enemy.get("attack_max", 0) or 0),
-                "energy_max": int(enemy.get("attack_max", 0) or 0),
-                "subtitle": "атака {}-{} / защита {}-{}".format(
+                "energy": int(enemy.get("energy", 0) or 0),
+                "energy_max": int(enemy.get("energy_max", 0) or 0),
+                "subtitle": "оружие: {} | атака {}-{} | защита {}-{} | тактика: {}".format(
+                    str(enemy.get("weapon", "") or "тело"),
                     int(enemy.get("attack_min", 0) or 0),
                     int(enemy.get("attack_max", 0) or 0),
                     int(enemy.get("defence_min", 0) or 0),
                     int(enemy.get("defence_max", 0) or 0),
+                    str(enemy.get("tactics", "") or "простая"),
                 ),
+                "weapon": str(enemy.get("weapon", "") or "тело"),
+                "attack_text": "{}-{}".format(int(enemy.get("attack_min", 0) or 0), int(enemy.get("attack_max", 0) or 0)),
+                "defence_text": "{}-{}".format(int(enemy.get("defence_min", 0) or 0), int(enemy.get("defence_max", 0) or 0)),
+                "tactics": str(enemy.get("tactics", "") or "простая"),
                 "status": status_labels,
             })
         return rows
 
     def show_fight_preview_main_ui(enemy_id="wolf", enemy_count=1, picture="images/forest/forest_1.png"):
+        global FightEnemyId, FightEnemyParty, FightEnemyState, FightSideLog, FightTargetIndex
+        global UI_mode, current_action_title, current_action_content, current_action_items
+        global MainTxt, CurLocDesc, scene_image, _layout_last_picture
         fight_ensure_runtime()
         fight_sync_level_from_exploration()
         fight_sync_supply_from_inventory()
-        globals()["FightEnemyId"] = str(enemy_id or "wolf")
-        globals()["FightEnemyParty"] = fight_build_enemy_party(enemy_id, enemy_count)
-        globals()["FightEnemyState"] = {
+        FightEnemyId = str(enemy_id or "wolf")
+        FightEnemyParty = fight_build_enemy_party(enemy_id, enemy_count)
+        FightEnemyState = {
             "enemy_id": str(enemy_id or "wolf"),
             "enemy_count": max(1, int(enemy_count or 1)),
         }
-        globals()["FightSideLog"] = ["Бой пока открыт как тестовый экран подготовки."]
-        globals()["FightTargetIndex"] = 1
-        store = renpy_module.store
-        store.UI_mode = "fight"
-        store.current_action_title = "Бой"
-        store.current_action_content = None
+        FightSideLog = ["Бой пока открыт как тестовый экран подготовки."]
+        FightTargetIndex = 1
+        UI_mode = "fight"
+        current_action_title = "Бой"
+        current_action_content = None
         fight_sync_loaded_weapon_state_from_inventory()
-        store.current_action_items = fight_preview_action_items()
-        store.MainTxt = fight_preview_text()
-        store.CurLocDesc = store.MainTxt
-        store.scene_image = str(picture or "images/forest/forest_1.png")
-        store._layout_last_picture = store.scene_image
+        current_action_items = fight_preview_action_items()
+        MainTxt = fight_preview_text()
+        CurLocDesc = MainTxt
+        scene_image = str(picture or "images/forest/forest_1.png")
+        _layout_last_picture = scene_image
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
@@ -1265,6 +1495,12 @@ init -20 python:
 
 label FightPreviewStart(enemy_id="wolf", enemy_count=1):
     $ show_fight_preview_main_ui(enemy_id, enemy_count)
+    return
+
+
+label FightLoop:
+    while str(UI_mode or "") == "fight":
+        call screen main_ui
     return
 
 
@@ -1276,6 +1512,7 @@ label FightStartHuntCurrentRoom:
     $ _fight_enemy_count = max(1, int(_hunt_roll.get("enemy_count", 1) or 1))
     $ _fight_intro_text = fight_hunt_intro_text(_fight_enemy_id, _fight_enemy_count, _fight_room_code)
     $ fight_begin(_fight_enemy_id, _fight_enemy_count, _fight_room_code, _fight_picture, _fight_intro_text)
+    call FightLoop
     return
 
 
@@ -1293,7 +1530,25 @@ label FightDoAction(action_code=""):
         python:
             for _fight_line in str(MainTxt or "").split("\n\n"):
                 fight_append_log(_fight_line)
-        $ fight_refresh_ui_actions()
+        $ _fight_minutes = fight_apply_end_consequences("victory")
+        $ MainTxt = MainTxt + "\n\nНа схватку уходит %d минут." % int(_fight_minutes or 0)
+        $ CurLocDesc = MainTxt
+        $ FightOutcomeKind = "victory"
+        $ FightOutcomeText = MainTxt
+        $ current_action_title = "Победа"
+        $ current_action_items = [MenuItem("Забрать добычу и вернуться", Call("FightReturnToScene"))]
+        $ renpy.notify("Победа. Добыча: " + (fight_loot_text() or "нет"))
+        return
+    if str(_fight_result.get("done", "") or "") in ("defeat", "retreat"):
+        $ _fight_done = str(_fight_result.get("done", "") or "")
+        $ _fight_minutes = fight_apply_end_consequences(_fight_done)
+        $ MainTxt = MainTxt + "\n\nНа исход схватки уходит %d минут." % int(_fight_minutes or 0)
+        $ CurLocDesc = MainTxt
+        $ FightOutcomeKind = _fight_done
+        $ FightOutcomeText = MainTxt
+        $ current_action_title = "Поражение" if _fight_done == "defeat" else "Отступление"
+        $ current_action_items = [MenuItem("Вернуться", Call("FightReturnToScene"))]
+        $ renpy.notify("Поражение в бою." if _fight_done == "defeat" else "Вы отступили из боя.")
         return
     call FightReturnToScene
     return
@@ -1306,7 +1561,6 @@ label FightReturnToScene:
     $ fight_finish_to_room(_fight_text)
     $ scene_image = _fight_return_picture
     $ _layout_last_picture = _fight_return_picture
-    call RefreshCurrentActionMenu(_fight_return_room, "", True)
     return
 
 

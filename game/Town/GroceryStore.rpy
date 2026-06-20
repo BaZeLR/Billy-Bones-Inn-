@@ -59,7 +59,7 @@ init python:
 
     def grocery_store_eddie_picture(randomize=False):
         candidates = []
-        if BeckyVar.get("EddieRobbedDay", 0) > 0 and BeckyVar.get("EddieRobbedDay", 0) + 12 >= dayspassed:
+        if Becky.var.get("EddieRobbedDay", 0) > 0 and Becky.var.get("EddieRobbedDay", 0) + 12 >= dayspassed:
             candidates.append("images/eddie/portraits/fingal.png")
         candidates.extend([
             "images/eddie/portraits/portrait_0.png",
@@ -93,7 +93,7 @@ init python:
         ]
         return grocery_store_pick_picture(candidates, randomize)
 
-    def grocery_store_talk_picture(npc_id=""):
+    def grocery_store_grocer_picture(npc_id=""):
         npc_key = str(npc_id or grocery_store_active_grocer_id() or "").strip().lower()
         if npc_key == "eddie":
             return grocery_store_eddie_picture(True)
@@ -109,7 +109,7 @@ init python:
 
         if active_grocer == "eddie":
             parts.append("Сейчас утро, и за прилавком стоит Эдди, управляющий лавкой Блэнкеншип. Это здоровый рыжий парень примерно вашего возраста; Бекки когда-то подобрала его сиротой и взяла помощником.")
-            if BeckyVar.get("EddieRobbedDay", 0) > 0 and BeckyVar.get("EddieRobbedDay", 0) + 12 >= dayspassed:
+            if Becky.var.get("EddieRobbedDay", 0) > 0 and Becky.var.get("EddieRobbedDay", 0) + 12 >= dayspassed:
                 parts.append("Вы заметили, что у Эдди красуется большой синяк под глазом и распухло ухо.")
             parts.append("Вы можете с ним поболтать.")
         elif active_grocer == "inga":
@@ -212,9 +212,12 @@ init python:
             ),
         ],
         schedule=RoomSchedule(
-            weekdays=[1, 2, 3, 4, 5, 6],
-            time_slots=[0, 1, 2, 3],
-            closed_text="В это время лавка закрыта.",
+            [1, 2, 3, 4, 5, 6],
+            [],
+            "В это время лавка закрыта.",
+            None,
+            "06:00",
+            "15:59",
         ),
         custom_properties={
             "shop_feature": "provisions",
@@ -236,7 +239,6 @@ label GroceryStore:
     $ current_action_items = []
     $ current_girl_key = ""
     $ current_object_id = ""
-    $ BeckyVar.setdefault("EddieRobbedDay", 0)
     $ _grocery_room = GroceryStoreRoom
     # Check if the store is closed
     if not _grocery_room.is_open(week, time):

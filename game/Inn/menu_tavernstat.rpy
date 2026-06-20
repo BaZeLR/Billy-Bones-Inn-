@@ -245,7 +245,7 @@ init python:
             except Exception:
                 pass
             if Melissa.bats_stage() >= 7 and Melissa.bats_stage() < 8:
-                repair_day = int(MelissaVar.get("roof_repair_complete_day", -1) or -1)
+                repair_day = int(Melissa.var.get("roof_repair_complete_day", -1) or -1)
                 if repair_day > int(dayspassed or 0):
                     days_left = repair_day - int(dayspassed or 0)
                     lines.append("Над комнатой Мелиссы уже заказана починка крыши. Мастерам осталось еще примерно %s дн., прежде чем можно будет окончательно считать дело закрытым." % days_left)
@@ -441,12 +441,11 @@ init python:
         }.get(str(job_type or ""), "")
 
     def _tavern_job_keys(job_type, room_code=None):
-        # Safe access to tavern job parameter dicts (these are store globals, not locals)
-        jk = _tavern_dict_value(getattr(renpy.store, 'jobkitchen', None))
-        jc = _tavern_dict_value(getattr(renpy.store, 'jobcleaning', None))
-        jw = _tavern_dict_value(getattr(renpy.store, 'jobwaitress', None))
-        jwh = _tavern_dict_value(getattr(renpy.store, 'jobwhore', None))
-        jgh = _tavern_dict_value(getattr(renpy.store, 'jobgloryhole', None))
+        jk = _tavern_dict_value(jobkitchen)
+        jc = _tavern_dict_value(jobcleaning)
+        jw = _tavern_dict_value(jobwaitress)
+        jwh = _tavern_dict_value(jobwhore)
+        jgh = _tavern_dict_value(jobgloryhole)
 
         mapping = {
             "jobkitchen": jk,
@@ -519,11 +518,11 @@ init python:
         waitress_value = _tavern_int(_tavern_get_stat(waitress, person, 0), 0)
         friends_value = _tavern_int(_tavern_get_stat(Friends, person, 0), 0)
 
-        jk = _tavern_dict_value(getattr(renpy.store, 'jobkitchen', None))
-        jc = _tavern_dict_value(getattr(renpy.store, 'jobcleaning', None))
-        jw = _tavern_dict_value(getattr(renpy.store, 'jobwaitress', None))
-        jwh = _tavern_dict_value(getattr(renpy.store, 'jobwhore', None))
-        jgh = _tavern_dict_value(getattr(renpy.store, 'jobgloryhole', None))
+        jk = _tavern_dict_value(jobkitchen)
+        jc = _tavern_dict_value(jobcleaning)
+        jw = _tavern_dict_value(jobwaitress)
+        jwh = _tavern_dict_value(jobwhore)
+        jgh = _tavern_dict_value(jobgloryhole)
 
         current_jobs = []
         if _tavern_int(jk.get(person, 0), 0):
@@ -887,7 +886,9 @@ label TavernReportApplyOverviewAction(person="", action_code="", return_label=""
 label HideTavernReport(return_label=""):
     if str(return_label or "") == "__main_ui__":
         $ TavernReportSelectedPerson = ""
-        $ main_ui_restore_room_scene_state()
+        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+        if _room_label:
+            jump expression _room_label
         return
     hide screen tavern_report_card_overlay
     $ TavernReportSelectedPerson = ""

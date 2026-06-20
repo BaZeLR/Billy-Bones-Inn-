@@ -29,8 +29,6 @@ init python:
             return church_call_label("ChurchAfterCermon", 1)
         if action_key == "draupnir":
             return church_call_label("ShowChurchDraupnirList")
-        if action_key == "after_liza":
-            return church_call_label("AfterCermonLizett")
         if action_key == "after_becky":
             return church_call_label("AfterCermonBecky")
 
@@ -98,12 +96,12 @@ init python:
     def church_becky_priest_talk_visible():
         return (
             church_confession_action_visible()
-            and BeckyVar.get("PriestAdvice", 0) > 0
-            and BeckyVar.get("GerhardBeckyTalk", 0) < 2
+            and Becky.var.get("PriestAdvice", 0) > 0
+            and Becky.var.get("GerhardBeckyTalk", 0) < 2
         )
 
     def church_draupnir_note_visible():
-        return church_confession_action_visible() and BeckyVar.get("GerhardBeckyTalk", 0) > 0
+        return church_confession_action_visible() and Becky.var.get("GerhardBeckyTalk", 0) > 0
 
     def _church_to_int(value, default=0):
         try:
@@ -306,7 +304,7 @@ label Church:
             vscene "images/church/churchEntryDay.png"
         elif church_confession_action_visible():
             $ MainTxt = "Служба закончилась, люди понемногу начали расходиться. Вы можете или пойти домой или пойти к отцу Герхарду на исповедь."
-            if BeckyVar.get("GerhardBeckyTalk", 0) > 0:
+            if Becky.var.get("GerhardBeckyTalk", 0) > 0:
                 $ MainTxt = MainTxt + "\nНа небольшом столике в углу лежит листок, на котором что-то накорябанно."
             $ CurLocDesc = MainTxt
             vscene "images/church/confessionEntry.png"
@@ -398,19 +396,19 @@ label ChurchServiceBlanken:
 
 
 label becky_church_talk:
-    if BeckyVar.get("GerhardBeckyTalk", 0) == 0:
+    if Becky.var.get("GerhardBeckyTalk", 0) == 0:
         $ MainTxt = "После службы вы подошли к отцу Герхарду: \"Падре, одна из ваших прихожанок, торговка с рынка, может обратиться к вам за советом. Снедает ее мысль о том, большой ли грех то, что она собирается совершить. Не могли ли бы вы сказать ей, что то невеликое дело?\""
     else:
         $ MainTxt = "После службы вы подошли к отцу Герхарду: \"Падре, та прихожанка о которой я вас спрашивал, ну та торговка с рынка, она к вам за советом случаем не подходила? И что же вы ей посоветовали?\""
 
-    if BeckyVar.get("PriestAdvice", 0) == 3:
+    if Becky.var.get("PriestAdvice", 0) == 3:
         $ MainTxt = MainTxt + "\n\n\"Поговорил я с ней, сын мой,\" сказал вам святой отец улыбаясь. \"Прав ты был, что ее тревожило - то невеликое прегрешение. Мудр ты, сын мой, не по годам. Да и щедр преизрядно и к церкви нашей с должным пиететом относишься.\"\n\nИ, осенив вас знаком Ильматера, отец Герхард вернулся к своим делам."
-    elif BeckyVar.get("GerhardBeckyTalk", 0) == 0:
+    elif Becky.var.get("GerhardBeckyTalk", 0) == 0:
         $ MainTxt = MainTxt + "\n\n\"Да как ты смеешь, молокосос, указывать мне, настоятелю этого храма, как с моей паствой общаться?!\" справедливо возмутился почтенный жрец.\n\n\"Я выслушиваю своих прихожанок дольше, чем ты прожил на свете, и уж способен сам решить, велик грех или мал, без чьих-то советов.\"\n\nРасстроены отказом, вы уже собрались было уйти, как отец Герхард промолвил в пустоту, ни к кому конкретно не обращаясь:\n\n\"Эх, что за народ нынче пошел, никакого уважения к церкви. Собор-то наш поистрепался слегка, так я и попросил мастера Драупнира чтоб он, значит, ремонт-то небольшой сделал. Раньше-то что, любой бы за честь великую счел бы, что ему доверили храм великого Ильматера ремонтировать. А сейчас? Драупнир, шельмец, такой счет выставил, как будто он десять новых соборов построил. А народишко-то измельчал, жертвуют неохотно. Так этот счет и лежит неоплаченный, вон там,\" жрец махнул рукой куда-то в сторону.\n\nПрисмотревшись, вы заметили в указанном направлении какой-то листок."
     else:
         $ MainTxt = MainTxt + "\n\n\"Да как ты смеешь, молодой человек, на тайну исповеди посягать?! Я по твоему кто, настоятель этого великого храма или сплетник с базарной площади?\" разгневался достопочтенный.\n\nПолучив такую отповедь вы уже собрались было отправиться восвояси, как отец Герхард заметил:\n\n\"Эх, что за люди нынче? Раньше к падре с благовением обращались. А сейчас? Одному тайну исповеди раскрой, а этот шельмец, Драупнир, все деньги требует по счету. А откуда же я их возьму, коли никто не жертвует?\""
 
     $ CurLocDesc = MainTxt
     vscene "images/church/confessionEntry.png"
-    $ BeckyVar["GerhardBeckyTalk"] = 2
+    $ Becky.var["GerhardBeckyTalk"] = 2
     jump Church

@@ -2,59 +2,6 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 6 python:
-    def tavern_melissa_room_clara_scene_paths():
-        return [
-            picture_path
-            for picture_path in (
-                "images/clara/melissa Pillow fight.png",
-                "images/clara/melissa_doodleTimes.png",
-                "images/clara/melissa_doodles.png",
-            )
-            if renpy.loadable(picture_path)
-        ]
-
-    def tavern_melissa_room_clara_visit_active():
-        return str(getLocation("clara") or "") == "TavernMelissaRoom" and Melissa.bats_stage() >= 8
-
-    def tavern_melissa_room_locked_from_inside():
-        if not tavern_melissa_room_clara_visit_active():
-            return False
-        try:
-            if story_event_available("TavernMelissaRoom", "clara_paintings"):
-                return False
-        except Exception:
-            pass
-        return True
-
-    def tavern_melissa_room_register_clara_visit():
-        if not tavern_melissa_room_clara_visit_active():
-            return
-        if int(ClaraVar.get("tavern_melissa_visit_day", -1) or -1) == int(dayspassed or 0):
-            return
-        ClaraVar["tavern_melissa_visit_day"] = int(dayspassed or 0)
-        ClaraVar["tavern_melissa_visit_count"] = int(ClaraVar.get("tavern_melissa_visit_count", 0) or 0) + 1
-
-    def tavern_melissa_room_clara_visit_index():
-        scene_count = len(tavern_melissa_room_clara_scene_paths())
-        if scene_count <= 0:
-            return 0
-        visit_count = max(1, int(ClaraVar.get("tavern_melissa_visit_count", 0) or 0))
-        return (visit_count - 1) % scene_count
-
-    def tavern_melissa_room_clara_visit_picture():
-        scene_paths = tavern_melissa_room_clara_scene_paths()
-        if len(scene_paths) <= 0:
-            return ""
-        return scene_paths[tavern_melissa_room_clara_visit_index()]
-
-    def tavern_melissa_room_clara_visit_text():
-        scene_index = tavern_melissa_room_clara_visit_index()
-        if scene_index == 0:
-            return "Вы заглядываете в комнату и тут же понимаете, что пришли не вовремя: Кларисса с Мелиссой уже устроили на кровати полушутливую драку подушками, а по полу летят перья и обрывки смеха. Обе резко замирают, увидев вас в дверях, и Мелисса первой просит вас не торчать у порога."
-        if scene_index == 1:
-            return "Сегодня девушки сидят совсем близко друг к другу на кровати и, склонившись над коленями, возятся с листками и угольком. Кларисса что-то быстро дорисовывает, а Мелисса смеется шепотом и тут же прикрывает рисунки ладонью, заметив вас."
-        return "Кларисса с Мелиссой так увлечены своими непристойными каракулями и перешептыванием, что сперва даже не сразу замечают вас. Когда же замечают, обе смотрят одинаково красноречиво: вам здесь сейчас делать нечего."
-
     def tavern_melissa_room_sleep_picture():
         picture_cycle = [
             "images/melissa/tavern/melissa_sleeps_0.jpg",
@@ -82,9 +29,6 @@ init 6 python:
         return int(time or 0) >= 4 or (household_morning_issue_type("melissa") == "sleepy" and int(hour or 0) < 12)
 
     def tavern_melissa_room_picture():
-        clara_picture = tavern_melissa_room_clara_visit_picture() if tavern_melissa_room_clara_visit_active() else ""
-        if str(clara_picture or "").strip():
-            return clara_picture
         if tavern_melissa_room_can_show_sleeping():
             sleep_picture = tavern_melissa_room_sleep_picture()
             if str(sleep_picture or "").strip():
@@ -130,7 +74,6 @@ init 6 python:
             bedroom_door_object("melissa_room_door_001", "TavernMelissaRoom", "Мелиссы"),
             "melissa_drawings_booklet_001",
         ],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "object_menu_label": "TavernMelissaRoomObjectMenu",
         },
@@ -142,22 +85,10 @@ label TavernMelissaRoom:
     $ CurrentRoom = TavernMelissaRoomRoom
     $ CurLoc = "TavernMelissaRoom"
     $ location = CurLoc
-    $ tavern_melissa_room_register_clara_visit()
     $ scene_image = tavern_melissa_room_picture() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
         call ShowImage("", "", scene_image)
-    if tavern_melissa_room_locked_from_inside():
-        $ MainTxt = "Дверь закрыта изнутри. За ней слышны приглушенные голоса, шорох и короткий смешок."
-        $ CurLocDesc = MainTxt
-        $ current_action_title = "Комната Мелиссы"
-        $ current_action_content = None
-        $ current_action_items = [MenuItem("Вернуться в коридор", Call("AdvanceMovementTime", "TavernUpstairs"))]
-        $ _melissa_locked_ui_return = None
-        while _melissa_locked_ui_return is None:
-            call screen main_ui
-            $ _melissa_locked_ui_return = _return
-        jump TavernMelissaRoom
     call RoomEnterEventGate(CurLoc, False)
     $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
     $ _melissa_room_notice = household_room_issue_notice_text("melissa")
@@ -182,15 +113,14 @@ label TavernMelissaRoomBuildActions:
     $ current_action_title = "Комната Мелиссы"
     $ current_action_content = None
     $ current_action_items = []
-    if tavern_melissa_room_locked_from_inside():
-        $ current_action_items = [MenuItem("Вернуться в коридор", Call("AdvanceMovementTime", "TavernUpstairs"))]
-        return
     python:
         for _issue_action in list(household_room_issue_action_specs("melissa") or []):
             current_action_items.append(MenuItem(str(_issue_action.get("label", "") or ""), Call(str(_issue_action.get("target", "") or ""), *tuple(_issue_action.get("args", ()) or ()))))
     if tavern_upstairs_can_clean_rooms():
         $ current_action_items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernMelissaRoom", "", "")))
     $ current_action_items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernMelissaRoom", "TavernMelissaRoomBuildActions")))
+    if story_event_available("TavernMelissaRoom", "clara_room_visit"):
+        $ current_action_items.append(MenuItem("Прислушаться к Клариссе и Мелиссе", Call("checkTriggers", "TavernMelissaRoom", "clara_room_visit", 0)))
     if story_event_available("TavernMelissaRoom", "clara_paintings"):
         $ current_action_items.append(MenuItem("Выслушать Клариссу и Мелиссу", Call("checkTriggers", "TavernMelissaRoom", "clara_paintings", 0)))
     python:

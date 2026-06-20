@@ -1,18 +1,29 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-label TavernProstClients(client_type=1, girl_name=""):
+label TavernProstClients(client_type=1, girl_name="", return_room=""):
+    if str(return_room or "") == "":
+        $ return_room = str(CurLoc or "TavernMain")
+    if str(girl_name or "") == "":
+        $ girl_name = str(TavernMainClientRoomGirl or "")
     if int(client_type or 0) != 1:
-        jump TavernMain
+        jump expression str(return_room or "TavernMain")
+    if str(girl_name or "") == "":
+        "В отдельной комнате сейчас никого нет."
+        jump expression str(return_room or "TavernMain")
 
     "Вы зашли в соседнюю комнату, где у вас было оборудовано специальное потайное окошко. Через него вам открылся прекрасный вид."
     ""
 
     python:
-        SexEventType = int(GetSexEventFromTable(girl_name, time) or 0)
+        SexEventType = int(GetSexEventFromTable(girl_name, 3, "Prostitution") or 0)
+
+    if SexEventType <= 0:
+        "Вы осторожно проверяете потайное окошко, но в комнате сейчас никого нет."
+        jump expression str(return_room or "TavernMain")
 
     if girl_name == "liza":
-        $ LizaVar["seeclients"] = 1
+        $ Liza.mark_portstreet_clients_seen()
         if SexEventType == 1:
             "Вы видите юную мулатку отсасывающей у какого-то старика. Однако похотливый старикашка не удовлетворяется минетом и просит Лизетту лечь на кровать. Когда же девушка его послушалась, старый козел не колеблясь задрал ей платьице, стащил панталончики и загнал свой член в юную податливую плоть. Однако девчонке, судя по всему, такое пришлось по нраву - она начала с энтузиазмом подмахивать своему годящемуся ей в деды любовнику. Ее усилия не пропали даром - она вскоре кончила. А следом за ней кончил и старик. Мулаточка посмотрела на капающую из нее сперму и на ее мордашке отразилась озабоченность возможными последствиями."
             $ PregnancyCheck("liza", "inside", 1, "", 1, "Неизвестный торговец")
@@ -20,18 +31,18 @@ label TavernProstClients(client_type=1, girl_name=""):
         elif SexEventType == 2:
             "Вы видите как матрос-негр сел на край кровати и расстегнул штаны, высвобождая свой действительно огромный член. По лицу девочки пробежала тень сомнения, быстро сменившаяся решимостью. Лизетта скинула панталончики, задрала юбочку и села прямо на черный кол. Сначала в девочку вошла только головка, но постепенно в ней оказалась вся жердь. Затем она начинает сначала медленно, а затем все быстрее подниматься и опускаться. Негр не выдерживает ее скачки и начинает накачивать ее семенем. Вслед за ним кончает и Лизетта."
             $ PregnancyCheck("liza", "inside", 1, "", 1, "Неизвестный негр")
-            $ ShowImage("liza", "traktirevents", "event2_" + str(renpy.random.randint(1, 9)))
+            $ ShowImage("liza", "traktirevents", "event2_" + str(procedural_randint(1, 9, "tavern_client_liza_event2_%s" % int(dayspassed or 0))))
         elif SexEventType == 99:
             "Вы видите как юная Лизетта в очередной раз делает минет почтенному отцу семейства, мессиру Легаре. Виноторговец сначала спокойно сидит на краешке кровати, но вскоре входит в раж, хватает девочку за косички и начинает буквально трахать ее рот. Когда он кончает, мулатка чуть было не давится хлынувшей ей в горло спермой."
             $ PregnancyCheck("liza", "mouth", 1, "legare")
-            $ ShowImage("liza", "traktirevents", "event3_" + str(renpy.random.randint(1, 10)))
+            $ ShowImage("liza", "traktirevents", "event3_" + str(procedural_randint(1, 10, "tavern_client_liza_event3_%s" % int(dayspassed or 0))))
         else:
             "Вы видите как Лизетта отсасывает сразу у двух городских стражников. Вскоре один разряжается молодой шлюшке в ротик, а другой изукрашивает своей спермой ее смуглую мордашку."
             $ PregnancyCheck("liza", "inside", 1, "", 1, "Неизвестный стражник")
             $ PregnancyCheck("liza", "face", 1, "", 1, "Неизвестный стражник")
-            $ ShowImage("liza", "traktirevents", "event4_" + str(renpy.random.randint(1, 6)))
+            $ ShowImage("liza", "traktirevents", "event4_" + str(procedural_randint(1, 6, "tavern_client_liza_event4_%s" % int(dayspassed or 0))))
     else:
-        $ GeorgettVar["seeclients"] = 1
+        $ Georgett.mark_portstreet_clients_seen()
         if SexEventType == 1:
             "Вы видите стоящую раком, оперевшись о спинку кровати, Жоржетту. Ее короткая юбчонка задрана до пояса, а сзади ее наяривает огромный мужик, судя по одежде портовый грузчик. Наконец грузчик разряжается прямо в киску Жоржетты."
             $ PregnancyCheck("georgett", "inside", 1, "", 1, "Неизвестный грузчик")
@@ -46,10 +57,10 @@ label TavernProstClients(client_type=1, girl_name=""):
             $ PregnancyCheck("georgett", "mouthface", 1, "", 1, "Неизвестный горожанин")
             $ ShowImageSeq("georgett", "portevents", "event3_", 3)
         elif SexEventType == 99:
-            if BeckyVar.get("visitedhome", 0) < 7:
-                if EddieVar.get("SawWithGeorgett", 0) == 0:
+            if Becky.var.get("visitedhome", 0) < 7:
+                if Eddie.var.get("SawWithGeorgett", 0) == 0:
                     "Вы видите голую Жоржетту с рыжим Эдди. Похоже, они играют в какую-то игру."
-                    $ EddieVar["SawWithGeorgett"] = 1
+                    $ Eddie.var["SawWithGeorgett"] = 1
                 else:
                     "Вы видите Жоржетту с вашим знакомцем Эдди, играющих в уже знакомую вам игру."
                 "\"Что это, негодный мальчишка? Неужто строгая леди-босс тебя так распалила?!\" - восклицает Жоржетта. Эдди смущенно отвечает, и через минуту эта игра заканчивается его бурной разрядкой."
@@ -69,6 +80,6 @@ label TavernProstClients(client_type=1, girl_name=""):
 
     menu:
         "Вернуться в трактир":
-            jump TavernMain
+            jump expression str(return_room or "TavernMain")
 
     return

@@ -15,6 +15,7 @@ default AmandaMiniEventMemory = {}
 default AmandaMiniEventLastState = {}
 default AmandaMiniEventLastCode = ""
 default AmandaMiniEventLastLocation = ""
+default AmandaMiniEventQueued = {}
 default BadLandlordScore = 0
 default TavernUncleTruthStage = 0
 default AmandaAIIntegrationEnabled = True
@@ -289,7 +290,7 @@ init 5 python:
             grooming += 0.35
         if int(AmandaVar.get("revealing_dress_ordered", 0) or 0) > 0 or int(AmandaVar.get("dress_request_satisfied", 0) or 0) > 0:
             dress += 0.35
-        if int(ClaraVar.get("paintings_confession", 0) or 0) > 0 or int(ClaraVar.get("courtesan_lessons", 0) or 0) > 0:
+        if int(Clara.var.get("paintings_confession", 0) or 0) > 0 or int(Clara.var.get("courtesan_lessons", 0) or 0) > 0:
             manners += 0.30
             clara_training += 0.35
         return {
@@ -1034,6 +1035,26 @@ init 5 python:
             return ""
         return code
 
+    def amanda_ai_mini_event_ready(location_code="", mode="room"):
+        if not bool(AmandaAIIntegrationEnabled):
+            return False
+        loc = str(location_code or CurLoc or "")
+        mode_key = str(mode or "room")
+        code = amanda_ai_mini_event_code(loc, mode_key)
+        if code == "":
+            return False
+        AmandaMiniEventQueued[loc + ":" + mode_key] = code
+        return True
+
+    def amanda_ai_mini_event_pop(location_code="", mode="room"):
+        loc = str(location_code or CurLoc or "")
+        mode_key = str(mode or "room")
+        key = loc + ":" + mode_key
+        code = str(AmandaMiniEventQueued.pop(key, "") or "")
+        if code == "":
+            code = amanda_ai_mini_event_code(loc, mode_key)
+        return code
+
 label AmandaAIIntentBreakfastEvent(intent_code=""):
     $ _amanda_ai_intent = str(intent_code or amanda_ai_breakfast_intent_code() or "")
     if _amanda_ai_intent == "":
@@ -1110,7 +1131,7 @@ label AmandaAIIntentReturn(context_code="room", location_code=""):
 # -----------------------------------------------------------------------------
 label AmandaMiniEventTry(location_code="", mode="room"):
     $ _amanda_mini_location = str(location_code or CurLoc or "")
-    $ _amanda_mini_event = amanda_ai_mini_event_code(_amanda_mini_location, mode)
+    $ _amanda_mini_event = amanda_ai_mini_event_pop(_amanda_mini_location, mode)
     if _amanda_mini_event == "":
         return
     $ amanda_ai_mark_mini_event_seen(_amanda_mini_event, _amanda_mini_location)
@@ -1122,6 +1143,25 @@ label AmandaMiniEventTry(location_code="", mode="room"):
     if _amanda_mini_label != "":
         call expression _amanda_mini_label
     return
+
+
+label AmandaMiniEventEntry(location_code="", mode="room"):
+    $ _amanda_mini_entry_location = str(location_code or CurLoc or "")
+    $ _amanda_mini_entry_mode = str(mode or "room")
+    call checkTriggers(_amanda_mini_entry_location, "amanda_ai_%s_mini" % _amanda_mini_entry_mode, 0)
+    if _return:
+        return True
+    return False
+
+
+label story_amanda_ai_room_mini_0:
+    call AmandaMiniEventTry(CurLoc, "room")
+    return True
+
+
+label story_amanda_ai_breakfast_mini_0:
+    call AmandaMiniEventTry("TavernKitchen", "breakfast")
+    return True
 
 
 # =============================================================================

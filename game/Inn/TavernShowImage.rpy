@@ -7,7 +7,7 @@ label TavernShowImage:
     $ rand_var = rand_int(1, 3)
 
     if rand_var == 1:
-        $ _jobkitchen = getattr(renpy.store, 'jobkitchen', {})
+        $ _jobkitchen = jobkitchen if isinstance(jobkitchen, dict) else {}
         if int(_jobkitchen.get("melissa", 0) or 0) != 0:
             if rand_int(1, 4) == 1:
                 python:

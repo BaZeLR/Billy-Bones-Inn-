@@ -1,8 +1,6 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default SexTimesToday = {}
-
 init python:
     def melissa_sex_available(girl_name="melissa"):
         return melissa_relationship_allows(girl_name, "sex")
@@ -33,10 +31,7 @@ init python:
         return False
 
     def _ims_count_sex_time(girl_name="melissa"):
-        key = str(girl_name or "melissa").strip().lower()
-        if not isinstance(SexTimesToday, dict):
-            return
-        SexTimesToday[key] = max(0, int(SexTimesToday.get(key, 0) or 0)) + 1
+        Melissa.var["sex_times_today"] = max(0, int(Melissa.var.get("sex_times_today", 0) or 0)) + 1
 
     def _ims_set_arousal(who, value):
         value = min(100, max(0, int(value or 0)))
@@ -69,11 +64,11 @@ init python:
         CumInsideOthers.setdefault(girl_key, 0)
         Arousal.setdefault("You", 0)
         Arousal.setdefault("you", Arousal.get("You", 0))
-        Arousal.setdefault(girl_key, int(PussyWetStart.get(girl_key, 0) or 0))
+        Arousal.setdefault(girl_key, int(Melissa.stats.get("PussyWetStart", 0) or 0))
         GiveOrgasms.setdefault(girl_key, 0)
         LickPussy.setdefault(girl_key, 0)
         check_visibility(girl_key)
-        return bodymodel_sync_character(girl_key, RealName.get(girl_key, girl_key), "female")
+        return bodymodel_sync_character(girl_key, Melissa.data.fullname, "female")
 
     def _ims_clear_contact_states(girl_name="melissa"):
         girl_key = str(girl_name or "melissa").strip()
@@ -196,22 +191,17 @@ init python:
         girl_key = str(girl_name or "melissa").strip()
         if melissa_intimacy_is_engagement(girl_key):
             _ims_clear_contact_states(girl_key)
-            Friends[girl_key] = min(20, int(Friends.get(girl_key, 0) or 0) + 1)
-            sluttiness[girl_key] = min(100, int(sluttiness.get(girl_key, 0) or 0) + 1)
+            Melissa.change_social(friend_delta=1, corruption_delta=1)
             return "Вы останавливаетесь до того, как близость сорвется в настоящий секс. Мелисса еще тяжело дышит, поправляет одежду и смотрит на вас уже мягче: этот вечер остался на грани, но именно поэтому она не чувствует себя загнанной."
         gained_orgasms = max(0, int(GiveOrgasms.get(girl_key, 0) or 0) - int(start_orgasms or 0))
         _ims_clear_contact_states(girl_key)
         if gained_orgasms <= 0:
-            Friends[girl_key] = min(20, int(Friends.get(girl_key, 0) or 0) + 1)
+            Melissa.change_social(friend_delta=1)
             return "Вы останавливаетесь прежде, чем довести Мелиссу до разрядки. Она еще тяжело дышит и просит в следующий раз не бросать ее на полпути."
         if gained_orgasms >= 2:
-            Friends[girl_key] = min(20, int(Friends.get(girl_key, 0) or 0) + 2)
-            sluttiness[girl_key] = min(100, int(sluttiness.get(girl_key, 0) or 0) + 3)
-            otkroven[girl_key] = min(20, int(otkroven.get(girl_key, 0) or 0) + 2)
+            Melissa.change_social(friend_delta=2, open_delta=2, corruption_delta=3)
             return "Когда вы наконец останавливаетесь, Мелисса выглядит измученной, но довольной. Теперь рядом с вами она держится уже куда менее настороженно."
-        Friends[girl_key] = min(20, int(Friends.get(girl_key, 0) or 0) + 2)
-        sluttiness[girl_key] = min(100, int(sluttiness.get(girl_key, 0) or 0) + 2)
-        otkroven[girl_key] = min(20, int(otkroven.get(girl_key, 0) or 0) + 1)
+        Melissa.change_social(friend_delta=2, open_delta=1, corruption_delta=2)
         return "Вы даете Мелиссе перевести дыхание и остановиться вместе с вами. По ее взгляду видно, что этот раз она запомнит как что-то по-настоящему важное."
 
 
@@ -280,49 +270,49 @@ label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
                 jump int_melissa_sex_menu
 
             "Поцеловать Мелиссу":
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "mouth", "kiss", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "mouth", "kiss", "You", Melissa.data.fullname, "female")
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "mouth", "kiss", _ims_effect)
                 "[MainTxt]"
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
             "Ласкать грудь" if "fondle" in bodymodel_actions_for_target(GirlNameIMS, "nipples"):
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "nipples", "fondle", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "nipples", "fondle", "You", Melissa.data.fullname, "female")
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "nipples", "fondle", _ims_effect)
                 "[MainTxt]"
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
             "Лизнуть соски" if "lick" in bodymodel_actions_for_target(GirlNameIMS, "nipples"):
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "nipples", "lick", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "nipples", "lick", "You", Melissa.data.fullname, "female")
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "nipples", "lick", _ims_effect)
                 "[MainTxt]"
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
             "Погладить ее между ног" if "fondle" in bodymodel_actions_for_target(GirlNameIMS, "pussy"):
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "fondle", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "fondle", "You", Melissa.data.fullname, "female")
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "pussy", "fondle", _ims_effect)
                 "[MainTxt]"
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
             "Раздвинуть ее бедра" if _ims_full_engine and "spread" in bodymodel_actions_for_target(GirlNameIMS, "pussy"):
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "spread", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "spread", "You", Melissa.data.fullname, "female")
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "pussy", "spread", _ims_effect)
                 "[MainTxt]"
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
             "Ввести пальцы в киску" if _ims_full_engine and "insert" in bodymodel_actions_for_target(GirlNameIMS, "pussy"):
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "insert", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "insert", "You", Melissa.data.fullname, "female")
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "pussy", "insert", _ims_effect)
                 "[MainTxt]"
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
             "Использовать игрушку" if _ims_full_engine and _ims_has_dildo() and "insert" in bodymodel_actions_for_target(GirlNameIMS, "pussy") and int(Arousal.get(GirlNameIMS, 0) or 0) >= 20:
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "insert", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "insert", "You", Melissa.data.fullname, "female")
                 $ _ims_effect["action"] = "toy_insert"
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "pussy", "toy_insert", _ims_effect)
                 "[MainTxt]"
@@ -330,7 +320,7 @@ label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
                 jump int_melissa_sex_menu
 
             "Лизать киску" if _ims_full_engine and "lick" in bodymodel_actions_for_target(GirlNameIMS, "pussy"):
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "lick", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "lick", "You", Melissa.data.fullname, "female")
                 $ LickPussy[GirlNameIMS] = int(LickPussy.get(GirlNameIMS, 0) or 0) + 1
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "pussy", "lick", _ims_effect)
                 "[MainTxt]"
@@ -338,21 +328,21 @@ label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
                 jump int_melissa_sex_menu
 
             "Погладить ягодицы" if "fondle" in bodymodel_actions_for_target(GirlNameIMS, "ass"):
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "ass", "fondle", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "ass", "fondle", "You", Melissa.data.fullname, "female")
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "ass", "fondle", _ims_effect)
                 "[MainTxt]"
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
             "Раздвинуть ягодицы" if _ims_full_engine and "spread" in bodymodel_actions_for_target(GirlNameIMS, "ass"):
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "ass", "spread", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "ass", "spread", "You", Melissa.data.fullname, "female")
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "ass", "spread", _ims_effect)
                 "[MainTxt]"
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
             "Ввести палец в попку" if _ims_full_engine and "insert" in bodymodel_actions_for_target(GirlNameIMS, "ass"):
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "ass", "insert", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "ass", "insert", "You", Melissa.data.fullname, "female")
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "ass", "insert", _ims_effect)
                 "[MainTxt]"
                 call IntMelissaSexState(GirlNameIMS)
@@ -360,7 +350,7 @@ label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
 
             "Подставить ей член" if _ims_full_engine and _ims_player_cum_count() < _ims_player_cum_limit() and int(SomebodyCums or 0) == 0:
                 $ _ims_set_inserted_container(GirlNameIMS, "mouth")
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "mouth", "suck", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "mouth", "suck", "You", Melissa.data.fullname, "female")
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "mouth", "suck", _ims_effect)
                 "[MainTxt]"
                 call IntMelissaSexState(GirlNameIMS)
@@ -368,14 +358,14 @@ label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
 
             "Войти в нее" if _ims_full_engine and _ims_player_cum_count() < _ims_player_cum_limit() and int(SomebodyCums or 0) == 0 and int(PussyVisible.get(GirlNameIMS, 0) or 0) == 1 and int(Arousal.get("You", 0) or 0) >= 20 and int(Arousal.get(GirlNameIMS, 0) or 0) >= 20:
                 $ _ims_set_inserted_container(GirlNameIMS, "pussy")
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "insert", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "insert", "You", Melissa.data.fullname, "female")
                 "Вы входите в Мелиссу медленно, оставляя ей время принять ваш темп и глубину."
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
             "Войти сзади" if _ims_full_engine and _ims_player_cum_count() < _ims_player_cum_limit() and int(SomebodyCums or 0) == 0 and "insert" in bodymodel_actions_for_target(GirlNameIMS, "ass") and int(Arousal.get("You", 0) or 0) >= 30 and int(Arousal.get(GirlNameIMS, 0) or 0) >= 40:
                 $ _ims_set_inserted_container(GirlNameIMS, "ass")
-                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "ass", "insert", "You", RealName.get(GirlNameIMS, GirlNameIMS), "female")
+                $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "ass", "insert", "You", Melissa.data.fullname, "female")
                 "Вы входите сзади, медленно и без спешки. Мелисса вцепляется в край стола и привыкает к новому давлению."
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu

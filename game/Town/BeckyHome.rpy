@@ -111,7 +111,7 @@ init python:
                 ],
             ),
         ],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
+        schedule=RoomSchedule([1, 2, 3, 4, 5, 6, 7], [], "", None, "06:00", "17:59"),
         custom_properties={
             "becky_house": True,
             "object_menu_label": "BeckyHomeObjectMenu",
@@ -143,10 +143,7 @@ label BeckyHome(arrive_mode=""):
         return
     $ GirlName = 'becky'
     python:
-        BeckyVar.setdefault("visitedhome", 0)
-        BeckyVar.setdefault("EddieTryToFuck", 0)
-        BeckyVar.setdefault("VisitScolded", 0)
-        BeckyVar.setdefault("TimesVisited", 0)
+        Becky.ensure_story_defaults()
         IngaVar.setdefault("Knowher", 0)
         pregnancy.setdefault("inga", 0)
         Arousal.setdefault(GirlName, 0)
@@ -154,7 +151,7 @@ label BeckyHome(arrive_mode=""):
     $ _becky_home_room.mark_visited()
 
     $ _start_becky_sex = False
-    if arrive_mode == 'FromDances' and BeckyVar['visitedhome'] < 5:
+    if arrive_mode == 'FromDances' and Becky.story_value('visitedhome', 0) < 5:
         "[_becky_home_room.descriptions[1].text] <br>Вы и миссис Блэнкеншип находитесь в ее спальне."
         call ShowImageSeq('becky', 'sex', 'inroom', 3)
         $ _start_becky_sex = True
@@ -165,10 +162,10 @@ label BeckyHome(arrive_mode=""):
         $ _start_becky_sex = True
     elif arrive_mode == 'FromDinner':
         "<br><br>[_becky_home_room.descriptions[2].text] "
-        if BeckyVar['EddieTryToFuck'] == 1 and BeckyVar['visitedhome'] < 7:
+        if Becky.story_value('EddieTryToFuck', 0) == 1 and Becky.story_value('visitedhome', 0) < 7:
             call BeckyEddieJoinFirst
         else:
-            if BeckyVar['visitedhome'] < 7:
+            if Becky.story_value('visitedhome', 0) < 7:
                 "Дав вам зайти, вдова закрыла дверь на ключ и обернулась к вам, сказав: 'Если детишки мои развлекаются, то почему в конце концов я не могу себе такого позволить? Иди же ко мне!' "
             else:
                 "Вдова не позаботилась не то, что запереть дверь на ключ, но и даже полностью закрыть ее, и не теряя времени потащила вас к кровати. "
@@ -182,14 +179,14 @@ label BeckyHome(arrive_mode=""):
             $ BeckyAdmit = 1
         else:
             "[_becky_home_room.descriptions[0].text] "
-            if BeckyVar['visitedhome'] < 3:
-                if BeckyVar['VisitScolded'] == 0:
+            if Becky.story_value('visitedhome', 0) < 3:
+                if Becky.story_value('VisitScolded', 0) == 0:
                     "Она не очень-то была рада вашему визиту: 'Стефан, зачем ты пришел?! Мы же договаривались! Надеюсь, тебя никто не видел?' <br> 'Никто,' сказали вы глядя на вдову своими честными глазами. 'Но я просто хотел...' <br> Бекки однако, ваше желание мало интересовало. Она резко прервала вас: 'Не приходи больше, что люди подумают. Все, пока.'<br> И дверь перед вашим носом захлопнулась.  "
-                    $ BeckyVar['VisitScolded'] = 1
-                    call SlutFriendsIncrease('becky', 8, 3, -1, 35, 3, -1)
+                    $ Becky.set_story_value('VisitScolded', 1)
+                    $ Becky.apply_social_roll(8, 3, -1, 35, 3, -1)
                 else:
                     "Увидев вас она рассердилась не на шутку: 'Стефан, тебе что, все нужно по 20 раз повторять?! Не приходи пока ко мне домой.' <br> 'Но я,' начали оправдываться вы, но поняли, что разговариваете с закрытой дубовой дверью. Изнутри послышался звук запираемого засова. Похоже, сейчас вам здесь не очень-то рады. "
-                    call SlutFriendsIncrease('becky', 8, 1, -1, 35, 1, -1)
+                    $ Becky.apply_social_roll(8, 1, -1, 35, 1, -1)
                 menu:
                     "В печали вернуться к трактиру":
                         jump StreetTavern
@@ -202,7 +199,7 @@ label BeckyHome(arrive_mode=""):
                 "Она тщательно осмотрела вас и сказала: 'Что же ты встал на пороге, проходи скорей!'\nВы не замедлили воспользоваться приглашением и прошли в дом, прямо к накрытому столу. К вашей скромной трапезе из 6 блюд присоединился и Эдди.\nНе успели вы приступить к поглощению пищи, как услышали как хлопнула входная дверь"
                 $ BeckyAdmit = 1
         if BeckyAdmit == 1:
-            $ BeckyVar['TimesVisited'] += 1
+            $ Becky.add_story_value('TimesVisited', 1)
             if IngaVar['Knowher'] >= 2:
                 " и вскоре к вам за столом присоединились Ингенборг, старшая дочка соломенной вдовушки, вместе со своим хахалем Лукасом."
             elif IngaVar['Knowher'] == 1:
@@ -254,7 +251,7 @@ label BeckyHomeRestore:
 
 
 label BeckyHomeAfterSex:
-    $ BeckyVar["visitedhome"] = max(int(BeckyVar.get("visitedhome", 0) or 0), 2)
+    $ Becky.set_story_value_min("visitedhome", 2)
     $ MainTxt = becky_home_after_sex_text()
     $ CurLocDesc = MainTxt
     call BeckyHomeBuildActions

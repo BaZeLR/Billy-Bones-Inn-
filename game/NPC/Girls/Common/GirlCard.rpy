@@ -248,7 +248,9 @@ label ShowGirlCard(girl_name="", return_label=""):
 
 label HideGirlCard(return_label=""):
     if str(return_label or "") == "__main_ui__":
-        $ main_ui_restore_room_scene_state()
+        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+        if _room_label:
+            jump expression _room_label
         return
     hide screen girl_card_overlay
     if str(return_label or "") != "":

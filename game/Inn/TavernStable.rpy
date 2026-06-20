@@ -19,13 +19,14 @@ init python:
         return MyStallion != "" and int(HorseSaddled or 0) == 1
 
     def tavern_stable_can_start_becky_trade(_obj=None):
-        return int(BeckyVar.get('TradeOffer', 0) or 0) == 1 and int(time or 0) == 0 and int(week or 0) != 7
+        hour_now = int(calendar_v2.hour or 0) % 24
+        return int(Becky.var.get('TradeOffer', 0) or 0) == 1 and int(week or 0) != 7 and 6 <= hour_now < 12
 
     def tavern_stable_can_ride_to_kunidell(_obj=None):
         return tavern_stable_can_start_becky_trade() and MyStallion != "" and int(money or 0) >= 200
 
     def tavern_stable_can_walk_to_kunidell(_obj=None):
-        return tavern_stable_can_start_becky_trade() and int(BeckyVar.get('SherwoodSuspect', 0) or 0) >= 5
+        return tavern_stable_can_start_becky_trade() and int(Becky.var.get('SherwoodSuspect', 0) or 0) >= 5
 
     TavernStableRoom = Room(
         code_name="TavernStable",
@@ -100,7 +101,6 @@ init python:
                 ],
             ),
         ],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "has_horse_character": True,
         },
@@ -128,7 +128,7 @@ init python:
         else:
             desc_parts.append("Несмотря на название вашего заведения, ни жеребцов, ни кобыл, в конюшне нет. Здесь вообще никого, кроме вас, нет.")
 
-        if int(MongolVar.get('WillTryToSteal', 0) or 0) and int(time or 0) == 4:
+        if int(Mongol.var.get('WillTryToSteal', 0) or 0) and int(time or 0) == 4:
             desc_parts.append("Вдруг со стороны ворот послышалось приглушенное лязгание, как будто кто-то незаметно пытался открыть замок. Вы повернулись на звук, нечаянно задев висящую на столбе на счастье подкову. Та звякнула. Со улицы раздались быстрые удаляющиеся шаги. Вы осторожно выглянули, но никого там не обнаружили. Присмотревшись, вы нашли на мостовой оброненный кусок парусины.\nСтранно, что бы это могло значить?")
 
         return "\n\n".join([part for part in desc_parts if str(part or "").strip()])
@@ -142,9 +142,9 @@ label TavernStable:
     $ scene_image = _room.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
-    $ MongolVar['WillTryToSteal'] = int(MongolVar.get('WillTryToSteal', 0) or 0)
-    $ BeckyVar['TradeOffer'] = int(BeckyVar.get('TradeOffer', 0) or 0)
-    $ BeckyVar['SherwoodSuspect'] = int(BeckyVar.get('SherwoodSuspect', 0) or 0)
+    $ Mongol.ensure_story_defaults()
+    $ Becky.var['TradeOffer'] = int(Becky.var.get('TradeOffer', 0) or 0)
+    $ Becky.var['SherwoodSuspect'] = int(Becky.var.get('SherwoodSuspect', 0) or 0)
     if MyStallion != "":
         call ShowImage("", "", "images/tavern/backyard/stables/stablehorse.jpg")
     else:
@@ -153,8 +153,8 @@ label TavernStable:
     $ CurLocDesc = MainTxt
     $ _room.mark_visited()
 
-    if MongolVar.get('WillTryToSteal', 0) and time == 4:
-        $ MongolVar['WillTryToSteal'] = 0
+    if Mongol.var.get('WillTryToSteal', 0) and time == 4:
+        $ Mongol.var['WillTryToSteal'] = 0
     call TavernStableBuildActions
     $ _stable_ui_return = None
     while _stable_ui_return is None:

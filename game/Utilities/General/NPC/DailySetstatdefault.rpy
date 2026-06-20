@@ -31,7 +31,7 @@ label DailySetstatdefault(girl_name):
             $ _dssd_know_about_birth = 1
             if (girl_name == "liza" or girl_name == "georgett") and CurrentLoc.get(girl_name, "") != "TavernMain":
                 $ _dssd_know_about_birth = 0
-            if (girl_name == "becky" or girl_name == "inga") and Friends.get("becky", 0) < 12:
+            if (girl_name == "becky" or girl_name == "inga") and Becky.rel < 12:
                 $ _dssd_know_about_birth = 0
 
             if _dssd_know_about_birth == 0:
@@ -55,7 +55,7 @@ label DailySetstatdefault(girl_name):
             if sluttiness.get("sandra", 0) <= 25 and _dssd_top_slut + _dssd_bottom_slut >= 8:
                 $ _dssd_slut_dress_trigger = 1
 
-            $ _dssd_talked_before = AmandaVar.get("MomDressComplaint", 0) if girl_name == "amanda" else MelissaVar.get("MomDressComplaint", 0)
+            $ _dssd_talked_before = AmandaVar.get("MomDressComplaint", 0) if girl_name == "amanda" else Melissa.var.get("MomDressComplaint", 0)
             if _dssd_slut_dress_trigger == 1 and renpy.random.randint(1, 2 + _dssd_talked_before * 15) == 1:
                 $ DailyEventsList_Add(girl_name, "TavernMain", 4, "<", 1, 1, "MomDressComplain", "MomDressComplaint")
 

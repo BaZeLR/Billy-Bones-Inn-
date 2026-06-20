@@ -32,7 +32,6 @@ init python:
         "liza",
         "becky",
         "irma",
-        "inga",
         "clara",
     ]
 

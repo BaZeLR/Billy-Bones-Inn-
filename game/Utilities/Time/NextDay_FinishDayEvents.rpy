@@ -28,20 +28,10 @@ init python:
         global TownStreetFiredLocationsToday
         global TownStreetCooldowns
 
-        if "TalkChurchAfterCermonLiza" not in GeorgettVar:
-            GeorgettVar["TalkChurchAfterCermonLiza"] = 0
-        if "ProstStart" not in LizaVar:
-            LizaVar["ProstStart"] = 0
-        if "PriestAdvice" not in BeckyVar:
-            BeckyVar["PriestAdvice"] = 0
-        if "visitedhome" not in BeckyVar:
-            BeckyVar["visitedhome"] = 0
-        if "EddieTryToFuck" not in BeckyVar:
-            BeckyVar["EddieTryToFuck"] = 0
-        if "alberfriends" not in AmandaVar:
-            AmandaVar["alberfriends"] = 0
-        if "lizafriends" not in AmandaVar:
-            AmandaVar["lizafriends"] = 0
+        Georgett.ensure_story_defaults()
+        Liza.ensure_story_defaults()
+        Becky.ensure_story_defaults()
+        Amanda.ensure_story_defaults()
         if "eddie" not in cametoday_npc:
             cametoday_npc["eddie"] = 0
 
@@ -50,17 +40,17 @@ init python:
         church_donated_amount = _ndf_int(ChurchDonatedAmount, 0)
         glory_hole_look = _ndf_int(GloryHoleLook, 0)
 
-        if GeorgettVar.get("TalkChurchAfterCermonLiza", 0) and LizaVar.get("ProstStart", 0) == 0:
-            LizaVar["ProstStart"] = 1
+        if Georgett.story_value("TalkChurchAfterCermonLiza", 0) and Liza.story_value("ProstStart", 0) == 0:
+            Liza.set_story_value("ProstStart", 1)
 
-        if ChurchAfterCermon.get("becky", 0) < 4 and week_val == 7 and BeckyVar.get("PriestAdvice", 0) > 0:
-            if BeckyVar.get("PriestAdvice", 0) in (1, 2):
-                BeckyVar["PriestAdvice"] = 2
-                if renpy.random.randint(1, 70) * 30 <= church_donated_amount:
-                    BeckyVar["PriestAdvice"] = 3
-            if BeckyVar.get("PriestAdvice", 0) == 3:
-                if BeckyVar.get("visitedhome", 0) < 7 and BeckyVar.get("EddieTryToFuck", 0) >= 4:
-                    BeckyVar["visitedhome"] = 7
+        if Becky.after_sermon_stage() < 4 and week_val == 7 and Becky.var.get("PriestAdvice", 0) > 0:
+            if Becky.var.get("PriestAdvice", 0) in (1, 2):
+                Becky.var["PriestAdvice"] = 2
+                if procedural_randint(1, 70, "becky_priest_advice_finish_%s" % dayspassed_val) * 30 <= church_donated_amount:
+                    Becky.var["PriestAdvice"] = 3
+            if Becky.var.get("PriestAdvice", 0) == 3:
+                if Becky.var.get("visitedhome", 0) < 7 and Becky.var.get("EddieTryToFuck", 0) >= 4:
+                    Becky.var["visitedhome"] = 7
 
         while TodaySexEvents:
             tmpArray = TodaySexEvents_PopFirst()
@@ -100,7 +90,7 @@ init python:
                 else:
                     PregnancyCheck(girl, glory_hole_inside, 1, "", 1, "")
             elif girl == "amanda" and place == "glorytry":
-                AmandaVar["glorytried"] = 1
+                Amanda.set_var_int("glorytried", 1)
                 PregnancyCheck(girl, "mouth", 1, "", 1, "")
             elif girl == "amanda" and place == "legarerun":
                 apply_legare_amanda_let_go_code()
@@ -109,20 +99,20 @@ init python:
             elif place == "Priest":
                 PregnancyCheck(girl, "inside", 1, "Отец Герхард")
                 if girl == "becky" and renpy.random.randint(1, 2) == 1:
-                    DayLastOrgasmGiven["becky"] = dayspassed_val
+                    Becky.set_story_value("last_store_orgasm_day", dayspassed_val)
             elif girl == "becky":
                 if place == "StoreLover":
                     if event_type == 1:
                         PregnancyCheck("becky", "inside", 1, "Легаре")
                     if event_type == 2:
                         PregnancyCheck("becky", "inside", 1, "", 1, "Неизвестный грузчик")
-                    DayLastOrgasmGiven["becky"] = dayspassed_val
+                    Becky.set_story_value("last_store_orgasm_day", dayspassed_val)
                 elif place == "EddieMom":
                     if _ndf_int(cametoday_npc.get("eddie", 0), 0) == 0:
                         inside_or_mouth = "inside" if renpy.random.randint(1, 2) == 1 else "mouth"
                         PregnancyCheck(girl, inside_or_mouth, 1, "eddie")
                         if renpy.random.randint(1, 5) == 1:
-                            DayLastOrgasmGiven["becky"] = dayspassed_val
+                            Becky.set_story_value("last_store_orgasm_day", dayspassed_val)
             else:
                 PregnancyCheck(girl, "", 1, "")
 
@@ -132,21 +122,21 @@ init python:
             if _ndf_int(tmpArray.get("GoOut", 0), 0) == 1:
                 apply_legare_amanda_let_go_code()
 
-        if AmandaVar.get("gloryscold", 0) or AmandaVar.get("glorywalkout", 0) or AmandaVar.get("glorysuck", 0) or AmandaVar.get("glorydeflower", 0):
-            AmandaVar["gloryyouknow"] = 1
-        if AmandaVar.get("glorysuck", 0):
-            AmandaVar["suckyou"] = 1
-        if AmandaVar.get("glorydeflower", 0):
-            AmandaVar["fuckyou"] = 1
-        if AmandaVar.get("glorydeflower", 0) or AmandaVar.get("fuckyou", 0) or AmandaVar.get("sawlegaresex", 0) or AmandaVar.get("sawwithguys", 0) or AmandaVar.get("knowlegaresex", 0) or AmandaVar.get("knownotvirgin", 0):
-            AmandaVar["knowsexactive"] = 1
-        AmandaVar["knowyouseesex"] = 0
-        AmandaVar["kickyoufromroom"] = 0
-        AmandaVar["askzalettoday"] = 0
-        AmandaVar["leftdances"] = 0
-        BeckyVar["leftdances"] = 0
-        AmandaVar["alberfriends"] = max(0, min(_ndf_int(AmandaVar.get("alberfriends", 0), 0), 20))
-        AmandaVar["lizafriends"] = max(0, min(_ndf_int(AmandaVar.get("lizafriends", 0), 0), 20))
+        if Amanda.var_int("gloryscold", 0) or Amanda.var_int("glorywalkout", 0) or Amanda.var_int("glorysuck", 0) or Amanda.var_int("glorydeflower", 0):
+            Amanda.set_var_int("gloryyouknow", 1)
+        if Amanda.var_int("glorysuck", 0):
+            Amanda.set_var_int("suckyou", 1)
+        if Amanda.var_int("glorydeflower", 0):
+            Amanda.set_var_int("fuckyou", 1)
+        if Amanda.var_int("glorydeflower", 0) or Amanda.var_int("fuckyou", 0) or Amanda.var_int("sawlegaresex", 0) or Amanda.var_int("sawwithguys", 0) or Amanda.var_int("knowlegaresex", 0) or Amanda.var_int("knownotvirgin", 0):
+            Amanda.set_var_int("knowsexactive", 1)
+        Amanda.set_var_int("knowyouseesex", 0)
+        Amanda.set_var_int("kickyoufromroom", 0)
+        Amanda.set_var_int("askzalettoday", 0)
+        Amanda.set_var_int("leftdances", 0)
+        Becky.set_story_value("leftdances", 0)
+        Amanda.set_var_int("alberfriends", max(0, min(Amanda.var_int("alberfriends", 0), 20)))
+        Amanda.set_var_int("lizafriends", max(0, min(Amanda.var_int("lizafriends", 0), 20)))
 
         ChurchDonatedToday = 0
         FridayDancesCount = 0
@@ -176,7 +166,7 @@ label NextDay_FinishDayEvents:
         call DailySetstatdefault(_ndf_all_girl_names[_ndf_all_girl_index])
         $ _ndf_all_girl_index += 1
 
-    $ Talked["Zimmer"] = 0
+    $ Talked["zimmer"] = 0
     $ people_reset_daily_interactions()
 
     python:
@@ -200,13 +190,6 @@ label NextDay_FinishDayEvents:
             StolenHorseDays -= 1
 
         cametoday_npc.clear()
-        if isinstance(SexTimesToday, dict):
-            SexTimesToday.clear()
-        if isinstance(MelissaVar, dict):
-            MelissaVar["private_context_day"] = -1
-            MelissaVar["private_context_origin"] = ""
-            MelissaVar["private_context_place"] = ""
-            MelissaVar["private_place_heat"] = 0
         Talked.clear()
         ChurchAfterCermon.clear()
         people_sync_all()

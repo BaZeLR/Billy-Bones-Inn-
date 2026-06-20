@@ -1,144 +1,209 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# Robin / Blackwood road story labels.
+#
+# Room owns place data: BlackwoodRoadRoom.
+# Event availability is owned by sherwoodThreadList in StoryEventRuntime.rpy.
+# These labels own only authored scene flow, images, choices, and state mutation.
 # ================================================================================
+
+default BlackwoodTravelOnHorse = 0
+
+init python:
+    BlackwoodRoadRoom = Room(
+        code_name="BlackwoodRoad",
+        group_name=ROOM_GROUP_FOREST,
+        display_name="Блэквудская вырубка",
+        bg_picture="images/Robin/robin.png",
+        descriptions=[
+            RoomDescription(
+                text="Дорога к Куниделлу проходит через Блэквудскую вырубку: редкие пни, молодая поросль и тропа, где слишком легко устроить засаду.",
+                priority=100,
+            ),
+        ],
+        exits=[
+            RoomExit(label="Вернуться в трактир", target="TavernMain", minutes_to_pass=60),
+        ],
+        custom_properties={
+            "legacy_location": "SherwoodTravel",
+        },
+    )
+
+
 label SherwoodRobbedHorseTakeCode:
     $ MyStallion = ""
-    $ MongolVar["WillTryToSteal"] = 0
-    $ RobinVar["KnowBigTitsVillage"] = max(RobinVar.get("KnowBigTitsVillage", 0), 1)
+    $ peopleInfo["mongol"].var["WillTryToSteal"] = 0
+    $ Robin.var["KnowBigTitsVillage"] = max(int(Robin.var.get("KnowBigTitsVillage", 0) or 0), 1)
     return
 
 
 label SherwoodRobbedAndGoCode:
-    "Идти дальше в Куниделл смысла не было никакого и вы направили свои стопы обратно домой."
-    $ money = max(0, money - 50)
-    $ BeckyVar["RobbedByRobin"] = max(1, BeckyVar.get("RobbedByRobin", 0))
+    $ money = max(0, int(money or 0) - 50)
+    $ Becky.var["RobbedByRobin"] = max(1, int(Becky.var.get("RobbedByRobin", 0) or 0))
+    $ Robin.var["RobbedNum"] = int(Robin.var.get("RobbedNum", 0) or 0) + 1
+    if int(Robin.var.get("Negotiate", 0) or 0) == 1:
+        $ Robin.var["Negotiate"] = 2
     $ calendar_v2.hour = 16
     $ calendar_v2.minute = 0
     $ calendar_v2.sync_state()
-    if RobinVar.get("Negotiate", 0) == 1:
-        $ RobinVar["Negotiate"] = RobinVar.get("Negotiate", 0) + 1
-    $ RobinVar["RobbedNum"] = RobinVar.get("RobbedNum", 0) + 1
     call stat
-    menu:
-        "Домой":
-            jump TavernMain
+    return
 
 
 label SherwoodKunidellOpenedCode(OnHorse=0):
-    $ RobinVar["MongolSafePassUsed"] = 1
-    $ RobinVar["KunidellOpened"] = 1
+    $ Robin.var["MongolSafePassUsed"] = 1
+    $ Robin.var["KunidellOpened"] = 1
     $ calendar_v2.hour = 16
     $ calendar_v2.minute = 0
     $ calendar_v2.sync_state()
-    if OnHorse == 1:
-        $ _sherwood_trade_profit = renpy.random.randint(50, 300)
-        $ money += 200 + _sherwood_trade_profit
-        $ RobinVar["KunidellDeliveries"] = RobinVar.get("KunidellDeliveries", 0) + 1
-        "До Куниделла вы добрались уже без приключений. Эльфы встретили мешки Беккиных овощей с таким видом, будто вы привезли им не репу с огурцами, а редчайшие дары заморских королевств."
-        "Торговля прошла удачно. Вернув Беккины двести мараведи оборота, вы получили еще [_sherwood_trade_profit] мараведи чистого навара."
-        call stat
-    else:
-        "Без груза и без лошади делать в Куниделле было особенно нечего, но теперь дорога хотя бы стала понятной. Слово Монгола действительно сработало: люди Робина вас пропустили."
-    menu:
-        "Домой":
-            jump TavernMain
+    if int(OnHorse or 0) == 1:
+        $ _blackwood_trade_profit = procedural_randint(50, 300, "blackwood_kunidell_trade_%s" % int(dayspassed or 0))
+        $ money += 200 + _blackwood_trade_profit
+        $ Robin.var["KunidellDeliveries"] = int(Robin.var.get("KunidellDeliveries", 0) or 0) + 1
+    call stat
+    return
 
 
 label SherwoodTravel(OnHorse=0):
-    call EnterLocation("SherwoodTravel")
-    if navigation_only_mode_enabled():
-        "Насвистывая, вы идете по дороге к Куниделлу через вырубку Шервуда."
-        "[navigation_only_message()]"
-        "[navigation_only_time_note()]"
-        menu:
-            "Вернутся обратно в Коитополис":
-                jump TavernMain
-        return
+    $ BlackwoodTravelOnHorse = int(OnHorse or 0)
+    jump BlackwoodRoad
 
-    $ OnHorse = int(OnHorse or 0)
-    $ RobbersHeadNameTmp = "Робин Гуд" if RobinVar.get("KnowHim", 0) else "предводитель"
-    $ travel_action = "Ехать" if OnHorse == 1 else "Идти"
-    $ travel_verb = "едете" if OnHorse == 1 else "идете"
 
-    "Насвистывая, вы [travel_verb] по дороге к Куниделлу. Через несколько часов поля и перелески уступают место вырубке. И так не сильно наезженная, дорога превращается практически в тропинку, петляющую между пнями и зарослями молодого кустарника."
-    call ShowImage("Robin", "", "robin")
-    if RobinVar.get("RobbedNum", 0) == 0:
-        "Вдруг вдалеке вы замечаете группу мужчин в зеленых трико."
-    elif RobinVar.get("KnowHim", 0) == 0:
-        "Вдруг вдалеке вы замечаете уже знакомых вам грабителей."
+label BlackwoodRoad:
+    call EnterLocation("BlackwoodRoad")
+    $ CurrentRoom = BlackwoodRoadRoom
+    $ CurLoc = "BlackwoodRoad"
+    $ location = CurLoc
+    $ scene_image = BlackwoodRoadRoom.bg_picture
+    $ _layout_last_picture = scene_image
+    $ MainTxt = BlackwoodRoadRoom.visible_descriptions()[0].text
+    $ CurLocDesc = MainTxt
+    $ BlackwoodRoadRoom.mark_visited()
+    call RoomEnterEventGate(CurLoc, False)
+    $ current_action_title = "Блэквудская вырубка"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Вернуться в трактир", Call("MoveToRoom", "TavernMain", 60)),
+    ]
+    call screen main_ui
+    jump BlackwoodRoad
+
+
+label story_robin_blackwood_ambush_0:
+    $ SignalBlockTime = 1
+    $ UI_mode = "event"
+    $ Robin.location = "BlackwoodRoad"
+    $ Robin.var["BlackwoodRoadSeen"] = 1
+    $ _blackwood_on_horse = int(BlackwoodTravelOnHorse or 0)
+    $ _blackwood_travel_verb = "едете" if _blackwood_on_horse == 1 else "идете"
+    vscene "images/Robin/robin.png"
+    $ MainTxt = "Насвистывая, вы [_blackwood_travel_verb] по дороге к Куниделлу. Через несколько часов поля и перелески уступают место вырубке. Дорога превращается почти в тропинку между пнями и молодым кустарником.\n\n"
+    if int(Robin.var.get("RobbedNum", 0) or 0) == 0:
+        $ MainTxt += "Вдруг впереди вы замечаете группу мужчин в зеленых трико."
+    elif int(Robin.var.get("KnowHim", 0) or 0) == 0:
+        $ MainTxt += "Вдруг впереди вы замечаете уже знакомых грабителей."
     else:
-        "Вдруг вдалеке вы замечаете ваших старых знакомых, несчастных безработных лесорубов, во главе с Робин Гудом."
+        $ MainTxt += "Вдруг впереди вы замечаете старых знакомых: несчастных безработных лесорубов во главе с Робин Гудом."
+    $ CurLocDesc = MainTxt
+    "[MainTxt]"
 
     menu:
-        "[travel_action] дальше":
-            call IntRobinTalk
-            if RobinVar.get("MongolSafePass", 0) == 1:
-                call ShowImage("Robin", "", "robin1")
-                "Вы уже приготовились к привычному разговору о добровольных пожертвованиях, но один из разбойников вдруг прищурился и дернул Робина за рукав."
-                "\"Йо, браза,\" сказал он. \"Это тот самый трактирщик. Монгол велел своих предупредить: этот чувак не мазафака, он его из колодок вытащил.\""
-                call ShowImage("Robin", "", "robin2")
-                "Робин Гуд некоторое время смотрел на вас с новым интересом, потом широко улыбнулся."
-                "\"Вот это другое дело, бразар. За Монгола уважуха. Раз наш человек сказал, что ты браза, значит сегодня ты едешь как браза. Деньги при себе оставь, коняшку тоже. Но если кто спросит - мы тебя не пропускали. Социяльная ответственность, понимаешь?\""
-                "\"Понимаю,\" поспешно согласились вы, не желая уточнять детали."
-                call SherwoodKunidellOpenedCode(OnHorse)
-                return
+        "Идти дальше":
+            jump story_robin_blackwood_approach
 
-            if RobinVar.get("RobbedNum", 0) == 0:
-                "\"Семь бед - один ответ!\" подумали вы и продолжили свой путь как ни в чем ни бывало. Мужики в трико при виде вас заметно оживились, в руках у них появились луки, стрелы и разнообразные колюще-режущие предметы."
-                "Когда вы приблизились, их [RobbersHeadNameTmp], негр с золотой цепью на шее и накинутом на голову капюшоне, вышел навстречу вам и спросил, широко улыбаясь: \"Йо, браза! Куда идешь?\""
-                "\"В Куниделл,\" скромно ответили вы."
-                if OnHorse == 1:
-                    "После этого обмена любезностями лицо вашего собеседника вдруг стало серьезным и он заявил: \"Хей, мэн, я и мои браза - простые лесорубы, доведенные обстоятельствами,\" тут он обвел рукой обширную вырубку, \"до отчаяния. Я вижу ты нам тоже браза, и хочешь сделать добровольное пожертвование на наше благое дело. Йо, я вижу ты щедрый чувак и хочешь пожертвовать все имеющиеся у тебя деньги. Ну и лошадь конечно, она нам тоже пригодится.\""
-                else:
-                    "После этого обмена любезностями лицо вашего собеседника вдруг стало серьезным и он заявил: \"Хей, мэн, я и мои браза - простые лесорубы, доведенные обстоятельствами,\" тут он обвел рукой обширную вырубку, \"до отчаяния. Я вижу ты нам тоже браза, и хочешь сделать добровольное пожертвование на наше благое дело. Йо, я вижу ты щедрый чувак и хочешь пожертвовать все имеющиеся у тебя деньги.\""
-                "Вы попробовали было осторожно отказаться, но ваш визави сразу отмел все возражения: \"Йо мэн, ты конечно хочешь к нам присоединиться и поучаствовать в нашей борьбе. Но не, сорри чувак, в настоящий момент мы не принимаем добровольцев. Только пожертвования.\""
-                $ BeckyVar["SherwoodSuspect"] = BeckyVar.get("SherwoodSuspect", 0) + 10
-                $ BeckyVar["KnowSherwood"] = 1
-                menu:
-                    "Попрощаться":
-                        "\"Ну ладно, с вами поговорить - одно удовольствие,\" заметили вы и непринужденно пошли своей дорогой."
-                        "\"Йо, браза, ты же о пожертвовании забыл,\" напомнил вам [RobbersHeadNameTmp]. И тут же чьи то трудовые мозолистые руки разлучили вас с вашим кошельком."
-                        if money >= 50:
-                            "Хорошо еще что вы взяли с собой только 50 мараведи!"
-                        if OnHorse == 1:
-                            "Еще один лесоруб заботливо взял из ваших рук поводья вашей лошади."
-                            "\"Йо, бразас, в Большие Сиськи теперь легче будет добраться!\" обрадованно вскричал он."
-                            call SherwoodRobbedHorseTakeCode
-                        call SherwoodRobbedAndGoCode
-            else:
-                "При виде вас [RobbersHeadNameTmp] и его друзья очень удивились. \"Слышь мужики, а я думал что он трактирщик,\" недоуменно пробормотал главарь. Обернушись к вам, он сменил тон на преувеличенно радостный: \"Йо, бразар, ты нам донату занес? Ты кул, бразар, видно что не мазафака.\""
-                menu:
-                    "Ага, вот ваши денежки":
-                        
-                        "Широко, хотя и немного вымученно, улыбаясь, вы вывернули карманы."
-                        if money >= 50:
-                            "Хорошо еще что вы взяли с собой только 50 мараведи!"
-                        "Обездоленные радостно переглянулись. Тут [RobbersHeadNameTmp] прокашлялся и сказал: \"Йо спасибо бразар, а теперь иди себе обратно. Нам с бразами надо перетереть за социяльную справедливость. Но ты приходи еще, завтра там.\""
-                        "Совету, подкрепленному мечами, пришлось последовать и вы отправились обратно."
-                        if OnHorse == 1:
-                            "В последний момент один из разбойников выхватил у вас повод, заявив: \"Эй, бразар, коняшку то оставь. Здесь недалеко, на своих дотопаешь.\""
-                            call SherwoodRobbedHorseTakeCode
-                        if OnHorse == 1:
-                            "\"Да, как-то глупо получилось,\" подумали вы. \"И зачем я еще раз сюда поперся? Да еще и с конем?\""
-                        else:
-                            "\"Да, как-то глупо получилось,\" подумали вы. \"И зачем я еще раз сюда поперся?\""
-                        call SherwoodRobbedAndGoCode
+        "Вернуться обратно в Коитополис":
+            jump story_robin_blackwood_return_to_city
 
-            call ShowImage("Robin", "", "portrait2")
 
-        "Вернутся обратно в Коитополис":
-            if RobinVar.get("RobbedNum", 0) == 0:
-                $ BeckyVar["SherwoodSuspect"] = BeckyVar.get("SherwoodSuspect", 0) + 2
-                $ BeckyVar["KnowSherwood"] = 1
-                "Решив что встреча со странными мужиками в трико на пустынной вырубке"
-            elif RobinVar.get("KnowHim", 0) == 0:
-                "Решив что, по здравому размышлению, встреча с грабителями"
-            else:
-                "Решив что новая встреча с вашим старым другом Робином, да еще и на пустынной вырубке,"
-            "ничего хорошего вам не принесет, вы развернулись и пустились в обратный путь. Может вас преследовали, может нет, но вы благополучно выбрались с вырубки на обжитую местность. Уже смеркалось, поэтому вам ничего не оставалось, как направиться обратно в Коитополис, куда вы и добрались без приключений. На сегодня ваше путешествие закончено."
-            $ calendar_v2.hour = 16
-            $ calendar_v2.minute = 0
-            $ calendar_v2.sync_state()
-            menu:
-                "Домой":
-                    jump TavernMain
+label story_robin_blackwood_approach:
+    call IntRobinTalk
+    if int(Robin.var.get("MongolSafePass", 0) or 0) == 1:
+        jump story_robin_blackwood_mongol_pass
+    if int(Robin.var.get("RobbedNum", 0) or 0) == 0:
+        jump story_robin_blackwood_first_robbery
+    jump story_robin_blackwood_repeat_robbery
+
+
+label story_robin_blackwood_mongol_pass:
+    vscene "images/Robin/mongolAndRobin1.png"
+    $ MainTxt = "Вы уже приготовились к привычному разговору о добровольных пожертвованиях, но один из разбойников вдруг прищурился и дернул Робина за рукав.\n\n\"Йо, браза,\" сказал он. \"Это тот самый трактирщик. Монгол велел своих предупредить: этот чувак не мазафака, он его из колодок вытащил.\"\n\nРобин некоторое время смотрит на вас с новым интересом, потом широко улыбается.\n\n\"Вот это другое дело, бразар. За Монгола уважуха. Раз наш человек сказал, что ты браза, значит сегодня ты едешь как браза. Деньги при себе оставь, коняшку тоже. Но если кто спросит - мы тебя не пропускали. Социяльная ответственность, понимаешь?\""
+    $ CurLocDesc = MainTxt
+    "[MainTxt]"
+    call SherwoodKunidellOpenedCode(BlackwoodTravelOnHorse)
+    if int(BlackwoodTravelOnHorse or 0) == 1:
+        $ MainTxt = "До Куниделла вы добрались уже без приключений. Эльфы встретили мешки Беккиных овощей с таким видом, будто вы привезли им редчайшие дары заморских королевств.\n\nТорговля прошла удачно, дорога теперь открыта."
+    else:
+        $ MainTxt = "Без груза и без лошади делать в Куниделле было особенно нечего, но теперь дорога хотя бы стала понятной. Слово Монгола действительно сработало: люди Робина вас пропустили."
+    $ CurLocDesc = MainTxt
+    "[MainTxt]"
+    $ thread.advance()
+    $ UI_mode = "scene"
+    $ SignalBlockTime = 0
+    return True
+
+
+label story_robin_blackwood_first_robbery:
+    vscene "images/Robin/portrait2.jpg"
+    $ _robbers_head = "Робин Гуд" if int(Robin.var.get("KnowHim", 0) or 0) else "предводитель"
+    $ MainTxt = "\"Семь бед - один ответ!\" думаете вы и продолжаете путь. Мужики в трико заметно оживляются, в руках у них появляются луки, стрелы и разное колюще-режущее железо.\n\nКогда вы приближаетесь, их [_robbers_head], здоровенный человек с золотой цепью и капюшоном, выходит навстречу и широко улыбается: \"Йо, браза! Куда идешь?\"\n\n\"В Куниделл,\" скромно отвечаете вы.\n\nПосле этого его лицо становится серьезным. \"Хей, мэн, я и мои браза - простые лесорубы, доведенные обстоятельствами до отчаяния. Я вижу, ты хочешь сделать добровольное пожертвование на наше благое дело.\""
+    if int(BlackwoodTravelOnHorse or 0) == 1:
+        $ MainTxt += " \"Все деньги. Ну и лошадь конечно, она нам тоже пригодится.\""
+    else:
+        $ MainTxt += " \"Все имеющиеся у тебя деньги.\""
+    $ Becky.var["SherwoodSuspect"] = int(Becky.var.get("SherwoodSuspect", 0) or 0) + 10
+    $ Becky.var["KnowSherwood"] = 1
+    $ Becky.var["KnowBlackwood"] = 1
+    $ CurLocDesc = MainTxt
+    "[MainTxt]"
+
+    menu:
+        "Попрощаться":
+            jump story_robin_blackwood_robbed_return
+
+
+label story_robin_blackwood_repeat_robbery:
+    vscene "images/Robin/portrait2.jpg"
+    $ _robbers_head = "Робин Гуд" if int(Robin.var.get("KnowHim", 0) or 0) else "предводитель"
+    $ MainTxt = "При виде вас [_robbers_head] и его друзья очень удивляются.\n\n\"Слышь мужики, а я думал, что он трактирщик,\" недоуменно бормочет главарь. Потом он сменяет тон на радостный: \"Йо, бразар, ты нам донату занес? Ты кул, бразар, видно что не мазафака.\""
+    $ CurLocDesc = MainTxt
+    "[MainTxt]"
+
+    menu:
+        "Ага, вот ваши денежки":
+            jump story_robin_blackwood_robbed_return
+
+
+label story_robin_blackwood_robbed_return:
+    $ MainTxt = "Вы пытаетесь сохранить лицо, но трудовые мозолистые руки быстро разлучают вас с кошельком."
+    if int(money or 0) >= 50:
+        $ MainTxt += "\n\nХорошо еще, что вы взяли с собой только 50 мараведи."
+    if int(BlackwoodTravelOnHorse or 0) == 1:
+        $ MainTxt += "\n\nЕще один лесоруб заботливо забирает поводья вашей лошади. \"Йо, бразас, в Большие Сиськи теперь легче будет добраться!\""
+        call SherwoodRobbedHorseTakeCode
+    $ CurLocDesc = MainTxt
+    "[MainTxt]"
+    call SherwoodRobbedAndGoCode
+    $ UI_mode = "scene"
+    $ SignalBlockTime = 0
+    return True
+
+
+label story_robin_blackwood_return_to_city:
+    vscene "images/Robin/robin.png"
+    if int(Robin.var.get("RobbedNum", 0) or 0) == 0:
+        $ Becky.var["SherwoodSuspect"] = int(Becky.var.get("SherwoodSuspect", 0) or 0) + 2
+        $ Becky.var["KnowSherwood"] = 1
+        $ Becky.var["KnowBlackwood"] = 1
+        $ MainTxt = "Решив, что встреча со странными мужиками в трико на пустынной вырубке ничего хорошего не принесет, вы разворачиваетесь и уходите обратно."
+    elif int(Robin.var.get("KnowHim", 0) or 0) == 0:
+        $ MainTxt = "Решив, что новая встреча с грабителями ничего хорошего не принесет, вы разворачиваетесь и уходите обратно."
+    else:
+        $ MainTxt = "Решив, что новая встреча с Робин Гудом на пустынной вырубке ничего хорошего не принесет, вы разворачиваетесь и уходите обратно."
+    $ MainTxt += "\n\nМожет, вас преследовали, может, нет, но вы благополучно выбрались с вырубки на обжитую местность. Уже смеркалось, и вам осталось только вернуться в Коитополис."
+    $ CurLocDesc = MainTxt
+    "[MainTxt]"
+    $ calendar_v2.hour = 16
+    $ calendar_v2.minute = 0
+    $ calendar_v2.sync_state()
+    $ UI_mode = "scene"
+    $ SignalBlockTime = 0
+    return True

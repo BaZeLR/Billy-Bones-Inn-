@@ -41,6 +41,7 @@ init python:
     )
 
 default TavernHelpPage = 0
+default CheatMoneyGrab = 0
 
 
 label TavernHelp:

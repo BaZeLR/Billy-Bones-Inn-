@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default CurrentRoom = None
 default current_action_title = "Actions"
@@ -25,47 +25,11 @@ init python:
         if callable(restart_fn):
             restart_fn()
 
-    def main_ui_set_action_panel(title="", items=None, content=None, ui_mode=None, selected_char=None, clear_specs=True, restart=True):
-        global UI_mode, UI_selected_char, current_girl_key, current_action_content
-        global current_action_title, current_action_items, main_ui_inventory_dropdown_open, action_menu_specs
-
-        if str(title or "").strip():
-            current_action_title = str(title or "")
-        current_action_content = content
-        current_action_items = list(items or [])
-        main_ui_inventory_dropdown_open = False
-
-        if ui_mode is not None:
-            UI_mode = str(ui_mode or "scene")
-        if selected_char is not None:
-            UI_selected_char = str(selected_char or "")
-            current_girl_key = str(selected_char or "")
-        elif str(ui_mode or "") in ("scene", "event"):
-            UI_selected_char = ""
-            current_girl_key = ""
-        if clear_specs:
-            action_menu_specs = []
-        if restart:
-            main_ui_restart_interaction()
-
-    def main_ui_call_label(label_name="", *label_args):
-        label = str(label_name or "").strip()
-        if not label:
-            return
-        has_label_fn = getattr(renpy_module, "has_label", None)
-        if callable(has_label_fn) and not has_label_fn(label):
-            return
-        call_new_context_fn = getattr(renpy_module, "call_in_new_context", None)
-        if callable(call_new_context_fn):
-            return call_new_context_fn(label, *tuple(label_args or ()))
-        raise Exception("Cannot call Ren'Py label from main UI: call_in_new_context is unavailable.")
-
     def main_ui_restore_room_scene_state():
         global UI_mode, UI_selected_char, current_girl_key, current_action_content
         global current_action_title, current_action_items, current_object_id, CurrentRoom, CurLoc
-        global main_ui_inventory_dropdown_open, action_menu_specs, action_menu_entity_type
-        global action_menu_entity_id, action_menu_where, action_menu_title, action_menu_entity_data
-        global action_menu_actions, action_menu_selected
+        global MainTxt, CurLocDesc
+        global main_ui_inventory_dropdown_open
 
         UI_mode = "scene"
         UI_selected_char = ""
@@ -73,29 +37,15 @@ init python:
         current_action_content = None
         current_object_id = ""
         main_ui_inventory_dropdown_open = False
-        action_menu_entity_type = ""
-        action_menu_entity_id = ""
-        action_menu_where = ""
-        action_menu_title = ""
-        action_menu_entity_data = {}
-        action_menu_actions = []
-        action_menu_selected = ""
-        action_menu_specs = []
-
         room_obj = CurrentRoom
         room_code = str(getattr(room_obj, "code_name", "") or CurLoc or "").strip()
         if room_code == "TavernKitchen" and bool(TavernBreakfastEventActive):
             tavern_breakfast_restore_ui_state()
             return
-        refresh_targets = {}
-        try:
-            refresh_targets = dict(_action_refresh_target_labels(room_code) or {})
-        except Exception:
-            refresh_targets = {}
-        if room_code == "TavernMain" or bool(str(refresh_targets.get("build", "") or "").strip()) or bool(str(refresh_targets.get("object", "") or "").strip()):
-            main_ui_call_label("RefreshCurrentActionMenu", room_code, "", True)
-            return
         current_action_title = "Действия в трактире" if room_code == "TavernMain" else "Действия"
+        if room_obj is not None and hasattr(room_obj, "current_description_text"):
+            MainTxt = room_obj.current_description_text(str(getattr(room_obj, "display_name", "") or room_code))
+            CurLocDesc = MainTxt
         room_sections = room_obj.build_menu_sections() if room_obj is not None and hasattr(room_obj, "build_menu_sections") else {"movement": [], "actions": []}
         current_action_items = list(room_sections.get("movement", [])) + list(room_sections.get("actions", []))
 
@@ -120,22 +70,6 @@ init python:
         player_card_set_inventory_origin("room")
         player_card_show_inventory_section_state(section_id)
 
-    def main_ui_entity_button_spec(entity_type="", entity_id="", entity_data=None):
-        entity_key = str(entity_type or "").strip().lower()
-        npc_key = str(entity_id or "").strip()
-        state = {
-            "id": "open_entity_menu",
-            "entity_type": entity_key,
-            "entity_id": npc_key,
-            "where_id": str(CurLoc or ""),
-            "entity_data": dict(entity_data or {}),
-        }
-        if npc_key.lower() == "you":
-            state["id"] = "open_player_card"
-        elif npc_key.lower() == "dog":
-            state["id"] = "open_dog_menu"
-        return state
-
     def main_ui_begin_talk_state(title="", selected_char=""):
         global UI_mode, UI_selected_char, current_girl_key, current_action_content, current_action_title
 
@@ -153,7 +87,8 @@ init python:
         main_ui_restart_interaction()
 
     def main_ui_end_talk_state():
-        main_ui_restore_room_scene_state()
+        room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+        renpy_module.jump(room_label)
 
     def main_ui_begin_native_scene_state(title=""):
         global UI_mode, current_action_title, current_action_content, current_action_items
@@ -170,7 +105,8 @@ init python:
         main_ui_restart_interaction()
 
     def main_ui_end_native_scene_state():
-        main_ui_restore_room_scene_state()
+        room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+        renpy_module.jump(room_label)
 
     def tractir_after_load_restore_ui():
         global current_action_content, current_action_items, CurrentRoom, current_room_code
@@ -249,14 +185,14 @@ init -5:
         size 18
 
 label ReturnMainUISceneMode:
-    $ main_ui_restore_room_scene_state()
+    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _room_label:
+        jump expression _room_label
     return
 
 
 screen current_action_panel():
-    if list(action_menu_specs or []):
-        use npc_action_menu(action_menu_specs)
-    elif current_action_content:
+    if current_action_content:
         use expression current_action_content
     elif current_action_items:
         use choice_panel(current_action_items)
@@ -269,33 +205,6 @@ screen current_action_panel():
         use choice_panel(action_items)
     else:
         text "Выберите действие." size 20
-
-
-screen npc_action_menu(specs):
-    vbox:
-        for spec in list(specs or []):
-            $ _spec_id = str(spec.get("id", "") or "").strip()
-            $ _spec_text = str(spec.get("text", "") or "").strip()
-            if _spec_text:
-                if _spec_id == "close_inventory":
-                    textbutton _spec_text action Function(main_ui_close_inventory_dropdown):
-                        text_size 20
-                elif _spec_id == "look":
-                    textbutton _spec_text action Call("ActionMenuRunSpec", _spec_id, str(spec.get("entity_type", "") or ""), str(spec.get("entity_id", "") or ""), str(spec.get("where_id", "") or "")):
-                        text_size 20
-                elif _spec_id == "talk":
-                    textbutton _spec_text action Call("ActionMenuRunSpec", _spec_id, str(spec.get("entity_type", "") or ""), str(spec.get("entity_id", "") or ""), str(spec.get("where_id", "") or "")):
-                        text_size 20
-                elif _spec_id == "flirt":
-                    textbutton _spec_text action Call("ActionMenuRunSpec", _spec_id, str(spec.get("entity_type", "") or ""), str(spec.get("entity_id", "") or ""), str(spec.get("where_id", "") or "")):
-                        text_size 20
-                elif _spec_id == "gift":
-                    textbutton _spec_text action Call("ActionMenuRunSpec", _spec_id, str(spec.get("entity_type", "") or ""), str(spec.get("entity_id", "") or ""), str(spec.get("where_id", "") or "")):
-                        text_size 20
-                elif _spec_id == "back":
-                    textbutton _spec_text action Function(action_menu_handle_back_state):
-                        text_size 20
-
 
 screen main_ui_status_item(label, value, value_color="#f0e6d2"):
     hbox:
@@ -421,7 +330,9 @@ screen main_ui():
     $ _desc = str(_coerce_panel_text_value(MainTxt if MainTxt is not None else CurLocDesc) or "")
     $ _picture = resolve_main_ui_picture(_room)
     $ _npcs = _room.visible_npcs() if _room is not None and hasattr(_room, "visible_npcs") else []
-    $ _char_entries = _character_action_grid_entries(_room)
+    $ _room_code = str(getattr(_room, "code_name", "") or CurLoc or "")
+    $ _char_entries = [{"entity_type": "player", "id": "you", "title": "Стефан", "where_id": _room_code, "entity_data": {}}]
+    $ _char_entries += [{"entity_type": str(row.get("entity_type", "npc") or "npc"), "id": str(row.get("npc_id", row.get("entity_id", "")) or ""), "title": str(row.get("title", "") or npc_display_name(str(row.get("npc_id", row.get("entity_id", "")) or ""))), "where_id": _room_code, "entity_data": dict(row)} for row in list(_npcs or []) if isinstance(row, dict) and str(row.get("npc_id", row.get("entity_id", "")) or "").strip()]
     $ _char_slots = list(_char_entries[:9]) + [None] * max(0, 9 - len(_char_entries[:9]))
     $ _textbox_h = int(getattr(gui, "textbox_height", 278))
     $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
@@ -505,6 +416,14 @@ screen main_ui():
                                     use main_ui_hud_button("Итоги", [Function(main_ui_close_inventory_dropdown), SetVariable("main_ui_overlay", "progress")], str(main_ui_overlay or "") == "progress", "main_ui_progress_button")
                                     use main_ui_hud_button("Кто где", [Function(main_ui_close_inventory_dropdown), SetVariable("main_ui_overlay", "people")], str(main_ui_overlay or "") == "people", "main_ui_people_button")
                                     use main_ui_hud_button("Инвентарь", Function(main_ui_toggle_inventory_dropdown), bool(main_ui_inventory_dropdown_open), "main_ui_inventory_button")
+                                    if config.developer:
+                                        use main_ui_hud_button("Debug", [
+                                            Function(main_ui_close_inventory_dropdown),
+                                            Hide("girl_card_overlay"),
+                                            Hide("player_card_overlay"),
+                                            Hide("tavern_report_card_overlay"),
+                                            Jump("DebugBuilderRoom"),
+                                        ], str(CurLoc or "") == "DebugBuilderRoom", "main_ui_debug_builder_button")
 
                                     if bool(main_ui_inventory_dropdown_open):
                                         for _inv_section in player_card_inventory_section_ids():
@@ -562,9 +481,9 @@ screen main_ui():
                                                 $ _npc_name = str(_entry.get("title", "") or "")
                                                 $ _npc_id = str(_entry.get("id", "") or "")
                                                 $ _entity_type = str(_entry.get("entity_type", "npc") or "npc")
+                                                $ _where_id = str(_entry.get("where_id", "") or CurLoc or "")
                                                 $ _entity_data = dict(_entry.get("entity_data", {}) or {})
-                                                $ _npc_spec = main_ui_entity_button_spec(_entity_type, _npc_id, _entity_data)
-                                                if str(_npc_spec.get("id", "") or "") == "open_player_card":
+                                                if _npc_id.lower() == "you":
                                                     textbutton _npc_name:
                                                         id "main_ui_entity_button_player_you"
                                                         alt "main_ui_entity_button_player_you"
@@ -577,7 +496,7 @@ screen main_ui():
                                                             Hide("tavern_report_card_overlay"),
                                                             Function(show_player_card_main_ui_state),
                                                         ]
-                                                elif str(_npc_spec.get("id", "") or "") == "open_dog_menu":
+                                                elif _npc_id.lower() == "dog":
                                                     textbutton _npc_name:
                                                         id "main_ui_entity_button_dog_dog"
                                                         alt "main_ui_entity_button_dog_dog"
@@ -587,7 +506,7 @@ screen main_ui():
                                                             Function(main_ui_close_inventory_dropdown),
                                                             Hide("girl_card_overlay"),
                                                             Hide("player_card_overlay"),
-                                                            Call("OpenEntityActionMenu", str(_npc_spec.get("entity_type", "") or ""), str(_npc_spec.get("entity_id", "") or ""), str(_npc_spec.get("where_id", "") or ""), dict(_npc_spec.get("entity_data", {}) or {})),
+                                                            Function(dog_open_action_menu_state, _where_id),
                                                         ]
                                                 else:
                                                     textbutton _npc_name:
@@ -599,7 +518,7 @@ screen main_ui():
                                                             Function(main_ui_close_inventory_dropdown),
                                                             Hide("girl_card_overlay"),
                                                             Hide("player_card_overlay"),
-                                                            Call("OpenNpcActionMenu", str(_npc_spec.get("entity_id", "") or ""), str(_npc_spec.get("where_id", "") or ""), dict(_npc_spec.get("entity_data", {}) or {})),
+                                                            Function(open_npc_action_menu_state, _npc_id, _where_id, dict(_entity_data)),
                                                         ]
                                             else:
                                                 # Move null outside textbutton block
@@ -717,7 +636,7 @@ screen main_ui_player_card_panel():
 
                 null height 8
 
-                if len(list(FightEnemyParty or [])) <= 0:
+                if len(list(fight_info().enemy_party or [])) <= 0:
                     textbutton "Назад":
                         xminimum 220
                         text_size 22
@@ -776,7 +695,7 @@ screen main_ui_girl_card_panel(girl_name=""):
                     text_bold True
                     text_color "#5c0f1b"
                     text_hover_color "#7d1a2c"
-                    action Function(main_ui_restore_room_scene_state)
+                    action Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or ""))
 
 
 screen main_ui_dog_card_panel():
@@ -827,7 +746,7 @@ screen main_ui_dog_card_panel():
                     text_bold True
                     text_color "#5c0f1b"
                     text_hover_color "#7d1a2c"
-                    action Function(main_ui_restore_room_scene_state)
+                    action Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or ""))
 
 
 screen main_ui_werecat_card_panel():
@@ -878,134 +797,7 @@ screen main_ui_werecat_card_panel():
                     text_bold True
                     text_color "#5c0f1b"
                     text_hover_color "#7d1a2c"
-                    action Function(main_ui_restore_room_scene_state)
-
-
-screen fight_side_status_column(title="", rows=None, energy_label="Энергия"):
-    frame:
-        xminimum 255
-        xmaximum 300
-        yfill True
-        padding (12, 10)
-        background "#ead9b8"
-
-        vbox:
-            spacing 8
-            text str(title or "") size 22 color "#1e130c" xalign 0.5
-
-            for _row in list(rows or []):
-                frame:
-                    xfill True
-                    padding (10, 8)
-                    background "#f5ead3"
-
-                    vbox:
-                        spacing 3
-                        text str(_row.get("name", "") or "") size 20 color "#301c10"
-                        text str(_row.get("subtitle", "") or "") size 15 color "#6a4b32"
-                        text "Здоровье: [int(_row.get('health', 0) or 0)] / [int(_row.get('health_max', 0) or 0)]" size 16 color "#301c10"
-                        text "[str(energy_label or 'Энергия')]: [int(_row.get('energy', 0) or 0)] / [int(_row.get('energy_max', 0) or 0)]" size 16 color "#301c10"
-                        if list(_row.get("status", []) or []):
-                            text "Состояние: [', '.join(list(_row.get('status', []) or []))]" size 15 color "#7c2a1b"
-
-screen fight_center_status_panel(picture="", result_text="", log_rows=None):
-    vbox:
-        xfill True
-        spacing 10
-
-        frame:
-            xfill True
-            ymaximum 300
-            padding (10, 10)
-            background "#ead9b8"
-
-            if picture:
-                add Transform(picture, fit="contain", xalign=0.5, yalign=0.0)
-            else:
-                text "Сцена боя" size 22 color "#1e130c" xalign 0.5
-
-        frame:
-            xfill True
-            padding (12, 10)
-            background "#f5ead3"
-
-            vbox:
-                spacing 4
-                text "Снаряжение" size 20 color "#1e130c"
-                text "Оружие: [str(EquippedWeapon or 'нет')]" size 16 color "#301c10"
-                text "Броня: [str(EquippedArmor or 'нет')]" size 16 color "#301c10"
-                text "Заряжено: [('да' if int(FightWeaponLoaded or 0) == 1 else 'нет')]" size 16 color "#301c10"
-                text "Боеприпас: [fight_loaded_ammo_name(FightLoadedAmmo)]" size 16 color "#301c10"
-                text "Запас стрел: [int(PlayerFightSupply.get('arrows', 0) or 0)]   дроби: [int(PlayerFightSupply.get('droplets', 0) or 0)]" size 16 color "#301c10"
-
-        frame:
-            xfill True
-            yminimum 160
-            padding (12, 10)
-            background "#ead9b8"
-
-            vbox:
-                spacing 6
-                text "Результат действия" size 20 color "#1e130c"
-                text str(result_text or "") size 17 color "#2d1d12"
-
-        if list(log_rows or []):
-            frame:
-                xfill True
-                yminimum 140
-                padding (12, 10)
-                background "#f5ead3"
-
-                vbox:
-                    spacing 4
-                    text "Журнал боя" size 20 color "#1e130c"
-                    for _row in list(log_rows or []):
-                        text str(_row or "") size 15 color "#2d1d12"
-
-screen main_ui_fight_panel():
-    $ _title = "БОЙ"
-    $ _picture = resolve_main_ui_picture(CurrentRoom)
-    $ _enemy_rows = fight_enemy_display_rows()
-    $ _company_rows = fight_company_display_rows()
-    $ _usable_h = max(360, int(config.screen_height) - int(getattr(gui, "textbox_height", 278)))
-    $ _left_h = _usable_h - 24
-
-    fixed:
-        xfill True
-        ysize _left_h
-
-        add Transform("images/rpg_message_bg.png", fit="cover")
-
-        viewport:
-            xpos 28
-            ypos 24
-            xsize int((config.screen_width - 36) * 0.72) - 56
-            ysize _left_h - 48
-            draggable True
-            mousewheel True
-
-            vbox:
-                spacing 10
-
-                text _title size 30 color "#1e130c" xalign 0.5
-
-                hbox:
-                    xfill True
-                    spacing 14
-
-                    use fight_side_status_column("ВАША СТОРОНА", _company_rows, "Энергия")
-
-                    use fight_center_status_panel(_picture, str(MainTxt or CurLocDesc or ""), list(FightSideLog or []))
-
-                    use fight_side_status_column("ПРОТИВНИКИ", _enemy_rows, "Напор")
-
-                textbutton "Назад":
-                    xminimum 220
-                    text_size 22
-                    text_bold True
-                    text_color "#5c0f1b"
-                    text_hover_color "#7d1a2c"
-                    action Function(main_ui_restore_room_scene_state)
+                    action Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or ""))
 
 
 screen main_ui_tavern_report_panel():
@@ -1087,69 +879,3 @@ screen main_ui_tavern_report_panel():
                     action Function(main_ui_restore_room_scene_state)
 
 
-label ActionMenuRunSpec(spec_id="", entity_type="", entity_id="", where_id=""):
-    $ _spec_key = str(spec_id or "").strip().lower()
-    $ _entity_type = str(entity_type or "").strip().lower()
-    $ _entity_id = str(entity_id or "").strip()
-    $ _where_id = str(where_id or CurLoc or "").strip()
-    if _spec_key == "look":
-        $ action_menu_specs = []
-        if _entity_type == "npc":
-            $ NpcActionLookState(_entity_id, _where_id, dict(action_menu_entity_data or {}))
-        elif _entity_type == "dog":
-            $ DogActionLookState(_where_id)
-        else:
-            $ action_menu_handle_look_state()
-        return
-    if _spec_key == "talk":
-        $ action_menu_specs = []
-        if _entity_type == "npc":
-            $ NpcActionTalkState(_entity_id, _where_id, dict(action_menu_entity_data or {}))
-        elif _entity_type == "dog":
-            $ DogActionTalkState(_where_id)
-        else:
-            $ action_menu_handle_talk_state()
-        return
-    if _spec_key == "flirt":
-        $ action_menu_specs = []
-        call SocialTalkTopicMenu(_entity_id, "flirt", social_topic_return_label(_entity_id))
-        return
-    if _spec_key == "gift":
-        $ action_menu_specs = []
-        if _entity_id == "clara":
-            call IntClaraGiftMenu(_entity_id)
-        else:
-            call PlayerCardGiftToFixedTargetMenu(_entity_id)
-        return
-    if _spec_key.startswith("amanda_ai:") and _entity_id == "amanda":
-        $ action_menu_specs = []
-        if not bool(globals().get("AmandaAIIntegrationEnabled", False)):
-            return
-        $ _amanda_ai_intent = _spec_key.split(":", 1)[1]
-        call AmandaAIIntentRoomEvent(_where_id, _amanda_ai_intent)
-        return
-    if _spec_key == "dog_bone":
-        $ action_menu_specs = []
-        call IntDogTalkApply(_where_id, "bone")
-        return
-    if _spec_key == "dog_call":
-        $ action_menu_specs = []
-        call IntDogTalkApply(_where_id, "call_stray")
-        return
-    if _spec_key == "dog_pet":
-        $ action_menu_specs = []
-        call IntDogTalkApply(_where_id, "pet_stray")
-        return
-    if _spec_key == "dog_play_stray":
-        $ action_menu_specs = []
-        call IntDogTalkApply(_where_id, "play_stray")
-        return
-    if _spec_key == "dog_stray_bone":
-        $ action_menu_specs = []
-        call IntDogTalkApply(_where_id, "stray_bone")
-        return
-    if _spec_key == "dog_adopt":
-        $ action_menu_specs = []
-        call IntDogTalkApply(_where_id, "adopt")
-        return
-    return

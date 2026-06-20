@@ -65,7 +65,7 @@ init python:
     def player_card_main_menu_items():
         return [
             MenuItem("Проверить вещи", Call("PlayerCardInventoryMenu")),
-            MenuItem("Назад", Function(main_ui_restore_room_scene_state)),
+            MenuItem("Назад", Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or ""))),
         ]
 
     def player_card_set_inventory_origin(origin_mode="profile"):
@@ -509,7 +509,7 @@ init python:
         if target_key != "":
             target_label = str(npc_talk_label(target_key) or "").strip()
             if target_label != "":
-                main_ui_call_label(target_label, target_key)
+                renpy_module.call_in_new_context(target_label, target_key)
                 return
         main_ui_end_talk_state()
 
@@ -580,7 +580,7 @@ init python:
         if player_card_inventory_back_to_profile():
             current_action_items.append(MenuItem("Назад", Call("PlayerCardMainMenu")))
         else:
-            current_action_items.append(MenuItem("Назад", Function(main_ui_restore_room_scene_state)))
+            current_action_items.append(MenuItem("Назад", Jump(str(CurLoc or ""))))
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
@@ -615,7 +615,7 @@ init python:
         if player_card_inventory_back_to_profile():
             current_action_items.append(MenuItem("Назад", Call("PlayerCardMainMenu")))
         else:
-            current_action_items.append(MenuItem("Назад", Function(main_ui_restore_room_scene_state)))
+            current_action_items.append(MenuItem("Назад", Jump(str(CurLoc or ""))))
 
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
@@ -669,7 +669,9 @@ label ShowPlayerCard(return_label=""):
 
 label HidePlayerCard(return_label=""):
     if str(return_label or "") == "__main_ui__":
-        $ main_ui_restore_room_scene_state()
+        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+        if _room_label:
+            jump expression _room_label
         return
     hide screen player_card_overlay
     if str(return_label or "") != "":

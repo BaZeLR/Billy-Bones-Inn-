@@ -25,22 +25,22 @@ label IntClaraTalkRefresh(girl_name="clara"):
     $ update_stat_state()
     $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
     $ current_action_items.extend(social_core_action_items(girl_name, "IntClaraTalkRefresh"))
-    if str(CurLoc or "") == "MarketPlace" and int(exploration or 0) >= 100 and int(AskedToday.get("clara", 0) or 0) == 0:
-        $ current_action_items.append(MenuItem("Проследить за Клариссой по рынку", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "follow_market")))
-    if str(CurLoc or "") == "WineStore" and (story_event_available("WineStore", "clara_talk") or (int(ClaraVar.get("mongol_theft_seen", 0) or 0) == 1 and int(ClaraVar.get("escape_confessed", 0) or 0) == 0)):
-        $ current_action_items.append(MenuItem("Осторожно заговорить о ее вечерних делах", Call("story_clara_market_booklet_wine_talk_direct")))
+    if str(CurLoc or "") == "MarketPlace" and int(exploration or 0) >= 100 and int(Clara.asked_today or 0) == 0:
+        $ current_action_items.append(MenuItem("Проследить за Клариссой по рынку", Call("IntClaraTalkApply", girl_name, "follow_market")))
+    if story_event_available("WineStore", "clara_talk"):
+        $ current_action_items.append(MenuItem("Осторожно заговорить о ее вечерних делах", Call("checkTriggers", "WineStore", "clara_talk", 0)))
     if story_event_available("WineStore", "clara_paintings"):
         $ current_action_items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "WineStore", "clara_paintings", 0)))
 
-    if int(AskedToday.get("clara", 0) or 0) == 0 and int(Friends.get("clara", 0) or 0) >= 6:
-        $ current_action_items.append(MenuItem("Спросить Клариссу о семье", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_family")))
-        $ current_action_items.append(MenuItem("Спросить Клариссу о ней самой", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_self")))
-        if int(ClaraVar.get("old_water_pump_hint_seen", 0) or 0) == 0 and Melissa.bats_stage() >= 5:
-            $ current_action_items.append(MenuItem("Спросить Клариссу об укромных местах", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_water_pump")))
-        if int(ClaraVar.get("drawings_secret_known", 0) or 0) == 1 or int(MelissaVar.get("drawings_found", 0) or 0) == 1:
-            $ current_action_items.append(MenuItem("Осторожно заговорить о ее тайных рисунках", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "ask_drawings")))
+    if int(Clara.asked_today or 0) == 0 and int(Clara.rel or 0) >= 6:
+        $ current_action_items.append(MenuItem("Спросить Клариссу о семье", Call("IntClaraTalkApply", girl_name, "ask_family")))
+        $ current_action_items.append(MenuItem("Спросить Клариссу о ней самой", Call("IntClaraTalkApply", girl_name, "ask_self")))
+        if int(Clara.var.get("old_water_pump_hint_seen", 0) or 0) == 0 and Melissa.bats_stage() >= 5:
+            $ current_action_items.append(MenuItem("Спросить Клариссу об укромных местах", Call("IntClaraTalkApply", girl_name, "ask_water_pump")))
+        if int(Clara.var.get("drawings_secret_known", 0) or 0) == 1 or int(Melissa.var.get("drawings_found", 0) or 0) == 1:
+            $ current_action_items.append(MenuItem("Осторожно заговорить о ее тайных рисунках", Call("IntClaraTalkApply", girl_name, "ask_drawings")))
     if Clara.can_accept_horse_ride(CurLoc):
-        $ current_action_items.append(MenuItem("Предложить подвезти Клариссу на коне.", Function(main_ui_call_label, "IntClaraTalkApply", girl_name, "horse_ride")))
+        $ current_action_items.append(MenuItem("Предложить подвезти Клариссу на коне.", Call("IntClaraTalkApply", girl_name, "horse_ride")))
 
     $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
     return
@@ -57,11 +57,11 @@ label IntClaraGiftMenu(girl_name="clara"):
         for _gift_row in Clara.giftable_entries():
             _gift_caption = str(_gift_row.get("gift_name", "") or "")
             _gift_id = str(_gift_row.get("gift_id", "") or "")
-            current_action_items.append(MenuItem(_gift_caption, Function(main_ui_call_label, "IntClaraGiftApply", girl_name, _gift_id)))
+            current_action_items.append(MenuItem(_gift_caption, Call("IntClaraGiftApply", girl_name, _gift_id)))
     if len(list(current_action_items or [])) <= 0:
         $ MainTxt = "У вас сейчас нет ничего подходящего для подарка."
         $ CurLocDesc = MainTxt
-    $ current_action_items.append(MenuItem("Назад", Function(main_ui_call_label, "IntClaraTalkRefresh", girl_name)))
+    $ current_action_items.append(MenuItem("Назад", Call("IntClaraTalkRefresh", girl_name)))
     return
 
 
@@ -79,7 +79,7 @@ label IntClaraGiftApply(girl_name="clara", gift_id=""):
             _gift_name = str(_selected.get("gift_name", "") or "подарок")
             _gift_id = str(_selected.get("gift_id", "") or "")
             _gift_base = 3 if _gift_id in tuple(preferred_gift_item_ids("clara") or ()) else 1
-            _friends_before = int(Friends.get("clara", 0) or 0)
+            _friends_before = int(Clara.rel or 0)
             _accepts, _gift_score = social_gift_acceptance("clara", _gift_id, _gift_base)
             if not _accepts:
                 _gift_result = player_gift_to("clara", _gift_name, _gift_base, _gift_id, False)
@@ -89,9 +89,10 @@ label IntClaraGiftApply(girl_name="clara", gift_id=""):
             else:
                 apply_social_interaction_base("clara", "gift", _gift_score, 0, 0, 1, 0, 1, 0, True)
                 if _gift_score > 0:
-                    ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + max(1, _gift_score // 2))
+                    Clara.trust = min(20, int(Clara.trust or 0) + max(1, _gift_score // 2))
                 elif _gift_score < 0:
-                    ClaraVar["trust"] = max(0, int(ClaraVar.get("trust", 0) or 0) + _gift_score)
+                    Clara.trust = max(0, int(Clara.trust or 0) + _gift_score)
+                Clara.var["trust"] = int(Clara.trust or 0)
                 if str(_selected.get("source", "") or "") == "item":
                     _effect = player_apply_item_social_effects("clara", _gift_id, True)
                 else:
@@ -160,13 +161,13 @@ label IntClaraTalkApply(girl_name="clara", choice_code=""):
     if str(choice_code or "") == "horse_ride":
         python:
             _loc = str(CurLoc or "").strip()
-            _friends = int(Friends.get("clara", 0) or 0)
-            if _loc == "ForestLake" and _friends < 8:
+            if _loc == "ForestLake" and int(Clara.rel or 0) < 8:
                 MainTxt = "Вы предлагаете Клариссе место в седле, но девушка с улыбкой качает головой. «Спасибо, Стефан, но здесь у озера на удивление хорошо. Я еще немного побуду здесь, а потом вернусь сама», - отвечает она."
             else:
-                Friends["clara"] = min(20, _friends + 1)
-                ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 1)
-                CurrentLoc["clara"] = "MarketPlace"
+                Clara.change_social(friend_delta=1)
+                Clara.trust = min(20, int(Clara.trust or 0) + 1)
+                Clara.var["trust"] = int(Clara.trust or 0)
+                Clara.current_location = "MarketPlace"
                 if _loc == "ForestLake":
                     MainTxt = "Вы предлагаете Клариссе место в седле. Она сначала говорит, что у озера ей очень нравится, но потом все же принимает ваше предложение. По дороге обратно в город девушка заметно расслабляется и благодарит вас за поездку."
                 else:
@@ -176,48 +177,58 @@ label IntClaraTalkApply(girl_name="clara", choice_code=""):
         return
 
     if str(choice_code or "") == "ask_family":
-        $ AskedToday["clara"] = int(AskedToday.get("clara", 0) or 0) + 1
-        $ ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 1)
-        $ Friends["clara"] = min(20, int(Friends.get("clara", 0) or 0) + 1)
+        $ Clara.mark_asked()
+        $ Clara.mark_talked()
+        $ Clara.trust = min(20, int(Clara.trust or 0) + 1)
+        $ Clara.var["trust"] = int(Clara.trust or 0)
+        $ Clara.change_social(friend_delta=1)
         $ MainTxt = "Вы осторожно спрашиваете Клариссу о ее семье. Девушка сначала держится по-прежнему светски, но потом все же смягчается.\n\n\"У нас дома все устроено правильно и чинно, но иногда от этой правильности устаешь сильнее, чем от любой работы,\" признается она. \"Отец много требует, мать следит за внешними приличиями, а мне все чаще хочется хоть иногда бывать там, где можно говорить свободнее.\""
         $ CurLocDesc = MainTxt
         call IntClaraTalkRefresh(girl_name)
         return
 
     if str(choice_code or "") == "ask_self":
-        $ AskedToday["clara"] = int(AskedToday.get("clara", 0) or 0) + 1
-        $ ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 1)
-        $ Friends["clara"] = min(20, int(Friends.get("clara", 0) or 0) + 1)
+        $ Clara.mark_asked()
+        $ Clara.mark_talked()
+        $ Clara.trust = min(20, int(Clara.trust or 0) + 1)
+        $ Clara.var["trust"] = int(Clara.trust or 0)
+        $ Clara.change_social(friend_delta=1)
         $ MainTxt = "Вы просите Клариссу рассказать о себе самой, а не о том, что от нее ждут дома. Она коротко смеется и, поколебавшись, все же отвечает честнее обычного.\n\n\"Я люблю смотреть, как люди ведут дела и как один и тот же город меняется в зависимости от того, с кем ты говоришь. Наверное, мне нравится наблюдать и делать выводы. Просто дома не всякому понравится, если девушка слишком много замечает,\" говорит Кларисса."
         $ CurLocDesc = MainTxt
         call IntClaraTalkRefresh(girl_name)
         return
 
     if str(choice_code or "") == "ask_water_pump":
-        $ AskedToday["clara"] = int(AskedToday.get("clara", 0) or 0) + 1
-        $ ClaraVar["old_water_pump_hint_seen"] = 1
-        $ ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 1)
-        $ Friends["clara"] = min(20, int(Friends.get("clara", 0) or 0) + 1)
+        $ Clara.mark_asked()
+        $ Clara.mark_talked()
+        $ Clara.var["old_water_pump_hint_seen"] = 1
+        $ Clara.trust = min(20, int(Clara.trust or 0) + 1)
+        $ Clara.var["trust"] = int(Clara.trust or 0)
+        $ Clara.change_social(friend_delta=1)
         $ MainTxt = "Кларисса, чуть усмехнувшись, признает, что в городе есть места, куда люди ходят не за водой и не за прогулкой.\n\n\"У старой водокачки, за лесной тропой, часто встречаются те, кому не хочется лишних глаз,\" говорит она. \"Если после того, что ты уже слышал с чердака, тебе все еще нужны доказательства, ищи не на главной дороге. Секреты любят обходные тропы.\""
         $ CurLocDesc = MainTxt
         call IntClaraTalkRefresh(girl_name)
         return
 
     if str(choice_code or "") == "ask_drawings":
-        $ AskedToday["clara"] = int(AskedToday.get("clara", 0) or 0) + 1
-        $ ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 2)
-        $ Friends["clara"] = min(20, int(Friends.get("clara", 0) or 0) + 1)
+        $ Clara.mark_asked()
+        $ Clara.mark_talked()
+        $ Clara.trust = min(20, int(Clara.trust or 0) + 2)
+        $ Clara.var["trust"] = int(Clara.trust or 0)
+        $ Clara.change_social(friend_delta=1)
         $ MainTxt = "Вы осторожно даете Клариссе понять, что знаете о ее тайных непристойных рисунках и не собираетесь поднимать из-за этого шум. Она сперва цепенеет, но потом, поняв ваш тон, только шумно выдыхает.\n\n\"Дома за такое меня бы живьем съели,\" признается она. \"Отец требует приличий, мать — судьбы по правилам, а мне иногда хочется хотя бы на бумаге жить не так, как велено. Потому я и наблюдаю за людьми, и слушаю лишнее. Иначе совсем задохнешься в чужих ожиданиях.\""
         $ CurLocDesc = MainTxt
         call IntClaraTalkRefresh(girl_name)
         return
 
     if str(choice_code or "") == "follow_market":
-        $ AskedToday["clara"] = int(AskedToday.get("clara", 0) or 0) + 1
-        $ ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 1)
+        $ Clara.mark_asked()
+        $ Clara.mark_talked()
+        $ Clara.trust = min(20, int(Clara.trust or 0) + 1)
+        $ Clara.var["trust"] = int(Clara.trust or 0)
         $ MainTxt = "Вы не навязываетесь Клариссе разговором, а просто держитесь чуть поодаль и смотрите, куда она направится дальше. Девушка делает круг по рыночным рядам, будто проверяя, нет ли за ней чужих глаз, а затем уверенно уходит к знакомому входу в винную лавку Легаре.\n\nПохоже, даже на рынке Кларисса все время держит в уме путь обратно в винную лавку семьи."
         $ CurLocDesc = MainTxt
-        $ CurrentLoc["clara"] = "WineStore"
+        $ Clara.current_location = "WineStore"
         call IntClaraTalkRefresh(girl_name)
         return
 

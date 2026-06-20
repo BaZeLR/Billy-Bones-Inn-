@@ -57,7 +57,6 @@ label SandraWeeklyEvaluationScene(step_index=0, return_label="TavernMain"):
     $ _sandra_step = max(0, min(int(step_index or 0), len(SANDRA_WEEKLY_EVALUATION_TEXTS) - 1))
     $ _sandra_gains = dict(SANDRA_WEEKLY_EVALUATION_STAT_GAINS[_sandra_step] or {})
     $ Sandra.weekly_thanks_wake_seen(_sandra_step, _sandra_gains)
-    $ SandraVar = Sandra.var
     $ _sandra_picture = SANDRA_WEEKLY_EVALUATION_PICTURES[_sandra_step]
     $ scene_image = _sandra_picture
     $ _layout_last_picture = _sandra_picture
@@ -109,13 +108,11 @@ label TavernSandraNightThanksScene:
         call TavernSandraRoomBuildActions
         return
     $ Sandra.night_thanks_seen()
-    $ SandraVar = Sandra.var
-    $ AskedToday["sandra"] = int(AskedToday.get("sandra", 0) or 0) + 1
-    $ Talked["sandra"] = int(Talked.get("sandra", 0) or 0) + 1
+    $ Sandra.mark_asked()
+    $ Sandra.mark_talked()
     $ _sandra_secured_future_now = tractir_apply_sandra_secured_future()
-    $ fun = _player_clamp(int(fun or 0) + 8, 0, 100)
+    $ player.change_stat("fun", 8)
     call PregnancyCheck("sandra", "inside", 1, "Вы")
-    $ Sandra.sync_from_sandra_maps()
     $ Sandra.save_story_state()
     $ calendar_v2.advance_minutes(60)
     $ scene_image = "images/sandra/thanks/player_room_sandra_1.png"
@@ -141,11 +138,8 @@ label SandraSexEngine(girl_name="sandra", source_room="TavernSandraRoom"):
     $ Arousal.setdefault(girl_name, int(PussyWetStart.get(girl_name, 20) or 20))
     call ShowCurrentSex(girl_name)
     call PregnancyCheck(girl_name, "inside", 1, "Вы")
-    $ Sandra.fucked_today = int(Sandra.fucked_today or 0) + 1
-    $ FuckedToday[girl_name] = int(FuckedToday.get(girl_name, 0) or 0) + 1
-    $ Sandra.sync_from_sandra_maps()
+    $ Sandra.mark_fucked()
     $ Sandra.save_story_state()
-    $ Sandra.sync_sandra_maps()
     $ calendar_v2.advance_minutes(30)
     $ MainTxt = "Сандра не тратит вечер на лишние слова. Она закрывает дверь, поправляет волосы и смотрит на вас так, будто решение уже давно принято. После близости она снова собирает себя в привычную строгую хозяйку, но в голосе остается теплота, которую теперь уже невозможно спутать с обычной деловитостью."
     $ CurLocDesc = MainTxt

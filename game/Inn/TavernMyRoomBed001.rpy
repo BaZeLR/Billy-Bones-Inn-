@@ -9,6 +9,7 @@ init 5 python:
         object_id="bed_001",
         name="Кровать",
         description="Простая кровать, на которой можно поспать до утра.",
+        picture="images/player_room/from_bed.png",
         actions=[
             ObjectAction(
                 action_id="sleep_until_morning",

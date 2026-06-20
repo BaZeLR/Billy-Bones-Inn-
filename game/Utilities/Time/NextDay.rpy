@@ -16,16 +16,14 @@ init python:
             pass
 
         try:
-            current_time = int(time or 0)
+            current_hour = int(calendar_v2.hour or 0) % 24
         except Exception:
-            current_time = 0
+            try:
+                current_hour = int(hour or 0) % 24
+            except Exception:
+                current_hour = 0
 
-        try:
-            current_hour = int(hour or 0)
-        except Exception:
-            current_hour = 0
-
-        return current_time == 4 and 0 <= current_hour < 6
+        return 0 <= current_hour < 6
 
     def nextday_pick_post_sleep_event_label():
         try:
@@ -253,7 +251,7 @@ label NextDay(retlocname, timepassed):
         KidBirthPosobie = ''
     
     # Reset daily variables
-    $ GeorgettVar['foundinchurch'] = 0
+    $ Georgett.set_story_value("foundinchurch", 0)
     $ Arousal['You'] = 0
     $ cametoday = 0
     $ energy = 100

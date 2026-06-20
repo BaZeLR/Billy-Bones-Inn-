@@ -1,25 +1,33 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# Becky after-ceremony church scene.
+# The label owns the staged voyeur scene and advances through normal Ren'Py menus.
 # ================================================================================
-label IntBeckyAfterCermon:
-    $ ChurchAfterCermon["becky"] = 0
+
+label story_becky_church_after_sermon:
+    $ Becky.set_after_sermon_stage(0)
     $ PriestIncestAgree = 0
-    return
+    $ MainTxt = MainTxt + "\n\nВы заметили, как миссис Блэнкеншип направилась было к кабинке для исповеди, но отец Герхард взял ее за руку и повел к неприметной двери, которую он отпер висящим у него на поясе ключом. Как только вдова проследовала за ним, дверь захлопнулась и послышался стук задвигаемого засова. Хотя вы можете попробовать посмотреть, что там происходит через замочную скважину."
+    $ CurLocDesc = MainTxt
+    vscene "images/church/confessionEntry.png"
+
+    menu:
+        "Посмотреть":
+            jump story_becky_church_after_sermon_look
+        "Вернуться в собор":
+            jump Church
 
 
-label AfterCermonBecky:
+label story_becky_church_after_sermon_look:
+    show screen main_ui
     $ GirlNameAC = "becky"
-    $ current_action_title = "Замочная скважина"
-    $ current_action_content = None
-    $ current_action_items = []
 
-    if ChurchAfterCermon.get(GirlNameAC, 0) == 0:
+    if Becky.after_sermon_stage() == 0:
         $ GetSexEventFromTable(GirlNameAC, 99, "Priest")
         call PregnancyCheck(GirlNameAC, "inside", 1, "Отец Герхард")
         $ MainTxt = "Посмотрев в замочную скважину вы, как и ожидали, увидели Ребекку Блэнкеншип и отца Герхарда."
-        if BeckyVar.get("PriestAdvice", 0) == 1:
+        if Becky.var.get("PriestAdvice", 0) == 1:
             $ MainTxt = MainTxt + "\n\n\"Приветствую тебя, дочь моя,\" смиренно сказал жрец. \"Что-то ты давно на исповедь не захаживала, а ведь грех это, исповедь пропускать.\"\n\"Знаю, падре, знаю.\""
-            if pregnancy.get("becky", 0) < 120:
+            if Becky.pregnancy_days() < 120:
                 $ MainTxt = MainTxt + "\n\n\"Уверен, за все то время, что прошло с нашей прошлой встречи, ты не смогла удержаться от греха,\" напористо заявил святой отец, \"не правда ли? И помни, что самый большой грех - это лгать на исповеди.\""
             else:
                 $ MainTxt = MainTxt + "\n\n\"Вижу, я за то время, что прошло с нашей прошлой встречи, ты не смогла удержаться от греха,\" заявил святой отец, указывая на округлившийся живот одинокой вдовицы, \"расскажи же мне, как это произошло. И помни, что самый большой грех - это лгать на исповеди.\""
@@ -37,81 +45,109 @@ label AfterCermonBecky:
                 $ MainTxt = MainTxt + "\nне обнаружив под ними нижнего белья, удовлетворенно заявил: \"Вижу дочь моя, ты подготовилась к исповеди.\""
             $ MainTxt = MainTxt + "\n\n\"Не столь тверда я в вере, падре, и податлива к искушениям,\" покаянно заявила миссис Блэнкеншип, откидываясь на кушетке и бесстыдно раздвигая ноги."
         $ CurLocDesc = MainTxt
-        call ShowImageSeq("becky", "church", "talk", 2)
-        $ ChurchAfterCermon[GirlNameAC] = 1
-        $ current_action_items.append(MenuItem("Посмотреть еще", Call("AfterCermonBecky")))
-        $ renpy.restart_interaction()
-        return
+        $ scene_image = "images/becky/church/talk1.jpg"
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+        "[MainTxt]"
+        $ scene_image = "images/becky/church/talk2.jpg"
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+        $ Becky.set_after_sermon_stage(1)
+        menu:
+            "Посмотреть еще":
+                jump story_becky_church_after_sermon_look
 
-    if ChurchAfterCermon.get(GirlNameAC, 0) == 1:
+    if Becky.after_sermon_stage() == 1:
         $ MainTxt = "Вы продолжаете наблюдать за вдовой Блэнкеншип и отцом Герхардом через замочную скважину."
-        if BeckyVar.get("PriestAdvice", 0) == 1:
+        if Becky.var.get("PriestAdvice", 0) == 1:
             $ MainTxt = MainTxt + "\n\n\"Ну, дочь моя, расскажи мне, что за сомнения тебя мучают,\" спросил отец Герхард, входя в Бекки.\n\"Ох, падре, даже и не знаю как сказать, стыдно-то как. Управляющий мой, Эдди, на меня как на женщину посматривать начал. А я ведь после смерти мужа одинокая, да и он в доме и лавке давно помогает,\" - при этих словах отец Герхард несколько увеличил темп, так что вдове пришлось взять временную паузу, но вскоре она приноровилась, и, подмахивая жрецу, продолжила с того же места:\n\"Только он моложе, а я ему хозяйка. Боюсь, если дам ему, то и авторитет потеряю, и сама перед ним глупой старой вдовой покажусь. Вот я и думаю, большой то грех будет али малый.\""
-        elif BeckyVar.get("PriestAdvice", 0) == 2:
+        elif Becky.var.get("PriestAdvice", 0) == 2:
             $ MainTxt = MainTxt + "\n\n\"Ну, дочь моя, допускала ли ты опять нескромные мысли о своем управляющем?\" спросил отец Герхард. То ли эта мысль, то ли вид бесстыдно обнаженной киски Бекки изрядно возбудили жреца, его член стоял колом.\n\"Ох, падре, как же вы проницательны, ааах,\" последний возглас вырвался из уст вдовы непроизвольно, так как в этот момент в нее вошел член отца Герхарда.\nПриноровившись к его толчкам она продолжила: \"Да, Эдди на меня все так же сладострастно смотрит. А я ведь после смерти мужа одинокая, выдержка у меня не железная, а помощник мой все так мучается. Только я ему хозяйка дома и лавки, мне нельзя выглядеть девчонкой, которая сама не знает, чего хочет.\""
-        elif BeckyVar.get("PriestAdvice", 0) == 3 and BeckyVar.get("visitedhome", 0) < 7:
+        elif Becky.var.get("PriestAdvice", 0) == 3 and Becky.var.get("visitedhome", 0) < 7:
             $ MainTxt = MainTxt + "\n\n\"Дочь моя, отдалась ли ты своему Эдди, как собиралась в прошлый раз?\" спросил отец Герхард, поднимая сутану. То ли эта мысль, то ли вид бесстыдно обнаженной киски Бекки изрядно возбудили жреца, его член стоял колом."
-            if BeckyVar.get("EddieTryToFuck", 0) < 4:
+            if Becky.var.get("EddieTryToFuck", 0) < 4:
                 $ MainTxt = MainTxt + "\n\"Ох, падре, нет еще, не решилась я да и случая подходящего не представилось, ааах,\" последний возглас вырвался из уст вдовы непроизвольно, так как в этот момент в нее вошел член отца Герхарда.\nПриноровившись к его толчкам она продолжила: \"Но скоро решусь наверное, я ведь вдова одинокая, а Эдди так мучается. Только я старше, я хозяйка, и страшно мне потерять перед ним власть в собственном доме.\""
             else:
                 $ MainTxt = MainTxt + "\n\"Ох, падре, да, согрешила я, перед Эдди ноги раздвинула, ааах,\" последний возглас вырвался из уст вдовы непроизвольно, так как в этот момент в нее вошел член отца Герхарда. Приноровившись к его толчкам она продолжила:\n\"А он, охальник, ни секунды не колебался, взял и в хозяйку свою вошел. Хоть и грех это, но как же сладко мне было! Только одна мысль меня теперь тревожит: Эдди ведь мальчик молодой еще, несдержанный, как я его не просила вытаскивать все равно в меня кончает. А я ведь еще в самом соку, вдруг младенчика от управляющего своего приживу? И как мне потом хозяйкой ему в глаза смотреть?\""
         else:
             $ MainTxt = MainTxt + "\n\n\"Дочь моя, продолжаешь ли ты отдаваться своему управляющему, как и раньше?\" спросил отец Герхард, поднимая сутану. То ли эта мысль, то ли вид бесстыдно обнаженной киски Бекки изрядно возбудили жреца, его член стоял колом.\n\"Ох, падре, да как же мне теперь остановится-то, коли сладко мне так с ним. Почитай каждый день он меня, грешную, имеет как хочет, ааах,\" последний возглас вырвался из уст вдовы непроизвольно, так как в этот момент в нее вошел член отца Герхарда.\nПриноровившись к его толчкам она продолжила: \"А я женщина слабая, вовсем ему потакаю, то один он, то на пару со Стефанчиком со мной совокупляется и стыда не знает.\""
         $ CurLocDesc = MainTxt
-        call ShowImageSeq("becky", "church", "fuckstart", 2)
-        $ ChurchAfterCermon[GirlNameAC] = 2
-        $ current_action_items.append(MenuItem("Смотреть дальше", Call("AfterCermonBecky")))
-        $ renpy.restart_interaction()
-        return
+        $ scene_image = "images/becky/church/fuckstart1.jpg"
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+        "[MainTxt]"
+        $ scene_image = "images/becky/church/fuckstart2.jpg"
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+        $ Becky.set_after_sermon_stage(2)
+        menu:
+            "Смотреть дальше":
+                jump story_becky_church_after_sermon_look
 
-    if ChurchAfterCermon.get(GirlNameAC, 0) == 2:
+    if Becky.after_sermon_stage() == 2:
         $ MainTxt = "Вы продолжаете наблюдать за Ребеккой и отцом Герхардом через замочную скважину."
         $ PriestIncestAgree = 0
-        if BeckyVar.get("PriestAdvice", 0) <= 2:
-            if renpy.random.randint(1, 70) * 20 <= ChurchDonatedAmount:
-                $ BeckyVar["PriestAdvice"] = 3
+        if Becky.var.get("PriestAdvice", 0) <= 2:
+            if procedural_randint(1, 70, "becky_church_priest_advice_%s" % int(dayspassed or 0)) * 20 <= ChurchDonatedAmount:
+                $ Becky.var["PriestAdvice"] = 3
                 $ PriestIncestAgree = 1
                 $ MainTxt = MainTxt + "\n\n\"Сказать по правде, то грех небольшой.\"\n\"Правда, падре?\" не смогла сдержать вздоха удивления Ребекка. Хотя может это был вздох вовсе и не удивления: ведь в тот момент отец Герхард в очередной раз задвинул свой член во вдову по самые яйца.\n\"Да, даже я, грешник, не удержался в свое время. Ведь матушка моя, достопочтенная Франческа, - жрица богини Эллоны. А жрицы Эллоны каждый праздник должны отдаваться всем прихожанам, кто того пожелает. Нельзя им отказывать, ведь тогда великая Эллона, богиня плодородия, может обидется, урожай пропадет, земля родить не будет.\n\nСовсем мальчонкой я был, когда дружки мои подговорили меня прийти в праздник в храм. А там, на ложе из цветов, и лежала мама, раздвинув ноги и чье-то семя стекало из ее лона.\""
             else:
-                if BeckyVar.get("PriestAdvice", 0) == 1:
+                if Becky.var.get("PriestAdvice", 0) == 1:
                     $ MainTxt = MainTxt + "\n\n\"Ах ты греховодница, да как тебе только мысль такая в голову прийти могла?\" вскричал в негодовании отец Герхард, впрочем не сбавляя темпа."
                 else:
                     $ MainTxt = MainTxt + "\n\n\"Ах ты греховодница, я ж тебе уже объяснил, а ты все срамные мысли из головы выгнать не можешь?\" вскричал в негодовании отец Герхард, впрочем не сбавляя темпа."
                 $ MainTxt = MainTxt + "\n\n\"И думать не смей о таком позоре,\" добавил он, задвигая в нее член по самые яйца."
-        elif BeckyVar.get("PriestAdvice", 0) == 3 and BeckyVar.get("visitedhome", 0) < 7:
-            if BeckyVar.get("EddieTryToFuck", 0) < 4:
+        elif Becky.var.get("PriestAdvice", 0) == 3 and Becky.var.get("visitedhome", 0) < 7:
+            if Becky.var.get("EddieTryToFuck", 0) < 4:
                 $ MainTxt = MainTxt + "\n\n\"Ну, не спеши, но и не сдерживай себя, я ведь уже растолковал тебе, что то грех невеликий,\" сказал жрец, задвинув во вдову свой член по самые яйца."
             else:
                 $ MainTxt = MainTxt + "\n\n\"Этот грех я тебе отпускаю,\" благочестиво сказал жрец, задвинув во вдову свой член по самые яйца.\n\"А насчет младенчика не переживай. Я ведь тоже столько в матушку свою семени закачал, что уверен, кто-то из моих младших братьев и сестер - от меня. Так что то беда невеликая.\""
         else:
             $ MainTxt = MainTxt + "\n\n\"Этот грех я тебе отпускаю,\" благочестиво сказал жрец, задвинув во вдову свой член по самые яйца. \"Что ж, парни они молодые, а ты женщина одинокая, так что ничего удивительного в том нет.\""
         $ CurLocDesc = MainTxt
-        call ShowImageSeq("becky", "church", "fuck", 4)
-        $ ChurchAfterCermon[GirlNameAC] = 3
-        $ current_action_items.append(MenuItem("Смотреть не отрываясь", Call("AfterCermonBecky")))
-        $ renpy.restart_interaction()
-        return
+        $ scene_image = "images/becky/church/fuck1.jpg"
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+        "[MainTxt]"
+        $ scene_image = "images/becky/church/fuck2.jpg"
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+        $ scene_image = "images/becky/church/fuck3.jpg"
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+        $ scene_image = "images/becky/church/fuck4.jpg"
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+        $ Becky.set_after_sermon_stage(3)
+        menu:
+            "Смотреть не отрываясь":
+                jump story_becky_church_after_sermon_look
 
     if PriestIncestAgree == 1:
-        $ MainTxt = "Увидела она меня, но ничего не сказала, праздник есть праздник, порядок есть порядок. А через неделю другой праздник был, а потом еще. А вскоре и вовсе разохотилась Франческа моя и без  праздников всяких стала меня приглашать в себя. Так что, дочь моя, сама посуди, это грех небольшой, раз даже столь святой человек как я ему поддался.\" и с этими словами старый жрец закряхтел и кончил прямо внутрь вдовушки.\n\"Ах, святой отец, спасибо вам, значит не столь греховны мои мысли, как я неразумная считала,\" содрогаясь в оргазме счастливо выдохнула вдова."
-    elif BeckyVar.get("PriestAdvice", 0) <= 2:
+        $ MainTxt = "Увидела она меня, но ничего не сказала, праздник есть праздник, порядок есть порядок. А через неделю другой праздник был, а потом еще. А вскоре и вовсе разохотилась Франческа моя и без праздников всяких стала меня приглашать в себя. Так что, дочь моя, сама посуди, это грех небольшой, раз даже столь святой человек как я ему поддался.\" и с этими словами старый жрец закряхтел и кончил прямо внутрь вдовушки.\n\"Ах, святой отец, спасибо вам, значит не столь греховны мои мысли, как я неразумная считала,\" содрогаясь в оргазме счастливо выдохнула вдова."
+    elif Becky.var.get("PriestAdvice", 0) <= 2:
         $ MainTxt = "\"Ах, святой отец, спасибо что остановили меня, неразумную, от греха такого уберегли,\" послушно ответила ему вдова, подмахивая его толчкам.\n\"То-то же,\" и тут старый жрец закряхтел и кончил прямо внутрь вдовушки."
-        $ BeckyVar["PriestAdvice"] = 2
+        $ Becky.var["PriestAdvice"] = 2
     else:
-        if BeckyVar.get("visitedhome", 0) < 7 and BeckyVar.get("EddieTryToFuck", 0) >= 4:
+        if Becky.var.get("visitedhome", 0) < 7 and Becky.var.get("EddieTryToFuck", 0) >= 4:
             $ MainTxt = "\"Ах, святой отец, спасибо вам, успокоили вы меня, тяжесть с души сняли,\" послушно ответила ему вдова, подмахивая его толчкам."
-            $ BeckyVar["visitedhome"] = 7
+            $ Becky.var["visitedhome"] = 7
         else:
             $ MainTxt = "\"Ах, святой отец, спасибо вам на добром слове, за совет и участие спасибо,\" послушно ответила ему вдова, подмахивая его толчкам."
         $ MainTxt = MainTxt + "\n\"Так я же слуга великого Ильматера, как же я мог тебя, прихожанку свою, участием обделить,\" и тут старый жрец закряхтел и не обделил вдовушку не только участием, но и спермой, начав заполнять ею влагалище Бекки."
-    $ MainTxt = MainTxt + "\n\nОбмякший член падре выскользнул из Ребекки и он разомлевшим голосом вымолвил, одной рукой лениво делая рукой  благословляющий жест, а другой опуская сутану: \"Теперь иди, а нагрешишь - приходи опять исповедоваться.\""
+    $ MainTxt = MainTxt + "\n\nОбмякший член падре выскользнул из Ребекки и он разомлевшим голосом вымолвил, одной рукой лениво делая рукой благословляющий жест, а другой опуская сутану: \"Теперь иди, а нагрешишь - приходи опять исповедоваться.\""
     if panties.get("becky", "") != "":
         $ MainTxt = MainTxt + "\n\nБекки вытерла панталонами сперму жреца с ляжек, поправила платье и удалилась."
     else:
         $ MainTxt = MainTxt + "\n\nБекки пальчиками сначала собрала сперму жреца с ляжек, потом их облизала, поправила платье и удалилась."
     $ CurLocDesc = MainTxt
-    call ShowImage("becky", "church", "cumface")
-    $ ChurchAfterCermon[GirlNameAC] = 4
-    $ current_action_items.append(MenuItem("Вернуться", Call("AdvanceTime", "Church")))
-    $ renpy.restart_interaction()
-    return
+    $ scene_image = "images/becky/church/cumface.jpg"
+    $ _layout_last_picture = scene_image
+    vscene scene_image
+    "[MainTxt]"
+    $ Becky.set_after_sermon_stage(4)
+    menu:
+        "Вернуться":
+            $ calendar_v2.advance_minutes(60)
+            jump Church

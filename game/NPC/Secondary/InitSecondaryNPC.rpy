@@ -1,7 +1,6 @@
 # Secondary NPC registration (PeopleInfo + direct knowsMC model)
-# All secondary classes (Robin, Zimmer, Mongol, Eddie, Alber, Francheska, Luisa, Sergio + others)
-# are now defined as class XXX(BaseNPC): inside this single Init file under init python:
-# (following the exact pattern used for girls in their per-NPC Init*.rpy files).
+# Most secondary classes live here. Larger NPCs can own their own Init*.rpy
+# files, following the same pattern used for girls.
 # Instantiation + list append stays in the thin label registrations.
 # References:
 # - textLocRef\InitSecondaryNPC.txt (legacy defaults)
@@ -13,16 +12,12 @@
 # Dialog ready in textLocRef\IntRobinTalk.txt
 # Pictures ready (portrait, robin1, robin2 sequences used in SherwoodTravel + IntRobinTalk)
 
-default EddieVar = {}
-default AlberVar = {}
-default FranVar = {}
-default FranBusy = {}
-default DraupnirVar = {}
-default MongolVar = {}
-default ZimmerVar = {}
-default RobinVar = {}
 default LuisaVar = {}
 default SergioVar = {}
+default GerhardVar = {}
+default LucasVar = {}
+default ClaraFianceVar = {}
+default SergioPetVar = {}
 default RobbersHeadNameTmp = ""
 default Talked = {}
 default cancumdaily_npc = {}
@@ -35,197 +30,257 @@ init python:
         SECONDARY_NPC_KEYS = []
 
     # All known secondary NPCs.
-    for _sec_key in ["robin", "zimmer", "eddie", "alber", "fran", "mongol", "luisa", "sergio", "draupnir"]:
+    for _sec_key in ["robin", "zimmer", "eddie", "alber", "fran", "mongol", "luisa", "sergio", "draupnir", "gerhard", "lucas", "clara_fiance", "sergio_pet"]:
         if _sec_key not in SECONDARY_NPC_KEYS:
             SECONDARY_NPC_KEYS.append(_sec_key)
 
     # --- Var defaults (legacy tables kept for compat) ---
-    if 'RobinVar' not in dir() or not isinstance(RobinVar, dict):
-        RobinVar = {}
-    for k, v in {
-        "KnowHim": 0, "KnowComplaint": 0, "KnowPlace": 0, "KnowWeapon": 0,
-        "RobbedNum": 0, "Negotiate": 0, "KnowBigTitsVillage": 0,
-        "MongolSafePass": 0, "PlayerDestroyedCamp": 0, "ZimmerPeaceful": 0,
-    }.items():
-        RobinVar.setdefault(k, v)
-
-    if 'ZimmerVar' not in dir() or not isinstance(ZimmerVar, dict):
-        ZimmerVar = {}
-    for k, v in {
-        "ComplainHorse": 0, "SherwoodStory": 0, "ComplainRobin": 0,
-        "RobinInvestigationDay": 0, "MissionUpdatedByPlayer": 0, "PlayerHandledRobin": 0,
-    }.items():
-        ZimmerVar.setdefault(k, v)
-
-    if 'MongolVar' not in dir() or not isinstance(MongolVar, dict):
-        MongolVar = {}
-    MongolVar.setdefault("StocksReleased", 0)
-    MongolVar.setdefault("WillTryToSteal", 0)
-    MongolVar.setdefault("StocksFoodDay", -1)
-
-    if 'EddieVar' not in dir() or not isinstance(EddieVar, dict):
-        EddieVar = {}
-    if 'AlberVar' not in dir() or not isinstance(AlberVar, dict):
-        AlberVar = {}
-    if 'FranVar' not in dir() or not isinstance(FranVar, dict):
-        FranVar = {}
-    for k, v in {
-        "meet": 0, "ellonaask": 0, "graceask": 0, "conchitaask": 0,
-        "dukeask": 0, "starkask": 0, "stateask": 0, "rebelask": 0,
-        "alienask": 0, "lasttalkday": -1,
-    }.items():
-        FranVar.setdefault(k, v)
-
-    # Luisa and Sergio (explicitly requested) - minimal tables for now, expanded as needed
     if 'LuisaVar' not in dir() or not isinstance(LuisaVar, dict):
         LuisaVar = {}
+    for k, v in {
+        "met": 0,
+        "lasttalkday": -1,
+    }.items():
+        LuisaVar.setdefault(k, v)
     if 'SergioVar' not in dir() or not isinstance(SergioVar, dict):
         SergioVar = {}
-
-    # Draupnir (blacksmith / artisan) - was missing from previous migration, causing NameError
-    if 'DraupnirVar' not in dir() or not isinstance(DraupnirVar, dict):
-        DraupnirVar = {}
-    DraupnirVar.setdefault("SloganAsked", 0)
-    DraupnirVar.setdefault("HoleAsked", 0)
-    DraupnirVar.setdefault("GloryHoleAsked", 0)
-    DraupnirVar.setdefault("SoapBarrelAsked", 0)
-    DraupnirVar.setdefault("DogBoothAsked", 0)
-    DraupnirVar.setdefault("MongolLockpickOrderDay", -1)
+    for k, v in {
+        "met": 0,
+        "lasttalkday": -1,
+        "clara_fiance_visit_seen": 0,
+    }.items():
+        SergioVar.setdefault(k, v)
+    if 'LucasVar' not in dir() or not isinstance(LucasVar, dict):
+        LucasVar = {}
+    for k, v in {
+        "met": 0,
+        "last_seen_with_inga_day": -1,
+    }.items():
+        LucasVar.setdefault(k, v)
+    if 'ClaraFianceVar' not in dir() or not isinstance(ClaraFianceVar, dict):
+        ClaraFianceVar = {}
+    for k, v in {
+        "met": 0,
+        "last_seen_day": -1,
+    }.items():
+        ClaraFianceVar.setdefault(k, v)
+    if 'SergioPetVar' not in dir() or not isinstance(SergioPetVar, dict):
+        SergioPetVar = {}
+    for k, v in {
+        "met": 0,
+        "last_seen_day": -1,
+    }.items():
+        SergioPetVar.setdefault(k, v)
+    if 'GerhardVar' not in dir() or not isinstance(GerhardVar, dict):
+        GerhardVar = {}
+    for k, v in {
+        "confession_intro_done": 0,
+        "sermon_story_stage": 0,
+        "becky_advice_stage": 0,
+        "georgett_confession_stage": 0,
+        "liza_confession_stage": 0,
+        "lasttalkday": -1,
+    }.items():
+        GerhardVar.setdefault(k, v)
 
     # --- All secondary class definitions live here in the normal Init file (init python block) ---
     # Per user request: specific classes in the per-NPC init file, inheriting BaseNPC from the people rpy file.
     # Everything uses .var for legacy XXXVar dicts + promote_from_var for story flags.
 
-    class Robin(BaseNPC):
-        """Robin (Blackwood/Sherwood leader, MongolSafePass, Zimmer mission)."""
-        def __init__(self, name="robin", **kwargs):
-            super().__init__(name, **kwargs)
-            if 'RobinVar' in dir() and isinstance(RobinVar, dict):
-                self.var = RobinVar
-                self.promote_from_var(RobinVar)
+    class LuisaData(PeopleData):
+        code_name = "luisa"
 
-    class Zimmer(BaseNPC):
-        """Zimmer (city guard captain, Robin investigation, Blackwood mission)."""
-        def __init__(self, name="zimmer", **kwargs):
-            super().__init__(name, **kwargs)
-            if 'ZimmerVar' in dir() and isinstance(ZimmerVar, dict):
-                self.var = ZimmerVar
-                self.promote_from_var(ZimmerVar)
+        def __init__(self):
+            super().__init__(
+                self.code_name,
+                cname="Луиза",
+                fullname="Толстушка Луиза",
+                genitive="Луизы",
+                dative="Луизе",
+                default_location="HunterClub",
+                description="Луиза - полная городская знакомая из охотничьей лавки и городских социальных сцен.",
+                age=28,
+            )
 
-    class Mongol(BaseNPC):
-        """Mongol (horse trader, stocks prisoner, theft events)."""
-        def __init__(self, name="mongol", **kwargs):
-            super().__init__(name, **kwargs)
-            if 'MongolVar' in dir() and isinstance(MongolVar, dict):
-                self.var = MongolVar
-                self.promote_from_var(MongolVar)
+    class LuisaInfo(BaseNPC):
+        """Fat Luisa: secondary female NPC for hunter store and social scenes."""
+        unknown_name = "Луиза"
 
-    class Eddie(BaseNPC):
-        """Eddie (Becky's son, group scenes, Georgett crossover)."""
-        def __init__(self, name="eddie", **kwargs):
-            super().__init__(name, **kwargs)
-            if 'EddieVar' in dir() and isinstance(EddieVar, dict):
-                self.var = EddieVar
-                self.promote_from_var(EddieVar)
-
-    class Alber(BaseNPC):
-        """Alber (artisan / barber shop)."""
-        def __init__(self, name="alber", **kwargs):
-            super().__init__(name, **kwargs)
-            if 'AlberVar' in dir() and isinstance(AlberVar, dict):
-                self.var = AlberVar
-                self.promote_from_var(AlberVar)
-
-    def alber_random_portrait():
-        candidates = [
-            "images/Alber/portrait1.png",
-            "images/Alber/portrat2.png",
-            "images/Alber/portrait3.png",
-            "images/Alber/portrait4.png",
-            "images/Alber/portrait5.jpg",
-            "images/Alber/portrait6.jpg",
-            "images/Alber/portrait7.jpg",
-        ]
-        loadable = [row for row in candidates if renpy.loadable(row)]
-        return loadable[renpy.random.randint(0, len(loadable) - 1)] if len(loadable) > 0 else ""
-
-    class Francheska(BaseNPC):
-        """Francheska (Ellona temple priestess, talk and birth-room scenes)."""
-        def __init__(self, name="fran", **kwargs):
-            super().__init__(name, **kwargs)
-            if 'FranVar' in dir() and isinstance(FranVar, dict):
-                self.var = FranVar
-                self.promote_from_var(FranVar)
-
-    class Luisa(BaseNPC):
-        """Luisa (secondary female NPC - social/church contexts)."""
         def __init__(self, name="luisa", **kwargs):
             super().__init__(name, **kwargs)
-            if 'LuisaVar' in dir() and isinstance(LuisaVar, dict):
-                self.var = LuisaVar
-                self.promote_from_var(LuisaVar)
+            self.var = kwargs.get("var", LuisaVar)
+            for k, v in {
+                "met": 0,
+                "lasttalkday": -1,
+            }.items():
+                self.var.setdefault(k, v)
+            self.location = "HunterClub"
+            self.promote_from_var(self.var)
 
-    class Sergio(BaseNPC):
+    class SergioData(PeopleData):
+        code_name = "sergio"
+
+        def __init__(self):
+            super().__init__(
+                self.code_name,
+                cname="Серджио",
+                fullname="Серджио",
+                genitive="Серджио",
+                dative="Серджио",
+                default_location="ArtisansQuarter",
+                description="Серджио - цирюльник из квартала ремесленников, связан с тайными визитами столичного жениха Клариссы.",
+                age=35,
+            )
+
+    class SergioInfo(BaseNPC):
         """Sergio (secondary artisan / town NPC, discount/quest hooks)."""
+        unknown_name = "Серджио"
+
         def __init__(self, name="sergio", **kwargs):
             super().__init__(name, **kwargs)
-            if 'SergioVar' in dir() and isinstance(SergioVar, dict):
-                self.var = SergioVar
-                self.promote_from_var(SergioVar)
+            self.var = kwargs.get("var", SergioVar)
+            for k, v in {
+                "met": 0,
+                "lasttalkday": -1,
+                "clara_fiance_visit_seen": 0,
+            }.items():
+                self.var.setdefault(k, v)
+            self.location = "ArtisansQuarter"
+            self.promote_from_var(self.var)
 
-    class Draupnir(BaseNPC):
-        """Draupnir (blacksmith/artisan in StolyarWorkshop, gloryhole/soap related quests)."""
-        def __init__(self, name="draupnir", **kwargs):
+    class LucasData(PeopleData):
+        code_name = "lucas"
+
+        def __init__(self):
+            super().__init__(
+                self.code_name,
+                cname="Лукас",
+                fullname="Лукас",
+                genitive="Лукаса",
+                dative="Лукасу",
+                default_location="BeckyHome",
+                description="Лукас - ухажер и жених Ингенборг Блэнкеншип.",
+                age=23,
+            )
+
+    class LucasInfo(BaseNPC):
+        """Lucas: Inga's boyfriend/fiance and pregnancy father in Becky-home scenes."""
+        unknown_name = "Лукас"
+
+        def __init__(self, name="lucas", **kwargs):
             super().__init__(name, **kwargs)
-            if 'DraupnirVar' in dir() and isinstance(DraupnirVar, dict):
-                self.var = DraupnirVar
-                self.promote_from_var(DraupnirVar)
+            self.var = kwargs.get("var", LucasVar)
+            for k, v in {
+                "met": 0,
+                "last_seen_with_inga_day": -1,
+            }.items():
+                self.var.setdefault(k, v)
+            self.location = "BeckyHome"
+            self.promote_from_var(self.var)
 
-    _secondary_class_map = {
-        "robin": Robin,
-        "zimmer": Zimmer,
-        "eddie": Eddie,
-        "alber": Alber,
-        "fran": Francheska,
-        "mongol": Mongol,
-        "luisa": Luisa,
-        "sergio": Sergio,
-        "draupnir": Draupnir,
-    }
-    _secondary_var_map = {
-        "robin": RobinVar,
-        "zimmer": ZimmerVar,
-        "eddie": EddieVar,
-        "alber": AlberVar,
-        "fran": FranVar,
-        "mongol": MongolVar,
-        "luisa": LuisaVar,
-        "sergio": SergioVar,
-        "draupnir": DraupnirVar,
-    }
-    if 'peopleInfo' not in dir() or not isinstance(peopleInfo, dict):
-        peopleInfo = {}
-    if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
-        secondary_npcs = []
-    for _sec_key in list(SECONDARY_NPC_KEYS or []):
-        _sec_cls = _secondary_class_map.get(_sec_key, BaseNPC)
-        _sec_var = _secondary_var_map.get(_sec_key, {})
-        if _sec_key not in peopleInfo or not isinstance(peopleInfo.get(_sec_key), _sec_cls):
-            peopleInfo[_sec_key] = _sec_cls(var=_sec_var)
-        else:
-            peopleInfo[_sec_key].var = _sec_var
-        if peopleInfo[_sec_key] not in secondary_npcs:
-            secondary_npcs.append(peopleInfo[_sec_key])
+    class ClaraFianceData(PeopleData):
+        code_name = "clara_fiance"
+
+        def __init__(self):
+            super().__init__(
+                self.code_name,
+                cname="Столичный жених",
+                fullname="Столичный жених Клариссы",
+                genitive="столичного жениха Клариссы",
+                dative="столичному жениху Клариссы",
+                default_location="",
+                description="Столичный жених Клариссы - молодой дворянин из договоренности семьи Легаре.",
+                age=24,
+            )
+
+    class ClaraFianceInfo(BaseNPC):
+        """Clara's fiance: identity only; Clara's thread owns discovery flags."""
+        unknown_name = "Столичный жених"
+
+        def __init__(self, name="clara_fiance", **kwargs):
+            super().__init__(name, **kwargs)
+            self.var = kwargs.get("var", ClaraFianceVar)
+            for k, v in {
+                "met": 0,
+                "last_seen_day": -1,
+            }.items():
+                self.var.setdefault(k, v)
+            self.location = ""
+            self.promote_from_var(self.var)
+
+    class SergioPetData(PeopleData):
+        code_name = "sergio_pet"
+
+        def __init__(self):
+            super().__init__(
+                self.code_name,
+                cname="Питомец Серджио",
+                fullname="Питомец Серджио",
+                genitive="питомца Серджио",
+                dative="питомцу Серджио",
+                default_location="BarberShop",
+                description="Питомец Серджио - второстепенная сущность для будущих сцен цирюльни.",
+                age=0,
+            )
+
+    class SergioPetInfo(BaseNPC):
+        """Sergio's pet: secondary runtime object for barber-shop scenes."""
+        unknown_name = "Питомец Серджио"
+
+        def __init__(self, name="sergio_pet", **kwargs):
+            super().__init__(name, **kwargs)
+            self.var = kwargs.get("var", SergioPetVar)
+            for k, v in {
+                "met": 0,
+                "last_seen_day": -1,
+            }.items():
+                self.var.setdefault(k, v)
+            self.location = "BarberShop"
+            self.promote_from_var(self.var)
+
+    class GerhardData(PeopleData):
+        code_name = "gerhard"
+
+        def __init__(self):
+            super().__init__(
+                self.code_name,
+                cname="Брат Герхард",
+                fullname="Брат Герхард",
+                genitive="брата Герхарда",
+                dative="брату Герхарду",
+                default_location="Church",
+                description="Брат Герхард - священник городского храма, принимает исповеди и ведет воскресные наставления.",
+                age=48,
+                portrait="images/gerhard/portrait.png",
+            )
+
+    class GerhardInfo(BaseNPC):
+        """Brother Gerhardt: church priest, confession and sermon story flags."""
+        unknown_name = "Брат Герхард"
+
+        def __init__(self, name="gerhard", **kwargs):
+            super().__init__(name, **kwargs)
+            self.var = kwargs.get("var", GerhardVar)
+            for k, v in {
+                "confession_intro_done": 0,
+                "sermon_story_stage": 0,
+                "becky_advice_stage": 0,
+                "georgett_confession_stage": 0,
+                "liza_confession_stage": 0,
+                "lasttalkday": -1,
+            }.items():
+                self.var.setdefault(k, v)
+            self.location = "Church"
+            self.promote_from_var(self.var)
 
     def secondary_npc_default_profiles():
         return {
             "eddie": {
                 "names": ("Эдди", "Эдди", "Эдди"),
-                "age": 19,
+                "age": 17,
                 "location": "GroceryStore",
-                "description": "Эдди - сирота, которого Бекки подобрала, выучила делу и поставила управляющим семейной лавкой.",
+                "description": "Эдди - сын Ребекки, подросток и помощник в бакалейной лавке. Связан с событиями Бекки, Жоржетты и Лукаса.",
                 "known": False,
-                "var": EddieVar,
             },
             "alber": {
                 "names": ("Альбер", "Альбера", "Альберу"),
@@ -233,7 +288,6 @@ init python:
                 "location": "WineStore",
                 "description": "Мессир Альбер Легаре - хозяин винного погребка, женат, у него большая семья.",
                 "known": False,
-                "var": AlberVar,
             },
             "fran": {
                 "names": ("Франческа", "Франчески", "Франческе"),
@@ -246,7 +300,7 @@ init python:
             "robin": {
                 "names": ("Робин", "Робина", "Робину"),
                 "age": 30,
-                "location": "Forest",
+                "location": "BlackwoodRoad",
                 "description": "Робин - предводитель лесных обездоленных.",
                 "known": False,
                 "var": RobinVar,
@@ -254,42 +308,72 @@ init python:
             "mongol": {
                 "names": ("Монгол", "Монгола", "Монголу"),
                 "age": 39,
-                "location": "",
-                "description": "Монгол - торговец лошадьми на рынке.",
-                "known": False,
-                "var": MongolVar,
-            },
+            "location": "",
+            "description": "Монгол - торговец лошадьми на рынке.",
+            "known": False,
+        },
             "zimmer": {
-                "names": ("Циммер", "Циммера", "Циммеру"),
-                "age": 41,
+                "names": ("Десятник Циммерман", "Десятника Циммермана", "Десятнику Циммерману"),
+                "age": 58,
                 "location": "CityGuard",
-                "description": "Циммер - служащий городской стражи.",
+                "description": "Десятник Циммерман - начальник городской стражи.",
                 "known": False,
-                "var": ZimmerVar,
             },
             "draupnir": {
                 "names": ("Драупнир", "Драупнира", "Драупниру"),
                 "age": 45,
                 "location": "StolyarWorkshop",
-                "description": "Драупнир - мастер из ремесленного квартала.",
+                "description": "Драупнир - гном-столяр из квартала ремесленников. Дерет дорого, но вывески, отверстия, глорихолы, зольные бочки и будки делает на совесть.",
                 "known": False,
                 "var": DraupnirVar,
             },
             "luisa": {
                 "names": ("Луиза", "Луизы", "Луизе"),
                 "age": 28,
-                "location": "Church",
-                "description": "Луиза - городская знакомая из церковных и социальных сцен.",
+                "location": "HunterClub",
+                "description": "Луиза - полная городская знакомая из охотничьей лавки и городских социальных сцен.",
                 "known": False,
                 "var": LuisaVar,
             },
             "sergio": {
                 "names": ("Серджио", "Серджио", "Серджио"),
                 "age": 35,
-                "location": "",
+                "location": "ArtisansQuarter",
                 "description": "Серджио - цирюльник из квартала ремесленников.",
                 "known": False,
                 "var": SergioVar,
+            },
+            "lucas": {
+                "names": ("Лукас", "Лукаса", "Лукасу"),
+                "age": 23,
+                "location": "BeckyHome",
+                "description": "Лукас - ухажер и жених Ингенборг Блэнкеншип.",
+                "known": False,
+                "var": LucasVar,
+            },
+            "clara_fiance": {
+                "names": ("Столичный жених", "столичного жениха", "столичному жениху"),
+                "age": 24,
+                "location": "",
+                "description": "Столичный жених Клариссы - молодой дворянин из договоренности семьи Легаре.",
+                "known": False,
+                "var": ClaraFianceVar,
+            },
+            "sergio_pet": {
+                "names": ("Питомец Серджио", "питомца Серджио", "питомцу Серджио"),
+                "age": 0,
+                "location": "BarberShop",
+                "description": "Питомец Серджио - второстепенная сущность для будущих сцен цирюльни.",
+                "known": False,
+                "var": SergioPetVar,
+            },
+            "gerhard": {
+                "names": ("Брат Герхард", "брата Герхарда", "брату Герхарду"),
+                "age": 48,
+                "location": "Church",
+                "description": "Брат Герхард - священник городского храма, принимает исповеди и ведет воскресные наставления.",
+                "known": False,
+                "var": GerhardVar,
             },
         }
 
@@ -318,139 +402,88 @@ init python:
             jobwhore[npc_key] = int(jobwhore.get(npc_key, 0) or 0)
             jobgloryhole[npc_key] = int(jobgloryhole.get(npc_key, 0) or 0)
             var_table = row.get("var", {})
-            if npc_key in peopleInfo and isinstance(peopleInfo[npc_key], PeopleInfo):
+            if npc_key == "robin":
+                peopleData[npc_key] = RobinStaticData
+            if npc_key == "zimmer":
+                peopleData[npc_key] = ZimmerStaticData
+            if npc_key == "eddie":
+                peopleData[npc_key] = EddieStaticData
+            if npc_key == "alber":
+                peopleData[npc_key] = AlberStaticData
+            if npc_key == "fran":
+                peopleData[npc_key] = FranStaticData
+            if npc_key == "gerhard":
+                peopleData[npc_key] = GerhardStaticData
+            if npc_key == "draupnir":
+                peopleData[npc_key] = DraupnirStaticData
+            if npc_key == "mongol":
+                peopleData[npc_key] = MongolStaticData
+            if npc_key == "luisa":
+                peopleData[npc_key] = LuisaStaticData
+            if npc_key == "sergio":
+                peopleData[npc_key] = SergioStaticData
+            if npc_key == "lucas":
+                peopleData[npc_key] = LucasStaticData
+            if npc_key == "clara_fiance":
+                peopleData[npc_key] = ClaraFianceStaticData
+            if npc_key == "sergio_pet":
+                peopleData[npc_key] = SergioPetStaticData
+            if npc_key == "alber":
+                peopleInfo[npc_key] = Alber
+                peopleInfo[npc_key].update()
+            elif npc_key in peopleInfo and isinstance(peopleInfo[npc_key], PeopleInfo):
                 peopleInfo[npc_key].var = var_table
                 peopleInfo[npc_key].update()
         return profiles
 
-# Registration function call pattern (called from main init after legacy TXT inits)
-label register_robin_secondary:
-    $ knowsMC.setdefault("robin", False)
+define GerhardStaticData = GerhardData()
+default Gerhard = GerhardInfo()
+define LuisaStaticData = LuisaData()
+default Luisa = LuisaInfo()
+define SergioStaticData = SergioData()
+default Sergio = SergioInfo()
+define LucasStaticData = LucasData()
+default Lucas = LucasInfo()
+define ClaraFianceStaticData = ClaraFianceData()
+default ClaraFiance = ClaraFianceInfo()
+define SergioPetStaticData = SergioPetData()
+default SergioPet = SergioPetInfo()
+
+label register_gerhard_secondary:
+    $ knowsMC.setdefault("gerhard", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
-            if "robin" not in peopleInfo:
-                try:
-                    info = Robin(var=RobinVar)  # class defined at top of this file (init python)
-                    peopleInfo["robin"] = info
-                except Exception:
-                    pass
+            peopleData["gerhard"] = GerhardStaticData
+            Gerhard.var = GerhardVar
+            Gerhard.location = "Church"
+            Gerhard.update()
+            peopleInfo["gerhard"] = Gerhard
         if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
             secondary_npcs = []
-        if peopleInfo.get("robin") and peopleInfo["robin"] not in secondary_npcs:
-            secondary_npcs.append(peopleInfo["robin"])
-    $ RobinProfile = "Робин (он же Робин Гуд, он же Худи/Гуди) — предводитель группы 'обездоленных' лесорубов на Шервудской (ныне Блэквудской) вырубке. Любит 'социяльную ответственность', пожертвования и стиль 'йо, браза'. После освобождения Монгола из колодок — потенциальный друг (через Монгола)."
+        if peopleInfo.get("gerhard") and peopleInfo["gerhard"] not in secondary_npcs:
+            secondary_npcs.append(peopleInfo["gerhard"])
     return
 
 
-label register_zimmer_secondary:
-    $ knowsMC.setdefault("zimmer", False)
-    python:
-        if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
-            if "zimmer" not in peopleInfo:
-                try:
-                    info = Zimmer(var=ZimmerVar)  # class defined at top of this file
-                    peopleInfo["zimmer"] = info
-                except Exception:
-                    pass
-        if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
-            secondary_npcs = []
-        if peopleInfo.get("zimmer") and peopleInfo["zimmer"] not in secondary_npcs:
-            secondary_npcs.append(peopleInfo["zimmer"])
-    $ ZimmerProfile = "Десятник Циммерман — старый, низкий, носатый, кучерявый начальник городской стражи (десятник). Немного картавит. Любит 'порядок', но очень осторожен (семья, дети, любовницы). Принимает жалобы на конокрадов (лошади) и разбойников в Шервуде/Блэквуде (за деньги). Готов 'поиcкать' Робина, но не арестовывать (не наша земля, слишком опасно). Ключевой NPC для Zimmer mission в Blackwood arc."
+label _auto_register_gerhard:
+    call register_gerhard_secondary from _call_gerhard_reg
     return
 
 
-# Auto-call on load (safe pattern)
-label _auto_register_robin:
-    call register_robin_secondary from _call_robin_reg
-    return
-
-label _auto_register_zimmer:
-    call register_zimmer_secondary from _call_zimmer_reg
-    return
-
-
-# Additional secondary registrations with per-NPC classes (Eddie, Alber, etc.)
-# Per user request: classes defined in the Init file for this NPC group.
-label register_eddie_secondary:
-    $ knowsMC.setdefault("eddie", False)
-    python:
-        if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
-            if "eddie" not in peopleInfo:
-                try:
-                    peopleInfo["eddie"] = Eddie(var=globals().get("EddieVar", {}))  # class at top of file
-                except Exception:
-                    pass
-        if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
-            secondary_npcs = []
-        if peopleInfo.get("eddie") and peopleInfo["eddie"] not in secondary_npcs:
-            secondary_npcs.append(peopleInfo["eddie"])
-    $ EddieProfile = "Эдди — сын Ребекки, подросток. Участвует в событиях дома с Жоржеттой и Лукасом (GeorgettBeckyVisit.txt)."
-    return
-
-
-label register_alber_secondary:
-    $ knowsMC.setdefault("alber", False)
-    python:
-        if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
-            if "alber" not in peopleInfo:
-                try:
-                    peopleInfo["alber"] = Alber(var=globals().get("AlberVar", {}))  # class at top of file
-                except Exception:
-                    pass
-        if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
-            secondary_npcs = []
-        if peopleInfo.get("alber") and peopleInfo["alber"] not in secondary_npcs:
-            secondary_npcs.append(peopleInfo["alber"])
-    return
-
-
-label register_francheska_secondary:
-    $ knowsMC.setdefault("fran", False)
-    python:
-        if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
-            if "fran" not in peopleInfo:
-                try:
-                    peopleInfo["fran"] = Francheska(var=globals().get("FranVar", {}))
-                except Exception:
-                    pass
-        if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
-            secondary_npcs = []
-        if peopleInfo.get("fran") and peopleInfo["fran"] not in secondary_npcs:
-            secondary_npcs.append(peopleInfo["fran"])
-    return
-
-
-label _auto_register_eddie:
-    call register_eddie_secondary from _call_eddie_reg
-    return
-
-
-label _auto_register_alber:
-    call register_alber_secondary from _call_alber_reg
-    return
-
-
-label _auto_register_francheska:
-    call register_francheska_secondary from _call_francheska_reg
-    return
-
-
-# === NEW: Luisa and Sergio (explicitly requested to finish all secondaries) ===
 label register_luisa_secondary:
     $ knowsMC.setdefault("luisa", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
-            if "luisa" not in peopleInfo:
-                try:
-                    peopleInfo["luisa"] = Luisa(var=globals().get("LuisaVar", {}))
-                except Exception:
-                    pass
+            peopleData["luisa"] = LuisaStaticData
+            Luisa.var = LuisaVar
+            Luisa.location = "HunterClub"
+            Luisa.update()
+            peopleInfo["luisa"] = Luisa
         if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
             secondary_npcs = []
         if peopleInfo.get("luisa") and peopleInfo["luisa"] not in secondary_npcs:
             secondary_npcs.append(peopleInfo["luisa"])
-    $ LuisaProfile = "Луиза — второстепенная женская NPC (социальные и церковные сцены)."
+    $ LuisaProfile = "Луиза — второстепенная женская NPC (охотничья лавка и городские социальные сцены)."
     return
 
 
@@ -458,11 +491,11 @@ label register_sergio_secondary:
     $ knowsMC.setdefault("sergio", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
-            if "sergio" not in peopleInfo:
-                try:
-                    peopleInfo["sergio"] = Sergio(var=globals().get("SergioVar", {}))
-                except Exception:
-                    pass
+            peopleData["sergio"] = SergioStaticData
+            Sergio.var = SergioVar
+            Sergio.location = "ArtisansQuarter"
+            Sergio.update()
+            peopleInfo["sergio"] = Sergio
         if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
             secondary_npcs = []
         if peopleInfo.get("sergio") and peopleInfo["sergio"] not in secondary_npcs:
@@ -481,45 +514,64 @@ label _auto_register_sergio:
     return
 
 
-label register_draupnir_secondary:
-    $ knowsMC.setdefault("draupnir", False)
+label register_lucas_secondary:
+    $ knowsMC.setdefault("lucas", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
-            if "draupnir" not in peopleInfo:
-                try:
-                    peopleInfo["draupnir"] = Draupnir(var=globals().get("DraupnirVar", {}))
-                except Exception:
-                    pass
+            peopleData["lucas"] = LucasStaticData
+            Lucas.var = LucasVar
+            Lucas.location = "BeckyHome"
+            Lucas.update()
+            peopleInfo["lucas"] = Lucas
         if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
             secondary_npcs = []
-        if peopleInfo.get("draupnir") and peopleInfo["draupnir"] not in secondary_npcs:
-            secondary_npcs.append(peopleInfo["draupnir"])
-    $ DraupnirProfile = "Драупнир — гном-кузнец, работает в Столярной мастерской. Связан с квестами по gloryhole и мылу."
+        if peopleInfo.get("lucas") and peopleInfo["lucas"] not in secondary_npcs:
+            secondary_npcs.append(peopleInfo["lucas"])
     return
 
 
-label _auto_register_draupnir:
-    call register_draupnir_secondary from _call_draupnir_reg
-    return
-
-
-# Also ensure Mongol gets registered early (has heavy Var usage)
-label register_mongol_secondary:
-    $ knowsMC.setdefault("mongol", False)
+label register_clara_fiance_secondary:
+    $ knowsMC.setdefault("clara_fiance", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
-            if "mongol" not in peopleInfo:
-                try:
-                    peopleInfo["mongol"] = Mongol(var=globals().get("MongolVar", {}))
-                except Exception:
-                    pass
+            peopleData["clara_fiance"] = ClaraFianceStaticData
+            ClaraFiance.var = ClaraFianceVar
+            ClaraFiance.location = ""
+            ClaraFiance.update()
+            peopleInfo["clara_fiance"] = ClaraFiance
         if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
             secondary_npcs = []
-        if peopleInfo.get("mongol") and peopleInfo["mongol"] not in secondary_npcs:
-            secondary_npcs.append(peopleInfo["mongol"])
+        if peopleInfo.get("clara_fiance") and peopleInfo["clara_fiance"] not in secondary_npcs:
+            secondary_npcs.append(peopleInfo["clara_fiance"])
     return
 
 
-label _auto_register_mongol:
-    call register_mongol_secondary from _call_mongol_reg
+label register_sergio_pet_secondary:
+    $ knowsMC.setdefault("sergio_pet", False)
+    python:
+        if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
+            peopleData["sergio_pet"] = SergioPetStaticData
+            SergioPet.var = SergioPetVar
+            SergioPet.location = "BarberShop"
+            SergioPet.update()
+            peopleInfo["sergio_pet"] = SergioPet
+        if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):
+            secondary_npcs = []
+        if peopleInfo.get("sergio_pet") and peopleInfo["sergio_pet"] not in secondary_npcs:
+            secondary_npcs.append(peopleInfo["sergio_pet"])
+    return
+
+
+label _auto_register_lucas:
+    call register_lucas_secondary from _call_lucas_reg
+    return
+
+
+label _auto_register_clara_fiance:
+    call register_clara_fiance_secondary from _call_clara_fiance_reg
+    return
+
+
+label _auto_register_sergio_pet:
+    call register_sergio_pet_secondary from _call_sergio_pet_reg
     return

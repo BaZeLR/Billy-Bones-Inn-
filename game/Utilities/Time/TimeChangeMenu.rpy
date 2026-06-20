@@ -15,16 +15,16 @@ init python:
         return str(CurLoc or "TavernMain")
 
     TIME_CHANGE_PERIOD_TARGETS = (
-        (1, 8, "Дождаться утра"),
-        (2, 11, "Дождаться полудня"),
-        (4, 16, "Дождаться дня"),
-        (5, 18, "Дождаться вечера"),
-        (7, 23, "Дождаться ночи"),
+        (8, "Дождаться утра"),
+        (11, "Дождаться полудня"),
+        (16, "Дождаться дня"),
+        (18, "Дождаться вечера"),
+        (23, "Дождаться ночи"),
     )
 
-    def _time_current_slot():
+    def _time_current_hour():
         calendar_v2.sync_state()
-        return int(calendar_v2.time_slot())
+        return int(calendar_v2.hour or 0) % 24
 
     def _time_overview_lines():
         calendar_v2.sync_state()
@@ -49,12 +49,12 @@ init python:
     def _time_change_items(return_label=""):
         items = []
         block_advance = int(BlockTimeAdvance or 0)
-        current_slot = _time_current_slot()
+        current_hour = _time_current_hour()
 
         if block_advance == 0:
-            for slot_id, target_hour, caption in TIME_CHANGE_PERIOD_TARGETS:
-                if current_slot < slot_id:
-                    items.append(MenuItem(caption, [_time_change_close_action(return_label), Call("ApplyTimePeriodChange", slot_id, target_hour)]))
+            for target_hour, caption in TIME_CHANGE_PERIOD_TARGETS:
+                if current_hour < int(target_hour or 0):
+                    items.append(MenuItem(caption, [_time_change_close_action(return_label), Call("ApplyTimePeriodChange", target_hour)]))
 
         if block_advance == 0:
             items.append(MenuItem("Дождаться следующего утра", [_time_change_close_action(return_label), Call("NextDay", _time_return_label(), 1)]))
@@ -89,11 +89,10 @@ label HideTimeChangeMenu(return_label=""):
     return
 
 
-label ApplyTimePeriodChange(target_time=0, target_hour=8):
-    $ target_time = int(target_time or 0)
+label ApplyTimePeriodChange(target_hour=8):
     $ target_hour = int(target_hour or 8) % 24
     $ calendar_v2.sync_state()
-    if int(BlockTimeAdvance or 0) == 0 and int(calendar_v2.time_slot()) < target_time:
+    if int(BlockTimeAdvance or 0) == 0 and int(calendar_v2.hour or 0) < target_hour:
         $ calendar_v2.hour = target_hour
         $ calendar_v2.minute = 0
         $ calendar_v2.sync_state()

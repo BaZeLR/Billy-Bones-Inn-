@@ -243,6 +243,7 @@ init python:
 
         if code == "meet":
             _fran_topic(0, 0, 3, "meet", 1)
+            Francheska.mark_met()
             return
         if code == "ellona":
             _fran_topic(1, 1, 2, "ellonaask", 1)
@@ -344,9 +345,7 @@ label FrancheskaTalkApply(topic_code=""):
 
 
 label FrancheskaTalkEnd:
-    if CurLoc == "EllonaBirthRoom":
-        call EllonaBuildActions("EllonaBirthRoom")
-    else:
-        call EllonaBuildActions("EllonaTemple")
-    $ main_ui_restore_room_scene_state()
+    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _room_label:
+        jump expression _room_label
     return

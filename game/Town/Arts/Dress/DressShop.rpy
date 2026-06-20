@@ -52,8 +52,9 @@ init python:
         ],
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
-            time_slots=[0, 1, 2],
             closed_text="В это время лавка закрыта.",
+            start="06:00",
+            end="17:59",
         ),
         custom_properties={
             "shop_feature": "tailor",
@@ -114,7 +115,7 @@ label DressShop:
     $ GirlDressBlock = 0
     call RoomEnterEventGate(CurLoc, False)
 
-    if not DressShopRoom.is_open(week, time):
+    if not DressShopRoom.is_open():
         $ MainTxt = DressShopRoom.schedule.closed_text
         $ CurLocDesc = MainTxt
         $ scene_image = build_media_ref("general", "", "LocArtisansQuarter" + str(renpy.random.randint(1, 4)))

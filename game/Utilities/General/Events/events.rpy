@@ -20,6 +20,8 @@ default eventPath = set()
 default eventProjectionRows = []
 default eventRouteHints = {}
 default story_thread_levels = {}
+default StoryEventFiredDay = -1
+default StoryEventFiredKeysToday = []
 
 init -25 python:
     import renpy.exports as renpy
@@ -45,6 +47,8 @@ init -25 python:
             self.conds = makeConditions(self.condStr)
 
         def canTrigger(self, evtDay=0):
+            if story_event_fired_today(self):
+                return False
             if not self.checkDay():
                 return False
             if not self.checkHour():
@@ -164,6 +168,32 @@ init -25 python:
                 str(self.conds),
                 str(self.item),
             )
+
+    def story_event_day_key(evt):
+        return "%s:%s:%s" % (
+            str(getattr(evt, "target", "") or "").strip(),
+            str(getattr(evt, "location", "") or "").strip(),
+            str(getattr(evt, "action", "") or "").strip(),
+        )
+
+    def story_event_reset_fired_today_if_needed():
+        global StoryEventFiredDay, StoryEventFiredKeysToday
+        day_value = _story_num_day()
+        if int(StoryEventFiredDay or -1) != int(day_value):
+            StoryEventFiredDay = int(day_value)
+            StoryEventFiredKeysToday = []
+
+    def story_event_fired_today(evt):
+        story_event_reset_fired_today_if_needed()
+        key = story_event_day_key(evt)
+        return bool(key and key in list(StoryEventFiredKeysToday or []))
+
+    def story_event_mark_fired_today(evt):
+        global StoryEventFiredKeysToday
+        story_event_reset_fired_today_if_needed()
+        key = story_event_day_key(evt)
+        if key and key not in StoryEventFiredKeysToday:
+            StoryEventFiredKeysToday.append(key)
 
     def initEvents():
         for _name, tdata in dict(threadData or {}).items():
@@ -357,6 +387,8 @@ init -25 python:
             return
         evalTime = eval_key
 
+        initEvents()
+
         tmp_events = []
         for _name, thread_info in dict(threads or {}).items():
             tmp_events.extend(thread_info.getAvailableEvents())
@@ -447,7 +479,7 @@ label before_main_menu:
 label checkTriggers(location, action, numpop=0):
     $ _story_location = str(location or "").strip()
     $ _story_action = str(action or "").strip()
-    $ findAvailableEvents(True)
+    $ findAvailableEvents(False)
     if _story_location not in availEvents:
         return False
     if _story_action not in availEvents[_story_location]:
@@ -458,6 +490,7 @@ label checkTriggers(location, action, numpop=0):
     if evt.item and not evt.checkItem():
         return False
     $ active_event = evt
+    $ story_event_mark_fired_today(evt)
     if numpop == 2:
         $ renpy.pop_call()
     elif numpop == 1:

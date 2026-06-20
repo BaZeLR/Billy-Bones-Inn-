@@ -6,7 +6,7 @@ init python:
         door_obj = obj
         if door_obj is None:
             return False
-        return int(door_obj.state.get("locked", 0) or 0) == 0 and FranBusy.get(time, 0) == 0
+        return int(door_obj.state.get("locked", 0) or 0) == 0 and Francheska.birth_room_available()
 
     EllonaBirthRoomDoorObject = GameObject(
         object_id="birth_room_door_001",

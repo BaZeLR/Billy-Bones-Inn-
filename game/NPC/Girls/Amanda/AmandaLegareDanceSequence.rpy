@@ -6,6 +6,19 @@
 # To be called from FridayDance or related event chains.
 
 init python:
+    def amanda_legare_claims_first_friday_dance():
+        try:
+            if str(getLocation("alber") or "") != "FridayDance":
+                return False
+        except Exception:
+            return False
+        try:
+            if str(getLocation("clara") or "") == "FridayDance":
+                return False
+        except Exception:
+            pass
+        return True
+
     def build_legare_amanda_let_go_plan(use_forced_type=0, forced_type=0):
         if int(use_forced_type or 0) == 1:
             tmp_legare_sex_type = int(forced_type or 0)
@@ -56,12 +69,12 @@ init python:
 
     def apply_legare_amanda_let_go_code(use_forced_type=0, forced_type=0):
         plan = build_legare_amanda_let_go_plan(use_forced_type, forced_type)
-        AmandaVar["sucklegare"] = int(plan.get("sucklegare", 0) or 0)
-        AmandaVar["fucklegare"] = int(plan.get("fucklegare", 0) or 0)
-        AmandaVar["deflowerlegare"] = int(plan.get("deflowerlegare", 0) or 0)
+        Amanda.set_var_int("sucklegare", int(plan.get("sucklegare", 0) or 0))
+        Amanda.set_var_int("fucklegare", int(plan.get("fucklegare", 0) or 0))
+        Amanda.set_var_int("deflowerlegare", int(plan.get("deflowerlegare", 0) or 0))
         if plan.get("set_virginity", None) is not None:
             virginity["amanda"] = int(plan.get("set_virginity", 0) or 0)
-        AmandaVar["alberfriends"] = int(AmandaVar.get("alberfriends", 0) or 0) + int(plan.get("alberfriends_delta", 0) or 0)
+        Amanda.set_var_int("alberfriends", Amanda.var_int("alberfriends", 0) + int(plan.get("alberfriends_delta", 0) or 0))
         slut_args = tuple(plan.get("slut_args", ()) or ())
         if slut_args:
             slut_friends_increase(slut_args[0], slut_args[1], slut_args[2], slut_args[3], slut_args[4], slut_args[5], slut_args[6])
@@ -70,36 +83,107 @@ init python:
             PregnancyCheck("amanda", pregnancy_target, 1, "legare")
         return plan
 
+label story_amanda_legare_dance_0:
+    vscene "images/market/LocFridayDance.jpg"
+    "У края танцующей толпы Аманда замечает, что месье Легаре смотрит на нее с терпеливым интересом."
+    "Она делает вид, что ей все равно, но между песнями ее взгляд снова и снова возвращается к нему."
+    $ Amanda.mark_legare_intro_seen()
+    $ thread.advance()
+    return
+
+label story_amanda_legare_dance_1:
+    vscene "images/market/LocFridayDance.jpg"
+    $ Amanda.set_var_int("albernowdances", 1)
+    $ Amanda.set_var_int("legare_dance_pending", 0)
+    call EventAmandaLegareCreateDance
+    $ FridayDancesCount += 1
+    "Вы нашли Аманду как раз в тот момент, когда месье Легаре галантно склонился перед ней и протянул руку."
+    "Аманда смущенно оглянулась по сторонам, но руку все же подала. Через миг они уже кружились среди танцующих."
+    call ShowImage("amanda", "dance", "legare_step_0")
+    $ DanceStep = 1
+    $ Amanda.set_var_int("legare_dance_thread_stage", 1)
+    $ thread.advance()
+    call IntAmandaDance
+    return
+
+label story_amanda_legare_dance_2:
+    vscene "images/market/LocFridayDance.jpg"
+    $ Amanda.set_var_int("albernowdances", 1)
+    $ Amanda.set_var_int("legare_dance_pending", 0)
+    call EventAmandaLegareCreateDance
+    $ FridayDancesCount += 1
+    "На этот раз Аманда уже не выглядит случайно втянутой в танец. Она замечает Легаре раньше вас и сама делает к нему пару шагов."
+    "Виноторговец улыбается слишком довольно, будто считал этот вечер уже выигранным."
+    call ShowImage("amanda", "dance", "legare_step_0")
+    $ Amanda.set_var_int("legare_dance_thread_stage", 2)
+    $ Amanda.set_var_int("alberfriends", max(2, Amanda.var_int("alberfriends", 0)))
+    $ DanceStep = 1
+    $ thread.advance()
+    call IntAmandaDance
+    return
+
+label story_amanda_legare_dance_3:
+    vscene "images/market/LocFridayDance.jpg"
+    $ Amanda.set_var_int("albernowdances", 1)
+    $ Amanda.set_var_int("legare_dance_pending", 0)
+    call EventAmandaLegareCreateDance
+    $ FridayDancesCount += 1
+    "Легаре больше не ограничивается учтивостью. Он говорит Аманде что-то на ухо, и она вспыхивает, но не отходит."
+    "Теперь это уже не просто танец. Между ними появилась своя маленькая тайна, и Аманда слишком хорошо это понимает."
+    call ShowImage("amanda", "dance", "legare_step_0")
+    $ Amanda.set_var_int("legare_dance_thread_stage", 3)
+    $ Amanda.set_var_int("legare_dance_private_seen", 1)
+    $ Amanda.change_mana(-1, "friday_dance_legare_pressure")
+    $ DanceStep = 1
+    $ thread.advance()
+    call IntAmandaDance
+    return
+
+label story_amanda_legare_dance_4:
+    vscene "images/market/LocFridayDance.jpg"
+    "Вы находите Аманду уже после танца. Легаре держит ее под руку и что-то тихо говорит, склонившись к самому уху."
+    "Аманда краснеет, но не отстраняется. По ее взгляду понятно: решение уже принято, осталось только увидеть, вмешаетесь вы или нет."
+    $ Amanda.set_var_int("albernowdances", 0)
+    $ Amanda.set_var_int("legare_dance_pending", 0)
+    $ Amanda.set_var_int("leftdances", 1)
+    $ Amanda.set_var_int("legare_dance_thread_stage", 4)
+    $ thread.advance()
+    call LegareAmandaGoMenu
+    return
+
 label AmandaLegareDanceSequence:
     # Dev note: This event generates Amanda/Legare dance sequence and outcomes for the Friday dance event.
     $ DanceCreated = 0
-    $ AmandaVar['EscapeUnnoticed'] = 0
+    $ Amanda.set_var_int("EscapeUnnoticed", 0)
     if week == 5:
         $ GirlDance_Clear()
+        $ ForceLegareFirstDance = amanda_legare_claims_first_friday_dance()
         # Friendship/prohibition logic
-        if AmandaVar.get('alberprohibit', 0) == 1:
-            $ AmandaVar['alberfriends'] = max(0, AmandaVar['alberfriends'] - 1)
-            if AmandaVar['alberfriends'] >= 12:
+        if Amanda.var_int("alberprohibit", 0) == 1:
+            $ Amanda.set_var_int("alberfriends", max(0, Amanda.var_int("alberfriends", 0) - 1))
+            if Amanda.var_int("alberfriends", 0) >= 12:
                 $ DanceCreated = renpy.random.randint(1,2)
-            elif AmandaVar['alberfriends'] >= 8:
+            elif Amanda.var_int("alberfriends", 0) >= 8:
                 $ DanceCreated = 1
-            elif AmandaVar['alberfriends'] >= 4:
+            elif Amanda.var_int("alberfriends", 0) >= 4:
                 if renpy.random.randint(1,2) == 1:
                     $ DanceCreated = 1
             else:
                 if renpy.random.randint(1,4) == 1:
                     $ DanceCreated = 1
-        elif AmandaVar['alberfriends'] >= 8:
+        elif Amanda.var_int("alberfriends", 0) >= 8:
             $ DanceCreated = renpy.random.randint(2,4)
         else:
             $ DanceCreated = renpy.random.randint(1,3)
-        $ AmandaVar['LegareGo'] = 0
+        if ForceLegareFirstDance:
+            $ DanceCreated = max(DanceCreated, 1)
+        $ Amanda.set_var_int("LegareGo", 0)
         $ GoPhrase = ""
-        if (AmandaVar['alberfriends'] >= 11 and sluttiness['amanda'] >= 16) or (AmandaVar['alberfriends'] >= 5 and sluttiness['amanda'] >= 30) or (sluttiness['amanda'] >= 50):
-            $ AmandaVar['LegareGo'] = 1
+        if (Amanda.var_int("alberfriends", 0) >= 11 and sluttiness['amanda'] >= 16) or (Amanda.var_int("alberfriends", 0) >= 5 and sluttiness['amanda'] >= 30) or (sluttiness['amanda'] >= 50):
+            $ Amanda.set_var_int("LegareGo", 1)
             if sluttiness['amanda'] < 20:
                 $ GoPhrase = 'Тут месье Легаре что-то шепнул на ушко Аманде. Она замялась, и, потупив глаза, покачала головой. Альбер пожал плечами и снова закружился с ней в танце.'
-                $ AmandaVar['LegareGo'] = 2
+                $ Amanda.set_var_int("LegareGo", 2)
             elif sluttiness['amanda'] < 35:
                 $ GoPhrase = 'Тут месье Легаре что-то шепнул на ушко Аманде. Она замялась, но, после небольшого раздумья, кивнула. Альбер взял Аманду под ручку и они поспешили прочь с площади.'
             else:
@@ -111,11 +195,19 @@ label AmandaLegareDanceSequence:
         $ i = 0
         $ j = 0
         while i < 5:
-            if renpy.random.randint(1, max(1, 5-i)) <= DanceCreated-j:
+            if ForceLegareFirstDance and i == 0:
                 $ j += 1
-                if AmandaVar['LegareGo'] > 0 and ((j > DanceCreated-1 and renpy.random.randint(1,2) == 1) or j == DanceCreated):
-                    $ GirlDance_Add('amanda', 'legare', i + 1, AmandaVar['LegareGo'], GoPhrase)
-                    $ AmandaVar['LegareGo'] = 0
+                if Amanda.var_int("LegareGo", 0) > 0 and DanceCreated <= 1:
+                    $ GirlDance_Add('amanda', 'legare', 1, Amanda.var_int("LegareGo", 0), GoPhrase)
+                    $ Amanda.set_var_int("LegareGo", 0)
+                    $ j = DanceCreated
+                else:
+                    $ GirlDance_Add('amanda', 'legare', 1, 0, '')
+            elif renpy.random.randint(1, max(1, 5-i)) <= DanceCreated-j:
+                $ j += 1
+                if Amanda.var_int("LegareGo", 0) > 0 and ((j > DanceCreated-1 and renpy.random.randint(1,2) == 1) or j == DanceCreated):
+                    $ GirlDance_Add('amanda', 'legare', i + 1, Amanda.var_int("LegareGo", 0), GoPhrase)
+                    $ Amanda.set_var_int("LegareGo", 0)
                     $ j = DanceCreated
                 else:
                     $ GirlDance_Add('amanda', 'legare', i + 1, 0, '')
@@ -126,7 +218,9 @@ label AmandaLegareDanceSequence:
 # --- Amanda/Legare outcome menu and logic ---
 label LegareAmandaGoMenu():
     # Dev note: This menu is shown when Amanda and Legare leave the dance together.
-    $ AmandaVar['leftdances'] = 1
+    $ Amanda.set_var_int("leftdances", 1)
+    $ Amanda.set_var_int("LegareGo", 0)
+    $ Amanda.set_var_int("albernowdances", 0)
     menu:
         "Проследить за ними":
             jump AfterDanceSexLegare

@@ -29,7 +29,6 @@ init 6 python:
             "old_axe_001",
             "lumber_001",
         ],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={},
     )
 

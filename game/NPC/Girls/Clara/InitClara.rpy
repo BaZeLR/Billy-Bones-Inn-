@@ -64,9 +64,8 @@ init python:
         if time_value == 3:
             if week_value == 5:
                 return False
-            MongolVar_safe = getattr(renpy.store, 'MongolVar', {})
             RobinVar_safe = getattr(renpy.store, 'RobinVar', {})
-            return int(MongolVar_safe.get("StocksReleased", 0) or 0) == 1 or int(RobinVar_safe.get("MongolSafePass", 0) or 0) == 1
+            return int(Mongol.var.get("StocksReleased", 0) or 0) == 1 or int(RobinVar_safe.get("MongolSafePass", 0) or 0) == 1
         if time_value != 4:
             return False
         return week_value in (1, 2, 3, 4, 5, 6, 7)
@@ -178,9 +177,12 @@ init python:
 
     class ClaraInfo(Girl):
         """Clara runtime: wine store, market booklet, paintings thread, social state."""
+        unknown_name = "Незнакомка"
+
         def __init__(self):
             super().__init__("clara")
             self.code_name = "clara"
+            self.uses_own_var_state = True
             self.data = ClaraStaticData
             self.age = 19
             self.rel = 0
@@ -273,10 +275,10 @@ init python:
             self.ensure_story_defaults()
 
         def update(self):
-            super(ClaraInfo, self).update()
+            self.name = self.code_name
             self.data = ClaraStaticData
             self.relationship = self.rel
-            self.sync_from_clara_maps()
+            self.ensure_story_defaults()
             return self
 
         def ensure_story_defaults(self):
@@ -292,16 +294,14 @@ init python:
                 update_stat_state()
             except Exception:
                 pass
-            name = self.code_name
-            return int(charisma or 0) >= 70 and int(Friends.get(name, 0) or 0) >= 5
+            return int(charisma or 0) >= 70 and int(self.rel or 0) >= 5
 
         def can_receive_gifts(self):
             try:
                 update_stat_state()
             except Exception:
                 pass
-            name = self.code_name
-            return int(charisma or 0) >= 70 and int(Friends.get(name, 0) or 0) >= 7
+            return int(charisma or 0) >= 70 and int(self.rel or 0) >= 7
 
         def has_caught_cat_gift(self):
             return werecat_second_gift_available() and int(WerecatVar.get("caught", 0) or 0) == 1
@@ -391,19 +391,19 @@ init python:
             gift_id = str(gift_item_id or "").strip()
             score = 0
             score += int(charisma or 0) // 15
-            score += int(Friends.get(name, 0) or 0) // 4
-            score += int(self.var.get("trust", 0) or 0) // 3
-            score += int(sluttiness.get(name, 0) or 0) // 10
+            score += int(self.rel or 0) // 4
+            score += int(self.trust or 0) // 3
+            score += int(self.corruption or 0) // 10
 
             if str(player_state().appearance.current_dress or "") == "thiefdress":
                 score += 1
 
             if interaction == "flirt":
                 score += 2
-                score -= int(FlirtedToday.get(name, 0) or 0) * 3
+                score -= int(self.flirted_today or 0) * 3
             elif interaction == "gift":
                 score += 1
-                score -= int(GiftedToday.get(name, 0) or 0) * 3
+                score -= int(self.gifted_today or 0) * 3
                 if gift_id == "werecat_caught_cat":
                     score += 4
                 elif gift_id in tuple(preferred_gift_item_ids(name)):
@@ -411,9 +411,9 @@ init python:
                 elif gift_id != "":
                     score -= 2
             else:
-                score -= int(TalkedToday.get(name, 0) or 0) * 2
+                score -= int(self.talked_today or 0) * 2
 
-            roll_key = "%s_social_%s_%s_%s_%s" % (name, interaction, gift_id, int(dayspassed or 0), int(Talked.get(name, 0) or 0))
+            roll_key = "%s_social_%s_%s_%s_%s" % (name, interaction, gift_id, int(dayspassed or 0), int(self.talkCountToday or 0))
             score += procedural_randint(-2, 2, roll_key)
 
             if score >= 7:
@@ -429,148 +429,39 @@ init python:
             return result_key
 
         def apply_social_result(self, interaction_type="talk", gift_item_id=""):
-            name = self.code_name
             interaction = str(interaction_type or "talk").strip().lower()
             gift_id = str(gift_item_id or "").strip()
             result_key = self.social_outcome(interaction, gift_id)
 
             if interaction == "talk":
-                Talked[name] = int(Talked.get(name, 0) or 0) + 1
-                TalkedToday[name] = int(TalkedToday.get(name, 0) or 0) + 1
+                self.mark_talked()
             elif interaction == "flirt":
-                Talked[name] = int(Talked.get(name, 0) or 0) + 1
-                FlirtedToday[name] = int(FlirtedToday.get(name, 0) or 0) + 1
+                self.mark_talked()
+                self.flirted_today = people_to_int(self.flirted_today, 0) + 1
+                self.flirtCountToday = people_to_int(self.flirtCountToday, 0) + 1
                 self.var["flirt"] = int(self.var.get("flirt", 0) or 0) + 1
             elif interaction == "gift":
-                Talked[name] = int(Talked.get(name, 0) or 0) + 1
-                GiftedToday[name] = int(GiftedToday.get(name, 0) or 0) + 1
+                self.mark_talked()
+                self.gifted_today = people_to_int(self.gifted_today, 0) + 1
+                self.giftCountToday = people_to_int(self.giftCountToday, 0) + 1
 
             if result_key == "positive":
-                Friends[name] = min(20, int(Friends.get(name, 0) or 0) + (2 if interaction == "gift" else 1))
-                self.var["trust"] = min(20, int(self.var.get("trust", 0) or 0) + 1)
+                self.change_social(friend_delta=(2 if interaction == "gift" else 1))
+                self.trust = min(20, int(self.trust or 0) + 1)
                 if interaction == "flirt":
-                    sluttiness[name] = min(100, int(sluttiness.get(name, 0) or 0) + 1)
+                    self.change_social(corruption_delta=1)
             elif result_key == "negative":
-                Friends[name] = max(0, int(Friends.get(name, 0) or 0) - (1 if interaction == "flirt" else 0))
-                self.var["trust"] = max(0, int(self.var.get("trust", 0) or 0) - 1)
+                self.change_social(friend_delta=-(1 if interaction == "flirt" else 0))
+                self.trust = max(0, int(self.trust or 0) - 1)
 
-            self.rel = int(Friends.get(name, self.rel) or 0)
             self.relationship = self.rel
-            self.trust = int(self.var.get("trust", self.trust) or 0)
-            self.talked_today = int(TalkedToday.get(name, 0) or 0)
-            self.flirted_today = int(FlirtedToday.get(name, 0) or 0)
-            self.gifted_today = int(GiftedToday.get(name, 0) or 0)
-            self.corruption = int(sluttiness.get(name, self.corruption) or 0)
-            Friends["Clara"] = Friends[name]
-            Talked["Clara"] = Talked[name]
+            self.var["trust"] = int(self.trust or 0)
             self.apply_result_counters(result_key)
             return result_key
 
-        def sync_from_clara_maps(self):
-            self.rel = people_to_int(Friends.get("clara", self.rel), self.rel)
-            self.relationship = self.rel
-            self.openness = people_to_int(otkroven.get("clara", self.openness), self.openness)
-            self.corruption = people_to_int(sluttiness.get("clara", self.corruption), self.corruption)
-            self.drunk = people_to_int(Drunk.get("clara", self.drunk), self.drunk)
-            self.talked_today = people_to_int(TalkedToday.get("clara", self.talked_today), self.talked_today)
-            self.flirted_today = people_to_int(FlirtedToday.get("clara", self.flirted_today), self.flirted_today)
-            self.gifted_today = people_to_int(GiftedToday.get("clara", self.gifted_today), self.gifted_today)
-            self.asked_today = people_to_int(AskedToday.get("clara", self.asked_today), self.asked_today)
-            self.fucked_today = people_to_int(FuckedToday.get("clara", self.fucked_today), self.fucked_today)
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                if "clara" in table:
-                    self.stats[stat_key] = table.get("clara")
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                if "clara" in table:
-                    self.jobs[job_key] = table.get("clara")
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                if "clara" in table:
-                    self.skills[skill_key] = table.get("clara")
-            self.ensure_story_defaults()
-            return self
-
-        def sync_clara_maps(self):
-            name = self.code_name
-            knowsMC[name] = bool(self.known)
-            RealName[name] = self.data.fullname
-            RealName2[name] = self.data.genitive
-            RealName3[name] = self.data.dative
-            age_girls[name] = people_to_int(self.age, 19)
-            DateOfBirth[name] = dict(self.data.birth_date)
-            girltextdesc[name] = self.data.description
-            Friends[name] = people_to_int(self.rel, 0)
-            otkroven[name] = people_to_int(self.openness, 0)
-            sluttiness[name] = people_to_int(self.corruption, 0)
-            Drunk[name] = people_to_int(self.drunk, 0)
-            Talked[name] = people_to_int(Talked.get(name, 0), 0)
-            TalkedToday[name] = people_to_int(self.talked_today, 0)
-            FlirtedToday[name] = people_to_int(self.flirted_today, 0)
-            GiftedToday[name] = people_to_int(self.gifted_today, 0)
-            AskedToday[name] = people_to_int(self.asked_today, 0)
-            FuckedToday[name] = people_to_int(self.fucked_today, 0)
-            CurrentLoc[name] = str(self.current_location or "WineStore")
-            GiftPreferences[name] = list(self.gift_preferences)
-            dressdefault[name] = self.wardrobe["current_dress"]
-            bradef[name] = self.wardrobe["current_underwear"]["bra"]
-            pantiesdef[name] = self.wardrobe["current_underwear"]["panties"]
-            legsdef[name] = self.wardrobe["current_underwear"]["legs"]
-            shoesdef[name] = self.wardrobe["current_underwear"]["shoes"]
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                table[name] = self.stats.get(stat_key)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                table[name] = self.skills.get(skill_key, 0)
-
-            # Uppercase legacy references still read these keys in old content.
-            Friends["Clara"] = Friends[name]
-            Talked["Clara"] = Talked[name]
-            self.ensure_story_defaults()
-            return self
-
         def initialize_new_game_state(self):
-            self.var = ClaraVar
             self.ensure_story_defaults()
             self.prepare_daily_event_rolls()
-            self.sync_clara_maps()
             return self
 
         def prepare_daily_event_rolls(self):
@@ -592,13 +483,7 @@ init python:
 
         def reset_daily(self, full=False):
             super(ClaraInfo, self).reset_daily(full)
-            self.talked_today = 0
-            self.flirted_today = 0
-            self.gifted_today = 0
-            self.asked_today = 0
-            self.fucked_today = 0
-            self.drunk = 0
-            self.sync_clara_maps()
+            self.ensure_story_defaults()
             return self
 
         def install_schedule(self):
@@ -614,12 +499,11 @@ label InitClara:
     python:
         GirlName = Clara.code_name
         peopleData[GirlName] = ClaraStaticData
-        Clara.var = ClaraVar
         Clara.initialize_new_game_state()
         peopleInfo[GirlName] = Clara
         if Clara not in girls:
             girls.append(Clara)
-        bodymodel_sync_character(GirlName, RealName[GirlName], "female")
+        bodymodel_sync_character(GirlName, Clara.data.fullname, "female")
         Clara.install_schedule()
 
     return

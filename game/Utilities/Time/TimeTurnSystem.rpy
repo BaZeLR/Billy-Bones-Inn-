@@ -36,6 +36,8 @@ init -115 python:
 
 label AdvanceMovementTime(target_label=""):
     $ movement_target = str(target_label or CurLoc or "TavernMain")
+    $ current_object_id = ""
+    $ current_girl_key = ""
     if _time_advancement_allowed():
         $ _movement_time_changed = _apply_movement_time_cost_without_sleep(MOVEMENT_TIME_COST_MINUTES)
         call stat

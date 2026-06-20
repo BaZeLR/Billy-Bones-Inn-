@@ -15,7 +15,7 @@ init -46 python:
         "Shed": {"build": "ShedRoomActions", "object": ""},
         "Backyard": {"build": "BackyardBuildActions", "object": "BackyardObjectMenu"},
         "TavernMyRoom": {"build": "TavernMyRoomBuildActions", "object": "TavernMyRoomObjectMenu"},
-        "TavernKitchen": {"build": "TavernKitchenBuildActions", "object": "TavernKitchenObjectMenu"},
+        "TavernKitchen": {"build": "TavernKitchenBuildActions", "object": ""},
         "TavernAmandaRoom": {"build": "TavernAmandaRoomBuildActions", "object": "tavern_amanda_room_object_menu"},
         "TavernSandraRoom": {"build": "TavernSandraRoomBuildActions", "object": ""},
         "TavernMelissaRoom": {"build": "TavernMelissaRoomBuildActions", "object": ""},
@@ -927,8 +927,8 @@ init -46 python:
                 fun = _player_clamp(fun + fun_bonus, 0, 100)
             if openness_bonus > 0 and isinstance(otkroven, dict):
                 add_to_stat_dict(otkroven, key, openness_bonus, 0, 20)
-            if trust_bonus > 0 and key == "clara" and isinstance(ClaraVar, dict):
-                ClaraVar["trust"] = clamp_stat(int(ClaraVar.get("trust", 0) or 0) + trust_bonus, 0, 20)
+            if trust_bonus > 0 and key == "clara" and isinstance(Clara.var, dict):
+                Clara.var["trust"] = clamp_stat(int(Clara.var.get("trust", 0) or 0) + trust_bonus, 0, 20)
             if horny_bonus > 0 and isinstance(sluttiness, dict):
                 add_to_stat_dict(sluttiness, key, horny_bonus, 0, 100)
 
@@ -1250,7 +1250,17 @@ init -46 python:
             "raw_friend_delta": flirt_gain,
         }
 
-    def current_room_object_menu_label():
+    def current_room_object_menu_label(object_id=""):
+        object_key = str(object_id or "").strip()
+        if object_key:
+            object_obj = get_game_object(object_key)
+            if object_obj is None:
+                object_obj = get_game_item(object_key)
+            object_props = getattr(object_obj, "custom_properties", {}) if object_obj is not None else {}
+            if isinstance(object_props, dict):
+                object_label = str(object_props.get("object_menu_label", "") or "").strip()
+                if object_label:
+                    return object_label
         room_obj = CurrentRoom
         if room_obj is None:
             return ""
@@ -1267,7 +1277,7 @@ label RefreshCurrentActionMenu(where_id="", object_id="", preserve_text=False):
     $ _refresh_saved_desc = str(CurLocDesc or "")
     $ _refresh_targets = _action_refresh_target_labels(_refresh_room)
     $ _refresh_build_label = str(_refresh_targets.get("build", "") or "")
-    $ _refresh_object_label = str(_refresh_targets.get("object", "") or "")
+    $ _refresh_object_label = str(current_room_object_menu_label(_refresh_object) or _refresh_targets.get("object", "") or "")
     if _refresh_object == "":
         $ current_object_id = ""
     if _refresh_object != "" and _refresh_object_label != "":
@@ -1284,7 +1294,10 @@ label RefreshCurrentActionMenu(where_id="", object_id="", preserve_text=False):
         return
 
     if CurrentRoom is not None:
-        $ main_ui_set_action_panel("Действия", build_room_action_items(CurrentRoom), None, "scene")
+        $ current_action_title = "Действия"
+        $ current_action_content = None
+        $ current_action_items = build_room_action_items(CurrentRoom)
+        $ UI_mode = "scene"
     return
 
 
@@ -1470,56 +1483,8 @@ label Rest(return_location="", minutes_passed=120, energy_gain=15, fallback_text
 
 
 label MakeFire(what_id="", where_id="", fallback_text="", object_id=""):
-    # Simple label for the player action "make fire" (per spec)
-    $ _block = action_restriction_result("chore", "make_fire")
-    if not _block.get("ok", False):
-        call ApplyActionResultToUI(_block, fallback_text, "", where_id, object_id or what_id, True, "room")
-        return
-
-    # Daily limit example ("you can only make fire X times a day")
-    $ _current = int(PlayerChoresWeek.get("make_fire", 0) or 0)
-    if _current >= 2:
-        $ MainTxt = "Вы уже разжигали огонь достаточно раз сегодня."
-        $ CurLocDesc = MainTxt
-        call RefreshCurrentActionMenu(where_id or CurLoc, object_id or what_id, True)
-        return
-
-    # === Direct effects on resources and the target object (hearth/fireplace) ===
-    $ _obj = None
-    python:
-        try:
-            _obj = _pc_fire_object(where_id, object_id or what_id)
-        except:
-            _obj = None
-
-    # Consume chopped wood
-    if _player_has_item_by_id("chopped_wood_001"):
-        $ _player_remove_item_by_id("chopped_wood_001")
-    elif _obj and _object_state_int(_obj, "chopped_wood_stock", 0) > 0:
-        $ _add_object_state_int(_obj, "chopped_wood_stock", -1, 0)
-
-    # Update the hearth object state directly
-    $ _now = (int(dayspassed or 0) * 1440) + int(clock_minutes or 0)
-    $ _until = _now + (12 * 60)
-    if _obj:
-        $ _set_object_state_int(_obj, "fire_started_minute", _now)
-        $ _set_object_state_int(_obj, "fire_until_minute", _until)
-        $ _set_object_state_int(_obj, "ash_dirty", 1)
-        $ _set_object_state_int(_obj, "fire_units", 0)
-
-    # Resource and time effects
-    $ energy = max(0, energy - 5)
-    $ fun = min(100, fun + 5)
-    $ exploration = max(0, exploration + 1)
-    $ calendar_v2.advance_minutes(10)
-
-    # This action counts as doing the chore
-    $ _pc_register_chore_success("make_fire")
-
-    $ MainTxt = "Вы разожгли огонь. Тепла должно хватить примерно на двенадцать часов."
-    $ CurLocDesc = MainTxt
-    call stat
-    call RefreshCurrentActionMenu(where_id or CurLoc, object_id or what_id, True)
+    $ _fire_result = do_player_chore("make_fire", where_id, object_id or what_id)
+    call ApplyActionResultToUI(_fire_result, fallback_text, "", where_id, object_id or what_id, True, "room")
     return
 
 
@@ -1548,8 +1513,8 @@ label Chop(what_id="", where_id="", fallback_text="", object_id=""):
         $ MainTxt = "Непонятно, что именно вы собираетесь рубить."
         $ CurLocDesc = MainTxt
         return
-    if not _player_has_item_by_id("old_axe_001"):
-        $ MainTxt = "Без топора колоть дрова не выйдет. Сначала возьмите старый топор."
+    if not player_has_equipped_weapon("old_axe_001"):
+        $ MainTxt = "Без топора в руках колоть дрова не выйдет. Сначала возьмите старый топор и вооружитесь им."
         $ CurLocDesc = MainTxt
         return
     if CurrentRoom is None:

@@ -20,9 +20,7 @@ label story_melissa_storage_rat_0:
             $ WerecatVar["rat_food_loss_next_day"] = int(dayspassed or 0) + 7
             $ Melissa.var["work_attitude"] = int(Melissa.var.get("work_attitude", 0) or 0) + 1
             $ Melissa.skills["cleaning"] = min(100, int(Melissa.skills.get("cleaning", 0) or 0) + 1)
-            $ Melissa.rel = min(20, int(Melissa.rel or 0) + 1)
-            $ Melissa.relationship = Melissa.rel
-            $ Melissa.sync_melissa_maps()
+            $ Melissa.change_social(friend_delta=1)
             $ thread.advance()
             $ evalTime = None
             $ findAvailableEvents(True)
@@ -81,8 +79,18 @@ label story_melissa_bat_problem_0:
     vscene "images/melissa/kitchen.jpg"
     "Мелисса садится за стол и, даже взяв кружку, продолжает коситься так, будто над ее головой все еще что-то шуршит."
     "Сандра уже спокойнее говорит: \"У нас уже была крысиная проблема, из-за которой портились припасы, а теперь еще и летучие мыши? После крыс в кладовой я не хочу ждать, пока новая дрянь опять испортит дом.\""
-    "Аманда тут же оживляется, складывает пальцы в дразнящий знак и тянет с ухмылкой: \"Мелисса, а что если ты настоящая ведьма? Крысы в подвале, мыши с крыльями под крышей... Может, это все твои любимцы сбежались?\""
-    "Мелисса зло щурится: \"Если я ведьма, то первым делом заколдую кое-кому язык, чтобы он хоть за завтраком помолчал.\""
+    if relationship_anger("amanda") > 0 and relationship_anger("melissa") > 0:
+        "Аманда не удерживается: \"Может, это все за тобой ходит? Крысы, летучие мыши... Ведьма у нас завелась, вот и зверье сбежалось.\""
+        "Мелисса ставит кружку на стол. \"Если я ведьма, Аманда, начну с тебя. Заколдую, чтобы ты одно утро помолчала.\""
+    elif relationship_anger("amanda") > 0:
+        "Аманда цепляет ее резче обычного: \"Крысы, летучие мыши... Может, они все к тебе, Мелисса? Ведьма при хозяйстве, да?\""
+        "Мелисса зло щурится: \"Если я ведьма, то первым делом заколдую кое-кому язык, чтобы он хоть за завтраком помолчал.\""
+    elif relationship_anger("melissa") > 0:
+        "Аманда тут же оживляется, складывает пальцы в дразнящий знак и тянет с ухмылкой: \"Мелисса, а что если ты настоящая ведьма? Крысы в подвале, мыши с крыльями под крышей... Может, это все твои любимцы сбежались?\""
+        "Мелисса отвечает ровно: \"Продолжай. Если я ведьма, мне как раз нужен кто-то болтливый для первого проклятия.\""
+    else:
+        "Аманда тут же оживляется, складывает пальцы в дразнящий знак и тянет с ухмылкой: \"Мелисса, а что если ты настоящая ведьма? Крысы в подвале, мыши с крыльями под крышей... Может, это все твои любимцы сбежались?\""
+        "Мелисса зло щурится: \"Если я ведьма, то первым делом заколдую кое-кому язык, чтобы он хоть за завтраком помолчал.\""
     $ MainTxt = "Разговор за столом быстро становится серьезнее. У вас в голове остается одна ясная мысль: с комнатой Мелиссы придется разбираться всерьез."
     $ CurLocDesc = MainTxt
     $ TavernKitchenSavedText = MainTxt
@@ -94,7 +102,6 @@ label story_melissa_bat_problem_0:
     $ TavernBreakfastDay = int(dayspassed or 0)
     $ TavernBreakfastEventActive = True
     $ Melissa.current_location = "TavernKitchen"
-    $ Melissa.sync_melissa_maps()
     $ thread.advance()
     $ evalTime = None
     $ findAvailableEvents(True)
@@ -125,7 +132,6 @@ label story_melissa_bat_problem_1:
         $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
         $ Melissa.var["bats_episode"] = 3
         $ Melissa.var["bat_attic_check_day"] = max(int(Melissa.var.get("bat_attic_check_day", -1) or -1), int(dayspassed or 0))
-        $ Melissa.sync_from_melissa_maps()
         $ thread.advance()
         $ evalTime = None
         $ findAvailableEvents(True)
@@ -142,7 +148,6 @@ label story_melissa_bat_problem_2:
     "[MainTxt]"
     $ calendar_v2.advance_minutes(45)
     $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 4)
-    $ Melissa.sync_from_melissa_maps()
     $ thread.advance()
     $ evalTime = None
     $ findAvailableEvents(True)
@@ -181,16 +186,14 @@ label story_melissa_bat_problem_3:
         $ Melissa.var["temp_room"] = "TavernAmandaRoom"
         $ AmandaVar["attic_window_busted"] = 1
         $ Melissa.add_trust(-7)
-        $ Friends["amanda"] = max(0, int(Friends.get("amanda", 0) or 0) - 5)
+        $ Amanda.change_social(friend_delta=-5)
         $ notoriety = min(100, int(notoriety or 0) + 10)
         $ tavernfame = max(-20, int(tavernfame or 0) - 2)
-        $ Melissa.sync_melissa_maps()
         $ thread.advance()
         $ evalTime = None
         $ findAvailableEvents(True)
     else:
         $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 5)
-        $ Melissa.sync_melissa_maps()
     return True
 
 
@@ -206,7 +209,6 @@ label story_melissa_bat_problem_5:
         "Пока Мелисса вынужденно ночует у Аманды, ее собственная комната остается непривычно тихой. Вы осматриваете ее внимательнее обычного: ларь, табурет, складки одеяла, щель между стеной и кроватью."
         "Под кроватью Мелиссы, задвинутый почти к самой стене, обнаруживается потертый рисованный буклет. Обложка ничего не объясняет, зато место, где его прятали, говорит само за себя."
         $ Melissa.var["drawings_found"] = 1
-        $ Melissa.sync_from_melissa_maps()
         $ MainTxt = "Под кроватью Мелиссы вы нашли {a=melissa_room_object:melissa_drawings_booklet_001}{color=#245b2b}потертый рисованный буклет{/color}{/a}. Теперь его можно рассмотреть как найденный предмет."
         $ CurLocDesc = MainTxt
         "[MainTxt]"
@@ -225,7 +227,6 @@ label MelissaBookletOpenPreview:
     "[MainTxt]"
     $ calendar_v2.advance_minutes(5)
     $ Melissa.var["drawings_booklet_opened"] = 1
-    $ Melissa.sync_from_melissa_maps()
     call TavernMelissaRoomObjectMenu("melissa_drawings_booklet_001", True)
     return
 
@@ -243,7 +244,6 @@ label ReadMelissaBooklet(return_to_location=True):
     $ calendar_v2.advance_minutes(10)
     $ Melissa.var["drawings_booklet_opened"] = 1
     $ Melissa.var["drawings_booklet_read"] = 1
-    $ Melissa.sync_from_melissa_maps()
     if bool(return_to_location):
         menu:
             "Закрыть буклет":
@@ -257,7 +257,6 @@ label MelissaBookletTake:
     if int(_player_item_count_by_id("melissa_drawings_booklet_001") or 0) > 0:
         $ Melissa.var["drawings_booklet_taken"] = 1
         $ Melissa.var["drawings_booklet_left"] = 0
-        $ Melissa.sync_from_melissa_maps()
     $ current_object_id = ""
     call TavernMelissaRoomBuildActions
     return
@@ -270,7 +269,6 @@ label MelissaBookletLeaveThere:
     "[MainTxt]"
     $ Melissa.var["drawings_booklet_left"] = 1
     $ Melissa.var["drawings_spy_option_unlocked"] = 1
-    $ Melissa.sync_from_melissa_maps()
     call TavernMelissaRoomObjectMenu("melissa_drawings_booklet_001", True)
     return
 
@@ -311,12 +309,10 @@ label story_melissa_bat_problem_4:
         $ _player_remove_item_by_id("bat_repellent_001", 1)
         $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 7)
         $ Melissa.var["bat_recipe_unlocked"] = 1
-        $ Melissa.sync_from_melissa_maps()
     elif _melissa_bat_problem_4_result == "order_roof":
         $ money = int(money or 0) - 1000
         $ Melissa.var["roof_repair_order_day"] = int(dayspassed or 0)
         $ Melissa.var["roof_repair_complete_day"] = int(dayspassed or 0) + 2
-        $ Melissa.sync_from_melissa_maps()
         $ thread.advance()
         $ evalTime = None
         $ findAvailableEvents(True)

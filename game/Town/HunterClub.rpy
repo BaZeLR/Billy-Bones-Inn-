@@ -264,7 +264,7 @@ init python:
                 rows.append("Луиза советует не ходить далеко без бинтов, ловушек и заряженного оружия.")
         except Exception:
             pass
-        if int(MongolVar.get("StocksArrestDay", -1) or -1) >= 0:
+        if int(Mongol.var.get("StocksArrestDay", -1) or -1) >= 0:
             rows.append("У стойки снова обсуждают арест конокрада: городская стража теперь смотрит на рынок строже.")
         return "\n\n".join(rows)
 
@@ -473,9 +473,12 @@ init python:
             ),
         ],
         schedule=RoomSchedule(
-            weekdays=[1, 2, 3, 4, 6],
-            time_slots=[0, 1, 2, 3],
-            closed_text="Охотничий клуб закрыт. По пятницам и воскресеньям здесь не торгуют, а в остальные дни он работает только с утра до вечера.",
+            [1, 2, 3, 4, 6],
+            [],
+            "Охотничий клуб закрыт. По пятницам и воскресеньям здесь не торгуют, а в остальные дни он работает только с утра до вечера.",
+            None,
+            "06:00",
+            "15:59",
         ),
         custom_properties={
             "shop_feature": "hunter_club",
@@ -580,7 +583,8 @@ screen hunter_club_trade_overlay():
 
 label HunterClub:
     scene black
-    call EnterLocation("HunterClub")
+    if str(CurLoc or "") != "HunterClub":
+        call EnterLocation("HunterClub")
     $ CurrentRoom = HunterClubRoom
     $ CurLoc = "HunterClub"
     $ location = CurLoc
@@ -607,7 +611,7 @@ label HunterClub:
     $ CurLocDesc = MainTxt
     if not hunter_club_seen_first_visit():
         call HunterClubFirstVisit
-    elif int(ClaraVar.get("escape_confessed", 0) or 0) == 1 and int(MongolVar.get("StocksArrestDay", -1) or -1) < 0:
+    elif int(Clara.var.get("escape_confessed", 0) or 0) == 1 and int(Mongol.var.get("StocksArrestDay", -1) or -1) < 0:
         call preEvent("claraBookletMarket")
         if thread is not None and int(thread.num or 0) < 4:
             $ thread.advanceTo(4, force_active=True)

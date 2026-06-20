@@ -21,6 +21,7 @@ init 4 python:
             "item_kind": "tool",
             "tool_kind": "axe",
             "attack_points": 10,
+            "speed_penalty": 1,
             "curLoc": "Shed",
         },
     )

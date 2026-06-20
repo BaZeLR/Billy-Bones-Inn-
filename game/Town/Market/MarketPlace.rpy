@@ -18,30 +18,22 @@ init python:
 
     def marketplace_becky_home_visible():
         minute_now = int(clock_minutes or 0) % 1440
-        return BeckyVar.get("visitedhome", 0) >= 2 and week != 5 and 13 * 60 <= minute_now <= 15 * 60 + 59
+        return Becky.var.get("visitedhome", 0) >= 2 and week != 5 and 13 * 60 <= minute_now <= 15 * 60 + 59
 
     def marketplace_mongol_visible():
-        if str(MyStallion or "") != "":
-            return False
-        if not MarketPlaceRoom.is_open(week, time):
-            return False
-        current_day = int(dayspassed or 0)
-        if marketplace_int(MongolVar.get("MarketRollDay", -1), -1) != current_day:
-            MongolVar["MarketRollDay"] = current_day
-            MongolVar["MarketRoll"] = 1 if procedural_randint(1, 4, "mongol_market_%s" % current_day) == 1 else 0
-        return marketplace_int(MongolVar.get("MarketRoll", 0), 0) == 1
+        return bool(Mongol.is_market_visible())
 
     def marketplace_stocks_visible():
         minute_now = int(clock_minutes or 0) % 1440
-        if marketplace_int(MongolVar.get("StocksArrestDay", -1), -1) >= 0 and marketplace_int(MongolVar.get("StocksSeen", 0), 0) == 0:
+        if marketplace_int(Mongol.var.get("StocksArrestDay", -1), -1) >= 0 and marketplace_int(Mongol.var.get("StocksSeen", 0), 0) == 0:
             return True
         return (
-            (marketplace_int(MongolVar.get("StocksSeen", 0), 0) == 1 and marketplace_int(MongolVar.get("StocksFoodDay", -1), -1) < 0 and minute_now >= 16 * 60)
+            (marketplace_int(Mongol.var.get("StocksSeen", 0), 0) == 1 and marketplace_int(Mongol.var.get("StocksFoodDay", -1), -1) < 0 and minute_now >= 16 * 60)
             or (
                 marketplace_int(DraupnirVar.get("MongolLockpickOrderDay", -1), -1) >= 0
-                and marketplace_int(MongolVar.get("StocksReleased", 0), 0) == 0
+                and marketplace_int(Mongol.var.get("StocksReleased", 0), 0) == 0
                 and minute_now >= 16 * 60
-                and int(dayspassed or 0) > marketplace_int(MongolVar.get("StocksFoodDay", -1), -1)
+                and int(dayspassed or 0) > marketplace_int(Mongol.var.get("StocksFoodDay", -1), -1)
             )
         )
 
@@ -100,7 +92,7 @@ init python:
         schedule=RoomSchedule(
             weekdays=[1, 2, 3, 4, 5, 6],
             start="06:00",
-            end="12:59",
+            end="18:59",
             closed_text="Сейчас уже поздно и рынок закрыт.",
         ),
         custom_properties={
@@ -200,10 +192,7 @@ label MarketPlace:
 
     # Random encounter with Mongol
     if marketplace_mongol_visible():
-        $ MongolVar['HorsePrice'] = 1000
-        if int(MongolVar.get('ZimmerKnow', 0) or 0):
-            $ MongolVar['HorsePrice'] += 100
-        $ MongolVar['DiscountAsk'] = 0
+        $ Mongol.reset_market_trade()
 
         if KnowMongol == 0:
             $ MainTxt = "Обведя взглядом рынок, в дальнем углу вы заметили мужика в красной рубахе, высоких сапогах, серьгой в ухе и с цветной косынкой на голове. Рядом с ним стояла оседланная лошадь, повод от которой был у него в руке. Встретив ваш взгляд, мужик широко улыбнулся, блеснув золотым зубом, и призывно замахал вам рукой."
@@ -318,13 +307,14 @@ label MarketPlaceObjectText(object_id="", action_id=""):
 label MarketPlaceApproachMongol(mode_code=""):
     $ scene_image = "images/mongol/gipsy.png"
     $ _layout_last_picture = scene_image
+    $ _mongol_horse_price = Mongol.var_int("HorsePrice", 1000)
     vscene scene_image
     if mode_code == "first":
         $ KnowMongol = 1
-        $ MainTxt = "Увидев, что вы направляетесь к нему, мужик обрадовался еще больше, хлопнул себя по ляжкам и воскликнул: 'Ай-нэ-нэ!'\n\nПротянув вам руку он представился: 'Монголом меня кличут. Я тут парувэла, в смысле коняшку продаю.'\n\n'Купишь ты коня прекрасного очень дешево, всего за [MongolVar['HorsePrice']] мараведи! Ну что, по рукам?'"
+        $ MainTxt = "Увидев, что вы направляетесь к нему, мужик обрадовался еще больше, хлопнул себя по ляжкам и воскликнул: 'Ай-нэ-нэ!'\n\nПротянув вам руку он представился: 'Монголом меня кличут. Я тут парувэла, в смысле коняшку продаю.'\n\n'Купишь ты коня прекрасного очень дешево, всего за [_mongol_horse_price] мараведи! Ну что, по рукам?'"
         $ CurLocDesc = MainTxt
     else:
-        $ MainTxt = "'Стефан, друг мой, посмотри какой у меня замечательный конь! Тебе я его всего за [MongolVar['HorsePrice']] мараведи отдам!'"
+        $ MainTxt = "'Стефан, друг мой, посмотри какой у меня замечательный конь! Тебе я его всего за [_mongol_horse_price] мараведи отдам!'"
         $ CurLocDesc = MainTxt
     call MongolTalk
     return

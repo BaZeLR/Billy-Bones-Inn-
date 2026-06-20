@@ -2,6 +2,21 @@
 # YOU ARE NOT ALLOWED TO CHANGE: THE STRUCTURE, THE MECHANICS. THE WORDING OF CODE BASE FILE WITHOUT EXPLICIT PERMISSION IN in your request for a change, YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
+    PLAYER_ROOM_IMAGE = {
+        "room": "images/player_room/player_room.png",
+        "table": "images/player_room/player_table.png",
+        "rifle": "images/player_room/rifle0.png",
+        "rifle_loaded": "images/player_room/rifle1.png",
+        "wake_up": "images/player_room/wake_up.png",
+        "from_bed": "images/player_room/from_bed.png",
+        "attic": "images/player_room/player_room_attic.png",
+        "attic_found": "images/player_room/player_room_attic_1.png",
+        "door": "images/player_room/player room_door.png",
+    }
+
+    def player_room_image_path(image_key="room"):
+        return str(PLAYER_ROOM_IMAGE.get(str(image_key or "room").strip(), PLAYER_ROOM_IMAGE["room"]) or "")
+
     def tavern_my_room_dress_short_name(dress_code=""):
         code = str(dress_code or "").strip()
         try:
@@ -32,7 +47,7 @@ init python:
         code_name="TavernMyRoom",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Моя комната",
-        bg_picture="bg myroom",
+        bg_picture=player_room_image_path("room"),
         descriptions=[
             RoomDescription(
                 text="Это ваша комната. Она невелика и обставленна довольно скромно, большую ее часть занимает кровать. В дальнем углу, у маленького окошка, располагается ларь с вашей одеждой. Других предметов обстановки в ней нет.",
@@ -73,23 +88,22 @@ init python:
         return "{a=call:TavernMyRoomTableMenu}{color=#245b2b}стол{/color}{/a}"
 
     def tavern_my_room_table_picture():
-        if renpy.loadable("images/tavern/myroom/player_table.png"):
-            return "images/tavern/myroom/player_table.png"
+        if renpy.loadable(player_room_image_path("table")):
+            return player_room_image_path("table")
         return str(TavernMyRoomRoom.bg_picture or "")
 
     def tavern_my_room_dynamic_picture():
         if "amanda" in list(getNPCids("TavernMyRoom") or []):
-            if renpy.loadable("images/amanda/mc_room_exposure.png"):
-                return "images/amanda/mc_room_exposure.png"
+            if renpy.loadable(player_room_image_path("from_bed")):
+                return player_room_image_path("from_bed")
         if tavern_my_room_has_floor_item("rusty_hunter_rifle_001"):
-            if renpy.loadable("images/tavern/myroom/rifle.png"):
-                return "images/tavern/myroom/rifle.png"
-            if renpy.loadable("images/tavern/myroom/riffle.png"):
-                return "images/tavern/myroom/riffle.png"
-        if tavern_my_room_has_floor_item("recipe_book_001") and renpy.loadable("images/tavern/myroom/player_table.png"):
-            return "images/tavern/myroom/player_table.png"
-        if int(time or 0) == 0 and renpy.loadable("images/tavern/myroom/wake_up_2.png"):
-            return "images/tavern/myroom/wake_up_2.png"
+            rifle_key = "rifle_loaded" if str(RustyHunterRifleLoadedAmmo or "").strip() != "" else "rifle"
+            if renpy.loadable(player_room_image_path(rifle_key)):
+                return player_room_image_path(rifle_key)
+        if tavern_my_room_has_floor_item("recipe_book_001") and renpy.loadable(player_room_image_path("table")):
+            return player_room_image_path("table")
+        if int(time or 0) == 0 and renpy.loadable(player_room_image_path("wake_up")):
+            return player_room_image_path("wake_up")
         return str(TavernMyRoomRoom.bg_picture or "")
 
     def tavern_my_room_dynamic_text():
@@ -153,7 +167,7 @@ label TavernMyRoom:
     $ CurLocDesc = _my_room_text
     $ CurrentRoom.mark_visited()
     if bool(AmandaAIIntegrationEnabled):
-        call AmandaMiniEventTry(CurLoc, "room")
+        call AmandaMiniEventEntry(CurLoc, "room")
     call TavernMyRoomBuildActions
     $ _my_room_ui_return = None
     while _my_room_ui_return is None:
@@ -193,6 +207,11 @@ label TavernMyRoomObjectMenu(object_id="", refresh_only=False):
     if _room_object is None:
         call TavernMyRoomBuildActions
         return
+    if object_id == "myroom_attic_hatch_001":
+        if int(TavernMyRoomAtticHatchFound or 0) == 1:
+            $ _room_object.picture = player_room_image_path("attic_found")
+        else:
+            $ _room_object.picture = player_room_image_path("attic")
 
     if str(action_override_text or "") != "":
         $ MainTxt = str(action_override_text or "")
@@ -309,12 +328,8 @@ label TavernMyRoomOpenChest(preserve_text=False):
                         current_action_items.append(MenuItem("Порвать " + _short + " на лоскуты", Call("TavernMyRoomTearDressToCloth", _dress)))
                 else:
                     current_action_items.append(MenuItem("Снять " + _short, Call("TavernMyRoomRemoveDress", _dress)))
-        if not player_is_in_nightwear():
-            current_action_items.append(MenuItem("Надеть ночную рубашку", Call("TavernMyRoomSetSleepLayer", "nightwear")))
         if not player_is_naked():
             current_action_items.append(MenuItem("Раздеться для сна", Call("TavernMyRoomSetSleepLayer", "nothing")))
-        if player_is_naked() or player_is_in_nightwear():
-            current_action_items.append(MenuItem("Надеть дневную одежду", Call("TavernMyRoomSetSleepLayer", "daywear")))
     $ current_action_items.append(MenuItem("Закрыть ларь", Call("TavernMyRoomCloseChest")))
     $ renpy.restart_interaction()
     return
@@ -340,9 +355,12 @@ label TavernMyRoomSetSleepLayer(mode="daywear"):
     if _sleep_mode == "nightwear":
         $ MainTxt = "Вы надеваете ночную рубашку из ларя. Для сна этого достаточно."
     elif _sleep_mode == "nothing":
-        $ MainTxt = "Вы снимаете одежду и оставляете ее в ларе. Для сна так удобно, но дальше второго этажа в таком виде идти нельзя."
+        if str(mode or "").strip().lower() in ("night", "nightwear", "sleep"):
+            $ MainTxt = "В ларе нет ночной рубашки. Придется спать без нее."
+        else:
+            $ MainTxt = "Вы снимаете одежду и оставляете ее в ларе. Для сна так удобно, но дальше второго этажа в таком виде идти нельзя."
     else:
-        $ MainTxt = "Вы приводите себя в порядок и надеваете дневную одежду."
+        $ MainTxt = "Вы приводите себя в порядок и надеваете одежду из ларя."
     $ CurLocDesc = MainTxt
     call TavernMyRoomOpenChest(True)
     return
@@ -473,14 +491,16 @@ label TavernMyRoomTableCraftItem(recipe_id=""):
 label TavernMyRoomWearDress(dress_code=""):
     $ _dress = str(dress_code or "")
     if _dress != "":
-        $ player_state().wear_dress(_dress)
-        call stat
         $ _short = tavern_my_room_dress_short_name(_dress)
         $ _desc = tavern_my_room_dress_full_desc(_dress)
-        if _desc:
-            $ MainTxt = "Вы надели [_short]. " + _desc
+        if player_state().wear_dress(_dress):
+            call stat
+            if _desc:
+                $ MainTxt = "Вы надели [_short]. " + _desc
+            else:
+                $ MainTxt = "Вы надели [_short]."
         else:
-            $ MainTxt = "Вы надели [_short]."
+            $ MainTxt = "Этой одежды уже нет в ларе."
         $ CurLocDesc = MainTxt
     call TavernMyRoomOpenChest
     return

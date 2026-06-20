@@ -34,14 +34,14 @@ label PartEventGirlReactionTalk(GirlNamePEGRT1, GirlNamePEGRT2, FriendVarToChang
 
         def _pegrt_get_ref_value(ref_expr):
             dict_name, dict_key = _pegrt_parse_ref(ref_expr)
-            if dict_name == "AmandaVar" and dict_key != "":
-                return _pegrt_int(AmandaVar.get(dict_key, 0), 0)
+            if dict_name == "Amanda.var" and dict_key != "":
+                return _pegrt_int(Amanda.var.get(dict_key, 0), 0)
             return 0
 
         def _pegrt_set_ref_value(ref_expr, value):
             dict_name, dict_key = _pegrt_parse_ref(ref_expr)
-            if dict_name == "AmandaVar" and dict_key != "":
-                AmandaVar[dict_key] = value
+            if dict_name == "Amanda.var" and dict_key != "":
+                Amanda.var[dict_key] = value
 
         friend_var_value = _pegrt_get_ref_value(FriendVarToChange)
         DefiniteAccept = _pegrt_int(DefiniteAccept, 0)

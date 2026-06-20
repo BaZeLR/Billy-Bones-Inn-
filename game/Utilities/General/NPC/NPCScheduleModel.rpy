@@ -558,7 +558,7 @@ init python:
     def npc_schedule_liza_portstreets_whore_active():
         try:
             return (
-                int(LizaVar.get("ProstStart", 0) or 0) > 0
+                int(Liza.story_value("ProstStart", 0) or 0) > 0
                 and int(jobwhore.get("liza", 0) or 0) > 0
                 and str(getLocation("liza") or "") == "PortStreets"
             )
@@ -573,7 +573,7 @@ init python:
 
     def npc_schedule_liza_portstreets_work_active():
         try:
-            return int(LizaVar.get("ProstStart", 0) or 0) > 0 and int(jobWhoreAvail.get("liza", 0) or 0) <= 0
+            return int(Liza.story_value("ProstStart", 0) or 0) > 0 and int(jobWhoreAvail.get("liza", 0) or 0) <= 0
         except Exception:
             return False
 
@@ -595,9 +595,9 @@ init python:
             if not npc_schedule_georgett_church_visible():
                 return False
             return (
-                int(GeorgettVar.get("askkids", 0) or 0) > 0
+                int(Georgett.story_value("askkids", 0) or 0) > 0
                 or int(Friends.get("liza", 0) or 0) > 0
-                or int(LizaVar.get("ProstStart", 0) or 0) > 0
+                or int(Liza.story_value("ProstStart", 0) or 0) > 0
             )
         except Exception:
             return False
@@ -608,9 +608,9 @@ init python:
                 return False
             if int(week or 0) not in (2, 4):
                 return False
-            if int(Friends.get("becky", 0) or 0) < 15 or int(Friends.get("sandra", 0) or 0) < 15:
+            if int(Becky.rel or 0) < 15 or int(Friends.get("sandra", 0) or 0) < 15:
                 return False
-            if int(HadSex.get("becky", 0) or 0) <= 0 and int(BeckyVar.get("HomeSex", 0) or 0) <= 0:
+            if int(Becky.stats.get("sexacts", 0) or 0) <= 0 and int(Becky.var.get("HomeSex", 0) or 0) <= 0:
                 return False
             fortnight = int(dayspassed or 0) // 14
             if npc_schedule_stable_percent("becky_sandra_visit_chance_%s" % fortnight) > 45:
@@ -644,8 +644,8 @@ init python:
             if rule_kind == "clara_paintings_confession":
                 try:
                     return (
-                        int(ClaraVar.get("peek_done", 0) or 0) == 1
-                        and int(ClaraVar.get("confession_done", 0) or 0) == 0
+                        int(Clara.var.get("peek_done", 0) or 0) == 1
+                        and int(Clara.var.get("confession_done", 0) or 0) == 0
                     )
                 except Exception:
                     return False
@@ -653,8 +653,8 @@ init python:
                 try:
                     clock_value = int(clock_minutes or 0) % 1440
                     return (
-                        int(ClaraVar.get("commission_followup_done", 0) or 0) == 1
-                        and int(ClaraVar.get("peek_done", 0) or 0) == 0
+                        int(Clara.var.get("commission_followup_done", 0) or 0) == 1
+                        and int(Clara.var.get("peek_done", 0) or 0) == 0
                         and 960 <= clock_value <= 1379
                     )
                 except Exception:
@@ -676,9 +676,8 @@ init python:
                     return False
             if rule_kind == "sandra_night_thanks_ready":
                 try:
-                    SandraVar_safe = globals().get("SandraVar", {})
                     dayspassed_safe = globals().get("dayspassed", 0)
-                    return int(SandraVar_safe.get("NightThanksReady", 0) or 0) > 0 and int(SandraVar_safe.get("NightThanksLastDay", -1) or -1) != int(dayspassed_safe or 0)
+                    return int(Sandra.night_thanks_ready_flag or 0) > 0 and int(Sandra.night_thanks_last_day or -1) != int(dayspassed_safe or 0)
                 except Exception:
                     return False
             if rule_kind == "job_assigned":

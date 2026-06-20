@@ -5,18 +5,17 @@ init python:
     import random
 
     def amanda_dress_change_has_options(girl_name="amanda"):
-        girl = str(girl_name or "amanda")
-        if Talked.get(girl, 0) >= 2:
+        if Amanda.talked_today >= 2:
             return False
-        if Friends.get(girl, 0) > 8 and GiveOrgasms.get(girl, 0) >= 2:
+        if Amanda.rel > 8 and int(Amanda.stats.get("orgasms_given", 0) or 0) >= 2:
             return True
-        if Friends.get(girl, 0) > 8 and CheckDailyEventExists("", "BuyDressTom") == 0 and CheckDailyEventExists(girl, "BuyDress") == 0 and week != 6:
+        if Amanda.rel > 8 and CheckDailyEventExists("", "BuyDressTom") == 0 and CheckDailyEventExists("amanda", "BuyDress") == 0 and week != 6:
             return True
         return False
 
     def amanda_dress_change_other_saw_text(girl_name="amanda", agreed_to_redress=0):
         girl = str(girl_name or "amanda")
-        if int(agreed_to_redress or 0) != 1 or int(sluttiness.get(girl, 0) or 0) < 50:
+        if int(agreed_to_redress or 0) != 1 or Amanda.corruption < 50:
             return ""
         randvar = random.randint(1, 9)
         if str(getLocation("liza") or "") != "TavernMain" and randvar == 4:
@@ -65,10 +64,10 @@ label IntAmandaDressChangeRefresh(GirlNameIAT="amanda"):
     $ current_action_title = "Переодеть Аманду"
     $ current_action_content = None
     $ current_action_items = []
-    $ _can_offer_bra = Friends.get(GirlNameIAT, 0) > 8 and GiveOrgasms.get(GirlNameIAT, 0) >= 2 and str(bra.get(GirlNameIAT, "") or "") != "" and (AmandaVar.get("suckyou", 0) or AmandaVar.get("fuckyou", 0)) and Talked.get(GirlNameIAT, 0) < 2
-    $ _can_offer_panties = Friends.get(GirlNameIAT, 0) > 8 and GiveOrgasms.get(GirlNameIAT, 0) >= 2 and str(panties.get(GirlNameIAT, "") or "") != "" and (AmandaVar.get("suckyou", 0) or AmandaVar.get("fuckyou", 0)) and Talked.get(GirlNameIAT, 0) < 2
-    $ _can_shame = Friends.get(GirlNameIAT, 0) > 8 and GiveOrgasms.get(GirlNameIAT, 0) >= 2 and Talked.get(GirlNameIAT, 0) < 2
-    $ _can_buy = Friends.get(GirlNameIAT, 0) > 8 and CheckDailyEventExists("", "BuyDressTom") == 0 and CheckDailyEventExists(GirlNameIAT, "BuyDress") == 0 and Talked.get(GirlNameIAT, 0) < 2 and week != 6
+    $ _can_offer_bra = Amanda.rel > 8 and int(Amanda.stats.get("orgasms_given", 0) or 0) >= 2 and str(bra.get(GirlNameIAT, "") or "") != "" and (Amanda.var_int("suckyou", 0) or Amanda.var_int("fuckyou", 0)) and Amanda.talked_today < 2
+    $ _can_offer_panties = Amanda.rel > 8 and int(Amanda.stats.get("orgasms_given", 0) or 0) >= 2 and str(panties.get(GirlNameIAT, "") or "") != "" and (Amanda.var_int("suckyou", 0) or Amanda.var_int("fuckyou", 0)) and Amanda.talked_today < 2
+    $ _can_shame = Amanda.rel > 8 and int(Amanda.stats.get("orgasms_given", 0) or 0) >= 2 and Amanda.talked_today < 2
+    $ _can_buy = Amanda.rel > 8 and CheckDailyEventExists("", "BuyDressTom") == 0 and CheckDailyEventExists(GirlNameIAT, "BuyDress") == 0 and Amanda.talked_today < 2 and week != 6
 
     if _can_offer_bra:
         $ current_action_items.append(MenuItem("Предложить Аманде ходить без лифчика", Call("IntAmandaDressChangeApply", GirlNameIAT, "offer_bra")))
@@ -91,12 +90,12 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
     if str(choice_code or "") == "offer_bra":
         $ MainTxt = '"Амандочка, милашка, а зачем же ты ходишь в лифчике?" - неожиданно спросили вы Аманду. "Ведь если начистоту, то он тебе пока не нужен, более того, он скрывает твою хоть и небольшую, но красивую и упругую грудь. Если ты будешь ходить без него, то платье лучше подчеркнет все ее изумительные изгибы если оно будет надето на голое тело," начали вы вешать ей лапшу на уши.'
         if DressPartSlut.get(topdress.get(GirlNameIAT, ""), 0) < 4:
-            if sluttiness.get(GirlNameIAT, 0) < 35:
+            if Amanda.corruption < 35:
                 $ MainTxt += '\n\n"Да ты что, Стефан?!" рассердилась Аманда. "Ты мне без лифчика предлагаешь ходить, чтобы полтрактира на мои сиськи пялилось? Ты что?!"'
             else:
                 $ MainTxt += '\n\n"Ну не знаю," ответила вам Аманда с сомнением. "Но раз ты так говоришь, то попробую без него походить."'
                 $ AgreedToRedress = 1
-                if sluttiness.get(GirlNameIAT, 0) < 50:
+                if Amanda.corruption < 50:
                     if renpy.random.randint(1, 2) == 1:
                         $ MainTxt += '\n\nАманда забежала на кухню, убедилась что там никого нет, и сноровисто избавилась от лифа, одев платье уже на голые груди.'
                     else:
@@ -105,7 +104,7 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
                     $ MainTxt += '\n\nАманда лишь слегка отвернулась от зала и быстро распахнула блузку. За ней пришел черед и лифчика. На несколько секунд мелькнули ее маленькие грудки с торчащими сосочками, а затем она застегнула платье, пряча свои два сокровища.'
                 $ MainTxt += '\n\n"Ну как я тебе," смущенно поинтересовалась она.\n"Гораздо лучше!" честно ответили вы.'
         else:
-            if sluttiness.get(GirlNameIAT, 0) < 50:
+            if Amanda.corruption < 50:
                 $ MainTxt += '\n\n"Да ты что?" удивилась Аманда вашему предложению. "Только парень мог такое предложить. Ты же видишь, что у меня глубокое декольте. Я подкладываю в лиф вату, чтобы моя грудь казалась больше. А если я его уберу, то моя грудь будет во-первых смотреться чуть меньше, а во вторых, и это самое главное, любой кто мне туда заглянет увидет мои груди вплоть до сосков, ведь платье-то чуть больше чем надо. Сам видишь, твоя идея не сработает."'
             else:
                 $ MainTxt += '\n\n"Хм, Стефан," удивилась Аманда. "Ты действительно так думаешь? Не помню, говорила я тебе или нет, у меня платье чуть больше чем мой размер, а декольте глубокое. Так любой сможет заглянуть и увидеть даже соски."\n"Так в этом и вся идея!" не растерялись вы. "Могут увидеть, так ты еще соблазнительней покажешься, разве нет?'
@@ -120,7 +119,7 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
         $ _other_saw = amanda_dress_change_other_saw_text(GirlNameIAT, AgreedToRedress)
         if str(_other_saw or "").strip() != "":
             $ MainTxt += "\n\n" + str(_other_saw)
-        $ Talked[GirlNameIAT] = Talked.get(GirlNameIAT, 0) + 1
+        $ Amanda.mark_talked()
         $ CurLocDesc = MainTxt
         call IntAmandaDressChangeRefresh(GirlNameIAT)
         return
@@ -131,19 +130,19 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
             $ MainTxt += ' Разве ты не знаешь, что Лизетта, твоя лучшая подруга, без них ходит?" добавили вы для пущей убедительности. '
             if pantiesdef.get("liza", "") == "":
                 $ MainTxt += '\n\n"И то правда," задумчиво сказала Аманда.'
-                $ tmpLizaComandoBonus = min(10, int(AmandaVar.get("lizafriends", 0) or 0) // 2)
+                $ tmpLizaComandoBonus = min(10, Amanda.var_int("lizafriends", 0) // 2)
             else:
                 $ MainTxt += '\n\n"Лишь бы чего ляпнуть," укоризнено сказала вам Аманда, "я прекрасно знаю что это не так."'
-                $ tmpLizaComandoBonus = -min(10, int(AmandaVar.get("lizafriends", 0) or 0) // 4)
+                $ tmpLizaComandoBonus = -min(10, Amanda.var_int("lizafriends", 0) // 4)
         else:
             $ MainTxt += '"'
         if DressPartSlut.get(bottomdress.get(GirlNameIAT, ""), 0) < 4:
-            if sluttiness.get(GirlNameIAT, 0) + tmpLizaComandoBonus < 42:
+            if Amanda.corruption + tmpLizaComandoBonus < 42:
                 $ MainTxt += '\n\n"Как тебе такое только в голову могло прийти! Мол сноровистей я буду работать. Я же каждую минуту буду думать, как бы мне кто под юбку не заглянул! Какая уж тут работа!"'
             else:
                 $ MainTxt += '\n\n"Ну, может оно и так," сказала Аманда. "Ведь никто ничего не увидит, значит все в порядке. Может и буду я шустрей работать. Надо попробовать."'
                 $ AgreedToRedress = 1
-                if sluttiness.get(GirlNameIAT, 0) < 50:
+                if Amanda.corruption < 50:
                     if renpy.random.randint(1, 2) == 1:
                         $ MainTxt += '\n\nАманда забежала на кухню, убедилась что там никого нет, и быстро стянула с себя панталончики.'
                     else:
@@ -151,7 +150,7 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
                 else:
                     $ MainTxt += '\n\nНе особо-то скрываясь, Аманда слегка присела, сунула руку себе под подол, и стянула с себя панталончики, даже не проверив, не следит ли за ней кто из посетителей.'
         else:
-            if sluttiness.get(GirlNameIAT, 0) + tmpLizaComandoBonus < 55:
+            if Amanda.corruption + tmpLizaComandoBonus < 55:
                 $ MainTxt += '\n\n"Да ты издеваешься, Стефан?!," возмутилась Аманда в ответ на ваше предложение. "Ты мое платье видел? Если не видел, то вот, посмотри! Оно же попу едва закрывает! Если я наклонюсь, то всем посетителям свою девочку покажу. Какое уж тут, прости Ильматер, обслуживание, если все меня будут лапать. А лапать будут, ты сам наших посетителей знаешь!" '
             else:
                 $ MainTxt += '\n\n"Эх, Стефан," пошло улыбнулась Аманда. "Ты ведь прекрасно знаешь, что в таком коротком платьичке, да без панталончиков, каждый мою писю увидит. А ведь нагибаться придется, там со стола вытри, здесь кружки поставь. Это ты называешь лучшим обслуживанием?"\n"Именно это, ты все отлично поняла," не смутились вы.\n"Ой, уговорил, языкастый, попробуем!" с готовностью отозвалась Аманда.\nДаже не попытавшись уйти за стойку или еще куда, Аманда сунула руки под короткую юбочку и стянула с себя панталончики, показав на секунду свою щелку.'
@@ -163,21 +162,21 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
         $ _other_saw = amanda_dress_change_other_saw_text(GirlNameIAT, AgreedToRedress)
         if str(_other_saw or "").strip() != "":
             $ MainTxt += "\n\n" + str(_other_saw)
-        $ Talked[GirlNameIAT] = Talked.get(GirlNameIAT, 0) + 1
+        $ Amanda.mark_talked()
         $ CurLocDesc = MainTxt
         call IntAmandaDressChangeRefresh(GirlNameIAT)
         return
 
     if str(choice_code or "") == "shame_bra":
         $ MainTxt = '"Аманда, а не стыдно тебе без лифа ходить?" - пристыдили вы Аманду. "Половина посетителей на тебя пялится!"'
-        if str(bra.get(GirlNameIAT, "") or "") != "" or (str(bra.get(GirlNameIAT, "") or "") == "" and sluttiness.get(GirlNameIAT, 0) >= 50 and renpy.random.randint(1, 2) == 1):
+        if str(bra.get(GirlNameIAT, "") or "") != "" or (str(bra.get(GirlNameIAT, "") or "") == "" and Amanda.corruption >= 50 and renpy.random.randint(1, 2) == 1):
             $ MainTxt += '\n\n"А с чего это ты решил что нету? Как это ты проверил? Во сне меня что ли без лифа представил?" пресекла ваши поучения Аманда. '
         else:
             $ MainTxt += '\n\n"Ну да, ты же меня сам так надоумил," обескураженно ответила вам она.\n"Сказал что мол изгибы мои изумительные так лучше будут подчеркнуты, помнишь?"\n"Не помню!" Отрезали вы. "А если и сказал, то уже сожалею, погорячился я, как-то уж слишком пошло ты без него выглядишь."'
-            if sluttiness.get(GirlNameIAT, 0) < 45:
+            if Amanda.corruption < 45:
                 $ MainTxt += '\n\n"Ну, коль ты теперь по-другому заговорил, то пойду и одену его обратно. Я себя и правда как-то неловко чувствовала."'
                 $ AgreedToRedress = 1
-            elif sluttiness.get(GirlNameIAT, 0) < 60 and renpy.random.randint(1, 4) <= 3:
+            elif Amanda.corruption < 60 and renpy.random.randint(1, 4) <= 3:
                 $ MainTxt += '\n\n"Так вроде тебе нравилось, а сейчас ты вон как заговорил, "Не помнит" видите ли..." надулась Аманда, "хорошо, ладно, пойду наверх одену его."'
                 $ AgreedToRedress = 1
                 call SlutFriendsIncrease(GirlNameIAT, 7, 2, -1, 0, 0, 0)
@@ -188,21 +187,21 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
             $ bradef[GirlNameIAT] = "simplebra"
             call SlutFriendsIncrease(GirlNameIAT, 0, 0, 0, 30, 1, -1)
             call DressUp(GirlNameIAT)
-        $ Talked[GirlNameIAT] = Talked.get(GirlNameIAT, 0) + 1
+        $ Amanda.mark_talked()
         $ CurLocDesc = MainTxt
         call IntAmandaDressChangeRefresh(GirlNameIAT)
         return
 
     if str(choice_code or "") == "shame_panties":
         $ MainTxt = '"Аманда, мне показалось что у тебя под юбкой ничего нет?" - пожурили вы Аманду. "И не стыдно?"'
-        if str(panties.get(GirlNameIAT, "") or "") != "" or (str(panties.get(GirlNameIAT, "") or "") == "" and sluttiness.get(GirlNameIAT, 0) >= 45 and renpy.random.randint(1, 2) == 1):
+        if str(panties.get(GirlNameIAT, "") or "") != "" or (str(panties.get(GirlNameIAT, "") or "") == "" and Amanda.corruption >= 45 and renpy.random.randint(1, 2) == 1):
             $ MainTxt += '\n\n"Ага, тебе показалось. А когда кажется, надо знак Ильматера вокруг себя очерчить, морок-то и пройдет," и Аманда убежала дальше.'
         else:
             $ MainTxt += '\n\n"Так ты ж сам сказал, что мол без них работать мне удобнее будет, если мол движения не скованны."\n"Ага, удобнее, я же вижу как все посетители, когда ты им голой мандой светишь, руки распускать начинают. Какое уж тут удобнее. Не стыдно? Одела бы ты панталоны обратно, не позорила наше заведение!" отчитали вы бесстыдницу.'
-            if sluttiness.get(GirlNameIAT, 0) < 45:
+            if Amanda.corruption < 45:
                 $ MainTxt += '\n\n"Ну, коль ты теперь по-другому заговорил, то пойду и одену их обратно. Я себя и правда как-то слишком неуютно чувствовала, все время юбку проверяла, не задралась ли."'
                 $ AgreedToRedress = 1
-            elif sluttiness.get(GirlNameIAT, 0) < 60 and renpy.random.randint(1, 4) <= 3:
+            elif Amanda.corruption < 60 and renpy.random.randint(1, 4) <= 3:
                 $ MainTxt += '\n\n"Ага, сначала сам подначил, а теперь стыдит. Да ты издеваешься надо мной, а я, то дура, поверила." надулась Аманда, "ну ладно, пойду наверх одену."'
                 $ AgreedToRedress = 1
                 call SlutFriendsIncrease(GirlNameIAT, 7, 1, -1, 0, 0, 0)
@@ -213,7 +212,7 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
             $ pantiesdef[GirlNameIAT] = "simplepanties"
             call SlutFriendsIncrease(GirlNameIAT, 0, 0, 0, 30, 1, -1)
             call DressUp(GirlNameIAT)
-        $ Talked[GirlNameIAT] = Talked.get(GirlNameIAT, 0) + 1
+        $ Amanda.mark_talked()
         $ CurLocDesc = MainTxt
         call IntAmandaDressChangeRefresh(GirlNameIAT)
         return
@@ -221,7 +220,7 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
     if str(choice_code or "") == "buy_dress":
         $ MainTxt = '"Амандочка, а хочешь я тебе обновку куплю?" - задали вы Аманде вопрос, хотя уже заранее знали на него ответ.\n"Конечно хочу!" Аманда даже подпрыгнула от радости и еле удержалась, чтобы не захлопать в ладоши.\n"Ну тогда завтра, с утра пораньше, дуй к Ирме Фараго, я буду тебя там ждать, вместе и выберем!" заверили вы Аманду.'
         $ DailyEventsList_Add(GirlNameIAT, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy")
-        $ Talked[GirlNameIAT] = Talked.get(GirlNameIAT, 0) + 1
+        $ Amanda.mark_talked()
         $ CurLocDesc = MainTxt
         call IntAmandaDressChangeRefresh(GirlNameIAT)
         return

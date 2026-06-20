@@ -102,10 +102,58 @@ init -20 python:
         }
 
         def _get(self, name, default=None):
-            try:
-                return globals().get(name, default)
-            except Exception:
-                return default
+            key = str(name or "")
+            if key == "clock_minutes":
+                return clock_minutes
+            if key == "CurLoc":
+                return CurLoc
+            if key == "dayspassed":
+                return dayspassed
+            if key == "energy":
+                return energy
+            if key == "exploration":
+                return exploration
+            if key == "GuardCaptainVar":
+                return GuardCaptainVar
+            if key == "health":
+                return health
+            if key == "hour":
+                return hour
+            if key == "minute":
+                return minute
+            if key == "notoriety":
+                return notoriety
+            if key == "RandomNameCode":
+                return RandomNameCode
+            if key == "RandomStallionNameCode":
+                return RandomStallionNameCode
+            if key == "RandomStreetNameCode":
+                return RandomStreetNameCode
+            if key == "TavernBlackworkerCandidates":
+                return TavernBlackworkerCandidates
+            if key == "TavernBlackworkers":
+                return TavernBlackworkers
+            if key == "time":
+                return time
+            if key == "TownStreetContext":
+                return TownStreetContext
+            if key == "TownStreetCooldowns":
+                return TownStreetCooldowns
+            if key == "TownStreetDailyPlan":
+                return TownStreetDailyPlan
+            if key == "TownStreetEventsToday":
+                return TownStreetEventsToday
+            if key == "TownStreetFightToday":
+                return TownStreetFightToday
+            if key == "TownStreetFiredLabelsToday":
+                return TownStreetFiredLabelsToday
+            if key == "TownStreetFiredLocationsToday":
+                return TownStreetFiredLocationsToday
+            if key == "TownStreetStorySeenKeys":
+                return TownStreetStorySeenKeys
+            if key == "week":
+                return week
+            return default
 
         def _int(self, value, default=0):
             try:
@@ -244,8 +292,8 @@ init -20 python:
         def ensure_daily_plan(self):
             plan = self._get("TownStreetDailyPlan", {})
             if not isinstance(plan, dict):
-                globals()["TownStreetDailyPlan"] = {}
-                plan = globals()["TownStreetDailyPlan"]
+                TownStreetDailyPlan.clear()
+                plan = TownStreetDailyPlan
             plan["day"] = self._int(self._get("dayspassed", 0), 0)
             plan["model"] = "probability"
             plan["events"] = {
@@ -370,7 +418,7 @@ init -20 python:
             return score >= self._int(challenge, 100)
 
         def fight_success(self, enemy_level=2):
-            fight_level = self._get("FightLevel", {})
+            fight_level = player_state(False).combat.fight_level
             try:
                 you = self._int(fight_level.get("you", 1), 1)
             except Exception:
@@ -384,9 +432,10 @@ init -20 python:
             appearance.apply_to_store()
 
         def apply_health_damage(self, amount=15):
+            global health, energy
             amount_int = self._int(amount, 15)
-            globals()["health"] = max(0, self._int(self._get("health", 100), 100) - amount_int)
-            globals()["energy"] = max(0, self._int(self._get("energy", 100), 100) - max(5, amount_int // 2))
+            health = max(0, self._int(self._get("health", 100), 100) - amount_int)
+            energy = max(0, self._int(self._get("energy", 100), 100) - max(5, amount_int // 2))
 
         def make_help_context(self):
             ctx = self._get("TownStreetContext", {})
@@ -495,24 +544,82 @@ label TownStreetThugsEvent:
 
 
 label TownStreetThugsFight:
-    $ notoriety = min(100, int(notoriety or 0) + 3)
+    $ _thug_reputation_before = int(reputation or 0)
+    $ _thug_tavernfame_before = int(tavernfame or 0)
+    $ _thug_notoriety_before = int(notoriety or 0)
+    $ notoriety = min(100, _thug_notoriety_before + 3)
     $ _thug_return_room = str(CurLoc or location or "StreetTavern")
     $ _thug_picture = str(_layout_last_picture or scene_image or "")
     $ _thug_intro = "Вы встаете между жертвой и громилами. Один сплевывает на мостовую и перехватывает дубинку: теперь разговор закончится только дракой."
     $ fight_begin("street_crook", 2, _thug_return_room, _thug_picture, _thug_intro)
+    call FightLoop
+    $ _thug_outcome = str(HuntLastResult.get("outcome", "") if isinstance(HuntLastResult, dict) else "")
+    if _thug_outcome == "victory":
+        $ reputation = min(100, _thug_reputation_before + 3)
+        $ tavernfame = _thug_tavernfame_before + 1
+        $ notoriety = min(100, _thug_notoriety_before + 3)
+        $ MainTxt = str(MainTxt or "") + "\n\nВы отбили прохожего у громил. На улице это быстро запоминают: репутация +3, слава трактира +1."
+        $ CurLocDesc = MainTxt
+        $ renpy.notify("Репутация +3, слава трактира +1")
+    elif _thug_outcome == "defeat":
+        $ notoriety = max(0, int(notoriety or 0) - 2)
+        $ MainTxt = str(MainTxt or "") + "\n\nГромилы уходят, убедившись, что вы больше не мешаете. Прохожие делают вид, что ничего не видели."
+        $ CurLocDesc = MainTxt
+    elif _thug_outcome == "retreat":
+        $ reputation = max(0, int(reputation or 0) - 1)
+        $ MainTxt = str(MainTxt or "") + "\n\nВы уходите из драки живым, но жертва остается на улице без вашей помощи: репутация -1."
+        $ CurLocDesc = MainTxt
+        $ renpy.notify("Репутация -1")
+    if _thug_outcome in ("victory", "defeat", "retreat"):
+        $ current_action_title = "Итог драки"
+        $ current_action_content = None
+        $ current_action_items = [MenuItem("Вернуться", Function(renpy.return_statement, True))]
+        call screen main_ui
     return True
 
 
 label TownStreetThugsShout:
-    if town_street.escape_success(85):
+    $ _shout_reputation_before = int(reputation or 0)
+    $ _shout_notoriety_before = int(notoriety or 0)
+    $ _thug_return_room = str(CurLoc or location or "StreetTavern")
+    $ _thug_picture = str(_layout_last_picture or scene_image or "")
+    $ _shout_score = int(exploration or 0) + procedural_randint(1, 100, "town_thugs_shout_%s_%s_%s" % (int(dayspassed or 0), _thug_return_room, int(clock_minutes or 0)))
+    if int(exploration or 0) >= 150:
+        $ _shout_score += 35
+    if _shout_score >= 85:
         $ exploration += 6
-        $ MainTxt = "Вы громко зовете стражу и называете ближайшие дома так уверенно, будто уже знаете, куда побежите за подкреплением. Громилы ругаются и исчезают."
+        $ reputation = min(100, int(reputation or 0) + 2)
+        $ notoriety = min(100, int(notoriety or 0) + 4)
+        $ MainTxt = "Вы громко зовете стражу и называете ближайшие дома так уверенно, будто уже знаете, куда побежите за подкреплением. Громилы переглядываются, ругаются и отступают в переулок. Прохожие запоминают, что вы не прошли мимо: репутация +2, дурная слава +4."
+        $ CurLocDesc = MainTxt
+        $ current_action_title = "Громилы отступили"
+        $ current_action_content = None
+        $ current_action_items = [MenuItem("Вернуться", Function(renpy.return_statement, True))]
+        call screen main_ui
+        return True
     else:
-        $ town_street.apply_health_damage(12)
-        $ MainTxt = "Ваш крик только злит громил. Один толкает вас плечом в стену, второй шипит, что в следующий раз разговор будет длиннее. Потом они все же уходят."
-    $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Идти дальше", Function(renpy.return_statement, True))]
-    return
+        $ notoriety = min(100, _shout_notoriety_before + 2)
+        $ _thug_intro = "Ваш крик только злит громил. Один толкает жертву в грязь, второй разворачивается к вам с дубинкой: теперь они хотят наказать именно вас."
+        $ fight_begin("street_crook", 2, _thug_return_room, _thug_picture, _thug_intro)
+        call FightLoop
+        $ _thug_outcome = str(HuntLastResult.get("outcome", "") if isinstance(HuntLastResult, dict) else "")
+        if _thug_outcome == "victory":
+            $ reputation = min(100, _shout_reputation_before + 2)
+            $ notoriety = min(100, _shout_notoriety_before + 2)
+            $ MainTxt = str(MainTxt or "") + "\n\nКрик не испугал громил, зато драка закончилась в вашу пользу. Прохожие запоминают это: репутация +2."
+            $ CurLocDesc = MainTxt
+            $ renpy.notify("Репутация +2")
+        elif _thug_outcome == "retreat":
+            $ reputation = max(0, int(reputation or 0) - 1)
+            $ MainTxt = str(MainTxt or "") + "\n\nВы отступаете, и громилы остаются хозяевами улицы. Это не выглядит геройством: репутация -1."
+            $ CurLocDesc = MainTxt
+            $ renpy.notify("Репутация -1")
+        if _thug_outcome in ("victory", "defeat", "retreat"):
+            $ current_action_title = "Итог драки"
+            $ current_action_content = None
+            $ current_action_items = [MenuItem("Вернуться", Function(renpy.return_statement, True))]
+            call screen main_ui
+        return True
 
 
 label TownStreetPatrolEvent:
@@ -595,6 +702,26 @@ label TownStreetPatrolFight:
     $ _patrol_picture = str(_layout_last_picture or scene_image or "")
     $ _patrol_intro = "Вы решаете не платить и не прятаться. Стражники переглядываются, опускают алебарды и берут вас в клещи. Теперь это настоящая драка с патрулем."
     $ fight_begin("patrol_guard", 2, _patrol_return_room, _patrol_picture, _patrol_intro)
+    call FightLoop
+    $ _patrol_outcome = str(HuntLastResult.get("outcome", "") if isinstance(HuntLastResult, dict) else "")
+    if _patrol_outcome == "victory":
+        $ notoriety = min(100, int(notoriety or 0) + 18)
+        $ tavernfame = int(tavernfame or 0) - 3
+        $ MainTxt = str(MainTxt or "") + "\n\nВы отбились от патруля, но это уже не мелкая ссора с ночной стражей. Дурная слава +18, слава трактира -3."
+        $ CurLocDesc = MainTxt
+        $ renpy.notify("Дурная слава +18, слава трактира -3")
+    elif _patrol_outcome == "retreat":
+        $ notoriety = min(100, int(notoriety or 0) + 4)
+        $ MainTxt = str(MainTxt or "") + "\n\nВы уходите от патруля, но теперь вас будут искать внимательнее: дурная слава +4."
+        $ CurLocDesc = MainTxt
+        $ renpy.notify("Дурная слава +4")
+    elif _patrol_outcome == "defeat":
+        jump TownStreetPatrolStocks
+    if _patrol_outcome in ("victory", "retreat"):
+        $ current_action_title = "Итог драки с патрулем"
+        $ current_action_content = None
+        $ current_action_items = [MenuItem("Вернуться", Function(renpy.return_statement, True))]
+        call screen main_ui
     return True
 
 

@@ -5,16 +5,44 @@
 # Converted from legacy script. Handles all Amanda dance menu options and outcomes.
 # To be called from FridayDance or related event chains.
 
+label story_amanda_friday_dance_mc_0:
+    vscene "images/market/LocFridayDance.jpg"
+    $ Amanda.set_var_int("albernowdances", 0)
+    $ Amanda.set_var_int("legare_dance_pending", 0)
+    $ FridayDancesCount += 1
+    "Вы прошлись по площади, ища Аманду, и нашли ее скромно стоящей около одной из колонн."
+    call ShowImage("amanda", "dance", "wait" + str(renpy.random.randint(1, 2)))
+    $ DanceStep = 1
+    call IntAmandaDance
+    return
+
+label story_amanda_friday_dance_legare_0:
+    vscene "images/market/LocFridayDance.jpg"
+    $ Amanda.set_var_int("albernowdances", 1)
+    $ Amanda.set_var_int("legare_dance_pending", 0)
+    call EventAmandaLegareCreateDance
+    $ FridayDancesCount += 1
+    if Amanda.var_int("EscapeUnnoticed", 0) == 1:
+        "Вы попробовали найти Аманду, но к своему удивлению не смогли этого сделать. На площади ее не было. Вокруг площади тоже. Может она отправилась домой, а может ее этот хрен Легаре за собой уволок, а может еще что стряслось, но так или иначе вы упустили Аманду."
+        $ Amanda.set_var_int("leftdances", 1)
+        call FridayDanceCounterShow
+        return
+    "Вы прошлись по площади, ища Аманду, и обнаружили ее c мессиром Легаре."
+    call ShowImage("amanda", "dance", "legare_step_0")
+    $ DanceStep = 1
+    call IntAmandaDance
+    return
+
 label IntAmandaDance():
     $ GirlNameIAD = 'amanda'
     $ DanceMaxIAD = 6
-    $ AmandaVar['albernowdances'] = AmandaVar.get('albernowdances', 0)
+    $ Amanda.ensure_story_defaults()
     
     menu amanda_dance_menu:
         "Осмотреть" if DanceStep < 10:
             call GirlsDesc("amanda")
             jump IntAmandaDance
-        "Поболтать" if DanceStep == 1 and AmandaVar['albernowdances'] == 0:
+        "Поболтать" if DanceStep == 1 and Amanda.var_int("albernowdances", 0) == 0:
             "Вы подошли к Аманде и начали с ней весело болтать о разной ерунде. За разговором незаметно пролетело время."
             if Friends[GirlNameIAD] >= 7:
                 "Вы подумали что зря вы стали болтать с Амандой о ерунде. Ничего нового вы не узнали, а доверяет вам она и без пустого трепа."
@@ -25,7 +53,7 @@ label IntAmandaDance():
             call ShowImage(GirlNameIAD, "dance", "YouInvite1")
             $ DanceStep = DanceMaxIAD
             jump IntAmandaDance
-        "Попросить об одолжении" if DanceStep == 1 and AmandaVar['albernowdances'] == 0 and amanda_can_be_asked_for_night_bowl_favor():
+        "Попросить об одолжении" if DanceStep == 1 and Amanda.var_int("albernowdances", 0) == 0 and amanda_can_be_asked_for_night_bowl_favor():
             "Пока музыка еще не стихла, вы наклоняетесь к Аманде поближе и тихо просите ее об одолжении. Объясняете, что для хозяйственного дела вам очень пригодилась бы ее ночная миска, а взамен обещаете потом купить новую, красивее прежней."
             $ _favor_result = amanda_night_bowl_request_result(True)
             if bool(_favor_result.get("granted", False)):
@@ -33,7 +61,7 @@ label IntAmandaDance():
             else:
                 "\"Нет уж, Стефан. Даже с вином в голове я не настолько безумна,\" шепчет Аманда и, смущенно улыбаясь, отмахивается от вашей просьбы."
             jump IntAmandaDance
-        "Пригласить потанцевать" if DanceStep == 1 and AmandaVar['albernowdances'] == 0:
+        "Пригласить потанцевать" if DanceStep == 1 and Amanda.var_int("albernowdances", 0) == 0:
             "Вы подошли к Аманде и пригласили ее потанцевать."
             $ HandsDance = ''
             $ KissDance = 0
@@ -52,7 +80,7 @@ label IntAmandaDance():
             if DanceStep == DanceMaxIAD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump IntAmandaDance
-        "Продолжить танцевать" if DanceStep >= 2 and DanceStep < DanceMaxIAD and AmandaVar['albernowdances'] == 0:
+        "Продолжить танцевать" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0:
             "Вы продолжили кружится в танце с Амандой."
             if HandsDance == 'waist':
                 "Ваши руки нежно обнимают талию Аманды."
@@ -70,7 +98,7 @@ label IntAmandaDance():
             if DanceStep == DanceMaxIAD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump IntAmandaDance
-        "Положить руки на талию" if DanceStep >= 2 and DanceStep < DanceMaxIAD and AmandaVar['albernowdances'] == 0 and HandsDance != 'waist':
+        "Положить руки на талию" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and HandsDance != 'waist':
             "Вы положили руки на талию Аманды."
             if Friends[GirlNameIAD] >= 6 and sluttiness[GirlNameIAD] > 10:
                 "Она улыбнулась и придвинулась к вам поближе, продолжая танец."
@@ -92,7 +120,7 @@ label IntAmandaDance():
             if DanceStep == DanceMaxIAD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump IntAmandaDance
-        "Положить руки на попу" if DanceStep >= 2 and DanceStep < DanceMaxIAD and AmandaVar['albernowdances'] == 0 and HandsDance == 'waist':
+        "Положить руки на попу" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and HandsDance == 'waist':
             if HandsDance == 'waist':
                 "Вы опустили руки с талии на попу Аманды."
             else:
@@ -122,7 +150,7 @@ label IntAmandaDance():
             if DanceStep == DanceMaxIAD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump IntAmandaDance
-        "Сжать попу Аманды" if DanceStep >= 2 and DanceStep < DanceMaxIAD and AmandaVar['albernowdances'] == 0 and HandsDance == 'ass':
+        "Сжать попу Аманды" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and HandsDance == 'ass':
             "Ваши беспокойные ручки начали гладить и сжимать попку Аманды."
             if Friends[GirlNameIAD] >= 10 and sluttiness[GirlNameIAD] > 20:
                 "Аманда улыбнулась и прижалась вплотную к вам, начав тереться своими сисечками о вашу грудь."
@@ -150,7 +178,7 @@ label IntAmandaDance():
             if DanceStep == DanceMaxIAD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump IntAmandaDance
-        "Поцеловать Аманду" if DanceStep >= 2 and DanceStep < DanceMaxIAD and AmandaVar['albernowdances'] == 0 and KissDance == 0:
+        "Поцеловать Аманду" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and KissDance == 0:
             "Продолжая танцевать, вы вдруг наклонились к Аманде и впились в ее губы своими."
             if Friends[GirlNameIAD] >= 10 and sluttiness[GirlNameIAD] > 21:
                 "Аманда с готовностью ответила на ваш поцелуй, страстно переплетаясь с вами языками."
@@ -177,7 +205,7 @@ label IntAmandaDance():
             if DanceStep == DanceMaxIAD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump IntAmandaDance
-        "Предложить Аманде прогулятся" if DanceStep >= 2 and DanceStep < DanceMaxIAD and AmandaVar['albernowdances'] == 0 and HadSex[GirlNameIAD] > 0 and (HandsDance.startswith('ass') or KissDance > 0):
+        "Предложить Аманде прогулятся" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and HadSex[GirlNameIAD] > 0 and (HandsDance.startswith('ass') or KissDance > 0):
             $ tmpGropeReact = AmandaSexOfferReaction()
             if tmpGropeReact == 2:
                 "Продолжая танцевать, вы вдруг прошептали Аманде на ушко: 'Милая, а может прогуляемся немного?'"
@@ -186,11 +214,11 @@ label IntAmandaDance():
                 call SlutFriendsIncrease(GirlNameIAD, 0, 3, -1, 0, 3, -1)
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
             elif tmpGropeReact >= 3:
-                $ AmandaVar['leftdances'] = 1
+                $ Amanda.set_var_int("leftdances", 1)
                 $ GirlDance_DeleteGirl('amanda')
                 $ FridayDancesCount = 5
                 call ShowImage(GirlNameIAD, "dance", "YouInvite2")
-                jump AmandaSexDanceStreet
+                jump AmandaAfterDanceMC
             else:
                 "Продолжая танцевать, вы вдруг прошептали Аманде на ушко: 'Милая, а может прогуляемся немного?'"
                 '"Стефан, ты что, предлагаешь мне пойти с тобой в какую-то подворотню? Мне?!" гневно сказала Аманда, развернулась и ушла, оставив вас в одиночестве.'
@@ -199,15 +227,15 @@ label IntAmandaDance():
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
             jump IntAmandaDance
             
-        "Наблюдать за Амандой и мессиром Легаре" if DanceStep >= 1 and DanceStep < DanceMaxIAD + 2 and AmandaVar['albernowdances'] == 1:
+        "Наблюдать за Амандой и мессиром Легаре" if DanceStep >= 1 and DanceStep < DanceMaxIAD + 2 and Amanda.var_int("albernowdances", 0) == 1:
             if DanceStep == 1:
                 "Вы посмотрели на Аманду и мессира Легаре."
             
             # Safe way to show dialogue based on dance step
             $ dance_message = ""
-            if DanceStep - 1 <= AmandaVar.get('alberdanceadvance', 0):
+            if DanceStep - 1 <= Amanda.var_int("alberdanceadvance", 0):
                 $ dance_message = DanceWatchLine[DanceStep]
-            elif AmandaVar.get('alberdanceadvance', 0) == 0:
+            elif Amanda.var_int("alberdanceadvance", 0) == 0:
                 $ dance_message = DanceWatchLine[1]
                 $ DanceStep = DanceMaxIAD + 1
             else:
@@ -216,11 +244,11 @@ label IntAmandaDance():
             "[dance_message]"
             call ShowImage("amanda", "dance", "alberdanceStep" + str(min(DanceStep, 3)))
             
-            if DanceStep == 6 and AmandaVar.get('LegareGo', 0) == 1:
+            if DanceStep == 6 and Amanda.var_int("LegareGo", 0) == 1:
                 $ legare_go_message = str(DanceWatchLine.get(6, "") or "")
                 if legare_go_message != "" and dance_message != legare_go_message:
                     "[legare_go_message]"
-                $ AmandaVar['LegareGo'] = 0
+                $ Amanda.set_var_int("LegareGo", 0)
                 call LegareAmandaGoMenu
             $ DanceStep += 1
                 
@@ -228,31 +256,30 @@ label IntAmandaDance():
                 "Музыка доиграла и Аманда с мессиром Легаре разошлись."
             jump IntAmandaDance
             
-        "Вмешаться и разогнать их" if DanceStep >= 1 and DanceStep < DanceMaxIAD + 2 and AmandaVar['albernowdances'] == 1:
+        "Вмешаться и разогнать их" if DanceStep >= 1 and DanceStep < DanceMaxIAD + 2 and Amanda.var_int("albernowdances", 0) == 1:
             "Нежелая больше смотреть на это непотребство вы решительно подошли к парочке и заявили:\n'Мессир! Что вы себе позволяете?! У вас же есть дети старше Аманды, да и вы женаты! А ты что возомнила?! Разве ты не видишь, что он ей по возрасту годится в опекуны! А ну, кыш отседа и чтобы больше я такого не видел!'"
             
-            if AmandaVar.get('alberprohibit', 0) == 1:
+            if Amanda.var_int("alberprohibit", 0) == 1:
                 "\"Да и вообще, я тебе ведь уже запрещал с ним танцевать, а ты опять за старое! Или ты оглохла или память потеряла?\" продолжаете орать вы."
                 
             "Нахмурившись от выволочки, что вы ему учинили, мессир Легаре мрачно удалился."
             call SlutFriendsIncrease("Alber", 2, 1, -4, 0, 0, 0)
             
-            if AmandaVar['alberfriends'] >= 7:
+            if Amanda.var_int("alberfriends", 0) >= 7:
                 "\"Как ты смеешь лезть в мою личную жизнь, Стефан?! Я уже взрослая и могу сама решать! А Альбер мне очень-очень нравится, ну и что что он женат!\" закричала Аманда и убежала рыдая."
-                $ AmandaVar['alberfriends'] += 3
+                $ Amanda.set_var_int("alberfriends", Amanda.var_int("alberfriends", 0) + 3)
                 call SlutFriendsIncrease("amanda", 3, 1, -5, 0, 0, 0)
             else:
                 "\"Хорошо,\" только и сказала Аманда. Но вам показалось что под внешней покорностью девчонка затаила обиду."
-                $ AmandaVar['alberfriends'] -= 1
+                $ Amanda.set_var_int("alberfriends", Amanda.var_int("alberfriends", 0) - 1)
                 call SlutFriendsIncrease("amanda", 3, 1, -2, 15, 1, -4)
-            $ AmandaVar['alberprohibit'] = 1
-            $ AmandaVar['leftdances'] = 1
+            $ Amanda.set_var_int("alberprohibit", 1)
+            $ Amanda.set_var_int("leftdances", 1)
             $ DanceStep = DanceMaxIAD + 2
-            $ AmandaVar['albernowdances'] = 0
+            $ Amanda.set_var_int("albernowdances", 0)
             $ GirlDance_DeleteGirl('amanda')
             jump IntAmandaDance
-        "Отойти" if DanceStep >= DanceMaxIAD or AmandaVar['albernowdances'] == 1 or DanceStep == 1:
-            $ CounterToClean = MaxCounterToClean
+        "Отойти" if DanceStep >= DanceMaxIAD or Amanda.var_int("albernowdances", 0) == 1 or DanceStep == 1:
             $ DanceStep = 0
             call ShowImage(GirlNameIAD, "dance", "wait" + str(renpy.random.randint(1, 2)))
             return

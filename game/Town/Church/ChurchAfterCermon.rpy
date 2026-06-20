@@ -22,16 +22,8 @@ label ChurchAfterCermon(entry_arg=0):
     if _return:
         return
 
-    if int(BeckyVar.get("PriestAdvice", 0) or 0) > 0:
-        call IntBeckyAfterCermon
-        $ MainTxt = MainTxt + "\n\nВы заметили, как миссис Блэнкеншип направилась было к кабинке для исповеди, но отец Герхард взял ее за руку и повел к неприметной двери, которую он отпер висящим у него на поясе ключом. Как только вдова проследовала за ним, дверь захлопнулась и послышался стук задвигаемого засова. Хотя вы можете попробовать {a=church:after_becky:1}{color=#245b2b}посмотреть{/color}{/a}, что там происходит через замочную скважину."
-        $ CurLocDesc = MainTxt
-        $ current_action_items.append(MenuItem("Посмотреть", Function(main_ui_call_label, "AfterCermonBecky")))
-    else:
-        $ MainTxt = MainTxt + "\n\nНичего интересного вы не нашли."
-        $ CurLocDesc = MainTxt
-
-    if BeckyVar.get("PriestAdvice", 0) == 0 or BeckyVar.get("PriestAdvice", 0) > 2:
-        $ current_action_items.append(MenuItem("Вернуться в собор", Jump("Church")))
+    $ MainTxt = MainTxt + "\n\nНичего интересного вы не нашли."
+    $ CurLocDesc = MainTxt
+    $ current_action_items.append(MenuItem("Вернуться в собор", Jump("Church")))
     $ renpy.restart_interaction()
     return

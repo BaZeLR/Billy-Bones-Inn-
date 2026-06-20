@@ -86,7 +86,7 @@ init python:
                 ],
             ),
         ],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
+        schedule=RoomSchedule([1, 2, 3, 4, 5, 6, 7], [], "", None, "06:00", "17:59"),
         custom_properties={
             "house_front": True,
         },
@@ -121,10 +121,7 @@ init python:
 label BeckyHomeFront(arrive_mode=""):
     call EnterLocation("BeckyHomeFront")
     python:
-        BeckyVar.setdefault("visitedhome", 0)
-        BeckyVar.setdefault("TodayFrontSexCheck", 0)
-        BeckyVar.setdefault("SawIngaFuck", 0)
-        BeckyVar.setdefault("IngaSexGreet", 0)
+        Becky.ensure_story_defaults()
         IngaVar.setdefault("SawLucassex", 0)
         IngaVar.setdefault("Knowher", 0)
         pregnancy.setdefault("inga", 0)
@@ -138,17 +135,17 @@ label BeckyHomeFront(arrive_mode=""):
         $ ArriveMode = arrive_mode
         $ ViewIngaSex = 0
         $ RandIngaFuck = renpy.random.randint(1,4)
-        if BeckyVar["TodayFrontSexCheck"] == 1 and RandIngaFuck <= 2:
+        if Becky.story_value("TodayFrontSexCheck", 0) == 1 and RandIngaFuck <= 2:
             $ RandIngaFuck = 3
-        $ BeckyVar["TodayFrontSexCheck"] = 1
+        $ Becky.set_story_value("TodayFrontSexCheck", 1)
         if RandIngaFuck == 1:
             $ PregnancyCheck("inga", "mouthface", 1, "Лукас")
         elif RandIngaFuck == 2:
             $ PregnancyCheck("inga", "inside", 1, "Лукас")
 
     if ArriveMode == "FromDances":
-        if BeckyVar["visitedhome"] == 0:
-            $ BeckyVar["visitedhome"] = 1
+        if Becky.story_value("visitedhome", 0) == 0:
+            $ Becky.set_story_value("visitedhome", 1)
         "[_becky_front_room.descriptions[1].text]"
         call ShowImage("", "", becky_homefront_withbecky_picture())
     else:
@@ -262,15 +259,15 @@ label becky_homefront_peek:
 
 label becky_homefront_share_with_becky:
     "\"Бекки, смотри\", подозвали вы вдовушку, указав ей на сношающуюся парочку. Бекки подошла к вам и осторожно выглянула из-за угла."
-    if BeckyVar["SawIngaFuck"] == 0:
+    if Becky.story_value("SawIngaFuck", 0) == 0:
         "\"Так это ж Ингенборг, дочка моя, с Лукасом, ухажером своим. Очень милый мальчик, он на ней даже жениться собирается. До дома не дотерпели, эх молодость-молодость!\""
     else:
         "\"Эх доченька бедная моя, тебе же наверное неудобно то, на камне. Ну да дело молодое!\""
     "- сказала Бекки, увидев парочку."
-    if BeckyVar["visitedhome"] < 5:
+    if Becky.story_value("visitedhome", 0) < 5:
         "\"Но ведь это значит, что дома скорее всего никого нет, так что пошли скорее внутрь, пока они нас не засекли!\" - добавила она."
     $ show_inga_front_fuck_image(RandIngaFuck, 2)
-    $ BeckyVar["SawIngaFuck"] = 1
+    $ Becky.set_story_value("SawIngaFuck", 1)
     $ IngaVar["Knowher"] = max(1, IngaVar["Knowher"])
     $ IngaVar["SawLucassex"] = 1
     $ ViewIngaSex += 1
@@ -278,7 +275,7 @@ label becky_homefront_share_with_becky:
 
 label becky_homefront_ignore:
     "Вы вернулись к вдове Блэнкеншип: \"А, кошка пробежала, ерунда\", сказали вы ей."
-    if BeckyVar["visitedhome"] < 5:
+    if Becky.story_value("visitedhome", 0) < 5:
         "\"А, ну тогда пошли скорее в дом, пока дети мои не вернулись,\" ответила вам Бекки, \"а то увидят, смеяться будут, мол мамке уже [age_girls.get('becky', 36)] лет, а она все с парнями гуляет.\""
     else:
         "\"А, ну тогда пошли скорее в дом, я уже и стол накрыла,\" ответила вам Бекки."
@@ -286,7 +283,7 @@ label becky_homefront_ignore:
     return
 
 label becky_homefront_suggest_approach:
-    if BeckyVar["visitedhome"] < 5:
+    if Becky.story_value("visitedhome", 0) < 5:
         "Вы обернулись к вдове Блэнкеншип: \"Может подойдем к ним?\" спросили вы ее."
         "\"Да ты что, ведь тогда дочка меня с тобой увидит, вдруг смеяться будет, мол мамке уже [age_girls.get('becky', 36)] лет, а она все с парнями гуляет. Пошли лучше скорее в дом, пока они тут заняты.\""
         "И с этими словами она настойчиво потянула вас в сторону двери."
@@ -304,7 +301,7 @@ label becky_homefront_suggest_approach:
         else:
             "Инга же обладала меньшей выдержкой чем ее хахаль и густо покраснела, увидев мать. Впрочем, недостаточно густо, чтобы перестать. \"Мам, ах, привет, ах, Стефанчик, ах, и тебе приветик,\" - вымолвила Блэнкеншип-младшая."
         $ ViewIngaSex += 1
-        call SlutFriendsIncrease("becky", 0, 0, 0, 45, 3, 1)
+        $ Becky.apply_social_roll(0, 0, 0, 45, 3, 1)
         call SlutFriendsIncrease("inga", 0, 0, 0, 45, 3, 1)
     return
 
@@ -324,16 +321,16 @@ label becky_homefront_watch_cum:
         $ show_inga_front_fuck_image(2, 2 if ArriveMode == "FromDances" else 1)
     if ArriveMode == "FromDances":
         "\"Мам, Стефан, мы закончили, пойдем теперь в дом,\" как ни в чем не бывало предложила вам Инга."
-        call SlutFriendsIncrease("becky", 0, 0, 0, 45, 3, 1)
+        $ Becky.apply_social_roll(0, 0, 0, 45, 3, 1)
     else:
         "\"Стефан, увидимся дома, нам надо еще кое что забрать,\" сказал вам Лукас, заправляя член обратно в штаны. И с этими словами парочка удалилась."
-    if renpy.random.randint(1,2) == 1 and RandIngaFuck == 2 and BeckyVar["IngaSexGreet"] == 0 and ArriveMode == "FromDances":
+    if renpy.random.randint(1,2) == 1 and RandIngaFuck == 2 and Becky.story_value("IngaSexGreet", 0) == 0 and ArriveMode == "FromDances":
         "\"Лукас, Ингочка, а что ж вы на улице, вам же небось неудобно?\" - резонно осведомилась у парочки Бекки."
         "\"Я же вам сказала, что можете у нас дома, не стесняйтесь.\""
         "\"Ой мам, ну ты сказанула. Лукас и стыд - вещи мало совместимые. Где он меня только не сношал. Это-то его и заводит, говорит что в одном месте скучно. Правда, милый?\""
         "\"Да, миссис Блэнкеншип,\" согласился Лукас, \"Инга все правильно говорит.\""
         "\"Ну, навязывать свой дом не буду,\" пошла на попятную Бекки, \"только смотрите, не простудитесь,\" заботливо поспешила добавить она."
-        $ BeckyVar["IngaSexGreet"] = 1
+        $ Becky.set_story_value("IngaSexGreet", 1)
     call SlutFriendsIncrease("inga", 0, 0, 0, 45, 3, 1)
     $ ViewIngaSex += 1
     return
@@ -347,7 +344,7 @@ label becky_homefront_approach:
         "\"Нет, нет, что вы, не надо исключений, будьте верны своим принципам,\" тут же нашлись вы."
         "И тут вы поняли, что разговариваете с пустотой: парень решил сосредоточиться на своей партнерше, а не на дискуссии с вами."
         $ ViewIngaSex = 10
-    elif BeckyVar["visitedhome"] < 5:
+    elif Becky.story_value("visitedhome", 0) < 5:
         "Вы решили нарушить уединение парочки. Подойдя к Лукасу с Ингой решительным шагом, вы нахально осведомились: \"А что это вы тут делаете, а?\""
         "\"О, привет Стефан,\" - ответил Лукас вам как ни в чем не бывало. \"А сам-то что думаешь, что мы тут делаем?\" - задал он риторический вопрос."
         if RandIngaFuck == 1:

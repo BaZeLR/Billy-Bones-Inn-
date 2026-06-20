@@ -6,6 +6,13 @@
 init -25 python:
     import renpy.exports as renpy
 
+    def story_event_object(evt, thread_name, threaded):
+        if isinstance(evt, Event):
+            evt.thread_name = thread_name
+            evt.threaded = threaded
+            return evt
+        return Event(evt, thread_name, threaded)
+
     class ThreadData(object):
         def __init__(self, level, person, subname, condStr, triggers, highlight, threaded):
             self.level = level
@@ -17,11 +24,11 @@ init -25 python:
             self.highlight = highlight
             if isinstance(triggers, list):
                 self.triggers = [
-                    ([Event(evt, self.name, threaded) for evt in evt_list] if isinstance(evt_list, list) else [Event(evt_list, self.name, threaded)])
+                    ([story_event_object(evt, self.name, threaded) for evt in evt_list] if isinstance(evt_list, list) else [story_event_object(evt_list, self.name, threaded)])
                     for evt_list in triggers
                 ]
             else:
-                self.triggers = [[Event(triggers, self.name, threaded)]]
+                self.triggers = [[story_event_object(triggers, self.name, threaded)]]
             self.length = len(self.triggers)
 
         def initConditions(self):

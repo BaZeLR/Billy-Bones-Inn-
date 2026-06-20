@@ -6,7 +6,7 @@ init 4 python:
         return CurrentRoom is not None and str(getattr(CurrentRoom, "code_name", "") or "") == "Shed" and _room_has_item_by_id(CurrentRoom, "lumber_001")
 
     def lumber_ready_for_chop(_obj=None):
-        return lumber_in_shed(_obj) and _player_has_item_by_id("old_axe_001")
+        return lumber_in_shed(_obj) and player_has_equipped_weapon("old_axe_001")
 
     LumberItem = GameItem(
         object_id="lumber_001",

@@ -379,7 +379,7 @@ init 4 python:
         if not player_can_tear_wardrobe_dress(dress_name, allow_worn):
             return {"ok": False, "text": "Эту одежду сейчас нельзя пустить на лоскуты."}
         scrap_qty = cloth_scrap_yield_for_dress(dress_name)
-        appearance.remove_dress(dress_name)
+        appearance.destroy_dress(dress_name)
         appearance.apply_to_store()
         _player_add_item_by_id("cloth_scrap_001", scrap_qty)
         try:
@@ -848,7 +848,7 @@ init 4 python:
                 action_id="use_cork",
                 label="Использовать пробку",
                 hook="call",
-                target="UseCorkItem",
+                target="AtticInventoryUseCork",
             ),
         ],
         custom_properties={
@@ -980,6 +980,7 @@ init 4 python:
             "consume_action": "drink",
             "consume_minutes": 30,
             "consume_energy": 20,
+            "fight_speed_boost": 4,
             "consume_fun": 0,
             "consume_text": "Вы выпиваете крепкий бодрящий чай. Тело понемногу отпускает усталость, а в голове проясняется. После этого у вас остаются пустая бутылка и пробка.",
             "consume_outputs": (("empty_bottle_001", 1), ("cork_001", 1)),
@@ -1108,6 +1109,7 @@ init 4 python:
             "item_kind": "weapon",
             "weapon_kind": "hybrid_rifle",
             "attack_points": 14,
+            "speed_penalty": 2,
             "ammo_kind": "arbalest_bolt",
             "can_bleed": True,
         },
@@ -1142,6 +1144,7 @@ init 4 python:
             "armor_slot": "body",
             "armor_points": 8,
             "defence_points": 8,
+            "speed_penalty": 3,
         },
     )
 
@@ -1724,8 +1727,7 @@ label AtticInventoryReturn(return_context="attic", room_code="TavernAtic"):
     if str(room_code or "") == "TavernAtic":
         call TavernAticRestore
         return
-    call RefreshCurrentActionMenu(room_code, "", True)
-    return
+    jump expression room_code
 
 
 label UpstairsRoomSearch(room_code="", restore_label=""):
@@ -1742,8 +1744,7 @@ label UpstairsRoomSearch(room_code="", restore_label=""):
     if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
         call expression str(restore_label or "")
         return
-    call RefreshCurrentActionMenu(_up_room_code, "", True)
-    return
+    jump expression _up_room_code
 
 
 label BackyardCookSoap(recipe_id="soap_recipe"):
@@ -1854,8 +1855,7 @@ label ShootingPracticeReturn(room_code=""):
     if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
         call ForestSubroomRestore
         return
-    call RefreshCurrentActionMenu(_shoot_room_code, "", True)
-    return
+    jump expression _shoot_room_code
 
 
 label UseEnergyTeaItem:

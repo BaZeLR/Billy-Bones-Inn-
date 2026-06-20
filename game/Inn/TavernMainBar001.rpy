@@ -7,8 +7,7 @@ init python:
             str(CurLoc or "") == "TavernMain"
             and str(getLocation("clara") or "") == "TavernMain"
             and str(getLocation("melissa") or "") == "TavernMain"
-            and int(time or 0) == 2
-            and story_event_available("TavernMain", "overheard")
+            and story_event_available("TavernMain", "clara_tavern_visit")
         )
 
     def tavern_bar_invite_targets():
@@ -92,9 +91,9 @@ label TavernMainBarInviteApply(target_npc=""):
     $ fun = _player_clamp(int(fun or 0) + 4, 0, 100)
     $ _bar_effect = player_apply_item_social_effects(_bar_target, "drink_ale_001", True)
     if _bar_target == "clara":
-        $ ClaraVar["trust"] = min(20, int(ClaraVar.get("trust", 0) or 0) + 1)
+        $ Clara.var["trust"] = min(20, int(Clara.var.get("trust", 0) or 0) + 1)
     if _bar_target == "becky":
-        $ BeckyVar["BarDrinkDay"] = int(dayspassed or 0)
+        $ Becky.var["BarDrinkDay"] = int(dayspassed or 0)
     $ MainTxt = "Вы зовете %s к стойке и ставите по кружке эля. Разговор быстро становится свободнее и теплее обычного." % _action_display_name(_bar_target)
     if str((_bar_effect or {}).get("text", "") or "").strip() != "":
         $ MainTxt = str(MainTxt or "") + "\n\n" + str((_bar_effect or {}).get("text", "") or "")
@@ -106,7 +105,7 @@ label TavernMainBarInviteApply(target_npc=""):
 
 label TavernMainBarPlaceholderEvent:
     if tavern_bar_clara_melissa_gossip_available():
-        call checkTriggers("TavernMain", "overheard", 0)
+        call checkTriggers("TavernMain", "clara_tavern_visit", 0)
         return
     python:
         _bar_events = [

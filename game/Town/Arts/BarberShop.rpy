@@ -14,7 +14,7 @@ init python:
 
     def barber_shop_discount_percent():
         try:
-            return max(0, min(90, int(ClaraVar.get("sergio_discount", 0) or 0)))
+            return max(0, min(90, int(Clara.var.get("sergio_discount", 0) or 0)))
         except Exception:
             return 0
 
@@ -32,9 +32,14 @@ init python:
         return "images/general/LocArtisansQuarter1.jpg"
 
     def barber_shop_is_open():
-        weekday = int(week or 0)
-        time_slot = int(time or 0)
-        return (weekday in (1, 3) and time_slot == 2) or (weekday == 6 and time_slot == 0)
+        calendar_v2.sync_state()
+        weekday = int(calendar_v2.week or 0)
+        current_minutes = int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)
+        if weekday in (1, 3):
+            return 12 * 60 <= current_minutes <= 17 * 60 + 59
+        if weekday == 6:
+            return 8 * 60 <= current_minutes <= 11 * 60 + 59
+        return False
 
     def barber_shop_haircut_price(customer_gender="male"):
         if str(customer_gender or "").strip().lower() in ("female", "woman", "girl"):
@@ -142,7 +147,7 @@ label BarberShop:
     $ current_object_id = ""
     $ GirlDressBlock = 0
 
-    if BarberShopRoom.is_open(week, time):
+    if BarberShopRoom.is_open():
         $ MainTxt = barber_shop_intro_text() + "\n\n" + barber_shop_status_text()
     else:
         $ MainTxt = barber_shop_intro_text() + "\n\n" + barber_shop_status_text()
@@ -155,7 +160,7 @@ label BarberShop:
         call screen main_ui
         jump BarberShop
 
-    if not BarberShopRoom.is_open(week, time):
+    if not BarberShopRoom.is_open():
         $ current_action_items = [MenuItem("Вернуться в квартал ремесленников", Jump("ArtisansQuarter"))]
         while True:
             call screen main_ui

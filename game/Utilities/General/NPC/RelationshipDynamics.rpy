@@ -226,7 +226,7 @@ init -42 python:
 
     def relationship_weekly_chore_eval():
         try:
-            return str(SandraVar.get("WeeklyChoreCheckEval", "") or "").strip().lower()
+            return str(Sandra.weekly_chore_eval or "").strip().lower()
         except Exception:
             return ""
 
@@ -380,7 +380,7 @@ init -42 python:
         if not result:
             result = relationship_weekly_chore_eval()
             try:
-                score = relationship_int(SandraVar.get("WeeklyChoreCheckScore", 0), 0)
+                score = relationship_int(Sandra.weekly_chore_score, 0)
             except Exception:
                 score = 0
         if result == "good":

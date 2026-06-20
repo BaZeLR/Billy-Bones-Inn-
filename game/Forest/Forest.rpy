@@ -139,7 +139,7 @@ init python:
         except Exception:
             pass
         try:
-            return int(time or 0) <= 1
+            return int(calendar_v2.hour or 0) < 12
         except Exception:
             return True
 
@@ -152,8 +152,9 @@ init python:
         except Exception:
             pass
         try:
-            current_minutes = int(clock_minutes or 0) % 1440
-            return current_minutes >= ((19 * 60) + 30)
+            current_hour = int(calendar_v2.hour or 0) % 24
+            current_minute = int(calendar_v2.minute or 0) % 60
+            return current_hour > 19 or (current_hour == 19 and current_minute >= 30)
         except Exception:
             return False
 
@@ -248,8 +249,7 @@ label TravelToForest(return_target="StreetTavern"):
     if not forest_can_depart_now():
         $ MainTxt = forest_departure_block_text()
         $ CurLocDesc = MainTxt
-        call RefreshCurrentActionMenu(ForestReturnTarget, "", True)
-        return
+        jump expression ForestReturnTarget
     $ calendar_v2.sync_state()
     $ calendar_v2.advance_minutes(forest_travel_cost_minutes())
     call stat

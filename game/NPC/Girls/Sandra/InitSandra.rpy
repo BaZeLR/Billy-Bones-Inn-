@@ -3,56 +3,8 @@
 # ================================================================================
 label InitSandra:
     python:
-        knowsMC["sandra"] = True
-        # Initialize Sandra's attributes
-        GirlName = 'sandra'
-
-        RealName[GirlName] = 'Сандра'
-        RealName2[GirlName] = 'Сандры'
-        RealName3[GirlName] = 'Сандре'
-        age_girls[GirlName] = 34
-        kids[GirlName] = 3
-        beauty[GirlName] = 65
-        sluttiness[GirlName] = 20
-        sexacts[GirlName] = 4352
-        cuminside[GirlName] = 2593
-        pregnancy[GirlName] = 0
-        pregfather[GirlName] = ''
-        ConceptionChance[GirlName] = 5
-        CurrentLoc[GirlName] = 'TavernMain'
-        PussyWetStart[GirlName] = 20
-        virginity[GirlName] = False
-
-        # Description and default dress
-        girltextdesc[GirlName] = 'Сандра - женщина в самом соку. У нее темные волосы, зеленые глаза и грудь размера DD.'
-        dressdefault[GirlName] = 'workdresszhilet'
-
-        # Default clothing
-        bradef[GirlName] = 'simplebra'
-        pantiesdef[GirlName] = 'simplepanties'
-        legsdef[GirlName] = ''
-        shoesdef[GirlName] = 'simpleshoes'
-
-        # Skills
-        cooking[GirlName] = 90
-        cleaning[GirlName] = 70
-        waitress[GirlName] = 20
-
-        # Job-related data
-        otkroven[GirlName] = 0
-        jobkitchen[GirlName] = 1
-        jobcleaning[GirlName] = 0
-        jobwaitress[GirlName] = 0
-        Friends[GirlName] = 5
-        jobHallAvail[GirlName] = 1
-        jobWhoreAvail[GirlName] = 0
-        jobwhore[GirlName] = 0
-        jobgloryhole[GirlName] = 0
-
-        # Custom variables
-        for key, value in sandra_story_defaults().items():
-            SandraVar.setdefault(key, value)
-        GiftPreferences[GirlName] = ["soap_001", "wild_rose_001", "lavender_001", "berries_001", "mushroom_001", "honey_comb_001", "energy_tea_001", "drink_ale_001"]
+        GirlName = Sandra.code_name
+        Sandra.initialize_new_game_state()
         npc_schedule_set(
             GirlName,
             [
@@ -75,10 +27,6 @@ label InitSandra:
         )
         npc_schedule_sync_currentloc(GirlName)
         peopleData["sandra"] = SandraStaticData
-        Sandra.var = SandraVar
-        Sandra.ensure_story_defaults()
-        Sandra.sync_from_maps()
-        Sandra.sync_from_sandra_maps()
         Sandra.update()
         peopleInfo["sandra"] = Sandra
         if Sandra not in girls:
@@ -105,6 +53,7 @@ init python:
             "revealing_dress_ordered": 0,
             "revealing_dress_code": "",
             "revealing_dress_initiative_seen": 0,
+            "harass_instruction": "",
             "MaidRevengeEnding": 0,
         }
 
@@ -126,9 +75,12 @@ init python:
 
     class SandraInfo(Girl):
         """Sandra runtime: household authority, chore rewards, room access."""
+        unknown_name = "Незнакомка"
+
         def __init__(self):
             super().__init__("sandra")
             self.code_name = "sandra"
+            self.uses_own_var_state = True
             self.data = SandraStaticData
             self.age = 34
             self.rel = 5
@@ -252,10 +204,16 @@ init python:
             self.ensure_story_defaults()
 
         def update(self):
-            super(SandraInfo, self).update()
+            self.name = self.code_name
             self.data = SandraStaticData
             self.relationship = self.rel
-            self.sync_from_sandra_maps()
+            self.ensure_story_defaults()
+            return self
+
+        def initialize_new_game_state(self):
+            self.data = SandraStaticData
+            self.known = True
+            self.ensure_story_defaults()
             return self
 
         def ensure_story_defaults(self):
@@ -294,99 +252,6 @@ init python:
             self.var["SandraSex"] = 1 if self.sandraSex else 0
             return self.var
 
-        def sync_from_sandra_maps(self):
-            self.rel = people_to_int(people_get_map("Friends").get("sandra", self.rel), self.rel)
-            self.relationship = self.rel
-            self.openness = people_to_int(people_get_map("otkroven").get("sandra", self.openness), self.openness)
-            self.corruption = people_to_int(people_get_map("sluttiness").get("sandra", self.corruption), self.corruption)
-            self.drunk = people_to_int(people_get_map("Drunk").get("sandra", self.drunk), self.drunk)
-            self.talked_today = people_to_int(people_get_map("TalkedToday").get("sandra", self.talked_today), self.talked_today)
-            self.flirted_today = people_to_int(people_get_map("FlirtedToday").get("sandra", self.flirted_today), self.flirted_today)
-            self.gifted_today = people_to_int(people_get_map("GiftedToday").get("sandra", self.gifted_today), self.gifted_today)
-            self.asked_today = people_to_int(people_get_map("AskedToday").get("sandra", self.asked_today), self.asked_today)
-            self.fucked_today = people_to_int(people_get_map("FuckedToday").get("sandra", self.fucked_today), self.fucked_today)
-            for map_name, stat_key in [
-                ("kids", "kids"),
-                ("beauty", "beauty"),
-                ("sexacts", "sexacts"),
-                ("cuminside", "cuminside"),
-                ("pregnancy", "pregnancy"),
-                ("pregfather", "pregfather"),
-                ("ConceptionChance", "ConceptionChance"),
-                ("PussyWetStart", "PussyWetStart"),
-                ("virginity", "virginity"),
-                ("Breastfeed", "breastfeed"),
-            ]:
-                table = people_get_map(map_name)
-                if "sandra" in table:
-                    self.stats[stat_key] = table.get("sandra")
-            for map_name, job_key in [
-                ("jobkitchen", "jobkitchen"),
-                ("jobcleaning", "jobcleaning"),
-                ("jobwaitress", "jobwaitress"),
-                ("jobHallAvail", "jobHallAvail"),
-                ("jobWhoreAvail", "jobWhoreAvail"),
-                ("jobwhore", "jobwhore"),
-                ("jobgloryhole", "jobgloryhole"),
-            ]:
-                table = people_get_map(map_name)
-                if "sandra" in table:
-                    self.jobs[job_key] = table.get("sandra")
-            for map_name, skill_key in [("cooking", "cooking"), ("cleaning", "cleaning"), ("waitress", "waitress")]:
-                table = people_get_map(map_name)
-                if "sandra" in table:
-                    self.skills[skill_key] = table.get("sandra")
-            self.ensure_story_defaults()
-            return self
-
-        def sync_sandra_maps(self):
-            people_get_map("Friends")["sandra"] = people_to_int(self.rel, 0)
-            people_get_map("otkroven")["sandra"] = people_to_int(self.openness, 0)
-            people_get_map("sluttiness")["sandra"] = people_to_int(self.corruption, 0)
-            people_get_map("Drunk")["sandra"] = people_to_int(self.drunk, 0)
-            people_get_map("TalkedToday")["sandra"] = people_to_int(self.talked_today, 0)
-            people_get_map("FlirtedToday")["sandra"] = people_to_int(self.flirted_today, 0)
-            people_get_map("GiftedToday")["sandra"] = people_to_int(self.gifted_today, 0)
-            people_get_map("AskedToday")["sandra"] = people_to_int(self.asked_today, 0)
-            people_get_map("FuckedToday")["sandra"] = people_to_int(self.fucked_today, 0)
-            for map_name, stat_key in [
-                ("kids", "kids"),
-                ("beauty", "beauty"),
-                ("sexacts", "sexacts"),
-                ("cuminside", "cuminside"),
-                ("pregnancy", "pregnancy"),
-                ("pregfather", "pregfather"),
-                ("ConceptionChance", "ConceptionChance"),
-                ("PussyWetStart", "PussyWetStart"),
-                ("virginity", "virginity"),
-                ("Breastfeed", "breastfeed"),
-            ]:
-                people_get_map(map_name)["sandra"] = self.stats.get(stat_key)
-            for map_name, job_key in [
-                ("jobkitchen", "jobkitchen"),
-                ("jobcleaning", "jobcleaning"),
-                ("jobwaitress", "jobwaitress"),
-                ("jobHallAvail", "jobHallAvail"),
-                ("jobWhoreAvail", "jobWhoreAvail"),
-                ("jobwhore", "jobwhore"),
-                ("jobgloryhole", "jobgloryhole"),
-            ]:
-                people_get_map(map_name)["sandra"] = self.jobs.get(job_key, 0)
-            for map_name, skill_key in [("cooking", "cooking"), ("cleaning", "cleaning"), ("waitress", "waitress")]:
-                people_get_map(map_name)["sandra"] = self.skills.get(skill_key, 0)
-            return self
-
-        def reset_daily(self, full=False):
-            super(SandraInfo, self).reset_daily(full)
-            self.talked_today = 0
-            self.flirted_today = 0
-            self.gifted_today = 0
-            self.asked_today = 0
-            self.fucked_today = 0
-            self.drunk = 0
-            self.sync_sandra_maps()
-            return self
-
         def story_value(self, key, default=0):
             flags = self.ensure_story_defaults()
             return flags.get(key, default)
@@ -395,6 +260,73 @@ init python:
             flags = self.ensure_story_defaults()
             flags[key] = value
             return value
+
+        def kitchen_can_discuss_household_food(self):
+            self.update()
+            return (
+                str(getLocation(self.code_name) or "") == "TavernKitchen"
+                and tavern_kitchen_food_stock_count() > 0
+                and people_to_int(self.rel, 0) >= 5
+                and people_to_int(self.asked_today, 0) == 0
+            )
+
+        def _add_household_relation(self, girl, amount=1):
+            if girl is None:
+                return
+            try:
+                girl.update()
+            except Exception:
+                pass
+            girl.rel = max(0, min(20, people_to_int(getattr(girl, "rel", 0), 0) + people_to_int(amount, 0)))
+            girl.relationship = girl.rel
+            girl.fun = max(0, min(100, people_to_int(getattr(girl, "fun", 0), 0) + 1))
+
+        def apply_kitchen_regular_breakfast_request(self, used_item_id=""):
+            self.update()
+            self.asked_today = people_to_int(self.asked_today, 0) + 1
+            self.talked_today = people_to_int(self.talked_today, 0) + 1
+            self.rel = min(20, people_to_int(self.rel, 0) + 1)
+            self.relationship = self.rel
+            self.fun = min(100, people_to_int(self.fun, 0) + 2)
+            self.ensure_story_defaults()["kitchen_regular_breakfast_requests"] = people_to_int(self.var.get("kitchen_regular_breakfast_requests", 0), 0) + 1
+            self._add_household_relation(Melissa, 1)
+            self._add_household_relation(Amanda, 1)
+            player.change_stat("fun", 2)
+            return self.kitchen_regular_breakfast_text(used_item_id)
+
+        def apply_kitchen_client_manners_request(self, used_item_id=""):
+            self.update()
+            self.asked_today = people_to_int(self.asked_today, 0) + 1
+            self.talked_today = people_to_int(self.talked_today, 0) + 1
+            self.rel = min(20, people_to_int(self.rel, 0) + 1)
+            self.relationship = self.rel
+            self.ensure_story_defaults()["kitchen_client_manners_requests"] = people_to_int(self.var.get("kitchen_client_manners_requests", 0), 0) + 1
+            player.sync_from_store()
+            player.economy.tavern_fame = people_to_int(player.economy.tavern_fame, 0) + 1
+            player.economy.apply_to_store()
+            return self.kitchen_client_manners_text(used_item_id)
+
+        def apply_kitchen_tea_with_becky(self):
+            self.update()
+            player.remove_item("energy_tea_001", 1)
+            self.rel = min(20, people_to_int(self.rel, 0) + 1)
+            self.relationship = self.rel
+            self.fun = min(100, people_to_int(self.fun, 0) + 1)
+            self._add_household_relation(Becky, 1)
+            player.change_stat("fun", 1)
+            return "Вы завариваете бодрящий чай и угощаете им Сандру с Бекки. Разговор за столом быстро теплеет: Сандра благодарит вас за внимание к хозяйству, а Бекки охотно подхватывает кухонные сплетни и делится парой полезных замечаний о трактирных делах."
+
+        def kitchen_regular_breakfast_text(self, used_item_id=""):
+            text = "Вы просите Сандру почаще собирать домочадцев за общий утренний стол и не давать всем разбредаться без толку. Сандра выслушивает вас без лишних слов, потом переводит взгляд на оставленные припасы и кивает.\n\n\"Ладно. Если уж на кухне есть из чего готовить, я поговорю с девочками. Общий завтрак дому не повредит, а там и работа ровнее пойдет,\" решает она."
+            if str(used_item_id or "").strip():
+                text += "\nДля ближайшего такого стола Сандра сразу откладывает %s." % tavern_kitchen_food_item_name(used_item_id)
+            return text
+
+        def kitchen_client_manners_text(self, used_item_id=""):
+            text = "Вы просите Сандру поговорить с домочадцами и держаться с гостями немного мягче обычного. Сандра щурится, явно взвешивая сказанное, а потом нехотя соглашается.\n\n\"Если уж хочешь, чтобы в трактире было больше довольных рож, я скажу девочкам не срываться на людях почем зря. Но и ты смотри, чтобы работа не шла через пень-колоду,\" бурчит она."
+            if str(used_item_id or "").strip():
+                text += "\nЗаодно Сандра решает пустить %s на что-нибудь поприятнее для посетителей." % tavern_kitchen_food_item_name(used_item_id)
+            return text
 
         def first_month_passed(self):
             try:
@@ -432,18 +364,6 @@ init python:
                 if row["min"] <= value <= row["max"]:
                     return row
             return self.mana_reaction_table["low"]
-
-        def change_mana(self, amount, reason=""):
-            before = people_to_int(self.mana, 0)
-            self.mana = max(0, min(100, before + people_to_int(amount, 0)))
-            self.reaction_state["last_mana_delta"] = self.mana - before
-            self.reaction_state["last_mana_reasons"] = [reason] if reason else []
-            return self.mana
-
-        def change_fear(self, amount, reason=""):
-            before = people_to_int(self.fear, 0)
-            self.fear = max(0, min(100, before + people_to_int(amount, 0)))
-            return self.fear
 
         def daily_mana_update(self, context=None):
             context = dict(context or {})
@@ -541,7 +461,6 @@ init python:
                 if people_to_int(self.anger_with_player, 0) > 40:
                     self.rebellion = max(0, min(100, people_to_int(self.rebellion, 0) + 2))
             self.save_story_state()
-            self.sync_sandra_maps()
             return self.var
 
         def weekly_thanks_wake_seen(self, step_index=0, gains=None):
@@ -560,7 +479,6 @@ init python:
             self.openness = max(0, min(20, people_to_int(self.openness, 0) + people_to_int(gains.get("otkroven", 0), 0)))
             self.corruption = max(0, min(100, people_to_int(self.corruption, 0) + people_to_int(gains.get("sluttiness", 0), 0)))
             self.save_story_state()
-            self.sync_sandra_maps()
             return self.var
 
         def night_thanks_seen(self):
@@ -579,7 +497,6 @@ init python:
             self.openness = max(0, min(20, people_to_int(self.openness, 0) + 2))
             self.corruption = max(0, min(100, people_to_int(self.corruption, 0) + 3))
             self.save_story_state()
-            self.sync_sandra_maps()
             return self.var
 
         def weekly_thanks_event_ready(self):

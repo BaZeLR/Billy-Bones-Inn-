@@ -14,6 +14,7 @@ init 99 python:
         TavernMainBarObject,
         TavernKitchenHearthObject,
         TavernKitchenCauldronObject,
+        TavernStorageSuppliesObject,
         TavernMyRoomBedObject,
         TavernMyRoomChestObject,
         TavernMyRoomWindowObject,
@@ -23,4 +24,9 @@ init 99 python:
         DressShopFemaleSamplesObject,
         DressShopMaleSamplesObject,
         DressShopWorktableObject,
+        BeckyHomeBedObject,
+        BeckyHomeChestsObject,
+        BeckyHomeDinnerTableObject,
+        BeckyHomeBackDoorObject,
+        BeckyHomeDarkCornerObject,
     ]

@@ -312,7 +312,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     $ _ias_inc_arousal("You", 18)
                 else:
                     $ _ias_inc_arousal("You", 22)
-                $ AmandaVar["suckyou"] = 1
+                $ Amanda.set_var_int("suckyou", 1)
                 call ShowCurrentSex(GirlNameASDS)
                 if GirlLocASDS == "street":
                     if Arousal.get("You", 0) < 20:
@@ -358,13 +358,13 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                 $ CockInTits[GirlNameASDS] = 0
                 $ _ias_inc_arousal("You", 25)
                 $ _ias_inc_arousal(GirlNameASDS, 20)
-                $ AmandaVar["fuckyou"] = 1
-                if AmandaVar.get("knownotvirgin", 0) == 0 and virginity.get(GirlNameASDS, 1) == 0:
+                $ Amanda.set_var_int("fuckyou", 1)
+                if Amanda.var_int("knownotvirgin", 0) == 0 and Amanda.stats.get("virginity", True) == False:
                     "Кстати, вы легко и без препятствий вошли в Аманду. Похоже, она уже не девочка. Может стоит потом ее об этом расспросить."
-                    $ AmandaVar["knownotvirgin"] = 1
-                if virginity.get(GirlNameASDS, 1):
-                    $ virginity[GirlNameASDS] = 0
-                    $ AmandaVar["knownotvirgin"] = 1
+                    $ Amanda.set_var_int("knownotvirgin", 1)
+                if Amanda.stats.get("virginity", True):
+                    $ Amanda.stats["virginity"] = False
+                    $ Amanda.set_var_int("knownotvirgin", 1)
                 call ShowCurrentSex(GirlNameASDS)
                 if GirlLocASDS == "street":
                     if pregnancy.get(GirlNameASDS, 0) < 130:
@@ -501,7 +501,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     call ShowImage(GirlNameASDS, "sexroom", _amanda_naked_pic)
                 $ _ias_set_arousal("You", 0)
                 $ _ias_set_arousal(GirlNameASDS, 0)
-                $ AmandaVar["kickyoufromroom"] = 1
+                $ Amanda.set_var_int("kickyoufromroom", 1)
                 $ SomebodyCums = 0
                 call ShowCurrentSex(GirlNameASDS)
                 call DressUp(GirlNameASDS)
@@ -524,7 +524,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     $ _aah_slut_friends_increase(GirlNameASDS, 16, 2, 1, 42, 1, 1)
                 $ _ias_set_arousal("You", 0)
                 $ _ias_set_arousal(GirlNameASDS, 0)
-                $ AmandaVar["kickyoufromroom"] = 1
+                $ Amanda.set_var_int("kickyoufromroom", 1)
                 call ShowCurrentSex(GirlNameASDS)
                 call DressUp(GirlNameASDS)
                 $ calendar_v2.advance_minutes(60)

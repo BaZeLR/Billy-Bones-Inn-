@@ -50,7 +50,7 @@ label EventFightSmall(eyewitness=0):
     else:
         $ current_action_items = []
         $ money -= CurMoneyLoss
-        if (FightRand == 3 or FightRand > 4) and callable(globals().get("dog_catch_delinquent_apply")):
+        if FightRand == 3 or FightRand > 4:
             $ _dog_tavern_result = dog_catch_delinquent_apply("tavern_nonpayment")
             if bool(_dog_tavern_result.get("ok", False)):
                 if FightRand == 3:
@@ -91,7 +91,7 @@ label EventFightSmallApply(reaction_code=1, CurMoneyLoss=0, FightRand=0, PhraseE
             $ extra_text = "Вы кинулись ловить вора, но споткнулись и растянулись на полу, выбыв из участников забавы."
         $ money -= CurMoneyLoss
 
-    if (FightRand == 3 or FightRand > 4) and callable(globals().get("dog_catch_delinquent_apply")):
+    if FightRand == 3 or FightRand > 4:
         $ _dog_tavern_result = dog_catch_delinquent_apply("tavern_nonpayment")
         if bool(_dog_tavern_result.get("ok", False)):
             if FightRand == 3:

@@ -5,9 +5,7 @@ label IntIngaTalk(show_menu=True):
     $ Talked.setdefault("inga", 0)
     $ IngaVar.setdefault("Knowher", 0)
     if str(CurLoc or "") == "GroceryStore":
-        $ _inga_talk_picture = str(grocery_store_talk_picture("inga") or "").strip()
-        if _inga_talk_picture:
-            call ShowImage("", "", _inga_talk_picture)
+        vscene "images/inga/StreetSex/minet1.jpg"
 
     if not bool(show_menu):
         call GirlsDesc("inga")
@@ -17,7 +15,7 @@ label IntIngaTalk(show_menu=True):
     $ current_action_title = "Разговор с Ингенборг"
     $ current_action_content = None
     $ current_action_items = [
-        MenuItem("Осмотреть", Function(main_ui_call_label, "IntIngaTalk", False)),
+        MenuItem("Осмотреть", Call("IntIngaTalk", False)),
         MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
     ]
 

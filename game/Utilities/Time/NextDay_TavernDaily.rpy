@@ -101,7 +101,7 @@ label NextDay_TavernDaily():
             TotalDay['KidsMoney'] += player_state().economy.weekly_child_support_money()
         if MyStallion:
             TotalDay['HorseFood'] += 3
-        if MongolVar['WillTryToSteal']:
+        if Mongol.var['WillTryToSteal']:
             _dog_theft_result = None
             try:
                 ensure_dog_runtime()
@@ -119,20 +119,20 @@ label NextDay_TavernDaily():
                 _dog_theft_result = dog_catch_delinquent_apply("horse")
             if _dog_theft_result and bool(_dog_theft_result.get("ok", False)):
                 TotalDay['HorseStolen'] = '{b}Ночью какой-то негодяй попытался увести вашего коня, но пес поднял лай, сбил вора с ног и не дал ему уйти. %s{/b}\n' % str(_dog_theft_result.get("text", "") or "")
-                MongolVar['WillTryToSteal'] = 0
-                MongolVar['TheftAsk'] = 0
-                MongolVar['AskSawStolen'] = 0
-                MongolVar['SawStolen'] = 0
-                ZimmerVar['ComplainHorse'] = 0
+                Mongol.var['WillTryToSteal'] = 0
+                Mongol.var['TheftAsk'] = 0
+                Mongol.var['AskSawStolen'] = 0
+                Mongol.var['SawStolen'] = 0
+                Zimmer.var['ComplainHorse'] = 0
             else:
                 TotalDay['HorseStolen'] = '{b}НЕГОДЯИ ПОД ПОКРОВОМ НОЧИ УКРАЛИ У ВАС ВАШЕГО КОНИКА, ВАШЕГО НЕНАГЛЯДНОГО %s. УТРОМ ВЫ ОБНАРУЖИЛИ ЧТО ЗАМОК НА ВОРОТАХ КОНЮШНИ ВЗЛОМАН, А ЛОШАДИ И СЛЕД ПРОСТЫЛ. НИКТО НИЧЕГО НЕ ВИДЕЛ И НЕ СЛЫШАЛ.{/b}\n' % MyStallion.upper()
                 MyStallion = ''
                 HorsePurchasePrice = 0
                 StolenHorseDays = 14
-                MongolVar['TheftAsk'] = 0
-                MongolVar['AskSawStolen'] = 0
-                MongolVar['SawStolen'] = 0
-                ZimmerVar['ComplainHorse'] = 0
+                Mongol.var['TheftAsk'] = 0
+                Mongol.var['AskSawStolen'] = 0
+                Mongol.var['SawStolen'] = 0
+                Zimmer.var['ComplainHorse'] = 0
         TotalDay['whorerevenue'] = 0
         # Reset jobs
         jobwhore['georgett'] = 0

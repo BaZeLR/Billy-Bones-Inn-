@@ -65,73 +65,73 @@ label IntGeorgettTalkRefresh(girl_name="georgett", girl_loc="street"):
     $ current_action_content = None
     $ current_action_items = []
     $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
-    $ current_action_items.append(MenuItem("Болтать", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "smalltalk")))
+    $ current_action_items.append(MenuItem("Болтать", Call("IntGeorgettTalkApply", girl_name, girl_loc, "smalltalk")))
 
     if Georgett.can_ask_topic("clients"):
-        $ current_action_items.append(MenuItem("Спросить о клиентах", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "ask_clients")))
+        $ current_action_items.append(MenuItem("Спросить о клиентах", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_clients")))
 
     if Georgett.can_ask_topic("sex"):
-        $ current_action_items.append(MenuItem("Спросить о сексе", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "ask_sex")))
+        $ current_action_items.append(MenuItem("Спросить о сексе", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_sex")))
 
     if Georgett.can_ask_topic("family"):
-        $ current_action_items.append(MenuItem("Спросить о семье", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "ask_family")))
+        $ current_action_items.append(MenuItem("Спросить о семье", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_family")))
 
     if Georgett.can_ask_topic("pregnancy"):
-        $ current_action_items.append(MenuItem("Спросить о беременности", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "ask_pregnancy")))
+        $ current_action_items.append(MenuItem("Спросить о беременности", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_pregnancy")))
 
     if Georgett.can_ask_topic("kids"):
-        $ current_action_items.append(MenuItem("Спросить о детях", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "ask_kids")))
+        $ current_action_items.append(MenuItem("Спросить о детях", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_kids")))
 
     if Georgett.can_ask_topic("gerhard"):
-        $ current_action_items.append(MenuItem("Спросить об отце Герхарде", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "ask_gerhard")))
+        $ current_action_items.append(MenuItem("Спросить об отце Герхарде", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_gerhard")))
 
     if int(Liza.story_value("SawChurchAfterCermon", 0) or 0) and Georgett.can_talk_today():
-        $ current_action_items.append(MenuItem("Рассказать про Лизетту и отца Герхарда", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "tell_liza_gerhard")))
+        $ current_action_items.append(MenuItem("Рассказать про Лизетту и отца Герхарда", Call("IntGeorgettTalkApply", girl_name, girl_loc, "tell_liza_gerhard")))
 
     if Georgett.can_invite_to_tavern() and Georgett.can_talk_today():
-        $ current_action_items.append(MenuItem("Предложить работать у себя в трактире", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "invite_tavern")))
+        $ current_action_items.append(MenuItem("Предложить работать у себя в трактире", Call("IntGeorgettTalkApply", girl_name, girl_loc, "invite_tavern")))
 
     if Georgett.can_work_tavern() and Georgett.can_talk_today():
-        $ current_action_items.append(MenuItem("Спросить как работается у вас в трактире", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "ask_work")))
+        $ current_action_items.append(MenuItem("Спросить как работается у вас в трактире", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_work")))
 
     if Georgett.can_work_tavern() and Georgett.can_talk_today() and int(Liza.story_value("GloryHoleAsked", 0) or 0) == 1 and int(Georgett.story_value("GloryHoleExplained", 0) or 0) == 0:
-        $ current_action_items.append(MenuItem("Спросить про работу в \"Пьяном Пирате\"", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "ask_pirate")) )
+        $ current_action_items.append(MenuItem("Спросить про работу в \"Пьяном Пирате\"", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_pirate")) )
 
     if Georgett.can_work_tavern() and Georgett.can_talk_today() and TavernGloryHole == 2 and int(Georgett.story_value("GloryHoleAgreed", 0) or 0) == 0:
-        $ current_action_items.append(MenuItem("Договориться об условиях работы у глорихола", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "gloryhole_terms")) )
+        $ current_action_items.append(MenuItem("Договориться об условиях работы у глорихола", Call("IntGeorgettTalkApply", girl_name, girl_loc, "gloryhole_terms")) )
 
     if (
         (
             int(Georgett.story_value("TellAboutEddieMomSex", 0) or 0) == 0
-            and (BeckyVar.get("EddieTryToFuck", 0) == 4 or BeckyVar.get("visitedhome", 0) >= 7)
+            and (Becky.var.get("EddieTryToFuck", 0) == 4 or Becky.var.get("visitedhome", 0) >= 7)
         )
         or (
-            BeckyVar.get("EddieGeorg", 0) == 0
-            and EddieVar.get("TalkedAboutGeorgett", 0) == 1
-            and BeckyVar.get("visitedhome", 0) >= 3
-            and (EddieVar.get("SawMomSex", 0) > 0 or BeckyVar.get("HomeSex", 0) > 0)
+            Becky.var.get("EddieGeorg", 0) == 0
+            and Eddie.var.get("TalkedAboutGeorgett", 0) == 1
+            and Becky.var.get("visitedhome", 0) >= 3
+            and (Eddie.var.get("SawMomSex", 0) > 0 or Becky.var.get("HomeSex", 0) > 0)
         )
     ) and Georgett.can_talk_today():
-        $ current_action_items.append(MenuItem("Обсудить Эдди", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "talk_eddie")))
+        $ current_action_items.append(MenuItem("Обсудить Эдди", Call("IntGeorgettTalkApply", girl_name, girl_loc, "talk_eddie")))
 
-    if BeckyVar.get("EddieGeorg", 0) > 0 and BeckyVar.get("EddieWhoreHome", 0) == 0 and (money > 25 or (BeckyVar.get("EddieGeorg", 0) > 1 and money > 10)) and Talked.get(girl_name, 0) < 2:
-        $ current_action_items.append(MenuItem("Предложить Жоржетте проспонсировать ее визит к Эдди домой", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "sponsor_eddie_home")) )
+    if Becky.var.get("EddieGeorg", 0) > 0 and Becky.var.get("EddieWhoreHome", 0) == 0 and (money > 25 or (Becky.var.get("EddieGeorg", 0) > 1 and money > 10)) and Talked.get(girl_name, 0) < 2:
+        $ current_action_items.append(MenuItem("Предложить Жоржетте проспонсировать ее визит к Эдди домой", Call("IntGeorgettTalkApply", girl_name, girl_loc, "sponsor_eddie_home")) )
 
-    if BeckyVar.get("EddieGeorg", 0) > 0 and time <= 3:
-        $ current_action_items.append(MenuItem("Спросить, не приходил ли Эдди", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "ask_eddie_visit")) )
+    if Becky.var.get("EddieGeorg", 0) > 0 and int(calendar_v2.hour or 0) <= 15:
+        $ current_action_items.append(MenuItem("Спросить, не приходил ли Эдди", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_eddie_visit")) )
 
     if (money >= 8 or (money >= 4 and girl_loc == "tavern")) and cametoday < cancumdaily:
-        $ current_action_items.append(MenuItem("Снять", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "hire")) )
+        $ current_action_items.append(MenuItem("Снять", Call("IntGeorgettTalkApply", girl_name, girl_loc, "hire")) )
 
-    $ current_action_items.append(MenuItem("Лапать", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "grope")))
+    $ current_action_items.append(MenuItem("Лапать", Call("IntGeorgettTalkApply", girl_name, girl_loc, "grope")))
 
     if Georgett.can_talk_today() and int(Georgett.rel or 0) >= 8 and int(Georgett.stats.get("pregnancy", 0) or 0) >= 120:
         $ _dad_phrase = DaddyAskBuildPhrase(girl_name)
         if str(_dad_phrase or "") != "":
-            $ current_action_items.append(MenuItem("Поинтересоваться, знает ли она от кого залетела", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "ask_dad")) )
+            $ current_action_items.append(MenuItem("Поинтересоваться, знает ли она от кого залетела", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_dad")) )
 
     if girl_loc == "tavern":
-        $ current_action_items.append(MenuItem("Обсудить одежду", Function(main_ui_call_label, "IntGeorgettTalkApply", girl_name, girl_loc, "dress")) )
+        $ current_action_items.append(MenuItem("Обсудить одежду", Call("IntGeorgettTalkApply", girl_name, girl_loc, "dress")) )
 
     $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
     return
@@ -278,36 +278,36 @@ label IntGeorgettTalkApply(girl_name="georgett", girl_loc="street", choice_code=
         $ Georgett.jobs["jobGloryHoleAvail"] = 1
         $ Liza.jobs["jobGloryHoleAvail"] = 1
         $ Georgett.sync_georgett_maps()
-        $ Liza.sync_liza_maps()
+        $ Liza.sync_shared_state()
         $ Georgett.finish_talk()
         $ CurLocDesc = MainTxt
         call IntGeorgettTalkRefresh(girl_name, girl_loc)
         return
 
     if str(choice_code or "") == "talk_eddie":
-        if BeckyVar.get("EddieTryToFuck", 0) == 4 or BeckyVar.get("visitedhome", 0) >= 7:
+        if Becky.var.get("EddieTryToFuck", 0) == 4 or Becky.var.get("visitedhome", 0) >= 7:
             $ MainTxt = "«Жоржетт, ты была права. Эдди действительно по своей хозяйке сох. Я им все подстроил, дверь в спальню отпер, Бекки раздел и внимание ее отвлек. Ну а Эдди предупредил заранее, что может заходить на огонек. Так он паршивец ни секунды не сомневался, забежал и засадил своей леди-босс!»\n«А она что?»\n«А ничего, подмахивать ему стала как ни в чем не бывало.»\n«Ну, я чего-то в таком роде и ожидала с первого раза как он меня снял. Что ж, теперь, когда его мечта сбылась, наверное ко мне он будет захаживать пореже.»"
             $ Georgett.mark_asked_topic("TellAboutEddieMomSex", 0)
         else:
             $ MainTxt = "Вы рассказываете Жоржетте про сальные взгляды, которые бросает Эдди каждый раз, когда подозревает, что его хозяйка позволяет вам какие-нибудь вольности. Жоржетта не остается в долгу и в свою очередь со смехом рассказывает вам, что когда Эдди ее снимает, он просит, чтобы она изображала строгую леди-босс.\nОтсмеявшись, она предлагает вам разнообразить половую жизнь Эдди, зайдя к нему домой. Вы соглашаетесь."
-            $ BeckyVar["EddieGeorg"] = 1
+            $ Becky.var["EddieGeorg"] = 1
         $ Georgett.finish_talk()
         $ CurLocDesc = MainTxt
         call IntGeorgettTalkRefresh(girl_name, girl_loc)
         return
 
     if str(choice_code or "") == "sponsor_eddie_home":
-        if BeckyVar.get("EddieGeorg", 0) == 1:
+        if Becky.var.get("EddieGeorg", 0) == 1:
             $ MainTxt = "Вы вручаете Жоржетте 25 мараведи и говорите, что очень бы хотели посмотреть на то, как она займется любовью с Эдди на глазах у Бекки."
             $ money -= 25
-        elif BeckyVar.get("EddieGeorg", 0) == 2 and BeckyVar.get("visitedhome", 0) == 5:
+        elif Becky.var.get("EddieGeorg", 0) == 2 and Becky.var.get("visitedhome", 0) == 5:
             $ MainTxt = "Вы вручаете Жоржетте 10 мараведи и говорите, что хотите повторения."
             $ money -= 10
         else:
             $ MainTxt = "Вы вручаете Жоржетте 10 мараведи и говорите, что хотели бы еще раз посмотреть на выражение лица вдовы Блэнкеншип."
             $ money -= 10
         $ MainTxt += "\n\nЖоржетта с радостью берет деньги и заверяет вас, что при встрече c Эдди непременно предложит ему навестить его у него дома за ужином."
-        $ BeckyVar["EddieWhoreHome"] = 1
+        $ Becky.var["EddieWhoreHome"] = 1
         $ Georgett.finish_talk()
         call stat
         $ CurLocDesc = MainTxt
@@ -316,32 +316,32 @@ label IntGeorgettTalkApply(girl_name="georgett", girl_loc="street", choice_code=
 
     if str(choice_code or "") == "ask_eddie_visit":
         $ MainTxt = "«Эй, Жоржи, наш друг Эдди к тебе случаем не захаживал?» - осведомляетесь вы у своей работницы."
-        if BeckyVar.get("EddieWhoreHome", 0) <= 1:
-            if BeckyVar.get("visitedhome", 0) >= 7:
+        if Becky.var.get("EddieWhoreHome", 0) <= 1:
+            if Becky.var.get("visitedhome", 0) >= 7:
                 $ MainTxt += "\n\n«Не, он говорит что теперь с хозяйкой своей все больше перепихивается, а на мне экономит.»"
             else:
                 $ MainTxt += "\n\n«Не, сегодня его не было. Может завтра зайдет.»"
         else:
             $ MainTxt += "\n\n«Заходил.»"
-            if BeckyVar.get("EddieGeorg", 0) == 1:
-                if BeckyVar.get("EddieWhoreHome", 0) == 4:
-                    if BeckyVar.get("visitedhome", 0) >= 7:
+            if Becky.var.get("EddieGeorg", 0) == 1:
+                if Becky.var.get("EddieWhoreHome", 0) == 4:
+                    if Becky.var.get("visitedhome", 0) >= 7:
                         $ MainTxt += "\n\n«Согласился, говорит что пусть его леди-босс посмотрит, поучится, разогреется.»"
                     else:
                         $ MainTxt += "\n\n«Пришел в восторг от моего предложения, сказал чтобы сегодня я к нему домой на огонек заглянула.»"
                     $ MainTxt += "\n\n«Так что если хочешь посмотреть - заглядывай и ты к вдове на огонек.»"
                 else:
                     $ MainTxt += "\n\n«Отказался.»"
-                    if BeckyVar.get("visitedhome", 0) < 5:
+                    if Becky.var.get("visitedhome", 0) < 5:
                         $ MainTxt += "\n\n«Объяснил, сказал что хозяйка его больно строгая, вышвырнет его за такие шутки.»"
-                    elif EddieVar.get("SawMomSex", 0) == 0 or BeckyVar.get("HomeSex", 0) == 0:
+                    elif Eddie.var.get("SawMomSex", 0) == 0 or Becky.var.get("HomeSex", 0) == 0:
                         $ MainTxt += "\n\n«Объяснил, сказал что хоть Бекки и разрешила домашним водить своих любовников домой, но он все-таки еще стесняется, не хочет быть первым.»"
-                    elif BeckyVar.get("EddieWhoreHome", 0) == 2:
+                    elif Becky.var.get("EddieWhoreHome", 0) == 2:
                         $ MainTxt += "\n\n«Объяснил, сказал что идея хорошая, только вот больно дорого я с него запросила, нету у него столько.»"
                     else:
                         $ MainTxt += "\n\n«Объяснил, сказал что в другой раз такое замутим, но сейчас ему мол нет мочи терпеть, так что он сразу отымел меня и ушел.»"
             else:
-                if BeckyVar.get("EddieWhoreHome", 0) == 4:
+                if Becky.var.get("EddieWhoreHome", 0) == 4:
                     $ MainTxt += "\n\n«Согласился, конечно. Говорит прошлый раз было здорово, надо повторить. Сказал чтобы сегодня я к нему домой на огонек заглянула. Так что если хочешь посмотреть - заглядывай и ты к вдовушке на огонек.»"
                 else:
                     $ MainTxt += "\n\n«Отказался, сказал что ему прямо сейчас хочется, мол нет мочи терпеть.»"

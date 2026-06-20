@@ -1,6 +1,16 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+
+init python:
+    def stolyar_workshop_is_open():
+        calendar_v2.sync_state()
+        current_minutes = int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)
+        return int(calendar_v2.week or 0) != 7 and 6 * 60 <= current_minutes <= 17 * 60 + 59
+
+    def stolyar_workshop_order_window_open():
+        return stolyar_workshop_is_open()
+
 label StolyarWorkshop:
     call EnterLocation("StolyarWorkshop")
     $ CurLoc = "StolyarWorkshop"
@@ -20,20 +30,20 @@ label StolyarWorkshop:
             georgett_whore = int(jobWhoreAvail.get("georgett", 0) or 0) > 0
         except Exception:
             georgett_whore = False
-    $ glory_explained = int(GeorgettVar.get("GloryHoleExplained", 0) or 0) == 1
+    $ glory_explained = int(Georgett.story_value("GloryHoleExplained", 0) or 0) == 1
     $ can_ask_slogan = (SloganFixed == 0 and slogan_asked == 0)
     $ can_pay_slogan = (SloganFixed == 0 and slogan_asked > 0 and money >= 200)
     $ can_ask_hole = (georgett_whore and hole_asked == 0 and TavernHole == 0)
-    $ can_pay_hole = (georgett_whore and hole_asked > 0 and TavernHole == 0 and money >= 100 and time == 0)
+    $ can_pay_hole = (georgett_whore and hole_asked > 0 and TavernHole == 0 and money >= 100 and stolyar_workshop_order_window_open())
     $ can_ask_glory = (georgett_whore and glory_asked == 0 and TavernGloryHole == 0 and glory_explained)
-    $ can_pay_glory = (georgett_whore and glory_asked > 0 and TavernGloryHole == 0 and money >= 700 and time == 0)
+    $ can_pay_glory = (georgett_whore and glory_asked > 0 and TavernGloryHole == 0 and money >= 700 and stolyar_workshop_order_window_open())
     $ can_ask_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked == 0)
-    $ can_pay_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked > 0 and money >= 75 and time == 0)
+    $ can_pay_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked > 0 and money >= 75 and stolyar_workshop_order_window_open())
     $ can_ask_dog_booth = (dog.owned and dog.booth_built == 0 and dog_booth_asked == 0)
-    $ can_pay_dog_booth = (dog.owned and dog.booth_built == 0 and dog_booth_asked > 0 and money >= 100 and time == 0)
+    $ can_pay_dog_booth = (dog.owned and dog.booth_built == 0 and dog.booth_built == 0 and dog_booth_asked > 0 and money >= 100 and stolyar_workshop_order_window_open())
     $ has_pending_orders = (can_pay_slogan or (hole_asked > 0 and TavernHole == 0) or (glory_asked > 0 and TavernGloryHole == 0) or can_pay_soap_barrel or can_pay_dog_booth)
 
-    if week == 7 or time >= 3:
+    if not stolyar_workshop_is_open():
         $ MainTxt = "В это время мастерская закрыта."
         $ CurLocDesc = MainTxt
         call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
@@ -103,17 +113,17 @@ label StolyarWorkshopBuildActions:
             georgett_whore = int(jobWhoreAvail.get("georgett", 0) or 0) > 0
         except Exception:
             georgett_whore = False
-    $ glory_explained = int(GeorgettVar.get("GloryHoleExplained", 0) or 0) == 1
+    $ glory_explained = int(Georgett.story_value("GloryHoleExplained", 0) or 0) == 1
     $ can_ask_slogan = (SloganFixed == 0 and slogan_asked == 0)
     $ can_pay_slogan = (SloganFixed == 0 and slogan_asked > 0 and money >= 200)
     $ can_ask_hole = (georgett_whore and hole_asked == 0 and TavernHole == 0)
-    $ can_pay_hole = (georgett_whore and hole_asked > 0 and TavernHole == 0 and money >= 100 and time == 0)
+    $ can_pay_hole = (georgett_whore and hole_asked > 0 and TavernHole == 0 and money >= 100 and stolyar_workshop_order_window_open())
     $ can_ask_glory = (georgett_whore and glory_asked == 0 and TavernGloryHole == 0 and glory_explained)
-    $ can_pay_glory = (georgett_whore and glory_asked > 0 and TavernGloryHole == 0 and money >= 700 and time == 0)
+    $ can_pay_glory = (georgett_whore and glory_asked > 0 and TavernGloryHole == 0 and money >= 700 and stolyar_workshop_order_window_open())
     $ can_ask_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked == 0)
-    $ can_pay_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked > 0 and money >= 75 and time == 0)
+    $ can_pay_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked > 0 and money >= 75 and stolyar_workshop_order_window_open())
     $ can_ask_dog_booth = (dog.owned and dog.booth_built == 0 and dog_booth_asked == 0)
-    $ can_pay_dog_booth = (dog.owned and dog.booth_built == 0 and dog_booth_asked > 0 and money >= 100 and time == 0)
+    $ can_pay_dog_booth = (dog.owned and dog.booth_built == 0 and dog_booth_asked > 0 and money >= 100 and stolyar_workshop_order_window_open())
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
@@ -138,8 +148,8 @@ label StolyarWorkshopBuildActions:
         $ current_action_items.append(MenuItem("Спросить о собачьей будке", Call("StolyarWorkshopApply", "ask_dog_booth")))
     if can_pay_dog_booth:
         $ current_action_items.append(MenuItem("Заплатить 100 мараведи за собачью будку", Call("StolyarWorkshopApply", "pay_dog_booth")))
-    if int(MongolVar.get("StocksFoodDay", -1) or -1) >= 0 and int(DraupnirVar.get("MongolLockpickOrderDay", -1) or -1) < 0 and int(time or 0) < 3 and int(week or 0) != 7 and int(money or 0) >= 40:
-        $ current_action_items.append(MenuItem("Заплатить 40 мараведи за тонкие отмычки", Call("story_clara_market_booklet_lockpicks_order_direct")))
+    if story_event_available("StolyarWorkshop", "enter"):
+        $ current_action_items.append(MenuItem("Поговорить с Драупниром об отмычках", Call("checkTriggers", "StolyarWorkshop", "enter", 0)))
     $ current_action_items.append(MenuItem("Вернуться в квартал ремесленников", Jump("ArtisansQuarter")))
     return
 

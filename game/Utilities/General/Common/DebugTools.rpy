@@ -1199,7 +1199,7 @@ init python:
         """
         Console-safe snapshot test without label calls.
         Use from console:
-            store.debug_tavern_events_snapshot_fn()
+            debug_tavern_events_snapshot_fn()
         """
         renpy.random.seed(123)
         _dbg_set("time", 0)
@@ -1224,7 +1224,7 @@ init python:
         """
         Console-safe deterministic unit check.
         Use from console:
-            store.debug_tavern_events_unit_fn()
+            debug_tavern_events_unit_fn()
         """
         renpy.random.seed(123)
         _dbg_set("time", 0)
@@ -1264,6 +1264,27 @@ init python:
 
     def dbg_events_unit():
         return debug_tavern_events_unit_fn()
+
+    def debug_builder_fight_stats_text():
+        ensure_dog_runtime()
+        dog_state = "with MC" if bool(dog.owned) and bool(dog.in_company) and dog.is_alive() else "not in fight"
+        lines = [
+            "Fight debug setup.",
+            "MC: health %d/100, energy %d/100, fun %d, sick days %d." % (int(health or 0), int(energy or 0), int(fun or 0), int(SickDays or 0)),
+            "World stats: reputation %d, notoriety %d, experience/exploration %d, tavern fame %d, money %d." % (int(reputation or 0), int(notoriety or 0), int(exploration or 0), int(tavernfame or 0), int(money or 0)),
+            "Fight level: %d. Weapon: %s. Armor: %s." % (int(fight_info().level.get("you", 1) or 1), fight_player_weapon_name(), fight_player_armor_name()),
+            "Ammo/supplies: arrows %d, droplets %d, gunpowder %d, bandages %d, tea %d, potions %d, fire bombs %d." % (
+                int(PlayerFightSupply.get("arrows", 0) or 0),
+                int(PlayerFightSupply.get("droplets", 0) or 0),
+                int(PlayerFightSupply.get("gunpowder", 0) or 0),
+                int(PlayerFightSupply.get("bandage", 0) or 0),
+                int(PlayerFightSupply.get("energy_tea", 0) or 0),
+                int(PlayerFightSupply.get("healing_potion", 0) or 0),
+                int(PlayerFightSupply.get("fire_bomb", 0) or 0),
+            ),
+            "Dog: %s." % dog_state,
+        ]
+        return "\n".join(lines)
 
 
 label debug_tavern_events_check:
@@ -1777,6 +1798,408 @@ label DebugBuilderCards:
     ]
     call screen main_ui
     jump DebugBuilderCards
+
+
+label DebugBuilderFightTests:
+    $ CurLoc = "DebugBuilderFightTests"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ UI_mode = "scene"
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Fight tests"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Fight setup", Jump("DebugFightSetupMenu")),
+        MenuItem("Launch fights", Jump("DebugFightLaunchMenu")),
+        MenuItem("Back", Jump("DebugBuilderRoom")),
+    ]
+    call screen main_ui
+    jump DebugBuilderFightTests
+
+
+label DebugFightSetupMenu:
+    $ CurLoc = "DebugBuilderFightTests"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ UI_mode = "scene"
+    $ fight_sync_level_from_exploration()
+    $ fight_sync_loaded_weapon_state_from_inventory()
+    $ fight_sync_supply_from_inventory()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Fight setup"
+    $ current_action_content = None
+    $ _debug_dog = ensure_dog_runtime()
+    $ _debug_dog_state = "with MC" if bool(_debug_dog.owned) and bool(_debug_dog.in_company) and _debug_dog.is_alive() else "none"
+    $ _debug_supply_caption = "Supplies: arrows %d / shot %d / bandage %d / tea %d / potion %d / fire %d / bees %d" % (int(PlayerFightSupply.get("arrows", 0) or 0), int(PlayerFightSupply.get("droplets", 0) or 0), int(PlayerFightSupply.get("bandage", 0) or 0), int(PlayerFightSupply.get("energy_tea", 0) or 0), int(PlayerFightSupply.get("healing_potion", 0) or 0), int(PlayerFightSupply.get("fire_bomb", 0) or 0), int(PlayerFightSupply.get("bees_bomb", 0) or 0))
+    $ current_action_items = [
+        MenuItem("Launch fights", Jump("DebugFightLaunchMenu")),
+        MenuItem("Weapon: " + fight_player_weapon_name(), Jump("DebugFightCycleWeapon")),
+        MenuItem("Armor: " + fight_player_armor_name(), Jump("DebugFightCycleArmor")),
+        MenuItem("Health: %d/100" % int(health or 0), Jump("DebugFightCycleHealth")),
+        MenuItem("Experience: %d / level %d" % (int(exploration or 0), int(FightLevel.get("you", 1) or 1)), Jump("DebugFightCycleExperience")),
+        MenuItem(_debug_supply_caption, Jump("DebugFightGrantSupplies")),
+        MenuItem("Dog: " + str(_debug_dog_state), Jump("DebugFightCycleDog")),
+        MenuItem("Back", Jump("DebugBuilderFightTests")),
+    ]
+    call screen main_ui
+    jump DebugFightSetupMenu
+
+
+label DebugFightStatsMenu:
+    $ CurLoc = "DebugBuilderFightTests"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ UI_mode = "scene"
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Fight stats"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Renew MC stats", Jump("DebugFightRenewMCStats")),
+        MenuItem("Experience +50", Jump("DebugFightExperienceUp")),
+        MenuItem("Experience -50", Jump("DebugFightExperienceDown")),
+        MenuItem("Experience reset", Jump("DebugFightExperienceReset")),
+        MenuItem("Back", Jump("DebugBuilderFightTests")),
+    ]
+    call screen main_ui
+    jump DebugFightStatsMenu
+
+
+label DebugFightWeaponsMenu:
+    $ CurLoc = "DebugBuilderFightTests"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ UI_mode = "scene"
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Fight weapons"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Weapon: fists", Jump("DebugFightWeaponFists")),
+        MenuItem("Weapon: old axe", Jump("DebugFightWeaponAxe")),
+        MenuItem("Weapon: rusty rifle", Jump("DebugFightWeaponRifle")),
+        MenuItem("Back", Jump("DebugBuilderFightTests")),
+    ]
+    call screen main_ui
+    jump DebugFightWeaponsMenu
+
+
+label DebugFightArmorMenu:
+    $ CurLoc = "DebugBuilderFightTests"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ UI_mode = "scene"
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Fight armor"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Armor: none", Jump("DebugFightArmorNone")),
+        MenuItem("Armor: cuirass", Jump("DebugFightArmorCuirass")),
+        MenuItem("Back", Jump("DebugBuilderFightTests")),
+    ]
+    call screen main_ui
+    jump DebugFightArmorMenu
+
+
+label DebugFightSupportMenu:
+    $ CurLoc = "DebugBuilderFightTests"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ UI_mode = "scene"
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Fight support"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Grant supplies", Jump("DebugFightGrantSupplies")),
+        MenuItem("Dog with MC", Jump("DebugFightDogOn")),
+        MenuItem("No dog in fight", Jump("DebugFightDogOff")),
+        MenuItem("Back", Jump("DebugBuilderFightTests")),
+    ]
+    call screen main_ui
+    jump DebugFightSupportMenu
+
+
+label DebugFightLaunchMenu:
+    $ CurLoc = "DebugBuilderFightTests"
+    $ location = CurLoc
+    $ CurrentRoom = DebugBuilderRoomObject
+    $ UI_mode = "scene"
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = "Launch fights"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Street crooks", Jump("DebugFightStreetCrooks")),
+        MenuItem("Random forest hunt roll", Jump("DebugFightRandomForestHunt")),
+        MenuItem("Patrol guards", Jump("DebugFightPatrolGuards")),
+        MenuItem("Back", Jump("DebugBuilderFightTests")),
+    ]
+    call screen main_ui
+    jump DebugFightLaunchMenu
+
+
+label DebugFightRenewMCStats:
+    $ health = 100
+    $ energy = 100
+    $ fun = 100
+    $ SickDays = 0
+    $ PlayerForestBanUntilDay = 0
+    $ exploration = max(180, int(exploration or 0))
+    $ notoriety = 0
+    $ reputation = max(20, int(reputation or 0))
+    $ tavernfame = int(tavernfame or 0)
+    $ money = max(500, int(money or 0))
+    $ fight_sync_level_from_exploration()
+    $ fight_sync_supply_from_inventory()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightCycleHealth:
+    if int(health or 0) >= 100:
+        $ health = 60
+    elif int(health or 0) >= 60:
+        $ health = 25
+    elif int(health or 0) >= 25:
+        $ health = 5
+    else:
+        $ health = 100
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightCycleEnergy:
+    if int(energy or 0) >= 100:
+        $ energy = 50
+    elif int(energy or 0) >= 50:
+        $ energy = 10
+    else:
+        $ energy = 100
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightCycleExperience:
+    if int(exploration or 0) < 50:
+        $ exploration = 50
+    elif int(exploration or 0) < 150:
+        $ exploration = 150
+    elif int(exploration or 0) < 300:
+        $ exploration = 300
+    else:
+        $ exploration = 0
+    $ fight_sync_level_from_exploration()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightCycleWeapon:
+    if str(EquippedWeapon or "").strip() == "":
+        $ _player_add_item_by_id("old_axe_001", 1)
+        $ EquippedWeapon = "old_axe_001"
+        $ RustyHunterRifleLoadedAmmo = ""
+    elif str(EquippedWeapon or "").strip() == "old_axe_001":
+        $ _player_add_item_by_id("rusty_hunter_rifle_001", 1)
+        $ _player_add_item_by_id("arrows_001", 10)
+        $ _player_add_item_by_id("droplets_001", 8)
+        $ _player_add_item_by_id("gunpowder_001", 8)
+        $ EquippedWeapon = "rusty_hunter_rifle_001"
+        $ RustyHunterRifleLoadedAmmo = "arrows"
+    else:
+        $ EquippedWeapon = ""
+        $ RustyHunterRifleLoadedAmmo = ""
+    $ fight_sync_loaded_weapon_state_from_inventory()
+    $ fight_sync_supply_from_inventory()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightCycleArmor:
+    if str(EquippedArmor or "").strip() == "old_leather_cuirass_001":
+        $ EquippedArmor = ""
+    else:
+        $ _player_add_item_by_id("old_leather_cuirass_001", 1)
+        $ EquippedArmor = "old_leather_cuirass_001"
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightCycleLoadedAmmo:
+    $ _player_add_item_by_id("rusty_hunter_rifle_001", 1)
+    $ EquippedWeapon = "rusty_hunter_rifle_001"
+    if str(RustyHunterRifleLoadedAmmo or "").strip() == "":
+        $ _player_add_item_by_id("arrows_001", 10)
+        $ RustyHunterRifleLoadedAmmo = "arrows"
+    elif str(RustyHunterRifleLoadedAmmo or "").strip() == "arrows":
+        $ _player_add_item_by_id("droplets_001", 8)
+        $ _player_add_item_by_id("gunpowder_001", 8)
+        $ RustyHunterRifleLoadedAmmo = "droplets"
+    else:
+        $ RustyHunterRifleLoadedAmmo = ""
+    $ fight_sync_loaded_weapon_state_from_inventory()
+    $ fight_sync_supply_from_inventory()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightCycleDog:
+    $ _debug_dog = ensure_dog_runtime()
+    if bool(_debug_dog.owned) and bool(_debug_dog.in_company) and _debug_dog.is_alive():
+        $ _debug_dog.in_company = False
+    else:
+        $ _debug_dog.met = True
+        $ _debug_dog.owned = True
+        $ _debug_dog.in_company = True
+        $ _debug_dog.health = max(int(getattr(_debug_dog, "health", 0) or 0), int(getattr(_debug_dog, "max_health", 40) or 40))
+        $ _debug_dog.loyalty = max(int(getattr(_debug_dog, "loyalty", 0) or 0), int(getattr(_debug_dog, "max_loyalty", 40) or 40))
+        $ _debug_dog.level = max(2, int(getattr(_debug_dog, "level", 0) or 0))
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightExperienceUp:
+    $ exploration = max(0, int(exploration or 0) + 50)
+    $ fight_sync_level_from_exploration()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightStatsMenu
+
+
+label DebugFightExperienceDown:
+    $ exploration = max(0, int(exploration or 0) - 50)
+    $ fight_sync_level_from_exploration()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightStatsMenu
+
+
+label DebugFightExperienceReset:
+    $ exploration = 0
+    $ fight_sync_level_from_exploration()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightStatsMenu
+
+
+label DebugFightWeaponFists:
+    $ EquippedWeapon = ""
+    $ RustyHunterRifleLoadedAmmo = ""
+    $ fight_sync_loaded_weapon_state_from_inventory()
+    $ fight_sync_supply_from_inventory()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightWeaponsMenu
+
+
+label DebugFightWeaponAxe:
+    $ _player_add_item_by_id("old_axe_001", 1)
+    $ EquippedWeapon = "old_axe_001"
+    $ RustyHunterRifleLoadedAmmo = ""
+    $ fight_sync_loaded_weapon_state_from_inventory()
+    $ fight_sync_supply_from_inventory()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightWeaponsMenu
+
+
+label DebugFightWeaponRifle:
+    $ _player_add_item_by_id("rusty_hunter_rifle_001", 1)
+    $ _player_add_item_by_id("arrows_001", 10)
+    $ _player_add_item_by_id("droplets_001", 8)
+    $ _player_add_item_by_id("gunpowder_001", 8)
+    $ EquippedWeapon = "rusty_hunter_rifle_001"
+    $ RustyHunterRifleLoadedAmmo = ""
+    $ fight_sync_loaded_weapon_state_from_inventory()
+    $ fight_sync_supply_from_inventory()
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightWeaponsMenu
+
+
+label DebugFightArmorNone:
+    $ EquippedArmor = ""
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightArmorMenu
+
+
+label DebugFightArmorCuirass:
+    $ _player_add_item_by_id("old_leather_cuirass_001", 1)
+    $ EquippedArmor = "old_leather_cuirass_001"
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightArmorMenu
+
+
+label DebugFightGrantSupplies:
+    $ _player_add_item_by_id("arrows_001", 10)
+    $ _player_add_item_by_id("droplets_001", 8)
+    $ _player_add_item_by_id("gunpowder_001", 8)
+    $ _player_add_item_by_id("bandage_001", 3)
+    $ _player_add_item_by_id("energy_tea_001", 3)
+    $ _player_add_item_by_id("healing_potion_001", 3)
+    $ _player_add_item_by_id("fire_bomb_001", 3)
+    $ PlayerFightSupply["bees_bomb"] = 3
+    $ fight_sync_supply_from_inventory()
+    $ PlayerFightSupply["bees_bomb"] = 3
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightDogOn:
+    $ _debug_dog = ensure_dog_runtime()
+    $ _debug_dog.met = True
+    $ _debug_dog.owned = True
+    $ _debug_dog.in_company = True
+    $ _debug_dog.health = max(int(getattr(_debug_dog, "health", 0) or 0), int(getattr(_debug_dog, "max_health", 40) or 40))
+    $ _debug_dog.loyalty = max(int(getattr(_debug_dog, "loyalty", 0) or 0), int(getattr(_debug_dog, "max_loyalty", 40) or 40))
+    $ _debug_dog.level = max(2, int(getattr(_debug_dog, "level", 0) or 0))
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightDogOff:
+    $ _debug_dog = ensure_dog_runtime()
+    $ _debug_dog.in_company = False
+    $ MainTxt = debug_builder_fight_stats_text()
+    $ CurLocDesc = MainTxt
+    jump DebugFightSetupMenu
+
+
+label DebugFightStreetCrooks:
+    $ fight_begin("street_crook", 2, "DebugBuilderFightTests", "images/fight/thug.png", "Debug fight: street crooks x2.")
+    call FightLoop
+    jump DebugBuilderFightTests
+
+
+label DebugFightRandomForestHunt:
+    $ _debug_hunt_roll = fight_roll_hunt_enemy("Forest")
+    $ _debug_hunt_enemy_id = str(_debug_hunt_roll.get("enemy_id", "wolf") or "wolf")
+    $ _debug_hunt_enemy_count = max(1, int(_debug_hunt_roll.get("enemy_count", 1) or 1))
+    $ _debug_hunt_intro = fight_hunt_intro_text(_debug_hunt_enemy_id, _debug_hunt_enemy_count, "Forest")
+    $ fight_begin(_debug_hunt_enemy_id, _debug_hunt_enemy_count, "DebugBuilderFightTests", "images/forest/forest_1.png", _debug_hunt_intro)
+    call FightLoop
+    jump DebugBuilderFightTests
+
+
+label DebugFightPatrolGuards:
+    $ fight_begin("patrol_guard", 2, "DebugBuilderFightTests", "images/fight/patrol_guard.png", "Debug fight: patrol guards.")
+    call FightLoop
+    jump DebugBuilderFightTests
 
 
 label DebugTestRoom:

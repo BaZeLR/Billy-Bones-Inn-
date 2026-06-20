@@ -13,6 +13,6 @@ init 4 python:
         custom_properties={
             "item_kind": "wearable",
             "dress_code": "nightshirt",
-            "wear_target": "female",
+            "wear_target": "player",
         },
     )

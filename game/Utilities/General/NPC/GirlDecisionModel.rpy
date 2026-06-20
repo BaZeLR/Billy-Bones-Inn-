@@ -291,36 +291,35 @@ init -34 python:
         girl = str(girl_name or "").strip().lower()
         if girl == "amanda":
             score = 0.0
-            try:
-                if int(AmandaVar.get("alberfriends", 0) or 0) >= 10 and int(AmandaVar.get("alberprohibit", 0) or 0) == 0:
-                    score += 0.25
-                if int(AmandaVar.get("prohibitwithguys", 0) or 0) > 0:
-                    score += 0.25
-                if int(AmandaVar.get("sawwithguys", 0) or 0) > 0 and int(Friends.get("amanda", 0) or 0) >= 10:
-                    score += 0.20
-            except Exception:
-                pass
+            if Amanda.var_int("alberfriends", 0) >= 10 and Amanda.var_int("alberprohibit", 0) == 0:
+                score += 0.25
+            if Amanda.var_int("prohibitwithguys", 0) > 0:
+                score += 0.25
+            if Amanda.var_int("sawwithguys", 0) > 0 and int(Amanda.rel or 0) >= 10:
+                score += 0.20
             return girl_decision_clamp(score)
         return 0.0
 
     def build_girl_decision_profile(girl_name=""):
         girl = str(girl_name or "").strip().lower()
         cycle = girl_decision_cycle_state(girl)
-        friend = girl_decision_int(Friends.get(girl, 0), 0) if isinstance(Friends, dict) else 0
-        open_value = girl_decision_int(otkroven.get(girl, 0), 0) if isinstance(otkroven, dict) else 0
-        slut_value = girl_decision_int(sluttiness.get(girl, 0), 0) if isinstance(sluttiness, dict) else 0
+        if girl == "amanda":
+            friend = girl_decision_int(Amanda.rel, 0)
+            open_value = girl_decision_int(Amanda.openness, 0)
+            slut_value = girl_decision_int(Amanda.corruption, 0)
+        else:
+            friend = girl_decision_int(Friends.get(girl, 0), 0) if isinstance(Friends, dict) else 0
+            open_value = girl_decision_int(otkroven.get(girl, 0), 0) if isinstance(otkroven, dict) else 0
+            slut_value = girl_decision_int(sluttiness.get(girl, 0), 0) if isinstance(sluttiness, dict) else 0
         arousal_value = girl_decision_int(Arousal.get(girl, 0), 0) if isinstance(Arousal, dict) else 0
         wet_value = max(girl_decision_int(PussyWetStart.get(girl, 0), 0) if isinstance(PussyWetStart, dict) else 0, arousal_value)
         anger_fn = getattr(store, "relationship_anger", None)
         anger_value = anger_fn(girl) if callable(anger_fn) else 0
-        rebel_value = girl_decision_int(neshlush.get(girl, 0), 0) if isinstance(neshlush, dict) else 0
+        rebel_value = girl_decision_int(Amanda.rebellion, 0) if girl == "amanda" else (girl_decision_int(neshlush.get(girl, 0), 0) if isinstance(neshlush, dict) else 0)
 
         player_history = 0
         if girl == "amanda":
-            try:
-                player_history = 1 if int(AmandaVar.get("suckyou", 0) or 0) or int(AmandaVar.get("fuckyou", 0) or 0) else 0
-            except Exception:
-                player_history = 0
+            player_history = 1 if Amanda.var_int("suckyou", 0) or Amanda.var_int("fuckyou", 0) else 0
         elif isinstance(HadSex, dict):
             player_history = 1 if girl_decision_int(HadSex.get(girl, 0), 0) > 0 else 0
 
@@ -363,18 +362,15 @@ init -34 python:
         }
 
         if girl == "amanda":
-            try:
-                profile.update({
-                    "amanda_suckyou": girl_decision_int(AmandaVar.get("suckyou", 0), 0),
-                    "amanda_fuckyou": girl_decision_int(AmandaVar.get("fuckyou", 0), 0),
-                    "amanda_knowsexactive": girl_decision_int(AmandaVar.get("knowsexactive", 0), 0),
-                    "amanda_alberfriends": girl_decision_int(AmandaVar.get("alberfriends", 0), 0),
-                    "amanda_lizafriends": girl_decision_int(AmandaVar.get("lizafriends", 0), 0),
-                    "amanda_alberprohibit": girl_decision_int(AmandaVar.get("alberprohibit", 0), 0),
-                    "amanda_prohibitwithguys": girl_decision_int(AmandaVar.get("prohibitwithguys", 0), 0),
-                })
-            except Exception:
-                pass
+            profile.update({
+                "amanda_suckyou": girl_decision_int(Amanda.var_int("suckyou", 0), 0),
+                "amanda_fuckyou": girl_decision_int(Amanda.var_int("fuckyou", 0), 0),
+                "amanda_knowsexactive": girl_decision_int(Amanda.var_int("knowsexactive", 0), 0),
+                "amanda_alberfriends": girl_decision_int(Amanda.var_int("alberfriends", 0), 0),
+                "amanda_lizafriends": girl_decision_int(Amanda.var_int("lizafriends", 0), 0),
+                "amanda_alberprohibit": girl_decision_int(Amanda.var_int("alberprohibit", 0), 0),
+                "amanda_prohibitwithguys": girl_decision_int(Amanda.var_int("prohibitwithguys", 0), 0),
+            })
         return profile
 
     def girl_decision_score(profile=None, action_name="", bucket="good"):

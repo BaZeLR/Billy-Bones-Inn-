@@ -37,14 +37,8 @@ init -26 python:
 label NextDay_NewDayEvents():
     python:
         # Defensive defaults to avoid startup KeyError on partially initialized saves.
-        BeckyVar = _nd_ensure_dict("BeckyVar")
-        EddieVar = _nd_ensure_dict("EddieVar")
         CurrentLoc = _nd_ensure_dict("CurrentLoc")
-        AlberVar = _nd_ensure_dict("AlberVar")
-        LizaVar = _nd_ensure_dict("LizaVar")
-        GeorgettVar = _nd_ensure_dict("GeorgettVar")
         IngaVar = _nd_ensure_dict("IngaVar")
-        AmandaVar = _nd_ensure_dict("AmandaVar")
         GiveOrgasms = _nd_ensure_dict("GiveOrgasms")
         HadSex = _nd_ensure_dict("HadSex")
         sluttiness = _nd_ensure_dict("sluttiness")
@@ -54,7 +48,9 @@ label NextDay_NewDayEvents():
         sexacts = _nd_ensure_dict("sexacts")
         pantiesdef = _nd_ensure_dict("pantiesdef")
         FranBusy = _nd_ensure_fran_busy()
-        MongolVar = _nd_ensure_dict("MongolVar")
+        Georgett.ensure_story_defaults()
+        Liza.ensure_story_defaults()
+        Mongol.ensure_story_defaults()
 
         retlocname = _nd_ensure_scalar("retlocname", "")
         tavernvisitors = int(_nd_ensure_scalar("tavernvisitors", 40) or 0)
@@ -66,52 +62,23 @@ label NextDay_NewDayEvents():
         dayspassed = int(_nd_ensure_scalar("dayspassed", 0) or 0)
         _nd_ensure_scalar("BreakfastToday", False)
 
-        BeckyVar.setdefault("EddieGeorg", 0)
-        BeckyVar.setdefault("EddieWhoreHome", 0)
-        BeckyVar.setdefault("visitedhome", 0)
-        BeckyVar.setdefault("HomeSex", 0)
-        BeckyVar.setdefault("husbandtalk", 0)
-        BeckyVar.setdefault("GerhardBeckyTalk", 0)
-        BeckyVar.setdefault("TodayFrontSexCheck", 0)
-        BeckyVar.setdefault("PriestAdvice", 0)
-        BeckyVar.setdefault("EddieRobbed", 0)
-        BeckyVar.setdefault("EddieRobbedDay", 0)
-
-        EddieVar.setdefault("WhoreVisitFreq", 6)
-        EddieVar.setdefault("SawMomSex", 0)
-        EddieVar.setdefault("TalkedAboutWhores", 0)
+        Eddie.ensure_story_defaults()
 
         CurrentLoc.setdefault("georgett", "")
         CurrentLoc.setdefault("liza", "")
         CurrentLoc.setdefault("werecat", "")
         CurrentLoc.setdefault("eddie", "GroceryStore")
-        AlberVar.setdefault("WhoreVisitFreq", 6)
-        LizaVar.setdefault("ProstStart", 0)
-        GeorgettVar.setdefault("churchgeorgettadmit", 0)
-        GeorgettVar.setdefault("churchlizaadmit", 0)
+        Alber.ensure_story_defaults()
         IngaVar.setdefault("Knowher", 0)
-        MongolVar.setdefault("WillTryToSteal", 0)
-        AmandaVar.setdefault("glorytried", 0)
-        AmandaVar.setdefault("gloryscold", 0)
-        AmandaVar.setdefault("glorywalkout", 0)
-        AmandaVar.setdefault("glorysuck", 0)
-        AmandaVar.setdefault("glorydeflower", 0)
-        AmandaVar.setdefault("fucklegare", 0)
-        AmandaVar.setdefault("alberfriends", 0)
-        AmandaVar.setdefault("alberprohibit", 0)
-        AmandaVar.setdefault("prohibitwithguys", 0)
+        Amanda.ensure_story_defaults()
 
-        GiveOrgasms.setdefault("becky", 0)
-        HadSex.setdefault("becky", 0)
-        sluttiness.setdefault("becky", 0)
         sluttiness.setdefault("amanda", 0)
-        DayLastOrgasmGiven.setdefault("becky", 0)
-        Friends.setdefault("becky", 0)
         Friends.setdefault("amanda", 0)
         virginity.setdefault("amanda", 1)
         sexacts.setdefault("amanda", 0)
         pantiesdef.setdefault("liza", "")
         store.BreakfastToday = False
+        tavern_kitchen_reset_daily_hearth_state()
 
         # --- Заканчиваем делать то, что начали в течении дня.
         if SloganFixed == 1:
@@ -123,49 +90,52 @@ label NextDay_NewDayEvents():
         _georgett_work_location = str(getLocation("georgett", week, 19 * 60) or "")
         _liza_work_location = str(getLocation("liza", week, 19 * 60) or "")
 
-        if BeckyVar['EddieGeorg'] > 0:
+        Becky.ensure_story_defaults()
+        _becky_story = Becky.var
+        if _becky_story['EddieGeorg'] > 0:
             # Сначала сбросим предыдущее состояние
-            if BeckyVar['EddieWhoreHome'] in (2, 3):
-                BeckyVar['EddieWhoreHome'] -= 2
-            elif BeckyVar['EddieWhoreHome'] == 4:
-                BeckyVar['EddieGeorg'] = max(BeckyVar['EddieGeorg'], 2)
-                BeckyVar['EddieWhoreHome'] = 0
+            if _becky_story['EddieWhoreHome'] in (2, 3):
+                _becky_story['EddieWhoreHome'] -= 2
+            elif _becky_story['EddieWhoreHome'] == 4:
+                _becky_story['EddieGeorg'] = max(_becky_story['EddieGeorg'], 2)
+                _becky_story['EddieWhoreHome'] = 0
             # Теперь определим успех на сегодня, по пятницам жоржи не приходит
-            if renpy.random.randint(1, EddieVar['WhoreVisitFreq']) == 1 and week != 5:
-                if BeckyVar['visitedhome'] >= 5 and EddieVar['SawMomSex'] > 0 and BeckyVar['HomeSex'] > 0:
-                    if renpy.random.randint(1, 10) <= 1 + BeckyVar['EddieWhoreHome'] * 5 + (3 if BeckyVar['EddieGeorg'] > 1 else 0):
-                        BeckyVar['EddieWhoreHome'] = 4
+            if renpy.random.randint(1, Eddie.var['WhoreVisitFreq']) == 1 and week != 5:
+                if _becky_story['visitedhome'] >= 5 and Eddie.var['SawMomSex'] > 0 and _becky_story['HomeSex'] > 0:
+                    if renpy.random.randint(1, 10) <= 1 + _becky_story['EddieWhoreHome'] * 5 + (3 if _becky_story['EddieGeorg'] > 1 else 0):
+                        _becky_story['EddieWhoreHome'] = 4
                     else:
-                        BeckyVar['EddieWhoreHome'] += 2
+                        _becky_story['EddieWhoreHome'] += 2
                 else:
-                    BeckyVar['EddieWhoreHome'] += 2
-            if BeckyVar['EddieWhoreHome'] in (2, 3) and _georgett_work_location in ("TavernMain", "PortStreets"):
+                    _becky_story['EddieWhoreHome'] += 2
+            if _becky_story['EddieWhoreHome'] in (2, 3) and _georgett_work_location in ("TavernMain", "PortStreets"):
                 TodaySexEvents_Add('georgett', 3, 99, 'Prostitution')
-        elif EddieVar['TalkedAboutWhores'] == 1 and _georgett_work_location in ("TavernMain", "PortStreets"):
-            if renpy.random.randint(1, EddieVar['WhoreVisitFreq']) == 1 and week != 5:
+        elif Eddie.var['TalkedAboutWhores'] == 1 and _georgett_work_location in ("TavernMain", "PortStreets"):
+            if renpy.random.randint(1, Eddie.var['WhoreVisitFreq']) == 1 and week != 5:
                 TodaySexEvents_Add('georgett', 3, 99, 'Prostitution')
-        if BeckyVar['EddieWhoreHome'] == 4:
+        if Becky.var['EddieWhoreHome'] == 4:
             TodaySexEvents_Add('georgett', 99, 99, 'EddieHomeVisit')
 
         # Визит Легаре к Лизе
-        if renpy.random.randint(1, AlberVar['WhoreVisitFreq']) == 1 and week != 5 and LizaVar['ProstStart'] and _liza_work_location == "PortStreets":
+        if renpy.random.randint(1, Alber.var_int("WhoreVisitFreq", 3)) == 1 and week != 5 and Liza.story_value("ProstStart", 0) and _liza_work_location == "PortStreets":
             TodaySexEvents_Add('liza', 3, 99, 'Prostitution')
 
-        if BeckyVar['husbandtalk'] == 0 and GiveOrgasms['becky'] > 0 and HadSex['becky'] > 0:
-            BeckyVar['husbandtalk'] = 1
-        if BeckyVar['GerhardBeckyTalk'] == 2:
-            BeckyVar['GerhardBeckyTalk'] = 1
-        BeckyVar['TodayFrontSexCheck'] = 0
+        Becky.ensure_story_defaults()
+        if Becky.var['husbandtalk'] == 0 and Becky.stats.get("orgasms_given", 0) > 0 and Becky.stats.get("sexacts", 0) > 0:
+            Becky.var['husbandtalk'] = 1
+        if Becky.var['GerhardBeckyTalk'] == 2:
+            Becky.var['GerhardBeckyTalk'] = 1
+        Becky.var['TodayFrontSexCheck'] = 0
 
         # К Бекки приходят любовники
-        if sluttiness['becky'] >= 35 and (DayLastOrgasmGiven['becky'] + 2) <= dayspassed and BeckyVar['visitedhome'] >= 2 and week != 7:
-            if sluttiness['becky'] >= 55 or renpy.random.randint(1, 2) == 1:
+        if Becky.corruption >= 35 and (Becky.story_value("last_store_orgasm_day", -1) + 2) <= dayspassed and Becky.var['visitedhome'] >= 2 and week != 7:
+            if Becky.corruption >= 55 or renpy.random.randint(1, 2) == 1:
                 TodaySexEvents_Add('becky', 99, renpy.random.randint(1, 3), 'StoreLover')
-        if BeckyVar['visitedhome'] >= 7 and renpy.random.randint(1, 3) <= 2 and CheckIfEventAlreadyExist('georgett', 99) <= 0:
+        if Becky.var['visitedhome'] >= 7 and renpy.random.randint(1, 3) <= 2 and CheckIfEventAlreadyExist('georgett', 99) <= 0:
             TodaySexEvents_Add('becky', 99, 99, 'EddieMom')
 
         if week == 7:
-            if BeckyVar['PriestAdvice'] > 0:
+            if Becky.var['PriestAdvice'] > 0:
                 TodaySexEvents_Add('becky', 99, 99, 'Priest')
             if Georgett.can_trigger_after_sermon_event():
                 TodaySexEvents_Add('georgett', 99, 99, 'Priest')
@@ -175,21 +145,21 @@ label NextDay_NewDayEvents():
             TodaySexEvents_Add('inga', 99, 99, 'Lucas')
 
         # Аманда
-        if sluttiness['amanda'] >= 22 and TavernGloryHole == 2 and get_random_girl_by_job('jobgloryhole') == 'liza':
-            if AmandaVar['glorytried'] == 0:
+        if Amanda.corruption >= 22 and TavernGloryHole == 2 and get_random_girl_by_job('jobgloryhole') == 'liza':
+            if Amanda.var_int("glorytried", 0) == 0:
                 if renpy.random.randint(1, 3) == 1:
                     TodaySexEvents_Add('amanda', 99, 99, 'glorytry')
             else:
                 GloryChanceDecrease = 0
-                if AmandaVar['gloryscold'] == 1:
+                if Amanda.var_int("gloryscold", 0) == 1:
                     GloryChanceDecrease += 9
-                if AmandaVar['glorywalkout'] == 1:
+                if Amanda.var_int("glorywalkout", 0) == 1:
                     GloryChanceDecrease += 3
-                if AmandaVar['glorysuck'] == 1:
+                if Amanda.var_int("glorysuck", 0) == 1:
                     GloryChanceDecrease -= 2
-                if AmandaVar['glorydeflower'] == 1:
+                if Amanda.var_int("glorydeflower", 0) == 1:
                     GloryChanceDecrease -= 3
-                if sluttiness['amanda'] >= 35:
+                if Amanda.corruption >= 35:
                     GloryChanceDecrease -= 3
                 if virginity['amanda'] == 0:
                     GloryChanceDecrease -= 2
@@ -201,39 +171,39 @@ label NextDay_NewDayEvents():
                     GloryChanceDecrease += 5
                 if renpy.random.randint(1, max(3, 4 + GloryChanceDecrease)) == 1:
                     TodaySexEvents_Add('amanda', 99, 99, 'glorytry')
-        if AmandaVar['fucklegare'] == 1 and AmandaVar['alberfriends'] >= 10 and sluttiness['amanda'] >= 35 and week != 5:
+        if Amanda.var_int("fucklegare", 0) == 1 and Amanda.var_int("alberfriends", 0) >= 10 and Amanda.corruption >= 35 and week != 5:
             ChanceVar = 6
-            if AmandaVar['alberfriends'] >= 15:
+            if Amanda.var_int("alberfriends", 0) >= 15:
                 ChanceVar -= 1
-            if AmandaVar.get('alberfriends', 0) >= 18:
+            if Amanda.var_int("alberfriends", 0) >= 18:
                 ChanceVar -= 1
-            if AmandaVar.get('alberfriends', 0) >= 20:
+            if Amanda.var_int("alberfriends", 0) >= 20:
                 ChanceVar -= 1
-            if AmandaVar['alberprohibit']:
+            if Amanda.var_int("alberprohibit", 0):
                 ChanceVar += 5
-            if Friends['amanda'] >= 15:
+            if Amanda.rel >= 15:
                 ChanceVar += 2
             if renpy.random.randint(1, ChanceVar) == 1:
                 TodaySexEvents_Add('amanda', 3, 99, 'legarerun')
-        if sexacts['amanda'] >= 5 and sluttiness['amanda'] >= 35 and week != 5:
+        if int(Amanda.stats.get("sexacts", 0) or 0) >= 5 and Amanda.corruption >= 35 and week != 5:
             ChanceVar = 4
-            if sluttiness['amanda'] >= 45:
+            if Amanda.corruption >= 45:
                 ChanceVar -= 1
-            if sluttiness['amanda'] >= 55:
+            if Amanda.corruption >= 55:
                 ChanceVar -= 1
-            if AmandaVar['prohibitwithguys']:
+            if Amanda.var_int("prohibitwithguys", 0):
                 ChanceVar += 5
             if renpy.random.randint(1, ChanceVar) == 1:
                 TodaySexEvents_Add('amanda', 2, 99, 'lovermeet')
 
         # Воровство лошадки
         if MyStallion and retlocname != 'TavernStable' and StolenHorseDays == 0 and renpy.random.randint(1, 40) == 25:
-            MongolVar['WillTryToSteal'] = 1
+            Mongol.var['WillTryToSteal'] = 1
 
         # Бекки предлагает подзаработать
-        if BeckyVar['visitedhome'] >= 5 and Friends['becky'] >= 15 and BeckyVar['EddieRobbed'] == 0 and dayspassed > 0 and renpy.random.randint(1, 6) == 1:
+        if Becky.var['visitedhome'] >= 5 and Becky.rel >= 15 and Becky.var['EddieRobbed'] == 0 and dayspassed > 0 and renpy.random.randint(1, 6) == 1:
             if DailyEventsList_Exists('becky', 'SherwoodQuest') == 0:
-                BeckyVar['EddieRobbedDay'] = dayspassed
+                Becky.var['EddieRobbedDay'] = dayspassed
                 DailyEventsList_Add("becky", "GroceryStore", 1, ">=", 1, 9999, "SherwoodQuest", "BeckyQuestInit")
 
         # Francheska in temple (per-time-slot availability map)
@@ -247,7 +217,7 @@ label NextDay_NewDayEvents():
         _run_liza_nextday_clients = 0
         _liza_nextday_clients_max = 0
         _liza_nextday_glory_max = tavernvisitors // 6
-        if LizaVar['ProstStart']:
+        if Liza.story_value("ProstStart", 0):
             _run_liza_nextday_clients = 1
             _liza_nextday_clients_max = 3 + (1 if pantiesdef['liza'] == '' else 0)
         npc_schedule_sync_all()

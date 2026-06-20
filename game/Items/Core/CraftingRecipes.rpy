@@ -516,8 +516,7 @@ label ReadRecipeBook(what_id="", where_id="", fallback_text="", object_id="", re
     if str(RecipeBookSelectedId or "").strip() == "":
         $ MainTxt = recipe_book_read_text()
         $ CurLocDesc = MainTxt
-        call RefreshCurrentActionMenu(where_id, object_id or what_id, True)
-        return
+        jump expression where_id
     $ recipe_book_apply_picture(RecipeBookSelectedId)
     $ MainTxt = recipe_book_page_text(RecipeBookSelectedId)
     $ CurLocDesc = MainTxt
@@ -627,5 +626,4 @@ label RecipeBookClose(where_id="", object_id=""):
     $ RecipeBookReturnRoomCode = ""
     $ RecipeBookReturnObjectId = ""
     $ RecipeBookReturnPicture = ""
-    call RefreshCurrentActionMenu(_return_room_code, _return_object_id, True)
-    return
+    jump expression _return_room_code

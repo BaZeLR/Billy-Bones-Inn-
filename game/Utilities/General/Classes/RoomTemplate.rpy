@@ -224,9 +224,12 @@ init -40 python:
             except Exception:
                 return int(default or 0)
 
-        def is_open(self, week_value, time_value):
+        def is_open(self, week_value=None, time_value=None):
             if not room_rule_true(self.condition):
                 return False
+            if week_value is None:
+                calendar_v2.sync_state()
+                week_value = calendar_v2.week
             if self.weekdays and int(week_value or 0) not in self.weekdays:
                 return False
             start_text = str(getattr(self, "start", "") or "")
@@ -344,7 +347,7 @@ init -40 python:
         def ready_triggers(self):
             return [row for row in self.triggers if hasattr(row, "is_ready") and row.is_ready()]
 
-        def is_open(self, week_value, time_value):
+        def is_open(self, week_value=None, time_value=None):
             if self.schedule is None:
                 return True
             if hasattr(self.schedule, "is_open"):
@@ -364,11 +367,13 @@ init -40 python:
 
         def build_object_items(self):
             items = []
-            object_menu_label = str(self.custom_properties.get("object_menu_label", "") or "")
-            if not object_menu_label:
-                return items
+            room_object_menu_label = str(self.custom_properties.get("object_menu_label", "") or "")
 
             for obj in self.visible_objects():
+                object_props = getattr(obj, "custom_properties", {}) or {}
+                object_menu_label = str(object_props.get("object_menu_label", "") or room_object_menu_label)
+                if not object_menu_label:
+                    continue
                 items.append(MenuItem(
                     obj.name,
                     [

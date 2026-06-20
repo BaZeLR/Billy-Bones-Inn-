@@ -268,8 +268,7 @@ label SoapSecondStageFinalize:
         store._player_add_item_by_id(item_id, 1)
 
         # Set flag so room table version knows not to duplicate
-        store.BeckyVar = getattr(store, 'BeckyVar', {})
-        store.BeckyVar['soap_process'] = True   # or a more global soap_in_progress flag
+        store.SoapProcessActive = True
 
     $ MainTxt = "Вы закончили варку мыла.\n\n"
     if soap_type == "luxury" and chosen_aromas:
@@ -292,10 +291,10 @@ label SoapSecondStageFinalize:
 # Room table protection (simple flag)
 label RoomTableStartSoap:
     python:
-        if getattr(renpy.store, 'BeckyVar', {}).get('soap_process', False):
+        if getattr(renpy.store, 'SoapProcessActive', False):
             renpy.notify("Вы уже начали варить мыло. Завершите второй этап.")
             renpy.return_statement()
-    $ BeckyVar['soap_process'] = True
+    $ SoapProcessActive = True
     $ MainTxt = "Вы начинаете готовить мыло за столом в комнате."
     return
 

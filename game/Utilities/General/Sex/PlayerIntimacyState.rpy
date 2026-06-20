@@ -313,6 +313,6 @@ label PlayerIntimacyHelpAsk(girl_name="", return_label=""):
     if str(return_label or "").strip() != "":
         $ current_action_items.append(MenuItem("Назад", Call(return_label)))
     else:
-        $ current_action_items.append(MenuItem("Назад", Function(main_ui_restore_room_scene_state)))
+        $ current_action_items.append(MenuItem("Назад", Jump(str(CurLoc or ""))))
     $ renpy.restart_interaction()
     return

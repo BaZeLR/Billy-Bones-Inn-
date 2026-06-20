@@ -261,6 +261,7 @@ init -998 python:
             self.owned_dresses = ["villagedress"]
             self.dress_days = {"villagedress": 0}
             self.dress_life_days = {"villagedress": self.DRESS_LIFE_DAYS}
+            self.destroyed_dresses = []
             self.item_life_days = {}
             self.haircut_day = 0
             self.washDays = self.WASH_FRESH_DAYS
@@ -284,6 +285,20 @@ init -998 python:
             dress_life_days = g.get("PlayerDressLifeDays", self.dress_life_days)
             if isinstance(dress_life_days, dict):
                 self.dress_life_days = dict(dress_life_days or {})
+            destroyed_dresses = g.get("PlayerDestroyedDresses", self.destroyed_dresses)
+            if isinstance(destroyed_dresses, (list, tuple, set)):
+                self.destroyed_dresses = player_normalize_id_list(destroyed_dresses)
+            else:
+                self.destroyed_dresses = []
+            self.owned_dresses = [
+                row for row in player_normalize_id_list(self.owned_dresses)
+                if row not in self.destroyed_dresses
+            ]
+            if str(self.current_dress or "").strip() in self.destroyed_dresses:
+                self.current_dress = ""
+                self.sleep_bottom_layer = "nothing"
+            if str(self.current_dress or "").strip() == "":
+                self.sleep_bottom_layer = "nothing"
             item_life_days = g.get("PlayerItemLifeDays", self.item_life_days)
             if isinstance(item_life_days, dict):
                 self.item_life_days = dict(item_life_days or {})
@@ -298,17 +313,20 @@ init -998 python:
             g["PlayerHaircutDaySt"] = max(0, player_to_int(self.haircut_day, 0))
             g["PlayerDressDaySt"] = dict(self.dress_days or {})
             g["PlayerDressLifeDays"] = dict(self.dress_life_days or {})
+            g["PlayerDestroyedDresses"] = list(self.destroyed_dresses or [])
             g["PlayerItemLifeDays"] = dict(self.item_life_days or {})
             g["costumecondition"] = player_clamp_value(self.costume_condition, 0, 100)
             return self
 
         def has_dress(self, dress_code):
             dress_key = str(dress_code or "").strip()
-            return bool(dress_key) and dress_key in list(self.owned_dresses or [])
+            return bool(dress_key) and dress_key in list(self.owned_dresses or []) and dress_key not in list(self.destroyed_dresses or [])
 
         def add_dress(self, dress_code, acquired_day=0):
             dress_key = str(dress_code or "").strip()
             if not dress_key:
+                return False
+            if dress_key in list(self.destroyed_dresses or []):
                 return False
             self.owned_dresses = player_normalize_id_list(self.owned_dresses)
             if dress_key not in self.owned_dresses:
@@ -332,14 +350,27 @@ init -998 python:
                 del self.dress_life_days[dress_key]
             if str(self.current_dress or "").strip() == dress_key:
                 self.current_dress = ""
+                self.sleep_bottom_layer = "nothing"
+            return True
+
+        def destroy_dress(self, dress_code):
+            dress_key = str(dress_code or "").strip()
+            if not dress_key:
+                return False
+            self.remove_dress(dress_key)
+            self.destroyed_dresses = player_normalize_id_list(self.destroyed_dresses)
+            if dress_key not in self.destroyed_dresses:
+                self.destroyed_dresses.append(dress_key)
             return True
 
         def wear_dress(self, dress_code, acquired_day=0):
             dress_key = str(dress_code or "").strip()
             if not dress_key:
                 return False
-            self.add_dress(dress_key, acquired_day)
+            if not self.has_dress(dress_key):
+                return False
             self.current_dress = dress_key
+            self.sleep_bottom_layer = "nightwear" if dress_key == "nightshirt" else "daywear"
             return True
 
         def remove_current_dress(self, dress_code=""):
@@ -348,6 +379,7 @@ init -998 python:
             if dress_key and dress_key != current:
                 return False
             self.current_dress = ""
+            self.sleep_bottom_layer = "nothing"
             return True
 
         def dress_age_days(self, dress_code="", current_day=0):
@@ -437,13 +469,24 @@ init -998 python:
                 self.current_dress = ""
                 self.sleep_bottom_layer = "nothing"
             elif mode_key in ("night", "nightwear", "sleep"):
-                self.ensure_nightwear(current_day)
-                self.current_dress = "nightshirt"
-                self.sleep_bottom_layer = "nightwear"
+                if self.has_dress("nightshirt"):
+                    self.current_dress = "nightshirt"
+                    self.sleep_bottom_layer = "nightwear"
+                else:
+                    self.current_dress = ""
+                    self.sleep_bottom_layer = "nothing"
             else:
-                self.sleep_bottom_layer = "daywear"
-                if str(self.current_dress or "").strip() in ("", "nightshirt"):
-                    self.wear_dress("villagedress", current_day)
+                self.owned_dresses = player_normalize_id_list(self.owned_dresses)
+                daywear = [row for row in list(self.owned_dresses or []) if str(row or "").strip() != "nightshirt" and row not in list(self.destroyed_dresses or [])]
+                current = str(self.current_dress or "").strip()
+                if current in daywear:
+                    self.sleep_bottom_layer = "daywear"
+                elif len(daywear) > 0:
+                    self.current_dress = daywear[0]
+                    self.sleep_bottom_layer = "daywear"
+                else:
+                    self.current_dress = ""
+                    self.sleep_bottom_layer = "nothing"
             return self.sleep_bottom_layer
 
         def is_naked(self):
@@ -558,36 +601,29 @@ init -998 python:
             self.party = []
             self.fight_level = {"you": 1}
             self.supply = dict(self.FIGHT_SUPPLY_DEFAULTS)
+            self.mana = 50
 
         def sync_from_store(self):
             g = globals()
             party = []
             if isinstance(g.get("player_company", []), list):
                 party.extend(list(g.get("player_company", []) or []))
-            if isinstance(g.get("company_list", []), list):
-                party.extend(list(g.get("company_list", []) or []))
             self.party = player_normalize_id_list(party)
-
-            fight_level = g.get("FightLevel", self.fight_level)
-            self.fight_level = dict(fight_level or {}) if isinstance(fight_level, dict) else {"you": 1}
             self.fight_level["you"] = max(1, player_to_int(self.fight_level.get("you", 1), 1))
-
-            supply = g.get("PlayerFightSupply", self.supply)
+            supply = dict(self.supply or {})
             self.supply = dict(self.FIGHT_SUPPLY_DEFAULTS)
-            if isinstance(supply, dict):
-                for key, value in supply.items():
-                    self.supply[str(key or "")] = max(0, player_to_int(value, 0))
+            for key, value in supply.items():
+                self.supply[str(key or "")] = max(0, player_to_int(value, 0))
+            self.mana = player_clamp_value(self.mana, 0, 100)
             return self
 
         def apply_to_store(self):
             g = globals()
             g["player_company"] = list(self.party or [])
-            g["company_list"] = list(self.party or [])
-            g["FightLevel"] = dict(self.fight_level or {"you": 1})
-            g["FightLevel"]["you"] = max(1, player_to_int(g["FightLevel"].get("you", 1), 1))
-            g["PlayerFightSupply"] = dict(self.supply or {})
+            self.fight_level["you"] = max(1, player_to_int(self.fight_level.get("you", 1), 1))
             for key, value in self.FIGHT_SUPPLY_DEFAULTS.items():
-                g["PlayerFightSupply"].setdefault(key, value)
+                self.supply.setdefault(key, value)
+            self.mana = player_clamp_value(self.mana, 0, 100)
             return self
 
         def add_party_member(self, member_id):
@@ -762,6 +798,12 @@ init -998 python:
 
     def player_after_load_init():
         sync_player_state_from_store()
+
+    def player_equipped_weapon_id():
+        return str(player_state().equipment.weapon or "").strip()
+
+    def player_has_equipped_weapon(item_id=""):
+        return player_equipped_weapon_id() == player_normalize_item_id(item_id)
 
     if player_after_load_init not in config.after_load_callbacks:
         config.after_load_callbacks.append(player_after_load_init)

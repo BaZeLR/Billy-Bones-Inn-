@@ -38,9 +38,9 @@ label GiveBirth(GirlName=""):
                 return 0
 
         def _mama_molodost_heard():
-            if SandraVar.get("knowmolodost", 0) == 0:
+            if Sandra.var.get("knowmolodost", 0) == 0:
                 renpy.say(None, "Сандра, услышав такое замечание, немного покраснела. Интересно, от чего? И что эти слова значат?")
-                SandraVar["knowmolodost"] = 1
+                Sandra.var["knowmolodost"] = 1
             else:
                 renpy.say(None, "Вы понимающе усмехнулись, услышав эти слова.")
 
@@ -255,7 +255,7 @@ label GiveBirth(GirlName=""):
 
                 elif GirlName == "inga":
                     '"Спасибо, Стефан, что помогаешь," поблагодарила вас Инга. "И где только Лукас шляется?"'
-                    if sluttiness.get("becky", 0) > 30:
+                    if Becky.corruption > 30:
                         '"Я так рада внучку, вы с Лукасом просто молодцы!" добавила Бекки.'
                         $ _sfi(GirlName, 14, 1, 1, 35, 1, 1)
                     else:

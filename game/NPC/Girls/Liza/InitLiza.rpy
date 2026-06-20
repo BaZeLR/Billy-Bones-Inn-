@@ -5,7 +5,6 @@ label InitLiza:
     python:
         GirlName = Liza.code_name
         peopleData[GirlName] = LizaStaticData
-        Liza.var = LizaVar
         Liza.initialize_new_game_state()
         peopleInfo[GirlName] = Liza
         if Liza not in girls:
@@ -24,6 +23,7 @@ init python:
             "askclients": 0,
             "askpregnancy": 0,
             "asksex": 0,
+            "after_sermon_stage": 0,
             "GloryHoleMentioned": 0,
             "GloryHoleAsked": 0,
         }
@@ -47,10 +47,13 @@ init python:
 
     class LizaInfo(Girl):
         """Lizette runtime: port work, tavern relocation, church story, pregnancy state."""
+        unknown_name = "Молодая женщина"
+
         def __init__(self):
             super().__init__("liza")
             self.code_name = "liza"
             self.data = LizaStaticData
+            self.uses_own_var_state = True
             self.age = 18
             self.rel = 0
             self.relationship = self.rel
@@ -118,7 +121,7 @@ init python:
             super(LizaInfo, self).update()
             self.data = LizaStaticData
             self.relationship = self.rel
-            self.sync_from_liza_maps()
+            self.sync_from_shared_state()
             return self
 
         def ensure_story_defaults(self):
@@ -128,8 +131,7 @@ init python:
                 self.var.setdefault(key, value)
             return self.var
 
-        def sync_from_liza_maps(self):
-            self.var = LizaVar
+        def sync_from_shared_state(self):
             self.rel = people_to_int(Friends.get("liza", self.rel), self.rel)
             self.relationship = self.rel
             self.openness = people_to_int(otkroven.get("liza", self.openness), self.openness)
@@ -174,7 +176,7 @@ init python:
             self.ensure_story_defaults()
             return self
 
-        def sync_liza_maps(self):
+        def sync_shared_state(self):
             name = self.code_name
             RealName[name] = self.data.fullname
             RealName2[name] = self.data.genitive
@@ -235,15 +237,11 @@ init python:
             for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
                 table[name] = self.skills.get(skill_key, 0)
             self.ensure_story_defaults()
-            for key, value in self.var.items():
-                LizaVar[key] = value
-            ChurchAfterCermon[name + "AC"] = people_to_int(ChurchAfterCermon.get(name + "AC", 0), 0)
             return self
 
         def initialize_new_game_state(self):
-            self.var = LizaVar
             self.ensure_story_defaults()
-            self.sync_liza_maps()
+            self.sync_shared_state()
             return self
 
         def reset_daily(self, full=False):
@@ -253,7 +251,8 @@ init python:
             self.asked_today = 0
             self.fucked_today = 0
             self.drunk = 0
-            self.sync_liza_maps()
+            self.var["after_sermon_stage"] = 0
+            self.sync_shared_state()
             return self
 
         def story_value(self, key, default=0):
@@ -261,7 +260,7 @@ init python:
 
         def set_story_value(self, key, value):
             self.ensure_story_defaults()[key] = value
-            self.sync_liza_maps()
+            self.sync_shared_state()
             return value
 
         def talk_count(self):
@@ -273,13 +272,13 @@ init python:
         def add_relation(self, amount=1, cap=20):
             self.rel = max(0, min(people_to_int(cap, 20), people_to_int(self.rel, 0) + people_to_int(amount, 0)))
             self.relationship = self.rel
-            self.sync_liza_maps()
+            self.sync_shared_state()
             return self.rel
 
         def finish_talk(self):
             self.talked_today = people_to_int(self.talked_today, 0) + 1
             Talked[self.code_name] = self.talk_count() + 1
-            self.sync_liza_maps()
+            self.sync_shared_state()
             return Talked[self.code_name]
 
         def mark_asked_topic(self, topic_flag, relation_gain=1):
@@ -290,7 +289,7 @@ init python:
                 if relation_gain:
                     self.add_relation(relation_gain)
             self.asked_today = people_to_int(self.asked_today, 0) + 1
-            self.sync_liza_maps()
+            self.sync_shared_state()
             return first_time
 
         def can_ask_topic(self, topic):
@@ -319,8 +318,7 @@ init python:
 
         def portstreet_work_hour(self):
             calendar_v2.sync_state()
-            current_minutes = people_to_int(calendar_v2.clock_minutes(), 0) % 1440
-            return current_minutes >= (19 * 60) and people_to_int(week, 0) != 5
+            return people_to_int(calendar_v2.hour, 0) >= 19 and people_to_int(week, 0) != 5
 
         def portstreet_work_active(self):
             return (
@@ -345,7 +343,7 @@ init python:
             self.jobs["jobWhoreAvail"] = 1 if self.hired else 0
             self.jobs["jobwhore"] = 1 if self.hired else 0
             self.current_location = "TavernMain" if self.hired else "PortStreets"
-            self.sync_liza_maps()
+            self.sync_shared_state()
             return self.hired
 
         def can_use_gloryhole(self):
@@ -358,17 +356,23 @@ init python:
             return people_to_int(self.story_value("SawChurchAfterCermon", 0), 0) > 0
 
         def can_trigger_after_sermon_event(self):
-            return people_to_int(ChurchAfterCermon.get("lizaAC", 0), 0) > 0
+            return self.can_trigger_church_service_event()
 
         def can_trigger_church_service_event(self):
             return people_to_int(Georgett.story_value("churchlizaadmit", 0), 0) > 0
 
+        def after_sermon_stage(self):
+            return people_to_int(self.story_value("after_sermon_stage", 0), 0)
+
+        def set_after_sermon_stage(self, value):
+            return self.set_story_value("after_sermon_stage", people_to_int(value, 0))
+
         def church_after_sermon_event_available(self):
-            self.sync_from_liza_maps()
+            self.sync_from_shared_state()
             return (
                 church_after_cermon_action_visible()
                 and self.can_trigger_church_service_event()
-                and people_to_int(ChurchAfterCermon.get(self.code_name, 0), 0) < 4
+                and self.after_sermon_stage() < 4
                 and CheckIfSexEventExist(self.code_name, 99, "Priest") > 0
             )
 

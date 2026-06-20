@@ -49,56 +49,58 @@ init python:
         global Result
 
         tmpGropeReact = 0
+        rel = _adc_i(Amanda.rel, 0)
+        corr = _adc_i(Amanda.corruption, 0)
 
-        if AmandaVar.get("prohibitliza", 0) or (AmandaVar.get("alberprohibit", 0) and _adc_i(AmandaVar.get("alberfriends", 0), 0) >= 5) or AmandaVar.get("gloryscold", 0):
-            if AmandaVar.get("suckyou", 0) or AmandaVar.get("fuckyou", 0):
-                if (_adc_i(Friends.get("amanda", 0), 0) >= 12 and _adc_i(sluttiness.get("amanda", 0), 0) >= 40) or _adc_i(sluttiness.get("amanda", 0), 0) >= 50:
+        if Amanda.var_int("prohibitliza", 0) or (Amanda.var_int("alberprohibit", 0) and Amanda.var_int("alberfriends", 0) >= 5) or Amanda.var_int("gloryscold", 0):
+            if Amanda.var_int("suckyou", 0) or Amanda.var_int("fuckyou", 0):
+                if (rel >= 12 and corr >= 40) or corr >= 50:
                     tmpGropeReact = 4
-                    if _adc_i(sluttiness.get("amanda", 0), 0) >= 55 and renpy.random.randint(1, 3) == 1:
+                    if corr >= 55 and renpy.random.randint(1, 3) == 1:
                         tmpGropeReact = 3
-                elif _adc_i(sluttiness.get("amanda", 0), 0) <= 25 and _adc_i(Friends.get("amanda", 0), 0) <= 10:
+                elif corr <= 25 and rel <= 10:
                     tmpGropeReact = 2
-                elif _adc_i(sluttiness.get("amanda", 0), 0) <= 30 and _adc_i(Friends.get("amanda", 0), 0) <= 5:
+                elif corr <= 30 and rel <= 5:
                     tmpGropeReact = 2
                 else:
                     tmpGropeReact = 3
             else:
-                if (_adc_i(Friends.get("amanda", 0), 0) >= 14 and _adc_i(sluttiness.get("amanda", 0), 0) >= 45) or _adc_i(sluttiness.get("amanda", 0), 0) >= 55:
+                if (rel >= 14 and corr >= 45) or corr >= 55:
                     tmpGropeReact = 4
-                    if _adc_i(sluttiness.get("amanda", 0), 0) >= 55 and renpy.random.randint(1, 3) == 1:
+                    if corr >= 55 and renpy.random.randint(1, 3) == 1:
                         tmpGropeReact = 3
-                elif _adc_i(sluttiness.get("amanda", 0), 0) <= 30 and _adc_i(Friends.get("amanda", 0), 0) <= 12:
+                elif corr <= 30 and rel <= 12:
                     tmpGropeReact = 2
-                elif _adc_i(sluttiness.get("amanda", 0), 0) <= 35 and _adc_i(Friends.get("amanda", 0), 0) <= 8:
+                elif corr <= 35 and rel <= 8:
                     tmpGropeReact = 2
                 else:
                     tmpGropeReact = 3
         else:
-            if AmandaVar.get("suckyou", 0) or AmandaVar.get("fuckyou", 0):
-                if _adc_i(Friends.get("amanda", 0), 0) >= 2 and _adc_i(sluttiness.get("amanda", 0), 0) >= 45:
+            if Amanda.var_int("suckyou", 0) or Amanda.var_int("fuckyou", 0):
+                if rel >= 2 and corr >= 45:
                     tmpGropeReact = 4
-                elif _adc_i(Friends.get("amanda", 0), 0) >= 5 and _adc_i(sluttiness.get("amanda", 0), 0) >= 35:
+                elif rel >= 5 and corr >= 35:
                     tmpGropeReact = 4
-                elif _adc_i(Friends.get("amanda", 0), 0) >= 10 and _adc_i(sluttiness.get("amanda", 0), 0) >= 25:
+                elif rel >= 10 and corr >= 25:
                     tmpGropeReact = 4
-                elif _adc_i(Friends.get("amanda", 0), 0) >= 15 and _adc_i(sluttiness.get("amanda", 0), 0) >= 21:
+                elif rel >= 15 and corr >= 21:
                     tmpGropeReact = 4
-                elif _adc_i(Friends.get("amanda", 0), 0) >= 2 and _adc_i(sluttiness.get("amanda", 0), 0) >= 35:
+                elif rel >= 2 and corr >= 35:
                     tmpGropeReact = 1
-                elif _adc_i(Friends.get("amanda", 0), 0) >= 5 and _adc_i(sluttiness.get("amanda", 0), 0) >= 25:
+                elif rel >= 5 and corr >= 25:
                     tmpGropeReact = 1
-                elif _adc_i(Friends.get("amanda", 0), 0) >= 10 and _adc_i(sluttiness.get("amanda", 0), 0) >= 21:
+                elif rel >= 10 and corr >= 21:
                     tmpGropeReact = 1
             else:
-                if _adc_i(Friends.get("amanda", 0), 0) >= 5 and _adc_i(sluttiness.get("amanda", 0), 0) >= 45:
+                if rel >= 5 and corr >= 45:
                     tmpGropeReact = 4
-                elif _adc_i(Friends.get("amanda", 0), 0) >= 10 and _adc_i(sluttiness.get("amanda", 0), 0) >= 35:
+                elif rel >= 10 and corr >= 35:
                     tmpGropeReact = 4
-                elif _adc_i(Friends.get("amanda", 0), 0) >= 15 and _adc_i(sluttiness.get("amanda", 0), 0) >= 25:
+                elif rel >= 15 and corr >= 25:
                     tmpGropeReact = 4
-                elif _adc_i(Friends.get("amanda", 0), 0) >= 5 and _adc_i(sluttiness.get("amanda", 0), 0) >= 35:
+                elif rel >= 5 and corr >= 35:
                     tmpGropeReact = 1
-                elif _adc_i(Friends.get("amanda", 0), 0) >= 10 and _adc_i(sluttiness.get("amanda", 0), 0) >= 25:
+                elif rel >= 10 and corr >= 25:
                     tmpGropeReact = 1
 
         Result = tmpGropeReact
@@ -107,27 +109,27 @@ init python:
     def AmandaLegareSetSexType():
         global Result
 
-        if _adc_i(AmandaVar.get("sucklegare", 0), 0) == 0:
+        if Amanda.var_int("sucklegare", 0) == 0:
             tmpLegareSexType = 0
         else:
-            if _adc_i(AmandaVar.get("fucklegare", 0), 0) == 0:
-                if _adc_i(virginity.get("amanda", 1), 1) == 1:
-                    if _adc_i(AmandaVar.get("alberfriends", 0), 0) >= 15 and _adc_i(sluttiness.get("amanda", 0), 0) >= 35 and _adc_i(sexacts.get("amanda", 0), 0) >= 5:
+            if Amanda.var_int("fucklegare", 0) == 0:
+                if Amanda.stats.get("virginity", True):
+                    if Amanda.var_int("alberfriends", 0) >= 15 and Amanda.corruption >= 35 and _adc_i(Amanda.stats.get("sexacts", 0), 0) >= 5:
                         tmpLegareSexType = 2
                     else:
                         tmpLegareSexType = 1
                 else:
-                    if _adc_i(AmandaVar.get("alberfriends", 0), 0) >= 12 and _adc_i(sluttiness.get("amanda", 0), 0) >= 32 and _adc_i(sexacts.get("amanda", 0), 0) >= 4:
+                    if Amanda.var_int("alberfriends", 0) >= 12 and Amanda.corruption >= 32 and _adc_i(Amanda.stats.get("sexacts", 0), 0) >= 4:
                         tmpLegareSexType = 3
                     else:
                         tmpLegareSexType = 1
             else:
-                if (_adc_i(AmandaVar.get("alberfriends", 0), 0) >= 10 and _adc_i(sluttiness.get("amanda", 0), 0) >= 30) or (_adc_i(AmandaVar.get("alberfriends", 0), 0) >= 5 and _adc_i(sluttiness.get("amanda", 0), 0) >= 40):
+                if (Amanda.var_int("alberfriends", 0) >= 10 and Amanda.corruption >= 30) or (Amanda.var_int("alberfriends", 0) >= 5 and Amanda.corruption >= 40):
                     tmpLegareSexType = 4
                 else:
                     tmpLegareSexType = 1
 
-        if _adc_i(pregnancy.get("amanda", 0), 0) >= 120 and tmpLegareSexType == 3:
+        if _adc_i(Amanda.stats.get("pregnancy", 0), 0) >= 120 and tmpLegareSexType == 3:
             tmpLegareSexType = 4
 
         Result = tmpLegareSexType
@@ -139,41 +141,41 @@ init python:
         AmandaNesluh = 0
         AmandaNesluhBonus = 0
 
-        if _adc_i(AmandaVar.get("glorydeflower", 0), 0) > 0 or _adc_i(AmandaVar.get("fuckyou", 0), 0) > 0:
+        if Amanda.var_int("glorydeflower", 0) > 0 or Amanda.var_int("fuckyou", 0) > 0:
             AmandaNesluhBonus += 6
-        if _adc_i(AmandaVar.get("gloryscold", 0), 0) > 0:
+        if Amanda.var_int("gloryscold", 0) > 0:
             AmandaNesluhBonus -= 3
-        if _adc_i(AmandaVar.get("glorysuck", 0), 0) > 0 or _adc_i(AmandaVar.get("suckyou", 0), 0) > 0:
+        if Amanda.var_int("glorysuck", 0) > 0 or Amanda.var_int("suckyou", 0) > 0:
             AmandaNesluhBonus += 3
-        if _adc_i(AmandaVar.get("glorywalkout", 0), 0) > 0:
+        if Amanda.var_int("glorywalkout", 0) > 0:
             AmandaNesluhBonus += 2
-        if _adc_i(AmandaVar.get("alberfriends", 0), 0) >= 7:
+        if Amanda.var_int("alberfriends", 0) >= 7:
             AmandaNesluhBonus += 1
-        if _adc_i(AmandaVar.get("alberfriends", 0), 0) >= 9:
+        if Amanda.var_int("alberfriends", 0) >= 9:
             AmandaNesluhBonus += 1
-        if _adc_i(AmandaVar.get("alberfriends", 0), 0) >= 12:
+        if Amanda.var_int("alberfriends", 0) >= 12:
             AmandaNesluhBonus += 2
-        if _adc_i(sluttiness.get("amanda", 0), 0) >= 23:
+        if Amanda.corruption >= 23:
             AmandaNesluhBonus += 1
-        if _adc_i(sluttiness.get("amanda", 0), 0) >= 30:
+        if Amanda.corruption >= 30:
             AmandaNesluhBonus += 2
-        if _adc_i(sluttiness.get("amanda", 0), 0) >= 40:
+        if Amanda.corruption >= 40:
             AmandaNesluhBonus += 4
-        if _adc_i(sluttiness.get("amanda", 0), 0) >= 50:
+        if Amanda.corruption >= 50:
             AmandaNesluhBonus += 3
-        if _adc_i(AmandaVar.get("sucklegare", 0), 0) > 0:
+        if Amanda.var_int("sucklegare", 0) > 0:
             AmandaNesluhBonus += 2
-        if _adc_i(AmandaVar.get("fucklegare", 0), 0) > 0:
+        if Amanda.var_int("fucklegare", 0) > 0:
             AmandaNesluhBonus += 3
-        if _adc_i(AmandaVar.get("deflowerlegare", 0), 0) > 0:
+        if Amanda.var_int("deflowerlegare", 0) > 0:
             AmandaNesluhBonus += 3
 
         AmandaNesluhBonus = min(14, max(1, AmandaNesluhBonus))
         if renpy.random.randint(1, 15) <= AmandaNesluhBonus:
             AmandaNesluh = 1
-        if (_adc_i(AmandaVar.get("glorydeflower", 0), 0) or _adc_i(AmandaVar.get("fuckyou", 0), 0)) and AmandaNesluh == 1 and renpy.random.randint(1, 4) <= 3:
+        if (Amanda.var_int("glorydeflower", 0) or Amanda.var_int("fuckyou", 0)) and AmandaNesluh == 1 and renpy.random.randint(1, 4) <= 3:
             AmandaNesluh = 2
-        elif (_adc_i(AmandaVar.get("glorysuck", 0), 0) or _adc_i(AmandaVar.get("suckyou", 0), 0)) and AmandaNesluh == 1 and renpy.random.randint(1, 4) <= 1:
+        elif (Amanda.var_int("glorysuck", 0) or Amanda.var_int("suckyou", 0)) and AmandaNesluh == 1 and renpy.random.randint(1, 4) <= 1:
             AmandaNesluh = 2
 
         Result = AmandaNesluh
@@ -188,20 +190,20 @@ init python:
             tmpGuyName = RandomNameCode("male")
 
         tmpSexType = 0
-        if _adc_i(sluttiness.get("amanda", 0), 0) >= 57:
+        if Amanda.corruption >= 57:
             tmpSexType = 2
-        elif _adc_i(pregnancy.get("amanda", 0), 0) > 120:
-            if _adc_i(sluttiness.get("amanda", 0), 0) >= 42:
+        elif _adc_i(Amanda.stats.get("pregnancy", 0), 0) > 120:
+            if Amanda.corruption >= 42:
                 tmpSexType = 2
-            elif _adc_i(sluttiness.get("amanda", 0), 0) >= 40:
+            elif Amanda.corruption >= 40:
                 tmpSexType = 1
         else:
-            if _adc_i(sluttiness.get("amanda", 0), 0) >= 45:
+            if Amanda.corruption >= 45:
                 if renpy.random.randint(1, 3) == 1:
                     tmpSexType = 1
                 elif renpy.random.randint(1, 9) <= 4:
                     tmpSexType = 2
-            elif _adc_i(sluttiness.get("amanda", 0), 0) >= 40:
+            elif Amanda.corruption >= 40:
                 tmpSexType = 1
 
         if _adc_i(forced_type, 0) > 0:
@@ -210,14 +212,14 @@ init python:
             tmpSexType = 3
 
         if tmpSexType == 3:
-            PregnancyCheck("amanda", "outside", 1, tmpGuyName, 0, "Соседский парень")
-            slut_friends_increase("amanda", 0, 0, 0, 62, 1, 1)
+            Amanda.pregnancy_check("outside", 1, tmpGuyName, 0, "Соседский парень")
+            Amanda.change_social(corruption_delta=1)
         elif tmpSexType == 2:
-            PregnancyCheck("amanda", "inside", 1, tmpGuyName, 0, "Соседский парень")
-            slut_friends_increase("amanda", 0, 0, 0, 65, 1, 1)
+            Amanda.pregnancy_check("inside", 1, tmpGuyName, 0, "Соседский парень")
+            Amanda.change_social(corruption_delta=1)
         elif tmpSexType == 1:
-            PregnancyCheck("amanda", "mouth", 1, tmpGuyName, 0, "Соседский парень")
-            slut_friends_increase("amanda", 0, 0, 0, 48, 1, 1)
+            Amanda.pregnancy_check("mouth", 1, tmpGuyName, 0, "Соседский парень")
+            Amanda.change_social(corruption_delta=1)
 
         Result = tmpSexType
         return tmpSexType
@@ -226,7 +228,7 @@ init python:
         global AmandaDynamicNextJump
 
         renpy.say(None, "Не стерпев что Аманда отлынивает от работы, вы подскочили к ней, взяли за плечо и начали орать:")
-        if _adc_i(AmandaVar.get("warnnotwork", 0), 0):
+        if Amanda.var_int("warnnotwork", 0):
             renpy.say(None, "\"Опять ты шляешься по улице вместо того, чтобы работать! А я ведь тебя предупреждал!\"")
             renpy.say(None, "\"Но перерыв...\" попыталась оправдаться Аманда.")
         else:
@@ -234,18 +236,18 @@ init python:
             renpy.say(None, "\"А что такого? У меня перерыв.\" ответила вам она.")
         renpy.say(None, "\"Не выдумывай! Нет у тебя никакого перерыва. А даже если бы и был, то считай что он уже закончился. Марш на работу!\"")
 
-        AmandaVar["warnnotwork"] = 1
+        Amanda.set_var_int("warnnotwork", 1)
 
         if renpy.random.randint(1, 3) == 1:
             renpy.say(None, "\"Нет так нет,\" недобро ответила вам она. \"Работать я работаю, как умею.\"")
             renpy.say(None, "И, напевая себе под нос: \"Так чего же нам стараться, поработаем с прохладцей,\" она пошла обратно.")
-            cooking["amanda"] = max(10, _adc_i(cooking.get("amanda", 0), 0) - 3)
-            cleaning["amanda"] = max(10, _adc_i(cleaning.get("amanda", 0), 0) - 3)
-            waitress["amanda"] = max(10, _adc_i(waitress.get("amanda", 0), 0) - 3)
+            Amanda.skills["cooking"] = max(10, _adc_i(Amanda.skills.get("cooking", 0), 0) - 3)
+            Amanda.skills["cleaning"] = max(10, _adc_i(Amanda.skills.get("cleaning", 0), 0) - 3)
+            Amanda.skills["waitress"] = max(10, _adc_i(Amanda.skills.get("waitress", 0), 0) - 3)
         else:
             renpy.say(None, "Расстроившись, но не найдя что вам возразить, Аманда пошлепала обратно в трактир.")
 
-        slut_friends_increase("amanda", 6, 1, -2, 0, 0, 0)
+        Amanda.change_social(friend_delta=(1 if Amanda.rel >= 6 else -2))
         AmandaDynamicNextJump = "StreetTavern"
         return 0
 

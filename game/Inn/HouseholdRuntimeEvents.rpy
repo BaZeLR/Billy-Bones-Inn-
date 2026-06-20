@@ -121,8 +121,8 @@ init python:
     def melissa_storage_thanks_available():
         return (
             str(CurLoc or "") == "TavernStorage"
-            and int(MelissaVar.get("storage_rat_last_help_day", -1) or -1) >= 0
-            and int(MelissaVar.get("StorageThanksDay", -1) or -1) != int(dayspassed or 0)
+            and int(Melissa.var.get("storage_rat_last_help_day", -1) or -1) >= 0
+            and int(Melissa.var.get("StorageThanksDay", -1) or -1) != int(dayspassed or 0)
         )
 
     def melissa_room_problem_available():
@@ -131,15 +131,15 @@ init python:
         except Exception:
             pass
         stage = Melissa.bats_stage()
-        temp_room = str(MelissaVar.get("temp_room", "") or "").strip()
+        temp_room = str(Melissa.var.get("temp_room", "") or "").strip()
         return (
             str(CurLoc or "") == "TavernMelissaRoom"
             and int(time or 0) >= 4
-            and int(MelissaVar.get("storage_rat_last_help_day", -1) or -1) >= 0
+            and int(Melissa.var.get("storage_rat_last_help_day", -1) or -1) >= 0
             and stage >= 2
             and stage < 4
             and (
-                int(MelissaVar.get("RoomProblemAskDay", -1) or -1) != int(dayspassed or 0)
+                int(Melissa.var.get("RoomProblemAskDay", -1) or -1) != int(dayspassed or 0)
                 or (stage >= 3 and temp_room == "")
             )
             and (stage < 2 or stage >= 3 or temp_room == "")
@@ -150,8 +150,8 @@ init python:
             Melissa.sync_room_problem_state()
         except Exception:
             pass
-        temp_room = str(MelissaVar.get("temp_room", "") or "")
-        repair_day = int(MelissaVar.get("roof_repair_complete_day", -1) or -1)
+        temp_room = str(Melissa.var.get("temp_room", "") or "")
+        repair_day = int(Melissa.var.get("roof_repair_complete_day", -1) or -1)
         waiting_for_repair = repair_day >= 0
         if temp_room == "" or Melissa.bats_stage() >= 8:
             return ""
@@ -189,11 +189,11 @@ init python:
             return 0
 
         if girl == "sandra":
-            SandraVar["revealing_dress_ordered"] = 1
-            SandraVar["revealing_dress_code"] = dress_name
+            Sandra.var["revealing_dress_ordered"] = 1
+            Sandra.var["revealing_dress_code"] = dress_name
         elif girl == "melissa":
-            MelissaVar["revealing_dress_ordered"] = 1
-            MelissaVar["revealing_dress_code"] = dress_name
+            Melissa.var["revealing_dress_ordered"] = 1
+            Melissa.var["revealing_dress_code"] = dress_name
         elif girl == "amanda":
             AmandaVar["revealing_dress_ordered"] = 1
             AmandaVar["revealing_dress_code"] = dress_name
@@ -203,13 +203,13 @@ init python:
 
     def sandra_revealing_dress_initiative_ready():
         return (
-            int(BeckyVar.get("visitedhome", 0) or 0) >= 3
-            and int(SandraVar.get("revealing_dress_ordered", 0) or 0) == 0
-            and int(SandraVar.get("revealing_dress_initiative_seen", 0) or 0) == 0
+            int(Becky.var.get("visitedhome", 0) or 0) >= 3
+            and int(Sandra.var.get("revealing_dress_ordered", 0) or 0) == 0
+            and int(Sandra.var.get("revealing_dress_initiative_seen", 0) or 0) == 0
             and CheckDailyEventExists("", "BuyDressTom", "") == 0
             and CheckDailyEventExists("sandra", "BuyDress", "") == 0
-            and int(Friends.get("sandra", 0) or 0) >= 7
-            and int(TalkedToday.get("sandra", 0) or 0) == 0
+            and int(Sandra.rel or 0) >= 7
+            and int(Sandra.talked_today or 0) == 0
         )
 
     def household_soap_request_ready(girl_name=""):
@@ -311,36 +311,23 @@ init python:
         return ("", "")
 
     def melissa_revealing_dress_request_ready():
-        # Respect classes: girls are objects now. Use .var (which holds the story flags dict)
-        # Fall back to legacy bare global only for compatibility.
-        sandra_info = peopleInfo.get("sandra") if 'peopleInfo' in dir() else None
-        sandra_dict = sandra_info.var if sandra_info and hasattr(sandra_info, "var") and isinstance(sandra_info.var, dict) else (SandraVar if 'SandraVar' in dir() else {})
-        melissa_info = peopleInfo.get("melissa") if 'peopleInfo' in dir() else None
-        melissa_dict = melissa_info.var if melissa_info and hasattr(melissa_info, "var") and isinstance(melissa_info.var, dict) else (MelissaVar if 'MelissaVar' in dir() else {})
-
         return (
-            int(sandra_dict.get("revealing_dress_ordered", 0) or 0) == 1
-            and int(melissa_dict.get("revealing_dress_ordered", 0) or 0) == 0
-            and int(melissa_dict.get("revealing_dress_request_seen", 0) or 0) == 0
+            int(Sandra.var.get("revealing_dress_ordered", 0) or 0) == 1
+            and int(Melissa.var.get("revealing_dress_ordered", 0) or 0) == 0
+            and int(Melissa.var.get("revealing_dress_request_seen", 0) or 0) == 0
             and CheckDailyEventExists("", "BuyDressTom", "") == 0
             and CheckDailyEventExists("melissa", "BuyDress", "") == 0
-            and int(Friends.get("melissa", 0) or 0) >= 6
-            and int(TalkedToday.get("melissa", 0) or 0) == 0
+            and int(Melissa.rel or 0) >= 6
+            and int(Melissa.talked_today or 0) == 0
         )
 
     def amanda_revealing_dress_request_ready():
-        # Respect classes: girls are objects now. Use .var (which holds the story flags dict)
-        # Fall back to legacy bare global only for compatibility.
-        sandra_info = peopleInfo.get("sandra") if 'peopleInfo' in dir() else None
-        sandra_dict = sandra_info.var if sandra_info and hasattr(sandra_info, "var") and isinstance(sandra_info.var, dict) else (SandraVar if 'SandraVar' in dir() else {})
-        melissa_info = peopleInfo.get("melissa") if 'peopleInfo' in dir() else None
-        melissa_dict = melissa_info.var if melissa_info and hasattr(melissa_info, "var") and isinstance(melissa_info.var, dict) else (MelissaVar if 'MelissaVar' in dir() else {})
         amanda_info = peopleInfo.get("amanda") if 'peopleInfo' in dir() else None
         amanda_dict = amanda_info.var if amanda_info and hasattr(amanda_info, "var") and isinstance(amanda_info.var, dict) else (AmandaVar if 'AmandaVar' in dir() else {})
 
         return (
-            int(sandra_dict.get("revealing_dress_ordered", 0) or 0) == 1
-            and int(melissa_dict.get("revealing_dress_ordered", 0) or 0) == 1
+            int(Sandra.var.get("revealing_dress_ordered", 0) or 0) == 1
+            and int(Melissa.var.get("revealing_dress_ordered", 0) or 0) == 1
             and int(amanda_dict.get("revealing_dress_ordered", 0) or 0) == 0
             and int(amanda_dict.get("revealing_dress_request_seen", 0) or 0) == 0
             and CheckDailyEventExists("", "BuyDressTom", "") == 0
@@ -367,7 +354,7 @@ init python:
             and int(time or 0) == 0
             and int(week or 0) != 7
             and str(getLocation("melissa") or "") == "TavernStorage"
-            and int(MelissaVar.get("storage_rat_cleared", 0) or 0) == 0
+            and int(Melissa.var.get("storage_rat_cleared", 0) or 0) == 0
             and not household_runtime_event_seen_today("melissa_storage_rat")
         )
 
@@ -512,7 +499,7 @@ label HouseholdBarberRequestChoice(girl_name="", agree=0):
 
 
 label SandraDressInitiativeEvent:
-    $ SandraVar["revealing_dress_initiative_seen"] = 1
+    $ Sandra.var["revealing_dress_initiative_seen"] = 1
     $ _sandra_scene = tavern_kitchen_random_sandra_scene() if renpy.has_label("TavernKitchen") else ""
     if str(_sandra_scene or "").strip():
         $ _layout_last_picture = _sandra_scene
@@ -531,7 +518,7 @@ label SandraDressInitiativeEvent:
 
 
 label MelissaDressRequestEvent:
-    $ MelissaVar["revealing_dress_request_seen"] = 1
+    $ Melissa.var["revealing_dress_request_seen"] = 1
     if renpy.loadable("images/melissa/tavern/melissa_portrait.png"):
         $ _layout_last_picture = "images/melissa/tavern/melissa_portrait.png"
     $ MainTxt = "Мелисса, дождавшись пока вокруг станет потише, смущенно признается: \"Я видела, какой наряд ты выбрал для Сандры. Если уж ей можно что-то посмелее, может и мне когда-нибудь подберешь платье не только для работы, но и чтобы самой себе нравиться?\"\n\nСказав это, она тут же опускает глаза, но по голосу слышно, что мысль ей давно не дает покоя."
@@ -575,10 +562,10 @@ label HouseholdRevealDressRequestChoice(girl_name="", agree=0):
         $ DailyEventsList_Add(_request_girl, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy")
         if _request_girl == "sandra":
             $ MainTxt = "Вы киваете Сандре и обещаете, что в ближайшее время заглянете с ней к Ирме и подберете что-нибудь заметно смелее ее обычных платьев. Сандра делает вид, что это пустяк, но по довольной полуулыбке видно: такой ответ ей пришелся по душе."
-            $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
+            $ Sandra.change_social(friend_delta=1)
         elif _request_girl == "melissa":
             $ MainTxt = "Вы обещаете Мелиссе, что не забудете о ее просьбе и подберете у Ирмы что-нибудь похожее, но по ее характеру. Мелисса заметно оживляется и тихо благодарит вас."
-            $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+            $ Melissa.change_social(friend_delta=1)
         else:
             $ MainTxt = "Вы соглашаетесь, что раз уж в доме одна за другой появляются новые наряды, то и Аманду обделять не стоит. Услышав это, девушка сияет так, будто обновка уже висит у нее в шкафу."
             $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
@@ -616,14 +603,14 @@ label TavernStorageRatEvent:
 
 label TavernStorageRatChoice(kill_rat=0):
     if int(kill_rat or 0) == 1:
-        $ MelissaVar["storage_rat_cleared"] = 1
-        $ MelissaVar["storage_rat_last_help_day"] = int(dayspassed or 0)
+        $ Melissa.var["storage_rat_cleared"] = 1
+        $ Melissa.var["storage_rat_last_help_day"] = int(dayspassed or 0)
         $ WerecatVar["rat_carcass_cached"] = 1
         $ WerecatVar["rats_problem_active"] = 1
         $ WerecatVar["rat_food_loss_next_day"] = int(dayspassed or 0) + 7
-        $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
-        $ cleaning["melissa"] = min(100, int(cleaning.get("melissa", 0) or 0) + 1)
-        $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+        $ Melissa.var["work_attitude"] = int(Melissa.var.get("work_attitude", 0) or 0) + 1
+        $ Melissa.skills["cleaning"] = min(100, int(Melissa.skills.get("cleaning", 0) or 0) + 1)
+        $ Melissa.change_social(friend_delta=1)
         $ story_thread_advance_current()
         $ MainTxt = "Вы быстро расправляетесь с крысой, и Мелисса заметно расслабляется. \"Вот теперь другое дело,\" тихо говорит она, уже без прежнего раздражения. На всякий случай вы решаете не выбрасывать тушку сразу: такая приманка еще может сгодиться, если в лесу и правда водится тот необычный кошачий охотник, о котором судачат по трактирам."
     else:
@@ -649,17 +636,17 @@ label MelissaRoomPestsChoice(help_pests=0):
     $ _melissa_bats_active = Melissa.bats_stage() > 0 and Melissa.bats_stage() < 8
     if int(help_pests or 0) == 1:
         if _melissa_bats_active:
-            $ MelissaVar["room_pests_last_help_day"] = int(dayspassed or 0)
-            $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
-            $ cleaning["melissa"] = min(100, int(cleaning.get("melissa", 0) or 0) + 1)
-            $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+            $ Melissa.var["room_pests_last_help_day"] = int(dayspassed or 0)
+            $ Melissa.var["work_attitude"] = int(Melissa.var.get("work_attitude", 0) or 0) + 1
+            $ Melissa.skills["cleaning"] = min(100, int(Melissa.skills.get("cleaning", 0) or 0) + 1)
+            $ Melissa.change_social(friend_delta=1)
             $ MainTxt = "Вы быстро выметаете свежую паутину и наводите в комнате хоть какой-то порядок, но сразу понимаете, что настоящая беда никуда не делась. Под крышей по-прежнему шуршит и скребется вся та дрянь, с которой придется разбираться уже через чердак и щели под кровлей."
         else:
             $ Melissa.complete_bats_problem()
-            $ MelissaVar["room_pests_last_help_day"] = int(dayspassed or 0)
-            $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
-            $ cleaning["melissa"] = min(100, int(cleaning.get("melissa", 0) or 0) + 1)
-            $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+            $ Melissa.var["room_pests_last_help_day"] = int(dayspassed or 0)
+            $ Melissa.var["work_attitude"] = int(Melissa.var.get("work_attitude", 0) or 0) + 1
+            $ Melissa.skills["cleaning"] = min(100, int(Melissa.skills.get("cleaning", 0) or 0) + 1)
+            $ Melissa.change_social(friend_delta=1)
             $ MainTxt = "Вы быстро смахиваете паутину, шумом поднимаете с балок летучих мышей и выпроваживаете их наружу. Мелисса облегченно выдыхает: похоже, порядок в ее комнате для нее и правда важен."
     else:
         $ MainTxt = "Вы решаете пока не возиться с пауками и мышами. Мелисса кривится и недовольно косится на потолок, понимая, что вечером ей снова придется слушать это шуршание."
@@ -753,11 +740,11 @@ label HouseholdWakeSleepyGirl(girl_name=""):
         $ MainTxt = "Вы будите Мелиссу тихо, но настойчиво. Она вздрагивает, садится на кровати и явно с трудом возвращается в явь, потом понимает, который час, и недовольно выдыхает себе под нос."
         if _wake_indecent:
             $ MainTxt = str(MainTxt or "") + "\nВо сне одеяло успело сползти, и вам открывается куда больше, чем Мелисса обычно позволяет увидеть днем. Осознав это, она быстро оправляется, но вместо злости в ее лице остается скорее смущенное раздражение."
-            $ sluttiness["melissa"] = min(100, int(sluttiness.get("melissa", 0) or 0) + 1)
+            $ Melissa.change_social(corruption_delta=1)
         if _wake_bulge:
-            if int(Friends.get("melissa", 0) or 0) >= 10 or int(sluttiness.get("melissa", 0) or 0) >= 18:
+            if int(Melissa.rel or 0) >= 10 or int(Melissa.corruption or 0) >= 18:
                 $ MainTxt = str(MainTxt or "") + "\nМелисса замечает вашу выпуклость под штанами, замолкает на полуслове и опускает взгляд. Потом, уже тише, чем прежде, бросает: \"Ну... в следующий раз хоть стучи чуть дольше.\""
-                $ otkroven["melissa"] = min(20, int(otkroven.get("melissa", 0) or 0) + 1)
+                $ Melissa.change_social(open_delta=1)
             else:
                 $ MainTxt = str(MainTxt or "") + "\nКогда Мелисса замечает, что вы явились будить ее в слишком уж красноречивом состоянии, она вспыхивает и немедленно отворачивается, явно желая закончить разговор как можно быстрее."
     else:
@@ -794,19 +781,17 @@ label MelissaNightWakeChoice(choice_value=0):
     $ _melissa_night_choice = int(choice_value or 0)
     if _melissa_night_choice == 1:
         $ calendar_v2.advance_minutes(20)
-        $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
-        $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
+        $ Melissa.change_social(friend_delta=1)
+        $ Melissa.var["work_attitude"] = int(Melissa.var.get("work_attitude", 0) or 0) + 1
         $ MainTxt = "Вы поднимаетесь вместе с Мелиссой, быстро прогоняете ночную дрянь из ее комнаты и помогаете ей успокоиться. На прощание она благодарит вас уже куда мягче обычного: видно, что такая помощь ей важна."
     elif _melissa_night_choice == 2:
         $ calendar_v2.advance_minutes(30)
-        $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
-        $ otkroven["melissa"] = min(20, int(otkroven.get("melissa", 0) or 0) + 1)
-        $ sluttiness["melissa"] = min(100, int(sluttiness.get("melissa", 0) or 0) + 2)
-        $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
-        $ MelissaVar["work_attitude"] = int(MelissaVar.get("work_attitude", 0) or 0) + 1
+        $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
+        $ player.change_stat("fun", 3)
+        $ Melissa.var["work_attitude"] = int(Melissa.var.get("work_attitude", 0) or 0) + 1
         $ MainTxt = "Вы сначала притягиваете Мелиссу к себе и даете ей выдохнуть в тишине, а уже потом идете разбираться с шорохами. Когда все заканчивается, она еще ненадолго остается рядом, благодарит вас шепотом и уходит заметно теплее и смелее, чем пришла."
     else:
-        $ Friends["melissa"] = max(0, int(Friends.get("melissa", 0) or 0) - 1)
+        $ Melissa.change_social(friend_delta=-1)
         $ MainTxt = "Вы бурчите, что ночью вам не до таких хлопот, и отправляете Мелиссу разбираться самой. Она ничего не отвечает, но по ее лицу видно, что такой ответ ей очень не по душе."
     $ CurLocDesc = MainTxt
     return

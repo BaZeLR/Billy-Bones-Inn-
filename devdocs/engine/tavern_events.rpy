@@ -2,7 +2,6 @@ default today_tavern_events = []
 init python:
     from collections import defaultdict
     import renpy as renpy_module
-    from renpy.store import store
 
     class TavernEvent(python_object):
         __slots__ = ("event_id", "category", "label", "weight", "repeatable", "requires_presence", "summary")
@@ -34,7 +33,7 @@ init python:
         def load(self):
             if self.loaded:
                 return
-            config = store.load_tavern_events_config() or {}
+            config = load_tavern_events_config() or {}
             self.defaults.update(config.get("defaults", {}))
             for category, items in config.get("categories", {}).items():
                 self.categories[category] = [TavernEvent(category, item) for item in items]
@@ -66,10 +65,10 @@ init python:
         return _rng().choices(events, weights=weights, k=1)[0]
 
     def clear_daily_tavern_events():
-        store.today_tavern_events = []
+        today_tavern_events[:] = []
 
     def get_daily_tavern_events():
-        return list(store.today_tavern_events)
+        return list(today_tavern_events)
 
     def generate_daily_tavern_events(state=None, max_events=None, category_cycle=None):
         catalog.load()
@@ -80,7 +79,7 @@ init python:
         plan = []
         used_ids = set()
         if max_events <= 0 or not cycle:
-            store.today_tavern_events = plan
+            today_tavern_events[:] = plan
             return plan
         # iterate through cycle until filled or no events
         attempts = 0
@@ -98,5 +97,5 @@ init python:
                     if not selected.repeatable:
                         used_ids.add(selected.event_id)
             attempts += 1
-        store.today_tavern_events = plan
+        today_tavern_events[:] = plan
         return plan

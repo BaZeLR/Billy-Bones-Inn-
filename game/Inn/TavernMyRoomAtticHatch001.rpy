@@ -17,6 +17,7 @@ init 5 python:
         object_id="myroom_attic_hatch_001",
         name="Люк на чердак",
         description="Под потолком обнаруживается старый люк с железным кольцом.",
+        picture="images/player_room/player_room_attic.png",
         actions=[
             ObjectAction(
                 action_id="examine_attic_hatch",
@@ -50,6 +51,7 @@ label TavernMyRoomAtticHatchSearch:
         $ MainTxt = "Пока вы слишком плохо ориентируетесь в хозяйстве трактира, чтобы заметить здесь что-то полезное."
     elif int(TavernMyRoomAtticHatchFound or 0) == 0:
         $ TavernMyRoomAtticHatchFound = 1
+        $ TavernMyRoomAtticHatchObject.picture = "images/player_room/player_room_attic_1.png"
         $ MainTxt = "Вы подтаскиваете табурет, ощупываете потолочную балку и понимаете, что люк на чердак держится на простом крюке. Теперь вы знаете, как его открыть."
     else:
         $ MainTxt = "Вы уже разобрались, как открыть этот люк на чердак."

@@ -58,8 +58,8 @@ init python:
                     ObjectAction(
                         action_id="examine_port_lanes",
                         label="Осмотреть переулки",
-                        hook="text",
-                        target="Тесные и запутанные переулки выглядят именно так, как и должно выглядеть место рядом с портом: темновато, шумно и не слишком безопасно.",
+                        hook="call",
+                        target="PortStreetsExamineLanes",
                     ),
                 ],
             ),
@@ -98,8 +98,12 @@ init python:
             ),
         ],
         schedule=RoomSchedule(
-            weekdays=[1, 2, 3, 4, 5, 6, 7],
-            time_slots=[0, 1, 2, 3, 4],
+            [1, 2, 3, 4, 5, 6, 7],
+            [],
+            "",
+            None,
+            "00:00",
+            "23:59",
         ),
         custom_properties={
             "street_prostitution_location": True,
@@ -146,7 +150,7 @@ label PortStreets:
 
     call RoomEnterEventGate(CurLoc, False)
     $ Georgett.sync_from_georgett_maps()
-    $ Liza.sync_from_liza_maps()
+    $ Liza.sync_from_shared_state()
 
     $ GirlNamePS1 = "georgett"
     $ GirlNamePS2 = "liza"
@@ -318,6 +322,18 @@ label PortStreetsObjectText(object_id="", action_id=""):
             MainTxt = _port_text
             CurLocDesc = _port_text
     call PortStreetsObjectMenu(object_id)
+    return
+
+
+label PortStreetsExamineLanes:
+    scene black
+    $ _port_lanes_pictures = ["images/general/port_streets.png", "images/general/port_streets1.png", "images/general/port_streets2.png", "images/general/port_streets4.png", "images/general/port_streets5.png"]
+    $ _port_lanes_picture = _port_lanes_pictures[renpy.random.randint(0, len(_port_lanes_pictures) - 1)]
+    $ scene_image = _port_lanes_picture
+    $ _layout_last_picture = _port_lanes_picture
+    $ MainTxt = "В этих темных углах любой искатель приключений может найти острые ощущения, которые удовлетворят его вкусы, а при неудаче, возможно, и его смерть."
+    $ CurLocDesc = MainTxt
+    call PortStreetsObjectMenu("port_lanes")
     return
 
 

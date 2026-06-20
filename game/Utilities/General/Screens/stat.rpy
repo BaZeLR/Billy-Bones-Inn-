@@ -232,7 +232,7 @@ init python:
             pass
 
         try:
-            if _player_int(LizaVar.get("ProstStart", 0), 0) > 0:
+            if _player_int(Liza.story_value("ProstStart", 0), 0) > 0:
                 score += 10
         except Exception:
             pass
@@ -244,13 +244,13 @@ init python:
             pass
 
         try:
-            if _player_int(BeckyVar.get("visitedhome", 0), 0) >= 3:
+            if _player_int(Becky.var.get("visitedhome", 0), 0) >= 3:
                 score += 15
         except Exception:
             pass
 
         try:
-            if _player_int(BeckyVar.get("AdmitSherwood", 0), 0) > 0 or _player_int(BeckyVar.get("RobbedByRobin", 0), 0) >= 2:
+            if _player_int(Becky.var.get("AdmitSherwood", 0), 0) > 0 or _player_int(Becky.var.get("RobbedByRobin", 0), 0) >= 2:
                 score += 15
         except Exception:
             pass
@@ -262,7 +262,7 @@ init python:
             pass
 
         try:
-            if _player_int(ZimmerVar.get("RobinInvestigationDay", 0), 0) > 0:
+            if _player_int(Zimmer.var.get("RobinInvestigationDay", 0), 0) > 0:
                 score += 5
         except Exception:
             pass

@@ -256,6 +256,24 @@ init -20 python:
         return {"code": "", "slot": tp}
 
 
+    def tavern_work_pop_planned_code(code="", time_period=None, require_room_match=False, room_code=""):
+        code_key = str(code or "")
+        tp = tavern_work_int(time if time_period is None else time_period, 0)
+        for index, row in enumerate(list(tavern_work_events or [])):
+            if bool(row.get("mandatory", False)):
+                continue
+            if str(row.get("code", "") or "") != code_key:
+                continue
+            if tavern_work_int(row.get("period", 0), 0) != tp:
+                continue
+            popped = tavern_work_events.pop(index)
+            tavern_work_add_report_row(popped, bool(require_room_match))
+            TavernPlayedEventsToday.append(code_key)
+            tavern_work_sync_legacy_queue()
+            return dict(popped or {})
+        return {}
+
+
 define tavern_work_type_chances = {
     "harrass": 55,
     "small_fight": 20,

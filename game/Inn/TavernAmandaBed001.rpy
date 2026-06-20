@@ -14,7 +14,8 @@ init python:
                 action_id="approach_bed",
                 label="Пристать к Аманде",
                 hook="call",
-                target="TavernAmandaRoomGropeAction",
+                target="checkTriggers",
+                args=("TavernAmandaRoom", "amanda_grope", 0),
                 condition=tavern_amanda_bed_action_available,
             ),
             ObjectAction(

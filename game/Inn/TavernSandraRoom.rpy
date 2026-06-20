@@ -3,7 +3,7 @@
 # ================================================================================
 init 6 python:
     def tavern_upstairs_can_enter_sandra_room():
-        return int(Friends.get("sandra", 0) or 0) >= 10 or int(SandraVar.get("RoomUnlocked", 0) or 0) == 1
+        return int(Sandra.rel or 0) >= 10 or Sandra.room_unlocked()
 
     def tavern_sandra_room_door_locked():
         return bedroom_door_locked("TavernSandraRoom")
@@ -68,7 +68,6 @@ init 6 python:
         game_items=[
             bedroom_door_object("sandra_room_door_001", "TavernSandraRoom", "Сандры"),
         ],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "object_menu_label": "TavernSandraRoomObjectMenu",
         },
@@ -195,11 +194,10 @@ label TavernSandraRoomRestore:
 
 
 label TavernSandraLedgerScene:
-    $ AskedToday["sandra"] = int(AskedToday.get("sandra", 0) or 0) + 1
-    $ Talked["sandra"] = int(Talked.get("sandra", 0) or 0) + 1
-    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
-    $ otkroven["sandra"] = min(20, int(otkroven.get("sandra", 0) or 0) + 1)
-    $ fun = _player_clamp(int(fun or 0) + 1, 0, 100)
+    $ Sandra.mark_asked()
+    $ Sandra.mark_talked()
+    $ Sandra.change_social(friend_delta=1, open_delta=1)
+    $ player.change_stat("fun", 1)
     $ calendar_v2.advance_minutes(30)
     $ _sandra_ledger_picture = str(tavern_sandra_ledger_picture() or "")
     if _sandra_ledger_picture != "":

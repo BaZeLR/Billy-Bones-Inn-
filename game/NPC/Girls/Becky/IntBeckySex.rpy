@@ -28,11 +28,11 @@ init python:
         if int(GrupenSex.get("eddie", 0) or 0) <= 0:
             return ("", 0)
         if int(obs_type or 0) == 0 and int(TitsVisible.get(girl_name, 0) or 0):
-            if int(sluttiness.get(girl_name, 0) or 0) < 55:
+            if Becky.corruption < 55:
                 return ("Бекки попыталась было прикрыть рукой свои тяжелые обнаженные груди от взгляда Эдди, но быстро одумалась.", 2)
             return ("Заметив, что Эдди любуется ее обнажившимися грудями, вдова повернулась к нему и начала играть с сосками.", 3)
         if int(obs_type or 0) == 1 and int(PussyVisible.get(girl_name, 0) or 0):
-            if int(sluttiness.get(girl_name, 0) or 0) < 55:
+            if Becky.corruption < 55:
                 return ("Увидев, что Эдди пристально смотрит на ее щель, она плотно сжала ноги, но, вспомнив через несколько секунд, что о целомудрии имело смысл думать малость пораньше, немного расслабилась.", 4)
             return ("Заметив непристойный взгляд Эдди, направленный на ее голую промежность, вдова широко расставила ноги и стала играться с клитором. У него разве что слюна со рта не закапала от такого зрелища.", 7)
         return ("Эдди с горящими глазами наблюдал за тем, как вы раздеваете хозяйку лавки.", 0)
@@ -65,14 +65,11 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
         Arousal.setdefault("you", Arousal.get("You", 0))
         Arousal.setdefault(GirlNameIBS, 0)
         Arousal.setdefault("eddie", 0)
-        GiveOrgasms.setdefault(GirlNameIBS, 0)
         LickPussy.setdefault(GirlNameIBS, 0)
         GrupenSex.setdefault("eddie", 0)
-        BeckyVar.setdefault("visitedhome", 0)
-        sluttiness.setdefault(GirlNameIBS, 0)
-        pregnancy.setdefault(GirlNameIBS, 0)
+        Becky.var.setdefault("visitedhome", 0)
         SomebodyCums = int(SomebodyCums or 0)
-        CurGiveOrgasms = GiveOrgasms.get(GirlNameIBS, 0)
+        CurGiveOrgasms = Becky.stats.get("orgasms_given", 0)
         _ibs_update_visibility(GirlNameIBS)
     call ShowBeckyPortrait
 
@@ -301,7 +298,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 $ LickPussy[GirlNameIBS] += 1
                 if LickPussy.get(GirlNameIBS, 0) == 4:
                     "\"Стефан, такой молодой, а уже знаешь что нужно даме, негодник!\", смеясь говорит [RealName.get(GirlNameIBS, GirlNameIBS)], трепя вас за шевелюру. \"Продолжай же, продолжай!\""
-                    $ Friends[GirlNameIBS] = Friends.get(GirlNameIBS, 0) + 1
+                    $ Becky.add_relation(1, cap=100)
                 $ _ibs_inc_arousal(GirlNameIBS, 26)
                 call ShowCurrentSex(GirlNameIBS)
                 call ShowImage(GirlNameIBS, "sex", "lick")
@@ -326,7 +323,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 elif Arousal.get("You", 0) < 40:
                     "Облизывать головку вашего напрягшегося члена."
                     call ShowImage(GirlNameIBS, "sex", "minet2")
-                elif sluttiness.get(GirlNameIBS, 0) < 40:
+                elif Becky.corruption < 40:
                     "Неумело, но с энтузиазмом сосать ваш член."
                     call ShowImage(GirlNameIBS, "sex", "minet3")
                 elif Arousal.get("You", 0) < 60:
@@ -341,7 +338,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 if EddieCockInPussy.get(GirlNameIBS, 0) == 0 and GrupenSex.get("eddie", 0) > 0:
                     $ _becky_minetalone_pic = "minetalone" + str(renpy.random.randint(1, 3))
                     call ShowImage(GirlNameIBS, "sex", _becky_minetalone_pic)
-                if sluttiness.get(GirlNameIBS, 0) < 40:
+                if Becky.corruption < 40:
                     $ _ibs_inc_arousal("You", 14)
                 else:
                     $ _ibs_inc_arousal("You", 20)
@@ -350,7 +347,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 call ShowCurrentSex(GirlNameIBS)
                 jump int_becky_sex_menu
 
-            "Трахать между грудей" if _cametoday < _cancumdaily and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and TitsVisible.get(GirlNameIBS, 0) and pregnancy.get(GirlNameIBS, 0) < 130 and EddieCockInTits.get(GirlNameIBS, 0) == 0 and EddieCockInMouth.get(GirlNameIBS, 0) == 0:
+            "Трахать между грудей" if _cametoday < _cancumdaily and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and TitsVisible.get(GirlNameIBS, 0) and Becky.pregnancy_days() < 130 and EddieCockInTits.get(GirlNameIBS, 0) == 0 and EddieCockInMouth.get(GirlNameIBS, 0) == 0:
                 if EddieCockInPussy.get(GirlNameIBS, 0) == 0:
                     if CockInTits.get(GirlNameIBS, 0):
                         "Вы лежите на кровати, а вдовица, наклонившись над вами, трахает ваш член своими огромными дойками. Время от времени ей удается поймать головку вашего члена ротиком."
@@ -371,7 +368,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 jump int_becky_sex_menu
 
             "Трахать" if _cametoday < _cancumdaily and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and Arousal.get(GirlNameIBS, 0) >= 20 and PussyVisible.get(GirlNameIBS, 0) and EddieCockInPussy.get(GirlNameIBS, 0) == 0:
-                if pregnancy.get(GirlNameIBS, 0) < 130 and GrupenSex.get("eddie", 0) == 0:
+                if Becky.pregnancy_days() < 130 and GrupenSex.get("eddie", 0) == 0:
                     if CockInPussy.get(GirlNameIBS, 0) == 0:
                         "Вы страстно впились поцелуем в губы [RealName2.get(GirlNameIBS, GirlNameIBS)]. Не прекращая целовать ее вы с некоторым трудом приподняли ее в воздух и насадили прямо на свой вздыбленный член. [RealName.get(GirlNameIBS, GirlNameIBS)] сладко охнула и, обхватив вас руками и ногами, стала подниматься и опускаться на вашем друге."
                         $ _becky_fuckstart_pic = "fuckstart" + str(renpy.random.randint(1, 8))
@@ -410,7 +407,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                             "Вы трахаете вдову раком на ее кровати. Она умело подмахивает вам, и ваш член входит в нее по самые яйца. Судя по всему [RealName3.get(GirlNameIBS, GirlNameIBS)] это приятно не меньше вашего, она постанывает от наслаждения при каждом толчке."
                             $ _becky_rakom_pic = "rakom" + str(renpy.random.randint(1, 4))
                             call ShowImage(GirlNameIBS, "sex", _becky_rakom_pic)
-                if pregnancy.get(GirlNameIBS, 0) > 130:
+                if Becky.pregnancy_days() > 130:
                     "Вы чувствуете как ребенок в животе у [RealName2.get(GirlNameIBS, GirlNameIBS)] двигается каждый раз когда ваш член входит во влагалище."
                 $ CockInPussy[GirlNameIBS] = 1
                 $ CockInMouth[GirlNameIBS] = 0
@@ -426,7 +423,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                     "Эдди с восторгом наблюдал за этой сценой, не переставая потрахивать хозяйку."
                     $ _ibs_inc_arousal("eddie", 10)
                 $ _ibs_set_arousal("You", 0)
-                $ PregnancyCheck(GirlNameIBS, "mouth", 1, "Вы")
+                $ Becky.apply_pregnancy_check("mouth", 1, "Вы")
                 $ _ibs_end_cock_state(GirlNameIBS)
                 $ SomebodyCums = 1
                 call ShowCurrentSex(GirlNameIBS)
@@ -436,7 +433,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
             "Кончить на лицо" if _cametoday < _cancumdaily and Arousal.get("You", 0) >= 100 and EddieCockInMouth.get(GirlNameIBS, 0) == 0 and EddieCockInTits.get(GirlNameIBS, 0) == 0:
                 "Вы вытащили ваш член и в следующее мгновение поток спермы выстрелил в переносицу [RealName2.get(GirlNameIBS, GirlNameIBS)] прямо между глаз. Продолжение струи легло на щеку, третья струя залила подбородок. Ваша подружка стала еще красивее чем была: лицо всё в сперме, струйки спускаются на шею, стекают по подбородку и капают на полные сиськи. Что за прелесть!"
                 $ _ibs_set_arousal("You", 0)
-                $ PregnancyCheck(GirlNameIBS, "face", 1, "Вы")
+                $ Becky.apply_pregnancy_check("face", 1, "Вы")
                 $ CumFaceYou[GirlNameIBS] = 1
                 $ _ibs_end_cock_state(GirlNameIBS)
                 $ SomebodyCums = 1
@@ -446,7 +443,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
             "Кончить на груди" if _cametoday < _cancumdaily and Arousal.get("You", 0) >= 100 and TitsVisible.get(GirlNameIBS, 0) and EddieCockInMouth.get(GirlNameIBS, 0) == 0 and EddieCockInTits.get(GirlNameIBS, 0) == 0:
                 "Вы вытащили свой член из [RealName2.get(GirlNameIBS, GirlNameIBS)] и залили своей спермой ее монументальный бюст."
                 $ _ibs_set_arousal("You", 0)
-                $ PregnancyCheck(GirlNameIBS, "tits", 1, "Вы")
+                $ Becky.apply_pregnancy_check("tits", 1, "Вы")
                 $ CumTitsYou[GirlNameIBS] = 1
                 $ _ibs_end_cock_state(GirlNameIBS)
                 $ SomebodyCums = 1
@@ -458,7 +455,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                     "Приняв ее неразборчивое мычание за приглашение вы загнали свой член по самые яйца в ее похотливое влагалище и разрядились глубоко внутри [RealName.get(GirlNameIBS, GirlNameIBS)]. Бекки, почувствовав что вы кончили в нее промычала что-то неразборчивое, продолжая делать минет Эдди."
                     $ _ibs_inc_arousal("eddie", 10)
                 else:
-                    if pregnancy.get(GirlNameIBS, 0) < 120:
+                    if Becky.pregnancy_days() < 120:
                         "Вы решили пойти на встречу просьбе вдовицы и, загнав свой член по самые яйца в ее похотливое влагалище, разрядились глубоко в [RealName.get(GirlNameIBS, GirlNameIBS)]. Стоило вам вытащить из нее свой обмякший член, как распутница провела пальчиком по своей измазанной семенем киске и, смотря вам в глаза, облизала его и с улыбкой сказала вам:"
                         "\"Стефанчик, какой ты нахальный. Пытаешься бедную одинокую вдову в положение ввести. Наглец!\""
                     else:
@@ -466,7 +463,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                         "\"Какие же вы, мужчины, нахальные. Воспользовались слабостью бедной вдовы и оставили ее в тягости. Но и этого вам мало, и дальше моей слабостью пользуетесь. Ох, наглец!\""
                 $ _ibs_set_arousal("You", 0)
                 $ _ibs_set_arousal(GirlNameIBS, int(Arousal.get(GirlNameIBS, 0) or 0) + 3)
-                $ PregnancyCheck(GirlNameIBS, "inside", 1, "Вы")
+                $ Becky.apply_pregnancy_check("inside", 1, "Вы")
                 $ CumInsideYou[GirlNameIBS] = 1
                 $ _ibs_end_cock_state(GirlNameIBS)
                 $ SomebodyCums = 1
@@ -474,14 +471,14 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 jump int_becky_sex_after_cum
 
             "Попрощаться и уйти" if SomebodyCums == 0:
-                if CurGiveOrgasms == GiveOrgasms.get(GirlNameIBS, 0):
+                if CurGiveOrgasms == Becky.stats.get("orgasms_given", 0):
                     "Вы сказали [RealName.get(GirlNameIBS, GirlNameIBS)] что вам нужно идти. Она была поражена:"
                     "\"Стефанчик, но мы же ведь только начали! Что случилось?! Я что, тебе разонравилась?!\""
                     "Но вы были непреклонны и направились к выходу, оставив за спиной неудовлетворенную вдову."
                     if GrupenSex.get("eddie", 0) > 0:
                         "\"Впрочем,\" услышали вы уже в дверях, \"у меня еще управляющий мой рыжий есть,\" и, оглянувшись перед тем как закрыть за собой дверь, вы увидели что Бекки тянет Эдди поближе к себе. \"Ты ведь не оставишь хозяйку мучаться как этот мужлан, нет?\""
-                        $ PregnancyCheck(GirlNameIBS, "inside", 1, "eddie")
-                    $ slut_friends_increase(GirlNameIBS, 3, 1, -1, 0, 0, 0)
+                        $ Becky.apply_pregnancy_check("inside", 1, "eddie")
+                    $ Becky.apply_social_roll(3, 1, -1, 0, 0, 0)
                     $ _becky_angry_pic = "angry" + str(renpy.random.randint(1, 2))
                     call ShowImage(GirlNameIBS, "sex", _becky_angry_pic)
                 else:
@@ -493,14 +490,14 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                             "Эдди помахал вам вслед рукой, он-то еще уходить явно не собирался."
                         else:
                             "Эдди помахал вам на прощание рукой и тоже стал одеваться."
-                    $ slut_friends_increase(GirlNameIBS, 16, 2, 1, 42, 1, 1)
+                    $ Becky.apply_social_roll(16, 2, 1, 42, 1, 1)
                     $ _becky_happy_pic = "happy" + str(renpy.random.randint(1, 5))
                     call ShowImage(GirlNameIBS, "sex", _becky_happy_pic)
 
                 $ _ibs_set_arousal("You", 0)
                 $ _ibs_set_arousal(GirlNameIBS, 0)
                 $ _ibs_end_cock_state(GirlNameIBS)
-                $ BeckyVar["visitedhome"] = max(BeckyVar.get("visitedhome", 0), 2)
+                $ Becky.var["visitedhome"] = max(Becky.var.get("visitedhome", 0), 2)
                 call ShowCurrentSex(GirlNameIBS)
                 call DressUp(GirlNameIBS)
                 $ SomebodyCums = 0

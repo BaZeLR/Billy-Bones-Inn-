@@ -1,5 +1,5 @@
 label story_georgett_church_after_sermon:
-    $ ChurchAfterCermon["georgett"] = 0
+    $ Georgett.set_after_sermon_stage(0)
     $ MainTxt = MainTxt + "\n\nЗа кабинками для исповеди вы заметили неприметную дверь, ведущую внутрь храма. Из-за нее слышаться приглушенные голоса. Вы замечаете большую замочную скважину."
     $ CurLocDesc = MainTxt
     vscene "images/georgett/ispoved/ispoved1.jpg"
@@ -21,7 +21,7 @@ label story_georgett_church_after_sermon_look_1:
     else:
         $ MainTxt = MainTxt + "\n\n\"Дочь моя, ты опять грешила. Расскажи мне все без утайки, не можешь же расскать - продемонстрируй\" - говорит отец Герхард, кладя руку на обнаженное колено Жоржетты.\n\"Ох, падре, грешила я, сходилась со многими, даже в храме этом\" - отвечает Жоржетта, слегка раздвигая ноги и приподнимая выше подол платья."
     $ CurLocDesc = MainTxt
-    $ ChurchAfterCermon["georgett"] = 1
+    $ Georgett.set_after_sermon_stage(1)
     vscene "images/georgett/ispoved/ispoved1.jpg"
 
     menu:
@@ -39,12 +39,12 @@ label story_georgett_church_after_sermon_look_2:
     else:
         $ MainTxt = MainTxt + "\n\n\"Не печалься, дочь моя, а рассказывай подробно. Вот член, подобный тем, с коими ты грешила. Покажи, что ты с ним делала.\" - говорит отец Герхард, приподнимая сутану. Под ней обнаруживается уже поднявшийся член жреца.\n\"Падре, трогала я член, вот так\" - говорит Жоржетта и начинает подрачивать член отца Герхарда своими ловкими пальчиками.\n\"А еще я в рот их брала, вот так\" - добавляет Жоржетта, становясь на колени и начиная делать минет отцу Герхарду своим искусным ротиком."
     $ CurLocDesc = MainTxt
-    $ ChurchAfterCermon["georgett"] = 2
+    $ Georgett.set_after_sermon_stage(2)
     vscene "images/georgett/ispoved/ispovedstep2_1.jpg"
 
     menu:
         "Дальше":
-            $ ChurchAfterCermon["georgett"] = 2
+            $ Georgett.set_after_sermon_stage(2)
 
     vscene "images/georgett/ispoved/ispovedstep2_2.jpg"
 
@@ -67,7 +67,7 @@ label story_georgett_church_after_sermon_look_3:
     $ MainTxt = MainTxt + "\n\n\"Ну, показывай, как грешила.\"\nЖоржетта встает, перекидывает ногу через сидящего отца Герхарда и садится своей девочкой прямо на его вздыбленный член. \"Вот так я грешила, падре!\""
     $ CurLocDesc = MainTxt
     $ Georgett.set_story_value("SawChurchAfterCermon", 1)
-    $ ChurchAfterCermon["georgett"] = 3
+    $ Georgett.set_after_sermon_stage(3)
     vscene "images/georgett/ispoved/ispovedstep3.jpg"
 
     menu:
@@ -88,7 +88,7 @@ label story_georgett_church_after_sermon_look_4:
             $ MainTxt = MainTxt + "\n\n\"Ловко вывернулся,\" смеется Жоржетта. \"Доча-то моя шустрая, меня ведь уже бабушкой сделала, а мне ведь и тридцати нет."
     $ MainTxt = MainTxt + "\n\n\"Заполнило тебя семя слуги Ильматера в храме его. Это отпускает все грехи твои и благославляет тебя, дочь моя\" - благочестиво говорит отец Герхард Жоржетте, даже не подумав прикрыть свой обмякший член сутаной. \"Теперь иди, а если еще нагрешишь - приходи и покайся мне.\"\n\"Спасибо, отец Герхард\" - говорит Жоржетта и начинает приводить себя в порядок."
     $ CurLocDesc = MainTxt
-    $ ChurchAfterCermon["georgett"] = 4
+    $ Georgett.set_after_sermon_stage(4)
     vscene "images/georgett/ispoved/ispovedstep4.jpg"
 
     menu:

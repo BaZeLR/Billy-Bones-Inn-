@@ -8,6 +8,7 @@ label SexEventsTableCode:
 # These must exist for any girl. Used for daily prostitution/glory events in tavern and side effects.
 default TodaySexEvents = []
 default GirlDance = []
+default DanceWatchLine = {}
 default sex_history_by_girl = {}
 
 init -44 python:
@@ -190,7 +191,7 @@ init -44 python:
         row = GirlDance.pop(row_index - 1)
         if str(GirlNameSE or "") == "amanda":
             DanceWatchLine[6] = str(row.get("GoPhrase", "") or "")
-            AmandaVar["LegareGo"] = _sexevents_int(row.get("GoOut", 0), 0)
+            Amanda.set_var_int("LegareGo", _sexevents_int(row.get("GoOut", 0), 0))
 
         return row_index
 

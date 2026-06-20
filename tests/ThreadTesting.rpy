@@ -24,7 +24,7 @@ label _test_thread_by_name(person_name, thread_name):
     #
     # IMPORTANT: Assign prerequisite flags DIRECTLY before calling this label.
     # Example:
-    #   $ BeckyVar["visitedhome"] = 7
+    #   $ Becky.var["visitedhome"] = 7
     #   $ EddieWhoreHome = 4          # or whatever the condStr points to
     #   call _test_thread_by_name("becky", "BeckyHomeVisits")
     #
@@ -244,7 +244,7 @@ label test_becky_home_georgett_visit_event:
     # A + unit test for the Georgett crossover (EddieWhoreHome==4 at dinnertime==5)
     # References:
     #   textLocRef\GeorgettBeckyVisit.txt (arrival narration, simultaneous blowjobs, kids 3-flavor Rand, Eddie/Lucas cum variants, player minet gates on sluttiness+dinnerbeckyorgasm+BeckyOpenMinet, cum face/mouth choices, PregnancyCheck + SlutFriends for becky/inga/georgett)
-    #   textLocRef\IntBeckyGuest.txt (the exact if BeckyVar['EddieWhoreHome']=4 and dinnertime=5: gs 'GeorgettBeckyVisit' inside eat/grope blocks)
+    #   textLocRef\IntBeckyGuest.txt (the exact if Becky.var['EddieWhoreHome']=4 and dinnertime=5: gs 'GeorgettBeckyVisit' inside eat/grope blocks)
     #   game/NPC/Girls/Georgett/InitGeorgett.rpy (georgett_eddie_peekhole_jealous sets the EddieWhoreHome=4 flag + tavern peekhole context)
     #   game/Inn/GeorgettBeckyVisit.rpy + game/Inn/IntBeckyGuest.rpy (detailed engine + BeckyGuestKidsWatchStepsCode + dinner loop)
     #   game/NPC/Girls/Becky/BeckyEvents.rpy (the atomic thin label we just added)
@@ -256,15 +256,15 @@ label test_becky_home_georgett_visit_event:
     # Prereqs for this stage (set directly, no globals):
     #   $ EddieWhoreHome = 4
     #   $ dinnertime = 5
-    #   $ BeckyVar["visitedhome"] = 5
+    #   $ Becky.var["visitedhome"] = 5
     #   $ dinnerbeckyorgasm = 1   # makes minet gates easier
-    #   $ BeckyVar["EddieGeorg"] = 0 or 1 (dialogue variant)
+    #   $ Becky.var["EddieGeorg"] = 0 or 1 (dialogue variant)
 
     $ EddieWhoreHome = 4
     $ dinnertime = 5
-    $ BeckyVar["visitedhome"] = 5
+    $ Becky.var["visitedhome"] = 5
     $ dinnerbeckyorgasm = 1
-    $ BeckyVar["EddieGeorg"] = 0
+    $ Becky.var["EddieGeorg"] = 0
     $ georgedinnersex = 0
 
     call _test_thread_by_name("becky", "BeckyHomeVisits")
@@ -339,11 +339,11 @@ label test_becky_blackwood_quest_hook:
     # Thread advance on robbery trigger + on offer acceptance + on full road danger reveal.
     # Direct $ assignments, proper calls, no gs/globals.
 
-    $ BeckyVar["visitedhome"] = 6
-    $ Friends["becky"] = 18
-    $ giveorgasms["becky"] = 12
-    $ BeckyVar["EddieRobbed"] = 0
-    $ BeckyVar["EddieRobbedDay"] = 0
+    $ Becky.var["visitedhome"] = 6
+    $ Becky.rel = 18
+    $ Becky.stats["orgasms_given"] = 12
+    $ Becky.var["EddieRobbed"] = 0
+    $ Becky.var["EddieRobbedDay"] = 0
     $ dayspassed = 45   # arbitrary day after guest progress
 
     call _test_thread_by_name("becky", "BeckyHomeVisits")   # or BeckyEddie / BeckyBlackwoodQuest when separate thread registered
@@ -367,7 +367,7 @@ label test_becky_blackwood_quest_hook:
         print("[BLACKWOOD] Expected: EddieRobbedDay set, SherwoodQuest daily available at GroceryStore mornings")
 
     # Now test the actual offer scene (after the daily has fired / player enters store)
-    $ BeckyVar["TradeOffer"] = 0
+    $ Becky.var["TradeOffer"] = 0
     call _test_thread_by_name("becky", "BeckyHomeVisits")
 
     python:
@@ -381,10 +381,10 @@ label test_becky_blackwood_quest_hook:
 label test_becky_eddie_black_eye_event:
     # Specific test for the robbery trigger thin label
     # See references in the hook test above + game/NPC/Girls/Becky/BeckyEvents.rpy
-    $ BeckyVar["visitedhome"] = 5
-    $ Friends["becky"] = 15
+    $ Becky.var["visitedhome"] = 5
+    $ Becky.rel = 15
     $ dayspassed = 30
-    $ BeckyVar["EddieRobbed"] = 0
+    $ Becky.var["EddieRobbed"] = 0
 
     call _test_thread_by_name("becky", "BeckyHomeVisits")
 
@@ -396,11 +396,11 @@ label test_becky_eddie_black_eye_event:
 label test_becky_blackwood_quest_start_event:
     # Specific test for the offer pitch
     # References: textLocRef\BeckyQuestInit.txt + IntBeckyTalkSherwood.txt
-    $ BeckyVar["visitedhome"] = 6
-    $ Friends["becky"] = 18
-    $ giveorgasms["becky"] = 10
-    $ BeckyVar["EddieRobbedDay"] = dayspassed if 'dayspassed' in dir() else 40
-    $ BeckyVar["TradeOffer"] = 0
+    $ Becky.var["visitedhome"] = 6
+    $ Becky.rel = 18
+    $ Becky.stats["orgasms_given"] = 10
+    $ Becky.var["EddieRobbedDay"] = dayspassed if 'dayspassed' in dir() else 40
+    $ Becky.var["TradeOffer"] = 0
 
     call _test_thread_by_name("becky", "BeckyHomeVisits")
 
@@ -494,21 +494,21 @@ label debug_set_becky_prereqs:
     # Quick dev menu to set common gates for the home guest thread
     menu:
         "Set visitedhome = 7 (high, unlocks group/Blackwood paths)":
-            $ BeckyVar["visitedhome"] = 7
+            $ Becky.var["visitedhome"] = 7
             "visitedhome = 7"
         "Set EddieWhoreHome = 4 (triggers Georgett crossover)":
-            $ BeckyVar["EddieWhoreHome"] = 4
+            $ Becky.var["EddieWhoreHome"] = 4
             "EddieWhoreHome = 4"
         "Set HomeSex = 1":
-            $ BeckyVar["HomeSex"] = 1
+            $ Becky.var["HomeSex"] = 1
             "HomeSex = 1"
         "Give citydress (bypass dress gate)":
             $ MyCurDress = "citydress"
             "MyCurDress = citydress"
         "Clear all above to defaults":
-            $ BeckyVar["visitedhome"] = 0
-            $ BeckyVar["EddieWhoreHome"] = 0
-            $ BeckyVar["HomeSex"] = 0
+            $ Becky.var["visitedhome"] = 0
+            $ Becky.var["EddieWhoreHome"] = 0
+            $ Becky.var["HomeSex"] = 0
             "Cleared"
         "Continue":
             pass

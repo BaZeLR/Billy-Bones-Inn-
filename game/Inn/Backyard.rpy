@@ -130,7 +130,6 @@ init 6 python:
                 condition=backyard_has_dog_booth,
             ),
         ],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
         custom_properties={
             "object_menu_label": "BackyardObjectMenu",
         },

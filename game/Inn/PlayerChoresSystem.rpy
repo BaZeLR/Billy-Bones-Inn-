@@ -4,14 +4,8 @@
 init -45 python:
     import renpy.exports as renpy
 
-    # Chore keys + targets are defined in Actions.rpy (action/restriction system)
-    # We pull them here for the implementation (weekly tracking, Sandra eval).
-    try:
-        PLAYER_CHORE_KEYS = renpy.store.PLAYER_CHORE_KEYS
-        PLAYER_CHORE_TARGETS = renpy.store.PLAYER_CHORE_TARGETS
-    except Exception:
-        PLAYER_CHORE_KEYS = ("bring_woods", "chop_wood", "make_fire", "clean_ashes", "boil_water", "clean_upstairs_rooms")
-        PLAYER_CHORE_TARGETS = {k: (7 if k == "boil_water" else 3) for k in PLAYER_CHORE_KEYS}
+    PLAYER_CHORE_KEYS = ("bring_woods", "chop_wood", "make_fire", "clean_ashes", "boil_water", "clean_upstairs_rooms")
+    PLAYER_CHORE_TARGETS = {k: (7 if k == "boil_water" else 3) for k in PLAYER_CHORE_KEYS}
 
     PLAYER_CORE_OTHER_GIRLS = ("amanda", "melissa")
 
@@ -108,10 +102,29 @@ init -45 python:
         return until_minute
 
     def _pc_fire_is_active(fire_object):
-        return _pc_fire_until_minute(fire_object) > _pc_calendar_total_minutes()
+        active = _pc_fire_until_minute(fire_object) > _pc_calendar_total_minutes()
+        _set_object_state_int(fire_object, "fireOn", 1 if active else 0)
+        try:
+            if fire_object is TavernKitchenHearthObject:
+                _set_object_state_int(TavernKitchenCauldronObject, "canBoilWater", 1 if active else 0)
+        except Exception:
+            pass
+        return active
 
     def _pc_hot_water_is_ready(water_object):
         return _pc_hot_water_until_minute(water_object) > _pc_calendar_total_minutes()
+
+    def tavern_kitchen_sync_hearth_state():
+        fire_on = 1 if _pc_fire_is_active(TavernKitchenHearthObject) else 0
+        _set_object_state_int(TavernKitchenHearthObject, "fireOn", fire_on)
+        _set_object_state_int(TavernKitchenCauldronObject, "canBoilWater", fire_on)
+        return fire_on
+
+    def tavern_kitchen_reset_daily_hearth_state():
+        _set_object_state_int(TavernKitchenHearthObject, "madeFireToday", 0)
+        _set_object_state_int(TavernKitchenCauldronObject, "boiledWaterToday", 0)
+        tavern_kitchen_sync_hearth_state()
+        return True
 
     def _pc_fire_fuel_available(where_id="", object_id=""):
         room_obj = _pc_room_by_code(where_id)
@@ -125,8 +138,7 @@ init -45 python:
     def _pc_sync_ui_chores():
         UI_chores.clear()
         UI_chores.update({key: int(PlayerChoresWeek.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-        if "sync_player_state_from_store" in globals():
-            sync_player_state_from_store()
+        sync_player_state_from_store()
 
     def _pc_chore_display_name(chore_key):
         names = {
@@ -177,11 +189,13 @@ init -45 python:
         if key == "boil_water":
             if not _pc_fire_is_active(_pc_fire_object(where_id, object_id)):
                 return False, "Сначала нужно разжечь огонь."
+            if _object_state_int(_pc_water_object(where_id, object_id), "canBoilWater", 0) <= 0:
+                return False, "Сначала нужно разжечь огонь."
         return True, ""
 
     def _ensure_player_chores_state():
         global PlayerChoresWeek, UI_chores, WeeklyVisitorsTrack, WeeklyChoresLastEvalStamp
-        global Friends, SandraVar, otkroven, neshlush
+        global Friends, otkroven, neshlush
 
         if not isinstance(PlayerChoresWeek, dict):
             PlayerChoresWeek = {}
@@ -206,9 +220,6 @@ init -45 python:
 
         if not isinstance(Friends, dict):
             Friends = {}
-        if not isinstance(SandraVar, dict):
-            SandraVar = {}
-
         if not isinstance(otkroven, dict):
             otkroven = {}
         if not isinstance(neshlush, dict):
@@ -233,7 +244,7 @@ init -45 python:
 
     def do_player_chore(chore_key, where_id="", object_id=""):
         global fun, energy, exploration, taverncleanliness
-        global ashesdirtydays, upstairsroomsdirty, FightLevel
+        global ashesdirtydays, upstairsroomsdirty
         _ensure_player_chores_state()
         key = str(chore_key or "").strip()
         allowed, reason = can_do_player_chore(key, where_id, object_id)
@@ -279,7 +290,11 @@ init -45 python:
             _set_object_state_int(_fire_object, "fire_started_minute", _fire_now)
             _set_object_state_int(_fire_object, "fire_until_minute", _fire_now + _pc_fire_duration_minutes())
             _set_object_state_int(_fire_object, "fire_units", 0)
+            _set_object_state_int(_fire_object, "fireOn", 1)
+            _set_object_state_int(_fire_object, "madeFireToday", 1)
             _set_object_state_int(_fire_object, "ash_dirty", 1)
+            if _fire_object is TavernKitchenHearthObject:
+                _set_object_state_int(TavernKitchenCauldronObject, "canBoilWater", 1)
             if _fire_was_active:
                 _add_object_state_int(_fire_object, "fire_adds", 1, 0)
             else:
@@ -308,6 +323,7 @@ init -45 python:
             _pc_advance_minutes(60)
             _set_object_state_int(_water_object, "hot_water_until_minute", _pc_calendar_total_minutes() + (24 * 60))
             _set_object_state_int(_water_object, "hot_water_units", 0)
+            _set_object_state_int(_water_object, "boiledWaterToday", 1)
             fun = _pc_clamp(fun - 10, 0, 100)
             energy = _pc_clamp(energy - 5, 0, 100)
             taverncleanliness = _pc_clamp(taverncleanliness - 4, 0, 100)
@@ -479,12 +495,10 @@ init -45 python:
 
     def evaluate_weekly_chores_and_rewards():
         global WeeklyChoresLastEvalStamp, PlayerChoresWeek, WeeklyVisitorsTrack
-        global neshlush, SandraVar, Friends, UI_chores
+        global neshlush, Friends, UI_chores
 
         _ensure_player_chores_state()
-        Sandra.var = SandraVar
         Sandra.ensure_story_defaults()
-        Sandra.sync_from_sandra_maps()
 
         preview = weekly_chores_evaluation_preview(
             week_now=week,
@@ -514,7 +528,6 @@ init -45 python:
             visit_first_pending=preview_flags.get("MCVisitFirstPending", 0),
             friend_value=preview.get("sandra_friend", Sandra.rel),
         )
-        SandraVar = Sandra.var
         if Sandra.weekly_wake_pending and "sandraWeeklyEvaluation" in threads:
             threads["sandraWeeklyEvaluation"].advanceTo(Sandra.weekly_wake_num, force_active=True)
 
@@ -548,7 +561,6 @@ init -45 python:
         WeeklyVisitorsTrack["prev_avg"] = float(preview_visitors.get("prev_avg", 0.0) or 0.0)
         WeeklyVisitorsTrack["sum"] = max(0, _pc_to_int(preview_visitors.get("sum", 0), 0))
         WeeklyVisitorsTrack["days"] = max(0, _pc_to_int(preview_visitors.get("days", 0), 0))
-        if "sync_player_state_from_store" in globals():
-            sync_player_state_from_store()
+        sync_player_state_from_store()
 
         return str(preview.get("message", "") or "")

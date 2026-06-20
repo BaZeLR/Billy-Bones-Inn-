@@ -81,12 +81,10 @@ init -1 python:
         WerecatVar["caught"] = 0
         WerecatVar["gifted_clara"] = 1
         WerecatVar["clara_gift_day"] = int(dayspassed or 0)
-        Friends["clara"] = min(20, int(Friends.get("clara", 0) or 0) + 3)
-        otkroven["clara"] = min(20, int(otkroven.get("clara", 0) or 0) + 2)
-        sluttiness["clara"] = min(100, int(sluttiness.get("clara", 0) or 0) + 4)
-        PussyWetStart["clara"] = max(35, int(PussyWetStart.get("clara", 0) or 0) + 15)
-        ClaraVar["werecat_gifted"] = 1
-        ClaraVar["werecat_gift_day"] = int(dayspassed or 0)
+        Clara.change_social(friend_delta=3, open_delta=2, corruption_delta=4)
+        Clara.stats["PussyWetStart"] = max(35, int(Clara.stats.get("PussyWetStart", 0) or 0) + 15)
+        Clara.var["werecat_gifted"] = 1
+        Clara.var["werecat_gift_day"] = int(dayspassed or 0)
 
     def werecat_month_thanks_ready():
         adopted_day = int(WerecatVar.get("adopted_day", -1) or -1)
@@ -251,9 +249,15 @@ label MelissaRatBreakfastScene:
     hide screen main_ui
     vscene tavern_kitchen_breakfast_picture()
     $ MainTxt = "Мягкий утренний свет ползет по кухне, в мисках парит каша, воздух пахнет молоком, овсом и горячим хлебом. За общим столом сегодня сидят все трое.\n\nСандра, помешивая кашу с лишней силой, первой возвращается к вчерашнему: \"Крысы в доме совсем распоясались. Уже по три полных тюка припасов за неделю портят. Если так пойдет дальше, к зиме сами у пустых мешков сядем.\"\n\nАманда разваливается на скамье и, как всегда, пытается рассечь тревогу шуткой: \"А знаешь, чего этому дому по-настоящему не хватает? Хорошей сильной киски. Такой, чтоб и мышей ловила, и с вредителями умела разбираться как следует.\" Она лукаво подмигивает.\n\nМелисса сперва краснеет, потом все же хихикает: \"Да... большой, гибкой охотницы. Чтобы маленьких пакостников душила без жалости... и ночами было бы с кем согреться.\"\n\nСмех за столом быстро снимает лишнее напряжение. Даже Сандра, отвернувшись к котлу, ворчит уже заметно мягче."
+    if relationship_anger("amanda") > 0 and relationship_anger("melissa") > 0:
+        $ MainTxt = str(MainTxt or "") + "\n\nАманда и Мелисса все равно успевают уколоть друг друга. Сандра сразу обрывает их: \"Когти оставьте для крыс. За столом не шипеть.\""
+    elif relationship_anger("amanda") > 0:
+        $ MainTxt = str(MainTxt or "") + "\n\nАманда шутит привычно, но сегодня в каждой шутке достается именно Мелиссе. Та краснеет, но не опускает глаза."
+    elif relationship_anger("melissa") > 0:
+        $ MainTxt = str(MainTxt or "") + "\n\nМелисса смеется вместе со всеми, но на амандины насмешки отвечает коротко и зло. Еще одно слово, и завтрак снова скатится в спор."
     $ CurLocDesc = MainTxt
     $ fun = _player_clamp(int(fun or 0) + 5, 0, 100)
-    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
+    $ Sandra.change_social(friend_delta=1)
     $ Melissa.add_trust(1)
     $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
     $ TavernKitchenSavedText = MainTxt
@@ -271,9 +275,15 @@ label WerecatAdoptionBreakfastScene:
     hide screen main_ui
     vscene tavern_kitchen_breakfast_picture()
     $ MainTxt = "За завтраком сегодня разговор быстро сворачивает к новой обитательнице трактира. У самого очага, настороженно щурясь, устроилась ваша необычная лесная кошка, и даже с такого расстояния видно, что она следит за каждым шорохом куда внимательнее обычного зверя.\n\nСандра первой признает очевидное: \"В кладовой ночью впервые было тихо. Если эта хвостатая и правда останется у нас, припасы хоть поживут спокойно.\" Аманда тут же расплывается в ухмылке: \"Говорила же, дому нужна хорошая киска. А эта еще и красавица, не только охотница.\" Мелисса тихо фыркает, но спорить не спешит: \"Главное, чтобы она крыс душила так же ловко, как на всех смотрит.\"\n\nПохоже, в трактире уже начинают принимать вашу странную добычу как свою. История на этом не кончается, но теперь у нее наконец есть продолжение дома, а не только в лесу."
+    if relationship_anger("amanda") > 0 and relationship_anger("melissa") > 0:
+        $ MainTxt = str(MainTxt or "") + "\n\nАманда и Мелисса опять начинают цеплять друг друга, но кошка вдруг шипит от очага, и обе замолкают. Сандра только хмыкает: \"Вот. Даже зверю надоело.\""
+    elif relationship_anger("amanda") > 0:
+        $ MainTxt = str(MainTxt or "") + "\n\nАманда цепляет Мелиссу за каждую реплику о кошке. Мелисса держится, но губы у нее сжаты."
+    elif relationship_anger("melissa") > 0:
+        $ MainTxt = str(MainTxt or "") + "\n\nМелисса сегодня не дает Аманде разгуляться. На каждую шутку отвечает сухо, и Сандра быстро переводит разговор обратно к кладовой."
     $ CurLocDesc = MainTxt
     $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
-    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
+    $ Sandra.change_social(friend_delta=1)
     $ Melissa.add_trust(1)
     $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
     $ TavernKitchenSavedText = MainTxt
@@ -293,7 +303,7 @@ label WerecatMonthThanksScene:
     if Melissa.bats_stage() >= 6:
         $ MainTxt = str(MainTxt or "") + "\n\nПосле короткой паузы Сандра добавляет уже совсем иначе: \"А ту глупую историю с чердаком пора бы и отпустить. Дом у нас старый, люди живые, а дурных случаев без того хватает. Главное, что теперь ты не отмахнулся от настоящей беды и довел дело до ума.\" Похоже, за столом наконец начинают считать тот позорный случай скорее нелепостью, чем клеймом."
     $ CurLocDesc = MainTxt
-    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
+    $ Sandra.change_social(friend_delta=1)
     $ Melissa.add_trust(1)
     $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
     $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
@@ -394,7 +404,7 @@ label WerecatAdoptChoice(choice_code="adopt"):
         $ werecat_sync_profile()
         $ money = int(money or 0) + 5000
         $ tavernfame = int(tavernfame or 0) - 3
-        $ Friends["sandra"] = max(0, int(Friends.get("sandra", 0) or 0) - 2)
+        $ Sandra.change_social(friend_delta=-2)
         $ Melissa.add_trust(-3)
         $ Friends["amanda"] = max(0, int(Friends.get("amanda", 0) or 0) - 2)
         $ MainTxt = "Вы выбираете самый жесткий и самый выгодный путь. За такую необычную добычу быстро дают большие деньги, но запах этой сделки остается при вас надолго. Крысы в доме от этого, разумеется, никуда не деваются."
@@ -426,7 +436,7 @@ label WerecatAdoptChoice(choice_code="adopt"):
     $ tavernfame = int(tavernfame or 0) + 2
     $ charisma = min(100, int(charisma or 0) + 15)
     $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
-    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
+    $ Sandra.change_social(friend_delta=1)
     $ Melissa.add_trust(1)
     $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
     $ neshlush["sandra"] = max(0, int(neshlush.get("sandra", 0) or 0) - 1)

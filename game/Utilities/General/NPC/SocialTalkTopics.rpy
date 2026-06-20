@@ -30,6 +30,8 @@ init -39 python:
     SOCIAL_NPC_TOPIC_PACKS = {
         "amanda": {
             "talk": [
+                {"id": "amanda_boys", "label": "О парнях", "min_friend": 2, "min_open": 1},
+                {"id": "sex_topics", "label": "О близости и желаниях", "min_friend": 7, "min_open": 4, "private": True},
                 {"id": "amanda_freedom", "label": "О свободе и запретах", "min_friend": 4, "min_open": 1},
                 {"id": "amanda_future", "label": "О ее будущем", "min_friend": 7, "min_open": 2, "private": True},
                 {"id": "amanda_attention", "label": "О том, чего ей не хватает", "min_friend": 10, "min_open": 4, "private": True},
@@ -83,7 +85,7 @@ init -39 python:
 
     SOCIAL_TALK_PROFILES = {
         "amanda": {
-            "talk": {"job_routine": -1, "chat": 2, "dances": 4, "gossip": 2, "forest": 0, "stories": 1, "food": 1, "fashion": 4, "money": 1, "family_life": 2, "amanda_freedom": 3, "amanda_future": 2, "amanda_attention": 4},
+            "talk": {"job_routine": -1, "chat": 2, "dances": 4, "gossip": 4, "forest": 0, "stories": 1, "food": 1, "fashion": 4, "money": 4, "family_life": 2, "sex_topics": 3, "amanda_boys": 4, "amanda_freedom": 3, "amanda_future": 2, "amanda_attention": 4},
             "flirt": {"joke": 3, "kino": 2, "flirt": 3, "sex_topics": 2, "amanda_tease": 3, "amanda_dance_hint": 4},
         },
         "melissa": {
@@ -220,6 +222,16 @@ init -39 python:
 
     SOCIAL_CUSTOM_TOPIC_TEXT = {
         "talk": {
+            "amanda_boys": {
+                "good": "Разговор о парнях быстро оживляет Аманду. Она смеется, спорит и выдает больше, чем собиралась, потому что тема ей явно по вкусу.",
+                "neutral": "Аманда поддерживает разговор о парнях с насмешкой и интересом, но пока не слишком раскрывается.",
+                "bad": "Тема парней звучит неудачно. Аманда решает, что ее дразнят, и отвечает колко.",
+            },
+            "sex_topics": {
+                "good": "Вы говорите с Амандой о близости осторожно, без грубого нажима. Она краснеет, но не уходит от темы и слушает внимательнее обычного.",
+                "neutral": "Аманда слышит разговор о близости и отвечает дерзкой шуткой. Интерес есть, но доверия пока мало.",
+                "bad": "Разговор о близости выходит слишком прямым. Аманда закрывается и делает вид, что ей скучно.",
+            },
             "amanda_freedom": {
                 "good": "Вы говорите с Амандой о свободе без приказного тона. Она сперва держится дерзко, но быстро понимает, что вы слушаете ее всерьез.",
                 "neutral": "Аманда охотно спорит о запретах и свободе, но пока больше проверяет ваши границы, чем раскрывается.",
@@ -327,13 +339,13 @@ init -39 python:
         if key == "clara":
             return "IntClaraTalkRefresh"
         if key == "becky":
-            return "IntBeckyTalkRefresh"
+            return "IntBeckyTalk"
         if key == "irma":
             return "IntIrmaTalkRefresh"
         if key == "inga":
             return "IntIngaTalk"
         if key == "liza":
-            return "IntLizaTalkRefresh"
+            return "IntLizaTalkMenu"
         if key == "georgett":
             return "IntGeorgettTalkRefresh"
         return ""
@@ -696,16 +708,16 @@ init -39 python:
         ret = str(return_label or social_topic_return_label(key) or "").strip()
         items = []
         if social_has_visible_topics(key, "talk"):
-            items.append(MenuItem("Поговорить о...", Function(main_ui_call_label, "SocialTalkTopicMenu", key, "talk", ret)))
+            items.append(MenuItem("Поговорить о...", Call("SocialTalkTopicMenu", key, "talk", ret)))
         if social_has_visible_topics(key, "flirt") and social_interaction_allowed_for_npc(key, "flirt"):
-            items.append(MenuItem("Флиртовать...", Function(main_ui_call_label, "SocialTalkTopicMenu", key, "flirt", ret)))
+            items.append(MenuItem("Флиртовать...", Call("SocialTalkTopicMenu", key, "flirt", ret)))
         if int(GiftedToday.get(key, 0) or 0) == 0 and social_interaction_allowed_for_npc(key, "gift"):
             if key == "clara":
-                items.append(MenuItem("Сделать Клариссе подарок", Function(main_ui_call_label, "IntClaraGiftMenu", key)))
+                items.append(MenuItem("Сделать Клариссе подарок", Call("IntClaraGiftMenu", key)))
             else:
-                items.append(MenuItem("Подарить что-нибудь", Function(main_ui_call_label, "PlayerCardGiftToFixedTargetMenu", key)))
+                items.append(MenuItem("Подарить что-нибудь", Call("PlayerCardGiftToFixedTargetMenu", key)))
             if player_card_has_shareable_items() and social_interaction_allowed_for_npc(key, "share"):
-                items.append(MenuItem("Поделиться угощением", Function(main_ui_call_label, "PlayerCardShareToFixedTargetMenu", key)))
+                items.append(MenuItem("Поделиться угощением", Call("PlayerCardShareToFixedTargetMenu", key)))
         return items
 
 
@@ -722,7 +734,7 @@ label SocialTalkTopicMenu(girl_name="", mode="talk", return_label=""):
         for _topic in social_visible_topic_entries(_social_girl, _social_mode):
             if _remaining_topics <= 0:
                 break
-            current_action_items.append(MenuItem(str(_topic.get("label", "") or ""), Function(main_ui_call_label, "SocialTalkTopicApply", _social_girl, _social_mode, str(_topic.get("id", "") or ""), _social_return)))
+            current_action_items.append(MenuItem(str(_topic.get("label", "") or ""), Call("SocialTalkTopicApply", _social_girl, _social_mode, str(_topic.get("id", "") or ""), _social_return)))
             _remaining_topics -= 1
         if len(current_action_items) <= 0:
             if _social_mode == "talk" and social_talk_session_remaining(_social_girl) <= 0:
@@ -731,7 +743,7 @@ label SocialTalkTopicMenu(girl_name="", mode="talk", return_label=""):
                 MainTxt = "Сейчас подходящих тем нет."
             CurLocDesc = MainTxt
     if _social_return != "":
-        $ current_action_items.append(MenuItem("Назад", Function(main_ui_call_label, _social_return, _social_girl)))
+        $ current_action_items.append(MenuItem("Назад", Call(_social_return, _social_girl)))
     else:
         $ current_action_items.append(MenuItem("Назад", Function(main_ui_end_talk_state)))
     return

@@ -77,7 +77,6 @@ default beauty = {}
 default pregfather = {}
 default girltextdesc = {}
 default GiftPreferences = {}
-default HarassInstructions = {}
 default cooking = {}
 default cleaning = {}
 default waitress = {}
@@ -149,17 +148,12 @@ default WeeklyChoresLastEvalStamp = ""
 default otkroven = {}
 default neshlush = {}
 
-# Per-girl custom variable tables (SandraVar, AmandaVar, etc.)
+# Legacy per-girl custom variable tables.
 # These must be defaulted early so bare access works reliably in ready functions
 # and dynamic if conditions (called from labels via py_eval).
-default SandraVar = {}
 default AmandaVar = {}
-default MelissaVar = {}
-default BeckyVar = {}
-default ClaraVar = {}
-default LizaVar = {}  # if used
-default GeorgettVar = {}
 default IrmaVar = {}
+default SoapProcessActive = False
 
 # Core NPC/player relation state maps.
 default CurrentLoc = {}
@@ -203,6 +197,7 @@ default dayssincehaircut = 0
 default PlayerHaircutDaySt = 0
 default PlayerDressDaySt = {"villagedress": 0}
 default PlayerDressLifeDays = {"villagedress": 42}
+default PlayerDestroyedDresses = []
 default PlayerItemLifeDays = {}
 default costumecondition = 100
 # Calendar defaults. calendar_v2 is the single initialized Calendar instance.
@@ -486,6 +481,15 @@ init -95 python:
 
         def clock_minutes(self):
             return self.hour * 60 + self.minute
+
+        def is_between_clock(self, start_hour, start_minute, end_hour, end_minute):
+            current = self.clock_minutes()
+            start = (_cal_int(start_hour, 0) % 24) * 60 + (_cal_int(start_minute, 0) % 60)
+            end = (_cal_int(end_hour, 0) % 24) * 60 + (_cal_int(end_minute, 0) % 60)
+
+            if start <= end:
+                return start <= current <= end
+            return current >= start or current <= end
 
         def time_slot(self):
             return self.slot_from_hour(self.hour)

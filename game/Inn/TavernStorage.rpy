@@ -4,6 +4,28 @@
 init 6 python:
     import renpy.exports as renpy
 
+    TavernStorageSuppliesObject = GameObject(
+        object_id="tavern_storage_supplies_001",
+        name="Кладовые припасы",
+        description="Полки и ящики с провизией, которую вы приносите для кухонного хозяйства.",
+        state={
+            "stock": {},
+            "effects": {},
+        },
+        carriable=False,
+        stackable=False,
+    )
+
+    def tavern_storage_supplies_stock():
+        if not isinstance(TavernStorageSuppliesObject.state.get("stock", None), dict):
+            TavernStorageSuppliesObject.state["stock"] = {}
+        return TavernStorageSuppliesObject.state["stock"]
+
+    def tavern_storage_supplies_effects():
+        if not isinstance(TavernStorageSuppliesObject.state.get("effects", None), dict):
+            TavernStorageSuppliesObject.state["effects"] = {}
+        return TavernStorageSuppliesObject.state["effects"]
+
     def tavern_storage_picture():
         if int(hour or 0) < 12 and int(week or 0) != 7:
             if str(getLocation("amanda") or "") == "TavernStorage" and renpy.loadable("images/amanda/tavern/amanda_storage.png"):
@@ -17,6 +39,8 @@ init 6 python:
 
     def tavern_storage_text():
         text_parts = [str(TavernStorageRoom.descriptions[0].text or "").strip()]
+        if tavern_kitchen_food_stock_count() > 0:
+            text_parts.append("На полках отложены принесенные вами припасы для кухни: %s." % tavern_kitchen_food_stock_summary())
         if int(hour or 0) < 12 and int(week or 0) != 7:
             names_here = tavern_household_present_names("TavernStorage")
             if str(names_here or "").strip() and str(names_here or "") != "никто":
@@ -38,8 +62,9 @@ init 6 python:
         exits=[
             RoomExit(label="Вернуться на кухню", target="TavernKitchen"),
         ],
-        game_items=[],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
+        game_items=[
+            TavernStorageSuppliesObject,
+        ],
         custom_properties={},
     )
 
@@ -58,12 +83,17 @@ label TavernStorage:
     $ MainTxt = tavern_storage_text()
     $ CurLocDesc = MainTxt
     if bool(AmandaAIIntegrationEnabled):
-        call AmandaMiniEventTry(CurLoc, "room")
+        call AmandaMiniEventEntry(CurLoc, "room")
     python:
         _storage_items = []
         for _storage_exit in TavernStorageRoom.visible_exits():
             _storage_items.append(MenuItem(_storage_exit.label, Call("AdvanceMovementTime", _storage_exit.target)))
-    $ main_ui_set_action_panel("Кладовая", _storage_items, None, "scene", restart=False)
+    $ current_action_title = "Кладовая"
+    $ current_action_content = None
+    $ current_action_items = _storage_items
+    $ UI_mode = "scene"
+    $ UI_selected_char = ""
+    $ current_girl_key = ""
     call screen main_ui
     jump TavernStorage
 

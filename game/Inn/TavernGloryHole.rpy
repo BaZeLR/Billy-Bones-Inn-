@@ -1,9 +1,35 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+init 6 python:
+    def tavern_glory_hole_available():
+        return int(TavernGloryHole or 0) == 2
+
+    TavernGloryHoleRoom = Room(
+        code_name="TavernGloryHole",
+        group_name=ROOM_GROUP_TAVERN,
+        display_name="Глорихол",
+        bg_picture="images/gloryhole/glory1.jpg",
+        descriptions=[
+            RoomDescription(
+                text="За ширмой в дальнем углу трактира устроена отдельная тесная комнатка с глорихолом. Клиент не видит девушку по ту сторону, девушка не видит клиента, а вы знаете, где здесь потайной проход и как проверить, что происходит.",
+                priority=100,
+            ),
+        ],
+        exits=[
+            RoomExit(label="Вернуться в главный зал", target="TavernMain"),
+        ],
+        game_items=[],
+        custom_properties={},
+    )
+
 label TavernGloryHole:
     call EnterLocation("TavernGloryHole")
-    if not can_enter_location("TavernGloryHole"):
+    $ CurrentRoom = TavernGloryHoleRoom
+    $ CurLoc = "TavernGloryHole"
+    $ location = CurLoc
+    $ _layout_last_picture = TavernGloryHoleRoom.bg_picture
+    if not tavern_glory_hole_available():
         "Отдельная комната пока недоступна. Сначала закажите и оплатите постройку."
         jump TavernMain
     if navigation_only_mode_enabled():
@@ -45,6 +71,8 @@ label TavernGloryHole:
 
         if GetSexEventFromTable("amanda", 99, "glorytry") > 0:
             AmandaAtGlory = 1
+            Amanda.var["glorytried"] = 1
+            Amanda.var["glory_last_event_day"] = int(dayspassed or 0)
 
         GloryHoleYouLine1 = "Вы засунули свое самое дорогое в дырку. Однако с той стороны никто не поспешил вам на помощь. Вы, еще на что-то надеясь, подождали немного, но безрезультатно. Продолжать стоять дальше с засунутым в отверстие в стене членом в гнетущей тишине показалось вам глуповатым, и, со вздохом разочарования, вы убрали свое хозяйство обратно в штаны. <br>В голове у вас возникло несколько гипотез, объясняющих произошедшее. Возможно вы пришли слишком рано, а может пришли вовремя, но не назначили никого работать у глорихола. Надо провести тщательное расследование."
         GloryHoleYouLine2 = ""
@@ -206,7 +234,7 @@ label TavernGloryHole:
                 if AmandaAtGlory == 1:
                     $ BlockGloryHoleMenu = 1
                     $ AmandaGloryCurState = 1
-                    $ AmandaVar["glorysdiscover"] = 1
+                    $ Amanda.var["glorysdiscover"] = 1
                     "Ваша реакция?"
                     if renpy.has_label("ShowImage"):
                         call ShowImage("amanda", "gloryfirst", "ambush")
@@ -252,7 +280,7 @@ label TavernGloryHole:
                     "Ваша реакция?"
                     python:
                         PregnancyCheck("amanda", "mouthface", 1, "Вы")
-                    $ AmandaVar["glorysuck"] = 1
+                    $ Amanda.var["glorysuck"] = 1
                     $ AmandaGloryCurState = 4
                 else:
                     python:
@@ -277,8 +305,8 @@ label TavernGloryHole:
                 jump TavernGloryHole_menu
 
             "Ваша реакция" if BlockGloryHoleMenu == 1:
-                if renpy.has_label("AmandaAtGloryHole"):
-                    call AmandaAtGloryHole
+                if renpy.has_label("AmandaAtGloryHoleEventEntry"):
+                    call AmandaAtGloryHoleEventEntry
                 else:
                     "Реакция для этой сцены пока недоступна."
                 jump TavernGloryHole_menu

@@ -37,17 +37,20 @@ init python:
         if room is None:
             return items
 
-        object_menu_label = str(room.custom_properties.get("object_menu_label", "") or "")
-        if object_menu_label:
-            for obj in room.visible_objects():
-                items.append(MenuItem(
-                    obj.name,
-                    [
-                        SetVariable("current_action_title", obj.name),
-                        SetVariable("current_object_id", obj.object_id),
-                        Call(object_menu_label, obj.object_id),
-                    ]
-                ))
+        room_object_menu_label = str(room.custom_properties.get("object_menu_label", "") or "")
+        for obj in room.visible_objects():
+            object_props = getattr(obj, "custom_properties", {}) or {}
+            object_menu_label = str(object_props.get("object_menu_label", "") or room_object_menu_label)
+            if not object_menu_label:
+                continue
+            items.append(MenuItem(
+                obj.name,
+                [
+                    SetVariable("current_action_title", obj.name),
+                    SetVariable("current_object_id", obj.object_id),
+                    Call(object_menu_label, obj.object_id),
+                ]
+            ))
 
         for room_action in room.visible_actions():
             menu_item = room_action_menu_item(room_action)

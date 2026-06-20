@@ -7,7 +7,7 @@ label ChurchIspoved(entry_arg=0):
 
     $ MainTxt = "Вы зашли в маленькую кабинку для исповеди. С другой стороны ее прозвучал вопрос: \"Грешил ли ты, сын мой?\"\n\nВы решили покаяться {a=church:confession_menu:1}{color=#245b2b}в...{/color}{/a}"
     $ CurLocDesc = MainTxt
-    call ShowImage("gerhard", "", "gerhardispoved")
+    vscene "images/gerhard/gerhardispoved.jpg"
     $ current_action_title = "Исповедь"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Вернуться в собор", [SetVariable("LastAdvancedMinutes", 60), Function(calendar_v2.sync_state), Function(calendar_v2.advance_minutes, 60), Function(npc_schedule_sync_all), Jump("Church")])]
@@ -20,16 +20,16 @@ label ChurchIspovedMenu:
     $ current_action_content = None
     $ current_action_items = []
 
-    $ current_action_items.append(MenuItem("В разных пустяках", Function(main_ui_call_label, "ChurchIspovedChoice", "small")))
+    $ current_action_items.append(MenuItem("В разных пустяках", Call("ChurchIspovedChoice", "small")))
     if HadSex.get("georgett", 0) > 0:
-        $ current_action_items.append(MenuItem("В том, что совокуплялись с Жоржеттой", Function(main_ui_call_label, "ChurchIspovedChoice", "georgett")))
+        $ current_action_items.append(MenuItem("В том, что совокуплялись с Жоржеттой", Call("ChurchIspovedChoice", "georgett")))
     if HadSex.get("georgett", 0) > 0 and Georgett.story_value("church_bench_seen", 0):
-        $ current_action_items.append(MenuItem("В том, что уединились с Жоржеттой во время службы", Function(main_ui_call_label, "ChurchIspovedChoice", "church_bench")))
+        $ current_action_items.append(MenuItem("В том, что уединились с Жоржеттой во время службы", Call("ChurchIspovedChoice", "church_bench")))
     if HadSex.get("georgett", 0) > 0 and Georgett.story_value("church_doggy_seen", 0):
-        $ current_action_items.append(MenuItem("В том, что рискнули с Жоржеттой прямо во время службы", Function(main_ui_call_label, "ChurchIspovedChoice", "church_doggy")))
+        $ current_action_items.append(MenuItem("В том, что рискнули с Жоржеттой прямо во время службы", Call("ChurchIspovedChoice", "church_doggy")))
     if HadSex.get("georgett", 0) > 0 and Georgett.story_value("church_liza_seen", 0):
-        $ current_action_items.append(MenuItem("В том, что Лизетта видела вас с Жоржеттой во время службы", Function(main_ui_call_label, "ChurchIspovedChoice", "church_liza")))
-    $ current_action_items.append(MenuItem("Назад", Function(main_ui_call_label, "ChurchIspoved", 1)))
+        $ current_action_items.append(MenuItem("В том, что Лизетта видела вас с Жоржеттой во время службы", Call("ChurchIspovedChoice", "church_liza")))
+    $ current_action_items.append(MenuItem("Назад", Call("ChurchIspoved", 1)))
     $ renpy.restart_interaction()
     return
 
@@ -51,7 +51,7 @@ label ChurchIspovedChoice(choice_code=""):
         $ Georgett.set_story_value("churchlizaadmit", 1)
 
     $ CurLocDesc = MainTxt
-    call ShowImage("gerhard", "", "gerhardispoved")
+    vscene "images/gerhard/gerhardispoved.jpg"
     $ current_action_title = "Исповедь"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Вернуться в собор", [SetVariable("LastAdvancedMinutes", 60), Function(calendar_v2.sync_state), Function(calendar_v2.advance_minutes, 60), Function(npc_schedule_sync_all), Jump("Church")])]

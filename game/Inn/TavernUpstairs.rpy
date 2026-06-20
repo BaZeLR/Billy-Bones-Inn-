@@ -3,7 +3,7 @@
 # ================================================================================
 init 6 python:
     def tavern_upstairs_can_enter_amanda_room():
-        return int(AmandaVar.get("kickyoufromroom", 0) or 0) == 0
+        return Amanda.var["kickyoufromroom"] == 0
 
     def tavern_upstairs_can_clean_rooms():
         try:
@@ -32,7 +32,7 @@ init 6 python:
             RoomExit(label="Спуститься в подвал", target="TavernStorage"),
         ],
         game_items=[],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[0, 1, 2, 3, 4]),
+        schedule=RoomSchedule([1, 2, 3, 4, 5, 6, 7], [], "", None, "00:00", "23:59"),
         custom_properties={},
     )
 
@@ -70,7 +70,10 @@ label TavernUpstairsBuildActions:
             _upstairs_items.append(MenuItem(_upstairs_exit.label, Call("AdvanceMovementTime", _target)))
         if not player_can_leave_second_floor():
             _upstairs_items.append(MenuItem(player_public_movement_block_text(), Call("AdvanceMovementTime", "TavernMyRoom")))
-    $ main_ui_set_action_panel("Наверху", _upstairs_items, None, "scene", restart=False)
+    $ current_action_title = "Наверху"
+    $ current_action_content = None
+    $ current_action_items = _upstairs_items
+    $ UI_mode = "scene"
     return
 
 
