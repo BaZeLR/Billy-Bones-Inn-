@@ -50,11 +50,11 @@ label NextDay_TavernDaily():
             CurDay['fameaten'] = productnum
             CurDay['happy'] -= 1
         productnum -= CurDay['fameaten']
-        _rat_food_loss_due_day = int(WerecatVar.get('rat_food_loss_next_day', -1) or -1)
-        if int(WerecatVar.get('rats_problem_active', 0) or 0) == 1 and _rat_food_loss_due_day >= 0 and int(dayspassed or 0) >= _rat_food_loss_due_day:
+        _rat_food_loss_due_day = int(werecat_state().get('rat_food_loss_next_day', -1) or -1)
+        if int(werecat_state().get('rats_problem_active', 0) or 0) == 1 and _rat_food_loss_due_day >= 0 and int(dayspassed or 0) >= _rat_food_loss_due_day:
             CurDay['rat_food_loss'] = min(3, int(productnum or 0))
             productnum = max(0, int(productnum or 0) - CurDay['rat_food_loss'])
-            WerecatVar['rat_food_loss_next_day'] = int(dayspassed or 0) + 7
+            werecat_state()['rat_food_loss_next_day'] = int(dayspassed or 0) + 7
             if CurDay['rat_food_loss'] == 1:
                 ExtraEvents += '{b}Крысы снова добрались до кладовой и испортили 1 мешок припасов.{/b}\n'
             elif CurDay['rat_food_loss'] == 2:

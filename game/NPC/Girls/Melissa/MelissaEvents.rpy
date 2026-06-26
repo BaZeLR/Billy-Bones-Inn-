@@ -6,7 +6,7 @@
 label story_melissa_storage_rat_0:
     $ SignalBlockTime = 1
     $ household_mark_runtime_event_seen("melissa_storage_rat")
-    vscene "images/melissa/tavern/rat_in_basement_melissa.png"
+    vscene Melissa.image_path("tavern", "rat")
     $ MainTxt = "В кладовой вас встречает раздраженная Мелисса: у мешков с крупой шуршит крупная крыса, а девушка уже стоит наготове с метлой в руках. \"Опять эта тварь сюда лазит,\" шепчет она. \"Если ее сейчас не прогнать, потом весь угол придется перебирать заново.\""
     $ CurLocDesc = MainTxt
     "[MainTxt]"
@@ -15,9 +15,9 @@ label story_melissa_storage_rat_0:
             $ Melissa.var["ratKilled"] = True
             $ Melissa.var["storage_rat_cleared"] = 1
             $ Melissa.var["storage_rat_last_help_day"] = int(dayspassed or 0)
-            $ WerecatVar["rat_carcass_cached"] = 1
-            $ WerecatVar["rats_problem_active"] = 1
-            $ WerecatVar["rat_food_loss_next_day"] = int(dayspassed or 0) + 7
+            $ werecat_state()["rat_carcass_cached"] = 1
+            $ werecat_state()["rats_problem_active"] = 1
+            $ werecat_state()["rat_food_loss_next_day"] = int(dayspassed or 0) + 7
             $ Melissa.var["work_attitude"] = int(Melissa.var.get("work_attitude", 0) or 0) + 1
             $ Melissa.skills["cleaning"] = min(100, int(Melissa.skills.get("cleaning", 0) or 0) + 1)
             $ Melissa.change_social(friend_delta=1)
@@ -73,10 +73,10 @@ label story_melissa_bat_problem_0:
     $ TavernBreakfastPresentIds = ["sandra", "amanda"]
     vscene tavern_kitchen_breakfast_picture()
     "Утренний стол уже накрыт, но одного места не хватает. Аманда первой замечает пустую скамью Мелиссы и с ленивой усмешкой тянет: \"Вот увидите, сейчас она явится с таким лицом, будто всю ночь воевала с нечистой силой.\""
-    vscene "images/melissa/bats/yawns.png"
+    vscene Melissa.image_path("bats", "yawns")
     "В этот момент в кухню, зевая и еле переставляя ноги, входит Мелисса. Вид у нее злой и невыспавшийся."
     $ TavernBreakfastPresentIds = ["sandra", "melissa", "amanda"]
-    vscene "images/melissa/kitchen.jpg"
+    vscene Melissa.image_path("kitchen", "work")
     "Мелисса садится за стол и, даже взяв кружку, продолжает коситься так, будто над ее головой все еще что-то шуршит."
     "Сандра уже спокойнее говорит: \"У нас уже была крысиная проблема, из-за которой портились припасы, а теперь еще и летучие мыши? После крыс в кладовой я не хочу ждать, пока новая дрянь опять испортит дом.\""
     if relationship_anger("amanda") > 0 and relationship_anger("melissa") > 0:
@@ -205,7 +205,7 @@ label story_melissa_bat_problem_5:
         "[MainTxt]"
         $ calendar_v2.advance_minutes(45)
     else:
-        vscene "images/melissa/bedRoomSearch/underBedBooklet.png"
+        vscene Melissa.image_path("bedroom_search", "booklet")
         "Пока Мелисса вынужденно ночует у Аманды, ее собственная комната остается непривычно тихой. Вы осматриваете ее внимательнее обычного: ларь, табурет, складки одеяла, щель между стеной и кроватью."
         "Под кроватью Мелиссы, задвинутый почти к самой стене, обнаруживается потертый рисованный буклет. Обложка ничего не объясняет, зато место, где его прятали, говорит само за себя."
         $ Melissa.var["drawings_found"] = 1
@@ -221,7 +221,7 @@ label story_melissa_bat_problem_5:
 
 
 label MelissaBookletOpenPreview:
-    vscene "images/melissa/bedRoomSearch/lewd_pages0.jpg"
+    vscene Melissa.image_path("bedroom_search", "lewd_pages")
     $ MainTxt = "Вы раскрываете буклет на первых страницах. Манера уверенная, линии смелые, а сюжеты вовсе не девичьи."
     $ CurLocDesc = MainTxt
     "[MainTxt]"
@@ -232,13 +232,13 @@ label MelissaBookletOpenPreview:
 
 
 label ReadMelissaBooklet(return_to_location=True):
-    vscene "images/melissa/bedRoomSearch/underBedBooklet.png"
+    vscene Melissa.image_path("bedroom_search", "booklet")
     "Вы достаете спрятанную пачку рисунков и осторожно разворачиваете потертые листы."
-    vscene "images/melissa/bedRoomSearch/lewd_pages0.jpg"
+    vscene Melissa.image_path("bedroom_search", "lewd_pages")
     "Первые страницы выглядят почти как упражнение в линии и тени, но позы и детали быстро выдают совсем другой интерес автора."
-    vscene "images/melissa/bedRoomSearch/lewd_pages1.jpg"
+    vscene Melissa.cycle_image("bedroom_search", "lewd_pages", 1)
     "На следующих листах осторожность исчезает: тела нарисованы смело, без стыда, будто тот, кто держал перо, слишком хорошо представлял себе каждое движение."
-    vscene "images/melissa/bedRoomSearch/lewd2_pages.jpg"
+    vscene Melissa.cycle_image("bedroom_search", "lewd_pages", 2)
     $ player_apply_arousal_trigger("melissa_booklet", 18)
     "К концу просмотра мысли становятся тяжелее и жарче. Это уже не просто любопытство: картинки цепляют тело быстрее, чем вы успеваете отвести взгляд."
     $ calendar_v2.advance_minutes(10)
@@ -263,7 +263,7 @@ label MelissaBookletTake:
 
 
 label MelissaBookletLeaveThere:
-    vscene "images/melissa/bedRoomSearch/underBedBooklet.png"
+    vscene Melissa.image_path("bedroom_search", "booklet")
     $ MainTxt = "Вы аккуратно возвращаете буклет туда, где нашли. Теперь вы знаете, что искать и где смотреть, не выдавая того, что уже обнаружили тайник."
     $ CurLocDesc = MainTxt
     "[MainTxt]"
@@ -322,7 +322,7 @@ label story_melissa_bat_problem_4:
 
 label story_melissa_bat_problem_6:
     $ SignalBlockTime = 1
-    vscene "images/melissa/thanks.png"
+    vscene Melissa.image_path("portrait", "thanks")
     $ MainTxt = "Вы говорите Мелиссе, что на этот раз все действительно закончено: чердачное гнездовище выжжено, щели под крышей забиты, а над ее комнатой теперь наконец тихо. Она сперва смотрит на вас с привычной настороженностью, будто все еще ждет подвоха, но потом сама коротко выдыхает и впервые за все это время заметно расслабляется.\n\n\"Значит, можно снова спать у себя и не ждать, что ночью над головой начнут бегать, пищать и сыпать трухой...\" Она качает головой, будто сама до конца не верит в удачу, а потом уже тише добавляет: \"Спасибо. Не за слова — за то, что ты и правда довел дело до конца.\"\n\nПохоже, история с летучими мышами и чердаком для Мелиссы наконец действительно закрыта."
     $ CurLocDesc = MainTxt
     "[MainTxt]"

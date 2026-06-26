@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     import renpy.exports as renpy_module
@@ -21,7 +21,7 @@ init python:
 
     def girl_card_base_dress_lines(girl_name):
         key = girl_card_resolved_key(girl_name)
-        dress_code = str(_girls_desc_get(dressdefault, key, "") or "")
+        dress_code = girl_card_current_dress_code(key)
         if not dress_code:
             return []
 
@@ -33,30 +33,53 @@ init python:
             lines.append(full_desc + ".")
         return lines
 
+    def girl_card_info_object(girl_name):
+        key = girl_card_resolved_key(girl_name)
+        try:
+            return peopleInfo.get(key, None)
+        except Exception:
+            return None
+
+    def girl_card_current_dress_code(girl_name):
+        key = girl_card_resolved_key(girl_name)
+        info = girl_card_info_object(key)
+        wardrobe = getattr(info, "wardrobe", {}) if info is not None else {}
+        if isinstance(wardrobe, dict):
+            dress_code = str(wardrobe.get("current_dress", "") or "").strip()
+            if dress_code:
+                return dress_code
+        return str(_girls_desc_get(dressdefault, key, "") or "").strip()
+
+    def girl_card_current_underwear(girl_name, item_key, legacy_map, legacy_default_map):
+        key = girl_card_resolved_key(girl_name)
+        info = girl_card_info_object(key)
+        wardrobe = getattr(info, "wardrobe", {}) if info is not None else {}
+        if isinstance(wardrobe, dict):
+            current_underwear = wardrobe.get("current_underwear", {})
+            if isinstance(current_underwear, dict):
+                value = str(current_underwear.get(item_key, "") or "").strip()
+                if value:
+                    return value
+        value = str(_girls_desc_get(legacy_map, key, "") or "").strip()
+        if value:
+            return value
+        return str(_girls_desc_get(legacy_default_map, key, "") or "").strip()
+
     def girl_card_current_outfit_line(girl_name):
         key = girl_card_resolved_key(girl_name)
         top = _girls_desc_get(topdress, key, "")
         bottom = _girls_desc_get(bottomdress, key, "")
-        bra_value = _girls_desc_get(bra, key, "")
-        panties_value = _girls_desc_get(panties, key, "")
-        legs_value = _girls_desc_get(legs, key, "")
+        bra_value = girl_card_current_underwear(key, "bra", bra, bradef)
+        panties_value = girl_card_current_underwear(key, "panties", panties, pantiesdef)
+        legs_value = girl_card_current_underwear(key, "legs", legs, legsdef)
         topraised_value = int(_girls_desc_get(topraised, key, 0) or 0)
         bottomraised_value = int(_girls_desc_get(bottomraised, key, 0) or 0)
-        dress_code = str(_girls_desc_get(dressdefault, key, "") or "")
-        bra_default = _girls_desc_get(bradef, key, "")
-        panties_default = _girls_desc_get(pantiesdef, key, "")
-        legs_default = _girls_desc_get(legsdef, key, "")
+        dress_code = girl_card_current_dress_code(key)
 
         if not str(top or "").strip():
             top = _girls_desc_get(DressTopPart, dress_code, "")
         if not str(bottom or "").strip():
             bottom = _girls_desc_get(DressBottomPart, dress_code, "")
-        if not str(bra_value or "").strip():
-            bra_value = bra_default
-        if not str(panties_value or "").strip():
-            panties_value = panties_default
-        if not str(legs_value or "").strip():
-            legs_value = legs_default
 
         parts = []
         if top and not topraised_value:
@@ -110,9 +133,16 @@ init python:
             lines.append("На бедрах и у лона заметны следы недавнего секса.")
 
         try:
-            cycle = girl_decision_cycle_state(key)
+            if key == "amanda":
+                cycle = Amanda.fertility_state()
+            else:
+                cycle = girl_decision_cycle_state(key)
             phase = str(cycle.get("phase", "") or "")
-            if phase == "critical":
+            desire_value = float(cycle.get("desire", cycle.get("horny", 0.0)) or 0.0)
+            tags = [str(row or "") for row in list(cycle.get("tags", []) or [])]
+            if key == "amanda" and (phase == "restless" or desire_value >= 0.6 or "horny" in tags):
+                lines.append("Аманда чуть возбуждена: улыбается чаще обычного и держится немного вызывающе.")
+            elif phase == "critical":
                 lines.append("Цикл: тело уязвимее обычного, настроение сдержаннее.")
             elif phase == "fertile":
                 lines.append("Цикл: плодородные дни, тело реагирует живее.")
@@ -149,7 +179,7 @@ init python:
         if key_l == "sandra":
             return "images/sandra/sandra_card.jpg" if renpy.loadable("images/sandra/sandra_card.jpg") else "images/sandra/sandra_0.png"
         if key_l == "melissa":
-            return "images/melissa/melissa_card.jpg" if renpy.loadable("images/melissa/melissa_card.jpg") else "images/melissa/tavern/melissa_portrait.png"
+            return Melissa.image_path("card", "default") or Melissa.image_path("portrait", "default")
         if key_l == "amanda":
             return "images/amanda/amanda_card.jpg" if renpy.loadable("images/amanda/amanda_card.jpg") else "images/amanda/amanda_portrait.jpg"
         if key_l == "becky":
@@ -199,7 +229,7 @@ init python:
             try:
                 current_location = str(getLocation(key) or "")
             except Exception:
-                current_location = str(CurrentLoc.get(key, "") or "")
+                current_location = ""
         age_value = getattr(info, "age", None) if info is not None else None
         if age_value is None or int(age_value or 0) <= 0:
             age_value = getattr(data, "age", 0) if data is not None else _girls_desc_stat_value(key, "age_girls", "age", default=0)
@@ -285,7 +315,7 @@ screen girl_card_overlay(girl_name="", return_label=""):
             xpos 28
             ypos 24
             xsize _left_w - 56
-            ysize _left_h - 48
+            ysize _left_h - 96
             draggable True
             mousewheel True
 
@@ -308,9 +338,10 @@ screen girl_card_overlay(girl_name="", return_label=""):
                 for _line in _lines:
                     text _line size 16 color "#2d1d12"
 
-                textbutton "Назад":
-                    text_size 22
-                    if str(return_label or "") == "__return__":
-                        action Return()
-                    else:
-                        action Call("HideGirlCard", return_label)
+        textbutton "Назад":
+            id "girl_card_overlay_back_button"
+            alt "girl_card_overlay_back_button"
+            xpos 28
+            ypos _left_h - 58
+            text_size 22
+            action [Hide("girl_card_overlay"), SetVariable("UI_mode", "scene"), SetVariable("UI_selected_char", ""), SetVariable("current_girl_key", ""), Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or "TavernMain"))]

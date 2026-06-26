@@ -11,8 +11,6 @@ init -49 python:
         payload = dict(payload or {})
         if "state" in payload:
             restored.state = dict(payload.get("state", {}) or {})
-        if "custom_properties" in payload:
-            restored.custom_properties = dict(payload.get("custom_properties", {}) or {})
         if "hidden" in payload:
             restored.hidden = bool(payload.get("hidden", False))
         if "locked" in payload:
@@ -106,7 +104,6 @@ init -49 python:
         def __reduce__(self):
             payload = {
                 "state": dict(getattr(self, "state", {}) or {}),
-                "custom_properties": dict(getattr(self, "custom_properties", {}) or {}),
                 "hidden": bool(getattr(self, "hidden", False)),
                 "locked": bool(getattr(self, "locked", False)),
                 "owner": str(getattr(self, "owner", "") or ""),

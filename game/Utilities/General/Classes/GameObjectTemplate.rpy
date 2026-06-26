@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 
 
@@ -8,7 +8,7 @@ init -50 python:
     def room_rule_serialize(rule):
         if rule is None:
             return None
-        if isinstance(rule, dict):
+        if isinstance(rule, dict) or hasattr(rule, "get"):
             return dict(rule)
         if callable(rule):
             rule_name = str(getattr(rule, "__name__", "") or "").strip()
@@ -19,7 +19,7 @@ init -50 python:
 
 
     def room_rule_resolve(rule):
-        if isinstance(rule, dict) and str(rule.get("__rule_type__", "") or "") == "callable_name":
+        if (isinstance(rule, dict) or hasattr(rule, "get")) and str(rule.get("__rule_type__", "") or "") == "callable_name":
             rule_name = str(rule.get("name", "") or "").strip()
             if rule_name == "":
                 return None
@@ -31,10 +31,65 @@ init -50 python:
         return rule
 
 
+    def room_rule_named_true(rule):
+        row = dict(rule or {})
+        rule_name = str(row.get("rule", "") or "").strip()
+        if not rule_name:
+            return False
+        if rule_name == "eddie_absent_week":
+            return 22 <= int(day or 0) <= 28
+        if rule_name == "eddie_in_town":
+            return not room_rule_named_true({"rule": "eddie_absent_week"})
+        if rule_name == "becky_sandra_kitchen_visit":
+            return bool(becky_kitchen_visit_active())
+        if rule_name == "liza_church_with_georgett_visible":
+            return bool(Liza.can_trigger_church_service_event())
+        if rule_name == "georgett_church_visible":
+            return bool(Georgett.can_trigger_church_service_event())
+        if rule_name == "tavern_whore_work_active":
+            people = [str(item or "").strip().lower() for item in list(row.get("people", []) or [])]
+            if not people:
+                people = ["liza", "georgett"]
+            return any(room_rule_named_true({"rule": "tavern_hired", "people": [person]}) for person in people)
+        if rule_name == "tavern_hired":
+            people = [str(item or "").strip().lower() for item in list(row.get("people", []) or [])]
+            if not people:
+                people = ["liza", "georgett"]
+            for person in people:
+                info = peopleInfo.get(person, None) if isinstance(peopleInfo, dict) else None
+                if info is not None and hasattr(info, "can_work_tavern") and info.can_work_tavern():
+                    return True
+                if int(jobwhore.get(person, 0) or 0) > 0:
+                    return True
+            return False
+        if rule_name == "liza_portstreets_work_active":
+            return bool(Liza.can_work_portstreets())
+        if rule_name == "liza_portstreets_whore_active":
+            return bool(Liza.can_work_portstreets() and Liza.portstreet_story_unblocked())
+        if rule_name == "georgett_portstreets":
+            return bool((not Georgett.can_work_tavern()) and Georgett.portstreet_story_unblocked())
+        if rule_name == "any_job_assigned":
+            job_name = str(row.get("job", "") or "").strip()
+            people = [str(item or "").strip().lower() for item in list(row.get("people", []) or [])]
+            if not job_name or not people:
+                return False
+            for person in people:
+                info = peopleInfo.get(person, None) if isinstance(peopleInfo, dict) else None
+                if info is not None and int(getattr(info, "jobs", {}).get(job_name, 0) or 0) > 0:
+                    return True
+                job_map = globals().get(job_name, {})
+                if isinstance(job_map, dict) and int(job_map.get(person, 0) or 0) > 0:
+                    return True
+            return False
+        return False
+
+
     def room_rule_true(rule, *args):
         rule = room_rule_resolve(rule)
         if rule is None:
             return True
+        if isinstance(rule, dict) or hasattr(rule, "get"):
+            return room_rule_named_true(rule)
         if callable(rule):
             try:
                 return bool(rule(*args))
@@ -53,8 +108,6 @@ init -50 python:
         payload = dict(payload or {})
         if "state" in payload:
             restored.state = dict(payload.get("state", {}) or {})
-        if "custom_properties" in payload:
-            restored.custom_properties = dict(payload.get("custom_properties", {}) or {})
         if "hidden" in payload:
             restored.hidden = bool(payload.get("hidden", False))
         if "locked" in payload:
@@ -175,7 +228,6 @@ init -50 python:
         def __reduce__(self):
             payload = {
                 "state": dict(getattr(self, "state", {}) or {}),
-                "custom_properties": dict(getattr(self, "custom_properties", {}) or {}),
                 "hidden": bool(getattr(self, "hidden", False)),
                 "locked": bool(getattr(self, "locked", False)),
                 "owner": str(getattr(self, "owner", "") or ""),

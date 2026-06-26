@@ -25,7 +25,7 @@ init python:
                 dative="Эдди",
                 default_location="GroceryStore",
                 description="Эдди - сын Ребекки, подросток и помощник в бакалейной лавке. Связан с событиями Бекки, Жоржетты и Лукаса.",
-                age=17,
+                birth_date={"day": 1, "period": 1, "cycle": 1083},
                 portrait="images/eddie/portraits/portrait_0.png",
             )
 
@@ -36,7 +36,6 @@ init python:
         def __init__(self, name="eddie", **kwargs):
             super().__init__(name, **kwargs)
             self.data = EddieStaticData
-            self.age = 17
             self.known = False
             self.location = "GroceryStore"
             self.var = {}
@@ -87,7 +86,6 @@ label InitEddie:
 
 
 label register_eddie_secondary:
-    $ knowsMC.setdefault("eddie", False)
     python:
         peopleData["eddie"] = EddieStaticData
         Eddie.update()

@@ -31,8 +31,9 @@ init 6 python:
             if str(getLocation("amanda") or "") == "TavernStorage" and renpy.loadable("images/amanda/tavern/amanda_storage.png"):
                 return "images/amanda/tavern/amanda_storage.png"
             if str(getLocation("melissa") or "") == "TavernStorage":
-                if renpy.loadable("images/melissa/tavern/basement.png"):
-                    return "images/melissa/tavern/basement.png"
+                melissa_basement = Melissa.image_path("tavern", "basement")
+                if melissa_basement:
+                    return melissa_basement
                 if renpy.loadable("images/tavern/storage/storage_room.png"):
                     return "images/tavern/storage/storage_room.png"
         return str(TavernStorageRoom.bg_picture or "")
@@ -70,7 +71,6 @@ init 6 python:
 
 
 label TavernStorage:
-    call EnterLocation("TavernStorage")
     $ CurrentRoom = TavernStorageRoom
     $ CurLoc = "TavernStorage"
     $ location = CurLoc
@@ -82,8 +82,6 @@ label TavernStorage:
         $ _layout_last_picture = ""
     $ MainTxt = tavern_storage_text()
     $ CurLocDesc = MainTxt
-    if bool(AmandaAIIntegrationEnabled):
-        call AmandaMiniEventEntry(CurLoc, "room")
     python:
         _storage_items = []
         for _storage_exit in TavernStorageRoom.visible_exits():

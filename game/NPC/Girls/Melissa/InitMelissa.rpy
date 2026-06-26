@@ -2,106 +2,21 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init -1 python:
+    def melissa_schedule_clara_paintings_confession_ready():
+        return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
+
     def melissa_install_schedule(girl_name="melissa"):
         schedule_name = str(girl_name or "melissa").strip()
-        npc_daily_schedule_set(
-            schedule_name,
-            default_slots=[
-                dict(npc_daily_schedule_slot(0, "Church", True, False, "sunday_church"), weekdays=[7]),
-                dict(npc_daily_schedule_slot(1, "Church", True, False, "sunday_church"), weekdays=[7]),
-                npc_daily_schedule_slot(4, "TavernMelissaRoom", False, False, "sleep"),
-            ],
-            random_slots=[
-                npc_daily_schedule_random_slot(
-                    0,
-                    weekdays=[1, 2, 3, 4, 5, 6],
-                    label="morning",
-                    priority=500,
-                    choices=[
-                        npc_daily_schedule_choice("TavernKitchen", 4, True, True, "breakfast_and_kitchen"),
-                        npc_daily_schedule_choice("TavernStorage", 4, True, True, "basement_cleaning"),
-                        npc_daily_schedule_choice("TavernMain", 3, True, True, "hall_cleaning"),
-                        npc_daily_schedule_choice("Backyard", 2, True, True, "yard_laundry"),
-                        npc_daily_schedule_choice("TavernMelissaRoom", 1, True, True, "late_start_room"),
-                    ],
-                ),
-                npc_daily_schedule_random_slot(
-                    1,
-                    weekdays=[1, 2, 3, 4, 5, 6],
-                    label="noon_work",
-                    priority=420,
-                    choices=[
-                        npc_daily_schedule_choice("TavernMain", 6, True, True, "working_hall"),
-                        npc_daily_schedule_choice("TavernKitchen", 1, True, True, "kitchen_help"),
-                        npc_daily_schedule_choice("TavernStorage", 1, True, True, "storage_sorting"),
-                        npc_daily_schedule_choice("Backyard", 1, True, True, "yard_chore"),
-                    ],
-                ),
-                npc_daily_schedule_random_slot(
-                    2,
-                    weekdays=[1, 2, 3, 4, 5, 6],
-                    label="day_work",
-                    priority=420,
-                    choices=[
-                        npc_daily_schedule_choice("TavernMain", 7, True, True, "working_hall"),
-                        npc_daily_schedule_choice("TavernKitchen", 1, True, True, "kitchen_help"),
-                        npc_daily_schedule_choice("Backyard", 1, True, True, "yard_chore"),
-                    ],
-                ),
-                npc_daily_schedule_random_slot(
-                    3,
-                    weekdays=[1, 2, 3, 4, 6],
-                    label="evening",
-                    priority=360,
-                    choices=[
-                        npc_daily_schedule_choice("TavernMain", 3, True, True, "evening_hall"),
-                        npc_daily_schedule_choice("TavernMelissaRoom", 2, True, True, "evening_room"),
-                        npc_daily_schedule_choice("Backyard", 1, True, True, "evening_yard"),
-                    ],
-                ),
-                npc_daily_schedule_random_slot(
-                    3,
-                    weekdays=[5],
-                    label="friday_evening",
-                    priority=360,
-                    choices=[
-                        npc_daily_schedule_choice("FridayDance", 4, True, True, "friday_dance"),
-                        npc_daily_schedule_choice("TavernMelissaRoom", 2, True, True, "friday_room"),
-                    ],
-                ),
-                npc_daily_schedule_random_slot(
-                    2,
-                    weekdays=[7],
-                    label="sunday_day",
-                    priority=360,
-                    choices=[
-                        npc_daily_schedule_choice("TavernMelissaRoom", 3, True, True, "sunday_room"),
-                        npc_daily_schedule_choice("Backyard", 2, True, True, "sunday_backyard"),
-                        npc_daily_schedule_choice("TavernMain", 2, True, True, "sunday_hall"),
-                        npc_daily_schedule_choice("TavernKitchen", 1, True, True, "sunday_kitchen"),
-                    ],
-                ),
-                npc_daily_schedule_random_slot(
-                    3,
-                    weekdays=[7],
-                    label="sunday_evening",
-                    priority=360,
-                    choices=[
-                        npc_daily_schedule_choice("TavernMelissaRoom", 3, True, True, "sunday_room"),
-                        npc_daily_schedule_choice("Backyard", 1, True, True, "sunday_backyard"),
-                        npc_daily_schedule_choice("TavernMain", 2, True, True, "sunday_hall"),
-                        npc_daily_schedule_choice("TavernKitchen", 1, True, True, "sunday_kitchen"),
-                    ],
-                ),
-            ],
-        )
+        schedule_data = people_schedule_data(schedule_name)
+        if schedule_data is not None:
+            schedule_data.set_daily_schedule([], [])
+            schedule_data.load_interval_schedule(True)
         npc_schedule_set(
             schedule_name,
             [
-                NPCScheduleEntry(location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[3, 4], awake=True, talkable=True, condition=npc_schedule_rule("clara_paintings_confession"), priority=470, label="clara_paintings_confession"),
+                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
             ],
         )
-        npc_daily_schedule_build_all(True)
         npc_schedule_sync_currentloc(schedule_name)
 
 label InitMelissa:
@@ -171,11 +86,152 @@ init python:
                 fullname="Мелисса",
                 genitive="Мелиссы",
                 dative="Мелиссе",
+                portrait="images/melissa/melissa_portrait_0.jpg",
                 description="Мелисса - молодая девушка. В ее сложении немного проступают восточные черты. Она немного отличается от остальных работниц трактира. У нее оливкового цвета кожа, черные глаза, волосы цвета вороньего крыла и полные, похожие на мячи груди размера С.",
             )
             self.birth_date = {"day": 25, "period": 6, "cycle": 1082}
             self.card_image = "images/melissa/melissa_card.jpg"
             self.schedule_source = "schedules/melissa.json"
+            self.image_manifest = {
+                "card": {
+                    "default": ["images/melissa/melissa_card.jpg"],
+                },
+                "portrait": {
+                    "default": [
+                        "images/melissa/melissa_portrait_0.jpg",
+                        "images/melissa/melissa_portrait_1.jpg",
+                        "images/melissa/tavern/portrait.png",
+                    ],
+                    "happy": ["images/melissa/happy.png"],
+                    "angry": ["images/melissa/angy.png"],
+                    "thanks": ["images/melissa/thanks.png", "images/melissa/thanks1.png"],
+                    "bats_problem": ["images/melissa/bats_problem.png"],
+                },
+                "kitchen": {
+                    "work": [
+                        "images/melissa/tavern/kitchen_0.png",
+                        "images/melissa/tavern/kitchen_1.png",
+                        "images/melissa/kitchen.jpg",
+                        "images/melissa/kitchen2.jpg",
+                        "images/melissa/kitchen3.jpg",
+                    ],
+                    "breakfast": [
+                        "images/melissa/tavern/kitchen_0.png",
+                        "images/melissa/tavern/kitchen_1.png",
+                        "images/melissa/tavern/portrait.png",
+                    ],
+                },
+                "tavern": {
+                    "hall_cleaning": [
+                        "images/melissa/tavern/clean_0.png",
+                        "images/melissa/tavern/clean_1.png",
+                        "images/melissa/tavern/cleans_0.png",
+                    ],
+                    "waitress": [
+                        "images/melissa/tavern/waitress_0.png",
+                        "images/melissa/tavern/waitress_1.png",
+                        "images/melissa/tavern/waitress_2.png",
+                        "images/melissa/tavern/waitress_4.png",
+                    ],
+                    "backyard": [
+                        "images/melissa/tavern/backyard_0.png",
+                        "images/melissa/tavern/backyard_1.png",
+                    ],
+                    "basement": ["images/melissa/tavern/basement.png"],
+                    "rat": ["images/melissa/tavern/rat_in_basement_melissa.png"],
+                    "sleep": [
+                        "images/melissa/tavern/melissa_sleeps_0.jpg",
+                        "images/melissa/tavern/melissa_sleeps_1.png",
+                        "images/melissa/tavern/melissa_sleeps_2.png",
+                        "images/melissa/tavern/melissa_sleeps_3.png",
+                        "images/melissa/tavern/melissa_sleeps_4.png",
+                        "images/melissa/tavern/melissa_sleeps.png",
+                    ],
+                    "clumsy_waitress": [
+                        "images/melissa/tavern/clumsywaitress/waitressFall1.jpg",
+                        "images/melissa/tavern/clumsywaitress/waitresFall2.png",
+                        "images/melissa/tavern/clumsywaitress/waitresshelp.png",
+                    ],
+                    "room": ["images/melissa/tavern/portrait.png"],
+                    "angry": ["images/melissa/tavern/angry.jpg"],
+                },
+                "bats": {
+                    "points_to_ceiling": ["images/melissa/bats/points_to_ceiling.jpg"],
+                    "sleepless": ["images/melissa/bats/sleepless.png"],
+                    "yawns": ["images/melissa/bats/yawns.png"],
+                },
+                "amanda_room": {
+                    "under_bed_search": [
+                        "images/melissa/amandaRoom/underBedsearch_0.png",
+                        "images/melissa/amandaRoom/underBedsearch_1.png",
+                        "images/melissa/amandaRoom/underBedsearch_2.png",
+                    ],
+                },
+                "bedroom_search": {
+                    "booklet": ["images/melissa/bedRoomSearch/underBedBooklet.png"],
+                    "lewd_pages": [
+                        "images/melissa/bedRoomSearch/lewd_pages0.jpg",
+                        "images/melissa/bedRoomSearch/lewd_pages1.jpg",
+                        "images/melissa/bedRoomSearch/lewd2_pages.jpg",
+                    ],
+                },
+                "church": {
+                    "sisters": ["images/melissa/church/sisters.png"],
+                },
+                "grope": {
+                    "ass_angry": ["images/melissa/Grope/assAngry.png"],
+                    "ass_ok": ["images/melissa/Grope/assOk.png"],
+                    "georgette": ["images/melissa/Grope/Georgette.jpg"],
+                    "scold_agree": ["images/melissa/Grope/scoldAgree.png"],
+                    "scold_angry": ["images/melissa/Grope/scoldAngry.png"],
+                    "scold_disagree": ["images/melissa/Grope/scoldDisagree.png"],
+                    "scold_like": ["images/melissa/Grope/scoldLike.png"],
+                    "scold_neutral": [
+                        "images/melissa/Grope/scoldNeutral1.png",
+                        "images/melissa/Grope/scoldNeutral2.png",
+                    ],
+                    "throw_delinquent": ["images/melissa/Grope/throwdeliquient.png"],
+                    "tit_angry": ["images/melissa/Grope/titAngry.png"],
+                    "tit_ok": [
+                        "images/melissa/Grope/titok1.png",
+                        "images/melissa/Grope/titsok2.png",
+                    ],
+                    "tits_shy": ["images/melissa/Grope/titsShy.png"],
+                    "waitress_rebel": [
+                        "images/melissa/Grope/waiteringrebel1.png",
+                        "images/melissa/Grope/waiteresRebel2.png",
+                        "images/melissa/Grope/waiteressrebel3.png",
+                        "images/melissa/Grope/waitressrebel4.png",
+                    ],
+                },
+                "sexy_times": {
+                    "blowjob": [
+                        "images/melissa/sexyTimes/blowjob0.png",
+                        "images/melissa/sexyTimes/blowjob1.jpg",
+                        "images/melissa/sexyTimes/blowjob3.png",
+                        "images/melissa/sexyTimes/blowjob5.png",
+                    ],
+                    "blowjob_finish": ["images/melissa/sexyTimes/blowjobFinish.jpg"],
+                },
+            }
+
+        def image_sequence(self, context="", key="default"):
+            context_key = str(context or "").strip()
+            image_key = str(key or "default").strip()
+            context_row = self.image_manifest.get(context_key, {})
+            if isinstance(context_row, list):
+                candidates = context_row
+            else:
+                candidates = context_row.get(image_key, [])
+            if isinstance(candidates, str):
+                candidates = [candidates]
+            return [str(path) for path in list(candidates or []) if str(path or "").strip() and renpy.loadable(str(path))]
+
+        def image_path(self, context="", key="default"):
+            candidates = self.image_sequence(context, key)
+            if len(candidates) > 0:
+                return candidates[0]
+            return ""
 
     class MelissaInfo(Girl):
         """Melissa runtime: tavern work, bats quest, social state, body state."""
@@ -186,7 +242,6 @@ init python:
             self.code_name = "melissa"
             self.uses_own_var_state = True
             self.data = MelissaStaticData
-            self.age = 18
             self.rel = 5
             self.relationship = self.rel
             self.openness = 0
@@ -246,7 +301,6 @@ init python:
             }
             self.gift_preferences = ["soap_001", "lavender_001", "wild_rose_001", "energy_tea_001", "drink_ale_001", "libido_tincture_001"]
             self.schedule_source = MelissaStaticData.schedule_source
-            self.schedule_uses_clock_minutes = True
             self.current_location = "TavernMain"
             self.talk_preferences = {
                 "favorite_topics": ["job_routine", "family_life", "melissa_safety", "melissa_quiet", "stories"],
@@ -286,6 +340,18 @@ init python:
             self.ensure_story_defaults()
             return self
 
+        def image_sequence(self, context="", key="default"):
+            return self.data.image_sequence(context, key)
+
+        def image_path(self, context="", key="default"):
+            return self.data.image_path(context, key)
+
+        def cycle_image(self, context="", key="default", salt=0):
+            candidates = self.image_sequence(context, key)
+            if len(candidates) <= 0:
+                return ""
+            return candidates[people_to_int(salt, 0) % len(candidates)]
+
         def reset_daily(self, full=False):
             super(MelissaInfo, self).reset_daily(full)
             self.ensure_story_defaults()
@@ -299,6 +365,14 @@ init python:
         def install_schedule(self):
             melissa_install_schedule(self.code_name)
             return self
+
+        def getLocation(self, wday=None, hour=None):
+            location_value = super(MelissaInfo, self).getLocation(wday, hour)
+            temp_room = str(self.var.get("temp_room", "") or "").strip()
+            if temp_room and self.temp_room_active(temp_room, hour, wday):
+                self.location = temp_room
+                return temp_room
+            return location_value
 
         def bats_stage(self):
             return max(0, people_to_int(self.var.get("bats_episode", 0), 0))
@@ -320,19 +394,19 @@ init python:
             self.var["bats_episode"] = stage
             return stage >= 8 or self.bats_repair_complete()
 
-        def temp_room_active(self, room_code="", time_value=None):
+        def temp_room_active(self, room_code="", hour_value=None, weekday_value=None):
             self.sync_room_problem_state()
             room_key = str(room_code or "").strip()
             temp_room = str(self.var.get("temp_room", "") or "").strip()
-            slot = people_to_int(time if time_value is None else time_value, 0)
-            hour_num = people_to_int(hour, 0)
+            hour_num = people_to_int(calendar_v2.hour if hour_value is None else hour_value, 0)
+            week_num = people_to_int(week if weekday_value is None else weekday_value, 0)
             if temp_room == "" or temp_room != room_key:
                 return False
             if self.bats_stage() >= 8:
                 return False
             scheduled_room = ""
             try:
-                scheduled_room = str(npc_schedule_location(self.code_name, people_to_int(week, 0), slot) or "")
+                scheduled_room = str(npc_schedule_location(self.code_name, week_num, hour_num) or "")
             except Exception:
                 scheduled_room = ""
             if scheduled_room == "TavernMelissaRoom":

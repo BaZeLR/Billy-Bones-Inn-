@@ -3,25 +3,24 @@
 # ================================================================================
 init python:
     def georgett_grope_outcome(girl_name="georgett", girl_loc="street"):
-        girl_key = str(girl_name or "georgett")
         loc_key = str(girl_loc or "street")
-        has_paid_context = (money >= 8 or (money >= 4 and loc_key == "tavern")) and cametoday < cancumdaily
+        has_paid_context = (money >= 8 or (money >= 4 and loc_key == "tavern")) and Georgett.can_player_cum()
 
         if not has_paid_context:
-            if cametoday >= cancumdaily:
-                grope_text = "«На сегодня с тебя уже хватит, красавчик», - усмехнулась %s. «Приходи завтра, если захочешь еще.»" % RealName.get(girl_key, girl_key)
+            if not Georgett.can_player_cum():
+                grope_text = "«На сегодня с тебя уже хватит, красавчик», - усмехнулась %s. «Приходи завтра, если захочешь еще.»" % Georgett.real_name()
             else:
-                grope_text = "«Эй, осади лошадей!» говорит вам %s. «Сначала заплати, а потом уже лапай!»" % RealName.get(girl_key, girl_key)
+                grope_text = "«Эй, осади лошадей!» говорит вам %s. «Сначала заплати, а потом уже лапай!»" % Georgett.real_name()
             return {"text": grope_text, "show_current_sex": False}
 
-        if Friends.get(girl_key, 0) >= 10:
-            grope_text = "Вы начали мять сиськи %s через тонкую ткань ее блузки.\nВы сунули руку под короткую юбочку вашей любовницы и стали наминать ее вульву." % RealName2.get(girl_key, girl_key)
-            if CumInsideYou.get(girl_key, 0) > 0:
-                grope_text += "\n\nВы почувствовали свою сперму в пещерке %s." % RealName2.get(girl_key, girl_key)
-            elif CumInsideOthers.get(girl_key, 0) > 0:
-                grope_text += "\n\nВаши пальцы заскользили по пещерке %s, похоже кто-то уже кончил в нее." % RealName2.get(girl_key, girl_key)
+        if Georgett.rel >= 10:
+            grope_text = "Вы начали мять сиськи %s через тонкую ткань ее блузки.\nВы сунули руку под короткую юбочку вашей любовницы и стали наминать ее вульву." % Georgett.real_name2()
+            if Georgett.cum_state("cum_inside_you") > 0:
+                grope_text += "\n\nВы почувствовали свою сперму в пещерке %s." % Georgett.real_name2()
+            elif Georgett.cum_state("cum_inside_others") > 0:
+                grope_text += "\n\nВаши пальцы заскользили по пещерке %s, похоже кто-то уже кончил в нее." % Georgett.real_name2()
         else:
-            grope_text = "«Эй, осади лошадей!» говорит вам %s. «Сначала заплати, а потом уже лапай!»" % RealName.get(girl_key, girl_key)
+            grope_text = "«Эй, осади лошадей!» говорит вам %s. «Сначала заплати, а потом уже лапай!»" % Georgett.real_name()
 
         return {"text": grope_text, "show_current_sex": True}
 
@@ -42,13 +41,15 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
         $ CurLocDesc = MainTxt
         $ Georgett.add_relation(1)
         $ Georgett.known = True
-        $ Georgett.sync_georgett_maps()
 
     $ main_ui_begin_talk_state("Разговор с Жоржеттой", girl_name)
     $ current_action_title = "Разговор с Жоржеттой"
     $ current_action_content = None
     python:
-        _georgett_picture = str(girl_card_portrait_path(girl_name) or "").strip()
+        if str(girl_loc or "") == "street" and str(girl_name or "").strip().lower() == "georgett" and renpy.loadable("images/georgett/Port/wait.jpg"):
+            _georgett_picture = "images/georgett/Port/wait.jpg"
+        else:
+            _georgett_picture = str(girl_card_portrait_path(girl_name) or "").strip()
         if _georgett_picture and renpy.loadable(_georgett_picture):
             scene_image = _georgett_picture
             _layout_last_picture = _georgett_picture
@@ -114,13 +115,13 @@ label IntGeorgettTalkRefresh(girl_name="georgett", girl_loc="street"):
     ) and Georgett.can_talk_today():
         $ current_action_items.append(MenuItem("Обсудить Эдди", Call("IntGeorgettTalkApply", girl_name, girl_loc, "talk_eddie")))
 
-    if Becky.var.get("EddieGeorg", 0) > 0 and Becky.var.get("EddieWhoreHome", 0) == 0 and (money > 25 or (Becky.var.get("EddieGeorg", 0) > 1 and money > 10)) and Talked.get(girl_name, 0) < 2:
+    if Becky.var.get("EddieGeorg", 0) > 0 and Becky.var.get("EddieWhoreHome", 0) == 0 and (money > 25 or (Becky.var.get("EddieGeorg", 0) > 1 and money > 10)) and Georgett.talk_count() < 2:
         $ current_action_items.append(MenuItem("Предложить Жоржетте проспонсировать ее визит к Эдди домой", Call("IntGeorgettTalkApply", girl_name, girl_loc, "sponsor_eddie_home")) )
 
     if Becky.var.get("EddieGeorg", 0) > 0 and int(calendar_v2.hour or 0) <= 15:
         $ current_action_items.append(MenuItem("Спросить, не приходил ли Эдди", Call("IntGeorgettTalkApply", girl_name, girl_loc, "ask_eddie_visit")) )
 
-    if (money >= 8 or (money >= 4 and girl_loc == "tavern")) and cametoday < cancumdaily:
+    if (money >= 8 or (money >= 4 and girl_loc == "tavern")) and Georgett.can_player_cum():
         $ current_action_items.append(MenuItem("Снять", Call("IntGeorgettTalkApply", girl_name, girl_loc, "hire")) )
 
     $ current_action_items.append(MenuItem("Лапать", Call("IntGeorgettTalkApply", girl_name, girl_loc, "grope")))
@@ -144,13 +145,13 @@ label IntGeorgettTalkApply(girl_name="georgett", girl_loc="street", choice_code=
 
     if str(choice_code or "") == "smalltalk":
         $ MainTxt = "Вы некоторое время болтаете с Жоржеттой о разных вещах."
-        if Talked.get(girl_name, 0) <= 2 and renpy.random.randint(1, 2) == 1:
-            if Georgett.rel < 3 or (LickPussy.get(girl_name, 0) >= 4 and Georgett.rel < 5) or (GiveOrgasms.get(girl_name, 0) >= 2 and LickPussy.get(girl_name, 0) >= 4 and Georgett.rel < 7):
+        if Georgett.talk_count() <= 2 and renpy.random.randint(1, 2) == 1:
+            if Georgett.rel < 3 or (Georgett.sex_state.get("lick_pussy", 0) >= 4 and Georgett.rel < 5) or (Georgett.orgasm_count_given() >= 2 and Georgett.sex_state.get("lick_pussy", 0) >= 4 and Georgett.rel < 7):
                 $ MainTxt += "\n\nВы чуть лучше узнали Жоржетту."
                 $ Georgett.add_relation(1)
             elif Georgett.rel < 7:
                 $ MainTxt += "\n\nИз уклончивых ответов девушки вы поняли, что она вам еще мало доверяет. Может, если бы вы узнали ее получше или доставили ей приятное, она бы с вами поделилась еще чем-то."
-        if Talked.get(girl_name, 0) > 2:
+        if Georgett.talk_count() > 2:
             $ MainTxt += "\n\nНичего нового из разговора вы не узнали."
         $ Georgett.finish_talk()
         $ CurLocDesc = MainTxt
@@ -277,7 +278,6 @@ label IntGeorgettTalkApply(girl_name="georgett", girl_loc="street", choice_code=
         $ Georgett.mark_asked_topic("GloryHoleAgreed", 0)
         $ Georgett.jobs["jobGloryHoleAvail"] = 1
         $ Liza.jobs["jobGloryHoleAvail"] = 1
-        $ Georgett.sync_georgett_maps()
         $ Liza.sync_shared_state()
         $ Georgett.finish_talk()
         $ CurLocDesc = MainTxt
@@ -353,10 +353,16 @@ label IntGeorgettTalkApply(girl_name="georgett", girl_loc="street", choice_code=
     if str(choice_code or "") == "hire":
         if girl_loc == "tavern":
             $ money -= 4
-            call SexProstTavern(1, "georgett")
+            call IntGeorgettSex("georgett", "tavern")
+            $ calendar_v2.advance_minutes(40)
+            $ CurLocDesc = MainTxt
+            call IntGeorgettTalkRefresh(girl_name, girl_loc)
         else:
             $ money -= 8
-            call SexPort(1, "georgett")
+            call IntGeorgettSex("georgett", "street")
+            $ calendar_v2.advance_minutes(40)
+            $ CurLocDesc = MainTxt
+            jump PortStreets
         return
 
     if str(choice_code or "") == "grope":

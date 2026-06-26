@@ -202,7 +202,7 @@ label IntZimmerTalkMongolWineDistraction:
     $ MainTxt = "Вы как бы между делом рассказываете Циммерману, что в трактире остался отличный бочонок, который не стыдно отправить доблестным ночным стражникам у караулки. Десятник заметно оживляется и тут же начинает рассуждать, как важно поддерживать людей на посту.\n\n\"Вот это, молодой человек, правильное понимание общественного порядка,\" важно кивает он. \"У хорошего хозяина и стража сыта, и город спокоен.\""
     vscene "images/zimmer/Talk.jpg"
     $ _mongol_var["GuardCaptainKnown"] = 1
-    $ Friends[_zimmer_name] = min(20, int(Friends.get(_zimmer_name, 0) or 0) + 1)
+    $ Zimmer.change_social(friend_delta=1)
     $ Talked[_zimmer_name] = Talked.get(_zimmer_name, 0) + 1
     $ TalkedToday[_zimmer_name] = TalkedToday.get(_zimmer_name, 0) + 1
     $ CurLocDesc = MainTxt

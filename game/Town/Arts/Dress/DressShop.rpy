@@ -104,7 +104,6 @@ init python:
         return "success"
 
 label DressShop:
-    call EnterLocation("DressShop")
     $ CurrentRoom = DressShopRoom
     $ CurLoc = "DressShop"
     $ location = CurLoc
@@ -132,8 +131,9 @@ label DressShop:
     $ scene_image = CurrentRoom.bg_picture
     $ _layout_last_picture = ""
 
-    if renpy.has_label("CheckDailyEvent"):
-        call CheckDailyEvent("", "BuyDress")
+    $ calendar_v2.sync_state()
+    if renpy.has_label("CheckDailyEvent") and int(calendar_v2.hour or 0) < 12:
+        call CheckDailyEvent("", "BuyDress", "DressShop", 0)
 
     if navigation_only_mode_enabled():
         $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()

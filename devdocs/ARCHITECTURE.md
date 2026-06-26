@@ -284,21 +284,35 @@ Current-room NPC display should remain visible unless intentionally hidden.
 
 ---
 
-# 13. main_ui Rules
+# 13. Persistent HUD And Menu Rules
 
-Ordinary story events should display through main_ui by setting:
+The right-side HUD is persistent gameplay UI. It must remain visible during:
 
-```python
-UI_mode
-MainTxt
-CurLocDesc
-current_picture_mode
-current_scene_picture
-current_action_title
-current_action_items
+* normal room flow
+* NPC interactions
+* ordinary story events
+
+The HUD displays state and provides the visual area for choices. It does not own
+story logic.
+
+Authored event labels own the scene flow:
+
+```renpy
+label some_event:
+    vscene "images/event/picture.jpg"
+    "Event text."
+
+    menu:
+        "Choice":
+            $ SomeState = True
+            $ thread.advance()
+            jump expression CurLoc
 ```
 
-Avoid raw Ren'Py fullscreen menus for ordinary gameplay.
+Tractir may style or place that Ren'Py menu in the right-side action area, like
+Family Life uses `menu (screen="locmenu", ...)`, but the choices remain authored
+in the label. Do not replace this with `current_action_items`, generic action
+queues, modal event screens, refresh labels, or dispatcher paths.
 
 ---
 
@@ -312,13 +326,10 @@ Canonical room builder:
 Room.build_menu_sections()
 ```
 
-Special authored events may directly define:
-
-```python
-current_action_items
-```
-
-Do NOT force special scripted scenes into generic menu builders.
+Special authored events must not be forced into generic room menu builders.
+They use authored labels with `vscene`, text, classic Ren'Py `menu:`, direct
+consequences, and direct thread progression. The screen layer may place that
+menu in the persistent HUD action area.
 
 ---
 
@@ -539,7 +550,6 @@ Authored event labels may directly:
 * mutate variables
 * select picture paths
 * write classic `menu:` choices in the label
-* use event-owned `current_action_items` only when rendering those choices in the active `main_ui` event panel
 * branch by state
 * advance/complete threads
 
@@ -670,9 +680,9 @@ Family Life sex-event files keep the menu choices in the authored event label.
 The menu appears while the event picture/text remains the current scene. The
 chosen branch mutates state and jumps onward directly.
 
-Tractir must preserve that behavior visually. If Tractir uses `main_ui` instead
-of Family Life's native `locmenu`, the event choices still belong in the middle
-action panel during the event, exactly like the in-game event screenshot.
+Tractir must preserve that behavior visually. Event choices belong in the middle
+action panel during the event, exactly like the in-game event screenshot, while
+remaining authored as Ren'Py menu choices in the event label.
 
 Do NOT move event choices into:
 
@@ -687,14 +697,12 @@ Current Tractir comparison:
 * Some files already follow the desired authored pattern, such as
   `game/NPC/Girls/Becky/BeckyEvents.rpy`, which explicitly says classic menu
   only and uses `menu:` inside event labels.
-* Other current files push choices into `current_action_items` or
-  `main_ui_set_action_panel`, for example Clara thread scenes. This can match
-  the desired visual layout only when the choices are authored at the event
-  point and rendered in the active event panel. It is not acceptable when it
-  becomes a generic UI queue, rebuild, refresh, or dispatcher layer.
-* Event choice authorship should move toward Family Life-style `menu:` in the
-  event label. Tractir's screen layer may render that menu in the right event
-  panel, but the content ownership stays with the label.
+* Files that push authored story choices into `current_action_items`,
+  `main_ui_set_action_panel`, generic queues, rebuild labels, refresh labels, or
+  dispatchers are legacy/bloat patterns to remove or bypass when touched.
+* Event choice authorship must use Family Life-style `menu:` in the event label.
+  Tractir's screen layer may render that menu in the right event panel, but the
+  content ownership stays with the label.
 
 ---
 

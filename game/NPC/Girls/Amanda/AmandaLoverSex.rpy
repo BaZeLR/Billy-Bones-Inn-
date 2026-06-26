@@ -10,7 +10,7 @@ label AmandaLoverSex:
         tmp_guy_name = RandomNameCode("male")
         tmp_girl_name = RandomNameCode("female")
         
-        if renpy.random.randint(1, 4) <= 3:
+        if Amanda.dynamic_roll(1, 4, "lover_guy_known") <= 3:
             tmp_guy_known = 1
             
         amanda_agree_sex = 0
@@ -18,7 +18,7 @@ label AmandaLoverSex:
     # Main scene intro
     "Вы подошли поближе и точно: это Аманда "
     
-    if Amanda.corruption >= 40 and renpy.random.randint(1, 2) == 1:
+    if Amanda.corruption >= 40 and Amanda.dynamic_roll(1, 2, "lover_walk_style") == 1:
         extend "идет под ручку "
     else:
         extend "болтает "
@@ -27,7 +27,7 @@ label AmandaLoverSex:
     
     if tmp_guy_known:
         extend "да это же [tmp_guy_name] "
-        if renpy.random.randint(1, 5) <= 3:
+        if Amanda.dynamic_roll(1, 5, "lover_guy_street") <= 3:
             $ random_street = RandomStreetNameCode()
             extend "с улицы [random_street]!"
         else:
@@ -37,14 +37,12 @@ label AmandaLoverSex:
 
     menu:
         "Отправить ее обратно на работу":
-            $ AmandaYellNotWork()
+            $ Amanda.yell_not_work()
             if Amanda.var_int("prohibitwithguys", 0):
                 "\"И это не говоря уже о том, что я запретил тебе приключения на свою манду искать!\" крикнули вы ей вслед."
             
             "А огорченный парень пошел куда-то своей дорогой. Хоть счастье было так близко и доступно, но уплыло из под носа."
-            $ _adc_jump_label = AmandaDynamicTakeNextJump()
-            if _adc_jump_label and renpy.has_label(_adc_jump_label):
-                jump expression _adc_jump_label
+            jump StreetTavern
             
         "Послушать о чем они говорят":
             "Вы прислушались к дискуссии:"
@@ -58,7 +56,7 @@ label AmandaLoverSex:
                     "Идти за ними":
                         call amanda_lover_show_sex_scene("sex", tmp_guy_name)
                     "Пусть себе балуются, а я к трактиру":
-                        $ AmandaLoverSexCalc(tmp_guy_name, amanda_agree_sex)
+                        $ Amanda.lover_sex_calc(tmp_guy_name, amanda_agree_sex)
                         jump StreetTavern
             
             else:
@@ -75,7 +73,7 @@ label AmandaLoverSex:
                                 "Идти за ними":
                                     call amanda_lover_show_sex_scene("sex", tmp_guy_name)
                                 "Пусть себе балуются, а я к трактиру":
-                                    $ AmandaLoverSexCalc(tmp_guy_name, amanda_agree_sex)
+                                    $ Amanda.lover_sex_calc(tmp_guy_name, amanda_agree_sex)
                                     jump StreetTavern
                         else:
                             call amanda_lover_ask_shy_code
@@ -91,13 +89,13 @@ label AmandaLoverSex:
                             "Идти за ними":
                                 call amanda_lover_show_sex_scene("sex", tmp_guy_name)
                             "Пусть себе балуются, а я к трактиру":
-                                $ AmandaLoverSexCalc(tmp_guy_name, amanda_agree_sex)
+                                $ Amanda.lover_sex_calc(tmp_guy_name, amanda_agree_sex)
                                 jump StreetTavern
 
                     elif Amanda.corruption >= 45:
                         "\"Место он знает! Тоже мне, герой-соблазнитель!\"\n\"А что, я вот тебе, этого, цветочек принес,\" галантно парирует [tmp_guy_name], даря Аманде "
 
-                        $ rand_var = renpy.random.randint(1, 4)
+                        $ rand_var = Amanda.dynamic_roll(1, 4, "lover_flower")
                         if rand_var == 1:
                             extend "ромашку без пары лепестков."
                         elif rand_var == 2:
@@ -105,7 +103,7 @@ label AmandaLoverSex:
                         else:
                             extend "ворох увядших незабудок."
 
-                        $ rand_var = renpy.random.randint(1, 3)
+                        $ rand_var = Amanda.dynamic_roll(1, 3, "lover_flower_reaction")
                         if rand_var == 1:
                             "\"Цветочек он принес?!\" отвечает чуть смягчившись Аманда, \"да иди ты со своим цветочком!\""
                             call amanda_lover_ask_cum_code
@@ -124,18 +122,18 @@ label AmandaLoverSex:
                         jump StreetTavern
         
         "Пусть себе балуются, а я к трактиру":
-            $ AmandaLoverSexCalc(tmp_guy_name)
+            $ Amanda.lover_sex_calc(tmp_guy_name)
             jump StreetTavern
 
 # Supporting functions and scene code
 label amanda_lover_show_sex_scene(scene_type, guy_name):
     $ main_ui_begin_native_scene_state("Аманда")
     python:
-        amanda_lover_build = renpy.random.randint(1, 2)
-        amanda_lover_build_get_in = renpy.random.randint(1, 3)
+        amanda_lover_build = Amanda.dynamic_roll(1, 2, "lover_build")
+        amanda_lover_build_get_in = Amanda.dynamic_roll(1, 3, "lover_build_get_in")
         amanda_lover_build_cum_in = 1
         if scene_type != "minet":
-            amanda_lover_build_cum_in = renpy.random.randint(2, 3)
+            amanda_lover_build_cum_in = Amanda.dynamic_roll(2, 3, "lover_cum_%s" % scene_type)
 
     if amanda_lover_build == 1:
         "[guy_name] и Аманда шли недолго, через пару поворотов галантный кавалер пропустил Аманду первой в какую-то калиточку, а потом зашел туда сам. Легким шагом, делая вид что прогуливаетесь, вы подвалили к этой калиточке и дернули ее на себя."
@@ -212,7 +210,7 @@ label amanda_lover_show_sex_scene(scene_type, guy_name):
         $ Amanda.change_social(corruption_delta=1)
     
     # Potential arrest scenario
-    if amanda_lover_build_get_in > 1 and renpy.random.randint(1, 7) == 1:
+    if amanda_lover_build_get_in > 1 and Amanda.dynamic_roll(1, 7, "lover_arrest") == 1:
         "Только вы собрались было вернуться к трактиру, как кто-то похлопал вас сзади по плечу."
         
         menu:
@@ -242,12 +240,12 @@ label amanda_lover_ask_shy_code:
 label amanda_lover_ask_cum_code:
     "\n\"А ты обещаешь что не кончишь раньше меня?\"\n\"Конечно обещаю, да что я, да я, я всегда о девушке в первую очередь волнуюсь. Не веришь - [tmp_girl_name] подтвердит.\" торопливо обещает [tmp_guy_name].\n\"Да я вот потому и сомневаюсь, что [tmp_girl_name] подтвердила. Только не совсем то.\""
     
-    if renpy.random.randint(1, 3) == 1:
+    if Amanda.dynamic_roll(1, 3, "lover_cum_question_first") == 1:
         "\"Да врет она все!\"\n\"Совсем ты запутался, то подтвердит, то врет. Ну ладно, бывай!\" обламывает Аманда незадачливого ухажера и идет обратно к трактиру."
     else:
         "\"Да нет, с ней пару накладок конечно было, но теперь я уже научился!\" ловко вывертывается [tmp_guy_name].\n\"А в меня кончать не будешь, вытащишь?\" продолжает уточнять дотошная девица.\n\"Конечно, как скажешь!\" [tmp_guy_name] соглашается на все с готовностью.\n\"А что это в таком случае [RandomNameCode('female')] с пузом ходит? И от кого же это [RandomNameCode('female')] родила в прошлом месяце?\" осведомляется Аманда.\n\"А откуда же мне знать? Я один что ли был? Но делал все как скажут.\" вывернулся парень."
         
-        if renpy.random.randint(1, 3) == 1:
+        if Amanda.dynamic_roll(1, 3, "lover_cum_question_second") == 1:
             "\"А [tmp_girl_name] эта сама говорила чтоб в нее кончал, мол люблю когда там хлюпает.\" добавил он не совсем складно.\n\"Так ты не кончал или она сама мол просила, ты уж определись. А когда определишься, тогда и поговорим!\" обламывает Аманда незадачливого ухажера и идет обратно к трактиру."
         else:
             "\"Ну ладно, поверю тебе, пошли!\" и парочка следует куда-то в переулки."
@@ -266,18 +264,16 @@ label amanda_lover_ask_minet_agree:
             call amanda_lover_show_sex_scene("minet", tmp_guy_name)
         
         "Пусть себе балуются, а я к трактиру":
-            $ AmandaLoverSexCalc(tmp_guy_name, amanda_agree_sex)
+            $ Amanda.lover_sex_calc(tmp_guy_name, amanda_agree_sex)
             jump StreetTavern
         
         "Отправить ее обратно на работу":
-            $ AmandaYellNotWork()
+            $ Amanda.yell_not_work()
             if Amanda.var_int("prohibitwithguys", 0):
                 "\"И это не говоря уже о том, что я запретил тебе приключения на свою манду искать!\" крикнули вы ей вслед."
             
             "А огорченный парень пошел куда-то своей дорогой. Хоть счастье было так близко и доступно, но уплыло из под носа."
-            $ _adc_jump_label = AmandaDynamicTakeNextJump()
-            if _adc_jump_label and renpy.has_label(_adc_jump_label):
-                jump expression _adc_jump_label
+            jump StreetTavern
     return
 
 # Amanda agrees to sex
@@ -290,16 +286,14 @@ label amanda_lover_ask_sex_agree:
             call amanda_lover_show_sex_scene("sex", tmp_guy_name)
             
         "Пусть себе балуются, а я к трактиру":
-            $ AmandaLoverSexCalc(tmp_guy_name, amanda_agree_sex)
+            $ Amanda.lover_sex_calc(tmp_guy_name, amanda_agree_sex)
             jump StreetTavern
             
         "Отправить ее обратно на работу":
-            $ AmandaYellNotWork()
+            $ Amanda.yell_not_work()
             if Amanda.var_int("prohibitwithguys", 0):
                 "\"И это не говоря уже о том, что я запретил тебе приключения на свою манду искать!\" крикнули вы ей вслед."
             
             "А огорченный парень пошел куда-то своей дорогой. Хоть счастье было так близко и доступно, но уплыло из под носа."
-            $ _adc_jump_label = AmandaDynamicTakeNextJump()
-            if _adc_jump_label and renpy.has_label(_adc_jump_label):
-                jump expression _adc_jump_label
+            jump StreetTavern
     return

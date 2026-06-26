@@ -60,7 +60,6 @@ init 6 python:
 
 
 label TavernEmptyRoom:
-    call EnterLocation("TavernEmptyRoom")
     $ CurrentRoom = TavernEmptyRoomRoom
     $ CurLoc = "TavernEmptyRoom"
     $ location = CurLoc

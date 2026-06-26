@@ -2,8 +2,6 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 4 python:
-    import random
-
     def amanda_has_given_night_bowl():
         return Amanda.var_int("gave_night_bowl", 0) == 1
 
@@ -16,18 +14,16 @@ init 4 python:
         )
 
     def amanda_can_be_asked_for_night_bowl_favor():
-        Drunk_safe = getattr(renpy.store, 'Drunk', {})
         return (
             amanda_can_be_asked_for_night_bowl()
             and int(Amanda.rel or 0) >= 7
-            and int(Drunk_safe.get("amanda", 0) or 0) > 0
+            and int(Amanda.drunk or 0) > 0
         )
 
     def amanda_night_bowl_success_chance(from_dance=False):
-        Drunk_safe = getattr(renpy.store, 'Drunk', {})
         friendship_value = int(Amanda.rel or 0)
         chance_value = 20 + max(0, friendship_value - 4) * 8
-        if from_dance and int(Drunk_safe.get("amanda", 0) or 0) > 0:
+        if from_dance and int(Amanda.drunk or 0) > 0:
             chance_value += 20
         if friendship_value >= 10:
             chance_value = 100
@@ -40,7 +36,7 @@ init 4 python:
         Amanda.set_var_int("night_bowl_request_day", dayspassed)
         friendship_value = int(Amanda.rel or 0)
         chance_value = amanda_night_bowl_success_chance(from_dance)
-        granted = friendship_value >= 10 or random.randint(1, 100) <= chance_value
+        granted = friendship_value >= 10 or procedural_randint(1, 100, "amanda_night_bowl_%s_%s" % (dayspassed, int(from_dance))) <= chance_value
         if granted:
             _player_add_item_by_id("night_bowl_001", 1)
             Amanda.set_var_int("gave_night_bowl", 1)
@@ -71,14 +67,13 @@ init 4 python:
         return Amanda.var_int("prefers_backyard_relief", -1) == 1
 
     def amanda_pick_backyard_relief_preference():
-        sluttiness_safe = getattr(renpy.store, 'sluttiness', {})
         friendship_value = int(Amanda.rel or 0)
-        sluttiness_value = int(sluttiness_safe.get("amanda", 0) or 0)
+        sluttiness_value = int(Amanda.corruption or 0)
         chance_value = 20 + friendship_value * 4 + int(sluttiness_value / 5)
         if Amanda.var_int("gave_night_bowl", 0) == 1:
             chance_value += 10
         chance_value = max(5, min(90, chance_value))
-        Amanda.set_var_int("prefers_backyard_relief", 1 if random.randint(1, 100) <= chance_value else 0)
+        Amanda.set_var_int("prefers_backyard_relief", 1 if procedural_randint(1, 100, "amanda_backyard_relief_%s" % dayspassed) <= chance_value else 0)
         return Amanda.var_int("prefers_backyard_relief", 0)
 
 init python:
@@ -194,7 +189,6 @@ init python:
             super().__init__("amanda")
             self.code_name = "amanda"
             self.data = AmandaStaticData
-            self.age = 18
             self.rel = 5
             self.relationship = self.rel
             self.openness = 3
@@ -269,7 +263,6 @@ init python:
             }
             self.gift_preferences = list(AmandaStaticData.gift_preferences)
             self.schedule_source = AmandaStaticData.schedule_source
-            self.schedule_uses_clock_minutes = True
             self.current_location = "TavernMain"
             self.talk_preferences = {
                 "favorite_topics": ["fashion", "amanda_boys", "money", "sex_topics", "gossip"],
@@ -305,6 +298,7 @@ init python:
 
         def initialize_new_game_state(self):
             self.ensure_story_defaults()
+            self.publish_wardrobe_state()
             return self
 
         def reset_daily(self, full=False):
@@ -334,6 +328,9 @@ init python:
         def decision_good_probability(self, action_name="", profile=None):
             return girl_decision_good_probability(self.code_name, action_name, profile)
 
+        def mana_bad_probability(self):
+            return max(0.0, min(1.0, 1.0 - (float(people_to_int(self.mana, 0)) / 100.0)))
+
         def mana_profile(self):
             if self.mana_corrupted:
                 return self.mana_reaction_table["corrupted"]
@@ -350,6 +347,12 @@ init python:
             self.reaction_state["last_mana_delta"] = self.mana - before
             self.reaction_state["last_mana_reasons"] = [reason] if reason else []
             return self.mana
+
+        def reward_need_fulfilled(self, amount=1, reason="need_fulfilled"):
+            return self.change_mana(abs(people_to_int(amount, 1)), reason)
+
+        def punish_need_unfulfilled(self, amount=1, reason="need_unfulfilled"):
+            return self.change_mana(-abs(people_to_int(amount, 1)), reason)
 
         def reaction_score(self, base_score=0, context=None):
             context = dict(context or {})
@@ -407,10 +410,7 @@ init python:
             return score
 
         def cycle_state(self):
-            try:
-                state = dict(amanda_ai_cycle_state() or {})
-            except Exception:
-                state = dict(girl_decision_cycle_state(self.code_name) or {})
+            state = dict(girl_decision_cycle_state(self.code_name) or {})
             phase = str(state.get("phase", "steady") or "steady")
             cycle_day = people_to_int(state.get("day", state.get("cycle_day", 0)), 0)
             self.fertility_cycle["cycle_day"] = cycle_day
@@ -421,12 +421,10 @@ init python:
 
         def fertility_state(self):
             cycle = self.cycle_state()
-            try:
-                body = dict(amanda_ai_body_state_bonus() or {})
-            except Exception:
-                body = {}
-            phase = str(cycle.get("phase", body.get("phase", "steady")) or "steady")
-            cycle_day = people_to_int(cycle.get("day", body.get("cycle_day", 0)), 0)
+            phase = str(cycle.get("phase", "steady") or "steady")
+            cycle_day = people_to_int(cycle.get("day", cycle.get("cycle_day", 0)), 0)
+            horny = float(cycle.get("horny", 0.0) or 0.0)
+            critical = float(cycle.get("critical", 0.0) or 0.0)
             return {
                 "phase": phase,
                 "cycle_day": cycle_day,
@@ -434,10 +432,10 @@ init python:
                 "desire": cycle.get("desire", cycle.get("horny", 0.0)),
                 "rest": cycle.get("rest", 0.0),
                 "safety": cycle.get("safety", 0.0),
-                "need_bandage": people_to_int(body.get("need_bandage", 0), 0),
-                "wet_bonus": people_to_int(body.get("wet_bonus", 0), 0),
-                "arousal_bonus": people_to_int(body.get("arousal_bonus", 0), 0),
-                "tags": list(body.get("tags", []) or []),
+                "need_bandage": 1 if critical >= 0.75 else 0,
+                "wet_bonus": int(max(0.0, horny) * 8),
+                "arousal_bonus": int(max(0.0, horny) * 10),
+                "tags": [phase],
             }
 
         def pregnancy_state(self):
@@ -467,16 +465,18 @@ init python:
             )
 
         def apply_body_state(self):
-            try:
-                return amanda_ai_apply_visible_body_state()
-            except Exception:
-                return self.fertility_state()
+            state = self.fertility_state()
+            self.stats["PussyWetStart"] = max(people_to_int(self.stats.get("PussyWetStart", 0), 0), people_to_int(state.get("wet_bonus", 0), 0))
+            return state
 
         def body_state_line(self):
-            try:
-                return str(amanda_ai_body_state_line() or "")
-            except Exception:
-                return ""
+            state = self.apply_body_state()
+            phase = str(state.get("phase", "steady") or "steady")
+            if phase == "horny":
+                return "Аманда выглядит оживленнее обычного: в движениях больше тепла, а во взгляде чаще вспыхивает игривый интерес."
+            if phase == "critical":
+                return "Аманда держится тише обычного и выглядит утомленной."
+            return ""
 
         def morning_issue(self, time_value=None, hour_value=None):
             try:
@@ -510,6 +510,7 @@ init python:
 
         def add_var_int(self, key, amount=1):
             return self.set_var_int(key, self.var_int(key, 0) + people_to_int(amount, 0))
+
 
         def is_at(self, location_code):
             try:
@@ -604,6 +605,48 @@ init python:
 define AmandaStaticData = AmandaData()
 default Amanda = AmandaInfo()
 
+init python:
+    def amanda_schedule_match(location="", mode="morning"):
+        target = str(location or "").strip()
+        mode_key = str(mode or "morning").strip().lower()
+        if mode_key == "morning":
+            return str(_tavern_household_preopening_location("amanda") or "") == target
+        if mode_key == "sunday":
+            return str(_tavern_household_sunday_location("amanda") or "") == target
+        if mode_key == "friday_evening":
+            return str(_tavern_household_friday_evening_location("amanda") or "") == target
+        return False
+
+    def amanda_schedule_morning_hall():
+        return amanda_schedule_match("TavernMain", "morning")
+
+    def amanda_schedule_morning_kitchen():
+        return amanda_schedule_match("TavernKitchen", "morning")
+
+    def amanda_schedule_morning_storage():
+        return amanda_schedule_match("TavernStorage", "morning")
+
+    def amanda_schedule_morning_backyard():
+        return amanda_schedule_match("Backyard", "morning")
+
+    def amanda_schedule_morning_room():
+        return amanda_schedule_match("TavernAmandaRoom", "morning")
+
+    def amanda_schedule_friday_dance():
+        return amanda_schedule_match("FridayDance", "friday_evening")
+
+    def amanda_schedule_sunday_room():
+        return amanda_schedule_match("TavernAmandaRoom", "sunday")
+
+    def amanda_schedule_sunday_backyard():
+        return amanda_schedule_match("Backyard", "sunday")
+
+    def amanda_schedule_sunday_hall():
+        return amanda_schedule_match("TavernMain", "sunday")
+
+    def amanda_schedule_sunday_kitchen():
+        return amanda_schedule_match("TavernKitchen", "sunday")
+
 label InitAmanda:
     python:
         GirlName = Amanda.code_name
@@ -615,18 +658,18 @@ label InitAmanda:
         npc_schedule_set(
             GirlName,
             [
-                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernMain", mode="morning"), priority=300, label="morning_hall"),
-                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernKitchen", mode="morning"), priority=300, label="morning_kitchen"),
-                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernStorage", mode="morning"), priority=300, label="morning_storage"),
-                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="Backyard", mode="morning"), priority=300, label="morning_backyard"),
-                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernAmandaRoom", mode="morning"), priority=300, label="morning_room"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_hall, priority=300, label="morning_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_kitchen, priority=300, label="morning_kitchen"),
+                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_storage, priority=300, label="morning_storage"),
+                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_backyard, priority=300, label="morning_backyard"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_room, priority=300, label="morning_room"),
                 NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[1, 2, 3], awake=True, talkable=True, priority=200, label="working_hall"),
-                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="FridayDance", mode="friday_evening"), priority=250, label="friday_dance"),
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=amanda_schedule_friday_dance, priority=250, label="friday_dance"),
                 NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=260, label="sunday_church"),
-                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernAmandaRoom", mode="sunday"), priority=240, label="sunday_room"),
-                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="Backyard", mode="sunday"), priority=240, label="sunday_backyard"),
-                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernMain", mode="sunday"), priority=240, label="sunday_hall"),
-                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=npc_schedule_rule("tavern_team_match", person="amanda", location="TavernKitchen", mode="sunday"), priority=240, label="sunday_kitchen"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_room, priority=240, label="sunday_room"),
+                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_backyard, priority=240, label="sunday_backyard"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_hall, priority=240, label="sunday_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_kitchen, priority=240, label="sunday_kitchen"),
                 NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
             ],
         )

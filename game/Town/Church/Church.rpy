@@ -58,22 +58,22 @@ init python:
             "images/becky/church/talk2.jpg",
         ])
 
-    def church_minutes_now():
+    def church_hour_now():
         try:
-            return int(clock_minutes or 0) % 1440
+            return int(calendar_v2.hour or 0) % 24
         except Exception:
             return 0
 
-    def church_minutes_between(start_value=0, end_value=0):
-        minute_value = church_minutes_now()
-        start_minute = int(start_value or 0)
-        end_minute = int(end_value or 0)
-        if start_minute <= end_minute:
-            return start_minute <= minute_value <= end_minute
-        return minute_value >= start_minute or minute_value <= end_minute
+    def church_hour_between(start_hour=0, end_hour=23):
+        hour_value = church_hour_now()
+        start_value = int(start_hour or 0) % 24
+        end_value = int(end_hour or 0) % 24
+        if start_value <= end_value:
+            return start_value <= hour_value < end_value
+        return hour_value >= start_value or hour_value < end_value
 
     def church_open_hours_visible():
-        return week == 7 and church_minutes_between(8 * 60, 12 * 60 + 59)
+        return week == 7 and church_hour_between(8, 13)
 
     def church_closed_description_visible():
         return not church_open_hours_visible()
@@ -85,13 +85,13 @@ init python:
         return not church_open_hours_visible()
 
     def church_service_action_visible():
-        return week == 7 and church_minutes_between(8 * 60, 9 * 60 + 29)
+        return week == 7 and church_hour_between(8, 10)
 
     def church_confession_action_visible():
-        return week == 7 and church_minutes_between(9 * 60 + 30, 10 * 60 + 59)
+        return week == 7 and church_hour_between(10, 11)
 
     def church_after_cermon_action_visible():
-        return week == 7 and church_minutes_between(11 * 60, 12 * 60 + 59)
+        return week == 7 and church_hour_between(11, 13)
 
     def church_becky_priest_talk_visible():
         return (
@@ -279,7 +279,6 @@ init python:
 
 label Church:
     scene black
-    call EnterLocation("Church")
     $ CurrentRoom = ChurchRoom
     $ CurLoc = "Church"
     $ location = CurLoc
@@ -293,7 +292,7 @@ label Church:
     $ current_object_id = ""
     $ church_apply_sunday_purity()
 
-    if not ChurchRoom.is_open(week, time):
+    if not ChurchRoom.is_open():
         $ MainTxt = ChurchRoom.schedule.closed_text
         $ CurLocDesc = MainTxt
         vscene "images/church/locChurchClosed_day.png"
@@ -318,7 +317,7 @@ label Church:
         $ CurLocDesc = MainTxt
 
     python:
-        if ChurchRoom.is_open(week, time):
+        if ChurchRoom.is_open():
             for _church_action in ChurchRoom.visible_actions():
                 _church_menu_item = room_action_menu_item(_church_action)
                 if _church_menu_item is not None:

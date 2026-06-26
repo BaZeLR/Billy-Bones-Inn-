@@ -69,7 +69,6 @@ label SherwoodTravel(OnHorse=0):
 
 
 label BlackwoodRoad:
-    call EnterLocation("BlackwoodRoad")
     $ CurrentRoom = BlackwoodRoadRoom
     $ CurLoc = "BlackwoodRoad"
     $ location = CurLoc

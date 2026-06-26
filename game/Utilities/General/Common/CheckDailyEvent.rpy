@@ -222,8 +222,8 @@ init -25 python:
             if event_type == "DressNoShow":
                 row["Time"] = -1
 
-            if event_type == "BuyDressTom" and week_value != 6:
-                DailyEventsList_Add(girl_name, "dressshop", 0, "=", 1, 1 if week_value == 6 else 0, "BuyDress", "GirlDressBuy")
+            if event_type == "BuyDressTom" and week_value != 7:
+                DailyEventsList_Add(girl_name, "dressshop", 0, "=", 1, 0, "BuyDress", "GirlDressBuy")
                 DailyEventsList_Add(girl_name, "alllocs", 0, ">", 1, 5 + renpy.random.randint(1, 5), "DressNoShow", "DressNoShow")
                 DailyEventsList.pop(index)
                 continue

@@ -11,8 +11,7 @@ label TavernShowImage:
         if int(_jobkitchen.get("melissa", 0) or 0) != 0:
             if rand_int(1, 4) == 1:
                 python:
-                    for p in [
-                        "images/melissa/tavern/basement.png",
+                    for p in Melissa.image_sequence("tavern", "basement") + [
                         "images/tavern/storage/storage_room.png",
                         "images/tavern/kitchen/kitchen_room.png",
                     ]:
@@ -20,20 +19,14 @@ label TavernShowImage:
                             ShowImage("", "", p)
                             break
             else:
-                $ _k = rand_int(0, 1)
-                call ShowImage("", "", "images/melissa/tavern/melissa_kitchen_" + str(_k) + ".png")
+                $ _melissa_kitchen_pics = Melissa.image_sequence("kitchen", "work")
+                if len(_melissa_kitchen_pics) > 0:
+                    call ShowImage("", "", _melissa_kitchen_pics[rand_int(0, len(_melissa_kitchen_pics) - 1)])
         else:
             # Randomly pick from the full stack of Melissa waitress pictures every time.
             # No "main candidate + fallback" — we want variety across play sessions.
             python:
-                waitress_pics = [
-                    "images/melissa/tavern/waitress_0.png",
-                    "images/melissa/tavern/waitress_1.jpg",
-                    "images/melissa/tavern/waitress_2.jpg",
-                    "images/melissa/tavern/waitress_3.jpg",
-                    "images/melissa/tavern/waitress_4.png",
-                ]
-                available = [p for p in waitress_pics if renpy.loadable(p)]
+                available = Melissa.image_sequence("tavern", "waitress")
                 if available:
                     idx = rand_int(0, len(available) - 1)
                     ShowImage("", "", available[idx])

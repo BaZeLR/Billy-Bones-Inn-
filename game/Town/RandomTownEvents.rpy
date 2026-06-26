@@ -357,8 +357,10 @@ init -20 python:
             )
 
         def interactive_allowed(self, location_name=""):
+            location_key = str(location_name or self._get("CurLoc", "") or "")
             return (
-                self.location_allowed(location_name)
+                self.location_allowed(location_key)
+                and location_key not in list(self._get("TownStreetFiredLocationsToday", []) or [])
                 and self._int(self._get("TownStreetEventsToday", 0), 0) < 2
             )
 
@@ -631,13 +633,15 @@ label TownStreetPatrolEvent:
     $ town_street.mark_seen(CurLoc, "TownStreetPatrolEvent")
     $ town_street.mark_seen(location, "TownStreetPatrolEvent")
     $ town_street.mark_seen(getattr(CurrentRoom, "code_name", ""), "TownStreetPatrolEvent")
+    $ scene_image = "images/general/cityguard.jpg"
+    $ _layout_last_picture = scene_image
+    vscene scene_image
     $ MainTxt = "Из темноты выступает ночной патруль капитана Циммера. Старший лениво поднимает фонарь к вашему лицу: «Комендантский час, добрый человек. Документы, пропуск или деньги. А если нет - пройдем до колодок»."
     $ CurLocDesc = MainTxt
     $ current_action_title = "Ночной патруль"
     $ current_action_content = None
     $ _fine = town_street.fine_amount("fight")
     $ current_action_items = [
-        MenuItem("Показать пропуск", Call("TownStreetPatrolPass")),
         MenuItem("Заплатить штраф %d мараведи" % _fine, Call("TownStreetPatrolBribe")),
         MenuItem("Спрятаться и уйти дворами", Call("TownStreetPatrolHide")),
         MenuItem("Бежать", Call("TownStreetPatrolRun")),
@@ -663,7 +667,10 @@ label TownStreetPatrolBribe:
     if money >= _fine:
         $ money -= _fine
         $ notoriety = max(0, int(notoriety or 0) - 3)
-        $ MainTxt = "Монеты быстро исчезают в руке старшего. Патруль сразу теряет к вам интерес, будто никакого комендантского часа и не было."
+        $ tavernfame = max(0, int(tavernfame or 0) - 1)
+        $ LastAdvancedMinutes = 10
+        $ calendar_v2.advance_minutes(10)
+        $ MainTxt = "Монеты быстро исчезают в руке старшего. Патруль сразу теряет к вам интерес, будто никакого комендантского часа и не было. Вы теряете десять минут, дурная слава снижается на 3, но слух о ночной плате слегка бьет по славе трактира."
     else:
         jump TownStreetPatrolStocks
     $ CurLocDesc = MainTxt
@@ -674,7 +681,10 @@ label TownStreetPatrolBribe:
 label TownStreetPatrolHide:
     if town_street.escape_success(115):
         $ exploration += 8
-        $ MainTxt = "Вы вовремя ныряете в темный проход, пережидаете шаги патруля и выбираетесь уже на другой стороне улицы."
+        $ notoriety = min(100, int(notoriety or 0) + 1)
+        $ LastAdvancedMinutes = 20
+        $ calendar_v2.advance_minutes(20)
+        $ MainTxt = "Вы вовремя ныряете в темный проход, пережидаете шаги патруля и выбираетесь уже на другой стороне улицы. Обход занимает двадцать минут: исследование +8, дурная слава +1."
     else:
         $ MainTxt = "Вы пробуете уйти дворами, но задеваете ведро. Патруль мгновенно разворачивается на шум."
         jump TownStreetPatrolStocks
@@ -686,7 +696,11 @@ label TownStreetPatrolHide:
 label TownStreetPatrolRun:
     if town_street.escape_success(130):
         $ exploration += 10
-        $ MainTxt = "Вы срываетесь с места и уходите от патруля через узкие проходы. За спиной ругаются, но догнать вас уже не могут."
+        $ notoriety = min(100, int(notoriety or 0) + 4)
+        $ tavernfame = max(0, int(tavernfame or 0) - 1)
+        $ LastAdvancedMinutes = 15
+        $ calendar_v2.advance_minutes(15)
+        $ MainTxt = "Вы срываетесь с места и уходите от патруля через узкие проходы. За спиной ругаются, но догнать вас уже не могут. Побег занимает пятнадцать минут: исследование +10, дурная слава +4, слава трактира -1."
     else:
         $ MainTxt = "Вы бросаетесь бежать, но улица оказывается слишком открытой. Вас сбивают древком алебарды и поднимают уже под смех патрульных."
         jump TownStreetPatrolStocks
@@ -698,8 +712,10 @@ label TownStreetPatrolRun:
 label TownStreetPatrolFight:
     $ notoriety = min(100, int(notoriety or 0) + 12)
     $ tavernfame -= 2
+    $ LastAdvancedMinutes = 10
+    $ calendar_v2.advance_minutes(10)
     $ _patrol_return_room = str(CurLoc or location or "StreetTavern")
-    $ _patrol_picture = str(_layout_last_picture or scene_image or "")
+    $ _patrol_picture = "images/fight/patrol_guard.png"
     $ _patrol_intro = "Вы решаете не платить и не прятаться. Стражники переглядываются, опускают алебарды и берут вас в клещи. Теперь это настоящая драка с патрулем."
     $ fight_begin("patrol_guard", 2, _patrol_return_room, _patrol_picture, _patrol_intro)
     call FightLoop

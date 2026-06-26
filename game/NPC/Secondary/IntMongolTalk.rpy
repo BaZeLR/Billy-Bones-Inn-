@@ -112,7 +112,6 @@ label MongolTalkApply(topic_code=""):
                 $ Mongol.var['HorsesBought'] += 1
                 hide screen girl_card_overlay
                 hide screen player_card_overlay
-                hide screen main_ui
                 jump TavernStable
         elif renpy.random.randint(1, 3 + Mongol.var['GypsyAsk']) == 1:
             $ MainTxt = "\"Сотню могу скинуть. Больше нет, извиняй.\""
@@ -135,7 +134,6 @@ label MongolTalkApply(topic_code=""):
         $ Mongol.var['HorsesBought'] += 1
         hide screen girl_card_overlay
         hide screen player_card_overlay
-        hide screen main_ui
         jump TavernStable
 
     if topic_code == "theft":

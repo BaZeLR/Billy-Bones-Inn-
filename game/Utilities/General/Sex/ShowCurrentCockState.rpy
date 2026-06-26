@@ -1,42 +1,36 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
     python:
-        Arousal.setdefault(DudeName, 0)
-        if not isinstance(cametoday_npc, dict):
-            cametoday_npc = {}
-
         if not DudeNameFull:
             DudeNameFull = DudeName
         if not DudeNameFull2:
             DudeNameFull2 = DudeNameFull
 
         is_you = str(DudeName).lower() == "you"
-        cur_arousal = int(Arousal.get(DudeName, 0) or 0)
-
         if is_you:
-            if isinstance(cametoday, dict):
-                cur_came = int(cametoday.get("You", cametoday.get("you", 0)) or 0)
-            else:
-                cur_came = int(cametoday or 0)
-
-            if isinstance(cancumdaily, dict):
-                cur_limit = int(cancumdaily.get("You", cancumdaily.get("you", 1)) or 1)
-            else:
-                cur_limit = int(cancumdaily or 1)
+            _cock_intimacy = player_state(False).intimacy
+            cur_arousal = _cock_intimacy.arousal_value("You")
+            cur_came = int(_cock_intimacy.came_today or 0)
+            cur_limit = max(1, int(_cock_intimacy.can_cum_daily or 1))
         else:
-            cur_came = int(cametoday_npc.get(DudeName, 0) or 0)
-
-            if isinstance(cancumdaily, dict):
-                cur_limit = int(cancumdaily.get(DudeName, 1) or 1)
+            _cock_actor = getPersonInfo(DudeName)
+            if _cock_actor is not None:
+                _cock_state = _cock_actor.ensure_sex_state()
+                cur_arousal = int(_cock_actor.arousal_value() or 0)
+                cur_came = int(_cock_state.get("came_today", 0) or 0)
+                cur_limit = max(1, int(_cock_state.get("can_cum_daily", 1) or 1))
             else:
-                cur_limit = int(cancumdaily or 1)
+                cur_arousal = 0
+                cur_came = 0
+                cur_limit = 1
 
     if str(DudeName).lower() == "you":
         if cur_came >= cur_limit:
             "То что упало - подняться не может. По крайней мере сегодня. Вот завтра силы к вам, быть может, вернутся."
-            $ Arousal[DudeName] = 0
+            $ player_state(False).intimacy.set_arousal(0, "You")
+            $ player_state(False).intimacy.apply_to_store()
         else:
             if cur_arousal < 20:
                 "Вы спокойны. Ваш член какой-то вялый."
@@ -54,7 +48,9 @@ label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
     else:
         if cur_came >= cur_limit:
             "[DudeNameFull] совсем выдохся, бедолага. Сомнительно, чтобы его боец еще раз смог подняться для новой схватки. По крайней мере сегодня."
-            $ Arousal[DudeName] = 0
+            $ _cock_actor = getPersonInfo(DudeName)
+            if _cock_actor is not None:
+                $ _cock_actor.set_arousal(0)
         else:
             if cur_arousal < 20:
                 "Член [DudeNameFull2] какой-то вялый."

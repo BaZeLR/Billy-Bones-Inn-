@@ -14,6 +14,21 @@ init -5 python:
         "StreetTavern",
     )
 
+    if "dog" not in peopleData:
+        peopleData["dog"] = PeopleData(
+            "dog",
+            cname="Пес",
+            fullname="Пес",
+            genitive="Пса",
+            dative="Псу",
+            portrait="images/dog/no_colar.png",
+            default_location="",
+            description="Пес может быть бродячим или вашим спутником, если вы его приручили.",
+        )
+    if "dog" not in peopleInfo:
+        peopleInfo["dog"] = BaseNPC("dog")
+    peopleInfo["dog"].data = peopleData["dog"]
+
     def dog_spawn_location_candidates(time_slot=None):
         candidates = []
         try:
@@ -63,6 +78,7 @@ init -5 python:
 
             self.spawn_day = -1
             self.spawn_location = None
+            self.location = ""
 
         @property
         def max_health(self):
@@ -399,18 +415,25 @@ init -5 python:
 
     def dog_sync_profile():
         d = ensure_dog_runtime()
-        RealName["dog"] = dog_display_name()
-        RealName2["dog"] = dog_display_name()
-        RealName3["dog"] = dog_display_name()
-        knowsMC["dog"] = bool(d.met or d.owned)
+        display_name = dog_display_name()
+        dog_data = peopleData.get("dog", None) if isinstance(peopleData, dict) else None
+        if dog_data is not None:
+            dog_data.cname = display_name
+            dog_data.fullname = display_name
+            dog_data.genitive = display_name
+            dog_data.dative = display_name
+        dog_info = peopleInfo.get("dog", None) if isinstance(peopleInfo, dict) else None
+        if dog_info is not None:
+            dog_info.known = bool(d.met or d.owned)
         if d.owned and bool(d.in_company):
-            CurrentLoc["dog"] = ""
+            d.location = ""
             return ""
         if dog_home_roam_active():
-            return npc_schedule_sync_currentloc("dog")
-        if not dog_is_here(str(CurrentLoc.get("dog", "") or "")):
-            CurrentLoc["dog"] = ""
-        return str(CurrentLoc.get("dog", "") or "")
+            d.location = str(getLocation("dog") or "")
+            return d.location
+        if not dog_is_here(str(d.location or "")):
+            d.location = ""
+        return str(d.location or "")
 
     def dog_card_portrait_path():
         d = ensure_dog_runtime()
@@ -591,7 +614,8 @@ init -5 python:
             return []
         candidates = []
         for npc_id in ("sandra", "melissa", "amanda"):
-            if int(Friends.get(npc_id, 0) or 0) < 15:
+            npc_info = getPersonInfo(npc_id)
+            if int(getattr(npc_info, "rel", 0) or 0) < 15:
                 continue
             try:
                 if str(getLocation(npc_id) or "") != room_key:
@@ -606,7 +630,7 @@ init 2 python:
     npc_daily_schedule_set(
         "dog",
         default_slots=[
-            dict(npc_daily_schedule_slot(4, "Backyard", True, True, "sleep_by_booth"), condition=npc_schedule_rule("dog_home_roam")),
+            dict(npc_daily_schedule_slot(4, "Backyard", True, True, "sleep_by_booth"), condition=dog_home_roam_active),
         ],
         random_slots=[
             npc_daily_schedule_random_slot(
@@ -614,10 +638,10 @@ init 2 python:
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
                 label="morning_roam",
                 choices=[
-                    npc_daily_schedule_choice("Backyard", 4, True, True, "yard_watch", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernKitchen", 2, True, True, "kitchen_smells", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernStable", 2, True, True, "stable_watch", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernStorage", 1, True, True, "rat_smells", condition=npc_schedule_rule("dog_home_roam")),
+                    npc_daily_schedule_choice("Backyard", 4, True, True, "yard_watch", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernKitchen", 2, True, True, "kitchen_smells", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernStable", 2, True, True, "stable_watch", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernStorage", 1, True, True, "rat_smells", condition=dog_home_roam_active),
                 ],
             ),
             npc_daily_schedule_random_slot(
@@ -625,10 +649,10 @@ init 2 python:
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
                 label="noon_roam",
                 choices=[
-                    npc_daily_schedule_choice("Backyard", 3, True, True, "yard_roam", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernMain", 2, True, True, "main_hall_watch", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernStable", 2, True, True, "stable_watch", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernMyRoom", 1, True, True, "player_room_door", condition=npc_schedule_rule("dog_home_roam")),
+                    npc_daily_schedule_choice("Backyard", 3, True, True, "yard_roam", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernMain", 2, True, True, "main_hall_watch", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernStable", 2, True, True, "stable_watch", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernMyRoom", 1, True, True, "player_room_door", condition=dog_home_roam_active),
                 ],
             ),
             npc_daily_schedule_random_slot(
@@ -636,10 +660,10 @@ init 2 python:
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
                 label="day_roam",
                 choices=[
-                    npc_daily_schedule_choice("Backyard", 4, True, True, "yard_guard", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernStable", 3, True, True, "stable_guard", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernStorage", 1, True, True, "storage_guard", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernMain", 1, True, True, "hall_guard", condition=npc_schedule_rule("dog_home_roam")),
+                    npc_daily_schedule_choice("Backyard", 4, True, True, "yard_guard", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernStable", 3, True, True, "stable_guard", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernStorage", 1, True, True, "storage_guard", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernMain", 1, True, True, "hall_guard", condition=dog_home_roam_active),
                 ],
             ),
             npc_daily_schedule_random_slot(
@@ -647,10 +671,10 @@ init 2 python:
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
                 label="evening_roam",
                 choices=[
-                    npc_daily_schedule_choice("Backyard", 4, True, True, "evening_yard", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernMain", 2, True, True, "evening_hall", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernStable", 2, True, True, "evening_stable", condition=npc_schedule_rule("dog_home_roam")),
-                    npc_daily_schedule_choice("TavernKitchen", 1, True, True, "evening_kitchen", condition=npc_schedule_rule("dog_home_roam")),
+                    npc_daily_schedule_choice("Backyard", 4, True, True, "evening_yard", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernMain", 2, True, True, "evening_hall", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernStable", 2, True, True, "evening_stable", condition=dog_home_roam_active),
+                    npc_daily_schedule_choice("TavernKitchen", 1, True, True, "evening_kitchen", condition=dog_home_roam_active),
                 ],
             ),
         ],
@@ -814,7 +838,7 @@ label IntDogTalkApply(room_code="", choice_code=""):
         $ dog.gain_loyalty(1)
         $ dog.training_progress += 1
         $ dog.try_level_up()
-        $ Friends[_dog_household] = min(20, int(Friends.get(_dog_household, 0) or 0) + 1)
+        $ getPersonInfo(_dog_household).change_social(friend_delta=1)
         if int(effective_player_exploration() or 0) >= 50:
             $ exploration = max(0, int(exploration or 0) + 1)
             $ MainTxt = "%s с удовольствием забирает пса на прогулку. Судя по шерсти в репьях и сырой земле на лапах, они успели добраться до лесной опушки и там вдоволь набегаться. Пес становится еще послушнее, а %s явно рада, что вы доверили ей такое дело." % (_dog_name, _dog_name)
@@ -920,7 +944,7 @@ screen dog_card_overlay(return_label=""):
             xpos 28
             ypos 24
             xsize _left_w - 56
-            ysize _left_h - 48
+            ysize _left_h - 96
             draggable True
             mousewheel True
 
@@ -942,12 +966,13 @@ screen dog_card_overlay(return_label=""):
                 for _line in _lines:
                     text _line size 16 color "#2d1d12"
 
-                textbutton "Назад":
-                    text_size 22
-                    if str(return_label or "") == "__return__":
-                        action Return()
-                    else:
-                        action Call("HideDogCard", return_label)
+        textbutton "Назад":
+            id "dog_card_overlay_back_button"
+            alt "dog_card_overlay_back_button"
+            xpos 28
+            ypos _left_h - 58
+            text_size 22
+            action [Hide("dog_card_overlay"), SetVariable("UI_mode", "scene"), SetVariable("UI_selected_char", ""), SetVariable("current_girl_key", ""), Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or "TavernMain"))]
 
 
 label DogBackyardBuildBooth:

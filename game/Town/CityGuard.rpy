@@ -67,7 +67,6 @@ init python:
 
 
 label CityGuard:
-    call EnterLocation("CityGuard")
     $ CurrentRoom = CityGuardRoom
     $ CurLoc = "CityGuard"
     $ location = CurLoc
@@ -85,7 +84,7 @@ label CityGuard:
 
     call RoomEnterEventGate(CurLoc, False)
 
-    if CityGuardRoom.is_open(week, time):
+    if CityGuardRoom.is_open():
         vscene "images/zimmer/Portrait1.jpg"
     else:
         vscene "images/general/cityguard.jpg"
@@ -110,7 +109,7 @@ label CityGuardBuildActions:
     if len(CityGuardRoom.visible_objects()) > 0:
         $ current_action_items.append(MenuItem("Расписные доски", Call("CityGuardShowPlacat")))
 
-    if CityGuardRoom.is_open(week, time):
+    if CityGuardRoom.is_open():
         $ current_action_items.append(MenuItem("Десятник Циммерман", Call("IntZimmerTalk")))
     if story_event_available("CityGuard", "enter"):
         $ current_action_items.append(MenuItem("Осмотреть колодки у караулки", Call("checkTriggers", "CityGuard", "enter", 0)))

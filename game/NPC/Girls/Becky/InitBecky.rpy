@@ -75,7 +75,6 @@ init python:
             self.code_name = "becky"
             self.data = BeckyStaticData
             self.uses_own_var_state = True
-            self.age = 36
             self.rel = 0
             self.relationship = self.rel
             self.openness = 0
@@ -136,7 +135,6 @@ init python:
             }
             self.gift_preferences = list(BeckyStaticData.gift_preferences)
             self.schedule_source = BeckyStaticData.schedule_source
-            self.schedule_uses_clock_minutes = True
             self.current_location = "GroceryStore"
             self.talk_preferences = {
                 "favorite_topics": ["family", "husband", "eddie", "inga", "sherwood"],
@@ -176,7 +174,6 @@ init python:
             RealName[name] = self.data.cname
             RealName2[name] = self.data.genitive
             RealName3[name] = self.data.dative
-            age_girls[name] = people_to_int(self.age, 36)
             DateOfBirth[name] = dict(self.data.birth_date)
             girltextdesc[name] = self.data.description
             knowsMC[name] = bool(self.known)
@@ -190,7 +187,7 @@ init python:
             GiftedToday[name] = people_to_int(self.gifted_today, 0)
             AskedToday[name] = people_to_int(self.asked_today, 0)
             FuckedToday[name] = people_to_int(self.fucked_today, 0)
-            CurrentLoc[name] = str(self.current_location or "GroceryStore")
+            self.location = str(self.current_location or "GroceryStore")
             GiftPreferences[name] = list(self.gift_preferences)
             dressdefault[name] = self.wardrobe["current_dress"]
             bradef[name] = self.wardrobe["current_underwear"]["bra"]
@@ -314,7 +311,6 @@ init python:
 
         def finish_talk(self):
             self.talked_today = people_to_int(self.talked_today, 0) + 1
-            self.talkCountToday = people_to_int(getattr(self, "talkCountToday", 0), 0) + 1
             return self.talked_today
 
         def talk_count(self):

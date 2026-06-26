@@ -275,7 +275,6 @@ label IntMelissaTalkApply(girl_name="melissa", choice_code=""):
 
     if str(choice_code or "") == "buy_dress":
         call IntMelissaDressChange(girl_name)
-        call IntMelissaTalkRefresh(girl_name)
         return
 
     if str(choice_code or "") == "ask_clara":

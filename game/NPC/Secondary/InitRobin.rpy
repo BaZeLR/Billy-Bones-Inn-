@@ -24,7 +24,7 @@ init python:
                 dative="Робину Гуду",
                 default_location="BlackwoodRoad",
                 description="Робин Гуд - предводитель обездоленных лесорубов на Блэквудской вырубке.",
-                age=30,
+                birth_date={"day": 1, "period": 1, "cycle": 1070},
                 portrait="images/Robin/portrait1.jpg",
             )
 
@@ -65,7 +65,6 @@ label InitRobin:
 
 
 label register_robin_secondary:
-    $ knowsMC.setdefault("robin", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["robin"] = RobinStaticData

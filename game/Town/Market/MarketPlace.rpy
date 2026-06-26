@@ -13,7 +13,7 @@ init python:
     def marketplace_blind_pirate_event_available():
         return (
             int(BlindPirateMarketEventSeen or 0) == 0
-            and MarketPlaceRoom.is_open(week, time)
+            and MarketPlaceRoom.is_open()
         )
 
     def marketplace_becky_home_visible():
@@ -101,11 +101,6 @@ init python:
         },
     )
 
-init 20 python:
-    npc_schedule_set("mongol", [
-        NPCScheduleEntry(location="MarketPlace", weekdays=[1, 2, 3, 4, 5, 6], condition=marketplace_mongol_visible, priority=100, label="market_horse_trade"),
-    ])
-
 default BlindPirateMarketEventSeen = 0
 default BlindPirateBreakfastPending = 0
 default MarketPlaceSavedText = ""
@@ -115,7 +110,6 @@ default market_mongol_alley_girl = ""
 
 label MarketPlace:
     scene black
-    call EnterLocation("MarketPlace")
     $ dog_prepare_current_spawn()
     $ CurrentRoom = MarketPlaceRoom
     $ CurLoc = "MarketPlace"
@@ -134,11 +128,6 @@ label MarketPlace:
     $ market_mongol_mode = ""
     $ market_mongol_alley_girl = ""
     $ MarketPlaceSavedText = ""
-    $ _amanda_dynamic_result = CheckIfRunToLegare()
-    $ _amanda_dynamic_jump = str(AmandaDynamicTakeNextJump() or "")
-    if _amanda_dynamic_jump != "" and renpy.has_label(_amanda_dynamic_jump):
-        jump expression _amanda_dynamic_jump
-
     if marketplace_blind_pirate_event_available():
         call MarketPlaceBlindPirateEvent
         $ _layout_last_picture = _market_room.bg_picture
@@ -161,7 +150,7 @@ label MarketPlace:
         $ current_action_items = marketplace_closed_action_items()
         call screen main_ui
         jump MarketPlace
-    elif not _market_room.is_open(week, time):
+    elif not _market_room.is_open():
         $ MainTxt = _market_room.schedule.closed_text
         if marketplace_becky_home_visible():
             $ MainTxt += "\n\nЛавка Бекки уже закрыта, но к этому часу вы можете пройти к ней домой через боковую улочку."

@@ -28,18 +28,18 @@ init 6 python:
     def backyard_dynamic_picture():
         if int(hour or 0) < 12 and int(week or 0) != 7:
             if str(getLocation("melissa") or "") == "Backyard":
-                melissa_backyard = [
-                    "images/melissa/tavern/backyard_0.png",
-                    "images/melissa/tavern/backyard_1.png",
-                ]
-                melissa_backyard = [row for row in melissa_backyard if renpy.loadable(row)]
+                melissa_backyard = Melissa.image_sequence("tavern", "backyard")
                 if len(melissa_backyard) > 0:
                     return melissa_backyard[int((dayspassed or 0) + (hour or 0) + (minute or 0)) % len(melissa_backyard)]
             if str(getLocation("amanda") or "") == "Backyard" and renpy.loadable("images/tavern/backyard/backyard_chop_woods.png"):
                 return "images/tavern/backyard/backyard_chop_woods.png"
-        if backyard_has_ash_barrel() and renpy.loadable("images/tavern/backyard/soap_backyard.png"):
-            return "images/tavern/backyard/soap_backyard.png"
         return str(BackyardRoom.bg_picture or "")
+
+    def player_has_plain_soap():
+        return player_state().item_count("soap_001") > 0
+
+    def player_has_luxury_soap():
+        return player_state().item_count("luxury_soap_001") > 0
 
     def backyard_base_text():
         return "Вы выходите на задний двор трактира. Здесь грязь, лужи, следы копыт и старые доски под ногами. У стены стоит большая бочка с дождевой водой, рядом темнеет маленькое кострище, на веревке болтается выстиранное белье, а у забора растут кусты и старый дуб. В углу притулился кривой деревянный нужник.\n\nСтарый дуб нависает над частью двора и дает немного тени. Под ногами хлюпает разбитая грязь, в которой отпечатались сапоги, копыта и волочившиеся мешки. Колючие кусты вдоль забора цепляются за одежду и собирают на себя пыль, перья и всякий мелкий сор."
@@ -60,6 +60,68 @@ init 6 python:
             return base_text + "\n\n" + ash_barrel_text
         return base_text
 
+    BackyardToiletObject = GameObject(
+        object_id="backyard_toilet",
+        name="Старый деревянный нужник",
+        description="Покосившийся деревянный нужник стоит у самого забора. Дверца перекошена, петли скрипят, а внутри пахнет так, как и положено подобному месту.",
+        actions=[
+            ObjectAction(action_id="examine_toilet", label="Осмотреть нужник", hook="call", target="BackyardToiletExamine"),
+        ],
+    )
+
+    BackyardWaterBarrelObject = GameObject(
+        object_id="backyard_water_barrel",
+        name="Бочка с дождевой водой",
+        description="Большая бочка под водостоком почти всегда полна дождевой воды. Вода холодная, но для умывания сойдет.",
+        actions=[
+            ObjectAction(action_id="wash_barrel", label="Умыться и ополоснуться", hook="call", target="BackyardWashAtBarrel"),
+            ObjectAction(action_id="wash_barrel_soap", label="Вымыться с мылом", hook="call", target="BackyardWashAtBarrelWithSoap", args=("soap_001",), condition=player_has_plain_soap),
+            ObjectAction(action_id="wash_barrel_luxury_soap", label="Вымыться с хорошим мылом", hook="call", target="BackyardWashAtBarrelWithSoap", args=("luxury_soap_001",), condition=player_has_luxury_soap),
+            ObjectAction(action_id="examine_barrel", label="Осмотреть бочку", hook="text", target="Обычная большая бочка, куда стекает дождевая вода с крыши трактира."),
+        ],
+    )
+
+    BackyardFirepitObject = GameObject(
+        object_id="backyard_firepit",
+        name="Кострище",
+        description="Небольшое кострище, где можно сжечь мусор или быстро что-нибудь прогреть.",
+        actions=[
+            ObjectAction(action_id="examine_firepit", label="Осмотреть кострище", hook="text", target="Здесь жгут мусор, сушат всякую дрянь и иногда разводят маленький огонь для хозяйственных нужд."),
+        ],
+    )
+
+    BackyardLaundryObject = GameObject(
+        object_id="backyard_laundry",
+        name="Веревка с бельем",
+        description="На длинной веревке развешано постиранное белье работников трактира.",
+        actions=[
+            ObjectAction(action_id="examine_laundry", label="Осмотреть белье", hook="text", target="Рубахи, тряпки, чулки и прочая мелочь сушатся на ветру."),
+        ],
+    )
+
+    BackyardAshBarrelObject = GameObject(
+        object_id="backyard_ash_barrel",
+        name="Зольная бочка",
+        description="Деревянная бочка с устроенным для щелока дном. Здесь зола постепенно вымачивается водой, чтобы потом пойти на мыло.",
+        picture="images/tavern/backyard/soap_backyard.png",
+        actions=[
+            ObjectAction(action_id="inspect_ash_barrel", label="Осмотреть зольную бочку", hook="call", target="BackyardInspectAshBarrel"),
+            ObjectAction(action_id="cook_soap", label="Варить хозяйственное мыло", hook="call", target="BackyardCookSoap", args=("soap_recipe",), condition=soap_can_cook_at_backyard),
+            ObjectAction(action_id="cook_luxury_soap", label="Варить туалетное мыло с оливковым маслом", hook="call", target="BackyardCookSoap", args=("luxury_soap_recipe",), condition=soap_can_cook_luxury_at_backyard),
+        ],
+        condition=backyard_has_ash_barrel,
+    )
+
+    BackyardDogBoothObject = GameObject(
+        object_id="backyard_dog_booth",
+        name="Собачья будка",
+        description="Простая, но крепкая собачья будка, поставленная во дворе специально для вашего пса.",
+        actions=[
+            ObjectAction(action_id="inspect_dog_booth", label="Осмотреть будку", hook="call", target="BackyardInspectDogBooth"),
+        ],
+        condition=backyard_has_dog_booth,
+    )
+
     BackyardRoom = Room(
         code_name="Backyard",
         group_name=ROOM_GROUP_TAVERN,
@@ -77,58 +139,12 @@ init 6 python:
             RoomExit(label="Проверить конюшню", target="TavernStable"),
         ],
         game_items=[
-            GameObject(
-                object_id="backyard_toilet",
-                name="Старый деревянный нужник",
-                description="Покосившийся деревянный нужник стоит у самого забора. Дверца перекошена, петли скрипят, а внутри пахнет так, как и положено подобному месту.",
-                actions=[
-                    ObjectAction(action_id="examine_toilet", label="Осмотреть нужник", hook="call", target="BackyardToiletExamine"),
-                ],
-            ),
-            GameObject(
-                object_id="backyard_water_barrel",
-                name="Бочка с дождевой водой",
-                description="Большая бочка под водостоком почти всегда полна дождевой воды. Вода холодная, но для умывания сойдет.",
-                actions=[
-                    ObjectAction(action_id="wash_barrel", label="Умыться и ополоснуться", hook="call", target="Wash", args=("backyard_water_barrel", "Backyard", "Вы умываетесь и наскоро обмываетесь холодной дождевой водой. Это освежает и помогает привести себя в порядок.", "backyard_water_barrel")),
-                    ObjectAction(action_id="examine_barrel", label="Осмотреть бочку", hook="text", target="Обычная большая бочка, куда стекает дождевая вода с крыши трактира."),
-                ],
-            ),
-            GameObject(
-                object_id="backyard_firepit",
-                name="Кострище",
-                description="Небольшое кострище, где можно сжечь мусор или быстро что-нибудь прогреть.",
-                actions=[
-                    ObjectAction(action_id="examine_firepit", label="Осмотреть кострище", hook="text", target="Здесь жгут мусор, сушат всякую дрянь и иногда разводят маленький огонь для хозяйственных нужд."),
-                ],
-            ),
-            GameObject(
-                object_id="backyard_laundry",
-                name="Веревка с бельем",
-                description="На длинной веревке развешано постиранное белье работников трактира.",
-                actions=[
-                    ObjectAction(action_id="examine_laundry", label="Осмотреть белье", hook="text", target="Рубахи, тряпки, чулки и прочая мелочь сушатся на ветру."),
-                ],
-            ),
-            GameObject(
-                object_id="backyard_ash_barrel",
-                name="Зольная бочка",
-                description="Деревянная бочка с устроенным для щелока дном. Здесь зола постепенно вымачивается водой, чтобы потом пойти на мыло.",
-                picture="images/tavern/backyard/soap_backyard.png",
-                actions=[
-                    ObjectAction(action_id="inspect_ash_barrel", label="Осмотреть зольную бочку", hook="call", target="BackyardInspectAshBarrel"),
-                ],
-                condition=backyard_has_ash_barrel,
-            ),
-            GameObject(
-                object_id="backyard_dog_booth",
-                name="Собачья будка",
-                description="Простая, но крепкая собачья будка, поставленная во дворе специально для вашего пса.",
-                actions=[
-                    ObjectAction(action_id="inspect_dog_booth", label="Осмотреть будку", hook="call", target="BackyardInspectDogBooth"),
-                ],
-                condition=backyard_has_dog_booth,
-            ),
+            BackyardToiletObject,
+            BackyardWaterBarrelObject,
+            BackyardFirepitObject,
+            BackyardLaundryObject,
+            BackyardAshBarrelObject,
+            BackyardDogBoothObject,
         ],
         custom_properties={
             "object_menu_label": "BackyardObjectMenu",
@@ -140,7 +156,6 @@ default BackyardToiletBusy = 0
 
 
 label Backyard:
-    call EnterLocation("Backyard")
     $ dog_prepare_current_spawn()
     $ CurrentRoom = BackyardRoom
     $ CurLoc = "Backyard"
@@ -170,10 +185,6 @@ label BackyardBuildActions:
     $ current_action_title = "Задний двор"
     $ current_action_content = None
     $ current_action_items = []
-    if soap_can_cook_at_backyard():
-        $ current_action_items.append(MenuItem("Варить хозяйственное мыло", Call("BackyardCookSoap", "soap_recipe")))
-    if soap_can_cook_luxury_at_backyard():
-        $ current_action_items.append(MenuItem("Варить туалетное мыло с оливковым маслом", Call("BackyardCookSoap", "luxury_soap_recipe")))
     if player_can_train_shooting():
         $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", "Backyard")))
     python:
@@ -200,8 +211,11 @@ label BackyardObjectMenu(object_id="", refresh_only=False):
         call BackyardBuildActions
         return
 
-    $ MainTxt = _yard_object.description
-    $ CurLocDesc = MainTxt
+    if not refresh_only:
+        $ MainTxt = _yard_object.description
+        $ CurLocDesc = MainTxt
+    if str(getattr(_yard_object, "picture", "") or "").strip():
+        $ _layout_last_picture = str(getattr(_yard_object, "picture", "") or "").strip()
     $ current_action_title = _yard_object.name
     $ current_action_content = None
     $ current_action_items = []
@@ -215,7 +229,7 @@ label BackyardObjectMenu(object_id="", refresh_only=False):
                 current_action_items.append(MenuItem(_yard_action.label, Call(_yard_action.target, *_yard_args)))
             elif _yard_action.hook == "jump" and str(_yard_action.target or "") != "":
                 current_action_items.append(MenuItem(_yard_action.label, Jump(_yard_action.target)))
-    $ current_action_items.append(MenuItem("Назад", Call("BackyardRestore")))
+    $ current_action_items.append(MenuItem("Назад", Jump("Backyard")))
     return
 
 
@@ -249,12 +263,39 @@ label BackyardToiletExamine:
     else:
         $ MainTxt = "Дверца нужника приоткрыта. Сейчас внутри свободно, хотя заходить туда без нужды желания не возникает."
     $ CurLocDesc = MainTxt
-    call BackyardObjectMenu("backyard_toilet")
+    call BackyardObjectMenu("backyard_toilet", True)
     return
 
 
 label BackyardWashAtBarrel:
-    call Wash("backyard_water_barrel", "Backyard", "Вы умываетесь у бочки с дождевой водой.", "backyard_water_barrel")
+    $ player_state().appearance.wash()
+    $ player_state().appearance.apply_to_store()
+    $ _layout_last_picture = "images/tavern/backyard/washing_MC.png"
+    $ MainTxt = "Вы умываетесь и наскоро обмываетесь холодной дождевой водой из бочки. Это освежает и помогает привести себя в порядок."
+    $ CurLocDesc = MainTxt
+    call BackyardObjectMenu("backyard_water_barrel", True)
+    return
+
+
+label BackyardWashAtBarrelWithSoap(soap_id="soap_001"):
+    $ _soap_id = str(soap_id or "soap_001").strip()
+    if player_state().item_count(_soap_id) <= 0:
+        $ MainTxt = "У вас нет подходящего мыла."
+        $ CurLocDesc = MainTxt
+        call BackyardObjectMenu("backyard_water_barrel", True)
+        return
+    $ player_state().remove_item(_soap_id, 1)
+    $ player_state().appearance.wash()
+    $ player_state().appearance.apply_to_store()
+    $ _layout_last_picture = "images/tavern/backyard/washing_MC.png"
+    if _soap_id == "luxury_soap_001":
+        $ player_state().change_stat("look", 3)
+        $ MainTxt = "Вы тщательно моетесь у бочки, не жалея хорошего душистого мыла. Холодная вода бодрит, кожа пахнет чище, и выглядите вы заметно лучше."
+    else:
+        $ player_state().change_stat("look", 1)
+        $ MainTxt = "Вы моетесь у бочки с куском обычного мыла. Холодная дождевая вода быстро смывает грязь, а мыло помогает привести себя в более приличный вид."
+    $ CurLocDesc = MainTxt
+    call BackyardObjectMenu("backyard_water_barrel", True)
     return
 
 
@@ -272,7 +313,9 @@ label BackyardRestore:
 label BackyardInspectAshBarrel:
     $ MainTxt = backyard_ash_barrel_description_text() or "Зольной бочки здесь пока нет."
     $ CurLocDesc = MainTxt
-    call BackyardObjectMenu("backyard_ash_barrel")
+    if backyard_has_ash_barrel() and renpy.loadable("images/tavern/backyard/soap_backyard.png"):
+        $ _layout_last_picture = "images/tavern/backyard/soap_backyard.png"
+    call BackyardObjectMenu("backyard_ash_barrel", True)
     return
 
 
@@ -283,5 +326,5 @@ label BackyardInspectDogBooth:
     else:
         $ MainTxt = "Собачьей будки здесь пока нет."
     $ CurLocDesc = MainTxt
-    call BackyardObjectMenu("backyard_dog_booth")
+    call BackyardObjectMenu("backyard_dog_booth", True)
     return

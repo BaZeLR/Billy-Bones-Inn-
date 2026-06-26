@@ -519,8 +519,9 @@ label SandraDressInitiativeEvent:
 
 label MelissaDressRequestEvent:
     $ Melissa.var["revealing_dress_request_seen"] = 1
-    if renpy.loadable("images/melissa/tavern/melissa_portrait.png"):
-        $ _layout_last_picture = "images/melissa/tavern/melissa_portrait.png"
+    $ _melissa_dress_picture = Melissa.image_path("portrait", "default")
+    if str(_melissa_dress_picture or "").strip():
+        $ _layout_last_picture = _melissa_dress_picture
     $ MainTxt = "Мелисса, дождавшись пока вокруг станет потише, смущенно признается: \"Я видела, какой наряд ты выбрал для Сандры. Если уж ей можно что-то посмелее, может и мне когда-нибудь подберешь платье не только для работы, но и чтобы самой себе нравиться?\"\n\nСказав это, она тут же опускает глаза, но по голосу слышно, что мысль ей давно не дает покоя."
     $ CurLocDesc = MainTxt
     $ current_action_title = "Ваш ответ"
@@ -586,10 +587,9 @@ label HouseholdRevealDressRequestChoice(girl_name="", agree=0):
 
 label TavernStorageRatEvent:
     $ household_mark_runtime_event_seen("melissa_storage_rat")
-    if renpy.loadable("game/images/melissa/tavern/rat_in_basement_melissa.png"):
-        $ _layout_last_picture = "game/images/melissa/tavern/rat_in_basement_melissa.png"
-    elif renpy.loadable("images/melissa/tavern/rat_in_basement_melissa.png"):
-        $ _layout_last_picture = "images/melissa/tavern/rat_in_basement_melissa.png"
+    $ _melissa_rat_picture = Melissa.image_path("tavern", "rat")
+    if str(_melissa_rat_picture or "").strip():
+        $ _layout_last_picture = _melissa_rat_picture
     $ MainTxt = "В кладовой вас встречает раздраженная Мелисса: у мешков с крупой шуршит крупная крыса, а девушка уже стоит наготове с метлой в руках. \"Опять эта тварь сюда лазит,\" шепчет она. \"Если ее сейчас не прогнать, потом весь угол придется перебирать заново.\""
     $ CurLocDesc = MainTxt
     $ current_action_title = "Крыса в кладовой"
@@ -605,9 +605,9 @@ label TavernStorageRatChoice(kill_rat=0):
     if int(kill_rat or 0) == 1:
         $ Melissa.var["storage_rat_cleared"] = 1
         $ Melissa.var["storage_rat_last_help_day"] = int(dayspassed or 0)
-        $ WerecatVar["rat_carcass_cached"] = 1
-        $ WerecatVar["rats_problem_active"] = 1
-        $ WerecatVar["rat_food_loss_next_day"] = int(dayspassed or 0) + 7
+        $ werecat_state()["rat_carcass_cached"] = 1
+        $ werecat_state()["rats_problem_active"] = 1
+        $ werecat_state()["rat_food_loss_next_day"] = int(dayspassed or 0) + 7
         $ Melissa.var["work_attitude"] = int(Melissa.var.get("work_attitude", 0) or 0) + 1
         $ Melissa.skills["cleaning"] = min(100, int(Melissa.skills.get("cleaning", 0) or 0) + 1)
         $ Melissa.change_social(friend_delta=1)

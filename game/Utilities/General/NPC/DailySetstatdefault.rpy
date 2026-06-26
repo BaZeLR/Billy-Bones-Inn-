@@ -21,15 +21,15 @@ label DailySetstatdefault(girl_name):
         $ ZaletGetSuspectList(girl_name)
 
     if CheckDailyEventExists(girl_name, "MorningSickness") == 0:
-        if ((pregnancy.get(girl_name, 0) > 0 and pregnancy.get(girl_name, 0) < 80 and renpy.random.randint(1, 7) == 1)
-                or (pregnancy.get(girl_name, 0) == 0 and renpy.random.randint(1, 60) == 32)):
+        if ((pregnancy.get(girl_name, 0) > 0 and pregnancy.get(girl_name, 0) < 80 and procedural_randint(1, 7, "morning_sickness_%s_%s" % (girl_name, int(dayspassed or 0))) == 1)
+                or (pregnancy.get(girl_name, 0) == 0 and procedural_randint(1, 60, "false_morning_sickness_%s_%s" % (girl_name, int(dayspassed or 0))) == 32)):
             $ DailyEventsList_Add(girl_name, "TavernKitchen", 1, "<", 1, 8, "MorningSickness", "MorningSickness")
 
     if CheckDailyEventExists(girl_name, "GiveBirth") == 0:
-        if ((pregnancy.get(girl_name, 0) > 240 and renpy.random.randint(1, 45) > max(270 - pregnancy.get(girl_name, 0), 0) + 10 and renpy.random.randint(1, 3) == 1)
+        if ((pregnancy.get(girl_name, 0) > 240 and procedural_randint(1, 45, "birth_window_%s_%s" % (girl_name, int(dayspassed or 0))) > max(270 - pregnancy.get(girl_name, 0), 0) + 10 and procedural_randint(1, 3, "birth_confirm_%s_%s" % (girl_name, int(dayspassed or 0))) == 1)
                 or pregnancy.get(girl_name, 0) >= 285):
             $ _dssd_know_about_birth = 1
-            if (girl_name == "liza" or girl_name == "georgett") and CurrentLoc.get(girl_name, "") != "TavernMain":
+            if (girl_name == "liza" or girl_name == "georgett") and str(getLocation(girl_name) or "") != "TavernMain":
                 $ _dssd_know_about_birth = 0
             if (girl_name == "becky" or girl_name == "inga") and Becky.rel < 12:
                 $ _dssd_know_about_birth = 0
@@ -56,7 +56,7 @@ label DailySetstatdefault(girl_name):
                 $ _dssd_slut_dress_trigger = 1
 
             $ _dssd_talked_before = AmandaVar.get("MomDressComplaint", 0) if girl_name == "amanda" else Melissa.var.get("MomDressComplaint", 0)
-            if _dssd_slut_dress_trigger == 1 and renpy.random.randint(1, 2 + _dssd_talked_before * 15) == 1:
+            if _dssd_slut_dress_trigger == 1 and procedural_randint(1, 2 + _dssd_talked_before * 15, "mom_dress_complain_%s_%s" % (girl_name, int(dayspassed or 0))) == 1:
                 $ DailyEventsList_Add(girl_name, "TavernMain", 4, "<", 1, 1, "MomDressComplain", "MomDressComplaint")
 
     $ Talked[girl_name] = 0
@@ -69,10 +69,9 @@ label DailySetstatdefault(girl_name):
     # Also reset on the OOP girl object if present (daily flags belong to the girl)
     python:
         try:
-            if "peopleInfo" in globals() and isinstance(peopleInfo, dict):
-                info = peopleInfo.get(girl_name)
-                if hasattr(info, "reset_daily"):
-                    info.reset_daily(False)
+            info = getPersonInfo(girl_name)
+            if hasattr(info, "reset_daily"):
+                info.reset_daily(False)
         except Exception:
             pass
     if Drunk.get(girl_name, 0) > 0:
@@ -90,8 +89,11 @@ label DailySetstatdefault(girl_name):
     $ adjust_otkroven(girl_name)
     call IncreaseSkill(girl_name)
 
-    if jobwhore.get(girl_name, 0):
-        $ TotalWhoreClients[girl_name] = TotalWhoreClients.get(girl_name, 0) + ClientsDayTotal.get(girl_name, 0)
-    if jobgloryhole.get(girl_name, 0):
-        $ TotalGloryHoleClients[girl_name] = TotalGloryHoleClients.get(girl_name, 0) + ClientsDayTotal.get(girl_name, 0)
+    $ _dssd_info = getPersonInfo(girl_name)
+    $ _dssd_jobs = getattr(_dssd_info, "jobs", {}) if _dssd_info is not None else {}
+    $ _dssd_clients = int(_dssd_info.sex_stat("clients_day_total", 0) or 0) if _dssd_info is not None and hasattr(_dssd_info, "sex_stat") else 0
+    if int(_dssd_jobs.get("jobwhore", 0) or 0):
+        $ TotalWhoreClients[girl_name] = TotalWhoreClients.get(girl_name, 0) + _dssd_clients
+    if int(_dssd_jobs.get("jobgloryhole", 0) or 0):
+        $ TotalGloryHoleClients[girl_name] = TotalGloryHoleClients.get(girl_name, 0) + _dssd_clients
     return

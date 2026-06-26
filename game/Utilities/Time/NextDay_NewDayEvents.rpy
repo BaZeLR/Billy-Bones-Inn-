@@ -37,13 +37,9 @@ init -26 python:
 label NextDay_NewDayEvents():
     python:
         # Defensive defaults to avoid startup KeyError on partially initialized saves.
-        CurrentLoc = _nd_ensure_dict("CurrentLoc")
         IngaVar = _nd_ensure_dict("IngaVar")
         GiveOrgasms = _nd_ensure_dict("GiveOrgasms")
-        HadSex = _nd_ensure_dict("HadSex")
-        sluttiness = _nd_ensure_dict("sluttiness")
         DayLastOrgasmGiven = _nd_ensure_dict("DayLastOrgasmGiven")
-        Friends = _nd_ensure_dict("Friends")
         virginity = _nd_ensure_dict("virginity")
         sexacts = _nd_ensure_dict("sexacts")
         pantiesdef = _nd_ensure_dict("pantiesdef")
@@ -64,16 +60,10 @@ label NextDay_NewDayEvents():
 
         Eddie.ensure_story_defaults()
 
-        CurrentLoc.setdefault("georgett", "")
-        CurrentLoc.setdefault("liza", "")
-        CurrentLoc.setdefault("werecat", "")
-        CurrentLoc.setdefault("eddie", "GroceryStore")
         Alber.ensure_story_defaults()
         IngaVar.setdefault("Knowher", 0)
         Amanda.ensure_story_defaults()
 
-        sluttiness.setdefault("amanda", 0)
-        Friends.setdefault("amanda", 0)
         virginity.setdefault("amanda", 1)
         sexacts.setdefault("amanda", 0)
         pantiesdef.setdefault("liza", "")

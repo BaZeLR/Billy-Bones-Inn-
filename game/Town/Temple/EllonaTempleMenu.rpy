@@ -11,7 +11,8 @@ label EllonaTempleMenu:
         MenuItem("Рассмотреть портрет над родильной комнатой", Call("EllonaTempleMenuApply", "agla")),
         MenuItem("Рассмотреть портрет справа от входа в родильную комнату", Call("EllonaTempleMenuApply", "pasi")),
         MenuItem("Рассмотреть портрет слева от входа в родильную комнату", Call("EllonaTempleMenuApply", "tali")),
-        MenuItem("Закончить осмотр", Call("ellona_room_object_menu", "EllonaTemple", "cloister")),
+        MenuItem("Закончить осмотр", Jump("EllonaTemple")),
+        MenuItem("Вернуться в порт", Jump("PortStreets")),
     ]
     return
 
@@ -53,7 +54,8 @@ label EllonaBirthRoomMenu:
     $ current_action_items = [
         MenuItem("Рассмотреть портрет справа от входа в родильную комнату", Call("EllonaBirthRoomMenuApply", "pasi")),
         MenuItem("Рассмотреть портрет слева от входа в родильную комнату", Call("EllonaBirthRoomMenuApply", "tali")),
-        MenuItem("Закончить осмотр", Call("ellona_room_object_menu", "EllonaBirthRoom", "birth_room_decor")),
+        MenuItem("Закончить осмотр", Jump("EllonaBirthRoom")),
+        MenuItem("Вернуться в порт", Jump("PortStreets")),
     ]
     return
 

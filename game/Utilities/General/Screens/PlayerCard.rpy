@@ -175,7 +175,6 @@ init python:
         for picture_path in (
             "images/general/player_card.jpg",
             "images/player_room/player_card.jpg",
-            "images/tavern/myroom/player_card.jpg",
         ):
             if renpy.loadable(picture_path):
                 return picture_path
@@ -734,14 +733,13 @@ screen player_card_overlay(return_label=""):
             for _line in _lines:
                 text _line size 16 color "#2d1d12"
 
-            textbutton "Назад":
-                text_size 22
-                if str(return_label or "") == "__return__":
-                    action Return()
-                elif str(return_label or "") == "__hide__":
-                    action Hide("player_card_overlay")
-                else:
-                    action Call("HidePlayerCard", return_label)
+        textbutton "Назад":
+            id "player_card_overlay_back_button"
+            alt "player_card_overlay_back_button"
+            xpos 28
+            ypos _left_h - 58
+            text_size 22
+            action [Hide("player_card_overlay"), SetVariable("UI_mode", "scene"), SetVariable("UI_selected_char", ""), SetVariable("current_girl_key", ""), Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or "TavernMain"))]
 
 
 label PlayerCardInventoryMenu(preserve_text=False):

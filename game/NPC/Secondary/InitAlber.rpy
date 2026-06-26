@@ -22,7 +22,7 @@ init python:
                 dative="Альберу Легаре",
                 default_location="WineStore",
                 description="Мессир Альбер Легаре - хозяин винного погребка, женат, у него большая семья.",
-                age=36,
+                birth_date={"day": 1, "period": 1, "cycle": 1064},
             )
             self.portrait = "images/Alber/portrait1.png"
 
@@ -34,7 +34,6 @@ init python:
         def __init__(self, name="alber", **kwargs):
             super().__init__(name, **kwargs)
             self.data = AlberStaticData
-            self.age = 36
             self.known = False
             self.location = "WineStore"
             self.rel = people_to_int(kwargs.get("rel", 0), 0)
@@ -123,7 +122,6 @@ define AlberStaticData = AlberData()
 default Alber = AlberInfo()
 
 label register_alber_secondary:
-    $ knowsMC.setdefault("alber", False)
     python:
         peopleData["alber"] = AlberStaticData
         Alber.update()

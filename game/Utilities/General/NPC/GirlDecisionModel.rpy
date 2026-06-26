@@ -303,19 +303,25 @@ init -34 python:
     def build_girl_decision_profile(girl_name=""):
         girl = str(girl_name or "").strip().lower()
         cycle = girl_decision_cycle_state(girl)
-        if girl == "amanda":
-            friend = girl_decision_int(Amanda.rel, 0)
-            open_value = girl_decision_int(Amanda.openness, 0)
-            slut_value = girl_decision_int(Amanda.corruption, 0)
+        girl_info = getPersonInfo(girl)
+        if girl_info is not None and girl in GIRL_DECISION_CORE_IDS:
+            friend = girl_decision_int(getattr(girl_info, "rel", 0), 0)
+            open_value = girl_decision_int(getattr(girl_info, "openness", 0), 0)
+            slut_value = girl_decision_int(getattr(girl_info, "corruption", 0), 0)
+            stats = getattr(girl_info, "stats", {})
+            if not isinstance(stats, dict):
+                stats = {}
+            arousal_value = girl_decision_int(stats.get("arousal", 0), 0)
+            wet_value = max(girl_decision_int(stats.get("PussyWetStart", 0), 0), arousal_value)
         else:
             friend = girl_decision_int(Friends.get(girl, 0), 0) if isinstance(Friends, dict) else 0
             open_value = girl_decision_int(otkroven.get(girl, 0), 0) if isinstance(otkroven, dict) else 0
             slut_value = girl_decision_int(sluttiness.get(girl, 0), 0) if isinstance(sluttiness, dict) else 0
-        arousal_value = girl_decision_int(Arousal.get(girl, 0), 0) if isinstance(Arousal, dict) else 0
-        wet_value = max(girl_decision_int(PussyWetStart.get(girl, 0), 0) if isinstance(PussyWetStart, dict) else 0, arousal_value)
+            arousal_value = girl_decision_int(Arousal.get(girl, 0), 0) if isinstance(Arousal, dict) else 0
+            wet_value = max(girl_decision_int(PussyWetStart.get(girl, 0), 0) if isinstance(PussyWetStart, dict) else 0, arousal_value)
         anger_fn = getattr(store, "relationship_anger", None)
         anger_value = anger_fn(girl) if callable(anger_fn) else 0
-        rebel_value = girl_decision_int(Amanda.rebellion, 0) if girl == "amanda" else (girl_decision_int(neshlush.get(girl, 0), 0) if isinstance(neshlush, dict) else 0)
+        rebel_value = girl_decision_int(getattr(girl_info, "rebellion", 0), 0) if girl_info is not None and girl in GIRL_DECISION_CORE_IDS else (girl_decision_int(neshlush.get(girl, 0), 0) if isinstance(neshlush, dict) else 0)
 
         player_history = 0
         if girl == "amanda":
@@ -339,6 +345,8 @@ init -34 python:
             "wetness": girl_decision_ratio(wet_value, 100),
             "anger": girl_decision_ratio(anger_value, 5),
             "rebel": girl_decision_ratio(rebel_value, 5),
+            "mana_value": girl_decision_int(getattr(girl_info, "mana", 0), 0) if girl_info is not None and girl in GIRL_DECISION_CORE_IDS else 0,
+            "mana_bad_probability": girl_info.mana_bad_probability() if girl_info is not None and girl in GIRL_DECISION_CORE_IDS else 0.0,
             "player_history": float(player_history),
             "likes_player": 1.0 if friend >= 10 else 0.0,
             "soap_bonus": girl_decision_soap_bonus(girl),
@@ -393,6 +401,21 @@ init -34 python:
         bad_score = girl_decision_score(data, action_key, "bad") - 1.05
         p_good = girl_decision_clamp(girl_decision_sigmoid(good_score))
         p_bad = girl_decision_clamp(girl_decision_sigmoid(bad_score))
+        if str(data.get("girl", "") or "").strip().lower() in GIRL_DECISION_CORE_IDS:
+            p_bad = girl_decision_clamp(data.get("mana_bad_probability", 0.0))
+            p_good = girl_decision_clamp(p_good * (1.0 - p_bad), 0.0, 1.0 - p_bad)
+            p_neutral = max(0.0, 1.0 - p_good - p_bad)
+            return {
+                "good": p_good,
+                "neutral": p_neutral,
+                "bad": p_bad,
+                "capricious_good_is_bad": 0.0,
+                "capricious_bad_is_good": 0.0,
+                "caprice": 0.0,
+                "good_score": good_score,
+                "bad_score": bad_score,
+                "mana_bad_probability": p_bad,
+            }
         if p_good + p_bad > 0.92:
             scale = 0.92 / (p_good + p_bad)
             p_good *= scale

@@ -3,15 +3,7 @@
 # ================================================================================
 init 6 python:
     def tavern_melissa_room_sleep_picture():
-        picture_cycle = [
-            "images/melissa/tavern/melissa_sleeps_0.jpg",
-            "images/melissa/tavern/melissa_sleeps_1.png",
-            "images/melissa/tavern/melissa_sleeps_2.png",
-            "images/melissa/tavern/melissa_sleeps_3.png",
-            "images/melissa/tavern/melissa_sleeps_4.png",
-            "images/melissa/tavern/melissa_sleeps.png",
-        ]
-        picture_cycle = [row for row in picture_cycle if renpy.loadable(row)]
+        picture_cycle = Melissa.image_sequence("tavern", "sleep")
         if len(picture_cycle) > 0:
             return picture_cycle[int(dayspassed or 0) % len(picture_cycle)]
         return ""
@@ -60,7 +52,7 @@ init 6 python:
         code_name="TavernMelissaRoom",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Комната Мелиссы",
-        bg_picture="images/melissa/tavern/melissa_portrait.png",
+        bg_picture=MelissaStaticData.image_path("tavern", "room") or MelissaStaticData.image_path("portrait", "default"),
         descriptions=[
             RoomDescription(
                 text="Вы заглядываете в комнату Мелиссы. Обстановка небогатая: кровать, ларь, табурет и несколько аккуратно сложенных вещей.",
@@ -81,7 +73,6 @@ init 6 python:
 
 
 label TavernMelissaRoom:
-    call EnterLocation("TavernMelissaRoom")
     $ CurrentRoom = TavernMelissaRoomRoom
     $ CurLoc = "TavernMelissaRoom"
     $ location = CurLoc
@@ -159,7 +150,7 @@ label TavernMelissaRoomObjectMenu(object_id="", preserve_text=False):
                 current_action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
         if bool(getattr(_room_object, "carriable", False)) and not _melissa_room_has_take_action:
             current_action_items.append(MenuItem("Взять", Call("Take", object_id, "TavernMelissaRoom", "", object_id)))
-        current_action_items.append(MenuItem("Назад", Call("TavernMelissaRoomRestore")))
+        current_action_items.append(MenuItem("Назад", Jump("TavernMelissaRoom")))
     return
 
 

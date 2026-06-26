@@ -50,11 +50,12 @@ init python:
                 fullname="Жоржетта",
                 genitive="Жоржетты",
                 dative="Жоржетте",
+                portrait="images/georgett/portraits/portrait1.jpg",
                 default_location="PortStreets",
                 description="Жоржетта Брюно - молодая женщина, не очень высокого роста, чуть пухленькая и с большой налитой грудью. Она белокура и кареглаза. Ее внешность и повадки не дают никаких сомнений в том, что она выбрала себе путь отнюдь не монашки.",
                 gift_preferences=["drink_ale_001", "wild_rose_001", "soap_001", "libido_tincture_001", "ethanol_001"],
             )
-            self.birth_date = {"day": 1, "period": 1, "cycle": 1072}
+            self.birth_date = {"day": 22, "period": 13, "cycle": 1072}
             self.schedule_source = "schedules/georgett.json"
 
     class GeorgettInfo(Girl):
@@ -66,7 +67,6 @@ init python:
             self.code_name = "georgett"
             self.data = GeorgettStaticData
             self.uses_own_var_state = True
-            self.age = 28
             self.rel = 0
             self.relationship = self.rel
             self.openness = 0
@@ -110,7 +110,6 @@ init python:
             }
             self.gift_preferences = list(GeorgettStaticData.gift_preferences)
             self.schedule_source = GeorgettStaticData.schedule_source
-            self.schedule_uses_clock_minutes = True
             self.current_location = "PortStreets"
             self.talk_preferences = {
                 "favorite_topics": ["clients", "sex", "family", "pregnancy", "kids"],
@@ -136,7 +135,8 @@ init python:
             super(GeorgettInfo, self).update()
             self.data = GeorgettStaticData
             self.relationship = self.rel
-            self.sync_from_georgett_maps()
+            self.ensure_story_defaults()
+            self.ensure_sex_state()
             return self
 
         def ensure_story_defaults(self):
@@ -157,129 +157,25 @@ init python:
                 "tits_visible": 0,
                 "pussy_visible": 0,
                 "cock_position": "none",
+                "top_removed": 0,
+                "bottom_removed": 0,
+                "top_raised": 0,
+                "bottom_raised": 0,
                 "cum_face_you": 0,
                 "cum_face_others": 0,
                 "cum_tits_you": 0,
                 "cum_tits_others": 0,
+                "cum_mouth_you": 0,
+                "cum_mouth_others": 0,
                 "cum_inside_you": 0,
                 "cum_inside_others": 0,
             }.items():
                 self.sex_state.setdefault(key, value)
             return self.sex_state
 
-        def sync_from_georgett_maps(self):
-            self.rel = people_to_int(Friends.get("georgett", self.rel), self.rel)
-            self.relationship = self.rel
-            self.openness = people_to_int(otkroven.get("georgett", self.openness), self.openness)
-            self.corruption = people_to_int(sluttiness.get("georgett", self.corruption), self.corruption)
-            self.drunk = people_to_int(Drunk.get("georgett", self.drunk), self.drunk)
-            self.talked_today = people_to_int(TalkedToday.get("georgett", self.talked_today), self.talked_today)
-            self.gifted_today = people_to_int(GiftedToday.get("georgett", self.gifted_today), self.gifted_today)
-            self.asked_today = people_to_int(AskedToday.get("georgett", self.asked_today), self.asked_today)
-            self.fucked_today = people_to_int(FuckedToday.get("georgett", self.fucked_today), self.fucked_today)
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                if "georgett" in table:
-                    self.stats[stat_key] = table.get("georgett")
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobGloryHoleAvail, "jobGloryHoleAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-                (jobwhoreTommorow, "jobwhoreTommorow"),
-                (jobgloryholeTommorow, "jobgloryholeTommorow"),
-            ]:
-                if "georgett" in table:
-                    self.jobs[job_key] = table.get("georgett")
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                if "georgett" in table:
-                    self.skills[skill_key] = table.get("georgett")
-            self.ensure_story_defaults()
-            self.ensure_sex_state()
-            return self
-
-        def sync_georgett_maps(self):
-            name = self.code_name
-            RealName[name] = self.data.fullname
-            RealName2[name] = self.data.genitive
-            RealName3[name] = self.data.dative
-            age_girls[name] = people_to_int(self.age, 28)
-            DateOfBirth[name] = dict(self.data.birth_date)
-            girltextdesc[name] = self.data.description
-            knowsMC[name] = bool(self.known)
-            Friends[name] = people_to_int(self.rel, 0)
-            otkroven[name] = people_to_int(self.openness, 0)
-            sluttiness[name] = people_to_int(self.corruption, 0)
-            Drunk[name] = people_to_int(self.drunk, 0)
-            TalkedToday[name] = people_to_int(self.talked_today, 0)
-            GiftedToday[name] = people_to_int(self.gifted_today, 0)
-            AskedToday[name] = people_to_int(self.asked_today, 0)
-            FuckedToday[name] = people_to_int(self.fucked_today, 0)
-            CurrentLoc[name] = str(self.current_location or "PortStreets")
-            GiftPreferences[name] = list(self.gift_preferences)
-            dressdefault[name] = self.wardrobe["current_dress"]
-            bradef[name] = self.wardrobe["current_underwear"]["bra"]
-            pantiesdef[name] = self.wardrobe["current_underwear"]["panties"]
-            legsdef[name] = self.wardrobe["current_underwear"]["legs"]
-            shoesdef[name] = self.wardrobe["current_underwear"]["shoes"]
-            topdress[name] = DressTopPart.get(dressdefault[name], "")
-            bottomdress[name] = DressBottomPart.get(dressdefault[name], "")
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            self.wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                table[name] = self.stats.get(stat_key)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobGloryHoleAvail, "jobGloryHoleAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-                (jobwhoreTommorow, "jobwhoreTommorow"),
-                (jobgloryholeTommorow, "jobgloryholeTommorow"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                table[name] = self.skills.get(skill_key, 0)
-            self.ensure_story_defaults()
-            return self
-
         def initialize_new_game_state(self):
             self.ensure_story_defaults()
             self.ensure_sex_state()
-            self.sync_georgett_maps()
             return self
 
         def reset_daily(self, full=False):
@@ -290,7 +186,7 @@ init python:
             self.fucked_today = 0
             self.drunk = 0
             self.var["after_sermon_stage"] = 0
-            self.sync_georgett_maps()
+            self.var["portstreet_clients_seen_today"] = 0
             return self
 
         def story_value(self, key, default=0):
@@ -298,41 +194,60 @@ init python:
 
         def set_story_value(self, key, value):
             self.ensure_story_defaults()[key] = value
-            self.sync_georgett_maps()
             return value
 
+        def real_name(self):
+            return self.data.fullname
+
+        def real_name2(self):
+            return self.data.genitive
+
+        def real_name3(self):
+            return self.data.dative
+
+        def display_name(self):
+            if people_to_int(self.rel, 0) <= 0:
+                return str(self.unknown_name or "Молодая женщина")
+            return str(self.data.fullname or self.code_name)
+
+        def orgasm_count_given(self):
+            return people_to_int(self.stats.get("orgasms_given", 0), 0)
+
+        def had_sex_count(self):
+            return people_to_int(self.stats.get("sexacts", 0), 0)
+
         def sex_setup(self, location="street"):
+            sync_player_state_from_store()
             self.ensure_sex_state()
             self.sex_state["location"] = str(location or "street")
             self.sex_state["somebody_cums"] = 0
+            self.sex_state["top_removed"] = 0
+            self.sex_state["bottom_removed"] = 0
+            self.sex_state["top_raised"] = 0
+            self.sex_state["bottom_raised"] = 0
             self.refresh_sex_visibility()
             return self.sex_state
 
         def _player_intimacy(self):
-            runtime = ensure_player_runtime()
-            if not isinstance(runtime.intimacy.arousal, dict):
-                runtime.intimacy.arousal = {"You": 0, "you": 0}
-            runtime.intimacy.arousal.setdefault("You", runtime.intimacy.arousal.get("you", 0))
-            runtime.intimacy.arousal.setdefault("you", runtime.intimacy.arousal.get("You", 0))
-            return runtime.intimacy
+            return player_state(False).intimacy
 
         def player_arousal(self):
-            intimacy = self._player_intimacy()
-            return people_to_int(intimacy.arousal.get("You", intimacy.arousal.get("you", 0)), 0)
+            return self._player_intimacy().arousal_value("You")
 
         def set_player_arousal(self, value):
             intimacy = self._player_intimacy()
-            new_value = max(0, min(100, people_to_int(value, 0)))
-            intimacy.arousal["You"] = new_value
-            intimacy.arousal["you"] = new_value
+            new_value = intimacy.set_arousal(value, "You")
+            intimacy.apply_to_store()
             return new_value
 
         def add_player_arousal(self, amount=0, cap=100):
-            return self.set_player_arousal(min(people_to_int(cap, 100), self.player_arousal() + people_to_int(amount, 0)))
+            intimacy = self._player_intimacy()
+            new_value = intimacy.add_arousal(amount, cap, "You")
+            intimacy.apply_to_store()
+            return new_value
 
         def can_player_cum(self):
-            intimacy = self._player_intimacy()
-            return people_to_int(intimacy.came_today, 0) < max(1, people_to_int(intimacy.can_cum_daily, 1))
+            return self._player_intimacy().can_cum()
 
         def arousal_value(self):
             return people_to_int(self.ensure_sex_state().get("arousal", 0), 0)
@@ -346,15 +261,21 @@ init python:
             state["arousal"] = max(0, min(people_to_int(cap, 100), self.arousal_value() + people_to_int(amount, 0)))
             return state["arousal"]
 
-        def set_cock_position(self, position="none"):
+        def set_cock_position(self, position="none", actor="You"):
             position_key = str(position or "none").strip().lower()
-            if position_key not in ("none", "mouth", "pussy", "tits"):
+            if position_key not in ("none", "mouth", "pussy", "tits", "ass"):
                 position_key = "none"
-            self.ensure_sex_state()["cock_position"] = position_key
+            actor_key = str(actor or "You").strip() or "You"
+            state = self.ensure_sex_state()
+            state.setdefault("partner_positions", {})[actor_key] = position_key
+            if actor_key.lower() == "you":
+                state["cock_position"] = position_key
             return position_key
 
-        def cock_in(self, position=""):
-            return self.ensure_sex_state().get("cock_position", "none") == str(position or "").strip().lower()
+        def cock_in(self, position="", actor="You"):
+            actor_key = str(actor or "You").strip() or "You"
+            state = self.ensure_sex_state()
+            return state.get("partner_positions", {}).get(actor_key, state.get("cock_position", "none")) == str(position or "").strip().lower()
 
         def sex_busy(self):
             return people_to_int(self.ensure_sex_state().get("somebody_cums", 0), 0) != 0
@@ -370,48 +291,46 @@ init python:
             return people_to_int(self.ensure_sex_state().get("pussy_visible", 0), 0) > 0
 
         def has_top(self):
-            return str(topdress.get(self.code_name, "") or "") != ""
+            return str(self.wardrobe.get("current_dress", "") or "") != "" and not people_to_int(self.ensure_sex_state().get("top_removed", 0), 0)
 
         def has_bottom(self):
-            return str(bottomdress.get(self.code_name, "") or "") != ""
+            return str(self.wardrobe.get("current_dress", "") or "") != "" and not people_to_int(self.ensure_sex_state().get("bottom_removed", 0), 0)
 
         def top_is_raised(self):
-            return people_to_int(topraised.get(self.code_name, 0), 0) != 0
+            return people_to_int(self.ensure_sex_state().get("top_raised", 0), 0) != 0
 
         def bottom_is_raised(self):
-            return people_to_int(bottomraised.get(self.code_name, 0), 0) != 0
+            return people_to_int(self.ensure_sex_state().get("bottom_raised", 0), 0) != 0
 
         def needs_dress_up(self):
-            name = self.code_name
+            state = self.ensure_sex_state()
             return (
-                str(topdress.get(name, "") or "") == ""
-                and str(bottomdress.get(name, "") or "") == ""
-                and str(legs.get(name, "") or "") == ""
-                and str(shoes.get(name, "") or "") == ""
-                and str(dressdefault.get(name, "") or "") != ""
+                people_to_int(state.get("top_removed", 0), 0) != 0
+                and people_to_int(state.get("bottom_removed", 0), 0) != 0
+                and str(self.wardrobe.get("current_dress", "") or "") != ""
             )
 
         def refresh_sex_visibility(self):
-            name = self.code_name
             state = self.ensure_sex_state()
-            state["tits_visible"] = 1 if str(bra.get(name, "") or "") == "" and (str(topdress.get(name, "") or "") == "" or people_to_int(topraised.get(name, 0), 0)) else 0
-            state["pussy_visible"] = 1 if str(panties.get(name, "") or "") == "" and (str(bottomdress.get(name, "") or "") == "" or people_to_int(bottomraised.get(name, 0), 0)) else 0
+            underwear = self.wardrobe.get("current_underwear", {})
+            state["tits_visible"] = 1 if str(underwear.get("bra", "") or "") == "" and (not self.has_top() or self.top_is_raised()) else 0
+            state["pussy_visible"] = 1 if str(underwear.get("panties", "") or "") == "" and (not self.has_bottom() or self.bottom_is_raised()) else 0
             return state
 
         def remove_blouse_for_sex(self):
-            topdress[self.code_name] = ""
+            self.ensure_sex_state()["top_removed"] = 1
             self.refresh_sex_visibility()
             self.set_cock_position("none")
             return self.sex_state
 
         def unbutton_blouse_for_sex(self):
-            topraised[self.code_name] = 1
+            self.ensure_sex_state()["top_raised"] = 1
             self.refresh_sex_visibility()
             self.set_cock_position("none")
             return self.sex_state
 
         def raise_skirt_for_sex(self):
-            bottomraised[self.code_name] = 1
+            self.ensure_sex_state()["bottom_raised"] = 1
             self.refresh_sex_visibility()
             self.set_cock_position("none")
             return self.sex_state
@@ -445,12 +364,9 @@ init python:
             if place_key not in ("inside", "mouth", "tits", "face"):
                 place_key = "outside"
             intimacy = self._player_intimacy()
-            intimacy.came_today = people_to_int(intimacy.came_today, 0) + 1
-            intimacy.had_sex_count = people_to_int(intimacy.had_sex_count, 0) + 1
-            intimacy.last_sex_day = people_to_int(dayspassed, 0)
-            intimacy.last_cum_day = people_to_int(dayspassed, 0)
-            self.set_player_arousal(0)
+            intimacy.record_cum(dayspassed)
             self.stats["sexacts"] = people_to_int(self.stats.get("sexacts", 0), 0) + 1
+            self.fucked_today = people_to_int(self.fucked_today, 0) + 1
             if place_key == "inside":
                 self.sex_state["cum_inside_you"] = 1
                 self.stats["cuminside"] = people_to_int(self.stats.get("cuminside", 0), 0) + 1
@@ -461,15 +377,17 @@ init python:
                         self.stats["pregfather"] = "Вы"
             elif place_key == "tits":
                 self.sex_state["cum_tits_you"] = 1
+            elif place_key == "mouth":
+                self.sex_state["cum_mouth_you"] = 1
             elif place_key == "face":
                 self.sex_state["cum_face_you"] = 1
             self.set_cock_position("none")
             self.set_sex_busy(1)
-            self.sync_georgett_maps()
+            intimacy.apply_to_store()
             return self.sex_state
 
         def talk_count(self):
-            return people_to_int(Talked.get(self.code_name, 0), 0)
+            return people_to_int(self.talked_today, 0)
 
         def can_talk_today(self, limit=2):
             return self.talk_count() < people_to_int(limit, 2)
@@ -477,14 +395,11 @@ init python:
         def add_relation(self, amount=1, cap=20):
             self.rel = max(0, min(people_to_int(cap, 20), people_to_int(self.rel, 0) + people_to_int(amount, 0)))
             self.relationship = self.rel
-            self.sync_georgett_maps()
             return self.rel
 
         def finish_talk(self):
             self.talked_today = people_to_int(self.talked_today, 0) + 1
-            Talked[self.code_name] = self.talk_count() + 1
-            self.sync_georgett_maps()
-            return Talked[self.code_name]
+            return self.talked_today
 
         def mark_asked_topic(self, topic_flag, relation_gain=1):
             flag = str(topic_flag or "")
@@ -494,7 +409,6 @@ init python:
                 if relation_gain:
                     self.add_relation(relation_gain)
             self.asked_today = people_to_int(self.asked_today, 0) + 1
-            self.sync_georgett_maps()
             return first_time
 
         def can_ask_topic(self, topic):
@@ -508,25 +422,25 @@ init python:
                 return (
                     people_to_int(self.story_value("askclients", 0), 0) > 0
                     and rel_value >= 7
-                    and people_to_int(GiveOrgasms.get(self.code_name, 0), 0) >= 3
+                    and self.orgasm_count_given() >= 3
                 )
             if key == "family":
                 return (
                     people_to_int(self.story_value("asksex", 0), 0) > 0
                     and rel_value >= 7
-                    and people_to_int(GiveOrgasms.get(self.code_name, 0), 0) >= 4
+                    and self.orgasm_count_given() >= 4
                 )
             if key == "pregnancy":
                 return (
                     people_to_int(self.story_value("askparents", 0), 0) > 0
                     and rel_value >= 7
-                    and people_to_int(GiveOrgasms.get(self.code_name, 0), 0) >= 4
+                    and self.orgasm_count_given() >= 4
                 )
             if key == "kids":
                 return (
                     people_to_int(self.story_value("askpregnancy", 0), 0) > 0
                     and rel_value >= 7
-                    and people_to_int(GiveOrgasms.get(self.code_name, 0), 0) >= 5
+                    and self.orgasm_count_given() >= 5
                 )
             if key == "gerhard":
                 return people_to_int(self.story_value("SawChurchAfterCermon", 0), 0) > 0
@@ -535,18 +449,19 @@ init python:
         def getLocation(self, wday=None, hour=None):
             location_value = super(GeorgettInfo, self).getLocation(wday, hour)
             if str(location_value or "") == "PortStreets":
-                try:
-                    if (
-                        str(CurLoc or "") == "PortStreets"
-                        and bool(PortStreetsRoom.custom_properties.get("georgett_back_alley", False))
-                    ):
-                        return "PortStreetsBackAlley"
-                except Exception:
-                    pass
+                if self.portstreet_visible_now():
+                    self.location = "PortStreets"
+                    return "PortStreets"
+                if (
+                    people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0
+                    and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
+                ):
+                    self.location = "PortStreetsBackAlley"
+                    return "PortStreetsBackAlley"
             return location_value
 
         def can_work_portstreets(self):
-            return str(self.getLocation() or "") == "PortStreets" and not self.can_work_tavern()
+            return str(self.getLocation() or "") in ("PortStreets", "PortStreetsBackAlley") and not self.can_work_tavern()
 
         def portstreet_story_unblocked(self):
             return not (
@@ -561,14 +476,22 @@ init python:
         def portstreet_work_active(self):
             return self.can_work_portstreets() and self.portstreet_story_unblocked() and self.portstreet_work_hour()
 
+        def set_portstreet_visible(self, visible=True):
+            self.var["portstreet_visible_now"] = 1 if visible else 0
+            return bool(visible)
+
+        def portstreet_visible_now(self):
+            return people_to_int(self.var.get("portstreet_visible_now", 0), 0) > 0
+
         def portstreet_client_event_available(self):
-            return self.portstreet_work_active() and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
+            return self.portstreet_work_active() and people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0 and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
 
         def mark_portstreet_clients_seen(self):
+            self.var["portstreet_clients_seen_today"] = 1
             return self.set_story_value("seeclients", 1)
 
         def can_work_tavern(self):
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0 or people_to_int(jobWhoreAvail.get("georgett", 0), 0) > 0
+            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
             return self.hired
 
         def set_hired(self, hired=True):
@@ -576,17 +499,16 @@ init python:
             self.jobs["jobWhoreAvail"] = 1 if self.hired else 0
             self.jobs["jobwhore"] = 1 if self.hired else 0
             self.current_location = "TavernMain" if self.hired else "PortStreets"
-            self.sync_georgett_maps()
             return self.hired
 
         def can_use_gloryhole(self):
-            return people_to_int(self.jobs.get("jobGloryHoleAvail", 0), 0) > 0 or people_to_int(jobGloryHoleAvail.get("georgett", 0), 0) > 0
+            return people_to_int(self.jobs.get("jobGloryHoleAvail", 0), 0) > 0
 
         def can_invite_to_tavern(self):
             return (
                 Alber.var_int("talkedaboutliza", 0) > 0
                 and people_to_int(self.rel, 0) >= 7
-                and str(CurrentLoc.get("georgett", "") or "") == "PortStreets"
+                and str(self.getLocation() or "") == "PortStreets"
             )
 
         def can_ask_about_priest(self):
@@ -602,7 +524,6 @@ init python:
             return self.set_story_value("after_sermon_stage", people_to_int(value, 0))
 
         def church_after_sermon_event_available(self):
-            self.sync_from_georgett_maps()
             return (
                 church_after_cermon_action_visible()
                 and self.can_trigger_after_sermon_event()

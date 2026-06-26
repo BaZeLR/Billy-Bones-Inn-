@@ -34,14 +34,18 @@ label PartEventGirlReactionTalk(GirlNamePEGRT1, GirlNamePEGRT2, FriendVarToChang
 
         def _pegrt_get_ref_value(ref_expr):
             dict_name, dict_key = _pegrt_parse_ref(ref_expr)
-            if dict_name == "Amanda.var" and dict_key != "":
-                return _pegrt_int(Amanda.var.get(dict_key, 0), 0)
+            if dict_name.endswith(".var") and dict_key != "":
+                info = getPersonInfo(dict_name[:-4])
+                if info is not None and isinstance(getattr(info, "var", None), dict):
+                    return _pegrt_int(info.var.get(dict_key, 0), 0)
             return 0
 
         def _pegrt_set_ref_value(ref_expr, value):
             dict_name, dict_key = _pegrt_parse_ref(ref_expr)
-            if dict_name == "Amanda.var" and dict_key != "":
-                Amanda.var[dict_key] = value
+            if dict_name.endswith(".var") and dict_key != "":
+                info = getPersonInfo(dict_name[:-4])
+                if info is not None and isinstance(getattr(info, "var", None), dict):
+                    info.var[dict_key] = value
 
         friend_var_value = _pegrt_get_ref_value(FriendVarToChange)
         DefiniteAccept = _pegrt_int(DefiniteAccept, 0)
@@ -53,15 +57,18 @@ label PartEventGirlReactionTalk(GirlNamePEGRT1, GirlNamePEGRT2, FriendVarToChang
                 BeleiveFriend = 1
         
         result_text = ""
-        if sluttiness.get(GirlNamePEGRT1, 0) >= DefiniteAccept or renpy.random.randint(1,5) <= 3 or BeleiveFriend:
+        girl_info = getPersonInfo(GirlNamePEGRT1)
+        girl_slut = _pegrt_int(getattr(girl_info, "corruption", 0), 0)
+
+        if girl_slut >= DefiniteAccept or renpy.random.randint(1,5) <= 3 or BeleiveFriend:
             result_text = f"\n{RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} внимательно слушает свою собеседницу, впитывая информацию."
             if friend_var_value < FriendLimit and renpy.random.randint(1,3) == 1:
                 _pegrt_set_ref_value(FriendVarToChange, friend_var_value + 1)
                 result_text += f"\nПохоже, {RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} и {RealName.get(GirlNamePEGRT2, GirlNamePEGRT2)} сдружились еще больше!"
             
-            girl_slut = sluttiness.get(GirlNamePEGRT1, 0)
             if girl_slut < SlutLimit and renpy.random.randint(1,2) == 1:
-                sluttiness[GirlNamePEGRT1] = girl_slut + 1
+                if girl_info is not None:
+                    girl_info.change_social(corruption_delta=1)
                 result_text += f"\nВам показалось, что после этого разговора {RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} почуствовала себя чуть больше раскрепощенной."
         else:
             result_text = f'\n"Да врешь ты все!" воскликнула {RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} и пошла по своим делам, даже не удосужившись попрощаться.'
@@ -69,9 +76,9 @@ label PartEventGirlReactionTalk(GirlNamePEGRT1, GirlNamePEGRT2, FriendVarToChang
                 _pegrt_set_ref_value(FriendVarToChange, friend_var_value - 1)
                 result_text += f"\nПохоже, {RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} и {RealName.get(GirlNamePEGRT2, GirlNamePEGRT2)} малость поссорились!"
             
-            girl_slut = sluttiness.get(GirlNamePEGRT1, 0)
             if girl_slut > (SlutLimit/4) and girl_slut > (SlutLimit+15) and renpy.random.randint(1,5) == 1:
-                sluttiness[GirlNamePEGRT1] = girl_slut - 1
+                if girl_info is not None:
+                    girl_info.change_social(corruption_delta=-1)
                 result_text += f"\nВам показалось, что после этого разговора {RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} почуствовала себя более гордой и неприступной."
         
         Result = result_text

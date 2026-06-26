@@ -60,16 +60,7 @@ init -40 python:
             group_value = str(getattr(room_obj, "group_name", "") or "").strip().lower()
             if group_value:
                 return group_value
-            props = getattr(room_obj, "custom_properties", None)
-            if isinstance(props, dict):
-                group_value = str(props.get("group_name", "") or "").strip().lower()
-                if group_value:
-                    return group_value
         return infer_room_group(room_key)
-
-    def current_room_group():
-        room_key = str(getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip()
-        return room_group(room_key)
 
     def room_in_group(room_code="", group_name=""):
         expected = str(group_name or "").strip().lower()
@@ -109,19 +100,45 @@ init -40 python:
         return roomRegistry.get(room_key, None)
 
 
+    def normalize_room_item_rows(rows=None):
+        normalized = []
+        for row in list(rows or []):
+            item_id = get_object_id(row)
+            if item_id:
+                normalized.append(item_id)
+        return normalized
+
+
     def restore_room_runtime(room_code="", payload=None):
         restored = get_registered_room(room_code)
         if restored is None:
-            restored = Room(code_name=room_code, display_name=room_code)
+            restored = object.__new__(Room)
+            restored.code_name = str(room_code or "").strip()
+            restored.room_id = restored.code_name
+            restored.display_name = restored.code_name
+            restored.bg_picture = ""
+            restored.descriptions = []
+            restored.exits = []
+            restored.game_items = []
+            restored.objects = restored.game_items
+            restored.action_menus = []
+            restored.schedule = None
+            restored.custom_properties = {}
+            restored.group_name = infer_room_group(restored.code_name)
+            restored.is_hidden = False
+            restored.is_locked = False
+            restored.open_override = None
 
         payload = dict(payload or {})
-        if "custom_properties" in payload:
-            merged_properties = dict(getattr(restored, "custom_properties", {}) or {})
-            merged_properties.update(dict(payload.get("custom_properties", {}) or {}))
-            restored.custom_properties = merged_properties
         if "game_items" in payload:
-            restored.game_items = list(payload.get("game_items", []) or [])
+            restored.game_items = normalize_room_item_rows(payload.get("game_items", []))
             restored.objects = restored.game_items
+        if "is_hidden" in payload:
+            restored.is_hidden = bool(payload.get("is_hidden", False))
+        if "is_locked" in payload:
+            restored.is_locked = bool(payload.get("is_locked", False))
+        if "open_override" in payload:
+            restored.open_override = payload.get("open_override", None)
         return restored
 
     class RoomExit(object):
@@ -162,69 +179,36 @@ init -40 python:
         def __setstate__(self, state):
             self.__dict__.update(dict(state or {}))
 
-    class RoomScene(object):
-        def __init__(self, scene_id="", picture="", text="", condition=None):
-            self.scene_id = str(scene_id or "").strip()
-            self.picture = str(picture or "").strip()
-            self.text = str(text or "")
-            self.condition = condition
-
-        def is_visible(self):
-            return room_rule_true(self.condition)
-
-        def __getstate__(self):
-            state = dict(self.__dict__)
-            state["condition"] = room_rule_serialize(state.get("condition", None))
-            return state
-
-        def __setstate__(self, state):
-            self.__dict__.update(dict(state or {}))
-
-    class RoomTrigger(object):
-        def __init__(self, trigger_id="", condition=None, event_id="", hook="", target="", args=None, once=False):
-            self.trigger_id = str(trigger_id or "").strip()
-            self.condition = condition
-            self.event_id = str(event_id or "").strip()
-            self.hook = str(hook or "").strip()
-            self.target = str(target or "").strip()
-            self.args = tuple(args or ())
-            self.once = bool(once)
-
-        def is_ready(self):
-            return room_rule_true(self.condition)
-
-        def __getstate__(self):
-            state = dict(self.__dict__)
-            state["condition"] = room_rule_serialize(state.get("condition", None))
-            return state
-
-        def __setstate__(self, state):
-            self.__dict__.update(dict(state or {}))
-
-
     class RoomSchedule(object):
-        def __init__(self, weekdays=None, time_slots=None, closed_text="", condition=None, start="", end=""):
+        def __init__(self, weekdays=None, closed_text="", condition=None, start="", end=""):
             self.weekdays = list(weekdays or [])
-            self.time_slots = list(time_slots or [])
             self.closed_text = str(closed_text or "")
             self.condition = condition
             self.start = str(start or "")
             self.end = str(end or "")
 
-        def _minute_value(self, value, default=0):
+        def _hour_value(self, value, default=0):
             text = str(value or "").strip()
-            if ":" not in text:
-                try:
-                    return max(0, min(1439, int(text)))
-                except Exception:
-                    return int(default or 0)
             try:
-                h_text, m_text = text.split(":", 1)
-                return max(0, min(23, int(h_text or 0))) * 60 + max(0, min(59, int(m_text or 0)))
+                if ":" in text:
+                    text = text.split(":", 1)[0]
+                return max(0, min(23, int(text or default)))
             except Exception:
                 return int(default or 0)
 
-        def is_open(self, week_value=None, time_value=None):
+        def _end_hour_value(self, value, default=23):
+            text = str(value or "").strip()
+            hour_value = self._hour_value(text, default)
+            if ":" in text:
+                try:
+                    minute_value = int(text.split(":", 1)[1] or 0)
+                except Exception:
+                    minute_value = 0
+                if minute_value > 0:
+                    return min(24, hour_value + 1)
+            return hour_value
+
+        def is_open(self, week_value=None):
             if not room_rule_true(self.condition):
                 return False
             if week_value is None:
@@ -235,27 +219,22 @@ init -40 python:
             start_text = str(getattr(self, "start", "") or "")
             end_text = str(getattr(self, "end", "") or "")
             if start_text or end_text:
-                try:
-                    minute_value = int(clock_minutes or 0) % 1440
-                except Exception:
-                    minute_value = 0
-                start_value = self._minute_value(start_text, 0)
-                end_value = self._minute_value(end_text, 1439)
+                calendar_v2.sync_state()
+                hour_value = int(calendar_v2.hour or 0) % 24
+                start_value = self._hour_value(start_text, 0)
+                end_value = self._end_hour_value(end_text, 23)
                 if start_value <= end_value:
-                    if not (start_value <= minute_value <= end_value):
+                    if not (start_value <= hour_value < end_value):
                         return False
                 else:
-                    if not (minute_value >= start_value or minute_value <= end_value):
+                    if not (hour_value >= start_value or hour_value < end_value):
                         return False
-            if self.time_slots and int(time_value or 0) not in self.time_slots:
-                return False
             return True
 
         def __getstate__(self):
             state = dict(self.__dict__)
             state["condition"] = room_rule_serialize(state.get("condition", None))
             state["weekdays"] = list(state.get("weekdays", []) or [])
-            state["time_slots"] = list(state.get("time_slots", []) or [])
             state["start"] = str(state.get("start", "") or "")
             state["end"] = str(state.get("end", "") or "")
             return state
@@ -276,28 +255,27 @@ init -40 python:
             game_items=None,
             action_menus=None,
             schedule=None,
-            scenes=None,
-            triggers=None,
             custom_properties=None,
             group_name="",
+            is_hidden=False,
+            is_locked=False,
+            open_override=None,
         ):
             self.code_name = str(code_name or "").strip()
             self.room_id = self.code_name
             self.display_name = str(display_name or self.code_name).strip()
             self.bg_picture = str(bg_picture or "").strip()
-            self.picture = self.bg_picture
             self.descriptions = list(descriptions or [])
             self.exits = list(exits or [])
-            self.game_items = list(game_items or objects or [])
+            self.game_items = normalize_room_item_rows(game_items or objects or [])
             self.objects = self.game_items
             self.action_menus = list(action_menus or [])
             self.schedule = schedule
-            self.scenes = list(scenes or [])
-            self.triggers = list(triggers or [])
             self.custom_properties = dict(custom_properties or {})
-            self.group_name = str(group_name or self.custom_properties.get("group_name", "") or infer_room_group(self.code_name)).strip().lower()
-            if self.group_name:
-                self.custom_properties["group_name"] = self.group_name
+            self.group_name = str(group_name or infer_room_group(self.code_name)).strip().lower()
+            self.is_hidden = bool(is_hidden)
+            self.is_locked = bool(is_locked)
+            self.open_override = open_override
             register_room_runtime(self)
 
         def is_first_visit(self):
@@ -313,7 +291,15 @@ init -40 python:
             return rows
 
         def visible_exits(self):
-            return [row for row in self.exits if hasattr(row, "is_visible") and row.is_visible()]
+            out = []
+            for row in self.exits:
+                if not hasattr(row, "is_visible") or not row.is_visible():
+                    continue
+                target_room = get_registered_room(getattr(row, "target", ""))
+                if target_room is not None and bool(getattr(target_room, "is_hidden", False)):
+                    continue
+                out.append(row)
+            return out
 
         def visible_objects(self):
             out = []
@@ -330,28 +316,16 @@ init -40 python:
         def visible_game_items(self):
             return self.visible_objects()
 
-        def visible_npcs(self):
-            out = []
-            for npc_id in getNPCids(self.code_name):
-                row = npc_action_data_for_room(npc_id, self.code_name)
-                if isinstance(row, dict):
-                    out.append(row)
-            return out
-
         def visible_actions(self):
             return [row for row in self.action_menus if hasattr(row, "is_visible") and row.is_visible()]
 
-        def visible_scenes(self):
-            return [row for row in self.scenes if hasattr(row, "is_visible") and row.is_visible()]
-
-        def ready_triggers(self):
-            return [row for row in self.triggers if hasattr(row, "is_ready") and row.is_ready()]
-
-        def is_open(self, week_value=None, time_value=None):
+        def is_open(self, week_value=None):
+            if self.open_override is not None:
+                return bool(self.open_override)
             if self.schedule is None:
                 return True
             if hasattr(self.schedule, "is_open"):
-                return self.schedule.is_open(week_value, time_value)
+                return self.schedule.is_open(week_value)
             return True
 
         # ---------- NEW SHARED BUILDERS ----------
@@ -387,8 +361,6 @@ init -40 python:
         def build_extra_action_items(self):
             items = []
             for room_action in self.visible_actions():
-                if "room_action_menu_item" not in globals():
-                    continue
                 menu_item = room_action_menu_item(room_action)
                 if menu_item is not None:
                     items.append(menu_item)
@@ -397,7 +369,13 @@ init -40 python:
         def build_action_items(self):
             items = []
             items.extend(self.build_object_items())
-            items.extend(self.build_extra_action_items())
+            room_actions = self.visible_actions()
+            for room_action in room_actions:
+                menu_item = room_action_menu_item(room_action)
+                if menu_item is not None:
+                    items.append(menu_item)
+            excluded_actions = [str(getattr(row, "action_id", "") or "").strip() for row in room_actions]
+            items.extend(story_event_action_items(self.code_name, excluded_actions))
             return items
 
         def build_menu_sections(self):
@@ -408,37 +386,33 @@ init -40 python:
 
         def __getstate__(self):
             state = dict(self.__dict__)
-            serialized_npcs = []
-            for npc in list(state.get("npcs", []) or []):
-                if isinstance(npc, dict):
-                    npc_state = dict(npc)
-                    npc_state["condition"] = room_rule_serialize(npc_state.get("condition", None))
-                    serialized_npcs.append(npc_state)
-                else:
-                    serialized_npcs.append(npc)
-            state["npcs"] = serialized_npcs
+            state.pop("npcs", None)
             state["descriptions"] = list(state.get("descriptions", []) or [])
             state["exits"] = list(state.get("exits", []) or [])
-            state["game_items"] = list(state.get("game_items", []) or [])
-            state["objects"] = list(state.get("objects", []) or [])
+            state["game_items"] = normalize_room_item_rows(state.get("game_items", []))
+            state["objects"] = state["game_items"]
             state["action_menus"] = list(state.get("action_menus", []) or [])
-            state["scenes"] = list(state.get("scenes", []) or [])
-            state["triggers"] = list(state.get("triggers", []) or [])
             state["custom_properties"] = dict(state.get("custom_properties", {}) or {})
+            state["is_hidden"] = bool(state.get("is_hidden", False))
+            state["is_locked"] = bool(state.get("is_locked", False))
             return state
 
         def __setstate__(self, state):
             self.__dict__.update(dict(state or {}))
-            register_room_runtime(self)
+            self.game_items = normalize_room_item_rows(getattr(self, "game_items", []))
+            self.objects = self.game_items
 
         def __reduce__(self):
             state = self.__getstate__()
             payload = {
-                "custom_properties": dict(state.get("custom_properties", {}) or {}),
-                "game_items": list(state.get("game_items", []) or []),
-                "npcs": list(state.get("npcs", []) or []),
+                "game_items": normalize_room_item_rows(state.get("game_items", [])),
+                "is_hidden": bool(state.get("is_hidden", False)),
+                "is_locked": bool(state.get("is_locked", False)),
+                "open_override": state.get("open_override", None),
             }
             return (restore_room_runtime, (str(getattr(self, "code_name", "") or ""), payload))
+
+
 label MoveToRoom(target_label="", movement_minutes=0):
     $ movement_target = str(target_label or CurLoc or "TavernMain")
     $ move_cost = int(movement_minutes or 0)

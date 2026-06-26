@@ -50,7 +50,6 @@ init python:
 
 
 label ArtisansQuarter:
-    call EnterLocation("ArtisansQuarter")
     $ dog_prepare_current_spawn()
     $ CurrentRoom = ArtisansQuarterRoom
     $ CurLoc = "ArtisansQuarter"
@@ -138,7 +137,7 @@ label ArtisansQuarterObjectMenu(object_id=""):
             elif _artisans_action.hook == "jump" and str(_artisans_action.target or "") != "":
                 current_action_items.append(MenuItem(_artisans_action.label, Jump(_artisans_action.target)))
 
-    $ current_action_items.append(MenuItem("Назад", Call("ArtisansQuarterRestore")))
+    $ current_action_items.append(MenuItem("Назад", Jump("ArtisansQuarter")))
     return
 
 

@@ -11,13 +11,13 @@ label PartEventCustomerHarrassmentReaction(GirlNamePECHR):
         if _girl_corruption >= 50:
             if renpy.random.randint(1,12) == 1:
                 $ Result += 'Вашим завсегдатаям очень понравилась такая податливость. '
-                $ tavernfame += 1
+                $ player.change_tavern_fame(1)
                 if _girl_info is not None:
                     $ _girl_info.skills["waitress"] = min(70, int(_girl_info.skills.get("waitress", 0) or 0) + 1)
         else:
             if renpy.random.randint(1,25) == 1:
                 $ Result += 'Ваших завсегдатаев устроило такое обслуживание. '
-                $ tavernfame += 1
+                $ player.change_tavern_fame(1)
                 if _girl_info is not None:
                     $ _girl_info.skills["waitress"] = min(70, int(_girl_info.skills.get("waitress", 0) or 0) + 1)
             if renpy.random.randint(1,6) == 1 and _girl_corruption < 7:
@@ -29,7 +29,7 @@ label PartEventCustomerHarrassmentReaction(GirlNamePECHR):
     elif GirlRunAway == 1 and GirlSlapped > 0:
         if renpy.random.randint(1,2) == 1:
             $ Result += 'Неудачливому приставале пощечина понравилась мало. Бормоча себе под нос ругательства он в гневе выбежал из трактира. Будьте уверенны, что он не замедлит рассказать о произошедшем своим дружкам, выставя себя в выгодном свете.'
-            $ tavernfame -= 1
+            $ player.change_tavern_fame(-1)
             if _girl_info is not None:
                 $ _girl_info.skills["waitress"] = max(20, int(_girl_info.skills.get("waitress", 0) or 0) - 1)
         else:
@@ -43,7 +43,7 @@ label PartEventCustomerHarrassmentReaction(GirlNamePECHR):
     elif GirlRunAway == 1 and GirlSlapped == 0:
         if renpy.random.randint(1,8) == 1:
             $ Result += 'Любителя распускать руки отказ, хотя и спокойный, судя по всему задел за живое, ущемив его нежную и ранимую гордость. Бормоча себе под нос ругательства он в гневе выбежал из трактира. Будьте уверенны, что он не замедлит рассказать о произошедшем своим дружкам, выставя себя в выгодном свете.'
-            $ tavernfame -= 1
+            $ player.change_tavern_fame(-1)
             if _girl_info is not None:
                 $ _girl_info.skills["waitress"] = max(20, int(_girl_info.skills.get("waitress", 0) or 0) - 1)
         else:

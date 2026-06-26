@@ -17,51 +17,36 @@ init python:
         return max(int(low), min(int(high), player_intimacy_int(value, low)))
 
     def player_cum_count():
-        try:
-            if isinstance(cametoday, dict):
-                return player_intimacy_int(cametoday.get("You", cametoday.get("you", 0)), 0)
-            return player_intimacy_int(cametoday, 0)
-        except Exception:
-            return 0
+        return player_intimacy_int(player_state(False).intimacy.came_today, 0)
 
     def player_cum_limit():
-        try:
-            if isinstance(cancumdaily, dict):
-                return max(1, player_intimacy_int(cancumdaily.get("You", cancumdaily.get("you", 1)), 1))
-            return max(1, player_intimacy_int(cancumdaily, 1))
-        except Exception:
-            return 1
+        return max(1, player_intimacy_int(player_state(False).intimacy.can_cum_daily, 1))
 
     def player_set_cum_count(value):
-        global cametoday
         count = max(0, player_intimacy_int(value, 0))
-        if isinstance(cametoday, dict):
-            cametoday["You"] = count
-            cametoday["you"] = count
-        else:
-            cametoday = count
+        intimacy = player_state(False).intimacy
+        intimacy.came_today = count
+        intimacy.apply_to_store()
         return count
 
     def player_mark_sex_day(reason="", target=""):
-        global LastDaySex, PlayerLastCumDay
-        LastDaySex = player_intimacy_int(dayspassed, 0)
-        PlayerLastCumDay = player_intimacy_int(dayspassed, 0)
-        return LastDaySex
+        intimacy = player_state(False).intimacy
+        intimacy.last_sex_day = player_intimacy_int(dayspassed, 0)
+        intimacy.last_cum_day = player_intimacy_int(dayspassed, 0)
+        intimacy.apply_to_store()
+        return intimacy.last_sex_day
 
     def player_record_orgasm(reason="", target=""):
-        global SomebodyCums
-        player_set_cum_count(player_cum_count() + 1)
-        if isinstance(HadSex, dict):
-            HadSex["You"] = player_intimacy_int(HadSex.get("You", 0), 0) + 1
-            target_key = str(target or "").strip().lower()
-            if target_key:
-                HadSex[target_key] = player_intimacy_int(HadSex.get(target_key, 0), 0) + 1
-        player_mark_sex_day(reason, target)
-        if isinstance(Arousal, dict):
-            Arousal["You"] = 0
-            Arousal["you"] = 0
-        SomebodyCums = 1
-        return player_cum_count()
+        intimacy = player_state(False).intimacy
+        result = intimacy.record_cum(dayspassed)
+        target_key = str(target or "").strip().lower()
+        if target_key:
+            partner = getPersonInfo(target_key)
+            if partner is not None:
+                partner.mark_fucked(1)
+                partner.record_sex_history("You", str(reason or ""), "orgasm")
+        intimacy.apply_to_store()
+        return result
 
     def player_days_without_sex():
         last_day = player_intimacy_int(LastDaySex, -1)
@@ -77,27 +62,8 @@ init python:
         return True
 
     def player_sync_body_state():
-        key = "You"
-        topdress.setdefault(key, "")
-        bottomdress.setdefault(key, "")
-        bra[key] = ""
-        panties[key] = ""
-        legs.setdefault(key, "")
-        shoes.setdefault(key, "")
-        topraised[key] = 0
-        bottomraised[key] = 0
-        appearance = player_state().appearance
-        if appearance.is_naked():
-            topdress[key] = ""
-            bottomdress[key] = ""
-            legs[key] = ""
-            shoes[key] = ""
-        else:
-            dress_code = "nightshirt" if appearance.is_nightwear() else str(appearance.current_dress or "")
-            topdress[key] = str(DressTopPart.get(dress_code, "") or "")
-            bottomdress[key] = str(DressBottomPart.get(dress_code, "") or "")
         try:
-            return bodymodel_sync_character(key, "Стефан", "male")
+            return bodymodel_sync_character("You", "Стефан", "male")
         except Exception:
             return {}
 
@@ -123,7 +89,7 @@ init python:
         return not player_is_naked()
 
     def player_arousal_state_line():
-        value = player_intimacy_int(Arousal.get("You", 0), 0) if isinstance(Arousal, dict) else 0
+        value = player_state(False).intimacy.arousal_value("You")
         if player_cum_count() >= player_cum_limit():
             return "Мужская сила на сегодня уже истрачена."
         if value < 20:
@@ -167,17 +133,16 @@ init python:
 
     def player_apply_arousal_trigger(trigger_code="", amount=0):
         global PlayerArousalReasons
-        if not isinstance(Arousal, dict):
-            return 0
         trigger_key = str(trigger_code or "context").strip()
-        current = player_intimacy_int(Arousal.get("You", 0), 0)
+        intimacy = player_state(False).intimacy
+        current = player_intimacy_int(intimacy.arousal_value("You"), 0)
         if player_cum_count() >= player_cum_limit():
-            Arousal["You"] = 0
-            Arousal["you"] = 0
+            intimacy.set_arousal(0, "You")
+            intimacy.apply_to_store()
             return 0
         new_value = player_intimacy_clamp(current + player_intimacy_int(amount, 0), 0, 95)
-        Arousal["You"] = new_value
-        Arousal["you"] = new_value
+        intimacy.set_arousal(new_value, "You")
+        intimacy.apply_to_store()
         if not isinstance(PlayerArousalReasons, list):
             PlayerArousalReasons = []
         if trigger_key and trigger_key not in PlayerArousalReasons:
@@ -230,7 +195,7 @@ init python:
             return 0
         today = player_intimacy_int(dayspassed, 0)
         if player_intimacy_int(PlayerObservedNakedNpcDay.get(key, -1), -1) == today:
-            return player_intimacy_int(Arousal.get("You", 0), 0)
+            return player_state(False).intimacy.arousal_value("You")
         PlayerObservedNakedNpcDay[key] = today
         return player_apply_arousal_trigger("saw_naked_" + key, 12 + min(18, player_days_without_sex() * 3))
 
@@ -244,12 +209,12 @@ init python:
 
     def player_apply_intimacy_help_penalty(girl_name=""):
         key = str(girl_name or "").strip().lower()
-        before = player_intimacy_int(sluttiness.get(key, 0), 0) if isinstance(sluttiness, dict) else 0
+        info = getPersonInfo(key)
+        before = player_intimacy_int(getattr(info, "corruption", 0), 0) if info is not None else 0
         reduction = max(1, int(round(float(before) * 0.35))) if before > 0 else 0
-        if isinstance(sluttiness, dict):
-            sluttiness[key] = max(0, before - reduction)
-        if isinstance(Friends, dict):
-            Friends[key] = max(-100, player_intimacy_int(Friends.get(key, 0), 0) - 10)
+        if info is not None:
+            info.corruption = max(0, before - reduction)
+            info.rel = max(0, player_intimacy_int(getattr(info, "rel", 0), 0) - 10)
         try:
             relationship_set_anger(key, 2, 1, "intimacy_help_insult")
         except Exception:
@@ -261,9 +226,15 @@ init python:
         key = str(girl_name or "").strip().lower()
         if key == "":
             return {"ok": False, "girl": "", "text": "Сейчас некого просить."}
-        profile = build_girl_decision_profile(key) if "build_girl_decision_profile" in globals() else {}
+        try:
+            profile = build_girl_decision_profile(key)
+        except Exception:
+            profile = {}
         roll_value = forced_roll
-        decision = girl_decide(key, "intimate_help", profile, roll_value) if "girl_decide" in globals() else {"reaction": "neutral", "profile": profile}
+        try:
+            decision = girl_decide(key, "intimate_help", profile, roll_value)
+        except Exception:
+            decision = {"reaction": "neutral", "profile": profile}
         reaction = str(decision.get("reaction", "neutral") or "neutral")
         positive = reaction in ("good", "capricious_bad_is_good")
         name = str(RealName.get(key, key) or key)
@@ -274,10 +245,9 @@ init python:
             else:
                 text = "%s соглашается помочь без лишнего шума. Она устраивается ближе, берет ваш член рукой и доводит вас до разрядки быстрым, уверенным движением." % name
             player_record_orgasm("npc_help_" + kind, key)
-            if isinstance(Friends, dict):
-                Friends[key] = min(100, player_intimacy_int(Friends.get(key, 0), 0) + 1)
-            if isinstance(sluttiness, dict):
-                sluttiness[key] = min(100, player_intimacy_int(sluttiness.get(key, 0), 0) + 1)
+            info = getPersonInfo(key)
+            if info is not None:
+                info.change_social(friend_delta=1, corruption_delta=1)
             result = {"ok": True, "girl": key, "kind": kind, "reaction": reaction, "text": text}
         else:
             penalty = player_apply_intimacy_help_penalty(key)
@@ -292,7 +262,7 @@ init python:
             return False
         if player_cum_count() >= player_cum_limit():
             return False
-        if player_intimacy_int(Arousal.get("You", 0), 0) < 40:
+        if player_intimacy_int(player_state(False).intimacy.arousal_value("You"), 0) < 40:
             return False
         return True
 
@@ -300,10 +270,8 @@ init python:
 label PlayerIntimacyHelpAsk(girl_name="", return_label=""):
     $ _pih_result = player_intimacy_help_result(girl_name)
     if str(girl_name or "").strip().lower() == "amanda":
-        $ AmandaVar["night_tease_resolved"] = 1
-        $ AmandaVar["night_tease_scene_active"] = 0
-        if bool(_pih_result.get("ok", False)) and str(CurLoc or "") == "TavernMyRoom":
-            $ amanda_ai_clear_room_presence("TavernMyRoom")
+        $ Amanda.var["night_tease_resolved"] = 1
+        $ Amanda.var["night_tease_scene_active"] = 0
     $ MainTxt = str(_pih_result.get("text", "") or "")
     $ CurLocDesc = MainTxt
     "[MainTxt]"

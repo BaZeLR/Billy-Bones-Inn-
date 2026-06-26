@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default TavernKitchenNoticeText = ""
 default TavernKitchenNoticePending = False
@@ -32,18 +32,15 @@ init python:
                 return sandra_scene
         if str(getLocation("melissa") or "") == "TavernKitchen":
             if random.randint(1, 4) == 1:
-                if renpy.loadable("images/melissa/tavern/basement.png"):
-                    return "images/melissa/tavern/basement.png"
+                melissa_basement = Melissa.image_path("tavern", "basement")
+                if melissa_basement:
+                    return melissa_basement
                 if renpy.loadable("images/tavern/storage/storage_room.png"):
                     return "images/tavern/storage/storage_room.png"
                 if renpy.loadable("images/tavern/kitchen/kitchen_room.png"):
                     return "images/tavern/kitchen/kitchen_room.png"
                 return resolve_room_background_media(TavernKitchenRoom)
-            melissa_kitchen = [
-                "images/melissa/tavern/melissa_kitchen_0.png",
-                "images/melissa/tavern/melissa_kitchen_1.png",
-            ]
-            melissa_kitchen = [row for row in melissa_kitchen if renpy.loadable(row)]
+            melissa_kitchen = Melissa.image_sequence("kitchen", "work")
             if len(melissa_kitchen) > 0:
                 return melissa_kitchen[random.randint(0, len(melissa_kitchen) - 1)]
         return resolve_room_background_media(TavernKitchenRoom)
@@ -257,10 +254,10 @@ init python:
         return lines
 
     def tavern_kitchen_sandra_can_discuss_breakfasts():
-        return Sandra.kitchen_can_discuss_household_food()
+        return str(getLocation("sandra") or "") == "TavernKitchen" and tavern_kitchen_food_stock_count() > 0 and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0
 
     def tavern_kitchen_sandra_can_discuss_clients():
-        return Sandra.kitchen_can_discuss_household_food()
+        return str(getLocation("sandra") or "") == "TavernKitchen" and tavern_kitchen_food_stock_count() > 0 and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0
 
     TavernKitchenRoom = Room(
         code_name="TavernKitchen",
@@ -287,7 +284,6 @@ init python:
             "hearth_001",
             "cauldron_001",
         ],
-        schedule=RoomSchedule([1, 2, 3, 4, 5, 6, 7], [], "", None, "00:00", "23:59"),
         custom_properties={},
     )
 
@@ -333,7 +329,6 @@ init python:
         return "\n".join([row for row in text_parts if str(row or "").strip()])
 
 label TavernKitchen:
-    call EnterLocation("TavernKitchen")
     $ CurrentRoom = TavernKitchenRoom
     $ CurLoc = "TavernKitchen"
     $ location = CurLoc
@@ -352,10 +347,7 @@ label TavernKitchen:
         else:
             $ MainTxt = "Вы все еще сидите за общим утренним столом."
         $ CurLocDesc = MainTxt
-        hide screen main_ui
         jump TavernKitchenBreakfastMenu
-    if bool(AmandaAIIntegrationEnabled):
-        call AmandaMiniEventTry(CurLoc, "room")
     $ BeckyKitchenVisitActive = 1 if becky_kitchen_visit_active() else 0
     if BeckyKitchenVisitActive:
         $ Becky.var["SandraKitchenVisitMonth"] = int(month or 0)
@@ -436,11 +428,15 @@ label TavernKitchenShareTeaWithSandraAndBecky:
         $ CurLocDesc = MainTxt
         call TavernKitchenBuildActions
         return
+    $ _player_remove_item_by_id("energy_tea_001", 1)
+    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
+    $ Friends["becky"] = min(20, int(Friends.get("becky", 0) or 0) + 1)
+    $ fun = _player_clamp(int(fun or 0) + 1, 0, 100)
     if str(getLocation("sandra") or "") == "TavernKitchen":
         $ _tea_scene = tavern_kitchen_random_sandra_scene()
         if str(_tea_scene or "").strip():
             $ _layout_last_picture = _tea_scene
-    $ MainTxt = Sandra.apply_kitchen_tea_with_becky()
+    $ MainTxt = "Вы завариваете бодрящий чай и угощаете им Сандру с Бекки. Разговор за столом быстро теплеет: Сандра благодарит вас за внимание к хозяйству, а Бекки охотно подхватывает кухонные сплетни и делится парой полезных замечаний о трактирных делах."
     $ CurLocDesc = MainTxt
     call stat
     call TavernKitchenBuildActions
@@ -492,7 +488,15 @@ label TavernKitchenAskSandraBreakfasts:
         call TavernKitchenBuildActions
         return
     $ _kitchen_used_item = tavern_kitchen_take_food_from_stock(["boar_meat_001", "honey_comb_001", "berries_001", "mushroom_001"])
-    $ MainTxt = Sandra.apply_kitchen_regular_breakfast_request(_kitchen_used_item)
+    $ AskedToday["sandra"] = int(AskedToday.get("sandra", 0) or 0) + 1
+    $ Talked["sandra"] = int(Talked.get("sandra", 0) or 0) + 1
+    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
+    $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+    $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
+    $ fun = _player_clamp(int(fun or 0) + 2, 0, 100)
+    $ MainTxt = "Вы просите Сандру почаще собирать домочадцев за общий утренний стол и не давать всем разбредаться без толку. Сандра выслушивает вас без лишних слов, потом переводит взгляд на оставленные припасы и кивает.\n\n\"Ладно. Если уж на кухне есть из чего готовить, я поговорю с девочками. Общий завтрак дому не повредит, а там и работа ровнее пойдет,\" решает она."
+    if str(_kitchen_used_item or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\nДля ближайшего такого стола Сандра сразу откладывает %s." % tavern_kitchen_food_item_name(_kitchen_used_item)
     $ CurLocDesc = MainTxt
     $ TavernKitchenSavedText = MainTxt
     if TavernBreakfastEventActive:
@@ -509,7 +513,13 @@ label TavernKitchenAskSandraClients:
         call TavernKitchenBuildActions
         return
     $ _kitchen_used_item = tavern_kitchen_take_food_from_stock(["berries_001", "honey_comb_001", "boar_meat_001", "mushroom_001"])
-    $ MainTxt = Sandra.apply_kitchen_client_manners_request(_kitchen_used_item)
+    $ AskedToday["sandra"] = int(AskedToday.get("sandra", 0) or 0) + 1
+    $ Talked["sandra"] = int(Talked.get("sandra", 0) or 0) + 1
+    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
+    $ tavernfame = int(tavernfame or 0) + 1
+    $ MainTxt = "Вы просите Сандру поговорить с домочадцами и держаться с гостями немного мягче обычного. Сандра щурится, явно взвешивая сказанное, а потом нехотя соглашается.\n\n\"Если уж хочешь, чтобы в трактире было больше довольных рож, я скажу девочкам не срываться на людях почем зря. Но и ты смотри, чтобы работа не шла через пень-колоду,\" бурчит она."
+    if str(_kitchen_used_item or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\nЗаодно Сандра решает пустить %s на что-нибудь поприятнее для посетителей." % tavern_kitchen_food_item_name(_kitchen_used_item)
     $ CurLocDesc = MainTxt
     $ TavernKitchenSavedText = MainTxt
     if TavernBreakfastEventActive:

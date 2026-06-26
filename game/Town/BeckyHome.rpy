@@ -111,7 +111,7 @@ init python:
                 ],
             ),
         ],
-        schedule=RoomSchedule([1, 2, 3, 4, 5, 6, 7], [], "", None, "06:00", "17:59"),
+        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], start="06:00", end="17:59"),
         custom_properties={
             "becky_house": True,
             "object_menu_label": "BeckyHomeObjectMenu",
@@ -123,7 +123,6 @@ label BeckyHome(arrive_mode=""):
         call BeckyHomeRestore
         call screen main_ui
         jump BeckyHome
-    call EnterLocation("BeckyHome")
     $ BeckyHomeActive = 1
     $ ArriveMode = arrive_mode
     $ _becky_home_room = BeckyHomeRoom
@@ -288,7 +287,7 @@ label BeckyHomeObjectMenu(object_id=""):
                 current_action_items.append(MenuItem(_becky_action.label, Call(_becky_action.target, *_becky_args)))
             elif _becky_action.hook == "jump" and str(_becky_action.target or "") != "":
                 current_action_items.append(MenuItem(_becky_action.label, Jump(_becky_action.target)))
-        current_action_items.append(MenuItem("Назад", Call("BeckyHomeRestore")))
+        current_action_items.append(MenuItem("Назад", Jump("BeckyHome")))
     return
 
 

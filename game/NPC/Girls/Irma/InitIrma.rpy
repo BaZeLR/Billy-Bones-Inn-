@@ -109,7 +109,6 @@ init python:
             super().__init__("irma")
             self.code_name = "irma"
             self.data = IrmaStaticData
-            self.age = 22
             self.rel = 0
             self.relationship = self.rel
             self.openness = 0
@@ -159,7 +158,6 @@ init python:
             }
             self.gift_preferences = list(IrmaStaticData.gift_preferences)
             self.schedule_source = IrmaStaticData.schedule_source
-            self.schedule_uses_clock_minutes = True
             self.current_location = "DressShop"
             self.talk_preferences = {
                 "favorite_topics": ["fashion", "tailoring", "family", "secrets", "work"],
@@ -241,7 +239,6 @@ init python:
             RealName[name] = self.data.cname
             RealName2[name] = self.data.genitive
             RealName3[name] = self.data.dative
-            age_girls[name] = people_to_int(self.age, 22)
             DateOfBirth[name] = dict(self.data.birth_date)
             girltextdesc[name] = self.data.description
             knowsMC[name] = bool(self.known)
@@ -254,7 +251,7 @@ init python:
             GiftedToday[name] = people_to_int(self.gifted_today, 0)
             AskedToday[name] = people_to_int(self.asked_today, 0)
             FuckedToday[name] = people_to_int(self.fucked_today, 0)
-            CurrentLoc[name] = str(self.current_location or "DressShop")
+            self.location = str(self.current_location or "DressShop")
             GiftPreferences[name] = list(self.gift_preferences)
             dressdefault[name] = self.wardrobe["current_dress"]
             bradef[name] = self.wardrobe["current_underwear"]["bra"]

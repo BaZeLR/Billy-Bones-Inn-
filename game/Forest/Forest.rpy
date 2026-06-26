@@ -272,7 +272,6 @@ label ForestReturnToTavernAfterDusk:
 
 
 label Forest:
-    call EnterLocation("Forest")
     $ CurrentRoom = ForestRoom
     $ CurLoc = "Forest"
     $ location = CurLoc
@@ -444,6 +443,11 @@ label ForestSpawnedItemMenu(item_id=""):
 
     $ MainTxt = str(_spawn_item.description or "")
     $ CurLocDesc = MainTxt
+    $ _spawn_picture = str(getattr(_spawn_item, "picture", "") or "").strip()
+    if _spawn_picture:
+        $ scene_image = _spawn_picture
+        $ _layout_last_picture = _spawn_picture
+        vscene _spawn_picture
     $ current_action_title = _spawn_item.name
     $ current_action_content = None
     $ current_action_items = [
@@ -550,6 +554,11 @@ label ForestSubroomSpawnedItemMenu(item_id=""):
 
     $ MainTxt = str(_spawn_item.description or "")
     $ CurLocDesc = MainTxt
+    $ _spawn_picture = str(getattr(_spawn_item, "picture", "") or "").strip()
+    if _spawn_picture:
+        $ scene_image = _spawn_picture
+        $ _layout_last_picture = _spawn_picture
+        vscene _spawn_picture
     $ current_action_title = _spawn_item.name
     $ current_action_content = None
     $ current_action_items = [

@@ -252,16 +252,16 @@ init python:
             return False
         if "amanda" not in list(tavern_breakfast_present_ids() or []):
             return False
-        if int(AmandaVar.get("attic_window_breakfast_bj_day", -1) or -1) == int(dayspassed or 0):
+        if int(Amanda.var.get("attic_window_breakfast_bj_day", -1) or -1) == int(dayspassed or 0):
             return False
-        wetness = max(int(PussyWetStart.get("amanda", 0) or 0), int(Arousal.get("amanda", 0) or 0))
-        return wetness >= 25 or int(sluttiness.get("amanda", 0) or 0) >= 28
+        wetness = max(int(Amanda.stats.get("PussyWetStart", 0) or 0), int(Amanda.arousal_value() or 0))
+        return wetness >= 25 or int(Amanda.corruption or 0) >= 28
 
     def tavern_breakfast_amanda_alt_cure_ready():
         if not tavern_breakfast_amanda_alt_cure_possible():
             return False
-        wetness = max(int(PussyWetStart.get("amanda", 0) or 0), int(Arousal.get("amanda", 0) or 0))
-        sluttiness_value = int(sluttiness.get("amanda", 0) or 0)
+        wetness = max(int(Amanda.stats.get("PussyWetStart", 0) or 0), int(Amanda.arousal_value() or 0))
+        sluttiness_value = int(Amanda.corruption or 0)
         chance = 15 + max(0, wetness - 25) * 2 + max(0, sluttiness_value - 28)
         if "melissa" in list(tavern_breakfast_present_ids() or []):
             chance += 8
@@ -280,9 +280,9 @@ init python:
         return (
             amanda_attic_busted()
             and "amanda" in list(tavern_breakfast_present_ids() or [])
-            and int(AmandaVar.get("attic_mock_stopped", 0) or 0) == 0
-            and int(AmandaVar.get("attic_mock_exposed", 0) or 0) == 0
-            and int(AmandaVar.get("attic_mock_response_day", -1) or -1) != int(dayspassed or 0)
+            and int(Amanda.var.get("attic_mock_stopped", 0) or 0) == 0
+            and int(Amanda.var.get("attic_mock_exposed", 0) or 0) == 0
+            and int(Amanda.var.get("attic_mock_response_day", -1) or -1) != int(dayspassed or 0)
         )
 
     def tavern_breakfast_sweet_or_spiced_served():
@@ -296,15 +296,12 @@ init python:
     def tavern_breakfast_melissa_amanda_gerhard_ready():
         present_ids = list(tavern_breakfast_present_ids() or [])
         return (
-            Melissa.bats_stage() >= 6
-            and Melissa.bats_stage() < 8
-            and str(Melissa.var.get("temp_room", "") or "") == "TavernAmandaRoom"
-            and amanda_attic_busted()
+            (int(Melissa.bats_stage() or 0) >= 3 or int(werecat_state().get("rats_problem_active", 0) or 0) == 1)
+            and int(Melissa.bats_stage() or 0) < 8
             and "melissa" in present_ids
             and "amanda" in present_ids
-            and "sandra" not in present_ids
+            and "sandra" in present_ids
             and int(TavernBreakfastMelissaAmandaGerhardDay or -1) != int(dayspassed or 0)
-            and tavern_breakfast_sweet_or_spiced_served()
         )
 
     def tavern_breakfast_soap_request_girl():
@@ -328,12 +325,13 @@ init python:
         for npc_id in list(tavern_breakfast_present_ids() or []):
             if npc_id not in ("amanda", "melissa"):
                 continue
-            state = AmandaVar if npc_id == "amanda" else Melissa.var
+            info = getPersonInfo(npc_id)
+            state = Amanda.var if npc_id == "amanda" else Melissa.var
             if int(state.get("breakfast_tease_day", -1) or -1) == int(dayspassed or 0):
                 continue
-            friend_value = int(Friends.get(npc_id, 0) or 0)
-            open_value = int(otkroven.get(npc_id, 0) or 0)
-            corruption_value = int(sluttiness.get(npc_id, 0) or 0)
+            friend_value = int(getattr(info, "rel", 0) or 0)
+            open_value = int(getattr(info, "openness", 0) or 0)
+            corruption_value = int(getattr(info, "corruption", 0) or 0)
             perk_score = tavern_breakfast_player_perk_score(npc_id)
             friend_need = max(4, 6 - perk_score // 5)
             open_need = 0 if perk_score >= 8 else 1
@@ -364,10 +362,11 @@ init python:
         key = str(npc_id or "").strip().lower()
         if key not in ("sandra", "melissa", "amanda"):
             return 0
+        info = getPersonInfo(key)
         score = 0
-        score += min(4, max(0, int(Friends.get(key, 0) or 0) // 4))
-        score += min(3, max(0, int(otkroven.get(key, 0) or 0) // 5))
-        score += min(3, max(0, int(sluttiness.get(key, 0) or 0) // 20))
+        score += min(4, max(0, int(getattr(info, "rel", 0) or 0) // 4))
+        score += min(3, max(0, int(getattr(info, "openness", 0) or 0) // 5))
+        score += min(3, max(0, int(getattr(info, "corruption", 0) or 0) // 20))
         if int(dayspassed or 0) - int(BarberVisitLastDay.get(key, -99) or -99) <= 14:
             score += 2
         dress_top = str(topdress.get(key, "") or topdressdef.get(key, "") or "")
@@ -453,12 +452,11 @@ init python:
                 "images/tavern/kitchen/sandra.png",
                 "images/tavern/kitchen/kitchen_sandra_0.jpg",
             ],
-            "melissa": [
-                "images/melissa/tavern/kitchen_0.png",
-                "images/melissa/tavern/kitchen_1.png",
-                "images/melissa/tavern/portrait.png",
-            ],
+            "melissa": Melissa.image_sequence("kitchen", "breakfast"),
             "amanda": [
+                "images/breakfast/amanda_breakfast/amanda_tease_1.jpg",
+                "images/breakfast/amanda_breakfast/amanda_tease.jpg",
+                "images/breakfast/amanda_b.png",
                 "images/amanda/kitchen_help.png",
                 "images/amanda/amanda_card.jpg",
                 "images/amanda/amanda_portrait.jpg",
@@ -477,9 +475,9 @@ init python:
         if key == "sandra":
             return "Вы внимательнее смотрите на Сандру за завтраком. Она держит стол в хозяйском порядке даже тогда, когда молчит: взглядом поправляет ленивых, замечает пустую миску раньше остальных и одним своим присутствием не дает кухне развалиться в балаган."
         if key == "melissa":
-            return "Вы присматриваетесь к Мелиссе за завтраком. Если она пришла к столу, значит старается держаться вместе с домом: ест аккуратно, слушает больше, чем говорит, и слишком быстро опускает глаза, когда разговор становится личным."
+            return "Вы присматриваетесь к Мелиссе за завтраком. Она сидит ровно, ест аккуратно, но под глазами у нее усталость: ночные шорохи, крысы и летучие мыши сделали ее злой еще до первой ложки."
         if key == "amanda":
-            return "Вы смотрите, как Аманда ведет себя за завтраком. Она будто специально занимает чуть больше места за столом, лениво играет ложкой и ловит чужие реакции, проверяя, кто первым сорвется на замечание."
+            return "Вы смотрите, как Аманда ведет себя за завтраком. Она играет ложкой, чуть наглее обычного садится за столом и ловит чужие взгляды, будто проверяет, кто первым полезет с замечанием."
         return "%s сидит за общим столом, и этого уже достаточно, чтобы разговоры и настроение завтрака шли иначе." % name
 
     def tavern_breakfast_record_group_perk(item_id="", score=1, targets=None):
@@ -770,10 +768,6 @@ init python:
             items.append(MenuItem("Разобрать спор Мелиссы и Аманды", Jump("TavernKitchenBreakfastMelissaAmandaGerhard")))
         if tavern_breakfast_tease_ready():
             items.append(MenuItem("Заметить провокацию за столом", Jump("TavernKitchenBreakfastTease")))
-        if bool(globals().get("AmandaAIIntegrationEnabled", False)) and "amanda_ai_breakfast_intent_code" in globals():
-            amanda_intent = amanda_ai_breakfast_intent_code()
-            if amanda_intent:
-                items.append(MenuItem(amanda_ai_menu_label(amanda_intent), Call("AmandaAIIntentBreakfastEvent", amanda_intent)))
         soap_request_girl = tavern_breakfast_soap_request_girl()
         if soap_request_girl:
             items.append(MenuItem("Выслушать просьбу о мыле", Call("HouseholdSoapRequestEvent", soap_request_girl)))
@@ -845,10 +839,10 @@ init python:
     def tavern_breakfast_intro_line():
         present_ids = list(tavern_breakfast_present_ids() or [])
         if "sandra" in present_ids:
-            return "Вы садитесь на кухне и завтракаете горячей кашей, свежим хлебом и чем-то согревающим."
+            return "Вы садитесь за кухонный стол. Сандра ставит кашу, хлеб и горячую кружку без всяких церемоний: ешь, пока теплое, потом всем по делам."
         if len(present_ids) > 0:
-            return "Сандра к столу не вышла, так что завтрак сегодня собирают на скорую руку из того, что уже было на кухне: хлеба, вчерашней каши и чего-нибудь горячего из котла."
-        return "Сандра к столу не вышла, так что вы перебиваетесь на кухне тем, что удается наскоро собрать самому."
+            return "Сандра к столу не вышла, и завтрак выходит кривоватый: хлеб, вчерашняя каша и что-то горячее из котла, лишь бы брюхо не урчало."
+        return "Сандра к столу не вышла, так что вы сами шарите по кухне и перебиваетесь тем, что попалось под руку."
 
     def tavern_breakfast_barber_request_ids():
         rows = []
@@ -942,7 +936,45 @@ init python:
         return candidates[0]
 
     def tavern_kitchen_breakfast_picture():
+        candidates = [
+            "images/tavern/kitchen/kitchen_breakfast.jpg",
+            "images/kitchen/kitchen_breakfast.jpg",
+            "images/breakfast/tavent_girls.jpg",
+            "images/breakfast/amanda_b.png",
+        ]
+        for candidate in candidates:
+            if renpy.loadable(candidate):
+                return candidate
         return tavern_kitchen_event_picture("kitchen_breakfast")
+
+    def tavern_breakfast_tease_picture(girl_name="", tier=0):
+        key = str(girl_name or "").strip().lower()
+        if key == "amanda":
+            candidates = [
+                "images/breakfast/amanda_breakfast/amanda_tease_5.jpg",
+                "images/breakfast/amanda_breakfast/amanda_tease_4.jpg",
+                "images/breakfast/amanda_breakfast/amanda_tease_3.jpg",
+                "images/breakfast/amanda_breakfast/amanda_tease_2.jpg",
+                "images/breakfast/amanda_breakfast/amanda_tease_1.jpg",
+                "images/breakfast/amanda_breakfast/amanda_tease.jpg",
+            ]
+        elif key == "melissa":
+            candidates = [
+                "images/breakfast/melissa_breakfast/melissa breakfast_2.jpg",
+                "images/breakfast/melissa_breakfast/melissa breakfast.jpg",
+                "images/breakfast/melissa_breakfast/melissa_breakfast_1.jpg",
+                "images/breakfast/melissa_breakfast/melissa_breakfast.jpg",
+            ]
+        else:
+            candidates = [
+                "images/breakfast/tavern_girls_impregnat.jpg",
+                "images/breakfast/tavern_girls_impregnat_1.jpg",
+                "images/breakfast/tavent_girls.jpg",
+            ]
+        for candidate in candidates:
+            if renpy.loadable(candidate):
+                return candidate
+        return tavern_kitchen_breakfast_picture()
 
     def tavern_kitchen_sunday_dinner_picture():
         return tavern_kitchen_event_picture("kitchen_sundaydinnerAll_0")
@@ -1009,27 +1041,34 @@ init python:
         lines = []
         present_ids = tavern_breakfast_present_ids()
         lines.extend(list(tavern_breakfast_relaxed_appearance_lines() or []))
+        rat_problem = int(werecat_state().get("rats_problem_active", 0) or 0) == 1 or int(CurDay.get("rat_food_loss", 0) or 0) > 0
+        bats_stage = int(Melissa.bats_stage() or 0)
 
         if "sandra" in present_ids:
-            lines.append("Сандра привычно командует утренней возней и следит, чтобы никто не сидел без дела.")
-            lines.append("Сандра ворчит, что хороший дом держится на привычке вставать вовремя, а не на пустых обещаниях сделать все потом.")
+            lines.append("Сандра ставит миски так, будто гвозди забивает. \"Жуйте быстрее. Крысы сами из кладовой не уйдут, пол сам себя не вымоет, а гости с пустыми кружками ждать не любят.\"")
+            lines.append("Она ворчит, что трактир держится не на красивых речах, а на том, кто утром поднял задницу раньше прочих.")
+            if rat_problem:
+                lines.append("\"И еще раз говорю: у нас крысиная беда,\" бросает Сандра. \"Если эти твари опять доберутся до мешков, я кому-нибудь этой кашей прямо в уши налью.\"")
         if "melissa" in present_ids:
-            lines.append("Мелисса за завтраком становится разговорчивее обычного и успевает вставить пару тихих замечаний почти в любой разговор.")
-            lines.append("Мелисса негромко замечает, что утро в трактире ей нравится куда больше шумного вечера: в такие часы дом еще живет скорее общим хозяйством, чем трактирной суетой.")
-            if int(Melissa.var.get("bats_episode", 0) or 0) < 8:
-                if int(Melissa.var.get("bats_episode", 0) or 0) >= 4:
-                    lines.append("Мелисса устало признается, что после ночи под шуршащей крышей опять почти не выспалась. Теперь, когда источник на чердаке уже найден, она только спрашивает, когда вы наконец выкурите эту дрянь и заделаете щели.")
-                elif int(Melissa.var.get("bats_episode", 0) or 0) >= 3:
-                    lines.append("Мелисса жалуется, что ночью над ее комнатой опять кто-то возился под крышей, а из найденных щелей тянет сыростью. По ее виду ясно: выспаться ей толком снова не удалось.")
+            lines.append("Мелисса ест аккуратно, но язык у нее сегодня острый: успевает буркнуть и про пол, и про грязные кружки, и про то, кто опять ночью топал по коридору.")
+            if bats_stage < 8:
+                if bats_stage >= 4:
+                    lines.append("Мелисса трет глаза и зло тычет ложкой в кашу. \"Опять всю ночь под крышей шуршало. То крысы внизу, то летучие мыши наверху. У нас дом или проклятый курятник?\"")
+                elif bats_stage >= 3:
+                    lines.append("Мелисса жалуется, что ночью над ее комнатой снова возились под балками, а из щелей тянуло сыростью. По виду ясно: спала она мало и ругаться готова с первого слова.")
                 else:
-                    lines.append("Мелисса мрачно признается, что снова не выспалась: под потолком шуршало, а по балкам будто кто-то бегал почти до рассвета.")
+                    lines.append("Мелисса мрачно говорит, что под потолком шуршало до рассвета. \"Если это мыши, пусть подавятся. Если летучие мыши, пусть провалятся в ад.\"")
                 if "sandra" in present_ids:
-                    lines.append("Сандра сразу обещает поговорить с Герхардом о крыше и велит вам не тянуть с чердаком: сначала найти источник шума, потом уже решать, чем выкуривать эту дрянь и чем заделывать щели.")
+                    lines.append("Сандра коротко отвечает, что с чердаком надо кончать: сначала выгнать крылатую дрянь, потом заделать щели, а не чесать языком за кашей.")
             if int(Melissa.var.get("bats_episode", 0) or 0) >= 6 and "amanda" in present_ids:
                 lines.append("Стоит за столом всплыть слову \"чердак\", как Аманда многозначительно тянет: \"Главное, Стефан, теперь не падать сверху в чужие комнаты без стука.\" Мелисса тут же фыркает, но уголки ее губ все равно дрожат.")
         if "amanda" in present_ids:
-            lines.append("Аманда клюет завтрак быстрее всех и все время норовит отвлечься на болтовню.")
-            lines.append("Аманда с набитым ртом уверяет, что если кормить ее так каждое утро, то она готова даже меньше жаловаться на работу.")
+            lines.append("Аманда ест быстро, но все равно успевает строить рожи и цеплять всех подряд, будто завтрак без подколок ей в горло не лезет.")
+            lines.append("\"Крысы?\" Аманда пожимает плечом. \"Нужна кошечка. Только не простая. Есть одна такая, благородная, коготки чистые, носик вверх... Может, Клариссу в кладовую запереть?\"")
+            if rat_problem and "sandra" in present_ids:
+                lines.append("Сандра смотрит на нее так, что Аманда сразу утыкается в миску. \"Еще раз про чужих кошечек за столом мяукнешь, сама полезешь к крысам с веником.\"")
+        if "sandra" in present_ids and "melissa" in present_ids and "amanda" in present_ids and (rat_problem or bats_stage >= 3):
+            lines.append("Когда разговор снова съезжает на ночные шорохи и девичьи комнаты, Аманда хихикает слишком грязно, а Мелисса краснеет не вовремя. Сандра хлопает ладонью по столу: \"Пальцы из кисок вынули обе. Самоуспокоение закончится тем, что брат Герхард устроит вам дьявольское покаяние, а этого в доме никто не хочет.\"")
         if "becky" in present_ids:
             lines.append("Бекки охотно подхватывает кухонные сплетни и сразу оживляет стол.")
             lines.append("Бекки усмехается, что именно за такими утренними столами и решается, кто в доме на самом деле всем заправляет.")
@@ -1113,8 +1152,6 @@ label TavernKitchenBreakfast:
     $ _breakfast_morning_sick_girl = str(tavern_breakfast_morning_sickness_girl() or "")
     $ calendar_v2.advance_minutes(30)
     vscene tavern_kitchen_breakfast_picture()
-    if bool(AmandaAIIntegrationEnabled):
-        call AmandaMiniEventTry("TavernKitchen", "breakfast")
     python:
         _breakfast_lines = [
             tavern_breakfast_intro_line(),
@@ -1130,11 +1167,6 @@ label TavernKitchenBreakfast:
             or tavern_breakfast_amanda_attic_mock_ready()
             or tavern_breakfast_melissa_amanda_gerhard_ready()
             or tavern_breakfast_tease_ready()
-            or (
-                bool(globals().get("AmandaAIIntegrationEnabled", False))
-                and "amanda_ai_breakfast_intent_code" in globals()
-                and str(amanda_ai_breakfast_intent_code() or "").strip() != ""
-            )
             or str(tavern_breakfast_soap_request_girl() or "").strip() != ""
             or str(tavern_breakfast_dress_request_girl() or "").strip() != ""
             or household_barber_request_ready("sandra", "breakfast")
@@ -1178,9 +1210,7 @@ label TavernKitchenBreakfast:
     $ TavernKitchenSavedText = str(MainTxt or "")
     call stat
     if _breakfast_morning_sick_girl != "":
-        hide screen main_ui
         call CheckDailyEvent(_breakfast_morning_sick_girl, "MorningSickness", "TavernKitchen", 0)
-    hide screen main_ui
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
     return
 
@@ -1245,7 +1275,7 @@ label TavernKitchenBreakfastHearDialogue:
     else:
         $ MainTxt = "За столом на миг воцаряется обычная утренняя болтовня без чего-то особенно примечательного."
     if int(_talk_arousal or 0) > 0:
-        $ Arousal["You"] = max(0, min(100, int(Arousal.get("You", 0) or 0) + int(_talk_arousal or 0)))
+        $ player_apply_arousal_trigger("breakfast_talk", int(_talk_arousal or 0))
         $ MainTxt = str(MainTxt or "") + "\nЭтот разговор слишком легко цепляет и вас самих: утреннее возбуждение только сильнее мешает делать вид, будто вы слушаете все это совсем спокойно."
     $ CurLocDesc = MainTxt
     if int(_talk_arousal or 0) > 0:
@@ -1255,9 +1285,9 @@ label TavernKitchenBreakfastHearDialogue:
 
 
 label TavernKitchenBreakfastAmandaAltCure1:
-    $ AmandaVar["attic_window_breakfast_bj_day"] = int(dayspassed or 0)
-    $ Arousal["You"] = max(35, int(Arousal.get("You", 0) or 0))
-    $ Arousal["amanda"] = max(30, int(Arousal.get("amanda", 0) or 0))
+    $ Amanda.var["attic_window_breakfast_bj_day"] = int(dayspassed or 0)
+    $ player_apply_arousal_trigger("breakfast_amanda_alt_cure", max(0, 35 - int(player_state(False).intimacy.arousal_value("You") or 0)))
+    $ Amanda.set_arousal(max(30, int(Amanda.arousal_value() or 0)))
     $ MainTxt = "За общим столом Аманда сегодня на редкость притихла. Несколько раз она украдкой встречается с вами взглядом, потом криво улыбается и будто невзначай касается вашей ноги под столом. Колкость про Мелиссу так и не срывается с ее языка.\n\nЧерез пару минут ее ступня уже гладит вас куда смелее, а сама она наклоняется ближе и почти беззвучно шепчет, что после той неловкой истории с окном ей почему-то самой теперь труднее делать вид, будто ничего такого в доме не бывает.\n\nПока остальные заняты едой и разговорами, Аманда незаметно скользит ниже под край стола и решает загладить свою дерзость способом куда приятнее обычных извинений."
     $ CurLocDesc = MainTxt
     call IntAmandaSex("amanda", "home", "minet")
@@ -1271,7 +1301,7 @@ label TavernKitchenBreakfastAmandaAltCure1:
 label TavernKitchenBreakfastAmandaAtticMock:
     if not tavern_breakfast_amanda_attic_mock_ready():
         jump TavernKitchenBreakfastMenu
-    $ AmandaVar["attic_mock_response_day"] = int(dayspassed or 0)
+    $ Amanda.var["attic_mock_response_day"] = int(dayspassed or 0)
     $ MainTxt = "Стоит за завтраком снова всплыть слову \"чердак\", Аманда тут же цепляет вас взглядом и слишком невинно спрашивает, не собираетесь ли вы опять падать туда, куда приличные люди хотя бы стучатся."
     $ CurLocDesc = MainTxt
     $ _attic_items = [
@@ -1285,10 +1315,9 @@ label TavernKitchenBreakfastAmandaAtticMock:
 
 
 label TavernKitchenBreakfastAmandaAtticExpose:
-    $ AmandaVar["attic_mock_exposed"] = 1
-    $ AmandaVar["attic_mock_stopped"] = 1
-    $ sluttiness["amanda"] = min(100, int(sluttiness.get("amanda", 0) or 0) + 1)
-    $ otkroven["amanda"] = min(20, int(otkroven.get("amanda", 0) or 0) + 1)
+    $ Amanda.var["attic_mock_exposed"] = 1
+    $ Amanda.var["attic_mock_stopped"] = 1
+    $ Amanda.change_social(open_delta=1, corruption_delta=1)
     $ MainTxt = "Вы спокойно отвечаете, что если Аманда так любит шутить про чердак, можно сразу рассказать всем, откуда она сама высматривала тот же двор. За столом становится тише. Аманда краснеет, дергает плечом и больше к этой теме за завтраком не возвращается."
     $ CurLocDesc = MainTxt
     call stat
@@ -1299,10 +1328,10 @@ label TavernKitchenBreakfastAmandaAtticExpose:
 label TavernKitchenBreakfastMelissaAmandaGerhard:
     if not tavern_breakfast_melissa_amanda_gerhard_ready():
         jump TavernKitchenBreakfastMenu
-    $ MainTxt = "Сладкая добавка к утренней еде делает разговор заметно мягче и одновременно опаснее. Сандры за столом нет, и Мелисса, сперва будто бы говоря о комнате, вдруг косится на Аманду.\n\n\"Некоторым, похоже, и шуршания под крышей не нужны, чтобы по ночам не спать,\" замечает она слишком невинно. \"У Аманды в комнате иногда тоже такое возится, будто кто-то сам себе мешает уснуть.\"\n\nАманда тут же вскидывает брови и улыбается так же сладко: \"О! А ты, дорогая, значит, точно знаешь, что это за звуки? Сама тоже так делаешь?\""
+    $ MainTxt = "Завтрак еще не успевает толком начаться, как Сандра снова заводит про кладовую.\n\n\"Крысы лезут к мешкам, будто им там ярмарку открыли,\" ворчит она. \"Еще пара таких ночей, и мы будем кормить не гостей, а хвостатую сволочь.\"\n\nМелисса тут же подхватывает, злая и невыспавшаяся: \"Крысы снизу, летучие мыши сверху, по крыше шуршит, по стенам скребет. Я ночью уже не знаю, то ли одеялом накрываться, то ли метлой отбиваться.\"\n\nАманда усмехается в миску. \"Так заведите кошечку. Только не простую. Клариссу, например. Пусть эта благородная киска в кладовой помурлычет, может, крысы от стыда сами уйдут.\"\n\nМелисса фыркает слишком громко, а Аманда смотрит на нее так, будто специально ждет грязной догадки. Сандра тут же хлопает ладонью по столу.\n\n\"Хватит мне ваших кошечек, кисок и ночных воздыханий,\" срезает она. \"Пальцы из пизд вынули обе и слушайте старших. Самоуспокоение закончится тем, что брат Герхард устроит вам дьявольское покаяние, а этого в доме никто не хочет. Крысы, мыши и чердак — вот о чем речь, а не о ваших мокрых фантазиях.\""
     $ CurLocDesc = MainTxt
     $ _melissa_amanda_items = [
-        MenuItem("Сказать, что это естественно", Jump("TavernKitchenBreakfastMelissaAmandaGerhardNatural")),
+        MenuItem("Сказать, что сначала надо решить крыс и чердак", Jump("TavernKitchenBreakfastMelissaAmandaGerhardNatural")),
         MenuItem("Не лезть в девичью перепалку", Jump("TavernKitchenBreakfastMenu")),
     ]
     call QueuePagedPanelText(MainTxt, "Спор за завтраком", _melissa_amanda_items, "plain")
@@ -1316,7 +1345,7 @@ label TavernKitchenBreakfastMelissaAmandaGerhardNatural:
     $ TavernBreakfastMelissaAmandaGerhardDay = int(dayspassed or 0)
     $ Melissa.change_social(friend_delta=1, open_delta=1)
     $ Amanda.change_social(friend_delta=1, open_delta=1)
-    $ MainTxt = "Вы спокойно обрываете перепалку и говорите, что в этом нет ни ведьмовства, ни особой тайны: почти все так делают, просто не все любят, когда их ловят на звуках и намеках.\n\nАманда победно смотрит на Мелиссу: \"Слышала? Все делают. Значит, нечего строить из себя святую кошку у чужой кровати.\" Мелисса краснеет, но не отступает: \"Я не об этом говорила. Если в твоей комнате теперь ночую я, мне тоже надо понимать, что там происходит.\"\n\nСпор быстро возвращается к настоящей причине: Мелиссе все еще некуда нормально спать, чердак над ее комнатой все еще испорчен, а после истории с падением и окном никто уже не может делать вид, будто вопрос решится сам собой.\n\nНа шум в кухню наконец заглядывает Сандра. Аманда и Мелисса наперебой пересказывают ей вашу фразу про то, что все это естественно, и Сандра краснеет так густо, будто ее застали за чем-то куда хуже обычного разговора. Но от темы она не уходит.\n\n\"Ладно,\" выдавливает она, глядя мимо всех сразу. \"Про такое с девками тоже надо говорить прямо, раз уж дом у нас дошел до таких разговоров. И с братом Герхардом насчет комнаты Мелиссы я тоже поговорю. Только без ваших ухмылок, поняли?\""
+    $ MainTxt = "Вы обрываете спор и говорите, что сначала надо разобраться с настоящей грязью: крысы в кладовой, летучие мыши под крышей, щели на чердаке. Остальное за столом можно оставить для тех часов, когда дом не трещит по углам.\n\nСандра хмуро кивает. \"Вот это дело. Сначала хозяйство, потом девичьи смешки. Мелисса, хватит ныть — покажешь, где сильнее всего шуршит. Аманда, хватит мяукать про Клариссу — пойдешь помогать, если надо будет таскать тряпки и доски.\"\n\nАманда закатывает глаза, но спорить уже не решается. Мелисса бурчит себе под нос, зато видно: ей стало легче от того, что проблему наконец назвали вслух, а не превратили в очередную кухонную шутку.\n\nСандра под конец все равно добавляет, не удержавшись: \"И чтоб я ночью не слышала, как кто-то вместо сна себя утешает. Я вам не монастырь держу, но если брат Герхард услышит такие стоны, дьявола он будет искать не на чердаке.\""
     $ CurLocDesc = MainTxt
     call stat
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
@@ -1324,7 +1353,7 @@ label TavernKitchenBreakfastMelissaAmandaGerhardNatural:
 
 
 label TavernKitchenBreakfastAmandaAtticStop:
-    $ AmandaVar["attic_mock_stopped"] = 1
+    $ Amanda.var["attic_mock_stopped"] = 1
     $ Amanda.change_social(friend_delta=1)
     $ MainTxt = "Вы наклоняетесь ближе и коротко говорите Аманде, что эту шутку пора оставить при себе. Она еще секунду держит дерзкий вид, потом опускает глаза к тарелке и тихо фыркает: \"Ладно. Поняла.\" После этого тема чердака за столом глохнет сама собой."
     $ CurLocDesc = MainTxt
@@ -1340,9 +1369,12 @@ label TavernKitchenBreakfastTease:
     if _tease_girl == "":
         jump TavernKitchenBreakfastMenu
     if _tease_girl == "amanda":
-        $ AmandaVar["breakfast_tease_day"] = int(dayspassed or 0)
+        $ Amanda.var["breakfast_tease_day"] = int(dayspassed or 0)
     else:
         $ Melissa.var["breakfast_tease_day"] = int(dayspassed or 0)
+    $ _breakfast_tease_picture = tavern_breakfast_tease_picture(_tease_girl, _tease_tier)
+    if str(_breakfast_tease_picture or "").strip():
+        vscene _breakfast_tease_picture
     if _tease_tier >= 4:
         $ MainTxt = "{} приходит к завтраку настолько по-домашнему небрежной, что это уже похоже не на случайность, а на проверку ваших границ. Ночная ткань или плохо запахнутый домашний наряд оставляют слишком много поводов для взгляда, и она прекрасно видит, что вы это заметили.".format(RealName.get(_tease_girl, _tease_girl))
         if int(Clara.var.get("booklet_market_seen", 0) or 0) == 1 or int(Clara.var.get("drawings_secret_known", 0) or 0) == 1:
@@ -1353,12 +1385,19 @@ label TavernKitchenBreakfastTease:
         $ MainTxt = "{} будто случайно садится смелее обычного: колено уходит в сторону, юбка натягивается, и вся поза становится скорее вызовом, чем неловкостью.".format(RealName.get(_tease_girl, _tease_girl))
     else:
         $ MainTxt = "{} незаметно приподнимает край юбки ровно настолько, чтобы вы успели заметить белье, а потом с невинным видом возвращается к завтраку.".format(RealName.get(_tease_girl, _tease_girl))
-    $ Arousal["You"] = max(0, min(100, int(Arousal.get("You", 0) or 0) + 5 + _tease_tier))
-    $ Arousal[_tease_girl] = max(0, min(100, int(Arousal.get(_tease_girl, 0) or 0) + 3 + _tease_tier))
-    $ sluttiness[_tease_girl] = min(100, int(sluttiness.get(_tease_girl, 0) or 0) + 1)
+    $ player_apply_arousal_trigger("breakfast_tease", 5 + _tease_tier)
+    $ _tease_info = getPersonInfo(_tease_girl)
+    if _tease_info is not None:
+        $ _tease_info.add_arousal(3 + _tease_tier)
+        $ _tease_info.change_social(corruption_delta=1)
     $ CurLocDesc = MainTxt
     call stat
-    if int(HadSex.get(_tease_girl, 0) or 0) > 0 or (_tease_girl == "amanda" and (int(AmandaVar.get("suckyou", 0) or 0) == 1 or int(AmandaVar.get("fuckyou", 0) or 0) == 1)) or (_tease_girl == "melissa" and int(Melissa.var.get("sex_engine_unlocked", 0) or 0) == 1):
+    $ _tease_private_unlocked = bool(_tease_info is not None and people_to_int(_tease_info.sex_stat("sexacts", 0), 0) > 0)
+    if _tease_girl == "amanda":
+        $ _tease_private_unlocked = _tease_private_unlocked or Amanda.var_int("suckyou", 0) == 1 or Amanda.var_int("fuckyou", 0) == 1
+    elif _tease_girl == "melissa":
+        $ _tease_private_unlocked = _tease_private_unlocked or people_to_int(Melissa.var.get("sex_engine_unlocked", 0), 0) == 1
+    if _tease_private_unlocked:
         $ _tease_items = [
             MenuItem("Намекнуть на склад после завтрака", Call("TavernKitchenBreakfastTeasePrivate", _tease_girl, "storage")),
             MenuItem("Намекнуть на сарай после завтрака", Call("TavernKitchenBreakfastTeasePrivate", _tease_girl, "shed")),
@@ -1507,9 +1546,9 @@ label TavernKitchenBreakfastServeSpicyDrink:
 label TavernKitchenBreakfastBlindPirateStory:
     $ BlindPirateBreakfastPending = 0
     $ TavernBreakfastBlindPirateTeamPledge = 1
-    $ AmandaVar["barber_request_interest"] = 1
-    $ AmandaVar["beauty_help_terms_accepted"] = 1
-    $ AmandaVar["beauty_help_approved_day"] = int(dayspassed or 0)
+    $ Amanda.set_var_int("barber_request_interest", 1)
+    $ Amanda.set_var_int("beauty_help_terms_accepted", 1)
+    $ Amanda.set_var_int("beauty_help_approved_day", int(dayspassed or 0))
     $ MainTxt = tavern_breakfast_blind_pirate_story_text()
     $ CurLocDesc = MainTxt
     $ player.change_stat("fun", 5)
@@ -1531,10 +1570,10 @@ label TavernKitchenBreakfastAnnounceGeorgetteLiza:
         $ MainTxt = str(MainTxt or "") + "\n\nБекки хмуро косится на остальных и, похоже, предпочитает не подливать масла в огонь: вдова слишком хорошо знает, как быстро в городе рушатся дома, где хозяин теряет хватку."
     $ MainTxt = str(MainTxt or "") + "\n\nЖоржетта держится с показным достоинством, а Лизетта жмется к матери чуть ближе обычного. Вы же на этом обрываете завтрак и даете понять, что разговор окончен."
     $ CurLocDesc = MainTxt
-    $ rebellion = max(0, int(rebellion or 0) - 1)
-    $ neshlush["sandra"] = max(0, int(neshlush.get("sandra", 0) or 0) - 1)
-    $ neshlush["melissa"] = max(0, int(neshlush.get("melissa", 0) or 0) - 1)
-    $ neshlush["amanda"] = max(0, int(neshlush.get("amanda", 0) or 0) - 1)
+    $ player.change_stat("rebellion", -1)
+    $ Sandra.change_rebellion(-1, "breakfast_georgette_liza_order")
+    $ Melissa.change_rebellion(-1, "breakfast_georgette_liza_order")
+    $ Amanda.change_rebellion(-1, "breakfast_georgette_liza_order")
     $ player.change_stat("fun", 1)
     call stat
     call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
@@ -1584,7 +1623,6 @@ label TavernKitchenSundayDinnerMenu:
     if not tavern_sunday_dinner_can_serve_spicy_tincture():
         call TavernKitchenSundayDinner
         return
-    hide screen main_ui
     menu:
         "Воскресный обед"
         "Сесть за воскресный обед":
@@ -1605,7 +1643,6 @@ label TavernKitchenSundayDinner(serve_spicy=0):
         $ CurLocDesc = MainTxt
         call TavernKitchenBuildActions
         return
-    hide screen main_ui
     $ TavernSundayDinnerLastDay = int(dayspassed or 0)
     $ calendar_v2.advance_minutes(45)
     vscene tavern_kitchen_sunday_dinner_picture()
@@ -1637,5 +1674,3 @@ label TavernKitchenSundayDinner(serve_spicy=0):
     call TavernKitchenBuildActions
     show screen main_ui
     return
-
-

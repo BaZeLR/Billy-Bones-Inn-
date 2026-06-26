@@ -99,7 +99,7 @@ init python:
                 dative="Луизе",
                 default_location="HunterClub",
                 description="Луиза - полная городская знакомая из охотничьей лавки и городских социальных сцен.",
-                age=28,
+                birth_date={"day": 1, "period": 1, "cycle": 1072},
             )
 
     class LuisaInfo(BaseNPC):
@@ -129,7 +129,7 @@ init python:
                 dative="Серджио",
                 default_location="ArtisansQuarter",
                 description="Серджио - цирюльник из квартала ремесленников, связан с тайными визитами столичного жениха Клариссы.",
-                age=35,
+                birth_date={"day": 1, "period": 1, "cycle": 1065},
             )
 
     class SergioInfo(BaseNPC):
@@ -160,7 +160,7 @@ init python:
                 dative="Лукасу",
                 default_location="BeckyHome",
                 description="Лукас - ухажер и жених Ингенборг Блэнкеншип.",
-                age=23,
+                birth_date={"day": 1, "period": 1, "cycle": 1077},
             )
 
     class LucasInfo(BaseNPC):
@@ -190,7 +190,7 @@ init python:
                 dative="столичному жениху Клариссы",
                 default_location="",
                 description="Столичный жених Клариссы - молодой дворянин из договоренности семьи Легаре.",
-                age=24,
+                birth_date={"day": 1, "period": 1, "cycle": 1076},
             )
 
     class ClaraFianceInfo(BaseNPC):
@@ -220,7 +220,6 @@ init python:
                 dative="питомцу Серджио",
                 default_location="BarberShop",
                 description="Питомец Серджио - второстепенная сущность для будущих сцен цирюльни.",
-                age=0,
             )
 
     class SergioPetInfo(BaseNPC):
@@ -250,7 +249,7 @@ init python:
                 dative="брату Герхарду",
                 default_location="Church",
                 description="Брат Герхард - священник городского храма, принимает исповеди и ведет воскресные наставления.",
-                age=48,
+                birth_date={"day": 1, "period": 1, "cycle": 1052},
                 portrait="images/gerhard/portrait.png",
             )
 
@@ -277,21 +276,21 @@ init python:
         return {
             "eddie": {
                 "names": ("Эдди", "Эдди", "Эдди"),
-                "age": 17,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1083},
                 "location": "GroceryStore",
                 "description": "Эдди - сын Ребекки, подросток и помощник в бакалейной лавке. Связан с событиями Бекки, Жоржетты и Лукаса.",
                 "known": False,
             },
             "alber": {
                 "names": ("Альбер", "Альбера", "Альберу"),
-                "age": 36,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1064},
                 "location": "WineStore",
                 "description": "Мессир Альбер Легаре - хозяин винного погребка, женат, у него большая семья.",
                 "known": False,
             },
             "fran": {
                 "names": ("Франческа", "Франчески", "Франческе"),
-                "age": 52,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1048},
                 "location": "EllonaTemple",
                 "description": "Франческа - жрица Эллоны, встречает прихожан в храме и помогает роженицам.",
                 "known": False,
@@ -299,7 +298,7 @@ init python:
             },
             "robin": {
                 "names": ("Робин", "Робина", "Робину"),
-                "age": 30,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1070},
                 "location": "BlackwoodRoad",
                 "description": "Робин - предводитель лесных обездоленных.",
                 "known": False,
@@ -307,21 +306,21 @@ init python:
             },
             "mongol": {
                 "names": ("Монгол", "Монгола", "Монголу"),
-                "age": 39,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1061},
             "location": "",
             "description": "Монгол - торговец лошадьми на рынке.",
             "known": False,
         },
             "zimmer": {
                 "names": ("Десятник Циммерман", "Десятника Циммермана", "Десятнику Циммерману"),
-                "age": 58,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1042},
                 "location": "CityGuard",
                 "description": "Десятник Циммерман - начальник городской стражи.",
                 "known": False,
             },
             "draupnir": {
                 "names": ("Драупнир", "Драупнира", "Драупниру"),
-                "age": 45,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1055},
                 "location": "StolyarWorkshop",
                 "description": "Драупнир - гном-столяр из квартала ремесленников. Дерет дорого, но вывески, отверстия, глорихолы, зольные бочки и будки делает на совесть.",
                 "known": False,
@@ -329,7 +328,7 @@ init python:
             },
             "luisa": {
                 "names": ("Луиза", "Луизы", "Луизе"),
-                "age": 28,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1072},
                 "location": "HunterClub",
                 "description": "Луиза - полная городская знакомая из охотничьей лавки и городских социальных сцен.",
                 "known": False,
@@ -337,7 +336,7 @@ init python:
             },
             "sergio": {
                 "names": ("Серджио", "Серджио", "Серджио"),
-                "age": 35,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1065},
                 "location": "ArtisansQuarter",
                 "description": "Серджио - цирюльник из квартала ремесленников.",
                 "known": False,
@@ -345,7 +344,7 @@ init python:
             },
             "lucas": {
                 "names": ("Лукас", "Лукаса", "Лукасу"),
-                "age": 23,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1077},
                 "location": "BeckyHome",
                 "description": "Лукас - ухажер и жених Ингенборг Блэнкеншип.",
                 "known": False,
@@ -353,7 +352,7 @@ init python:
             },
             "clara_fiance": {
                 "names": ("Столичный жених", "столичного жениха", "столичному жениху"),
-                "age": 24,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1076},
                 "location": "",
                 "description": "Столичный жених Клариссы - молодой дворянин из договоренности семьи Легаре.",
                 "known": False,
@@ -361,7 +360,6 @@ init python:
             },
             "sergio_pet": {
                 "names": ("Питомец Серджио", "питомца Серджио", "питомцу Серджио"),
-                "age": 0,
                 "location": "BarberShop",
                 "description": "Питомец Серджио - второстепенная сущность для будущих сцен цирюльни.",
                 "known": False,
@@ -369,7 +367,7 @@ init python:
             },
             "gerhard": {
                 "names": ("Брат Герхард", "брата Герхарда", "брату Герхарду"),
-                "age": 48,
+                "birth_date": {"day": 1, "period": 1, "cycle": 1052},
                 "location": "Church",
                 "description": "Брат Герхард - священник городского храма, принимает исповеди и ведет воскресные наставления.",
                 "known": False,
@@ -381,26 +379,7 @@ init python:
         profiles = secondary_npc_default_profiles()
         for npc_key, row in profiles.items():
             n1, n2, n3 = row.get("names", (npc_key, npc_key, npc_key))
-            RealName[npc_key] = str(n1)
-            RealName2[npc_key] = str(n2)
-            RealName3[npc_key] = str(n3)
-            age_girls[npc_key] = int(row.get("age", 0) or 0)
-            girltextdesc[npc_key] = str(row.get("description", "") or "")
-            CurrentLoc[npc_key] = str(row.get("location", "") or "")
-            Friends[npc_key] = int(Friends.get(npc_key, 0) or 0)
-            knowsMC[npc_key] = bool(row.get("known", False))
-            kids[npc_key] = int(kids.get(npc_key, 0) or 0)
-            beauty[npc_key] = int(beauty.get(npc_key, 0) or 0)
-            sluttiness[npc_key] = int(sluttiness.get(npc_key, 0) or 0)
-            otkroven[npc_key] = int(otkroven.get(npc_key, 0) or 0)
-            cooking[npc_key] = int(cooking.get(npc_key, 0) or 0)
-            cleaning[npc_key] = int(cleaning.get(npc_key, 0) or 0)
-            waitress[npc_key] = int(waitress.get(npc_key, 0) or 0)
-            jobkitchen[npc_key] = int(jobkitchen.get(npc_key, 0) or 0)
-            jobcleaning[npc_key] = int(jobcleaning.get(npc_key, 0) or 0)
-            jobwaitress[npc_key] = int(jobwaitress.get(npc_key, 0) or 0)
-            jobwhore[npc_key] = int(jobwhore.get(npc_key, 0) or 0)
-            jobgloryhole[npc_key] = int(jobgloryhole.get(npc_key, 0) or 0)
+            _secondary_location = str(row.get("location", "") or "")
             var_table = row.get("var", {})
             if npc_key == "robin":
                 peopleData[npc_key] = RobinStaticData
@@ -428,12 +407,19 @@ init python:
                 peopleData[npc_key] = ClaraFianceStaticData
             if npc_key == "sergio_pet":
                 peopleData[npc_key] = SergioPetStaticData
+            if npc_key in peopleData:
+                peopleData[npc_key].default_location = _secondary_location
             if npc_key == "alber":
                 peopleInfo[npc_key] = Alber
                 peopleInfo[npc_key].update()
             elif npc_key in peopleInfo and isinstance(peopleInfo[npc_key], PeopleInfo):
                 peopleInfo[npc_key].var = var_table
                 peopleInfo[npc_key].update()
+            else:
+                peopleInfo[npc_key] = BaseNPC(npc_key, var=var_table)
+                peopleInfo[npc_key].update()
+            peopleInfo[npc_key].known = bool(row.get("known", False))
+            peopleInfo[npc_key].location = _secondary_location
         return profiles
 
 define GerhardStaticData = GerhardData()
@@ -450,7 +436,6 @@ define SergioPetStaticData = SergioPetData()
 default SergioPet = SergioPetInfo()
 
 label register_gerhard_secondary:
-    $ knowsMC.setdefault("gerhard", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["gerhard"] = GerhardStaticData
@@ -471,7 +456,6 @@ label _auto_register_gerhard:
 
 
 label register_luisa_secondary:
-    $ knowsMC.setdefault("luisa", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["luisa"] = LuisaStaticData
@@ -488,7 +472,6 @@ label register_luisa_secondary:
 
 
 label register_sergio_secondary:
-    $ knowsMC.setdefault("sergio", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["sergio"] = SergioStaticData
@@ -515,7 +498,6 @@ label _auto_register_sergio:
 
 
 label register_lucas_secondary:
-    $ knowsMC.setdefault("lucas", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["lucas"] = LucasStaticData
@@ -531,7 +513,6 @@ label register_lucas_secondary:
 
 
 label register_clara_fiance_secondary:
-    $ knowsMC.setdefault("clara_fiance", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["clara_fiance"] = ClaraFianceStaticData
@@ -547,7 +528,6 @@ label register_clara_fiance_secondary:
 
 
 label register_sergio_pet_secondary:
-    $ knowsMC.setdefault("sergio_pet", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["sergio_pet"] = SergioPetStaticData

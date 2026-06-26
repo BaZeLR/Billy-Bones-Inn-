@@ -38,21 +38,14 @@ init python:
             RoomExit(label="Вернуться в порт", target="PortStreets"),
         ],
         game_items=[
-            GameObject(
-                object_id="cloister",
-                name="Дворик-клуатр",
-                description="Небольшой дворик с изваянием Эллоны и фресками на стенах.",
-                actions=[
-                    ObjectAction(action_id="inspect_cloister", label="Осмотреть дворик-клуатр", hook="call", target="EllonaTempleMenu"),
-                ],
-            ),
             "birth_room_door_001",
         ],
-        schedule=RoomSchedule([1, 2, 3, 4, 5, 6, 7], [], "", None, "00:00", "23:59"),
+        action_menus=[
+            RoomAction(action_id="inspect_cloister", label="Осмотреть дворик-клуатр", hook="call", target="EllonaTempleMenu"),
+        ],
+        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], start="00:00", end="23:59"),
         custom_properties={
             "temple_open_always": True,
-            "object_menu_label": "ellona_room_object_menu",
-            "object_menu_args": ("EllonaTemple",),
         },
     )
 
@@ -70,38 +63,18 @@ init python:
             RoomExit(label="Вернуться во дворик храма", target="EllonaTemple"),
         ],
         game_items=[
-            GameObject(
-                object_id="birth_room_decor",
-                name="Убранство родильной комнаты",
-                description="Ложе, полотенца, кувшины и картины, приготовленные для принятия родов.",
-                actions=[
-                    ObjectAction(action_id="inspect_birth_room", label="Осмотреть убранство родильной комнаты", hook="call", target="EllonaBirthRoomMenu"),
-                ],
-            ),
         ],
-        schedule=RoomSchedule([1, 2, 3, 4, 5, 6, 7], [], "", None, "00:00", "23:59"),
+        action_menus=[
+            RoomAction(action_id="inspect_birth_room", label="Осмотреть убранство родильной комнаты", hook="call", target="EllonaBirthRoomMenu"),
+        ],
+        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], start="00:00", end="23:59"),
         custom_properties={
             "birth_room": True,
-            "object_menu_label": "ellona_room_object_menu",
-            "object_menu_args": ("EllonaBirthRoom",),
         },
     )
 
-    def ellona_get_room_object(room_obj, object_id):
-        object_key = str(object_id or "").strip()
-        if object_key == "birth_room_door_001":
-            return get_game_object(object_key)
-        for room_object in room_obj.visible_game_items():
-            if getattr(room_object, "object_id", "") == object_key:
-                return room_object
-        return None
-
-default ellona_room_object_menu_room_code = "EllonaTemple"
-default ellona_room_object_menu_object_id = ""
-
 label EllonaTemple:
     scene black
-    call EnterLocation("EllonaTemple")
     $ CurrentRoom = EllonaTempleRoom
     $ CurLoc = "EllonaTemple"
     $ location = CurLoc
@@ -111,8 +84,6 @@ label EllonaTemple:
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
-    $ current_girl_key = ""
-    $ current_object_id = ""
     $ _room = EllonaTempleRoom
     python:
         _room_desc_rows = _room.visible_descriptions()
@@ -135,7 +106,7 @@ label EllonaTemple:
     else:
         call ShowImageSeq("ellona", "", "Fran", 4)
 
-    call EllonaBuildActions("EllonaTemple")
+    $ current_action_items = CurrentRoom.build_action_items() + CurrentRoom.build_exit_items()
     $ _ellona_temple_ui_return = None
     while _ellona_temple_ui_return is None:
         call screen main_ui
@@ -147,7 +118,6 @@ label EllonaBirthRoom:
     scene black
     if Francheska.busy_now():
         jump EllonaTemple
-    call EnterLocation("EllonaBirthRoom")
     $ CurrentRoom = EllonaBirthRoomRoom
     $ CurLoc = "EllonaBirthRoom"
     $ location = CurLoc
@@ -157,8 +127,6 @@ label EllonaBirthRoom:
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
-    $ current_girl_key = ""
-    $ current_object_id = ""
     $ _room = EllonaBirthRoomRoom
 
     $ CurLocDesc = _room.descriptions[0].text
@@ -167,103 +135,9 @@ label EllonaBirthRoom:
     if Francheska.visible_now():
         call ShowImageSeq("ellona", "", "Fran", 4)
 
-    call EllonaBuildActions("EllonaBirthRoom")
+    $ current_action_items = CurrentRoom.build_action_items() + CurrentRoom.build_exit_items()
     $ _ellona_birth_ui_return = None
     while _ellona_birth_ui_return is None:
         call screen main_ui
         $ _ellona_birth_ui_return = _return
     jump EllonaBirthRoom
-
-
-label EllonaBuildActions(room_code="EllonaTemple"):
-    if str(room_code or "") == "EllonaBirthRoom":
-        $ _room = EllonaBirthRoomRoom
-    else:
-        $ _room = EllonaTempleRoom
-
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-
-    python:
-        for _room_object in _room.visible_game_items():
-            current_action_items.append(MenuItem(_room_object.name, Call("ellona_room_object_menu", room_code, _room_object.object_id)))
-        for _npc_id in getNPCids(_room.code_name):
-            _npc_id = str(_npc_id or "").strip()
-            _room_npc = getPersonInfo(_npc_id)
-            if _npc_id and _room_npc is not None and npc_room_interaction_visible(_npc_id, _room.code_name):
-                _npc_name = str(npc_display_name(_npc_id) or RealName.get(_npc_id, _npc_id) or _npc_id)
-                _talk_label = str(npc_talk_label(_npc_id) or "")
-                if _talk_label and renpy.has_label(_talk_label):
-                    current_action_items.append(MenuItem(_npc_name, Call(_talk_label)))
-        for _room_exit in _room.visible_exits():
-            current_action_items.append(MenuItem(_room_exit.label, Jump(_room_exit.target)))
-
-    return
-
-
-label ellona_room_object_menu(room_code="", object_id=""):
-    if str(room_code or "") != "":
-        $ ellona_room_object_menu_room_code = room_code
-    if str(object_id or "") != "":
-        $ ellona_room_object_menu_object_id = object_id
-    $ room_code = str(ellona_room_object_menu_room_code or "EllonaTemple")
-    $ object_id = str(ellona_room_object_menu_object_id or "")
-    if object_id == "":
-        call EllonaBuildActions(room_code)
-        return
-    if str(room_code or "") == "EllonaBirthRoom":
-        $ _room = EllonaBirthRoomRoom
-    else:
-        $ _room = EllonaTempleRoom
-    $ _room_object = ellona_get_room_object(_room, object_id)
-    if _room_object is None:
-        call EllonaBuildActions(room_code)
-        return
-
-    $ MainTxt = _room_object.description
-    $ CurLocDesc = MainTxt
-    $ current_action_title = _room_object.name
-    $ current_action_content = None
-    $ current_action_items = []
-
-    python:
-        for _room_action in _room_object.visible_actions():
-            if _room_action.hook == "text":
-                current_action_items.append(MenuItem(_room_action.label, Call("EllonaRoomObjectText", room_code, object_id, _room_action.action_id)))
-            elif _room_action.hook == "call" and _room_action.target != "":
-                _room_args = tuple(getattr(_room_action, "args", ()) or ())
-                current_action_items.append(MenuItem(_room_action.label, Call(_room_action.target, *_room_args)))
-            elif _room_action.hook == "jump" and _room_action.target != "":
-                current_action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
-
-    $ current_action_items.append(MenuItem("Назад", Call("EllonaBuildActions", room_code)))
-    return
-
-
-label EllonaRoomObjectText(room_code="", object_id="", action_id=""):
-    python:
-        _room = EllonaBirthRoomRoom if str(room_code or "") == "EllonaBirthRoom" else EllonaTempleRoom
-        _object_text = ""
-        _object_name = ""
-        for _room_object in _room.visible_game_items():
-            if getattr(_room_object, "object_id", "") != str(object_id or ""):
-                continue
-            _object_name = str(getattr(_room_object, "name", "") or "")
-            for _room_action in _room_object.visible_actions():
-                if getattr(_room_action, "action_id", "") == str(action_id or ""):
-                    _object_text = str(_room_action.target or "")
-                    break
-            break
-        if str(object_id or "") == "birth_room_door_001" and str(action_id or "") == "examine_birth_room_door" and Francheska.busy_now():
-            _object_text = "Дверь родильной закрыта. За ней слышны стоны и короткие распоряжения Франчески: жрица занята родами, и внутрь сейчас не пройти."
-        if _object_text:
-            MainTxt = _object_text
-            CurLocDesc = _object_text
-            current_action_title = _object_name or "Действия"
-
-    if str(object_id or "") == "birth_room_door_001" and str(action_id or "") == "examine_birth_room_door" and Francheska.busy_now():
-        vscene "images/ellona/afterBirth.png"
-
-    call ellona_room_object_menu(room_code, object_id)
-    return

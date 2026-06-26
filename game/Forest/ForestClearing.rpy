@@ -6,7 +6,7 @@ init 6 python:
         code_name="ForestClearing",
         group_name=ROOM_GROUP_FOREST,
         display_name="Малая поляна",
-        bg_picture="",
+        bg_picture="images/forest/small_clearing.png",
         descriptions=[
             RoomDescription(
                 text="Небольшая лесная поляна освещена солнцем. Здесь чуть суше, чем под деревьями, а трава примята следами зверей и людей.",
@@ -32,7 +32,6 @@ init 6 python:
 
 
 label ForestClearing:
-    call EnterLocation("ForestClearing")
     $ CurrentRoom = ForestClearingRoom
     $ CurLoc = "ForestClearing"
     $ location = CurLoc

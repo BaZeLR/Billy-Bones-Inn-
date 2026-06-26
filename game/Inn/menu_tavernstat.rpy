@@ -88,10 +88,21 @@ init python:
         return default
 
     def _tavern_name(person):
-        real_names = _tavern_dict_value(RealName)
-        if person in real_names and str(real_names[person]).strip():
-            return str(real_names[person])
+        display = people_display_name(person)
+        if str(display or "").strip():
+            return str(display)
         return str(person).capitalize()
+
+    def _tavern_person_info(person):
+        return getPersonInfo(str(person or "").strip().lower())
+
+    def _tavern_person_corruption(person):
+        info = _tavern_person_info(person)
+        return _tavern_int(getattr(info, "corruption", 0), 0)
+
+    def _tavern_person_relation(person):
+        info = _tavern_person_info(person)
+        return _tavern_int(getattr(info, "rel", 0), 0)
 
     def _tavern_private_room(person):
         key = str(person or "").strip().lower()
@@ -107,11 +118,11 @@ init python:
     def _household_sleep_indecent_possible(person=""):
         key = str(person or "").strip().lower()
         if key == "amanda":
-            return int(sluttiness.get("amanda", 0) or 0) >= 30 or int(AmandaVar.get("suckyou", 0) or 0) > 0 or int(AmandaVar.get("fuckyou", 0) or 0) > 0
+            return _tavern_person_corruption("amanda") >= 30 or int(Amanda.var.get("suckyou", 0) or 0) > 0 or int(Amanda.var.get("fuckyou", 0) or 0) > 0
         if key == "melissa":
-            return int(sluttiness.get("melissa", 0) or 0) >= 18 or int(Friends.get("melissa", 0) or 0) >= 10
+            return _tavern_person_corruption("melissa") >= 18 or _tavern_person_relation("melissa") >= 10
         if key == "sandra":
-            return int(sluttiness.get("sandra", 0) or 0) >= 20 or int(Friends.get("sandra", 0) or 0) >= 10
+            return _tavern_person_corruption("sandra") >= 20 or _tavern_person_relation("sandra") >= 10
         return False
 
     def _ensure_household_morning_state(person="", day_marker=None):
@@ -170,15 +181,16 @@ init python:
 
     def household_needs_reconcile(person=""):
         key = str(person or "").strip().lower()
-        return key in ("sandra", "melissa", "amanda") and int(Friends.get(key, 0) or 0) < 5 and int(Talked.get(key, 0) or 0) < 3
+        info = _tavern_person_info(key)
+        talked_today = _tavern_int(getattr(info, "talked_today", 0), 0)
+        return key in ("sandra", "melissa", "amanda") and _tavern_person_relation(key) < 5 and talked_today < 3
 
     def player_recent_sex_count(day_span=2):
         min_day = max(0, int(dayspassed or 0) - max(1, int(day_span or 2)) + 1)
         total = 0
         seen_rows = set()
-        history_repo = sex_history_by_girl if isinstance(sex_history_by_girl, dict) else {}
-        for girl_rows in list(history_repo.values()):
-            for row in list(girl_rows or []):
+        for girl_name in list(AllGirlNames or []):
+            for row in sex_history_rows(girl_name):
                 try:
                     row_day = int(row.get("Day", 0) or 0)
                 except Exception:
@@ -189,7 +201,7 @@ init python:
                 if dude_name not in ("вы", "you"):
                     continue
                 row_token = (
-                    str(row.get("GirlName", "") or ""),
+                    str(girl_name or ""),
                     int(row.get("RowId", 0) or 0),
                     row_day,
                 )
@@ -379,15 +391,15 @@ init python:
             "TavernAmandaRoom",
         }
 
-        slot = _tavern_int(time if time_value is None else time_value, 0)
+        hour_value = _tavern_int(calendar_v2.hour if time_value is None else time_value, 0)
         if key == "melissa":
             try:
                 Melissa.sync_room_problem_state()
-                if Melissa.temp_room_active("TavernMyRoom", slot):
+                if Melissa.temp_room_active("TavernMyRoom", hour_value):
                     return "TavernMyRoom"
-                if Melissa.temp_room_active("TavernAmandaRoom", slot):
+                if Melissa.temp_room_active("TavernAmandaRoom", hour_value):
                     return "TavernAmandaRoom"
-                if Melissa.temp_room_active("TavernEmptyRoom", slot):
+                if Melissa.temp_room_active("TavernEmptyRoom", hour_value):
                     return "TavernEmptyRoom"
             except Exception:
                 pass
@@ -422,11 +434,11 @@ init python:
             return private_room
 
         if key in ("sandra", "melissa", "amanda"):
-            if _tavern_int(_tavern_dict_value(jobkitchen).get(key, 0), 0):
+            if _girl_job_value(key, "jobkitchen"):
                 return "TavernKitchen"
-            if _tavern_int(_tavern_dict_value(jobcleaning).get(key, 0), 0):
+            if _girl_job_value(key, "jobcleaning"):
                 return "TavernMain"
-            if _tavern_int(_tavern_dict_value(jobwaitress).get(key, 0), 0):
+            if _girl_job_value(key, "jobwaitress"):
                 return "TavernMain"
             if private_room:
                 return private_room
@@ -441,25 +453,8 @@ init python:
         }.get(str(job_type or ""), "")
 
     def _tavern_job_keys(job_type, room_code=None):
-        jk = _tavern_dict_value(jobkitchen)
-        jc = _tavern_dict_value(jobcleaning)
-        jw = _tavern_dict_value(jobwaitress)
-        jwh = _tavern_dict_value(jobwhore)
-        jgh = _tavern_dict_value(jobgloryhole)
-
-        mapping = {
-            "jobkitchen": jk,
-            "jobcleaning": jc,
-            "jobwaitress": jw,
-            "jobwhore": jwh,
-            "jobgloryhole": jgh,
-        }
-        source = mapping.get(job_type, {})
-        keys = [name for name, assigned in source.items() if _tavern_int(assigned, 0) != 0]
         target_room = str(room_code or _tavern_job_room(job_type) or "")
-        if not target_room:
-            return keys
-        return [name for name in keys if str(getLocation(name) or "") == target_room]
+        return girls_by_job(job_type, target_room)
 
     def NamesList(job_type, room_code=None):
         """Строка имен для выбранного типа работы."""
@@ -513,27 +508,23 @@ init python:
         return "обычная рабочая одежда"
 
     def _tavern_worker_summary(person):
-        cooking_value = _tavern_int(_tavern_get_stat(cooking, person, 0), 0)
-        cleaning_value = _tavern_int(_tavern_get_stat(cleaning, person, 0), 0)
-        waitress_value = _tavern_int(_tavern_get_stat(waitress, person, 0), 0)
-        friends_value = _tavern_int(_tavern_get_stat(Friends, person, 0), 0)
-
-        jk = _tavern_dict_value(jobkitchen)
-        jc = _tavern_dict_value(jobcleaning)
-        jw = _tavern_dict_value(jobwaitress)
-        jwh = _tavern_dict_value(jobwhore)
-        jgh = _tavern_dict_value(jobgloryhole)
+        info = _tavern_person_info(person)
+        skills = getattr(info, "skills", {}) if info is not None else {}
+        cooking_value = _tavern_int(skills.get("cooking", 0), 0)
+        cleaning_value = _tavern_int(skills.get("cleaning", 0), 0)
+        waitress_value = _tavern_int(skills.get("waitress", 0), 0)
+        friends_value = _tavern_person_relation(person)
 
         current_jobs = []
-        if _tavern_int(jk.get(person, 0), 0):
+        if _girl_job_value(person, "jobkitchen"):
             current_jobs.append("кухня")
-        if _tavern_int(jc.get(person, 0), 0):
+        if _girl_job_value(person, "jobcleaning"):
             current_jobs.append("уборка")
-        if _tavern_int(jw.get(person, 0), 0):
+        if _girl_job_value(person, "jobwaitress"):
             current_jobs.append("зал")
-        if _tavern_int(jwh.get(person, 0), 0):
+        if _girl_job_value(person, "jobwhore"):
             current_jobs.append("интим")
-        if _tavern_int(jgh.get(person, 0), 0):
+        if _girl_job_value(person, "jobgloryhole"):
             current_jobs.append("глорихол")
 
         jobs_text = ", ".join(current_jobs) if current_jobs else "без смены"
@@ -569,24 +560,10 @@ init python:
     def _tavern_team_keys():
         ordered = []
         roster = list(AllGirlNames) if isinstance(AllGirlNames, list) else []
-        hall_avail = _tavern_dict_value(jobHallAvail)
-        hall_current = (
-            _tavern_dict_value(jobkitchen),
-            _tavern_dict_value(jobcleaning),
-            _tavern_dict_value(jobwaitress),
-        )
         hall_tomorrow = (
             _tavern_dict_value(jobkitchentomorrow),
             _tavern_dict_value(jobcleaningtomorrow),
             _tavern_dict_value(jobwaitresstomorrow),
-        )
-        special_avail = (
-            _tavern_dict_value(jobWhoreAvail),
-            _tavern_dict_value(jobGloryHoleAvail),
-        )
-        special_current = (
-            _tavern_dict_value(jobwhore),
-            _tavern_dict_value(jobgloryhole),
         )
         special_tomorrow = (
             _tavern_dict_value(jobwhoreTommorow),
@@ -604,16 +581,18 @@ init python:
             return False
 
         for person in roster:
-            if _tavern_int(hall_avail.get(person, 0), 0) != 0:
+            info = _tavern_person_info(person)
+            jobs = getattr(info, "jobs", {}) if info is not None else {}
+            if _tavern_int(jobs.get("jobHallAvail", 0), 0) != 0:
                 add(person)
                 continue
-            if in_any(person, hall_current) or in_any(person, hall_tomorrow):
+            if _girl_job_value(person, "jobkitchen") or _girl_job_value(person, "jobcleaning") or _girl_job_value(person, "jobwaitress") or in_any(person, hall_tomorrow):
                 add(person)
                 continue
-            if in_any(person, special_avail) or in_any(person, special_current) or in_any(person, special_tomorrow):
+            if _tavern_int(jobs.get("jobWhoreAvail", 0), 0) != 0 or _tavern_int(jobs.get("jobGloryHoleAvail", 0), 0) != 0 or _girl_job_value(person, "jobwhore") or _girl_job_value(person, "jobgloryhole") or in_any(person, special_tomorrow):
                 add(person)
 
-        for mapping in hall_current + hall_tomorrow + special_avail + special_current + special_tomorrow:
+        for mapping in hall_tomorrow + special_tomorrow:
             for person, value in mapping.items():
                 if _tavern_int(value, 0) != 0:
                     add(person)

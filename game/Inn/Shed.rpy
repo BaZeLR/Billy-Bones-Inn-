@@ -38,6 +38,12 @@ init 6 python:
             target_room = ShedRoom
         return _room_has_item_by_id(target_room, "lumber_001")
 
+    def shed_picture():
+        current_minutes = (int(calendar_v2.hour or 0) % 24) * 60 + int(calendar_v2.minute or 0)
+        if 360 <= current_minutes <= 1170:
+            return "images/tavern/backyard/shed/shed.png"
+        return "images/tavern/backyard/shed/shed_night.png"
+
     def build_shed_description(include_notice=True, intro_text=""):
         room_obj = CurrentRoom if CurrentRoom is not None else ShedRoom
         room_item_ids = [get_object_id(row) for row in list(getattr(room_obj, "game_items", []) or [])]
@@ -80,8 +86,12 @@ init 6 python:
         axe_name = str(axe_item.name).strip()
         if "old_axe_001" in room_item_ids:
             text_parts.append("На стене висит {}.".format(axe_name))
+        elif _player_has_item_by_id("old_axe_001") and player_has_equipped_weapon("old_axe_001"):
+            text_parts.append("{} заткнут у вас за пояс.".format(axe_name[:1].upper() + axe_name[1:]))
+        elif _player_has_item_by_id("old_axe_001"):
+            text_parts.append("{} лежит у вас в сумке.".format(axe_name[:1].upper() + axe_name[1:]))
         else:
-            text_parts.append("{} у вас.".format(axe_name[:1].upper() + axe_name[1:]))
+            text_parts.append("Крючок для топора пуст.")
 
         return "\n\n".join([row for row in text_parts if str(row or "").strip()])
 
@@ -131,12 +141,11 @@ init 6 python:
 
 
 label Shed:
-    call EnterLocation("Shed")
     $ CurrentRoom = ShedRoom
     $ CurLoc = "Shed"
     $ location = CurLoc
     call RoomEnterEventGate(CurLoc, False)
-    $ scene_image = CurrentRoom.bg_picture or None
+    $ scene_image = shed_picture() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
     else:

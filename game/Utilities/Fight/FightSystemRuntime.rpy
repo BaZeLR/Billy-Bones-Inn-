@@ -1561,7 +1561,7 @@ label FightReturnToScene:
     $ fight_finish_to_room(_fight_text)
     $ scene_image = _fight_return_picture
     $ _layout_last_picture = _fight_return_picture
-    return
+    jump expression _fight_return_room
 
 
 label ForestSetTrap:

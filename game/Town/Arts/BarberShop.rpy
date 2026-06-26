@@ -134,7 +134,6 @@ init python:
 
 
 label BarberShop:
-    call EnterLocation("BarberShop")
     $ CurrentRoom = BarberShopRoom
     $ CurLoc = "BarberShop"
     $ location = CurLoc

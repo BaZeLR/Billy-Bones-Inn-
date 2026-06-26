@@ -77,16 +77,9 @@ init -25 python:
                 return _story_to_int(profile.get("phase_index", 0), 0)
             except Exception:
                 pass
-        friends_map = _story_named_value("Friends", {})
-        corruption_map = _story_named_value("sluttiness", {})
-        try:
-            friend_value = _story_to_int(friends_map.get(key, 0), 0)
-        except Exception:
-            friend_value = 0
-        try:
-            corruption_value = _story_to_int(corruption_map.get(key, 0), 0)
-        except Exception:
-            corruption_value = 0
+        info = getPersonInfo(key)
+        friend_value = _story_to_int(getattr(info, "rel", 0), 0) if info is not None else 0
+        corruption_value = _story_to_int(getattr(info, "corruption", 0), 0) if info is not None else 0
         if friend_value >= 15 and corruption_value >= 55:
             return 6
         if friend_value >= 11 and corruption_value >= 35:

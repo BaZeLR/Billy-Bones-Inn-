@@ -54,7 +54,6 @@ init python:
             self.code_name = "liza"
             self.data = LizaStaticData
             self.uses_own_var_state = True
-            self.age = 18
             self.rel = 0
             self.relationship = self.rel
             self.openness = 0
@@ -97,7 +96,6 @@ init python:
             }
             self.gift_preferences = list(LizaStaticData.gift_preferences)
             self.schedule_source = LizaStaticData.schedule_source
-            self.schedule_uses_clock_minutes = True
             self.current_location = "PortStreets"
             self.talk_preferences = {
                 "favorite_topics": ["clients", "sex", "pregnancy", "family", "work"],
@@ -181,7 +179,6 @@ init python:
             RealName[name] = self.data.fullname
             RealName2[name] = self.data.genitive
             RealName3[name] = self.data.dative
-            age_girls[name] = people_to_int(self.age, 18)
             DateOfBirth[name] = dict(self.data.birth_date)
             girltextdesc[name] = self.data.description
             knowsMC[name] = bool(self.known)
@@ -193,7 +190,7 @@ init python:
             GiftedToday[name] = people_to_int(self.gifted_today, 0)
             AskedToday[name] = people_to_int(self.asked_today, 0)
             FuckedToday[name] = people_to_int(self.fucked_today, 0)
-            CurrentLoc[name] = str(self.current_location or "PortStreets")
+            self.location = str(self.current_location or "PortStreets")
             GiftPreferences[name] = list(self.gift_preferences)
             dressdefault[name] = self.wardrobe["current_dress"]
             bradef[name] = self.wardrobe["current_underwear"]["bra"]
@@ -252,6 +249,7 @@ init python:
             self.fucked_today = 0
             self.drunk = 0
             self.var["after_sermon_stage"] = 0
+            self.var["portstreet_clients_seen_today"] = 0
             self.sync_shared_state()
             return self
 
@@ -313,6 +311,16 @@ init python:
                 return self.can_work_tavern() and people_to_int(self.story_value("GloryHoleAsked", 0), 0) == 0 and people_to_int(self.story_value("GloryHoleMentioned", 0), 0) == 1
             return False
 
+        def getLocation(self, wday=None, hour=None):
+            location_value = super(LizaInfo, self).getLocation(wday, hour)
+            if str(location_value or "") == "PortStreets":
+                if (
+                    people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0
+                    and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
+                ):
+                    return "PortStreetsBackAlley"
+            return location_value
+
         def can_work_portstreets(self):
             return people_to_int(self.story_value("ProstStart", 0), 0) > 0 and not self.can_work_tavern()
 
@@ -323,15 +331,23 @@ init python:
         def portstreet_work_active(self):
             return (
                 self.can_work_portstreets()
-                and str(self.getLocation() or "") == "PortStreets"
+                and str(self.getLocation() or "") in ("PortStreets", "PortStreetsBackAlley")
                 and Georgett.portstreet_story_unblocked()
                 and self.portstreet_work_hour()
             )
 
+        def set_portstreet_visible(self, visible=True):
+            self.var["portstreet_visible_now"] = 1 if visible else 0
+            return bool(visible)
+
+        def portstreet_visible_now(self):
+            return people_to_int(self.var.get("portstreet_visible_now", 0), 0) > 0
+
         def portstreet_client_event_available(self):
-            return self.portstreet_work_active() and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
+            return self.portstreet_work_active() and people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0 and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
 
         def mark_portstreet_clients_seen(self):
+            self.var["portstreet_clients_seen_today"] = 1
             return self.set_story_value("seeclients", 1)
 
         def can_work_tavern(self):

@@ -25,7 +25,7 @@ init 4 python:
     }
 
     def attic_room_picture_path():
-        picture_path = "images/tavern/myroom/playr_room attic.png"
+        picture_path = "images/player_room/player_room_attic.png"
         if renpy.loadable(picture_path):
             return picture_path
         return ""
@@ -34,7 +34,7 @@ init 4 python:
         item_key = str(item_id or "").strip()
         picture_map = {
             "recipe_book_001": "images/recipe_book/recipe_book_attick.png",
-            "rusty_hunter_rifle_001": "images/tavern/myroom/riffle.png",
+            "rusty_hunter_rifle_001": "images/player_room/rifle0.png",
             "old_leather_cuirass_001": attic_room_picture_path(),
         }
         picture_path = str(picture_map.get(item_key, "") or "").strip()
@@ -341,8 +341,8 @@ init 4 python:
         fixed_yield = int(CLOTH_DRESS_SCRAP_YIELD.get(code, 0) or 0)
         if fixed_yield > 0:
             return fixed_yield
-        if code in list(globals().get("MaleDressCodes", []) or []):
-            price = int(globals().get("DressCost", {}).get(code, 0) or 0)
+        if code in list(MaleDressCodes or []):
+            price = int(DressCost.get(code, 0) or 0)
             if price >= 3000:
                 return 8
             if price >= 800:
@@ -350,8 +350,8 @@ init 4 python:
             if price >= 250:
                 return 5
             return 3
-        if code in list(globals().get("FemaleDressCodes", []) or []):
-            price = int(globals().get("DressCost", {}).get(code, 0) or 0)
+        if code in list(FemaleDressCodes or []):
+            price = int(DressCost.get(code, 0) or 0)
             if price >= 450:
                 return 5
             if price >= 150:
@@ -386,8 +386,7 @@ init 4 python:
             update_stat_state()
         except Exception:
             pass
-        dress_names = globals().get("ShortDressName", {}) or {}
-        dress_name_short = str(dress_names.get(dress_name, dress_name) or dress_name).lower()
+        dress_name_short = str(ShortDressName.get(dress_name, dress_name) or dress_name).lower()
         if str(context_text or "").strip():
             result_text = str(context_text or "").strip()
         elif worn_now:
@@ -754,7 +753,7 @@ init 4 python:
                 args=("recipe_book_001", "TavernAtic", "", "recipe_book_001"),
             ),
         ],
-        picture="images/tavern/myroom/player_table.png",
+        picture="images/player_room/player_table.png",
         carriable=True,
         readable=True,
         stackable=False,
@@ -768,14 +767,6 @@ init 4 python:
         object_id="night_bowl_001",
         name="ночная миска",
         description="Простая, но крепкая ночная миска, которую можно пустить на хозяйственные нужды.",
-        actions=[
-            ObjectAction(
-                action_id="examine_night_bowl",
-                label="Осмотреть миску",
-                hook="text",
-                target="Ночная миска из грубой глины. Не самая благородная посудина, зато для хозяйственного дела сгодится.",
-            ),
-        ],
         carriable=True,
         stackable=False,
         condition=amanda_night_bowl_available,
@@ -803,14 +794,6 @@ init 4 python:
         object_id="bucket_001",
         name="ведро",
         description="Крепкое деревянное ведро для воды, золы и прочих хозяйственных дел.",
-        actions=[
-            ObjectAction(
-                action_id="examine_bucket",
-                label="Осмотреть ведро",
-                hook="text",
-                target="Обычное хозяйственное ведро из дерева, скрепленное железными обручами.",
-            ),
-        ],
         carriable=True,
         stackable=False,
         custom_properties={
@@ -1088,12 +1071,6 @@ init 4 python:
         description="Старинная помесь ружья и арбалета. Сейчас она слишком ржавая для уверенного применения, но выглядит занятно.",
         actions=[
             ObjectAction(
-                action_id="examine_rusty_rifle",
-                label="Осмотреть оружие",
-                hook="text",
-                target="Тяжелая старая помесь охотничьего ружья и арбалета. Механизм заржавел, но сам трофей производит впечатление.",
-            ),
-            ObjectAction(
                 action_id="take_rusty_rifle",
                 label="Забрать оружие",
                 hook="call",
@@ -1101,7 +1078,7 @@ init 4 python:
                 args=("rusty_hunter_rifle_001", "TavernAtic", "", "rusty_hunter_rifle_001"),
             ),
         ],
-        picture="images/tavern/myroom/rifle.png",
+        picture="images/player_room/rifle0.png",
         carriable=True,
         stackable=False,
         weapon=True,
@@ -1121,12 +1098,6 @@ init 4 python:
         description="Старая кожаная кираса с потемневшими ремнями. Защита уже не новая, но все еще годная.",
         actions=[
             ObjectAction(
-                action_id="examine_old_cuirass",
-                label="Осмотреть кирасу",
-                hook="text",
-                target="Потрепанная, но еще крепкая кожаная кираса. Видно, что когда-то она служила охотнику или сторожу.",
-            ),
-            ObjectAction(
                 action_id="take_old_cuirass",
                 label="Забрать кирасу",
                 hook="call",
@@ -1134,7 +1105,7 @@ init 4 python:
                 args=("old_leather_cuirass_001", "TavernAtic", "", "old_leather_cuirass_001"),
             ),
         ],
-        picture="",
+        picture="images/tavern/backyard/cuirass.png",
         carriable=True,
         stackable=False,
         wearable=True,
@@ -1752,13 +1723,13 @@ label BackyardCookSoap(recipe_id="soap_recipe"):
     if not recipe_page_can_craft(_soap_recipe_id):
         $ MainTxt = "У вас нет необходимых ингредиентов, чтобы сварить мыло."
         $ CurLocDesc = MainTxt
-        call BackyardBuildActions
+        call BackyardObjectMenu("backyard_ash_barrel", True)
         return
 
     $ _soap_craft_result = apply_recipe_craft(_soap_recipe_id)
     $ MainTxt = str(_soap_craft_result.get("text", "") or "Вы варите мыло.")
     $ CurLocDesc = MainTxt
-    call BackyardBuildActions
+    call BackyardObjectMenu("backyard_ash_barrel", True)
     return
 
 

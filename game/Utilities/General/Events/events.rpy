@@ -115,12 +115,12 @@ init -25 python:
         def checkReqs(self):
             if self.reqs is None:
                 return True
-            friends_map = _story_named_value("Friends", {})
             roster = list(_story_named_value("AllGirlNames", []) or [])
             for stat, limit in dict(self.reqs).items():
                 threshold = _story_to_int(limit, 0)
-                if stat in roster or (hasattr(friends_map, "get") and stat in friends_map):
-                    current_value = _story_to_int(friends_map.get(stat, 0), 0)
+                person_info = getPersonInfo(stat) if stat in roster else None
+                if person_info is not None:
+                    current_value = _story_to_int(getattr(person_info, "rel", 0), 0)
                 else:
                     current_value = _story_named_number(stat, 0)
                 if threshold > 0 and current_value < threshold:
@@ -233,10 +233,7 @@ init -25 python:
                 return str(loc)
         except Exception:
             pass
-        try:
-            return str(CurrentLoc.get(key, "") or "")
-        except Exception:
-            return ""
+        return ""
 
     def _story_event_projection_location(evt):
         location_key = str(getattr(evt, "location", "") or "").strip()
@@ -438,6 +435,64 @@ init -25 python:
 
 
 init python:
+    def story_event_action_caption(evt):
+        action_key = str(getattr(evt, "action", "") or "").strip()
+        location_key = str(getattr(evt, "location", "") or "").strip()
+        person_key = _story_event_person(evt)
+
+        if action_key == "clara_paintings":
+            return "Поговорить о рисунках"
+        if action_key == "melissa_bats":
+            if location_key == "TavernAtic":
+                return "Проверить шумы на чердаке"
+            if location_key == "TavernAmandaRoom":
+                return "Осмотреть рисунки Мелиссы"
+            return "Поговорить о летучих мышах"
+        if action_key == "street_clients_georgett":
+            return "Проверить переулок Жоржетты"
+        if action_key == "street_clients_liza":
+            return "Проверить переулок Лизетты"
+        if action_key == "after_cermon_walk":
+            return "Обойти храм после службы"
+        if action_key == "dress_change":
+            return "Поговорить об одежде"
+        if action_key == "amanda_grope":
+            return "Подойти к Аманде"
+        if person_key:
+            person_info = getPersonInfo(person_key)
+            person_name = str(getattr(person_info, "name", "") or person_key)
+            if action_key.endswith("_talk"):
+                return "Поговорить с %s" % person_name
+            return "%s: %s" % (person_name, action_key.replace("_", " "))
+        return action_key.replace("_", " ").strip().capitalize()
+
+    def story_event_action_items(location_name="", excluded_actions=None):
+        location_key = str(location_name or "").strip()
+        if not location_key:
+            return []
+        try:
+            findAvailableEvents(False)
+        except Exception:
+            return []
+        action_map = dict(availEvents.get(location_key, {}) or {})
+        if not action_map:
+            return []
+
+        excluded = set(str(row or "").strip() for row in list(excluded_actions or []) if str(row or "").strip())
+        items = []
+        for action_key in sorted(action_map.keys()):
+            action_name = str(action_key or "").strip()
+            if not action_name or action_name in ("enter", "sleep") or action_name in excluded:
+                continue
+            evt = action_map.get(action_name, None)
+            if evt is None:
+                continue
+            caption = story_event_action_caption(evt)
+            if not str(caption or "").strip():
+                continue
+            items.append(MenuItem(str(caption), Call("checkTriggers", location_key, action_name, 0)))
+        return items
+
     def story_event_available(location_name="", action_name=""):
         location_key = str(location_name or "").strip()
         action_key = str(action_name or "").strip()

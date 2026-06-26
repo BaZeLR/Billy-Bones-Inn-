@@ -9,7 +9,7 @@ init python:
         return amanda_dress_change_has_options("amanda")
 
 
-label AmandaTalkHubEventEntry:
+label AmandaTalkHubEventEntry(girl_name="amanda", where_id="", entity_data=None):
     call checkTriggers("talk", "amanda", 0)
     if _return:
         return True
@@ -107,15 +107,27 @@ label IntAmandaTalkApply(girl_name="amanda", choice_code=""):
         return
 
     if str(choice_code or "") == "reconcile":
+        $ _amanda_talk_return_room = str(CurLoc or "TavernMain")
         $ MainTxt = "Вы подошли к Аманде и извинились за то, что были к ней несколько невнимательны и грубы последнее время. В свое оправдание вы заметили, что уберечь трактир от разорения очень сложно и всем вам нужно дружно работать вместе, чтобы преуспеть."
         if renpy.random.randint(1, 3) == 1:
             $ MainTxt += "\n\nАманда благосклонно выслушала вас, трогательно обняла и сказала, что очень к вам привязана!"
-            call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)
+            $ Amanda.rel = max(5, min(20, int(Amanda.rel or 0) + 1))
+            $ Amanda.relationship = Amanda.rel
+            $ Amanda.openness = min(100, int(Amanda.openness or 0) + 1)
+            $ Amanda.anger_with_player = max(0, int(Amanda.anger_with_player or 0) - 3)
+            $ Amanda.mood = "softened"
         else:
             $ MainTxt += "\n\nАманда холодно выслушала вас, фыркнула и пошла прочь."
+            $ Amanda.anger_with_player = min(100, int(Amanda.anger_with_player or 0) + 1)
+            $ Amanda.mood = "cold"
         $ Amanda.mark_talked()
         $ CurLocDesc = MainTxt
-        call IntAmandaTalkRefresh(girl_name)
+        $ current_action_title = "Разговор с Амандой"
+        $ current_action_content = None
+        $ current_action_items = [
+            MenuItem("Продолжить разговор", Call("IntAmandaTalk", girl_name)),
+            MenuItem("Вернуться", Jump(_amanda_talk_return_room)),
+        ]
         return
 
     if str(choice_code or "") == "talk":

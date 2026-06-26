@@ -14,8 +14,8 @@ init python:
         return friday_dance_slot_is_active() and int(FridayDancesCount or 0) < 5
 
 label FridayDance(add_dance_phrase_tmp=""):
-    hide screen main_ui
-    call EnterLocation("FridayDance")
+    $ CurLoc = "FridayDance"
+    $ location = CurLoc
     $ DanceStep = 0
     $ GirlsCounter = 0
     $ CurrentActions = ""

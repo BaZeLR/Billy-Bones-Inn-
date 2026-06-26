@@ -206,7 +206,7 @@ label IntAmandaDance():
                 "Танец закончился и вы вернулись к колоннаде."
             jump IntAmandaDance
         "Предложить Аманде прогулятся" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and HadSex[GirlNameIAD] > 0 and (HandsDance.startswith('ass') or KissDance > 0):
-            $ tmpGropeReact = AmandaSexOfferReaction()
+            $ tmpGropeReact = Amanda.sex_offer_reaction()
             if tmpGropeReact == 2:
                 "Продолжая танцевать, вы вдруг прошептали Аманде на ушко: 'Милая, а может прогуляемся немного?'"
                 '"Ага, значит то ты меня ругаешь, шлюхой обзываешь, учишь скромности и всякому возвышенному да? Ф как танцы - так все мигом забыл и мало что за задницу лапаешь, так еще и в подворотню тащищь?" обругала ваше двуличие Аманда.{p}"Знаешь что, иди себе сам в свою подворотню и сам с собою там что хочешь то и делай. Впрочем, ты только одного и хочешь. А я пока пойду!" гневно сказала Аманда, слово с делом у нее не разошлись и она развернулась и ушла, оставив вас в одиночестве.'
@@ -234,18 +234,18 @@ label IntAmandaDance():
             # Safe way to show dialogue based on dance step
             $ dance_message = ""
             if DanceStep - 1 <= Amanda.var_int("alberdanceadvance", 0):
-                $ dance_message = DanceWatchLine[DanceStep]
+                $ dance_message = SexEvents.dance_watch_line[DanceStep]
             elif Amanda.var_int("alberdanceadvance", 0) == 0:
-                $ dance_message = DanceWatchLine[1]
+                $ dance_message = SexEvents.dance_watch_line[1]
                 $ DanceStep = DanceMaxIAD + 1
             else:
-                $ dance_message = DanceWatchLine[0]
+                $ dance_message = SexEvents.dance_watch_line[0]
             
             "[dance_message]"
             call ShowImage("amanda", "dance", "alberdanceStep" + str(min(DanceStep, 3)))
             
             if DanceStep == 6 and Amanda.var_int("LegareGo", 0) == 1:
-                $ legare_go_message = str(DanceWatchLine.get(6, "") or "")
+                $ legare_go_message = str(SexEvents.dance_watch_line.get(6, "") or "")
                 if legare_go_message != "" and dance_message != legare_go_message:
                     "[legare_go_message]"
                 $ Amanda.set_var_int("LegareGo", 0)

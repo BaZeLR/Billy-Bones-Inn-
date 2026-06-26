@@ -385,7 +385,7 @@ init python:
             "Room: %s / %s" % (room_key, getattr(room_obj, "display_name", room_key)),
             "Group: %s" % str(getattr(room_obj, "group_name", "") or ""),
             "Picture: %s | loadable=%s" % (str(getattr(room_obj, "bg_picture", "") or ""), str(renpy.loadable(str(getattr(room_obj, "bg_picture", "") or "")))),
-            "Open now: %s" % str(room_obj.is_open(week, time)),
+            "Open now: %s" % str(room_obj.is_open()),
             "",
             "Descriptions:",
         ]
@@ -416,10 +416,10 @@ init python:
 
         lines.append("")
         lines.append("Visible NPCs from schedule:")
-        npcs = list(room_obj.visible_npcs() or [])
-        if npcs:
-            for npc in npcs:
-                lines.append("- %s / %s" % (npc.get("id", ""), npc.get("display_name", "")))
+        npc_ids = list(getNPCids(room_code) or [])
+        if npc_ids:
+            for npc_id in npc_ids:
+                lines.append("- %s / %s" % (npc_id, npc_display_name(npc_id)))
         else:
             lines.append("- <none visible>")
 
@@ -466,16 +466,12 @@ init python:
             except Exception:
                 loc = ""
             try:
-                cur_loc = str(CurrentLoc.get(key, "") or "")
-            except Exception:
-                cur_loc = ""
-            try:
                 entry = npc_schedule_resolve(key)
             except Exception:
                 entry = None
             if entry is not None:
-                if hasattr(entry, "start_minute") and hasattr(entry, "end_minute"):
-                    interval_text = "%s-%s" % (npc_schedule_minutes_to_time(getattr(entry, "start_minute", 0)), npc_schedule_minutes_to_time(getattr(entry, "end_minute", 0)))
+                if getattr(entry, "start_hour", None) is not None and getattr(entry, "end_hour", None) is not None:
+                    interval_text = "hours=%02d-%02d" % (int(getattr(entry, "start_hour", 0) or 0), int(getattr(entry, "end_hour", 0) or 0))
                 else:
                     interval_text = "slots=" + (",".join([str(row) for row in list(getattr(entry, "time_slots", []) or [])]) or "*")
                 entry_text = "entry=%s %s awake=%s talk=%s p=%s source=%s" % (
@@ -490,17 +486,15 @@ init python:
                 entry_text = "entry=<none>"
             if loc:
                 seen.setdefault(loc, []).append(key)
-                lines.append("- %s -> getLocation=%s CurrentLoc=%s %s" % (key, loc, cur_loc, entry_text))
+                lines.append("- %s -> getLocation=%s %s" % (key, loc, entry_text))
         lines.append("")
         lines.append("Rooms with NPCs:")
         for loc in sorted(seen.keys()):
             try:
-                room_obj = get_registered_room(loc)
-                visible_rows = list(room_obj.visible_npcs() or []) if room_obj is not None else []
-                visible_ids = [str(row.get("npc_id", row.get("id", "")) or "") for row in visible_rows]
+                visible_ids = list(getNPCids(loc) or [])
             except Exception:
                 visible_ids = []
-            lines.append("- %s: getNPCids=%s | visible_npcs=%s" % (loc, ", ".join(sorted(seen.get(loc, []))), ", ".join(sorted(visible_ids))))
+            lines.append("- %s: getNPCids=%s" % (loc, ", ".join(sorted(visible_ids or seen.get(loc, [])))))
         lines.append("")
         lines.append("Duplicate/source checks:")
         try:
@@ -571,17 +565,10 @@ init python:
         except Exception as ex:
             ids = []
             lines.append("getNPCids error: %s" % ex)
-        try:
-            visible_rows = list(room_obj.visible_npcs() or [])
-        except Exception as ex:
-            visible_rows = []
-            lines.append("visible_npcs error: %s" % ex)
-        visible_ids = [str(row.get("npc_id", row.get("id", "")) or "") for row in visible_rows]
         lines.append("getNPCids: %s" % (", ".join(ids) if ids else "<none>"))
-        lines.append("Room.visible_npcs: %s" % (", ".join(visible_ids) if visible_ids else "<none>"))
         lines.append("")
         lines.append("Rows:")
-        for npc_id in sorted(set(ids + visible_ids)):
+        for npc_id in sorted(set(ids)):
             try:
                 state = npc_schedule_state(npc_id)
             except Exception:
@@ -820,7 +807,7 @@ init python:
             "- patch the GameObject actions or the room object's object_menu_label path.\n"
             "- do not add dispatch labels for one simple action.\n\n"
             "NPC schedules:\n"
-            "- patch the owning Init*.rpy schedule entries or NPCDailyScheduleTemplates.\n"
+            "- patch the owning NPC data schedule_entries, daily_schedule_template, or NPC/Schedules/<npc>.json.\n"
             "- the debug schedule page shows the matched entry label, slots, awake/talkable, and priority.\n\n"
             "Story/event conditions:\n"
             "- patch the Event tuple/class definition or its condition function.\n"
@@ -888,7 +875,7 @@ init python:
             "- Expected weekday/time interval:",
             "- Expected location:",
             "- Actual getLocation():",
-            "- Actual Room.visible_npcs():",
+            "- Actual getNPCids(current_location):",
             "- Expected awake/talkable:",
             "- Actual awake/talkable:",
             "- Expected HUD name:",
@@ -962,7 +949,7 @@ init python:
         sections.append("")
         sections.append("- Expected: room text and picture are owned by the Room object. Reality: inspect room reports below for missing/duplicated text or bad paths.")
         sections.append("- Expected: object actions are owned by room GameObjects/GameItems. Reality: inspect menu reports below for missing or redundant menu items.")
-        sections.append("- Expected: NPC presence resolves from schedule and agrees with Room.visible_npcs(). Reality: inspect schedule report below.")
+        sections.append("- Expected: NPC presence resolves from getLocation()/getNPCids(current_location). Reality: inspect schedule report below.")
         sections.append("- Expected: events are exposed by Event/Thread checks and fired through checkTriggers. Reality: inspect event probes below.")
         sections.append("- Expected: image sequences resolve to loadable files. Reality: inspect media sequence report below.")
         sections.append("")
@@ -1448,7 +1435,6 @@ define DebugBuilderRoomObject = Room(
 
 
 label DebugBuilderRoom:
-    call EnterLocation("DebugBuilderRoom")
     $ CurLoc = "DebugBuilderRoom"
     $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
@@ -1700,7 +1686,7 @@ label DebugBuilderScheduleRooms:
     $ CurLoc = "DebugBuilderRoom"
     $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = "Choose a room. The probe compares getNPCids(room) with Room.visible_npcs() for the current calendar time."
+    $ MainTxt = "Choose a room. The probe lists NPC ids whose getLocation() resolves to that room for the current calendar time."
     $ CurLocDesc = MainTxt
     $ current_action_title = "Schedule room probes"
     $ current_action_content = None
@@ -2227,7 +2213,8 @@ label debug_room_builder:
 
 
 label DebugTestRoomLegacy:
-    call EnterLocation("DebugTestRoom")
+    $ CurLoc = "DebugTestRoom"
+    $ location = CurLoc
     python:
         _dbg_desc = "Тестовая комната. Здесь можно проверять таверн-события, показывать картинки и запускать диалоги."
         MainTxt = _dbg_desc

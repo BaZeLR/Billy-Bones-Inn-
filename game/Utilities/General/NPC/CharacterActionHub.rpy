@@ -293,6 +293,8 @@ init -40 python:
         if key == "georgett":
             if room_key == "PortStreets":
                 data["talk_args"] = ("georgett", "street")
+                data["picture_path"] = "images/georgett/Port/wait.jpg"
+                data["talk_picture"] = data["picture_path"]
             elif room_key == "TavernMain":
                 data["talk_args"] = ("georgett", "tavern")
         return data
@@ -307,6 +309,8 @@ init -40 python:
                 return key in [str(row or "").strip().lower() for row in list(tavern_breakfast_present_ids() or [])]
         except Exception:
             pass
+        if room_key == "PortStreets" and key in ("georgett", "liza"):
+            return bool(npc_can_talk_now(key)) and bool(npc_room_interaction_visible(key, room_key))
         if not (bool(npc_can_talk_now(key)) and str(getLocation(key) or "") == room_key):
             return False
         try:
@@ -506,18 +510,6 @@ init -40 python:
                 menu_items.append(MenuItem("Подарить", Call("IntClaraGiftMenu", npc_key)))
             else:
                 menu_items.append(MenuItem("Подарить", Call("PlayerCardGiftToFixedTargetMenu", npc_key)))
-        try:
-            _amanda_ai_enabled = bool(AmandaAIIntegrationEnabled)
-        except NameError:
-            _amanda_ai_enabled = False
-        if npc_key == "amanda" and _amanda_ai_enabled:
-            try:
-                _amanda_ai_intent = amanda_ai_room_intent_code(room_key)
-            except Exception:
-                _amanda_ai_intent = ""
-            if str(_amanda_ai_intent or "") != "":
-                menu_items.append(MenuItem(amanda_ai_menu_label(_amanda_ai_intent), Call("AmandaAIIntentRoomEvent", room_key, _amanda_ai_intent)))
-
         current_action_title = str(normalized.get("title", "") or "Персонаж")
         current_action_content = None
         current_action_items = menu_items

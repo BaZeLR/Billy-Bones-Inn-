@@ -8,7 +8,7 @@ label InitInga:
         RealName[GirlName] = 'Ингенборг'
         RealName2[GirlName] = 'Ингенборг'
         RealName3[GirlName] = 'Ингенборг'
-        age_girls[GirlName] = 22
+        DateOfBirth[GirlName] = {"day": 1, "period": 1, "cycle": 1078}
         kids[GirlName] = 0
         beauty[GirlName] = 55
         sluttiness[GirlName] = 30
@@ -45,7 +45,11 @@ label InitInga:
         IngaVar['SawLucassex'] = 0
         IngaVar['Knowher'] = 0
         GiftPreferences[GirlName] = ["wild_rose_001", "soap_001", "lavender_001"]
-        CurrentLoc[GirlName] = "BeckyHome"
+        peopleData[GirlName] = IngaStaticData
+        Inga.var = IngaVar
+        Inga.location = "BeckyHome"
+        Inga.update()
+        peopleInfo[GirlName] = Inga
         npc_schedule_set(GirlName, [
             NPCScheduleEntry(
                 location="GroceryStore",
@@ -116,7 +120,7 @@ init python:
                 dative="Ингенборг",
                 default_location="BeckyHome",
                 description="Старшей дочке вдовы Блэнкеншип в привлекательности не откажешь. Рыжая, высокая, зеленоглазая, с большой налитой грудью, Ингенборг выглядит как молодая и еще более привлекательная копия своей матушки.",
-                age=22,
+                birth_date={"day": 1, "period": 1, "cycle": 1078},
                 portrait="images/inga/StreetSex/minet1.jpg",
             )
 

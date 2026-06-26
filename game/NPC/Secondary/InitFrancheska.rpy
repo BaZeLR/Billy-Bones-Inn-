@@ -24,7 +24,7 @@ init python:
                 dative="Франческе",
                 default_location="EllonaTemple",
                 description="Франческа - старая жрица Эллоны, встречает прихожан в храме и помогает роженицам.",
-                age=52,
+                birth_date={"day": 1, "period": 1, "cycle": 1048},
                 portrait="images/ellona/Fran1.jpg",
             )
 
@@ -149,7 +149,6 @@ label InitFrancheska:
 
 
 label register_francheska_secondary:
-    $ knowsMC.setdefault("fran", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["fran"] = FranStaticData

@@ -50,7 +50,7 @@ init 6 python:
         code_name="TavernAtic",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Чердак",
-        bg_picture="images/tavern/myroom/playr_room attic.png",
+        bg_picture="images/player_room/player_room_attic.png",
         descriptions=[
             RoomDescription(
                 text="Вы выбираетесь на пыльный чердак трактира. Под самой крышей темно, пахнет старым деревом, сухой пылью и забытыми вещами. Между балками навалены какие-то ящики, тряпье и обломки мебели.",
@@ -66,7 +66,6 @@ init 6 python:
 
 
 label TavernAtic:
-    call EnterLocation("TavernAtic")
     $ CurrentRoom = TavernAticRoom
     $ CurLoc = "TavernAtic"
     $ location = CurLoc
@@ -249,7 +248,7 @@ label TavernAticObjectMenu(object_id="", refresh_only=False):
                 current_action_items.append(MenuItem(_atic_action.label, Jump(_atic_action.target)))
         if bool(getattr(_atic_item, "carriable", False)) and not _atic_has_take_action:
             current_action_items.append(MenuItem("Взять", Call("Take", object_id, "TavernAtic", "", object_id)))
-    $ current_action_items.append(MenuItem("Назад", Call("TavernAticRestore")))
+    $ current_action_items.append(MenuItem("Назад", Jump("TavernAtic")))
     return
 
 

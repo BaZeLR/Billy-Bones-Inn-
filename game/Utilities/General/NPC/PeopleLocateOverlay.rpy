@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     def people_locate_room_name(room_code=""):
@@ -50,13 +50,11 @@ init python:
                 loc = str(info.getLocation() if info is not None else getLocation(key) or "").strip()
             except Exception:
                 loc = ""
-            if not loc:
-                loc = "неизвестно"
             rows.append({
                 "id": key,
                 "name": people_display_name(key),
                 "location": loc,
-                "location_name": people_locate_room_name(loc),
+                "location_name": people_locate_room_name(loc) if loc else "неизвестно",
                 "state": people_locate_state_text(key, loc),
                 "can_jump": bool(loc and loc != "неизвестно" and renpy.has_label(loc)),
                 "here": bool(str(CurLoc or "") == loc),

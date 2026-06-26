@@ -13,12 +13,6 @@ init 4 python:
                 hook="jump",
                 target="TavernHelp",
             ),
-            ObjectAction(
-                action_id="examine_book",
-                label="Осмотреть книгу",
-                hook="text",
-                target="Потрепанный семейный том, который давно стал частью трактира.",
-            ),
         ],
         picture="bg book",
         carriable=False,

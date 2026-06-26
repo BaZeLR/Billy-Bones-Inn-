@@ -54,10 +54,7 @@ label story_amanda_tavern_seduction_0:
             "Вы тихо предложили ей оставить зал на пару минут. Аманда посмотрела на лестницу, прикусила губу и пошла первой."
             jump TavernAmandaRoom
         "Вернуть к работе":
-            $ AmandaYellNotWork()
-            $ _amanda_seduction_jump = AmandaDynamicTakeNextJump()
-            if _amanda_seduction_jump and renpy.has_label(_amanda_seduction_jump):
-                jump expression _amanda_seduction_jump
+            $ Amanda.yell_not_work()
             jump TavernMain
 
 
@@ -104,10 +101,7 @@ label story_amanda_street_legare_sighting_0:
             return True
         "Отправить ее обратно на работу":
             $ _amanda_legare_event = GetSexEventFromTable("amanda", time, "legarerun")
-            $ AmandaYellNotWork()
-            $ _amanda_legare_jump = AmandaDynamicTakeNextJump()
-            if _amanda_legare_jump and renpy.has_label(_amanda_legare_jump):
-                jump expression _amanda_legare_jump
+            $ Amanda.yell_not_work()
             jump StreetTavern
 
 
@@ -121,10 +115,7 @@ label story_amanda_street_lover_encounter_0:
             jump AmandaLoverSex
         "Окликнуть Аманду и вернуть к работе":
             $ GetSexEventFromTable("amanda", time, "lovermeet")
-            $ AmandaYellNotWork()
-            $ _amanda_lover_jump = AmandaDynamicTakeNextJump()
-            if _amanda_lover_jump and renpy.has_label(_amanda_lover_jump):
-                jump expression _amanda_lover_jump
+            $ Amanda.yell_not_work()
             jump StreetTavern
         "Не вмешиваться":
             "Вы прошли мимо. Если Аманда решила искать себе приключения, то этот разговор еще можно будет отложить до вечера."

@@ -14,6 +14,7 @@ init 4 python:
                 target="UseHoneyCombItem",
             ),
         ],
+        picture="images/forest/bee_hive.png",
         price=8,
         carriable=True,
         stackable=True,

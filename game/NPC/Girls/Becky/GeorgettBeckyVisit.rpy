@@ -148,5 +148,4 @@ label GeorgettBeckyVisit:
                 call PregnancyCheck("becky", "mouth", 1, "Вы")
                 $ georgedinnersex = 0
 
-    $ Georgett.sync_georgett_maps()
     return

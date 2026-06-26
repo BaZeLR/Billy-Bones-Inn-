@@ -184,7 +184,6 @@ init python:
             self.code_name = "clara"
             self.uses_own_var_state = True
             self.data = ClaraStaticData
-            self.age = 19
             self.rel = 0
             self.relationship = self.rel
             self.openness = 0
@@ -254,7 +253,6 @@ init python:
                 "werecat_caught_cat",
             ]
             self.schedule_source = ClaraStaticData.schedule_source
-            self.schedule_uses_clock_minutes = True
             self.current_location = "WineStore"
             self.talk_preferences = {
                 "favorite_topics": ["fashion", "stories", "secrets", "art", "family_life"],
@@ -304,7 +302,7 @@ init python:
             return int(charisma or 0) >= 70 and int(self.rel or 0) >= 7
 
         def has_caught_cat_gift(self):
-            return werecat_second_gift_available() and int(WerecatVar.get("caught", 0) or 0) == 1
+            return werecat_second_gift_available() and int(werecat_state().get("caught", 0) or 0) == 1
 
         def can_accept_horse_ride(self, location_code=""):
             location_key = str(location_code or CurLoc or "").strip()
@@ -365,7 +363,7 @@ init python:
             row = dict(entry or {})
             source = str(row.get("source", "") or "")
             if source == "werecat":
-                if not werecat_second_gift_available() or int(WerecatVar.get("caught", 0) or 0) != 1:
+                if not werecat_second_gift_available() or int(werecat_state().get("caught", 0) or 0) != 1:
                     return False
                 werecat_apply_clara_gift_bonus()
                 return True
@@ -413,7 +411,7 @@ init python:
             else:
                 score -= int(self.talked_today or 0) * 2
 
-            roll_key = "%s_social_%s_%s_%s_%s" % (name, interaction, gift_id, int(dayspassed or 0), int(self.talkCountToday or 0))
+            roll_key = "%s_social_%s_%s_%s_%s" % (name, interaction, gift_id, int(dayspassed or 0), int(self.talked_today or 0))
             score += procedural_randint(-2, 2, roll_key)
 
             if score >= 7:
@@ -438,12 +436,10 @@ init python:
             elif interaction == "flirt":
                 self.mark_talked()
                 self.flirted_today = people_to_int(self.flirted_today, 0) + 1
-                self.flirtCountToday = people_to_int(self.flirtCountToday, 0) + 1
                 self.var["flirt"] = int(self.var.get("flirt", 0) or 0) + 1
             elif interaction == "gift":
                 self.mark_talked()
                 self.gifted_today = people_to_int(self.gifted_today, 0) + 1
-                self.giftCountToday = people_to_int(self.giftCountToday, 0) + 1
 
             if result_key == "positive":
                 self.change_social(friend_delta=(2 if interaction == "gift" else 1))

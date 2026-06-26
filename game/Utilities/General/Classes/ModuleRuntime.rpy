@@ -19,7 +19,6 @@ init -42 python:
 
 
 label BeginPaidSexModule(girl_name="", return_room=""):
-    hide screen main_ui
     $ set_active_module("sex", "", return_room, girl_name)
     if str(girl_name or "") == "":
         return

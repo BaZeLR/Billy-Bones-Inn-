@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     import renpy
@@ -21,7 +21,7 @@ init python:
             "item_id": "boar_fang_001",
             "qty": 1,
             "rep": 3,
-            "text": "Кабаний клык быстро переходит из ваших рук к Луизе. Она показывает его паре охотников у стены, и те смотрят на вас уже внимательнее.",
+            "text": "Кабаний клык быстро переходит из ваших рук к Луизе. Она показывает его паре охотников у стены, и те смотрят на вас с уважением: вы явно не новичок в лесу.",
         },
         {
             "id": "white_wolf",
@@ -335,7 +335,7 @@ init python:
             applied_rows.append("%s x%s" % (str(entry.get("name", item_id) or item_id), qty))
 
         if len(applied_rows) <= 0:
-            return {"ok": False, "text": "Сначала выберите товар и количество."}
+            return {"ok": False, "text": "Сначала выберите товар и желаемое количество."}
 
         if mode_value == "buy":
             if int(money or 0) < total_price:
@@ -344,13 +344,13 @@ init python:
             return {"ok": True, "text": "Толстая Луиза складывает для вас: %s. Всего вы платите %s мараведи." % (", ".join(applied_rows), total_price)}
 
         money += total_price
-        return {"ok": True, "text": "Толстая Луиза принимает у вас: %s. Всего она платит %s мараведи." % (", ".join(applied_rows), total_price)}
+        return {"ok": True, "text": " Луиза принимает,с доволной ухмылкой принимает у вас: %s. Всего она платит %s мараведи." % (", ".join(applied_rows), total_price)}
 
     def hunter_club_main_text():
         return (
             "Вы входите в охотничий клуб на рыночной площади. Внутри пахнет шкурами, сушеными травами, "
-            "смолой и дешевым элем. На стенах развешаны старые луки, кабаньи головы, рога и потемневшие "
-            "трофеи, а за широким прилавком хозяйничает толстая Луиза.\n\n"
+            "смолой и дешевым элем. На стенах развешаны старые луки, кабаньи головы, рога, потемневшие "
+            "от времени,шкуры различных зверей,и других диковин, а за широким прилавком хозяйничает толстуха Луиза.\n\n"
             "Здесь можно купить охотничьи припасы и сбыть лесную добычу."
         )
 
@@ -465,7 +465,7 @@ init python:
             GameObject(
                 object_id="hunter_board",
                 name="Доска клуба",
-                description="На доске прибиты новости, заметки о звериных следах и небольшие вызовы для тех, кто хочет, чтобы его имя запомнили охотники.",
+                description="На доске прибиты новости, заметки о звериных следах и небольшие вызовы для тех, кто хочет, совместить приятное с полезным и заработать репутацию в клубе и немного мараведи.",
                 actions=[
                     ObjectAction(action_id="club_news", label="Почитать новости", hook="call", target="HunterClubNewsMenu"),
                     ObjectAction(action_id="club_challenges", label="Посмотреть охотничьи вызовы", hook="call", target="HunterClubChallengesMenu"),
@@ -473,12 +473,10 @@ init python:
             ),
         ],
         schedule=RoomSchedule(
-            [1, 2, 3, 4, 6],
-            [],
-            "Охотничий клуб закрыт. По пятницам и воскресеньям здесь не торгуют, а в остальные дни он работает только с утра до вечера.",
-            None,
-            "06:00",
-            "15:59",
+            weekdays=[1, 2, 3, 4, 6],
+            start="08:00",
+            end="18:59",
+            closed_text="Охотничий клуб закрыт. По пятницам и воскресеньям здесь не торгуют, а в остальные дни он работает только с утра до вечера.",
         ),
         custom_properties={
             "shop_feature": "hunter_club",
@@ -583,8 +581,6 @@ screen hunter_club_trade_overlay():
 
 label HunterClub:
     scene black
-    if str(CurLoc or "") != "HunterClub":
-        call EnterLocation("HunterClub")
     $ CurrentRoom = HunterClubRoom
     $ CurLoc = "HunterClub"
     $ location = CurLoc
@@ -597,7 +593,7 @@ label HunterClub:
     $ current_girl_key = ""
     $ current_object_id = ""
 
-    if not HunterClubRoom.is_open(week, time):
+    if not HunterClubRoom.is_open():
         $ MainTxt = HunterClubRoom.schedule.closed_text
         $ CurLocDesc = MainTxt
         $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
@@ -649,6 +645,9 @@ label HunterClubBuildActions:
     $ findAvailableEvents(True)
 
     python:
+        current_action_items.append(MenuItem("Купить товары", Call("HunterClubBuyMenu")))
+        current_action_items.append(MenuItem("Продать добычу", Call("HunterClubSellMenu")))
+        current_action_items.append(MenuItem("Поговорить с Луизой", Call("HunterClubLuiseTalk")))
         for _club_object in HunterClubRoom.visible_objects():
             current_action_items.append(MenuItem(_club_object.name, Call("HunterClubObjectMenu", _club_object.object_id)))
         if story_event_available("HunterClub", "overheard"):
@@ -687,7 +686,7 @@ label HunterClubObjectMenu(object_id=""):
             elif _club_action.hook == "jump" and str(_club_action.target or "") != "":
                 current_action_items.append(MenuItem(_club_action.label, Jump(_club_action.target)))
 
-    $ current_action_items.append(MenuItem("Назад", Call("HunterClubRestore")))
+    $ current_action_items.append(MenuItem("Назад", Jump("HunterClub")))
     return
 
 
@@ -713,14 +712,14 @@ label HunterClubObjectText(object_id="", action_id=""):
 
 
 label HunterClubLuiseTalk:
-    $ current_action_title = "Толстая Луиза"
+    $ current_action_title = "Толстуха Луиза"
     $ current_action_content = None
-    $ MainTxt = "Толстая Луиза смеряет вас быстрым опытным взглядом и хмыкает: \"Если принес добычу - платила и буду платить. Если пришел за снарягой - смотри товар, только не торгуйся по пустякам.\""
+    $ MainTxt = " Луиза смеряет вас быстрым опытным взглядом и хмыкает: \"Если принес добычу - платила и буду платить. Если пришел за снарягой - смотри товар, только не торгуйся по пустякам.\""
     $ CurLocDesc = MainTxt
     $ current_action_items = [
-        MenuItem("Открыть список покупок", Call("HunterClubBuyMenu")),
-        MenuItem("Открыть список продажи", Call("HunterClubSellMenu")),
-        MenuItem("Назад", Call("HunterClubRestore")),
+        MenuItem("Закупиться для охоты", Call("HunterClubBuyMenu")),
+        MenuItem("Подать добычу", Call("HunterClubSellMenu")),
+        MenuItem("Назад", Jump("HunterClub")),
     ]
     return
 
@@ -732,7 +731,7 @@ label HunterClubNewsMenu:
     $ CurLocDesc = MainTxt
     $ current_action_items = [
         MenuItem("Посмотреть охотничьи вызовы", Call("HunterClubChallengesMenu")),
-        MenuItem("Назад", Call("HunterClubRestore")),
+        MenuItem("Назад", Jump("HunterClub")),
     ]
     return
 
@@ -755,7 +754,7 @@ label HunterClubChallengesMenu(result_text=""):
                 current_action_items.append(MenuItem(_caption, Call("HunterClubChallengeMissing", _challenge_id)))
         if len(current_action_items) <= 0:
             current_action_items.append(MenuItem("Все доступные вызовы уже закрыты", Call("HunterClubNewsMenu")))
-        current_action_items.append(MenuItem("Назад", Call("HunterClubRestore")))
+        current_action_items.append(MenuItem("Назад", Jump("HunterClub")))
     return
 
 
@@ -807,7 +806,7 @@ label HunterClubSellMenu:
     show screen hunter_club_trade_overlay
     $ current_action_title = "Продажа"
     $ current_action_content = None
-    $ MainTxt = "Толстая Луиза готова принять шкуры, когти, мясо, травы и прочую лесную добычу. Отметьте нужное и укажите количество."
+    $ MainTxt = "Толстуха Луиза готова принять шкуры, когти, мясо, травы и прочую лесную добычу. Отметьте нужное и укажите количество."
     $ CurLocDesc = MainTxt
     $ current_action_items = [
         MenuItem("Подтвердить продажу", Call("HunterClubApplyTrade", "sell")),

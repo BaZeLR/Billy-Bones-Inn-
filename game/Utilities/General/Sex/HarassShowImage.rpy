@@ -1,53 +1,64 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# Tavern harassment event picture selection.
 # ================================================================================
 
 label HarassShowImage(GirlNameHSI="", ActionHSI="", ReactionHSI=0, EyewitnessHSI=0, JobTypeHSI=""):
-    if EyewitnessHSI > 0:
-        if GirlNameHSI == "melissa":
-            if ReactionHSI == 0:
-                call ShowImage(GirlNameHSI, "Grope", "inter")
-            elif ActionHSI in ("ass", "dress"):
-                if ReactionHSI >= 3:
-                    call ShowImageSeq(GirlNameHSI, "Grope", "assok", 2)
+    $ _hsi_picture = ""
+    $ _hsi_girl = str(GirlNameHSI or "")
+    $ _hsi_action = str(ActionHSI or "")
+    $ _hsi_reaction = int(ReactionHSI or 0)
+    $ _hsi_eyewitness = int(EyewitnessHSI or 0)
+    $ _hsi_info = getPersonInfo(_hsi_girl)
+
+    if _hsi_eyewitness > 0:
+        if _hsi_girl == "melissa":
+            if _hsi_reaction == 0:
+                $ _hsi_picture = build_media_ref(_hsi_girl, "Grope", "inter")
+            elif _hsi_action in ("ass", "dress"):
+                if _hsi_reaction >= 3:
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "Grope", "assok" + str(procedural_randint(1, 2, "harass_melissa_ass_ok_%s" % int(dayspassed or 0))))
                 else:
-                    call ShowImage(GirlNameHSI, "Grope", "assangry")
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "Grope", "assangry")
             else:
-                if ReactionHSI >= 3:
-                    call ShowImage(GirlNameHSI, "Grope", "titok")
-                elif ReactionHSI == 2:
-                    call ShowImageSeq(GirlNameHSI, "Grope", "titshy", 2)
+                if _hsi_reaction >= 3:
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "Grope", "titok")
+                elif _hsi_reaction == 2:
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "Grope", "titshy" + str(procedural_randint(1, 2, "harass_melissa_tit_shy_%s" % int(dayspassed or 0))))
                 else:
-                    call ShowImageSeq(GirlNameHSI, "Grope", "titangry", 2)
-        elif GirlNameHSI == "amanda":
-            if ReactionHSI == 0:
-                call ShowImage(GirlNameHSI, "grope", "inter")
-            elif ActionHSI == "ass":
-                if ReactionHSI >= 3:
-                    call ShowImageSeq(GirlNameHSI, "grope", "assok", 2)
-                elif ReactionHSI == 2:
-                    call ShowImage(GirlNameHSI, "grope", "assshy")
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "Grope", "titangry" + str(procedural_randint(1, 2, "harass_melissa_tit_angry_%s" % int(dayspassed or 0))))
+        elif _hsi_girl == "amanda":
+            if _hsi_reaction == 0:
+                $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "inter")
+            elif _hsi_action == "ass":
+                if _hsi_reaction >= 3:
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "assok" + str(procedural_randint(1, 2, "harass_amanda_ass_ok_%s" % int(dayspassed or 0))))
+                elif _hsi_reaction == 2:
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "assshy")
                 else:
-                    call ShowImage(GirlNameHSI, "grope", "assangry")
-            elif ActionHSI == "tits":
-                if ReactionHSI >= 3:
-                    call ShowImageSeq(GirlNameHSI, "grope", "titok", 2)
-                elif ReactionHSI == 2:
-                    call ShowImageSeq(GirlNameHSI, "grope", "titshy", 2)
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "assangry")
+            elif _hsi_action == "tits":
+                if _hsi_reaction >= 3:
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "titok" + str(procedural_randint(1, 2, "harass_amanda_tit_ok_%s" % int(dayspassed or 0))))
+                elif _hsi_reaction == 2:
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "titshy" + str(procedural_randint(1, 2, "harass_amanda_tit_shy_%s" % int(dayspassed or 0))))
                 else:
-                    call ShowImage(GirlNameHSI, "grope", "titangry")
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "titangry")
             else:
-                if panties.get(GirlNameHSI, "") == "":
-                    if ReactionHSI >= 2:
-                        call ShowImageSeq(GirlNameHSI, "grope", "dressnaked", 2)
+                if _hsi_info is not None and not _hsi_info.has_panties():
+                    if _hsi_reaction >= 2:
+                        $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "dressnaked" + str(procedural_randint(1, 2, "harass_amanda_dress_naked_%s" % int(dayspassed or 0))))
                     else:
-                        call ShowImage(GirlNameHSI, "grope", "dressnakedangry")
+                        $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "dressnakedangry")
                 else:
-                    call ShowImage(GirlNameHSI, "grope", "dresspanties")
-        elif GirlNameHSI == "sandra":
+                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "dresspanties")
+        elif _hsi_girl == "sandra":
             if JobTypeHSI == "waitress":
-                $ _sandra_pic = "waitress" + str(renpy.random.randint(1, 4))
+                $ _hsi_picture = build_media_ref(_hsi_girl, "tavern", "waitress" + str(procedural_randint(1, 4, "harass_sandra_waitress_%s" % int(dayspassed or 0))))
             else:
-                $ _sandra_pic = "cleaning1"
-            call ShowImage(GirlNameHSI, "tavern", _sandra_pic)
+                $ _hsi_picture = build_media_ref(_hsi_girl, "tavern", "cleaning1")
+
+    if str(_hsi_picture or "").strip():
+        $ scene_image = str(_hsi_picture or "")
+        $ _layout_last_picture = scene_image
+        vscene scene_image
     return

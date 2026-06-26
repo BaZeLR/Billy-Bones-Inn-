@@ -153,7 +153,6 @@ default neshlush = {}
 # and dynamic if conditions (called from labels via py_eval).
 default AmandaVar = {}
 default IrmaVar = {}
-default SoapProcessActive = False
 
 # Core NPC/player relation state maps.
 default CurrentLoc = {}

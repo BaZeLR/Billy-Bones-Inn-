@@ -39,7 +39,6 @@ init python:
 
 
 label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
-    hide screen main_ui
     python:
         topdress.setdefault(GirlNameIBS, "")
         bottomdress.setdefault(GirlNameIBS, "")

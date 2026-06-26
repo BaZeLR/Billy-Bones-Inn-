@@ -76,7 +76,6 @@ init 6 python:
 
 label TavernSandraRoom:
     if tavern_sandra_room_door_locked():
-        call EnterLocation("TavernUpstairs")
         $ CurrentRoom = TavernUpstairsRoom
         $ CurLoc = "TavernUpstairs"
         $ location = CurLoc
@@ -89,7 +88,6 @@ label TavernSandraRoom:
             call screen main_ui
             $ _sandra_locked_ui_return = _return
         jump TavernUpstairs
-    call EnterLocation("TavernSandraRoom")
     $ CurrentRoom = TavernSandraRoomRoom
     $ CurLoc = "TavernSandraRoom"
     $ location = CurLoc
@@ -156,7 +154,7 @@ label TavernSandraRoomObjectMenu(object_id=""):
                 current_action_items.append(MenuItem(_room_action.label, Call(_room_action.target, *_room_args)))
             elif _room_action.hook == "jump" and str(_room_action.target or "") != "":
                 current_action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
-        current_action_items.append(MenuItem("Назад", Call("TavernSandraRoomRestore")))
+        current_action_items.append(MenuItem("Назад", Jump("TavernSandraRoom")))
     return
 
 

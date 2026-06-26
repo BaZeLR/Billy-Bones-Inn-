@@ -10,7 +10,6 @@ init python:
         "wake_up": "images/player_room/wake_up.png",
         "from_bed": "images/player_room/from_bed.png",
         "attic": "images/player_room/player_room_attic.png",
-        "attic_found": "images/player_room/player_room_attic_1.png",
         "door": "images/player_room/player room_door.png",
     }
 
@@ -156,9 +155,7 @@ label TavernMyRoom:
     $ current_action_items = []
     $ current_girl_key = ""
     $ current_object_id = ""
-    call LOC("TavernMyRoom")
     $ player_apply_morning_state("TavernMyRoom")
-    $ _amanda_ai_room_intent = amanda_ai_room_intent_code("TavernMyRoom", True) if bool(globals().get("AmandaAIIntegrationEnabled", False)) and "amanda_ai_room_intent_code" in globals() else ""
     $ _my_room_picture, _my_room_text = tavern_my_room_scene_state()
     $ scene_image = _my_room_picture or None
     if _my_room_picture:
@@ -166,8 +163,6 @@ label TavernMyRoom:
     $ MainTxt = _my_room_text
     $ CurLocDesc = _my_room_text
     $ CurrentRoom.mark_visited()
-    if bool(AmandaAIIntegrationEnabled):
-        call AmandaMiniEventEntry(CurLoc, "room")
     call TavernMyRoomBuildActions
     $ _my_room_ui_return = None
     while _my_room_ui_return is None:
@@ -207,12 +202,6 @@ label TavernMyRoomObjectMenu(object_id="", refresh_only=False):
     if _room_object is None:
         call TavernMyRoomBuildActions
         return
-    if object_id == "myroom_attic_hatch_001":
-        if int(TavernMyRoomAtticHatchFound or 0) == 1:
-            $ _room_object.picture = player_room_image_path("attic_found")
-        else:
-            $ _room_object.picture = player_room_image_path("attic")
-
     if str(action_override_text or "") != "":
         $ MainTxt = str(action_override_text or "")
         $ CurLocDesc = MainTxt
@@ -248,7 +237,7 @@ label TavernMyRoomObjectMenu(object_id="", refresh_only=False):
             if object_id == "recipe_book_001":
                 current_action_items.append(MenuItem("Сесть за стол", Call("TavernMyRoomTableMenu")))
             current_action_items.append(MenuItem("Взять", Call("TavernMyRoomTakeFloorItem", object_id)))
-        current_action_items.append(MenuItem("Назад", Call("TavernMyRoomRestore")))
+        current_action_items.append(MenuItem("Назад", Jump("TavernMyRoom")))
     if not refresh_only:
         $ renpy.restart_interaction()
     return
@@ -376,7 +365,7 @@ label TavernMyRoomTableMenu:
         $ CurLocDesc = MainTxt
         $ current_action_title = "Стол"
         $ current_action_content = None
-        $ current_action_items = [MenuItem("Назад", Call("TavernMyRoomRestore"))]
+        $ current_action_items = [MenuItem("Назад", Jump("TavernMyRoom"))]
     else:
         $ _table_picture = tavern_my_room_table_picture()
         $ scene_image = _table_picture or None
@@ -392,7 +381,7 @@ label TavernMyRoomTableMenu:
         $ current_action_items = []
         $ current_action_items.append(MenuItem("Читать книгу рецептов", Call("TavernMyRoomTableRead")))
         $ current_action_items.append(MenuItem("Создать предмет", Call("TavernMyRoomTableCraftMenu")))
-        $ current_action_items.append(MenuItem("Назад", Call("TavernMyRoomRestore")))
+        $ current_action_items.append(MenuItem("Назад", Jump("TavernMyRoom")))
     $ renpy.restart_interaction()
     return
 
@@ -402,7 +391,7 @@ label TavernMyRoomTableRead(recipe_id=""):
     if not tavern_my_room_has_recipe_book_access():
         call TavernMyRoomTableMenu
         return
-    $ recipe_book_mark_read()
+    $ RecipeBookReadCount = max(0, int(RecipeBookReadCount or 0)) + 1
     $ _table_recipe_id = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()
     $ _table_picture = recipe_page_image_path(_table_recipe_id) or tavern_my_room_table_picture()
     $ scene_image = _table_picture or None
@@ -429,7 +418,10 @@ label TavernMyRoomTableRead(recipe_id=""):
             if str(_recipe_id or "") == str(_table_recipe_id or ""):
                 _title += " (открыто)"
             current_action_items.append(MenuItem(_title, Call("TavernMyRoomTableRead", _recipe_id)))
-        recipe_book_append_secret_actions("TavernMyRoom", "recipe_book_001", "table")
+        if recipe_book_can_notice_hidden_note():
+            current_action_items.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", "TavernMyRoom", "recipe_book_001", "table")))
+        elif int(RecipeBookTinyNoteFound or 0) == 1 and int(RecipeBookHiddenRecipesRevealed or 0) == 0:
+            current_action_items.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", "TavernMyRoom", "recipe_book_001", "table")))
     $ current_action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
     $ renpy.restart_interaction()
     return

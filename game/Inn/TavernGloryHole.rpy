@@ -24,7 +24,6 @@ init 6 python:
     )
 
 label TavernGloryHole:
-    call EnterLocation("TavernGloryHole")
     $ CurrentRoom = TavernGloryHoleRoom
     $ CurLoc = "TavernGloryHole"
     $ location = CurLoc

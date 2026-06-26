@@ -63,7 +63,7 @@ label CodeAmandaSorryChoices:
 
             "Взять назад слова про Лизетту" if Amanda.var["prohibitliza"]:
                 "\"Даже не знаю, что на меня нашло,\" — удивленно сказали вы. \"Ну подумаешь, Аманда с портовой шлюхой подружилась и та ее жизни учит. Что здесь такого? Даже не знаю, чего это я так рассердился. Все ж нормально.\""
-                $ _amanda_confirm_msg = CodeAmandaHappyConfirm()
+                $ _amanda_confirm_msg = Amanda.happy_confirm_text()
                 "[_amanda_confirm_msg]"
                 python:
                     slut_friends_increase("amanda", 18, 1, 1, 45, 2, 1)
@@ -72,7 +72,7 @@ label CodeAmandaSorryChoices:
 
             "Взять назад слова про месье Легаре" if Amanda.var["alberprohibit"] and Amanda.var["alberfriends"] >= 5:
                 "\"Да ладно тебе,\" — сказали вы. \"Про Легаре это я вспылил. Если он тебе так нравится, то можешь с ним видеться. Ну и что, что он женат и у него дети старше тебя. Подумаешь...\""
-                $ _amanda_confirm_msg = CodeAmandaHappyConfirm()
+                $ _amanda_confirm_msg = Amanda.happy_confirm_text()
                 "[_amanda_confirm_msg]"
                 python:
                     slut_friends_increase("amanda", 18, 1, 1, 45, 2, 1)
@@ -81,7 +81,7 @@ label CodeAmandaSorryChoices:
 
             "Взять назад слова про глорихол" if Amanda.var["gloryscold"]:
                 "\"Ну хорошо, хорошо,\" — примирительно сказали вы. \"Если хочешь у незнакомцев члены через дырку сосать, то соси, любой нормальный мужчина тебе и слова поперек бы не сказал, это я просто вспылил, что уж там.\""
-                $ _amanda_confirm_msg = CodeAmandaHappyConfirm()
+                $ _amanda_confirm_msg = Amanda.happy_confirm_text()
                 "[_amanda_confirm_msg]"
                 python:
                     slut_friends_increase("amanda", 18, 1, 1, 45, 2, 1)
@@ -90,7 +90,7 @@ label CodeAmandaSorryChoices:
 
             "Взять назад слова про путанье с парнями" if Amanda.var["prohibitwithguys"]:
                 "\"Ну хорошо, хорошо,\" — примирительно сказали вы. \"Если ты даешь каждому встречному-поперечному парню, да так что они уже в очередь становятся, то это твоя личная жизнь. Зря я к тебе придирался, пока не нагуляешься ведь не успокоишься!\""
-                $ _amanda_confirm_msg = CodeAmandaHappyConfirm()
+                $ _amanda_confirm_msg = Amanda.happy_confirm_text()
                 "[_amanda_confirm_msg]"
                 python:
                     slut_friends_increase("amanda", 18, 1, 1, 45, 2, 1)

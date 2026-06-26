@@ -30,7 +30,6 @@ init 6 python:
 
 
 label ForestHiddenPath:
-    call EnterLocation("ForestHiddenPath")
     $ CurrentRoom = ForestHiddenPathRoom
     $ CurLoc = "ForestHiddenPath"
     $ location = CurLoc

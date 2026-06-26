@@ -170,7 +170,6 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         return
 
     $ _girl_dress_restore_buy_menu = (str(CurLoc or "") == "GirlDressBuy")
-    hide screen main_ui
     $ _gds_ensure_stats(GirlName)
     $ _gds_ensure_stats("irma")
 

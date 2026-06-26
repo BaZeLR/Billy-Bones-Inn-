@@ -140,7 +140,7 @@ label NextDay(retlocname, timepassed):
                 money -= 5
             else:
                 NewDressCame += f' Вы забрали заказ, проигнорировав протянутую ладошку мальчишки и не дав ему ничего на чай. А обновку вы положили в ларь.'
-                Friends['irma'] = max(0, Friends.get('irma', 0) - 1)
+                Irma.change_social(friend_delta=-1)
                 
         DressProduced = ''
         DressBuyer = ''
@@ -252,7 +252,8 @@ label NextDay(retlocname, timepassed):
     
     # Reset daily variables
     $ Georgett.set_story_value("foundinchurch", 0)
-    $ Arousal['You'] = 0
+    $ player_state().intimacy.set_arousal(0, "You")
+    $ player_state().intimacy.apply_to_store()
     $ cametoday = 0
     $ energy = 100
     $ BlockTimeAdvance = 1

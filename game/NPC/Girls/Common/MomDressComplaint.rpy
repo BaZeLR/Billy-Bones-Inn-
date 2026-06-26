@@ -75,7 +75,6 @@ label MomDressComplaint(girl_name):
     $ KidsOrPregTmp = mom_dress_complaint_kids_or_preg(_mdc_girl)
     $ _mdc_real_name = RealName.get(_mdc_girl, _mdc_girl)
     $ _mdc_georgett_present = str(getLocation("georgett") or "") == "TavernMain"
-    hide screen main_ui
     $ main_ui_begin_native_scene_state("Разговор с Сандрой")
     $ TavernMainBlockEvents = 1
     if renpy.loadable("images/sandra/tavern/cleaning1.jpg"):

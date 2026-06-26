@@ -151,7 +151,7 @@ label story_clara_paintings_commission_6:
     $ CurLocDesc = MainTxt
     $ current_action_title = "Кларисса"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Кивнуть и не продолжать при людях", Call("TavernMainRestore"))]
+    $ current_action_items = [MenuItem("Кивнуть и не продолжать при людях", Jump("TavernMain"))]
     if thread is not None:
         $ thread.advance()
     return
@@ -173,7 +173,8 @@ label story_clara_paintings_evening_peek_8:
     $ Clara.var["peek_done"] = 1
     $ Clara.var["murder_day"] = int(dayspassed or 0) + 1
     $ Clara.current_location = "TavernMelissaRoom"
-    $ CurrentLoc["melissa"] = "TavernMelissaRoom"
+    $ Melissa.current_location = "TavernMelissaRoom"
+    $ Melissa.location = "TavernMelissaRoom"
     $ MainTxt = "Вечером вы с Клариссой держитесь в тени напротив цирюльни. Когда боковая дверь снова открывается, она успевает увидеть достаточно: столичного жениха, Серджио, их осторожные жесты и ту особую близость, которую нельзя объяснить случайным визитом.\n\nКларисса сперва каменеет, потом почти злится на себя за облегчение. \"Значит, он тоже живет не той жизнью, которую ему продают,\" шепчет она. \"А меня собирались сделать ширмой для чужих приличий.\""
     $ CurLocDesc = MainTxt
     $ current_action_title = "Вечерняя слежка"
@@ -193,7 +194,7 @@ label story_clara_paintings_confession_9:
     $ CurLocDesc = MainTxt
     $ current_action_title = "Комната Мелиссы"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Оставить девушек поговорить", Call("TavernMelissaRoomRestore"))]
+    $ current_action_items = [MenuItem("Оставить девушек поговорить", Jump("TavernMelissaRoom"))]
     if thread is not None:
         $ thread.advance()
     return

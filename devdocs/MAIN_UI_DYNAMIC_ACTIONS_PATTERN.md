@@ -1,6 +1,13 @@
 # Main UI Dynamic Actions Pattern
 
-This is the project rule for rendering room, object, NPC, shop, and event actions in the main UI.
+This is the project rule for rendering room, object, NPC, and shop actions in
+the main UI.
+
+It is not the rule for authored story/event scenes. Story/event scenes must
+follow `devdocs/EventThreadInstruction/README.md`: event tuples own
+availability; event labels own `vscene`, text, classic Ren'Py `menu:`, direct
+consequences, time cost, and thread progression; the right-side HUD remains
+persistent.
 
 ## Goal
 
@@ -64,12 +71,8 @@ Each room source file sets its own room object directly before entering:
 
 ```renpy
 $ CurrentRoom = TavernMainRoom
-call EnterLocation("TavernMain")
-```
-
-`EnterLocation` only resets the action panel state:
-
-```renpy
+$ CurLoc = CurrentRoom.code_name
+$ location = CurLoc
 $ current_action_title = "Actions"
 $ current_action_content = "room_navigation"
 $ current_girl_key = ""
@@ -117,19 +120,26 @@ No alias map, no fallback resolver.
 
 ## Event Use
 
-Events can reuse the same pattern:
+Authored events do not build choices through the dynamic action panel. They use
+the event/thread runtime for availability and a normal Ren'Py label for flow:
 
 ```renpy
-label some_event:
-    $ current_action_title = "Talk to Amanda"
-    $ current_action_content = "girl_interaction"
-    $ current_girl_key = "amanda"
-    $ renpy.pause()
-    $ current_action_content = None
-    return
+label story_example_event:
+    vscene "images/example/event.jpg"
+    "Event text."
+
+    menu:
+        "Act":
+            $ SomeNpc.var["example_seen"] = 1
+            $ thread.advance()
+            jump expression CurLoc
+
+        "Leave":
+            jump expression CurLoc
 ```
 
-If the action content is embedded in `main_ui`, do not also `show screen` for the same content unless it is meant to be a popup.
+The screen layer may style the Ren'Py menu in the right-side action area, but
+the choices and consequences stay in the event label.
 
 ## Execution Rule
 

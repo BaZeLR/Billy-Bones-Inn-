@@ -2,41 +2,20 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    import renpy.store as store
-    import renpy.exports as renpy
-
     def add_others_sperm_apply(girl_name, chance):
-        girl = str(girl_name or "")
-        if girl == "":
+        girl = getPersonInfo(girl_name)
+        if girl is None:
             return 0
 
         chance_i = max(1, int(chance or 1))
+        girl.clear_cum("cum_inside_others", "cum_face_others", "cum_tits_others")
 
-        cum_inside_others = getattr(store, "CumInsideOthers", None)
-        if not isinstance(cum_inside_others, dict):
-            cum_inside_others = {}
-            store.CumInsideOthers = cum_inside_others
-
-        cum_face_others = getattr(store, "CumFaceOthers", None)
-        if not isinstance(cum_face_others, dict):
-            cum_face_others = {}
-            store.CumFaceOthers = cum_face_others
-
-        cum_tits_others = getattr(store, "CumTitsOthers", None)
-        if not isinstance(cum_tits_others, dict):
-            cum_tits_others = {}
-            store.CumTitsOthers = cum_tits_others
-
-        cum_inside_others[girl] = 0
-        cum_face_others[girl] = 0
-        cum_tits_others[girl] = 0
-
-        if renpy.random.randint(1, chance_i * 2) == 1:
-            cum_face_others[girl] = 1
-        if renpy.random.randint(1, chance_i) == 1:
-            cum_tits_others[girl] = 1
-        if renpy.random.randint(1, chance_i * 2) == 1:
-            cum_inside_others[girl] = 1
+        if procedural_randint(1, chance_i * 2, "others_sperm_face_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            girl.set_cum_state("cum_face_others", 1)
+        if procedural_randint(1, chance_i, "others_sperm_tits_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            girl.set_cum_state("cum_tits_others", 1)
+        if procedural_randint(1, chance_i * 2, "others_sperm_inside_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            girl.set_cum_state("cum_inside_others", 1)
         return 0
 
 

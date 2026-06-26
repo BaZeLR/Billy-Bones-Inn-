@@ -96,7 +96,6 @@ init python:
 label StreetTavern:
     scene black
     show bg StreetTavern at master
-    call EnterLocation("StreetTavern")
     $ dog_prepare_current_spawn()
     $ CurrentRoom = StreetTavernRoom
     $ CurLoc = "StreetTavern"
@@ -116,15 +115,6 @@ label StreetTavern:
             _street_tavern_event_check_block = ""
 
     if _street_tavern_event_check_block != "EventCheckBlock":
-        $ _amanda_dynamic_result = CheckIfRunToLegare()
-        $ _amanda_dynamic_jump = str(AmandaDynamicTakeNextJump() or "")
-        if _amanda_dynamic_jump != "" and renpy.has_label(_amanda_dynamic_jump):
-            jump expression _amanda_dynamic_jump
-        if int(_amanda_dynamic_result or 0) == 0:
-            $ _amanda_dynamic_result = CheckIfMeetLover()
-            $ _amanda_dynamic_jump = str(AmandaDynamicTakeNextJump() or "")
-            if _amanda_dynamic_jump != "" and renpy.has_label(_amanda_dynamic_jump):
-                jump expression _amanda_dynamic_jump
         call RoomEnterEventGate(CurLoc, False)
 
     python:

@@ -30,6 +30,7 @@ init 5 python:
             BandageItem,
             HealingPotionItem,
             WolfSkinItem,
+            WhiteWolfSkinItem,
             BoarFangItem,
             BoarMeatItem,
             BearClawItem,

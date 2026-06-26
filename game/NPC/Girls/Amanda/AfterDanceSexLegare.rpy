@@ -10,13 +10,13 @@ init python:
 
     def _adsl_pick_sex_type():
         try:
-            return max(0, min(5, int(AmandaLegareSetSexType())))
+            return max(0, min(5, int(Amanda.legare_sex_type())))
         except Exception:
             return 0
 
     def _adsl_nesluh():
         try:
-            return int(AmandaNesluhCalc())
+            return int(Amanda.nesluh_value())
         except Exception:
             return 0
 

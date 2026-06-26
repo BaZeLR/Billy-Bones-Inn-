@@ -25,6 +25,16 @@ Then a room-specific or generic builder assembles the current visible action lis
 
 This is much closer to how QSP locations expose context-sensitive `act` options than to a single service router.
 
+Every room, object, NPC, and event interaction that is still part of the current
+location must keep the main UI layout intact: title/media/text on the left and
+the HUD/action/character panel on the right. Do not hide `main_ui`, open a
+second full-screen action interface, or introduce refresh/rebuild/restore labels
+for ordinary choices.
+
+Object menus are owned by the object label. A clicked object opens its own small
+menu by assigning direct `MenuItem` choices to `current_action_items`; those
+choices call or jump to direct labels owned by that object/item/domain.
+
 ---
 
 ## Current Runtime Model
@@ -40,11 +50,14 @@ A `Room` already contains:
 - descriptions
 - exits
 - `game_items`
-- `npcs`
 - `action_menus`
 - schedule
 - triggers
 - custom properties
+
+Some room files still have compatibility NPC/menu fields. Those fields are not
+authority for NPC state. NPC presence must come from NPC class location and
+visibility state.
 
 So the room is the top-level container that decides what can appear right now.
 
@@ -99,15 +112,16 @@ This is the correct current model.
 
 ---
 
-## 4. NPC actions are bound through room NPC lists
+## 4. NPC actions are bound through NPC visibility
 
 File:
 
 - `game/Inn/CharacterActionHub.rpy`
 
-NPC actions come from the room's `npcs` list, not from a global NPC action dispatcher.
+NPC presence must come from NPC class state and visibility rules, not from the
+room as NPC authority.
 
-Each NPC entry typically provides:
+Current compatibility code may still pass entries that provide:
 
 - `npc_id`
 - `name`
@@ -115,7 +129,11 @@ Each NPC entry typically provides:
 - `talk_label`
 - optional inspect target
 
-Then the current room decides which NPCs are visible.
+Target correction:
+
+- the NPC instance owns its location and visibility;
+- the current room/HUD only displays NPCs whose state says they are present;
+- selecting the NPC opens that NPC's interaction menu.
 
 The current hub provides actions like:
 
@@ -124,11 +142,8 @@ The current hub provides actions like:
 
 So NPC interactions are:
 
-- room-bound
 - entity-bound
 - currently passed through a generic interaction hub
-
-Target correction:
 
 - the hub may remain only as a thin selector while callers are migrated;
 - it must not own NPC truth, social mechanics, story consequences, or dialogue menus;
@@ -169,7 +184,8 @@ become refresh/apply/renew/rebuild dispatch layers.
 
 ## 6. MC-owned actions are also a real category
 
-This project also already has actions that belong primarily to the player character, not to an external NPC or passive room object.
+This project also already has actions that belong primarily to the player
+character, not to an external NPC or passive room object.
 
 Examples:
 
@@ -207,7 +223,7 @@ So the full action model is not only:
 
 It is also:
 
-- room -> player-available self action -> stat change
+- room/object -> player-available self action -> player/domain state change
 
 QSP perspective:
 
@@ -224,6 +240,10 @@ Good pattern:
 - self action label performs state change
 - `call stat` refreshes UI
 - caller returns to the owning room/object/NPC flow directly
+
+Do not mix these basic actions with NPC interaction, purchasing, inventory item
+behavior, crafting, fight/hunt, or sex-engine flow. Those systems may affect the
+Player, but they own their own labels and rules.
 
 Examples already in code:
 
@@ -261,7 +281,7 @@ For new work, prefer this hierarchy:
 
 1. room defines which objects/NPCs/exits are present
 2. object or NPC defines what actions are available
-3. room may also expose MC-owned self actions
+3. room/object may expose MC-owned self actions when that context is the target
 4. builder assembles current menu
 5. action label performs the actual logic
 6. caller returns to the owning room/object/NPC directly

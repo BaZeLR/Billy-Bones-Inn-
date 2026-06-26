@@ -25,9 +25,14 @@ init python:
                 dative="Драупниру",
                 default_location="StolyarWorkshop",
                 description="Драупнир - гном-столяр из квартала ремесленников. Дерет дорого, но вывески, отверстия, глорихолы, зольные бочки и будки делает на совесть.",
-                age=45,
+                birth_date={"day": 1, "period": 1, "cycle": 1055},
                 portrait="images/draupnir/dwarf1.jpg",
             )
+
+        def getLocation(self, wday=None, hour=None):
+            if int(SloganFixed or 0) == 1:
+                return "StreetTavern"
+            return super(DraupnirData, self).getLocation(wday, hour)
 
     class DraupnirInfo(BaseNPC):
         """Draupnir: carpenter/artisan in StolyarWorkshop, gloryhole/soap/dog-booth quests."""
@@ -48,6 +53,11 @@ init python:
             self.location = "StolyarWorkshop"
             self.promote_from_var(self.var)
 
+        def social_action_allowed(self, action="", item_id=""):
+            if int(SloganFixed or 0) == 1:
+                return False
+            return super(DraupnirInfo, self).social_action_allowed(action, item_id)
+
 define DraupnirStaticData = DraupnirData()
 default Draupnir = DraupnirInfo()
 
@@ -57,12 +67,11 @@ label InitDraupnir:
 
 
 label register_draupnir_secondary:
-    $ knowsMC.setdefault("draupnir", False)
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["draupnir"] = DraupnirStaticData
             Draupnir.var = DraupnirVar
-            Draupnir.location = "StolyarWorkshop"
+            Draupnir.location = Draupnir.getLocation()
             Draupnir.update()
             peopleInfo["draupnir"] = Draupnir
         if 'secondary_npcs' not in dir() or not isinstance(secondary_npcs, list):

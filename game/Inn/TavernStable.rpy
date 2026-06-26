@@ -28,11 +28,22 @@ init python:
     def tavern_stable_can_walk_to_kunidell(_obj=None):
         return tavern_stable_can_start_becky_trade() and int(Becky.var.get('SherwoodSuspect', 0) or 0) >= 5
 
+    def tavern_stable_picture():
+        hour_now = int(calendar_v2.hour or 0) % 24
+        is_day = 6 <= hour_now < 20
+        if MyStallion != "":
+            if is_day:
+                return "images/tavern/backyard/stables/horse-day.png"
+            return "images/tavern/backyard/stables/stablehorse_night.png"
+        if is_day:
+            return "images/tavern/backyard/stables/stable_empty_day.png"
+        return "images/tavern/backyard/stables/stable_empy _night.png"
+
     TavernStableRoom = Room(
         code_name="TavernStable",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Конюшня",
-        bg_picture="bg stable",
+        bg_picture="images/tavern/backyard/stables/stable_empty_day.png",
         descriptions=[
             RoomDescription(
                 text="Вы находитесь в конюшне, пристроенной к вашему трактиру. С обеих сторон от выхода на улицу располагаются денники для лошадей, по три с каждой стороны. За ними стоит большая кадка с водой и расположены вешалки для конской сбруи. Сверху, почти на всем протяжении конюшни, тянется навес для хранения сена. В углу стоит лестница.\n\nЭту конюшню выстроил прежний владелец трактира - большой оптимист. В его мечтах в трактир валом валили богатые и знатные господа: дворяне и купцы. Приезжать они конечно, должны были верхом. Реальность же оказалась куда прозаичней - контингент завсегдатаев 'Дикого Жеребца' состоял из людей попроще и являлся на пьянку пешком. За все время, что вы были владельцем этого заведения, хоть бы один человек приехал бы сюда на лошади!",
@@ -134,21 +145,16 @@ init python:
         return "\n\n".join([part for part in desc_parts if str(part or "").strip()])
 
 label TavernStable:
-    call EnterLocation("TavernStable")
     $ _room = TavernStableRoom
     $ CurrentRoom = _room
     $ CurLoc = "TavernStable"
     $ location = CurLoc
-    $ scene_image = _room.bg_picture or None
+    $ scene_image = tavern_stable_picture() or _room.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
     $ Mongol.ensure_story_defaults()
     $ Becky.var['TradeOffer'] = int(Becky.var.get('TradeOffer', 0) or 0)
     $ Becky.var['SherwoodSuspect'] = int(Becky.var.get('SherwoodSuspect', 0) or 0)
-    if MyStallion != "":
-        call ShowImage("", "", "images/tavern/backyard/stables/stablehorse.jpg")
-    else:
-        call ShowImage("", "", "images/tavern/backyard/stables/stableempty.jpg")
     $ MainTxt = tavern_stable_scene_text()
     $ CurLocDesc = MainTxt
     $ _room.mark_visited()
@@ -202,7 +208,7 @@ label tavern_stable_object_menu(object_id=""):
                 current_action_items.append(MenuItem(_room_action.label, Call(_room_action.target)))
             elif _room_action.hook == "jump" and str(_room_action.target or "") != "":
                 current_action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
-        current_action_items.append(MenuItem("Назад", Call("TavernStableRestore")))
+        current_action_items.append(MenuItem("Назад", Jump("TavernStable")))
     return
 
 

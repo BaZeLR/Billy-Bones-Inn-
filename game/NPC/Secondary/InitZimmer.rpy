@@ -22,7 +22,7 @@ init python:
                 dative="Десятнику Циммерману",
                 default_location="CityGuard",
                 description="Десятник Циммерман - старый начальник городской стражи, осторожный, носатый, кучерявый и всегда готовый объяснить, почему дело сложнее, чем кажется.",
-                age=58,
+                birth_date={"day": 1, "period": 1, "cycle": 1042},
                 portrait="images/zimmer/portrait1.png",
             )
 
@@ -33,7 +33,6 @@ init python:
         def __init__(self, name="zimmer", **kwargs):
             super().__init__(name, **kwargs)
             self.data = ZimmerStaticData
-            self.age = 58
             self.known = False
             self.location = "CityGuard"
             self.var = {}
@@ -84,7 +83,6 @@ label InitZimmer:
 
 
 label register_zimmer_secondary:
-    $ knowsMC.setdefault("zimmer", False)
     python:
         peopleData["zimmer"] = ZimmerStaticData
         Zimmer.update()

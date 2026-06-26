@@ -502,11 +502,14 @@ init -998 python:
             self.came_today = 0
             self.last_sex_day = -1
             self.last_cum_day = -1
+            self.cock_positions = {}
             self.history = {}
             self.had_sex_count = 0
 
         def sync_from_store(self):
             g = globals()
+            if not isinstance(getattr(self, "cock_positions", None), dict):
+                self.cock_positions = {}
             arousal_value = g.get("Arousal", self.arousal)
             self.arousal = dict(arousal_value or {}) if isinstance(arousal_value, dict) else {"you": 0}
             self.can_cum_daily = player_to_int(g.get("cancumdaily", self.can_cum_daily), 2)
@@ -531,6 +534,59 @@ init -998 python:
             had_sex["You"] = player_to_int(self.had_sex_count, 0)
             g["HadSex"] = had_sex
             return self
+
+        def normalize_arousal(self):
+            if not isinstance(self.arousal, dict):
+                self.arousal = {"You": 0, "you": 0}
+            self.arousal.setdefault("You", self.arousal.get("you", 0))
+            self.arousal.setdefault("you", self.arousal.get("You", 0))
+            return self.arousal
+
+        def arousal_value(self, actor="You"):
+            self.normalize_arousal()
+            key = str(actor or "You")
+            return player_to_int(self.arousal.get(key, self.arousal.get(key.lower(), 0)), 0)
+
+        def set_arousal(self, value, actor="You"):
+            self.normalize_arousal()
+            new_value = player_clamp_value(value, 0, 100)
+            key = str(actor or "You")
+            self.arousal[key] = new_value
+            self.arousal[key.lower()] = new_value
+            return new_value
+
+        def add_arousal(self, amount=0, cap=100, actor="You"):
+            return self.set_arousal(min(player_to_int(cap, 100), self.arousal_value(actor) + player_to_int(amount, 0)), actor)
+
+        def set_cock_position(self, target_id="", position="none"):
+            target_key = str(target_id or "").strip().lower()
+            position_key = str(position or "none").strip().lower()
+            if not target_key:
+                return "none"
+            if position_key not in ("none", "pussy", "mouth", "tits", "ass"):
+                position_key = "none"
+            self.cock_positions[target_key] = position_key
+            return position_key
+
+        def cock_position(self, target_id=""):
+            target_key = str(target_id or "").strip().lower()
+            if not target_key:
+                return "none"
+            return str(self.cock_positions.get(target_key, "none") or "none")
+
+        def cock_in(self, target_id="", position="none"):
+            return self.cock_position(target_id) == str(position or "none").strip().lower()
+
+        def can_cum(self):
+            return player_to_int(self.came_today, 0) < max(1, player_to_int(self.can_cum_daily, 1))
+
+        def record_cum(self, day_value=0):
+            self.came_today = player_to_int(self.came_today, 0) + 1
+            self.had_sex_count = player_to_int(self.had_sex_count, 0) + 1
+            self.last_sex_day = player_to_int(day_value, 0)
+            self.last_cum_day = player_to_int(day_value, 0)
+            self.set_arousal(0, "You")
+            return self.came_today
 
     class PlayerChores(object):
         KEYS = ("bring_woods", "chop_wood", "make_fire", "clean_ashes", "boil_water", "clean_upstairs_rooms")
@@ -685,6 +741,12 @@ init -998 python:
             value = self.economy.add_money(amount)
             self.economy.apply_to_store()
             return value
+
+        def change_tavern_fame(self, amount):
+            self.sync_from_store()
+            self.economy.tavern_fame = player_to_int(self.economy.tavern_fame, 0) + player_to_int(amount, 0)
+            self.economy.apply_to_store()
+            return self.economy.tavern_fame
 
         def spend_money(self, amount):
             self.sync_from_store()

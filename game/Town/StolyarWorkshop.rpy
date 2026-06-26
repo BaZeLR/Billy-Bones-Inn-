@@ -3,18 +3,35 @@
 # ================================================================================
 
 init python:
-    def stolyar_workshop_is_open():
-        calendar_v2.sync_state()
-        current_minutes = int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)
-        return int(calendar_v2.week or 0) != 7 and 6 * 60 <= current_minutes <= 17 * 60 + 59
-
-    def stolyar_workshop_order_window_open():
-        return stolyar_workshop_is_open()
+    StolyarWorkshopRoom = Room(
+        code_name="StolyarWorkshop",
+        group_name=ROOM_GROUP_CITY,
+        display_name="Мастерская Драупнира",
+        bg_picture="images/draupnir/dwarf1.jpg",
+        descriptions=[
+            RoomDescription(
+                text="Вы находитесь в мастерской известного столяра Драупнира. Всему городу известно что гном Драупнир хоть и дерет дорого, но работу свою исполняет не за страх, а за совесть. Мало кто, а точнее никто, может сравниться с ним в столярном ремесле. В его лавке приятно пахнет деревом и всюду висят рубанки, пилы, стамески, топоры и прочий инструмент. В глубине мастерской, за верстаком, что-то тачает сам хозяин - приземистый и крепко сбитый гном.",
+                priority=100,
+            ),
+        ],
+        exits=[
+            RoomExit(label="Вернуться в квартал ремесленников", target="ArtisansQuarter"),
+        ],
+        schedule=RoomSchedule(
+            weekdays=[1, 2, 3, 4, 5, 6],
+            start="06:00",
+            end="17:59",
+            closed_text="В это время мастерская закрыта.",
+        ),
+    )
 
 label StolyarWorkshop:
-    call EnterLocation("StolyarWorkshop")
-    $ CurLoc = "StolyarWorkshop"
+    $ CurrentRoom = StolyarWorkshopRoom
+    $ CurLoc = CurrentRoom.code_name
     $ location = CurLoc
+    $ scene_image = CurrentRoom.bg_picture or None
+    if scene_image:
+        $ _layout_last_picture = scene_image
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
@@ -34,17 +51,17 @@ label StolyarWorkshop:
     $ can_ask_slogan = (SloganFixed == 0 and slogan_asked == 0)
     $ can_pay_slogan = (SloganFixed == 0 and slogan_asked > 0 and money >= 200)
     $ can_ask_hole = (georgett_whore and hole_asked == 0 and TavernHole == 0)
-    $ can_pay_hole = (georgett_whore and hole_asked > 0 and TavernHole == 0 and money >= 100 and stolyar_workshop_order_window_open())
+    $ can_pay_hole = (georgett_whore and hole_asked > 0 and TavernHole == 0 and money >= 100 and StolyarWorkshopRoom.is_open())
     $ can_ask_glory = (georgett_whore and glory_asked == 0 and TavernGloryHole == 0 and glory_explained)
-    $ can_pay_glory = (georgett_whore and glory_asked > 0 and TavernGloryHole == 0 and money >= 700 and stolyar_workshop_order_window_open())
+    $ can_pay_glory = (georgett_whore and glory_asked > 0 and TavernGloryHole == 0 and money >= 700 and StolyarWorkshopRoom.is_open())
     $ can_ask_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked == 0)
-    $ can_pay_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked > 0 and money >= 75 and stolyar_workshop_order_window_open())
+    $ can_pay_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked > 0 and money >= 75 and StolyarWorkshopRoom.is_open())
     $ can_ask_dog_booth = (dog.owned and dog.booth_built == 0 and dog_booth_asked == 0)
-    $ can_pay_dog_booth = (dog.owned and dog.booth_built == 0 and dog.booth_built == 0 and dog_booth_asked > 0 and money >= 100 and stolyar_workshop_order_window_open())
+    $ can_pay_dog_booth = (dog.owned and dog.booth_built == 0 and dog.booth_built == 0 and dog_booth_asked > 0 and money >= 100 and StolyarWorkshopRoom.is_open())
     $ has_pending_orders = (can_pay_slogan or (hole_asked > 0 and TavernHole == 0) or (glory_asked > 0 and TavernGloryHole == 0) or can_pay_soap_barrel or can_pay_dog_booth)
 
-    if not stolyar_workshop_is_open():
-        $ MainTxt = "В это время мастерская закрыта."
+    if not CurrentRoom.is_open():
+        $ MainTxt = CurrentRoom.schedule.closed_text
         $ CurLocDesc = MainTxt
         call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
         $ current_action_items = [MenuItem("Вернуться в квартал ремесленников", Jump("ArtisansQuarter"))]
@@ -67,7 +84,11 @@ label StolyarWorkshop:
 
     call RoomEnterEventGate(CurLoc, False)
 
-    $ MainTxt = "Вы находитесь в мастерской известного столяра Драупнира. Всему городу известно что гном Драупнир хоть и дерет дорого, но работу свою исполняет не за страх, а за совесть. Мало кто, а точнее никто, может сравниться с ним в столярном ремесле. В его лавке приятно пахнет деревом и всюду висят рубанки, пилы, стамески, топоры и прочий инструмент. В глубине мастерской, за верстаком, что-то тачает сам хозяин - приземистый и крепко сбитый гном."
+    $ _stolyar_desc_rows = CurrentRoom.visible_descriptions()
+    if len(_stolyar_desc_rows) > 0:
+        $ MainTxt = _stolyar_desc_rows[0].text
+    else:
+        $ MainTxt = "Вы находитесь в мастерской Драупнира."
     if has_pending_orders:
         $ MainTxt += "\n\nВы помните, что у него можно заказать следующее:"
         if can_pay_slogan:
@@ -82,6 +103,7 @@ label StolyarWorkshop:
             $ MainTxt += "\n\nСобачью будку за 100 мараведи."
     $ CurLocDesc = MainTxt
     $ StolyarWorkshopSavedText = MainTxt
+    $ CurrentRoom.mark_visited()
     call ShowImageSeq("draupnir", "", "dwarf", 3)
 
     if navigation_only_mode_enabled():
@@ -117,13 +139,13 @@ label StolyarWorkshopBuildActions:
     $ can_ask_slogan = (SloganFixed == 0 and slogan_asked == 0)
     $ can_pay_slogan = (SloganFixed == 0 and slogan_asked > 0 and money >= 200)
     $ can_ask_hole = (georgett_whore and hole_asked == 0 and TavernHole == 0)
-    $ can_pay_hole = (georgett_whore and hole_asked > 0 and TavernHole == 0 and money >= 100 and stolyar_workshop_order_window_open())
+    $ can_pay_hole = (georgett_whore and hole_asked > 0 and TavernHole == 0 and money >= 100 and StolyarWorkshopRoom.is_open())
     $ can_ask_glory = (georgett_whore and glory_asked == 0 and TavernGloryHole == 0 and glory_explained)
-    $ can_pay_glory = (georgett_whore and glory_asked > 0 and TavernGloryHole == 0 and money >= 700 and stolyar_workshop_order_window_open())
+    $ can_pay_glory = (georgett_whore and glory_asked > 0 and TavernGloryHole == 0 and money >= 700 and StolyarWorkshopRoom.is_open())
     $ can_ask_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked == 0)
-    $ can_pay_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked > 0 and money >= 75 and stolyar_workshop_order_window_open())
+    $ can_pay_soap_barrel = (soap_recipe_chain_discovered() and SoapAshBarrelInstalled == 0 and soap_barrel_asked > 0 and money >= 75 and StolyarWorkshopRoom.is_open())
     $ can_ask_dog_booth = (dog.owned and dog.booth_built == 0 and dog_booth_asked == 0)
-    $ can_pay_dog_booth = (dog.owned and dog.booth_built == 0 and dog_booth_asked > 0 and money >= 100 and stolyar_workshop_order_window_open())
+    $ can_pay_dog_booth = (dog.owned and dog.booth_built == 0 and dog_booth_asked > 0 and money >= 100 and StolyarWorkshopRoom.is_open())
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
@@ -171,6 +193,7 @@ label StolyarWorkshopApply(choice_code=""):
     if str(choice_code or "") == "pay_slogan":
         $ MainTxt = "Скрепя сердце вы отсчитали 200 мараведи мастеру Драупниру. Собрав свои инструменты работящий гном направил свои стопы к вашему трактиру."
         $ SloganFixed = 1
+        $ Draupnir.location = "StreetTavern"
         $ money -= 200
         $ CurLocDesc = MainTxt
         call StolyarWorkshopBuildActions

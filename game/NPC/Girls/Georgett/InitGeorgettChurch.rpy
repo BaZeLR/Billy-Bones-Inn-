@@ -32,7 +32,7 @@ label story_georgett_church_service_bench:
         vscene "images/georgett/church/cermon.jpg"
     "Вы предлагаете Жоржетте найти укромное место, где вас никто не увидит."
 
-    if Friends.get("georgett", 0) < 6:
+    if Georgett.rel < 6:
         "«Ты что, сдурел!» - отвечает вам она. «Это же собор!»"
         call ChurchServiceGeorgett
         return

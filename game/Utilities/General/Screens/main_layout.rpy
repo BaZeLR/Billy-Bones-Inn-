@@ -329,10 +329,24 @@ screen main_ui():
     $ _room_name = _room.display_name if _room is not None else str(CurLoc or location or "")
     $ _desc = str(_coerce_panel_text_value(MainTxt if MainTxt is not None else CurLocDesc) or "")
     $ _picture = resolve_main_ui_picture(_room)
-    $ _npcs = _room.visible_npcs() if _room is not None and hasattr(_room, "visible_npcs") else []
-    $ _room_code = str(getattr(_room, "code_name", "") or CurLoc or "")
-    $ _char_entries = [{"entity_type": "player", "id": "you", "title": "Стефан", "where_id": _room_code, "entity_data": {}}]
-    $ _char_entries += [{"entity_type": str(row.get("entity_type", "npc") or "npc"), "id": str(row.get("npc_id", row.get("entity_id", "")) or ""), "title": str(row.get("title", "") or npc_display_name(str(row.get("npc_id", row.get("entity_id", "")) or ""))), "where_id": _room_code, "entity_data": dict(row)} for row in list(_npcs or []) if isinstance(row, dict) and str(row.get("npc_id", row.get("entity_id", "")) or "").strip()]
+    $ current_location = str(CurLoc or location or getattr(_room, "code_name", "") or "")
+    $ _npc_ids_here = list(getNPCids(current_location) or []) if current_location else []
+    $ _char_entries = [{"entity_type": "player", "id": "you", "title": "Стефан", "where_id": current_location, "entity_data": {}}]
+    python:
+        for npc_id in _npc_ids_here:
+            npc_key = str(npc_id or "").strip()
+            if not npc_key:
+                continue
+            npc_data = npc_action_data_for_room(npc_key, current_location)
+            if npc_data is None:
+                npc_data = {"entity_id": npc_key, "npc_id": npc_key}
+            _char_entries.append({
+                "entity_type": "npc",
+                "id": npc_key,
+                "title": str(npc_data.get("title", "") or npc_display_name(npc_key)),
+                "where_id": current_location,
+                "entity_data": dict(npc_data),
+            })
     $ _char_slots = list(_char_entries[:9]) + [None] * max(0, 9 - len(_char_entries[:9]))
     $ _textbox_h = int(getattr(gui, "textbox_height", 278))
     $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
@@ -411,7 +425,7 @@ screen main_ui():
                                         Hide("tavern_report_card_overlay"),
                                         Call("ShowTavernReport", "__main_ui__"),
                                     ], str(UI_mode or "") == "tavern", "main_ui_tavern_button")
-                                    use main_ui_hud_button("Время", [Function(main_ui_close_inventory_dropdown), SetVariable("main_ui_overlay", "time")], str(main_ui_overlay or "") == "time", "main_ui_time_button")
+                                    use main_ui_hud_button("Время", [Function(main_ui_close_inventory_dropdown), Call("ShowTimeChangeMenu", "__hide__")], False, "main_ui_time_button")
                                     use main_ui_hud_button("Сюжеты", [Function(main_ui_close_inventory_dropdown), Function(story_board_refresh), SetVariable("main_ui_overlay", "story")], str(main_ui_overlay or "") == "story", "main_ui_story_button")
                                     use main_ui_hud_button("Итоги", [Function(main_ui_close_inventory_dropdown), SetVariable("main_ui_overlay", "progress")], str(main_ui_overlay or "") == "progress", "main_ui_progress_button")
                                     use main_ui_hud_button("Кто где", [Function(main_ui_close_inventory_dropdown), SetVariable("main_ui_overlay", "people")], str(main_ui_overlay or "") == "people", "main_ui_people_button")
@@ -508,6 +522,14 @@ screen main_ui():
                                                             Hide("player_card_overlay"),
                                                             Function(dog_open_action_menu_state, _where_id),
                                                         ]
+                                                elif _npc_id.lower() == "draupnir" and int(SloganFixed or 0) == 1:
+                                                    textbutton _npc_name:
+                                                        id "main_ui_entity_button_npc_draupnir_repairing"
+                                                        alt "main_ui_entity_button_npc_draupnir_repairing"
+                                                        xminimum 150
+                                                        text_size 18
+                                                        sensitive False
+                                                        action NullAction()
                                                 else:
                                                     textbutton _npc_name:
                                                         id "main_ui_entity_button_{}_{}".format(_entity_type, _npc_id)
@@ -530,8 +552,6 @@ screen main_ui():
         use story_thread_board_panel
     elif str(main_ui_overlay or "") == "people":
         use people_locate_panel
-    elif str(main_ui_overlay or "") == "time":
-        use time_change_card_overlay("__main_ui_overlay__")
     elif str(main_ui_overlay or "") == "progress":
         use tractir_progress_panel
 
@@ -601,7 +621,7 @@ screen main_ui_player_card_panel():
             xpos 28
             ypos 24
             xsize int((config.screen_width - 36) * 0.72) - 56
-            ysize _left_h - 48
+            ysize _left_h - 96
             draggable True
             mousewheel True
 
@@ -634,16 +654,18 @@ screen main_ui_player_card_panel():
                 for _line in _lines:
                     text _line size 16 color "#2d1d12"
 
-                null height 8
-
-                if len(list(fight_info().enemy_party or [])) <= 0:
-                    textbutton "Назад":
-                        xminimum 220
-                        text_size 22
-                        text_bold True
-                        text_color "#5c0f1b"
-                        text_hover_color "#7d1a2c"
-                        action Function(main_ui_restore_room_scene_state)
+        if len(list(fight_info().enemy_party or [])) <= 0:
+            textbutton "Назад":
+                id "main_ui_player_card_back_button"
+                alt "main_ui_player_card_back_button"
+                xpos 28
+                ypos _left_h - 58
+                xminimum 220
+                text_size 22
+                text_bold True
+                text_color "#5c0f1b"
+                text_hover_color "#7d1a2c"
+                action [SetVariable("UI_mode", "scene"), SetVariable("UI_selected_char", ""), SetVariable("current_girl_key", ""), Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or "TavernMain"))]
 
 
 screen main_ui_girl_card_panel(girl_name=""):
@@ -665,7 +687,7 @@ screen main_ui_girl_card_panel(girl_name=""):
             xpos 28
             ypos 24
             xsize int((config.screen_width - 36) * 0.72) - 56
-            ysize _left_h - 48
+            ysize _left_h - 96
             draggable True
             mousewheel True
 
@@ -687,15 +709,17 @@ screen main_ui_girl_card_panel(girl_name=""):
                 for _line in _lines:
                     text _line size 16 color "#2d1d12"
 
-                null height 8
-
-                textbutton "Назад":
-                    xminimum 220
-                    text_size 22
-                    text_bold True
-                    text_color "#5c0f1b"
-                    text_hover_color "#7d1a2c"
-                    action Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or ""))
+        textbutton "Назад":
+            id "main_ui_girl_card_back_button"
+            alt "main_ui_girl_card_back_button"
+            xpos 28
+            ypos _left_h - 58
+            xminimum 220
+            text_size 22
+            text_bold True
+            text_color "#5c0f1b"
+            text_hover_color "#7d1a2c"
+            action [SetVariable("UI_mode", "scene"), SetVariable("UI_selected_char", ""), SetVariable("current_girl_key", ""), Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or "TavernMain"))]
 
 
 screen main_ui_dog_card_panel():
@@ -716,7 +740,7 @@ screen main_ui_dog_card_panel():
             xpos 28
             ypos 24
             xsize int((config.screen_width - 36) * 0.72) - 56
-            ysize _left_h - 48
+            ysize _left_h - 96
             draggable True
             mousewheel True
 
@@ -738,15 +762,17 @@ screen main_ui_dog_card_panel():
                 for _line in _lines:
                     text _line size 16 color "#2d1d12"
 
-                null height 8
-
-                textbutton "Назад":
-                    xminimum 220
-                    text_size 22
-                    text_bold True
-                    text_color "#5c0f1b"
-                    text_hover_color "#7d1a2c"
-                    action Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or ""))
+        textbutton "Назад":
+            id "main_ui_dog_card_back_button"
+            alt "main_ui_dog_card_back_button"
+            xpos 28
+            ypos _left_h - 58
+            xminimum 220
+            text_size 22
+            text_bold True
+            text_color "#5c0f1b"
+            text_hover_color "#7d1a2c"
+            action [SetVariable("UI_mode", "scene"), SetVariable("UI_selected_char", ""), SetVariable("current_girl_key", ""), Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or "TavernMain"))]
 
 
 screen main_ui_werecat_card_panel():
@@ -767,7 +793,7 @@ screen main_ui_werecat_card_panel():
             xpos 28
             ypos 24
             xsize int((config.screen_width - 36) * 0.72) - 56
-            ysize _left_h - 48
+            ysize _left_h - 96
             draggable True
             mousewheel True
 
@@ -789,15 +815,17 @@ screen main_ui_werecat_card_panel():
                 for _line in _lines:
                     text _line size 16 color "#2d1d12"
 
-                null height 8
-
-                textbutton "Назад":
-                    xminimum 220
-                    text_size 22
-                    text_bold True
-                    text_color "#5c0f1b"
-                    text_hover_color "#7d1a2c"
-                    action Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or ""))
+        textbutton "Назад":
+            id "main_ui_werecat_card_back_button"
+            alt "main_ui_werecat_card_back_button"
+            xpos 28
+            ypos _left_h - 58
+            xminimum 220
+            text_size 22
+            text_bold True
+            text_color "#5c0f1b"
+            text_hover_color "#7d1a2c"
+            action [SetVariable("UI_mode", "scene"), SetVariable("UI_selected_char", ""), SetVariable("current_girl_key", ""), Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or "TavernMain"))]
 
 
 screen main_ui_tavern_report_panel():

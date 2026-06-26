@@ -9,8 +9,13 @@ label IntEddieTalk(preserve_text=False):
     $ Eddie.ensure_story_defaults()
     $ _eddie_var = Eddie.var
     $ _becky_var = Becky.var
+    $ _eddie_picture = ""
     if str(CurLoc or "") == "GroceryStore":
-        vscene grocery_store_grocer_picture("eddie")
+        $ _eddie_picture = grocery_store_grocer_picture("eddie")
+    else:
+        $ _eddie_picture = str(Eddie.data.portrait or "images/eddie/portraits/portrait_0.png")
+    if str(_eddie_picture or "").strip():
+        vscene _eddie_picture
     $ main_ui_begin_talk_state("Разговор с Эдди", _eddie_name)
     $ current_action_title = "Разговор с Эдди"
     $ current_action_content = None
@@ -49,74 +54,67 @@ label IntEddieTalk(preserve_text=False):
 
 
 label IntEddieTalkSmalltalk:
-    $ _eddie_name = "eddie"
     $ Eddie.ensure_story_defaults()
+    $ _eddie_talk_count = int(Eddie.talked_today or 0)
     $ MainTxt = "Вы некоторое время болтаете с Эдди о несущественных вещах."
-    if Talked.get(_eddie_name, 0) <= 2 and procedural_randint(1, 2, "eddie_smalltalk_%s_%s" % (dayspassed, Talked.get(_eddie_name, 0))) == 1 and Friends.get(_eddie_name, 0) <= 5:
+    if _eddie_talk_count <= 2 and procedural_randint(1, 2, "eddie_smalltalk_%s_%s" % (dayspassed, _eddie_talk_count)) == 1 and int(Eddie.rel or 0) <= 5:
         $ MainTxt += "\n\nВы немного сдружились с Эдди."
-        $ Friends[_eddie_name] = Friends.get(_eddie_name, 0) + 1
-    elif Talked.get(_eddie_name, 0) > 2:
+        $ Eddie.change_social(friend_delta=1)
+    elif _eddie_talk_count > 2:
         $ MainTxt += "\n\nНичего нового из разговора вы не узнали."
-    $ Talked[_eddie_name] = Talked.get(_eddie_name, 0) + 1
-    $ TalkedToday[_eddie_name] = TalkedToday.get(_eddie_name, 0) + 1
+    $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
     call IntEddieTalk(True)
     return
 
 
 label IntEddieTalkPersonal:
-    $ _eddie_name = "eddie"
     $ Eddie.ensure_story_defaults()
+    $ _eddie_talk_count = int(Eddie.talked_today or 0)
     $ MainTxt = "Вы некоторое время болтаете с Эдди о том, кто сколько выпил и о том, какие девушки кому нравятся."
-    if Talked.get(_eddie_name, 0) <= 2 and procedural_randint(1, 2, "eddie_personal_%s_%s" % (dayspassed, Talked.get(_eddie_name, 0))) == 1 and Friends.get(_eddie_name, 0) <= 10:
+    if _eddie_talk_count <= 2 and procedural_randint(1, 2, "eddie_personal_%s_%s" % (dayspassed, _eddie_talk_count)) == 1 and int(Eddie.rel or 0) <= 10:
         $ MainTxt += "\n\nВы немного сдружились с Эдди."
-        $ Friends[_eddie_name] = Friends.get(_eddie_name, 0) + 1
-    elif Talked.get(_eddie_name, 0) > 2:
+        $ Eddie.change_social(friend_delta=1)
+    elif _eddie_talk_count > 2:
         $ MainTxt += "\n\nНичего нового из разговора вы не узнали."
-    $ Talked[_eddie_name] = Talked.get(_eddie_name, 0) + 1
-    $ TalkedToday[_eddie_name] = TalkedToday.get(_eddie_name, 0) + 1
+    $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
     call IntEddieTalk(True)
     return
 
 
 label IntEddieTalkWhores:
-    $ _eddie_name = "eddie"
     $ Eddie.ensure_story_defaults()
     $ _eddie_var = Eddie.var
     $ MainTxt = "Вы как бы между делом замечаете, что у вас теперь работают девочки не самого тяжелого поведения. Глаза рыжего Эдди загораются, хотя на словах он никак не показывает своей заинтересованности. Вернее, он старательно показывает что ему пофигу."
-    $ Friends[_eddie_name] = Friends.get(_eddie_name, 0) + 1
+    $ Eddie.change_social(friend_delta=1)
     $ _eddie_var["TalkedAboutWhores"] = 1
-    $ Talked[_eddie_name] = Talked.get(_eddie_name, 0) + 1
-    $ TalkedToday[_eddie_name] = TalkedToday.get(_eddie_name, 0) + 1
+    $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
     call IntEddieTalk(True)
     return
 
 
 label IntEddieTalkGirls:
-    $ _eddie_name = "eddie"
     $ Eddie.ensure_story_defaults()
     $ _eddie_var = Eddie.var
     $ MainTxt = "Ведя общий разговор вы неожиданно спрашиваете Эдди, как ему Жоржетта. Эдди густо краснеет, запинается, но все таки отмечает, что она очень даже ничего. При этом парень вас внимательно изучает, как бы пытаясь понять что вам известно. Вы делаете безразличный вид и переводите разговор на другую тему."
     vscene "images/eddie/portraits/surprised.png"
-    $ Friends[_eddie_name] = Friends.get(_eddie_name, 0) + 1
+    $ Eddie.change_social(friend_delta=1)
     $ _eddie_var["TalkedAboutGeorgett"] = 1
-    $ Talked[_eddie_name] = Talked.get(_eddie_name, 0) + 1
-    $ TalkedToday[_eddie_name] = TalkedToday.get(_eddie_name, 0) + 1
+    $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
     call IntEddieTalk(True)
     return
 
 
 label IntEddieTalkMomHelper:
-    $ _eddie_name = "eddie"
     $ Becky.update()
     $ Eddie.ensure_story_defaults()
     $ _becky_var = Becky.var
     if _becky_var.get("EddieTryToFuck", 0) == 0:
         $ MainTxt = "\"Эй, Эдди, я прекрасно знаю чего тебе хочется,\" сказали вы юному бакалейщику. \"Думаешь я не видел, какие ты взгляды на хозяйку лавки кидаешь? Или не знаю в какие ты игры с Жоржеттой играешься?\""
-        if Friends.get(_eddie_name, 0) < 9:
+        if int(Eddie.rel or 0) < 9:
             $ MainTxt += "\n\n\"Не понимаю, мастер Стефан, о чем это вы,\" ответил вам Эдди слегка покраснев. Все ваши дальнейшие попытки разговорить его упирались в стену молчания. Судя по всему он вас плохо знает и не доверяет."
         else:
             $ MainTxt += "\n\n\"Это мое дело\", буркнул парень, \"и тебя оно не касается.\" \"Зря ты так,\" вы отнюдь не обиделись на данный им отпор, \"я же помочь тебе хочу. Слушай, когда я в следующий раз после ужина пойду с твоей хозяйкой в спальню, я оставлю дверь открытой. Ты подожди пару минут и заходи. Бекки сама тебя хочет, только решиться не может.\""
@@ -127,7 +125,7 @@ label IntEddieTalkMomHelper:
         vscene "images/eddie/portraits/surprised.png"
     elif _becky_var.get("EddieTryToFuck", 0) in [2, 3]:
         $ MainTxt = "\"Эй Эдди, насчет прошлого раза,\" начали вы свою речь."
-        if Friends.get(_eddie_name, 0) < 10:
+        if int(Eddie.rel or 0) < 10:
             $ MainTxt += "\n\n\"Да пошел ты,\" ответил вам Эдди, с ненавистью глядя на вас, \"куда подальше. Не поддамся я еще раз на твое издевательство.\""
             $ MainTxt += "\n\nС этими словами бакалейщик отвернулся и на дальнейшие попытки завязать разговор не реагировал."
         elif _becky_var.get("EddieFailures", 0) > 2:
@@ -153,15 +151,13 @@ label IntEddieTalkMomHelper:
     else:
         $ MainTxt = "\"И как у тебя идут дела с твоей сисястой начальницей?\" цинично поинтересовались вы у Эдди."
         $ MainTxt += "\n\n\"Благодаря тебе, Стефан, более чем хорошо,\" довольно ответил тот."
-    $ Talked[_eddie_name] = Talked.get(_eddie_name, 0) + 1
-    $ TalkedToday[_eddie_name] = TalkedToday.get(_eddie_name, 0) + 1
+    $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
     call IntEddieTalk(True)
     return
 
 
 label IntEddieTalkBruise:
-    $ _eddie_name = "eddie"
     $ Becky.update()
     $ Eddie.ensure_story_defaults()
     $ _eddie_var = Eddie.var
@@ -172,56 +168,49 @@ label IntEddieTalkBruise:
     $ MainTxt += "\n\n\"Ну не с теми значит не с теми. Мое дело. И вообще, Бекки не велела говорить,\" отбрехался ваш знакомый."
     $ _becky_var["SherwoodSuspect"] = _becky_var.get("SherwoodSuspect", 0) + 1
     $ _eddie_var["FingalTalk"] = 1
-    $ Talked[_eddie_name] = Talked.get(_eddie_name, 0) + 1
-    $ TalkedToday[_eddie_name] = TalkedToday.get(_eddie_name, 0) + 1
+    $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
     call IntEddieTalk(True)
     return
 
 
 label IntEddieTalkWhoHit:
-    $ _eddie_name = "eddie"
     $ Becky.update()
     $ Eddie.ensure_story_defaults()
     $ _eddie_var = Eddie.var
     $ _becky_var = Becky.var
-    if _becky_var.get("visitedhome", 0) >= 7 and Friends.get(_eddie_name, 0) >= 9:
+    if _becky_var.get("visitedhome", 0) >= 7 and int(Eddie.rel or 0) >= 9:
         $ MainTxt = "\"Знаешь, ты мне удружил, и мою хозяйку мы с тобой классно оттрахали. Врядли бы она мне дала, если бы не ты. Так что скажу, хоть она и не велела. Только ты меня не запали, хорошо? В общем меня уроды эти, из Шервудского леса, отмудохали. Обычно нормально можно было проехать, дашь им пару десятков монет и едешь себе. А надысь еду - только их встретил так мне сразу в табло засветили. Хоть бы объяснили, за что. Деньги отобрали, лошадь забрали. Вот пидорасы!\""
         $ _becky_var["SherwoodSuspect"] = _becky_var.get("SherwoodSuspect", 0) + 10
         $ _eddie_var["FingalTalk"] = 2
         $ _becky_var["KnowSherwood"] = 1
     else:
         $ MainTxt = "\"Я тебе уже все что хотел сказал. Мало того, что огреб, так еще ты тут с распросами дурацкими. Кто ты такой, что мне вопросы задавать?\" отбрил вас Эдди."
-        if Friends.get(_eddie_name, 0) >= 5:
-            $ Friends[_eddie_name] = Friends.get(_eddie_name, 0) - procedural_randint(0, 1, "eddie_who_hit_rel_%s_%s" % (dayspassed, Talked.get(_eddie_name, 0)))
-    $ Talked[_eddie_name] = Talked.get(_eddie_name, 0) + 1
-    $ TalkedToday[_eddie_name] = TalkedToday.get(_eddie_name, 0) + 1
+        if int(Eddie.rel or 0) >= 5:
+            $ Eddie.change_social(friend_delta=-procedural_randint(0, 1, "eddie_who_hit_rel_%s_%s" % (dayspassed, int(Eddie.talked_today or 0))))
+    $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
     call IntEddieTalk(True)
     return
 
 
 label IntEddieTalkDestination:
-    $ _eddie_name = "eddie"
     $ Eddie.ensure_story_defaults()
     $ _eddie_var = Eddie.var
     $ MainTxt = "\"По делам. Я и так уже слишком много тебе рассказал.\""
     $ _eddie_var["FingalTalkDestination"] = 1
-    $ Talked[_eddie_name] = Talked.get(_eddie_name, 0) + 1
-    $ TalkedToday[_eddie_name] = TalkedToday.get(_eddie_name, 0) + 1
+    $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
     call IntEddieTalk(True)
     return
 
 
 label IntEddieTalkComplain:
-    $ _eddie_name = "eddie"
     $ Eddie.ensure_story_defaults()
     $ _eddie_var = Eddie.var
     $ MainTxt = "\"Ну ты шутник,\" развеселился Эдди. \"Я чего, дурак? Денег они слупят, типа за хлопоты, но вряд ли будут связываться. Тем более, что сам Циммерман раньше трепался, что мол ентот лес ничейный, и никого они там ловить не обязанны.\""
     $ _eddie_var["FingalTalkComplain"] = 1
-    $ Talked[_eddie_name] = Talked.get(_eddie_name, 0) + 1
-    $ TalkedToday[_eddie_name] = TalkedToday.get(_eddie_name, 0) + 1
+    $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
     call IntEddieTalk(True)
     return

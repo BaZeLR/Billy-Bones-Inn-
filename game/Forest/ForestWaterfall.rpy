@@ -31,7 +31,6 @@ init 6 python:
 
 
 label ForestWaterfall:
-    call EnterLocation("ForestWaterfall")
     $ CurrentRoom = ForestWaterfallRoom
     $ CurLoc = "ForestWaterfall"
     $ location = CurLoc

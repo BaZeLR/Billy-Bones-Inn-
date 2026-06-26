@@ -22,11 +22,7 @@ init python:
             })
 
         if str(getLocation("melissa") or "") == "TavernMain":
-            melissa_hall_candidates = [
-                "images/melissa/tavern/melissa_cleans_0.png",
-                "images/melissa/tavern/melissa_cleans_1.png",
-            ]
-            melissa_hall_loadable = [row for row in melissa_hall_candidates if renpy.loadable(row)]
+            melissa_hall_loadable = Melissa.image_sequence("tavern", "hall_cleaning")
             if len(melissa_hall_loadable) > 0:
                 event_pool.append({
                     "picture": melissa_hall_loadable[int((dayspassed or 0) + (hour or 0)) % len(melissa_hall_loadable)],
@@ -266,6 +262,13 @@ label TavernMain:
                 and not tavern_preopening_mode()
                 and int(BlockEvents or 0) != 1
             )
+            if (
+                ShouldDispatchTavernEvent
+                and int(TavernWorkPlanDay or -1) != int(dayspassed or 0)
+                and len(list(tavern_work_events or [])) == 0
+                and len(list(TavernPlayedEventsToday or [])) == 0
+            ):
+                tavern_work_build_daily_plan()
 
         if ShouldDispatchTavernEvent:
             call checkTriggers("TavernMain", "tavern_work", 0)
@@ -309,43 +312,53 @@ label TavernMain:
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит юная Лизетта и ждет клиентов. А вот ее мамаша клиента уже похоже нашла."
                     $ LizaAvail = 1
-                    $ CurrentLoc[GirlNameTS1] = "TavernClientRoom"
-                    $ CurrentLoc[GirlNameTS2] = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].location = "TavernClientRoom"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernClientRoom"
+                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
                     $ TavernMainClientRoomGirl = "georgett"
                 elif randvarPS == 2 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Жоржетта и ждет клиентов. А вот ее старшую дочку, судя по всему, уже кто-то снял."
                     $ GeorgettAvail = 1
-                    $ CurrentLoc[GirlNameTS1] = "TavernMain"
-                    $ CurrentLoc[GirlNameTS2] = "TavernClientRoom"
+                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].location = "TavernClientRoom"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernClientRoom"
                     $ TavernMainClientRoomGirl = "liza"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидят Жоржетта со своей дочкой Лизеттой и ждут клиентов."
                     $ LizaAvail = 1
                     $ GeorgettAvail = 1
-                    $ CurrentLoc[GirlNameTS1] = "TavernMain"
-                    $ CurrentLoc[GirlNameTS2] = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
             elif _jobwhore.get("liza", 0) == 1:
                 python:
                     randvarPS = renpy.random.randint(1, 3)
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу, где обычно сидит Лизетта, пусто. Похоже что ветренную девчонку уже кто-то снял."
-                    $ CurrentLoc[GirlNameTS2] = "TavernClientRoom"
+                    $ peopleInfo[GirlNameTS2].location = "TavernClientRoom"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernClientRoom"
                     $ TavernMainClientRoomGirl = "liza"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Лизетта и ждет клиентов."
                     $ LizaAvail = 1
-                    $ CurrentLoc[GirlNameTS2] = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
             elif _jobwhore.get("georgett", 0) == 1:
                 python:
                     randvarPS = renpy.random.randint(1, 3)
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу, где обычно сидит Жоржетта, пусто. Похоже что шлюшку уже кто-то снял."
-                    $ CurrentLoc[GirlNameTS1] = "TavernClientRoom"
+                    $ peopleInfo[GirlNameTS1].location = "TavernClientRoom"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernClientRoom"
                     $ TavernMainClientRoomGirl = "georgett"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Жоржетта и ждет клиентов."
                     $ GeorgettAvail = 1
-                    $ CurrentLoc[GirlNameTS1] = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
         python:
             try:
                 _glory_quest_started = int(DraupnirVar.get("GloryHoleAsked", 0) or 0) > 0
@@ -360,14 +373,7 @@ label TavernMain:
         $ _layout_last_picture = scene_image
 
     if TavernEventOngoing == "":
-        if TavernClosed == "" and not tavern_preopening_mode() and int(week or 0) != 7:
-            $ _amanda_dynamic_result = CheckIfRunToLegare()
-            $ _amanda_dynamic_jump = str(AmandaDynamicTakeNextJump() or "")
-            if _amanda_dynamic_jump != "" and renpy.has_label(_amanda_dynamic_jump):
-                jump expression _amanda_dynamic_jump
         call RoomEnterEventGate(CurLoc, False)
-        if bool(AmandaAIIntegrationEnabled):
-            call AmandaMiniEventTry(CurLoc, "room")
         if TavernClosed == "" and not tavern_preopening_mode() and int(week or 0) != 7:
             if str(getLocation('amanda') or "") == CurLoc:
                 call CheckDailyEvent('amanda', None, CurLoc, time)
@@ -480,7 +486,7 @@ label TavernMainObjectMenu(object_id="", refresh_only=False):
                 current_action_items.append(MenuItem(_tavern_label, Call(_tavern_action.target, *_tavern_args)))
             elif _tavern_action.hook == "jump" and str(_tavern_action.target or "") != "":
                 current_action_items.append(MenuItem(_tavern_label, Jump(_tavern_action.target)))
-        current_action_items.append(MenuItem("Назад", Call("TavernMainRestore")))
+        current_action_items.append(MenuItem("Назад", Jump("TavernMain")))
     return
 
 

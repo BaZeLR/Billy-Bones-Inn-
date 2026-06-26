@@ -21,7 +21,7 @@ init python:
         return player_has_soap_recipe_book()
 
     def grocery_store_fancy_night_bowl_visible(_obj=None):
-        return int(AmandaVar.get("gave_night_bowl", 0) or 0) == 1 and int(AmandaVar.get("got_fancy_night_bowl", 0) or 0) == 0
+        return Amanda.var_int("gave_night_bowl", 0) == 1 and Amanda.var_int("got_fancy_night_bowl", 0) == 0
 
     def grocery_store_lard_action_visible(_obj=None):
         return grocery_store_service_available() and grocery_store_lard_visible()
@@ -175,6 +175,28 @@ init python:
 
         return "", object_name
 
+    GroceryStoreFoodStockObject = GameObject(
+        object_id="food_stock",
+        name="Провизия",
+        description="Мешки с овощами, мясо и прочая снедь для торговли и поставок в трактир.",
+        actions=[
+            ObjectAction(action_id="buy_provisions", label="Купить провизию", hook="call", target="GroceryStoreBuyMenu", condition=grocery_store_service_available),
+            ObjectAction(action_id="buy_lard", label="Купить свиное сало", hook="call", target="GroceryStoreBuyLard", condition=grocery_store_lard_action_visible),
+            ObjectAction(action_id="buy_milk", label="Купить крынку молока", hook="call", target="GroceryStoreBuyMilk", condition=grocery_store_service_available),
+            ObjectAction(action_id="buy_fancy_night_bowl", label="Купить красивую ночную миску", hook="call", target="GroceryStoreBuyFancyNightBowl", condition=grocery_store_fancy_night_bowl_action_visible),
+            ObjectAction(action_id="examine_food_stock", label="Осмотреть товар", hook="text", target="Мешки, капуста, туши в леднике. Все как и положено в приличной продуктовой лавке."),
+        ],
+    )
+
+    GroceryStoreColdRoomObject = GameObject(
+        object_id="cold_room",
+        name="Ледниковая комната",
+        description="Через приоткрытую дверь виден холодный ледник с запасами мяса.",
+        actions=[
+            ObjectAction(action_id="examine_cold_room", label="Осмотреть ледник", hook="text", target="Внутри прохладно и темно, на крюках висят туши, подготовленные к продаже."),
+        ],
+    )
+
     GroceryStoreRoom = Room(
         code_name="GroceryStore",
         group_name=ROOM_GROUP_CITY,
@@ -190,34 +212,14 @@ init python:
             RoomExit(label="Вернуться на рынок", target="MarketPlace"),
         ],
         game_items=[
-            GameObject(
-                object_id="food_stock",
-                name="Провизия",
-                description="Мешки с овощами, мясо и прочая снедь для торговли и поставок в трактир.",
-                actions=[
-                    ObjectAction(action_id="buy_provisions", label="Купить провизию", hook="call", target="GroceryStoreBuyMenu", condition=grocery_store_service_available),
-                    ObjectAction(action_id="buy_lard", label="Купить свиное сало", hook="call", target="GroceryStoreBuyLard", condition=grocery_store_lard_action_visible),
-                    ObjectAction(action_id="buy_milk", label="Купить крынку молока", hook="call", target="GroceryStoreBuyMilk", condition=grocery_store_service_available),
-                    ObjectAction(action_id="buy_fancy_night_bowl", label="Купить красивую ночную миску", hook="call", target="GroceryStoreBuyFancyNightBowl", condition=grocery_store_fancy_night_bowl_action_visible),
-                    ObjectAction(action_id="examine_food_stock", label="Осмотреть товар", hook="text", target="Мешки, капуста, туши в леднике. Все как и положено в приличной продуктовой лавке."),
-                ],
-            ),
-            GameObject(
-                object_id="cold_room",
-                name="Ледниковая комната",
-                description="Через приоткрытую дверь виден холодный ледник с запасами мяса.",
-                actions=[
-                    ObjectAction(action_id="examine_cold_room", label="Осмотреть ледник", hook="text", target="Внутри прохладно и темно, на крюках висят туши, подготовленные к продаже."),
-                ],
-            ),
+            GroceryStoreFoodStockObject,
+            GroceryStoreColdRoomObject,
         ],
         schedule=RoomSchedule(
-            [1, 2, 3, 4, 5, 6],
-            [],
-            "В это время лавка закрыта.",
-            None,
-            "06:00",
-            "15:59",
+            weekdays=[1, 2, 3, 4, 5, 6],
+            start="06:00",
+            end="17:59",
+            closed_text="В это время лавка закрыта.",
         ),
         custom_properties={
             "shop_feature": "provisions",
@@ -227,7 +229,6 @@ init python:
 
 label GroceryStore:
     scene black
-    call EnterLocation("GroceryStore")
     $ CurrentRoom = GroceryStoreRoom
     $ CurLoc = "GroceryStore"
     $ location = CurLoc
@@ -241,9 +242,12 @@ label GroceryStore:
     $ current_object_id = ""
     $ _grocery_room = GroceryStoreRoom
     # Check if the store is closed
-    if not _grocery_room.is_open(week, time):
+    if not _grocery_room.is_open():
         $ MainTxt = _grocery_room.schedule.closed_text
         $ CurLocDesc = MainTxt
+        $ scene_image = "images/general/closedVenue default.png"
+        $ _layout_last_picture = scene_image
+        vscene scene_image
         $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
         $ _grocery_ui_return = None
         while _grocery_ui_return is None:
@@ -278,16 +282,22 @@ label GroceryStore:
     if grocery_store_active_grocer_id() == "eddie":
         $ _grocery_picture = grocery_store_eddie_picture()
         if str(_grocery_picture or "").strip():
-            call ShowImage("", "", _grocery_picture)
+            $ scene_image = _grocery_picture
+            $ _layout_last_picture = scene_image
+            vscene scene_image
     elif grocery_store_active_grocer_id() == "inga":
         $ _grocery_picture = grocery_store_inga_picture()
         if str(_grocery_picture or "").strip():
-            call ShowImage("", "", _grocery_picture)
+            $ scene_image = _grocery_picture
+            $ _layout_last_picture = scene_image
+            vscene scene_image
     elif grocery_store_active_grocer_id() == "becky":
         call BeckyLoversInStore
         $ _grocery_picture = grocery_store_becky_picture()
         if str(_grocery_picture or "").strip():
-            call ShowImage("", "", _grocery_picture)
+            $ scene_image = _grocery_picture
+            $ _layout_last_picture = scene_image
+            vscene scene_image
         # Dynamic calls for breastfeeding and kids list
         python:
             DescribeBreastFeeding('becky', 3)
@@ -345,11 +355,12 @@ label GroceryStoreObjectText(object_id="", action_id=""):
     return
 
 
-label GroceryStoreBuyMenu:
+label GroceryStoreBuyMenu(preserve_text=False):
     $ current_action_title = "Покупка провизии"
     $ current_action_content = None
-    $ MainTxt = "В этой лавке вы можете купить провизию для вашего трактира, по 6 мараведи за мешок."
-    $ CurLocDesc = MainTxt
+    if not preserve_text:
+        $ MainTxt = "В этой лавке вы можете купить провизию для вашего трактира, по 6 мараведи за мешок."
+        $ CurLocDesc = MainTxt
     $ current_action_items = [MenuItem("Ничего не покупать", Call("GroceryStoreBuyApply", 0, 0, 0))]
     if money >= 6:
         $ current_action_items.append(MenuItem("Купить один мешок", Call("GroceryStoreBuyApply", 6, 10, 1)))
@@ -362,7 +373,7 @@ label GroceryStoreBuyMenu:
     if money >= 6 * 200:
         $ current_action_items.append(MenuItem("Купить двести мешков", Call("GroceryStoreBuyApply", 6 * 200, 2000, 200)))
 
-    $ current_action_items.append(MenuItem("Назад", Jump("GroceryStore")))
+    $ current_action_items.append(MenuItem("Назад", Call("GroceryStoreObjectMenu", "food_stock")))
     return
 
 
@@ -385,15 +396,16 @@ label GroceryStoreBuyApply(cost=0, add_amount=0, bag_count=0):
             $ MainTxt = "Вы купили двести мешков продуктов. [GrocerName] говорит вам, что ваш заказ будет доставлен в \"Дикий жеребец\" немедленно."
         call stat
     $ CurLocDesc = MainTxt
-    call GroceryStoreBuildActions
+    call GroceryStoreBuyMenu(True)
     return
 
 
-label GroceryStoreBuyFancyNightBowl:
+label GroceryStoreBuyFancyNightBowl(preserve_text=False):
     $ current_action_title = "Красивая ночная миска"
     $ current_action_content = None
-    $ MainTxt = "Среди простой хозяйственной утвари вы замечаете аккуратную расписную ночную миску. Она выглядит куда приятнее той грубой посудины, к которой привыкла Аманда."
-    $ CurLocDesc = MainTxt
+    if not preserve_text:
+        $ MainTxt = "Среди простой хозяйственной утвари вы замечаете аккуратную расписную ночную миску. Она выглядит куда приятнее той грубой посудины, к которой привыкла Аманда."
+        $ CurLocDesc = MainTxt
     $ current_action_items = []
     if int(_player_item_count_by_id("fancy_night_bowl_001") or 0) <= 0 and int(money or 0) >= 9:
         $ current_action_items.append(MenuItem("Купить красивую ночную миску за 9 мараведи", Call("GroceryStoreBuyFancyNightBowlApply")))
@@ -403,7 +415,7 @@ label GroceryStoreBuyFancyNightBowl:
     else:
         $ MainTxt = MainTxt + "\n\nНа такую покупку сейчас не хватает денег."
         $ CurLocDesc = MainTxt
-    $ current_action_items.append(MenuItem("Назад", Jump("GroceryStore")))
+    $ current_action_items.append(MenuItem("Назад", Call("GroceryStoreObjectMenu", "food_stock")))
     return
 
 
@@ -418,7 +430,7 @@ label GroceryStoreBuyFancyNightBowlApply:
         $ MainTxt = "[GrocerName] отыскивает для вас миску получше, заворачивает ее в тряпицу и вручает покупку. Теперь у вас есть вещь, которую не стыдно подарить Аманде."
         call stat
     $ CurLocDesc = MainTxt
-    call GroceryStoreBuildActions
+    call GroceryStoreBuyFancyNightBowl(True)
     return
 
 
@@ -431,7 +443,7 @@ label GroceryStoreBuyLard:
         $ MainTxt = "Вы покупаете у [GrocerName] кусок свиного сала. Его можно пустить на стряпню или на мыло."
         call stat
     $ CurLocDesc = MainTxt
-    call GroceryStoreBuildActions
+    call GroceryStoreObjectMenu("food_stock", True)
     return
 
 
@@ -444,6 +456,6 @@ label GroceryStoreBuyMilk:
         $ MainTxt = "Вы покупаете у [GrocerName] свежую крынку молока. Такое молоко сразу просится на кухню: с медом и кашей из него выйдет особенно мягкий общий стол."
         call stat
     $ CurLocDesc = MainTxt
-    call GroceryStoreBuildActions
+    call GroceryStoreObjectMenu("food_stock", True)
     return
 

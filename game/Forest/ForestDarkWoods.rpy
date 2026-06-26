@@ -6,7 +6,7 @@ init 6 python:
         code_name="ForestDarkWoods",
         group_name=ROOM_GROUP_FOREST,
         display_name="Темный лес",
-        bg_picture="",
+        bg_picture="images/forest/darkForest.png",
         descriptions=[
             RoomDescription(
                 text="Под сводом густых крон здесь заметно темнее, чем в остальных местах. Между стволами лежат глубокие тени, а под ногами хрустит сухой валежник.",
@@ -31,7 +31,6 @@ init 6 python:
 
 
 label ForestDarkWoods:
-    call EnterLocation("ForestDarkWoods")
     $ CurrentRoom = ForestDarkWoodsRoom
     $ CurLoc = "ForestDarkWoods"
     $ location = CurLoc

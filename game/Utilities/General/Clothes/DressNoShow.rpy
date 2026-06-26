@@ -53,7 +53,6 @@ label DressNoShow(girl_name_dns):
     $ DressBuyIsRelative = dress_no_show_relation_type(_dns_girl)
     $ _dns_real_name = RealName.get(_dns_girl, _dns_girl)
     $ _dns_real_name3 = RealName3.get(_dns_girl, _dns_real_name)
-    hide screen main_ui
     $ dress_no_show_open_picture(_dns_girl)
 
     '"Ага!" воскликнула [_dns_real_name], едва завидев вас. "Явился значит! Мы где договаривались встретиться? Я тебя ждала, как дура, битый час под дверью, а ты шлялся незнамо где! Ну и нафига было предлагать мне обновку купить если ты даже зад свой от кровати не способен вовремя оторвать!'

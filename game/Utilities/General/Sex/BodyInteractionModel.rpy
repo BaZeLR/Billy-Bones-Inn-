@@ -1,5 +1,5 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default BodyInteractionProfiles = {}
 
@@ -285,40 +285,44 @@ init python:
         if not profile_id:
             return {}
 
-        def scene_value_or_default(scene_map, default_map, default_value=""):
-            if isinstance(scene_map, dict) and profile_id in scene_map:
-                return str(scene_map.get(profile_id, "") or "")
-            if isinstance(default_map, dict):
-                return str(default_map.get(profile_id, default_value) or default_value or "")
-            return str(default_value or "")
-
-        resolved_name = str(display_name or RealName.get(profile_id, profile_id) or profile_id)
+        person = getPersonInfo(profile_id)
+        resolved_name = str(display_name or (person.display_name() if person is not None and hasattr(person, "display_name") else people_display_name(profile_id)) or profile_id)
         profile = bodymodel_register_character(profile_id, resolved_name, body_type)
         bodymodel_clear_clothing(profile)
 
-        default_dress = str(dressdefault.get(profile_id, "") or "")
-        top_default = str(topdressdef.get(profile_id, "") or DressTopPart.get(default_dress, "") or "")
-        bottom_default = str(bottomdressdef.get(profile_id, "") or DressBottomPart.get(default_dress, "") or "")
-        top_item = scene_value_or_default(topdress, topdressdef, top_default)
-        bottom_item = scene_value_or_default(bottomdress, bottomdressdef, bottom_default)
-        bra_item = scene_value_or_default(bra, bradef, "")
-        panties_item = scene_value_or_default(panties, pantiesdef, "")
-        legs_item = scene_value_or_default(legs, legsdef, "")
-        shoes_item = scene_value_or_default(shoes, shoesdef, "")
+        if profile_id.lower() in ("you", "mc", "stefan", "стефан"):
+            appearance = player_state(False).appearance
+            default_dress = str(getattr(appearance, "current_dress", "") or "")
+            underwear = {}
+            sex_state = {}
+        else:
+            wardrobe = dict(getattr(person, "wardrobe", {}) or {}) if person is not None else {}
+            default_dress = str(wardrobe.get("current_dress", "") or "")
+            underwear = dict(wardrobe.get("current_underwear", {}) or {})
+            sex_state = person.ensure_sex_state() if person is not None and hasattr(person, "ensure_sex_state") else {}
 
-        bodymodel_set_item(profile, top_item, "lifted" if int(topraised.get(profile_id, 0) or 0) == 1 else "worn")
-        bodymodel_set_item(profile, bottom_item, "lifted" if int(bottomraised.get(profile_id, 0) or 0) == 1 else "worn")
+        top_default = str(DressTopPart.get(default_dress, default_dress) or "")
+        bottom_default = str(DressBottomPart.get(default_dress, "") or "")
+        top_item = "" if int(sex_state.get("top_removed", 0) or 0) else top_default
+        bottom_item = "" if int(sex_state.get("bottom_removed", 0) or 0) else bottom_default
+        bra_item = str(underwear.get("bra", "") or "")
+        panties_item = str(underwear.get("panties", "") or "")
+        legs_item = str(underwear.get("legs", "") or "")
+        shoes_item = str(underwear.get("shoes", "") or "")
+
+        bodymodel_set_item(profile, top_item, "lifted" if int(sex_state.get("top_raised", 0) or 0) == 1 else "worn")
+        bodymodel_set_item(profile, bottom_item, "lifted" if int(sex_state.get("bottom_raised", 0) or 0) == 1 else "worn")
         bodymodel_set_item(profile, bra_item, "worn")
         bodymodel_set_item(profile, panties_item, "worn")
         bodymodel_set_item(profile, legs_item, "worn")
         bodymodel_set_item(profile, shoes_item, "worn")
         profile["scene_clothing_state"] = {
-            "top_removed": bool(isinstance(topdress, dict) and profile_id in topdress and top_item == "" and top_default != ""),
-            "bottom_removed": bool(isinstance(bottomdress, dict) and profile_id in bottomdress and bottom_item == "" and bottom_default != ""),
-            "bra_removed": bool(isinstance(bra, dict) and profile_id in bra and bra_item == "" and str(bradef.get(profile_id, "") or "") != ""),
-            "panties_removed": bool(isinstance(panties, dict) and profile_id in panties and panties_item == "" and str(pantiesdef.get(profile_id, "") or "") != ""),
-            "top_lifted": bool(top_item != "" and int(topraised.get(profile_id, 0) or 0) == 1),
-            "bottom_lifted": bool(bottom_item != "" and int(bottomraised.get(profile_id, 0) or 0) == 1),
+            "top_removed": bool(top_item == "" and top_default != ""),
+            "bottom_removed": bool(bottom_item == "" and bottom_default != ""),
+            "bra_removed": bool(bra_item == "" and str(underwear.get("bra", "") or "") != ""),
+            "panties_removed": bool(panties_item == "" and str(underwear.get("panties", "") or "") != ""),
+            "top_lifted": bool(top_item != "" and int(sex_state.get("top_raised", 0) or 0) == 1),
+            "bottom_lifted": bool(bottom_item != "" and int(sex_state.get("bottom_raised", 0) or 0) == 1),
         }
 
         bodymodel_update_container_states(profile)
@@ -341,15 +345,18 @@ init python:
         meta = bodymodel_item_meta(item_key)
         if str(meta.get("name", "") or "").strip():
             return str(meta.get("name", "") or "")
-        short_names = globals().get("ShortDressName", {}) or {}
-        return str(short_names.get(item_key, item_key) or item_key)
+        return str(item_key or "")
 
     def bodymodel_sync_profile_arousal(profile, char_id=""):
         if not isinstance(profile, dict):
             return {}
         key = str(char_id or profile.get("id", "") or "").strip()
-        if key and isinstance(Arousal, dict):
-            profile["arousal"] = int(Arousal.get(key, Arousal.get("You" if key.lower() == "you" else key, profile.get("arousal", 0))) or 0)
+        if key.lower() in ("you", "mc", "stefan", "стефан"):
+            profile["arousal"] = int(player_state(False).intimacy.arousal_value("You") or 0)
+        elif key:
+            person = getPersonInfo(key)
+            if person is not None and hasattr(person, "arousal_value"):
+                profile["arousal"] = int(person.arousal_value() or 0)
         arousal_value = int(profile.get("arousal", 0) or 0)
         if arousal_value >= 70:
             profile.setdefault("features", {})["nipples"] = "swallowed"
@@ -502,19 +509,24 @@ init python:
             effect["arousal"] = int(profile.get("arousal", 0) or 0)
             effect["container_state"] = str(profile.get("containers", {}).get(str(target_id or ""), {}).get("state", "") or "")
             return effect
-        if isinstance(Arousal, dict):
-            Arousal[profile_id] = min(100, max(0, int(Arousal.get(profile_id, profile.get("arousal", 0)) or 0) + int(effect.get("target_gain", 0) or 0)))
-            if actor_key.lower() == "you":
-                Arousal["You"] = min(100, max(0, int(Arousal.get("You", 0) or 0) + int(effect.get("actor_gain", 0) or 0)))
-                Arousal["you"] = Arousal["You"]
-            else:
-                Arousal[actor_key] = min(100, max(0, int(Arousal.get(actor_key, 0) or 0) + int(effect.get("actor_gain", 0) or 0)))
+        target_person = getPersonInfo(profile_id)
+        if profile_id.lower() in ("you", "mc", "stefan", "стефан"):
+            player_state(False).intimacy.add_arousal(effect.get("target_gain", 0), 100, "You")
+            player_state(False).intimacy.apply_to_store()
+        elif target_person is not None:
+            target_person.add_arousal(effect.get("target_gain", 0))
+        if actor_key.lower() in ("you", "mc", "stefan", "стефан"):
+            player_state(False).intimacy.add_arousal(effect.get("actor_gain", 0), 100, "You")
+            player_state(False).intimacy.apply_to_store()
+        else:
+            actor_person = getPersonInfo(actor_key)
+            if actor_person is not None:
+                actor_person.add_arousal(effect.get("actor_gain", 0))
         container_key = str(target_id or "").strip()
         if container_key in ("mouth", "pussy", "ass"):
             container_state = profile.setdefault("containers", {}).setdefault(container_key, {"state": "dry", "wetness": 0, "itch": 0})
             container_state["wetness"] = min(100, max(0, int(container_state.get("wetness", 0) or 0) + int(effect.get("wetness_gain", 0) or 0)))
             container_state["state"] = bodymodel_container_state_name(container_state.get("wetness", 0), container_state.get("itch", 0))
-        profile["arousal"] = int(Arousal.get(profile_id, profile.get("arousal", 0)) or 0)
         bodymodel_sync_profile_arousal(profile, profile_id)
         BodyInteractionProfiles[profile_id] = profile
         effect["profile"] = profile

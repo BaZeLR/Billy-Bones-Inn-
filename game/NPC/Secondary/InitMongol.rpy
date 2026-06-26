@@ -33,7 +33,7 @@ init python:
                 dative="Монголу",
                 default_location="",
                 description="Монгол - торговец лошадьми на рынке.",
-                age=39,
+                birth_date={"day": 1, "period": 1, "cycle": 1061},
                 portrait="images/mongol/portrait1.jpg",
             )
 
@@ -44,7 +44,6 @@ init python:
         def __init__(self, name="mongol", **kwargs):
             super().__init__(name, **kwargs)
             self.data = MongolStaticData
-            self.age = 39
             self.known = False
             self.location = ""
             self.var = {}
@@ -103,7 +102,7 @@ init python:
             if str(MyStallion or "") != "":
                 return False
             try:
-                if not MarketPlaceRoom.is_open(week, time):
+                if not MarketPlaceRoom.is_open():
                     return False
             except Exception:
                 return False
@@ -118,9 +117,11 @@ label InitMongol:
 
 
 label register_mongol_secondary:
-    $ knowsMC.setdefault("mongol", False)
     python:
         peopleData["mongol"] = MongolStaticData
+        MongolStaticData.set_schedule([
+            NPCScheduleEntry(location="MarketPlace", weekdays=[1, 2, 3, 4, 5, 6], start_hour=6, end_hour=19, awake=True, talkable=True, condition=marketplace_mongol_visible, priority=100, label="market_horse_trade"),
+        ])
         Mongol.update()
         peopleInfo["mongol"] = Mongol
         if Mongol not in secondary_npcs:

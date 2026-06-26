@@ -1,8 +1,6 @@
 init python:
     def eddie_talk_init_state():
-        Talked.setdefault("eddie", 0)
-        TalkedToday.setdefault("eddie", 0)
-        Friends.setdefault("eddie", 0)
+        Eddie.update()
         return True
 
     def eddie_talk_picture_path(becky_var=None):
@@ -28,64 +26,72 @@ init python:
         return "Эдди вопросительно смотрит на вас, ожидая, о чем вы заговорите."
 
     def eddie_talk_can_personal(eddie_name="eddie"):
-        return int(Friends.get(eddie_name, 0) or 0) >= 5
+        info = getPersonInfo(eddie_name)
+        return int(getattr(info, "rel", 0) or 0) >= 5
 
     def eddie_talk_can_whores(eddie_var, eddie_name="eddie"):
+        info = getPersonInfo(eddie_name)
         return (
-            int(Friends.get(eddie_name, 0) or 0) >= 5
+            int(getattr(info, "rel", 0) or 0) >= 5
             and str(getLocation("georgett") or "") == "TavernMain"
             and int(eddie_var.get("TalkedAboutWhores", 0) or 0) == 0
-            and int(Talked.get(eddie_name, 0) or 0) < 2
+            and int(getattr(info, "talked_today", 0) or 0) < 2
         )
 
     def eddie_talk_can_girls(eddie_var, eddie_name="eddie"):
+        info = getPersonInfo(eddie_name)
         return (
-            int(Friends.get(eddie_name, 0) or 0) >= 5
+            int(getattr(info, "rel", 0) or 0) >= 5
             and str(getLocation("georgett") or "") == "TavernMain"
             and int(eddie_var.get("SawWithGeorgett", 0) or 0) > 0
             and int(eddie_var.get("TalkedAboutGeorgett", 0) or 0) == 0
-            and int(Talked.get(eddie_name, 0) or 0) < 2
+            and int(getattr(info, "talked_today", 0) or 0) < 2
         )
 
     def eddie_talk_can_mom_helper(eddie_var, becky_var, eddie_name="eddie"):
+        info = getPersonInfo(eddie_name)
         return (
-            int(Friends.get(eddie_name, 0) or 0) >= 3
+            int(getattr(info, "rel", 0) or 0) >= 3
             and int(becky_var.get("HomeSex", 0) or 0) > 0
             and int(eddie_var.get("SawMomSex", 0) or 0) > 0
             and int(eddie_var.get("SawWithGeorgett", 0) or 0) > 0
             and int(becky_var.get("EddieTryToFuck", 0) or 0) != 1
-            and int(Talked.get(eddie_name, 0) or 0) < 2
+            and int(getattr(info, "talked_today", 0) or 0) < 2
         )
 
     def eddie_talk_can_bruise(eddie_var, becky_var, eddie_name="eddie"):
+        info = getPersonInfo(eddie_name)
         return (
-            int(Friends.get(eddie_name, 0) or 0) >= 3
-            and int(Talked.get(eddie_name, 0) or 0) < 2
+            int(getattr(info, "rel", 0) or 0) >= 3
+            and int(getattr(info, "talked_today", 0) or 0) < 2
             and eddie_talk_robbed_window(becky_var)
             and int(eddie_var.get("FingalTalk", 0) or 0) == 0
         )
 
     def eddie_talk_can_who_hit(eddie_var, becky_var, eddie_name="eddie"):
+        info = getPersonInfo(eddie_name)
         return (
-            int(Friends.get(eddie_name, 0) or 0) >= 7
-            and int(Talked.get(eddie_name, 0) or 0) < 2
+            int(getattr(info, "rel", 0) or 0) >= 7
+            and int(getattr(info, "talked_today", 0) or 0) < 2
             and eddie_talk_robbed_window(becky_var)
             and int(eddie_var.get("FingalTalk", 0) or 0) == 1
         )
 
     def eddie_talk_can_destination(eddie_var, becky_var, eddie_name="eddie"):
+        info = getPersonInfo(eddie_name)
         return (
-            int(Friends.get(eddie_name, 0) or 0) >= 7
-            and int(Talked.get(eddie_name, 0) or 0) < 2
+            int(getattr(info, "rel", 0) or 0) >= 7
+            and int(getattr(info, "talked_today", 0) or 0) < 2
             and eddie_talk_robbed_window(becky_var)
             and int(eddie_var.get("FingalTalk", 0) or 0) == 2
             and int(eddie_var.get("FingalTalkDestination", 0) or 0) == 0
         )
 
     def eddie_talk_can_complain(eddie_var, becky_var, eddie_name="eddie"):
+        info = getPersonInfo(eddie_name)
         return (
-            int(Friends.get(eddie_name, 0) or 0) >= 7
-            and int(Talked.get(eddie_name, 0) or 0) < 2
+            int(getattr(info, "rel", 0) or 0) >= 7
+            and int(getattr(info, "talked_today", 0) or 0) < 2
             and eddie_talk_robbed_window(becky_var)
             and int(eddie_var.get("FingalTalk", 0) or 0) == 2
             and int(eddie_var.get("FingalTalkComplain", 0) or 0) == 0

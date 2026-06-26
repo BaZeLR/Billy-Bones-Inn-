@@ -32,9 +32,6 @@ init python:
         Liza.ensure_story_defaults()
         Becky.ensure_story_defaults()
         Amanda.ensure_story_defaults()
-        if "eddie" not in cametoday_npc:
-            cametoday_npc["eddie"] = 0
-
         week_val = _ndf_int(week, 1)
         dayspassed_val = _ndf_int(dayspassed, 0)
         church_donated_amount = _ndf_int(ChurchDonatedAmount, 0)
@@ -52,7 +49,7 @@ init python:
                 if Becky.var.get("visitedhome", 0) < 7 and Becky.var.get("EddieTryToFuck", 0) >= 4:
                     Becky.var["visitedhome"] = 7
 
-        while TodaySexEvents:
+        while SexEvents.today_events:
             tmpArray = TodaySexEvents_PopFirst()
             girl = str(tmpArray.get("GirlName", "") or "")
             place = str(tmpArray.get("Place", "") or "")
@@ -69,14 +66,15 @@ init python:
                 PregnancyCheck(girl, inside_or_mouth, 1, "Лукас")
             elif place == "Glory":
                 glory_hole_inside = "mouth"
-                sluttiness_val = _ndf_int(sluttiness.get(girl, 0), 0)
-                if sluttiness_val >= 80:
+                girl_info = getPersonInfo(girl)
+                corruption_val = _ndf_int(getattr(girl_info, "corruption", 0), 0) if girl_info is not None else 0
+                if corruption_val >= 80:
                     if renpy.random.randint(1, 15) == 1:
                         glory_hole_inside = "inside"
-                elif sluttiness_val >= 60:
+                elif corruption_val >= 60:
                     if renpy.random.randint(1, 30) == 1:
                         glory_hole_inside = "inside"
-                elif sluttiness_val >= 50:
+                elif corruption_val >= 50:
                     if renpy.random.randint(1, 60) == 1:
                         glory_hole_inside = "inside"
                 if event_type == 1:
@@ -95,7 +93,7 @@ init python:
             elif girl == "amanda" and place == "legarerun":
                 apply_legare_amanda_let_go_code()
             elif girl == "amanda" and place == "lovermeet":
-                AmandaLoverSexCalc()
+                Amanda.lover_sex_calc()
             elif place == "Priest":
                 PregnancyCheck(girl, "inside", 1, "Отец Герхард")
                 if girl == "becky" and renpy.random.randint(1, 2) == 1:
@@ -108,7 +106,9 @@ init python:
                         PregnancyCheck("becky", "inside", 1, "", 1, "Неизвестный грузчик")
                     Becky.set_story_value("last_store_orgasm_day", dayspassed_val)
                 elif place == "EddieMom":
-                    if _ndf_int(cametoday_npc.get("eddie", 0), 0) == 0:
+                    eddie = getPersonInfo("eddie")
+                    eddie_came_today = _ndf_int(eddie.ensure_sex_state().get("came_today", 0), 0) if eddie is not None else 0
+                    if eddie_came_today == 0:
                         inside_or_mouth = "inside" if renpy.random.randint(1, 2) == 1 else "mouth"
                         PregnancyCheck(girl, inside_or_mouth, 1, "eddie")
                         if renpy.random.randint(1, 5) == 1:
@@ -116,7 +116,7 @@ init python:
             else:
                 PregnancyCheck(girl, "", 1, "")
 
-        while GirlDance:
+        while SexEvents.girl_dance:
             tmpArray = GirlDance_PopFirst()
             event_amanda_legare_create_dance()
             if _ndf_int(tmpArray.get("GoOut", 0), 0) == 1:
@@ -170,26 +170,12 @@ label NextDay_FinishDayEvents:
     $ people_reset_daily_interactions()
 
     python:
-        if isinstance(Friends, dict):
-            for k in list(Friends.keys()):
-                try:
-                    Friends[k] = max(0, min(20, int(Friends.get(k, 0) or 0)))
-                except Exception:
-                    Friends[k] = 0
-        elif isinstance(Friends, list):
-            for i in range(len(Friends)):
-                try:
-                    Friends[i] = max(0, min(20, int(Friends[i] or 0)))
-                except Exception:
-                    Friends[i] = 0
-
         if CursedByEllona > 0:
             CursedByEllonaDays -= 1
 
         if StolenHorseDays > 0:
             StolenHorseDays -= 1
 
-        cametoday_npc.clear()
         Talked.clear()
         ChurchAfterCermon.clear()
         people_sync_all()

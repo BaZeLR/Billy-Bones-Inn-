@@ -1,3 +1,29 @@
+# OBSOLETE EARLY-STAGE GUIDANCE
+
+This file is retained only as historical context. It must not be used as the
+current coding blueprint when it conflicts with:
+
+- `devdocs/EventThreadInstruction/README.md`
+- `devdocs/EventThreadInstruction/STORY_LABEL_EVENT_FLOW_STANDARD.md`
+- `devdocs/EventThreadInstruction/ENGINE_STYLE_EVENT_THREAD_STANDARD.md`
+- `devdocs/EventThreadInstruction/FAMILY_LIFE_HUD_MENU_PATTERN.md`
+- `AGENTS.md` / workspace instructions
+
+Current rule:
+
+- Live Tractir `.rpy` runtime is authoritative for implementation.
+- Legacy TXT/reference files are reference material unless the user explicitly
+  asks for TXT parity for a specific conversion.
+- Do not prefer compatibility wrappers/adapters.
+- Do not add refresh, rebuild, apply, renew, dispatcher, generic queue, or
+  recursive menu layers.
+- Events are authored labels with `vscene`, text, Ren'Py `menu:`, direct
+  consequences, time cost, and direct thread progression.
+- The right-side HUD is persistent; screens display UI only and do not own story
+  logic.
+
+The older lines below are superseded where they conflict with those rules.
+
 WORKSPACE LOCK (NON-NEGOTIABLE):
 
 - Base working directory is: c:\Users\blank\Documents\RenPy_Projects\Tractir
@@ -11,13 +37,11 @@ use object oriented renpy with all python features to enhance and improve the or
 keep labels name the same as txt files names for consistency 
 the main goal to see original working project in renpy 
 
-RULES FOR TXT -> RENPY CONVERSION (NON-NEGOTIABLE):
-- The .txt files are the source of truth.
-- Preserve original logic and outcomes from .txt files.
-- Do not delete or omit code paths unless proven unused and behavior-equivalent.
-- If two implementations look duplicated but can produce different results, keep both until mapped to .txt semantics.
-- Prefer compatibility wrappers/adapters over refactors during migration.
-- Any omission must be documented with reason and affected labels/functions.
+RULES FOR TXT -> RENPY CONVERSION (SUPERSEDED):
+- These old TXT-parity rules apply only when the user explicitly asks for a
+  direct TXT conversion pass.
+- They are not permission to keep duplicate runtime systems, wrappers,
+  adapters, fallback paths, or legacy procedural flow in current Tractir code.
 
 STRICT PARITY ENFORCEMENT (NON-NEGOTIABLE):
 - Do not invent new gameplay labels when an original .txt location/label already exists.

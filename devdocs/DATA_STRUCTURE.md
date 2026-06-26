@@ -366,9 +366,14 @@ Room owns:
 - room description
 - room picture
 - exits
-- visible items
-- NPCs in location
+- placed items/objects
+- optional room-owned actions only when the room itself is acted on
 - room-specific flags/checks if needed
+- hidden/locked/open state booleans
+- optional venue schedule
+
+Room does not own NPCs. NPCs appear in the right-side visible NPC field by
+`getNPCids(current_location)`, which checks each NPC's `getLocation()`.
 
 Item owns:
 

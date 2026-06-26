@@ -86,7 +86,7 @@ init python:
                 ],
             ),
         ],
-        schedule=RoomSchedule([1, 2, 3, 4, 5, 6, 7], [], "", None, "06:00", "17:59"),
+        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], start="06:00", end="17:59"),
         custom_properties={
             "house_front": True,
         },
@@ -119,7 +119,6 @@ init python:
 
 # --- MAIN LOCATION LABEL ---
 label BeckyHomeFront(arrive_mode=""):
-    call EnterLocation("BeckyHomeFront")
     python:
         Becky.ensure_story_defaults()
         IngaVar.setdefault("SawLucassex", 0)

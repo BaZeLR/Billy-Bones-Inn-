@@ -32,13 +32,11 @@ init 6 python:
             RoomExit(label="Спуститься в подвал", target="TavernStorage"),
         ],
         game_items=[],
-        schedule=RoomSchedule([1, 2, 3, 4, 5, 6, 7], [], "", None, "00:00", "23:59"),
         custom_properties={},
     )
 
 
 label TavernUpstairs:
-    call EnterLocation("TavernUpstairs")
     $ CurrentRoom = TavernUpstairsRoom
     $ CurLoc = "TavernUpstairs"
     $ location = CurLoc
@@ -67,7 +65,10 @@ label TavernUpstairsBuildActions:
             _target = str(_upstairs_exit.target or "")
             if _target in ("TavernMain", "TavernStorage") and not player_can_leave_second_floor():
                 continue
-            _upstairs_items.append(MenuItem(_upstairs_exit.label, Call("AdvanceMovementTime", _target)))
+            if _target == "TavernAmandaRoom":
+                _upstairs_items.append(MenuItem(_upstairs_exit.label, Call("TavernAmandaRoomDoor")))
+            else:
+                _upstairs_items.append(MenuItem(_upstairs_exit.label, Call("AdvanceMovementTime", _target)))
         if not player_can_leave_second_floor():
             _upstairs_items.append(MenuItem(player_public_movement_block_text(), Call("AdvanceMovementTime", "TavernMyRoom")))
     $ current_action_title = "Наверху"

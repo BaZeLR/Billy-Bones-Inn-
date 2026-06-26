@@ -1,15 +1,23 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# Harassment discussion picture selection.
 # ================================================================================
+
 label HarassDiscussImage(girl="", value=0):
-    python:
-        if girl == "melissa":
-            if value == 0:
-                renpy.call("ShowImage", girl, "grope", "scoldangry")
-            elif value == 1:
-                renpy.call("ShowImage", girl, "grope", "scoldneutral")
-            else:
-                renpy.call("ShowImage", girl, "grope", "scoldok")
-        elif girl == "amanda":
-            renpy.call("ShowImage", girl, "grope", "scold")
+    $ _hdi_girl = str(girl or "")
+    $ _hdi_value = int(value or 0)
+    $ _hdi_picture = ""
+    if _hdi_girl == "melissa":
+        if _hdi_value == 0:
+            $ _hdi_picture = build_media_ref(_hdi_girl, "grope", "scoldangry")
+        elif _hdi_value == 1:
+            $ _hdi_picture = build_media_ref(_hdi_girl, "grope", "scoldneutral")
+        else:
+            $ _hdi_picture = build_media_ref(_hdi_girl, "grope", "scoldok")
+    elif _hdi_girl == "amanda":
+        $ _hdi_picture = build_media_ref(_hdi_girl, "grope", "scold")
+
+    if str(_hdi_picture or "").strip():
+        $ scene_image = str(_hdi_picture or "")
+        $ _layout_last_picture = scene_image
+        vscene scene_image
     return

@@ -7,6 +7,9 @@
 
 label dress_for_night(girl_name, mode):
     # mode: 0 = nightshirt, 1 = panties, 2 = naked
+    $ girl_name = str(girl_name or "").strip()
+    if girl_name in peopleInfo:
+        $ peopleInfo[girl_name].publish_wardrobe_state()
     $ legs[girl_name] = ''
     $ shoes[girl_name] = ''
     $ topraised[girl_name] = 0

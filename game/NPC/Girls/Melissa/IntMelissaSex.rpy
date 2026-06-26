@@ -206,7 +206,6 @@ init python:
 
 
 label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
-    hide screen main_ui
     if not melissa_intimacy_available(GirlNameIMS, GirlLocIMS):
         $ MainTxt = "Для такого между вами уже нужно место без чужих взглядов. Здесь слишком открыто."
         $ CurLocDesc = MainTxt
@@ -217,8 +216,9 @@ label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
         _ims_start_orgasms = int(GiveOrgasms.get(GirlNameIMS, 0) or 0)
         _ims_clear_contact_states(GirlNameIMS)
         _ims_scene_counted = False
-    if renpy.loadable("images/melissa/tavern/melissa_portrait.png"):
-        call ShowImage("melissa", "", "portrait")
+    $ _ims_melissa_picture = Melissa.image_path("portrait", "default")
+    if str(_ims_melissa_picture or "").strip():
+        call ShowImage("", "", _ims_melissa_picture)
 
     label int_melissa_sex_menu:
         $ _ims_prepare_scene_state(GirlNameIMS)

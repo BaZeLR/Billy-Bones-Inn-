@@ -1,5 +1,6 @@
 default TavernPlayedEventsToday = []
 default TavernEventReportRows = []
+default TavernWorkPlanDay = -1
 
 init -20 python:
     class TavernWorkEventDefinition(object):
@@ -62,14 +63,7 @@ init -20 python:
 
 
     def tavern_work_job_candidates(job_code):
-        source = tavern_work_job_map(job_code)
-        if not isinstance(source, dict):
-            return []
-        out = []
-        for person, value in source.items():
-            if tavern_work_int(value, 0) != 0:
-                out.append(str(person or ""))
-        return [person for person in out if person]
+        return list(girls_by_job(str(job_code or "")) or [])
 
 
     def tavern_work_liza_talk_ready():
@@ -163,11 +157,13 @@ init -20 python:
 
 
     def tavern_work_build_daily_plan():
+        global TavernWorkPlanDay
         tavern_work_events[:] = []
         TavernPlayedEventsToday[:] = []
         TavernEventReportRows[:] = []
 
         current_day = tavern_work_int(dayspassed, 0)
+        TavernWorkPlanDay = current_day
         for event_type in tavern_work_random_type_order:
             candidates = [row for row in tavern_work_events_by_type.get(event_type, []) if row.can_schedule()]
             if len(candidates) <= 0:

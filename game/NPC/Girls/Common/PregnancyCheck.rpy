@@ -47,7 +47,10 @@ init python:
             return max(a, b)
         
         # Argument normalization
-        girl = girl_name
+        girl = str(girl_name or "").strip().lower()
+        girl_info = getPersonInfo(girl)
+        if girl_info is None:
+            return 0
         dad = dad_name
         dad_type = dad_name_type
         is_random = is_dude_random
@@ -96,55 +99,54 @@ init python:
                     cum_place = 'tits'
                 else:
                     cum_place = 'mouthface'
-            # Stat changes
-            sexacts[girl] = sexacts.get(girl, 0) + 1
-            cur_conc = ConceptionChance.get(girl, 0)
+            girl_info.add_sex_stat("sexacts", 1)
+            cur_conc = girl_info.sex_stat("ConceptionChance", 0)
             if dad == 'Вы':
                 cur_conc *= 3
-                HadSex[girl] = HadSex.get(girl, 0) + 1
-                HadSex['You'] = HadSex.get('You', 0) + 1
+                girl_info.mark_fucked(1)
                 if fun_awarded == 0:
-                    renpy.store.fun = max(0, min(100, int(getattr(renpy.store, "fun", 0) or 0) + 30))
+                    player_state(False).condition.change("fun", 30)
+                    player_state(False).condition.apply_to_store()
                     fun_awarded = 1
-                renpy.store.cametoday = int(getattr(renpy.store, 'cametoday', 0) or 0) + 1
-                try:
-                    renpy.store.LastDaySex = int(getattr(renpy.store, "dayspassed", 0) or 0)
-                    renpy.store.PlayerLastCumDay = int(getattr(renpy.store, "dayspassed", 0) or 0)
-                except Exception:
-                    pass
+                player_state(False).intimacy.record_cum(dayspassed)
+                player_state(False).intimacy.apply_to_store()
                 if cum_place == 'inside':
-                    CumInsideYou[girl] = 1
+                    girl_info.set_cum_state("cum_inside_you", 1)
                 elif cum_place == 'tits':
-                    CumTitsYou[girl] = 1
+                    girl_info.set_cum_state("cum_tits_you", 1)
                 elif cum_place in ['face', 'mouthface']:
-                    CumFaceYou[girl] = 1
+                    girl_info.set_cum_state("cum_face_you", 1)
+                elif cum_place == 'mouth':
+                    girl_info.set_cum_state("cum_mouth_you", 1)
             else:
                 if cum_place == 'inside':
-                    CumInsideOthers[girl] = 1
+                    girl_info.set_cum_state("cum_inside_others", 1)
                 elif cum_place == 'tits':
-                    CumTitsOthers[girl] = 1
+                    girl_info.set_cum_state("cum_tits_others", 1)
                 elif cum_place in ['face', 'mouthface']:
-                    CumFaceOthers[girl] = 1
+                    girl_info.set_cum_state("cum_face_others", 1)
+                elif cum_place == 'mouth':
+                    girl_info.set_cum_state("cum_mouth_others", 1)
                 if cum_place == '':
-                    CumFaceOthers[girl] = 0
-                    CumTitsOthers[girl] = 0
-                if not isinstance(getattr(renpy.store, "cametoday_npc", None), dict):
-                    renpy.store.cametoday_npc = {}
-                renpy.store.cametoday_npc[dad] = int(renpy.store.cametoday_npc.get(dad, 0) or 0) + 1
+                    girl_info.clear_cum("cum_face_others", "cum_tits_others")
+                dad_info = getPersonInfo(dad)
+                if dad_info is not None:
+                    dad_state = dad_info.ensure_sex_state()
+                    dad_state["came_today"] = int(dad_state.get("came_today", 0) or 0) + 1
             # Sluttiness increase
             Zalet = 0
-            if renpy.random.randint(1, Max(sluttiness.get(girl, 1), 1)*3) <= 1 * (2 if cum_place == 'inside' else 1) and sluttiness.get(girl, 0) <= 70:
-                sluttiness[girl] = sluttiness.get(girl, 0) + 1
+            if renpy.random.randint(1, Max(getattr(girl_info, "corruption", 1), 1)*3) <= 1 * (2 if cum_place == 'inside' else 1) and getattr(girl_info, "corruption", 0) <= 70:
+                girl_info.change_social(corruption_delta=1)
             if is_random:
                 cur_conc = cur_conc / 10
             if cum_place == 'inside':
-                cuminside[girl] = cuminside.get(girl, 0) + 1
-                if pregnancy.get(girl, 0) == 0:
+                girl_info.add_sex_stat("cuminside", 1)
+                if girl_info.pregnancy_days() == 0:
                     cur_conc += int(pregnancy_conception_bonus(girl) or 0)
                     cur_conc = Min(cur_conc, 800)
                     if renpy.random.randint(1, 1000) <= cur_conc:
-                        pregnancy[girl] = 1
-                        pregfather[girl] = dad
+                        girl_info.set_sex_stat("pregnancy", 1)
+                        girl_info.set_sex_stat("pregfather", dad)
                         Zalet = 1
             # Dad name record normalization
             dad_record = dad
@@ -155,11 +157,10 @@ init python:
             if lcase(dad_record) == 'месье легаре' and dad_type == 'NPC':
                 dad_record = 'Мессир Легаре'
 
-            repo = getattr(renpy.store, "sex_history_by_girl", {}) or {}
-            next_ids = getattr(renpy.store, "sex_history_next_id", {}) or {}
-            girl_rows = list(repo.get(girl, []) or [])
-            row_id = int(next_ids.get(girl, 1) or 1)
-            girl_rows.append({
+            if not isinstance(getattr(girl_info, "detailed_sex_history", None), list):
+                girl_info.detailed_sex_history = []
+            row_id = len(girl_info.detailed_sex_history) + 1
+            girl_info.detailed_sex_history.append({
                 "RowId": row_id,
                 "Day": int(dayspassed + 1),
                 "GirlName": str(girl),
@@ -169,10 +170,7 @@ init python:
                 "CumTarget": str(cum_place or ""),
                 "Zalet": int(Zalet or 0),
             })
-            repo[girl] = girl_rows
-            next_ids[girl] = row_id + 1
-            renpy.store.sex_history_by_girl = repo
-            renpy.store.sex_history_next_id = next_ids
+        return 0
 
 # Ren'Py label for script compatibility
 label PregnancyCheck(girl_name, cum_place, repeat_count, dad_name='', is_dude_random=0, dad_name_type=''):

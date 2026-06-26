@@ -31,7 +31,6 @@ init python:
         return ""
 
 label MorningSickness(girl_name):
-    hide screen main_ui
     hide screen girl_card_overlay
     hide screen player_card_overlay
     python:
@@ -100,7 +99,6 @@ label MorningSickness(girl_name):
 
 
 label morning_sickness_step2(girl_name, ZaletOpinion, Zaderzhka, CumInsideLastDays, MSickAskedDelay=False, MSickZaletCommentMade=False):
-    hide screen main_ui
     hide screen girl_card_overlay
     hide screen player_card_overlay
     python:
