@@ -72,7 +72,7 @@ init python:
         for _unused_pregnancy_check in range(int(repeat_count)):
             # Randomize dad type if needed
             if dad_type_reset:
-                randnum = renpy.random.randint(1, 7)
+                randnum = procedural_randint(1, 7, key="procedural:NPC/Girls/Common/PregnancyCheck.rpy:procedural_randint:75:1")
                 dad_type = [
                     'Неизвестный моряк',
                     'Неизвестный грузчик',
@@ -90,7 +90,7 @@ init python:
                     dad = 'Случайный негр'
             # Randomize cum place if needed
             if cum_place_reset:
-                randvar = renpy.random.randint(1, 6)
+                randvar = procedural_randint(1, 6, key="procedural:NPC/Girls/Common/PregnancyCheck.rpy:procedural_randint:93:2")
                 if randvar <= 3:
                     cum_place = 'inside'
                 elif randvar == 4:
@@ -135,7 +135,7 @@ init python:
                     dad_state["came_today"] = int(dad_state.get("came_today", 0) or 0) + 1
             # Sluttiness increase
             Zalet = 0
-            if renpy.random.randint(1, Max(getattr(girl_info, "corruption", 1), 1)*3) <= 1 * (2 if cum_place == 'inside' else 1) and getattr(girl_info, "corruption", 0) <= 70:
+            if procedural_randint(1, Max(getattr(girl_info, "corruption", 1), 1)*3, key="procedural:NPC/Girls/Common/PregnancyCheck.rpy:procedural_randint:138:3") <= 1 * (2 if cum_place == 'inside' else 1) and getattr(girl_info, "corruption", 0) <= 70:
                 girl_info.change_social(corruption_delta=1)
             if is_random:
                 cur_conc = cur_conc / 10
@@ -144,7 +144,7 @@ init python:
                 if girl_info.pregnancy_days() == 0:
                     cur_conc += int(pregnancy_conception_bonus(girl) or 0)
                     cur_conc = Min(cur_conc, 800)
-                    if renpy.random.randint(1, 1000) <= cur_conc:
+                    if procedural_randint(1, 1000, key="procedural:NPC/Girls/Common/PregnancyCheck.rpy:procedural_randint:147:4") <= cur_conc:
                         girl_info.set_sex_stat("pregnancy", 1)
                         girl_info.set_sex_stat("pregfather", dad)
                         Zalet = 1

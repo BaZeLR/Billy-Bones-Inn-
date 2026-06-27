@@ -32,10 +32,10 @@ init python:
         if Amanda.var_int("alberdanceadvance", 0) == 5:
             watch_line[0] += " При этом он не забывает целовать малышку Аманду а та отвечает ему тем же, с трудом не сбиваясь с ритма танца."
 
-        if Amanda.var_int("alberfriends", 0) < 12 and renpy.random.randint(1, 2) == 1:
+        if Amanda.var_int("alberfriends", 0) < 12 and procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/EventAmandaLegareCreateDance.rpy:procedural_randint:35:1") == 1:
             Amanda.set_var_int("alberfriends", Amanda.var_int("alberfriends", 0) + 1)
 
-        slut_friends_increase("amanda", 0, 0, 0, 21, 2, 1)
+        Amanda.apply_social_chance(0, 0, 0, 21, 2, 1, "legare_create_dance")
 
 label EventAmandaLegareCreateDance:
     $ event_amanda_legare_create_dance()

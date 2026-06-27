@@ -1064,7 +1064,7 @@ init python:
 
         try:
             # 1) deterministic setup
-            renpy.random.seed(123)
+            procedural_seed("procedural:Utilities/General/Common/DebugTools.rpy:procedural_seed:1067:1")
             _dbg_set("time", 0)
             _dbg_set("week", 1)
             _dbg_set("day", 1)
@@ -1188,7 +1188,7 @@ init python:
         Use from console:
             debug_tavern_events_snapshot_fn()
         """
-        renpy.random.seed(123)
+        procedural_seed("procedural:Utilities/General/Common/DebugTools.rpy:procedural_seed:1191:2")
         _dbg_set("time", 0)
         _dbg_set("week", 1)
         _dbg_set("day", 1)
@@ -1213,7 +1213,7 @@ init python:
         Use from console:
             debug_tavern_events_unit_fn()
         """
-        renpy.random.seed(123)
+        procedural_seed("procedural:Utilities/General/Common/DebugTools.rpy:procedural_seed:1216:3")
         _dbg_set("time", 0)
         _dbg_set("week", 1)
         _dbg_set("day", 1)
@@ -2306,7 +2306,7 @@ label debug_test_room:
 label debug_tavern_events_snapshot:
     python:
         # Deterministic setup for console/manual verification.
-        renpy.random.seed(123)
+        procedural_seed("procedural:Utilities/General/Common/DebugTools.rpy:procedural_seed:2309:4")
         _dbg_set("time", 0)
         _dbg_set("week", 1)
         _dbg_set("day", 1)

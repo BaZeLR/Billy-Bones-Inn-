@@ -117,7 +117,7 @@ label DressShop:
     if not DressShopRoom.is_open():
         $ MainTxt = DressShopRoom.schedule.closed_text
         $ CurLocDesc = MainTxt
-        $ scene_image = build_media_ref("general", "", "LocArtisansQuarter" + str(renpy.random.randint(1, 4)))
+        $ scene_image = build_media_ref("general", "", "LocArtisansQuarter" + str(procedural_randint(1, 4, key="procedural:Town/Arts/Dress/DressShop.rpy:procedural_randint:120:1")))
         $ _layout_last_picture = ""
         $ current_action_items = DressShopRoom.build_exit_items()
         $ _dress_ui_return = None

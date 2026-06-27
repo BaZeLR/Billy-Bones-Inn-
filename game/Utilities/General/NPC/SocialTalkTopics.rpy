@@ -331,7 +331,7 @@ init -39 python:
     def social_topic_return_label(girl_name=""):
         key = social_topic_key(girl_name)
         if key == "amanda":
-            return "IntAmandaTalkRefresh"
+            return "IntAmandaTalk"
         if key == "melissa":
             return "IntMelissaTalkRefresh"
         if key == "sandra":

@@ -167,7 +167,7 @@ init python:
         _fran_inc_talk()
 
     def _fran_random_topic(clean_lines=3):
-        idx = renpy.random.randint(0, 10)
+        idx = procedural_randint(0, 10, key="procedural:NPC/Secondary/IntFrancheskaTalk.rpy:procedural_randint:170:1")
         second_text = _fran_phrase("second", idx)
         main_text = _fran_phrase("main", idx)
         _fran_publish_location_text(second_text, main_text)

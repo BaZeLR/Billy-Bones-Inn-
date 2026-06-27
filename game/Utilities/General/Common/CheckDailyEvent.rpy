@@ -198,7 +198,7 @@ init -25 python:
                 continue
             if not _daily_match_time(current_time, row_time, row_time_expr):
                 continue
-            if renpy.random.randint(1, row_chance) != 1:
+            if procedural_randint(1, row_chance, key="procedural:Utilities/General/Common/CheckDailyEvent.rpy:procedural_randint:201:1") != 1:
                 continue
 
             return DailyEventsList.pop(index)
@@ -224,7 +224,7 @@ init -25 python:
 
             if event_type == "BuyDressTom" and week_value != 7:
                 DailyEventsList_Add(girl_name, "dressshop", 0, "=", 1, 0, "BuyDress", "GirlDressBuy")
-                DailyEventsList_Add(girl_name, "alllocs", 0, ">", 1, 5 + renpy.random.randint(1, 5), "DressNoShow", "DressNoShow")
+                DailyEventsList_Add(girl_name, "alllocs", 0, ">", 1, 5 + procedural_randint(1, 5, key="procedural:Utilities/General/Common/CheckDailyEvent.rpy:procedural_randint:227:2"), "DressNoShow", "DressNoShow")
                 DailyEventsList.pop(index)
                 continue
 

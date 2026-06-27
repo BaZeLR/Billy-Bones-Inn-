@@ -33,7 +33,7 @@ label AmandaAfterDanceMCMakeOut:
         "Остановиться":
             "Вы еще немного стоите рядом в темноте, держась за руки, пока шум праздника окончательно не начинает стихать."
             jump AmandaAfterDanceMCFinish
-        "Увести ее глубже в переулок" if int(Amanda.stats.get("sexacts", 0) or 0) > 0 or Amanda.var_int("suckyou", 0) == 1 or Amanda.corruption >= 35:
+        "Увести ее глубже в переулок" if int(Amanda.sex_stat("sexacts", 0) or 0) > 0 or Amanda.var_int("suckyou", 0) == 1 or Amanda.corruption >= 35:
             $ Amanda.add_var_int("mc_dance_sex_seen", 1)
             $ Amanda.change_mana(1, "friday_dance_after_sex")
             jump AmandaSexDanceStreet
@@ -68,7 +68,7 @@ label AmandaSexDanceStreet:
 
     python:
         tmp_minet_or_full = 0
-        if Amanda.stats.get("virginity", True) != True:
+        if Amanda.sex_stat("virginity", True) != True:
             # Not virgin, check conditions
             if Amanda.var_int("fuckyou", 0) and Amanda.corruption >= 35:
                 tmp_minet_or_full = 1

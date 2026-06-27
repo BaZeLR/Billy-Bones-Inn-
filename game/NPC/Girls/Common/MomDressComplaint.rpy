@@ -37,7 +37,7 @@ init python:
             return "прокричав напоследок, что вы ей не указ и она лучше знает как ей себя вести."
 
         if bool(georgett_present) and girl == "amanda":
-            AmandaVar["prohibitliza"] = 1
+            Amanda.set_var_int("prohibitliza", 1)
             tail = "пообещав напоследок что будет себя скромнее вести и не будет больше болтать с Лизеттой."
         else:
             tail = "пообещав напоследок что будет себя скромнее вести и одеваться."
@@ -53,11 +53,11 @@ init python:
         return [MenuItem("Вернуться к делам", Jump("TavernMain"))]
 
     def mom_dress_complaint_skill_drop_data():
-        prof_choice = renpy.random.randint(1, 3)
+        prof_choice = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:56:1")
         prof_name = "cooking" if prof_choice == 1 else ("cleaning" if prof_choice == 2 else "waitress")
         prof_desc = "ГОТОВКИ" if prof_name == "cooking" else ("УБОРКИ" if prof_name == "cleaning" else "ОФИЦИАНТКИ")
         current_value = max(0, int(getattr(renpy.store, prof_name).get("sandra", 0) or 0))
-        drop_value = max(0, min(renpy.random.randint(0, 3), current_value - 10))
+        drop_value = max(0, min(procedural_randint(0, 3, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:60:2"), current_value - 10))
         return {
             "prof_name": prof_name,
             "prof_desc": prof_desc,
@@ -85,7 +85,7 @@ label MomDressComplaint(girl_name):
         $ _mdc_intro_text = "Вы мирно и спокойно шли по своим делам, когда вас вдруг остановила Сандра: \"Стефан, мне надо с тобой поговорить.\"\n\nОтведя вас в сторонку, она продолжила: \"{}Ты видел как {} вырядилась? Как блядь последняя, извини за выражение! Сиськи практически наружу, подол короче некуда! Мне порой кажется, что она и нижнего белья-то не надевает!\"".format("Я знаю, мы уже про это говорили, но не могу дальше молчать. " if TalkedBeforeTmp > 0 else "", _mdc_real_name)
         if _mdc_georgett_present:
             $ _mdc_intro_text = str(_mdc_intro_text or "") + "\n\nЭто все от Жоржи с Лизкой идет! Стефан, я конечно понимаю, что от этих шлюх нам доходик капает, но ты посмотри, как они на нашу {}у влияют!".format(GirlSillyName)
-            if _mdc_girl == "amanda" and AmandaVar.get("prohibitliza", 0):
+            if _mdc_girl == "amanda" and Amanda.var_int("prohibitliza", 0):
                 $ _mdc_intro_text = str(_mdc_intro_text or "") + "\n\nТы хоть и запретил Аманде с Лизкой трепаться, но ты ж ее знаешь, она сама лучше всех все знает! Я уже несколько раз видела, как Аманда плевала на все запреты и с этой профурсеткой болтала."
             else:
                 $ _mdc_intro_text = str(_mdc_intro_text or "") + "\n\nКак не посмотрю, она с Лизкой все время о чем-то шушукается!"
@@ -163,7 +163,7 @@ label MomDressComplaintBoughtDress(girl_name="", kids_or_preg=0, real_name="", g
     $ _mdc_girl = str(girl_name or "").strip().lower()
     $ _mdc_real_name = str(real_name or "").strip()
     $ _mdc_kids = int(kids_or_preg or 0)
-    $ _mdc_body_part = "задницу" if renpy.random.randint(1, 2) == 1 else "сиськи"
+    $ _mdc_body_part = "задницу" if procedural_randint(1, 2, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:166:3") == 1 else "сиськи"
     $ _mdc_follow_text = "\"А чего бы не заметить-то?\" сказали вы глядя Сандре в глаза. \"Это ж я ей это платье и купил. Думаю оно ей идет. И посетителям нравится, смотри как они на ее {} пялятся.\"\n\n\"Ты, ты...\" потрясенно ответила вам Сандра. \"Значит ты покупаешь {} такие шмотки, чтобы на нее бухие мужики пялились и за задницу хватали?\"\n\n\"Ага,\" довольно ответили вы. \"Да ей и самой внимание приятно.\"\n\n\"И не стыдно тебе из нее блядь делать? Ты должен ее защищать!".format(_mdc_body_part, _mdc_real_name)
     if _mdc_kids > 0:
         if _mdc_kids == 2:
@@ -202,8 +202,8 @@ label MomDressComplaintBoughtDressNope:
 
 label MomDressComplaintSandraShouldDress(girl_name="", real_name="", georgett_present=False):
     $ _mdc_reacts = (
-        (sluttiness.get("sandra", 0) >= 20 and renpy.random.randint(1, 4) == 1)
-        or (sluttiness.get("sandra", 0) >= 38 and renpy.random.randint(1, 2) == 1)
+        (sluttiness.get("sandra", 0) >= 20 and procedural_randint(1, 4, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:205:4") == 1)
+        or (sluttiness.get("sandra", 0) >= 38 and procedural_randint(1, 2, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:206:5") == 1)
         or sluttiness.get("sandra", 0) >= 47
     )
     $ _mdc_intro_text = "\"Конечно видел, и на мой взгляд, ее выбор гардероба получше твоего,\" нагло заявили вы.\n\n\"Что?!\" гневно воскликнула Сандра. \"Это ты о чем вообще?\"\n\n\"Ты прекрасно знаешь, о чем. У нас трактир, а не богадельня. Все работницы должны быть привлекательны собой. И одеты тоже привлекательно. Ты собой хороша,\" при этих словах Сандра слегка зарделась, \"а вот одеваешься излишне скромно. Если к нам никто ходить не будет, то мы все окажемся на улице, побираться будем. Да и вообще, ты после смерти мужа слегка зачахла, а ты ведь еще совсем не старая.\""
@@ -253,8 +253,8 @@ label MomDressComplaintHowCanYouSayThatInsist(girl_name="", real_name="", george
     $ _mdc_tail = mom_dress_complaint_finish_scold(_mdc_girl, bool(georgett_present), -1, True)
     $ MainTxt = "\"Тебе может забота глаза застилает, а я вижу все как есть,\" ответили вы. \"Пойдем, поговорим с ней, нас двоих она должна послушать.\"\n\nСандре ничего не оставалось, как пойти за вами следом. Вы строго отчитали {}, научив ее уму разуму.".format(str(real_name or ""))
     if _mdc_girl == "amanda":
-        $ MainTxt = str(MainTxt or "") + "\n\nЗаодно вы {}запретили ей болтать с Лизеттой, источником грязи и разврата.".format("еще раз " if AmandaVar.get("prohibitliza", 0) else "")
-        $ AmandaVar["prohibitliza"] = 1
+        $ MainTxt = str(MainTxt or "") + "\n\nЗаодно вы {}запретили ей болтать с Лизеттой, источником грязи и разврата.".format("еще раз " if Amanda.var_int("prohibitliza", 0) else "")
+        $ Amanda.set_var_int("prohibitliza", 1)
     $ MainTxt = str(MainTxt or "") + "\n\nВ конце концов {} расплакалась и убежала, {}".format(str(real_name or ""), _mdc_tail)
     $ CurLocDesc = MainTxt
     call QueuePagedPanelText(MainTxt, "Ваши действия", mom_dress_complaint_return_items(), "plain")
@@ -272,7 +272,7 @@ label MomDressComplaintHowCanYouSayThatBackOff:
 
 
 label MomDressComplaintBoughtDressHighSandra(girl_name="", kids_or_preg=0, real_name=""):
-    $ _mdc_body_part = "задницу" if renpy.random.randint(1, 2) == 1 else "сиськи"
+    $ _mdc_body_part = "задницу" if procedural_randint(1, 2, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:275:6") == 1 else "сиськи"
     $ _mdc_kids = int(kids_or_preg or 0)
     $ MainTxt = "\"Да, оно ей очень идет,\" отозвались вы. \"Это ж я ей этот наряд и купил. И посетителям нравится, смотри как они на ее {} пялятся. Даже щипают порой, вот как она им нравится.\"\n\n\"Ну, может это все-таки уже слишком,\" неуверенно ответила вам Сандра.\n\n\"Да ладно тебе, Сандра!".format(_mdc_body_part)
     if _mdc_kids > 0:

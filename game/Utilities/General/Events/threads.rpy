@@ -219,14 +219,14 @@ init -25 python:
         def __init__(self, data):
             super(RThreadInfo, self).__init__(data)
             self.order = list(range(self.data.length))
-            renpy.random.shuffle(self.order)
+            procedural_shuffle(self.order, key="procedural:Utilities/General/Events/threads.rpy:procedural_shuffle:222:1")
 
         def advance(self):
             self.done[self.order[self.num]] = True
             self.num += 1
             if self.num >= self.data.length:
                 self.completed = True
-                renpy.random.shuffle(self.order)
+                procedural_shuffle(self.order, key="procedural:Utilities/General/Events/threads.rpy:procedural_shuffle:229:2")
 
         def reactivate(self, num=None):
             self.aborted = False

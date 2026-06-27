@@ -4,10 +4,10 @@
 init python:
     def tavern_amanda_room_sleep_dress():
         sleep_dress = 0
-        if int(virginity.get("amanda", 1) or 1) == 0:
-            if int(sluttiness.get("amanda", 0) or 0) >= 30:
+        if not bool(Amanda.sex_stat("virginity", True)):
+            if int(Amanda.corruption or 0) >= 30:
                 sleep_dress = 1
-            if int(sluttiness.get("amanda", 0) or 0) >= 50:
+            if int(Amanda.corruption or 0) >= 50:
                 sleep_dress = 2
         return sleep_dress
 
@@ -99,17 +99,17 @@ init python:
             and str(household_morning_issue_type("amanda") or "") == "sleepy"
             and int(time or 0) == 0
             and int(hour or 0) < 12
-            and Amanda.var["attic_window_morning_day"] != int(dayspassed or 0)
+            and Amanda.var_int("attic_window_morning_day", -1) != int(dayspassed or 0)
         )
 
     def tavern_amanda_morning_window_outcome():
-        friend_value = int(Friends.get("amanda", 0) or 0)
-        open_value = int(otkroven.get("amanda", 0) or 0)
-        corruption_value = int(sluttiness.get("amanda", 0) or 0)
+        friend_value = int(Amanda.rel or 0)
+        open_value = int(Amanda.openness or 0)
+        corruption_value = int(Amanda.corruption or 0)
         decision = girl_decide("amanda", "peek_window_confront")
         reaction = str(decision.get("reaction", "") or "")
         decision_score = girl_decision_reaction_score(reaction)
-        if Amanda.var["suckyou"] == 1 or Amanda.var["fuckyou"] == 1:
+        if Amanda.var_int("suckyou", 0) == 1 or Amanda.var_int("fuckyou", 0) == 1:
             return "oral" if decision_score >= 0 else "mutual"
         if decision_score > 0:
             if friend_value >= 10 and open_value >= 6 and corruption_value >= 28:
@@ -320,7 +320,7 @@ label TavernAmandaRoomDoor:
 
 
 label TavernAmandaRoomKnock:
-    $ _amanda_knock_roll = renpy.random.randint(1, 100)
+    $ _amanda_knock_roll = procedural_randint(1, 100, key="procedural:Inn/TavernAmandaRoom.rpy:procedural_randint:323:1")
     $ current_action_title = "Дверь Аманды"
     $ current_action_content = None
     if _amanda_knock_roll <= 50:
@@ -466,7 +466,7 @@ label TavernAmandaRoomMorningWindowEpisode:
     if not tavern_amanda_morning_window_episode_ready():
         call TavernAmandaRoomRestore
         return
-    $ Amanda.var["attic_window_morning_day"] = int(dayspassed or 0)
+    $ Amanda.set_var_int("attic_window_morning_day", int(dayspassed or 0))
     $ _amanda_window_outcome = tavern_amanda_morning_window_outcome()
     $ calendar_v2.advance_minutes(20)
     $ household_clear_morning_issue("amanda")
@@ -475,21 +475,18 @@ label TavernAmandaRoomMorningWindowEpisode:
     $ MainTxt = "Аманда не спит. Вы застаете ее у окна ровно в тот момент, когда она резко отдергивает руку от занавески и пытается сделать вид, будто просто смотрела во двор.\n\n\"Ну что, Аманда? Кто у нас теперь извращенец?\" спрашиваете вы.\n\nОна вспыхивает, но не уходит от ответа: \"Ничего не могу поделать... иногда так зудит, что хоть на стену лезь.\" Вы спокойно отвечаете: \"Могу помочь, если хочешь.\""
     if _amanda_window_outcome == "oral":
         $ Arousal["You"] = max(35, int(Arousal.get("You", 0) or 0))
-        $ Arousal["amanda"] = max(35, int(Arousal.get("amanda", 0) or 0))
-        $ sluttiness["amanda"] = min(100, int(sluttiness.get("amanda", 0) or 0) + 2)
-        $ otkroven["amanda"] = min(20, int(otkroven.get("amanda", 0) or 0) + 1)
+        $ Amanda.set_arousal(max(35, Amanda.arousal_value()))
+        $ Amanda.change_social(open_delta=1, corruption_delta=2)
         $ CurLocDesc = MainTxt
         call IntAmandaSex("amanda", "home", "minet")
         $ MainTxt = "После этого Аманда уже не спорит насчет окна. Она только быстро приводит себя в порядок и, все еще краснея, просит не разносить эту сцену по всему дому."
     elif _amanda_window_outcome == "mutual":
         $ Arousal["You"] = max(30, int(Arousal.get("You", 0) or 0) + 10)
-        $ Arousal["amanda"] = max(30, int(Arousal.get("amanda", 0) or 0) + 10)
-        $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
-        $ otkroven["amanda"] = min(20, int(otkroven.get("amanda", 0) or 0) + 1)
-        $ sluttiness["amanda"] = min(100, int(sluttiness.get("amanda", 0) or 0) + 2)
+        $ Amanda.add_arousal(10, 100)
+        $ Amanda.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
         $ MainTxt = str(MainTxt or "") + "\n\nАманда долго смотрит на вас, потом сама делает шаг ближе. Дальше все остается на грани игры и взаимной смелости: достаточно, чтобы обоим стало трудно делать вид, будто это обычное утро, но недостаточно, чтобы она потом могла назвать это чем-то большим.\n\nЧерез несколько минут она уже торопливо поправляет платье и шепчет, что на сегодня с нее хватит."
     else:
-        $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
+        $ Amanda.change_social(friend_delta=1)
         $ MainTxt = str(MainTxt or "") + "\n\nАманда кусает губу, но все же качает головой. \"Не сейчас. Увидимся позже, если ты умеешь держать язык за зубами.\" На этом она быстро собирается и делает вид, будто вы разбудили ее самым обычным способом."
     $ CurLocDesc = MainTxt
     call stat
@@ -524,21 +521,21 @@ label TavernAmandaRoomGropeAction:
         call ShowImage("amanda", "room", "wakedress")
     $ tmpGropeReact = Amanda.sex_offer_reaction()
     $ tmpSexType = 0
-    if virginity['amanda']:
-        if (Amanda.var["suckyou"] or Amanda.var["fuckyou"]) and sluttiness['amanda'] >= 30:
+    if bool(Amanda.sex_stat("virginity", True)):
+        if (Amanda.var_int("suckyou", 0) or Amanda.var_int("fuckyou", 0)) and Amanda.corruption >= 30:
             $ tmpSexType = 1
-        if sluttiness['amanda'] >= 38:
+        if Amanda.corruption >= 38:
             $ tmpSexType = 1
     else:
-        if (Amanda.var["suckyou"] or Amanda.var["fuckyou"]) and sluttiness['amanda'] >= 20:
+        if (Amanda.var_int("suckyou", 0) or Amanda.var_int("fuckyou", 0)) and Amanda.corruption >= 20:
             $ tmpSexType = 2
-        if sluttiness['amanda'] >= 30:
+        if Amanda.corruption >= 30:
             $ tmpSexType = 2
     
     if tmpGropeReact == 1:
         "Проснувшаяся от вашего поцелуя Аманда не казалась через чур уж обескураженной вашим пылом. Тем не менее она все-таки оттолкнула вас, прошептав: 'Стефан, ты что?'"
         python:
-            tmpRand = random.randint(1,3)
+            tmpRand = procedural_randint(1, 3, "amanda_room_grope_soft_refusal_1_%s" % int(dayspassed or 0))
             if tmpRand == 1:
                 renpy.say(None, 'За стенкой Сандра и остальные спят, да и я спать хочу, намаялась за день.')
             elif tmpRand == 2:
@@ -546,7 +543,7 @@ label TavernAmandaRoomGropeAction:
             else:
                 renpy.say(None, 'Нашел время.')
         python:
-            tmpRand = random.randint(1,3)
+            tmpRand = procedural_randint(1, 3, "amanda_room_grope_soft_refusal_2_%s" % int(dayspassed or 0))
             if tmpRand == 1:
                 renpy.say(None, 'Давай, иди к себе, водичкой холодной облейся если невтерпеж.')
             elif tmpRand == 2:
@@ -554,16 +551,20 @@ label TavernAmandaRoomGropeAction:
             else:
                 renpy.say(None, 'Если совсем невмоготу, то в узел завяжи себе, а меня сейчас не трогай.')
         "<br>Увидев, что Аманда настроена вежливо, но решительно дать вам отпор, вы не стали шуметь и спорить, а вернулись в зал."
-        $ Amanda.var["kickyoufromroom"] = 1
+        $ Amanda.set_var_int("kickyoufromroom", 1)
         jump TavernMain
     elif tmpGropeReact == 2:
         "Аманда, почувствовав ваши прикосновения, раскрыла глаза. 'Ага, заявился, подонок,' не очень-то романтично огорошила вас своенравная девица
         ."
         call CodeAmandaListScold
         "Вы открыли рот чтобы оправдаться, но такого шанса вам не дали, не став слушать ваших оправданий Аманда твердо и решительно произнесла: 'Вон отсюда, пока я не закричала.'<br>Вы попробовали еще что-то сказать, но в ответ услышали лишь снова 'Вон!'. Почуствовав твердость в голосе девушки, вы решили попробовать сделать свой заход позже, а пока временно отступить в главный зал.<br>"
-        $ Amanda.var["kickyoufromroom"] = 1
-        call SlutFriendsIncrease('amanda', 5, 1, -1, 30, 1, -1)
-        call SlutFriendsIncrease('amanda', 5, 1, -1, 0, 0, 0)
+        $ Amanda.set_var_int("kickyoufromroom", 1)
+        if Amanda.rel > 5:
+            $ Amanda.change_social(friend_delta=-1)
+        if Amanda.corruption > 30:
+            $ Amanda.change_social(corruption_delta=-1)
+        if Amanda.rel > 5:
+            $ Amanda.change_social(friend_delta=-1)
         jump TavernMain
     elif tmpGropeReact == 3:
         

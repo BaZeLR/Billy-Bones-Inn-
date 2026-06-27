@@ -239,8 +239,8 @@ label GiveBirth(GirlName=""):
                             '"Тем более что это, наверное, твой ребенок," смущенно добавила она.'
                         else:
                             '"Тем более что это может быть и твой ребенок," смущенно добавила она.'
-                        if min(sluttiness.get("amanda", 0), sluttiness.get("melissa", 0)) < 55:
-                            $ offended_girl = "Аманда" if sluttiness.get("amanda", 0) < 55 else "Мелисса"
+                        if min(int(Amanda.corruption or 0), int(Melissa.corruption or 0)) < 55:
+                            $ offended_girl = "Аманда" if int(Amanda.corruption or 0) < 55 else "Мелисса"
                             '"[offended_girl], как ты могла?!" возмущенно воскликнула [offended_girl]. "Прижить младенца от Стефана? А ты, Стефан! Как ты мог так поступить с Сандрой? Где твоя совесть?"'
                             if sluttiness.get(GirlName, 0) > 62:
                                 '"А ты меня не стыди," спокойно оборвала излияния моралистки Сандра. "Я женщина еще не старая, но одинокая и овдовевшая. У меня есть свои потребности. И Стефан оказался достаточно хорош, чтобы мне с этими потребностями помочь. Понятно? И нечего мне тут морали читать, нос не дорос."'
@@ -317,7 +317,7 @@ label GiveBirth(GirlName=""):
                     else:
                         "[real_name] густо покраснела и не нашлась с ответом."
                     $ _sfi(GirlName, 0, 0, 0, 55, 2, 1)
-                    $ RandVar = renpy.random.randint(1, 3)
+                    $ RandVar = procedural_randint(1, 3, key="procedural:Town/Temple/GiveBirth.rpy:procedural_randint:320:1")
                     if RandVar == 1:
                         '"Молодец! Прямо как я," не слушая роженицу продолжала улыбаться приятным воспоминаниям Франческа. "Я тоже, когда моложе была, на членах скакала до самых родовых схваток!"'
                     elif RandVar == 2:

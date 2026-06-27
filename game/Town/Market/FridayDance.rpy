@@ -49,7 +49,7 @@ label FridayDance(add_dance_phrase_tmp=""):
         "Вы видите всех своих знакомых. Что вы собираетесь делать?"
         menu friday_dance_menu:
             "Понаблюдать за танцующими" if FridayDancesCount < 5 and DanceStep == 0:
-                $ rand_friday_dance = renpy.random.randint(1, 8)
+                $ rand_friday_dance = procedural_randint(1, 8, key="procedural:Town/Market/FridayDance.rpy:procedural_randint:52:1")
                 if rand_friday_dance == 1:
                     $ result = "Вы замечаете как молодая пара, танцуя, сливается в страстном поцелуе."
                 elif rand_friday_dance == 2:
@@ -104,7 +104,7 @@ label CheckIfAmandaGoneDance:
         return
     if GetDanceJustLeft("amanda", "legare", FridayDancesCount) > 0 or Amanda.var_int("LegareGo", 0) == 1:
         $ Amanda.set_var_int("LegareGo", 0)
-        if renpy.random.randint(1, 2) == 1:
+        if procedural_randint(1, 2, key="procedural:Town/Market/FridayDance.rpy:procedural_randint:107:2") == 1:
             $ Amanda.set_var_int("leftdances", 1)
             "Неожиданно вы заметили, что Аманда торопиться куда-то прочь под ручку с мессиром Легаре."
             call LegareAmandaGoMenu

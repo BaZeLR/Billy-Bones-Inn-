@@ -62,20 +62,20 @@ init python:
             elif girl == "liza" and event_type == 99:
                 PregnancyCheck(girl, "mouth", 1, "legare")
             elif girl == "inga" and place == "Lucas":
-                inside_or_mouth = "inside" if renpy.random.randint(1, 3) <= 2 else "mouth"
+                inside_or_mouth = "inside" if procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:65:1") <= 2 else "mouth"
                 PregnancyCheck(girl, inside_or_mouth, 1, "Лукас")
             elif place == "Glory":
                 glory_hole_inside = "mouth"
                 girl_info = getPersonInfo(girl)
                 corruption_val = _ndf_int(getattr(girl_info, "corruption", 0), 0) if girl_info is not None else 0
                 if corruption_val >= 80:
-                    if renpy.random.randint(1, 15) == 1:
+                    if procedural_randint(1, 15, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:72:2") == 1:
                         glory_hole_inside = "inside"
                 elif corruption_val >= 60:
-                    if renpy.random.randint(1, 30) == 1:
+                    if procedural_randint(1, 30, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:75:3") == 1:
                         glory_hole_inside = "inside"
                 elif corruption_val >= 50:
-                    if renpy.random.randint(1, 60) == 1:
+                    if procedural_randint(1, 60, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:78:4") == 1:
                         glory_hole_inside = "inside"
                 if event_type == 1:
                     PregnancyCheck(girl, glory_hole_inside, 1, "Мастер Драупнир")
@@ -96,7 +96,7 @@ init python:
                 Amanda.lover_sex_calc()
             elif place == "Priest":
                 PregnancyCheck(girl, "inside", 1, "Отец Герхард")
-                if girl == "becky" and renpy.random.randint(1, 2) == 1:
+                if girl == "becky" and procedural_randint(1, 2, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:99:5") == 1:
                     Becky.set_story_value("last_store_orgasm_day", dayspassed_val)
             elif girl == "becky":
                 if place == "StoreLover":
@@ -109,9 +109,9 @@ init python:
                     eddie = getPersonInfo("eddie")
                     eddie_came_today = _ndf_int(eddie.ensure_sex_state().get("came_today", 0), 0) if eddie is not None else 0
                     if eddie_came_today == 0:
-                        inside_or_mouth = "inside" if renpy.random.randint(1, 2) == 1 else "mouth"
+                        inside_or_mouth = "inside" if procedural_randint(1, 2, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:112:6") == 1 else "mouth"
                         PregnancyCheck(girl, inside_or_mouth, 1, "eddie")
-                        if renpy.random.randint(1, 5) == 1:
+                        if procedural_randint(1, 5, key="procedural:Utilities/Time/NextDay_FinishDayEvents.rpy:procedural_randint:114:7") == 1:
                             Becky.set_story_value("last_store_orgasm_day", dayspassed_val)
             else:
                 PregnancyCheck(girl, "", 1, "")

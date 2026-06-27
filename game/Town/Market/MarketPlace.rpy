@@ -190,7 +190,7 @@ label MarketPlace:
             $ market_mongol_mode = "first"
 
         else:
-            if StolenHorseDays == 0 or renpy.random.randint(1, 3) <= 2:
+            if StolenHorseDays == 0 or procedural_randint(1, 3, key="procedural:Town/Market/MarketPlace.rpy:procedural_randint:193:1") <= 2:
                 $ MainTxt = "Обведя взглядом рынок, в дальнем углу вы заметили своего старого знакомого Монгола. Как обычно, рядом с ним была очередная лошадка. Увидев вас, Монгол улыбнулся, блеснув золотым зубом, и призывно замахал вам рукой."
                 $ CurLocDesc = MainTxt
                 call ShowImageSeq("mongol", "", "portrait", 3)

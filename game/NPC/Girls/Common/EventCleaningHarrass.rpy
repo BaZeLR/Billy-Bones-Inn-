@@ -8,7 +8,7 @@ label event_cleaning_harrass(eyewitness=0):
     $ girl_name = get_random_girl_by_job("jobcleaning")
 
     if girl_name:
-        $ HarassType = renpy.random.randint(1, 4)
+        $ HarassType = procedural_randint(1, 4, key="procedural:NPC/Girls/Common/EventCleaningHarrass.rpy:procedural_randint:11:1")
 
         if HarassType == 1:
             $ CurEventDesc = "{} подошла к столу чтобы вытереть разлитое вино. Когда она наклонилась над столом, ее груди оказались в непосредственной близости к одному из сидящих за ним подмастерьев. Юнец не смог устоять перед соблазном и схватил оба шарика, начав с наслаждением их мять.".format(RealName.get(girl_name, girl_name))

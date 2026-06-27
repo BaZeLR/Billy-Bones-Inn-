@@ -28,5 +28,5 @@ init python:
     def get_random_girl_by_job(jobtype):
         candidates = girls_by_job(jobtype)
         if candidates:
-            return renpy.random.choice(candidates)
+            return procedural_choice(candidates, key="procedural:NPC/Girls/Common/GetRandomGirlByJob.rpy:procedural_choice:31:1")
         return ""

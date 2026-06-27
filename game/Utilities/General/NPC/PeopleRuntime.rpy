@@ -758,6 +758,7 @@ init -999 python:
         def clear_cum(self, *keys):
             state = self.ensure_sex_state()
             selected = list(keys or ())
+            clear_all = not selected
             if not selected:
                 selected = [
                     "cum_inside_you", "cum_face_you", "cum_tits_you", "cum_mouth_you",
@@ -765,7 +766,8 @@ init -999 python:
                 ]
             for key in selected:
                 state[str(key)] = 0
-            self.set_cock_position("none")
+            if clear_all:
+                self.set_cock_position("none")
             return state
 
         def current_underwear(self, key, default=""):
@@ -877,6 +879,23 @@ init -999 python:
             self.openness = max(0, min(20, people_to_int(getattr(self, "openness", 0), 0) + people_to_int(open_delta, 0)))
             self.corruption = max(0, min(100, people_to_int(getattr(self, "corruption", 0), 0) + people_to_int(corruption_delta, 0)))
             return self
+
+        def apply_social_chance(self, friend_limit=0, friend_chance=0, friend_delta=0, corruption_limit=0, corruption_chance=0, corruption_delta=0, reason="social"):
+            friend_delta = people_to_int(friend_delta, 0)
+            corruption_delta = people_to_int(corruption_delta, 0)
+            friend_limit = people_to_int(friend_limit, 0)
+            corruption_limit = people_to_int(corruption_limit, 0)
+            friend_chance = max(0, people_to_int(friend_chance, 0))
+            corruption_chance = max(0, people_to_int(corruption_chance, 0))
+            if friend_delta != 0 and self.rel < friend_limit and (friend_chance <= 1 or procedural_randint(1, friend_chance, key="procedural:Utilities/General/NPC/PeopleRuntime.rpy:procedural_randint:888:1") == 1):
+                self.change_social(friend_delta=friend_delta)
+            if corruption_delta != 0 and self.corruption < corruption_limit and (corruption_chance <= 1 or procedural_randint(1, corruption_chance, key="procedural:Utilities/General/NPC/PeopleRuntime.rpy:procedural_randint:890:2") == 1):
+                self.change_social(corruption_delta=corruption_delta)
+            if friend_delta > 0 or corruption_delta > 0:
+                self.change_mana(1, reason)
+            elif friend_delta < 0 or corruption_delta < 0:
+                self.change_mana(-1, reason)
+            return {"rel": self.rel, "corruption": self.corruption, "mana": self.mana}
 
         def change_rebellion(self, amount=0, reason=""):
             self.rebellion = max(0, min(100, people_to_int(getattr(self, "rebellion", 0), 0) + people_to_int(amount, 0)))
@@ -1047,6 +1066,101 @@ init -999 python:
             bottomraised[name] = people_to_int(bottomraised.get(name, 0), 0)
             wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
             return self
+
+        def sex_clothing_state(self):
+            state = self.ensure_sex_state()
+            state.setdefault("top_removed", 0)
+            state.setdefault("bottom_removed", 0)
+            state.setdefault("bra_removed", 0)
+            state.setdefault("panties_removed", 0)
+            state.setdefault("top_raised", 0)
+            state.setdefault("bottom_raised", 0)
+            state.setdefault("lick_pussy", 0)
+            return state
+
+        def current_dress(self):
+            wardrobe = getattr(self, "wardrobe", {}) or {}
+            if not isinstance(wardrobe, dict):
+                return ""
+            return str(wardrobe.get("current_dress", "") or "")
+
+        def clothing_layer(self, layer):
+            layer_key = str(layer or "").strip().lower()
+            state = self.sex_clothing_state()
+            dress = self.current_dress()
+            if layer_key == "top":
+                if people_to_int(state.get("top_removed", 0), 0):
+                    return ""
+                return str(DressTopPart.get(dress, "") or "")
+            if layer_key == "bottom":
+                if people_to_int(state.get("bottom_removed", 0), 0):
+                    return ""
+                return str(DressBottomPart.get(dress, "") or "")
+            if layer_key == "bra":
+                if people_to_int(state.get("bra_removed", 0), 0):
+                    return ""
+                return self.current_underwear("bra", "")
+            if layer_key == "panties":
+                if people_to_int(state.get("panties_removed", 0), 0):
+                    return ""
+                return self.current_underwear("panties", "")
+            return ""
+
+        def clothing_slut(self, layer):
+            return people_to_int(DressPartSlut.get(self.clothing_layer(layer), 0), 0)
+
+        def layer_raised(self, layer):
+            layer_key = str(layer or "").strip().lower()
+            if layer_key not in ("top", "bottom"):
+                return 0
+            return people_to_int(self.sex_clothing_state().get("%s_raised" % layer_key, 0), 0)
+
+        def set_layer_raised(self, layer, value=1):
+            layer_key = str(layer or "").strip().lower()
+            if layer_key not in ("top", "bottom"):
+                return 0
+            state = self.sex_clothing_state()
+            state["%s_raised" % layer_key] = 1 if people_to_int(value, 0) else 0
+            return state["%s_raised" % layer_key]
+
+        def remove_clothing_layer(self, layer):
+            layer_key = str(layer or "").strip().lower()
+            if layer_key not in ("top", "bottom", "bra", "panties"):
+                return ""
+            removed = self.clothing_layer(layer_key)
+            self.sex_clothing_state()["%s_removed" % layer_key] = 1
+            return removed
+
+        def reset_sex_clothing_state(self):
+            state = self.sex_clothing_state()
+            for key in ("top_removed", "bottom_removed", "bra_removed", "panties_removed", "top_raised", "bottom_raised"):
+                state[key] = 0
+            self.publish_visibility_state()
+            return self
+
+        def tits_visible(self):
+            return self.clothing_layer("bra") == "" and (self.clothing_layer("top") == "" or self.layer_raised("top"))
+
+        def pussy_visible(self):
+            return self.clothing_layer("panties") == "" and (self.clothing_layer("bottom") == "" or self.layer_raised("bottom"))
+
+        def short_skirt_no_panties(self):
+            return self.clothing_layer("panties") == "" and not self.layer_raised("bottom") and self.clothing_slut("bottom") >= 4
+
+        def publish_visibility_state(self):
+            name = people_normalize_id(getattr(self, "code_name", self.name))
+            TitsVisible[name] = 1 if self.tits_visible() else 0
+            PussyVisible[name] = 1 if self.pussy_visible() else 0
+            ShortSkirtNoPanties[name] = 1 if self.short_skirt_no_panties() else 0
+            return self
+
+        def record_lick_pussy(self):
+            state = self.sex_clothing_state()
+            state["lick_pussy"] = people_to_int(state.get("lick_pussy", 0), 0) + 1
+            return state["lick_pussy"]
+
+        def lick_pussy_count(self):
+            return people_to_int(self.sex_clothing_state().get("lick_pussy", 0), 0)
 
         def decision_profile(self):
             return build_girl_decision_profile(self.code_name)

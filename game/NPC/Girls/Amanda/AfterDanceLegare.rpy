@@ -23,7 +23,7 @@ label AfterDanceLegare(arg=""):
         if AmandaNesluh == 0:
             "Аманда расплакалась от вашей отповеди и убежала. Альбер хмуро посмотрел на вас и пошел восовояси. Что же, вы всего лишь сделали то, что были должны сделать, не правда ли?"
             $ Amanda.add_var_int("alberfriends", -2)
-            call SlutFriendsIncrease("amanda", 3, 1, -2, 20, 1, -3)
+            $ Amanda.apply_social_chance(3, 1, -2, 20, 1, -3, "after_dance_legare_prohibit")
             
             menu:
                 "Вернуться на танцы":
@@ -32,7 +32,7 @@ label AfterDanceLegare(arg=""):
         elif AmandaNesluh == 1:
             "Аманда мрачно буркнула \"Не твое дело, Стефан, пойдем, Альбер,\" и резким движением выдернула свою руку из вашего хвата."
             $ Amanda.add_var_int("alberfriends", 1)
-            call SlutFriendsIncrease("amanda", 5, 1, -1, 25, 1, 2)
+            $ Amanda.apply_social_chance(5, 1, -1, 25, 1, 2, "after_dance_legare_prohibit")
             
         elif AmandaNesluh == 2:
             if Amanda.var_int("glorydeflower", 0) > 0 or Amanda.var_int("fuckyou", 0) > 0:
@@ -44,7 +44,7 @@ label AfterDanceLegare(arg=""):
                 
             "Нагло смотря вам в глаза Аманда процедила: \"Да ты ревнуешь, Стефан! Думаешь что раз я [AmandaArgue1], то теперь на других и смотреть не могу? Чем меня учить и указывать с кем я могу гулять а с кем нет, лучше бы на себя посмотрел, мне свой хрен [AmandaArgue2], а теперь еще моей жизни учишь, тоже мне, учитель выискался!\"\nС этими словами она выдернула руку и потянула Альбера за собой."
             $ Amanda.add_var_int("alberfriends", 2)
-            call SlutFriendsIncrease("amanda", 5, 1, -1, 30, 1, 3)
+            $ Amanda.apply_social_chance(5, 1, -1, 30, 1, 3, "after_dance_legare_prohibit")
             
         $ Amanda.set_var_int("alberprohibit", 1)
         
@@ -93,7 +93,7 @@ label AfterDanceLegare_Fight:
         $ Alber.add_relation(-3)
         $ Amanda.change_social(friend_delta=-2)
         $ Amanda.add_var_int("alberfriends", 2)
-        call SlutFriendsIncrease("amanda", 0, 0, 0, 32, 1, 1)
+        $ Amanda.apply_social_chance(0, 0, 0, 32, 1, 1, "after_dance_legare_fight")
         $ apply_legare_amanda_let_go_code()
         
         "Однако месье был готов к такому обороту событий и врасплох вы его застать не смогли. Альбер ловко уклонился и, пользуясь тем, что вы вложили в удар весь свой вес, сделал вам подсечку и заодно заехал по затылку. \"А меня-то за что?!\" успели подумать вы пока булыжная мостовая летела вам прямо в лицо. Когда вы пришли в себя, ни Легаре, ни Аманды рядом уже не было."
@@ -107,7 +107,7 @@ label AfterDanceLegare_Fight:
         $ Alber.add_relation(-2)
         $ Amanda.change_social(friend_delta=-1)
         $ Amanda.add_var_int("alberfriends", 1)
-        call SlutFriendsIncrease("amanda", 0, 0, 0, 32, 1, 1)
+        $ Amanda.apply_social_chance(0, 0, 0, 32, 1, 1, "after_dance_legare_fight")
         $ apply_legare_amanda_let_go_code()
         
         "Альбер ловко уклонился и попробовал сбить вас с ног. Правда, это ему не удалось. Аманда несколько секунд смотрела на вашу драку, а потом закричала: \"Стража, стража!\"\n\nК вам подошло пара толстых стражей порядка. \"Так, так, так, что это у нас тут?\" вопросил один из них.\n\"Драка? Значит так, господа хорошие, за драку полагается посидеть денек, подумать, но я сегодня добрый, так что предлагаю заменить вам отсидку штрафом.\" с этими словами страж порядка оглянулся. Убедившись, что других неподкупных слуг закона, кроме него и его напарника, поблизости нет, он продолжил: \"Всего 50 мараведи с каждого, платить нужно непосредственно мне и прямо сейчас.\"\n\n\"Конечно, господин сержант,\" с готовностью ответил месье Легаре и несколько монет поменяло хозяина."
@@ -135,7 +135,7 @@ label AfterDanceLegare_Police:
     $ Alber.add_relation(-2)
     $ Amanda.change_social(friend_delta=-2)
     
-    if Amanda.corruption < 25 or (Amanda.corruption <= 30 and renpy.random.randint(1, 3) < 3) or (Amanda.corruption <= 35 and renpy.random.randint(1, 3) == 1):
+    if Amanda.corruption < 25 or (Amanda.corruption <= 30 and procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AfterDanceLegare.rpy:procedural_randint:138:1") < 3) or (Amanda.corruption <= 35 and procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AfterDanceLegare.rpy:procedural_randint:138:2") == 1):
         "Услышав, что вы зовете стражу, Аманда подрастеряла весь кураж, заплакала и побежала домой к трактиру. Месье Легаре с ненавистью посмотрел на вас, пробормотал что-то себе под нос, и тоже отправился по своим делам."
         $ Amanda.change_social(corruption_delta=-3)
         
@@ -146,23 +146,23 @@ label AfterDanceLegare_Police:
     else:
         "К вам подошло пара толстых стражей порядка. \"Так, так, так, что это у нас тут?\" вопросил один из них.\n\"Этот господин, большой охотник до молоденьких девушек, клеится к Аманде, а я пытаюсь отвести ее домой,\" рассудительно объясняете вы ситуацию стражам порядка. \n\nНо тут вмешивается Аманда: \"А это мое дело, с кем мне ходить. Нет у него права мне говорить, что делать.\"\nСтражники плотоядно осмотрели фигурку Аманды. В гневе она была еще красивее, чем обычно."
         
-        if int(Amanda.stats.get("pregnancy", 0) or 0) > 120:
+        if int(Amanda.sex_stat("pregnancy", 0) or 0) > 120:
             "\"Знаете что, господин хороший, а она дело говорит,\" ответил вам старшой патруля. \"Вон, она уже и пузо себе нагуляла, значит не маленькая, коль ножки-то раздвигать уже научилась,\" и стражи сально засмеялись собственной шутке."
         
-        elif DressPartSlut.get(bottomdress.get("amanda", "")) >= 4 or DressPartSlut.get(topdress.get("amanda", "")) >= 4:
+        elif DressPartSlut.get(DressBottomPart.get(Amanda.current_dress(), ""), 0) >= 4 or DressPartSlut.get(DressTopPart.get(Amanda.current_dress(), ""), 0) >= 4:
             "\"Знаете что, господин хороший, а она дело говорит,\" ответил вам старшой патруля. \"Вон, как вырядилась, юбка короткая, сиськи почти наружу. Аманда уже выросла, а вы и не заметили!\""
         
         else:
             "\"Хм, может вы и правы, сисек у нее еще почти нет, хотя росточком она и вымахала,\" заметил старшой патруля."
             
-            if Amanda.corruption >= 40 or (Amanda.corruption >= 30 and renpy.random.randint(1, 2) == 1):
+            if Amanda.corruption >= 40 or (Amanda.corruption >= 30 and procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AfterDanceLegare.rpy:procedural_randint:158:3") == 1):
                 "\"Это у меня-то нет сисек?!\" не согласилась с ним Аманда, \"А это что по твоему?\" и с этими словами Аманда развязала несколько завязок на платье и предъявила свои хоть и небольшие, но упругие аргументы с задорно торчащими сосками. Сержант посмотрел на них, улыбнулся, облизывая губы, и ответил: \"Вот так бы сразу! Да, дело ясное, видно что вы, юная мисс, уже подросли, а Стефан вас небось еще девчонкой считает. А может к нам заглянете как нибудь?\" страж закона так и не смог оторвать взгляд от грудей Аманды, пока та их не убрала обратно под одежду."
-                call SlutFriendsIncrease("amanda", 0, 0, 0, 44, 1, 1)
+                $ Amanda.apply_social_chance(0, 0, 0, 44, 1, 1, "after_dance_legare_police")
             
             else:
                 "\"С другой стороны, далеко не у всех юных мисс, к сожалению, сиськи растут с той скоростью, что нам хотелось бы,\" засмеялся его напарник. \"Так что извините нас, но повода для вмешательства я пока не вижу, Аманда вольна вести себя как ей вздумается, даже к нам в казарму на огонек заглянуть.\""
                 
-                if Amanda.var_int("alberfriends", 0) >= 11 and renpy.random.randint(1, 3) == 1:
+                if Amanda.var_int("alberfriends", 0) >= 11 and procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AfterDanceLegare.rpy:procedural_randint:165:4") == 1:
                     "Тут Альбер достал что-то из кармана и сунул старшему стражнику. Тот просветлел и сказал вам:\n\"Тем более, что этот почтенный господин только что предъявил нам убедительные аргументы в пользу того, что эта юная мисс уже совсем взрослая. Так что шли бы, мил человек отсюда по хорошему!\"\n\nВам осталось только проследить за тем, как Альбер уводит Аманду."
                     $ AlberBribe = 1
         
@@ -170,7 +170,7 @@ label AfterDanceLegare_Police:
             "Дать Аманде уйти":
                 $ apply_legare_amanda_let_go_code()
                 "Аргументы стражи вас убедили, да и денег было жалко, чай не казенные, так что вы проводили парочку взглядом и пошли обратно к трактиру."
-                call SlutFriendsIncrease("amanda", 0, 0, 0, 32, 1, 2)
+                $ Amanda.apply_social_chance(0, 0, 0, 32, 1, 2, "after_dance_legare_police")
                 
                 menu:
                     "Дойти до трактира":

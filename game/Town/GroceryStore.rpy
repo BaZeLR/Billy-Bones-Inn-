@@ -54,7 +54,7 @@ init python:
         if len(loadable) <= 0:
             return ""
         if randomize:
-            return renpy.random.choice(loadable)
+            return procedural_choice(loadable, key="procedural:Town/GroceryStore.rpy:procedural_choice:57:1")
         return loadable[0]
 
     def grocery_store_eddie_picture(randomize=False):

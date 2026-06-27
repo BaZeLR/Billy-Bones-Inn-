@@ -10,12 +10,12 @@ label NextDay_TavernDaily():
     python:
         # Daily visitors and happiness
         CurDay['happy'] = 0
-        CurDay['visitors'] = tavernvisitors + renpy.random.randint(-4, 4)
+        CurDay['visitors'] = tavernvisitors + procedural_randint(-4, 4, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:13:1")
         if week == 5:
             CurDay['visitors'] = CurDay['visitors'] // 2
         if week == 7:
             CurDay['visitors'] == 0
-        if renpy.random.randint(1, 15) == 1:
+        if procedural_randint(1, 15, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:18:2") == 1:
             ExtraEvents += 'В гавань зашло сразу несколько больших кораблей. Их истосковавшиеся по берегу команды ломанулись в окрестные кабаки.<br>'
             CurDay['visitors'] *= 2
         if callable(record_weekly_tavern_visitors):
@@ -73,17 +73,17 @@ label NextDay_TavernDaily():
                 if tavernlevel > CurDay['visitors'] * 4:
                     CurDay['happy'] += 1
         # Sign and girls effects
-        if SloganFixed < 2 and renpy.random.randint(1, 3) == 1:
+        if SloganFixed < 2 and procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:76:3") == 1:
             CurDay['happy'] -= 1
-        if get_random_girl_by_job('jobwhore') and renpy.random.randint(1, 4) == 1:
+        if get_random_girl_by_job('jobwhore') and procedural_randint(1, 4, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:78:4") == 1:
             CurDay['happy'] += 1
-        if get_random_girl_by_job('jobgloryhole') and renpy.random.randint(1, 3) == 1:
+        if get_random_girl_by_job('jobgloryhole') and procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:80:5") == 1:
             CurDay['happy'] += 1
         CurDay['loyalty'] = 0
         if week > 5 and DanceSponsor == 1:
             DanceSponsor = 0
-            CurDay['loyalty'] += renpy.random.randint(3, 5)
-        if CurDay['happy'] > 0 and renpy.random.randint(1, 5) <= CurDay['happy']:
+            CurDay['loyalty'] += procedural_randint(3, 5, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:85:6")
+        if CurDay['happy'] > 0 and procedural_randint(1, 5, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:86:7") <= CurDay['happy']:
             CurDay['loyalty'] += 1
         if CurDay['happy'] < 0:
             CurDay['loyalty'] += CurDay['happy']

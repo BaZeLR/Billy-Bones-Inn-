@@ -137,7 +137,7 @@ init -25 python:
             if probability in (None, 1, 1.0):
                 return True
             try:
-                return renpy.random.random() < float(probability)
+                return procedural_random(key="procedural:Utilities/General/Events/events.rpy:procedural_random:140:1") < float(probability)
             except Exception:
                 return False
 

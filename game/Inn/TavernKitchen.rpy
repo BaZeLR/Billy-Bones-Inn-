@@ -492,7 +492,7 @@ label TavernKitchenAskSandraBreakfasts:
     $ Talked["sandra"] = int(Talked.get("sandra", 0) or 0) + 1
     $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
     $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
-    $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
+    $ Amanda.change_social(friend_delta=1)
     $ fun = _player_clamp(int(fun or 0) + 2, 0, 100)
     $ MainTxt = "Вы просите Сандру почаще собирать домочадцев за общий утренний стол и не давать всем разбредаться без толку. Сандра выслушивает вас без лишних слов, потом переводит взгляд на оставленные припасы и кивает.\n\n\"Ладно. Если уж на кухне есть из чего готовить, я поговорю с девочками. Общий завтрак дому не повредит, а там и работа ровнее пойдет,\" решает она."
     if str(_kitchen_used_item or "").strip() != "":

@@ -6,7 +6,7 @@ label ShowLizaPortrait():
     $ check_visibility(GirlName)
 
     if TitsVisible.get(GirlName, 0) == 1 and PussyVisible.get(GirlName, 0) == 0:
-        call ShowImage(GirlName, "portraits", "nakedtits" + str(renpy.random.randint(1, 2)))
+        call ShowImage(GirlName, "portraits", "nakedtits" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/ShowLizaPortrait.rpy:procedural_randint:9:1")))
     elif TitsVisible.get(GirlName, 0) == 1 and PussyVisible.get(GirlName, 0) == 1:
         python:
             CurSperm0 = CumFaceOthers.get(GirlName, 0) + CumFaceYou.get(GirlName, 0)

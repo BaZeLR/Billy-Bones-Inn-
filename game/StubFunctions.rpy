@@ -15,12 +15,6 @@ label NamesSet_stub:
     $ renpy.notify("NamesSet called (stub)")
     return
 
-# NPC Initialization labels
-label AmandaDynamicCommonBlocks_stub:
-    # Placeholder for Amanda dynamic common blocks
-    $ renpy.notify("AmandaDynamicCommonBlocks called (stub)")
-    return
-
 # Create basic NPC interaction screens
 label IntLizaTalk_stub:
     "You talk with Liza."

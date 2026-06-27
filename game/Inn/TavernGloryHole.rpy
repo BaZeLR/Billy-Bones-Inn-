@@ -70,8 +70,8 @@ label TavernGloryHole:
 
         if GetSexEventFromTable("amanda", 99, "glorytry") > 0:
             AmandaAtGlory = 1
-            Amanda.var["glorytried"] = 1
-            Amanda.var["glory_last_event_day"] = int(dayspassed or 0)
+            Amanda.set_var_int("glorytried", 1)
+            Amanda.set_var_int("glory_last_event_day", int(dayspassed or 0))
 
         GloryHoleYouLine1 = "Вы засунули свое самое дорогое в дырку. Однако с той стороны никто не поспешил вам на помощь. Вы, еще на что-то надеясь, подождали немного, но безрезультатно. Продолжать стоять дальше с засунутым в отверстие в стене членом в гнетущей тишине показалось вам глуповатым, и, со вздохом разочарования, вы убрали свое хозяйство обратно в штаны. <br>В голове у вас возникло несколько гипотез, объясняющих произошедшее. Возможно вы пришли слишком рано, а может пришли вовремя, но не назначили никого работать у глорихола. Надо провести тщательное расследование."
         GloryHoleYouLine2 = ""
@@ -233,7 +233,7 @@ label TavernGloryHole:
                 if AmandaAtGlory == 1:
                     $ BlockGloryHoleMenu = 1
                     $ AmandaGloryCurState = 1
-                    $ Amanda.var["glorysdiscover"] = 1
+                    $ Amanda.set_var_int("glorysdiscover", 1)
                     "Ваша реакция?"
                     if renpy.has_label("ShowImage"):
                         call ShowImage("amanda", "gloryfirst", "ambush")
@@ -278,8 +278,8 @@ label TavernGloryHole:
                     $ BlockGloryHoleMenu = 1
                     "Ваша реакция?"
                     python:
-                        PregnancyCheck("amanda", "mouthface", 1, "Вы")
-                    $ Amanda.var["glorysuck"] = 1
+                        Amanda.pregnancy_check("mouthface", 1, "Вы")
+                    $ Amanda.set_var_int("glorysuck", 1)
                     $ AmandaGloryCurState = 4
                 else:
                     python:

@@ -33,7 +33,7 @@ init python:
                 return
             incrfine = sum(bonus for threshold, bonus in thresholds if skill_value > threshold)
             roll_max = max(1, (base + incrfine) * girldiv)
-            if renpy.random.randint(1, roll_max) == 1:
+            if procedural_randint(1, roll_max, key="procedural:Utilities/General/NPC/IncreaseSkill.rpy:procedural_randint:36:1") == 1:
                 counter_map[girl_name] = counter_map.get(girl_name, 0) + 1
                 skill_map[girl_name] = skill_value + 1
                 gained = True

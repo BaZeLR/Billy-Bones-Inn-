@@ -1,5 +1,5 @@
 # Amanda thread blueprint.
-# This file is a catalog of Amanda-specific R/L/U thread definitions and safe wrapper labels.
+# This file is a catalog of Amanda-specific R/L/U thread definitions.
 # It is intentionally not appended to the active threadList yet.
 # To activate it later, merge AmandaThreadBlueprint into the engine's threadList.
 
@@ -19,7 +19,7 @@ init 100 python:
                 return default
 
     def _amanda_bp_var(name, default=0):
-        return _amanda_bp_i(globals().get("AmandaVar", {}).get(name, default), default)
+        return Amanda.var_int(name, default)
 
     def _amanda_bp_stat(table_name, key="amanda", default=0):
         table = globals().get(table_name, {})

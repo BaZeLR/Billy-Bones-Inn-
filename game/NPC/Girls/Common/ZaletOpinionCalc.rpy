@@ -157,7 +157,7 @@ init python:
         dude_type_l = _zalet_text(dude_name_type)
 
         if dude_type_l.startswith("неизвестный"):
-            rand_var = renpy.random.randint(1, 4)
+            rand_var = procedural_randint(1, 4, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:160:1")
             unknown_type = dude_type_l.replace("неизвестный", "", 1).strip()
             if rand_var == 1:
                 return "какой-то " + unknown_type + " как же его звали, а, вспомнила, " + str(dude_name)
@@ -168,7 +168,7 @@ init python:
             return "блин, на языке вертится, как же его звали, а, " + unknown_type + ", " + unknown_type + " " + str(dude_name) + "!"
 
         if "парень" in dude_type_l:
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:171:2")
             if rand_var == 1:
                 return "как-же этого парня звали, ну ту его видел, он недалеко от нас живет, а, вот: " + str(dude_name)
             if rand_var == 2:
@@ -176,7 +176,7 @@ init python:
             return str(dude_name) + ", парень из соседнего квартала, да ты его знаешь. Дала я ему, уболтал он меня, гоблин языкастый!"
 
         if str(girl_name) == "amanda" and dude_name_l == "вы":
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:179:3")
             if rand_var == 1:
                 return "ты, Стефан, кто же еще? Завернул мне подол и обрюхатил меня. Думай теперь, как это объяснять"
             if rand_var == 2:
@@ -184,7 +184,7 @@ init python:
             return "ты. Вот блин, от хозяина трактира понесла, стыд-то какой!"
 
         if str(girl_name) == "becky" and dude_name_l == "вы":
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:187:4")
             if rand_var == 1:
                 return "ты мальчик мой милый. Соблазнил меня, бедную вдову, а теперь еще и в положение ввел"
             if rand_var == 2:
@@ -192,7 +192,7 @@ init python:
             return "ты, Стефан, кто же еще!"
 
         if str(girl_name) == "liza" and dude_name_l == "вы":
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:195:5")
             if rand_var == 1:
                 return "ты Стефанчик. Помнишь, как доставал мне почти до маточки и туда спускал? Вот тогда, думаю, я и залетела"
             if rand_var == 2:
@@ -200,7 +200,7 @@ init python:
             return "ты наверное. Ты же любишь в меня спускать, вот и в тот месяц так было."
 
         if str(girl_name) == "georgett" and dude_name_l == "вы":
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:203:6")
             if rand_var == 1:
                 return "ты Стефанчик я думаю. Хотя конечно это не столь важно, все равно я точно отцов своих детей не знаю"
             if rand_var == 2:
@@ -208,7 +208,7 @@ init python:
             return "ты наверное. Любишь спускать мне внутрь, вот я и думаю что ты"
 
         if str(girl_name) == "becky" and dude_name_l == "эдди":
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:211:7")
             if rand_var == 1:
                 return "Эдди, мой управляющий. Тяжело ведь мне одной без мужика, вот и баловалась с ним. А теперь он мне и заделал ребеночка"
             if rand_var == 2:
@@ -216,7 +216,7 @@ init python:
             return "Эдди, мой рыжий помощник. Добаловались, докувыркались мы с ним"
 
         if str(girl_name) == "amanda" and "легаре" in dude_name_l:
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:219:8")
             if rand_var == 1:
                 return "Альберчик мой хороший. Он любит в меня кончать, вот и в тот день он прямо в меня спустил"
             if rand_var == 2:
@@ -224,7 +224,7 @@ init python:
             return "Альберчик, после танцев он тогда прямо в меня кончил, а потом и задержка была"
 
         if "легаре" in dude_name_l:
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:227:9")
             if rand_var == 1:
                 return "Мессир Легаре, ну ты знаешь, виноторговец"
             if rand_var == 2:
@@ -232,7 +232,7 @@ init python:
             return "Мессир Легаре, такой степенный мужчина, у него еще лавка с вином на рынке есть"
 
         if "герхард" in dude_name_l:
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:235:10")
             if rand_var == 1:
                 return "Отец Герхард, настоятель святого храма Ильматера"
             if rand_var == 2:
@@ -240,7 +240,7 @@ init python:
             return "Отец Герхард приобщил меня к благодати Ильматера. Ну и под подол мне залез.."
 
         if str(girl_name) == "inga" and "лукас" in dude_name_l:
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:243:11")
             if rand_var == 1:
                 return "мой парень, Лукас, от него я затяжелела"
             if rand_var == 2:
@@ -248,7 +248,7 @@ init python:
             return "с Лукасом, моим женишком мы баловались, баловались и вот, он мне ребенка заделал"
 
         if "эдди" in dude_name_l:
-            rand_var = renpy.random.randint(1, 3)
+            rand_var = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:251:12")
             if rand_var == 1:
                 return "Эдди, управляющий лавкой вдовы Блэнкеншип, ну той у которой ты продукты покупаешь"
             if rand_var == 2:
@@ -266,7 +266,7 @@ init python:
         if times_num <= 4:
             return str(times_num) + " раза в меня кончил, вот и залетела я."
         if times_num <= 10:
-            return str(times_num + renpy.random.randint(-1, 3)) + " раз в меня кончил наверное, чтобы уж наверняка."
+            return str(times_num + procedural_randint(-1, 3, key="procedural:NPC/Girls/Common/ZaletOpinionCalc.rpy:procedural_randint:269:13")) + " раз в меня кончил наверное, чтобы уж наверняка."
         if times_num <= 25:
             return "Раз двадцать наверное в меня спустил, чтобы значит наверняка меня обрюхатить."
         return "Даже и не упомнишь сколько раз в меня кончил. Спермы бы хватило чтобы наверное пол Коитополиса обрюхатить."

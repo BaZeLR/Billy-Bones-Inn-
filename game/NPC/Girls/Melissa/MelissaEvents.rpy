@@ -184,7 +184,7 @@ label story_melissa_bat_problem_3:
         $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 6)
         $ Melissa.var["drawings_ready_day"] = int(dayspassed or 0) + 2
         $ Melissa.var["temp_room"] = "TavernAmandaRoom"
-        $ AmandaVar["attic_window_busted"] = 1
+        $ Amanda.set_var_int("attic_window_busted", 1)
         $ Melissa.add_trust(-7)
         $ Amanda.change_social(friend_delta=-5)
         $ notoriety = min(100, int(notoriety or 0) + 10)

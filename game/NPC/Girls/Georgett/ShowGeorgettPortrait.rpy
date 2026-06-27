@@ -5,7 +5,7 @@ label ShowGeorgettPortrait():
     $ Georgett.refresh_sex_visibility()
 
     if not Georgett.visible_tits() and not Georgett.visible_pussy():
-        call ShowImage("georgett", "portraits", "portrait" + str(renpy.random.randint(1, 4)))
+        call ShowImage("georgett", "portraits", "portrait" + str(procedural_randint(1, 4, key="procedural:NPC/Girls/Georgett/ShowGeorgettPortrait.rpy:procedural_randint:8:1")))
     elif not Georgett.visible_tits() and Georgett.visible_pussy():
         call ShowImage("georgett", "portraits", "strip01")
     elif Georgett.visible_tits() and not Georgett.visible_pussy():

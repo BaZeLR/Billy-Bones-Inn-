@@ -68,7 +68,7 @@ init python:
         girl = str(girl_name or "becky")
         if int(agreed_to_redress or 0) != 1 or Becky.corruption < 45:
             return ""
-        randvar = renpy.random.randint(1, 6)
+        randvar = procedural_randint(1, 6, key="procedural:NPC/Girls/Becky/IntBeckyDressChange.rpy:procedural_randint:71:1")
         if randvar == 1:
             text = "Какой-то мужик, зашедший за чем-то в лавку, наблюдал за этой сценкой с отвалившей челюстью. Бекки подмигнула ему и стала перекладывать овощи на прилавке как ни в чем не бывало."
         elif randvar == 2:
@@ -103,7 +103,7 @@ label IntBeckyDressChange(GirlName="becky"):
                     "\"Ой, спасибо тебе за комплимент,\" ответила вам польщенная вдова. \"Наверное ты прав, без него я буду выглядеть лучше.\""
                     $ AgreedToRedress = 1
                     if Becky.corruption < 45:
-                        if renpy.random.randint(1, 2) == 1:
+                        if procedural_randint(1, 2, key="procedural:NPC/Girls/Becky/IntBeckyDressChange.rpy:procedural_randint:106:2") == 1:
                             "Убедившись что вы одни, Бекки растегнула платье, сняла лиф и одела платье уже на голые груди."
                         else:
                             "Бекки подождала, пока из лавки выйдут посетители, затем растегнула платье, сняла лиф и одела платье уже на голые груди."
@@ -137,7 +137,7 @@ label IntBeckyDressChange(GirlName="becky"):
                     "\"Ой, ну я даже не знаю, наверное ты прав,\" помялась немного вдова. \"Все равно никто и не увидит.\""
                     $ AgreedToRedress = 1
                     if Becky.corruption < 45:
-                        if renpy.random.randint(1, 2) == 1:
+                        if procedural_randint(1, 2, key="procedural:NPC/Girls/Becky/IntBeckyDressChange.rpy:procedural_randint:140:3") == 1:
                             "Оглянувшись по сторонам и убедившись что вы одни, Бекки залезла себе под подол и сняла столь досаждавшую вам деталь одежды."
                         else:
                             "Бекки подождала, пока из лавки выйдут посетители, затем залезла себе под подол и сняла столь досаждавшую вам деталь одежды."
@@ -163,14 +163,14 @@ label IntBeckyDressChange(GirlName="becky"):
         "Постыдить Бекки за то, что ходит без лифчика" if _can_shame:
             $ AgreedToRedress = 0
             "\"Бекки, а ты чего без лифа ходишь?\" - строго спросили вы вдову. \"У тебя и так грудь велика, так ты ее еще наружу выпячиваешь.\""
-            if Becky.has_bra() or (not Becky.has_bra() and Becky.corruption >= 45 and renpy.random.randint(1, 2) == 1):
+            if Becky.has_bra() or (not Becky.has_bra() and Becky.corruption >= 45 and procedural_randint(1, 2, key="procedural:NPC/Girls/Becky/IntBeckyDressChange.rpy:procedural_randint:166:4") == 1):
                 "\"С чего это ты решил что нету, конечно я лиф одеваю,\" Ребекка пресекла ваши разглагольствования на полуслове."
             else:
                 "\"Ну да, ты же меня сам просил без него ходить,\" обескураженно ответила вам она.\n\"Мне кажется, все-таки это как-то пошло и безвкусно, может лучше оденешь?\" отчитали вы бесстыдницу."
                 if Becky.corruption < 45:
                     "\"Ты прав, я только ради тебя его сняла, но раз ты передумал, то...\" с облегчением в голосе сказала Бекки, \"хорошо, одену как только доберусь до комода.\""
                     $ AgreedToRedress = 1
-                elif Becky.corruption < 60 and renpy.random.randint(1, 4) <= 3:
+                elif Becky.corruption < 60 and procedural_randint(1, 4, key="procedural:NPC/Girls/Becky/IntBeckyDressChange.rpy:procedural_randint:173:5") <= 3:
                     "\"А раньше тебе нравилось...\" обиженно протянула Бекки, \"хорошо, одену как только доберусь до комода.\""
                     $ AgreedToRedress = 1
                     $ Becky.apply_social_roll(10, 2, -1, 0, 0, 0)
@@ -188,14 +188,14 @@ label IntBeckyDressChange(GirlName="becky"):
         "Постыдить Бекки за то, что ходит без панталон" if _can_shame:
             $ AgreedToRedress = 0
             "\"Бекки, а у тебя что, сейчас под юбкой ничего нет, что ли?\" - строго спросили вы вдову."
-            if Becky.has_panties() or (not Becky.has_panties() and Becky.corruption >= 45 and renpy.random.randint(1, 2) == 1):
+            if Becky.has_panties() or (not Becky.has_panties() and Becky.corruption >= 45 and procedural_randint(1, 2, key="procedural:NPC/Girls/Becky/IntBeckyDressChange.rpy:procedural_randint:191:6") == 1):
                 "\"Конечно есть, за кого ты меня принимаешь,\" Ребекка пресекла вас на полуслове."
             else:
                 "\"Ну да, ты же меня сам просил без ничего ходить,\" обескураженно ответила вам она.\n\"Мне кажется, все-таки это как-то пошло и безвкусно, может лучше оденешь?\" отчитали вы бесстыдницу."
                 if Becky.corruption < 45:
                     "\"Ты прав, я только ради тебя без них ходила, но раз ты передумал, то...\" с облегчением в голосе сказала Бекки, \"хорошо, одену как только доберусь до комода.\""
                     $ AgreedToRedress = 1
-                elif Becky.corruption < 60 and renpy.random.randint(1, 4) <= 3:
+                elif Becky.corruption < 60 and procedural_randint(1, 4, key="procedural:NPC/Girls/Becky/IntBeckyDressChange.rpy:procedural_randint:198:7") <= 3:
                     "\"А раньше тебе нравилось...\" обиженно протянула Бекки, \"хорошо, одену как только доберусь до комода.\""
                     $ AgreedToRedress = 1
                     $ Becky.apply_social_roll(10, 2, -1, 0, 0, 0)

@@ -171,28 +171,28 @@ init -20 python:
             fn = self._get("RandomNameCode", None)
             key = self._gender_key(gender)
             if callable(fn):
-                return fn(gender=key, nationality=renpy.random.choice(["German", "French", "Italian"]))
+                return fn(gender=key, nationality=procedural_choice(["German", "French", "Italian"], key="procedural:Town/RandomTownEvents.rpy:procedural_choice:174:1"))
             fallback = {
                 "male": ("Ганс", "Пьер", "Томас", "Сергио"),
                 "female": ("Мария", "Лючия", "Анна", "Франческа"),
             }
-            return renpy.random.choice(fallback.get(key, fallback["male"]))
+            return procedural_choice(fallback.get(key, fallback["male"]), key="procedural:Town/RandomTownEvents.rpy:procedural_choice:179:2")
 
         def _gender_key(self, gender=None):
             key = str(gender or "").strip().lower()
             if key in ("male", "female"):
                 return key
-            return renpy.random.choice(["male", "female"])
+            return procedural_choice(["male", "female"], key="procedural:Town/RandomTownEvents.rpy:procedural_choice:185:3")
 
         def _call_occupation(self, gender=None):
             key = self._gender_key(gender)
-            return renpy.random.choice(self.OCCUPATIONS.get(key, self.OCCUPATIONS["male"]))
+            return procedural_choice(self.OCCUPATIONS.get(key, self.OCCUPATIONS["male"]), key="procedural:Town/RandomTownEvents.rpy:procedural_choice:189:4")
 
         def _call_stallion(self):
             fn = self._get("RandomStallionNameCode", None)
             if callable(fn):
                 return fn()
-            return renpy.random.choice(["Черный", "Буян", "Гром"])
+            return procedural_choice(["Черный", "Буян", "Гром"], key="procedural:Town/RandomTownEvents.rpy:procedural_choice:195:5")
 
         def location_allowed(self, location_name=""):
             return str(location_name or self._get("CurLoc", "") or "") in self.LOCATIONS
@@ -343,11 +343,11 @@ init -20 python:
             key = str(time_of_day or "morning")
             if key not in self.TIME_EVENTS:
                 key = "morning"
-            entry = renpy.random.choice(self.TIME_EVENTS[key])
+            entry = procedural_choice(self.TIME_EVENTS[key], key="procedural:Town/RandomTownEvents.rpy:procedural_choice:346:6")
             text = str(entry.get("text", "") if isinstance(entry, dict) else entry)
             gender = self._gender_key(entry.get("gender", None) if isinstance(entry, dict) else None)
-            if renpy.random.random() < float(entry.get("guard_chance", 0.45) if isinstance(entry, dict) else 0.45):
-                text += renpy.random.choice(self.PASSIVE_GUARDS)
+            if procedural_random(key="procedural:Town/RandomTownEvents.rpy:procedural_random:349:1") < float(entry.get("guard_chance", 0.45) if isinstance(entry, dict) else 0.45):
+                text += procedural_choice(self.PASSIVE_GUARDS, key="procedural:Town/RandomTownEvents.rpy:procedural_choice:350:7")
             return (
                 text
                 .replace("[улица]", self.street_display())
@@ -414,7 +414,7 @@ init -20 python:
 
         def escape_success(self, challenge=100):
             exploration_value = self._int(self._get("exploration", 0), 0)
-            score = exploration_value + renpy.random.randint(1, 100)
+            score = exploration_value + procedural_randint(1, 100, key="procedural:Town/RandomTownEvents.rpy:procedural_randint:417:1")
             if exploration_value >= 150:
                 score += 35
             return score >= self._int(challenge, 100)
@@ -425,7 +425,7 @@ init -20 python:
                 you = self._int(fight_level.get("you", 1), 1)
             except Exception:
                 you = 1
-            score = you * 20 + (self._int(self._get("exploration", 0), 0) // 10) + renpy.random.randint(1, 60)
+            score = you * 20 + (self._int(self._get("exploration", 0), 0) // 10) + procedural_randint(1, 60, key="procedural:Town/RandomTownEvents.rpy:procedural_randint:428:2")
             return score >= (self._int(enemy_level, 2) * 30 + 30)
 
         def apply_cloth_damage(self, amount=15):

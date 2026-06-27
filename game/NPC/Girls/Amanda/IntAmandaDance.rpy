@@ -11,7 +11,7 @@ label story_amanda_friday_dance_mc_0:
     $ Amanda.set_var_int("legare_dance_pending", 0)
     $ FridayDancesCount += 1
     "Вы прошлись по площади, ища Аманду, и нашли ее скромно стоящей около одной из колонн."
-    call ShowImage("amanda", "dance", "wait" + str(renpy.random.randint(1, 2)))
+    call ShowImage("amanda", "dance", "wait" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/IntAmandaDance.rpy:procedural_randint:14:1")))
     $ DanceStep = 1
     call IntAmandaDance
     return
@@ -44,11 +44,11 @@ label IntAmandaDance():
             jump IntAmandaDance
         "Поболтать" if DanceStep == 1 and Amanda.var_int("albernowdances", 0) == 0:
             "Вы подошли к Аманде и начали с ней весело болтать о разной ерунде. За разговором незаметно пролетело время."
-            if Friends[GirlNameIAD] >= 7:
+            if Amanda.rel >= 7:
                 "Вы подумали что зря вы стали болтать с Амандой о ерунде. Ничего нового вы не узнали, а доверяет вам она и без пустого трепа."
             else:
-                if renpy.random.randint(1, 3) == 1:
-                    $ Friends[GirlNameIAD] += 1
+                if procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/IntAmandaDance.rpy:procedural_randint:50:2") == 1:
+                    $ Amanda.change_social(friend_delta=1)
                     "Кажется, Аманда стала еще больше восхищаться вами!"
             call ShowImage(GirlNameIAD, "dance", "YouInvite1")
             $ DanceStep = DanceMaxIAD
@@ -66,10 +66,10 @@ label IntAmandaDance():
             $ HandsDance = ''
             $ KissDance = 0
             $ TitsDance = 0
-            if Friends[GirlNameIAD] >= 8 and sluttiness[GirlNameIAD] > 15:
+            if Amanda.rel >= 8 and Amanda.corruption > 15:
                 "Она с радостью согласилась, вы взяли ее под руку и вскоре вы закружились в танце."
                 call ShowImage(GirlNameIAD, "dance", "YouInvite2")
-            elif Friends[GirlNameIAD] >= 5 and sluttiness[GirlNameIAD] >= 5:
+            elif Amanda.rel >= 5 and Amanda.corruption >= 5:
                 "Она с сомнением сказала: 'Ты же Стефан, зачем это мне с тобой танцевать?', но все таки взяла вашу руку и вскоре вы закружились в танце."
                 call ShowImage(GirlNameIAD, "dance", "YouInvite1")
             else:
@@ -100,20 +100,20 @@ label IntAmandaDance():
             jump IntAmandaDance
         "Положить руки на талию" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and HandsDance != 'waist':
             "Вы положили руки на талию Аманды."
-            if Friends[GirlNameIAD] >= 6 and sluttiness[GirlNameIAD] > 10:
+            if Amanda.rel >= 6 and Amanda.corruption > 10:
                 "Она улыбнулась и придвинулась к вам поближе, продолжая танец."
-                call SlutFriendsIncrease(GirlNameIAD, 8, 5, 1, 14, 5, 1)
+                $ Amanda.apply_social_chance(8, 5, 1, 14, 5, 1, "friday_dance_waist")
                 $ HandsDance = 'waist'
                 call ShowImage(GirlNameIAD, "dance", "YouClose")
-            elif Friends[GirlNameIAD] >= 5 and sluttiness[GirlNameIAD] >= 6:
+            elif Amanda.rel >= 5 and Amanda.corruption >= 6:
                 "Аманда поморщилась, но возражать не стала."
-                call SlutFriendsIncrease(GirlNameIAD, 8, 5, 1, 14, 5, 1)
+                $ Amanda.apply_social_chance(8, 5, 1, 14, 5, 1, "friday_dance_waist")
                 $ HandsDance = 'waist'
                 call ShowImage(GirlNameIAD, "dance", "YouDanceWorry")
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда. Вы попробовали объяснить, что так обычно танцуют, но обнаружили что разговариваете с пустотой, Аманда ушла.'
                 $ DanceStep = DanceMaxIAD
-                call SlutFriendsIncrease(GirlNameIAD, 2, 2, -1, 0, 0, 0)
+                $ Amanda.apply_social_chance(2, 2, -1, 0, 0, 0, "friday_dance_waist_reject")
                 $ HandsDance = ''
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
             $ DanceStep += 1
@@ -125,25 +125,25 @@ label IntAmandaDance():
                 "Вы опустили руки с талии на попу Аманды."
             else:
                 "Вы положили руки на попу Аманды."
-            if Friends[GirlNameIAD] >= 7 and sluttiness[GirlNameIAD] > 18:
+            if Amanda.rel >= 7 and Amanda.corruption > 18:
                 "Аманда улыбнулась и придвинулась к вам поближе, продолжая танец."
-                call SlutFriendsIncrease(GirlNameIAD, 9, 3, 1, 18, 3, 1)
+                $ Amanda.apply_social_chance(9, 3, 1, 18, 3, 1, "friday_dance_ass")
                 $ HandsDance = 'ass'
                 call ShowImage(GirlNameIAD, "dance", "YouClose")
-            elif Friends[GirlNameIAD] >= 6 and sluttiness[GirlNameIAD] >= 12:
+            elif Amanda.rel >= 6 and Amanda.corruption >= 12:
                 '"Стефан, что ты делаешь?!" прошептала Аманда. Впрочем танцевать она не перестала и рук ваших не убрала.'
-                call SlutFriendsIncrease(GirlNameIAD, 9, 3, 1, 18, 3, 1)
+                $ Amanda.apply_social_chance(9, 3, 1, 18, 3, 1, "friday_dance_ass")
                 $ HandsDance = 'ass'
                 call ShowImage(GirlNameIAD, "dance", "YouDance")
-            elif Friends[GirlNameIAD] >= 5 and sluttiness[GirlNameIAD] >= 9:
+            elif Amanda.rel >= 5 and Amanda.corruption >= 9:
                 '"Стефан, что ты делаешь?!" прошептала Аманда и передвинула ваши руки с попы на талию.'
-                call SlutFriendsIncrease(GirlNameIAD, 9, 4, 1, 14, 4, 1)
+                $ Amanda.apply_social_chance(9, 4, 1, 14, 4, 1, "friday_dance_ass_worry")
                 $ HandsDance = 'waist'
                 call ShowImage(GirlNameIAD, "dance", "YouDanceWorry")
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда, с размаху дала вам смачную пощечину, развернулась и ушла, оставив вас в одиночестве.'
                 $ DanceStep = DanceMaxIAD
-                call SlutFriendsIncrease(GirlNameIAD, 0, 1, -1, 0, 1, -1)
+                $ Amanda.apply_social_chance(0, 1, -1, 0, 1, -1, "friday_dance_ass_reject")
                 $ HandsDance = ''
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
             $ DanceStep += 1
@@ -152,26 +152,26 @@ label IntAmandaDance():
             jump IntAmandaDance
         "Сжать попу Аманды" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and HandsDance == 'ass':
             "Ваши беспокойные ручки начали гладить и сжимать попку Аманды."
-            if Friends[GirlNameIAD] >= 10 and sluttiness[GirlNameIAD] > 20:
+            if Amanda.rel >= 10 and Amanda.corruption > 20:
                 "Аманда улыбнулась и прижалась вплотную к вам, начав тереться своими сисечками о вашу грудь."
-                call SlutFriendsIncrease(GirlNameIAD, 11, 4, 1, 22, 3, 1)
+                $ Amanda.apply_social_chance(11, 4, 1, 22, 3, 1, "friday_dance_grope")
                 $ HandsDance = 'ass2'
                 $ TitsDance = 1
                 call ShowImage(GirlNameIAD, "dance", "YouClose")
-            elif Friends[GirlNameIAD] >= 8 and sluttiness[GirlNameIAD] >= 16:
+            elif Amanda.rel >= 8 and Amanda.corruption >= 16:
                 '"Стефанчик, что ты делаешь?! Мы же все-таки не на виду у всех" прошептала Аманда, но не сделала ничего, чтобы остановить вас.'
-                call SlutFriendsIncrease(GirlNameIAD, 11, 4, 1, 22, 3, 1)
+                $ Amanda.apply_social_chance(11, 4, 1, 22, 3, 1, "friday_dance_grope")
                 $ HandsDance = 'ass2'
                 call ShowImage(GirlNameIAD, "dance", "YouDance")
-            elif Friends[GirlNameIAD] >= 7 and sluttiness[GirlNameIAD] >= 13:
+            elif Amanda.rel >= 7 and Amanda.corruption >= 13:
                 '"Стефан, что ты делаешь?!" прошептала Аманда и передвинула ваши руки с попы на талию.'
-                call SlutFriendsIncrease(GirlNameIAD, 9, 4, 1, 16, 4, 1)
+                $ Amanda.apply_social_chance(9, 4, 1, 16, 4, 1, "friday_dance_grope_worry")
                 $ HandsDance = 'waist'
                 call ShowImage(GirlNameIAD, "dance", "YouDanceWorry")
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда, с размаху дала вам смачную пощечину, развернулась и ушла, оставив вас в одиночестве.'
                 $ DanceStep = DanceMaxIAD
-                call SlutFriendsIncrease(GirlNameIAD, 0, 1, -1, 0, 1, -1)
+                $ Amanda.apply_social_chance(0, 1, -1, 0, 1, -1, "friday_dance_grope_reject")
                 $ HandsDance = ''
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
             $ DanceStep += 1
@@ -180,38 +180,38 @@ label IntAmandaDance():
             jump IntAmandaDance
         "Поцеловать Аманду" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and KissDance == 0:
             "Продолжая танцевать, вы вдруг наклонились к Аманде и впились в ее губы своими."
-            if Friends[GirlNameIAD] >= 10 and sluttiness[GirlNameIAD] > 21:
+            if Amanda.rel >= 10 and Amanda.corruption > 21:
                 "Аманда с готовностью ответила на ваш поцелуй, страстно переплетаясь с вами языками."
-                call SlutFriendsIncrease(GirlNameIAD, 11, 4, 1, 24, 3, 1)
+                $ Amanda.apply_social_chance(11, 4, 1, 24, 3, 1, "friday_dance_kiss")
                 $ KissDance = 2
                 call ShowImage(GirlNameIAD, "dance", "YouKiss")
-            elif Friends[GirlNameIAD] >= 8 and sluttiness[GirlNameIAD] >= 16:
+            elif Amanda.rel >= 8 and Amanda.corruption >= 16:
                 "Преодолев секундное замешательство, Аманда откликнулась на ваш поцелуй, хотя и без особого энтузиазма."
-                call SlutFriendsIncrease(GirlNameIAD, 11, 4, 1, 24, 3, 1)
+                $ Amanda.apply_social_chance(11, 4, 1, 24, 3, 1, "friday_dance_kiss")
                 $ KissDance = 1
                 call ShowImage(GirlNameIAD, "dance", "YouKiss")
-            elif Friends[GirlNameIAD] >= 7 and sluttiness[GirlNameIAD] >= 13:
+            elif Amanda.rel >= 7 and Amanda.corruption >= 13:
                 '"Стефанчик, что ты делаешь?!" прошептала Аманда и отстранилась от вас.'
-                call SlutFriendsIncrease(GirlNameIAD, 9, 6, 1, 16, 6, 1)
+                $ Amanda.apply_social_chance(9, 6, 1, 16, 6, 1, "friday_dance_kiss_worry")
                 $ KissDance = 0
                 call ShowImage(GirlNameIAD, "dance", "YouDanceWorry")
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда, с размаху дала вам смачную пощечину, развернулась и ушла, оставив вас в одиночестве.'
                 $ DanceStep = DanceMaxIAD
-                call SlutFriendsIncrease(GirlNameIAD, 0, 1, -1, 0, 1, -1)
+                $ Amanda.apply_social_chance(0, 1, -1, 0, 1, -1, "friday_dance_kiss_reject")
                 $ KissDance = 0
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
             $ DanceStep += 1
             if DanceStep == DanceMaxIAD:
                 "Танец закончился и вы вернулись к колоннаде."
             jump IntAmandaDance
-        "Предложить Аманде прогулятся" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and HadSex[GirlNameIAD] > 0 and (HandsDance.startswith('ass') or KissDance > 0):
+        "Предложить Аманде прогулятся" if DanceStep >= 2 and DanceStep < DanceMaxIAD and Amanda.var_int("albernowdances", 0) == 0 and Amanda.sex_stat("sexacts", 0) > 0 and (HandsDance.startswith('ass') or KissDance > 0):
             $ tmpGropeReact = Amanda.sex_offer_reaction()
             if tmpGropeReact == 2:
                 "Продолжая танцевать, вы вдруг прошептали Аманде на ушко: 'Милая, а может прогуляемся немного?'"
                 '"Ага, значит то ты меня ругаешь, шлюхой обзываешь, учишь скромности и всякому возвышенному да? Ф как танцы - так все мигом забыл и мало что за задницу лапаешь, так еще и в подворотню тащищь?" обругала ваше двуличие Аманда.{p}"Знаешь что, иди себе сам в свою подворотню и сам с собою там что хочешь то и делай. Впрочем, ты только одного и хочешь. А я пока пойду!" гневно сказала Аманда, слово с делом у нее не разошлись и она развернулась и ушла, оставив вас в одиночестве.'
                 $ DanceStep = DanceMaxIAD
-                call SlutFriendsIncrease(GirlNameIAD, 0, 3, -1, 0, 3, -1)
+                $ Amanda.apply_social_chance(0, 3, -1, 0, 3, -1, "friday_dance_walk_reject")
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
             elif tmpGropeReact >= 3:
                 $ Amanda.set_var_int("leftdances", 1)
@@ -223,7 +223,7 @@ label IntAmandaDance():
                 "Продолжая танцевать, вы вдруг прошептали Аманде на ушко: 'Милая, а может прогуляемся немного?'"
                 '"Стефан, ты что, предлагаешь мне пойти с тобой в какую-то подворотню? Мне?!" гневно сказала Аманда, развернулась и ушла, оставив вас в одиночестве.'
                 $ DanceStep = DanceMaxIAD
-                call SlutFriendsIncrease(GirlNameIAD, 0, 1, -1, 0, 1, -1)
+                $ Amanda.apply_social_chance(0, 1, -1, 0, 1, -1, "friday_dance_walk_reject")
                 call ShowImage(GirlNameIAD, "dance", "YouDanceAngry")
             jump IntAmandaDance
             
@@ -263,16 +263,16 @@ label IntAmandaDance():
                 "\"Да и вообще, я тебе ведь уже запрещал с ним танцевать, а ты опять за старое! Или ты оглохла или память потеряла?\" продолжаете орать вы."
                 
             "Нахмурившись от выволочки, что вы ему учинили, мессир Легаре мрачно удалился."
-            call SlutFriendsIncrease("Alber", 2, 1, -4, 0, 0, 0)
+            $ Alber.add_relation(-4)
             
             if Amanda.var_int("alberfriends", 0) >= 7:
                 "\"Как ты смеешь лезть в мою личную жизнь, Стефан?! Я уже взрослая и могу сама решать! А Альбер мне очень-очень нравится, ну и что что он женат!\" закричала Аманда и убежала рыдая."
                 $ Amanda.set_var_int("alberfriends", Amanda.var_int("alberfriends", 0) + 3)
-                call SlutFriendsIncrease("amanda", 3, 1, -5, 0, 0, 0)
+                $ Amanda.apply_social_chance(3, 1, -5, 0, 0, 0, "friday_dance_intervene")
             else:
                 "\"Хорошо,\" только и сказала Аманда. Но вам показалось что под внешней покорностью девчонка затаила обиду."
                 $ Amanda.set_var_int("alberfriends", Amanda.var_int("alberfriends", 0) - 1)
-                call SlutFriendsIncrease("amanda", 3, 1, -2, 15, 1, -4)
+                $ Amanda.apply_social_chance(3, 1, -2, 15, 1, -4, "friday_dance_intervene")
             $ Amanda.set_var_int("alberprohibit", 1)
             $ Amanda.set_var_int("leftdances", 1)
             $ DanceStep = DanceMaxIAD + 2
@@ -281,7 +281,7 @@ label IntAmandaDance():
             jump IntAmandaDance
         "Отойти" if DanceStep >= DanceMaxIAD or Amanda.var_int("albernowdances", 0) == 1 or DanceStep == 1:
             $ DanceStep = 0
-            call ShowImage(GirlNameIAD, "dance", "wait" + str(renpy.random.randint(1, 2)))
+            call ShowImage(GirlNameIAD, "dance", "wait" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/IntAmandaDance.rpy:procedural_randint:284:3")))
             return
     return
 
@@ -290,7 +290,6 @@ label IntAmandaDance():
 #     # ...show girl description...
 #     return
 
-# label slut_friends_increase(girl, a, b, c, d, e, f):
 #     # ...logic for increasing slut friends...
 #     return
 

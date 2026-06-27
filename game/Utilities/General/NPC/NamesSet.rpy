@@ -162,11 +162,11 @@ init python:
     ]
 
     def RandomOccupCode(*_args):
-        return renpy.random.choice(OccupationsList)
+        return procedural_choice(OccupationsList, key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:165:1")
 
     def RandomNameCode(gender="", nationality=""):
         if nationality == "":
-            nationality = renpy.random.choice(["German", "Italian", "French"])
+            nationality = procedural_choice(["German", "Italian", "French"], key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:169:2")
 
         suffix = "MaleName" if str(gender).lower() == "male" else "FemaleName"
         name_map = {
@@ -182,15 +182,15 @@ init python:
 
         if not name_list:
             fallback = GermanMaleName if suffix == "MaleName" else GermanFemaleName
-            return renpy.random.choice(fallback)
+            return procedural_choice(fallback, key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:185:3")
 
-        return renpy.random.choice(name_list)
+        return procedural_choice(name_list, key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:187:4")
 
     def RandomStreetNameCode(*_args):
-        return renpy.random.choice(StreetNameList)
+        return procedural_choice(StreetNameList, key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:190:5")
 
     def RandomStallionNameCode(*_args):
-        return renpy.random.choice(StallionName)
+        return procedural_choice(StallionName, key="procedural:Utilities/General/NPC/NamesSet.rpy:procedural_choice:193:6")
 
 label NamesSet:
     return

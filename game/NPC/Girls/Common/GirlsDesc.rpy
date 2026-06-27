@@ -416,11 +416,11 @@ label GirlsDesc(girl_name):
     elif _gd_id == "irma":
         call ShowImage("", "", irma_card_portrait_path())
     elif _gd_id == "clara":
-        call ShowImage("clara", "", "portrait" + str(renpy.random.randint(1, 7)))
+        call ShowImage("clara", "", "portrait" + str(procedural_randint(1, 7, key="procedural:NPC/Girls/Common/GirlsDesc.rpy:procedural_randint:419:1")))
     elif _gd_id == "fran":
         call ShowImageSeq("ellona", "", "Fran", 4)
     elif _gd_id == "inga":
-        call ShowImage("inga", "StreetSex", "minet" + str(renpy.random.randint(1, 5)))
+        call ShowImage("inga", "StreetSex", "minet" + str(procedural_randint(1, 5, key="procedural:NPC/Girls/Common/GirlsDesc.rpy:procedural_randint:423:2")))
 
     python:
         check_visibility(_gd_key or girl_name)

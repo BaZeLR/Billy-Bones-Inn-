@@ -147,7 +147,7 @@ label HouseholdEvent_AmandaPrivatePressure:
     menu:
         "Ask what she wants":
             "Amanda: Depends what you can afford. Attention is cheap. Pretty things are not."
-            $ AmandaVar["attention_hint_day"] = dayspassed
+            $ Amanda.set_var_int("attention_hint_day", dayspassed)
             $ household_ai_reduce_drive("amanda", 0.16)
 
         "Tell her she is fishing for favors":
@@ -157,7 +157,7 @@ label HouseholdEvent_AmandaPrivatePressure:
 
         "Tell her later":
             "She accepts it badly, but she accepts it."
-            $ AmandaNeedBlocked["amanda"] = 1
+            $ Amanda.set_var_int("need_blocked", 1)
             $ household_ai_raise_friction(0.04)
 
     return

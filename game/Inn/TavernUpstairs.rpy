@@ -3,7 +3,7 @@
 # ================================================================================
 init 6 python:
     def tavern_upstairs_can_enter_amanda_room():
-        return Amanda.var["kickyoufromroom"] == 0
+        return Amanda.var_int("kickyoufromroom", 0) == 0
 
     def tavern_upstairs_can_clean_rooms():
         try:

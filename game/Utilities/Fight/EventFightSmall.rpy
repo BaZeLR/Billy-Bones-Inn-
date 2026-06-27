@@ -2,8 +2,8 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label EventFightSmall(eyewitness=0):
-    $ CurMoneyLoss = renpy.random.randint(10, 16)
-    $ FightRand = renpy.random.randint(1, 7)
+    $ CurMoneyLoss = procedural_randint(10, 16, key="procedural:Utilities/Fight/EventFightSmall.rpy:procedural_randint:5:1")
+    $ FightRand = procedural_randint(1, 7, key="procedural:Utilities/Fight/EventFightSmall.rpy:procedural_randint:6:2")
     $ YourReaction1 = 0
     $ PhraseEnd1EFS = ""
     $ CurEventDesc = ""
@@ -84,7 +84,7 @@ label EventFightSmallApply(reaction_code=1, CurMoneyLoss=0, FightRand=0, PhraseE
         $ money -= CurMoneyLoss
         $ extra_text = "Вы выскочили за дверь и начали кричать \"Стража, Стража!\". Не прошло и каких-то 20 минут, как к вам подошли двое толстых стражников и поинтересовались, в чем собственно дело. Узнав подробности они резонно заметили, что ваши обидчики уже успели уйти далеко и поймать их будет затруднительно. Промочив горло парой кружек вина за счет заведения и взяв 4 мараведи за труды, стражи порядка удалились. Хорошо все-таки, что те, кому положенно, берегут ваш покой и неукоснительно следят за соблюдением законов!"
     elif reaction_code == 6:
-        if renpy.random.randint(1, 2) == 1:
+        if procedural_randint(1, 2, key="procedural:Utilities/Fight/EventFightSmall.rpy:procedural_randint:87:3") == 1:
             $ extra_text = "Вы кинулись ловить вора. Разбив в процессе пару кружек и сбив со стойки поднос, на котором громоздилась пирамида из грязной посуды, вы отрезали вора от выхода и стражникам удалось в конце концов его поймать."
             $ PhraseEnd1EFS = "Стражники торжественно увели свою добычу, смело шагая по похрустывающим черепкам, в которые превратились многие из ваших кружек-плошек. Последним ушел капитан, поблагодарив вас за неоценимую помощь. А вы остались убирать битую посуду и считать убытки. Визит служителей закона и порядка обошелся вам в смешные {} мараведи.\n\"Ради торжества справедливости и вдвое больше потерять не жалко!\" -подумали вы.".format(CurMoneyLoss)
         else:

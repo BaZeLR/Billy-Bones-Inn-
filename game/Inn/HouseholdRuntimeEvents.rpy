@@ -195,8 +195,8 @@ init python:
             Melissa.var["revealing_dress_ordered"] = 1
             Melissa.var["revealing_dress_code"] = dress_name
         elif girl == "amanda":
-            AmandaVar["revealing_dress_ordered"] = 1
-            AmandaVar["revealing_dress_code"] = dress_name
+            Amanda.set_var_int("revealing_dress_ordered", 1)
+            Amanda.set_story_value("revealing_dress_code", dress_name)
         else:
             return 0
         return 1
@@ -322,17 +322,14 @@ init python:
         )
 
     def amanda_revealing_dress_request_ready():
-        amanda_info = peopleInfo.get("amanda") if 'peopleInfo' in dir() else None
-        amanda_dict = amanda_info.var if amanda_info and hasattr(amanda_info, "var") and isinstance(amanda_info.var, dict) else (AmandaVar if 'AmandaVar' in dir() else {})
-
         return (
             int(Sandra.var.get("revealing_dress_ordered", 0) or 0) == 1
             and int(Melissa.var.get("revealing_dress_ordered", 0) or 0) == 1
-            and int(amanda_dict.get("revealing_dress_ordered", 0) or 0) == 0
-            and int(amanda_dict.get("revealing_dress_request_seen", 0) or 0) == 0
+            and Amanda.var_int("revealing_dress_ordered", 0) == 0
+            and Amanda.var_int("revealing_dress_request_seen", 0) == 0
             and CheckDailyEventExists("", "BuyDressTom", "") == 0
             and CheckDailyEventExists("amanda", "BuyDress", "") == 0
-            and int(Friends.get("amanda", 0) or 0) >= 5
+            and int(Amanda.rel or 0) >= 5
             and int(TalkedToday.get("amanda", 0) or 0) == 0
         )
 
@@ -537,7 +534,7 @@ label MelissaDressRequestEvent:
 
 
 label AmandaDressRequestEvent:
-    $ AmandaVar["revealing_dress_request_seen"] = 1
+    $ Amanda.set_var_int("revealing_dress_request_seen", 1)
     if renpy.loadable("images/amanda/amanda_portrate.jpg"):
         $ _layout_last_picture = "images/amanda/amanda_portrate.jpg"
     $ MainTxt = "Аманда сама подскакивает к вам, едва улучив момент. \"Стефан, это нечестно! У Сандры теперь наряд посмелее, Мелиссе ты тоже обещаешь что-то красивое, а я что, хуже? Мне тоже хочется платье, чтобы ахнули, а не только подносы таскать!\"\n\nПохоже, увиденное окончательно раззадорило ее самолюбие."
@@ -569,7 +566,7 @@ label HouseholdRevealDressRequestChoice(girl_name="", agree=0):
             $ Melissa.change_social(friend_delta=1)
         else:
             $ MainTxt = "Вы соглашаетесь, что раз уж в доме одна за другой появляются новые наряды, то и Аманду обделять не стоит. Услышав это, девушка сияет так, будто обновка уже висит у нее в шкафу."
-            $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
+            $ Amanda.change_social(friend_delta=1)
     else:
         if _request_girl == "sandra":
             $ MainTxt = "Вы отвечаете Сандре, что с этим пока лучше не торопиться. Она только фыркает, возвращается к кастрюлям и делает вид, что разговор ничего для нее не значил."
@@ -666,8 +663,13 @@ label HouseholdMorningIssueCure(girl_name=""):
         return
     $ _player_remove_item_by_id("healing_potion_001", 1)
     $ household_clear_morning_issue(_issue_girl)
-    $ Friends[_issue_girl] = min(20, int(Friends.get(_issue_girl, 0) or 0) + 1)
-    $ otkroven[_issue_girl] = min(20, int(otkroven.get(_issue_girl, 0) or 0) + 1)
+    if _issue_girl == "amanda":
+        $ Amanda.change_social(friend_delta=1, open_delta=1)
+    elif _issue_girl == "melissa":
+        $ Melissa.change_social(friend_delta=1, open_delta=1)
+    else:
+        $ Friends[_issue_girl] = min(20, int(Friends.get(_issue_girl, 0) or 0) + 1)
+        $ otkroven[_issue_girl] = min(20, int(otkroven.get(_issue_girl, 0) or 0) + 1)
     $ MainTxt = "%s с благодарностью принимает лечебное зелье. Через несколько минут ей заметно легчает, и она уже выглядит так, будто сможет вернуться к обычным делам." % _action_display_name(_issue_girl)
     $ CurLocDesc = MainTxt
     call HouseholdReturnCurrentRoom
@@ -682,9 +684,14 @@ label HouseholdMorningIssueWarmDrink(girl_name=""):
     $ _player_remove_item_by_id("libido_tincture_001", 1)
     $ HouseholdWarmDrinkLastDay[_issue_girl] = int(dayspassed or 0)
     $ TalkedToday[_issue_girl] = max(1, int(TalkedToday.get(_issue_girl, 0) or 0))
-    $ Friends[_issue_girl] = min(20, int(Friends.get(_issue_girl, 0) or 0) + 1)
-    $ otkroven[_issue_girl] = min(20, int(otkroven.get(_issue_girl, 0) or 0) + 1)
-    $ sluttiness[_issue_girl] = min(100, int(sluttiness.get(_issue_girl, 0) or 0) + 1)
+    if _issue_girl == "amanda":
+        $ Amanda.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
+    elif _issue_girl == "melissa":
+        $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
+    else:
+        $ Friends[_issue_girl] = min(20, int(Friends.get(_issue_girl, 0) or 0) + 1)
+        $ otkroven[_issue_girl] = min(20, int(otkroven.get(_issue_girl, 0) or 0) + 1)
+        $ sluttiness[_issue_girl] = min(100, int(sluttiness.get(_issue_girl, 0) or 0) + 1)
     if _issue_girl == "sandra":
         $ MainTxt = "Сандра сначала кривится на саму идею пряной настойки с утра, но все же делает несколько осторожных глотков. Напиток быстро разгоняет холод по телу, и хозяйка уже не так сурово ворчит, признавая, что от такого внимания ей и правда легче."
     elif _issue_girl == "melissa":
@@ -701,15 +708,14 @@ label HouseholdAmandaFakeSicknessWake:
         call HouseholdReturnCurrentRoom
         return
     $ calendar_v2.advance_minutes(15)
-    if int(Friends.get("amanda", 0) or 0) >= 6 or int(Talked.get("amanda", 0) or 0) >= 2:
+    if int(Amanda.rel or 0) >= 6 or int(Amanda.talked_today or 0) >= 2:
         $ household_clear_morning_issue("amanda")
         $ MainTxt = "Вы не спорите у двери, а спокойно садитесь рядом и просите Аманду хотя бы раз сказать честно, плохо ей или просто не хочется вставать. Она сперва обиженно сопит, потом все же сдается: \"Ладно... больше лени, чем болезни.\" Через несколько минут она уже нехотя натягивает платье и обещает выйти к общему столу."
-        $ Friends["amanda"] = min(20, int(Friends.get("amanda", 0) or 0) + 1)
-        $ otkroven["amanda"] = min(20, int(otkroven.get("amanda", 0) or 0) + 1)
+        $ Amanda.change_social(friend_delta=1, open_delta=1)
     else:
         $ household_clear_morning_issue("amanda")
         $ MainTxt = "Вы резко пресекаете Амандину \"болезнь\" и велите ей подниматься. Она фыркает, жалуется на жестокость и нарочно долго возится с одеждой, но все же встает. Похоже, сегодня это было скорее представление, чем настоящая слабость."
-        $ Friends["amanda"] = max(0, int(Friends.get("amanda", 0) or 0) - 1)
+        $ Amanda.change_social(friend_delta=-1)
     $ CurLocDesc = MainTxt
     call HouseholdReturnCurrentRoom
     return
@@ -724,7 +730,12 @@ label HouseholdWakeSleepyGirl(girl_name=""):
     $ _wake_bulge = 1 if _wake_indecent and player_has_visible_morning_bulge() else 0
     $ calendar_v2.advance_minutes(20)
     $ household_clear_morning_issue(_wake_girl)
-    $ Friends[_wake_girl] = min(20, int(Friends.get(_wake_girl, 0) or 0) + 1)
+    if _wake_girl == "amanda":
+        $ Amanda.change_social(friend_delta=1)
+    elif _wake_girl == "melissa":
+        $ Melissa.change_social(friend_delta=1)
+    else:
+        $ Friends[_wake_girl] = min(20, int(Friends.get(_wake_girl, 0) or 0) + 1)
     if _wake_girl == "sandra":
         $ MainTxt = "Вы осторожно будите Сандру. Та сначала недовольно морщится, потом резко собирается, будто сама сердится не на вас, а на то, что дала себе лишнюю слабину."
         if _wake_indecent:
@@ -751,11 +762,11 @@ label HouseholdWakeSleepyGirl(girl_name=""):
         $ MainTxt = "Вы будите Аманду, и та сперва лишь что-то недовольно бурчит в подушку. Но стоит ей понять, что утренний стол уже давно собирается без нее, как она мигом оживает и принимается оправдываться."
         if _wake_indecent:
             $ MainTxt = str(MainTxt or "") + "\nВо сне Аманда успела раскрыться куда сильнее приличного, и вам открывается достаточно, чтобы понять: спать скромницей она умеет не всегда. Поняв по вашему лицу, что вы успели увидеть лишнее, она сперва краснеет, а потом упрямо делает вид, будто это пустяк."
-            $ sluttiness["amanda"] = min(100, int(sluttiness.get("amanda", 0) or 0) + 1)
+            $ Amanda.change_social(corruption_delta=1)
         if _wake_bulge:
-            if int(Friends.get("amanda", 0) or 0) >= 10 or int(sluttiness.get("amanda", 0) or 0) >= 30:
+            if int(Amanda.rel or 0) >= 10 or int(Amanda.corruption or 0) >= 30:
                 $ MainTxt = str(MainTxt or "") + "\nАманда быстро замечает и вашу предательскую выпуклость. Вместо того чтобы смутиться, она хихикает, бросает на вас хитрый взгляд и только потом начинает поспешно поправлять одежду."
-                $ sluttiness["amanda"] = min(100, int(sluttiness.get("amanda", 0) or 0) + 1)
+                $ Amanda.change_social(corruption_delta=1)
             else:
                 $ MainTxt = str(MainTxt or "") + "\nСтоит Аманде заметить ваш слишком уж выразительный стояк, как она фыркает, закатывает глаза и тут же прикрывается одеялом уже куда тщательнее."
     $ CurLocDesc = MainTxt

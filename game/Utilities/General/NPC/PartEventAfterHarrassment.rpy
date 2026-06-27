@@ -12,7 +12,7 @@ label PartEventAfterHarrassment(GirlNamePEAH, GirlSlapped, YourReaction1):
     if strcomp(_harass_instruction, "^allow"):
         if _girl_corruption < 18:
             $ Result += "Красная как рак после всего произошедшего, к вам подбежала {}.\n-\"Ты видел?\" спросила она тяжело дыша. Неужели я на самом деле должна это все переносить?".format(RealName.get(GirlNamePEAH, GirlNamePEAH))
-            if _girl_rel > 0 and renpy.random.randint(1, 3) == 1:
+            if _girl_rel > 0 and procedural_randint(1, 3, key="procedural:Utilities/General/NPC/PartEventAfterHarrassment.rpy:procedural_randint:15:1") == 1:
                 $ Result += "\nПохоже, что ваше задание приводит к тому, что {} сильно на вас злится.".format(RealName.get(GirlNamePEAH, GirlNamePEAH))
                 $ _girl_info.change_social(friend_delta=-1)
                 $ _girl_info.change_anger(1, "harass_allow_instruction")
@@ -25,7 +25,7 @@ label PartEventAfterHarrassment(GirlNamePEAH, GirlSlapped, YourReaction1):
                 RealName.get(GirlNamePEAH, GirlNamePEAH),
                 relationship_desc1(GirlNamePEAH),
             )
-            if _girl_rel > 0 and renpy.random.randint(1, 2) == 1:
+            if _girl_rel > 0 and procedural_randint(1, 2, key="procedural:Utilities/General/NPC/PartEventAfterHarrassment.rpy:procedural_randint:28:2") == 1:
                 $ Result += "\nПохоже, что ваша реакция не очень-то понравилась {}.".format(RealName3.get(GirlNamePEAH, GirlNamePEAH))
                 $ _girl_info.change_social(friend_delta=-1)
                 $ _girl_info.change_anger(1, "harass_player_watched")
@@ -37,7 +37,7 @@ label PartEventAfterHarrassment(GirlNamePEAH, GirlSlapped, YourReaction1):
             )
         elif (_girl_corruption < 30 or GirlSlapped > 0) and YourReaction1 == 1:
             $ Result += "Красная как рак после всего произошедшего, к вам подскочила {}.\n-\"Где тебя носило!\" закричала она - \"Меня попытался облапать какой-то подонок, а тебя нигде не было чтобы мне помочь!\"".format(RealName.get(GirlNamePEAH, GirlNamePEAH))
-            if _girl_rel > 0 and renpy.random.randint(1, 5) == 1:
+            if _girl_rel > 0 and procedural_randint(1, 5, key="procedural:Utilities/General/NPC/PartEventAfterHarrassment.rpy:procedural_randint:40:3") == 1:
                 $ Result += "\nПохоже, что ваша реакция не очень-то понравилась {}.".format(RealName3.get(GirlNamePEAH, GirlNamePEAH))
                 $ _girl_info.change_social(friend_delta=-1)
                 $ _girl_info.change_anger(1, "harass_player_ignored")

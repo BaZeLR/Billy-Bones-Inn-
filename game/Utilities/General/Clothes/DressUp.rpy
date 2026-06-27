@@ -79,7 +79,7 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
         topraised.setdefault(GirlNameDress, 0)
         bottomraised.setdefault(GirlNameDress, 0)
 
-        if int(IsNewDayForDress or 0) > 0 and renpy.random.randint(1, 2) == 1:
+        if int(IsNewDayForDress or 0) > 0 and procedural_randint(1, 2, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:82:1") == 1:
             dress_list_name = GirlNameDress + "Dresses"
             TMPAllDressArray = list(getattr(renpy.store, dress_list_name, []) or [])
             TMPBraArray = []
@@ -141,9 +141,9 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
                         DressSlutDesireLevel = DressSlutDesireLevelTop + DressSlutDesireLevelBottom
 
                     if DressSlutDesireLevel > 0:
-                        DressSlutDesireLevel = min(DressSlutDesireLevel, 4) + renpy.random.randint(1, 7)
+                        DressSlutDesireLevel = min(DressSlutDesireLevel, 4) + procedural_randint(1, 7, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:144:2")
                     else:
-                        DressSlutDesireLevel = min(DressSlutDesireLevel + renpy.random.randint(1, 5), 3)
+                        DressSlutDesireLevel = min(DressSlutDesireLevel + procedural_randint(1, 5, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:146:3"), 3)
 
                     if DressSlutDesireLevel > TmpDressSelectMaxCur:
                         TmpDressSelectMaxCur = DressSlutDesireLevel
@@ -168,13 +168,13 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
             if girl_slut >= 51:
                 DecideNoBra = 1
 
-            if girl_slut < 56 and renpy.random.randint(1, 2) == 1:
+            if girl_slut < 56 and procedural_randint(1, 2, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:171:4") == 1:
                 DecideNoPanties = 0
-            if girl_slut < 74 and renpy.random.randint(1, 4) == 1:
+            if girl_slut < 74 and procedural_randint(1, 4, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:173:5") == 1:
                 DecideNoPanties = 0
-            if girl_slut < 56 and renpy.random.randint(1, 2) == 1:
+            if girl_slut < 56 and procedural_randint(1, 2, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:175:6") == 1:
                 DecideNoBra = 0
-            if girl_slut < 71 and renpy.random.randint(1, 4) == 1:
+            if girl_slut < 71 and procedural_randint(1, 4, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:177:7") == 1:
                 DecideNoBra = 0
 
             bradef[GirlNameDress] = ""
@@ -182,11 +182,11 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
             legsdef[GirlNameDress] = ""
 
             if len(TMPStockingsArray) > 0:
-                legsdef[GirlNameDress] = TMPStockingsArray[renpy.random.randint(0, len(TMPStockingsArray) - 1)]
+                legsdef[GirlNameDress] = TMPStockingsArray[procedural_randint(0, len(TMPStockingsArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:185:8")]
             if len(TMPBraArray) > 0 and DecideNoBra == 0:
-                bradef[GirlNameDress] = TMPBraArray[renpy.random.randint(0, len(TMPBraArray) - 1)]
+                bradef[GirlNameDress] = TMPBraArray[procedural_randint(0, len(TMPBraArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:187:9")]
             if len(TMPPantiesArray) > 0 and DecideNoPanties == 0:
-                pantiesdef[GirlNameDress] = TMPPantiesArray[renpy.random.randint(0, len(TMPPantiesArray) - 1)]
+                pantiesdef[GirlNameDress] = TMPPantiesArray[procedural_randint(0, len(TMPPantiesArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:189:10")]
 
         cur_default = dressdefault.get(GirlNameDress, "")
         dressup_ensure_dress_catalog_entry(cur_default)

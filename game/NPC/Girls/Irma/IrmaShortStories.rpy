@@ -5,11 +5,11 @@
 label IrmaShortStories(args=()):
     # args: tuple/list, expects at least 2 elements
     python:
-        RandVar = renpy.random.randint(1, 3)
+        RandVar = procedural_randint(1, 3, key="procedural:NPC/Girls/Irma/IrmaShortStories.rpy:procedural_randint:8:1")
         # Defensive: ensure args has at least 2 elements
         a0 = args[0] if len(args) > 0 else 0
         a1 = args[1] if len(args) > 1 else 0
-        if a0 > 0 or (a1 == 1 and renpy.random.randint(1, 2) == 1):
+        if a0 > 0 or (a1 == 1 and procedural_randint(1, 2, key="procedural:NPC/Girls/Irma/IrmaShortStories.rpy:procedural_randint:12:2") == 1):
             if RandVar == 1:
                 IrmaVar['KnowMom'] = max(IrmaVar.get('KnowMom', 0), 1)
                 text = 'Моя мамочка тоже не из стеснительных. Когда она хахалей в дом приводила, они порой до спальни дотерпеть не могли и ее еще в прихожей драли, или в гостинной. Мы тогда сбегались посмотреть, а она нас как будто не замечала.'

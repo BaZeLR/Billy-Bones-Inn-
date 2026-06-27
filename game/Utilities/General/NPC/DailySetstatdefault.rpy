@@ -55,7 +55,7 @@ label DailySetstatdefault(girl_name):
             if sluttiness.get("sandra", 0) <= 25 and _dssd_top_slut + _dssd_bottom_slut >= 8:
                 $ _dssd_slut_dress_trigger = 1
 
-            $ _dssd_talked_before = AmandaVar.get("MomDressComplaint", 0) if girl_name == "amanda" else Melissa.var.get("MomDressComplaint", 0)
+            $ _dssd_talked_before = Amanda.var_int("MomDressComplaint", 0) if girl_name == "amanda" else Melissa.var.get("MomDressComplaint", 0)
             if _dssd_slut_dress_trigger == 1 and procedural_randint(1, 2 + _dssd_talked_before * 15, "mom_dress_complain_%s_%s" % (girl_name, int(dayspassed or 0))) == 1:
                 $ DailyEventsList_Add(girl_name, "TavernMain", 4, "<", 1, 1, "MomDressComplain", "MomDressComplaint")
 

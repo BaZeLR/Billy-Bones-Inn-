@@ -38,9 +38,6 @@
 # label InitAmandaLizaTalkItems:
 #     return
 
-# label AmandaDynamicCommonBlocks:
-#     return
-
 # label CreateMandatoryEvents:
 #     return
 

@@ -427,7 +427,7 @@ init python:
         except Exception:
             n = 0
         if n > 0:
-            pick = renpy.random.randint(1, n)
+            pick = procedural_randint(1, n, key="procedural:Utilities/General/Screens/ShowImage.rpy:procedural_randint:430:1")
             return show_image(folder1, folder2, str(image_name) + str(pick))
         return show_image(folder1, folder2, image_name)
 

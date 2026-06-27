@@ -9,11 +9,11 @@ label ShowBeckyPortrait():
         check_visibility(GirlName)
 
     if TitsVisible.get(GirlName, 0) and PussyVisible.get(GirlName, 0):
-        call ShowImage(GirlName, "portraits", "naked" + str(renpy.random.randint(1, 3)))
+        call ShowImage(GirlName, "portraits", "naked" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Becky/ShowBeckyPortrait.rpy:procedural_randint:12:1")))
     elif TitsVisible.get(GirlName, 0):
-        call ShowImage(GirlName, "portraits", "nakedtits" + str(renpy.random.randint(1, 2)))
+        call ShowImage(GirlName, "portraits", "nakedtits" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Becky/ShowBeckyPortrait.rpy:procedural_randint:14:2")))
     elif PussyVisible.get(GirlName, 0):
-        call ShowImage(GirlName, "portraits", "nakedpussy" + str(renpy.random.randint(1, 2)))
+        call ShowImage(GirlName, "portraits", "nakedpussy" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Becky/ShowBeckyPortrait.rpy:procedural_randint:16:3")))
     else:
-        call ShowImage(GirlName, "portraits", "portrait" + str(renpy.random.randint(1, 3)))
+        call ShowImage(GirlName, "portraits", "portrait" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Becky/ShowBeckyPortrait.rpy:procedural_randint:18:4")))
     return

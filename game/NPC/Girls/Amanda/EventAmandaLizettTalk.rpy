@@ -7,54 +7,28 @@ label EventAmandaLizettTalk(eyewitness=0):
     $ Result = ""
 
     if jobWhoreAvail.get("liza", 0):
-        if Amanda.var.get("prohibitliza", 0) == 1:
+        if Amanda.var_int("prohibitliza", 0) == 1:
             $ Result = "Проходя по трактиру вы вдруг услышали как Аманда говорит Лизетте:\n\"Ой, нельзя мне с тобой говорить, мастер Стефан запретил!\""
-            if renpy.random.randint(1, max(2, 10 - Amanda.var.get("lizafriends", 0) * 3 // 2)) == 1:
+            if procedural_randint(1, max(2, 10 - Amanda.var_int("lizafriends", 0) * 3 // 2), key="procedural:NPC/Girls/Amanda/EventAmandaLizettTalk.rpy:procedural_randint:12:1") == 1:
                 $ Result += "\n\"Ну да ладно\", добавляет она, \"его вроде здесь нет, так что давай немножко поболтаем!\""
             else:
                 $ Result += "\nИ девицы расходятся по своим делам."
                 $ NotToSpeak = 1
-        elif Amanda.var.get("prohibitliza", 0) == 2:
+        elif Amanda.var_int("prohibitliza", 0) == 2:
             $ Result = "Проходя по трактиру вы вдруг услышали как Аманда говорит Лизетте:\n\"Ой, ты что, знаешь как мастер Стефан ругаться будет, если узнает что мы с тобой болтаем!\""
-            if renpy.random.randint(1, max(4, 20 - Amanda.var.get("lizafriends", 0) * 2)) == 1:
+            if procedural_randint(1, max(4, 20 - Amanda.var_int("lizafriends", 0) * 2), key="procedural:NPC/Girls/Amanda/EventAmandaLizettTalk.rpy:procedural_randint:19:2") == 1:
                 $ Result += "\n\"Ну ладно, его нет, а с тобой болтать интересно, так что рискнем!\" - добавляет она после секундных раздумий."
             else:
                 $ Result += "\nИ девицы расходятся по своим делам."
                 $ NotToSpeak = 1
         else:
-            if (sluttiness.get("amanda", 0) <= 5 and renpy.random.randint(1, 2) == 1) or (sluttiness.get("amanda", 0) <= 10 and sluttiness.get("amanda", 0) > 5 and renpy.random.randint(1, 4) == 1):
+            if (Amanda.corruption <= 5 and procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/EventAmandaLizettTalk.rpy:procedural_randint:25:3") == 1) or (Amanda.corruption <= 10 and Amanda.corruption > 5 and procedural_randint(1, 4, key="procedural:NPC/Girls/Amanda/EventAmandaLizettTalk.rpy:procedural_randint:25:4") == 1):
                 $ Result = "Проходя по трактиру вы вдруг услышали как Аманда говорит Лизетте:\n\"Не хочу я с тобой болтать, ты такая распущенная и такие пошлые вещи рассказываешь!\""
                 $ NotToSpeak = 1
             else:
                 $ Result = "Проходя по трактиру вы вдруг услышали как Лизетта весело болтает с Амандой."
 
         if eyewitness > 0:
-            $ current_action_title = "Что предпринять"
-            $ current_action_content = None
-            $ _amanda_talk_choices = []
-
-            if Amanda.var.get("prohibitliza", 0) > 0 and NotToSpeak == 1:
-                $ _amanda_talk_choices.append(MenuItem("Похвалить Аманду, за то, что не стала болтать с Лизеттой", [SetVariable("current_action_items", []), Call("EventAmandaLizettTalkApply", 1, eyewitness)]))
-
-            if Amanda.var.get("prohibitliza", 0) > 0 and NotToSpeak == 0:
-                $ _amanda_talk_choices.append(MenuItem("Строго наругать Аманду за то, та болтает с Лизеттой", [SetVariable("current_action_items", []), Call("EventAmandaLizettTalkApply", 2, eyewitness)]))
-
-            if Amanda.var.get("prohibitliza", 0) == 0 and NotToSpeak == 0:
-                $ _amanda_talk_choices.append(MenuItem("Сказать Аманде, чтобы не болтала с Лизеттой", [SetVariable("current_action_items", []), Call("EventAmandaLizettTalkApply", 3, eyewitness)]))
-
-            if Amanda.var.get("prohibitliza", 0) == 0 and NotToSpeak == 1:
-                $ _amanda_talk_choices.append(MenuItem("Сказать Аманде, что она правильно не стала болтать с Лизеттой", [SetVariable("current_action_items", []), Call("EventAmandaLizettTalkApply", 4, eyewitness)]))
-
-            if Amanda.var.get("prohibitliza", 0) > 0 and NotToSpeak == 1:
-                $ _amanda_talk_choices.append(MenuItem("Сказать Аманде, что вы погорячились, когда запретили ей говорить с Лизеттой", [SetVariable("current_action_items", []), Call("EventAmandaLizettTalkApply", 5, eyewitness)]))
-
-            if NotToSpeak == 0:
-                $ _amanda_talk_choices.append(MenuItem("Подслушать", [SetVariable("current_action_items", []), Call("EventAmandaLizettTalkApply", 6, eyewitness)]))
-
-            if NotToSpeak == 1:
-                $ _amanda_talk_choices.append(MenuItem("Вернуться к своим делам", [SetVariable("current_action_items", []), Call("EventAmandaLizettTalkApply", 7, eyewitness)]))
-
-            $ current_action_items = _amanda_talk_choices
             $ Result += "\n\nЧто вы намеренны предпринять?"
         elif NotToSpeak == 0:
             call EventAmandaLizettTalk2(eyewitness)
@@ -63,10 +37,27 @@ label EventAmandaLizettTalk(eyewitness=0):
     else:
         $ Result = ""
 
-    if eyewitness == 0:
-        $ Result = ""
-    else:
-        call ShowImage("amanda", "tavern", "lizatalk{}".format(renpy.random.randint(1, 2)))
+    if eyewitness > 0:
+        call ShowImage("amanda", "tavern", "lizatalk{}".format(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/EventAmandaLizettTalk.rpy:procedural_randint:41:5")))
+        "[Result]"
+        menu:
+            "Похвалить Аманду, за то, что не стала болтать с Лизеттой" if Amanda.var_int("prohibitliza", 0) > 0 and NotToSpeak == 1:
+                call EventAmandaLizettTalkApply(1, eyewitness)
+            "Строго наругать Аманду за то, та болтает с Лизеттой" if Amanda.var_int("prohibitliza", 0) > 0 and NotToSpeak == 0:
+                call EventAmandaLizettTalkApply(2, eyewitness)
+            "Сказать Аманде, чтобы не болтала с Лизеттой" if Amanda.var_int("prohibitliza", 0) == 0 and NotToSpeak == 0:
+                call EventAmandaLizettTalkApply(3, eyewitness)
+            "Сказать Аманде, что она правильно не стала болтать с Лизеттой" if Amanda.var_int("prohibitliza", 0) == 0 and NotToSpeak == 1:
+                call EventAmandaLizettTalkApply(4, eyewitness)
+            "Сказать Аманде, что вы погорячились, когда запретили ей говорить с Лизеттой" if Amanda.var_int("prohibitliza", 0) > 0 and NotToSpeak == 1:
+                call EventAmandaLizettTalkApply(5, eyewitness)
+            "Подслушать" if NotToSpeak == 0:
+                call EventAmandaLizettTalkApply(6, eyewitness)
+            "Вернуться к своим делам" if NotToSpeak == 1:
+                call EventAmandaLizettTalkApply(7, eyewitness)
+        return ""
+
+    $ Result = ""
 
     return Result
 
@@ -76,20 +67,20 @@ label EventAmandaLizettTalkApply(reaction_code=7, eyewitness=0):
     if reaction_code == 1:
         "Вы похвалили Аманду за то, что она послушалась вас и не стала болтать с Лизеттой. На ее лице читалось явное облегчение от того, что она не попалась."
     elif reaction_code == 2:
-        $ Amanda.var["prohibitliza"] = 2
+        $ Amanda.set_var_int("prohibitliza", 2)
         $ NotToSpeak = 1
         "Вы подошли к болтушкам и начали сурово отчитывать Аманду за то, что она не выполнила вашего наказа. Аманда расплакалась и убежала в слезах."
-        call SlutFriendsIncrease("amanda", 4, 1, -1, 0, 0, 0)
+        $ Amanda.apply_social_chance(4, 1, -1, 0, 0, 0, "liza_talk_scold")
     elif reaction_code == 3:
-        $ Amanda.var["prohibitliza"] = 1
+        $ Amanda.set_var_int("prohibitliza", 1)
         $ NotToSpeak = 1
         "Вы подошли к болтушкам и вмешались в их разговор, отозвав Аманду в сторону, якобы по неотложному делу. Как только вы остались вдвоем вы сказали Аманде, чтобы она не болтала с Лизеттой, так как та распущенная девчонка и хорошему не научит. Аманда выслушала вас и пообещала с Лизеттой не говорить."
     elif reaction_code == 4:
-        $ Amanda.var["prohibitliza"] = 1
+        $ Amanda.set_var_int("prohibitliza", 1)
         $ NotToSpeak = 1
         "Вы подошли к Аманде и сказали, что случайно слышали ее разговор с Лизеттой. Вы отметили, что она абсолютно правильно не стала с ней болтать и что вы тоже не советуете ей трепаться с юной шлюхой. При слове \"шлюха\" Аманда зарделась и пообещала с Лизеттой больше не говорить."
     elif reaction_code == 5:
-        $ Amanda.var["prohibitliza"] = 0
+        $ Amanda.set_var_int("prohibitliza", 0)
         "Вы подошли к Аманде и сказали, что погорячились, вы не хотите на нее давить и она имеет полное право говорить с кем хочет. Аманда поблагодарила вас за доверие и пошла по своим делам."
     elif reaction_code == 6:
         "Вы решили подслушать, что будет дальше."

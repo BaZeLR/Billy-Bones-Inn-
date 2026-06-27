@@ -32,7 +32,7 @@ init python:
         ]
         loadable = [row for row in candidates if renpy.loadable(row)]
         if len(loadable) > 0:
-            return renpy.random.choice(loadable)
+            return procedural_choice(loadable, key="procedural:Town/BeckyHomeFront.rpy:procedural_choice:35:1")
         return "images/becky/Home/house2.jpg"
 
     def becky_homefront_normal_desc():
@@ -133,7 +133,7 @@ label BeckyHomeFront(arrive_mode=""):
     if not _resume_mode:
         $ ArriveMode = arrive_mode
         $ ViewIngaSex = 0
-        $ RandIngaFuck = renpy.random.randint(1,4)
+        $ RandIngaFuck = procedural_randint(1,4, key="procedural:Town/BeckyHomeFront.rpy:procedural_randint:136:1")
         if Becky.story_value("TodayFrontSexCheck", 0) == 1 and RandIngaFuck <= 2:
             $ RandIngaFuck = 3
         $ Becky.set_story_value("TodayFrontSexCheck", 1)
@@ -323,7 +323,7 @@ label becky_homefront_watch_cum:
         $ Becky.apply_social_roll(0, 0, 0, 45, 3, 1)
     else:
         "\"Стефан, увидимся дома, нам надо еще кое что забрать,\" сказал вам Лукас, заправляя член обратно в штаны. И с этими словами парочка удалилась."
-    if renpy.random.randint(1,2) == 1 and RandIngaFuck == 2 and Becky.story_value("IngaSexGreet", 0) == 0 and ArriveMode == "FromDances":
+    if procedural_randint(1,2, key="procedural:Town/BeckyHomeFront.rpy:procedural_randint:326:2") == 1 and RandIngaFuck == 2 and Becky.story_value("IngaSexGreet", 0) == 0 and ArriveMode == "FromDances":
         "\"Лукас, Ингочка, а что ж вы на улице, вам же небось неудобно?\" - резонно осведомилась у парочки Бекки."
         "\"Я же вам сказала, что можете у нас дома, не стесняйтесь.\""
         "\"Ой мам, ну ты сказанула. Лукас и стыд - вещи мало совместимые. Где он меня только не сношал. Это-то его и заводит, говорит что в одном месте скучно. Правда, милый?\""

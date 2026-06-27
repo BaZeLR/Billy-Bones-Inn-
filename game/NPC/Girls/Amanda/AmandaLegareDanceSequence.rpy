@@ -24,7 +24,7 @@ init python:
             tmp_legare_sex_type = int(forced_type or 0)
         else:
             tmp_legare_sex_type = 1
-            if tmp_legare_sex_type == 2 and renpy.random.randint(1, 6) <= 5:
+            if tmp_legare_sex_type == 2 and procedural_randint(1, 6, key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:27:1") <= 5:
                 tmp_legare_sex_type = 1
 
         plan = {
@@ -49,7 +49,7 @@ init python:
             plan["set_virginity"] = 0
             plan["alberfriends_delta"] = 2
             plan["slut_args"] = ("amanda", 0, 0, 0, 50, 1, 4)
-            if renpy.random.randint(1, 3) <= 2:
+            if procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:52:2") <= 2:
                 plan["alberfriends_delta"] += 1
                 plan["pregnancy_target"] = "inside"
             else:
@@ -58,7 +58,7 @@ init python:
         else:
             plan["fucklegare"] = 1
             plan["slut_args"] = ("amanda", 0, 0, 0, 50, 1, 2)
-            if renpy.random.randint(1, 3) <= 2:
+            if procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:61:3") <= 2:
                 plan["alberfriends_delta"] = 1
                 plan["pregnancy_target"] = "inside"
             else:
@@ -73,14 +73,14 @@ init python:
         Amanda.set_var_int("fucklegare", int(plan.get("fucklegare", 0) or 0))
         Amanda.set_var_int("deflowerlegare", int(plan.get("deflowerlegare", 0) or 0))
         if plan.get("set_virginity", None) is not None:
-            virginity["amanda"] = int(plan.get("set_virginity", 0) or 0)
+            Amanda.set_sex_stat("virginity", bool(int(plan.get("set_virginity", 0) or 0)))
         Amanda.set_var_int("alberfriends", Amanda.var_int("alberfriends", 0) + int(plan.get("alberfriends_delta", 0) or 0))
         slut_args = tuple(plan.get("slut_args", ()) or ())
         if slut_args:
-            slut_friends_increase(slut_args[0], slut_args[1], slut_args[2], slut_args[3], slut_args[4], slut_args[5], slut_args[6])
+            Amanda.apply_social_chance(slut_args[1], slut_args[2], slut_args[3], slut_args[4], slut_args[5], slut_args[6], "legare_dance_outcome")
         pregnancy_target = str(plan.get("pregnancy_target", "") or "")
         if pregnancy_target != "":
-            PregnancyCheck("amanda", pregnancy_target, 1, "legare")
+            Amanda.pregnancy_check(pregnancy_target, 1, "legare")
         return plan
 
 label story_amanda_legare_dance_0:
@@ -162,32 +162,32 @@ label AmandaLegareDanceSequence:
         if Amanda.var_int("alberprohibit", 0) == 1:
             $ Amanda.set_var_int("alberfriends", max(0, Amanda.var_int("alberfriends", 0) - 1))
             if Amanda.var_int("alberfriends", 0) >= 12:
-                $ DanceCreated = renpy.random.randint(1,2)
+                $ DanceCreated = procedural_randint(1,2, key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:165:4")
             elif Amanda.var_int("alberfriends", 0) >= 8:
                 $ DanceCreated = 1
             elif Amanda.var_int("alberfriends", 0) >= 4:
-                if renpy.random.randint(1,2) == 1:
+                if procedural_randint(1,2, key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:169:5") == 1:
                     $ DanceCreated = 1
             else:
-                if renpy.random.randint(1,4) == 1:
+                if procedural_randint(1,4, key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:172:6") == 1:
                     $ DanceCreated = 1
         elif Amanda.var_int("alberfriends", 0) >= 8:
-            $ DanceCreated = renpy.random.randint(2,4)
+            $ DanceCreated = procedural_randint(2,4, key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:175:7")
         else:
-            $ DanceCreated = renpy.random.randint(1,3)
+            $ DanceCreated = procedural_randint(1,3, key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:177:8")
         if ForceLegareFirstDance:
             $ DanceCreated = max(DanceCreated, 1)
         $ Amanda.set_var_int("LegareGo", 0)
         $ GoPhrase = ""
-        if (Amanda.var_int("alberfriends", 0) >= 11 and sluttiness['amanda'] >= 16) or (Amanda.var_int("alberfriends", 0) >= 5 and sluttiness['amanda'] >= 30) or (sluttiness['amanda'] >= 50):
+        if (Amanda.var_int("alberfriends", 0) >= 11 and Amanda.corruption >= 16) or (Amanda.var_int("alberfriends", 0) >= 5 and Amanda.corruption >= 30) or (Amanda.corruption >= 50):
             $ Amanda.set_var_int("LegareGo", 1)
-            if sluttiness['amanda'] < 20:
+            if Amanda.corruption < 20:
                 $ GoPhrase = 'Тут месье Легаре что-то шепнул на ушко Аманде. Она замялась, и, потупив глаза, покачала головой. Альбер пожал плечами и снова закружился с ней в танце.'
                 $ Amanda.set_var_int("LegareGo", 2)
-            elif sluttiness['amanda'] < 35:
+            elif Amanda.corruption < 35:
                 $ GoPhrase = 'Тут месье Легаре что-то шепнул на ушко Аманде. Она замялась, но, после небольшого раздумья, кивнула. Альбер взял Аманду под ручку и они поспешили прочь с площади.'
             else:
-                if renpy.random.randint(1,2) == 1:
+                if procedural_randint(1,2, key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:190:9") == 1:
                     $ GoPhrase = 'Тут месье Легаре что-то шепнул на ушко Аманде. Даже не дослушав его, она обрадованно кивнула, поцеловала месье в губы и потянула прочь с площади. Тот последовал за ней.'
                 else:
                     $ GoPhrase = 'Тут Аманда вдруг засмеялась, сказала что-то Альберу и потянула его за руку прочь. Тот несколько смутился от ее напора, но обрадованно последовал за ней.'
@@ -203,9 +203,9 @@ label AmandaLegareDanceSequence:
                     $ j = DanceCreated
                 else:
                     $ GirlDance_Add('amanda', 'legare', 1, 0, '')
-            elif renpy.random.randint(1, max(1, 5-i)) <= DanceCreated-j:
+            elif procedural_randint(1, max(1, 5-i), key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:206:10") <= DanceCreated-j:
                 $ j += 1
-                if Amanda.var_int("LegareGo", 0) > 0 and ((j > DanceCreated-1 and renpy.random.randint(1,2) == 1) or j == DanceCreated):
+                if Amanda.var_int("LegareGo", 0) > 0 and ((j > DanceCreated-1 and procedural_randint(1,2, key="procedural:NPC/Girls/Amanda/AmandaLegareDanceSequence.rpy:procedural_randint:208:11") == 1) or j == DanceCreated):
                     $ GirlDance_Add('amanda', 'legare', i + 1, Amanda.var_int("LegareGo", 0), GoPhrase)
                     $ Amanda.set_var_int("LegareGo", 0)
                     $ j = DanceCreated

@@ -270,8 +270,8 @@ init python:
 label PlayerIntimacyHelpAsk(girl_name="", return_label=""):
     $ _pih_result = player_intimacy_help_result(girl_name)
     if str(girl_name or "").strip().lower() == "amanda":
-        $ Amanda.var["night_tease_resolved"] = 1
-        $ Amanda.var["night_tease_scene_active"] = 0
+        $ Amanda.set_var_int("night_tease_resolved", 1)
+        $ Amanda.set_var_int("night_tease_scene_active", 0)
     $ MainTxt = str(_pih_result.get("text", "") or "")
     $ CurLocDesc = MainTxt
     "[MainTxt]"

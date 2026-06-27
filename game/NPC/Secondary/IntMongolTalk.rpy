@@ -113,7 +113,7 @@ label MongolTalkApply(topic_code=""):
                 hide screen girl_card_overlay
                 hide screen player_card_overlay
                 jump TavernStable
-        elif renpy.random.randint(1, 3 + Mongol.var['GypsyAsk']) == 1:
+        elif procedural_randint(1, 3 + Mongol.var['GypsyAsk'], key="procedural:NPC/Secondary/IntMongolTalk.rpy:procedural_randint:116:1") == 1:
             $ MainTxt = "\"Сотню могу скинуть. Больше нет, извиняй.\""
             $ CurLocDesc = MainTxt
             $ Mongol.var['HorsePrice'] -= 100

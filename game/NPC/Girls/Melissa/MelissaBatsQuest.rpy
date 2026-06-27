@@ -6,4 +6,4 @@ init -1 python:
         return "Там, не особенно заботясь о чужих глазах, молочник грубо и с явным азартом имеет собственную жену. До вас долетают приглушенные стоны, хлесткий ритм тел и влажный блеск обнаженной кожи."
 
     def amanda_attic_busted():
-        return int(AmandaVar.get("attic_window_busted", 0) or 0) == 1 and Melissa.bats_stage() >= 6
+        return Amanda.var_int("attic_window_busted", 0) == 1 and Melissa.bats_stage() >= 6

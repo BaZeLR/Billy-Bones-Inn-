@@ -48,7 +48,7 @@ label story_amanda_tavern_seduction_0:
         "Подыграть":
             "Вы ответили ей в том же тоне. Аманда вспыхнула, но не отступила, только ниже опустила голос и пообещала вечером быть послушнее, если вы тоже будете к ней внимательнее."
             $ Amanda.change_mana(1, "tavern_seduction_attention")
-            $ slut_friends_increase("amanda", 0, 0, 1, 2, 0, 0)
+            $ Amanda.apply_social_chance(0, 0, 1, 2, 0, 0, "tavern_seduction_attention")
             return True
         "Позвать наверх" if int(Amanda.rel or 0) >= 12 and int(Amanda.corruption or 0) >= 35:
             "Вы тихо предложили ей оставить зал на пару минут. Аманда посмотрела на лестницу, прикусила губу и пошла первой."

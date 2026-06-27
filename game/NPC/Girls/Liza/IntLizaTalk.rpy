@@ -83,7 +83,7 @@ label IntLizaTalkSmalltalk(girl_name_ilt="liza", girl_loc_ilt=""):
 
     $ MainTxt = "Вы некоторое время болтаете с Лизеттой о разных вещах."
     python:
-        if Talked.get(GirlNameILT, 0) <= 2 and renpy.random.randint(1, 2) == 1:
+        if Talked.get(GirlNameILT, 0) <= 2 and procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaTalk.rpy:procedural_randint:86:1") == 1:
             girl_friends = Liza.rel
             lick_pussy_count = LickPussy.get(GirlNameILT, 0)
             give_orgasms_count = GiveOrgasms.get(GirlNameILT, 0)

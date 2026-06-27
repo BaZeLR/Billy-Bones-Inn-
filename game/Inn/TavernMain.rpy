@@ -308,7 +308,7 @@ label TavernMain:
             $ _jobwhore = jobwhore if isinstance(jobwhore, dict) else {}
             if _jobwhore.get("liza", 0) == 1 and _jobwhore.get("georgett", 0) == 1:
                 python:
-                    randvarPS = renpy.random.randint(1, 5)
+                    randvarPS = procedural_randint(1, 5, key="procedural:Inn/TavernMain.rpy:procedural_randint:311:1")
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит юная Лизетта и ждет клиентов. А вот ее мамаша клиента уже похоже нашла."
                     $ LizaAvail = 1
@@ -335,7 +335,7 @@ label TavernMain:
                     $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
             elif _jobwhore.get("liza", 0) == 1:
                 python:
-                    randvarPS = renpy.random.randint(1, 3)
+                    randvarPS = procedural_randint(1, 3, key="procedural:Inn/TavernMain.rpy:procedural_randint:338:2")
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу, где обычно сидит Лизетта, пусто. Похоже что ветренную девчонку уже кто-то снял."
                     $ peopleInfo[GirlNameTS2].location = "TavernClientRoom"
@@ -348,7 +348,7 @@ label TavernMain:
                     $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
             elif _jobwhore.get("georgett", 0) == 1:
                 python:
-                    randvarPS = renpy.random.randint(1, 3)
+                    randvarPS = procedural_randint(1, 3, key="procedural:Inn/TavernMain.rpy:procedural_randint:351:3")
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу, где обычно сидит Жоржетта, пусто. Похоже что шлюшку уже кто-то снял."
                     $ peopleInfo[GirlNameTS1].location = "TavernClientRoom"

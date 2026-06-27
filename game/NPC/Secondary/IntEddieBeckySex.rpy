@@ -204,11 +204,11 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
                 else:
                     if EddieCockInPussy.get(GirlNameIBS, 0) == 0:
                         "Ребекка провела рукой по поднявшемуся члену Эдди: \"Давай, мой управляющий. Чего же ты ждешь, разве не видишь что я уже вся горю?\" - бесстыдно сказала она становясь перед ним раком. Тот не заставил себя долго упрашивать и начал сношать хозяйку сзади."
-                        $ _eddie_fuck_picture = "fuckstart" + str(renpy.random.randint(1, 3))
+                        $ _eddie_fuck_picture = "fuckstart" + str(procedural_randint(1, 3, key="procedural:NPC/Secondary/IntEddieBeckySex.rpy:procedural_randint:207:1"))
                         call ShowImage("becky", "sexeddie", _eddie_fuck_picture)
                     else:
                         "Эдди продолжает трахать Ребекку, ее большие сиськи болтаются при каждом его толчке. Вдова громко стонет от наслаждения при каждом движении члена управляющего в ее киске."
-                        $ _eddie_fuck_picture = "fuck" + str(renpy.random.randint(1, 4))
+                        $ _eddie_fuck_picture = "fuck" + str(procedural_randint(1, 4, key="procedural:NPC/Secondary/IntEddieBeckySex.rpy:procedural_randint:211:2"))
                         call ShowImage("becky", "sexeddie", _eddie_fuck_picture)
 
                 if pregnancy.get(GirlNameIBS, 0) > 130:

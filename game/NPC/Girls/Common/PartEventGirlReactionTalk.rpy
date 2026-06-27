@@ -53,30 +53,30 @@ label PartEventGirlReactionTalk(GirlNamePEGRT1, GirlNamePEGRT2, FriendVarToChang
         SlutLimit = _pegrt_int(SlutLimit, 0)
 
         if friend_var_value > 0:
-            if renpy.random.randint(1, max(2, int(FriendLimit / friend_var_value))) == 1:
+            if procedural_randint(1, max(2, int(FriendLimit / friend_var_value)), key="procedural:NPC/Girls/Common/PartEventGirlReactionTalk.rpy:procedural_randint:56:1") == 1:
                 BeleiveFriend = 1
         
         result_text = ""
         girl_info = getPersonInfo(GirlNamePEGRT1)
         girl_slut = _pegrt_int(getattr(girl_info, "corruption", 0), 0)
 
-        if girl_slut >= DefiniteAccept or renpy.random.randint(1,5) <= 3 or BeleiveFriend:
+        if girl_slut >= DefiniteAccept or procedural_randint(1,5, key="procedural:NPC/Girls/Common/PartEventGirlReactionTalk.rpy:procedural_randint:63:2") <= 3 or BeleiveFriend:
             result_text = f"\n{RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} внимательно слушает свою собеседницу, впитывая информацию."
-            if friend_var_value < FriendLimit and renpy.random.randint(1,3) == 1:
+            if friend_var_value < FriendLimit and procedural_randint(1,3, key="procedural:NPC/Girls/Common/PartEventGirlReactionTalk.rpy:procedural_randint:65:3") == 1:
                 _pegrt_set_ref_value(FriendVarToChange, friend_var_value + 1)
                 result_text += f"\nПохоже, {RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} и {RealName.get(GirlNamePEGRT2, GirlNamePEGRT2)} сдружились еще больше!"
             
-            if girl_slut < SlutLimit and renpy.random.randint(1,2) == 1:
+            if girl_slut < SlutLimit and procedural_randint(1,2, key="procedural:NPC/Girls/Common/PartEventGirlReactionTalk.rpy:procedural_randint:69:4") == 1:
                 if girl_info is not None:
                     girl_info.change_social(corruption_delta=1)
                 result_text += f"\nВам показалось, что после этого разговора {RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} почуствовала себя чуть больше раскрепощенной."
         else:
             result_text = f'\n"Да врешь ты все!" воскликнула {RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} и пошла по своим делам, даже не удосужившись попрощаться.'
-            if friend_var_value > (FriendLimit/4) and renpy.random.randint(1,5) == 1:
+            if friend_var_value > (FriendLimit/4) and procedural_randint(1,5, key="procedural:NPC/Girls/Common/PartEventGirlReactionTalk.rpy:procedural_randint:75:5") == 1:
                 _pegrt_set_ref_value(FriendVarToChange, friend_var_value - 1)
                 result_text += f"\nПохоже, {RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} и {RealName.get(GirlNamePEGRT2, GirlNamePEGRT2)} малость поссорились!"
             
-            if girl_slut > (SlutLimit/4) and girl_slut > (SlutLimit+15) and renpy.random.randint(1,5) == 1:
+            if girl_slut > (SlutLimit/4) and girl_slut > (SlutLimit+15) and procedural_randint(1,5, key="procedural:NPC/Girls/Common/PartEventGirlReactionTalk.rpy:procedural_randint:79:6") == 1:
                 if girl_info is not None:
                     girl_info.change_social(corruption_delta=-1)
                 result_text += f"\nВам показалось, что после этого разговора {RealName.get(GirlNamePEGRT1, GirlNamePEGRT1)} почуствовала себя более гордой и неприступной."

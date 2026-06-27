@@ -1285,7 +1285,7 @@ label TavernKitchenBreakfastHearDialogue:
 
 
 label TavernKitchenBreakfastAmandaAltCure1:
-    $ Amanda.var["attic_window_breakfast_bj_day"] = int(dayspassed or 0)
+    $ Amanda.set_var_int("attic_window_breakfast_bj_day", int(dayspassed or 0))
     $ player_apply_arousal_trigger("breakfast_amanda_alt_cure", max(0, 35 - int(player_state(False).intimacy.arousal_value("You") or 0)))
     $ Amanda.set_arousal(max(30, int(Amanda.arousal_value() or 0)))
     $ MainTxt = "За общим столом Аманда сегодня на редкость притихла. Несколько раз она украдкой встречается с вами взглядом, потом криво улыбается и будто невзначай касается вашей ноги под столом. Колкость про Мелиссу так и не срывается с ее языка.\n\nЧерез пару минут ее ступня уже гладит вас куда смелее, а сама она наклоняется ближе и почти беззвучно шепчет, что после той неловкой истории с окном ей почему-то самой теперь труднее делать вид, будто ничего такого в доме не бывает.\n\nПока остальные заняты едой и разговорами, Аманда незаметно скользит ниже под край стола и решает загладить свою дерзость способом куда приятнее обычных извинений."
@@ -1301,7 +1301,7 @@ label TavernKitchenBreakfastAmandaAltCure1:
 label TavernKitchenBreakfastAmandaAtticMock:
     if not tavern_breakfast_amanda_attic_mock_ready():
         jump TavernKitchenBreakfastMenu
-    $ Amanda.var["attic_mock_response_day"] = int(dayspassed or 0)
+    $ Amanda.set_var_int("attic_mock_response_day", int(dayspassed or 0))
     $ MainTxt = "Стоит за завтраком снова всплыть слову \"чердак\", Аманда тут же цепляет вас взглядом и слишком невинно спрашивает, не собираетесь ли вы опять падать туда, куда приличные люди хотя бы стучатся."
     $ CurLocDesc = MainTxt
     $ _attic_items = [
@@ -1315,8 +1315,8 @@ label TavernKitchenBreakfastAmandaAtticMock:
 
 
 label TavernKitchenBreakfastAmandaAtticExpose:
-    $ Amanda.var["attic_mock_exposed"] = 1
-    $ Amanda.var["attic_mock_stopped"] = 1
+    $ Amanda.set_var_int("attic_mock_exposed", 1)
+    $ Amanda.set_var_int("attic_mock_stopped", 1)
     $ Amanda.change_social(open_delta=1, corruption_delta=1)
     $ MainTxt = "Вы спокойно отвечаете, что если Аманда так любит шутить про чердак, можно сразу рассказать всем, откуда она сама высматривала тот же двор. За столом становится тише. Аманда краснеет, дергает плечом и больше к этой теме за завтраком не возвращается."
     $ CurLocDesc = MainTxt
@@ -1353,7 +1353,7 @@ label TavernKitchenBreakfastMelissaAmandaGerhardNatural:
 
 
 label TavernKitchenBreakfastAmandaAtticStop:
-    $ Amanda.var["attic_mock_stopped"] = 1
+    $ Amanda.set_var_int("attic_mock_stopped", 1)
     $ Amanda.change_social(friend_delta=1)
     $ MainTxt = "Вы наклоняетесь ближе и коротко говорите Аманде, что эту шутку пора оставить при себе. Она еще секунду держит дерзкий вид, потом опускает глаза к тарелке и тихо фыркает: \"Ладно. Поняла.\" После этого тема чердака за столом глохнет сама собой."
     $ CurLocDesc = MainTxt
@@ -1369,7 +1369,7 @@ label TavernKitchenBreakfastTease:
     if _tease_girl == "":
         jump TavernKitchenBreakfastMenu
     if _tease_girl == "amanda":
-        $ Amanda.var["breakfast_tease_day"] = int(dayspassed or 0)
+        $ Amanda.set_var_int("breakfast_tease_day", int(dayspassed or 0))
     else:
         $ Melissa.var["breakfast_tease_day"] = int(dayspassed or 0)
     $ _breakfast_tease_picture = tavern_breakfast_tease_picture(_tease_girl, _tease_tier)

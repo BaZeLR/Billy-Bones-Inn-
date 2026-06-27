@@ -132,10 +132,6 @@ init python:
         except Exception:
             pass
         try:
-            _put("AmandaVar", AmandaVar)
-        except Exception:
-            pass
-        try:
             _put("MelissaVar", MelissaVar)
         except Exception:
             pass

@@ -45,7 +45,7 @@ label story_clara_paintings_confront_legare:
     $ Clara.var["cellar_confronted"] = 1
     $ Alber.set_var_int("FightYouAmanda", 1)
     $ Alber.set_var_int("clara_paintings_enemy", 1)
-    $ AmandaVar["LegareGo"] = max(2, int(AmandaVar.get("LegareGo", 0) or 0))
+    $ Amanda.set_var_int("LegareGo", max(2, Amanda.var_int("LegareGo", 0)))
     $ Clara.change_social(friend_delta=1)
     $ MainTxt = "Вы выходите из-за стеллажей и прямо говорите Легаре, что его семейные распоряжения перестали быть только семейным делом. Легаре быстро закрывает подвал за спиной Клариссы и встречает вас уже без торговой улыбки.\n\nДрака выходит короткой и злой: несколько ударов, сбитая бутылка, хруст стекла под сапогом. Легаре отступает первым, но по его лицу ясно, что теперь вы для него не помеха, а враг. Перед уходом он почти спокойно бросает, что раз вы вмешиваетесь в его дом, он займется вашим домом куда настойчивее.\n\nПохоже, он ускорит свои попытки добраться до Аманды."
     $ CurLocDesc = MainTxt

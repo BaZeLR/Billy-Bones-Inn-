@@ -7,7 +7,7 @@ label IntLizaDressChange(GirlNameILT="liza"):
             global tavernfame
             if AgreedToRedress != 1 or int(sluttiness.get(GirlNameILT, 0) or 0) < 50:
                 return ""
-            RandVar = renpy.random.randint(1, 9)
+            RandVar = procedural_randint(1, 9, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:10:1")
             if RandVar == 1:
                 if sluttiness.get("sandra", 0) >= 35:
                     text = "Обернувшись, вы вдруг встретились взглядом с Сандрой, наблюдающей за этой сценкой. Но она всего лишь усмехнулась, покачала головой и пошла по своим делам."
@@ -19,7 +19,7 @@ label IntLizaDressChange(GirlNameILT="liza"):
                 else:
                     text = 'Вы заметили, что за вами наблюдала Мелисса. И этот стриптиз ее немного шокировал. Она подошла и выговорила вам: "Знаешь что, Стефан, держи своих шлюх так, чтобы по крайней мере девочкам не приходилось пялиться на их прелести. У тебя ведь и младшая есть, она еще мала на такое смотреть!"'
             elif RandVar == 3:
-                if sluttiness.get("amanda", 0) >= 35:
+                if int(Amanda.corruption or 0) >= 35:
                     text = "Вы заметили, что за вами наблюдала Аманда. Стриптиз подруги ее позабавил, она даже от возбуждения слегка потерла у себя между ножек."
                 else:
                     text = 'Вы заметили, что за вами наблюдала Аманда. Причем наблюдала с открытым ртом, публичное раздевание для нее явно было в новинку и шокировало. "Пусть учится смотреть на вещи шире," подумали вы.'
@@ -60,7 +60,7 @@ label IntLizaDressChange(GirlNameILT="liza"):
                     "\"А и то верно, да и мамочка несколько раз мне уже говорила, что можно и без них, \" согласила с вами Лизетта. \"Ладно, попробую.\""
                     $ AgreedToRedress = 1
                     if sluttiness.get(GirlNameILT, 0) < 50:
-                        if renpy.random.randint(1, 2) == 1:
+                        if procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:63:2") == 1:
                             "Лизетта зашла в комнатку, где они с мамой обычно обслуживали посетителей, и сноровисто стянула с себя панталончики."
                         else:
                             "Лизетта скромно спряталась за стойкой и быстро избавилась от мешающего ей нижнего белья."
@@ -93,14 +93,14 @@ label IntLizaDressChange(GirlNameILT="liza"):
         "Постыдить Лизетту за отстутсвие панталон" if _can_shame:
             $ AgreedToRedress = 0
             "\"Лизетта, а чего это ты без панталон ходишь? Я понимаю, что в твоем ремесле они скорее мешают, но стыд-то знать надо?\" - раскритиковали вы юную давалку."
-            if panties.get(GirlNameILT, "") != "" or (panties.get(GirlNameILT, "") == "" and sluttiness.get(GirlNameILT, 0) >= 45 and renpy.random.randint(1, 2) == 1):
+            if panties.get(GirlNameILT, "") != "" or (panties.get(GirlNameILT, "") == "" and sluttiness.get(GirlNameILT, 0) >= 45 and procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:96:3") == 1):
                 "\"А может они у меня есть? Ты точно все проверил? Вот сними меня и посмотри, а пока верь мне на слово, что они у меня есть!\" отбрехалась от вас Лизетта."
             else:
                 "\"Ну нет и нет, что ты шум поднимаешь? Мне так удобнее работается, сам же говорил!\n\"Может и удобнее, только все-таки это приличное заведение, так что одень как ты их, подруга, обратно!\" отчитали вы бесстыдницу."
                 if sluttiness.get(GirlNameILT, 0) < 45:
                     "\"Ну, ладно, ладно, не ругайся. Приличное значит приличное, сейчас одену.\""
                     $ AgreedToRedress = 1
-                elif sluttiness.get(GirlNameILT, 0) < 60 and renpy.random.randint(1, 4) <= 3:
+                elif sluttiness.get(GirlNameILT, 0) < 60 and procedural_randint(1, 4, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:103:4") <= 3:
                     "\"Ага, то сам говорил, посмотри на маму, посмотри на маму, так тебе удобнее мол будет, а теперь стыдит. Приличное у него видите ли заведение. Ладно, не плачь, ща пойду наверх одену.\""
                     $ AgreedToRedress = 1
                     $ slut_friends_increase(GirlNameILT, 7, 1, -1, 0, 0, 0)

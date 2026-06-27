@@ -199,11 +199,11 @@ label GirlDressBuyJerkoff(GirlName="", DressToBuy="", DressBuyIsRelative=0):
         "Продолжить свое грязное занятие":
             'Вы продолжали наяривать свой член все то время, пока Ирма снимала мерку. Но все хорошее быстро заканчивается: Ирма закончила свои измерения, а вы... просто кончили.'
 
-            if int(_gds_get_dict("HadSex").get(GirlName, 0) or 0) > 0 and renpy.random.randint(1, 2) == 1:
+            if int(_gds_get_dict("HadSex").get(GirlName, 0) or 0) > 0 and procedural_randint(1, 2, key="procedural:NPC/Girls/Common/GirlSuggestDressFunc.rpy:procedural_randint:202:1") == 1:
                 'В последний момент [_rn] быстро наклонилась и обхватила губами головку вашего члена. Вы разрядились ей прямо в ротик.'
                 call PregnancyCheck(GirlName, "mouth", 1, "Вы")
                 call SlutFriendsIncrease(GirlName, 15, 2, 1, 50, 1, 1)
-            elif int(_gds_get_dict("Friends").get("irma", 0) or 0) > 5 and renpy.random.randint(1, 2) == 1:
+            elif int(_gds_get_dict("Friends").get("irma", 0) or 0) > 5 and procedural_randint(1, 2, key="procedural:NPC/Girls/Common/GirlSuggestDressFunc.rpy:procedural_randint:206:2") == 1:
                 'Ирма, хоть и была поглощена работой, успела в последний момент взять ваш член в рот, и ваше семя отправилось ей в желудок.'
                 call PregnancyCheck("irma", "mouth", 1, "Вы")
                 call SlutFriendsIncrease("irma", 8, 2, 1, 50, 1, 1)
@@ -246,7 +246,7 @@ label GirlDressBuyShowOutside(GirlName="", DressToBuy="", ShowOffLevel=0, DressB
 
     call GirlDressBuyPregRemark(GirlName)
 
-    $ RandVar = renpy.random.randint(1, 5)
+    $ RandVar = procedural_randint(1, 5, key="procedural:NPC/Girls/Common/GirlSuggestDressFunc.rpy:procedural_randint:249:3")
     if RandVar <= 3:
         'Ваше внимание привлек шум за окном: похоже, зрители у примерки все же нашлись.'
         call SlutFriendsIncrease(GirlName, 0, 1, 0, 57, 1, 1)

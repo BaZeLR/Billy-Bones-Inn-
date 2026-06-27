@@ -196,7 +196,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                     if GirlLocILSS == "tavern":
                         call ShowImage(GirlNameILSS, "sextraktir", "lick")
                     else:
-                        call ShowImage(GirlNameILSS, "sexstreet", "lick" + str(renpy.random.randint(1, 3)))
+                        call ShowImage(GirlNameILSS, "sexstreet", "lick" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:199:1")))
                 jump int_liza_sex_menu
 
             "Предложить отсосать" if _can_player_cum and SomebodyCums == 0:
@@ -224,9 +224,9 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                 call ShowCurrentSex(GirlNameILSS)
                 if renpy.has_label("ShowImage"):
                     if GirlLocILSS == "tavern":
-                        call ShowImage(GirlNameILSS, "sextraktir", "minet" + str(renpy.random.randint(1, 2)))
+                        call ShowImage(GirlNameILSS, "sextraktir", "minet" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:227:2")))
                     else:
-                        call ShowImage(GirlNameILSS, "sexstreet", "minet" + str(renpy.random.randint(1, 3)))
+                        call ShowImage(GirlNameILSS, "sexstreet", "minet" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:229:3")))
                 jump int_liza_sex_menu
 
             "Трахать" if _can_player_cum and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and Arousal.get(GirlNameILSS, 0) >= 20 and PussyVisible.get(GirlNameILSS, 0):
@@ -235,31 +235,31 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         "Вы впились в губы девушки и насадили ее на вздыбленный член."
                         if renpy.has_label("ShowImage"):
                             if GirlLocILSS == "tavern":
-                                call ShowImage(GirlNameILSS, "sextraktir", "fuckstart" + str(renpy.random.randint(1, 2)))
+                                call ShowImage(GirlNameILSS, "sextraktir", "fuckstart" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:238:4")))
                             else:
-                                call ShowImage(GirlNameILSS, "sexstreet", "fuck" + str(renpy.random.randint(1, 4)))
+                                call ShowImage(GirlNameILSS, "sexstreet", "fuck" + str(procedural_randint(1, 4, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:240:5")))
                     else:
                         "Вы продолжаете трахать молоденькую мулатку на весу, и она стонет от наслаждения."
                         if renpy.has_label("ShowImage"):
                             if GirlLocILSS == "tavern":
-                                call ShowImage(GirlNameILSS, "sextraktir", "fuck" + str(renpy.random.randint(1, 3)))
+                                call ShowImage(GirlNameILSS, "sextraktir", "fuck" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:245:6")))
                             else:
-                                call ShowImage(GirlNameILSS, "sexstreet", "fuck" + str(renpy.random.randint(1, 4)))
+                                call ShowImage(GirlNameILSS, "sexstreet", "fuck" + str(procedural_randint(1, 4, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:247:7")))
                 else:
                     if CockInPussy.get(GirlNameILSS, 0) == 0:
                         "Из-за выросшего животика она встает раком, а вы начинаете сношать ее сзади."
                         if renpy.has_label("ShowImage"):
                             if GirlLocILSS == "tavern":
-                                call ShowImage(GirlNameILSS, "sextraktir", "fuckstart" + str(renpy.random.randint(1, 2)))
+                                call ShowImage(GirlNameILSS, "sextraktir", "fuckstart" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:253:8")))
                             else:
-                                call ShowImage(GirlNameILSS, "sexstreet", "rakomstart" + str(renpy.random.randint(1, 2)))
+                                call ShowImage(GirlNameILSS, "sexstreet", "rakomstart" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:255:9")))
                     else:
                         "Вы наращиваете темп, чувствуя как ребенок в ее животе шевелится при каждом толчке."
                         if renpy.has_label("ShowImage"):
                             if GirlLocILSS == "tavern":
-                                call ShowImage(GirlNameILSS, "sextraktir", "fuck" + str(renpy.random.randint(1, 3)))
+                                call ShowImage(GirlNameILSS, "sextraktir", "fuck" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:260:10")))
                             else:
-                                call ShowImage(GirlNameILSS, "sexstreet", "rakom" + str(renpy.random.randint(1, 6)))
+                                call ShowImage(GirlNameILSS, "sexstreet", "rakom" + str(procedural_randint(1, 6, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:262:11")))
 
                 $ Arousal["You"] = Arousal.get("You", 0) + 20
                 $ Arousal[GirlNameILSS] = Arousal.get(GirlNameILSS, 0) + 26

@@ -61,7 +61,7 @@ label AmandaAtGloryHole_menu:
             else:
                 "Ах ты шлюха! Что это ты себе позволяешь, да еще в твоем-то возрасте?"
 
-            if (Amanda.corruption >= 35 and renpy.random.randint(1, 2) == 1) or Amanda.corruption >= 45:
+            if (Amanda.corruption >= 35 and procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AmandaAtGloryHole.rpy:procedural_randint:64:1") == 1) or Amanda.corruption >= 45:
                 if Amanda.var_int("glorydeflower", 0) > 0 or Amanda.var_int("fuckyou", 0) > 0:
                     "\"Кто бы говорил, хозяин, кто бы говорил,\" нагло ответила вам Аманда, не отводя взгляда. \"Раньше-то ты совсем по другому пел, когда в меня свою висюльку совал. А теперь он у тебя что, не стоит больше, что ты так разорался? Ну и ори дальше себе, коли так нравится.\""
                 elif Amanda.var_int("glorysuck", 0) > 0 or Amanda.var_int("suckyou", 0) > 0:
@@ -70,16 +70,14 @@ label AmandaAtGloryHole_menu:
                     "\"Кто бы говорил, хозяин, кто бы говорил,\" нагло ответила вам Аманда, не отводя взгляда. \"На словах ты прямо евнух, а на деле здесь бордель устроил, с глорихолом и Лизеттой. Не выросла у тебя указывалка мне указывать, так то хозяин.\""
                 "С этими словами борзая Аманда гордо развернулась и вышла. Лизетта же, с интересом выслушав вашу перепалку, лишь пожала плечами. Вы пробормотали Лизетте чтобы она не впутывала Аманду в свои дела, но прозвучала ваша речь неубедительно и вы замолкли. Похоже, больше вам здесь делать нечего."
                 $ Amanda.change_social(corruption_delta=-1)
-                $ sluttiness["liza"] = sluttiness.get("liza", 0) - 1
-                $ Friends["liza"] = max(0, Friends.get("liza", 0) - 1)
+                $ Liza.change_social(friend_delta=-1, corruption_delta=-1)
             else:
                 "\"Но Стефан, Лизетта не старше меня, а она умеет так много, я только хотела научится..\" - несмело отвечает вам Аманда.\n\"Молчать, научиться она видите ли хотела! Иди вон отсюда, шлюха! А ты, Лизетта, больше не впутывай Аманду в свое распутство, понятно?\""
                 "Аманда в слезах убежала, а Лизетта, надувшись, села в угол. Вы немножко погордились своими высокими моральными принципами, впрочем долго гордится вам надоело, а больше здесь делать нечего."
                 $ Amanda.change_social(corruption_delta=-5)
-                $ sluttiness["liza"] = sluttiness.get("liza", 0) - 2
-                $ Friends["liza"] = max(0, Friends.get("liza", 0) - 5)
+                $ Liza.change_social(friend_delta=-5, corruption_delta=-2)
 
-            $ CumFaceYou["amanda"] = 0
+            $ Amanda.clear_cum("cum_face_you")
             $ Amanda.set_var_int("gloryscold", 1)
             $ Amanda.set_var_int("glorywalkout", 0)
             $ Amanda.change_social(friend_delta=-5)
@@ -88,7 +86,7 @@ label AmandaAtGloryHole_menu:
 
         "Развернуться и уйти, ничего не говоря" if AmandaGloryCurState <= 2 or AmandaGloryCurState == 4:
             
-            $ CumFaceYou["amanda"] = 0
+            $ Amanda.clear_cum("cum_face_you")
             $ Amanda.set_var_int("glorywalkout", 1)
             jump TavernMain
 
@@ -105,72 +103,69 @@ label AmandaAtGloryHole_menu:
                 "Без малейших колебаний Аманда заглотила ваш член своим ротиком, под одобрительным взглядом Лизетты."
             else:
                 "В ее глазах мелькнула тень сомнения, но в следующую секунду Лизетта сказала: \"Амандочка, давай, не стесняйся!\" и сомнение сменилось решимостью. Аманда хоть и покраснела, но все-так взяла ваш детородный орган в свой рот."
-            if int(Amanda.stats.get("sexacts", 0) or 0) < 15:
+            if int(Amanda.sex_stat("sexacts", 0) or 0) < 15:
                 "Устроившись поудобнее Аманда начала хоть и не умело, но с энтузиазмом, делать вам минет."
             else:
                 "Споро устроившись Аманда начала вполне сноровисто отсасывать у вас, не забывая ласкать ваши яйца."
-            if Amanda.var_int("knowsexactive", 0) or int(Amanda.stats.get("sexacts", 0) or 0) >= 3 or int(Amanda.stats.get("pregnancy", 0) or 0) > 120:
+            if Amanda.var_int("knowsexactive", 0) or int(Amanda.sex_stat("sexacts", 0) or 0) >= 3 or int(Amanda.sex_stat("pregnancy", 0) or 0) > 120:
                 "Вы еще раз про себя поразились, как быстро преобразилась Аманда. Кажется, еще недавно она была такой всей из себя пай-девочкой, а теперь как ни в чем не бывало сосет ваш член, даже не стеснеясь присутствия подруги. Не успели вы додумать эту мысль, как почувствовали что вот-вот кончите."
-                call SlutFriendsIncrease("amanda", 15, 1, 1, 45, 1, 1)
+                $ Amanda.apply_social_chance(15, 1, 1, 45, 1, 1, "glory_hole_suck")
             else:
                 "Осознание того, что у вас сосет пай-девочка Амандочка возбуждало вас вне всякой меры. Вскоре вы почувствовали что уже очень близки к оргазму."
-                call SlutFriendsIncrease("liza", 10, 1, 1, 40, 1, 1)
-                call SlutFriendsIncrease("amanda", 15, 1, 3, 45, 1, 3)
+                $ Liza.apply_social_chance(10, 1, 1, 40, 1, 1, "glory_hole_suck")
+                $ Amanda.apply_social_chance(15, 1, 3, 45, 1, 3, "glory_hole_suck")
             $ Amanda.set_var_int("glorysuck", 1)
             $ Amanda.set_var_int("suckyou", 1)
             $ Amanda.set_var_int("gloryscold", 0)
             $ Amanda.set_var_int("glorywalkout", 0)
             $ AmandaGloryCurState = 3
-            if renpy.has_label("ShowImageSeq"):
-                call ShowImageSeq("amanda", "gloryfirst", "minet", 3)
+            call ShowImageSeq("amanda", "gloryfirst", "minet", 3)
             jump AmandaAtGloryHole_menu
 
         "Предложить ей продолжить" if AmandaGloryCurState == 1:
             
             "\"Ах, Аманда, Аманда,\" сказали вы. \"Это ведь ты только что у меня отсасывала? Так что же ты остановилась, продолжай же!\" С этими словами вы придвинули свой член, на котором уже блестели капли слюны Аманды к ее губкам."
-            if int(Amanda.stats.get("sexacts", 0) or 0) < 15:
+            if int(Amanda.sex_stat("sexacts", 0) or 0) < 15:
                 "В ее глазах мелькнуло сомнение, испуг, стыд, но в следующую секунду это все сменилось выражением решимости. Аманда опять заглотила ваш член и, постепенно распаляясь, продолжила делать вам минет."
             else:
                 "Ничуть не удивившись вашему предложению Аманда с готовностью взяла ваш член в свой очаровательный ротик и продолжила свое дело."
-            if Amanda.var_int("knowsexactive", 0) or int(Amanda.stats.get("sexacts", 0) or 0) >= 3 or int(Amanda.stats.get("pregnancy", 0) or 0) > 120:
+            if Amanda.var_int("knowsexactive", 0) or int(Amanda.sex_stat("sexacts", 0) or 0) >= 3 or int(Amanda.sex_stat("pregnancy", 0) or 0) > 120:
                 "Вы подумали про себя, что Амандочка из недавней пай-девочки быстро превращается, а может уже и превратилась, в маленькую шлюшку, с готовностью сосущую любой член, будь-то член незнакомца или ваш. Эта мысль, вместе с активной помощью Аманды, довели вас до оргазма."
-                call SlutFriendsIncrease("amanda", 15, 1, 1, 45, 1, 1)
+                $ Amanda.apply_social_chance(15, 1, 1, 45, 1, 1, "glory_hole_continue")
             else:
                 "Осознание того, что пай-девочка Амандочка сначала отсасывала у вас через глорихол, даже не зная что это вы, а теперь продолжает сосать, уже смотря вам в глаза, возбуждало вас вне всякой меры. Вскоре вы почувствовали что уже очень близки к оргазму."
-                call SlutFriendsIncrease("liza", 10, 1, 1, 40, 1, 1)
-                call SlutFriendsIncrease("amanda", 15, 1, 3, 45, 1, 3)
+                $ Liza.apply_social_chance(10, 1, 1, 40, 1, 1, "glory_hole_continue")
+                $ Amanda.apply_social_chance(15, 1, 3, 45, 1, 3, "glory_hole_continue")
             $ Amanda.set_var_int("glorysuck", 1)
             $ Amanda.set_var_int("suckyou", 1)
             $ Amanda.set_var_int("gloryscold", 0)
             $ Amanda.set_var_int("glorywalkout", 0)
             $ AmandaGloryCurState = 3
-            if renpy.has_label("ShowImageSeq"):
-                call ShowImageSeq("amanda", "gloryfirst", "minet", 3)
+            call ShowImageSeq("amanda", "gloryfirst", "minet", 3)
             jump AmandaAtGloryHole_menu
 
         "Кончить на лицо" if AmandaGloryCurState == 2:
             
             "Перед самым оргазмом вы вытащили член изо рта Аманды и кончили ей на лицо. Крупные белые капли потекли по ее щечкам и подбородку, одна струйка попала ей в левый глаз, отчего она зажмурилась, а пара капель осталась в ее белокурых локонах."
             "Лизетта, которая надрачивала себя глядя на вас, подскочила, слизала несколько капель с лица Аманды, сказав \"ням-ням\"."
-            if Amanda.corruption >= 40 and int(Amanda.stats.get("sexacts", 0) or 0) > 10:
+            if Amanda.corruption >= 40 and int(Amanda.sex_stat("sexacts", 0) or 0) > 10:
                 "Не отстала от нее и сама Аманда, сначала собрав часть вашего семени пальцами у себя с лица, а потом, с пошлой улыбочкой, эти пальцы облизав."
             $ Amanda.pregnancy_check("mouthface", 1, "Вы")
             $ Amanda.set_var_int("glorysuck", 1)
             $ Amanda.set_var_int("suckyou", 1)
             $ AmandaGloryCurState = 4
-            if renpy.has_label("ShowImage"):
-                call ShowImage("amanda", "gloryfirst", "cummouth")
+            call ShowImage("amanda", "gloryfirst", "cummouth")
             jump AmandaAtGloryHole_menu
 
         "Кончить в рот" if AmandaGloryCurState == 3:
             
             "Вы и не подумали вытащить член изо рта Аманды когда начали кончать."
-            if Amanda.corruption >= 40 or int(Amanda.stats.get("sexacts", 0) or 0) > 12:
+            if Amanda.corruption >= 40 or int(Amanda.sex_stat("sexacts", 0) or 0) > 12:
                 "Впрочем, врасплох вы ее не застали, Аманда без смущения и с готовностью приняла вашу кончину."
             else:
                 "Глаза у нее чуть было от удивления не полезли на лоб с непривычки, но она быстро опомнилась и начала судорожно сглатывать ваше семя."
             "Все, впрочем, проглотить ей не удалось и маленькие белые струйки потекли у нее по уголкам губ. Лизетта, которая надрачивала себя глядя на вас, подошла и поцеловала Аманду прямо в губы."
-            if Amanda.corruption >= 45 and int(Amanda.stats.get("sexacts", 0) or 0) > 15:
+            if Amanda.corruption >= 45 and int(Amanda.sex_stat("sexacts", 0) or 0) > 15:
                 "Та не растерялась и ответила на поцелуй подружки, передав ей язычком часть спермы. Улыбнувшись как две довольных кошечки девчушки скушали вкусняшку."
             else:
                 "Лизетта забрала у нее часть вашей спермы и не замедлила проглотить, сказав \"ням-ням\"."
@@ -178,8 +173,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.set_var_int("glorysuck", 1)
             $ Amanda.set_var_int("suckyou", 1)
             $ AmandaGloryCurState = 4
-            if renpy.has_label("ShowImage"):
-                call ShowImage("amanda", "gloryfirst", "cummouth")
+            call ShowImage("amanda", "gloryfirst", "cummouth")
             jump AmandaAtGloryHole_menu
 
         "Поцеловать Аманду" if AmandaGloryCurState == 4:
@@ -187,31 +181,29 @@ label AmandaAtGloryHole_menu:
             "Не говоря ни слова, вы наклонились и поцеловали Аманду, чувствуя на ее губах и языке привкус собственной спермы. Аманда с радостью ответила на ваш поцелуй, переплетя ваш язык своим. Продолжая целоваться вы вдруг почуствовали жаркий ротик Лизетты на своем обмякшем было члене. Поцелуи Аманды и лизеттин ротик начали быстро приводить вас обратно в полную готовность."
             $ AmandaGloryCurState = 5
             $ Amanda.set_var_int("gloryyouknow", 1)
-            $ _kiss_image = "kiss" + str(renpy.random.randint(1, 2))
-            if renpy.has_label("ShowImage"):
-                call ShowImage("amanda", "gloryfirst", _kiss_image)
+            $ _kiss_image = "kiss" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AmandaAtGloryHole.rpy:procedural_randint:184:2"))
+            call ShowImage("amanda", "gloryfirst", _kiss_image)
             jump AmandaAtGloryHole_menu
 
         "Поблагодарить Аманду" if AmandaGloryCurState == 4:
             
             "Вы пылко поблагодарили Аманду, сказав что вам было очень приятно и вы ей очень признательны. Аманда зарделась, пробормотала \"Я тоже люблю тебя, Стефанчик\" и убежала."
-            call SlutFriendsIncrease("amanda", 15, 1, 1, 0, 0, 0)
-            $ CumFaceYou["amanda"] = 0
+            $ Amanda.apply_social_chance(15, 1, 1, 0, 0, 0, "glory_hole_thanks")
+            $ Amanda.clear_cum("cum_face_you")
             $ Amanda.set_var_int("gloryyouknow", 1)
-            if renpy.has_label("ShowImage"):
-                call ShowImage("amanda", "gloryfirst", "ambush")
+            call ShowImage("amanda", "gloryfirst", "ambush")
             $ AmandaGloryCurState = 10
             jump TavernMain
 
         "Трахнуть Аманду" if AmandaGloryCurState == 4 or AmandaGloryCurState == 5:
             
-            if Amanda.stats.get("virginity", True):
+            if Amanda.sex_stat("virginity", True):
                 "Преодолев слабое сопротивление вы уложили Аманду на лавочку. Она поняла, что сейчас произойдет, но и не подумала возразить, наоборот, сама раздвинула ножки, только сказала: \"Стефанчик, я еще девушка, будь нежным\". Лизетта направила своей рукой ваш стоящий колом член прямо в киску своей подруги. Резкий толчок, вскрик Аманды и вот Аманда уже больше не девочка."
                 "Вы замерли на пару минут, давая ей привыкнуть к вашему члену внутри нее, а потом начали двигаться, постепенно наращивая темп. Вскрики от боли вскоре утихли, сменившись совсем другими ощущениями. Аманда начала стонать все громче и громче, потом закинула свои стройные ножки вам за спину и прижала вас к себе."
                 "\"Ох Стефан, миленький, хорошо то как, продолжай!\" шептала она вам в ухо. И вдруг, с длинным протяжным стоном Аманда изогнулась от первого в своей жизни оргазма испытанного от мужского члена. Вы тоже очень близки к тому, чтобы кончить."
             else:
                 "Нежно поцеловав Аманду вы уложили ее на лавку. Она и не подумала вам возражать, с готовностью раздвинув ножки."
-                if int(Amanda.stats.get("sexacts", 0) or 0) > 15 and int(Amanda.stats.get("cuminside", 0) or 0) >= 10:
+                if int(Amanda.sex_stat("sexacts", 0) or 0) > 15 and int(Amanda.sex_stat("cuminside", 0) or 0) >= 10:
                     "Ваш член легко вошел в Аманду."
                 else:
                     "С некоторым трудом вы вошли в тесную пещерку Аманды, не встретив на пути девственной плевы."
@@ -220,7 +212,7 @@ label AmandaAtGloryHole_menu:
                 $ VirginNotKnow = 0
                 if Amanda.var_int("fuckyou", 0) == 0 and Amanda.var_int("knownotvirgin", 0) == 0:
                     "\"Оба-на, а ведь Аманда-то уже не девочка!\" потрясенно осознали вы."
-                    if int(Amanda.stats.get("pregnancy", 0) or 0) > 120:
+                    if int(Amanda.sex_stat("pregnancy", 0) or 0) > 120:
                         "\"Наличие отсутствия девственности прекрасно объясняет ее округлившийся животик,\" решили вы, отбросив прежние гипотезы о непорочном зачатии и божественном вмешательстве."
                     elif Amanda.var_int("knowlegaresex", 0) or Amanda.var_int("sawlegaresex", 0):
                         "Собственно, после забав Аманды с месье Легаре удивительным было бы обратное."
@@ -233,97 +225,95 @@ label AmandaAtGloryHole_menu:
                 if VirginNotKnow:
                     "Вы вспомнили, что так и не узнали как и с кем Аманда лишилась девственности. А ведь вы всегда отличались здоровым любопытством!"
                 "Несколько минут траха - и протяжным стоном Аманда кончила на вашем члене. Недолго осталось и вам, вы тоже кончаете."
-            $ Amanda.stats["orgasms_given"] = int(Amanda.stats.get("orgasms_given", 0) or 0) + 1
+            $ Amanda.add_sex_stat("orgasms_given", 1)
             $ AmandaGloryCurState = 6
             $ Amanda.set_var_int("fuckyou", 1)
             $ Amanda.set_var_int("knownotvirgin", 1)
-            if Amanda.stats.get("virginity", True):
+            if Amanda.sex_stat("virginity", True):
                 $ Amanda.set_var_int("glorydeflower", 1)
-            if renpy.has_label("ShowImageSeq"):
-                call ShowImageSeq("amanda", "gloryfirst", "fuck", 6)
+            call ShowImageSeq("amanda", "gloryfirst", "fuck", 6)
             jump AmandaAtGloryHole_menu
 
         "Кончить в Аманду" if AmandaGloryCurState == 6:
             
             "Даже и не подумав вытащить свой член из Аманды вы начали кончать. Струи вашего семени ударили в маточку Аманды, заполняя ее до краев. Когда ваш обмякший член в конце концов вывалился из Аманды, то из влагалища девушки медленно начало вытекать ваше семя."
-            if Amanda.stats.get("virginity", True):
+            if Amanda.sex_stat("virginity", True):
                 "Оно перемешалось с ее девственной кровью и собственным соком."
             else:
                 "Оно перемешалось с ее соком."
             "С трудом пришедшая в себя после оргазма Аманда собрала пару капель пальцем."
-            if Amanda.corruption >= 45 and int(Amanda.stats.get("sexacts", 0) or 0) > 15:
+            if Amanda.corruption >= 45 and int(Amanda.sex_stat("sexacts", 0) or 0) > 15:
                 "Она с аппетитом скушала их, похотливо улыбнувшись."
             else:
                 "Она начала их рассматривать."
-            if int(Amanda.stats.get("cuminside", 0) or 0) < 2:
+            if int(Amanda.sex_stat("cuminside", 0) or 0) < 2:
                 "\"Вот от нее-то дети и рождаются?\" немного наивно осведомилась она."
-            if int(Amanda.stats.get("pregnancy", 0) or 0) > 120:
+            if int(Amanda.sex_stat("pregnancy", 0) or 0) > 120:
                 "\"Эх, вот оттого что вы, парни, не можете вовремя вытащить, у меня теперь такой животик,\" заметила Аманда, нежно погладив свое пузико."
             else:
-                $ tmpCumInside = dyneval(GetSexNum, "amanda", "you", "inside")
+                $ tmpCumInside = Amanda.sex_count("you", "inside")
                 if Amanda.corruption >= 60:
                     "\"Какой ты пошлый, Стефанчик,\" игриво заметила Аманда. \"Не только трахаешь меня, но и, похоже, пытаешься обрюхатить. Посмотри, сколько ты накончал!\" С этими словами Аманда раздвинула ножки, предоставив вам на обозрение свою полную спермы киску."
-                elif tmpCumInside == 0 and int(Amanda.stats.get("cuminside", 0) or 0) >= 2:
+                elif tmpCumInside == 0 and int(Amanda.sex_stat("cuminside", 0) or 0) >= 2:
                     "\"Эх, и ты тоже такой же как все, Стефанчик, кончаешь внутрь а о последствиях и не думаешь,\" несколько туманно заметила Аманда."
-                elif tmpCumInside == 0 and int(Amanda.stats.get("cuminside", 0) or 0) < 2:
+                elif tmpCumInside == 0 and int(Amanda.sex_stat("cuminside", 0) or 0) < 2:
                     "\"Эх Стефанчик-Стефанчик, мог бы ведь и вытащить. Но все равно, было так здорово, что надо будет потом повторить.\""
                 else:
                     "\"Стефан, я же уже не раз просила тебя вытаскивать!\" строго отчитала вас девушка. \"Сколько можно, говоришь, говоришь, а ты ноль внимания. Как будто нарочно.\""
-            if Amanda.corruption >= 60 or int(Amanda.stats.get("pregnancy", 0) or 0) > 120:
+            if Amanda.corruption >= 60 or int(Amanda.sex_stat("pregnancy", 0) or 0) > 120:
                 "\"Ты умничка,\" сказала ей Лизетта. \"А теперь давай я тебя почищу, ух ням-ням\"."
             else:
                 "\"Да ладно тебе, подруга\", ответила ей Лизетта. \"Не так уж и велик риск. Расслабся и не бойся. А пока, давай я тебя почищу\"."
-            if Amanda.stats.get("virginity", True):
+            if Amanda.sex_stat("virginity", True):
                 "И с этими словами развратная Жоржеттина дочка начала вылизывать язычком киску Аманды, очищая ее от семени, крови и соков."
             else:
                 "И с этими словами развратная Жоржеттина дочка начала вылизывать язычком киску Аманды, очищая ее от семени и соков."
             "\"Вся в маму!\" подумали вы. Когда же Лизетта закончила, Аманда оделась, застегнулась, вытерлась, чмокнула вас еще раз и довольная убежала."
-            call SlutFriendsIncrease("liza", 10, 1, 1, 40, 1, 1)
-            call SlutFriendsIncrease("amanda", 18, 1, 2, 55, 1, 2)
-            if Amanda.stats.get("virginity", True):
-                call SlutFriendsIncrease("amanda", 0, 0, 0, 55, 1, 2)
+            $ Liza.apply_social_chance(10, 1, 1, 40, 1, 1, "glory_hole_first_sex")
+            $ Amanda.apply_social_chance(18, 1, 2, 55, 1, 2, "glory_hole_first_sex")
+            if Amanda.sex_stat("virginity", True):
+                $ Amanda.apply_social_chance(0, 0, 0, 55, 1, 2, "glory_hole_first_sex")
             $ Amanda.pregnancy_check("inside", 1, "Вы")
-            $ CumFaceYou["amanda"] = 0
-            $ Amanda.stats["virginity"] = False
+            $ Amanda.clear_cum("cum_face_you")
+            $ Amanda.set_sex_stat("virginity", False)
             $ AmandaGloryCurState = 10
-            $ _cumpussy_image = "cumpussy" + str(renpy.random.randint(1, 2))
-            if renpy.has_label("ShowImage"):
-                call ShowImage("amanda", "gloryfirst", _cumpussy_image)
+            $ _cumpussy_image = "cumpussy" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AmandaAtGloryHole.rpy:procedural_randint:280:3"))
+            call ShowImage("amanda", "gloryfirst", _cumpussy_image)
             jump TavernMain
 
         "Кончить на животик" if AmandaGloryCurState == 6:
             "Не желая рисковать вы в последний момент вытащили свой член и кончили Аманде на животик. С трудом пришедшая в себя после оргазма Аманда собрала пару капель пальцем."
-            if Amanda.corruption >= 45 and int(Amanda.stats.get("sexacts", 0) or 0) > 15:
+            if Amanda.corruption >= 45 and int(Amanda.sex_stat("sexacts", 0) or 0) > 15:
                 "Она с аппетитом скушала их, похотливо улыбнувшись."
             else:
                 "Она начала их рассматривать."
-            if int(Amanda.stats.get("cuminside", 0) or 0) < 2:
+            if int(Amanda.sex_stat("cuminside", 0) or 0) < 2:
                 "\"Вот от нее-то дети и рождаются?\" немного наивно осведомилась она."
-            if int(Amanda.stats.get("pregnancy", 0) or 0) > 120:
+            if int(Amanda.sex_stat("pregnancy", 0) or 0) > 120:
                 "\"Да мог бы и в меня, разницы уже особой нет,\" заметила Аманда, размазывая ваше семя по своему беременному животу."
             else:
-                $ tmpCumInside = dyneval(GetSexNum, "amanda", "you", "inside")
+                $ tmpCumInside = Amanda.sex_count("you", "inside")
                 if Amanda.corruption >= 60:
                     "\"Да мог бы и внутрь спустить,\" игриво заметила Аманда. \"Мне бы так даже приятнее было.\""
-                elif tmpCumInside == 0 and int(Amanda.stats.get("cuminside", 0) or 0) >= 2:
+                elif tmpCumInside == 0 and int(Amanda.sex_stat("cuminside", 0) or 0) >= 2:
                     "\"Молодец, Стефанчик, что не в меня. Стараешься, обо мне заботишься, не то что некоторые,\" несколько туманно заметила Аманда."
                 else:
                     "\"Молодец, Стефанчик, что не в меня. Эх, как здорово было-то, надо будет потом обязательно повторить.\""
-            if Amanda.stats.get("virginity", True):
+            if Amanda.sex_stat("virginity", True):
                 "\"Ох подруга\", сказала ей Лизетта, \"Поздравляю тебя с избавлением от досадного бремени девства.\""
             else:
                 "\"Видишь, как свезло тебе\", поздравила подругу Лизетта. \"Хотела в отсосе попрактиковаться, а получилось так шикарно потрахаться. Сейчас я тебе помогу.\""
-            if Amanda.stats.get("virginity", True):
+            if Amanda.sex_stat("virginity", True):
                 "И с этими словами развратная Жоржеттина дочка начала вылизывать язычком киску Аманды, очищая ее от крови и соков. А закончив, она перешла на животик, слизав с него сперму."
             else:
                 "И с этими словами развратная Жоржеттина дочка начала вылизывать язычком киску Аманды, очищая ее от соков. А закончив, она перешла на животик, слизав с него сперму."
             "\"Вся в маму!\" подумали вы. Когда же Лизетта закончила, Аманда оделась, застегнулась, вытерлась, чмокнула вас еще раз и довольная убежала."
-            call SlutFriendsIncrease("liza", 10, 1, 1, 40, 1, 1)
-            call SlutFriendsIncrease("amanda", 18, 1, 2, 45, 1, 1)
-            if Amanda.stats.get("virginity", True):
-                call SlutFriendsIncrease("amanda", 18, 1, 1, 45, 1, 1)
+            $ Liza.apply_social_chance(10, 1, 1, 40, 1, 1, "glory_hole_sex")
+            $ Amanda.apply_social_chance(18, 1, 2, 45, 1, 1, "glory_hole_sex")
+            if Amanda.sex_stat("virginity", True):
+                $ Amanda.apply_social_chance(18, 1, 1, 45, 1, 1, "glory_hole_sex")
             $ AmandaGloryCurState = 10
             $ Amanda.pregnancy_check("outside", 1, "Вы")
-            $ CumFaceYou["amanda"] = 0
-            $ Amanda.stats["virginity"] = False
+            $ Amanda.clear_cum("cum_face_you")
+            $ Amanda.set_sex_stat("virginity", False)
             jump TavernMain

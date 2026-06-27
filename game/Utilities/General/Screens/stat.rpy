@@ -256,7 +256,7 @@ init python:
             pass
 
         try:
-            if _player_int(AmandaVar.get("knowlegaresex", 0), 0) > 0 or _player_int(AmandaVar.get("alberfriends", 0), 0) >= 9:
+            if Amanda.var_int("knowlegaresex", 0) > 0 or Amanda.var_int("alberfriends", 0) >= 9:
                 score += 10
         except Exception:
             pass

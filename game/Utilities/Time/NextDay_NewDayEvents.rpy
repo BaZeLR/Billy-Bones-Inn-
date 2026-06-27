@@ -40,8 +40,6 @@ label NextDay_NewDayEvents():
         IngaVar = _nd_ensure_dict("IngaVar")
         GiveOrgasms = _nd_ensure_dict("GiveOrgasms")
         DayLastOrgasmGiven = _nd_ensure_dict("DayLastOrgasmGiven")
-        virginity = _nd_ensure_dict("virginity")
-        sexacts = _nd_ensure_dict("sexacts")
         pantiesdef = _nd_ensure_dict("pantiesdef")
         FranBusy = _nd_ensure_fran_busy()
         Georgett.ensure_story_defaults()
@@ -64,8 +62,6 @@ label NextDay_NewDayEvents():
         IngaVar.setdefault("Knowher", 0)
         Amanda.ensure_story_defaults()
 
-        virginity.setdefault("amanda", 1)
-        sexacts.setdefault("amanda", 0)
         pantiesdef.setdefault("liza", "")
         store.BreakfastToday = False
         tavern_kitchen_reset_daily_hearth_state()
@@ -90,9 +86,9 @@ label NextDay_NewDayEvents():
                 _becky_story['EddieGeorg'] = max(_becky_story['EddieGeorg'], 2)
                 _becky_story['EddieWhoreHome'] = 0
             # Теперь определим успех на сегодня, по пятницам жоржи не приходит
-            if renpy.random.randint(1, Eddie.var['WhoreVisitFreq']) == 1 and week != 5:
+            if procedural_randint(1, Eddie.var['WhoreVisitFreq'], key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:93:1") == 1 and week != 5:
                 if _becky_story['visitedhome'] >= 5 and Eddie.var['SawMomSex'] > 0 and _becky_story['HomeSex'] > 0:
-                    if renpy.random.randint(1, 10) <= 1 + _becky_story['EddieWhoreHome'] * 5 + (3 if _becky_story['EddieGeorg'] > 1 else 0):
+                    if procedural_randint(1, 10, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:95:2") <= 1 + _becky_story['EddieWhoreHome'] * 5 + (3 if _becky_story['EddieGeorg'] > 1 else 0):
                         _becky_story['EddieWhoreHome'] = 4
                     else:
                         _becky_story['EddieWhoreHome'] += 2
@@ -101,13 +97,13 @@ label NextDay_NewDayEvents():
             if _becky_story['EddieWhoreHome'] in (2, 3) and _georgett_work_location in ("TavernMain", "PortStreets"):
                 TodaySexEvents_Add('georgett', 3, 99, 'Prostitution')
         elif Eddie.var['TalkedAboutWhores'] == 1 and _georgett_work_location in ("TavernMain", "PortStreets"):
-            if renpy.random.randint(1, Eddie.var['WhoreVisitFreq']) == 1 and week != 5:
+            if procedural_randint(1, Eddie.var['WhoreVisitFreq'], key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:104:3") == 1 and week != 5:
                 TodaySexEvents_Add('georgett', 3, 99, 'Prostitution')
         if Becky.var['EddieWhoreHome'] == 4:
             TodaySexEvents_Add('georgett', 99, 99, 'EddieHomeVisit')
 
         # Визит Легаре к Лизе
-        if renpy.random.randint(1, Alber.var_int("WhoreVisitFreq", 3)) == 1 and week != 5 and Liza.story_value("ProstStart", 0) and _liza_work_location == "PortStreets":
+        if procedural_randint(1, Alber.var_int("WhoreVisitFreq", 3), key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:110:4") == 1 and week != 5 and Liza.story_value("ProstStart", 0) and _liza_work_location == "PortStreets":
             TodaySexEvents_Add('liza', 3, 99, 'Prostitution')
 
         Becky.ensure_story_defaults()
@@ -119,9 +115,9 @@ label NextDay_NewDayEvents():
 
         # К Бекки приходят любовники
         if Becky.corruption >= 35 and (Becky.story_value("last_store_orgasm_day", -1) + 2) <= dayspassed and Becky.var['visitedhome'] >= 2 and week != 7:
-            if Becky.corruption >= 55 or renpy.random.randint(1, 2) == 1:
-                TodaySexEvents_Add('becky', 99, renpy.random.randint(1, 3), 'StoreLover')
-        if Becky.var['visitedhome'] >= 7 and renpy.random.randint(1, 3) <= 2 and CheckIfEventAlreadyExist('georgett', 99) <= 0:
+            if Becky.corruption >= 55 or procedural_randint(1, 2, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:122:5") == 1:
+                TodaySexEvents_Add('becky', 99, procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:123:6"), 'StoreLover')
+        if Becky.var['visitedhome'] >= 7 and procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:124:7") <= 2 and CheckIfEventAlreadyExist('georgett', 99) <= 0:
             TodaySexEvents_Add('becky', 99, 99, 'EddieMom')
 
         if week == 7:
@@ -137,7 +133,7 @@ label NextDay_NewDayEvents():
         # Аманда
         if Amanda.corruption >= 22 and TavernGloryHole == 2 and get_random_girl_by_job('jobgloryhole') == 'liza':
             if Amanda.var_int("glorytried", 0) == 0:
-                if renpy.random.randint(1, 3) == 1:
+                if procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:140:8") == 1:
                     TodaySexEvents_Add('amanda', 99, 99, 'glorytry')
             else:
                 GloryChanceDecrease = 0
@@ -151,15 +147,15 @@ label NextDay_NewDayEvents():
                     GloryChanceDecrease -= 3
                 if Amanda.corruption >= 35:
                     GloryChanceDecrease -= 3
-                if virginity['amanda'] == 0:
+                if not bool(Amanda.sex_stat("virginity", True)):
                     GloryChanceDecrease -= 2
-                if sexacts['amanda'] > 15:
+                if Amanda.sex_stat("sexacts", 0) > 15:
                     GloryChanceDecrease += 2
-                if sexacts['amanda'] > 35:
+                if Amanda.sex_stat("sexacts", 0) > 35:
                     GloryChanceDecrease += 3
-                if sexacts['amanda'] > 50:
+                if Amanda.sex_stat("sexacts", 0) > 50:
                     GloryChanceDecrease += 5
-                if renpy.random.randint(1, max(3, 4 + GloryChanceDecrease)) == 1:
+                if procedural_randint(1, max(3, 4 + GloryChanceDecrease), key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:162:9") == 1:
                     TodaySexEvents_Add('amanda', 99, 99, 'glorytry')
         if Amanda.var_int("fucklegare", 0) == 1 and Amanda.var_int("alberfriends", 0) >= 10 and Amanda.corruption >= 35 and week != 5:
             ChanceVar = 6
@@ -173,7 +169,7 @@ label NextDay_NewDayEvents():
                 ChanceVar += 5
             if Amanda.rel >= 15:
                 ChanceVar += 2
-            if renpy.random.randint(1, ChanceVar) == 1:
+            if procedural_randint(1, ChanceVar, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:176:10") == 1:
                 TodaySexEvents_Add('amanda', 3, 99, 'legarerun')
         if int(Amanda.stats.get("sexacts", 0) or 0) >= 5 and Amanda.corruption >= 35 and week != 5:
             ChanceVar = 4
@@ -183,22 +179,22 @@ label NextDay_NewDayEvents():
                 ChanceVar -= 1
             if Amanda.var_int("prohibitwithguys", 0):
                 ChanceVar += 5
-            if renpy.random.randint(1, ChanceVar) == 1:
+            if procedural_randint(1, ChanceVar, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:186:11") == 1:
                 TodaySexEvents_Add('amanda', 2, 99, 'lovermeet')
 
         # Воровство лошадки
-        if MyStallion and retlocname != 'TavernStable' and StolenHorseDays == 0 and renpy.random.randint(1, 40) == 25:
+        if MyStallion and retlocname != 'TavernStable' and StolenHorseDays == 0 and procedural_randint(1, 40, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:190:12") == 25:
             Mongol.var['WillTryToSteal'] = 1
 
         # Бекки предлагает подзаработать
-        if Becky.var['visitedhome'] >= 5 and Becky.rel >= 15 and Becky.var['EddieRobbed'] == 0 and dayspassed > 0 and renpy.random.randint(1, 6) == 1:
+        if Becky.var['visitedhome'] >= 5 and Becky.rel >= 15 and Becky.var['EddieRobbed'] == 0 and dayspassed > 0 and procedural_randint(1, 6, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:194:13") == 1:
             if DailyEventsList_Exists('becky', 'SherwoodQuest') == 0:
                 Becky.var['EddieRobbedDay'] = dayspassed
                 DailyEventsList_Add("becky", "GroceryStore", 1, ">=", 1, 9999, "SherwoodQuest", "BeckyQuestInit")
 
         # Francheska in temple (per-time-slot availability map)
         for i in range(5):
-            FranBusy[i] = 1 if renpy.random.randint(1, 3) == 1 else 0
+            FranBusy[i] = 1 if procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:201:14") == 1 else 0
 
         _run_georgett_nextday_clients = 1
         _georgett_nextday_clients_max = 5

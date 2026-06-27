@@ -241,7 +241,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                             "Ваши руки забрались под декольте [RealName2.get(GirlNameIBS, GirlNameIBS)] и начали мять ее груди через лифчик."
                         else:
                             "Вы начали гладить и мять внушительные сиськи [RealName2.get(GirlNameIBS, GirlNameIBS)] через одежду."
-                        $ _becky_grope_pic = "grope" + str(renpy.random.randint(1, 2))
+                        $ _becky_grope_pic = "grope" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:244:1"))
                         call ShowImage(GirlNameIBS, "sex", _becky_grope_pic)
                     else:
                         if CumTitsYou.get(GirlNameIBS, 0) > 0:
@@ -335,7 +335,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 $ CockInPussy[GirlNameIBS] = 0
                 $ CockInTits[GirlNameIBS] = 0
                 if EddieCockInPussy.get(GirlNameIBS, 0) == 0 and GrupenSex.get("eddie", 0) > 0:
-                    $ _becky_minetalone_pic = "minetalone" + str(renpy.random.randint(1, 3))
+                    $ _becky_minetalone_pic = "minetalone" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:338:2"))
                     call ShowImage(GirlNameIBS, "sex", _becky_minetalone_pic)
                 if Becky.corruption < 40:
                     $ _ibs_inc_arousal("You", 14)
@@ -370,41 +370,41 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                 if Becky.pregnancy_days() < 130 and GrupenSex.get("eddie", 0) == 0:
                     if CockInPussy.get(GirlNameIBS, 0) == 0:
                         "Вы страстно впились поцелуем в губы [RealName2.get(GirlNameIBS, GirlNameIBS)]. Не прекращая целовать ее вы с некоторым трудом приподняли ее в воздух и насадили прямо на свой вздыбленный член. [RealName.get(GirlNameIBS, GirlNameIBS)] сладко охнула и, обхватив вас руками и ногами, стала подниматься и опускаться на вашем друге."
-                        $ _becky_fuckstart_pic = "fuckstart" + str(renpy.random.randint(1, 8))
+                        $ _becky_fuckstart_pic = "fuckstart" + str(procedural_randint(1, 8, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:373:3"))
                         call ShowImage(GirlNameIBS, "sex", _becky_fuckstart_pic)
                     else:
                         "Вы, благодаря своей прекрасной физической форме, трахаете не столь легкую вдову на весу, обняв под ягодицы. После каждого толчка она опускается на ваш член всем своим весом, так что он входит в нее по самые яйца, чуть ли не доставая до матки. [RealName.get(GirlNameIBS, GirlNameIBS)] постанывает от наслаждения каждый раз как вы входите в нее."
-                        $ _becky_fuck_pic = "fuck" + str(renpy.random.randint(1, 9))
+                        $ _becky_fuck_pic = "fuck" + str(procedural_randint(1, 9, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:377:4"))
                         call ShowImage(GirlNameIBS, "sex", _becky_fuck_pic)
                 else:
                     if EddieCockInMouth.get(GirlNameIBS, 0) == 1:
                         if CockInPussy.get(GirlNameIBS, 0) == 0:
                             "Вы посмотрели на то, как Ребекка отсасывает Эдди а потом перевели взгляд на ее истекающую соками дырочку. \"Ну, если это не приглашение, то я заморский гоблин-шахтер,\" подумали вы и резко вошли в любезно подставленную вам щель. Вдова охнула, но быстро приноровилась к вашим возвратно-поступательным движениям, не прекращая делать Эдди минет."
-                            $ _becky_rakomstart_pic = "rakomstart" + str(renpy.random.randint(1, 3))
+                            $ _becky_rakomstart_pic = "rakomstart" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:383:5"))
                             call ShowImage(GirlNameIBS, "sex", _becky_rakomstart_pic)
                         else:
                             "Вы трахаете Бекки сзади, массируя руками ее ягодицы, а она, в свою очередь, продолжает делать минет Эдди. Должно быть ей трудно заниматься двумя делами сразу но справляется. Умница!"
                         $ _ibs_inc_arousal("eddie", 15)
-                        $ _becky_rakom_pic = "rakom" + str(renpy.random.randint(1, 4))
+                        $ _becky_rakom_pic = "rakom" + str(procedural_randint(1, 4, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:388:6"))
                         call ShowImage(GirlNameIBS, "sex", _becky_rakom_pic)
                     elif EddieCockInTits.get(GirlNameIBS, 0) == 1:
                         if CockInPussy.get(GirlNameIBS, 0) == 0:
                             "Ребекка наклонилась над Эдди и трахает его член своими грудями, выставив свою истекающую соками дырочку на ваше обозрение. \"Ну, если это не приглашение, то я верховный маг высших эльфов,\" подумали вы и резко вошли в любезно подставленную вам щель, начав задавать темп вашей небольшой оргии. Вдове ваша помощь пришлась по нраву, она начала подмахивать вам, одновременно продолжая работать над членом Эдди."
-                            $ _becky_rakomstart_pic = "rakomstart" + str(renpy.random.randint(1, 3))
+                            $ _becky_rakomstart_pic = "rakomstart" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:393:7"))
                             call ShowImage(GirlNameIBS, "sex", _becky_rakomstart_pic)
                         else:
                             "Вы трахаете Бекки сзади, массируя руками ее ягодицы, а она, в свою очередь, трахает член Эдди своими дыньками. Ваши толчки задают ей темп, упрощая задачу. Как вы любите помогать людям!"
                         $ _ibs_inc_arousal("eddie", 15)
-                        $ _becky_rakom_pic = "rakom" + str(renpy.random.randint(1, 4))
+                        $ _becky_rakom_pic = "rakom" + str(procedural_randint(1, 4, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:398:8"))
                         call ShowImage(GirlNameIBS, "sex", _becky_rakom_pic)
                     else:
                         if CockInPussy.get(GirlNameIBS, 0) == 0:
                             "Вы страстно впились поцелуем в губы [RealName2.get(GirlNameIBS, GirlNameIBS)]. С трудом оторвавшись от ее губ, вы развернули ее раком и вошли в ее разгоряченное лоно одним движением. Вдовушка охнула и, поймав темп ваших толчков, стала вам умело подмахивать."
-                            $ _becky_rakomstart_pic = "rakomstart" + str(renpy.random.randint(1, 3))
+                            $ _becky_rakomstart_pic = "rakomstart" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:403:9"))
                             call ShowImage(GirlNameIBS, "sex", _becky_rakomstart_pic)
                         else:
                             "Вы трахаете вдову раком на ее кровати. Она умело подмахивает вам, и ваш член входит в нее по самые яйца. Судя по всему [RealName3.get(GirlNameIBS, GirlNameIBS)] это приятно не меньше вашего, она постанывает от наслаждения при каждом толчке."
-                            $ _becky_rakom_pic = "rakom" + str(renpy.random.randint(1, 4))
+                            $ _becky_rakom_pic = "rakom" + str(procedural_randint(1, 4, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:407:10"))
                             call ShowImage(GirlNameIBS, "sex", _becky_rakom_pic)
                 if Becky.pregnancy_days() > 130:
                     "Вы чувствуете как ребенок в животе у [RealName2.get(GirlNameIBS, GirlNameIBS)] двигается каждый раз когда ваш член входит во влагалище."
@@ -478,7 +478,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                         "\"Впрочем,\" услышали вы уже в дверях, \"у меня еще управляющий мой рыжий есть,\" и, оглянувшись перед тем как закрыть за собой дверь, вы увидели что Бекки тянет Эдди поближе к себе. \"Ты ведь не оставишь хозяйку мучаться как этот мужлан, нет?\""
                         $ Becky.apply_pregnancy_check("inside", 1, "eddie")
                     $ Becky.apply_social_roll(3, 1, -1, 0, 0, 0)
-                    $ _becky_angry_pic = "angry" + str(renpy.random.randint(1, 2))
+                    $ _becky_angry_pic = "angry" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:481:11"))
                     call ShowImage(GirlNameIBS, "sex", _becky_angry_pic)
                 else:
                     "Вы поцеловали [RealName.get(GirlNameIBS, GirlNameIBS)], удовлетворенно развалившуюся на кровати, заверили ее что она была бесподобна, но сейчас вам надо возвращаться домой."
@@ -490,7 +490,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                         else:
                             "Эдди помахал вам на прощание рукой и тоже стал одеваться."
                     $ Becky.apply_social_roll(16, 2, 1, 42, 1, 1)
-                    $ _becky_happy_pic = "happy" + str(renpy.random.randint(1, 5))
+                    $ _becky_happy_pic = "happy" + str(procedural_randint(1, 5, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:493:12"))
                     call ShowImage(GirlNameIBS, "sex", _becky_happy_pic)
 
                 $ _ibs_set_arousal("You", 0)

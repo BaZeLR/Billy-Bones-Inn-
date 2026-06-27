@@ -151,7 +151,6 @@ default neshlush = {}
 # Legacy per-girl custom variable tables.
 # These must be defaulted early so bare access works reliably in ready functions
 # and dynamic if conditions (called from labels via py_eval).
-default AmandaVar = {}
 default IrmaVar = {}
 
 # Core NPC/player relation state maps.
@@ -263,12 +262,28 @@ init python:
         key_total = 0
         for index, char_value in enumerate(key_text):
             key_total += (index + 1) * ord(char_value)
+        try:
+            day_value = int(day or 0)
+        except Exception:
+            day_value = 0
+        try:
+            month_value = int(month or 0)
+        except Exception:
+            month_value = 0
+        try:
+            week_value = int(week or 0)
+        except Exception:
+            week_value = 0
+        try:
+            time_value = int(time or 0)
+        except Exception:
+            time_value = 0
         return (
             current_game_day() * 1009
-            + int(day or 0) * 97
-            + int(month or 0) * 53
-            + int(week or 0) * 31
-            + int(time or 0) * 17
+            + day_value * 97
+            + month_value * 53
+            + week_value * 31
+            + time_value * 17
             + key_total
         )
 
@@ -326,6 +341,23 @@ init python:
         if len(values) <= 0:
             return None
         return values[procedural_index(len(values), key)]
+
+    def procedural_random(key=""):
+        return procedural_index(1000000, key) / 1000000.0
+
+    def procedural_shuffle(seq, key=""):
+        if seq is None:
+            return []
+        keyed_values = []
+        for index, value in enumerate(list(seq)):
+            keyed_values.append((procedural_seed("%s:%s:%s" % (key, index, value)), value))
+        keyed_values.sort(key=lambda row: row[0])
+        ordered_values = [value for _, value in keyed_values]
+        try:
+            seq[:] = ordered_values
+            return seq
+        except Exception:
+            return ordered_values
 
     def procedural_randint(a, b=None, key=""):
         if b is None:

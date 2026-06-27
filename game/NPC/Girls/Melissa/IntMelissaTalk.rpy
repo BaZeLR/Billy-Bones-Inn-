@@ -249,7 +249,7 @@ label IntMelissaTalkApply(girl_name="melissa", choice_code=""):
 
     if str(choice_code or "") == "reconcile":
         $ MainTxt = "Вы подошли к Мелиссе и извинились за то, что были к ней несколько невнимательны и грубы последнее время. В свое оправдание вы заметили, что уберечь трактир от разорения очень сложно и всем вам нужно дружно работать вместе, чтобы преуспеть."
-        if renpy.random.randint(1, 3) == 1:
+        if procedural_randint(1, 3, key="procedural:NPC/Girls/Melissa/IntMelissaTalk.rpy:procedural_randint:252:1") == 1:
             $ MainTxt += "\n\nМелисса благосклонно выслушала вас, обняла, поцеловала в щечку и сказала, что очень дорожит вами и все понимает!"
             $ Melissa.change_social(friend_delta=6, open_delta=1, corruption_delta=1)
         else:
