@@ -42,7 +42,7 @@
     "player_friendship": 0
   },
   "custom": {
-    "GeorgettVar": {
+    "story_vars": {
       "seeClients": 0,
       "askClients": 0,
       "askKids": 0,

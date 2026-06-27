@@ -1358,7 +1358,7 @@
         },
         {
           "line": 13,
-          "raw": "if arrive_mode == 'FromDances' and BeckyVar['visitedhome'] < 5:"
+          "raw": "if arrive_mode == 'FromDances' and Becky.var['visitedhome'] < 5:"
         },
         {
           "line": 17,
@@ -5732,32 +5732,6 @@
       "matching_rpy_file": "",
       "rpy_arg_usage": [],
       "descriptional_summary": "arg[0] -> KidId (L7)"
-    },
-    {
-      "location": "Loc",
-      "txt_file": "game/Inn/Loc.txt",
-      "arg_indexes_used": [],
-      "arg_mentions": [],
-      "arg_assignments": [],
-      "outgoing_links": [],
-      "incoming_links": [],
-      "matching_rpy_labels": [
-        {
-          "label": "LOC",
-          "params": "loc_name=\"\"",
-          "file": "game/Inn/loc.rpy",
-          "line": 17
-        },
-        {
-          "label": "loc",
-          "params": "loc_name=\"\"",
-          "file": "game/Inn/loc.rpy",
-          "line": 60
-        }
-      ],
-      "matching_rpy_file": "game/Inn/Loc.rpy",
-      "rpy_arg_usage": [],
-      "descriptional_summary": "No explicit arg assignment in TXT."
     },
     {
       "location": "MarketPlace",

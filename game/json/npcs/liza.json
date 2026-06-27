@@ -42,7 +42,7 @@
     "player_friendship": 0
   },
   "custom": {
-    "LizaVar": {
+    "story_vars": {
       "SawChurchAfterCermon": 0,
       "TalkChurchAfterCermon": 0,
       "TalkChurchAfterCermonGeorgett": 0,

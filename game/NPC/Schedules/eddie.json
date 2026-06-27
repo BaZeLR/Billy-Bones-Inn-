@@ -45,7 +45,7 @@
       "weekdays": [2, 4],
       "start": "20:00",
       "end": "22:59",
-      "location": "PortStreets",
+      "location": "PortStreetsBackAlley",
       "awake": true,
       "talkable": false,
       "priority": 730,

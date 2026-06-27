@@ -79,7 +79,7 @@
     {
       "label": "evening",
       "weekdays": [1, 2, 3, 4, 6, 7],
-      "start": "19:00",
+      "start": "20:30",
       "end": "21:59",
       "location": ["TavernMelissaRoom", "TavernMain", "Backyard"],
       "location_probabilities": [0.55, 0.3, 0.15],
