@@ -7,8 +7,6 @@ default ChurchPurityLastDay = -1
 default ChurchPurityReport = {}
 
 init python:
-    import random
-
     def church_call_label(label_name="", *label_args):
         label = str(label_name or "").strip()
         if label == "" or not renpy.has_label(label):
@@ -36,7 +34,9 @@ init python:
 
     def church_pick_picture(candidates=None):
         loadable = [str(row or "").strip() for row in list(candidates or []) if str(row or "").strip() != "" and renpy.loadable(str(row or "").strip())]
-        return random.choice(loadable) if len(loadable) > 0 else ""
+        if len(loadable) <= 0:
+            return ""
+        return loadable[procedural_randint(0, len(loadable) - 1, "church_pick_picture_%s" % people_to_int(dayspassed, 0))]
 
     def church_sandra_picture():
         return church_pick_picture([
@@ -131,21 +131,14 @@ init python:
 
     def church_purity_girl_keys():
         keys = []
-        try:
-            source_keys = list(sluttiness.keys())
-        except Exception:
-            source_keys = []
-
-        for raw_key in source_keys:
-            key = str(raw_key or "").strip()
-            if key == "" or key.lower() == "you":
+        for raw_key in list(peopleInfo.keys() if isinstance(peopleInfo, dict) else []):
+            key = str(raw_key or "").strip().lower()
+            if key == "" or key == "you":
                 continue
-            if _church_to_int(sluttiness.get(key, 0), 0) <= 0:
+            info = getPersonInfo(key)
+            if info is None or not hasattr(info, "corruption"):
                 continue
-            try:
-                if _church_to_int(age_girls.get(key, 0), 0) < 18:
-                    continue
-            except Exception:
+            if _church_to_int(getattr(info, "corruption", 0), 0) <= 0:
                 continue
             keys.append(key)
         return sorted(keys)
@@ -167,15 +160,18 @@ init python:
         player_resistance = church_purity_player_pressure_resistance()
 
         for key in church_purity_girl_keys():
-            before_value = _church_to_int(sluttiness.get(key, 0), 0)
-            base_percent = random.randint(20, 60)
-            openness_value = _church_to_int(otkroven.get(key, 0), 0)
-            friend_value = _church_to_int(Friends.get(key, 0), 0)
+            info = getPersonInfo(key)
+            if info is None:
+                continue
+            before_value = _church_to_int(getattr(info, "corruption", 0), 0)
+            base_percent = procedural_randint(20, 60, "church_purity_%s_%s" % (key, today))
+            openness_value = _church_to_int(getattr(info, "openness", 0), 0)
+            friend_value = _church_to_int(getattr(info, "rel", 0), 0)
             relation_resistance = min(16, max(0, openness_value // 2) + max(0, friend_value // 3))
             effective_percent = max(20, min(60, base_percent - player_resistance - relation_resistance))
             reduction = max(1, int(round(float(before_value) * float(effective_percent) / 100.0)))
             after_value = max(0, before_value - reduction)
-            sluttiness[key] = after_value
+            info.corruption = after_value
             report[key] = {
                 "before": before_value,
                 "after": after_value,
@@ -205,7 +201,13 @@ init python:
             after_value = _church_to_int(row.get("after", 0), 0)
             if before_value <= after_value:
                 continue
-            name = str(RealName.get(key, key) or key)
+            info = getPersonInfo(key)
+            if info is not None and hasattr(info, "display_name"):
+                name = str(info.display_name() or key)
+            elif info is not None and hasattr(info, "data"):
+                name = str(getattr(info.data, "fullname", key) or key)
+            else:
+                name = str(key or "")
             reduction = max(0, before_value - after_value)
             if reduction >= 18 or after_value <= before_value // 2:
                 change_text = "заметно строже держит себя после службы"
@@ -340,7 +342,7 @@ label ChurchServiceMenu(show_attendees=True):
     $ current_action_items.append(MenuItem("Найти сестричек", Function(main_ui_call_label, "ChurchServiceSisters")))
     $ current_action_items.append(MenuItem("Найти семейство Легаре", Function(main_ui_call_label, "ChurchServiceLegare")))
     $ current_action_items.append(MenuItem("Найти семейство Блэнкеншип", Function(main_ui_call_label, "ChurchServiceBlanken")))
-    if (bool(Georgett.known) or bool(knowsMC.get("georgett", False)) or people_to_int(Georgett.rel, 0) > 0) and people_to_int(Friends.get("georgett", Georgett.rel), 0) >= 2:
+    if (bool(Georgett.known) or people_to_int(Georgett.rel, 0) > 0) and people_to_int(Georgett.rel, 0) >= 2:
         $ current_action_items.append(MenuItem("Найти Жоржетту Брюно", Function(main_ui_call_label, "ChurchServiceGeorgett")))
     $ current_action_items.append(MenuItem("Вернуться к службе", Jump("Church")))
     $ renpy.restart_interaction()

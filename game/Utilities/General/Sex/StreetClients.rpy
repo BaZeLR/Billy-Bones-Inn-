@@ -12,8 +12,8 @@ label street_clients(client_type, girl_name, event_time):
     if int(client_type or 0) != 1:
         jump PortStreets
 
-    $ CurrentRoom = PortStreetsBackAlleyRoom
-    $ CurLoc = "PortStreetsBackAlley"
+    $ CurrentRoom = PortStreetsRoom
+    $ CurLoc = "PortStreets"
     $ location = CurLoc
     $ UI_mode = "event"
     $ current_action_title = "Подворотня"
@@ -33,8 +33,8 @@ label street_clients_watch(client_type=1, girl_name="", event_time=None):
     if int(client_type or 0) != 1:
         jump PortStreets
 
-    $ CurrentRoom = PortStreetsBackAlleyRoom
-    $ CurLoc = "PortStreetsBackAlley"
+    $ CurrentRoom = PortStreetsRoom
+    $ CurLoc = "PortStreets"
     $ location = CurLoc
     $ UI_mode = "event"
     $ current_action_title = "Подворотня"

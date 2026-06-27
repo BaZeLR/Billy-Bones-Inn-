@@ -372,7 +372,7 @@ init python:
                 self.stats["cuminside"] = people_to_int(self.stats.get("cuminside", 0), 0) + 1
                 if people_to_int(self.stats.get("pregnancy", 0), 0) == 0:
                     chance = min(800, people_to_int(self.stats.get("ConceptionChance", 0), 0) * 3)
-                    if renpy.random.randint(1, 1000) <= chance:
+                    if procedural_randint(1, 1000, key="procedural:NPC/Girls/Georgett/InitGeorgett.rpy:procedural_randint:375:1") <= chance:
                         self.stats["pregnancy"] = 1
                         self.stats["pregfather"] = "Вы"
             elif place_key == "tits":
@@ -452,16 +452,10 @@ init python:
                 if self.portstreet_visible_now():
                     self.location = "PortStreets"
                     return "PortStreets"
-                if (
-                    people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0
-                    and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
-                ):
-                    self.location = "PortStreetsBackAlley"
-                    return "PortStreetsBackAlley"
             return location_value
 
         def can_work_portstreets(self):
-            return str(self.getLocation() or "") in ("PortStreets", "PortStreetsBackAlley") and not self.can_work_tavern()
+            return str(self.getLocation() or "") == "PortStreets" and not self.can_work_tavern()
 
         def portstreet_story_unblocked(self):
             return not (
@@ -482,6 +476,26 @@ init python:
 
         def portstreet_visible_now(self):
             return people_to_int(self.var.get("portstreet_visible_now", 0), 0) > 0
+
+        def portstreet_scene_pictures(self):
+            return [
+                path for path in [
+                    "images/georgett/Port/portStreets.png",
+                    "images/georgett/Port/portstreets1.png",
+                    "images/georgett/Port/portStreetsG_1.png",
+                    "images/georgett/Port/port1.jpg",
+                    "images/georgett/Port/port2.jpg",
+                    "images/georgett/Port/port3.jpg",
+                ] if renpy.loadable(path)
+            ]
+
+        def portstreet_scene_picture(self):
+            pictures = self.portstreet_scene_pictures()
+            if not pictures:
+                return self.data.portrait
+            if len(pictures) == 1:
+                return pictures[0]
+            return pictures[procedural_randint(0, len(pictures) - 1, "georgett_portstreets_scene_%s" % people_to_int(dayspassed, 0))]
 
         def portstreet_client_event_available(self):
             return self.portstreet_work_active() and people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0 and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0

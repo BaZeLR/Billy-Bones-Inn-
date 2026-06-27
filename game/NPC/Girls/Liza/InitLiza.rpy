@@ -313,12 +313,6 @@ init python:
 
         def getLocation(self, wday=None, hour=None):
             location_value = super(LizaInfo, self).getLocation(wday, hour)
-            if str(location_value or "") == "PortStreets":
-                if (
-                    people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0
-                    and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
-                ):
-                    return "PortStreetsBackAlley"
             return location_value
 
         def can_work_portstreets(self):
@@ -331,7 +325,7 @@ init python:
         def portstreet_work_active(self):
             return (
                 self.can_work_portstreets()
-                and str(self.getLocation() or "") in ("PortStreets", "PortStreetsBackAlley")
+                and str(self.getLocation() or "") == "PortStreets"
                 and Georgett.portstreet_story_unblocked()
                 and self.portstreet_work_hour()
             )

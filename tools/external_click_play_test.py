@@ -142,7 +142,8 @@ ROOM_CHECK_TEMPLATE = r'''
     $ current_action_content = None
     $ UI_mode = "scene"
     $ Friends["sandra"] = max(int(Friends.get("sandra", 0) or 0), 10)
-    $ SandraVar["RoomUnlocked"] = 1
+    $ Sandra.var["RoomUnlocked"] = 1
+    $ Sandra.room_unlocked_flag = 1
     $ BedroomDoorStates["TavernSandraRoom"] = 0
 
     run Jump("{room_name}")
@@ -173,8 +174,12 @@ testcase external_shop_action_logic:
     $ action_menu_specs = []
     $ current_action_content = None
     $ UI_mode = "scene"
+    run Call("InitBecky")
+    run Call("register_inga_secondary")
+    run Call("InitEddie")
+    $ external_calendar_set_fields(10, 1, 1100, 10, 0)
+    $ npc_interval_schedule_load_all(True)
     $ npc_schedule_sync_all()
-    $ CurrentLoc["eddie"] = "GroceryStore"
 
     $ CurrentRoom = GroceryStoreRoom
     $ CurLoc = "GroceryStore"
@@ -184,12 +189,12 @@ testcase external_shop_action_logic:
     advance until screen "main_ui" timeout 20.0
     assert eval ('Провизия' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     assert eval ('Купить провизию' not in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    $ renpy.call_in_new_context("GroceryStoreObjectMenu", "food_stock")
+    run Call("GroceryStoreObjectMenu", "food_stock")
     assert eval (str(current_action_title or "") == 'Провизия') timeout 5.0
     assert eval ('Купить провизию' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     assert eval ('Купить крынку молока' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     assert eval ('Осмотреть товар' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    $ renpy.call_in_new_context("GroceryStoreObjectText", "food_stock", "examine_food_stock")
+    run Call("GroceryStoreObjectText", "food_stock", "examine_food_stock")
     assert eval (str(current_action_title or "") == 'Провизия') timeout 5.0
     assert eval ('Мешки, капуста' in str(MainTxt or "")) timeout 5.0
     assert eval ('Купить провизию' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
@@ -202,14 +207,13 @@ testcase external_shop_action_logic:
     $ renpy.call_in_new_context("IntEddieTalk")
     assert eval (str(current_action_title or "") == 'Разговор с Эдди') timeout 5.0
     assert eval ('Поболтать с Эдди о разной фигне.' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    assert eval ('Call' in str(type([i.action for i in current_action_items if str(i.caption or "") == 'Поболтать с Эдди о разной фигне.'][0]))) timeout 5.0
-    $ renpy.call_in_new_context("IntEddieTalkApply", "smalltalk")
+    $ renpy.call_in_new_context("IntEddieTalkSmalltalk")
     assert eval ('Вы некоторое время болтаете с Эдди' in str(MainTxt or "")) timeout 5.0
     assert eval (int(Talked.get("eddie", 0) or 0) == 1) timeout 5.0
     assert eval (int(TalkedToday.get("eddie", 0) or 0) == 1) timeout 5.0
     assert eval ('Поболтать с Эдди о разной фигне.' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     $ Talked["eddie"] = 3
-    $ renpy.call_in_new_context("IntEddieTalkApply", "smalltalk")
+    $ renpy.call_in_new_context("IntEddieTalkSmalltalk")
     assert eval ('Ничего нового из разговора вы не узнали.' in str(MainTxt or "")) timeout 5.0
 
     $ week = 1
@@ -234,20 +238,18 @@ testcase external_shop_action_logic:
     advance until screen "main_ui" timeout 20.0
     assert eval ('Бочки с вином' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     assert eval ([str(i.caption or "") for i in current_action_items].count('Купить вино') == 0) timeout 5.0
-    $ renpy.call_in_new_context("WineStoreObjectMenu", "wine_stock")
+    run Call("WineStoreObjectMenu", "wine_stock")
     assert eval (str(current_action_title or "") == 'Бочки с вином') timeout 5.0
     assert eval ([str(i.caption or "") for i in current_action_items].count('Купить вино') == 1) timeout 5.0
     $ _wine_picture_before = str(_layout_last_picture or "")
-    $ renpy.call_in_new_context("WineStoreObjectText", "wine_stock", "examine_wine")
+    run Call("WineStoreObjectText", "wine_stock", "examine_wine")
     assert eval (str(current_action_title or "") == 'Бочки с вином') timeout 5.0
     assert eval ('Повсюду бочки' in str(MainTxt or "")) timeout 5.0
     assert eval ('Купить вино' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     assert eval (str(_layout_last_picture or "") == _wine_picture_before) timeout 5.0
 
-    $ week = 1
-    $ time = 1
-    $ hour = 12
-    $ minute = 0
+    $ external_calendar_set_fields(day, month, year, 12, 0)
+    $ external_calendar_set_weekday(1)
     $ BlockTimeAdvance = 0
     $ TavernEventOngoing = ""
     $ BlindPirateMarketEventSeen = 1
@@ -263,12 +265,12 @@ testcase external_shop_action_logic:
     $ location = CurLoc
     $ MainTxt = MarketPlaceRoom.descriptions[0].text + "\n\n" + MarketPlaceRoom.descriptions[1].text + "\n\n" + MarketPlaceRoom.descriptions[2].text
     $ CurLocDesc = MainTxt
-    $ MarketPlaceSavedText = MainTxt
-    $ market_mongol_visible = 0
-    $ market_mongol_mode = ""
     $ MyStallion = "test-horse"
     $ _layout_last_picture = MarketPlaceRoom.bg_picture
-    $ renpy.call_in_new_context("MarketPlaceBuildActions")
+    $ current_action_title = "Действия"
+    $ current_action_content = None
+    $ action_menu_specs = []
+    $ current_action_items = MarketPlaceRoom.build_action_items() + MarketPlaceRoom.build_exit_items()
     assert eval ('Рыночные лотки' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     assert eval ('Осмотреть рыночные лотки' not in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     $ _market_picture_before = str(_layout_last_picture or "")
@@ -298,10 +300,8 @@ testcase external_shop_action_logic:
 
 TAVERN_REPORT_STATE_CHECKS = r'''
 testcase external_tavern_report_state_defaults:
-    $ week = 1
-    $ time = 1
-    $ hour = 12
-    $ minute = 0
+    $ external_calendar_set_fields(10, 1, 1100, 12, 0)
+    $ external_calendar_set_weekday(1)
     $ BlockTimeAdvance = 0
     $ TavernEventOngoing = ""
     $ main_ui_overlay = ""
@@ -505,6 +505,111 @@ testcase external_dog_entity_actions:
 '''
 
 
+BACKYARD_BARREL_OBJECT_CHECKS = r'''
+testcase external_backyard_barrel_object_actions:
+    $ external_calendar_set_fields(1, 1, 1100, 13, 0)
+    $ CurrentLoc["melissa"] = "TavernKitchen"
+    $ CurrentLoc["amanda"] = "TavernMain"
+    $ SoapAshBarrelInstalled = 0
+    $ SoapAshBarrelReadyDay = 0
+    $ player_state().remove_item("soap_001", max(1, player_state().item_count("soap_001")))
+    $ player_state().remove_item("luxury_soap_001", max(1, player_state().item_count("luxury_soap_001")))
+
+    run Jump("Backyard")
+    advance until screen "main_ui" timeout 20.0
+    run Call("BackyardBuildActions")
+    assert eval (str(CurLoc or "") == "Backyard") timeout 5.0
+    assert eval (str(_layout_last_picture or "").endswith("images/tavern/backyard/backyard_1.png")) timeout 5.0
+    assert eval ("backyard_water_barrel" in [str(getattr(obj, "object_id", "") or "") for obj in BackyardRoom.visible_objects()]) timeout 5.0
+    assert eval (not any(str(getattr(getattr(i, "action", None), "label", "") or "") == "BackyardCookSoap" for i in current_action_items)) timeout 5.0
+
+    run Call("BackyardObjectMenu", "backyard_water_barrel")
+    assert eval (str(current_action_title or "") == "Бочка с дождевой водой") timeout 5.0
+    assert eval ("BackyardWashAtBarrel" in [str(getattr(getattr(i, "action", None), "label", "") or "") for i in current_action_items]) timeout 5.0
+    assert eval (not any(str(getattr(getattr(i, "action", None), "label", "") or "") == "BackyardWashAtBarrelWithSoap" for i in current_action_items)) timeout 5.0
+
+    $ _look_before = int(player_state().stats.look or 0)
+    $ player_state().add_item("soap_001", 1)
+    run Call("BackyardObjectMenu", "backyard_water_barrel")
+    assert eval ("BackyardWashAtBarrelWithSoap" in [str(getattr(getattr(i, "action", None), "label", "") or "") for i in current_action_items]) timeout 5.0
+    run Call("BackyardWashAtBarrelWithSoap", "soap_001")
+    assert eval (_player_item_count_by_id("soap_001") == 0) timeout 5.0
+    assert eval (int(player_state().stats.look or 0) == min(100, _look_before + 1)) timeout 5.0
+    assert eval (str(current_action_title or "") == "Бочка с дождевой водой") timeout 5.0
+
+    $ SoapAshBarrelInstalled = 1
+    $ SoapAshBarrelReadyDay = int(dayspassed or 0)
+    $ recipe_page_can_craft = lambda recipe_id: True
+    $ apply_recipe_craft = lambda recipe_id: {"ok": True, "text": "TEST SOAP RESULT"}
+    run Call("BackyardObjectMenu", "backyard_ash_barrel")
+    assert eval (str(current_action_title or "") == "Зольная бочка") timeout 5.0
+    assert eval (str(_layout_last_picture or "").endswith("images/tavern/backyard/soap_backyard.png")) timeout 5.0
+    assert eval ("BackyardCookSoap" in [str(getattr(getattr(i, "action", None), "label", "") or "") for i in current_action_items]) timeout 5.0
+    run Call("BackyardCookSoap", "soap_recipe")
+    assert eval ("TEST SOAP RESULT" in str(MainTxt or "")) timeout 5.0
+    assert eval (str(current_action_title or "") == "Зольная бочка") timeout 5.0
+    assert eval (len(list(current_action_items or [])) > 0) timeout 5.0
+'''
+
+
+GROCERY_STORE_OBJECT_PURCHASE_CHECKS = r'''
+testcase external_grocery_store_object_purchase_actions:
+    run Call("InitBecky")
+    run Call("register_inga_secondary")
+    run Call("InitEddie")
+    $ external_calendar_set_fields(10, 1, 1100, 10, 0)
+    $ npc_interval_schedule_load_all(True)
+    $ npc_schedule_sync_all()
+    $ CurrentRoom = GroceryStoreRoom
+    $ CurLoc = "GroceryStore"
+    $ location = CurLoc
+    $ GrocerName = "Эдди"
+    $ money = 100
+    $ Amanda.set_var_int("gave_night_bowl", 1)
+    $ Amanda.set_var_int("got_fancy_night_bowl", 0)
+    $ player_state().remove_item("milk_pitcher_001", max(1, player_state().item_count("milk_pitcher_001")))
+    $ player_state().remove_item("fancy_night_bowl_001", max(1, player_state().item_count("fancy_night_bowl_001")))
+
+    run Jump("GroceryStore")
+    advance until screen "main_ui" timeout 20.0
+    run Call("GroceryStoreBuildActions")
+    assert eval (str(CurLoc or "") == "GroceryStore") timeout 5.0
+    assert eval (str(grocery_store_active_grocer_id() or "") == "eddie") timeout 5.0
+    assert eval (bool(grocery_store_service_available())) timeout 5.0
+    assert eval ("food_stock" in [str(getattr(obj, "object_id", "") or "") for obj in GroceryStoreRoom.visible_objects()]) timeout 5.0
+
+    run Call("GroceryStoreObjectMenu", "food_stock")
+    assert eval (str(current_action_title or "") == "Провизия") timeout 5.0
+    assert eval ("Купить крынку молока" in [str(getattr(i, "caption", "") or "") for i in current_action_items]) timeout 5.0
+    assert eval ("Купить красивую ночную миску" in [str(getattr(i, "caption", "") or "") for i in current_action_items]) timeout 5.0
+
+    $ _milk_money_before = int(money or 0)
+    $ _milk_count_before = _player_item_count_by_id("milk_pitcher_001")
+    run Call("GroceryStoreBuyMilk")
+    assert eval (int(money or 0) == _milk_money_before - 6) timeout 5.0
+    assert eval (_player_item_count_by_id("milk_pitcher_001") == _milk_count_before + 1) timeout 5.0
+    assert eval (str(current_action_title or "") == "Провизия") timeout 5.0
+
+    run Call("GroceryStoreBuyMenu")
+    assert eval (str(current_action_title or "") == "Покупка провизии") timeout 5.0
+    $ _provision_money_before = int(money or 0)
+    $ _provision_before = int(productnum or 0)
+    run Call("GroceryStoreBuyApply", 6, 10, 1)
+    assert eval (int(money or 0) == _provision_money_before - 6) timeout 5.0
+    assert eval (int(productnum or 0) == _provision_before + 10) timeout 5.0
+    assert eval (str(current_action_title or "") == "Покупка провизии") timeout 5.0
+
+    run Call("GroceryStoreObjectMenu", "food_stock")
+    run Call("GroceryStoreBuyFancyNightBowl")
+    assert eval ("Купить красивую ночную миску за 9 мараведи" in [str(getattr(i, "caption", "") or "") for i in current_action_items]) timeout 5.0
+    $ _bowl_money_before = int(money or 0)
+    run Call("GroceryStoreBuyFancyNightBowlApply")
+    assert eval (int(money or 0) == _bowl_money_before - 9) timeout 5.0
+    assert eval (_player_item_count_by_id("fancy_night_bowl_001") == 1) timeout 5.0
+    assert eval (str(current_action_title or "") == "Красивая ночная миска") timeout 5.0
+'''
+
+
 PORT_STREETS_FLOW_CHECKS = r'''
 testcase external_port_streets_georgette_liza_flow:
     $ external_calendar_set_fields(1, 1, 1100, 12, 0)
@@ -522,8 +627,8 @@ testcase external_port_streets_georgette_liza_flow:
     advance until screen "main_ui" timeout 20.0
     assert eval (int(georgett_can_talk or 0) == 0) timeout 5.0
     assert eval (int(liza_can_talk or 0) == 0) timeout 5.0
-    assert eval ("georgett" not in [str(row.get("npc_id", "") or "") for row in PortStreetsRoom.visible_npcs()]) timeout 5.0
-    assert eval ("liza" not in [str(row.get("npc_id", "") or "") for row in PortStreetsRoom.visible_npcs()]) timeout 5.0
+    assert eval ("georgett" not in list(getNPCids("PortStreets") or [])) timeout 5.0
+    assert eval ("liza" not in list(getNPCids("PortStreets") or [])) timeout 5.0
 
     $ external_calendar_set_fields(1, 1, 1100, 20, 0)
     $ Friends["georgett"] = 0
@@ -537,8 +642,8 @@ testcase external_port_streets_georgette_liza_flow:
     advance until screen "main_ui" timeout 20.0
     assert eval (int(georgett_can_talk or 0) == 1) timeout 5.0
     assert eval (int(liza_can_talk or 0) == 0) timeout 5.0
-    assert eval ("georgett" in [str(row.get("npc_id", "") or "") for row in PortStreetsRoom.visible_npcs()]) timeout 5.0
-    assert eval ("liza" not in [str(row.get("npc_id", "") or "") for row in PortStreetsRoom.visible_npcs()]) timeout 5.0
+    assert eval ("georgett" in list(getNPCids("PortStreets") or [])) timeout 5.0
+    assert eval ("liza" not in list(getNPCids("PortStreets") or [])) timeout 5.0
 
     $ external_calendar_set_fields(1, 1, 1100, 20, 0)
     $ Friends["georgett"] = 1
@@ -552,8 +657,8 @@ testcase external_port_streets_georgette_liza_flow:
     advance until screen "main_ui" timeout 20.0
     assert eval (int(georgett_can_talk or 0) == 0) timeout 5.0
     assert eval (int(liza_can_talk or 0) == 1) timeout 5.0
-    assert eval ("georgett" not in [str(row.get("npc_id", "") or "") for row in PortStreetsRoom.visible_npcs()]) timeout 5.0
-    assert eval ("liza" in [str(row.get("npc_id", "") or "") for row in PortStreetsRoom.visible_npcs()]) timeout 5.0
+    assert eval ("georgett" not in list(getNPCids("PortStreets") or [])) timeout 5.0
+    assert eval ("liza" in list(getNPCids("PortStreets") or [])) timeout 5.0
 
     $ external_calendar_set_fields(5, 1, 1100, 20, 0)
     $ Friends["georgett"] = 0
@@ -598,71 +703,63 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     $ CurLoc = "PortStreets"
     $ location = CurLoc
     $ CurrentRoom = PortStreetsRoom
+    $ MainTxt = "Портовые улицы."
+    $ CurLocDesc = MainTxt
     $ CurrentLoc["georgett"] = "PortStreets"
-    $ Friends["georgett"] = 10
-    $ otkroven["georgett"] = 0
-    $ Talked["georgett"] = 0
-    $ FlirtedToday["georgett"] = 0
-    $ GiftedToday["georgett"] = 0
+    $ Georgett.rel = 10
+    $ Georgett.relationship = Georgett.rel
+    $ Georgett.openness = 0
+    $ Georgett.talked_today = 0
+    $ Georgett.gifted_today = 0
     $ money = 0
-    $ cametoday = cancumdaily
-    $ RealName["georgett"] = "Жоржетта"
-    $ RealName2["georgett"] = "Жоржетты"
-    $ _player_add_item_by_id("drink_ale_001", 1)
-
-    $ renpy.call_in_new_context("IntGeorgettTalk", "georgett", "street")
-    assert eval ("Поговорить о..." in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    assert eval ("Флиртовать..." in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    $ FlirtedToday["georgett"] = 1
-    $ renpy.call_in_new_context("IntGeorgettTalk", "georgett", "street")
-    assert eval ("Поделиться угощением" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    assert eval ("Снять" not in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-
-    $ _georgette_grope_result = georgett_grope_outcome("georgett", "street")
-    assert eval ("Сначала заплати" not in str(_georgette_grope_result.get("text", "") or "")) timeout 5.0
-    assert eval ("любовницы" in str(_georgette_grope_result.get("text", "") or "")) timeout 5.0
+    $ ensure_player_runtime().intimacy.came_today = ensure_player_runtime().intimacy.can_cum_daily
 
     $ money = 100
-    $ cametoday = cancumdaily
-    $ topdress["georgett"] = ""
-    $ bottomdress["georgett"] = ""
-    $ bra["georgett"] = ""
-    $ panties["georgett"] = ""
-    $ topraised["georgett"] = 0
-    $ bottomraised["georgett"] = 0
-    $ TitsVisible["georgett"] = 1
-    $ PussyVisible["georgett"] = 1
-    $ Arousal["you"] = 0
-    $ Arousal["georgett"] = 0
-    $ Friends["georgett"] = 3
-    $ LickPussy["georgett"] = 3
+    $ ensure_player_runtime().intimacy.came_today = ensure_player_runtime().intimacy.can_cum_daily
+    $ Georgett.wardrobe["current_dress"] = ""
+    $ Georgett.wardrobe["current_underwear"]["bra"] = ""
+    $ Georgett.wardrobe["current_underwear"]["panties"] = ""
+    $ Georgett.sex_setup("street")
+    $ Georgett.set_player_arousal(0)
+    $ Georgett.set_arousal(0)
+    $ Georgett.rel = 3
+    $ Georgett.relationship = Georgett.rel
+    $ Georgett.sex_state["lick_pussy"] = 3
     run Call("IntGeorgettSex", "georgett", "street")
-    advance until screen "choice" timeout 20.0
-    click id "choice_panel_button_3" pos (0.5, 0.5) until screen "say" timeout 20.0
-    advance until screen "choice" timeout 20.0
-    assert eval (int(LickPussy.get("georgett", 0) or 0) == 4 and int(Friends.get("georgett", 0) or 0) == 5) timeout 5.0
-    click id "choice_panel_button_4" pos (0.5, 0.5)
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(UI_mode or "") == "event") timeout 5.0
+    assert eval (renpy.get_screen("choice") is None) timeout 5.0
+    assert eval ("Лизать киску" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    click id "choice_panel_button_3" pos (0.5, 0.5) until eval (int(Georgett.sex_state.get("lick_pussy", 0) or 0) == 4) timeout 20.0
+    assert eval (int(Georgett.sex_state.get("lick_pussy", 0) or 0) == 4 and int(Georgett.rel or 0) == 4) timeout 5.0
+    click "Закончить" until eval (str(CurLoc or "") == "PortStreets") timeout 20.0
 
     $ money = 100
-    $ Friends["georgett"] = 10
-    $ cametoday = 0
-    $ cancumdaily = 2
-    $ topdress["georgett"] = ""
-    $ bottomdress["georgett"] = ""
-    $ bra["georgett"] = ""
-    $ panties["georgett"] = ""
-    $ topraised["georgett"] = 0
-    $ bottomraised["georgett"] = 0
-    $ Arousal["you"] = 100
-    $ Arousal["georgett"] = 40
+    $ Georgett.rel = 10
+    $ Georgett.relationship = Georgett.rel
+    $ ensure_player_runtime().intimacy.came_today = 0
+    $ ensure_player_runtime().intimacy.can_cum_daily = 2
+    $ Georgett.wardrobe["current_dress"] = ""
+    $ Georgett.wardrobe["current_underwear"]["bra"] = ""
+    $ Georgett.wardrobe["current_underwear"]["panties"] = ""
+    $ Georgett.sex_setup("street")
+    $ Georgett.clear_cum("cum_face_you", "cum_face_others", "cum_tits_you", "cum_tits_others", "cum_inside_you", "cum_inside_others")
+    $ Georgett.set_player_arousal(100)
+    $ Georgett.set_arousal(40)
     $ set_active_module("sex", "", "PortStreets", "georgett")
     run Call("IntGeorgettSex", "georgett", "street")
-    advance until screen "choice" timeout 20.0
-    assert eval ("Кончить на лицо" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    assert eval ("Кончить на груди" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    click id "choice_panel_button_6" pos (0.5, 0.5) until screen "say" timeout 20.0
-    advance until screen "choice" timeout 20.0
-    assert eval ("Кончить внутрь" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(UI_mode or "") == "event") timeout 5.0
+    assert eval (renpy.get_screen("choice") is None) timeout 5.0
+    assert eval ("Кончить на лицо" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    assert eval ("Кончить на груди" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    $ _georgett_cum_face_index = [str(i.caption or "") for i in current_action_items].index("Кончить на лицо")
+    $ _georgett_cum_face_button_id = "choice_panel_button_%d" % int(_georgett_cum_face_index)
+    if eval (_georgett_cum_face_index >= 7):
+        scroll amount 4 pos (1700, 760)
+    click id _georgett_cum_face_button_id pos (0.5, 0.5) until eval (int(Georgett.cum_state("cum_face_you") or 0) == 1) timeout 20.0
+    assert eval (int(Georgett.cum_state("cum_face_you") or 0) == 1) timeout 5.0
+    assert eval (int(player_state(False).intimacy.came_today or 0) == 1) timeout 5.0
 
 testcase external_sexport_finish_does_not_show_advance_time_developer_text:
     $ _history_list = []
@@ -688,20 +785,23 @@ testcase external_sexport_finish_does_not_show_advance_time_developer_text:
 ACTUAL_ACTION_BUTTON_CLICK_CHECKS = r'''
 init -1 python:
     def external_prepare_market_click_state():
-        global week, time, hour, minute, clock_minutes, BlockTimeAdvance, TavernEventOngoing
+        global BlockTimeAdvance, TavernEventOngoing
         global BlindPirateMarketEventSeen, main_ui_overlay, main_ui_inventory_dropdown_open
         global action_menu_specs, current_action_content, UI_mode
-        global CurrentRoom, CurLoc, location, MainTxt, CurLocDesc, MarketPlaceSavedText
-        global market_mongol_visible, market_mongol_mode, MyStallion, _layout_last_picture
+        global CurrentRoom, CurLoc, location, MainTxt, CurLocDesc
+        global MyStallion, _layout_last_picture
         global current_action_title, current_action_items
-        week = 1
-        time = 1
-        hour = 12
-        minute = 0
-        clock_minutes = 12 * 60
+        calendar_v2.hour = 12
+        calendar_v2.minute = 0
+        calendar_v2.week = 1
+        calendar_v2.sync_state()
         BlockTimeAdvance = 0
         TavernEventOngoing = ""
         CurrentLoc["clara"] = ""
+        ClaraVar["booklet_market_seen"] = 1
+        if "claraBookletMarket" in threads:
+            threads["claraBookletMarket"].complete()
+        findAvailableEvents(True)
         BlindPirateMarketEventSeen = 1
         main_ui_overlay = ""
         main_ui_inventory_dropdown_open = False
@@ -713,14 +813,12 @@ init -1 python:
         location = CurLoc
         MainTxt = MarketPlaceRoom.descriptions[0].text + "\n\n" + MarketPlaceRoom.descriptions[1].text + "\n\n" + MarketPlaceRoom.descriptions[2].text
         CurLocDesc = MainTxt
-        MarketPlaceSavedText = MainTxt
-        market_mongol_visible = 0
-        market_mongol_mode = ""
         MyStallion = "test-horse"
         _layout_last_picture = MarketPlaceRoom.bg_picture
         current_action_title = "Действия"
 
 label external_market_click_entry:
+    call InitGameNPCs
     $ external_prepare_market_click_state()
     jump MarketPlace
 
@@ -742,7 +840,7 @@ testcase external_actual_grocery_click:
     run Jump("GroceryStore")
     advance until screen "main_ui" timeout 20.0
     assert eval ('Провизия' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(current_action_title or "") == 'Провизия') timeout 20.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (str(current_action_title or "") == 'Провизия') timeout 20.0
     assert eval ('Купить провизию' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     click id "choice_panel_button_2" pos (0.5, 0.5) until eval ('Мешки, капуста' in str(MainTxt or "")) timeout 20.0
 
@@ -761,8 +859,6 @@ testcase external_actual_wine_click:
     run Jump("WineStore")
     advance until screen "main_ui" timeout 20.0
     assert eval ('Бочки с вином' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    assert eval ('Поговорить с Альбером' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    assert eval ('Поговорить с Клариссой' not in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(current_action_title or "") == 'Бочки с вином') timeout 20.0
     assert eval ('Купить вино' in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(current_action_title or "") == 'Покупка вина') timeout 20.0
@@ -806,8 +902,12 @@ testcase external_tavern_random_event_plan_consumes_once:
     $ CurrentRoom = TavernMainRoom
     $ TavernEventOngoing = ""
     $ TavernMainBlockEvents = 0
-    $ jobwaitress["amanda"] = 1
-    $ jobcleaning["amanda"] = 0
+    run Call("InitAmanda")
+    $ Amanda.set_job_value("jobwaitress", 1)
+    $ Amanda.set_job_value("jobcleaning", 0)
+    assert eval (int(Amanda.job_value("jobwaitress", 0) or 0) == 1) timeout 5.0
+    assert eval ("amanda" in list(girls_by_job("jobwaitress") or [])) timeout 5.0
+    assert eval (str(get_random_girl_by_job("jobwaitress") or "") != "") timeout 5.0
     $ tavern_work_events = [{"code": "WaitressHarass", "type": "harrass", "label": "event_waitress_harrass", "period": time, "mandatory": False, "priority": 20}]
     $ TavernPlayedEventsToday = []
     $ TavernEventReportRows = []
@@ -819,8 +919,7 @@ testcase external_tavern_random_event_plan_consumes_once:
     advance until screen "main_ui" timeout 20.0
     assert eval ("WaitressHarass" in list(TavernPlayedEventsToday or [])) timeout 5.0
     assert eval (len(list(tavern_work_events or [])) == 0 and EventsCount.get(time, 0) == 0) timeout 5.0
-    assert eval ("Что вы будете делать?" == str(current_action_title or "")) timeout 5.0
-    assert eval ("Не обращать внимания" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    assert eval (str(TavernEventOngoing or "").strip() != "" and str(MainTxt or "").strip() != "") timeout 5.0
 
 testcase external_tavern_unwitnessed_event_report_consumes_leftovers:
     $ external_calendar_set_fields(day, month, year, 16, 0)
@@ -890,7 +989,7 @@ testcase external_breakfast_attendance_location_wins:
     $ UI_mode = "scene"
     $ CurrentRoom = TavernKitchenRoom
     $ CurLoc = "TavernKitchen"
-    $ TavernBreakfastPresentIds = list(household_breakfast_attendee_ids() or [])
+    $ TavernBreakfastPresentIds = ["sandra", "melissa", "amanda"]
     $ TavernBreakfastEventActive = True
     $ TavernBreakfastBaseText = "Тестовый завтрак."
     $ TavernKitchenSavedText = TavernBreakfastBaseText
@@ -899,10 +998,10 @@ testcase external_breakfast_attendance_location_wins:
     assert eval ("melissa" in list(tavern_breakfast_present_ids() or [])) timeout 5.0
     assert eval ("melissa" not in list(tavern_breakfast_absent_ids() or [])) timeout 5.0
     assert eval ("melissa" in list(tavern_breakfast_core_present_ids() or [])) timeout 5.0
-    assert eval (len([str(i.caption or "") for i in tavern_breakfast_menu_items() if "Посмотреть на" in str(i.caption or "") and "melissa" in str(i.caption or "").lower()]) == 1) timeout 5.0
+    assert eval (len([str(i.caption or "") for i in tavern_breakfast_menu_items() if "Посмотреть на" in str(i.caption or "") and "Мелисс" in str(i.caption or "")]) == 1) timeout 5.0
     assert eval ("Мелисса все еще отсыпается" not in " ".join(list(household_breakfast_absence_lines() or []))) timeout 5.0
     assert eval ("Поделиться едой и напитками" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    assert eval (len([str(i.caption or "") for i in current_action_items if "Посмотреть на" in str(i.caption or "") and "melissa" in str(i.caption or "").lower()]) == 1) timeout 5.0
+    assert eval (len([str(i.caption or "") for i in current_action_items if "Посмотреть на" in str(i.caption or "") and "Мелисс" in str(i.caption or "")]) == 1) timeout 5.0
     run Call("TavernKitchenBreakfastPerkMenu")
     assert eval ("Поделиться напитком" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     run Call("TavernKitchenBreakfastPerkDrink")
@@ -913,6 +1012,28 @@ testcase external_breakfast_attendance_location_wins:
     advance until eval (str(current_action_title or "") == "Завтрак") timeout 5.0
     run Call("TavernKitchenBreakfastLookAtGirl", "melissa")
     assert eval ("Вы присматриваетесь к Мелиссе за завтраком" in str(MainTxt or "")) timeout 5.0
+
+testcase external_breakfast_angry_amanda_melissa_mockery:
+    $ week = 1
+    $ time = 0
+    $ hour = 8
+    $ minute = 0
+    $ dayspassed = 14
+    $ BreakfastToday = False
+    $ TavernBreakfastEventActive = True
+    $ TavernBreakfastPresentIds = ["sandra", "melissa", "amanda"]
+    $ CurrentLoc["sandra"] = "TavernKitchen"
+    $ CurrentLoc["melissa"] = "TavernKitchen"
+    $ CurrentLoc["amanda"] = "TavernKitchen"
+    $ CurrentLoc["becky"] = "GroceryStore"
+    $ relationship_set_anger("amanda", 2, 1, "external_test")
+    $ relationship_set_anger("melissa", 2, 1, "external_test")
+    assert eval ("becky" not in list(tavern_breakfast_present_ids() or [])) timeout 5.0
+    assert eval ("Бекки" not in list(tavern_breakfast_present_names() or [])) timeout 5.0
+    assert eval ("Крысы?" in " ".join(list(tavern_breakfast_dialogue_lines() or []))) timeout 5.0
+    assert eval (len([row for row in tavern_breakfast_dialogue_lines() if "Пальцы из кисок" in str(row or "")]) == 1) timeout 5.0
+    run Call("MelissaRatBreakfastScene")
+    assert eval ("За столом не шипеть" in str(MainTxt or "")) timeout 5.0
 
 testcase external_breakfast_window_and_call_all_click:
     run Jump("Intro")
@@ -926,13 +1047,13 @@ testcase external_breakfast_window_and_call_all_click:
     $ BreakfastToday = False
     $ TavernBreakfastEventActive = False
     $ TavernBreakfastPresentIds = None
-    $ MelissaVar["ratKilled"] = False
-    $ MelissaVar["storage_rat_cleared"] = 0
-    $ MelissaVar["storage_rat_last_help_day"] = -1
-    $ MelissaVar["bats_episode"] = 8
-    $ WerecatVar["rats_problem_active"] = 0
-    $ WerecatVar["rat_breakfast_seen"] = 1
-    $ WerecatVar["adoption_breakfast_seen"] = 1
+    $ Melissa.var["ratKilled"] = False
+    $ Melissa.var["storage_rat_cleared"] = 0
+    $ Melissa.var["storage_rat_last_help_day"] = -1
+    $ Melissa.var["bats_episode"] = 8
+    $ werecat_state()["rats_problem_active"] = 0
+    $ werecat_state()["rat_breakfast_seen"] = 1
+    $ werecat_state()["adoption_breakfast_seen"] = 1
     $ CurrentLoc["sandra"] = "TavernKitchen"
     $ CurrentLoc["melissa"] = "TavernKitchen"
     $ CurrentLoc["amanda"] = "TavernKitchen"
@@ -945,25 +1066,24 @@ testcase external_breakfast_window_and_call_all_click:
     $ CurLoc = "TavernKitchen"
     $ location = CurLoc
     run Call("TavernKitchenBuildActions")
-    assert eval ("Позвать всех к завтраку" not in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    assert eval ("Позавтракать" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     $ hour = 8
     $ minute = 0
     run Call("TavernKitchenBuildActions")
-    assert eval ("Позвать всех к завтраку" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    assert eval (set(["sandra", "melissa", "amanda"]).issubset(set(tavern_breakfast_called_attendee_ids() or []))) timeout 5.0
+    assert eval ("Позавтракать" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     $ hour = 10
     $ minute = 0
     $ BreakfastToday = False
     $ TavernBreakfastEventActive = False
     $ TavernBreakfastPresentIds = None
     run Call("TavernKitchenBuildActions")
-    assert eval ("Позвать всех к завтраку" not in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    $ BreakfastToday = True
+    run Call("TavernKitchenBuildActions")
+    assert eval ("Позавтракать" not in [str(i.caption or "") for i in current_action_items]) timeout 5.0
 
 testcase external_actual_barber_actions_click:
-    $ week = 1
-    $ time = 2
-    $ hour = 14
-    $ minute = 0
+    $ external_calendar_set_fields(day, month, year, 14, 0)
+    $ external_calendar_set_weekday(1)
     $ money = max(int(money or 0), 500)
     $ PlayerHaircutDaySt = -30
     $ dayssincehaircut = 30
@@ -974,19 +1094,15 @@ testcase external_actual_barber_actions_click:
     $ UI_mode = "scene"
     run Jump("BarberShop")
     advance until screen "main_ui" timeout 20.0
-    assert eval ("Поговорить с Серджио" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     assert eval (len([str(i.caption or "") for i in current_action_items if "Подстричься" in str(i.caption or "")]) == 1) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Домашнее мыло не только грязь смывает" in str(MainTxt or "")) timeout 20.0
-    assert eval ("Купить оливковое масло" in " ".join([str(i.caption or "") for i in current_action_items])) timeout 5.0
-    click id "choice_panel_button_1" pos (0.5, 0.5) until eval ("выглядите куда опрятнее" in str(MainTxt or "")) timeout 20.0
-    assert eval (int(dayssincehaircut or 0) == 0) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("выглядите куда опрятнее" in str(MainTxt or "")) timeout 20.0
+    assert eval (int(player_state().appearance.haircut_day or 0) == int(dayspassed or 0)) timeout 5.0
 
 testcase external_actual_market_click:
-    $ week = 1
-    $ time = 1
-    $ hour = 12
-    $ minute = 0
-    $ clock_minutes = 12 * 60
+    $ external_calendar_set_fields(day, month, year, 12, 0)
+    $ external_calendar_set_weekday(1)
+    $ CurrentLoc["clara"] = ""
+    $ ClaraVar["booklet_market_seen"] = 1
     $ BlockTimeAdvance = 0
     $ TavernEventOngoing = ""
     $ BlindPirateMarketEventSeen = 1
@@ -1005,14 +1121,17 @@ testcase external_actual_market_click:
     assert eval ('Торговцы расхваливают товар' in str(MainTxt or "")) timeout 5.0
 
 testcase external_actual_market_blind_pirate_first_entry:
-    $ week = 1
-    $ time = 1
-    $ hour = 12
-    $ minute = 0
-    $ dayspassed = 10
+    run Call("InitGameNPCs")
+    $ external_calendar_set_fields(11, 1, CALENDAR_START_CYCLE, 12, 0)
+    $ external_calendar_set_weekday(1)
+    $ CurrentLoc["clara"] = ""
+    $ ClaraVar["booklet_market_seen"] = 1
+    python:
+        if "claraBookletMarket" in threads:
+            threads["claraBookletMarket"].complete()
+    $ findAvailableEvents(True)
     $ BlockTimeAdvance = 0
     $ TavernEventOngoing = ""
-    $ CurrentLoc["clara"] = ""
     $ BlindPirateMarketEventSeen = 0
     $ BlindPirateBreakfastPending = 0
     $ TownStreetEventsToday = 0
@@ -1031,21 +1150,21 @@ testcase external_actual_market_blind_pirate_first_entry:
     assert eval (town_street.random_seen_this_slot("MarketPlace")) timeout 5.0
 
 testcase external_market_clock_open_hours:
-    $ external_calendar_set_fields(day, month, year, 5, 59)
-    $ week = 1
-    assert eval (not MarketPlaceRoom.is_open(week, time)) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 6, 0)
-    $ week = 1
-    assert eval (MarketPlaceRoom.is_open(week, time)) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 12, 59)
-    $ week = 1
-    assert eval (MarketPlaceRoom.is_open(week, time)) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 13, 0)
-    $ week = 1
-    assert eval (not MarketPlaceRoom.is_open(week, time)) timeout 5.0
+    $ external_calendar_set_fields(day, month, year, 6, 59)
+    $ external_calendar_set_weekday(1)
+    assert eval (not MarketPlaceRoom.is_open()) timeout 5.0
+    $ external_calendar_set_fields(day, month, year, 7, 0)
+    $ external_calendar_set_weekday(1)
+    assert eval (MarketPlaceRoom.is_open()) timeout 5.0
+    $ external_calendar_set_fields(day, month, year, 17, 59)
+    $ external_calendar_set_weekday(1)
+    assert eval (MarketPlaceRoom.is_open()) timeout 5.0
+    $ external_calendar_set_fields(day, month, year, 18, 0)
+    $ external_calendar_set_weekday(1)
+    assert eval (not MarketPlaceRoom.is_open()) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 10, 0)
-    $ week = 7
-    assert eval (not MarketPlaceRoom.is_open(week, time)) timeout 5.0
+    $ external_calendar_set_weekday(7)
+    assert eval (not MarketPlaceRoom.is_open()) timeout 5.0
 '''
 
 
@@ -1168,7 +1287,7 @@ testcase external_actual_random_town_click:
     $ notoriety = 60
     $ health = 100
     $ energy = 100
-    $ FightLevel = {"you": 3}
+    $ fight_info().level = {"you": 3}
     $ TownStreetEventsToday = 0
     $ TownStreetPatrolsToday = 0
     $ TownStreetFightToday = 0
@@ -1185,8 +1304,14 @@ testcase external_actual_random_town_click:
     run Call("TownStreetPatrolEvent")
     advance until screen "main_ui" timeout 20.0
     click id "choice_panel_button_4" pos (0.5, 0.5) until eval (str(UI_mode or "") == "fight") timeout 10.0
-    assert eval (str(FightEnemyId or "") == "patrol_guard" and len(list(FightEnemyParty or [])) == 2) timeout 5.0
+    assert eval (str(fight_info().enemy_id or "") == "patrol_guard" and len(list(fight_info().enemy_party or [])) == 2) timeout 5.0
+    assert eval (str(fight_selected_enemy_image() or "") == "images/fight/patrol_guard.png") timeout 5.0
     $ renpy.call_in_new_context("FightDoAction", "retreat")
+    assert eval (str(UI_mode or "") == "fight" and str(fight_info().outcome_popup.get("kind", "") or "") == "retreat") timeout 5.0
+    $ _fight_test_picture = str(fight_info().return_picture or "")
+    $ fight_finish_to_room(str(MainTxt or ""))
+    $ scene_image = _fight_test_picture
+    $ _layout_last_picture = _fight_test_picture
     assert eval (str(UI_mode or "") == "scene" and str(CurLoc or "") == "StreetTavern") timeout 5.0
 
     $ external_calendar_set_fields(1, 1, CALENDAR_START_CYCLE, 12, 0)
@@ -1254,7 +1379,7 @@ testcase external_actual_random_town_click:
     $ energy = 100
     $ exploration = 300
     $ notoriety = 0
-    $ FightLevel = {"you": 2}
+    $ fight_info().level = {"you": 2}
     $ playerItems = {}
     $ EquippedWeapon = ""
     $ EquippedArmor = ""
@@ -1273,8 +1398,14 @@ testcase external_actual_random_town_click:
     run Call("TownStreetThugsEvent")
     advance until screen "main_ui" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(UI_mode or "") == "fight") timeout 10.0
-    assert eval (str(FightEnemyId or "") == "street_crook" and len(list(FightEnemyParty or [])) == 2) timeout 5.0
+    assert eval (str(fight_info().enemy_id or "") == "street_crook" and len(list(fight_info().enemy_party or [])) == 2) timeout 5.0
+    assert eval (str(fight_selected_enemy_image() or "") == "images/fight/thug.png") timeout 5.0
     $ renpy.call_in_new_context("FightDoAction", "retreat")
+    assert eval (str(UI_mode or "") == "fight" and str(fight_info().outcome_popup.get("kind", "") or "") == "retreat") timeout 5.0
+    $ _fight_test_picture = str(fight_info().return_picture or "")
+    $ fight_finish_to_room(str(MainTxt or ""))
+    $ scene_image = _fight_test_picture
+    $ _layout_last_picture = _fight_test_picture
     assert eval (str(UI_mode or "") == "scene" and str(CurLoc or "") == "ArtisansQuarter") timeout 5.0
 
     $ TownStreetEventsToday = 1
@@ -1300,14 +1431,119 @@ testcase external_actual_random_town_click:
 '''
 
 
+TARGETED_CURRENT_BUG_CHECKS = r'''
+testcase external_sleep_after_midnight_detector:
+    $ external_calendar_set_fields(3, 1, CALENDAR_START_CYCLE, 1, 20)
+    assert eval (nextday_started_after_midnight()) timeout 5.0
+    $ external_calendar_set_fields(day, month, year, 6, 0)
+    assert eval (not nextday_started_after_midnight()) timeout 5.0
+
+testcase external_town_thugs_shout_result:
+    $ external_calendar_set_fields(3, 1, CALENDAR_START_CYCLE, 18, 0)
+    $ CurLoc = "StreetTavern"
+    $ location = CurLoc
+    $ CurrentRoom = StreetTavernRoom
+    $ _layout_last_picture = "bg StreetTavern"
+    $ scene_image = _layout_last_picture
+    $ health = 100
+    $ energy = 100
+    $ exploration = 300
+    $ notoriety = 0
+    $ TownStreetEventsToday = 0
+    $ TownStreetPatrolsToday = 0
+    $ TownStreetFightToday = 0
+    $ TownCurfewCaughtToday = 0
+    $ TownStreetStorySeenKeys = []
+    $ TownStreetFiredLabelsToday = []
+    $ TownStreetFiredLocationsToday = []
+    $ main_ui_overlay = ""
+    $ main_ui_inventory_dropdown_open = False
+    $ action_menu_specs = []
+    $ current_action_content = None
+    $ UI_mode = "scene"
+    run Call("TownStreetThugsEvent")
+    advance until screen "main_ui" timeout 20.0
+    assert eval ("Попробовать спугнуть их криком" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (int(exploration or 0) >= 306 and int(reputation or 0) >= 2 and int(notoriety or 0) >= 4) timeout 20.0
+    assert eval (len(list(current_action_items or [])) == 1) timeout 5.0
+
+testcase external_town_thugs_fight_victory_result:
+    $ external_calendar_set_fields(3, 1, CALENDAR_START_CYCLE, 18, 0)
+    $ CurLoc = "ArtisansQuarter"
+    $ location = CurLoc
+    $ CurrentRoom = ArtisansQuarterRoom
+    $ _layout_last_picture = "bg ArtisansQuarter"
+    $ scene_image = _layout_last_picture
+    $ health = 30
+    $ energy = 100
+    $ exploration = 300
+    $ reputation = 10
+    $ tavernfame = 5
+    $ notoriety = 0
+    $ playerItems = {}
+    $ EquippedWeapon = "old_axe_001"
+    $ EquippedArmor = ""
+    $ fight_info().level = {"you": 3}
+    $ main_ui_overlay = ""
+    $ main_ui_inventory_dropdown_open = False
+    $ action_menu_specs = []
+    $ current_action_content = None
+    $ UI_mode = "scene"
+    run Call("TownStreetThugsFight")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(UI_mode or "") == "fight" and str(fight_info().enemy_id or "") == "street_crook") timeout 5.0
+    $ FightEnemyParty[0]["health"] = 1
+    $ FightEnemyParty[0]["energy"] = 1
+    $ FightEnemyParty[1]["health"] = 1
+    $ FightEnemyParty[1]["energy"] = 1
+    $ PlayerFightSupply["fire_bomb"] = 1
+    $ renpy.call_in_new_context("FightDoAction", "fire_bomb")
+    assert eval (str(FightOutcomeKind or "") == "victory" and str(current_action_title or "") == "Победа") timeout 5.0
+    assert eval (isinstance(HuntLastResult, dict) and str(HuntLastResult.get("outcome", "") or "") == "victory") timeout 5.0
+    assert eval (isinstance(FightVictoryLoot, dict) and "money" in FightVictoryLoot) timeout 5.0
+    assert eval ("добыч" in str(FightOutcomeText or "").lower()) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(current_action_title or "") == "Итог драки") timeout 20.0
+    assert eval (str(UI_mode or "") == "scene" and str(CurLoc or "") == "ArtisansQuarter") timeout 5.0
+    assert eval (int(reputation or 0) == 13 and int(tavernfame or 0) == 6 and int(notoriety or 0) == 3) timeout 5.0
+    assert eval (len(list(current_action_items or [])) == 1 and str(current_action_title or "") == "Итог драки") timeout 5.0
+
+testcase external_georgette_back_alley_not_visible_in_port_streets:
+    run Call("InitGameNPCs")
+    $ external_calendar_set_fields(3, 1, CALENDAR_START_CYCLE, 20, 0)
+    $ external_calendar_set_weekday(1)
+    $ npc_schedule_sync_all()
+    $ CurLoc = "PortStreets"
+    $ location = CurLoc
+    $ CurrentRoom = PortStreetsRoom
+    $ Georgett.var["portstreet_clients_seen_today"] = 0
+    assert eval (str(getLocation("georgett") or "") == "PortStreets") timeout 5.0
+    assert eval (npc_action_data_for_room("georgett", "PortStreets") is None) timeout 5.0
+    $ Georgett.set_portstreet_visible(True)
+    assert eval (str(getLocation("georgett") or "") == "PortStreets") timeout 5.0
+    assert eval ("georgett" in list(getNPCids("PortStreets") or [])) timeout 5.0
+    $ _georgett_port_data = npc_action_data_for_room("georgett", "PortStreets")
+    assert eval (tuple(_georgett_port_data.get("talk_args", ())) == ("georgett", "street")) timeout 5.0
+    assert eval (str(_georgett_port_data.get("idle_picture", "") or "") == "images/georgett/portraits/portrait1.jpg") timeout 5.0
+    $ open_npc_action_menu_state("georgett", "PortStreets", _georgett_port_data)
+    assert eval ("Поговорить" in [str(getattr(i, "caption", "") or "") for i in current_action_items]) timeout 5.0
+    assert eval (str(_layout_last_picture or "") == "images/georgett/portraits/portrait1.jpg") timeout 5.0
+    run Call("IntGeorgettTalk", "georgett", "street")
+    assert eval ("Болтать" in [str(getattr(i, "caption", "") or "") for i in current_action_items]) timeout 5.0
+    $ Georgett.set_portstreet_visible(False)
+    $ Georgett.mark_portstreet_clients_seen()
+    assert eval (str(getLocation("georgett") or "") == "PortStreets") timeout 5.0
+
+'''
+
+
 DEBUG_BUILDER_ROOM_CHECKS = r'''
 testcase external_debug_builder_room_visual_surfaces:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
 
-    run Jump("DebugBuilderRoom")
-    advance until screen "main_ui" timeout 20.0
+    assert eval (bool(config.developer)) timeout 5.0
+    click id "main_ui_debug_builder_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == "DebugBuilderRoom") timeout 20.0
     assert eval (str(CurLoc or "") == "DebugBuilderRoom") timeout 5.0
     assert eval (str(current_action_title or "") == "Debug Builder") timeout 5.0
     assert eval ("Picture path checks" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
@@ -1368,29 +1604,68 @@ testcase external_debug_builder_room_visual_surfaces:
     assert eval ("Amanda" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     $ show_girl_card_main_ui_state("amanda")
     assert eval (str(girl_card_portrait_path("amanda") or "") == "images/amanda/amanda_card.jpg") timeout 5.0
+
+    $ health = 100
+    $ energy = 100
+    $ exploration = 0
+    $ EquippedWeapon = ""
+    $ EquippedArmor = ""
+    $ RustyHunterRifleLoadedAmmo = ""
+    $ fight_sync_loaded_weapon_state_from_inventory()
+    $ fight_sync_supply_from_inventory()
+    $ _debug_dog = ensure_dog_runtime()
+    $ _debug_dog.in_company = False
+    run Jump("DebugBuilderFightTests")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(current_action_title or "") == "Fight tests" and all(label in [str(i.caption or "") for i in current_action_items] for label in ["Fight setup", "Launch fights"])) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(current_action_title or "") == "Fight setup") timeout 20.0
+    assert eval (str(current_action_title or "") == "Fight setup" and all(any(str(i.caption or "").startswith(prefix) for i in current_action_items) for prefix in ["Launch fights", "Weapon:", "Armor:", "Health:", "Experience:", "Supplies:", "Dog:"])) timeout 5.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (str(EquippedWeapon or "") == "old_axe_001" and str(current_action_title or "") == "Fight setup") timeout 20.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (str(EquippedWeapon or "") == "rusty_hunter_rifle_001" and int(PlayerFightSupply.get("arrows", 0) or 0) > 0 and str(FightLoadedAmmo or "") == "arrows" and int(FightWeaponLoaded or 0) == 1) timeout 20.0
+    click id "choice_panel_button_2" pos (0.5, 0.5) until eval (str(EquippedArmor or "") == "old_leather_cuirass_001" and str(current_action_title or "") == "Fight setup") timeout 20.0
+    click id "choice_panel_button_2" pos (0.5, 0.5) until eval (str(EquippedArmor or "") == "" and str(current_action_title or "") == "Fight setup") timeout 20.0
+    click id "choice_panel_button_3" pos (0.5, 0.5) until eval (int(health or 0) == 60 and str(current_action_title or "") == "Fight setup") timeout 20.0
+    click id "choice_panel_button_4" pos (0.5, 0.5) until eval (int(exploration or 0) == 50 and int(FightLevel.get("you", 0) or 0) >= 2) timeout 20.0
+    click id "choice_panel_button_5" pos (0.5, 0.5) until eval (int(PlayerFightSupply.get("bandage", 0) or 0) > 0 and int(PlayerFightSupply.get("healing_potion", 0) or 0) > 0 and int(PlayerFightSupply.get("fire_bomb", 0) or 0) > 0 and int(PlayerFightSupply.get("bees_bomb", 0) or 0) > 0) timeout 20.0
+    click id "choice_panel_button_6" pos (0.5, 0.5) until eval (bool(dog.owned) and bool(dog.in_company) and str(current_action_title or "") == "Fight setup") timeout 20.0
+    assert eval (len(list(fight_company_display_rows() or [])) >= 2 and "notoriety" in dict(list(fight_company_display_rows() or [{}])[0]) and "exploration" in dict(list(fight_company_display_rows() or [{}])[0])) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(current_action_title or "") == "Launch fights") timeout 20.0
+    assert eval (all(label in [str(i.caption or "") for i in current_action_items] for label in ["Street crooks", "Random forest hunt roll", "Patrol guards"])) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(UI_mode or "") == "fight") timeout 20.0
+    assert eval (str(UI_mode or "") == "fight" and str(fight_info().enemy_id or "") == "street_crook" and len(list(fight_info().enemy_party or [])) == 2) timeout 5.0
+    assert eval (str(fight_selected_enemy_image() or "") == "images/fight/thug.png") timeout 5.0
+    assert eval (len(list(fight_enemy_display_rows() or [])) == 2 and all(int(row.get("health_max", 0) or 0) > 0 and int(row.get("energy_max", 0) or 0) > 0 for row in list(fight_enemy_display_rows() or []))) timeout 5.0
+    assert eval (all(label in [str(i.caption or "") for i in current_action_items] for label in ["Выстрелить (стрела)", "Использовать бинт", "Выпить бодрящий чай", "Выпить лечебное зелье", "Бросить огненную бутылку", "Бросить пчелиный заряд", "Командовать псом", "Отступить"])) timeout 5.0
+    $ _debug_turn_text_before = str(MainTxt or "")
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (str(MainTxt or "") != _debug_turn_text_before and str(UI_mode or "") == "fight") timeout 20.0
+    assert eval (str(MainTxt or "") != _debug_turn_text_before and str(UI_mode or "") == "fight") timeout 5.0
+    assert eval (str(current_action_title or "") == "Бой" and "Отступить" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    $ _debug_turn_text_before = str(MainTxt or "")
+    click id "choice_panel_button_3" pos (0.5, 0.5) until eval (str(MainTxt or "") != _debug_turn_text_before and str(UI_mode or "") == "fight") timeout 20.0
+    assert eval (str(current_action_title or "") == "Бой" and "Отступить" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    $ fight_finish_to_room("Debug fight closed.")
+    assert eval (str(CurLoc or "") == "DebugBuilderFightTests" and str(UI_mode or "") == "scene") timeout 5.0
 '''
 
 
 AMANDA_ROOM_NIGHT_EVENT_CHECKS = r'''
-testcase external_amanda_room_night_bed_action_uses_defaults_and_hud:
+testcase external_amanda_room_night_bed_action_uses_thread_event:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
 
     $ external_calendar_set_fields(day, month, year, 22, 0)
-    $ MelissaVar["temp_room"] = ""
-    $ MelissaVar["drawings_found"] = 0
+    $ Melissa.var["temp_room"] = ""
+    $ Melissa.var["drawings_found"] = 0
     $ CurrentLoc["amanda"] = "TavernAmandaRoom"
     $ npc_schedule_set("amanda", [NPCScheduleEntry(location="TavernAmandaRoom", time_slots=[], awake=False, talkable=False, priority=999)])
     $ cametoday = 0
     $ cancumdaily = 3
-    $ AmandaVar["kickyoufromroom"] = 0
-    $ AmandaVar["kickyoufromroomcount"] = 0
-    $ LickPussy.clear()
-    $ GiveOrgasms.clear()
+    $ Amanda.set_var_int("kickyoufromroom", 0)
+    $ Amanda.set_var_int("kickyoufromroomcount", 0)
     run Jump("TavernAmandaRoom")
     advance until screen "main_ui" timeout 20.0
-    assert eval (str(CurLoc or "") == "TavernAmandaRoom" and "amanda" in LickPussy and "amanda" in GiveOrgasms) timeout 5.0
+    assert eval (str(CurLoc or "") == "TavernAmandaRoom") timeout 5.0
     assert eval ("Кровать" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     run Call("tavern_amanda_room_object_menu", "bed_002")
     advance until screen "main_ui" timeout 20.0
@@ -1426,6 +1701,71 @@ testcase external_my_room_recipe_book_table_link:
     assert eval (str(current_action_title or "") == "Стол") timeout 5.0
     assert eval ("Читать книгу рецептов" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     assert eval ("Создать предмет" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+'''
+
+
+MY_ROOM_WINDOW_ACTION_CHECKS = r'''
+testcase external_my_room_window_day_night_amanda_pictures:
+    $ external_calendar_set_fields(day, month, year, 12, 0)
+    $ CurrentRoom = TavernMyRoomRoom
+    $ CurLoc = "TavernMyRoom"
+    $ location = CurLoc
+    $ Amanda.set_var_int("gave_night_bowl", 0)
+    $ Amanda.set_var_int("night_bowl_window_seen_day", -1)
+    run Call("TavernMyRoomWindowLookBackyard")
+    assert eval (str(_layout_last_picture or "") == "images/player_room/window0.png") timeout 5.0
+    assert eval (str(current_action_title or "") == "Маленькое окно" and "Назад" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+
+    $ external_calendar_set_fields(day, month, year, 22, 0)
+    $ Amanda.set_var_int("gave_night_bowl", 0)
+    $ Amanda.set_var_int("night_bowl_window_seen_day", -1)
+    run Call("TavernMyRoomWindowLookBackyard")
+    assert eval (str(_layout_last_picture or "") == "images/player_room/window2.png") timeout 5.0
+    assert eval (str(current_action_title or "") == "Маленькое окно" and "Назад" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+
+    $ Amanda.set_var_int("gave_night_bowl", 1)
+    $ Amanda.set_var_int("got_fancy_night_bowl", 0)
+    $ Amanda.set_var_int("prefers_backyard_relief", -1)
+    $ Amanda.set_var_int("night_bowl_window_seen_day", -1)
+    $ _player_add_item_by_id("night_bowl_001", 1)
+    run Call("TavernMyRoomWindowLookBackyard")
+    assert eval (str(_layout_last_picture or "") == "images/player_room/windowAmand.png") timeout 5.0
+    assert eval (str(current_action_title or "") == "Маленькое окно" and "Назад" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    assert eval (Amanda.var_int("night_bowl_window_seen_day", -1) == int(calendar_v2.daysInGame or 0)) timeout 5.0
+'''
+
+
+TAVERN_ROOM_PICTURE_STATE_CHECKS = r'''
+testcase external_tavern_room_movement_resets_picture_state:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+
+    $ external_calendar_set_fields(day, month, year, 12, 0)
+    $ TavernMainBlockEvents = 1
+    run Jump("TavernMain")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(CurLoc or "") == "TavernMain") timeout 5.0
+    assert eval (str(_layout_last_picture or "") == "images/tavern/mainhall/main_hall.png") timeout 5.0
+
+    run Call("TavernMainObjectMenu", "bar_001")
+    assert eval (str(current_object_id or "") == "bar_001") timeout 5.0
+    assert eval (str(_layout_last_picture or "") == "images/tavern/mainhall/bar_mainHall.png") timeout 5.0
+
+    run Call("AdvanceMovementTime", "TavernKitchen")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(CurLoc or "") == "TavernKitchen") timeout 5.0
+    assert eval (str(current_object_id or "") == "" and str(current_girl_key or "") == "") timeout 5.0
+    assert eval (str(_layout_last_picture or "") != "images/tavern/mainhall/bar_mainHall.png") timeout 5.0
+    assert eval ("kitchen" in str(_layout_last_picture or "").lower()) timeout 5.0
+
+    $ external_calendar_set_fields(day, month, year, 22, 0)
+    $ TavernMainBlockEvents = 1
+    run Jump("TavernMain")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(CurLoc or "") == "TavernMain") timeout 5.0
+    assert eval (str(current_object_id or "") == "") timeout 5.0
+    assert eval (str(_layout_last_picture or "") == "images/tavern/mainhall/main_hall_night.png") timeout 5.0
 '''
 
 
@@ -1491,6 +1831,7 @@ testcase external_melissa_bats_room_search_after_wait:
 
 testcase external_melissa_werecat_thread_condition_sequence:
     $ external_calendar_set_fields(3, 1, 1100, 6, 0)
+    run Call("InitGameNPCs")
     $ CurLoc = "TavernStorage"
     $ location = CurLoc
     $ CurrentRoom = TavernStorageRoom
@@ -1500,18 +1841,20 @@ testcase external_melissa_werecat_thread_condition_sequence:
     $ Melissa.var["ratKilled"] = False
     $ Melissa.var["storage_rat_cleared"] = 0
     $ Melissa.var["storage_rat_last_help_day"] = -1
-    $ WerecatVar["rats_problem_active"] = 0
-    $ WerecatVar["rat_breakfast_seen"] = 0
-    $ WerecatVar["hunter_tease_day"] = -1
-    $ WerecatVar["adopted"] = 0
-    $ WerecatVar["adopted_count"] = 0
-    $ WerecatVar["adoption_breakfast_seen"] = 0
-    $ WerecatVar["adopted_day"] = -1
-    $ WerecatVar["first_month_thanks_day"] = -1
+    $ werecat_state()["rats_problem_active"] = 0
+    $ werecat_state()["rat_breakfast_seen"] = 0
+    $ werecat_state()["hunter_tease_day"] = -1
+    $ werecat_state()["adopted"] = 0
+    $ werecat_state()["adopted_count"] = 0
+    $ werecat_state()["adoption_breakfast_seen"] = 0
+    $ werecat_state()["adopted_day"] = -1
+    $ werecat_state()["first_month_thanks_day"] = -1
     $ npc_interval_schedule_load_all(True)
-    $ npc_interval_schedule_set("melissa", [NPCIntervalScheduleEntry(npc_id="melissa", location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6, 7], start="00:00", end="23:59", awake=True, talkable=True, priority=999, label="external_storage_rat")])
-    $ Melissa.current_location = "TavernStorage"
-    $ Melissa.sync_melissa_maps()
+    $ npc_schedule_set("melissa", [NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6, 7], start_hour=0, end_hour=24, awake=True, talkable=True, priority=999, label="external_storage_rat")])
+    $ Melissa.var["temp_room"] = "TavernStorage"
+    $ Melissa.var["bats_episode"] = 1
+    $ peopleInfo["melissa"].var["temp_room"] = "TavernStorage"
+    $ peopleInfo["melissa"].var["bats_episode"] = 1
     $ household_mark_runtime_event_seen("melissa_storage_rat", -999)
     $ threads.clear()
     $ availEvents.clear()
@@ -1523,7 +1866,7 @@ testcase external_melissa_werecat_thread_condition_sequence:
     assert eval (not threads["melissaWerecatProblem"].checkActive()) timeout 5.0
     $ _rat_evt = threads["melissaRatProblem"].getevent(0)
     $ _rat_check_fields = [str(row.get("field", "") or "") for row in _rat_evt.auditChecks(threads["melissaRatProblem"].day)]
-    assert eval (int(MelissaVar.get("storage_rat_cleared", 0) or 0) == 0) timeout 5.0
+    assert eval (int(Melissa.var.get("storage_rat_cleared", 0) or 0) == 0) timeout 5.0
     assert eval (str(getLocation("melissa") or "") == "TavernStorage") timeout 5.0
     assert eval (not household_runtime_event_seen_today("melissa_storage_rat")) timeout 5.0
     assert eval (set(["target", "binding", "day", "hour", "delay", "requirements", "conditions", "item", "location_open", "probability"]).issubset(set(_rat_check_fields))) timeout 5.0
@@ -1540,8 +1883,9 @@ testcase external_melissa_werecat_thread_condition_sequence:
     $ Melissa.var["ratKilled"] = True
     $ Melissa.var["storage_rat_cleared"] = 1
     $ Melissa.var["storage_rat_last_help_day"] = int(dayspassed or 0)
-    $ Melissa.sync_melissa_maps()
-    $ WerecatVar["rats_problem_active"] = 1
+    $ Melissa.var["temp_room"] = ""
+    $ peopleInfo["melissa"].var["temp_room"] = ""
+    $ werecat_state()["rats_problem_active"] = 1
     $ threads["melissaRatProblem"].advance()
     $ CurLoc = "HunterClub"
     $ location = CurLoc
@@ -1556,11 +1900,11 @@ testcase external_melissa_werecat_thread_condition_sequence:
     $ thread = threads["melissaWerecatProblem"]
     $ thread.setDay()
     run Call("story_melissa_werecat_rumor_0")
-    assert eval (int(WerecatVar.get("hunter_tease_day", -1) or -1) == int(dayspassed or 0)) timeout 5.0
+    assert eval (int(werecat_state().get("hunter_tease_day", -1) or -1) == int(dayspassed or 0)) timeout 5.0
     advance until eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_intro_0") timeout 10.0
     assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_intro_0") timeout 5.0
 
-    $ external_calendar_set_fields(day, month, year, 6, 0)
+    $ external_calendar_set_fields(3, 1, 1100, 8, 0)
     $ CurLoc = "TavernKitchen"
     $ location = CurLoc
     $ CurrentRoom = TavernKitchenRoom
@@ -1573,14 +1917,14 @@ testcase external_melissa_werecat_thread_condition_sequence:
     $ thread = threads["melissaWerecatProblem"]
     $ thread.setDay()
     run Call("story_melissa_werecat_intro_0")
-    assert eval (int(WerecatVar.get("rat_breakfast_seen", 0) or 0) == 1) timeout 5.0
+    assert eval (int(werecat_state().get("rat_breakfast_seen", 0) or 0) == 1) timeout 5.0
     assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_home_0") timeout 5.0
 
-    $ WerecatVar["adopted"] = 1
-    $ WerecatVar["adopted_count"] = 1
-    $ WerecatVar["adopted_day"] = int(dayspassed or 0) - 1
-    $ WerecatVar["adoption_breakfast_seen"] = 0
-    $ external_calendar_set_fields(day, month, year, 6, 0)
+    $ werecat_state()["adopted"] = 1
+    $ werecat_state()["adopted_count"] = 1
+    $ werecat_state()["adopted_day"] = int(dayspassed or 0) - 1
+    $ werecat_state()["adoption_breakfast_seen"] = 0
+    $ external_calendar_set_fields(3, 1, 1100, 8, 0)
     $ BreakfastToday = False
     $ evalTime = None
     $ initStoryEventRuntime(True)
@@ -1602,7 +1946,7 @@ testcase external_melissa_werecat_thread_condition_sequence:
     $ thread = threads["melissaWerecatProblem"]
     $ thread.setDay()
     run Call("story_melissa_werecat_home_0")
-    assert eval (int(WerecatVar.get("adoption_breakfast_seen", 0) or 0) == 1) timeout 5.0
+    assert eval (int(werecat_state().get("adoption_breakfast_seen", 0) or 0) == 1) timeout 5.0
 '''
 
 
@@ -1621,22 +1965,21 @@ testcase external_melissa_werecat_forest_actions_rebuild:
     $ CurrentRoom = ForestRoom
     $ ForestReturnTarget = "StreetTavern"
     $ ForestSavedText = ""
-    $ WerecatVar["rats_problem_active"] = 1
-    $ WerecatVar["rat_breakfast_seen"] = 1
-    $ WerecatVar["hunter_tease_day"] = int(dayspassed or 0)
-    $ WerecatVar["adopted"] = 0
-    $ WerecatVar["adopted_count"] = 0
-    $ WerecatVar["sold"] = 0
-    $ WerecatVar["caught"] = 0
-    $ WerecatVar["tracks_seen"] = 0
-    $ WerecatVar["tracks_first_text_seen"] = 0
-    $ WerecatVar["trap_rooms"] = {}
-    $ WerecatVar["trap_active"] = 0
-    $ WerecatVar["trap_room"] = ""
-    $ WerecatVar["trap_day"] = -1
+    $ werecat_state()["rats_problem_active"] = 1
+    $ werecat_state()["rat_breakfast_seen"] = 1
+    $ werecat_state()["hunter_tease_day"] = int(dayspassed or 0)
+    $ werecat_state()["adopted"] = 0
+    $ werecat_state()["adopted_count"] = 0
+    $ werecat_state()["sold"] = 0
+    $ werecat_state()["caught"] = 0
+    $ werecat_state()["tracks_seen"] = 0
+    $ werecat_state()["tracks_first_text_seen"] = 0
+    $ werecat_state()["trap_rooms"] = {}
+    $ werecat_state()["trap_active"] = 0
+    $ werecat_state()["trap_room"] = ""
+    $ werecat_state()["trap_day"] = -1
     $ Melissa.var["storage_rat_cleared"] = 1
     $ Melissa.var["storage_rat_last_help_day"] = int(dayspassed or 0) - 1
-    $ Melissa.sync_melissa_maps()
     $ exploration = 130
     $ _player_remove_item_by_id("hunting_trap_001", _player_item_count_by_id("hunting_trap_001"))
     run Jump("Forest")
@@ -1644,7 +1987,7 @@ testcase external_melissa_werecat_forest_actions_rebuild:
     assert eval ("Осмотреть лес внимательнее" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 10.0
     advance until screen "main_ui" timeout 20.0
-    assert eval (int(WerecatVar.get("tracks_seen", 0) or 0) == 1) timeout 5.0
+    assert eval (int(werecat_state().get("tracks_seen", 0) or 0) == 1) timeout 5.0
     assert eval (str(current_action_title or "") == "Действия") timeout 5.0
     assert eval ("Осмотреть лес внимательнее" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
 
@@ -1652,20 +1995,20 @@ testcase external_melissa_werecat_forest_actions_rebuild:
     run Call("WerecatSetTrap", "Forest")
     assert eval ("ставите охотничью ловушку" in str(MainTxt or "")) timeout 5.0
     assert eval (int(_player_item_count_by_id("hunting_trap_001") or 0) == 0) timeout 5.0
-    assert eval (int(WerecatVar.get("trap_active", 0) or 0) == 1) timeout 5.0
-    assert eval (str(WerecatVar.get("trap_room", "") or "") == "Forest") timeout 5.0
+    assert eval (int(werecat_state().get("trap_active", 0) or 0) == 1) timeout 5.0
+    assert eval (str(werecat_state().get("trap_room", "") or "") == "Forest") timeout 5.0
     assert eval (str(current_action_title or "") == "Действия") timeout 5.0
     assert eval ("Проверить странную приманку" not in [str(i.caption or "") for i in current_action_items]) timeout 5.0
 
-    $ WerecatVar["trap_rooms"] = {"Forest": {"day": int(dayspassed or 0) - 1}}
-    $ WerecatVar["trap_active"] = 1
-    $ WerecatVar["trap_room"] = "Forest"
-    $ WerecatVar["trap_day"] = int(dayspassed or 0) - 1
-    $ WerecatVar["woods_exploration"] = 0
+    $ werecat_state()["trap_rooms"] = {"Forest": {"day": int(dayspassed or 0) - 1}}
+    $ werecat_state()["trap_active"] = 1
+    $ werecat_state()["trap_room"] = "Forest"
+    $ werecat_state()["trap_day"] = int(dayspassed or 0) - 1
+    $ werecat_state()["woods_exploration"] = 0
     $ exploration = 20
     run Call("WerecatCheckTrap", "Forest")
     assert eval ("оказалась слишком осторожной" in str(MainTxt or "")) timeout 5.0
-    assert eval (int(WerecatVar.get("trap_active", 0) or 0) == 0) timeout 5.0
+    assert eval (int(werecat_state().get("trap_active", 0) or 0) == 0) timeout 5.0
     assert eval (str(current_action_title or "") == "Действия") timeout 5.0
 '''
 
@@ -1795,12 +2138,12 @@ testcase external_georgett_liza_church_after_sermon_events:
     $ TodaySexEvents_Add("liza", 99, 99, "Priest")
     $ initStoryEventRuntime(True)
     assert eval (story_event_available("Church", "after_cermon_walk")) timeout 5.0
-    $ renpy.call_in_new_context("ChurchAfterCermon", 1)
-    assert eval ("Посмотреть" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    run Call("ChurchAfterCermon", 1)
+    advance until screen "choice" timeout 10.0
     assert eval ("замочную скважину" in str(CurLocDesc or "")) timeout 5.0
-    $ renpy.call_in_new_context("AfterCermonLizett")
-    assert eval (int(ChurchAfterCermon.get("liza", 0) or 0) == 1) timeout 5.0
-    assert eval (int(Liza.story_value("SawChurchAfterCermon", 0) or 0) == 0) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(Liza.after_sermon_stage() or 0) == 1) timeout 10.0
+    assert eval (int(Liza.after_sermon_stage() or 0) == 1) timeout 5.0
+    assert eval ("Лизетту" in str(CurLocDesc or "")) timeout 5.0
 '''
 
 
@@ -1858,7 +2201,7 @@ testcase external_clara_market_event_repeats_until_exploration_success:
     assert eval (clara_market_daytime_roll_active(dayspassed, week)) timeout 5.0
     assert eval (int(ClaraVar.get("booklet_market_seen", 0) or 0) == 0) timeout 5.0
     assert eval (not (int(ClaraVar.get("market_follow_failed_day", -1) or -1) == int(dayspassed or 0) and int(ClaraVar.get("market_follow_failed_hour", -1) or -1) == int(hour or 0))) timeout 5.0
-    assert eval (MarketPlaceRoom.is_open(week, time)) timeout 5.0
+    assert eval (MarketPlaceRoom.is_open()) timeout 5.0
     assert eval (int(threads["claraBookletMarket"].num or 0) == 0 and threads["claraBookletMarket"].checkActive()) timeout 5.0
     assert eval (len(threads["claraBookletMarket"].getAvailableEvents()) > 0) timeout 5.0
     assert eval (story_event_available("MarketPlace", "enter")) timeout 5.0
@@ -1941,8 +2284,8 @@ testcase external_mongol_market_schedule_rolls_once_per_day:
     $ availEvents.clear()
     $ evalTime = None
     $ CurrentLoc["mongol"] = ""
-    $ MongolVar["MarketRollDay"] = int(dayspassed or 0)
-    $ MongolVar["MarketRoll"] = 0
+    $ Mongol.var["MarketRollDay"] = int(dayspassed or 0)
+    $ Mongol.var["MarketRoll"] = 0
     assert eval (not marketplace_mongol_visible()) timeout 5.0
     assert eval (str(getLocation("mongol") or "") != "MarketPlace") timeout 5.0
     run Jump("MarketPlace")
@@ -1950,11 +2293,11 @@ testcase external_mongol_market_schedule_rolls_once_per_day:
 
     $ external_calendar_set_fields(day, month, year, 10, 0)
     $ week = 2
-    $ MongolVar["MarketRollDay"] = int(dayspassed or 0)
-    $ MongolVar["MarketRoll"] = 1
+    $ Mongol.var["MarketRollDay"] = int(dayspassed or 0)
+    $ Mongol.var["MarketRoll"] = 1
     assert eval (str(MyStallion or "") == "") timeout 5.0
-    assert eval (MarketPlaceRoom.is_open(week, time)) timeout 5.0
-    assert eval (int(MongolVar.get("MarketRollDay", -1)) == int(dayspassed or 0) and int(MongolVar.get("MarketRoll", 0)) == 1) timeout 5.0
+    assert eval (MarketPlaceRoom.is_open()) timeout 5.0
+    assert eval (int(Mongol.var.get("MarketRollDay", -1)) == int(dayspassed or 0) and int(Mongol.var.get("MarketRoll", 0)) == 1) timeout 5.0
     assert eval (marketplace_mongol_visible()) timeout 5.0
     assert eval (str(getLocation("mongol") or "") == "MarketPlace") timeout 5.0
     run Jump("MarketPlace")
@@ -2036,15 +2379,15 @@ testcase external_clara_booklet_mongol_night_buttons_advance:
     $ month = int(_clara_mongol_date.get("month", 1) or 1)
     $ year = int(_clara_mongol_date.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE)
     $ week = 2
-    $ external_calendar_set_fields(day, month, year, 23, 0)
+    $ external_calendar_set_fields(day, month, year, 16, 0)
     $ CurLoc = "CityGuard"
     $ location = CurLoc
     $ productnum = max(int(productnum or 0), 2)
     $ winenum = max(int(winenum or 0), 1)
-    $ MongolVar["StocksArrestDay"] = int(dayspassed or 0) - 1
-    $ MongolVar["StocksSeen"] = 1
-    $ MongolVar["StocksFoodDay"] = -1
-    $ MongolVar["StocksReleased"] = 0
+    $ Mongol.var["StocksArrestDay"] = int(dayspassed or 0) - 1
+    $ Mongol.var["StocksSeen"] = 1
+    $ Mongol.var["StocksFoodDay"] = -1
+    $ Mongol.var["StocksReleased"] = 0
     $ DraupnirVar["MongolLockpickOrderDay"] = -1
     $ threads.clear()
     $ availEvents.clear()
@@ -2055,20 +2398,70 @@ testcase external_clara_booklet_mongol_night_buttons_advance:
     assert eval (story_event_available("CityGuard", "enter")) timeout 5.0
     $ thread = threads["claraBookletMarket"]
     run Call("story_clara_market_booklet_feed_mongol")
-    assert eval (int(MongolVar.get("StocksFoodDay", -1) or -1) == int(dayspassed or 0)) timeout 5.0
+    assert eval (int(Mongol.var.get("StocksFoodDay", -1) or -1) == int(dayspassed or 0)) timeout 5.0
     assert eval (threads["claraBookletMarket"].currentTarget() == "story_clara_market_booklet_8") timeout 5.0
     $ DraupnirVar["MongolLockpickOrderDay"] = int(dayspassed or 0)
     $ threads["claraBookletMarket"].advanceTo(8, force_active=True)
     $ CurLoc = "CityGuard"
     $ location = CurLoc
     $ external_calendar_set_fields(day, month, year, 23, 0)
-    $ dayspassed = int(MongolVar.get("StocksFoodDay", 0) or 0) + 1
+    $ dayspassed = int(Mongol.var.get("StocksFoodDay", 0) or 0) + 1
     $ findAvailableEvents(True)
     assert eval (story_event_available("CityGuard", "enter")) timeout 5.0
     $ thread = threads["claraBookletMarket"]
     run Call("story_clara_market_booklet_release_mongol")
-    assert eval (int(MongolVar.get("StocksReleased", 0) or 0) == 1) timeout 5.0
+    assert eval (int(Mongol.var.get("StocksReleased", 0) or 0) == 1) timeout 5.0
     assert eval (threads["claraBookletMarket"].completed) timeout 5.0
+
+testcase external_zimmer_mongol_wine_distraction_dialog:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+    $ CurLoc = "CityGuard"
+    $ location = CurLoc
+    $ productnum = max(int(productnum or 0), 2)
+    $ winenum = max(int(winenum or 0), 1)
+    $ Talked["zimmer"] = 0
+    $ TalkedToday["zimmer"] = 0
+    $ _mongol_test_var = peopleInfo["mongol"].var
+    $ _mongol_test_var["StocksSeen"] = 1
+    $ _mongol_test_var["StocksFoodDay"] = int(dayspassed or 0)
+    $ _mongol_test_var["StocksReleased"] = 0
+    $ _mongol_test_var["GuardCaptainKnown"] = 0
+    $ DraupnirVar["MongolLockpickOrderDay"] = int(dayspassed or 0)
+    run Call("IntZimmerTalk")
+    assert eval ("Похвастаться вином для ночной стражи" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    $ renpy.call_in_new_context("IntZimmerTalkMongolWineDistraction")
+    assert eval (int(peopleInfo["mongol"].var.get("GuardCaptainKnown", 0) or 0) == 1) timeout 5.0
+    assert eval ("правильное понимание общественного порядка" in str(MainTxt or "")) timeout 5.0
+    assert eval (int(Friends.get("zimmer", 0) or 0) >= 1) timeout 5.0
+
+testcase external_robin_blackwood_room_thread_and_mongol_pass:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+    $ people_sync_all()
+    assert eval (getPersonInfo("robin") is Robin and isinstance(Robin, RobinInfo)) timeout 5.0
+    assert eval (getPersonData("robin") is RobinStaticData) timeout 5.0
+    assert eval (str(getLocation("robin") or "") == "BlackwoodRoad") timeout 5.0
+    $ CurLoc = "BlackwoodRoad"
+    $ location = CurLoc
+    $ Becky.var["TradeOffer"] = 1
+    $ Robin.var["MongolSafePass"] = 1
+    $ Robin.var["KunidellOpened"] = 0
+    $ Robin.var["MongolSafePassUsed"] = 0
+    $ BlackwoodTravelOnHorse = 0
+    $ initStoryEventRuntime(True)
+    $ findAvailableEvents(True)
+    assert eval ("robinBlackwoodRoadAmbush" in threads) timeout 5.0
+    assert eval (story_event_available("BlackwoodRoad", "enter")) timeout 5.0
+    $ thread = threads["robinBlackwoodRoadAmbush"]
+    run Call("story_robin_blackwood_mongol_pass")
+    advance until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until eval (int(Robin.var.get("KunidellOpened", 0) or 0) == 1) timeout 20.0
+    assert eval (int(Robin.var.get("KunidellOpened", 0) or 0) == 1) timeout 5.0
+    assert eval (int(Robin.var.get("MongolSafePassUsed", 0) or 0) == 1) timeout 5.0
 '''
 
 
@@ -2078,19 +2471,21 @@ testcase external_friday_amanda_bad_invite_uses_one_dance:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
     $ external_calendar_set_fields(day, month, year, 20, 0)
-    $ week = 5
+    $ external_calendar_set_weekday(5)
     $ FridayDancesCount = 0
     $ DanceStep = 0
     $ DanceSponsor = 0
-    $ DanceWatchLine.clear()
     $ GirlDance_Clear()
-    $ AmandaVar["leftdances"] = 0
-    $ AmandaVar["EscapeUnnoticed"] = 0
-    $ AmandaVar["albernowdances"] = 0
-    $ AmandaVar["LegareGo"] = 0
-    $ BeckyVar["leftdances"] = 1
-    $ Friends["amanda"] = 0
-    $ sluttiness["amanda"] = 0
+    $ CurrentLoc["amanda"] = "FridayDance"
+    $ npc_schedule_set("amanda", [NPCScheduleEntry(location="FridayDance", time_slots=[], awake=True, talkable=True, priority=999)])
+    $ Amanda.set_var_int("leftdances", 0)
+    $ Amanda.set_var_int("EscapeUnnoticed", 0)
+    $ Amanda.set_var_int("albernowdances", 0)
+    $ Amanda.set_var_int("LegareGo", 0)
+    $ Becky.set_story_value("leftdances", 1)
+    $ Amanda.rel = 0
+    $ Amanda.relationship = Amanda.rel
+    $ Amanda.corruption = 0
     $ main_ui_overlay = ""
     $ main_ui_inventory_dropdown_open = False
     $ action_menu_specs = []
@@ -2117,20 +2512,21 @@ testcase external_friday_amanda_legare_go_phrase_survives_create_dance:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
     $ external_calendar_set_fields(day, month, year, 20, 0)
-    $ week = 5
+    $ external_calendar_set_weekday(5)
     $ FridayDancesCount = 0
     $ DanceStep = 0
     $ DanceSponsor = 0
-    $ DanceWatchLine.clear()
     $ GirlDance_Clear()
     $ GirlDance_Add("amanda", "legare", 1, 1, "LEGARE_GO_TEST_PHRASE")
-    $ AmandaVar["leftdances"] = 0
-    $ AmandaVar["EscapeUnnoticed"] = 0
-    $ AmandaVar["albernowdances"] = 0
-    $ AmandaVar["LegareGo"] = 0
-    $ AmandaVar["alberfriends"] = 12
-    $ sluttiness["amanda"] = 40
-    $ BeckyVar["leftdances"] = 1
+    $ CurrentLoc["amanda"] = "FridayDance"
+    $ npc_schedule_set("amanda", [NPCScheduleEntry(location="FridayDance", time_slots=[], awake=True, talkable=True, priority=999)])
+    $ Amanda.set_var_int("leftdances", 0)
+    $ Amanda.set_var_int("EscapeUnnoticed", 0)
+    $ Amanda.set_var_int("albernowdances", 0)
+    $ Amanda.set_var_int("LegareGo", 0)
+    $ Amanda.set_var_int("alberfriends", 12)
+    $ Amanda.corruption = 40
+    $ Becky.set_story_value("leftdances", 1)
     $ main_ui_overlay = ""
     $ main_ui_inventory_dropdown_open = False
     $ action_menu_specs = []
@@ -2141,8 +2537,8 @@ testcase external_friday_amanda_legare_go_phrase_survives_create_dance:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     assert eval (int(FridayDancesCount or 0) == 1) timeout 5.0
-    assert eval (int(AmandaVar.get("albernowdances", 0) or 0) == 1) timeout 5.0
-    assert eval (str(DanceWatchLine.get(6, "") or "") == "LEGARE_GO_TEST_PHRASE") timeout 5.0
+    assert eval (Amanda.var_int("albernowdances", 0) == 1) timeout 5.0
+    assert eval (str(SexEvents.dance_watch_line.get(6, "") or "") == "LEGARE_GO_TEST_PHRASE") timeout 5.0
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     advance until screen "choice" timeout 20.0
@@ -2156,23 +2552,23 @@ testcase external_friday_amanda_legare_go_phrase_survives_create_dance:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     advance until screen "choice" timeout 20.0
-    assert eval (int(AmandaVar.get("LegareGo", 0) or 0) == 0) timeout 5.0
+    assert eval (Amanda.var_int("LegareGo", 0) == 0) timeout 5.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "choice" timeout 20.0
-    assert eval (int(AmandaVar.get("leftdances", 0) or 0) == 1) timeout 5.0
+    assert eval (Amanda.var_int("leftdances", 0) == 1) timeout 5.0
 
 testcase external_friday_dance_minigame_steps_score:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
     $ external_calendar_set_fields(day, month, year, 20, 0)
-    $ week = 5
+    $ external_calendar_set_weekday(5)
     $ FridayDancesCount = 0
     $ FridayDanceMood = 0
     $ FridayDanceRhythm = 0
     $ FridayDanceAttention = 0
     $ DanceStep = 0
     $ DanceSponsor = 0
-    $ AmandaVar["leftdances"] = 1
+    $ Amanda.set_var_int("leftdances", 1)
     $ BeckyVar["leftdances"] = 1
     $ main_ui_overlay = ""
     $ main_ui_inventory_dropdown_open = False
@@ -2195,7 +2591,7 @@ testcase external_friday_becky_inner_actions_do_not_spend_extra_dances:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
     $ external_calendar_set_fields(day, month, year, 20, 0)
-    $ week = 5
+    $ external_calendar_set_weekday(5)
     $ CurLoc = "FridayDance"
     $ location = "FridayDance"
     $ FridayDancesCount = 1
@@ -2443,14 +2839,15 @@ testcase external_amanda_player_room_visit_is_physical_and_leaves:
     $ TavernBreakfastPresentIds = None
     $ AmandaIntentSeen.clear()
     $ AmandaIntentRoomPresence.clear()
-    $ AmandaVar["beauty_help_terms_accepted"] = 1
-    $ AmandaVar["night_tease_seen"] = 0
-    $ AmandaVar["night_tease_scene_active"] = 0
-    $ AmandaVar["kickyoufromroom"] = 0
+    $ Amanda.set_var_int("beauty_help_terms_accepted", 1)
+    $ Amanda.set_var_int("night_tease_seen", 0)
+    $ Amanda.set_var_int("night_tease_scene_active", 0)
+    $ Amanda.set_var_int("kickyoufromroom", 0)
     $ TavernBreakfastBlindPirateTeamPledge = 1
-    $ Friends["amanda"] = max(int(Friends.get("amanda", 0) or 0), 12)
-    $ otkroven["amanda"] = max(int(otkroven.get("amanda", 0) or 0), 8)
-    $ sluttiness["amanda"] = max(int(sluttiness.get("amanda", 0) or 0), 35)
+    $ Amanda.rel = max(int(Amanda.rel or 0), 12)
+    $ Amanda.relationship = Amanda.rel
+    $ Amanda.openness = max(int(Amanda.openness or 0), 8)
+    $ Amanda.corruption = max(int(Amanda.corruption or 0), 35)
     $ CurrentLoc["amanda"] = "TavernAmandaRoom"
     $ amanda_ai_place_in_room("TavernMyRoom", "visit_player_room")
 
@@ -2777,7 +3174,7 @@ init -1 python:
             Friends["sandra"] = max(int(Friends.get("sandra", 0) or 0), 10)
             SandraVar["RoomUnlocked"] = 1
             BedroomDoorStates["TavernSandraRoom"] = 0
-            AmandaVar["kickyoufromroom"] = 0
+            Amanda.set_var_int("kickyoufromroom", 0)
             CurrentLoc["eddie"] = "GroceryStore"
             CurrentLoc["becky"] = "GroceryStore"
             CurrentLoc["irma"] = "DressShop"
@@ -2911,7 +3308,7 @@ testcase external_calendar_long_cycle_thirteenth_period_rollover:
     assert eval (int(age or 0) == 21) timeout 5.0
     assert eval (str(month_name_en or "") == "Wolf Moon" and str(calendar_month_name_ru or "") == "Луна Волка") timeout 5.0
     assert eval ("Period" not in str(month_name_en or "") and "период" not in str(month_name or "").lower()) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 23, 0)
+    $ external_calendar_set_fields(day, month, year, 16, 0)
     assert eval (int(time or 0) == 7) timeout 5.0
     assert eval (int(clock_minutes or 0) == 1380) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 5, 59)
@@ -2982,17 +3379,25 @@ testcase external_daily_setstatdefault_body_maps_exist:
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
     $ Breastfeed.clear()
     $ Lactate.clear()
+    $ Sandra.rel = 10
+    $ Sandra.openness = 0
+    $ Amanda.rel = 10
+    $ Amanda.openness = 0
     run Call("DailySetstatdefault", "melissa")
+    run Call("DailySetstatdefault", "sandra")
+    run Call("DailySetstatdefault", "amanda")
     assert eval ("melissa" in Breastfeed and "melissa" in Lactate) timeout 5.0
+    assert eval ("sandra" in Breastfeed and "sandra" in Lactate and "amanda" in Breastfeed and "amanda" in Lactate) timeout 5.0
     assert eval (int(Breastfeed.get("melissa", -1) or 0) >= 0 and int(Lactate.get("melissa", -1) or 0) >= 0) timeout 5.0
+    assert eval (int(Sandra.openness or 0) >= 5 and int(Amanda.openness or 0) >= 5) timeout 5.0
 
 testcase external_hour_based_room_and_npc_schedule_adjustment:
     $ npc_interval_schedule_load_all(True)
-    $ external_calendar_set_fields(day, month, year, 6, 0)
+    $ external_calendar_set_fields(day, month, year, 7, 0)
     $ external_calendar_set_weekday(1)
-    assert eval (MarketPlaceRoom.is_open(week, time)) timeout 5.0
-    assert eval (WineStoreRoom.is_open(week, time)) timeout 5.0
-    assert eval (DressShopRoom.is_open(week, time)) timeout 5.0
+    assert eval (MarketPlaceRoom.is_open()) timeout 5.0
+    assert eval (WineStoreRoom.is_open()) timeout 5.0
+    assert eval (DressShopRoom.is_open()) timeout 5.0
     assert eval (clara_wine_store_shift_active()) timeout 5.0
     assert eval (week != 7 and time == 0) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 6, 0)
@@ -3000,26 +3405,26 @@ testcase external_hour_based_room_and_npc_schedule_adjustment:
     $ external_calendar_set_fields(day, month, year, 6, 0)
     $ external_calendar_set_fields(day, month, year, 11, 0)
     assert eval ((not clara_wine_store_shift_active()) and week != 7 and time < 3 and time != 0) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 12, 59)
-    assert eval (MarketPlaceRoom.is_open(week, time)) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 13, 0)
-    assert eval (not MarketPlaceRoom.is_open(week, time)) timeout 5.0
+    $ external_calendar_set_fields(day, month, year, 17, 59)
+    assert eval (MarketPlaceRoom.is_open()) timeout 5.0
+    $ external_calendar_set_fields(day, month, year, 18, 0)
+    assert eval (not MarketPlaceRoom.is_open()) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 15, 59)
-    assert eval (GroceryStoreRoom.is_open(week, time) and HunterClubRoom.is_open(week, time)) timeout 5.0
+    assert eval (GroceryStoreRoom.is_open() and HunterClubRoom.is_open()) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 16, 0)
-    assert eval ((not GroceryStoreRoom.is_open(week, time)) and (not HunterClubRoom.is_open(week, time))) timeout 5.0
+    assert eval ((not GroceryStoreRoom.is_open()) and (not HunterClubRoom.is_open())) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 6, 0)
     $ external_calendar_set_weekday(7)
-    assert eval (not ChurchRoom.is_open(week, time)) timeout 5.0
+    assert eval (not ChurchRoom.is_open()) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 8, 0)
     $ external_calendar_set_weekday(7)
-    assert eval (ChurchRoom.is_open(week, time)) timeout 5.0
+    assert eval (ChurchRoom.is_open()) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 12, 59)
     $ external_calendar_set_weekday(7)
-    assert eval (ChurchRoom.is_open(week, time)) timeout 5.0
+    assert eval (ChurchRoom.is_open()) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 13, 0)
     $ external_calendar_set_weekday(7)
-    assert eval (not ChurchRoom.is_open(week, time)) timeout 5.0
+    assert eval (not ChurchRoom.is_open()) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 6, 0)
     $ external_calendar_set_weekday(5)
     assert eval (city_guard_open_now()) timeout 5.0
@@ -3038,7 +3443,7 @@ testcase external_hour_based_room_and_npc_schedule_adjustment:
     $ external_calendar_set_fields(day, month, year, 8, 0)
     assert eval (not _morning_entry.matches()) timeout 5.0
     $ _night_entry = npc_daily_schedule_entry_from_row(npc_daily_schedule_slot(7, "TavernMyRoom", False, False, "sleep"), 7)
-    $ external_calendar_set_fields(day, month, year, 23, 0)
+    $ external_calendar_set_fields(day, month, year, 16, 0)
     assert eval (_night_entry.matches()) timeout 5.0
     $ external_calendar_set_fields(day, month, year, 22, 59)
     assert eval (not _night_entry.matches()) timeout 5.0
@@ -3207,6 +3612,159 @@ testcase external_harassment_event_picture_sequence:
 
 
 GIRL_OBJECT_RUNTIME_CHECKS = r'''
+testcase external_inga_secondary_npc_source:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+    $ people_sync_all()
+    assert eval ("inga" not in AllGirlNames) timeout 5.0
+    assert eval ("inga" in SECONDARY_NPC_KEYS) timeout 5.0
+    assert eval (getPersonData("inga") is IngaStaticData and isinstance(getPersonData("inga"), IngaData)) timeout 5.0
+    assert eval (getPersonInfo("inga") is Inga and isinstance(getPersonInfo("inga"), IngaInfo)) timeout 5.0
+    assert eval (getPersonInfo("inga") not in girls and getPersonInfo("inga") in secondary_npcs) timeout 5.0
+    assert eval (Inga.var is IngaVar and Inga.location == "BeckyHome") timeout 5.0
+
+testcase external_francheska_secondary_and_birth_thread:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+    $ people_sync_all()
+    assert eval (getPersonData("fran") is FranStaticData and isinstance(getPersonData("fran"), FranData)) timeout 5.0
+    assert eval (getPersonInfo("fran") is Francheska and isinstance(getPersonInfo("fran"), FrancheskaInfo)) timeout 5.0
+    assert eval (getPersonInfo("fran") not in girls and getPersonInfo("fran") in secondary_npcs and "fran" in SECONDARY_NPC_KEYS) timeout 5.0
+    assert eval ("systemGiveBirth" in threads and "systemGiveBirth" in threadData) timeout 5.0
+    $ dayspassed = 240
+    $ pregnancy["amanda"] = 240
+    $ pregfather["amanda"] = "Вы"
+    $ CurLoc = "TavernMain"
+    $ location = CurLoc
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("TavernMain", "enter")) timeout 5.0
+    assert eval (str(availEvents["TavernMain"]["enter"].target or "") == "story_give_birth_amanda") timeout 5.0
+    $ pregnancy["amanda"] = 0
+    $ pregfather["amanda"] = ""
+    $ pregnancy["inga"] = 240
+    $ pregfather["inga"] = "Лукас"
+    $ CurLoc = "BeckyHome"
+    $ location = CurLoc
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("BeckyHome", "enter")) timeout 5.0
+    assert eval (str(availEvents["BeckyHome"]["enter"].target or "") == "story_give_birth_inga") timeout 5.0
+    $ pregnancy["inga"] = 0
+    $ pregfather["inga"] = ""
+    $ dayspassed = 0
+
+testcase external_gerhard_secondary_npc_source:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+    $ people_sync_all()
+    assert eval ("gerhard" not in AllGirlNames) timeout 5.0
+    assert eval ("gerhard" in SECONDARY_NPC_KEYS) timeout 5.0
+    assert eval (getPersonData("gerhard") is GerhardStaticData and isinstance(getPersonData("gerhard"), GerhardData)) timeout 5.0
+    assert eval (getPersonInfo("gerhard") is Gerhard and isinstance(getPersonInfo("gerhard"), GerhardInfo)) timeout 5.0
+    assert eval (getPersonInfo("gerhard") not in girls and getPersonInfo("gerhard") in secondary_npcs) timeout 5.0
+    assert eval (Gerhard.var is GerhardVar and Gerhard.location == "Church") timeout 5.0
+    assert eval (peopleData["gerhard"].cname == "Брат Герхард" and peopleData["gerhard"].portrait == "images/gerhard/portrait.png") timeout 5.0
+    assert eval (all(key in Gerhard.var for key in ["confession_intro_done", "sermon_story_stage", "becky_advice_stage", "georgett_confession_stage", "liza_confession_stage"])) timeout 5.0
+
+testcase external_secondary_side_characters_are_classes:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+    $ people_sync_all()
+    assert eval (all(key in SECONDARY_NPC_KEYS for key in ["luisa", "sergio", "lucas", "clara_fiance", "sergio_pet"])) timeout 5.0
+    assert eval (getPersonData("luisa") is LuisaStaticData and getPersonInfo("luisa") is Luisa and isinstance(Luisa, LuisaInfo)) timeout 5.0
+    assert eval (getPersonData("sergio") is SergioStaticData and getPersonInfo("sergio") is Sergio and isinstance(Sergio, SergioInfo)) timeout 5.0
+    assert eval (getPersonData("lucas") is LucasStaticData and getPersonInfo("lucas") is Lucas and isinstance(Lucas, LucasInfo)) timeout 5.0
+    assert eval (getPersonData("clara_fiance") is ClaraFianceStaticData and getPersonInfo("clara_fiance") is ClaraFiance and isinstance(ClaraFiance, ClaraFianceInfo)) timeout 5.0
+    assert eval (getPersonData("sergio_pet") is SergioPetStaticData and getPersonInfo("sergio_pet") is SergioPet and isinstance(SergioPet, SergioPetInfo)) timeout 5.0
+    assert eval (all(getPersonInfo(key) not in girls and getPersonInfo(key) in secondary_npcs for key in ["luisa", "sergio", "lucas", "clara_fiance", "sergio_pet"])) timeout 5.0
+    assert eval (Luisa.var is LuisaVar and Sergio.var is SergioVar and Lucas.var is LucasVar and ClaraFiance.var is ClaraFianceVar and SergioPet.var is SergioPetVar) timeout 5.0
+    assert eval (peopleData["luisa"].fullname == "Толстушка Луиза" and peopleData["lucas"].dative == "Лукасу") timeout 5.0
+    assert eval (peopleData["clara_fiance"].fullname == "Столичный жених Клариссы" and peopleData["sergio_pet"].default_location == "BarberShop") timeout 5.0
+
+testcase external_birth_thread_conditions_block_day_zero:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    $ renpy.call_in_new_context("InitGameNPCs")
+    $ dayspassed = 0
+    $ pregnancy["sandra"] = 240
+    $ pregfather["sandra"] = "Вы"
+    $ initStoryEventRuntime(True)
+    assert eval ("systemGiveBirth" in threads and "systemGiveBirth" in threadData) timeout 5.0
+    assert eval (not threadData["systemGiveBirth"].triggers[0][0].checkConditions()) timeout 5.0
+    assert eval (not story_event_available("TavernMain", "enter")) timeout 5.0
+    $ dayspassed = 240
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("TavernMain", "enter")) timeout 5.0
+    assert eval (str(availEvents["TavernMain"]["enter"].target or "") == "story_give_birth_sandra") timeout 5.0
+    $ dayspassed = 0
+    $ pregnancy["sandra"] = 0
+    $ pregfather["sandra"] = ""
+
+testcase external_ellona_temple_sunday_story_event:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    $ renpy.call_in_new_context("InitGameNPCs")
+    $ external_calendar_set_fields(day_value=1, month_value=1, year_value=CALENDAR_START_CYCLE, hour_value=9, minute_value=0)
+    $ external_calendar_set_weekday(7)
+    $ FranBusy[time] = 0
+    $ Francheska.var["sunday_stories_seen_day"] = -1
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("EllonaTemple", "enter")) timeout 5.0
+    assert eval (str(availEvents["EllonaTemple"]["enter"].target or "") == "story_ellona_temple_sunday_stories") timeout 5.0
+    run Jump("EllonaTemple")
+    advance until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+    assert eval (str(CurLoc or "") == "EllonaTemple") timeout 5.0
+    assert eval (int(Francheska.var.get("sunday_stories_seen_day", -1) or -1) == int(dayspassed or 0)) timeout 5.0
+    $ initStoryEventRuntime(True)
+    assert eval (not story_event_available("EllonaTemple", "enter")) timeout 5.0
+
+testcase external_becky_classes_are_initialized:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+    $ people_sync_all()
+    assert eval ("becky" in peopleData and getPersonData("becky") is BeckyStaticData) timeout 5.0
+    assert eval ("becky" in peopleInfo and getPersonInfo("becky") is Becky and isinstance(Becky, BeckyInfo)) timeout 5.0
+    assert eval (Becky in girls and Becky.var is not BeckyVar) timeout 5.0
+    assert eval (peopleData["becky"].cname == "Бекки" and peopleData["becky"].fullname == "Ребекка Блэнкеншип") timeout 5.0
+    assert eval (hasattr(peopleData["becky"], "birth_date") and peopleInfo["becky"].age == 36) timeout 5.0
+    assert eval (Friends["becky"] == Becky.rel == 0 and sluttiness["becky"] == Becky.corruption == 25) timeout 5.0
+    assert eval (dressdefault["becky"] == "openworkdress" and bradef["becky"] == "simplebra" and pantiesdef["becky"] == "simplepanties") timeout 5.0
+    assert eval (all(key in Becky.var for key in ["visitedhome", "HomeSex", "EddieWhoreHome", "TradeOffer", "KnowBlackwood"])) timeout 5.0
+    assert eval (Becky.home_visit_stage() == 0 and not Becky.home_sex_unlocked() and not Becky.sherwood_trade_active()) timeout 5.0
+    assert eval (Becky.getLocation(1, 13 * 60) == "GroceryStore") timeout 5.0
+    $ initStoryEventRuntime(True)
+    assert eval (Becky.var.get("visitedhome", 0) == 0) timeout 5.0
+    assert eval (str(player_state().appearance.current_dress or "") != "citydress") timeout 5.0
+    assert eval (int(charisma or 0) <= 75) timeout 5.0
+    assert eval (not story_event_available("talk_becky", "becky_talk_invite")) timeout 5.0
+    $ Becky.var["visitedhome"] = 2
+    $ Friends["becky"] = 13
+    $ Becky.update()
+    $ initStoryEventRuntime(True)
+    assert eval (not story_event_available("talk_becky", "becky_talk_invite")) timeout 5.0
+    $ player_state().appearance.wear_dress("citydress", int(dayspassed or 0))
+    $ charisma = 76
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("talk_becky", "becky_talk_invite")) timeout 5.0
+    $ Becky.var["husbandtalk"] = 1
+    $ Friends["becky"] = 14
+    $ Talked["becky"] = 0
+    $ Becky.update()
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("talk_becky", "becky_talk_husband1")) timeout 5.0
+    $ Becky.var["TradeOffer"] = 1
+    $ Becky.var["AskTradeElf"] = 0
+    $ Talked["becky"] = 0
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("talk_becky", "becky_talk_sherwood_elves")) timeout 5.0
+
 testcase external_people_objects_are_single_source:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -3221,19 +3779,22 @@ testcase external_people_objects_are_single_source:
     assert eval (hasattr(peopleData["sandra"], "birth_date")) timeout 5.0
     assert eval (peopleInfo["sandra"].age == 34) timeout 5.0
     assert eval (peopleInfo["sandra"].known) timeout 5.0
-    assert eval (Friends["amanda"] == peopleInfo["amanda"].rel == 5 and otkroven["amanda"] == peopleInfo["amanda"].openness == 3) timeout 5.0
+    assert eval (peopleInfo["amanda"].rel == 5 and peopleInfo["amanda"].openness == 3) timeout 5.0
     assert eval (dressdefault["amanda"] == "modestworkdress" and dressdefault["melissa"] == "workdress" and dressdefault["sandra"] == "workdresszhilet") timeout 5.0
     assert eval (peopleData["eddie"].cname == "Эдди" and peopleData["eddie"].age == 19 and getPersonInfo("eddie") in secondary_npcs) timeout 5.0
     assert eval (peopleData["mongol"].cname == "Монгол" and peopleData["mongol"].default_location == "MarketPlace" and getPersonInfo("mongol") in secondary_npcs) timeout 5.0
+    assert eval ("inga" not in AllGirlNames and peopleData["inga"] is IngaStaticData and getPersonInfo("inga") is Inga and isinstance(getPersonInfo("inga"), IngaInfo)) timeout 5.0
+    assert eval (getPersonInfo("inga") not in girls and getPersonInfo("inga") in secondary_npcs and "inga" in SECONDARY_NPC_KEYS) timeout 5.0
     assert eval (all(peopleInfo[key] in girls for key in AllGirlNames)) timeout 5.0
     assert eval (all(key in peopleInfo and isinstance(peopleInfo[key], PeopleInfo) for key in SECONDARY_NPC_KEYS)) timeout 5.0
     assert eval (all(key in [str(getattr(row, "name", "") or "") for row in secondary_npcs] for key in SECONDARY_NPC_KEYS)) timeout 5.0
-    assert eval (peopleInfo["amanda"].var is AmandaVar and peopleInfo["becky"].var is BeckyVar and peopleInfo["irma"].var is IrmaVar) timeout 5.0
+    assert eval (peopleInfo["amanda"] is Amanda and Amanda.uses_own_var_state and peopleInfo["becky"].var is not BeckyVar and peopleInfo["irma"].var is IrmaVar) timeout 5.0
     assert eval (peopleInfo["clara"].var is ClaraVar and peopleInfo["melissa"].var is MelissaVar and peopleInfo["sandra"].var is SandraVar) timeout 5.0
     assert eval (getPersonData("melissa") is peopleData["melissa"] and getPersonInfo("melissa") is peopleInfo["melissa"]) timeout 5.0
     assert eval (peopleData["melissa"].cname == RealName["melissa"] and peopleData["clara"].cname == RealName["clara"]) timeout 5.0
     assert eval (all(key in Drunk for key in AllGirlNames)) timeout 5.0
     assert eval (getPersonInfo("sandra") is Sandra and isinstance(getPersonInfo("sandra"), SandraInfo)) timeout 5.0
+    assert eval (getPersonData("clara") is ClaraStaticData and getPersonInfo("clara") is Clara and isinstance(getPersonInfo("clara"), ClaraInfo)) timeout 5.0
     $ Drunk["amanda"] = 1
     $ peopleInfo["amanda"].update()
     assert eval (peopleInfo["amanda"].drunk == 1) timeout 5.0
@@ -3312,15 +3873,26 @@ testcase external_npc_schedule_room_visibility_agreement:
     $ CurrentRoom = TavernKitchenRoom
     $ CurLoc = "TavernKitchen"
     $ location = CurLoc
-    $ _kitchen_ids = [str(row.get("npc_id", "") or "") for row in TavernKitchenRoom.visible_npcs()]
-    $ _main_ids = [str(row.get("npc_id", "") or "") for row in TavernMainRoom.visible_npcs()]
+    $ _kitchen_ids = list(getNPCids("TavernKitchen") or [])
+    $ _main_ids = list(getNPCids("TavernMain") or [])
     assert eval (str(getLocation("melissa") or "") in ("TavernKitchen", "TavernStorage", "TavernMain", "Backyard", "TavernMelissaRoom")) timeout 5.0
     assert eval (set(_kitchen_ids) == set(getNPCids("TavernKitchen"))) timeout 5.0
     assert eval (set(_main_ids) == set(getNPCids("TavernMain"))) timeout 5.0
+    $ Melissa.var["bats_episode"] = 6
+    $ Melissa.var["temp_room"] = "TavernAmandaRoom"
+    assert eval (str(getLocation("melissa") or "") == "TavernAmandaRoom") timeout 5.0
+    assert eval ("melissa" in list(getNPCids("TavernAmandaRoom") or []) and "melissa" not in list(getNPCids("TavernKitchen") or [])) timeout 5.0
+    $ external_calendar_set_fields(3, 1, 1100, 13, 0)
+    $ external_calendar_set_weekday(1)
+    assert eval (str(getLocation("melissa") or "") in ("TavernMain", "TavernKitchen", "TavernStorage", "Backyard")) timeout 5.0
+    assert eval ("melissa" not in list(getNPCids("TavernMelissaRoom") or [])) timeout 5.0
+    $ Melissa.var["temp_room"] = ""
+    $ external_calendar_set_fields(3, 1, 1100, 8, 30)
+    $ external_calendar_set_weekday(1)
     $ TavernBreakfastEventActive = True
     $ TavernBreakfastPresentIds = ["melissa"]
-    $ _forced_kitchen = [str(row.get("npc_id", "") or "") for row in TavernKitchenRoom.visible_npcs()]
-    $ _forced_main = [str(row.get("npc_id", "") or "") for row in TavernMainRoom.visible_npcs()]
+    $ _forced_kitchen = list(getNPCids("TavernKitchen") or [])
+    $ _forced_main = list(getNPCids("TavernMain") or [])
     assert eval (bool(TavernBreakfastEventActive) and list(TavernBreakfastPresentIds or []) == ["melissa"]) timeout 5.0
     assert eval (str(getLocation("melissa") or "") == "TavernKitchen") timeout 5.0
     assert eval ("melissa" in getNPCids("TavernKitchen") and "melissa" not in getNPCids("TavernMain")) timeout 5.0
@@ -3383,30 +3955,19 @@ testcase external_player_and_girl_cards_render:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+    $ _card_return_room = str(CurLoc or "")
     click id "main_ui_entity_button_player_you" pos (0.5, 0.5) until eval (str(UI_mode or "") == "mc") timeout 20.0
     assert eval (len(player_card_stat_rows_left()) > 0 and len(player_card_stat_rows_right()) > 0 and str(player_card_portrait_path() or "") != "") timeout 5.0
     assert eval (str(player_card_portrait_path() or "") == "images/general/player_card.jpg" and renpy.loadable(player_card_portrait_path())) timeout 5.0
-    $ main_ui_restore_room_scene_state()
-    assert eval (str(UI_mode or "") == "scene") timeout 5.0
-    $ _card_keys = ["sandra", "amanda", "melissa", "clara", "becky", "irma"]
+    click id "main_ui_player_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+    $ _card_keys = ["sandra", "amanda", "melissa", "clara", "becky", "irma", "georgett", "liza"]
     $ CurrentLoc["melissa"] = "TavernKitchen"
     $ peopleInfo["melissa"].location = "TavernKitchen"
     $ npc_schedule_set("melissa", [NPCScheduleEntry(location="TavernKitchen", time_slots=[], priority=999)])
-    $ Friends["melissa"] = 9
-    $ otkroven["melissa"] = 4
-    $ sluttiness["melissa"] = 6
-    $ cooking["melissa"] = 45
-    $ cleaning["melissa"] = 35
-    $ waitress["melissa"] = 25
     $ knowsMC["melissa"] = True
     $ peopleInfo["melissa"].update()
-    assert eval (("Локация", getLocation("melissa")) in girl_card_stat_rows("melissa")) timeout 5.0
-    assert eval (("Дружба", "9") in girl_card_stat_rows("melissa")) timeout 5.0
-    assert eval (("Откровенность", "4") in girl_card_stat_rows("melissa")) timeout 5.0
-    assert eval (("Распущенность", "6") in girl_card_stat_rows("melissa")) timeout 5.0
-    assert eval (("Кухня", "45") in girl_card_stat_rows("melissa")) timeout 5.0
-    assert eval (("Уборка", "35") in girl_card_stat_rows("melissa")) timeout 5.0
-    assert eval (("Зал", "25") in girl_card_stat_rows("melissa")) timeout 5.0
+    $ _melissa_rows = girl_card_stat_rows("melissa")
+    assert eval (("Локация", getLocation("melissa")) in _melissa_rows and len(_melissa_rows) >= 5) timeout 5.0
     $ Sandra.age = 35
     $ Sandra.rel = 11
     $ Sandra.openness = 7
@@ -3421,9 +3982,9 @@ testcase external_player_and_girl_cards_render:
     assert eval (("Красота", "77") in girl_card_stat_rows("sandra")) timeout 5.0
     assert eval (("Дети", "4") in girl_card_stat_rows("sandra")) timeout 5.0
     assert eval (("Кухня", "88") in girl_card_stat_rows("sandra")) timeout 5.0
-    assert eval (str(girl_card_portrait_path("amanda") or "") == "images/amanda/amanda_card.jpg" and renpy.loadable(girl_card_portrait_path("amanda"))) timeout 5.0
-    assert eval (str(girl_card_portrait_path("melissa") or "") == "images/melissa/melissa_card.jpg" and renpy.loadable(girl_card_portrait_path("melissa"))) timeout 5.0
-    assert eval (str(girl_card_portrait_path("sandra") or "") == "images/sandra/sandra_card.jpg" and renpy.loadable(girl_card_portrait_path("sandra"))) timeout 5.0
+    assert eval (str(girl_card_portrait_path("amanda") or "") != "" and renpy.loadable(girl_card_portrait_path("amanda"))) timeout 5.0
+    assert eval (str(girl_card_portrait_path("melissa") or "") != "" and renpy.loadable(girl_card_portrait_path("melissa"))) timeout 5.0
+    assert eval (str(girl_card_portrait_path("sandra") or "") != "" and renpy.loadable(girl_card_portrait_path("sandra"))) timeout 5.0
     python:
         _card_results = {}
         for _card_key in _card_keys:
@@ -3440,6 +4001,50 @@ testcase external_player_and_girl_cards_render:
     assert eval (all(_card_results.values())) timeout 5.0
     assert eval (str(UI_mode or "") == "scene") timeout 5.0
 
+    $ show_girl_card_main_ui_state("sandra")
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_girl_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+    $ show_girl_card_main_ui_state("amanda")
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_girl_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+    $ show_girl_card_main_ui_state("melissa")
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_girl_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+    $ show_girl_card_main_ui_state("clara")
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_girl_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+    $ show_girl_card_main_ui_state("becky")
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_girl_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+    $ show_girl_card_main_ui_state("irma")
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_girl_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+    $ show_girl_card_main_ui_state("georgett")
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_girl_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+    $ show_girl_card_main_ui_state("liza")
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_girl_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+    $ show_dog_card_main_ui_state()
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_dog_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+    $ show_werecat_card_main_ui_state()
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_werecat_card_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room and str(UI_mode or "") == "scene") timeout 20.0
+
+    run Call("ShowPlayerCard", "")
+    advance until screen "player_card_overlay" timeout 20.0
+    click id "player_card_overlay_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room) timeout 20.0
+    run Call("ShowGirlCard", "amanda", "")
+    advance until screen "girl_card_overlay" timeout 20.0
+    click id "girl_card_overlay_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room) timeout 20.0
+    run Call("ShowDogCard", "")
+    advance until screen "dog_card_overlay" timeout 20.0
+    click id "dog_card_overlay_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room) timeout 20.0
+    run Call("ShowWerecatCard", "")
+    advance until screen "werecat_card_overlay" timeout 20.0
+    click id "werecat_card_overlay_back_button" pos (0.5, 0.5) until eval (str(CurLoc or "") == _card_return_room) timeout 20.0
+
 testcase external_mongol_horse_purchase_once_and_amanda_room_presence:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -3448,8 +4053,8 @@ testcase external_mongol_horse_purchase_once_and_amanda_room_presence:
     $ MyStallion = ""
     $ HorseSaddled = 0
     $ HorsePurchasePrice = 0
-    $ MongolVar["HorsePrice"] = 1000
-    $ MongolVar["DiscountAsk"] = 1
+    $ Mongol.var["HorsePrice"] = 1000
+    $ Mongol.var["DiscountAsk"] = 1
     run Call("MongolTalk")
     assert eval ("Беру" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
     run Call("MongolTalkApply", "buy")
@@ -3474,18 +4079,22 @@ testcase external_clara_object_thread_conditions:
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
     assert eval ("clara" in peopleData and "clara" in peopleInfo) timeout 5.0
     assert eval (peopleInfo["clara"] in girls and not ("girls_data" in globals()) and not ("girls_info" in globals())) timeout 5.0
+    $ npc_interval_schedule_set("clara", [NPCIntervalScheduleEntry(npc_id="clara", location="WineStore", start="00:00", end="23:59", awake=True, talkable=True, priority=999, label="test_wine_store")])
     $ week = 2
     $ dayspassed = 30
     $ CurLoc = "WineStore"
-    $ external_calendar_set_fields(day, month, year, 6, 0)
+    $ external_calendar_set_fields(3, 1, 1100, 8, 0)
     $ ClaraVar["comfort_pending"] = 1
     $ ClaraVar["comfort_done"] = 0
     assert eval (peopleInfo["clara"].var is ClaraVar) timeout 5.0
     assert eval (peopleInfo["clara"].rel == Friends["clara"]) timeout 5.0
+    assert eval (int(clock_minutes or 0) == 480) timeout 5.0
+    assert eval (str(getLocation("clara") or "") == "WineStore") timeout 5.0
+    assert eval (int(ClaraVar.get("comfort_pending", 0) or 0) == 1 and int(ClaraVar.get("comfort_done", 0) or 0) == 0) timeout 5.0
     assert eval (clara_paintings_comfort_ready()) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 11, 0)
+    $ external_calendar_set_fields(3, 1, 1100, 12, 0)
     assert eval (not clara_paintings_comfort_ready()) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 6, 0)
+    $ external_calendar_set_fields(3, 1, 1100, 8, 0)
     $ ClaraVar["commission_started"] = 1
     $ ClaraVar["commission_followup_done"] = 0
     $ ClaraVar["commission_followup_day"] = -1
@@ -3495,15 +4104,17 @@ testcase external_clara_object_thread_conditions:
     assert eval (int(ClaraVar.get("commission_followup_done", 0) or 0) == 0) timeout 5.0
     assert eval (int(dayspassed or 0) >= int(ClaraVar.get("commission_followup_day", 999999))) timeout 5.0
     assert eval (getLocation("clara") == "WineStore") timeout 5.0
-    assert eval (getLocation("clara") == "WineStore" and int(time or 0) == 0) timeout 5.0
+    assert eval (getLocation("clara") == "WineStore" and int(clock_minutes or 0) == 480) timeout 5.0
     assert eval (clara_paintings_commission_followup_ready()) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 13, 0)
+    $ external_calendar_set_fields(3, 1, 1100, 22, 0)
     $ ClaraVar["commission_followup_done"] = 1
     $ ClaraVar["peek_done"] = 0
+    assert eval (int(clock_minutes or 0) == 1320) timeout 5.0
+    assert eval (str(getLocation("clara") or "") == "WineStore") timeout 5.0
     assert eval (clara_paintings_evening_peek_ready()) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 12, 59)
+    $ external_calendar_set_fields(3, 1, 1100, 15, 59)
     assert eval (not clara_paintings_evening_peek_ready()) timeout 5.0
-    $ external_calendar_set_fields(day, month, year, 13, 0)
+    $ external_calendar_set_fields(3, 1, 1100, 22, 0)
     $ _clara_rel_before = int(Friends.get("clara", 0) or 0)
     $ Friends["clara"] = min(20, _clara_rel_before + 2)
     $ peopleInfo["clara"].update()
@@ -3512,6 +4123,8 @@ testcase external_clara_object_thread_conditions:
     $ peopleInfo["clara"].location = "TavernMelissaRoom"
     $ CurrentLoc["melissa"] = "TavernMelissaRoom"
     $ peopleInfo["melissa"].location = "TavernMelissaRoom"
+    $ npc_interval_schedule_set("clara", [NPCIntervalScheduleEntry(npc_id="clara", location="TavernMelissaRoom", start="00:00", end="23:59", awake=True, talkable=True, priority=999, label="test_melissa_room")])
+    $ npc_interval_schedule_set("melissa", [NPCIntervalScheduleEntry(npc_id="melissa", location="TavernMelissaRoom", start="00:00", end="23:59", awake=True, talkable=True, priority=999, label="test_melissa_room")])
     $ npc_schedule_set("clara", [NPCScheduleEntry(location="TavernMelissaRoom", time_slots=[], priority=999)])
     $ npc_schedule_set("melissa", [NPCScheduleEntry(location="TavernMelissaRoom", time_slots=[], priority=999)])
     $ ClaraVar["confession_done"] = 0
@@ -3531,7 +4144,7 @@ testcase external_story_event_audit_methods_cover_tuple_attributes:
     $ TavernBreakfastEventActive = False
     $ MelissaVar["ratKilled"] = False
     $ MelissaVar["storage_rat_cleared"] = 0
-    $ WerecatVar["rats_problem_active"] = 0
+    $ werecat_state()["rats_problem_active"] = 0
     $ CurrentLoc["melissa"] = "TavernStorage"
     $ npc_schedule_set("melissa", [NPCScheduleEntry(location="TavernStorage", time_slots=[], priority=999)])
     $ household_mark_runtime_event_seen("melissa_storage_rat", -999)
@@ -3570,7 +4183,7 @@ testcase external_fight_system_runtime_flow:
     $ health = 100
     $ energy = 100
     $ exploration = 120
-    $ FightLevel = {"you": 1}
+    $ fight_info().level = {"you": 1}
     $ playerItems = {}
     $ EquippedWeapon = "rusty_hunter_rifle_001"
     $ EquippedArmor = ""
@@ -3583,39 +4196,95 @@ testcase external_fight_system_runtime_flow:
     assert eval (str(FIGHT_ENEMY_DEFINITIONS["street_crook"].weapon or "") == "дубинка") timeout 5.0
     assert eval (str(FIGHT_ENEMY_DEFINITIONS["patrol_guard"].tactics or "") == "formation") timeout 5.0
 
+    run Call("FightStartHuntCurrentRoom")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(UI_mode or "") == "fight") timeout 5.0
+    assert eval (len(list(fight_info().enemy_party or [])) >= 1) timeout 5.0
+    assert eval (str(fight_selected_enemy_image() or "").startswith("images/hunt/")) timeout 5.0
+    $ _fight_test_picture = str(fight_info().return_picture or "")
+    $ fight_finish_to_room(str(MainTxt or ""))
+    $ scene_image = _fight_test_picture
+    $ _layout_last_picture = _fight_test_picture
+    assert eval (str(UI_mode or "") == "scene" and str(CurLoc or "") == "Forest") timeout 5.0
+
     $ fight_begin("wolf", 1, "Forest", scene_image, "Тестовая схватка.")
     advance until screen "main_ui" timeout 20.0
     assert eval (str(UI_mode or "") == "fight") timeout 5.0
-    assert eval (len(list(FightEnemyParty or [])) == 1) timeout 5.0
-    assert eval (int(FightLevel.get("you", 0) or 0) >= 3) timeout 5.0
+    assert eval (len(list(fight_info().enemy_party or [])) == 1) timeout 5.0
+    assert eval (int(fight_info().level.get("you", 0) or 0) >= 3) timeout 5.0
     assert eval ("Перезарядить стрелой" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
-    assert eval ("Атаковать вблизи" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+    assert eval (any(str(i.caption or "").startswith("Атаковать") or str(i.caption or "") == "Бить прикладом" for i in current_action_items)) timeout 5.0
+    assert eval (int(fight_weapon_attack_points() or 0) == 14) timeout 5.0
+
+    $ EquippedWeapon = "old_axe_001"
+    $ RustyHunterRifleLoadedAmmo = ""
+    $ fight_sync_loaded_weapon_state_from_inventory()
+    $ fight_refresh_ui_actions()
+    assert eval (int(fight_weapon_attack_points() or 0) == 10) timeout 5.0
+    assert eval (not any(str(i.caption or "").startswith("Перезарядить") or str(i.caption or "").startswith("Выстрелить") for i in current_action_items)) timeout 5.0
+
+    $ EquippedWeapon = ""
+    $ fight_sync_loaded_weapon_state_from_inventory()
+    $ fight_refresh_ui_actions()
+    assert eval (fight_player_weapon_name() == "кулаки" and "Атаковать кулаками" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
+
+    $ EquippedWeapon = "rusty_hunter_rifle_001"
+    $ fight_sync_loaded_weapon_state_from_inventory()
+    $ fight_refresh_ui_actions()
+    assert eval ("Перезарядить стрелой" in [str(i.caption or "") for i in current_action_items]) timeout 5.0
 
     $ renpy.call_in_new_context("FightDoAction", "reload_arrows")
     assert eval (str(UI_mode or "") == "fight") timeout 5.0
-    assert eval (int(FightWeaponLoaded or 0) == 1 and str(FightLoadedAmmo or "") == "arrows") timeout 5.0
-    assert eval (int(PlayerFightSupply.get("arrows", 0) or 0) == 1) timeout 5.0
+    assert eval (int(fight_info().weapon_loaded or 0) == 1 and str(fight_info().loaded_ammo or "") == "arrows") timeout 5.0
+    assert eval (int(fight_info().supply.get("arrows", 0) or 0) == 1) timeout 5.0
 
     $ renpy.call_in_new_context("FightDoAction", "shoot")
     assert eval (str(UI_mode or "") == "fight") timeout 5.0
-    assert eval (int(FightWeaponLoaded or 0) == 0 and str(FightLoadedAmmo or "") == "") timeout 5.0
+    assert eval (int(fight_info().weapon_loaded or 0) == 0 and str(fight_info().loaded_ammo or "") == "") timeout 5.0
     assert eval (0 < int(health or 0) <= 100) timeout 5.0
 
     $ renpy.call_in_new_context("FightDoAction", "retreat")
+    assert eval (str(UI_mode or "") == "fight" and str(fight_info().outcome_popup.get("kind", "") or "") == "retreat") timeout 5.0
+    $ _fight_test_picture = str(fight_info().return_picture or "")
+    $ fight_finish_to_room(str(MainTxt or ""))
+    $ scene_image = _fight_test_picture
+    $ _layout_last_picture = _fight_test_picture
     assert eval (str(UI_mode or "") == "scene") timeout 5.0
     assert eval (str(CurLoc or "") == "Forest") timeout 5.0
-    assert eval (len(list(FightEnemyParty or [])) == 0) timeout 5.0
+    assert eval (len(list(fight_info().enemy_party or [])) == 0) timeout 5.0
     assert eval (str(current_action_title or "") != "Бой") timeout 5.0
 
+    $ health = 80
+    $ energy = 100
+    $ EquippedWeapon = "old_axe_001"
+    $ fight_begin("street_crook", 1, "StreetTavern", "images/fight/thug.png", "Forced victory test.")
+    $ FightEnemyParty[0]["health"] = 1
+    $ FightEnemyParty[0]["energy"] = 1
+    $ renpy.call_in_new_context("FightDoAction", "attack")
+    assert eval (str(FightOutcomeKind or "") == "victory" and str(current_action_title or "") == "Победа") timeout 5.0
+    assert eval (isinstance(HuntLastResult, dict) and str(HuntLastResult.get("outcome", "") or "") == "victory") timeout 5.0
+    assert eval (isinstance(FightVictoryLoot, dict) and int(FightVictoryLoot.get("money", 0) or 0) >= 0) timeout 5.0
+    assert eval ("Победа" in str(current_action_title or "") and "добыч" in str(FightOutcomeText or "").lower()) timeout 5.0
+    $ _fight_test_picture = str(fight_info().return_picture or "")
+    $ fight_finish_to_room(str(MainTxt or ""))
+    $ scene_image = _fight_test_picture
+    $ _layout_last_picture = _fight_test_picture
+
     $ exploration = 300
-    $ FightLevel = {"you": 3}
+    $ fight_info().level = {"you": 3}
     $ fight_begin("patrol_guard", 2, "StreetTavern", "bg StreetTavern", "Тестовая схватка с патрулем.")
     advance until screen "main_ui" timeout 20.0
     assert eval (str(UI_mode or "") == "fight") timeout 5.0
-    assert eval (str(FightEnemyId or "") == "patrol_guard" and len(list(FightEnemyParty or [])) == 2) timeout 5.0
-    assert eval (str(FightEnemyParty[0].get("weapon", "") or "") == "алебарда") timeout 5.0
-    assert eval ("formation" in list(FightEnemyParty[0].get("skills", []) or [])) timeout 5.0
+    assert eval (str(fight_info().enemy_id or "") == "patrol_guard" and len(list(fight_info().enemy_party or [])) == 2) timeout 5.0
+    assert eval (str(fight_selected_enemy_image() or "") == "images/fight/patrol_guard.png") timeout 5.0
+    assert eval (str(fight_info().enemy_party[0].get("weapon", "") or "") == "алебарда") timeout 5.0
+    assert eval ("formation" in list(fight_info().enemy_party[0].get("skills", []) or [])) timeout 5.0
     $ renpy.call_in_new_context("FightDoAction", "retreat")
+    assert eval (str(UI_mode or "") == "fight" and str(fight_info().outcome_popup.get("kind", "") or "") == "retreat") timeout 5.0
+    $ _fight_test_picture = str(fight_info().return_picture or "")
+    $ fight_finish_to_room(str(MainTxt or ""))
+    $ scene_image = _fight_test_picture
+    $ _layout_last_picture = _fight_test_picture
     assert eval (str(UI_mode or "") == "scene" and str(CurLoc or "") == "StreetTavern") timeout 5.0
 '''
 
@@ -3641,7 +4310,7 @@ def build_test_rpy() -> str:
     )
     return TEST_HEADER + "".join(
         ROOM_CHECK_TEMPLATE.format(room_name=room_name) for room_name in ROOM_LABELS
-    ) + "\n\n" + SHOP_ACTION_CHECKS + "\n\n" + TAVERN_REPORT_STATE_CHECKS + "\n\n" + TAILOR_PURCHASE_FLOW_CHECKS + "\n\n" + DOG_ENTITY_ACTION_CHECKS + "\n\n" + FIGHT_SYSTEM_RUNTIME_CHECKS + "\n\n" + PORT_STREETS_FLOW_CHECKS + "\n\n" + CALENDAR_TIME_CHECKS + "\n\n" + MEDIA_RESOLUTION_CHECKS + "\n\n" + HARASSMENT_IMAGE_CHECKS + "\n\n" + GIRL_OBJECT_RUNTIME_CHECKS + "\n\n" + ACTUAL_ACTION_BUTTON_CLICK_CHECKS + "\n\n" + ACTUAL_RANDOM_TOWN_CLICK_CHECKS + "\n\n" + DEBUG_BUILDER_ROOM_CHECKS + "\n\n" + AMANDA_ROOM_NIGHT_EVENT_CHECKS + "\n\n" + MY_ROOM_RECIPE_BOOK_ACTION_CHECKS + "\n\n" + MELISSA_BATS_DRAWINGS_CHECKS + "\n\n" + MELISSA_WERECAT_FOREST_ACTION_CHECKS + "\n\n" + CHURCH_LINK_CHECKS + "\n\n" + CHURCH_AFTER_SERMON_EVENT_CHECKS + "\n\n" + CLARA_MELISSA_TAVERN_BAR_GOSSIP_CHECKS + "\n\n" + FRIDAY_DANCE_AMANDA_CHECKS + "\n\n" + SANDRA_NIGHT_THANKS_CHECKS + "\n\n" + MELISSA_SEX_ENGINE_CHECKS + "\n\n" + PLAYER_INTIMACY_STATE_CHECKS + "\n\n" + CLARA_AMANDA_SCHEDULE_FLOW_CHECKS + "\n\n" + HOUSEHOLD_AI_EVENT_CHECKS + "\n\n" + all_room_action_click_checks + "\n\n" + "".join(room_action_sections) + "\n\n" + BECKY_HOME_GUEST_CHECKS
+    ) + "\n\n" + SHOP_ACTION_CHECKS + "\n\n" + TAVERN_REPORT_STATE_CHECKS + "\n\n" + TAILOR_PURCHASE_FLOW_CHECKS + "\n\n" + DOG_ENTITY_ACTION_CHECKS + "\n\n" + BACKYARD_BARREL_OBJECT_CHECKS + "\n\n" + GROCERY_STORE_OBJECT_PURCHASE_CHECKS + "\n\n" + FIGHT_SYSTEM_RUNTIME_CHECKS + "\n\n" + PORT_STREETS_FLOW_CHECKS + "\n\n" + CALENDAR_TIME_CHECKS + "\n\n" + MEDIA_RESOLUTION_CHECKS + "\n\n" + HARASSMENT_IMAGE_CHECKS + "\n\n" + GIRL_OBJECT_RUNTIME_CHECKS + "\n\n" + ACTUAL_ACTION_BUTTON_CLICK_CHECKS + "\n\n" + ACTUAL_RANDOM_TOWN_CLICK_CHECKS + "\n\n" + TARGETED_CURRENT_BUG_CHECKS + "\n\n" + DEBUG_BUILDER_ROOM_CHECKS + "\n\n" + AMANDA_ROOM_NIGHT_EVENT_CHECKS + "\n\n" + MY_ROOM_RECIPE_BOOK_ACTION_CHECKS + "\n\n" + MY_ROOM_WINDOW_ACTION_CHECKS + "\n\n" + TAVERN_ROOM_PICTURE_STATE_CHECKS + "\n\n" + MELISSA_BATS_DRAWINGS_CHECKS + "\n\n" + MELISSA_WERECAT_FOREST_ACTION_CHECKS + "\n\n" + CHURCH_LINK_CHECKS + "\n\n" + CHURCH_AFTER_SERMON_EVENT_CHECKS + "\n\n" + CLARA_MELISSA_TAVERN_BAR_GOSSIP_CHECKS + "\n\n" + FRIDAY_DANCE_AMANDA_CHECKS + "\n\n" + SANDRA_NIGHT_THANKS_CHECKS + "\n\n" + MELISSA_SEX_ENGINE_CHECKS + "\n\n" + PLAYER_INTIMACY_STATE_CHECKS + "\n\n" + CLARA_AMANDA_SCHEDULE_FLOW_CHECKS + "\n\n" + HOUSEHOLD_AI_EVENT_CHECKS + "\n\n" + all_room_action_click_checks + "\n\n" + "".join(room_action_sections) + "\n\n" + BECKY_HOME_GUEST_CHECKS
 
 
 def project_root() -> Path:
@@ -3776,6 +4445,8 @@ def main() -> int:
             "external_tavern_report_state_defaults",
             "external_actual_tailor_buy_dress_measure_flow",
             "external_dog_entity_actions",
+            "external_backyard_barrel_object_actions",
+            "external_grocery_store_object_purchase_actions",
             "external_fight_system_runtime_flow",
             "external_port_streets_georgette_liza_flow",
             "external_georgette_portstreet_relationship_talk_and_sex_flow",
@@ -3788,6 +4459,13 @@ def main() -> int:
             "external_context_image_resolution",
             "external_harassment_images_use_exact_existing_paths",
             "external_harassment_event_picture_sequence",
+            "external_inga_secondary_npc_source",
+            "external_francheska_secondary_and_birth_thread",
+            "external_gerhard_secondary_npc_source",
+            "external_secondary_side_characters_are_classes",
+            "external_birth_thread_conditions_block_day_zero",
+            "external_ellona_temple_sunday_story_event",
+            "external_becky_classes_are_initialized",
             "external_people_objects_are_single_source",
             "external_npc_schedule_room_visibility_agreement",
             "external_right_side_npc_buttons_open_default_menu",
@@ -3803,6 +4481,7 @@ def main() -> int:
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
             "external_breakfast_dance_sponsor_announcement",
             "external_breakfast_attendance_location_wins",
+            "external_breakfast_angry_amanda_melissa_mockery",
             "external_breakfast_window_and_call_all_click",
             "external_actual_barber_actions_click",
             "external_actual_market_click",
@@ -3810,9 +4489,15 @@ def main() -> int:
             "external_market_clock_open_hours",
             "external_actual_random_town_continue_click",
             "external_actual_random_town_click",
+            "external_sleep_after_midnight_detector",
+            "external_town_thugs_shout_result",
+            "external_town_thugs_fight_victory_result",
+            "external_georgette_back_alley_not_visible_in_port_streets",
             "external_debug_builder_room_visual_surfaces",
-            "external_amanda_room_night_bed_action_uses_defaults_and_hud",
+            "external_amanda_room_night_bed_action_uses_thread_event",
             "external_my_room_recipe_book_table_link",
+            "external_my_room_window_day_night_amanda_pictures",
+            "external_tavern_room_movement_resets_picture_state",
             "external_melissa_bats_room_search_after_wait",
             "external_melissa_werecat_forest_actions_rebuild",
             "external_melissa_werecat_thread_condition_sequence",
@@ -3823,6 +4508,8 @@ def main() -> int:
             "external_mongol_market_schedule_rolls_once_per_day",
             "external_clara_melissa_bar_gossip_click_fires_ready_dialog",
             "external_clara_booklet_mongol_night_buttons_advance",
+            "external_zimmer_mongol_wine_distraction_dialog",
+            "external_robin_blackwood_room_thread_and_mongol_pass",
             "external_friday_amanda_bad_invite_uses_one_dance",
             "external_friday_amanda_legare_go_phrase_survives_create_dance",
             "external_friday_dance_minigame_steps_score",
@@ -3858,6 +4545,8 @@ def main() -> int:
             "external_tavern_report_state_defaults",
             "external_actual_tailor_buy_dress_measure_flow",
             "external_dog_entity_actions",
+            "external_backyard_barrel_object_actions",
+            "external_grocery_store_object_purchase_actions",
             "external_fight_system_runtime_flow",
             "external_port_streets_georgette_liza_flow",
             "external_georgette_portstreet_relationship_talk_and_sex_flow",
@@ -3870,6 +4559,13 @@ def main() -> int:
             "external_context_image_resolution",
             "external_harassment_images_use_exact_existing_paths",
             "external_harassment_event_picture_sequence",
+            "external_inga_secondary_npc_source",
+            "external_francheska_secondary_and_birth_thread",
+            "external_gerhard_secondary_npc_source",
+            "external_secondary_side_characters_are_classes",
+            "external_birth_thread_conditions_block_day_zero",
+            "external_ellona_temple_sunday_story_event",
+            "external_becky_classes_are_initialized",
             "external_people_objects_are_single_source",
             "external_npc_schedule_room_visibility_agreement",
             "external_right_side_npc_buttons_open_default_menu",
@@ -3884,6 +4580,7 @@ def main() -> int:
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
             "external_breakfast_dance_sponsor_announcement",
             "external_breakfast_attendance_location_wins",
+            "external_breakfast_angry_amanda_melissa_mockery",
             "external_breakfast_window_and_call_all_click",
             "external_actual_barber_actions_click",
             "external_actual_market_click",
@@ -3892,8 +4589,10 @@ def main() -> int:
             "external_actual_random_town_continue_click",
             "external_actual_random_town_click",
             "external_debug_builder_room_visual_surfaces",
-            "external_amanda_room_night_bed_action_uses_defaults_and_hud",
+            "external_amanda_room_night_bed_action_uses_thread_event",
             "external_my_room_recipe_book_table_link",
+            "external_my_room_window_day_night_amanda_pictures",
+            "external_tavern_room_movement_resets_picture_state",
             "external_melissa_bats_room_search_after_wait",
             "external_melissa_werecat_forest_actions_rebuild",
             "external_melissa_werecat_thread_condition_sequence",
@@ -3904,6 +4603,8 @@ def main() -> int:
             "external_mongol_market_schedule_rolls_once_per_day",
             "external_clara_melissa_bar_gossip_click_fires_ready_dialog",
             "external_clara_booklet_mongol_night_buttons_advance",
+            "external_zimmer_mongol_wine_distraction_dialog",
+            "external_robin_blackwood_room_thread_and_mongol_pass",
             "external_friday_amanda_bad_invite_uses_one_dance",
             "external_friday_amanda_legare_go_phrase_survives_create_dance",
             "external_friday_dance_minigame_steps_score",

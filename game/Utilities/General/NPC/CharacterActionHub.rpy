@@ -293,7 +293,8 @@ init -40 python:
         if key == "georgett":
             if room_key == "PortStreets":
                 data["talk_args"] = ("georgett", "street")
-                data["picture_path"] = "images/georgett/Port/wait.jpg"
+                data["picture_path"] = "images/georgett/portraits/portrait1.jpg"
+                data["idle_picture"] = data["picture_path"]
                 data["talk_picture"] = data["picture_path"]
             elif room_key == "TavernMain":
                 data["talk_args"] = ("georgett", "tavern")

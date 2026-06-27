@@ -21,13 +21,13 @@ label ChurchIspovedMenu:
     $ current_action_items = []
 
     $ current_action_items.append(MenuItem("В разных пустяках", Call("ChurchIspovedChoice", "small")))
-    if HadSex.get("georgett", 0) > 0:
+    if Georgett.had_sex_count() > 0:
         $ current_action_items.append(MenuItem("В том, что совокуплялись с Жоржеттой", Call("ChurchIspovedChoice", "georgett")))
-    if HadSex.get("georgett", 0) > 0 and Georgett.story_value("church_bench_seen", 0):
+    if Georgett.had_sex_count() > 0 and Georgett.story_value("church_bench_seen", 0):
         $ current_action_items.append(MenuItem("В том, что уединились с Жоржеттой во время службы", Call("ChurchIspovedChoice", "church_bench")))
-    if HadSex.get("georgett", 0) > 0 and Georgett.story_value("church_doggy_seen", 0):
+    if Georgett.had_sex_count() > 0 and Georgett.story_value("church_doggy_seen", 0):
         $ current_action_items.append(MenuItem("В том, что рискнули с Жоржеттой прямо во время службы", Call("ChurchIspovedChoice", "church_doggy")))
-    if HadSex.get("georgett", 0) > 0 and Georgett.story_value("church_liza_seen", 0):
+    if Georgett.had_sex_count() > 0 and Georgett.story_value("church_liza_seen", 0):
         $ current_action_items.append(MenuItem("В том, что Лизетта видела вас с Жоржеттой во время службы", Call("ChurchIspovedChoice", "church_liza")))
     $ current_action_items.append(MenuItem("Назад", Call("ChurchIspoved", 1)))
     $ renpy.restart_interaction()

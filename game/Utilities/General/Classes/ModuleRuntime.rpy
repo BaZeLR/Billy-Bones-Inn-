@@ -34,5 +34,5 @@ label FinishPaidSexModule(girl_name="", return_room=""):
         call DressUp(girl_name)
     $ _module_return_room = str(return_room or active_module_return_room or "TavernMain")
     $ clear_active_module()
-    call AdvanceTime(_module_return_room)
-    return
+    call AdvanceTimeOnly(40)
+    jump expression _module_return_room

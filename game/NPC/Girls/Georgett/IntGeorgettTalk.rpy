@@ -145,7 +145,7 @@ label IntGeorgettTalkApply(girl_name="georgett", girl_loc="street", choice_code=
 
     if str(choice_code or "") == "smalltalk":
         $ MainTxt = "Вы некоторое время болтаете с Жоржеттой о разных вещах."
-        if Georgett.talk_count() <= 2 and renpy.random.randint(1, 2) == 1:
+        if Georgett.talk_count() <= 2 and procedural_randint(1, 2, key="procedural:NPC/Girls/Georgett/IntGeorgettTalk.rpy:procedural_randint:148:1") == 1:
             if Georgett.rel < 3 or (Georgett.sex_state.get("lick_pussy", 0) >= 4 and Georgett.rel < 5) or (Georgett.orgasm_count_given() >= 2 and Georgett.sex_state.get("lick_pussy", 0) >= 4 and Georgett.rel < 7):
                 $ MainTxt += "\n\nВы чуть лучше узнали Жоржетту."
                 $ Georgett.add_relation(1)
@@ -354,13 +354,11 @@ label IntGeorgettTalkApply(girl_name="georgett", girl_loc="street", choice_code=
         if girl_loc == "tavern":
             $ money -= 4
             call IntGeorgettSex("georgett", "tavern")
-            $ calendar_v2.advance_minutes(40)
             $ CurLocDesc = MainTxt
             call IntGeorgettTalkRefresh(girl_name, girl_loc)
         else:
             $ money -= 8
             call IntGeorgettSex("georgett", "street")
-            $ calendar_v2.advance_minutes(40)
             $ CurLocDesc = MainTxt
             jump PortStreets
         return

@@ -339,7 +339,7 @@ screen main_ui():
                 continue
             npc_data = npc_action_data_for_room(npc_key, current_location)
             if npc_data is None:
-                npc_data = {"entity_id": npc_key, "npc_id": npc_key}
+                continue
             _char_entries.append({
                 "entity_type": "npc",
                 "id": npc_key,

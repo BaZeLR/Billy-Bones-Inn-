@@ -84,7 +84,12 @@ screen georgett_sex_action_panel():
         for _line in georgett_sex_state_lines():
             text _line size 16 color "#d8c27a"
         null height 4
-        use choice_panel(current_action_items)
+        viewport:
+            ymaximum 520
+            mousewheel True
+            draggable True
+            scrollbars "vertical"
+            use choice_panel(current_action_items)
 
 label IntGeorgettSexSetup(GirlNameIGSS="georgett", GirlLocIGSS="street"):
     $ Georgett.sex_setup(GirlLocIGSS)
@@ -419,6 +424,9 @@ label GeorgettSexApply(action_id=""):
 
 label GeorgettSexFinish:
     $ Georgett.set_sex_busy(0)
+    if str(active_module_kind or "") == "sex" and str(active_module_actor or "") == "georgett":
+        return
+    call AdvanceTimeOnly(40)
     $ _georgett_return_room = str(GeorgettSexReturnRoom or CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
     if _georgett_return_room:
         jump expression _georgett_return_room

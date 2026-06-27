@@ -15,7 +15,7 @@ init python:
         if int(PortStreetsRoom.custom_properties.get("bottle_spawn_day", -1) or -1) == current_day:
             return
         PortStreetsRoom.custom_properties["bottle_spawn_day"] = current_day
-        PortStreetsRoom.custom_properties["bottle_present"] = 1 if renpy.random.randint(1, 3) == 1 else 0
+        PortStreetsRoom.custom_properties["bottle_present"] = 1 if procedural_randint(1, 3, key="procedural:Town/PortStreets.rpy:procedural_randint:18:1") == 1 else 0
 
     def port_streets_empty_bottle_visible():
         return int(PortStreetsRoom.custom_properties.get("bottle_present", 0) or 0) == 1
@@ -74,24 +74,6 @@ init python:
         },
     )
 
-    PortStreetsBackAlleyRoom = Room(
-        code_name="PortStreetsBackAlley",
-        group_name=ROOM_GROUP_CITY,
-        display_name="Портовая подворотня",
-        bg_picture="images/general/port_streets.png",
-        descriptions=[
-            RoomDescription(
-                text="Темная подворотня у портовых переулков. Здесь не задерживаются случайные прохожие.",
-                priority=200,
-            ),
-        ],
-        exits=[
-            RoomExit(label="Вернуться в портовые переулки", target="PortStreets"),
-        ],
-        schedule=None,
-        custom_properties={"street_prostitution_sublocation": True},
-    )
-
 label PortStreets:
     $ CurrentRoom = PortStreetsRoom
     $ CurLoc = CurrentRoom.code_name
@@ -147,7 +129,11 @@ label PortStreets:
             if Georgett.pregnancy_days() > 120 and Georgett.pregnancy_days() < 150:
                 $ CurLocDesc += "\n\nВидно что она нагуляла себе животик, но он еще не очень заметен."
             $ MainTxt = CurLocDesc
-            call ShowImage("georgett", "port", "wait")
+            $ _georgett_port_picture = Georgett.portstreet_scene_picture()
+            if str(_georgett_port_picture or "").strip():
+                $ scene_image = _georgett_port_picture
+                $ _layout_last_picture = scene_image
+                vscene scene_image
             $ Georgett.set_portstreet_visible(True)
             $ Liza.set_portstreet_visible(False)
         else:
@@ -155,7 +141,7 @@ label PortStreets:
 
             if Liza.can_work_portstreets():
                 call AddOthersSperm(GirlNamePS2, 8)
-                $ randvarPS = renpy.random.randint(1, 5)
+                $ randvarPS = procedural_randint(1, 5, key="procedural:Town/PortStreets.rpy:procedural_randint:158:2")
                 if _port_georgett_event_available and _port_liza_event_available:
                     $ CurLocDesc = "На обычном углу Жоржетты и Лизетты сейчас пусто. Судя по тихим звукам из соседних подворотен, обе уже нашли клиентов."
                     $ MainTxt = CurLocDesc
@@ -185,7 +171,7 @@ label PortStreets:
                     $ Georgett.set_portstreet_visible(True)
                     $ Liza.set_portstreet_visible(True)
             else:
-                if _port_georgett_event_available or renpy.random.randint(1, 3) == 1:
+                if _port_georgett_event_available or procedural_randint(1, 3, key="procedural:Town/PortStreets.rpy:procedural_randint:188:3") == 1:
                     $ CurLocDesc = "Почему-то Жоржетты сейчас нет на ее обычном месте. Где же она может быть?"
                     $ MainTxt = CurLocDesc
                     $ Georgett.set_portstreet_visible(False)
@@ -196,13 +182,17 @@ label PortStreets:
                 else:
                     $ CurLocDesc = "На углу стоит {b}Жоржетта{/b} и ждет клиентов."
                     $ MainTxt = CurLocDesc
-                    call ShowImage("georgett", "port", "wait")
+                    $ _georgett_port_picture = Georgett.portstreet_scene_picture()
+                    if str(_georgett_port_picture or "").strip():
+                        $ scene_image = _georgett_port_picture
+                        $ _layout_last_picture = scene_image
+                        vscene scene_image
                     $ Georgett.set_portstreet_visible(True)
                     $ Liza.set_portstreet_visible(False)
     else:
         if int(clock_minutes or 0) < (13 * 60):
             $ _port_temple_road_pics = ["images/ellona/toTemple.png", "images/ellona/toTemple1.png"]
-            $ _port_temple_road_pic = _port_temple_road_pics[renpy.random.randint(0, len(_port_temple_road_pics) - 1)]
+            $ _port_temple_road_pic = _port_temple_road_pics[procedural_randint(0, len(_port_temple_road_pics) - 1, key="procedural:Town/PortStreets.rpy:procedural_randint:205:4")]
             vscene _port_temple_road_pic
         else:
             call ShowImageSeq("georgett", "port", "port", 3)
@@ -234,11 +224,11 @@ label PortStreets:
 
 
 label PortStreetsBackAlley(girl_name=""):
-    $ CurrentRoom = PortStreetsBackAlleyRoom
+    $ CurrentRoom = PortStreetsRoom
     $ CurLoc = CurrentRoom.code_name
     $ location = CurLoc
     $ UI_mode = "scene"
-    $ scene_image = CurrentRoom.bg_picture or None
+    $ scene_image = "images/general/port_streets.png"
     if scene_image:
         $ _layout_last_picture = scene_image
         vscene scene_image
@@ -289,7 +279,7 @@ label PortStreetsBottleMenu(object_id="port_empty_bottle"):
 
 label PortStreetsExamineLanes:
     $ _port_lanes_pictures = ["images/general/port_streets.png", "images/general/port_streets1.png", "images/general/port_streets2.png", "images/general/port_streets4.png", "images/general/port_streets5.png"]
-    $ _port_lanes_picture = _port_lanes_pictures[renpy.random.randint(0, len(_port_lanes_pictures) - 1)]
+    $ _port_lanes_picture = _port_lanes_pictures[procedural_randint(0, len(_port_lanes_pictures) - 1, key="procedural:Town/PortStreets.rpy:procedural_randint:292:5")]
     $ scene_image = _port_lanes_picture
     $ _layout_last_picture = _port_lanes_picture
     vscene _port_lanes_picture
