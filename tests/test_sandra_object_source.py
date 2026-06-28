@@ -10,6 +10,11 @@ SANDRA_EVENTS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "SandraEven
 PLAYER_CHORES = PROJECT_ROOT / "game" / "Inn" / "PlayerChoresSystem.rpy"
 STORY_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy"
 SOCIAL_TOPICS = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "SocialTalkTopics.rpy"
+PEOPLE_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
+HARASS_REACTION = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Common" / "PartEventGirlHarrassmentReaction.rpy"
+HARASS_DISCUSS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Common" / "IntHarrassmentDiscuss.rpy"
+HARASS_AFTER = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PartEventAfterHarrassment.rpy"
+HARASS_CUSTOMER = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PartEventCustomerHarrassmentReaction.rpy"
 
 
 def test_sandra_uses_data_info_runtime_shape():
@@ -61,6 +66,7 @@ def test_sandra_story_defaults_cover_live_sandravar_keys():
         "revealing_dress_code",
         "revealing_dress_initiative_seen",
         "MaidRevengeEnding",
+        "harass_instruction",
     ]
 
     for key in required_keys:
@@ -90,9 +96,11 @@ def test_people_runtime_preserves_class_data_without_sandra_specific_overwrite()
 
 def test_sandra_runtime_has_hidden_reaction_state_and_methods():
     source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+    runtime = PEOPLE_RUNTIME.read_text(encoding="utf-8-sig")
 
     for token in [
         "self.energy = 100",
+        "self.uses_own_var_state = True",
         "self.rebellion = 0",
         "self.anger_with_player = 0",
         "self.trust = 0",
@@ -100,8 +108,6 @@ def test_sandra_runtime_has_hidden_reaction_state_and_methods():
         "self.mana = 10",
         "self.mana_corrupted = False",
         "self.reaction_log = []",
-        "def change_mana",
-        "def change_fear",
         "def daily_mana_update",
         "def reaction_score",
         "self.weekly_chore_score = 0",
@@ -114,16 +120,87 @@ def test_sandra_runtime_has_hidden_reaction_state_and_methods():
         "def weekly_thanks_event_ready",
         "def weekly_thanks_target_label",
         "def sex_available",
-        "def reset_daily",
     ]:
         assert token in source
 
+    for token in [
+        "def reset_daily",
+        "def mark_talked",
+        "def mark_asked",
+        "def mark_fucked",
+        "def change_social",
+        "def change_rebellion",
+        "def change_anger",
+        "def change_fear",
+        "def change_mana",
+        "def mana_bad_probability",
+        "def reward_need_fulfilled",
+        "def punish_need_unfulfilled",
+        "def decision_profile",
+        "def decide",
+        "def decision_good_probability",
+        "def record_reaction",
+        "def last_decision_reaction",
+        "def apply_decision_reaction",
+        "def harass_instruction",
+        "def set_harass_instruction",
+    ]:
+        assert token in runtime
+
+    sandra_info_block = source.split("class SandraInfo(Girl):", 1)[1]
+    for token in [
+        "def reset_daily",
+        "def mark_talked",
+        "def mark_asked",
+        "def mark_fucked",
+        "def change_social",
+        "def change_mana",
+        "def mana_bad_probability",
+        "def reward_need_fulfilled",
+        "def punish_need_unfulfilled",
+        "def decision_profile",
+        "def decide",
+        "def decision_good_probability",
+        "def record_reaction",
+        "def last_decision_reaction",
+        "def apply_decision_reaction",
+        "def change_fear",
+    ]:
+        assert token not in sandra_info_block
+
+
+def test_sandra_harassment_uses_girl_class_state_not_old_maps():
+    sources = {
+        "reaction": HARASS_REACTION.read_text(encoding="utf-8-sig"),
+        "discuss": HARASS_DISCUSS.read_text(encoding="utf-8-sig"),
+        "after": HARASS_AFTER.read_text(encoding="utf-8-sig"),
+        "customer": HARASS_CUSTOMER.read_text(encoding="utf-8-sig"),
+    }
+    combined = "\n".join(sources.values())
+
+    assert "getPersonInfo(" in combined
+    assert ".harass_instruction()" in combined
+    assert ".set_harass_instruction(" in combined
+    assert ".change_social(" in combined
+    assert ".change_mana(" in combined
+    assert ".change_rebellion(" in combined
+    assert ".change_anger(" in combined
+    assert ".skills[\"waitress\"]" in combined
+
+    for forbidden in [
+        "HarassInstructions",
+        "sluttiness.get",
+        "sluttiness[",
+        "Friends.get",
+        "Friends[",
+        "waitress[",
+    ]:
+        assert forbidden not in combined
+
 
 def test_sandra_night_thanks_uses_current_late_night_time_contract():
-    init_source = SANDRA_INIT.read_text(encoding="utf-8-sig")
     room_source = SANDRA_ROOM.read_text(encoding="utf-8-sig")
 
-    assert "time_slots=[6, 7]" in init_source
     assert "int(time or 0) == 3" not in room_source
     assert "int(hour or 0) >= 22" in room_source
     assert "int(hour or 0) <= 23" in room_source

@@ -3,6 +3,8 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MELISSA_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "InitMelissa.rpy"
+PEOPLE_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
+GIRL_DECISION = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "GirlDecisionModel.rpy"
 
 
 def test_melissa_uses_data_info_runtime_shape():
@@ -71,11 +73,11 @@ def test_melissa_story_defaults_cover_live_melissavar_keys():
         assert f'"{key}"' in source
 
 
-def test_melissa_info_owns_runtime_defaults_and_legacy_sync():
+def test_melissa_info_owns_runtime_defaults_without_legacy_sync():
     source = MELISSA_INIT.read_text(encoding="utf-8-sig")
+    runtime = PEOPLE_RUNTIME.read_text(encoding="utf-8-sig")
 
     for token in [
-        "self.age = 18",
         "self.rel = 5",
         "self.openness = 0",
         "self.corruption = 3",
@@ -96,12 +98,52 @@ def test_melissa_info_owns_runtime_defaults_and_legacy_sync():
         "\"waitress\": 30",
         "\"jobcleaning\": 1",
         "\"jobwaitress\": 1",
-        "def sync_from_melissa_maps",
-        "def sync_melissa_maps",
-        "def reset_daily",
         "def install_schedule",
     ]:
         assert token in source
+
+    for token in [
+        "def sync_from_melissa_maps",
+        "def sync_melissa_maps",
+        "Melissa.var =",
+        "MelissaVar",
+    ]:
+        assert token not in source
+
+    for token in [
+        "def reset_daily",
+        "def mana_bad_probability",
+        "def reward_need_fulfilled",
+        "def punish_need_unfulfilled",
+        "def decision_profile",
+        "def decide",
+        "def decision_good_probability",
+        "def record_reaction",
+        "def last_decision_reaction",
+        "def apply_decision_reaction",
+    ]:
+        assert token in runtime
+
+    melissa_info_block = source.split("class MelissaInfo(Girl):", 1)[1]
+    for token in [
+        "def decision_profile",
+        "def decide",
+        "def decision_good_probability",
+        "def record_reaction",
+        "def last_decision_reaction",
+        "def apply_decision_reaction",
+    ]:
+        assert token not in melissa_info_block
+
+    decision_source = GIRL_DECISION.read_text(encoding="utf-8-sig")
+    for token in [
+        'GIRL_DECISION_CORE_IDS = ("amanda", "melissa", "sandra")',
+        "girl_info = getPersonInfo(girl)",
+        "girl in GIRL_DECISION_CORE_IDS",
+        '"mana_bad_probability": girl_info.mana_bad_probability()',
+        "in GIRL_DECISION_CORE_IDS:",
+    ]:
+        assert token in decision_source
 
 
 def test_melissa_has_five_valid_favorite_talk_topics():

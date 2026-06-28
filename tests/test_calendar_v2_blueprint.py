@@ -36,7 +36,7 @@ def test_calendar_initial_state_is_single_calendar_source():
     assert state["moon_phase"] == "new_moon"
 
 
-def test_calendar_time_slot_is_derived_from_hour_and_minute():
+def test_calendar_time_display_code_is_derived_from_hour_and_minute():
     cases = (
         (5, 59, "night"),
         (6, 0, "early_morning"),
@@ -57,9 +57,9 @@ def test_calendar_time_slot_is_derived_from_hour_and_minute():
     )
 
     calendar = new_calendar()
-    for hour, minute, expected_slot in cases:
+    for hour, minute, expected_code_name in cases:
         calendar.set_clock(hour, minute)
-        assert calendar.data()["time_code_name"] == expected_slot
+        assert calendar.data()["time_code_name"] == expected_code_name
 
 
 def test_calendar_exact_clock_interval_handles_overnight_windows():

@@ -68,3 +68,14 @@ def test_tavern_mandatory_wine_uses_planned_list():
     assert 'tavern_work_pending_mandatory_code("WineForDance", "TavernKitchen")' in wine_source
     assert 'tavern_work_pop_mandatory_code("WineForDance", "TavernKitchen")' in wine_source
     assert 'return tavern_work_pending_mandatory_code("", "TavernKitchen")' in kitchen_source
+
+
+def test_breakfast_tease_uses_step_picture_assets():
+    kitchen_source = read_rel("game/Inn/TavernKitchen.rpy")
+
+    assert "def tavern_breakfast_tease_picture" in kitchen_source
+    assert '"images/breakfast/amanda_breakfast/amanda_tease_%d.jpg" % step' in kitchen_source
+    assert '"images/amanda/brekfastTease/breakfasttease1.jpg"' in kitchen_source
+    assert '"images/amanda/brekfastTease/breakfasttease3.jpg"' in kitchen_source
+    assert '"images/amanda/brekfastTease/breakfasttease6.jpg"' in kitchen_source
+    assert "vscene tavern_breakfast_tease_picture(_tease_girl, _tease_tier)" in kitchen_source

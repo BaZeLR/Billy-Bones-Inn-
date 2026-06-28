@@ -23,19 +23,24 @@ Readable event files should follow this shape:
 
 ```renpy
 label event_name:
-    $ _items = [
-        scene_panel_call_item("Choice text", "event_name_choice", minutes=5),
-        scene_panel_return_item("Back"),
-    ]
-    call SceneActionPanel("images/path/picture.png", "Editable event text.", "Actions", _items)
-    return
+    vscene "images/path/picture.png"
+    "Editable event text."
+
+    menu:
+        "Choice text":
+            $ SomeVar["state"] = 1
+            $ calendar_advance_minutes(5)
+            $ thread.advance()
+            jump event_name_choice
+
+        "Back":
+            jump expression CurLoc
 
 label event_name_choice:
-    $ SomeVar["state"] = 1
-    $ MainTxt = "Result text."
+    vscene "images/path/result.png"
+    "Result text."
     call stat
-    $ main_ui_restore_room_scene_state()
-    return
+    jump expression CurLoc
 ```
 
 This keeps the human-editable parts visible:
@@ -43,7 +48,7 @@ This keeps the human-editable parts visible:
 - label name;
 - picture path;
 - text;
-- right-panel choices;
+- event choices;
 - consequence labels.
 
 ## Picture And Video Rules

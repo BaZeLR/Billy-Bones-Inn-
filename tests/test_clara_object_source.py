@@ -19,7 +19,7 @@ def test_clara_uses_normal_data_and_runtime_instances():
     init_label = source.split("label InitClara:", 1)[1]
     assert "GirlName = Clara.code_name" in init_label
     assert "peopleData[GirlName] = ClaraStaticData" in init_label
-    assert "Clara.var = ClaraVar" in init_label
+    assert "Clara.var =" not in init_label
     assert "Clara.initialize_new_game_state()" in init_label
     assert "peopleInfo[GirlName] = Clara" in init_label
     assert "if Clara not in girls:" in init_label
@@ -52,6 +52,10 @@ def test_clara_old_peopleinfo_bridge_is_removed():
     source = _source(Path("game") / "NPC" / "Girls" / "Clara" / "InitClara.rpy")
 
     assert "Auto-attach .var for PeopleInfo consistency" not in source
+    assert "ClaraVar" not in source
+    assert "sync_from_clara_maps" not in source
+    assert "sync_clara_maps" not in source
+    assert "Clara.var =" not in source
     assert "if 'peopleInfo' not in dir()" not in source
     assert "class Clara(Girl):" not in source
     assert "peopleInfo['clara'] = Clara(" not in source
@@ -65,6 +69,22 @@ def test_clara_social_and_gift_logic_belongs_to_clara_instance():
     social_topics = _source(Path("game") / "Utilities" / "General" / "NPC" / "SocialTalkTopics.rpy")
 
     clara_class = source.split("class ClaraInfo(Girl):", 1)[1].split("define ClaraStaticData", 1)[0]
+    for old_map in [
+        'Friends.get("clara"',
+        'Friends["clara"]',
+        'Talked.get("clara"',
+        'TalkedToday.get("clara"',
+        'AskedToday.get("clara"',
+        'FlirtedToday.get("clara"',
+        'GiftedToday.get("clara"',
+        'otkroven.get("clara"',
+        'otkroven["clara"]',
+        'sluttiness.get("clara"',
+        'sluttiness["clara"]',
+        'CurrentLoc["clara"]',
+    ]:
+        assert old_map not in clara_class
+
     for method_name in [
         "can_start_social_events",
         "can_receive_gifts",

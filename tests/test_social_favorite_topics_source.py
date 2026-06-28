@@ -7,6 +7,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOCIAL_TOPICS = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "SocialTalkTopics.rpy"
 MELISSA_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "InitMelissa.rpy"
 SANDRA_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "InitSandra.rpy"
+AMANDA_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "InitAmanda.rpy"
 
 
 def _topic_ids_from_social_source():
@@ -24,11 +25,15 @@ def _favorite_topics_from_init(path):
 def test_class_based_girls_have_five_valid_favorite_topics():
     valid_topics = _topic_ids_from_social_source()
 
-    for path in [MELISSA_INIT, SANDRA_INIT]:
+    for path in [AMANDA_INIT, MELISSA_INIT, SANDRA_INIT]:
         favorites = _favorite_topics_from_init(path)
         assert len(favorites) == 5
         assert len(set(favorites)) == 5
         assert all(topic in valid_topics for topic in favorites)
+
+
+def test_amanda_favorite_topics_match_character_brief():
+    assert _favorite_topics_from_init(AMANDA_INIT) == ["fashion", "amanda_boys", "money", "sex_topics", "gossip"]
 
 
 def test_favorite_topics_are_used_by_social_score():

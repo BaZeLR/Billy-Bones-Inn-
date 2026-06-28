@@ -2143,23 +2143,6 @@ This document maps args both programmatically (exact indexes/usages) and descrip
 - RPY arg usage lines:
   - none
 
-## Loc
-- TXT: `game/Inn/Loc.txt`
-- RPY: `game/Inn/Loc.rpy`
-- Arg indexes used: `[]`
-- Description: No explicit arg assignment in TXT.
-- TXT arg assignments:
-  - none
-- Incoming links with explicit args:
-  - none
-- Outgoing links with explicit args:
-  - none
-- Matching RPY labels:
-  - `LOC(loc_name="")` in `game/Inn/loc.rpy:17`
-  - `loc(loc_name="")` in `game/Inn/loc.rpy:60`
-- RPY arg usage lines:
-  - none
-
 ## MarketPlace
 - TXT: `game/Inn/MarketPlace.txt`
 - RPY: `game/Inn/MarketPlace.rpy`

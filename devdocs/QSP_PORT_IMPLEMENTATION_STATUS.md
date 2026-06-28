@@ -34,25 +34,22 @@ The main issue is that the QSP compatibility logic is now spread across many foc
 
 ## Implemented QSP-Style Foundations
 
-### 1. Location entry model: implemented
+### 1. Direct room entry model: implemented
 
 Files:
 
-- `game/Inn/Loc.rpy`
 - many location files under `game/Inn/*.rpy`
 
 What exists:
 
-- `prepare_location_entry(loc_name="")`
-- `label LOC(loc_name="")`
-- `label EnterLocation(loc_name="")`
+- room labels set `CurrentRoom`, `CurLoc`, and `location` directly
+- room labels call room-entry event checks directly where needed
 
-This is already the closest Ren'Py equivalent of QSP location-entry normalization:
+This is the closest Ren'Py equivalent of QSP location-entry normalization:
 
-- set current location
-- decide whether time advance is blocked
-- synchronize `CurLoc` / `location`
-- run entry checks
+- a room label is the location entry point
+- movement/time belongs to movement labels
+- event checks belong to event/thread entry checks
 
 QSP perspective:
 
@@ -72,8 +69,6 @@ What exists:
 
 - `RoomExit`
 - `RoomDescription`
-- `RoomScene`
-- `RoomTrigger`
 - `RoomSchedule`
 - `Room`
 
@@ -84,7 +79,6 @@ This already gives the project a structured replacement for loose QSP location t
 - objects/items
 - NPC presence
 - schedules
-- triggers
 
 QSP perspective:
 
@@ -307,27 +301,23 @@ Status: implemented.
 
 These parts work, but from a QSP-port perspective they are not yet normalized enough.
 
-### 1. Location entry is implemented, but not perfectly normalized
+### 1. Location entry now belongs to room labels
 
-Many world labels now call `EnterLocation(...)`, which is good.
-
-But some files also manually repeat:
+World labels set:
 
 - `CurLoc = ...`
 - `location = CurLoc`
-
-after the entry call.
+- `CurrentRoom = ...`
 
 QSP perspective:
 
-- this is redundant
-- location entry should be standardized through one contract
-- duplicated location-state assignment creates maintenance risk
+- this is direct and visible
+- no central location-entry hub is required
 
 Recommended direction:
 
-- keep `EnterLocation(...)` as canonical
-- avoid repeating manual location sync unless there is a specific exception
+- keep room entry direct inside the room label
+- do not restore a central location-entry hub
 
 ### 2. Compatibility logic exists, but is scattered
 
@@ -618,11 +608,11 @@ Examples to preserve as style:
 
 ### 3. Normalize location entry
 
-Make every world/location label rely on:
+Make every world/location label rely on direct room assignment:
 
-- `call EnterLocation("...")`
-
-and avoid duplicating state sync unless necessary.
+- `$ CurrentRoom = ExampleRoomObject`
+- `$ CurLoc = CurrentRoom.code_name`
+- `$ location = CurLoc`
 
 ### 4. Replace stale missing-function docs
 

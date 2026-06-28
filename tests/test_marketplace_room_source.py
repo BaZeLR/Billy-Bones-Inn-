@@ -13,9 +13,12 @@ def test_marketplace_schedule_uses_clock_hours_not_time_slots():
     room_block = source.split("MarketPlaceRoom = Room(", 1)[1].split("default BlindPirateMarketEventSeen", 1)[0]
 
     assert 'schedule=RoomSchedule(' in room_block
-    assert 'start="06:00"' in room_block
-    assert 'end="12:59"' in room_block
+    assert 'start="07:00"' in room_block
+    assert 'end="17:59"' in room_block
     assert "time_slots=" not in room_block
+    assert "int(clock_minutes" not in source
+    assert "MarketPlaceRoom.is_open(week, time)" not in source
+    assert "_market_room.is_open(week, time)" not in source
 
 
 def test_marketplace_room_does_not_duplicate_exits_as_objects():
@@ -30,9 +33,10 @@ def test_marketplace_room_does_not_duplicate_exits_as_objects():
 def test_marketplace_uses_direct_picture_paths_without_fallback_helper():
     source = read_rel("game/Town/Market/MarketPlace.rpy")
 
-    assert 'MARKETPLACE_CLOSED_PICTURE = "images/market/LocMarketPlaceClosed.jpg"' in source
+    assert 'MARKETPLACE_CLOSED_PICTURE = "images/general/closedVenue default.png"' in source
     assert "def marketplace_closed_picture" not in source
     assert "images/general/LocMarketPlaceClosed.jpg" not in source
+    assert "images/market/LocMarketPlaceClosed.jpg" not in source
     assert "vscene scene_image" in source
 
 
@@ -42,6 +46,9 @@ def test_marketplace_has_no_ui_wait_loop_or_special_refresh_branch():
 
     assert "while _market_ui_return is None" not in market_source
     assert "marketplace_action_items" not in market_source
+    assert "marketplace_int" not in market_source
+    assert "marketplace_closed_action_items" not in market_source
+    assert "label MarketPlaceBuildActions" not in market_source
     assert 'room_code == "MarketPlace"' not in layout_source
 
 

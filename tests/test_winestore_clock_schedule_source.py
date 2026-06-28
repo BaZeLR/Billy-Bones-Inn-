@@ -8,6 +8,7 @@ CLARA_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Clara" / "InitClara.rpy"
 CLARA_SCHEDULE = PROJECT_ROOT / "game" / "NPC" / "Schedules" / "clara.json"
 ALBER_SCHEDULE = PROJECT_ROOT / "game" / "NPC" / "Schedules" / "alber.json"
 SECONDARY_INIT = PROJECT_ROOT / "game" / "NPC" / "Secondary" / "InitSecondaryNPC.rpy"
+ALBER_INIT = PROJECT_ROOT / "game" / "NPC" / "Secondary" / "InitAlber.rpy"
 
 
 def _source(path):
@@ -91,10 +92,10 @@ def test_winestore_npc_presence_uses_hour_intervals_not_display_slots():
 def test_alber_portrait_source_is_secondary_npc_not_clara_or_wine_store_duplicate():
     clara = _source(CLARA_INIT)
     wine_store = _source(WINESTORE_ROOM)
-    secondary = _source(SECONDARY_INIT)
+    alber = _source(ALBER_INIT)
 
-    assert "def alber_random_portrait():" in secondary
-    assert "images/Alber/portrait1.png" in secondary
+    assert "def alber_random_portrait():" in alber
+    assert "images/Alber/portrait1.png" in alber
     assert "alber_random_portrait()" not in clara
     assert "def alber_stable_portrait" not in wine_store
     assert "alber_random_portrait()" in wine_store

@@ -41,6 +41,4 @@ def test_story_and_random_cooldowns_use_day_delta_helper():
     story_source = read_rel("game/Utilities/General/Classes/StoryEventRuntime.rpy")
     town_source = read_rel("game/Town/RandomTownEvents.rpy")
 
-    assert "#day_delta_ready(WerecatVar.get('adopted_day', -1), 1)" in story_source
-    assert "#day_delta_ready(WerecatVar.get('adopted_day', -1), 30)" in story_source
     assert "return day_delta_since(last_day) < self._int(cooldown_days, 1)" in town_source

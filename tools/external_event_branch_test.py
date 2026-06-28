@@ -174,7 +174,7 @@ testcase event_{safe_name}:
         ClaraVar["peek_done"] = 1
         ClaraVar["confession_done"] = 1
         ClaraVar["murder_day"] = 0
-        WerecatVar["adopted"] = 1
+        werecat_state()["adopted"] = 1
         CurLoc = "TavernMain"
         location = CurLoc
         thread = None
@@ -239,7 +239,7 @@ testcase event_{safe_name}_branch_{branch_index}:
         ClaraVar["peek_done"] = 1
         ClaraVar["confession_done"] = 1
         ClaraVar["murder_day"] = 0
-        WerecatVar["adopted"] = 1
+        werecat_state()["adopted"] = 1
         CurLoc = "TavernMain"
         location = CurLoc
         thread = None

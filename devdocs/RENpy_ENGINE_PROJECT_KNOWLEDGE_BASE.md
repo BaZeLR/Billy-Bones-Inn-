@@ -74,8 +74,10 @@ call ShowImage("amanda", "tavern", "some_image")
 
 Preservation rule:
 
-- Use `ShowImage` when ported legacy content relies on folder/name resolution.
-- Use `vscene` or `SceneActionPanel` when building a new self-contained right-panel event.
+- Use `ShowImage` only when ported legacy content still relies on folder/name
+  resolution.
+- Use direct picture paths with `vscene` for new or refactored authored
+  event/scene media.
 
 ## 3. Main UI And Right Panel
 
@@ -108,19 +110,15 @@ The current action panel is controlled by these store variables:
 4. Else if the current mode is a non-room mode, show no fallback.
 5. Else build room actions from `CurrentRoom`.
 
-The helper `main_ui_set_action_panel(...)` is the correct central API for changing this panel:
-
-```renpy
-$ main_ui_set_action_panel("Title", items, None, "scene")
-```
-
 Preservation rule:
 
 - Do not replace `main_ui`.
 - Do not build separate full-screen menus for normal gameplay actions.
 - Use `current_action_items` plus `MenuItem` for right-panel choices.
 - Use `current_action_content` only for a custom screen inside the right panel.
-- Use `main_ui_set_action_panel()` when changing panel title/items/content from Python or labels.
+- Do not route authored events, talk choices, or one-off object actions through
+  generic panel setter wrappers. The owning room, object, NPC, or event label
+  owns the choices and consequences.
 
 ## 4. Menu And Action Shape
 
@@ -148,8 +146,9 @@ Valid actions are normal Ren'Py actions:
 Preservation rule:
 
 - Right-panel actions should be `MenuItem` objects.
-- Mutating actions should call labels/functions that update variables, call `stat` if needed, then restore/rebuild UI.
-- Avoid blocking native `menu:` statements for actions that must live in the right panel.
+- Mutating actions should call direct labels/functions that update variables,
+  call `stat` if needed, then return to the owning room/object/NPC flow.
+- Authored story/talk choices should use normal Ren'Py `menu:` in the label.
 
 ## 5. Room Model
 
@@ -159,22 +158,20 @@ File: `game/Inn/RoomTemplate.rpy`
 
 - `code_name`
 - `display_name`
+- `group_name`
 - `bg_picture`
-- descriptions
+- default, first-visit, and situational descriptions
 - exits
 - game objects/items
-- action menus
-- schedule
-- scenes
-- triggers
+- explicit room-owned actions only when the room itself is the target
+- optional schedule for venues
+- hidden/locked/open state booleans
 - custom properties
 
 Related classes:
 
 - `RoomExit`
 - `RoomDescription`
-- `RoomScene`
-- `RoomTrigger`
 - `RoomSchedule`
 
 Important methods:
@@ -182,10 +179,7 @@ Important methods:
 - `visible_descriptions()`
 - `visible_exits()`
 - `visible_objects()`
-- `visible_npcs()`
 - `visible_actions()`
-- `visible_scenes()`
-- `ready_triggers()`
 - `build_menu_sections()`
 
 Movement:
@@ -197,7 +191,10 @@ Preservation rule:
 
 - Keep room content bound to room files.
 - Do not move all actions into one global router.
-- Room files may add special local actions, but should still respect `CurrentRoom`, `CurLoc`, `MainTxt`, `scene_image`, and the right-panel variables.
+- Room files may add special local actions only when the room itself owns the
+  action. Object/item, NPC, and event actions stay with their owners.
+- Room files should still respect `CurrentRoom`, `CurLoc`, `MainTxt`,
+  `scene_image`, and the right-panel variables.
 
 ## 6. Generic Room Action Builder
 
@@ -218,29 +215,33 @@ Preservation rule:
 - Use this as fallback only.
 - More complex room files can build richer menus, but should use the same `MenuItem` and Ren'Py action style.
 
-## 7. NPC Action Model
+## 7. NPC Visibility And Interaction
 
-File: `game/Inn/CharacterActionHub.rpy`
+NPC presence is not room-owned. It is driven by NPC class/schedule/event
+location state:
 
-NPC actions are not hidden or magic. They are driven by:
+- current room/location is `CurLoc`/`current_location`;
+- the visible NPC section calls `getNPCids(current_location)`;
+- `getNPCids` compares each NPC `getLocation(...)` result to that location;
+- NPC data/info classes for identity, portraits, info cards, and state;
+- NPC talk/info labels for talk, examine, gift, flirt, and NPC-specific actions.
 
-- `NPC_META`: per-NPC talk labels, examine labels, known/unknown names, supported actions.
-- schedule/location presence through `getLocation()` and `getNPCids()`.
-- `Room.visible_npcs()`, which asks `npc_action_data_for_room(...)`.
-- right-panel menu building through `open_entity_action_menu_state(...)`.
+Common NPC interactions:
 
-Common NPC actions:
-
-- look/examine
+- info/examine card
 - talk
-- dog talk/look
-- player card
+- NPC-specific action labels
+- event-owned contextual interactions
 
 Preservation rule:
 
-- If an NPC is present but has no action menu, check `NPC_META`, `npc_room_interaction_visible`, schedule location, and `npc_social_actions_available_in_room`.
-- Do not invent hidden schedules. Use `NPCScheduleModel.rpy` and current room visibility checks.
-- New NPC actions should extend `NPC_META` or the room-specific action builder, not bypass the character grid/right panel.
+- If an NPC is present but has no interaction, check the NPC's data/info class,
+  talk label, info-card/examine label, schedule location, and room visibility.
+- Do not invent hidden schedules. Use `NPCScheduleModel.rpy`, `getLocation`,
+  and current room visibility checks.
+- New NPC actions belong to the NPC talk/info labels or the owning room.
+- Do not recreate a generic character action hub, action dictionary, spec
+  dispatcher, or Python menu layer.
 
 ## 8. NPC Schedule Model
 
@@ -254,7 +255,8 @@ Main data class:
 NPCScheduleEntry(
     location="TavernMain",
     weekdays=[1, 2, 3, 4, 5, 6, 7],
-    time_slots=[0, 1, 2, 3, 4],
+    start="08:00",
+    end="17:59",
     awake=True,
     talkable=True,
     condition=None,
@@ -287,6 +289,9 @@ Preservation rule:
 - `CurrentLoc[npc_id]` is a synced projection plus explicit overrides.
 - Room/NPC visibility should call `getLocation`, `getNPCids`, or `npc_schedule_location`, not hand-rolled checks.
 - Events that change where somebody is should sync schedule state or make a deliberate override.
+- New or touched schedules should use real clock intervals (`start` / `end`) or
+  `calendar_v2.hour` / `calendar_v2.minute` checks. Display slots are UI
+  display only and should not decide gameplay availability.
 
 ## 9. `people.rpy` Comparison
 
@@ -303,17 +308,24 @@ Reference file: `devdocs/people.rpy`
 
 Current Tractir runtime differs:
 
-- Schedules are conditional objects (`NPCScheduleEntry`), not simple 24-slot arrays.
-- Presence is resolved by priority, weekday, time slot, and conditions.
-- Talk/look actions are in `CharacterActionHub.rpy`, not in `people.rpy`.
-- Runtime social state is spread across project maps such as `Friends`, `Talked`, character var dicts, and action hubs.
+- NPC identity belongs to `PeopleData` subclasses.
+- NPC runtime state belongs to info-class instances such as `Girl` or secondary
+  NPC info classes.
+- NPC-specific state belongs on the owning object, for example `Amanda.var`,
+  `Melissa.var`, or the secondary NPC info object's var store.
+- Schedules are conditional objects or interval rows, not simple 24-slot arrays.
+- Presence is resolved by priority, weekday, clock interval, and conditions.
+- Talk/look/info-card actions belong to the NPC's own talk/info labels and
+  methods, not a global action dispatcher.
 
 How to combine safely:
 
-- Treat `people.rpy` as a data-loading/reference model, not a replacement for Tractir UI/action flow.
-- If importing JSON NPC data, convert schedule rows into `NPCScheduleEntry` objects or load them into `NPCSchedules`.
-- Keep `CharacterActionHub.rpy` as the action-menu layer.
-- Keep relationship/talk state compatible with existing project vars unless doing a planned migration.
+- Treat `people.rpy` as a data-loading/reference model, not a replacement for
+  Tractir UI/action flow.
+- If importing JSON NPC data, convert schedule rows into interval schedule
+  rows or `NPCScheduleEntry` objects that use real clock ranges.
+- Do not add old global dict/action-hub dependencies when the NPC data/info
+  class can own the state or behavior.
 
 ## 10. Daily Events Versus Story Threads
 
@@ -380,38 +392,32 @@ Preservation rule:
 - Use story threads for arcs that advance by event sequence and availability conditions.
 - Use `_story_enter` for room entry story checks where the room already follows that pattern.
 
-## 11. Scene Action Panel Template
+## 11. Removed Panel/Wrapper Patterns
 
-File: `game/Inn/SceneActionPanel.rpy`
+Do not use these as current architecture:
 
-This project now has a reusable right-panel scene/event helper:
+- `SceneActionPanel`
+- `main_ui_set_action_panel` as an event/talk/object-choice dispatcher
+- refresh/rebuild/restore/apply/renew labels
+- generic scene queues or paged-panel engines for authored story scenes
+- Python dispatchers that hide which label owns a choice or consequence
+
+Correct event shape:
 
 ```renpy
-label some_event:
-    $ _items = [
-        scene_panel_call_item("Talk", "SomeTalkLabel", minutes=5),
-        scene_panel_add_item("Take item", "money", 1, text="You take a coin."),
-        scene_panel_jump_item("Go outside", "StreetTavern", minutes=10),
-        scene_panel_return_item("Back"),
-    ]
-    call SceneActionPanel("images/path/to/picture.png", "Event text.", "Actions", _items)
-    return
+label story_example_event:
+    vscene "images/example/event.jpg"
+    "Event text."
+
+    menu:
+        "Act":
+            $ SomeNpc.var["example_seen"] = 1
+            $ thread.advance()
+            jump expression CurLoc
+
+        "Leave":
+            jump expression CurLoc
 ```
-
-It does:
-
-- optional `vscene picture`;
-- sets `MainTxt` and `CurLocDesc`;
-- sets right-panel items through `main_ui_set_action_panel`;
-- applies variable mutations;
-- advances time;
-- supports `call`, `jump`, `panel`, and return/current-room modes.
-
-Preservation rule:
-
-- Use this for new text-game events where the player should see picture/text and choose from the right panel.
-- This is the correct replacement for ad hoc blocking `menu:` when the UI must remain intact.
-- It is also the correct pattern for "label + vscene path + text + actions with mutating/advancing/jump/current lock".
 
 ## 12. Implementation Rules Going Forward
 
@@ -421,22 +427,24 @@ For new rooms:
 2. Set `CurLoc`, `location`, `CurrentRoom`, `scene_image`, and `MainTxt`.
 3. Show media with `ShowImage` or `vscene`.
 4. Populate `current_action_items` with `MenuItem`.
-5. Call `ReturnToMainUI` or restore the main UI state.
+5. Call `screen main_ui` through the room's normal entry flow.
 
 For new event scenes:
 
 1. Put event text in the label, not in a hidden dispatcher.
-2. Use `SceneActionPanel` for right-panel choices.
-3. Mutate vars through labels/functions or `scene_panel_*_item` helpers.
-4. Advance time with `calendar_advance_minutes` through the helper or explicit labels.
-5. Return to room state through `main_ui_restore_room_scene_state()` or `scene_panel_return_item()`.
+2. Use `vscene`, text, and normal Ren'Py `menu:`.
+3. Mutate vars directly at the choice branch or call a real shared helper label.
+4. Advance time with `calendar_v2.advance_minutes(...)` where appropriate.
+5. Return to the owning room label with `jump expression CurLoc` or a direct
+   room label.
 
 For NPC presence:
 
-1. Add/adjust `NPCScheduleEntry` rows.
+1. Add/adjust NPC schedule rows using real clock ranges where possible.
 2. Ensure `npc_schedule_sync_currentloc()` or `npc_schedule_sync_all()` runs after time/location changes.
-3. Ensure `NPC_META` has talk/look labels and actions.
-4. Let `Room.visible_npcs()` and the character grid expose the action menu.
+3. Ensure the NPC data/info class has the right talk/info/examine ownership.
+4. Let `getLocation()`/`getNPCids(current_location)` and the character grid
+   expose the visible NPC.
 
 For events:
 
@@ -452,6 +460,7 @@ For events:
 - Preserve `vscene` behavior for scene media.
 - Preserve room-bound action modeling.
 - Preserve `NPCSchedules` as canonical schedule truth.
-- Preserve `CharacterActionHub` as the NPC action menu layer.
 - Preserve the separation between daily events and story threads.
 - Add content in local feature/room/event files unless there is a clear shared abstraction already present.
+- Do not preserve generic action hubs, dispatchers, or wrapper labels as target
+  architecture when touching affected code.

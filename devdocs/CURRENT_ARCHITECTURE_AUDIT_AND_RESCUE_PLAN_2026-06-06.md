@@ -1116,7 +1116,7 @@ Work:
 - remove alias labels, recursive loops, and gameplay mutation access from normal UI;
 - make debug notes/report generation explicit;
 - update architecture docs to match actual runtime, deleting contradictory standards.
-- keep the Family Life-derived standards aligned across `ARCHITECTURE.md`, `STORY_LABEL_EVENT_FLOW_STANDARD.md`, `ACTION_ITEM_STANDARD.md`, `LOCATION_LOCATE_TALK_RESET_STANDARD.md`, and this rescue plan.
+- keep the Family Life-derived standards aligned across `ARCHITECTURE.md`, `devdocs/EventThreadInstruction/STORY_LABEL_EVENT_FLOW_STANDARD.md`, `ACTION_ITEM_STANDARD.md`, `LOCATION_LOCATE_TALK_RESET_STANDARD.md`, and this rescue plan.
 
 Acceptance:
 

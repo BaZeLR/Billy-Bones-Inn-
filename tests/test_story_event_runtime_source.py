@@ -47,7 +47,9 @@ def test_story_event_runtime_monolith_keeps_only_content_definitions():
     assert "label checkTriggers" not in source
     assert "label preEvent" not in source
     assert "define amandaThreadList" in source
-    assert "label melissaClaraOverheard_0:" in source
+    assert "label melissaClaraOverheard_0:" not in source
+    assert "label story_clara_tavern_visit_bar_0:" not in source
+    assert "label story_clara_melissa_room_visit_0:" not in source
 
 
 def test_story_runtime_uses_familylife_style_split_files():
@@ -65,3 +67,23 @@ def test_story_runtime_uses_familylife_style_split_files():
     assert "$ initStoryEventRuntime(True)" in events
     assert "label checkTriggers(location, action, numpop=0):" in events
     assert "label preEvent(thread_name=None):" in events
+
+
+def test_check_triggers_uses_cached_events_and_marks_event_once_per_day():
+    source = EVENTS_PATH.read_text(encoding="utf-8-sig")
+    body = source.split("label checkTriggers(location, action, numpop=0):", 1)[1].split("\n\nlabel ", 1)[0]
+
+    assert "$ findAvailableEvents(False)" in body
+    assert "$ findAvailableEvents(True)" not in body
+    assert "$ story_event_mark_fired_today(evt)" in body
+    assert body.index("$ story_event_mark_fired_today(evt)") < body.index("jump expression evt.target")
+
+
+def test_story_events_are_blocked_after_firing_today():
+    source = EVENTS_PATH.read_text(encoding="utf-8-sig")
+    body = function_body(source, "canTrigger")
+
+    assert "story_event_fired_today(self)" in body
+    assert "return False" in body
+    assert "def story_event_reset_fired_today_if_needed" in source
+    assert "StoryEventFiredKeysToday = []" in source

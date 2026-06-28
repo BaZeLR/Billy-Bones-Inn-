@@ -53,10 +53,10 @@ def test_clara_market_event_checks_are_explicit_tuple_conditions():
     assert 'procedural_randint(1, 2, "clara_market_day_%s_%s"' in clara_init
     assert 'procedural_randint(1, 3, "clara_market_evening_%s_%s"' in clara_init
     assert "$ Clara.prepare_daily_event_rolls()" in next_day
-    assert "#int(ClaraVar.get('market_day_roll_day', -1) or -1) == int(dayspassed or 0)" in clara_thread
-    assert "#int(ClaraVar.get('market_day_roll', 0) or 0) == 1" in clara_thread
-    assert "#int(ClaraVar.get('market_evening_roll_day', -1) or -1) == int(dayspassed or 0)" in clara_thread
-    assert "#int(ClaraVar.get('market_evening_roll', 0) or 0) == 1" in clara_thread
+    assert "#int(Clara.var.get('market_day_roll_day', -1) or -1) == int(dayspassed or 0)" in clara_thread
+    assert "#int(Clara.var.get('market_day_roll', 0) or 0) == 1" in clara_thread
+    assert "#int(Clara.var.get('market_evening_roll_day', -1) or -1) == int(dayspassed or 0)" in clara_thread
+    assert "#int(Clara.var.get('market_evening_roll', 0) or 0) == 1" in clara_thread
 
 
 def test_clara_paintings_events_use_event_checks_not_ready_helpers():
@@ -90,7 +90,6 @@ def test_clara_paintings_events_use_event_checks_not_ready_helpers():
         assert name not in combined
 
     paintings_thread = events.split('LThreadData(1, "clara", "PaintingsPath"', 1)[1].split('LThreadData(2, "clara", "TavernVisit"', 1)[0]
-    assert "#int(AskedToday.get('melissa', 0) or 0) == 0" in paintings_thread
     assert '"WineStore",\n            "clara_paintings",\n            3,' in paintings_thread
     assert 'story_event_available("WineStore", "clara_paintings")' in clara_talk
     assert 'story_event_available("talk_melissa", "clara_paintings")' in melissa_talk
@@ -110,71 +109,115 @@ def test_clara_story_labels_use_thread_methods_directly():
     assert "story_thread_advance_current()" not in combined
     assert "$ thread.advance()" in combined
     assert "thread.abort()" in paintings
-    assert "thread.advanceTo(" in booklet
+    assert "thread.advanceTo(" not in booklet
 
 
 def test_clara_market_follow_label_is_simple_repeat_until_success():
     labels = _source(Path("game") / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy")
-    follow = labels.split("label story_clara_market_booklet_follow:", 1)[1].split("label story_clara_market_booklet_2_direct_follow:", 1)[0]
+    follow = labels.split("label story_clara_market_booklet_follow:", 1)[1].split("label story_clara_market_booklet_confront:", 1)[0]
 
-    assert "call story_clara_market_follow_cost" in follow
-    assert "call story_clara_market_restore_room_result" in follow
     assert "if int(exploration or 0) < 80:" in follow
-    assert 'ClaraVar["market_follow_failed_day"] = int(dayspassed or 0)' in follow
-    assert 'ClaraVar["market_follow_failed_hour"] = int(hour or 0)' in follow
-    assert 'ClaraVar["booklet_market_seen"] = 1' in follow
+    assert 'Clara.var["market_follow_failed_day"] = int(dayspassed or 0)' in follow
+    assert 'Clara.var["market_follow_failed_hour"] = int(hour or 0)' in follow
+    assert 'Clara.var["booklet_market_seen"] = 1' in follow
     assert "$ thread.advance()" in follow
     assert "story_thread_advance_current()" not in follow
     assert "advanceTo(" not in follow
     assert "effective_player_exploration" not in follow
+    assert "vscene" in follow
+    assert "menu:" in follow
+    assert "\"[MainTxt]\"" in follow
     assert "call screen main_ui" not in follow
-    assert 'MenuItem("Вернуться к рынку", Jump("MarketPlace"))' not in follow
-    assert 'MenuItem("Тихо уйти", Jump("MarketPlace"))' not in follow
-    assert "menu:" not in follow
-    assert "ShowImageSeq(\"general\", \"\", \"LocMarketPlace\"" not in follow
+    assert "call story_clara_market_booklet" not in follow
+    assert "jump story_clara_market_booklet_confront" in follow
+    assert "jump story_clara_market_booklet_follow_success_leave" in follow
+    assert "QueuePagedPanelText" not in follow
+    assert "ShowImage" not in follow
+    assert "Jump(\"MarketPlace\")" not in follow
 
 
 def test_clara_market_ignore_prepares_state_without_self_loop():
     labels = _source(Path("game") / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy")
     ignore = labels.split("label story_clara_market_booklet_ignore:", 1)[1].split("label story_clara_market_booklet_follow:", 1)[0]
 
-    assert "call story_clara_market_follow_cost" in ignore
-    assert "call story_clara_market_restore_room_result" in ignore
+    assert "$ calendar_v2.advance_minutes(15)" in ignore
+    assert 'Clara.var["market_follow_failed_day"] = int(dayspassed or 0)' in ignore
+    assert "return True" in ignore
     assert 'MenuItem("Вернуться к рынку", Jump("MarketPlace"))' not in ignore
     assert "current_action_items" not in ignore
-    assert "menu:" not in ignore
     assert "call screen main_ui" not in ignore
     assert "jump MarketPlace" not in ignore
+    assert "ShowImage" not in ignore
+    assert "QueuePagedPanelText" not in ignore
     assert "return" in ignore
 
 
-def test_clara_market_follow_cost_spends_time_and_energy():
+def test_clara_market_time_costs_are_visible_at_consequence_points():
     labels = _source(Path("game") / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy")
-    cost = labels.split("label story_clara_market_follow_cost:", 1)[1].split("label story_clara_market_restore_room_result:", 1)[0]
-    restore = labels.split("label story_clara_market_restore_room_result:", 1)[1].split("label story_clara_market_booklet_ignore:", 1)[0]
 
-    assert "$ LastAdvancedMinutes = 30" in cost
-    assert "$ calendar_v2.advance_minutes(30)" in cost
-    assert 'player_state().change_stat("energy", -5)' in cost
-    assert "call stat" in cost
-    assert '$ CurrentRoom = MarketPlaceRoom' in restore
-    assert '$ CurLoc = "MarketPlace"' in restore
-    assert "call ReturnMainUISceneMode" in restore
+    assert "label story_clara_market_booklet_follow_cost" not in labels
+    assert "$ LastAdvancedMinutes = 30" in labels
+    assert "$ calendar_v2.advance_minutes(30)" in labels
+    assert "$ LastAdvancedMinutes = 15" in labels
+    assert "$ calendar_v2.advance_minutes(15)" in labels
+    assert 'player_state().change_stat("energy", -5)' in labels
+    assert "call stat" in labels
+    assert "label story_clara_market_restore_room_result" not in labels
 
 
-def test_clara_market_intro_uses_main_ui_middle_action_panel():
+def test_clara_market_intro_uses_authored_scene_text_and_menu_order():
     labels = _source(Path("game") / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy")
     intro = labels.split("label story_clara_market_booklet_0:", 1)[1].split("label story_clara_market_booklet_confront:", 1)[0]
 
-    assert 'MenuItem("Проследить за Клариссой", Call("story_clara_market_booklet_follow"))' in intro
-    assert 'MenuItem("Не вмешиваться", Call("story_clara_market_booklet_ignore"))' in intro
+    assert 'vscene "images/clara/market_day.png"' in intro
+    assert '"[MainTxt]"' in intro
+    assert "menu:" in intro
+    assert '"Проследить за Клариссой":' in intro
+    assert '"Не вмешиваться":' in intro
+    assert "jump story_clara_market_booklet_follow" in intro
+    assert "jump story_clara_market_booklet_ignore" in intro
+    assert "call story_clara_market_booklet" not in intro
+    assert 'Clara.var["market_intro_seen"] = 1' in intro
     assert "main_ui_event_overlay" not in intro
     assert "show screen main_ui" not in intro
-    assert "current_action_items" in intro
-    assert "call screen main_ui" in intro
-    assert "menu:" not in intro
-    assert "jump MarketPlace" in intro
+    assert "current_action_items" not in intro
+    assert "call screen main_ui" not in intro
+    assert "jump MarketPlace" not in intro
+    assert "ShowImage" not in intro
+    assert "QueuePagedPanelText" not in intro
     assert "ShowImageSeq(\"general\", \"\", \"LocMarketPlace\"" not in intro
+
+    assert intro.index('vscene "images/clara/market_day.png"') < intro.index('"[MainTxt]"') < intro.index("menu:")
+
+
+def test_clara_market_thread_file_has_no_direct_wrappers_or_paged_panels():
+    labels = _source(Path("game") / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy")
+    clara_talk = _source(Path("game") / "NPC" / "Girls" / "Clara" / "IntClaraTalk.rpy")
+    city_guard = _source(Path("game") / "Town" / "CityGuard.rpy")
+    stolyar = _source(Path("game") / "Town" / "StolyarWorkshop.rpy")
+    hunter = _source(Path("game") / "Town" / "HunterClub.rpy")
+
+    for forbidden in [
+        "story_clara_market_booklet_wine_talk_direct",
+        "story_clara_market_booklet_city_guard_direct",
+        "story_clara_market_booklet_feed_mongol_direct",
+        "story_clara_market_booklet_lockpicks_order_direct",
+        "story_clara_market_booklet_release_mongol_direct",
+        "QueuePagedPanelText",
+        "call preEvent(\"claraBookletMarket\")",
+        "current_action_items",
+        "call screen main_ui",
+        "call story_clara_market_booklet",
+    ]:
+        assert forbidden not in labels
+
+    assert "ShowImage" not in labels
+    assert "ClaraVar" not in labels
+    assert "Clara.var" in labels
+    assert 'Call("checkTriggers", "WineStore", "clara_talk", 0)' in clara_talk
+    assert 'Call("checkTriggers", "CityGuard", "enter", 0)' in city_guard
+    assert 'Call("checkTriggers", "StolyarWorkshop", "enter", 0)' in stolyar
+    assert 'call checkTriggers("HunterClub", "overheard", 0)' in hunter
 
 
 def test_main_ui_keeps_standard_three_section_layout():

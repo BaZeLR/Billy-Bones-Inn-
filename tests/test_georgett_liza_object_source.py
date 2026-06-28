@@ -50,6 +50,25 @@ def test_liza_uses_data_info_runtime_shape():
     assert "class Liza(Girl):" not in source
 
 
+def test_liza_has_no_legacy_var_runtime_owner():
+    liza = _source(LIZA_INIT)
+
+    assert "self.uses_own_var_state = True" in liza
+    assert "Liza.var = LizaVar" not in liza
+    assert "self.var = LizaVar" not in liza
+    assert "def sync_liza_maps" not in liza
+    assert "def sync_from_liza_maps" not in liza
+    assert "LizaVar" not in liza
+
+    for path in (PROJECT_ROOT / "game").rglob("*"):
+        if "saves" in path.parts:
+            continue
+        if path.suffix.lower() not in {".rpy", ".json"}:
+            continue
+        source = _source(path)
+        assert "LizaVar" not in source, str(path)
+
+
 def test_georgett_liza_data_classes_keep_static_identity_only():
     georgett = _data_block(_source(GEORGETT_INIT), "class GeorgettData(PeopleData):", "class GeorgettInfo(Girl):")
     liza = _data_block(_source(LIZA_INIT), "class LizaData(PeopleData):", "class LizaInfo(Girl):")
@@ -79,8 +98,6 @@ def test_georgett_liza_runtime_owns_stats_jobs_story_and_pregnancy():
         assert "self.jobs = {" in source
         assert "self.wardrobe = {" in source
         assert "def ensure_story_defaults" in source
-        assert "def sync_from_%s_maps" % name in source
-        assert "def sync_%s_maps" % name in source
         assert "def reset_daily" in source
         assert "def pregnancy_stage" in source
         assert '"pregnancy": 0' in source
@@ -98,13 +115,12 @@ def test_georgett_liza_hired_flag_is_runtime_state_and_syncs_jobs():
     liza = _source(LIZA_INIT)
     talk = _source(GEORGETT_TALK)
 
-    for source, sync_name in [(georgett, "sync_georgett_maps"), (liza, "sync_liza_maps")]:
+    for source in (georgett, liza):
         assert "self.hired = False" in source
         assert "def set_hired(self, hired=True):" in source
         assert 'self.jobs["jobWhoreAvail"] = 1 if self.hired else 0' in source
         assert 'self.jobs["jobwhore"] = 1 if self.hired else 0' in source
         assert 'self.current_location = "TavernMain" if self.hired else "PortStreets"' in source
-        assert f"self.{sync_name}()" in source
         assert "def can_work_tavern(self):" in source
         assert "return self.hired" in source
 
@@ -143,6 +159,10 @@ def test_georgett_liza_talk_labels_use_class_topic_state():
     assert 'Liza.can_ask_topic("clients")' in liza
     assert 'Liza.mark_asked_topic("askclients")' in liza
     assert "Liza.finish_talk()" in liza
+    assert "label IntLizaTalkMenu" in liza
+    assert "label IntLizaTalkRefresh" not in liza
+    assert "label IntLizaTalkApply" not in liza
+    assert "choice_code" not in liza
     assert "LizaVar.setdefault" not in liza
     assert "GeorgettVar.setdefault" not in liza
     assert "LizaVar[" not in liza
@@ -158,8 +178,10 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
 
     assert "def portstreet_client_event_available" in georgett
     assert "def portstreet_client_event_available" in liza
-    assert "calendar_v2.clock_minutes()" in georgett
-    assert "calendar_v2.clock_minutes()" in liza
+    assert "people_to_int(calendar_v2.hour, 0) >= 19" in georgett
+    assert "people_to_int(calendar_v2.hour, 0) >= 19" in liza
+    assert "calendar_v2.clock_minutes()" not in georgett
+    assert "calendar_v2.clock_minutes()" not in liza
     assert 'CheckIfSexEventExist(self.code_name, 3, "Prostitution")' in georgett
     assert 'CheckIfSexEventExist(self.code_name, 3, "Prostitution")' in liza
 
@@ -177,7 +199,6 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
     assert 'LizaVar.get("ProstStart"' not in port
     assert 'CheckIfSexEventExist(GirlNamePS1, time, "Prostitution")' not in port
     assert "time in (0, 1, 2)" not in port
-
     assert 'LizaVar["seeclients"]' not in clients
     assert 'GeorgettVar["seeclients"]' not in clients
     assert "label story_georgett_portstreet_clients:" in clients
@@ -197,6 +218,12 @@ def test_church_after_sermon_events_are_threaded_from_classes():
 
     assert "def church_after_sermon_event_available" in georgett
     assert "def church_after_sermon_event_available" in liza
+    assert '"after_sermon_stage": 0' in georgett
+    assert '"after_sermon_stage": 0' in liza
+    assert "def set_after_sermon_stage" in georgett
+    assert "def set_after_sermon_stage" in liza
+    assert "and self.after_sermon_stage() < 4" in georgett
+    assert "and self.after_sermon_stage() < 4" in liza
     assert "def can_trigger_church_service_event" in liza
     assert 'CheckIfSexEventExist(self.code_name, 99, "Priest")' in georgett
     assert 'CheckIfSexEventExist(self.code_name, 99, "Priest")' in liza
@@ -210,6 +237,8 @@ def test_church_after_sermon_events_are_threaded_from_classes():
 
     assert "church_aftercermon_pick_scene_code" not in church_entry
     assert 'call checkTriggers("Church", "after_cermon_walk", 0)' in church_entry
+    assert "AfterCermonLizett" not in _source(CHURCH_ROOM)
+    assert "after_liza" not in _source(CHURCH_ROOM)
 
     assert "label story_georgett_church_after_sermon:" in georgett_scene
     assert "label story_georgett_church_after_sermon_look_1:" in georgett_scene
@@ -222,12 +251,28 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     assert "current_action_items" not in georgett_scene
     assert "renpy.restart_interaction" not in georgett_scene
     assert "ChurchRestore" not in georgett_scene
+    assert "ChurchAfterCermon[" not in georgett_scene
+    assert "ChurchAfterCermon.get" not in georgett_scene
     assert "calendar_v2.advance_minutes(60)" in georgett_scene
     assert 'vscene "images/georgett/ispoved/ispoved1.jpg"' in georgett_scene
     assert 'vscene "images/georgett/ispoved/ispovedstep2_1.jpg"' in georgett_scene
     assert 'vscene "images/georgett/ispoved/ispovedstep2_2.jpg"' in georgett_scene
     assert 'vscene "images/georgett/ispoved/ispovedstep4.jpg"' in georgett_scene
     assert "label story_liza_church_after_sermon:" in liza_scene
+    assert "label story_liza_church_after_sermon_look_1:" in liza_scene
+    assert "label story_liza_church_after_sermon_look_2:" in liza_scene
+    assert "label story_liza_church_after_sermon_look_3:" in liza_scene
+    assert "label story_liza_church_after_sermon_look_4:" in liza_scene
+    assert "label AfterCermonLizett:" not in liza_scene
+    assert "label IntLizettAfterCermon:" not in liza_scene
+    assert "MenuItem(" not in liza_scene
+    assert "current_action_items" not in liza_scene
+    assert "renpy.restart_interaction" not in liza_scene
+    assert "ChurchAfterCermon[" not in liza_scene
+    assert "ChurchAfterCermon.get" not in liza_scene
+    assert 'vscene "images/liza/ispoved/ispoved1.jpg"' in liza_scene
+    assert 'vscene "images/liza/ispoved/ispovedstep2_1.jpg"' in liza_scene
+    assert 'vscene "images/liza/ispoved/ispovedstep4_1.jpg"' in liza_scene
     assert 'GeorgettVar.get("SawChurchAfterCermon"' not in georgett_scene
     assert 'GeorgettVar["SawChurchAfterCermon"]' not in georgett_scene
     assert 'LizaVar.get("SawChurchAfterCermon"' not in liza_scene
@@ -267,9 +312,7 @@ def test_georgett_church_service_events_are_threaded_from_explicit_conditions():
     assert '"#people_to_int(Georgett.story_value(\'askkids\', 0), 0) > 0"' in runtime
     assert '"#people_to_int(Georgett.story_value(\'fuckinchurch\', 0), 0) > 0"' in runtime
     assert '"#people_to_int(cametoday, 0) < people_to_int(cancumdaily, 0)"' in runtime
-    assert '"#people_to_int(Friends.get(\'georgett\', Georgett.rel), 0) >= 6"' in runtime
     assert '"#people_to_int(Georgett.rel, 0) >= 6"' in runtime
-    assert '"#people_to_int(sluttiness.get(\'georgett\', Georgett.corruption), 0) >= 50"' in runtime
     assert '"#people_to_int(Georgett.corruption, 0) >= 50"' in runtime
     assert '"#people_to_int(HadSex.get(\'georgett\', 0), 0) >= 3"' in runtime
     assert '"Church"' in runtime
@@ -278,7 +321,6 @@ def test_georgett_church_service_events_are_threaded_from_explicit_conditions():
     assert '"georgett_church_service_with_liza"' in runtime
 
     assert "def church_georgett_quick_sex_visible" not in church
-    assert 'Function(main_ui_call_label, "ChurchServiceGeorgett")' in church
     assert 'Georgett.can_trigger_church_service_event()' not in church
     assert "label ChurchServiceGeorgett:" not in church
     assert "label story_georgett_church_service_bench:" not in church
@@ -291,7 +333,8 @@ def test_georgett_church_service_events_are_threaded_from_explicit_conditions():
     assert 'story_event_available("Church", "georgett_church_service_bench")' in georgett_church_events
     assert 'story_event_available("Church", "georgett_church_service_doggy")' in georgett_church_events
     assert 'story_event_available("Church", "georgett_church_service_with_liza")' in georgett_church_events
-    assert 'findAvailableEvents(True)' in georgett_church_events
+    assert 'findAvailableEvents(False)' in georgett_church_events
+    assert 'findAvailableEvents(True)' not in georgett_church_events
     assert 'call checkTriggers("Church", "georgett_church_service_bench", 0)' in georgett_church_events
     assert 'call checkTriggers("Church", "georgett_church_service_doggy", 0)' in georgett_church_events
     assert 'call checkTriggers("Church", "georgett_church_service_with_liza", 0)' in georgett_church_events

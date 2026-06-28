@@ -41,7 +41,11 @@ def test_clara_visit_conditions_use_clock_schedule_and_classes():
     source = read(STORY_RUNTIME)
     labels = read(CLARA_TAVERN_VISIT)
 
-    assert "clock_minutes" in source
+    clara_block = source.split("# clara_tavern_visit", 1)[1].split("define eddieThreadList", 1)[0]
+    assert "(12, 17)" in clara_block
+    assert "(18, 22)" in clara_block
+    assert "(16, 22)" in clara_block
+    assert "clock_minutes" not in clara_block
     assert "str(getLocation('clara') or '') == 'TavernMain'" in source
     assert "str(getLocation('melissa') or '') == 'TavernMain'" in source
     assert "str(getLocation('clara') or '') == 'TavernMelissaRoom'" in source
@@ -49,8 +53,8 @@ def test_clara_visit_conditions_use_clock_schedule_and_classes():
     assert "Clara.var.get('tavern_visit_bar_0_seen'" in source
     assert "Melissa.var.get('drawings_booklet_read'" in source
     assert "calendar_v2.advance_minutes(45)" in labels
-    assert "Clara.sync_clara_maps()" in labels
-    assert "Melissa.sync_melissa_maps()" in labels
+    assert "Clara.sync_clara_maps()" not in labels
+    assert "Clara.change_social(" in labels
 
 
 def test_room_files_no_longer_own_clara_visit_state():
