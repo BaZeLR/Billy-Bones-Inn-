@@ -10,9 +10,7 @@ init python:
     import renpy.exports as renpy_module
 
     def player_card_state():
-        if "player_state" in globals():
-            return player_state(True)
-        return globals().get("player", None)
+        return player_state(True)
 
     def player_card_equipped_weapon():
         state = player_card_state()
@@ -951,7 +949,7 @@ init python:
             return ""
         if target_key in ("", "you", "dog"):
             return ""
-        if not hasattr(Friends, "keys") or target_key not in Friends:
+        if getPersonInfo(target_key) is None:
             return ""
         return target_key
 
@@ -1059,9 +1057,7 @@ init python:
             allowed, reason = relationship_social_action_allowed(active_target, "share", item_key)
             return [active_target] if allowed else []
         targets = []
-        if not hasattr(Friends, "keys"):
-            return targets
-        for char_id in sorted(list(Friends.keys())):
+        for char_id in sorted(list(peopleInfo.keys() or [])):
             key = str(char_id or "").strip()
             if key == "" or key != key.lower() or key in ("you", "dog"):
                 continue
@@ -1127,7 +1123,8 @@ label PlayerCardGiftItemTo(item_id="", char_name=""):
         return
     $ _gift_name = player_card_item_display_name(_item_id)
     $ _gift_base = int(getattr(_item_obj, "custom_properties", {}).get("gift_value", 2) or 2)
-    $ _friends_before = int(Friends.get(_char_name, 0) or 0)
+    $ _gift_target_info = getPersonInfo(_char_name)
+    $ _friends_before = int(getattr(_gift_target_info, "rel", 0) or 0) if _gift_target_info is not None else 0
     $ _gift_allowed, _gift_block_reason = relationship_social_action_allowed(_char_name, "gift", _item_id)
     if not bool(_gift_allowed):
         $ _gift_result = player_gift_to(_char_name, _gift_name, _gift_base, _item_id, False)
@@ -1158,8 +1155,8 @@ label PlayerCardGiftItemTo(item_id="", char_name=""):
         return
     $ _gift_result = player_gift_to(_char_name, _gift_name, _gift_base, _item_id, False)
     $ _effect_result = player_apply_item_social_effects(_char_name, _item_id, True)
-    if int(Friends.get(_char_name, 0) or 0) <= _friends_before and int(_gift_base or 0) > 0:
-        $ Friends[_char_name] = min(20, _friends_before + 1)
+    if _gift_target_info is not None and int(_gift_target_info.rel or 0) <= _friends_before and int(_gift_base or 0) > 0:
+        $ _gift_target_info.change_social(friend_delta=1)
     $ MainTxt = str(_gift_result.get("text", "") or "")
     if str(_effect_result.get("text", "") or "").strip() != "":
         $ MainTxt = str(MainTxt or "") + " " + str(_effect_result.get("text", "") or "")

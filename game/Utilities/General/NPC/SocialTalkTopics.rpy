@@ -83,6 +83,37 @@ init -39 python:
         "clara": {"charisma": 70, "exploration": 50},
     }
 
+    def social_person_info(girl_name=""):
+        return getPersonInfo(social_topic_key(girl_name))
+
+    def social_rel_value(girl_name=""):
+        info = social_person_info(girl_name)
+        return int(getattr(info, "rel", 0) or 0) if info is not None else 0
+
+    def social_open_value(girl_name=""):
+        info = social_person_info(girl_name)
+        return int(getattr(info, "openness", 0) or 0) if info is not None else 0
+
+    def social_corruption_value(girl_name=""):
+        info = social_person_info(girl_name)
+        return int(getattr(info, "corruption", 0) or 0) if info is not None else 0
+
+    def social_flirted_today_value(girl_name=""):
+        info = social_person_info(girl_name)
+        return int(getattr(info, "flirted_today", 0) or 0) if info is not None else 0
+
+    def social_gifted_today_value(girl_name=""):
+        info = social_person_info(girl_name)
+        return int(getattr(info, "gifted_today", 0) or 0) if info is not None else 0
+
+    def social_talked_today_value(girl_name=""):
+        info = social_person_info(girl_name)
+        return int(getattr(info, "talked_today", 0) or 0) if info is not None else 0
+
+    def social_drunk_value(girl_name=""):
+        info = social_person_info(girl_name)
+        return int(getattr(info, "drunk", 0) or 0) if info is not None else 0
+
     SOCIAL_TALK_PROFILES = {
         "amanda": {
             "talk": {"job_routine": -1, "chat": 2, "dances": 4, "gossip": 4, "forest": 0, "stories": 1, "food": 1, "fashion": 4, "money": 4, "family_life": 2, "sex_topics": 3, "amanda_boys": 4, "amanda_freedom": 3, "amanda_future": 2, "amanda_attention": 4},
@@ -450,7 +481,7 @@ init -39 python:
             return False
         if mode_key == "talk" and social_topic_already_seen(key, mode_key, topic_key):
             return False
-        if mode_key == "flirt" and int(FlirtedToday.get(key, 0) or 0) > 0:
+        if mode_key == "flirt" and social_flirted_today_value(key) > 0:
             return False
         if mode_key == "flirt" and not social_external_requirement_met(key, "flirt"):
             return False
@@ -460,15 +491,15 @@ init -39 python:
         for row in social_topic_entries(mode_key, key):
             if str(row.get("id", "") or "") != topic_key:
                 continue
-            if int(Friends.get(key, 0) or 0) < int(row.get("min_friend", 0) or 0):
+            if social_rel_value(key) < int(row.get("min_friend", 0) or 0):
                 return False
-            if int(otkroven.get(key, 0) or 0) < int(row.get("min_open", 0) or 0):
+            if social_open_value(key) < int(row.get("min_open", 0) or 0):
                 return False
             if mode_key == "talk" and bool(row.get("private", False)):
                 private_allowed, private_reason = relationship_social_action_allowed(key, "private_talk")
                 if not private_allowed:
                     return False
-            if mode_key == "flirt" and int(sluttiness.get(key, 0) or 0) < int(row.get("min_slut", 0) or 0):
+            if mode_key == "flirt" and social_corruption_value(key) < int(row.get("min_slut", 0) or 0):
                 return False
             return True
         return False
@@ -491,13 +522,13 @@ init -39 python:
         mood = 0
         if mode_key == "talk" and topic_key in social_favorite_topic_ids(key):
             mood += 2
-        if int(Friends.get(key, 0) or 0) >= 10:
+        if social_rel_value(key) >= 10:
             mood += 1
-        if int(otkroven.get(key, 0) or 0) >= 8:
+        if social_open_value(key) >= 8:
             mood += 1
-        if mode_key == "flirt" and int(sluttiness.get(key, 0) or 0) >= 15:
+        if mode_key == "flirt" and social_corruption_value(key) >= 15:
             mood += 1
-        if int(Drunk.get(key, 0) or 0) > 0:
+        if social_drunk_value(key) > 0:
             mood += 1
         adjusted = relationship_adjust_social_score(key, mode_key, max(-5, min(5, base + mood)))
         try:
@@ -550,7 +581,7 @@ init -39 python:
         if not social_topic_visible(key, mode_key, topic_key):
             allowed, reason = relationship_social_action_allowed(key, mode_key)
             return {"ok": False, "text": str(reason or "Сейчас этот разговор не складывается."), "score": 0}
-        friends_before = int(Friends.get(key, 0) or 0)
+        friends_before = social_rel_value(key)
         topic_score = int(social_topic_profile(key, mode_key).get(topic_key, 0) or 0)
         score = social_topic_score(key, mode_key, topic_key)
         if mode_key == "talk" and score > 0:
@@ -558,16 +589,22 @@ init -39 python:
         if mode_key == "flirt":
             apply_social_interaction_base(key, "flirt", score, 2 if score > 0 else 0, 30, 1, 1, 0, 0, True)
             if score > 0:
-                add_to_stat_dict(sluttiness, key, max(1, score), 0, 100)
+                info = social_person_info(key)
+                if info is not None:
+                    info.change_social(corruption_delta=max(1, score))
             elif score < 0:
-                add_to_stat_dict(otkroven, key, score, 0, 20)
+                info = social_person_info(key)
+                if info is not None:
+                    info.change_social(open_delta=score)
         else:
-            talk_already_today = int(TalkedToday.get(key, 0) or 0) > 0
+            talk_already_today = social_talked_today_value(key) > 0
             talk_minutes = 0 if talk_already_today else 30
             talk_today_delta = 0 if talk_already_today else 1
             apply_social_interaction_base(key, "talk", score, 1, talk_minutes, 1, 0, 0, talk_today_delta, True)
             if score > 0:
-                add_to_stat_dict(otkroven, key, max(1, score // 2), 0, 20)
+                info = social_person_info(key)
+                if info is not None:
+                    info.change_social(open_delta=max(1, score // 2))
         actual_score = social_score_delta_for(key, friends_before)
         SocialTalkTopicSeen[social_topic_seen_key(key, mode_key, topic_key)] = score
         try:
@@ -602,16 +639,16 @@ init -39 python:
             score = max(1, min(4, base))
         else:
             score = 0
-            if key in SOCIAL_TALK_PROFILES and int(Friends.get(key, 0) or 0) < 5:
+            if key in SOCIAL_TALK_PROFILES and social_rel_value(key) < 5:
                 score = -2
         affinity = social_custom_gift_affinity(key, item_key)
         if affinity > 0:
             score = max(score, base + affinity)
         elif affinity < 0:
             score += affinity
-        if int(Friends.get(key, 0) or 0) >= 10:
+        if social_rel_value(key) >= 10:
             score += 1
-        if int(GiftedToday.get(key, 0) or 0) > 0:
+        if social_gifted_today_value(key) > 0:
             score -= 3
         return relationship_adjust_social_score(key, "gift", max(-5, min(5, score)))
 
@@ -624,7 +661,7 @@ init -39 python:
         score = social_gift_score(key, item_key, base_gain)
         if item_key in SOCIAL_EARLY_CARE_GIFT_IDS:
             return True, score
-        if key in SOCIAL_TALK_PROFILES and int(Friends.get(key, 0) or 0) < 3 and score <= 0:
+        if key in SOCIAL_TALK_PROFILES and social_rel_value(key) < 3 and score <= 0:
             return False, score
         return True, score
 
@@ -671,7 +708,7 @@ init -39 python:
         except Exception:
             pass
         if key == "melissa" and action_key in ("flirt", "gift", "share"):
-            if action_key in ("gift", "share") and int(FlirtedToday.get(key, 0) or 0) <= 0:
+            if action_key in ("gift", "share") and social_flirted_today_value(key) <= 0:
                 return False
             try:
                 return bool(melissa_relationship_allows(key, action_key))
@@ -684,24 +721,24 @@ init -39 python:
                 except Exception:
                     return False
             if action_key == "gift":
-                if int(FlirtedToday.get(key, 0) or 0) <= 0:
+                if social_flirted_today_value(key) <= 0:
                     return False
                 try:
                     return bool((Clara.can_receive_gifts() or Clara.has_caught_cat_gift()) and Clara.has_giftable_entries())
                 except Exception:
                     return False
             if action_key == "share":
-                if int(FlirtedToday.get(key, 0) or 0) <= 0:
+                if social_flirted_today_value(key) <= 0:
                     return False
                 allowed, reason = relationship_social_action_allowed(key, action_key, item_key)
                 return bool(allowed)
         if action_key == "flirt" and not social_external_requirement_met(key, "flirt"):
             return False
         if action_key == "gift":
-            if int(FlirtedToday.get(key, 0) or 0) <= 0:
+            if social_flirted_today_value(key) <= 0:
                 return False
             return bool(relationship_any_gift_allowed(key))
-        if action_key == "share" and int(FlirtedToday.get(key, 0) or 0) <= 0:
+        if action_key == "share" and social_flirted_today_value(key) <= 0:
             return False
         allowed, reason = relationship_social_action_allowed(key, action_key, item_key)
         return bool(allowed)
@@ -714,7 +751,7 @@ init -39 python:
             items.append(MenuItem("Поговорить о...", Call("SocialTalkTopicMenu", key, "talk", ret)))
         if social_has_visible_topics(key, "flirt") and social_interaction_allowed_for_npc(key, "flirt"):
             items.append(MenuItem("Флиртовать...", Call("SocialTalkTopicMenu", key, "flirt", ret)))
-        if int(GiftedToday.get(key, 0) or 0) == 0 and social_interaction_allowed_for_npc(key, "gift"):
+        if social_gifted_today_value(key) == 0 and social_interaction_allowed_for_npc(key, "gift"):
             if key == "clara":
                 items.append(MenuItem("Сделать Клариссе подарок", Call("IntClaraGiftMenu", key)))
             else:

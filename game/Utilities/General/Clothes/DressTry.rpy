@@ -19,8 +19,7 @@ label DressTry(dress_buyer="You", dress_code=""):
     hide screen girl_card_overlay
     $ DressProduced = str(dress_code or "")
     $ DressBuyer = str(dress_buyer or "You")
-    $ Friends.setdefault("irma", 0)
-    $ IrmaVar.setdefault("DeniedMinetMoney", 0)
+    $ Irma.var.setdefault("DeniedMinetMoney", 0)
     $ HadSex.setdefault("You", 0)
     $ DressTryStep = 0
     $ _layout_last_picture = irma_measure_picture_path(0)
@@ -62,7 +61,7 @@ label DressTryNakedThink:
 
 label DressTryNakedFantasy:
     $ _layout_last_picture = irma_measure_picture_path(3)
-    if Friends.get("irma", 0) < 3 or cametoday >= cancumdaily or IrmaVar.get("DeniedMinetMoney", 0) == 1:
+    if Irma.rel < 3 or cametoday >= cancumdaily or Irma.var.get("DeniedMinetMoney", 0) == 1:
         $ MainTxt = "Вы быстро и решительно сняли с себя все. А сняв, предались приятным грезам о том, как и в каких позах вы хотели бы поиметь смазливую полуэльфийку. Такие мечты не замедлили сказаться на состоянии вашего члена - реагируя на ваши мысли он с готовностью напрягся, приходя в полную боевую. Это не прошло незамеченным Ирмой: снимая с вас мерку, она улыбнулась, спросила \"Это я тебе настолько нравлюсь?\" и, не дожидаясь ответа, измерила и ваш вздыбленный член. Судя по ее выражению лица результат ей скорее всего понравился. Закончив мерять, Ирма сказала, что она начнет шить немедленно, а работа будет готова к утру."
         $ CurLocDesc = MainTxt
         call SlutFriendsIncrease("irma", 5, 1, 1, 0, 0, 0)
@@ -126,8 +125,8 @@ label DressTryRefuseExtra:
     $ _layout_last_picture = irma_angry_picture_path()
     $ MainTxt = "Заметив такую обдираловку, вы не замедлили бурно выразить свое несогласие. Мисс Фараго выслушала вас и тихо сказала: \"Что ж, значит вы клиент постоянный, но не щедрый, будем знать,\" и исправила счет обратно."
     $ CurLocDesc = MainTxt
-    $ Friends["irma"] = max(Friends.get("irma", 0) - 3, 0)
-    $ IrmaVar["DeniedMinetMoney"] = 1
+    $ Irma.change_social(friend_delta=-3)
+    $ Irma.var["DeniedMinetMoney"] = 1
     $ current_action_title = "Счет Ирмы"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Одеться и вернуться в лавку", Call("DressShopRoomActions"))]

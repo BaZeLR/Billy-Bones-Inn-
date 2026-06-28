@@ -154,8 +154,7 @@ init python:
             renpy.say(None, "\n")
 
     def _fran_inc_talk():
-        global Talked
-        Talked["fran"] = int(Talked.get("fran", 0) or 0) + 1
+        Francheska.mark_talked(1)
 
     def _fran_topic(start_idx, main_idx, clean_lines=2, update_key=None, update_val=1):
         global FranVar
@@ -207,7 +206,6 @@ init python:
 
     def _fran_prepare_state():
         global FranVar
-        global Talked
         global dayspassed
 
         def _fran_i(value, default=0):
@@ -219,10 +217,8 @@ init python:
         day_now = max(0, _fran_i(dayspassed, 0))
         last_talk_day = _fran_i(FranVar.get("lasttalkday", -1), -1)
         if last_talk_day != day_now:
-            Talked["fran"] = 0
+            Francheska.talked_today = 0
             FranVar["lasttalkday"] = day_now
-        else:
-            Talked["fran"] = max(0, _fran_i(Talked.get("fran", 0), 0))
         FranVar["meet"] = max(0, _fran_i(FranVar.get("meet", 0), 0))
         FranVar["ellonaask"] = max(0, _fran_i(FranVar.get("ellonaask", 0), 0))
         FranVar["graceask"] = max(0, _fran_i(FranVar.get("graceask", 0), 0))
@@ -233,7 +229,7 @@ init python:
         FranVar["kingask"] = max(0, _fran_i(FranVar.get("kingask", 0), 0))
         FranVar["rebelask"] = max(0, _fran_i(FranVar.get("rebelask", 0), 0))
         FranVar["alienask"] = max(0, _fran_i(FranVar.get("alienask", 0), 0))
-        return FranVar, Talked
+        return FranVar
 
     def _fran_topic_select(topic_code):
         code = str(topic_code or "")
@@ -294,40 +290,40 @@ label FrancheskaTalk:
 label BuildFrancheskaTalkMenu:
     $ Result = []
 
-    if FranVar.get("meet", 0) == 0 and Talked.get("fran", 0) < 3:
+    if FranVar.get("meet", 0) == 0 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Пораспрашивать об этом месте", Call("FrancheskaTalkApply", "meet")))
 
-    if FranVar.get("meet", 0) == 1 and FranVar.get("ellonaask", 0) == 0 and Talked.get("fran", 0) < 3:
+    if FranVar.get("meet", 0) == 1 and FranVar.get("ellonaask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Пораспрашивать Франческу о богине Эллоне", Call("FrancheskaTalkApply", "ellona")))
 
-    if FranVar.get("ellonaask", 0) == 1 and FranVar.get("graceask", 0) == 0 and Talked.get("fran", 0) < 3:
+    if FranVar.get("ellonaask", 0) == 1 and FranVar.get("graceask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Пораспрашивать Франческу о грациях", Call("FrancheskaTalkApply", "grace")))
 
-    if FranVar.get("graceask", 0) == 1 and Talked.get("fran", 0) < 3:
+    if FranVar.get("graceask", 0) == 1 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Узнать больше о грациях", Call("FrancheskaTalkApply", "grace_more")))
 
-    if FranVar.get("meet", 0) == 1 and FranVar.get("conchitaask", 0) == 0 and Talked.get("fran", 0) < 3:
+    if FranVar.get("meet", 0) == 1 and FranVar.get("conchitaask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Пораспрашивать Франческу о герцогине", Call("FrancheskaTalkApply", "conchita")))
 
-    if FranVar.get("conchitaask", 0) == 1 and FranVar.get("dukeask", 0) == 0 and Talked.get("fran", 0) < 3:
+    if FranVar.get("conchitaask", 0) == 1 and FranVar.get("dukeask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Спросить Франческу о герцоге", Call("FrancheskaTalkApply", "duke")))
 
-    if FranVar.get("dukeask", 0) == 1 and FranVar.get("starkask", 0) == 0 and Talked.get("fran", 0) < 3:
+    if FranVar.get("dukeask", 0) == 1 and FranVar.get("starkask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Узнать больше о предателе", Call("FrancheskaTalkApply", "stark")))
 
-    if FranVar.get("conchitaask", 0) == 1 and FranVar.get("stateask", 0) == 0 and Talked.get("fran", 0) < 3:
+    if FranVar.get("conchitaask", 0) == 1 and FranVar.get("stateask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Пораспрашивать Франческу о герцогстве", Call("FrancheskaTalkApply", "state")))
 
-    if FranVar.get("stateask", 0) == 1 and FranVar.get("kingask", 0) == 0 and Talked.get("fran", 0) < 3:
+    if FranVar.get("stateask", 0) == 1 and FranVar.get("kingask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Узнать больше о короле", Call("FrancheskaTalkApply", "king")))
 
-    if FranVar.get("kingask", 0) == 1 and FranVar.get("rebelask", 0) == 0 and Talked.get("fran", 0) < 3:
+    if FranVar.get("kingask", 0) == 1 and FranVar.get("rebelask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Узнать больше об отношениях с королевством", Call("FrancheskaTalkApply", "rebel")))
 
-    if FranVar.get("stateask", 0) == 1 and FranVar.get("alienask", 0) == 0 and Talked.get("fran", 0) < 3:
+    if FranVar.get("stateask", 0) == 1 and FranVar.get("alienask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Расспросить про нелюдей", Call("FrancheskaTalkApply", "alien")))
 
-    if FranVar.get("rebelask", 0) == 1 and FranVar.get("alienask", 0) == 1 and FranVar.get("starkask", 0) == 1 and FranVar.get("graceask", 0) == 2 and Talked.get("fran", 0) < 3:
+    if FranVar.get("rebelask", 0) == 1 and FranVar.get("alienask", 0) == 1 and FranVar.get("starkask", 0) == 1 and FranVar.get("graceask", 0) == 2 and int(Francheska.talked_today or 0) < 3:
         $ Result.append(MenuItem("Поболтать с Франческой", Call("FrancheskaTalkApply", "random")))
 
     $ Result.append(MenuItem("Закончить разговор", Call("FrancheskaTalkEnd")))

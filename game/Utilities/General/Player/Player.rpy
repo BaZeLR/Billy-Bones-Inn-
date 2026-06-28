@@ -510,8 +510,6 @@ init -998 python:
             g = globals()
             if not isinstance(getattr(self, "cock_positions", None), dict):
                 self.cock_positions = {}
-            arousal_value = g.get("Arousal", self.arousal)
-            self.arousal = dict(arousal_value or {}) if isinstance(arousal_value, dict) else {"you": 0}
             self.can_cum_daily = player_to_int(g.get("cancumdaily", self.can_cum_daily), 2)
             self.came_today = player_to_int(g.get("cametoday", self.came_today), 0)
             self.last_sex_day = player_to_int(g.get("LastDaySex", self.last_sex_day), -1)
@@ -523,7 +521,6 @@ init -998 python:
 
         def apply_to_store(self):
             g = globals()
-            g["Arousal"] = dict(self.arousal or {})
             g["cancumdaily"] = player_to_int(self.can_cum_daily, 2)
             g["cametoday"] = player_to_int(self.came_today, 0)
             g["LastDaySex"] = player_to_int(self.last_sex_day, -1)

@@ -12,16 +12,19 @@ init python:
 
     def tavern_bar_invite_targets():
         targets = []
-        if str(getLocation("clara") or "") == "TavernMain" and int(GiftedToday.get("clara", 0) or 0) == 0:
+        clara_info = getPersonInfo("clara")
+        becky_info = getPersonInfo("becky")
+        if str(getLocation("clara") or "") == "TavernMain" and clara_info is not None and int(clara_info.gifted_today or 0) == 0:
             targets.append(("clara", "Клариссу"))
-        if str(getLocation("becky") or "") == "TavernMain" and int(GiftedToday.get("becky", 0) or 0) == 0:
+        if str(getLocation("becky") or "") == "TavernMain" and becky_info is not None and int(becky_info.gifted_today or 0) == 0:
             targets.append(("becky", "Бекки"))
         for npc_id, caption in (
             ("sandra", "Сандру"),
             ("melissa", "Мелиссу"),
             ("amanda", "Аманду"),
         ):
-            if str(getLocation(npc_id) or "") == "TavernMain" and int(GiftedToday.get(npc_id, 0) or 0) == 0:
+            npc_info = getPersonInfo(npc_id)
+            if str(getLocation(npc_id) or "") == "TavernMain" and npc_info is not None and int(npc_info.gifted_today or 0) == 0:
                 targets.append((npc_id, caption))
         return targets
 
@@ -84,10 +87,12 @@ label TavernMainBarInviteApply(target_npc=""):
         return
     $ money = int(money or 0) - 2
     $ calendar_v2.advance_minutes(30)
-    $ Talked[_bar_target] = int(Talked.get(_bar_target, 0) or 0) + 1
-    $ TalkedToday[_bar_target] = int(TalkedToday.get(_bar_target, 0) or 0) + 1
-    $ GiftedToday[_bar_target] = int(GiftedToday.get(_bar_target, 0) or 0) + 1
-    $ Friends[_bar_target] = min(20, int(Friends.get(_bar_target, 0) or 0) + 1)
+    $ _bar_info = getPersonInfo(_bar_target)
+    if _bar_info is not None:
+        $ _bar_info.mark_talked(1)
+        $ _bar_info.gifted_today = int(_bar_info.gifted_today or 0) + 1
+        $ _bar_info.giftToday = True
+        $ _bar_info.change_social(friend_delta=1)
     $ fun = _player_clamp(int(fun or 0) + 4, 0, 100)
     $ _bar_effect = player_apply_item_social_effects(_bar_target, "drink_ale_001", True)
     if _bar_target == "clara":

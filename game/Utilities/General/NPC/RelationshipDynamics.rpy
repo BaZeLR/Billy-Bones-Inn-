@@ -103,9 +103,10 @@ init -42 python:
         key = relationship_key(person)
         if not key:
             return 0
-        friend_value = relationship_int(Friends.get(key, 0), 0) if isinstance(Friends, dict) else 0
-        open_value = relationship_int(otkroven.get(key, 0), 0) if isinstance(otkroven, dict) else 0
-        talked_value = relationship_int(Talked.get(key, 0), 0) if isinstance(Talked, dict) else 0
+        info = getPersonInfo(key)
+        friend_value = relationship_int(getattr(info, "rel", 0), 0) if info is not None else 0
+        open_value = relationship_int(getattr(info, "openness", 0), 0) if info is not None else 0
+        talked_value = relationship_int(getattr(info, "talked_today", 0), 0) if info is not None else 0
         inferred = max(0, friend_value * 3 + open_value + min(10, talked_value * 2))
         if not isinstance(RelationshipInteractionScore, dict):
             return inferred
@@ -155,9 +156,10 @@ init -42 python:
         open_need = relationship_int(requirement.get("open", 0), 0)
         slut_need = relationship_int(requirement.get("slut", 0), 0)
         score_value = relationship_interaction_score(key)
-        friend_value = relationship_int(Friends.get(key, 0), 0) if isinstance(Friends, dict) else 0
-        open_value = relationship_int(otkroven.get(key, 0), 0) if isinstance(otkroven, dict) else 0
-        slut_value = relationship_int(sluttiness.get(key, 0), 0) if isinstance(sluttiness, dict) else 0
+        info = getPersonInfo(key)
+        friend_value = relationship_int(getattr(info, "rel", 0), 0) if info is not None else 0
+        open_value = relationship_int(getattr(info, "openness", 0), 0) if info is not None else 0
+        slut_value = relationship_int(getattr(info, "corruption", 0), 0) if info is not None else 0
         if score_value < score_need:
             return "Сначала нужны обычные разговоры с %s. Сейчас между вами еще мало накопленного доверия." % name
         if friend_value < friend_need:
@@ -174,9 +176,10 @@ init -42 python:
             return False, "Некого выбрать."
         requirement = relationship_action_requirement(key, action, item_id)
         score_value = relationship_interaction_score(key)
-        friend_value = relationship_int(Friends.get(key, 0), 0) if isinstance(Friends, dict) else 0
-        open_value = relationship_int(otkroven.get(key, 0), 0) if isinstance(otkroven, dict) else 0
-        slut_value = relationship_int(sluttiness.get(key, 0), 0) if isinstance(sluttiness, dict) else 0
+        info = getPersonInfo(key)
+        friend_value = relationship_int(getattr(info, "rel", 0), 0) if info is not None else 0
+        open_value = relationship_int(getattr(info, "openness", 0), 0) if info is not None else 0
+        slut_value = relationship_int(getattr(info, "corruption", 0), 0) if info is not None else 0
         if score_value < relationship_int(requirement.get("score", 0), 0):
             return False, relationship_requirement_block_text(key, action, item_id)
         if friend_value < relationship_int(requirement.get("friend", 0), 0):
@@ -240,12 +243,9 @@ init -42 python:
     def relationship_has_talked_today(person=""):
         key = relationship_key(person)
         try:
-            if relationship_int(TalkedToday.get(key, 0), 0) > 0:
-                return True
-        except Exception:
-            pass
-        try:
             info = getPersonInfo(key)
+            if info is not None and relationship_int(getattr(info, "talked_today", 0), 0) > 0:
+                return True
             if info is not None and len(getattr(info, "talkToday", set()) or set()) > 0:
                 return True
         except Exception:
@@ -254,9 +254,10 @@ init -42 python:
 
     def relationship_social_stage(person=""):
         key = relationship_key(person)
-        friend_value = relationship_int(Friends.get(key, 0), 0) if isinstance(Friends, dict) else 0
-        open_value = relationship_int(otkroven.get(key, 0), 0) if isinstance(otkroven, dict) else 0
-        corruption_value = relationship_int(sluttiness.get(key, 0), 0) if isinstance(sluttiness, dict) else 0
+        info = getPersonInfo(key)
+        friend_value = relationship_int(getattr(info, "rel", 0), 0) if info is not None else 0
+        open_value = relationship_int(getattr(info, "openness", 0), 0) if info is not None else 0
+        corruption_value = relationship_int(getattr(info, "corruption", 0), 0) if info is not None else 0
         stage = 0
         if friend_value >= 2:
             stage = 1
@@ -296,7 +297,8 @@ init -42 python:
         if anger > 0:
             return False, relationship_block_text(key, action_key)
 
-        friend_value = relationship_int(Friends.get(key, 0), 0) if isinstance(Friends, dict) else 0
+        info = getPersonInfo(key)
+        friend_value = relationship_int(getattr(info, "rel", 0), 0) if info is not None else 0
         weekly_eval = relationship_weekly_chore_eval()
 
         if key in RELATIONSHIP_HOUSEHOLD_NPCS and weekly_eval == "bad" and friend_value < 10:

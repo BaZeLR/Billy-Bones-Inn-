@@ -7,10 +7,10 @@
 
 init python:
     def get_girl_drunk(girl_name):
-        if Drunk[girl_name] == 0:
-            Drunk[girl_name] = 1
-            sluttiness[girl_name] += 4
-            Friends[girl_name] += 2
+        girl_info = getPersonInfo(girl_name)
+        if girl_info is not None and int(girl_info.drunk or 0) == 0:
+            girl_info.drunk = 1
+            girl_info.change_social(friend_delta=2, corruption_delta=4)
 
 # Usage: call from python with get_girl_drunk(girl_name)
 

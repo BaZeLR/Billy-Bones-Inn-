@@ -22,7 +22,9 @@ label BeginPaidSexModule(girl_name="", return_room=""):
     $ set_active_module("sex", "", return_room, girl_name)
     if str(girl_name or "") == "":
         return
-    $ Arousal[girl_name] = PussyWetStart.get(girl_name, 0)
+    $ _module_actor_info = getPersonInfo(girl_name)
+    if _module_actor_info is not None and hasattr(_module_actor_info, "set_arousal"):
+        $ _module_actor_info.set_arousal(PussyWetStart.get(girl_name, 0))
     call CockPosition(girl_name, 0, "You")
     call CheckVisibility(girl_name)
     return

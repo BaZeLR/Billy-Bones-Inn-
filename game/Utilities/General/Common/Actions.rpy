@@ -150,7 +150,9 @@ init -46 python:
 
     def social_score_delta_for(char_name="", before_value=0):
         key = str(char_name or "").strip()
-        return int(Friends.get(key, 0) or 0) - int(before_value or 0)
+        info = getPersonInfo(key)
+        current_value = int(getattr(info, "rel", 0) or 0) if info is not None else 0
+        return current_value - int(before_value or 0)
 
     def social_score_message(score_delta=0):
         value = int(score_delta or 0)
@@ -855,17 +857,18 @@ init -46 python:
             calendar_v2.advance_minutes(int(minutes_cost or 0))
             update_stat_state()
 
-        if int(talked_delta or 0) != 0:
-            Talked[key] = max(0, int(Talked.get(key, 0) or 0) + int(talked_delta or 0))
-        if int(flirted_today_delta or 0) != 0:
-            FlirtedToday[key] = max(0, int(FlirtedToday.get(key, 0) or 0) + int(flirted_today_delta or 0))
-        if int(gifted_today_delta or 0) != 0:
-            GiftedToday[key] = max(0, int(GiftedToday.get(key, 0) or 0) + int(gifted_today_delta or 0))
-        if int(talked_today_delta or 0) != 0:
-            TalkedToday[key] = max(0, int(TalkedToday.get(key, 0) or 0) + int(talked_today_delta or 0))
-
-        if int(friend_delta or 0) != 0:
-            add_to_stat_dict(Friends, key, int(friend_delta or 0), 0, 20)
+        info = getPersonInfo(key)
+        talk_increment = max(int(talked_delta or 0), int(talked_today_delta or 0))
+        if info is not None and talk_increment != 0:
+            info.mark_talked(talk_increment)
+        if info is not None and int(flirted_today_delta or 0) != 0:
+            info.flirted_today = max(0, int(info.flirted_today or 0) + int(flirted_today_delta or 0))
+            info.flirtToday = int(info.flirted_today or 0) > 0
+        if info is not None and int(gifted_today_delta or 0) != 0:
+            info.gifted_today = max(0, int(info.gifted_today or 0) + int(gifted_today_delta or 0))
+            info.giftToday = int(info.gifted_today or 0) > 0
+        if info is not None and int(friend_delta or 0) != 0:
+            info.change_social(friend_delta=int(friend_delta or 0))
         if sync_openness:
             _action_sync_openness(key)
         if int(fun_delta or 0) != 0:
@@ -897,7 +900,8 @@ init -46 python:
         effect_text = str(dict(rule.get("effect_texts", {}) or {}).get(key, "") or "").strip()
         if effect_text:
             lines.append(effect_text)
-        if item_key == "soap_001" and int(Friends.get(key, 0) or 0) >= int(rule.get("soap_request_threshold", 999) or 999):
+        info = getPersonInfo(key)
+        if item_key == "soap_001" and info is not None and int(info.rel or 0) >= int(rule.get("soap_request_threshold", 999) or 999):
             lines.append("Похоже, ей так нравится это мыло, что потом она наверняка попросит у вас еще.")
         return lines
 
@@ -918,31 +922,32 @@ init -46 python:
         friend_bonus = max(0, int(custom_props.get("social_friend_bonus", 0) or 0))
 
         rule = _social_item_rule(item_key, key)
+        info = getPersonInfo(key)
 
         if from_gift:
-            if friend_bonus > 0:
-                add_to_stat_dict(Friends, key, friend_bonus, 0, 20)
+            if info is not None and friend_bonus > 0:
+                info.change_social(friend_delta=friend_bonus)
             if fun_bonus > 0:
                 fun = _player_clamp(fun + fun_bonus, 0, 100)
-            if openness_bonus > 0 and isinstance(otkroven, dict):
-                add_to_stat_dict(otkroven, key, openness_bonus, 0, 20)
+            if info is not None and openness_bonus > 0:
+                info.change_social(open_delta=openness_bonus)
             if trust_bonus > 0 and key == "clara" and isinstance(Clara.var, dict):
                 Clara.var["trust"] = clamp_stat(int(Clara.var.get("trust", 0) or 0) + trust_bonus, 0, 20)
-            if horny_bonus > 0 and isinstance(sluttiness, dict):
-                add_to_stat_dict(sluttiness, key, horny_bonus, 0, 100)
+            if info is not None and horny_bonus > 0:
+                info.change_social(corruption_delta=horny_bonus)
 
             if rule:
-                if int(rule.get("friend_bonus", 0) or 0) != 0:
-                    add_to_stat_dict(Friends, key, int(rule.get("friend_bonus", 0) or 0), 0, 20)
+                if info is not None and int(rule.get("friend_bonus", 0) or 0) != 0:
+                    info.change_social(friend_delta=int(rule.get("friend_bonus", 0) or 0))
                 if int(rule.get("fun_bonus", 0) or 0) != 0 and fun_bonus <= 0:
                     fun = _player_clamp(int(fun or 0) + int(rule.get("fun_bonus", 0) or 0), 0, 100)
                 if int(rule.get("beauty_bonus", 0) or 0) != 0 and isinstance(beauty, dict):
                     add_to_stat_dict(beauty, key, int(rule.get("beauty_bonus", 0) or 0), 0, 100)
-                if int(rule.get("horny_bonus", 0) or 0) != 0 and isinstance(sluttiness, dict):
-                    add_to_stat_dict(sluttiness, key, int(rule.get("horny_bonus", 0) or 0), 0, 100)
+                if info is not None and int(rule.get("horny_bonus", 0) or 0) != 0:
+                    info.change_social(corruption_delta=int(rule.get("horny_bonus", 0) or 0))
                 if int(rule.get("neshlush_delta", 0) or 0) != 0 and isinstance(neshlush, dict):
                     neshlush[key] = max(0, int(neshlush.get(key, 0) or 0) + int(rule.get("neshlush_delta", 0) or 0))
-                if item_key == "soap_001" and int(Friends.get(key, 0) or 0) >= int(rule.get("soap_request_threshold", 999) or 999):
+                if item_key == "soap_001" and info is not None and int(info.rel or 0) >= int(rule.get("soap_request_threshold", 999) or 999):
                     if not isinstance(SoapRequestQueue, dict):
                         SoapRequestQueue = {}
                     SoapRequestQueue[key] = 1
@@ -1017,8 +1022,9 @@ init -46 python:
                 share_text = share_rule.format(_action_display_name(key))
 
         if item_key == "drink_ale_001" and key in _ALE_SHARE_BONUS_TARGETS:
-            if isinstance(sluttiness, dict):
-                sluttiness[key] = max(0, min(100, int(sluttiness.get(key, 0) or 0) + 1))
+            target_info = getPersonInfo(key)
+            if target_info is not None:
+                target_info.change_social(corruption_delta=1)
 
         result_text = share_text
         if str(effect_result.get("text", "") or "").strip():
@@ -1076,7 +1082,8 @@ init -46 python:
         if not key:
             return {"ok": False, "text": "Не с кем разговаривать.", "action_key": "talk"}
 
-        friends_before = int(Friends.get(key, 0) or 0)
+        info = getPersonInfo(key)
+        friends_before = int(getattr(info, "rel", 0) or 0) if info is not None else 0
         friend_gain = relationship_adjust_social_score(key, "talk", resolve_player_social_delta(key, "talk"))
         apply_social_interaction_base(key, "talk", friend_gain, 2, 30, 1, 0, 0, 1, True)
         relationship_after_social_result(key, "talk", friend_gain, True)
@@ -1110,7 +1117,8 @@ init -46 python:
         if not key:
             return {"ok": False, "text": "Некому дарить подарок.", "action_key": "gift"}
 
-        friends_before = int(Friends.get(key, 0) or 0)
+        info = getPersonInfo(key)
+        friends_before = int(getattr(info, "rel", 0) or 0) if info is not None else 0
         allowed, reason = relationship_social_action_allowed(key, "gift", gift_item)
         if not allowed:
             apply_social_interaction_base(key, "gift", -1, 0, 0, 1, 0, 1, 0, True)
@@ -1223,7 +1231,8 @@ init -46 python:
             relationship_after_social_result(key, "flirt", -1, False)
             return {"ok": False, "text": str(reason or relationship_block_text(key, "flirt")), "action_key": "flirt", "char_name": key, "friend_delta": 0, "raw_friend_delta": -1}
 
-        friends_before = int(Friends.get(key, 0) or 0)
+        info = getPersonInfo(key)
+        friends_before = int(getattr(info, "rel", 0) or 0) if info is not None else 0
         flirt_gain = relationship_adjust_social_score(key, "flirt", resolve_player_social_delta(key, "flirt"))
         apply_social_interaction_base(key, "flirt", flirt_gain, 4, 30, 1, 1, 0, 0, True)
         relationship_after_social_result(key, "flirt", flirt_gain, True)

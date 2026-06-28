@@ -13,7 +13,7 @@ init python:
         return "images/irma/portraits/portrait2.png"
 
     def irma_card_portrait_path():
-        if int(Friends.get("irma", 0) or 0) >= 5:
+        if int(getPersonInfo("irma").rel or 0) >= 5:
             return "images/irma/portraits/flirts.png"
         return irma_default_portrait_path()
 
@@ -181,7 +181,7 @@ init python:
             super(IrmaInfo, self).update()
             self.data = IrmaStaticData
             self.relationship = self.rel
-            self.sync_from_irma_maps()
+            self.sync_irma_runtime()
             return self
 
         def ensure_story_defaults(self):
@@ -191,18 +191,8 @@ init python:
                 self.var.setdefault(key, value)
             return self.var
 
-        def sync_from_irma_maps(self):
-            self.var = IrmaVar
-            self.rel = people_to_int(Friends.get("irma", self.rel), self.rel)
+        def sync_irma_runtime(self):
             self.relationship = self.rel
-            self.openness = people_to_int(otkroven.get("irma", self.openness), self.openness)
-            self.corruption = people_to_int(sluttiness.get("irma", self.corruption), self.corruption)
-            self.drunk = people_to_int(Drunk.get("irma", self.drunk), self.drunk)
-            self.talked_today = people_to_int(TalkedToday.get("irma", self.talked_today), self.talked_today)
-            self.flirted_today = people_to_int(FlirtedToday.get("irma", self.flirted_today), self.flirted_today)
-            self.gifted_today = people_to_int(GiftedToday.get("irma", self.gifted_today), self.gifted_today)
-            self.asked_today = people_to_int(AskedToday.get("irma", self.asked_today), self.asked_today)
-            self.fucked_today = people_to_int(FuckedToday.get("irma", self.fucked_today), self.fucked_today)
             for table, stat_key in [
                 (kids, "kids"),
                 (beauty, "beauty"),
@@ -234,7 +224,7 @@ init python:
             self.ensure_story_defaults()
             return self
 
-        def sync_irma_maps(self):
+        def sync_irma_runtime_tables(self):
             name = self.code_name
             RealName[name] = self.data.cname
             RealName2[name] = self.data.genitive
@@ -242,15 +232,6 @@ init python:
             DateOfBirth[name] = dict(self.data.birth_date)
             girltextdesc[name] = self.data.description
             knowsMC[name] = bool(self.known)
-            Friends[name] = people_to_int(self.rel, 0)
-            otkroven[name] = people_to_int(self.openness, 0)
-            sluttiness[name] = people_to_int(self.corruption, 0)
-            Drunk[name] = people_to_int(self.drunk, 0)
-            TalkedToday[name] = people_to_int(self.talked_today, 0)
-            FlirtedToday[name] = people_to_int(self.flirted_today, 0)
-            GiftedToday[name] = people_to_int(self.gifted_today, 0)
-            AskedToday[name] = people_to_int(self.asked_today, 0)
-            FuckedToday[name] = people_to_int(self.fucked_today, 0)
             self.location = str(self.current_location or "DressShop")
             GiftPreferences[name] = list(self.gift_preferences)
             dressdefault[name] = self.wardrobe["current_dress"]
@@ -291,14 +272,11 @@ init python:
             for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
                 table[name] = self.skills.get(skill_key, 0)
             self.ensure_story_defaults()
-            for key, value in self.var.items():
-                IrmaVar[key] = value
             return self
 
         def initialize_new_game_state(self):
-            self.var = IrmaVar
             self.ensure_story_defaults()
-            self.sync_irma_maps()
+            self.sync_irma_runtime_tables()
             return self
 
         def install_schedule(self):

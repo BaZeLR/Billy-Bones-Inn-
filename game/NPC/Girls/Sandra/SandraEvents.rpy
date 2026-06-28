@@ -6,10 +6,10 @@
 
 init python:
     SANDRA_WEEKLY_EVALUATION_STAT_GAINS = (
-        {"friends": 1, "otkroven": 1, "sluttiness": 1},
-        {"friends": 1, "otkroven": 1, "sluttiness": 2},
-        {"friends": 1, "otkroven": 2, "sluttiness": 3},
-        {"friends": 2, "otkroven": 2, "sluttiness": 4},
+        {"rel": 1, "openness": 1, "corruption": 1},
+        {"rel": 1, "openness": 1, "corruption": 2},
+        {"rel": 1, "openness": 2, "corruption": 3},
+        {"rel": 2, "openness": 2, "corruption": 4},
     )
     SANDRA_WEEKLY_EVALUATION_PICTURES = (
         "images/sandra/player_room_sandra_0.jpg",
@@ -134,8 +134,9 @@ label SandraSexEngine(girl_name="sandra", source_room="TavernSandraRoom"):
             call TavernSandraRoomBuildActions
         return
     $ bodymodel_sync_character(girl_name, RealName.get(girl_name, "Сандра"), "female")
-    $ Arousal.setdefault("You", 0)
-    $ Arousal.setdefault(girl_name, int(PussyWetStart.get(girl_name, 20) or 20))
+    $ player_state(False).intimacy.set_arousal(player_state(False).intimacy.arousal_value("You"), "You")
+    $ Sandra.set_arousal(int(PussyWetStart.get(girl_name, Sandra.arousal_value() or 20) or 20))
+    $ player_state(False).intimacy.apply_to_store()
     call ShowCurrentSex(girl_name)
     call PregnancyCheck(girl_name, "inside", 1, "Вы")
     $ Sandra.mark_fucked()

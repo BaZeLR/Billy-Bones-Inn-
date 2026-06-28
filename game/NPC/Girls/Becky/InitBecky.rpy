@@ -358,7 +358,6 @@ init python:
             self.stats["cuminside"] = people_to_int(cuminside.get(self.code_name, self.stats.get("cuminside", 0)), 0)
             self.stats["pregnancy"] = people_to_int(pregnancy.get(self.code_name, self.stats.get("pregnancy", 0)), 0)
             self.stats["pregfather"] = str(pregfather.get(self.code_name, self.stats.get("pregfather", "")) or "")
-            self.corruption = people_to_int(sluttiness.get(self.code_name, self.corruption), 0)
             return self
 
         def has_bra(self):

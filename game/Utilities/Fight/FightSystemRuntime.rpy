@@ -1283,7 +1283,9 @@ init -20 python:
             if ransom > 0:
                 money += ransom
             for girl_key in ("sandra", "melissa", "amanda"):
-                Friends[girl_key] = int(Friends.get(girl_key, 0) or 0) + 2
+                girl_info = getPersonInfo(girl_key)
+                if girl_info is not None:
+                    girl_info.change_social(friend_delta=2)
             notoriety = min(100, int(notoriety or 0) + 3)
             tavernfame = int(tavernfame or 0) + 2
             return {
@@ -1305,7 +1307,9 @@ init -20 python:
             _player_add_item_by_id(item_id, qty)
         money = int(money or 0) + money_gain
         for girl_key in ("sandra", "melissa", "amanda"):
-            Friends[girl_key] = int(Friends.get(girl_key, 0) or 0) + 2
+            girl_info = getPersonInfo(girl_key)
+            if girl_info is not None:
+                girl_info.change_social(friend_delta=2)
         notoriety = min(100, int(notoriety or 0) + 3)
         tavernfame = int(tavernfame or 0) + 2
         item_name = str(getattr(get_game_item(item_id), "name", item_id) or item_id)

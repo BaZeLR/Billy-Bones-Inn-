@@ -48,20 +48,15 @@ init python:
         g = str(girl_name or "").strip()
         if not g:
             return
-        _gds_get_dict("Friends").setdefault(g, 0)
-        _gds_get_dict("sluttiness").setdefault(g, 0)
         _gds_get_dict("HadSex").setdefault(g, 0)
         _gds_get_dict("pregnancy").setdefault(g, 0)
 
     def _gds_showoff_level(girl_name):
         g = str(girl_name or "")
-        sluttiness = _gds_get_dict("sluttiness")
-        had_sex = _gds_get_dict("HadSex")
-        friends = _gds_get_dict("Friends")
-
-        girl_slut = int(sluttiness.get(g, 0) or 0)
-        girl_had = int(had_sex.get(g, 0) or 0)
-        girl_friend = int(friends.get(g, 0) or 0)
+        girl_info = getPersonInfo(g)
+        girl_slut = int(getattr(girl_info, "corruption", 0) or 0) if girl_info is not None else 0
+        girl_had = int(girl_info.sex_stat("sexacts", 0) or 0) if girl_info is not None and hasattr(girl_info, "sex_stat") else 0
+        girl_friend = int(getattr(girl_info, "rel", 0) or 0) if girl_info is not None else 0
 
         level = 0
         if (girl_slut > 25 and girl_had > 1 and girl_friend > 10) or (girl_slut > 33 and girl_had > 0 and girl_friend > 5):
@@ -187,7 +182,8 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         _is_bra = "bra" in _gds_dress_id
         _is_panties = "panties" in _gds_dress_id
         _is_stockings = "stockings" in _gds_dress_id
-        _slut = int(_gds_get_dict("sluttiness").get(GirlName, 0) or 0)
+        _girl_info = getPersonInfo(GirlName)
+        _slut = int(_girl_info.corruption or 0) if _girl_info is not None else 0
 
     if _is_bra:
         if GirlName == "georgett":

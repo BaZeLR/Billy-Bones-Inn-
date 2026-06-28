@@ -306,10 +306,10 @@ label BarberShopServePendingGuest:
     $ calendar_v2.advance_minutes(45)
     $ BarberInvitePending[_barber_guest] = 0
     $ BarberVisitLastDay[_barber_guest] = int(dayspassed or 0)
-    $ Friends[_barber_guest] = min(20, int(Friends.get(_barber_guest, 0) or 0) + 1)
+    $ _barber_guest_info = getPersonInfo(_barber_guest)
+    if _barber_guest_info is not None:
+        $ _barber_guest_info.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
     $ beauty[_barber_guest] = min(100, int(beauty.get(_barber_guest, 0) or 0) + 3)
-    $ otkroven[_barber_guest] = min(20, int(otkroven.get(_barber_guest, 0) or 0) + 1)
-    $ sluttiness[_barber_guest] = min(100, int(sluttiness.get(_barber_guest, 0) or 0) + 2)
     if _barber_guest == "sandra":
         $ cooking[_barber_guest] = min(100, int(cooking.get(_barber_guest, 0) or 0) + 1)
         $ cleaning[_barber_guest] = min(100, int(cleaning.get(_barber_guest, 0) or 0) + 1)

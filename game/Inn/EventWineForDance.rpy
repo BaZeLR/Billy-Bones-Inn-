@@ -59,7 +59,9 @@ init python:
         if str(getLocation("becky") or "") == "TavernKitchen":
             present_ids.append("becky")
         for npc_id in present_ids:
-            Friends[npc_id] = min(20, int(Friends.get(npc_id, 0) or 0) + 1)
+            npc_info = getPersonInfo(npc_id)
+            if npc_info is not None:
+                npc_info.change_social(friend_delta=1)
         return present_ids
 
 default DanceSponsorPledgeDay = -1

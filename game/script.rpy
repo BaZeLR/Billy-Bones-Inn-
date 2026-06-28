@@ -61,7 +61,6 @@ default EquippedArmor = ""
 default cametoday = 0
 default bathedToday = False
 default swamToday = False
-default Arousal = {"you": 0}
 default PussyWetStart = {}
 default Drunk = {}
 default pregnancy = {}
@@ -148,14 +147,8 @@ default WeeklyChoresLastEvalStamp = ""
 default otkroven = {}
 default neshlush = {}
 
-# Legacy per-girl custom variable tables.
-# These must be defaulted early so bare access works reliably in ready functions
-# and dynamic if conditions (called from labels via py_eval).
-default IrmaVar = {}
-
 # Core NPC/player relation state maps.
 default CurrentLoc = {}
-default Friends = {}
 default HadSex = {}
 default GiveOrgasms = {}
 default LickPussy = {}
@@ -182,7 +175,6 @@ default PussyVisible = {}
 default ShortSkirtNoPanties = {}
 
 # Daily tracking
-default TalkedToday = {}
 default FlirtedToday = {}
 default GiftedToday = {}
 default FuckedToday = {}

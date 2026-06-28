@@ -262,10 +262,10 @@ init python:
         return lines
 
     def tavern_kitchen_sandra_can_discuss_breakfasts():
-        return str(getLocation("sandra") or "") == "TavernKitchen" and tavern_kitchen_food_stock_count() > 0 and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0
+        return str(getLocation("sandra") or "") == "TavernKitchen" and tavern_kitchen_food_stock_count() > 0 and int(Sandra.rel or 0) >= 5 and int(Sandra.asked_today or 0) == 0
 
     def tavern_kitchen_sandra_can_discuss_clients():
-        return str(getLocation("sandra") or "") == "TavernKitchen" and tavern_kitchen_food_stock_count() > 0 and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0
+        return str(getLocation("sandra") or "") == "TavernKitchen" and tavern_kitchen_food_stock_count() > 0 and int(Sandra.rel or 0) >= 5 and int(Sandra.asked_today or 0) == 0
 
     TavernKitchenRoom = Room(
         code_name="TavernKitchen",

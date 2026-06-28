@@ -36,10 +36,18 @@ init python:
     def _ims_set_arousal(who, value):
         value = min(100, max(0, int(value or 0)))
         if str(who or "").lower() == "you":
-            Arousal["You"] = value
-            Arousal["you"] = value
+            player_state(False).intimacy.set_arousal(value, "You")
+            player_state(False).intimacy.apply_to_store()
             return
-        Arousal[str(who or "").strip()] = value
+        info = getPersonInfo(who)
+        if info is not None and hasattr(info, "set_arousal"):
+            info.set_arousal(value)
+
+    def _ims_arousal(who):
+        if str(who or "").lower() == "you":
+            return int(player_state(False).intimacy.arousal_value("You") or 0)
+        info = getPersonInfo(who)
+        return int(info.arousal_value() or 0) if info is not None and hasattr(info, "arousal_value") else 0
 
     def _ims_prepare_scene_state(girl_name="melissa"):
         girl_key = str(girl_name or "melissa").strip()
@@ -62,9 +70,7 @@ init python:
         CumTitsOthers.setdefault(girl_key, 0)
         CumInsideYou.setdefault(girl_key, 0)
         CumInsideOthers.setdefault(girl_key, 0)
-        Arousal.setdefault("You", 0)
-        Arousal.setdefault("you", Arousal.get("You", 0))
-        Arousal.setdefault(girl_key, int(Melissa.stats.get("PussyWetStart", 0) or 0))
+        _ims_set_arousal(girl_key, int(Melissa.stats.get("PussyWetStart", 0) or 0))
         GiveOrgasms.setdefault(girl_key, 0)
         LickPussy.setdefault(girl_key, 0)
         check_visibility(girl_key)
@@ -131,8 +137,8 @@ init python:
         girl_key = str(girl_name or "melissa").strip()
         if melissa_sex_available(girl_key):
             return
-        _ims_set_arousal("You", min(85, int(Arousal.get("You", 0) or 0)))
-        _ims_set_arousal(girl_key, min(90, int(Arousal.get(girl_key, 0) or 0)))
+        _ims_set_arousal("You", min(85, _ims_arousal("You")))
+        _ims_set_arousal(girl_key, min(90, _ims_arousal(girl_key)))
 
     def _ims_touch_text(girl_name="melissa", target_id="", action_id="", effect=None):
         girl_key = str(girl_name or "melissa").strip()
@@ -224,7 +230,7 @@ label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
         $ _ims_prepare_scene_state(GirlNameIMS)
         $ _ims_stage = melissa_relationship_stage(GirlNameIMS)
         $ _ims_full_engine = melissa_sex_available(GirlNameIMS)
-        $ _ims_can_cum = _ims_full_engine and int(Arousal.get("You", 0) or 0) >= 100 and _ims_player_cum_count() < _ims_player_cum_limit()
+        $ _ims_can_cum = _ims_full_engine and _ims_arousal("You") >= 100 and _ims_player_cum_count() < _ims_player_cum_limit()
         menu:
             "Осмотреть Мелиссу":
                 $ MainTxt = _ims_scene_summary(GirlNameIMS)
@@ -311,7 +317,7 @@ label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
-            "Использовать игрушку" if _ims_full_engine and _ims_has_dildo() and "insert" in bodymodel_actions_for_target(GirlNameIMS, "pussy") and int(Arousal.get(GirlNameIMS, 0) or 0) >= 20:
+            "Использовать игрушку" if _ims_full_engine and _ims_has_dildo() and "insert" in bodymodel_actions_for_target(GirlNameIMS, "pussy") and _ims_arousal(GirlNameIMS) >= 20:
                 $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "insert", "You", Melissa.data.fullname, "female")
                 $ _ims_effect["action"] = "toy_insert"
                 $ MainTxt = _ims_touch_text(GirlNameIMS, "pussy", "toy_insert", _ims_effect)
@@ -356,14 +362,14 @@ label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
-            "Войти в нее" if _ims_full_engine and _ims_player_cum_count() < _ims_player_cum_limit() and int(SomebodyCums or 0) == 0 and int(PussyVisible.get(GirlNameIMS, 0) or 0) == 1 and int(Arousal.get("You", 0) or 0) >= 20 and int(Arousal.get(GirlNameIMS, 0) or 0) >= 20:
+            "Войти в нее" if _ims_full_engine and _ims_player_cum_count() < _ims_player_cum_limit() and int(SomebodyCums or 0) == 0 and int(PussyVisible.get(GirlNameIMS, 0) or 0) == 1 and _ims_arousal("You") >= 20 and _ims_arousal(GirlNameIMS) >= 20:
                 $ _ims_set_inserted_container(GirlNameIMS, "pussy")
                 $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "pussy", "insert", "You", Melissa.data.fullname, "female")
                 "Вы входите в Мелиссу медленно, оставляя ей время принять ваш темп и глубину."
                 call IntMelissaSexState(GirlNameIMS)
                 jump int_melissa_sex_menu
 
-            "Войти сзади" if _ims_full_engine and _ims_player_cum_count() < _ims_player_cum_limit() and int(SomebodyCums or 0) == 0 and "insert" in bodymodel_actions_for_target(GirlNameIMS, "ass") and int(Arousal.get("You", 0) or 0) >= 30 and int(Arousal.get(GirlNameIMS, 0) or 0) >= 40:
+            "Войти сзади" if _ims_full_engine and _ims_player_cum_count() < _ims_player_cum_limit() and int(SomebodyCums or 0) == 0 and "insert" in bodymodel_actions_for_target(GirlNameIMS, "ass") and _ims_arousal("You") >= 30 and _ims_arousal(GirlNameIMS) >= 40:
                 $ _ims_set_inserted_container(GirlNameIMS, "ass")
                 $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "ass", "insert", "You", Melissa.data.fullname, "female")
                 "Вы входите сзади, медленно и без спешки. Мелисса вцепляется в край стола и привыкает к новому давлению."

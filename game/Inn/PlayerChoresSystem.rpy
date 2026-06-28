@@ -195,7 +195,7 @@ init -45 python:
 
     def _ensure_player_chores_state():
         global PlayerChoresWeek, UI_chores, WeeklyVisitorsTrack, WeeklyChoresLastEvalStamp
-        global Friends, otkroven, neshlush
+        global neshlush
 
         if not isinstance(PlayerChoresWeek, dict):
             PlayerChoresWeek = {}
@@ -218,25 +218,16 @@ init -45 python:
         if not isinstance(WeeklyChoresLastEvalStamp, str):
             WeeklyChoresLastEvalStamp = str(WeeklyChoresLastEvalStamp or "")
 
-        if not isinstance(Friends, dict):
-            Friends = {}
-        if not isinstance(otkroven, dict):
-            otkroven = {}
         if not isinstance(neshlush, dict):
             neshlush = {}
         for girl in PLAYER_CORE_OTHER_GIRLS:
             if girl not in neshlush:
-                neshlush[girl] = max(0, 5 - _pc_to_int(otkroven.get(girl, 0), 0))
-
-            # Sync to girl object (girls are classes now, not just dict entries)
-            try:
-                info = peopleInfo.get(girl)
-                if isinstance(info, PeopleInfo):
-                    info.openness = otkroven.get(girl, info.openness)
-                    if not hasattr(info, "rebel_baseline"):
-                        info.rebel_baseline = neshlush[girl]
-            except Exception:
-                pass
+                info = getPersonInfo(girl)
+                base_open = int(getattr(info, "openness", 0) or 0) if info is not None else 0
+                neshlush[girl] = max(0, 5 - base_open)
+            info = getPersonInfo(girl)
+            if info is not None and not hasattr(info, "rebel_baseline"):
+                info.rebel_baseline = neshlush[girl]
 
     def get_player_chores_ui_state():
         _ensure_player_chores_state()
@@ -355,8 +346,9 @@ init -45 python:
         key = str(girl_key or "").strip()
         if not key:
             return
-        cur = _pc_to_int(Friends.get(key, 0), 0)
-        Friends[key] = max(0, min(20, cur + _pc_to_int(delta, 0)))
+        info = getPersonInfo(key)
+        if info is not None:
+            info.change_social(friend_delta=_pc_to_int(delta, 0))
 
     def weekly_chores_evaluation_preview(
         week_now=1,
@@ -495,7 +487,7 @@ init -45 python:
 
     def evaluate_weekly_chores_and_rewards():
         global WeeklyChoresLastEvalStamp, PlayerChoresWeek, WeeklyVisitorsTrack
-        global neshlush, Friends, UI_chores
+        global neshlush, UI_chores
 
         _ensure_player_chores_state()
         Sandra.ensure_story_defaults()

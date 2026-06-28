@@ -67,8 +67,6 @@ init python:
             _girls_desc_map("RealName2", {}),
             _girls_desc_map("age", {}),
             _girls_desc_map("beauty", {}),
-            _girls_desc_map("friends", {}),
-            _girls_desc_map("Friends", {}),
             _girls_desc_map("pregnancy", {}),
             _girls_desc_map("topdress", {}),
             _girls_desc_map("bottomdress", {}),
@@ -339,16 +337,17 @@ init python:
         if int(_girls_desc_get(gm("Drunk"), g, 0) or 0) > 0:
             lines.append("%s слегка выпила, расслабилась и подобрела." % real_name)
 
+        girl_info = getPersonInfo(g)
         age_val = int(_girls_desc_stat_value(g, "age_girls", "age", default=0) or 0)
-        friends_val = int(_girls_desc_stat_value(g, "Friends", "friends", default=0) or 0)
+        friends_val = int(getattr(girl_info, "rel", 0) or 0) if girl_info is not None else 0
         lines.append("Ей %d лет." % age_val)
         lines.append("Уровень дружбы: %d." % friends_val)
 
         beauty_val = int(_girls_desc_get(gm("beauty"), g, 0) or 0)
         lines.append(_girls_desc_beauty_text(beauty_val))
 
-        otkroven = int(_girls_desc_get(gm("otkroven"), g, 0) or 0)
-        sluttiness_val = int(_girls_desc_get(gm("sluttiness"), g, 0) or 0)
+        otkroven = int(getattr(girl_info, "openness", 0) or 0) if girl_info is not None else 0
+        sluttiness_val = int(getattr(girl_info, "corruption", 0) or 0) if girl_info is not None else 0
         if otkroven >= 3:
             lines.append("Ее распущенность: %d." % sluttiness_val)
 

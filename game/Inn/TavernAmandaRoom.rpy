@@ -474,14 +474,16 @@ label TavernAmandaRoomMorningWindowEpisode:
     $ Amanda.current_location = "TavernAmandaRoom"
     $ MainTxt = "Аманда не спит. Вы застаете ее у окна ровно в тот момент, когда она резко отдергивает руку от занавески и пытается сделать вид, будто просто смотрела во двор.\n\n\"Ну что, Аманда? Кто у нас теперь извращенец?\" спрашиваете вы.\n\nОна вспыхивает, но не уходит от ответа: \"Ничего не могу поделать... иногда так зудит, что хоть на стену лезь.\" Вы спокойно отвечаете: \"Могу помочь, если хочешь.\""
     if _amanda_window_outcome == "oral":
-        $ Arousal["You"] = max(35, int(Arousal.get("You", 0) or 0))
+        $ player_state(False).intimacy.set_arousal(max(35, int(player_state(False).intimacy.arousal_value("You") or 0)), "You")
+        $ player_state(False).intimacy.apply_to_store()
         $ Amanda.set_arousal(max(35, Amanda.arousal_value()))
         $ Amanda.change_social(open_delta=1, corruption_delta=2)
         $ CurLocDesc = MainTxt
         call IntAmandaSex("amanda", "home", "minet")
         $ MainTxt = "После этого Аманда уже не спорит насчет окна. Она только быстро приводит себя в порядок и, все еще краснея, просит не разносить эту сцену по всему дому."
     elif _amanda_window_outcome == "mutual":
-        $ Arousal["You"] = max(30, int(Arousal.get("You", 0) or 0) + 10)
+        $ player_state(False).intimacy.set_arousal(max(30, int(player_state(False).intimacy.arousal_value("You") or 0) + 10), "You")
+        $ player_state(False).intimacy.apply_to_store()
         $ Amanda.add_arousal(10, 100)
         $ Amanda.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
         $ MainTxt = str(MainTxt or "") + "\n\nАманда долго смотрит на вас, потом сама делает шаг ближе. Дальше все остается на грани игры и взаимной смелости: достаточно, чтобы обоим стало трудно делать вид, будто это обычное утро, но недостаточно, чтобы она потом могла назвать это чем-то большим.\n\nЧерез несколько минут она уже торопливо поправляет платье и шепчет, что на сегодня с нее хватит."

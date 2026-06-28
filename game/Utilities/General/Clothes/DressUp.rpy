@@ -89,7 +89,8 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
             TmpDressSelect = 0
             TmpDressSelectMaxCur = -10000
 
-            girl_slut = int(sluttiness.get(GirlNameDress, 0) or 0)
+            _dress_girl_info = getPersonInfo(GirlNameDress)
+            girl_slut = int(getattr(_dress_girl_info, "corruption", 0) or 0) if _dress_girl_info is not None else 0
             if girl_slut >= 70:
                 TmpTopSlutLevelMax, TmpTopSlutLevelMin = 8, 3
                 TmpBottomSlutLevelMax, TmpBottomSlutLevelMin = 8, 2

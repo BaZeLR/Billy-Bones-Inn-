@@ -145,8 +145,7 @@ label BeckyHome(arrive_mode=""):
         Becky.ensure_story_defaults()
         Inga.ensure_story_defaults()
         pregnancy.setdefault("inga", 0)
-        Arousal.setdefault(GirlName, 0)
-        PussyWetStart.setdefault(GirlName, Arousal.get(GirlName, 0))
+        PussyWetStart.setdefault(GirlName, Becky.arousal_value())
     $ _becky_home_room.mark_visited()
 
     $ _start_becky_sex = False
@@ -215,7 +214,7 @@ label BeckyHome(arrive_mode=""):
             call IntBeckyGuest
             " Итак, вы сидите за столом в гостях у вдовы Блэнкеншип и наслаждаетесь аппетитной домашней кухней."
     if _start_becky_sex:
-        $ Arousal[GirlName] = PussyWetStart[GirlName]
+        $ Becky.set_arousal(PussyWetStart[GirlName])
         call cock_position(GirlName, 0)
         call check_visibility(GirlName)
         call IntBeckySex(GirlName)

@@ -86,8 +86,7 @@ label GirlDressBuyPregRemark(GirlName=""):
     if int(_gds_get_dict("pregnancy").get(GirlName, 0) or 0) > 120:
         'Ирма обратила внимание на то, что клиентка находится в положении. "От мужа или нагуляла?" спросила она у покрасневшей [_gds_name("RealName2", GirlName)].'
         '"То беда небольшая, у всех моих платьев талия шнуровкой меняется. Сейчас чуть распустим, потом затянем."'
-        $ IrmaVar = _gds_get_dict("IrmaVar")
-        $ IrmaVar["KnowInfertility"] = max(int(IrmaVar.get("KnowInfertility", 0) or 0), 1)
+        $ Irma.var["KnowInfertility"] = max(int(Irma.var.get("KnowInfertility", 0) or 0), 1)
 
     return
 
@@ -128,7 +127,7 @@ label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBu
 
     if str(_gds_get_dict("panties").get(GirlName, "") or "") == "":
         'Панталончиков под ним не оказалось.'
-        if (int(_gds_get_dict("sluttiness").get(GirlName, 0) or 0) > 49 and int(_gds_get_dict("HadSex").get(GirlName, 0) or 0) > 0) or int(_gds_get_dict("sluttiness").get(GirlName, 0) or 0) > 62:
+        if (int(getPersonInfo(GirlName).corruption or 0) > 49 and int(getPersonInfo(GirlName).sex_stat("sexacts", 0) or 0) > 0) or int(getPersonInfo(GirlName).corruption or 0) > 62:
             'Впрочем, [_rn] ничуть не смутилась от такой мелочи. Она поймала ваш похотливый взгляд, улыбнулась и сказала: "Что, нравится? Смотри!"'
             if DressBuyIsRelative == 1:
                 '"Вот что значит доверие в доме!" добавила разбитная Сандра.'
@@ -156,7 +155,7 @@ label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBu
                 call SlutFriendsIncrease(GirlName, 4, 1, -2, 20, 1, -3)
                 jump ArtisansQuarter
             else:
-                if int(_gds_get_dict("Friends").get("irma", 0) or 0) < 4:
+                if int(Irma.rel or 0) < 4:
                     '"Знаете что, молодой человек, вы мне своими глупостями мешаете нормально работать. Посидите пока снаружи," сказала вам Ирма.'
                     menu:
                         "Пойти и подождать":
@@ -203,7 +202,7 @@ label GirlDressBuyJerkoff(GirlName="", DressToBuy="", DressBuyIsRelative=0):
                 'В последний момент [_rn] быстро наклонилась и обхватила губами головку вашего члена. Вы разрядились ей прямо в ротик.'
                 call PregnancyCheck(GirlName, "mouth", 1, "Вы")
                 call SlutFriendsIncrease(GirlName, 15, 2, 1, 50, 1, 1)
-            elif int(_gds_get_dict("Friends").get("irma", 0) or 0) > 5 and procedural_randint(1, 2, key="procedural:NPC/Girls/Common/GirlSuggestDressFunc.rpy:procedural_randint:206:2") == 1:
+            elif int(Irma.rel or 0) > 5 and procedural_randint(1, 2, key="procedural:NPC/Girls/Common/GirlSuggestDressFunc.rpy:procedural_randint:206:2") == 1:
                 'Ирма, хоть и была поглощена работой, успела в последний момент взять ваш член в рот, и ваше семя отправилось ей в желудок.'
                 call PregnancyCheck("irma", "mouth", 1, "Вы")
                 call SlutFriendsIncrease("irma", 8, 2, 1, 50, 1, 1)

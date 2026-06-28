@@ -116,7 +116,7 @@ label TavernSandraRoomBuildActions:
     python:
         for _issue_action in list(household_room_issue_action_specs("sandra") or []):
             current_action_items.append(MenuItem(str(_issue_action.get("label", "") or ""), Call(str(_issue_action.get("target", "") or ""), *tuple(_issue_action.get("args", ()) or ()))))
-    if str(getLocation("sandra") or "") == "TavernSandraRoom" and npc_can_talk_now("sandra") and int(Friends.get("sandra", 0) or 0) >= 5 and int(AskedToday.get("sandra", 0) or 0) == 0:
+    if str(getLocation("sandra") or "") == "TavernSandraRoom" and npc_can_talk_now("sandra") and int(Sandra.rel or 0) >= 5 and int(Sandra.asked_today or 0) == 0:
         $ current_action_items.append(MenuItem("Сесть с Сандрой над трактирной книгой", Call("TavernSandraLedgerScene")))
     if Sandra.night_thanks_ready() and int(hour or 0) >= 22 and int(hour or 0) <= 23 and int(Sandra.night_thanks_last_day or -1) != int(dayspassed or 0):
         $ current_action_items.append(MenuItem("Принять ночную благодарность Сандры", Call("TavernSandraNightThanksScene")))
@@ -210,7 +210,7 @@ label TavernSandraLedgerScene:
             "Вы раскладываете на кровати трактирные записи, и Сандра быстро втягивается в подсчеты так, словно всегда только этим и занималась. Когда дело доходит до старых долгов и привычек постоянных гостей, она вдруг рассказывает пару историй о тех временах, когда в доме все держалось не на деньгах, а на умении помнить, кто сколько наобещал и кто потом непременно попытается прикинуться забывчивым.",
             "Пока вы вместе перебираете счета и прикидываете, на чем трактир теряет больше всего, Сандра неожиданно начинает рассказывать о себе куда больше обычного. О том, как рано привыкла считать не только деньги, но и силы людей вокруг; кто вынослив, кто ленив, кто сорвется, а кто вытянет весь день на одной злости. В ее голосе почти нет жалобы, только старая привычка держать дом на своих плечах и заранее думать за всех остальных.",
         ]
-        _ledger_idx = int((dayspassed or 0) + (hour or 0) + int(Friends.get("sandra", 0) or 0)) % len(_ledger_stories)
+        _ledger_idx = int((dayspassed or 0) + (hour or 0) + int(Sandra.rel or 0)) % len(_ledger_stories)
         MainTxt = _ledger_stories[_ledger_idx]
         CurLocDesc = MainTxt
     call TavernSandraRoomBuildActions

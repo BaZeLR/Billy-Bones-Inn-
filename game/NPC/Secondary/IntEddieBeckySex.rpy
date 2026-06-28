@@ -19,35 +19,35 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
         EddieCockInTits.setdefault(GirlNameIBS, 0)
         CumInsideYou.setdefault(GirlNameIBS, 0)
         CumInsideOthers.setdefault(GirlNameIBS, 0)
-        Arousal.setdefault(GirlNameIBS, 0)
-        Arousal.setdefault("You", 0)
-        Arousal.setdefault("you", Arousal.get("You", 0))
-        Arousal.setdefault("eddie", 0)
-        Arousal.setdefault("Eddie", Arousal.get("eddie", 0))
         GrupenSex.setdefault("eddie", 0)
         pregnancy.setdefault(GirlNameIBS, 0)
-        sluttiness.setdefault(GirlNameIBS, 0)
         SomebodyCums = int(SomebodyCums or 0)
         if not isinstance(cametoday_npc, dict):
             cametoday_npc = {}
 
-        def _iebs_sync_eddie_arousal():
-            if "Eddie" in Arousal and "eddie" not in Arousal:
-                Arousal["eddie"] = Arousal["Eddie"]
-            if "eddie" in Arousal:
-                Arousal["Eddie"] = Arousal["eddie"]
+        def _iebs_set_arousal(who, value):
+            value = min(100, max(0, int(value or 0)))
+            if str(who or "").lower() == "you":
+                player_state(False).intimacy.set_arousal(value, "You")
+                player_state(False).intimacy.apply_to_store()
+                return
+            info = getPersonInfo(who)
+            if info is not None and hasattr(info, "set_arousal"):
+                info.set_arousal(value)
+
+        def _iebs_arousal(who):
+            if str(who or "").lower() == "you":
+                return int(player_state(False).intimacy.arousal_value("You") or 0)
+            info = getPersonInfo(who)
+            return int(info.arousal_value() or 0) if info is not None and hasattr(info, "arousal_value") else 0
 
         def _iebs_inc_arousal(who, amount):
-            key = "eddie" if str(who).lower() == "eddie" else who
-            Arousal[key] = min(100, max(0, Arousal.get(key, 0) + amount))
-            _iebs_sync_eddie_arousal()
+            _iebs_set_arousal(who, _iebs_arousal(who) + int(amount or 0))
 
         def _iebs_set_eddie_pos(pos):
             EddieCockInMouth[GirlNameIBS] = 1 if pos == 2 else 0
             EddieCockInPussy[GirlNameIBS] = 1 if pos == 1 else 0
             EddieCockInTits[GirlNameIBS] = 1 if pos == 3 else 0
-
-        _iebs_sync_eddie_arousal()
 
     label int_eddie_becky_sex_menu:
         python:
@@ -144,11 +144,11 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
                     else:
                         "Разгульная вдова продолжает умело отсасывать Эдди."
 
-                if Arousal.get("eddie", 0) < 20:
+                if _iebs_arousal("eddie") < 20:
                     "Она лишь облизывает его вялый член."
-                elif Arousal.get("eddie", 0) < 40:
+                elif _iebs_arousal("eddie") < 40:
                     "Она облизывает головку напрягшегося члена Эдди."
-                elif Arousal.get("eddie", 0) < 60:
+                elif _iebs_arousal("eddie") < 60:
                     "Она умело отсасывает Эдди."
                 else:
                     "Она заглатывает член Эдди по самые яйца."
@@ -164,7 +164,7 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
                 call ShowCurrentSex(GirlNameIBS)
                 jump int_eddie_becky_sex_menu
 
-            "Трахнуть сиси Бекки" if _cametoday_eddie < _cancumdaily_eddie and SomebodyCums == 0 and Arousal.get("eddie", 0) >= 20 and TitsVisible.get(GirlNameIBS, 0) and pregnancy.get(GirlNameIBS, 0) < 130 and CockInTits.get(GirlNameIBS, 0) == 0 and CockInMouth.get(GirlNameIBS, 0) == 0:
+            "Трахнуть сиси Бекки" if _cametoday_eddie < _cancumdaily_eddie and SomebodyCums == 0 and _iebs_arousal("eddie") >= 20 and TitsVisible.get(GirlNameIBS, 0) and pregnancy.get(GirlNameIBS, 0) < 130 and CockInTits.get(GirlNameIBS, 0) == 0 and CockInMouth.get(GirlNameIBS, 0) == 0:
                 if CockInPussy.get(GirlNameIBS, 0) == 0:
                     if EddieCockInTits.get(GirlNameIBS, 0):
                         "Эдди лежит и балдеет, пока Бекки трахает его член своими грудями."
@@ -185,7 +185,7 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
                 call ShowCurrentSex(GirlNameIBS)
                 jump int_eddie_becky_sex_menu
 
-            "Трахать" if _cametoday_eddie < _cancumdaily_eddie and SomebodyCums == 0 and Arousal.get("eddie", 0) >= 20 and Arousal.get(GirlNameIBS, 0) >= 20 and PussyVisible.get(GirlNameIBS, 0) and CockInPussy.get(GirlNameIBS, 0) == 0:
+            "Трахать" if _cametoday_eddie < _cancumdaily_eddie and SomebodyCums == 0 and _iebs_arousal("eddie") >= 20 and _iebs_arousal(GirlNameIBS) >= 20 and PussyVisible.get(GirlNameIBS, 0) and CockInPussy.get(GirlNameIBS, 0) == 0:
                 if CockInMouth.get(GirlNameIBS, 0) == 1:
                     if EddieCockInPussy.get(GirlNameIBS, 0) == 0:
                         "Эдди посмотрел как Ребекка делает вам минет, подошел к хозяйке сзади и приставил свой член к ее щели. Бекки, почуствовав член управляющего, приглашающе вильнула попой и Эдди одним движением вошел в нее."
@@ -222,15 +222,14 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
                 call ShowCurrentSex(GirlNameIBS)
                 jump int_eddie_becky_sex_menu
 
-            "Кончить в рот" if _cametoday_eddie < _cancumdaily_eddie and Arousal.get("eddie", 0) >= 100 and (EddieCockInMouth.get(GirlNameIBS, 0) or EddieCockInTits.get(GirlNameIBS, 0)) and CockInMouth.get(GirlNameIBS, 0) == 0 and CockInTits.get(GirlNameIBS, 0) == 0:
+            "Кончить в рот" if _cametoday_eddie < _cancumdaily_eddie and _iebs_arousal("eddie") >= 100 and (EddieCockInMouth.get(GirlNameIBS, 0) or EddieCockInTits.get(GirlNameIBS, 0)) and CockInMouth.get(GirlNameIBS, 0) == 0 and CockInTits.get(GirlNameIBS, 0) == 0:
                 "Эдди прижал голову Бекки к себе и начал заполнять ее рот своим семенем."
                 "Когда он ее отпустил, разбитная вдова начисто облизала член Эдди."
                 if CockInPussy.get(GirlNameIBS, 0) == 1:
                     "При этом сладострастная торговка не забывала еще и вам подмахивать, приближая и ваш собственный оргазм."
                     python:
                         _iebs_inc_arousal("You", 10)
-                $ Arousal["eddie"] = 0
-                $ Arousal["Eddie"] = 0
+                $ _iebs_set_arousal("eddie", 0)
                 call PregnancyCheck(GirlNameIBS, "mouth", 1, "eddie")
                 python:
                     _iebs_set_eddie_pos(0)
@@ -238,10 +237,9 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
                 call ShowCurrentSex(GirlNameIBS)
                 jump int_eddie_becky_sex_menu
 
-            "Кончить на лицо" if _cametoday_eddie < _cancumdaily_eddie and Arousal.get("eddie", 0) >= 100 and CockInMouth.get(GirlNameIBS, 0) == 0 and CockInTits.get(GirlNameIBS, 0) == 0:
+            "Кончить на лицо" if _cametoday_eddie < _cancumdaily_eddie and _iebs_arousal("eddie") >= 100 and CockInMouth.get(GirlNameIBS, 0) == 0 and CockInTits.get(GirlNameIBS, 0) == 0:
                 "Почувствовав что кончает, Эдди вытащил член из Бекки и залил ее смазливое личико своим семенем. Бекки вытерла сперму с зажмуренных глаз и ошарашенно заморгала: сперма ее управляющего покрывала ее личико и капала на ее монументальный бюст. Отдельные белые капли застряли даже в ее рыжей шевелюре."
-                $ Arousal["eddie"] = 0
-                $ Arousal["Eddie"] = 0
+                $ _iebs_set_arousal("eddie", 0)
                 call PregnancyCheck(GirlNameIBS, "face", 1, "eddie")
                 python:
                     _iebs_set_eddie_pos(0)
@@ -249,10 +247,9 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
                 call ShowCurrentSex(GirlNameIBS)
                 jump int_eddie_becky_sex_menu
 
-            "Кончить на груди" if _cametoday_eddie < _cancumdaily_eddie and Arousal.get("eddie", 0) >= 100 and TitsVisible.get(GirlNameIBS, 0) and CockInMouth.get(GirlNameIBS, 0) == 0 and CockInTits.get(GirlNameIBS, 0) == 0:
+            "Кончить на груди" if _cametoday_eddie < _cancumdaily_eddie and _iebs_arousal("eddie") >= 100 and TitsVisible.get(GirlNameIBS, 0) and CockInMouth.get(GirlNameIBS, 0) == 0 and CockInTits.get(GirlNameIBS, 0) == 0:
                 "Эдди направил свой член на сиси Бекки и метко выстрелил несколькими струями спермы на обе ее груди, попав точно в ареолы. \"Такому меткому стрелку прямая дорога в королевскую гвардию,\" невпопад подумали вы."
-                $ Arousal["eddie"] = 0
-                $ Arousal["Eddie"] = 0
+                $ _iebs_set_arousal("eddie", 0)
                 call PregnancyCheck(GirlNameIBS, "tits", 1, "eddie")
                 python:
                     _iebs_set_eddie_pos(0)
@@ -260,8 +257,8 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
                 call ShowCurrentSex(GirlNameIBS)
                 jump int_eddie_becky_sex_menu
 
-            "Кончить в Бекки" if _cametoday_eddie < _cancumdaily_eddie and Arousal.get("eddie", 0) >= 100 and EddieCockInPussy.get(GirlNameIBS, 0):
-                if pregnancy.get(GirlNameIBS, 0) < 120 and sluttiness.get(GirlNameIBS, 0) < 65:
+            "Кончить в Бекки" if _cametoday_eddie < _cancumdaily_eddie and _iebs_arousal("eddie") >= 100 and EddieCockInPussy.get(GirlNameIBS, 0):
+                if pregnancy.get(GirlNameIBS, 0) < 120 and getPersonInfo(GirlNameIBS).corruption < 65:
                     if CockInMouth.get(GirlNameIBS, 0) == 1:
                         "Эдди увеличил темп, и Бекки, выплюнув ваш член, с ужасом спросила, не спускает ли он в нее."
                     else:
@@ -276,8 +273,7 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
                     if pregnancy.get(GirlNameIBS, 0) >= 120:
                         "\"Ну мальчики, нагуляла я с вами животик, так вы и дальше пользуетесь моей слабостью,\" — сладострастно улыбнулась Бекки."
 
-                $ Arousal["eddie"] = 0
-                $ Arousal["Eddie"] = 0
+                $ _iebs_set_arousal("eddie", 0)
                 python:
                     _iebs_inc_arousal(GirlNameIBS, 5)
                     _iebs_set_eddie_pos(0)

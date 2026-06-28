@@ -9,7 +9,6 @@
 default sexacts = {}
 default ConceptionChance = {}
 default cametoday_npc = {}
-default sluttiness = {}
 default cuminside = {}
 # Remove duplicate pregnancy declaration - it's already declared in InitAmanda.rpy
 # default pregnancy = {}

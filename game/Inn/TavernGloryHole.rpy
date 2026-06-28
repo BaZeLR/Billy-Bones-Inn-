@@ -40,8 +40,6 @@ label TavernGloryHole:
                 jump TavernMain
         return
     python:
-        import random
-
         if not isinstance(ClientsSaw, dict):
             ClientsSaw = {}
         GirlNameTGH = get_random_girl_by_job("jobgloryhole")
@@ -64,6 +62,10 @@ label TavernGloryHole:
         BlockGloryHoleMenu = 0
         AmandaAtGlory = 0
 
+        def _tgh_corruption(girl_name):
+            info = getPersonInfo(girl_name)
+            return int(info.corruption or 0) if info is not None and hasattr(info, "corruption") else 0
+
         _time_now = time
         if _time_now in (2, 3) and GirlNameTGH != "":
             GloryHoleWorks = 1
@@ -85,14 +87,15 @@ label TavernGloryHole:
             GloryHoleInsideOnce = 0
 
             if GloryHoleWorks and AmandaAtGlory == 0 and GirlNameTGH != "":
-                if sluttiness.get(GirlNameTGH, 0) >= 80:
-                    if random.randint(1, 4) == 1:
+                _worker_corruption = _tgh_corruption(GirlNameTGH)
+                if _worker_corruption >= 80:
+                    if procedural_randint(1, 4, key="procedural:Inn/TavernGloryHole.rpy:inside:80") == 1:
                         GloryHoleInside = 1
-                elif sluttiness.get(GirlNameTGH, 0) >= 50:
-                    if random.randint(1, 8) == 1:
+                elif _worker_corruption >= 50:
+                    if procedural_randint(1, 8, key="procedural:Inn/TavernGloryHole.rpy:inside:50") == 1:
                         GloryHoleInside = 1
 
-                if GloryHoleInside == 0 and random.randint(1, 3) == 1 and sluttiness.get(GirlNameTGH, 0) >= 40:
+                if GloryHoleInside == 0 and procedural_randint(1, 3, key="procedural:Inn/TavernGloryHole.rpy:inside_once") == 1 and _worker_corruption >= 40:
                     GloryHoleInsideOnce = 1
 
                 GloryHoleYouLine1 = "Вы засунули свое самое дорогое в дырку, в пугающую неизвестность. И ваша смелость была вознагражденна: чей-то страстный язычок с другой стороны глорихола начал облизывать головку вашего члена. Вскоре незнакомка стала посасывать ваш, уже принявший полную боевую готовность, агрегат, делая вам весьма и весьма приятно."
@@ -136,7 +139,7 @@ label TavernGloryHole:
             else:
                 GloryGirlLine3 += "."
 
-            if CheckIfSexEventExist(GirlNameTGH, _time_now) > 0 and random.randint(1, 2) == 1 and AmandaAtGlory == 0:
+            if CheckIfSexEventExist(GirlNameTGH, _time_now) > 0 and procedural_randint(1, 2, key="procedural:Inn/TavernGloryHole.rpy:sex_event") == 1 and AmandaAtGlory == 0:
                 GloryHoleLook = GetSexEventFromTable(GirlNameTGH, _time_now)
                 ClientsSaw[GirlNameTGH] = ClientsSaw.get(GirlNameTGH, 0) + 1
 

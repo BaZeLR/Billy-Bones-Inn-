@@ -101,7 +101,7 @@ init python:
     def melissa_wet_enough_to_find_place(girl_name="melissa"):
         key = str(girl_name or "melissa").strip().lower()
         wet_value = max(
-            _melissa_int(Arousal.get(key, 0), 0),
+            _melissa_int(Melissa.arousal_value(), 0),
             _melissa_int(Melissa.stats.get("PussyWetStart", 0), 0),
             _melissa_int(Melissa.var.get("private_place_heat", 0), 0),
         )

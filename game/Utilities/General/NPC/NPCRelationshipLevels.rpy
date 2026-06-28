@@ -44,11 +44,13 @@ init -20 python:
 
     def npc_friend_value(npc_id=""):
         key = str(npc_id or "").strip().lower()
-        return _relationship_int(Friends.get(key, 0), 0) if isinstance(Friends, dict) and key else 0
+        info = getPersonInfo(key)
+        return _relationship_int(getattr(info, "rel", 0), 0) if info is not None and key else 0
 
     def npc_corruption_value(npc_id=""):
         key = str(npc_id or "").strip().lower()
-        return _relationship_int(sluttiness.get(key, 0), 0) if isinstance(sluttiness, dict) and key else 0
+        info = getPersonInfo(key)
+        return _relationship_int(getattr(info, "corruption", 0), 0) if info is not None and key else 0
 
     def _relationship_level_from_thresholds(value, thresholds):
         score = _relationship_int(value, 0)

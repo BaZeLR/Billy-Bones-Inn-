@@ -450,18 +450,19 @@ init python:
 
         social_bonus = int(player_social_interaction_bonus() or 0)
         tavern_bonus = int(tavern_crew_interaction_bonus(key) or 0)
+        info = getPersonInfo(key)
         mood_points = 0
-        mood_points += min(4, max(0, _player_int(Friends.get(key, 0), 0) // 5))
-        mood_points += min(2, max(0, _player_int(sluttiness.get(key, 0), 0) // 20))
+        mood_points += min(4, max(0, _player_int(getattr(info, "rel", 0), 0) // 5)) if info is not None else 0
+        mood_points += min(2, max(0, _player_int(getattr(info, "corruption", 0), 0) // 20)) if info is not None else 0
         mood_points += min(2, social_bonus + tavern_bonus)
-        if int(Drunk.get(key, 0) or 0) > 0:
+        if info is not None and int(getattr(info, "drunk", 0) or 0) > 0:
             mood_points += 1
 
         if interaction == "talk":
-            repeats_today = int(TalkedToday.get(key, 0) or 0)
+            repeats_today = int(getattr(info, "talked_today", 0) or 0) if info is not None else 0
             default_gain = 1
         elif interaction == "flirt":
-            repeats_today = int(FlirtedToday.get(key, 0) or 0)
+            repeats_today = int(getattr(info, "flirted_today", 0) or 0) if info is not None else 0
             default_gain = 1
         else:
             repeats_today = int(GiftedToday.get(key, 0) or 0)

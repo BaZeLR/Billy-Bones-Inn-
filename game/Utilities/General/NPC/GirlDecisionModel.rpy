@@ -5,7 +5,6 @@ default GirlDecisionLast = {}
 
 init -34 python:
     import math
-    import renpy.store as store
 
     GIRL_DECISION_CORE_IDS = ("amanda", "melissa", "sandra")
     GIRL_DECISION_CYCLE_IDS = ("amanda", "melissa", "sandra", "clara", "irma", "inga", "becky")
@@ -178,15 +177,6 @@ init -34 python:
         except Exception:
             return 0.5
 
-    def girl_decision_map_value(map_name="", key="", default=0):
-        try:
-            mapping = getattr(store, str(map_name or ""), {})
-            if isinstance(mapping, dict):
-                return mapping.get(str(key or "").strip().lower(), default)
-        except Exception:
-            pass
-        return default
-
     def girl_decision_pref(girl_name="", pref_name=""):
         girl = str(girl_name or "").strip().lower()
         pref = str(pref_name or "").strip().lower()
@@ -260,9 +250,7 @@ init -34 python:
     def girl_decision_breakfast_perk(girl_name=""):
         girl = str(girl_name or "").strip().lower()
         try:
-            score_fn = getattr(store, "tavern_breakfast_player_perk_score", None)
-            if callable(score_fn):
-                return girl_decision_clamp(float(score_fn(girl)) / 20.0)
+            return girl_decision_clamp(float(tavern_breakfast_player_perk_score(girl)) / 20.0)
         except Exception:
             pass
         return 0.0
@@ -271,13 +259,11 @@ init -34 python:
         girl = str(girl_name or "").strip().lower()
         score = 0.0
         try:
-            issue_fn = getattr(store, "household_morning_issue_type", None)
-            if callable(issue_fn):
-                issue = str(issue_fn(girl) or "")
-                if issue == "sick":
-                    score += 0.5
-                elif issue == "sleepy":
-                    score += 0.3
+            issue = str(household_morning_issue_type(girl) or "")
+            if issue == "sick":
+                score += 0.5
+            elif issue == "sleepy":
+                score += 0.3
         except Exception:
             pass
         try:
@@ -304,30 +290,32 @@ init -34 python:
         girl = str(girl_name or "").strip().lower()
         cycle = girl_decision_cycle_state(girl)
         girl_info = getPersonInfo(girl)
-        if girl_info is not None and girl in GIRL_DECISION_CORE_IDS:
+        if girl_info is not None:
             friend = girl_decision_int(getattr(girl_info, "rel", 0), 0)
             open_value = girl_decision_int(getattr(girl_info, "openness", 0), 0)
             slut_value = girl_decision_int(getattr(girl_info, "corruption", 0), 0)
             stats = getattr(girl_info, "stats", {})
             if not isinstance(stats, dict):
                 stats = {}
-            arousal_value = girl_decision_int(stats.get("arousal", 0), 0)
+            if hasattr(girl_info, "arousal_value"):
+                arousal_value = girl_decision_int(girl_info.arousal_value(), 0)
+            else:
+                arousal_value = girl_decision_int(stats.get("arousal", 0), 0)
             wet_value = max(girl_decision_int(stats.get("PussyWetStart", 0), 0), arousal_value)
         else:
-            friend = girl_decision_int(Friends.get(girl, 0), 0) if isinstance(Friends, dict) else 0
-            open_value = girl_decision_int(otkroven.get(girl, 0), 0) if isinstance(otkroven, dict) else 0
-            slut_value = girl_decision_int(sluttiness.get(girl, 0), 0) if isinstance(sluttiness, dict) else 0
-            arousal_value = girl_decision_int(Arousal.get(girl, 0), 0) if isinstance(Arousal, dict) else 0
-            wet_value = max(girl_decision_int(PussyWetStart.get(girl, 0), 0) if isinstance(PussyWetStart, dict) else 0, arousal_value)
-        anger_fn = getattr(store, "relationship_anger", None)
-        anger_value = anger_fn(girl) if callable(anger_fn) else 0
-        rebel_value = girl_decision_int(getattr(girl_info, "rebellion", 0), 0) if girl_info is not None and girl in GIRL_DECISION_CORE_IDS else (girl_decision_int(neshlush.get(girl, 0), 0) if isinstance(neshlush, dict) else 0)
+            friend = 0
+            open_value = 0
+            slut_value = 0
+            arousal_value = 0
+            wet_value = 0
+        anger_value = relationship_anger(girl)
+        rebel_value = girl_decision_int(getattr(girl_info, "rebellion", 0), 0) if girl_info is not None else 0
 
         player_history = 0
         if girl == "amanda":
             player_history = 1 if Amanda.var_int("suckyou", 0) or Amanda.var_int("fuckyou", 0) else 0
-        elif isinstance(HadSex, dict):
-            player_history = 1 if girl_decision_int(HadSex.get(girl, 0), 0) > 0 else 0
+        elif girl_info is not None:
+            player_history = 1 if girl_decision_int(girl_info.sex_stat("sexacts", 0), 0) > 0 else 0
 
         profile = {
             "girl": girl,

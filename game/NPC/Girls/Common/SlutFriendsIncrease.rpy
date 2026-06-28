@@ -11,29 +11,25 @@ init python:
         return max(1, chance + bonus)
 
     def slut_friends_increase(girl, limit_friend, friend_chance, inc_decr_friends, limit_sluttiness, sluttiness_chance, inc_decr_sluttiness):
-        # Friends and sluttiness are assumed to be dicts, girl is a string
-        import random as random_module
+        girl_info = getPersonInfo(girl)
+        if girl_info is None:
+            return
         positive_friend_chance = social_friend_roll_chance(friend_chance, girl, True)
         negative_friend_chance = social_friend_roll_chance(friend_chance, girl, False)
-        if inc_decr_friends < 0:
-            if Friends[girl] > limit_friend and random_module.randint(1, negative_friend_chance) == 1:
-                Friends[girl] -= 1
-            inc_decr_friends += 1
-        if inc_decr_friends > 0:
-            if Friends[girl] < limit_friend and random_module.randint(1, positive_friend_chance) == 1:
-                Friends[girl] += 1
-            inc_decr_friends -= 1
-        if inc_decr_sluttiness < 0:
-            if sluttiness[girl] > limit_sluttiness and random_module.randint(1, sluttiness_chance) == 1:
-                sluttiness[girl] -= 1
-            inc_decr_sluttiness += 1
-        if inc_decr_sluttiness > 0:
-            if sluttiness[girl] < limit_sluttiness and random_module.randint(1, sluttiness_chance) == 1:
-                sluttiness[girl] += 1
-            inc_decr_sluttiness -= 1
-        # Recursion if needed
-        if inc_decr_sluttiness != 0 or inc_decr_friends != 0:
-            slut_friends_increase(girl, limit_friend, friend_chance, inc_decr_friends, limit_sluttiness, sluttiness_chance, inc_decr_sluttiness)
+        friend_steps = abs(int(inc_decr_friends or 0))
+        friend_direction = 1 if int(inc_decr_friends or 0) > 0 else -1
+        corruption_steps = abs(int(inc_decr_sluttiness or 0))
+        corruption_direction = 1 if int(inc_decr_sluttiness or 0) > 0 else -1
+        for step in range(friend_steps):
+            if friend_direction < 0 and girl_info.rel > int(limit_friend or 0) and procedural_randint(1, negative_friend_chance, "slut_friend_%s_%s_%s_down" % (girl, dayspassed, step)) == 1:
+                girl_info.change_social(friend_delta=-1)
+            elif friend_direction > 0 and girl_info.rel < int(limit_friend or 0) and procedural_randint(1, positive_friend_chance, "slut_friend_%s_%s_%s_up" % (girl, dayspassed, step)) == 1:
+                girl_info.change_social(friend_delta=1)
+        for step in range(corruption_steps):
+            if corruption_direction < 0 and girl_info.corruption > int(limit_sluttiness or 0) and procedural_randint(1, int(sluttiness_chance or 1), "slut_corr_%s_%s_%s_down" % (girl, dayspassed, step)) == 1:
+                girl_info.change_social(corruption_delta=-1)
+            elif corruption_direction > 0 and girl_info.corruption < int(limit_sluttiness or 0) and procedural_randint(1, int(sluttiness_chance or 1), "slut_corr_%s_%s_%s_up" % (girl, dayspassed, step)) == 1:
+                girl_info.change_social(corruption_delta=1)
 
 label SlutFriendsIncrease(girl, limit_friend, friend_chance, inc_decr_friends, limit_sluttiness, sluttiness_chance, inc_decr_sluttiness):
     python:

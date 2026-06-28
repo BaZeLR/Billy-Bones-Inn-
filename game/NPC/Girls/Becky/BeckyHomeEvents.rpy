@@ -291,8 +291,7 @@ label story_becky_home_visit_0:
     $ GirlName = "becky"
     $ Inga.ensure_story_defaults()
     $ pregnancy.setdefault("inga", 0)
-    $ Arousal.setdefault(GirlName, 0)
-    $ PussyWetStart.setdefault(GirlName, Arousal.get(GirlName, 0))
+    $ PussyWetStart.setdefault(GirlName, Becky.arousal_value())
     $ scene_image = "images/becky/Home/withbecky.jpg"
     $ _layout_last_picture = scene_image
     vscene scene_image
@@ -361,9 +360,8 @@ label story_becky_home_from_dances_0:
     "Заведя вас к себе в дом, Бекки тихо и осторожно повела вас по коридору к себе в спальню."
     "Вдоль стен стояло несколько массивных сундуков, скамья, пара стульев. А весь центр комнаты занимала большая кровать."
     "Вы и миссис Блэнкеншип находитесь в ее спальне."
-    $ Arousal.setdefault(GirlName, 0)
-    $ PussyWetStart.setdefault(GirlName, Arousal.get(GirlName, 0))
-    $ Arousal[GirlName] = PussyWetStart[GirlName]
+    $ PussyWetStart.setdefault(GirlName, Becky.arousal_value())
+    $ Becky.set_arousal(PussyWetStart[GirlName])
     $ ArriveMode = ""
     call cock_position(GirlName, 0)
     call check_visibility(GirlName)
@@ -386,9 +384,8 @@ label story_becky_home_from_dinner_0:
         else:
             "Вдова не позаботилась не то, что запереть дверь на ключ, но и даже полностью закрыть ее, и не теряя времени потащила вас к кровати."
         "Вы и миссис Блэнкеншип находитесь в ее спальне."
-    $ Arousal.setdefault(GirlName, 0)
-    $ PussyWetStart.setdefault(GirlName, Arousal.get(GirlName, 0))
-    $ Arousal[GirlName] = PussyWetStart[GirlName]
+    $ PussyWetStart.setdefault(GirlName, Becky.arousal_value())
+    $ Becky.set_arousal(PussyWetStart[GirlName])
     $ ArriveMode = ""
     call cock_position(GirlName, 0)
     call check_visibility(GirlName)
@@ -406,9 +403,8 @@ label story_becky_home_svalnyi_greh_0:
     call IntEddieBeckySex
     "Весь центр комнаты занимает большая кровать, а вдоль стен стоит несколько массивных сундуков, скамья, пара стульев."
     "Вы и миссис Блэнкеншип находитесь в ее спальне. Вместе с вами находится Эдди, сын Бекки и управляющий лавкой. Им движут к матери отнюдь не сыновьи чувства."
-    $ Arousal.setdefault(GirlName, 0)
-    $ PussyWetStart.setdefault(GirlName, Arousal.get(GirlName, 0))
-    $ Arousal[GirlName] = PussyWetStart[GirlName]
+    $ PussyWetStart.setdefault(GirlName, Becky.arousal_value())
+    $ Becky.set_arousal(PussyWetStart[GirlName])
     $ ArriveMode = ""
     call cock_position(GirlName, 0)
     call check_visibility(GirlName)

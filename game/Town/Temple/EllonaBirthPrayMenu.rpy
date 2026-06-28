@@ -1,9 +1,7 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-# EllonaBirthPrayMenu location - converted from legacy script
 label EllonaBirthPrayMenu:
-    # Menu for praying to Ellona and the Graces during childbirth
     menu ellona_birth_pray:
         "Помолиться Эллоне" if money >= 10:
             $ money -= 10
@@ -79,7 +77,7 @@ label EllonaBirthPrayMenu:
                 call GiveBirthStep2
         "Помолиться Талии" if money >= 10:
             $ money -= 10
-            if sluttiness[GirlName] >= 60:
+            if getPersonInfo(GirlName).corruption >= 60:
                 "Я вижу здесь страстную женщину которую ее страсть ввела в положение. Да пребудет с ней мое благословение! Пусть боль уляжется."
                 $ GraceBlessing[5] = 1
                 call SlutFriendsIncrease(GirlName, 20, 1, 1, 65, 1, 1)

@@ -166,7 +166,6 @@ label NextDay_FinishDayEvents:
         call DailySetstatdefault(_ndf_all_girl_names[_ndf_all_girl_index])
         $ _ndf_all_girl_index += 1
 
-    $ Talked["zimmer"] = 0
     $ people_reset_daily_interactions()
 
     python:
@@ -176,7 +175,6 @@ label NextDay_FinishDayEvents:
         if StolenHorseDays > 0:
             StolenHorseDays -= 1
 
-        Talked.clear()
         ChurchAfterCermon.clear()
         people_sync_all()
     return

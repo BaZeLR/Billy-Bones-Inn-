@@ -19,7 +19,6 @@ default LucasVar = {}
 default ClaraFianceVar = {}
 default SergioPetVar = {}
 default RobbersHeadNameTmp = ""
-default Talked = {}
 default cancumdaily_npc = {}
 default KnowMongol = 0
 default StolenHorseDays = 0

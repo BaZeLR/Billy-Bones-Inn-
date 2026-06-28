@@ -520,10 +520,10 @@ init python:
                 self.mc_visit_first_ready = 1
                 self.mc_visit_first_done = 1
             self.mc_visit_first_pending = 0
-            self.rel = max(0, min(20, people_to_int(self.rel, 0) + people_to_int(gains.get("friends", 0), 0)))
+            self.rel = max(0, min(20, people_to_int(self.rel, 0) + people_to_int(gains.get("rel", 0), 0)))
             self.relationship = self.rel
-            self.openness = max(0, min(20, people_to_int(self.openness, 0) + people_to_int(gains.get("otkroven", 0), 0)))
-            self.corruption = max(0, min(100, people_to_int(self.corruption, 0) + people_to_int(gains.get("sluttiness", 0), 0)))
+            self.openness = max(0, min(20, people_to_int(self.openness, 0) + people_to_int(gains.get("openness", 0), 0)))
+            self.corruption = max(0, min(100, people_to_int(self.corruption, 0) + people_to_int(gains.get("corruption", 0), 0)))
             self.save_story_state()
             return self.var
 

@@ -2,7 +2,9 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    import random as _mom_dress_random
+    def mom_dress_corruption(girl_name=""):
+        info = getPersonInfo(girl_name)
+        return int(info.corruption or 0) if info is not None and hasattr(info, "corruption") else 0
 
     def mom_dress_complaint_kids_or_preg(girl_name=""):
         girl = str(girl_name or "").strip().lower()
@@ -25,10 +27,11 @@ init python:
 
     def mom_dress_complaint_scold_tail(girl_name="", georgett_present=False, strict_callout=False):
         girl = str(girl_name or "").strip().lower()
+        corruption_value = mom_dress_corruption(girl)
         rebellious = (
-            int(sluttiness.get(girl, 0) or 0) >= 60
-            or (int(sluttiness.get(girl, 0) or 0) >= 45 and _mom_dress_random.randint(1, 2) == 1)
-            or (int(sluttiness.get(girl, 0) or 0) >= 35 and _mom_dress_random.randint(1, 4) == 1)
+            corruption_value >= 60
+            or (corruption_value >= 45 and procedural_randint(1, 2, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:rebellious45") == 1)
+            or (corruption_value >= 35 and procedural_randint(1, 4, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:rebellious35") == 1)
         )
         if rebellious:
             slut_friends_increase(girl, 5, 1, -2, 65, 1, 2)
@@ -81,7 +84,7 @@ label MomDressComplaint(girl_name):
         $ _layout_last_picture = "images/sandra/tavern/cleaning1.jpg"
     elif renpy.loadable("images/tavern/mainhall/tavern_crew.jpg"):
         $ _layout_last_picture = "images/tavern/mainhall/tavern_crew.jpg"
-    if sluttiness.get("sandra", 0) < 50:
+    if mom_dress_corruption("sandra") < 50:
         $ _mdc_intro_text = "Вы мирно и спокойно шли по своим делам, когда вас вдруг остановила Сандра: \"Стефан, мне надо с тобой поговорить.\"\n\nОтведя вас в сторонку, она продолжила: \"{}Ты видел как {} вырядилась? Как блядь последняя, извини за выражение! Сиськи практически наружу, подол короче некуда! Мне порой кажется, что она и нижнего белья-то не надевает!\"".format("Я знаю, мы уже про это говорили, но не могу дальше молчать. " if TalkedBeforeTmp > 0 else "", _mdc_real_name)
         if _mdc_georgett_present:
             $ _mdc_intro_text = str(_mdc_intro_text or "") + "\n\nЭто все от Жоржи с Лизкой идет! Стефан, я конечно понимаю, что от этих шлюх нам доходик капает, но ты посмотри, как они на нашу {}у влияют!".format(GirlSillyName)
@@ -202,9 +205,9 @@ label MomDressComplaintBoughtDressNope:
 
 label MomDressComplaintSandraShouldDress(girl_name="", real_name="", georgett_present=False):
     $ _mdc_reacts = (
-        (sluttiness.get("sandra", 0) >= 20 and procedural_randint(1, 4, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:205:4") == 1)
-        or (sluttiness.get("sandra", 0) >= 38 and procedural_randint(1, 2, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:206:5") == 1)
-        or sluttiness.get("sandra", 0) >= 47
+        (mom_dress_corruption("sandra") >= 20 and procedural_randint(1, 4, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:205:4") == 1)
+        or (mom_dress_corruption("sandra") >= 38 and procedural_randint(1, 2, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:206:5") == 1)
+        or mom_dress_corruption("sandra") >= 47
     )
     $ _mdc_intro_text = "\"Конечно видел, и на мой взгляд, ее выбор гардероба получше твоего,\" нагло заявили вы.\n\n\"Что?!\" гневно воскликнула Сандра. \"Это ты о чем вообще?\"\n\n\"Ты прекрасно знаешь, о чем. У нас трактир, а не богадельня. Все работницы должны быть привлекательны собой. И одеты тоже привлекательно. Ты собой хороша,\" при этих словах Сандра слегка зарделась, \"а вот одеваешься излишне скромно. Если к нам никто ходить не будет, то мы все окажемся на улице, побираться будем. Да и вообще, ты после смерти мужа слегка зачахла, а ты ведь еще совсем не старая.\""
     if _mdc_reacts:

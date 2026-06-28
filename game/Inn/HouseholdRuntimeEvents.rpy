@@ -99,7 +99,8 @@ init python:
         topics = list(_household_insight_topics(girl))
         if len(topics) <= 0:
             return False
-        friend_value = int(Friends.get(girl, 0) or 0)
+        girl_info = getPersonInfo(girl)
+        friend_value = int(getattr(girl_info, "rel", 0) or 0) if girl_info is not None else 0
         for topic in topics:
             if friend_value >= int(topic.get("min_friend", 0) or 0):
                 return True
@@ -107,7 +108,9 @@ init python:
 
     def household_special_talk_entry(girl_name=""):
         girl = str(girl_name or "").strip().lower()
-        topics = [topic for topic in _household_insight_topics(girl) if int(Friends.get(girl, 0) or 0) >= int(topic.get("min_friend", 0) or 0)]
+        girl_info = getPersonInfo(girl)
+        friend_value = int(getattr(girl_info, "rel", 0) or 0) if girl_info is not None else 0
+        topics = [topic for topic in _household_insight_topics(girl) if friend_value >= int(topic.get("min_friend", 0) or 0)]
         if len(topics) <= 0:
             return None
         topic_index = int(HouseholdInsightState.get(girl, 0) or 0) % len(topics)
@@ -220,7 +223,8 @@ init python:
             return False
         if int(SoapRequestQueue.get(girl, 0) or 0) <= 0:
             return False
-        if int(TalkedToday.get(girl, 0) or 0) != 0:
+        girl_info = getPersonInfo(girl)
+        if girl_info is not None and int(girl_info.talked_today or 0) != 0:
             return False
         if soap_total_piece_count() > 0:
             return False
@@ -235,7 +239,8 @@ init python:
             return False
         if int(_player_item_count_by_id("libido_tincture_001") or 0) <= 0:
             return False
-        if int(TalkedToday.get(girl, 0) or 0) != 0:
+        girl_info = getPersonInfo(girl)
+        if girl_info is not None and int(girl_info.talked_today or 0) != 0:
             return False
         return int(dayspassed or 0) - int(HouseholdWarmDrinkLastDay.get(girl, -7) or -7) >= 1
 
@@ -282,7 +287,8 @@ init python:
             return False
         if girl not in list(tavern_breakfast_present_ids() or []):
             return False
-        if int(TalkedToday.get(girl, 0) or 0) != 0:
+        girl_info = getPersonInfo(girl)
+        if girl_info is not None and int(girl_info.talked_today or 0) != 0:
             return False
         if not isinstance(BarberInvitePending, dict):
             return False
@@ -294,9 +300,12 @@ init python:
             return False
         friend_thresholds = {"sandra": 7, "melissa": 6, "amanda": 5}
         openness_thresholds = {"sandra": 2, "melissa": 2, "amanda": 1}
-        if int(Friends.get(girl, 0) or 0) < int(friend_thresholds.get(girl, 99) or 99):
+        girl_info = getPersonInfo(girl)
+        if girl_info is None:
             return False
-        return int(otkroven.get(girl, 0) or 0) >= int(openness_thresholds.get(girl, 99) or 99)
+        if int(girl_info.rel or 0) < int(friend_thresholds.get(girl, 99) or 99):
+            return False
+        return int(girl_info.openness or 0) >= int(openness_thresholds.get(girl, 99) or 99)
 
     def household_pending_request_girl(current_room=""):
         room_code = str(current_room or CurLoc or "").strip()
@@ -330,7 +339,7 @@ init python:
             and CheckDailyEventExists("", "BuyDressTom", "") == 0
             and CheckDailyEventExists("amanda", "BuyDress", "") == 0
             and int(Amanda.rel or 0) >= 5
-            and int(TalkedToday.get("amanda", 0) or 0) == 0
+            and int(Amanda.talked_today or 0) == 0
         )
 
     def melissa_clara_overhear_ready():
@@ -387,7 +396,9 @@ label HouseholdSoapRequestEvent(girl_name=""):
     if _soap_girl == "":
         call HouseholdReturnCurrentRoom
     $ HouseholdSoapRequestLastDay[_soap_girl] = int(dayspassed or 0)
-    $ TalkedToday[_soap_girl] = max(1, int(TalkedToday.get(_soap_girl, 0) or 0))
+    $ _soap_info = getPersonInfo(_soap_girl)
+    if _soap_info is not None:
+        $ _soap_info.mark_talked(1)
     $ _soap_preferred = household_soap_preferred_aroma_text(_soap_girl)
     $ _soap_last_label = soap_last_batch_label()
     if _soap_girl == "sandra":
@@ -436,7 +447,9 @@ label HouseholdSoapRequestAcknowledge(girl_name="", agree=0):
     $ _soap_girl = str(girl_name or "").strip().lower()
     if int(agree or 0) == 1:
         $ MainTxt = "Вы обещаете, что не забудете о просьбе. Похоже, это заметно поднимает ей настроение."
-        $ Friends[_soap_girl] = min(20, int(Friends.get(_soap_girl, 0) or 0) + 1)
+        $ _soap_info = getPersonInfo(_soap_girl)
+        if _soap_info is not None:
+            $ _soap_info.change_social(friend_delta=1)
     else:
         $ MainTxt = "Вы отвечаете, что пока вам не до мыла. Просьбу принимают без скандала, но без особой радости."
     $ CurLocDesc = MainTxt
@@ -452,7 +465,9 @@ label HouseholdBarberRequestEvent(girl_name=""):
     if _barber_girl == "":
         call HouseholdReturnCurrentRoom
     $ HouseholdBarberRequestLastDay[_barber_girl] = int(dayspassed or 0)
-    $ TalkedToday[_barber_girl] = max(1, int(TalkedToday.get(_barber_girl, 0) or 0))
+    $ _barber_info = getPersonInfo(_barber_girl)
+    if _barber_info is not None:
+        $ _barber_info.mark_talked(1)
     if _barber_girl == "sandra":
         $ MainTxt = "За завтраком вы сами поднимаете разговор о Серджио и предлагаете Сандре сходить к цирюльнику. Она сперва щурится с привычным недоверием, а потом все же кивает: \"Если уж ты решил тянуть трактир вверх, дом тоже должен выглядеть аккуратнее. И да, для трактира это тоже не пустяк: ухоженная хозяйка кухни дому только на пользу.\""
     elif _barber_girl == "melissa":
@@ -483,7 +498,9 @@ label HouseholdBarberRequestChoice(girl_name="", agree=0):
     $ _barber_girl = str(girl_name or "").strip().lower()
     if int(agree or 0) == 1:
         $ BarberInvitePending[_barber_girl] = 1
-        $ Friends[_barber_girl] = min(20, int(Friends.get(_barber_girl, 0) or 0) + 1)
+        $ _barber_info = getPersonInfo(_barber_girl)
+        if _barber_info is not None:
+            $ _barber_info.change_social(friend_delta=1)
         $ MainTxt = "Вы обещаете, что при первом удобном открытом дне Серджио отведете ее к цирюльнику. Просьбу явно услышали с удовольствием."
     else:
         $ MainTxt = "Вы отвечаете, что пока у трактира и без того хватает расходов. На этом разговор сворачивается."
@@ -668,8 +685,9 @@ label HouseholdMorningIssueCure(girl_name=""):
     elif _issue_girl == "melissa":
         $ Melissa.change_social(friend_delta=1, open_delta=1)
     else:
-        $ Friends[_issue_girl] = min(20, int(Friends.get(_issue_girl, 0) or 0) + 1)
-        $ otkroven[_issue_girl] = min(20, int(otkroven.get(_issue_girl, 0) or 0) + 1)
+        $ _issue_info = getPersonInfo(_issue_girl)
+        if _issue_info is not None:
+            $ _issue_info.change_social(friend_delta=1, open_delta=1)
     $ MainTxt = "%s с благодарностью принимает лечебное зелье. Через несколько минут ей заметно легчает, и она уже выглядит так, будто сможет вернуться к обычным делам." % _action_display_name(_issue_girl)
     $ CurLocDesc = MainTxt
     call HouseholdReturnCurrentRoom
@@ -683,15 +701,16 @@ label HouseholdMorningIssueWarmDrink(girl_name=""):
         return
     $ _player_remove_item_by_id("libido_tincture_001", 1)
     $ HouseholdWarmDrinkLastDay[_issue_girl] = int(dayspassed or 0)
-    $ TalkedToday[_issue_girl] = max(1, int(TalkedToday.get(_issue_girl, 0) or 0))
+    $ _issue_info = getPersonInfo(_issue_girl)
+    if _issue_info is not None:
+        $ _issue_info.mark_talked(1)
     if _issue_girl == "amanda":
         $ Amanda.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
     elif _issue_girl == "melissa":
         $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
     else:
-        $ Friends[_issue_girl] = min(20, int(Friends.get(_issue_girl, 0) or 0) + 1)
-        $ otkroven[_issue_girl] = min(20, int(otkroven.get(_issue_girl, 0) or 0) + 1)
-        $ sluttiness[_issue_girl] = min(100, int(sluttiness.get(_issue_girl, 0) or 0) + 1)
+        if _issue_info is not None:
+            $ _issue_info.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
     if _issue_girl == "sandra":
         $ MainTxt = "Сандра сначала кривится на саму идею пряной настойки с утра, но все же делает несколько осторожных глотков. Напиток быстро разгоняет холод по телу, и хозяйка уже не так сурово ворчит, признавая, что от такого внимания ей и правда легче."
     elif _issue_girl == "melissa":
@@ -735,16 +754,18 @@ label HouseholdWakeSleepyGirl(girl_name=""):
     elif _wake_girl == "melissa":
         $ Melissa.change_social(friend_delta=1)
     else:
-        $ Friends[_wake_girl] = min(20, int(Friends.get(_wake_girl, 0) or 0) + 1)
+        $ _wake_info = getPersonInfo(_wake_girl)
+        if _wake_info is not None:
+            $ _wake_info.change_social(friend_delta=1)
     if _wake_girl == "sandra":
         $ MainTxt = "Вы осторожно будите Сандру. Та сначала недовольно морщится, потом резко собирается, будто сама сердится не на вас, а на то, что дала себе лишнюю слабину."
         if _wake_indecent:
             $ MainTxt = str(MainTxt or "") + "\nПока Сандра поднималась, вы невольно успели заметить, что рубаха на ней сбилась куда выше приличного. Поймав ваш взгляд, она без лишней суеты поправляет ткань, но в ее лице на миг мелькает совсем не хозяйская, а женская неловкость."
-            $ sluttiness["sandra"] = min(100, int(sluttiness.get("sandra", 0) or 0) + 1)
+            $ Sandra.change_social(corruption_delta=1)
         if _wake_bulge:
-            if int(Friends.get("sandra", 0) or 0) >= 10 or int(sluttiness.get("sandra", 0) or 0) >= 20:
+            if int(Sandra.rel or 0) >= 10 or int(Sandra.corruption or 0) >= 20:
                 $ MainTxt = str(MainTxt or "") + "\nСандра успевает заметить и вашу слишком уж явную выпуклость под одеждой. Вместо скандала она только сухо хмыкает: \"Вот и думай после этого, кто тут проспал по-настоящему.\""
-                $ otkroven["sandra"] = min(20, int(otkroven.get("sandra", 0) or 0) + 1)
+                $ Sandra.change_social(open_delta=1)
             else:
                 $ MainTxt = str(MainTxt or "") + "\nКогда Сандра замечает, что у вас под одеждой все слишком уж на виду, она мгновенно щурится и велит вам сперва привести себя в порядок, а уже потом лезть кого-то будить."
     elif _wake_girl == "melissa":
