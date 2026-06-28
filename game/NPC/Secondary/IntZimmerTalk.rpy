@@ -8,7 +8,6 @@ label IntZimmerTalk(preserve_text=False):
     $ _zimmer_var = Zimmer.var
     $ _becky_var = Becky.var
     $ _mongol_var = peopleInfo["mongol"].var
-    $ _robin_var = peopleInfo["robin"].var
     $ main_ui_begin_talk_state("Разговор с Циммерманом", _zimmer_name)
     $ current_action_title = "Разговор с Циммерманом"
     $ current_action_content = None
@@ -30,7 +29,7 @@ label IntZimmerTalk(preserve_text=False):
     if Talked.get(_zimmer_name, 0) < 2 and _becky_var.get("KnowSherwood", 0) == 1 and _zimmer_var.get("SherwoodStory", 0) == 1:
         $ current_action_items.append(MenuItem("И что с лесом теперь?", Call("IntZimmerTalkSherwoodStory2")))
 
-    if Talked.get(_zimmer_name, 0) < 2 and _robin_var.get("RobbedNum", 0) > 0 and _zimmer_var.get("ComplainRobin", 0) == 0:
+    if Talked.get(_zimmer_name, 0) < 2 and Robin.var_int("RobbedNum", 0) > 0 and _zimmer_var.get("ComplainRobin", 0) == 0:
         $ current_action_items.append(MenuItem("Пожаловаться на Робин Гуда", Call("IntZimmerTalkRobinReport")))
 
     if Talked.get(_zimmer_name, 0) < 2 and _zimmer_var.get("ComplainRobin", 0) == 1 and money >= 100:

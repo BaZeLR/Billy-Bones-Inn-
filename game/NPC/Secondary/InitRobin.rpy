@@ -48,6 +48,23 @@ init python:
             self.ensure_story_defaults()
             return self
 
+        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(str(key or ""), default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[str(key or "")] = value
+            self.promote_from_var(self.var)
+            return value
+
+        def add_var_int(self, key, amount=1):
+            return self.set_var_int(key, self.var_int(key, 0) + people_to_int(amount, 0))
+
+        def set_var_min(self, key, value):
+            return self.set_var_int(key, max(self.var_int(key, 0), people_to_int(value, 0)))
+
 define RobinStaticData = RobinData()
 default Robin = RobinInfo()
 

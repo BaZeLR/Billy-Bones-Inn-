@@ -83,7 +83,7 @@ label story_clara_paintings_comfort_2:
     $ CurLocDesc = MainTxt
     $ current_action_title = "Кларисса"
     $ current_action_content = None
-    $ current_action_items = [MenuItem("Дать ей прийти в себя", Call("IntClaraTalkRefresh", "clara"))]
+    $ current_action_items = [MenuItem("Дать ей прийти в себя", Call("IntClaraTalkMenu", "clara"))]
     if thread is not None:
         $ thread.advance()
     return
@@ -101,7 +101,7 @@ label story_clara_paintings_second_ask_3:
     $ CurLocDesc = MainTxt
     if thread is not None:
         $ thread.advance()
-    call IntClaraTalkRefresh("clara")
+    call IntClaraTalkMenu("clara")
     return
 
 

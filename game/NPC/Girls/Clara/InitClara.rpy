@@ -2,7 +2,6 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    import random
     import renpy.exports as renpy
 
     def clara_wine_store_talk_picture():
@@ -15,7 +14,7 @@ init python:
             "images/clara/wineSellar_clara_talk_6.png",
         ]
         loadable = [row for row in candidates if renpy.loadable(row)]
-        return random.choice(loadable) if len(loadable) > 0 else ""
+        return procedural_choice(loadable, key="procedural:NPC/Girls/Clara/InitClara.rpy:clara_wine_store_talk_picture") if len(loadable) > 0 else ""
 
     def clara_wine_store_flirt_picture():
         candidates = [
@@ -24,7 +23,7 @@ init python:
             "images/clara/wineSellar_clara_flirt_2.png",
         ]
         loadable = [row for row in candidates if renpy.loadable(row)]
-        return random.choice(loadable) if len(loadable) > 0 else ""
+        return procedural_choice(loadable, key="procedural:NPC/Girls/Clara/InitClara.rpy:clara_wine_store_flirt_picture") if len(loadable) > 0 else ""
 
     def clara_forest_picture(location_code=""):
         location_key = str(location_code or "").strip()
@@ -50,13 +49,12 @@ init python:
                 "images/clara/forestLake_clara_2.png",
             ]
         loadable = [row for row in candidates if renpy.loadable(row)]
-        return random.choice(loadable) if len(loadable) > 0 else ""
+        return procedural_choice(loadable, key="procedural:NPC/Girls/Clara/InitClara.rpy:clara_forest_picture:%s" % location_key) if len(loadable) > 0 else ""
 
     def clara_melissa_visit_active(day_marker=None, weekday=None, time_slot=None):
-        week_safe = getattr(renpy.store, 'week', 0)
-        time_safe = getattr(renpy.store, 'time', 0)
-        week_value = int(week_safe if weekday is None else weekday or 0)
-        time_value = int(time_safe if time_slot is None else time_slot or 0)
+        calendar_v2.sync_state()
+        week_value = int(week if weekday is None else weekday or 0)
+        time_value = int(time if time_slot is None else time_slot or 0)
         if Melissa.bats_stage() < 8:
             return False
         if not werecat_is_living_with_household():
@@ -64,19 +62,16 @@ init python:
         if time_value == 3:
             if week_value == 5:
                 return False
-            RobinVar_safe = getattr(renpy.store, 'RobinVar', {})
-            return int(Mongol.var.get("StocksReleased", 0) or 0) == 1 or int(RobinVar_safe.get("MongolSafePass", 0) or 0) == 1
+            return int(Mongol.var.get("StocksReleased", 0) or 0) == 1 or Robin.var_int("MongolSafePass", 0) == 1
         if time_value != 4:
             return False
         return week_value in (1, 2, 3, 4, 5, 6, 7)
 
     def clara_tavern_visit_active(day_marker=None, weekday=None, time_slot=None):
-        dayspassed_safe = getattr(renpy.store, 'dayspassed', 0)
-        week_safe = getattr(renpy.store, 'week', 0)
-        clock_safe = getattr(renpy.store, 'clock_minutes', 480)
-        day_value = int(dayspassed_safe if day_marker is None else day_marker or 0)
-        week_value = int(week_safe if weekday is None else weekday or 0)
-        clock_value = int(clock_safe or 0) % 1440
+        calendar_v2.sync_state()
+        day_value = int(dayspassed if day_marker is None else day_marker or 0)
+        week_value = int(week if weekday is None else weekday or 0)
+        clock_value = (int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)) % 1440
         if clock_value < 720 or clock_value > 1079:
             return False
         if week_value == 7:

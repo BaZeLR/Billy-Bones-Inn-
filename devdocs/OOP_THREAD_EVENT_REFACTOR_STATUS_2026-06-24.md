@@ -107,6 +107,40 @@ Liza vertical-slice cleanup completed on 2026-06-28:
 - Not yet claimed: full real click-route QA and old-save migration for every
   Liza route.
 
+Clara/Robin vertical-slice cleanup completed on 2026-06-28:
+
+- Clara source files and direct Clara thread files were checked:
+  `InitClara.rpy`, `IntClaraTalk.rpy`, `ClaraBookletMarketThread.rpy`,
+  `ClaraTavernVisitThread.rpy`, and `ClaraPaintingsThread.rpy`.
+- Clara no longer imports Python `random` or uses `renpy.store` in her runtime
+  helper logic. Wine-store and forest image selection now use
+  `procedural_choice(...)`.
+- Clara/Melissa visit and tavern visit checks now read Robin safety state from
+  `Robin.var_int("MongolSafePass")` rather than any old `RobinVar` map.
+- Clara talk flow now uses `IntClaraTalkMenu` as the direct talk-menu owner.
+  The former `IntClaraTalkRefresh` name was removed from Clara call paths.
+- Clara talk and tavern visit media beats now use `vscene`, including dynamic
+  Clara picture paths.
+- The Clara market/Mongol release thread now mutates Zimmer through
+  `Zimmer.change_social(...)` instead of `Friends["zimmer"]`.
+- Robin source and direct Blackwood adjacency were checked:
+  `InitRobin.rpy`, `IntRobinTalk.rpy`, `SherwoodTravel.rpy`,
+  `BeckyEvents.rpy`, `IntZimmerTalk.rpy`, and Clara helper adjacency.
+- `RobinInfo` now owns explicit integer story-state methods:
+  `var_int(...)`, `set_var_int(...)`, `add_var_int(...)`, and
+  `set_var_min(...)`.
+- Robin talk, Blackwood road events, Becky Blackwood followups, Zimmer complaint
+  availability, and Clara/Melissa visit checks now read/write Robin story state
+  through those methods instead of direct `Robin.var[...]` / `Robin.var.get(...)`
+  code.
+- Focused source searches returned no remaining Clara/Robin external ownership
+  hits for `ClaraVar`, `ClarissaVar`, `RobinVar`, `Friends`, `sluttiness`,
+  `pregnancy`, `Arousal`, `Talked`, old visibility/cum/cock-position maps,
+  `renpy.store`, or Python `random` in the checked Clara/Robin files.
+- `renpy.exe . compile` passed after this slice.
+- Not yet claimed: full real click-route QA and old-save migration for every
+  Clara/Robin route.
+
 Earlier cleanup stage removed the werecat story globals:
 
 - `WerecatVar` was removed as an external story-state dict.
@@ -586,6 +620,10 @@ Partially completed:
 - Clara church/dress/sex/event flow.
 - Georgett port-street and sex flows.
 - Liza source OOP conversion, pending real click-route/save-load verification.
+- Clara source OOP cleanup for talk, image random, tavern/market/paintings
+  adjacency, pending real click-route/save-load verification.
+- Robin source OOP cleanup for Blackwood story state and direct adjacency,
+  pending real click-route/save-load verification.
 - secondary NPC class conversion.
 - object/game-item catalog.
 - shop menus and item ownership.

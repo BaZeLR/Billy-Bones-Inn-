@@ -210,7 +210,7 @@ label becky_blackwood_talk_reveal:
 # ROBIN + MONGOL VOUCH + ZIMMER MISSION (Blackwood part 2)
 # =============================================================================
 # Mongol released from stocks (Mongol.var["StocksReleased"]) → later vouch to Robin
-# → Robin.var["MongolSafePass"] = 1 lets MC pass the cut without losing horse/money.
+# -> Robin.var_int("MongolSafePass", 0) == 1 lets MC pass the cut without losing horse/money.
 # Zimmer (guard boss) gave mission to deal with outlaws disrupting trade.
 # On the way to Cunidale (for Becky veggies) player reaches the bandit camp.
 # Choice: destroy the camp (violent) or solve peacefully for Zimmer quest.
@@ -222,7 +222,7 @@ label robin_mongol_vouch_safe_passage:
     # Mongol (after being freed from stocks by player) puts in a good word.
     # This saves the MC's ass (horse + money) from the usual "пожертвование" shakedown.
     # References:
-    #   tools/external_click_play_test.py (Mongol.var["StocksReleased"], Robin.var["MongolSafePass"])
+    #   tools/external_click_play_test.py (Mongol.var["StocksReleased"], Robin.var_int("MongolSafePass", 0))
     #   textLocRef\MongolTalk.txt + stocks story events in StoryEventRuntime
     #   textLocRef\SherwoodTravel.txt + IntRobinTalk.txt (current robbery path we now bypass)
     #   game/NPC/Secondary/InitSecondaryNPC.rpy (Robin registration + MongolSafePass default)
@@ -233,7 +233,7 @@ label robin_mongol_vouch_safe_passage:
     $ Mongol.ensure_story_defaults()
     $ Robin.ensure_story_defaults()
 
-    if Mongol.var.get("StocksReleased", 0) == 0 or Robin.var.get("MongolSafePass", 0) == 1:
+    if Mongol.var.get("StocksReleased", 0) == 0 or Robin.var_int("MongolSafePass", 0) == 1:
         return
 
     $ MainTxt = "Когда вы подходите к группе в зелёных трико, один из бандитов узнаёт вас и дёргает Робина за рукав.\n\n"
@@ -241,8 +241,8 @@ label robin_mongol_vouch_safe_passage:
     $ MainTxt += "Робин смотрит на вас с новым интересом, потом широко улыбается.\n\n"
     $ MainTxt += "«Вот это другое дело, бразар. За Монгола уважуха. Раз наш человек сказал, что ты браза, значит сегодня ты едешь как браза. Деньги при себе оставь, коняшку тоже. Но если кто спросит — мы тебя не пропускали. Социяльная ответственность, понимаешь?»\n\n"
 
-    $ Robin.var["MongolSafePass"] = 1
-    $ Robin.var["KnowHim"] = 1
+    $ Robin.set_var_int("MongolSafePass", 1)
+    $ Robin.set_var_int("KnowHim", 1)
 
     if thread is not None:
         $ thread.advance()
@@ -276,7 +276,7 @@ label zimmer_bandit_camp_choice:
 
     $ MainTxt = "Вы добрались до лагеря обездоленных на вырубке. Несколько десятков человек в зелёных трико. Робин в центре.\n\n"
 
-    if Robin.var.get("MongolSafePass", 0) == 1:
+    if Robin.var_int("MongolSafePass", 0) == 1:
         $ MainTxt += "Благодаря слову Монгола вас пока не трогают. Можно попробовать договориться.\n\n"
     else:
         $ MainTxt += "Без защиты Монгола любой подход опасен — вас могут сразу попытаться «попросить на социяльную ответственность».\n\n"
@@ -288,7 +288,7 @@ label zimmer_bandit_camp_choice:
         "Уничтожить лагерь (силовой вариант)":
             $ MainTxt += "Вы решаете, что мирным путём не обойтись. Лагерь нужно ликвидировать.\n"
             $ MainTxt += "(Полная реализация этого пути — уничтожение, последствия для торговли, реакция Зиммера и Бекки — в будущей части квеста.)\n"
-            $ Robin.var["PlayerDestroyedCamp"] = 1
+            $ Robin.set_var_int("PlayerDestroyedCamp", 1)
 
             if thread is not None:
                 $ thread.advance()
@@ -299,7 +299,7 @@ label zimmer_bandit_camp_choice:
         "Попробовать решить мирно (для миссии Зиммера)":
             $ MainTxt += "Вы вспоминаете поручение Циммермана. Возможно, удастся договориться, провести «расследование» или найти компромисс, который устроит и стражу, и Бекки, и даже Робина.\n"
             $ MainTxt += "(Полная реализация мирного пути — переговоры, условия, последствия, оплата от Зиммера — в будущей части квеста.)\n"
-            $ Robin.var["ZimmerPeaceful"] = 1
+            $ Robin.set_var_int("ZimmerPeaceful", 1)
 
             if thread is not None:
                 $ thread.advance()
@@ -333,7 +333,7 @@ label zimmer_guard_mission_update:
 
     $ MainTxt = "Вы возвращаетесь к десятнику Циммерману в городскую стражу.\n\n"
 
-    if Robin.var.get("PlayerDestroyedCamp", 0) == 1:
+    if Robin.var_int("PlayerDestroyedCamp", 0) == 1:
         $ MainTxt += "«Десятник, я сам разобрался с этими разбойниками в вырубке.»\n\n"
         $ MainTxt += "Циммерман выглядит одновременно впечатлённым и слегка испуганным вашей смелостью.\n"
         $ MainTxt += "«Ай-яй, молодой человек... Вы таки серьёзный человек. Ну что ж, дело закрыто. Если вдруг что-то ещё... вы знаете, где меня найти.»\n"
@@ -343,7 +343,7 @@ label zimmer_guard_mission_update:
         if thread is not None:
             $ thread.advance()
 
-    elif Robin.var.get("ZimmerPeaceful", 0) == 1:
+    elif Robin.var_int("ZimmerPeaceful", 0) == 1:
         $ MainTxt += "Вы рассказываете Циммерману о договорённости, которую удалось достичь с Робином (или компромиссе).\n\n"
         $ MainTxt += "Десятник кивает, пряча улыбку. «Молодой человек, вы меня удивляете. Я думал, вы просто заплатите и забудете. А вы таки решили вопрос по-настоящему. Молодец. Стража в долгу.»\n"
         $ Zimmer.var["PlayerHandledRobin"] = 2

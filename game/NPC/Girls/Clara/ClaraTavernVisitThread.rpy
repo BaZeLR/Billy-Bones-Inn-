@@ -11,7 +11,7 @@ label story_clara_tavern_visit_bar_0:
     $ Melissa.change_social(corruption_delta=3)
     $ Clara.change_social(open_delta=1)
     $ CurLocDesc = MainTxt
-    call ShowImage("", "", "images/clara/tavern_visit.png")
+    vscene "images/clara/tavern_visit.png"
     $ calendar_v2.advance_minutes(45)
     $ current_action_title = "Действия в трактире"
     $ current_action_content = None
@@ -28,7 +28,7 @@ label story_clara_tavern_visit_bar_1:
     $ Melissa.change_social(corruption_delta=4)
     $ Clara.change_social(open_delta=2)
     $ CurLocDesc = MainTxt
-    call ShowImage("", "", "images/clara/tavern_visit_size.png")
+    vscene "images/clara/tavern_visit_size.png"
     $ calendar_v2.advance_minutes(45)
     $ current_action_title = "Действия в трактире"
     $ current_action_content = None
@@ -48,7 +48,7 @@ label story_clara_tavern_visit_bar_2:
     $ Clara.trust = min(20, int(Clara.trust or 0) + 1)
     $ Clara.var["trust"] = int(Clara.trust or 0)
     $ CurLocDesc = MainTxt
-    call ShowImage("", "", "images/clara/melissa_talk.png")
+    vscene "images/clara/melissa_talk.png"
     $ calendar_v2.advance_minutes(45)
     $ current_action_title = "Действия в трактире"
     $ current_action_content = None
@@ -66,7 +66,7 @@ label story_clara_melissa_room_visit_0:
     $ Melissa.fun = min(100, int(Melissa.fun or 0) + 3)
     $ Clara.fun = min(100, int(Clara.fun or 0) + 3)
     $ CurLocDesc = MainTxt
-    call ShowImage("", "", "images/clara/melissa Pillow fight.png")
+    vscene "images/clara/melissa Pillow fight.png"
     $ calendar_v2.advance_minutes(45)
     $ current_action_title = "Комната Мелиссы"
     $ current_action_content = None
@@ -84,7 +84,7 @@ label story_clara_melissa_room_visit_1:
     $ Melissa.change_social(open_delta=1)
     $ Clara.change_social(open_delta=1)
     $ CurLocDesc = MainTxt
-    call ShowImage("", "", "images/clara/melissa_doodleTimes.png")
+    vscene "images/clara/melissa_doodleTimes.png"
     $ calendar_v2.advance_minutes(45)
     $ current_action_title = "Комната Мелиссы"
     $ current_action_content = None
@@ -104,7 +104,7 @@ label story_clara_melissa_room_visit_2:
     $ Melissa.change_social(corruption_delta=2)
     $ Clara.change_social(corruption_delta=2)
     $ CurLocDesc = MainTxt
-    call ShowImage("", "", "images/clara/melissa_doodles.png")
+    vscene "images/clara/melissa_doodles.png"
     $ calendar_v2.advance_minutes(45)
     $ current_action_title = "Комната Мелиссы"
     $ current_action_content = None

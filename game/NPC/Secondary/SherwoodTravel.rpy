@@ -32,16 +32,16 @@ init python:
 label SherwoodRobbedHorseTakeCode:
     $ MyStallion = ""
     $ peopleInfo["mongol"].var["WillTryToSteal"] = 0
-    $ Robin.var["KnowBigTitsVillage"] = max(int(Robin.var.get("KnowBigTitsVillage", 0) or 0), 1)
+    $ Robin.set_var_min("KnowBigTitsVillage", 1)
     return
 
 
 label SherwoodRobbedAndGoCode:
     $ money = max(0, int(money or 0) - 50)
     $ Becky.var["RobbedByRobin"] = max(1, int(Becky.var.get("RobbedByRobin", 0) or 0))
-    $ Robin.var["RobbedNum"] = int(Robin.var.get("RobbedNum", 0) or 0) + 1
-    if int(Robin.var.get("Negotiate", 0) or 0) == 1:
-        $ Robin.var["Negotiate"] = 2
+    $ Robin.add_var_int("RobbedNum", 1)
+    if Robin.var_int("Negotiate", 0) == 1:
+        $ Robin.set_var_int("Negotiate", 2)
     $ calendar_v2.hour = 16
     $ calendar_v2.minute = 0
     $ calendar_v2.sync_state()
@@ -50,15 +50,15 @@ label SherwoodRobbedAndGoCode:
 
 
 label SherwoodKunidellOpenedCode(OnHorse=0):
-    $ Robin.var["MongolSafePassUsed"] = 1
-    $ Robin.var["KunidellOpened"] = 1
+    $ Robin.set_var_int("MongolSafePassUsed", 1)
+    $ Robin.set_var_int("KunidellOpened", 1)
     $ calendar_v2.hour = 16
     $ calendar_v2.minute = 0
     $ calendar_v2.sync_state()
     if int(OnHorse or 0) == 1:
         $ _blackwood_trade_profit = procedural_randint(50, 300, "blackwood_kunidell_trade_%s" % int(dayspassed or 0))
         $ money += 200 + _blackwood_trade_profit
-        $ Robin.var["KunidellDeliveries"] = int(Robin.var.get("KunidellDeliveries", 0) or 0) + 1
+        $ Robin.add_var_int("KunidellDeliveries", 1)
     call stat
     return
 
@@ -91,14 +91,14 @@ label story_robin_blackwood_ambush_0:
     $ SignalBlockTime = 1
     $ UI_mode = "event"
     $ Robin.location = "BlackwoodRoad"
-    $ Robin.var["BlackwoodRoadSeen"] = 1
+    $ Robin.set_var_int("BlackwoodRoadSeen", 1)
     $ _blackwood_on_horse = int(BlackwoodTravelOnHorse or 0)
     $ _blackwood_travel_verb = "едете" if _blackwood_on_horse == 1 else "идете"
     vscene "images/Robin/robin.png"
     $ MainTxt = "Насвистывая, вы [_blackwood_travel_verb] по дороге к Куниделлу. Через несколько часов поля и перелески уступают место вырубке. Дорога превращается почти в тропинку между пнями и молодым кустарником.\n\n"
-    if int(Robin.var.get("RobbedNum", 0) or 0) == 0:
+    if Robin.var_int("RobbedNum", 0) == 0:
         $ MainTxt += "Вдруг впереди вы замечаете группу мужчин в зеленых трико."
-    elif int(Robin.var.get("KnowHim", 0) or 0) == 0:
+    elif Robin.var_int("KnowHim", 0) == 0:
         $ MainTxt += "Вдруг впереди вы замечаете уже знакомых грабителей."
     else:
         $ MainTxt += "Вдруг впереди вы замечаете старых знакомых: несчастных безработных лесорубов во главе с Робин Гудом."
@@ -115,9 +115,9 @@ label story_robin_blackwood_ambush_0:
 
 label story_robin_blackwood_approach:
     call IntRobinTalk
-    if int(Robin.var.get("MongolSafePass", 0) or 0) == 1:
+    if Robin.var_int("MongolSafePass", 0) == 1:
         jump story_robin_blackwood_mongol_pass
-    if int(Robin.var.get("RobbedNum", 0) or 0) == 0:
+    if Robin.var_int("RobbedNum", 0) == 0:
         jump story_robin_blackwood_first_robbery
     jump story_robin_blackwood_repeat_robbery
 
@@ -142,7 +142,7 @@ label story_robin_blackwood_mongol_pass:
 
 label story_robin_blackwood_first_robbery:
     vscene "images/Robin/portrait2.jpg"
-    $ _robbers_head = "Робин Гуд" if int(Robin.var.get("KnowHim", 0) or 0) else "предводитель"
+    $ _robbers_head = "Робин Гуд" if Robin.var_int("KnowHim", 0) else "предводитель"
     $ MainTxt = "\"Семь бед - один ответ!\" думаете вы и продолжаете путь. Мужики в трико заметно оживляются, в руках у них появляются луки, стрелы и разное колюще-режущее железо.\n\nКогда вы приближаетесь, их [_robbers_head], здоровенный человек с золотой цепью и капюшоном, выходит навстречу и широко улыбается: \"Йо, браза! Куда идешь?\"\n\n\"В Куниделл,\" скромно отвечаете вы.\n\nПосле этого его лицо становится серьезным. \"Хей, мэн, я и мои браза - простые лесорубы, доведенные обстоятельствами до отчаяния. Я вижу, ты хочешь сделать добровольное пожертвование на наше благое дело.\""
     if int(BlackwoodTravelOnHorse or 0) == 1:
         $ MainTxt += " \"Все деньги. Ну и лошадь конечно, она нам тоже пригодится.\""
@@ -161,7 +161,7 @@ label story_robin_blackwood_first_robbery:
 
 label story_robin_blackwood_repeat_robbery:
     vscene "images/Robin/portrait2.jpg"
-    $ _robbers_head = "Робин Гуд" if int(Robin.var.get("KnowHim", 0) or 0) else "предводитель"
+    $ _robbers_head = "Робин Гуд" if Robin.var_int("KnowHim", 0) else "предводитель"
     $ MainTxt = "При виде вас [_robbers_head] и его друзья очень удивляются.\n\n\"Слышь мужики, а я думал, что он трактирщик,\" недоуменно бормочет главарь. Потом он сменяет тон на радостный: \"Йо, бразар, ты нам донату занес? Ты кул, бразар, видно что не мазафака.\""
     $ CurLocDesc = MainTxt
     "[MainTxt]"
@@ -188,12 +188,12 @@ label story_robin_blackwood_robbed_return:
 
 label story_robin_blackwood_return_to_city:
     vscene "images/Robin/robin.png"
-    if int(Robin.var.get("RobbedNum", 0) or 0) == 0:
+    if Robin.var_int("RobbedNum", 0) == 0:
         $ Becky.var["SherwoodSuspect"] = int(Becky.var.get("SherwoodSuspect", 0) or 0) + 2
         $ Becky.var["KnowSherwood"] = 1
         $ Becky.var["KnowBlackwood"] = 1
         $ MainTxt = "Решив, что встреча со странными мужиками в трико на пустынной вырубке ничего хорошего не принесет, вы разворачиваетесь и уходите обратно."
-    elif int(Robin.var.get("KnowHim", 0) or 0) == 0:
+    elif Robin.var_int("KnowHim", 0) == 0:
         $ MainTxt = "Решив, что новая встреча с грабителями ничего хорошего не принесет, вы разворачиваетесь и уходите обратно."
     else:
         $ MainTxt = "Решив, что новая встреча с Робин Гудом на пустынной вырубке ничего хорошего не принесет, вы разворачиваетесь и уходите обратно."

@@ -416,7 +416,7 @@ label story_clara_market_booklet_release_mongol:
     $ productnum = max(0, int(productnum or 0) - 1)
     $ winenum = max(0, int(winenum or 0) - 1)
     $ tavernfame = int(tavernfame or 0) + 2
-    $ Friends["zimmer"] = min(20, int(Friends.get("zimmer", 0) or 0) + 1)
+    $ Zimmer.change_social(friend_delta=1)
     $ Mongol.var["GuardGiftSent"] = 1
     $ Mongol.var["GuardCaptainKnown"] = 1
     $ Mongol.var["StocksReleased"] = 1

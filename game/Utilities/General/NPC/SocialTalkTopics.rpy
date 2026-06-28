@@ -337,7 +337,7 @@ init -39 python:
         if key == "sandra":
             return "IntSandraTalk"
         if key == "clara":
-            return "IntClaraTalkRefresh"
+            return "IntClaraTalkMenu"
         if key == "becky":
             return "IntBeckyTalk"
         if key == "irma":
