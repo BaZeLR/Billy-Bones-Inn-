@@ -185,7 +185,7 @@ init python:
         if key_l == "becky":
             return "images/becky/portraits/portrait_1.png"
         if key_l == "georgett":
-            return "images/georgett/portraits/portrait1.jpg"
+            return "images/georgett/portraits/portrait.jpg"
         if key_l == "liza":
             return "images/liza/portraits/naked.jpg"
         if key_l == "irma":

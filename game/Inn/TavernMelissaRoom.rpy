@@ -79,7 +79,7 @@ label TavernMelissaRoom:
     $ scene_image = tavern_melissa_room_picture() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
-        call ShowImage("", "", scene_image)
+        vscene scene_image
     call RoomEnterEventGate(CurLoc, False)
     $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
     $ _melissa_room_notice = household_room_issue_notice_text("melissa")
@@ -177,7 +177,7 @@ label TavernMelissaRoomRestore:
     $ scene_image = tavern_melissa_room_picture() or TavernMelissaRoomRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
-        call ShowImage("", "", scene_image)
+        vscene scene_image
     $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
     $ _melissa_room_notice = household_room_issue_notice_text("melissa")
     if str(_melissa_room_notice or "").strip() != "":

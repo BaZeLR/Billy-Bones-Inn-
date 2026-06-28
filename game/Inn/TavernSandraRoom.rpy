@@ -94,6 +94,7 @@ label TavernSandraRoom:
     $ scene_image = tavern_sandra_room_picture()
     if scene_image:
         $ _layout_last_picture = scene_image
+        vscene scene_image
     $ MainTxt = TavernSandraRoomRoom.descriptions[0].text
     $ _sandra_room_notice = household_room_issue_notice_text("sandra")
     if str(_sandra_room_notice or "").strip() != "":
@@ -181,6 +182,7 @@ label TavernSandraRoomRestore:
     $ scene_image = tavern_sandra_room_picture()
     if scene_image:
         $ _layout_last_picture = scene_image
+        vscene scene_image
     $ MainTxt = TavernSandraRoomRoom.descriptions[0].text
     $ _sandra_room_notice = household_room_issue_notice_text("sandra")
     if str(_sandra_room_notice or "").strip() != "":
@@ -201,7 +203,7 @@ label TavernSandraLedgerScene:
     if _sandra_ledger_picture != "":
         $ scene_image = _sandra_ledger_picture
         $ _layout_last_picture = _sandra_ledger_picture
-        call ShowImage("", "", _sandra_ledger_picture)
+        vscene _sandra_ledger_picture
     python:
         _ledger_stories = [
             "Вы с Сандрой усаживаетесь над трактирной книгой и какое-то время вместе сводите расходы, припасы и долги по мелочам. Постепенно сухие цифры переходят в разговор, и Сандра неожиданно вспоминает, как еще совсем молодой девчонкой училась считать закупки не по записям, а по памяти, потому что старшие все равно не доверяли ей книги. \"Ошибешься раз-другой, зато потом уже не забываешь,\" замечает она с сухой усмешкой.",

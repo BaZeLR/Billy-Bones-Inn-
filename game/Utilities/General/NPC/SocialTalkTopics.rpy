@@ -562,7 +562,10 @@ init -39 python:
             elif score < 0:
                 add_to_stat_dict(otkroven, key, score, 0, 20)
         else:
-            apply_social_interaction_base(key, "talk", score, 1 if score > 0 else 0, 30, 1, 0, 0, 1, True)
+            talk_already_today = int(TalkedToday.get(key, 0) or 0) > 0
+            talk_minutes = 0 if talk_already_today else 30
+            talk_today_delta = 0 if talk_already_today else 1
+            apply_social_interaction_base(key, "talk", score, 1, talk_minutes, 1, 0, 0, talk_today_delta, True)
             if score > 0:
                 add_to_stat_dict(otkroven, key, max(1, score // 2), 0, 20)
         actual_score = social_score_delta_for(key, friends_before)

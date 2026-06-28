@@ -448,9 +448,22 @@ init python:
         candidates = {
             "sandra": [
                 "images/sandra/tavern/kitchen_sandra_0.jpg",
+                "images/sandra/tavern/kitchen_sandra_1.jpg",
+                "images/sandra/tavern/kitchen_sandra_2.jpg",
+                "images/sandra/tavern/kitchen_sandra_3.jpg",
+                "images/sandra/tavern/kitchen_sandra_4.jpg",
                 "images/sandra/sandra_kitchen.png",
                 "images/tavern/kitchen/sandra.png",
+                "images/kitchen/kitchen_sandra_0.jpg",
+                "images/kitchen/kitchen_sandra_1.jpg",
+                "images/kitchen/kitchen_sandra_2.jpg",
+                "images/kitchen/kitchen_sandra_3.jpg",
+                "images/kitchen/kitchen_sandra_4.jpg",
                 "images/tavern/kitchen/kitchen_sandra_0.jpg",
+                "images/tavern/kitchen/kitchen_sandra_1.jpg",
+                "images/tavern/kitchen/kitchen_sandra_2.jpg",
+                "images/tavern/kitchen/kitchen_sandra_3.jpg",
+                "images/tavern/kitchen/kitchen_sandra_4.jpg",
             ],
             "melissa": Melissa.image_sequence("kitchen", "breakfast"),
             "amanda": [
@@ -937,9 +950,11 @@ init python:
 
     def tavern_kitchen_breakfast_picture():
         candidates = [
-            "images/tavern/kitchen/kitchen_breakfast.jpg",
             "images/kitchen/kitchen_breakfast.jpg",
+            "images/tavern/kitchen/kitchen_breakfast.jpg",
             "images/breakfast/tavent_girls.jpg",
+            "images/breakfast/tavern_girls_impregnat.jpg",
+            "images/breakfast/tavern_girls_impregnat_1.jpg",
             "images/breakfast/amanda_b.png",
         ]
         for candidate in candidates:

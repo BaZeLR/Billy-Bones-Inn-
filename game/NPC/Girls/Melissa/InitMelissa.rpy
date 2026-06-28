@@ -116,6 +116,10 @@ init python:
                         "images/melissa/kitchen3.jpg",
                     ],
                     "breakfast": [
+                        "images/breakfast/melissa_breakfast/melissa breakfast.jpg",
+                        "images/breakfast/melissa_breakfast/melissa breakfast_2.jpg",
+                        "images/breakfast/melissa_breakfast/melissa_breakfast.jpg",
+                        "images/breakfast/melissa_breakfast/melissa_breakfast_1.jpg",
                         "images/melissa/tavern/kitchen_0.png",
                         "images/melissa/tavern/kitchen_1.png",
                         "images/melissa/tavern/portrait.png",

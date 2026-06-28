@@ -4,30 +4,8 @@
 label StreetClients(client_type=1, girl_name="", event_time=None):
     if event_time is None:
         $ event_time = time
-    call street_clients(client_type, girl_name, event_time)
+    call PortStreetsBackAlley(girl_name)
     jump PortStreets
-
-
-label street_clients(client_type, girl_name, event_time):
-    if int(client_type or 0) != 1:
-        jump PortStreets
-
-    $ CurrentRoom = PortStreetsRoom
-    $ CurLoc = "PortStreets"
-    $ location = CurLoc
-    $ UI_mode = "event"
-    $ current_action_title = "Подворотня"
-    $ current_action_content = None
-    $ _street_client_picture = ""
-    if girl_name == "liza":
-        $ MainTxt = "Вы уверенным шагом пошли к знакомой подворотне. Как вы и ожидали, вскоре стали слышны приглушенные девичьи стоны. Как можно тише и аккуратнее вы преодолели оставшееся расстояние и осторожно заглянули за угол. Открывшаяся вам картина послужила вполне достойным вознаграждением за ваши хлопоты."
-    else:
-        $ MainTxt = "Вы решили пойти и проверить подворотню, где вы сношали Жоржетту в прошлый раз. Не доходя до нее нескольких шагов вы услышали приглушенные стоны. Желая остаться незамеченным, вы как можно тише преодолели оставшееся расстояние и осторожно заглянули за угол. Открывшаяся вам картина послужила вполне достойным вознаграждением за ваши хлопоты."
-    $ CurLocDesc = MainTxt
-    $ current_action_items = [MenuItem("Подсмотреть", Call("street_clients_watch", client_type, girl_name, event_time)), MenuItem("Вернуться в переулок", Jump("PortStreets"))]
-    call screen main_ui
-    jump PortStreets
-
 
 label street_clients_watch(client_type=1, girl_name="", event_time=None):
     if int(client_type or 0) != 1:
@@ -119,10 +97,10 @@ label street_clients_watch(client_type=1, girl_name="", event_time=None):
 
 
 label story_georgett_portstreet_clients:
-    call street_clients(1, "georgett", 3)
+    call PortStreetsBackAlley("georgett")
     jump PortStreets
 
 
 label story_liza_portstreet_clients:
-    call street_clients(1, "liza", 3)
+    call PortStreetsBackAlley("liza")
     jump PortStreets

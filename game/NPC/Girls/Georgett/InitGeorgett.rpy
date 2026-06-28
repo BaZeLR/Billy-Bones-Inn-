@@ -50,7 +50,7 @@ init python:
                 fullname="Жоржетта",
                 genitive="Жоржетты",
                 dative="Жоржетте",
-                portrait="images/georgett/portraits/portrait1.jpg",
+                portrait="images/georgett/portraits/portrait.jpg",
                 default_location="PortStreets",
                 description="Жоржетта Брюно - молодая женщина, не очень высокого роста, чуть пухленькая и с большой налитой грудью. Она белокура и кареглаза. Ее внешность и повадки не дают никаких сомнений в том, что она выбрала себе путь отнюдь не монашки.",
                 gift_preferences=["drink_ale_001", "wild_rose_001", "soap_001", "libido_tincture_001", "ethanol_001"],

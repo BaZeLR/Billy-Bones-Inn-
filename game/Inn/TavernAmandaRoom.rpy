@@ -268,7 +268,7 @@ label TavernAmandaRoom:
         $ scene_image = _amanda_room_picture or None
         if str(_amanda_room_picture or "").strip():
             $ _layout_last_picture = _amanda_room_picture
-            call ShowImage("", "", _amanda_room_picture)
+            vscene _amanda_room_picture
         $ MainTxt = "Дверь закрыта изнутри. За ней слышны приглушенные голоса, шорох и короткий смешок."
         $ CurLocDesc = MainTxt
         $ current_action_title = "Комната Аманды"
@@ -286,7 +286,7 @@ label TavernAmandaRoom:
     $ scene_image = _amanda_room_picture or None
     $ _layout_last_picture = _amanda_room_picture or ""
     if str(_amanda_room_picture or "").strip():
-        call ShowImage("", "", _amanda_room_picture)
+        vscene _amanda_room_picture
     $ _room.mark_visited()
     if int(time or 0) >= 4:
         call DressForNight("amanda", tmpSleepDress)

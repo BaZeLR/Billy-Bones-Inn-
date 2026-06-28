@@ -580,13 +580,13 @@ screen hunter_club_trade_overlay():
                                         text str(_line_total) + " мараведи" size 20 color "#1e130c" xalign 0.5
 
 label HunterClub:
-    scene black
     $ CurrentRoom = HunterClubRoom
     $ CurLoc = "HunterClub"
     $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
+        vscene scene_image
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
@@ -625,6 +625,8 @@ label HunterClub:
 label HunterClubFirstVisit:
     $ HunterClubVar["first_visit_seen"] = 1
     $ scene_image ="images/general/hunter_store_2.png"
+    $ _layout_last_picture = scene_image
+    vscene scene_image
     $ MainTxt = (
         "Вы внимательно и с живым интересом рассматриваете помещение и товары, Вас с таким же живым интересом рассматривает толстуха за прилавком\n"
         "А ты, вы уважаемый хер... ммм, случайно не родственник покойного Лонгкока?\n"
