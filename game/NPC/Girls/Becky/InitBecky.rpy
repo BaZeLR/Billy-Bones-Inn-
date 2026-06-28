@@ -177,16 +177,6 @@ init python:
             DateOfBirth[name] = dict(self.data.birth_date)
             girltextdesc[name] = self.data.description
             knowsMC[name] = bool(self.known)
-            Friends[name] = people_to_int(self.rel, 0)
-            otkroven[name] = people_to_int(self.openness, 0)
-            sluttiness[name] = people_to_int(self.corruption, 0)
-            Drunk[name] = people_to_int(self.drunk, 0)
-            Talked[name] = people_to_int(Talked.get(name, 0), 0)
-            TalkedToday[name] = people_to_int(self.talked_today, 0)
-            FlirtedToday[name] = people_to_int(self.flirted_today, 0)
-            GiftedToday[name] = people_to_int(self.gifted_today, 0)
-            AskedToday[name] = people_to_int(self.asked_today, 0)
-            FuckedToday[name] = people_to_int(self.fucked_today, 0)
             self.location = str(self.current_location or "GroceryStore")
             GiftPreferences[name] = list(self.gift_preferences)
             dressdefault[name] = self.wardrobe["current_dress"]
@@ -285,26 +275,30 @@ init python:
             return self
 
         def apply_social_roll(self, limit_friend, friend_chance, inc_decr_friends, limit_corruption, corruption_chance, inc_decr_corruption):
-            import random as random_module
             friend_delta = people_to_int(inc_decr_friends, 0)
             corruption_delta = people_to_int(inc_decr_corruption, 0)
             positive_friend_chance = social_friend_roll_chance(friend_chance, self.code_name, True)
             negative_friend_chance = social_friend_roll_chance(friend_chance, self.code_name, False)
             corruption_roll_chance = max(1, people_to_int(corruption_chance, 1))
+            roll_index = 0
             while friend_delta < 0:
-                if people_to_int(self.rel, 0) > people_to_int(limit_friend, 0) and random_module.randint(1, negative_friend_chance) == 1:
+                roll_index += 1
+                if people_to_int(self.rel, 0) > people_to_int(limit_friend, 0) and procedural_randint(1, negative_friend_chance, "becky_social_friend_down_%s_%s" % (people_to_int(dayspassed, 0), roll_index)) == 1:
                     self.add_relation(-1, cap=100)
                 friend_delta += 1
             while friend_delta > 0:
-                if people_to_int(self.rel, 0) < people_to_int(limit_friend, 0) and random_module.randint(1, positive_friend_chance) == 1:
+                roll_index += 1
+                if people_to_int(self.rel, 0) < people_to_int(limit_friend, 0) and procedural_randint(1, positive_friend_chance, "becky_social_friend_up_%s_%s" % (people_to_int(dayspassed, 0), roll_index)) == 1:
                     self.add_relation(1, cap=100)
                 friend_delta -= 1
             while corruption_delta < 0:
-                if people_to_int(self.corruption, 0) > people_to_int(limit_corruption, 0) and random_module.randint(1, corruption_roll_chance) == 1:
+                roll_index += 1
+                if people_to_int(self.corruption, 0) > people_to_int(limit_corruption, 0) and procedural_randint(1, corruption_roll_chance, "becky_social_corruption_down_%s_%s" % (people_to_int(dayspassed, 0), roll_index)) == 1:
                     self.add_corruption(-1)
                 corruption_delta += 1
             while corruption_delta > 0:
-                if people_to_int(self.corruption, 0) < people_to_int(limit_corruption, 0) and random_module.randint(1, corruption_roll_chance) == 1:
+                roll_index += 1
+                if people_to_int(self.corruption, 0) < people_to_int(limit_corruption, 0) and procedural_randint(1, corruption_roll_chance, "becky_social_corruption_up_%s_%s" % (people_to_int(dayspassed, 0), roll_index)) == 1:
                     self.add_corruption(1)
                 corruption_delta -= 1
             return self

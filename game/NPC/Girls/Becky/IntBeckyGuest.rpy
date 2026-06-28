@@ -26,18 +26,18 @@ label IntBeckyGuest:
             "Осмотреть Ингенборг" if dinnertime <= 5:
                 call GirlsDesc("inga")
 
-            "Выставить на стол вино и еду из вашего трактира" if dinnertime == 0 and winenum >= 30 and productnum >= 30 and IngaVar.get("Knowher", 0) >= 2:
+            "Выставить на стол вино и еду из вашего трактира" if dinnertime == 0 and winenum >= 30 and productnum >= 30 and Inga.var_int("Knowher", 0) >= 2:
                 "Вы решили, что столоваться на шару у хлебосольной вдовы хотя и безусловно вкусно и питательно, но пора и честь знать."
                 "Мучимый уколами совести, вы принесли с собой кувшинчик красненького из запасов вашего заведения и разные закуски, завернутые в тряпицу. Благо этого добра у вас было все равно с избытком."
                 "Если закуски смотрелись на фоне угощений вдовы немного бледно, если даже не сказать жалко, то вино явно пришлось по вкусу присутствующим. Лукас с Эдди сразу жахнули по стакану."
                 if Becky.can_drink_wine():
                     "Вместе с ними накатила и вдовушка, ее лицо сразу раскраснелось от принятого, а настроение улучшилось."
-                    call GetGirlDrunk("becky")
+                    $ Becky.drunk = 1
                 else:
                     "Бекки же от вина воздержалась, лишь слегка пригубив свой бокал."
                 if pregnancy.get("inga", 0) <= 30:
                     "Ингенборг, игнорируя укоризненный взгляд своей мамочки, тоже налила себе стакан и подняла тост за здоровье всех присутствующих."
-                    call GetGirlDrunk("inga")
+                    $ Inga.drunk = 1
                 else:
                     "Инга отодвинула предложенный ей стакан, заметив что ей и так весело, да и дури у нее своей хватает, поэтому она разве что для запаха может чуток выпить."
                 $ Becky.apply_social_roll(11, 1, 2, 0, 0, 0)
@@ -86,7 +86,7 @@ label IntBeckyGuest:
 
                 if dinneringaminet == 4:
                     "Инга наконец нашла свой нож и вылезла из-под стола. На уголках губ ее что-то поблескивало, впрочем, она быстро вытерла губы салфеткой, так что вам могло и показаться. Вернулся к еде и Лукас."
-                    call SlutFriendsIncrease("inga", 0, 1, 0, 40, 2, 1)
+                    $ Inga.apply_social_chance(0, 1, 0, 40, 2, 1, "becky_dinner_under_table")
                     call PregnancyCheck("inga", "mouth", 1, "Лукас")
                     $ dinneringaminet += 1
 
@@ -141,7 +141,7 @@ label IntBeckyGuest:
 
                 $ dinnerbecky += 1
                 $ dinnertime += 1
-                if Drunk.get("becky", 0) == 1:
+                if int(Becky.drunk or 0) == 1:
                     $ _drink_pic = procedural_randint(1, 3, "becky_dinner_drink_pic_%s_%s" % (int(dayspassed or 0), dinnertime))
                     $ scene_image = "images/becky/dinner/drink%s.jpg" % _drink_pic
                 else:
@@ -190,18 +190,21 @@ label IntBeckyGuest:
                         "Ребекка пребывала в явной растеренности, вы же строго отшили нахала: \"Спасибо, Эдди, но мы уж сами. Может я запамятовал чего, но мне кажется, что ни я ни миссис Блэнкеншип тебя не звали. Или ты услыхал чего? Или просто нафантазировал невесть что?\""
                         if procedural_randint(1, 3, "becky_dinner_eddie_ridicule_%s" % int(dayspassed or 0)) == 1:
                             "Эдди такая отповедь не на шутку расстроила. Он едва не разрыдался от нанесенной обиды и выбежал из комнаты, хлопнув дверью."
-                            call SlutFriendsIncrease("eddie", 5, 1, -1, 0, 0, 0)
+                            $ Eddie.change_social(friend_delta=-1)
                         else:
                             "Эдди от такой отповеди закусил губу и плюхнулся обратно на стул."
-                            call SlutFriendsIncrease("eddie", 5, 2, -1, 0, 0, 0)
+                            if procedural_randint(1, 2, "becky_dinner_eddie_ridicule_friend_%s" % int(dayspassed or 0)) == 1:
+                                $ Eddie.change_social(friend_delta=-1)
                         "Лукас и Инга заулыбались от постигшего Эдди облома."
                         if Becky.var.get("EddieWhoreHome", 0) == 4:
                             "А Жоржетта так и вовсе невежливо заржала в голос."
-                            call SlutFriendsIncrease("eddie", 5, 2, -1, 0, 0, 0)
+                            if procedural_randint(1, 2, "becky_dinner_eddie_georgett_laugh_%s" % int(dayspassed or 0)) == 1:
+                                $ Eddie.change_social(friend_delta=-1)
                         $ Eddie.var["RidiculeFollow"] = 1
                     else:
                         "Эдди, похоже, малость огорчился, что его с собой не взяли, но за вами последовать не попытался, наверное решил, что возьмет свое позже."
-                        call SlutFriendsIncrease("eddie", 5, 5, -1, 0, 0, 0)
+                        if procedural_randint(1, 5, "becky_dinner_eddie_left_behind_%s" % int(dayspassed or 0)) == 1:
+                            $ Eddie.change_social(friend_delta=-1)
                     "Вы невозбранно последовали со вдовой вдвоем наверх, в ее уютненькую спальню."
                     $ _kids_watch = procedural_randint(1, 8, "becky_dinner_kids_watch_late_%s" % int(dayspassed or 0))
                     call BeckyGuestKidsWatchStepsCode(_kids_watch)
@@ -223,11 +226,11 @@ label IntBeckyGuest:
                     "Вы с готовностью махнули парню рукой, он подскочил со стула и последовал за вами."
                     if Eddie.var.get("OthersSawWithMom", 0) > 0:
                         "Ингенборг проводила вас понимающим и затуманенным от похоти взглядом. Лукас же, пользуясь тем, что внимание Инги приковано к вашей процессии, лез ей тем временем под подол. Прежде чем он исчез из виду, вы заметили, как он тянется к завязке своих штанов."
-                        call SlutFriendsIncrease("inga", 0, 0, 0, 45, 2, 1)
+                        $ Inga.apply_social_chance(0, 0, 0, 45, 2, 1, "becky_dinner_kids_notice")
                     else:
                         "Ингенборг открыв рот смотрела на братца, шествующего за мамой в спальню и на ходу отнюдь не по-сыновьему щипающего мать за попу. Лукас же быстро посмотрел на эту картину, соориентировался в ситуации и начал заворачивать Инге юбку, пользуясь ее прострацией. Но тем временем вы уже поднялись на второй этаж и так и не узнали, чем дело у них закончилось."
                         $ Eddie.var["OthersSawWithMom"] = 1
-                        call SlutFriendsIncrease("inga", 0, 0, 0, 45, 2, 1)
+                        $ Inga.apply_social_chance(0, 0, 0, 45, 2, 1, "becky_dinner_kids_notice")
                 else:
                     "Вы уже было собрались позвать его с вами, но, разгадав ваши намерения, целомудренная Ребекка успела вас одернуть и шепнуть на ушко: \"Ну не так явно же!\""
                     "Решив не ранить чувства бедной вдовы, вы обернулись и как можно незаметнее кивнули в ответ на обращенный к вам полный надежды взгляд Эдди. Тот просветлел лицом. А вы продолжили подниматься по лестнице. Пока вдвоем."

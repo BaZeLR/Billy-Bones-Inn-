@@ -13,8 +13,7 @@ label story_becky_home_front_inga_0:
         $ RandIngaFuck = 3
     $ Becky.var["TodayFrontSexCheck"] = 1
     $ ViewIngaSex = 0
-    $ IngaVar.setdefault("SawLucassex", 0)
-    $ IngaVar.setdefault("Knowher", 0)
+    $ Inga.ensure_story_defaults()
     $ pregnancy.setdefault("inga", 0)
     if RandIngaFuck == 1:
         $ PregnancyCheck("inga", "mouthface", 1, "Лукас")
@@ -55,11 +54,11 @@ label story_becky_home_front_inga_0:
 label story_becky_home_front_peek_0:
     show screen main_ui
     if RandIngaFuck == 1:
-        if IngaVar["SawLucassex"] == 0:
+        if Inga.var_int("SawLucassex", 0) == 0:
             "Ваше любопытство оказалось вознагражденным интересной сценой:"
         else:
             "Вы увидели уже знакомую картину:"
-        if IngaVar["Knowher"] == 0:
+        if Inga.var_int("Knowher", 0) == 0:
             "В углу за крыльцом стоял, прислонившись к стене, какой-то молодой парень. На его лице застыла блаженная гримаса."
             "Причина его счастья была очевидна: рыжая деваха стояла перед ним на коленях и увлеченно у него отсасывала."
         else:
@@ -69,14 +68,14 @@ label story_becky_home_front_peek_0:
         $ _layout_last_picture = scene_image
         vscene scene_image
         $ ViewIngaSex = 1
-        $ IngaVar["SawLucassex"] = 1
-        $ IngaVar["Knowher"] = max(1, IngaVar["Knowher"])
+        $ Inga.set_var_int("SawLucassex", 1)
+        $ Inga.set_story_value_min("Knowher", 1)
     elif RandIngaFuck == 2:
-        if IngaVar["SawLucassex"] == 0:
+        if Inga.var_int("SawLucassex", 0) == 0:
             "Ваше любопытство оказалось вознагражденным интересной сценой:"
         else:
             "Вы увидели уже знакомую картину:"
-        if IngaVar["Knowher"] == 0:
+        if Inga.var_int("Knowher", 0) == 0:
             "В углу за крыльцом самозабвенно сношалась парочка. Молодой парень прижал к стене свою подружку, какую-то рыжую деваху."
         else:
             "В углу за крыльцом самозабвенно сношалась парочка. Лукас, ухажер Ингенборг, прижал к стене свою подружку, старшую дочку вдовушки."
@@ -88,8 +87,8 @@ label story_becky_home_front_peek_0:
         $ _layout_last_picture = scene_image
         vscene scene_image
         $ ViewIngaSex = 1
-        $ IngaVar["SawLucassex"] = 1
-        $ IngaVar["Knowher"] = max(1, IngaVar["Knowher"])
+        $ Inga.set_var_int("SawLucassex", 1)
+        $ Inga.set_story_value_min("Knowher", 1)
     else:
         "Наверное, показалось: вы заглянули за крыльцо, но там никого не было."
         $ scene_image = "images/becky/Home/house2.jpg"
@@ -136,8 +135,8 @@ label story_becky_home_front_share_0:
     $ _layout_last_picture = scene_image
     vscene scene_image
     $ Becky.var["SawIngaFuck"] = max(int(Becky.var.get("SawIngaFuck", 0) or 0), 1)
-    $ IngaVar["Knowher"] = max(1, IngaVar["Knowher"])
-    $ IngaVar["SawLucassex"] = 1
+    $ Inga.set_story_value_min("Knowher", 1)
+    $ Inga.set_var_int("SawLucassex", 1)
     $ ViewIngaSex = 2
     menu:
         "Предложить подойти к парочке":
@@ -189,7 +188,7 @@ label story_becky_home_front_suggest_approach_0:
             "\"Мам, ах, привет, ах, Стефанчик, ах, и тебе приветик,\" - вымолвила Блэнкеншип-младшая."
         $ ViewIngaSex = 3
         $ Becky.apply_social_roll(0, 0, 0, 45, 3, 1)
-        call SlutFriendsIncrease("inga", 0, 0, 0, 45, 3, 1)
+        $ Inga.apply_social_chance(0, 0, 0, 45, 3, 1, "becky_home_front_approach")
         menu:
             "Посмотреть как они кончат":
                 jump story_becky_home_front_watch_0
@@ -235,7 +234,7 @@ label story_becky_home_front_watch_0:
         "\"Ну, навязывать свой дом не буду,\" - пошла на попятную Бекки, \"только смотрите, не простудитесь,\" - заботливо поспешила добавить она."
         $ Becky.var["IngaSexGreet"] = 1
 
-    call SlutFriendsIncrease("inga", 0, 0, 0, 45, 3, 1)
+    $ Inga.apply_social_chance(0, 0, 0, 45, 3, 1, "becky_home_front_watch")
     $ ViewIngaSex = 10
     menu:
         "Зайти в дом" if ArriveMode == "FromDances":
@@ -248,7 +247,7 @@ label story_becky_home_front_watch_0:
 
 label story_becky_home_front_approach_0:
     show screen main_ui
-    if IngaVar["Knowher"] < 2:
+    if Inga.var_int("Knowher", 0) < 2:
         "Вы решили нарушить уединение парочки. Подойдя к любовникам решительным шагом, вы нахально осведомились: \"А что это вы тут делаете, а?\""
         "\"Как что делаем, разве не видно?\" - удивился парень. \"Я трахаю свою подружку.\""
         "\"Резонно, можно было бы и не спрашивать,\" - подумали вы, но, набравшись наглости, вслух произнесли: \"Ну тогда я следующий!\""
@@ -275,7 +274,7 @@ label story_becky_home_front_approach_0:
         else:
             "Лукас ни на секунду не замедлил темпа, продолжая сношать Ингенборг. Та обернулась к вам и вежливо, хотя и несколько запыхавшись, поприветствовала вас: \"Стефанчик, ах, приветик, ах!\""
         $ ViewIngaSex = 3
-    call SlutFriendsIncrease("inga", 0, 0, 0, 45, 3, 1)
+    $ Inga.apply_social_chance(0, 0, 0, 45, 3, 1, "becky_home_front_approach")
     menu:
         "Посмотреть как они кончат" if ViewIngaSex == 3:
             jump story_becky_home_front_watch_0
@@ -290,7 +289,7 @@ label story_becky_home_visit_0:
     $ Becky.var["HomeEnterCheckedDay"] = int(dayspassed or 0)
     $ BeckyAdmit = 0
     $ GirlName = "becky"
-    $ IngaVar.setdefault("Knowher", 0)
+    $ Inga.ensure_story_defaults()
     $ pregnancy.setdefault("inga", 0)
     $ Arousal.setdefault(GirlName, 0)
     $ PussyWetStart.setdefault(GirlName, Arousal.get(GirlName, 0))
@@ -329,18 +328,18 @@ label story_becky_home_visit_0:
 
     if BeckyAdmit == 1:
         $ Becky.var["TimesVisited"] = int(Becky.var.get("TimesVisited", 0) or 0) + 1
-        if IngaVar["Knowher"] >= 2:
+        if Inga.var_int("Knowher", 0) >= 2:
             "Вскоре к вам за столом присоединились Ингенборг, старшая дочка соломенной вдовушки, вместе с ее хахалем Лукасом."
-        elif IngaVar["Knowher"] == 1:
+        elif Inga.var_int("Knowher", 0) == 1:
             "На пороге показалась уже виденная вами парочка - Лукас и Ингенборг."
             "Бекки повернулась к вам: \"Стефан, позволь мне представить тебе мою старшую дочку Ингенборг и ее жениха Лукаса. Лукас, Инга, это Стефан, мой важный клиент и оптовый покупатель.\""
             "Вы пожали руку Лукасу, поцеловали в щечку Ингу и уселись за стол."
-            $ IngaVar["Knowher"] = 2
+            $ Inga.set_var_int("Knowher", 2)
         else:
             "На пороге показалось двое - высокая рыжеволосая девушка, похожая на хозяйку дома, в сопровождении парня чуть постарше ее."
             "Бекки повернулась к вам: \"Стефан, позволь мне представить тебе мою старшую дочку Ингенборг и ее жениха Лукаса. Лукас, Инга, это Стефан, мой важный клиент и оптовый покупатель.\""
             "Вы пожали руку Лукасу, поцеловали в щечку Ингу и уселись за стол."
-            $ IngaVar["Knowher"] = 2
+            $ Inga.set_var_int("Knowher", 2)
         $ scene_image = "images/becky/dinner/DinnerInga.jpg"
         $ _layout_last_picture = scene_image
         vscene scene_image

@@ -1,16 +1,12 @@
-default RobinVar = {}
-
 init python:
-    if 'RobinVar' not in dir() or not isinstance(RobinVar, dict):
-        RobinVar = {}
-    for k, v in {
+    def robin_story_defaults():
+        return {
         "KnowHim": 0, "KnowComplaint": 0, "KnowPlace": 0, "KnowWeapon": 0,
         "RobbedNum": 0, "Negotiate": 0, "KnowBigTitsVillage": 0,
         "MongolSafePass": 0, "PlayerDestroyedCamp": 0, "ZimmerPeaceful": 0,
         "MongolSafePassUsed": 0, "KunidellOpened": 0, "KunidellDeliveries": 0,
         "BlackwoodRoadSeen": 0, "BlackwoodRoadOpen": 0,
-    }.items():
-        RobinVar.setdefault(k, v)
+    }
 
     class RobinData(PeopleData):
         code_name = "robin"
@@ -30,31 +26,27 @@ init python:
 
     class RobinInfo(BaseNPC):
         """Robin: Blackwood leader, Mongol safe pass, Zimmer mission."""
+        code_name = "robin"
         unknown_name = "Робин"
 
         def __init__(self, name="robin", **kwargs):
             super().__init__(name, **kwargs)
-            self.var = kwargs.get("var", RobinVar)
-            for k, v in {
-                "KnowHim": 0,
-                "KnowComplaint": 0,
-                "KnowPlace": 0,
-                "KnowWeapon": 0,
-                "RobbedNum": 0,
-                "Negotiate": 0,
-                "KnowBigTitsVillage": 0,
-                "MongolSafePass": 0,
-                "MongolSafePassUsed": 0,
-                "KunidellOpened": 0,
-                "KunidellDeliveries": 0,
-                "PlayerDestroyedCamp": 0,
-                "ZimmerPeaceful": 0,
-                "BlackwoodRoadSeen": 0,
-                "BlackwoodRoadOpen": 0,
-            }.items():
-                self.var.setdefault(k, v)
             self.location = "BlackwoodRoad"
+            self.ensure_story_defaults()
+
+        def ensure_story_defaults(self):
+            if not isinstance(getattr(self, "var", None), dict):
+                self.var = {}
+            for k, v in robin_story_defaults().items():
+                self.var.setdefault(k, v)
             self.promote_from_var(self.var)
+            return self.var
+
+        def update(self):
+            self.name = self.code_name
+            self.data = RobinStaticData
+            self.ensure_story_defaults()
+            return self
 
 define RobinStaticData = RobinData()
 default Robin = RobinInfo()
@@ -68,7 +60,6 @@ label register_robin_secondary:
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["robin"] = RobinStaticData
-            Robin.var = RobinVar
             Robin.location = "BlackwoodRoad"
             Robin.update()
             peopleInfo["robin"] = Robin

@@ -2,8 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntIngaTalk(show_menu=True):
-    $ Talked.setdefault("inga", 0)
-    $ IngaVar.setdefault("Knowher", 0)
+    $ Inga.ensure_story_defaults()
     if str(CurLoc or "") == "GroceryStore":
         vscene "images/inga/StreetSex/minet1.jpg"
 

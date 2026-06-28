@@ -11,7 +11,6 @@ init 4 python:
         return int(jobkitchen.get(worker_name, 0))
 
 init python:
-    import random
     import re
     import renpy.exports as renpy
 
@@ -23,7 +22,7 @@ init python:
                 candidates.append(picture_path)
         if len(candidates) == 0:
             return ""
-        return random.choice(candidates)
+        return procedural_choice(candidates, key="tavern_kitchen_sandra_scene_%s" % int(dayspassed or 0))
 
     def tavern_kitchen_picture():
         if str(getLocation("sandra") or "") == "TavernKitchen":
@@ -31,7 +30,7 @@ init python:
             if sandra_scene:
                 return sandra_scene
         if str(getLocation("melissa") or "") == "TavernKitchen":
-            if random.randint(1, 4) == 1:
+            if procedural_randint(1, 4, key="tavern_kitchen_melissa_picture_%s_%s" % (int(dayspassed or 0), int(clock_minutes or 0))) == 1:
                 melissa_basement = Melissa.image_path("tavern", "basement")
                 if melissa_basement:
                     return melissa_basement
@@ -42,7 +41,7 @@ init python:
                 return resolve_room_background_media(TavernKitchenRoom)
             melissa_kitchen = Melissa.image_sequence("kitchen", "work")
             if len(melissa_kitchen) > 0:
-                return melissa_kitchen[random.randint(0, len(melissa_kitchen) - 1)]
+                return procedural_choice(melissa_kitchen, key="tavern_kitchen_melissa_work_%s_%s" % (int(dayspassed or 0), int(clock_minutes or 0)))
         return resolve_room_background_media(TavernKitchenRoom)
 
     def tavern_kitchen_pending_mandatory_event_code():
@@ -178,12 +177,18 @@ init python:
         if item_key == "honey_comb_001":
             tavern_kitchen_add_food_effect("honey_days", min(3, max(1, units)))
             for npc_id in ("sandra", "melissa", "amanda"):
-                sluttiness[npc_id] = min(100, int(sluttiness.get(npc_id, 0) or 0) + 2)
+                npc_info = peopleInfo.get(npc_id, None) if isinstance(peopleInfo, dict) else None
+                if npc_info is not None:
+                    npc_info.change_social(corruption_delta=2)
+                    npc_info.change_mana(1, "kitchen_honey")
             return "honey"
         if item_key == "boar_meat_001":
             tavern_kitchen_add_food_effect("boar_days", min(3, max(1, units)))
             for npc_id in ("sandra", "melissa", "amanda"):
-                sluttiness[npc_id] = min(100, int(sluttiness.get(npc_id, 0) or 0) + 1)
+                npc_info = peopleInfo.get(npc_id, None) if isinstance(peopleInfo, dict) else None
+                if npc_info is not None:
+                    npc_info.change_social(corruption_delta=1)
+                    npc_info.change_mana(1, "kitchen_boar")
             return "boar"
         if item_key == "milk_pitcher_001":
             tavern_kitchen_add_food_effect("milk_days", min(3, max(1, units)))
@@ -235,13 +240,16 @@ init python:
         lines = []
         if tavern_kitchen_honey_bonus_active():
             for npc_id in ("sandra", "melissa", "amanda"):
-                sluttiness[npc_id] = min(100, int(sluttiness.get(npc_id, 0) or 0) + 1)
+                npc_info = peopleInfo.get(npc_id, None) if isinstance(peopleInfo, dict) else None
+                if npc_info is not None:
+                    npc_info.change_social(corruption_delta=1)
+                    npc_info.change_mana(1, "kitchen_honey_daily")
             try:
                 add_sex_event = TodaySexEvents_Add
             except Exception:
                 add_sex_event = None
-            if callable(add_sex_event) and random.randint(1, 3) == 1:
-                add_sex_event(random.choice(["sandra", "melissa", "amanda"]), 99, 99, "KitchenHoneyMood")
+            if callable(add_sex_event) and procedural_randint(1, 3, key="tavern_kitchen_honey_mood_%s" % int(dayspassed or 0)) == 1:
+                add_sex_event(procedural_choice(["sandra", "melissa", "amanda"], key="tavern_kitchen_honey_mood_target_%s" % int(dayspassed or 0)), 99, 99, "KitchenHoneyMood")
             lines.append("Медовые угощения за день заметно смягчили настроение в доме.")
         if tavern_kitchen_fertility_bonus_active():
             lines.append("Молоко с медом делает общую еду мягче, сытнее и будто бы здоровее: в доме даже начинают шутить, что от такой кухни женщин тянет к детям быстрее обычного.")
@@ -428,15 +436,11 @@ label TavernKitchenShareTeaWithSandraAndBecky:
         $ CurLocDesc = MainTxt
         call TavernKitchenBuildActions
         return
-    $ _player_remove_item_by_id("energy_tea_001", 1)
-    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
-    $ Friends["becky"] = min(20, int(Friends.get("becky", 0) or 0) + 1)
-    $ fun = _player_clamp(int(fun or 0) + 1, 0, 100)
+    $ MainTxt = Sandra.apply_kitchen_tea_with_becky()
     if str(getLocation("sandra") or "") == "TavernKitchen":
         $ _tea_scene = tavern_kitchen_random_sandra_scene()
         if str(_tea_scene or "").strip():
             $ _layout_last_picture = _tea_scene
-    $ MainTxt = "Вы завариваете бодрящий чай и угощаете им Сандру с Бекки. Разговор за столом быстро теплеет: Сандра благодарит вас за внимание к хозяйству, а Бекки охотно подхватывает кухонные сплетни и делится парой полезных замечаний о трактирных делах."
     $ CurLocDesc = MainTxt
     call stat
     call TavernKitchenBuildActions
@@ -488,15 +492,7 @@ label TavernKitchenAskSandraBreakfasts:
         call TavernKitchenBuildActions
         return
     $ _kitchen_used_item = tavern_kitchen_take_food_from_stock(["boar_meat_001", "honey_comb_001", "berries_001", "mushroom_001"])
-    $ AskedToday["sandra"] = int(AskedToday.get("sandra", 0) or 0) + 1
-    $ Talked["sandra"] = int(Talked.get("sandra", 0) or 0) + 1
-    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
-    $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
-    $ Amanda.change_social(friend_delta=1)
-    $ fun = _player_clamp(int(fun or 0) + 2, 0, 100)
-    $ MainTxt = "Вы просите Сандру почаще собирать домочадцев за общий утренний стол и не давать всем разбредаться без толку. Сандра выслушивает вас без лишних слов, потом переводит взгляд на оставленные припасы и кивает.\n\n\"Ладно. Если уж на кухне есть из чего готовить, я поговорю с девочками. Общий завтрак дому не повредит, а там и работа ровнее пойдет,\" решает она."
-    if str(_kitchen_used_item or "").strip() != "":
-        $ MainTxt = str(MainTxt or "") + "\nДля ближайшего такого стола Сандра сразу откладывает %s." % tavern_kitchen_food_item_name(_kitchen_used_item)
+    $ MainTxt = Sandra.apply_kitchen_regular_breakfast_request(_kitchen_used_item)
     $ CurLocDesc = MainTxt
     $ TavernKitchenSavedText = MainTxt
     if TavernBreakfastEventActive:
@@ -513,13 +509,7 @@ label TavernKitchenAskSandraClients:
         call TavernKitchenBuildActions
         return
     $ _kitchen_used_item = tavern_kitchen_take_food_from_stock(["berries_001", "honey_comb_001", "boar_meat_001", "mushroom_001"])
-    $ AskedToday["sandra"] = int(AskedToday.get("sandra", 0) or 0) + 1
-    $ Talked["sandra"] = int(Talked.get("sandra", 0) or 0) + 1
-    $ Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 1)
-    $ tavernfame = int(tavernfame or 0) + 1
-    $ MainTxt = "Вы просите Сандру поговорить с домочадцами и держаться с гостями немного мягче обычного. Сандра щурится, явно взвешивая сказанное, а потом нехотя соглашается.\n\n\"Если уж хочешь, чтобы в трактире было больше довольных рож, я скажу девочкам не срываться на людях почем зря. Но и ты смотри, чтобы работа не шла через пень-колоду,\" бурчит она."
-    if str(_kitchen_used_item or "").strip() != "":
-        $ MainTxt = str(MainTxt or "") + "\nЗаодно Сандра решает пустить %s на что-нибудь поприятнее для посетителей." % tavern_kitchen_food_item_name(_kitchen_used_item)
+    $ MainTxt = Sandra.apply_kitchen_client_manners_request(_kitchen_used_item)
     $ CurLocDesc = MainTxt
     $ TavernKitchenSavedText = MainTxt
     if TavernBreakfastEventActive:

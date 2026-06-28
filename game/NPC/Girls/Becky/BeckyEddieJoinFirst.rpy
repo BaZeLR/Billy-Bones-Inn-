@@ -32,14 +32,14 @@ label BeckyEddieJoinFirst:
                     "Бекки отпустила ваш орган и подскочила от неожиданности. Увидев же голого управляющего, она аж взвизгнула: \"Ты что здесь делаешь?! Что это ты такое себе вообразил? Ты что себе позволяешь?! Ах ты козел, урод, после всего, что я для тебя сделала?!\""
                     "От такого напора Эдди аж попятился. А хозяйка лавки налетела на него как тигрица и в мгновение ока вытолкала за дверь."
                     "Следом же она обернулась к вам: \"Стефан?! Я знаю, это твои шутки. Ты что себе такое позволяешь. Кто я такая по-твоему? А ну вон отседова.\""
-                    $ Friends["eddie"] = max(0, Friends.get("eddie", 0) - 5)
+                    $ Eddie.change_social(friend_delta=-5)
                     $ Becky.add_relation(-3)
                     $ Becky.add_corruption(-3, 25)
                 else:
                     "Бекки отпустила ваш орган и резко развернулась. Увидев голого управляющего, она отвесила ему смачную пощечину: \"Опять ты, маньяк хренов?! Ты с первого раза не понял? Хочешь, чтобы я тебя из дома и лавки выкинула? Ты что себе позволяешь?! Ах ты козел!\""
                     "От такого напора Эдди аж попятился. А хозяйка лавки налетела на него как тигрица и в мгновение ока вытолкала за дверь."
                     "Следом же она обернулась к вам: \"Стефан?! Я знаю, это опять твои шутки, это ты его подучил и дверь отпер. Ты за кого меня принимаешь? А ну вон отседова.\""
-                    $ Friends["eddie"] = max(0, Friends.get("eddie", 0) - 7)
+                    $ Eddie.change_social(friend_delta=-7)
                     $ Becky.add_relation(-5)
                     $ Becky.add_corruption(-5, 25)
 
@@ -83,7 +83,7 @@ label BeckyEddieJoinFirst_EddieFailureCode:
         "Бекки тоже услышала шум и хмыкнула: \"Домашние, домашние, вечно пытаются всюду свой нос всунуть,\" - и впилась в ваши губы поцелуем."
 
     $ Becky.var["EddieTryToFuck"] = 3
-    $ Friends["eddie"] = max(Friends.get("eddie", 0) - 2, 0)
+    $ Eddie.change_social(friend_delta=-2)
     $ Becky.apply_social_gate(0, 0, 0, 35, 1, -1)
     "Вы и миссис Блэнкеншип находитесь в ее спальне."
     $ scene_image = "images/becky/sexeddie/eddiespy.jpg"
@@ -105,7 +105,7 @@ label BeckyEddieJoinFirst_EddieFirstCumCode:
     call PregnancyCheck("becky", "mouthface", 1, "Вы")
     $ Becky.add_corruption(5)
     $ Becky.add_relation(1)
-    $ Friends["eddie"] = Friends.get("eddie", 0) + 5
+    $ Eddie.change_social(friend_delta=5)
     $ Becky.var["EddieTryToFuck"] = 4
     $ calendar_v2.advance_minutes(60)
     jump MarketPlace

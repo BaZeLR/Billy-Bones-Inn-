@@ -302,7 +302,6 @@ init python:
                 "location": "BlackwoodRoad",
                 "description": "Робин - предводитель лесных обездоленных.",
                 "known": False,
-                "var": RobinVar,
             },
             "mongol": {
                 "names": ("Монгол", "Монгола", "Монголу"),

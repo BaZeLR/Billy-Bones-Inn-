@@ -72,9 +72,9 @@ label GeorgettBeckyVisit:
                 vscene scene_image
                 call PregnancyCheck("inga", "mouth", 1, "Лукас")
                 call PregnancyCheck("georgett", "mouthface", 1, "eddie")
-                call SlutFriendsIncrease("inga", 0, 0, 0, 50, 1, 1)
+                $ Inga.apply_social_chance(0, 0, 0, 50, 1, 1, "georgett_becky_visit")
                 $ Becky.apply_social_roll(0, 0, 0, 50, 1, 1)
-                call SlutFriendsIncrease("georgett", 0, 0, 0, 60, 1, 1)
+                $ Georgett.apply_social_chance(0, 0, 0, 60, 1, 1, "georgett_becky_visit")
                 $ georgedinnersex = 0
 
             "Расстегнуть штаны и позвать Бекки" if georgedinnersex == 1 and cametoday < cancumdaily:
@@ -101,8 +101,8 @@ label GeorgettBeckyVisit:
                         $ Becky.apply_social_roll(10, 2, -1, 35, 2, -1)
                         call PregnancyCheck("inga", "mouth", 1, "Лукас")
                         call PregnancyCheck("georgett", "mouthface", 1, "eddie")
-                        call SlutFriendsIncrease("inga", 0, 0, 0, 50, 1, 1)
-                        call SlutFriendsIncrease("georgett", 0, 0, 0, 60, 1, 1)
+                        $ Inga.apply_social_chance(0, 0, 0, 50, 1, 1, "georgett_becky_visit_refusal")
+                        $ Georgett.apply_social_chance(0, 0, 0, 60, 1, 1, "georgett_becky_visit_refusal")
                         $ calendar_v2.advance_minutes(60)
                         $ georgedinnersex = 0
                         jump MarketPlace
@@ -129,8 +129,8 @@ label GeorgettBeckyVisit:
                 $ Becky.apply_social_roll(20, 2, 1, 55, 1, 1)
                 call PregnancyCheck("inga", "mouth", 1, "Лукас")
                 call PregnancyCheck("georgett", "mouthface", 1, "eddie")
-                call SlutFriendsIncrease("inga", 0, 0, 0, 55, 1, 1)
-                call SlutFriendsIncrease("georgett", 0, 0, 0, 65, 1, 1)
+                $ Inga.apply_social_chance(0, 0, 0, 55, 1, 1, "georgett_becky_visit_minet")
+                $ Georgett.apply_social_chance(0, 0, 0, 65, 1, 1, "georgett_becky_visit_minet")
                 $ georgedinnersex += 1
 
             "Кончить на лицо" if georgedinnersex == 2 and cametoday < cancumdaily:

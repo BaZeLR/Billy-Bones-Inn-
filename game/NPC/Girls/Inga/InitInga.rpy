@@ -11,7 +11,7 @@ label InitInga:
         DateOfBirth[GirlName] = {"day": 1, "period": 1, "cycle": 1078}
         kids[GirlName] = 0
         beauty[GirlName] = 55
-        sluttiness[GirlName] = 30
+        Inga.corruption = 30
         sexacts[GirlName] = 134
         cuminside[GirlName] = 42
         pregnancy[GirlName] = 0
@@ -32,21 +32,20 @@ label InitInga:
         cleaning[GirlName] = 20
         waitress[GirlName] = 40
 
-        otkroven[GirlName] = 0
+        Inga.openness = 0
         jobkitchen[GirlName] = 0
         jobcleaning[GirlName] = 0
         jobwaitress[GirlName] = 0
-        Friends[GirlName] = 0
+        Inga.rel = 0
         jobHallAvail[GirlName] = 0
         jobWhoreAvail[GirlName] = 0
         jobwhore[GirlName] = 0
         jobgloryhole[GirlName] = 0
 
-        IngaVar['SawLucassex'] = 0
-        IngaVar['Knowher'] = 0
+        Inga.set_story_value("SawLucassex", 0)
+        Inga.set_story_value("Knowher", 0)
         GiftPreferences[GirlName] = ["wild_rose_001", "soap_001", "lavender_001"]
         peopleData[GirlName] = IngaStaticData
-        Inga.var = IngaVar
         Inga.location = "BeckyHome"
         Inga.update()
         peopleInfo[GirlName] = Inga
@@ -93,9 +92,6 @@ label InitInga:
     return
 
 init python:
-    if 'IngaVar' not in dir() or not isinstance(IngaVar, dict):
-        IngaVar = {"SawLucassex": 0, "Knowher": 0}
-
     def inga_grocery_store_active(weekday_value=None, time_slot=None):
         week_now = int(week if weekday_value is None else weekday_value or 0)
         time_now = int(time if time_slot is None else time_slot or 0)
@@ -126,18 +122,45 @@ init python:
 
     class IngaInfo(BaseNPC):
         """Inga Blankenship: secondary NPC with Becky-home story state."""
+        code_name = "inga"
         unknown_name = "Незнакомка"
 
         def __init__(self, name="inga", **kwargs):
             super().__init__(name, **kwargs)
-            self.var = kwargs.get("var", IngaVar)
-            for k, v in {
-                "SawLucassex": 0,
-                "Knowher": 0,
-            }.items():
-                self.var.setdefault(k, v)
             self.location = "BeckyHome"
+            self.ensure_story_defaults()
+
+        def ensure_story_defaults(self):
+            if not isinstance(getattr(self, "var", None), dict):
+                self.var = {}
+            self.var.setdefault("SawLucassex", 0)
+            self.var.setdefault("Knowher", 0)
             self.promote_from_var(self.var)
+            return self.var
+
+        def update(self):
+            self.name = self.code_name
+            self.data = IngaStaticData
+            self.ensure_story_defaults()
+            return self
+
+        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(str(key or ""), default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()[str(key or "")] = value
+            self.promote_from_var(self.var)
+            return value
+
+        def var_int(self, key, default=0):
+            return people_to_int(self.story_value(key, default), default)
+
+        def set_var_int(self, key, value):
+            return self.set_story_value(key, people_to_int(value, 0))
+
+        def set_story_value_min(self, key, value):
+            current = self.var_int(key, 0)
+            return self.set_var_int(key, max(current, people_to_int(value, 0)))
 
 define IngaStaticData = IngaData()
 default Inga = IngaInfo()
@@ -149,7 +172,6 @@ label register_inga_secondary:
         if "peopleData" in dir() and isinstance(peopleData, dict):
             peopleData["inga"] = IngaStaticData
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
-            Inga.var = IngaVar
             Inga.location = "BeckyHome"
             Inga.update()
             peopleInfo["inga"] = Inga

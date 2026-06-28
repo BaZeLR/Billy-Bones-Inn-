@@ -143,7 +143,7 @@ label BeckyHome(arrive_mode=""):
     $ GirlName = 'becky'
     python:
         Becky.ensure_story_defaults()
-        IngaVar.setdefault("Knowher", 0)
+        Inga.ensure_story_defaults()
         pregnancy.setdefault("inga", 0)
         Arousal.setdefault(GirlName, 0)
         PussyWetStart.setdefault(GirlName, Arousal.get(GirlName, 0))
@@ -199,19 +199,17 @@ label BeckyHome(arrive_mode=""):
                 $ BeckyAdmit = 1
         if BeckyAdmit == 1:
             $ Becky.add_story_value('TimesVisited', 1)
-            if IngaVar['Knowher'] >= 2:
+            if Inga.var_int("Knowher", 0) >= 2:
                 " и вскоре к вам за столом присоединились Ингенборг, старшая дочка соломенной вдовушки, вместе со своим хахалем Лукасом."
-            elif IngaVar['Knowher'] == 1:
+            elif Inga.var_int("Knowher", 0) == 1:
                 " и на пороге показалась уже виденная вами парочка - Лукас и Ингенборг. Бекки повернулась к вам: 'Стефан, позволь мне представить тебе мою старшую дочку Ингенборг и ее жениха Лукаса. Лукас, Инга, это Стефан, мой важный клиент и оптовый покупатель.'\nВы пожали руку Лукасу, поцеловали в щечку Ингу и уселись за стол. "
-                $ IngaVar['Knowher'] = 2
+                $ Inga.set_var_int("Knowher", 2)
             else:
                 " и на пороге показалось двое - высокая рыжеволосая девушка, похожая на хозяйку дома, в сопровождения парня чуть постарше ее. Бекки повернулась к вам: 'Стефан, позволь мне представить тебе мою старшую дочку Ингенборг и ее жениха Лукаса. Лукас, Инга, это Стефан, мой важный клиент и оптовый покупатель.'\nВы пожали руку Лукасу, поцеловали в щечку Ингу и уселись за стол. "
-                $ IngaVar['Knowher'] = 2
+                $ Inga.set_var_int("Knowher", 2)
             call ShowImage('becky', 'dinner', 'DinnerInga')
-            python:
-                import random
-                if random.randint(1,5) == 1:
-                    renpy.say(None, ' Вы присмотрелись к Инге и заметили, что перед ужином времени она не теряла, на ее рыжей шевелюре были видны следы спермы.')
+            if procedural_randint(1, 5, "becky_home_dinner_inga_legacy_%s" % int(dayspassed or 0)) == 1:
+                " Вы присмотрелись к Инге и заметили, что перед ужином времени она не теряла, на ее рыжей шевелюре были видны следы спермы."
             if pregnancy.get('inga', 0) >= 120:
                 " Одного взгляда на круглый живот Инги было достаточно, чтобы понять что она ведет активную половую жизнь."
             call IntBeckyGuest
