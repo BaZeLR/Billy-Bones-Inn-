@@ -255,7 +255,7 @@ label GeorgettSexApply(action_id=""):
         call GeorgettSexStatus(GirlLocIGSS)
 
     elif _georgett_sex_action == "look":
-        $ georgett_sex_add_text(Georgett.info_card_text() if hasattr(Georgett, "info_card_text") else Georgett.description)
+        $ georgett_sex_add_text(Georgett.data.description)
         $ georgett_sex_set_portrait()
 
     elif _georgett_sex_action == "remove_blouse":
