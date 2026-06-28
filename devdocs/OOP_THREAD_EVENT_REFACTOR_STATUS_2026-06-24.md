@@ -3,6 +3,62 @@
 Date: 2026-06-24
 Project root audited: `C:\Users\blank\Documents\RenPy_Projects\Tractir`
 
+Update: 2026-06-29
+
+Current committed baseline:
+
+- `cfd8bdd OOP state cleanup for NPC relationships`
+- committed source `.rpy` files only;
+- deliberately left saves, `errors.txt`, compiled artifacts, backups, loose
+  reports, and notes uncommitted;
+- changed 49 `.rpy` files with a balanced source cleanup:
+  480 insertions and 480 deletions;
+- focused source scan after the commit returned no active `.rpy` hits for:
+  `Arousal`, `Friends`, `TalkedToday`, `Talked`, `sluttiness`, or `IrmaVar`;
+- `git diff --check` on the staged `.rpy` batch passed with only Git
+  line-ending warnings.
+
+Source cleanup continued after `cfd8bdd`:
+
+- `game/Utilities/Time/NextDay_NewDayEvents.rpy` no longer creates or reads
+  `IngaVar` for the Lucas daily event gate;
+- that gate now calls `Inga.ensure_story_defaults()` and checks
+  `Inga.var_int("Knowher", 0)`;
+- this is a direct correction to an older report claim: the previous report
+  said `IngaVar` was gone, but live source still had it in the new-day event
+  file.
+- the remaining active `IngaVar` references in `DailySetstatdefault.rpy` and
+  `CharacterActionHub.rpy` were converted to `Inga.var_int("Knowher", 0)`;
+- Draupnir story state is now owned by `Draupnir.var`: `InitDraupnir.rpy`
+  defines class defaults and `var_int` / `set_var_int`, while
+  `TavernMain.rpy`, `StolyarWorkshop.rpy`, `DogCompanion.rpy`,
+  `IntZimmerTalk.rpy`, `MarketPlace.rpy`, `stat.rpy`,
+  `ClaraBookletMarketThread.rpy`, and `StoryEventRuntime.rpy` now read/write
+  Draupnir through the class owner;
+- focused source scan now returns no active `.rpy` hits for `IngaVar` or
+  `DraupnirVar`.
+- `devdocs/engine/amanda_thread_blueprint.rpy` now builds Amanda thread
+  blueprint rows as actual `Event` objects instead of tuple rows, and its
+  readiness checks read `Amanda.var`, `Amanda.corruption`, and
+  `Amanda.pregnancy_days()` directly without `globals()`, `renpy.store`,
+  old relationship maps, or old Amanda dictionaries.
+- validation after this update:
+  `C:\Users\blank\renpy\renpy-8.5.2-sdk\renpy.exe . compile` passed, and
+  `git diff --check` passed with only Git line-ending warnings.
+
+Current live blockers found by source scan:
+
+- `game/Utilities/General/Common/Actions.rpy` still contains the old
+  refresh/ReturnToMainUI target map and imports `renpy.store`;
+- several room files still use `BuildActions` labels as action-menu builders.
+  They must be classified before removal because some are real room menu
+  owners, while refresh/rebuild-only paths are bloat;
+- `game/Town/HunterClub.rpy` still owns venue state through `HunterClubVar`;
+- `game/Utilities/Time/NextDay_NewDayEvents.rpy` still contains generic
+  `_nd_ensure_dict(...)` global-save compatibility for non-Inga day-event
+  data. This is not fixed by the Inga cleanup and must be handled subsystem by
+  subsystem.
+
 Update: 2026-06-28
 
 This document is now being updated from live code changes, not from planned
@@ -29,7 +85,7 @@ Recent source cleanup in progress:
 - `game/Inn/TavernKitchen.rpy` no longer imports Python `random`; kitchen
   picture and food-effect rolls use `procedural_choice` /
   `procedural_randint`;
-- this kitchen source cleanup is not committed yet.
+- this kitchen source cleanup is included in `cfd8bdd`.
 
 Becky vertical-slice cleanup started on 2026-06-28:
 
@@ -57,7 +113,7 @@ Becky vertical-slice cleanup started on 2026-06-28:
   `GiftedToday[`, `FuckedToday[`, `Drunk[`, `Drunk.get`, `GetGirlDrunk`,
   `import random`, `random.`, or `SlutFriendsIncrease`.
 - `renpy.exe . compile` passed after this slice.
-- This source cleanup is not committed yet.
+- This source cleanup is included in `cfd8bdd`.
 
 Becky/Grocery adjacent status:
 
