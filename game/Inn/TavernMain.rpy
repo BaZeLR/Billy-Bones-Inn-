@@ -305,8 +305,9 @@ label TavernMain:
             if time == 3:
                 call AddOthersSperm(GirlNameTS1, 7)
                 call AddOthersSperm(GirlNameTS2, 8)
-            $ _jobwhore = jobwhore if isinstance(jobwhore, dict) else {}
-            if _jobwhore.get("liza", 0) == 1 and _jobwhore.get("georgett", 0) == 1:
+            $ _liza_whore_work = int(Liza.job_value("jobwhore", 0) or 0)
+            $ _georgett_whore_work = int(Georgett.job_value("jobwhore", 0) or 0)
+            if _liza_whore_work == 1 and _georgett_whore_work == 1:
                 python:
                     randvarPS = procedural_randint(1, 5, key="procedural:Inn/TavernMain.rpy:procedural_randint:311:1")
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:
@@ -333,7 +334,7 @@ label TavernMain:
                     $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
                     $ peopleInfo[GirlNameTS2].location = "TavernMain"
                     $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
-            elif _jobwhore.get("liza", 0) == 1:
+            elif _liza_whore_work == 1:
                 python:
                     randvarPS = procedural_randint(1, 3, key="procedural:Inn/TavernMain.rpy:procedural_randint:338:2")
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
@@ -346,7 +347,7 @@ label TavernMain:
                     $ LizaAvail = 1
                     $ peopleInfo[GirlNameTS2].location = "TavernMain"
                     $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
-            elif _jobwhore.get("georgett", 0) == 1:
+            elif _georgett_whore_work == 1:
                 python:
                     randvarPS = procedural_randint(1, 3, key="procedural:Inn/TavernMain.rpy:procedural_randint:351:3")
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS1, time) > 0:

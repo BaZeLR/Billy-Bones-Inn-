@@ -137,8 +137,7 @@ label NextDay_TavernDaily():
         # Reset jobs
         jobwhore['georgett'] = 0
         jobgloryhole['georgett'] = 0
-        jobwhore['liza'] = 0
-        jobgloryhole['liza'] = 0
+        Liza.reset_tavern_work_day()
     call change_tomorrow_whore_job('georgett')
     call change_tomorrow_whore_job('liza')
     call change_tomorrow_hall_job('sandra')

@@ -6,7 +6,7 @@ label EventAmandaLizettTalk(eyewitness=0):
     $ NotToSpeak = 0
     $ Result = ""
 
-    if jobWhoreAvail.get("liza", 0):
+    if Liza.can_work_tavern():
         if Amanda.var_int("prohibitliza", 0) == 1:
             $ Result = "Проходя по трактиру вы вдруг услышали как Аманда говорит Лизетте:\n\"Ой, нельзя мне с тобой говорить, мастер Стефан запретил!\""
             if procedural_randint(1, max(2, 10 - Amanda.var_int("lizafriends", 0) * 3 // 2), key="procedural:NPC/Girls/Amanda/EventAmandaLizettTalk.rpy:procedural_randint:12:1") == 1:

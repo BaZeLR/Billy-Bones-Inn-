@@ -544,16 +544,21 @@ init python:
             tomorrow_jobs.append("уборка")
         if _tavern_int(_tavern_dict_value(jobwaitresstomorrow).get(person, 0), 0):
             tomorrow_jobs.append("зал")
-        if _tavern_int(_tavern_dict_value(jobwhoreTommorow).get(person, 0), 0):
+        if _girl_job_value(person, "jobwhoreTommorow"):
             tomorrow_jobs.append("интим")
-        if _tavern_int(_tavern_dict_value(jobgloryholeTommorow).get(person, 0), 0):
+        if _girl_job_value(person, "jobgloryholeTommorow"):
             tomorrow_jobs.append("глорихол")
         if not tomorrow_jobs:
             return "без назначения"
         return ", ".join(tomorrow_jobs)
 
     def _tavern_job_button_caption(job_dict, person, title):
-        assigned = _tavern_int(_tavern_dict_value(job_dict).get(person, 0), 0)
+        if job_dict is jobwhoreTommorow:
+            assigned = _girl_job_value(person, "jobwhoreTommorow")
+        elif job_dict is jobgloryholeTommorow:
+            assigned = _girl_job_value(person, "jobgloryholeTommorow")
+        else:
+            assigned = _tavern_int(_tavern_dict_value(job_dict).get(person, 0), 0)
         prefix = "(x) " if assigned else "( ) "
         return prefix + title
 
@@ -565,10 +570,7 @@ init python:
             _tavern_dict_value(jobcleaningtomorrow),
             _tavern_dict_value(jobwaitresstomorrow),
         )
-        special_tomorrow = (
-            _tavern_dict_value(jobwhoreTommorow),
-            _tavern_dict_value(jobgloryholeTommorow),
-        )
+        special_tomorrow_keys = ("jobwhoreTommorow", "jobgloryholeTommorow")
 
         def add(person):
             if person and person not in ordered:
@@ -577,6 +579,12 @@ init python:
         def in_any(person, mappings):
             for mapping in mappings:
                 if _tavern_int(mapping.get(person, 0), 0) != 0:
+                    return True
+            return False
+
+        def in_any_job(person, job_keys):
+            for job_key in job_keys:
+                if _girl_job_value(person, job_key):
                     return True
             return False
 
@@ -589,19 +597,23 @@ init python:
             if _girl_job_value(person, "jobkitchen") or _girl_job_value(person, "jobcleaning") or _girl_job_value(person, "jobwaitress") or in_any(person, hall_tomorrow):
                 add(person)
                 continue
-            if _tavern_int(jobs.get("jobWhoreAvail", 0), 0) != 0 or _tavern_int(jobs.get("jobGloryHoleAvail", 0), 0) != 0 or _girl_job_value(person, "jobwhore") or _girl_job_value(person, "jobgloryhole") or in_any(person, special_tomorrow):
+            if _tavern_int(jobs.get("jobWhoreAvail", 0), 0) != 0 or _tavern_int(jobs.get("jobGloryHoleAvail", 0), 0) != 0 or _girl_job_value(person, "jobwhore") or _girl_job_value(person, "jobgloryhole") or in_any_job(person, special_tomorrow_keys):
                 add(person)
 
-        for mapping in hall_tomorrow + special_tomorrow:
+        for mapping in hall_tomorrow:
             for person, value in mapping.items():
                 if _tavern_int(value, 0) != 0:
                     add(person)
 
+        for person in roster:
+            if in_any_job(person, special_tomorrow_keys):
+                add(person)
+
         return ordered
 
     def _tavern_can_assign_gloryhole(person):
-        avail = _tavern_int(_tavern_dict_value(jobGloryHoleAvail).get(person, 0), 0)
-        tomorrow = _tavern_int(_tavern_dict_value(jobgloryholeTommorow).get(person, 0), 0)
+        avail = _girl_job_value(person, "jobGloryHoleAvail")
+        tomorrow = _girl_job_value(person, "jobgloryholeTommorow")
         busy = 0
         try:
             busy = 1 if glory_hole_busy(person) else 0
@@ -610,8 +622,8 @@ init python:
         return bool(avail and tomorrow == 0 and busy == 0)
 
     def _tavern_can_assign_whore(person):
-        avail = _tavern_int(_tavern_dict_value(jobWhoreAvail).get(person, 0), 0)
-        tomorrow = _tavern_int(_tavern_dict_value(jobwhoreTommorow).get(person, 0), 0)
+        avail = _girl_job_value(person, "jobWhoreAvail")
+        tomorrow = _girl_job_value(person, "jobwhoreTommorow")
         return bool(avail and tomorrow == 0)
 
     def toggle_job_assignment(job_dict, person):
@@ -657,6 +669,16 @@ init python:
 
     def assign_special_job(person, target):
         """Переназначает сотрудника на особую работу (глорихол или шлюха)."""
+        info = _tavern_person_info(person)
+        if info is not None and hasattr(info, "set_job_value"):
+            if target == "gloryhole":
+                info.set_job_value("jobgloryholeTommorow", 1)
+                info.set_job_value("jobwhoreTommorow", 0)
+            elif target == "whore":
+                info.set_job_value("jobgloryholeTommorow", 0)
+                info.set_job_value("jobwhoreTommorow", 1)
+            _tavern_restart_interaction()
+            return
         if target == "gloryhole":
             jobgloryholeTommorow[person] = 1
             jobwhoreTommorow[person] = 0

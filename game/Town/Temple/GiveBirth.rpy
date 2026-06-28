@@ -7,7 +7,6 @@ label GiveBirth(GirlName=""):
 
     python:
         import re
-        import random
 
         def _strcomp(value, pattern):
             try:
@@ -29,7 +28,7 @@ label GiveBirth(GirlName=""):
                 names = ["Питер", "Жан", "Карло", "Андреас"]
             else:
                 names = ["Анна", "Мария", "Кармела", "Лорен"]
-            return random.choice(names)
+            return names[procedural_randint(0, len(names) - 1, key="procedural:Town/Temple/GiveBirth.rpy:_random_name:%s" % str(gender or ""))]
 
         def _get_sex_num(*args):
             try:
@@ -82,7 +81,7 @@ label GiveBirth(GirlName=""):
 
                 if GirlName == "georgett":
                     '"А я и не волнуюсь," ответила вам опытная проститутка. "Не первый раз залетаю от клиентов, не первый раз от них рожаю. Вон старшенькая моя Лизка какая уже вымахала! Какая красотулечка-мулаточка!"'
-                    if sluttiness.get("liza", 0) < 55:
+                    if Liza.corruption < 55:
                         '"Ой, Жоржетта, ты чего?" засмущалась красотулечка.'
                         '"А ведь не накончай мне тогда те трое негров полную пизденку, не было бы тебя! А я ведь даже имен их не спросила!"'
                         "Лизетта от такого рассказа о своем батяне густо покраснела."

@@ -2,73 +2,25 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
-    $ SomebodyCums = 0
-    python:
-        if GirlNameILSS not in topdress:
-            topdress[GirlNameILSS] = ""
-        if GirlNameILSS not in bottomdress:
-            bottomdress[GirlNameILSS] = ""
-        if GirlNameILSS not in panties:
-            panties[GirlNameILSS] = ""
-        if GirlNameILSS not in topraised:
-            topraised[GirlNameILSS] = 0
-        if GirlNameILSS not in bottomraised:
-            bottomraised[GirlNameILSS] = 0
-        if GirlNameILSS not in TitsVisible:
-            TitsVisible[GirlNameILSS] = 0
-        if GirlNameILSS not in PussyVisible:
-            PussyVisible[GirlNameILSS] = 0
-        if GirlNameILSS not in CockInMouth:
-            CockInMouth[GirlNameILSS] = 0
-        if GirlNameILSS not in CockInPussy:
-            CockInPussy[GirlNameILSS] = 0
-        if GirlNameILSS not in CockInTits:
-            CockInTits[GirlNameILSS] = 0
-        if GirlNameILSS not in CumFaceYou:
-            CumFaceYou[GirlNameILSS] = 0
-        if GirlNameILSS not in CumFaceOthers:
-            CumFaceOthers[GirlNameILSS] = 0
-        if GirlNameILSS not in CumTitsYou:
-            CumTitsYou[GirlNameILSS] = 0
-        if GirlNameILSS not in CumTitsOthers:
-            CumTitsOthers[GirlNameILSS] = 0
-        if GirlNameILSS not in CumInsideYou:
-            CumInsideYou[GirlNameILSS] = 0
-        if GirlNameILSS not in CumInsideOthers:
-            CumInsideOthers[GirlNameILSS] = 0
-        if "You" not in Arousal:
-            Arousal["You"] = 0
-        if GirlNameILSS not in Arousal:
-            Arousal[GirlNameILSS] = 0
-        if GirlNameILSS not in LickPussy:
-            LickPussy[GirlNameILSS] = 0
-        if GirlNameILSS not in Friends:
-            Friends[GirlNameILSS] = 0
-        if GirlNameILSS not in sluttiness:
-            sluttiness[GirlNameILSS] = 0
-        if GirlNameILSS not in pregnancy:
-            pregnancy[GirlNameILSS] = 0
-    call CockPosition(GirlNameILSS, 0, "You")
-    call CheckVisibility(GirlNameILSS)
+    $ GirlNameILSS = "liza"
+    $ Liza.sex_setup(GirlLocILSS)
+    call ShowLizaPortrait
 
     label int_liza_sex_menu:
         python:
-            if isinstance(cametoday, (int, float)):
-                _cametoday = int(cametoday)
-            elif isinstance(cametoday, dict):
-                _cametoday = int(cametoday.get("You", cametoday.get("you", 0)) or 0)
-            else:
-                _cametoday = 0
-
-            if isinstance(cancumdaily, (int, float)):
-                _cancumdaily = int(cancumdaily)
-            elif isinstance(cancumdaily, dict):
-                _cancumdaily = int(cancumdaily.get("You", cancumdaily.get("you", 1)) or 1)
-            else:
-                _cancumdaily = 1
-            _player_ready_to_cum = int(Arousal.get("You", Arousal.get("you", 0)) or 0) >= 100
-            _can_player_cum = _cametoday < _cancumdaily or _player_ready_to_cum
-
+            _liza_name = Liza.data.fullname
+            _liza_name2 = Liza.data.genitive
+            _liza_busy = Liza.sex_busy()
+            _liza_top = Liza.clothing_layer("top")
+            _liza_bottom = Liza.clothing_layer("bottom")
+            _liza_panties = Liza.clothing_layer("panties")
+            _liza_top_raised = Liza.layer_raised("top")
+            _liza_bottom_raised = Liza.layer_raised("bottom")
+            _liza_tits_visible = Liza.tits_visible()
+            _liza_pussy_visible = Liza.pussy_visible()
+            _liza_arousal = Liza.arousal_value()
+            _you_arousal = Liza.player_arousal()
+            _can_player_cum = Liza.can_player_cum()
             _sex_ctx = "sextraktir" if GirlLocILSS == "tavern" else "sexstreet"
 
         menu:
@@ -77,120 +29,103 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                     call GirlsDesc(GirlNameILSS)
                 jump int_liza_sex_menu
 
-            "Снять блузку" if topdress.get(GirlNameILSS, "") != "" and SomebodyCums == 0:
-                "Вы сняли с [RealName2.get(GirlNameILSS, GirlNameILSS)] блузку, обнажив ее до пояса."
-                $ topdress[GirlNameILSS] = ""
-                call CheckVisibility(GirlNameILSS)
-                call CockPosition(GirlNameILSS, 0)
+            "Снять блузку" if _liza_top != "" and not _liza_busy:
+                "Вы сняли с [_liza_name2] блузку, обнажив ее до пояса."
+                $ Liza.remove_top_for_sex()
                 call ShowLizaPortrait
                 jump int_liza_sex_menu
 
-            "Растегнуть блузку" if topdress.get(GirlNameILSS, "") != "" and topraised.get(GirlNameILSS, 0) == 0 and SomebodyCums == 0:
-                "Вы расстегнули блузку [RealName2.get(GirlNameILSS, GirlNameILSS)], выпустив на волю ее маленькие крепкие мячики."
-                $ topraised[GirlNameILSS] = 1
-                call CheckVisibility(GirlNameILSS)
-                call CockPosition(GirlNameILSS, 0)
+            "Растегнуть блузку" if _liza_top != "" and not _liza_top_raised and not _liza_busy:
+                "Вы расстегнули блузку [_liza_name2], выпустив на волю ее маленькие крепкие мячики."
+                $ Liza.raise_top_for_sex()
                 call ShowLizaPortrait
                 jump int_liza_sex_menu
 
-            "Задрать юбочку" if bottomdress.get(GirlNameILSS, "") != "" and bottomraised.get(GirlNameILSS, 0) == 0 and SomebodyCums == 0:
-                if panties.get(GirlNameILSS, "") != "":
+            "Задрать юбочку" if _liza_bottom != "" and not _liza_bottom_raised and not _liza_busy:
+                if _liza_panties != "":
                     "Вы задрали красотке юбочку до пояса, обнаружив под ней маленькие кружевные панталончики."
                 else:
-                    "Вы прошептали свое нескромное пожелание. [RealName.get(GirlNameILSS, GirlNameILSS)] покраснела, но задрала подол платьичка."
-                $ bottomraised[GirlNameILSS] = 1
-                call CheckVisibility(GirlNameILSS)
-                call CockPosition(GirlNameILSS, 0)
+                    "Вы прошептали свое нескромное пожелание. [_liza_name] покраснела, но задрала подол платьичка."
+                $ Liza.raise_bottom_for_sex()
                 call ShowLizaPortrait
                 jump int_liza_sex_menu
 
-            "Снять панталончики" if panties.get(GirlNameILSS, "") != "" and SomebodyCums == 0:
-                if bottomraised.get(GirlNameILSS, 0) == 0 and bottomdress.get(GirlNameILSS, "") != "":
+            "Снять панталончики" if _liza_panties != "" and not _liza_busy:
+                if not _liza_bottom_raised and _liza_bottom != "":
                     "Вы засунули руки под подол платья и стащили с нее панталончики до щиколоток."
                 else:
                     "Вы аккуратно стянули с нее панталончики, открывая киску нескромным взорам."
-                $ panties[GirlNameILSS] = ""
-                call CheckVisibility(GirlNameILSS)
-                call CockPosition(GirlNameILSS, 0)
+                $ Liza.remove_panties_for_sex()
                 call ShowLizaPortrait
                 jump int_liza_sex_menu
 
-            "Вытереть сперму с лица" if (CumFaceYou.get(GirlNameILSS, 0) or CumFaceOthers.get(GirlNameILSS, 0)) and SomebodyCums == 0:
-                "Вы предложили шлюшке убрать с лица результаты ее предыдущих похождений. [RealName.get(GirlNameILSS, GirlNameILSS)] покраснела, достала платочек и вытерла лицо и волосы от спермы."
-                $ CumFaceYou[GirlNameILSS] = 0
-                $ CumFaceOthers[GirlNameILSS] = 0
-                call CheckVisibility(GirlNameILSS)
-                call CockPosition(GirlNameILSS, 0)
+            "Вытереть сперму с лица" if (Liza.cum_state("cum_face_you") or Liza.cum_state("cum_face_others") or Liza.cum_state("cum_mouth_you") or Liza.cum_state("cum_mouth_others")) and not _liza_busy:
+                "Вы предложили шлюшке убрать с лица результаты ее предыдущих похождений. [_liza_name] покраснела, достала платочек и вытерла лицо и волосы от спермы."
+                $ Liza.clear_visible_cum("cum_face_you", "cum_face_others", "cum_mouth_you", "cum_mouth_others")
                 call ShowLizaPortrait
                 jump int_liza_sex_menu
 
-            "Вытереть сперму с грудей" if (CumTitsYou.get(GirlNameILSS, 0) or CumTitsOthers.get(GirlNameILSS, 0)) and TitsVisible.get(GirlNameILSS, 0) and SomebodyCums == 0:
-                "Вы предложили шлюшке убрать с сисечек результаты ее предыдущих похождений. [RealName.get(GirlNameILSS, GirlNameILSS)] достала платочек и, кокетливо улыбаясь, вытерла свои маленькие грудки от спермы."
-                $ CumTitsYou[GirlNameILSS] = 0
-                $ CumTitsOthers[GirlNameILSS] = 0
-                call CheckVisibility(GirlNameILSS)
-                call CockPosition(GirlNameILSS, 0)
+            "Вытереть сперму с грудей" if (Liza.cum_state("cum_tits_you") or Liza.cum_state("cum_tits_others")) and _liza_tits_visible and not _liza_busy:
+                "Вы предложили шлюшке убрать с сисечек результаты ее предыдущих похождений. [_liza_name] достала платочек и, кокетливо улыбаясь, вытерла свои маленькие грудки от спермы."
+                $ Liza.clear_visible_cum("cum_tits_you", "cum_tits_others")
                 call ShowLizaPortrait
                 jump int_liza_sex_menu
 
-            "Вытереть сперму с бедер" if (CumInsideYou.get(GirlNameILSS, 0) or CumInsideOthers.get(GirlNameILSS, 0)) and PussyVisible.get(GirlNameILSS, 0) and SomebodyCums == 0:
-                "Вы предложили девчушке убрать с влагалища и бедер результаты ее предыдущих похождений. [RealName.get(GirlNameILSS, GirlNameILSS)] достала платочек и, виновато посматривая на вас, вытерла бедра и лобок от спермы. Скорее всего сперма во влагалище еще осталась, но вы ее теперь вряд ли почувствуете."
-                $ CumInsideYou[GirlNameILSS] = 0
-                $ CumInsideOthers[GirlNameILSS] = 0
-                call CheckVisibility(GirlNameILSS)
-                call CockPosition(GirlNameILSS, 0)
+            "Вытереть сперму с бедер" if (Liza.cum_state("cum_inside_you") or Liza.cum_state("cum_inside_others")) and _liza_pussy_visible and not _liza_busy:
+                "Вы предложили девчушке убрать с влагалища и бедер результаты ее предыдущих похождений. [_liza_name] достала платочек и, виновато посматривая на вас, вытерла бедра и лобок от спермы. Скорее всего сперма во влагалище еще осталась, но вы ее теперь вряд ли почувствуете."
+                $ Liza.clear_visible_cum("cum_inside_you", "cum_inside_others")
                 call ShowLizaPortrait
                 jump int_liza_sex_menu
 
-            "Целовать" if SomebodyCums == 0:
-                "[RealName.get(GirlNameILSS, GirlNameILSS)] со всей страстью молодости целует вас в засос, переплетаясь языками."
-                if CumFaceYou.get(GirlNameILSS, 0) > 0:
+            "Целовать" if not _liza_busy:
+                "[_liza_name] со всей страстью молодости целует вас в засос, переплетаясь языками."
+                if Liza.cum_state("cum_face_you") > 0 or Liza.cum_state("cum_mouth_you") > 0:
                     "На язык вам попадают капли вашего семени, которым вы обкончали ее раньше."
-                elif CumFaceOthers.get(GirlNameILSS, 0) > 0:
+                elif Liza.cum_state("cum_face_others") > 0 or Liza.cum_state("cum_mouth_others") > 0:
                     "Вы чувствуете солоноватый привкус чужой спермы. Шустрая девчонка уже успела у кого-то отсосать до вас!"
-                if Arousal.get(GirlNameILSS, 0) < 50:
-                    $ Arousal[GirlNameILSS] = Arousal.get(GirlNameILSS, 0) + 8
-                if Arousal.get("You", 0) < 50:
-                    $ Arousal["You"] = Arousal.get("You", 0) + 8
-                call CockPosition(GirlNameILSS, 0)
+                if Liza.arousal_value() < 50:
+                    $ Liza.add_arousal(8)
+                if Liza.player_arousal() < 50:
+                    $ Liza.add_player_arousal(8)
+                $ Liza.set_cock_position("none")
                 call ShowCurrentSex(GirlNameILSS)
                 jump int_liza_sex_menu
 
-            "Лапать" if SomebodyCums == 0:
-                if TitsVisible.get(GirlNameILSS, 0) == 0:
+            "Лапать" if not _liza_busy:
+                if not _liza_tits_visible:
                     "Вы начали гладить маленькие сисечки через тонкую ткань блузки."
                     if renpy.has_label("ShowImage"):
-                        call ShowImage(GirlNameILSS, "sexstreet", "grope")
+                        call ShowImage(GirlNameILSS, _sex_ctx, "grope")
                 else:
                     "Вы припали ртом к обнаженным мячикам, лаская чувствительные соски."
                     if renpy.has_label("ShowImage"):
-                        call ShowImage(GirlNameILSS, "sexstreet", "gropetits")
+                        call ShowImage(GirlNameILSS, _sex_ctx, "gropetits")
 
-                if PussyVisible.get(GirlNameILSS, 0) == 1:
+                if _liza_pussy_visible:
                     "Вы медленно опустили руку вниз и начали нежно массировать ее вульву."
                     if renpy.has_label("ShowImage"):
-                        call ShowImage(GirlNameILSS, "sexstreet", "gropepussy")
+                        call ShowImage(GirlNameILSS, _sex_ctx, "gropepussy")
                 else:
                     "Вы ласкаете ее киску через одежду."
 
-                if Arousal.get(GirlNameILSS, 0) < 60:
-                    $ Arousal[GirlNameILSS] = Arousal.get(GirlNameILSS, 0) + 12
-                call CockPosition(GirlNameILSS, 0)
+                if Liza.arousal_value() < 60:
+                    $ Liza.add_arousal(12)
+                $ Liza.set_cock_position("none")
                 call ShowCurrentSex(GirlNameILSS)
                 jump int_liza_sex_menu
 
-            "Лизать киску" if PussyVisible.get(GirlNameILSS, 0) and SomebodyCums == 0:
-                "[RealName.get(GirlNameILSS, GirlNameILSS)] радостно предоставила вам свое похотливое влагалище. Вы начали старательно ласкать развратницу языком. [RealName.get(GirlNameILSS, GirlNameILSS)] прижимает вашу голову к себе обеими руками и сладко попискивает при каждом движении вашего языка."
-                if CumInsideYou.get(GirlNameILSS, 0) > 0:
-                    "Вы ощущаете привкус собственной спермы, медленно вытекающей из влагалища [RealName2.get(GirlNameILSS, GirlNameILSS)]."
-                elif CumInsideOthers.get(GirlNameILSS, 0) > 0:
-                    "Вы ощущаете привкус чьей-то спермы, медленно вытекающей из влагалища [RealName2.get(GirlNameILSS, GirlNameILSS)], кто-то уже успел оттрахать эту девочку до вас."
-                $ LickPussy[GirlNameILSS] = LickPussy.get(GirlNameILSS, 0) + 1
-                if LickPussy.get(GirlNameILSS, 0) == 7:
-                    "\"Ой, дяденька, какой ты хороший!\"  говорит [RealName.get(GirlNameILSS, GirlNameILSS)]. \"Многие дяденьки сразу начинают меня сношать, а ведь я так люблю когда мне там внизу лижут!\""
-                    $ Friends[GirlNameILSS] = Friends.get(GirlNameILSS, 0) + 1
-                $ Arousal[GirlNameILSS] = Arousal.get(GirlNameILSS, 0) + 26
-                call CockPosition(GirlNameILSS, 0)
+            "Лизать киску" if _liza_pussy_visible and not _liza_busy:
+                "[_liza_name] радостно предоставила вам свое похотливое влагалище. Вы начали старательно ласкать развратницу языком. [_liza_name] прижимает вашу голову к себе обеими руками и сладко попискивает при каждом движении вашего языка."
+                if Liza.cum_state("cum_inside_you") > 0:
+                    "Вы ощущаете привкус собственной спермы, медленно вытекающей из влагалища [_liza_name2]."
+                elif Liza.cum_state("cum_inside_others") > 0:
+                    "Вы ощущаете привкус чьей-то спермы, медленно вытекающей из влагалища [_liza_name2], кто-то уже успел оттрахать эту девочку до вас."
+                $ _liza_licks = Liza.record_lick_pussy()
+                if _liza_licks == 7:
+                    "\"Ой, дяденька, какой ты хороший!\"  говорит [_liza_name]. \"Многие дяденьки сразу начинают меня сношать, а ведь я так люблю когда мне там внизу лижут!\""
+                    $ Liza.change_social(friend_delta=1)
+                $ Liza.add_arousal(26)
+                $ Liza.set_cock_position("none")
                 call ShowCurrentSex(GirlNameILSS)
                 if renpy.has_label("ShowImage"):
                     if GirlLocILSS == "tavern":
@@ -199,28 +134,26 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         call ShowImage(GirlNameILSS, "sexstreet", "lick" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:199:1")))
                 jump int_liza_sex_menu
 
-            "Предложить отсосать" if _can_player_cum and SomebodyCums == 0:
-                if CockInMouth.get(GirlNameILSS, 0):
-                    "[RealName.get(GirlNameILSS, GirlNameILSS)] сидит перед вами на коленках и продолжает "
+            "Предложить отсосать" if _can_player_cum and not _liza_busy:
+                if Liza.cock_in("mouth"):
+                    "[_liza_name] сидит перед вами на коленках и продолжает "
                 else:
-                    "[RealName.get(GirlNameILSS, GirlNameILSS)] опустилась перед вами на коленки и стала "
-                if Arousal.get("You", 0) < 20:
+                    "[_liza_name] опустилась перед вами на коленки и стала "
+                if Liza.player_arousal() < 20:
                     "облизывать ваш вялый член."
-                elif Arousal.get("You", 0) < 40:
+                elif Liza.player_arousal() < 40:
                     "облизывать головку вашего напрягшегося члена."
-                elif sluttiness.get(GirlNameILSS, 0) < 40:
+                elif Liza.corruption < 40:
                     "неумело, но с энтузиазмом сосать ваш член."
-                elif Arousal.get("You", 0) < 60:
+                elif Liza.player_arousal() < 60:
                     "умело сосать ваш член."
                 else:
                     "заглатывать ваш член по самые яйца."
-                if sluttiness.get(GirlNameILSS, 0) < 40:
-                    $ Arousal["You"] = Arousal.get("You", 0) + 14
+                if Liza.corruption < 40:
+                    $ Liza.add_player_arousal(14)
                 else:
-                    $ Arousal["You"] = Arousal.get("You", 0) + 20
-                $ CockInMouth[GirlNameILSS] = 1
-                $ CockInPussy[GirlNameILSS] = 0
-                $ CockInTits[GirlNameILSS] = 0
+                    $ Liza.add_player_arousal(20)
+                $ Liza.set_cock_position("mouth")
                 call ShowCurrentSex(GirlNameILSS)
                 if renpy.has_label("ShowImage"):
                     if GirlLocILSS == "tavern":
@@ -229,9 +162,9 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         call ShowImage(GirlNameILSS, "sexstreet", "minet" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:229:3")))
                 jump int_liza_sex_menu
 
-            "Трахать" if _can_player_cum and SomebodyCums == 0 and Arousal.get("You", 0) >= 20 and Arousal.get(GirlNameILSS, 0) >= 20 and PussyVisible.get(GirlNameILSS, 0):
-                if pregnancy.get(GirlNameILSS, 0) < 130:
-                    if CockInPussy.get(GirlNameILSS, 0) == 0:
+            "Трахать" if _can_player_cum and not _liza_busy and _you_arousal >= 20 and _liza_arousal >= 20 and _liza_pussy_visible:
+                if Liza.pregnancy_days() < 130:
+                    if not Liza.cock_in("pussy"):
                         "Вы впились в губы девушки и насадили ее на вздыбленный член."
                         if renpy.has_label("ShowImage"):
                             if GirlLocILSS == "tavern":
@@ -246,7 +179,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                             else:
                                 call ShowImage(GirlNameILSS, "sexstreet", "fuck" + str(procedural_randint(1, 4, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:247:7")))
                 else:
-                    if CockInPussy.get(GirlNameILSS, 0) == 0:
+                    if not Liza.cock_in("pussy"):
                         "Из-за выросшего животика она встает раком, а вы начинаете сношать ее сзади."
                         if renpy.has_label("ShowImage"):
                             if GirlLocILSS == "tavern":
@@ -261,22 +194,18 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                             else:
                                 call ShowImage(GirlNameILSS, "sexstreet", "rakom" + str(procedural_randint(1, 6, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:262:11")))
 
-                $ Arousal["You"] = Arousal.get("You", 0) + 20
-                $ Arousal[GirlNameILSS] = Arousal.get(GirlNameILSS, 0) + 26
-                $ CockInPussy[GirlNameILSS] = 1
-                $ CockInMouth[GirlNameILSS] = 0
-                $ CockInTits[GirlNameILSS] = 0
+                $ Liza.add_player_arousal(20)
+                $ Liza.add_arousal(26)
+                $ Liza.set_cock_position("pussy")
                 call ShowCurrentSex(GirlNameILSS)
                 jump int_liza_sex_menu
 
-            "Кончить в ротик" if _can_player_cum and Arousal.get("You", 0) >= 100 and (CockInMouth.get(GirlNameILSS, 0) or CockInTits.get(GirlNameILSS, 0)):
+            "Кончить в ротик" if _can_player_cum and _you_arousal >= 100 and (Liza.cock_in("mouth") or Liza.cock_in("tits")):
                 "Вы прижали голову мулатки к себе и разрядились ей в рот, залив горло и подбородок семенем."
-                $ Arousal["You"] = 0
-                if renpy.has_label("PregnancyCheck"):
-                    call PregnancyCheck(GirlNameILSS, "mouthface", 1, "Вы")
-                call CockPosition(GirlNameILSS, 0)
-                $ CumFaceYou[GirlNameILSS] = 1
-                $ SomebodyCums = 1
+                $ Liza.set_player_arousal(0)
+                call PregnancyCheck(GirlNameILSS, "mouthface", 1, "Вы")
+                $ Liza.set_cock_position("none")
+                $ Liza.set_sex_busy(True)
                 if renpy.has_label("ShowImage"):
                     if GirlLocILSS == "tavern":
                         call ShowImage(GirlNameILSS, "sextraktir", "cummouth")
@@ -284,43 +213,37 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         call ShowImage(GirlNameILSS, "sexstreet", "cummouth")
                 jump int_liza_sex_menu
 
-            "Кончить на лицо" if _can_player_cum and Arousal.get("You", 0) >= 100:
+            "Кончить на лицо" if _can_player_cum and _you_arousal >= 100:
                 "Вы вытащили член и несколькими струями залили лицо девушки."
-                $ Arousal["You"] = 0
-                if renpy.has_label("PregnancyCheck"):
-                    call PregnancyCheck(GirlNameILSS, "face", 1, "Вы")
-                call CockPosition(GirlNameILSS, 0)
-                $ CumFaceYou[GirlNameILSS] = 1
-                $ SomebodyCums = 1
+                $ Liza.set_player_arousal(0)
+                call PregnancyCheck(GirlNameILSS, "face", 1, "Вы")
+                $ Liza.set_cock_position("none")
+                $ Liza.set_sex_busy(True)
                 if renpy.has_label("ShowImage"):
-                    call ShowImage(GirlNameILSS, "sexstreet", "cumface")
+                    call ShowImage(GirlNameILSS, _sex_ctx, "cumface")
                 jump int_liza_sex_menu
 
-            "Кончить на груди" if _can_player_cum and Arousal.get("You", 0) >= 100 and TitsVisible.get(GirlNameILSS, 0):
+            "Кончить на груди" if _can_player_cum and _you_arousal >= 100 and _liza_tits_visible:
                 "Вы вытащили член и залили спермой ее маленькие грудки."
-                $ Arousal["You"] = 0
-                if renpy.has_label("PregnancyCheck"):
-                    call PregnancyCheck(GirlNameILSS, "tits", 1, "Вы")
-                call CockPosition(GirlNameILSS, 0)
-                $ CumTitsYou[GirlNameILSS] = 1
-                $ SomebodyCums = 1
+                $ Liza.set_player_arousal(0)
+                call PregnancyCheck(GirlNameILSS, "tits", 1, "Вы")
+                $ Liza.set_cock_position("none")
+                $ Liza.set_sex_busy(True)
                 if renpy.has_label("ShowImage"):
-                    call ShowImage(GirlNameILSS, "sexstreet", "cumtits")
+                    call ShowImage(GirlNameILSS, _sex_ctx, "cumtits")
                 jump int_liza_sex_menu
 
-            "Кончить внутрь" if _can_player_cum and Arousal.get("You", 0) >= 100 and CockInPussy.get(GirlNameILSS, 0):
-                if sluttiness.get(GirlNameILSS, 0) < 50 and pregnancy.get(GirlNameILSS, 0) < 120:
+            "Кончить внутрь" if _can_player_cum and _you_arousal >= 100 and Liza.cock_in("pussy"):
+                if Liza.corruption < 50 and Liza.pregnancy_days() < 120:
                     "Вы проигнорировали просьбу и начали заливать ее киску семенем."
                     "\"Дяденька Стефан, и вы тоже меня не послушали!\" — обреченно проговорила девушка."
                 else:
                     "Вы, насадив худенькую смуглянку на член, начали заливать ее киску горячим семенем."
-                $ Arousal["You"] = 0
-                $ Arousal[GirlNameILSS] = Arousal.get(GirlNameILSS, 0) + 3
-                if renpy.has_label("PregnancyCheck"):
-                    call PregnancyCheck(GirlNameILSS, "inside", 1, "Вы")
-                call CockPosition(GirlNameILSS, 0)
-                $ CumInsideYou[GirlNameILSS] = 1
-                $ SomebodyCums = 1
+                $ Liza.set_player_arousal(0)
+                $ Liza.add_arousal(3)
+                call PregnancyCheck(GirlNameILSS, "inside", 1, "Вы")
+                $ Liza.set_cock_position("none")
+                $ Liza.set_sex_busy(True)
                 if renpy.has_label("ShowImage"):
                     if GirlLocILSS == "tavern":
                         call ShowImage(GirlNameILSS, "sextraktir", "cumpussy")
@@ -328,10 +251,11 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         call ShowImage(GirlNameILSS, "sexstreet", "cumpussy")
                 jump int_liza_sex_menu
 
-            "Продолжить" if SomebodyCums == 1:
-                $ SomebodyCums = 0
+            "Продолжить" if _liza_busy:
+                $ Liza.set_sex_busy(False)
                 jump int_liza_sex_menu
 
             "Закончить":
-                $ SomebodyCums = 0
+                $ Liza.set_sex_busy(False)
+                $ Liza.set_cock_position("none")
                 return

@@ -68,9 +68,9 @@ init -20 python:
 
     def tavern_work_liza_talk_ready():
         return (
-            tavern_work_int(jobWhoreAvail.get("liza", 0), 0) != 0
+            Liza.can_work_tavern()
             and (
-                tavern_work_int(jobgloryhole.get("liza", 0), 0) == 0
+                not Liza.can_use_gloryhole()
                 or tavern_work_int(time, 0) < 2
             )
         )

@@ -10,29 +10,57 @@ init python:
         if not girl_name:
             return
 
-        if jobwhoreTommorow.get(girl_name) == 1:
-            jobwhore[girl_name] = 1
-            jobgloryhole[girl_name] = 0
+        girl_key = str(girl_name or "").strip().lower()
+        girl_info = getPersonInfo(girl_key)
+        if girl_info is not None and hasattr(girl_info, "job_value") and hasattr(girl_info, "set_job_value"):
+            if people_to_int(girl_info.job_value("jobwhoreTommorow", 0), 0) == 1:
+                girl_info.set_job_value("jobwhore", 1)
+                girl_info.set_job_value("jobgloryhole", 0)
 
-        if jobgloryholeTommorow.get(girl_name) == 1:
-            jobwhore[girl_name] = 0
-            jobgloryhole[girl_name] = 1
+            if people_to_int(girl_info.job_value("jobgloryholeTommorow", 0), 0) == 1:
+                girl_info.set_job_value("jobwhore", 0)
+                girl_info.set_job_value("jobgloryhole", 1)
 
-        if jobwhore.get(girl_name, 0) and jobgloryhole.get(girl_name, 0):
-            jobwhore[girl_name] = 1
-            jobgloryhole[girl_name] = 0
+            if people_to_int(girl_info.job_value("jobwhore", 0), 0) and people_to_int(girl_info.job_value("jobgloryhole", 0), 0):
+                girl_info.set_job_value("jobwhore", 1)
+                girl_info.set_job_value("jobgloryhole", 0)
 
-        if jobwhore.get(girl_name, 0) == 0 and jobgloryhole.get(girl_name, 0) == 0:
-            jobwhore[girl_name] = 1
-            jobgloryhole[girl_name] = 0
+            if people_to_int(girl_info.job_value("jobwhore", 0), 0) == 0 and people_to_int(girl_info.job_value("jobgloryhole", 0), 0) == 0:
+                girl_info.set_job_value("jobwhore", 1)
+                girl_info.set_job_value("jobgloryhole", 0)
 
-        if jobWhoreAvail.get(girl_name, 0) == 0:
-            jobwhore[girl_name] = 0
-        if jobGloryHoleAvail.get(girl_name, 0) == 0:
-            jobgloryhole[girl_name] = 0
+            if people_to_int(girl_info.job_value("jobWhoreAvail", 0), 0) == 0:
+                girl_info.set_job_value("jobwhore", 0)
+            if people_to_int(girl_info.job_value("jobGloryHoleAvail", 0), 0) == 0:
+                girl_info.set_job_value("jobgloryhole", 0)
 
-        jobwhoreTommorow[girl_name] = jobwhore.get(girl_name, 0)
-        jobgloryholeTommorow[girl_name] = jobgloryhole.get(girl_name, 0)
+            girl_info.set_job_value("jobwhoreTommorow", girl_info.job_value("jobwhore", 0))
+            girl_info.set_job_value("jobgloryholeTommorow", girl_info.job_value("jobgloryhole", 0))
+            return
+
+        if jobwhoreTommorow.get(girl_key) == 1:
+            jobwhore[girl_key] = 1
+            jobgloryhole[girl_key] = 0
+
+        if jobgloryholeTommorow.get(girl_key) == 1:
+            jobwhore[girl_key] = 0
+            jobgloryhole[girl_key] = 1
+
+        if jobwhore.get(girl_key, 0) and jobgloryhole.get(girl_key, 0):
+            jobwhore[girl_key] = 1
+            jobgloryhole[girl_key] = 0
+
+        if jobwhore.get(girl_key, 0) == 0 and jobgloryhole.get(girl_key, 0) == 0:
+            jobwhore[girl_key] = 1
+            jobgloryhole[girl_key] = 0
+
+        if jobWhoreAvail.get(girl_key, 0) == 0:
+            jobwhore[girl_key] = 0
+        if jobGloryHoleAvail.get(girl_key, 0) == 0:
+            jobgloryhole[girl_key] = 0
+
+        jobwhoreTommorow[girl_key] = jobwhore.get(girl_key, 0)
+        jobgloryholeTommorow[girl_key] = jobgloryhole.get(girl_key, 0)
 
     def glory_hole_busy(girl_name):
         """Возвращает True, если место у глорихола уже занято."""
@@ -40,9 +68,9 @@ init python:
             return False
 
         if girl_name == 'liza':
-            return jobgloryholeTommorow.get('georgett') == 1
+            return _girl_job_value('georgett', 'jobgloryholeTommorow') == 1
         if girl_name == 'georgett':
-            return jobgloryholeTommorow.get('liza') == 1
+            return _girl_job_value('liza', 'jobgloryholeTommorow') == 1
         return False
 
     def change_tomorrow_hall_job(girl_name):

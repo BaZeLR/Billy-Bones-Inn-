@@ -5,16 +5,16 @@ label IntLizaDressChange(GirlNameILT="liza"):
     python:
         def OtherSawLizaCode(AgreedToRedress):
             global tavernfame
-            if AgreedToRedress != 1 or int(sluttiness.get(GirlNameILT, 0) or 0) < 50:
+            if AgreedToRedress != 1 or int(Liza.corruption or 0) < 50:
                 return ""
             RandVar = procedural_randint(1, 9, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:10:1")
             if RandVar == 1:
-                if sluttiness.get("sandra", 0) >= 35:
+                if int(Sandra.corruption or 0) >= 35:
                     text = "Обернувшись, вы вдруг встретились взглядом с Сандрой, наблюдающей за этой сценкой. Но она всего лишь усмехнулась, покачала головой и пошла по своим делам."
                 else:
                     text = 'Обернувшись, вы вдруг встретились взглядом с Сандрой, наблюдающей за этой сценкой. И увиденное ей явно не понравилось. Она подошла и сердито сказала: "Стефан, я понимаю что без этих шлюх мы можем концы с концами не свести, но хоть крупицу стыда иметь надо?"\nВы еле смогли успокоить Сандру и заболтать тему.'
             elif RandVar == 2:
-                if sluttiness.get("melissa", 0) >= 35:
+                if int(Melissa.corruption or 0) >= 35:
                     text = "Вы заметили, что за вами наблюдала Мелисса. Но увиденное ее совсем не шокировало, скорее позабавило."
                 else:
                     text = 'Вы заметили, что за вами наблюдала Мелисса. И этот стриптиз ее немного шокировал. Она подошла и выговорила вам: "Знаешь что, Стефан, держи своих шлюх так, чтобы по крайней мере девочкам не приходилось пялиться на их прелести. У тебя ведь и младшая есть, она еще мала на такое смотреть!"'
@@ -23,7 +23,7 @@ label IntLizaDressChange(GirlNameILT="liza"):
                     text = "Вы заметили, что за вами наблюдала Аманда. Стриптиз подруги ее позабавил, она даже от возбуждения слегка потерла у себя между ножек."
                 else:
                     text = 'Вы заметили, что за вами наблюдала Аманда. Причем наблюдала с открытым ртом, публичное раздевание для нее явно было в новинку и шокировало. "Пусть учится смотреть на вещи шире," подумали вы.'
-                    slut_friends_increase("amanda", 0, 0, 0, 21, 1, 1)
+                    Amanda.apply_social_chance(0, 0, 0, 21, 1, 1, "liza_dress_change_seen")
             elif RandVar == 4:
                 text = "Вы заметили, что за снимающей на людях панталоны дочкой с улыбкой наблюдала Жоржетта, одобрительно кивая."
             elif RandVar == 5:
@@ -35,15 +35,15 @@ label IntLizaDressChange(GirlNameILT="liza"):
             else:
                 text = ""
             if RandVar <= 2:
-                slut_friends_increase(GirlNameILT, 0, 0, 0, 60, 2, 1)
+                Liza.apply_social_chance(0, 0, 0, 60, 2, 1, "dress_change_seen")
             if RandVar >= 5 and RandVar <= 7:
-                slut_friends_increase(GirlNameILT, 0, 0, 0, 60, 1, 1)
+                Liza.apply_social_chance(0, 0, 0, 60, 1, 1, "dress_change_seen")
                 tavernfame += 1
             return text
 
-        _can_remove_panties = Friends.get(GirlNameILT, 0) > 8 and panties.get(GirlNameILT, "") != "" and Talked.get(GirlNameILT, 0) < 2
-        _can_shame = Friends.get(GirlNameILT, 0) > 8 and Talked.get(GirlNameILT, 0) < 2
-        _can_buy = Friends.get(GirlNameILT, 0) > 8 and CheckDailyEventExists("", "BuyDressTom", "") == 0 and CheckDailyEventExists(GirlNameILT, "BuyDress", "") == 0 and Talked.get(GirlNameILT, 0) < 2 and week != 6
+        _can_remove_panties = Liza.rel > 8 and Liza.current_underwear("panties", "") != "" and Liza.talk_count() < 2
+        _can_shame = Liza.rel > 8 and Liza.talk_count() < 2
+        _can_buy = Liza.rel > 8 and CheckDailyEventExists("", "BuyDressTom", "") == 0 and CheckDailyEventExists(GirlNameILT, "BuyDress", "") == 0 and Liza.talk_count() < 2 and week != 6
 
     if not (_can_remove_panties or _can_shame or _can_buy):
         return
@@ -53,13 +53,13 @@ label IntLizaDressChange(GirlNameILT="liza"):
             $ AgreedToRedress = 0
             "\"Лизетта, а чего ты в панталонах-то ходишь?\" - поинтересовались вы у вашей юной работницы. \"Мамка-то твоя без них ходит, бери с нее пример! Они тебе только в обузу, снимать, одевать по многу раз за день...\""
 
-            if DressPartSlut.get(bottomdress.get(GirlNameILT, ""), 0) < 4:
-                if sluttiness.get(GirlNameILT, 0) < 40:
+            if Liza.clothing_slut("bottom") < 4:
+                if Liza.corruption < 40:
                     "\"Спасибочки конечно за заботу, но руки у меня не отсохнут их снимать-надевать. Чай не слабосильная,\" отбрила вас Лизетта."
                 else:
                     "\"А и то верно, да и мамочка несколько раз мне уже говорила, что можно и без них, \" согласила с вами Лизетта. \"Ладно, попробую.\""
                     $ AgreedToRedress = 1
-                    if sluttiness.get(GirlNameILT, 0) < 50:
+                    if Liza.corruption < 50:
                         if procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:63:2") == 1:
                             "Лизетта зашла в комнатку, где они с мамой обычно обслуживали посетителей, и сноровисто стянула с себя панталончики."
                         else:
@@ -67,59 +67,59 @@ label IntLizaDressChange(GirlNameILT="liza"):
                     else:
                         "Решив, что лучшая демонстрация - лучшая реклама ее услуг, Лизетта в тот же момент стянула с себя панталоны не прячась и не пугаясь возможных зрителей."
             else:
-                if sluttiness.get(GirlNameILT, 0) < 50:
+                if Liza.corruption < 50:
                     "\"Стефанчик, да ты прикалываешься?\" недоверчиво сказала Лизетта, услышав ваше предложение. \"У меня же платьичко смотри, какое короткое. Если я без панталон буду, то я мою щелку всем и каждому покажу, это все равно как голой на улицу выйти. Это моя мамка может, а у меня духу на такое не хватит.\""
                 else:
                     "\"Ха, Стефан,\" засмеялась Лизетта. \"Ты хочешь чтобы я, в таком коротком платьичке, ничего под ним не носила? И всем свою щелочку светила?\"\n\"Именно!\" согласились вы. \"Так ты всем покажешь, чего ты предлагаешь, глядишь, и клиентов у тебя прибавится. Ну и ветерок тебе нижние губки-то пощекочет, мокренькой будешь,  значит приятнее тебе клиентов принимать будет. Сплошной выигрыш, не веришь мне - у мамы спроси!\"\n\"А чего ее справшивать, она мне давно тоже самое советовала,\" и Лизетта в тот же момент стянула с себя панталоны не прячась и не пугаясь возможных зрителей."
                     $ AgreedToRedress = 1
 
             if AgreedToRedress == 1:
-                $ pantiesdef[GirlNameILT] = ""
-                $ slut_friends_increase(GirlNameILT, 0, 0, 0, 60, 2, 1)
-                $ dress_change_sync_layers(GirlNameILT)
+                $ Liza.set_current_underwear("panties", "")
+                $ Liza.publish_wardrobe_state()
+                $ Liza.apply_social_chance(0, 0, 0, 60, 2, 1, "dress_change_panties")
 
             $ _other_saw = OtherSawLizaCode(AgreedToRedress)
             if str(_other_saw or "").strip() != "":
                 "[_other_saw]"
-            $ Talked[GirlNameILT] = Talked.get(GirlNameILT, 0) + 1
+            $ Liza.finish_talk()
             return
 
         "Постыдить Лизетту за то, что ходит без лифчика" if _can_shame:
             $ AgreedToRedress = 0
             "\"Лизетта, а не стыдно тебе без лифа ходить?\" - попробовали пристыдить вы юную шлюху. Однако это был дохлый номер: \"Не, не стыдно,\" спокойно ответила вам она. \"Нет у меня лифа, у мамы нету и она всегда меня учила, что от него сиськи плохо растут. А ей это бабуся рассказала. Так что не надо мне тут мораль читать.\""
-            $ Talked[GirlNameILT] = Talked.get(GirlNameILT, 0) + 1
+            $ Liza.finish_talk()
             return
 
         "Постыдить Лизетту за отстутсвие панталон" if _can_shame:
             $ AgreedToRedress = 0
             "\"Лизетта, а чего это ты без панталон ходишь? Я понимаю, что в твоем ремесле они скорее мешают, но стыд-то знать надо?\" - раскритиковали вы юную давалку."
-            if panties.get(GirlNameILT, "") != "" or (panties.get(GirlNameILT, "") == "" and sluttiness.get(GirlNameILT, 0) >= 45 and procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:96:3") == 1):
+            if Liza.current_underwear("panties", "") != "" or (Liza.current_underwear("panties", "") == "" and Liza.corruption >= 45 and procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:96:3") == 1):
                 "\"А может они у меня есть? Ты точно все проверил? Вот сними меня и посмотри, а пока верь мне на слово, что они у меня есть!\" отбрехалась от вас Лизетта."
             else:
                 "\"Ну нет и нет, что ты шум поднимаешь? Мне так удобнее работается, сам же говорил!\n\"Может и удобнее, только все-таки это приличное заведение, так что одень как ты их, подруга, обратно!\" отчитали вы бесстыдницу."
-                if sluttiness.get(GirlNameILT, 0) < 45:
+                if Liza.corruption < 45:
                     "\"Ну, ладно, ладно, не ругайся. Приличное значит приличное, сейчас одену.\""
                     $ AgreedToRedress = 1
-                elif sluttiness.get(GirlNameILT, 0) < 60 and procedural_randint(1, 4, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:103:4") <= 3:
+                elif Liza.corruption < 60 and procedural_randint(1, 4, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:103:4") <= 3:
                     "\"Ага, то сам говорил, посмотри на маму, посмотри на маму, так тебе удобнее мол будет, а теперь стыдит. Приличное у него видите ли заведение. Ладно, не плачь, ща пойду наверх одену.\""
                     $ AgreedToRedress = 1
-                    $ slut_friends_increase(GirlNameILT, 7, 1, -1, 0, 0, 0)
+                    $ Liza.apply_social_chance(7, 1, -1, 0, 0, 0, "dress_change_shame")
                 else:
                     "\"А ты вот мамашке моей эту байку расскажи! То-то она в коротюлечком платье без них шляется. Не, ей ты ни слова не сказал, только ко мне придираешься.\" отбрила вас Лизетта. \"А мне, между прочим, так клиентов больше набегает. Так что не учи меня, дяденька.\""
-                    $ slut_friends_increase(GirlNameILT, 7, 1, -1, 0, 0, 0)
+                    $ Liza.apply_social_chance(7, 1, -1, 0, 0, 0, "dress_change_shame")
 
             if AgreedToRedress == 1:
-                $ pantiesdef[GirlNameILT] = "simplepanties"
-                $ slut_friends_increase(GirlNameILT, 0, 0, 0, 30, 1, -1)
-                $ dress_change_sync_layers(GirlNameILT)
+                $ Liza.set_current_underwear("panties", "simplepanties")
+                $ Liza.publish_wardrobe_state()
+                $ Liza.apply_social_chance(0, 0, 0, 30, 1, -1, "dress_change_panties")
 
-            $ Talked[GirlNameILT] = Talked.get(GirlNameILT, 0) + 1
+            $ Liza.finish_talk()
             return
 
         "Предложить купить Лизетте обновку" if _can_buy:
             "\"Лизка, красотулька моя, а хочешь я тебе тряпку новую подарю?\" - порадовали вы юную давалку.\n\"Подаришь?\" обрадовалась та. \"Конечно хочу, Стефанчик, миленький!\" От избытка чувств она даже чмокнула вас в губы.\n\"Ну тогда завтра, с утра пораньше, беги к Ирме Фараго, я буду тебя там ждать, вместе и выберем!\" заверили вы шалаву."
             $ DailyEventsList_Add(GirlNameILT, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy")
-            $ Talked[GirlNameILT] = Talked.get(GirlNameILT, 0) + 1
+            $ Liza.finish_talk()
             return
 
         "Назад":

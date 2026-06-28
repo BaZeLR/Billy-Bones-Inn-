@@ -67,7 +67,7 @@ label IntLizaTalkMenu(girl_name_ilt="liza", girl_loc_ilt=""):
 
     $ current_action_items.append(MenuItem("Лапать", Call("IntLizaTalkGrope", GirlNameILT, GirlLocILT)))
 
-    if Liza.can_talk_today() and Liza.rel >= 8 and int(Liza.stats.get("pregnancy", 0) or 0) >= 120:
+    if Liza.can_talk_today() and Liza.rel >= 8 and Liza.pregnancy_days() >= 120:
         $ current_action_items.append(MenuItem("Поинтересоваться, знает ли она кто ей ребенка заделал", Call("IntLizaTalkAskDad", GirlNameILT, GirlLocILT)))
 
     if GirlLocILT == "tavern":
@@ -83,10 +83,10 @@ label IntLizaTalkSmalltalk(girl_name_ilt="liza", girl_loc_ilt=""):
 
     $ MainTxt = "Вы некоторое время болтаете с Лизеттой о разных вещах."
     python:
-        if Talked.get(GirlNameILT, 0) <= 2 and procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaTalk.rpy:procedural_randint:86:1") == 1:
+        if Liza.talk_count() <= 2 and procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaTalk.rpy:procedural_randint:86:1") == 1:
             girl_friends = Liza.rel
-            lick_pussy_count = LickPussy.get(GirlNameILT, 0)
-            give_orgasms_count = GiveOrgasms.get(GirlNameILT, 0)
+            lick_pussy_count = Liza.lick_pussy_count()
+            give_orgasms_count = Liza.sex_stat("orgasms_given", 0)
 
             if (
                 girl_friends < 3
@@ -102,7 +102,7 @@ label IntLizaTalkSmalltalk(girl_name_ilt="liza", girl_loc_ilt=""):
             elif girl_friends < 5:
                 MainTxt = str(MainTxt or "") + "\n\nИз уклончивых ответов девушки вы поняли, что она вам еще мало доверяет. Может, если бы вы узнали ее получше или доставили ей приятное, она бы с вами поделилась еще чем-то."
 
-        if Talked.get(GirlNameILT, 0) > 2:
+        if Liza.talk_count() > 2:
             MainTxt = str(MainTxt or "") + "\n\nНичего нового из разговора вы не узнали."
 
         Liza.finish_talk()
@@ -116,9 +116,9 @@ label IntLizaTalkAskClients(girl_name_ilt="liza", girl_loc_ilt=""):
         GirlNameILT, GirlLocILT = liza_talk_prepare_state(girl_name_ilt, girl_loc_ilt)
 
     $ MainTxt = "«За вечер меня хотят обычно три-четыре дяденьки. С некоторыми очень хорошо бывает, пока он закончит успеваешь сама спустить, а порой и несколько раз. А некоторые дяденьки так быстро заканчивают, что только начинаешь входить в охотку, а он уже все», - говорит Лизетта, автоматически поглаживая промежность сквозь юбку."
-    if Liza.corruption < 50 and int(Liza.stats.get("pregnancy", 0) or 0) < 120:
+    if Liza.corruption < 50 and Liza.pregnancy_days() < 120:
         $ MainTxt = str(MainTxt or "") + "\n\n«Только вот как не прошу я их чтобы внутрь не спускали, а они почти все либо делают вид что не слышат, либо отвечают, что платят деньги и спускают куда хотят. И в моей бедной киске теперь постоянно сперма хлюпает. А я не хочу залететь!» - добавляет Лизетта."
-    elif int(Liza.stats.get("pregnancy", 0) or 0) >= 120:
+    elif Liza.pregnancy_days() >= 120:
         $ MainTxt = str(MainTxt or "") + "\n\n«Только вот как не просила я дяденек не спускать в меня, никто меня не слушал и теперь я залетела», - грустно добавляет Лизетта, проводя рукой по своему округлившемуся животику."
     if Liza.mark_asked_topic("askclients"):
         $ MainTxt = str(MainTxt or "") + "\n\nВас немного возбудил рассказ Лизетты."
@@ -144,11 +144,11 @@ label IntLizaTalkAskSex(girl_name_ilt="liza", girl_loc_ilt=""):
 label IntLizaTalkAskPregnancy(girl_name_ilt="liza", girl_loc_ilt=""):
     python:
         GirlNameILT, GirlLocILT = liza_talk_prepare_state(girl_name_ilt, girl_loc_ilt)
-        if Liza.corruption < 50 and int(Liza.stats.get("pregnancy", 0) or 0) < 120 and int(Liza.stats.get("kids", 0) or 0) > 0:
+        if Liza.corruption < 50 and Liza.pregnancy_days() < 120 and int(Liza.stats.get("kids", 0) or 0) > 0:
             MainTxt = "«Эх, как я не прошу дяденек чтобы в серединку мне не спускали, а они все равно! Все время во мне семя чье-то! Ребеночка мне уже заделали, скоро такими темпами еще будет!» - говорит Лизетта."
-        elif Liza.corruption < 50 and int(Liza.stats.get("pregnancy", 0) or 0) < 120:
+        elif Liza.corruption < 50 and Liza.pregnancy_days() < 120:
             MainTxt = "«Эх, как я не прошу дяденек чтобы в серединку мне не спускали, а они все равно! Все время во мне семя чье-то! Мамочка говорит что я ее скоро бабушкой сделаю, а я не хочу, я еще слишком молодая!» - говорит Лизетта."
-        elif int(Liza.stats.get("pregnancy", 0) or 0) >= 120:
+        elif Liza.pregnancy_days() >= 120:
             MainTxt = "«Эх, баловалась я, баловалась вот и добаловалась - залетела. Столько меня имели, что теперь и предположить от кого - сложно.» - говорит Лизетта, проводя рукой по своему округлившемуся животику."
         else:
             MainTxt = "«Маменька говорит, что любишь гулять - непременно пузо нагуляешь. А я гулять люблю, без чьего-нибудь колышка у себя в серединке и дня прожить трудно. Так что чему быть - того не миновать», - философски замечает Лизетта."
@@ -221,20 +221,22 @@ label IntLizaTalkHire(girl_name_ilt="liza", girl_loc_ilt=""):
 label IntLizaTalkGrope(girl_name_ilt="liza", girl_loc_ilt=""):
     python:
         GirlNameILT, GirlLocILT = liza_talk_prepare_state(girl_name_ilt, girl_loc_ilt)
+        _liza_name = Liza.data.fullname
+        _liza_name2 = Liza.data.genitive
         if Liza.rel >= 5:
-            MainTxt = "Вы начали гладить маленькие сисечки %s через тонкую ткань ее блузки." % RealName2.get(GirlNameILT, GirlNameILT)
-            if panties.get(GirlNameILT, ""):
+            MainTxt = "Вы начали гладить маленькие сисечки %s через тонкую ткань ее блузки." % _liza_name2
+            if Liza.current_underwear("panties", ""):
                 MainTxt += "\n\nВы сунули руку под платьичко вашей подружки и начали натирать ее киску сквозь панталончики."
             else:
                 MainTxt += "\n\nВы сунули руку под короткое платьичко вашей любовницы и стали наминать ее юную вульвочку."
 
-            if not panties.get(GirlNameILT, ""):
-                if CumInsideYou.get(GirlNameILT, 0) > 0:
-                    MainTxt += "\n\nВы почувствовали свою сперму в пещерке %s." % RealName2.get(GirlNameILT, GirlNameILT)
-                elif CumInsideOthers.get(GirlNameILT, 0) > 0:
-                    MainTxt += "\n\nВаши пальцы заскользили по пещерке %s, похоже кто-то уже кончил в нее." % RealName2.get(GirlNameILT, GirlNameILT)
+            if not Liza.current_underwear("panties", ""):
+                if Liza.cum_state("cum_inside_you") > 0:
+                    MainTxt += "\n\nВы почувствовали свою сперму в пещерке %s." % _liza_name2
+                elif Liza.cum_state("cum_inside_others") > 0:
+                    MainTxt += "\n\nВаши пальцы заскользили по пещерке %s, похоже кто-то уже кончил в нее." % _liza_name2
         else:
-            MainTxt = "«Эй, дяденка, не так быстро!» останавливает вас %s. «Мамочка говорит, что ты сначала заплатить должен, а потом уже лапать!»" % RealName.get(GirlNameILT, GirlNameILT)
+            MainTxt = "«Эй, дяденка, не так быстро!» останавливает вас %s. «Мамочка говорит, что ты сначала заплатить должен, а потом уже лапать!»" % _liza_name
         CurLocDesc = MainTxt
     call ShowCurrentSex(GirlNameILT)
     call IntLizaTalkMenu(GirlNameILT, GirlLocILT)

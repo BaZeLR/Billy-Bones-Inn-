@@ -73,6 +73,40 @@ Becky/Grocery adjacent status:
   adding wrapper state functions; update the test when the store is converted to
   simple Ren'Py menu labels.
 
+Liza vertical-slice cleanup completed on 2026-06-28:
+
+- All six live Liza source files were covered:
+  `InitLiza.rpy`, `IntLizaTalk.rpy`, `IntLizaSex.rpy`,
+  `IntLizaDressChange.rpy`, `IntLizettAfterCermon.rpy`, and
+  `ShowLizaPortrait.rpy`.
+- Liza social, daily, job, pregnancy, sex, arousal, cum, cock-position,
+  visibility, and dress decisions now read/write the `Liza` object through
+  class fields or methods such as `Liza.var`, `Liza.stats`, `Liza.jobs`,
+  `Liza.sex_state`, `Liza.pregnancy_days()`, `Liza.cum_state(...)`,
+  `Liza.job_value(...)`, `Liza.set_job_value(...)`, and
+  `Liza.publish_visibility_state()`.
+- `InitLiza.rpy` no longer imports relationship/job/stat/sex state from old
+  external maps and no longer publishes Liza social/daily/job/stat state back
+  into those maps. The remaining clothing projection maps in `sync_shared_state`
+  are render-facing wardrobe projections for shared clothes helpers, not Liza
+  state ownership.
+- Liza sex flow now uses class-owned partner state and player arousal state for
+  menu conditions and consequences.
+- Liza portrait and church-after-sermon flow no longer read old visibility/cum
+  or pregnancy maps.
+- Liza tavern special-work adjacency now reads/writes class job values in
+  `TavernMain.rpy`, `TavernRandomEvents.rpy`, `menu_tavernstat.rpy`,
+  `ChangeTommorowWhoreJob.rpy`, and `NextDay_TavernDaily.rpy`.
+- Amanda/Liza talk and Georgett/Liza birth text adjacency now check `Liza`
+  directly instead of old global maps.
+- Focused source searches returned no remaining Liza external ownership hits
+  for `Friends`, `sluttiness`, `pregnancy`, `Arousal`, `Talked`,
+  `jobwhore`, `jobgloryhole`, `CumInside`, `CockIn`, `PussyVisible`, or
+  `TitsVisible`.
+- `renpy.exe . compile` passed after this slice.
+- Not yet claimed: full real click-route QA and old-save migration for every
+  Liza route.
+
 Earlier cleanup stage removed the werecat story globals:
 
 - `WerecatVar` was removed as an external story-state dict.
@@ -324,8 +358,9 @@ Concrete examples from live code:
 
 - `PeopleRuntime.initPeople()` can attach legacy `AmandaVar`-style dicts as
   `.var` unless an object opts out.
-- `InitLiza.rpy` still syncs class fields with global relationship/job/stat
-  dictionaries.
+- `InitLiza.rpy` has been cleaned for Liza-owned relationship/job/stat/sex
+  state; do not list Liza as evidence for this blocker unless a new source
+  search finds a specific external owner.
 - some sex/daily flows still read or mutate old globals such as `HadSex`,
   `Friends`, `sluttiness`, `CockPosition`, and daily stat maps.
 
@@ -418,8 +453,11 @@ Remaining old pieces:
 - old helper state such as `CockPosition`;
 - story labels that still mutate old maps;
 - some screens/labels that do not preserve the intended full main UI flow;
-- Georgett/Liza port-street sex flows still need complete event-driven,
+- Georgett port-street sex flow still needs complete event-driven,
   class-owned verification against TXT flow.
+- Liza sex flow has been moved to class-owned partner/player state, but still
+  needs real click-route verification and save/load verification before being
+  marked fully complete.
 
 ### Fight System
 
@@ -492,9 +530,9 @@ Acceptance:
 - Back Alley is a real sublocation, not a text-only branch.
 - Eddie/Alber whore visits use NPC/event state and are visible only in the
   correct location.
-- Georgett/Liza sex flows must use class-owned partner state and player state;
-  active Liza sex/dress code still contains old sex global-map state and is a
-  pending conversion target.
+- Georgett sex flow must use class-owned partner state and player state.
+- Liza sex/dress source no longer contains focused old-map ownership hits, but
+  the real PortStreets/BackAlley click route still needs verification.
 - Original TXT flow/content is preserved.
 - Menus render through the intended full main UI event flow.
 - Daily seen/client flags reset through class/event owner.
@@ -546,7 +584,8 @@ Partially completed:
 - Becky full class/event conversion.
 - Melissa/Sandra events and tavern flows.
 - Clara church/dress/sex/event flow.
-- Georgett/Liza port-street and sex flows.
+- Georgett port-street and sex flows.
+- Liza source OOP conversion, pending real click-route/save-load verification.
 - secondary NPC class conversion.
 - object/game-item catalog.
 - shop menus and item ownership.

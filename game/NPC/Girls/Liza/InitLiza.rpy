@@ -119,7 +119,8 @@ init python:
             super(LizaInfo, self).update()
             self.data = LizaStaticData
             self.relationship = self.rel
-            self.sync_from_shared_state()
+            self.ensure_story_defaults()
+            self.ensure_sex_state()
             return self
 
         def ensure_story_defaults(self):
@@ -130,48 +131,8 @@ init python:
             return self.var
 
         def sync_from_shared_state(self):
-            self.rel = people_to_int(Friends.get("liza", self.rel), self.rel)
-            self.relationship = self.rel
-            self.openness = people_to_int(otkroven.get("liza", self.openness), self.openness)
-            self.corruption = people_to_int(sluttiness.get("liza", self.corruption), self.corruption)
-            self.drunk = people_to_int(Drunk.get("liza", self.drunk), self.drunk)
-            self.talked_today = people_to_int(TalkedToday.get("liza", self.talked_today), self.talked_today)
-            self.gifted_today = people_to_int(GiftedToday.get("liza", self.gifted_today), self.gifted_today)
-            self.asked_today = people_to_int(AskedToday.get("liza", self.asked_today), self.asked_today)
-            self.fucked_today = people_to_int(FuckedToday.get("liza", self.fucked_today), self.fucked_today)
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                if "liza" in table:
-                    self.stats[stat_key] = table.get("liza")
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobGloryHoleAvail, "jobGloryHoleAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-                (jobwhoreTommorow, "jobwhoreTommorow"),
-                (jobgloryholeTommorow, "jobgloryholeTommorow"),
-            ]:
-                if "liza" in table:
-                    self.jobs[job_key] = table.get("liza")
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                if "liza" in table:
-                    self.skills[skill_key] = table.get("liza")
             self.ensure_story_defaults()
+            self.ensure_sex_state()
             return self
 
         def sync_shared_state(self):
@@ -182,14 +143,6 @@ init python:
             DateOfBirth[name] = dict(self.data.birth_date)
             girltextdesc[name] = self.data.description
             knowsMC[name] = bool(self.known)
-            Friends[name] = people_to_int(self.rel, 0)
-            otkroven[name] = people_to_int(self.openness, 0)
-            sluttiness[name] = people_to_int(self.corruption, 0)
-            Drunk[name] = people_to_int(self.drunk, 0)
-            TalkedToday[name] = people_to_int(self.talked_today, 0)
-            GiftedToday[name] = people_to_int(self.gifted_today, 0)
-            AskedToday[name] = people_to_int(self.asked_today, 0)
-            FuckedToday[name] = people_to_int(self.fucked_today, 0)
             self.location = str(self.current_location or "PortStreets")
             GiftPreferences[name] = list(self.gift_preferences)
             dressdefault[name] = self.wardrobe["current_dress"]
@@ -204,40 +157,84 @@ init python:
             legs[name] = legsdef[name]
             shoes[name] = shoesdef[name]
             self.wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                table[name] = self.stats.get(stat_key)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobGloryHoleAvail, "jobGloryHoleAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-                (jobwhoreTommorow, "jobwhoreTommorow"),
-                (jobgloryholeTommorow, "jobgloryholeTommorow"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
             self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                table[name] = self.skills.get(skill_key, 0)
             self.ensure_story_defaults()
             return self
 
+        def ensure_sex_state(self):
+            state = super(LizaInfo, self).ensure_sex_state()
+            for key, value in {
+                "location": "street",
+                "lick_pussy": 0,
+                "top_removed": 0,
+                "bottom_removed": 0,
+                "bra_removed": 0,
+                "panties_removed": 0,
+                "top_raised": 0,
+                "bottom_raised": 0,
+            }.items():
+                state.setdefault(key, value)
+            return state
+
+        def sex_setup(self, location="street"):
+            self.ensure_sex_state()
+            self.sex_state["location"] = str(location or "street")
+            self.sex_state["somebody_cums"] = 0
+            self.reset_sex_clothing_state()
+            self.set_cock_position("none")
+            return self.sex_state
+
+        def player_arousal(self):
+            return people_to_int(player_state(False).intimacy.arousal_value("You"), 0)
+
+        def set_player_arousal(self, value):
+            intimacy = player_state(False).intimacy
+            result = intimacy.set_arousal(value, "You")
+            intimacy.apply_to_store()
+            return result
+
+        def add_player_arousal(self, amount=0, cap=100):
+            intimacy = player_state(False).intimacy
+            result = intimacy.add_arousal(amount, cap, "You")
+            intimacy.apply_to_store()
+            return result
+
+        def can_player_cum(self):
+            return player_state(False).intimacy.can_cum() or self.player_arousal() >= 100
+
+        def remove_top_for_sex(self):
+            self.remove_clothing_layer("top")
+            self.publish_visibility_state()
+            self.set_cock_position("none")
+            return self.sex_state
+
+        def raise_top_for_sex(self):
+            self.set_layer_raised("top", 1)
+            self.publish_visibility_state()
+            self.set_cock_position("none")
+            return self.sex_state
+
+        def raise_bottom_for_sex(self):
+            self.set_layer_raised("bottom", 1)
+            self.publish_visibility_state()
+            self.set_cock_position("none")
+            return self.sex_state
+
+        def remove_panties_for_sex(self):
+            self.remove_clothing_layer("panties")
+            self.publish_visibility_state()
+            self.set_cock_position("none")
+            return self.sex_state
+
+        def clear_visible_cum(self, *keys):
+            self.clear_cum(*keys)
+            self.publish_visibility_state()
+            self.set_cock_position("none")
+            return self.sex_state
+
         def initialize_new_game_state(self):
             self.ensure_story_defaults()
+            self.ensure_sex_state()
             self.sync_shared_state()
             return self
 
@@ -253,6 +250,12 @@ init python:
             self.sync_shared_state()
             return self
 
+        def reset_tavern_work_day(self):
+            self.jobs["jobwhore"] = 0
+            self.jobs["jobgloryhole"] = 0
+            self.sync_shared_state()
+            return self.jobs
+
         def story_value(self, key, default=0):
             return self.ensure_story_defaults().get(key, default)
 
@@ -262,7 +265,7 @@ init python:
             return value
 
         def talk_count(self):
-            return people_to_int(Talked.get(self.code_name, 0), 0)
+            return people_to_int(self.talked_today, 0)
 
         def can_talk_today(self, limit=2):
             return self.talk_count() < people_to_int(limit, 2)
@@ -275,9 +278,8 @@ init python:
 
         def finish_talk(self):
             self.talked_today = people_to_int(self.talked_today, 0) + 1
-            Talked[self.code_name] = self.talk_count() + 1
             self.sync_shared_state()
-            return Talked[self.code_name]
+            return self.talked_today
 
         def mark_asked_topic(self, topic_flag, relation_gain=1):
             flag = str(topic_flag or "")
@@ -345,7 +347,7 @@ init python:
             return self.set_story_value("seeclients", 1)
 
         def can_work_tavern(self):
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0 or people_to_int(jobWhoreAvail.get("liza", 0), 0) > 0
+            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
             return self.hired
 
         def set_hired(self, hired=True):
@@ -357,7 +359,7 @@ init python:
             return self.hired
 
         def can_use_gloryhole(self):
-            return people_to_int(self.jobs.get("jobGloryHoleAvail", 0), 0) > 0 or people_to_int(jobGloryHoleAvail.get("liza", 0), 0) > 0
+            return people_to_int(self.jobs.get("jobGloryHoleAvail", 0), 0) > 0
 
         def can_ask_about_clients(self):
             return people_to_int(self.story_value("seeclients", 0), 0) > 0 and people_to_int(self.rel, 0) >= 5
