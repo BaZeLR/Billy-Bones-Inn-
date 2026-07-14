@@ -279,6 +279,7 @@ label FrancheskaTalk:
     python:
         global _FRAN_PHRASE_CACHE
         _FRAN_PHRASE_CACHE = None
+    $ Francheska.mark_known()
     $ _fran_prepare_state()
     $ main_ui_begin_talk_state("Что обсудить с Франческой?", "fran")
     $ current_action_title = "Что обсудить с Франческой?"

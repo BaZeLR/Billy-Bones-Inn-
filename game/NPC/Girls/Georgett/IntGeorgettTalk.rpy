@@ -26,6 +26,7 @@ init python:
 
 
 label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
+    $ Georgett.mark_known()
     if str(girl_loc or "") == "":
         if CurrentRoom is not None and str(getattr(CurrentRoom, "code_name", "") or "") == "TavernMain":
             $ girl_loc = "tavern"
@@ -40,7 +41,6 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
         $ MainTxt = "-Привет красавчик! Не хочешь ли поразвлечься? Всего восемь мараведи!\n\nВы поговорили с ней и узнали, что ее зовут Жоржетта Брюно, она шлюха и промышляет здесь уже давно."
         $ CurLocDesc = MainTxt
         $ Georgett.add_relation(1)
-        $ Georgett.known = True
 
     $ main_ui_begin_talk_state("Разговор с Жоржеттой", girl_name)
     $ current_action_title = "Разговор с Жоржеттой"

@@ -305,7 +305,7 @@ init -8 python:
             info.description = desc
         info = peopleInfo.get("werecat", None)
         if info is not None and werecat_is_living_with_household():
-            info.known = True
+            info.mark_known()
         if not werecat_is_living_with_household():
             if info is not None:
                 info.location = ""
@@ -497,6 +497,7 @@ label IntWerecatTalk(room_code=""):
     if not werecat_is_in_room(_werecat_room):
         $ main_ui_end_talk_state()
         return
+    $ werecat.mark_known()
     $ main_ui_begin_talk_state(str(werecat_display_name() or "Луна"), "werecat")
     $ current_action_title = str(werecat_display_name() or "Луна")
     $ current_action_content = None

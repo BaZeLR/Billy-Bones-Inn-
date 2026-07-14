@@ -142,3 +142,28 @@ def test_dog_action_data_belongs_to_dog_runtime():
     assert "def dog_action_look_state" in dog_source
     assert "def dog_open_action_menu_state" in dog_source
     assert '"talk_label": "IntDogTalk"' in dog_source
+
+
+def test_unknown_npc_talk_entries_mark_object_known():
+    talk_entries = {
+        "game/NPC/Secondary/IntEddieTalk.rpy": ("label IntEddieTalk(preserve_text=False):", "Eddie.mark_known()"),
+        "game/NPC/Girls/Inga/IntIngaTalk.rpy": ("label IntIngaTalk(show_menu=True):", "Inga.mark_known()"),
+        "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy": ("label IntGeorgettTalk(girl_name=\"georgett\", girl_loc=\"\"):", "Georgett.mark_known()"),
+        "game/NPC/Secondary/IntAlberTalk.rpy": ("label IntAlberTalk:", "Alber.mark_known()"),
+        "game/NPC/Secondary/IntDraupnirTalk.rpy": ("label IntDraupnirTalk:", "Draupnir.mark_known()"),
+        "game/NPC/Secondary/IntZimmerTalk.rpy": ("label IntZimmerTalk(preserve_text=False):", "Zimmer.mark_known()"),
+        "game/Town/Arts/BarberShop.rpy": ("label BarberShopTalk:", "Sergio.mark_known()"),
+        "game/NPC/Secondary/WerecatNPC.rpy": ("label IntWerecatTalk(room_code=\"\"):", "werecat.mark_known()"),
+        "game/NPC/Secondary/IntFrancheskaTalk.rpy": ("label FrancheskaTalk:", "Francheska.mark_known()"),
+        "game/NPC/Secondary/IntRobinTalk.rpy": ("label IntRobinTalk:", "Robin.mark_known()"),
+    }
+
+    for relative_path, (entry_label, mark_call) in talk_entries.items():
+        talk_source = (ROOT / relative_path).read_text(encoding="utf-8-sig")
+        talk_block = talk_source.split(entry_label, 1)[1].split("\nlabel ", 1)[0]
+        assert mark_call in talk_block, relative_path
+
+    fran_source = (ROOT / "game/NPC/Secondary/InitFrancheska.rpy").read_text(encoding="utf-8-sig")
+    known_block = fran_source.split("def known_now", 1)[1].split("def sleep_note_now", 1)[0]
+    assert "self.known" in known_block
+    assert 'self.var.get("meet"' not in known_block

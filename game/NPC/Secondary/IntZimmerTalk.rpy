@@ -3,6 +3,7 @@
 # ================================================================================
 
 label IntZimmerTalk(preserve_text=False):
+    $ Zimmer.mark_known()
     $ Zimmer.ensure_story_defaults()
     $ _zimmer_name = "zimmer"
     $ _zimmer_var = Zimmer.var

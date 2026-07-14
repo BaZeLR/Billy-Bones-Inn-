@@ -10,6 +10,7 @@ label IntIngaTalk(show_menu=True):
         call GirlsDesc("inga")
         return
 
+    $ Inga.mark_known()
     $ main_ui_begin_talk_state("Разговор с Ингенборг", "inga")
     $ current_action_title = "Разговор с Ингенборг"
     $ current_action_content = None

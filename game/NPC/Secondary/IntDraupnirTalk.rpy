@@ -1,4 +1,5 @@
 label IntDraupnirTalk:
+    $ Draupnir.mark_known()
     $ current_action_title = "Драупнир"
     $ current_action_content = None
     if int(SloganFixed or 0) == 1:

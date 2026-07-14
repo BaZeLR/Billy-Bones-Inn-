@@ -98,10 +98,10 @@ init python:
             return self.visible_now()
 
         def known_now(self):
-            return self.visible_now() and bool(self.var.get("meet", 0))
+            return self.visible_now() and bool(self.known)
 
         def unknown_now(self):
-            return self.visible_now() and not bool(self.var.get("meet", 0))
+            return self.visible_now() and not bool(self.known)
 
         def sleep_note_now(self):
             minute_value = self.current_minutes()

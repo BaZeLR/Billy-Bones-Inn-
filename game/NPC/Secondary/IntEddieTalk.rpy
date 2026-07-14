@@ -3,6 +3,7 @@
 # ================================================================================
 
 label IntEddieTalk(preserve_text=False):
+    $ Eddie.mark_known()
     $ Becky.update()
     $ _eddie_name = "eddie"
     $ eddie_talk_init_state()

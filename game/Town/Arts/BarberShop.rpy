@@ -189,6 +189,7 @@ label BarberShopBuildActions:
 
 
 label BarberShopTalk:
+    $ Sergio.mark_known()
     $ MainTxt = barber_shop_talk_text()
     if int(BarberFirstTipSeen or 0) == 0:
         $ BarberFirstTipSeen = 1

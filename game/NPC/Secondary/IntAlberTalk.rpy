@@ -2,6 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntAlberTalk:
+    $ Alber.mark_known()
     $ Alber.set_var_int("LegareProvokeYou", 0)
     if str(CurLoc or "") == "WineStore":
         $ _alber_talk_picture = str(alber_random_portrait() or "").strip()
