@@ -1,0 +1,31 @@
+# PATCH: Remove all QSP gs artifacts + add slut_friends_increase method
+
+# 1. In game/Utilities/General/NPC/GirlObjectRuntime.rpy
+# Add this method inside class GirlInfo(PeopleInfo):
+
+    def slut_friends_increase(self, friends=0, openness=0, corruption=0, sluttiness=0, horny=0, beauty=0):
+        self.friends += friends
+        self.openness += openness
+        self.corruption += corruption
+        if hasattr(self, 'sluttiness'):
+            self.sluttiness += sluttiness
+        self.apply_to_maps()
+        return self
+
+# 2. In game/Inn/SlutFriendsIncrease.rpy  (make the label delegate to the method)
+# Replace the body with:
+python:
+    girl = getPersonInfo(girl_name)
+    if girl:
+        girl.slut_friends_increase(friends=friends, openness=openness, corruption=corruption, sluttiness=sluttiness)
+
+# 3. In game/NPC/Girls/Becky/BeckyEvents.rpy (the thin home guest labels)
+# Find every line like this:
+gs 'SlutFriendsIncrease', 'becky', 8, 1, -1, 35, 1, -1
+
+# And replace the entire block with:
+\$ becky = getPersonInfo('becky')
+\$ becky.slut_friends_increase(friends=8, openness=1, corruption=-1, sluttiness=35)
+
+# Do the same for all other gs SlutFriendsIncrease lines in the home guest section.
+# There should be ZERO gs statements left anywhere in .rpy files.

@@ -1,0 +1,23 @@
+# CORRECTED VERSION - becky_home_dinner_poproshchatysya
+# Use 180 minutes for a normal full dinner visit.
+# Change to 240 if you want longer sessions by default.
+
+label becky_home_dinner_poproshchatysya:
+    show screen main_ui
+    $ becky = getPersonInfo("becky")
+
+    $ MainTxt = "Вы вежливо попрощались с семейством Блэнкеншип и направились на улицу."
+
+    if thread is not None:
+        $ thread.advance()
+
+    $ Talked["becky"] = Talked.get("becky", 0) + 1
+    $ CurLocDesc = MainTxt
+
+    # Proper minute-based time advancement for a full dinner + possible upstairs
+    # 180 minutes is a solid default for a complete evening visit.
+    # Use 240 for particularly long sessions.
+    call calendar_advance_minutes(180) from _call_becky_home_dinner_exit_minutes
+
+    jump MarketPlace
+    return

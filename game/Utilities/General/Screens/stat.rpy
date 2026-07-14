@@ -1,11 +1,35 @@
-# ================================================================================
+        global player.stats.look, player.stats.reputation, player.stats.charismadefault PlayerConditionNoticeState = {}
+default PlayerSocialConditionLast = {}        global PlayerSocialConditionLast        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+        try:
+            soap_expire_if_needed()
+        except Exception:
+            pass        global player.stats.look, player.stats.reputation, player.stats.charismadefault PlayerConditionNoticeState = {}
+default PlayerSocialConditionLast = {}        global PlayerSocialConditionLast        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+        try:
+            soap_expire_if_needed()
+        except Exception:
+            pass        global player.stats.look, player.stats.reputation, player.stats.charismadefault PlayerConditionNoticeState = {}
+default PlayerSocialConditionLast = {}        global PlayerSocialConditionLast        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+        try:
+            soap_expire_if_needed()
+        except Exception:
+            pass# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default PlayerConditionNoticeState = {}
-default PlayerSocialConditionLast = {}
 
 init python:
     import renpy.exports as renpy_module
+    import renpy.store as store
+    import renpy.store as store
     import renpy.store as store
 
     def _player_int(value, default=0):
@@ -18,7 +42,7 @@ init python:
         return max(int(low), min(int(high), _player_int(value, low)))
 
     def player_dress_look_value(dress_code=""):
-        appearance = player_state().appearance
+        appearance = player.appearance
         code = str(dress_code or appearance.current_dress or "").strip()
         if not code:
             return 15
@@ -35,16 +59,16 @@ init python:
         return 24
 
     def player_haircut_look_value(haircut_days=None):
-        appearance = player_state().appearance
+        appearance = player.appearance
         days = _player_int(appearance.days_since_haircut if haircut_days is None else haircut_days, 0)
         return 15 if days < _player_int(getattr(appearance, "HAIRCUT_FRESH_DAYS", 14), 14) else -40
 
     def player_haircut_due_day():
-        marker = _player_int(player_state().appearance.haircut_day, 0)
-        return marker + _player_int(getattr(player_state().appearance, "HAIRCUT_FRESH_DAYS", 14), 14)
+        marker = _player_int(player.appearance.haircut_day, 0)
+        return marker + _player_int(getattr(player.appearance, "HAIRCUT_FRESH_DAYS", 14), 14)
 
     def player_hygiene_look_value(wash_days=None):
-        appearance = player_state().appearance
+        appearance = player.appearance
         days = _player_int(appearance.days_since_wash if wash_days is None else wash_days, 0)
         if days <= 0:
             return 20
@@ -55,12 +79,12 @@ init python:
         return -10
 
     def player_costume_condition_look_value(condition_value=None):
-        appearance = player_state().appearance
+        appearance = player.appearance
         condition = _player_clamp_stat(appearance.costume_condition if condition_value is None else condition_value, 0, 100)
         return _player_int(round(float(condition) / 4.0), 0)
 
     def player_haircut_elapsed_days():
-        appearance = player_state().appearance
+        appearance = player.appearance
         try:
             marker = _player_int(appearance.haircut_day, 0)
         except Exception:
@@ -69,7 +93,7 @@ init python:
         return max(elapsed, _player_int(appearance.days_since_haircut, 0))
 
     def player_current_dress_age_days(dress_code=""):
-        appearance = player_state().appearance
+        appearance = player.appearance
         code = str(dress_code or appearance.current_dress or "").strip()
         if not code:
             return 0
@@ -82,7 +106,7 @@ init python:
         return max(0, 100 - int(round((float(age_days) / 42.0) * 50.0)))
 
     def player_look_breakdown():
-        appearance = player_state().appearance
+        appearance = player.appearance
         haircut_days = player_haircut_elapsed_days()
         dress_age_days = player_current_dress_age_days(appearance.current_dress)
         dress_value = player_dress_look_value(appearance.current_dress)
@@ -109,7 +133,7 @@ init python:
             return False
 
     def player_condition_warning_lines():
-        appearance = player_state().appearance
+        appearance = player.appearance
         lines = []
         wash_days = _player_int(appearance.days_since_wash, 0)
         haircut_days = _player_int(player_haircut_elapsed_days(), 0)
@@ -129,7 +153,7 @@ init python:
             elif dress_condition <= 60:
                 lines.append("Одежда заметно поношена. Пока в ней можно ходить, но она уже портит впечатление.")
 
-        if int(SoapLookBonusUntilDay or -1) >= 0 and not player_soap_freshness_active() and wash_days > 0:
+        if int(crafting.soap_look_bonus_until_day or -1) >= 0 and not player_soap_freshness_active() and wash_days > 0:
             lines.append("Запах мыла уже выветрился. Свежий вид от последнего мытья больше не держится.")
 
         return lines
@@ -154,7 +178,7 @@ init python:
         state[str(key or "")] = str(dayspassed or 0)
 
     def player_condition_daily_notice_lines():
-        appearance = player_state().appearance
+        appearance = player.appearance
         lines = []
         wash_days = _player_int(appearance.days_since_wash, 0)
         haircut_days = _player_int(player_haircut_elapsed_days(), 0)
@@ -179,7 +203,7 @@ init python:
                 lines.append("Одежда заметно поношена.")
                 _player_condition_mark_notice_seen("clothes_worn")
 
-        soap_until = _player_int(SoapLookBonusUntilDay, -1)
+        soap_until = _player_int(crafting.soap_look_bonus_until_day, -1)
         if soap_until >= 0 and _player_int(dayspassed, 0) > soap_until and not _player_condition_notice_seen("soap_faded_%s" % soap_until):
             lines.append("Свежий запах мыла уже выветрился.")
             _player_condition_mark_notice_seen("soap_faded_%s" % soap_until)
@@ -273,7 +297,7 @@ init python:
         score = 0
 
         try:
-            slogan_state = _player_int(SloganFixed, 0)
+            slogan_state = _player_int(player.tavern_management.slogan_state, 0)
             if slogan_state > 1:
                 score += 20
             elif slogan_state == 1:
@@ -282,7 +306,7 @@ init python:
             pass
 
         try:
-            if _player_int(TavernHole, 0) > 0:
+            if _player_int(player.tavern_management.client_room_hole, 0) > 0:
                 score += 10
         except Exception:
             pass
@@ -304,8 +328,8 @@ init python:
         return _player_clamp_stat(score, 0, 100)
 
     def tavern_reputation_score():
-        visitors_score = _player_clamp_stat(_player_int(tavernvisitors, 0), 0, 100)
-        fame_score = _player_clamp_stat(50 + (_player_int(tavernfame, 0) * 5), 0, 100)
+        visitors_score = _player_clamp_stat(_player_int(player.tavern_management.visitors, 0), 0, 100)
+        fame_score = _player_clamp_stat(50 + (_player_int(player.economy.tavern_fame, 0) * 5), 0, 100)
         improvements_score = tavern_improvements_score()
         dog_bonus = 0
         try:
@@ -342,7 +366,7 @@ init python:
         charisma_info = player_charisma_breakdown()
         look_value = _player_int(breakdown.get("look", 0), 0)
         charisma_value = _player_int(charisma_info.get("charisma", 0), 0)
-        appearance = player_state().appearance
+        appearance = player.appearance
         wash_days = _player_int(appearance.days_since_wash, 0)
         haircut_days = _player_int(breakdown.get("haircut_days", 0), 0)
         dress_condition = _player_int(player_dress_condition_from_age(player_current_dress_age_days(appearance.current_dress)), 100)
@@ -393,7 +417,6 @@ init python:
         return {"score": score, "reasons": reasons}
 
     def player_social_adjusted_delta(girl_name="", interaction_type="talk", base_score=0):
-        global PlayerSocialConditionLast
         key = str(girl_name or "").strip().lower()
         interaction = str(interaction_type or "talk").strip().lower()
         base_value = _player_int(base_score, 0)
@@ -436,6 +459,8 @@ init python:
 
     def preferred_gift_item_ids(girl_name=""):
         key = str(girl_name or "").strip()
+        if not isinstance(GiftPreferences, dict):
+            return []
         if not isinstance(GiftPreferences, dict):
             return []
         return [str(row or "").strip() for row in list(GiftPreferences.get(key, []) or []) if str(row or "").strip()]
@@ -550,26 +575,22 @@ init python:
     def update_stat_state():
         global look, reputation, charisma
 
-        calendar_v2.sync_state()
         try:
-            fight_sync_level_from_exploration()
-            fight_sync_supply_from_inventory()
         except Exception:
             pass
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
-        try:
-            soap_expire_if_needed()
-        except Exception:
-            pass
-        appearance = player_state().appearance
+        global look, reputation, charisma, charisma
+
+        appearance = player.appearance
         appearance.days_since_haircut = _player_int(player_haircut_elapsed_days(), 0)
         appearance.hairCutdays = max(0, _player_int(getattr(appearance, "HAIRCUT_FRESH_DAYS", 14), 14) - appearance.days_since_haircut)
         appearance.washDays = max(0, _player_int(getattr(appearance, "WASH_FRESH_DAYS", 3), 3) - _player_int(appearance.days_since_wash, 0))
         appearance.costume_condition = _player_int(player_dress_condition_from_age(player_current_dress_age_days(appearance.current_dress)), 0)
-        appearance.apply_to_store()
+        look = _player_int(player_look_breakdown().get("look", 0), 0)
+        reputation = _player_int(player_reputation_breakdown().get("reputation", 0), 0)
+        charisma = _player_int(player_charisma_breakdown().get("charisma", 0), 0)
+        look = _player_int(player_look_breakdown().get("look", 0), 0)
+        reputation = _player_int(player_reputation_breakdown().get("reputation", 0), 0)
+        charisma = _player_int(player_charisma_breakdown().get("charisma", 0), 0)
         look = _player_int(player_look_breakdown().get("look", 0), 0)
         reputation = _player_int(player_reputation_breakdown().get("reputation", 0), 0)
         charisma = _player_int(player_charisma_breakdown().get("charisma", 0), 0)

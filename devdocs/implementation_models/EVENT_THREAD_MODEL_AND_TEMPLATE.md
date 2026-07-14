@@ -38,6 +38,11 @@ extra `*_ready()` function that repeats the same event checks.
 Classes remain authoritative for character and system state. Event conditions
 may reference class state or class methods only when they express a real domain
 rule that belongs to that class, not when they duplicate event availability.
+For NPC stories, flags and counters live on the NPC instance, usually through
+`NPC.var`, `NPC.var_int(...)`, and `NPC.set_var_int(...)`. Event/thread code
+must not read or write NPC story state through `globals()`, `renpy.store`,
+`store.*`, old `*Var` dicts, relationship maps such as `Friends[...]`, or
+duplicated parallel state dictionaries.
 
 Screens are not event authority. Event labels author text, pictures, choices,
 and consequences. Screens may render HUD/menu areas, but do not decide event
@@ -211,6 +216,32 @@ Tuple order is fixed:
 target, day, hour, delay, probability, requirements, conditions, item, location, action, priority
 ```
 
+Thread definitions may pass either the fixed tuple above or an instance of the
+existing runtime `Event` class. Use `Event(...)` only when a blueprint/catalog
+needs explicit event objects; do not create wrapper event classes or dict row
+schemas.
+
+```renpy
+Event(
+    (
+        "story_amanda_example_0",
+        None, None, None,
+        1,
+        None,
+        "amanda_example_ready()",
+        None,
+        "TavernMain",
+        "talk",
+        10,
+    ),
+    "",
+    True,
+)
+```
+
+`ThreadData` will attach the owning thread name and threaded flag when it loads
+the row. Availability remains the `Event` object's job.
+
 Field meaning:
 
 - `target`: Ren'Py label to jump to.
@@ -264,6 +295,19 @@ Each condition should be an atomic rule or a real owner method. It must not be a
 wrapper around `Event.canTrigger()` or a repeated bundle of day/hour/item/priority
 checks.
 
+Condition owner rule:
+
+- NPC state: `Amanda.var_int("alberfriends", 0)`,
+  `Amanda.sex_stat("sexacts", 0)`, `Amanda.pregnancy_days()`,
+  `Melissa.mana`, `Sandra.anger_reason`.
+- Player state: Player/MC class fields or methods.
+- Room/object/item state: that room/object/item owner.
+- Thread state: the existing thread condition syntax or `thread` object.
+
+Do not use old maps or store lookups as condition authority. If an old map still
+exists in code, it is migration debt, not a valid model for new event/thread
+definitions.
+
 Correct:
 
 ```renpy
@@ -279,6 +323,8 @@ Also correct when the method is a real class/domain rule:
 ["#getPersonInfo('fran').visible_now()"]
 ["#ExampleObject.can_be_searched()"]
 ["#Clara.paintings_thread_not_aborted()"]
+["#Amanda.var_int('alberfriends', 0) >= 5"]
+["#Amanda.pregnancy_days() >= 120"]
 ```
 
 Wrong:
@@ -292,7 +338,8 @@ Wrong:
 ```
 
 Legacy dicts may appear only as temporary compatibility reads while their owner
-class is not converted yet. New work must use class methods.
+class is not converted yet. New work must use class fields or class methods, and
+converted owners must not keep a parallel old dict as authority.
 
 If an event became unavailable because of a player choice or story outcome, put
 that state on the thread or owning class and let the event condition check that

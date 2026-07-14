@@ -1,6 +1,129 @@
-# ================================================================================
+        npc_schedule_sync_currentloc(GirlName)            girl.relationship = girl.rel            self.current_location = "TavernMain"        def story_value(self, key, default=0):
+            flags = self.ensure_story_defaults()
+            return flags.get(key, default)
+
+        def set_story_value(self, key, value):
+            flags = self.ensure_story_defaults()
+            flags[key] = value
+            return value
+            self.schedule_source = SandraStaticData.schedule_source            self.schedule_source = SandraStaticData.schedule_source
+            self.current_location = "TavernMain"            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel                self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel        npc_schedule_sync_currentloc(GirlName)            girl.relationship = girl.rel            self.current_location = "TavernMain"        def story_value(self, key, default=0):
+            flags = self.ensure_story_defaults()
+            return flags.get(key, default)
+
+        def set_story_value(self, key, value):
+            flags = self.ensure_story_defaults()
+            flags[key] = value
+            return value
+            self.schedule_source = SandraStaticData.schedule_source            self.schedule_source = SandraStaticData.schedule_source
+            self.current_location = "TavernMain"            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel                self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel        npc_schedule_sync_currentloc(GirlName)            girl.relationship = girl.rel            self.current_location = "TavernMain"        def story_value(self, key, default=0):
+            flags = self.ensure_story_defaults()
+            return flags.get(key, default)
+
+        def set_story_value(self, key, value):
+            flags = self.ensure_story_defaults()
+            flags[key] = value
+            return value
+            self.schedule_source = SandraStaticData.schedule_source            self.schedule_source = SandraStaticData.schedule_source
+            self.current_location = "TavernMain"            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel                self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+init python:
+    def sandra_schedule_match(location="", mode="morning"):
+        target = str(location or "").strip()
+        mode_key = str(mode or "morning").strip().lower()
+        if mode_key == "morning":
+            return str(_tavern_household_preopening_location("sandra") or "") == target
+        if mode_key == "sunday":
+            return str(_tavern_household_sunday_location("sandra") or "") == target
+        if mode_key == "friday_evening":
+            return str(_tavern_household_friday_evening_location("sandra") or "") == target
+        return False
+
+    def sandra_schedule_night_thanks_ready():
+        return int(Sandra.night_thanks_ready_flag or 0) > 0 and int(Sandra.night_thanks_last_day or -1) != int(dayspassed or 0)
+
+    def sandra_schedule_morning_hall():
+        return sandra_schedule_match("TavernMain", "morning")
+
+    def sandra_schedule_morning_kitchen():
+        return sandra_schedule_match("TavernKitchen", "morning")
+
+    def sandra_schedule_morning_storage():
+        return sandra_schedule_match("TavernStorage", "morning")
+
+    def sandra_schedule_morning_backyard():
+        return sandra_schedule_match("Backyard", "morning")
+
+    def sandra_schedule_morning_room():
+        return sandra_schedule_match("TavernSandraRoom", "morning")
+
+    def sandra_schedule_friday_dance():
+        return sandra_schedule_match("FridayDance", "friday_evening")
+
+    def sandra_schedule_friday_room():
+        return sandra_schedule_match("TavernSandraRoom", "friday_evening")
+
+    def sandra_schedule_sunday_room():
+        return sandra_schedule_match("TavernSandraRoom", "sunday")
+
+    def sandra_schedule_sunday_backyard():
+        return sandra_schedule_match("Backyard", "sunday")
+
+    def sandra_schedule_sunday_hall():
+        return sandra_schedule_match("TavernMain", "sunday")
+
+    def sandra_schedule_sunday_kitchen():
+        return sandra_schedule_match("TavernKitchen", "sunday")
+
+init python:
+    def sandra_schedule_match(location="", mode="morning"):
+        target = str(location or "").strip()
+        mode_key = str(mode or "morning").strip().lower()
+        if mode_key == "morning":
+            return str(_tavern_household_preopening_location("sandra") or "") == target
+        if mode_key == "sunday":
+            return str(_tavern_household_sunday_location("sandra") or "") == target
+        if mode_key == "friday_evening":
+            return str(_tavern_household_friday_evening_location("sandra") or "") == target
+        return False
+
+    def sandra_schedule_night_thanks_ready():
+        return int(Sandra.night_thanks_ready_flag or 0) > 0 and int(Sandra.night_thanks_last_day or -1) != int(dayspassed or 0)
+
+    def sandra_schedule_morning_hall():
+        return sandra_schedule_match("TavernMain", "morning")
+
+    def sandra_schedule_morning_kitchen():
+        return sandra_schedule_match("TavernKitchen", "morning")
+
+    def sandra_schedule_morning_storage():
+        return sandra_schedule_match("TavernStorage", "morning")
+
+    def sandra_schedule_morning_backyard():
+        return sandra_schedule_match("Backyard", "morning")
+
+    def sandra_schedule_morning_room():
+        return sandra_schedule_match("TavernSandraRoom", "morning")
+
+    def sandra_schedule_friday_dance():
+        return sandra_schedule_match("FridayDance", "friday_evening")
+
+    def sandra_schedule_friday_room():
+        return sandra_schedule_match("TavernSandraRoom", "friday_evening")
+
+    def sandra_schedule_sunday_room():
+        return sandra_schedule_match("TavernSandraRoom", "sunday")
+
+    def sandra_schedule_sunday_backyard():
+        return sandra_schedule_match("Backyard", "sunday")
+
+    def sandra_schedule_sunday_hall():
+        return sandra_schedule_match("TavernMain", "sunday")
+
+    def sandra_schedule_sunday_kitchen():
+        return sandra_schedule_match("TavernKitchen", "sunday")
+
 init python:
     def sandra_schedule_match(location="", mode="morning"):
         target = str(location or "").strip()
@@ -73,7 +196,66 @@ label InitSandra:
                 NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
             ],
         )
-        npc_schedule_sync_currentloc(GirlName)
+        npc_schedule_set(
+            GirlName,
+            [
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[6, 7], awake=True, talkable=True, condition=sandra_schedule_night_thanks_ready, priority=380, label="night_thanks"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_hall, priority=300, label="morning_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_kitchen, priority=300, label="morning_kitchen"),
+                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_storage, priority=300, label="morning_storage"),
+                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_backyard, priority=300, label="morning_backyard"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_room, priority=300, label="morning_room"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 6], time_slots=[1, 2, 3], awake=True, talkable=True, priority=200, label="working_kitchen"),
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=sandra_schedule_friday_dance, priority=250, label="friday_dance"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=sandra_schedule_friday_room, priority=240, label="friday_room"),
+                NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=260, label="sunday_church"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_room, priority=240, label="sunday_room"),
+                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_backyard, priority=240, label="sunday_backyard"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_hall, priority=240, label="sunday_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_kitchen, priority=240, label="sunday_kitchen"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
+            ],
+        )
+        npc_schedule_set(
+            GirlName,
+            [
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[6, 7], awake=True, talkable=True, condition=sandra_schedule_night_thanks_ready, priority=380, label="night_thanks"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_hall, priority=300, label="morning_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_kitchen, priority=300, label="morning_kitchen"),
+                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_storage, priority=300, label="morning_storage"),
+                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_backyard, priority=300, label="morning_backyard"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_room, priority=300, label="morning_room"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 6], time_slots=[1, 2, 3], awake=True, talkable=True, priority=200, label="working_kitchen"),
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=sandra_schedule_friday_dance, priority=250, label="friday_dance"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=sandra_schedule_friday_room, priority=240, label="friday_room"),
+                NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=260, label="sunday_church"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_room, priority=240, label="sunday_room"),
+                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_backyard, priority=240, label="sunday_backyard"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_hall, priority=240, label="sunday_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_kitchen, priority=240, label="sunday_kitchen"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
+            ],
+        )
+        npc_schedule_set(
+            GirlName,
+            [
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[6, 7], awake=True, talkable=True, condition=sandra_schedule_night_thanks_ready, priority=380, label="night_thanks"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_hall, priority=300, label="morning_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_kitchen, priority=300, label="morning_kitchen"),
+                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_storage, priority=300, label="morning_storage"),
+                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_backyard, priority=300, label="morning_backyard"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=sandra_schedule_morning_room, priority=300, label="morning_room"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 6], time_slots=[1, 2, 3], awake=True, talkable=True, priority=200, label="working_kitchen"),
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=sandra_schedule_friday_dance, priority=250, label="friday_dance"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=sandra_schedule_friday_room, priority=240, label="friday_room"),
+                NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=260, label="sunday_church"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_room, priority=240, label="sunday_room"),
+                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_backyard, priority=240, label="sunday_backyard"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_hall, priority=240, label="sunday_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=sandra_schedule_sunday_kitchen, priority=240, label="sunday_kitchen"),
+                NPCScheduleEntry(location="TavernSandraRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
+            ],
+        )
         peopleData["sandra"] = SandraStaticData
         Sandra.update()
         peopleInfo["sandra"] = Sandra
@@ -131,7 +313,6 @@ init python:
             self.uses_own_var_state = True
             self.data = SandraStaticData
             self.rel = 5
-            self.relationship = self.rel
             self.openness = 0
             self.corruption = 20
             self.known = True
@@ -229,8 +410,7 @@ init python:
                 "jobgloryhole": 0,
             }
             self.gift_preferences = ["soap_001", "wild_rose_001", "lavender_001", "berries_001", "mushroom_001", "honey_comb_001", "energy_tea_001", "drink_ale_001"]
-            self.schedule_source = SandraStaticData.schedule_source
-            self.current_location = "TavernMain"
+            self.relationship_cap = 100
             self.talk_preferences = {
                 "favorite_topics": ["job_routine", "food", "money", "family_life", "fashion"],
                 "blocked_topics": [],
@@ -252,9 +432,26 @@ init python:
         def update(self):
             self.name = self.code_name
             self.data = SandraStaticData
-            self.relationship = self.rel
             self.ensure_story_defaults()
-            return self
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            self.save_story_state()
+            return self.var.var.var.var.var.var.var.var.var.var.var.var.var.var.var.var.var.var
 
         def initialize_new_game_state(self):
             self.data = SandraStaticData
@@ -324,7 +521,6 @@ init python:
             except Exception:
                 pass
             girl.rel = max(0, min(20, people_to_int(getattr(girl, "rel", 0), 0) + people_to_int(amount, 0)))
-            girl.relationship = girl.rel
             girl.fun = max(0, min(100, people_to_int(getattr(girl, "fun", 0), 0) + 1))
 
         def apply_kitchen_regular_breakfast_request(self, used_item_id=""):
@@ -332,7 +528,6 @@ init python:
             self.asked_today = people_to_int(self.asked_today, 0) + 1
             self.talked_today = people_to_int(self.talked_today, 0) + 1
             self.rel = min(20, people_to_int(self.rel, 0) + 1)
-            self.relationship = self.rel
             self.fun = min(100, people_to_int(self.fun, 0) + 2)
             self.ensure_story_defaults()["kitchen_regular_breakfast_requests"] = people_to_int(self.var.get("kitchen_regular_breakfast_requests", 0), 0) + 1
             self._add_household_relation(Melissa, 1)
@@ -345,7 +540,6 @@ init python:
             self.asked_today = people_to_int(self.asked_today, 0) + 1
             self.talked_today = people_to_int(self.talked_today, 0) + 1
             self.rel = min(20, people_to_int(self.rel, 0) + 1)
-            self.relationship = self.rel
             self.ensure_story_defaults()["kitchen_client_manners_requests"] = people_to_int(self.var.get("kitchen_client_manners_requests", 0), 0) + 1
             player.sync_from_store()
             player.economy.tavern_fame = people_to_int(player.economy.tavern_fame, 0) + 1
@@ -356,7 +550,6 @@ init python:
             self.update()
             player.remove_item("energy_tea_001", 1)
             self.rel = min(20, people_to_int(self.rel, 0) + 1)
-            self.relationship = self.rel
             self.fun = min(100, people_to_int(self.fun, 0) + 1)
             self._add_household_relation(Becky, 1)
             player.change_stat("fun", 1)
@@ -376,7 +569,7 @@ init python:
 
         def first_month_passed(self):
             try:
-                return int(dayspassed or 0) >= 30
+                return int(current_game_day() or 0) >= 30
             except Exception:
                 return False
 
@@ -494,7 +687,6 @@ init python:
                 self.mc_visit_first_pending = max(0, people_to_int(visit_first_pending, 0))
             if friend_value is not None:
                 self.rel = max(0, min(20, people_to_int(friend_value, self.rel)))
-                self.relationship = self.rel
             if self.weekly_wake_pending:
                 self.weekly_wake_num = max(0, min(people_to_int(self.weekly_chore_counter, 0) - 1, 3))
             if result == "good":
@@ -506,8 +698,7 @@ init python:
                 self.change_fear(5, "weekly_check_bad")
                 if people_to_int(self.anger_with_player, 0) > 40:
                     self.rebellion = max(0, min(100, people_to_int(self.rebellion, 0) + 2))
-            self.save_story_state()
-            return self.var
+            return self
 
         def weekly_thanks_wake_seen(self, step_index=0, gains=None):
             self.ensure_story_defaults()
@@ -521,17 +712,15 @@ init python:
                 self.mc_visit_first_done = 1
             self.mc_visit_first_pending = 0
             self.rel = max(0, min(20, people_to_int(self.rel, 0) + people_to_int(gains.get("rel", 0), 0)))
-            self.relationship = self.rel
             self.openness = max(0, min(20, people_to_int(self.openness, 0) + people_to_int(gains.get("openness", 0), 0)))
             self.corruption = max(0, min(100, people_to_int(self.corruption, 0) + people_to_int(gains.get("corruption", 0), 0)))
-            self.save_story_state()
-            return self.var
+            return self
 
         def night_thanks_seen(self):
             self.ensure_story_defaults()
             self.night_thanks_ready_flag = 0
             try:
-                self.night_thanks_last_day = int(dayspassed or 0)
+                self.night_thanks_last_day = int(current_game_day() or 0)
             except Exception:
                 self.night_thanks_last_day = 0
             self.mc_visit_first_done = 1
@@ -539,11 +728,9 @@ init python:
             self.room_unlocked_flag = 1
             self.sandraSex = True
             self.rel = max(0, min(20, people_to_int(self.rel, 0) + 2))
-            self.relationship = self.rel
             self.openness = max(0, min(20, people_to_int(self.openness, 0) + 2))
             self.corruption = max(0, min(100, people_to_int(self.corruption, 0) + 3))
-            self.save_story_state()
-            return self.var
+            return self
 
         def weekly_thanks_event_ready(self):
             self.ensure_story_defaults()

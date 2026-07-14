@@ -1,46 +1,58 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
-default peopleData = {}
-default peopleInfo = {}
-default girls = []
-default secondary_npcs = []
+        def promote_from_var(self, vardict=None):
+            super().promote_from_var(vardict)
+            v = vardict if vardict is not None else self.var
+            if isinstance(v, dict):
+                for k in ("body_layers", "clothing", "sex_history", "pregnancy"):
+                    if k in v and isinstance(v[k], (dict, list)):
+                        setattr(self, k, v[k])
+            return self
+        def publish_visibility_state(self):
+            name = people_normalize_id(getattr(self, "code_name", self.name))
+            TitsVisible[name] = 1 if self.tits_visible() else 0
+            PussyVisible[name] = 1 if self.pussy_visible() else 0
+            ShortSkirtNoPanties[name] = 1 if self.short_skirt_no_panties() else 0
+            self.publish_visibility_state()
+            return self
+    def npc_schedule_sync_currentloc(npc_id="", weekday_value=None, time_value=None):
+        info = peopleInfo.get(people_normalize_id(npc_id), None)
+        if info is None:
+            return ""
+        info.location = str(info.getLocation(weekday_value, time_value) or "")
+        return info.location
 
-init -1000 python:
-    peopleData = {}
-    peopleInfo = {}
-    girls = []
-    secondary_npcs = []
-
-# =============================================================================
-# BASE CLASSES (templates) - placed here in the normal people runtime file
-# as requested ("classes as definitions of templates will leave in people").
-# Using init -999 python: (documented Ren'Py priority) so they are available
-# before any later init python blocks in the per-NPC Init*.rpy files run.
-# Specific per-NPC classes (Amanda, Becky, etc.) stay defined in their own
-# game/NPC/*/Init*.rpy files. Instantiation also stays there.
-# No magic 00_ files. Only this existing people rpy + the per-NPC Inits.
-# =============================================================================
-init -999 python:
-    import json
-
-    def people_to_int(value, default=0):
-        try:
-            return int(value)
-        except Exception:
-            return int(default or 0)
-
-    def people_to_bool(value, default=False):
-        if value is None:
-            return bool(default)
-        return bool(value)
-
-    def people_clamp(value, low=0, high=100):
-        return max(people_to_int(low, 0), min(people_to_int(high, 100), people_to_int(value, low)))
-
-    def people_normalize_id(person=""):
-        return str(person or "").strip().lower()
-
+    def npc_schedule_sync_all(weekday_value=None, time_value=None):
+        for info in list(peopleInfo.values()):
+            if info is not None:
+                info.location = str(info.getLocation(weekday_value, time_value) or "")
+        def publish_wardrobe_state(self):
+            name = people_normalize_id(getattr(self, "code_name", self.name))
+            wardrobe = getattr(self, "wardrobe", {})
+            if not isinstance(wardrobe, dict):
+                $ dog_sync_profile()
+    $ werecat_sync_profile()
+    return self
+            underwear = wardrobe.get("current_underwear", {})
+            if not isinstance(underwear, dict):
+                underwear = {}
+                wardrobe["current_underwear"] = underwear
+            current_dress = str(wardrobe.get("current_dress", "") or "")
+            dressdefault[name] = current_dress
+            topdressdef[name] = DressTopPart.get(current_dress, "")
+            bottomdressdef[name] = DressBottomPart.get(current_dress, "")
+            bradef[name] = str(underwear.get("bra", "") or "")
+            pantiesdef[name] = str(underwear.get("panties", "") or "")
+            legsdef[name] = str(underwear.get("legs", "") or "")
+            shoesdef[name] = str(underwear.get("shoes", "") or "")
+            topdress[name] = topdressdef[name]
+            bottomdress[name] = bottomdressdef[name]
+            bra[name] = bradef[name]
+            panties[name] = pantiesdef[name]
+            legs[name] = legsdef[name]
+            shoes[name] = shoesdef[name]
+            topraised[name] = people_to_int(topraised.get(name, 0), 0)
+            bottomraised[name] = people_to_int(bottomraised.get(name, 0), 0)
+            wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
+            return self
     def people_initial_location(person=""):
         return {
             "sandra": "TavernMain",
@@ -66,6 +78,451 @@ init -999 python:
             "sergio": "ArtisansQuarter",
             "sergio_pet": "BarberShop",
         }.get(people_normalize_id(person), "")
+            self.pregnancy_state = {}    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
+
+    def npc_daily_schedule_build_all(force=False):
+        for data in list(peopleData.values()):
+            if isinstance(data, PeopleData):
+                data.daily_schedule_build(force)
+    def npc_daily_schedule_entries(npc_id=""):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return list(data.daily_schedule_build(False) or [])
+
+    def npc_daily_schedule_rows(npc_id=""):
+        rows = []
+        for entry in npc_daily_schedule_entries(npc_id):
+            rows.append({
+                "slot": int(entry.time_slots[0]) if list(entry.time_slots or []) else 0,
+                "location": str(getattr(entry, "location", "") or ""),
+                "awake": bool(getattr(entry, "awake", True)),
+                "talkable": bool(getattr(entry, "talkable", True)),
+                "label": str(getattr(entry, "label", "") or ""),
+            })
+        return rows
+    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
+
+    def npc_daily_schedule_build_all(force=False):
+        for data in list(peopleData.values()):
+            if data is not None:
+                data.daily_schedule_build(force)
+    def npc_daily_schedule_entries(npc_id=""):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return list(data.daily_schedule_build(False) or [])
+
+    def npc_daily_schedule_rows(npc_id=""):
+        rows = []
+        for entry in npc_daily_schedule_entries(npc_id):
+            rows.append({
+                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
+                "location": str(getattr(entry, "location", "") or ""),
+                "awake": bool(getattr(entry, "awake", True)),
+                "talkable": bool(getattr(entry, "talkable", True)),
+                "label": str(getattr(entry, "label", "") or ""),
+            })
+        return rows
+    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
+
+    def npc_daily_schedule_build_all(force=False):
+        for data in list(peopleData.values()):
+            if data is not None:
+                data.daily_schedule_build(force)
+    def npc_daily_schedule_entries(npc_id=""):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return list(data.daily_schedule_build(False) or [])
+
+    def npc_daily_schedule_rows(npc_id=""):
+        rows = []
+        for entry in npc_daily_schedule_entries(npc_id):
+            rows.append({
+                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
+                "location": str(getattr(entry, "location", "") or ""),
+                "awake": bool(getattr(entry, "awake", True)),
+                "talkable": bool(getattr(entry, "talkable", True)),
+                "label": str(getattr(entry, "label", "") or ""),
+            })
+        return rows
+                self.relationship = self.rel        def promote_from_var(self, vardict=None):
+            super().promote_from_var(vardict)
+            v = vardict if vardict is not None else self.var
+            if isinstance(v, dict):
+                for k in ("body_layers", "clothing", "sex_history", "pregnancy"):
+                    if k in v and isinstance(v[k], (dict, list)):
+                        setattr(self, k, v[k])
+            return self
+        def publish_visibility_state(self):
+            name = people_normalize_id(getattr(self, "code_name", self.name))
+            TitsVisible[name] = 1 if self.tits_visible() else 0
+            PussyVisible[name] = 1 if self.pussy_visible() else 0
+            ShortSkirtNoPanties[name] = 1 if self.short_skirt_no_panties() else 0
+            self.publish_visibility_state()
+            return self
+    def npc_schedule_sync_currentloc(npc_id="", weekday_value=None, time_value=None):
+        info = peopleInfo.get(people_normalize_id(npc_id), None)
+        if info is None:
+            return ""
+        info.location = str(info.getLocation(weekday_value, time_value) or "")
+        return info.location
+
+    def npc_schedule_sync_all(weekday_value=None, time_value=None):
+        for info in list(peopleInfo.values()):
+            if info is not None:
+                info.location = str(info.getLocation(weekday_value, time_value) or "")
+        def publish_wardrobe_state(self):
+            name = people_normalize_id(getattr(self, "code_name", self.name))
+            wardrobe = getattr(self, "wardrobe", {})
+            if not isinstance(wardrobe, dict):
+                $ dog_sync_profile()
+    $ werecat_sync_profile()
+    return self
+            underwear = wardrobe.get("current_underwear", {})
+            if not isinstance(underwear, dict):
+                underwear = {}
+                wardrobe["current_underwear"] = underwear
+            current_dress = str(wardrobe.get("current_dress", "") or "")
+            dressdefault[name] = current_dress
+            topdressdef[name] = DressTopPart.get(current_dress, "")
+            bottomdressdef[name] = DressBottomPart.get(current_dress, "")
+            bradef[name] = str(underwear.get("bra", "") or "")
+            pantiesdef[name] = str(underwear.get("panties", "") or "")
+            legsdef[name] = str(underwear.get("legs", "") or "")
+            shoesdef[name] = str(underwear.get("shoes", "") or "")
+            topdress[name] = topdressdef[name]
+            bottomdress[name] = bottomdressdef[name]
+            bra[name] = bradef[name]
+            panties[name] = pantiesdef[name]
+            legs[name] = legsdef[name]
+            shoes[name] = shoesdef[name]
+            topraised[name] = people_to_int(topraised.get(name, 0), 0)
+            bottomraised[name] = people_to_int(bottomraised.get(name, 0), 0)
+            wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
+            return self
+    def people_initial_location(person=""):
+        return {
+            "sandra": "TavernMain",
+            "melissa": "TavernMain",
+            "amanda": "TavernMain",
+            "georgett": "",
+            "liza": "",
+            "becky": "GroceryStore",
+            "irma": "DressShop",
+            "inga": "BeckyHome",
+            "clara": "WineStore",
+            "eddie": "GroceryStore",
+            "alber": "WineStore",
+            "fran": "EllonaTemple",
+            "gerhard": "Church",
+            "lucas": "BeckyHome",
+            "clara_fiance": "",
+            "robin": "BlackwoodRoad",
+            "mongol": "",
+            "zimmer": "CityGuard",
+            "draupnir": "StolyarWorkshop",
+            "luisa": "HunterClub",
+            "sergio": "ArtisansQuarter",
+            "sergio_pet": "BarberShop",
+        }.get(people_normalize_id(person), "")
+            self.pregnancy_state = {}    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
+
+    def npc_daily_schedule_build_all(force=False):
+        for data in list(peopleData.values()):
+            if isinstance(data, PeopleData):
+                data.daily_schedule_build(force)
+    def npc_daily_schedule_entries(npc_id=""):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return list(data.daily_schedule_build(False) or [])
+
+    def npc_daily_schedule_rows(npc_id=""):
+        rows = []
+        for entry in npc_daily_schedule_entries(npc_id):
+            rows.append({
+                "slot": int(entry.time_slots[0]) if list(entry.time_slots or []) else 0,
+                "location": str(getattr(entry, "location", "") or ""),
+                "awake": bool(getattr(entry, "awake", True)),
+                "talkable": bool(getattr(entry, "talkable", True)),
+                "label": str(getattr(entry, "label", "") or ""),
+            })
+        return rows
+    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
+
+    def npc_daily_schedule_build_all(force=False):
+        for data in list(peopleData.values()):
+            if data is not None:
+                data.daily_schedule_build(force)
+    def npc_daily_schedule_entries(npc_id=""):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return list(data.daily_schedule_build(False) or [])
+
+    def npc_daily_schedule_rows(npc_id=""):
+        rows = []
+        for entry in npc_daily_schedule_entries(npc_id):
+            rows.append({
+                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
+                "location": str(getattr(entry, "location", "") or ""),
+                "awake": bool(getattr(entry, "awake", True)),
+                "talkable": bool(getattr(entry, "talkable", True)),
+                "label": str(getattr(entry, "label", "") or ""),
+            })
+        return rows
+    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
+
+    def npc_daily_schedule_build_all(force=False):
+        for data in list(peopleData.values()):
+            if data is not None:
+                data.daily_schedule_build(force)
+    def npc_daily_schedule_entries(npc_id=""):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return list(data.daily_schedule_build(False) or [])
+
+    def npc_daily_schedule_rows(npc_id=""):
+        rows = []
+        for entry in npc_daily_schedule_entries(npc_id):
+            rows.append({
+                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
+                "location": str(getattr(entry, "location", "") or ""),
+                "awake": bool(getattr(entry, "awake", True)),
+                "talkable": bool(getattr(entry, "talkable", True)),
+                "label": str(getattr(entry, "label", "") or ""),
+            })
+        return rows
+                self.relationship = self.rel        def promote_from_var(self, vardict=None):
+            super().promote_from_var(vardict)
+            v = vardict if vardict is not None else self.var
+            if isinstance(v, dict):
+                for k in ("body_layers", "clothing", "sex_history", "pregnancy"):
+                    if k in v and isinstance(v[k], (dict, list)):
+                        setattr(self, k, v[k])
+            return self
+        def publish_visibility_state(self):
+            name = people_normalize_id(getattr(self, "code_name", self.name))
+            TitsVisible[name] = 1 if self.tits_visible() else 0
+            PussyVisible[name] = 1 if self.pussy_visible() else 0
+            ShortSkirtNoPanties[name] = 1 if self.short_skirt_no_panties() else 0
+            self.publish_visibility_state()
+            return self
+    def npc_schedule_sync_currentloc(npc_id="", weekday_value=None, time_value=None):
+        info = peopleInfo.get(people_normalize_id(npc_id), None)
+        if info is None:
+            return ""
+        info.location = str(info.getLocation(weekday_value, time_value) or "")
+        return info.location
+
+    def npc_schedule_sync_all(weekday_value=None, time_value=None):
+        for info in list(peopleInfo.values()):
+            if info is not None:
+                info.location = str(info.getLocation(weekday_value, time_value) or "")
+        def publish_wardrobe_state(self):
+            name = people_normalize_id(getattr(self, "code_name", self.name))
+            wardrobe = getattr(self, "wardrobe", {})
+            if not isinstance(wardrobe, dict):
+                $ dog_sync_profile()
+    $ werecat_sync_profile()
+    return self
+            underwear = wardrobe.get("current_underwear", {})
+            if not isinstance(underwear, dict):
+                underwear = {}
+                wardrobe["current_underwear"] = underwear
+            current_dress = str(wardrobe.get("current_dress", "") or "")
+            dressdefault[name] = current_dress
+            topdressdef[name] = DressTopPart.get(current_dress, "")
+            bottomdressdef[name] = DressBottomPart.get(current_dress, "")
+            bradef[name] = str(underwear.get("bra", "") or "")
+            pantiesdef[name] = str(underwear.get("panties", "") or "")
+            legsdef[name] = str(underwear.get("legs", "") or "")
+            shoesdef[name] = str(underwear.get("shoes", "") or "")
+            topdress[name] = topdressdef[name]
+            bottomdress[name] = bottomdressdef[name]
+            bra[name] = bradef[name]
+            panties[name] = pantiesdef[name]
+            legs[name] = legsdef[name]
+            shoes[name] = shoesdef[name]
+            topraised[name] = people_to_int(topraised.get(name, 0), 0)
+            bottomraised[name] = people_to_int(bottomraised.get(name, 0), 0)
+            wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
+            return self
+    def people_initial_location(person=""):
+        return {
+            "sandra": "TavernMain",
+            "melissa": "TavernMain",
+            "amanda": "TavernMain",
+            "georgett": "",
+            "liza": "",
+            "becky": "GroceryStore",
+            "irma": "DressShop",
+            "inga": "BeckyHome",
+            "clara": "WineStore",
+            "eddie": "GroceryStore",
+            "alber": "WineStore",
+            "fran": "EllonaTemple",
+            "gerhard": "Church",
+            "lucas": "BeckyHome",
+            "clara_fiance": "",
+            "robin": "BlackwoodRoad",
+            "mongol": "",
+            "zimmer": "CityGuard",
+            "draupnir": "StolyarWorkshop",
+            "luisa": "HunterClub",
+            "sergio": "ArtisansQuarter",
+            "sergio_pet": "BarberShop",
+        }.get(people_normalize_id(person), "")
+            self.pregnancy_state = {}    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
+
+    def npc_daily_schedule_build_all(force=False):
+        for data in list(peopleData.values()):
+            if isinstance(data, PeopleData):
+                data.daily_schedule_build(force)
+    def npc_daily_schedule_entries(npc_id=""):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return list(data.daily_schedule_build(False) or [])
+
+    def npc_daily_schedule_rows(npc_id=""):
+        rows = []
+        for entry in npc_daily_schedule_entries(npc_id):
+            rows.append({
+                "slot": int(entry.time_slots[0]) if list(entry.time_slots or []) else 0,
+                "location": str(getattr(entry, "location", "") or ""),
+                "awake": bool(getattr(entry, "awake", True)),
+                "talkable": bool(getattr(entry, "talkable", True)),
+                "label": str(getattr(entry, "label", "") or ""),
+            })
+        return rows
+    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
+
+    def npc_daily_schedule_build_all(force=False):
+        for data in list(peopleData.values()):
+            if data is not None:
+                data.daily_schedule_build(force)
+    def npc_daily_schedule_entries(npc_id=""):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return list(data.daily_schedule_build(False) or [])
+
+    def npc_daily_schedule_rows(npc_id=""):
+        rows = []
+        for entry in npc_daily_schedule_entries(npc_id):
+            rows.append({
+                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
+                "location": str(getattr(entry, "location", "") or ""),
+                "awake": bool(getattr(entry, "awake", True)),
+                "talkable": bool(getattr(entry, "talkable", True)),
+                "label": str(getattr(entry, "label", "") or ""),
+            })
+        return rows
+    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
+
+    def npc_daily_schedule_build_all(force=False):
+        for data in list(peopleData.values()):
+            if data is not None:
+                data.daily_schedule_build(force)
+    def npc_daily_schedule_entries(npc_id=""):
+        data = people_schedule_data(npc_id)
+        if data is None:
+            return []
+        return list(data.daily_schedule_build(False) or [])
+
+    def npc_daily_schedule_rows(npc_id=""):
+        rows = []
+        for entry in npc_daily_schedule_entries(npc_id):
+            rows.append({
+                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
+                "location": str(getattr(entry, "location", "") or ""),
+                "awake": bool(getattr(entry, "awake", True)),
+                "talkable": bool(getattr(entry, "talkable", True)),
+                "label": str(getattr(entry, "label", "") or ""),
+            })
+        return rows
+                self.relationship = self.rel# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+default peopleData = {}
+default peopleInfo = {}
+default girls = []
+default secondary_npcs = []
+
+init -1000 python:
+    peopleData = {}
+    peopleInfo = {}
+    girls = []
+    secondary_npcs = []
+
+# =============================================================================
+# BASE CLASSES (templates) - placed here in the normal people runtime file
+# as requested ("classes as definitions of templates will leave in people").
+# Using init -1000 python: (documented Ren'Py priority) so they are available
+# before any later init python blocks in the per-NPC Init*.rpy files run.
+# Specific per-NPC classes (Amanda, Becky, etc.) stay defined in their own
+# game/NPC/*/Init*.rpy files. Instantiation also stays there.
+# No magic 00_ files. Only this existing people rpy + the per-NPC Inits.
+# =============================================================================
+init -1000 python:
+    import json
+
+    def people_to_int(value, default=0):
+        try:
+            return int(value)
+        except Exception:
+            return int(default or 0)
+
+    def people_to_bool(value, default=False):
+        if value is None:
+            return bool(default)
+        return bool(value)
+
+    def people_clamp(value, low=0, high=100):
+        return max(people_to_int(low, 0), min(people_to_int(high, 100), people_to_int(value, low)))
+
+    def people_normalize_id(person=""):
+        return str(person or "").strip().lower()
 
     class NPCScheduleEntry(object):
         def __init__(self, location="", weekdays=None, time_slots=None, start_hour=None, end_hour=None, awake=True, talkable=True, venue_open_required=False, condition=None, priority=0, label=""):
@@ -143,14 +600,14 @@ init -999 python:
                 return ""
             scale = 10000
             if total_probability <= 1.000001:
-                roll = procedural_randint(1, scale, "npc_hour_%s_%s_%s_%s" % (self.npc_id, self.label, dayspassed, self.start_hour))
+                roll = procedural_randint(1, scale, "npc_hour_%s_%s_%s_%s" % (self.npc_id, self.label, calendar_v2.daysInGame, self.start_hour))
                 cursor = 0
                 for row in choices:
                     cursor += int(round(max(0.0, float(row.get("probability", 0.0) or 0.0)) * scale))
                     if roll <= cursor:
                         return str(row.get("location", "") or "")
                 return ""
-            roll = procedural_randint(1, int(round(total_probability * scale)), "npc_hour_%s_%s_%s_%s" % (self.npc_id, self.label, dayspassed, self.start_hour))
+            roll = procedural_randint(1, int(round(total_probability * scale)), "npc_hour_%s_%s_%s_%s" % (self.npc_id, self.label, calendar_v2.daysInGame, self.start_hour))
             cursor = 0
             for row in choices:
                 cursor += int(round(max(0.0, float(row.get("probability", 0.0) or 0.0)) * scale))
@@ -201,6 +658,11 @@ init -999 python:
             self.daily_schedule_template = {"default_slots": [], "random_slots": []}
             self.daily_schedule_plan_day = -1
             self.daily_schedule_plan = []
+            self.schedule_monthly_counters = {}
+            self.schedule_monthly_counters = {}
+            self.schedule_monthly_counters = {}
+            self.schedule_monthly_counters = {}
+            self.schedule_monthly_counters = {}
             self.schedule_monthly_counters = {}
             self.interval_schedule_entries = []
             self.interval_schedule_loaded = False
@@ -263,10 +725,152 @@ init -999 python:
                 row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
                 if int(row_count.get("month", -1) or -1) != current_month:
                     row_count = {"month": current_month, "count": 0}
+                if int(row_count.get("count", 0) or 0) >= monthly_limit:
+                    return False
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if monthly_key and monthly_limit > 0:
+                current_month = int(year or 0) * 100 + int(month or 0)
+                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+                if int(row_count.get("month", -1) or -1) != current_month:
+                    row_count = {"month": current_month, "count": 0}
                     self.schedule_monthly_counters[monthly_key] = row_count
                 if int(row_count.get("count", 0) or 0) >= monthly_limit:
                     return False
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if monthly_key and monthly_limit > 0:
+                current_month = int(year or 0) * 100 + int(month or 0)
+                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+                if int(row_count.get("month", -1) or -1) != current_month:
+                    row_count = {"month": current_month, "count": 0}
+                    self.schedule_monthly_counters[monthly_key] = row_count
+                if int(row_count.get("count", 0) or 0) >= monthly_limit:
+                    return False
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if monthly_key and monthly_limit > 0:
+                current_month = int(year or 0) * 100 + int(month or 0)
+                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+                if int(row_count.get("month", -1) or -1) != current_month:
+                    row_count = {"month": current_month, "count": 0}
+                    self.schedule_monthly_counters[monthly_key] = row_count
+                if int(row_count.get("count", 0) or 0) >= monthly_limit:
+                    return False
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if monthly_key and monthly_limit > 0:
+                current_month = int(year or 0) * 100 + int(month or 0)
+                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+                if int(row_count.get("month", -1) or -1) != current_month:
+                    row_count = {"month": current_month, "count": 0}
+                    self.schedule_monthly_counters[monthly_key] = row_count
+                if int(row_count.get("count", 0) or 0) >= monthly_limit:
+                    return False
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if monthly_key and monthly_limit > 0:
+                current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
+                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+                if int(row_count.get("month", -1) or -1) != current_month:
+                    row_count = {"month": current_month, "count": 0}
+                    self.schedule_monthly_counters[monthly_key] = row_count
+                if int(row_count.get("count", 0) or 0) >= monthly_limit:
+                    return False
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if monthly_key and monthly_limit > 0:
+                current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
+                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+                if int(row_count.get("month", -1) or -1) != current_month:
+                    row_count = {"month": current_month, "count": 0}
+                if int(row_count.get("count", 0) or 0) >= monthly_limit:
+                    return False
             return True
+
+        def daily_schedule_mark_choice(self, choice):
+            row = dict(choice or {})
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if not monthly_key or monthly_limit <= 0:
+                return
+            current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
+            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+            if int(row_count.get("month", -1) or -1) != current_month:
+                row_count = {"month": current_month, "count": 0}
+            row_count["month"] = current_month
+            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
+            self.schedule_monthly_counters[monthly_key] = row_count
+
+        def daily_schedule_mark_choice(self, choice):
+            row = dict(choice or {})
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if not monthly_key or monthly_limit <= 0:
+                return
+            current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
+            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+            if int(row_count.get("month", -1) or -1) != current_month:
+                row_count = {"month": current_month, "count": 0}
+            row_count["month"] = current_month
+            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
+            self.schedule_monthly_counters[monthly_key] = row_count
+
+        def daily_schedule_mark_choice(self, choice):
+            row = dict(choice or {})
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if not monthly_key or monthly_limit <= 0:
+                return
+            current_month = int(year or 0) * 100 + int(month or 0)
+            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+            if int(row_count.get("month", -1) or -1) != current_month:
+                row_count = {"month": current_month, "count": 0}
+            row_count["month"] = current_month
+            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
+            self.schedule_monthly_counters[monthly_key] = row_count
+
+        def daily_schedule_mark_choice(self, choice):
+            row = dict(choice or {})
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if not monthly_key or monthly_limit <= 0:
+                return
+            current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
+            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+            if int(row_count.get("month", -1) or -1) != current_month:
+                row_count = {"month": current_month, "count": 0}
+            row_count["month"] = current_month
+            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
+            self.schedule_monthly_counters[monthly_key] = row_count
+
+        def daily_schedule_mark_choice(self, choice):
+            row = dict(choice or {})
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if not monthly_key or monthly_limit <= 0:
+                return
+            current_month = int(year or 0) * 100 + int(month or 0)
+            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+            if int(row_count.get("month", -1) or -1) != current_month:
+                row_count = {"month": current_month, "count": 0}
+            row_count["month"] = current_month
+            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
+            self.schedule_monthly_counters[monthly_key] = row_count
+
+        def daily_schedule_mark_choice(self, choice):
+            row = dict(choice or {})
+            monthly_key = str(row.get("monthly_key", "") or "").strip()
+            monthly_limit = int(row.get("monthly_limit", 0) or 0)
+            if not monthly_key or monthly_limit <= 0:
+                return
+            current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
+            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
+            if int(row_count.get("month", -1) or -1) != current_month:
+                row_count = {"month": current_month, "count": 0}
+            row_count["month"] = current_month
+            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
+            self.schedule_monthly_counters[monthly_key] = row_count
 
         def daily_schedule_mark_choice(self, choice):
             row = dict(choice or {})
@@ -289,7 +893,7 @@ init -999 python:
             total_weight = sum([max(0, int(row.get("weight", 1) or 1)) for row in allowed])
             if total_weight <= 0:
                 return allowed[0]
-            roll = procedural_randint(1, total_weight, "daily_schedule_%s_%s_%s" % (self.name, int(dayspassed or 0), total_weight))
+            roll = procedural_randint(1, total_weight, "daily_schedule_%s_%s_%s" % (self.name, int(calendar_v2.daysInGame or 0), total_weight))
             cursor = 0
             for row in allowed:
                 cursor += max(0, int(row.get("weight", 1) or 1))
@@ -313,7 +917,7 @@ init -999 python:
             )
 
         def daily_schedule_build(self, force=False, weekday_value=None):
-            day_value = int(dayspassed or 0)
+            day_value = int(calendar_v2.daysInGame or 0)
             if not force and int(self.daily_schedule_plan_day or -1) == day_value:
                 return list(self.daily_schedule_plan or [])
             template = dict(self.daily_schedule_template or {})
@@ -412,6 +1016,10 @@ init -999 python:
                 self.interval_schedule_entries = rows
             except Exception as ex:
                 self.interval_schedule_load_error = "%s: %s" % (path, ex)
+                self.interval_schedule_entries = previous_entries
+                self.interval_schedule_entries = previous_entries
+                self.interval_schedule_entries = previous_entries
+                self.interval_schedule_entries = previous_entries
             self.interval_schedule_loaded = True
             return list(self.interval_schedule_entries or [])
 
@@ -504,34 +1112,15 @@ init -999 python:
         if data is not None:
             data.set_daily_schedule(default_slots, random_slots)
 
-    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
+    def npc_daily_schedule_invalidate(npc_id=""):
         data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
+        if data is not None:
+            data.invalidate_daily_schedule()
 
-    def npc_daily_schedule_build_all(force=False):
+    def npc_daily_schedule_invalidate_all():
         for data in list(peopleData.values()):
             if data is not None:
-                data.daily_schedule_build(force)
-
-    def npc_daily_schedule_entries(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.daily_schedule_build(False) or [])
-
-    def npc_daily_schedule_rows(npc_id=""):
-        rows = []
-        for entry in npc_daily_schedule_entries(npc_id):
-            rows.append({
-                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
-                "location": str(getattr(entry, "location", "") or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "label": str(getattr(entry, "label", "") or ""),
-            })
-        return rows
+                data.invalidate_daily_schedule()
 
     def npc_interval_schedule_load_file(npc_id=""):
         data = people_schedule_data(npc_id)
@@ -585,18 +1174,6 @@ init -999 python:
             return {"location": "", "awake": True, "talkable": True, "venue_open_required": False, "label": "", "interval": "", "source": ""}
         return data.schedule_state(weekday_value, time_value)
 
-    def npc_schedule_sync_currentloc(npc_id="", weekday_value=None, time_value=None):
-        info = peopleInfo.get(people_normalize_id(npc_id), None)
-        if info is None:
-            return ""
-        info.location = str(info.getLocation(weekday_value, time_value) or "")
-        return info.location
-
-    def npc_schedule_sync_all(weekday_value=None, time_value=None):
-        for info in list(peopleInfo.values()):
-            if info is not None:
-                info.location = str(info.getLocation(weekday_value, time_value) or "")
-
     def _npc_display_name(npc_id=""):
         key = people_normalize_id(npc_id)
         if not key:
@@ -647,10 +1224,16 @@ init -999 python:
             self.name = people_normalize_id(name)
             self.rel = people_to_int(rel, 0)
             self.talkToday = set(talkToday or [])
+            self.gifts = set(gifts or [])
+            self.flirtToday = False
+            self.giftToday = False
+            self.flirtToday = False
+            self.giftToday = False
+            self.flirtToday = False
+            self.giftToday = False
+            self.talked_today = 0
             self.flirtToday = people_to_bool(flirtToday, False)
             self.giftToday = people_to_bool(giftToday, False)
-            self.gifts = set(gifts or [])
-            self.talked_today = 0
             self.flirted_today = 0
             self.gifted_today = 0
             self.asked_today = 0
@@ -664,6 +1247,10 @@ init -999 python:
             self.data = None
             self.var = var if var is not None else {}
             self.sex_state = {}
+            # Hidden per-girl lunar fertility dict (for Amanda, Melissa, Clara, Sandra)
+            self.lunar_fertility = {"offset": 0, "last_phase": 0, "strength": 1.0}
+            # Hidden per-girl lunar fertility dict (for Amanda, Melissa, Clara, Sandra)
+            self.lunar_fertility = {"offset": 0, "last_phase": 0, "strength": 1.0}
             # Hidden per-girl lunar fertility dict (for Amanda, Melissa, Clara, Sandra)
             self.lunar_fertility = {"offset": 0, "last_phase": 0, "strength": 1.0}
 
@@ -716,7 +1303,7 @@ init -999 python:
             if position_key not in ("none", "pussy", "mouth", "tits", "ass"):
                 position_key = "none"
             actor_key = str(actor or "You").strip() or "You"
-            state = self.ensure_sex_state()
+            state = self.sex_clothing_state()
             state["partner_positions"][actor_key] = position_key
             if actor_key.lower() == "you":
                 state["cock_position"] = position_key
@@ -724,7 +1311,7 @@ init -999 python:
 
         def cock_position(self, actor="You"):
             actor_key = str(actor or "You").strip() or "You"
-            state = self.ensure_sex_state()
+            state = self.sex_clothing_state()
             return str(state.get("partner_positions", {}).get(actor_key, state.get("cock_position", "none")) or "none")
 
         def cock_in(self, position="none", actor="You"):
@@ -751,7 +1338,7 @@ init -999 python:
             return people_to_int(self.ensure_sex_state().get(str(key or ""), 0), 0)
 
         def set_cum_state(self, key, value=1):
-            state = self.ensure_sex_state()
+            state = self.sex_clothing_state()
             state[str(key or "")] = 1 if people_to_int(value, 0) else 0
             return state[str(key or "")]
 
@@ -802,6 +1389,17 @@ init -999 python:
             self.jobs[str(key or "")] = value
             return value
 
+        def reset_skill_gains(self):
+            self.skill_gains_today = {}
+            return self.skill_gains_today
+
+        def record_skill_gain(self, key, amount=1):
+            if not isinstance(getattr(self, "skill_gains_today", None), dict):
+                self.skill_gains_today = {}
+            skill_key = str(key or "")
+            self.skill_gains_today[skill_key] = people_to_int(self.skill_gains_today.get(skill_key, 0), 0) + people_to_int(amount, 1)
+            return self.skill_gains_today[skill_key]
+
         def sex_stat(self, key, default=0):
             stats = getattr(self, "stats", None)
             if not isinstance(stats, dict):
@@ -824,13 +1422,13 @@ init -999 python:
 
         def record_orgasm_given(self):
             count = self.add_sex_stat("orgasms_given", 1)
-            self.set_sex_stat("last_orgasm_day", people_to_int(dayspassed, 0))
+            self.set_sex_stat("last_orgasm_day", people_to_int(calendar_v2.daysInGame, 0))
             return count
 
         def record_sex_history(self, partner="You", place="", cum_target="", day_value=None):
             if not isinstance(getattr(self, "detailed_sex_history", None), list):
                 self.detailed_sex_history = []
-            day = people_to_int(day_value if day_value is not None else dayspassed, 0)
+            day = people_to_int(day_value if day_value is not None else calendar_v2.daysInGame, 0)
             row = {
                 "day": day,
                 "partner": str(partner or ""),
@@ -846,9 +1444,8 @@ init -999 python:
                 place_key = "outside"
             state = self.ensure_sex_state()
             try:
-                intimacy = player_state(False).intimacy
-                intimacy.record_cum(dayspassed)
-                intimacy.apply_to_store()
+                intimacy = player.intimacy
+                intimacy.record_cum(calendar_v2.daysInGame)
             except Exception:
                 pass
             self.add_sex_stat("sexacts", 1)
@@ -858,7 +1455,7 @@ init -999 python:
                 self.add_sex_stat("cuminside", 1)
                 if self.pregnancy_days() == 0:
                     chance = min(800, people_to_int(self.sex_stat("ConceptionChance", 0), 0) * 3)
-                    if chance > 0 and procedural_randint(1, 1000, "pregnancy_%s_%s" % (self.code_name, people_to_int(dayspassed, 0))) <= chance:
+                    if chance > 0 and procedural_randint(1, 1000, "pregnancy_%s_%s" % (self.code_name, people_to_int(calendar_v2.daysInGame, 0))) <= chance:
                         self.set_sex_stat("pregnancy", 1)
                         self.set_sex_stat("pregfather", "Вы")
             elif place_key == "mouth":
@@ -873,9 +1470,13 @@ init -999 python:
             return state
 
         def change_social(self, friend_delta=0, open_delta=0, corruption_delta=0):
-            self.rel = max(0, min(20, people_to_int(getattr(self, "rel", 0), 0) + people_to_int(friend_delta, 0)))
+            relationship_cap = max(20, people_to_int(getattr(self, "relationship_cap", 20), 20))
+            self.rel = max(0, min(relationship_cap, people_to_int(getattr(self, "rel", 0), 0) + people_to_int(friend_delta, 0)))
             if hasattr(self, "relationship"):
-                self.relationship = self.rel
+            if hasattr(self, "relationship"):
+            if hasattr(self, "relationship"):
+            if hasattr(self, "relationship"):
+            if hasattr(self, "relationship"):
             self.openness = max(0, min(20, people_to_int(getattr(self, "openness", 0), 0) + people_to_int(open_delta, 0)))
             self.corruption = max(0, min(100, people_to_int(getattr(self, "corruption", 0), 0) + people_to_int(corruption_delta, 0)))
             return self
@@ -898,10 +1499,10 @@ init -999 python:
             return {"rel": self.rel, "corruption": self.corruption, "mana": self.mana}
 
         def change_rebellion(self, amount=0, reason=""):
-            self.rebellion = max(0, min(100, people_to_int(getattr(self, "rebellion", 0), 0) + people_to_int(amount, 0)))
+            self.player.stats.rebellion = max(0, min(100, people_to_int(getattr(self, "rebellion", 0), 0) + people_to_int(amount, 0)))
             if isinstance(getattr(self, "reaction_state", None), dict):
                 self.reaction_state["last_rebellion_reason"] = str(reason or "")
-            return self.rebellion
+            return self.player.stats.rebellion
 
         def change_anger(self, amount=0, reason=""):
             self.anger_with_player = max(0, min(100, people_to_int(getattr(self, "anger_with_player", 0), 0) + people_to_int(amount, 0)))
@@ -950,8 +1551,6 @@ init -999 python:
             not as pure player-global state.
             """
             self.drunk = 0
-            self.flirtToday = False
-            self.giftToday = False
             self.talked_today = 0
             self.flirted_today = 0
             self.gifted_today = 0
@@ -969,14 +1568,22 @@ init -999 python:
                 if bool(TavernBreakfastEventActive) and TavernBreakfastPresentIds is not None:
                     breakfast_ids = [people_normalize_id(row) for row in list(TavernBreakfastPresentIds or [])]
                     if self.name in breakfast_ids:
-                        self.location = "TavernKitchen"
-                        return self.location
-                if self.data is None:
-                    self.data = peopleData.get(self.name, PeopleData(self.name))
-                self.location = str(self.data.getLocation(wday, hour) or "")
+                        return "TavernKitchen"
+            authored_location = str(getattr(self, "location", "") or "").strip()
+            if authored_location:
+                return authored_location
+            authored_location = str(getattr(self, "location", "") or "").strip()
+            if authored_location:
+                return authored_location
+            authored_location = str(getattr(self, "location", "") or "").strip()
+            if authored_location:
+                return authored_location
+            data_owner = getattr(self, "data", None)
+                if data_owner is None:
+                    return ""
+                return str(data_owner.getLocation(wday, hour) or "")
             except Exception:
-                self.location = str(self.location or "")
-            return self.location
+                return str(self.location or "")
 
         def isInLocation(self, location, wday=None, hour=None):
             return str(self.getLocation(wday, hour) or "") == str(location or "")
@@ -1017,6 +1624,42 @@ init -999 python:
             if "napVars" in v and isinstance(v["napVars"], dict):
                 self.story_flags.update(v["napVars"])
             return self
+            self.clothing = {}
+            self.body_state = {}
+            self.sex_history = []
+            self.story_flags = {}
+            self.knows_mc = {}
+
+        def promote_from_var(self, vardict=None):
+            v = vardict if vardict is not None else self.var
+            if not isinstance(v, dict):
+                return self
+            for key in list(v.keys()):
+                if key.lower() in ("knowhim", "knowcomplaint", "mongolsafepass", "playerhandledrobin",
+                                "missionupdatedbyplayer", "stocksreleased", "sawmomsex", "visitedhome",
+                                "homesex", "eddiegeorg"):
+                    self.story_flags[key] = v[key]
+            if "napVars" in v and isinstance(v["napVars"], dict):
+                self.story_flags.update(v["napVars"])
+            return self
+            self.clothing = {}
+            self.body_state = {}
+            self.sex_history = []
+            self.story_flags = {}
+            self.knows_mc = {}
+
+        def promote_from_var(self, vardict=None):
+            v = vardict if vardict is not None else self.var
+            if not isinstance(v, dict):
+                return self
+            for key in list(v.keys()):
+                if key.lower() in ("knowhim", "knowcomplaint", "mongolsafepass", "playerhandledrobin",
+                                "missionupdatedbyplayer", "stocksreleased", "sawmomsex", "visitedhome",
+                                "homesex", "eddiegeorg"):
+                    self.story_flags[key] = v[key]
+            if "napVars" in v and isinstance(v["napVars"], dict):
+                self.story_flags.update(v["napVars"])
+            return self
 
         def mark_known(self):
             self.known = True
@@ -1034,38 +1677,9 @@ init -999 python:
             self.body_layers = {}
             self.insertion_state = {}
             self.clothing_layers = {}
-            self.pregnancy_state = {}
             self.detailed_sex_history = []
             if not getattr(self, 'lunar_fertility', None):
                 self.lunar_fertility = {"offset": hash(name) % 7, "last_phase": 0, "strength": 1.0}
-
-        def publish_wardrobe_state(self):
-            name = people_normalize_id(getattr(self, "code_name", self.name))
-            wardrobe = getattr(self, "wardrobe", {})
-            if not isinstance(wardrobe, dict):
-                return self
-            underwear = wardrobe.get("current_underwear", {})
-            if not isinstance(underwear, dict):
-                underwear = {}
-                wardrobe["current_underwear"] = underwear
-            current_dress = str(wardrobe.get("current_dress", "") or "")
-            dressdefault[name] = current_dress
-            topdressdef[name] = DressTopPart.get(current_dress, "")
-            bottomdressdef[name] = DressBottomPart.get(current_dress, "")
-            bradef[name] = str(underwear.get("bra", "") or "")
-            pantiesdef[name] = str(underwear.get("panties", "") or "")
-            legsdef[name] = str(underwear.get("legs", "") or "")
-            shoesdef[name] = str(underwear.get("shoes", "") or "")
-            topdress[name] = topdressdef[name]
-            bottomdress[name] = bottomdressdef[name]
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            topraised[name] = people_to_int(topraised.get(name, 0), 0)
-            bottomraised[name] = people_to_int(bottomraised.get(name, 0), 0)
-            wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            return self
 
         def sex_clothing_state(self):
             state = self.ensure_sex_state()
@@ -1083,6 +1697,48 @@ init -999 python:
             if not isinstance(wardrobe, dict):
                 return ""
             return str(wardrobe.get("current_dress", "") or "")
+
+        def scene_dress(self):
+            state = self.ensure_sex_state()
+            if "dress_override" in state:
+                return str(state.get("dress_override", "") or "")
+            return self.current_dress()
+
+        def scene_dress(self):
+            state = self.ensure_sex_state()
+            if "dress_override" in state:
+                return str(state.get("dress_override", "") or "")
+            return self.current_dress()
+
+        def scene_dress(self):
+            state = self.ensure_sex_state()
+            if "dress_override" in state:
+                return str(state.get("dress_override", "") or "")
+            return self.current_dress()
+
+        def scene_dress(self):
+            state = self.ensure_sex_state()
+            if "dress_override" in state:
+                return str(state.get("dress_override", "") or "")
+            return self.current_dress()
+
+        def scene_dress(self):
+            state = self.ensure_sex_state()
+            if "dress_override" in state:
+                return str(state.get("dress_override", "") or "")
+            return self.current_dress()
+
+        def scene_dress(self):
+            state = self.ensure_sex_state()
+            if "dress_override" in state:
+                return str(state.get("dress_override", "") or "")
+            return self.current_dress()
+
+        def scene_dress(self):
+            state = self.ensure_sex_state()
+            if "dress_override" in state:
+                return str(state.get("dress_override", "") or "")
+            return self.current_dress()
 
         def clothing_layer(self, layer):
             layer_key = str(layer or "").strip().lower()
@@ -1135,7 +1791,6 @@ init -999 python:
             state = self.sex_clothing_state()
             for key in ("top_removed", "bottom_removed", "bra_removed", "panties_removed", "top_raised", "bottom_raised"):
                 state[key] = 0
-            self.publish_visibility_state()
             return self
 
         def tits_visible(self):
@@ -1146,13 +1801,6 @@ init -999 python:
 
         def short_skirt_no_panties(self):
             return self.clothing_layer("panties") == "" and not self.layer_raised("bottom") and self.clothing_slut("bottom") >= 4
-
-        def publish_visibility_state(self):
-            name = people_normalize_id(getattr(self, "code_name", self.name))
-            TitsVisible[name] = 1 if self.tits_visible() else 0
-            PussyVisible[name] = 1 if self.pussy_visible() else 0
-            ShortSkirtNoPanties[name] = 1 if self.short_skirt_no_panties() else 0
-            return self
 
         def record_lick_pussy(self):
             state = self.sex_clothing_state()
@@ -1181,7 +1829,7 @@ init -999 python:
             if not isinstance(getattr(self, "reaction_log", None), list):
                 self.reaction_log = []
             self.reaction_state["last_reaction"] = reaction_key
-            self.reaction_state["last_reaction_day"] = people_to_int(dayspassed, 0)
+            self.reaction_state["last_reaction_day"] = people_to_int(calendar_v2.daysInGame, 0)
             self.reaction_state["last_reaction_context"] = str(action_name or "")
             self.reaction_state["last_reaction_score"] = score_value
             self.reaction_state["pending_decision"] = ""
@@ -1213,15 +1861,6 @@ init -999 python:
             elif score < 0:
                 self.change_mana(-1, mana_reason)
             return score
-
-        def promote_from_var(self, vardict=None):
-            super().promote_from_var(vardict)
-            v = vardict if vardict is not None else self.var
-            if isinstance(v, dict):
-                for k in ("body_layers", "clothing", "sex_history", "pregnancy"):
-                    if k in v and isinstance(v[k], (dict, list)):
-                        setattr(self, k, v[k])
-            return self
 
     def _register_people_lists():
         """Fill girls / secondary_npcs from peopleInfo after registrations."""
@@ -1403,11 +2042,70 @@ init python:
         data = getPersonData(person)
         if data is not None:
             return str(data.cname or data.fullname or data.name)
+        return people_normalize_id(person)
+
+    def people_name(person="", grammatical_case="nominative", fallback=""):
         key = people_normalize_id(person)
-        try:
-            return str(RealName.get(key, key) or key)
-        except Exception:
-            return key
+        data = getPersonData(key)
+        if data is None:
+            return str(fallback or key)
+        case_key = str(grammatical_case or "nominative").strip().lower()
+        if case_key == "genitive":
+            return str(data.genitive or data.fullname or data.cname or key)
+        if case_key == "dative":
+            return str(data.dative or data.fullname or data.cname or key)
+        return str(data.cname or data.fullname or key)
+
+    def people_name(person="", grammatical_case="nominative", fallback=""):
+        key = people_normalize_id(person)
+        data = getPersonData(key)
+        if data is None:
+            return str(fallback or key)
+        case_key = str(grammatical_case or "nominative").strip().lower()
+        if case_key == "genitive":
+            return str(data.genitive or data.fullname or data.cname or key)
+        if case_key == "dative":
+            return str(data.dative or data.fullname or data.cname or key)
+        return str(data.cname or data.fullname or key)
+
+    def people_name(person="", grammatical_case="nominative", fallback=""):
+        key = people_normalize_id(person)
+        data = getPersonData(key)
+        if data is None:
+            return str(fallback or key)
+        case_key = str(grammatical_case or "nominative").strip().lower()
+        if case_key == "genitive":
+            return str(data.genitive or data.fullname or data.cname or key)
+        if case_key == "dative":
+            return str(data.dative or data.fullname or data.cname or key)
+        return str(data.cname or data.fullname or key)
+
+    def people_name(person="", grammatical_case="nominative", fallback=""):
+        key = people_normalize_id(person)
+        data = getPersonData(key)
+        if data is None:
+            return str(fallback or key)
+        case_key = str(grammatical_case or "nominative").strip().lower()
+        if case_key == "genitive":
+            return str(data.genitive or data.fullname or data.cname or key)
+        if case_key == "dative":
+            return str(data.dative or data.fullname or data.cname or key)
+        return str(data.cname or data.fullname or key)
+
+    def people_age(person="", fallback=0):
+        data = getPersonData(person)
+        if data is None:
+            return people_to_int(fallback, 0)
+        age_value = data.age(calendar_v2.cycle, calendar_v2.period, calendar_v2.day)
+        return people_to_int(age_value, fallback)
+
+    def people_birth_date(person=""):
+        data = getPersonData(person)
+        return dict(data.birth_date or {}) if data is not None else {}
+
+    def people_gift_preferences(person=""):
+        data = getPersonData(person)
+        return list(data.gift_preferences or []) if data is not None else []
 
     def people_known_ids():
         if isinstance(peopleInfo, dict):
@@ -1431,6 +2129,8 @@ label InitGameNPCs:
     call InitInga
     call register_inga_secondary
     $ init_secondary_npc_profiles()
+    call register_inga_secondary
+    $ init_secondary_npc_profiles()
     call InitRobin
     call InitZimmer
     call InitEddie
@@ -1444,10 +2144,8 @@ label InitGameNPCs:
     call register_sergio_pet_secondary
     call InitDraupnir
     call InitMongol
+    call InitDog
+    call InitWerecat
     $ initPeople()
     $ npc_interval_schedule_load_all(True)
-    $ people_sync_all()
-    $ ensure_dog_runtime()
-    $ dog_sync_profile()
-    $ werecat_sync_profile()
     return

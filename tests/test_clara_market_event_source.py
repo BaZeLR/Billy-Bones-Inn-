@@ -107,9 +107,9 @@ def test_clara_story_labels_use_thread_methods_directly():
     combined = "\n".join([booklet, paintings, tavern])
 
     assert "story_thread_advance_current()" not in combined
-    assert "$ thread.advance()" in combined
-    assert "thread.abort()" in paintings
-    assert "thread.advanceTo(" not in booklet
+    assert "$ event_runtime.active_thread.advance()" in combined
+    assert "event_runtime.active_thread.abort()" in paintings
+    assert "event_runtime.active_thread.advanceTo(" not in booklet
 
 
 def test_clara_market_follow_label_is_simple_repeat_until_success():
@@ -120,7 +120,7 @@ def test_clara_market_follow_label_is_simple_repeat_until_success():
     assert 'Clara.var["market_follow_failed_day"] = int(dayspassed or 0)' in follow
     assert 'Clara.var["market_follow_failed_hour"] = int(hour or 0)' in follow
     assert 'Clara.var["booklet_market_seen"] = 1' in follow
-    assert "$ thread.advance()" in follow
+    assert "$ event_runtime.active_thread.advance()" in follow
     assert "story_thread_advance_current()" not in follow
     assert "advanceTo(" not in follow
     assert "effective_player_exploration" not in follow
@@ -214,7 +214,7 @@ def test_clara_market_thread_file_has_no_direct_wrappers_or_paged_panels():
     assert "ShowImage" not in labels
     assert "ClaraVar" not in labels
     assert "Clara.var" in labels
-    assert 'Call("checkTriggers", "WineStore", "clara_talk", 0)' in clara_talk
+    assert 'call checkTriggers("WineStore", "clara_talk", 0)' in clara_talk
     assert 'Call("checkTriggers", "CityGuard", "enter", 0)' in city_guard
     assert 'Call("checkTriggers", "StolyarWorkshop", "enter", 0)' in stolyar
     assert 'call checkTriggers("HunterClub", "overheard", 0)' in hunter

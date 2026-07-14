@@ -2,7 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/Inn/Forest.rpy", line 414: Line with id WerecatForestSearch_d51f2c38 appears twice. The other line is game/Forest/Forest.rpy:414
+File "game/Utilities/General/NPC/PeopleRuntime.rpy", line 938: expected an indented block after 'if' statement on line 914
+    self.openness = max(0, min(20, people_to_int(getattr(self, "openness", 0), 0) + people_to_int(open_delta, 0)))
+        ^^^^
 
 Ren'Py Version: Ren'Py 8.5.2.26010301
-Tue Apr 28 21:29:15 2026
+Mon Jul 13 19:17:10 2026

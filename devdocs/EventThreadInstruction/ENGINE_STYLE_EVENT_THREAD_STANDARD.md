@@ -36,6 +36,32 @@ Event tuple order:
 
 Keep condition logic in named callable readiness methods when a condition becomes long.
 
+When a blueprint or generated catalog needs to name the event object directly,
+instantiate the existing runtime `Event` class. Do not invent a parallel event
+row class, dict schema, wrapper, or fallback mapper. The `Event` constructor
+still receives the same ordered fields:
+
+```renpy
+Event(
+    (
+        "story_amanda_example_0",
+        None, None, None,
+        1,
+        None,
+        "amanda_example_ready()",
+        None,
+        "TavernMain",
+        "talk",
+        10,
+    ),
+    "",
+    True,
+)
+```
+
+`ThreadData` may later attach the real thread name and threaded flag. The
+availability fields remain owned by the event object, not by a second helper.
+
 ## Readiness Conditions
 
 Use the FamilyLife-style condition system already supported by the runtime:
@@ -47,6 +73,27 @@ Use the FamilyLife-style condition system already supported by the runtime:
 - `threadName_3` / `!threadName_3` for event-step progress.
 - `threadNameNum == 3` / `threadNameNum != 3` for current linear step.
 - Callable readiness helpers when a condition becomes too long for a readable row.
+
+Readiness helpers must read the authoritative OOP owner:
+
+- NPC story flags and counters from the NPC instance, for example
+  `Amanda.var_int("alberfriends", 0)` or `Amanda.var.get("some_key", 0)`.
+- NPC attributes from the NPC instance, for example `Amanda.corruption`,
+  `Amanda.rel`, `Melissa.mana`, or `Sandra.anger_reason`.
+- NPC mechanics through class methods, for example
+  `Amanda.pregnancy_days()`, `Amanda.sex_stat("sexacts", 0)`, or
+  `Amanda.getLocation()`.
+- Player state through the Player/MC owner when the state belongs to the
+  player.
+- Room/object/item state through that room/object/item owner when the state
+  belongs there.
+
+Do not read story state through `globals()`, `renpy.store`, `store.*`, old
+`*Var` dicts, old relationship maps such as `Friends[...]`, or duplicated
+parallel dictionaries. If the state is already represented by an OOP class, the
+event condition must use that class. If a helper is needed, the helper belongs
+on the owner class or in the event file as a readable condition that calls owner
+methods; it must not become a compatibility bridge to old global state.
 
 Good condition value inside the existing tuple:
 
@@ -70,25 +117,25 @@ Use story flags and counters as readable chapter markers, not as scattered one-o
 
 Good examples:
 
-- `MelissaVar["bats_episode"]`: ordered chapter number for the bat problem.
-- `WerecatVar["rat_breakfast_seen"]`: one-shot scene gate.
-- `WerecatVar["adopted_count"]`: repeatable progression counter.
-- `ClaraVar["paintings_stage"]`: ordered investigation branch stage.
+- `Melissa.var["bats_episode"]`: ordered chapter number for the bat problem.
+- `Werecat.var["rat_breakfast_seen"]`: one-shot scene gate.
+- `Werecat.var["adopted_count"]`: repeatable progression counter.
+- `Clara.var["paintings_stage"]`: ordered investigation branch stage.
 
 When adding an arc, prefer:
 
 ```renpy
-SomeVar["arc_stage"] = 0
-SomeVar["arc_scene_seen"] = 0
-SomeVar["arc_repeat_count"] = 0
-SomeVar["arc_last_day"] = -1
+Person.var["arc_stage"] = 0
+Person.var["arc_scene_seen"] = 0
+Person.var["arc_repeat_count"] = 0
+Person.var["arc_last_day"] = -1
 ```
 
 Then point thread rows at those markers through explicit readiness helpers:
 
 ```renpy
 def some_arc_scene_2_ready():
-    return SomeVar["arc_stage"] == 2 and SomeVar["arc_last_day"] != dayspassed
+    return Person.var_int("arc_stage", 0) == 2 and Person.var_int("arc_last_day", -1) != dayspassed
 ```
 
 This makes the story board act like a chapter map. A human should be able to read the flags and understand which scene is next, which scenes repeat, and which branch has already locked or completed.
@@ -106,7 +153,7 @@ label story_person_arc_0:
         "Player choice text."
 
         "Choice A":
-            $ SomeVar["state"] = 1
+            $ Person.set_var_int("state", 1)
             jump story_person_arc_0_choice_a
 
         "Leave":
@@ -142,11 +189,27 @@ Threaded event labels must keep consequences visible in the label.
 
 Preferred:
 
-- direct assignment for simple stats, flags, counters, and thread state
+- direct assignment to the owner class for simple stats, flags, counters, and
+  thread state
 - `call` to established helper labels for shared mechanics such as
   `SlutFriendsIncrease` or `PregnancyCheck`
 - a short comment block before choice-heavy labels explaining the event purpose
   and branch outcomes
+
+Use the owner object at the point of consequence:
+
+```renpy
+$ Amanda.set_var_int("praised_after_dance", 1)
+$ Amanda.rel = min(20, int(Amanda.rel or 0) + 1)
+$ Amanda.mana = min(100, int(Amanda.mana or 0) + 5)
+$ Player.fun = min(100, int(Player.fun or 0) + 5)
+$ thread.advance()
+```
+
+If the change belongs to an NPC, it goes on that NPC class. If it belongs to the
+player, it goes on the Player/MC owner. If it belongs to a room, object, or
+item, it goes on that owner. The event label owns why the consequence happened;
+the class owner owns the state.
 
 Avoid:
 
@@ -154,6 +217,8 @@ Avoid:
 - Python evaluator methods that hide the outcome
 - generic apply handlers for one event choice
 - dispatcher labels that obscure which branch changed which stat
+- `globals()`, `renpy.store`, `store.*`, old `*Var` dicts, old relationship
+  maps, or duplicated state mirrors as normal event state
 
 The reader should be able to inspect the event label and understand what each
 choice changes without chasing a handler chain.

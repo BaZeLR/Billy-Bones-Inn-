@@ -1,10 +1,16 @@
 # Character Worklist: Лизетта
 
+> REFERENCE ONLY.
+>
+> This file preserves source/TXT worklist names. Legacy `*Var` tokens are not
+> current runtime owners. Runtime/story state belongs to the character class
+> instance and event/thread labels.
+
 ## Identity
 - Canonical id: liza
 - Legacy keys/tokens: liza, LizaVar
 - Init source: InitLiza.txt
-- Main var store: LizaVar
+- Current runtime owner: Liza/Lizette class instance
 
 ## Presence/Schedule (TXT-driven notes)
 - Базовая локация старта: PortStreets.

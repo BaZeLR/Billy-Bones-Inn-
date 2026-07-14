@@ -1,16 +1,130 @@
-# ================================================================================
+        npc_schedule_sync_currentloc(GirlName)            self.current_location = "TavernMain"        def var_int(self, key, default=0):
+            return people_to_int(self.ensure_story_defaults().get(str(key or ""), default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()[str(key or "")] = people_to_int(value, 0)
+            return self.var[str(key or "")]
+            self.fertility_cycle = {
+                "cycle_day": 0,
+                "cycle_length": 28,
+                "fertile_window_start": 11,
+                "fertile_window_end": 16,
+                "last_updated_day": None,
+            }        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()[key] = value
+            return value
+            self.schedule_source = AmandaStaticData.schedule_source            self.schedule_source = AmandaStaticData.schedule_source
+            self.current_location = "TavernMain"            self.relationship = self.rel            self.relationship = self.rel        npc_schedule_sync_currentloc(GirlName)            self.current_location = "TavernMain"        def var_int(self, key, default=0):
+                npc_schedule_set(
+            GirlName,
+            [
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_hall, priority=300, label="morning_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_kitchen, priority=300, label="morning_kitchen"),
+                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_storage, priority=300, label="morning_storage"),
+                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_backyard, priority=300, label="morning_backyard"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_room, priority=300, label="morning_room"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[1, 2, 3], awake=True, talkable=True, priority=200, label="working_hall"),
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=amanda_schedule_friday_dance, priority=250, label="friday_dance"),
+                NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=260, label="sunday_church"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_room, priority=240, label="sunday_room"),
+                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_backyard, priority=240, label="sunday_backyard"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_hall, priority=240, label="sunday_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_kitchen, priority=240, label="sunday_kitchen"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
+            ],
+        )
+
+    return people_to_int(self.ensure_story_defaults().get(str(key or ""), default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()[str(key or "")] = people_to_int(value, 0)
+            return self.var[str(key or "")]
+            self.fertility_cycle = {
+                "cycle_day": 0,
+                "cycle_length": 28,
+                "fertile_window_start": 11,
+                "fertile_window_end": 16,
+                "last_updated_day": None,
+            }        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()[key] = value
+            return value
+            self.schedule_source = AmandaStaticData.schedule_source            self.schedule_source = AmandaStaticData.schedule_source
+            self.current_location = "TavernMain"            self.relationship = self.rel            self.relationship = self.rel        npc_schedule_sync_currentloc(GirlName)            self.current_location = "TavernMain"        def var_int(self, key, default=0):
+                npc_schedule_set(
+            GirlName,
+            [
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_hall, priority=300, label="morning_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_kitchen, priority=300, label="morning_kitchen"),
+                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_storage, priority=300, label="morning_storage"),
+                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_backyard, priority=300, label="morning_backyard"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_room, priority=300, label="morning_room"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[1, 2, 3], awake=True, talkable=True, priority=200, label="working_hall"),
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=amanda_schedule_friday_dance, priority=250, label="friday_dance"),
+                NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=260, label="sunday_church"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_room, priority=240, label="sunday_room"),
+                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_backyard, priority=240, label="sunday_backyard"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_hall, priority=240, label="sunday_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_kitchen, priority=240, label="sunday_kitchen"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
+            ],
+        )
+
+    return people_to_int(self.ensure_story_defaults().get(str(key or ""), default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()[str(key or "")] = people_to_int(value, 0)
+            return self.var[str(key or "")]
+            self.fertility_cycle = {
+                "cycle_day": 0,
+                "cycle_length": 28,
+                "fertile_window_start": 11,
+                "fertile_window_end": 16,
+                "last_updated_day": None,
+            }        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()[key] = value
+            return value
+            self.schedule_source = AmandaStaticData.schedule_source            self.schedule_source = AmandaStaticData.schedule_source
+            self.current_location = "TavernMain"            self.relationship = self.rel            self.relationship = self.rel# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 4 python:
     def amanda_has_given_night_bowl():
-        return Amanda.var_int("gave_night_bowl", 0) == 1
+            npc_schedule_set(
+            GirlName,
+            [
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_hall, priority=300, label="morning_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_kitchen, priority=300, label="morning_kitchen"),
+                NPCScheduleEntry(location="TavernStorage", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_storage, priority=300, label="morning_storage"),
+                NPCScheduleEntry(location="Backyard", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_backyard, priority=300, label="morning_backyard"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, condition=amanda_schedule_morning_room, priority=300, label="morning_room"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[1, 2, 3], awake=True, talkable=True, priority=200, label="working_hall"),
+                NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, condition=amanda_schedule_friday_dance, priority=250, label="friday_dance"),
+                NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=260, label="sunday_church"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_room, priority=240, label="sunday_room"),
+                NPCScheduleEntry(location="Backyard", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_backyard, priority=240, label="sunday_backyard"),
+                NPCScheduleEntry(location="TavernMain", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_hall, priority=240, label="sunday_hall"),
+                NPCScheduleEntry(location="TavernKitchen", weekdays=[7], time_slots=[2, 3], awake=True, talkable=True, condition=amanda_schedule_sunday_kitchen, priority=240, label="sunday_kitchen"),
+                NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
+            ],
+        )
+
+    return Amanda.var_int("gave_night_bowl", 0) == 1
 
     def amanda_can_be_asked_for_night_bowl():
         return (
             player_has_soap_recipe_book()
             and not amanda_has_given_night_bowl()
-            and _player_item_count_by_id("night_bowl_001") <= 0
-            and Amanda.var_int("night_bowl_request_day", -1) != int(dayspassed or 0)
+            and player.item_count("night_bowl_001") <= 0
+            and Amanda.var_int("night_bowl_request_day", -1) != int(current_game_day() or 0)
         )
 
     def amanda_can_be_asked_for_night_bowl_favor():
@@ -33,12 +147,12 @@ init 4 python:
         if not amanda_can_be_asked_for_night_bowl():
             return {"ok": False, "granted": False, "reason": "unavailable"}
 
-        Amanda.set_var_int("night_bowl_request_day", dayspassed)
+        Amanda.set_var_int("night_bowl_request_day", current_game_day())
         friendship_value = int(Amanda.rel or 0)
         chance_value = amanda_night_bowl_success_chance(from_dance)
-        granted = friendship_value >= 10 or procedural_randint(1, 100, "amanda_night_bowl_%s_%s" % (dayspassed, int(from_dance))) <= chance_value
+        granted = friendship_value >= 10 or procedural_randint(1, 100, "amanda_night_bowl_%s_%s" % (current_game_day(), int(from_dance))) <= chance_value
         if granted:
-            _player_add_item_by_id("night_bowl_001", 1)
+            player.add_item("night_bowl_001", 1)
             Amanda.set_var_int("gave_night_bowl", 1)
             Amanda.set_var_int("night_bowl_window_seen_day", -1)
             return {"ok": True, "granted": True, "chance": chance_value}
@@ -47,20 +161,20 @@ init 4 python:
     def amanda_night_bowl_window_event_ready():
         return (
             amanda_has_given_night_bowl()
-            and _player_item_count_by_id("night_bowl_001") > 0
+            and player.item_count("night_bowl_001") > 0
             and (
                 Amanda.var_int("got_fancy_night_bowl", 0) == 0
                 or Amanda.var_int("prefers_backyard_relief", -1) == 1
             )
             and int(time or 0) >= 4
-            and Amanda.var_int("night_bowl_window_seen_day", -1) != int(dayspassed or 0)
+            and Amanda.var_int("night_bowl_window_seen_day", -1) != int(current_game_day() or 0)
         )
 
     def amanda_can_receive_fancy_night_bowl():
         return (
             amanda_has_given_night_bowl()
             and Amanda.var_int("got_fancy_night_bowl", 0) == 0
-            and _player_item_count_by_id("fancy_night_bowl_001") > 0
+            and player.item_count("fancy_night_bowl_001") > 0
         )
 
     def amanda_prefers_backyard_relief():
@@ -73,7 +187,7 @@ init 4 python:
         if Amanda.var_int("gave_night_bowl", 0) == 1:
             chance_value += 10
         chance_value = max(5, min(90, chance_value))
-        Amanda.set_var_int("prefers_backyard_relief", 1 if procedural_randint(1, 100, "amanda_backyard_relief_%s" % dayspassed) <= chance_value else 0)
+        Amanda.set_var_int("prefers_backyard_relief", 1 if procedural_randint(1, 100, "amanda_backyard_relief_%s" % current_game_day()) <= chance_value else 0)
         return Amanda.var_int("prefers_backyard_relief", 0)
 
 init python:
@@ -173,6 +287,7 @@ init python:
                 fullname="Аманда",
                 genitive="Аманды",
                 dative="Аманде",
+                portrait="images/amanda/amanda_portrait.jpg",
                 default_location="TavernMain",
                 description="Аманда - молодая девушка. У нее очень светлая кожа, белокурые волосы и голубые глаза. Ее груди небольшие, размера А.",
                 gift_preferences=["wild_rose_001", "soap_001", "berries_001", "energy_tea_001", "drink_ale_001"],
@@ -191,7 +306,6 @@ init python:
             self.code_name = "amanda"
             self.data = AmandaStaticData
             self.rel = 5
-            self.relationship = self.rel
             self.openness = 3
             self.corruption = 0
             self.known = True
@@ -263,10 +377,9 @@ init python:
                 "jobgloryhole": 0,
             }
             self.gift_preferences = list(AmandaStaticData.gift_preferences)
-            self.schedule_source = AmandaStaticData.schedule_source
-            self.current_location = "TavernMain"
+            self.relationship_cap = 100
             self.talk_preferences = {
-                "favorite_topics": ["fashion", "amanda_boys", "money", "sex_topics", "gossip"],
+                "favorite_topics": ["fashion", "dances", "gossip", "money", "stories"],
                 "blocked_topics": [],
             }
             self.wardrobe = {
@@ -286,7 +399,6 @@ init python:
         def update(self):
             self.name = people_normalize_id(self.name)
             self.data = AmandaStaticData
-            self.relationship = self.rel
             self.ensure_story_defaults()
             return self
 
@@ -377,7 +489,7 @@ init python:
             reaction_key = str(reaction or "neutral")
             score_value = people_to_int(score, girl_decision_reaction_score(reaction_key))
             self.reaction_state["last_reaction"] = reaction_key
-            self.reaction_state["last_reaction_day"] = people_to_int(dayspassed, 0)
+            self.reaction_state["last_reaction_day"] = people_to_int(current_game_day(), 0)
             self.reaction_state["last_reaction_context"] = str(action_name or "")
             self.reaction_state["last_reaction_score"] = score_value
             self.reaction_state["pending_decision"] = ""
@@ -513,11 +625,9 @@ init python:
                     cur_conc *= 3
                     self.mark_fucked(1)
                     if fun_awarded == 0:
-                        player_state(False).condition.change("fun", 30)
-                        player_state(False).condition.apply_to_store()
+                        player.condition.change("fun", 30)
                         fun_awarded = 1
-                    player_state(False).intimacy.record_cum(dayspassed)
-                    player_state(False).intimacy.apply_to_store()
+                    player.intimacy.record_cum(current_game_day())
                     if place == "inside":
                         self.set_cum_state("cum_inside_you", 1)
                     elif place == "tits":
@@ -567,7 +677,7 @@ init python:
                     self.detailed_sex_history = []
                 self.detailed_sex_history.append({
                     "RowId": len(self.detailed_sex_history) + 1,
-                    "Day": people_to_int(dayspassed, 0) + 1,
+                    "Day": people_to_int(current_game_day(), 0) + 1,
                     "GirlName": self.code_name,
                     "DudeName": str(dad_record or ""),
                     "DudeNameType": str(dad_type or ""),
@@ -580,7 +690,7 @@ init python:
         def birth_ready(self):
             state = self.pregnancy_state()
             return (
-                people_to_int(dayspassed, 0) > 0
+                people_to_int(current_game_day(), 0) > 0
                 and people_to_int(state.get("pregnancy", 0), 0) >= 240
                 and str(state.get("pregfather", "") or "") != ""
             )
@@ -654,7 +764,7 @@ init python:
             return (
                 self.is_at("FridayDance")
                 and self.var_int("leftdances", 0) == 0
-                and people_to_int(FridayDancesCount, 0) < 5
+                and people_to_int(friday_dance_count(), 0) < 5
                 and people_to_int(DanceStep, 0) == 0
             )
 
@@ -662,13 +772,13 @@ init python:
             try:
                 if self.var_int("legare_dance_pending", 0) == 1:
                     return True
-                return people_to_int(CheckIfDanceExist("amanda", "legare", FridayDancesCount), 0) > 0
+                return people_to_int(CheckIfDanceExist("amanda", "legare", friday_dance_count()), 0) > 0
             except Exception:
                 return False
 
         def friday_dance_mc_table_ready(self):
             try:
-                return self.var_int("legare_dance_pending", 0) == 0 and people_to_int(CheckIfDanceExist("amanda", "legare", FridayDancesCount), 0) <= 0
+                return self.var_int("legare_dance_pending", 0) == 0 and people_to_int(CheckIfDanceExist("amanda", "legare", friday_dance_count()), 0) <= 0
             except Exception:
                 return True
 
@@ -726,7 +836,7 @@ init python:
         def dynamic_roll(self, low_value=1, high_value=1, key=""):
             return procedural_randint(low_value, high_value, "amanda_dynamic_%s_%s_%s_%s" % (
                 str(key or ""),
-                people_to_int(dayspassed, 0),
+                people_to_int(current_game_day(), 0),
                 people_to_int(time, 0),
                 self.var_int("dynamic_roll_salt", 0),
             ))
@@ -975,6 +1085,90 @@ init python:
     def amanda_schedule_sunday_kitchen():
         return amanda_schedule_match("TavernKitchen", "sunday")
 
+init python:
+    def amanda_schedule_match(location="", mode="morning"):
+        target = str(location or "").strip()
+        mode_key = str(mode or "morning").strip().lower()
+        if mode_key == "morning":
+            return str(_tavern_household_preopening_location("amanda") or "") == target
+        if mode_key == "sunday":
+            return str(_tavern_household_sunday_location("amanda") or "") == target
+        if mode_key == "friday_evening":
+            return str(_tavern_household_friday_evening_location("amanda") or "") == target
+        return False
+
+    def amanda_schedule_morning_hall():
+        return amanda_schedule_match("TavernMain", "morning")
+
+    def amanda_schedule_morning_kitchen():
+        return amanda_schedule_match("TavernKitchen", "morning")
+
+    def amanda_schedule_morning_storage():
+        return amanda_schedule_match("TavernStorage", "morning")
+
+    def amanda_schedule_morning_backyard():
+        return amanda_schedule_match("Backyard", "morning")
+
+    def amanda_schedule_morning_room():
+        return amanda_schedule_match("TavernAmandaRoom", "morning")
+
+    def amanda_schedule_friday_dance():
+        return amanda_schedule_match("FridayDance", "friday_evening")
+
+    def amanda_schedule_sunday_room():
+        return amanda_schedule_match("TavernAmandaRoom", "sunday")
+
+    def amanda_schedule_sunday_backyard():
+        return amanda_schedule_match("Backyard", "sunday")
+
+    def amanda_schedule_sunday_hall():
+        return amanda_schedule_match("TavernMain", "sunday")
+
+    def amanda_schedule_sunday_kitchen():
+        return amanda_schedule_match("TavernKitchen", "sunday")
+
+init python:
+    def amanda_schedule_match(location="", mode="morning"):
+        target = str(location or "").strip()
+        mode_key = str(mode or "morning").strip().lower()
+        if mode_key == "morning":
+            return str(_tavern_household_preopening_location("amanda") or "") == target
+        if mode_key == "sunday":
+            return str(_tavern_household_sunday_location("amanda") or "") == target
+        if mode_key == "friday_evening":
+            return str(_tavern_household_friday_evening_location("amanda") or "") == target
+        return False
+
+    def amanda_schedule_morning_hall():
+        return amanda_schedule_match("TavernMain", "morning")
+
+    def amanda_schedule_morning_kitchen():
+        return amanda_schedule_match("TavernKitchen", "morning")
+
+    def amanda_schedule_morning_storage():
+        return amanda_schedule_match("TavernStorage", "morning")
+
+    def amanda_schedule_morning_backyard():
+        return amanda_schedule_match("Backyard", "morning")
+
+    def amanda_schedule_morning_room():
+        return amanda_schedule_match("TavernAmandaRoom", "morning")
+
+    def amanda_schedule_friday_dance():
+        return amanda_schedule_match("FridayDance", "friday_evening")
+
+    def amanda_schedule_sunday_room():
+        return amanda_schedule_match("TavernAmandaRoom", "sunday")
+
+    def amanda_schedule_sunday_backyard():
+        return amanda_schedule_match("Backyard", "sunday")
+
+    def amanda_schedule_sunday_hall():
+        return amanda_schedule_match("TavernMain", "sunday")
+
+    def amanda_schedule_sunday_kitchen():
+        return amanda_schedule_match("TavernKitchen", "sunday")
+
 label InitAmanda:
     python:
         GirlName = Amanda.code_name
@@ -1001,6 +1195,4 @@ label InitAmanda:
                 NPCScheduleEntry(location="TavernAmandaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
             ],
         )
-        npc_schedule_sync_currentloc(GirlName)
-
     return

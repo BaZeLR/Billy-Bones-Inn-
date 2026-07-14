@@ -9,48 +9,99 @@ label IntZimmerTalk(preserve_text=False):
     $ _becky_var = Becky.var
     $ _mongol_var = peopleInfo["mongol"].var
     $ main_ui_begin_talk_state("Разговор с Циммерманом", _zimmer_name)
-    $ current_action_title = "Разговор с Циммерманом"
-    $ current_action_content = None
-    if not preserve_text:
-        $ MainTxt = "Десятник Циммерман внимательно смотрит на вас, ожидая, что вы скажете."
-        $ CurLocDesc = MainTxt
-    $ current_action_items = []
-    $ current_action_items.append(MenuItem("Посмотреть на десятника", Call("IntZimmerTalkLook")))
+    $ MainTxt = "Десятник Циммерман внимательно смотрит на вас, ожидая, что вы скажете."
+    $ CurLocDesc = MainTxt
 
-    if int(Zimmer.talked_today or 0) < 2 and StolenHorseDays > 0 and _zimmer_var.get("ComplainHorse", 0) == 0:
-        $ current_action_items.append(MenuItem("Сообщить о краже лошади", Call("IntZimmerTalkHorseReport")))
-
-    if int(Zimmer.talked_today or 0) < 2 and StolenHorseDays > 0 and _zimmer_var.get("ComplainHorse", 0) == 1:
-        $ current_action_items.append(MenuItem("Узнать, как продвигаются поиски украденной лошади", Call("IntZimmerTalkHorseProgress")))
-
-    if int(Zimmer.talked_today or 0) < 2 and _becky_var.get("KnowSherwood", 0) == 1 and _zimmer_var.get("SherwoodStory", 0) == 0:
-        $ current_action_items.append(MenuItem("Спросить о Шервудском лесе", Call("IntZimmerTalkSherwoodStory1")))
-
-    if int(Zimmer.talked_today or 0) < 2 and _becky_var.get("KnowSherwood", 0) == 1 and _zimmer_var.get("SherwoodStory", 0) == 1:
-        $ current_action_items.append(MenuItem("И что с лесом теперь?", Call("IntZimmerTalkSherwoodStory2")))
-
-    if int(Zimmer.talked_today or 0) < 2 and Robin.var_int("RobbedNum", 0) > 0 and _zimmer_var.get("ComplainRobin", 0) == 0:
-        $ current_action_items.append(MenuItem("Пожаловаться на Робин Гуда", Call("IntZimmerTalkRobinReport")))
-
-    if int(Zimmer.talked_today or 0) < 2 and _zimmer_var.get("ComplainRobin", 0) == 1 and money >= 100:
-        $ current_action_items.append(MenuItem("Отдать сотню мараведи", Call("IntZimmerTalkPay100")))
-        $ current_action_items.append(MenuItem("Поторговаться", Call("IntZimmerTalkHaggle")))
-
-    if int(Zimmer.talked_today or 0) < 2 and _zimmer_var.get("ComplainRobin", 0) == 2:
-        $ current_action_items.append(MenuItem("Узнать как там расследование", Call("IntZimmerTalkInvestigation")))
-
-    if (
-        int(Zimmer.talked_today or 0) < 2
-        and int(_mongol_var.get("StocksSeen", 0) or 0) == 1
-        and int(_mongol_var.get("StocksFoodDay", -1)) >= 0
-        and int(DraupnirVar.get("MongolLockpickOrderDay", -1)) >= 0
-        and int(_mongol_var.get("StocksReleased", 0) or 0) == 0
-        and int(_mongol_var.get("GuardCaptainKnown", 0) or 0) == 0
-        and int(winenum or 0) > 0
-    ):
-        $ current_action_items.append(MenuItem("Похвастаться вином для ночной стражи", Call("IntZimmerTalkMongolWineDistraction")))
-
-    $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
+    while True:
+        $ _zimmer_var = Zimmer.var
+        $ _becky_var = Becky.var
+        $ _mongol_var = peopleInfo["mongol"].var
+        menu:
+            "Посмотреть на десятника":
+                call IntZimmerTalkLook
+            "Сообщить о краже лошади" if int(Zimmer.talked_today or 0) < 2 and player.horse.stolen_days > 0 and _zimmer_var.get("ComplainHorse", 0) == 0:
+                call IntZimmerTalkHorseReport
+            "Узнать, как продвигаются поиски украденной лошади" if int(Zimmer.talked_today or 0) < 2 and player.horse.stolen_days > 0 and _zimmer_var.get("ComplainHorse", 0) == 1:
+                call IntZimmerTalkHorseProgress
+            "Спросить о Шервудском лесе" if int(Zimmer.talked_today or 0) < 2 and _becky_var.get("KnowSherwood", 0) == 1 and _zimmer_var.get("SherwoodStory", 0) == 0:
+                call IntZimmerTalkSherwoodStory1
+            "И что с лесом теперь?" if int(Zimmer.talked_today or 0) < 2 and _becky_var.get("KnowSherwood", 0) == 1 and _zimmer_var.get("SherwoodStory", 0) == 1:
+                call IntZimmerTalkSherwoodStory2
+            "Пожаловаться на Робин Гуда" if int(Zimmer.talked_today or 0) < 2 and Robin.var_int("RobbedNum", 0) > 0 and _zimmer_var.get("ComplainRobin", 0) == 0:
+                call IntZimmerTalkRobinReport
+            "Отдать сотню мараведи" if int(Zimmer.talked_today or 0) < 2 and _zimmer_var.get("ComplainRobin", 0) == 1 and player.economy.money >= 100:
+                call IntZimmerTalkPay100
+            "Поторговаться" if int(Zimmer.talked_today or 0) < 2 and _zimmer_var.get("ComplainRobin", 0) == 1 and player.economy.money >= 100:
+                call IntZimmerTalkHaggle
+            "Узнать как там расследование" if int(Zimmer.talked_today or 0) < 2 and _zimmer_var.get("ComplainRobin", 0) == 2:
+                call IntZimmerTalkInvestigation
+            "Похвастаться вином для ночной стражи" if int(Zimmer.talked_today or 0) < 2 and int(_mongol_var.get("StocksSeen", 0) or 0) == 1 and int(_mongol_var.get("StocksFoodDay", -1)) >= 0 and int(Draupnir.var.get("MongolLockpickOrderDay", -1)) >= 0 and int(_mongol_var.get("StocksReleased", 0) or 0) == 0 and int(_mongol_var.get("GuardCaptainKnown", 0) or 0) == 0 and int(player.tavern_management.winenum or 0) > 0:
+                call IntZimmerTalkMongolWineDistraction
+            "Закончить разговор":
+                $ main_ui_end_talk_state()
+                call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
+    call IntZimmerTalk(True)
     return
 
 
@@ -72,7 +123,6 @@ label IntZimmerTalkHorseReport:
     $ _zimmer_var["ComplainHorse"] = 1
     $ Zimmer.mark_talked(1)
     $ CurLocDesc = MainTxt
-    call IntZimmerTalk(True)
     return
 
 
@@ -81,7 +131,6 @@ label IntZimmerTalkHorseProgress:
     $ MainTxt = "\"Ничего, не волнуйтесь, ищем. Это наша работа!\""
     $ Zimmer.mark_talked(1)
     $ CurLocDesc = MainTxt
-    call IntZimmerTalk(True)
     return
 
 
@@ -99,7 +148,6 @@ label IntZimmerTalkSherwoodStory1:
     $ _zimmer_var["SherwoodStory"] = 1
     $ Zimmer.mark_talked(1)
     $ CurLocDesc = MainTxt
-    call IntZimmerTalk(True)
     return
 
 
@@ -113,7 +161,6 @@ label IntZimmerTalkSherwoodStory2:
     $ _zimmer_var["SherwoodStory"] = 2
     $ Zimmer.mark_talked(1)
     $ CurLocDesc = MainTxt
-    call IntZimmerTalk(True)
     return
 
 
@@ -126,7 +173,6 @@ label IntZimmerTalkRobinReport:
     $ _zimmer_var["ComplainRobin"] = 1
     $ Zimmer.mark_talked(1)
     $ CurLocDesc = MainTxt
-    call IntZimmerTalk(True)
     return
 
 
@@ -137,12 +183,11 @@ label IntZimmerTalkPay100:
     $ MainTxt = "\"Таки вы сделали правильный выбор, молодой человек, старый Циммерман все сделает. Завтра же поищу негодяев,\" заверил вас десятник, ловко пряча монеты в карман."
     vscene "images/zimmer/Talk.jpg"
     $ _zimmer_var["ComplainRobin"] = 2
-    $ _zimmer_var["RobinInvestigationDay"] = dayspassed + procedural_randint(9, 14, "zimmer_robin_investigation_%s" % dayspassed)
+    $ _zimmer_var["RobinInvestigationDay"] = current_game_day() + procedural_randint(9, 14, "zimmer_robin_investigation_%s" % current_game_day())
     $ money -= 100
     call stat
     $ Zimmer.mark_talked(1)
     $ CurLocDesc = MainTxt
-    call IntZimmerTalk(True)
     return
 
 
@@ -156,13 +201,12 @@ label IntZimmerTalkHaggle:
     else:
         $ MainTxt += "\n\nДесятник осмотрел вас скептически, но все таки сказал:\n\"98 мараведи\"\n\"60\"\n\"97\"\n\"70\"\n\"Ладно, 95\"\n\"80, больше нет!\"\n\"Вы меня совсем по миру пустить хотите, молодой человек, 90! Больше уступить не могу!\"\n\"Согласен!\" радостно заорали вы, и быстро, пока он не передумал отсчитали монеты.\n\"Все моя доброта,\" понуро заявил Циммерман, \"Завтра же пойду и поищу негодяев.\"\nЧерез некоторое время радость от удачной сделки улеглась и вам почему-то стало казаться, что вас накололи.\n\"Странно, с чего бы это?\" подумали вы."
         $ _zimmer_var["ComplainRobin"] = 2
-        $ _zimmer_var["RobinInvestigationDay"] = dayspassed + procedural_randint(9, 14, "zimmer_robin_haggle_%s" % dayspassed)
+        $ _zimmer_var["RobinInvestigationDay"] = current_game_day() + procedural_randint(9, 14, "zimmer_robin_haggle_%s" % current_game_day())
         $ money -= 90
         call stat
     vscene "images/zimmer/Talk.jpg"
     $ Zimmer.mark_talked(1)
     $ CurLocDesc = MainTxt
-    call IntZimmerTalk(True)
     return
 
 
@@ -170,7 +214,7 @@ label IntZimmerTalkInvestigation:
     $ Zimmer.ensure_story_defaults()
     $ _zimmer_name = "zimmer"
     $ _zimmer_var = Zimmer.var
-    if _zimmer_var.get("RobinInvestigationDay", 0) > dayspassed:
+    if _zimmer_var.get("RobinInvestigationDay", 0) > current_game_day():
         $ MainTxt = "\"Не волнуйтесь молодой человек. Ваше дело в надежных руках! Если старый Циммерман сказал, что найдет негодяев, будьте таки уверены, он их найдет!\" заверил вас бравый десятник."
     else:
         $ MainTxt = "\"Молодой человек!\" торжественно сказал десятник. \"Ваше сообщение полностью подтвердилось! Как я и обещал, я сходил к Шервудкому лесу. И шо вы таки думаете? Все как вы и говорили. Разбойнички именно там и обнаружились. Всей бандой, голубчики.\""
@@ -183,7 +227,6 @@ label IntZimmerTalkInvestigation:
     vscene "images/zimmer/Talk.jpg"
     $ Zimmer.mark_talked(1)
     $ CurLocDesc = MainTxt
-    call IntZimmerTalk(True)
     return
 
 
@@ -196,5 +239,4 @@ label IntZimmerTalkMongolWineDistraction:
     $ Zimmer.change_social(friend_delta=1)
     $ Zimmer.mark_talked(1)
     $ CurLocDesc = MainTxt
-    call IntZimmerTalk(True)
     return

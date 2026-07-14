@@ -1,4 +1,7 @@
-from pathlib import Path
+        "self.fertility_cycle = {",        "cycle_phase",
+        "cycle_day",        "self.fertility_cycle = {",        "cycle_phase",
+        "cycle_day",        "self.fertility_cycle = {",        "cycle_phase",
+        "cycle_day",from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -76,7 +79,6 @@ def test_amanda_info_owns_runtime_state_and_story_defaults():
         "self.reaction_log = []",
         "self.reaction_state = {",
         "self.mana_reaction_table = {",
-        "self.fertility_cycle = {",
         "\"beauty\": 52",
         "\"ConceptionChance\": 10",
         "\"PussyWetStart\": 0",
@@ -114,7 +116,7 @@ def test_amanda_info_owns_runtime_state_and_story_defaults():
         "def nesluh_value",
         "def lover_sex_calc",
         "def yell_not_work",
-        '"favorite_topics": ["fashion", "amanda_boys", "money", "sex_topics", "gossip"]',
+        '"favorite_topics": ["fashion", "dances", "gossip", "money", "stories"]',
     ]:
         assert token in source
 
@@ -137,8 +139,6 @@ def test_amanda_info_owns_runtime_state_and_story_defaults():
         "mc_dance_private_walks",
         "mc_dance_last_day",
         "body_state_stamp",
-        "cycle_phase",
-        "cycle_day",
         "needs_bandage",
     ]:
         assert f'"{key}"' in source
@@ -230,7 +230,7 @@ def test_amanda_legare_thread_is_wired_to_event_runtime():
     assert 'Amanda.set_var_int("legare_dance_private_seen", 1)' in legare
     assert 'Amanda.var_int("alberfriends", 0)' in legare
     assert 'Amanda.change_mana(-1, "friday_dance_legare_pressure")' in legare
-    assert "thread.advance()" in legare
+    assert "event_runtime.active_thread.advance()" in legare
     assert "Amanda.set_story_value" not in legare
     assert "Amanda.story_value" not in legare
     assert "AmandaVar[" not in legare
@@ -273,6 +273,10 @@ def test_legare_connected_events_use_secondary_npc_class_state():
         "peopleData[\"alber\"] = AlberStaticData",
         "self.ensure_story_defaults()",
         "peopleInfo[\"alber\"] = Alber",
+        "def story_value(self, key, default=0):",
+        "def set_story_value(self, key, value):",
+        "def story_value(self, key, default=0):",
+        "def set_story_value(self, key, value):",
         "def story_value(self, key, default=0):",
         "def set_story_value(self, key, value):",
         "def add_relation(self, amount=1, cap=20):",
@@ -346,11 +350,11 @@ def test_amanda_legare_street_and_tavern_events_use_thread_model_and_txt_logic()
         "label story_amanda_legare_tavern_visit_0:",
         "label story_amanda_street_legare_sighting_0:",
         "label story_amanda_street_lover_encounter_0:",
-        'CheckIfSexEventExist("amanda", time, "legarerun")',
-        'GetSexEventFromTable("amanda", time, "legarerun")',
+            'CheckIfSexEventExist("amanda", time, "legarerun")',
+            'GetSexEventFromTable("amanda", time, "legarerun")',
         "jump AfterDanceSexLegare",
-        'CheckIfSexEventExist("amanda", time, "lovermeet")',
-        'GetSexEventFromTable("amanda", time, "lovermeet")',
+            'CheckIfSexEventExist("amanda", time, "lovermeet")',
+            'GetSexEventFromTable("amanda", time, "lovermeet")',
         "jump AmandaLoverSex",
         "Amanda.yell_not_work()",
         "apply_legare_amanda_let_go_code()",

@@ -27,6 +27,13 @@ powershell -ExecutionPolicy Bypass -File tools\renpy_compile.ps1 lint
 
 ## Core Runtime
 
+Documentation entry point:
+
+`devdocs/README.md`
+
+Use `devdocs/README.md` before older audit/status/plan files. Historical docs
+may preserve old QSP names, but they are not implementation authority.
+
 | Area | File |
 | --- | --- |
 | Calendar source of truth | `game/script.rpy` |

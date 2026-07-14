@@ -1,4 +1,4 @@
-# ================================================================================
+        ("story_give_birth_amanda", None, None, None, 1, None, ["#int(calendar_v2.daysInGame or 0) > 0", "#Amanda.pregnancy_days() >= 240", "#str(Amanda.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 7),        ("story_give_birth_amanda", None, None, None, 1, None, ["#int(calendar_v2.daysInGame or 0) > 0", "#Amanda.pregnancy_days() >= 240", "#str(Amanda.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 7),        ("story_give_birth_amanda", None, None, None, 1, None, ["#int(calendar_v2.daysInGame or 0) > 0", "#Amanda.pregnancy_days() >= 240", "#str(Amanda.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 7),# ================================================================================
 # FamilyLife-style story event runtime split.
 # Engine code lives in conditions.rpy, threads.rpy, and events.rpy.
 # Authored thread definitions and event labels stay in StoryEventRuntime.rpy for now.
@@ -23,11 +23,17 @@ define amandaThreadList = [
             "story_amanda_tavern_seduction_0",
             (1, 2, 3, 4, 6), (12, 21), None,
             0.35,
-            None,
+            [
+                "#int(Clara.var.get('source_known', 0) or 0) == 1",
+                "#int(Clara.var.get('fiance_church_seen', 0) or 0) == 0",
+            ],
             [
                 "#amanda_tavern_seduction_ready()",
             ],
-            None,
+            [
+                "#int(Clara.var.get('second_ask_unlocked', 0) or 0) == 1",
+                "#int(Clara.var.get('source_known', 0) or 0) == 0",
+            ],
             "TavernMain",
             "enter",
             210,
@@ -38,11 +44,17 @@ define amandaThreadList = [
             "story_amanda_liza_talk_work_0",
             (1, 2, 3, 4, 5, 6), (12, 17), None,
             1,
-            None,
+            [
+                "#int(Clara.var.get('source_known', 0) or 0) == 1",
+                "#int(Clara.var.get('fiance_church_seen', 0) or 0) == 0",
+            ],
             [
                 "#amanda_liza_talk_work_ready()",
             ],
-            None,
+            [
+                "#int(Clara.var.get('second_ask_unlocked', 0) or 0) == 1",
+                "#int(Clara.var.get('source_known', 0) or 0) == 0",
+            ],
             "TavernMain",
             "tavern_work",
             230,
@@ -53,11 +65,17 @@ define amandaThreadList = [
             "story_amanda_liza_glory_invite_0",
             (1, 2, 3, 4, 6), (12, 21), None,
             1,
-            None,
+            [
+                "#int(Clara.var.get('source_known', 0) or 0) == 1",
+                "#int(Clara.var.get('fiance_church_seen', 0) or 0) == 0",
+            ],
             [
                 "#amanda_liza_glory_invite_ready()",
             ],
-            None,
+            [
+                "#int(Clara.var.get('second_ask_unlocked', 0) or 0) == 1",
+                "#int(Clara.var.get('source_known', 0) or 0) == 0",
+            ],
             "TavernMain",
             "enter",
             208,
@@ -295,7 +313,7 @@ define melissaThreadList = [
                 "#int(werecat_state().get('rats_problem_active', 0) or 0) == 1",
                 "#int(werecat_state().get('rat_breakfast_seen', 0) or 0) == 0",
                 "#int(werecat_state().get('hunter_tease_day', -1) or -1) >= 0",
-                "#not bool(BreakfastToday)",
+                "#not bool(player.tavern_management.breakfast.today)",
             ],
             None,
             "TavernKitchen",
@@ -312,7 +330,7 @@ define melissaThreadList = [
                 "#int(werecat_state().get('adoption_breakfast_seen', 0) or 0) == 0",
                 "#int(werecat_state().get('adopted_day', -1) or -1) >= 0",
                 "#day_delta_ready(werecat_state().get('adopted_day', -1), 1)",
-                "#not bool(BreakfastToday)",
+                "#not bool(player.tavern_management.breakfast.today)",
             ],
             None,
             "TavernKitchen",
@@ -330,7 +348,7 @@ define melissaThreadList = [
                 "#int(werecat_state().get('adopted_day', -1) or -1) >= 0",
                 "#day_delta_ready(werecat_state().get('adopted_day', -1), 30)",
                 "#int(werecat_state().get('first_month_thanks_day', -1) or -1) < int(werecat_state().get('adopted_day', -1) or -1) + 30",
-                "#not bool(BreakfastToday)",
+                "#not bool(player.tavern_management.breakfast.today)",
             ],
             None,
             "TavernKitchen",
@@ -351,7 +369,7 @@ define melissaThreadList = [
                 "#int(Melissa.var.get('bats_episode', 0) or 0) <= 0",
                 "#int(Melissa.var.get('storage_rat_last_help_day', -1) or -1) >= 0",
                 "#calendar_v2.moon_phase_name_en(calendar_v2.day) == 'Full Moon'",
-                "#not bool(BreakfastToday)",
+                "#not bool(player.tavern_management.breakfast.today)",
             ],
             None,
             "TavernKitchen",
@@ -378,7 +396,7 @@ define melissaThreadList = [
             None,
             [
                 "#int(Melissa.var.get('bats_episode', 0) or 0) == 3",
-                "#int(dayspassed or 0) >= int(Melissa.var.get('bat_attic_check_day', -1) or -1)",
+                "#int(current_game_day() or 0) >= int(Melissa.var.get('bat_attic_check_day', -1) or -1)",
             ],
             None,
             "TavernAtic",
@@ -408,7 +426,7 @@ define melissaThreadList = [
                 "#int(Melissa.var.get('bats_episode', 0) or 0) < 8",
                 "#str(Melissa.var.get('temp_room', '') or '') == 'TavernAmandaRoom'",
                 "#int(Melissa.var.get('drawings_found', 0) or 0) == 0",
-                "#int(dayspassed or 0) >= int(Melissa.var.get('drawings_ready_day', -1) or -1)",
+                "#int(current_game_day() or 0) >= int(Melissa.var.get('drawings_ready_day', -1) or -1)",
             ],
             None,
             "TavernMelissaRoom",
@@ -437,7 +455,7 @@ define melissaThreadList = [
             [
                 "#int(Melissa.var.get('bats_episode', 0) or 0) == 7",
                 "#int(Melissa.var.get('roof_repair_complete_day', -1) or -1) >= 0",
-                "#int(dayspassed or 0) >= int(Melissa.var.get('roof_repair_complete_day', -1) or -1)",
+                "#int(current_game_day() or 0) >= int(Melissa.var.get('roof_repair_complete_day', -1) or -1)",
                 "#int(Melissa.var.get('drawings_returned', 0) or 0) == 1",
             ],
             None,
@@ -472,7 +490,7 @@ define claraThreadList = [
             None,
             "MarketPlace",
             "enter",
-            0,
+            900,
         ),
         (
             "story_clara_market_booklet_2",
@@ -488,7 +506,7 @@ define claraThreadList = [
             None,
             "MarketPlace",
             "enter",
-            1,
+            900,
         ),
         (
             "story_clara_market_booklet_3",
@@ -584,7 +602,7 @@ define claraThreadList = [
             [
                 "#int(DraupnirVar.get('MongolLockpickOrderDay', -1) or -1) >= 0",
                 "#int(Mongol.var.get('StocksReleased', 0) or 0) == 0",
-                "#int(dayspassed or 0) > int(Mongol.var.get('StocksFoodDay', -1) or -1)",
+                "#int(current_game_day() or 0) > int(Mongol.var.get('StocksFoodDay', -1) or -1)",
             ],
             None,
             "CityGuard",
@@ -710,7 +728,7 @@ define claraThreadList = [
             [
                 "#int(Clara.var.get('commission_started', 0) or 0) == 1",
                 "#int(Clara.var.get('commission_followup_done', 0) or 0) == 0",
-                "#int(dayspassed or 0) >= int(Clara.var.get('commission_followup_day', 999999) or 999999)",
+                "#int(current_game_day() or 0) >= int(Clara.var.get('commission_followup_day', 999999) or 999999)",
                 "#str(getLocation('clara') or '') == 'WineStore'",
             ],
             None,
@@ -757,7 +775,7 @@ define claraThreadList = [
             [
                 "#int(Clara.var.get('confession_done', 0) or 0) == 1",
                 "#int(Clara.var.get('murder_seen', 0) or 0) == 0",
-                "#int(dayspassed or 0) >= int(Clara.var.get('murder_day', 999999) or 999999)",
+                "#int(current_game_day() or 0) >= int(Clara.var.get('murder_day', 999999) or 999999)",
             ],
             None,
             "CityGuard",
@@ -777,6 +795,8 @@ define claraThreadList = [
             1,
             None,
             [
+                "#int(Clara.var.get('fiance_barber_seen', 0) or 0) == 1",
+                "#int(Clara.var.get('commission_started', 0) or 0) == 0",
                 "#str(getLocation('clara') or '') == 'TavernMain'",
                 "#str(getLocation('melissa') or '') == 'TavernMain'",
                 "#int(Clara.var.get('tavern_visit_bar_0_seen', 0) or 0) == 0",
@@ -793,6 +813,8 @@ define claraThreadList = [
             1,
             None,
             [
+                "#int(Clara.var.get('fiance_barber_seen', 0) or 0) == 1",
+                "#int(Clara.var.get('commission_started', 0) or 0) == 0",
                 "#str(getLocation('clara') or '') == 'TavernMain'",
                 "#str(getLocation('melissa') or '') == 'TavernMain'",
                 "#int(Clara.var.get('tavern_visit_bar_0_seen', 0) or 0) == 1",
@@ -812,6 +834,8 @@ define claraThreadList = [
             1,
             None,
             [
+                "#int(Clara.var.get('fiance_barber_seen', 0) or 0) == 1",
+                "#int(Clara.var.get('commission_started', 0) or 0) == 0",
                 "#str(getLocation('clara') or '') == 'TavernMain'",
                 "#str(getLocation('melissa') or '') == 'TavernMain'",
                 "#int(Clara.var.get('tavern_visit_bar_1_seen', 0) or 0) == 1",
@@ -830,6 +854,8 @@ define claraThreadList = [
             1,
             None,
             [
+                "#int(Clara.var.get('peek_done', 0) or 0) == 1",
+                "#int(Clara.var.get('confession_done', 0) or 0) == 0",
                 "#str(getLocation('clara') or '') == 'TavernMelissaRoom'",
                 "#str(getLocation('melissa') or '') == 'TavernMelissaRoom'",
                 "#int(Melissa.var.get('bats_episode', 0) or 0) >= 8",
@@ -848,6 +874,8 @@ define claraThreadList = [
             1,
             None,
             [
+                "#int(Clara.var.get('peek_done', 0) or 0) == 1",
+                "#int(Clara.var.get('confession_done', 0) or 0) == 0",
                 "#str(getLocation('clara') or '') == 'TavernMelissaRoom'",
                 "#str(getLocation('melissa') or '') == 'TavernMelissaRoom'",
                 "#int(Melissa.var.get('bats_episode', 0) or 0) >= 8",
@@ -866,6 +894,8 @@ define claraThreadList = [
             1,
             None,
             [
+                "#int(Clara.var.get('peek_done', 0) or 0) == 1",
+                "#int(Clara.var.get('confession_done', 0) or 0) == 0",
                 "#str(getLocation('clara') or '') == 'TavernMelissaRoom'",
                 "#str(getLocation('melissa') or '') == 'TavernMelissaRoom'",
                 "#int(Melissa.var.get('bats_episode', 0) or 0) >= 8",
@@ -948,7 +978,7 @@ define beckyThreadList = [
             "#Becky.var.get('visitedhome', 0) == 2",
             "#Becky.rel > 12",
             "#Becky.talk_count() < 2",
-            "#str(player_state().appearance.current_dress or '') == 'citydress'",
+            "#str(player.appearance.current_dress or '') == 'citydress'",
             "#int(charisma or 0) > 75",
         ], None, "talk_becky", "becky_talk_invite", 100),
     ], highlight=False, threaded=True),
@@ -1063,14 +1093,14 @@ define beckyThreadList = [
     ], highlight=False, threaded=True),
     LThreadData(0, "becky", "HomeFrontIngaLucas", None, [
         ("story_becky_home_front_inga_0", None, None, None, 1, None, [
-            "#int(Becky.var.get('HomeFrontCheckedDay', -1) or -1) != int(dayspassed or 0)",
+            "#int(Becky.var.get('HomeFrontCheckedDay', -1) or -1) != int(current_game_day() or 0)",
             "#int(Becky.var.get('TodayFrontSexCheck', 0) or 0) == 0",
         ], None, "BeckyHomeFront", "enter", 300),
     ], highlight=False, threaded=False),
     LThreadData(0, "becky", "HomeVisitEntry", None, [
         ("story_becky_home_visit_0", None, None, None, 1, None, [
             "#str(ArriveMode or '') == ''",
-            "#int(Becky.var.get('HomeEnterCheckedDay', -1) or -1) != int(dayspassed or 0)",
+            "#int(Becky.var.get('HomeEnterCheckedDay', -1) or -1) != int(current_game_day() or 0)",
         ], None, "BeckyHome", "enter", 310),
     ], highlight=False, threaded=False),
     LThreadData(0, "becky", "HomeDanceArrival", None, [
@@ -1470,8 +1500,8 @@ define lizaThreadList = [
             ],
             None,
             "PortStreets",
-            "street_clients_liza",
-            100,
+            "street_clients",
+            110,
         ),
     ], highlight=False, threaded=False),
     LThreadData(0, "liza", "TavernClientRoom", None, [
@@ -1483,7 +1513,7 @@ define lizaThreadList = [
             [
                 "#Liza.can_work_tavern()",
                 "#str(TavernMainClientRoomGirl or '') == 'liza'",
-                "#int(TavernHole or 0) > 0",
+                "#int(player.tavern_management.client_room_hole or 0) > 0",
                 "#CheckIfSexEventExist('liza', 3, 'Prostitution') > 0",
             ],
             None,
@@ -1589,7 +1619,7 @@ define georgettThreadList = [
             ],
             None,
             "PortStreets",
-            "street_clients_georgett",
+            "street_clients",
             100,
         ),
     ], highlight=False, threaded=False),
@@ -1602,7 +1632,7 @@ define georgettThreadList = [
             [
                 "#Georgett.can_work_tavern()",
                 "#str(TavernMainClientRoomGirl or '') == 'georgett'",
-                "#int(TavernHole or 0) > 0",
+                "#int(player.tavern_management.client_room_hole or 0) > 0",
                 "#CheckIfSexEventExist('georgett', 3, 'Prostitution') > 0",
             ],
             None,
@@ -1649,12 +1679,12 @@ define franThreadList = [
 
 define birthThreadList = [
     UThreadData(0, "system", "GiveBirth", None, [
-        ("story_give_birth_sandra", None, None, None, 1, None, ["#int(dayspassed or 0) > 0", "#Sandra.pregnancy_days() >= 240", "#str(Sandra.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 5),
-        ("story_give_birth_melissa", None, None, None, 1, None, ["#int(dayspassed or 0) > 0", "#Melissa.pregnancy_days() >= 240", "#str(Melissa.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 6),
-        ("story_give_birth_becky", None, None, None, 1, None, ["#int(dayspassed or 0) > 0", "#Becky.pregnancy_days() >= 240", "#str(Becky.stats.get('pregfather', '') or '') != ''"], None, "BeckyHome", "enter", 5),
-        ("story_give_birth_inga", None, None, None, 1, None, ["#int(dayspassed or 0) > 0", "#Inga.pregnancy_days() >= 240", "#str(Inga.sex_stat('pregfather', '') or '') != ''"], None, "BeckyHome", "enter", 6),
-        ("story_give_birth_georgett", None, None, None, 1, None, ["#int(dayspassed or 0) > 0", "#Georgett.pregnancy_days() >= 240", "#str(Georgett.sex_stat('pregfather', '') or '') != ''"], None, "PortStreets", "enter", 5),
-        ("story_give_birth_liza", None, None, None, 1, None, ["#int(dayspassed or 0) > 0", "#Liza.pregnancy_days() >= 240", "#str(Liza.sex_stat('pregfather', '') or '') != ''"], None, "PortStreets", "enter", 6),
+        ("story_give_birth_sandra", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Sandra.pregnancy_days() >= 240", "#str(Sandra.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 5),
+        ("story_give_birth_melissa", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Melissa.pregnancy_days() >= 240", "#str(Melissa.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 6),
+        ("story_give_birth_becky", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Becky.pregnancy_days() >= 240", "#str(Becky.stats.get('pregfather', '') or '') != ''"], None, "BeckyHome", "enter", 5),
+        ("story_give_birth_inga", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Inga.pregnancy_days() >= 240", "#str(Inga.sex_stat('pregfather', '') or '') != ''"], None, "BeckyHome", "enter", 6),
+        ("story_give_birth_georgett", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Georgett.pregnancy_days() >= 240", "#str(Georgett.sex_stat('pregfather', '') or '') != ''"], None, "PortStreets", "enter", 5),
+        ("story_give_birth_liza", None, None, None, 1, None, ["#int(current_game_day() or 0) > 0", "#Liza.pregnancy_days() >= 240", "#str(Liza.sex_stat('pregfather', '') or '') != ''"], None, "PortStreets", "enter", 6),
     ], highlight=False, threaded=True),
 ]
 

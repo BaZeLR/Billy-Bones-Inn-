@@ -1,10 +1,16 @@
 # Character Worklist: Бекки
 
+> REFERENCE ONLY.
+>
+> This file preserves source/TXT worklist names. Legacy `*Var` tokens are not
+> current runtime owners. Runtime/story state belongs to the character class
+> instance and event/thread labels.
+
 ## Identity
 - Canonical id: becky
 - Legacy keys/tokens: becky, BeckyVar
 - Init source: InitBecky.txt
-- Main var store: BeckyVar
+- Current runtime owner: Becky class instance
 
 ## Presence/Schedule (TXT-driven notes)
 - Днем обычно в GroceryStore (по time), поздние ветки в BeckyHomeFront/BeckyHome.

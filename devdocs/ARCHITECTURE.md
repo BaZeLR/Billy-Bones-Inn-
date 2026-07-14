@@ -1,5 +1,13 @@
 # Billy Bones Inn — Event/UI/Media Architecture Rules
 
+> REFERENCE ONLY / PARTLY SUPERSEDED.
+>
+> Use `devdocs/README.md`, `devdocs/implementation_models/*`, and
+> `devdocs/EventThreadInstruction/*` as current implementation authority.
+> This file is kept for historical architecture notes. Do not copy old examples
+> that use `*Var` dicts, `Friends[...]`, `Talked[...]`, refresh/rebuild/apply
+> labels, dispatcher layers, wrappers, or screen-owned gameplay flow.
+
 ## Purpose
 
 This document defines the canonical architecture rules for:

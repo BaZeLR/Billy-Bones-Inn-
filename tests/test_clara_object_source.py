@@ -114,11 +114,11 @@ def test_clara_social_and_gift_logic_belongs_to_clara_instance():
         assert old_name not in source
         assert old_name not in talk_source
 
-    assert "Clara.can_start_social_events()" in talk_source
+    assert 'talk_system_action_unlocked(girl_name, "flirt")' in talk_source
     assert "Clara.giftable_entries()" in talk_source
     assert "Clara.remove_gift_entry(_selected)" in talk_source
-    assert "Clara.apply_social_result(\"talk\")" in talk_source
-    assert "Clara.apply_social_result(\"flirt\")" in talk_source
+    assert "TalkSystemSmallTalkMenu(girl_name)" in talk_source
+    assert "TalkSystemFlirtAttempt(girl_name)" in talk_source
     assert "Clara.can_receive_gifts()" in character_hub
     assert "Clara.has_giftable_entries()" in character_hub
     assert "Clara.has_caught_cat_gift()" in social_topics

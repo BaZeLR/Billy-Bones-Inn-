@@ -2,6 +2,8 @@
 
 Use this folder as the first guide for writing or reviewing event/thread code.
 
+Start from `devdocs/README.md` for the full documentation map.
+
 This folder is the current blueprint. Do not use older early-stage devdocs to
 justify alternate UI/event approaches, compatibility adapters, fallback layers,
 or TXT-parity wrappers.
@@ -19,6 +21,9 @@ or TXT-parity wrappers.
 3. `FAMILY_LIFE_HUD_MENU_PATTERN.md`
    - Family Life reference pattern for keeping HUD visible while event choices remain attached to the active scene.
    - Tractir event choices must appear in the active event/action area, not in detached overlays or refresh/apply paths.
+
+4. `../implementation_models/EVENT_THREAD_MODEL_AND_TEMPLATE.md`
+   - Current implementation model and tuple/template expectations.
 
 ## Non-Negotiable Rules
 

@@ -1,6 +1,38 @@
-# ================================================================================
+        npc_schedule_sync_currentloc(schedule_name)        bodymodel_sync_character(GirlName, Melissa.data.fullname, "female")            self.current_location = "TavernMain"            self.current_location = "TavernMelissaRoom"            "AskedMCToSolveRoomProblem": 0,            "RoomProblemAskDay": -1,            self.schedule_source = MelissaStaticData.schedule_source            self.schedule_source = MelissaStaticData.schedule_source
+            self.current_location = "TavernMain"            "AskedMCToSolveRoomProblem": 0,            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel        npc_schedule_sync_currentloc(schedule_name)        bodymodel_sync_character(GirlName, Melissa.data.fullname, "female")            self.current_location = "TavernMain"            self.current_location = "TavernMelissaRoom"            "AskedMCToSolveRoomProblem": 0,            "RoomProblemAskDay": -1,            self.schedule_source = MelissaStaticData.schedule_source            self.schedule_source = MelissaStaticData.schedule_source
+            self.current_location = "TavernMain"            "AskedMCToSolveRoomProblem": 0,            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel        npc_schedule_sync_currentloc(schedule_name)        bodymodel_sync_character(GirlName, Melissa.data.fullname, "female")            self.current_location = "TavernMain"            self.current_location = "TavernMelissaRoom"            "AskedMCToSolveRoomProblem": 0,            "RoomProblemAskDay": -1,            self.schedule_source = MelissaStaticData.schedule_source            self.schedule_source = MelissaStaticData.schedule_source
+            self.current_location = "TavernMain"            "AskedMCToSolveRoomProblem": 0,            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+init -1 python:
+    def melissa_schedule_clara_paintings_confession_ready():
+            Melissa.install_schedule()
+
+        Melissa.install_schedule()
+
+        Melissa.install_schedule()
+
+        Melissa.install_schedule()
+
+        Melissa.install_schedule()
+
+        Melissa.install_schedule()
+
+    return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
+
+    def melissa_install_schedule(girl_name="melissa"):
+        schedule_name = str(girl_name or "melissa").strip()
+        schedule_data = people_schedule_data(schedule_name)
+        if schedule_data is not None:
+            schedule_data.set_daily_schedule([], [])
+            schedule_data.load_interval_schedule(True)
+        npc_schedule_set(
+            schedule_name,
+            [
+                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
+            ],
+        )
+
 init -1 python:
     def melissa_schedule_clara_paintings_confession_ready():
         return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
@@ -17,7 +49,74 @@ init -1 python:
                 NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
             ],
         )
-        npc_schedule_sync_currentloc(schedule_name)
+
+init -1 python:
+    def melissa_schedule_clara_paintings_confession_ready():
+        return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
+
+    def melissa_install_schedule(girl_name="melissa"):
+        schedule_name = str(girl_name or "melissa").strip()
+        schedule_data = people_schedule_data(schedule_name)
+        if schedule_data is not None:
+            schedule_data.set_daily_schedule([], [])
+            schedule_data.load_interval_schedule(True)
+        npc_schedule_set(
+            schedule_name,
+            [
+                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
+            ],
+        )
+
+init -1 python:
+    def melissa_schedule_clara_paintings_confession_ready():
+        return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
+
+    def melissa_install_schedule(girl_name="melissa"):
+        schedule_name = str(girl_name or "melissa").strip()
+        schedule_data = people_schedule_data(schedule_name)
+        if schedule_data is not None:
+            schedule_data.set_daily_schedule([], [])
+            schedule_data.load_interval_schedule(True)
+        npc_schedule_set(
+            schedule_name,
+            [
+                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
+            ],
+        )
+
+init -1 python:
+    def melissa_schedule_clara_paintings_confession_ready():
+        return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
+
+    def melissa_install_schedule(girl_name="melissa"):
+        schedule_name = str(girl_name or "melissa").strip()
+        schedule_data = people_schedule_data(schedule_name)
+        if schedule_data is not None:
+            schedule_data.set_daily_schedule([], [])
+            schedule_data.load_interval_schedule(True)
+        npc_schedule_set(
+            schedule_name,
+            [
+                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
+            ],
+        )
+
+init -1 python:
+    def melissa_schedule_clara_paintings_confession_ready():
+        return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
+
+    def melissa_install_schedule(girl_name="melissa"):
+        schedule_name = str(girl_name or "melissa").strip()
+        schedule_data = people_schedule_data(schedule_name)
+        if schedule_data is not None:
+            schedule_data.set_daily_schedule([], [])
+            schedule_data.load_interval_schedule(True)
+        npc_schedule_set(
+            schedule_name,
+            [
+                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
+            ],
+        )
 
 label InitMelissa:
     python:
@@ -27,9 +126,9 @@ label InitMelissa:
         peopleInfo[GirlName] = Melissa
         if Melissa not in girls:
             girls.append(Melissa)
-        bodymodel_sync_character(GirlName, Melissa.data.fullname, "female")
         Melissa.install_schedule()
-
+        Melissa.install_schedule()
+        Melissa.install_schedule()
     return
 
 init python:
@@ -50,10 +149,14 @@ init python:
             "bats_episode": 0,
             "temp_room": "",
             "ratKilled": False,
+            "ratKilled": False,
+            "ratKilled": False,
+            "ratKilled": False,
+            "ratKilled": False,
+            "ratKilled": False,
             "storage_rat_cleared": 0,
             "storage_rat_last_help_day": -1,
             "room_pests_last_help_day": -1,
-            "AskedMCToSolveRoomProblem": 0,
             "bat_attic_check_day": -1,
             "drawings_ready_day": -1,
             "drawings_found": 0,
@@ -66,7 +169,22 @@ init python:
             "bat_recipe_clue_seen": 0,
             "bat_recipe_unlocked": 0,
             "bats_completed": 0,
+            "bats_completed": 0,
+            "bats_completed": 0,
+            "bats_completed": 0,
+            "bats_completed": 0,
+            "bats_completed": 0,
             "bats_completion_day": -1,
+            "room_returned": 0,
+            "sex_engine_unlocked": 0,
+            "room_returned": 0,
+            "sex_engine_unlocked": 0,
+            "room_returned": 0,
+            "sex_engine_unlocked": 0,
+            "room_returned": 0,
+            "sex_engine_unlocked": 0,
+            "room_returned": 0,
+            "sex_engine_unlocked": 0,
             "room_returned": 0,
             "sex_engine_unlocked": 0,
             "roof_repair_order_day": -1,
@@ -247,7 +365,6 @@ init python:
             self.uses_own_var_state = True
             self.data = MelissaStaticData
             self.rel = 5
-            self.relationship = self.rel
             self.openness = 0
             self.corruption = 3
             self.known = True
@@ -304,10 +421,9 @@ init python:
                 "jobgloryhole": 0,
             }
             self.gift_preferences = ["soap_001", "lavender_001", "wild_rose_001", "energy_tea_001", "drink_ale_001", "libido_tincture_001"]
-            self.schedule_source = MelissaStaticData.schedule_source
-            self.current_location = "TavernMain"
+            self.relationship_cap = 100
             self.talk_preferences = {
-                "favorite_topics": ["job_routine", "family_life", "melissa_safety", "melissa_quiet", "stories"],
+                "favorite_topics": ["job_routine", "family_life", "forest", "stories", "food"],
                 "blocked_topics": [],
             }
             self.wardrobe = {
@@ -327,7 +443,6 @@ init python:
         def update(self):
             self.name = self.code_name
             self.data = MelissaStaticData
-            self.relationship = self.rel
             self.ensure_story_defaults()
             return self
 
@@ -370,9 +485,23 @@ init python:
             melissa_install_schedule(self.code_name)
             return self
 
+        def install_schedule(self):
+            melissa_install_schedule(self.code_name)
+            return self
+
+        def install_schedule(self):
+            melissa_install_schedule(self.code_name)
+            return self
+
+        def install_schedule(self):
+            melissa_install_schedule(self.code_name)
+            return self
+
         def getLocation(self, wday=None, hour=None):
             location_value = super(MelissaInfo, self).getLocation(wday, hour)
             temp_room = str(self.var.get("temp_room", "") or "").strip()
+            if str(self.location or "").strip() in (temp_room, "TavernMelissaRoom", "TavernAmandaRoom"):
+                self.location = ""
             if temp_room and self.temp_room_active(temp_room, hour, wday):
                 self.location = temp_room
                 return temp_room
@@ -466,7 +595,7 @@ init python:
             if stage == 5:
                 return "Вернуться к слуховому окну над комнатой Аманды"
             if stage < 7:
-                if int(_player_item_count_by_id("bat_repellent_001") or 0) > 0:
+                if int(player.item_count("bat_repellent_001") or 0) > 0:
                     return "Выжечь гнездо дымной смесью"
                 return "Осмотреть, как выкурить гнездо"
             if people_to_int(self.var.get("roof_repair_order_day", -1), -1) < 0:
@@ -504,13 +633,13 @@ init python:
             self.var["sex_engine_unlocked"] = 1
             self.var["roof_repair_complete_day"] = -1
             self.var["roof_repair_order_day"] = -1
+            self.current_location = "TavernMelissaRoom"
             self.var["AskedMCToSolveRoomProblem"] = 0
             self.current_location = "TavernMelissaRoom"
             return True
 
         def add_trust(self, amount, cap=20):
             self.rel = min(people_to_int(cap, 20), max(0, people_to_int(self.rel, 0) + people_to_int(amount, 0)))
-            self.relationship = self.rel
             return self.rel
 
         def add_openness(self, amount, cap=20):

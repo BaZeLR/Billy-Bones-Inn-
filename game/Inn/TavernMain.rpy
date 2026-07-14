@@ -1,6 +1,125 @@
+label TavernMainRestore:
+    $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+    if tavern_preopening_mode():
+        $ _layout_last_picture = tavern_main_preopening_background()
+    elif scene_image:
+        $ _layout_last_picture = scene_image
+    $ MainTxt = tavern_main_build_description()
+    $ CurLocDesc = MainTxt
+    call TavernMainBuildActions
+    return                    $ peopleInfo[GirlNameTS1].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS1].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"default TavernMainClientRoomGirl = ""                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"label TavernMainRestore:
+    $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+    if tavern_preopening_mode():
+        $ _layout_last_picture = tavern_main_preopening_background()
+    elif scene_image:
+        $ _layout_last_picture = scene_image
+    $ MainTxt = tavern_main_build_description()
+    $ CurLocDesc = MainTxt
+    call TavernMainBuildActions
+    return    if navigation_only_mode_enabled():
+        if not tavern_preopening_mode():
+            $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+            $ _layout_last_picture = scene_image
+        else:
+            $ _layout_last_picture = tavern_main_preopening_background()
+        python:
+            _nav_desc_parts = [
+                _tavern_main_base_desc,
+                navigation_only_message(),
+                navigation_only_time_note(),
+            ]
+            CurLocDesc = "\n\n".join([part for part in _nav_desc_parts if str(part or "").strip()])
+            MainTxt = CurLocDesc
+        call screen main_ui
+        jump TavernMain
+label TavernMainRestore:
+    $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+    if tavern_preopening_mode():
+        $ _layout_last_picture = tavern_main_preopening_background()
+    elif scene_image:
+        $ _layout_last_picture = scene_image
+    $ MainTxt = tavern_main_build_description()
+    $ CurLocDesc = MainTxt
+    call TavernMainBuildActions
+    return                    $ peopleInfo[GirlNameTS1].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS1].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"default TavernMainClientRoomGirl = ""                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"label TavernMainRestore:
+    $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+    if tavern_preopening_mode():
+        $ _layout_last_picture = tavern_main_preopening_background()
+    elif scene_image:
+        $ _layout_last_picture = scene_image
+    $ MainTxt = tavern_main_build_description()
+    $ CurLocDesc = MainTxt
+    call TavernMainBuildActions
+    return    if navigation_only_mode_enabled():
+        if not tavern_preopening_mode():
+            $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+            $ _layout_last_picture = scene_image
+        else:
+            $ _layout_last_picture = tavern_main_preopening_background()
+        python:
+            _nav_desc_parts = [
+                _tavern_main_base_desc,
+                navigation_only_message(),
+                navigation_only_time_note(),
+            ]
+            CurLocDesc = "\n\n".join([part for part in _nav_desc_parts if str(part or "").strip()])
+            MainTxt = CurLocDesc
+        call screen main_ui
+        jump TavernMain
+label TavernMainRestore:
+    $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+    if tavern_preopening_mode():
+        $ _layout_last_picture = tavern_main_preopening_background()
+    elif scene_image:
+        $ _layout_last_picture = scene_image
+    $ MainTxt = tavern_main_build_description()
+    $ CurLocDesc = MainTxt
+    call TavernMainBuildActions
+    return                    $ peopleInfo[GirlNameTS1].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS1].current_location = "TavernClientRoom"                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"default TavernMainClientRoomGirl = ""                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"label TavernMainRestore:
+    $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+    if tavern_preopening_mode():
+        $ _layout_last_picture = tavern_main_preopening_background()
+    elif scene_image:
+        $ _layout_last_picture = scene_image
+    $ MainTxt = tavern_main_build_description()
+    $ CurLocDesc = MainTxt
+    call TavernMainBuildActions
+    return    if navigation_only_mode_enabled():
+        if not tavern_preopening_mode():
+            $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+            $ _layout_last_picture = scene_image
+        else:
+            $ _layout_last_picture = tavern_main_preopening_background()
+        python:
+            _nav_desc_parts = [
+                _tavern_main_base_desc,
+                navigation_only_message(),
+                navigation_only_time_note(),
+            ]
+            CurLocDesc = "\n\n".join([part for part in _nav_desc_parts if str(part or "").strip()])
+            MainTxt = CurLocDesc
+        call screen main_ui
+        jump TavernMain
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+default TavernClosed = ""
+default TavernClosed = ""
 default TavernClosed = ""
 #default TavernGloryHole = 0
 default TavernEventOngoing = ""
@@ -8,7 +127,22 @@ default GeorgettAvail = 0
 default LizaAvail = 0
 default TavernMainExtraDesc = ""
 default TavernMainGloryDesc = ""
-default TavernMainClientRoomGirl = ""
+default TavernEventOngoing = ""
+default GeorgettAvail = 0
+default LizaAvail = 0
+default TavernMainExtraDesc = ""
+default TavernMainGloryDesc = ""
+default TavernEventOngoing = ""
+default GeorgettAvail = 0
+default LizaAvail = 0
+default TavernMainExtraDesc = ""
+default TavernMainGloryDesc = ""
+
+
+#default TavernGloryHole = 0
+
+
+#default TavernGloryHole = 0
 
 
 init python:    
@@ -129,6 +263,9 @@ init python:
         return str(tavern_main_morning_event_data().get("text", "") or "")
 
     def tavern_main_build_description():
+        if str(TavernMainRoom.state["event_ongoing"] or "").strip():
+            return str(TavernMainRoom.state["event_ongoing"] or "")
+
         if str(TavernEventOngoing or "").strip():
             return str(TavernEventOngoing or "")
 
@@ -193,7 +330,30 @@ init python:
         },
     )
 
+    def tavern_main_action_items():
+        tavern_main_fireplace_wood_stock()
+        sections = TavernMainRoom.build_menu_sections()
+        items = list(sections.get("movement", [])) + list(sections.get("actions", []))
+        if TavernMainRoom.state["closed_text"] == "" and int(player.tavern_management.client_room_hole or 0) > 0 and str(TavernMainRoom.state["client_room_girl"] or "") != "":
+            items.append(MenuItem("Пойти проверить отдельную комнату", Call("TavernProstClients", 1, TavernMainRoom.state["client_room_girl"])))
+        if TavernMainRoom.state["closed_text"] == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "clara_tavern_visit"):
+            items.append(MenuItem("Прислушаться к историям у стойки", Call("checkTriggers", "TavernMain", "clara_tavern_visit", 0)))
+        if TavernClosed == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "overheard"):
+            items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
+        if TavernClosed == "" and story_event_available("TavernMain", "clara_paintings"):
+            items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "TavernMain", "clara_paintings", 0)))
+        return items
+
 default TavernMainBlockEvents = 0
+default TavernMainRoom.state["block_events"] = 0
+default TavernMainObjectMenuId = ""
+
+default TavernMainBlockEvents = 0
+default TavernMainRoom.state["block_events"] = 0
+default TavernMainObjectMenuId = ""
+
+default TavernMainBlockEvents = 0
+default TavernMainRoom.state["block_events"] = 0
 default TavernMainObjectMenuId = ""
 
 label TavernMain:
@@ -202,9 +362,7 @@ label TavernMain:
     $ CurLocDesc = _tavern_main_base_desc
     $ CurrentRoom = TavernMainRoom
     $ CurLoc = "TavernMain"
-    $ location = CurLoc
     $ tavern_main_fireplace_wood_stock()
-    $ calendar_v2.sync_state()
     $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -245,18 +403,20 @@ label TavernMain:
                 _draupnir_gh_asked = 0
         if _draupnir_gh_asked == 0:
             $ TavernGloryHole = 0
-            $ TavernHole = 0
+            $ player.tavern_management.client_room_hole = 0
     # Determine if tavern is closed
-    $ TavernClosed = tavern_main_closed_text()
-    if TavernClosed == "":
+    $ TavernMainRoom.state["closed_text"] = tavern_main_closed_text()
+    if TavernEventOngoing == "" and TavernClosed == "":
         python:
             _arg_list = _args or ()
-            BlockEvents = _arg_list[0] if len(_arg_list) > 0 else TavernMainBlockEvents
-            TavernMainBlockEvents = 0
-            TavernEventOngoing = ""
-            TavernMainExtraDesc = ""
+            BlockEvents = _arg_list[0] if len(_arg_list) > 0 else TavernMainRoom.state["block_events"]
+            TavernMainRoom.state["block_events"] = 0
+            TavernMainRoom.state["event_ongoing"] = ""
+            TavernMainRoom.state["georgett_available"] = 0
+            TavernMainRoom.state["liza_available"] = 0
+            TavernMainRoom.state["extra_desc"] = ""
             TavernMainClientRoomGirl = ""
-            TavernMainGloryDesc = ""
+            TavernMainRoom.state["glory_desc"] = ""
             ShouldDispatchTavernEvent = (
                 int(week or 0) != 7
                 and not tavern_preopening_mode()
@@ -264,14 +424,20 @@ label TavernMain:
             )
             if (
                 ShouldDispatchTavernEvent
-                and int(TavernWorkPlanDay or -1) != int(dayspassed or 0)
-                and len(list(tavern_work_events or [])) == 0
-                and len(list(TavernPlayedEventsToday or [])) == 0
+                and int(event_runtime.tavern_work_plan_day or -1) != int(dayspassed or 0)
+                and len(list(event_runtime.tavern_work_events or [])) == 0
+                and len(list(event_runtime.tavern_played_today or [])) == 0
             ):
                 tavern_work_build_daily_plan()
 
         if ShouldDispatchTavernEvent:
             call checkTriggers("TavernMain", "tavern_work", 0)
+            if _return:
+                jump TavernMain
+            if _return:
+                jump TavernMain
+            if _return:
+                jump TavernMain
             if _return:
                 jump TavernMain
     
@@ -283,7 +449,40 @@ label TavernMain:
 
     if navigation_only_mode_enabled():
         if not tavern_preopening_mode():
-            $ calendar_v2.sync_state()
+            $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+            $ _layout_last_picture = scene_image
+        else:
+            $ _layout_last_picture = tavern_main_preopening_background()
+        python:
+            _nav_desc_parts = [
+                _tavern_main_base_desc,
+                navigation_only_message(),
+                navigation_only_time_note(),
+            ]
+            CurLocDesc = "\n\n".join([part for part in _nav_desc_parts if str(part or "").strip()])
+            MainTxt = CurLocDesc
+        call screen main_ui
+        jump TavernMain
+
+    if navigation_only_mode_enabled():
+        if not tavern_preopening_mode():
+            $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+            $ _layout_last_picture = scene_image
+        else:
+            $ _layout_last_picture = tavern_main_preopening_background()
+        python:
+            _nav_desc_parts = [
+                _tavern_main_base_desc,
+                navigation_only_message(),
+                navigation_only_time_note(),
+            ]
+            CurLocDesc = "\n\n".join([part for part in _nav_desc_parts if str(part or "").strip()])
+            MainTxt = CurLocDesc
+        call screen main_ui
+        jump TavernMain
+
+    if navigation_only_mode_enabled():
+        if not tavern_preopening_mode():
             $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
             $ _layout_last_picture = scene_image
         else:
@@ -300,7 +499,7 @@ label TavernMain:
         jump TavernMain
 
     # Main event and interaction logic
-    if TavernEventOngoing == "" and TavernClosed == "":
+    if TavernMainRoom.state["event_ongoing"] == "" and TavernMainRoom.state["closed_text"] == "":
         if str(getLocation(GirlNameTS1) or "") == CurLoc:
             if time == 3:
                 call AddOthersSperm(GirlNameTS1, 7)
@@ -315,14 +514,10 @@ label TavernMain:
                     $ LizaAvail = 1
                     $ peopleInfo[GirlNameTS1].location = "TavernClientRoom"
                     $ peopleInfo[GirlNameTS1].current_location = "TavernClientRoom"
-                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
-                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
                     $ TavernMainClientRoomGirl = "georgett"
                 elif randvarPS == 2 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Жоржетта и ждет клиентов. А вот ее старшую дочку, судя по всему, уже кто-то снял."
                     $ GeorgettAvail = 1
-                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
-                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
                     $ peopleInfo[GirlNameTS2].location = "TavernClientRoom"
                     $ peopleInfo[GirlNameTS2].current_location = "TavernClientRoom"
                     $ TavernMainClientRoomGirl = "liza"
@@ -330,23 +525,19 @@ label TavernMain:
                     $ TavernMainExtraDesc = "В правом углу трактира сидят Жоржетта со своей дочкой Лизеттой и ждут клиентов."
                     $ LizaAvail = 1
                     $ GeorgettAvail = 1
-                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
-                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
-                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
-                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
             elif _liza_whore_work == 1:
                 python:
                     randvarPS = procedural_randint(1, 3, key="procedural:Inn/TavernMain.rpy:procedural_randint:338:2")
                 if randvarPS == 1 and dyneval(CheckIfSexEventExist, GirlNameTS2, time) > 0:
                     $ TavernMainExtraDesc = "В правом углу, где обычно сидит Лизетта, пусто. Похоже что ветренную девчонку уже кто-то снял."
+                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
                     $ peopleInfo[GirlNameTS2].location = "TavernClientRoom"
                     $ peopleInfo[GirlNameTS2].current_location = "TavernClientRoom"
                     $ TavernMainClientRoomGirl = "liza"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Лизетта и ждет клиентов."
                     $ LizaAvail = 1
-                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
-                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
             elif _georgett_whore_work == 1:
                 python:
                     randvarPS = procedural_randint(1, 3, key="procedural:Inn/TavernMain.rpy:procedural_randint:351:3")
@@ -354,12 +545,12 @@ label TavernMain:
                     $ TavernMainExtraDesc = "В правом углу, где обычно сидит Жоржетта, пусто. Похоже что шлюшку уже кто-то снял."
                     $ peopleInfo[GirlNameTS1].location = "TavernClientRoom"
                     $ peopleInfo[GirlNameTS1].current_location = "TavernClientRoom"
+                    $ peopleInfo[GirlNameTS2].location = "TavernMain"
+                    $ peopleInfo[GirlNameTS2].current_location = "TavernMain"
                     $ TavernMainClientRoomGirl = "georgett"
                 else:
                     $ TavernMainExtraDesc = "В правом углу трактира сидит Жоржетта и ждет клиентов."
                     $ GeorgettAvail = 1
-                    $ peopleInfo[GirlNameTS1].location = "TavernMain"
-                    $ peopleInfo[GirlNameTS1].current_location = "TavernMain"
         python:
             try:
                 _glory_quest_started = int(DraupnirVar.get("GloryHoleAsked", 0) or 0) > 0
@@ -369,36 +560,37 @@ label TavernMain:
             $ TavernMainGloryDesc = "В дальнем углу трактира мастера Драупнир что-то строгает и пилит. Работа кипит. Еще несколько часов и вы сможете насладиться построенным глорихолом."
         elif TavernGloryHole == 2 and _glory_quest_started:
             $ TavernMainGloryDesc = "В дальнем углу трактира располагается ширмочка, а за ней, как вы знаете, глорихол - место где, за умеренную плату, а для вас, как вы надеетесь, и вовсе бесплатно, любой страждущий может получить полностью анонимный минет. Ну, если с другой стороны ширмы есть кто-то, желающий его сделать."
-        $ calendar_v2.sync_state()
         $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
         $ _layout_last_picture = scene_image
 
     if TavernEventOngoing == "":
         call RoomEnterEventGate(CurLoc, False)
         if TavernClosed == "" and not tavern_preopening_mode() and int(week or 0) != 7:
-            if str(getLocation('amanda') or "") == CurLoc:
-                call CheckDailyEvent('amanda', None, CurLoc, time)
-            if str(getLocation('sandra') or "") == CurLoc:
-                call CheckDailyEvent('sandra', None, CurLoc, time)
-            if str(getLocation('melissa') or "") == CurLoc:
-                call CheckDailyEvent('melissa', None, CurLoc, time)
-            $ _tmp_bf_sandra = DescribeBreastFeeding('sandra')
-            $ _tmp_bf_amanda = DescribeBreastFeeding('amanda')
-            $ _tmp_bf_melissa = DescribeBreastFeeding('melissa')
-            if GeorgettAvail == 1:
-                $ _tmp_bf_georgett = DescribeBreastFeeding('georgett')
-            if LizaAvail == 1:
-                $ _tmp_bf_liza = DescribeBreastFeeding('liza')
-            if str(getLocation("georgett") or "") == "TavernMain":
-                $ _tmp_kids_list = ShowFullKidsListByAge('sandra','amanda','melissa','georgett','liza')
-            else:
-                $ _tmp_kids_list = ShowFullKidsListByAge('sandra','amanda','melissa')
-            if GeorgettAvail == 1 or (str(getLocation("georgett") or "") == CurLoc and time < 2):
-                call CheckDailyEvent('georgett', None, CurLoc, time)
-            if LizaAvail == 1 or (str(getLocation("liza") or "") == CurLoc and time < 2):
-                call CheckDailyEvent('liza', None, CurLoc, time)
-        call TavernMainBuildActions
-        
+        if str(getLocation('amanda') or "") == CurLoc:
+            call check_daily_event('amanda', None, CurLoc, time)
+        if str(getLocation('sandra') or "") == CurLoc:
+            call check_daily_event('sandra', None, CurLoc, time)
+        if str(getLocation('melissa') or "") == CurLoc:
+            call check_daily_event('melissa', None, CurLoc, time)
+        $ _tmp_bf_sandra = DescribeBreastFeeding('sandra')
+        $ _tmp_bf_amanda = DescribeBreastFeeding('amanda')
+        $ _tmp_bf_melissa = DescribeBreastFeeding('melissa')
+        if TavernMainRoom.state["georgett_available"] == 1:
+            $ _tmp_bf_georgett = DescribeBreastFeeding('georgett')
+        if TavernMainRoom.state["liza_available"] == 1:
+            $ _tmp_bf_liza = DescribeBreastFeeding('liza')
+        if str(getLocation("georgett") or "") == "TavernMain":
+            $ _tmp_kids_list = ShowFullKidsListByAge('sandra','amanda','melissa','georgett','liza')
+        else:
+            $ _tmp_kids_list = ShowFullKidsListByAge('sandra','amanda','melissa')
+        if TavernMainRoom.state["georgett_available"] == 1 or (str(getLocation("georgett") or "") == CurLoc and time < 2):
+            call check_daily_event('georgett', None, CurLoc, time)
+        if TavernMainRoom.state["liza_available"] == 1 or (str(getLocation("liza") or "") == CurLoc and time < 2):
+            call check_daily_event('liza', None, CurLoc, time)
+    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = tavern_main_action_items()
+
     else:
         $ CurLocDesc = TavernEventOngoing
         $ MainTxt = TavernEventOngoing
@@ -420,28 +612,8 @@ label TavernMain:
             if str(_household_request_type or "") == "soap":
                 call HouseholdSoapRequestEvent(_household_request_girl)
 
-    $ _main_ui_return = None
-    while _main_ui_return is None:
+    while True:
         call screen main_ui
-        $ _main_ui_return = _return
-    jump TavernMain
-
-
-label TavernMainBuildActions:
-    $ tavern_main_fireplace_wood_stock()
-    $ current_action_title = "Действия в трактире"
-    $ current_action_content = None
-    $ _tavern_room_menu = CurrentRoom.build_menu_sections() if CurrentRoom is not None and hasattr(CurrentRoom, "build_menu_sections") else {"movement": [], "actions": []}
-    $ current_action_items = list(_tavern_room_menu.get("movement", [])) + list(_tavern_room_menu.get("actions", []))
-    if TavernClosed == "" and int(TavernHole or 0) > 0 and str(TavernMainClientRoomGirl or "") != "":
-        $ current_action_items.append(MenuItem("Пойти проверить отдельную комнату", Call("TavernProstClients", 1, TavernMainClientRoomGirl)))
-    if TavernClosed == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "clara_tavern_visit"):
-        $ current_action_items.append(MenuItem("Прислушаться к историям у стойки", Call("checkTriggers", "TavernMain", "clara_tavern_visit", 0)))
-    if TavernClosed == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "overheard"):
-        $ current_action_items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
-    if TavernClosed == "" and story_event_available("TavernMain", "clara_paintings"):
-        $ current_action_items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "TavernMain", "clara_paintings", 0)))
-    return
 
 
 label TavernMainObjectMenu(object_id="", refresh_only=False):
@@ -513,14 +685,3 @@ label TavernMainObjectText(object_id="", action_id=""):
     return
 
 
-label TavernMainRestore:
-    $ calendar_v2.sync_state()
-    $ scene_image = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
-    if tavern_preopening_mode():
-        $ _layout_last_picture = tavern_main_preopening_background()
-    elif scene_image:
-        $ _layout_last_picture = scene_image
-    $ MainTxt = tavern_main_build_description()
-    $ CurLocDesc = MainTxt
-    call TavernMainBuildActions
-    return

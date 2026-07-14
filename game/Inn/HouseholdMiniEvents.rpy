@@ -21,40 +21,40 @@ label HouseholdEvent_Try(location_code="", mode="room"):
 
 label HouseholdEvent_KitchenAmandaSandraSpark:
 
-    "The kitchen is already too warm, and not only because of the fire."
+    "На кухне и без того жарко, и не только из-за огня в очаге."
 
-    "Sandra stands near the table, making notes with a face that promises more work before breakfast is over."
+    "Сандра стоит у стола и что-то записывает с таким лицом, будто до конца завтрака всем еще прибавится работы."
 
-    "Sandra: If this house is going to survive, someone here must remember discipline."
+    "Сандра: Если этот дом собирается выжить, кто-то здесь должен помнить о дисциплине."
 
-    "Amanda looks up from her task."
+    "Аманда отрывается от своего дела и поднимает взгляд."
 
-    "Amanda: Funny. Discipline always means our hands are busy and your mouth is free."
+    "Аманда: Забавно. Дисциплина почему-то всегда значит, что у нас руки заняты, а у тебя рот свободен."
 
-    "Melissa almost laughs, then hides it behind her cup."
+    "Мелисса едва не смеется, но вовремя прячет улыбку за кружкой."
 
-    "Sandra: Watch yourself."
+    "Сандра: Следи за языком."
 
-    "Amanda’s smile becomes sharper."
+    "Улыбка Аманды становится острее."
 
-    "Amanda: I am watching. That is the problem."
+    "Аманда: Я и слежу. В этом-то и проблема."
 
-    "For a moment the whole kitchen goes quiet."
+    "На мгновение вся кухня замирает."
 
     menu:
-        "Tell Amanda to return to work":
-            "Amanda obeys, but her eyes stay angry."
+        "Велеть Аманде вернуться к работе":
+            "Аманда слушается, но взгляд у нее остается злым."
             $ household_ai_reduce_drive("amanda", 0.20)
             $ household_ai_raise_friction(0.06)
 
-        "Tell Sandra to stop provoking her":
-            "Sandra closes her notebook slowly."
-            "Sandra: So now I am the problem?"
+        "Сказать Сандре, чтобы она перестала ее заводить":
+            "Сандра медленно закрывает тетрадь."
+            "Сандра: Значит, теперь проблема во мне?"
             $ household_ai_reduce_drive("sandra", 0.15)
             $ household_ai_raise_friction(0.08)
 
-        "Tell both of them the tavern comes first":
-            "Neither of them looks pleased, but both understand the point."
+        "Напомнить обеим, что трактир важнее перепалок":
+            "Довольной не выглядит ни одна из них, но смысл до обеих доходит."
             $ household_ai_raise_convergence(0.08)
             $ household_ai_reduce_drive("amanda", 0.12)
             $ household_ai_reduce_drive("sandra", 0.12)
@@ -64,32 +64,32 @@ label HouseholdEvent_KitchenAmandaSandraSpark:
 
 label HouseholdEvent_KitchenMelissaPracticalComplaint:
 
-    "Melissa watches the room like she is counting every missing coin and every dirty plate."
+    "Мелисса оглядывает кухню так, будто считает каждую недостающую монету и каждую грязную тарелку."
 
-    "Melissa: We cannot keep pretending everything is fine."
+    "Мелисса: Нельзя бесконечно делать вид, будто все в порядке."
 
-    "She nods toward the shelves."
+    "Она кивает в сторону полок."
 
-    "Melissa: Food, clean cloth, repairs. If those fail, everyone starts fighting over favors instead of working."
+    "Мелисса: Еда, чистая ткань, починка. Если с этим провалиться, все начинают не работать, а драться за поблажки."
 
-    "Sandra: At least someone here can count."
+    "Сандра: Хоть кто-то здесь умеет считать."
 
-    "Melissa smiles thinly."
+    "Мелисса тонко улыбается."
 
-    "Melissa: I can count. I can also remember who gets help first."
+    "Мелисса: Считать я умею. И еще умею помнить, кому помогают первым."
 
     menu:
-        "Promise to fix supplies":
-            "Melissa relaxes a little."
+        "Пообещать разобраться с припасами":
+            "Мелисса немного расслабляется."
             $ household_ai_raise_convergence(0.06)
             $ household_ai_reduce_drive("melissa", 0.15)
 
-        "Tell her to manage with what she has":
-            "Melissa says nothing, but her expression becomes colder."
+        "Сказать, чтобы справлялась с тем, что есть":
+            "Мелисса ничего не отвечает, но лицо у нее становится холоднее."
             $ household_ai_raise_friction(0.08)
 
-        "Ask what she needs most":
-            "Melissa: Security first. Then comfort. Then everyone becomes much easier to deal with."
+        "Спросить, что ей нужнее всего":
+            "Мелисса: Сначала безопасность. Потом удобство. После этого со всеми становится куда проще иметь дело."
             $ household_ai_raise_convergence(0.04)
 
     return
@@ -97,36 +97,36 @@ label HouseholdEvent_KitchenMelissaPracticalComplaint:
 
 label HouseholdEvent_BreakfastSquirrelMockery:
 
-    "Breakfast begins with small noises, small looks, and the kind of silence that is not peaceful."
+    "Завтрак начинается с мелких звуков, коротких взглядов и такой тишины, которую никак не назовешь мирной."
 
-    "Amanda: So, who is pretending to be innocent today?"
+    "Аманда: Ну что, кто сегодня притворяется невинной?"
 
-    "Melissa: Depends. Who is pretending hardest?"
+    "Мелисса: Смотря кто старается сильнее всех."
 
-    "Amanda laughs."
+    "Аманда смеется."
 
-    "Sandra looks from one girl to the other."
+    "Сандра переводит взгляд с одной девушки на другую."
 
-    "Sandra: Eat. Work. Then talk."
+    "Сандра: Ешьте. Работайте. Потом разговаривайте."
 
-    "Amanda: There. The household sermon."
+    "Аманда: Вот. Домашняя проповедь началась."
 
-    "Melissa taps her spoon against the bowl."
+    "Мелисса постукивает ложкой по миске."
 
-    "Melissa: Careful. Sermons get longer when the tavern is poor."
+    "Мелисса: Осторожнее. Когда трактир беднеет, проповеди становятся длиннее."
 
     menu:
-        "Let them mock each other":
-            "The table grows louder, but nobody leaves."
+        "Дать им еще немного поддеть друг друга":
+            "За столом становится шумнее, но никто не уходит."
             $ household_ai_raise_friction(0.06)
 
-        "Cut it short":
-            "The silence that follows is worse than the noise."
+        "Оборвать разговор":
+            "Наступившая тишина выходит хуже шума."
             $ household_ai_raise_friction(0.04)
             $ household_ai_reduce_drive("sandra", 0.10)
 
-        "Turn it into work planning":
-            "They complain, but the conversation becomes useful."
+        "Перевести разговор в рабочие планы":
+            "Они ворчат, но разговор становится полезнее."
             $ household_ai_raise_convergence(0.08)
 
     return
@@ -134,29 +134,29 @@ label HouseholdEvent_BreakfastSquirrelMockery:
 
 label HouseholdEvent_AmandaPrivatePressure:
 
-    "Amanda finds a reason to be near you when nobody else is close."
+    "Аманда находит повод оказаться рядом, когда поблизости больше никого нет."
 
-    "She does not ask directly. That would be too simple."
+    "Прямо она не просит. Это было бы слишком просто."
 
-    "Amanda: You always notice what is missing from the tavern."
+    "Аманда: Ты всегда замечаешь, чего не хватает трактиру."
 
-    "She steps closer."
+    "Она делает шаг ближе."
 
-    "Amanda: Do you notice what is missing from me?"
+    "Аманда: А замечаешь, чего не хватает мне?"
 
     menu:
-        "Ask what she wants":
-            "Amanda: Depends what you can afford. Attention is cheap. Pretty things are not."
-            $ Amanda.set_var_int("attention_hint_day", dayspassed)
+        "Спросить, чего она хочет":
+            "Аманда: Смотря что ты можешь себе позволить. Внимание дешевое. Красивые вещи — нет."
+            $ Amanda.set_var_int("attention_hint_day", current_game_day())
             $ household_ai_reduce_drive("amanda", 0.16)
 
-        "Tell her she is fishing for favors":
-            "Amanda smiles, but not kindly."
-            "Amanda: Then maybe learn to bait the hook better."
+        "Сказать, что она выпрашивает поблажки":
+            "Аманда улыбается, но не слишком доброжелательно."
+            "Аманда: Тогда, может, научись лучше наживку подбирать."
             $ household_ai_raise_friction(0.05)
 
-        "Tell her later":
-            "She accepts it badly, but she accepts it."
+        "Сказать, что поговорите потом":
+            "Она принимает это плохо, но все-таки принимает."
             $ Amanda.set_var_int("need_blocked", 1)
             $ household_ai_raise_friction(0.04)
 
@@ -165,25 +165,25 @@ label HouseholdEvent_AmandaPrivatePressure:
 
 label HouseholdEvent_SandraPrivateCheck:
 
-    "Sandra appears at the wrong time with the exact face of someone who knows it."
+    "Сандра появляется в самый неподходящий момент и с лицом человека, который прекрасно это понимает."
 
-    "Sandra: I wanted to see whether you are managing the house or letting it manage you."
+    "Сандра: Я хотела посмотреть, ты управляешь домом или дом уже управляет тобой."
 
-    "She looks around, not accusing directly, which somehow makes it worse."
+    "Она оглядывается, ни в чем не обвиняя вас прямо, и от этого становится только хуже."
 
     menu:
-        "Ask what she really wants":
-            "Sandra: Order. Security. And not watching the girls tear each other apart over scraps."
+        "Спросить, чего она на самом деле хочет":
+            "Сандра: Порядка. Безопасности. И чтобы девчонки не рвали друг друга на части из-за объедков."
             $ household_ai_reduce_drive("sandra", 0.15)
             $ household_ai_raise_convergence(0.05)
 
-        "Tell her you are the manager":
-            "Sandra: Then manage."
+        "Напомнить ей, что управляете здесь вы":
+            "Сандра: Тогда управляй."
             $ household_ai_raise_friction(0.06)
 
-        "Ask for her help with the girls":
-            "Sandra studies you for a long moment."
-            "Sandra: Then stop rewarding chaos."
+        "Попросить ее помочь с девчонками":
+            "Сандра долго смотрит на вас."
+            "Сандра: Тогда перестань награждать беспорядок."
             $ household_ai_raise_convergence(0.06)
 
     return
@@ -191,27 +191,27 @@ label HouseholdEvent_SandraPrivateCheck:
 
 label HouseholdEvent_ThreeWomenConverge:
 
-    "For once, nobody starts the morning by fighting."
+    "На этот раз никто не начинает утро со ссоры."
 
-    "Sandra has notes, Melissa has numbers, Amanda has objections — but they are all looking at the same problem."
+    "У Сандры есть записи, у Мелиссы — цифры, у Аманды — возражения, но все трое смотрят на одну и ту же проблему."
 
-    "Sandra: If the house holds, everyone eats."
+    "Сандра: Если дом устоит, все будут сыты."
 
-    "Melissa: If everyone eats, everyone behaves better."
+    "Мелисса: Если все сыты, все ведут себя лучше."
 
-    "Amanda: Do not make it sound too noble. I still want my share."
+    "Аманда: Только не надо делать вид, будто это так благородно. Свою долю я все равно хочу."
 
-    "Sandra almost smiles."
+    "Сандра почти улыбается."
 
-    "Sandra: Good. Wanting a share means you intend to stay."
+    "Сандра: Хорошо. Если хочешь долю, значит, собираешься остаться."
 
     menu:
-        "Tell them this is how the household survives":
-            "For a rare moment, all three seem to accept it."
+        "Сказать, что так дом и выживает":
+            "На редкое мгновение все трое, кажется, принимают это."
             $ household_ai_raise_convergence(0.12)
 
-        "Promise rewards when the tavern improves":
-            "Amanda likes the word reward. Melissa likes the word when. Sandra likes the word improves."
+        "Пообещать награды, когда трактир поднимется":
+            "Аманде нравится слово «награды». Мелиссе нравится слово «когда». Сандре нравится слово «поднимется»."
             $ household_ai_raise_convergence(0.10)
 
     return

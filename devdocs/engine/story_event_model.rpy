@@ -1029,7 +1029,7 @@ screen board():
         padding (20, 20)
         vbox:
             spacing 12
-            text "Story Threads" size 28 color "#c90"
+            text "Story Threads" size 32 color "#c90"
             viewport:
                 mousewheel True
                 draggable True

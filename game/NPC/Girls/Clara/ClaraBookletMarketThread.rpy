@@ -1,4 +1,4 @@
-# ================================================================================
+    $ npc_schedule_sync_all()        $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()        $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ werecat_sync_profile()        $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()        $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ Clara.var["trust"] = int(Clara.trust or 0)    $ Clara.var["trust"] = int(Clara.trust or 0)    $ npc_schedule_sync_all()        $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()        $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ werecat_sync_profile()        $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()        $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ Clara.var["trust"] = int(Clara.trust or 0)    $ Clara.var["trust"] = int(Clara.trust or 0)    $ npc_schedule_sync_all()        $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()        $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ npc_schedule_sync_all()    $ werecat_sync_profile()        $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()        $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ werecat_sync_profile()    $ Clara.var["trust"] = int(Clara.trust or 0)    $ Clara.var["trust"] = int(Clara.trust or 0)# ================================================================================
 # Clara booklet market authored event labels.
 #
 # Event availability is owned by claraBookletMarket in StoryEventRuntime.rpy.
@@ -13,6 +13,7 @@
 # - follow: exploration >= 80 succeeds, reveals booklet merchant, optionally confronts Clara, advances thread
 # - ignore: keeps thread on this stage and records retry cooldown
 label story_clara_market_booklet_0:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ UI_mode = "event"
 
@@ -39,13 +40,10 @@ label story_clara_market_booklet_ignore:
     $ CurLocDesc = MainTxt
     "[MainTxt]"
 
-    $ Clara.var["market_follow_failed_day"] = int(dayspassed or 0)
-    $ Clara.var["market_follow_failed_hour"] = int(hour or 0)
-    $ LastAdvancedMinutes = 15
+    $ Clara.var["market_follow_failed_day"] = int(calendar_v2.daysInGame or 0)
+    $ Clara.var["market_follow_failed_hour"] = int(calendar_v2.hour or 0)
     $ calendar_v2.advance_minutes(15)
-    $ npc_schedule_sync_all()
-    $ werecat_sync_profile()
-    $ player_state().change_stat("energy", -2)
+    $ player.change_stat("energy", -2)
     call stat
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
@@ -53,19 +51,17 @@ label story_clara_market_booklet_ignore:
 
 
 label story_clara_market_booklet_follow:
-    if int(exploration or 0) < 80:
+    show screen main_ui
+    if int(player.stats.exploration or 0) < 80:
         vscene "images/clara/market_day.png"
         $ MainTxt = "Вы стараетесь не отстать, но дневной рынок слишком шумный и тесный. Стоит вам замешкаться на пару шагов, как Кларисса ускользает между рядами и будто растворяется среди чужих спин.\n\nПохоже, без лучшей сноровки в слежке вы просто потеряете ее снова."
         $ CurLocDesc = MainTxt
         "[MainTxt]"
 
-        $ Clara.var["market_follow_failed_day"] = int(dayspassed or 0)
-        $ Clara.var["market_follow_failed_hour"] = int(hour or 0)
-        $ LastAdvancedMinutes = 30
+        $ Clara.var["market_follow_failed_day"] = int(calendar_v2.daysInGame or 0)
+        $ Clara.var["market_follow_failed_hour"] = int(calendar_v2.hour or 0)
         $ calendar_v2.advance_minutes(30)
-        $ npc_schedule_sync_all()
-        $ werecat_sync_profile()
-        $ player_state().change_stat("energy", -5)
+        $ player.change_stat("energy", -5)
         call stat
         $ UI_mode = "scene"
         $ SignalBlockTime = 0
@@ -86,13 +82,10 @@ label story_clara_market_booklet_follow:
 
 label story_clara_market_booklet_follow_success_leave:
     $ Clara.var["booklet_market_seen"] = 1
-    $ LastAdvancedMinutes = 30
     $ calendar_v2.advance_minutes(30)
-    $ npc_schedule_sync_all()
-    $ werecat_sync_profile()
-    $ player_state().change_stat("energy", -5)
+    $ player.change_stat("energy", -5)
     call stat
-    $ thread.advance()
+    $ event_runtime.active_thread.advance()
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
     return True
@@ -102,12 +95,12 @@ label story_clara_market_booklet_confront:
     vscene "images/clara/market_bookletDeal.png"
 
     $ _clara_market_bonus = 1
-    if str(player_state().appearance.current_dress or "") == "thiefdress":
+    if str(player.appearance.current_dress or "") == "thiefdress":
         $ _clara_market_bonus += 1
     if int(Clara.rel or 0) >= 7:
         $ _clara_market_bonus += 1
 
-    if str(player_state().appearance.current_dress or "") == "thiefdress" and int(Clara.rel or 0) >= 7:
+    if str(player.appearance.current_dress or "") == "thiefdress" and int(Clara.rel or 0) >= 7:
         $ MainTxt = "Вы выходите из-за лотка без лишней суеты и даете Клариссе понять, что уже видели похожие непристойные рисунки у Мелиссы. На секунду она белеет, но, заметив ваш бандитский костюм и поняв, что вы не собираетесь устраивать сцену, быстро берет себя в руки.\n\nКларисса коротко просит не устраивать разговор прямо здесь, а таинственный торговец запоминает вас уже без прежней враждебности. Похоже, с этого дня он готов показывать вам свой особый товар не чаще раза в месяц, а сама Кларисса становится с вами заметно откровеннее."
     else:
         $ MainTxt = "Вы подходите ближе и спокойно даете понять Клариссе, что уже видели похожие непристойные рисунки и догадываетесь, чем она тут занимается. Девушка сразу напрягается, но, услышав, что вы не собираетесь ее выдавать, все же выдыхает.\n\nБез долгих разговоров Кларисса просит не поднимать шум на рынке. Торговец рядом молча запоминает вас взглядом. Похоже, теперь и он будет считать вас своим человеком, а сама Кларисса станет откровеннее лишь если решит, что вам действительно можно доверять."
@@ -118,7 +111,6 @@ label story_clara_market_booklet_confront:
     $ Clara.var["merchant_contact_unlocked"] = 1
     $ Clara.openness = min(20, int(Clara.openness or 0) + _clara_market_bonus)
     $ Clara.trust = min(20, int(Clara.trust or 0) + max(1, _clara_market_bonus - 1))
-    $ Clara.var["trust"] = int(Clara.trust or 0)
     jump story_clara_market_booklet_follow_success_leave
 
 
@@ -128,6 +120,7 @@ label story_clara_market_booklet_confront:
 # - follow: exploration >= 100 succeeds, advances to the Mongol deal scene
 # - leave: keeps thread on this stage
 label story_clara_market_booklet_2:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ UI_mode = "event"
 
@@ -150,11 +143,8 @@ label story_clara_market_booklet_2_ignore:
     $ CurLocDesc = MainTxt
     "[MainTxt]"
 
-    $ LastAdvancedMinutes = 15
     $ calendar_v2.advance_minutes(15)
-    $ npc_schedule_sync_all()
-    $ werecat_sync_profile()
-    $ player_state().change_stat("energy", -2)
+    $ player.change_stat("energy", -2)
     call stat
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
@@ -164,37 +154,32 @@ label story_clara_market_booklet_2_ignore:
 label story_clara_market_booklet_2_follow:
     $ Clara.var["market_evening_intro_seen"] = 1
 
-    if int(exploration or 0) < 100:
+    if int(player.stats.exploration or 0) < 100:
         vscene "images/clara/market_night.png"
         $ MainTxt = "Закрытый вечерний рынок куда опаснее для слежки, чем дневная толпа. Стоит вам задеть чью-то корзину и чуть замешкаться, как Кларисса вместе с Монголом растворяются в темном закутке между пустеющими рядами. Без лучшей сноровки здесь их не удержать."
         $ CurLocDesc = MainTxt
         "[MainTxt]"
 
-        $ Clara.var["market_follow_failed_day"] = int(dayspassed or 0)
-        $ Clara.var["market_follow_failed_hour"] = int(hour or 0)
-        $ LastAdvancedMinutes = 30
+        $ Clara.var["market_follow_failed_day"] = int(calendar_v2.daysInGame or 0)
+        $ Clara.var["market_follow_failed_hour"] = int(calendar_v2.hour or 0)
         $ calendar_v2.advance_minutes(30)
-        $ npc_schedule_sync_all()
-        $ werecat_sync_profile()
-        $ player_state().change_stat("energy", -5)
+        $ player.change_stat("energy", -5)
         call stat
         $ UI_mode = "scene"
         $ SignalBlockTime = 0
         return True
 
-    $ LastAdvancedMinutes = 30
     $ calendar_v2.advance_minutes(30)
-    $ npc_schedule_sync_all()
-    $ werecat_sync_profile()
-    $ player_state().change_stat("energy", -5)
+    $ player.change_stat("energy", -5)
     call stat
-    $ thread.advance()
+    $ event_runtime.active_thread.advance()
     jump story_clara_market_booklet_3
 
 
 # Event: Clara and Mongol horse-theft deal.
 # Consequence: the deal is seen and the thread advances.
 label story_clara_market_booklet_3:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ UI_mode = "event"
 
@@ -209,7 +194,7 @@ label story_clara_market_booklet_3:
 
     $ Clara.var["mongol_theft_seen"] = 1
     $ Clara.openness = min(20, int(Clara.openness or 0) + 1)
-    $ thread.advance()
+    $ event_runtime.active_thread.advance()
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
     return True
@@ -218,6 +203,7 @@ label story_clara_market_booklet_3:
 # Event: Clara confesses her reason in WineStore talk.
 # Consequence: confession is marked, openness/friendship change, and the thread advances.
 label story_clara_market_booklet_4:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ UI_mode = "event"
 
@@ -231,7 +217,7 @@ label story_clara_market_booklet_4:
             pass
 
     $ _clara_escape_bonus = 1
-    if str(player_state().appearance.current_dress or "") == "thiefdress":
+    if str(player.appearance.current_dress or "") == "thiefdress":
         $ _clara_escape_bonus += 1
     if int(Clara.rel or 0) >= 7:
         $ _clara_escape_bonus += 1
@@ -239,13 +225,9 @@ label story_clara_market_booklet_4:
     $ Clara.var["drawings_secret_known"] = 1
     $ Clara.openness = min(20, int(Clara.openness or 0) + _clara_escape_bonus)
     $ Clara.trust = min(20, int(Clara.trust or 0) + max(1, _clara_escape_bonus - 1))
-    $ Clara.var["trust"] = int(Clara.trust or 0)
-    $ LastAdvancedMinutes = 30
     $ calendar_v2.advance_minutes(30)
-    $ npc_schedule_sync_all()
-    $ werecat_sync_profile()
     call stat
-    $ thread.advance()
+    $ event_runtime.active_thread.advance()
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
     return True
@@ -254,6 +236,7 @@ label story_clara_market_booklet_4:
 # Event: HunterClub rumor reveals Mongol's arrest.
 # Consequence: the stocks arrest day is recorded and the thread advances.
 label story_clara_market_booklet_5:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ UI_mode = "event"
 
@@ -266,13 +249,10 @@ label story_clara_market_booklet_5:
         "Запомнить слух":
             pass
 
-    $ Mongol.var["StocksArrestDay"] = int(dayspassed or 0)
-    $ LastAdvancedMinutes = 15
+    $ Mongol.var["StocksArrestDay"] = int(calendar_v2.daysInGame or 0)
     $ calendar_v2.advance_minutes(15)
-    $ npc_schedule_sync_all()
-    $ werecat_sync_profile()
     call stat
-    $ thread.advance()
+    $ event_runtime.active_thread.advance()
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
     return True
@@ -281,6 +261,7 @@ label story_clara_market_booklet_5:
 # Event: the player sees Mongol in the stocks.
 # Consequence: stocks seen flag is recorded and the thread advances.
 label story_clara_market_booklet_6:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ UI_mode = "event"
 
@@ -294,7 +275,7 @@ label story_clara_market_booklet_6:
             pass
 
     $ Mongol.var["StocksSeen"] = 1
-    $ thread.advance()
+    $ event_runtime.active_thread.advance()
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
     return True
@@ -305,6 +286,7 @@ label story_clara_market_booklet_6:
 # - give food: consumes food, records the day, advances thread
 # - leave: keeps thread on this stage
 label story_clara_market_booklet_7:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ UI_mode = "event"
 
@@ -330,13 +312,10 @@ label story_clara_market_booklet_feed_mongol:
     "[MainTxt]"
 
     $ productnum = max(0, int(productnum or 0) - 1)
-    $ Mongol.var["StocksFoodDay"] = int(dayspassed or 0)
-    $ LastAdvancedMinutes = 15
+    $ Mongol.var["StocksFoodDay"] = int(calendar_v2.daysInGame or 0)
     $ calendar_v2.advance_minutes(15)
-    $ npc_schedule_sync_all()
-    $ werecat_sync_profile()
     call stat
-    $ thread.advance()
+    $ event_runtime.active_thread.advance()
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
     return True
@@ -347,6 +326,7 @@ label story_clara_market_booklet_feed_mongol:
 # - pay: consumes money, records lockpick order, advances thread
 # - leave: keeps thread on this stage
 label story_clara_market_booklet_8:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ UI_mode = "event"
 
@@ -372,13 +352,10 @@ label story_clara_market_booklet_lockpicks_order:
     "[MainTxt]"
 
     $ money = int(money or 0) - 40
-    $ DraupnirVar["MongolLockpickOrderDay"] = int(dayspassed or 0)
-    $ LastAdvancedMinutes = 15
+    $ DraupnirVar["MongolLockpickOrderDay"] = int(calendar_v2.daysInGame or 0)
     $ calendar_v2.advance_minutes(15)
-    $ npc_schedule_sync_all()
-    $ werecat_sync_profile()
     call stat
-    $ thread.advance()
+    $ event_runtime.active_thread.advance()
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
     return True
@@ -389,6 +366,7 @@ label story_clara_market_booklet_lockpicks_order:
 # - release: consumes food/wine, updates consequences, completes the thread
 # - leave: keeps thread on this stage
 label story_clara_market_booklet_9:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ UI_mode = "event"
 
@@ -422,12 +400,9 @@ label story_clara_market_booklet_release_mongol:
     $ Mongol.var["StocksReleased"] = 1
     $ Robin.var["MongolSafePass"] = 1
     $ Robin.var["BlackwoodRoadOpen"] = 1
-    $ LastAdvancedMinutes = 30
     $ calendar_v2.advance_minutes(30)
-    $ npc_schedule_sync_all()
-    $ werecat_sync_profile()
     call stat
-    $ thread.complete()
+    $ event_runtime.active_thread.complete()
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
     return True

@@ -1,5 +1,11 @@
 # Tractir Current Architecture Audit And Rescue Plan
 
+> REFERENCE ONLY / HISTORICAL AUDIT.
+>
+> Keep this as evidence of past cleanup targets, not as the current standard.
+> Current implementation authority is `devdocs/README.md`,
+> `devdocs/implementation_models/*`, and `devdocs/EventThreadInstruction/*`.
+
 Date: 2026-06-06
 
 Status: evidence-backed architecture proposal, updated with the Family Life-style findings from the follow-up audit. No gameplay code was changed during this audit.

@@ -1,3 +1,39 @@
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = CurrentRoom.build_exit_items()
+        while True:
+            call screen main_ui
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = CurrentRoom.build_exit_items()
+        while True:
+            call screen main_ui
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = CurrentRoom.build_exit_items()
+        while True:
+            call screen main_ui
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = CurrentRoom.build_exit_items()
+        while True:
+            call screen main_ui
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = CurrentRoom.build_exit_items()
+        while True:
+            call screen main_ui
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = CurrentRoom.build_exit_items()
+        while True:
+            call screen main_ui
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -38,9 +74,9 @@ init python:
         seller_id = wine_store_seller_id()
         if seller_id == "clara":
             base_text += "\n\nСейчас утро, и за прилавком стоит Кларисса, старшая дочь мессира Легаре. Это привлекательная блондинка чуть младше вас."
-            if dayspassed > 40 and dayspassed <= 90:
+            if current_game_day() > 40 and current_game_day() <= 90:
                 base_text += "\n\nВы знаете, что Мелисса с ней недавно подружилась."
-            elif dayspassed > 90:
+            elif current_game_day() > 90:
                 base_text += "\n\nОна с Мелиссой - лучшие подруги."
             base_text += "\n\nВы можете с ней поболтать."
             if not Clara.can_start_social_events():
@@ -87,7 +123,7 @@ init python:
             ),
         ],
         exits=[
-            RoomExit(label="Вернуться на рынок", target="MarketPlace"),
+            RoomExit(label="Вернуться на рынок", target="MarketPlace", minutes_to_pass=10),
         ],
         game_items=[
             WineStoreWineStockObject,
@@ -108,7 +144,6 @@ label WineStore:
     scene black
     $ CurrentRoom = WineStoreRoom
     $ CurLoc = CurrentRoom.code_name
-    $ location = CurLoc
     $ scene_image = wine_store_scene_picture()
     $ _layout_last_picture = scene_image
     $ current_action_title = "Действия"
@@ -130,13 +165,6 @@ label WineStore:
     $ CurLocDesc = MainTxt
     vscene scene_image
 
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = CurrentRoom.build_exit_items()
-        while True:
-            call screen main_ui
-
     $ CurLocDesc = MainTxt
     $ current_action_title = "Действия"
     $ current_action_content = None
@@ -153,52 +181,45 @@ label WineStore:
 
 
 label WineStoreObjectMenu(object_id="", preserve_text=False):
-    $ _wine_object = None
-    python:
-        for _room_object in WineStoreRoom.visible_objects():
-            if str(getattr(_room_object, "object_id", "") or "") == str(object_id or ""):
-                _wine_object = _room_object
-                break
+    $ _wine_object = wine_store_find_object(object_id)
     if _wine_object is None:
+        $ current_action_items = []
+    python:
+        for _wine_object_row in CurrentRoom.visible_objects():
+            current_action_items.append(MenuItem(_wine_object_row.name, Call("WineStoreObjectMenu", _wine_object_row.object_id)))
+    if story_event_available("WineStore", "clara_paintings"):
+        $ current_action_items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "WineStore", "clara_paintings", 0)))
+    $ current_action_items.extend(CurrentRoom.build_exit_items())
         return
-    if not preserve_text:
-        $ MainTxt = _wine_object.description
-        $ CurLocDesc = MainTxt
-    $ current_action_title = _wine_object.name
+    $ current_object_id = str(object_id or "")
+    $ current_action_title = str(_wine_object.name or "")
     $ current_action_content = None
+    if not preserve_text:
+        $ MainTxt = str(_wine_object.description or "")
+        $ CurLocDesc = MainTxt
     $ current_action_items = []
     python:
         for _wine_action in _wine_object.visible_actions():
             if _wine_action.hook == "text":
                 current_action_items.append(MenuItem(_wine_action.label, Call("WineStoreObjectText", object_id, _wine_action.action_id)))
-            elif _wine_action.hook == "call" and str(_wine_action.target or "") != "":
-                _wine_args = tuple(getattr(_wine_action, "args", ()) or ())
-                current_action_items.append(MenuItem(_wine_action.label, Call(_wine_action.target, *_wine_args)))
-            elif _wine_action.hook == "jump" and str(_wine_action.target or "") != "":
-                current_action_items.append(MenuItem(_wine_action.label, Jump(_wine_action.target)))
-    $ current_action_items.append(MenuItem("Назад", Jump("WineStore")))
+            else:
+                _wine_item = room_action_menu_item(_wine_action)
+                if _wine_item is not None:
+                    current_action_items.append(_wine_item)
+    $ current_action_items.append(MenuItem("Назад", [SetVariable("current_action_title", "Действия"), SetVariable("current_action_content", None), SetVariable("current_action_items", wine_store_action_items()), Function(main_ui_restart_interaction)]))
     return
 
 
 label WineStoreObjectText(object_id="", action_id=""):
-    $ _wine_text = ""
-    $ _wine_name = ""
-    python:
-        for _room_object in WineStoreRoom.visible_objects():
-            if str(getattr(_room_object, "object_id", "") or "") != str(object_id or ""):
-                continue
-            _wine_name = str(getattr(_room_object, "name", "") or "")
-            for _wine_action in _room_object.visible_actions():
-                if str(getattr(_wine_action, "action_id", "") or "") == str(action_id or ""):
-                    _wine_text = str(_wine_action.target or "")
+    $ _wine_object = wine_store_find_object(object_id)
+    if _wine_object is not None:
+        python:
+            for _wine_action in _wine_object.visible_actions():
+                if str(_wine_action.action_id or "") == str(action_id or ""):
+                    MainTxt = str(_wine_action.target or "")
+                    CurLocDesc = MainTxt
                     break
-            break
-    if str(_wine_text or "").strip():
-        $ MainTxt = _wine_text
-        $ CurLocDesc = MainTxt
     call WineStoreObjectMenu(object_id, True)
-    if str(_wine_name or "").strip():
-        $ current_action_title = _wine_name
     return
 
 

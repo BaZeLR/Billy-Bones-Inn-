@@ -3,16 +3,11 @@
 # ================================================================================
 label DailySetstatdefault(girl_name):
     $ _dssd_info = getPersonInfo(girl_name)
-    if _dssd_info is not None and hasattr(_dssd_info, "set_arousal"):
-        $ _dssd_info.set_arousal(PussyWetStart.get(girl_name, 0))
-    $ CumInsideYou[girl_name] = 0
-    $ CumInsideOthers[girl_name] = 0
-    $ CumFaceYou[girl_name] = 0
-    $ CumTitsYou[girl_name] = 0
-    $ CumFaceOthers[girl_name] = 0
-    $ CumTitsOthers[girl_name] = 0
-    $ Breastfeed[girl_name] = 0
-    $ Lactate[girl_name] = 0
+    if _dssd_info is not None and hasattr(_dssd_info, "reset_daily"):
+        $ _dssd_info.set_arousal(_dssd_info.sex_stat("PussyWetStart", 0))
+        $ _dssd_info.clear_cum()
+        $ _dssd_info.set_sex_stat("breastfeed", 0)
+        $ _dssd_info.set_sex_stat("lactate", 0)
 
     if not (girl_name == "inga" and IngaVar.get("Knowher", 0) == 0):
         if pregnancy.get(girl_name, 0) > 0:
@@ -74,6 +69,8 @@ label DailySetstatdefault(girl_name):
         $ Lactate[girl_name] = 1
 
     call CockPosition(girl_name, 0)
+    $ adjust_otkroven(girl_name)
+    $ adjust_otkroven(girl_name)
     $ adjust_otkroven(girl_name)
     call IncreaseSkill(girl_name)
 

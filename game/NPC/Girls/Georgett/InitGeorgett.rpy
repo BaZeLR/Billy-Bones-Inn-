@@ -1,4 +1,25 @@
-# ================================================================================
+            sync_player_state_from_store()            self.current_location = "PortStreets"            self.current_location = "TavernMain" if self.hired else "PortStreets"            self.hired = False        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()[key] = value
+            return value
+            self.schedule_source = GeorgettStaticData.schedule_source            self.schedule_source = GeorgettStaticData.schedule_source
+            self.current_location = "PortStreets"            self.hired = False            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            sync_player_state_from_store()            self.current_location = "PortStreets"            self.current_location = "TavernMain" if self.hired else "PortStreets"            self.hired = False        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()[key] = value
+            return value
+            self.schedule_source = GeorgettStaticData.schedule_source            self.schedule_source = GeorgettStaticData.schedule_source
+            self.current_location = "PortStreets"            self.hired = False            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            sync_player_state_from_store()            self.current_location = "PortStreets"            self.current_location = "TavernMain" if self.hired else "PortStreets"            self.hired = False        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()[key] = value
+            return value
+            self.schedule_source = GeorgettStaticData.schedule_source            self.schedule_source = GeorgettStaticData.schedule_source
+            self.current_location = "PortStreets"            self.hired = False            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label InitGeorgett:
@@ -68,11 +89,9 @@ init python:
             self.data = GeorgettStaticData
             self.uses_own_var_state = True
             self.rel = 0
-            self.relationship = self.rel
             self.openness = 0
             self.corruption = 80
             self.known = False
-            self.hired = False
             self.talked_today = 0
             self.gifted_today = 0
             self.asked_today = 0
@@ -109,8 +128,6 @@ init python:
                 "jobgloryholeTommorow": 0,
             }
             self.gift_preferences = list(GeorgettStaticData.gift_preferences)
-            self.schedule_source = GeorgettStaticData.schedule_source
-            self.current_location = "PortStreets"
             self.talk_preferences = {
                 "favorite_topics": ["clients", "sex", "family", "pregnancy", "kids"],
                 "blocked_topics": ["flirt"],
@@ -134,7 +151,6 @@ init python:
         def update(self):
             super(GeorgettInfo, self).update()
             self.data = GeorgettStaticData
-            self.relationship = self.rel
             self.ensure_story_defaults()
             self.ensure_sex_state()
             return self
@@ -151,6 +167,8 @@ init python:
                 self.sex_state = {}
             for key, value in {
                 "location": "street",
+                "tits_visible": 0,
+                "pussy_visible": 0,
                 "somebody_cums": 0,
                 "arousal": 0,
                 "lick_pussy": 0,
@@ -217,7 +235,6 @@ init python:
             return people_to_int(self.stats.get("sexacts", 0), 0)
 
         def sex_setup(self, location="street"):
-            sync_player_state_from_store()
             self.ensure_sex_state()
             self.sex_state["location"] = str(location or "street")
             self.sex_state["somebody_cums"] = 0
@@ -229,7 +246,7 @@ init python:
             return self.sex_state
 
         def _player_intimacy(self):
-            return player_state(False).intimacy
+            return player.intimacy
 
         def player_arousal(self):
             return self._player_intimacy().arousal_value("You")
@@ -237,13 +254,11 @@ init python:
         def set_player_arousal(self, value):
             intimacy = self._player_intimacy()
             new_value = intimacy.set_arousal(value, "You")
-            intimacy.apply_to_store()
             return new_value
 
         def add_player_arousal(self, amount=0, cap=100):
             intimacy = self._player_intimacy()
             new_value = intimacy.add_arousal(amount, cap, "You")
-            intimacy.apply_to_store()
             return new_value
 
         def can_player_cum(self):
@@ -356,7 +371,7 @@ init python:
 
         def record_orgasm_given(self):
             self.stats["orgasms_given"] = people_to_int(self.stats.get("orgasms_given", 0), 0) + 1
-            self.stats["last_orgasm_day"] = people_to_int(dayspassed, 0)
+            self.stats["last_orgasm_day"] = people_to_int(current_game_day(), 0)
             return self.stats["orgasms_given"]
 
         def player_cum(self, place):
@@ -364,7 +379,7 @@ init python:
             if place_key not in ("inside", "mouth", "tits", "face"):
                 place_key = "outside"
             intimacy = self._player_intimacy()
-            intimacy.record_cum(dayspassed)
+            intimacy.record_cum(current_game_day())
             self.stats["sexacts"] = people_to_int(self.stats.get("sexacts", 0), 0) + 1
             self.fucked_today = people_to_int(self.fucked_today, 0) + 1
             if place_key == "inside":
@@ -383,7 +398,6 @@ init python:
                 self.sex_state["cum_face_you"] = 1
             self.set_cock_position("none")
             self.set_sex_busy(1)
-            intimacy.apply_to_store()
             return self.sex_state
 
         def talk_count(self):
@@ -394,7 +408,6 @@ init python:
 
         def add_relation(self, amount=1, cap=20):
             self.rel = max(0, min(people_to_int(cap, 20), people_to_int(self.rel, 0) + people_to_int(amount, 0)))
-            self.relationship = self.rel
             return self.rel
 
         def finish_talk(self):
@@ -447,12 +460,16 @@ init python:
             return False
 
         def getLocation(self, wday=None, hour=None):
-            location_value = super(GeorgettInfo, self).getLocation(wday, hour)
-            if str(location_value or "") == "PortStreets":
-                if self.portstreet_visible_now():
-                    self.location = "PortStreets"
-                    return "PortStreets"
-            return location_value
+            return super(GeorgettInfo, self).getLocation(wday, hour)
+
+        def getLocation(self, wday=None, hour=None):
+            return super(GeorgettInfo, self).getLocation(wday, hour)
+
+        def getLocation(self, wday=None, hour=None):
+            return super(GeorgettInfo, self).getLocation(wday, hour)
+
+        def getLocation(self, wday=None, hour=None):
+            return super(GeorgettInfo, self).getLocation(wday, hour)
 
         def can_work_portstreets(self):
             return str(self.getLocation() or "") == "PortStreets" and not self.can_work_tavern()
@@ -464,18 +481,13 @@ init python:
             )
 
         def portstreet_work_hour(self):
-            calendar_v2.sync_state()
             return people_to_int(calendar_v2.hour, 0) >= 19 and people_to_int(week, 0) != 5
 
         def portstreet_work_active(self):
             return self.can_work_portstreets() and self.portstreet_story_unblocked() and self.portstreet_work_hour()
 
-        def set_portstreet_visible(self, visible=True):
-            self.var["portstreet_visible_now"] = 1 if visible else 0
-            return bool(visible)
-
         def portstreet_visible_now(self):
-            return people_to_int(self.var.get("portstreet_visible_now", 0), 0) > 0
+            return self.portstreet_work_active() and not self.portstreet_client_event_available()
 
         def portstreet_scene_pictures(self):
             return [
@@ -495,7 +507,7 @@ init python:
                 return self.data.portrait
             if len(pictures) == 1:
                 return pictures[0]
-            return pictures[procedural_randint(0, len(pictures) - 1, "georgett_portstreets_scene_%s" % people_to_int(dayspassed, 0))]
+            return pictures[procedural_randint(0, len(pictures) - 1, "georgett_portstreets_scene_%s" % people_to_int(current_game_day(), 0))]
 
         def portstreet_client_event_available(self):
             return self.portstreet_work_active() and people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0 and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0

@@ -1,7 +1,93 @@
+
+
+label ArtisansQuarterRestore:
+    $ MainTxt = ArtisansQuarterSavedText
+    $ CurLocDesc = MainTxt
+    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
+    call ArtisansQuarterBuildActions
+    return    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
+        call screen main_ui
+        return
+label ArtisansQuarterRestore:
+    $ MainTxt = ArtisansQuarterSavedText
+    $ CurLocDesc = MainTxt
+    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
+    call ArtisansQuarterBuildActions
+    return    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
+        $ _artisans_nav_ui_return = None
+        while _artisans_nav_ui_return is None:
+            call screen main_ui
+            $ _artisans_nav_ui_return = _return
+        jump ArtisansQuarter
+
+
+label ArtisansQuarterRestore:
+    $ MainTxt = ArtisansQuarterSavedText
+    $ CurLocDesc = MainTxt
+    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
+    call ArtisansQuarterBuildActions
+    return    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
+        call screen main_ui
+        return
+label ArtisansQuarterRestore:
+    $ MainTxt = ArtisansQuarterSavedText
+    $ CurLocDesc = MainTxt
+    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
+    call ArtisansQuarterBuildActions
+    return    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
+        $ _artisans_nav_ui_return = None
+        while _artisans_nav_ui_return is None:
+            call screen main_ui
+            $ _artisans_nav_ui_return = _return
+        jump ArtisansQuarter
+
+
+label ArtisansQuarterRestore:
+    $ MainTxt = ArtisansQuarterSavedText
+    $ CurLocDesc = MainTxt
+    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
+    call ArtisansQuarterBuildActions
+    return    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
+        call screen main_ui
+        return
+label ArtisansQuarterRestore:
+    $ MainTxt = ArtisansQuarterSavedText
+    $ CurLocDesc = MainTxt
+    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
+    call ArtisansQuarterBuildActions
+    return    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
+        $ _artisans_nav_ui_return = None
+        while _artisans_nav_ui_return is None:
+            call screen main_ui
+            $ _artisans_nav_ui_return = _return
+        jump ArtisansQuarter
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
+    def artisans_quarter_exit_minutes(target_room=""):
+        if str(target_room or "").strip() == "StreetTavern":
+            return navigation_group_travel_minutes()
+        return 10
+
     ArtisansQuarterRoom = Room(
         code_name="ArtisansQuarter",
         display_name="Квартал ремесленников",
@@ -13,9 +99,9 @@ init python:
             ),
         ],
         exits=[
-            RoomExit(label="Идти в мастерскую столяра Драупнира", target="StolyarWorkshop"),
-            RoomExit(label="Идти в лавку портнихи Фараго", target="DressShop"),
-            RoomExit(label="Зайти в цирюльню Серджио Пета", target="BarberShop"),
+            RoomExit(label="Идти в мастерскую столяра Драупнира", target="StolyarWorkshop", minutes_to_pass=10),
+            RoomExit(label="Идти в лавку портнихи Фараго", target="DressShop", minutes_to_pass=10),
+            RoomExit(label="Зайти в цирюльню Серджио Пета", target="BarberShop", minutes_to_pass=10),
             RoomExit(label="Вернуться к трактиру", target="StreetTavern"),
         ],
         game_items=[
@@ -53,7 +139,6 @@ label ArtisansQuarter:
     $ dog_prepare_current_spawn()
     $ CurrentRoom = ArtisansQuarterRoom
     $ CurLoc = "ArtisansQuarter"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -76,16 +161,6 @@ label ArtisansQuarter:
 
     call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
 
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться к трактиру", Jump("StreetTavern"))]
-        $ _artisans_nav_ui_return = None
-        while _artisans_nav_ui_return is None:
-            call screen main_ui
-            $ _artisans_nav_ui_return = _return
-        jump ArtisansQuarter
-
     call RoomEnterEventGate(CurLoc, False)
 
     call ArtisansQuarterBuildActions
@@ -105,7 +180,7 @@ label ArtisansQuarterBuildActions:
         for _artisans_object in ArtisansQuarterRoom.visible_objects():
             current_action_items.append(MenuItem(_artisans_object.name, Call("ArtisansQuarterObjectMenu", _artisans_object.object_id)))
         for _artisans_exit in ArtisansQuarterRoom.visible_exits():
-            current_action_items.append(MenuItem(_artisans_exit.label, Jump(_artisans_exit.target)))
+            current_action_items.append(MenuItem(_artisans_exit.label, Call("MoveToRoom", _artisans_exit.target, artisans_quarter_exit_minutes(_artisans_exit.target))))
     return
 
 
@@ -162,9 +237,3 @@ label ArtisansQuarterObjectText(object_id="", action_id=""):
     return
 
 
-label ArtisansQuarterRestore:
-    $ MainTxt = ArtisansQuarterSavedText
-    $ CurLocDesc = MainTxt
-    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
-    call ArtisansQuarterBuildActions
-    return

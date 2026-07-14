@@ -1,5 +1,10 @@
 # QSP Port Implementation Status
 
+> REFERENCE ONLY / HISTORICAL STATUS.
+>
+> This file is not an implementation standard. Use it only for historical
+> context. Current work follows `devdocs/README.md` and the model/template docs.
+
 Purpose: summarize the current Ren'Py project from a QSP-port perspective.
 
 This is not a generic Ren'Py review. It answers:

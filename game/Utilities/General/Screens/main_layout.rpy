@@ -1,32 +1,5 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
-default CurrentRoom = None
-default current_action_title = "Actions"
-default current_action_content = None
-default current_action_items = []
-default current_girl_key = ""
-default current_object_id = ""
-default current_room_code = ""
-default scene_image = ""
-default UI_mode = "scene"
-default UI_selected_char = ""
-default main_ui_inventory_dropdown_open = False
-default main_ui_overlay = ""
-default story_board_hover_event_thread = None
-default story_board_hover_event_index = -1
-default story_board_control_thread_name = ""
-
-init python:
-    import renpy.exports as renpy_module
-
-    def main_ui_restart_interaction():
-        restart_fn = getattr(renpy_module, "restart_interaction", None)
-        if callable(restart_fn):
-            restart_fn()
-
     def main_ui_restore_room_scene_state():
-        global UI_mode, UI_selected_char, current_girl_key, current_action_content
+        global UI_mode, UI_selected_char, current_girl_key, current_talk_picture, current_action_content
         global current_action_title, current_action_items, current_object_id, CurrentRoom, CurLoc
         global MainTxt, CurLocDesc
         global main_ui_inventory_dropdown_open
@@ -34,6 +7,7 @@ init python:
         UI_mode = "scene"
         UI_selected_char = ""
         current_girl_key = ""
+        current_talk_picture = ""
         current_action_content = None
         current_object_id = ""
         main_ui_inventory_dropdown_open = False
@@ -50,6 +24,129 @@ init python:
         current_action_items = list(room_sections.get("movement", [])) + list(room_sections.get("actions", []))
 
         main_ui_restart_interaction()
+        try:
+            main_ui_restore_room_scene_state()
+        except Exception:
+            pass
+    style mui_hud_nav_button is mui_hud_button:
+        yminimum 28
+
+    style mui_hud_nav_button_text is mui_hud_button_text:
+        size 17
+                                        Hide("girl_card_overlay"),
+                                        Hide("player_card_overlay"),                                            Hide("girl_card_overlay"),
+                                            Hide("player_card_overlay"),                                                    Hide("girl_card_overlay"),
+                                                    Hide("player_card_overlay"),                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),default current_room_code = ""    def main_ui_restore_room_scene_state():
+        global UI_mode, UI_selected_char, current_girl_key, current_talk_picture, current_action_content
+        global current_action_title, current_action_items, current_object_id, CurrentRoom, CurLoc
+        global MainTxt, CurLocDesc
+        global main_ui_inventory_dropdown_open
+
+        UI_mode = "scene"
+        UI_selected_char = ""
+        current_girl_key = ""
+        current_talk_picture = ""
+        current_action_content = None
+        current_object_id = ""
+        main_ui_inventory_dropdown_open = False
+        room_obj = CurrentRoom
+        room_code = str(getattr(room_obj, "code_name", "") or CurLoc or "").strip()
+        if room_code == "TavernKitchen" and bool(TavernBreakfastEventActive):
+            tavern_breakfast_restore_ui_state()
+            return
+        current_action_title = "Действия в трактире" if room_code == "TavernMain" else "Действия"
+        if room_obj is not None and hasattr(room_obj, "current_description_text"):
+            MainTxt = room_obj.current_description_text(str(getattr(room_obj, "display_name", "") or room_code))
+            CurLocDesc = MainTxt
+        room_sections = room_obj.build_menu_sections() if room_obj is not None and hasattr(room_obj, "build_menu_sections") else {"movement": [], "actions": []}
+        current_action_items = list(room_sections.get("movement", [])) + list(room_sections.get("actions", []))
+
+        main_ui_restart_interaction()
+        try:
+            main_ui_restore_room_scene_state()
+        except Exception:
+            pass
+    style mui_hud_nav_button is mui_hud_button:
+        yminimum 28
+
+    style mui_hud_nav_button_text is mui_hud_button_text:
+        size 17
+                                        Hide("girl_card_overlay"),
+                                        Hide("player_card_overlay"),                                            Hide("girl_card_overlay"),
+                                            Hide("player_card_overlay"),                                                    Hide("girl_card_overlay"),
+                                                    Hide("player_card_overlay"),                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),default current_room_code = ""    def main_ui_restore_room_scene_state():
+        global UI_mode, UI_selected_char, current_girl_key, current_talk_picture, current_action_content
+        global current_action_title, current_action_items, current_object_id, CurrentRoom, CurLoc
+        global MainTxt, CurLocDesc
+        global main_ui_inventory_dropdown_open
+
+        UI_mode = "scene"
+        UI_selected_char = ""
+        current_girl_key = ""
+        current_talk_picture = ""
+        current_action_content = None
+        current_object_id = ""
+        main_ui_inventory_dropdown_open = False
+        room_obj = CurrentRoom
+        room_code = str(getattr(room_obj, "code_name", "") or CurLoc or "").strip()
+        if room_code == "TavernKitchen" and bool(TavernBreakfastEventActive):
+            tavern_breakfast_restore_ui_state()
+            return
+        current_action_title = "Действия в трактире" if room_code == "TavernMain" else "Действия"
+        if room_obj is not None and hasattr(room_obj, "current_description_text"):
+            MainTxt = room_obj.current_description_text(str(getattr(room_obj, "display_name", "") or room_code))
+            CurLocDesc = MainTxt
+        room_sections = room_obj.build_menu_sections() if room_obj is not None and hasattr(room_obj, "build_menu_sections") else {"movement": [], "actions": []}
+        current_action_items = list(room_sections.get("movement", [])) + list(room_sections.get("actions", []))
+
+        main_ui_restart_interaction()
+        try:
+            main_ui_restore_room_scene_state()
+        except Exception:
+            pass
+    style mui_hud_nav_button is mui_hud_button:
+        yminimum 28
+
+    style mui_hud_nav_button_text is mui_hud_button_text:
+        size 17
+                                        Hide("girl_card_overlay"),
+                                        Hide("player_card_overlay"),                                            Hide("girl_card_overlay"),
+                                            Hide("player_card_overlay"),                                                    Hide("girl_card_overlay"),
+                                                    Hide("player_card_overlay"),                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),                                                            Hide("girl_card_overlay"),
+                                                            Hide("player_card_overlay"),default current_room_code = ""# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+default CurrentRoom = None
+default current_action_title = "Actions"
+default current_action_content = None
+default current_action_items = []
+default current_girl_key = ""
+default current_talk_picture = ""
+default current_object_id = ""
+default scene_image = ""
+default UI_mode = "scene"
+default UI_selected_char = ""
+default main_ui_inventory_dropdown_open = False
+default main_ui_overlay = ""
+default story_board_hover_event_thread = None
+default story_board_hover_event_index = -1
+default story_board_control_thread_name = ""
+
+init python:
+    import renpy.exports as renpy_module
+
+    def main_ui_restart_interaction():
+        restart_fn = getattr(renpy_module, "restart_interaction", None)
+        if callable(restart_fn):
+            restart_fn()
 
     def main_ui_toggle_inventory_dropdown():
         global main_ui_inventory_dropdown_open
@@ -70,20 +167,70 @@ init python:
         player_card_set_inventory_origin("room")
         player_card_show_inventory_section_state(section_id)
 
+    def main_ui_talk_picture_path(girl_name=""):
+        key = str(girl_name or "").strip().lower()
+        candidates = []
+
+        if key == "amanda":
+            candidates.extend([
+                "images/amanda/amanda_portrait.jpg",
+                "images/amanda/close up.jpg",
+                "images/amanda/amanda_card.jpg",
+            ])
+        elif key == "melissa":
+            try:
+                candidates.append(Melissa.image_path("portrait", "default"))
+            except Exception:
+                pass
+            candidates.extend([
+                "images/melissa/tavern/portrait.png",
+                "images/melissa/melissa_portrait_0.jpg",
+                "images/melissa/melissa_portrait_1.jpg",
+                "images/melissa/melissa_card.jpg",
+            ])
+        elif key == "sandra":
+            candidates.extend([
+                "images/sandra/portrait2.jpg",
+                "images/sandra/portrait3.jpg",
+                "images/sandra/talk_0.png",
+                "images/sandra/sandra_card.jpg",
+            ])
+        elif key in ("clara", "clarissa"):
+            candidates.extend([
+                "images/clara/portrait1.jpg",
+                "images/clara/portrait.png",
+                "images/clara/portrait2.jpg",
+            ])
+        else:
+            try:
+                candidates.append(girl_card_portrait_path(key))
+            except Exception:
+                pass
+
+        for candidate in candidates:
+            path = str(candidate or "").strip()
+            if path and renpy_module.loadable(path):
+                return path
+        return ""
+
     def main_ui_begin_talk_state(title="", selected_char=""):
-        global UI_mode, UI_selected_char, current_girl_key, current_action_content, current_action_title
+        global UI_mode, UI_selected_char, current_girl_key, current_talk_picture
+        global current_action_content, current_action_items, current_action_title
 
         UI_mode = "talk"
         current_action_content = None
+        current_action_items = []
 
         char_key = str(selected_char or "").strip()
         if char_key:
             UI_selected_char = char_key
             current_girl_key = char_key
+            current_talk_picture = main_ui_talk_picture_path(char_key)
 
         if str(title or "").strip():
             current_action_title = str(title)
 
+        renpy_module.show_screen("main_ui")
         main_ui_restart_interaction()
 
     def main_ui_end_talk_state():
@@ -92,11 +239,12 @@ init python:
 
     def main_ui_begin_native_scene_state(title=""):
         global UI_mode, current_action_title, current_action_content, current_action_items
-        global UI_selected_char, current_girl_key
+        global UI_selected_char, current_girl_key, current_talk_picture
 
         UI_mode = "event"
         UI_selected_char = ""
         current_girl_key = ""
+        current_talk_picture = ""
         current_action_content = None
         current_action_items = []
         if str(title or "").strip():
@@ -128,15 +276,11 @@ init python:
             if restored_room is not None:
                 CurrentRoom = restored_room
                 current_room_code = str(getattr(restored_room, "code_name", "") or CurLoc or "")
+                current_room_code = str(getattr(restored_room, "code_name", "") or CurLoc or "")
             elif CurrentRoom is not None:
                 current_room_code = str(getattr(CurrentRoom, "code_name", "") or CurLoc or "")
             else:
                 current_room_code = str(CurLoc or "")
-        except Exception:
-            pass
-
-        try:
-            main_ui_restore_room_scene_state()
         except Exception:
             pass
 
@@ -191,14 +335,70 @@ label ReturnMainUISceneMode:
     return
 
 
+label ReturnMainUISceneMode:
+    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _room_label:
+        jump expression _room_label
+    return
+
+
+label ReturnMainUISceneMode:
+    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _room_label:
+        jump expression _room_label
+    return
+
+
+label ReturnMainUISceneMode:
+    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _room_label:
+        jump expression _room_label
+    return
+
+
+label ReturnMainUISceneMode:
+    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _room_label:
+        jump expression _room_label
+    return
+
+
+label ReturnMainUISceneMode:
+    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _room_label:
+        jump expression _room_label
+    return
+
+
+label ReturnMainUISceneMode:
+    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _room_label:
+        jump expression _room_label
+    return
+
+
+label ReturnMainUISceneMode:
+    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _room_label:
+        jump expression _room_label
+    return
+
+
+label ReturnMainUISceneMode:
+    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _room_label:
+        jump expression _room_label
+    return
+
+
 screen current_action_panel():
-    if current_action_content:
+    if str(UI_mode or "") in ("mc", "char", "dog", "fight", "event", "talk"):
+        null
+    elif current_action_content:
         use expression current_action_content
     elif current_action_items:
         use choice_panel(current_action_items)
-    elif str(UI_mode or "") in ("mc", "char", "dog", "fight", "event"):
-        null
-    elif str(getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip() == "TavernKitchen" and bool(TavernBreakfastEventActive):
+    elif str(getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip() == "TavernKitchen" and bool(player.tavern_management.breakfast.event_active):
         null
     elif CurrentRoom is not None:
         $ action_items = build_room_action_items(CurrentRoom)
@@ -314,6 +514,7 @@ screen main_ui():
     zorder 0
 
     key "dismiss" action NullAction()
+    key "dismiss" action NullAction()
     if CurLoc == "Intro":
         key "game_menu" action NullAction()
     else:
@@ -420,12 +621,9 @@ screen main_ui():
                                     spacing 6
                                     use main_ui_hud_button("Трактир", [
                                         Function(main_ui_close_inventory_dropdown),
-                                        Hide("girl_card_overlay"),
-                                        Hide("player_card_overlay"),
-                                        Hide("tavern_report_card_overlay"),
                                         Call("ShowTavernReport", "__main_ui__"),
                                     ], str(UI_mode or "") == "tavern", "main_ui_tavern_button")
-                                    use main_ui_hud_button("Время", [Function(main_ui_close_inventory_dropdown), Call("ShowTimeChangeMenu", "__hide__")], False, "main_ui_time_button")
+                                    use main_ui_hud_button("Время", [Function(main_ui_close_inventory_dropdown), SetVariable("main_ui_overlay", "time")], str(main_ui_overlay or "") == "time", "main_ui_time_button")
                                     use main_ui_hud_button("Сюжеты", [Function(main_ui_close_inventory_dropdown), Function(story_board_refresh), SetVariable("main_ui_overlay", "story")], str(main_ui_overlay or "") == "story", "main_ui_story_button")
                                     use main_ui_hud_button("Итоги", [Function(main_ui_close_inventory_dropdown), SetVariable("main_ui_overlay", "progress")], str(main_ui_overlay or "") == "progress", "main_ui_progress_button")
                                     use main_ui_hud_button("Кто где", [Function(main_ui_close_inventory_dropdown), SetVariable("main_ui_overlay", "people")], str(main_ui_overlay or "") == "people", "main_ui_people_button")
@@ -433,8 +631,6 @@ screen main_ui():
                                     if config.developer:
                                         use main_ui_hud_button("Debug", [
                                             Function(main_ui_close_inventory_dropdown),
-                                            Hide("girl_card_overlay"),
-                                            Hide("player_card_overlay"),
                                             Hide("tavern_report_card_overlay"),
                                             Jump("DebugBuilderRoom"),
                                         ], str(CurLoc or "") == "DebugBuilderRoom", "main_ui_debug_builder_button")
@@ -444,8 +640,6 @@ screen main_ui():
                                             textbutton player_card_inventory_section_button_caption(_inv_section):
                                                 style "mui_hud_subbutton"
                                                 action [
-                                                    Hide("girl_card_overlay"),
-                                                    Hide("player_card_overlay"),
                                                     Hide("tavern_report_card_overlay"),
                                                     Function(main_ui_open_inventory_section, _inv_section),
                                                 ]
@@ -505,8 +699,6 @@ screen main_ui():
                                                         text_size 18
                                                         action [
                                                             Function(main_ui_close_inventory_dropdown),
-                                                            Hide("girl_card_overlay"),
-                                                            Hide("player_card_overlay"),
                                                             Hide("tavern_report_card_overlay"),
                                                             Function(show_player_card_main_ui_state),
                                                         ]
@@ -518,11 +710,9 @@ screen main_ui():
                                                         text_size 18
                                                         action [
                                                             Function(main_ui_close_inventory_dropdown),
-                                                            Hide("girl_card_overlay"),
-                                                            Hide("player_card_overlay"),
                                                             Function(dog_open_action_menu_state, _where_id),
                                                         ]
-                                                elif _npc_id.lower() == "draupnir" and int(SloganFixed or 0) == 1:
+                                                elif _npc_id.lower() == "draupnir" and int(player.tavern_management.slogan_state or 0) == 1:
                                                     textbutton _npc_name:
                                                         id "main_ui_entity_button_npc_draupnir_repairing"
                                                         alt "main_ui_entity_button_npc_draupnir_repairing"
@@ -538,8 +728,6 @@ screen main_ui():
                                                         text_size 18
                                                         action [
                                                             Function(main_ui_close_inventory_dropdown),
-                                                            Hide("girl_card_overlay"),
-                                                            Hide("player_card_overlay"),
                                                             Function(open_npc_action_menu_state, _npc_id, _where_id, dict(_entity_data)),
                                                         ]
                                             else:
@@ -550,6 +738,8 @@ screen main_ui():
 
     if str(main_ui_overlay or "") == "story":
         use story_thread_board_panel
+    elif str(main_ui_overlay or "") == "time":
+        use time_change_card_overlay("__main_ui_overlay__")("__main_ui_overlay__")("__main_ui_overlay__")("__main_ui_overlay__")
     elif str(main_ui_overlay or "") == "people":
         use people_locate_panel
     elif str(main_ui_overlay or "") == "progress":
@@ -567,7 +757,9 @@ screen main_ui_left_panel(room_name, desc, picture):
         use main_ui_werecat_card_panel()
     elif str(UI_mode or "scene") == "fight":
         use main_ui_fight_panel()
-    elif str(UI_mode or "scene") == "char" and str(UI_selected_char or current_girl_key or "") != "":
+    elif str(UI_mode or "scene") == "talk" and str(UI_selected_char or current_girl_key or "") != "":
+        use main_ui_talk_panel(str(UI_selected_char or current_girl_key or ""), room_name, desc)
+    elif str(UI_mode or "scene") in ("char", "event") and str(UI_selected_char or current_girl_key or "") != "":
         use main_ui_girl_card_panel(str(UI_selected_char or current_girl_key or ""))
     else:
         vbox:
@@ -600,6 +792,46 @@ screen main_ui_left_panel(room_name, desc, picture):
                         text desc size 20
                 else:
                     text desc size 20
+
+
+screen main_ui_talk_panel(girl_name="", room_name="", desc=""):
+    $ _girl_key = girl_card_resolved_key(girl_name)
+    $ _title = str(current_action_title or ("Разговор с %s" % girl_card_display_name(_girl_key)))
+    $ _portrait = str(current_talk_picture or main_ui_talk_picture_path(_girl_key) or "")
+    $ _text = str(MainTxt or CurLocDesc or desc or "")
+    $ _usable_h = max(360, int(config.screen_height) - int(getattr(gui, "textbox_height", 278)))
+    $ _picture_h = int((_usable_h - 24) * 0.68)
+
+    vbox:
+        xfill True
+        yfill True
+        spacing 8
+
+        text _title size 20
+
+        fixed:
+            xfill True
+            ymaximum _picture_h
+            if str(_portrait or "").strip():
+                add Transform(_portrait, fit="contain", xalign=0.5, yalign=0.0)
+            else:
+                use BGIMAGE(None)
+
+        frame:
+            xfill True
+            yminimum 260
+            ymaximum 420
+            padding (12, 10)
+            background "#000000ff"
+
+            viewport:
+                xfill True
+                yfill True
+                draggable True
+                mousewheel True
+                scrollbars "vertical"
+
+                text _text size 20
 
 
 screen main_ui_player_card_panel():
@@ -654,7 +886,7 @@ screen main_ui_player_card_panel():
                 for _line in _lines:
                     text _line size 16 color "#2d1d12"
 
-        if len(list(fight_info().enemy_party or [])) <= 0:
+        if len(list(fight.enemy_party or [])) <= 0:
             textbutton "Назад":
                 id "main_ui_player_card_back_button"
                 alt "main_ui_player_card_back_button"
@@ -830,7 +1062,7 @@ screen main_ui_werecat_card_panel():
 
 screen main_ui_tavern_report_panel():
     $ _report = BuildTavernReport()
-    $ _person = str(TavernReportSelectedPerson or "")
+    $ _person = str(main_ui_runtime.tavern_report_person or "")
     $ _title = _tavern_name(_person) if _person else "ТРАКТИР"
     $ _body = _tavern_worker_label(_person) if _person else _tavern_report_label(_report)
     $ _usable_h = max(360, int(config.screen_height) - int(getattr(gui, "textbox_height", 278)))

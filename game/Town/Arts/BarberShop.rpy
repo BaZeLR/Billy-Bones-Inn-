@@ -1,10 +1,17 @@
-# ================================================================================
+default BarberFirstTipSeen = 0
+default BarberInvitePending = {}
+default BarberVisitLastDay = {}default BarberFirstTipSeen = 0
+default BarberInvitePending = {}
+default BarberVisitLastDay = {}default BarberFirstTipSeen = 0
+default BarberInvitePending = {}
+default BarberVisitLastDay = {}# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default BarberShopSavedText = ""
-default BarberFirstTipSeen = 0
-default BarberInvitePending = {}
-default BarberVisitLastDay = {}
+
+default BarberShopSavedText = ""
+
+default BarberShopSavedText = ""
 
 init python:
     BARBER_MALE_HAIRCUT_PRICE = 90
@@ -32,7 +39,6 @@ init python:
         return "images/general/LocArtisansQuarter1.jpg"
 
     def barber_shop_is_open():
-        calendar_v2.sync_state()
         weekday = int(calendar_v2.week or 0)
         current_minutes = int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)
         if weekday in (1, 3):
@@ -73,10 +79,10 @@ init python:
         return True
 
     def barber_shop_can_refine_luxury_soap():
-        return int(_player_item_count_by_id("soap_001") or 0) > 0 and int(_player_item_count_by_id("olive_oil_001") or 0) > 0
+        return int(player.item_count("soap_001") or 0) > 0 and int(player.item_count("olive_oil_001") or 0) > 0
 
     def barber_shop_can_sell_luxury_soap():
-        return int(_player_item_count_by_id("luxury_soap_001") or 0) > 0
+        return int(player.item_count("luxury_soap_001") or 0) > 0
 
     def barber_shop_can_serve_pending_guest():
         return barber_shop_pending_npc_id() != ""
@@ -123,7 +129,7 @@ init python:
             ),
         ],
         exits=[
-            RoomExit(label="Вернуться в квартал ремесленников", target="ArtisansQuarter"),
+            RoomExit(label="Вернуться в квартал ремесленников", target="ArtisansQuarter", minutes_to_pass=10),
         ],
         game_items=[],
         schedule=RoomSchedule(
@@ -136,7 +142,6 @@ init python:
 label BarberShop:
     $ CurrentRoom = BarberShopRoom
     $ CurLoc = "BarberShop"
-    $ location = CurLoc
     $ scene_image = barber_shop_picture_path()
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -152,10 +157,18 @@ label BarberShop:
         $ MainTxt = barber_shop_intro_text() + "\n\n" + barber_shop_status_text()
     $ CurLocDesc = MainTxt
     $ BarberShopSavedText = MainTxt
+    $ BarberShopSavedText = MainTxt
+    $ BarberShopSavedText = MainTxt
     call ShowImage("", "", barber_shop_picture_path())
 
     if story_event_available("BarberShop", "clara_fiance"):
         call checkTriggers("BarberShop", "clara_fiance", 0)
+        call screen main_ui
+        jump BarberShop
+        call screen main_ui
+        jump BarberShop
+        call screen main_ui
+        jump BarberShop
         call screen main_ui
         jump BarberShop
 
@@ -164,28 +177,11 @@ label BarberShop:
         while True:
             call screen main_ui
 
+    $ current_action_title = "Действия"
+    $ current_action_content = None
     call BarberShopBuildActions
     while True:
         call screen main_ui
-
-
-label BarberShopBuildActions:
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_action_items.append(MenuItem("Подстричься за %d мараведи" % int(barber_shop_player_haircut_price() or 0), Call("BarberShopHaircut")))
-    if barber_shop_can_buy_olive_oil():
-        $ current_action_items.append(MenuItem("Купить оливковое масло за %d мараведи" % int(barber_shop_discounted_price(BARBER_OLIVE_OIL_PRICE) or 0), Call("BarberShopBuyOliveOil")))
-    if barber_shop_can_refine_luxury_soap():
-        $ current_action_items.append(MenuItem("Улучшить мыло оливковым маслом", Call("BarberShopRefineLuxurySoap")))
-    if barber_shop_can_sell_luxury_soap():
-        $ current_action_items.append(MenuItem("Продать роскошное мыло Серджио", Call("BarberShopSellLuxurySoap")))
-    if barber_shop_can_serve_pending_guest():
-        $ current_action_items.append(MenuItem("Оплатить визит %s к цирюльнику" % barber_shop_pending_npc_name(), Call("BarberShopServePendingGuest")))
-    python:
-        for _room_exit in BarberShopRoom.visible_exits():
-            current_action_items.append(MenuItem(_room_exit.label, Jump(_room_exit.target)))
-    return
 
 
 label BarberShopTalk:

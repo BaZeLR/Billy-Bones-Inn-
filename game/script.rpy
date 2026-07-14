@@ -1,4 +1,463 @@
-init python:
+default money = 10000default health = 100
+default fun = 50
+default energy = 100default playerItems = {}default EquippedWeapon = ""
+default EquippedArmor = ""default washDays = 3
+default hairCutdays = 14
+default dayssincewash = 0
+default dayssincehaircut = 0
+default PlayerHaircutDaySt = 0
+default PlayerDressDaySt = {"villagedress": 0}
+default PlayerDressLifeDays = {"villagedress": 42}
+default PlayerDestroyedDresses = []
+default PlayerItemLifeDays = {}
+default costumecondition = 100default cametoday = 0default cancumdaily = 2
+default LastDaySex = -1
+default PlayerLastCumDay = -1default bring_woods = 0          # target 3 (weekly)
+default chop_wood = 0            # target 3 (weekly)
+default make_fire = 0            # target 3 (weekly)
+default clean_ashes = 0          # target 3 (weekly)
+default boil_water = 0           # target 7 (weekly)
+default clean_upstairs_rooms = 0 # target 3 (weekly)
+default PlayerChoresWeek = {}
+default UI_chores = {}default productnum = 200
+default winenum = 100default taverncleanliness = 60
+default upstairsroomsdirty = 0
+default ashesdirtydays = 0default WeeklyVisitorsTrack = {"sum": 0, "days": 0, "prev_avg": 0.0}default PlayerForestBanUntilDay = 0   # If this > current dayspassed → blocked from forest
+default SickDays = 0default tavernfame=0default KidsPosobie = 0default age = 18default charisma = 0
+default reputation = 0
+default notoriety = 0
+default exploration = 0
+default rebellion = 0default look = 40default CurrentLoc = {}default pregnancy = {}default kids = {}default beauty = {}default cooking = {}
+default cleaning = {}
+default waitress = {}default jobkitchen = {}
+default jobcleaning = {}
+default jobwaitress = {}
+default jobwhore = {}
+default jobgloryhole = {}
+default jobHallAvail = {}
+default jobWhoreAvail = {}
+default jobGloryHoleAvail = {}
+default jobkitchentomorrow = {}
+default jobcleaningtomorrow = {}
+default jobwaitresstomorrow = {}
+default jobwhoreTommorow = {}
+default jobgloryholeTommorow = {}default TitsVisible = {}
+default PussyVisible = {}
+default ShortSkirtNoPanties = {}default GiveOrgasms = {}
+default LickPussy = {}default CumFaceYou = {}
+default CumFaceOthers = {}
+default CumTitsYou = {}
+default CumTitsOthers = {}
+default CumInsideYou = {}
+default CumInsideOthers = {}
+default CockInMouth = {}
+default CockInPussy = {}
+default CockInTits = {}
+default CockInAss = {}
+default SexInsertedContainer = {}
+default EddieCockInMouth = {}
+default EddieCockInPussy = {}
+default EddieCockInTits = {}default GrupenSex = {}default HadSex = {}
+default DayLastOrgasmGiven = {}default PussyWetStart = {}
+default Drunk = {}
+default Breastfeed = {}
+default Lactate = {}default virginity = {}default pregfather = {}default FlirtedToday = {}
+default GiftedToday = {}
+default FuckedToday = {}
+default AskedToday = {}default week_name = "Понедельник"
+default month_name = "Луна Волка"
+default week_name_en = "Monday"
+default month_name_en = "Wolf Moon"
+default calendar_weekday_name_ru = "Понедельник"
+default calendar_month_name_ru = "Луна Волка"
+default calendar_weekday_name_en = "Monday"
+default calendar_month_name_en = "Wolf Moon"
+default calendar_cycle_name_ru = "Цикл 1"
+default calendar_cycle_name_en = "Cycle 1"
+default calendar_time_slot_name_ru = "Утро"
+default calendar_time_slot_name_en = "morning"
+default datestr = ""        def apply_counters_and_names(self):
+            global dayspassed
+            global game_days_count, game_months_count, game_years_count
+            global day_of_year, datestr
+            global month_name, week_name, month_name_en, week_name_en
+            global calendar_month_name_ru, calendar_weekday_name_ru
+            global calendar_month_name_en, calendar_weekday_name_en
+            global calendar_cycle_name_ru, calendar_cycle_name_en
+            global calendar_time_slot_name_ru, calendar_time_slot_name_en
+
+            _year = _cal_int(year, CALENDAR_START_CYCLE)
+            _month = max(1, min(13, _cal_int(month, 1)))
+            _day = _cal_int(day, 1)
+            _week = max(1, min(7, _cal_int(week, 1)))
+            _slot = max(0, min(7, _cal_int(time, 0)))
+
+            game_days_count = dayspassed
+            game_months_count = max(0, dayspassed // 28)
+            game_years_count = _year - CALENDAR_START_CYCLE
+            day_of_year = ((_month - 1) * 28) + _day
+
+            week_name = WEEKDAY_NAMES_RU[_week - 1]
+            month_name = MONTH_NAMES_RU[_month - 1]
+            week_name_en = WEEKDAY_NAMES_EN[_week - 1]
+            month_name_en = MONTH_NAMES_EN[_month - 1]
+            calendar_weekday_name_ru = week_name
+            calendar_month_name_ru = month_name
+            calendar_weekday_name_en = week_name_en
+            calendar_month_name_en = month_name_en
+            calendar_cycle_name_ru = "Цикл %d" % _year
+            calendar_cycle_name_en = "Cycle %d" % _year
+            calendar_time_slot_name_ru = TIME_SLOT_INFO[_slot]["name_ru"]
+            calendar_time_slot_name_en = TIME_SLOT_INFO[_slot]["name_en"]
+            datestr = self.format_date_en(_day, _month, _year, _week, True)
+
+        def sync_state(self):
+            global day, month, year, week, hour, minute, time, dayspassed, clock_minutes, location
+            day = int(self.day)
+            month = int(self.period)
+            year = int(self.cycle)
+            week = int(self.week)
+            hour = int(self.hour)
+            minute = int(self.minute)
+            time = int(self.time_slot())
+            dayspassed = int(self.daysInGame)
+            clock_minutes = int(self.clock_minutes())
+            try:
+                location
+            except Exception:
+                try:
+                    location = CurLoc
+                except Exception:
+                    location = "TavernMain"
+            self.apply_counters_and_names()
+            return#inventory and equipment
+default inventory = []
+# Daily reset flags
+default bathedToday = False
+default swamToday = Falsedefault ProstitutesKids = 0default age_girls = {}
+default DateOfBirth = {}
+default girltextdesc = {}
+default GiftPreferences = {}default ZaletSuspectFinal = {}
+default PregTotalSuspects = {}default WeeklyChoresLastEvalStamp = ""# Core stats
+default player.tavern_management.visitors = 40
+default player.tavern_management.slogan_state = 0
+default player.tavern_management.client_room_hole = 0
+default player.tavern_management.glory_hole = 0
+default player.tavern_management.glory_hole_look = 0
+default player.tavern_management.dance_sponsor = 0
+default player.economy.church_donated_amount = 0
+default player.intimacy.ellona_cursed = 0
+default player.intimacy.ellona_curse_days = 0
+default player.tavern_management.household_members = 4
+default KidBirthPosobie = ""default SleepWakeHourOverride = -1
+default SleepWakeMinuteOverride = 0default KidBirthPosobie = ""default SleepWakeHourOverride = -1
+default SleepWakeMinuteOverride = 0default Result = ""default money = 10000default health = 100
+default fun = 50
+default energy = 100default playerItems = {}default EquippedWeapon = ""
+default EquippedArmor = ""default washDays = 3
+default hairCutdays = 14
+default dayssincewash = 0
+default dayssincehaircut = 0
+default PlayerHaircutDaySt = 0
+default PlayerDressDaySt = {"villagedress": 0}
+default PlayerDressLifeDays = {"villagedress": 42}
+default PlayerDestroyedDresses = []
+default PlayerItemLifeDays = {}
+default costumecondition = 100default cametoday = 0default cancumdaily = 2
+default LastDaySex = -1
+default PlayerLastCumDay = -1default bring_woods = 0          # target 3 (weekly)
+default chop_wood = 0            # target 3 (weekly)
+default make_fire = 0            # target 3 (weekly)
+default clean_ashes = 0          # target 3 (weekly)
+default boil_water = 0           # target 7 (weekly)
+default clean_upstairs_rooms = 0 # target 3 (weekly)
+default PlayerChoresWeek = {}
+default UI_chores = {}default productnum = 200
+default winenum = 100default taverncleanliness = 60
+default upstairsroomsdirty = 0
+default ashesdirtydays = 0default WeeklyVisitorsTrack = {"sum": 0, "days": 0, "prev_avg": 0.0}default PlayerForestBanUntilDay = 0   # If this > current dayspassed → blocked from forest
+default SickDays = 0default tavernfame=0default KidsPosobie = 0default age = 18default charisma = 0
+default reputation = 0
+default notoriety = 0
+default exploration = 0
+default rebellion = 0default look = 40default CurrentLoc = {}default pregnancy = {}default kids = {}default beauty = {}default cooking = {}
+default cleaning = {}
+default waitress = {}default jobkitchen = {}
+default jobcleaning = {}
+default jobwaitress = {}
+default jobwhore = {}
+default jobgloryhole = {}
+default jobHallAvail = {}
+default jobWhoreAvail = {}
+default jobGloryHoleAvail = {}
+default jobkitchentomorrow = {}
+default jobcleaningtomorrow = {}
+default jobwaitresstomorrow = {}
+default jobwhoreTommorow = {}
+default jobgloryholeTommorow = {}default TitsVisible = {}
+default PussyVisible = {}
+default ShortSkirtNoPanties = {}default GiveOrgasms = {}
+default LickPussy = {}default CumFaceYou = {}
+default CumFaceOthers = {}
+default CumTitsYou = {}
+default CumTitsOthers = {}
+default CumInsideYou = {}
+default CumInsideOthers = {}
+default CockInMouth = {}
+default CockInPussy = {}
+default CockInTits = {}
+default CockInAss = {}
+default SexInsertedContainer = {}
+default EddieCockInMouth = {}
+default EddieCockInPussy = {}
+default EddieCockInTits = {}default GrupenSex = {}default HadSex = {}
+default DayLastOrgasmGiven = {}default PussyWetStart = {}
+default Drunk = {}
+default Breastfeed = {}
+default Lactate = {}default virginity = {}default pregfather = {}default FlirtedToday = {}
+default GiftedToday = {}
+default FuckedToday = {}
+default AskedToday = {}default week_name = "Понедельник"
+default month_name = "Луна Волка"
+default week_name_en = "Monday"
+default month_name_en = "Wolf Moon"
+default calendar_weekday_name_ru = "Понедельник"
+default calendar_month_name_ru = "Луна Волка"
+default calendar_weekday_name_en = "Monday"
+default calendar_month_name_en = "Wolf Moon"
+default calendar_cycle_name_ru = "Цикл 1"
+default calendar_cycle_name_en = "Cycle 1"
+default calendar_time_slot_name_ru = "Утро"
+default calendar_time_slot_name_en = "morning"
+default datestr = ""        def apply_counters_and_names(self):
+            global dayspassed
+            global game_days_count, game_months_count, game_years_count
+            global day_of_year, datestr
+            global month_name, week_name, month_name_en, week_name_en
+            global calendar_month_name_ru, calendar_weekday_name_ru
+            global calendar_month_name_en, calendar_weekday_name_en
+            global calendar_cycle_name_ru, calendar_cycle_name_en
+            global calendar_time_slot_name_ru, calendar_time_slot_name_en
+
+            _year = _cal_int(year, CALENDAR_START_CYCLE)
+            _month = max(1, min(13, _cal_int(month, 1)))
+            _day = _cal_int(day, 1)
+            _week = max(1, min(7, _cal_int(week, 1)))
+            _slot = max(0, min(7, _cal_int(time, 0)))
+
+            game_days_count = dayspassed
+            game_months_count = max(0, dayspassed // 28)
+            game_years_count = _year - CALENDAR_START_CYCLE
+            day_of_year = ((_month - 1) * 28) + _day
+
+            week_name = WEEKDAY_NAMES_RU[_week - 1]
+            month_name = MONTH_NAMES_RU[_month - 1]
+            week_name_en = WEEKDAY_NAMES_EN[_week - 1]
+            month_name_en = MONTH_NAMES_EN[_month - 1]
+            calendar_weekday_name_ru = week_name
+            calendar_month_name_ru = month_name
+            calendar_weekday_name_en = week_name_en
+            calendar_month_name_en = month_name_en
+            calendar_cycle_name_ru = "Цикл %d" % _year
+            calendar_cycle_name_en = "Cycle %d" % _year
+            calendar_time_slot_name_ru = TIME_SLOT_INFO[_slot]["name_ru"]
+            calendar_time_slot_name_en = TIME_SLOT_INFO[_slot]["name_en"]
+            datestr = self.format_date_en(_day, _month, _year, _week, True)
+
+        def sync_state(self):
+            global day, month, year, week, hour, minute, time, dayspassed, clock_minutes, location
+            day = int(self.day)
+            month = int(self.period)
+            year = int(self.cycle)
+            week = int(self.week)
+            hour = int(self.hour)
+            minute = int(self.minute)
+            time = int(self.time_slot())
+            dayspassed = int(self.daysInGame)
+            clock_minutes = int(self.clock_minutes())
+            try:
+                location
+            except Exception:
+                try:
+                    location = CurLoc
+                except Exception:
+                    location = "TavernMain"
+            self.apply_counters_and_names()
+            return#inventory and equipment
+default inventory = []
+# Daily reset flags
+default bathedToday = False
+default swamToday = Falsedefault ProstitutesKids = 0default age_girls = {}
+default DateOfBirth = {}
+default girltextdesc = {}
+default GiftPreferences = {}default ZaletSuspectFinal = {}
+default PregTotalSuspects = {}default WeeklyChoresLastEvalStamp = ""# Core stats
+default player.tavern_management.visitors = 40
+default player.tavern_management.slogan_state = 0
+default player.tavern_management.client_room_hole = 0
+default player.tavern_management.glory_hole = 0
+default player.tavern_management.glory_hole_look = 0
+default player.tavern_management.dance_sponsor = 0
+default player.economy.church_donated_amount = 0
+default player.intimacy.ellona_cursed = 0
+default player.intimacy.ellona_curse_days = 0
+default player.tavern_management.household_members = 4
+default KidBirthPosobie = ""default SleepWakeHourOverride = -1
+default SleepWakeMinuteOverride = 0default KidBirthPosobie = ""default SleepWakeHourOverride = -1
+default SleepWakeMinuteOverride = 0default Result = ""default money = 10000default health = 100
+default fun = 50
+default energy = 100default playerItems = {}default EquippedWeapon = ""
+default EquippedArmor = ""default washDays = 3
+default hairCutdays = 14
+default dayssincewash = 0
+default dayssincehaircut = 0
+default PlayerHaircutDaySt = 0
+default PlayerDressDaySt = {"villagedress": 0}
+default PlayerDressLifeDays = {"villagedress": 42}
+default PlayerDestroyedDresses = []
+default PlayerItemLifeDays = {}
+default costumecondition = 100default cametoday = 0default cancumdaily = 2
+default LastDaySex = -1
+default PlayerLastCumDay = -1default bring_woods = 0          # target 3 (weekly)
+default chop_wood = 0            # target 3 (weekly)
+default make_fire = 0            # target 3 (weekly)
+default clean_ashes = 0          # target 3 (weekly)
+default boil_water = 0           # target 7 (weekly)
+default clean_upstairs_rooms = 0 # target 3 (weekly)
+default PlayerChoresWeek = {}
+default UI_chores = {}default productnum = 200
+default winenum = 100default taverncleanliness = 60
+default upstairsroomsdirty = 0
+default ashesdirtydays = 0default WeeklyVisitorsTrack = {"sum": 0, "days": 0, "prev_avg": 0.0}default PlayerForestBanUntilDay = 0   # If this > current dayspassed → blocked from forest
+default SickDays = 0default tavernfame=0default KidsPosobie = 0default age = 18default charisma = 0
+default reputation = 0
+default notoriety = 0
+default exploration = 0
+default rebellion = 0default look = 40default CurrentLoc = {}default pregnancy = {}default kids = {}default beauty = {}default cooking = {}
+default cleaning = {}
+default waitress = {}default jobkitchen = {}
+default jobcleaning = {}
+default jobwaitress = {}
+default jobwhore = {}
+default jobgloryhole = {}
+default jobHallAvail = {}
+default jobWhoreAvail = {}
+default jobGloryHoleAvail = {}
+default jobkitchentomorrow = {}
+default jobcleaningtomorrow = {}
+default jobwaitresstomorrow = {}
+default jobwhoreTommorow = {}
+default jobgloryholeTommorow = {}default TitsVisible = {}
+default PussyVisible = {}
+default ShortSkirtNoPanties = {}default GiveOrgasms = {}
+default LickPussy = {}default CumFaceYou = {}
+default CumFaceOthers = {}
+default CumTitsYou = {}
+default CumTitsOthers = {}
+default CumInsideYou = {}
+default CumInsideOthers = {}
+default CockInMouth = {}
+default CockInPussy = {}
+default CockInTits = {}
+default CockInAss = {}
+default SexInsertedContainer = {}
+default EddieCockInMouth = {}
+default EddieCockInPussy = {}
+default EddieCockInTits = {}default GrupenSex = {}default HadSex = {}
+default DayLastOrgasmGiven = {}default PussyWetStart = {}
+default Drunk = {}
+default Breastfeed = {}
+default Lactate = {}default virginity = {}default pregfather = {}default FlirtedToday = {}
+default GiftedToday = {}
+default FuckedToday = {}
+default AskedToday = {}default week_name = "Понедельник"
+default month_name = "Луна Волка"
+default week_name_en = "Monday"
+default month_name_en = "Wolf Moon"
+default calendar_weekday_name_ru = "Понедельник"
+default calendar_month_name_ru = "Луна Волка"
+default calendar_weekday_name_en = "Monday"
+default calendar_month_name_en = "Wolf Moon"
+default calendar_cycle_name_ru = "Цикл 1"
+default calendar_cycle_name_en = "Cycle 1"
+default calendar_time_slot_name_ru = "Утро"
+default calendar_time_slot_name_en = "morning"
+default datestr = ""        def apply_counters_and_names(self):
+            global dayspassed
+            global game_days_count, game_months_count, game_years_count
+            global day_of_year, datestr
+            global month_name, week_name, month_name_en, week_name_en
+            global calendar_month_name_ru, calendar_weekday_name_ru
+            global calendar_month_name_en, calendar_weekday_name_en
+            global calendar_cycle_name_ru, calendar_cycle_name_en
+            global calendar_time_slot_name_ru, calendar_time_slot_name_en
+
+            _year = _cal_int(year, CALENDAR_START_CYCLE)
+            _month = max(1, min(13, _cal_int(month, 1)))
+            _day = _cal_int(day, 1)
+            _week = max(1, min(7, _cal_int(week, 1)))
+            _slot = max(0, min(7, _cal_int(time, 0)))
+
+            game_days_count = dayspassed
+            game_months_count = max(0, dayspassed // 28)
+            game_years_count = _year - CALENDAR_START_CYCLE
+            day_of_year = ((_month - 1) * 28) + _day
+
+            week_name = WEEKDAY_NAMES_RU[_week - 1]
+            month_name = MONTH_NAMES_RU[_month - 1]
+            week_name_en = WEEKDAY_NAMES_EN[_week - 1]
+            month_name_en = MONTH_NAMES_EN[_month - 1]
+            calendar_weekday_name_ru = week_name
+            calendar_month_name_ru = month_name
+            calendar_weekday_name_en = week_name_en
+            calendar_month_name_en = month_name_en
+            calendar_cycle_name_ru = "Цикл %d" % _year
+            calendar_cycle_name_en = "Cycle %d" % _year
+            calendar_time_slot_name_ru = TIME_SLOT_INFO[_slot]["name_ru"]
+            calendar_time_slot_name_en = TIME_SLOT_INFO[_slot]["name_en"]
+            datestr = self.format_date_en(_day, _month, _year, _week, True)
+
+        def sync_state(self):
+            global day, month, year, week, hour, minute, time, dayspassed, clock_minutes, location
+            day = int(self.day)
+            month = int(self.period)
+            year = int(self.cycle)
+            week = int(self.week)
+            hour = int(self.hour)
+            minute = int(self.minute)
+            time = int(self.time_slot())
+            dayspassed = int(self.daysInGame)
+            clock_minutes = int(self.clock_minutes())
+            try:
+                location
+            except Exception:
+                try:
+                    location = CurLoc
+                except Exception:
+                    location = "TavernMain"
+            self.apply_counters_and_names()
+            return#inventory and equipment
+default inventory = []
+# Daily reset flags
+default bathedToday = False
+default swamToday = Falsedefault ProstitutesKids = 0default age_girls = {}
+default DateOfBirth = {}
+default girltextdesc = {}
+default GiftPreferences = {}default ZaletSuspectFinal = {}
+default PregTotalSuspects = {}default WeeklyChoresLastEvalStamp = ""# Core stats
+default player.tavern_management.visitors = 40
+default player.tavern_management.slogan_state = 0
+default player.tavern_management.client_room_hole = 0
+default player.tavern_management.glory_hole = 0
+default player.tavern_management.glory_hole_look = 0
+default player.tavern_management.dance_sponsor = 0
+default player.economy.church_donated_amount = 0
+default player.intimacy.ellona_cursed = 0
+default player.intimacy.ellona_curse_days = 0
+default player.tavern_management.household_members = 4
+default KidBirthPosobie = ""default SleepWakeHourOverride = -1
+default SleepWakeMinuteOverride = 0default KidBirthPosobie = ""default SleepWakeHourOverride = -1
+default SleepWakeMinuteOverride = 0default Result = ""init python:
     # Base style for the button itself
     style.warning_button = Style(style.default)
     style.warning_button.background = "#FFFFFF"
@@ -36,111 +495,23 @@ init python:
 # =============================================================================
 #some general defaults
 default CurLoc = "TavernMain"
-# Core stats
-default tavernfame=0
-default health = 100
-default fun = 50
-default energy = 100
-default age = 18
-default money = 10000
-default charisma = 0
-default reputation = 0
-default notoriety = 0
-default exploration = 0
-default rebellion = 0
-default tavernvisitors = 40
-default productnum = 200
-default winenum = 100
-default look = 40
-#inventory and equipment
-default inventory = []
-default playerItems = {}
-default EquippedWeapon = ""
-default EquippedArmor = ""
-# Daily reset flags
-default cametoday = 0
-default bathedToday = False
-default swamToday = False
-default PussyWetStart = {}
-default Drunk = {}
-default pregnancy = {}
-default Breastfeed = {}
-default Lactate = {}
-default ZaletSuspectFinal = {}
-default PregTotalSuspects = {}
-default virginity = {}
-default age_girls = {}
-default DateOfBirth = {}
-default kids = {}
-default beauty = {}
-default pregfather = {}
-default girltextdesc = {}
-default GiftPreferences = {}
-default cooking = {}
-default cleaning = {}
-default waitress = {}
-default jobkitchen = {}
-default jobcleaning = {}
-default jobwaitress = {}
-default jobwhore = {}
-default jobgloryhole = {}
-default jobHallAvail = {}
-default jobWhoreAvail = {}
-default jobGloryHoleAvail = {}
-default jobkitchentomorrow = {}
-default jobcleaningtomorrow = {}
-default jobwaitresstomorrow = {}
-default jobwhoreTommorow = {}
-default jobgloryholeTommorow = {}
-default SloganFixed = 0
-default TavernHole = 0
-default TavernGloryHole = 0
-default GloryHoleLook = 0
-default DanceSponsor = 0
-default ChurchDonatedAmount = 0
-default CursedByEllona = 0
-default CursedByEllonaDays = 0
-default householdmembers = 4
-default KidsPosobie = 0
-default KidBirthPosobie = ""
-default ProstitutesKids = 0
 
 # Intimacy / sex limits
-default cancumdaily = 2
-default LastDaySex = -1
-default PlayerLastCumDay = -1
 
 # Sleep / morning state
 default PlayerMorningArousalDay = -1
 default PlayerWakeStateNotice = ""
 default PlayerArousalReasons = []
 default PlayerObservedNakedNpcDay = {}
-default SleepWakeHourOverride = -1
-default SleepWakeMinuteOverride = 0
 
 # Health & Injury system (new)
 # Health recovers +20 (or to max 100) during sleep.
 # If health drops below 25 due to fight or hunt injury, player gets 3-day forest ban.
-default PlayerForestBanUntilDay = 0   # If this > current dayspassed → blocked from forest
-default SickDays = 0
 
 # Player chore counters (generic actions)
 # These (and the weekly tracking below) are reset/cleared after Sandra's weekly chore check.
-default bring_woods = 0          # target 3 (weekly)
-default chop_wood = 0            # target 3 (weekly)
-default make_fire = 0            # target 3 (weekly)
-default clean_ashes = 0          # target 3 (weekly)
-default boil_water = 0           # target 7 (weekly)
-default clean_upstairs_rooms = 0 # target 3 (weekly)
-default PlayerChoresWeek = {}
-default UI_chores = {}
-default taverncleanliness = 60
-default upstairsroomsdirty = 0
-default ashesdirtydays = 0
 
 # Weekly chore + visitor tracking state (managed with chores, reset by Sandra weekly eval)
-default WeeklyVisitorsTrack = {"sum": 0, "days": 0, "prev_avg": 0.0}
-default WeeklyChoresLastEvalStamp = ""
 
 # Restriction / rebel tracking (otkroven = openness, neshlush = rebellion baseline)
 # Tied to household weekly evaluation alongside chores.
@@ -148,48 +519,12 @@ default otkroven = {}
 default neshlush = {}
 
 # Core NPC/player relation state maps.
-default CurrentLoc = {}
-default HadSex = {}
-default GiveOrgasms = {}
-default LickPussy = {}
-default DayLastOrgasmGiven = {}
-default CumFaceYou = {}
-default CumFaceOthers = {}
-default CumTitsYou = {}
-default CumTitsOthers = {}
-default CumInsideYou = {}
-default CumInsideOthers = {}
-default CockInMouth = {}
-default CockInPussy = {}
-default CockInTits = {}
-default CockInAss = {}
-default EddieCockInMouth = {}
-default EddieCockInPussy = {}
-default EddieCockInTits = {}
 default YouCockInMouth = {}
 default YouCockInPussy = {}
 default YouCockInTits = {}
-default GrupenSex = {}
-default TitsVisible = {}
-default PussyVisible = {}
-default ShortSkirtNoPanties = {}
 
 # Daily tracking
-default FlirtedToday = {}
-default GiftedToday = {}
-default FuckedToday = {}
-default AskedToday = {}
 # Player appearance compatibility mirrors. Player.appearance owns these values.
-default washDays = 3
-default hairCutdays = 14
-default dayssincewash = 0
-default dayssincehaircut = 0
-default PlayerHaircutDaySt = 0
-default PlayerDressDaySt = {"villagedress": 0}
-default PlayerDressLifeDays = {"villagedress": 42}
-default PlayerDestroyedDresses = []
-default PlayerItemLifeDays = {}
-default costumecondition = 100
 # Calendar defaults. calendar_v2 is the single initialized Calendar instance.
 # The scalar values below are display/legacy mirrors for existing labels and screens.
 default day = 1
@@ -201,20 +536,25 @@ default minute = 0
 default time = 0
 default dayspassed = 0
 default clock_minutes = 480
+default day = 1
+default month = 1
+default year = CALENDAR_START_CYCLE
+default week = 1
+default hour = 8
+default minute = 0
+default time = 0
+default dayspassed = 0
+default clock_minutes = 480
+default day = 1
+default month = 1
+default year = CALENDAR_START_CYCLE
+default week = 1
+default hour = 8
+default minute = 0
+default time = 0
+default dayspassed = 0
+default clock_minutes = 480
 default calendar_v2 = Calendar(minute=0, hour=8, day=1, week=1, period=1, cycle=CALENDAR_START_CYCLE, daysInGame=0)
-default week_name = "Понедельник"
-default month_name = "Луна Волка"
-default week_name_en = "Monday"
-default month_name_en = "Wolf Moon"
-default calendar_weekday_name_ru = "Понедельник"
-default calendar_month_name_ru = "Луна Волка"
-default calendar_weekday_name_en = "Monday"
-default calendar_month_name_en = "Wolf Moon"
-default calendar_cycle_name_ru = "Цикл 1"
-default calendar_cycle_name_en = "Cycle 1"
-default calendar_time_slot_name_ru = "Утро"
-default calendar_time_slot_name_en = "morning"
-default datestr = ""
 default ClientsDayTotal = {}
 init python:
     def load_intro_sequence():
@@ -284,14 +624,20 @@ init python:
             try:
                 return int(day_value)
             except Exception:
+                try:
+                return int(dayspassed or 0)
+            except Exception:
+                try:
+                return int(dayspassed or 0)
+            except Exception:
+                try:
+                return int(dayspassed or 0)
+            except Exception:
                 return 0
         try:
             return int(calendar_v2.daysInGame)
         except Exception:
-            try:
-                return int(dayspassed or 0)
-            except Exception:
-                return 0
+            return 0
 
     def day_delta_since(start_day, current_day=None):
         try:
@@ -502,6 +848,10 @@ init -95 python:
                     self.cycle += 1
             self.sync_state()
 
+            self.sync_state()
+
+            self.sync_state()
+
         def clock_minutes(self):
             return self.hour * 60 + self.minute
 
@@ -625,61 +975,6 @@ init -95 python:
             slot_name = TIME_SLOT_INFO.get(slot, TIME_SLOT_INFO[1])["name_ru"]
             return "%s (%s)" % (self.clock_text(self.hour, self.minute), slot_name)
 
-        def apply_counters_and_names(self):
-            global dayspassed
-            global game_days_count, game_months_count, game_years_count
-            global day_of_year, datestr
-            global month_name, week_name, month_name_en, week_name_en
-            global calendar_month_name_ru, calendar_weekday_name_ru
-            global calendar_month_name_en, calendar_weekday_name_en
-            global calendar_cycle_name_ru, calendar_cycle_name_en
-            global calendar_time_slot_name_ru, calendar_time_slot_name_en
-
-            _year = _cal_int(year, CALENDAR_START_CYCLE)
-            _month = max(1, min(13, _cal_int(month, 1)))
-            _day = _cal_int(day, 1)
-            _week = max(1, min(7, _cal_int(week, 1)))
-            _slot = max(0, min(7, _cal_int(time, 0)))
-
-            game_days_count = dayspassed
-            game_months_count = max(0, dayspassed // 28)
-            game_years_count = _year - CALENDAR_START_CYCLE
-            day_of_year = ((_month - 1) * 28) + _day
-
-            week_name = WEEKDAY_NAMES_RU[_week - 1]
-            month_name = MONTH_NAMES_RU[_month - 1]
-            week_name_en = WEEKDAY_NAMES_EN[_week - 1]
-            month_name_en = MONTH_NAMES_EN[_month - 1]
-            calendar_weekday_name_ru = week_name
-            calendar_month_name_ru = month_name
-            calendar_weekday_name_en = week_name_en
-            calendar_month_name_en = month_name_en
-            calendar_cycle_name_ru = "Цикл %d" % _year
-            calendar_cycle_name_en = "Cycle %d" % _year
-            calendar_time_slot_name_ru = TIME_SLOT_INFO[_slot]["name_ru"]
-            calendar_time_slot_name_en = TIME_SLOT_INFO[_slot]["name_en"]
-            datestr = self.format_date_en(_day, _month, _year, _week, True)
-
-        def sync_state(self):
-            global day, month, year, week, hour, minute, time, dayspassed, clock_minutes, location
-            day = int(self.day)
-            month = int(self.period)
-            year = int(self.cycle)
-            week = int(self.week)
-            hour = int(self.hour)
-            minute = int(self.minute)
-            time = int(self.time_slot())
-            dayspassed = int(self.daysInGame)
-            clock_minutes = int(self.clock_minutes())
-            try:
-                location
-            except Exception:
-                try:
-                    location = CurLoc
-                except Exception:
-                    location = "TavernMain"
-            self.apply_counters_and_names()
-            return
 
 screen splash_screen():
     tag menu

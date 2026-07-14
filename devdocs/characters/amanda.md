@@ -1,10 +1,16 @@
 # Character Worklist: Аманда
 
+> REFERENCE ONLY.
+>
+> This file preserves source/TXT worklist names. `AmandaVar` is a legacy source
+> token, not the current runtime owner. Amanda runtime/story state belongs to
+> the Amanda class instance and Amanda event/thread labels.
+
 ## Identity
 - Canonical id: amanda
 - Legacy keys/tokens: amanda, AmandaVar
 - Init source: InitAmanda.txt
-- Main var store: AmandaVar
+- Current runtime owner: Amanda class instance
 
 ## Presence/Schedule (TXT-driven notes)
 - Основная локация старта: TavernMain.

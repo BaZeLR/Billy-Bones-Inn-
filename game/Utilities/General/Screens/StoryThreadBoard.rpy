@@ -69,8 +69,7 @@ init python:
         "georgett_church_service_doggy": "Georgette church / right here",
         "georgett_church_service_with_liza": "Georgette church / with Lizette",
         "after_cermon_walk": "After-sermon walk",
-        "street_clients_georgett": "Georgette street clients",
-        "street_clients_liza": "Lizette street clients",
+        "street_clients": "Port street clients",
     }
 
     STORY_BOARD_TARGET_FILES = {
@@ -94,6 +93,8 @@ init python:
         "story_georgett_church_service_with_liza": "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy",
         "story_georgett_church_after_sermon": "game/NPC/Girls/Georgett/IntGeorgettAfterCermon.rpy",
         "story_liza_church_after_sermon": "game/NPC/Girls/Liza/IntLizettAfterCermon.rpy",
+        "story_georgett_portstreet_clients": "game/NPC/Girls/Georgett/GeorgettEvents.rpy",
+        "story_liza_portstreet_clients": "game/NPC/Girls/Liza/LizaEvents.rpy",
         "story_becky_church_after_sermon": "game/NPC/Girls/Becky/IntBeckyAfterCermon.rpy",
     }
 

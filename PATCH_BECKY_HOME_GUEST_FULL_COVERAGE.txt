@@ -1,0 +1,60 @@
+# PATCH FOR BECKY HOME GUEST - FULL EXACT COVERAGE (not partial)
+# Reference TXT: textLocRef\IntBeckyGuest.txt + textLocRef\BeckyHome.txt + GeorgettBeckyVisit.txt
+# Do NOT touch game\script.rpy intro placeholders
+# Keep full file names in comments (e.g. see game\NPC\Girls\Georgett\InitGeorgett.rpy)
+
+# In game\NPC\Girls\Becky\BeckyEvents.rpy
+# Adjust the BeckyHomeVisits LThreadData and the event labels:
+
+# Example structure for one event (do this one by one for all):
+
+label becky_home_dinner_grope:
+    show screen main_ui
+    $ becky = getPersonInfo('becky')
+    # Reference: textLocRef\IntBeckyGuest.txt - 'Полапать под столом Бекки' section
+    # Counters live inside the event
+    if not hasattr(store, 'dinnerbecky'):
+        store.dinnerbecky = 0
+    if not hasattr(store, 'dinnertime'):
+        store.dinnertime = 0
+    if not hasattr(store, 'dinnerbeckyorgasm'):
+        store.dinnerbeckyorgasm = 0
+
+    # Logic from TXT using our Ren'Py code + rand_int for chances
+    if store.dinnerbecky == 0:
+        $ MainTxt = 'Как можно более незаметно вы запустили руку под стол...'
+    else:
+        $ MainTxt = 'Вы продолжаете ласкать вдовушку прямо под семейным столом.'
+
+    $ store.dinnerbecky += 1
+    $ store.dinnertime += 1
+
+    if (store.dinnerbecky >= 3 or (panties.get('becky', '') == '' and store.dinnerbecky > 2)) and rand_int(1,3) == 1:
+        $ store.dinnerbeckyorgasm = 1
+        $ MainTxt += '\n\nПо телу Бекки пробежала дрожь оргазма...'
+        call SlutFriendsIncrease('becky', 16, 1, 1, 40, 2, 1) from _call_grope_orgasm  # see game\Inn\SlutFriendsIncrease.rpy
+        $ BeckyVar['visitedhome'] = max(BeckyVar.get('visitedhome', 0), 4)
+
+    # Family noticing (Eddie, Inga) from TXT - use rand_int
+    if rand_int(1,4) == 1:
+        $ MainTxt += '\n\nВаши игры не остались незамеченными: Эдди нырнул под стол...'
+        $ EddieVar['SawMomSex'] = max(EddieVar.get('SawMomSex', 0), 1)
+
+    # Only advance the thread if this stage's counters/logic is 'done' for this visit
+    if store.dinnerbecky >= 3 or store.dinnerbeckyorgasm == 1:  # example completion condition
+        if thread is not None:
+            $ thread.advance()
+
+    $ Talked['becky'] = Talked.get('becky', 0) + 1
+    $ CurLocDesc = MainTxt
+    # Call the detailed engine from the reference (IntBeckyGuest.rpy) for the interactive part if needed
+    call IntBeckyGuest('becky', 'BeckyHome') from _call_becky_grope_engine  # see game\NPC\Girls\Becky\IntBeckyGuest.rpy
+    return
+
+# Repeat the same pattern one by one for:
+# becky_home_dinner_eat (with dinneringaminet random using rand_int(1,6))
+# becky_home_dinner_to_bedroom (visitedhome gates + KidsWatchStepsCode from TXT)
+# becky_home_georgett_arrival (when EddieWhoreHome==4 and dinnertime==5)
+# etc.
+
+# After adding each event label, add the corresponding test in tests\ThreadTesting.rpy using the framework.

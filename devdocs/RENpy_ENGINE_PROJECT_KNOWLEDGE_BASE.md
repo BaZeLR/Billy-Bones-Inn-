@@ -459,7 +459,8 @@ For events:
 - Preserve the right-panel variables and `current_action_panel()` flow.
 - Preserve `vscene` behavior for scene media.
 - Preserve room-bound action modeling.
-- Preserve `NPCSchedules` as canonical schedule truth.
+- Preserve class-owned NPC schedule/location truth; visible NPCs resolve
+  through `getLocation()`/`getNPCids(...)`.
 - Preserve the separation between daily events and story threads.
 - Add content in local feature/room/event files unless there is a clear shared abstraction already present.
 - Do not preserve generic action hubs, dispatchers, or wrapper labels as target

@@ -1,9 +1,41 @@
-# Family Life HUD Placement Finding
+# Family Life HUD Menu Pattern
 
 Reference project:
 `C:\Users\blank\Documents\RenPy_Projects\FamilyLife-0.1.1-base+Event0\game`
 
-## Finding
+## Binding Rule
+
+This is the required Tractir HUD/menu pattern. Follow it directly.
+
+- Authored event choices use native Ren'Py `menu:` inside the event label.
+- The global Ren'Py `screen choice` positions those native menu choices in the
+  right-side HUD action area.
+- Event labels own their own text, media, choices, branches, and consequences.
+- `current_action_items` and `choice_panel` are for room, object, travel, and
+  system action panels only. They are not the authoring model for story-event
+  or sex-event choices.
+- Do not convert an authored `menu:` into a refresh, rebuild, apply, queue,
+  dispatcher, modal screen, or action-panel workaround.
+
+The intended shape is:
+
+```renpy
+label some_event:
+    vscene "images/event/picture.jpg"
+    "Event text."
+
+    menu:
+        "Choice A":
+            jump some_event_a
+
+        "Leave":
+            jump expression CurLoc
+```
+
+`screen choice` is the only screen-level placement layer for those `menu:`
+choices.
+
+## Family Life Reference
 
 Family Life keeps its HUD visible as a right-side screen while event choices are displayed in the normal interaction area. The important rule is that event choices stay attached to the active event scene.
 
@@ -24,7 +56,8 @@ Observed in:
 - `status.rpy`, `screen status`: HUD is a right-side screen, not a menu controller.
 
 Family Life does not build event choices through a separate refresh/apply/renew
-screen path. The event label writes the choices where the event happens.
+screen path. The event label writes the choices where the event happens, and the
+global `screen choice` places them.
 
 ## Tractir Rule
 
@@ -40,7 +73,7 @@ This is mandatory for story and sex events. The visual target is the attached
 event screenshot: event picture and text remain visible, and the available event
 choices appear inside the right-side action area during the event.
 
-Classic event-label menu authorship is the preferred source model:
+Classic event-label menu authorship is the required source model:
 
 ```renpy
 label some_event:
@@ -56,8 +89,8 @@ label some_event:
             jump expression CurLoc
 ```
 
-Tractir may render this through `main_ui`, but the choices must still be owned
-by the event label and displayed in the event layout.
+Tractir renders this through the global `screen choice` placement. The choices
+must still be owned by the event label and displayed in the event layout.
 
 ## Multi-Picture Proceed Beats
 
@@ -82,8 +115,8 @@ event picture/text layout.
 
 ## Tractir Rendering Rule
 
-Classic event-label `menu:` is the source model. Tractir's screen layer may style
-or place that menu in the right-side middle action area, but the event label
+Classic event-label `menu:` is the source model. Tractir's screen layer styles
+and places that menu in the right-side middle action area, but the event label
 still owns the choices and branches.
 
 Do not build ordinary event choices through `current_action_items`,

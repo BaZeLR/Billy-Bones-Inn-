@@ -287,7 +287,39 @@ screen choice_panel(items, label=None):
 screen choice(items, label=None, menu_name=None):
     style_prefix "choice"
     zorder 220
-    use choice_panel(items, label)
+    if str(UI_mode or "") in ("talk", "event") and str(CurLoc or "") != "Intro":
+        $ _choice_right_x = 12 + int((config.screen_width - 36) * 0.72) + 12
+        $ _choice_right_w = int((config.screen_width - 36) * 0.28)
+        $ _choice_y = 12 + 220 + 10 + 52
+        viewport:
+            xpos _choice_right_x + 20
+            ypos _choice_y
+            xsize max(240, _choice_right_w - 40)
+            ymaximum 260
+            draggable True
+            mousewheel True
+            vbox:
+                spacing 6
+                if label:
+                    text label size 20 xalign 0.5
+                for _choice_index, i in enumerate(items):
+                    textbutton i.caption action i.action:
+                        id "choice_panel_button_%d" % int(_choice_index)
+                        alt "choice_panel_button_%d" % int(_choice_index)
+                        style "mui_hud_button"
+                        text_style "mui_hud_button_text"
+                        text_color (i.action.color if hasattr(i.action, "color") else "#d6c8ad")
+                        text_hover_color "#ffffff"
+    else:
+        if label:
+            text label
+        vbox:
+            for _choice_index, i in enumerate(items):
+                textbutton i.caption action i.action:
+                    id "choice_panel_button_%d" % int(_choice_index)
+                    alt "choice_panel_button_%d" % int(_choice_index)
+                    text_color (i.action.color if hasattr(i.action, "color") else "#c90")
+                    text_hover_color "#fff"
 
 style choice_button_text is button_text
 style choice_button_text:
@@ -317,23 +349,15 @@ style choice_button is button
 style choice_button_text is button_text
 
 style choice_vbox:
-    xpos 1472
-    ypos 118
-    xsize 430
-    spacing 4
+    xalign 1.0
+    ypos 384
+    spacing gui.choice_spacing
 
 style choice_button is default:
     properties gui.button_properties("choice_button")
-    xfill True
-    xminimum 430
 
 style choice_button_text is default:
     properties gui.button_text_properties("choice_button")
-    xalign 0.0
-    size 20
-    color "#f0d000"
-    hover_color "#fff080"
-    outlines []
 
 
 ## Quick Menu screen ###########################################################

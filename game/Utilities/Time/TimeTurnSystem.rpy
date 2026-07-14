@@ -3,10 +3,20 @@
 # ================================================================================
 default BlockTimeAdvance = 0
 
+default BlockTimeAdvance = 0
+
+default BlockTimeAdvance = 0
+
+default BlockTimeAdvance = 0
+
+default BlockTimeAdvance = 0
+
+default BlockTimeAdvance = 0
+
 init -115 python:
     import renpy.exports as renpy
 
-    MOVEMENT_TIME_COST_MINUTES = 10
+    MOVEMENT_TIME_COST_MINUTES = 5
 
     def _turn_i(value, default=0):
         try:
@@ -21,25 +31,30 @@ init -115 python:
             return False
         return True
 
+    def navigation_has_saddled_horse():
+        return bool(str(MyStallion or "").strip()) and _turn_i(HorseSaddled, 0) == 1
+
+    def navigation_group_travel_minutes():
+        return 15 if navigation_has_saddled_horse() else 30
+
     def _apply_movement_time_cost_without_sleep(minutes_to_add):
-        calendar_v2.sync_state()
         current_minutes = _turn_i(clock_minutes, 0)
         target_minutes = current_minutes + max(0, _turn_i(minutes_to_add, 0))
         if target_minutes >= 1440:
             # Movement is never allowed to roll the calendar into the next day.
             calendar_v2.hour = 23
             calendar_v2.minute = 59
-            calendar_v2.sync_state()
             return False
         calendar_v2.advance_minutes(max(0, _turn_i(minutes_to_add, 0)))
         return True
 
-label AdvanceMovementTime(target_label=""):
+label AdvanceMovementTime(target_label="", movement_minutes=0):
     $ movement_target = str(target_label or CurLoc or "TavernMain")
+    $ _movement_cost_minutes = int(movement_minutes or MOVEMENT_TIME_COST_MINUTES)
     $ current_object_id = ""
     $ current_girl_key = ""
     if _time_advancement_allowed():
-        $ _movement_time_changed = _apply_movement_time_cost_without_sleep(MOVEMENT_TIME_COST_MINUTES)
+        $ _movement_time_changed = _apply_movement_time_cost_without_sleep(_movement_cost_minutes)
         call stat
         if _movement_time_changed:
             $ checkpoint_tractir_progress("movement_time")

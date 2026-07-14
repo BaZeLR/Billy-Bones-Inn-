@@ -1,7 +1,276 @@
-# ================================================================================
+label ForestBuildActions:
+    $ current_action_title = "Действия"
+    $ current_action_content = None
+    $ current_action_items = []
+    if forest_after_dusk():
+        $ forest_apply_after_dusk_message()
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk"))]
+        return
+    if werecat_can_search("Forest"):
+        $ current_action_items.append(MenuItem("Осмотреть лес внимательнее", Call("WerecatForestSearch", "Forest")))
+    if fight_can_hunt_here("Forest"):
+        $ current_action_items.append(MenuItem("Выслеживать добычу", Call("FightStartHuntCurrentRoom")))
+    if player_can_train_shooting():
+        $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", "Forest")))
+    if forest_trap_can_place("Forest"):
+        $ current_action_items.append(MenuItem("Поставить ловушку", Call("ForestSetTrap")))
+    elif forest_trap_can_check("Forest"):
+        $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap")))
+    if werecat_can_set_bait("Forest"):
+        $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", "Forest")))
+    elif werecat_can_check_bait("Forest"):
+        $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", "Forest")))
+    python:
+        for _forest_object in ForestRoom.visible_objects():
+            current_action_items.append(MenuItem(_forest_object.name, Call("ForestObjectMenu", _forest_object.object_id)))
+        for _spawn_entry in ForestRoom.get_spawned_items():
+            _spawn_item_id = str(_spawn_entry.get("item_id", "") or "")
+            _spawn_units = max(1, int(_spawn_entry.get("units", 1) or 1))
+            _spawn_item = get_game_item(_spawn_item_id, ForestRoom)
+            if _spawn_item is not None:
+                _spawn_name = str(getattr(_spawn_item, "name", _spawn_item_id) or _spawn_item_id)
+                current_action_items.append(MenuItem(_spawn_name + " x" + str(_spawn_units), Call("ForestSpawnedItemMenu", _spawn_item_id)))
+        for _forest_exit in ForestRoom.visible_exits():
+            if str(_forest_exit.target or "") == "StreetTavern":
+                current_action_items.append(MenuItem(forest_return_label_text(), Call("ForestReturnToOrigin")))
+            else:
+                current_action_items.append(MenuItem(_forest_exit.label, Call("AdvanceMovementTime", _forest_exit.target, 30)))
+    return
+
+label ForestSubroomBuildActions:
+    $ current_action_title = CurrentRoom.display_name
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Осмотреться", Call("ForestSubroomExplore")),
+    ]
+    if forest_after_dusk():
+        $ forest_apply_after_dusk_message()
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk"))]
+        return
+    if werecat_can_set_bait(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
+    elif werecat_can_check_bait(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
+    if fight_can_hunt_here(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Выслеживать добычу", Call("FightStartHuntCurrentRoom")))
+    if player_can_train_shooting():
+        $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", str(getattr(CurrentRoom, "code_name", "") or ""))))
+    if forest_trap_can_place(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Поставить ловушку", Call("ForestSetTrap")))
+    elif forest_trap_can_check(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap")))
+    if str(getattr(CurrentRoom, "code_name", "") or "") == "ForestLake":
+        $ current_action_items.append(MenuItem("Искупаться в озере", Call("ForestLakeBath")))
+        if forest_has_horse():
+            $ current_action_items.append(MenuItem("Искупать коня", Call("ForestLakeWashHorse")))
+    if str(getLocation("clara") or "") == str(getattr(CurrentRoom, "code_name", "") or ""):
+        $ current_action_items.append(MenuItem("Кларисса", Call("IntClaraTalk", "clara")))
+    python:
+        for _spawn_entry in forest_room_get_spawned_items(CurrentRoom):
+            _spawn_item_id = str(_spawn_entry.get("item_id", "") or "")
+            _spawn_units = max(1, int(_spawn_entry.get("units", 1) or 1))
+            _spawn_item = get_game_item(_spawn_item_id, CurrentRoom)
+            if _spawn_item is not None:
+                _spawn_name = str(getattr(_spawn_item, "name", _spawn_item_id) or _spawn_item_id)
+                current_action_items.append(MenuItem(_spawn_name + " x" + str(_spawn_units), Call("ForestSubroomSpawnedItemMenu", _spawn_item_id)))
+        for _forest_exit in CurrentRoom.visible_exits():
+            if str(_forest_exit.target or "") == "StreetTavern":
+                current_action_items.append(MenuItem(forest_return_label_text(), Call("ForestReturnToOrigin")))
+            else:
+                current_action_items.append(MenuItem(_forest_exit.label, Call("AdvanceMovementTime", _forest_exit.target, 30)))
+    return
+
+label ForestSubroomRestore:
+    $ MainTxt = ForestSubroomSavedText
+    $ CurLocDesc = MainTxt
+    call ForestSubroomBuildActions
+    returnlabel ForestBuildActions:
+    $ current_action_title = "Действия"
+    $ current_action_content = None
+    $ current_action_items = []
+    if forest_after_dusk():
+        $ forest_apply_after_dusk_message()
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk"))]
+        return
+    if werecat_can_search("Forest"):
+        $ current_action_items.append(MenuItem("Осмотреть лес внимательнее", Call("WerecatForestSearch", "Forest")))
+    if fight_can_hunt_here("Forest"):
+        $ current_action_items.append(MenuItem("Выслеживать добычу", Call("FightStartHuntCurrentRoom")))
+    if player_can_train_shooting():
+        $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", "Forest")))
+    if forest_trap_can_place("Forest"):
+        $ current_action_items.append(MenuItem("Поставить ловушку", Call("ForestSetTrap")))
+    elif forest_trap_can_check("Forest"):
+        $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap")))
+    if werecat_can_set_bait("Forest"):
+        $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", "Forest")))
+    elif werecat_can_check_bait("Forest"):
+        $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", "Forest")))
+    python:
+        for _forest_object in ForestRoom.visible_objects():
+            current_action_items.append(MenuItem(_forest_object.name, Call("ForestObjectMenu", _forest_object.object_id)))
+        for _spawn_entry in ForestRoom.get_spawned_items():
+            _spawn_item_id = str(_spawn_entry.get("item_id", "") or "")
+            _spawn_units = max(1, int(_spawn_entry.get("units", 1) or 1))
+            _spawn_item = get_game_item(_spawn_item_id, ForestRoom)
+            if _spawn_item is not None:
+                _spawn_name = str(getattr(_spawn_item, "name", _spawn_item_id) or _spawn_item_id)
+                current_action_items.append(MenuItem(_spawn_name + " x" + str(_spawn_units), Call("ForestSpawnedItemMenu", _spawn_item_id)))
+        for _forest_exit in ForestRoom.visible_exits():
+            if str(_forest_exit.target or "") == "StreetTavern":
+                current_action_items.append(MenuItem(forest_return_label_text(), Call("ForestReturnToOrigin")))
+            else:
+                current_action_items.append(MenuItem(_forest_exit.label, Call("AdvanceMovementTime", _forest_exit.target, 30)))
+    return
+
+label ForestSubroomBuildActions:
+    $ current_action_title = CurrentRoom.display_name
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Осмотреться", Call("ForestSubroomExplore")),
+    ]
+    if forest_after_dusk():
+        $ forest_apply_after_dusk_message()
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk"))]
+        return
+    if werecat_can_set_bait(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
+    elif werecat_can_check_bait(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
+    if fight_can_hunt_here(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Выслеживать добычу", Call("FightStartHuntCurrentRoom")))
+    if player_can_train_shooting():
+        $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", str(getattr(CurrentRoom, "code_name", "") or ""))))
+    if forest_trap_can_place(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Поставить ловушку", Call("ForestSetTrap")))
+    elif forest_trap_can_check(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap")))
+    if str(getattr(CurrentRoom, "code_name", "") or "") == "ForestLake":
+        $ current_action_items.append(MenuItem("Искупаться в озере", Call("ForestLakeBath")))
+        if forest_has_horse():
+            $ current_action_items.append(MenuItem("Искупать коня", Call("ForestLakeWashHorse")))
+    if str(getLocation("clara") or "") == str(getattr(CurrentRoom, "code_name", "") or ""):
+        $ current_action_items.append(MenuItem("Кларисса", Call("IntClaraTalk", "clara")))
+    python:
+        for _spawn_entry in forest_room_get_spawned_items(CurrentRoom):
+            _spawn_item_id = str(_spawn_entry.get("item_id", "") or "")
+            _spawn_units = max(1, int(_spawn_entry.get("units", 1) or 1))
+            _spawn_item = get_game_item(_spawn_item_id, CurrentRoom)
+            if _spawn_item is not None:
+                _spawn_name = str(getattr(_spawn_item, "name", _spawn_item_id) or _spawn_item_id)
+                current_action_items.append(MenuItem(_spawn_name + " x" + str(_spawn_units), Call("ForestSubroomSpawnedItemMenu", _spawn_item_id)))
+        for _forest_exit in CurrentRoom.visible_exits():
+            if str(_forest_exit.target or "") == "StreetTavern":
+                current_action_items.append(MenuItem(forest_return_label_text(), Call("ForestReturnToOrigin")))
+            else:
+                current_action_items.append(MenuItem(_forest_exit.label, Call("AdvanceMovementTime", _forest_exit.target, 30)))
+    return
+
+label ForestSubroomRestore:
+    $ MainTxt = ForestSubroomSavedText
+    $ CurLocDesc = MainTxt
+    call ForestSubroomBuildActions
+    returnlabel ForestBuildActions:
+    $ current_action_title = "Действия"
+    $ current_action_content = None
+    $ current_action_items = []
+    if forest_after_dusk():
+        $ forest_apply_after_dusk_message()
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk"))]
+        return
+    if werecat_can_search("Forest"):
+        $ current_action_items.append(MenuItem("Осмотреть лес внимательнее", Call("WerecatForestSearch", "Forest")))
+    if fight_can_hunt_here("Forest"):
+        $ current_action_items.append(MenuItem("Выслеживать добычу", Call("FightStartHuntCurrentRoom")))
+    if player_can_train_shooting():
+        $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", "Forest")))
+    if forest_trap_can_place("Forest"):
+        $ current_action_items.append(MenuItem("Поставить ловушку", Call("ForestSetTrap")))
+    elif forest_trap_can_check("Forest"):
+        $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap")))
+    if werecat_can_set_bait("Forest"):
+        $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", "Forest")))
+    elif werecat_can_check_bait("Forest"):
+        $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", "Forest")))
+    python:
+        for _forest_object in ForestRoom.visible_objects():
+            current_action_items.append(MenuItem(_forest_object.name, Call("ForestObjectMenu", _forest_object.object_id)))
+        for _spawn_entry in ForestRoom.get_spawned_items():
+            _spawn_item_id = str(_spawn_entry.get("item_id", "") or "")
+            _spawn_units = max(1, int(_spawn_entry.get("units", 1) or 1))
+            _spawn_item = get_game_item(_spawn_item_id, ForestRoom)
+            if _spawn_item is not None:
+                _spawn_name = str(getattr(_spawn_item, "name", _spawn_item_id) or _spawn_item_id)
+                current_action_items.append(MenuItem(_spawn_name + " x" + str(_spawn_units), Call("ForestSpawnedItemMenu", _spawn_item_id)))
+        for _forest_exit in ForestRoom.visible_exits():
+            if str(_forest_exit.target or "") == "StreetTavern":
+                current_action_items.append(MenuItem(forest_return_label_text(), Call("ForestReturnToOrigin")))
+            else:
+                current_action_items.append(MenuItem(_forest_exit.label, Call("AdvanceMovementTime", _forest_exit.target, 30)))
+    return
+
+label ForestSubroomBuildActions:
+    $ current_action_title = CurrentRoom.display_name
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Осмотреться", Call("ForestSubroomExplore")),
+    ]
+    if forest_after_dusk():
+        $ forest_apply_after_dusk_message()
+        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk"))]
+        return
+    if werecat_can_set_bait(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
+    elif werecat_can_check_bait(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
+    if fight_can_hunt_here(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Выслеживать добычу", Call("FightStartHuntCurrentRoom")))
+    if player_can_train_shooting():
+        $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", str(getattr(CurrentRoom, "code_name", "") or ""))))
+    if forest_trap_can_place(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Поставить ловушку", Call("ForestSetTrap")))
+    elif forest_trap_can_check(str(getattr(CurrentRoom, "code_name", "") or "")):
+        $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap")))
+    if str(getattr(CurrentRoom, "code_name", "") or "") == "ForestLake":
+        $ current_action_items.append(MenuItem("Искупаться в озере", Call("ForestLakeBath")))
+        if forest_has_horse():
+            $ current_action_items.append(MenuItem("Искупать коня", Call("ForestLakeWashHorse")))
+    if str(getLocation("clara") or "") == str(getattr(CurrentRoom, "code_name", "") or ""):
+        $ current_action_items.append(MenuItem("Кларисса", Call("IntClaraTalk", "clara")))
+    python:
+        for _spawn_entry in forest_room_get_spawned_items(CurrentRoom):
+            _spawn_item_id = str(_spawn_entry.get("item_id", "") or "")
+            _spawn_units = max(1, int(_spawn_entry.get("units", 1) or 1))
+            _spawn_item = get_game_item(_spawn_item_id, CurrentRoom)
+            if _spawn_item is not None:
+                _spawn_name = str(getattr(_spawn_item, "name", _spawn_item_id) or _spawn_item_id)
+                current_action_items.append(MenuItem(_spawn_name + " x" + str(_spawn_units), Call("ForestSubroomSpawnedItemMenu", _spawn_item_id)))
+        for _forest_exit in CurrentRoom.visible_exits():
+            if str(_forest_exit.target or "") == "StreetTavern":
+                current_action_items.append(MenuItem(forest_return_label_text(), Call("ForestReturnToOrigin")))
+            else:
+                current_action_items.append(MenuItem(_forest_exit.label, Call("AdvanceMovementTime", _forest_exit.target, 30)))
+    return
+
+label ForestSubroomRestore:
+    $ MainTxt = ForestSubroomSavedText
+    $ CurLocDesc = MainTxt
+    call ForestSubroomBuildActions
+    return# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+default ForestReturnTarget = "StreetTavern"
+
+default ForestReturnTarget = "StreetTavern"
+
+default ForestReturnTarget = "StreetTavern"
+
 init python:
+    import random
+    import random
+    import random
+    import random
+    import random
     import random
     import renpy.exports as renpy
 
@@ -9,7 +278,7 @@ init python:
         "images/forest/forest_1.png",
         "images/forest/forest_2.png",
     )
-    FOREST_TRAVEL_COST_MINUTES = 240
+    FOREST_TRAVEL_COST_MINUTES = 120
     FOREST_WILDLIFE_TEXTS = (
         "Где-то в кронах тревожно перекликаются лесные птицы.",
         "Между кустами мелькает заяц и тут же скрывается в подлеске.",
@@ -130,12 +399,23 @@ init python:
 
     def forest_travel_cost_minutes():
         if forest_has_horse() and int(HorseSaddled or 0) == 1:
-            return 150
-        return int(FOREST_TRAVEL_COST_MINUTES or 240)
+            return 60
+        return int(FOREST_TRAVEL_COST_MINUTES or 120)
 
     def forest_can_depart_now():
         try:
-            calendar_v2.sync_state()
+        except Exception:
+            pass
+        try:
+        except Exception:
+            pass
+        try:
+        except Exception:
+            pass
+        try:
+        except Exception:
+            pass
+        try:
         except Exception:
             pass
         try:
@@ -144,11 +424,22 @@ init python:
             return True
 
     def forest_departure_block_text():
-        return "После полудня идти в лес уже поздно. На такую вылазку уйдет не меньше четырех часов."
+        return "После полудня идти в лес уже поздно. На такую вылазку уйдет не меньше часа верхом и двух часов пешком."
 
     def forest_after_dusk():
         try:
-            calendar_v2.sync_state()
+        except Exception:
+            pass
+        try:
+        except Exception:
+            pass
+        try:
+        except Exception:
+            pass
+        try:
+        except Exception:
+            pass
+        try:
         except Exception:
             pass
         try:
@@ -240,7 +531,7 @@ init python:
     ) 
 
 default ForestSavedText = ""
-default ForestReturnTarget = "StreetTavern"
+
 default ForestSubroomSavedText = ""
 
 
@@ -250,7 +541,6 @@ label TravelToForest(return_target="StreetTavern"):
         $ MainTxt = forest_departure_block_text()
         $ CurLocDesc = MainTxt
         jump expression ForestReturnTarget
-    $ calendar_v2.sync_state()
     $ calendar_v2.advance_minutes(forest_travel_cost_minutes())
     call stat
     jump Forest
@@ -259,7 +549,7 @@ label TravelToForest(return_target="StreetTavern"):
 
 label ForestReturnToOrigin:
     $ _forest_target = forest_return_target()
-    call AdvanceMovementTime(_forest_target)
+    call AdvanceMovementTime(_forest_target, forest_travel_cost_minutes())
     return
 
 
@@ -267,14 +557,13 @@ label ForestReturnToTavernAfterDusk:
     $ ForestReturnTarget = "StreetTavern"
     $ MainTxt = forest_after_dusk_return_text()
     $ CurLocDesc = MainTxt
-    call AdvanceMovementTime("StreetTavern")
+    call AdvanceMovementTime("StreetTavern", forest_travel_cost_minutes())
     return
 
 
 label Forest:
     $ CurrentRoom = ForestRoom
     $ CurLoc = "Forest"
-    $ location = CurLoc
     $ scene_image = forest_pick_background()
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -294,51 +583,12 @@ label Forest:
         $ CurLocDesc = MainTxt
         $ ForestSavedText = MainTxt
 
-    call ForestBuildActions
-    $ _forest_ui_return = None
-    while _forest_ui_return is None:
-        call screen main_ui
-        $ _forest_ui_return = _return
-    jump Forest
-
-
-label ForestBuildActions:
     $ current_action_title = "Действия"
     $ current_action_content = None
-    $ current_action_items = []
     if forest_after_dusk():
         $ forest_apply_after_dusk_message()
-        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk"))]
-        return
-    if werecat_can_search("Forest"):
-        $ current_action_items.append(MenuItem("Осмотреть лес внимательнее", Call("WerecatForestSearch", "Forest")))
-    if fight_can_hunt_here("Forest"):
-        $ current_action_items.append(MenuItem("Выслеживать добычу", Call("FightStartHuntCurrentRoom")))
-    if player_can_train_shooting():
-        $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", "Forest")))
-    if forest_trap_can_place("Forest"):
-        $ current_action_items.append(MenuItem("Поставить ловушку", Call("ForestSetTrap")))
-    elif forest_trap_can_check("Forest"):
-        $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap")))
-    if werecat_can_set_bait("Forest"):
-        $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", "Forest")))
-    elif werecat_can_check_bait("Forest"):
-        $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", "Forest")))
-    python:
-        for _forest_object in ForestRoom.visible_objects():
-            current_action_items.append(MenuItem(_forest_object.name, Call("ForestObjectMenu", _forest_object.object_id)))
-        for _spawn_entry in ForestRoom.get_spawned_items():
-            _spawn_item_id = str(_spawn_entry.get("item_id", "") or "")
-            _spawn_units = max(1, int(_spawn_entry.get("units", 1) or 1))
-            _spawn_item = get_game_item(_spawn_item_id, ForestRoom)
-            if _spawn_item is not None:
-                _spawn_name = str(getattr(_spawn_item, "name", _spawn_item_id) or _spawn_item_id)
-                current_action_items.append(MenuItem(_spawn_name + " x" + str(_spawn_units), Call("ForestSpawnedItemMenu", _spawn_item_id)))
-        for _forest_exit in ForestRoom.visible_exits():
-            if str(_forest_exit.target or "") == "StreetTavern":
-                current_action_items.append(MenuItem(forest_return_label_text(), Call("ForestReturnToOrigin")))
-            else:
-                current_action_items.append(MenuItem(_forest_exit.label, Call("AdvanceMovementTime", _forest_exit.target)))
+    call ForestBuildActions
+    call screen main_ui
     return
 
 
@@ -402,6 +652,20 @@ label ForestRestore:
     return
 
 
+label ForestRestore:
+    $ MainTxt = ForestSavedText
+    $ CurLocDesc = MainTxt
+    call ForestBuildActions
+    return
+
+
+label ForestRestore:
+    $ MainTxt = ForestSavedText
+    $ CurLocDesc = MainTxt
+    call ForestBuildActions
+    return
+
+
 label WerecatForestSearch(room_code=""):
     $ _werecat_room = str(room_code or CurLoc or "").strip()
     if not werecat_can_search(_werecat_room):
@@ -419,8 +683,9 @@ label WerecatForestSearch(room_code=""):
     $ CurLocDesc = MainTxt
     if bool(_werecat_search.get("found_tracks", False)) and str(werecat_info_picture_path() or "").strip():
         hide screen main_ui
+        hide screen main_ui
         vscene werecat_info_picture_path()
-        "[MainTxt]"
+            "[MainTxt]"
     if _werecat_room == "Forest":
         call ForestBuildActions
     else:
@@ -468,55 +733,11 @@ label ForestTakeSpawnedItem(item_id=""):
     python:
         if bool(getattr(_taken_item, "carriable", False)):
             for _unused_taken_unit in range(_taken_units):
-                _player_add_item_by_id(get_object_id(_taken_item))
+                player.add_item(get_object_id(_taken_item))
     $ MainTxt = "Вы подбираете: [(_taken_item.name)] x[(_taken_units)]."
     $ CurLocDesc = MainTxt
     $ ForestSavedText = MainTxt
     call ForestBuildActions
-    return
-
-
-label ForestSubroomBuildActions:
-    $ current_action_title = CurrentRoom.display_name
-    $ current_action_content = None
-    $ current_action_items = [
-        MenuItem("Осмотреться", Call("ForestSubroomExplore")),
-    ]
-    if forest_after_dusk():
-        $ forest_apply_after_dusk_message()
-        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk"))]
-        return
-    if werecat_can_set_bait(str(getattr(CurrentRoom, "code_name", "") or "")):
-        $ current_action_items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
-    elif werecat_can_check_bait(str(getattr(CurrentRoom, "code_name", "") or "")):
-        $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
-    if fight_can_hunt_here(str(getattr(CurrentRoom, "code_name", "") or "")):
-        $ current_action_items.append(MenuItem("Выслеживать добычу", Call("FightStartHuntCurrentRoom")))
-    if player_can_train_shooting():
-        $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", str(getattr(CurrentRoom, "code_name", "") or ""))))
-    if forest_trap_can_place(str(getattr(CurrentRoom, "code_name", "") or "")):
-        $ current_action_items.append(MenuItem("Поставить ловушку", Call("ForestSetTrap")))
-    elif forest_trap_can_check(str(getattr(CurrentRoom, "code_name", "") or "")):
-        $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap")))
-    if str(getattr(CurrentRoom, "code_name", "") or "") == "ForestLake":
-        $ current_action_items.append(MenuItem("Искупаться в озере", Call("ForestLakeBath")))
-        if forest_has_horse():
-            $ current_action_items.append(MenuItem("Искупать коня", Call("ForestLakeWashHorse")))
-    if str(getLocation("clara") or "") == str(getattr(CurrentRoom, "code_name", "") or ""):
-        $ current_action_items.append(MenuItem("Кларисса", Call("IntClaraTalk", "clara")))
-    python:
-        for _spawn_entry in forest_room_get_spawned_items(CurrentRoom):
-            _spawn_item_id = str(_spawn_entry.get("item_id", "") or "")
-            _spawn_units = max(1, int(_spawn_entry.get("units", 1) or 1))
-            _spawn_item = get_game_item(_spawn_item_id, CurrentRoom)
-            if _spawn_item is not None:
-                _spawn_name = str(getattr(_spawn_item, "name", _spawn_item_id) or _spawn_item_id)
-                current_action_items.append(MenuItem(_spawn_name + " x" + str(_spawn_units), Call("ForestSubroomSpawnedItemMenu", _spawn_item_id)))
-        for _forest_exit in CurrentRoom.visible_exits():
-            if str(_forest_exit.target or "") == "StreetTavern":
-                current_action_items.append(MenuItem(forest_return_label_text(), Call("ForestReturnToOrigin")))
-            else:
-                current_action_items.append(MenuItem(_forest_exit.label, Call("AdvanceMovementTime", _forest_exit.target)))
     return
 
 
@@ -579,7 +800,7 @@ label ForestSubroomTakeSpawnedItem(item_id=""):
     python:
         if bool(getattr(_taken_item, "carriable", False)):
             for _unused_taken_unit in range(_taken_units):
-                _player_add_item_by_id(get_object_id(_taken_item))
+                player.add_item(get_object_id(_taken_item))
     $ MainTxt = "Вы подбираете: [(_taken_item.name)] x[(_taken_units)]."
     $ CurLocDesc = MainTxt
     $ ForestSubroomSavedText = MainTxt
@@ -590,9 +811,11 @@ label ForestSubroomTakeSpawnedItem(item_id=""):
 label ForestLakeBath:
     python:
         global fun
+        global fun
+        global fun
         calendar_v2.advance_minutes(60)
-        player_state().appearance.wash()
-        player_state().appearance.apply_to_store()
+        player.appearance.wash()
+        global fun
         fun = _player_clamp(fun + 10, 0, 100)
         update_stat_state()
     $ MainTxt = "Вы раздеваетесь, заходите в прохладную воду и хорошенько смываете с себя дорожную пыль и пот. После купания вы чувствуете себя заметно свежее."
@@ -609,7 +832,7 @@ label ForestLakeWashHorse:
         return
     python:
         calendar_v2.advance_minutes(60)
-        tavernfame = _player_clamp(tavernfame + 1, -20, 20)
+        player.economy.tavern_fame = _player_clamp(player.economy.tavern_fame + 1, -20, 20)
         update_stat_state()
     $ MainTxt = "Вы осторожно заводите [MyStallion] в воду и тщательно смываете с него дорожную грязь и пыль. Конь фыркает, встряхивает гривой и выглядит заметно бодрее."
     $ CurLocDesc = MainTxt
@@ -618,8 +841,3 @@ label ForestLakeWashHorse:
     return
 
 
-label ForestSubroomRestore:
-    $ MainTxt = ForestSubroomSavedText
-    $ CurLocDesc = MainTxt
-    call ForestSubroomBuildActions
-    return

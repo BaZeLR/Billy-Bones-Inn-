@@ -1,14 +1,6 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
-# NextDay_NewDayEvents.rpy
-# Converted from NextDay_NewDayEvents.txt
-# Handles new day event logic for the simulation/visual novel
-
-init -26 python:
-    import renpy.store as store
-
-    def _nd_ensure_dict(name):
+        GiveOrgasms = _nd_ensure_dict("GiveOrgasms")        DayLastOrgasmGiven = _nd_ensure_dict("DayLastOrgasmGiven")        week = int(_nd_ensure_scalar("week", 1) or 1)
+        dayspassed = int(_nd_ensure_scalar("dayspassed", 0) or 0)        MyStallion = _nd_ensure_scalar("MyStallion", "")        npc_schedule_sync_all()
+        werecat_sync_profile()    def _nd_ensure_dict(name):
         value = getattr(store, name, None)
         if not isinstance(value, dict):
             value = {}
@@ -19,6 +11,71 @@ init -26 python:
         if not hasattr(store, name):
             setattr(store, name, default_value)
         return getattr(store, name)
+        retlocname = _nd_ensure_scalar("retlocname", "")        GiveOrgasms = _nd_ensure_dict("GiveOrgasms")        DayLastOrgasmGiven = _nd_ensure_dict("DayLastOrgasmGiven")        week = int(_nd_ensure_scalar("week", 1) or 1)
+        dayspassed = int(_nd_ensure_scalar("dayspassed", 0) or 0)        MyStallion = _nd_ensure_scalar("MyStallion", "")        npc_schedule_sync_all()
+        werecat_sync_profile()    def _nd_ensure_dict(name):
+        value = getattr(store, name, None)
+        if not isinstance(value, dict):
+            value = {}
+            setattr(store, name, value)
+        return value
+
+    def _nd_ensure_scalar(name, default_value):
+        if not hasattr(store, name):
+            setattr(store, name, default_value)
+        return getattr(store, name)
+        retlocname = _nd_ensure_scalar("retlocname", "")        GiveOrgasms = _nd_ensure_dict("GiveOrgasms")        DayLastOrgasmGiven = _nd_ensure_dict("DayLastOrgasmGiven")        week = int(_nd_ensure_scalar("week", 1) or 1)
+        dayspassed = int(_nd_ensure_scalar("dayspassed", 0) or 0)        MyStallion = _nd_ensure_scalar("MyStallion", "")        npc_schedule_sync_all()
+        werecat_sync_profile()    def _nd_ensure_dict(name):
+        value = getattr(store, name, None)
+        if not isinstance(value, dict):
+            value = {}
+            setattr(store, name, value)
+        return value
+
+    def _nd_ensure_scalar(name, default_value):
+        if not hasattr(store, name):
+            setattr(store, name, default_value)
+        return getattr(store, name)
+        retlocname = _nd_ensure_scalar("retlocname", "")# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+# NextDay_NewDayEvents.rpy
+# Converted from NextDay_NewDayEvents.txt
+# Handles new day event logic for the simulation/visual novel
+
+init -26 python:
+    import renpy.store as store
+
+    def _nd_ensure_fran_busy():
+        value = getattr(store, "FranBusy", {})
+        if isinstance(value, list):
+            converted = {}
+            for i in range(len(value)):
+                converted[i] = int(value[i] or 0)
+            value = converted
+        if not isinstance(value, dict):
+            value = {}
+        for slot in range(5):
+            value.setdefault(slot, 0)
+        setattr(store, "FranBusy", value)
+        return value
+    import renpy.store as store
+
+    def _nd_ensure_fran_busy():
+        value = getattr(store, "FranBusy", {})
+        if isinstance(value, list):
+            converted = {}
+            for i in range(len(value)):
+                converted[i] = int(value[i] or 0)
+            value = converted
+        if not isinstance(value, dict):
+            value = {}
+        for slot in range(5):
+            value.setdefault(slot, 0)
+        setattr(store, "FranBusy", value)
+        return value
+    import renpy.store as store
 
     def _nd_ensure_fran_busy():
         value = getattr(store, "FranBusy", {})
@@ -38,23 +95,27 @@ label NextDay_NewDayEvents():
     python:
         # Defensive defaults to avoid startup KeyError on partially initialized saves.
         IngaVar = _nd_ensure_dict("IngaVar")
-        GiveOrgasms = _nd_ensure_dict("GiveOrgasms")
-        DayLastOrgasmGiven = _nd_ensure_dict("DayLastOrgasmGiven")
         pantiesdef = _nd_ensure_dict("pantiesdef")
+        pantiesdef = _nd_ensure_dict("pantiesdef")
+        pantiesdef = _nd_ensure_dict("pantiesdef")
+        FranBusy = _nd_ensure_fran_busy()
+        FranBusy = _nd_ensure_fran_busy()
         FranBusy = _nd_ensure_fran_busy()
         Georgett.ensure_story_defaults()
         Liza.ensure_story_defaults()
         Mongol.ensure_story_defaults()
 
-        retlocname = _nd_ensure_scalar("retlocname", "")
-        tavernvisitors = int(_nd_ensure_scalar("tavernvisitors", 40) or 0)
-        MyStallion = _nd_ensure_scalar("MyStallion", "")
-        StolenHorseDays = int(_nd_ensure_scalar("StolenHorseDays", 0) or 0)
-        SloganFixed = int(_nd_ensure_scalar("SloganFixed", 0) or 0)
+        player.tavern_management.visitors = int(_nd_ensure_scalar("player.tavern_management.visitors", 40) or 0)
+        player.horse.stolen_days = int(_nd_ensure_scalar("player.horse.stolen_days", 0) or 0)
+        player.tavern_management.slogan_state = int(_nd_ensure_scalar("player.tavern_management.slogan_state", 0) or 0)
         TavernGloryHole = int(_nd_ensure_scalar("TavernGloryHole", 0) or 0)
-        week = int(_nd_ensure_scalar("week", 1) or 1)
-        dayspassed = int(_nd_ensure_scalar("dayspassed", 0) or 0)
-        _nd_ensure_scalar("BreakfastToday", False)
+        _nd_ensure_scalar("player.tavern_management.breakfast.today", False)
+
+        _nd_ensure_scalar("player.tavern_management.breakfast.today", False)
+
+        _nd_ensure_scalar("player.tavern_management.breakfast.today", False)
+
+        _nd_ensure_scalar("player.tavern_management.breakfast.today", False)
 
         Eddie.ensure_story_defaults()
 
@@ -62,13 +123,12 @@ label NextDay_NewDayEvents():
         IngaVar.setdefault("Knowher", 0)
         Amanda.ensure_story_defaults()
 
-        pantiesdef.setdefault("liza", "")
-        store.BreakfastToday = False
+        store.player.tavern_management.breakfast.today = False
         tavern_kitchen_reset_daily_hearth_state()
 
         # --- Заканчиваем делать то, что начали в течении дня.
-        if SloganFixed == 1:
-            SloganFixed = 2
+        if player.tavern_management.slogan_state == 1:
+            player.tavern_management.slogan_state = 2
         if TavernGloryHole == 1:
             TavernGloryHole = 2
 
@@ -183,7 +243,7 @@ label NextDay_NewDayEvents():
                 TodaySexEvents_Add('amanda', 2, 99, 'lovermeet')
 
         # Воровство лошадки
-        if MyStallion and retlocname != 'TavernStable' and StolenHorseDays == 0 and procedural_randint(1, 40, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:190:12") == 25:
+        if player.horse.owns_horse() and retlocname != 'TavernStable' and player.horse.stolen_days == 0 and procedural_randint(1, 40, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:190:12") == 25:
             Mongol.var['WillTryToSteal'] = 1
 
         # Бекки предлагает подзаработать
@@ -198,16 +258,14 @@ label NextDay_NewDayEvents():
 
         _run_georgett_nextday_clients = 1
         _georgett_nextday_clients_max = 5
-        _georgett_nextday_glory_max = tavernvisitors // 6
+        _georgett_nextday_glory_max = player.tavern_management.visitors // 6
 
         _run_liza_nextday_clients = 0
         _liza_nextday_clients_max = 0
-        _liza_nextday_glory_max = tavernvisitors // 6
+        _liza_nextday_glory_max = player.tavern_management.visitors // 6
         if Liza.story_value("ProstStart", 0):
             _run_liza_nextday_clients = 1
             _liza_nextday_clients_max = 3 + (1 if pantiesdef['liza'] == '' else 0)
-        npc_schedule_sync_all()
-        werecat_sync_profile()
     if _run_georgett_nextday_clients:
         call WhoreNextDayClients('georgett', _georgett_nextday_clients_max, _georgett_nextday_glory_max)
     if _run_liza_nextday_clients:

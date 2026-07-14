@@ -1,5 +1,11 @@
 # Character Port Plan (TXT Authority)
 
+> REFERENCE ONLY / HISTORICAL PLAN.
+>
+> This plan may contain old dict/global assumptions. Do not treat it as current
+> architecture. Character state now belongs to NPC classes and event/thread
+> labels own their own story flow.
+
 Scope: girls + Clarisse/Clara documentation-first pass before UI implementation.
 
 ## Locked Rules

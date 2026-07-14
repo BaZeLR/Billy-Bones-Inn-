@@ -1,10 +1,16 @@
 # Character Worklist: Ингенборг
 
+> REFERENCE ONLY.
+>
+> This file preserves source/TXT worklist names. Legacy `*Var` tokens are not
+> current runtime owners. Runtime/story state belongs to the character class
+> instance and event/thread labels.
+
 ## Identity
 - Canonical id: inga
 - Legacy keys/tokens: inga, IngaVar
 - Init source: InitInga.txt
-- Main var store: IngaVar
+- Current runtime owner: Inga class instance
 
 ## Presence/Schedule (TXT-driven notes)
 - Связана с ветками семьи Бекки (BeckyHome*, GroceryStore).

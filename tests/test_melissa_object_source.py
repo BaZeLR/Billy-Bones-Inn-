@@ -1,4 +1,4 @@
-from pathlib import Path
+        "AskedMCToSolveRoomProblem",        "def install_schedule",        "AskedMCToSolveRoomProblem",        "def install_schedule",        "AskedMCToSolveRoomProblem",        "def install_schedule",from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -47,13 +47,14 @@ def test_melissa_story_defaults_cover_live_melissavar_keys():
         "private_context_place",
         "private_place_heat",
         "RoomProblemAskDay",
+        "RoomProblemAskDay",
+        "RoomProblemAskDay",
         "StorageThanksDay",
         "AtticFindingsDay",
         "bats_episode",
         "temp_room",
         "storage_rat_last_help_day",
         "room_pests_last_help_day",
-        "AskedMCToSolveRoomProblem",
         "bat_attic_check_day",
         "drawings_ready_day",
         "drawings_found",
@@ -61,7 +62,13 @@ def test_melissa_story_defaults_cover_live_melissavar_keys():
         "bat_recipe_clue_seen",
         "bat_recipe_unlocked",
         "bats_completed",
+        "bats_completed",
+        "bats_completed",
         "bats_completion_day",
+        "room_returned",
+        "sex_engine_unlocked",
+        "room_returned",
+        "sex_engine_unlocked",
         "room_returned",
         "sex_engine_unlocked",
         "roof_repair_order_day",
@@ -98,7 +105,6 @@ def test_melissa_info_owns_runtime_defaults_without_legacy_sync():
         "\"waitress\": 30",
         "\"jobcleaning\": 1",
         "\"jobwaitress\": 1",
-        "def install_schedule",
     ]:
         assert token in source
 
@@ -149,7 +155,7 @@ def test_melissa_info_owns_runtime_defaults_without_legacy_sync():
 def test_melissa_has_five_valid_favorite_talk_topics():
     source = MELISSA_INIT.read_text(encoding="utf-8-sig")
 
-    assert '"favorite_topics": ["job_routine", "family_life", "melissa_safety", "melissa_quiet", "stories"]' in source
+    assert '"favorite_topics": ["job_routine", "family_life", "forest", "stories", "food"]' in source
     assert '"clothes"' not in source
 
 

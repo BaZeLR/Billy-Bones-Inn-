@@ -1,7 +1,19 @@
-# ================================================================================
+default RelationshipMoodState = {}        try:
+            people_sync_person(key)
+        except Exception:
+            passdefault RelationshipMoodState = {}        try:
+            people_sync_person(key)
+        except Exception:
+            passdefault RelationshipMoodState = {}        try:
+            people_sync_person(key)
+        except Exception:
+            pass# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default RelationshipMoodState = {}
+default RelationshipInteractionScore = {}
+
+default RelationshipInteractionScore = {}
+
 default RelationshipInteractionScore = {}
 
 init -42 python:
@@ -19,27 +31,27 @@ init -42 python:
         },
         "amanda": {
             "private_talk": {"score": 12, "friend": 4, "open": 2, "slut": 0},
-            "gift": {"score": 8, "friend": 3, "open": 0, "slut": 0},
+            "gift": {"score": 0, "friend": 30, "open": 0, "slut": 0},
             "share": {"score": 5, "friend": 2, "open": 0, "slut": 0},
-            "flirt": {"score": 25, "friend": 5, "open": 1, "slut": 0},
+            "flirt": {"score": 0, "friend": 10, "open": 0, "slut": 0},
         },
         "melissa": {
             "private_talk": {"score": 10, "friend": 4, "open": 2, "slut": 0},
-            "gift": {"score": 8, "friend": 3, "open": 0, "slut": 0},
+            "gift": {"score": 0, "friend": 30, "open": 0, "slut": 0},
             "share": {"score": 5, "friend": 2, "open": 0, "slut": 0},
-            "flirt": {"score": 25, "friend": 5, "open": 1, "slut": 0},
+            "flirt": {"score": 0, "friend": 10, "open": 0, "slut": 0},
         },
         "sandra": {
             "private_talk": {"score": 15, "friend": 5, "open": 3, "slut": 0},
-            "gift": {"score": 10, "friend": 4, "open": 0, "slut": 0},
+            "gift": {"score": 0, "friend": 30, "open": 0, "slut": 0},
             "share": {"score": 6, "friend": 3, "open": 0, "slut": 0},
-            "flirt": {"score": 30, "friend": 7, "open": 2, "slut": 0},
+            "flirt": {"score": 0, "friend": 10, "open": 0, "slut": 0},
         },
         "clara": {
             "private_talk": {"score": 10, "friend": 3, "open": 2, "slut": 0},
-            "gift": {"score": 12, "friend": 4, "open": 1, "slut": 0},
+            "gift": {"score": 0, "friend": 30, "open": 0, "slut": 0},
             "share": {"score": 7, "friend": 3, "open": 0, "slut": 0},
-            "flirt": {"score": 20, "friend": 5, "open": 2, "slut": 0},
+            "flirt": {"score": 0, "friend": 10, "open": 0, "slut": 0},
         },
         "becky": {
             "private_talk": {"score": 8, "friend": 2, "open": 1, "slut": 0},
@@ -84,6 +96,8 @@ init -42 python:
 
     def relationship_state(person=""):
         global RelationshipMoodState
+        global RelationshipMoodState
+        global RelationshipMoodState
         key = relationship_key(person)
         if not key:
             return {}
@@ -119,6 +133,8 @@ init -42 python:
             return 0
         if not isinstance(RelationshipInteractionScore, dict):
             RelationshipInteractionScore = {}
+        action_key = str(action or "").strip().lower()
+        action_key = str(action or "").strip().lower()
         action_key = str(action or "").strip().lower()
         score = max(0, relationship_int(raw_score, 0))
         if score <= 0:
@@ -367,10 +383,6 @@ init -42 python:
             relationship_add_interaction_score(key, action_key, score)
             if key in RELATIONSHIP_HOUSEHOLD_NPCS and isinstance(neshlush, dict):
                 neshlush[key] = max(0, relationship_int(neshlush.get(key, 0), 0) - 1)
-        try:
-            people_sync_person(key)
-        except Exception:
-            pass
 
     def relationship_apply_weekly_chore_evaluation(preview=None):
         result = ""

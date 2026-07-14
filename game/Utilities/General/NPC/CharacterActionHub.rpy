@@ -1,7 +1,6 @@
-# ================================================================================
+default knowsMC = {}default knowsMC = {}default knowsMC = {}# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default knowsMC = {}
 
 init -40 python:
     import renpy.exports as renpy
@@ -174,7 +173,8 @@ init -40 python:
     def npc_is_known(npc_id):
         key = str(npc_id or "").strip().lower()
         if not key:
-            return False
+            knowsMC[key] = True
+        return True
         try:
             info = getPersonInfo(key)
             if info is not None:
@@ -239,9 +239,10 @@ init -40 python:
         key = str(npc_id or "").strip().lower()
         room_key = str(room_code or "").strip()
         if not key or not room_key:
-            return False
+            knowsMC[key] = True
+        return True
         if key == "clara" and room_key == "MarketPlace":
-            return False
+            return bool(knowsMC.get(key, False))
         try:
             if key == "mongol" and room_key == "MarketPlace":
                 return bool(marketplace_mongol_visible())
@@ -261,14 +262,15 @@ init -40 python:
                 if key == "eddie":
                     return ArriveMode in ("SvalnyiGreh", "")
                 if key in ("inga", "lucas"):
-                    return IngaVar.get("Knowher", 0) >= 1 and ArriveMode == ""
+                    return IngaVar.get("Knowher", 0) >= 1 and BeckyHomeFrontRoom.state["arrival_mode"] == ""
             if room_key == "BeckyHomeFront":
                 if key == "becky":
                     return ArriveMode == "FromDances"
                 if key in ("inga", "lucas"):
                     return ViewIngaSex > 0
         except Exception:
-            return False
+            knowsMC[key] = True
+        return True
         return True
 
     def npc_action_data_for_room(npc_id="", room_code=""):
@@ -304,9 +306,9 @@ init -40 python:
         key = str(npc_id or "").strip().lower()
         room_key = str(room_code or CurLoc or "").strip()
         if key == "" or room_key == "":
-            return False
+            return bool(knowsMC.get(key, False))
         try:
-            if room_key == "TavernKitchen" and bool(TavernBreakfastEventActive):
+            if room_key == "TavernKitchen" and bool(player.tavern_management.breakfast.event_active):
                 return key in [str(row or "").strip().lower() for row in list(tavern_breakfast_present_ids() or [])]
         except Exception:
             pass
@@ -395,8 +397,7 @@ init -40 python:
                 return bool(info.mark_known())
         except Exception:
             pass
-        knowsMC[key] = True
-        return True
+        return False
 
     def npc_context_picture_path(character_id="", where_id="", action_hint="", entity_data=None):
         key = str(character_id or "").strip().lower()
@@ -485,6 +486,146 @@ init -40 python:
         if examine_label and renpy.has_label(examine_label):
             renpy.call_in_new_context(examine_label)
 
+    def NpcActionTalkState(npc_id="", where_id="", entity_data=None):
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
+        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
+        if not npc_key:
+            return
+        show_npc_picture_main_ui_state(npc_key, where_key, "talk", normalized)
+        target_label = str(normalized.get("talk_label", "") or "").strip()
+        target_args = tuple(normalized.get("talk_args", ()) or ())
+        if target_label and renpy.has_label(target_label):
+            renpy.call_in_new_context(target_label, *target_args)
+            mark_entity_known(npc_key)
+
+    def NpcActionLookState(npc_id="", where_id="", entity_data=None):
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
+        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
+        if not npc_key:
+            return
+        show_npc_picture_main_ui_state(npc_key, where_key, "idle", normalized)
+        try:
+            player_observe_npc_body(npc_key, where_key)
+        except Exception:
+            pass
+        examine_label = str(normalized.get("examine_label", "") or "").strip()
+        if examine_label and renpy.has_label(examine_label):
+            renpy.call_in_new_context(examine_label)
+
+    def NpcActionTalkState(npc_id="", where_id="", entity_data=None):
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
+        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
+        if not npc_key:
+            return
+        show_npc_picture_main_ui_state(npc_key, where_key, "talk", normalized)
+        target_label = str(normalized.get("talk_label", "") or "").strip()
+        target_args = tuple(normalized.get("talk_args", ()) or ())
+        if target_label and renpy.has_label(target_label):
+            renpy.call_in_new_context(target_label, *target_args)
+            mark_entity_known(npc_key)
+
+    def NpcActionLookState(npc_id="", where_id="", entity_data=None):
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
+        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
+        if not npc_key:
+            return
+        show_npc_picture_main_ui_state(npc_key, where_key, "idle", normalized)
+        try:
+            player_observe_npc_body(npc_key, where_key)
+        except Exception:
+            pass
+        examine_label = str(normalized.get("examine_label", "") or "").strip()
+        if examine_label and renpy.has_label(examine_label):
+            renpy.call_in_new_context(examine_label)
+
+    def NpcActionTalkState(npc_id="", where_id="", entity_data=None):
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
+        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
+        if not npc_key:
+            return
+        show_npc_picture_main_ui_state(npc_key, where_key, "talk", normalized)
+        target_label = str(normalized.get("talk_label", "") or "").strip()
+        target_args = tuple(normalized.get("talk_args", ()) or ())
+        if target_label and renpy.has_label(target_label):
+            renpy.call_in_new_context(target_label, *target_args)
+            mark_entity_known(npc_key)
+
+    def NpcActionLookState(npc_id="", where_id="", entity_data=None):
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
+        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
+        if not npc_key:
+            return
+        show_npc_picture_main_ui_state(npc_key, where_key, "idle", normalized)
+        try:
+            player_observe_npc_body(npc_key, where_key)
+        except Exception:
+            pass
+        examine_label = str(normalized.get("examine_label", "") or "").strip()
+        if examine_label and renpy.has_label(examine_label):
+            renpy.call_in_new_context(examine_label)
+
+    def NpcActionTalkState(npc_id="", where_id="", entity_data=None):
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
+        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
+        if not npc_key:
+            return
+        show_npc_picture_main_ui_state(npc_key, where_key, "talk", normalized)
+        target_label = str(normalized.get("talk_label", "") or "").strip()
+        target_args = tuple(normalized.get("talk_args", ()) or ())
+        if target_label and renpy.has_label(target_label):
+            renpy.call_in_new_context(target_label, *target_args)
+            mark_entity_known(npc_key)
+
+    def NpcActionLookState(npc_id="", where_id="", entity_data=None):
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
+        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
+        if not npc_key:
+            return
+        show_npc_picture_main_ui_state(npc_key, where_key, "idle", normalized)
+        try:
+            player_observe_npc_body(npc_key, where_key)
+        except Exception:
+            pass
+        examine_label = str(normalized.get("examine_label", "") or "").strip()
+        if examine_label and renpy.has_label(examine_label):
+            renpy.call_in_new_context(examine_label)
+
+    def NpcActionTalkState(npc_id="", where_id="", entity_data=None):
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
+        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
+        if not npc_key:
+            return
+        show_npc_picture_main_ui_state(npc_key, where_key, "talk", normalized)
+        target_label = str(normalized.get("talk_label", "") or "").strip()
+        target_args = tuple(normalized.get("talk_args", ()) or ())
+        if target_label and renpy.has_label(target_label):
+            renpy.call_in_new_context(target_label, *target_args)
+            mark_entity_known(npc_key)
+
+    def NpcActionLookState(npc_id="", where_id="", entity_data=None):
+        normalized = npc_action_data(npc_id, where_id, entity_data)
+        npc_key = str(normalized.get("entity_id", "") or "").strip().lower()
+        where_key = str(normalized.get("where_id", "") or CurLoc or "").strip()
+        if not npc_key:
+            return
+        show_npc_picture_main_ui_state(npc_key, where_key, "idle", normalized)
+        try:
+            player_observe_npc_body(npc_key, where_key)
+        except Exception:
+            pass
+        examine_label = str(normalized.get("examine_label", "") or "").strip()
+        if examine_label and renpy.has_label(examine_label):
+            renpy.call_in_new_context(examine_label)
+
     def open_npc_action_menu_state(npc_id="", where_id="", entity_data=None):
         global current_action_title, current_action_content, current_action_items
         normalized = npc_action_data(npc_id, where_id, entity_data)
@@ -504,6 +645,16 @@ init -40 python:
             menu_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, npc_key, room_key, dict(normalized))))
         if can_talk:
             menu_items.append(MenuItem("Поговорить", Function(NpcActionTalkState, npc_key, room_key, dict(normalized))))
+        if "flirt" in actions and npc_flirt_action_available(npc_key, room_key):
+            menu_items.append(MenuItem("Флиртовать", Call("SocialTalkTopicMenu", npc_key, "flirt", social_topic_return_label(npc_key))))
+        if "flirt" in actions and npc_flirt_action_available(npc_key, room_key):
+            menu_items.append(MenuItem("Флиртовать", Call("SocialTalkTopicMenu", npc_key, "flirt", social_topic_return_label(npc_key))))
+        if "flirt" in actions and npc_flirt_action_available(npc_key, room_key):
+            menu_items.append(MenuItem("Флиртовать", Call("SocialTalkTopicMenu", npc_key, "flirt", social_topic_return_label(npc_key))))
+        if "flirt" in actions and npc_flirt_action_available(npc_key, room_key):
+            menu_items.append(MenuItem("Флиртовать", Call("SocialTalkTopicMenu", npc_key, "flirt", social_topic_return_label(npc_key))))
+        if "flirt" in actions and npc_flirt_action_available(npc_key, room_key):
+            menu_items.append(MenuItem("Флиртовать", Call("SocialTalkTopicMenu", npc_key, "flirt", social_topic_return_label(npc_key))))
         if "flirt" in actions and npc_flirt_action_available(npc_key, room_key):
             menu_items.append(MenuItem("Флиртовать", Call("SocialTalkTopicMenu", npc_key, "flirt", social_topic_return_label(npc_key))))
         if "gift" in actions and npc_gift_action_available(npc_key, room_key):

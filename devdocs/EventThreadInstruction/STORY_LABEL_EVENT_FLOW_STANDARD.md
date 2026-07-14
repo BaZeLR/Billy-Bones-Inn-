@@ -191,10 +191,10 @@ choice happens:
 ```renpy
 menu:
     "Help her":
-        $ Friends["clara"] += 1
-        $ ClaraVar["helped_market"] = 1
-        $ fun -= 5
-        $ calendar_advance_minutes(20)
+        $ Clara.rel = min(20, int(Clara.rel or 0) + 1)
+        $ Clara.set_var_int("helped_market", 1)
+        $ Player.fun = max(0, int(Player.fun or 0) - 5)
+        $ calendar_v2.advance_minutes(20)
         $ thread.advance()
         jump MarketPlace
 ```
@@ -205,12 +205,26 @@ For established shared mechanics, call the real Ren'Py helper label directly:
 menu:
     "Praise Amanda":
         call SlutFriendsIncrease("amanda", 4, 1, 1, 18, 1, 1)
-        $ AmandaVar["praised_after_dance"] = 1
+        $ Amanda.set_var_int("praised_after_dance", 1)
         jump TavernMain
 ```
 
 Use `call`, not `jump`, for helper labels that calculate or apply consequences.
 The event branch must remain the visible owner of why the helper was called.
+
+The owner class is the state authority. Event labels may call shared mechanics,
+but normal state writes must go to the object that owns the state:
+
+```renpy
+$ Amanda.set_var_int("legare_dance_private_seen", 1)
+$ Amanda.rel = min(20, int(Amanda.rel or 0) + 1)
+$ Amanda.mana = min(100, int(Amanda.mana or 0) + 5)
+$ Player.fun = min(100, int(Player.fun or 0) + 5)
+```
+
+Do not use `globals()`, `renpy.store`, `store.*`, old `*Var` dicts, old
+relationship maps such as `Friends[...]`, or duplicated state mirrors as normal
+event/talk state.
 
 Do not hide consequences behind:
 
@@ -226,8 +240,8 @@ label:
 ```renpy
 # Event: Amanda reacts after Legare's dance invitation.
 # Choices:
-# - defend Amanda: raises friendship, lowers Legare cooperation, advances thread
-# - pressure Amanda: raises corruption/sluttiness through SlutFriendsIncrease
+# - defend Amanda: raises Amanda.rel, lowers Legare cooperation, advances thread
+# - pressure Amanda: raises Amanda.corruption through the Amanda/shared sex mechanic
 # - refuse involvement: leaves follow-up available tomorrow
 label event_amanda_legare_dance_choice:
     ...
@@ -306,8 +320,8 @@ label ClaraMarketSpy_0:
         jump MarketPlace
 
     "You follow Clarissa to a merchant at the far end of the market."
-    $ ClaraVar["booklet_flag"] = True
-    $ MongolVar["conspiration_flag"] = True
+    $ Clara.set_var_int("booklet_flag", 1)
+    $ Mongol.set_var_int("conspiration_flag", 1)
     $ thread.complete()
     jump MarketPlace
 ```
@@ -329,18 +343,18 @@ label MelissaTalk:
 
     menu:
         "Talk about safety" if not social_topic_already_seen("melissa", "talk", "melissa_safety"):
-            $ Talked["melissa"] = int(Talked.get("melissa", 0) or 0) + 1
-            $ TalkedToday["melissa"] = int(TalkedToday.get("melissa", 0) or 0) + 1
-            $ SocialTalkTopicSeen[social_topic_seen_key("melissa", "talk", "melissa_safety")] = 1
-            $ Friends["melissa"] = min(20, int(Friends.get("melissa", 0) or 0) + 1)
+            $ Melissa.talked = int(Melissa.talked or 0) + 1
+            $ Melissa.talked_today = int(Melissa.talked_today or 0) + 1
+            $ Melissa.set_var_int("talk_topic_melissa_safety_seen", 1)
+            $ Melissa.rel = min(20, int(Melissa.rel or 0) + 1)
             jump MelissaTalk
 
-        "Flirt" if melissa.friends["you"] >= 100 and int(FlirtedToday.get("melissa", 0) or 0) == 0:
-            $ FlirtedToday["melissa"] = 1
+        "Flirt" if Melissa.rel >= 10 and Melissa.var_int("flirted_today", 0) == 0:
+            $ Melissa.set_var_int("flirted_today", 1)
             call SlutFriendsIncrease("melissa", 4, 1, 1, 5, 1, 0)
             jump MelissaTalk
 
-        "Gift" if melissa.friends["you"] >= 100:
+        "Gift" if Melissa.rel >= 10:
             jump MelissaGiftMenu
 
         "Back":
@@ -355,7 +369,8 @@ Dialogue rules:
 
 - Talk, flirt, gift, apology, questions, and story-specific dialogue are choices in the NPC talk label or real sublabels called by it.
 - The visual result is the same as a story event: picture/text remain visible, and choices appear in the active event/talk choice area.
-- Direct mutations happen in the chosen branch: `Talked`, `TalkedToday`, `FlirtedToday`, `GiftedToday`, `AskedToday`, relationship stats, and NPC vars.
+- Direct mutations happen in the chosen branch on the NPC class: talked counters,
+  flirt/gift/asked daily counters, relationship stats, mana, and `NPC.var`.
 - Daily counters reset in the new-day/sleep layer, not in the talk label.
 - Topic preferences and gift preferences belong to the NPC's data/init/object.
 - Amanda, Melissa, Sandra, and Clarissa currently share talk theme and gift mechanics; that data may be reused, but the authored talk label still owns the menu and the consequence point.
@@ -386,7 +401,7 @@ The event label sets the reason directly:
 ```renpy
 $ melissa.anger_reason = "harassment_player_watched"
 $ melissa.anger_days = 3
-$ melissa.friends["you"] -= 20
+$ melissa.rel = max(0, int(melissa.rel or 0) - 2)
 ```
 
 The next NPC interaction can branch into the correct complaint:
@@ -405,13 +420,13 @@ label MelissaComplaintMenu:
             "\"You are right. I should have helped.\""
             $ melissa.anger_reason = None
             $ melissa.anger_days = 0
-            $ melissa.friends["you"] += 10
+            $ melissa.rel = min(20, int(melissa.rel or 0) + 1)
             jump MelissaTalk
 
         "Dismiss it":
             "\"You are overreacting.\""
             $ melissa.anger_days += 2
-            $ melissa.friends["you"] -= 10
+            $ melissa.rel = max(0, int(melissa.rel or 0) - 1)
             jump expression CurLoc
 ```
 
@@ -484,21 +499,21 @@ label PersonTalk:
         "Talk about work":
             if "job_routine" in person.talk_preferences:
                 "She enjoys talking about the rhythm of the tavern work."
-                $ person.friends["you"] += 10
+                $ person.rel = min(20, int(person.rel or 0) + 1)
             else:
                 "She answers politely, but the topic does not catch her interest."
-            $ Talked[person.id] = int(Talked.get(person.id, 0) or 0) + 1
-            $ TalkedToday[person.id] = int(TalkedToday.get(person.id, 0) or 0) + 1
-            $ minutes += 3
+            $ person.talked = int(person.talked or 0) + 1
+            $ person.talked_today = int(person.talked_today or 0) + 1
+            $ calendar_v2.advance_minutes(3)
             jump PersonTalk
 
-        "Flirt" if person.friends["you"] >= 100:
+        "Flirt" if person.rel >= 10:
             "You try a warmer tone."
-            $ FlirtedToday[person.id] = int(FlirtedToday.get(person.id, 0) or 0) + 1
-            $ minutes += 3
+            $ person.set_var_int("flirted_today", person.var_int("flirted_today", 0) + 1)
+            $ calendar_v2.advance_minutes(3)
             jump PersonTalk
 
-        "Gift" if person.friends["you"] >= 100:
+        "Gift" if person.rel >= 10:
             jump PersonGiftMenu
 
         "Back":
@@ -520,26 +535,24 @@ label PersonTalkTopics:
         "Work":
             if "job_routine" in person.talk_preferences:
                 "She enjoys talking about the rhythm of the tavern work."
-                $ person.friends["you"] += 10
+                $ person.rel = min(20, int(person.rel or 0) + 1)
             else:
                 "She answers politely, but the topic does not catch her interest."
-                $ person.friends["you"] += 0
-            $ minutes += 3
+            $ calendar_v2.advance_minutes(3)
             jump PersonTalkTopics
 
         "Gossip":
             if "gossip" in person.talk_preferences:
                 "Her expression brightens as the conversation turns lively."
-                $ person.friends["you"] += 10
+                $ person.rel = min(20, int(person.rel or 0) + 1)
             else:
                 "She listens, but gives little back."
-                $ person.friends["you"] -= 0
-            $ minutes += 3
+            $ calendar_v2.advance_minutes(3)
             jump PersonTalkTopics
 
         "End conversation":
-            $ minutes += 30
-            $ fun += 15
+            $ calendar_v2.advance_minutes(30)
+            $ Player.fun = min(100, int(Player.fun or 0) + 15)
             jump PersonTalk
 ```
 
@@ -565,16 +578,16 @@ label PersonComplaintMenu:
             "\"You are right. I should have handled it better.\""
             $ person.anger_reason = None
             $ person.anger_days = 0
-            $ person.friends["you"] += 10
-            $ minutes += 10
+            $ person.rel = min(20, int(person.rel or 0) + 1)
+            $ calendar_v2.advance_minutes(10)
             jump PersonTalk
 
         "Dismiss it":
             "\"You are overreacting.\""
             "She goes quiet. That hurt more than shouting."
             $ person.anger_days += 2
-            $ person.friends["you"] -= 10
-            $ minutes += 5
+            $ person.rel = max(0, int(person.rel or 0) - 1)
+            $ calendar_v2.advance_minutes(5)
             jump expression CurLoc
 ```
 
@@ -589,18 +602,18 @@ label PersonEvent_0:
     menu:
         "Help":
             "You step in and deal with it."
-            $ minutes += 20
-            $ fun += 5
-            $ person.friends["you"] += 10
+            $ calendar_v2.advance_minutes(20)
+            $ Player.fun = min(100, int(Player.fun or 0) + 5)
+            $ person.rel = min(20, int(person.rel or 0) + 1)
             $ thread.advance()
             jump expression CurLoc
 
         "Leave it":
             "You decide not to get involved."
-            $ minutes += 5
+            $ calendar_v2.advance_minutes(5)
             $ person.anger_reason = "ignored_tavern_problem"
             $ person.anger_days = 2
-            $ person.friends["you"] -= 10
+            $ person.rel = max(0, int(person.rel or 0) - 1)
             jump expression CurLoc
 ```
 
@@ -617,14 +630,14 @@ label ClaraMarketSpy_0:
 
         menu:
             "Follow her":
-                $ minutes += 30
-                $ explorations += 1
-                $ fun += 10
+                $ calendar_v2.advance_minutes(30)
+                $ Player.explorations = int(Player.explorations or 0) + 1
+                $ Player.fun = min(100, int(Player.fun or 0) + 10)
                 jump MarketPlace
 
             "Leave her to her business":
                 "You decide not to disturb her and give her some privacy."
-                $ minutes += 5
+                $ calendar_v2.advance_minutes(5)
                 jump MarketPlace
 
     vscene "images/clara/market/day_success.jpg"
@@ -634,13 +647,13 @@ label ClaraMarketSpy_0:
     menu:
         "Approach them":
             "You approach Clarissa and the merchant."
-            $ ClaraVar["booklet_flag"] = True
-            $ MongolVar["conspiration_flag"] = True
+            $ Clara.set_var_int("booklet_flag", 1)
+            $ Mongol.set_var_int("conspiration_flag", 1)
             $ thread.complete()
             jump MongolMerchantList
 
         "Decide to talk to Clarissa later":
-            $ minutes += 20
+            $ calendar_v2.advance_minutes(20)
             jump MarketPlace
 ```
 

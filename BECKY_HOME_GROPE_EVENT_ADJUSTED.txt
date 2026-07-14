@@ -1,0 +1,56 @@
+# RECOMMENDED CODE TO PASTE INTO game\NPC\Girls\Becky\BeckyEvents.rpy
+# Replace the current becky_home_dinner_grope label with this version.
+# Reference full logic: textLocRef\IntBeckyGuest.txt (section 'Полапать под столом Бекки')
+# Related: game\NPC\Girls\Georgett\InitGeorgett.rpy for Eddie peeking context, game\Inn\SlutFriendsIncrease.rpy for the call
+
+label becky_home_dinner_grope:
+    show screen main_ui
+    $ becky = getPersonInfo('becky')
+    # Counters are local to this event for this visit stage
+    if 'dinnerbecky' not in store.__dict__:
+        store.dinnerbecky = 0
+    if 'dinnertime' not in store.__dict__:
+        store.dinnertime = 0
+    if 'dinnerbeckyorgasm' not in store.__dict__:
+        store.dinnerbeckyorgasm = 0
+
+    if store.dinnerbecky == 0:
+        $ MainTxt = 'Как можно более незаметно вы запустили руку под стол и положили ее на колено Бекки.'
+    elif store.dinnerbecky == 1:
+        $ MainTxt = 'Ваша шаловливая рука задирает подол вдовушки все выше.'
+        if panties.get('becky', '') != '':
+            $ MainTxt += '\n\nПуть в сладкую пещерку преграждала ткань...'
+        else:
+            $ MainTxt += '\n\nПод юбкой ничего не оказалось...'
+        call ShowImage('becky', 'dinner', 'grope') from _call_grope_img1  # see game\Utilities\General\Screens\ShowImage.rpy patterns
+    else:
+        $ store.dinnerbeckyorgasm = 0
+        $ MainTxt = 'Вы продолжаете ласкать вдовушку прямо под семейным столом.'
+        if (store.dinnerbecky >= 3 or (panties.get('becky', '') == '' and store.dinnerbecky > 2)) and rand_int(1, 3) == 1:
+            $ store.dinnerbeckyorgasm = 1
+            $ MainTxt += '\n\nПо телу Бекки пробежала дрожь оргазма. Она крепко сжала вашу руку ногами.'
+            $ GiveOrgasms['becky'] = GiveOrgasms.get('becky', 0) + 1
+            call SlutFriendsIncrease('becky', 16, 1, 1, 40, 2, 1) from _call_grope_orgasm  # game\Inn\SlutFriendsIncrease.rpy
+            $ BeckyVar['visitedhome'] = max(BeckyVar.get('visitedhome', 0), 4)
+            if rand_int(1,4) == 1:
+                $ MainTxt += '\n\nВаши игры не остались незамеченными: Эдди нырнул под стол и все понял.'
+                $ EddieVar['SawMomSex'] = max(EddieVar.get('SawMomSex', 0), 1)
+
+    if store.dinnertime == 5 and store.dinnerbeckyorgasm == 0:
+        $ MainTxt += '\n\nК вашему сожалению, Эдди, Инга и Лукас уже доели...'
+
+    if BeckyVar.get('EddieWhoreHome', 0) == 4 and store.dinnertime == 5:
+        call GeorgettBeckyVisit from _call_grope_georgett  # see game\NPC\Girls\Becky\GeorgettBeckyVisit.rpy
+
+    $ store.dinnerbecky += 1
+    $ store.dinnertime += 1
+
+    # Advance thread ONLY if this stage's logic + counters are complete for the visit
+    if store.dinnerbecky >= 3 or store.dinnerbeckyorgasm == 1:
+        if thread is not None:
+            $ thread.advance()
+
+    $ Talked['becky'] = Talked.get('becky', 0) + 1
+    $ CurLocDesc = MainTxt
+    call IntBeckyGuest('becky', 'BeckyHome') from _call_becky_dinner_grope  # the detailed menu engine from reference
+    return

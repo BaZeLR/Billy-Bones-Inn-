@@ -3,16 +3,26 @@
 # ================================================================================
 init python:
     def street_tavern_sign_broken():
-        return SloganFixed == 0
+        return player.tavern_management.slogan_state == 0
 
     def street_tavern_sign_repairing():
-        return SloganFixed == 1
+        return player.tavern_management.slogan_state == 1
 
     def street_tavern_sign_fixed():
-        return SloganFixed > 1
+        return player.tavern_management.slogan_state > 1
 
     def street_tavern_draupnir_donkey_visible():
         return TavernGloryHole == 1
+
+    def street_tavern_exit_minutes(target_room=""):
+        target_key = str(target_room or "").strip()
+        if target_key == "TavernMain":
+            return 5
+        if target_key == "Church":
+            return 5
+        if target_key == "PortStreets":
+            return 10
+        return navigation_group_travel_minutes()
 
     StreetTavernRoom = Room(
         code_name="StreetTavern",
@@ -99,7 +109,6 @@ label StreetTavern:
     $ dog_prepare_current_spawn()
     $ CurrentRoom = StreetTavernRoom
     $ CurLoc = "StreetTavern"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     $ current_action_title = "Куда идти"
     $ current_action_content = None
@@ -127,11 +136,11 @@ label StreetTavern:
             CurLocDesc += "\n\nНеподалеку от входа крутится бродячий пес, время от времени принюхиваясь к прохожим."
         MainTxt = CurLocDesc
         for _street_exit in StreetTavernRoom.visible_exits():
-            current_action_items.append(MenuItem(_street_exit.label, Jump(_street_exit.target)))
+            current_action_items.append(MenuItem(_street_exit.label, Call("MoveToRoom", _street_exit.target, street_tavern_exit_minutes(_street_exit.target))))
     $ StreetTavernRoom.mark_visited()
 
-    call screen main_ui
-    jump StreetTavern
+    while True:
+        call screen main_ui
 
 
 label street_tavern_menu:
@@ -196,9 +205,9 @@ label street_tavern_object_menu(object_id=""):
 
 
 label StreetTavernExamineSignboard:
-    if SloganFixed == 0:
+    if player.tavern_management.slogan_state == 0:
         "Вывеска выглядит старой и выцветшей. Она уже давно просится в руки хорошего мастера."
-    elif SloganFixed == 1:
+    elif player.tavern_management.slogan_state == 1:
         "Мастер Драупнир как раз приводит вывеску в порядок. Лучше не мешать ему за работой."
     else:
         "Теперь вывеска действительно выглядит так, словно достойна хорошего трактира."

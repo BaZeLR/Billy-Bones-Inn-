@@ -1,5 +1,13 @@
 # Tavern Events Mechanics (Current RPY Runtime)
 
+> REFERENCE ONLY.
+>
+> This file records an older tavern-event runtime/audit. It is not current
+> architecture authority for new code. Port any useful mechanics through
+> class-owned state, event/thread objects, direct labels, and `vscene` media.
+> Do not copy old queues, `Friends[...]`, `sluttiness[...]`, fallback events,
+> or dispatcher patterns from this file.
+
 This document is the current reference for tavern-event mechanics in the Ren'Py port.
 It describes how events are created, dispatched, resolved, and how they modify tavern/crew state.
 

@@ -1,0 +1,45 @@
+# becky_home_front_inga_lucas - Inga/Lucas front of the house side scene
+# Reference: game/Town/BeckyHomeFront.rpy (RandIngaFuck logic, pregnancy checks, discovery)
+# Unordered side scene. Can happen on arrival at BeckyHomeFront.
+# Updates SawIngaFuck, calls SlutFriendsIncrease on Inga, pregnancy risk.
+# The detailed player choices (peek/share/suggest/approach/watch) stay in the location menu.
+label becky_home_front_inga_lucas:
+    show screen main_ui
+    $ becky = getPersonInfo("becky")
+
+    $ BeckyVar.setdefault("TodayFrontSexCheck", 0)
+    $ BeckyVar.setdefault("SawIngaFuck", 0)
+    $ BeckyVar.setdefault("IngaSexGreet", 0)
+    IngaVar.setdefault("SawLucassex", 0)
+    IngaVar.setdefault("Knowher", 0)
+    pregnancy.setdefault("inga", 0)
+
+    if BeckyVar["TodayFrontSexCheck"] == 1:
+        return
+
+    $ RandIngaFuck = rand_int(1,4)
+    if BeckyVar["TodayFrontSexCheck"] == 1 and RandIngaFuck <= 2:
+        $ RandIngaFuck = 3
+
+    $ BeckyVar["TodayFrontSexCheck"] = 1
+
+    if RandIngaFuck <= 3:
+        call PregnancyCheck("inga", "mouthface", 1, "Лукас")
+        call PregnancyCheck("inga", "inside", 1, "Лукас")
+
+        $ MainTxt = "Вдруг какое-то движение в темном углу за крыльцом привлекло ваше внимание.\n\nВ темном углу за крыльцом Лукас прижался к стене, а Инга стоит перед ним на коленях и увлеченно отсасывает. Или они трахаются. Или кончают на лицо. Рыжие волосы Инги растрепаны, на губах и щеках поблескивает."
+
+        call SlutFriendsIncrease('inga', 0, 1, 0, 40, 2, 1)
+        $ BeckyVar["SawIngaFuck"] = max(BeckyVar.get("SawIngaFuck", 0), 1)
+        $ ViewIngaSex = 1
+
+        if thread is not None:
+            $ thread.advance()
+
+        $ Talked["becky"] = Talked.get("becky", 0) + 1
+        $ CurLocDesc = MainTxt
+
+        # Detailed player choices (peek, share with Becky if FromDances, suggest approach, watch cum, interrupt)
+        # remain in the location menu system.
+        # See game/Town/BeckyHomeFront.rpy for the full menu options and BeckyHomeFrontRoom descriptions.
+    return

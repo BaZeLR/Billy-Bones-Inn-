@@ -1,142 +1,15 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
-label IntClaraTalk(girl_name="clara"):
-    if str(CurLoc or "") == "WineStore":
-        $ _clara_talk_picture = str(clara_wine_store_talk_picture() or "").strip()
-        if _clara_talk_picture:
-            vscene _clara_talk_picture
-    $ main_ui_begin_talk_state("Разговор с Клариссой", girl_name)
-    $ current_action_title = "Разговор с Клариссой"
-    $ current_action_content = None
-    $ update_stat_state()
-    if str(MainTxt or "").strip() == "":
-        $ MainTxt = "Кларисса вопросительно смотрит на вас, ожидая, что вы скажете дальше."
-        $ CurLocDesc = MainTxt
-    call IntClaraTalkMenu(girl_name)
-    return
-
-
-label IntClaraTalkMenu(girl_name="clara"):
-    $ main_ui_begin_talk_state("Разговор с Клариссой", girl_name)
-    $ current_action_title = "Разговор с Клариссой"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ update_stat_state()
-    $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
-    $ current_action_items.extend(social_core_action_items(girl_name, "IntClaraTalkMenu"))
-    if str(CurLoc or "") == "MarketPlace" and int(exploration or 0) >= 100 and int(Clara.asked_today or 0) == 0:
-        $ current_action_items.append(MenuItem("Проследить за Клариссой по рынку", Call("IntClaraTalkApply", girl_name, "follow_market")))
-    if story_event_available("WineStore", "clara_talk"):
-        $ current_action_items.append(MenuItem("Осторожно заговорить о ее вечерних делах", Call("checkTriggers", "WineStore", "clara_talk", 0)))
-    if story_event_available("WineStore", "clara_paintings"):
-        $ current_action_items.append(MenuItem("Поговорить с Клариссой о рисунках", Call("checkTriggers", "WineStore", "clara_paintings", 0)))
-
-    if int(Clara.asked_today or 0) == 0 and int(Clara.rel or 0) >= 6:
-        $ current_action_items.append(MenuItem("Спросить Клариссу о семье", Call("IntClaraTalkApply", girl_name, "ask_family")))
-        $ current_action_items.append(MenuItem("Спросить Клариссу о ней самой", Call("IntClaraTalkApply", girl_name, "ask_self")))
-        if int(Clara.var.get("old_water_pump_hint_seen", 0) or 0) == 0 and Melissa.bats_stage() >= 5:
-            $ current_action_items.append(MenuItem("Спросить Клариссу об укромных местах", Call("IntClaraTalkApply", girl_name, "ask_water_pump")))
-        if int(Clara.var.get("drawings_secret_known", 0) or 0) == 1 or int(Melissa.var.get("drawings_found", 0) or 0) == 1:
-            $ current_action_items.append(MenuItem("Осторожно заговорить о ее тайных рисунках", Call("IntClaraTalkApply", girl_name, "ask_drawings")))
-    if Clara.can_accept_horse_ride(CurLoc):
-        $ current_action_items.append(MenuItem("Предложить подвезти Клариссу на коне.", Call("IntClaraTalkApply", girl_name, "horse_ride")))
-
-    $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
-    return
-
-
-label IntClaraGiftMenu(girl_name="clara"):
-    $ main_ui_begin_talk_state("Подарок для Клариссы", girl_name)
-    $ current_action_title = "Подарок для Клариссы"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ MainTxt = "Вы прикидываете, что из имеющегося при себе может понравиться Клариссе."
-    $ CurLocDesc = MainTxt
-    python:
-        for _gift_row in Clara.giftable_entries():
-            _gift_caption = str(_gift_row.get("gift_name", "") or "")
-            _gift_id = str(_gift_row.get("gift_id", "") or "")
-            current_action_items.append(MenuItem(_gift_caption, Call("IntClaraGiftApply", girl_name, _gift_id)))
-    if len(list(current_action_items or [])) <= 0:
-        $ MainTxt = "У вас сейчас нет ничего подходящего для подарка."
-        $ CurLocDesc = MainTxt
-    $ current_action_items.append(MenuItem("Назад", Call("IntClaraTalkMenu", girl_name)))
-    return
-
-
-label IntClaraGiftApply(girl_name="clara", gift_id=""):
-    python:
-        _selected = None
-        for _gift_row in Clara.giftable_entries():
-            if str(_gift_row.get("gift_id", "") or "") == str(gift_id or ""):
-                _selected = dict(_gift_row)
-                break
-
-        if _selected is None:
-            MainTxt = "Подарок уже недоступен."
-        else:
-            _gift_name = str(_selected.get("gift_name", "") or "подарок")
-            _gift_id = str(_selected.get("gift_id", "") or "")
-            _gift_base = 3 if _gift_id in tuple(preferred_gift_item_ids("clara") or ()) else 1
-            _friends_before = int(Clara.rel or 0)
-            _accepts, _gift_score = social_gift_acceptance("clara", _gift_id, _gift_base)
-            if not _accepts:
-                _gift_result = player_gift_to("clara", _gift_name, _gift_base, _gift_id, False)
-                MainTxt = append_social_score_message(str(_gift_result.get("text", "") or ""), social_score_delta_for("clara", _friends_before))
-            elif not Clara.remove_gift_entry(_selected):
-                MainTxt = "Подарок уже недоступен."
-            else:
-                apply_social_interaction_base("clara", "gift", _gift_score, 0, 0, 1, 0, 1, 0, True)
-                if _gift_score > 0:
-                    Clara.trust = min(20, int(Clara.trust or 0) + max(1, _gift_score // 2))
-                elif _gift_score < 0:
-                    Clara.trust = max(0, int(Clara.trust or 0) + _gift_score)
-                Clara.var["trust"] = int(Clara.trust or 0)
-                if str(_selected.get("source", "") or "") == "item":
-                    _effect = player_apply_item_social_effects("clara", _gift_id, True)
-                else:
-                    _effect = {"text": ""}
-                if _gift_id == "werecat_caught_cat":
-                    MainTxt = "Кларисса принимает пойманную лесную кошку не как безделушку, а как редкий и опасный знак доверия. Она долго смотрит на зверя, потом на вас, и в ее улыбке появляется куда больше тепла и дерзкого любопытства, чем раньше."
-                else:
-                    MainTxt = social_gift_text("clara", _gift_name, _gift_id, _gift_score)
-                if str(_effect.get("text", "") or "").strip():
-                    MainTxt = str(MainTxt or "") + " " + str(_effect.get("text", "") or "").strip()
-                MainTxt = append_social_score_message(MainTxt, social_score_delta_for("clara", _friends_before))
-        CurLocDesc = MainTxt
-    call IntClaraTalkMenu(girl_name)
-    return
-
-
+    if str(choice_code or "") == "talk":
+        call TalkSystemSmallTalkMenu(girl_name)
+        return
+    if str(choice_code or "") == "flirt":
+        call TalkSystemFlirtAttempt(girl_name)
+        return
 label IntClaraTalkApply(girl_name="clara", choice_code=""):
     if str(choice_code or "") == "smalltalk":
-        if str(CurLoc or "") in ("ForestClearing", "ForestSpring", "ForestLake"):
-            $ _clara_picture = clara_forest_picture(str(CurLoc or ""))
-            if str(_clara_picture or "").strip():
-                vscene _clara_picture
-        if str(CurLoc or "") == "WineStore":
-            $ _clara_picture = clara_wine_store_talk_picture()
-            if str(_clara_picture or "").strip():
-                vscene _clara_picture
-        python:
-            _result = Clara.apply_social_result("talk")
-            if _result == "positive":
-                MainTxt = "Вы некоторое время болтаете с Клариссой о городских новостях, покупателях и последних сплетнях. Разговор выходит удивительно живым, и Кларисса заметно теплеет к вам."
-            elif _result == "neutral":
-                MainTxt = "Вы некоторое время болтаете с Клариссой о несущественных вещах. Разговор проходит ровно и без особых откровений."
-            else:
-                MainTxt = "Вы пытаетесь разговорить Клариссу, но сегодня она отвечает коротко и держится чуть холоднее обычного."
-            CurLocDesc = MainTxt
-        call IntClaraTalkMenu(girl_name)
+        call TalkSystemSmallTalkMenu(girl_name)
         return
 
     if str(choice_code or "") == "flirt":
-        if not Clara.can_start_social_events():
-            $ MainTxt = "Вы ловите себя на мысли, что, прежде чем всерьез заигрывать с Клариссой, вам стоит выглядеть и держаться куда увереннее."
-            $ CurLocDesc = MainTxt
-            call IntClaraTalkMenu(girl_name)
-            return
         if str(CurLoc or "") in ("ForestClearing", "ForestSpring", "ForestLake"):
             $ _clara_picture = clara_forest_picture(str(CurLoc or ""))
             if str(_clara_picture or "").strip():
@@ -146,16 +19,7 @@ label IntClaraTalkApply(girl_name="clara", choice_code=""):
             if str(_clara_picture or "").strip():
                 vscene _clara_picture
 
-        python:
-            _result = Clara.apply_social_result("flirt")
-            if _result == "positive":
-                MainTxt = "Вы позволяете себе чуть более смелый и игривый тон. Кларисса отвечает вам лукавой улыбкой и, кажется, начинает смотреть на вас заметно внимательнее."
-            elif _result == "neutral":
-                MainTxt = "Вы немного флиртуете с Клариссой. Она принимает это скорее как приятную светскую игру, не давая понять ничего определенного."
-            else:
-                MainTxt = "Вы пытаетесь заигрывать с Клариссой, но она ловко переводит разговор на более безопасные темы."
-            CurLocDesc = MainTxt
-        call IntClaraTalkMenu(girl_name)
+        call TalkSystemFlirtAttempt(girl_name)
         return
 
     if str(choice_code or "") == "horse_ride":
@@ -174,7 +38,8 @@ label IntClaraTalkApply(girl_name="clara", choice_code=""):
                     MainTxt = "Вы предлагаете Клариссе место в седле и подвозите ее обратно к городу. Девушка сначала смеется над неожиданной затеей, а потом явно начинает смотреть на вас теплее."
             CurLocDesc = MainTxt
         call IntClaraTalkMenu(girl_name)
-        return
+        call IntClaraTalkMenu(girl_name)
+    return
 
     if str(choice_code or "") == "ask_family":
         $ Clara.mark_asked()

@@ -1,3 +1,90 @@
+        global player.stats.reputationdefault HunterClubVar = {}    def hunter_club_restore_scene_state():
+        global MainTxt, CurLocDesc, HunterClubTradeMode, HunterClubTradeSelection
+        room_text = hunter_club_main_text()
+        MainTxt = room_text
+        CurLocDesc = room_text
+        HunterClubTradeMode = ""
+        HunterClubTradeSelection = {}
+        renpy.hide_screen("hunter_club_trade_overlay")
+        main_ui_restore_room_scene_state()
+    def hunter_club_migrate_legacy_state():
+        """Consume pre-OOP HunterClubVar data once, then discard the old owner."""
+        legacy_state = globals().pop("HunterClubVar", None)
+        if not isinstance(legacy_state, dict):
+            return False
+
+        HunterClubRoom.state["first_visit_seen"] = max(
+            int(HunterClubRoom.state.get("first_visit_seen", 0) or 0),
+            int(legacy_state.get("first_visit_seen", 0) or 0),
+        )
+        HunterClubRoom.state["reputation"] = max(
+            int(HunterClubRoom.state.get("reputation", 0) or 0),
+            int(legacy_state.get("reputation", 0) or 0),
+        )
+        completed = hunter_club_completed_challenges()
+        completed.update(dict(legacy_state.get("completed_challenges", {}) or {}))
+        HunterClubRoom.state["completed_challenges"] = completed
+        return True
+    def hunter_club_action_items():
+        return list(HunterClubRoom.build_action_items()) + list(HunterClubRoom.build_exit_items())
+        global player.stats.reputationdefault HunterClubVar = {}    def hunter_club_restore_scene_state():
+        global MainTxt, CurLocDesc, HunterClubTradeMode, HunterClubTradeSelection
+        room_text = hunter_club_main_text()
+        MainTxt = room_text
+        CurLocDesc = room_text
+        HunterClubTradeMode = ""
+        HunterClubTradeSelection = {}
+        renpy.hide_screen("hunter_club_trade_overlay")
+        main_ui_restore_room_scene_state()
+    def hunter_club_migrate_legacy_state():
+        """Consume pre-OOP HunterClubVar data once, then discard the old owner."""
+        legacy_state = globals().pop("HunterClubVar", None)
+        if not isinstance(legacy_state, dict):
+            return False
+
+        HunterClubRoom.state["first_visit_seen"] = max(
+            int(HunterClubRoom.state.get("first_visit_seen", 0) or 0),
+            int(legacy_state.get("first_visit_seen", 0) or 0),
+        )
+        HunterClubRoom.state["reputation"] = max(
+            int(HunterClubRoom.state.get("reputation", 0) or 0),
+            int(legacy_state.get("reputation", 0) or 0),
+        )
+        completed = hunter_club_completed_challenges()
+        completed.update(dict(legacy_state.get("completed_challenges", {}) or {}))
+        HunterClubRoom.state["completed_challenges"] = completed
+        return True
+    def hunter_club_action_items():
+        return list(HunterClubRoom.build_action_items()) + list(HunterClubRoom.build_exit_items())
+        global player.stats.reputationdefault HunterClubVar = {}    def hunter_club_restore_scene_state():
+        global MainTxt, CurLocDesc, HunterClubTradeMode, HunterClubTradeSelection
+        room_text = hunter_club_main_text()
+        MainTxt = room_text
+        CurLocDesc = room_text
+        HunterClubTradeMode = ""
+        HunterClubTradeSelection = {}
+        renpy.hide_screen("hunter_club_trade_overlay")
+        main_ui_restore_room_scene_state()
+    def hunter_club_migrate_legacy_state():
+        """Consume pre-OOP HunterClubVar data once, then discard the old owner."""
+        legacy_state = globals().pop("HunterClubVar", None)
+        if not isinstance(legacy_state, dict):
+            return False
+
+        HunterClubRoom.state["first_visit_seen"] = max(
+            int(HunterClubRoom.state.get("first_visit_seen", 0) or 0),
+            int(legacy_state.get("first_visit_seen", 0) or 0),
+        )
+        HunterClubRoom.state["reputation"] = max(
+            int(HunterClubRoom.state.get("reputation", 0) or 0),
+            int(legacy_state.get("reputation", 0) or 0),
+        )
+        completed = hunter_club_completed_challenges()
+        completed.update(dict(legacy_state.get("completed_challenges", {}) or {}))
+        HunterClubRoom.state["completed_challenges"] = completed
+        return True
+    def hunter_club_action_items():
+        return list(HunterClubRoom.build_action_items()) + list(HunterClubRoom.build_exit_items())
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -114,7 +201,7 @@ init python:
         entries = []
         for item_id in list(HUNTER_CLUB_SELL_ITEM_IDS or []):
             item_obj = get_game_item(item_id)
-            item_count = int(_player_item_count_by_id(item_id) or 0)
+            item_count = int(player.item_count(item_id) or 0)
             if item_obj is None or item_count <= 0:
                 continue
             item_price = max(0, int(getattr(item_obj, "price", 0) or 0))
@@ -140,7 +227,7 @@ init python:
         return max(0, min(HUNTER_CLUB_TRADE_MAX_QTY, int(money or 0) // price_each))
 
     def hunter_club_sell_max_quantity(item_id):
-        return max(0, min(HUNTER_CLUB_TRADE_MAX_QTY, int(_player_item_count_by_id(item_id) or 0)))
+        return max(0, min(HUNTER_CLUB_TRADE_MAX_QTY, int(player.item_count(item_id) or 0)))
 
     def hunter_club_trade_entries(trade_mode="buy"):
         mode = str(trade_mode or "buy").strip().lower()
@@ -157,7 +244,7 @@ init python:
                 "item_id": item_id,
                 "name": str(getattr(item_obj, "name", item_id) or item_id),
                 "price": max(0, int(entry.get("price", getattr(item_obj, "price", 0)) or 0)),
-                "owned_qty": int(_player_item_count_by_id(item_id) or 0),
+                "owned_qty": int(player.item_count(item_id) or 0),
                 "max_qty": hunter_club_buy_max_quantity(item_id) if mode == "buy" else hunter_club_sell_max_quantity(item_id),
             })
         return rows
@@ -238,7 +325,7 @@ init python:
             return False
         item_id = str(data.get("item_id", "") or "")
         qty = max(1, int(data.get("qty", 1) or 1))
-        return int(_player_item_count_by_id(item_id) or 0) >= qty
+        return int(player.item_count(item_id) or 0) >= qty
 
     def hunter_club_reputation_title():
         value = hunter_club_reputation()
@@ -282,6 +369,10 @@ init python:
     def hunter_club_apply_challenge(challenge_id=""):
         global reputation
 
+        global reputation
+
+        global reputation
+
         row = hunter_club_challenge_row(challenge_id)
         if not row:
             return {"ok": False, "text": "Такого вызова на доске нет."}
@@ -290,7 +381,7 @@ init python:
             return {"ok": False, "text": "Этот вызов уже закрыт."}
         item_id = str(row.get("item_id", "") or "")
         qty = max(1, int(row.get("qty", 1) or 1))
-        if int(_player_item_count_by_id(item_id) or 0) < qty:
+        if int(player.item_count(item_id) or 0) < qty:
             return {"ok": False, "text": "Для этого вызова у вас пока нет нужного трофея."}
         for _unused in range(qty):
             _player_remove_item_by_id(item_id)
@@ -306,6 +397,8 @@ init python:
         return {"ok": True, "text": "%s\n\nРепутация в клубе: +%s." % (str(row.get("text", "") or "Луиза принимает трофей."), rep_gain)}
 
     def hunter_club_apply_trade(mode="buy"):
+        global money
+        global money
         global money
 
         mode_value = str(mode or HunterClubTradeMode or "buy").strip().lower()
@@ -354,17 +447,9 @@ init python:
             "Здесь можно купить охотничьи припасы и сбыть лесную добычу."
         )
 
-    def hunter_club_restore_scene_state():
-        global MainTxt, CurLocDesc, HunterClubTradeMode, HunterClubTradeSelection
-        room_text = hunter_club_main_text()
-        MainTxt = room_text
-        CurLocDesc = room_text
-        HunterClubTradeMode = ""
-        HunterClubTradeSelection = {}
-        renpy.hide_screen("hunter_club_trade_overlay")
-        main_ui_restore_room_scene_state()
-
     def hunter_club_buy_item(item_id, quantity=1):
+        global money
+        global money
         global money
 
         item_key = str(item_id or "").strip()
@@ -394,6 +479,8 @@ init python:
 
     def hunter_club_sell_item(item_id, quantity=0):
         global money
+        global money
+        global money
 
         item_key = str(item_id or "").strip()
         item_obj = get_game_item(item_key)
@@ -420,6 +507,441 @@ init python:
             "total_price": total_price,
         }
 
+    def hunter_club_buy_item(item_id, quantity=1):
+
+        item_key = str(item_id or "").strip()
+        offer = hunter_club_offer_data(item_key)
+        item_obj = get_game_item(item_key)
+        qty = max(1, int(quantity or 1))
+
+        if not item_key or not offer or item_obj is None:
+            return {"ok": False, "text": "Луиза качает головой: такого товара у нее сейчас нет."}
+
+        total_cost = max(0, int(offer.get("price", getattr(item_obj, "price", 0)) or 0)) * qty
+        if int(money or 0) < total_cost:
+            return {"ok": False, "text": "У вас не хватает денег на эту покупку."}
+
+        for _unused_buy_unit in range(qty):
+            player.add_item(item_key)
+        money -= total_cost
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза отсчитывает вам {}. Покупка обходится в {} мараведи.".format(item_name, total_cost),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_cost": total_cost,
+        }
+
+    def hunter_club_sell_item(item_id, quantity=0):
+
+        item_key = str(item_id or "").strip()
+        item_obj = get_game_item(item_key)
+        available = int(player.item_count(item_key) or 0)
+        if item_obj is None or available <= 0:
+            return {"ok": False, "text": "Продавать сейчас нечего."}
+
+        price_each = max(0, int(getattr(item_obj, "price", 0) or 0))
+        if price_each <= 0:
+            return {"ok": False, "text": "Луиза не хочет брать это на продажу."}
+
+        qty = available if int(quantity or 0) <= 0 else min(available, max(1, int(quantity or 1)))
+        for _unused_sell_unit in range(qty):
+            player.remove_item(item_key)
+        total_price = price_each * qty
+        money += total_price
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза осматривает товар и платит вам {} мараведи за {}.".format(total_price, item_name),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_price": total_price,
+        }
+
+    def hunter_club_buy_item(item_id, quantity=1):
+
+        item_key = str(item_id or "").strip()
+        offer = hunter_club_offer_data(item_key)
+        item_obj = get_game_item(item_key)
+        qty = max(1, int(quantity or 1))
+
+        if not item_key or not offer or item_obj is None:
+            return {"ok": False, "text": "Луиза качает головой: такого товара у нее сейчас нет."}
+
+        total_cost = max(0, int(offer.get("price", getattr(item_obj, "price", 0)) or 0)) * qty
+        if int(money or 0) < total_cost:
+            return {"ok": False, "text": "У вас не хватает денег на эту покупку."}
+
+        for _unused_buy_unit in range(qty):
+            player.add_item(item_key)
+        money -= total_cost
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза отсчитывает вам {}. Покупка обходится в {} мараведи.".format(item_name, total_cost),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_cost": total_cost,
+        }
+
+    def hunter_club_sell_item(item_id, quantity=0):
+
+        item_key = str(item_id or "").strip()
+        item_obj = get_game_item(item_key)
+        available = int(player.item_count(item_key) or 0)
+        if item_obj is None or available <= 0:
+            return {"ok": False, "text": "Продавать сейчас нечего."}
+
+        price_each = max(0, int(getattr(item_obj, "price", 0) or 0))
+        if price_each <= 0:
+            return {"ok": False, "text": "Луиза не хочет брать это на продажу."}
+
+        qty = available if int(quantity or 0) <= 0 else min(available, max(1, int(quantity or 1)))
+        for _unused_sell_unit in range(qty):
+            player.remove_item(item_key)
+        total_price = price_each * qty
+        money += total_price
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза осматривает товар и платит вам {} мараведи за {}.".format(total_price, item_name),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_price": total_price,
+        }
+
+
+    def hunter_club_buy_item(item_id, quantity=1):
+
+        item_key = str(item_id or "").strip()
+        offer = hunter_club_offer_data(item_key)
+        item_obj = get_game_item(item_key)
+        qty = max(1, int(quantity or 1))
+
+        if not item_key or not offer or item_obj is None:
+            return {"ok": False, "text": "Луиза качает головой: такого товара у нее сейчас нет."}
+
+        total_cost = max(0, int(offer.get("price", getattr(item_obj, "price", 0)) or 0)) * qty
+        if int(player.economy.money or 0) < total_cost:
+            return {"ok": False, "text": "У вас не хватает денег на эту покупку."}
+
+        for _unused_buy_unit in range(qty):
+            _player_add_item_by_id(item_key)
+        player.spend_money(total_cost)
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза отсчитывает вам {}. Покупка обходится в {} мараведи.".format(item_name, total_cost),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_cost": total_cost,
+        }
+
+    def hunter_club_sell_item(item_id, quantity=0):
+
+        item_key = str(item_id or "").strip()
+        item_obj = get_game_item(item_key)
+        available = int(_player_item_count_by_id(item_key) or 0)
+        if item_obj is None or available <= 0:
+            return {"ok": False, "text": "Продавать сейчас нечего."}
+
+        price_each = max(0, int(getattr(item_obj, "price", 0) or 0))
+        if price_each <= 0:
+            return {"ok": False, "text": "Луиза не хочет брать это на продажу."}
+
+        qty = available if int(quantity or 0) <= 0 else min(available, max(1, int(quantity or 1)))
+        for _unused_sell_unit in range(qty):
+            _player_remove_item_by_id(item_key)
+        total_price = price_each * qty
+        money += total_price
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза осматривает товар и платит вам {} мараведи за {}.".format(total_price, item_name),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_price": total_price,
+        }
+
+    def hunter_club_buy_item(item_id, quantity=1):
+
+        item_key = str(item_id or "").strip()
+        offer = hunter_club_offer_data(item_key)
+        item_obj = get_game_item(item_key)
+        qty = max(1, int(quantity or 1))
+
+        if not item_key or not offer or item_obj is None:
+            return {"ok": False, "text": "Луиза качает головой: такого товара у нее сейчас нет."}
+
+        total_cost = max(0, int(offer.get("price", getattr(item_obj, "price", 0)) or 0)) * qty
+        if int(player.economy.money or 0) < total_cost:
+            return {"ok": False, "text": "У вас не хватает денег на эту покупку."}
+
+        for _unused_buy_unit in range(qty):
+            player.add_item(item_key)
+        player.spend_money(total_cost)
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза отсчитывает вам {}. Покупка обходится в {} мараведи.".format(item_name, total_cost),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_cost": total_cost,
+        }
+
+    def hunter_club_sell_item(item_id, quantity=0):
+
+        item_key = str(item_id or "").strip()
+        item_obj = get_game_item(item_key)
+        available = int(player.item_count(item_key) or 0)
+        if item_obj is None or available <= 0:
+            return {"ok": False, "text": "Продавать сейчас нечего."}
+
+        price_each = max(0, int(getattr(item_obj, "price", 0) or 0))
+        if price_each <= 0:
+            return {"ok": False, "text": "Луиза не хочет брать это на продажу."}
+
+        qty = available if int(quantity or 0) <= 0 else min(available, max(1, int(quantity or 1)))
+        for _unused_sell_unit in range(qty):
+            player.remove_item(item_key)
+        total_price = price_each * qty
+        money += total_price
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза осматривает товар и платит вам {} мараведи за {}.".format(total_price, item_name),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_price": total_price,
+        }
+
+    def hunter_club_buy_item(item_id, quantity=1):
+
+        item_key = str(item_id or "").strip()
+        offer = hunter_club_offer_data(item_key)
+        item_obj = get_game_item(item_key)
+        qty = max(1, int(quantity or 1))
+
+        if not item_key or not offer or item_obj is None:
+            return {"ok": False, "text": "Луиза качает головой: такого товара у нее сейчас нет."}
+
+        total_cost = max(0, int(offer.get("price", getattr(item_obj, "price", 0)) or 0)) * qty
+        if int(player.economy.money or 0) < total_cost:
+            return {"ok": False, "text": "У вас не хватает денег на эту покупку."}
+
+        for _unused_buy_unit in range(qty):
+            player.add_item(item_key)
+        player.spend_money(total_cost)
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза отсчитывает вам {}. Покупка обходится в {} мараведи.".format(item_name, total_cost),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_cost": total_cost,
+        }
+
+    def hunter_club_sell_item(item_id, quantity=0):
+
+        item_key = str(item_id or "").strip()
+        item_obj = get_game_item(item_key)
+        available = int(player.item_count(item_key) or 0)
+        if item_obj is None or available <= 0:
+            return {"ok": False, "text": "Продавать сейчас нечего."}
+
+        price_each = max(0, int(getattr(item_obj, "price", 0) or 0))
+        if price_each <= 0:
+            return {"ok": False, "text": "Луиза не хочет брать это на продажу."}
+
+        qty = available if int(quantity or 0) <= 0 else min(available, max(1, int(quantity or 1)))
+        for _unused_sell_unit in range(qty):
+            player.remove_item(item_key)
+        total_price = price_each * qty
+        player.add_money(total_price)
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза осматривает товар и платит вам {} мараведи за {}.".format(total_price, item_name),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_price": total_price,
+        }
+
+
+    def hunter_club_buy_item(item_id, quantity=1):
+
+        item_key = str(item_id or "").strip()
+        offer = hunter_club_offer_data(item_key)
+        item_obj = get_game_item(item_key)
+        qty = max(1, int(quantity or 1))
+
+        if not item_key or not offer or item_obj is None:
+            return {"ok": False, "text": "Луиза качает головой: такого товара у нее сейчас нет."}
+
+        total_cost = max(0, int(offer.get("price", getattr(item_obj, "price", 0)) or 0)) * qty
+        if int(player.economy.money or 0) < total_cost:
+            return {"ok": False, "text": "У вас не хватает денег на эту покупку."}
+
+        for _unused_buy_unit in range(qty):
+            _player_add_item_by_id(item_key)
+        player.spend_money(total_cost)
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза отсчитывает вам {}. Покупка обходится в {} мараведи.".format(item_name, total_cost),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_cost": total_cost,
+        }
+
+    def hunter_club_sell_item(item_id, quantity=0):
+
+        item_key = str(item_id or "").strip()
+        item_obj = get_game_item(item_key)
+        available = int(_player_item_count_by_id(item_key) or 0)
+        if item_obj is None or available <= 0:
+            return {"ok": False, "text": "Продавать сейчас нечего."}
+
+        price_each = max(0, int(getattr(item_obj, "price", 0) or 0))
+        if price_each <= 0:
+            return {"ok": False, "text": "Луиза не хочет брать это на продажу."}
+
+        qty = available if int(quantity or 0) <= 0 else min(available, max(1, int(quantity or 1)))
+        for _unused_sell_unit in range(qty):
+            _player_remove_item_by_id(item_key)
+        total_price = price_each * qty
+        player.add_money(total_price)
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза осматривает товар и платит вам {} мараведи за {}.".format(total_price, item_name),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_price": total_price,
+        }
+
+    def hunter_club_buy_item(item_id, quantity=1):
+
+        item_key = str(item_id or "").strip()
+        offer = hunter_club_offer_data(item_key)
+        item_obj = get_game_item(item_key)
+        qty = max(1, int(quantity or 1))
+
+        if not item_key or not offer or item_obj is None:
+            return {"ok": False, "text": "Луиза качает головой: такого товара у нее сейчас нет."}
+
+        total_cost = max(0, int(offer.get("price", getattr(item_obj, "price", 0)) or 0)) * qty
+        if int(player.economy.money or 0) < total_cost:
+            return {"ok": False, "text": "У вас не хватает денег на эту покупку."}
+
+        for _unused_buy_unit in range(qty):
+            player.add_item(item_key)
+        player.spend_money(total_cost)
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза отсчитывает вам {}. Покупка обходится в {} мараведи.".format(item_name, total_cost),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_cost": total_cost,
+        }
+
+    def hunter_club_sell_item(item_id, quantity=0):
+
+        item_key = str(item_id or "").strip()
+        item_obj = get_game_item(item_key)
+        available = int(player.item_count(item_key) or 0)
+        if item_obj is None or available <= 0:
+            return {"ok": False, "text": "Продавать сейчас нечего."}
+
+        price_each = max(0, int(getattr(item_obj, "price", 0) or 0))
+        if price_each <= 0:
+            return {"ok": False, "text": "Луиза не хочет брать это на продажу."}
+
+        qty = available if int(quantity or 0) <= 0 else min(available, max(1, int(quantity or 1)))
+        for _unused_sell_unit in range(qty):
+            player.remove_item(item_key)
+        total_price = price_each * qty
+        player.add_money(total_price)
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза осматривает товар и платит вам {} мараведи за {}.".format(total_price, item_name),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_price": total_price,
+        }
+
+    def hunter_club_buy_item(item_id, quantity=1):
+
+        item_key = str(item_id or "").strip()
+        offer = hunter_club_offer_data(item_key)
+        item_obj = get_game_item(item_key)
+        qty = max(1, int(quantity or 1))
+
+        if not item_key or not offer or item_obj is None:
+            return {"ok": False, "text": "Луиза качает головой: такого товара у нее сейчас нет."}
+
+        total_cost = max(0, int(offer.get("price", getattr(item_obj, "price", 0)) or 0)) * qty
+        if int(player.economy.money or 0) < total_cost:
+            return {"ok": False, "text": "У вас не хватает денег на эту покупку."}
+
+        for _unused_buy_unit in range(qty):
+            player.add_item(item_key)
+        player.spend_money(total_cost)
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза отсчитывает вам {}. Покупка обходится в {} мараведи.".format(item_name, total_cost),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_cost": total_cost,
+        }
+
+    def hunter_club_sell_item(item_id, quantity=0):
+
+        item_key = str(item_id or "").strip()
+        item_obj = get_game_item(item_key)
+        available = int(player.item_count(item_key) or 0)
+        if item_obj is None or available <= 0:
+            return {"ok": False, "text": "Продавать сейчас нечего."}
+
+        price_each = max(0, int(getattr(item_obj, "price", 0) or 0))
+        if price_each <= 0:
+            return {"ok": False, "text": "Луиза не хочет брать это на продажу."}
+
+        qty = available if int(quantity or 0) <= 0 else min(available, max(1, int(quantity or 1)))
+        for _unused_sell_unit in range(qty):
+            player.remove_item(item_key)
+        total_price = price_each * qty
+        player.add_money(total_price)
+
+        item_name = str(getattr(item_obj, "name", item_key) or item_key)
+        return {
+            "ok": True,
+            "text": "Толстая Луиза осматривает товар и платит вам {} мараведи за {}.".format(total_price, item_name),
+            "item_id": item_key,
+            "quantity": qty,
+            "total_price": total_price,
+        }
+
+
     HunterClubRoom = Room(
         code_name="HunterClub",
         group_name=ROOM_GROUP_CITY,
@@ -432,7 +954,7 @@ init python:
             ),
         ],
         exits=[
-            RoomExit(label="Вернуться на рынок", target="MarketPlace"),
+            RoomExit(label="Вернуться на рынок", target="MarketPlace", minutes_to_pass=10),
         ],
         game_items=[
             GameObject(
@@ -451,7 +973,6 @@ init python:
                 description="На полках лежат веревки, факелы, кремни, стрелы, дробь, порох, масло для оружия и другие полезные вещи для лесной вылазки.",
                 actions=[
                     ObjectAction(action_id="inspect_goods", label="Осмотреть товары", hook="text", target="Среди запасов хватает полезного: стрелы, дробь, ловушки, веревки, факелы, порох, оружейное масло, собачьи кости и даже кружки дешевого эля."),
-                    ObjectAction(action_id="buy_hunter_goods", label="Купить товары", hook="call", target="HunterClubBuyMenu"),
                 ],
             ),
             GameObject(
@@ -481,127 +1002,100 @@ init python:
         custom_properties={
             "shop_feature": "hunter_club",
             "object_menu_label": "HunterClubObjectMenu",
+            "object_menu_label": "HunterClubObjectMenu",
+            "object_menu_label": "HunterClubObjectMenu",
             "bg_picture_by_time": {
                 3: "images/general/hunter_store_2.png",
             },
         },
     )      
 
-
-default HunterClubTradeMode = ""
-default HunterClubTradeSelection = {}
-default HunterClubVar = {}
-
-
-screen hunter_club_trade_overlay():
-    zorder 120
-
+screen hunter_club_trade_panel():
     $ _mode = str(HunterClubTradeMode or "buy").strip().lower()
     $ _entries = list(hunter_club_trade_entries(_mode) or [])
-    $ _textbox_h = int(getattr(gui, "textbox_height", 278))
-    $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
-    $ _left_w = int((config.screen_width - 36) * 0.72)
-    $ _left_h = _usable_h - 24
-    $ _title = "ПОКУПКА В ОХОТНИЧЬЕМ КЛУБЕ" if _mode == "buy" else "ПРОДАЖА В ОХОТНИЧЬЕМ КЛУБЕ"
 
-    fixed:
-        xpos 12
-        ypos 12
-        xsize _left_w
-        ysize _left_h
+    vbox:
+        xfill True
+        spacing 8
 
-        add Transform("images/rpg_message_bg.png", fit="cover")
+        text hunter_club_trade_summary_text(_mode) size 17
 
-        viewport:
-            xpos 28
-            ypos 24
-            xsize _left_w - 56
-            ysize _left_h - 48
-            draggable True
-            mousewheel True
+        hbox:
+            spacing 8
+            textbutton ("Подтвердить покупку" if _mode == "buy" else "Подтвердить продажу"):
+                text_size 16
+                action Call("HunterClubApplyTrade", _mode)
+            textbutton "Сбросить выбор":
+                text_size 16
+                action Function(hunter_club_trade_reset, _mode)
+            textbutton "Назад":
+                text_size 16
+                action [
+                    SetVariable("current_action_title", "Действия"),
+                    SetVariable("current_action_content", None),
+                    SetVariable("current_action_items", hunter_club_action_items()),
+                    Function(main_ui_restart_interaction),
+                ]
 
-            vbox:
-                spacing 14
+        if len(_entries) <= 0:
+            text "Список пуст." size 18
+        else:
+            for _entry in _entries:
+                $ _item_id = str(_entry.get("item_id", "") or "")
+                $ _qty = hunter_club_trade_selected_qty(_item_id)
+                $ _price = int(_entry.get("price", 0) or 0)
+                $ _max_qty = int(_entry.get("max_qty", 0) or 0)
 
-                text _title size 30 color "#1e130c" xalign 0.5
-                text hunter_club_trade_summary_text(_mode) size 18 color "#2d1d12"
+                frame:
+                    xfill True
+                    padding (6, 4)
 
-                if len(_entries) <= 0:
-                    text "Список пуст." size 22 color "#5a3a24"
-                else:
-                    for _entry in _entries:
-                        $ _item_id = str(_entry.get("item_id", "") or "")
-                        $ _qty = hunter_club_trade_selected_qty(_item_id)
-                        $ _price = int(_entry.get("price", 0) or 0)
-                        $ _max_qty = int(_entry.get("max_qty", 0) or 0)
-                        $ _owned_qty = int(_entry.get("owned_qty", 0) or 0)
-                        $ _line_total = _price * _qty
+                    vbox:
+                        spacing 4
+                        text str(_entry.get("name", "") or _item_id) size 18
+                        text "[_price] мараведи за штуку" size 14
 
-                        frame:
-                            xfill True
-                            padding (10, 8)
-                            background "#f5ead3"
-
-                            hbox:
-                                xfill True
-                                spacing 14
-
-                                vbox:
-                                    xmaximum int((_left_w - 80) * 0.52)
-                                    spacing 4
-                                    text str(_entry.get("name", "") or _item_id) size 22 color "#1e130c"
-                                    if _mode == "buy":
-                                        text "Цена: [str(_price)] мараведи. Можно взять до [str(_max_qty)]." size 17 color "#2d1d12"
-                                    else:
-                                        text "Цена: [str(_price)] мараведи. У вас: [str(_owned_qty)]." size 17 color "#2d1d12"
-
-                                hbox:
-                                    spacing 10
-                                    xalign 1.0
-
-                                    textbutton "-":
-                                        xminimum 48
-                                        text_size 20
-                                        sensitive _qty > 0
-                                        action Function(hunter_club_trade_change_qty, _item_id, -1, _mode)
-
-                                    text "[_qty]" size 24 color "#1e130c" xalign 0.5 yalign 0.5
-
-                                    textbutton "+":
-                                        xminimum 48
-                                        text_size 20
-                                        sensitive _qty < _max_qty
-                                        action Function(hunter_club_trade_change_qty, _item_id, 1, _mode)
-
-                                    vbox:
-                                        xminimum 160
-                                        spacing 2
-                                        text "Сумма" size 16 color "#5a3a24" xalign 0.5
-                                        text str(_line_total) + " мараведи" size 20 color "#1e130c" xalign 0.5
+                        hbox:
+                            spacing 8
+                            textbutton "-":
+                                text_size 18
+                                sensitive _qty > 0
+                                action Function(hunter_club_trade_change_qty, _item_id, -1, _mode)
+                            text "[_qty]" size 18 yalign 0.5
+                            textbutton "+":
+                                text_size 18
+                                sensitive _qty < _max_qty
+                                action Function(hunter_club_trade_change_qty, _item_id, 1, _mode)
+                            text "Итого: [int(_price * _qty)]" size 15 yalign 0.5
 
 label HunterClub:
     $ CurrentRoom = HunterClubRoom
     $ CurLoc = "HunterClub"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
         vscene scene_image
     $ current_action_title = "Действия"
     $ current_action_content = None
-    $ current_action_items = []
+    $ current_action_items = [
+        MenuItem("Подтвердить продажу", Call("HunterClubApplyTrade", "sell")),
+        MenuItem("Сбросить выбор", Function(hunter_club_trade_reset, "sell")),
+        MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]),
+    ]
     $ current_girl_key = ""
     $ current_object_id = ""
 
     if not HunterClubRoom.is_open():
         $ MainTxt = HunterClubRoom.schedule.closed_text
         $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
-        $ _hunter_closed_ui_return = None
-        while _hunter_closed_ui_return is None:
+        $ current_action_items = HunterClubRoom.build_exit_items()
+        while True:
             call screen main_ui
-            $ _hunter_closed_ui_return = _return
-        jump HunterClub
 
     $ MainTxt = hunter_club_main_text()
     $ CurLocDesc = MainTxt
@@ -609,22 +1103,20 @@ label HunterClub:
         call HunterClubFirstVisit
     elif int(Clara.var.get("escape_confessed", 0) or 0) == 1 and int(Mongol.var.get("StocksArrestDay", -1) or -1) < 0:
         call preEvent("claraBookletMarket")
-        if thread is not None and int(thread.num or 0) < 4:
-            $ thread.advanceTo(4, force_active=True)
+        if event_runtime.active_thread is not None and int(thread.num or 0) < 4:
+            $ event_runtime.active_thread.advanceTo(4, force_active=True)
         call story_clara_market_booklet_5
     elif story_event_available("HunterClub", "overheard"):
         call checkTriggers("HunterClub", "overheard", 0)
-    call HunterClubBuildActions
-    $ _hunter_ui_return = None
-    while _hunter_ui_return is None:
+
+    $ current_action_items = HunterClubRoom.build_action_items() + HunterClubRoom.build_exit_items()
+    while True:
         call screen main_ui
-        $ _hunter_ui_return = _return
-    jump HunterClub
 
 
 label HunterClubFirstVisit:
-    $ HunterClubVar["first_visit_seen"] = 1
-    $ scene_image ="images/general/hunter_store_2.png"
+    $ HunterClubRoom.state["first_visit_seen"] = 1
+    $ scene_image = "images/general/hunter_store_2.png"
     $ _layout_last_picture = scene_image
     vscene scene_image
     $ MainTxt = (
@@ -643,24 +1135,72 @@ label HunterClubBuildActions:
     hide screen hunter_club_trade_overlay
     $ current_action_title = "Действия"
     $ current_action_content = None
-    $ current_action_items = []
+    $ current_action_items = [
+        MenuItem("Подтвердить продажу", Call("HunterClubApplyTrade", "sell")),
+        MenuItem("Сбросить выбор", Function(hunter_club_trade_reset, "sell")),
+        MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]),
+    ]
     $ findAvailableEvents(True)
 
     python:
-        current_action_items.append(MenuItem("Купить товары", Call("HunterClubBuyMenu")))
-        current_action_items.append(MenuItem("Продать добычу", Call("HunterClubSellMenu")))
-        current_action_items.append(MenuItem("Поговорить с Луизой", Call("HunterClubLuiseTalk")))
         for _club_object in HunterClubRoom.visible_objects():
             current_action_items.append(MenuItem(_club_object.name, Call("HunterClubObjectMenu", _club_object.object_id)))
         if story_event_available("HunterClub", "overheard"):
             current_action_items.append(MenuItem("Подслушать охотников у стены", Call("checkTriggers", "HunterClub", "overheard", 0)))
         for _club_exit in HunterClubRoom.visible_exits():
-            current_action_items.append(MenuItem(_club_exit.label, Jump(_club_exit.target)))
+            current_action_items.append(MenuItem(_club_exit.label, Call("MoveToRoom", _club_exit.target, 10)))
+    return
+
+
+label HunterClubBuildActions:
+    hide screen hunter_club_trade_overlay
+    $ current_action_title = "Действия"
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Подтвердить продажу", Call("HunterClubApplyTrade", "sell")),
+        MenuItem("Сбросить выбор", Function(hunter_club_trade_reset, "sell")),
+        MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]),
+    ]
+    $ findAvailableEvents(True)
+
+    python:
+        for _club_object in HunterClubRoom.visible_objects():
+            current_action_items.append(MenuItem(_club_object.name, Call("HunterClubObjectMenu", _club_object.object_id)))
+        if story_event_available("HunterClub", "overheard"):
+            current_action_items.append(MenuItem("Подслушать охотников у стены", Call("checkTriggers", "HunterClub", "overheard", 0)))
+        for _club_exit in HunterClubRoom.visible_exits():
+            current_action_items.append(MenuItem(_club_exit.label, Call("MoveToRoom", _club_exit.target, 10)))
+    return
+
+
+label HunterClubBuildActions:
+    hide screen hunter_club_trade_overlay
+    $ current_action_title = "Действия"
+    $ current_action_content = None
+    $ current_action_items = []
+    $ findAvailableEvents(True)
+
+    python:
+        for _club_object in HunterClubRoom.visible_objects():
+            current_action_items.append(MenuItem(_club_object.name, Call("HunterClubObjectMenu", _club_object.object_id)))
+        if story_event_available("HunterClub", "overheard"):
+            current_action_items.append(MenuItem("Подслушать охотников у стены", Call("checkTriggers", "HunterClub", "overheard", 0)))
+        for _club_exit in HunterClubRoom.visible_exits():
+            current_action_items.append(MenuItem(_club_exit.label, Call("MoveToRoom", _club_exit.target, 10)))
     return
 
 
 label HunterClubObjectMenu(object_id=""):
-    hide screen hunter_club_trade_overlay
     $ _club_object = None
     python:
         for _room_object in HunterClubRoom.visible_objects():
@@ -669,47 +1209,126 @@ label HunterClubObjectMenu(object_id=""):
                 break
 
     if _club_object is None:
-        call HunterClubBuildActions
+        $ current_action_title = "Действия"
+        $ current_action_content = None
+        elif story_event_available("HunterClub", "overheard"):
+        call checkTriggers("HunterClub", "overheard", 0)
+    call HunterClubBuildActions
         return
 
-    $ MainTxt = _club_object.description
+    $ MainTxt = str(_club_object.description or "")
     $ CurLocDesc = MainTxt
-    $ current_action_title = _club_object.name
+    $ current_action_title = str(_club_object.name or "Действия")
     $ current_action_content = None
-    $ current_action_items = []
-
+    $ current_action_items = [
+        MenuItem("Подтвердить покупку", Call("HunterClubApplyTrade", "buy")),
+        MenuItem("Сбросить выбор", Function(hunter_club_trade_reset, "buy")),
+        MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]),
+    ]
     python:
         for _club_action in _club_object.visible_actions():
-            if _club_action.hook == "text":
-                current_action_items.append(MenuItem(_club_action.label, Call("HunterClubObjectText", object_id, _club_action.action_id)))
-            elif _club_action.hook == "call" and str(_club_action.target or "") != "":
-                _club_args = tuple(getattr(_club_action, "args", ()) or ())
-                current_action_items.append(MenuItem(_club_action.label, Call(_club_action.target, *_club_args)))
-            elif _club_action.hook == "jump" and str(_club_action.target or "") != "":
-                current_action_items.append(MenuItem(_club_action.label, Jump(_club_action.target)))
-
-    $ current_action_items.append(MenuItem("Назад", Jump("HunterClub")))
+            _club_menu_item = room_action_menu_item(_club_action)
+            if _club_menu_item is not None:
+                current_action_items.append(_club_menu_item)
+        current_action_items.append(MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]))
     return
 
 
-label HunterClubObjectText(object_id="", action_id=""):
+label HunterClubObjectMenu(object_id=""):
+    $ _club_object = None
     python:
-        _club_text = ""
-        _club_name = ""
         for _room_object in HunterClubRoom.visible_objects():
-            if getattr(_room_object, "object_id", "") != str(object_id or ""):
-                continue
-            _club_name = str(getattr(_room_object, "name", "") or "")
-            for _club_action in _room_object.visible_actions():
-                if getattr(_club_action, "action_id", "") == str(action_id or ""):
-                    _club_text = str(_club_action.target or "")
-                    break
-            break
-        if _club_text:
-            MainTxt = _club_text
-            CurLocDesc = _club_text
-            current_action_title = _club_name or "Действия"
-    call HunterClubObjectMenu(object_id)
+            if getattr(_room_object, "object_id", "") == str(object_id or ""):
+                _club_object = _room_object
+                break
+
+    if _club_object is None:
+        $ current_action_title = "Действия"
+        $ current_action_content = None
+        elif story_event_available("HunterClub", "overheard"):
+        call checkTriggers("HunterClub", "overheard", 0)
+    call HunterClubBuildActions
+        return
+
+    $ MainTxt = str(_club_object.description or "")
+    $ CurLocDesc = MainTxt
+    $ current_action_title = str(_club_object.name or "Действия")
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Подтвердить покупку", Call("HunterClubApplyTrade", "buy")),
+        MenuItem("Сбросить выбор", Function(hunter_club_trade_reset, "buy")),
+        MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]),
+    ]
+    python:
+        for _club_action in _club_object.visible_actions():
+            _club_menu_item = room_action_menu_item(_club_action)
+            if _club_menu_item is not None:
+                current_action_items.append(_club_menu_item)
+        current_action_items.append(MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]))
+    return
+
+
+label HunterClubObjectMenu(object_id=""):
+    $ _club_object = None
+    python:
+        for _room_object in HunterClubRoom.visible_objects():
+            if getattr(_room_object, "object_id", "") == str(object_id or ""):
+                _club_object = _room_object
+                break
+
+    if _club_object is None:
+        $ current_action_title = "Действия"
+        $ current_action_content = None
+        elif story_event_available("HunterClub", "overheard"):
+        call checkTriggers("HunterClub", "overheard", 0)
+    call HunterClubBuildActions
+        return
+
+    $ MainTxt = str(_club_object.description or "")
+    $ CurLocDesc = MainTxt
+    $ current_action_title = str(_club_object.name or "Действия")
+    $ current_action_content = None
+    $ current_action_items = [
+        MenuItem("Подтвердить покупку", Call("HunterClubApplyTrade", "buy")),
+        MenuItem("Сбросить выбор", Function(hunter_club_trade_reset, "buy")),
+        MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]),
+    ]
+    python:
+        for _club_action in _club_object.visible_actions():
+            _club_menu_item = room_action_menu_item(_club_action)
+            if _club_menu_item is not None:
+                current_action_items.append(_club_menu_item)
+        current_action_items.append(MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]))
     return
 
 
@@ -721,7 +1340,12 @@ label HunterClubLuiseTalk:
     $ current_action_items = [
         MenuItem("Закупиться для охоты", Call("HunterClubBuyMenu")),
         MenuItem("Подать добычу", Call("HunterClubSellMenu")),
-        MenuItem("Назад", Jump("HunterClub")),
+        MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]),
     ]
     return
 
@@ -733,7 +1357,12 @@ label HunterClubNewsMenu:
     $ CurLocDesc = MainTxt
     $ current_action_items = [
         MenuItem("Посмотреть охотничьи вызовы", Call("HunterClubChallengesMenu")),
-        MenuItem("Назад", Jump("HunterClub")),
+        MenuItem("Назад", [
+            SetVariable("current_action_title", "Действия"),
+            SetVariable("current_action_content", None),
+            SetVariable("current_action_items", hunter_club_action_items()),
+            Function(main_ui_restart_interaction),
+        ]),
     ]
     return
 
@@ -745,18 +1374,7 @@ label HunterClubChallengesMenu(result_text=""):
     if MainTxt == "":
         $ MainTxt = "Луиза кивает на доску: \"Кто приносит трофеи, того тут запоминают. Деньги деньгами, а имя среди охотников тоже чего-то стоит.\""
     $ CurLocDesc = MainTxt
-    $ current_action_items = []
-    python:
-        for _challenge in list(HUNTER_CLUB_CHALLENGES or []):
-            _caption = hunter_club_challenge_caption(_challenge)
-            _challenge_id = str(_challenge.get("id", "") or "")
-            if hunter_club_challenge_available(_challenge):
-                current_action_items.append(MenuItem(_caption, Call("HunterClubChallengeApply", _challenge_id)))
-            elif not hunter_club_challenge_completed(_challenge_id):
-                current_action_items.append(MenuItem(_caption, Call("HunterClubChallengeMissing", _challenge_id)))
-        if len(current_action_items) <= 0:
-            current_action_items.append(MenuItem("Все доступные вызовы уже закрыты", Call("HunterClubNewsMenu")))
-        current_action_items.append(MenuItem("Назад", Jump("HunterClub")))
+    $ current_action_items = hunter_club_challenge_items()
     return
 
 
@@ -766,7 +1384,7 @@ label HunterClubChallengeMissing(challenge_id=""):
     if _challenge:
         $ MainTxt = "Луиза смотрит на доску и качает головой: \"Сначала принеси то, что там написано. Тут словам не верят, тут трофеи кладут на стол.\""
     $ CurLocDesc = MainTxt
-    call HunterClubChallengesMenu(MainTxt)
+    $ current_action_items = hunter_club_challenge_items()
     return
 
 
@@ -774,71 +1392,27 @@ label HunterClubChallengeApply(challenge_id=""):
     $ _challenge_result = hunter_club_apply_challenge(challenge_id)
     $ MainTxt = str(_challenge_result.get("text", "") or "")
     $ CurLocDesc = MainTxt
-    call stat
-    call HunterClubChallengesMenu(MainTxt)
+    $ current_action_items = hunter_club_challenge_items()
     return
 
 
 label HunterClubBuyMenu:
     $ hunter_club_trade_reset("buy")
-    show screen hunter_club_trade_overlay
     $ current_action_title = "Покупка"
-    $ current_action_content = None
+    $ current_action_content = "hunter_club_trade_panel"
     $ MainTxt = "Толстая Луиза показывает вам охотничьи припасы, лесной инструмент и прочие полезные вещи. Выберите товар и сразу укажите количество."
     $ CurLocDesc = MainTxt
-    $ current_action_items = [
-        MenuItem("Подтвердить покупку", Call("HunterClubApplyTrade", "buy")),
-        MenuItem("Сбросить выбор", Call("HunterClubResetTrade", "buy")),
-        MenuItem("Назад", Call("HunterClubRestore")),
-    ]
-    return
-
-
-label HunterClubBuyApply(item_id=""):
-    $ _buy_result = hunter_club_buy_item(item_id, 1)
-    $ MainTxt = str(_buy_result.get("text", "") or "")
-    $ CurLocDesc = MainTxt
-    call stat
-    call HunterClubBuildActions
+    $ current_action_items = []
     return
 
 
 label HunterClubSellMenu:
     $ hunter_club_trade_reset("sell")
-    show screen hunter_club_trade_overlay
     $ current_action_title = "Продажа"
-    $ current_action_content = None
+    $ current_action_content = "hunter_club_trade_panel"
     $ MainTxt = "Толстуха Луиза готова принять шкуры, когти, мясо, травы и прочую лесную добычу. Отметьте нужное и укажите количество."
     $ CurLocDesc = MainTxt
-    $ current_action_items = [
-        MenuItem("Подтвердить продажу", Call("HunterClubApplyTrade", "sell")),
-        MenuItem("Сбросить выбор", Call("HunterClubResetTrade", "sell")),
-        MenuItem("Назад", Call("HunterClubRestore")),
-    ]
-    return
-
-
-label HunterClubSellApply(item_id=""):
-    $ _sell_result = hunter_club_sell_item(item_id, 0)
-    $ MainTxt = str(_sell_result.get("text", "") or "")
-    $ CurLocDesc = MainTxt
-    call stat
-    call HunterClubBuildActions
-    return
-
-
-label HunterClubRestore:
-    $ hunter_club_restore_scene_state()
-    call HunterClubBuildActions
-    return
-
-
-label HunterClubResetTrade(mode="buy"):
-    $ hunter_club_trade_reset(mode)
-    if str(mode or "buy") == "sell":
-        call HunterClubSellMenu
-        return
-    call HunterClubBuyMenu
+    $ current_action_items = []
     return
 
 
@@ -847,11 +1421,6 @@ label HunterClubApplyTrade(mode="buy"):
     $ _trade_result = hunter_club_apply_trade(_trade_mode)
     $ MainTxt = str(_trade_result.get("text", "") or "")
     $ CurLocDesc = MainTxt
-    call stat
     if bool(_trade_result.get("ok", False)):
         $ hunter_club_trade_reset(_trade_mode)
-    if _trade_mode == "sell":
-        call HunterClubSellMenu
-        return
-    call HunterClubBuyMenu
     return

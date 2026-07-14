@@ -207,16 +207,16 @@ define gui.quick_button_text_selected_color = gui.accent_color
 ##
 ## Choice buttons are used in the in-game menus.
 
-define gui.choice_button_width = 452
+define gui.choice_button_width = 460
 define gui.choice_button_height = None
 define gui.choice_button_tile = False
-define gui.choice_button_borders = Borders(20, 8, 20, 8)
+define gui.choice_button_borders = Borders(0, 0, 0, 0)
 define gui.choice_button_text_font = gui.text_font
-define gui.choice_button_text_size = gui.text_size
+define gui.choice_button_text_size = 20
 define gui.choice_button_text_xalign = 0.0
-define gui.choice_button_text_idle_color = '#888888'
+define gui.choice_button_text_idle_color = "#c90"
 define gui.choice_button_text_hover_color = "#ffffff"
-define gui.choice_button_text_insensitive_color = '#8888887f'
+define gui.choice_button_text_insensitive_color = "#444444"
 
 
 ## File Slot Buttons ###########################################################
@@ -284,7 +284,7 @@ define gui.main_menu_text_xalign = 1.0
 
 ## Frames ######################################################################
 ##
-## These variables control the look of frames that can contain user interface
+## These variables control the player.stats.look of frames that can contain user interface
 ## components when an overlay or window is not present.
 
 ## Generic frames.
@@ -305,7 +305,7 @@ define gui.frame_tile = False
 
 ## Bars, Scrollbars, and Sliders ###############################################
 ##
-## These control the look and size of bars, scrollbars, and sliders.
+## These control the player.stats.look and size of bars, scrollbars, and sliders.
 ##
 ## The default GUI only uses sliders and vertical scrollbars. All of the other
 ## bars are only used in creator-written screens.

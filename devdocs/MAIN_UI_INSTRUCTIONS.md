@@ -4,10 +4,13 @@ This document defines the required behavior for the main gameplay UI.
 
 ## Source of Truth
 
-- UI layout/spec source of truth: `devdocs/mainUI_screen_template.txt`.
+- Documentation entry point: `devdocs/README.md`.
+- UI architecture source of truth:
+  - `devdocs/EventThreadInstruction/FAMILY_LIFE_HUD_MENU_PATTERN.md`
+  - `devdocs/HUD_MENU_CARD_STANDARD.md`
 - Runtime implementation files:
-  - `game/Inn/my_layouts/main_layout.rpy`
-  - `game/Inn/my_layouts/layout_logic.rpy`
+  - `game/Utilities/General/Screens/main_layout.rpy`
+  - `game/Utilities/General/Screens/build_room_action_items.rpy`
 
 ## Rendering Contract
 
@@ -55,6 +58,8 @@ This document defines the required behavior for the main gameplay UI.
 - Avoid `globals()` in UI flow where store helpers are available.
 - Do not use Python `renpy.call/renpy.jump` in python blocks.
 - Keep flow in script labels (`call`, `jump`, `call expression ... pass (...)`).
+- Do not add refresh/rebuild/apply/renew labels or dispatcher layers to make the
+  UI redraw. Return or jump to the real owner label.
 
 ## Constraints
 

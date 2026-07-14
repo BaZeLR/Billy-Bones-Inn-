@@ -1,5 +1,11 @@
 # Tavern + Shops Test Plan
 
+> REFERENCE ONLY / OLD TEST PLAN.
+>
+> Do not use old time-slot or "actions per time slot" rules from this file as
+> current architecture. Current venue/shop checks use clock hour/minute and
+> weekdays from the calendar model.
+
 ## Scope
 - Tavern daily event queue and dispatch.
 - Location picture update after navigation jump.
@@ -8,7 +14,7 @@
   - Wine shop (`Clara`/`Alber`)
   - Tailor (`Irma`)
   - Carpenter (`Draupnir`)
-- Time-turn rule: **4 actions per time slot**.
+- Time rule: actions advance explicit clock minutes through the calendar model.
 
 ## In-Game Entry
 1. Start game.

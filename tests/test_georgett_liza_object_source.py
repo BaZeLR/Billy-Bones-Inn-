@@ -3,12 +3,15 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 GEORGETT_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Georgett" / "InitGeorgett.rpy"
+GEORGETT_EVENTS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Georgett" / "GeorgettEvents.rpy"
 LIZA_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Liza" / "InitLiza.rpy"
+LIZA_EVENTS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Liza" / "LizaEvents.rpy"
 GEORGETT_TALK = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Georgett" / "IntGeorgettTalk.rpy"
 LIZA_TALK = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Liza" / "IntLizaTalk.rpy"
 PORT_STREETS = PROJECT_ROOT / "game" / "Town" / "PortStreets.rpy"
 STREET_CLIENTS = PROJECT_ROOT / "game" / "Utilities" / "General" / "Sex" / "StreetClients.rpy"
 STORY_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy"
+EVENTS = PROJECT_ROOT / "game" / "Utilities" / "General" / "Events" / "events.rpy"
 GEORGETT_CHURCH = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Georgett" / "IntGeorgettAfterCermon.rpy"
 GEORGETT_CHURCH_EVENTS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Georgett" / "InitGeorgettChurch.rpy"
 LIZA_CHURCH = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Liza" / "IntLizettAfterCermon.rpy"
@@ -121,6 +124,8 @@ def test_georgett_liza_hired_flag_is_runtime_state_and_syncs_jobs():
         assert 'self.jobs["jobWhoreAvail"] = 1 if self.hired else 0' in source
         assert 'self.jobs["jobwhore"] = 1 if self.hired else 0' in source
         assert 'self.current_location = "TavernMain" if self.hired else "PortStreets"' in source
+        assert 'if scheduled_location != "TavernMain":' in source
+        assert 'self.location = ""' in source
         assert "def can_work_tavern(self):" in source
         assert "return self.hired" in source
 
@@ -162,6 +167,8 @@ def test_georgett_liza_talk_labels_use_class_topic_state():
     assert "label IntLizaTalkMenu" in liza
     assert "label IntLizaTalkRefresh" not in liza
     assert "label IntLizaTalkApply" not in liza
+    assert "current_action_items" not in liza
+    assert "MenuItem(" not in liza
     assert "choice_code" not in liza
     assert "LizaVar.setdefault" not in liza
     assert "GeorgettVar.setdefault" not in liza
@@ -171,7 +178,9 @@ def test_georgett_liza_talk_labels_use_class_topic_state():
 
 def test_portstreets_clients_are_repeatable_action_events_from_classes():
     georgett = _source(GEORGETT_INIT)
+    georgett_events = _source(GEORGETT_EVENTS)
     liza = _source(LIZA_INIT)
+    liza_events = _source(LIZA_EVENTS)
     port = _source(PORT_STREETS)
     clients = _source(STREET_CLIENTS)
     runtime = _source(STORY_RUNTIME)
@@ -187,23 +196,29 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
 
     assert '"story_georgett_portstreet_clients"' in runtime
     assert '"story_liza_portstreet_clients"' in runtime
-    assert '"street_clients_georgett"' in runtime
-    assert '"street_clients_liza"' in runtime
     assert '"#Georgett.portstreet_client_event_available()"' in runtime
     assert '"#Liza.portstreet_client_event_available()"' in runtime
     assert "threaded=False" in runtime
 
     assert 'Call("StreetClients"' not in port
-    assert 'Call("checkTriggers", "PortStreets", _port_clients_action, 0)' in port
+    assert "_port_clients_action" not in port
+    assert "CurrentRoom.build_action_items()" in port
+    assert "set_portstreet_visible" not in port
+    assert '"street_clients_georgett"' not in runtime
+    assert '"street_clients_liza"' not in runtime
+    assert '"street_clients"' in runtime
+    assert 'story_event_available("PortStreets", "street_clients")' in port
+    assert 'if location_key == "PortStreets"' not in _source(EVENTS)
     assert 'GeorgettVar.get("TalkChurchAfterCermonLiza"' not in port
     assert 'LizaVar.get("ProstStart"' not in port
     assert 'CheckIfSexEventExist(GirlNamePS1, time, "Prostitution")' not in port
     assert "time in (0, 1, 2)" not in port
     assert 'LizaVar["seeclients"]' not in clients
     assert 'GeorgettVar["seeclients"]' not in clients
-    assert "label story_georgett_portstreet_clients:" in clients
-    assert "label story_liza_portstreet_clients:" in clients
-    assert 'GetSexEventFromTable(girl_name, 3, "Prostitution")' in clients
+    assert "label story_georgett_portstreet_clients:" not in clients
+    assert "label story_liza_portstreet_clients:" not in clients
+    assert "label story_georgett_portstreet_clients:" in georgett_events
+    assert "label story_liza_portstreet_clients:" in liza_events
 
 
 def test_church_after_sermon_events_are_threaded_from_classes():

@@ -1,10 +1,16 @@
 # Character Worklist: Кларисса (Clara)
 
+> REFERENCE ONLY.
+>
+> This file preserves source/TXT worklist names. Legacy relationship-map tokens
+> are not current runtime owners. Runtime/story state belongs to the character
+> class instance and event/thread labels.
+
 ## Identity
 - Canonical id: clarisse
 - Legacy keys/tokens: Clara, Кларисса, clara
 - Init source: InitSecondaryNPC.txt
-- Main var store: Friends/Talked key Clara
+- Current runtime owner: Clarisse/Clara class instance
 
 ## Presence/Schedule (TXT-driven notes)
 - Утренняя продавщица в WineStore (time == 0).

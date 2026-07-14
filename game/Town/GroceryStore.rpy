@@ -1,4 +1,100 @@
-# ================================================================================
+    def grocery_store_restore_scene_state():
+        global MainTxt, CurLocDesc
+        room_text = grocery_store_main_text()
+        MainTxt = room_text
+        CurLocDesc = room_text
+        main_ui_restore_room_scene_state()
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        $ _grocery_ui_return = None
+        while _grocery_ui_return is None:
+            call screen main_ui
+            $ _grocery_ui_return = _return
+        jump GroceryStore
+
+    # Assign grocer name
+    if grocery_store_active_grocer_id() == "eddie":
+        $ GrocerName = 'Эдди'
+    elif grocery_store_active_grocer_id() == "inga":
+        $ GrocerName = 'Ингенборг'
+    elif grocery_store_active_grocer_id() == "becky":
+        $ GrocerName = 'Бекки'
+    else:
+        $ GrocerName = 'хозяин лавки'
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        call screen main_ui
+        $ current_action_items.append(MenuItem("Назад", Call("GroceryStoreObjectMenu", "food_stock")))
+    return
+        def grocery_store_restore_scene_state():
+        global MainTxt, CurLocDesc
+        room_text = grocery_store_main_text()
+        MainTxt = room_text
+        CurLocDesc = room_text
+        main_ui_restore_room_scene_state()
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        $ _grocery_ui_return = None
+        while _grocery_ui_return is None:
+            call screen main_ui
+            $ _grocery_ui_return = _return
+        jump GroceryStore
+
+    # Assign grocer name
+    if grocery_store_active_grocer_id() == "eddie":
+        $ GrocerName = 'Эдди'
+    elif grocery_store_active_grocer_id() == "inga":
+        $ GrocerName = 'Ингенборг'
+    elif grocery_store_active_grocer_id() == "becky":
+        $ GrocerName = 'Бекки'
+    else:
+        $ GrocerName = 'хозяин лавки'
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        call screen main_ui
+        $ current_action_items.append(MenuItem("Назад", Call("GroceryStoreObjectMenu", "food_stock")))
+    return
+        def grocery_store_restore_scene_state():
+        global MainTxt, CurLocDesc
+        room_text = grocery_store_main_text()
+        MainTxt = room_text
+        CurLocDesc = room_text
+        main_ui_restore_room_scene_state()
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        $ _grocery_ui_return = None
+        while _grocery_ui_return is None:
+            call screen main_ui
+            $ _grocery_ui_return = _return
+        jump GroceryStore
+
+    # Assign grocer name
+    if grocery_store_active_grocer_id() == "eddie":
+        $ GrocerName = 'Эдди'
+    elif grocery_store_active_grocer_id() == "inga":
+        $ GrocerName = 'Ингенборг'
+    elif grocery_store_active_grocer_id() == "becky":
+        $ GrocerName = 'Бекки'
+    else:
+        $ GrocerName = 'хозяин лавки'
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        call screen main_ui
+        $ current_action_items.append(MenuItem("Назад", Call("GroceryStoreObjectMenu", "food_stock")))
+    return
+    # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # GroceryStore location - converted from legacy script
@@ -59,7 +155,7 @@ init python:
 
     def grocery_store_eddie_picture(randomize=False):
         candidates = []
-        if Becky.var.get("EddieRobbedDay", 0) > 0 and Becky.var.get("EddieRobbedDay", 0) + 12 >= dayspassed:
+        if Becky.var.get("EddieRobbedDay", 0) > 0 and Becky.var.get("EddieRobbedDay", 0) + 12 >= current_game_day():
             candidates.append("images/eddie/portraits/fingal.png")
         candidates.extend([
             "images/eddie/portraits/portrait_0.png",
@@ -109,7 +205,7 @@ init python:
 
         if active_grocer == "eddie":
             parts.append("Сейчас утро, и за прилавком стоит Эдди, управляющий лавкой Блэнкеншип. Это здоровый рыжий парень примерно вашего возраста; Бекки когда-то подобрала его сиротой и взяла помощником.")
-            if Becky.var.get("EddieRobbedDay", 0) > 0 and Becky.var.get("EddieRobbedDay", 0) + 12 >= dayspassed:
+            if Becky.var.get("EddieRobbedDay", 0) > 0 and Becky.var.get("EddieRobbedDay", 0) + 12 >= current_game_day():
                 parts.append("Вы заметили, что у Эдди красуется большой синяк под глазом и распухло ухо.")
             parts.append("Вы можете с ним поболтать.")
         elif active_grocer == "inga":
@@ -118,21 +214,14 @@ init python:
         elif active_grocer == "becky":
             parts.append("За прилавком стоит сама Бекки Блэнкеншип. Это высокая рыжая женщина с полной грудью, ей на вид немного меньше сорока. Ее муж умер от болезни примерно за год до того, как ваш дядя купил \"Дикого Жеребца\".")
             parts.append("Вы можете с ней поболтать.")
-            if dayspassed > 30 and dayspassed <= 70:
+            if current_game_day() > 30 and current_game_day() <= 70:
                 parts.append("Вы знаете, что Сандра с ней недавно подружилась.")
-            elif dayspassed > 70:
+            elif current_game_day() > 70:
                 parts.append("Она с Сандрой - лучшие подруги.")
         else:
             parts.append("Лавка открыта, но за прилавком сейчас никого нет: видно, хозяйка и ее управляющий заняты в другом месте.")
 
         return "\n\n".join([row for row in parts if str(row or "").strip()])
-
-    def grocery_store_restore_scene_state():
-        global MainTxt, CurLocDesc
-        room_text = grocery_store_main_text()
-        MainTxt = room_text
-        CurLocDesc = room_text
-        main_ui_restore_room_scene_state()
 
     def grocery_store_find_visible_object(object_id):
         object_key = str(object_id or "")
@@ -209,7 +298,7 @@ init python:
             ),
         ],
         exits=[
-            RoomExit(label="Вернуться на рынок", target="MarketPlace"),
+            RoomExit(label="Вернуться на рынок", target="MarketPlace", minutes_to_pass=10),
         ],
         game_items=[
             GroceryStoreFoodStockObject,
@@ -231,7 +320,6 @@ label GroceryStore:
     scene black
     $ CurrentRoom = GroceryStoreRoom
     $ CurLoc = "GroceryStore"
-    $ location = CurLoc
     $ scene_image = grocery_store_background_picture()
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -249,35 +337,12 @@ label GroceryStore:
         $ _layout_last_picture = scene_image
         vscene scene_image
         $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
-        $ _grocery_ui_return = None
-        while _grocery_ui_return is None:
+        while True:
             call screen main_ui
-            $ _grocery_ui_return = _return
-        jump GroceryStore
     
     $ MainTxt = grocery_store_main_text()
     $ CurLocDesc = MainTxt
 
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
-        $ _grocery_ui_return = None
-        while _grocery_ui_return is None:
-            call screen main_ui
-            $ _grocery_ui_return = _return
-        jump GroceryStore
-    
-    # Assign grocer name
-    if grocery_store_active_grocer_id() == "eddie":
-        $ GrocerName = 'Эдди'
-    elif grocery_store_active_grocer_id() == "inga":
-        $ GrocerName = 'Ингенборг'
-    elif grocery_store_active_grocer_id() == "becky":
-        $ GrocerName = 'Бекки'
-    else:
-        $ GrocerName = 'хозяин лавки'
-    
     # Character interaction
     if grocery_store_active_grocer_id() == "eddie":
         $ _grocery_picture = grocery_store_eddie_picture()
@@ -302,60 +367,62 @@ label GroceryStore:
         python:
             DescribeBreastFeeding('becky', 3)
             ShowFullKidsListByAge('becky', 'inga')
-        call CheckDailyEvent('becky')
+        call check_daily_event('becky')
     $ CurLocDesc = MainTxt
-    call GroceryStoreBuildActions
-    $ _grocery_ui_return = None
-    while _grocery_ui_return is None:
-        call screen main_ui
-        $ _grocery_ui_return = _return
-    jump GroceryStore
-
-
-label GroceryStoreBuildActions:
     $ current_action_title = "Действия"
     $ current_action_content = None
-    $ action_menu_specs = []
     $ current_action_items = []
-
     python:
         for _grocery_object in GroceryStoreRoom.visible_objects():
-            current_action_items.append(MenuItem(_grocery_object.name, Call("GroceryStoreObjectMenu", _grocery_object.object_id)))
-
-    $ current_action_items.append(MenuItem("Вернуться на рынок", Jump("MarketPlace")))
-    return
+            current_action_items.append(MenuItem(_grocery_object.name, Function(grocery_store_open_object_menu_state, _grocery_object.object_id)))
+    $ current_action_items.extend(GroceryStoreRoom.build_exit_items())
+    $ GroceryStoreRoom.custom_properties["first_visit_seen"] = True
+    while True:
+        call screen main_ui
 
 
 label GroceryStoreObjectMenu(object_id="", preserve_text=False):
-    $ _grocery_payload = grocery_store_object_menu_payload(object_id)
-    if _grocery_payload is None:
-        call GroceryStoreBuildActions
+    $ _grocery_object = grocery_store_find_visible_object(object_id)
+    if _grocery_object is None:
+        $ current_action_items = []
+    python:
+        for _grocery_object in GroceryStoreRoom.visible_objects():
+            current_action_items.append(MenuItem(_grocery_object.name, Function(grocery_store_open_object_menu_state, _grocery_object.object_id)))
+    $ current_action_items.extend(GroceryStoreRoom.build_exit_items())
         return
-
-    if not preserve_text:
-        $ MainTxt = _grocery_payload["description"]
-        $ CurLocDesc = MainTxt
-    $ current_action_title = _grocery_payload["name"]
+    $ current_object_id = str(object_id or "")
+    $ current_action_title = str(_grocery_object.name or "")
     $ current_action_content = None
-    $ current_action_items = list(_grocery_payload["items"])
-    $ current_action_items.append(MenuItem("Назад", Jump("GroceryStore")))
+    if not preserve_text:
+        $ MainTxt = str(_grocery_object.description or "")
+        $ CurLocDesc = MainTxt
+    $ current_action_items = []
+    python:
+        for _grocery_action in _grocery_object.visible_actions():
+            if _grocery_action.hook == "text":
+                current_action_items.append(MenuItem(_grocery_action.label, Call("GroceryStoreObjectText", object_id, _grocery_action.action_id)))
+            elif _grocery_action.hook == "jump" and str(_grocery_action.target or ""):
+                current_action_items.append(MenuItem(_grocery_action.label, Jump(_grocery_action.target)))
+            elif _grocery_action.hook == "call" and str(_grocery_action.target or ""):
+                current_action_items.append(MenuItem(_grocery_action.label, Call(_grocery_action.target, *tuple(_grocery_action.args or ()))))
+    $ current_action_items.append(MenuItem("Назад", [SetVariable("current_action_title", "Действия"), SetVariable("current_action_content", None), SetVariable("current_action_items", grocery_store_action_items()), Function(main_ui_restart_interaction)]))
     return
 
 
 label GroceryStoreObjectText(object_id="", action_id=""):
-    $ _grocery_title = "Действия"
-    python:
-        grocery_text, grocery_name = grocery_store_object_text_payload(object_id, action_id)
-        if grocery_text:
-            MainTxt = grocery_text
-            CurLocDesc = grocery_text
-            _grocery_title = grocery_name or "Действия"
+    $ _grocery_object = grocery_store_find_visible_object(object_id)
+    if _grocery_object is not None:
+        python:
+            for _grocery_action in _grocery_object.visible_actions():
+                if str(_grocery_action.action_id or "") == str(action_id or ""):
+                    MainTxt = str(_grocery_action.target or "")
+                    CurLocDesc = MainTxt
+                    break
     call GroceryStoreObjectMenu(object_id, True)
-    $ current_action_title = _grocery_title
     return
 
 
-label GroceryStoreBuyMenu(preserve_text=False):
+label GroceryStoreBuyStockMenu(preserve_text=False):
     $ current_action_title = "Покупка провизии"
     $ current_action_content = None
     if not preserve_text:
@@ -373,7 +440,6 @@ label GroceryStoreBuyMenu(preserve_text=False):
     if money >= 6 * 200:
         $ current_action_items.append(MenuItem("Купить двести мешков", Call("GroceryStoreBuyApply", 6 * 200, 2000, 200)))
 
-    $ current_action_items.append(MenuItem("Назад", Call("GroceryStoreObjectMenu", "food_stock")))
     return
 
 
@@ -407,9 +473,9 @@ label GroceryStoreBuyFancyNightBowl(preserve_text=False):
         $ MainTxt = "Среди простой хозяйственной утвари вы замечаете аккуратную расписную ночную миску. Она выглядит куда приятнее той грубой посудины, к которой привыкла Аманда."
         $ CurLocDesc = MainTxt
     $ current_action_items = []
-    if int(_player_item_count_by_id("fancy_night_bowl_001") or 0) <= 0 and int(money or 0) >= 9:
+    if int(player.item_count("fancy_night_bowl_001") or 0) <= 0 and int(player.economy.money or 0) >= 9:
         $ current_action_items.append(MenuItem("Купить красивую ночную миску за 9 мараведи", Call("GroceryStoreBuyFancyNightBowlApply")))
-    elif int(_player_item_count_by_id("fancy_night_bowl_001") or 0) > 0:
+    elif int(player.item_count("fancy_night_bowl_001") or 0) > 0:
         $ MainTxt = MainTxt + "\n\nТакую миску вы уже купили."
         $ CurLocDesc = MainTxt
     else:
@@ -420,7 +486,7 @@ label GroceryStoreBuyFancyNightBowl(preserve_text=False):
 
 
 label GroceryStoreBuyFancyNightBowlApply:
-    if int(_player_item_count_by_id("fancy_night_bowl_001") or 0) > 0:
+    if int(player.item_count("fancy_night_bowl_001") or 0) > 0:
         $ MainTxt = "У вас уже есть такая миска."
     elif int(money or 0) < 9:
         $ MainTxt = "У вас не хватает денег на эту покупку."

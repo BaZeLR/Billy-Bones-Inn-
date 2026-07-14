@@ -1,10 +1,16 @@
 # Character Worklist: Ирма
 
+> REFERENCE ONLY.
+>
+> This file preserves source/TXT worklist names. Legacy `*Var` tokens are not
+> current runtime owners. Runtime/story state belongs to the character class
+> instance and event/thread labels.
+
 ## Identity
 - Canonical id: irma
 - Legacy keys/tokens: irma, IrmaVar
 - Init source: InitIrma.txt
-- Main var store: IrmaVar
+- Current runtime owner: Irma class instance
 
 ## Presence/Schedule (TXT-driven notes)
 - Основная локация: DressShop (лавка портнихи).

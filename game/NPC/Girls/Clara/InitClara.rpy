@@ -1,4 +1,33 @@
-# ================================================================================
+            npc_schedule_sync_currentloc(name)        bodymodel_sync_character(GirlName, Clara.data.fullname, "female")            self.current_location = "WineStore"            "werecat_gifted": 0,
+            "werecat_gift_day": -1,            "trust": 0,            self.schedule_source = ClaraStaticData.schedule_source            self.schedule_source = ClaraStaticData.schedule_source
+            self.current_location = "WineStore"        def install_schedule(self):
+            name = self.code_name
+            npc_interval_schedule_load_file(name)
+            return self
+            "werecat_gifted": 0,
+            "werecat_gift_day": -1,            "trust": 0,            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            npc_schedule_sync_currentloc(name)        bodymodel_sync_character(GirlName, Clara.data.fullname, "female")            self.current_location = "WineStore"            "werecat_gifted": 0,
+            "werecat_gift_day": -1,            "trust": 0,            self.schedule_source = ClaraStaticData.schedule_source            self.schedule_source = ClaraStaticData.schedule_source
+            self.current_location = "WineStore"        def install_schedule(self):
+            name = self.code_name
+            npc_interval_schedule_load_file(name)
+                Clara.install_schedule()
+
+        Clara.install_schedule()
+
+    return self
+            "werecat_gifted": 0,
+            "werecat_gift_day": -1,            "trust": 0,            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            npc_schedule_sync_currentloc(name)        bodymodel_sync_character(GirlName, Clara.data.fullname, "female")            self.current_location = "WineStore"            "werecat_gifted": 0,
+            "werecat_gift_day": -1,            "trust": 0,            self.schedule_source = ClaraStaticData.schedule_source            self.schedule_source = ClaraStaticData.schedule_source
+            self.current_location = "WineStore"        def install_schedule(self):
+            name = self.code_name
+            npc_interval_schedule_load_file(name)
+                Clara.install_schedule()
+
+        Clara.install_schedule()
+
+    return self
+            "werecat_gifted": 0,
+            "werecat_gift_day": -1,            "trust": 0,            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -14,7 +43,11 @@ init python:
             "images/clara/wineSellar_clara_talk_6.png",
         ]
         loadable = [row for row in candidates if renpy.loadable(row)]
-        return procedural_choice(loadable, key="procedural:NPC/Girls/Clara/InitClara.rpy:clara_wine_store_talk_picture") if len(loadable) > 0 else ""
+            Clara.install_schedule()
+
+        Clara.install_schedule()
+
+    return procedural_choice(loadable, key="procedural:NPC/Girls/Clara/InitClara.rpy:clara_wine_store_talk_picture") if len(loadable) > 0 else ""
 
     def clara_wine_store_flirt_picture():
         candidates = [
@@ -52,7 +85,6 @@ init python:
         return procedural_choice(loadable, key="procedural:NPC/Girls/Clara/InitClara.rpy:clara_forest_picture:%s" % location_key) if len(loadable) > 0 else ""
 
     def clara_melissa_visit_active(day_marker=None, weekday=None, time_slot=None):
-        calendar_v2.sync_state()
         week_value = int(week if weekday is None else weekday or 0)
         time_value = int(time if time_slot is None else time_slot or 0)
         if Melissa.bats_stage() < 8:
@@ -68,7 +100,6 @@ init python:
         return week_value in (1, 2, 3, 4, 5, 6, 7)
 
     def clara_tavern_visit_active(day_marker=None, weekday=None, time_slot=None):
-        calendar_v2.sync_state()
         day_value = int(dayspassed if day_marker is None else day_marker or 0)
         week_value = int(week if weekday is None else weekday or 0)
         clock_value = (int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)) % 1440
@@ -85,7 +116,7 @@ init python:
 
     def clara_visible_at_friday_dance():
         try:
-            return int(CheckIfDanceExist("amanda", "legare", int(FridayDancesCount or 0)) or 0) <= 0
+            return int(CheckIfDanceExist("amanda", "legare", int(friday_dance_count() or 0)) or 0) <= 0
         except Exception:
             return True
 
@@ -93,7 +124,6 @@ init python:
         return {
             "flirt": 0,
             "knownotvirgin": 0,
-            "trust": 0,
             "positive": 0,
             "neutral": 0,
             "negative": 0,
@@ -150,8 +180,6 @@ init python:
             "sergio_discount": 0,
             "anal_unlocked": 0,
             "virginity_choice_unlocked": 0,
-            "werecat_gifted": 0,
-            "werecat_gift_day": -1,
         }
 
     class ClaraData(PeopleData):
@@ -180,13 +208,12 @@ init python:
             self.uses_own_var_state = True
             self.data = ClaraStaticData
             self.rel = 0
-            self.relationship = self.rel
             self.openness = 0
             self.corruption = 10
             self.known = True
             self.energy = 100
             self.energy_max = 100
-            self.rebellion = 0
+            self.player.stats.rebellion = 0
             self.anger_with_player = 0
             self.fun = 0
             self.trust = 0
@@ -247,10 +274,9 @@ init python:
                 "libido_tincture_001",
                 "werecat_caught_cat",
             ]
-            self.schedule_source = ClaraStaticData.schedule_source
-            self.current_location = "WineStore"
+            self.relationship_cap = 100
             self.talk_preferences = {
-                "favorite_topics": ["fashion", "stories", "secrets", "art", "family_life"],
+                "favorite_topics": ["fashion", "stories", "gossip", "money", "family_life"],
                 "blocked_topics": [],
             }
             self.wardrobe = {
@@ -270,7 +296,6 @@ init python:
         def update(self):
             self.name = self.code_name
             self.data = ClaraStaticData
-            self.relationship = self.rel
             self.ensure_story_defaults()
             return self
 
@@ -279,6 +304,9 @@ init python:
                 self.var = {}
             for key, value in clara_story_defaults().items():
                 self.var.setdefault(key, value)
+            self.trust = people_to_int(self.var.get("trust", self.trust), self.trust)
+            self.trust = people_to_int(self.var.get("trust", self.trust), self.trust)
+            self.trust = people_to_int(self.var.get("trust", self.trust), self.trust)
             self.trust = people_to_int(self.var.get("trust", self.trust), self.trust)
             return self.var
 
@@ -312,7 +340,7 @@ init python:
 
             item_ids = ("soap_001", "special_mushroom_001", "lavender_001", "luxury_soap_001", "libido_tincture_001")
             for item_id in item_ids:
-                if _player_item_count_by_id(item_id) <= 0:
+                if player.item_count(item_id) <= 0:
                     continue
                 item_obj = get_game_item(item_id)
                 if item_obj is None:
@@ -331,9 +359,9 @@ init python:
                 "redstockings",
             )
             for dress_code in dress_codes:
-                if not player_state().appearance.has_dress(dress_code):
+                if not player.appearance.has_dress(dress_code):
                     continue
-                if str(player_state().appearance.current_dress or "") == str(dress_code or ""):
+                if str(player.appearance.current_dress or "") == str(dress_code or ""):
                     continue
                 entries.append({
                     "source": "dress",
@@ -364,19 +392,18 @@ init python:
                 return True
             if source == "dress":
                 dress_code = str(row.get("dress_code", "") or "")
-                if dress_code == "" or not player_state().appearance.has_dress(dress_code):
+                if dress_code == "" or not player.appearance.has_dress(dress_code):
                     return False
-                if dress_code == str(player_state().appearance.current_dress or ""):
+                if dress_code == str(player.appearance.current_dress or ""):
                     return False
-                appearance = player_state().appearance
+                appearance = player.appearance
                 result = appearance.remove_dress(dress_code)
-                appearance.apply_to_store()
                 return result
 
             item_id = str(row.get("gift_id", "") or "")
             if item_id == "":
                 return False
-            return _player_remove_item_by_id(item_id, 1)
+            return player.remove_item(item_id, 1)
 
         def social_outcome(self, interaction_type="talk", gift_item_id=""):
             name = self.code_name
@@ -388,7 +415,7 @@ init python:
             score += int(self.trust or 0) // 3
             score += int(self.corruption or 0) // 10
 
-            if str(player_state().appearance.current_dress or "") == "thiefdress":
+            if str(player.appearance.current_dress or "") == "thiefdress":
                 score += 1
 
             if interaction == "flirt":
@@ -445,7 +472,11 @@ init python:
                 self.change_social(friend_delta=-(1 if interaction == "flirt" else 0))
                 self.trust = max(0, int(self.trust or 0) - 1)
 
-            self.relationship = self.rel
+            self.var["trust"] = int(self.trust or 0)
+            self.var["trust"] = int(self.trust or 0)
+            self.var["trust"] = int(self.trust or 0)
+            self.var["trust"] = int(self.trust or 0)
+            self.var["trust"] = int(self.trust or 0)
             self.var["trust"] = int(self.trust or 0)
             self.apply_result_counters(result_key)
             return result_key
@@ -480,7 +511,16 @@ init python:
         def install_schedule(self):
             name = self.code_name
             npc_interval_schedule_load_file(name)
-            npc_schedule_sync_currentloc(name)
+            return self
+
+        def install_schedule(self):
+            name = self.code_name
+            npc_interval_schedule_load_file(name)
+            return self
+
+        def install_schedule(self):
+            name = self.code_name
+            npc_interval_schedule_load_file(name)
             return self
 
 define ClaraStaticData = ClaraData()
@@ -494,7 +534,5 @@ label InitClara:
         peopleInfo[GirlName] = Clara
         if Clara not in girls:
             girls.append(Clara)
-        bodymodel_sync_character(GirlName, Clara.data.fullname, "female")
         Clara.install_schedule()
-
     return

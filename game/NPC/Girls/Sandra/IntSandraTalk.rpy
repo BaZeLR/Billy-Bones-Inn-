@@ -1,40 +1,105 @@
-# ================================================================================
+        "Извиниться перед Сандрой" if talk_system_apology_available(girl_name):
+            call TalkSystemApology(girl_name)
+            jump IntSandraTalk        "Извиниться перед Сандрой" if talk_system_apology_available(girl_name):
+            call TalkSystemApology(girl_name)
+            jump IntSandraTalk        "Извиниться перед Сандрой" if talk_system_apology_available(girl_name):
+            call TalkSystemApology(girl_name)
+            jump IntSandraTalk        "Извиниться перед Сандрой" if talk_system_apology_available(girl_name):
+            call TalkSystemApology(girl_name)
+            jump IntSandraTalk        "Извиниться перед Сандрой" if talk_system_apology_available(girl_name):
+            call TalkSystemApology(girl_name)
+            jump IntSandraTalk        "Извиниться перед Сандрой" if talk_system_apology_available(girl_name):
+            call TalkSystemApology(girl_name)
+            jump IntSandraTalk# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntSandraTalk(girl_name="sandra"):
     $ main_ui_begin_talk_state("Разговор с Сандрой", girl_name)
     $ current_action_title = "Разговор с Сандрой"
     $ current_action_content = None
-    $ current_action_items = []
-    $ current_action_items.append(MenuItem("Осмотреть", Function(NpcActionLookState, girl_name, CurLoc)))
     if not getPersonInfo(girl_name).social_action_allowed("talk"):
         $ MainTxt = "Сандра отвечает коротко и по делу. Сейчас между вами еще нет того доверия, которое позволило бы говорить с ней не только о работе."
         $ CurLocDesc = MainTxt
-        $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
-        return
+        menu:
+            "Назад":
+                $ main_ui_end_talk_state()
+                $ current_action_items = [
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
+    ]
+    $ current_action_items = [
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
+    ]
+    $ current_action_items = [
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
+    ]
+    $ current_action_items = [
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
+    ]
+    $ current_action_items = [
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
+    ]
+    $ current_action_items = [
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
+    ]
+    $ current_action_items = [
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
+    ]
+    $ current_action_items = [
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
+    ]
+    $ current_action_items = [
+        MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
+    ]
+    return
     if str(MainTxt or "").strip() == "":
         $ MainTxt = "Сандра внимательно смотрит на вас, ожидая, что вы скажете."
         $ CurLocDesc = MainTxt
-    $ current_action_items.extend(social_core_action_items(girl_name, "IntSandraTalk"))
-
-    if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:
-        $ current_action_items.append(MenuItem("Попробовать помириться с Сандрой", Call("IntSandraReconcile", girl_name)))
-
-    if sandra_dress_change_can_buy(girl_name):
-        $ current_action_items.append(MenuItem("Предложить купить Сандре обновку", Call("IntSandraOfferBuyDress", girl_name)))
-    if int(Sandra.asked_today or 0) == 0 and household_special_talk_available(girl_name):
-        $ _sandra_special_entry = household_special_talk_entry(girl_name)
-        if _sandra_special_entry is not None:
-            $ current_action_items.append(MenuItem(str(_sandra_special_entry.get("label", "Спросить о чем-то важном") or "Спросить о чем-то важном"), Call("IntSandraHouseholdInsight", girl_name)))
-    if int(Sandra.asked_today or 0) == 0 and int(Sandra.rel or 0) >= 15:
-        $ current_action_items.append(MenuItem("Спросить, что для нее сейчас важнее всего по хозяйству", Call("IntSandraHouseholdPriorities", girl_name)))
-    if Sandra.sex_available() and str(CurLoc or "") == "TavernSandraRoom":
-        $ current_action_items.append(MenuItem("Уединиться с Сандрой", Call("SandraSexEngine", girl_name, CurLoc)))
-
-    $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
-    return
-
-
+    $ _sandra_special_entry = household_special_talk_entry(girl_name) if int(Sandra.asked_today or 0) == 0 and household_special_talk_available(girl_name) else None
+    menu:
+            "Осмотреть":
+                call ShowGirlCard(girl_name)
+            "Поговорить" if old_point_smalltalk_available(girl_name):
+                call OldPointSmallTalkMenu(girl_name)
+            "Флиртовать" if old_point_action_unlocked(girl_name, "flirt"):
+                call OldPointFlirtAttempt(girl_name)
+            "Подарить маленький подарок" if old_point_action_unlocked(girl_name, "gift"):
+                call PlayerCardGiftToFixedTargetMenu(girl_name)
+            "Коснуться ее смелее" if old_point_action_unlocked(girl_name, "kino"):
+                call OldPointKinoAttempt(girl_name)
+            "Извиниться перед Сандрой" if old_point_apology_available(girl_name):
+                call OldPointApology(girl_name)
+            "Предложить купить Сандре обновку" if sandra_dress_change_can_buy(girl_name):
+                call IntSandraOfferBuyDress(girl_name)
+            "[_sandra_special_entry.get('label', 'Спросить о чем-то важном')]" if _sandra_special_entry is not None:
+                call IntSandraHouseholdInsight(girl_name)
+            "Спросить, что для нее сейчас важнее всего по хозяйству" if int(Sandra.asked_today or 0) == 0 and int(Sandra.rel or 0) >= 15:
+                call IntSandraHouseholdPriorities(girl_name)
+            "Уединиться с Сандрой" if Sandra.sex_available() and str(CurLoc or "") == "TavernSandraRoom":
+                call SandraSexEngine(girl_name, CurLoc)
+            "Назад":
+                $ main_ui_end_talk_state()
+                $ current_action_items = [
+            MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+            MenuItem("Назад", Function(main_ui_end_talk_state)),
+        ]
+        $ current_action_items = [
+            MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+            MenuItem("Назад", Function(main_ui_end_talk_state)),
+        ]
+        $ current_action_items = [
+            MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
+            MenuItem("Назад", Function(main_ui_end_talk_state)),
+        ]
+        return
 label IntSandraReconcile(girl_name="sandra"):
     $ MainTxt = "Вы подошли к Сандре и извинились за то, что были к ней несколько невнимательны и грубы последнее время. В свое оправдание вы заметили, что уберечь трактир от разорения очень сложно и всем вам нужно дружно работать вместе, чтобы преуспеть."
     if procedural_randint(1, 2, key="procedural:NPC/Girls/Sandra/IntSandraTalk.rpy:procedural_randint:40:1") == 1:
@@ -48,8 +113,10 @@ label IntSandraReconcile(girl_name="sandra"):
     $ current_action_content = None
     $ current_action_items = [
         MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
-        MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
     ]
+    $ current_action_title = "Разговор с Сандрой"
+    $ current_action_content = None
     return
 
 
@@ -62,8 +129,10 @@ label IntSandraHouseholdInsight(girl_name="sandra"):
         $ current_action_content = None
         $ current_action_items = [
             MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
-            MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
+            MenuItem("Назад", Function(main_ui_end_talk_state)),
         ]
+        $ current_action_title = "Разговор с Сандрой"
+        $ current_action_content = None
         return
     $ Sandra.mark_asked()
     $ Sandra.mark_talked()
@@ -75,8 +144,10 @@ label IntSandraHouseholdInsight(girl_name="sandra"):
     $ current_action_content = None
     $ current_action_items = [
         MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
-        MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
     ]
+    $ current_action_title = "Разговор с Сандрой"
+    $ current_action_content = None
     return
 
 
@@ -90,6 +161,8 @@ label IntSandraHouseholdPriorities(girl_name="sandra"):
     $ current_action_content = None
     $ current_action_items = [
         MenuItem("Вернуться к разговору", Call("IntSandraTalk", girl_name)),
-        MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
+        MenuItem("Назад", Function(main_ui_end_talk_state)),
     ]
+    $ current_action_title = "Разговор с Сандрой"
+    $ current_action_content = None
     return

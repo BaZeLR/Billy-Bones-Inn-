@@ -1,10 +1,16 @@
 # Character Worklist: Сандра
 
+> REFERENCE ONLY.
+>
+> This file preserves source/TXT worklist names. Legacy `*Var` tokens are not
+> current runtime owners. Runtime/story state belongs to the character class
+> instance and event/thread labels.
+
 ## Identity
 - Canonical id: sandra
 - Legacy keys/tokens: sandra, SandraVar
 - Init source: InitSandra.txt
-- Main var store: SandraVar
+- Current runtime owner: Sandra class instance
 
 ## Presence/Schedule (TXT-driven notes)
 - Основная локация старта: TavernMain.

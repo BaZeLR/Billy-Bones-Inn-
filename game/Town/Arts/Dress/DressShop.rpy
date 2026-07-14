@@ -1,4 +1,4 @@
-# ================================================================================
+    hide screen girl_card_overlay    hide screen girl_card_overlay        hide screen girl_card_overlay    hide screen girl_card_overlay    hide screen girl_card_overlay    hide screen girl_card_overlay        hide screen girl_card_overlay    hide screen girl_card_overlay    hide screen girl_card_overlay    hide screen girl_card_overlay        hide screen girl_card_overlay    hide screen girl_card_overlay# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default DressProduced = ""
@@ -43,7 +43,7 @@ init python:
             ),
         ],
         exits=[
-            RoomExit(label="Вернуться в квартал ремесленников", target="ArtisansQuarter"),
+            RoomExit(label="Вернуться в квартал ремесленников", target="ArtisansQuarter", minutes_to_pass=10),
         ],
         game_items=[
             "female_samples_001",
@@ -61,6 +61,14 @@ init python:
             "object_menu_label": "DressShopObjectMenu",
         },
     )
+
+
+
+default dress_shop = DressShopRuntimeState()
+
+
+
+default dress_shop = DressShopRuntimeState()
 
     def dress_shop_get_object(object_id):
         return get_game_object(object_id)
@@ -87,6 +95,8 @@ init python:
 
     def dress_shop_buy_male_item(dress_code):
         global money
+        global money
+        global money
         code = str(dress_code or "").strip()
         if not code:
             return "invalid"
@@ -95,7 +105,7 @@ init python:
         item_obj = get_game_item("dress_" + code)
         if item_obj is None:
             return "invalid"
-        if player_state().appearance.has_dress(code) and not dress_shop_item_depreciated(item_obj):
+        if player.appearance.has_dress(code) and not dress_shop_item_depreciated(item_obj):
             return "owned"
         price = int(getattr(item_obj, "price", 0) or 0)
         if int(money or 0) < price:
@@ -106,7 +116,6 @@ init python:
 label DressShop:
     $ CurrentRoom = DressShopRoom
     $ CurLoc = "DressShop"
-    $ location = CurLoc
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
@@ -120,20 +129,61 @@ label DressShop:
         $ scene_image = build_media_ref("general", "", "LocArtisansQuarter" + str(procedural_randint(1, 4, key="procedural:Town/Arts/Dress/DressShop.rpy:procedural_randint:120:1")))
         $ _layout_last_picture = ""
         $ current_action_items = DressShopRoom.build_exit_items()
-        $ _dress_ui_return = None
-        while _dress_ui_return is None:
+        while True:
             call screen main_ui
-            $ _dress_ui_return = _return
-        jump DressShop
 
     $ MainTxt = "\n\n".join([row.text for row in DressShopRoom.visible_descriptions()])
     $ CurLocDesc = MainTxt
     $ scene_image = CurrentRoom.bg_picture
     $ _layout_last_picture = ""
 
-    $ calendar_v2.sync_state()
     if renpy.has_label("CheckDailyEvent") and int(calendar_v2.hour or 0) < 12:
-        call CheckDailyEvent("", "BuyDress", "DressShop", 0)
+        call check_daily_event("", "BuyDress", "DressShop", 0)
+
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = DressShopRoom.build_exit_items()
+    else:
+        if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = DressShopRoom.build_exit_items()
+    else:
+        if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = DressShopRoom.build_exit_items()
+    else:
+        $ current_action_items = DressShopRoom.build_object_items() + DressShopRoom.build_exit_items()
+    while True:
+        call screen main_ui
+
+
+label DressShopOpenCatalog(rack_type=""):
+    $ _rack_type = str(rack_type or "")
+    if _rack_type not in ("female", "male"):
+        if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = DressShopRoom.build_exit_items()
+        $ _dress_ui_return = None
+        while _dress_ui_return is None:
+            call screen main_ui
+            $ _dress_ui_return = _return
+        jump DressShop
+
+    call DressShopRoomActions
+        call DressShopRoomActions
+        if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = DressShopRoom.build_exit_items()
+        $ _dress_ui_return = None
+        while _dress_ui_return is None:
+            call screen main_ui
+            $ _dress_ui_return = _return
+        jump DressShop
 
     if navigation_only_mode_enabled():
         $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
@@ -146,33 +196,6 @@ label DressShop:
         jump DressShop
 
     call DressShopRoomActions
-    $ _dress_ui_return = None
-    while _dress_ui_return is None:
-        call screen main_ui
-        $ _dress_ui_return = _return
-    jump DressShop
-
-
-label DressShopRoomActions:
-    hide screen dress_shop_male_catalog_overlay
-    hide screen dress_shop_female_catalog_overlay
-    hide screen girl_card_overlay
-    $ MainTxt = "\n\n".join([row.text for row in DressShopRoom.visible_descriptions()])
-    $ CurLocDesc = MainTxt
-    $ current_object_id = ""
-    $ scene_image = CurrentRoom.bg_picture
-    $ _layout_last_picture = ""
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = DressShopRoom.build_object_items()
-    $ current_action_items.extend(DressShopRoom.build_exit_items())
-    return
-
-
-label DressShopOpenCatalog(rack_type=""):
-    $ _rack_type = str(rack_type or "")
-    if _rack_type not in ("female", "male"):
-        call DressShopRoomActions
         return
 
     $ dress_shop_populate_rack_contents()
@@ -182,7 +205,6 @@ label DressShopOpenCatalog(rack_type=""):
     $ _rack_object = dress_shop_get_object(current_object_id)
     $ MainTxt = str(getattr(_rack_object, "description", "") or "")
     $ CurLocDesc = MainTxt
-    hide screen girl_card_overlay
     if _rack_type == "female":
         show screen dress_shop_female_catalog_overlay
         hide screen dress_shop_male_catalog_overlay
@@ -208,14 +230,12 @@ label DressShopBuyMaleItem(dress_code=""):
         $ current_action_content = None
         $ current_action_title = "Действия"
         $ current_object_id = "male_samples_001"
-        hide screen girl_card_overlay
         hide screen dress_shop_female_catalog_overlay
         show screen dress_shop_male_catalog_overlay
         return
 
     hide screen dress_shop_male_catalog_overlay
     hide screen dress_shop_female_catalog_overlay
-    hide screen girl_card_overlay
     $ current_object_id = ""
     call DressTry("You", _dress_code)
     return
@@ -252,119 +272,3 @@ label DressShopObjectMenu(object_id=""):
 
     $ current_action_items.append(MenuItem("Назад", Call("DressShopRoomActions")))
     return
-
-
-screen dress_shop_male_catalog_overlay():
-    zorder 120
-
-    $ _textbox_h = int(getattr(gui, "textbox_height", 278))
-    $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
-    $ _left_w = int((config.screen_width - 36) * 0.72)
-    $ _left_h = _usable_h - 24
-
-    fixed:
-        xpos 12
-        ypos 12
-        xsize _left_w
-        ysize _left_h
-
-        add im.Scale("images/rpg_message_bg.png", _left_w, _left_h)
-
-        viewport:
-            xpos 28
-            ypos 24
-            xsize _left_w - 56
-            ysize _left_h - 48
-            draggable True
-            mousewheel True
-
-            vbox:
-                spacing 16
-
-                text "МУЖСКИЕ КОСТЮМЫ" size 30 color "#1e130c" xalign 0.5
-
-                for _dress_item in dress_shop_catalog_items("male"):
-                    $ _dress_code = str(_dress_item.custom_properties.get("dress_code", "") or "")
-                    $ _dress_desc = str(getattr(_dress_item, "description", "") or "")
-                    $ _dress_price = int(getattr(_dress_item, "price", 0) or 0)
-
-                    hbox:
-                        spacing 20
-
-                        vbox:
-                            xmaximum int((_left_w - 260) * 0.72)
-                            spacing 4
-                            text str(_dress_item.name or _dress_code) size 24 color "#1e130c"
-                            text _dress_desc size 18 color "#2d1d12"
-
-                        vbox:
-                            xminimum 170
-                            spacing 8
-                            text str(_dress_price) + " мараведи" size 20 color "#1e130c" xalign 0.5
-                            if dress_shop_item_owned(_dress_item):
-                                text "Уже куплено" size 18 color "#5a3a24" xalign 0.5
-                            else:
-                                textbutton "Купить":
-                                    text_size 20
-                                    sensitive dress_shop_can_buy_item(_dress_item)
-                                    action Call("DressShopBuyMaleItem", _dress_code)
-
-                textbutton "Назад в лавку":
-                    text_size 22
-                    action Call("DressShopRoomActions")
-
-
-screen dress_shop_female_catalog_overlay():
-    zorder 120
-
-    $ _textbox_h = int(getattr(gui, "textbox_height", 278))
-    $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
-    $ _left_w = int((config.screen_width - 36) * 0.72)
-    $ _left_h = _usable_h - 24
-
-    fixed:
-        xpos 12
-        ypos 12
-        xsize _left_w
-        ysize _left_h
-
-        add im.Scale("images/rpg_message_bg.png", _left_w, _left_h)
-
-        viewport:
-            xpos 28
-            ypos 24
-            xsize _left_w - 56
-            ysize _left_h - 48
-            draggable True
-            mousewheel True
-
-            vbox:
-                spacing 16
-
-                text "ЖЕНСКИЕ ПЛАТЬЯ" size 30 color "#1e130c" xalign 0.5
-
-                for _dress_item in dress_shop_catalog_items("female"):
-                    $ _dress_code = str(_dress_item.custom_properties.get("dress_code", "") or "")
-                    $ _dress_desc = str(getattr(_dress_item, "description", "") or "")
-                    $ _dress_price = int(getattr(_dress_item, "price", 0) or 0)
-
-                    hbox:
-                        spacing 20
-
-                        vbox:
-                            xmaximum int((_left_w - 260) * 0.72)
-                            spacing 4
-                            text str(_dress_item.name or _dress_code) size 24 color "#1e130c"
-                            text _dress_desc size 18 color "#2d1d12"
-
-                        vbox:
-                            xminimum 170
-                            spacing 8
-                            text str(_dress_price) + " мараведи" size 20 color "#1e130c" xalign 0.5
-                            textbutton "Подробнее":
-                                text_size 20
-                                action Call("DressShopFemaleBuyInfo", _dress_code)
-
-                textbutton "Назад в лавку":
-                    text_size 22
-                    action Call("DressShopRoomActions")

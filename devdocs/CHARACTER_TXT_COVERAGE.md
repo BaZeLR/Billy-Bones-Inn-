@@ -1,5 +1,11 @@
 # Character TXT Coverage Index
 
+> REFERENCE ONLY.
+>
+> This file preserves old TXT/QSP coverage names. The listed `*Var` names are
+> not current state owners. Use them only to recover source text/coverage, then
+> port the meaning into the relevant NPC class, event/thread, item, or room.
+
 Auto-generated source inventory for girls + Clarisse using token scans over game/Inn/*.txt.
 Use as anti-omission checklist; contains both direct and cross-character references.
 

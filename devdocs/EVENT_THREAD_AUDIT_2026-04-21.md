@@ -1,5 +1,11 @@
 # Event / Thread Audit
 
+> REFERENCE ONLY / HISTORICAL AUDIT.
+>
+> Do not use this as implementation authority. Current event/thread rules live
+> in `devdocs/EventThreadInstruction/*` and
+> `devdocs/implementation_models/EVENT_THREAD_MODEL_AND_TEMPLATE.md`.
+
 Date: 2026-04-21
 
 Scope:

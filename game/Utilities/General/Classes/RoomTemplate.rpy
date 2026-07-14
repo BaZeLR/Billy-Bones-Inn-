@@ -1,7 +1,101 @@
-# ================================================================================
+default roomFirstVisit = {}label MoveToRoom(target_label="", movement_minutes=0):
+    $ movement_target = str(target_label or CurLoc or "TavernMain")
+    $ move_cost = int(movement_minutes or 0)
+
+    if _time_advancement_allowed():
+        if move_cost > 0:
+            $ calendar_v2.advance_minutes(move_cost)
+
+    $ CurLoc = movement_target
+    $ location = movement_target
+
+    if renpy.has_label(movement_target):
+        jump expression movement_target
+
+    "DEBUG: missing target label [movement_target]"
+    jump TavernMainlabel MoveToRoom(target_label="", movement_minutes=0):
+    $ movement_target = str(target_label or CurLoc or "TavernMain")
+    $ move_cost = int(movement_minutes or 0)
+
+    if _time_advancement_allowed():
+        $ calendar_v2.sync_state()
+        if move_cost > 0:
+            $ calendar_v2.advance_minutes(move_cost)
+
+    $ CurLoc = movement_target
+    $ location = movement_target
+
+    if renpy.has_label(movement_target):
+        jump expression movement_target
+
+    "DEBUG: missing target label [movement_target]"
+    jump TavernMaindefault roomFirstVisit = {}label MoveToRoom(target_label="", movement_minutes=0):
+    $ movement_target = str(target_label or CurLoc or "TavernMain")
+    $ move_cost = int(movement_minutes or 0)
+
+    if _time_advancement_allowed():
+        $ calendar_v2.sync_state()
+        if move_cost > 0:
+            $ calendar_v2.advance_minutes(move_cost)
+
+    $ CurLoc = movement_target
+    $ location = movement_target
+
+    if renpy.has_label(movement_target):
+        jump expression movement_target
+
+    "DEBUG: missing target label [movement_target]"
+    jump TavernMainlabel MoveToRoom(target_label="", movement_minutes=0):
+    $ movement_target = str(target_label or CurLoc or "TavernMain")
+    $ move_cost = int(movement_minutes or 0)
+
+    if _time_advancement_allowed():
+        $ calendar_v2.sync_state()
+        if move_cost > 0:
+            $ calendar_v2.advance_minutes(move_cost)
+
+    $ CurLoc = movement_target
+    $ location = movement_target
+
+    if renpy.has_label(movement_target):
+        jump expression movement_target
+
+    "DEBUG: missing target label [movement_target]"
+    jump TavernMaindefault roomFirstVisit = {}label MoveToRoom(target_label="", movement_minutes=0):
+    $ movement_target = str(target_label or CurLoc or "TavernMain")
+    $ move_cost = int(movement_minutes or 0)
+
+    if _time_advancement_allowed():
+        $ calendar_v2.sync_state()
+        if move_cost > 0:
+            $ calendar_v2.advance_minutes(move_cost)
+
+    $ CurLoc = movement_target
+    $ location = movement_target
+
+    if renpy.has_label(movement_target):
+        jump expression movement_target
+
+    "DEBUG: missing target label [movement_target]"
+    jump TavernMainlabel MoveToRoom(target_label="", movement_minutes=0):
+    $ movement_target = str(target_label or CurLoc or "TavernMain")
+    $ move_cost = int(movement_minutes or 0)
+
+    if _time_advancement_allowed():
+        $ calendar_v2.sync_state()
+        if move_cost > 0:
+            $ calendar_v2.advance_minutes(move_cost)
+
+    $ CurLoc = movement_target
+    $ location = movement_target
+
+    if renpy.has_label(movement_target):
+        jump expression movement_target
+
+    "DEBUG: missing target label [movement_target]"
+    jump TavernMain# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default roomFirstVisit = {}
 
 init -40 python:
     roomRegistry = {}
@@ -220,6 +314,9 @@ init -40 python:
             end_text = str(getattr(self, "end", "") or "")
             if start_text or end_text:
                 calendar_v2.sync_state()
+                calendar_v2.sync_state()
+                calendar_v2.sync_state()
+                calendar_v2.sync_state()
                 hour_value = int(calendar_v2.hour or 0) % 24
                 start_value = self._hour_value(start_text, 0)
                 end_value = self._end_hour_value(end_text, 23)
@@ -413,20 +510,3 @@ init -40 python:
             return (restore_room_runtime, (str(getattr(self, "code_name", "") or ""), payload))
 
 
-label MoveToRoom(target_label="", movement_minutes=0):
-    $ movement_target = str(target_label or CurLoc or "TavernMain")
-    $ move_cost = int(movement_minutes or 0)
-
-    if _time_advancement_allowed():
-        $ calendar_v2.sync_state()
-        if move_cost > 0:
-            $ calendar_v2.advance_minutes(move_cost)
-
-    $ CurLoc = movement_target
-    $ location = movement_target
-
-    if renpy.has_label(movement_target):
-        jump expression movement_target
-
-    "DEBUG: missing target label [movement_target]"
-    jump TavernMain

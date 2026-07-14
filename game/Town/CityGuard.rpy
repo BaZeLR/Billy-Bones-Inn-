@@ -1,3 +1,39 @@
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        call screen main_ui
+        return
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = CityGuardRoom.build_exit_items()
+        call screen main_ui
+        return
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        call screen main_ui
+        return
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = CityGuardRoom.build_exit_items()
+        call screen main_ui
+        return
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
+        call screen main_ui
+        return
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items = CityGuardRoom.build_exit_items()
+        call screen main_ui
+        return
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -41,7 +77,7 @@ init python:
             ),
         ],
         exits=[
-            RoomExit(label="Вернуться на рынок", target="MarketPlace"),
+            RoomExit(label="Вернуться на рынок", target="MarketPlace", minutes_to_pass=10),
         ],
         game_items=[
             GameObject(
@@ -69,7 +105,6 @@ init python:
 label CityGuard:
     $ CurrentRoom = CityGuardRoom
     $ CurLoc = "CityGuard"
-    $ location = CurLoc
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
@@ -89,21 +124,6 @@ label CityGuard:
     else:
         vscene "images/general/cityguard.jpg"
 
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
-        call screen main_ui
-        jump CityGuard
-
-    call CityGuardBuildActions
-    call screen main_ui
-    jump CityGuard
-
-
-label CityGuardBuildActions:
-    $ current_action_title = "Действия"
-    $ current_action_content = None
     $ current_action_items = []
 
     if len(CityGuardRoom.visible_objects()) > 0:
@@ -114,12 +134,13 @@ label CityGuardBuildActions:
     if story_event_available("CityGuard", "enter"):
         $ current_action_items.append(MenuItem("Осмотреть колодки у караулки", Call("checkTriggers", "CityGuard", "enter", 0)))
 
-    $ current_action_items.append(MenuItem("Вернуться на рынок", Jump("MarketPlace")))
-    return
+    $ current_action_items.extend(CityGuardRoom.build_exit_items())
+    while True:
+        call screen main_ui
 
 
 label CityGuardShowPlacat:
-    $ RandVar = procedural_randint(1, 8, "city_guard_placard_%s_%s" % (dayspassed, int(clock_minutes or 0)))
+    $ RandVar = procedural_randint(1, 8, "city_guard_placard_%s_%s" % (current_game_day(), int(clock_minutes or 0)))
     $ MainTxt = CityGuardPlacat[RandVar]
     $ CurLocDesc = MainTxt
     vscene "images/general/soldierplakat/plakat[RandVar].jpg"

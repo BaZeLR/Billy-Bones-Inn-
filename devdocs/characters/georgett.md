@@ -1,10 +1,16 @@
 # Character Worklist: Жоржетта
 
+> REFERENCE ONLY.
+>
+> This file preserves source/TXT worklist names. Legacy `*Var` tokens are not
+> current runtime owners. Runtime/story state belongs to the character class
+> instance and event/thread labels.
+
 ## Identity
 - Canonical id: georgett
 - Legacy keys/tokens: georgett, GeorgettVar
 - Init source: InitGeorgett.txt
-- Main var store: GeorgettVar
+- Current runtime owner: Georgette class instance
 
 ## Presence/Schedule (TXT-driven notes)
 - Базовая локация старта: PortStreets.

@@ -1,7 +1,19 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
-init python:
+    def _time_return_label():
+        if CurrentRoom is not None:
+            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
+            if room_code:
+                return room_code
+        return str(CurLoc or "TavernMain")
+label ApplyTimeSkip(minutes_to_add=60):
+    $ _time_skip_minutes = max(0, int(minutes_to_add or 0))
+    if int(BlockTimeAdvance or 0) == 0 and _time_skip_minutes > 0:
+        call AdvanceTimeOnly(_time_skip_minutes)
+    $ main_ui_overlay = ""
+    $ return_loc = _time_return_label()
+    if renpy.has_label(return_loc):
+        jump expression return_loc
+    jump TavernMain
+
     def _time_change_close_action(return_label=""):
         if str(return_label or "") == "__main_ui_overlay__":
             return SetVariable("main_ui_overlay", "")
@@ -13,7 +25,64 @@ init python:
             if room_code:
                 return room_code
         return str(CurLoc or "TavernMain")
+    def _time_return_label():
+        if CurrentRoom is not None:
+            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
+            if room_code:
+                return room_code
+        return str(CurLoc or "TavernMain")
+label ApplyTimeSkip(minutes_to_add=60):
+    $ _time_skip_minutes = max(0, int(minutes_to_add or 0))
+    if int(BlockTimeAdvance or 0) == 0 and _time_skip_minutes > 0:
+        call AdvanceTimeOnly(_time_skip_minutes)
+    $ main_ui_overlay = ""
+    $ return_loc = _time_return_label()
+    if renpy.has_label(return_loc):
+        jump expression return_loc
+    jump TavernMain
 
+    def _time_change_close_action(return_label=""):
+        if str(return_label or "") == "__main_ui_overlay__":
+            return SetVariable("main_ui_overlay", "")
+        return Hide("time_change_card_overlay")
+
+    def _time_return_label():
+        if CurrentRoom is not None:
+            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
+            if room_code:
+                return room_code
+        return str(CurLoc or "TavernMain")
+    def _time_return_label():
+        if CurrentRoom is not None:
+            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
+            if room_code:
+                return room_code
+        return str(CurLoc or "TavernMain")
+label ApplyTimeSkip(minutes_to_add=60):
+    $ _time_skip_minutes = max(0, int(minutes_to_add or 0))
+    if int(BlockTimeAdvance or 0) == 0 and _time_skip_minutes > 0:
+        call AdvanceTimeOnly(_time_skip_minutes)
+    $ main_ui_overlay = ""
+    $ return_loc = _time_return_label()
+    if renpy.has_label(return_loc):
+        jump expression return_loc
+    jump TavernMain
+
+    def _time_change_close_action(return_label=""):
+        if str(return_label or "") == "__main_ui_overlay__":
+            return SetVariable("main_ui_overlay", "")
+        return Hide("time_change_card_overlay")
+
+    def _time_return_label():
+        if CurrentRoom is not None:
+            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
+            if room_code:
+                return room_code
+        return str(CurLoc or "TavernMain")
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+init python:
     TIME_CHANGE_PERIOD_TARGETS = (
         (8, "Дождаться утра"),
         (11, "Дождаться полудня"),
@@ -22,12 +91,28 @@ init python:
         (23, "Дождаться ночи"),
     )
 
-    def _time_current_hour():
-        calendar_v2.sync_state()
-        return int(calendar_v2.hour or 0) % 24
+    TIME_CHANGE_SKIP_TARGETS = (
+        (60, "Пропустить 1 час"),
+        (180, "Пропустить 3 часа"),
+        (360, "Пропустить 6 часов"),
+        (720, "Пропустить 12 часов"),
+        (1440, "Пропустить 1 день"),
+        (7200, "Пропустить 5 дней"),
+        (10080, "Пропустить неделю"),
+    )
+
+    def _time_minutes_to_hour(target_hour):
+        current_minutes = (int(calendar_v2.hour or 0) % 24) * 60 + (int(calendar_v2.minute or 0) % 60)
+        target_minutes = (int(target_hour or 0) % 24) * 60
+        minutes_to_add = target_minutes - current_minutes
+        if minutes_to_add <= 0:
+            minutes_to_add += 1440
+        return minutes_to_add
+
+    def _time_skip_action(return_label="", minutes_to_add=60):
+        return [_time_change_close_action(return_label), Call("ApplyTimeSkip", int(minutes_to_add or 0))]
 
     def _time_overview_lines():
-        calendar_v2.sync_state()
         hud = calendar_v2.hud_data()
         return [
             "Сейчас: %s." % calendar_v2.clock_text(calendar_v2.hour, calendar_v2.minute),
@@ -43,23 +128,19 @@ init python:
         if int(BlockTimeAdvance or 0) != 0:
             lines.append("Сейчас пропуск времени недоступен.")
         else:
-            lines.append("Выберите, до какого времени ждать, либо пропустите несколько дней.")
+            lines.append("Выберите, сколько времени пропустить, либо до какого времени ждать.")
         return "\n".join(lines)
 
     def _time_change_items(return_label=""):
         items = []
         block_advance = int(BlockTimeAdvance or 0)
-        current_hour = _time_current_hour()
 
         if block_advance == 0:
+            for minutes_to_add, caption in TIME_CHANGE_SKIP_TARGETS:
+                items.append(MenuItem(caption, _time_skip_action(return_label, minutes_to_add)))
+
             for target_hour, caption in TIME_CHANGE_PERIOD_TARGETS:
-                if current_hour < int(target_hour or 0):
-                    items.append(MenuItem(caption, [_time_change_close_action(return_label), Call("ApplyTimePeriodChange", target_hour)]))
-
-        if block_advance == 0:
-            items.append(MenuItem("Дождаться следующего утра", [_time_change_close_action(return_label), Call("NextDay", _time_return_label(), 1)]))
-            items.append(MenuItem("Пропустить 5 дней", [_time_change_close_action(return_label), Call("NextDay", _time_return_label(), 5)]))
-            items.append(MenuItem("Пропустить неделю", [_time_change_close_action(return_label), Call("NextDay", _time_return_label(), 7)]))
+                items.append(MenuItem(caption, _time_skip_action(return_label, _time_minutes_to_hour(target_hour))))
 
         if str(return_label or "") == "__main_ui_overlay__":
             items.append(MenuItem("Назад", SetVariable("main_ui_overlay", "")))
@@ -87,20 +168,6 @@ label HideTimeChangeMenu(return_label=""):
     if str(return_label or "") != "":
         call expression return_label
     return
-
-
-label ApplyTimePeriodChange(target_hour=8):
-    $ target_hour = int(target_hour or 8) % 24
-    $ calendar_v2.sync_state()
-    if int(BlockTimeAdvance or 0) == 0 and int(calendar_v2.hour or 0) < target_hour:
-        $ calendar_v2.hour = target_hour
-        $ calendar_v2.minute = 0
-        $ calendar_v2.sync_state()
-        call stat
-    $ return_loc = _time_return_label()
-    if renpy.has_label(return_loc):
-        jump expression return_loc
-    jump TavernMain
 
 
 screen time_change_card_overlay(return_label=""):

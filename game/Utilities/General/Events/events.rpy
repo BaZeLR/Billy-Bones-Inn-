@@ -10,6 +10,20 @@ default tavern_work_events = []
 
 default availEvents = {}
 default evalTime = None
+default active_event = None
+default random_events = []
+default story_events = []
+default tavern_work_events = []
+
+default availEvents = {}
+default evalTime = None
+default active_event = None
+default random_events = []
+default story_events = []
+default tavern_work_events = []
+
+default availEvents = {}
+default evalTime = None
 default thread = None
 default eventLocations = set()
 default eventPeople = set()
@@ -22,6 +36,32 @@ default eventRouteHints = {}
 default story_thread_levels = {}
 default StoryEventFiredDay = -1
 default StoryEventFiredKeysToday = []
+default eventLocations = set()
+default eventPeople = set()
+default eventTalk = set()
+default eventOptions = set()
+default eventItems = set()
+default eventPath = set()
+default eventProjectionRows = []
+default eventRouteHints = {}
+default story_thread_levels = {}
+default StoryEventFiredDay = -1
+default StoryEventFiredKeysToday = []
+default eventLocations = set()
+default eventPeople = set()
+default eventTalk = set()
+default eventOptions = set()
+default eventItems = set()
+default eventPath = set()
+default eventProjectionRows = []
+default eventRouteHints = {}
+default story_thread_levels = {}
+default StoryEventFiredDay = -1
+default StoryEventFiredKeysToday = []
+
+default thread = None
+
+default thread = None
 
 init -25 python:
     import renpy.exports as renpy
@@ -177,6 +217,8 @@ init -25 python:
         )
 
     def story_event_reset_fired_today_if_needed():
+        global event_runtime.fired_day, event_runtime.fired_keys_today
+        global event_runtime.fired_day, event_runtime.fired_keys_today
         global StoryEventFiredDay, StoryEventFiredKeysToday
         day_value = _story_num_day()
         if int(StoryEventFiredDay or -1) != int(day_value):
@@ -189,6 +231,8 @@ init -25 python:
         return bool(key and key in list(StoryEventFiredKeysToday or []))
 
     def story_event_mark_fired_today(evt):
+        global event_runtime.fired_keys_today
+        global event_runtime.fired_keys_today
         global StoryEventFiredKeysToday
         story_event_reset_fired_today_if_needed()
         key = story_event_day_key(evt)
@@ -291,6 +335,12 @@ init -25 python:
         return target_key
 
     def _story_project_available_events():
+        global event_runtime.locations, event_runtime.people, event_runtime.talk, event_runtime.options, event_runtime.items
+        global event_runtime.paths, event_runtime.projection_rows, event_runtime.route_hints
+
+        global event_runtime.locations, event_runtime.people, event_runtime.talk, event_runtime.options, event_runtime.items
+        global event_runtime.paths, event_runtime.projection_rows, event_runtime.route_hints
+
         global eventLocations, eventPeople, eventTalk, eventOptions, eventItems
         global eventPath, eventProjectionRows, eventRouteHints
 
@@ -369,7 +419,20 @@ init -25 python:
         return key in set(eventLocations or set()) or key in set(eventPath or set())
 
     def findAvailableEvents(forced=False):
+        global event_runtime.available, event_runtime.evaluation_time
+        global event_runtime.locations, event_runtime.people, event_runtime.talk, event_runtime.options, event_runtime.items
+        global event_runtime.story_events
+
+        global event_runtime.available, event_runtime.evaluation_time
+        global event_runtime.locations, event_runtime.people, event_runtime.talk, event_runtime.options, event_runtime.items
+        global event_runtime.story_events
+
         global availEvents, evalTime
+        global eventLocations, eventPeople, eventTalk, eventOptions, eventItems
+        global story_events
+
+        global availEvents, evalTime
+        global eventLocations, eventPeople, eventTalk, eventOptions, eventItems
         global eventLocations, eventPeople, eventTalk, eventOptions, eventItems
         global story_events
 
@@ -448,10 +511,8 @@ init python:
             if location_key == "TavernAmandaRoom":
                 return "Осмотреть рисунки Мелиссы"
             return "Поговорить о летучих мышах"
-        if action_key == "street_clients_georgett":
-            return "Проверить переулок Жоржетты"
-        if action_key == "street_clients_liza":
-            return "Проверить переулок Лизетты"
+        if action_key == "street_clients":
+            return "Пойти проверить подворотню"
         if action_key == "after_cermon_walk":
             return "Обойти храм после службы"
         if action_key == "dress_change":
@@ -510,12 +571,13 @@ init python:
         )
 
     def story_thread_advance_current():
+        global event_runtime.evaluation_time
         global evalTime
         try:
             current_thread = thread
         except NameError:
             current_thread = None
-        if current_thread is not None:
+        if current_event_runtime.active_thread is not None:
             try:
                 current_thread.advance()
             except Exception:
