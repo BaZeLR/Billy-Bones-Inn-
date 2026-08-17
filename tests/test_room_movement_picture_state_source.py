@@ -14,3 +14,22 @@ def test_advance_movement_time_clears_selected_object_and_npc_before_jump():
 
     assert '$ current_object_id = ""' in label
     assert '$ current_girl_key = ""' in label
+
+
+def test_move_to_room_uses_curloc_as_single_location_truth():
+    source = read_rel("game/Utilities/General/Classes/RoomTemplate.rpy")
+    label = source.split('label MoveToRoom(target_label="", movement_minutes=0):', 1)[1].split('"DEBUG: missing target label', 1)[0]
+
+    assert '$ CurLoc = movement_target' in label
+    assert '$ location =' not in label
+    assert '$ CurrentRoom =' not in label
+    assert 'get_registered_room(CurLoc)' in label
+
+
+def test_room_schedule_uses_clock_hours_not_display_time_slot():
+    source = read_rel("game/Utilities/General/Classes/RoomTemplate.rpy")
+    schedule = source.split("class RoomSchedule(object):", 1)[1].split("class Room(object):", 1)[0]
+
+    assert "calendar_v2.hour" in schedule
+    assert "time_slots" not in schedule
+    assert "slot_from_hour" not in schedule

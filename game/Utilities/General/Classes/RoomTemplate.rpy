@@ -422,8 +422,9 @@ label MoveToRoom(target_label="", movement_minutes=0):
         if move_cost > 0:
             $ calendar_v2.advance_minutes(move_cost)
 
+    # CurLoc is the single source of truth for current location identity.
+    # Room behavior is resolved from roomRegistry with get_registered_room(CurLoc).
     $ CurLoc = movement_target
-    $ location = movement_target
 
     if renpy.has_label(movement_target):
         jump expression movement_target
