@@ -75,7 +75,25 @@ def test_forest_spawned_items_are_room_owned_and_transfer_to_player_inventory():
     take_block = source.split('label ForestTakeSpawnedItem(item_id=""):', 1)[1].split("label ForestSubroomBuildActions:", 1)[0]
 
     assert 'self.custom_properties["spawned_items"]' in forest_class
+    assert 'self.custom_properties["spawn_day"] = day_value' in forest_class
+    assert 'int(self.custom_properties.get("spawn_day", -1)) == day_value' in forest_class
     assert "ForestRoom.remove_spawned_item(item_id)" in take_block
     assert "_player_add_item_by_id" in take_block
     assert "picked_item" not in source.lower()
     assert "pickeditem" not in source.lower()
+
+
+def test_main_forest_uses_vertical_slice_without_location_mirrors():
+    source = read_rel("game/Forest/Forest.rpy")
+    entry = source.split("label Forest:", 1)[1].split("label ForestBuildActions:", 1)[0]
+    actions = source.split("label ForestBuildActions:", 1)[1].split("label ForestObjectMenu", 1)[0]
+
+    assert '$ CurLoc = "Forest"' in entry
+    assert "get_registered_room(CurLoc) or ForestRoom" in entry
+    assert "$ CurrentRoom =" not in entry
+    assert "$ location =" not in entry
+    assert "call RoomEnterEventGate(CurLoc, False)" in entry
+    assert entry.index("call RoomEnterEventGate(CurLoc, False)") < entry.index("forest_pick_background()")
+    assert "_forest_room.spawn()" in entry
+    assert "get_registered_room(CurLoc) or ForestRoom" in actions
+    assert 'Call("MoveToRoom", _forest_exit.target' in actions
