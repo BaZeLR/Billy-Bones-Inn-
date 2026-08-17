@@ -43,3 +43,34 @@ def test_room_entry_event_gate_does_not_own_room_media():
     assert "scene_image" not in gate
     assert "bg_picture" not in gate
     assert 'room_enter_story_action_ready(_room_enter_code, "enter")' in gate
+
+
+def test_room_owns_first_visit_state_in_custom_properties():
+    source = read_rel("game/Utilities/General/Classes/RoomTemplate.rpy")
+    room_block = source.split("class Room(object):", 1)[1].split('label MoveToRoom(target_label="", movement_minutes=0):', 1)[0]
+
+    assert "default roomFirstVisit" not in source
+    assert 'self.custom_properties.get("_visited", False)' in room_block
+    assert 'self.custom_properties["_visited"] = True' in room_block
+
+
+def test_room_custom_properties_are_in_save_restore_payload():
+    source = read_rel("game/Utilities/General/Classes/RoomTemplate.rpy")
+    restore_block = source.split('def restore_room_runtime(room_code="", payload=None):', 1)[1].split("class RoomExit(object):", 1)[0]
+    reduce_block = source.split("def __reduce__(self):", 1)[1].split('label MoveToRoom(target_label="", movement_minutes=0):', 1)[0]
+
+    assert 'if "custom_properties" in payload:' in restore_block
+    assert 'restored.custom_properties = dict(payload.get("custom_properties", {}) or {})' in restore_block
+    assert '"custom_properties": dict(state.get("custom_properties", {}) or {})' in reduce_block
+
+
+def test_forest_spawned_items_are_room_owned_and_transfer_to_player_inventory():
+    source = read_rel("game/Forest/Forest.rpy")
+    forest_class = source.split("class Forest(Room):", 1)[1].split("def forest_room_spawn", 1)[0]
+    take_block = source.split('label ForestTakeSpawnedItem(item_id=""):', 1)[1].split("label ForestSubroomBuildActions:", 1)[0]
+
+    assert 'self.custom_properties["spawned_items"]' in forest_class
+    assert "ForestRoom.remove_spawned_item(item_id)" in take_block
+    assert "_player_add_item_by_id" in take_block
+    assert "picked_item" not in source.lower()
+    assert "pickeditem" not in source.lower()
