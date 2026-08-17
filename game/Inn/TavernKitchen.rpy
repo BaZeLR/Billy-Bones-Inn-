@@ -296,7 +296,7 @@ init python:
     )
 
     def build_kitchen_description(include_notice=True, intro_text=""):
-        room_obj = CurrentRoom if CurrentRoom is not None else TavernKitchenRoom
+        room_obj = get_registered_room("TavernKitchen") or TavernKitchenRoom
         room_item_ids = [get_object_id(row) for row in list(getattr(room_obj, "game_items", []) or [])]
         text_parts = []
 
@@ -319,7 +319,7 @@ init python:
             text_parts.append("На кухне работают: " + crew_names + ".")
         if int(BeckyKitchenVisitActive or 0) == 1:
             text_parts.append("Сегодня сюда заглянула Бекки Блэнкеншип. Она что-то негромко обсуждает с Сандрой у разделочного стола.")
-        if int(week or 0) == 7 and int(time or 0) == 1:
+        if int(week or 0) == 7 and 12 <= int(hour or 0) < 18:
             text_parts.append("Судя по запахам и приготовленным блюдам, Сандра решила устроить для всей трактирной челяди воскресный обед поосновательнее обычного.")
         if tavern_kitchen_food_stock_count() > 0:
             text_parts.append("В кладовой уже отложены принесенные вами припасы для кухни: %s." % tavern_kitchen_food_stock_summary())
@@ -337,11 +337,10 @@ init python:
         return "\n".join([row for row in text_parts if str(row or "").strip()])
 
 label TavernKitchen:
-    $ CurrentRoom = TavernKitchenRoom
     $ CurLoc = "TavernKitchen"
-    $ location = CurLoc
+    $ _kitchen_room = get_registered_room(CurLoc) or TavernKitchenRoom
     $ tavern_kitchen_hearth_wood_stock()
-    $ scene_image = tavern_kitchen_picture() or CurrentRoom.bg_picture or None
+    $ scene_image = tavern_kitchen_picture() or _kitchen_room.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
     else:
@@ -367,8 +366,10 @@ label TavernKitchen:
         if str(_kitchen_event_picture or "").strip():
             $ scene_image = _kitchen_event_picture
             $ _layout_last_picture = _kitchen_event_picture
-        call DisplayTavernEventShort(time, 1)
-        $ _kitchen_wine_event_text = str(_return or "")
+        $ _kitchen_mandatory_event = tavern_work_pop_mandatory_code("WineForDance", CurLoc)
+        if str(_kitchen_mandatory_event or "") == "WineForDance":
+            call EventWineForDance(1)
+            $ _kitchen_wine_event_text = str(_return or "")
 
     if str(_kitchen_wine_event_text or "").strip():
         $ MainTxt = _kitchen_wine_event_text
@@ -400,10 +401,11 @@ label TavernKitchen:
 label TavernKitchenBuildActions:
     if TavernBreakfastEventActive:
         return
+    $ _kitchen_room = get_registered_room(CurLoc) or TavernKitchenRoom
     $ tavern_kitchen_hearth_wood_stock()
     $ current_action_title = "Кухня"
     $ current_action_content = None
-    $ room_menu = CurrentRoom.build_menu_sections()
+    $ room_menu = _kitchen_room.build_menu_sections()
     $ current_action_items = room_menu["movement"] + room_menu["actions"]
     if tavern_breakfast_available():
         $ current_action_items.append(MenuItem("Позавтракать", Call("TavernKitchenBreakfast")))
