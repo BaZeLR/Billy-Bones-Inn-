@@ -23,7 +23,11 @@ init python:
             Room.__init__(self, **kwargs)
             self.spawn_rules = list(spawn_rules or [])
 
-        def spawn(self):
+        def spawn(self, force=False):
+            day_value = int(dayspassed or 0)
+            if not bool(force) and int(self.custom_properties.get("spawn_day", -1) or -1) == day_value:
+                return self.get_spawned_items()
+
             spawned_items = []
             for rule in self.spawn_rules:
                 item_id = str(rule.get("item_id", "") or "").strip()
@@ -37,6 +41,7 @@ init python:
                         "units": units,
                     })
             self.custom_properties["spawned_items"] = list(spawned_items)
+            self.custom_properties["spawn_day"] = day_value
             return list(spawned_items)
 
         def get_spawned_items(self):
@@ -55,10 +60,15 @@ init python:
             self.custom_properties["spawned_items"] = kept_items
             return removed_entry
 
-    def forest_room_spawn(room_obj):
+    def forest_room_spawn(room_obj, force=False):
         if room_obj is None:
             return []
-        rules = list((getattr(room_obj, "custom_properties", {}) or {}).get("spawn_rules", []) or [])
+        props = getattr(room_obj, "custom_properties", {}) or {}
+        day_value = int(dayspassed or 0)
+        if not bool(force) and int(props.get("spawn_day", -1) or -1) == day_value:
+            return list(props.get("spawned_items", []) or [])
+
+        rules = list(props.get("spawn_rules", []) or [])
         spawned_items = []
         for rule in rules:
             item_id = str(rule.get("item_id", "") or "").strip()
@@ -69,6 +79,7 @@ init python:
             if random.randint(1, frequency) == 1:
                 spawned_items.append({"item_id": item_id, "units": units})
         room_obj.custom_properties["spawned_items"] = list(spawned_items)
+        room_obj.custom_properties["spawn_day"] = day_value
         return list(spawned_items)
 
     def forest_room_get_spawned_items(room_obj):
@@ -272,10 +283,10 @@ label ForestReturnToTavernAfterDusk:
 
 
 label Forest:
-    $ CurrentRoom = ForestRoom
     $ CurLoc = "Forest"
-    $ location = CurLoc
-    $ scene_image = forest_pick_background()
+    $ _forest_room = get_registered_room(CurLoc) or ForestRoom
+    call RoomEnterEventGate(CurLoc, False)
+    $ scene_image = forest_pick_background() or _forest_room.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
     else:
@@ -284,11 +295,11 @@ label Forest:
     $ current_action_content = None
     $ current_action_items = []
     $ current_object_id = ""
-    $ MainTxt = forest_build_entry_text(CurrentRoom)
+    $ MainTxt = forest_build_entry_text(_forest_room)
     $ CurLocDesc = MainTxt
     $ ForestSavedText = MainTxt
-    $ CurrentRoom.mark_visited()
-    $ _forest_spawned = ForestRoom.spawn()
+    $ _forest_room.mark_visited()
+    $ _forest_spawned = _forest_room.spawn()
     if len(_forest_spawned) > 0:
         $ MainTxt = MainTxt + "\n\nСегодня здесь можно кое-что найти, если внимательно осмотреться."
         $ CurLocDesc = MainTxt
@@ -303,6 +314,7 @@ label Forest:
 
 
 label ForestBuildActions:
+    $ _forest_room = get_registered_room(CurLoc) or ForestRoom
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
@@ -325,20 +337,20 @@ label ForestBuildActions:
     elif werecat_can_check_bait("Forest"):
         $ current_action_items.append(MenuItem("Проверить странную приманку", Call("WerecatCheckTrap", "Forest")))
     python:
-        for _forest_object in ForestRoom.visible_objects():
+        for _forest_object in _forest_room.visible_objects():
             current_action_items.append(MenuItem(_forest_object.name, Call("ForestObjectMenu", _forest_object.object_id)))
-        for _spawn_entry in ForestRoom.get_spawned_items():
+        for _spawn_entry in _forest_room.get_spawned_items():
             _spawn_item_id = str(_spawn_entry.get("item_id", "") or "")
             _spawn_units = max(1, int(_spawn_entry.get("units", 1) or 1))
-            _spawn_item = get_game_item(_spawn_item_id, ForestRoom)
+            _spawn_item = get_game_item(_spawn_item_id, _forest_room)
             if _spawn_item is not None:
                 _spawn_name = str(getattr(_spawn_item, "name", _spawn_item_id) or _spawn_item_id)
                 current_action_items.append(MenuItem(_spawn_name + " x" + str(_spawn_units), Call("ForestSpawnedItemMenu", _spawn_item_id)))
-        for _forest_exit in ForestRoom.visible_exits():
+        for _forest_exit in _forest_room.visible_exits():
             if str(_forest_exit.target or "") == "StreetTavern":
                 current_action_items.append(MenuItem(forest_return_label_text(), Call("ForestReturnToOrigin")))
             else:
-                current_action_items.append(MenuItem(_forest_exit.label, Call("AdvanceMovementTime", _forest_exit.target)))
+                current_action_items.append(MenuItem(_forest_exit.label, Call("MoveToRoom", _forest_exit.target, getattr(_forest_exit, "minutes_to_pass", 5))))
     return
 
 
@@ -497,7 +509,7 @@ label ForestSubroomBuildActions:
     if forest_trap_can_place(str(getattr(CurrentRoom, "code_name", "") or "")):
         $ current_action_items.append(MenuItem("Поставить ловушку", Call("ForestSetTrap")))
     elif forest_trap_can_check(str(getattr(CurrentRoom, "code_name", "") or "")):
-        $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap")))
+        $ current_action_items.append(MenuItem("Проверить ловушку", Call("ForestCheckTrap", str(getattr(CurrentRoom, "code_name", "") or ""))))
     if str(getattr(CurrentRoom, "code_name", "") or "") == "ForestLake":
         $ current_action_items.append(MenuItem("Искупаться в озере", Call("ForestLakeBath")))
         if forest_has_horse():
@@ -614,6 +626,7 @@ label ForestLakeWashHorse:
     $ MainTxt = "Вы осторожно заводите [MyStallion] в воду и тщательно смываете с него дорожную грязь и пыль. Конь фыркает, встряхивает гривой и выглядит заметно бодрее."
     $ CurLocDesc = MainTxt
     $ ForestSubroomSavedText = MainTxt
+    call stat
     call ForestSubroomBuildActions
     return
 
