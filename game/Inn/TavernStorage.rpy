@@ -61,7 +61,7 @@ init 6 python:
             ),
         ],
         exits=[
-            RoomExit(label="Вернуться на кухню", target="TavernKitchen"),
+            RoomExit(label="Вернуться на кухню", target="TavernKitchen", minutes_to_pass=10),
         ],
         game_items=[
             TavernStorageSuppliesObject,
@@ -71,24 +71,20 @@ init 6 python:
 
 
 label TavernStorage:
-    $ CurrentRoom = TavernStorageRoom
     $ CurLoc = "TavernStorage"
-    $ location = CurLoc
+    $ _storage_room = get_registered_room(CurLoc) or TavernStorageRoom
     call RoomEnterEventGate(CurLoc, False)
-    $ scene_image = tavern_storage_picture() or TavernStorageRoom.bg_picture or None
+    $ scene_image = tavern_storage_picture() or _storage_room.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
     else:
         $ _layout_last_picture = ""
     $ MainTxt = tavern_storage_text()
     $ CurLocDesc = MainTxt
-    python:
-        _storage_items = []
-        for _storage_exit in TavernStorageRoom.visible_exits():
-            _storage_items.append(MenuItem(_storage_exit.label, Call("AdvanceMovementTime", _storage_exit.target)))
+    $ _storage_menu = _storage_room.build_menu_sections()
     $ current_action_title = "Кладовая"
     $ current_action_content = None
-    $ current_action_items = _storage_items
+    $ current_action_items = _storage_menu["movement"] + _storage_menu["actions"]
     $ UI_mode = "scene"
     $ UI_selected_char = ""
     $ current_girl_key = ""
