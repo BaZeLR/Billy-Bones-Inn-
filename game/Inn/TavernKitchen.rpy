@@ -340,12 +340,12 @@ label TavernKitchen:
     $ CurLoc = "TavernKitchen"
     $ _kitchen_room = get_registered_room(CurLoc) or TavernKitchenRoom
     $ tavern_kitchen_hearth_wood_stock()
+    call RoomEnterEventGate(CurLoc, False)
     $ scene_image = tavern_kitchen_picture() or _kitchen_room.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
     else:
         $ _layout_last_picture = ""
-    call RoomEnterEventGate(CurLoc, False)
     $ current_object_id = ""
     $ current_girl_key = ""
     if TavernBreakfastEventActive:
