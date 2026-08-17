@@ -1,10 +1,6 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default RoomEnterPresentIds = []
-default RoomEnterLastRoom = ""
-default RoomEnterLastEventFired = False
-
 init python:
     def room_enter_present_ids(room_code=""):
         room_key = str(room_code or CurLoc or "").strip()
@@ -25,12 +21,6 @@ init python:
         except Exception:
             return False
 
-    def room_enter_capture_presence(room_code=""):
-        global RoomEnterPresentIds, RoomEnterLastRoom
-        RoomEnterLastRoom = str(room_code or CurLoc or "").strip()
-        RoomEnterPresentIds = list(room_enter_present_ids(RoomEnterLastRoom) or [])
-        return list(RoomEnterPresentIds or [])
-
 
 label RoomEnterEventGate(room_code="", include_daily=True):
     $ _room_enter_code = str(room_code or CurLoc or "").strip()
@@ -39,30 +29,26 @@ label RoomEnterEventGate(room_code="", include_daily=True):
 
     # Entry dispatch does not own room presentation. The room decides its normal
     # picture/text; an event decides its temporary scene while it is playing.
-    $ RoomEnterLastEventFired = False
-    $ room_enter_capture_presence(_room_enter_code)
-
     if room_enter_story_action_ready(_room_enter_code, "enter"):
         call checkTriggers(_room_enter_code, "enter", 0)
         if _return:
-            $ RoomEnterLastEventFired = True
             return True
 
     if include_daily:
-        $ _room_enter_daily_ids = list(RoomEnterPresentIds or [])
+        $ _room_enter_daily_ids = list(room_enter_present_ids(_room_enter_code) or [])
         while len(_room_enter_daily_ids) > 0:
             $ _room_enter_daily_npc = str(_room_enter_daily_ids.pop(0) or "").strip()
             if _room_enter_daily_npc != "":
+                # Legacy daily-event tables still use the display slot. New room,
+                # schedule and story-event code must use calendar clock hours.
                 call CheckDailyEvent(_room_enter_daily_npc, None, _room_enter_code, time)
                 if _return:
-                    $ RoomEnterLastEventFired = True
                     return True
 
     if _room_enter_code != "" and "household_ai_pick_event" in globals() and renpy.has_label("HouseholdEvent_Try"):
         $ _household_seen_before = len(HouseholdAISeen) if isinstance(globals().get("HouseholdAISeen", None), dict) else 0
         call HouseholdEvent_Try(_room_enter_code, "room")
         if isinstance(globals().get("HouseholdAISeen", None), dict) and len(HouseholdAISeen) > _household_seen_before:
-            $ RoomEnterLastEventFired = True
             return True
 
     return False
