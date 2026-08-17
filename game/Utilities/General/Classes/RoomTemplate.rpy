@@ -1,8 +1,6 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default roomFirstVisit = {}
-
 init -40 python:
     roomRegistry = {}
     ROOM_GROUP_TAVERN = "tavern"
@@ -133,6 +131,8 @@ init -40 python:
         if "game_items" in payload:
             restored.game_items = normalize_room_item_rows(payload.get("game_items", []))
             restored.objects = restored.game_items
+        if "custom_properties" in payload:
+            restored.custom_properties = dict(payload.get("custom_properties", {}) or {})
         if "is_hidden" in payload:
             restored.is_hidden = bool(payload.get("is_hidden", False))
         if "is_locked" in payload:
@@ -279,10 +279,11 @@ init -40 python:
             register_room_runtime(self)
 
         def is_first_visit(self):
-            return not bool(roomFirstVisit.get(self.code_name, False))
+            return not bool(self.custom_properties.get("_visited", False))
 
         def mark_visited(self):
-            roomFirstVisit[self.code_name] = True
+            self.custom_properties["_visited"] = True
+            return True
 
         def visible_descriptions(self):
             first_visit_now = self.is_first_visit()
@@ -401,11 +402,13 @@ init -40 python:
             self.__dict__.update(dict(state or {}))
             self.game_items = normalize_room_item_rows(getattr(self, "game_items", []))
             self.objects = self.game_items
+            self.custom_properties = dict(getattr(self, "custom_properties", {}) or {})
 
         def __reduce__(self):
             state = self.__getstate__()
             payload = {
                 "game_items": normalize_room_item_rows(state.get("game_items", [])),
+                "custom_properties": dict(state.get("custom_properties", {}) or {}),
                 "is_hidden": bool(state.get("is_hidden", False)),
                 "is_locked": bool(state.get("is_locked", False)),
                 "open_override": state.get("open_override", None),
