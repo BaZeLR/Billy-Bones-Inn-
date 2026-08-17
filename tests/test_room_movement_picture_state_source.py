@@ -33,3 +33,13 @@ def test_room_schedule_uses_clock_hours_not_display_time_slot():
     assert "calendar_v2.hour" in schedule
     assert "time_slots" not in schedule
     assert "slot_from_hour" not in schedule
+
+
+def test_room_entry_event_gate_does_not_own_room_media():
+    source = read_rel("game/Utilities/General/Common/RoomEnterPipeline.rpy")
+    gate = source.split('label RoomEnterEventGate(room_code="", include_daily=True):', 1)[1]
+
+    assert "_layout_last_picture" not in gate
+    assert "scene_image" not in gate
+    assert "bg_picture" not in gate
+    assert 'room_enter_story_action_ready(_room_enter_code, "enter")' in gate
