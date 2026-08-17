@@ -36,10 +36,9 @@ label RoomEnterEventGate(room_code="", include_daily=True):
     $ _room_enter_code = str(room_code or CurLoc or "").strip()
     if _room_enter_code != "" and room_in_group(_room_enter_code, ROOM_GROUP_CITY):
         $ dog_prepare_current_spawn()
-    $ _room_enter_obj = get_registered_room(_room_enter_code)
-    if _room_enter_obj is not None and str(getattr(_room_enter_obj, "bg_picture", "") or "").strip():
-        $ _layout_last_picture = str(getattr(_room_enter_obj, "bg_picture", "") or "").strip()
-        $ scene_image = _layout_last_picture
+
+    # Entry dispatch does not own room presentation. The room decides its normal
+    # picture/text; an event decides its temporary scene while it is playing.
     $ RoomEnterLastEventFired = False
     $ room_enter_capture_presence(_room_enter_code)
 
