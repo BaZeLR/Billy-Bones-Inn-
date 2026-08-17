@@ -25,7 +25,7 @@ init python:
 
         def spawn(self, force=False):
             day_value = int(dayspassed or 0)
-            if not bool(force) and int(self.custom_properties.get("spawn_day", -1) or -1) == day_value:
+            if not bool(force) and int(self.custom_properties.get("spawn_day", -1)) == day_value:
                 return self.get_spawned_items()
 
             spawned_items = []
@@ -65,7 +65,7 @@ init python:
             return []
         props = getattr(room_obj, "custom_properties", {}) or {}
         day_value = int(dayspassed or 0)
-        if not bool(force) and int(props.get("spawn_day", -1) or -1) == day_value:
+        if not bool(force) and int(props.get("spawn_day", -1)) == day_value:
             return list(props.get("spawned_items", []) or [])
 
         rules = list(props.get("spawn_rules", []) or [])
