@@ -101,7 +101,10 @@ init python:
         # progression, however, is counted at most once per game day.
         npc_apply_grooming(key, "barber_full")
         current_day = int(dayspassed or 0)
-        last_progress_day = int(progression.get("barber_last_progress_day", -1) or -1)
+        try:
+            last_progress_day = int(progression.get("barber_last_progress_day", -1))
+        except Exception:
+            last_progress_day = -1
         visit_count = max(0, int(progression.get("barber_visit_count", 0) or 0))
         readiness = max(0, min(BARBER_READINESS_MAX, int(progression.get("barber_readiness", 0) or 0)))
         before_stage = _barber_progress_stage_from_readiness(readiness)
