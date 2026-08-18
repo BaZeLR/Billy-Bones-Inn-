@@ -11,6 +11,184 @@ init python:
     BARBER_FEMALE_HAIRCUT_PRICE = 120
     BARBER_OLIVE_OIL_PRICE = 11
     BARBER_LUXURY_SOAP_BUY_PRICE = 22
+    BARBER_READINESS_MAX = 20
+    BARBER_NPC_READINESS_GAIN = {
+        "sandra": 2,
+        "melissa": 3,
+        "amanda": 3,
+        "becky": 2,
+        "clara": 2,
+    }
+
+    def barber_shop_readiness_gain(npc_id=""):
+        key = str(npc_id or "").strip().lower()
+        return max(1, int(BARBER_NPC_READINESS_GAIN.get(key, 2) or 2))
+
+    def _barber_progress_stage_from_readiness(readiness_value=0):
+        value = max(0, min(BARBER_READINESS_MAX, int(readiness_value or 0)))
+        if value < 4:
+            return 0
+        if value < 8:
+            return 1
+        if value < 12:
+            return 2
+        if value < 16:
+            return 3
+        return 4
+
+    def npc_barber_progress_state(girl_name=""):
+        key = str(girl_name or "").strip().lower()
+        if key == "":
+            return {}
+        state = npc_appearance_state(key)
+        if not isinstance(state, dict):
+            return {}
+        grooming = state.setdefault("grooming", {})
+        grooming.setdefault("barber_visit_count", 0)
+        grooming.setdefault("barber_readiness", 0)
+        grooming.setdefault("barber_last_progress_day", -1)
+
+        # Old saves only knew the last barber day. Import one historical visit
+        # without retroactively changing social stats.
+        raw_legacy_day = BarberVisitLastDay.get(key, -1) if isinstance(BarberVisitLastDay, dict) else -1
+        try:
+            legacy_day = int(raw_legacy_day)
+        except Exception:
+            legacy_day = -1
+        try:
+            visit_count = int(grooming.get("barber_visit_count", 0) or 0)
+        except Exception:
+            visit_count = 0
+        if legacy_day >= 0 and visit_count <= 0:
+            grooming["barber_visit_count"] = 1
+            grooming["barber_readiness"] = min(BARBER_READINESS_MAX, barber_shop_readiness_gain(key))
+            grooming["barber_last_progress_day"] = legacy_day
+        return grooming
+
+    def npc_barber_visit_count(girl_name=""):
+        progression = npc_barber_progress_state(girl_name)
+        try:
+            return max(0, int(progression.get("barber_visit_count", 0) or 0))
+        except Exception:
+            return 0
+
+    def npc_barber_readiness(girl_name=""):
+        progression = npc_barber_progress_state(girl_name)
+        try:
+            return max(0, min(BARBER_READINESS_MAX, int(progression.get("barber_readiness", 0) or 0)))
+        except Exception:
+            return 0
+
+    def npc_barber_stage(girl_name=""):
+        return _barber_progress_stage_from_readiness(npc_barber_readiness(girl_name))
+
+    def npc_record_barber_visit(girl_name=""):
+        key = str(girl_name or "").strip().lower()
+        progression = npc_barber_progress_state(key)
+        if key == "" or not progression:
+            return {
+                "counted": False,
+                "visit_count": 0,
+                "readiness": 0,
+                "stage": 0,
+                "stage_delta": 0,
+                "friend_delta": 0,
+                "openness_delta": 0,
+                "corruption_delta": 0,
+            }
+
+        # Physical grooming is refreshed every completed service. Social
+        # progression, however, is counted at most once per game day.
+        npc_apply_grooming(key, "barber_full")
+        current_day = int(dayspassed or 0)
+        last_progress_day = int(progression.get("barber_last_progress_day", -1) or -1)
+        visit_count = max(0, int(progression.get("barber_visit_count", 0) or 0))
+        readiness = max(0, min(BARBER_READINESS_MAX, int(progression.get("barber_readiness", 0) or 0)))
+        before_stage = _barber_progress_stage_from_readiness(readiness)
+
+        if last_progress_day == current_day:
+            return {
+                "counted": False,
+                "visit_count": visit_count,
+                "readiness": readiness,
+                "stage": before_stage,
+                "stage_delta": 0,
+                "friend_delta": 0,
+                "openness_delta": 0,
+                "corruption_delta": 0,
+            }
+
+        visit_count += 1
+        readiness = min(BARBER_READINESS_MAX, readiness + barber_shop_readiness_gain(key))
+        after_stage = _barber_progress_stage_from_readiness(readiness)
+        stage_delta = max(0, after_stage - before_stage)
+
+        # Openness grows only when a new readiness stage is crossed. Corruption
+        # begins later: stages 2, 3 and 4 each unlock one gradual point.
+        corruption_delta = sum(1 for milestone in (2, 3, 4) if before_stage < milestone <= after_stage)
+        progression["barber_visit_count"] = visit_count
+        progression["barber_readiness"] = readiness
+        progression["barber_last_progress_day"] = current_day
+        return {
+            "counted": True,
+            "visit_count": visit_count,
+            "readiness": readiness,
+            "stage": after_stage,
+            "stage_delta": stage_delta,
+            "friend_delta": 1,
+            "openness_delta": stage_delta,
+            "corruption_delta": corruption_delta,
+        }
+
+    def barber_shop_guest_progress_text(npc_id="", progress=None):
+        key = str(npc_id or "").strip().lower()
+        progress = dict(progress or {})
+        stage = max(0, min(4, int(progress.get("stage", npc_barber_stage(key)) or 0)))
+        counted = bool(progress.get("counted", True))
+        if not counted:
+            return "Сегодняшний уход лишь освежает уже достигнутый результат; отношение к нему за один день заметно не меняется."
+
+        texts = {
+            "amanda": [
+                "Аманда пока воспринимает визит скорее как забавную перемену и с любопытством разглядывает результат в зеркале.",
+                "Аманда уже явно наслаждается тем, что ухоженный вид привлекает внимание, и охотнее обсуждает с Серджио, что ей идет.",
+                "Аманда начинает сама выбирать детали ухода так, чтобы они подчеркивали фигуру и заставляли окружающих задерживать взгляд чуть дольше.",
+                "Для Аманды эти визиты превращаются в часть игры с вниманием: она становится смелее в выборе ухода и куда меньше стесняется обсуждать личные предпочтения.",
+                "Аманда уже совершенно сознательно использует уход как средство соблазнения и без смущения выбирает то, что делает ее образ наиболее вызывающим.",
+            ],
+            "melissa": [
+                "Мелисса немного смущена непривычным вниманием к собственной внешности, хотя результат ей явно нравится.",
+                "Мелисса начинает чувствовать себя увереннее после таких визитов и уже не так неловко обсуждает уход за собой.",
+                "Мелисса с любопытством спрашивает о новых способах ухода и все чаще сама решает, что именно хотела бы изменить или подчеркнуть.",
+                "Привычное смущение заметно отступает: Мелисса спокойно говорит о довольно личных деталях ухода и позволяет себе выбирать более смелые варианты.",
+                "Мелисса уже воспринимает ухоженность как собственное удовольствие и уверенно выбирает то, что заставляет ее чувствовать себя особенно привлекательной.",
+            ],
+            "sandra": [
+                "Сандра пока относится к процедуре практично: чисто, аккуратно и достаточно, чтобы снова заниматься делами.",
+                "Сандра начинает замечать комплименты после визитов и, хоть отмахивается от них, явно становится внимательнее к собственной внешности.",
+                "Она уже позволяет Серджио тратить время не только на практичность: хороший уход начинает нравиться Сандре сам по себе.",
+                "Сандра все спокойнее принимает внимание к своей зрелой женственности и уже сама просит подчеркнуть некоторые детали вместо того, чтобы просто привести себя в порядок.",
+                "Для Сандры уход окончательно становится личным удовольствием; хозяйская строгость остается, но она больше не делает вид, будто ей безразлично собственное чувственное впечатление.",
+            ],
+            "becky": [
+                "Бекки принимает уход без лишней церемонии: ей приятно выглядеть свежее, но никакого открытия в собственной привлекательности она не видит.",
+                "Бекки охотно обсуждает с Серджио, какие детали лучше подчеркивают ее зрелую красоту, и явно получает удовольствие от результата.",
+                "Ее и без того спокойная телесная уверенность становится более намеренной: Бекки выбирает уход уже не только ради удобства, но и ради того эффекта, который он производит.",
+                "Бекки относится к процедуре как к еще одному приятному чувственному удовольствию и без стеснения объясняет, чего хочет от своего образа.",
+                "Она прекрасно знает, какой эффект производит, и теперь использует профессиональный уход с той же естественной уверенностью, с какой относится к собственным желаниям.",
+            ],
+            "clara": [
+                "Кларисса и без того привыкла к хорошему уходу, поэтому оценивает работу Серджио прежде всего как придирчивая знаточица.",
+                "Кларисса начинает обсуждать с Серджио более тонкие детали стиля и с удовольствием превращает обычный визит в маленький эксперимент.",
+                "Ее выбор становится личнее и игривее: дорогая аккуратность все чаще используется не только ради моды, но и ради впечатления.",
+                "Кларисса уже без смущения просит о более смелых деталях, сохраняя при этом ту же безупречную, почти аристократическую ухоженность.",
+                "Она доводит игру с образом до совершенства: внешне все по-прежнему изысканно, но теперь каждая деталь рассчитана на вполне определенное, чувственное впечатление.",
+            ],
+        }
+        rows = texts.get(key, [])
+        if not rows:
+            return "Регулярный профессиональный уход постепенно делает ее увереннее и открытее в разговорах о собственной внешности."
+        return rows[stage]
 
     def barber_shop_discount_percent():
         try:
@@ -306,10 +484,11 @@ label BarberShopServePendingGuest:
     $ money -= _barber_guest_price
     $ calendar_v2.advance_minutes(45)
     $ BarberInvitePending[_barber_guest] = 0
+    $ _barber_progress = npc_record_barber_visit(_barber_guest)
     $ BarberVisitLastDay[_barber_guest] = int(dayspassed or 0)
     $ _barber_guest_info = getPersonInfo(_barber_guest)
     if _barber_guest_info is not None:
-        $ _barber_guest_info.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
+        $ _barber_guest_info.change_social(friend_delta=int(_barber_progress.get("friend_delta", 0) or 0), open_delta=int(_barber_progress.get("openness_delta", 0) or 0), corruption_delta=int(_barber_progress.get("corruption_delta", 0) or 0))
     $ beauty[_barber_guest] = min(100, int(beauty.get(_barber_guest, 0) or 0) + 3)
     if _barber_guest == "sandra":
         $ cooking[_barber_guest] = min(100, int(cooking.get(_barber_guest, 0) or 0) + 1)
@@ -320,7 +499,10 @@ label BarberShopServePendingGuest:
     elif _barber_guest == "amanda":
         $ waitress[_barber_guest] = min(100, int(waitress.get(_barber_guest, 0) or 0) + 2)
     $ tavernfame = int(tavernfame or 0) + 1
+    $ _barber_progress_text = barber_shop_guest_progress_text(_barber_guest, _barber_progress)
     $ MainTxt = "Вы приводите %s к Серджио и оплачиваете визит. Цирюльник долго возится с волосами, душистой водой и острыми ножницами, при этом без остановки болтая о женщинах, тканях, нижнем белье и о том, как ухоженный вид меняет весь дом. Когда все заканчивается, %s выглядит заметно ухоженнее и явно уходит от Серджио с новыми мыслями о себе." % (_barber_guest_name, _barber_guest_name)
+    if str(_barber_progress_text or "").strip() != "":
+        $ MainTxt += "\n\n" + str(_barber_progress_text)
     $ CurLocDesc = MainTxt
     call stat
     call ShowImage("", "", barber_shop_picture_path())
