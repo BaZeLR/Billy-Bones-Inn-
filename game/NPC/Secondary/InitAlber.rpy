@@ -1,4 +1,61 @@
-init python:
+        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(key, default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[key] = value
+            return value
+        def story_value(self, key, default=0):
+            self.ensure_story_defaults()
+            return self.var.get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()
+            self.var[key] = value
+            return value
+            self.relationship = self.rel            self.relationship = self.rellabel _auto_register_alber:
+    call register_alber_secondary from _call_alber_reg
+    return        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(key, default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[key] = value
+            return value
+        def story_value(self, key, default=0):
+            self.ensure_story_defaults()
+            return self.var.get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()
+            self.var[key] = value
+            return value
+            self.relationship = self.rel            self.relationship = self.rellabel _auto_register_alber:
+    call register_alber_secondary from _call_alber_reg
+    return        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(key, default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[key] = value
+            return value
+        def story_value(self, key, default=0):
+            self.ensure_story_defaults()
+            return self.var.get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()
+            self.var[key] = value
+            return value
+            self.relationship = self.rel            self.relationship = self.rellabel _auto_register_alber:
+    call register_alber_secondary from _call_alber_reg
+    returninit python:
     def alber_story_defaults():
         return {
             "sawwithliza": 0,
@@ -37,7 +94,6 @@ init python:
             self.known = False
             self.location = "WineStore"
             self.rel = people_to_int(kwargs.get("rel", 0), 0)
-            self.relationship = self.rel
             self.talked_today = 0
             self.var = dict(kwargs.get("var", {}) or {})
             self.ensure_story_defaults()
@@ -80,7 +136,6 @@ init python:
 
         def add_relation(self, amount=1, cap=20):
             self.rel = max(0, min(people_to_int(cap, 20), people_to_int(self.rel, 0) + people_to_int(amount, 0)))
-            self.relationship = self.rel
             return self.rel
 
         def finish_talk(self):
@@ -101,7 +156,7 @@ init python:
             "images/Alber/portrait7.jpg",
         ]
         loadable = [row for row in candidates if renpy.loadable(row)]
-        return loadable[procedural_randint(0, len(loadable) - 1, "alber_portrait_%s" % int(dayspassed or 0))] if len(loadable) > 0 else ""
+        return loadable[procedural_randint(0, len(loadable) - 1, "alber_portrait_%s" % int(current_game_day() or 0))] if len(loadable) > 0 else ""
 
     def alber_tavern_visit_ready():
         return (
@@ -109,6 +164,46 @@ init python:
             and Amanda.var_int("alberprohibit", 0) == 0
             and int(week or 0) != 5
         )
+
+init 20 python:
+    npc_schedule_set("alber", [
+        NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[1, 2], awake=True, talkable=True, priority=180, label="wine_store_day"),
+        NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[3], awake=True, talkable=True, condition=alber_tavern_visit_ready, priority=260, label="amanda_tavern_visit"),
+        NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, priority=260, label="friday_dance"),
+        NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=180, label="sunday_church"),
+    ])
+
+init 20 python:
+    npc_schedule_set("alber", [
+        NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[1, 2], awake=True, talkable=True, priority=180, label="wine_store_day"),
+        NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[3], awake=True, talkable=True, condition=alber_tavern_visit_ready, priority=260, label="amanda_tavern_visit"),
+        NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, priority=260, label="friday_dance"),
+        NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=180, label="sunday_church"),
+    ])
+
+init 20 python:
+    npc_schedule_set("alber", [
+        NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[1, 2], awake=True, talkable=True, priority=180, label="wine_store_day"),
+        NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[3], awake=True, talkable=True, condition=alber_tavern_visit_ready, priority=260, label="amanda_tavern_visit"),
+        NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, priority=260, label="friday_dance"),
+        NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=180, label="sunday_church"),
+    ])
+
+init 20 python:
+    npc_schedule_set("alber", [
+        NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[1, 2], awake=True, talkable=True, priority=180, label="wine_store_day"),
+        NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[3], awake=True, talkable=True, condition=alber_tavern_visit_ready, priority=260, label="amanda_tavern_visit"),
+        NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, priority=260, label="friday_dance"),
+        NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=180, label="sunday_church"),
+    ])
+
+init 20 python:
+    npc_schedule_set("alber", [
+        NPCScheduleEntry(location="WineStore", weekdays=[1, 2, 3, 4, 5, 6], time_slots=[1, 2], awake=True, talkable=True, priority=180, label="wine_store_day"),
+        NPCScheduleEntry(location="TavernMain", weekdays=[1, 2, 3, 4, 6], time_slots=[3], awake=True, talkable=True, condition=alber_tavern_visit_ready, priority=260, label="amanda_tavern_visit"),
+        NPCScheduleEntry(location="FridayDance", weekdays=[5], time_slots=[3], awake=True, talkable=True, priority=260, label="friday_dance"),
+        NPCScheduleEntry(location="Church", weekdays=[7], time_slots=[0, 1], awake=True, talkable=False, priority=180, label="sunday_church"),
+    ])
 
 init 20 python:
     npc_schedule_set("alber", [
@@ -131,6 +226,3 @@ label register_alber_secondary:
     return
 
 
-label _auto_register_alber:
-    call register_alber_secondary from _call_alber_reg
-    return

@@ -608,7 +608,7 @@ def check_required_hooks(project_root: Path, report: RuntimeLogicReport) -> None
     checks = {
         "projection": (
             project_root / "game" / "Utilities" / "General" / "Events" / "events.rpy",
-            ("eventProjectionRows", "eventRouteHints", "story_event_projection_rows", "story_event_path_targets"),
+            ("event_runtime.projection_rows", "event_runtime.route_hints", "story_event_projection_rows", "story_event_path_targets"),
         ),
         "player_condition": (
             project_root / "game" / "Utilities" / "General" / "Screens" / "stat.rpy",

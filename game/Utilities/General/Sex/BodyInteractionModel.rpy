@@ -3,6 +3,22 @@
 # ================================================================================
 default BodyInteractionProfiles = {}
 
+default BodyInteractionProfiles = {}
+
+default BodyInteractionProfiles = {}
+
+default BodyInteractionProfiles = {}
+
+default BodyInteractionProfiles = {}
+
+default BodyInteractionProfiles = {}
+
+default BodyInteractionProfiles = {}
+
+default BodyInteractionProfiles = {}
+
+default BodyInteractionProfiles = {}
+
 init python:
     BODYMODEL_PARTS = ("head", "upper", "pelvis", "lower", "feet", "hands", "palms")
     BODYMODEL_LAYERS = ("layer_0", "layer_1", "layer_2")
@@ -158,6 +174,15 @@ init python:
             profile.setdefault("features", bodymodel_blank_features())
             profile.setdefault("access", bodymodel_blank_target_access())
         BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
         return profile
 
     def bodymodel_clear_clothing(profile):
@@ -291,7 +316,7 @@ init python:
         bodymodel_clear_clothing(profile)
 
         if profile_id.lower() in ("you", "mc", "stefan", "стефан"):
-            appearance = player_state(False).appearance
+            appearance = player.appearance
             default_dress = str(getattr(appearance, "current_dress", "") or "")
             underwear = {}
             sex_state = {}
@@ -327,7 +352,6 @@ init python:
 
         bodymodel_update_container_states(profile)
         bodymodel_compute_access(profile)
-        BodyInteractionProfiles[profile_id] = profile
         return profile
 
     def bodymodel_actions_for_target(char_id="", target_id=""):
@@ -352,7 +376,7 @@ init python:
             return {}
         key = str(char_id or profile.get("id", "") or "").strip()
         if key.lower() in ("you", "mc", "stefan", "стефан"):
-            profile["arousal"] = int(player_state(False).intimacy.arousal_value("You") or 0)
+            profile["arousal"] = int(player.intimacy.arousal_value("You") or 0)
         elif key:
             person = getPersonInfo(key)
             if person is not None and hasattr(person, "arousal_value"):
@@ -501,23 +525,30 @@ init python:
         actor_key = str(actor_id or "").strip() or "You"
         if not profile_id:
             return {"allowed": False, "target": str(target_id or ""), "action": str(action_id or "")}
-        profile = bodymodel_sync_character(profile_id, display_name, body_type)
+        profile = bodymodel_build_profile(profile_id, display_name, body_type)
         bodymodel_sync_profile_arousal(profile, profile_id)
         effect = bodymodel_action_effect(profile, target_id, action_id)
         if not bool(effect.get("allowed", False)):
-            effect["profile"] = profile
+            BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        BodyInteractionProfiles[profile_id] = profile
+        effect["profile"] = profile
             effect["arousal"] = int(profile.get("arousal", 0) or 0)
             effect["container_state"] = str(profile.get("containers", {}).get(str(target_id or ""), {}).get("state", "") or "")
             return effect
         target_person = getPersonInfo(profile_id)
         if profile_id.lower() in ("you", "mc", "stefan", "стефан"):
-            player_state(False).intimacy.add_arousal(effect.get("target_gain", 0), 100, "You")
-            player_state(False).intimacy.apply_to_store()
+            player.intimacy.add_arousal(effect.get("target_gain", 0), 100, "You")
         elif target_person is not None:
             target_person.add_arousal(effect.get("target_gain", 0))
         if actor_key.lower() in ("you", "mc", "stefan", "стефан"):
-            player_state(False).intimacy.add_arousal(effect.get("actor_gain", 0), 100, "You")
-            player_state(False).intimacy.apply_to_store()
+            player.intimacy.add_arousal(effect.get("actor_gain", 0), 100, "You")
         else:
             actor_person = getPersonInfo(actor_key)
             if actor_person is not None:
@@ -528,7 +559,6 @@ init python:
             container_state["wetness"] = min(100, max(0, int(container_state.get("wetness", 0) or 0) + int(effect.get("wetness_gain", 0) or 0)))
             container_state["state"] = bodymodel_container_state_name(container_state.get("wetness", 0), container_state.get("itch", 0))
         bodymodel_sync_profile_arousal(profile, profile_id)
-        BodyInteractionProfiles[profile_id] = profile
         effect["profile"] = profile
         effect["arousal"] = int(profile.get("arousal", 0) or 0)
         effect["container_state"] = str(profile.get("containers", {}).get(container_key, {}).get("state", "") or "")

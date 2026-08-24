@@ -38,7 +38,7 @@ label ShowCurrentSex(GirlNameSCS=""):
 
     call ShowCurrentCockState("You")
 
-    $ _scs_intimacy = player_state(False).intimacy
+    $ _scs_intimacy = player.intimacy
     $ _scs_real_name = sex_current_name(_scs_girl)
     $ _scs_real_name2 = sex_current_name(_scs_girl, "genitive")
     $ _scs_key = str(getattr(_scs_girl, "name", GirlNameSCS) or GirlNameSCS).strip().lower()
@@ -133,7 +133,7 @@ label ShowCurrentSex(GirlNameSCS=""):
             $ _scs_girl.set_arousal(20)
         else:
             $ _scs_girl.set_arousal(0)
-        $ _scs_girl.set_sex_stat("last_orgasm_day", dayspassed)
+        $ _scs_girl.set_sex_stat("last_orgasm_day", current_game_day())
 
     $ _scs_any_cums = int(_scs_intimacy.arousal_value("You") >= 100 or _scs_girl.arousal_value() >= 100 or _scs_eddie_arousal >= 100)
     $ _scs_girl.set_sex_busy(_scs_any_cums)

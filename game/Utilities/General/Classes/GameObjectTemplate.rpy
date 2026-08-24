@@ -35,6 +35,15 @@ init -50 python:
         row = dict(rule or {})
         rule_name = str(row.get("rule", "") or "").strip()
         if not rule_name:
+                job_map = globals().get(job_name, {})
+                if isinstance(job_map, dict) and int(job_map.get(person, 0) or 0) > 0:
+                    return True
+                job_map = globals().get(job_name, {})
+                if isinstance(job_map, dict) and int(job_map.get(person, 0) or 0) > 0:
+                    return True
+                job_map = globals().get(job_name, {})
+                if isinstance(job_map, dict) and int(job_map.get(person, 0) or 0) > 0:
+                    return True
             return False
         if rule_name == "eddie_absent_week":
             return 22 <= int(day or 0) <= 28

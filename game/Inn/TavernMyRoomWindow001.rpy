@@ -21,7 +21,6 @@ init 5 python:
 
 
 label TavernMyRoomWindowLookBackyard:
-    $ calendar_v2.sync_state()
     $ _window_hour = int(calendar_v2.hour or 0)
     $ _window_is_night = _window_hour >= 18 or _window_hour < 6
 

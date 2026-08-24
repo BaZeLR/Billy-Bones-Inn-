@@ -1,3 +1,68 @@
+    $ knowsMC.setdefault("inga", False)        npc_schedule_sync_currentloc(GirlName)        RealName[GirlName] = 'Ингенборг'
+        RealName2[GirlName] = 'Ингенборг'
+        RealName3[GirlName] = 'Ингенборг'
+        DateOfBirth[GirlName] = {"day": 1, "period": 1, "cycle": 1078}        girltextdesc[GirlName] = 'Старшей дочке вдовы Блэнкеншип в привлекательности не откажешь. Рыжая, высокая, зеленоглазая, с большой налитой грудью, Ингенборг выглядит как молодая и еще более привлекательная копия своей матушки.'
+        dressdefault[GirlName] = 'openworkdress'
+
+        bradef[GirlName] = 'simplebra'
+        pantiesdef[GirlName] = 'simplepanties'
+        legsdef[GirlName] = 'redstockings'
+        shoesdef[GirlName] = 'simpleshoes'
+        def var_int(self, key, default=0):
+            return people_to_int(self.story_value(key, default), default)
+
+        def set_var_int(self, key, value):
+            return self.set_story_value(key, people_to_int(value, 0))
+        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(str(key or ""), default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()[str(key or "")] = value
+            return value
+    $ knowsMC.setdefault("inga", False)        npc_schedule_sync_currentloc(GirlName)        RealName[GirlName] = 'Ингенборг'
+        RealName2[GirlName] = 'Ингенборг'
+        RealName3[GirlName] = 'Ингенборг'
+        DateOfBirth[GirlName] = {"day": 1, "period": 1, "cycle": 1078}        girltextdesc[GirlName] = 'Старшей дочке вдовы Блэнкеншип в привлекательности не откажешь. Рыжая, высокая, зеленоглазая, с большой налитой грудью, Ингенборг выглядит как молодая и еще более привлекательная копия своей матушки.'
+        dressdefault[GirlName] = 'openworkdress'
+
+        bradef[GirlName] = 'simplebra'
+        pantiesdef[GirlName] = 'simplepanties'
+        legsdef[GirlName] = 'redstockings'
+        shoesdef[GirlName] = 'simpleshoes'
+        def var_int(self, key, default=0):
+            return people_to_int(self.story_value(key, default), default)
+
+        def set_var_int(self, key, value):
+            return self.set_story_value(key, people_to_int(value, 0))
+        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(str(key or ""), default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()[str(key or "")] = value
+            self.promote_from_var(self.var)
+            return value
+    $ knowsMC.setdefault("inga", False)        npc_schedule_sync_currentloc(GirlName)        RealName[GirlName] = 'Ингенборг'
+        RealName2[GirlName] = 'Ингенборг'
+        RealName3[GirlName] = 'Ингенборг'
+        DateOfBirth[GirlName] = {"day": 1, "period": 1, "cycle": 1078}        girltextdesc[GirlName] = 'Старшей дочке вдовы Блэнкеншип в привлекательности не откажешь. Рыжая, высокая, зеленоглазая, с большой налитой грудью, Ингенборг выглядит как молодая и еще более привлекательная копия своей матушки.'
+        dressdefault[GirlName] = 'openworkdress'
+
+        bradef[GirlName] = 'simplebra'
+        pantiesdef[GirlName] = 'simplepanties'
+        legsdef[GirlName] = 'redstockings'
+        shoesdef[GirlName] = 'simpleshoes'
+        def var_int(self, key, default=0):
+            return people_to_int(self.story_value(key, default), default)
+
+        def set_var_int(self, key, value):
+            return self.set_story_value(key, people_to_int(value, 0))
+        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(str(key or ""), default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()[str(key or "")] = value
+            self.promote_from_var(self.var)
+            return value
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -5,10 +70,6 @@ label InitInga:
     python:
         # Initialize Inga's attributes
         GirlName = 'inga'
-        RealName[GirlName] = 'Ингенборг'
-        RealName2[GirlName] = 'Ингенборг'
-        RealName3[GirlName] = 'Ингенборг'
-        DateOfBirth[GirlName] = {"day": 1, "period": 1, "cycle": 1078}
         kids[GirlName] = 0
         beauty[GirlName] = 55
         Inga.corruption = 30
@@ -19,14 +80,6 @@ label InitInga:
         ConceptionChance[GirlName] = 10
         PussyWetStart[GirlName] = 25
         virginity[GirlName] = False
-
-        girltextdesc[GirlName] = 'Старшей дочке вдовы Блэнкеншип в привлекательности не откажешь. Рыжая, высокая, зеленоглазая, с большой налитой грудью, Ингенборг выглядит как молодая и еще более привлекательная копия своей матушки.'
-        dressdefault[GirlName] = 'openworkdress'
-
-        bradef[GirlName] = 'simplebra'
-        pantiesdef[GirlName] = 'simplepanties'
-        legsdef[GirlName] = 'redstockings'
-        shoesdef[GirlName] = 'simpleshoes'
 
         cooking[GirlName] = 40
         cleaning[GirlName] = 20
@@ -45,7 +98,11 @@ label InitInga:
         Inga.set_story_value("SawLucassex", 0)
         Inga.set_story_value("Knowher", 0)
         GiftPreferences[GirlName] = ["wild_rose_001", "soap_001", "lavender_001"]
+        GiftPreferences[GirlName] = ["wild_rose_001", "soap_001", "lavender_001"]
+        GiftPreferences[GirlName] = ["wild_rose_001", "soap_001", "lavender_001"]
         peopleData[GirlName] = IngaStaticData
+        Inga.location = "BeckyHome"
+        Inga.location = "BeckyHome"
         Inga.location = "BeckyHome"
         Inga.update()
         peopleInfo[GirlName] = Inga
@@ -88,7 +145,6 @@ label InitInga:
                 label="inga_home_sleep",
             ),
         ])
-        npc_schedule_sync_currentloc(GirlName)
     return
 
 init python:
@@ -127,6 +183,8 @@ init python:
 
         def __init__(self, name="inga", **kwargs):
             super().__init__(name, **kwargs)
+            self.location = "BeckyHome"
+            self.location = "BeckyHome"
             self.location = "BeckyHome"
             self.ensure_story_defaults()
 
@@ -167,7 +225,6 @@ default Inga = IngaInfo()
 
 
 label register_inga_secondary:
-    $ knowsMC.setdefault("inga", False)
     python:
         if "peopleData" in dir() and isinstance(peopleData, dict):
             peopleData["inga"] = IngaStaticData

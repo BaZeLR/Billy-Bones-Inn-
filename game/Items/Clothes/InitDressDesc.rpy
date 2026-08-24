@@ -1,6 +1,3 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
 default dressdefault = {}
 default topdressdef = {}
 default bottomdressdef = {}
@@ -16,7 +13,39 @@ default legs = {}
 default shoes = {}
 default topraised = {}
 default bottomraised = {}
-
+default dressdefault = {}
+default topdressdef = {}
+default bottomdressdef = {}
+default bradef = {}
+default pantiesdef = {}
+default legsdef = {}
+default shoesdef = {}
+default topdress = {}
+default bottomdress = {}
+default bra = {}
+default panties = {}
+default legs = {}
+default shoes = {}
+default topraised = {}
+default bottomraised = {}
+default dressdefault = {}
+default topdressdef = {}
+default bottomdressdef = {}
+default bradef = {}
+default pantiesdef = {}
+default legsdef = {}
+default shoesdef = {}
+default topdress = {}
+default bottomdress = {}
+default bra = {}
+default panties = {}
+default legs = {}
+default shoes = {}
+default topraised = {}
+default bottomraised = {}
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init python:
     DressDesc = {
         "villagedress": "простые холщовые штаны, подпоясанные веревкой и рубаху из грубого полотна",

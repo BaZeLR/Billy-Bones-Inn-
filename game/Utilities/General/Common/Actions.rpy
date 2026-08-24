@@ -1,16 +1,92 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
-default action_override_text = ""
+        global energy, fun        global fun        global fun        global energy, fun        global energy    def _ensure_player_inventory_store():
+        global playerItems
 
-init -46 python:
+        if hasattr(playerItems, "items"):
+            normalized = {}
+            for raw_key, raw_count in list(playerItems.items()):
+                item_key = get_object_id(raw_key)
+                if not item_key:
+                    continue
+                try:
+                    item_count = int(raw_count or 0)
+                except (TypeError, ValueError):
+                    item_count = 0
+                if item_count > 0:
+                    normalized[item_key] = normalized.get(item_key, 0) + item_count
+            playerItems = normalized
+            return playerItems
+
+        normalized = {}
+        for raw_item in list(playerItems or []):
+            item_key = get_object_id(raw_item)
+            if not item_key:
+                continue
+            normalized[item_key] = normalized.get(item_key, 0) + 1
+        playerItems = normalized
+        return playerItems
+
+    def _player_item_count_by_id(item_id):
+        inventory = _ensure_player_inventory_store()
+        item_key = get_object_id(item_id)
+        if not item_key:
+            return 0
+        return max(0, int(inventory.get(item_key, 0) or 0))
+
+    def _player_inventory_item_ids(expand_stacks=False):
+        inventory = _ensure_player_inventory_store()
+        item_ids = []
+        for item_key in sorted(list(inventory.keys())):
+            item_count = max(0, int(inventory.get(item_key, 0) or 0))
+            if item_count <= 0:
+                continue
+            if expand_stacks:
+                for _unused_item_unit in range(item_count):
+                    item_ids.append(item_key)
+            else:
+                item_ids.append(item_key)
+        return item_ids
+    def _player_remove_item_by_id(item_id, quantity=1):
+        global playerItems
+
+        item_id = get_object_id(item_id)
+        if not item_id:
+            return False
+
+        inventory = _ensure_player_inventory_store()
+        current_count = max(0, int(inventory.get(item_id, 0) or 0))
+        remove_count = max(1, int(quantity or 1))
+        if current_count < remove_count:
+            return False
+
+        if current_count == remove_count:
+            if item_id in inventory:
+                del inventory[item_id]
+        else:
+            inventory[item_id] = current_count - remove_count
+
+        playerItems = dict(inventory)
+        if "sync_player_state_from_store" in globals():
+            sync_player_state_from_store()
+        return True
+
+    def _player_add_item_by_id(item_id, quantity=1):
+        global playerItems
+
+        item_id = get_object_id(item_id)
+        if not item_id:
+            return False
+
+        inventory = _ensure_player_inventory_store()
+        add_count = max(1, int(quantity or 1))
+        inventory[item_id] = max(0, int(inventory.get(item_id, 0) or 0)) + add_count
+        playerItems = dict(inventory)
+        if "sync_player_state_from_store" in globals():
+            sync_player_state_from_store()
+        return True
+
+    def _player_has_item_by_id(item_id):
+        return _player_item_count_by_id(item_id) > 0
     import renpy.store as store
-
-    _SANDRA_FORAGED_ITEM_IDS = ("berries_001", "mushroom_001", "honey_comb_001")
-    _SANDRA_FORAGED_EFFECT_TEXT = "Сандра сразу прикидывает, как пустить это в дело на кухне, и обещает сварить что-нибудь вкусное для всей трактирной челяди."
-    _SANDRA_FORAGED_SHARE_TEXT = "Вы отдаете {} {}. Сандра сразу думает, как пустить находку в дело и обещает приготовить для всей трактирной челяди что-нибудь вкусное."
-    _ALE_SHARE_BONUS_TARGETS = ("melissa", "amanda")
-
     ROOM_ACTION_REFRESH = {
         "Shed": {"build": "ShedRoomActions", "object": ""},
         "Backyard": {"build": "BackyardBuildActions", "object": "BackyardObjectMenu"},
@@ -29,6 +105,276 @@ init -46 python:
         "WineStore": {"build": "WineStoreRoomActions", "object": "WineStoreObjectMenu"},
         "Forest": {"build": "ForestBuildActions", "object": "ForestObjectMenu"},
     }
+    def _action_refresh_target_labels(room_code=""):
+        room_key = str(room_code or "").strip()
+        return dict(ROOM_ACTION_REFRESH.get(room_key, {}) or {})
+        global fun, SoapRequestQueuedefault action_override_text = ""
+    $ action_override_text = _rest_text    def _action_sync_openness(char_name):
+        key = str(char_name or "").strip()
+        if not key:
+            call RefreshCurrentActionMenu(_sleep_where, _sleep_object, True)
+        return
+        adjust_otkroven(key)
+        if sync_openness:
+            _action_sync_openness(key)        try:
+            people_sync_person(key)
+        except Exception:
+            pass    def player_apply_item_action(item_id, action_key="", consume_from_inventory=False):
+        return dict(player_use_item(item_id, action_key, consume_from_inventory) or {})
+        global energy, fun        global fun        global fun        global energy, fun        global energy    def _ensure_player_inventory_store():
+        global playerItems
+
+        if hasattr(playerItems, "items"):
+            normalized = {}
+            for raw_key, raw_count in list(playerItems.items()):
+                item_key = get_object_id(raw_key)
+                if not item_key:
+                    continue
+                try:
+                    item_count = int(raw_count or 0)
+                except (TypeError, ValueError):
+                    item_count = 0
+                if item_count > 0:
+                    normalized[item_key] = normalized.get(item_key, 0) + item_count
+            playerItems = normalized
+            return playerItems
+
+        normalized = {}
+        for raw_item in list(playerItems or []):
+            item_key = get_object_id(raw_item)
+            if not item_key:
+                continue
+            normalized[item_key] = normalized.get(item_key, 0) + 1
+        playerItems = normalized
+        return playerItems
+
+    def _player_item_count_by_id(item_id):
+        inventory = _ensure_player_inventory_store()
+        item_key = get_object_id(item_id)
+        if not item_key:
+            return 0
+        return max(0, int(inventory.get(item_key, 0) or 0))
+
+    def _player_inventory_item_ids(expand_stacks=False):
+        inventory = _ensure_player_inventory_store()
+        item_ids = []
+        for item_key in sorted(list(inventory.keys())):
+            item_count = max(0, int(inventory.get(item_key, 0) or 0))
+            if item_count <= 0:
+                continue
+            if expand_stacks:
+                for _unused_item_unit in range(item_count):
+                    item_ids.append(item_key)
+            else:
+                item_ids.append(item_key)
+        return item_ids
+    def _player_remove_item_by_id(item_id, quantity=1):
+        global playerItems
+
+        item_id = get_object_id(item_id)
+        if not item_id:
+            return False
+
+        inventory = _ensure_player_inventory_store()
+        current_count = max(0, int(inventory.get(item_id, 0) or 0))
+        remove_count = max(1, int(quantity or 1))
+        if current_count < remove_count:
+            return False
+
+        if current_count == remove_count:
+            if item_id in inventory:
+                del inventory[item_id]
+        else:
+            inventory[item_id] = current_count - remove_count
+
+        playerItems = dict(inventory)
+        if "sync_player_state_from_store" in globals():
+            sync_player_state_from_store()
+        return True
+
+    def _player_add_item_by_id(item_id, quantity=1):
+        global playerItems
+
+        item_id = get_object_id(item_id)
+        if not item_id:
+            return False
+
+        inventory = _ensure_player_inventory_store()
+        add_count = max(1, int(quantity or 1))
+        inventory[item_id] = max(0, int(inventory.get(item_id, 0) or 0)) + add_count
+        playerItems = dict(inventory)
+        if "sync_player_state_from_store" in globals():
+            sync_player_state_from_store()
+        return True
+
+    def _player_has_item_by_id(item_id):
+        return _player_item_count_by_id(item_id) > 0
+    import renpy.store as store
+    ROOM_ACTION_REFRESH = {
+        "Shed": {"build": "ShedRoomActions", "object": ""},
+        "Backyard": {"build": "BackyardBuildActions", "object": "BackyardObjectMenu"},
+        "TavernMyRoom": {"build": "TavernMyRoomBuildActions", "object": "TavernMyRoomObjectMenu"},
+        "TavernKitchen": {"build": "TavernKitchenBuildActions", "object": ""},
+        "TavernAmandaRoom": {"build": "TavernAmandaRoomBuildActions", "object": "tavern_amanda_room_object_menu"},
+        "TavernSandraRoom": {"build": "TavernSandraRoomBuildActions", "object": ""},
+        "TavernMelissaRoom": {"build": "TavernMelissaRoomBuildActions", "object": ""},
+        "TavernEmptyRoom": {"build": "TavernEmptyRoomBuildActions", "object": ""},
+        "TavernAtic": {"build": "TavernAticBuildActions", "object": "TavernAticObjectMenu"},
+        "TavernUpstairs": {"build": "TavernUpstairsBuildActions", "object": ""},
+        "TavernMain": {"build": "TavernMainBuildActions", "object": "TavernMainObjectMenu"},
+        "HunterClub": {"build": "HunterClubBuildActions", "object": "HunterClubObjectMenu"},
+        "MarketPlace": {"build": "MarketPlaceBuildActions", "object": "MarketPlaceObjectMenu"},
+        "GroceryStore": {"build": "GroceryStoreBuildActions", "object": "GroceryStoreObjectMenu"},
+        "WineStore": {"build": "WineStoreRoomActions", "object": "WineStoreObjectMenu"},
+        "Forest": {"build": "ForestBuildActions", "object": "ForestObjectMenu"},
+    }
+    def _action_refresh_target_labels(room_code=""):
+        room_key = str(room_code or "").strip()
+        return dict(ROOM_ACTION_REFRESH.get(room_key, {}) or {})
+        global fun, SoapRequestQueuedefault action_override_text = ""
+    $ action_override_text = _rest_text    def _action_sync_openness(char_name):
+        key = str(char_name or "").strip()
+        if not key:
+            call RefreshCurrentActionMenu(_sleep_where, _sleep_object, True)
+        return
+        adjust_otkroven(key)
+        if sync_openness:
+            _action_sync_openness(key)        try:
+            people_sync_person(key)
+        except Exception:
+            pass    def player_apply_item_action(item_id, action_key="", consume_from_inventory=False):
+        return dict(player_use_item(item_id, action_key, consume_from_inventory) or {})
+        global energy, fun        global fun        global fun        global energy, fun        global energy    def _ensure_player_inventory_store():
+        global playerItems
+
+        if hasattr(playerItems, "items"):
+            normalized = {}
+            for raw_key, raw_count in list(playerItems.items()):
+                item_key = get_object_id(raw_key)
+                if not item_key:
+                    continue
+                try:
+                    item_count = int(raw_count or 0)
+                except (TypeError, ValueError):
+                    item_count = 0
+                if item_count > 0:
+                    normalized[item_key] = normalized.get(item_key, 0) + item_count
+            playerItems = normalized
+            return playerItems
+
+        normalized = {}
+        for raw_item in list(playerItems or []):
+            item_key = get_object_id(raw_item)
+            if not item_key:
+                continue
+            normalized[item_key] = normalized.get(item_key, 0) + 1
+        playerItems = normalized
+        return playerItems
+
+    def _player_item_count_by_id(item_id):
+        inventory = _ensure_player_inventory_store()
+        item_key = get_object_id(item_id)
+        if not item_key:
+            return 0
+        return max(0, int(inventory.get(item_key, 0) or 0))
+
+    def _player_inventory_item_ids(expand_stacks=False):
+        inventory = _ensure_player_inventory_store()
+        item_ids = []
+        for item_key in sorted(list(inventory.keys())):
+            item_count = max(0, int(inventory.get(item_key, 0) or 0))
+            if item_count <= 0:
+                continue
+            if expand_stacks:
+                for _unused_item_unit in range(item_count):
+                    item_ids.append(item_key)
+            else:
+                item_ids.append(item_key)
+        return item_ids
+    def _player_remove_item_by_id(item_id, quantity=1):
+        global playerItems
+
+        item_id = get_object_id(item_id)
+        if not item_id:
+            return False
+
+        inventory = _ensure_player_inventory_store()
+        current_count = max(0, int(inventory.get(item_id, 0) or 0))
+        remove_count = max(1, int(quantity or 1))
+        if current_count < remove_count:
+            return False
+
+        if current_count == remove_count:
+            if item_id in inventory:
+                del inventory[item_id]
+        else:
+            inventory[item_id] = current_count - remove_count
+
+        playerItems = dict(inventory)
+        if "sync_player_state_from_store" in globals():
+            sync_player_state_from_store()
+        return True
+
+    def _player_add_item_by_id(item_id, quantity=1):
+        global playerItems
+
+        item_id = get_object_id(item_id)
+        if not item_id:
+            return False
+
+        inventory = _ensure_player_inventory_store()
+        add_count = max(1, int(quantity or 1))
+        inventory[item_id] = max(0, int(inventory.get(item_id, 0) or 0)) + add_count
+        playerItems = dict(inventory)
+        if "sync_player_state_from_store" in globals():
+            sync_player_state_from_store()
+        return True
+
+    def _player_has_item_by_id(item_id):
+        return _player_item_count_by_id(item_id) > 0
+    import renpy.store as store
+    ROOM_ACTION_REFRESH = {
+        "Shed": {"build": "ShedRoomActions", "object": ""},
+        "Backyard": {"build": "BackyardBuildActions", "object": "BackyardObjectMenu"},
+        "TavernMyRoom": {"build": "TavernMyRoomBuildActions", "object": "TavernMyRoomObjectMenu"},
+        "TavernKitchen": {"build": "TavernKitchenBuildActions", "object": ""},
+        "TavernAmandaRoom": {"build": "TavernAmandaRoomBuildActions", "object": "tavern_amanda_room_object_menu"},
+        "TavernSandraRoom": {"build": "TavernSandraRoomBuildActions", "object": ""},
+        "TavernMelissaRoom": {"build": "TavernMelissaRoomBuildActions", "object": ""},
+        "TavernEmptyRoom": {"build": "TavernEmptyRoomBuildActions", "object": ""},
+        "TavernAtic": {"build": "TavernAticBuildActions", "object": "TavernAticObjectMenu"},
+        "TavernUpstairs": {"build": "TavernUpstairsBuildActions", "object": ""},
+        "TavernMain": {"build": "TavernMainBuildActions", "object": "TavernMainObjectMenu"},
+        "HunterClub": {"build": "HunterClubBuildActions", "object": "HunterClubObjectMenu"},
+        "MarketPlace": {"build": "MarketPlaceBuildActions", "object": "MarketPlaceObjectMenu"},
+        "GroceryStore": {"build": "GroceryStoreBuildActions", "object": "GroceryStoreObjectMenu"},
+        "WineStore": {"build": "WineStoreRoomActions", "object": "WineStoreObjectMenu"},
+        "Forest": {"build": "ForestBuildActions", "object": "ForestObjectMenu"},
+    }
+    def _action_refresh_target_labels(room_code=""):
+        room_key = str(room_code or "").strip()
+        return dict(ROOM_ACTION_REFRESH.get(room_key, {}) or {})
+        global fun, SoapRequestQueuedefault action_override_text = ""
+    $ action_override_text = _rest_text    def _action_sync_openness(char_name):
+        key = str(char_name or "").strip()
+        if not key:
+            call RefreshCurrentActionMenu(_sleep_where, _sleep_object, True)
+        return
+        adjust_otkroven(key)
+        if sync_openness:
+            _action_sync_openness(key)        try:
+            people_sync_person(key)
+        except Exception:
+            pass    def player_apply_item_action(item_id, action_key="", consume_from_inventory=False):
+        return dict(player_use_item(item_id, action_key, consume_from_inventory) or {})
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+init -46 python:
+    _SANDRA_FORAGED_ITEM_IDS = ("berries_001", "mushroom_001", "honey_comb_001")
+    _SANDRA_FORAGED_EFFECT_TEXT = "Сандра сразу прикидывает, как пустить это в дело на кухне, и обещает сварить что-нибудь вкусное для всей трактирной челяди."
+    _SANDRA_FORAGED_SHARE_TEXT = "Вы отдаете {} {}. Сандра сразу думает, как пустить находку в дело и обещает приготовить для всей трактирной челяди что-нибудь вкусное."
+    _ALE_SHARE_BONUS_TARGETS = ("melissa", "amanda")
 
     SOCIAL_ITEM_EFFECT_RULES = {
         "soap_001": {
@@ -226,7 +572,7 @@ init -46 python:
         "fun60": {"energy_floor": 10, "late_hour_range": (4, 5), "fun_floor": 60},
     }
 
-    # Chore action identifiers + weekly targets (counters live in PlayerChoresWeek, defaulted in script.rpy)
+    # Chore action identifiers + weekly targets (counters live in player.chores.weekly, defaulted in script.rpy)
     # These are the "chores" that have energy/time restrictions above and are tracked for Sandra's weekly review.
     PLAYER_CHORE_KEYS = (
         "bring_woods",
@@ -391,54 +737,6 @@ init -46 python:
             return {"ok": True, "text": "", "action_key": str(action_key or action_type or "").strip()}
         return {"ok": False, "text": message, "action_key": str(action_key or action_type or "").strip()}
 
-    def _ensure_player_inventory_store():
-        global playerItems
-
-        if hasattr(playerItems, "items"):
-            normalized = {}
-            for raw_key, raw_count in list(playerItems.items()):
-                item_key = get_object_id(raw_key)
-                if not item_key:
-                    continue
-                try:
-                    item_count = int(raw_count or 0)
-                except (TypeError, ValueError):
-                    item_count = 0
-                if item_count > 0:
-                    normalized[item_key] = normalized.get(item_key, 0) + item_count
-            playerItems = normalized
-            return playerItems
-
-        normalized = {}
-        for raw_item in list(playerItems or []):
-            item_key = get_object_id(raw_item)
-            if not item_key:
-                continue
-            normalized[item_key] = normalized.get(item_key, 0) + 1
-        playerItems = normalized
-        return playerItems
-
-    def _player_item_count_by_id(item_id):
-        inventory = _ensure_player_inventory_store()
-        item_key = get_object_id(item_id)
-        if not item_key:
-            return 0
-        return max(0, int(inventory.get(item_key, 0) or 0))
-
-    def _player_inventory_item_ids(expand_stacks=False):
-        inventory = _ensure_player_inventory_store()
-        item_ids = []
-        for item_key in sorted(list(inventory.keys())):
-            item_count = max(0, int(inventory.get(item_key, 0) or 0))
-            if item_count <= 0:
-                continue
-            if expand_stacks:
-                for _unused_item_unit in range(item_count):
-                    item_ids.append(item_key)
-            else:
-                item_ids.append(item_key)
-        return item_ids
-
     def _player_inventory_snapshot():
         return dict(_ensure_player_inventory_store() or {})
 
@@ -531,14 +829,12 @@ init -46 python:
         return _room_item_count_by_id(room_obj, item_id) > 0
 
     def _player_can_sleep_now():
-        calendar_v2.sync_state()
         current_slot = int(time or 0)
         current_hour = int(hour or 0)
 
         return current_slot >= 3 or current_hour >= 20
 
     def player_sleep_wake_time():
-        calendar_v2.sync_state()
         current_hour = int(hour or 0)
         current_minute = int(minute or 0)
         if int(SleepWakeHourOverride or -1) >= 0:
@@ -578,63 +874,11 @@ init -46 python:
         next_value = max(int(minimum or 0), current_value + int(delta or 0))
         return _set_object_state_int(game_object, state_key, next_value)
 
-    def _player_remove_item_by_id(item_id, quantity=1):
-        global playerItems
-
-        item_id = get_object_id(item_id)
-        if not item_id:
-            return False
-
-        inventory = _ensure_player_inventory_store()
-        current_count = max(0, int(inventory.get(item_id, 0) or 0))
-        remove_count = max(1, int(quantity or 1))
-        if current_count < remove_count:
-            return False
-
-        if current_count == remove_count:
-            if item_id in inventory:
-                del inventory[item_id]
-        else:
-            inventory[item_id] = current_count - remove_count
-
-        playerItems = dict(inventory)
-        if "sync_player_state_from_store" in globals():
-            sync_player_state_from_store()
-        return True
-
-    def _player_add_item_by_id(item_id, quantity=1):
-        global playerItems
-
-        item_id = get_object_id(item_id)
-        if not item_id:
-            return False
-
-        inventory = _ensure_player_inventory_store()
-        add_count = max(1, int(quantity or 1))
-        inventory[item_id] = max(0, int(inventory.get(item_id, 0) or 0)) + add_count
-        playerItems = dict(inventory)
-        if "sync_player_state_from_store" in globals():
-            sync_player_state_from_store()
-        return True
-
-    def _player_has_item_by_id(item_id):
-        return _player_item_count_by_id(item_id) > 0
-
     def _action_display_name(char_name):
         key = str(char_name or "").strip()
         if not key:
             return ""
         return str(RealName.get(key, key) or key)
-
-    def _action_refresh_target_labels(room_code=""):
-        room_key = str(room_code or "").strip()
-        return dict(ROOM_ACTION_REFRESH.get(room_key, {}) or {})
-
-    def _action_sync_openness(char_name):
-        key = str(char_name or "").strip()
-        if not key:
-            return
-        adjust_otkroven(key)
 
     def _player_item_consume_profile(item_id, expected_action=""):
         item_key = str(get_object_id(item_id) or "").strip()
@@ -673,7 +917,6 @@ init -46 python:
         }
 
     def _player_apply_item_consume_profile(item_id, expected_action="", consume_from_inventory=False):
-        global energy, fun
 
         item_key = str(get_object_id(item_id) or "").strip()
         action_key = str(expected_action or "").strip()
@@ -843,11 +1086,7 @@ init -46 python:
             }
         return dict(_player_apply_item_consume_profile(item_key, use_key, consume_from_inventory) or {})
 
-    def player_apply_item_action(item_id, action_key="", consume_from_inventory=False):
-        return dict(player_use_item(item_id, action_key, consume_from_inventory) or {})
-
     def apply_social_interaction_base(char_name="", interaction_type="", friend_delta=0, fun_delta=0, minutes_cost=0, talked_delta=0, flirted_today_delta=0, gifted_today_delta=0, talked_today_delta=0, sync_openness=True):
-        global fun
 
         key = str(char_name or "").strip()
         if key == "":
@@ -869,14 +1108,8 @@ init -46 python:
             info.giftToday = int(info.gifted_today or 0) > 0
         if info is not None and int(friend_delta or 0) != 0:
             info.change_social(friend_delta=int(friend_delta or 0))
-        if sync_openness:
-            _action_sync_openness(key)
         if int(fun_delta or 0) != 0:
             fun = _player_clamp(int(fun or 0) + int(fun_delta or 0), 0, 100)
-        try:
-            people_sync_person(key)
-        except Exception:
-            pass
 
     def _social_item_rule(item_id="", char_name=""):
         item_key = str(item_id or "").strip()
@@ -906,7 +1139,6 @@ init -46 python:
         return lines
 
     def player_apply_item_social_effects(char_name="", item_id="", from_gift=False):
-        global fun, SoapRequestQueue
 
         key = str(char_name or "").strip()
         item_key = str(item_id or "").strip()
@@ -948,9 +1180,7 @@ init -46 python:
                 if int(rule.get("neshlush_delta", 0) or 0) != 0 and isinstance(neshlush, dict):
                     neshlush[key] = max(0, int(neshlush.get(key, 0) or 0) + int(rule.get("neshlush_delta", 0) or 0))
                 if item_key == "soap_001" and info is not None and int(info.rel or 0) >= int(rule.get("soap_request_threshold", 999) or 999):
-                    if not isinstance(SoapRequestQueue, dict):
-                        SoapRequestQueue = {}
-                    SoapRequestQueue[key] = 1
+                    crafting.soap_requests[key] = 1
 
         effect_lines = []
         if fun_bonus > 0:
@@ -972,7 +1202,6 @@ init -46 python:
         }
 
     def player_share_item_with(char_name="", item_id=""):
-        global fun
 
         key = str(char_name or "").strip()
         item_key = str(item_id or "").strip()
@@ -1044,7 +1273,6 @@ init -46 python:
         }
 
     def player_eat_meal(item_name, item_energy):
-        global energy, fun
 
         item_label = str(item_name or "еду").strip() or "еду"
         energy_gain = max(0, int(item_energy or 0))
@@ -1063,11 +1291,9 @@ init -46 python:
         }
 
     def player_wash_with_rainwater():
-        global energy
 
         calendar_v2.advance_minutes(30)
-        player_state().appearance.wash()
-        player_state().appearance.apply_to_store()
+        player.appearance.wash()
         update_stat_state()
         energy = _player_clamp(energy - 5, 0, 100)
 
@@ -1309,6 +1535,108 @@ label RefreshCurrentActionMenu(where_id="", object_id="", preserve_text=False):
     return
 
 
+    def current_room_object_menu_label(object_id=""):
+        object_key = str(object_id or "").strip()
+        if object_key:
+            object_obj = get_game_object(object_key)
+            if object_obj is None:
+                object_obj = get_game_item(object_key)
+            object_props = getattr(object_obj, "custom_properties", {}) if object_obj is not None else {}
+            if isinstance(object_props, dict):
+                object_label = str(object_props.get("object_menu_label", "") or "").strip()
+                if object_label:
+                    return object_label
+        room_obj = CurrentRoom
+        if room_obj is None:
+            return ""
+        room_props = getattr(room_obj, "custom_properties", None)
+        if not isinstance(room_props, dict):
+            return ""
+        return str(room_props.get("object_menu_label", "") or "")
+
+
+label RefreshCurrentActionMenu(where_id="", object_id="", preserve_text=False):
+    $ _refresh_room = str(where_id or getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip()
+    $ _refresh_object = str(object_id or "").strip()
+    $ _refresh_saved_main = str(MainTxt or "")
+    $ _refresh_saved_desc = str(CurLocDesc or "")
+    $ _refresh_targets = _action_refresh_target_labels(_refresh_room)
+    $ _refresh_build_label = str(_refresh_targets.get("build", "") or "")
+    $ _refresh_object_label = str(current_room_object_menu_label(_refresh_object) or _refresh_targets.get("object", "") or "")
+    if _refresh_object == "":
+        $ current_object_id = ""
+    if _refresh_object != "" and _refresh_object_label != "":
+        call expression _refresh_object_label pass (_refresh_object, True)
+        if preserve_text:
+            $ MainTxt = _refresh_saved_main
+            $ CurLocDesc = _refresh_saved_desc
+        $ renpy.restart_interaction()
+        return
+
+    if _refresh_build_label != "":
+        call expression _refresh_build_label
+        $ renpy.restart_interaction()
+        return
+
+    if CurrentRoom is not None:
+        $ current_action_title = "Действия"
+        $ current_action_content = None
+        $ current_action_items = build_room_action_items(CurrentRoom)
+        $ UI_mode = "scene"
+    return
+
+
+    def current_room_object_menu_label(object_id=""):
+        object_key = str(object_id or "").strip()
+        if object_key:
+            object_obj = get_game_object(object_key)
+            if object_obj is None:
+                object_obj = get_game_item(object_key)
+            object_props = getattr(object_obj, "custom_properties", {}) if object_obj is not None else {}
+            if isinstance(object_props, dict):
+                object_label = str(object_props.get("object_menu_label", "") or "").strip()
+                if object_label:
+                    return object_label
+        room_obj = CurrentRoom
+        if room_obj is None:
+            return ""
+        room_props = getattr(room_obj, "custom_properties", None)
+        if not isinstance(room_props, dict):
+            return ""
+        return str(room_props.get("object_menu_label", "") or "")
+
+
+label RefreshCurrentActionMenu(where_id="", object_id="", preserve_text=False):
+    $ _refresh_room = str(where_id or getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip()
+    $ _refresh_object = str(object_id or "").strip()
+    $ _refresh_saved_main = str(MainTxt or "")
+    $ _refresh_saved_desc = str(CurLocDesc or "")
+    $ _refresh_targets = _action_refresh_target_labels(_refresh_room)
+    $ _refresh_build_label = str(_refresh_targets.get("build", "") or "")
+    $ _refresh_object_label = str(current_room_object_menu_label(_refresh_object) or _refresh_targets.get("object", "") or "")
+    if _refresh_object == "":
+        $ current_object_id = ""
+    if _refresh_object != "" and _refresh_object_label != "":
+        call expression _refresh_object_label pass (_refresh_object, True)
+        if preserve_text:
+            $ MainTxt = _refresh_saved_main
+            $ CurLocDesc = _refresh_saved_desc
+        $ renpy.restart_interaction()
+        return
+
+    if _refresh_build_label != "":
+        call expression _refresh_build_label
+        $ renpy.restart_interaction()
+        return
+
+    if CurrentRoom is not None:
+        $ current_action_title = "Действия"
+        $ current_action_content = None
+        $ current_action_items = build_room_action_items(CurrentRoom)
+        $ UI_mode = "scene"
+    return
+
+
 label ReturnToMainUI:
     $ request_tractir_autosave("return_ui")
     call screen main_ui
@@ -1329,6 +1657,70 @@ label ApplyActionResultToUI(result=None, fallback_text="", checkpoint_key="", wh
         $ player_card_show_inventory_item_state(str(inventory_item_id or ""), True)
         return
     call RefreshCurrentActionMenu(where_id, object_id, preserve_text)
+    return
+
+
+label ReturnToMainUI:
+    $ request_tractir_autosave("return_ui")
+    call screen main_ui
+    return
+
+
+label ApplyActionResultToUI(result=None, fallback_text="", checkpoint_key="", where_id="", object_id="", preserve_text=False, ui_mode="room", inventory_item_id=""):
+    $ _ui_result = dict(result or {})
+    $ MainTxt = str(_ui_result.get("text", fallback_text) or fallback_text or "")
+    $ CurLocDesc = MainTxt
+    $ update_stat_state()
+    if str(checkpoint_key or "").strip() != "":
+        $ checkpoint_tractir_progress(str(checkpoint_key or "").strip())
+    if str(ui_mode or "room") == "inventory_menu":
+        $ player_card_show_inventory_menu_state(True)
+        return
+    if str(ui_mode or "room") == "inventory_item":
+        $ player_card_show_inventory_item_state(str(inventory_item_id or ""), True)
+        return
+    call RefreshCurrentActionMenu(where_id, object_id, preserve_text)
+    return
+
+
+label ReturnToMainUI:
+    $ request_tractir_autosave("return_ui")
+    call screen main_ui
+    return
+
+
+label ApplyActionResultToUI(result=None, fallback_text="", checkpoint_key="", where_id="", object_id="", preserve_text=False, ui_mode="room", inventory_item_id=""):
+    $ _ui_result = dict(result or {})
+    $ MainTxt = str(_ui_result.get("text", fallback_text) or fallback_text or "")
+    $ CurLocDesc = MainTxt
+    $ update_stat_state()
+    if str(checkpoint_key or "").strip() != "":
+        $ checkpoint_tractir_progress(str(checkpoint_key or "").strip())
+    if str(ui_mode or "room") == "inventory_menu":
+        $ player_card_show_inventory_menu_state(True)
+        return
+    if str(ui_mode or "room") == "inventory_item":
+        $ player_card_show_inventory_item_state(str(inventory_item_id or ""), True)
+        return
+    call RefreshCurrentActionMenu(where_id, object_id, preserve_text)
+    return
+
+
+label ApplyItemAction(what_id="", action_key="", consume_from_inventory=False, where_id="", object_id="", ui_mode="room", fallback_text=""):
+    $ _item_action_id = str(what_id or "").strip()
+    $ _item_action_key = str(action_key or "").strip()
+    $ _item_action_result = player_apply_item_action(_item_action_id, _item_action_key, bool(consume_from_inventory))
+    $ _item_checkpoint = "drink_item" if _item_action_key == "drink" else "eat_item"
+    call ApplyActionResultToUI(_item_action_result, fallback_text, _item_checkpoint, where_id, object_id, bool(str(ui_mode or "room") == "room"), ui_mode, _item_action_id)
+    return
+
+
+label ApplyItemAction(what_id="", action_key="", consume_from_inventory=False, where_id="", object_id="", ui_mode="room", fallback_text=""):
+    $ _item_action_id = str(what_id or "").strip()
+    $ _item_action_key = str(action_key or "").strip()
+    $ _item_action_result = player_apply_item_action(_item_action_id, _item_action_key, bool(consume_from_inventory))
+    $ _item_checkpoint = "drink_item" if _item_action_key == "drink" else "eat_item"
+    call ApplyActionResultToUI(_item_action_result, fallback_text, _item_checkpoint, where_id, object_id, bool(str(ui_mode or "room") == "room"), ui_mode, _item_action_id)
     return
 
 
@@ -1404,6 +1796,46 @@ label UseAleItem:
     return
 
 
+label UseAleItem:
+    call UseDrinkItem("drink_ale_001")
+    return
+
+
+label UseAleItem:
+    call UseDrinkItem("drink_ale_001")
+    return
+
+
+label UseAleItem:
+    call UseDrinkItem("drink_ale_001")
+    return
+
+
+label UseAleItem:
+    call UseDrinkItem("drink_ale_001")
+    return
+
+
+label UseAleItem:
+    call UseDrinkItem("drink_ale_001")
+    return
+
+
+label UseAleItem:
+    call UseDrinkItem("drink_ale_001")
+    return
+
+
+label UseAleItem:
+    call UseDrinkItem("drink_ale_001")
+    return
+
+
+label UseAleItem:
+    call UseDrinkItem("drink_ale_001")
+    return
+
+
 label Eat(item_name="", item_energy=0, fallback_text="", where_id="", object_id=""):
     $ _eat_result = player_eat_meal(item_name, item_energy)
     call ApplyActionResultToUI(_eat_result, fallback_text, "eat_item", where_id, object_id, False, "room")
@@ -1412,6 +1844,86 @@ label Eat(item_name="", item_energy=0, fallback_text="", where_id="", object_id=
 
 label UseFoodItem(what_id=""):
     call ApplyItemAction(what_id, "eat", True, "", "", "inventory_item", "")
+    return
+
+
+label UseBerriesItem:
+    call UseFoodItem("berries_001")
+    return
+
+
+label UseMushroomItem:
+    call UseFoodItem("mushroom_001")
+    return
+
+
+label UseBerriesItem:
+    call UseFoodItem("berries_001")
+    return
+
+
+label UseMushroomItem:
+    call UseFoodItem("mushroom_001")
+    return
+
+
+label UseBerriesItem:
+    call UseFoodItem("berries_001")
+    return
+
+
+label UseMushroomItem:
+    call UseFoodItem("mushroom_001")
+    return
+
+
+label UseBerriesItem:
+    call UseFoodItem("berries_001")
+    return
+
+
+label UseMushroomItem:
+    call UseFoodItem("mushroom_001")
+    return
+
+
+label UseBerriesItem:
+    call UseFoodItem("berries_001")
+    return
+
+
+label UseMushroomItem:
+    call UseFoodItem("mushroom_001")
+    return
+
+
+label UseBerriesItem:
+    call UseFoodItem("berries_001")
+    return
+
+
+label UseMushroomItem:
+    call UseFoodItem("mushroom_001")
+    return
+
+
+label UseBerriesItem:
+    call UseFoodItem("berries_001")
+    return
+
+
+label UseMushroomItem:
+    call UseFoodItem("mushroom_001")
+    return
+
+
+label UseBerriesItem:
+    call UseFoodItem("berries_001")
+    return
+
+
+label UseMushroomItem:
+    call UseFoodItem("mushroom_001")
     return
 
 
@@ -1451,11 +1963,9 @@ label Sleep(return_location="TavernMain", timepassed=1, fallback_text="", where_
     $ _sleep_days = max(1, int(timepassed or 1))
     $ _sleep_where = str(where_id or CurLoc or _sleep_target or "TavernMain")
     $ _sleep_object = str(object_id or current_object_id or "")
-    $ calendar_v2.sync_state()
     if not _player_can_sleep_now():
         $ MainTxt = "Еще слишком рано ложиться спать."
         $ CurLocDesc = MainTxt
-        call RefreshCurrentActionMenu(_sleep_where, _sleep_object, True)
         return
     if str(fallback_text or "").strip() != "":
         $ MainTxt = str(fallback_text or "").strip()
@@ -1481,7 +1991,6 @@ label Rest(return_location="", minutes_passed=120, energy_gain=15, fallback_text
         $ _rest_text = _rest_text + " You feel rested and refreshed!"
     else:
         $ _rest_text = "You feel rested and refreshed!"
-    $ action_override_text = _rest_text
     if _rest_minutes > 0:
         $ calendar_v2.advance_minutes(_rest_minutes)
     $ update_stat_state()

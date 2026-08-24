@@ -34,7 +34,7 @@ label GeorgettBeckyVisit:
     $ _layout_last_picture = scene_image
     vscene scene_image
 
-    $ KidsWatch = procedural_randint(1, 6, "becky_georgett_kids_%s" % int(dayspassed or 0))
+    $ KidsWatch = procedural_randint(1, 6, "becky_georgett_kids_%s" % int(current_game_day() or 0))
     if KidsWatch <= 3:
         "Вдруг вы заметили, что дверь в столовую приоткрыта и за вами кто-то подсматривает."
         if KidsWatch == 1:
@@ -44,12 +44,12 @@ label GeorgettBeckyVisit:
         else:
             "Это была Эмма с маленькой Лаурой, младшей дочкой Бекки. Лаура явно поражена происходящим, ее глазенки расширились, а щеки залила краска. Эмма же, на правах старшей, наклонилась к ней и шепотом комментирует происходящее."
 
-    if procedural_randint(1, 2, "becky_georgett_eddie_finish_%s" % int(dayspassed or 0)) == 1:
+    if procedural_randint(1, 2, "becky_georgett_eddie_finish_%s" % int(current_game_day() or 0)) == 1:
         $ BeckyGuestSexDesc += "Тем временем кончил и Эдди, в последний момент он выдернул свой член изо рта Жоржетты и выстрелил потоками спермы ей на лицо. Та, ничуть не смутившись, опять поймала его член своим ротиком и начисто его облизала. "
     else:
         $ BeckyGuestSexDesc += "Тем временем кончил и Эдди, прямо в ротик Жоржетты. Шлюшка выпила все до капли! "
 
-    if procedural_randint(1, 2, "becky_georgett_lucas_finish_%s" % int(dayspassed or 0)) == 1:
+    if procedural_randint(1, 2, "becky_georgett_lucas_finish_%s" % int(current_game_day() or 0)) == 1:
         $ BeckyGuestSexDesc += "\nЗа Эдди настал черед и Лукаса. Прижав голову Инги к своей промежности, он накончал ей полный рот. "
     else:
         $ BeckyGuestSexDesc += "\nГлядя на Эдди, спустил и Лукас, обкончав Беккиной дочке все ее личико и даже немного ее рыжие волосы. "
@@ -77,8 +77,8 @@ label GeorgettBeckyVisit:
                 $ Georgett.apply_social_chance(0, 0, 0, 60, 1, 1, "georgett_becky_visit")
                 $ georgedinnersex = 0
 
-            "Расстегнуть штаны и позвать Бекки" if georgedinnersex == 1 and cametoday < cancumdaily:
-                $ beckyminetagree = procedural_randint(1, 3, "becky_georgett_minet_agree_%s" % int(dayspassed or 0))
+            "Расстегнуть штаны и позвать Бекки" if georgedinnersex == 1 and player.intimacy.came_today < player.intimacy.can_cum_daily:
+                $ beckyminetagree = procedural_randint(1, 3, "becky_georgett_minet_agree_%s" % int(current_game_day() or 0))
                 if Becky.corruption < 40:
                     $ beckyminetagree = 3
                 elif Becky.var.get("BeckyOpenMinet", 0) > 0 and Becky.corruption + dinnerbeckyorgasm * 5 > 44:
@@ -133,7 +133,7 @@ label GeorgettBeckyVisit:
                 $ Georgett.apply_social_chance(0, 0, 0, 65, 1, 1, "georgett_becky_visit_minet")
                 $ georgedinnersex += 1
 
-            "Кончить на лицо" if georgedinnersex == 2 and cametoday < cancumdaily:
+            "Кончить на лицо" if georgedinnersex == 2 and player.intimacy.came_today < player.intimacy.can_cum_daily:
                 "Вытащив в последний момент член изо рта вашей любовницы, вы залилили спермой ей все лицо. Оторвав взгляд от украшенной белыми каплями спермы Бекки, вы осмотрелись."
                 "[BeckyGuestSexDesc]"
                 "Вдова же, не смущаясь, встретилась взглядом с дочкой и сыном, подмигнула им и только затем вытерла лицо от белых капель вашего семени."
@@ -141,7 +141,7 @@ label GeorgettBeckyVisit:
                 call PregnancyCheck("becky", "mouthface", 1, "Вы")
                 $ georgedinnersex = 0
 
-            "Кончить в ротик" if georgedinnersex == 2 and cametoday < cancumdaily:
+            "Кончить в ротик" if georgedinnersex == 2 and player.intimacy.came_today < player.intimacy.can_cum_daily:
                 "Ощутив приближающий оргазм, вы и не подумали вытаскивать член из горячего ротика Ребекки или хотя бы предупредить ее. Впрочем, вдову ваша неожиданная разрядка не смутила, это был далеко не первый минет в ее жизни. Даже не поперхнувшись, она сглотнула ваше семя и только тогда отпустила начавший обмякать член."
                 "[BeckyGuestSexDesc]"
                 "Бекки поймала взгляд Эдди, чуток покраснела, но все-таки, глядя сыну в глаза, облизала ваш член от остатков спермы, встала и строго сказала: \"Ну раз мы закончили, то помогите убрать со стола.\""

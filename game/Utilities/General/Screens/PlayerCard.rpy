@@ -10,28 +10,37 @@ init python:
     import renpy.exports as renpy_module
 
     def player_card_state():
-        return player_state(True)
+        return player
 
     def player_card_equipped_weapon():
         state = player_card_state()
+        _ensure_player_inventory_store()
+        _ensure_player_inventory_store()
+        _ensure_player_inventory_store()
+        _ensure_player_inventory_store()
+        _ensure_player_inventory_store()
+        _ensure_player_inventory_store()
+        _ensure_player_inventory_store()
+        _ensure_player_inventory_store()
+        _ensure_player_inventory_store()
         try:
             return str(state.equipment.weapon or "")
         except Exception:
-            return str(EquippedWeapon or "")
+            return str(player.equipment.weapon or "")
 
     def player_card_equipped_armor():
         state = player_card_state()
         try:
             return str(state.equipment.armor or "")
         except Exception:
-            return str(EquippedArmor or "")
+            return str(player.equipment.armor or "")
 
     def player_card_inventory_count(item_id=""):
         state = player_card_state()
         try:
             return int(state.inventory.count(item_id) or 0)
         except Exception:
-            return int(_player_item_count_by_id(item_id) or 0)
+            return int(player.item_count(item_id) or 0)
 
     def player_card_inventory_ids(expand_stacks=False):
         state = player_card_state()
@@ -94,6 +103,18 @@ init python:
     def player_card_set_item_view(item_id=""):
         global player_inventory_view_mode, player_inventory_view_section, player_inventory_view_item
 
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
         item_key = str(item_id or "").strip()
         player_inventory_view_mode = "item"
         player_inventory_view_item = item_key
@@ -103,6 +124,18 @@ init python:
         global UI_mode, UI_selected_char, current_action_title, current_action_content, current_action_items
 
         player_card_set_inventory_origin("profile")
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
         player_card_set_profile_view()
         UI_mode = "mc"
         UI_selected_char = "you"
@@ -202,7 +235,7 @@ init python:
         try:
             _last_day = int(state.intimacy.last_sex_day)
             if _last_day >= 0:
-                last_sex_text = str(max(0, int(dayspassed or 0) - _last_day)) + " дн. назад"
+                last_sex_text = str(max(0, int(current_game_day() or 0) - _last_day)) + " дн. назад"
         except Exception:
             last_sex_text = "нет"
         return [
@@ -234,6 +267,16 @@ init python:
         return lines
 
     def player_card_inventory_lines():
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+
         try:
             sync_soap_batches_with_day()
         except Exception:
@@ -423,6 +466,18 @@ init python:
         return [line for line in lines if str(line or "").strip()]
 
     def player_card_section_view_lines(section_id=""):
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
+        try:
+            sync_soap_batches_with_day()
+        except Exception:
+            pass
         section_key = str(section_id or "").strip()
         lines = []
         if section_key == "":
@@ -546,11 +601,6 @@ init python:
     def player_card_show_inventory_menu_state(preserve_text=False):
         global UI_mode, UI_selected_char, current_action_title, current_action_content, current_action_items, MainTxt, CurLocDesc
 
-        _ensure_player_inventory_store()
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
         player_card_set_profile_view()
         UI_mode = "mc"
         UI_selected_char = "you"
@@ -585,11 +635,6 @@ init python:
     def player_card_show_inventory_section_state(section_id="", preserve_text=False):
         global UI_mode, UI_selected_char, current_action_title, current_action_content, current_action_items, MainTxt, CurLocDesc
 
-        _ensure_player_inventory_store()
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
         section_key = str(section_id or "").strip()
         if section_key not in player_card_inventory_section_ids():
             player_card_show_inventory_menu_state(preserve_text)
@@ -621,11 +666,6 @@ init python:
     def player_card_show_inventory_item_state(item_id="", preserve_text=False):
         global UI_mode, UI_selected_char, current_action_title, current_action_content, current_action_items, MainTxt, CurLocDesc
 
-        _ensure_player_inventory_store()
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
         item_key = str(item_id or "").strip()
         item_obj = get_game_item(item_key)
         if item_obj is None or int(player_card_inventory_count(item_key) or 0) <= 0:
@@ -675,69 +715,54 @@ label HidePlayerCard(return_label=""):
         call expression return_label
     return
 
+label ShowPlayerCard(return_label=""):
+    if str(return_label or "") == "__main_ui__":
+        $ show_player_card_main_ui_state()
+        return
+    show screen player_card_overlay(return_label)
+    return
 
-screen player_card_overlay(return_label=""):
-    zorder 120
 
-    $ _title = player_card_display_name()
-    $ _portrait = player_card_portrait_path()
-    $ _stats_left = player_card_stat_rows_left()
-    $ _stats_right = player_card_stat_rows_right()
-    $ _lines = player_card_body_lines()
-    $ _textbox_h = int(getattr(gui, "textbox_height", 278))
-    $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
-    $ _left_w = int((config.screen_width - 36) * 0.72)
-    $ _left_h = _usable_h - 24
-    $ _portrait_w = 180
-    $ _portrait_h = 240
+label HidePlayerCard(return_label=""):
+    if str(return_label or "") == "__main_ui__":
+        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+        if _room_label:
+            jump expression _room_label
+        return
+    hide screen player_card_overlay
+    if str(return_label or "") != "":
+        call expression return_label
+    return
 
-    fixed:
-        xpos 12
-        ypos 12
-        xsize _left_w
-        ysize _left_h
 
-        add im.Scale("images/rpg_message_bg.png", _left_w, _left_h)
+label ShowPlayerCard(return_label=""):
+    if str(return_label or "") == "__main_ui__":
+        $ show_player_card_main_ui_state()
+        return
+    show screen player_card_overlay(return_label)
+    return
 
-        vbox:
-            xpos 28
-            ypos 24
-            xmaximum _left_w - 56
-            spacing 10
 
-            text _title.upper() size 30 color "#1e130c" xalign 0.5
+label HidePlayerCard(return_label=""):
+    if str(return_label or "") == "__main_ui__":
+        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+        if _room_label:
+            jump expression _room_label
+        return
+    hide screen player_card_overlay
+    if str(return_label or "") != "":
+        call expression return_label
+    return
 
-            hbox:
-                spacing 12
 
-                add im.Scale(_portrait, _portrait_w, _portrait_h)
+label ShowPlayerCard(return_label=""):
+    $ show_player_card_main_ui_state()
+    return
 
-                hbox:
-                    xmaximum _left_w - _portrait_w - 120
-                    spacing 24
 
-                    vbox:
-                        xminimum 220
-                        spacing 3
-                        for _row in _stats_left:
-                            text "%s: %s" % (_row[0], _row[1]) size 18 color "#1e130c"
-
-                    vbox:
-                        xminimum 220
-                        spacing 3
-                        for _row in _stats_right:
-                            text "%s: %s" % (_row[0], _row[1]) size 18 color "#1e130c"
-
-            for _line in _lines:
-                text _line size 16 color "#2d1d12"
-
-        textbutton "Назад":
-            id "player_card_overlay_back_button"
-            alt "player_card_overlay_back_button"
-            xpos 28
-            ypos _left_h - 58
-            text_size 22
-            action [Hide("player_card_overlay"), SetVariable("UI_mode", "scene"), SetVariable("UI_selected_char", ""), SetVariable("current_girl_key", ""), Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or "TavernMain"))]
+label HidePlayerCard(return_label=""):
+    $ main_ui_end_card_state()
+    return
 
 
 label PlayerCardInventoryMenu(preserve_text=False):
@@ -770,10 +795,10 @@ label PlayerCardEquipItem(item_id=""):
         call PlayerCardInventoryMenu
         return
     if str(player_card_item_kind(_item_id) or "") == "weapon":
-        $ player_state().equip(_item_id, "weapon")
+        $ player.equip(_item_id, "weapon")
         $ MainTxt = "Вы берете при себе " + player_card_item_display_name(_item_id) + "."
     elif str(player_card_item_kind(_item_id) or "") == "armor":
-        $ player_state().equip(_item_id, "armor")
+        $ player.equip(_item_id, "armor")
         $ MainTxt = "Вы надеваете " + player_card_item_display_name(_item_id) + "."
     else:
         $ MainTxt = "Сейчас это нельзя экипировать."
@@ -790,10 +815,10 @@ label PlayerCardUnequipItem(item_id=""):
         call PlayerCardInventoryMenu
         return
     if _item_id == player_card_equipped_weapon():
-        $ player_state().unequip("weapon")
+        $ player.unequip("weapon")
         $ MainTxt = "Вы убираете " + player_card_item_display_name(_item_id) + "."
     elif _item_id == player_card_equipped_armor():
-        $ player_state().unequip("armor")
+        $ player.unequip("armor")
         $ MainTxt = "Вы снимаете " + player_card_item_display_name(_item_id) + "."
     else:
         $ MainTxt = "Сейчас эта вещь и так не экипирована."
@@ -811,9 +836,9 @@ label PlayerCardStoreItemInMyRoom(item_id=""):
         call PlayerCardInventoryItemMenu(_item_id, True)
         return
     if _item_id == player_card_equipped_weapon():
-        $ player_state().unequip("weapon")
+        $ player.unequip("weapon")
     if _item_id == player_card_equipped_armor():
-        $ player_state().unequip("armor")
+        $ player.unequip("armor")
     $ _drop_result = player_drop_item(TavernMyRoomRoom, _item_id)
     $ MainTxt = str((_drop_result or {}).get("text", "") or "Вы оставляете вещь в комнате.")
     $ CurLocDesc = MainTxt
@@ -881,7 +906,7 @@ label PlayerCardRifleOil:
     elif player_card_inventory_count("weapon_oil_001") <= 0:
         $ MainTxt = "У вас нет оружейного масла."
     else:
-        $ _player_remove_item_by_id("weapon_oil_001", 1)
+        $ player.remove_item("weapon_oil_001", 1)
         $ _rifle_item.state["oiled"] = 1
         $ MainTxt = "Вы аккуратно смазываете механизм оружейным маслом. Скрип уходит, а детали начинают двигаться куда увереннее."
     $ CurLocDesc = MainTxt
@@ -1147,7 +1172,7 @@ label PlayerCardGiftItemTo(item_id="", char_name=""):
         else:
             $ player_card_social_result_menu(MainTxt, "PlayerCardGiftToFixedTargetMenu", (_char_name,))
         return
-    $ _removed = _player_remove_item_by_id(_item_id, 1)
+    $ _removed = player.remove_item(_item_id, 1)
     if not bool(_removed):
         $ MainTxt = "Этой вещи у вас больше нет."
         $ CurLocDesc = MainTxt
@@ -1258,10 +1283,10 @@ label PlayerCardRifleLoadAmmo(ammo_code="arrows"):
         call PlayerCardInventoryItemMenu("rusty_hunter_rifle_001", True)
         return
     if _ammo_code == "arrows":
-        $ _player_remove_item_by_id("arrows_001", 1)
+        $ player.remove_item("arrows_001", 1)
     elif _ammo_code == "droplets":
-        $ _player_remove_item_by_id("droplets_001", 1)
-        $ _player_remove_item_by_id("gunpowder_001", 1)
+        $ player.remove_item("droplets_001", 1)
+        $ player.remove_item("gunpowder_001", 1)
     $ RustyHunterRifleLoadedAmmo = _ammo_code
     $ MainTxt = "Вы заряжаете оружие {} и осторожно ставите механизм наготове.".format(rusty_hunter_rifle_ammo_name(_ammo_code))
     $ CurLocDesc = MainTxt
@@ -1277,10 +1302,10 @@ label PlayerCardRifleUnload:
         call PlayerCardInventoryItemMenu("rusty_hunter_rifle_001", True)
         return
     if _loaded_ammo == "arrows":
-        $ _player_add_item_by_id("arrows_001", 1)
+        $ player.add_item("arrows_001", 1)
     elif _loaded_ammo == "droplets":
-        $ _player_add_item_by_id("droplets_001", 1)
-        $ _player_add_item_by_id("gunpowder_001", 1)
+        $ player.add_item("droplets_001", 1)
+        $ player.add_item("gunpowder_001", 1)
     $ RustyHunterRifleLoadedAmmo = ""
     $ MainTxt = "Вы осторожно разряжаете оружие и убираете заряд."
     $ CurLocDesc = MainTxt

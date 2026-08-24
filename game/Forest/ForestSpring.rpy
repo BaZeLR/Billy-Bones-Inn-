@@ -33,7 +33,6 @@ init 6 python:
 label ForestSpring:
     $ CurrentRoom = ForestSpringRoom
     $ CurLoc = "ForestSpring"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -46,20 +45,16 @@ label ForestSpring:
             $ _layout_last_picture = _clara_forest_picture
         $ MainTxt = MainTxt + "\n\nУ родника вы замечаете Клариссу, которая явно наслаждается прохладой и тишиной этого места."
     $ CurLocDesc = MainTxt
-    $ ForestSubroomSavedText = MainTxt
+    $ forest_room_set_saved_text(MainTxt, CurrentRoom)
     $ _forest_spawned = forest_room_spawn(ForestSpringRoom)
     if len(_forest_spawned) > 0:
         $ MainTxt = MainTxt + "\n\nУ воды и под кустами можно кое-что найти."
         $ CurLocDesc = MainTxt
-        $ ForestSubroomSavedText = MainTxt
+        $ forest_room_set_saved_text(MainTxt, CurrentRoom)
     $ current_action_title = "Родник"
     $ current_action_content = None
     $ current_action_items = []
-    call ForestSubroomBuildActions
-    $ _forest_spring_ui_return = None
-    while _forest_spring_ui_return is None:
-        call screen main_ui
-        $ _forest_spring_ui_return = _return
-    jump ForestSpring
-
+    $ current_action_items = forest_subroom_action_items(CurrentRoom)
+    call screen main_ui
+    return
 

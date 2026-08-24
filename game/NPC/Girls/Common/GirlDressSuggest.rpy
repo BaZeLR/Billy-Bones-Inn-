@@ -1,4 +1,37 @@
-# ================================================================================
+    def _gds_player_hadsex():
+        had = _gds_get_dict("HadSex")
+        return int(had.get("you", had.get("You", 0)) or 0)
+    $ _girl_dress_restore_buy_menu = (str(CurLoc or "") == "GirlDressBuy")    def _gds_name(dict_name, girl_key):
+        table = _gds_get_dict(dict_name)
+        key = str(girl_key or "")
+        return str(table.get(key, key))
+label girl_dress_suggest(girl_name="", dress_to_buy=""):
+    call GirlDressSuggest(girl_name, dress_to_buy)
+    returnlabel girl_dress_suggest(girl_name="", dress_to_buy=""):
+    call GirlDressSuggest(girl_name, dress_to_buy)
+    return    def _gds_player_hadsex():
+        had = _gds_get_dict("HadSex")
+        return int(had.get("you", had.get("You", 0)) or 0)
+    $ _girl_dress_restore_buy_menu = (str(CurLoc or "") == "GirlDressBuy")    def _gds_name(dict_name, girl_key):
+        table = _gds_get_dict(dict_name)
+        key = str(girl_key or "")
+        return str(table.get(key, key))
+label girl_dress_suggest(girl_name="", dress_to_buy=""):
+    call GirlDressSuggest(girl_name, dress_to_buy)
+    returnlabel girl_dress_suggest(girl_name="", dress_to_buy=""):
+    call GirlDressSuggest(girl_name, dress_to_buy)
+    return    def _gds_player_hadsex():
+        had = _gds_get_dict("HadSex")
+        return int(had.get("you", had.get("You", 0)) or 0)
+    $ _girl_dress_restore_buy_menu = (str(CurLoc or "") == "GirlDressBuy")    def _gds_name(dict_name, girl_key):
+        table = _gds_get_dict(dict_name)
+        key = str(girl_key or "")
+        return str(table.get(key, key))
+label girl_dress_suggest(girl_name="", dress_to_buy=""):
+    call GirlDressSuggest(girl_name, dress_to_buy)
+    returnlabel girl_dress_suggest(girl_name="", dress_to_buy=""):
+    call GirlDressSuggest(girl_name, dress_to_buy)
+    return# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -30,11 +63,62 @@ init python:
         value = []
         setattr(store, name, value)
         return value
+    import renpy.store as store
 
-    def _gds_name(dict_name, girl_key):
-        table = _gds_get_dict(dict_name)
-        key = str(girl_key or "")
-        return str(table.get(key, key))
+    def _gds_get_dict(name):
+        value = getattr(store, name, None)
+        if not isinstance(value, dict):
+            value = {}
+            setattr(store, name, value)
+        return value
+
+    def _gds_get_list(name):
+        value = getattr(store, name, None)
+        if isinstance(value, list):
+            return value
+        if isinstance(value, tuple):
+            value = list(value)
+            setattr(store, name, value)
+            return value
+        if isinstance(value, dict):
+            ordered = []
+            for _gds_key, v in sorted(value.items(), key=lambda kv: str(kv[0])):
+                s = str(v or "").strip()
+                if s:
+                    ordered.append(s)
+            setattr(store, name, ordered)
+            return ordered
+        value = []
+        setattr(store, name, value)
+        return value
+    import renpy.store as store
+
+    def _gds_get_dict(name):
+        value = getattr(store, name, None)
+        if not isinstance(value, dict):
+            value = {}
+            setattr(store, name, value)
+        return value
+
+    def _gds_get_list(name):
+        value = getattr(store, name, None)
+        if isinstance(value, list):
+            return value
+        if isinstance(value, tuple):
+            value = list(value)
+            setattr(store, name, value)
+            return value
+        if isinstance(value, dict):
+            ordered = []
+            for _gds_key, v in sorted(value.items(), key=lambda kv: str(kv[0])):
+                s = str(v or "").strip()
+                if s:
+                    ordered.append(s)
+            setattr(store, name, ordered)
+            return ordered
+        value = []
+        setattr(store, name, value)
+        return value
 
     def _gds_relative_type(girl_name):
         girl = str(girl_name or "").strip().lower()
@@ -133,18 +217,14 @@ init python:
 
         return cost
 
-    def _gds_player_hadsex():
-        had = _gds_get_dict("HadSex")
-        return int(had.get("you", had.get("You", 0)) or 0)
-
     def _gds_player_cum_today():
-        value = getattr(store, "cametoday", 0)
+        value = getattr(store, "player.intimacy.came_today", 0)
         if isinstance(value, dict):
             return int(value.get("You", value.get("you", 0)) or 0)
         return int(value or 0)
 
     def _gds_player_cum_cap():
-        value = getattr(store, "cancumdaily", 0)
+        value = getattr(store, "player.intimacy.can_cum_daily", 0)
         if isinstance(value, dict):
             return int(value.get("You", value.get("you", 0)) or 0)
         return int(value or 0)
@@ -164,7 +244,6 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
     if str(GirlName or "") == "" or str(DressToBuy or "") == "":
         return
 
-    $ _girl_dress_restore_buy_menu = (str(CurLoc or "") == "GirlDressBuy")
     $ _gds_ensure_stats(GirlName)
     $ _gds_ensure_stats("irma")
 
@@ -193,7 +272,7 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         else:
             '"Лифчик?" удивилась [_rn]. "Не, спасибо конечно, но он мне не нужен!"'
         call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
-        return
+            return
 
     if _is_panties:
         if GirlName == "georgett":
@@ -201,12 +280,12 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         else:
             '"Панталончики?" удивилась [_rn]. "Не, спасибо конечно, но они мне не нужны!"'
         call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
-        return
+            return
 
     if _is_stockings:
         if _slut < 15:
             '"Ой, чулочки! Ну не знаю, нужны ли они мне?" скромно заметила [_rn]. "Наверное нет, я же никому свои ножки показывать не собираюсь. Давай лучше еще что-то посмотрим."'
-            call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
+        call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
             return
 
         if ShowOffLevel > 1:
@@ -236,7 +315,7 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
             call SlutFriendsIncrease(GirlName, 20, 1, 1, 50, 1, 2)
             $ _gds_apply_purchase(GirlName, DressToBuy, set_legsdef=True, set_legs=True, set_produced=False)
             call stat
-            call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
+            call GirlDressBuyReturnFromSuggestion(GirlName)
             return
 
         '"Ой, какие хорошенькие чулочки," восхитилась [_rn]. "Они мне?! Спасибочки!" С этими словами она взяла ваш подарочек, явно намереваясь одеть его позже.'
@@ -245,44 +324,44 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         call SlutFriendsIncrease(GirlName, 20, 1, 1, 0, 0, 0)
         $ _gds_apply_purchase(GirlName, DressToBuy, set_legsdef=True, set_legs=False, set_produced=False)
         call stat
-        call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
-        return
+        call GirlDressBuyReturnFromSuggestion(GirlName)
+            return
 
     $ _top_slut, _bottom_slut = _gds_dress_top_bottom_slut(DressToBuy)
 
     if _slut < 40 and _top_slut >= 5:
         '"Не, ну ты чего?" удивилась вашему выбору [_rn]. "Тут же сиськи практически наружу. Да если и не поворачиваться - все равно все будет видно. Я такое не то, что одевать, в комнате своей не хочу хранить."'
-        call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
-        return
+        call GirlDressBuyReturnFromSuggestion(GirlName)
+            return
 
     if _slut < 20 and _top_slut >= 3:
         '"Стефан, ты видел эту блузку? В ней же все открыто. Она на грани приличия, вернее уже за гранью," попеняла вам [_rn]. "А я девушка приличная и мне нужны приличные платья."'
-        call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
+        call GirlDressBuyReturnFromSuggestion(GirlName)
         return
 
     if _slut < 10 and _top_slut >= 2:
         '"Стефан, это платье конечно милое, но какое-то черезчур смелое. Не думаю, что я смогу такое, с вырезом, носить," засмущалась [_rn]. "Давай пока посмотрим другие платья, поскромнее."'
-        call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
+        call GirlDressBuyReturnFromSuggestion(GirlName)
         return
 
     if _slut < 55 and _bottom_slut >= 5:
         '"Ну ты и выбрал! Наверное членом думал," прокоментировала ваш выбор [_rn]. "С такой юбочкой наклонишься и все видно. Сам такое носи."'
-        call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
+        call GirlDressBuyReturnFromSuggestion(GirlName)
         return
 
     if _slut < 35 and _bottom_slut >= 3:
         '"Долго думал? Я такую юбочку не то что на люди, в комнате своей не одену," не одобрила ваш выбор [_rn]. "Если хочешь мне подарок сделать, то давай что-то другое купим."'
-        call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
+        call GirlDressBuyReturnFromSuggestion(GirlName)
         return
 
     if _slut < 20 and _bottom_slut >= 2:
         '"Ну все таки такое платье слишком смелое," зарделась [_rn]. "Давай посмотрим другие, такие чтоб подол до пола был."'
-        call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
+        call GirlDressBuyReturnFromSuggestion(GirlName)
         return
 
     if ((_slut >= 35 and _top_slut < 2) or (_slut >= 55 and _top_slut < 3) or (_slut >= 70 and _top_slut < 6) or (_slut >= 45 and _bottom_slut < 2) or (_slut >= 60 and _bottom_slut < 3) or (_slut >= 75 and _bottom_slut < 6)):
         '"Стефан, я по твоему кто? Грымза какая или серая мышка? Зачем ты мне суешь это платье, которое слишком скромно и для сорокалетней девственницы? Давай другие посмотрим, понаряднее и попривлекательней."'
-        call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
+        call GirlDressBuyReturnFromSuggestion(GirlName)
         return
 
     '"Ой какое миленькое платье!" обрадовалась [_rn]. "Ты хочешь мне такое заказать?"'
@@ -290,7 +369,7 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
     '"Ой, здорово. Тогда пусть Ирмочка с меня мерку сейчас и снимет, чтобы уже сегодня могла начать кроить и шить!"'
 
     call GirlSuggestDressFunc(GirlName, DressToBuy, ShowOffLevel, DressBuyIsRelative)
-    call GirlDressSuggestRestore(GirlName, _girl_dress_restore_buy_menu)
+        call GirlDressBuyReturnFromSuggestion(GirlName)
     return
 
 
@@ -298,9 +377,4 @@ label GirlDressSuggestRestore(GirlName="", should_restore=False):
     if should_restore:
         call GirlDressBuyRefresh(GirlName)
         show screen main_ui
-    return
-
-
-label girl_dress_suggest(girl_name="", dress_to_buy=""):
-    call GirlDressSuggest(girl_name, dress_to_buy)
     return

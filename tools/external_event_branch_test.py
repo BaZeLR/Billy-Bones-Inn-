@@ -184,9 +184,9 @@ testcase event_{safe_name}:
                     if str(getattr(_evt, "target", "") or "") == "{label_name}":
                         thread = _thread_info
                         break
-                if thread is not None:
+                if event_runtime.active_thread is not None:
                     break
-            if thread is not None:
+            if event_runtime.active_thread is not None:
                 break
         print("EVENT_LABEL_START", "{label_name}")
     run Call("{label_name}")
@@ -249,9 +249,9 @@ testcase event_{safe_name}_branch_{branch_index}:
                     if str(getattr(_evt, "target", "") or "") == "{label_name}":
                         thread = _thread_info
                         break
-                if thread is not None:
+                if event_runtime.active_thread is not None:
                     break
-            if thread is not None:
+            if event_runtime.active_thread is not None:
                 break
     run Call("{label_name}")
     pause 0.1

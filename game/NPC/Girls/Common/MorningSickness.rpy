@@ -1,4 +1,10 @@
-# ================================================================================
+    hide screen girl_card_overlay
+    hide screen player_card_overlay    hide screen girl_card_overlay
+    hide screen player_card_overlay    hide screen girl_card_overlay
+    hide screen player_card_overlay    hide screen girl_card_overlay
+    hide screen player_card_overlay    hide screen girl_card_overlay
+    hide screen player_card_overlay    hide screen girl_card_overlay
+    hide screen player_card_overlay# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -31,9 +37,9 @@ init python:
         return ""
 
 label MorningSickness(girl_name):
-    hide screen girl_card_overlay
-    hide screen player_card_overlay
     python:
+        import random
+
         import random
 
         CumInsideLastDays = int(cuminside.get(girl_name, 0) or 0)
@@ -44,15 +50,15 @@ label MorningSickness(girl_name):
             Zaderzhka = 0
         else:
             Zaderzhka = 0
-            if random.randint(1, 3) == 1:
-                Zaderzhka = random.randint(1, 20)
+            if procedural_randint(1, 3, "morning_sickness_delay_gate_%s_%s" % (girl_name, int(current_game_day() or 0))) == 1:
+                Zaderzhka = procedural_randint(1, 20, "morning_sickness_delay_%s_%s" % (girl_name, int(current_game_day() or 0)))
 
         ZaletOpinion = 0
         if int(kids.get(girl_name, 0) or 0) > 0:
-            if CumInsideLastDays > 2 + random.randint(1, 8):
+            if CumInsideLastDays > 2 + procedural_randint(1, 8, "morning_sickness_kids_inside_%s_%s" % (girl_name, int(current_game_day() or 0))):
                 if Zaderzhka == 0:
                     ZaletOpinion = 1
-                elif Zaderzhka >= 3 + random.randint(1, 5):
+                elif Zaderzhka >= 3 + procedural_randint(1, 5, "morning_sickness_kids_delay_%s_%s" % (girl_name, int(current_game_day() or 0))):
                     ZaletOpinion = 3
                 else:
                     ZaletOpinion = 2
@@ -61,24 +67,24 @@ label MorningSickness(girl_name):
             else:
                 if Zaderzhka == 0:
                     ZaletOpinion = 0
-                elif Zaderzhka >= 10 + random.randint(1, 8):
+                elif Zaderzhka >= 10 + procedural_randint(1, 8, "morning_sickness_kids_mid_%s_%s" % (girl_name, int(current_game_day() or 0))):
                     ZaletOpinion = 3
                 elif Zaderzhka >= 8:
                     ZaletOpinion = 2
                 else:
                     ZaletOpinion = 1
         else:
-            if CumInsideLastDays > 6 + random.randint(3, 12):
+            if CumInsideLastDays > 6 + procedural_randint(3, 12, "morning_sickness_inside_%s_%s" % (girl_name, int(current_game_day() or 0))):
                 if Zaderzhka < 5:
                     ZaletOpinion = 0
-                elif Zaderzhka >= 10 + random.randint(2, 10):
+                elif Zaderzhka >= 10 + procedural_randint(2, 10, "morning_sickness_high_delay_%s_%s" % (girl_name, int(current_game_day() or 0))):
                     ZaletOpinion = 2
                 else:
                     ZaletOpinion = 1
             elif CumInsideLastDays == 0:
                 ZaletOpinion = 1 if Zaderzhka >= 7 else 0
             else:
-                ZaletOpinion = 1 if Zaderzhka >= 10 + random.randint(2, 10) else 0
+                ZaletOpinion = 1 if Zaderzhka >= 10 + procedural_randint(2, 10, "morning_sickness_low_delay_%s_%s" % (girl_name, int(current_game_day() or 0))) else 0
 
         MSickAskedDelay = False
         MSickZaletCommentMade = False
@@ -99,13 +105,10 @@ label MorningSickness(girl_name):
 
 
 label morning_sickness_step2(girl_name, ZaletOpinion, Zaderzhka, CumInsideLastDays, MSickAskedDelay=False, MSickZaletCommentMade=False):
-    hide screen girl_card_overlay
-    hide screen player_card_overlay
     python:
-        import random
         girl_display_name = RealName.get(girl_name, girl_name)
-        ms_long_delay_limit = 20 + random.randint(1, 8)
-        ms_mid_delay_limit = 10 + random.randint(1, 4)
+        ms_long_delay_limit = 20 + procedural_randint(1, 8, "morning_sickness_long_%s_%s" % (girl_name, int(current_game_day() or 0)))
+        ms_mid_delay_limit = 10 + procedural_randint(1, 4, "morning_sickness_mid_%s_%s" % (girl_name, int(current_game_day() or 0)))
 
     if ZaletOpinion == 3:
         "\"Вот же ежик гальюнный, наверное опять залетела. Меня и в прошлый раз также тошнило. Так я и знала, надо было осторожней быть, хотя чего уж там,\""
@@ -171,8 +174,7 @@ label morning_sickness_step2(girl_name, ZaletOpinion, Zaderzhka, CumInsideLastDa
 
 label morning_sickness_pregnancy_comment(girl_name, CumInsideLastDays, already_said=False):
     python:
-        import random
-        ms_many_sex_limit = 15 + random.randint(1, 10)
+        ms_many_sex_limit = 15 + procedural_randint(1, 10, "morning_sickness_many_%s_%s" % (girl_name, int(current_game_day() or 0)))
     if already_said:
         "\""
         return

@@ -1,6 +1,43 @@
-# ================================================================================
+    def init_relationship_levels_runtime(force=False):
+        if force or len(dict(RelationshipLevels or {})) <= 0:
+            sync_relationship_levels()
+
+    def _relationship_after_load_init():
+        try:
+            init_relationship_levels_runtime(True)
+        except Exception:
+            pass
+
+    if _relationship_after_load_init not in config.after_load_callbacks:
+        config.after_load_callbacks.append(_relationship_after_load_init)    def init_relationship_levels_runtime(force=False):
+        if force or len(dict(RelationshipLevels or {})) <= 0:
+            sync_relationship_levels()
+
+    def _relationship_after_load_init():
+        try:
+            init_relationship_levels_runtime(True)
+        except Exception:
+            pass
+
+    if _relationship_after_load_init not in config.after_load_callbacks:
+        config.after_load_callbacks.append(_relationship_after_load_init)    def init_relationship_levels_runtime(force=False):
+        if force or len(dict(RelationshipLevels or {})) <= 0:
+            sync_relationship_levels()
+
+    def _relationship_after_load_init():
+        try:
+            init_relationship_levels_runtime(True)
+        except Exception:
+            pass
+
+    if _relationship_after_load_init not in config.after_load_callbacks:
+        config.after_load_callbacks.append(_relationship_after_load_init)# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+default RelationshipLevels = {}
+
+default RelationshipLevels = {}
+
 default RelationshipLevels = {}
 
 init -20 python:
@@ -141,15 +178,5 @@ init -20 python:
     def npc_relationship_label(npc_id=""):
         return str(npc_relationship_level(npc_id).get("phase_label", "") or "")
 
-    def init_relationship_levels_runtime(force=False):
-        if force or len(dict(RelationshipLevels or {})) <= 0:
-            sync_relationship_levels()
 
-    def _relationship_after_load_init():
-        try:
-            init_relationship_levels_runtime(True)
-        except Exception:
-            pass
 
-    if _relationship_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(_relationship_after_load_init)

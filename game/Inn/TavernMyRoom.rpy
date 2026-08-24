@@ -81,7 +81,7 @@ init python:
         return _room_has_item_by_id(TavernMyRoomRoom, str(item_id or "").strip())
 
     def tavern_my_room_has_recipe_book_access():
-        return tavern_my_room_has_floor_item("recipe_book_001") or _player_item_count_by_id("recipe_book_001") > 0
+        return tavern_my_room_has_floor_item("recipe_book_001") or player.item_count("recipe_book_001") > 0
 
     def tavern_my_room_table_link_markup():
         return "{a=call:TavernMyRoomTableMenu}{color=#245b2b}стол{/color}{/a}"
@@ -148,7 +148,6 @@ label TavernMyRoom:
     $ dog_prepare_current_spawn()
     $ CurrentRoom = TavernMyRoomRoom
     $ CurLoc = "TavernMyRoom"
-    $ location = CurLoc
     call RoomEnterEventGate(CurLoc, False)
     $ current_action_title = "Действия"
     $ current_action_content = None
@@ -163,35 +162,11 @@ label TavernMyRoom:
     $ MainTxt = _my_room_text
     $ CurLocDesc = _my_room_text
     $ CurrentRoom.mark_visited()
-    call TavernMyRoomBuildActions
-    $ _my_room_ui_return = None
-    while _my_room_ui_return is None:
-        call screen main_ui
-        $ _my_room_ui_return = _return
-    jump TavernMyRoom
-
-
-label TavernMyRoomBuildActions:
-    $ _my_room_picture, _my_room_text = tavern_my_room_scene_state()
-    $ scene_image = _my_room_picture or None
-    if _my_room_picture:
-        $ _layout_last_picture = _my_room_picture
-    $ MainTxt = _my_room_text
-    $ CurLocDesc = _my_room_text
     $ current_action_title = "Действия"
     $ current_action_content = None
-    $ room_menu = CurrentRoom.build_menu_sections()
-    $ current_action_items = list(room_menu["movement"])
-    if tavern_my_room_can_go_forest():
-        $ current_action_items.append(MenuItem("Идти в лес", Call("TravelToForest", "TavernMyRoom")))
-    python:
-        for _room_item_id in ("rusty_hunter_rifle_001", "old_leather_cuirass_001"):
-            if _room_has_item_by_id(TavernMyRoomRoom, _room_item_id):
-                _room_item_obj = get_game_item(_room_item_id, TavernMyRoomRoom)
-                if _room_item_obj is not None:
-                    current_action_items.append(MenuItem(str(runtime_item_display_name(_room_item_id) or _room_item_id), Call("TavernMyRoomObjectMenu", _room_item_id)))
-    $ current_action_items.extend(list(room_menu["actions"]))
-    return
+    $ current_action_items = tavern_my_room_action_items()
+    while True:
+        call screen main_ui
 
 
 label TavernMyRoomObjectMenu(object_id="", refresh_only=False):
@@ -239,6 +214,8 @@ label TavernMyRoomObjectMenu(object_id="", refresh_only=False):
             current_action_items.append(MenuItem("Взять", Call("TavernMyRoomTakeFloorItem", object_id)))
         current_action_items.append(MenuItem("Назад", Jump("TavernMyRoom")))
     if not refresh_only:
+        if not refresh_only:
+        if not refresh_only:
         $ renpy.restart_interaction()
     return
 
@@ -297,7 +274,7 @@ label TavernMyRoomOpenChest(preserve_text=False):
     $ current_action_items = []
     python:
         _all_dresses = []
-        _appearance = player_state().appearance
+        _appearance = player.appearance
         for _dress in list(_appearance.owned_dresses or []):
             _dress_key = str(_dress or "").strip()
             if _dress_key and _dress_key not in _all_dresses:
@@ -334,7 +311,7 @@ label TavernMyRoomCloseChest:
 
 
 label TavernMyRoomSleepAction:
-    if str(player_state().appearance.sleep_bottom_layer or "") == "daywear":
+    if str(player.appearance.sleep_bottom_layer or "") == "daywear":
         $ player_set_sleep_layer("nightwear")
     call Sleep("TavernMyRoom", 1, "Вы ложитесь на кровать и быстро проваливаетесь в сон.", "TavernMyRoom", "bed_001")
 

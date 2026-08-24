@@ -1,3 +1,90 @@
+            Melissa.sync_room_problem_state()label TavernMelissaRoomRestore:
+    $ scene_image = tavern_melissa_room_picture() or TavernMelissaRoomRoom.bg_picture or None
+    if scene_image:
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+    $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
+    $ _melissa_room_notice = household_room_issue_notice_text("melissa")
+    if str(_melissa_room_notice or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_room_notice or "")
+    $ _melissa_temp_room_notice = melissa_temp_room_text()
+    if str(_melissa_temp_room_notice or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_temp_room_notice or "")
+    $ MainTxt = werecat_append_visible_text(MainTxt, "TavernMelissaRoom")
+    $ CurLocDesc = MainTxt
+    call TavernMelissaRoomBuildActions
+    return
+
+    def tavern_melissa_room_call_label(label_name="", *label_args):
+        label = str(label_name or "").strip()
+        if label == "" or not renpy.has_label(label):
+            return
+        return renpy.call_in_new_context(label, *tuple(label_args or ()))
+
+    def tavern_melissa_room_object_hyperlink_handler(value=""):
+        object_key = str(value or "").strip()
+        if object_key == "":
+            return
+        return tavern_melissa_room_call_label("TavernMelissaRoomObjectMenu", object_key)
+    config.hyperlink_handlers["melissa_room_object"] = tavern_melissa_room_object_hyperlink_handler
+            Melissa.sync_room_problem_state()label TavernMelissaRoomRestore:
+    $ scene_image = tavern_melissa_room_picture() or TavernMelissaRoomRoom.bg_picture or None
+    if scene_image:
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+    $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
+    $ _melissa_room_notice = household_room_issue_notice_text("melissa")
+    if str(_melissa_room_notice or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_room_notice or "")
+    $ _melissa_temp_room_notice = melissa_temp_room_text()
+    if str(_melissa_temp_room_notice or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_temp_room_notice or "")
+    $ MainTxt = werecat_append_visible_text(MainTxt, "TavernMelissaRoom")
+    $ CurLocDesc = MainTxt
+    call TavernMelissaRoomBuildActions
+    return
+
+    def tavern_melissa_room_call_label(label_name="", *label_args):
+        label = str(label_name or "").strip()
+        if label == "" or not renpy.has_label(label):
+            return
+        return renpy.call_in_new_context(label, *tuple(label_args or ()))
+
+    def tavern_melissa_room_object_hyperlink_handler(value=""):
+        object_key = str(value or "").strip()
+        if object_key == "":
+            return
+        return tavern_melissa_room_call_label("TavernMelissaRoomObjectMenu", object_key)
+    config.hyperlink_handlers["melissa_room_object"] = tavern_melissa_room_object_hyperlink_handler
+            Melissa.sync_room_problem_state()label TavernMelissaRoomRestore:
+    $ scene_image = tavern_melissa_room_picture() or TavernMelissaRoomRoom.bg_picture or None
+    if scene_image:
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+    $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
+    $ _melissa_room_notice = household_room_issue_notice_text("melissa")
+    if str(_melissa_room_notice or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_room_notice or "")
+    $ _melissa_temp_room_notice = melissa_temp_room_text()
+    if str(_melissa_temp_room_notice or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_temp_room_notice or "")
+    $ MainTxt = werecat_append_visible_text(MainTxt, "TavernMelissaRoom")
+    $ CurLocDesc = MainTxt
+    call TavernMelissaRoomBuildActions
+    return
+
+    def tavern_melissa_room_call_label(label_name="", *label_args):
+        label = str(label_name or "").strip()
+        if label == "" or not renpy.has_label(label):
+            return
+        return renpy.call_in_new_context(label, *tuple(label_args or ()))
+
+    def tavern_melissa_room_object_hyperlink_handler(value=""):
+        object_key = str(value or "").strip()
+        if object_key == "":
+            return
+        return tavern_melissa_room_call_label("TavernMelissaRoomObjectMenu", object_key)
+    config.hyperlink_handlers["melissa_room_object"] = tavern_melissa_room_object_hyperlink_handler
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -5,10 +92,13 @@ init 6 python:
     def tavern_melissa_room_sleep_picture():
         picture_cycle = Melissa.image_sequence("tavern", "sleep")
         if len(picture_cycle) > 0:
-            return picture_cycle[int(dayspassed or 0) % len(picture_cycle)]
+            return picture_cycle[int(current_game_day() or 0) % len(picture_cycle)]
         return ""
 
     def tavern_melissa_room_can_show_sleeping():
+        try:
+        except Exception:
+            pass
         try:
             Melissa.sync_room_problem_state()
         except Exception:
@@ -34,19 +124,22 @@ init 6 python:
                 return room_object
         return None
 
-    def tavern_melissa_room_call_label(label_name="", *label_args):
-        label = str(label_name or "").strip()
-        if label == "" or not renpy.has_label(label):
-            return
-        return renpy.call_in_new_context(label, *tuple(label_args or ()))
-
-    def tavern_melissa_room_object_hyperlink_handler(value=""):
-        object_key = str(value or "").strip()
-        if object_key == "":
-            return
-        return tavern_melissa_room_call_label("TavernMelissaRoomObjectMenu", object_key)
-
-    config.hyperlink_handlers["melissa_room_object"] = tavern_melissa_room_object_hyperlink_handler
+    def tavern_melissa_room_action_items():
+        items = []
+        for issue_action in list(household_room_issue_action_specs("melissa") or []):
+            items.append(MenuItem(str(issue_action.get("label", "") or ""), Call(str(issue_action.get("target", "") or ""), *tuple(issue_action.get("args", ()) or ()))))
+        if tavern_upstairs_can_clean_rooms():
+            items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernMelissaRoom", "", "")))
+        items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernMelissaRoom", "")))
+        if story_event_available("TavernMelissaRoom", "clara_room_visit"):
+            items.append(MenuItem("Прислушаться к Клариссе и Мелиссе", Call("checkTriggers", "TavernMelissaRoom", "clara_room_visit", 0)))
+        if story_event_available("TavernMelissaRoom", "clara_paintings"):
+            items.append(MenuItem("Выслушать Клариссу и Мелиссу", Call("checkTriggers", "TavernMelissaRoom", "clara_paintings", 0)))
+        for room_object in TavernMelissaRoomRoom.visible_game_items():
+            items.append(MenuItem(room_object.name, Call("TavernMelissaRoomObjectMenu", room_object.object_id)))
+        for room_exit in TavernMelissaRoomRoom.visible_exits():
+            items.append(MenuItem(room_exit.label, Call("AdvanceMovementTime", room_exit.target)))
+        return items
 
     TavernMelissaRoomRoom = Room(
         code_name="TavernMelissaRoom",
@@ -75,7 +168,6 @@ init 6 python:
 label TavernMelissaRoom:
     $ CurrentRoom = TavernMelissaRoomRoom
     $ CurLoc = "TavernMelissaRoom"
-    $ location = CurLoc
     $ scene_image = tavern_melissa_room_picture() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -93,7 +185,8 @@ label TavernMelissaRoom:
     call TavernMelissaRoomBuildActions
     if tavern_melissa_room_pests_event_ready():
         call MelissaRoomPestsEvent
-    $ _melissa_room_ui_return = None
+    while True:
+        $ _melissa_room_ui_return = None
     while _melissa_room_ui_return is None:
         call screen main_ui
         $ _melissa_room_ui_return = _return
@@ -120,7 +213,6 @@ label TavernMelissaRoomBuildActions:
     python:
         for _exit in TavernMelissaRoomRoom.visible_exits():
             current_action_items.append(MenuItem(_exit.label, Call("AdvanceMovementTime", _exit.target)))
-    return
 
 
 label TavernMelissaRoomObjectMenu(object_id="", preserve_text=False):
@@ -170,24 +262,6 @@ label TavernMelissaRoomObjectText(object_id="", action_id=""):
             CurLocDesc = _room_text
             current_action_title = _room_name or "Комната Мелиссы"
     call TavernMelissaRoomObjectMenu(object_id)
-    return
-
-
-label TavernMelissaRoomRestore:
-    $ scene_image = tavern_melissa_room_picture() or TavernMelissaRoomRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-        vscene scene_image
-    $ MainTxt = TavernMelissaRoomRoom.descriptions[0].text
-    $ _melissa_room_notice = household_room_issue_notice_text("melissa")
-    if str(_melissa_room_notice or "").strip() != "":
-        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_room_notice or "")
-    $ _melissa_temp_room_notice = melissa_temp_room_text()
-    if str(_melissa_temp_room_notice or "").strip() != "":
-        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_melissa_temp_room_notice or "")
-    $ MainTxt = werecat_append_visible_text(MainTxt, "TavernMelissaRoom")
-    $ CurLocDesc = MainTxt
-    call TavernMelissaRoomBuildActions
     return
 
 

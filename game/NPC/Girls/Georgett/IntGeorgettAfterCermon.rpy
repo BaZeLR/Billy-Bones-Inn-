@@ -1,4 +1,5 @@
 label story_georgett_church_after_sermon:
+    show screen main_ui
     $ Georgett.set_after_sermon_stage(0)
     $ MainTxt = MainTxt + "\n\nЗа кабинками для исповеди вы заметили неприметную дверь, ведущую внутрь храма. Из-за нее слышаться приглушенные голоса. Вы замечаете большую замочную скважину."
     $ CurLocDesc = MainTxt
@@ -13,6 +14,7 @@ label story_georgett_church_after_sermon:
 
 
 label story_georgett_church_after_sermon_look_1:
+    show screen main_ui
     $ GetSexEventFromTable("georgett", 99, "Priest")
     call PregnancyCheck("georgett", "inside", 1, "Отец Герхард")
     $ MainTxt = "Посмотрев в замочную скважину вы увидели Жоржетту и отца Герхарда."
@@ -33,6 +35,7 @@ label story_georgett_church_after_sermon_look_1:
 
 
 label story_georgett_church_after_sermon_look_2:
+    show screen main_ui
     $ MainTxt = "Вы продолжаете наблюдать за Жоржеттой и отцом Герхардом через замочную скважину."
     if Georgett.story_value("SawChurchAfterCermon", 0) == 0:
         $ MainTxt = MainTxt + "\n\n\"Не печалься, дочь моя, могу я отпустить тебе этот грех, как и грех лжи. Но сначала расскажи подробно, как ты согрешила. Вот член, подобный тому, с коим ты грешила. Если трогала его рукой, то покажи как.\" - говорит отец Герхард, приподнимая сутану. Под ней обнаруживается уже поднявшийся член жреца.\n\"Да, падре, трогала я член, вот так\" - говорит Жоржетта и начинает подрачивать член отца Герхарда своими ловкими пальчиками."
@@ -57,6 +60,7 @@ label story_georgett_church_after_sermon_look_2:
 
 
 label story_georgett_church_after_sermon_look_3:
+    show screen main_ui
     $ MainTxt = "Вы продолжаете наблюдать за Жоржеттой и отцом Герхардом через замочную скважину."
     if Georgett.story_value("SawChurchAfterCermon", 0) == 0:
         $ MainTxt = MainTxt + "\n\n\"А что ты потом делала? Панталончики сняла наверное?\"\n\"Нет, падре, не ношу я панталончиков, вот, смотрите.\" - говорит Жоржетта и задирает подол платья, демонстрируя жрецу свою киску."
@@ -79,6 +83,7 @@ label story_georgett_church_after_sermon_look_3:
 
 
 label story_georgett_church_after_sermon_look_4:
+    show screen main_ui
     $ MainTxt = "Вы продолжаете наблюдать за Жоржеттой и отцом Герхардом через замочную скважину.\n\nЖоржетта скачет на члене отца Герхарда, а тот уже успел расстегнуть ее блузку и теперь мнет ее полные груди. Жоржетта впивается в отца Герхарда страстным поцелуем, не прекращая скачки.\n\nВскоре парочка достигает оргазма практически одновременно, Жоржетта издает протяжный стон, содрогаясь всем телом, а жрец заполняет ее своим семенем."
     if Georgett.story_value("TalkChurchAfterCermonLiza", 0):
         $ MainTxt = MainTxt + "\n\n\"А ты ведь и доченьку мою потрахиваешь\" - говорит Жоржетта. \"И кто лучше: я или она?\"\n\"Обе вы прекрасны\", не растерявшись, говорит жрец. \"Все важны Ильматеру, все ему любы. А значит и мне любы одинаково, как его слуге."

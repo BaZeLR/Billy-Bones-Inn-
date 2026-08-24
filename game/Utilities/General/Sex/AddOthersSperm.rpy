@@ -10,11 +10,11 @@ init python:
         chance_i = max(1, int(chance or 1))
         girl.clear_cum("cum_inside_others", "cum_face_others", "cum_tits_others")
 
-        if procedural_randint(1, chance_i * 2, "others_sperm_face_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+        if procedural_randint(1, chance_i * 2, "others_sperm_face_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
             girl.set_cum_state("cum_face_others", 1)
-        if procedural_randint(1, chance_i, "others_sperm_tits_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+        if procedural_randint(1, chance_i, "others_sperm_tits_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
             girl.set_cum_state("cum_tits_others", 1)
-        if procedural_randint(1, chance_i * 2, "others_sperm_inside_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+        if procedural_randint(1, chance_i * 2, "others_sperm_inside_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
             girl.set_cum_state("cum_inside_others", 1)
         return 0
 

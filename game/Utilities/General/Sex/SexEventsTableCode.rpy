@@ -225,7 +225,7 @@ init -44 python:
             if matched:
                 latest_day = max(latest_day, row_day)
         if latest_day > 0:
-            return dayspassed + 1 - latest_day
+            return current_game_day() + 1 - latest_day
         return -1
 
     def GetSexNum(GirlNameSE, DudeNameSE="", CumTargetSE="", SignSE="", StartDaySE=0):

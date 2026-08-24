@@ -1,0 +1,368 @@
+game/Inn\Backyard.rpy:183:label BackyardObjectMenu(object_id="", display_text=""):
+game/Inn\Backyard.rpy:231:label BackyardObjectText(object_id="", action_id=""):
+game/Inn\Backyard.rpy:272:label BackyardWashAtBarrelWithSoap(soap_id="soap_001"):
+game/Inn\HouseholdMiniEvents.rpy:3:label HouseholdEvent_Try(location_code="", mode="room"):
+game/Inn\EventWineForDance.rpy:39:label EventWineForDance(eyewitness=0):
+game/Inn\EventWineForDance.rpy:62:label WineForDanceOutcome(reaction_code=1):
+game/Inn\HouseholdRuntimeEvents.rpy:387:label HouseholdSoapRequestEvent(girl_name=""):
+game/Inn\HouseholdRuntimeEvents.rpy:428:label HouseholdSoapRequestGiveNow(girl_name="", item_id="soap_001"):
+game/Inn\HouseholdRuntimeEvents.rpy:446:label HouseholdBarberRequestEvent(girl_name=""):
+game/Inn\HouseholdRuntimeEvents.rpy:582:label MelissaRoomPestsChoice(help_pests=0):
+game/Inn\HouseholdRuntimeEvents.rpy:601:    jump TavernMelissaRoom
+game/Inn\HouseholdRuntimeEvents.rpy:604:label HouseholdMorningIssueCure(girl_name=""):
+game/Inn\HouseholdRuntimeEvents.rpy:630:label HouseholdMorningIssueWarmDrink(girl_name=""):
+game/Inn\HouseholdRuntimeEvents.rpy:676:label HouseholdWakeSleepyGirl(girl_name=""):
+game/Inn\HouseholdRuntimeEvents.rpy:745:label MelissaNightWakeChoice(choice_value=0):
+game/Town\BeckyHomeFront.rpy:126:label BeckyHomeFront(arrive_mode=""):
+game/Inn\menu_tavernstat.rpy:791:label ShowTavernReport(return_label=""):
+game/Inn\menu_tavernstat.rpy:803:label ShowTavernReportPerson(person="", return_label=""):
+game/Inn\menu_tavernstat.rpy:815:label TavernReportApplyAction(person="", action_code="", return_label=""):
+game/Inn\menu_tavernstat.rpy:832:label TavernReportApplyOverviewAction(person="", action_code="", return_label=""):
+game/Inn\menu_tavernstat.rpy:849:label HideTavernReport(return_label=""):
+game/Inn\menu_tavernstat.rpy:954:label menu_tavernstat_person(person):
+game/Town\BeckyHome.rpy:123:label BeckyHome(arrive_mode=""):
+game/Town\BeckyHome.rpy:240:label BeckyHomeObjectMenu(object_id=""):
+game/Town\BeckyHome.rpy:273:label BeckyHomeObjectText(object_id="", action_id=""):
+game/Inn\Shed.rpy:204:label ShedTakeChoppedWood(quantity=1):
+game/Town\Arts\ArtisansQuarter.rpy:103:label ArtisansQuarterObjectMenu(object_id=""):
+game/Town\Arts\ArtisansQuarter.rpy:142:label ArtisansQuarterObjectText(object_id="", action_id=""):
+game/Town\WineStore.rpy:170:label WineStoreObjectMenu(object_id="", preserve_text=False):
+game/Town\WineStore.rpy:194:label WineStoreObjectText(object_id="", action_id=""):
+game/Town\WineStore.rpy:207:label WineStoreBuyStockMenu(result_text=""):
+game/Town\WineStore.rpy:230:label WineStoreBuyStockApply(cost=0, add_amount=0, barrel_count=0):
+game/Inn\TavernAmandaRoom.rpy:383:    jump TavernUpstairs
+game/Inn\TavernAmandaRoom.rpy:386:label tavern_amanda_room_object_menu(object_id=""):
+game/Inn\TavernAmandaRoom.rpy:421:label tavern_amanda_room_object_text(object_id="", action_id=""):
+game/NPC\Secondary\WerecatNPC.rpy:352:label IntWerecatTalk(room_code=""):
+game/NPC\Secondary\WerecatNPC.rpy:434:label ShowWerecatCard(return_label=""):
+game/NPC\Secondary\WerecatNPC.rpy:446:label HideWerecatCard(return_label=""):
+game/NPC\Secondary\SherwoodTravel.rpy:50:label SherwoodKunidellOpenedCode(OnHorse=0):
+game/NPC\Secondary\SherwoodTravel.rpy:63:label SherwoodTravel(OnHorse=0):
+game/NPC\Secondary\MelissaWerecatQuest.rpy:260:label WerecatSetTrap(room_code=""):
+game/NPC\Secondary\MelissaWerecatQuest.rpy:283:label WerecatCheckTrap(room_code=""):
+game/Town\Arts\Dress\DressShop.rpy:145:label DressShopOpenCatalog(rack_type=""):
+game/Town\Arts\Dress\DressShop.rpy:166:label DressShopBuyMaleItem(dress_code=""):
+game/Town\Arts\Dress\DressShop.rpy:193:label DressShopFemaleBuyInfo(dress_code=""):
+game/Town\Arts\Dress\DressShop.rpy:203:label DressShopObjectMenu(object_id=""):
+game/Inn\TavernEmptyRoom.rpy:88:label TavernEmptyRoomObjectMenu(object_id=""):
+game/Inn\TavernAtic.rpy:223:label TavernAticObjectMenu(object_id=""):
+game/Inn\TavernAtic.rpy:263:label TavernAticObjectText(object_id="", action_id=""):
+game/Inn\TavernBedroomDoors.rpy:71:label BedroomDoorInspect(room_code="", owner_name="", object_id=""):
+game/Inn\TavernKitchenHearth001.rpy:78:label TavernKitchenHearthMenu(object_id="hearth_001"):
+game/Inn\TavernKitchenHearth001.rpy:111:label TavernKitchenHearthText(action_id=""):
+game/NPC\Girls\Sandra\SandraEvents.rpy:48:label SandraWeek5WakeEvent(return_label="TavernMain"):
+game/NPC\Girls\Sandra\SandraEvents.rpy:56:label SandraWeeklyEvaluationScene(step_index=0, return_label="TavernMain"):
+game/NPC\Girls\Sandra\SandraEvents.rpy:74:label sandraWeeklyEvaluation_0(return_label="TavernMain"):
+game/NPC\Girls\Sandra\SandraEvents.rpy:82:label sandraWeeklyEvaluation_1(return_label="TavernMain"):
+game/NPC\Girls\Sandra\SandraEvents.rpy:90:label sandraWeeklyEvaluation_2(return_label="TavernMain"):
+game/NPC\Girls\Sandra\SandraEvents.rpy:98:label sandraWeeklyEvaluation_3(return_label="TavernMain"):
+game/NPC\Girls\Sandra\SandraEvents.rpy:132:label SandraSexEngine(girl_name="sandra", source_room="TavernSandraRoom"):
+game/Inn\TavernMainBar001.rpy:78:label TavernMainBarInviteApply(target_npc=""):
+game/NPC\Secondary\IntMongolTalk.rpy:51:label ClaraSecretMerchantBuy(item_id="", price_value=0):
+game/NPC\Secondary\IntMongolTalk.rpy:74:label MongolTalkApply(topic_code=""):
+game/Inn\TavernHelp.rpy:41:    jump TavernHelpReadPage
+game/Inn\TavernHelp.rpy:58:            jump TavernHelpReadPage
+game/Inn\TavernHelp.rpy:62:            jump TavernHelpReadPage
+game/Inn\TavernHelp.rpy:71:            jump TavernHelpReadPage
+game/Inn\TavernHelp.rpy:76:            jump TavernHelpReadPage
+game/Inn\TavernHelp.rpy:81:            jump TavernHelpReadPage
+game/Inn\TavernHelp.rpy:84:            jump TavernMain
+game/Inn\TavernMelissaRoom.rpy:104:label TavernMelissaRoomObjectMenu(object_id="", preserve_text=False):
+game/Inn\TavernMelissaRoom.rpy:142:label TavernMelissaRoomObjectText(object_id="", action_id=""):
+game/Inn\TavernMain.rpy:391:label TavernMainObjectMenu(object_id=""):
+game/Inn\TavernMain.rpy:443:label TavernMainObjectText(object_id="", action_id=""):
+game/Inn\TavernKitchenCauldron001.rpy:34:label TavernKitchenCauldronMenu(object_id="cauldron_001"):
+game/Inn\TavernKitchenCauldron001.rpy:64:label TavernKitchenCauldronText(action_id=""):
+game/Inn\TavernKitchen.rpy:461:label TavernKitchenDepositApply(item_id=""):
+game/Inn\TavernKitchenBreakfast.rpy:1228:label TavernKitchenBreakfastShowText(text=""):
+game/Inn\TavernKitchenBreakfast.rpy:1281:            jump TavernKitchenBreakfastAmandaAtticExpose
+game/Inn\TavernKitchenBreakfast.rpy:1284:            jump TavernKitchenBreakfastAmandaAtticStop
+game/Inn\TavernKitchenBreakfast.rpy:1310:            jump TavernKitchenBreakfastMelissaAmandaGerhardNatural
+game/Inn\TavernKitchenBreakfast.rpy:1391:label TavernKitchenBreakfastTeasePrivate(girl_name="", place_code="storage"):
+game/Inn\TavernKitchenBreakfast.rpy:1494:label TavernKitchenBreakfastLookAtGirl(girl_name=""):
+game/Inn\TavernKitchenBreakfast.rpy:1507:label TavernKitchenBreakfastPerkFood(item_id=""):
+game/Inn\TavernKitchenBreakfast.rpy:1516:label TavernKitchenBreakfastPerkDrink(item_id=""):
+game/Inn\TavernKitchenBreakfast.rpy:1647:label TavernKitchenSundayDinner(serve_spicy=0):
+game/NPC\Girls\Sandra\IntSandraTalk.rpy:4:label IntSandraTalk(girl_name="sandra"):
+game/NPC\Girls\Sandra\IntSandraTalk.rpy:46:label IntSandraReconcile(girl_name="sandra"):
+game/NPC\Girls\Sandra\IntSandraTalk.rpy:60:label IntSandraHouseholdInsight(girl_name="sandra"):
+game/NPC\Girls\Sandra\IntSandraTalk.rpy:79:label IntSandraHouseholdPriorities(girl_name="sandra"):
+game/Inn\TavernMyRoom.rpy:184:label TavernMyRoomObjectMenu(object_id="", display_text=""):
+game/Inn\TavernMyRoom.rpy:238:label TavernMyRoomObjectText(object_id="", action_id=""):
+game/Inn\TavernMyRoom.rpy:257:label TavernMyRoomTakeFloorItem(item_id=""):
+game/Inn\TavernMyRoom.rpy:267:label TavernMyRoomOpenChest(preserve_text=False):
+game/Inn\TavernMyRoom.rpy:330:label TavernMyRoomSetSleepLayer(mode="daywear"):
+game/Inn\TavernMyRoom.rpy:378:label TavernMyRoomTableRead(recipe_id=""):
+game/Inn\TavernMyRoom.rpy:446:label TavernMyRoomTableCraftItem(recipe_id=""):
+game/Inn\TavernMyRoom.rpy:471:label TavernMyRoomWearDress(dress_code=""):
+game/Inn\TavernMyRoom.rpy:489:label TavernMyRoomRemoveDress(dress_code=""):
+game/Inn\TavernMyRoom.rpy:504:label TavernMyRoomTearDressToCloth(dress_code=""):
+game/Town\HunterClub.rpy:542:label HunterClubObjectMenu(object_id=""):
+game/Town\HunterClub.rpy:610:label HunterClubChallengesMenu(result_text=""):
+game/Town\HunterClub.rpy:621:label HunterClubChallengeMissing(challenge_id=""):
+game/Town\HunterClub.rpy:631:label HunterClubChallengeApply(challenge_id=""):
+game/Town\HunterClub.rpy:677:label HunterClubApplyTrade(mode="buy"):
+game/Town\GroceryStore.rpy:270:label GroceryStoreObjectMenu(object_id="", preserve_text=False):
+game/Town\GroceryStore.rpy:294:label GroceryStoreObjectText(object_id="", action_id=""):
+game/Town\GroceryStore.rpy:307:label GroceryStoreBuyStockMenu(preserve_text=False):
+game/Town\GroceryStore.rpy:328:label GroceryStoreBuyStockApply(cost=0, add_amount=0, bag_count=0):
+game/Town\GroceryStore.rpy:353:label GroceryStoreBuyFancyNightBowl(preserve_text=False):
+game/Town\RandomTownEvents.rpy:684:        jump TownStreetPatrolStocks
+game/Town\RandomTownEvents.rpy:697:        jump TownStreetPatrolStocks
+game/Town\RandomTownEvents.rpy:711:        jump TownStreetPatrolStocks
+game/Town\RandomTownEvents.rpy:738:        jump TownStreetPatrolStocks
+game/Town\RandomTownEvents.rpy:779:    jump DebugTownRandomEvents
+game/Inn\TavernProstClients.rpy:4:label TavernProstClients(girl_name="", client_type=1, return_room=""):
+game/Inn\TavernProstClients.rpy:32:label TavernProstClientsWatch(client_type=1, girl_name="", return_room=""):
+game/Town\PortStreets.rpy:120:    jump PortStreets
+game/Town\PortStreets.rpy:123:label PortStreetsBackAlley(girl_name=""):
+game/Town\PortStreets.rpy:144:label PortStreetsBottleMenu(object_id="port_empty_bottle"):
+game/Town\Temple\GiveBirth.rpy:4:label GiveBirth(GirlName=""):
+game/NPC\Secondary\IntEddieBeckySex.rpy:4:label IntEddieBeckySex(GirlNameIBS="becky"):
+game/Inn\TavernSandraRoom.rpy:127:label TavernSandraRoomObjectMenu(object_id=""):
+game/Inn\TavernSandraRoom.rpy:159:label TavernSandraRoomObjectText(object_id="", action_id=""):
+game/NPC\Girls\Sandra\IntSandraDressChange.rpy:16:label IntSandraOfferBuyDress(GirlNameIST="sandra"):
+game/NPC\Secondary\DogCompanion.rpy:561:label ShowDogCard(return_label=""):
+game/NPC\Secondary\DogCompanion.rpy:573:label HideDogCard(return_label=""):
+game/NPC\Secondary\DogCompanion.rpy:577:label IntDogTalk(room_code=""):
+game/NPC\Secondary\DogCompanion.rpy:715:label IntDogAdoptNameMenu(room_code=""):
+game/Town\StreetTavern.rpy:153:label StreetTavernObjectMenu(object_id=""):
+game/Inn\TavernStable.rpy:178:label tavern_stable_object_menu(object_id=""):
+game/Inn\TavernStable.rpy:214:label tavern_stable_object_text(object_id="", action_id=""):
+game/NPC\Girls\Amanda\ShowAmandaPortrait.rpy:4:label ShowAmandaPortrait():
+game/NPC\Secondary\IntAlberTalk.rpy:73:                jump MarketPlace
+game/NPC\Secondary\IntAlberTalk.rpy:90:                jump MarketPlace
+game/Town\Market\FridayDance.rpy:27:label FridayDance(add_dance_phrase_tmp=""):
+game/NPC\Girls\Amanda\AmandaLegareStreetEvents.rpy:101:            jump AfterDanceSexLegare
+game/NPC\Girls\Amanda\AmandaLegareStreetEvents.rpy:127:            jump AmandaLoverSex
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:12:label AmandaTalkHubEventEntry(girl_name="amanda", where_id="", entity_data=None):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:30:label IntAmandaTalk(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:96:label IntAmandaReconcile(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:115:label IntAmandaAllowAlber(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:132:label IntAmandaAllowLiza(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:141:label IntAmandaAllowGlory(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:151:label IntAmandaAllowGuys(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:160:label IntAmandaAllowBreaks(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:173:label IntAmandaAskVirginity(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:188:label IntAmandaBanAlber(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:201:label IntAmandaBanGuys(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:210:label IntAmandaAskPregnancy(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:235:label IntAmandaAskDad(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:243:label IntAmandaAskNightBowl(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:257:label IntAmandaGiftFancyNightBowl(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:272:label IntAmandaHouseholdInsight(girl_name="amanda"):
+game/NPC\Girls\Amanda\IntAmandaTalk.rpy:285:label IntAmandaHouseholdPriorities(girl_name="amanda"):
+game/NPC\Girls\Amanda\AmandaLoverSex.rpy:129:label amanda_lover_show_sex_scene(scene_type, guy_name):
+game/Town\Market\MarketPlace.rpy:119:        jump FridayDance
+game/Town\Market\MarketPlace.rpy:200:            jump MarketPlace
+game/Town\Market\MarketPlace.rpy:203:label MarketPlaceObjectMenu(object_id="", preserve_text=False):
+game/Town\Market\MarketPlace.rpy:239:label MarketPlaceObjectText(object_id="", action_id=""):
+game/Town\Market\MarketPlace.rpy:262:label MarketPlaceApproachMongol(mode_code=""):
+game/NPC\Girls\Amanda\AfterDanceLegare.rpy:4:label AfterDanceLegare(arg=""):
+game/NPC\Girls\Amanda\EventAmandaLizettTalk.rpy:4:label EventAmandaLizettTalk(eyewitness=0):
+game/NPC\Girls\Amanda\AmandaTalkEvents.rpy:21:label AmandaTalkWorkTipEvent(girl_name="amanda"):
+game/NPC\Girls\Amanda\AmandaTalkEvents.rpy:33:label AmandaTalkLookOpinionEvent(girl_name="amanda"):
+game/Town\Church\ShowChurchDraupnirList.rpy:34:label ChurchDonate(donation_idx=0):
+game/NPC\Girls\Amanda\EventAmandaLizettTalk2.rpy:4:label EventAmandaLizettTalk2(eyewitness=0):
+game/NPC\Girls\Amanda\EventAmandaLizettTalk2.rpy:54:label EventAmandaLizettTalk2Apply(reaction_code=4):
+game/NPC\Girls\Amanda\IntAmandaDressChange.rpy:54:label int_amanda_dress_change(GirlNameIAT="amanda"):
+game/NPC\Girls\Amanda\IntAmandaDressChange.rpy:78:label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
+game/NPC\Girls\Amanda\AmandaAtHomeCode.rpy:8:label CodeAmandaKickFromRoom(reason=""):
+game/NPC\Girls\Amanda\AmandaAtHomeCode.rpy:195:label CodeAmandaSexBedDeflower(tmpCurSexStep=0):
+game/NPC\Girls\Amanda\AmandaAtHomeCode.rpy:350:label CodeAmandaSexAgreeLeave(mode=""):
+game/NPC\Girls\Amanda\IntAmandaDance.rpy:36:label IntAmandaDance():
+game/Town\Church\ChurchIspoved.rpy:4:label ChurchIspoved(entry_arg=0):
+game/NPC\Girls\Amanda\AmandaLegareDanceSequence.rpy:219:label LegareAmandaGoMenu():
+game/NPC\Girls\Amanda\AmandaLegareDanceSequence.rpy:238:label LegareAmandaLetGoCode(args=None):
+game/NPC\Girls\Amanda\IntAmandaSex.rpy:30:label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
+game/NPC\Girls\Amanda\IntAmandaSex.rpy:455:                    jump TavernMain
+game/NPC\Girls\Amanda\IntAmandaSex.rpy:479:                    jump TavernMain
+game/Town\Church\ChurchAfterCermon.rpy:4:label ChurchAfterCermon(entry_arg=0):
+game/NPC\Girls\Melissa\IntMelissaDressChange.rpy:1:label IntMelissaDressChange(GirlNameIMT="melissa"):
+game/Town\Church\Church.rpy:292:label ChurchServiceMenu(show_attendees=True):
+game/NPC\Girls\Inga\IntIngaTalk.rpy:4:label IntIngaTalk(show_menu=True):
+game/NPC\Girls\Inga\IntIngaTalk.rpy:24:label int_inga_talk(show_menu=True):
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:196:label IntMelissaTalk(girl_name="melissa"):
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:209:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:212:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:215:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:220:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:223:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:226:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:229:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:232:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:235:            jump IntMelissaTalk
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:238:            jump IntMelissaTalk
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:241:            jump IntMelissaTalk
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:244:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:247:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:250:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:253:            jump IntMelissaTalkRefresh
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:260:label IntMelissaTalkApply(girl_name="melissa", choice_code=""):
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:346:label IntMelissaStartMenu(girl_name="melissa"):
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:370:label IntMelissaStartApply(girl_name="melissa", start_action=""):
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:411:label IntMelissaFindPrivatePlace(girl_name="melissa", source_room=""):
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:427:label IntMelissaRoomProblemAdviceMenu(girl_name="melissa"):
+game/NPC\Girls\Melissa\IntMelissaTalk.rpy:453:label IntMelissaRoomProblemAdviceApply(girl_name="melissa", advice_code=""):
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:31:            jump story_clara_market_booklet_follow
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:34:            jump story_clara_market_booklet_ignore
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:77:            jump story_clara_market_booklet_confront
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:80:            jump story_clara_market_booklet_follow_success_leave
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:114:    jump story_clara_market_booklet_follow_success_leave
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:134:            jump story_clara_market_booklet_2_follow
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:137:            jump story_clara_market_booklet_2_ignore
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:176:    jump story_clara_market_booklet_3
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:300:            jump story_clara_market_booklet_feed_mongol
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:340:            jump story_clara_market_booklet_lockpicks_order
+game/NPC\Girls\Clara\ClaraBookletMarketThread.rpy:380:            jump story_clara_market_booklet_release_mongol
+game/NPC\Girls\Irma\IrmaTailorEvents.rpy:40:label IrmaMeasureRoomStage(stage=0):
+game/NPC\Girls\Irma\IrmaTailorEvents.rpy:83:label IrmaSexSequence(step=0):
+game/NPC\Girls\Irma\IrmaTailorEvents.rpy:133:label IrmaClaraFittingScene(stage=0):
+game/NPC\Girls\Melissa\MelissaEvents.rpy:55:    jump HunterClub
+game/NPC\Girls\Melissa\MelissaEvents.rpy:243:label ReadMelissaBooklet(return_to_location=True):
+game/NPC\Girls\Melissa\MelissaEvents.rpy:259:                jump expression CurLoc
+game/NPC\Girls\Amanda\AfterDanceSexLegare.rpy:92:label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
+game/NPC\Girls\Clara\ClaraPaintingsThread.rpy:139:    jump TavernMelissaRoom
+game/NPC\Girls\Clara\IntClaraTalk.rpy:1:label IntClaraTalk(girl_name="clara"):
+game/NPC\Girls\Clara\IntClaraTalk.rpy:109:label IntClaraGiftMenu(girl_name="clara"):
+game/NPC\Girls\Clara\IntClaraTalk.rpy:141:label ClaraGiveGift(girl_name="clara", gift_id=""):
+game/NPC\Girls\Melissa\IntMelissaSex.rpy:172:label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
+game/NPC\Girls\Melissa\IntMelissaSex.rpy:366:label IntMelissaSexState(girl_name="melissa"):
+game/NPC\Girls\Becky\BeckyInviteHome.rpy:8:label BeckyInviteHome(girl_name="becky"):
+game/NPC\Girls\Common\EventWaitressHarrassPart2.rpy:4:label event_waitress_harrass_part2(girl_name, eyewitness=0, your_reaction1=0, harass_type=1):
+game/NPC\Girls\Common\EventCleaningHarrass.rpy:4:label event_cleaning_harrass(eyewitness=0):
+game/NPC\Girls\Common\EventWaitressHarrass.rpy:4:label event_waitress_harrass(eyewitness=0):
+game/NPC\Girls\Georgett\ShowGeorgettPortrait.rpy:4:label ShowGeorgettPortrait():
+game/NPC\Girls\Liza\IntLizaDressChange.rpy:4:label IntLizaDressChange(GirlNameILT="liza"):
+game/NPC\Girls\Common\GirlDressBuy.rpy:25:label GirlDressBuy(GirlName="", CurLocArg=""):
+game/NPC\Girls\Common\GirlDressBuy.rpy:61:label GirlDressBuyLeave(GirlName=""):
+game/NPC\Girls\Common\GirlDressBuy.rpy:83:label GirlDressBuyRefuse(GirlName=""):
+game/NPC\Girls\Common\GirlDressBuy.rpy:90:label GirlDressBuyContinue(GirlName=""):
+game/NPC\Girls\Irma\IrmaShortStories.rpy:4:label IrmaShortStories(args=()):
+game/NPC\Girls\Common\GirlsDesc.rpy:372:label GirlsDesc(girl_name):
+game/NPC\Girls\Common\GetGirlDrunk.rpy:18:label get_girl_drunk(girl_name=""):
+game/NPC\Girls\Common\GirlDressSuggest.rpy:131:label GirlDressSuggest(GirlName="", DressToBuy=""):
+game/NPC\Girls\Common\GirlSuggestDressFunc.rpy:4:label GirlSuggestDressFunc(GirlName="", DressToBuy="", ShowOffLevel=-1, DressBuyIsRelative=-1):
+game/NPC\Girls\Common\GirlSuggestDressFunc.rpy:74:label GirlDressBuyPay(GirlName="", DressToBuy=""):
+game/NPC\Girls\Common\GirlSuggestDressFunc.rpy:82:label GirlDressBuyPregRemark(GirlName=""):
+game/NPC\Girls\Common\GirlSuggestDressFunc.rpy:94:label GirlDressBuyWaitPay(GirlName="", DressToBuy=""):
+game/NPC\Girls\Common\GirlSuggestDressFunc.rpy:110:label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBuyIsRelative=0):
+game/NPC\Girls\Common\GirlSuggestDressFunc.rpy:177:label GirlDressBuyJerkoff(GirlName="", DressToBuy="", DressBuyIsRelative=0):
+game/NPC\Girls\Common\GirlSuggestDressFunc.rpy:221:label GirlDressBuyShowOutside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBuyIsRelative=0):
+game/NPC\Girls\Common\IntHarrassmentDiscuss.rpy:4:label IntHarrassmentDiscuss(GirlNameMHD, YourReaction1):
+game/NPC\Girls\Common\IntHarrassmentDiscuss.rpy:27:label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5):
+game/NPC\Girls\Common\GirlCard.rpy:246:label ShowGirlCard(girl_name=""):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:27:label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:90:label IntGeorgettSmalltalk(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:105:label IntGeorgettAskClients(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:114:label IntGeorgettAskSex(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:123:label IntGeorgettAskFamily(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:132:label IntGeorgettAskPregnancy(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:141:label IntGeorgettAskKids(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:154:label IntGeorgettAskGerhard(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:163:label IntGeorgettTellLizaGerhard(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:176:label IntGeorgettInviteTavern(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:199:label IntGeorgettAskWork(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:212:label IntGeorgettAskPirate(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:220:label IntGeorgettGloryholeTerms(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:230:label IntGeorgettTalkEddie(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:242:label IntGeorgettSponsorEddieHome(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:260:label IntGeorgettAskEddieVisit(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:296:label IntGeorgettHire(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:309:label IntGeorgettGrope(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:319:label IntGeorgettAskDad(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Georgett\IntGeorgettTalk.rpy:326:label IntGeorgettDress(girl_name="georgett", girl_loc="street"):
+game/NPC\Girls\Common\MomDressComplaint.rpy:67:label MomDressComplaint(girl_name):
+game/NPC\Girls\Common\MomDressComplaint.rpy:117:label MomDressComplaintLikeIt(girl_name="", kids_or_preg=0, real_name="", georgett_present=False):
+game/NPC\Girls\Common\MomDressComplaint.rpy:144:    jump MomDressComplaintFinish
+game/NPC\Girls\Common\MomDressComplaint.rpy:147:label MomDressComplaintLikeItMaybeNot(girl_name="", real_name="", georgett_present=False):
+game/NPC\Girls\Common\MomDressComplaint.rpy:152:    jump MomDressComplaintFinish
+game/NPC\Girls\Common\MomDressComplaint.rpy:155:label MomDressComplaintYouAreRight(girl_name="", real_name="", georgett_present=False):
+game/NPC\Girls\Common\MomDressComplaint.rpy:160:    jump MomDressComplaintFinish
+game/NPC\Girls\Common\MomDressComplaint.rpy:163:label MomDressComplaintBoughtDress(girl_name="", kids_or_preg=0, real_name="", georgett_present=False):
+game/NPC\Girls\Common\MomDressComplaint.rpy:186:label MomDressComplaintBoughtDressMaybeAshamed(girl_name="", real_name="", georgett_present=False):
+game/NPC\Girls\Common\MomDressComplaint.rpy:191:    jump MomDressComplaintFinish
+game/NPC\Girls\Common\MomDressComplaint.rpy:198:    jump MomDressComplaintFinish
+game/NPC\Girls\Common\MomDressComplaint.rpy:201:label MomDressComplaintSandraShouldDress(girl_name="", real_name="", georgett_present=False):
+game/NPC\Girls\Common\MomDressComplaint.rpy:226:    jump MomDressComplaintFinish
+game/NPC\Girls\Common\MomDressComplaint.rpy:229:label MomDressComplaintHowCanYouSayThat(girl_name="", real_name="", georgett_present=False):
+game/NPC\Girls\Common\MomDressComplaint.rpy:248:label MomDressComplaintHowCanYouSayThatInsist(girl_name="", real_name="", georgett_present=False):
+game/NPC\Girls\Common\MomDressComplaint.rpy:257:    jump MomDressComplaintFinish
+game/NPC\Girls\Common\MomDressComplaint.rpy:264:    jump MomDressComplaintFinish
+game/NPC\Girls\Common\MomDressComplaint.rpy:267:label MomDressComplaintBoughtDressHighSandra(girl_name="", kids_or_preg=0, real_name=""):
+game/NPC\Girls\Common\MomDressComplaint.rpy:281:    jump MomDressComplaintFinish
+game/NPC\Girls\Georgett\IntGeorgettDressChange.rpy:4:label IntGeorgettDressChange(GirlNameIGT="georgett"):
+game/NPC\Girls\Liza\IntLizaSex.rpy:4:label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
+game/NPC\Girls\Common\MorningSickness.rpy:33:label MorningSickness(girl_name):
+game/NPC\Girls\Common\MorningSickness.rpy:101:label morning_sickness_step2(girl_name, ZaletOpinion, Zaderzhka, CumInsideLastDays, MSickAskedDelay=False, MSickZaletCommentMade=False):
+game/NPC\Girls\Common\MorningSickness.rpy:170:label morning_sickness_pregnancy_comment(girl_name, CumInsideLastDays, already_said=False):
+game/NPC\Girls\Common\MorningSickness.rpy:190:label morning_sickness_end(girl_name):
+game/NPC\Girls\Georgett\IntGeorgettSex.rpy:76:label IntGeorgettSexSetup(GirlNameIGSS="georgett", GirlLocIGSS="street"):
+game/NPC\Girls\Georgett\IntGeorgettSex.rpy:86:label IntGeorgettSexRemoveBlouse(GirlNameIGSS="georgett"):
+game/NPC\Girls\Georgett\IntGeorgettSex.rpy:97:label IntGeorgettSexUnbuttonBlouse(GirlNameIGSS="georgett"):
+game/NPC\Girls\Georgett\IntGeorgettSex.rpy:108:label IntGeorgettSexRaiseSkirt(GirlNameIGSS="georgett"):
+game/NPC\Girls\Georgett\IntGeorgettSex.rpy:116:label GeorgettSexStatus(GirlLocIGSS="street"):
+game/NPC\Girls\Georgett\IntGeorgettSex.rpy:148:label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
+game/NPC\Girls\Common\EventCleaningHarrassPart2.rpy:4:label event_cleaning_harrass_part2(girl_name, eyewitness=0, your_reaction1=0, harass_type=1):
+game/NPC\Girls\Common\OldPointTalkSystem.rpy:255:label OldPointSmallTalkMenu(girl_name=""):
+game/NPC\Girls\Common\OldPointTalkSystem.rpy:297:label OldPointSmallTalkApply(girl_name="", topic_id=""):
+game/NPC\Girls\Common\OldPointTalkSystem.rpy:304:label OldPointSmallTalkFinish(girl_name=""):
+game/NPC\Girls\Common\OldPointTalkSystem.rpy:310:label OldPointFlirtAttempt(girl_name=""):
+game/NPC\Girls\Common\OldPointTalkSystem.rpy:317:label OldPointKinoAttempt(girl_name=""):
+game/NPC\Girls\Common\OldPointTalkSystem.rpy:324:label OldPointApology(girl_name=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:4:label IntLizaTalk(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:48:label IntLizaTalkSmalltalk(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:78:label IntLizaTalkAskClients(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:91:label IntLizaTalkAskSex(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:100:label IntLizaTalkAskPregnancy(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:119:label IntLizaTalkTellGeorgettGerhard(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:128:label IntLizaTalkAskWork(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:142:label IntLizaTalkAskHolglor(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:150:label IntLizaTalkHire(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:160:label IntLizaTalkGrope(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:183:label IntLizaTalkAskDad(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Liza\IntLizaTalk.rpy:190:label IntLizaTalkDress(girl_name_ilt="liza", girl_loc_ilt=""):
+game/NPC\Girls\Common\PartEventGirlHarrassmentReaction.rpy:5:label PartEventGirlHarrassmentReaction(GirlNamePEGHR, JobTypePEGHR, EyewitnessPEGHR=0):
+game/NPC\Girls\Becky\BeckyQuestInit.rpy:8:label BeckyQuestInit():
+game/NPC\Girls\Common\PregnancyCheck.rpy:167:label PregnancyCheck(girl_name, cum_place, repeat_count, dad_name='', is_dude_random=0, dad_name_type=''):
+game/NPC\Girls\Common\ShowGirlSexHistory.rpy:4:label ShowGirlSexHistory(args0=""):
+game/NPC\Girls\Liza\ShowLizaPortrait.rpy:4:label ShowLizaPortrait():
+game/NPC\Girls\Common\SlutFriendsIncrease.rpy:34:label SlutFriendsIncrease(girl, limit_friend, friend_chance, inc_decr_friends, limit_sluttiness, sluttiness_chance, inc_decr_sluttiness):
+game/NPC\Girls\Becky\IntBeckyDance.rpy:16:label int_becky_dance():
+game/NPC\Girls\Becky\IntBeckyDressChange.rpy:60:label IntBeckyDressChange(GirlName="becky"):
+game/NPC\Girls\Becky\IntBeckyGuest.rpy:254:label BeckyGuestKidsWatchStepsCode(kids_watch=0):
+game/NPC\Girls\Becky\IntBeckyTalk.rpy:4:label IntBeckyTalk(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckySex.rpy:49:label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
+game/NPC\Girls\Becky\IntBeckySex.rpy:476:                        jump BeckyHomeAfterSex
+game/NPC\Girls\Becky\IntBeckySex.rpy:480:                                jump StreetTavern
+game/NPC\Girls\Becky\IntBeckySex.rpy:484:                                jump MarketPlace
+game/NPC\Girls\Becky\IntBeckySex.rpy:499:                    jump BeckyHomeAfterSex
+game/NPC\Girls\Becky\ShowBeckyPortrait.rpy:4:label ShowBeckyPortrait():
+game/NPC\Girls\Becky\IntBeckyTalkSherwood.rpy:6:label story_becky_sherwood_offer_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkSherwood.rpy:18:label story_becky_sherwood_elves_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkSherwood.rpy:30:label story_becky_sherwood_fingal_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkSherwood.rpy:40:label story_becky_sherwood_warn_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkSherwood.rpy:50:label story_becky_sherwood_road_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkSherwood.rpy:66:label story_becky_sherwood_lied_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkSherwood.rpy:75:label story_becky_sherwood_robbed_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkSherwood.rpy:86:label story_becky_sherwood_howto_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkSherwood.rpy:96:label story_becky_sherwood_warned_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:7:label _int_becky_talk_smalltalk(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:18:label _int_becky_talk_personal(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:29:label story_becky_talk_inga_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:40:label story_becky_talk_inga_1(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:52:label story_becky_talk_lucas_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:63:label story_becky_talk_husband_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:74:label story_becky_talk_husband_1(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:85:label story_becky_talk_husband_2(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:96:label story_becky_talk_husband_3(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:107:label story_becky_talk_eddie_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:118:label story_becky_talk_eddie_georgett_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:141:label story_becky_home_invite_talk_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:195:label story_becky_talk_pregnancy_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:205:label story_becky_home_last_visit_talk_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:247:label story_becky_talk_eddie_behavior_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:267:label story_becky_talk_eddie_georgett_1(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:287:label story_becky_talk_eddie_reaction_0(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:314:label story_becky_talk_eddie_reaction_1(girl_name="becky"):
+game/NPC\Girls\Becky\IntBeckyTalkTopics.rpy:363:label story_becky_talk_eddie_after_sex_0(girl_name="becky"):

@@ -1,4 +1,4 @@
-# ================================================================================
+            "fire_units": 0,            "fire_units": 0,            "fire_units": 0,            "fire_units": 0,            "fire_units": 0,            "fire_units": 0,# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -26,7 +26,7 @@ init python:
             description = "Большой очаг, на котором готовят пищу. Сейчас он не разожжен."
         if wood_stock > 0:
             description += "\n\nРядом с очагом сложены колотые дрова: {b}%s{/b} шт." % str(wood_stock)
-        carried_wood = int(_player_item_count_by_id("chopped_wood_001") or 0)
+        carried_wood = int(player.item_count("chopped_wood_001") or 0)
         if carried_wood > 0:
             description += "\nПри себе у вас колотые дрова: {b}%s{/b} шт." % str(carried_wood)
         return description
@@ -62,10 +62,11 @@ init python:
         ],
         state={
             "fireOn": 0,
+            "fireOn": 0,
+            "fireOn": 0,
             "madeFireToday": 0,
             "fire_started_minute": 0,
             "fire_until_minute": 0,
-            "fire_units": 0,
             "fire_adds": 0,
             "ash_dirty": 0,
             "chopped_wood_stock": 0,
@@ -118,7 +119,7 @@ label TavernKitchenHearthText(action_id=""):
 
 
 label TavernKitchenHearthDepositWood:
-    if not _player_remove_item_by_id("chopped_wood_001", 1):
+    if not player.remove_item("chopped_wood_001", 1):
         $ MainTxt = "У вас больше нет колотых дров."
         $ CurLocDesc = MainTxt
         call TavernKitchenHearthMenu

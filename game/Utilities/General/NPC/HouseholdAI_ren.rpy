@@ -1,4 +1,105 @@
+        HouseholdNPCState[npc_id] = row    def household:
+        global Household
+        if Household is None:
+            Household = HouseholdInfo()
+        return Household
+        HouseholdNPCState[npc_id] = row    def household:
+        global Household
+        if Household is None:
+            Household = HouseholdInfo()
+        return Household
+        HouseholdNPCState[npc_id] = row    def household:
+        global Household
+        if Household is None:
+            Household = HouseholdInfo()
+        return Household
 # game/Utilities/General/NPC/HouseholdAI_ren.rpy
+
+default HouseholdAIState = {
+    "pressure": 0.0,
+    "friction": 0.2,
+    "convergence": 0.0,
+    "external_threat": 0.0,
+    "last_event_day": -1,
+    "last_event_slot": -1,
+    "last_event_code": "",
+}
+
+default HouseholdNPCState = {
+    "amanda": {
+        "drive": 0.0,
+        "resistance": 0.75,
+        "threshold": 0.62,
+        "stability": 0.35,
+        "rivalry": 0.65,
+        "obedience": 0.45,
+        "path": "undecided",
+    },
+    "melissa": {
+        "drive": 0.0,
+        "resistance": 0.45,
+        "threshold": 0.50,
+        "stability": 0.45,
+        "rivalry": 0.35,
+        "obedience": 0.50,
+        "path": "adaptive",
+    },
+    "sandra": {
+        "drive": 0.0,
+        "resistance": 0.60,
+        "threshold": 0.58,
+        "stability": 0.65,
+        "rivalry": 0.40,
+        "obedience": 0.75,
+        "path": "household_order",
+    },
+}
+
+default HouseholdAISeen = {}
+
+
+default HouseholdAIState = {
+    "pressure": 0.0,
+    "friction": 0.2,
+    "convergence": 0.0,
+    "external_threat": 0.0,
+    "last_event_day": -1,
+    "last_event_slot": -1,
+    "last_event_code": "",
+}
+
+default HouseholdNPCState = {
+    "amanda": {
+        "drive": 0.0,
+        "resistance": 0.75,
+        "threshold": 0.62,
+        "stability": 0.35,
+        "rivalry": 0.65,
+        "obedience": 0.45,
+        "path": "undecided",
+    },
+    "melissa": {
+        "drive": 0.0,
+        "resistance": 0.45,
+        "threshold": 0.50,
+        "stability": 0.45,
+        "rivalry": 0.35,
+        "obedience": 0.50,
+        "path": "adaptive",
+    },
+    "sandra": {
+        "drive": 0.0,
+        "resistance": 0.60,
+        "threshold": 0.58,
+        "stability": 0.65,
+        "rivalry": 0.40,
+        "obedience": 0.75,
+        "path": "household_order",
+    },
+}
+
+default HouseholdAISeen = {}
+
 
 default HouseholdAIState = {
     "pressure": 0.0,
@@ -45,6 +146,8 @@ default HouseholdAISeen = {}
 
 init 5 python:
     import renpy.store as store
+    import renpy.store as store
+    import renpy.store as store
 
     def household_ai_float(value, default=0.0):
         try:
@@ -73,7 +176,7 @@ init 5 python:
         )
 
     def household_ai_seen(event_code="", location_code=""):
-        return household_ai_int(HouseholdAISeen.get(household_ai_seen_key(event_code, location_code), 0), 0) == 1
+        return household_ai_int(household.seen.get(household_ai_seen_key(event_code, location_code), 0), 0) == 1
 
     def household_ai_mark_seen(event_code="", location_code=""):
         HouseholdAISeen[household_ai_seen_key(event_code, location_code)] = 1
@@ -109,7 +212,8 @@ init 5 python:
 
     def household_ai_update_meta():
         pressure = household_ai_resource_pressure()
-        external = household_ai_clamp(HouseholdAIState.get("external_threat", 0.0), 0.0, 1.0)
+        meta = household.meta
+        external = household_ai_clamp(meta.get("external_threat", 0.0), 0.0, 1.0)
 
         friction = household_ai_clamp(HouseholdAIState.get("friction", 0.2), 0.0, 1.0)
         convergence = household_ai_clamp(HouseholdAIState.get("convergence", 0.0), 0.0, 1.0)
@@ -135,10 +239,11 @@ init 5 python:
 
     def household_ai_update_npc_drive(npc_id):
         row = HouseholdNPCState.get(npc_id, {})
-        pressure = household_ai_clamp(HouseholdAIState.get("pressure", 0.0))
-        friction = household_ai_clamp(HouseholdAIState.get("friction", 0.0))
-        convergence = household_ai_clamp(HouseholdAIState.get("convergence", 0.0))
-        external = household_ai_clamp(HouseholdAIState.get("external_threat", 0.0))
+        meta = household.meta
+        pressure = household_ai_clamp(meta.get("pressure", 0.0))
+        friction = household_ai_clamp(meta.get("friction", 0.0))
+        convergence = household_ai_clamp(meta.get("convergence", 0.0))
+        external = household_ai_clamp(meta.get("external_threat", 0.0))
 
         resistance = household_ai_clamp(row.get("resistance", 0.5))
         drive = household_ai_clamp(row.get("drive", 0.0))
@@ -151,6 +256,8 @@ init 5 python:
         drive -= convergence * 0.10
 
         row["drive"] = household_ai_clamp(drive)
+        HouseholdNPCState[npc_id] = row
+        HouseholdNPCState[npc_id] = row
         HouseholdNPCState[npc_id] = row
         return row
 
@@ -176,13 +283,13 @@ init 5 python:
             "slot": household_ai_int(time, 0),
             "hour": household_ai_int(hour, household_ai_int(time, 0) * 6),
             "present": present,
-            "pressure": household_ai_clamp(HouseholdAIState.get("pressure", 0.0)),
-            "friction": household_ai_clamp(HouseholdAIState.get("friction", 0.0)),
-            "convergence": household_ai_clamp(HouseholdAIState.get("convergence", 0.0)),
-            "external_threat": household_ai_clamp(HouseholdAIState.get("external_threat", 0.0)),
-            "amanda": dict(HouseholdNPCState.get("amanda", {})),
-            "melissa": dict(HouseholdNPCState.get("melissa", {})),
-            "sandra": dict(HouseholdNPCState.get("sandra", {})),
+            "pressure": household_ai_clamp(household.meta.get("pressure", 0.0)),
+            "friction": household_ai_clamp(household.meta.get("friction", 0.0)),
+            "convergence": household_ai_clamp(household.meta.get("convergence", 0.0)),
+            "external_threat": household_ai_clamp(household.meta.get("external_threat", 0.0)),
+            "amanda": dict(household_ai_npc_state("amanda")),
+            "melissa": dict(household_ai_npc_state("melissa")),
+            "sandra": dict(household_ai_npc_state("sandra")),
         }
 
     def household_ai_pick_event(location_code="", mode="room"):
@@ -233,10 +340,27 @@ init 5 python:
     def household_ai_reduce_drive(npc_id, amount=0.25):
         row = HouseholdNPCState.get(npc_id, {})
         row["drive"] = household_ai_clamp(row.get("drive", 0.0) - amount)
-        HouseholdNPCState[npc_id] = row
 
     def household_ai_raise_friction(amount=0.1):
-        HouseholdAIState["friction"] = household_ai_clamp(HouseholdAIState.get("friction", 0.0) + amount)
+        household.meta["friction"] = household_ai_clamp(household.meta.get("friction", 0.0) + amount)
 
     def household_ai_raise_convergence(amount=0.1):
-        HouseholdAIState["convergence"] = household_ai_clamp(HouseholdAIState.get("convergence", 0.0) + amount)
+        household.meta["convergence"] = household_ai_clamp(household.meta.get("convergence", 0.0) + amount)
+    class HouseholdInfo(object):
+        def __init__(self):
+            self.meta = {"pressure": 0.0, "friction": 0.2, "convergence": 0.0, "external_threat": 0.0, "last_event_day": -1, "last_event_slot": -1, "last_event_code": ""}
+            self.seen = {}
+            self.runtime_event_seen = {}
+            self.morning_state = {}
+
+    HOUSEHOLD_NPC_DEFAULTS = {
+        "amanda": {"drive": 0.0, "resistance": 0.75, "threshold": 0.62, "stability": 0.35, "rivalry": 0.65, "obedience": 0.45, "path": "undecided"},
+        "melissa": {"drive": 0.0, "resistance": 0.45, "threshold": 0.50, "stability": 0.45, "rivalry": 0.35, "obedience": 0.50, "path": "adaptive"},
+        "sandra": {"drive": 0.0, "resistance": 0.60, "threshold": 0.58, "stability": 0.65, "rivalry": 0.40, "obedience": 0.75, "path": "household_order"},
+    }
+
+    def household_ai_npc_state(npc_id):
+        info = getPersonInfo(str(npc_id or "").lower())
+        if info is None:
+            return {}
+        return info.var.setdefault("household_ai", dict(HOUSEHOLD_NPC_DEFAULTS.get(str(npc_id or "").lower(), {})))

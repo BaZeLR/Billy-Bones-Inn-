@@ -27,6 +27,56 @@ init python:
         topraised[girl] = 0
         bottomraised[girl] = 0
 
+    def dress_change_sync_layers(girl_name=""):
+        girl = str(girl_name or "").strip()
+        if girl == "":
+            return
+        topdress.setdefault(girl, "")
+        bottomdress.setdefault(girl, "")
+        bra.setdefault(girl, "")
+        panties.setdefault(girl, "")
+        legs.setdefault(girl, "")
+        shoes.setdefault(girl, "")
+        topdressdef.setdefault(girl, topdress.get(girl, ""))
+        bottomdressdef.setdefault(girl, bottomdress.get(girl, ""))
+        bradef.setdefault(girl, bra.get(girl, ""))
+        pantiesdef.setdefault(girl, panties.get(girl, ""))
+        legsdef.setdefault(girl, legs.get(girl, ""))
+        shoesdef.setdefault(girl, shoes.get(girl, ""))
+        topdress[girl] = topdressdef.get(girl, "")
+        bottomdress[girl] = bottomdressdef.get(girl, "")
+        bra[girl] = bradef.get(girl, "")
+        panties[girl] = pantiesdef.get(girl, "")
+        legs[girl] = legsdef.get(girl, "")
+        shoes[girl] = shoesdef.get(girl, "")
+        topraised[girl] = 0
+        bottomraised[girl] = 0
+
+    def dress_change_sync_layers(girl_name=""):
+        girl = str(girl_name or "").strip()
+        if girl == "":
+            return
+        topdress.setdefault(girl, "")
+        bottomdress.setdefault(girl, "")
+        bra.setdefault(girl, "")
+        panties.setdefault(girl, "")
+        legs.setdefault(girl, "")
+        shoes.setdefault(girl, "")
+        topdressdef.setdefault(girl, topdress.get(girl, ""))
+        bottomdressdef.setdefault(girl, bottomdress.get(girl, ""))
+        bradef.setdefault(girl, bra.get(girl, ""))
+        pantiesdef.setdefault(girl, panties.get(girl, ""))
+        legsdef.setdefault(girl, legs.get(girl, ""))
+        shoesdef.setdefault(girl, shoes.get(girl, ""))
+        topdress[girl] = topdressdef.get(girl, "")
+        bottomdress[girl] = bottomdressdef.get(girl, "")
+        bra[girl] = bradef.get(girl, "")
+        panties[girl] = pantiesdef.get(girl, "")
+        legs[girl] = legsdef.get(girl, "")
+        shoes[girl] = shoesdef.get(girl, "")
+        topraised[girl] = 0
+        bottomraised[girl] = 0
+
     def becky_dress_change_flags(girl_name="becky"):
         girl_key = str(girl_name or "becky")
         can_offer_bra_off = (

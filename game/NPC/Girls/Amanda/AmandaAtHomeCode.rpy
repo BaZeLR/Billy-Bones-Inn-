@@ -173,6 +173,9 @@ label CodeAmandaSexBedUndress:
                 $ Amanda.remove_clothing_layer("top")
                 $ Amanda.remove_clothing_layer("bottom")
                 jump CodeAmandaSexBedUndress
+                jump CodeAmandaSexBedUndress
+                jump CodeAmandaSexBedUndress
+                jump CodeAmandaSexBedUndress
 
     if tmpSleepDress == 1:
         menu:
@@ -180,6 +183,9 @@ label CodeAmandaSexBedUndress:
                 "Продолжая ласкать ее сисечки, вы начали потихоньку стягивать с постанывающей от наслаждения Аманды ее панталончики. Чтобы помочь вам, она задрала свои очаровательные ножки. Совместными усилиями вы избавились от этой помехи, закинув их в угол."
                 $ Amanda.remove_clothing_layer("panties")
                 $ tmpSleepDress = 2
+                jump CodeAmandaSexBedUndress
+                jump CodeAmandaSexBedUndress
+                jump CodeAmandaSexBedUndress
                 jump CodeAmandaSexBedUndress
 
     if tmpSleepDress >= 2:

@@ -1,4 +1,4 @@
-# ================================================================================
+    hide screen girl_card_overlay    hide screen girl_card_overlay    hide screen girl_card_overlay# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -45,25 +45,22 @@ label GirlDressBuy(GirlName="", CurLocArg=""):
     $ _rn = _gds_name("RealName", GirlName)
     $ _rn3 = _gds_name("RealName3", GirlName)
 
-    call GirlDressBuyRefresh(GirlName)
-    call screen main_ui
-    jump GirlDressBuy
-
-
-label GirlDressBuyRefresh(GirlName=""):
-    hide screen dress_shop_male_catalog_overlay
-    hide screen dress_shop_female_catalog_overlay
-    hide screen girl_card_overlay
+    $ MainTxt = "Вы зашли в лавку очаровательной Ирмы. Там вас уже ожидала %s. Она обрадованно улыбнулась, увидев вас, и сразу же вернулась к рассматриванию образцов разнообразных платьев, юбок и блузок, развешанных вдоль левой стены. Вы тоже можете на них поглазеть. Ну а если вы наконец определились с выбором, то можете предложить %s примерить и заказать одно из платьев." % (_gds_name("RealName", GirlName), _gds_name("RealName3", GirlName))
+    $ CurLocDesc = MainTxt
     $ UI_mode = "scene"
     $ CurLoc = "GirlDressBuy"
-    $ location = CurLoc
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ MainTxt = "Вы зашли в лавку очаровательной Ирмы. Там вас уже ожидала [_gds_name('RealName', GirlName)]. Она обрадованно улыбнулась, увидев вас, и сразу же вернулась к рассматриванию образцов разнообразных платьев, юбок и блузок, развешанных вдоль левой стены. Вы тоже можете на них поглазеть. Ну а если вы наконец определились с выбором, то можете предложить [_gds_name('RealName3', GirlName)] примерить и заказать одно из платьев."
     $ CurLocDesc = MainTxt
+    $ MainTxt = "Вы зашли в лавку очаровательной Ирмы. Там вас уже ожидала [_gds_name('RealName', GirlName)]. Она обрадованно улыбнулась, увидев вас, и сразу же вернулась к рассматриванию образцов разнообразных платьев, юбок и блузок, развешанных вдоль левой стены. Вы тоже можете на них поглазеть. Ну а если вы наконец определились с выбором, то можете предложить [_gds_name('RealName3', GirlName)] примерить и заказать одно из платьев."
+    $ CurLocDesc = MainTxt
+    $ MainTxt = "Вы зашли в лавку очаровательной Ирмы. Там вас уже ожидала [_gds_name('RealName', GirlName)]. Она обрадованно улыбнулась, увидев вас, и сразу же вернулась к рассматриванию образцов разнообразных платьев, юбок и блузок, развешанных вдоль левой стены. Вы тоже можете на них поглазеть. Ну а если вы наконец определились с выбором, то можете предложить [_gds_name('RealName3', GirlName)] примерить и заказать одно из платьев."
+    $ CurLocDesc = MainTxt
     call ShowImage("", "", irma_working_picture_path())
     $ current_action_items = girl_dress_buy_actions(GirlName)
-    return
+    while True:
+        call screen main_ui
 
 
 label GirlDressBuyLeave(GirlName=""):
@@ -85,6 +82,48 @@ label GirlDressBuyLeave(GirlName=""):
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = [MenuItem("Выйти из лавки", Jump("ArtisansQuarter"))]
+    return
+
+
+label GirlDressBuyRefuse(GirlName=""):
+    "\"Я же сказал, смотреть здесь не на что, покупать нечего, цены запре.., да не в ценах дело, просто выбор убогий!\" назидательно сказали вы и вышли на улицу."
+    call SlutFriendsIncrease("irma", 0, 2, -1, 0, 0, 0)
+    call SlutFriendsIncrease(GirlName, 5, 1, -1, 0, 0, 0)
+    jump ArtisansQuarter
+
+
+label GirlDressBuyContinue(GirlName=""):
+    "Вы решили не обманывать надежды и вернулись к осмотру одеяний."
+    $ dress_shop.girl_dress_block = 0
+    call GirlDressBuyReturnFromSuggestion(GirlName)
+    return
+
+
+label GirlDressBuyRefuse(GirlName=""):
+    "\"Я же сказал, смотреть здесь не на что, покупать нечего, цены запре.., да не в ценах дело, просто выбор убогий!\" назидательно сказали вы и вышли на улицу."
+    call SlutFriendsIncrease("irma", 0, 2, -1, 0, 0, 0)
+    call SlutFriendsIncrease(GirlName, 5, 1, -1, 0, 0, 0)
+    jump ArtisansQuarter
+
+
+label GirlDressBuyContinue(GirlName=""):
+    "Вы решили не обманывать надежды и вернулись к осмотру одеяний."
+    $ dress_shop.girl_dress_block = 0
+    call GirlDressBuyReturnFromSuggestion(GirlName)
+    return
+
+
+label GirlDressBuyRefuse(GirlName=""):
+    "\"Я же сказал, смотреть здесь не на что, покупать нечего, цены запре.., да не в ценах дело, просто выбор убогий!\" назидательно сказали вы и вышли на улицу."
+    call SlutFriendsIncrease("irma", 0, 2, -1, 0, 0, 0)
+    call SlutFriendsIncrease(GirlName, 5, 1, -1, 0, 0, 0)
+    jump ArtisansQuarter
+
+
+label GirlDressBuyContinue(GirlName=""):
+    "Вы решили не обманывать надежды и вернулись к осмотру одеяний."
+    $ dress_shop.girl_dress_block = 0
+    call GirlDressBuyReturnFromSuggestion(GirlName)
     return
 
 

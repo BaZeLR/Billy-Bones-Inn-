@@ -1,4 +1,40 @@
-# ================================================================================
+        global TownStreetEventsToday
+        global TownStreetPatrolsToday
+        global TownStreetFightToday
+        global TownCurfewCaughtToday        global TownStreetFiredLabelsToday
+        global TownStreetFiredLocationsToday        ChurchAfterCermon.clear()
+        people_sync_all()        global player.intimacy.ellona_curse_days        global player.horse.stolen_days        global player.economy.church_donated_today
+        global FridayDanceRoom.state["dance_count"]
+        global TownStreetStorySeenKeys
+        global TownStreetDailyPlan
+        global TownStreetLastEventText
+        global TownStreetContext
+        global TownStreetCooldowns
+        global player.horse.stolen_days        global player.horse.stolen_days        global TownStreetEventsToday
+        global TownStreetPatrolsToday
+        global TownStreetFightToday
+        global TownCurfewCaughtToday        global TownStreetFiredLabelsToday
+        global TownStreetFiredLocationsToday        ChurchAfterCermon.clear()
+        people_sync_all()        global player.intimacy.ellona_curse_days        global player.horse.stolen_days        global player.economy.church_donated_today
+        global FridayDanceRoom.state["dance_count"]
+        global TownStreetStorySeenKeys
+        global TownStreetDailyPlan
+        global TownStreetLastEventText
+        global TownStreetContext
+        global TownStreetCooldowns
+        global player.horse.stolen_days        global player.horse.stolen_days        global TownStreetEventsToday
+        global TownStreetPatrolsToday
+        global TownStreetFightToday
+        global TownCurfewCaughtToday        global TownStreetFiredLabelsToday
+        global TownStreetFiredLocationsToday        ChurchAfterCermon.clear()
+        people_sync_all()        global player.intimacy.ellona_curse_days        global player.horse.stolen_days        global player.economy.church_donated_today
+        global FridayDanceRoom.state["dance_count"]
+        global TownStreetStorySeenKeys
+        global TownStreetDailyPlan
+        global TownStreetLastEventText
+        global TownStreetContext
+        global TownStreetCooldowns
+        global player.horse.stolen_days        global player.horse.stolen_days# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -12,21 +48,7 @@ init python:
                 return default
 
     def next_day_finish_day_events():
-        global ChurchDonatedToday
-        global FridayDancesCount
         global CursedByEllonaDays
-        global StolenHorseDays
-        global TownStreetEventsToday
-        global TownStreetPatrolsToday
-        global TownStreetFightToday
-        global TownCurfewCaughtToday
-        global TownStreetStorySeenKeys
-        global TownStreetDailyPlan
-        global TownStreetLastEventText
-        global TownStreetContext
-        global TownStreetFiredLabelsToday
-        global TownStreetFiredLocationsToday
-        global TownStreetCooldowns
 
         Georgett.ensure_story_defaults()
         Liza.ensure_story_defaults()
@@ -35,7 +57,7 @@ init python:
         week_val = _ndf_int(week, 1)
         dayspassed_val = _ndf_int(dayspassed, 0)
         church_donated_amount = _ndf_int(ChurchDonatedAmount, 0)
-        glory_hole_look = _ndf_int(GloryHoleLook, 0)
+        glory_hole_look = _ndf_int(player.tavern_management.glory_hole_look, 0)
 
         if Georgett.story_value("TalkChurchAfterCermonLiza", 0) and Liza.story_value("ProstStart", 0) == 0:
             Liza.set_story_value("ProstStart", 1)
@@ -138,8 +160,8 @@ init python:
         Amanda.set_var_int("alberfriends", max(0, min(Amanda.var_int("alberfriends", 0), 20)))
         Amanda.set_var_int("lizafriends", max(0, min(Amanda.var_int("lizafriends", 0), 20)))
 
-        ChurchDonatedToday = 0
-        FridayDancesCount = 0
+        player.economy.church_donated_today = 0
+        friday_dance_count() = 0
         if "town_street" in globals():
             town_street.settle_blackworker_candidates()
         TownStreetEventsToday = 0
@@ -172,9 +194,7 @@ label NextDay_FinishDayEvents:
         if CursedByEllona > 0:
             CursedByEllonaDays -= 1
 
-        if StolenHorseDays > 0:
-            StolenHorseDays -= 1
+        if player.horse.stolen_days > 0:
+            player.horse.stolen_days -= 1
 
-        ChurchAfterCermon.clear()
-        people_sync_all()
     return

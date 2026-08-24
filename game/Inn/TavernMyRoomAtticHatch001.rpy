@@ -3,6 +3,10 @@
 # ================================================================================
 default TavernMyRoomAtticHatchFound = 0
 
+default TavernMyRoomAtticHatchFound = 0
+
+default TavernMyRoomAtticHatchFound = 0
+
 init 5 python:
     def tavern_my_room_attic_hatch_visible():
         return int(exploration or 0) >= 15 or Melissa.bats_stage() >= 3

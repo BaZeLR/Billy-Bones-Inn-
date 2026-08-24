@@ -1,4 +1,28 @@
-# ================================================================================
+label show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
+    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
+    return# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
@@ -10,7 +34,7 @@ label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
 
         is_you = str(DudeName).lower() == "you"
         if is_you:
-            _cock_intimacy = player_state(False).intimacy
+            _cock_intimacy = player.intimacy
             cur_arousal = _cock_intimacy.arousal_value("You")
             cur_came = int(_cock_intimacy.came_today or 0)
             cur_limit = max(1, int(_cock_intimacy.can_cum_daily or 1))
@@ -29,8 +53,7 @@ label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
     if str(DudeName).lower() == "you":
         if cur_came >= cur_limit:
             "То что упало - подняться не может. По крайней мере сегодня. Вот завтра силы к вам, быть может, вернутся."
-            $ player_state(False).intimacy.set_arousal(0, "You")
-            $ player_state(False).intimacy.apply_to_store()
+            $ player.intimacy.set_arousal(0, "You")
         else:
             if cur_arousal < 20:
                 "Вы спокойны. Ваш член какой-то вялый."
@@ -67,6 +90,3 @@ label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
     return
 
 
-label show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    return

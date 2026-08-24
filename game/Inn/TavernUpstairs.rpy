@@ -7,7 +7,7 @@ init 6 python:
 
     def tavern_upstairs_can_clean_rooms():
         try:
-            return int(PlayerChoresWeek.get("clean_upstairs_rooms", 0) or 0) < int(player_chore_target("clean_upstairs_rooms") or 0)
+            return int(player.chores.weekly.get("clean_upstairs_rooms", 0) or 0) < int(player_chore_target("clean_upstairs_rooms") or 0)
         except Exception:
             return True
 
@@ -39,7 +39,6 @@ init 6 python:
 label TavernUpstairs:
     $ CurrentRoom = TavernUpstairsRoom
     $ CurLoc = "TavernUpstairs"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -48,33 +47,11 @@ label TavernUpstairs:
     call RoomEnterEventGate(CurLoc, False)
     $ MainTxt = TavernUpstairsRoom.descriptions[0].text
     $ CurLocDesc = MainTxt
-    call TavernUpstairsBuildActions
-    $ _upstairs_ui_return = None
-    while _upstairs_ui_return is None:
-        call screen main_ui
-        $ _upstairs_ui_return = _return
-    jump TavernUpstairs
-
-
-label TavernUpstairsBuildActions:
-    $ _upstairs_items = []
-    if tavern_upstairs_can_clean_rooms():
-        $ _upstairs_items.append(MenuItem("Убрать комнаты наверху", Call("DoChore", "clean_upstairs_rooms", "TavernUpstairs", "", "")))
-    python:
-        for _upstairs_exit in TavernUpstairsRoom.visible_exits():
-            _target = str(_upstairs_exit.target or "")
-            if _target in ("TavernMain", "TavernStorage") and not player_can_leave_second_floor():
-                continue
-            if _target == "TavernAmandaRoom":
-                _upstairs_items.append(MenuItem(_upstairs_exit.label, Call("TavernAmandaRoomDoor")))
-            else:
-                _upstairs_items.append(MenuItem(_upstairs_exit.label, Call("AdvanceMovementTime", _target)))
-        if not player_can_leave_second_floor():
-            _upstairs_items.append(MenuItem(player_public_movement_block_text(), Call("AdvanceMovementTime", "TavernMyRoom")))
     $ current_action_title = "Наверху"
     $ current_action_content = None
-    $ current_action_items = _upstairs_items
+    $ current_action_items = tavern_upstairs_action_items()
     $ UI_mode = "scene"
-    return
+    while True:
+    
 
 

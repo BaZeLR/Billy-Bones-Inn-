@@ -73,7 +73,6 @@ init 6 python:
 label TavernStorage:
     $ CurrentRoom = TavernStorageRoom
     $ CurLoc = "TavernStorage"
-    $ location = CurLoc
     call RoomEnterEventGate(CurLoc, False)
     $ scene_image = tavern_storage_picture() or TavernStorageRoom.bg_picture or None
     if scene_image:
@@ -92,7 +91,7 @@ label TavernStorage:
     $ UI_mode = "scene"
     $ UI_selected_char = ""
     $ current_girl_key = ""
-    call screen main_ui
-    jump TavernStorage
+    while True:
+        call screen main_ui
 
 

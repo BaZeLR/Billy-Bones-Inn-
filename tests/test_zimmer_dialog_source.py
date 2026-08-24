@@ -1,8 +1,10 @@
-from pathlib import Path
+    assert "CityGuardBuildActions" not in source    assert "CityGuardBuildActions" not in source    assert "CityGuardBuildActions" not in sourcefrom pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 ZIMMER_TALK = ROOT / "game" / "NPC" / "Secondary" / "IntZimmerTalk.rpy"
+CITY_GUARD = ROOT / "game" / "Town" / "CityGuard.rpy"
+CITY_GUARD = ROOT / "game" / "Town" / "CityGuard.rpy"
 
 
 def _source(path: Path) -> str:
@@ -34,6 +36,28 @@ def test_zimmer_dialogs_are_explicit_sublabels_not_dispatcher():
         "label IntZimmerTalkMongolWineDistraction:",
     ]:
         assert label in source
+
+
+def test_city_guard_builds_real_actions_inline_without_room_loop_wrapper():
+    source = _source(CITY_GUARD)
+
+    assert "label CityGuardBuildActions:" not in source
+    assert "call CityGuardBuildActions" not in source
+    assert 'Call("CityGuardShowPlacat")' in source
+    assert 'Call("IntZimmerTalk")' in source
+    assert 'Call("checkTriggers", "CityGuard", "enter", 0)' in source
+    assert "CityGuardRoom.build_exit_items()" in source
+
+
+def test_city_guard_builds_real_actions_inline_without_room_loop_wrapper():
+    source = _source(CITY_GUARD)
+
+    assert "label CityGuardBuildActions:" not in source
+    assert "call CityGuardBuildActions" not in source
+    assert 'Call("CityGuardShowPlacat")' in source
+    assert 'Call("IntZimmerTalk")' in source
+    assert 'Call("checkTriggers", "CityGuard", "enter", 0)' in source
+    assert "CityGuardRoom.build_exit_items()" in source
 
 
 def test_zimmer_dialog_menu_has_reference_choices_and_mongol_distraction():

@@ -1,3 +1,45 @@
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items.append(MenuItem("Вернуться в собор", Jump("Church")))
+        return
+    $ current_action_title = "Действия"
+    $ current_action_content = None
+    $ current_action_items = []
+
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items.append(MenuItem("Вернуться в собор", Jump("Church")))
+        return
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items.append(MenuItem("Вернуться в собор", Jump("Church")))
+        return
+    $ current_action_title = "Действия"
+    $ current_action_content = None
+    $ current_action_items = []
+
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items.append(MenuItem("Вернуться в собор", Jump("Church")))
+        return
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items.append(MenuItem("Вернуться в собор", Jump("Church")))
+        return
+    $ current_action_title = "Действия"
+    $ current_action_content = None
+    $ current_action_items = []
+
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+        $ current_action_items.append(MenuItem("Вернуться в собор", Jump("Church")))
+        return
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -11,13 +53,6 @@ label ChurchAfterCermon(entry_arg=0):
     $ current_action_title = "Действия"
     $ current_action_content = None
     $ current_action_items = []
-
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items.append(MenuItem("Вернуться в собор", Jump("Church")))
-        return
-
     call checkTriggers("Church", "after_cermon_walk", 0)
     if _return:
         return

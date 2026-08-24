@@ -33,7 +33,6 @@ init 6 python:
 label ForestDarkWoods:
     $ CurrentRoom = ForestDarkWoodsRoom
     $ CurLoc = "ForestDarkWoods"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -41,20 +40,16 @@ label ForestDarkWoods:
         $ _layout_last_picture = ""
     $ MainTxt = ForestDarkWoodsRoom.descriptions[0].text
     $ CurLocDesc = MainTxt
-    $ ForestSubroomSavedText = MainTxt
+    $ forest_room_set_saved_text(MainTxt, CurrentRoom)
     $ _forest_spawned = forest_room_spawn(ForestDarkWoodsRoom)
     if len(_forest_spawned) > 0:
         $ MainTxt = MainTxt + "\n\nВ тенях между стволами можно наткнуться на кое-что полезное."
         $ CurLocDesc = MainTxt
-        $ ForestSubroomSavedText = MainTxt
+        $ forest_room_set_saved_text(MainTxt, CurrentRoom)
     $ current_action_title = "Темный лес"
     $ current_action_content = None
     $ current_action_items = []
-    call ForestSubroomBuildActions
-    $ _forest_dark_woods_ui_return = None
-    while _forest_dark_woods_ui_return is None:
-        call screen main_ui
-        $ _forest_dark_woods_ui_return = _return
-    jump ForestDarkWoods
-
+    $ current_action_items = forest_subroom_action_items(CurrentRoom)
+    call screen main_ui
+    return
 

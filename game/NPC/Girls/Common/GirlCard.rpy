@@ -1,4 +1,4 @@
-# ================================================================================
+﻿# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -108,7 +108,7 @@ init python:
         lines = []
 
         try:
-            if isinstance(ChurchPurityReport, dict) and int(ChurchPurityLastDay or -1) == int(dayspassed or 0):
+            if isinstance(ChurchPurityReport, dict) and int(ChurchPurityLastDay or -1) == int(current_game_day() or 0):
                 row = dict(ChurchPurityReport.get(key, {}) or {})
                 before_value = int(row.get("before", 0) or 0)
                 after_value = int(row.get("after", 0) or 0)
@@ -286,62 +286,3 @@ label HideGirlCard(return_label=""):
     if str(return_label or "") != "":
         call expression return_label
     return
-
-
-screen girl_card_overlay(girl_name="", return_label=""):
-    zorder 120
-
-    $ _girl_key = girl_card_resolved_key(girl_name)
-    $ _title = girl_card_display_name(_girl_key)
-    $ _portrait = girl_card_portrait_path(_girl_key)
-    $ _stats = girl_card_stat_rows(_girl_key)
-    $ _lines = girl_card_body_lines(_girl_key)
-    $ _textbox_h = int(getattr(gui, "textbox_height", 278))
-    $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
-    $ _left_w = int((config.screen_width - 36) * 0.72)
-    $ _left_h = _usable_h - 24
-    $ _portrait_w = 180
-    $ _portrait_h = 240
-
-    fixed:
-        xpos 12
-        ypos 12
-        xsize _left_w
-        ysize _left_h
-
-        add im.Scale("images/rpg_message_bg.png", _left_w, _left_h)
-
-        viewport:
-            xpos 28
-            ypos 24
-            xsize _left_w - 56
-            ysize _left_h - 96
-            draggable True
-            mousewheel True
-
-            vbox:
-                spacing 10
-
-                text _title.upper() size 30 color "#1e130c" xalign 0.5
-
-                hbox:
-                    spacing 12
-
-                    add im.Scale(_portrait, _portrait_w, _portrait_h)
-
-                    vbox:
-                        xmaximum _left_w - _portrait_w - 120
-                        spacing 3
-                        for _row in _stats:
-                            text "%s: %s" % (_row[0], _row[1]) size 18 color "#1e130c"
-
-                for _line in _lines:
-                    text _line size 16 color "#2d1d12"
-
-        textbutton "Назад":
-            id "girl_card_overlay_back_button"
-            alt "girl_card_overlay_back_button"
-            xpos 28
-            ypos _left_h - 58
-            text_size 22
-            action [Hide("girl_card_overlay"), SetVariable("UI_mode", "scene"), SetVariable("UI_selected_char", ""), SetVariable("current_girl_key", ""), Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or "TavernMain"))]

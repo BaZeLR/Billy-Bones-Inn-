@@ -1,3 +1,27 @@
+    if navigation_only_mode_enabled():
+        "Вы находитесь на рыночной площади в пятничный вечер, когда здесь проходят городские танцы."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Вернуться к трактиру":
+                jump StreetTavern
+        return
+    if navigation_only_mode_enabled():
+        "Вы находитесь на рыночной площади в пятничный вечер, когда здесь проходят городские танцы."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Вернуться к трактиру":
+                jump StreetTavern
+        return
+    if navigation_only_mode_enabled():
+        "Вы находитесь на рыночной площади в пятничный вечер, когда здесь проходят городские танцы."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Вернуться к трактиру":
+                jump StreetTavern
+        return
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -7,15 +31,13 @@
 
 init python:
     def friday_dance_slot_is_active():
-        calendar_v2.sync_state()
         return int(calendar_v2.week or 0) == 5 and calendar_v2.is_between_clock(18, 0, 21, 59)
 
     def friday_dance_market_entry_is_active():
-        return friday_dance_slot_is_active() and int(FridayDancesCount or 0) < 5
+        return friday_dance_slot_is_active() and int(friday_dance_count() or 0) < 5
 
 label FridayDance(add_dance_phrase_tmp=""):
     $ CurLoc = "FridayDance"
-    $ location = CurLoc
     $ DanceStep = 0
     $ GirlsCounter = 0
     $ CurrentActions = ""
@@ -28,16 +50,7 @@ label FridayDance(add_dance_phrase_tmp=""):
 
     call ShowImage("", "", "images/market/LocFridayDance.jpg")
 
-    if navigation_only_mode_enabled():
-        "Вы находитесь на рыночной площади в пятничный вечер, когда здесь проходят городские танцы."
-        "[navigation_only_message()]"
-        "[navigation_only_time_note()]"
-        menu:
-            "Вернуться к трактиру":
-                jump StreetTavern
-        return
-
-    if FridayDancesCount < 5:
+    if friday_dance_count() < 5:
         "Вы находитесь на рыночной площади. Сейчас вечер пятницы и площадь расчищена от лотков и палаток, которые занимают ее в обычное время. На стенах домов, на колоннах, в общем всюду, висят факелы освещающие праздник хоть и тусклым и колеблющимся, но светом. А народу, похоже, собралось больше чем днем. Кажется полгорода пришло сюда послушать музыку, которую играет маленький оркестр, стоящий на возвышении в центре площади. Ну и конечно потанцевать, куда же без этого. "
         call FridayDanceCounterShow
         if DanceSponsor == 1:
@@ -48,7 +61,7 @@ label FridayDance(add_dance_phrase_tmp=""):
                 $ GirlsCounter += 1
         "Вы видите всех своих знакомых. Что вы собираетесь делать?"
         menu friday_dance_menu:
-            "Понаблюдать за танцующими" if FridayDancesCount < 5 and DanceStep == 0:
+            "Понаблюдать за танцующими" if friday_dance_count() < 5 and DanceStep == 0:
                 $ rand_friday_dance = procedural_randint(1, 8, key="procedural:Town/Market/FridayDance.rpy:procedural_randint:52:1")
                 if rand_friday_dance == 1:
                     $ result = "Вы замечаете как молодая пара, танцуя, сливается в страстном поцелуе."
@@ -61,23 +74,23 @@ label FridayDance(add_dance_phrase_tmp=""):
                 else:
                     $ result = "Вы наблюдаете за тем, как народ весело отплясывает под разухабистые мелодии."
                 call ShowImage("", "", "images/market/LocFridayDance.jpg")
-                $ FridayDancesCount += 1
+                $ FridayDanceRoom.state["dance_count"] += 1
                 "[result]"
                 call FridayDanceCounterShow
                 jump FridayDance
-            "Найти Аманду" if FridayDancesCount < 5 and DanceStep == 0 and Amanda.var_int("leftdances", 0) == 0:
+            "Найти Аманду" if friday_dance_count() < 5 and DanceStep == 0 and Amanda.var_int("leftdances", 0) == 0:
                 $ Amanda.set_var_int("legare_dance_pending", 0)
-                if GetDanceFromTable('amanda', 'legare', FridayDancesCount) > 0:
+                if GetDanceFromTable('amanda', 'legare', friday_dance_count()) > 0:
                     $ Amanda.set_var_int("legare_dance_pending", 1)
                     call checkTriggers("FridayDance", "amanda_dance_legare", 0)
                 else:
                     call checkTriggers("FridayDance", "amanda_dance_mc", 0)
                 jump FridayDance
-            "Найти Бекки Блэнкеншип" if FridayDancesCount < 5 and DanceStep == 0 and Becky.var.get("leftdances", 0) == 0:
+            "Найти Бекки Блэнкеншип" if friday_dance_count() < 5 and DanceStep == 0 and Becky.var.get("leftdances", 0) == 0:
                 call checkTriggers("FridayDance", "becky_dance_mc", 0)
                 jump FridayDance
-            "Заметить Мелиссу и Клариссу среди танцующих" if FridayDancesCount < 5 and DanceStep == 0 and clara_visible_at_friday_dance():
-                $ FridayDancesCount += 1
+            "Заметить Мелиссу и Клариссу среди танцующих" if friday_dance_count() < 5 and DanceStep == 0 and clara_visible_at_friday_dance():
+                $ FridayDanceRoom.state["dance_count"] += 1
                 if Clara.can_start_social_events():
                     $ result = "Среди танцующих вы замечаете Мелиссу и Клариссу. Девушки смеются, кружатся под музыку и явно чувствуют себя на празднике совершенно свободно. Кларисса, заметив ваш взгляд, на миг улыбается вам поверх плеча подруги."
                 else:
@@ -100,9 +113,9 @@ label FridayDance(add_dance_phrase_tmp=""):
     return
 
 label CheckIfAmandaGoneDance:
-    if int(FridayDancesCount or 0) <= 0:
+    if int(friday_dance_count() or 0) <= 0:
         return
-    if GetDanceJustLeft("amanda", "legare", FridayDancesCount) > 0 or Amanda.var_int("LegareGo", 0) == 1:
+    if GetDanceJustLeft("amanda", "legare", friday_dance_count()) > 0 or Amanda.var_int("LegareGo", 0) == 1:
         $ Amanda.set_var_int("LegareGo", 0)
         if procedural_randint(1, 2, key="procedural:Town/Market/FridayDance.rpy:procedural_randint:107:2") == 1:
             $ Amanda.set_var_int("leftdances", 1)
@@ -115,8 +128,8 @@ label CheckIfAmandaGoneDance:
 
 
 label FridayDanceCounterShow:
-    if FridayDancesCount < 5:
-        "Осталось еще [5-FridayDancesCount] танцев, до того как все разойдутся."
+    if friday_dance_count() < 5:
+        "Осталось еще [5-friday_dance_count()] танцев, до того как все разойдутся."
     else:
         "Праздник закончился и народ расходится."
     call CheckIfAmandaGoneDance

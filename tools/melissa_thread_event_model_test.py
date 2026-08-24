@@ -23,6 +23,7 @@ from tools.runtime_logic_tests import (  # noqa: E402
 STORY_PATH = ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy"
 MELISSA_EVENTS_PATH = ROOT / "game" / "NPC" / "Girls" / "Melissa" / "MelissaEvents.rpy"
 MELISSA_WERECAT_PATH = ROOT / "game" / "NPC" / "Secondary" / "MelissaWerecatQuest.rpy"
+WERECAT_OWNER_PATH = ROOT / "game" / "NPC" / "Secondary" / "WerecatNPC.rpy"
 GAME_ITEMS_PATH = ROOT / "game" / "Items" / "Core" / "GameItems.rpy"
 MELISSA_BOOKLET_ITEM_PATH = ROOT / "game" / "Items" / "Resources" / "MelissaBookletItem.rpy"
 GAME_DIR = ROOT / "game"
@@ -103,6 +104,7 @@ class MelissaThreadEventModelTest(unittest.TestCase):
         cls.source = read_text(STORY_PATH)
         cls.melissa_events_source = read_text(MELISSA_EVENTS_PATH)
         cls.melissa_werecat_source = read_text(MELISSA_WERECAT_PATH)
+        cls.werecat_owner_source = read_text(WERECAT_OWNER_PATH)
         cls.game_items_source = read_text(GAME_ITEMS_PATH)
         cls.melissa_booklet_item_source = read_text(MELISSA_BOOKLET_ITEM_PATH)
         cls.report = RuntimeLogicReport()
@@ -226,7 +228,7 @@ class MelissaThreadEventModelTest(unittest.TestCase):
         self.assertIn('Melissa.var["drawings_spy_option_unlocked"]', self.melissa_events_source)
         self.assertNotIn("MelissaFoundBookletObjectMenu", self.melissa_events_source)
         self.assertGreater(body.find('Melissa.var["drawings_found"] = 1'), body.find("effective_player_exploration"))
-        self.assertGreater(body.find("thread.advance()"), body.find('Melissa.var["drawings_found"] = 1'))
+        self.assertGreater(body.find("event_runtime.active_thread.advance()"), body.find('Melissa.var["drawings_found"] = 1'))
 
     def test_melissa_booklet_item_is_registered_and_readable(self):
         self.assertIn("MelissaBookletItem", self.game_items_source)

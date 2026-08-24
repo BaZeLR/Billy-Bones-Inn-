@@ -15,11 +15,20 @@ label IntBeckyTalk(girl_name="becky"):
     $ current_action_title = "Разговор с Бекки"
     $ current_action_content = None
     $ current_action_items = []
+    $ current_action_items = []
+    $ current_action_title = "Разговор с Бекки"
+    $ current_action_content = None
+    $ current_action_items = []
+    $ current_action_items = []
+    $ current_action_title = "Разговор с Бекки"
+    $ current_action_content = None
+    $ current_action_items = []
+    $ current_action_items = []
     if str(CurLoc or "") == "GroceryStore":
         $ MainTxt = "За прилавком стоит сама Бекки Блэнкеншип. Это высокая рыжая женщина с полной грудью, ей на вид немного меньше сорока. Ее муж умер от болезни примерно за год до того, как ваш отец купил \"Дикого Жеребца\"."
-        if dayspassed > 30 and dayspassed <= 70:
+        if current_game_day() > 30 and current_game_day() <= 70:
             $ MainTxt += "\n\nВы знаете, что ваша мама с ней недавно подружилась."
-        elif dayspassed > 70:
+        elif current_game_day() > 70:
             $ MainTxt += "\n\nОна с вашей мамой - лучшие подруги."
         $ CurLocDesc = MainTxt
     elif str(MainTxt or "").strip() == "":

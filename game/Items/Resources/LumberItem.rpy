@@ -71,7 +71,7 @@ label Chop(what_id="", where_id="", fallback_text="", object_id=""):
         if _used_room_item:
             _room_remove_item_by_id(CurrentRoom, item_id)
         else:
-            _player_remove_item_by_id(item_id)
+            player.remove_item(item_id)
         _room_add_item_units(CurrentRoom, "chopped_wood_001", 10)
         _chopped_item = get_game_item("chopped_wood_001", CurrentRoom)
         _chopped_total = _room_item_count_by_id(CurrentRoom, "chopped_wood_001")

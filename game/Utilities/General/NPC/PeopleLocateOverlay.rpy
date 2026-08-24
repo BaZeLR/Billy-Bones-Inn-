@@ -1,4 +1,4 @@
-# ================================================================================
+    on "show" action Function(people_sync_all)    on "show" action Function(people_sync_all)    on "show" action Function(people_sync_all)# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -40,6 +40,8 @@ init python:
 
     def people_locate_rows():
         people_sync_all()
+        people_sync_all()
+        people_sync_all()
         rows = []
         for person in people_known_ids():
             key = people_normalize_id(person)
@@ -57,6 +59,8 @@ init python:
                 "location_name": people_locate_room_name(loc) if loc else "неизвестно",
                 "state": people_locate_state_text(key, loc),
                 "can_jump": bool(loc and loc != "неизвестно" and renpy.has_label(loc)),
+                "can_jump": bool(loc and loc != "неизвестно" and renpy.has_label(loc)),
+                "can_jump": bool(loc and loc != "неизвестно" and renpy.has_label(loc)),
                 "here": bool(str(CurLoc or "") == loc),
             })
         return sorted(rows, key=lambda row: (str(row.get("location_name", "")), str(row.get("name", ""))))
@@ -69,7 +73,6 @@ screen people_locate_panel(standalone=False):
     modal True
     zorder 210
 
-    on "show" action Function(people_sync_all)
     if standalone:
         key "K_ESCAPE" action Hide("people_locate_overlay")
     else:
@@ -100,6 +103,12 @@ screen people_locate_panel(standalone=False):
                     if standalone:
                         action Hide("people_locate_overlay")
                     else:
+                        if standalone:
+                        action Hide("people_locate_overlay")
+                    else:
+                        if standalone:
+                        action Hide("people_locate_overlay")
+                    else:
                         action SetVariable("main_ui_overlay", "")
 
             text "Локации берутся из того же getLocation(), что и иконки/действия NPC в комнатах." size 18 color "#b9b0a0"
@@ -120,6 +129,8 @@ screen people_locate_panel(standalone=False):
                         $ _loc = str(_row.get("location", "") or "")
                         $ _loc_name = str(_row.get("location_name", "") or _loc)
                         $ _state = str(_row.get("state", "") or "")
+                        $ _can_jump = bool(_row.get("can_jump", False))
+                        $ _can_jump = bool(_row.get("can_jump", False))
                         $ _can_jump = bool(_row.get("can_jump", False))
                         $ _here = bool(_row.get("here", False))
                         $ _row_bg = "#21301f" if _here else "#171717"

@@ -1,4 +1,25 @@
-# ================================================================================
+    if navigation_only_mode_enabled():
+        "Вы находитесь у вдовы Блэнкеншип дома."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Вернуться к трактиру":
+                jump StreetTavern
+        return        pregnancy.setdefault("inga", 0)    if navigation_only_mode_enabled():
+        "Вы находитесь у вдовы Блэнкеншип дома."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Вернуться к трактиру":
+                jump StreetTavern
+        return        pregnancy.setdefault("inga", 0)    if navigation_only_mode_enabled():
+        "Вы находитесь у вдовы Блэнкеншип дома."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Вернуться к трактиру":
+                jump StreetTavern
+        return        pregnancy.setdefault("inga", 0)# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # Becky Home Location (Converted from legacy script)
@@ -7,9 +28,13 @@
 
 default BeckyHomeActive = 0
 
+default BeckyHomeActive = 0
+
+default BeckyHomeActive = 0
+
 init python:
     def becky_home_picture(arrive_mode=""):
-        mode_key = str(arrive_mode or ArriveMode or "").strip()
+        mode_key = str(arrive_mode or BeckyHomeFrontRoom.state["arrival_mode"] or "").strip()
         if mode_key in ("FromDances", "FromDinner", "SvalnyiGreh"):
             candidates = [
                 "images/becky/sex/inroom1.jpg",
@@ -29,7 +54,7 @@ init python:
         return candidates[0]
 
     def becky_home_restore_text():
-        mode_key = str(ArriveMode or "").strip()
+        mode_key = str(BeckyHomeFrontRoom.state["arrival_mode"] or "").strip()
         if mode_key == "FromDances":
             return "Вы и миссис Блэнкеншип находитесь в ее спальне."
         if mode_key == "FromDinner":
@@ -39,7 +64,7 @@ init python:
         return "Итак, вы сидите за столом в гостях у вдовы Блэнкеншип и наслаждаетесь аппетитной домашней кухней."
 
     def becky_home_after_sex_text():
-        mode_key = str(ArriveMode or "").strip()
+        mode_key = str(BeckyHomeFrontRoom.state["arrival_mode"] or "").strip()
         if mode_key == "FromDances":
             return "Вы и миссис Блэнкеншип находитесь в ее спальне."
         if mode_key == "FromDinner":
@@ -49,16 +74,17 @@ init python:
         return "Итак, вы сидите за столом в гостях у вдовы Блэнкеншип и наслаждаетесь аппетитной домашней кухней."
 
     def becky_home_desc_default():
-        return ArriveMode == ""
+        return BeckyHomeFrontRoom.state["arrival_mode"] == ""
 
     def becky_home_desc_dances():
-        return ArriveMode == "FromDances"
+        return BeckyHomeFrontRoom.state["arrival_mode"] == "FromDances"
 
     def becky_home_desc_special():
-        return ArriveMode in ("SvalnyiGreh", "FromDinner")
+        return BeckyHomeFrontRoom.state["arrival_mode"] in ("SvalnyiGreh", "FromDinner")
 
     def becky_home_table_visible():
-        return ArriveMode == ""
+        return BeckyHomeFrontRoom.state["arrival_mode"] == ""
+
 
     BeckyHomeRoom = Room(
         code_name="BeckyHome",
@@ -124,14 +150,29 @@ label BeckyHome(arrive_mode=""):
         call screen main_ui
         jump BeckyHome
     $ BeckyHomeActive = 1
-    $ ArriveMode = arrive_mode
+    $ BeckyHomeFrontRoom.state["arrival_mode"] = arrive_mode
     $ _becky_home_room = BeckyHomeRoom
     $ CurrentRoom = _becky_home_room
     $ CurLoc = "BeckyHome"
-    $ location = CurLoc
-    $ scene_image = becky_home_picture(ArriveMode)
+    $ scene_image = becky_home_picture(BeckyHomeFrontRoom.state["arrival_mode"])
     if str(scene_image or "").strip():
         $ _layout_last_picture = scene_image
+    if navigation_only_mode_enabled():
+        "Вы находитесь у вдовы Блэнкеншип дома."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Вернуться к трактиру":
+                jump StreetTavern
+        return
+    if navigation_only_mode_enabled():
+        "Вы находитесь у вдовы Блэнкеншип дома."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Вернуться к трактиру":
+                jump StreetTavern
+        return
     if navigation_only_mode_enabled():
         "Вы находитесь у вдовы Блэнкеншип дома."
         "[navigation_only_message()]"
@@ -144,6 +185,8 @@ label BeckyHome(arrive_mode=""):
     python:
         Becky.ensure_story_defaults()
         Inga.ensure_story_defaults()
+        pregnancy.setdefault("inga", 0)
+        pregnancy.setdefault("inga", 0)
         pregnancy.setdefault("inga", 0)
         PussyWetStart.setdefault(GirlName, Becky.arousal_value())
     $ _becky_home_room.mark_visited()
@@ -188,7 +231,7 @@ label BeckyHome(arrive_mode=""):
                 menu:
                     "В печали вернуться к трактиру":
                         jump StreetTavern
-            elif player_state().appearance.current_dress != 'citydress':
+            elif player.appearance.current_dress != 'citydress':
                 "Она тщательно осмотрела вас и строго сказала: 'Стефан, я же тебе говорила, ты должен быть одет скромно но прилично. А ты в чем пришел? Беги переодевайся!'\nС этими словами она захлопнула дверь перед вашим носом. Отчего-то вы почувствовали себя нашкодничавшим школьником."
                 menu:
                     "Вернуться к трактиру переодеться":
@@ -207,7 +250,7 @@ label BeckyHome(arrive_mode=""):
                 " и на пороге показалось двое - высокая рыжеволосая девушка, похожая на хозяйку дома, в сопровождения парня чуть постарше ее. Бекки повернулась к вам: 'Стефан, позволь мне представить тебе мою старшую дочку Ингенборг и ее жениха Лукаса. Лукас, Инга, это Стефан, мой важный клиент и оптовый покупатель.'\nВы пожали руку Лукасу, поцеловали в щечку Ингу и уселись за стол. "
                 $ Inga.set_var_int("Knowher", 2)
             call ShowImage('becky', 'dinner', 'DinnerInga')
-            if procedural_randint(1, 5, "becky_home_dinner_inga_legacy_%s" % int(dayspassed or 0)) == 1:
+            if procedural_randint(1, 5, "becky_home_dinner_inga_legacy_%s" % int(current_game_day() or 0)) == 1:
                 " Вы присмотрелись к Инге и заметили, что перед ужином времени она не теряла, на ее рыжей шевелюре были видны следы спермы."
             if pregnancy.get('inga', 0) >= 120:
                 " Одного взгляда на круглый живот Инги было достаточно, чтобы понять что она ведет активную половую жизнь."
@@ -219,40 +262,108 @@ label BeckyHome(arrive_mode=""):
         call check_visibility(GirlName)
         call IntBeckySex(GirlName)
         return
-    call BeckyHomeRestore
-    call screen main_ui
-    jump BeckyHome
-
-
-label BeckyHomeBuildActions:
-    $ CurrentRoom = BeckyHomeRoom
-    $ current_action_title = str(CurrentRoom.display_name or "Дом Бекки")
-    $ current_action_content = None
-    $ _becky_home_menu = CurrentRoom.build_menu_sections()
-    $ current_action_items = list(_becky_home_menu.get("movement", [])) + list(_becky_home_menu.get("actions", []))
-    return
-
-
-label BeckyHomeRestore:
-    $ CurrentRoom = BeckyHomeRoom
-    $ CurLoc = "BeckyHome"
-    $ location = CurLoc
-    $ scene_image = becky_home_picture(ArriveMode)
-    if str(scene_image or "").strip():
-        $ _layout_last_picture = scene_image
     $ MainTxt = becky_home_restore_text()
     $ CurLocDesc = MainTxt
-    call BeckyHomeBuildActions
-    return
+    $ current_action_title = str(CurrentRoom.display_name or "Дом Бекки")
+    $ current_action_content = None
+    $ current_action_items = becky_home_action_items()
+    while True:
+        call screen main_ui
 
 
 label BeckyHomeAfterSex:
     $ Becky.set_story_value_min("visitedhome", 2)
     $ MainTxt = becky_home_after_sex_text()
     $ CurLocDesc = MainTxt
-    call BeckyHomeBuildActions
-    call screen main_ui
-    jump BeckyHome
+    $ current_action_title = str(BeckyHomeRoom.display_name or "Дом Бекки")
+    $ current_action_content = None
+    $ current_action_items = becky_home_action_items()
+    while True:
+        call screen main_ui
+
+
+label BeckyHomeReturnFromObject:
+    $ CurrentRoom = BeckyHomeRoom
+    $ CurLoc = "BeckyHome"
+    $ scene_image = becky_home_picture(BeckyHomeFrontRoom.state["arrival_mode"])
+    if str(scene_image or "").strip():
+        $ _layout_last_picture = scene_image
+    $ MainTxt = becky_home_restore_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = str(CurrentRoom.display_name or "Дом Бекки")
+    $ current_action_content = None
+    $ current_action_items = becky_home_action_items()
+    return
+
+
+label BeckyHomeReturnFromObject:
+    $ CurrentRoom = BeckyHomeRoom
+    $ CurLoc = "BeckyHome"
+    $ scene_image = becky_home_picture(BeckyHomeFrontRoom.state["arrival_mode"])
+    if str(scene_image or "").strip():
+        $ _layout_last_picture = scene_image
+    $ MainTxt = becky_home_restore_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = str(CurrentRoom.display_name or "Дом Бекки")
+    $ current_action_content = None
+    $ current_action_items = becky_home_action_items()
+    return
+
+
+label BeckyHomeReturnFromObject:
+    $ CurrentRoom = BeckyHomeRoom
+    $ CurLoc = "BeckyHome"
+    $ scene_image = becky_home_picture(BeckyHomeFrontRoom.state["arrival_mode"])
+    if str(scene_image or "").strip():
+        $ _layout_last_picture = scene_image
+    $ MainTxt = becky_home_restore_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = str(CurrentRoom.display_name or "Дом Бекки")
+    $ current_action_content = None
+    $ current_action_items = becky_home_action_items()
+    return
+
+
+label BeckyHomeReturnFromObject:
+    $ CurrentRoom = BeckyHomeRoom
+    $ CurLoc = "BeckyHome"
+    $ scene_image = becky_home_picture(BeckyHomeFrontRoom.state["arrival_mode"])
+    if str(scene_image or "").strip():
+        $ _layout_last_picture = scene_image
+    $ MainTxt = becky_home_restore_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = str(CurrentRoom.display_name or "Дом Бекки")
+    $ current_action_content = None
+    $ current_action_items = becky_home_action_items()
+    return
+
+
+label BeckyHomeReturnFromObject:
+    $ CurrentRoom = BeckyHomeRoom
+    $ CurLoc = "BeckyHome"
+    $ scene_image = becky_home_picture(BeckyHomeFrontRoom.state["arrival_mode"])
+    if str(scene_image or "").strip():
+        $ _layout_last_picture = scene_image
+    $ MainTxt = becky_home_restore_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = str(CurrentRoom.display_name or "Дом Бекки")
+    $ current_action_content = None
+    $ current_action_items = becky_home_action_items()
+    return
+
+
+label BeckyHomeReturnFromObject:
+    $ CurrentRoom = BeckyHomeRoom
+    $ CurLoc = "BeckyHome"
+    $ scene_image = becky_home_picture(BeckyHomeFrontRoom.state["arrival_mode"])
+    if str(scene_image or "").strip():
+        $ _layout_last_picture = scene_image
+    $ MainTxt = becky_home_restore_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = str(CurrentRoom.display_name or "Дом Бекки")
+    $ current_action_content = None
+    $ current_action_items = becky_home_action_items()
+    return
 
 
 label BeckyHomeObjectMenu(object_id=""):
@@ -267,7 +378,17 @@ label BeckyHomeObjectMenu(object_id=""):
                 break
 
     if _becky_home_object is None:
-        call BeckyHomeRestore
+        $ CurrentRoom = BeckyHomeRoom
+    $ CurLoc = "BeckyHome"
+    $ location = CurLoc
+    $ scene_image = becky_home_picture(ArriveMode)
+    if str(scene_image or "").strip():
+        $ _layout_last_picture = scene_image
+    $ MainTxt = becky_home_restore_text()
+    $ CurLocDesc = MainTxt
+    $ current_action_title = str(CurrentRoom.display_name or "Дом Бекки")
+    $ current_action_content = None
+    $ current_action_items = becky_home_action_items()
         return
 
     $ current_action_title = str(_becky_home_object.name or "Дом Бекки")

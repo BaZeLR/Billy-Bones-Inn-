@@ -13,7 +13,7 @@ label ShowChurchDraupnirList:
         SawDraupnirChurchList = 1
 
     $ MainTxt = "Вы с интересом ознакомились со счетом, выставленным мастером Драупниром:\n\n" + show_list
-    if ChurchDonatedToday > 0:
+    if player.economy.church_donated_today > 0:
         $ MainTxt = MainTxt + "\n\nВы сегодня уже сделали пожертвование святой церкви и на душе у вас благостно и возвышенно, а карманы малость полегчали."
     $ CurLocDesc = MainTxt
     vscene "images/church/confessionEntry.png"
@@ -23,7 +23,7 @@ label ShowChurchDraupnirList:
 
     python:
         for IList in range(len(ChurchRepairDesc)):
-            if money > ChurchRepairCost[IList] and ChurchDonatedToday == 0 and ChurchDonated[IList] == 0 and SawDraupnirChurchList > 0:
+            if player.economy.money > ChurchRepairCost[IList] and player.economy.church_donated_today == 0 and ChurchDonated[IList] == 0 and SawDraupnirChurchList > 0:
                 current_action_items.append(MenuItem("Пожертвовать {} мараведи на {}".format(ChurchRepairCost[IList], ChurchRepairDonat[IList]), Call("ChurchDonate", IList)))
 
     $ current_action_items.append(MenuItem("Назад", Jump("Church")))
@@ -35,7 +35,7 @@ label ChurchDonate(donation_idx=0):
     $ idx = int(donation_idx or 0)
     $ cost = ChurchRepairCost[idx]
     $ ChurchDonated[idx] = 1
-    $ ChurchDonatedToday = 1
+    $ player.economy.church_donated_today = 1
     $ ChurchDonatedAmount += cost
     $ money -= cost
     $ notoriety = 0

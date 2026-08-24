@@ -1,11 +1,24 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
 default TavernKitchenNoticeText = ""
 default TavernKitchenNoticePending = False
 default TavernKitchenSavedText = ""
 default BeckyKitchenVisitActive = 0
-
+        if include_notice and bool(TavernKitchenNoticePending) and str(TavernKitchenNoticeText or "").strip():
+            text_parts.append(str(TavernKitchenNoticeText or "").strip())
+default TavernKitchenNoticeText = ""
+default TavernKitchenNoticePending = False
+default TavernKitchenSavedText = ""
+default BeckyKitchenVisitActive = 0
+        if include_notice and bool(TavernKitchenNoticePending) and str(TavernKitchenNoticeText or "").strip():
+            text_parts.append(str(TavernKitchenNoticeText or "").strip())
+default TavernKitchenNoticeText = ""
+default TavernKitchenNoticePending = False
+default TavernKitchenSavedText = ""
+default BeckyKitchenVisitActive = 0
+        if include_notice and bool(TavernKitchenNoticePending) and str(TavernKitchenNoticeText or "").strip():
+            text_parts.append(str(TavernKitchenNoticeText or "").strip())
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 init 4 python:
     def tavern_kitchen_has_worker(worker_name):
         return int(jobkitchen.get(worker_name, 0))
@@ -65,7 +78,7 @@ init python:
         return ""
 
     def tavern_kitchen_can_share_tea_with_sandra_and_becky():
-        return int(BeckyKitchenVisitActive or 0) == 1 and str(getLocation("sandra") or "") == "TavernKitchen" and int(_player_item_count_by_id("energy_tea_001") or 0) > 0
+        return npc_schedule_becky_sandra_kitchen_visit_active() and str(getLocation("sandra") or "") == "TavernKitchen" and int(player.item_count("energy_tea_001") or 0) > 0
 
     def tavern_kitchen_depositable_food_ids():
         return ("berries_001", "mushroom_001", "honey_comb_001", "boar_meat_001", "milk_pitcher_001")
@@ -90,14 +103,14 @@ init python:
 
     def tavern_kitchen_has_depositable_food():
         for item_id in tavern_kitchen_depositable_food_ids():
-            if int(_player_item_count_by_id(item_id) or 0) > 0:
+            if int(player.item_count(item_id) or 0) > 0:
                 return True
         return False
 
     def tavern_kitchen_deposit_entries():
         entries = []
         for item_id in tavern_kitchen_depositable_food_ids():
-            item_count = int(_player_item_count_by_id(item_id) or 0)
+            item_count = int(player.item_count(item_id) or 0)
             if item_count <= 0:
                 continue
             item_obj = get_game_item(item_id)
@@ -113,10 +126,10 @@ init python:
         item_key = str(item_id or "").strip()
         if item_key == "":
             return 0
-        item_count = int(_player_item_count_by_id(item_key) or 0)
+        item_count = int(player.item_count(item_key) or 0)
         if item_count <= 0:
             return 0
-        removed = _player_remove_item_by_id(item_key, item_count)
+        removed = player.remove_item(item_key, item_count)
         if not removed:
             return 0
         stock = tavern_storage_supplies_stock()
@@ -304,9 +317,6 @@ init python:
         if intro_value:
             text_parts.append(intro_value)
 
-        if include_notice and bool(TavernKitchenNoticePending) and str(TavernKitchenNoticeText or "").strip():
-            text_parts.append(str(TavernKitchenNoticeText or "").strip())
-
         # Dynamic crew from original NamesList
         kitchen_crew = NamesList("jobkitchen", "TavernKitchen")
         crew_names = str(kitchen_crew or "никто")
@@ -317,7 +327,8 @@ init python:
                 text_parts.append("После службы здесь наверняка соберутся и на более основательную воскресную трапезу, но пока речь идет только о спокойном утреннем сборе.")
         else:
             text_parts.append("На кухне работают: " + crew_names + ".")
-        if int(BeckyKitchenVisitActive or 0) == 1:
+        $ BeckyKitchenVisitActive = 1 if becky_kitchen_visit_active() else 0
+    if BeckyKitchenVisitActive:
             text_parts.append("Сегодня сюда заглянула Бекки Блэнкеншип. Она что-то негромко обсуждает с Сандрой у разделочного стола.")
         if int(week or 0) == 7 and int(time or 0) == 1:
             text_parts.append("Судя по запахам и приготовленным блюдам, Сандра решила устроить для всей трактирной челяди воскресный обед поосновательнее обычного.")
@@ -339,7 +350,6 @@ init python:
 label TavernKitchen:
     $ CurrentRoom = TavernKitchenRoom
     $ CurLoc = "TavernKitchen"
-    $ location = CurLoc
     $ tavern_kitchen_hearth_wood_stock()
     $ scene_image = tavern_kitchen_picture() or CurrentRoom.bg_picture or None
     if scene_image:
@@ -349,7 +359,7 @@ label TavernKitchen:
     call RoomEnterEventGate(CurLoc, False)
     $ current_object_id = ""
     $ current_girl_key = ""
-    if TavernBreakfastEventActive:
+    if player.tavern_management.breakfast.event_active:
         if str(TavernKitchenSavedText or "").strip():
             $ MainTxt = str(TavernKitchenSavedText or "")
         else:
@@ -381,6 +391,8 @@ label TavernKitchen:
         $ MainTxt = build_kitchen_description()
         $ CurLocDesc = MainTxt
         $ TavernKitchenSavedText = MainTxt
+        $ current_action_title = "Кухня"
+        $ current_action_content = None
         call TavernKitchenBuildActions
         if sandra_revealing_dress_initiative_ready():
             call SandraDressInitiativeEvent
@@ -389,7 +401,8 @@ label TavernKitchen:
                 _kitchen_request_type, _kitchen_request_girl = household_pending_request_girl("TavernKitchen")
             if str(_kitchen_request_type or "") == "soap":
                 call HouseholdSoapRequestEvent(_kitchen_request_girl)
-    $ TavernKitchenNoticePending = False
+    while True:
+        $ TavernKitchenNoticePending = False
     $ _kitchen_ui_return = None
     while _kitchen_ui_return is None:
         call screen main_ui
@@ -427,7 +440,6 @@ label TavernKitchenBuildActions:
             renpy.restart_interaction()
         except Exception:
             pass
-    return
 
 
 label TavernKitchenShareTeaWithSandraAndBecky:
@@ -481,7 +493,7 @@ label TavernKitchenDepositApply(item_id=""):
     if tavern_kitchen_food_stock_count() > 0:
         $ MainTxt = str(MainTxt or "") + "\nТеперь в кладовых запасах лежат: %s." % tavern_kitchen_food_stock_summary()
     $ CurLocDesc = MainTxt
-    call TavernKitchenBuildActions
+        call TavernKitchenBuildActions
     return
 
 
@@ -495,7 +507,7 @@ label TavernKitchenAskSandraBreakfasts:
     $ MainTxt = Sandra.apply_kitchen_regular_breakfast_request(_kitchen_used_item)
     $ CurLocDesc = MainTxt
     $ TavernKitchenSavedText = MainTxt
-    if TavernBreakfastEventActive:
+    if player.tavern_management.breakfast.event_active:
         jump TavernKitchenBreakfastMenu
     else:
         call TavernKitchenBuildActions
@@ -512,7 +524,7 @@ label TavernKitchenAskSandraClients:
     $ MainTxt = Sandra.apply_kitchen_client_manners_request(_kitchen_used_item)
     $ CurLocDesc = MainTxt
     $ TavernKitchenSavedText = MainTxt
-    if TavernBreakfastEventActive:
+    if player.tavern_management.breakfast.event_active:
         jump TavernKitchenBreakfastMenu
     else:
         call TavernKitchenBuildActions

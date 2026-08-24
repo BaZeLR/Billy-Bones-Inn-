@@ -1,3 +1,132 @@
+        global Francheska.var    def _fran_topic_select(topic_code):
+        code = str(topic_code or "")
+
+        # Keep the location picture synced with dialog actions.
+        _fran_show_topic_picture(code)
+
+        if code == "meet":
+            _fran_topic(0, 0, 3, "meet", 1)
+            Francheska.mark_met()
+            return
+        if code == "ellona":
+            _fran_topic(1, 1, 2, "ellonaask", 1)
+            return
+        if code == "grace":
+            _fran_topic(2, 2, 2, "graceask", 1)
+            return
+        if code == "grace_more":
+            _fran_topic(10, 10, 2, "graceask", 2)
+            return
+        if code == "conchita":
+            _fran_topic(3, 3, 3, "conchitaask", 1)
+            return
+        if code == "duke":
+            _fran_topic(4, 4, 3, "dukeask", 1)
+            return
+        if code == "stark":
+            _fran_topic(5, 5, 3, "starkask", 1)
+            return
+        if code == "state":
+            _fran_topic(6, 6, 2, "stateask", 1)
+            return
+        if code == "king":
+            _fran_topic(7, 7, 3, "kingask", 1)
+            return
+        if code == "rebel":
+            _fran_topic(8, 8, 2, "rebelask", 1)
+            return
+        if code == "alien":
+            _fran_topic(9, 9, 2, "alienask", 1)
+            return
+        if code == "random":
+            _fran_random_topic(3)
+            return
+        global Francheska.var    def _fran_topic_select(topic_code):
+        code = str(topic_code or "")
+
+        # Keep the location picture synced with dialog actions.
+        _fran_show_topic_picture(code)
+
+        if code == "meet":
+            _fran_topic(0, 0, 3, "meet", 1)
+            Francheska.mark_met()
+            return
+        if code == "ellona":
+            _fran_topic(1, 1, 2, "ellonaask", 1)
+            return
+        if code == "grace":
+            _fran_topic(2, 2, 2, "graceask", 1)
+            return
+        if code == "grace_more":
+            _fran_topic(10, 10, 2, "graceask", 2)
+            return
+        if code == "conchita":
+            _fran_topic(3, 3, 3, "conchitaask", 1)
+            return
+        if code == "duke":
+            _fran_topic(4, 4, 3, "dukeask", 1)
+            return
+        if code == "stark":
+            _fran_topic(5, 5, 3, "starkask", 1)
+            return
+        if code == "state":
+            _fran_topic(6, 6, 2, "stateask", 1)
+            return
+        if code == "king":
+            _fran_topic(7, 7, 3, "kingask", 1)
+            return
+        if code == "rebel":
+            _fran_topic(8, 8, 2, "rebelask", 1)
+            return
+        if code == "alien":
+            _fran_topic(9, 9, 2, "alienask", 1)
+            return
+        if code == "random":
+            _fran_random_topic(3)
+            return
+        global Francheska.var    def _fran_topic_select(topic_code):
+        code = str(topic_code or "")
+
+        # Keep the location picture synced with dialog actions.
+        _fran_show_topic_picture(code)
+
+        if code == "meet":
+            _fran_topic(0, 0, 3, "meet", 1)
+            Francheska.mark_met()
+            return
+        if code == "ellona":
+            _fran_topic(1, 1, 2, "ellonaask", 1)
+            return
+        if code == "grace":
+            _fran_topic(2, 2, 2, "graceask", 1)
+            return
+        if code == "grace_more":
+            _fran_topic(10, 10, 2, "graceask", 2)
+            return
+        if code == "conchita":
+            _fran_topic(3, 3, 3, "conchitaask", 1)
+            return
+        if code == "duke":
+            _fran_topic(4, 4, 3, "dukeask", 1)
+            return
+        if code == "stark":
+            _fran_topic(5, 5, 3, "starkask", 1)
+            return
+        if code == "state":
+            _fran_topic(6, 6, 2, "stateask", 1)
+            return
+        if code == "king":
+            _fran_topic(7, 7, 3, "kingask", 1)
+            return
+        if code == "rebel":
+            _fran_topic(8, 8, 2, "rebelask", 1)
+            return
+        if code == "alien":
+            _fran_topic(9, 9, 2, "alienask", 1)
+            return
+        if code == "random":
+            _fran_random_topic(3)
+            return
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -153,6 +282,76 @@ init python:
         else:
             renpy.say(None, "\n")
 
+    def _fran_clean(lines=2):
+        if renpy.has_label("CleanScreenOverflow"):
+            try:
+                renpy.call("CleanScreenOverflow", int(lines or 1))
+            except Exception:
+                renpy.call("CleanScreenOverflow")
+        elif renpy.has_label("clean_screen_overflow"):
+            try:
+                renpy.call("clean_screen_overflow", int(lines or 1))
+            except Exception:
+                renpy.call("clean_screen_overflow")
+        else:
+            renpy.say(None, "\n")
+
+    def _fran_clean(lines=2):
+        if renpy.has_label("CleanScreenOverflow"):
+            try:
+                renpy.call("CleanScreenOverflow", int(lines or 1))
+            except Exception:
+                renpy.call("CleanScreenOverflow")
+        elif renpy.has_label("clean_screen_overflow"):
+            try:
+                renpy.call("clean_screen_overflow", int(lines or 1))
+            except Exception:
+                renpy.call("clean_screen_overflow")
+        else:
+            renpy.say(None, "\n")
+
+    def _fran_clean(lines=2):
+        if renpy.has_label("CleanScreenOverflow"):
+            try:
+                renpy.call("CleanScreenOverflow", int(lines or 1))
+            except Exception:
+                renpy.call("CleanScreenOverflow")
+        elif renpy.has_label("clean_screen_overflow"):
+            try:
+                renpy.call("clean_screen_overflow", int(lines or 1))
+            except Exception:
+                renpy.call("clean_screen_overflow")
+        else:
+            renpy.say(None, "\n")
+
+    def _fran_clean(lines=2):
+        if renpy.has_label("CleanScreenOverflow"):
+            try:
+                renpy.call("CleanScreenOverflow", int(lines or 1))
+            except Exception:
+                renpy.call("CleanScreenOverflow")
+        elif renpy.has_label("clean_screen_overflow"):
+            try:
+                renpy.call("clean_screen_overflow", int(lines or 1))
+            except Exception:
+                renpy.call("clean_screen_overflow")
+        else:
+            renpy.say(None, "\n")
+
+    def _fran_clean(lines=2):
+        if renpy.has_label("CleanScreenOverflow"):
+            try:
+                renpy.call("CleanScreenOverflow", int(lines or 1))
+            except Exception:
+                renpy.call("CleanScreenOverflow")
+        elif renpy.has_label("clean_screen_overflow"):
+            try:
+                renpy.call("clean_screen_overflow", int(lines or 1))
+            except Exception:
+                renpy.call("clean_screen_overflow")
+        else:
+            renpy.say(None, "\n")
+
     def _fran_inc_talk():
         Francheska.mark_talked(1)
 
@@ -205,6 +404,18 @@ init python:
         _fran_show_picture_path(("images/ellona/Fran1.jpg",))
 
     def _fran_prepare_state():
+        global Francheska.var
+        global dayspassed
+
+        global FranVar
+        global dayspassed
+
+        global Francheska.var
+        global dayspassed
+
+        global Francheska.var
+        global dayspassed
+
         global FranVar
         global dayspassed
 
@@ -275,6 +486,226 @@ init python:
             _fran_random_topic(3)
             return
 
+    def _fran_topic_select(topic_code):
+        code = str(topic_code or "")
+
+        # Keep the location picture synced with dialog actions.
+        _fran_show_topic_picture(code)
+
+        if code == "meet":
+            _fran_topic(0, 0, 3, "meet", 1)
+            Francheska.mark_met()
+            return
+        if code == "ellona":
+            _fran_topic(1, 1, 2, "ellonaask", 1)
+            return
+        if code == "grace":
+            _fran_topic(2, 2, 2, "graceask", 1)
+            return
+        if code == "grace_more":
+            _fran_topic(10, 10, 2, "graceask", 2)
+            return
+        if code == "conchita":
+            _fran_topic(3, 3, 3, "conchitaask", 1)
+            return
+        if code == "duke":
+            _fran_topic(4, 4, 3, "dukeask", 1)
+            return
+        if code == "stark":
+            _fran_topic(5, 5, 3, "starkask", 1)
+            return
+        if code == "state":
+            _fran_topic(6, 6, 2, "stateask", 1)
+            return
+        if code == "king":
+            _fran_topic(7, 7, 3, "kingask", 1)
+            return
+        if code == "rebel":
+            _fran_topic(8, 8, 2, "rebelask", 1)
+            return
+        if code == "alien":
+            _fran_topic(9, 9, 2, "alienask", 1)
+            return
+        if code == "random":
+            _fran_random_topic(3)
+            return
+
+    def _fran_topic_select(topic_code):
+        code = str(topic_code or "")
+
+        # Keep the location picture synced with dialog actions.
+        _fran_show_topic_picture(code)
+
+        if code == "meet":
+            _fran_topic(0, 0, 3, "meet", 1)
+            Francheska.mark_met()
+            return
+        if code == "ellona":
+            _fran_topic(1, 1, 2, "ellonaask", 1)
+            return
+        if code == "grace":
+            _fran_topic(2, 2, 2, "graceask", 1)
+            return
+        if code == "grace_more":
+            _fran_topic(10, 10, 2, "graceask", 2)
+            return
+        if code == "conchita":
+            _fran_topic(3, 3, 3, "conchitaask", 1)
+            return
+        if code == "duke":
+            _fran_topic(4, 4, 3, "dukeask", 1)
+            return
+        if code == "stark":
+            _fran_topic(5, 5, 3, "starkask", 1)
+            return
+        if code == "state":
+            _fran_topic(6, 6, 2, "stateask", 1)
+            return
+        if code == "king":
+            _fran_topic(7, 7, 3, "kingask", 1)
+            return
+        if code == "rebel":
+            _fran_topic(8, 8, 2, "rebelask", 1)
+            return
+        if code == "alien":
+            _fran_topic(9, 9, 2, "alienask", 1)
+            return
+        if code == "random":
+            _fran_random_topic(3)
+            return
+
+    def _fran_topic_select(topic_code):
+        code = str(topic_code or "")
+
+        # Keep the location picture synced with dialog actions.
+        _fran_show_topic_picture(code)
+
+        if code == "meet":
+            _fran_topic(0, 0, 3, "meet", 1)
+            Francheska.mark_met()
+            return
+        if code == "ellona":
+            _fran_topic(1, 1, 2, "ellonaask", 1)
+            return
+        if code == "grace":
+            _fran_topic(2, 2, 2, "graceask", 1)
+            return
+        if code == "grace_more":
+            _fran_topic(10, 10, 2, "graceask", 2)
+            return
+        if code == "conchita":
+            _fran_topic(3, 3, 3, "conchitaask", 1)
+            return
+        if code == "duke":
+            _fran_topic(4, 4, 3, "dukeask", 1)
+            return
+        if code == "stark":
+            _fran_topic(5, 5, 3, "starkask", 1)
+            return
+        if code == "state":
+            _fran_topic(6, 6, 2, "stateask", 1)
+            return
+        if code == "king":
+            _fran_topic(7, 7, 3, "kingask", 1)
+            return
+        if code == "rebel":
+            _fran_topic(8, 8, 2, "rebelask", 1)
+            return
+        if code == "alien":
+            _fran_topic(9, 9, 2, "alienask", 1)
+            return
+        if code == "random":
+            _fran_random_topic(3)
+            return
+
+    def _fran_topic_select(topic_code):
+        code = str(topic_code or "")
+
+        # Keep the location picture synced with dialog actions.
+        _fran_show_topic_picture(code)
+
+        if code == "meet":
+            _fran_topic(0, 0, 3, "meet", 1)
+            Francheska.mark_met()
+            return
+        if code == "ellona":
+            _fran_topic(1, 1, 2, "ellonaask", 1)
+            return
+        if code == "grace":
+            _fran_topic(2, 2, 2, "graceask", 1)
+            return
+        if code == "grace_more":
+            _fran_topic(10, 10, 2, "graceask", 2)
+            return
+        if code == "conchita":
+            _fran_topic(3, 3, 3, "conchitaask", 1)
+            return
+        if code == "duke":
+            _fran_topic(4, 4, 3, "dukeask", 1)
+            return
+        if code == "stark":
+            _fran_topic(5, 5, 3, "starkask", 1)
+            return
+        if code == "state":
+            _fran_topic(6, 6, 2, "stateask", 1)
+            return
+        if code == "king":
+            _fran_topic(7, 7, 3, "kingask", 1)
+            return
+        if code == "rebel":
+            _fran_topic(8, 8, 2, "rebelask", 1)
+            return
+        if code == "alien":
+            _fran_topic(9, 9, 2, "alienask", 1)
+            return
+        if code == "random":
+            _fran_random_topic(3)
+            return
+
+    def _fran_topic_select(topic_code):
+        code = str(topic_code or "")
+
+        # Keep the location picture synced with dialog actions.
+        _fran_show_topic_picture(code)
+
+        if code == "meet":
+            _fran_topic(0, 0, 3, "meet", 1)
+            Francheska.mark_met()
+            return
+        if code == "ellona":
+            _fran_topic(1, 1, 2, "ellonaask", 1)
+            return
+        if code == "grace":
+            _fran_topic(2, 2, 2, "graceask", 1)
+            return
+        if code == "grace_more":
+            _fran_topic(10, 10, 2, "graceask", 2)
+            return
+        if code == "conchita":
+            _fran_topic(3, 3, 3, "conchitaask", 1)
+            return
+        if code == "duke":
+            _fran_topic(4, 4, 3, "dukeask", 1)
+            return
+        if code == "stark":
+            _fran_topic(5, 5, 3, "starkask", 1)
+            return
+        if code == "state":
+            _fran_topic(6, 6, 2, "stateask", 1)
+            return
+        if code == "king":
+            _fran_topic(7, 7, 3, "kingask", 1)
+            return
+        if code == "rebel":
+            _fran_topic(8, 8, 2, "rebelask", 1)
+            return
+        if code == "alien":
+            _fran_topic(9, 9, 2, "alienask", 1)
+            return
+        if code == "random":
+            _fran_random_topic(3)
+            return
+
 label FrancheskaTalk:
     python:
         global _FRAN_PHRASE_CACHE
@@ -285,63 +716,4 @@ label FrancheskaTalk:
     $ current_action_content = None
     call BuildFrancheskaTalkMenu
     $ current_action_items = list(_return or [])
-    return
-
-label BuildFrancheskaTalkMenu:
-    $ Result = []
-
-    if FranVar.get("meet", 0) == 0 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Пораспрашивать об этом месте", Call("FrancheskaTalkApply", "meet")))
-
-    if FranVar.get("meet", 0) == 1 and FranVar.get("ellonaask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Пораспрашивать Франческу о богине Эллоне", Call("FrancheskaTalkApply", "ellona")))
-
-    if FranVar.get("ellonaask", 0) == 1 and FranVar.get("graceask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Пораспрашивать Франческу о грациях", Call("FrancheskaTalkApply", "grace")))
-
-    if FranVar.get("graceask", 0) == 1 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Узнать больше о грациях", Call("FrancheskaTalkApply", "grace_more")))
-
-    if FranVar.get("meet", 0) == 1 and FranVar.get("conchitaask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Пораспрашивать Франческу о герцогине", Call("FrancheskaTalkApply", "conchita")))
-
-    if FranVar.get("conchitaask", 0) == 1 and FranVar.get("dukeask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Спросить Франческу о герцоге", Call("FrancheskaTalkApply", "duke")))
-
-    if FranVar.get("dukeask", 0) == 1 and FranVar.get("starkask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Узнать больше о предателе", Call("FrancheskaTalkApply", "stark")))
-
-    if FranVar.get("conchitaask", 0) == 1 and FranVar.get("stateask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Пораспрашивать Франческу о герцогстве", Call("FrancheskaTalkApply", "state")))
-
-    if FranVar.get("stateask", 0) == 1 and FranVar.get("kingask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Узнать больше о короле", Call("FrancheskaTalkApply", "king")))
-
-    if FranVar.get("kingask", 0) == 1 and FranVar.get("rebelask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Узнать больше об отношениях с королевством", Call("FrancheskaTalkApply", "rebel")))
-
-    if FranVar.get("stateask", 0) == 1 and FranVar.get("alienask", 0) == 0 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Расспросить про нелюдей", Call("FrancheskaTalkApply", "alien")))
-
-    if FranVar.get("rebelask", 0) == 1 and FranVar.get("alienask", 0) == 1 and FranVar.get("starkask", 0) == 1 and FranVar.get("graceask", 0) == 2 and int(Francheska.talked_today or 0) < 3:
-        $ Result.append(MenuItem("Поболтать с Франческой", Call("FrancheskaTalkApply", "random")))
-
-    $ Result.append(MenuItem("Закончить разговор", Call("FrancheskaTalkEnd")))
-    return Result
-
-
-label FrancheskaTalkApply(topic_code=""):
-    $ _fran_topic_select(topic_code)
-    call BuildFrancheskaTalkMenu
-    $ _fran_menu_items = list(_return or [])
-    $ stage_paged_panel_text(MainTxt, "Что обсудить с Франческой?", _fran_menu_items, "plain")
-    call QueuePagedPanelTextFromStore
-    call ReturnToMainUI
-    return
-
-
-label FrancheskaTalkEnd:
-    $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
-    if _room_label:
-        jump expression _room_label
     return

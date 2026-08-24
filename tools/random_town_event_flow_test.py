@@ -378,8 +378,8 @@ def test_help_recruit(namespace) -> None:
         TownStreetFightToday=0,
         TownCurfewCaughtToday=0,
         TownStreetStorySeenKeys=[],
-        TavernBlackworkerCandidates=[],
-        TavernBlackworkers=[],
+        TownStreet.blackworker_candidates=[],
+        TownStreet.blackworkers=[],
         TownStreetContext={},
     )
     town = namespace["town_street"]
@@ -389,7 +389,7 @@ def test_help_recruit(namespace) -> None:
 
     simulate_event_entry(namespace, "MarketPlace", "TownStreetHelpEvent")
     town.make_help_context()
-    namespace["TavernBlackworkerCandidates"].append(
+    namespace["TownStreet.blackworker_candidates"].append(
         {
             "id": "bw_001",
             "name": namespace["TownStreetContext"].get("help_name", "бродяга"),
@@ -402,7 +402,7 @@ def test_help_recruit(namespace) -> None:
     namespace["exploration"] += 5
     namespace["tavernfame"] += 1
 
-    if len(namespace["TavernBlackworkerCandidates"]) != 1:
+    if len(namespace["TownStreet.blackworker_candidates"]) != 1:
         fail("help recruit did not create a blackworker candidate")
     if namespace["tavernfame"] != 1 or namespace["exploration"] != 105:
         fail("help recruit did not apply fame/exploration rewards")
@@ -471,7 +471,7 @@ def main() -> int:
     )
 
     assert_contains("TownStreetPatrolHide", ["exploration += 8", "current_action_items = [MenuItem(\"Идти дальше\", Function(renpy.return_statement, True))]"])
-    assert_contains("TownStreetHelpRecruit", ["TavernBlackworkerCandidates.append", "exploration += 5", "tavernfame += 1"])
+    assert_contains("TownStreetHelpRecruit", ["TownStreet.blackworker_candidates.append", "exploration += 5", "tavernfame += 1"])
     assert_contains("TownStreetThugsShout", ["exploration += 6", "current_action_items = [MenuItem(\"Идти дальше\", Function(renpy.return_statement, True))]"])
 
     namespace = make_runtime_namespace()

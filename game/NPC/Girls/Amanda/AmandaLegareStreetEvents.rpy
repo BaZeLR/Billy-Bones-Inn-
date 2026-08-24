@@ -1,9 +1,9 @@
 init python:
     def amanda_story_seen_today(key):
-        return int(Amanda.story_value(key, -1) or -1) == int(dayspassed or 0)
+        return int(Amanda.story_value(key, -1) or -1) == int(current_game_day() or 0)
 
     def amanda_mark_story_seen_today(key):
-        Amanda.set_story_value(key, int(dayspassed or 0))
+        Amanda.set_story_value(key, int(current_game_day() or 0))
         return True
 
     def amanda_tavern_seduction_ready():
@@ -40,6 +40,7 @@ init python:
 
 
 label story_amanda_tavern_seduction_0:
+    show screen main_ui
     $ amanda_mark_story_seen_today("tavern_seduction_seen_day")
     call ShowImage("amanda", "", "portrait")
     "В зале Аманда задержалась у стойки дольше обычного. Она будто ждала, пока вы заметите ее новое платье, поправила волосы и улыбнулась слишком невинно."
@@ -59,6 +60,7 @@ label story_amanda_tavern_seduction_0:
 
 
 label story_amanda_legare_tavern_visit_0:
+    show screen main_ui
     $ amanda_mark_story_seen_today("legare_tavern_visit_seen_day")
     call ShowImage("alber", "", "portrait")
     "Ближе к вечеру в трактир заглянул месье Легаре. Он заказал кувшин вина не у стойки, а так, чтобы Аманда сама подошла к его столу."
@@ -82,6 +84,7 @@ label story_amanda_legare_tavern_visit_0:
 
 
 label story_amanda_street_legare_sighting_0:
+    show screen main_ui
     $ amanda_mark_story_seen_today("street_legare_sighting_seen_day")
     $ _amanda_legare_event = None
     call ShowImage("amanda", "", "portrait")
@@ -106,6 +109,7 @@ label story_amanda_street_legare_sighting_0:
 
 
 label story_amanda_street_lover_encounter_0:
+    show screen main_ui
     $ amanda_mark_story_seen_today("street_lover_encounter_seen_day")
     call ShowImage("amanda", "", "portrait")
     "На улице вы заметили Аманду рядом с каким-то молодым горожанином. Он что-то торопливо доказывал, а она смеялась и не спешила уходить."

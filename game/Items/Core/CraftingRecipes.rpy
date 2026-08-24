@@ -1,3 +1,54 @@
+    def recipe_book:
+        global RecipeBook
+        if RecipeBook is None:
+            RecipeBook = RecipeBookSession()
+        return RecipeBook
+    def register_recipe_page(page_obj):
+        if page_obj is None:
+            return
+        recipe_id = str(getattr(page_obj, "recipe_id", "") or "").strip()
+        if not recipe_id:
+            return
+        recipe_pages[recipe_id] = page_obj
+        if recipe_id not in recipe_names:
+            recipe_names.append(recipe_id)
+
+    def get_recipe_page(recipe_id):
+        return recipe_pages.get(str(recipe_id or "").strip(), None)
+    def recipe_book:
+        global RecipeBook
+        if RecipeBook is None:
+            RecipeBook = RecipeBookSession()
+        return RecipeBook
+    def register_recipe_page(page_obj):
+        if page_obj is None:
+            return
+        recipe_id = str(getattr(page_obj, "recipe_id", "") or "").strip()
+        if not recipe_id:
+            return
+        recipe_pages[recipe_id] = page_obj
+        if recipe_id not in recipe_names:
+            recipe_names.append(recipe_id)
+
+    def get_recipe_page(recipe_id):
+        return recipe_pages.get(str(recipe_id or "").strip(), None)
+    def recipe_book:
+        global RecipeBook
+        if RecipeBook is None:
+            RecipeBook = RecipeBookSession()
+        return RecipeBook
+    def register_recipe_page(page_obj):
+        if page_obj is None:
+            return
+        recipe_id = str(getattr(page_obj, "recipe_id", "") or "").strip()
+        if not recipe_id:
+            return
+        recipe_pages[recipe_id] = page_obj
+        if recipe_id not in recipe_names:
+            recipe_names.append(recipe_id)
+
+    def get_recipe_page(recipe_id):
+        return recipe_pages.get(str(recipe_id or "").strip(), None)
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -12,7 +63,42 @@ default RecipeBookTinyNoteFound = 0
 default RecipeBookRiddleSeen = 0
 default RecipeBookHiddenRecipesRevealed = 0
 
+default RecipeBookSelectedId = ""
+default RecipeBookReturnRoomCode = ""
+default RecipeBookReturnObjectId = ""
+default RecipeBookReturnPicture = ""
+default RecipeBookReadCount = 0
+default RecipeBookTinyNoteFound = 0
+default RecipeBookRiddleSeen = 0
+default RecipeBookHiddenRecipesRevealed = 0
+
+default RecipeBookSelectedId = ""
+default RecipeBookReturnRoomCode = ""
+default RecipeBookReturnObjectId = ""
+default RecipeBookReturnPicture = ""
+default RecipeBookReadCount = 0
+default RecipeBookTinyNoteFound = 0
+default RecipeBookRiddleSeen = 0
+default RecipeBookHiddenRecipesRevealed = 0
+
 init 4 python:
+    class RecipeBookSession(object):
+        def __init__(self):
+            self.selected_id = ""
+            self.return_room_code = ""
+            self.return_object_id = ""
+            self.return_picture = ""
+            self.return_room_code = ""
+            self.return_object_id = ""
+            self.return_picture = ""
+            self.return_room_code = ""
+            self.return_object_id = ""
+            self.return_picture = ""
+
+    def recipe_book_item_state():
+        item = get_game_item("recipe_book_001")
+        return item.state if item is not None else {}
+
     class RecipePage(object):
         def __init__(self, recipe_id, title, image, item_result=None, ingredients=None, unlocked=False, unlock_condition=None, result_quantity=1, notes=None, craft_handler=None):
             self.recipe_id = str(recipe_id or "").strip()
@@ -162,7 +248,7 @@ init 4 python:
             rows.append({
                 "item_id": item_id,
                 "name": recipe_ingredient_display_name(item_id),
-                "owned": max(0, int(_player_item_count_by_id(item_id) or 0)),
+                "owned": max(0, int(player.item_count(item_id) or 0)),
                 "hint": recipe_ingredient_spawn_hint(item_id),
             })
         return rows
@@ -346,7 +432,7 @@ init 4 python:
         return rows
 
     def recipe_book_resolved_selected_id():
-        selected_id = str(RecipeBookSelectedId or "").strip()
+        selected_id = str(recipe_book.selected_id or "").strip()
         if selected_id and recipe_page_is_unlocked(selected_id):
             return selected_id
         visible_ids = list(visible_recipe_pages() or [])
@@ -408,6 +494,12 @@ init 4 python:
     def recipe_book_restore_picture():
         return str(RecipeBookReturnPicture or "").strip()
 
+    def recipe_book_restore_picture():
+        return str(RecipeBookReturnPicture or "").strip()
+
+    def recipe_book_restore_picture():
+        return str(RecipeBookReturnPicture or "").strip()
+
     def recipe_book_action_state(selected_id, where_id="", object_id=""):
         resolved_id = str(selected_id or recipe_book_resolved_selected_id() or "").strip()
         action_rows = []
@@ -441,7 +533,7 @@ init 4 python:
             qty = max(1, int(row.get("quantity", 1) or 1))
             if item_id == "":
                 return {"ok": False, "text": "Не удалось выбрать предмет для рецепта: {}.".format(str(row.get("name", "ингредиент") or "ингредиент"))}
-            if not _player_remove_item_by_id(item_id, qty):
+            if not player.remove_item(item_id, qty):
                 return {"ok": False, "text": "Не удалось взять {} x{} из ваших вещей.".format(recipe_ingredient_display_name(item_id), qty)}
             consumed.append({
                 "key": str(row.get("key", "") or ""),
@@ -498,23 +590,23 @@ init 4 python:
 
 
 label ReadRecipeBook(what_id="", where_id="", fallback_text="", object_id="", recipe_id=""):
-    $ RecipeBookReadCount = max(0, int(RecipeBookReadCount or 0)) + 1
-    if str(RecipeBookReturnRoomCode or "").strip() == "":
-        $ RecipeBookReturnRoomCode = str(where_id or CurLoc or "").strip()
-        $ RecipeBookReturnObjectId = str(object_id or what_id or "").strip()
-        $ RecipeBookReturnPicture = str(_layout_last_picture or scene_image or "") or ""
-    $ RecipeBookSelectedId = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()
-    if str(RecipeBookSelectedId or "").strip() == "":
+    $ recipe_book_item_state()["read_count"] = max(0, int(recipe_book_item_state().get("read_count", 0) or 0)) + 1
+    $ recipe_book.selected_id = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()
+    if not recipe_book.selected_id:
         $ MainTxt = recipe_book_read_text()
         $ CurLocDesc = MainTxt
+    if str(recipe_book_session().return_room_code or "").strip() == "":
+        $ recipe_book_session().return_room_code = str(where_id or CurLoc or "").strip()
+        $ recipe_book_session().return_object_id = str(object_id or what_id or "").strip()
+        $ recipe_book_session().return_picture = str(_layout_last_picture or scene_image or "") or ""
         jump expression where_id
-    $ _recipe_picture = recipe_book_apply_picture(RecipeBookSelectedId)
+    $ _recipe_picture = recipe_book_apply_picture(recipe_book.selected_id)
     if _recipe_picture:
         $ scene_image = _recipe_picture
         $ _layout_last_picture = _recipe_picture
-    $ MainTxt = recipe_book_page_text(RecipeBookSelectedId)
+    $ MainTxt = recipe_book_page_text(recipe_book.selected_id)
     $ CurLocDesc = MainTxt
-    $ _recipe_action_state = recipe_book_action_state(RecipeBookSelectedId, where_id, object_id or what_id)
+    $ _recipe_action_state = recipe_book_action_state(recipe_book.selected_id, where_id, object_id or what_id)
     $ current_action_title = _recipe_action_state["title"]
     $ current_action_content = None
     $ current_action_items = _recipe_action_state["items"]
@@ -536,10 +628,10 @@ label RecipeBookFindTinyNote(where_id="", object_id="", return_context="book"):
             $ current_action_items.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", where_id, object_id or "recipe_book_001", "table")))
         elif int(RecipeBookTinyNoteFound or 0) == 1 and int(RecipeBookHiddenRecipesRevealed or 0) == 0:
             $ current_action_items.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "table")))
-        $ current_action_items.append(MenuItem("Вернуться к записям", Call("TavernMyRoomTableRead", RecipeBookSelectedId)))
+        $ current_action_items.append(MenuItem("Вернуться к записям", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
         $ current_action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
     else:
-        $ _recipe_action_state = recipe_book_action_state(RecipeBookSelectedId, where_id, object_id or "recipe_book_001")
+        $ _recipe_action_state = recipe_book_action_state(recipe_book.selected_id, where_id, object_id or "recipe_book_001")
         $ current_action_title = _recipe_action_state["title"]
         $ current_action_content = None
         $ current_action_items = _recipe_action_state["items"]
@@ -552,11 +644,11 @@ label RecipeBookRevealHiddenRecipes(where_id="", object_id="", return_context="b
         $ MainTxt = "Пока вы не понимаете, что именно нужно искать на этих страницах."
     elif int(RecipeBookHiddenRecipesRevealed or 0) == 1:
         $ MainTxt = "Скрытые строки уже проявлены. Теперь их можно читать как обычные рецепты."
-    elif int(winenum or 0) <= 0:
+    elif int(player.tavern_management.winenum or 0) <= 0:
         $ MainTxt = "Для опыта нужен хотя бы глоток вина из запасов трактира. Без него старые поля остаются пустыми."
     else:
-        $ RecipeBookHiddenRecipesRevealed = 1
-        $ RecipeBookSelectedId = "bat_repellent_recipe"
+        $ recipe_book_item_state()["hidden_recipes_revealed"] = True
+        $ recipe_book.selected_id = "bat_repellent_recipe"
         $ MainTxt = "Вы держите пергамент над ровным теплом, пока старые волокна не начинают едва темнеть, потом смачиваете край тряпки вином и осторожно проводите по полям. Через несколько минут под выцветшей желтизной проступают новые строки.\n\nАвтор прятал часть записей намеренно. Среди них есть дымная смесь из сухого мха, лаванды и резких трав - как раз то, чем можно выкурить летучих тварей из-под крыши."
         $ Melissa.var["bat_recipe_unlocked"] = 1
     $ CurLocDesc = MainTxt
@@ -565,25 +657,25 @@ label RecipeBookRevealHiddenRecipes(where_id="", object_id="", return_context="b
         $ current_action_content = None
         $ current_action_items = []
         if int(RecipeBookHiddenRecipesRevealed or 0) == 1:
-            $ _recipe_picture = recipe_book_apply_picture(RecipeBookSelectedId)
+            $ _recipe_picture = recipe_book_apply_picture(recipe_book.selected_id)
             if _recipe_picture:
                 $ scene_image = _recipe_picture
                 $ _layout_last_picture = _recipe_picture
-            $ current_action_items.append(MenuItem("Читать проявленный рецепт", Call("TavernMyRoomTableRead", RecipeBookSelectedId)))
+            $ current_action_items.append(MenuItem("Читать проявленный рецепт", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
             $ current_action_items.append(MenuItem("Продолжить работу", Call("TavernMyRoomTableCraftMenu")))
         else:
             if recipe_book_can_notice_hidden_note():
                 $ current_action_items.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", where_id, object_id or "recipe_book_001", "table")))
             elif int(RecipeBookTinyNoteFound or 0) == 1 and int(RecipeBookHiddenRecipesRevealed or 0) == 0:
                 $ current_action_items.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "table")))
-            $ current_action_items.append(MenuItem("Вернуться к записям", Call("TavernMyRoomTableRead", RecipeBookSelectedId)))
+            $ current_action_items.append(MenuItem("Вернуться к записям", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
         $ current_action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
     else:
-        $ _recipe_picture = recipe_book_apply_picture(RecipeBookSelectedId)
+        $ _recipe_picture = recipe_book_apply_picture(recipe_book.selected_id)
         if _recipe_picture:
             $ scene_image = _recipe_picture
             $ _layout_last_picture = _recipe_picture
-        $ _recipe_action_state = recipe_book_action_state(RecipeBookSelectedId, where_id, object_id or "recipe_book_001")
+        $ _recipe_action_state = recipe_book_action_state(recipe_book.selected_id, where_id, object_id or "recipe_book_001")
         $ current_action_title = _recipe_action_state["title"]
         $ current_action_content = None
         $ current_action_items = _recipe_action_state["items"]
@@ -592,7 +684,7 @@ label RecipeBookRevealHiddenRecipes(where_id="", object_id="", return_context="b
 
 
 label RecipeBookCraftMenu(where_id="", object_id=""):
-    $ _book_picture = recipe_page_image_path(RecipeBookSelectedId) or str(_layout_last_picture or scene_image or "")
+    $ _book_picture = recipe_page_image_path(recipe_book.selected_id) or str(_layout_last_picture or scene_image or "")
     if _book_picture:
         $ scene_image = _book_picture
         $ _layout_last_picture = _book_picture
@@ -609,7 +701,7 @@ label RecipeBookCraftMenu(where_id="", object_id=""):
     if int(_craftable_count or 0) <= 0:
         $ MainTxt = "Сейчас ни один рецепт не готов полностью. Прочитайте нужную страницу, чтобы увидеть, чего не хватает."
         $ CurLocDesc = MainTxt
-    $ current_action_items.append(MenuItem("Читать книгу", Call("ReadRecipeBook", "recipe_book_001", where_id, "", object_id or "recipe_book_001", RecipeBookSelectedId)))
+    $ current_action_items.append(MenuItem("Читать книгу", Call("ReadRecipeBook", "recipe_book_001", where_id, "", object_id or "recipe_book_001", recipe_book.selected_id)))
     $ current_action_items.append(MenuItem("Закрыть книгу", Call("RecipeBookClose", where_id, object_id or "recipe_book_001")))
     return
 
@@ -631,7 +723,7 @@ label RecipeBookCraftItem(recipe_id="", where_id="", object_id=""):
     if _recipe_picture:
         $ scene_image = _recipe_picture
         $ _layout_last_picture = _recipe_picture
-    $ RecipeBookSelectedId = _recipe_id
+    $ recipe_book.selected_id = _recipe_id
     $ _recipe_action_state = recipe_book_action_state(_recipe_id, where_id, object_id or "recipe_book_001")
     $ current_action_title = _recipe_action_state["title"]
     $ current_action_content = None
@@ -640,13 +732,13 @@ label RecipeBookCraftItem(recipe_id="", where_id="", object_id=""):
 
 
 label RecipeBookClose(where_id="", object_id=""):
+    $ recipe_book.selected_id = ""
     $ _recipe_restore_picture = recipe_book_restore_picture()
     $ scene_image = _recipe_restore_picture
     $ _layout_last_picture = _recipe_restore_picture
-    $ RecipeBookSelectedId = ""
-    $ _return_room_code = str(RecipeBookReturnRoomCode or where_id or CurLoc or "").strip()
-    $ _return_object_id = str(RecipeBookReturnObjectId or object_id or "").strip()
-    $ RecipeBookReturnRoomCode = ""
-    $ RecipeBookReturnObjectId = ""
-    $ RecipeBookReturnPicture = ""
+    $ _return_room_code = str(recipe_book_session().return_room_code or where_id or CurLoc or "").strip()
+    $ _return_object_id = str(recipe_book_session().return_object_id or object_id or "").strip()
+    $ recipe_book_session().return_room_code = ""
+    $ recipe_book_session().return_object_id = ""
+    $ recipe_book_session().return_picture = ""
     jump expression _return_room_code

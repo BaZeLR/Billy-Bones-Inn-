@@ -33,7 +33,7 @@ init python:
             target.set_cock_position(position_key, actor_key)
 
         if actor_key.lower() in ("you", "mc", "stefan", "стефан"):
-            player_obj = player_state(False)
+            player_obj = player
             player_obj.intimacy.set_cock_position(target_key, position_key)
         else:
             actor = getPersonInfo(actor_key)

@@ -1,4 +1,85 @@
-# ================================================================================
+label EventAmandaLizettTalkApply(reaction_code=7, eyewitness=0):
+    $ YourReaction1 = reaction_code
+
+    if reaction_code == 1:
+        "Вы похвалили Аманду за то, что она послушалась вас и не стала болтать с Лизеттой. На ее лице читалось явное облегчение от того, что она не попалась."
+    elif reaction_code == 2:
+        $ Amanda.set_var_int("prohibitliza", 2)
+        $ NotToSpeak = 1
+        "Вы подошли к болтушкам и начали сурово отчитывать Аманду за то, что она не выполнила вашего наказа. Аманда расплакалась и убежала в слезах."
+        $ Amanda.apply_social_chance(4, 1, -1, 0, 0, 0, "liza_talk_scold")
+    elif reaction_code == 3:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        $ NotToSpeak = 1
+        "Вы подошли к болтушкам и вмешались в их разговор, отозвав Аманду в сторону, якобы по неотложному делу. Как только вы остались вдвоем вы сказали Аманде, чтобы она не болтала с Лизеттой, так как та распущенная девчонка и хорошему не научит. Аманда выслушала вас и пообещала с Лизеттой не говорить."
+    elif reaction_code == 4:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        $ NotToSpeak = 1
+        "Вы подошли к Аманде и сказали, что случайно слышали ее разговор с Лизеттой. Вы отметили, что она абсолютно правильно не стала с ней болтать и что вы тоже не советуете ей трепаться с юной шлюхой. При слове \"шлюха\" Аманда зарделась и пообещала с Лизеттой больше не говорить."
+    elif reaction_code == 5:
+        $ Amanda.set_var_int("prohibitliza", 0)
+        "Вы подошли к Аманде и сказали, что погорячились, вы не хотите на нее давить и она имеет полное право говорить с кем хочет. Аманда поблагодарила вас за доверие и пошла по своим делам."
+    elif reaction_code == 6:
+        "Вы решили подслушать, что будет дальше."
+        call EventAmandaLizettTalk2(eyewitness)
+        if _return:
+            "[_return]"
+
+    jump TavernMainlabel EventAmandaLizettTalkApply(reaction_code=7, eyewitness=0):
+    $ YourReaction1 = reaction_code
+
+    if reaction_code == 1:
+        "Вы похвалили Аманду за то, что она послушалась вас и не стала болтать с Лизеттой. На ее лице читалось явное облегчение от того, что она не попалась."
+    elif reaction_code == 2:
+        $ Amanda.set_var_int("prohibitliza", 2)
+        $ NotToSpeak = 1
+        "Вы подошли к болтушкам и начали сурово отчитывать Аманду за то, что она не выполнила вашего наказа. Аманда расплакалась и убежала в слезах."
+        $ Amanda.apply_social_chance(4, 1, -1, 0, 0, 0, "liza_talk_scold")
+    elif reaction_code == 3:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        $ NotToSpeak = 1
+        "Вы подошли к болтушкам и вмешались в их разговор, отозвав Аманду в сторону, якобы по неотложному делу. Как только вы остались вдвоем вы сказали Аманде, чтобы она не болтала с Лизеттой, так как та распущенная девчонка и хорошему не научит. Аманда выслушала вас и пообещала с Лизеттой не говорить."
+    elif reaction_code == 4:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        $ NotToSpeak = 1
+        "Вы подошли к Аманде и сказали, что случайно слышали ее разговор с Лизеттой. Вы отметили, что она абсолютно правильно не стала с ней болтать и что вы тоже не советуете ей трепаться с юной шлюхой. При слове \"шлюха\" Аманда зарделась и пообещала с Лизеттой больше не говорить."
+    elif reaction_code == 5:
+        $ Amanda.set_var_int("prohibitliza", 0)
+        "Вы подошли к Аманде и сказали, что погорячились, вы не хотите на нее давить и она имеет полное право говорить с кем хочет. Аманда поблагодарила вас за доверие и пошла по своим делам."
+    elif reaction_code == 6:
+        "Вы решили подслушать, что будет дальше."
+        call EventAmandaLizettTalk2(eyewitness)
+        if _return:
+            "[_return]"
+
+    jump TavernMainlabel EventAmandaLizettTalkApply(reaction_code=7, eyewitness=0):
+    $ YourReaction1 = reaction_code
+
+    if reaction_code == 1:
+        "Вы похвалили Аманду за то, что она послушалась вас и не стала болтать с Лизеттой. На ее лице читалось явное облегчение от того, что она не попалась."
+    elif reaction_code == 2:
+        $ Amanda.set_var_int("prohibitliza", 2)
+        $ NotToSpeak = 1
+        "Вы подошли к болтушкам и начали сурово отчитывать Аманду за то, что она не выполнила вашего наказа. Аманда расплакалась и убежала в слезах."
+        $ Amanda.apply_social_chance(4, 1, -1, 0, 0, 0, "liza_talk_scold")
+    elif reaction_code == 3:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        $ NotToSpeak = 1
+        "Вы подошли к болтушкам и вмешались в их разговор, отозвав Аманду в сторону, якобы по неотложному делу. Как только вы остались вдвоем вы сказали Аманде, чтобы она не болтала с Лизеттой, так как та распущенная девчонка и хорошему не научит. Аманда выслушала вас и пообещала с Лизеттой не говорить."
+    elif reaction_code == 4:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        $ NotToSpeak = 1
+        "Вы подошли к Аманде и сказали, что случайно слышали ее разговор с Лизеттой. Вы отметили, что она абсолютно правильно не стала с ней болтать и что вы тоже не советуете ей трепаться с юной шлюхой. При слове \"шлюха\" Аманда зарделась и пообещала с Лизеттой больше не говорить."
+    elif reaction_code == 5:
+        $ Amanda.set_var_int("prohibitliza", 0)
+        "Вы подошли к Аманде и сказали, что погорячились, вы не хотите на нее давить и она имеет полное право говорить с кем хочет. Аманда поблагодарила вас за доверие и пошла по своим делам."
+    elif reaction_code == 6:
+        "Вы решили подслушать, что будет дальше."
+        call EventAmandaLizettTalk2(eyewitness)
+        if _return:
+            "[_return]"
+
+    jump TavernMain# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label EventAmandaLizettTalk(eyewitness=0):
@@ -55,7 +136,67 @@ label EventAmandaLizettTalk(eyewitness=0):
                 call EventAmandaLizettTalkApply(6, eyewitness)
             "Вернуться к своим делам" if NotToSpeak == 1:
                 call EventAmandaLizettTalkApply(7, eyewitness)
-        return ""
+        $ Result = ""
+
+    return Result
+
+label EventAmandaLizettTalkApply(reaction_code=7, eyewitness=0):
+    $ YourReaction1 = reaction_code
+
+    if reaction_code == 1:
+        "Вы похвалили Аманду за то, что она послушалась вас и не стала болтать с Лизеттой. На ее лице читалось явное облегчение от того, что она не попалась."
+    elif reaction_code == 2:
+        $ Amanda.set_var_int("prohibitliza", 2)
+        $ NotToSpeak = 1
+        "Вы подошли к болтушкам и начали сурово отчитывать Аманду за то, что она не выполнила вашего наказа. Аманда расплакалась и убежала в слезах."
+        $ Amanda.apply_social_chance(4, 1, -1, 0, 0, 0, "liza_talk_scold")
+    elif reaction_code == 3:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        $ NotToSpeak = 1
+        "Вы подошли к болтушкам и вмешались в их разговор, отозвав Аманду в сторону, якобы по неотложному делу. Как только вы остались вдвоем вы сказали Аманде, чтобы она не болтала с Лизеттой, так как та распущенная девчонка и хорошему не научит. Аманда выслушала вас и пообещала с Лизеттой не говорить."
+    elif reaction_code == 4:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        $ NotToSpeak = 1
+        "Вы подошли к Аманде и сказали, что случайно слышали ее разговор с Лизеттой. Вы отметили, что она абсолютно правильно не стала с ней болтать и что вы тоже не советуете ей трепаться с юной шлюхой. При слове \"шлюха\" Аманда зарделась и пообещала с Лизеттой больше не говорить."
+    elif reaction_code == 5:
+        $ Amanda.set_var_int("prohibitliza", 0)
+        "Вы подошли к Аманде и сказали, что погорячились, вы не хотите на нее давить и она имеет полное право говорить с кем хочет. Аманда поблагодарила вас за доверие и пошла по своим делам."
+    elif reaction_code == 6:
+        "Вы решили подслушать, что будет дальше."
+        call EventAmandaLizettTalk2(eyewitness)
+        if _return:
+            "[_return]"
+
+    jump TavernMain
+
+label EventAmandaLizettTalkApply(reaction_code=7, eyewitness=0):
+    $ YourReaction1 = reaction_code
+
+    if reaction_code == 1:
+        "Вы похвалили Аманду за то, что она послушалась вас и не стала болтать с Лизеттой. На ее лице читалось явное облегчение от того, что она не попалась."
+    elif reaction_code == 2:
+        $ Amanda.set_var_int("prohibitliza", 2)
+        $ NotToSpeak = 1
+        "Вы подошли к болтушкам и начали сурово отчитывать Аманду за то, что она не выполнила вашего наказа. Аманда расплакалась и убежала в слезах."
+        $ Amanda.apply_social_chance(4, 1, -1, 0, 0, 0, "liza_talk_scold")
+    elif reaction_code == 3:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        $ NotToSpeak = 1
+        "Вы подошли к болтушкам и вмешались в их разговор, отозвав Аманду в сторону, якобы по неотложному делу. Как только вы остались вдвоем вы сказали Аманде, чтобы она не болтала с Лизеттой, так как та распущенная девчонка и хорошему не научит. Аманда выслушала вас и пообещала с Лизеттой не говорить."
+    elif reaction_code == 4:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        $ NotToSpeak = 1
+        "Вы подошли к Аманде и сказали, что случайно слышали ее разговор с Лизеттой. Вы отметили, что она абсолютно правильно не стала с ней болтать и что вы тоже не советуете ей трепаться с юной шлюхой. При слове \"шлюха\" Аманда зарделась и пообещала с Лизеттой больше не говорить."
+    elif reaction_code == 5:
+        $ Amanda.set_var_int("prohibitliza", 0)
+        "Вы подошли к Аманде и сказали, что погорячились, вы не хотите на нее давить и она имеет полное право говорить с кем хочет. Аманда поблагодарила вас за доверие и пошла по своим делам."
+    elif reaction_code == 6:
+        "Вы решили подслушать, что будет дальше."
+        call EventAmandaLizettTalk2(eyewitness)
+        if _return:
+            "[_return]"
+
+    jump TavernMain
 
     $ Result = ""
 

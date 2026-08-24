@@ -1,4 +1,67 @@
-init python:
+        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(key, default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[key] = value
+            return value
+        def story_value(self, key, default=0):
+            self.ensure_story_defaults()
+            return self.var.get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()
+            self.var[key] = value
+            return value
+
+
+label _auto_register_eddie:
+    call register_eddie_secondary from _call_eddie_reg
+    return        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(key, default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[key] = value
+            return value
+        def story_value(self, key, default=0):
+            self.ensure_story_defaults()
+            return self.var.get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()
+            self.var[key] = value
+            return value
+
+
+label _auto_register_eddie:
+    call register_eddie_secondary from _call_eddie_reg
+    return        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(key, default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[key] = value
+            return value
+        def story_value(self, key, default=0):
+            self.ensure_story_defaults()
+            return self.var.get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()
+            self.var[key] = value
+            return value
+
+
+label _auto_register_eddie:
+    call register_eddie_secondary from _call_eddie_reg
+    returninit python:
     def eddie_story_defaults():
         return {
             "TalkedAboutWhores": 0,
@@ -45,6 +108,7 @@ init python:
             self.name = people_normalize_id(self.name)
             self.data = EddieStaticData
             self.location = "GroceryStore"
+            self.location = "GroceryStore"
             self.ensure_story_defaults()
             return self
 
@@ -85,6 +149,16 @@ label InitEddie:
     return
 
 
+label InitEddie:
+    call register_eddie_secondary from _call_init_eddie_register
+    return
+
+
+label InitEddie:
+    call register_eddie_secondary from _call_init_eddie_register
+    return
+
+
 label register_eddie_secondary:
     python:
         peopleData["eddie"] = EddieStaticData
@@ -93,9 +167,4 @@ label register_eddie_secondary:
         if Eddie not in secondary_npcs:
             secondary_npcs.append(Eddie)
     $ EddieProfile = "Эдди — сын Ребекки, подросток. Участвует в событиях дома с Жоржеттой и Лукасом (GeorgettBeckyVisit.txt)."
-    return
-
-
-label _auto_register_eddie:
-    call register_eddie_secondary from _call_eddie_reg
     return

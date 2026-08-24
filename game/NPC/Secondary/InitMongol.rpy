@@ -1,4 +1,71 @@
-init python:
+        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(key, default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[key] = value
+            return value
+        def story_value(self, key, default=0):
+            self.ensure_story_defaults()
+            return self.var.get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()
+            self.var[key] = value
+            return value
+
+
+label _auto_register_mongol:
+    call register_mongol_secondary from _call_mongol_reg
+    return        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(key, default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[key] = value
+            self.promote_from_var(self.var)
+            return value
+        def story_value(self, key, default=0):
+            self.ensure_story_defaults()
+            return self.var.get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()
+            self.var[key] = value
+            self.promote_from_var(self.var)
+            return value
+
+
+label _auto_register_mongol:
+    call register_mongol_secondary from _call_mongol_reg
+    return        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(key, default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[key] = value
+            self.promote_from_var(self.var)
+            return value
+        def story_value(self, key, default=0):
+            self.ensure_story_defaults()
+            return self.var.get(key, default)
+
+        def set_story_value(self, key, value):
+            self.ensure_story_defaults()
+            self.var[key] = value
+            self.promote_from_var(self.var)
+            return value
+
+
+label _auto_register_mongol:
+    call register_mongol_secondary from _call_mongol_reg
+    returninit python:
     def mongol_story_defaults():
         return {
             "StocksReleased": 0,
@@ -116,6 +183,16 @@ label InitMongol:
     return
 
 
+label InitMongol:
+    call register_mongol_secondary from _call_init_mongol_register
+    return
+
+
+label InitMongol:
+    call register_mongol_secondary from _call_init_mongol_register
+    return
+
+
 label register_mongol_secondary:
     python:
         peopleData["mongol"] = MongolStaticData
@@ -126,9 +203,4 @@ label register_mongol_secondary:
         peopleInfo["mongol"] = Mongol
         if Mongol not in secondary_npcs:
             secondary_npcs.append(Mongol)
-    return
-
-
-label _auto_register_mongol:
-    call register_mongol_secondary from _call_mongol_reg
     return

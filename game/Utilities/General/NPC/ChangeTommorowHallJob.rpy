@@ -1,4 +1,34 @@
-# ================================================================================
+label ChangeTommorowHallJob(girl_name=None):
+    $ apply_tomorrow_hall_job(girl_name)
+    returnlabel ChangeTommorowHallJob(girl_name=None):
+    python:
+        if girl_name is None:
+            girl_name = GirlName if 'GirlName' in locals() else None
+        if girl_name:
+            apply_tomorrow_hall_job(girl_name)
+    returnlabel ChangeTommorowHallJob(girl_name=None):
+    $ apply_tomorrow_hall_job(girl_name)
+    returnlabel ChangeTommorowHallJob(girl_name=None):
+    $ apply_tomorrow_hall_job(girl_name)
+    returnlabel ChangeTommorowHallJob(girl_name=None):
+    python:
+        if girl_name is None:
+            girl_name = GirlName if 'GirlName' in locals() else None
+        if girl_name:
+            apply_tomorrow_hall_job(girl_name)
+    returnlabel ChangeTommorowHallJob(girl_name=None):
+    $ apply_tomorrow_hall_job(girl_name)
+    returnlabel ChangeTommorowHallJob(girl_name=None):
+    $ apply_tomorrow_hall_job(girl_name)
+    returnlabel ChangeTommorowHallJob(girl_name=None):
+    python:
+        if girl_name is None:
+            girl_name = GirlName if 'GirlName' in locals() else None
+        if girl_name:
+            apply_tomorrow_hall_job(girl_name)
+    returnlabel ChangeTommorowHallJob(girl_name=None):
+    $ apply_tomorrow_hall_job(girl_name)
+    return# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # ChangeTommorowHallJob.rpy
@@ -22,6 +52,3 @@ init python:
         jobcleaningtomorrow[person] = cleaning_value
         jobwaitresstomorrow[person] = waitress_value
 
-label ChangeTommorowHallJob(girl_name=None):
-    $ apply_tomorrow_hall_job(girl_name)
-    return

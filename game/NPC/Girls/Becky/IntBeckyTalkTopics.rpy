@@ -6,7 +6,7 @@
 
 label _int_becky_talk_smalltalk(girl_name="becky"):
     "Вы некоторое время болтаете со вдовой Блэнкеншип о несущественных вещах."
-    if Becky.talk_count() <= 2 and procedural_randint(1, 2, "becky_smalltalk_%s_%s" % (dayspassed, Becky.talk_count())) == 1 and Becky.rel < 3:
+    if Becky.talk_count() <= 2 and procedural_randint(1, 2, "becky_smalltalk_%s_%s" % (current_game_day(), Becky.talk_count())) == 1 and Becky.rel < 3:
         "Вы немного сдружились с Бекки."
         $ Becky.add_relation(1, 3)
     if Becky.talk_count() > 2:
@@ -17,7 +17,7 @@ label _int_becky_talk_smalltalk(girl_name="becky"):
 
 label _int_becky_talk_personal(girl_name="becky"):
     "Вы некоторое время болтаете с Бекки Блэнкеншип о том, как ей живется без мужа."
-    if Becky.talk_count() <= 2 and procedural_randint(1, 2, "becky_personal_%s_%s" % (dayspassed, Becky.talk_count())) == 1 and Becky.rel <= 5:
+    if Becky.talk_count() <= 2 and procedural_randint(1, 2, "becky_personal_%s_%s" % (current_game_day(), Becky.talk_count())) == 1 and Becky.rel <= 5:
         "Вдова несколько раз заинтересованно поглядывает на вас."
         $ Becky.add_relation(1, 6)
     if Becky.talk_count() > 2:
@@ -32,9 +32,9 @@ label story_becky_talk_inga_0(girl_name="becky"):
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
     $ Becky.var["SawIngaFuck"] = 2
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_inga_1(girl_name="becky"):
@@ -44,9 +44,9 @@ label story_becky_talk_inga_1(girl_name="becky"):
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
     $ Becky.var["SawIngaFuck"] = 3
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_lucas_0(girl_name="becky"):
@@ -55,9 +55,9 @@ label story_becky_talk_lucas_0(girl_name="becky"):
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
     $ Becky.var["SawIngaFuck"] = 4
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_husband_0(girl_name="becky"):
@@ -66,9 +66,9 @@ label story_becky_talk_husband_0(girl_name="becky"):
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
     $ Becky.var["husbandtalk"] = 2
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_husband_1(girl_name="becky"):
@@ -77,9 +77,9 @@ label story_becky_talk_husband_1(girl_name="becky"):
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
     $ Becky.var["husbandtalk"] = 3
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_husband_2(girl_name="becky"):
@@ -88,9 +88,9 @@ label story_becky_talk_husband_2(girl_name="becky"):
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
     $ Becky.var["husbandtalk"] = 4
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_husband_3(girl_name="becky"):
@@ -99,9 +99,9 @@ label story_becky_talk_husband_3(girl_name="becky"):
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
     $ Becky.var["husbandtalk"] = 5
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_eddie_0(girl_name="becky"):
@@ -110,19 +110,19 @@ label story_becky_talk_eddie_0(girl_name="becky"):
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
     $ Becky.var["eddietalk"] = 1
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_eddie_georgett_0(girl_name="becky"):
-    if procedural_randint(1, 2, "becky_eddie2_open_%s_%s" % (dayspassed, Becky.talk_count())) == 1:
+    if procedural_randint(1, 2, "becky_eddie2_open_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
         "Вы рассказали Бекки про то, как Эдди просит Жоржетту играть ее роль."
         "\"Где же он мог такие мысли подхватить?!\" - удивилась Бекки."
     else:
         "Вы напомнили Бекки про то, как Эдди просит Жоржетту играть ее роль."
         "\"И все таки, что его на такое надоумило?\" - стала размышлять вслух Бекки."
-    $ tmpRnd = procedural_randint(1, 3, "becky_eddie2_memory_%s_%s" % (dayspassed, Becky.talk_count()))
+    $ tmpRnd = procedural_randint(1, 3, "becky_eddie2_memory_%s_%s" % (current_game_day(), Becky.talk_count()))
     if tmpRnd == 1:
         "\"А, знаю! Наверное это от того случая, когда мы с Эриком играли в карты с месье Легаре и Элоизочкой. Эрик поставил на кон меня, а Альбер Элоизу. Альбер выиграл и хочешь не хочешь, пришлось мне на него залезть и попрыгать. И только я во вкус вошла, как Эдди вошел, что-то спросить хотел. Я хотела его прогнать, но не могла, так как рот был мужниным членом занят. А сам Эрик только ухмылялся.\" - поделилась с вами своим предположением Бекки."
     elif tmpRnd == 2:
@@ -133,18 +133,18 @@ label story_becky_talk_eddie_georgett_0(girl_name="becky"):
     if Becky.var.get("eddietalk", 0) < 2:
         $ Becky.var["eddietalk"] = 2
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_home_invite_talk_0(girl_name="becky"):
-    if not (str(player_state().appearance.current_dress or "") == "citydress" and int(charisma or 0) > 75):
+    if not (str(player.appearance.current_dress or "") == "citydress" and int(charisma or 0) > 75):
         "Бекки смеряет вас внимательным взглядом и качает головой: к ней домой с такими просьбами нужно приходить прилично одетым и уверенным в себе."
         $ Becky.finish_talk()
-        if thread is not None:
-            $ thread.complete()
-        jump IntBeckyTalk
+        if event_runtime.active_thread is not None:
+            $ event_runtime.active_thread.complete()
+        return
     "Вы решили попробовать напросится в гости к вдовушке: \"Бекки, сладкая моя, может я к тебе домой зайду как-нибудь вечерком?\" - предложили вы."
     if Becky.var.get("husbandtalk", 0) == 0:
         "\"Да нет, Стефанчик, я же тебя почти совсем не знаю, люди еще увидят, говорить будут, не, извини, но нет!\" - ответила вам вдова."
@@ -170,12 +170,12 @@ label story_becky_home_invite_talk_0(girl_name="becky"):
             $ InvitePoints += 1
         else:
             "Вам представился суровый дух усопшего мужа и вы пристыженно примолкли."
-        if str(player_state().appearance.current_dress or "") == "citydress":
+        if str(player.appearance.current_dress or "") == "citydress":
             "\"Одно хорошо\", отметила Бекки. - \"Ты хотя бы прилично одет.\""
             $ InvitePoints += 1
         else:
             "\"А костюмчик-то у тебя приличный и в меру скромный есть?\" поинтересовалась благонравная вдовица."
-            if player_state().appearance.has_dress("citydress"):
+            if player.appearance.has_dress("citydress"):
                 "\"За кого ты меня принимаешь?! Конечно есть.\" ответили вы."
                 $ InvitePoints += 1
             else:
@@ -187,9 +187,9 @@ label story_becky_home_invite_talk_0(girl_name="becky"):
         else:
             "\"Ну вот, сам видишь, что в гости ко мне тебе лучше не приходить.\" - торжествуеще сказала вдовица. Вам ничего не оставалось делать, как с ней согласиться."
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_pregnancy_0(girl_name="becky"):
@@ -197,21 +197,21 @@ label story_becky_talk_pregnancy_0(girl_name="becky"):
     $ CurLocDesc = MainTxt
     if str(MainTxt or "") != "":
         $ Becky.finish_talk()
-        if thread is not None:
-            $ thread.complete()
-    jump IntBeckyTalk
+        if event_runtime.active_thread is not None:
+            $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_home_last_visit_talk_0(girl_name="becky"):
     if Becky.var.get("visitedhome", 0) >= 6:
         "\"Бекки, как тебе завершение ужина?\" - осведомились вы."
-        if procedural_randint(1, max(1, 3 + Becky.var.get("BeckyOpenMinet", 0)), "becky_lastvisit_inga_%s_%s" % (dayspassed, Becky.talk_count())) == 1:
+        if procedural_randint(1, max(1, 3 + Becky.var.get("BeckyOpenMinet", 0)), "becky_lastvisit_inga_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
             "\"А ты заметил, что Ингенборг, доча моя, совсем большая стала?\" ответила вам мать семейства."
         elif Becky.var.get("BeckyOpenMinet", 0) > 0:
             if Becky.corruption < 48:
                 "\"Ну я не знаю, все-таки как-то неловко мне было на глазах Эдди и Инги.\""
             else:
-                $ RandVar = procedural_randint(1, 4, "becky_lastvisit_memory_%s_%s" % (dayspassed, Becky.talk_count()))
+                $ RandVar = procedural_randint(1, 4, "becky_lastvisit_memory_%s_%s" % (current_game_day(), Becky.talk_count()))
                 if RandVar == 1:
                     "\"Неплохо, но ты заметил, Стефан, как на меня Эдди смотрел? Даже, пожалуй почаще чем на свою Жоржетту. Не такая я уж и старая видно, что на меня не только ты, но даже и управляющий мой так смотрит.\" гордо заявила вам в ответ вдова."
                 elif RandVar == 2:
@@ -227,7 +227,7 @@ label story_becky_home_last_visit_talk_0(girl_name="becky"):
         if Becky.var.get("TimesVisited", 0) <= 2:
             "\"Ой, я так рада что ты к нам зашел, с семьей моей познакомился. У нас уже пару месяцев как гостей не было.\""
         elif Becky.var.get("HomeSex", 0) == 1:
-            if procedural_randint(1, 2, "becky_lastvisit_homesex_%s_%s" % (dayspassed, Becky.talk_count())) == 1:
+            if procedural_randint(1, 2, "becky_lastvisit_homesex_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
                 if Becky.corruption >= 42:
                     "\"Ну ты приходи почаще, а то я без твоего члена уже и заснуть спокойно не могу,\" игриво заметила Бекки."
                 else:
@@ -239,9 +239,9 @@ label story_becky_home_last_visit_talk_0(girl_name="becky"):
         else:
             "\"Хорошо было, ты еще приходи, не стесняйся.\""
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_eddie_behavior_0(girl_name="becky"):
@@ -259,9 +259,9 @@ label story_becky_talk_eddie_behavior_0(girl_name="becky"):
             $ Becky.apply_social_roll(10, 3, -1, 35, 3, -1)
     $ Becky.var["TalkAboutEddie"] = 1
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_eddie_georgett_1(girl_name="becky"):
@@ -274,14 +274,14 @@ label story_becky_talk_eddie_georgett_1(girl_name="becky"):
     elif Becky.corruption <= 50:
         "\"Ну и ну, ну и фантазии же у него.\" спокойно сказала Ребекка, \"Ничего, подрастет, перебесится.\""
     else:
-        if procedural_randint(1, 2, "becky_eddie4_reaction_%s_%s" % (dayspassed, Becky.talk_count())) == 1:
+        if procedural_randint(1, 2, "becky_eddie4_reaction_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
             "\"Ох стервец,\" засмеялась Бекки, \"Прямо как Эрик, мой покойный муженек, тот тоже обожал такие игры с властными хозяйками и строгими дамами. До сих пор не знаю, правда ли он где-то это видел или все придумал.\""
         else:
             "\"Эх, затейник,\" ответила вам разбитная хозяйка Эдди, \"Значит не стара я еще, что на меня мальчики заглядываются. Сначала ты, а теперь и управляющий мой обо мне фантазирует.\""
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_eddie_reaction_0(girl_name="becky"):
@@ -306,9 +306,9 @@ label story_becky_talk_eddie_reaction_0(girl_name="becky"):
     if ChangeMind == 1:
         "\"Хотя, погоди-ка, раньше же ты совсем по другому говорил, разве нет?\" с подозрением заметила миссис Блэнкеншип."
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_eddie_reaction_1(girl_name="becky"):
@@ -323,8 +323,8 @@ label story_becky_talk_eddie_reaction_1(girl_name="becky"):
         "\"Так,\" гневно сказала вдова, отступая от вас на шаг. \"Это мне показалось, или ты только что предложил мне заняться любовью с человеком, которого я подобрала сиротой и выучила делу?! Хорошо же ты обо мне думаешь. Ну ты и подонок, Стефан! Вон из моей лавки!\""
         "\"Да, надо было держать язык за зубами\" - эту мудрую мысль вы додумали уже на улице."
         $ Becky.apply_social_roll(5, 1, -1, 25, 1, -1)
-        if thread is not None:
-            $ thread.complete()
+        if event_runtime.active_thread is not None:
+            $ event_runtime.active_thread.complete()
         jump MarketPlace
     elif Becky.corruption <= 48:
         "\"Да ты смеешься, что ли?\" мрачно посмотрела на вас Ребекка."
@@ -355,9 +355,9 @@ label story_becky_talk_eddie_reaction_1(girl_name="becky"):
     if ChangeMind == 1:
         "\"Хотя, погоди-ка, раньше же ты совсем по другому говорил, разве нет?\" с подозрением заметила миссис Блэнкеншип."
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_talk_eddie_after_sex_0(girl_name="becky"):
@@ -374,8 +374,8 @@ label story_becky_talk_eddie_after_sex_0(girl_name="becky"):
         "\"А даже если и так, то что? Отец Герхард говорит, что то грех небольшой. Надо же бедной вдове как то скрашивать свои вечера. Но и тебе в нашем доме мы всегда рады.\""
         $ Becky.var["AskedEddieFuck"] = 2
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 

@@ -1,4 +1,4 @@
-# ================================================================================
+            "isOpen": isOpen,            "npc_schedule_georgett_church_visible": npc_schedule_georgett_church_visible,            "isOpen": isOpen,            "npc_schedule_georgett_church_visible": npc_schedule_georgett_church_visible,            "isOpen": isOpen,            "npc_schedule_georgett_church_visible": npc_schedule_georgett_church_visible,# ================================================================================
 # Story event conditions runtime.
 # Conditions are readable gates used by thread/event definitions and board display.
 # ================================================================================
@@ -30,6 +30,19 @@ init -25 python:
         return _story_to_int(_story_get("dayspassed", 0), 0)
 
     def _story_named_value(name, default=None):
+        calendar_values = {
+            "day": calendar_v2.day,
+            "month": calendar_v2.period,
+            "year": calendar_v2.cycle,
+            "week": calendar_v2.week,
+            "hour": calendar_v2.hour,
+            "minute": calendar_v2.minute,
+            "time": calendar_v2.time_slot(),
+            "current_game_day()": calendar_v2.daysInGame,
+            "clock_minutes": calendar_v2.clock_minutes(),
+        }
+        if str(name or "") in calendar_values:
+            return calendar_values[str(name or "")]
         return _story_get(name, default)
 
     def _story_named_number(name, default=0):
@@ -50,12 +63,53 @@ init -25 python:
             return default
 
     def _story_condition_scope():
-        scope = {}
-        for key, value in dict(globals()).items():
-            if str(key or "").startswith("_"):
-                continue
-            scope[key] = value
-        scope.update({
+        return {
+            "Amanda": Amanda,
+            "Becky": Becky,
+            "BeckyHomeFrontRoom": BeckyHomeFrontRoom,
+            "Clara": Clara,
+            "Draupnir": Draupnir,
+            "Eddie": Eddie,
+            "Francheska": Francheska,
+            "Georgett": Georgett,
+            "Inga": Inga,
+            "Liza": Liza,
+            "Melissa": Melissa,
+            "Mongol": Mongol,
+            "Sandra": Sandra,
+            "TavernMainRoom": TavernMainRoom,
+            "TownStreet": TownStreet,
+            "Zimmer": Zimmer,
+            "CurLoc": CurLoc,
+            "location": CurLoc,
+            "calendar_v2": calendar_v2,
+            "event_runtime": event_runtime,
+            "player": player,
+            "threads": threads,
+            "CheckIfSexEventExist": CheckIfSexEventExist,
+            "DaddyAskBuildPhrase": DaddyAskBuildPhrase,
+            "amanda_birth_ready": amanda_birth_ready,
+            "amanda_dress_change_thread_ready": amanda_dress_change_thread_ready,
+            "amanda_glory_tavern_aftermath_ready": amanda_glory_tavern_aftermath_ready,
+            "amanda_gloryhole_try_ready": amanda_gloryhole_try_ready,
+            "amanda_legare_tavern_visit_ready": amanda_legare_tavern_visit_ready,
+            "amanda_liza_glory_invite_ready": amanda_liza_glory_invite_ready,
+            "amanda_liza_talk_work_ready": amanda_liza_talk_work_ready,
+            "amanda_night_after_glory_ready": amanda_night_after_glory_ready,
+            "amanda_street_legare_sighting_ready": amanda_street_legare_sighting_ready,
+            "amanda_street_lover_encounter_ready": amanda_street_lover_encounter_ready,
+            "amanda_talk_hub_ready": amanda_talk_hub_ready,
+            "amanda_tavern_seduction_ready": amanda_tavern_seduction_ready,
+            "church_after_cermon_action_visible": church_after_cermon_action_visible,
+            "church_service_action_visible": church_service_action_visible,
+            "day_delta_ready": day_delta_ready,
+            "getLocation": getLocation,
+            "household_runtime_event_seen_today": household_runtime_event_seen_today,
+            "npc_relationship_level": npc_relationship_level,
+            "people_to_int": people_to_int,
+            "tavern_amanda_bed_action_available": tavern_amanda_bed_action_available,
+            "tavern_work_planned_for": tavern_work_planned_for,
+            "werecat_state": werecat_state,
             "bool": bool,
             "float": float,
             "int": int,
@@ -63,8 +117,7 @@ init -25 python:
             "max": max,
             "min": min,
             "str": str,
-        })
-        return scope
+        }
 
     def _story_relationship_level(person):
         key = str(person or "").strip().lower()

@@ -26,27 +26,23 @@ label EventFightSmall(eyewitness=0):
         $ CurEventDesc = "В вашем трактире произошла драка! Двое пьяных моряков начали выяснять отношения и в процессе расколотили горшков и тарелок на {} мараведи, а потом смылись, не заплатив!".format(CurMoneyLoss)
 
     if eyewitness > 0:
-        $ current_action_title = "Ваши действия"
-        $ current_action_content = None
-        $ _fight_choices = [MenuItem("Выругаться и не делать ничего", [SetVariable("current_action_items", []), Call("EventFightSmallApply", 1, CurMoneyLoss, FightRand, PhraseEnd1EFS)])]
-
-        if FightRand == 3:
-            $ _fight_choices.append(MenuItem("Кинуться бежать вслед", [SetVariable("current_action_items", []), Call("EventFightSmallApply", 2, CurMoneyLoss, FightRand, PhraseEnd1EFS)]))
-
-        if FightRand > 4:
-            $ _fight_choices.append(MenuItem("Преследовать", [SetVariable("current_action_items", []), Call("EventFightSmallApply", 3, CurMoneyLoss, FightRand, PhraseEnd1EFS)]))
-
-        if FightRand <= 2:
-            $ _fight_choices.append(MenuItem("Качать права", [SetVariable("current_action_items", []), Call("EventFightSmallApply", 4, CurMoneyLoss, FightRand, PhraseEnd1EFS)]))
-
-        if FightRand != 4 and money >= 4 and winenum >= 2:
-            $ _fight_choices.append(MenuItem("Звать стражу", [SetVariable("current_action_items", []), Call("EventFightSmallApply", 5, CurMoneyLoss, FightRand, PhraseEnd1EFS)]))
-
-        if FightRand == 4 and money >= (4 + CurMoneyLoss) and winenum >= 2:
-            $ _fight_choices.append(MenuItem("Помочь ловить", [SetVariable("current_action_items", []), Call("EventFightSmallApply", 6, CurMoneyLoss, FightRand, PhraseEnd1EFS)]))
-
-        $ current_action_items = _fight_choices
         $ CurEventDesc += "\n\nЧто вы намеренны предпринять?"
+        $ MainTxt = CurEventDesc
+        $ CurLocDesc = CurEventDesc
+        show screen main_ui
+        menu:
+            "Выругаться и не делать ничего":
+                call EventFightSmallFinish(1, CurMoneyLoss, FightRand, PhraseEnd1EFS)
+            "Кинуться бежать вслед" if FightRand == 3:
+                call EventFightSmallFinish(2, CurMoneyLoss, FightRand, PhraseEnd1EFS)
+            "Преследовать" if FightRand > 4:
+                call EventFightSmallFinish(3, CurMoneyLoss, FightRand, PhraseEnd1EFS)
+            "Качать права" if FightRand <= 2:
+                call EventFightSmallFinish(4, CurMoneyLoss, FightRand, PhraseEnd1EFS)
+            "Звать стражу" if FightRand != 4 and player.economy.money >= 4 and player.tavern_management.winenum >= 2:
+                call EventFightSmallFinish(5, CurMoneyLoss, FightRand, PhraseEnd1EFS)
+            "Помочь ловить" if FightRand == 4 and player.economy.money >= (4 + CurMoneyLoss) and player.tavern_management.winenum >= 2:
+                call EventFightSmallFinish(6, CurMoneyLoss, FightRand, PhraseEnd1EFS)
     else:
         $ current_action_items = []
         $ money -= CurMoneyLoss
@@ -59,10 +55,9 @@ label EventFightSmall(eyewitness=0):
         if PhraseEnd1EFS:
             $ CurEventDesc += "\n" + PhraseEnd1EFS
 
-    $ Result = CurEventDesc
-    return Result
+    jump TavernMain CurEventDesc
 
-label EventFightSmallApply(reaction_code=1, CurMoneyLoss=0, FightRand=0, PhraseEnd1EFS=""):
+label EventFightSmallFinish(reaction_code=1, CurMoneyLoss=0, FightRand=0, PhraseEnd1EFS=""):
     $ YourReaction1 = reaction_code
     $ extra_text = ""
     $ _dog_tavern_result = {"ok": False, "text": ""}
@@ -80,7 +75,7 @@ label EventFightSmallApply(reaction_code=1, CurMoneyLoss=0, FightRand=0, PhraseE
         $ extra_text = "Вы попробовали потребовать возмещения ваших убытков, но наткнулись на искренне непонимание. По мнению ваших буйных посетителей они не были вам должны ничего сверх того, что они уже заплатили. А молодецкой силы, позволившей бы набить морды всей их компании, вы в себе не ощущали."
     elif reaction_code == 5:
         $ money -= 4
-        $ winenum -= 2
+        $ player.tavern_management.winenum -= 2
         $ money -= CurMoneyLoss
         $ extra_text = "Вы выскочили за дверь и начали кричать \"Стража, Стража!\". Не прошло и каких-то 20 минут, как к вам подошли двое толстых стражников и поинтересовались, в чем собственно дело. Узнав подробности они резонно заметили, что ваши обидчики уже успели уйти далеко и поймать их будет затруднительно. Промочив горло парой кружек вина за счет заведения и взяв 4 мараведи за труды, стражи порядка удалились. Хорошо все-таки, что те, кому положенно, берегут ваш покой и неукоснительно следят за соблюдением законов!"
     elif reaction_code == 6:

@@ -152,9 +152,9 @@ screen fight_player_info_window(rows, ammo_text=""):
             $ _reputation = int(_row.get("reputation", reputation) or 0)
             $ _notoriety = int(_row.get("notoriety", notoriety) or 0)
             $ _exploration = int(_row.get("exploration", exploration) or 0)
-            $ _tavernfame = int(_row.get("tavernfame", tavernfame) or 0)
+            $ _tavernfame = int(_row.get("player.economy.tavern_fame", player.economy.tavern_fame) or 0)
             $ _money = int(_row.get("money", money) or 0)
-            $ _sick_days = int(_row.get("sick_days", SickDays) or 0)
+            $ _sick_days = int(_row.get("sick_days", player.condition.sick_days) or 0)
             $ _fun = int(_row.get("fun", fun) or 0)
             text "Здоровье: [_health]/[_health_max]   Силы: [_energy]/[_energy_max]" size 14
             text "Оружие: [fight_player_weapon_name()]" size 14 color "#d8c27a"
@@ -172,8 +172,8 @@ screen fight_player_info_window(rows, ammo_text=""):
                 text "Состояние: [_status]" size 13 color "#d8c27a"
 
 
-screen fight_result_popup():
-    $ _kind = str(FightOutcomeKind or "")
+screen fight_outcome_popup():
+    $ _kind = str(fight.outcome_kind or "")
     $ _title = "Победа" if _kind == "victory" else ("Поражение" if _kind == "defeat" else ("Отступление" if _kind == "retreat" else "Итог боя"))
 
     frame:
@@ -195,7 +195,7 @@ screen fight_result_popup():
                 ymaximum 330
                 draggable True
                 mousewheel True
-                text str(FightOutcomeText or "") size 18
+                text str(fight.outcome_text or "") size 18
 
             text "Выберите действие справа, чтобы продолжить." size 15 color "#a39a8b" xalign 0.5
 
@@ -206,11 +206,12 @@ screen main_ui_fight_panel():
     $ _enemy_rows = list(fight_enemy_display_rows() or [])
     $ _target_rows = [row for row in _enemy_rows if "цель" in list(row.get("status", []) or [])]
     $ _enemy_row = _target_rows[0] if len(_target_rows) > 0 else (_enemy_rows[0] if len(_enemy_rows) > 0 else {"name": "Противник", "health": 0, "health_max": 1, "energy": 0, "energy_max": 1})
-    $ _loaded = str(FightLoadedAmmo or "").strip()
-    $ _loaded_text = "Заряжено: " + fight_loaded_ammo_name(_loaded) if int(FightWeaponLoaded or 0) == 1 and _loaded else "Оружие не заряжено"
-    $ _ammo_text = _loaded_text + "\nСтрелы: " + str(int(PlayerFightSupply.get("arrows", 0) or 0)) + " / дробь: " + str(int(PlayerFightSupply.get("droplets", 0) or 0))
+    $ _loaded = str(fight.loaded_ammo or "").strip()
+    $ _loaded_text = "Заряжено: " + fight_loaded_ammo_name(_loaded) if int(fight.weapon_loaded or 0) == 1 and _loaded else "Оружие не заряжено"
+    $ _ammo_text = _loaded_text + "\nСтрелы: " + str(int(player.combat.supply.get("arrows", 0) or 0)) + " / дробь: " + str(int(player.combat.supply.get("droplets", 0) or 0))
     $ _fight_picture = str(fight_selected_enemy_image() or _layout_last_picture or scene_image or "")
-    $ _fight_desc = "" if str(FightOutcomeText or "").strip() else str(MainTxt or CurLocDesc or fight_preview_text() or "")
+    $ _fight_text = str(MainTxt or fight_preview_text() or "")
+    $ _fight_desc = "" if str(fight.outcome_text or "").strip() else _fight_text
     $ _top_h = int((config.screen_height - int(getattr(gui, "textbox_height", 278)) - 24) * 0.55)
     $ _text_h = int((config.screen_height - int(getattr(gui, "textbox_height", 278)) - 24) * 0.30)
 
@@ -247,5 +248,5 @@ screen main_ui_fight_panel():
             else:
                 null height _text_h
 
-        if str(FightOutcomeText or "").strip():
-            use fight_result_popup()
+        if str(fight.outcome_text or "").strip():
+            use fight_outcome_popup()

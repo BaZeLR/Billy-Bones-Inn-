@@ -1,10 +1,11 @@
+    $ Liza.publish_visibility_state()
+    $ Liza.publish_visibility_state()
+    $ Liza.publish_visibility_state()
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label ShowLizaPortrait():
     $ GirlName = "liza"
-    $ Liza.publish_visibility_state()
-
     if Liza.tits_visible() and not Liza.pussy_visible():
         call ShowImage(GirlName, "portraits", "nakedtits" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/ShowLizaPortrait.rpy:procedural_randint:9:1")))
     elif Liza.tits_visible() and Liza.pussy_visible():

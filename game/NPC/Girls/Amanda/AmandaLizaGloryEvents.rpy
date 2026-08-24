@@ -9,7 +9,7 @@ init python:
         return tavern_work_planned_for("AmandaLizaTalk", CurLoc, time)
 
     def amanda_liza_glory_invite_ready():
-        current_day = amanda_liza_glory_int(dayspassed, 0)
+        current_day = amanda_liza_glory_int(current_game_day(), 0)
         invite_day = Amanda.var_int("glory_liza_invite_day", -1)
         return (
             str(CurLoc or "") == "TavernMain"
@@ -23,7 +23,7 @@ init python:
         )
 
     def amanda_glory_tavern_aftermath_ready():
-        current_day = amanda_liza_glory_int(dayspassed, 0)
+        current_day = amanda_liza_glory_int(current_game_day(), 0)
         last_day = Amanda.var_int("glory_last_event_day", -1)
         return (
             str(CurLoc or "") == "TavernMain"
@@ -34,7 +34,7 @@ init python:
         )
 
     def amanda_night_after_glory_ready():
-        current_day = amanda_liza_glory_int(dayspassed, 0)
+        current_day = amanda_liza_glory_int(current_game_day(), 0)
         last_day = Amanda.var_int("glory_last_event_day", -1)
         return (
             str(CurLoc or "") == "TavernAmandaRoom"
@@ -63,8 +63,9 @@ label story_amanda_liza_talk_work_0:
 
 
 label story_amanda_liza_glory_invite_0:
+    show screen main_ui
     $ SignalBlockTime = 1
-    $ Amanda.set_var_int("liza_glory_invite_event_seen_day", int(dayspassed or 0))
+    $ Amanda.set_var_int("liza_glory_invite_event_seen_day", int(current_game_day() or 0))
     call ShowImage("amanda", "tavern", "lizatalk1")
     "После разговора с Лизеттой Аманда весь вечер вертится возле зала и то и дело косится в сторону ширмы глорихола."
     "Она делает вид, будто просто ищет работу, но слишком быстро краснеет, когда замечает ваш взгляд."
@@ -78,7 +79,7 @@ label story_amanda_liza_glory_invite_0:
 
 label story_amanda_glory_tavern_aftermath_0:
     $ SignalBlockTime = 1
-    $ Amanda.set_var_int("glory_tavern_aftermath_seen_day", int(dayspassed or 0))
+    $ Amanda.set_var_int("glory_tavern_aftermath_seen_day", int(current_game_day() or 0))
     call ShowImage("amanda", "tavern", "lizatalk2")
     if Amanda.var_int("gloryscold", 0) > 0:
         "В зале Аманда держится от ширмы подальше. Лизетта пытается что-то шепнуть ей на ухо, но Аманда только мотает головой и снова хватается за работу."
@@ -93,7 +94,7 @@ label story_amanda_glory_tavern_aftermath_0:
 
 label story_amanda_night_after_glory_0:
     $ SignalBlockTime = 1
-    $ Amanda.set_var_int("night_after_glory_seen_day", int(dayspassed or 0))
+    $ Amanda.set_var_int("night_after_glory_seen_day", int(current_game_day() or 0))
     call ShowImage("amanda", "room", "night")
     if Amanda.var_int("gloryscold", 0) > 0:
         "Ночью Аманда встречает вас настороженно. Разговор у глорихола еще стоит между вами, и она явно ждет, будете ли вы снова давить на нее."

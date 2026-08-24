@@ -1,4 +1,4 @@
-# ================================================================================
+    $ module_runtime.return_room = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "")        Georgett.refresh_sex_visibility()    $ Georgett.refresh_sex_visibility()    $ module_runtime.return_room = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "")        Georgett.refresh_sex_visibility()    $ Georgett.refresh_sex_visibility()    $ module_runtime.return_room = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "")        Georgett.refresh_sex_visibility()    $ Georgett.refresh_sex_visibility()# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default GeorgettSexGirlName = "georgett"
@@ -6,9 +6,24 @@ default GeorgettSexGirlLoc = "street"
 default GeorgettSexReturnRoom = ""
 default GeorgettSexPicturePath = ""
 
+default module_runtime.actor = "georgett"
+default module_runtime.actor_location = "street"
+default module_runtime.return_room = ""
+default module_runtime.picture_path = ""
+
+default module_runtime.actor = "georgett"
+default module_runtime.actor_location = "street"
+default module_runtime.return_room = ""
+default module_runtime.picture_path = ""
+
+default module_runtime.actor = "georgett"
+default module_runtime.actor_location = "street"
+default module_runtime.return_room = ""
+default module_runtime.picture_path = ""
+
 init 6 python:
     def georgett_sex_begin_text():
-        global MainTxt, CurLocDesc, GeorgettSexPicturePath
+        global MainTxt, CurLocDesc, module_runtime.picture_path, module_runtime.picture_path, module_runtime.picture_path, GeorgettSexPicturePath
         MainTxt = ""
         CurLocDesc = ""
         GeorgettSexPicturePath = ""
@@ -60,7 +75,7 @@ init 6 python:
                 georgett_sex_set_picture("georgett", "portraits", "strip11")
 
     def georgett_sex_state_lines():
-        runtime = ensure_player_runtime()
+        runtime = player
         intimacy = runtime.intimacy
         mc_arousal = Georgett.player_arousal()
         mc_came = people_to_int(intimacy.came_today, 0)
@@ -77,6 +92,71 @@ init 6 python:
         elif mc_arousal >= 20:
             lines.append("Вы достаточно возбуждены для продолжения.")
         return lines
+
+screen georgett_sex_action_panel():
+    vbox:
+        spacing 8
+        for _line in georgett_sex_state_lines():
+            text _line size 16 color "#d8c27a"
+        null height 4
+        viewport:
+            ymaximum 520
+            mousewheel True
+            draggable True
+            scrollbars "vertical"
+            use choice_panel(current_action_items)
+
+screen georgett_sex_action_panel():
+    vbox:
+        spacing 8
+        for _line in georgett_sex_state_lines():
+            text _line size 16 color "#d8c27a"
+        null height 4
+        viewport:
+            ymaximum 520
+            mousewheel True
+            draggable True
+            scrollbars "vertical"
+            use choice_panel(current_action_items)
+
+screen georgett_sex_action_panel():
+    vbox:
+        spacing 8
+        for _line in georgett_sex_state_lines():
+            text _line size 16 color "#d8c27a"
+        null height 4
+        viewport:
+            ymaximum 520
+            mousewheel True
+            draggable True
+            scrollbars "vertical"
+            use choice_panel(current_action_items)
+
+screen georgett_sex_action_panel():
+    vbox:
+        spacing 8
+        for _line in georgett_sex_state_lines():
+            text _line size 16 color "#d8c27a"
+        null height 4
+        viewport:
+            ymaximum 520
+            mousewheel True
+            draggable True
+            scrollbars "vertical"
+            use choice_panel(current_action_items)
+
+screen georgett_sex_action_panel():
+    vbox:
+        spacing 8
+        for _line in georgett_sex_state_lines():
+            text _line size 16 color "#d8c27a"
+        null height 4
+        viewport:
+            ymaximum 520
+            mousewheel True
+            draggable True
+            scrollbars "vertical"
+            use choice_panel(current_action_items)
 
 screen georgett_sex_action_panel():
     vbox:
@@ -223,207 +303,257 @@ label GeorgettSexMenu:
     return
 
 
-label GeorgettSexApply(action_id=""):
-    $ GirlNameIGSS = str(GeorgettSexGirlName or "georgett")
-    $ GirlLocIGSS = str(GeorgettSexGirlLoc or "street")
-    $ _georgett_sex_action = str(action_id or "")
+label GeorgettSexCumMouth:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
     $ georgett_sex_begin_text()
+    $ georgett_sex_add_text("Ваш дружок напрягся и струя за струей заполнил ротик [Georgett.real_name2()] вашим семенем. [Georgett.real_name()] судорожно заглатывала вашу сперму и потом высунула свой очаровательный язычок дабы продемонстрировать вам что она проглотила все.")
+    $ Georgett.player_cum("mouth")
+    call GeorgettSexStatus(GirlLocIGSS)
+    $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cummouth")
+    return
 
-    if _georgett_sex_action == "cum_mouth":
-        $ georgett_sex_add_text("Ваш дружок напрягся и струя за струей заполнил ротик [Georgett.real_name2()] вашим семенем. [Georgett.real_name()] судорожно заглатывала вашу сперму и потом высунула свой очаровательный язычок дабы продемонстрировать вам что она проглотила все.")
-        $ Georgett.player_cum("mouth")
-        call GeorgettSexStatus(GirlLocIGSS)
-        $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cummouth")
 
-    elif _georgett_sex_action == "cum_face":
-        $ georgett_sex_add_text("Вы вытащили вашего дружка в последний момент и густые струи вашего семени ударили прямо по пухленьким щечкам и белокурым кудрям [Georgett.real_name2()].")
-        $ Georgett.player_cum("face")
-        call GeorgettSexStatus(GirlLocIGSS)
-        $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cummouth")
+label GeorgettSexCumFace:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    $ georgett_sex_add_text("Вы вытащили вашего дружка в последний момент и густые струи вашего семени ударили прямо по пухленьким щечкам и белокурым кудрям [Georgett.real_name2()].")
+    $ Georgett.player_cum("face")
+    call GeorgettSexStatus(GirlLocIGSS)
+    $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cummouth")
+    return
 
-    elif _georgett_sex_action == "cum_tits":
-        $ georgett_sex_add_text("Вы вытащили свой член из [Georgett.real_name2()] и немедленно разрядились на ее груди и живот. [Georgett.real_name()] провела пальцем по своим грудям а затем медленно, смотря вам в глаза, облизала измазанный спермой палец и улыбнулась.")
-        $ Georgett.player_cum("tits")
-        call GeorgettSexStatus(GirlLocIGSS)
 
-    elif _georgett_sex_action == "cum_inside":
-        $ georgett_sex_add_text("Вы зарычали и кончили. Густые струи вашего семени хлынули во влагалище [Georgett.real_name2()]. Блондинка, чувствуя как ее заполняет ваше семя, сладострастно застонала, приговаривая \"Да, милый, прямо в маточку твое семя ударило, сладко-то как. Так и залететь недолго!\"")
-        $ georgett_sex_add_text("Ваш обмякший член вывалился из ненасытной щелки и из нее потекла вязкая белая струйка.")
-        $ georgett_sex_set_picture(GirlNameIGSS, "sex", "doggyinside")
-        $ Georgett.add_arousal(3)
-        $ Georgett.player_cum("inside")
-        call GeorgettSexStatus(GirlLocIGSS)
+label GeorgettSexCumTits:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    $ georgett_sex_add_text("Вы вытащили свой член из [Georgett.real_name2()] и немедленно разрядились на ее груди и живот. [Georgett.real_name()] провела пальцем по своим грудям а затем медленно, смотря вам в глаза, облизала измазанный спермой палец и улыбнулась.")
+    $ Georgett.player_cum("tits")
+    call GeorgettSexStatus(GirlLocIGSS)
+    return
 
-    elif _georgett_sex_action == "look":
-        $ georgett_sex_add_text(Georgett.data.description)
-        $ georgett_sex_set_portrait()
 
-    elif _georgett_sex_action == "remove_blouse":
-        call IntGeorgettSexRemoveBlouse(GirlNameIGSS)
+label GeorgettSexCumInside:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    $ georgett_sex_add_text("Вы зарычали и кончили. Густые струи вашего семени хлынули во влагалище [Georgett.real_name2()]. Блондинка, чувствуя как ее заполняет ваше семя, сладострастно застонала, приговаривая \"Да, милый, прямо в маточку твое семя ударило, сладко-то как. Так и залететь недолго!\"")
+    $ georgett_sex_add_text("Ваш обмякший член вывалился из ненасытной щелки и из нее потекла вязкая белая струйка.")
+    $ georgett_sex_set_picture(GirlNameIGSS, "sex", "doggyinside")
+    $ Georgett.add_arousal(3)
+    $ Georgett.player_cum("inside")
+    call GeorgettSexStatus(GirlLocIGSS)
+    return
 
-    elif _georgett_sex_action == "unbutton_blouse":
-        call IntGeorgettSexUnbuttonBlouse(GirlNameIGSS)
 
-    elif _georgett_sex_action == "raise_skirt":
-        call IntGeorgettSexRaiseSkirt(GirlNameIGSS)
+label GeorgettSexLook:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    $ georgett_sex_add_text(Georgett.data.description)
+    $ georgett_sex_set_portrait()
+    return
 
-    elif _georgett_sex_action == "wipe_face":
-        $ georgett_sex_add_text("Вы предложили шлюшке убрать с лица результаты ее предыдущих похождений. [Georgett.real_name()] достала платочек и вытерла лицо и волосы от спермы.")
-        $ Georgett.clear_cum("cum_face_you", "cum_face_others")
-        $ georgett_sex_set_portrait()
 
-    elif _georgett_sex_action == "wipe_tits":
-        $ georgett_sex_add_text("Вы предложили шлюшке убрать с сисечек результаты ее предыдущих похождений. [Georgett.real_name()] достала платочек и вытерла свои груди от спермы.")
-        $ Georgett.clear_cum("cum_tits_you", "cum_tits_others")
-        $ georgett_sex_set_portrait()
+label GeorgettSexWipeFace:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    $ georgett_sex_add_text("Вы предложили шлюшке убрать с лица результаты ее предыдущих похождений. [Georgett.real_name()] достала платочек и вытерла лицо и волосы от спермы.")
+    $ Georgett.clear_cum("cum_face_you", "cum_face_others")
+    $ georgett_sex_set_portrait()
+    return
 
-    elif _georgett_sex_action == "wipe_inside":
-        $ georgett_sex_add_text("Вы предложили шлюшке убрать с влагалища и бедер результаты ее предыдущих похождений. [Georgett.real_name()] достала платочек и вытерла бедра и лобок от спермы. Скорее всего сперма во влагалище еще осталась, но вы ее теперь вряд ли почувствуете.")
-        $ Georgett.clear_cum("cum_inside_you", "cum_inside_others")
-        $ georgett_sex_set_portrait()
 
-    elif _georgett_sex_action == "kiss":
-        $ georgett_sex_add_text("[Georgett.real_name()] целует вас в засос, переплетаясь языками.")
-        if Georgett.cum_state("cum_face_you") > 0:
-            $ georgett_sex_add_text("На язык вам попадают капли вашего семени, которым вы обкончали ее раньше.")
-        elif Georgett.cum_state("cum_face_others") > 0:
-            $ georgett_sex_add_text("Вы чувствуете солоноватый привкус чужой спермы. Шалунья уже успела у кого-то отсосать до вас!")
-        if Georgett.arousal_value() < 50:
-            $ Georgett.add_arousal(7, 50)
-        if Georgett.player_arousal() < 50:
-            $ Georgett.add_player_arousal(7, 50)
-        $ Georgett.set_cock_position("none")
-        call GeorgettSexStatus(GirlLocIGSS)
+label GeorgettSexWipeTits:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    $ georgett_sex_add_text("Вы предложили шлюшке убрать с сисечек результаты ее предыдущих похождений. [Georgett.real_name()] достала платочек и вытерла свои груди от спермы.")
+    $ Georgett.clear_cum("cum_tits_you", "cum_tits_others")
+    $ georgett_sex_set_portrait()
+    return
 
-    elif _georgett_sex_action == "grope":
-        if not Georgett.visible_tits():
-            $ georgett_sex_add_text("Вы начали мять сиськи через тонкую ткань ее блузки.")
+
+label GeorgettSexWipeInside:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    $ georgett_sex_add_text("Вы предложили шлюшке убрать с влагалища и бедер результаты ее предыдущих похождений. [Georgett.real_name()] достала платочек и вытерла бедра и лобок от спермы. Скорее всего сперма во влагалище еще осталась, но вы ее теперь вряд ли почувствуете.")
+    $ Georgett.clear_cum("cum_inside_you", "cum_inside_others")
+    $ georgett_sex_set_portrait()
+    return
+
+
+label GeorgettSexKiss:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    $ georgett_sex_add_text("[Georgett.real_name()] целует вас в засос, переплетаясь языками.")
+    if Georgett.cum_state("cum_face_you") > 0:
+        $ georgett_sex_add_text("На язык вам попадают капли вашего семени, которым вы обкончали ее раньше.")
+    elif Georgett.cum_state("cum_face_others") > 0:
+        $ georgett_sex_add_text("Вы чувствуете солоноватый привкус чужой спермы. Шалунья уже успела у кого-то отсосать до вас!")
+    if Georgett.arousal_value() < 50:
+        $ Georgett.add_arousal(7, 50)
+    if Georgett.player_arousal() < 50:
+        $ Georgett.add_player_arousal(7, 50)
+    $ Georgett.set_cock_position("none")
+    call GeorgettSexStatus(GirlLocIGSS)
+    return
+
+
+label GeorgettSexGrope:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    if not Georgett.visible_tits():
+        $ georgett_sex_add_text("Вы начали мять сиськи через тонкую ткань ее блузки.")
+    else:
+        $ _grope_text = "Вы припали ртом к обнаженным грудям %s, лаская ртом ее чувствительные соски" % Georgett.real_name2()
+        if Georgett.cum_state("cum_tits_you") > 0:
+            $ _grope_text += " и слизывая с них свою сперму."
+        elif Georgett.cum_state("cum_tits_others") > 0:
+            $ _grope_text += " и слизывая с них чью-то сперму."
         else:
-            $ _grope_text = "Вы припали ртом к обнаженным грудям %s, лаская ртом ее чувствительные соски" % Georgett.real_name2()
-            if Georgett.cum_state("cum_tits_you") > 0:
-                $ _grope_text += " и слизывая с них свою сперму."
-            elif Georgett.cum_state("cum_tits_others") > 0:
-                $ _grope_text += " и слизывая с них чью-то сперму."
+            $ _grope_text += "."
+        $ georgett_sex_add_text(_grope_text)
+    $ _lactate_tits_fondle = LactateTitsFondle(GirlNameIGSS)
+    if str(_lactate_tits_fondle or "").strip():
+        $ georgett_sex_add_text(_lactate_tits_fondle)
+    if Georgett.visible_pussy():
+        $ georgett_sex_add_text("Вы медленно опустили руку вниз, к ее вульвочке, и начали ее нежно массировать.")
+    else:
+        $ georgett_sex_add_text("Вы сунули руку под короткую юбочку и стали наминать ее вульву.")
+    if Georgett.cum_state("cum_inside_you") > 0:
+        $ georgett_sex_add_text("Вы почуствовали свою сперму в пещерке [Georgett.real_name2()].")
+    elif Georgett.cum_state("cum_inside_others") > 0:
+        $ georgett_sex_add_text("Ваши пальцы заскользили по пещерке [Georgett.real_name2()], похоже кто-то уже кончил в нее.")
+    if not Georgett.visible_tits() and not Georgett.visible_pussy():
+        $ georgett_sex_set_picture(GirlNameIGSS, "sex", "grope")
+    if Georgett.arousal_value() < 60:
+        $ Georgett.add_arousal(12, 60)
+    $ Georgett.set_cock_position("none")
+    call GeorgettSexStatus(GirlLocIGSS)
+    return
+
+
+label GeorgettSexLick:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    if GirlLocIGSS == "tavern":
+        $ georgett_sex_add_text("[Georgett.real_name()] легла на кровать и бесстыдно раздвинула ножки. Вы припали к раскрытому как цветок влагалищу и начали старательно ласкать его языком.")
+    else:
+        $ georgett_sex_add_text("[Georgett.real_name()] стоя облокотилась спиной на стену, развинув бедра. Вы припали к раскрытому как цветок влагалищу и начали старательно ласкать его языком.")
+    if Georgett.cum_state("cum_inside_you") > 0:
+        $ georgett_sex_add_text("Вы ощущаете привкус собственной спермы, медленно вытекающей из влагалища [Georgett.real_name2()].")
+    elif Georgett.cum_state("cum_inside_others") > 0:
+        $ georgett_sex_add_text("Вы ощущаете привкус чьей-то спермы, медленно вытекающей из влагалища [Georgett.real_name2()], кто-то уже успел оттрахать эту куколку до вас.")
+    $ _georgett_lick_count = Georgett.add_lick_pussy()
+    if _georgett_lick_count == 4:
+        $ georgett_sex_add_text("\"Ой, какой ты милый!\"  говорит [Georgett.real_name()]. \"Многие мои клиенты особо не утруждаются чтобы сделать девушке приятное, но ты, я вижу, не из таких.\"")
+        $ Georgett.add_relation(1, 100)
+    $ Georgett.add_arousal(20)
+    $ Georgett.set_cock_position("none")
+    call GeorgettSexStatus(GirlLocIGSS)
+    return
+
+
+label GeorgettSexBlowjob:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    if Georgett.cock_in("mouth"):
+        $ georgett_sex_add_text("[Georgett.real_name()] сидит перед вами на корточках и продолжает ")
+        $ georgett_sex_set_picture(GirlNameIGSS, "sex", "minet2")
+    else:
+        $ georgett_sex_add_text("[Georgett.real_name()] опустилась перед вами на корточки и стала ")
+        $ georgett_sex_set_picture(GirlNameIGSS, "sex", "minet1")
+    if Georgett.player_arousal() < 20:
+        $ georgett_sex_add_text("облизывать ваш вялый член.")
+    elif Georgett.player_arousal() < 40:
+        $ georgett_sex_add_text("облизывать головку вашего напрягшегося члена.")
+    elif Georgett.player_arousal() < 60:
+        $ georgett_sex_add_text("умело сосать ваш член.")
+    else:
+        $ georgett_sex_add_text("заглатывать ваш член по самые яйца.")
+    $ Georgett.add_player_arousal(20)
+    $ Georgett.set_cock_position("mouth")
+    call GeorgettSexStatus(GirlLocIGSS)
+    return
+
+
+label GeorgettSexTitfuck:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    if GirlLocIGSS == "tavern":
+        if Georgett.cock_in("tits"):
+            $ georgett_sex_add_text("[Georgett.real_name()] лежит изогнувшись на кровати, выставив вперед оба своих выдающихся достоинства, чтобы вы могли их трахнуть. Вы сношаете ее между упругих грудок. В конце каждого вашего движения [Georgett.real_name()] ловко ловит головку вашего члена своим страстным ротиком.")
+        else:
+            $ georgett_sex_add_text("[Georgett.real_name()] легла спиной на кровать, частично свесившись, и изогнулась, выставив вперед оба своих выдающихся достоинства. Ваш член скользнул в ложбинку между ее холмов, и [Georgett.real_name()] прижала свои сисечки руками одна к другой.")
+            $ georgett_sex_add_text("Вы начали трахать ее между упругих грудок. В конце каждого вашего движения [Georgett.real_name()] ловко ловит головку вашего члена своим страстным ротиком.")
+    else:
+        if Georgett.cock_in("tits"):
+            $ georgett_sex_add_text("[Georgett.real_name()] сидит перед вами на корточках, выставив вперед оба своих выдающихся достоинства. Вы трахаете ее между упругих грудок. В конце каждого вашего движения [Georgett.real_name()] ловко ловит головку вашего члена своим страстным ротиком.")
+        else:
+            $ georgett_sex_add_text("[Georgett.real_name()] опустилась перед вами на корточки и изогнулась, выставив вперед оба своих выдающихся достоинства. Ваш член скользнул в ложбинку между ее холмов, и [Georgett.real_name()] прижала свои сисечки руками одна к другой.")
+            $ georgett_sex_add_text("Вы начали трахать ее между упругих грудок. В конце каждого вашего движения [Georgett.real_name()] ловко ловит головку вашего члена своим страстным ротиком.")
+    $ _lactate_tits_fuck = LactateTitsFuck(GirlNameIGSS)
+    if str(_lactate_tits_fuck or "").strip():
+        $ georgett_sex_add_text(_lactate_tits_fuck)
+    $ Georgett.add_player_arousal(20)
+    $ Georgett.set_cock_position("tits")
+    call GeorgettSexStatus(GirlLocIGSS)
+    return
+
+
+label GeorgettSexFuck:
+    $ GirlNameIGSS = str(module_runtime.actor or "georgett")
+    $ GirlLocIGSS = str(module_runtime.actor_location or "street")
+    $ georgett_sex_begin_text()
+    if GirlLocIGSS == "tavern":
+        if not Georgett.cock_in("pussy"):
+            $ georgett_sex_add_text("Вы легли на кровать и усадили девицу прямо на возбужденный член, засадив по самые яйца.")
+            if not Georgett.has_top():
+                $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cowgirl3")
             else:
-                $ _grope_text += "."
-            $ georgett_sex_add_text(_grope_text)
-        $ _lactate_tits_fondle = LactateTitsFondle(GirlNameIGSS)
-        if str(_lactate_tits_fondle or "").strip():
-            $ georgett_sex_add_text(_lactate_tits_fondle)
-        if Georgett.visible_pussy():
-            $ georgett_sex_add_text("Вы медленно опустили руку вниз, к ее вульвочке, и начали ее нежно массировать.")
+                $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cowgirl1")
         else:
-            $ georgett_sex_add_text("Вы сунули руку под короткую юбочку и стали наминать ее вульву.")
-        if Georgett.cum_state("cum_inside_you") > 0:
-            $ georgett_sex_add_text("Вы почуствовали свою сперму в пещерке [Georgett.real_name2()].")
-        elif Georgett.cum_state("cum_inside_others") > 0:
-            $ georgett_sex_add_text("Ваши пальцы заскользили по пещерке [Georgett.real_name2()], похоже кто-то уже кончил в нее.")
-        if not Georgett.visible_tits() and not Georgett.visible_pussy():
-            $ georgett_sex_set_picture(GirlNameIGSS, "sex", "grope")
-        if Georgett.arousal_value() < 60:
-            $ Georgett.add_arousal(12, 60)
-        $ Georgett.set_cock_position("none")
-        call GeorgettSexStatus(GirlLocIGSS)
-
-    elif _georgett_sex_action == "lick":
-        if GirlLocIGSS == "tavern":
-            $ georgett_sex_add_text("[Georgett.real_name()] легла на кровать и бесстыдно раздвинула ножки. Вы припали к раскрытому как цветок влагалищу и начали старательно ласкать его языком.")
-        else:
-            $ georgett_sex_add_text("[Georgett.real_name()] стоя облокотилась спиной на стену, развинув бедра. Вы припали к раскрытому как цветок влагалищу и начали старательно ласкать его языком.")
-        if Georgett.cum_state("cum_inside_you") > 0:
-            $ georgett_sex_add_text("Вы ощущаете привкус собственной спермы, медленно вытекающей из влагалища [Georgett.real_name2()].")
-        elif Georgett.cum_state("cum_inside_others") > 0:
-            $ georgett_sex_add_text("Вы ощущаете привкус чьей-то спермы, медленно вытекающей из влагалища [Georgett.real_name2()], кто-то уже успел оттрахать эту куколку до вас.")
-        $ _georgett_lick_count = Georgett.add_lick_pussy()
-        if _georgett_lick_count == 4:
-            $ georgett_sex_add_text("\"Ой, какой ты милый!\"  говорит [Georgett.real_name()]. \"Многие мои клиенты особо не утруждаются чтобы сделать девушке приятное, но ты, я вижу, не из таких.\"")
-            $ Georgett.add_relation(1, 100)
-        $ Georgett.add_arousal(20)
-        $ Georgett.set_cock_position("none")
-        call GeorgettSexStatus(GirlLocIGSS)
-
-    elif _georgett_sex_action == "blowjob":
-        if Georgett.cock_in("mouth"):
-            $ georgett_sex_add_text("[Georgett.real_name()] сидит перед вами на корточках и продолжает ")
-            $ georgett_sex_set_picture(GirlNameIGSS, "sex", "minet2")
-        else:
-            $ georgett_sex_add_text("[Georgett.real_name()] опустилась перед вами на корточки и стала ")
-            $ georgett_sex_set_picture(GirlNameIGSS, "sex", "minet1")
-        if Georgett.player_arousal() < 20:
-            $ georgett_sex_add_text("облизывать ваш вялый член.")
-        elif Georgett.player_arousal() < 40:
-            $ georgett_sex_add_text("облизывать головку вашего напрягшегося члена.")
-        elif Georgett.player_arousal() < 60:
-            $ georgett_sex_add_text("умело сосать ваш член.")
-        else:
-            $ georgett_sex_add_text("заглатывать ваш член по самые яйца.")
-        $ Georgett.add_player_arousal(20)
-        $ Georgett.set_cock_position("mouth")
-        call GeorgettSexStatus(GirlLocIGSS)
-
-    elif _georgett_sex_action == "titfuck":
-        if GirlLocIGSS == "tavern":
-            if Georgett.cock_in("tits"):
-                $ georgett_sex_add_text("[Georgett.real_name()] лежит изогнувшись на кровати, выставив вперед оба своих выдающихся достоинства, чтобы вы могли их трахнуть. Вы сношаете ее между упругих грудок. В конце каждого вашего движения [Georgett.real_name()] ловко ловит головку вашего члена своим страстным ротиком.")
+            $ georgett_sex_add_text("Она страстно скачет на вас, пока вы мнете ее ягодицы и сиськи.")
+            if not Georgett.has_top():
+                $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cowgirl4")
             else:
-                $ georgett_sex_add_text("[Georgett.real_name()] легла спиной на кровать, частично свесившись, и изогнулась, выставив вперед оба своих выдающихся достоинства. Ваш член скользнул в ложбинку между ее холмов, и [Georgett.real_name()] прижала свои сисечки руками одна к другой.")
-                $ georgett_sex_add_text("Вы начали трахать ее между упругих грудок. В конце каждого вашего движения [Georgett.real_name()] ловко ловит головку вашего члена своим страстным ротиком.")
+                $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cowgirl2")
+    else:
+        if not Georgett.cock_in("pussy"):
+            $ georgett_sex_add_text("Она уперлась ладонями в стену и выставила киску. Вы немедленно засадили ей по самые яйца.")
+            $ georgett_sex_set_picture(GirlNameIGSS, "sex", "doggy1")
         else:
-            if Georgett.cock_in("tits"):
-                $ georgett_sex_add_text("[Georgett.real_name()] сидит перед вами на корточках, выставив вперед оба своих выдающихся достоинства. Вы трахаете ее между упругих грудок. В конце каждого вашего движения [Georgett.real_name()] ловко ловит головку вашего члена своим страстным ротиком.")
-            else:
-                $ georgett_sex_add_text("[Georgett.real_name()] опустилась перед вами на корточки и изогнулась, выставив вперед оба своих выдающихся достоинства. Ваш член скользнул в ложбинку между ее холмов, и [Georgett.real_name()] прижала свои сисечки руками одна к другой.")
-                $ georgett_sex_add_text("Вы начали трахать ее между упругих грудок. В конце каждого вашего движения [Georgett.real_name()] ловко ловит головку вашего члена своим страстным ротиком.")
-        $ _lactate_tits_fuck = LactateTitsFuck(GirlNameIGSS)
-        if str(_lactate_tits_fuck or "").strip():
-            $ georgett_sex_add_text(_lactate_tits_fuck)
-        $ Georgett.add_player_arousal(20)
-        $ Georgett.set_cock_position("tits")
-        call GeorgettSexStatus(GirlLocIGSS)
-
-    elif _georgett_sex_action == "fuck":
-        if GirlLocIGSS == "tavern":
-            if not Georgett.cock_in("pussy"):
-                $ georgett_sex_add_text("Вы легли на кровать и усадили девицу прямо на возбужденный член, засадив по самые яйца.")
-                if not Georgett.has_top():
-                    $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cowgirl3")
-                else:
-                    $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cowgirl1")
-            else:
-                $ georgett_sex_add_text("Она страстно скачет на вас, пока вы мнете ее ягодицы и сиськи.")
-                if not Georgett.has_top():
-                    $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cowgirl4")
-                else:
-                    $ georgett_sex_set_picture(GirlNameIGSS, "sex", "cowgirl2")
-        else:
-            if not Georgett.cock_in("pussy"):
-                $ georgett_sex_add_text("Она уперлась ладонями в стену и выставила киску. Вы немедленно засадили ей по самые яйца.")
-                $ georgett_sex_set_picture(GirlNameIGSS, "sex", "doggy1")
-            else:
-                $ georgett_sex_add_text("Вы продолжаете страстно трахать девушку, нежно мять ее ягодицы и сиськи.")
-                $ georgett_sex_set_picture(GirlNameIGSS, "sex", "doggy" + str(procedural_randint(2, 3, "georgett_sex_doggy")))
-        if Georgett.pregnancy_days() >= 150:
-            $ georgett_sex_add_text("Вы чувствуете, как ребенок в ее животе шевелится при каждом толчке.")
-        $ _lactate_pussy_fuck = LactatePussyFuck(GirlNameIGSS)
-        if str(_lactate_pussy_fuck or "").strip():
-            $ georgett_sex_add_text(_lactate_pussy_fuck)
-        $ Georgett.add_player_arousal(20)
-        $ Georgett.add_arousal(14)
-        $ Georgett.set_cock_position("pussy")
-        call GeorgettSexStatus(GirlLocIGSS)
-
-    elif _georgett_sex_action == "continue":
-        $ Georgett.set_sex_busy(0)
-
-    if str(GeorgettSexPicturePath or "").strip():
-        $ scene_image = str(GeorgettSexPicturePath or "")
-        $ _layout_last_picture = scene_image
-        vscene scene_image
-    jump GeorgettSexMenu
-
+            $ georgett_sex_add_text("Вы продолжаете страстно трахать девушку, нежно мять ее ягодицы и сиськи.")
+            $ georgett_sex_set_picture(GirlNameIGSS, "sex", "doggy" + str(procedural_randint(2, 3, "georgett_sex_doggy")))
+    if Georgett.pregnancy_days() >= 150:
+        $ georgett_sex_add_text("Вы чувствуете, как ребенок в ее животе шевелится при каждом толчке.")
+    $ _lactate_pussy_fuck = LactatePussyFuck(GirlNameIGSS)
+    if str(_lactate_pussy_fuck or "").strip():
+        $ georgett_sex_add_text(_lactate_pussy_fuck)
+    $ Georgett.add_player_arousal(20)
+    $ Georgett.add_arousal(14)
+    $ Georgett.set_cock_position("pussy")
+    call GeorgettSexStatus(GirlLocIGSS)
+    return
 
 label GeorgettSexFinish:
     $ Georgett.set_sex_busy(0)
+    if str(module_runtime.kind or "") == "sex" and str(module_runtime.actor or "") == "georgett":
+        return
+    call AdvanceTimeOnly(40)
+    $ _georgett_return_room = str(module_runtime.return_room or CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
+    if _georgett_return_room:
+        jump expression _georgett_return_room
     if str(active_module_kind or "") == "sex" and str(active_module_actor or "") == "georgett":
         return
     call AdvanceTimeOnly(40)

@@ -1,3 +1,18 @@
+    def _dtes_events_count():
+        return EventsCount
+
+    def _dtes_new_events():
+        return NewEvents
+    def _dtes_events_count():
+        return EventsCount
+
+    def _dtes_new_events():
+        return NewEvents
+    def _dtes_events_count():
+        return EventsCount
+
+    def _dtes_new_events():
+        return NewEvents
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -15,12 +30,6 @@ init python:
             except Exception:
                 return default
 
-    def _dtes_events_count():
-        return EventsCount
-
-    def _dtes_new_events():
-        return NewEvents
-
     def _dtes_mandatory_event_allowed(event_code, room_code=""):
         code = str(event_code or "")
         if code == "WineForDance":
@@ -37,6 +46,12 @@ init python:
         This path is side-effect-light and used by debug/unit helpers.
         """
         global CurEventCode, Result
+        EventsCount = _dtes_events_count()
+        NewEvents = _dtes_new_events()
+
+        EventsCount = _dtes_events_count()
+        NewEvents = _dtes_new_events()
+
         EventsCount = _dtes_events_count()
         NewEvents = _dtes_new_events()
 

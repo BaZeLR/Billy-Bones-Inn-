@@ -32,7 +32,6 @@ init 6 python:
 label ForestLake:
     $ CurrentRoom = ForestLakeRoom
     $ CurLoc = "ForestLake"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -45,20 +44,16 @@ label ForestLake:
             $ _layout_last_picture = _clara_forest_picture
         $ MainTxt = MainTxt + "\n\nУ воды вы замечаете Клариссу, которая, похоже, решила ненадолго скрыться от городской суеты."
     $ CurLocDesc = MainTxt
-    $ ForestSubroomSavedText = MainTxt
+    $ forest_room_set_saved_text(MainTxt, CurrentRoom)
     $ _forest_spawned = forest_room_spawn(ForestLakeRoom)
     if len(_forest_spawned) > 0:
         $ MainTxt = MainTxt + "\n\nПо берегу озера можно найти кое-что полезное."
         $ CurLocDesc = MainTxt
-        $ ForestSubroomSavedText = MainTxt
+        $ forest_room_set_saved_text(MainTxt, CurrentRoom)
     $ current_action_title = "Озеро"
     $ current_action_content = None
     $ current_action_items = []
-    call ForestSubroomBuildActions
-    $ _forest_lake_ui_return = None
-    while _forest_lake_ui_return is None:
-        call screen main_ui
-        $ _forest_lake_ui_return = _return
-    jump ForestLake
-
+    $ current_action_items = forest_subroom_action_items(CurrentRoom)
+    call screen main_ui
+    return
 

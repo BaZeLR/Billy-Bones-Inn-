@@ -139,7 +139,7 @@ testcase becky_dance_accept_home_order:
         time = 3
         hour = 20
         minute = 0
-        FridayDancesCount = 1
+        FridayDanceRoom.state["dance_count"] = 1
         DanceStep = 3
         DanceMaxIBD = 6
         HandsDance = "ass"
@@ -158,7 +158,7 @@ testcase becky_dance_accept_home_order:
     advance until screen "choice" timeout 20.0
     assert eval (str(CurLoc or "") == "BeckyHomeFront") timeout 5.0
     assert eval (str(ArriveMode or "") == "FromDances") timeout 5.0
-    assert eval (int(FridayDancesCount or 0) == 5) timeout 5.0
+    assert eval (int(FridayDanceRoom.state["dance_count"] or 0) == 5) timeout 5.0
     click "Зайти в дом" until eval (str(CurLoc or "") == "BeckyHome") timeout 20.0
     advance until screen "choice" timeout 20.0
     assert eval (str(CurLoc or "") == "BeckyHome") timeout 5.0
@@ -174,7 +174,7 @@ testcase friday_dance_find_becky_opens_becky_dance:
         time = 3
         hour = 20
         minute = 0
-        FridayDancesCount = 0
+        FridayDanceRoom.state["dance_count"] = 0
         DanceStep = 0
         BeckyVar["leftdances"] = 0
         Friends["becky"] = 20
@@ -185,7 +185,7 @@ testcase friday_dance_find_becky_opens_becky_dance:
     advance until screen "choice" timeout 20.0
     assert eval (str(CurLoc or "") == "FridayDance") timeout 5.0
     assert eval (int(DanceStep or 0) == 1) timeout 5.0
-    assert eval (int(FridayDancesCount or 0) == 1) timeout 5.0
+    assert eval (int(FridayDanceRoom.state["dance_count"] or 0) == 1) timeout 5.0
     run Jump("StreetTavern")
 '''
 

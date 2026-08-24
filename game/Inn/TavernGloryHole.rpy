@@ -1,4 +1,25 @@
-# ================================================================================
+    if navigation_only_mode_enabled():
+        "Вы находитесь в отдельной комнате трактира, где расположен глорихол."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Идти обратно в трактир":
+                jump TavernMain
+        return    if navigation_only_mode_enabled():
+        "Вы находитесь в отдельной комнате трактира, где расположен глорихол."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Идти обратно в трактир":
+                jump TavernMain
+        return    if navigation_only_mode_enabled():
+        "Вы находитесь в отдельной комнате трактира, где расположен глорихол."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Идти обратно в трактир":
+                jump TavernMain
+        return# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 6 python:
@@ -26,11 +47,26 @@ init 6 python:
 label TavernGloryHole:
     $ CurrentRoom = TavernGloryHoleRoom
     $ CurLoc = "TavernGloryHole"
-    $ location = CurLoc
     $ _layout_last_picture = TavernGloryHoleRoom.bg_picture
     if not tavern_glory_hole_available():
         "Отдельная комната пока недоступна. Сначала закажите и оплатите постройку."
         jump TavernMain
+    if navigation_only_mode_enabled():
+        "Вы находитесь в отдельной комнате трактира, где расположен глорихол."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Идти обратно в трактир":
+                jump TavernMain
+        return
+    if navigation_only_mode_enabled():
+        "Вы находитесь в отдельной комнате трактира, где расположен глорихол."
+        "[navigation_only_message()]"
+        "[navigation_only_time_note()]"
+        menu:
+            "Идти обратно в трактир":
+                jump TavernMain
+        return
     if navigation_only_mode_enabled():
         "Вы находитесь в отдельной комнате трактира, где расположен глорихол."
         "[navigation_only_message()]"
@@ -44,7 +80,7 @@ label TavernGloryHole:
             ClientsSaw = {}
         GirlNameTGH = get_random_girl_by_job("jobgloryhole")
 
-        GloryHoleLook = 0
+        player.tavern_management.glory_hole_look = 0
         GloryHoleCurrentStep = 0
         CockInGloryHole = 0
         GloryHoleInside = 0
@@ -115,6 +151,8 @@ label TavernGloryHole:
 
             _real_name = RealName.get(GirlNameTGH, GirlNameTGH)
             _real_name2 = RealName2.get(GirlNameTGH, _real_name)
+            _tgh_info = getPersonInfo(GirlNameTGH)
+            _tgh_pregnancy_days = _tgh_info.pregnancy_days() if _tgh_info is not None else 0
 
             GloryGirlLine0 = _real_name + " сидит за ширмой на скамеечке в ожидании клиентов. Подол юбки задран до пояса, полностью открывая киску. Панталончиков прелестница либо не носит, либо сняла как лишнее препятствие."
             if pregnancy.get(GirlNameTGH, 0) > 120:
@@ -140,35 +178,35 @@ label TavernGloryHole:
                 GloryGirlLine3 += "."
 
             if CheckIfSexEventExist(GirlNameTGH, _time_now) > 0 and procedural_randint(1, 2, key="procedural:Inn/TavernGloryHole.rpy:sex_event") == 1 and AmandaAtGlory == 0:
-                GloryHoleLook = GetSexEventFromTable(GirlNameTGH, _time_now)
+                player.tavern_management.glory_hole_look = GetSexEventFromTable(GirlNameTGH, _time_now)
                 ClientsSaw[GirlNameTGH] = ClientsSaw.get(GirlNameTGH, 0) + 1
 
-                if GloryHoleLook == 1:
+                if player.tavern_management.glory_hole_look == 1:
                     GloryLine1 = "За занавеской вы увидели мастера Драупнира. Видимо низкая цена все-таки привлекла экономного гнома. Расстегнув штаны на помочах, мастер Драупнир извлек свой инструмент. Оный инструмент был как сам гном - очень толстый, но не очень длиный. Встав, в силу невысокого роста, на приступочку, мастер Драупнир направил свой агрегат в дырку."
                     GloryLine2 = "Мастер Драупнир наслаждается происходящим, беря максимум удовольствия за свои деньги. Пока кто-то обрабатывает член через дырку, гном блаженно улыбается."
                     GloryLine3 = "Гном вдруг замер, и судя, по всему кончил. Ну а затем он застегнул штаны и отправился восвояси."
                     PregnancyCheck(GirlNameTGH, "inside" if GloryHoleInside else "mouth", 1, "Мастер Драупнир")
-                elif GloryHoleLook == 2:
+                elif player.tavern_management.glory_hole_look == 2:
                     GloryLine1 = "За занавеской вы увидели своего старого знакомца - рыжего Эдди. Немного нервничая, Эдди смело расстегивает штаны и сует свое достоинство прямо в дырку."
                     GloryLine2 = "Эдди кайфует, пока с той стороны ему делают отсос а может и кое-чего покруче."
                     GloryLine3 = "Эдди кончил и, застегнув штаны, отправился восвояси."
                     PregnancyCheck(GirlNameTGH, "inside" if GloryHoleInside else "mouth", 1, "Эдди")
-                elif GloryHoleLook == 3:
+                elif player.tavern_management.glory_hole_look == 3:
                     GloryLine1 = "За занавеской вы увидели месье Легаре. Женатый, но похотливый винторговец в который уже раз решил обратиться к продажной любви. Приспустив штаны он сунул свой длинный и тонкий член прямо в дырку."
                     GloryLine2 = "Месье Легаре слегка поставнывает, пока кто-то с той стороны занимается его сокровищем."
                     GloryLine3 = "Месье Легаре извергся и, подтянув штаны, вернулся в главную залу."
                     PregnancyCheck(GirlNameTGH, "inside" if GloryHoleInside else "mouth", 1, "Месье Легаре")
-                elif GloryHoleLook == 4:
+                elif player.tavern_management.glory_hole_look == 4:
                     GloryLine1 = "За занавеской вы увидели достойного отца Герхарда. Осенив глорихол знаком Ильматера, он приподнял сутану и, ничтоже сумняшись, сунул своего грешника прямо в дырку."
                     GloryLine2 = "Отец Герхард бормочет толи благословения, толи молитвы, пока с той стороны кто-то, несомненно с благославения Ильматера, пытается уложить его вставшего грешника."
                     GloryLine3 = "Отец Герхард закончил, благословил свою невидимую прихожанку, опустил сутану и отправился дальше нести слово великого Ильматера."
                     PregnancyCheck(GirlNameTGH, "inside" if GloryHoleInside else "mouth", 1, "Отец Герхард")
-                elif 5 <= GloryHoleLook <= 7:
+                elif 5 <= player.tavern_management.glory_hole_look <= 7:
                     GloryLine1 = "За занавеской полупьяный морской волк сунул своего волчонка прямо в дырку."
                     GloryLine2 = "Моряк наслаждается процессом, не обращая внимание на окружающее."
                     GloryLine3 = "Морячок кончил, и пошел восвояси, может к себе на корабль, а может гулять дальше."
                     PregnancyCheck(GirlNameTGH, "inside" if GloryHoleInside else "mouth", 1, "", 1, "Неизвестный моряк")
-                elif 8 <= GloryHoleLook <= 10:
+                elif 8 <= player.tavern_management.glory_hole_look <= 10:
                     GloryLine1 = "За занавеской городской стражник расстегнул форменные штаны и сунул свой член прямо в дырку."
                     GloryLine2 = "Страж порядка громко стонет от наслаждения."
                     GloryLine3 = "Слуга закона кончил, и пошел обратно на улицы, ловить воров и грабителей."
@@ -189,7 +227,7 @@ label TavernGloryHole:
             call ShowImage("gloryhole", "", "glory1")
 
         menu:
-            "Смотреть на клиента" if GloryHoleLook > 0 and GloryHoleCurrentStep <= 3 and BlockGloryHoleMenu == 0:
+            "Смотреть на клиента" if player.tavern_management.glory_hole_look > 0 and GloryHoleCurrentStep <= 3 and BlockGloryHoleMenu == 0:
                 if GloryHoleCurrentStep == 0:
                     "Вспомнив про сделанную мастеровитым гномом возможность обзора, вы решили посмотреть на происходящее инкогнито."
                 else:
@@ -205,7 +243,7 @@ label TavernGloryHole:
                 $ GloryHoleCurrentStep += 1
                 if GloryHoleCurrentStep >= 3:
                     $ GloryHoleCurrentStep = 0
-                    $ GloryHoleLook = 0
+                    $ player.tavern_management.glory_hole_look = 0
 
                 if renpy.has_label("ShowImage"):
                     call ShowImage("gloryhole", "", "gloryclient")
@@ -213,12 +251,12 @@ label TavernGloryHole:
 
             "Смотреть на девочку" if CockInGloryHole == 0 and BlockGloryHoleMenu == 0:
                 
-                if GloryHoleCurrentStep == 0 or GloryHoleLook == 0:
+                if GloryHoleCurrentStep == 0 or player.tavern_management.glory_hole_look == 0:
                     "Вы решили аккуратно заглянуть за ширмочку и посмотреть на девочку за работой."
                 else:
                     "Вы продолжаете дальше смотреть, как работает очаровательная [RealName.get(GirlNameTGH, GirlNameTGH)]."
 
-                if GloryHoleLook == 0:
+                if player.tavern_management.glory_hole_look == 0:
                     "[GloryGirlLine0]"
                 elif GloryHoleCurrentStep == 0:
                     "[GloryGirlLine1]"
@@ -227,15 +265,15 @@ label TavernGloryHole:
                 else:
                     "[GloryGirlLine3]"
 
-                if GloryHoleLook:
+                if player.tavern_management.glory_hole_look:
                     $ GloryHoleCurrentStep += 1
                     if GloryHoleCurrentStep >= 3:
                         $ GloryHoleCurrentStep = 0
-                        $ GloryHoleLook = 0
+                        $ player.tavern_management.glory_hole_look = 0
 
                 if AmandaAtGlory == 1:
                     $ BlockGloryHoleMenu = 1
-                    $ AmandaGloryCurState = 1
+                    $ Amanda.set_var_int("glory_cur_state", 1)
                     $ Amanda.set_var_int("glorysdiscover", 1)
                     "Ваша реакция?"
                     if renpy.has_label("ShowImage"):
@@ -249,7 +287,7 @@ label TavernGloryHole:
                         call ShowImage("gloryhole", "", "glory1")
                 jump TavernGloryHole_menu
 
-            "Вставить член" if CockInGloryHole == 0 and GloryHoleLook == 0 and cametoday < cancumdaily and GloryHoleCurrentStep == 0 and BlockGloryHoleMenu == 0:
+            "Вставить член" if CockInGloryHole == 0 and player.tavern_management.glory_hole_look == 0 and player.intimacy.came_today < player.intimacy.can_cum_daily and GloryHoleCurrentStep == 0 and BlockGloryHoleMenu == 0:
                 
                 python:
                     _set_gloryhole_inside()
@@ -262,7 +300,7 @@ label TavernGloryHole:
                     call ShowImage("gloryhole", "", "gloryyou")
                 jump TavernGloryHole_menu
 
-            "Наслаждаться процессом" if CockInGloryHole == 1 and GloryHoleLook == 0 and cametoday < cancumdaily and GloryHoleCurrentStep == 1 and BlockGloryHoleMenu == 0:
+            "Наслаждаться процессом" if CockInGloryHole == 1 and player.tavern_management.glory_hole_look == 0 and player.intimacy.came_today < player.intimacy.can_cum_daily and GloryHoleCurrentStep == 1 and BlockGloryHoleMenu == 0:
                 
                 "[GloryHoleYouLine2]"
                 if GloryHoleWorks:
@@ -271,7 +309,7 @@ label TavernGloryHole:
                     call ShowImage("gloryhole", "", "gloryyou")
                 jump TavernGloryHole_menu
 
-            "Кончить" if CockInGloryHole == 1 and GloryHoleLook == 0 and cametoday < cancumdaily and GloryHoleCurrentStep == 2 and BlockGloryHoleMenu == 0:
+            "Кончить" if CockInGloryHole == 1 and player.tavern_management.glory_hole_look == 0 and player.intimacy.came_today < player.intimacy.can_cum_daily and GloryHoleCurrentStep == 2 and BlockGloryHoleMenu == 0:
                 
                 "[GloryHoleYouLine3]"
                 if GloryHoleWorks:
@@ -283,7 +321,7 @@ label TavernGloryHole:
                     python:
                         Amanda.pregnancy_check("mouthface", 1, "Вы")
                     $ Amanda.set_var_int("glorysuck", 1)
-                    $ AmandaGloryCurState = 4
+                    $ Amanda.set_var_int("glory_cur_state", 4)
                 else:
                     python:
                         PregnancyCheck(
@@ -299,7 +337,7 @@ label TavernGloryHole:
             "Что-то не то, проверить кто у глорихола" if AmandaAtGlory == 1 and BlockGloryHoleMenu == 0 and CockInGloryHole == 1:
                 
                 "[GloryGirlLine1]"
-                $ AmandaGloryCurState = 2
+                $ Amanda.set_var_int("glory_cur_state", 2)
                 $ BlockGloryHoleMenu = 1
                 "Ваша реакция?"
                 if renpy.has_label("ShowImage"):

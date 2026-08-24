@@ -38,7 +38,7 @@ label event_waitress_harrass(eyewitness=0):
             else:
                 $ CurEventDesc += str(_part2_result or "")
             $ tavern_event_panel_raw_text = _normalize_tavern_event_text(CurEventDesc)
-            $ Result = format_tavern_event_text(tavern_event_panel_raw_text)
+        $ Result = format_tavern_event_text(tavern_event_panel_raw_text)
 
     if not girl_name:
         $ tavern_event_panel_raw_text = _normalize_tavern_event_text(CurEventDesc)

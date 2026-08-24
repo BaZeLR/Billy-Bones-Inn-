@@ -3,11 +3,10 @@
 # ================================================================================
 init 6 python:
     def backyard_has_ash_barrel():
-        return int(SoapAshBarrelInstalled or 0) == 1
+        return bool(crafting.ash_barrel_installed)
 
     def backyard_has_dog_booth():
         try:
-            ensure_dog_runtime()
             return bool(getattr(dog, "booth_built", False))
         except Exception:
             return False
@@ -36,10 +35,10 @@ init 6 python:
         return str(BackyardRoom.bg_picture or "")
 
     def player_has_plain_soap():
-        return player_state().item_count("soap_001") > 0
+        return player.item_count("soap_001") > 0
 
     def player_has_luxury_soap():
-        return player_state().item_count("luxury_soap_001") > 0
+        return player.item_count("luxury_soap_001") > 0
 
     def backyard_base_text():
         return "Вы выходите на задний двор трактира. Здесь грязь, лужи, следы копыт и старые доски под ногами. У стены стоит большая бочка с дождевой водой, рядом темнеет маленькое кострище, на веревке болтается выстиранное белье, а у забора растут кусты и старый дуб. В углу притулился кривой деревянный нужник.\n\nСтарый дуб нависает над частью двора и дает немного тени. Под ногами хлюпает разбитая грязь, в которой отпечатались сапоги, копыта и волочившиеся мешки. Колючие кусты вдоль забора цепляются за одежду и собирают на себя пыль, перья и всякий мелкий сор."
@@ -159,7 +158,6 @@ label Backyard:
     $ dog_prepare_current_spawn()
     $ CurrentRoom = BackyardRoom
     $ CurLoc = "Backyard"
-    $ location = CurLoc
     call RoomEnterEventGate(CurLoc, False)
     $ scene_image = backyard_dynamic_picture() or CurrentRoom.bg_picture or None
     if scene_image:
@@ -168,31 +166,11 @@ label Backyard:
         $ _layout_last_picture = ""
     $ MainTxt = backyard_dynamic_text()
     $ CurLocDesc = MainTxt
-    $ BackyardSavedText = MainTxt
     $ current_action_title = "Задний двор"
     $ current_action_content = None
-    $ current_action_items = []
-    call BackyardBuildActions
-    $ _backyard_ui_return = None
-    while _backyard_ui_return is None:
+    $ current_action_items = backyard_action_items()
+    while True:
         call screen main_ui
-        $ _backyard_ui_return = _return
-    jump Backyard
-
-
-label BackyardBuildActions:
-    $ BackyardSavedText = backyard_dynamic_text()
-    $ current_action_title = "Задний двор"
-    $ current_action_content = None
-    $ current_action_items = []
-    if player_can_train_shooting():
-        $ current_action_items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", "Backyard")))
-    python:
-        for _yard_object in BackyardRoom.visible_objects():
-            current_action_items.append(MenuItem(_yard_object.name, Call("BackyardObjectMenu", _yard_object.object_id)))
-        for _yard_exit in BackyardRoom.visible_exits():
-            current_action_items.append(MenuItem(_yard_exit.label, Call("AdvanceMovementTime", _yard_exit.target)))
-    return
 
 
 label BackyardObjectMenu(object_id="", refresh_only=False):
@@ -269,7 +247,6 @@ label BackyardToiletExamine:
 
 label BackyardWashAtBarrel:
     $ player_state().appearance.wash()
-    $ player_state().appearance.apply_to_store()
     $ _layout_last_picture = "images/tavern/backyard/washing_MC.png"
     $ MainTxt = "Вы умываетесь и наскоро обмываетесь холодной дождевой водой из бочки. Это освежает и помогает привести себя в порядок."
     $ CurLocDesc = MainTxt
@@ -279,14 +256,13 @@ label BackyardWashAtBarrel:
 
 label BackyardWashAtBarrelWithSoap(soap_id="soap_001"):
     $ _soap_id = str(soap_id or "soap_001").strip()
-    if player_state().item_count(_soap_id) <= 0:
+    if player.item_count(_soap_id) <= 0:
         $ MainTxt = "У вас нет подходящего мыла."
         $ CurLocDesc = MainTxt
         call BackyardObjectMenu("backyard_water_barrel", True)
         return
-    $ player_state().remove_item(_soap_id, 1)
-    $ player_state().appearance.wash()
-    $ player_state().appearance.apply_to_store()
+    $ player.remove_item(_soap_id, 1)
+    $ player.appearance.wash()
     $ _layout_last_picture = "images/tavern/backyard/washing_MC.png"
     if _soap_id == "luxury_soap_001":
         $ player_state().change_stat("look", 3)
@@ -296,6 +272,28 @@ label BackyardWashAtBarrelWithSoap(soap_id="soap_001"):
         $ MainTxt = "Вы моетесь у бочки с куском обычного мыла. Холодная дождевая вода быстро смывает грязь, а мыло помогает привести себя в более приличный вид."
     $ CurLocDesc = MainTxt
     call BackyardObjectMenu("backyard_water_barrel", True)
+    return
+
+
+label BackyardRestore:
+    $ BackyardSavedText = backyard_dynamic_text()
+    $ MainTxt = BackyardSavedText
+    $ CurLocDesc = MainTxt
+    $ scene_image = backyard_dynamic_picture() or CurrentRoom.bg_picture or None
+    if scene_image:
+        $ _layout_last_picture = scene_image
+    call BackyardBuildActions
+    return
+
+
+label BackyardRestore:
+    $ BackyardSavedText = backyard_dynamic_text()
+    $ MainTxt = BackyardSavedText
+    $ CurLocDesc = MainTxt
+    $ scene_image = backyard_dynamic_picture() or CurrentRoom.bg_picture or None
+    if scene_image:
+        $ _layout_last_picture = scene_image
+    call BackyardBuildActions
     return
 
 
@@ -328,3 +326,5 @@ label BackyardInspectDogBooth:
     $ CurLocDesc = MainTxt
     call BackyardObjectMenu("backyard_dog_booth", True)
     return
+
+

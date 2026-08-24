@@ -1,4 +1,12 @@
-# ================================================================================
+label DressForNight(girl_name, mode):
+    call dress_for_night(girl_name, mode)
+    returnlabel DressForNight(girl_name, mode):
+    call dress_for_night(girl_name, mode)
+    $ bodymodel_sync_character(girl_name)
+    returnlabel DressForNight(girl_name, mode):
+    call dress_for_night(girl_name, mode)
+    $ bodymodel_sync_character(girl_name)
+    return# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # DressForNight.rpy
@@ -8,29 +16,27 @@
 label dress_for_night(girl_name, mode):
     # mode: 0 = nightshirt, 1 = panties, 2 = naked
     $ girl_name = str(girl_name or "").strip()
-    if girl_name in peopleInfo:
-        $ peopleInfo[girl_name].publish_wardrobe_state()
-    $ legs[girl_name] = ''
-    $ shoes[girl_name] = ''
-    $ topraised[girl_name] = 0
-    $ bottomraised[girl_name] = 0
-    $ bra[girl_name] = ''
-    if mode <= 1:
-        $ panties[girl_name] = pantiesdef[girl_name]
-    else:
-        $ panties[girl_name] = ''
+    $ _night_girl = getPersonInfo(girl_name)
+    if _night_girl is None:
+        $ bodymodel_sync_character(girl_name)
+    return
+    $ _night_state = _night_girl.sex_clothing_state()
+    $ _night_girl.reset_sex_clothing_state()
+    $ _night_state["bra_removed"] = 1
+    $ _night_state["panties_removed"] = 1 if int(mode or 0) >= 2 else 0
     if mode == 0:
-        $ topdress[girl_name] = DressTopPart['nightshirt']
-        $ bottomdress[girl_name] = DressBottomPart['nightshirt']
+        $ _night_state["dress_override"] = "nightshirt"
     else:
-        $ topdress[girl_name] = ''
-        $ bottomdress[girl_name] = ''
-    $ bodymodel_sync_character(girl_name)
+        $ _night_state["dress_override"] = ""
     return
 
 # Usage: call dress_for_night('liza', 0)  # 0=nightshirt, 1=panties, 2=naked
 
 
-label DressForNight(girl_name, mode):
-    call dress_for_night(girl_name, mode)
-    return
+
+
+
+
+
+
+

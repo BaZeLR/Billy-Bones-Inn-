@@ -1,15 +1,26 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
-init python:
-    import renpy.exports as renpy
-
     for _dress_runtime_helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
         try:
             if hasattr(renpy.store, _dress_runtime_helper_name):
                 delattr(renpy.store, _dress_runtime_helper_name)
         except Exception:
             pass
+        dressup_prune_legacy_runtime_helpers()        bodymodel_sync_character(GirlNameDress)    for _dress_runtime_helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
+        try:
+            if hasattr(renpy.store, _dress_runtime_helper_name):
+                delattr(renpy.store, _dress_runtime_helper_name)
+        except Exception:
+            pass
+        dressup_prune_legacy_runtime_helpers()        bodymodel_sync_character(GirlNameDress)    for _dress_runtime_helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
+        try:
+            if hasattr(renpy.store, _dress_runtime_helper_name):
+                delattr(renpy.store, _dress_runtime_helper_name)
+        except Exception:
+            pass
+        dressup_prune_legacy_runtime_helpers()        bodymodel_sync_character(GirlNameDress)# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+init python:
+    import renpy.exports as renpy
 
     def dressup_ensure_dress_catalog_entry(code):
         key = str(code or "").strip()
@@ -44,12 +55,29 @@ init python:
                 pass
 
 
+    def dressup_prune_legacy_runtime_helpers():
+        for helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
+            try:
+                if hasattr(renpy.store, helper_name):
+                    delattr(renpy.store, helper_name)
+            except Exception:
+                pass
+
+
+    def dressup_prune_legacy_runtime_helpers():
+        for helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
+            try:
+                if hasattr(renpy.store, helper_name):
+                    delattr(renpy.store, helper_name)
+            except Exception:
+                pass
+
+
 label DressUp(GirlNameDress="", IsNewDayForDress=0):
     $ GirlNameDress = str(GirlNameDress or "").strip()
     if not GirlNameDress:
         return
     python:
-        dressup_prune_legacy_runtime_helpers()
         try:
             topdressdef
         except NameError:
@@ -89,6 +117,8 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
             TmpDressSelect = 0
             TmpDressSelectMaxCur = -10000
 
+            _dress_girl_info = getPersonInfo(GirlNameDress)
+            _dress_girl_info = getPersonInfo(GirlNameDress)
             _dress_girl_info = getPersonInfo(GirlNameDress)
             girl_slut = int(getattr(_dress_girl_info, "corruption", 0) or 0) if _dress_girl_info is not None else 0
             if girl_slut >= 70:
@@ -155,6 +185,8 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
 
             DecideNoPanties = 0
             cur_default = dressdefault.get(GirlNameDress, "")
+            cur_default = dressdefault.get(GirlNameDress, "")
+            cur_default = dressdefault.get(GirlNameDress, "")
             cur_bottom = DressBottomPart.get(cur_default, "")
             cur_top = DressTopPart.get(cur_default, "")
 
@@ -178,38 +210,22 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
             if girl_slut < 71 and procedural_randint(1, 4, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:177:7") == 1:
                 DecideNoBra = 0
 
-            bradef[GirlNameDress] = ""
-            pantiesdef[GirlNameDress] = ""
-            legsdef[GirlNameDress] = ""
+            _dress_underwear["bra"] = ""
+            _dress_underwear["panties"] = ""
+            _dress_underwear["legs"] = ""
 
             if len(TMPStockingsArray) > 0:
-                legsdef[GirlNameDress] = TMPStockingsArray[procedural_randint(0, len(TMPStockingsArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:185:8")]
+                _dress_underwear["legs"] = TMPStockingsArray[procedural_randint(0, len(TMPStockingsArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:185:8")]
             if len(TMPBraArray) > 0 and DecideNoBra == 0:
-                bradef[GirlNameDress] = TMPBraArray[procedural_randint(0, len(TMPBraArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:187:9")]
+                _dress_underwear["bra"] = TMPBraArray[procedural_randint(0, len(TMPBraArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:187:9")]
             if len(TMPPantiesArray) > 0 and DecideNoPanties == 0:
-                pantiesdef[GirlNameDress] = TMPPantiesArray[procedural_randint(0, len(TMPPantiesArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:189:10")]
+                _dress_underwear["panties"] = TMPPantiesArray[procedural_randint(0, len(TMPPantiesArray) - 1, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:189:10")]
 
-        cur_default = dressdefault.get(GirlNameDress, "")
+        _dress_wardrobe["current_dress"] = cur_default
         dressup_ensure_dress_catalog_entry(cur_default)
         dressup_ensure_dress_parts(cur_default)
-        topdressdef[GirlNameDress] = DressTopPart.get(cur_default, "")
-        bottomdressdef[GirlNameDress] = DressBottomPart.get(cur_default, "")
-
-        topdress[GirlNameDress] = topdressdef.get(GirlNameDress, "")
-        bottomdress[GirlNameDress] = bottomdressdef.get(GirlNameDress, "")
-        bra[GirlNameDress] = bradef.get(GirlNameDress, "")
-        panties[GirlNameDress] = pantiesdef.get(GirlNameDress, "")
-        legs[GirlNameDress] = legsdef.get(GirlNameDress, "")
-        shoes[GirlNameDress] = shoesdef.get(GirlNameDress, "")
-        dressup_ensure_dress_catalog_entry(bradef.get(GirlNameDress, ""))
-        dressup_ensure_dress_catalog_entry(pantiesdef.get(GirlNameDress, ""))
-        dressup_ensure_dress_catalog_entry(legsdef.get(GirlNameDress, ""))
-        topraised[GirlNameDress] = 0
-        bottomraised[GirlNameDress] = 0
-        bodymodel_sync_character(GirlNameDress)
-    return
-
-
-label dress_up(girl_name="", is_new_day_for_dress=0):
-    call DressUp(girl_name, is_new_day_for_dress)
+        dressup_ensure_dress_catalog_entry(_dress_underwear.get("bra", ""))
+        dressup_ensure_dress_catalog_entry(_dress_underwear.get("panties", ""))
+        dressup_ensure_dress_catalog_entry(_dress_underwear.get("legs", ""))
+        _dress_girl_info.reset_sex_clothing_state()
     return

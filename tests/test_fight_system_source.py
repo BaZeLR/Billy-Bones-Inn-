@@ -127,8 +127,8 @@ def test_fight_click_runner_uses_current_fight_object_state():
     assert "FightWeaponLoaded" not in runner
     assert "FightLoadedAmmo" not in runner
     assert "PlayerFightSupply" not in runner
-    assert "fight_info().enemy_party" in runner
-    assert "fight_info().enemy_id" in runner
+    assert "fight.enemy_party" in runner
+    assert "fight.enemy_id" in runner
 
 
 def test_fight_has_explicit_flow_labels_and_escape_actions():
@@ -137,7 +137,7 @@ def test_fight_has_explicit_flow_labels_and_escape_actions():
 
     assert "label FightStart(" in source
     assert "$ Fight.begin(" not in source
-    assert "$ fight_info().begin(enemy_id, enemy_count, CurLoc, \"images/forest/forest_1.png\")" in source
+    assert "$ fight.begin(enemy_id, enemy_count, CurLoc, \"images/forest/forest_1.png\")" in source
     assert "label FightStartHuntCurrentRoom:" in source
     assert "label FightDoAction(action_code=\"\"):" in source
     assert "label FightEnd:" in source

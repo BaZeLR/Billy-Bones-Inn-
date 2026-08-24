@@ -3,6 +3,10 @@
 # ================================================================================
 default GirlDecisionLast = {}
 
+default GirlDecisionLast = {}
+
+default GirlDecisionLast = {}
+
 init -34 python:
     import math
 
@@ -215,12 +219,12 @@ init -34 python:
         girl = str(girl_name or "").strip().lower()
         score = 0.0
         try:
-            if int(HouseholdSoapSampleGiven.get(girl, 0) or 0) > 0:
+            if int(crafting.soap_sample_given.get(girl, 0) or 0) > 0:
                 score += 0.35
         except Exception:
             pass
         try:
-            if int(SoapRequestQueue.get(girl, 0) or 0) > 0:
+            if int(crafting.soap_requests.get(girl, 0) or 0) > 0:
                 score += 0.25
         except Exception:
             pass
@@ -240,7 +244,7 @@ init -34 python:
         except Exception:
             pass
         try:
-            if int(ChurchDonatedToday or 0) > 0:
+            if int(player.economy.church_donated_today or 0) > 0:
                 score += 0.15
             score += min(0.35, max(0.0, float(girl_decision_int(ChurchDonatedAmount, 0)) / 1000.0))
         except Exception:
@@ -267,7 +271,7 @@ init -34 python:
         except Exception:
             pass
         try:
-            if int(SoapRequestQueue.get(girl, 0) or 0) > 0:
+            if int(crafting.soap_requests.get(girl, 0) or 0) > 0:
                 score += 0.25
         except Exception:
             pass

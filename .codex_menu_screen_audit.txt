@@ -1,0 +1,121 @@
+game\Forest\ForestWaterfall.rpy:53:    call screen main_ui
+game\Forest\ForestLake.rpy:57:    call screen main_ui
+game\Forest\ForestDarkWoods.rpy:53:    call screen main_ui
+game\Forest\ForestCave.rpy:58:    call screen main_ui
+game\Utilities\Time\NextDay.rpy:270:    call screen nextday_report_card_overlay
+game\script.rpy:574:    call screen splash_screen
+game\script.rpy:586:        call screen cinematic_intro(intro_data) with dissolve
+game\script.rpy:602:        call screen cinematic_intro(intro_data) with dissolve
+game\Forest\ForestSpring.rpy:58:    call screen main_ui
+game\Forest\ForestClearing.rpy:59:    call screen main_ui
+game\Forest\ForestHiddenPath.rpy:52:    call screen main_ui
+game\Forest\Forest.rpy:377:    call screen main_ui
+game\screens.rpy:277:screen choice_panel(items, label=None):
+game\screens.rpy:287:screen choice(items, label=None, menu_name=None):
+game\screens.rpy:292:            on "show" action Show("main_ui")
+game\screens.rpy:377:screen quick_menu():
+game\screens.rpy:389:            textbutton ui_tr("History") action ShowMenu('history')
+game\screens.rpy:392:            textbutton ui_tr("Save") action ShowMenu('save')
+game\screens.rpy:395:            textbutton ui_tr("Prefs") action ShowMenu('preferences')
+game\screens.rpy:441:            textbutton ui_tr("History") action ShowMenu("history")
+game\screens.rpy:443:            textbutton ui_tr("Save") action ShowMenu("save")
+game\screens.rpy:445:        textbutton ui_tr("Load") action ShowMenu("load")
+game\screens.rpy:447:        textbutton ui_tr("Preferences") action ShowMenu("preferences")
+game\screens.rpy:457:        textbutton ui_tr("About") action ShowMenu("about")
+game\screens.rpy:465:            textbutton ui_tr("Help") action ShowMenu("help")
+game\screens.rpy:491:screen main_menu():
+game\screens.rpy:520:            textbutton "Load" action ShowMenu("load")
+game\screens.rpy:570:screen game_menu(title, scroll=None, yinitial=0.0):
+game\screens.rpy:636:        key "game_menu" action ShowMenu("main_menu")
+game\screens.rpy:638:screen game_menu_orig(title, scroll=None, yinitial=0.0):
+game\screens.rpy:702:        key "game_menu" action ShowMenu("main_menu")
+game\screens.rpy:1349:screen confirm(message, yes_action, no_action):
+game\screens.rpy:1628:screen quick_menu():
+game\screens.rpy:1642:            textbutton ui_tr("Menu") action ShowMenu()
+game\Inn\TavernUpstairs.rpy:70:    call screen main_ui
+game\Inn\TavernStorage.rpy:94:    call screen main_ui
+game\Inn\TavernStable.rpy:174:    call screen main_ui
+game\Inn\TavernSandraRoom.rpy:106:        call screen main_ui
+game\Inn\TavernSandraRoom.rpy:123:    call screen main_ui
+game\Inn\TavernMyRoom.rpy:180:    call screen main_ui
+game\Inn\TavernMelissaRoom.rpy:100:    call screen main_ui
+game\Inn\TavernMain.rpy:387:    call screen main_ui
+game\NPC\Secondary\SherwoodTravel.rpy:82:    call screen main_ui
+game\Inn\TavernKitchen.rpy:415:    call screen main_ui
+game\Utilities\General\Clothes\DressNoShow.rpy:47:label DressNoShow(girl_name_dns):
+game\Inn\TavernEmptyRoom.rpy:84:    call screen main_ui
+game\Utilities\General\Screens\main_layout.rpy:312:screen current_action_panel():
+game\Utilities\General\Screens\main_layout.rpy:335:screen main_ui_hud_button(caption, action_value, selected_value=False, button_id=""):
+game\Utilities\General\Screens\main_layout.rpy:438:        key "game_menu" action ShowMenu("save")
+game\Utilities\General\Screens\main_layout.rpy:715:screen main_ui_talk_panel(girl_name="", room_name="", desc=""):
+game\Utilities\General\Screens\StoryThreadBoard.rpy:518:    textbutton "Help" action Show("story_board_help"):
+game\Utilities\General\Screens\StoryThreadBoard.rpy:543:                    action [Hide("story_thread_board"), Show("story_thread_board", None, _person)]
+game\Utilities\General\Screens\StoryThreadBoard.rpy:565:                            hovered Show("story_thread_screen", None, _tinfo)
+game\Utilities\General\Screens\StoryThreadBoard.rpy:574:                                    hovered Show("story_event_screen", None, _tinfo, _idx, _tinfo.getevent(_idx))
+game\Inn\TavernAtic.rpy:105:    call screen main_ui
+game\Inn\TavernAmandaRoom.rpy:291:        call screen main_ui
+game\Inn\TavernAmandaRoom.rpy:309:    call screen main_ui
+game\Utilities\General\Screens\PlayerCard.rpy:1103:        call screen main_ui as player_card_fixed_target_interaction
+game\Utilities\General\Screens\PlayerCard.rpy:1137:            call screen main_ui as player_card_fixed_target_interaction
+game\Utilities\General\Screens\PlayerCard.rpy:1150:        call screen main_ui as player_card_fixed_target_interaction
+game\Utilities\Fight\FightSystemRuntime.rpy:1423:        call screen main_ui
+game\Utilities\Fight\FightScreen.rpy:86:screen fight_action_panel():
+game\Inn\Backyard.rpy:179:    call screen main_ui
+game\Inn\Shed.rpy:165:    call screen main_ui
+game\Inn\menu_tavernstat.rpy:799:    show screen tavern_report_card_overlay(return_label)
+game\Inn\menu_tavernstat.rpy:811:    show screen tavern_report_card_overlay(return_label)
+game\Town\WineStore.rpy:153:        call screen main_ui
+game\Town\WineStore.rpy:166:    call screen main_ui
+game\Town\GroceryStore.rpy:230:        call screen main_ui
+game\Town\GroceryStore.rpy:266:    call screen main_ui
+game\Town\StolyarWorkshop.rpy:101:        call screen main_ui
+game\Town\StolyarWorkshop.rpy:109:        call screen main_ui
+game\Town\StolyarWorkshop.rpy:136:    call screen main_ui
+game\Town\CityGuard.rpy:103:    call screen main_ui
+game\Town\BeckyHome.rpy:211:    call screen main_ui
+game\Town\BeckyHome.rpy:222:    call screen main_ui
+game\Utilities\General\Common\AchievementsEndings.rpy:200:    call screen tractir_result_card_overlay(tractir_progress.ending_title, tractir_progress.ending_body)
+game\Town\RandomTownEvents.rpy:778:    call screen main_ui
+game\Town\PortStreets.rpy:119:    call screen main_ui
+game\Town\Arts\ArtisansQuarter.rpy:99:    call screen main_ui
+game\Town\Arts\BarberShop.rpy:167:        call screen main_ui
+game\Town\Arts\BarberShop.rpy:173:    call screen main_ui
+game\Town\Church\Church.rpy:288:    call screen main_ui
+game\Town\HunterClub.rpy:505:        call screen main_ui
+game\Town\HunterClub.rpy:521:    call screen main_ui
+game\Town\Temple\EllonaTemple.rpy:109:    call screen main_ui
+game\Town\Temple\EllonaTemple.rpy:134:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1376:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1396:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1426:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1453:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1472:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1501:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1516:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1532:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1548:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1564:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1598:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1610:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1626:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1642:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1658:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1675:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1696:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1713:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1738:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1757:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1775:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1792:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1810:    call screen main_ui
+game\Utilities\General\Common\DebugTools.rpy:1834:    call screen main_ui
+game\Town\StreetTavern.rpy:149:    call screen main_ui
+game\Town\Market\MarketPlace.rpy:135:        call screen main_ui
+game\Town\Market\MarketPlace.rpy:150:        call screen main_ui
+game\Town\Market\MarketPlace.rpy:183:    call screen main_ui
+game\Town\Arts\Dress\DressShop.rpy:129:        call screen main_ui
+game\Town\Arts\Dress\DressShop.rpy:141:    call screen main_ui
+game\Town\Arts\Dress\DressShop.rpy:158:        show screen dress_shop_female_catalog_overlay
+game\Town\Arts\Dress\DressShop.rpy:161:        show screen dress_shop_male_catalog_overlay
+game\Town\Arts\Dress\DressShop.rpy:183:        show screen dress_shop_male_catalog_overlay
+game\NPC\Girls\Common\GirlDressBuy.rpy:57:    call screen main_ui

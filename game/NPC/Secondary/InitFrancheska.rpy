@@ -1,7 +1,45 @@
+            self.promote_from_var(self.var)
+
+label _auto_register_francheska:
+    call register_francheska_secondary from _call_francheska_reg
+    return            self.promote_from_var(self.var)
+
+label _auto_register_francheska:
+    call register_francheska_secondary from _call_francheska_reg
+    return            self.promote_from_var(self.var)
+
+label _auto_register_francheska:
+    call register_francheska_secondary from _call_francheska_reg
+    returndefault FranVar = {}
+default FranBusy = {}
+
+default FranVar = {}
+default FranBusy = {}
+
 default FranVar = {}
 default FranBusy = {}
 
 init python:
+    if 'FranVar' not in dir() or not isinstance(FranVar, dict):
+        FranVar = {}
+    for k, v in {
+        "meet": 0, "ellonaask": 0, "graceask": 0, "conchitaask": 0,
+        "dukeask": 0, "starkask": 0, "stateask": 0, "kingask": 0,
+        "rebelask": 0, "alienask": 0, "lasttalkday": -1,
+        "sunday_stories_seen_day": -1,
+    }.items():
+        FranVar.setdefault(k, v)
+
+    if 'FranVar' not in dir() or not isinstance(FranVar, dict):
+        FranVar = {}
+    for k, v in {
+        "meet": 0, "ellonaask": 0, "graceask": 0, "conchitaask": 0,
+        "dukeask": 0, "starkask": 0, "stateask": 0, "kingask": 0,
+        "rebelask": 0, "alienask": 0, "lasttalkday": -1,
+        "sunday_stories_seen_day": -1,
+    }.items():
+        FranVar.setdefault(k, v)
+
     if 'FranVar' not in dir() or not isinstance(FranVar, dict):
         FranVar = {}
     for k, v in {
@@ -51,7 +89,7 @@ init python:
             }.items():
                 self.var.setdefault(k, v)
             self.location = "EllonaTemple"
-            self.promote_from_var(self.var)
+            self.location = "EllonaTemple"
 
         def getLocation(self, wday=None, hour=None):
             if self.busy_now():
@@ -113,11 +151,11 @@ init python:
                 int(week or 0) == 7
                 and 8 * 60 <= minute_value <= 12 * 60
                 and self.visible_now()
-                and int(self.var.get("sunday_stories_seen_day", -1) or -1) < int(dayspassed or 0)
+                and int(self.var.get("sunday_stories_seen_day", -1) or -1) < int(current_game_day() or 0)
             )
 
         def mark_sunday_stories_seen(self):
-            self.var["sunday_stories_seen_day"] = int(dayspassed or 0)
+            self.var["sunday_stories_seen_day"] = int(current_game_day() or 0)
             return self.var["sunday_stories_seen_day"]
 
         def mark_met(self):
@@ -148,11 +186,27 @@ label InitFrancheska:
     return
 
 
+label InitFrancheska:
+    call register_francheska_secondary from _call_init_francheska_register
+    return
+
+
+label InitFrancheska:
+    call register_francheska_secondary from _call_init_francheska_register
+    return
+
+
 label register_francheska_secondary:
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
             peopleData["fran"] = FranStaticData
             Francheska.var = FranVar
+            Francheska.location = "EllonaTemple"
+            Francheska.var = FranVar
+            Francheska.var = FranVar
+            Francheska.location = "EllonaTemple"
+            Francheska.location = "EllonaTemple"
+            Francheska.location = "EllonaTemple"
             Francheska.location = "EllonaTemple"
             Francheska.update()
             peopleInfo["fran"] = Francheska
@@ -160,9 +214,4 @@ label register_francheska_secondary:
             secondary_npcs = []
         if peopleInfo.get("fran") and peopleInfo["fran"] not in secondary_npcs:
             secondary_npcs.append(peopleInfo["fran"])
-    return
-
-
-label _auto_register_francheska:
-    call register_francheska_secondary from _call_francheska_reg
     return

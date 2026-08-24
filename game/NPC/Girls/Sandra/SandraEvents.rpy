@@ -1,4 +1,4 @@
-# ================================================================================
+    $ bodymodel_sync_character(girl_name, RealName.get(girl_name, "Сандра"), "female")    $ Sandra.save_story_state()    $ Sandra.save_story_state()    $ bodymodel_sync_character(girl_name, RealName.get(girl_name, "Сандра"), "female")    $ Sandra.save_story_state()    $ Sandra.save_story_state()    $ bodymodel_sync_character(girl_name, RealName.get(girl_name, "Сандра"), "female")    $ Sandra.save_story_state()    $ Sandra.save_story_state()# ================================================================================
 # Sandra authored events.
 # Event/thread availability is defined in StoryEventRuntime.rpy.
 # SandraInfo owns Sandra's mutable reward state.
@@ -72,34 +72,30 @@ label SandraWeeklyEvaluationScene(step_index=0, return_label="TavernMain"):
 
 
 label sandraWeeklyEvaluation_0(return_label="TavernMain"):
-    $ thread = threads["sandraWeeklyEvaluation"]
     call SandraWeeklyEvaluationScene(0, return_label)
-    $ thread.day = int(dayspassed or 0)
-    $ thread.advance()
+    $ threads["sandraWeeklyEvaluation"].day = int(current_game_day() or 0)
+    $ threads["sandraWeeklyEvaluation"].advance()
     return
 
 
 label sandraWeeklyEvaluation_1(return_label="TavernMain"):
-    $ thread = threads["sandraWeeklyEvaluation"]
     call SandraWeeklyEvaluationScene(1, return_label)
-    $ thread.day = int(dayspassed or 0)
-    $ thread.advance()
+    $ threads["sandraWeeklyEvaluation"].day = int(current_game_day() or 0)
+    $ threads["sandraWeeklyEvaluation"].advance()
     return
 
 
 label sandraWeeklyEvaluation_2(return_label="TavernMain"):
-    $ thread = threads["sandraWeeklyEvaluation"]
     call SandraWeeklyEvaluationScene(2, return_label)
-    $ thread.day = int(dayspassed or 0)
-    $ thread.advance()
+    $ threads["sandraWeeklyEvaluation"].day = int(current_game_day() or 0)
+    $ threads["sandraWeeklyEvaluation"].advance()
     return
 
 
 label sandraWeeklyEvaluation_3(return_label="TavernMain"):
-    $ thread = threads["sandraWeeklyEvaluation"]
     call SandraWeeklyEvaluationScene(3, return_label)
-    $ thread.day = int(dayspassed or 0)
-    $ thread.advance()
+    $ threads["sandraWeeklyEvaluation"].day = int(current_game_day() or 0)
+    $ threads["sandraWeeklyEvaluation"].advance()
     return
 
 
@@ -113,6 +109,8 @@ label TavernSandraNightThanksScene:
     $ _sandra_secured_future_now = tractir_apply_sandra_secured_future()
     $ player.change_stat("fun", 8)
     call PregnancyCheck("sandra", "inside", 1, "Вы")
+    $ Sandra.save_story_state()
+    $ Sandra.save_story_state()
     $ Sandra.save_story_state()
     $ calendar_v2.advance_minutes(60)
     $ scene_image = "images/sandra/thanks/player_room_sandra_1.png"
@@ -133,13 +131,13 @@ label SandraSexEngine(girl_name="sandra", source_room="TavernSandraRoom"):
         if str(source_room or "") == "TavernSandraRoom":
             call TavernSandraRoomBuildActions
         return
-    $ bodymodel_sync_character(girl_name, RealName.get(girl_name, "Сандра"), "female")
-    $ player_state(False).intimacy.set_arousal(player_state(False).intimacy.arousal_value("You"), "You")
+    $ player.intimacy.set_arousal(player.intimacy.arousal_value("You"), "You")
     $ Sandra.set_arousal(int(PussyWetStart.get(girl_name, Sandra.arousal_value() or 20) or 20))
-    $ player_state(False).intimacy.apply_to_store()
     call ShowCurrentSex(girl_name)
     call PregnancyCheck(girl_name, "inside", 1, "Вы")
     $ Sandra.mark_fucked()
+    $ Sandra.save_story_state()
+    $ Sandra.save_story_state()
     $ Sandra.save_story_state()
     $ calendar_v2.advance_minutes(30)
     $ MainTxt = "Сандра не тратит вечер на лишние слова. Она закрывает дверь, поправляет волосы и смотрит на вас так, будто решение уже давно принято. После близости она снова собирает себя в привычную строгую хозяйку, но в голосе остается теплота, которую теперь уже невозможно спутать с обычной деловитостью."

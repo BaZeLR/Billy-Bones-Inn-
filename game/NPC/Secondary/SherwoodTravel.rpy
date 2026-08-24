@@ -1,10 +1,14 @@
-# ================================================================================
+    $ Robin.location = "BlackwoodRoad"    $ Robin.location = "BlackwoodRoad"    $ Robin.location = "BlackwoodRoad"# ================================================================================
 # Robin / Blackwood road story labels.
 #
 # Room owns place data: BlackwoodRoadRoom.
 # Event availability is owned by sherwoodThreadList in StoryEventRuntime.rpy.
 # These labels own only authored scene flow, images, choices, and state mutation.
 # ================================================================================
+
+default BlackwoodTravelOnHorse = 0
+
+default BlackwoodTravelOnHorse = 0
 
 default BlackwoodTravelOnHorse = 0
 
@@ -25,6 +29,8 @@ init python:
         ],
         custom_properties={
             "legacy_location": "SherwoodTravel",
+            "legacy_location": "SherwoodTravel",
+            "legacy_location": "SherwoodTravel",
         },
     )
 
@@ -44,7 +50,6 @@ label SherwoodRobbedAndGoCode:
         $ Robin.set_var_int("Negotiate", 2)
     $ calendar_v2.hour = 16
     $ calendar_v2.minute = 0
-    $ calendar_v2.sync_state()
     call stat
     return
 
@@ -54,9 +59,8 @@ label SherwoodKunidellOpenedCode(OnHorse=0):
     $ Robin.set_var_int("KunidellOpened", 1)
     $ calendar_v2.hour = 16
     $ calendar_v2.minute = 0
-    $ calendar_v2.sync_state()
     if int(OnHorse or 0) == 1:
-        $ _blackwood_trade_profit = procedural_randint(50, 300, "blackwood_kunidell_trade_%s" % int(dayspassed or 0))
+        $ _blackwood_trade_profit = procedural_randint(50, 300, "blackwood_kunidell_trade_%s" % int(current_game_day() or 0))
         $ money += 200 + _blackwood_trade_profit
         $ Robin.add_var_int("KunidellDeliveries", 1)
     call stat
@@ -68,10 +72,34 @@ label SherwoodTravel(OnHorse=0):
     jump BlackwoodRoad
 
 
+label SherwoodTravel(OnHorse=0):
+    $ BlackwoodTravelOnHorse = int(OnHorse or 0)
+    jump BlackwoodRoad
+
+
+label SherwoodTravel(OnHorse=0):
+    $ BlackwoodTravelOnHorse = int(OnHorse or 0)
+    jump BlackwoodRoad
+
+
+label SherwoodTravel(OnHorse=0):
+    $ BlackwoodRoadRoom.custom_properties["on_horse"] = int(OnHorse or 0)
+    jump BlackwoodRoad
+
+
+label SherwoodTravel(OnHorse=0):
+    $ BlackwoodRoadRoom.custom_properties["on_horse"] = int(OnHorse or 0)
+    jump BlackwoodRoad
+
+
+label SherwoodTravel(OnHorse=0):
+    $ BlackwoodRoadRoom.custom_properties["on_horse"] = int(OnHorse or 0)
+    jump BlackwoodRoad
+
+
 label BlackwoodRoad:
     $ CurrentRoom = BlackwoodRoadRoom
     $ CurLoc = "BlackwoodRoad"
-    $ location = CurLoc
     $ scene_image = BlackwoodRoadRoom.bg_picture
     $ _layout_last_picture = scene_image
     $ MainTxt = BlackwoodRoadRoom.visible_descriptions()[0].text
@@ -83,11 +111,12 @@ label BlackwoodRoad:
     $ current_action_items = [
         MenuItem("Вернуться в трактир", Call("MoveToRoom", "TavernMain", 60)),
     ]
-    call screen main_ui
-    jump BlackwoodRoad
+    while True:
+        call screen main_ui
 
 
 label story_robin_blackwood_ambush_0:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ UI_mode = "event"
     $ Robin.location = "BlackwoodRoad"
@@ -127,20 +156,21 @@ label story_robin_blackwood_mongol_pass:
     $ MainTxt = "Вы уже приготовились к привычному разговору о добровольных пожертвованиях, но один из разбойников вдруг прищурился и дернул Робина за рукав.\n\n\"Йо, браза,\" сказал он. \"Это тот самый трактирщик. Монгол велел своих предупредить: этот чувак не мазафака, он его из колодок вытащил.\"\n\nРобин некоторое время смотрит на вас с новым интересом, потом широко улыбается.\n\n\"Вот это другое дело, бразар. За Монгола уважуха. Раз наш человек сказал, что ты браза, значит сегодня ты едешь как браза. Деньги при себе оставь, коняшку тоже. Но если кто спросит - мы тебя не пропускали. Социяльная ответственность, понимаешь?\""
     $ CurLocDesc = MainTxt
     "[MainTxt]"
-    call SherwoodKunidellOpenedCode(BlackwoodTravelOnHorse)
+    call SherwoodKunidellOpenedCode(BlackwoodRoadRoom.custom_properties.get("on_horse", 0))
     if int(BlackwoodTravelOnHorse or 0) == 1:
         $ MainTxt = "До Куниделла вы добрались уже без приключений. Эльфы встретили мешки Беккиных овощей с таким видом, будто вы привезли им редчайшие дары заморских королевств.\n\nТорговля прошла удачно, дорога теперь открыта."
     else:
         $ MainTxt = "Без груза и без лошади делать в Куниделле было особенно нечего, но теперь дорога хотя бы стала понятной. Слово Монгола действительно сработало: люди Робина вас пропустили."
     $ CurLocDesc = MainTxt
     "[MainTxt]"
-    $ thread.advance()
+    $ event_runtime.active_thread.advance()
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
     return True
 
 
 label story_robin_blackwood_first_robbery:
+    show screen main_ui
     vscene "images/Robin/portrait2.jpg"
     $ _robbers_head = "Робин Гуд" if Robin.var_int("KnowHim", 0) else "предводитель"
     $ MainTxt = "\"Семь бед - один ответ!\" думаете вы и продолжаете путь. Мужики в трико заметно оживляются, в руках у них появляются луки, стрелы и разное колюще-режущее железо.\n\nКогда вы приближаетесь, их [_robbers_head], здоровенный человек с золотой цепью и капюшоном, выходит навстречу и широко улыбается: \"Йо, браза! Куда идешь?\"\n\n\"В Куниделл,\" скромно отвечаете вы.\n\nПосле этого его лицо становится серьезным. \"Хей, мэн, я и мои браза - простые лесорубы, доведенные обстоятельствами до отчаяния. Я вижу, ты хочешь сделать добровольное пожертвование на наше благое дело.\""
@@ -149,6 +179,11 @@ label story_robin_blackwood_first_robbery:
     else:
         $ MainTxt += " \"Все имеющиеся у тебя деньги.\""
     $ Becky.var["SherwoodSuspect"] = int(Becky.var.get("SherwoodSuspect", 0) or 0) + 10
+    $ Becky.var["KnowSherwood"] = 1
+    $ Becky.var["KnowSherwood"] = 1
+    $ Becky.var["KnowSherwood"] = 1
+    $ Becky.var["KnowSherwood"] = 1
+    $ Becky.var["KnowSherwood"] = 1
     $ Becky.var["KnowSherwood"] = 1
     $ Becky.var["KnowBlackwood"] = 1
     $ CurLocDesc = MainTxt
@@ -160,6 +195,7 @@ label story_robin_blackwood_first_robbery:
 
 
 label story_robin_blackwood_repeat_robbery:
+    show screen main_ui
     vscene "images/Robin/portrait2.jpg"
     $ _robbers_head = "Робин Гуд" if Robin.var_int("KnowHim", 0) else "предводитель"
     $ MainTxt = "При виде вас [_robbers_head] и его друзья очень удивляются.\n\n\"Слышь мужики, а я думал, что он трактирщик,\" недоуменно бормочет главарь. Потом он сменяет тон на радостный: \"Йо, бразар, ты нам донату занес? Ты кул, бразар, видно что не мазафака.\""
@@ -191,6 +227,11 @@ label story_robin_blackwood_return_to_city:
     if Robin.var_int("RobbedNum", 0) == 0:
         $ Becky.var["SherwoodSuspect"] = int(Becky.var.get("SherwoodSuspect", 0) or 0) + 2
         $ Becky.var["KnowSherwood"] = 1
+        $ Becky.var["KnowSherwood"] = 1
+        $ Becky.var["KnowSherwood"] = 1
+        $ Becky.var["KnowSherwood"] = 1
+        $ Becky.var["KnowSherwood"] = 1
+        $ Becky.var["KnowSherwood"] = 1
         $ Becky.var["KnowBlackwood"] = 1
         $ MainTxt = "Решив, что встреча со странными мужиками в трико на пустынной вырубке ничего хорошего не принесет, вы разворачиваетесь и уходите обратно."
     elif Robin.var_int("KnowHim", 0) == 0:
@@ -202,7 +243,6 @@ label story_robin_blackwood_return_to_city:
     "[MainTxt]"
     $ calendar_v2.hour = 16
     $ calendar_v2.minute = 0
-    $ calendar_v2.sync_state()
     $ UI_mode = "scene"
     $ SignalBlockTime = 0
     return True

@@ -1,4 +1,7 @@
-# ================================================================================
+# Example usage in script:
+# $result = get_names_list('waitress', AllGirlNames, RealName, {'waitress': waitress, ...})# Example usage in script:
+# $result = get_names_list('waitress', AllGirlNames, RealName, {'waitress': waitress, ...})# Example usage in script:
+# $result = get_names_list('waitress', AllGirlNames, RealName, {'waitress': waitress, ...})# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # NamesList.rpy
@@ -31,5 +34,3 @@ init python:
             strtmp = 'никто'
         return strtmp
 
-# Example usage in script:
-# $result = get_names_list('waitress', AllGirlNames, RealName, {'waitress': waitress, ...})

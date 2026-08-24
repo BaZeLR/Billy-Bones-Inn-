@@ -13,7 +13,17 @@ init python:
         dress_code = dress_shop_item_code(item_obj)
         if not dress_code:
             return False
-        if not player_state().appearance.has_dress(dress_code):
+        if not player.appearance.has_dress(dress_code):
+            return False
+        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
+            return False
+        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
+            return False
+        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
+            return False
+        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
+            return False
+        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
             return False
         if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
             return False
@@ -26,11 +36,11 @@ init python:
             return False
         if not bool(dress_code) or item_price > int(money or 0):
             return False
-        return not player_state().appearance.has_dress(dress_code) or dress_shop_item_depreciated(item_obj)
+        return not player.appearance.has_dress(dress_code) or dress_shop_item_depreciated(item_obj)
 
     def dress_shop_item_owned(item_obj):
         dress_code = dress_shop_item_code(item_obj)
-        return bool(dress_code) and player_state().appearance.has_dress(dress_code) and not dress_shop_item_depreciated(item_obj)
+        return bool(dress_code) and player.appearance.has_dress(dress_code) and not dress_shop_item_depreciated(item_obj)
 
     def dress_shop_prepare_dress_item(dress_code, female_rack=False):
         dress_id = str(dress_code or "").strip()
@@ -79,6 +89,11 @@ init python:
 
     def dress_shop_rack_items(rack_type):
         if "ensure_game_item_registry" in globals():
+            if "ensure_game_item_registry" in globals():
+            if "ensure_game_item_registry" in globals():
+            if "ensure_game_item_registry" in globals():
+            if "ensure_game_item_registry" in globals():
+            if "ensure_game_item_registry" in globals():
             ensure_game_item_registry()
         items = []
         if str(rack_type or "") == "female":

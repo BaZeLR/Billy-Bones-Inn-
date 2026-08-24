@@ -1,10 +1,33 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
 default ChurchAfterCermon = {}
 default PriestIncestAgree = 0
 default ChurchPurityLastDay = -1
-default ChurchPurityReport = {}
+default ChurchPurityReport = {}    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n" + navigation_only_message() + "\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n" + navigation_only_message() + "\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+default ChurchAfterCermon = {}
+default PriestIncestAgree = 0
+default ChurchPurityLastDay = -1
+default ChurchPurityReport = {}    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n" + navigation_only_message() + "\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n" + navigation_only_message() + "\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+default ChurchAfterCermon = {}
+default PriestIncestAgree = 0
+default ChurchPurityLastDay = -1
+default ChurchPurityReport = {}    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n" + navigation_only_message() + "\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+    if navigation_only_mode_enabled():
+        $ MainTxt = MainTxt + "\n" + navigation_only_message() + "\n" + navigation_only_time_note()
+        $ CurLocDesc = MainTxt
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
 
 init python:
     def church_call_label(label_name="", *label_args):
@@ -21,6 +44,62 @@ init python:
             return church_call_label("ChurchServiceMenu", action_arg != "0")
         if action_key == "confession":
             return church_call_label("ChurchIspoved", 1)
+        if action_key == "confession_menu":
+            return church_call_label("ChurchIspovedMenu")
+        if action_key == "confession_menu":
+            return church_call_label("ChurchIspovedMenu")
+        if action_key == "after_cermon":
+            return church_call_label("ChurchAfterCermon", 1)
+        if action_key == "draupnir":
+            return church_call_label("ShowChurchDraupnirList")
+        if action_key == "after_becky":
+            return church_call_label("AfterCermonBecky")
+
+    config.hyperlink_handlers["church"] = church_hyperlink_handler
+
+    def church_call_label(label_name="", *label_args):
+        label = str(label_name or "").strip()
+        if label == "" or not renpy.has_label(label):
+            return
+        return renpy.call_in_new_context(label, *tuple(label_args or ()))
+
+    def church_hyperlink_handler(value=""):
+        parts = [str(row or "").strip() for row in str(value or "").split(":")]
+        action_key = parts[0] if len(parts) > 0 else ""
+        action_arg = parts[1] if len(parts) > 1 else ""
+        if action_key == "service":
+            return church_call_label("ChurchServiceMenu", action_arg != "0")
+        if action_key == "confession":
+            return church_call_label("ChurchIspoved", 1)
+        if action_key == "confession_menu":
+            return church_call_label("ChurchIspovedMenu")
+        if action_key == "confession_menu":
+            return church_call_label("ChurchIspovedMenu")
+        if action_key == "after_cermon":
+            return church_call_label("ChurchAfterCermon", 1)
+        if action_key == "draupnir":
+            return church_call_label("ShowChurchDraupnirList")
+        if action_key == "after_becky":
+            return church_call_label("AfterCermonBecky")
+
+    config.hyperlink_handlers["church"] = church_hyperlink_handler
+
+    def church_call_label(label_name="", *label_args):
+        label = str(label_name or "").strip()
+        if label == "" or not renpy.has_label(label):
+            return
+        return renpy.call_in_new_context(label, *tuple(label_args or ()))
+
+    def church_hyperlink_handler(value=""):
+        parts = [str(row or "").strip() for row in str(value or "").split(":")]
+        action_key = parts[0] if len(parts) > 0 else ""
+        action_arg = parts[1] if len(parts) > 1 else ""
+        if action_key == "service":
+            return church_call_label("ChurchServiceMenu", action_arg != "0")
+        if action_key == "confession":
+            return church_call_label("ChurchIspoved", 1)
+        if action_key == "confession_menu":
+            return church_call_label("ChurchIspovedMenu")
         if action_key == "confession_menu":
             return church_call_label("ChurchIspovedMenu")
         if action_key == "after_cermon":
@@ -283,7 +362,6 @@ label Church:
     scene black
     $ CurrentRoom = ChurchRoom
     $ CurLoc = "Church"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -314,10 +392,6 @@ label Church:
             $ CurLocDesc = MainTxt
             vscene "images/church/confessionEntry.png"
 
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n" + navigation_only_message() + "\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-
     python:
         if ChurchRoom.is_open():
             for _church_action in ChurchRoom.visible_actions():
@@ -327,8 +401,8 @@ label Church:
         for _church_exit in ChurchRoom.visible_exits():
             current_action_items.append(MenuItem(_church_exit.label, Call("MoveToRoom", _church_exit.target, getattr(_church_exit, "minutes_to_pass", 5))))
 
-    call screen main_ui
-    jump Church
+    while True:
+        call screen main_ui
 
 
 label ChurchServiceMenu(show_attendees=True):

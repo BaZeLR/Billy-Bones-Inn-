@@ -1,4 +1,10 @@
-# ================================================================================
+label CheckVisibility(girl_name=""):
+    $ check_visibility(girl_name)
+    returnlabel CheckVisibility(girl_name=""):
+    $ check_visibility(girl_name)
+    returnlabel CheckVisibility(girl_name=""):
+    $ check_visibility(girl_name)
+    return# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # CheckVisibility.rpy
@@ -29,11 +35,16 @@ init python:
 # This will update the TitsVisible, PussyVisible, and ShortSkirtNoPanties dicts for the given girl.
 
 
+# Usage: check_visibility('liza')
+# This will update the TitsVisible, PussyVisible, and ShortSkirtNoPanties dicts for the given girl.
+
+
+# Usage: check_visibility('liza')
+# This will update the TitsVisible, PussyVisible, and ShortSkirtNoPanties dicts for the given girl.
+
+
 label check_visibility(girl_name=""):
     $ check_visibility(girl_name)
     return
 
 
-label CheckVisibility(girl_name=""):
-    $ check_visibility(girl_name)
-    return

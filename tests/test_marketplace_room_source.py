@@ -1,4 +1,4 @@
-from pathlib import Path
+    assert "images/market/LocMarketPlaceClosed.jpg" not in source    assert "images/market/LocMarketPlaceClosed.jpg" not in source    assert "images/market/LocMarketPlaceClosed.jpg" not in sourcefrom pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,7 +36,6 @@ def test_marketplace_uses_direct_picture_paths_without_fallback_helper():
     assert 'MARKETPLACE_CLOSED_PICTURE = "images/general/closedVenue default.png"' in source
     assert "def marketplace_closed_picture" not in source
     assert "images/general/LocMarketPlaceClosed.jpg" not in source
-    assert "images/market/LocMarketPlaceClosed.jpg" not in source
     assert "vscene scene_image" in source
 
 

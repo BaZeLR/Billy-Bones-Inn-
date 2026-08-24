@@ -12,7 +12,7 @@ label BeckyEddieJoinFirst:
 
     menu:
         "Поцеловать Бекки и незаметно открыть засов":
-            if Becky.var.get("PriestAdvice", 0) < 3 and procedural_randint(1, 2, "becky_eddie_join_latch_%s" % int(dayspassed or 0)) == 1:
+            if Becky.var.get("PriestAdvice", 0) < 3 and procedural_randint(1, 2, "becky_eddie_join_latch_%s" % int(current_game_day() or 0)) == 1:
                 "Одной рукой вы обняли вдовушку, а другой попробовали незаметно отодвинуть засов. Однако Ребекка засекла ваше движение, погрозила вам пальчиком и задвинула его обратно: \"Ай-ай озорник, я все-таки еще не готова заниматься с тобой любовью с дверью настежь. А вдруг кто-то из домашних зайдет?\""
                 call BeckyEddieJoinFirst_EddieFailureCode
                 return
@@ -77,7 +77,7 @@ label BeckyEddieJoinFirst:
 
 label BeckyEddieJoinFirst_EddieFailureCode:
     "Целуя вдовушку, вы краем уха услышали, как дернулась, но не поддалась дверь, а затем последовали тихие удаляющиеся шаги. Пожав плечами, вы вернулись к страстным губкам."
-    if procedural_randint(1, 2, "becky_eddie_join_failure_text_%s" % int(dayspassed or 0)) == 1:
+    if procedural_randint(1, 2, "becky_eddie_join_failure_text_%s" % int(current_game_day() or 0)) == 1:
         "Бекки же внимания на это и вовсе не обратила."
     else:
         "Бекки тоже услышала шум и хмыкнула: \"Домашние, домашние, вечно пытаются всюду свой нос всунуть,\" - и впилась в ваши губы поцелуем."

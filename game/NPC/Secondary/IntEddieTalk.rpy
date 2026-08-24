@@ -17,39 +17,87 @@ label IntEddieTalk(preserve_text=False):
     if str(_eddie_picture or "").strip():
         vscene _eddie_picture
     $ main_ui_begin_talk_state("Разговор с Эдди", _eddie_name)
-    $ current_action_title = "Разговор с Эдди"
-    $ current_action_content = None
-    if not preserve_text:
-        $ MainTxt = eddie_talk_intro_text()
-        $ CurLocDesc = MainTxt
-    $ current_action_items = []
-    $ current_action_items.append(MenuItem("Поболтать с Эдди о разной фигне.", Call("IntEddieTalkSmalltalk")))
+    $ MainTxt = eddie_talk_intro_text()
+    $ CurLocDesc = MainTxt
 
-    if eddie_talk_can_personal(_eddie_name):
-        $ current_action_items.append(MenuItem("Поболтать с Эдди о личных вещах.", Call("IntEddieTalkPersonal")))
-
-    if eddie_talk_can_whores(_eddie_var, _eddie_name):
-        $ current_action_items.append(MenuItem("Рассказать Эдди о том, что у вас теперь работают девочки.", Call("IntEddieTalkWhores")))
-
-    if eddie_talk_can_girls(_eddie_var, _eddie_name):
-        $ current_action_items.append(MenuItem("Поинтересоваться у Эдди как ему ваши девочки.", Call("IntEddieTalkGirls")))
-
-    if eddie_talk_can_mom_helper(_eddie_var, _becky_var, _eddie_name):
-        $ current_action_items.append(MenuItem("Предложить помочь подкатится к хозяйке лавки.", Call("IntEddieTalkMomHelper")))
-
-    if eddie_talk_can_bruise(_eddie_var, _becky_var, _eddie_name):
-        $ current_action_items.append(MenuItem("Спросить о синяке.", Call("IntEddieTalkBruise")))
-
-    if eddie_talk_can_who_hit(_eddie_var, _becky_var, _eddie_name):
-        $ current_action_items.append(MenuItem("А все таки расскажи, кто это тебе так вмазал?", Call("IntEddieTalkWhoHit")))
-
-    if eddie_talk_can_destination(_eddie_var, _becky_var, _eddie_name):
-        $ current_action_items.append(MenuItem("А куда это ты ездил?", Call("IntEddieTalkDestination")))
-
-    if eddie_talk_can_complain(_eddie_var, _becky_var, _eddie_name):
-        $ current_action_items.append(MenuItem("Страже жаловался?", Call("IntEddieTalkComplain")))
-
-    $ current_action_items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
+    while True:
+        $ _eddie_var = Eddie.var
+        $ _becky_var = Becky.var
+        menu:
+            "Поболтать с Эдди о разной фигне.":
+                call IntEddieTalkSmalltalk
+            "Поболтать с Эдди о личных вещах." if eddie_talk_can_personal(_eddie_name):
+                call IntEddieTalkPersonal
+            "Рассказать Эдди о том, что у вас теперь работают девочки." if eddie_talk_can_whores(_eddie_var, _eddie_name):
+                call IntEddieTalkWhores
+            "Поинтересоваться у Эдди как ему ваши девочки." if eddie_talk_can_girls(_eddie_var, _eddie_name):
+                call IntEddieTalkGirls
+            "Предложить помочь подкатится к хозяйке лавки." if eddie_talk_can_mom_helper(_eddie_var, _becky_var, _eddie_name):
+                call IntEddieTalkMomHelper
+            "Спросить о синяке." if eddie_talk_can_bruise(_eddie_var, _becky_var, _eddie_name):
+                call IntEddieTalkBruise
+            "А все таки расскажи, кто это тебе так вмазал?" if eddie_talk_can_who_hit(_eddie_var, _becky_var, _eddie_name):
+                call IntEddieTalkWhoHit
+            "А куда это ты ездил?" if eddie_talk_can_destination(_eddie_var, _becky_var, _eddie_name):
+                call IntEddieTalkDestination
+            "Страже жаловался?" if eddie_talk_can_complain(_eddie_var, _becky_var, _eddie_name):
+                call IntEddieTalkComplain
+            "Закончить разговор":
+                $ main_ui_end_talk_state()
+                call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
+    call IntEddieTalk(True)
     return
 
 
@@ -57,14 +105,13 @@ label IntEddieTalkSmalltalk:
     $ Eddie.ensure_story_defaults()
     $ _eddie_talk_count = int(Eddie.talked_today or 0)
     $ MainTxt = "Вы некоторое время болтаете с Эдди о несущественных вещах."
-    if _eddie_talk_count <= 2 and procedural_randint(1, 2, "eddie_smalltalk_%s_%s" % (dayspassed, _eddie_talk_count)) == 1 and int(Eddie.rel or 0) <= 5:
+    if _eddie_talk_count <= 2 and procedural_randint(1, 2, "eddie_smalltalk_%s_%s" % (current_game_day(), _eddie_talk_count)) == 1 and int(Eddie.rel or 0) <= 5:
         $ MainTxt += "\n\nВы немного сдружились с Эдди."
         $ Eddie.change_social(friend_delta=1)
     elif _eddie_talk_count > 2:
         $ MainTxt += "\n\nНичего нового из разговора вы не узнали."
     $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
-    call IntEddieTalk(True)
     return
 
 
@@ -72,14 +119,13 @@ label IntEddieTalkPersonal:
     $ Eddie.ensure_story_defaults()
     $ _eddie_talk_count = int(Eddie.talked_today or 0)
     $ MainTxt = "Вы некоторое время болтаете с Эдди о том, кто сколько выпил и о том, какие девушки кому нравятся."
-    if _eddie_talk_count <= 2 and procedural_randint(1, 2, "eddie_personal_%s_%s" % (dayspassed, _eddie_talk_count)) == 1 and int(Eddie.rel or 0) <= 10:
+    if _eddie_talk_count <= 2 and procedural_randint(1, 2, "eddie_personal_%s_%s" % (current_game_day(), _eddie_talk_count)) == 1 and int(Eddie.rel or 0) <= 10:
         $ MainTxt += "\n\nВы немного сдружились с Эдди."
         $ Eddie.change_social(friend_delta=1)
     elif _eddie_talk_count > 2:
         $ MainTxt += "\n\nНичего нового из разговора вы не узнали."
     $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
-    call IntEddieTalk(True)
     return
 
 
@@ -91,7 +137,6 @@ label IntEddieTalkWhores:
     $ _eddie_var["TalkedAboutWhores"] = 1
     $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
-    call IntEddieTalk(True)
     return
 
 
@@ -104,7 +149,6 @@ label IntEddieTalkGirls:
     $ _eddie_var["TalkedAboutGeorgett"] = 1
     $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
-    call IntEddieTalk(True)
     return
 
 
@@ -153,7 +197,6 @@ label IntEddieTalkMomHelper:
         $ MainTxt += "\n\n\"Благодаря тебе, Стефан, более чем хорошо,\" довольно ответил тот."
     $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
-    call IntEddieTalk(True)
     return
 
 
@@ -170,7 +213,6 @@ label IntEddieTalkBruise:
     $ _eddie_var["FingalTalk"] = 1
     $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
-    call IntEddieTalk(True)
     return
 
 
@@ -187,10 +229,9 @@ label IntEddieTalkWhoHit:
     else:
         $ MainTxt = "\"Я тебе уже все что хотел сказал. Мало того, что огреб, так еще ты тут с распросами дурацкими. Кто ты такой, что мне вопросы задавать?\" отбрил вас Эдди."
         if int(Eddie.rel or 0) >= 5:
-            $ Eddie.change_social(friend_delta=-procedural_randint(0, 1, "eddie_who_hit_rel_%s_%s" % (dayspassed, int(Eddie.talked_today or 0))))
+            $ Eddie.change_social(friend_delta=-procedural_randint(0, 1, "eddie_who_hit_rel_%s_%s" % (current_game_day(), int(Eddie.talked_today or 0))))
     $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
-    call IntEddieTalk(True)
     return
 
 
@@ -201,7 +242,6 @@ label IntEddieTalkDestination:
     $ _eddie_var["FingalTalkDestination"] = 1
     $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
-    call IntEddieTalk(True)
     return
 
 
@@ -212,5 +252,4 @@ label IntEddieTalkComplain:
     $ _eddie_var["FingalTalkComplain"] = 1
     $ Eddie.mark_talked()
     $ CurLocDesc = MainTxt
-    call IntEddieTalk(True)
     return

@@ -26,6 +26,7 @@ label ChurchServiceGeorgett:
 
 
 label story_georgett_church_service_bench:
+    show screen main_ui
     if Georgett.story_value("askkids", 0):
         vscene "images/georgett/church/cermonliza.jpg"
     else:
@@ -80,7 +81,7 @@ label story_georgett_church_service_bench:
     $ Georgett.set_story_value("fuckinchurch", 1)
     $ Georgett.set_story_value("church_bench_seen", 1)
     $ player_record_orgasm("georgett_church_bench", "georgett")
-    $ PregnancyCheck("georgett", "inside", 1, "Вы")
+    $ pregnancy_check("georgett", "inside", 1, "Вы")
     vscene "images/georgett/church/bench/bench6.jpg"
     menu:
         "Вернуться в собор":
@@ -89,6 +90,7 @@ label story_georgett_church_service_bench:
 
 
 label story_georgett_church_service_doggy:
+    show screen main_ui
     vscene "images/georgett/church/cermon.jpg"
     "Вы предлагаете Жоржетте не искать укрытия и рискнуть прямо здесь."
 
@@ -127,7 +129,7 @@ label story_georgett_church_service_doggy:
     $ Georgett.set_story_value("fuckinchurch", 1)
     $ Georgett.set_story_value("church_doggy_seen", 1)
     $ player_record_orgasm("georgett_church_doggy", "georgett")
-    $ PregnancyCheck("georgett", "inside", 1, "Вы")
+    $ pregnancy_check("georgett", "inside", 1, "Вы")
     vscene "images/georgett/church/doggy/doggy6.jpg"
     menu:
         "Вернуться в собор":
@@ -136,6 +138,7 @@ label story_georgett_church_service_doggy:
 
 
 label story_georgett_church_service_with_liza:
+    show screen main_ui
     vscene "images/georgett/church/cermonliza.jpg"
     "В следующий раз Жоржетта уже не делает вид, что не понимает вашего намека, и сама зовет Лизетту ближе."
 
@@ -178,7 +181,7 @@ label story_georgett_church_service_with_liza:
     $ Georgett.set_story_value("church_liza_seen", 1)
     $ Georgett.set_story_value("lizasawinchurch", 1)
     $ player_record_orgasm("georgett_church_liza", "georgett")
-    $ PregnancyCheck("georgett", "inside", 1, "Вы")
+    $ pregnancy_check("georgett", "inside", 1, "Вы")
     vscene "images/georgett/church/withLiza.jpg/withliza6.jpg"
     menu:
         "Вернуться в собор":

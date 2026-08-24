@@ -1,10 +1,9 @@
-# ================================================================================
+            global player.economy.tavern_fame            global player.economy.tavern_fame            global player.economy.tavern_fame            global player.economy.tavern_fame            global player.economy.tavern_fame            global player.economy.tavern_fame# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntLizaDressChange(GirlNameILT="liza"):
     python:
         def OtherSawLizaCode(AgreedToRedress):
-            global tavernfame
             if AgreedToRedress != 1 or int(Liza.corruption or 0) < 50:
                 return ""
             RandVar = procedural_randint(1, 9, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:10:1")
@@ -38,7 +37,7 @@ label IntLizaDressChange(GirlNameILT="liza"):
                 Liza.apply_social_chance(0, 0, 0, 60, 2, 1, "dress_change_seen")
             if RandVar >= 5 and RandVar <= 7:
                 Liza.apply_social_chance(0, 0, 0, 60, 1, 1, "dress_change_seen")
-                tavernfame += 1
+                player.economy.tavern_fame += 1
             return text
 
         _can_remove_panties = Liza.rel > 8 and Liza.current_underwear("panties", "") != "" and Liza.talk_count() < 2

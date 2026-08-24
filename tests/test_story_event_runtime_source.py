@@ -86,4 +86,4 @@ def test_story_events_are_blocked_after_firing_today():
     assert "story_event_fired_today(self)" in body
     assert "return False" in body
     assert "def story_event_reset_fired_today_if_needed" in source
-    assert "StoryEventFiredKeysToday = []" in source
+    assert "event_runtime.fired_keys_today = []" in source

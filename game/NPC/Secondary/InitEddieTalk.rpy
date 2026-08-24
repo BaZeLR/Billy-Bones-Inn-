@@ -8,14 +8,14 @@ init python:
             return ""
         row = becky_var if isinstance(becky_var, dict) else getattr(Becky, "var", {})
         robbed_day = int(row.get("EddieRobbedDay", 0) or 0)
-        if robbed_day > 0 and robbed_day + 12 >= int(dayspassed or 0):
+        if robbed_day > 0 and robbed_day + 12 >= int(current_game_day() or 0):
             return "images/eddie/portraits/fingal.png"
         return "images/eddie/portraits/portrait_0.png"
 
     def eddie_talk_robbed_window(becky_var=None):
         row = becky_var if isinstance(becky_var, dict) else getattr(Becky, "var", {})
         robbed_day = int(row.get("EddieRobbedDay", 0) or 0)
-        return robbed_day > 0 and robbed_day + 12 >= int(dayspassed or 0)
+        return robbed_day > 0 and robbed_day + 12 >= int(current_game_day() or 0)
 
     def eddie_talk_intro_text():
         if str(CurLoc or "") == "GroceryStore":

@@ -1,12 +1,13 @@
-# ================================================================================
+    $ _next_title = "Ваши действия"
+    $ _next_items = [MenuItem("Вернуться к делам", Jump("TavernMain"))]    $ _next_title = "Ваши действия"
+    $ _next_items = [MenuItem("Вернуться к делам", Jump("TavernMain"))]    $ _next_title = "Ваши действия"
+    $ _next_items = [MenuItem("Вернуться к делам", Jump("TavernMain"))]# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label event_cleaning_harrass_part2(girl_name, eyewitness=0, your_reaction1=0, harass_type=1):
     $ Eyewitness = eyewitness
     $ YourReaction1 = your_reaction1
     $ HarassType = harass_type
-    $ _next_title = "Ваши действия"
-    $ _next_items = [MenuItem("Вернуться к делам", Jump("TavernMain"))]
 
     call PartEventGirlHarrassmentReaction(girl_name, "cleaning", eyewitness)
     $ CurEventDescPart2 = _return

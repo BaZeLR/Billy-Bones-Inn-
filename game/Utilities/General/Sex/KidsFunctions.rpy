@@ -1,4 +1,34 @@
-# ================================================================================
+        if key == "dayspassed":
+            return dayspassed            _kids_set("EventsCount", {})
+            _kids_set("NewEvents", {})        if key == "RealName":
+            return dict((girl, people_display_name(girl)) for girl in list(AllGirlNames or []))
+        if key == "RealName2":
+            names = {}
+            for girl in list(AllGirlNames or []):
+                info = getPersonInfo(girl)
+                data = getattr(info, "data", None) if info is not None else None
+                names[girl] = str(getattr(data, "genitive", "") or people_display_name(girl))
+            return names        if key == "dayspassed":
+            return dayspassed            _kids_set("EventsCount", {})
+            _kids_set("NewEvents", {})        if key == "RealName":
+            return dict((girl, people_display_name(girl)) for girl in list(AllGirlNames or []))
+        if key == "RealName2":
+            names = {}
+            for girl in list(AllGirlNames or []):
+                info = getPersonInfo(girl)
+                data = getattr(info, "data", None) if info is not None else None
+                names[girl] = str(getattr(data, "genitive", "") or people_display_name(girl))
+            return names        if key == "dayspassed":
+            return dayspassed            _kids_set("EventsCount", {})
+            _kids_set("NewEvents", {})        if key == "RealName":
+            return dict((girl, people_display_name(girl)) for girl in list(AllGirlNames or []))
+        if key == "RealName2":
+            names = {}
+            for girl in list(AllGirlNames or []):
+                info = getPersonInfo(girl)
+                data = getattr(info, "data", None) if info is not None else None
+                names[girl] = str(getattr(data, "genitive", "") or people_display_name(girl))
+            return names# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init -44 python:
@@ -6,7 +36,7 @@ init -44 python:
     import renpy
 
     def _kids_state():
-        runtime = player_state(False)
+        runtime = player
         if not isinstance(runtime.history, dict):
             runtime.history = {}
         state = runtime.history.setdefault("kids", {})
@@ -22,17 +52,6 @@ init -44 python:
             return state["list"]
         if key == "KidsListNextId":
             return state["next_id"]
-        if key == "dayspassed":
-            return dayspassed
-        if key == "RealName":
-            return dict((girl, people_display_name(girl)) for girl in list(AllGirlNames or []))
-        if key == "RealName2":
-            names = {}
-            for girl in list(AllGirlNames or []):
-                info = getPersonInfo(girl)
-                data = getattr(info, "data", None) if info is not None else None
-                names[girl] = str(getattr(data, "genitive", "") or people_display_name(girl))
-            return names
         if key == "pregnancy":
             result = {}
             for girl in list(AllGirlNames or []):
@@ -233,8 +252,6 @@ init -44 python:
             TodaySexEvents_DeleteGirl("sandra")
             TodaySexEvents_DeleteGirl("melissa")
             TodaySexEvents_DeleteGirl("amanda")
-            _kids_set("EventsCount", {})
-            _kids_set("NewEvents", {})
         if MomName in ["georgett", "liza"]:
             TodaySexEvents_DeleteGirl("georgett")
             TodaySexEvents_DeleteGirl("liza")
@@ -243,15 +260,19 @@ init -44 python:
             TodaySexEvents_DeleteGirl("becky")
 
         if MomName in ["amanda", "melissa", "sandra"]:
-            player_state().economy.sync_from_store()
-            player_state().economy.add_child_support(1)
-            player_state().economy.apply_to_store()
-            _kids_set("householdmembers", _kids_int(_kids_get("householdmembers", 0), 0) + 1)
+            player.economy.sync_from_store()
+            player.economy.sync_from_store()
+            player.economy.sync_from_store()
+            player.economy.add_child_support(1)
+            player.economy.apply_to_store()
+            player.economy.apply_to_store()
+            player.economy.apply_to_store()
+            _kids_set("player.tavern_management.household_members", _kids_int(_kids_get("player.tavern_management.household_members", 0), 0) + 1)
             _kids_set("KidBirthPosobie", "Так как " + str(_kids_get("RealName", {}).get(MomName, MomName)) + " родила без мужа, то именем герцогини Кончитты Дель Семени вашей семье, тоесть вам, было выплаченно единовременно 600 мараведи воспоможения. Также вы будете получать дополнительно по 15 мараведи каждое воскресенье.")
         if MomName in ["liza", "georgett"]:
             current_loc = _kids_get("CurrentLoc", {})
             if str(current_loc.get("georgett", "")) == "TavernMain":
-                _kids_set("householdmembers", _kids_int(_kids_get("householdmembers", 0), 0) + 1)
+                _kids_set("player.tavern_management.household_members", _kids_int(_kids_get("player.tavern_management.household_members", 0), 0) + 1)
             _kids_set("ProstitutesKids", _kids_int(_kids_get("ProstitutesKids", 0), 0) + 1)
 
         return _kids_result(kid_id)
@@ -416,8 +437,7 @@ init -44 python:
         if info is not None and _kids_lactating(GirlName) and info.arousal_value() > 45:
             info.set_arousal(min(65, info.arousal_value() + 6))
             if str(PartnerName) == "":
-                player_state(False).intimacy.add_arousal(5, 100, "You")
-                player_state(False).intimacy.apply_to_store()
+                player.intimacy.add_arousal(5, 100, "You")
         return 0
 
     def LactatePussyFuck(GirlName, PartnerName=""):

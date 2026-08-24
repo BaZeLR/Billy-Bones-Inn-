@@ -12,6 +12,8 @@ init python:
             "Amanda": Amanda,
             "TavernGloryHole": TavernGloryHole,
             "age": age_girls,
+            "age": age_girls,
+            "age": age_girls,
             "Liza": Liza,
         }
 
@@ -77,7 +79,7 @@ init python:
     def amanda_liza_apply_story_marks(row):
         condition = str(dict(row or {}).get("Condition", "") or "")
         phrase = str(dict(row or {}).get("Phrase", "") or "").lower()
-        current_day = int(dayspassed or 0)
+        current_day = int(current_game_day() or 0)
         Amanda.set_var_int("liza_talk_seen_day", current_day)
         if "TavernGloryHole" in condition or "глорихол" in phrase:
             Amanda.set_var_int("liza_glory_hint_seen_day", current_day)

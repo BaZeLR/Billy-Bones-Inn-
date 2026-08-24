@@ -96,7 +96,7 @@ label story_amanda_legare_dance_1:
     $ Amanda.set_var_int("albernowdances", 1)
     $ Amanda.set_var_int("legare_dance_pending", 0)
     call EventAmandaLegareCreateDance
-    $ FridayDancesCount += 1
+    $ FridayDanceRoom.state["dance_count"] += 1
     "Вы нашли Аманду как раз в тот момент, когда месье Легаре галантно склонился перед ней и протянул руку."
     "Аманда смущенно оглянулась по сторонам, но руку все же подала. Через миг они уже кружились среди танцующих."
     call ShowImage("amanda", "dance", "legare_step_0")
@@ -111,7 +111,7 @@ label story_amanda_legare_dance_2:
     $ Amanda.set_var_int("albernowdances", 1)
     $ Amanda.set_var_int("legare_dance_pending", 0)
     call EventAmandaLegareCreateDance
-    $ FridayDancesCount += 1
+    $ FridayDanceRoom.state["dance_count"] += 1
     "На этот раз Аманда уже не выглядит случайно втянутой в танец. Она замечает Легаре раньше вас и сама делает к нему пару шагов."
     "Виноторговец улыбается слишком довольно, будто считал этот вечер уже выигранным."
     call ShowImage("amanda", "dance", "legare_step_0")
@@ -127,7 +127,7 @@ label story_amanda_legare_dance_3:
     $ Amanda.set_var_int("albernowdances", 1)
     $ Amanda.set_var_int("legare_dance_pending", 0)
     call EventAmandaLegareCreateDance
-    $ FridayDancesCount += 1
+    $ FridayDanceRoom.state["dance_count"] += 1
     "Легаре больше не ограничивается учтивостью. Он говорит Аманде что-то на ухо, и она вспыхивает, но не отходит."
     "Теперь это уже не просто танец. Между ними появилась своя маленькая тайна, и Аманда слишком хорошо это понимает."
     call ShowImage("amanda", "dance", "legare_step_0")

@@ -1,4 +1,31 @@
-# ================================================================================
+        Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()label TavernAticRestore:
+    $ scene_image = attic_room_picture_path() or CurrentRoom.bg_picture or None
+    if scene_image:
+        $ _layout_last_picture = scene_image
+    $ MainTxt = TavernAticRoom.descriptions[0].text
+    if int(AtticLootFound or 0) == 1:
+        $ MainTxt = MainTxt + "\n\nВы уже перерыли здесь хлам и теперь знаете, где лежат найденные вещи."
+    $ CurLocDesc = MainTxt
+    call TavernAticBuildActions
+    return        Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()label TavernAticRestore:
+    $ scene_image = attic_room_picture_path() or CurrentRoom.bg_picture or None
+    if scene_image:
+        $ _layout_last_picture = scene_image
+    $ MainTxt = TavernAticRoom.descriptions[0].text
+    if int(AtticLootFound or 0) == 1:
+        $ MainTxt = MainTxt + "\n\nВы уже перерыли здесь хлам и теперь знаете, где лежат найденные вещи."
+    $ CurLocDesc = MainTxt
+    call TavernAticBuildActions
+    return        Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()label TavernAticRestore:
+    $ scene_image = attic_room_picture_path() or CurrentRoom.bg_picture or None
+    if scene_image:
+        $ _layout_last_picture = scene_image
+    $ MainTxt = TavernAticRoom.descriptions[0].text
+    if int(AtticLootFound or 0) == 1:
+        $ MainTxt = MainTxt + "\n\nВы уже перерыли здесь хлам и теперь знаете, где лежат найденные вещи."
+    $ CurLocDesc = MainTxt
+    call TavernAticBuildActions
+    return# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 6 python:
@@ -13,7 +40,7 @@ init 6 python:
         return (
             Melissa.bats_stage() >= 3
             and Melissa.bats_stage() < 6
-            and int(dayspassed or 0) >= int(Melissa.var.get("bat_attic_check_day", -1) or -1)
+            and int(current_game_day() or 0) >= int(Melissa.var.get("bat_attic_check_day", -1) or -1)
         )
 
     def tavern_atic_melissa_colony_search_available():
@@ -68,7 +95,6 @@ init 6 python:
 label TavernAtic:
     $ CurrentRoom = TavernAticRoom
     $ CurLoc = "TavernAtic"
-    $ location = CurLoc
     $ scene_image = attic_room_picture_path() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -76,35 +102,13 @@ label TavernAtic:
         $ _layout_last_picture = ""
     $ MainTxt = TavernAticRoom.descriptions[0].text
     $ CurLocDesc = MainTxt
-    call TavernAticBuildActions
-    $ _atic_ui_return = None
-    while _atic_ui_return is None:
-        call screen main_ui
-        $ _atic_ui_return = _return
-    jump TavernAtic
-
-
-label TavernAticBuildActions:
+    $ Melissa.sync_room_problem_state()
+    $ Melissa.sync_room_problem_state()
     $ Melissa.sync_room_problem_state()
     $ current_action_title = "Чердак"
     $ current_action_content = None
-    $ current_action_items = []
-    if tavern_atic_search_available():
-        $ current_action_items.append(MenuItem("Порыться в старом хламе", Call("TavernAticSearch")))
-    elif tavern_atic_supply_search_available():
-        $ current_action_items.append(MenuItem("Порыться в старом хламе еще раз", Call("TavernAticSupplySearch")))
-    if story_event_available("TavernAtic", "melissa_bats"):
-        $ current_action_items.append(MenuItem(Melissa.bat_attic_event_caption(), Call("checkTriggers", "TavernAtic", "melissa_bats", 0)))
-    python:
-        for _atic_item in tavern_atic_visible_items():
-            _atic_item_id = str(getattr(_atic_item, "object_id", "") or "")
-            _atic_count = _room_item_count_by_id(TavernAticRoom, _atic_item_id)
-            _atic_caption = str(_atic_item.name or _atic_item_id)
-            if _atic_count > 1:
-                _atic_caption = "{} x{}".format(_atic_caption, _atic_count)
-            current_action_items.append(MenuItem(_atic_caption, Call("TavernAticObjectMenu", _atic_item_id)))
-        for _exit in TavernAticRoom.visible_exits():
-            current_action_items.append(MenuItem(_exit.label, Call("AdvanceMovementTime", _exit.target)))
+    call TavernAticBuildActions
+    call screen main_ui
     return
 
 
@@ -126,8 +130,8 @@ label TavernAticSearch:
 label TavernAticSupplySearch:
     if int(AtticSupplyLootFound or 0) == 0:
         $ AtticSupplyLootFound = 1
-        $ _player_add_item_by_id("droplets_001", 5)
-        $ _player_add_item_by_id("gunpowder_001", 5)
+        $ player.add_item("droplets_001", 5)
+        $ player.add_item("gunpowder_001", 5)
         $ MainTxt = "Вы снова перетряхиваете старый хлам и в дальнем ящике находите завернутые в промасленную тряпку припасы: {b}дробь{/b} и {b}порох{/b}. Этого хватит примерно на пять хороших выстрелов. Вы сразу забираете находку с собой."
     else:
         $ MainTxt = "После второго тщательного обыска чердак больше ничем полезным не радует."
@@ -166,10 +170,10 @@ label MelissaAtticWindowPeek:
 
 
 label MelissaBurnAtticColony:
-    if int(_player_item_count_by_id("bat_repellent_001") or 0) <= 0 or Melissa.bats_stage() < 4:
+    if int(player.item_count("bat_repellent_001") or 0) <= 0 or Melissa.bats_stage() < 4:
         call TavernAticBuildActions
         return
-    $ _player_remove_item_by_id("bat_repellent_001", 1)
+    $ player.remove_item("bat_repellent_001", 1)
     # Stage 7: colony was smoked out; roof repair / final cleanup still pending.
     $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 7)
     $ Melissa.var["bat_recipe_unlocked"] = 1
@@ -189,8 +193,8 @@ label MelissaOrderRoofRepair:
         call TavernAticBuildActions
         return
     $ money = int(money or 0) - 1000
-    $ Melissa.var["roof_repair_order_day"] = int(dayspassed or 0)
-    $ Melissa.var["roof_repair_complete_day"] = int(dayspassed or 0) + 2
+    $ Melissa.var["roof_repair_order_day"] = int(current_game_day() or 0)
+    $ Melissa.var["roof_repair_complete_day"] = int(current_game_day() or 0) + 2
     $ MainTxt = "Вы договариваетесь о починке старой крыши и отдаете за работу тысячу монет. Теперь остается только дождаться, пока мастера перетянут гнилые доски, забьют щели и приведут верх трактира в порядок. Обещают управиться за пару дней."
     $ CurLocDesc = MainTxt
     $ story_thread_advance_current()
@@ -201,21 +205,25 @@ label MelissaOrderRoofRepair:
 
 label MelissaCheckRoofRepair:
     $ Melissa.sync_room_problem_state()
+    $ Melissa.sync_room_problem_state()
+    $ Melissa.sync_room_problem_state()
     if Melissa.bats_stage() >= 8 or Melissa.bats_repair_complete():
         $ MainTxt = "Теперь все видно сразу: крыша над комнатой Мелиссы наконец подлатана, щели закрыты, а прежнее гнездовище выжжено и вычищено. Похоже, на этот раз проблема действительно решена."
         $ CurLocDesc = MainTxt
         call TavernAticBuildActions
         return
-    if int(Melissa.var.get("roof_repair_complete_day", -1) or -1) > int(dayspassed or 0):
-        $ _days_left = int(Melissa.var.get("roof_repair_complete_day", -1) or -1) - int(dayspassed or 0)
+    if int(Melissa.var.get("roof_repair_complete_day", -1) or -1) > int(current_game_day() or 0):
+        $ _days_left = int(Melissa.var.get("roof_repair_complete_day", -1) or -1) - int(current_game_day() or 0)
         $ MainTxt = "Работа над крышей еще не закончена. Придется подождать еще примерно {} дн.".format(_days_left)
         $ CurLocDesc = MainTxt
         call TavernAticBuildActions
         return
     $ Melissa.sync_room_problem_state()
+    $ Melissa.sync_room_problem_state()
+    $ Melissa.sync_room_problem_state()
     $ MainTxt = "Крыша уже должна быть готова. Судя по виду балок и свежим заплатам, мастера и правда сделали свое дело. Теперь под потолком тихо, и дряни сверху больше взяться неоткуда."
     $ CurLocDesc = MainTxt
-    call TavernAticBuildActions
+        call TavernAticBuildActions
     return
 
 
@@ -268,13 +276,3 @@ label TavernAticObjectText(object_id="", action_id=""):
     return
 
 
-label TavernAticRestore:
-    $ scene_image = attic_room_picture_path() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ MainTxt = TavernAticRoom.descriptions[0].text
-    if int(AtticLootFound or 0) == 1:
-        $ MainTxt = MainTxt + "\n\nВы уже перерыли здесь хлам и теперь знаете, где лежат найденные вещи."
-    $ CurLocDesc = MainTxt
-    call TavernAticBuildActions
-    return

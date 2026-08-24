@@ -1,3 +1,45 @@
+label TavernSandraRoomRestore:
+    $ scene_image = tavern_sandra_room_picture()
+    if scene_image:
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+    $ MainTxt = TavernSandraRoomRoom.descriptions[0].text
+    $ _sandra_room_notice = household_room_issue_notice_text("sandra")
+    if str(_sandra_room_notice or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_sandra_room_notice or "")
+    $ MainTxt = werecat_append_visible_text(MainTxt, "TavernSandraRoom")
+    $ CurLocDesc = MainTxt
+    call TavernSandraRoomBuildActions
+    return
+
+label TavernSandraRoomRestore:
+    $ scene_image = tavern_sandra_room_picture()
+    if scene_image:
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+    $ MainTxt = TavernSandraRoomRoom.descriptions[0].text
+    $ _sandra_room_notice = household_room_issue_notice_text("sandra")
+    if str(_sandra_room_notice or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_sandra_room_notice or "")
+    $ MainTxt = werecat_append_visible_text(MainTxt, "TavernSandraRoom")
+    $ CurLocDesc = MainTxt
+    call TavernSandraRoomBuildActions
+    return
+
+label TavernSandraRoomRestore:
+    $ scene_image = tavern_sandra_room_picture()
+    if scene_image:
+        $ _layout_last_picture = scene_image
+        vscene scene_image
+    $ MainTxt = TavernSandraRoomRoom.descriptions[0].text
+    $ _sandra_room_notice = household_room_issue_notice_text("sandra")
+    if str(_sandra_room_notice or "").strip() != "":
+        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_sandra_room_notice or "")
+    $ MainTxt = werecat_append_visible_text(MainTxt, "TavernSandraRoom")
+    $ CurLocDesc = MainTxt
+    call TavernSandraRoomBuildActions
+    return
+
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -78,19 +120,16 @@ label TavernSandraRoom:
     if tavern_sandra_room_door_locked():
         $ CurrentRoom = TavernUpstairsRoom
         $ CurLoc = "TavernUpstairs"
-        $ location = CurLoc
         $ _layout_last_picture = ""
         $ MainTxt = "Дверь в комнату Сандры заперта. Пока она не начала вам по-настоящему доверять, лезть туда рано."
         $ CurLocDesc = MainTxt
-        call TavernUpstairsBuildActions
-        $ _sandra_locked_ui_return = None
-        while _sandra_locked_ui_return is None:
+        $ current_action_title = "Наверху"
+        $ current_action_content = None
+        $ current_action_items = tavern_upstairs_action_items()
+        while True:
             call screen main_ui
-            $ _sandra_locked_ui_return = _return
-        jump TavernUpstairs
     $ CurrentRoom = TavernSandraRoomRoom
     $ CurLoc = "TavernSandraRoom"
-    $ location = CurLoc
     $ scene_image = tavern_sandra_room_picture()
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -101,37 +140,11 @@ label TavernSandraRoom:
         $ MainTxt = str(MainTxt or "") + "\n\n" + str(_sandra_room_notice or "")
     $ MainTxt = werecat_append_visible_text(MainTxt, "TavernSandraRoom")
     $ CurLocDesc = MainTxt
-    call TavernSandraRoomBuildActions
-    $ _sandra_room_ui_return = None
-    while _sandra_room_ui_return is None:
-        call screen main_ui
-        $ _sandra_room_ui_return = _return
-    jump TavernSandraRoom
-
-
-label TavernSandraRoomBuildActions:
     $ current_action_title = "Комната Сандры"
     $ current_action_content = None
-    $ current_action_items = []
-    python:
-        for _issue_action in list(household_room_issue_action_specs("sandra") or []):
-            current_action_items.append(MenuItem(str(_issue_action.get("label", "") or ""), Call(str(_issue_action.get("target", "") or ""), *tuple(_issue_action.get("args", ()) or ()))))
-    if str(getLocation("sandra") or "") == "TavernSandraRoom" and npc_can_talk_now("sandra") and int(Sandra.rel or 0) >= 5 and int(Sandra.asked_today or 0) == 0:
-        $ current_action_items.append(MenuItem("Сесть с Сандрой над трактирной книгой", Call("TavernSandraLedgerScene")))
-    if Sandra.night_thanks_ready() and int(hour or 0) >= 22 and int(hour or 0) <= 23 and int(Sandra.night_thanks_last_day or -1) != int(dayspassed or 0):
-        $ current_action_items.append(MenuItem("Принять ночную благодарность Сандры", Call("TavernSandraNightThanksScene")))
-    if Sandra.sex_available():
-        $ current_action_items.append(MenuItem("Уединиться с Сандрой", Call("SandraSexEngine", "sandra", "TavernSandraRoom")))
-    if tavern_upstairs_can_clean_rooms():
-        $ current_action_items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernSandraRoom", "", "")))
-    $ current_action_items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernSandraRoom", "TavernSandraRoomBuildActions")))
-    python:
-        for _room_object in TavernSandraRoomRoom.visible_game_items():
-            current_action_items.append(MenuItem(_room_object.name, Call("TavernSandraRoomObjectMenu", _room_object.object_id)))
-    python:
-        for _exit in TavernSandraRoomRoom.visible_exits():
-            current_action_items.append(MenuItem(_exit.label, Call("AdvanceMovementTime", _exit.target)))
-    return
+    call TavernSandraRoomBuildActions
+    while True:
+        call screen main_ui
 
 
 label TavernSandraRoomObjectMenu(object_id=""):
@@ -175,21 +188,6 @@ label TavernSandraRoomObjectText(object_id="", action_id=""):
             CurLocDesc = _room_text
             current_action_title = _room_name or "Комната Сандры"
     call TavernSandraRoomObjectMenu(object_id)
-    return
-
-
-label TavernSandraRoomRestore:
-    $ scene_image = tavern_sandra_room_picture()
-    if scene_image:
-        $ _layout_last_picture = scene_image
-        vscene scene_image
-    $ MainTxt = TavernSandraRoomRoom.descriptions[0].text
-    $ _sandra_room_notice = household_room_issue_notice_text("sandra")
-    if str(_sandra_room_notice or "").strip() != "":
-        $ MainTxt = str(MainTxt or "") + "\n\n" + str(_sandra_room_notice or "")
-    $ MainTxt = werecat_append_visible_text(MainTxt, "TavernSandraRoom")
-    $ CurLocDesc = MainTxt
-    call TavernSandraRoomBuildActions
     return
 
 

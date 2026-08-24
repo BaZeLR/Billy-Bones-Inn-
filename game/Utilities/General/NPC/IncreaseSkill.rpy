@@ -6,6 +6,14 @@ default cookincr = {}
 default cleanincr = {}
 default waitressincr = {}
 
+default cookincr = {}
+default cleanincr = {}
+default waitressincr = {}
+
+default cookincr = {}
+default cleanincr = {}
+default waitressincr = {}
+
 init python:
     def increase_skill(girl_name):
         """Compute potential skill gain for a tavern worker based on current assignments."""

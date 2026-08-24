@@ -1,4 +1,7 @@
-# ================================================================================
+    $ sync_player_state_from_store()    hide screen tavern_report_card_overlay    hide screen time_change_card_overlay    hide screen girl_card_overlay
+    hide screen player_card_overlay    hide screen time_change_card_overlay    $ sync_player_state_from_store()    hide screen tavern_report_card_overlay    hide screen time_change_card_overlay    hide screen girl_card_overlay
+    hide screen player_card_overlay    hide screen time_change_card_overlay    $ sync_player_state_from_store()    hide screen tavern_report_card_overlay    hide screen time_change_card_overlay    hide screen girl_card_overlay
+    hide screen player_card_overlay    hide screen time_change_card_overlay# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # NextDay location - converted from legacy script
@@ -11,12 +14,22 @@ init python:
 
     def nextday_started_after_midnight():
         try:
-            calendar_v2.sync_state()
         except Exception:
             pass
 
         try:
+        except Exception:
+            pass
+
+        try:
+            try:
             current_hour = int(calendar_v2.hour or 0) % 24
+        except Exception:
+            try:
+                current_hour = int(hour or 0) % 24
+            except Exception:
+                current_hour = 0
+
         except Exception:
             try:
                 current_hour = int(hour or 0) % 24
@@ -102,10 +115,8 @@ label NextDay(retlocname, timepassed):
                     calendar_v2.period = 1
                     calendar_v2.cycle += 1
 
-                calendar_v2.sync_state()
         $ calendar_v2.hour = 6
         $ calendar_v2.minute = 0
-        $ calendar_v2.sync_state()
         $ Clara.prepare_daily_event_rolls()
         $ player_state(False).daily_maintenance(1)
         
@@ -120,7 +131,7 @@ label NextDay(retlocname, timepassed):
         TotalDay['whorerevenue'] = TotalWhoreClients['georgett']*3 + TotalWhoreClients['liza']*3
         TotalDay['gloryholerevenue'] = TotalGloryHoleClients['georgett']*2 + TotalGloryHoleClients['liza']*2
         
-        tavernfame += TotalDay['loyalty']
+        player.economy.tavern_fame += TotalDay['loyalty']
         money += (TotalDay['revenue'] - TotalDay['dineout'] - TotalDay['fixedcost'] +
                 TotalDay['whorerevenue'] + TotalDay['gloryholerevenue'] +
                 TotalDay['KidsMoney'] + (600 if KidBirthPosobie else 0))
@@ -132,8 +143,7 @@ label NextDay(retlocname, timepassed):
             if DressBuyer == 'You':
                 dress_name = ShortDressName.get(DressProduced, DressProduced).lower()
                 NewDressCame = f'Утром прибежал посыльный из лавки Фараго и принес вам ваш заказ - {dress_name}.'
-                player_state().appearance.add_dress(DressProduced, int(dayspassed or 0))
-                player_state().appearance.apply_to_store()
+                player.appearance.add_dress(DressProduced, int(dayspassed or 0))
                 
             if money >= 50:
                 NewDressCame += f' Вы поблагодарили мальчишку, дав ему 5 мараведи, и положили обнову в ларь.'
@@ -211,12 +221,12 @@ label NextDay(retlocname, timepassed):
         if TotalDay['gloryholerevenue'] > 0:
             _nextday_lines.append("Ваша прибыль с глорихола, как и было договоренно, составила %s мараведи." % TotalDay['gloryholerevenue'])
 
-        _nextday_lines.append("На кухне остается %s мешков продуктов." % DispFrac(productnum))
-        _nextday_lines.append("В погребе остается %s бочонков вина." % DispFrac(winenum))
+        _nextday_lines.append("На кухне остается %s мешков продуктов." % DispFrac(player.tavern_management.productnum))
+        _nextday_lines.append("В погребе остается %s бочонков вина." % DispFrac(player.tavern_management.winenum))
 
         if CursedByEllona > 0 and CursedByEllonaDays <= 0:
             CursedByEllona = 0
-            cancumdaily += CursedByEllonaReduce
+            player.intimacy.can_cum_daily += CursedByEllonaReduce
             CursedByEllonaDays = 0
             CursedByEllonaReduce = 0
             _nextday_lines.append("ВЫ ПОЧУВСТВОВАЛИ КАК ПРОКЛЯТЬЕ ГРАЦИИ УШЛО. ВАША МУЖСКАЯ СИЛА ВОССТАНОВИЛАСЬ.")
@@ -234,14 +244,14 @@ label NextDay(retlocname, timepassed):
         elif TotalDay['loyalty'] < 0:
             _nextday_lines.append("Ваша популярность уменьшается!")
 
-        if tavernfame >= 10:
+        if player.economy.tavern_fame >= 10:
             _nextday_lines.append("Ваша популярность выросла настолько, что в ваш трактир стало заходить больше посетителей!")
-            tavernvisitors += tavernfame
-            tavernfame = 0
-        elif tavernfame <= -10:
+            player.tavern_management.visitors += player.economy.tavern_fame
+            player.economy.tavern_fame = 0
+        elif player.economy.tavern_fame <= -10:
             _nextday_lines.append("Ваш трактир обрел настолько дурную славу, что многие бывшие завсегдатаи стали его избегать!")
-            tavernvisitors += tavernfame
-            tavernfame = 0
+            player.tavern_management.visitors += player.economy.tavern_fame
+            player.economy.tavern_fame = 0
 
         for _girl in ('sandra', 'melissa', 'amanda'):
             _nextday_lines.extend(describe_skill_increase(_girl))
@@ -252,19 +262,23 @@ label NextDay(retlocname, timepassed):
     
     # Reset daily variables
     $ Georgett.set_story_value("foundinchurch", 0)
-    $ player_state().intimacy.set_arousal(0, "You")
-    $ player_state().intimacy.apply_to_store()
-    $ cametoday = 0
+    $ player.intimacy.set_arousal(0, "You")
+    $ player.intimacy.came_today = 0
     $ energy = 100
     $ BlockTimeAdvance = 1
     call TractirCheckAchievements
     call TractirShowPendingAchievements
     $ notoriety = 0
-    $ sync_player_state_from_store()
     
     # Ensure minimums
-    if tavernvisitors < 0:
-        $ tavernvisitors = 0
+    if player.tavern_management.visitors < 0:
+        $ player.tavern_management.visitors = 0
+    if money < 0:
+        $ money = 0
+        
+    if money < 0:
+        $ money = 0
+        
     if money < 0:
         $ money = 0
         
@@ -274,15 +288,11 @@ label NextDay(retlocname, timepassed):
 
     call stat
     hide screen main_ui
-    hide screen girl_card_overlay
-    hide screen player_card_overlay
-    hide screen tavern_report_card_overlay
-    hide screen time_change_card_overlay
     call screen nextday_report_card_overlay
     $ checkpoint_tractir_progress("next_day", True)
     
     # End game or return
-    if money == 0 or tavernvisitors == 0:
+    if player.economy.money == 0 or player.tavern_management.visitors == 0:
         menu:
             "Начать сначала":
                 jump Intro

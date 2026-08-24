@@ -1,4 +1,4 @@
-# ================================================================================
+            global player.economy.tavern_fame            global player.economy.tavern_fame    return            global player.economy.tavern_fame            global player.economy.tavern_fame    return            global player.economy.tavern_fame            global player.economy.tavern_fame    return# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -46,8 +46,7 @@ init python:
             Amanda.apply_social_chance(0, 0, 0, 60, 2, 1, "dress_change_seen")
         if randvar >= 5 and randvar <= 7:
             Amanda.apply_social_chance(0, 0, 0, 60, 1, 1, "dress_change_seen")
-            global tavernfame
-            tavernfame = int(tavernfame or 0) + 1
+            player.economy.tavern_fame = int(player.economy.tavern_fame or 0) + 1
         return text
 
 
@@ -216,4 +215,3 @@ label IntAmandaDressChangeApply(GirlNameIAT="amanda", choice_code=""):
         $ CurLocDesc = MainTxt
         return
 
-    return

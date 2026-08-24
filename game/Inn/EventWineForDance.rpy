@@ -1,19 +1,4 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
-init python:
-    def wine_for_dance_costs():
-        return {"wine": 50, "products": 40, "money": 20}
-
-    def wine_for_dance_can_sponsor():
-        costs = wine_for_dance_costs()
-        return (
-            int(winenum or 0) >= int(costs["wine"])
-            and int(productnum or 0) >= int(costs["products"])
-            and int(money or 0) >= int(costs["money"])
-        )
-
-    def wine_for_dance_apply_choice(reaction_code=1):
+default player.tavern_management.breakfast.dance_sponsor_announced_day = -1    def wine_for_dance_apply_choice(reaction_code=1):
         code = int(reaction_code or 0)
         costs = wine_for_dance_costs()
 
@@ -40,6 +25,74 @@ init python:
             "product_delta": 0,
             "money_delta": 0,
         }
+default player.tavern_management.breakfast.dance_sponsor_announced_day = -1    def wine_for_dance_apply_choice(reaction_code=1):
+        code = int(reaction_code or 0)
+        costs = wine_for_dance_costs()
+
+        if code == 1:
+            return {
+                "text": "Вы решили поддержать народные гуляния.",
+                "dance_sponsor": 1,
+                "wine_delta": -int(costs["wine"]),
+                "product_delta": -int(costs["products"]),
+                "money_delta": -int(costs["money"]),
+            }
+        if code == 2:
+            return {
+                "text": "Вы бы были и рады поддержать оные гуляния, но, к сожалению, у вас было недостаточно вина и продуктов для столь благородной затеи.",
+                "dance_sponsor": 0,
+                "wine_delta": 0,
+                "product_delta": 0,
+                "money_delta": 0,
+            }
+        return {
+            "text": "Вы решили что ваши финансы не позволяют участвовать в такой затее.",
+            "dance_sponsor": 0,
+            "wine_delta": 0,
+            "product_delta": 0,
+            "money_delta": 0,
+        }
+default player.tavern_management.breakfast.dance_sponsor_announced_day = -1    def wine_for_dance_apply_choice(reaction_code=1):
+        code = int(reaction_code or 0)
+        costs = wine_for_dance_costs()
+
+        if code == 1:
+            return {
+                "text": "Вы решили поддержать народные гуляния.",
+                "dance_sponsor": 1,
+                "wine_delta": -int(costs["wine"]),
+                "product_delta": -int(costs["products"]),
+                "money_delta": -int(costs["money"]),
+            }
+        if code == 2:
+            return {
+                "text": "Вы бы были и рады поддержать оные гуляния, но, к сожалению, у вас было недостаточно вина и продуктов для столь благородной затеи.",
+                "dance_sponsor": 0,
+                "wine_delta": 0,
+                "product_delta": 0,
+                "money_delta": 0,
+            }
+        return {
+            "text": "Вы решили что ваши финансы не позволяют участвовать в такой затее.",
+            "dance_sponsor": 0,
+            "wine_delta": 0,
+            "product_delta": 0,
+            "money_delta": 0,
+        }
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+init python:
+    def wine_for_dance_costs():
+        return {"wine": 50, "products": 40, "money": 20}
+
+    def wine_for_dance_can_sponsor():
+        costs = wine_for_dance_costs()
+        return (
+            int(winenum or 0) >= int(costs["wine"])
+            and int(productnum or 0) >= int(costs["products"])
+            and int(money or 0) >= int(costs["money"])
+        )
 
     def tavern_breakfast_can_offer_dance_sponsorship():
         return (
@@ -66,6 +119,18 @@ init python:
 
 default DanceSponsorPledgeDay = -1
 default TavernBreakfastDanceSponsorAnnouncedDay = -1
+
+default DanceSponsorPledgeDay = -1
+
+default DanceSponsorPledgeDay = -1
+default TavernBreakfastDanceSponsorAnnouncedDay = -1
+
+default DanceSponsorPledgeDay = -1
+
+default DanceSponsorPledgeDay = -1
+default TavernBreakfastDanceSponsorAnnouncedDay = -1
+
+default DanceSponsorPledgeDay = -1
 
 label EventWineForDance(eyewitness=0):
     $ YourReaction1 = 0
@@ -109,9 +174,9 @@ label EventWineForDanceApply(reaction_code=1):
             $ MainTxt = str(MainTxt or "") + "\n\nЗа столом решение встречают заметно теплее. Домашние переглядываются с одобрением: щедрый жест явно поднимает всем настроение."
             $ CurLocDesc = MainTxt
     call stat
-    if str(CurLoc or "") == "TavernKitchen" and bool(TavernBreakfastEventActive):
+    if str(CurLoc or "") == "TavernKitchen" and bool(player.tavern_management.breakfast.event_active):
         $ TavernKitchenSavedText = MainTxt
-        call TavernKitchenBreakfastShowText(MainTxt, "TavernKitchenBreakfastMenu")
+        call TavernKitchenBreakfastShowText(MainTxt)
         return
     $ current_action_title = ""
     $ current_action_content = None

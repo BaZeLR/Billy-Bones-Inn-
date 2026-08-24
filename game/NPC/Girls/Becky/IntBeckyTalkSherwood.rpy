@@ -7,6 +7,14 @@ label IntBeckyTalkSherwood(girl_name="becky"):
     jump IntBeckyTalk
 
 
+label IntBeckyTalkSherwood(girl_name="becky"):
+    jump IntBeckyTalk
+
+
+label IntBeckyTalkSherwood(girl_name="becky"):
+    jump IntBeckyTalk
+
+
 label story_becky_sherwood_offer_0(girl_name="becky"):
     $ MainTxt = "\"Ага передумал,\" радостно воскликнула вдова. \"Так я и знала, что жадность твою лень пересилит! Рада, что в тебе не ошиблась.\""
     if str(Becky.var.get("TradeOfferText", "") or "") != "":
@@ -14,9 +22,9 @@ label story_becky_sherwood_offer_0(girl_name="becky"):
     $ CurLocDesc = MainTxt
     $ Becky.var["TradeOffer"] = 1
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_sherwood_elves_0(girl_name="becky"):
@@ -26,9 +34,9 @@ label story_becky_sherwood_elves_0(girl_name="becky"):
     $ CurLocDesc = MainTxt
     $ Becky.var["AskTradeElf"] = 1
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_sherwood_fingal_0(girl_name="becky"):
@@ -36,9 +44,9 @@ label story_becky_sherwood_fingal_0(girl_name="becky"):
     $ CurLocDesc = MainTxt
     $ Becky.var["SherwoodSuspect"] = Becky.var.get("SherwoodSuspect", 0) + 1
     $ Becky.var["FingalClarify"] = 1
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_sherwood_warn_0(girl_name="becky"):
@@ -46,9 +54,9 @@ label story_becky_sherwood_warn_0(girl_name="becky"):
     $ CurLocDesc = MainTxt
     $ Becky.var["SherwoodSuspect"] = Becky.var.get("SherwoodSuspect", 0) + 1
     $ Becky.var["SherwoodWarn"] = 2
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_sherwood_road_0(girl_name="becky"):
@@ -62,18 +70,18 @@ label story_becky_sherwood_road_0(girl_name="becky"):
     $ Becky.var["SherwoodSuspect"] = Becky.var.get("SherwoodSuspect", 0) + 10
     $ Becky.var["AdmitSherwood"] = 1
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_sherwood_lied_0(girl_name="becky"):
     $ MainTxt = "\"Так я ж не нарочно. Ну, вернее, думала что ты и так справишься, ты ж смышленный, что тебя раньше времени пугать?\""
     $ CurLocDesc = MainTxt
     $ Becky.var["AdmitSherwood"] = 2
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_sherwood_robbed_0(girl_name="becky"):
@@ -82,9 +90,9 @@ label story_becky_sherwood_robbed_0(girl_name="becky"):
     $ Becky.var["AdmitSherwood"] = max(Becky.var.get("AdmitSherwood", 0), 2)
     $ Becky.var["RobbedByRobin"] = Becky.var.get("RobbedByRobin", 0) + 1
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_sherwood_howto_0(girl_name="becky"):
@@ -92,15 +100,15 @@ label story_becky_sherwood_howto_0(girl_name="becky"):
     $ CurLocDesc = MainTxt
     $ Becky.var["ConsoleRobbery"] = Becky.var.get("ConsoleRobbery", 0) + 1
     $ Becky.finish_talk()
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return
 
 
 label story_becky_sherwood_warned_0(girl_name="becky"):
     $ MainTxt = "\"Так не виноватая я. Ты и не спрашивал-то особо. А я думала что ты и так справишься, ты ж смышленный, что тебя раньше времени расстраивать? А может энтово Робина там и нет уже? Может он ушел кудайсь? Могло же такое быть? Могло. Вот я и решила тебя не пугать. Ты уж прости меня, дуру.\""
     $ CurLocDesc = MainTxt
     $ Becky.var["RobbedByRobin"] = Becky.var.get("RobbedByRobin", 0) + 1
-    if thread is not None:
-        $ thread.complete()
-    jump IntBeckyTalk
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.complete()
+    return

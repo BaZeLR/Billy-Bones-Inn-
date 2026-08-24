@@ -72,7 +72,7 @@ label AfterDanceLegare(arg=""):
 
 # Separated the fight portion into its own label
 label AfterDanceLegare_Fight:
-    $ FridayDancesCount = 5
+    $ FridayDanceRoom.state["dance_count"] = 5
     $ _amanda_dance_fight_level = player_state(False).combat.fight_level
     $ Randvar = FightResult(_amanda_dance_fight_level.get("you", 1), _amanda_dance_fight_level.get("legare", 1), 1)
     $ Alber.set_var_int("FightYouAmanda", 1)
@@ -123,7 +123,7 @@ label AfterDanceLegare_Fight:
             
             "Удивленно посмотреть":
                 "Вы непонимающим взглядом уставились на стражников и пожали плечами. \"Ну что же, на нет и суда нет,\" засмеялись они, моментально закрутили вам руки и отвели в кутузку. \nХоть и просидели вы там всего одну ночь, но слухи об этом успели распространиться, к тому же многие видели, как вас вели под конвоем. \nНа репутации вашего заведения это маленькое приключение отразилось не лучшим образом."
-                $ tavernfame -= 3
+                $ player.economy.tavern_fame -= 3
                 menu:
                     "Понуро вернуться в трактир на утро из каталажки":
                         call NextDay("TavernMain", 1)
@@ -131,7 +131,7 @@ label AfterDanceLegare_Fight:
 # Police intervention path
 label AfterDanceLegare_Police:
     $ AlberBribe = 0
-    $ FridayDancesCount = 5
+    $ FridayDanceRoom.state["dance_count"] = 5
     $ Alber.add_relation(-2)
     $ Amanda.change_social(friend_delta=-2)
     

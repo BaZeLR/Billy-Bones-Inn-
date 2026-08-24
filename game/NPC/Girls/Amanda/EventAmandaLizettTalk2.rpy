@@ -1,4 +1,55 @@
-# ================================================================================
+label EventAmandaLizettTalk2Apply(reaction_code=4):
+    $ YourReaction2 = reaction_code
+
+    if reaction_code == 1:
+        $ Amanda.set_var_int("prohibitliza", 2)
+        "Вы поймали проходящую мимо Аманду и строго ее отчитали за то, что она болтала с Лизеттой несмотря на запрет. Аманда расплакалась и убежала в слезах."
+        $ Amanda.apply_social_chance(3, 1, -1, 0, 0, 0, "liza_talk_scold")
+    elif reaction_code == 2:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        "Вы поймали проходящую мимо Аманду и сказали ей, чтобы она не болтала с Лизеттой, так как та распущенная девчонка и хорошему не научит. Аманда выслушала вас и пообещала с Лизеттой не говорить."
+    elif reaction_code == 3:
+        $ Amanda.set_var_int("prohibitliza", 0)
+        "Вы поймали проходящую мимо Аманду и сказали ей, что погорячились, вы не хотите на нее давить и она имеет полное право говорить с кем хочет. Аманда поблагодарила вас за доверие и пошла по своим делам."
+        if Amanda.rel < 5 and procedural_randint(1, 4, key="procedural:NPC/Girls/Amanda/EventAmandaLizettTalk2.rpy:procedural_randint:67:7") == 1:
+            "Ей очень понравилось, что вы ей так доверяете."
+            $ Amanda.apply_social_chance(6, 1, 1, 0, 0, 0, "liza_talk_trust")
+
+    jump TavernMainlabel EventAmandaLizettTalk2Apply(reaction_code=4):
+    $ YourReaction2 = reaction_code
+
+    if reaction_code == 1:
+        $ Amanda.set_var_int("prohibitliza", 2)
+        "Вы поймали проходящую мимо Аманду и строго ее отчитали за то, что она болтала с Лизеттой несмотря на запрет. Аманда расплакалась и убежала в слезах."
+        $ Amanda.apply_social_chance(3, 1, -1, 0, 0, 0, "liza_talk_scold")
+    elif reaction_code == 2:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        "Вы поймали проходящую мимо Аманду и сказали ей, чтобы она не болтала с Лизеттой, так как та распущенная девчонка и хорошему не научит. Аманда выслушала вас и пообещала с Лизеттой не говорить."
+    elif reaction_code == 3:
+        $ Amanda.set_var_int("prohibitliza", 0)
+        "Вы поймали проходящую мимо Аманду и сказали ей, что погорячились, вы не хотите на нее давить и она имеет полное право говорить с кем хочет. Аманда поблагодарила вас за доверие и пошла по своим делам."
+        if Amanda.rel < 5 and procedural_randint(1, 4, key="procedural:NPC/Girls/Amanda/EventAmandaLizettTalk2.rpy:procedural_randint:67:7") == 1:
+            "Ей очень понравилось, что вы ей так доверяете."
+            $ Amanda.apply_social_chance(6, 1, 1, 0, 0, 0, "liza_talk_trust")
+
+    jump TavernMainlabel EventAmandaLizettTalk2Apply(reaction_code=4):
+    $ YourReaction2 = reaction_code
+
+    if reaction_code == 1:
+        $ Amanda.set_var_int("prohibitliza", 2)
+        "Вы поймали проходящую мимо Аманду и строго ее отчитали за то, что она болтала с Лизеттой несмотря на запрет. Аманда расплакалась и убежала в слезах."
+        $ Amanda.apply_social_chance(3, 1, -1, 0, 0, 0, "liza_talk_scold")
+    elif reaction_code == 2:
+        $ Amanda.set_var_int("prohibitliza", 1)
+        "Вы поймали проходящую мимо Аманду и сказали ей, чтобы она не болтала с Лизеттой, так как та распущенная девчонка и хорошему не научит. Аманда выслушала вас и пообещала с Лизеттой не говорить."
+    elif reaction_code == 3:
+        $ Amanda.set_var_int("prohibitliza", 0)
+        "Вы поймали проходящую мимо Аманду и сказали ей, что погорячились, вы не хотите на нее давить и она имеет полное право говорить с кем хочет. Аманда поблагодарила вас за доверие и пошла по своим делам."
+        if Amanda.rel < 5 and procedural_randint(1, 4, key="procedural:NPC/Girls/Amanda/EventAmandaLizettTalk2.rpy:procedural_randint:67:7") == 1:
+            "Ей очень понравилось, что вы ей так доверяете."
+            $ Amanda.apply_social_chance(6, 1, 1, 0, 0, 0, "liza_talk_trust")
+
+    jump TavernMain# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label EventAmandaLizettTalk2(eyewitness=0):

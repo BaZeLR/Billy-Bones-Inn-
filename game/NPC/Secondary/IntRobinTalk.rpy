@@ -1,4 +1,4 @@
-# ================================================================================
+            $ RobbersHeadNameTmp = "Робин Гуд"            $ RobbersHeadNameTmp = "Робин Гуд"            $ RobbersHeadNameTmp = "Робин Гуд"# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntRobinTalk:
@@ -18,7 +18,6 @@ label IntRobinTalk:
             "Вы посмотрели на мрачных друзей Робин Гуда, плотно обступивших вас, и поспешно согласились с обездоленным."
             "\"Хей, а на самом деле браза назвали меня не Худи, а Гудом за мой добрый нрав и щедрое сердце. Вот мы с моими бразами мазафаков бьем, несправедливость исправляем. Нам, это, как ее, социяльная ответственность нужна. Мы за социяльную ответственность - горой!\""
             $ Robin.set_var_int("KnowHim", 1)
-            $ RobbersHeadNameTmp = "Робин Гуд"
             return
 
         "А если вы простые лесорубы, то откуда у вас оружие?" if Robin.var_int("KnowHim", 0) == 1 and Robin.var_int("KnowWeapon", 0) == 0:

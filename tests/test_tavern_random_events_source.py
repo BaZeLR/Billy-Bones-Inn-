@@ -49,8 +49,8 @@ def test_create_tavern_events_has_no_forced_waitress_fallback():
 def test_tavern_daily_plan_appends_random_selection():
     source = read_rel("game/Inn/TavernRandomEvents.rpy")
 
-    assert "tavern_work_events.append(tavern_work_plan_row(selected, period))" in source
-    assert "continue\n                tavern_work_events.append" not in source
+    assert "event_runtime.tavern_work_events.append(tavern_work_plan_row(selected, period))" in source
+    assert "continue\n                event_runtime.tavern_work_events.append" not in source
 
 
 def test_tavern_dispatch_uses_planned_event_pop():

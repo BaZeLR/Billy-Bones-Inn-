@@ -2,7 +2,7 @@
 # This file follows the exact engine standard and user rules:
 # - Thin labels only (one stage per label)
 # - All counters live inside the event
-# - thread.advance() ONLY when THIS event's stage completion conditions are met
+# - event_runtime.active_thread.advance() ONLY when THIS event's stage completion conditions are met
 # - Use rand_int() for all random chances (no direct rand())
 # - Direct $ Becky.var[...] / Eddie.var[...] assignments (NO globals(), NO store. hacks after purge)
 # - Classic menu: only, no MenuItem.append
@@ -69,9 +69,9 @@ label becky_eddie_black_eye:
     # Rare 1/6 roll (exact match to source). Only if guest progress + friends sufficient.
     if (Becky.var.get("visitedhome", 0) >= 5 and
             Becky.rel >= 15 and
-            procedural_randint(1, 6, "becky_eddie_black_eye_%s" % people_to_int(dayspassed, 0)) == 1 and dayspassed > 0):
+            procedural_randint(1, 6, "becky_eddie_black_eye_%s" % people_to_int(current_game_day(), 0)) == 1 and current_game_day() > 0):
 
-        $ Becky.var["EddieRobbedDay"] = dayspassed
+        $ Becky.var["EddieRobbedDay"] = current_game_day()
         $ Becky.var["EddieRobbed"] = 1
 
         $ MainTxt = "Эдди вернулся с синяком под глазом и распухшим ухом. Он явно получил хорошую взбучку где-то за городом.\n\n"
@@ -83,8 +83,8 @@ label becky_eddie_black_eye:
         # For the thin event we just mark that the offer is now available at GroceryStore.
         $ Becky.var["SherwoodQuestScheduled"] = 1
 
-        if thread is not None:
-            $ thread.advance()
+        if event_runtime.active_thread is not None:
+            $ event_runtime.active_thread.advance()
 
         $ Becky.finish_talk()
 
@@ -144,8 +144,8 @@ label becky_blackwood_quest_start:
 
             $ Becky.var["TradeOffer"] = 1
 
-            if thread is not None:
-                $ thread.advance()
+            if event_runtime.active_thread is not None:
+                $ event_runtime.active_thread.advance()
 
             $ Becky.finish_talk()
             $ CurLocDesc = MainTxt
@@ -176,6 +176,11 @@ label becky_blackwood_talk_reveal:
     $ becky = getPersonInfo("becky")
 
     $ Becky.var.setdefault("KnowSherwood", 0)
+    $ Becky.var.setdefault("KnowSherwood", 0)
+    $ Becky.var.setdefault("KnowSherwood", 0)
+    $ Becky.var.setdefault("KnowSherwood", 0)
+    $ Becky.var.setdefault("KnowSherwood", 0)
+    $ Becky.var.setdefault("KnowSherwood", 0)
     $ Becky.var.setdefault("KnowBlackwood", 0)
     $ Becky.var.setdefault("AdmitSherwood", 0)
     $ Becky.var.setdefault("SherwoodSuspect", 0)
@@ -192,10 +197,15 @@ label becky_blackwood_talk_reveal:
     $ Becky.var["SherwoodSuspect"] += 10
     $ Becky.var["AdmitSherwood"] = 1
     $ Becky.var["KnowBlackwood"] = 1          # modern rename flag
+    $ Becky.var["KnowSherwood"] = 1           # keep legacy for compatibility          # modern rename flag
+    $ Becky.var["KnowSherwood"] = 1           # keep legacy for compatibility          # modern rename flag
+    $ Becky.var["KnowSherwood"] = 1           # keep legacy for compatibility          # modern rename flag
+    $ Becky.var["KnowSherwood"] = 1           # keep legacy for compatibility          # modern rename flag
+    $ Becky.var["KnowSherwood"] = 1           # keep legacy for compatibility          # modern rename flag
     $ Becky.var["KnowSherwood"] = 1           # keep legacy for compatibility
 
-    if thread is not None:
-        $ thread.advance()
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.advance()
 
     $ Becky.finish_talk()
     $ CurLocDesc = MainTxt
@@ -244,8 +254,8 @@ label robin_mongol_vouch_safe_passage:
     $ Robin.set_var_int("MongolSafePass", 1)
     $ Robin.set_var_int("KnowHim", 1)
 
-    if thread is not None:
-        $ thread.advance()
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.advance()
 
     $ CurLocDesc = MainTxt
 
@@ -290,8 +300,8 @@ label zimmer_bandit_camp_choice:
             $ MainTxt += "(Полная реализация этого пути — уничтожение, последствия для торговли, реакция Зиммера и Бекки — в будущей части квеста.)\n"
             $ Robin.set_var_int("PlayerDestroyedCamp", 1)
 
-            if thread is not None:
-                $ thread.advance()
+            if event_runtime.active_thread is not None:
+                $ event_runtime.active_thread.advance()
 
             # Placeholder return / jump to future camp destruction scene
             return
@@ -301,8 +311,8 @@ label zimmer_bandit_camp_choice:
             $ MainTxt += "(Полная реализация мирного пути — переговоры, условия, последствия, оплата от Зиммера — в будущей части квеста.)\n"
             $ Robin.set_var_int("ZimmerPeaceful", 1)
 
-            if thread is not None:
-                $ thread.advance()
+            if event_runtime.active_thread is not None:
+                $ event_runtime.active_thread.advance()
 
             return
 
@@ -340,8 +350,8 @@ label zimmer_guard_mission_update:
         $ Zimmer.var["PlayerHandledRobin"] = 1
         $ Zimmer.var["MissionUpdatedByPlayer"] = 1
 
-        if thread is not None:
-            $ thread.advance()
+        if event_runtime.active_thread is not None:
+            $ event_runtime.active_thread.advance()
 
     elif Robin.var_int("ZimmerPeaceful", 0) == 1:
         $ MainTxt += "Вы рассказываете Циммерману о договорённости, которую удалось достичь с Робином (или компромиссе).\n\n"
@@ -349,8 +359,8 @@ label zimmer_guard_mission_update:
         $ Zimmer.var["PlayerHandledRobin"] = 2
         $ Zimmer.var["MissionUpdatedByPlayer"] = 1
 
-        if thread is not None:
-            $ thread.advance()
+        if event_runtime.active_thread is not None:
+            $ event_runtime.active_thread.advance()
 
     else:
         $ MainTxt += "Вы пока не готовы отчитаться о результатах миссии."

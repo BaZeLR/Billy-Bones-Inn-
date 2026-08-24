@@ -4,7 +4,7 @@
 # ================================================================================
 
 label BeckyLoversInStore:
-    if CheckIfSexEventExist("becky", 99, "StoreLover") > 0 and procedural_randint(1, 3, "becky_store_lover_%s" % int(dayspassed or 0)) == 1:
+    if CheckIfSexEventExist("becky", 99, "StoreLover") > 0 and procedural_randint(1, 3, "becky_store_lover_%s" % int(current_game_day() or 0)) == 1:
         $ BeckyStoreSexType = GetSexEventFromTable("becky", 99, "StoreLover")
         $ ChooseOption = 0
         if Becky.store_lover_modest_reaction():

@@ -11,29 +11,29 @@ init python:
         s = int(getattr(girl, "corruption", 0) or 0)
 
         if s > 70:
-            if procedural_randint(1, 3, "clean_sperm_face_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            if procedural_randint(1, 3, "clean_sperm_face_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
                 girl.clear_cum("cum_face_others", "cum_face_you")
-            if procedural_randint(1, 6, "clean_sperm_tits_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            if procedural_randint(1, 6, "clean_sperm_tits_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
                 girl.clear_cum("cum_tits_others", "cum_tits_you")
-            if procedural_randint(1, 10, "clean_sperm_inside_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            if procedural_randint(1, 10, "clean_sperm_inside_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
                 girl.clear_cum("cum_inside_others", "cum_inside_you")
         elif s > 40:
-            if procedural_randint(1, 2, "clean_sperm_face_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            if procedural_randint(1, 2, "clean_sperm_face_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
                 girl.clear_cum("cum_face_others", "cum_face_you")
-            if procedural_randint(1, 3, "clean_sperm_tits_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            if procedural_randint(1, 3, "clean_sperm_tits_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
                 girl.clear_cum("cum_tits_others", "cum_tits_you")
-            if procedural_randint(1, 7, "clean_sperm_inside_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            if procedural_randint(1, 7, "clean_sperm_inside_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
                 girl.clear_cum("cum_inside_others", "cum_inside_you")
         elif s > 20:
-            if procedural_randint(1, 10, "clean_sperm_face_%s_%s" % (girl.code_name, int(dayspassed or 0))) <= 9:
+            if procedural_randint(1, 10, "clean_sperm_face_%s_%s" % (girl.code_name, int(current_game_day() or 0))) <= 9:
                 girl.clear_cum("cum_face_others", "cum_face_you")
-            if procedural_randint(1, 2, "clean_sperm_tits_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            if procedural_randint(1, 2, "clean_sperm_tits_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
                 girl.clear_cum("cum_tits_others", "cum_tits_you")
-            if procedural_randint(1, 3, "clean_sperm_inside_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            if procedural_randint(1, 3, "clean_sperm_inside_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
                 girl.clear_cum("cum_inside_others", "cum_inside_you")
         else:
             girl.clear_cum("cum_face_others", "cum_face_you", "cum_tits_others", "cum_tits_you")
-            if procedural_randint(1, 2, "clean_sperm_inside_%s_%s" % (girl.code_name, int(dayspassed or 0))) == 1:
+            if procedural_randint(1, 2, "clean_sperm_inside_%s_%s" % (girl.code_name, int(current_game_day() or 0))) == 1:
                 girl.clear_cum("cum_inside_others", "cum_inside_you")
 
         return 0

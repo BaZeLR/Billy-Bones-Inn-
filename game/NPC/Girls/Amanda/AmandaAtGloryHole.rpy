@@ -81,7 +81,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.set_var_int("gloryscold", 1)
             $ Amanda.set_var_int("glorywalkout", 0)
             $ Amanda.change_social(friend_delta=-5)
-            $ AmandaGloryCurState = 10
+            $ Amanda.set_var_int("glory_cur_state", 10)
             jump TavernMain
 
         "Развернуться и уйти, ничего не говоря" if AmandaGloryCurState <= 2 or AmandaGloryCurState == 4:
@@ -118,7 +118,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.set_var_int("suckyou", 1)
             $ Amanda.set_var_int("gloryscold", 0)
             $ Amanda.set_var_int("glorywalkout", 0)
-            $ AmandaGloryCurState = 3
+            $ Amanda.set_var_int("glory_cur_state", 3)
             call ShowImageSeq("amanda", "gloryfirst", "minet", 3)
             jump AmandaAtGloryHole_menu
 
@@ -140,7 +140,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.set_var_int("suckyou", 1)
             $ Amanda.set_var_int("gloryscold", 0)
             $ Amanda.set_var_int("glorywalkout", 0)
-            $ AmandaGloryCurState = 3
+            $ Amanda.set_var_int("glory_cur_state", 3)
             call ShowImageSeq("amanda", "gloryfirst", "minet", 3)
             jump AmandaAtGloryHole_menu
 
@@ -153,7 +153,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.pregnancy_check("mouthface", 1, "Вы")
             $ Amanda.set_var_int("glorysuck", 1)
             $ Amanda.set_var_int("suckyou", 1)
-            $ AmandaGloryCurState = 4
+            $ Amanda.set_var_int("glory_cur_state", 4)
             call ShowImage("amanda", "gloryfirst", "cummouth")
             jump AmandaAtGloryHole_menu
 
@@ -172,14 +172,14 @@ label AmandaAtGloryHole_menu:
             $ Amanda.pregnancy_check("mouthface", 1, "Вы")
             $ Amanda.set_var_int("glorysuck", 1)
             $ Amanda.set_var_int("suckyou", 1)
-            $ AmandaGloryCurState = 4
+            $ Amanda.set_var_int("glory_cur_state", 4)
             call ShowImage("amanda", "gloryfirst", "cummouth")
             jump AmandaAtGloryHole_menu
 
         "Поцеловать Аманду" if AmandaGloryCurState == 4:
             
             "Не говоря ни слова, вы наклонились и поцеловали Аманду, чувствуя на ее губах и языке привкус собственной спермы. Аманда с радостью ответила на ваш поцелуй, переплетя ваш язык своим. Продолжая целоваться вы вдруг почуствовали жаркий ротик Лизетты на своем обмякшем было члене. Поцелуи Аманды и лизеттин ротик начали быстро приводить вас обратно в полную готовность."
-            $ AmandaGloryCurState = 5
+            $ Amanda.set_var_int("glory_cur_state", 5)
             $ Amanda.set_var_int("gloryyouknow", 1)
             $ _kiss_image = "kiss" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AmandaAtGloryHole.rpy:procedural_randint:184:2"))
             call ShowImage("amanda", "gloryfirst", _kiss_image)
@@ -192,7 +192,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.clear_cum("cum_face_you")
             $ Amanda.set_var_int("gloryyouknow", 1)
             call ShowImage("amanda", "gloryfirst", "ambush")
-            $ AmandaGloryCurState = 10
+            $ Amanda.set_var_int("glory_cur_state", 10)
             jump TavernMain
 
         "Трахнуть Аманду" if AmandaGloryCurState == 4 or AmandaGloryCurState == 5:
@@ -226,7 +226,7 @@ label AmandaAtGloryHole_menu:
                     "Вы вспомнили, что так и не узнали как и с кем Аманда лишилась девственности. А ведь вы всегда отличались здоровым любопытством!"
                 "Несколько минут траха - и протяжным стоном Аманда кончила на вашем члене. Недолго осталось и вам, вы тоже кончаете."
             $ Amanda.add_sex_stat("orgasms_given", 1)
-            $ AmandaGloryCurState = 6
+            $ Amanda.set_var_int("glory_cur_state", 6)
             $ Amanda.set_var_int("fuckyou", 1)
             $ Amanda.set_var_int("knownotvirgin", 1)
             if Amanda.sex_stat("virginity", True):
@@ -276,7 +276,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.pregnancy_check("inside", 1, "Вы")
             $ Amanda.clear_cum("cum_face_you")
             $ Amanda.set_sex_stat("virginity", False)
-            $ AmandaGloryCurState = 10
+            $ Amanda.set_var_int("glory_cur_state", 10)
             $ _cumpussy_image = "cumpussy" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AmandaAtGloryHole.rpy:procedural_randint:280:3"))
             call ShowImage("amanda", "gloryfirst", _cumpussy_image)
             jump TavernMain
@@ -312,7 +312,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.apply_social_chance(18, 1, 2, 45, 1, 1, "glory_hole_sex")
             if Amanda.sex_stat("virginity", True):
                 $ Amanda.apply_social_chance(18, 1, 1, 45, 1, 1, "glory_hole_sex")
-            $ AmandaGloryCurState = 10
+            $ Amanda.set_var_int("glory_cur_state", 10)
             $ Amanda.pregnancy_check("outside", 1, "Вы")
             $ Amanda.clear_cum("cum_face_you")
             $ Amanda.set_sex_stat("virginity", False)

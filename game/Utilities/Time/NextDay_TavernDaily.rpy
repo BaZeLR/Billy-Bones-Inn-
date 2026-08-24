@@ -10,7 +10,7 @@ label NextDay_TavernDaily():
     python:
         # Daily visitors and happiness
         CurDay['happy'] = 0
-        CurDay['visitors'] = tavernvisitors + procedural_randint(-4, 4, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:13:1")
+        CurDay['visitors'] = player.tavern_management.visitors + procedural_randint(-4, 4, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:13:1")
         if week == 5:
             CurDay['visitors'] = CurDay['visitors'] // 2
         if week == 7:
@@ -28,14 +28,14 @@ label NextDay_TavernDaily():
         CurDay['products'] = max(0, CurDay['products'] - _kitchen_stock_used)
         if tavern_kitchen_boar_bonus_active():
             CurDay['wine'] = max(0, (CurDay['wine'] * 105 + 99) // 100)
-        if CurDay['wine'] > winenum:
+        if CurDay['wine'] > player.tavern_management.winenum:
             CurDay['happy'] -= 1
-            CurDay['wine'] = winenum
-        winenum -= CurDay['wine']
-        if CurDay['products'] > productnum:
+            CurDay['wine'] = player.tavern_management.winenum
+        player.tavern_management.winenum -= CurDay['wine']
+        if CurDay['products'] > player.tavern_management.productnum:
             CurDay['happy'] -= 1
-            CurDay['products'] = productnum
-        productnum -= CurDay['products']
+            CurDay['products'] = player.tavern_management.productnum
+        player.tavern_management.productnum -= CurDay['products']
         CurDay['revenue'] = round((CurDay['products'] * 8 + CurDay['wine'] * 30) * 0.1, 2)
         if tavern_kitchen_boar_bonus_active():
             CurDay['revenue'] = round(CurDay['revenue'] * 1.15, 2)
@@ -43,17 +43,17 @@ label NextDay_TavernDaily():
         if len(list(_kitchen_effect_lines or [])) > 0:
             ExtraEvents += "{b}" + "\n".join(list(_kitchen_effect_lines or [])) + "{/b}\n"
         CurDay['dineout'] = 0
-        CurDay['fameaten'] = householdmembers
+        CurDay['fameaten'] = player.tavern_management.household_members
         CurDay['rat_food_loss'] = 0
-        if CurDay['fameaten'] > productnum:
-            CurDay['dineout'] = (CurDay['fameaten'] - productnum) * 3
-            CurDay['fameaten'] = productnum
+        if CurDay['fameaten'] > player.tavern_management.productnum:
+            CurDay['dineout'] = (CurDay['fameaten'] - player.tavern_management.productnum) * 3
+            CurDay['fameaten'] = player.tavern_management.productnum
             CurDay['happy'] -= 1
-        productnum -= CurDay['fameaten']
+        player.tavern_management.productnum -= CurDay['fameaten']
         _rat_food_loss_due_day = int(werecat_state().get('rat_food_loss_next_day', -1) or -1)
         if int(werecat_state().get('rats_problem_active', 0) or 0) == 1 and _rat_food_loss_due_day >= 0 and int(dayspassed or 0) >= _rat_food_loss_due_day:
-            CurDay['rat_food_loss'] = min(3, int(productnum or 0))
-            productnum = max(0, int(productnum or 0) - CurDay['rat_food_loss'])
+            CurDay['rat_food_loss'] = min(3, int(player.tavern_management.productnum or 0))
+            player.tavern_management.productnum = max(0, int(player.tavern_management.productnum or 0) - CurDay['rat_food_loss'])
             werecat_state()['rat_food_loss_next_day'] = int(dayspassed or 0) + 7
             if CurDay['rat_food_loss'] == 1:
                 ExtraEvents += '{b}Крысы снова добрались до кладовой и испортили 1 мешок припасов.{/b}\n'
@@ -63,7 +63,7 @@ label NextDay_TavernDaily():
                 ExtraEvents += '{b}Крысы снова добрались до кладовой и испортили 3 мешка припасов.{/b}\n'
             else:
                 ExtraEvents += '{b}Крысы опять шуршали в кладовой, но брать там уже почти нечего.{/b}\n'
-        CurDay['fixedcost'] = householdmembers * 1 + 10
+        CurDay['fixedcost'] = player.tavern_management.household_members * 1 + 10
         # Service level effects
         if CurDay['happy'] >= 0:
             if tavernwaitress_value < 10 or tavernclean_value < 10 or tavernkitchen_value < 10:
@@ -73,7 +73,7 @@ label NextDay_TavernDaily():
                 if tavernlevel > CurDay['visitors'] * 4:
                     CurDay['happy'] += 1
         # Sign and girls effects
-        if SloganFixed < 2 and procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:76:3") == 1:
+        if player.tavern_management.slogan_state < 2 and procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:76:3") == 1:
             CurDay['happy'] -= 1
         if get_random_girl_by_job('jobwhore') and procedural_randint(1, 4, key="procedural:Utilities/Time/NextDay_TavernDaily.rpy:procedural_randint:78:4") == 1:
             CurDay['happy'] += 1
@@ -98,13 +98,12 @@ label NextDay_TavernDaily():
         TotalDay['happy'] += CurDay['happy']
         TotalDay['loyalty'] += CurDay['loyalty']
         if week == 7:
-            TotalDay['KidsMoney'] += player_state().economy.weekly_child_support_money()
+            TotalDay['KidsMoney'] += player.economy.weekly_child_support_money()
         if MyStallion:
             TotalDay['HorseFood'] += 3
         if Mongol.var['WillTryToSteal']:
             _dog_theft_result = None
             try:
-                ensure_dog_runtime()
             except Exception:
                 pass
             try:
@@ -128,7 +127,7 @@ label NextDay_TavernDaily():
                 TotalDay['HorseStolen'] = '{b}НЕГОДЯИ ПОД ПОКРОВОМ НОЧИ УКРАЛИ У ВАС ВАШЕГО КОНИКА, ВАШЕГО НЕНАГЛЯДНОГО %s. УТРОМ ВЫ ОБНАРУЖИЛИ ЧТО ЗАМОК НА ВОРОТАХ КОНЮШНИ ВЗЛОМАН, А ЛОШАДИ И СЛЕД ПРОСТЫЛ. НИКТО НИЧЕГО НЕ ВИДЕЛ И НЕ СЛЫШАЛ.{/b}\n' % MyStallion.upper()
                 MyStallion = ''
                 HorsePurchasePrice = 0
-                StolenHorseDays = 14
+                player.horse.stolen_days = 14
                 Mongol.var['TheftAsk'] = 0
                 Mongol.var['AskSawStolen'] = 0
                 Mongol.var['SawStolen'] = 0
@@ -144,3 +143,5 @@ label NextDay_TavernDaily():
     call change_tomorrow_hall_job('melissa')
     call change_tomorrow_hall_job('amanda')
     return
+
+

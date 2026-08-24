@@ -12,7 +12,6 @@ label WhoreNextDayClients(girl_name="", max_clients=0, glory_hole_max=0):
         max_clients_i = people_to_int(max_clients, 0)
         glory_max_i = min(10, max(0, people_to_int(glory_hole_max, 0)))
 
-        calendar_v2.sync_state()
         week_val = people_to_int(week, 0)
         current_time = people_to_int(time, 0)
 

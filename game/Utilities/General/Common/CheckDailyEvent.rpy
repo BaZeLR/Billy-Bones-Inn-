@@ -1,6 +1,14 @@
-# ================================================================================
+label CheckDailyEvent(girlname=None, eventtype=None, curloc=None, checktime=None):
+    call check_daily_event(girlname, eventtype, curloc, checktime)
+    returnlabel CheckDailyEvent(girlname=None, eventtype=None, curloc=None, checktime=None):
+    call check_daily_event(girlname, eventtype, curloc, checktime)
+    returnlabel CheckDailyEvent(girlname=None, eventtype=None, curloc=None, checktime=None):
+    call check_daily_event(girlname, eventtype, curloc, checktime)
+    return# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+default DailyEventsList = []
+default DailyEventsList = []
 default DailyEventsList = []
 init -25 python:
     import re
@@ -39,6 +47,78 @@ init -25 python:
         if op == "<=":
             return left <= right
         return left == right
+
+
+    def _daily_camel_to_snake(name):
+        text = str(name or "").strip()
+        if text == "":
+            return ""
+        return re.sub(r"(?<!^)(?=[A-Z])", "_", text).lower()
+
+
+    def _daily_extract_label_name(event_code):
+        code = str(event_code or "").strip()
+        if code == "":
+            return ""
+
+        if renpy.has_label(code):
+            return code
+
+        code_norm = code.replace("''", "'").replace('""', '"')
+        lowered = code_norm.lower()
+        if lowered.startswith("gt ") or lowered.startswith("gs "):
+            code_norm = code_norm[2:].strip()
+
+        if code_norm.startswith("'"):
+            quote_pos = code_norm.find("'", 1)
+            if quote_pos > 1:
+                code_norm = code_norm[1:quote_pos].strip()
+        elif code_norm.startswith('"'):
+            quote_pos = code_norm.find('"', 1)
+            if quote_pos > 1:
+                code_norm = code_norm[1:quote_pos].strip()
+        else:
+            code_norm = code_norm.split(",", 1)[0].strip()
+            code_norm = code_norm.split(" ", 1)[0].strip()
+
+        if renpy.has_label(code_norm):
+            return code_norm
+
+        snake_name = _daily_camel_to_snake(code_norm)
+        if snake_name != "" and renpy.has_label(snake_name):
+            return snake_name
+
+        return ""
+
+
+    def _daily_dispatch_args(label_name, girl_name="", cur_loc=""):
+        label = str(label_name or "").strip()
+        girl = str(girl_name or "")
+        loc = str(cur_loc or "")
+
+        zero_arg_labels = {
+            "BeckyQuestInit",
+            "UITestDailyEventSinkZero",
+        }
+        one_arg_labels = {
+            "MorningSickness",
+            "GiveBirth",
+            "MomDressComplaint",
+            "DressNoShow",
+            "UITestDailyEventSinkOne",
+        }
+
+        if label in zero_arg_labels:
+            return ()
+        if label in one_arg_labels:
+            return (girl,)
+        if girl != "" and loc != "":
+            return (girl, loc)
+        if girl != "":
+            return (girl,)
+        if loc != "":
+            return (loc,)
+        return ()
 
 
     def _daily_camel_to_snake(name):
@@ -281,7 +361,4 @@ label check_daily_event(girlname=None, eventtype=None, curloc=None, checktime=No
     return _daily_found
 
 
-label CheckDailyEvent(girlname=None, eventtype=None, curloc=None, checktime=None):
-    call check_daily_event(girlname, eventtype, curloc, checktime)
-    return
 

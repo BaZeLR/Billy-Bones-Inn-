@@ -3,7 +3,17 @@
 # ================================================================================
 default BedroomDoorStates = {}
 
+default BedroomDoorStates = {}
+
+default BedroomDoorStates = {}
+
 init -20 python:
+    if "BedroomDoorStates" not in globals() or not isinstance(globals().get("BedroomDoorStates", {}), dict):
+        BedroomDoorStates = {}
+
+    if "BedroomDoorStates" not in globals() or not isinstance(globals().get("BedroomDoorStates", {}), dict):
+        BedroomDoorStates = {}
+
     if "BedroomDoorStates" not in globals() or not isinstance(globals().get("BedroomDoorStates", {}), dict):
         BedroomDoorStates = {}
 

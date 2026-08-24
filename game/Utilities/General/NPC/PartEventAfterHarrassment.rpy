@@ -4,6 +4,8 @@
 label PartEventAfterHarrassment(GirlNamePEAH, GirlSlapped, YourReaction1):
     $ Result = "\n"
     $ _discussion_menu = {"title": "Ваши действия", "items": [MenuItem("Вернуться к делам", Jump("TavernMain"))]}
+    $ _discussion_menu = {"title": "Ваши действия", "items": [MenuItem("Вернуться к делам", Jump("TavernMain"))]}
+    $ _discussion_menu = {"title": "Ваши действия", "items": [MenuItem("Вернуться к делам", Jump("TavernMain"))]}
     $ _girl_info = getPersonInfo(GirlNamePEAH)
     $ _girl_corruption = int(getattr(_girl_info, "corruption", 0) or 0)
     $ _girl_rel = int(getattr(_girl_info, "rel", 0) or 0)

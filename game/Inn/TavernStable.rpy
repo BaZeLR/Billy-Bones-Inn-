@@ -148,7 +148,6 @@ label TavernStable:
     $ _room = TavernStableRoom
     $ CurrentRoom = _room
     $ CurLoc = "TavernStable"
-    $ location = CurLoc
     $ scene_image = tavern_stable_picture() or _room.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -161,28 +160,11 @@ label TavernStable:
 
     if Mongol.var.get('WillTryToSteal', 0) and time == 4:
         $ Mongol.var['WillTryToSteal'] = 0
-    call TavernStableBuildActions
-    $ _stable_ui_return = None
-    while _stable_ui_return is None:
-        call screen main_ui
-        $ _stable_ui_return = _return
-    jump TavernStable
-
-
-label TavernStableBuildActions:
     $ current_action_title = "Конюшня"
     $ current_action_content = None
-    $ current_action_items = []
-    python:
-        for _room_object in TavernStableRoom.visible_game_items():
-            current_action_items.append(MenuItem(_room_object.name, Call("tavern_stable_object_menu", _room_object.object_id)))
-        if tavern_stable_can_ride_to_kunidell():
-            current_action_items.append(MenuItem("Купить провизию для эльфов у Бекки и отправится в Куниделл верхом", Call("TavernStableRideToKunidell")))
-        if tavern_stable_can_walk_to_kunidell():
-            current_action_items.append(MenuItem("Пойти в Куниделл пешком и налегке", Call("TavernStableWalkToKunidell")))
-        for _room_exit in TavernStableRoom.visible_exits():
-            current_action_items.append(MenuItem(_room_exit.label, Call("AdvanceMovementTime", _room_exit.target)))
-    return
+    $ current_action_items = tavern_stable_action_items()
+    while True:
+        call screen main_ui
 
 
 label tavern_stable_object_menu(object_id=""):
@@ -228,6 +210,20 @@ label tavern_stable_object_text(object_id="", action_id=""):
             CurLocDesc = _room_text
             current_action_title = _room_name or "Конюшня"
     call tavern_stable_object_menu(object_id)
+    return
+
+
+label TavernStableRestore:
+    $ MainTxt = tavern_stable_scene_text()
+    $ CurLocDesc = MainTxt
+    call TavernStableBuildActions
+    return
+
+
+label TavernStableRestore:
+    $ MainTxt = tavern_stable_scene_text()
+    $ CurLocDesc = MainTxt
+    call TavernStableBuildActions
     return
 
 

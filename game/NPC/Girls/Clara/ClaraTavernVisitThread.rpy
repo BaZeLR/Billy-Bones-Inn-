@@ -1,4 +1,76 @@
-# ================================================================================
+    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ Clara.var["trust"] = int(Clara.trust or 0)    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ Clara.var["trust"] = int(Clara.trust or 0)    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Действия в трактире"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ current_action_title = "Комната Мелиссы"
+    $ current_action_content = None
+    $ current_action_items = []    $ Clara.var["trust"] = int(Clara.trust or 0)# ================================================================================
 # Clara tavern visit authored event labels.
 # Event/thread tuples live in StoryEventRuntime.rpy; this file owns presentation
 # and immediate class-state mutations for the Clara/Melissa visit scenes.
@@ -13,11 +85,8 @@ label story_clara_tavern_visit_bar_0:
     $ CurLocDesc = MainTxt
     vscene "images/clara/tavern_visit.png"
     $ calendar_v2.advance_minutes(45)
-    $ current_action_title = "Действия в трактире"
-    $ current_action_content = None
-    $ current_action_items = []
-    if thread is not None:
-        $ thread.advance()
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.advance()
     return True
 
 
@@ -30,11 +99,8 @@ label story_clara_tavern_visit_bar_1:
     $ CurLocDesc = MainTxt
     vscene "images/clara/tavern_visit_size.png"
     $ calendar_v2.advance_minutes(45)
-    $ current_action_title = "Действия в трактире"
-    $ current_action_content = None
-    $ current_action_items = []
-    if thread is not None:
-        $ thread.advance()
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.advance()
     return True
 
 
@@ -46,15 +112,11 @@ label story_clara_tavern_visit_bar_2:
     $ Clara.change_social(open_delta=1)
     $ Melissa.trust = min(20, int(Melissa.trust or 0) + 1)
     $ Clara.trust = min(20, int(Clara.trust or 0) + 1)
-    $ Clara.var["trust"] = int(Clara.trust or 0)
     $ CurLocDesc = MainTxt
     vscene "images/clara/melissa_talk.png"
     $ calendar_v2.advance_minutes(45)
-    $ current_action_title = "Действия в трактире"
-    $ current_action_content = None
-    $ current_action_items = []
-    if thread is not None:
-        $ thread.advance()
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.advance()
     return True
 
 
@@ -68,11 +130,8 @@ label story_clara_melissa_room_visit_0:
     $ CurLocDesc = MainTxt
     vscene "images/clara/melissa Pillow fight.png"
     $ calendar_v2.advance_minutes(45)
-    $ current_action_title = "Комната Мелиссы"
-    $ current_action_content = None
-    $ current_action_items = []
-    if thread is not None:
-        $ thread.advance()
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.advance()
     return True
 
 
@@ -86,11 +145,8 @@ label story_clara_melissa_room_visit_1:
     $ CurLocDesc = MainTxt
     vscene "images/clara/melissa_doodleTimes.png"
     $ calendar_v2.advance_minutes(45)
-    $ current_action_title = "Комната Мелиссы"
-    $ current_action_content = None
-    $ current_action_items = []
-    if thread is not None:
-        $ thread.advance()
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.advance()
     return True
 
 
@@ -106,9 +162,6 @@ label story_clara_melissa_room_visit_2:
     $ CurLocDesc = MainTxt
     vscene "images/clara/melissa_doodles.png"
     $ calendar_v2.advance_minutes(45)
-    $ current_action_title = "Комната Мелиссы"
-    $ current_action_content = None
-    $ current_action_items = []
-    if thread is not None:
-        $ thread.advance()
+    if event_runtime.active_thread is not None:
+        $ event_runtime.active_thread.advance()
     return True

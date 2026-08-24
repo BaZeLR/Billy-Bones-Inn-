@@ -34,6 +34,8 @@ init python:
 
 label TavernKitchenCauldronMenu(object_id="cauldron_001", refresh_only=False):
     $ tavern_kitchen_sync_hearth_state()
+    $ tavern_kitchen_sync_hearth_state()
+    $ tavern_kitchen_sync_hearth_state()
     $ current_object_id = "cauldron_001"
     $ current_action_title = str(TavernKitchenCauldronObject.name or "Котел")
     $ current_action_content = None

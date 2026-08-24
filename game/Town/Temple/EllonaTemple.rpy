@@ -77,7 +77,6 @@ label EllonaTemple:
     scene black
     $ CurrentRoom = EllonaTempleRoom
     $ CurLoc = "EllonaTemple"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -107,11 +106,8 @@ label EllonaTemple:
         call ShowImageSeq("ellona", "", "Fran", 4)
 
     $ current_action_items = CurrentRoom.build_action_items() + CurrentRoom.build_exit_items()
-    $ _ellona_temple_ui_return = None
-    while _ellona_temple_ui_return is None:
+    while True:
         call screen main_ui
-        $ _ellona_temple_ui_return = _return
-    jump EllonaTemple
 
 
 label EllonaBirthRoom:
@@ -120,7 +116,6 @@ label EllonaBirthRoom:
         jump EllonaTemple
     $ CurrentRoom = EllonaBirthRoomRoom
     $ CurLoc = "EllonaBirthRoom"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -136,8 +131,5 @@ label EllonaBirthRoom:
         call ShowImageSeq("ellona", "", "Fran", 4)
 
     $ current_action_items = CurrentRoom.build_action_items() + CurrentRoom.build_exit_items()
-    $ _ellona_birth_ui_return = None
-    while _ellona_birth_ui_return is None:
+    while True:
         call screen main_ui
-        $ _ellona_birth_ui_return = _return
-    jump EllonaBirthRoom

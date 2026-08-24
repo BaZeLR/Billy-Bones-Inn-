@@ -3,7 +3,7 @@
 # ================================================================================
 init python:
     def tavern_amanda_bed_action_available():
-        return time >= 4 and cametoday < cancumdaily
+        return time >= 4 and player.intimacy.came_today < player.intimacy.can_cum_daily
 
     TavernAmandaBedObject = GameObject(
         object_id="bed_002",

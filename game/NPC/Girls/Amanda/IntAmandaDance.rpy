@@ -9,7 +9,7 @@ label story_amanda_friday_dance_mc_0:
     vscene "images/market/LocFridayDance.jpg"
     $ Amanda.set_var_int("albernowdances", 0)
     $ Amanda.set_var_int("legare_dance_pending", 0)
-    $ FridayDancesCount += 1
+    $ FridayDanceRoom.state["dance_count"] += 1
     "Вы прошлись по площади, ища Аманду, и нашли ее скромно стоящей около одной из колонн."
     call ShowImage("amanda", "dance", "wait" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/IntAmandaDance.rpy:procedural_randint:14:1")))
     $ DanceStep = 1
@@ -21,7 +21,7 @@ label story_amanda_friday_dance_legare_0:
     $ Amanda.set_var_int("albernowdances", 1)
     $ Amanda.set_var_int("legare_dance_pending", 0)
     call EventAmandaLegareCreateDance
-    $ FridayDancesCount += 1
+    $ FridayDanceRoom.state["dance_count"] += 1
     if Amanda.var_int("EscapeUnnoticed", 0) == 1:
         "Вы попробовали найти Аманду, но к своему удивлению не смогли этого сделать. На площади ее не было. Вокруг площади тоже. Может она отправилась домой, а может ее этот хрен Легаре за собой уволок, а может еще что стряслось, но так или иначе вы упустили Аманду."
         $ Amanda.set_var_int("leftdances", 1)
@@ -216,7 +216,7 @@ label IntAmandaDance():
             elif tmpGropeReact >= 3:
                 $ Amanda.set_var_int("leftdances", 1)
                 $ GirlDance_DeleteGirl('amanda')
-                $ FridayDancesCount = 5
+                $ FridayDanceRoom.state["dance_count"] = 5
                 call ShowImage(GirlNameIAD, "dance", "YouInvite2")
                 jump AmandaAfterDanceMC
             else:

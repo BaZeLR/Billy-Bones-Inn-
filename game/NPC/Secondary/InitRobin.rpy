@@ -1,4 +1,45 @@
-init python:
+        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(str(key or ""), default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[str(key or "")] = value
+            return value
+            self.location = "BlackwoodRoad"            Robin.location = "BlackwoodRoad"
+
+label _auto_register_robin:
+    call register_robin_secondary from _call_robin_reg
+    return        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(str(key or ""), default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[str(key or "")] = value
+            self.promote_from_var(self.var)
+            return value
+            self.location = "BlackwoodRoad"            Robin.location = "BlackwoodRoad"
+
+label _auto_register_robin:
+    call register_robin_secondary from _call_robin_reg
+    return        def var_int(self, key, default=0):
+            self.ensure_story_defaults()
+            return people_to_int(self.var.get(str(key or ""), default), default)
+
+        def set_var_int(self, key, value):
+            self.ensure_story_defaults()
+            value = people_to_int(value, 0)
+            self.var[str(key or "")] = value
+            self.promote_from_var(self.var)
+            return value
+            self.location = "BlackwoodRoad"            Robin.location = "BlackwoodRoad"
+
+label _auto_register_robin:
+    call register_robin_secondary from _call_robin_reg
+    returninit python:
     def robin_story_defaults():
         return {
         "KnowHim": 0, "KnowComplaint": 0, "KnowPlace": 0, "KnowWeapon": 0,
@@ -73,6 +114,16 @@ label InitRobin:
     return
 
 
+label InitRobin:
+    call register_robin_secondary from _call_init_robin_register
+    return
+
+
+label InitRobin:
+    call register_robin_secondary from _call_init_robin_register
+    return
+
+
 label register_robin_secondary:
     python:
         if "peopleInfo" in dir() and isinstance(peopleInfo, dict):
@@ -85,9 +136,4 @@ label register_robin_secondary:
         if peopleInfo.get("robin") and peopleInfo["robin"] not in secondary_npcs:
             secondary_npcs.append(peopleInfo["robin"])
     $ RobinProfile = "Робин (он же Робин Гуд, он же Худи/Гуди) — предводитель группы 'обездоленных' лесорубов на Шервудской (ныне Блэквудской) вырубке. Любит 'социяльную ответственность', пожертвования и стиль 'йо, браза'. После освобождения Монгола из колодок — потенциальный друг (через Монгола)."
-    return
-
-
-label _auto_register_robin:
-    call register_robin_secondary from _call_robin_reg
     return

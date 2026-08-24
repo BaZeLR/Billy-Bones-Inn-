@@ -656,6 +656,40 @@ This document maps args both programmatically (exact indexes/usages) and descrip
 - RPY arg usage lines:
   - none
 
+## CreateDressListMenu
+- TXT: `game/Inn/CreateDressListMenu.txt`
+- RPY: `game/Inn/CreateDressListMenu.rpy`
+- Arg indexes used: `[]`
+- Description: No explicit arg assignment in TXT.
+- TXT arg assignments:
+  - none
+- Incoming links with explicit args:
+  - none
+- Outgoing links with explicit args:
+  - none
+- Matching RPY labels:
+  - `create_dress_list_menu(no params)` in `game/Inn/CreateDressListMenu.rpy:4`
+  - `CreateDressListMenu(no params)` in `game/Inn/RuntimeCompat.rpy:132`
+- RPY arg usage lines:
+  - none
+
+## CreateDressListMenu
+- TXT: `game/Inn/CreateDressListMenu.txt`
+- RPY: `game/Inn/CreateDressListMenu.rpy`
+- Arg indexes used: `[]`
+- Description: No explicit arg assignment in TXT.
+- TXT arg assignments:
+  - none
+- Incoming links with explicit args:
+  - none
+- Outgoing links with explicit args:
+  - none
+- Matching RPY labels:
+  - `create_dress_list_menu(no params)` in `game/Inn/CreateDressListMenu.rpy:4`
+  - `CreateDressListMenu(no params)` in `game/Inn/RuntimeCompat.rpy:132`
+- RPY arg usage lines:
+  - none
+
 ## CreateMandatoryEvents
 - TXT: `game/Inn/CreateMandatoryEvents.txt`
 - RPY: `game/Inn/CreateMandatoryEvents.rpy`

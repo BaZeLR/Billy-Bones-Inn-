@@ -1,3 +1,9 @@
+    def mom_dress_complaint_return_items():
+        return [MenuItem("Вернуться к делам", Jump("TavernMain"))]
+    def mom_dress_complaint_return_items():
+        return [MenuItem("Вернуться к делам", Jump("TavernMain"))]
+    def mom_dress_complaint_return_items():
+        return [MenuItem("Вернуться к делам", Jump("TavernMain"))]
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -51,9 +57,6 @@ init python:
         tail = mom_dress_complaint_scold_tail(girl_name, georgett_present, strict_callout)
         slut_friends_increase("sandra", 15, 1, sandra_friend_delta, 30, 1, -1)
         return tail
-
-    def mom_dress_complaint_return_items():
-        return [MenuItem("Вернуться к делам", Jump("TavernMain"))]
 
     def mom_dress_complaint_skill_drop_data():
         prof_choice = procedural_randint(1, 3, key="procedural:NPC/Girls/Common/MomDressComplaint.rpy:procedural_randint:56:1")
@@ -140,6 +143,13 @@ label MomDressComplaintLikeItDontCare:
     call QueuePagedPanelText(MainTxt, "Ваши действия", mom_dress_complaint_return_items(), "plain")
     call ReturnToMainUI
     return
+    return
+    return
+    return
+    return
+    return
+    return
+    return
 
 
 label MomDressComplaintLikeItMaybeNot(girl_name="", real_name="", georgett_present=False):
@@ -149,7 +159,6 @@ label MomDressComplaintLikeItMaybeNot(girl_name="", real_name="", georgett_prese
     $ CurLocDesc = MainTxt
     call QueuePagedPanelText(MainTxt, "Ваши действия", mom_dress_complaint_return_items(), "plain")
     call ReturnToMainUI
-    return
 
 
 label MomDressComplaintYouAreRight(girl_name="", real_name="", georgett_present=False):
@@ -159,7 +168,6 @@ label MomDressComplaintYouAreRight(girl_name="", real_name="", georgett_present=
     $ CurLocDesc = MainTxt
     call QueuePagedPanelText(MainTxt, "Ваши действия", mom_dress_complaint_return_items(), "plain")
     call ReturnToMainUI
-    return
 
 
 label MomDressComplaintBoughtDress(girl_name="", kids_or_preg=0, real_name="", georgett_present=False):
@@ -191,7 +199,6 @@ label MomDressComplaintBoughtDressMaybeAshamed(girl_name="", real_name="", georg
     $ CurLocDesc = MainTxt
     call QueuePagedPanelText(MainTxt, "Ваши действия", mom_dress_complaint_return_items(), "plain")
     call ReturnToMainUI
-    return
 
 
 label MomDressComplaintBoughtDressNope:
@@ -200,7 +207,6 @@ label MomDressComplaintBoughtDressNope:
     $ slut_friends_increase("sandra", 4, 1, -1, 35, 2, 1)
     call QueuePagedPanelText(MainTxt, "Ваши действия", mom_dress_complaint_return_items(), "plain")
     call ReturnToMainUI
-    return
 
 
 label MomDressComplaintSandraShouldDress(girl_name="", real_name="", georgett_present=False):
@@ -230,7 +236,6 @@ label MomDressComplaintSandraShouldDress(girl_name="", real_name="", georgett_pr
     $ CurLocDesc = MainTxt
     call QueuePagedPanelText(MainTxt, "Ваши действия", mom_dress_complaint_return_items(), "plain")
     call ReturnToMainUI
-    return
 
 
 label MomDressComplaintHowCanYouSayThat(girl_name="", real_name="", georgett_present=False):
@@ -262,7 +267,6 @@ label MomDressComplaintHowCanYouSayThatInsist(girl_name="", real_name="", george
     $ CurLocDesc = MainTxt
     call QueuePagedPanelText(MainTxt, "Ваши действия", mom_dress_complaint_return_items(), "plain")
     call ReturnToMainUI
-    return
 
 
 label MomDressComplaintHowCanYouSayThatBackOff:
@@ -271,7 +275,6 @@ label MomDressComplaintHowCanYouSayThatBackOff:
     $ slut_friends_increase("sandra", 12, 2, 1, 0, 0, 0)
     call QueuePagedPanelText(MainTxt, "Ваши действия", mom_dress_complaint_return_items(), "plain")
     call ReturnToMainUI
-    return
 
 
 label MomDressComplaintBoughtDressHighSandra(girl_name="", kids_or_preg=0, real_name=""):

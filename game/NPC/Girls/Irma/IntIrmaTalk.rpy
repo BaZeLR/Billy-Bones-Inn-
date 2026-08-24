@@ -3,10 +3,10 @@
 # ================================================================================
 init python:
     def irma_tailor_wolf_skin_count():
-        return int(_player_item_count_by_id("wolf_skin_001") or 0) + int(_player_item_count_by_id("white_wolf_skin_001") or 0)
+        return int(player.item_count("wolf_skin_001") or 0) + int(player.item_count("white_wolf_skin_001") or 0)
 
     def irma_tailor_bear_fur_count():
-        return int(_player_item_count_by_id("bear_fur_brown_001") or 0) + int(_player_item_count_by_id("bear_fur_grizzly_001") or 0)
+        return int(player.item_count("bear_fur_brown_001") or 0) + int(player.item_count("bear_fur_grizzly_001") or 0)
 
     def irma_can_make_warm_cloak():
         return int(money or 0) >= 35 and (irma_tailor_bear_fur_count() >= 1 or irma_tailor_wolf_skin_count() >= 2)
@@ -17,12 +17,12 @@ init python:
     def irma_remove_best_bear_fur(amount=1):
         removed = 0
         while removed < int(amount or 0):
-            if int(_player_item_count_by_id("bear_fur_grizzly_001") or 0) > 0:
-                _player_remove_item_by_id("bear_fur_grizzly_001", 1)
+            if int(player.item_count("bear_fur_grizzly_001") or 0) > 0:
+                player.remove_item("bear_fur_grizzly_001", 1)
                 removed += 1
                 continue
-            if int(_player_item_count_by_id("bear_fur_brown_001") or 0) > 0:
-                _player_remove_item_by_id("bear_fur_brown_001", 1)
+            if int(player.item_count("bear_fur_brown_001") or 0) > 0:
+                player.remove_item("bear_fur_brown_001", 1)
                 removed += 1
                 continue
             break
@@ -31,18 +31,20 @@ init python:
     def irma_remove_wolf_skins(amount=1):
         removed = 0
         while removed < int(amount or 0):
-            if int(_player_item_count_by_id("wolf_skin_001") or 0) > 0:
-                _player_remove_item_by_id("wolf_skin_001", 1)
+            if int(player.item_count("wolf_skin_001") or 0) > 0:
+                player.remove_item("wolf_skin_001", 1)
                 removed += 1
                 continue
-            if int(_player_item_count_by_id("white_wolf_skin_001") or 0) > 0:
-                _player_remove_item_by_id("white_wolf_skin_001", 1)
+            if int(player.item_count("white_wolf_skin_001") or 0) > 0:
+                player.remove_item("white_wolf_skin_001", 1)
                 removed += 1
                 continue
             break
         return removed
 
     def irma_make_warm_cloak():
+        global money
+        global money
         global money
         if not irma_can_make_warm_cloak():
             return False
@@ -52,10 +54,12 @@ init python:
         elif int(irma_remove_wolf_skins(2) or 0) != 2:
             return False
         money = int(money or 0) - 35
-        _player_add_item_by_id("warm_fur_cloak_001", 1)
+        player.add_item("warm_fur_cloak_001", 1)
         return True
 
     def irma_make_fur_bedding():
+        global money
+        global money
         global money
         if not irma_can_make_fur_bedding():
             return False
@@ -70,8 +74,47 @@ init python:
         elif int(irma_remove_wolf_skins(4) or 0) != 4:
             return False
         money = int(money or 0) - 55
-        _player_add_item_by_id("fur_bedroll_001", 1)
+        player.add_item("fur_bedroll_001", 1)
         return True
+
+
+    def irma_talk_action_items():
+        items = [MenuItem("Осмотреть", Call("IntIrmaTalkApply", "inspect"))]
+        if str(dress_shop.produced or "") != "":
+            items.append(MenuItem("Спросить, когда будет готово", Call("IntIrmaTalkApply", "ask_ready")))
+        items.append(MenuItem("Спросить про теплые плащи и постели", Call("IntIrmaTalkApply", "ask_winter_work")))
+        if irma_can_make_warm_cloak():
+            items.append(MenuItem("Заказать теплый меховой плащ", Call("IntIrmaTalkApply", "make_cloak")))
+        if irma_can_make_fur_bedding():
+            items.append(MenuItem("Заказать меховую постель", Call("IntIrmaTalkApply", "make_bedding")))
+        items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
+        return items
+
+
+    def irma_talk_action_items():
+        items = [MenuItem("Осмотреть", Call("IntIrmaTalkApply", "inspect"))]
+        if str(dress_shop.produced or "") != "":
+            items.append(MenuItem("Спросить, когда будет готово", Call("IntIrmaTalkApply", "ask_ready")))
+        items.append(MenuItem("Спросить про теплые плащи и постели", Call("IntIrmaTalkApply", "ask_winter_work")))
+        if irma_can_make_warm_cloak():
+            items.append(MenuItem("Заказать теплый меховой плащ", Call("IntIrmaTalkApply", "make_cloak")))
+        if irma_can_make_fur_bedding():
+            items.append(MenuItem("Заказать меховую постель", Call("IntIrmaTalkApply", "make_bedding")))
+        items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
+        return items
+
+
+    def irma_talk_action_items():
+        items = [MenuItem("Осмотреть", Call("IntIrmaTalkApply", "inspect"))]
+        if str(dress_shop.produced or "") != "":
+            items.append(MenuItem("Спросить, когда будет готово", Call("IntIrmaTalkApply", "ask_ready")))
+        items.append(MenuItem("Спросить про теплые плащи и постели", Call("IntIrmaTalkApply", "ask_winter_work")))
+        if irma_can_make_warm_cloak():
+            items.append(MenuItem("Заказать теплый меховой плащ", Call("IntIrmaTalkApply", "make_cloak")))
+        if irma_can_make_fur_bedding():
+            items.append(MenuItem("Заказать меховую постель", Call("IntIrmaTalkApply", "make_bedding")))
+        items.append(MenuItem("Закончить разговор", Function(main_ui_end_talk_state)))
+        return items
 
 
 label IntIrmaTalk(show_menu=True):

@@ -98,7 +98,7 @@ label TavernMainBarInviteApply(target_npc=""):
     if _bar_target == "clara":
         $ Clara.var["trust"] = min(20, int(Clara.var.get("trust", 0) or 0) + 1)
     if _bar_target == "becky":
-        $ Becky.var["BarDrinkDay"] = int(dayspassed or 0)
+        $ Becky.var["BarDrinkDay"] = int(current_game_day() or 0)
     $ MainTxt = "Вы зовете %s к стойке и ставите по кружке эля. Разговор быстро становится свободнее и теплее обычного." % _action_display_name(_bar_target)
     if str((_bar_effect or {}).get("text", "") or "").strip() != "":
         $ MainTxt = str(MainTxt or "") + "\n\n" + str((_bar_effect or {}).get("text", "") or "")
@@ -118,7 +118,7 @@ label TavernMainBarPlaceholderEvent:
             "Пока вы стоите у стойки, трактир словно ненадолго становится центром всего околотка. Именно отсюда удобнее всего подмечать чужие привычки, обрывки разговоров и назревающие истории.",
             "У барной стойки легче всего сделать вид, что вы просто заняты делом, и при этом слушать вполуха все, что происходит вокруг. Позже из таких мелочей наверняка будут рождаться новые события.",
         ]
-        _bar_index = int((dayspassed or 0) + (hour or 0) + (minute or 0)) % len(_bar_events)
+        _bar_index = int((current_game_day() or 0) + (hour or 0) + (minute or 0)) % len(_bar_events)
         MainTxt = _bar_events[_bar_index]
         CurLocDesc = MainTxt
     call TavernMainObjectMenu("bar_001")

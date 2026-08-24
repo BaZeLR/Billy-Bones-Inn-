@@ -26,7 +26,7 @@ init python:
             description = "Небольшой камин, который помогает держать главный зал в тепле. Сейчас он не разожжен."
         if wood_stock > 0:
             description += "\n\nРядом с камином сложены колотые дрова: {b}%s{/b} шт." % str(wood_stock)
-        carried_wood = int(_player_item_count_by_id("chopped_wood_001") or 0)
+        carried_wood = int(player.item_count("chopped_wood_001") or 0)
         if carried_wood > 0:
             description += "\nПри себе у вас колотые дрова: {b}%s{/b} шт." % str(carried_wood)
         return description
@@ -67,7 +67,7 @@ init python:
 
 
 label TavernMainFireplaceDepositWood:
-    if not _player_remove_item_by_id("chopped_wood_001", 1):
+    if not player.remove_item("chopped_wood_001", 1):
         $ MainTxt = "У вас больше нет колотых дров."
         $ CurLocDesc = MainTxt
         call TavernMainObjectMenu("fireplace_001")

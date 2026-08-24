@@ -1,3 +1,252 @@
+default GuardCaptainVar = {}            if key == "GuardCaptainVar":
+                return GuardCaptainVar            if key == "dayspassed":
+                return dayspasseddefault TownStreetEventsToday = 0
+default TownStreetPatrolsToday = 0
+default TownStreetFightToday = 0
+default TownCurfewCaughtToday = 0
+default TownStreetStorySeenKeys = []
+default TownStreetDailyPlan = {}
+default TownStreetLastEventText = ""
+default TownStreetContext = {}
+default TownStreetFiredLabelsToday = []
+default TownStreetFiredLocationsToday = []
+default TownStreetCooldowns = {}
+            if key == "TownStreetContext":
+                return TownStreetContext
+            if key == "TownStreetCooldowns":
+                return TownStreetCooldowns
+            if key == "TownStreetDailyPlan":
+                return TownStreetDailyPlan
+            if key == "TownStreetEventsToday":
+                return TownStreetEventsToday
+            if key == "TownStreetFightToday":
+                return TownStreetFightToday
+            if key == "TownStreetFiredLabelsToday":
+                return TownStreetFiredLabelsToday
+            if key == "TownStreetFiredLocationsToday":
+                return TownStreetFiredLocationsToday
+            if key == "TownStreetStorySeenKeys":
+                return TownStreetStorySeenKeys﻿default TownStreetEventsToday = 0
+default TownStreetEventsToday = 0
+default TownStreetPatrolsToday = 0
+default TownStreetFightToday = 0
+default TownCurfewCaughtToday = 0
+default TownStreetStorySeenKeys = []
+default TownStreetDailyPlan = {}
+default TownStreetLastEventText = ""
+default TownStreetContext = {}
+default TownStreetFiredLabelsToday = []
+default TownStreetFiredLocationsToday = []
+default TownStreetCooldowns = {}            if key == "TavernBlackworkerCandidates":
+                return TavernBlackworkerCandidates
+            if key == "TavernBlackworkers":
+                return TavernBlackworkerslabel DebugTownRandomEventsResetToday:
+    $ TownStreetEventsToday = 0
+    $ TownStreetPatrolsToday = 0
+    $ TownStreetFightToday = 0
+    $ TownCurfewCaughtToday = 0
+    $ TownStreetStorySeenKeys = []
+    $ TownStreetDailyPlan = {}
+    $ TownStreetLastEventText = ""
+    $ TownStreetContext = {}
+    $ TownStreetFiredLabelsToday = []
+    $ TownStreetFiredLocationsToday = []
+    $ TownStreetCooldowns = {}
+    return        def _get(self, name, default=None):
+            key = str(name or "")
+            if key == "clock_minutes":
+                return clock_minutes
+            if key == "CurLoc":
+                return CurLoc
+            if key == "energy":
+                return energy
+            if key == "exploration":
+                return exploration
+            if key == "health":
+                return health
+            if key == "hour":
+                return hour
+            if key == "minute":
+                return minute
+            if key == "notoriety":
+                return notoriety
+            if key == "RandomNameCode":
+                return RandomNameCode
+            if key == "RandomStallionNameCode":
+                return RandomStallionNameCode
+            if key == "RandomStreetNameCode":
+                return RandomStreetNameCode
+            if key == "time":
+                return time
+            if key == "week":
+                return week
+            return default
+default GuardCaptainVar = {}            if key == "GuardCaptainVar":
+                return GuardCaptainVar            if key == "dayspassed":
+                return dayspasseddefault TownStreetEventsToday = 0
+default TownStreetPatrolsToday = 0
+default TownStreetFightToday = 0
+default TownCurfewCaughtToday = 0
+default TownStreetStorySeenKeys = []
+default TownStreetDailyPlan = {}
+default TownStreetLastEventText = ""
+default TownStreetContext = {}
+default TownStreetFiredLabelsToday = []
+default TownStreetFiredLocationsToday = []
+default TownStreetCooldowns = {}
+            if key == "TownStreetContext":
+                return TownStreetContext
+            if key == "TownStreetCooldowns":
+                return TownStreetCooldowns
+            if key == "TownStreetDailyPlan":
+                return TownStreetDailyPlan
+            if key == "TownStreetEventsToday":
+                return TownStreetEventsToday
+            if key == "TownStreetFightToday":
+                return TownStreetFightToday
+            if key == "TownStreetFiredLabelsToday":
+                return TownStreetFiredLabelsToday
+            if key == "TownStreetFiredLocationsToday":
+                return TownStreetFiredLocationsToday
+            if key == "TownStreetStorySeenKeys":
+                return TownStreetStorySeenKeys﻿default TownStreetEventsToday = 0
+default TownStreetEventsToday = 0
+default TownStreetPatrolsToday = 0
+default TownStreetFightToday = 0
+default TownCurfewCaughtToday = 0
+default TownStreetStorySeenKeys = []
+default TownStreetDailyPlan = {}
+default TownStreetLastEventText = ""
+default TownStreetContext = {}
+default TownStreetFiredLabelsToday = []
+default TownStreetFiredLocationsToday = []
+default TownStreetCooldowns = {}            if key == "TavernBlackworkerCandidates":
+                return TavernBlackworkerCandidates
+            if key == "TavernBlackworkers":
+                return TavernBlackworkerslabel DebugTownRandomEventsResetToday:
+    $ TownStreetEventsToday = 0
+    $ TownStreetPatrolsToday = 0
+    $ TownStreetFightToday = 0
+    $ TownCurfewCaughtToday = 0
+    $ TownStreetStorySeenKeys = []
+    $ TownStreetDailyPlan = {}
+    $ TownStreetLastEventText = ""
+    $ TownStreetContext = {}
+    $ TownStreetFiredLabelsToday = []
+    $ TownStreetFiredLocationsToday = []
+    $ TownStreetCooldowns = {}
+    return        def _get(self, name, default=None):
+            key = str(name or "")
+            if key == "clock_minutes":
+                return clock_minutes
+            if key == "CurLoc":
+                return CurLoc
+            if key == "energy":
+                return energy
+            if key == "exploration":
+                return exploration
+            if key == "health":
+                return health
+            if key == "hour":
+                return hour
+            if key == "minute":
+                return minute
+            if key == "notoriety":
+                return notoriety
+            if key == "RandomNameCode":
+                return RandomNameCode
+            if key == "RandomStallionNameCode":
+                return RandomStallionNameCode
+            if key == "RandomStreetNameCode":
+                return RandomStreetNameCode
+            if key == "time":
+                return time
+            if key == "week":
+                return week
+            return default
+default GuardCaptainVar = {}            if key == "GuardCaptainVar":
+                return GuardCaptainVar            if key == "dayspassed":
+                return dayspasseddefault TownStreetEventsToday = 0
+default TownStreetPatrolsToday = 0
+default TownStreetFightToday = 0
+default TownCurfewCaughtToday = 0
+default TownStreetStorySeenKeys = []
+default TownStreetDailyPlan = {}
+default TownStreetLastEventText = ""
+default TownStreetContext = {}
+default TownStreetFiredLabelsToday = []
+default TownStreetFiredLocationsToday = []
+default TownStreetCooldowns = {}
+            if key == "TownStreetContext":
+                return TownStreetContext
+            if key == "TownStreetCooldowns":
+                return TownStreetCooldowns
+            if key == "TownStreetDailyPlan":
+                return TownStreetDailyPlan
+            if key == "TownStreetEventsToday":
+                return TownStreetEventsToday
+            if key == "TownStreetFightToday":
+                return TownStreetFightToday
+            if key == "TownStreetFiredLabelsToday":
+                return TownStreetFiredLabelsToday
+            if key == "TownStreetFiredLocationsToday":
+                return TownStreetFiredLocationsToday
+            if key == "TownStreetStorySeenKeys":
+                return TownStreetStorySeenKeys﻿default TownStreetEventsToday = 0
+default TownStreetEventsToday = 0
+default TownStreetPatrolsToday = 0
+default TownStreetFightToday = 0
+default TownCurfewCaughtToday = 0
+default TownStreetStorySeenKeys = []
+default TownStreetDailyPlan = {}
+default TownStreetLastEventText = ""
+default TownStreetContext = {}
+default TownStreetFiredLabelsToday = []
+default TownStreetFiredLocationsToday = []
+default TownStreetCooldowns = {}            if key == "TavernBlackworkerCandidates":
+                return TavernBlackworkerCandidates
+            if key == "TavernBlackworkers":
+                return TavernBlackworkerslabel DebugTownRandomEventsResetToday:
+    $ TownStreetEventsToday = 0
+    $ TownStreetPatrolsToday = 0
+    $ TownStreetFightToday = 0
+    $ TownCurfewCaughtToday = 0
+    $ TownStreetStorySeenKeys = []
+    $ TownStreetDailyPlan = {}
+    $ TownStreetLastEventText = ""
+    $ TownStreetContext = {}
+    $ TownStreetFiredLabelsToday = []
+    $ TownStreetFiredLocationsToday = []
+    $ TownStreetCooldowns = {}
+    return        def _get(self, name, default=None):
+            key = str(name or "")
+            if key == "clock_minutes":
+                return clock_minutes
+            if key == "CurLoc":
+                return CurLoc
+            if key == "energy":
+                return energy
+            if key == "exploration":
+                return exploration
+            if key == "health":
+                return health
+            if key == "hour":
+                return hour
+            if key == "minute":
+                return minute
+            if key == "notoriety":
+                return notoriety
+            if key == "RandomNameCode":
+                return RandomNameCode
+            if key == "RandomStallionNameCode":
+                return RandomStallionNameCode
+            if key == "RandomStreetNameCode":
+                return RandomStreetNameCode
+            if key == "time":
+                return time
+            if key == "week":
+                return week
+            return default
 default TownStreetEventsToday = 0
 default TownStreetPatrolsToday = 0
 default TownStreetFightToday = 0
@@ -10,7 +259,36 @@ default TownStreetFiredLabelsToday = []
 default TownStreetFiredLocationsToday = []
 default TownStreetCooldowns = {}
 
-default GuardCaptainVar = {}
+default TownStreetEventsToday = 0
+default TownStreetPatrolsToday = 0
+default TownStreetFightToday = 0
+default TownCurfewCaughtToday = 0
+default TownStreetStorySeenKeys = []
+default TownStreetDailyPlan = {}
+default TownStreetLastEventText = ""
+default TownStreetContext = {}
+default TownStreetFiredLabelsToday = []
+default TownStreetFiredLocationsToday = []
+default TownStreetCooldowns = {}
+
+default TownStreetEventsToday = 0
+default TownStreetPatrolsToday = 0
+default TownStreetFightToday = 0
+default TownCurfewCaughtToday = 0
+default TownStreetStorySeenKeys = []
+default TownStreetDailyPlan = {}
+default TownStreetLastEventText = ""
+default TownStreetContext = {}
+default TownStreetFiredLabelsToday = []
+default TownStreetFiredLocationsToday = []
+default TownStreetCooldowns = {}
+
+default TavernBlackworkers = []
+default TavernBlackworkerCandidates = []
+
+default TavernBlackworkers = []
+default TavernBlackworkerCandidates = []
+
 default TavernBlackworkers = []
 default TavernBlackworkerCandidates = []
 
@@ -18,6 +296,60 @@ init -20 python:
 
     class TownStreetRuntime(object):
         LOCATIONS = ("StreetTavern", "MarketPlace", "PortStreets", "ArtisansQuarter")
+
+        def __init__(self):
+            self.events_today = 0
+            self.patrols_today = 0
+            self.fights_today = 0
+            self.curfew_caught_today = False
+            self.story_seen_keys = []
+            self.daily_plan = {}
+            self.last_event_text = ""
+            self.context = {}
+            self.fired_labels_today = []
+            self.fired_locations_today = []
+            self.cooldowns = {}
+
+        def __init__(self):
+            self.events_today = 0
+            self.patrols_today = 0
+            self.fights_today = 0
+            self.curfew_caught_today = False
+            self.story_seen_keys = []
+            self.daily_plan = {}
+            self.last_event_text = ""
+            self.context = {}
+            self.fired_labels_today = []
+            self.fired_locations_today = []
+            self.cooldowns = {}
+
+        def __init__(self):
+            self.events_today = 0
+            self.patrols_today = 0
+            self.fights_today = 0
+            self.curfew_caught_today = False
+            self.story_seen_keys = []
+            self.daily_plan = {}
+            self.last_event_text = ""
+            self.context = {}
+            self.fired_labels_today = []
+            self.fired_locations_today = []
+            self.cooldowns = {}
+            self.blackworkers = []
+            self.blackworker_candidates = []
+
+        def __init__(self):
+            self.events_today = 0
+            self.patrols_today = 0
+            self.fights_today = 0
+            self.curfew_caught_today = False
+            self.story_seen_keys = []
+            self.daily_plan = {}
+            self.last_event_text = ""
+            self.context = {}
+            self.fired_labels_today = []
+            self.fired_locations_today = []
+            self.cooldowns = {}
 
         STREET_NAMES = {
             "пекарей": "улице Пекарей",
@@ -100,60 +432,6 @@ init -20 python:
                 {"hooks": ("horse", "night_panic", "forest_demon"), "text": "В глухую ночь [stallion] вышибает забор. Полураздетые горожане бегают с факелами. «Он вернулся! Лесной демон в теле коня!» - вопит [имя] - [занятие]."},
             ),
         }
-
-        def _get(self, name, default=None):
-            key = str(name or "")
-            if key == "clock_minutes":
-                return clock_minutes
-            if key == "CurLoc":
-                return CurLoc
-            if key == "dayspassed":
-                return dayspassed
-            if key == "energy":
-                return energy
-            if key == "exploration":
-                return exploration
-            if key == "GuardCaptainVar":
-                return GuardCaptainVar
-            if key == "health":
-                return health
-            if key == "hour":
-                return hour
-            if key == "minute":
-                return minute
-            if key == "notoriety":
-                return notoriety
-            if key == "RandomNameCode":
-                return RandomNameCode
-            if key == "RandomStallionNameCode":
-                return RandomStallionNameCode
-            if key == "RandomStreetNameCode":
-                return RandomStreetNameCode
-            if key == "TavernBlackworkerCandidates":
-                return TavernBlackworkerCandidates
-            if key == "TavernBlackworkers":
-                return TavernBlackworkers
-            if key == "time":
-                return time
-            if key == "TownStreetContext":
-                return TownStreetContext
-            if key == "TownStreetCooldowns":
-                return TownStreetCooldowns
-            if key == "TownStreetDailyPlan":
-                return TownStreetDailyPlan
-            if key == "TownStreetEventsToday":
-                return TownStreetEventsToday
-            if key == "TownStreetFightToday":
-                return TownStreetFightToday
-            if key == "TownStreetFiredLabelsToday":
-                return TownStreetFiredLabelsToday
-            if key == "TownStreetFiredLocationsToday":
-                return TownStreetFiredLocationsToday
-            if key == "TownStreetStorySeenKeys":
-                return TownStreetStorySeenKeys
-            if key == "week":
-                return week
-            return default
 
         def _int(self, value, default=0):
             try:
@@ -429,9 +707,8 @@ init -20 python:
             return score >= (self._int(enemy_level, 2) * 30 + 30)
 
         def apply_cloth_damage(self, amount=15):
-            appearance = player_state().appearance
+            appearance = player.appearance
             appearance.costume_condition = max(0, self._int(appearance.costume_condition, 100) - self._int(amount, 15))
-            appearance.apply_to_store()
 
         def apply_health_damage(self, amount=15):
             global health, energy
@@ -503,9 +780,9 @@ label TownStreetHelpEvent:
 
 label TownStreetHelpRecruit:
     $ _candidate_id = "bw_%03d" % (len(TavernBlackworkerCandidates) + len(TavernBlackworkers) + 1)
-    $ TavernBlackworkerCandidates.append({"id": _candidate_id, "name": TownStreetContext.get("help_name", "бродяга"), "origin": "street_help", "day": int(dayspassed or 0), "sleep_place": "TavernStable", "trust": 0})
+    $ TavernBlackworkerCandidates.append({"id": _candidate_id, "name": TownStreetContext.get("help_name", "бродяга"), "origin": "street_help", "day": int(calendar_v2.daysInGame or 0), "sleep_place": "TavernStable", "trust": 0})
     $ exploration += 5
-    $ tavernfame += 1
+    $ player.economy.tavern_fame += 1
     $ MainTxt = "Вы обещаете еду, угол в конюшне и простую грязную работу. Человек хватается за это предложение так, будто вы протянули ему не хлеб, а целую жизнь. Если он не сбежит от страха, утром у трактира появится новый чернорабочий."
     $ CurLocDesc = MainTxt
     $ current_action_items = [MenuItem("Идти дальше", Function(renpy.return_statement, True))]
@@ -547,7 +824,7 @@ label TownStreetThugsEvent:
 
 label TownStreetThugsFight:
     $ _thug_reputation_before = int(reputation or 0)
-    $ _thug_tavernfame_before = int(tavernfame or 0)
+    $ _thug_tavernfame_before = int(player.economy.tavern_fame or 0)
     $ _thug_notoriety_before = int(notoriety or 0)
     $ notoriety = min(100, _thug_notoriety_before + 3)
     $ _thug_return_room = str(CurLoc or location or "StreetTavern")
@@ -555,10 +832,10 @@ label TownStreetThugsFight:
     $ _thug_intro = "Вы встаете между жертвой и громилами. Один сплевывает на мостовую и перехватывает дубинку: теперь разговор закончится только дракой."
     $ fight_begin("street_crook", 2, _thug_return_room, _thug_picture, _thug_intro)
     call FightLoop
-    $ _thug_outcome = str(HuntLastResult.get("outcome", "") if isinstance(HuntLastResult, dict) else "")
+    $ _thug_outcome = str(hunt.last_result.get("outcome", "") or "")
     if _thug_outcome == "victory":
         $ reputation = min(100, _thug_reputation_before + 3)
-        $ tavernfame = _thug_tavernfame_before + 1
+        $ player.economy.tavern_fame = _thug_tavernfame_before + 1
         $ notoriety = min(100, _thug_notoriety_before + 3)
         $ MainTxt = str(MainTxt or "") + "\n\nВы отбили прохожего у громил. На улице это быстро запоминают: репутация +3, слава трактира +1."
         $ CurLocDesc = MainTxt
@@ -585,7 +862,7 @@ label TownStreetThugsShout:
     $ _shout_notoriety_before = int(notoriety or 0)
     $ _thug_return_room = str(CurLoc or location or "StreetTavern")
     $ _thug_picture = str(_layout_last_picture or scene_image or "")
-    $ _shout_score = int(exploration or 0) + procedural_randint(1, 100, "town_thugs_shout_%s_%s_%s" % (int(dayspassed or 0), _thug_return_room, int(clock_minutes or 0)))
+    $ _shout_score = int(exploration or 0) + procedural_randint(1, 100, "town_thugs_shout_%s_%s_%s" % (int(calendar_v2.daysInGame or 0), _thug_return_room, int(calendar_v2.clock_minutes() or 0)))
     if int(exploration or 0) >= 150:
         $ _shout_score += 35
     if _shout_score >= 85:
@@ -604,7 +881,7 @@ label TownStreetThugsShout:
         $ _thug_intro = "Ваш крик только злит громил. Один толкает жертву в грязь, второй разворачивается к вам с дубинкой: теперь они хотят наказать именно вас."
         $ fight_begin("street_crook", 2, _thug_return_room, _thug_picture, _thug_intro)
         call FightLoop
-        $ _thug_outcome = str(HuntLastResult.get("outcome", "") if isinstance(HuntLastResult, dict) else "")
+        $ _thug_outcome = str(hunt.last_result.get("outcome", "") or "")
         if _thug_outcome == "victory":
             $ reputation = min(100, _shout_reputation_before + 2)
             $ notoriety = min(100, _shout_notoriety_before + 2)
@@ -667,8 +944,7 @@ label TownStreetPatrolBribe:
     if money >= _fine:
         $ money -= _fine
         $ notoriety = max(0, int(notoriety or 0) - 3)
-        $ tavernfame = max(0, int(tavernfame or 0) - 1)
-        $ LastAdvancedMinutes = 10
+        $ player.economy.tavern_fame = max(0, int(player.economy.tavern_fame or 0) - 1)
         $ calendar_v2.advance_minutes(10)
         $ MainTxt = "Монеты быстро исчезают в руке старшего. Патруль сразу теряет к вам интерес, будто никакого комендантского часа и не было. Вы теряете десять минут, дурная слава снижается на 3, но слух о ночной плате слегка бьет по славе трактира."
     else:
@@ -682,7 +958,6 @@ label TownStreetPatrolHide:
     if town_street.escape_success(115):
         $ exploration += 8
         $ notoriety = min(100, int(notoriety or 0) + 1)
-        $ LastAdvancedMinutes = 20
         $ calendar_v2.advance_minutes(20)
         $ MainTxt = "Вы вовремя ныряете в темный проход, пережидаете шаги патруля и выбираетесь уже на другой стороне улицы. Обход занимает двадцать минут: исследование +8, дурная слава +1."
     else:
@@ -697,8 +972,7 @@ label TownStreetPatrolRun:
     if town_street.escape_success(130):
         $ exploration += 10
         $ notoriety = min(100, int(notoriety or 0) + 4)
-        $ tavernfame = max(0, int(tavernfame or 0) - 1)
-        $ LastAdvancedMinutes = 15
+        $ player.economy.tavern_fame = max(0, int(player.economy.tavern_fame or 0) - 1)
         $ calendar_v2.advance_minutes(15)
         $ MainTxt = "Вы срываетесь с места и уходите от патруля через узкие проходы. За спиной ругаются, но догнать вас уже не могут. Побег занимает пятнадцать минут: исследование +10, дурная слава +4, слава трактира -1."
     else:
@@ -711,18 +985,17 @@ label TownStreetPatrolRun:
 
 label TownStreetPatrolFight:
     $ notoriety = min(100, int(notoriety or 0) + 12)
-    $ tavernfame -= 2
-    $ LastAdvancedMinutes = 10
+    $ player.economy.tavern_fame -= 2
     $ calendar_v2.advance_minutes(10)
     $ _patrol_return_room = str(CurLoc or location or "StreetTavern")
     $ _patrol_picture = "images/fight/patrol_guard.png"
     $ _patrol_intro = "Вы решаете не платить и не прятаться. Стражники переглядываются, опускают алебарды и берут вас в клещи. Теперь это настоящая драка с патрулем."
     $ fight_begin("patrol_guard", 2, _patrol_return_room, _patrol_picture, _patrol_intro)
     call FightLoop
-    $ _patrol_outcome = str(HuntLastResult.get("outcome", "") if isinstance(HuntLastResult, dict) else "")
+    $ _patrol_outcome = str(hunt.last_result.get("outcome", "") or "")
     if _patrol_outcome == "victory":
         $ notoriety = min(100, int(notoriety or 0) + 18)
-        $ tavernfame = int(tavernfame or 0) - 3
+        $ player.economy.tavern_fame = int(player.economy.tavern_fame or 0) - 3
         $ MainTxt = str(MainTxt or "") + "\n\nВы отбились от патруля, но это уже не мелкая ссора с ночной стражей. Дурная слава +18, слава трактира -3."
         $ CurLocDesc = MainTxt
         $ renpy.notify("Дурная слава +18, слава трактира -3")
@@ -744,7 +1017,7 @@ label TownStreetPatrolFight:
 label TownStreetPatrolStocks:
     $ TownCurfewCaughtToday = 1
     $ TownStreetPatrolsToday = int(TownStreetPatrolsToday or 0) + 1
-    $ tavernfame = int(tavernfame * 0.4)
+    $ player.economy.tavern_fame = int(player.economy.tavern_fame * 0.4)
     $ notoriety = 0
     $ MainTxt = "Патруль тащит вас к колодкам. Ночь проходит унизительно: холод, смех поздних прохожих и тупая боль в плечах. К утру о вашем приключении уже знают слишком многие."
     $ CurLocDesc = MainTxt
@@ -755,10 +1028,9 @@ label TownStreetPatrolStocks:
 
 label DebugTownRandomEvents:
     $ CurLoc = "StreetTavern"
-    $ location = CurLoc
     $ CurrentRoom = StreetTavernRoom
     $ _debug_town_plan = town_street.ensure_daily_plan()
-    $ MainTxt = "День: %s\nСлот времени: %s\nСобытий сегодня: %s/2\nПлан: %s\nСработали локации: %s\nСработали события: %s\nКлючи: %s\nКулдауны: %s" % (dayspassed, time, TownStreetEventsToday, town_street._screen_text(_debug_town_plan), town_street._screen_text(TownStreetFiredLocationsToday), town_street._screen_text(TownStreetFiredLabelsToday), town_street._screen_text(TownStreetStorySeenKeys), town_street._screen_text(TownStreetCooldowns))
+    $ MainTxt = "День: %s\nСлот времени: %s\nСобытий сегодня: %s/2\nПлан: %s\nСработали локации: %s\nСработали события: %s\nКлючи: %s\nКулдауны: %s" % (calendar_v2.daysInGame, time, TownStreetEventsToday, town_street._screen_text(_debug_town_plan), town_street._screen_text(TownStreetFiredLocationsToday), town_street._screen_text(TownStreetFiredLabelsToday), town_street._screen_text(TownStreetStorySeenKeys), town_street._screen_text(TownStreetCooldowns))
     $ CurLocDesc = MainTxt
     $ current_action_title = "Отладка городских случайных событий"
     $ current_action_content = None
@@ -771,20 +1043,5 @@ label DebugTownRandomEvents:
         MenuItem("Форсировать патруль", Call("TownStreetPatrolEvent")),
         MenuItem("Выйти на улицу трактира", Jump("StreetTavern")),
     ]
-    call screen main_ui
-    jump DebugTownRandomEvents
-
-
-label DebugTownRandomEventsResetToday:
-    $ TownStreetEventsToday = 0
-    $ TownStreetPatrolsToday = 0
-    $ TownStreetFightToday = 0
-    $ TownCurfewCaughtToday = 0
-    $ TownStreetStorySeenKeys = []
-    $ TownStreetDailyPlan = {}
-    $ TownStreetLastEventText = ""
-    $ TownStreetContext = {}
-    $ TownStreetFiredLabelsToday = []
-    $ TownStreetFiredLocationsToday = []
-    $ TownStreetCooldowns = {}
-    return
+    while True:
+        call screen main_ui

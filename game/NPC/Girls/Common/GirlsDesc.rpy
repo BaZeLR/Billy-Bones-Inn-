@@ -1,7 +1,43 @@
+    def _girls_desc_stat_value(key, *map_names, **kwargs):
+        default = kwargs.get("default", 0)
+        for map_name in map_names:
+            mapping = _girls_desc_map(map_name, {})
+            value = _girls_desc_get(mapping, key, None)
+            if value is not None:
+                return value
+        return default
+    def _girls_desc_stat_value(key, *map_names, **kwargs):
+        default = kwargs.get("default", 0)
+        for map_name in map_names:
+            mapping = _girls_desc_map(map_name, {})
+            value = _girls_desc_get(mapping, key, None)
+            if value is not None:
+                return value
+        return default
+    def _girls_desc_stat_value(key, *map_names, **kwargs):
+        default = kwargs.get("default", 0)
+        for map_name in map_names:
+            mapping = _girls_desc_map(map_name, {})
+            value = _girls_desc_get(mapping, key, None)
+            if value is not None:
+                return value
+        return default
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
+    def _girls_desc_map(name, default=None):
+        value = getattr(renpy.store, str(name or ""), default)
+        if value is None:
+            return default
+        return value
+
+    def _girls_desc_map(name, default=None):
+        value = getattr(renpy.store, str(name or ""), default)
+        if value is None:
+            return default
+        return value
+
     def _girls_desc_map(name, default=None):
         value = getattr(renpy.store, str(name or ""), default)
         if value is None:
@@ -68,6 +104,10 @@ init python:
             _girls_desc_map("age", {}),
             _girls_desc_map("beauty", {}),
             _girls_desc_map("pregnancy", {}),
+            _girls_desc_map("topdress", {}),
+            _girls_desc_map("bottomdress", {}),
+            _girls_desc_map("topdress", {}),
+            _girls_desc_map("bottomdress", {}),
             _girls_desc_map("topdress", {}),
             _girls_desc_map("bottomdress", {}),
         )
@@ -137,15 +177,6 @@ init python:
         if value < 80:
             return "Она просто прекрасна."
         return "Она красавица из красавиц."
-
-    def _girls_desc_stat_value(key, *map_names, **kwargs):
-        default = kwargs.get("default", 0)
-        for map_name in map_names:
-            mapping = _girls_desc_map(map_name, {})
-            value = _girls_desc_get(mapping, key, None)
-            if value is not None:
-                return value
-        return default
 
     def _girls_desc_recent_barber_line(girl_key=""):
         key = str(girl_key or "").strip().lower()
@@ -337,6 +368,8 @@ init python:
         if int(_girls_desc_get(gm("Drunk"), g, 0) or 0) > 0:
             lines.append("%s слегка выпила, расслабилась и подобрела." % real_name)
 
+        girl_info = getPersonInfo(g)
+        girl_info = getPersonInfo(g)
         girl_info = getPersonInfo(g)
         age_val = int(_girls_desc_stat_value(g, "age_girls", "age", default=0) or 0)
         friends_val = int(getattr(girl_info, "rel", 0) or 0) if girl_info is not None else 0

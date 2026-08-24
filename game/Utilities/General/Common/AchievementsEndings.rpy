@@ -1,6 +1,20 @@
-# ================================================================================
+        global player.intimacy.can_cum_daily        global player.intimacy.can_cum_daily        global player.intimacy.can_cum_daily        global player.intimacy.can_cum_daily        global player.intimacy.can_cum_daily        global player.intimacy.can_cum_daily# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+default tractir_activated_achievements = set()
+default tractir_achieved = set()
+default tractir_endings = set()
+default tractir_progress_view = "achievements"
+default TractirEndingTitle = ""
+default TractirEndingBody = ""
+
+default tractir_activated_achievements = set()
+default tractir_achieved = set()
+default tractir_endings = set()
+default tractir_progress_view = "achievements"
+default TractirEndingTitle = ""
+default TractirEndingBody = ""
+
 default tractir_activated_achievements = set()
 default tractir_achieved = set()
 default tractir_endings = set()
@@ -105,12 +119,12 @@ init -20 python:
     def tractir_first_active_ending():
         if _tractir_progress_int(globals().get("money", 0), 0) <= 0:
             return "bankrupt"
-        if _tractir_progress_int(globals().get("tavernvisitors", 0), 0) <= 0:
+        if _tractir_progress_int(globals().get("player.tavern_management.visitors", 0), 0) <= 0:
             return "empty_tavern"
         if _tractir_progress_int(Sandra.var.get("MaidRevengeEnding", 0), 0) > 0:
             return "maid_revenge"
         try:
-            if _tractir_progress_int(fight_info().enemy_state.get("fatal_loss", 0), 0) > 0:
+            if _tractir_progress_int(fight.enemy_state.get("fatal_loss", 0), 0) > 0:
                 return "boss_death"
         except Exception:
             pass
@@ -123,7 +137,7 @@ init -20 python:
 
     def tractir_mark_boss_fatal_loss(enemy_id=""):
         try:
-            fight_state = fight_info().enemy_state
+            fight_state = fight.enemy_state
         except Exception:
             return False
         fight_state["fatal_loss"] = 1
@@ -131,14 +145,15 @@ init -20 python:
         return True
 
     def tractir_apply_sandra_secured_future():
-        global cancumdaily
+        global player.intimacy.can_cum_daily
+        global player.intimacy.can_cum_daily
         if _tractir_progress_int(globals().get("dayspassed", 0), 0) < 28:
             return False
         if _tractir_progress_int(Sandra.var.get("SecuredFuture", 0), 0) > 0:
             return False
         Sandra.var["SecuredFuture"] = 1
         Sandra.var["SecuredFutureDay"] = _tractir_progress_int(globals().get("dayspassed", 0), 0)
-        cancumdaily = max(1, _tractir_progress_int(cancumdaily, 2) - 1)
+        player.intimacy.can_cum_daily = max(1, _tractir_progress_int(player.intimacy.can_cum_daily, 2) - 1)
         tractir_activate_achievement("sandra_secured_future")
         try:
             renpy.notify("После ночи с Сандрой сил на чужие постели стало меньше.")

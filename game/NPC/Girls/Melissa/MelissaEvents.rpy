@@ -1,9 +1,10 @@
-# ================================================================================
+    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ Melissa.current_location = "TavernKitchen"    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ Melissa.current_location = "TavernKitchen"    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ Melissa.current_location = "TavernKitchen"# ================================================================================
 # Melissa authored events.
 # Event/thread availability is defined in StoryEventRuntime.rpy.
 # ================================================================================
 
 label story_melissa_storage_rat_0:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ household_mark_runtime_event_seen("melissa_storage_rat")
     vscene Melissa.image_path("tavern", "rat")
@@ -13,16 +14,21 @@ label story_melissa_storage_rat_0:
     menu:
         "Прибить крысу":
             $ Melissa.var["ratKilled"] = True
+            $ Melissa.var["ratKilled"] = True
+            $ Melissa.var["ratKilled"] = True
+            $ Melissa.var["ratKilled"] = True
+            $ Melissa.var["ratKilled"] = True
+            $ Melissa.var["ratKilled"] = True
             $ Melissa.var["storage_rat_cleared"] = 1
-            $ Melissa.var["storage_rat_last_help_day"] = int(dayspassed or 0)
+            $ Melissa.var["storage_rat_last_help_day"] = int(current_game_day() or 0)
             $ werecat_state()["rat_carcass_cached"] = 1
             $ werecat_state()["rats_problem_active"] = 1
-            $ werecat_state()["rat_food_loss_next_day"] = int(dayspassed or 0) + 7
+            $ werecat_state()["rat_food_loss_next_day"] = int(current_game_day() or 0) + 7
             $ Melissa.var["work_attitude"] = int(Melissa.var.get("work_attitude", 0) or 0) + 1
             $ Melissa.skills["cleaning"] = min(100, int(Melissa.skills.get("cleaning", 0) or 0) + 1)
             $ Melissa.change_social(friend_delta=1)
-            $ thread.advance()
-            $ evalTime = None
+            $ event_runtime.active_thread.advance()
+            $ event_runtime.evaluation_time = None
             $ findAvailableEvents(True)
             $ MainTxt = "Вы быстро расправляетесь с крысой, и Мелисса заметно расслабляется. \"Вот теперь другое дело,\" тихо говорит она, уже без прежнего раздражения. На всякий случай вы решаете не выбрасывать тушку сразу: такая приманка еще может сгодиться, если в лесу и правда водится тот необычный кошачий охотник, о котором судачат по трактирам."
         "Оставить все как есть":
@@ -35,47 +41,51 @@ label story_melissa_storage_rat_0:
 label story_melissa_werecat_intro_0:
     $ SignalBlockTime = 1
     call MelissaRatBreakfastScene
-    $ thread.advance()
-    $ evalTime = None
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    return True
+    jump HunterClub
 
 
 label story_melissa_werecat_rumor_0:
     $ SignalBlockTime = 1
-    call WerecatHunterClubTease
-    $ thread.advance()
-    $ evalTime = None
+    $ werecat_state()["hunter_tease_day"] = int(calendar_v2.daysInGame or 0)
+    $ MainTxt = "У дальней стены двое охотников переговариваются вполголоса, но так, чтобы половина зала все равно слышала.\n\n\"Говорят, в чаще теперь водится лесная кошка не из простых. Хвостом водит, ушами прядает, а тело такое, что у мужика колени подломятся быстрее, чем он лук натянет.\"\n\nВторой хмыкает, уже явно смакуя чужую байку: \"Если далеко заберешься, можно и след взять. А если удача с умением сходятся, такую тварь будто бы и поймать можно. Только не для всякого поводка она годится.\"\n\nПахнет дешевой бравадой и мужицкой похабщиной, но зерно в слухе, похоже, есть."
+    $ CurLocDesc = MainTxt
+    vscene werecat_info_picture_path()
+    "[MainTxt]"
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    return True
+    jump HunterClub
 
 
 label story_melissa_werecat_home_0:
     $ SignalBlockTime = 1
     call WerecatAdoptionBreakfastScene
-    $ thread.advance()
-    $ evalTime = None
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    return True
+    jump HunterClub
 
 
 label story_melissa_werecat_home_1:
     $ SignalBlockTime = 1
     call WerecatMonthThanksScene
-    $ thread.advance()
-    $ evalTime = None
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    return True
+    jump HunterClub
 
 
 label story_melissa_bat_problem_0:
     $ SignalBlockTime = 1
-    $ TavernBreakfastPresentIds = ["sandra", "amanda"]
+    $ player.tavern_management.breakfast.present_ids = ["sandra", "amanda"]
     vscene tavern_kitchen_breakfast_picture()
     "Утренний стол уже накрыт, но одного места не хватает. Аманда первой замечает пустую скамью Мелиссы и с ленивой усмешкой тянет: \"Вот увидите, сейчас она явится с таким лицом, будто всю ночь воевала с нечистой силой.\""
     vscene Melissa.image_path("bats", "yawns")
     "В этот момент в кухню, зевая и еле переставляя ноги, входит Мелисса. Вид у нее злой и невыспавшийся."
-    $ TavernBreakfastPresentIds = ["sandra", "melissa", "amanda"]
+    $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
     vscene Melissa.image_path("kitchen", "work")
     "Мелисса садится за стол и, даже взяв кружку, продолжает коситься так, будто над ее головой все еще что-то шуршит."
     "Сандра уже спокойнее говорит: \"У нас уже была крысиная проблема, из-за которой портились припасы, а теперь еще и летучие мыши? После крыс в кладовой я не хочу ждать, пока новая дрянь опять испортит дом.\""
@@ -97,18 +107,19 @@ label story_melissa_bat_problem_0:
     "[MainTxt]"
     $ calendar_v2.advance_minutes(45)
     $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 1)
-    $ BreakfastToday = True
-    $ TavernBreakfastLastDay = int(dayspassed or 0)
-    $ TavernBreakfastDay = int(dayspassed or 0)
-    $ TavernBreakfastEventActive = True
+    $ player.tavern_management.breakfast.today = True
+    $ player.tavern_management.breakfast.last_day = int(current_game_day() or 0)
+    $ player.tavern_management.breakfast.day = int(current_game_day() or 0)
+    $ player.tavern_management.breakfast.event_active = True
     $ Melissa.current_location = "TavernKitchen"
-    $ thread.advance()
-    $ evalTime = None
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    return True
+    jump HunterClub
 
 
 label story_melissa_bat_problem_1:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ _melissa_bat_problem_1_choice = ""
     vscene tavern_melissa_room_picture()
@@ -130,10 +141,15 @@ label story_melissa_bat_problem_1:
     $ calendar_v2.advance_minutes(45)
     if _melissa_bat_problem_1_choice == "promise":
         $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
+        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
+        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
+        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
+        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
+        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
         $ Melissa.var["bats_episode"] = 3
-        $ Melissa.var["bat_attic_check_day"] = max(int(Melissa.var.get("bat_attic_check_day", -1) or -1), int(dayspassed or 0))
-        $ thread.advance()
-        $ evalTime = None
+        $ Melissa.var["bat_attic_check_day"] = max(int(Melissa.var.get("bat_attic_check_day", -1) or -1), int(current_game_day() or 0))
+        $ event_runtime.active_thread.advance()
+        $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
     elif _melissa_bat_problem_1_choice == "comfort":
         $ Melissa.add_trust(1)
@@ -148,13 +164,14 @@ label story_melissa_bat_problem_2:
     "[MainTxt]"
     $ calendar_v2.advance_minutes(45)
     $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 4)
-    $ thread.advance()
-    $ evalTime = None
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    return True
+    jump HunterClub
 
 
 label story_melissa_bat_problem_3:
+    show screen main_ui
     $ SignalBlockTime = 1
     $ _melissa_bat_problem_3_choice = ""
     vscene "images/player_room/player_room_attic.png"
@@ -182,15 +199,15 @@ label story_melissa_bat_problem_3:
     $ calendar_v2.advance_minutes(45)
     if _melissa_bat_problem_3_choice == "fall":
         $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 6)
-        $ Melissa.var["drawings_ready_day"] = int(dayspassed or 0) + 2
+        $ Melissa.var["drawings_ready_day"] = int(current_game_day() or 0) + 2
         $ Melissa.var["temp_room"] = "TavernAmandaRoom"
         $ Amanda.set_var_int("attic_window_busted", 1)
         $ Melissa.add_trust(-7)
         $ Amanda.change_social(friend_delta=-5)
         $ notoriety = min(100, int(notoriety or 0) + 10)
-        $ tavernfame = max(-20, int(tavernfame or 0) - 2)
-        $ thread.advance()
-        $ evalTime = None
+        $ player.economy.tavern_fame = max(-20, int(player.economy.tavern_fame or 0) - 2)
+        $ event_runtime.active_thread.advance()
+        $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
     else:
         $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 5)
@@ -213,8 +230,8 @@ label story_melissa_bat_problem_5:
         $ CurLocDesc = MainTxt
         "[MainTxt]"
         $ calendar_v2.advance_minutes(45)
-        $ thread.advance()
-        $ evalTime = None
+        $ event_runtime.active_thread.advance()
+        $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
         call TavernMelissaRoomBuildActions
     return True
@@ -254,7 +271,7 @@ label ReadMelissaBooklet(return_to_location=True):
 
 label MelissaBookletTake:
     call Take("melissa_drawings_booklet_001", "TavernMelissaRoom", "", "melissa_drawings_booklet_001")
-    if int(_player_item_count_by_id("melissa_drawings_booklet_001") or 0) > 0:
+    if int(player.item_count("melissa_drawings_booklet_001") or 0) > 0:
         $ Melissa.var["drawings_booklet_taken"] = 1
         $ Melissa.var["drawings_booklet_left"] = 0
     $ current_object_id = ""
@@ -286,7 +303,7 @@ label story_melissa_bat_problem_4:
     $ _melissa_bat_problem_4_result = ""
     vscene "images/player_room/player_room_attic_1.png"
     if int(Melissa.var.get("bats_episode", 0) or 0) < 7:
-        if int(_player_item_count_by_id("bat_repellent_001") or 0) > 0:
+        if int(player.item_count("bat_repellent_001") or 0) > 0:
             $ _melissa_bat_problem_4_result = "smoke"
             $ MainTxt = "Вы раскладываете дымную смесь между балок, даете ей как следует разгореться и быстро отступаете. Чердак наполняется густым едким дымом из мха, лаванды и трав. Из-под крыши с писком и хлопаньем вырываются летучие мыши.\n\nГнездовище вы наконец выкурили, но на одном дыме дело не закончится: пока крышу не заделают как следует, щели останутся и вся пакость со временем полезет обратно."
         else:
@@ -297,8 +314,8 @@ label story_melissa_bat_problem_4:
             $ MainTxt = "Вы договариваетесь о починке старой крыши и отдаете за работу тысячу монет. Теперь остается только дождаться, пока мастера перетянут гнилые доски, забьют щели и приведут верх трактира в порядок. Обещают управиться за пару дней."
         else:
             $ MainTxt = "Летучих мышей вы уже выкурили, но без починки крыши дело не закончить. Денег на мастеров пока не хватает."
-    elif int(Melissa.var.get("roof_repair_complete_day", -1) or -1) < 0 or int(dayspassed or 0) < int(Melissa.var.get("roof_repair_complete_day", -1) or -1):
-        $ _days_left = max(0, int(Melissa.var.get("roof_repair_complete_day", -1) or -1) - int(dayspassed or 0))
+    elif int(Melissa.var.get("roof_repair_complete_day", -1) or -1) < 0 or int(current_game_day() or 0) < int(Melissa.var.get("roof_repair_complete_day", -1) or -1):
+        $ _days_left = max(0, int(Melissa.var.get("roof_repair_complete_day", -1) or -1) - int(current_game_day() or 0))
         $ MainTxt = "Крыша еще в работе. По свежим доскам и забитым щелям видно, что мастера уже начали, но до полного порядка придется подождать еще {} дн.".format(_days_left)
     else:
         $ MainTxt = "Теперь на чердаке сразу видно, что работа завершена: щели закрыты, прогнившие доски заменены, а от старого гнездовища не осталось ничего, кроме сухой пыли."
@@ -306,15 +323,15 @@ label story_melissa_bat_problem_4:
     "[MainTxt]"
     $ calendar_v2.advance_minutes(45)
     if _melissa_bat_problem_4_result == "smoke":
-        $ _player_remove_item_by_id("bat_repellent_001", 1)
+        $ player.remove_item("bat_repellent_001", 1)
         $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 7)
         $ Melissa.var["bat_recipe_unlocked"] = 1
     elif _melissa_bat_problem_4_result == "order_roof":
         $ money = int(money or 0) - 1000
-        $ Melissa.var["roof_repair_order_day"] = int(dayspassed or 0)
-        $ Melissa.var["roof_repair_complete_day"] = int(dayspassed or 0) + 2
-        $ thread.advance()
-        $ evalTime = None
+        $ Melissa.var["roof_repair_order_day"] = int(current_game_day() or 0)
+        $ Melissa.var["roof_repair_complete_day"] = int(current_game_day() or 0) + 2
+        $ event_runtime.active_thread.advance()
+        $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
         call stat
     return True
@@ -327,10 +344,10 @@ label story_melissa_bat_problem_6:
     $ CurLocDesc = MainTxt
     "[MainTxt]"
     $ calendar_v2.advance_minutes(45)
-    $ thread.complete()
+    $ event_runtime.active_thread.complete()
     $ Melissa.complete_bats_problem()
     $ Melissa.add_trust(3)
     $ Melissa.add_openness(2)
-    $ evalTime = None
+    $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     return True

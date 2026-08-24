@@ -3,13 +3,13 @@
 # ================================================================================
 init 6 python:
     def tavern_empty_room_peephole_visible():
-        return int(TavernHole or 0) > 0
+        return int(player.tavern_management.client_room_hole or 0) > 0
 
     def tavern_empty_room_peephole_has_client():
-        return str(TavernClosed or "") == "" and int(TavernHole or 0) > 0 and story_event_available("TavernEmptyRoom", "tavern_client_room")
+        return str(TavernMainRoom.state.get("closed_text", "") or "") == "" and int(player.tavern_management.client_room_hole or 0) > 0 and story_event_available("TavernEmptyRoom", "tavern_client_room")
 
     def tavern_empty_room_peephole_no_client():
-        return int(TavernHole or 0) > 0 and not tavern_empty_room_peephole_has_client()
+        return int(player.tavern_management.client_room_hole or 0) > 0 and not tavern_empty_room_peephole_has_client()
 
     TavernEmptyRoomPeepholeObject = GameObject(
         object_id="tavern_empty_room_peephole",
@@ -62,7 +62,6 @@ init 6 python:
 label TavernEmptyRoom:
     $ CurrentRoom = TavernEmptyRoomRoom
     $ CurLoc = "TavernEmptyRoom"
-    $ location = CurLoc
     $ scene_image = CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -79,17 +78,9 @@ label TavernEmptyRoom:
 label TavernEmptyRoomBuildActions:
     $ current_action_title = "Пустая комната"
     $ current_action_content = None
-    $ current_action_items = []
-    python:
-        for _empty_room_object in TavernEmptyRoomRoom.visible_objects():
-            current_action_items.append(MenuItem(_empty_room_object.name, Call("TavernEmptyRoomObjectMenu", _empty_room_object.object_id)))
-    if tavern_upstairs_can_clean_rooms():
-        $ current_action_items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernEmptyRoom", "", "")))
-    $ current_action_items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernEmptyRoom", "TavernEmptyRoomBuildActions")))
-    python:
-        for _exit in TavernEmptyRoomRoom.visible_exits():
-            current_action_items.append(MenuItem(_exit.label, Call("AdvanceMovementTime", _exit.target)))
-    return
+    $ current_action_items = tavern_empty_room_action_items()
+    while True:
+        call screen main_ui
 
 
 label TavernEmptyRoomObjectMenu(object_id=""):

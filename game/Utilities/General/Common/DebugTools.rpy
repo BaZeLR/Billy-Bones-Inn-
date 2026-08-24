@@ -1,4 +1,105 @@
-# ================================================================================
+    $ fight_sync_loaded_weapon_state_from_inventory()            if key == "EventsCount":
+                return EventsCount
+            if key == "NewEvents":
+                return NewEvents            if key == "build_tavern_events_queue_python":
+                return build_tavern_events_queue_python        elif key == "EventsCount":
+            _dbg_set("EventsCount", {})
+        elif key == "NewEvents":
+            _dbg_set("NewEvents", {})
+
+    def _dbg_ensure_event_maps():
+        ecount = _dbg_get("EventsCount", None)
+        if not isinstance(ecount, dict):
+            ecount = _dbg_set("EventsCount", {})
+        nevents = _dbg_get("NewEvents", None)
+        if not isinstance(nevents, dict):
+            nevents = _dbg_set("NewEvents", {})
+        return ecount, nevents    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()
+    $ fight_sync_level_from_exploration()
+    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass    $ npc_schedule_sync_all()        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass    $ npc_schedule_sync_all()            if key == "DisplayTavernEventShort":
+                return DisplayTavernEventShort    $ fight_sync_loaded_weapon_state_from_inventory()            if key == "EventsCount":
+                while True:
+        call screen main_ui EventsCount
+            if key == "NewEvents":
+                while True:
+        call screen main_ui NewEvents            if key == "build_tavern_events_queue_python":
+                while True:
+        call screen main_ui build_tavern_events_queue_python        elif key == "EventsCount":
+            _dbg_set("EventsCount", {})
+        elif key == "NewEvents":
+            _dbg_set("NewEvents", {})
+
+    def _dbg_ensure_event_maps():
+        ecount = _dbg_get("EventsCount", None)
+        if not isinstance(ecount, dict):
+            ecount = _dbg_set("EventsCount", {})
+        nevents = _dbg_get("NewEvents", None)
+        if not isinstance(nevents, dict):
+            nevents = _dbg_set("NewEvents", {})
+        while True:
+        call screen main_ui ecount, nevents    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()
+    $ fight_sync_level_from_exploration()
+    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass    $ npc_schedule_sync_all()        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass    $ npc_schedule_sync_all()            if key == "DisplayTavernEventShort":
+                return DisplayTavernEventShort    $ fight_sync_loaded_weapon_state_from_inventory()            if key == "EventsCount":
+                while True:
+        call screen main_ui EventsCount
+            if key == "NewEvents":
+                while True:
+        call screen main_ui NewEvents            if key == "build_tavern_events_queue_python":
+                while True:
+        call screen main_ui build_tavern_events_queue_python        elif key == "EventsCount":
+            _dbg_set("EventsCount", {})
+        elif key == "NewEvents":
+            _dbg_set("NewEvents", {})
+
+    def _dbg_ensure_event_maps():
+        ecount = _dbg_get("EventsCount", None)
+        if not isinstance(ecount, dict):
+            ecount = _dbg_set("EventsCount", {})
+        nevents = _dbg_get("NewEvents", None)
+        if not isinstance(nevents, dict):
+            nevents = _dbg_set("NewEvents", {})
+        while True:
+        call screen main_ui ecount, nevents    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()
+    $ fight_sync_level_from_exploration()
+    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass    $ npc_schedule_sync_all()        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass        try:
+            npc_schedule_sync_all()
+        except Exception:
+            pass    $ npc_schedule_sync_all()            if key == "DisplayTavernEventShort":
+                return DisplayTavernEventShort# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 default DebugBuilderRepairNotesPath = ""
@@ -9,29 +110,30 @@ init python:
 
     def _dbg_i(v, d=0):
         try:
-            return int(v)
+            while True:
+        call screen main_ui int(v)
         except Exception:
-            return d
+            while True:
+        call screen main_ui d
 
     def _dbg_get(name, default=None):
+        global calendar_v2.time_slot(), calendar_v2.week, calendar_v2.day, EventsCount, NewEvents
+        global calendar_v2.time_slot(), calendar_v2.week, calendar_v2.day, EventsCount, NewEvents
+        global calendar_v2.time_slot(), calendar_v2.week, calendar_v2.day, EventsCount, NewEvents
         key = str(name or "")
         try:
             if key == "time":
-                return time
+                while True:
+        call screen main_ui calendar_v2.time_slot()
             if key == "week":
-                return week
+                while True:
+        call screen main_ui calendar_v2.week
             if key == "day":
-                return day
-            if key == "EventsCount":
-                return EventsCount
-            if key == "NewEvents":
-                return NewEvents
+                return calendar_v2.day
             if key == "_mui_location_char_keys":
                 return _mui_location_char_keys
             if key == "_mui_dialog_rows":
                 return _mui_dialog_rows
-            if key == "build_tavern_events_queue_python":
-                return build_tavern_events_queue_python
             if key == "ensure_default_tavern_jobs":
                 return ensure_default_tavern_jobs
             if key == "DisplayTavernEventShort":
@@ -54,13 +156,11 @@ init python:
         calendar_v2.daysInGame = day_number_i
         calendar_v2.hour = _dbg_i(hour if hour_value is None else hour_value, 8) % 24
         calendar_v2.minute = _dbg_i(minute if minute_value is None else minute_value, 0) % 60
-        calendar_v2.sync_state()
         return True
 
     # Debug/test fixture setup only. Gameplay never changes weekday directly.
     def _dbg_calendar_set_weekday(weekday_value=1):
         target_week = max(1, min(7, _dbg_i(weekday_value, 1)))
-        calendar_v2.sync_state()
         steps = (target_week - max(1, min(7, _dbg_i(week, 1)))) % 7
         while steps > 0:
             calendar_v2.day += 1
@@ -75,7 +175,6 @@ init python:
                 calendar_v2.period = 1
                 calendar_v2.cycle += 1
             steps -= 1
-        calendar_v2.sync_state()
         return True
 
     def _dbg_set(name, value):
@@ -85,11 +184,18 @@ init python:
             _slot = max(0, min(7, int(value or 0)))
             calendar_v2.hour = (6, 8, 11, 13, 16, 18, 21, 23)[_slot]
             calendar_v2.minute = 0
-            calendar_v2.sync_state()
         elif key == "week":
             _dbg_calendar_set_weekday(value)
         elif key == "day":
             _dbg_calendar_set_fields(value, month, year, hour, minute)
+        elif key == "EventsCount":
+            EventsCount = value
+        elif key == "NewEvents":
+            NewEvents = value
+        elif key == "EventsCount":
+            EventsCount = value
+        elif key == "NewEvents":
+            NewEvents = value
         elif key == "EventsCount":
             EventsCount = value
         elif key == "NewEvents":
@@ -104,19 +210,6 @@ init python:
             _dbg_set("week", 1)
         elif key == "day":
             _dbg_set("day", 1)
-        elif key == "EventsCount":
-            _dbg_set("EventsCount", {})
-        elif key == "NewEvents":
-            _dbg_set("NewEvents", {})
-
-    def _dbg_ensure_event_maps():
-        ecount = _dbg_get("EventsCount", None)
-        if not isinstance(ecount, dict):
-            ecount = _dbg_set("EventsCount", {})
-        nevents = _dbg_get("NewEvents", None)
-        if not isinstance(nevents, dict):
-            nevents = _dbg_set("NewEvents", {})
-        return ecount, nevents
 
     def _dbg_queue_for_period(period):
         out = []
@@ -135,12 +228,10 @@ init python:
         return out
 
     def _dbg_build_queue(include_mandatory=True):
-        builder = _dbg_get("build_tavern_events_queue_python", None)
-        if callable(builder):
-            builder(bool(include_mandatory))
-            return True
-        _dbg_ensure_event_maps()
-        return False
+        tavern_work_build_daily_plan()
+        if not bool(include_mandatory):
+            event_runtime.tavern_work_events[:] = [row for row in list(event_runtime.tavern_work_events or []) if not bool(row.get("mandatory", False))]
+        return True
 
     def _dbg_queue_day_map():
         out = {}
@@ -153,6 +244,12 @@ init python:
         Build queue for debug visibility. If RNG yields empty day, inject one
         known random event so debug UI always has something to show/dispatch.
         """
+        _dbg_ensure_event_maps()
+
+        _dbg_ensure_event_maps()
+
+        _dbg_ensure_event_maps()
+
         _dbg_build_queue(True)
         day_map = _dbg_queue_day_map()
         total = 0
@@ -162,12 +259,12 @@ init python:
             return day_map
 
         # Deterministic fallback for debug-only visibility.
-        ecount, nevents = _dbg_ensure_event_maps()
         period = _dbg_i(_dbg_get("time", 0), 0)
         if period < 0 or period > 4:
             period = 0
-        ecount[period] = 1
-        nevents[str(period) + "_0"] = "CleaningHarass"
+        fallback_def = tavern_work_definition("CleaningHarass")
+        if fallback_def is not None:
+            event_runtime.tavern_work_events.append(tavern_work_plan_row(fallback_def, period))
         return _dbg_queue_day_map()
 
     def _dbg_image_exists(*paths):
@@ -310,15 +407,22 @@ init python:
 
     def debug_builder_refresh_runtime():
         try:
-            calendar_v2.sync_state()
+        except Exception:
+            pass
+        try:
+        except Exception:
+            pass
+        try:
+        except Exception:
+            pass
+        try:
+        except Exception:
+            pass
+        try:
         except Exception:
             pass
         try:
             npc_daily_schedule_build_all(True)
-        except Exception:
-            pass
-        try:
-            npc_schedule_sync_all()
         except Exception:
             pass
         try:
@@ -331,8 +435,10 @@ init python:
         slot_i = max(0, min(7, int(slot_id or 0)))
         calendar_v2.hour = (6, 8, 11, 13, 16, 18, 21, 23)[slot_i]
         calendar_v2.minute = 0
-        calendar_v2.sync_state()
         debug_builder_refresh_runtime()
+        _pc_sync_ui_chores()
+        _pc_sync_ui_chores()
+        _pc_sync_ui_chores()
         main_ui_restart_interaction()
         return int(time or 0)
 
@@ -370,10 +476,15 @@ init python:
         if not key:
             return 0
         _ensure_player_chores_state()
-        PlayerChoresWeek[key] = max(0, int(PlayerChoresWeek.get(key, 0) or 0) + int(delta or 0))
-        _pc_sync_ui_chores()
+        player.chores.weekly[key] = max(0, int(player.chores.weekly.get(key, 0) or 0) + int(delta or 0))
         main_ui_restart_interaction()
-        return int(PlayerChoresWeek.get(key, 0) or 0)
+        _pc_sync_ui_chores()
+        _pc_sync_ui_chores()
+        _pc_sync_ui_chores()
+        _pc_sync_ui_chores()
+        _pc_sync_ui_chores()
+        _pc_sync_ui_chores()
+        return int(player.chores.weekly.get(key, 0) or 0)
 
     def debug_builder_room_report(room_code=""):
         room_key = str(room_code or "").strip()
@@ -452,7 +563,7 @@ init python:
         seen = {}
         keys = []
         try:
-            keys.extend([str(k or "") for k in peopleInfo.keys()])
+            keys.extend([str(k or "") for k in CurrentLoc.keys()])
         except Exception:
             pass
         try:
@@ -539,13 +650,8 @@ init python:
         slot_i = max(0, min(7, int(slot_id or 0)))
         calendar_v2.hour = (6, 8, 11, 13, 16, 18, 21, 23)[slot_i]
         calendar_v2.minute = 0
-        calendar_v2.sync_state()
         try:
             npc_daily_schedule_build_all(True)
-        except Exception:
-            pass
-        try:
-            npc_schedule_sync_all()
         except Exception:
             pass
         return int(time or 0)
@@ -1059,8 +1165,9 @@ init python:
         prev_time = _dbg_get("time", None)
         prev_week = _dbg_get("week", None)
         prev_day = _dbg_get("day", None)
-        prev_events_count = _dbg_get("EventsCount", None)
-        prev_new_events = _dbg_get("NewEvents", None)
+        prev_plan = list(event_runtime.tavern_work_events or [])
+        prev_played = list(event_runtime.tavern_played_today or [])
+        prev_report = list(event_runtime.tavern_report_rows or [])
 
         try:
             # 1) deterministic setup
@@ -1125,14 +1232,9 @@ init python:
             else:
                 _dbg_set("day", prev_day)
 
-            if isinstance(prev_events_count, dict):
-                _dbg_set("EventsCount", prev_events_count)
-            else:
-                _dbg_del("EventsCount")
-            if isinstance(prev_new_events, dict):
-                _dbg_set("NewEvents", prev_new_events)
-            else:
-                _dbg_del("NewEvents")
+            event_runtime.tavern_work_events[:] = prev_plan
+            event_runtime.tavern_played_today[:] = prev_played
+            event_runtime.tavern_report_rows[:] = prev_report
 
     def debug_tavern_events_probe(run_dispatch=True):
         result = {
@@ -1192,8 +1294,6 @@ init python:
         _dbg_set("time", 0)
         _dbg_set("week", 1)
         _dbg_set("day", 1)
-        _dbg_ensure_event_maps()
-
         _dbg_build_queue(True)
 
         t = _dbg_i(_dbg_get("time", 0), 0)
@@ -1253,21 +1353,20 @@ init python:
         return debug_tavern_events_unit_fn()
 
     def debug_builder_fight_stats_text():
-        ensure_dog_runtime()
         dog_state = "with MC" if bool(dog.owned) and bool(dog.in_company) and dog.is_alive() else "not in fight"
         lines = [
             "Fight debug setup.",
-            "MC: health %d/100, energy %d/100, fun %d, sick days %d." % (int(health or 0), int(energy or 0), int(fun or 0), int(SickDays or 0)),
-            "World stats: reputation %d, notoriety %d, experience/exploration %d, tavern fame %d, money %d." % (int(reputation or 0), int(notoriety or 0), int(exploration or 0), int(tavernfame or 0), int(money or 0)),
-            "Fight level: %d. Weapon: %s. Armor: %s." % (int(fight_info().level.get("you", 1) or 1), fight_player_weapon_name(), fight_player_armor_name()),
+            "MC: health %d/100, energy %d/100, fun %d, sick days %d." % (int(player.condition.health or 0), int(player.condition.energy or 0), int(player.condition.fun or 0), int(player.condition.sick_days or 0)),
+            "World stats: reputation %d, notoriety %d, experience/exploration %d, tavern fame %d, money %d." % (int(reputation or 0), int(notoriety or 0), int(exploration or 0), int(player.economy.tavern_fame or 0), int(player.economy.money or 0)),
+            "Fight level: %d. Weapon: %s. Armor: %s." % (int(fight.level.get("you", 1) or 1), fight_player_weapon_name(), fight_player_armor_name()),
             "Ammo/supplies: arrows %d, droplets %d, gunpowder %d, bandages %d, tea %d, potions %d, fire bombs %d." % (
-                int(PlayerFightSupply.get("arrows", 0) or 0),
-                int(PlayerFightSupply.get("droplets", 0) or 0),
-                int(PlayerFightSupply.get("gunpowder", 0) or 0),
-                int(PlayerFightSupply.get("bandage", 0) or 0),
-                int(PlayerFightSupply.get("energy_tea", 0) or 0),
-                int(PlayerFightSupply.get("healing_potion", 0) or 0),
-                int(PlayerFightSupply.get("fire_bomb", 0) or 0),
+                int(player.combat.supply.get("arrows", 0) or 0),
+                int(player.combat.supply.get("droplets", 0) or 0),
+                int(player.combat.supply.get("gunpowder", 0) or 0),
+                int(player.combat.supply.get("bandage", 0) or 0),
+                int(player.combat.supply.get("energy_tea", 0) or 0),
+                int(player.combat.supply.get("healing_potion", 0) or 0),
+                int(player.combat.supply.get("fire_bomb", 0) or 0),
             ),
             "Dog: %s." % dog_state,
         ]
@@ -1436,7 +1535,6 @@ define DebugBuilderRoomObject = Room(
 
 label DebugBuilderRoom:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ UI_mode = "scene"
     $ UI_selected_char = ""
@@ -1447,13 +1545,12 @@ label DebugBuilderRoom:
     $ current_action_title = "Debug Builder"
     $ current_action_content = None
     $ current_action_items = debug_builder_main_items()
-    call screen main_ui
-    jump DebugBuilderRoom
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderPictures:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = debug_builder_picture_report()
     $ CurLocDesc = MainTxt
@@ -1468,8 +1565,8 @@ label DebugBuilderPictures:
         MenuItem("Irma flirts", Call("DebugBuilderShowPicture", "images/irma/flirts.png")),
         MenuItem("Back", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderPictures
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderShowPicture(picture_path=""):
@@ -1486,7 +1583,6 @@ label DebugBuilderShowPicture(picture_path=""):
 
 label DebugBuilderSequences:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = debug_builder_media_sequence_report()
     $ CurLocDesc = MainTxt
@@ -1499,8 +1595,8 @@ label DebugBuilderSequences:
         MenuItem("Irma measure sequence", Call("DebugBuilderShowSequence", "irma", "measure", "measure", 4)),
         MenuItem("Back", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderSequences
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderShowSequence(folder1="", folder2="", image_name="", variants=0):
@@ -1516,7 +1612,6 @@ label DebugBuilderShowSequence(folder1="", folder2="", image_name="", variants=0
 
 label DebugBuilderRooms:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = "Select a room to inspect its actual Room object output: picture, visible descriptions, visible objects, visible exits, and schedule-driven NPCs."
     $ CurLocDesc = MainTxt
@@ -1527,8 +1622,8 @@ label DebugBuilderRooms:
         for _debug_room_key in debug_builder_room_keys()[:24]:
             current_action_items.append(MenuItem(_debug_room_key, Call("DebugBuilderInspectRoom", _debug_room_key)))
         current_action_items.append(MenuItem("Back", Jump("DebugBuilderRoom")))
-    call screen main_ui
-    jump DebugBuilderRooms
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderInspectRoom(room_code=""):
@@ -1546,8 +1641,7 @@ label DebugBuilderInspectRoom(room_code=""):
         MenuItem("Back to rooms", Jump("DebugBuilderRooms")),
         MenuItem("Back to builder", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderRooms
+    return
 
 
 label DebugBuilderShowRoomPicture(room_code=""):
@@ -1565,7 +1659,6 @@ label DebugBuilderShowRoomPicture(room_code=""):
 
 label DebugBuilderMenuRooms:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = "Select a room to inspect generated menu items, object actions, room actions, and exits."
     $ CurLocDesc = MainTxt
@@ -1576,8 +1669,8 @@ label DebugBuilderMenuRooms:
         for _debug_room_key in debug_builder_room_keys()[:24]:
             current_action_items.append(MenuItem(_debug_room_key, Call("DebugBuilderMenuRoom", _debug_room_key)))
         current_action_items.append(MenuItem("Back", Jump("DebugBuilderRoom")))
-    call screen main_ui
-    jump DebugBuilderMenuRooms
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderMenuRoom(room_code=""):
@@ -1591,13 +1684,11 @@ label DebugBuilderMenuRoom(room_code=""):
         MenuItem("Back to menu probes", Jump("DebugBuilderMenuRooms")),
         MenuItem("Back to builder", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderMenuRooms
+    return
 
 
 label DebugBuilderStoryEvents:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = debug_builder_story_report()
     $ CurLocDesc = MainTxt
@@ -1608,13 +1699,12 @@ label DebugBuilderStoryEvents:
         MenuItem("Refresh event checks", Jump("DebugBuilderStoryEvents")),
         MenuItem("Back", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderStoryEvents
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderEventProbes:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = debug_builder_event_probe_report()
     $ CurLocDesc = MainTxt
@@ -1625,8 +1715,8 @@ label DebugBuilderEventProbes:
         MenuItem("Open story board overlay", [Function(story_board_refresh), SetVariable("main_ui_overlay", "story")]),
         MenuItem("Back", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderEventProbes
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderEventProbe(location_key="", action_key=""):
@@ -1641,8 +1731,7 @@ label DebugBuilderEventProbe(location_key="", action_key=""):
         MenuItem("Back to event probes", Jump("DebugBuilderEventProbes")),
         MenuItem("Back to builder", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderEventProbes
+    return
 
 
 label DebugBuilderFireEvent(location_key="", action_key=""):
@@ -1650,7 +1739,6 @@ label DebugBuilderFireEvent(location_key="", action_key=""):
     $ _debug_event_action = str(action_key or "")
     call checkTriggers(_debug_event_location, _debug_event_action, 0)
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = "Returned from checkTriggers(%s, %s, 0)." % (_debug_event_location, _debug_event_action)
     $ CurLocDesc = MainTxt
@@ -1659,9 +1747,7 @@ label DebugBuilderFireEvent(location_key="", action_key=""):
 
 label DebugBuilderSchedules:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
-    $ npc_schedule_sync_all()
     $ MainTxt = debug_builder_schedule_report()
     $ CurLocDesc = MainTxt
     $ current_action_title = "NPC schedules"
@@ -1678,26 +1764,24 @@ label DebugBuilderSchedules:
         MenuItem("Probe rooms", Jump("DebugBuilderScheduleRooms")),
         MenuItem("Back", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderSchedules
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderScheduleRooms:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = "Choose a room. The probe lists NPC ids whose getLocation() resolves to that room for the current calendar time."
     $ CurLocDesc = MainTxt
     $ current_action_title = "Schedule room probes"
     $ current_action_content = None
     $ current_action_items = debug_builder_schedule_room_items() + [MenuItem("Back", Jump("DebugBuilderSchedules"))]
-    call screen main_ui
-    jump DebugBuilderScheduleRooms
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderScheduleRoom(room_code=""):
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = debug_builder_schedule_room_report(room_code)
     $ CurLocDesc = MainTxt
@@ -1708,13 +1792,11 @@ label DebugBuilderScheduleRoom(room_code=""):
         MenuItem("Back to probes", Jump("DebugBuilderScheduleRooms")),
         MenuItem("Back to schedules", Jump("DebugBuilderSchedules")),
     ]
-    call screen main_ui
-    jump DebugBuilderScheduleRooms
+    return
 
 
 label DebugBuilderCorrectionNotes:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = debug_builder_correction_notes()
     $ CurLocDesc = MainTxt
@@ -1725,13 +1807,12 @@ label DebugBuilderCorrectionNotes:
         MenuItem("Preview full repair document", Jump("DebugBuilderRepairDocumentPreview")),
         MenuItem("Back", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderCorrectionNotes
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderRepairDocumentPreview:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = debug_builder_repair_document_text()
     $ CurLocDesc = MainTxt
@@ -1742,13 +1823,12 @@ label DebugBuilderRepairDocumentPreview:
         MenuItem("Back to notes", Jump("DebugBuilderCorrectionNotes")),
         MenuItem("Back to builder", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderCorrectionNotes
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderWriteRepairNotes:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ DebugBuilderRepairNotesPath = debug_builder_write_repair_document()
     $ MainTxt = "Repair notes document written:\n" + str(DebugBuilderRepairNotesPath or "")
@@ -1760,13 +1840,12 @@ label DebugBuilderWriteRepairNotes:
         MenuItem("Back to notes", Jump("DebugBuilderCorrectionNotes")),
         MenuItem("Back to builder", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderCorrectionNotes
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderCards:
     $ CurLoc = "DebugBuilderRoom"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ MainTxt = "Open card panels and verify that stats and _card pictures come from the current runtime state."
     $ CurLocDesc = MainTxt
@@ -1782,13 +1861,12 @@ label DebugBuilderCards:
         MenuItem("Irma", Function(show_girl_card_main_ui_state, "irma")),
         MenuItem("Back", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderCards
+    while True:
+        call screen main_ui
 
 
 label DebugBuilderFightTests:
     $ CurLoc = "DebugBuilderFightTests"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ UI_mode = "scene"
     $ MainTxt = debug_builder_fight_stats_text()
@@ -1800,25 +1878,21 @@ label DebugBuilderFightTests:
         MenuItem("Launch fights", Jump("DebugFightLaunchMenu")),
         MenuItem("Back", Jump("DebugBuilderRoom")),
     ]
-    call screen main_ui
-    jump DebugBuilderFightTests
+    while True:
+        call screen main_ui
 
 
 label DebugFightSetupMenu:
     $ CurLoc = "DebugBuilderFightTests"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ UI_mode = "scene"
-    $ fight_sync_level_from_exploration()
-    $ fight_sync_loaded_weapon_state_from_inventory()
-    $ fight_sync_supply_from_inventory()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     $ current_action_title = "Fight setup"
     $ current_action_content = None
-    $ _debug_dog = ensure_dog_runtime()
+    $ _debug_dog = dog
     $ _debug_dog_state = "with MC" if bool(_debug_dog.owned) and bool(_debug_dog.in_company) and _debug_dog.is_alive() else "none"
-    $ _debug_supply_caption = "Supplies: arrows %d / shot %d / bandage %d / tea %d / potion %d / fire %d / bees %d" % (int(PlayerFightSupply.get("arrows", 0) or 0), int(PlayerFightSupply.get("droplets", 0) or 0), int(PlayerFightSupply.get("bandage", 0) or 0), int(PlayerFightSupply.get("energy_tea", 0) or 0), int(PlayerFightSupply.get("healing_potion", 0) or 0), int(PlayerFightSupply.get("fire_bomb", 0) or 0), int(PlayerFightSupply.get("bees_bomb", 0) or 0))
+    $ _debug_supply_caption = "Supplies: arrows %d / shot %d / bandage %d / tea %d / potion %d / fire %d / bees %d" % (int(player.combat.supply.get("arrows", 0) or 0), int(player.combat.supply.get("droplets", 0) or 0), int(player.combat.supply.get("bandage", 0) or 0), int(player.combat.supply.get("energy_tea", 0) or 0), int(player.combat.supply.get("healing_potion", 0) or 0), int(player.combat.supply.get("fire_bomb", 0) or 0), int(player.combat.supply.get("bees_bomb", 0) or 0))
     $ current_action_items = [
         MenuItem("Launch fights", Jump("DebugFightLaunchMenu")),
         MenuItem("Weapon: " + fight_player_weapon_name(), Jump("DebugFightCycleWeapon")),
@@ -1829,13 +1903,12 @@ label DebugFightSetupMenu:
         MenuItem("Dog: " + str(_debug_dog_state), Jump("DebugFightCycleDog")),
         MenuItem("Back", Jump("DebugBuilderFightTests")),
     ]
-    call screen main_ui
-    jump DebugFightSetupMenu
+    while True:
+        call screen main_ui
 
 
 label DebugFightStatsMenu:
     $ CurLoc = "DebugBuilderFightTests"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ UI_mode = "scene"
     $ MainTxt = debug_builder_fight_stats_text()
@@ -1849,13 +1922,12 @@ label DebugFightStatsMenu:
         MenuItem("Experience reset", Jump("DebugFightExperienceReset")),
         MenuItem("Back", Jump("DebugBuilderFightTests")),
     ]
-    call screen main_ui
-    jump DebugFightStatsMenu
+    while True:
+        call screen main_ui
 
 
 label DebugFightWeaponsMenu:
     $ CurLoc = "DebugBuilderFightTests"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ UI_mode = "scene"
     $ MainTxt = debug_builder_fight_stats_text()
@@ -1868,13 +1940,12 @@ label DebugFightWeaponsMenu:
         MenuItem("Weapon: rusty rifle", Jump("DebugFightWeaponRifle")),
         MenuItem("Back", Jump("DebugBuilderFightTests")),
     ]
-    call screen main_ui
-    jump DebugFightWeaponsMenu
+    while True:
+        call screen main_ui
 
 
 label DebugFightArmorMenu:
     $ CurLoc = "DebugBuilderFightTests"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ UI_mode = "scene"
     $ MainTxt = debug_builder_fight_stats_text()
@@ -1886,13 +1957,12 @@ label DebugFightArmorMenu:
         MenuItem("Armor: cuirass", Jump("DebugFightArmorCuirass")),
         MenuItem("Back", Jump("DebugBuilderFightTests")),
     ]
-    call screen main_ui
-    jump DebugFightArmorMenu
+    while True:
+        call screen main_ui
 
 
 label DebugFightSupportMenu:
     $ CurLoc = "DebugBuilderFightTests"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ UI_mode = "scene"
     $ MainTxt = debug_builder_fight_stats_text()
@@ -1905,13 +1975,12 @@ label DebugFightSupportMenu:
         MenuItem("No dog in fight", Jump("DebugFightDogOff")),
         MenuItem("Back", Jump("DebugBuilderFightTests")),
     ]
-    call screen main_ui
-    jump DebugFightSupportMenu
+    while True:
+        call screen main_ui
 
 
 label DebugFightLaunchMenu:
     $ CurLoc = "DebugBuilderFightTests"
-    $ location = CurLoc
     $ CurrentRoom = DebugBuilderRoomObject
     $ UI_mode = "scene"
     $ MainTxt = debug_builder_fight_stats_text()
@@ -1924,23 +1993,22 @@ label DebugFightLaunchMenu:
         MenuItem("Patrol guards", Jump("DebugFightPatrolGuards")),
         MenuItem("Back", Jump("DebugBuilderFightTests")),
     ]
-    call screen main_ui
-    jump DebugFightLaunchMenu
+    while True:
+        call screen main_ui
+
 
 
 label DebugFightRenewMCStats:
     $ health = 100
     $ energy = 100
     $ fun = 100
-    $ SickDays = 0
-    $ PlayerForestBanUntilDay = 0
+    $ player.condition.sick_days = 0
+    $ player.condition.forest_ban_until_day = 0
     $ exploration = max(180, int(exploration or 0))
     $ notoriety = 0
     $ reputation = max(20, int(reputation or 0))
-    $ tavernfame = int(tavernfame or 0)
+    $ player.economy.tavern_fame = int(player.economy.tavern_fame or 0)
     $ money = max(500, int(money or 0))
-    $ fight_sync_level_from_exploration()
-    $ fight_sync_supply_from_inventory()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightSetupMenu
@@ -1973,74 +2041,72 @@ label DebugFightCycleEnergy:
 
 
 label DebugFightCycleExperience:
-    if int(exploration or 0) < 50:
-        $ exploration = 50
-    elif int(exploration or 0) < 150:
-        $ exploration = 150
-    elif int(exploration or 0) < 300:
-        $ exploration = 300
+    if int(player.stats.exploration or 0) < 50:
+        $ player.set_stat("exploration", 50)
+    elif int(player.stats.exploration or 0) < 150:
+        $ player.set_stat("exploration", 150)
+    elif int(player.stats.exploration or 0) < 300:
+        $ player.set_stat("exploration", 300)
     else:
         $ exploration = 0
-    $ fight_sync_level_from_exploration()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightSetupMenu
 
 
 label DebugFightCycleWeapon:
-    if str(EquippedWeapon or "").strip() == "":
-        $ _player_add_item_by_id("old_axe_001", 1)
-        $ EquippedWeapon = "old_axe_001"
-        $ RustyHunterRifleLoadedAmmo = ""
-    elif str(EquippedWeapon or "").strip() == "old_axe_001":
-        $ _player_add_item_by_id("rusty_hunter_rifle_001", 1)
-        $ _player_add_item_by_id("arrows_001", 10)
-        $ _player_add_item_by_id("droplets_001", 8)
-        $ _player_add_item_by_id("gunpowder_001", 8)
-        $ EquippedWeapon = "rusty_hunter_rifle_001"
-        $ RustyHunterRifleLoadedAmmo = "arrows"
-    else:
-        $ EquippedWeapon = ""
+    if str(player.equipment.weapon or "").strip() == "":
+        $ player.add_item("old_axe_001", 1)
+        $ player.equipment.weapon = "old_axe_001"
         $ RustyHunterRifleLoadedAmmo = ""
     $ fight_sync_loaded_weapon_state_from_inventory()
-    $ fight_sync_supply_from_inventory()
+    elif str(player.equipment.weapon or "").strip() == "old_axe_001":
+        $ player.add_item("rusty_hunter_rifle_001", 1)
+        $ player.add_item("arrows_001", 10)
+        $ player.add_item("droplets_001", 8)
+        $ player.add_item("gunpowder_001", 8)
+        $ player.equipment.weapon = "rusty_hunter_rifle_001"
+        $ RustyHunterRifleLoadedAmmo = "arrows"
+    else:
+        $ player.equipment.weapon = ""
+        $ RustyHunterRifleLoadedAmmo = ""
+    $ fight_sync_loaded_weapon_state_from_inventory()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightSetupMenu
 
 
 label DebugFightCycleArmor:
-    if str(EquippedArmor or "").strip() == "old_leather_cuirass_001":
-        $ EquippedArmor = ""
+    if str(player.equipment.armor or "").strip() == "old_leather_cuirass_001":
+        $ player.equipment.armor = ""
     else:
-        $ _player_add_item_by_id("old_leather_cuirass_001", 1)
-        $ EquippedArmor = "old_leather_cuirass_001"
+        $ player.add_item("old_leather_cuirass_001", 1)
+        $ player.equipment.armor = "old_leather_cuirass_001"
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightSetupMenu
 
 
 label DebugFightCycleLoadedAmmo:
-    $ _player_add_item_by_id("rusty_hunter_rifle_001", 1)
-    $ EquippedWeapon = "rusty_hunter_rifle_001"
+    $ player.add_item("rusty_hunter_rifle_001", 1)
+    $ player.equipment.weapon = "rusty_hunter_rifle_001"
     if str(RustyHunterRifleLoadedAmmo or "").strip() == "":
-        $ _player_add_item_by_id("arrows_001", 10)
+        $ player.add_item("arrows_001", 10)
         $ RustyHunterRifleLoadedAmmo = "arrows"
     elif str(RustyHunterRifleLoadedAmmo or "").strip() == "arrows":
-        $ _player_add_item_by_id("droplets_001", 8)
-        $ _player_add_item_by_id("gunpowder_001", 8)
+        $ player.add_item("droplets_001", 8)
+        $ player.add_item("gunpowder_001", 8)
         $ RustyHunterRifleLoadedAmmo = "droplets"
     else:
         $ RustyHunterRifleLoadedAmmo = ""
     $ fight_sync_loaded_weapon_state_from_inventory()
-    $ fight_sync_supply_from_inventory()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightSetupMenu
 
 
 label DebugFightCycleDog:
-    $ _debug_dog = ensure_dog_runtime()
+    $ _debug_dog = dog
     if bool(_debug_dog.owned) and bool(_debug_dog.in_company) and _debug_dog.is_alive():
         $ _debug_dog.in_company = False
     else:
@@ -2057,7 +2123,6 @@ label DebugFightCycleDog:
 
 label DebugFightExperienceUp:
     $ exploration = max(0, int(exploration or 0) + 50)
-    $ fight_sync_level_from_exploration()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightStatsMenu
@@ -2065,7 +2130,6 @@ label DebugFightExperienceUp:
 
 label DebugFightExperienceDown:
     $ exploration = max(0, int(exploration or 0) - 50)
-    $ fight_sync_level_from_exploration()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightStatsMenu
@@ -2073,70 +2137,66 @@ label DebugFightExperienceDown:
 
 label DebugFightExperienceReset:
     $ exploration = 0
-    $ fight_sync_level_from_exploration()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightStatsMenu
 
 
 label DebugFightWeaponFists:
-    $ EquippedWeapon = ""
+    $ player.equipment.weapon = ""
     $ RustyHunterRifleLoadedAmmo = ""
     $ fight_sync_loaded_weapon_state_from_inventory()
-    $ fight_sync_supply_from_inventory()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightWeaponsMenu
 
 
 label DebugFightWeaponAxe:
-    $ _player_add_item_by_id("old_axe_001", 1)
-    $ EquippedWeapon = "old_axe_001"
+    $ player.add_item("old_axe_001", 1)
+    $ player.equipment.weapon = "old_axe_001"
     $ RustyHunterRifleLoadedAmmo = ""
     $ fight_sync_loaded_weapon_state_from_inventory()
-    $ fight_sync_supply_from_inventory()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightWeaponsMenu
 
 
 label DebugFightWeaponRifle:
-    $ _player_add_item_by_id("rusty_hunter_rifle_001", 1)
-    $ _player_add_item_by_id("arrows_001", 10)
-    $ _player_add_item_by_id("droplets_001", 8)
-    $ _player_add_item_by_id("gunpowder_001", 8)
-    $ EquippedWeapon = "rusty_hunter_rifle_001"
+    $ player.add_item("rusty_hunter_rifle_001", 1)
+    $ player.add_item("arrows_001", 10)
+    $ player.add_item("droplets_001", 8)
+    $ player.add_item("gunpowder_001", 8)
+    $ player.equipment.weapon = "rusty_hunter_rifle_001"
     $ RustyHunterRifleLoadedAmmo = ""
     $ fight_sync_loaded_weapon_state_from_inventory()
-    $ fight_sync_supply_from_inventory()
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightWeaponsMenu
 
 
 label DebugFightArmorNone:
-    $ EquippedArmor = ""
+    $ player.equipment.armor = ""
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightArmorMenu
 
 
 label DebugFightArmorCuirass:
-    $ _player_add_item_by_id("old_leather_cuirass_001", 1)
-    $ EquippedArmor = "old_leather_cuirass_001"
+    $ player.add_item("old_leather_cuirass_001", 1)
+    $ player.equipment.armor = "old_leather_cuirass_001"
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
     jump DebugFightArmorMenu
 
 
 label DebugFightGrantSupplies:
-    $ _player_add_item_by_id("arrows_001", 10)
-    $ _player_add_item_by_id("droplets_001", 8)
-    $ _player_add_item_by_id("gunpowder_001", 8)
-    $ _player_add_item_by_id("bandage_001", 3)
-    $ _player_add_item_by_id("energy_tea_001", 3)
-    $ _player_add_item_by_id("healing_potion_001", 3)
-    $ _player_add_item_by_id("fire_bomb_001", 3)
+    $ player.add_item("arrows_001", 10)
+    $ player.add_item("droplets_001", 8)
+    $ player.add_item("gunpowder_001", 8)
+    $ player.add_item("bandage_001", 3)
+    $ player.add_item("energy_tea_001", 3)
+    $ player.add_item("healing_potion_001", 3)
+    $ player.add_item("fire_bomb_001", 3)
     $ PlayerFightSupply["bees_bomb"] = 3
     $ fight_sync_supply_from_inventory()
     $ PlayerFightSupply["bees_bomb"] = 3
@@ -2146,7 +2206,7 @@ label DebugFightGrantSupplies:
 
 
 label DebugFightDogOn:
-    $ _debug_dog = ensure_dog_runtime()
+    $ _debug_dog = dog
     $ _debug_dog.met = True
     $ _debug_dog.owned = True
     $ _debug_dog.in_company = True
@@ -2159,7 +2219,7 @@ label DebugFightDogOn:
 
 
 label DebugFightDogOff:
-    $ _debug_dog = ensure_dog_runtime()
+    $ _debug_dog = dog
     $ _debug_dog.in_company = False
     $ MainTxt = debug_builder_fight_stats_text()
     $ CurLocDesc = MainTxt
@@ -2214,7 +2274,6 @@ label debug_room_builder:
 
 label DebugTestRoomLegacy:
     $ CurLoc = "DebugTestRoom"
-    $ location = CurLoc
     python:
         _dbg_desc = "Тестовая комната. Здесь можно проверять таверн-события, показывать картинки и запускать диалоги."
         MainTxt = _dbg_desc
@@ -2257,25 +2316,21 @@ label DebugTestRoomLegacy:
                 $ _dbg_calendar_set_weekday(1)
                 $ calendar_v2.hour = 6
                 $ calendar_v2.minute = 0
-                $ calendar_v2.sync_state()
                 jump GroceryStore
             "Тест: винный погребок (утро)":
                 $ _dbg_calendar_set_weekday(1)
                 $ calendar_v2.hour = 6
                 $ calendar_v2.minute = 0
-                $ calendar_v2.sync_state()
                 jump WineStore
             "Тест: лавка Ирмы":
                 $ _dbg_calendar_set_weekday(1)
                 $ calendar_v2.hour = 8
                 $ calendar_v2.minute = 0
-                $ calendar_v2.sync_state()
                 jump DressShop
             "Тест: мастерская Драупнира":
                 $ _dbg_calendar_set_weekday(1)
                 $ calendar_v2.hour = 8
                 $ calendar_v2.minute = 0
-                $ calendar_v2.sync_state()
                 jump StolyarWorkshop
             "Показать портрет Сандры":
                 call ShowImageSeq("sandra", "portraits", "portrait", 4)
@@ -2303,6 +2358,14 @@ label debug_test_room:
     jump DebugBuilderRoom
 
 
+label debug_test_room:
+    jump DebugBuilderRoom
+
+
+label debug_test_room:
+    jump DebugBuilderRoom
+
+
 label debug_tavern_events_snapshot:
     python:
         # Deterministic setup for console/manual verification.
@@ -2310,6 +2373,10 @@ label debug_tavern_events_snapshot:
         _dbg_set("time", 0)
         _dbg_set("week", 1)
         _dbg_set("day", 1)
+        _dbg_ensure_event_maps()
+
+        _dbg_ensure_event_maps()
+
         _dbg_ensure_event_maps()
 
     call CreateTavernEvents
@@ -2324,3 +2391,5 @@ label debug_tavern_events_snapshot:
         }
         _return = _snapshot
     return
+
+

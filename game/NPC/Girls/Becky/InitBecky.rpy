@@ -1,9 +1,161 @@
-# ================================================================================
+            knowsMC[name] = bool(self.known)            npc_schedule_sync_currentloc(name)        bodymodel_sync_character(GirlName, RealName[GirlName], "female")            self.current_location = "GroceryStore"        def story_value(self, key, default=0):
+            return self.ensure_story_defaults().get(key, default)
+
+        def set_story_value(self, key, value):
+            for table, stat_key in [
+                (kids, "kids"),
+                (beauty, "beauty"),
+                (sexacts, "sexacts"),
+                (cuminside, "cuminside"),
+                (pregnancy, "pregnancy"),
+                (pregfather, "pregfather"),
+                (ConceptionChance, "ConceptionChance"),
+                (PussyWetStart, "PussyWetStart"),
+                (virginity, "virginity"),
+                (Breastfeed, "breastfeed"),
+            ]:
+                table[name] = self.stats.get(stat_key)
+            for table, job_key in [
+                (jobkitchen, "jobkitchen"),
+                (jobcleaning, "jobcleaning"),
+                (jobwaitress, "jobwaitress"),
+                (jobHallAvail, "jobHallAvail"),
+                (jobWhoreAvail, "jobWhoreAvail"),
+                (jobwhore, "jobwhore"),
+                (jobgloryhole, "jobgloryhole"),
+            ]:
+                table[name] = self.jobs.get(job_key, 0)
+            for table, job_key in [
+                (jobkitchen, "jobkitchen"),
+                (jobcleaning, "jobcleaning"),
+                (jobwaitress, "jobwaitress"),
+                (jobHallAvail, "jobHallAvail"),
+                (jobWhoreAvail, "jobWhoreAvail"),
+                (jobwhore, "jobwhore"),
+                (jobgloryhole, "jobgloryhole"),
+            ]:
+                table[name] = self.jobs.get(job_key, 0)
+            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
+                table[name] = self.skills.get(skill_key, 0)
+            self.ensure_story_defaults()[key] = value
+            return value
+            self.schedule_source = BeckyStaticData.schedule_source            self.schedule_source = BeckyStaticData.schedule_source
+            self.current_location = "GroceryStore"        def install_schedule(self):
+            name = self.code_name
+            npc_interval_schedule_load_file(name)
+            return self
+            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            knowsMC[name] = bool(self.known)            npc_schedule_sync_currentloc(name)        bodymodel_sync_character(GirlName, RealName[GirlName], "female")            self.current_location = "GroceryStore"        def story_value(self, key, default=0):
+                Becky.install_schedule()
+
+        Becky.install_schedule()
+
+    return self.ensure_story_defaults().get(key, default)
+
+        def set_story_value(self, key, value):
+            for table, stat_key in [
+                (kids, "kids"),
+                (beauty, "beauty"),
+                (sexacts, "sexacts"),
+                (cuminside, "cuminside"),
+                (pregnancy, "pregnancy"),
+                (pregfather, "pregfather"),
+                (ConceptionChance, "ConceptionChance"),
+                (PussyWetStart, "PussyWetStart"),
+                (virginity, "virginity"),
+                (Breastfeed, "breastfeed"),
+            ]:
+                table[name] = self.stats.get(stat_key)
+            for table, job_key in [
+                (jobkitchen, "jobkitchen"),
+                (jobcleaning, "jobcleaning"),
+                (jobwaitress, "jobwaitress"),
+                (jobHallAvail, "jobHallAvail"),
+                (jobWhoreAvail, "jobWhoreAvail"),
+                (jobwhore, "jobwhore"),
+                (jobgloryhole, "jobgloryhole"),
+            ]:
+                table[name] = self.jobs.get(job_key, 0)
+            for table, job_key in [
+                (jobkitchen, "jobkitchen"),
+                (jobcleaning, "jobcleaning"),
+                (jobwaitress, "jobwaitress"),
+                (jobHallAvail, "jobHallAvail"),
+                (jobWhoreAvail, "jobWhoreAvail"),
+                (jobwhore, "jobwhore"),
+                (jobgloryhole, "jobgloryhole"),
+            ]:
+                table[name] = self.jobs.get(job_key, 0)
+            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
+                table[name] = self.skills.get(skill_key, 0)
+            self.legacy_story_imported = False
+            self.ensure_story_defaults()[key] = value
+            return value
+            self.schedule_source = BeckyStaticData.schedule_source            self.schedule_source = BeckyStaticData.schedule_source
+            self.current_location = "GroceryStore"        def install_schedule(self):
+            name = self.code_name
+            npc_interval_schedule_load_file(name)
+            return self
+            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            knowsMC[name] = bool(self.known)            npc_schedule_sync_currentloc(name)        bodymodel_sync_character(GirlName, RealName[GirlName], "female")            self.current_location = "GroceryStore"        def story_value(self, key, default=0):
+                Becky.install_schedule()
+
+        Becky.install_schedule()
+
+    return self.ensure_story_defaults().get(key, default)
+
+        def set_story_value(self, key, value):
+            for table, stat_key in [
+                (kids, "kids"),
+                (beauty, "beauty"),
+                (sexacts, "sexacts"),
+                (cuminside, "cuminside"),
+                (pregnancy, "pregnancy"),
+                (pregfather, "pregfather"),
+                (ConceptionChance, "ConceptionChance"),
+                (PussyWetStart, "PussyWetStart"),
+                (virginity, "virginity"),
+                (Breastfeed, "breastfeed"),
+            ]:
+                table[name] = self.stats.get(stat_key)
+            for table, job_key in [
+                (jobkitchen, "jobkitchen"),
+                (jobcleaning, "jobcleaning"),
+                (jobwaitress, "jobwaitress"),
+                (jobHallAvail, "jobHallAvail"),
+                (jobWhoreAvail, "jobWhoreAvail"),
+                (jobwhore, "jobwhore"),
+                (jobgloryhole, "jobgloryhole"),
+            ]:
+                table[name] = self.jobs.get(job_key, 0)
+            for table, job_key in [
+                (jobkitchen, "jobkitchen"),
+                (jobcleaning, "jobcleaning"),
+                (jobwaitress, "jobwaitress"),
+                (jobHallAvail, "jobHallAvail"),
+                (jobWhoreAvail, "jobWhoreAvail"),
+                (jobwhore, "jobwhore"),
+                (jobgloryhole, "jobgloryhole"),
+            ]:
+                table[name] = self.jobs.get(job_key, 0)
+            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
+                table[name] = self.skills.get(skill_key, 0)
+            self.legacy_story_imported = False
+            self.ensure_story_defaults()[key] = value
+            return value
+            self.schedule_source = BeckyStaticData.schedule_source            self.schedule_source = BeckyStaticData.schedule_source
+            self.current_location = "GroceryStore"        def install_schedule(self):
+            name = self.code_name
+            npc_interval_schedule_load_file(name)
+            return self
+            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     def becky_story_defaults():
-        return {
+            Becky.install_schedule()
+
+        Becky.install_schedule()
+
+    return {
             "leftdances": 0,
             "danceinvitehome": 0,
             "visitedhome": 0,
@@ -30,6 +182,11 @@ init python:
             "EddieFailures": 0,
             "EddieRobbedDay": 0,
             "EddieRobbed": 0,
+            "KnowSherwood": 0,
+            "KnowSherwood": 0,
+            "KnowSherwood": 0,
+            "KnowSherwood": 0,
+            "KnowSherwood": 0,
             "KnowSherwood": 0,
             "KnowBlackwood": 0,
             "SherwoodQuestScheduled": 0,
@@ -76,7 +233,6 @@ init python:
             self.data = BeckyStaticData
             self.uses_own_var_state = True
             self.rel = 0
-            self.relationship = self.rel
             self.openness = 0
             self.corruption = 25
             self.known = True
@@ -134,8 +290,6 @@ init python:
                 "jobgloryhole": 0,
             }
             self.gift_preferences = list(BeckyStaticData.gift_preferences)
-            self.schedule_source = BeckyStaticData.schedule_source
-            self.current_location = "GroceryStore"
             self.talk_preferences = {
                 "favorite_topics": ["family", "husband", "eddie", "inga", "sherwood"],
                 "blocked_topics": [],
@@ -158,7 +312,6 @@ init python:
         def update(self):
             self.name = self.code_name
             self.data = BeckyStaticData
-            self.relationship = self.rel
             self.ensure_story_defaults()
             return self
 
@@ -176,7 +329,6 @@ init python:
             RealName3[name] = self.data.dative
             DateOfBirth[name] = dict(self.data.birth_date)
             girltextdesc[name] = self.data.description
-            knowsMC[name] = bool(self.known)
             self.location = str(self.current_location or "GroceryStore")
             GiftPreferences[name] = list(self.gift_preferences)
             dressdefault[name] = self.wardrobe["current_dress"]
@@ -191,31 +343,6 @@ init python:
             legs[name] = legsdef[name]
             shoes[name] = shoesdef[name]
             self.wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                table[name] = self.stats.get(stat_key)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                table[name] = self.skills.get(skill_key, 0)
             self.ensure_story_defaults()
             return self
 
@@ -252,7 +379,6 @@ init python:
 
         def add_relation(self, amount=1, cap=20):
             self.rel = max(0, min(people_to_int(cap, 20), people_to_int(self.rel, 0) + people_to_int(amount, 0)))
-            self.relationship = self.rel
             return self.rel
 
         def add_corruption(self, amount=1, floor=0, cap=100):
@@ -261,7 +387,6 @@ init python:
 
         def change_social(self, friend_delta=0, open_delta=0, corruption_delta=0):
             super(BeckyInfo, self).change_social(friend_delta, open_delta, corruption_delta)
-            self.relationship = self.rel
             return self
 
         def apply_social_gate(self, rel_gate=0, open_delta=0, rel_delta=0, corruption_gate=0, corruption_delta=0, fallback_rel_delta=0):
@@ -283,22 +408,22 @@ init python:
             roll_index = 0
             while friend_delta < 0:
                 roll_index += 1
-                if people_to_int(self.rel, 0) > people_to_int(limit_friend, 0) and procedural_randint(1, negative_friend_chance, "becky_social_friend_down_%s_%s" % (people_to_int(dayspassed, 0), roll_index)) == 1:
+                if people_to_int(self.rel, 0) > people_to_int(limit_friend, 0) and procedural_randint(1, negative_friend_chance, "becky_social_friend_down_%s_%s" % (people_to_int(current_game_day(), 0), roll_index)) == 1:
                     self.add_relation(-1, cap=100)
                 friend_delta += 1
             while friend_delta > 0:
                 roll_index += 1
-                if people_to_int(self.rel, 0) < people_to_int(limit_friend, 0) and procedural_randint(1, positive_friend_chance, "becky_social_friend_up_%s_%s" % (people_to_int(dayspassed, 0), roll_index)) == 1:
+                if people_to_int(self.rel, 0) < people_to_int(limit_friend, 0) and procedural_randint(1, positive_friend_chance, "becky_social_friend_up_%s_%s" % (people_to_int(current_game_day(), 0), roll_index)) == 1:
                     self.add_relation(1, cap=100)
                 friend_delta -= 1
             while corruption_delta < 0:
                 roll_index += 1
-                if people_to_int(self.corruption, 0) > people_to_int(limit_corruption, 0) and procedural_randint(1, corruption_roll_chance, "becky_social_corruption_down_%s_%s" % (people_to_int(dayspassed, 0), roll_index)) == 1:
+                if people_to_int(self.corruption, 0) > people_to_int(limit_corruption, 0) and procedural_randint(1, corruption_roll_chance, "becky_social_corruption_down_%s_%s" % (people_to_int(current_game_day(), 0), roll_index)) == 1:
                     self.add_corruption(-1)
                 corruption_delta += 1
             while corruption_delta > 0:
                 roll_index += 1
-                if people_to_int(self.corruption, 0) < people_to_int(limit_corruption, 0) and procedural_randint(1, corruption_roll_chance, "becky_social_corruption_up_%s_%s" % (people_to_int(dayspassed, 0), roll_index)) == 1:
+                if people_to_int(self.corruption, 0) < people_to_int(limit_corruption, 0) and procedural_randint(1, corruption_roll_chance, "becky_social_corruption_up_%s_%s" % (people_to_int(current_game_day(), 0), roll_index)) == 1:
                     self.add_corruption(1)
                 corruption_delta -= 1
             return self
@@ -350,7 +475,7 @@ init python:
             return (people_to_int(self.corruption, 0) <= 45 or people_to_int(self.rel, 0) < 10) and people_to_int(self.corruption, 0) <= 55
 
         def mark_store_orgasm_today(self):
-            return self.set_story_value("last_store_orgasm_day", people_to_int(dayspassed, 0))
+            return self.set_story_value("last_store_orgasm_day", people_to_int(current_game_day(), 0))
 
         def apply_pregnancy_check(self, cum_place, repeat_count, dad_name="", is_dude_random=0, dad_name_type=""):
             PregnancyCheck(self.code_name, cum_place, repeat_count, dad_name, is_dude_random, dad_name_type)
@@ -385,7 +510,7 @@ init python:
             return (
                 location_now in ("FridayDance", "MarketPlace")
                 and int(self.var.get("leftdances", 0) or 0) == 0
-                and people_to_int(FridayDancesCount, 0) < 5
+                and people_to_int(friday_dance_count(), 0) < 5
                 and people_to_int(DanceStep, 0) == 0
             )
 
@@ -410,7 +535,16 @@ init python:
         def install_schedule(self):
             name = self.code_name
             npc_interval_schedule_load_file(name)
-            npc_schedule_sync_currentloc(name)
+            return self
+
+        def install_schedule(self):
+            name = self.code_name
+            npc_interval_schedule_load_file(name)
+            return self
+
+        def install_schedule(self):
+            name = self.code_name
+            npc_interval_schedule_load_file(name)
             return self
 
 define BeckyStaticData = BeckyData()
@@ -424,7 +558,5 @@ label InitBecky:
         peopleInfo[GirlName] = Becky
         if Becky not in girls:
             girls.append(Becky)
-        bodymodel_sync_character(GirlName, RealName[GirlName], "female")
         Becky.install_schedule()
-
     return

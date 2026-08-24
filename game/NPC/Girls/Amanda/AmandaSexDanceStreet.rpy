@@ -6,9 +6,9 @@
 label AmandaAfterDanceMC:
     $ GirlNameASDS = "amanda"
     $ Amanda.add_var_int("mc_dance_after_seen", 1)
-    $ Amanda.set_var_int("mc_dance_last_day", dayspassed)
+    $ Amanda.set_var_int("mc_dance_last_day", current_game_day())
     $ Amanda.set_var_int("leftdances", 1)
-    $ FridayDancesCount = 5
+    $ FridayDanceRoom.state["dance_count"] = 5
     vscene "images/market/LocFridayDance.jpg"
     "Музыка стихает, но Аманда не сразу отпускает вашу руку. Она смеется тише обычного и сама тянет вас прочь от света факелов."
     "За углом шум площади становится глухим. Аманда останавливается, будто хочет что-то сказать, но вместо слов только смотрит на вас и улыбается."

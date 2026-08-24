@@ -31,6 +31,6 @@ label CreateDonationsList:
         ChurchDonated = [0 for _unused_repair in ChurchRepairDesc]
 
         SawDraupnirChurchList = 0
-        ChurchDonatedToday = 0
+        player.economy.church_donated_today = 0
         ChurchDonatedAmount = 0
     return

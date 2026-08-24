@@ -1,3 +1,15 @@
+label int_inga_talk(show_menu=True):
+    call IntIngaTalk(show_menu)
+    return
+
+label int_inga_talk(show_menu=True):
+    call IntIngaTalk(show_menu)
+    return
+
+label int_inga_talk(show_menu=True):
+    call IntIngaTalk(show_menu)
+    return
+
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================

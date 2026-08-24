@@ -417,7 +417,7 @@ init 4 python:
     )
 
 label UseBandageItem:
-    if int(_player_item_count_by_id("bandage_001") or 0) <= 0:
+    if int(player.item_count("bandage_001") or 0) <= 0:
         $ MainTxt = "При себе у вас больше нет бинтов."
         $ CurLocDesc = MainTxt
         call PlayerCardInventoryMenu
@@ -428,7 +428,7 @@ label UseBandageItem:
         call PlayerCardInventoryItemMenu("bandage_001", True)
         return
 
-    $ _player_remove_item_by_id("bandage_001", 1)
+    $ player.remove_item("bandage_001", 1)
     $ health = _player_clamp(health + 12, 0, 100)
     $ MainTxt = "Вы неторопливо перевязываете раны и чувствуете себя немного лучше."
     $ CurLocDesc = MainTxt
@@ -438,13 +438,13 @@ label UseBandageItem:
 
 
 label UseHealingPotionItem:
-    if int(_player_item_count_by_id("healing_potion_001") or 0) <= 0:
+    if int(player.item_count("healing_potion_001") or 0) <= 0:
         $ MainTxt = "При себе у вас больше нет лечебного зелья."
         $ CurLocDesc = MainTxt
         call PlayerCardInventoryMenu
         return
 
-    $ _player_remove_item_by_id("healing_potion_001", 1)
+    $ player.remove_item("healing_potion_001", 1)
     $ health = _player_clamp(health + 25, 0, 100)
     $ MainTxt = "Вы выпиваете лечебное зелье. Горечь быстро сменяется ощущением, что силы возвращаются."
     $ CurLocDesc = MainTxt

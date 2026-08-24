@@ -1,4 +1,4 @@
-# ================================================================================
+        global PlayerArousalReasons        global PlayerMorningArousalDay, PlayerWakeStateNotice        global PlayerLastHelpResult        global PlayerArousalReasons        global PlayerMorningArousalDay, PlayerWakeStateNotice        global PlayerLastHelpResult        global PlayerArousalReasons        global PlayerMorningArousalDay, PlayerWakeStateNotice        global PlayerLastHelpResult# ================================================================================
 # Player intimacy, sleep layer, and arousal state.
 # (Defaults centralized in script.rpy to avoid duplicate default errors)
 # ================================================================================
@@ -17,27 +17,25 @@ init python:
         return max(int(low), min(int(high), player_intimacy_int(value, low)))
 
     def player_cum_count():
-        return player_intimacy_int(player_state(False).intimacy.came_today, 0)
+        return player_intimacy_int(player.intimacy.came_today, 0)
 
     def player_cum_limit():
-        return max(1, player_intimacy_int(player_state(False).intimacy.can_cum_daily, 1))
+        return max(1, player_intimacy_int(player.intimacy.can_cum_daily, 1))
 
     def player_set_cum_count(value):
         count = max(0, player_intimacy_int(value, 0))
-        intimacy = player_state(False).intimacy
+        intimacy = player.intimacy
         intimacy.came_today = count
-        intimacy.apply_to_store()
         return count
 
     def player_mark_sex_day(reason="", target=""):
-        intimacy = player_state(False).intimacy
+        intimacy = player.intimacy
         intimacy.last_sex_day = player_intimacy_int(dayspassed, 0)
         intimacy.last_cum_day = player_intimacy_int(dayspassed, 0)
-        intimacy.apply_to_store()
         return intimacy.last_sex_day
 
     def player_record_orgasm(reason="", target=""):
-        intimacy = player_state(False).intimacy
+        intimacy = player.intimacy
         result = intimacy.record_cum(dayspassed)
         target_key = str(target or "").strip().lower()
         if target_key:
@@ -45,20 +43,18 @@ init python:
             if partner is not None:
                 partner.mark_fucked(1)
                 partner.record_sex_history("You", str(reason or ""), "orgasm")
-        intimacy.apply_to_store()
         return result
 
     def player_days_without_sex():
-        last_day = player_intimacy_int(LastDaySex, -1)
+        last_day = player_intimacy_int(player.intimacy.last_sex_day, -1)
         today = player_intimacy_int(dayspassed, 0)
         if last_day < 0:
             return max(0, today)
         return max(0, today - last_day)
 
     def player_ensure_nightwear_in_chest():
-        appearance = player_state().appearance
+        appearance = player.appearance
         appearance.ensure_nightwear(player_intimacy_int(dayspassed, 0))
-        appearance.apply_to_store()
         return True
 
     def player_sync_body_state():
@@ -68,17 +64,16 @@ init python:
             return {}
 
     def player_set_sleep_layer(mode="daywear"):
-        appearance = player_state().appearance
+        appearance = player.appearance
         appearance.set_sleep_layer(mode, player_intimacy_int(dayspassed, 0))
-        appearance.apply_to_store()
         player_sync_body_state()
         return appearance.sleep_bottom_layer
 
     def player_is_naked():
-        return player_state().appearance.is_naked()
+        return player.appearance.is_naked()
 
     def player_is_in_nightwear():
-        return player_state().appearance.is_nightwear()
+        return player.appearance.is_nightwear()
 
     def player_public_movement_block_text():
         if player_is_naked():
@@ -89,7 +84,7 @@ init python:
         return not player_is_naked()
 
     def player_arousal_state_line():
-        value = player_state(False).intimacy.arousal_value("You")
+        value = player.intimacy.arousal_value("You")
         if player_cum_count() >= player_cum_limit():
             return "Мужская сила на сегодня уже истрачена."
         if value < 20:
@@ -132,17 +127,14 @@ init python:
         return [str(line) for line in lines if str(line or "").strip()]
 
     def player_apply_arousal_trigger(trigger_code="", amount=0):
-        global PlayerArousalReasons
         trigger_key = str(trigger_code or "context").strip()
-        intimacy = player_state(False).intimacy
+        intimacy = player.intimacy
         current = player_intimacy_int(intimacy.arousal_value("You"), 0)
         if player_cum_count() >= player_cum_limit():
             intimacy.set_arousal(0, "You")
-            intimacy.apply_to_store()
             return 0
         new_value = player_intimacy_clamp(current + player_intimacy_int(amount, 0), 0, 95)
         intimacy.set_arousal(new_value, "You")
-        intimacy.apply_to_store()
         if not isinstance(PlayerArousalReasons, list):
             PlayerArousalReasons = []
         if trigger_key and trigger_key not in PlayerArousalReasons:
@@ -150,7 +142,6 @@ init python:
         return new_value
 
     def player_apply_morning_state(location_code=""):
-        global PlayerMorningArousalDay, PlayerWakeStateNotice
         if str(location_code or CurLoc or "") != "TavernMyRoom":
             return ""
         today = player_intimacy_int(dayspassed, 0)
@@ -195,7 +186,7 @@ init python:
             return 0
         today = player_intimacy_int(dayspassed, 0)
         if player_intimacy_int(PlayerObservedNakedNpcDay.get(key, -1), -1) == today:
-            return player_state(False).intimacy.arousal_value("You")
+            return player.intimacy.arousal_value("You")
         PlayerObservedNakedNpcDay[key] = today
         return player_apply_arousal_trigger("saw_naked_" + key, 12 + min(18, player_days_without_sex() * 3))
 
@@ -222,7 +213,6 @@ init python:
         return {"before": before, "after": max(0, before - reduction), "reduction": reduction}
 
     def player_intimacy_help_result(girl_name="", forced_roll=None):
-        global PlayerLastHelpResult
         key = str(girl_name or "").strip().lower()
         if key == "":
             return {"ok": False, "girl": "", "text": "Сейчас некого просить."}
@@ -262,7 +252,7 @@ init python:
             return False
         if player_cum_count() >= player_cum_limit():
             return False
-        if player_intimacy_int(player_state(False).intimacy.arousal_value("You"), 0) < 40:
+        if player_intimacy_int(player.intimacy.arousal_value("You"), 0) < 40:
             return False
         return True
 

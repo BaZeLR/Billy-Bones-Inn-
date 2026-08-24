@@ -6,7 +6,7 @@
 label story_becky_friday_dance_mc_0:
     vscene "images/market/LocFridayDance.jpg"
     $ Becky.var["danceinvitehome"] = 0
-    $ FridayDancesCount += 1
+    $ FridayDanceRoom.state["dance_count"] += 1
     "Вы прошлись по площади, ища вдовушку Блэнкеншип, и нашли ее болтающей с другими торговками."
     call ShowImage("becky", "dance", "wait")
     $ DanceStep = 1
@@ -32,7 +32,7 @@ label int_becky_dance():
                 "Вы подошли к веселой вдовушке и начали сыпать шутками и прибаутками, веселя ее. За разговором незаметно пролетело время."
                 if Becky.rel >= 7:
                     "Вы подумали, что зря тратите время. Ничего нового вы не узнали, а Бекки и так знает, что вы шутник хоть куда."
-                elif procedural_randint(1, 3, "becky_dance_talk_%s" % int(dayspassed or 0)) == 1:
+                elif procedural_randint(1, 3, "becky_dance_talk_%s" % int(current_game_day() or 0)) == 1:
                     $ Becky.add_relation(1, cap=100)
                     "Вы очень развеселили Бекки своими шутками!"
                 $ DanceStep = DanceMaxIBD
@@ -63,7 +63,7 @@ label int_becky_dance():
                     "Танец закончился и вы вернулись к колоннаде."
 
             "Продолжить танцевать" if DanceStep >= 2 and DanceStep < DanceMaxIBD:
-                $ _dance_pic = procedural_randint(1, 5, "becky_dance_continue_%s_%s" % (int(dayspassed or 0), DanceStep))
+                $ _dance_pic = procedural_randint(1, 5, "becky_dance_continue_%s_%s" % (int(current_game_day() or 0), DanceStep))
                 if _dance_pic == 1:
                     $ scene_image = "images/becky/dance/you_dance_1.png"
                 elif _dance_pic == 2:
@@ -250,6 +250,6 @@ label int_becky_dance():
 
 label becky_accept_home_invitation:
     $ Becky.var["danceinvitehome"] = 1
-    $ FridayDancesCount = 5
+    $ FridayDanceRoom.state["dance_count"] = 5
     call BeckyHomeFront("FromDances")
     return

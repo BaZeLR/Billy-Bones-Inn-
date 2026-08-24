@@ -1,4 +1,7 @@
-# ================================================================================
+# Remove duplicate pregnancy declaration - it's already declared in InitAmanda.rpy
+# default pregnancy = {}default cametoday_npc = {}# Remove duplicate pregnancy declaration - it's already declared in InitAmanda.rpy
+# default pregnancy = {}default cametoday_npc = {}# Remove duplicate pregnancy declaration - it's already declared in InitAmanda.rpy
+# default pregnancy = {}default cametoday_npc = {}# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # PregnancyCheck.rpy
@@ -8,10 +11,19 @@
 # Default variable statements - only declare if not already declared elsewhere
 default sexacts = {}
 default ConceptionChance = {}
-default cametoday_npc = {}
 default cuminside = {}
-# Remove duplicate pregnancy declaration - it's already declared in InitAmanda.rpy
-# default pregnancy = {}
+# default pregfather = {}
+
+# Default variable statements - only declare if not already declared elsewhere
+default sexacts = {}
+default ConceptionChance = {}
+default cuminside = {}
+# default pregfather = {}
+
+# Default variable statements - only declare if not already declared elsewhere
+default sexacts = {}
+default ConceptionChance = {}
+default cuminside = {}
 # default pregfather = {}
 
 init python:
@@ -104,11 +116,9 @@ init python:
                 cur_conc *= 3
                 girl_info.mark_fucked(1)
                 if fun_awarded == 0:
-                    player_state(False).condition.change("fun", 30)
-                    player_state(False).condition.apply_to_store()
+                    player.condition.change("fun", 30)
                     fun_awarded = 1
-                player_state(False).intimacy.record_cum(dayspassed)
-                player_state(False).intimacy.apply_to_store()
+                player.intimacy.record_cum(current_game_day())
                 if cum_place == 'inside':
                     girl_info.set_cum_state("cum_inside_you", 1)
                 elif cum_place == 'tits':
@@ -161,7 +171,7 @@ init python:
             row_id = len(girl_info.detailed_sex_history) + 1
             girl_info.detailed_sex_history.append({
                 "RowId": row_id,
-                "Day": int(dayspassed + 1),
+                "Day": int(current_game_day() + 1),
                 "GirlName": str(girl),
                 "DudeName": str(dad_record),
                 "DudeNameType": str(dad_type or ""),

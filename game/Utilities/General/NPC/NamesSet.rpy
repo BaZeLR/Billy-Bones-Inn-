@@ -1,9 +1,3 @@
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
-init python:
-    import store
-
     RealName = {
         "sandra": "Сандра",
         "melissa": "Мелисса",
@@ -23,18 +17,6 @@ init python:
         "zimmer": "Циммер",
         "draupnir": "Драупнир",
     }
-
-    AllGirlNames = [
-        "sandra",
-        "melissa",
-        "amanda",
-        "georgett",
-        "liza",
-        "becky",
-        "irma",
-        "clara",
-    ]
-
     RealName2 = {
         "sandra": "Сандры",
         "melissa": "Мелиссы",
@@ -74,6 +56,140 @@ init python:
         "zimmer": "Циммеру",
         "draupnir": "Драупниру",
     }
+    RealName = {
+        "sandra": "Сандра",
+        "melissa": "Мелисса",
+        "amanda": "Аманда",
+        "georgett": "Жоржетта",
+        "liza": "Лизетта",
+        "becky": "Бекки",
+        "irma": "Ирма",
+        "inga": "Инга",
+        "clara": "Кларисса",
+        "eddie": "Эдди",
+        "gerhard": "Герхард",
+        "alber": "Альбер",
+        "fran": "Франческа",
+        "robin": "Робин",
+        "mongol": "Монгол",
+        "zimmer": "Циммер",
+        "draupnir": "Драупнир",
+    }
+    RealName2 = {
+        "sandra": "Сандры",
+        "melissa": "Мелиссы",
+        "amanda": "Аманды",
+        "georgett": "Жоржетты",
+        "liza": "Лизетты",
+        "becky": "Бекки",
+        "irma": "Ирмы",
+        "inga": "Инги",
+        "clara": "Клариссы",
+        "eddie": "Эдди",
+        "gerhard": "Герхарда",
+        "alber": "Альбера",
+        "fran": "Франчески",
+        "robin": "Робина",
+        "mongol": "Монгола",
+        "zimmer": "Циммера",
+        "draupnir": "Драупнира",
+    }
+
+    RealName3 = {
+        "sandra": "Сандре",
+        "melissa": "Мелиссе",
+        "amanda": "Аманде",
+        "georgett": "Жоржетте",
+        "liza": "Лизетте",
+        "becky": "Бекки",
+        "irma": "Ирме",
+        "inga": "Инге",
+        "clara": "Клариссе",
+        "eddie": "Эдди",
+        "gerhard": "Герхарду",
+        "alber": "Альберу",
+        "fran": "Франческе",
+        "robin": "Робину",
+        "mongol": "Монголу",
+        "zimmer": "Циммеру",
+        "draupnir": "Драупниру",
+    }
+    RealName = {
+        "sandra": "Сандра",
+        "melissa": "Мелисса",
+        "amanda": "Аманда",
+        "georgett": "Жоржетта",
+        "liza": "Лизетта",
+        "becky": "Бекки",
+        "irma": "Ирма",
+        "inga": "Инга",
+        "clara": "Кларисса",
+        "eddie": "Эдди",
+        "gerhard": "Герхард",
+        "alber": "Альбер",
+        "fran": "Франческа",
+        "robin": "Робин",
+        "mongol": "Монгол",
+        "zimmer": "Циммер",
+        "draupnir": "Драупнир",
+    }
+    RealName2 = {
+        "sandra": "Сандры",
+        "melissa": "Мелиссы",
+        "amanda": "Аманды",
+        "georgett": "Жоржетты",
+        "liza": "Лизетты",
+        "becky": "Бекки",
+        "irma": "Ирмы",
+        "inga": "Инги",
+        "clara": "Клариссы",
+        "eddie": "Эдди",
+        "gerhard": "Герхарда",
+        "alber": "Альбера",
+        "fran": "Франчески",
+        "robin": "Робина",
+        "mongol": "Монгола",
+        "zimmer": "Циммера",
+        "draupnir": "Драупнира",
+    }
+
+    RealName3 = {
+        "sandra": "Сандре",
+        "melissa": "Мелиссе",
+        "amanda": "Аманде",
+        "georgett": "Жоржетте",
+        "liza": "Лизетте",
+        "becky": "Бекки",
+        "irma": "Ирме",
+        "inga": "Инге",
+        "clara": "Клариссе",
+        "eddie": "Эдди",
+        "gerhard": "Герхарду",
+        "alber": "Альберу",
+        "fran": "Франческе",
+        "robin": "Робину",
+        "mongol": "Монголу",
+        "zimmer": "Циммеру",
+        "draupnir": "Драупниру",
+    }
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+init python:
+    import store
+    import store
+    import store
+
+    AllGirlNames = [
+        "sandra",
+        "melissa",
+        "amanda",
+        "georgett",
+        "liza",
+        "becky",
+        "irma",
+        "clara",
+    ]
 
     OccupationsList = [
         "крестьянин",

@@ -38,7 +38,6 @@ init 6 python:
 label ForestCave:
     $ CurrentRoom = ForestCaveRoom
     $ CurLoc = "ForestCave"
-    $ location = CurLoc
     $ scene_image = forest_cave_picture() or CurrentRoom.bg_picture or None
     if scene_image:
         $ _layout_last_picture = scene_image
@@ -46,20 +45,16 @@ label ForestCave:
         $ _layout_last_picture = ""
     $ MainTxt = ForestCaveRoom.descriptions[0].text
     $ CurLocDesc = MainTxt
-    $ ForestSubroomSavedText = MainTxt
+    $ forest_room_set_saved_text(MainTxt, CurrentRoom)
     $ _forest_spawned = forest_room_spawn(ForestCaveRoom)
     if len(_forest_spawned) > 0:
         $ MainTxt = MainTxt + "\n\nДаже здесь можно отыскать кое-что съедобное или полезное."
         $ CurLocDesc = MainTxt
-        $ ForestSubroomSavedText = MainTxt
+        $ forest_room_set_saved_text(MainTxt, CurrentRoom)
     $ current_action_title = "Пещера"
     $ current_action_content = None
     $ current_action_items = []
-    call ForestSubroomBuildActions
-    $ _forest_cave_ui_return = None
-    while _forest_cave_ui_return is None:
-        call screen main_ui
-        $ _forest_cave_ui_return = _return
-    jump ForestCave
-
+    $ current_action_items = forest_subroom_action_items(CurrentRoom)
+    call screen main_ui
+    return
 

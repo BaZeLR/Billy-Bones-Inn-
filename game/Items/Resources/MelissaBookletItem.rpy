@@ -3,7 +3,7 @@ init 4 python:
         return (
             str(CurLoc or "") == "TavernMelissaRoom"
             and int(Melissa.var.get("drawings_found", 0) or 0) > 0
-            and int(_player_item_count_by_id("melissa_drawings_booklet_001") or 0) <= 0
+            and int(player.item_count("melissa_drawings_booklet_001") or 0) <= 0
         )
 
     MelissaBookletItem = GameItem(

@@ -54,15 +54,15 @@ label RoomEnterEventGate(room_code="", include_daily=True):
         while len(_room_enter_daily_ids) > 0:
             $ _room_enter_daily_npc = str(_room_enter_daily_ids.pop(0) or "").strip()
             if _room_enter_daily_npc != "":
-                call CheckDailyEvent(_room_enter_daily_npc, None, _room_enter_code, time)
+                call check_daily_event(_room_enter_daily_npc, None, _room_enter_code, time)
                 if _return:
                     $ RoomEnterLastEventFired = True
                     return True
 
     if _room_enter_code != "" and "household_ai_pick_event" in globals() and renpy.has_label("HouseholdEvent_Try"):
-        $ _household_seen_before = len(HouseholdAISeen) if isinstance(globals().get("HouseholdAISeen", None), dict) else 0
+        $ _household_seen_before = len(household.seen)
         call HouseholdEvent_Try(_room_enter_code, "room")
-        if isinstance(globals().get("HouseholdAISeen", None), dict) and len(HouseholdAISeen) > _household_seen_before:
+        if len(household.seen) > _household_seen_before:
             $ RoomEnterLastEventFired = True
             return True
 

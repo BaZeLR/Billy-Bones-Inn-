@@ -56,7 +56,7 @@ label OldAxeTake:
         $ CurLocDesc = MainTxt
         return
     $ _room_remove_item_by_id(CurrentRoom, "old_axe_001")
-    $ _player_add_item_by_id("old_axe_001", 1)
+    $ player.add_item("old_axe_001", 1)
     $ ShedNoticeText = "Вы сняли со стены старый топор и забрали его с собой."
     $ ShedNoticePending = True
     $ MainTxt = build_shed_description(True, "")
@@ -71,7 +71,7 @@ label OldAxeEquip:
         $ MainTxt = "Старого топора у вас нет."
         $ CurLocDesc = MainTxt
         return
-    $ player_state().equip("old_axe_001", "weapon")
+    $ player.equip("old_axe_001", "weapon")
     $ MainTxt = "Вы заткнули старый топор за пояс."
     $ CurLocDesc = MainTxt
     $ update_stat_state()
@@ -88,7 +88,7 @@ label OldAxeUnequip:
         $ CurLocDesc = MainTxt
         return
     if player_has_equipped_weapon("old_axe_001"):
-        $ player_state().unequip("weapon")
+        $ player.unequip("weapon")
         $ MainTxt = "Вы убрали старый топор в сумку."
     else:
         $ MainTxt = "Топор и так лежит в сумке."
@@ -113,12 +113,12 @@ label OldAxeDropToShed:
         call ShedRoomActions
         return
     if player_has_equipped_weapon("old_axe_001"):
-        $ player_state().unequip("weapon")
-    $ _player_remove_item_by_id("old_axe_001", 1)
+        $ player.unequip("weapon")
+    $ player.remove_item("old_axe_001", 1)
     if not _room_has_item_by_id(CurrentRoom, "old_axe_001"):
         $ _room_add_item_by_id(CurrentRoom, "old_axe_001")
     else:
-        $ _player_add_item_by_id("old_axe_001", 1)
+        $ player.add_item("old_axe_001", 1)
     $ ShedNoticeText = "Вы повесили старый топор обратно на его место."
     $ ShedNoticePending = True
     $ MainTxt = build_shed_description(True, "")
