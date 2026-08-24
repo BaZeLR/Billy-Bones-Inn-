@@ -11,13 +11,25 @@ def _source(path: Path) -> str:
 
 def test_eddie_dialogs_are_explicit_sublabels_not_dispatcher():
     source = _source(EDDIE_TALK)
+    init_source = _source(ROOT / "game" / "NPC" / "Secondary" / "InitEddieTalk.rpy")
 
+    assert "label IntEddieTalkMenu:" not in source
+    assert "jump IntEddieTalkMenu" not in source
+    assert "jump IntEddieTalk" not in source
+    assert "while True:" in source
+    assert "menu:" in source
+    assert "main_ui_runtime.action_items" not in source
+    assert "MenuItem(" not in source
     assert "label IntEddieTalkApply" not in source
     assert 'str(choice_code or "")' not in source
-    assert "Eddie.ensure_story_defaults()" in source
+    assert "Eddie.ensure_story_defaults()" not in source
+    assert "_eddie_var" not in source
     assert "peopleInfo[_eddie_name].update()" not in source
     assert "EddieVar" not in source
     assert "renpy.random" not in source
+    assert "eddie_talk_init_state" not in source + init_source
+    assert "label InitEddieTalk:" not in init_source
+    assert "if _eddie_talk_new:" in source
 
     for label in [
         "label IntEddieTalkSmalltalk:",
@@ -57,5 +69,17 @@ def test_eddie_dialog_uses_vscene_and_room_restore_end():
     assert 'vscene "images/eddie/portraits/fingal.png"' not in source
     assert 'vscene "images/eddie/portraits/portrait_0.png"' not in source
     assert 'vscene "images/eddie/portraits/surprised.png"' in source
-    assert 'MenuItem("Закончить разговор", Function(main_ui_end_talk_state))' in source
+    assert '"Закончить разговор":' in source
+    assert "$ main_ui_end_talk_state()" in source
     assert 'Jump("GroceryStore")' not in source
+
+
+def test_shop_click_regression_uses_current_oop_and_object_menu_apis():
+    source = _source(ROOT / "tools" / "external_click_play_test.py")
+
+    assert 'Talked["eddie"]' not in source
+    assert 'TalkedToday["eddie"]' not in source
+    assert 'Friends["eddie"]' not in source
+    assert 'Function(grocery_store_open_object_menu_state' not in source
+    assert 'Function(wine_store_open_object_menu_state' not in source
+    assert '$ Eddie.talked_today = 0' in source

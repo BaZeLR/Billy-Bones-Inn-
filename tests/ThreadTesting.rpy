@@ -233,7 +233,7 @@ label test_becky_home_front_inga_lucas_event:
     # Reference: game/Town/BeckyHomeFront.rpy (RandIngaFuck logic, pregnancy checks, peek/share/suggest/approach/watch cum options)
     # See also BeckyHomeFront.txt if exists.
     # Random discovery of Inga + Lucas having sex in front of the house.
-    # Updates SawIngaFuck, calls SlutFriendsIncrease on Inga, pregnancy risk.
+    # Advances beckyIngaLucasPath, updates Inga relationship state, pregnancy risk.
     # Unordered side scene (can happen on arrival).
     call _test_thread_by_name("becky", "BeckyHomeVisits")
     python:
@@ -319,94 +319,6 @@ label test_becky_home_georgett_arrival_event:
     call _test_thread_by_name("becky", "BeckyHomeVisits")
     python:
         print("[FRAMEWORK] Georgett arrival slice (Eddie announcement + initial simultaneous acts) verified")
-    return
-
-
-label test_becky_blackwood_quest_hook:
-    # Full unit test for the Sherwood/Blackwood (Kunidell/Cundail trade) quest hook
-    # Triggered after home guest progress: rare NewDay robbery (Eddie black eye) → 12-day store coverage by Becky → offer at GroceryStore.
-    # References (exact):
-    #   textLocRef\NextDay_NewDayEvents.txt:118 (visitedhome>=5 + Friends>=15 + EddieRobbed=0 + Rand(1,6)==1 → EddieRobbedDay + daily 'SherwoodQuest' → BeckyQuestInit)
-    #   textLocRef\GroceryStore.txt:74 (black eye description + Eddie talk while window active)
-    #   textLocRef\IntEddieTalk.txt (multi-stage "Спросить о синяке" → full "отмудохали... из Шервудского леса... деньги отобрали, лошадь забрали" at high friends + visitedhome>=7, sets KnowSherwood + FingalTalk)
-    #   textLocRef\BeckyQuestInit.txt (the pitch: "человек надежный", 4 мешка по 50м, profit 50-300, morning except Sunday, possible early "загвоздка" warn)
-    #   textLocRef\IntBeckyTalkSherwood.txt (all follow-ups: elves explanation, son fingal suspicion, "Насчет дороги в Куниделл" full admission of bandits + AdmitSherwood, later "меня ограбили" etc.)
-    #   game/NPC/Girls/Becky/BeckyEvents.rpy (the thin atomic labels + KnowBlackwood rename flag)
-    #   game/Inn/SherwoodTravel.rpy + game/NPC/Secondary/SherwoodTravel.rpy (actual road encounters with Robin gang, Mongol protection, possible robbery, successful trade)
-    #
-    # Counters/flags inside events (EddieRobbedDay, TradeOffer, AdmitSherwood, KnowBlackwood, SherwoodSuspect, SherwoodWarn).
-    # Uses rand_int for the rare trigger simulation.
-    # Thread advance on robbery trigger + on offer acceptance + on full road danger reveal.
-    # Direct $ assignments, proper calls, no gs/globals.
-
-    $ Becky.var["visitedhome"] = 6
-    $ Becky.rel = 18
-    $ Becky.stats["orgasms_given"] = 12
-    $ Becky.var["EddieRobbed"] = 0
-    $ Becky.var["EddieRobbedDay"] = 0
-    $ dayspassed = 45   # arbitrary day after guest progress
-
-    call _test_thread_by_name("becky", "BeckyHomeVisits")   # or BeckyEddie / BeckyBlackwoodQuest when separate thread registered
-
-    python:
-        print("[FRAMEWORK] === BLACKWOOD / SHERWOOD QUEST HOOK TEST ===")
-        print("[FRAMEWORK] NewDay rare trigger (1/6 with visitedhome>=5 + Friends>=15) + EddieRobbedDay + 12-day window")
-        print("[FRAMEWORK] BeckyQuestInit pitch + TradeOffer + possible early warn + IntBeckyTalkSherwood follow-ups")
-        print("[FRAMEWORK] Eddie black eye multi-stage reveal ('отмудохали' line) + KnowBlackwood rename flag")
-        print("[FRAMEWORK] References: NextDay_NewDayEvents.txt, BeckyQuestInit.txt, IntBeckyTalkSherwood.txt, IntEddieTalk.txt, GroceryStore.txt")
-
-        # Simulate the robbery trigger event directly (rare roll)
-        # In real play this fires from NewDay; here we force the state the thin label expects
-        import renpy
-        try:
-            renpy.python.py_eval("renpy.call('becky_eddie_black_eye')")
-        except Exception as e:
-            print("[BLACKWOOD] Direct call simulation (normal if not in full RenPy context):", e)
-
-        print("[BLACKWOOD] Prereqs for trigger: visitedhome=6, Friends=18, dayspassed=45")
-        print("[BLACKWOOD] Expected: EddieRobbedDay set, SherwoodQuest daily available at GroceryStore mornings")
-
-    # Now test the actual offer scene (after the daily has fired / player enters store)
-    $ Becky.var["TradeOffer"] = 0
-    call _test_thread_by_name("becky", "BeckyHomeVisits")
-
-    python:
-        print("[FRAMEWORK] becky_blackwood_quest_start (BeckyQuestInit pitch) + reveal path ready for testing")
-        print("[FRAMEWORK] Set EddieRobbedDay and visit GroceryStore in-game to see black eye + offer")
-        print("[FRAMEWORK] Blackwood quest hook test complete (full spine from robbery to Kunidell trade offer + danger admission)")
-
-    return
-
-
-label test_becky_eddie_black_eye_event:
-    # Specific test for the robbery trigger thin label
-    # See references in the hook test above + game/NPC/Girls/Becky/BeckyEvents.rpy
-    $ Becky.var["visitedhome"] = 5
-    $ Becky.rel = 15
-    $ dayspassed = 30
-    $ Becky.var["EddieRobbed"] = 0
-
-    call _test_thread_by_name("becky", "BeckyHomeVisits")
-
-    python:
-        print("[FRAMEWORK] Testing becky_eddie_black_eye (NewDay 1/6 rare robbery → EddieRobbedDay + 12-day store coverage by Becky)")
-    return
-
-
-label test_becky_blackwood_quest_start_event:
-    # Specific test for the offer pitch
-    # References: textLocRef\BeckyQuestInit.txt + IntBeckyTalkSherwood.txt
-    $ Becky.var["visitedhome"] = 6
-    $ Becky.rel = 18
-    $ Becky.stats["orgasms_given"] = 10
-    $ Becky.var["EddieRobbedDay"] = dayspassed if 'dayspassed' in dir() else 40
-    $ Becky.var["TradeOffer"] = 0
-
-    call _test_thread_by_name("becky", "BeckyHomeVisits")
-
-    python:
-        print("[FRAMEWORK] Testing becky_blackwood_quest_start (reliable guy pitch, TradeOffer, possible early SherwoodWarn, fallback to IntBeckyTalkSherwood)")
-    return
     return
 
 

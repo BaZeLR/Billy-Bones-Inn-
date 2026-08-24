@@ -3,19 +3,20 @@
 This document reflects the current live code path for Melissa's bats quest.
 
 Core rule:
-- `MelissaVar["bats_episode"]` is the progression source of truth.
+- `melissaBatProblem` thread state is the sole progression source of truth.
+- `Melissa.bats_stage()` derives the readable `0..8` phase from that thread; it does not store a second phase value.
 
 Timing fields:
-- `MelissaVar["storage_rat_last_help_day"]`
-- `MelissaVar["bat_attic_check_day"]`
-- `MelissaVar["drawings_ready_day"]`
-- `MelissaVar["roof_repair_order_day"]`
-- `MelissaVar["roof_repair_complete_day"]`
+- `Melissa.var["storage_rat_last_help_day"]`
+- `Melissa.var["bat_attic_check_day"]`
+- `Melissa.var["drawings_ready_day"]`
+- `Melissa.var["roof_repair_order_day"]`
+- `Melissa.var["roof_repair_complete_day"]`
 
 Side state:
-- `MelissaVar["temp_room"]`
+- `Melissa.var["temp_room"]`
 
-The older boolean fields still exist in save/state, but they are compatibility mirrors. They are not supposed to define the live quest order.
+The old `bats_episode`, `ratKilled`, `AskedMCToSolveRoomProblem`, `bats_completed`, `room_returned`, and `sex_engine_unlocked` fields are retired. Save migration promotes the old bat phase into `melissaBatProblem` once and removes the mirror; live gates use `Melissa.bats_stage()`.
 
 ## Real Trigger Sequence
 
@@ -155,7 +156,7 @@ That means the book now supports the intended progression hint:
 - the hidden bat-repellent path does not appear before Melissa's bat problem is a live story issue
 
 Current gate:
-- `MelissaVar["bats_episode"] >= 1`
+- `Melissa.bats_stage() >= 1`
 - effective exploration is at least `120`
 - the note has not already been found
 

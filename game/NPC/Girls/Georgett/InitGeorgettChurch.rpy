@@ -1,14 +1,14 @@
 label ChurchServiceGeorgett:
-    $ MainTxt = "В одном из углов собора вы находите вашу ветренную знакомую - Жоржетту Брюно, шлюху из портового квартала. Это молодая белокурая и кареглазая женщина, среднего роста, чуть пухленькая и с большой налитой грудью. В собор она нарядилась чуть скромнее, чем обычно, но не слишком: на ней красное платье до колен и блузка с глубоким декольте, на этот раз хотя бы не прозрачная. Вы замечаете, что прихожане-мужчины обращают на нее гораздо больше внимания, чем на проповедь с амвона."
+    $ scene_runtime.text = "В одном из углов собора вы находите вашу ветренную знакомую - Жоржетту Брюно, шлюху из портового квартала. Это молодая белокурая и кареглазая женщина, среднего роста, чуть пухленькая и с большой налитой грудью. В собор она нарядилась чуть скромнее, чем обычно, но не слишком: на ней красное платье до колен и блузка с глубоким декольте, на этот раз хотя бы не прозрачная. Вы замечаете, что прихожане-мужчины обращают на нее гораздо больше внимания, чем на проповедь с амвона."
     if Georgett.story_value("askkids", 0):
         if Liza.rel > 0:
-            $ MainTxt = MainTxt + "\n\nРядом с ней вы видите ее старшую дочь Лизетту - молоденькую мулатку, на вид - ровесницу Аманды. Ее волосы забранны в две косички а груди только начали расти. Ее шоколадное тело закрывают юбка и блузка, такие же как у ее мамы."
+            $ scene_runtime.text = scene_runtime.text + "\n\nРядом с ней вы видите ее старшую дочь Лизетту - молоденькую мулатку, на вид - ровесницу Аманды. Ее волосы забранны в две косички а груди только начали расти. Ее шоколадное тело закрывают юбка и блузка, такие же как у ее мамы."
         else:
-            $ MainTxt = MainTxt + "\n\nРядом с ней вы видите молоденькую мулатку, на вид - ровесницу Аманды. Ее волосы забранны в две косички а груди только начали расти. Судя по всему это Лизетта - старшая дочь Жоржетты. Ее шоколадное тело закрывают юбка и блузка, такие же как у ее мамы."
+            $ scene_runtime.text = scene_runtime.text + "\n\nРядом с ней вы видите молоденькую мулатку, на вид - ровесницу Аманды. Ее волосы забранны в две косички а груди только начали расти. Судя по всему это Лизетта - старшая дочь Жоржетты. Ее шоколадное тело закрывают юбка и блузка, такие же как у ее мамы."
         vscene "images/georgett/church/cermonliza.jpg"
     else:
         vscene "images/georgett/church/cermon.jpg"
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.location_text = scene_runtime.text
     $ Georgett.set_story_value("foundinchurch", 1)
     $ findAvailableEvents(False)
     menu:
@@ -22,7 +22,7 @@ label ChurchServiceGeorgett:
             call checkTriggers("Church", "georgett_church_service_with_liza", 0)
             return
         "Вернуться в собор":
-            jump Church
+            return
 
 
 label story_georgett_church_service_bench:
@@ -40,44 +40,43 @@ label story_georgett_church_service_bench:
 
     "«Какой ты пошлый! Поиметь меня прямо на церковной службе!» - смеется Жоржетта. «Это обойдется тебе в 15 мараведи!»"
 
-    if int(money or 0) < 15:
+    if int(player.economy.money or 0) < 15:
         "«Ой, а у меня столько нет», говорите вы."
         "«Ну нет так нет», следует резонный ответ."
         call ChurchServiceGeorgett
         return
 
-    $ TmpChurchGeorgSex = "bench"
     vscene "images/georgett/church/bench/bench1.jpg"
     "Жоржетта берет монеты и ведет вас к одной из скамей в темном углу собора."
 
     menu:
         "Дальше":
-            $ TmpChurchGeorgSex = str(TmpChurchGeorgSex or "bench")
+            pass
 
     vscene "images/georgett/church/bench/bench2.jpg"
     menu:
         "Дальше":
-            $ TmpChurchGeorgSex = str(TmpChurchGeorgSex or "bench")
+            pass
 
     vscene "images/georgett/church/bench/bench3.jpg"
     menu:
         "Дальше":
-            $ TmpChurchGeorgSex = str(TmpChurchGeorgSex or "bench")
+            pass
 
     vscene "images/georgett/church/bench/bench4.jpg"
     menu:
         "Дальше":
-            $ TmpChurchGeorgSex = str(TmpChurchGeorgSex or "bench")
+            pass
 
     vscene "images/georgett/church/bench/bench5.jpg"
     menu:
         "Дальше":
-            $ TmpChurchGeorgSex = str(TmpChurchGeorgSex or "bench")
+            pass
 
     "Через несколько минут вы оба приводите себя в порядок и возвращаетесь к звукам службы."
 
-    $ money -= 15
-    $ fun = min(100, int(fun or 0) + 4)
+    $ player.spend_money(15)
+    $ player.change_stat("fun", 4)
     $ Georgett.set_story_value("fuckinchurch", 1)
     $ Georgett.set_story_value("church_bench_seen", 1)
     $ player_record_orgasm("georgett_church_bench", "georgett")
@@ -86,7 +85,7 @@ label story_georgett_church_service_bench:
     menu:
         "Вернуться в собор":
             $ calendar_v2.advance_minutes(60)
-            jump Church
+            return
 
 
 label story_georgett_church_service_doggy:
@@ -94,7 +93,7 @@ label story_georgett_church_service_doggy:
     vscene "images/georgett/church/cermon.jpg"
     "Вы предлагаете Жоржетте не искать укрытия и рискнуть прямо здесь."
 
-    if int(money or 0) < 15:
+    if int(player.economy.money or 0) < 15:
         "«Ну нет так нет», отвечает Жоржетта, услышав, что у вас не хватает денег."
         call ChurchServiceGeorgett
         return
@@ -124,8 +123,8 @@ label story_georgett_church_service_doggy:
     vscene "images/georgett/church/doggy/doggy5.jpg"
     "Вы едва удерживаетесь от лишнего шума, пока служба продолжается совсем рядом."
 
-    $ money -= 15
-    $ fun = min(100, int(fun or 0) + 4)
+    $ player.spend_money(15)
+    $ player.change_stat("fun", 4)
     $ Georgett.set_story_value("fuckinchurch", 1)
     $ Georgett.set_story_value("church_doggy_seen", 1)
     $ player_record_orgasm("georgett_church_doggy", "georgett")
@@ -134,7 +133,7 @@ label story_georgett_church_service_doggy:
     menu:
         "Вернуться в собор":
             $ calendar_v2.advance_minutes(60)
-            jump Church
+            return
 
 
 label story_georgett_church_service_with_liza:
@@ -142,7 +141,7 @@ label story_georgett_church_service_with_liza:
     vscene "images/georgett/church/cermonliza.jpg"
     "В следующий раз Жоржетта уже не делает вид, что не понимает вашего намека, и сама зовет Лизетту ближе."
 
-    if int(money or 0) < 15:
+    if int(player.economy.money or 0) < 15:
         "Жоржетта только пожимает плечами: без денег она не собирается рисковать."
         call ChurchServiceGeorgett
         return
@@ -175,8 +174,8 @@ label story_georgett_church_service_with_liza:
     vscene "images/georgett/church/withLiza.jpg/withliza5.jpg"
     "Когда все заканчивается, Жоржетта спокойно поправляет платье, а Лизетта старается не смотреть вам прямо в глаза."
 
-    $ money -= 15
-    $ fun = min(100, int(fun or 0) + 40)
+    $ player.spend_money(15)
+    $ player.change_stat("fun", 40)
     $ Georgett.set_story_value("fuckinchurch", 1)
     $ Georgett.set_story_value("church_liza_seen", 1)
     $ Georgett.set_story_value("lizasawinchurch", 1)
@@ -186,4 +185,4 @@ label story_georgett_church_service_with_liza:
     menu:
         "Вернуться в собор":
             $ calendar_v2.advance_minutes(60)
-            jump Church
+            return

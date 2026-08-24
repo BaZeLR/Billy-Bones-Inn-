@@ -1,6 +1,7 @@
 # game/Events/HouseholdMiniEvents.rpy
 
 label HouseholdEvent_Try(location_code="", mode="room"):
+    $ renpy.dynamic("_household_event", "_household_label")
 
     $ _household_event = household_ai_pick_event(location_code, mode)
 
@@ -147,7 +148,6 @@ label HouseholdEvent_AmandaPrivatePressure:
     menu:
         "Спросить, чего она хочет":
             "Аманда: Смотря что ты можешь себе позволить. Внимание дешевое. Красивые вещи — нет."
-            $ Amanda.set_var_int("attention_hint_day", current_game_day())
             $ household_ai_reduce_drive("amanda", 0.16)
 
         "Сказать, что она выпрашивает поблажки":
@@ -157,7 +157,6 @@ label HouseholdEvent_AmandaPrivatePressure:
 
         "Сказать, что поговорите потом":
             "Она принимает это плохо, но все-таки принимает."
-            $ Amanda.set_var_int("need_blocked", 1)
             $ household_ai_raise_friction(0.04)
 
     return

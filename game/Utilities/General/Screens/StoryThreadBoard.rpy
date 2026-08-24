@@ -1,8 +1,6 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default story_board_selected_person = "melissa"
-
 init python:
     STORY_BOARD_PERSON_ORDER = [
         "melissa",
@@ -122,14 +120,6 @@ init python:
     def story_board_safe_text(value):
         return str(value or "").replace("[", "[[")
 
-    def story_board_refresh():
-        try:
-            initStoryEventRuntime(True)
-            findBlockedThreads(threads)
-            findAvailableEvents(True)
-        except Exception:
-            pass
-
     def story_board_people():
         people = []
         try:
@@ -216,7 +206,7 @@ init python:
             return people_display_name(key)
         except Exception:
             try:
-                return str(RealName.get(key, key) or key)
+                return str(people_display_name(key) or key)
             except Exception:
                 return key
 
@@ -354,13 +344,7 @@ init python:
                 evt_key, delta = evt_day
             else:
                 evt_key, delta = evt_day, 1
-            try:
-                evt_num_day = threads[str(evt_key)[:-3]].day
-            except Exception:
-                try:
-                    evt_num_day = globals()[str(evt_key)]
-                except Exception:
-                    evt_num_day = _story_num_day()
+            evt_num_day = _story_marker_day(evt_key, evt_num_day)
         wait_days = int(evt_num_day or 0) + int(delta or 0) - int(_story_num_day() or 0)
         if wait_days <= 0:
             return story_board_colorize("Available", True)
@@ -373,8 +357,8 @@ init python:
             return "Any"
         if isinstance(evt_day, list):
             return ",".join([story_board_show_day(row) for row in evt_day])
-        names = list(WEEKDAY_NAMES_RU) if "WEEKDAY_NAMES_RU" in globals() else ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-        current_day = int(week or 0)
+        names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        current_day = int(calendar_v2.week or 0)
         if evt_day == (1, 5):
             return story_board_colorize("Weekday", current_day <= 5)
         if evt_day == (6, 7):
@@ -395,7 +379,7 @@ init python:
     def story_board_show_hour(evt_hour):
         if evt_hour is None:
             return "Any"
-        current_hour = int(hour or 0)
+        current_hour = int(calendar_v2.hour or 0)
         def _hour_name(value):
             try:
                 return "%02d:00" % (int(value) % 24)
@@ -419,7 +403,7 @@ init python:
         key = str(item_id or "")
         has_it = False
         try:
-            has_it = _player_has_item_by_id(key)
+            has_it = player.item_count(key) > 0
         except Exception:
             pass
         try:
@@ -436,8 +420,9 @@ init python:
         for req, val in dict(reqs or {}).items():
             key = str(req or "")
             limit = int(val or 0)
-            if key in peopleInfo:
-                current = int(getattr(peopleInfo[key], "rel", 0) or 0)
+            info = people.get_info(key)
+            if info is not None:
+                current = int(getattr(info, "rel", 0) or 0)
                 msg.append(story_board_colorize("%s Rel >= %d" % (story_board_person_title(key), limit), current >= limit))
             else:
                 current = _story_named_number(key, 0)
@@ -509,14 +494,13 @@ screen story_thread_board_panel(person=None, standalone=False):
     modal True
     zorder 210
     style_prefix "board"
-    on "show" action Function(story_board_refresh)
 
     $ _people = story_board_people()
     if person is not None and person in _people:
-        $ story_board_selected_person = person
-    if story_board_selected_person not in _people and _people:
-        $ story_board_selected_person = _people[0]
-    $ person = story_board_selected_person
+        $ main_ui_runtime.story_board_person = person
+    if main_ui_runtime.story_board_person not in _people and _people:
+        $ main_ui_runtime.story_board_person = _people[0]
+    $ person = main_ui_runtime.story_board_person
     $ _rows = story_board_rows(person)
 
     add Solid("#000000")
@@ -535,7 +519,7 @@ screen story_thread_board_panel(person=None, standalone=False):
         if standalone:
             action Hide("story_thread_board")
         else:
-            action SetVariable("main_ui_overlay", "")
+            action SetField(main_ui_runtime, "overlay", "")
 
     vbox:
         spacing 5

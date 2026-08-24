@@ -1,84 +1,3 @@
-
-
-label ArtisansQuarterRestore:
-    $ MainTxt = ArtisansQuarterSavedText
-    $ CurLocDesc = MainTxt
-    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
-    call ArtisansQuarterBuildActions
-    return    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
-        call screen main_ui
-        return
-label ArtisansQuarterRestore:
-    $ MainTxt = ArtisansQuarterSavedText
-    $ CurLocDesc = MainTxt
-    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
-    call ArtisansQuarterBuildActions
-    return    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
-        $ _artisans_nav_ui_return = None
-        while _artisans_nav_ui_return is None:
-            call screen main_ui
-            $ _artisans_nav_ui_return = _return
-        jump ArtisansQuarter
-
-
-label ArtisansQuarterRestore:
-    $ MainTxt = ArtisansQuarterSavedText
-    $ CurLocDesc = MainTxt
-    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
-    call ArtisansQuarterBuildActions
-    return    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
-        call screen main_ui
-        return
-label ArtisansQuarterRestore:
-    $ MainTxt = ArtisansQuarterSavedText
-    $ CurLocDesc = MainTxt
-    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
-    call ArtisansQuarterBuildActions
-    return    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
-        $ _artisans_nav_ui_return = None
-        while _artisans_nav_ui_return is None:
-            call screen main_ui
-            $ _artisans_nav_ui_return = _return
-        jump ArtisansQuarter
-
-
-label ArtisansQuarterRestore:
-    $ MainTxt = ArtisansQuarterSavedText
-    $ CurLocDesc = MainTxt
-    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
-    call ArtisansQuarterBuildActions
-    return    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
-        call screen main_ui
-        return
-label ArtisansQuarterRestore:
-    $ MainTxt = ArtisansQuarterSavedText
-    $ CurLocDesc = MainTxt
-    call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
-    call ArtisansQuarterBuildActions
-    return    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться к трактиру", Call("MoveToRoom", "StreetTavern", navigation_group_travel_minutes()))]
-        $ _artisans_nav_ui_return = None
-        while _artisans_nav_ui_return is None:
-            call screen main_ui
-            $ _artisans_nav_ui_return = _return
-        jump ArtisansQuarter
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -88,7 +7,15 @@ init python:
             return navigation_group_travel_minutes()
         return 10
 
-    ArtisansQuarterRoom = Room(
+    def artisans_quarter_action_items():
+        items = []
+        for _artisans_object in rooms.get("ArtisansQuarter").visible_objects():
+            items.append(MenuItem(_artisans_object.name, Call("ArtisansQuarterObjectMenu", _artisans_object.object_id)))
+        for _artisans_exit in rooms.get("ArtisansQuarter").visible_exits():
+            items.append(MenuItem(_artisans_exit.label, movement_actions(_artisans_exit.target, artisans_quarter_exit_minutes(_artisans_exit.target))))
+        return items
+
+    ArtisansQuarterRoomDefinition = Room(
         code_name="ArtisansQuarter",
         display_name="Квартал ремесленников",
         bg_picture="bg ArtisansQuarter",
@@ -132,95 +59,90 @@ init python:
                 ],
             ),
         ],
+        state={
+            "display_text": "",
+        },
     )
 
 
 label ArtisansQuarter:
-    $ dog_prepare_current_spawn()
-    $ CurrentRoom = ArtisansQuarterRoom
-    $ CurLoc = "ArtisansQuarter"
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_object_id = ""
-    $ GirlDressBlock = 0
-    $ _artisans_desc_rows = CurrentRoom.visible_descriptions()
+    $ renpy.dynamic("_artisans_desc_rows")
+    $ rooms.enter("ArtisansQuarter")
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.object_id = ""
+    $ dress_shop.girl_dress_block = 0
+    $ _artisans_desc_rows = rooms.current.visible_descriptions()
     if len(_artisans_desc_rows) > 0:
-        $ MainTxt = _artisans_desc_rows[0].text
+        $ scene_runtime.text = _artisans_desc_rows[0].text
     else:
-        $ MainTxt = "Вы находитесь в квартале ремесленников."
-    $ MainTxt += "\n\nМежду портновской лавкой и мастерской столяра примостилась цирюльня Серджио Пета: оттуда тянет мылом, горячими полотенцами и нескончаемыми городскими сплетнями."
-    if dog_is_here("ArtisansQuarter"):
-        $ MainTxt += "\n\nУ края мостовой крутится бродячий пес, заглядывающий в мастерские в поисках чего-нибудь съестного."
-    $ CurLocDesc = MainTxt
-    $ ArtisansQuarterSavedText = MainTxt
-    $ CurrentRoom.mark_visited()
+        $ scene_runtime.text = "Вы находитесь в квартале ремесленников."
+    $ scene_runtime.text += "\n\nМежду портновской лавкой и мастерской столяра примостилась цирюльня Серджио Пета: оттуда тянет мылом, горячими полотенцами и нескончаемыми городскими сплетнями."
+    if dog.is_stray_here("ArtisansQuarter"):
+        $ scene_runtime.text += "\n\nУ края мостовой крутится бродячий пес, заглядывающий в мастерские в поисках чего-нибудь съестного."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ rooms.get("ArtisansQuarter").state["display_text"] = scene_runtime.text
+    $ rooms.current.mark_visited()
 
     call ShowImageSeq("general", "", "LocArtisansQuarter", 4)
 
-    call RoomEnterEventGate(CurLoc, False)
+    call RoomEnterEventGate(rooms.current_code, False)
 
-    call ArtisansQuarterBuildActions
-    $ _artisans_ui_return = None
-    while _artisans_ui_return is None:
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = artisans_quarter_action_items()
+    while True:
         call screen main_ui
-        $ _artisans_ui_return = _return
-    jump ArtisansQuarter
-
-
-label ArtisansQuarterBuildActions:
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-
-    python:
-        for _artisans_object in ArtisansQuarterRoom.visible_objects():
-            current_action_items.append(MenuItem(_artisans_object.name, Call("ArtisansQuarterObjectMenu", _artisans_object.object_id)))
-        for _artisans_exit in ArtisansQuarterRoom.visible_exits():
-            current_action_items.append(MenuItem(_artisans_exit.label, Call("MoveToRoom", _artisans_exit.target, artisans_quarter_exit_minutes(_artisans_exit.target))))
-    return
 
 
 label ArtisansQuarterObjectMenu(object_id=""):
+    $ renpy.dynamic("_artisans_object", "_room_object", "_artisans_action", "_artisans_args")
     $ _artisans_object = None
     python:
-        for _room_object in ArtisansQuarterRoom.visible_objects():
+        for _room_object in rooms.get("ArtisansQuarter").visible_objects():
             if getattr(_room_object, "object_id", "") == str(object_id or ""):
                 _artisans_object = _room_object
                 break
 
     if _artisans_object is None:
-        call ArtisansQuarterBuildActions
+        $ main_ui_runtime.action_items = artisans_quarter_action_items()
         return
 
-    $ MainTxt = _artisans_object.description
-    $ CurLocDesc = MainTxt
-    $ current_action_title = _artisans_object.name
-    $ current_action_content = None
-    $ current_action_items = []
+    $ scene_runtime.text = _artisans_object.description
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = _artisans_object.name
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
 
     python:
         for _artisans_action in _artisans_object.visible_actions():
             _artisans_args = tuple(getattr(_artisans_action, "args", ()) or ())
             if _artisans_action.hook == "text":
-                current_action_items.append(MenuItem(_artisans_action.label, Call("ArtisansQuarterObjectText", object_id, _artisans_action.action_id)))
+                main_ui_runtime.action_items.append(MenuItem(_artisans_action.label, Call("ArtisansQuarterObjectText", object_id, _artisans_action.action_id)))
             elif _artisans_action.hook == "call" and str(_artisans_action.target or "") != "":
-                current_action_items.append(MenuItem(_artisans_action.label, Call(_artisans_action.target, *_artisans_args)))
+                main_ui_runtime.action_items.append(MenuItem(_artisans_action.label, Call(_artisans_action.target, *_artisans_args)))
             elif _artisans_action.hook == "jump" and str(_artisans_action.target or "") != "":
-                current_action_items.append(MenuItem(_artisans_action.label, Jump(_artisans_action.target)))
+                main_ui_runtime.action_items.append(MenuItem(_artisans_action.label, Jump(_artisans_action.target)))
 
-    $ current_action_items.append(MenuItem("Назад", Jump("ArtisansQuarter")))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [
+        SetField(scene_runtime, "text", str(rooms.get("ArtisansQuarter").state.get("display_text", "") or "")),
+        SetField(scene_runtime, "location_text", str(rooms.get("ArtisansQuarter").state.get("display_text", "") or "")),
+        SetField(main_ui_runtime, "action_title", "Действия"),
+        SetField(main_ui_runtime, "action_content", None),
+        SetField(main_ui_runtime, "action_items", artisans_quarter_action_items()),
+        Function(main_ui_restart_interaction),
+    ]))
     return
 
 
 label ArtisansQuarterObjectText(object_id="", action_id=""):
+    $ renpy.dynamic("_artisans_name", "_artisans_text", "_room_action", "_room_object")
     python:
         _artisans_text = ""
         _artisans_name = ""
-        for _room_object in ArtisansQuarterRoom.visible_objects():
+        for _room_object in rooms.get("ArtisansQuarter").visible_objects():
             if getattr(_room_object, "object_id", "") != str(object_id or ""):
                 continue
             _artisans_name = str(getattr(_room_object, "name", "") or "")
@@ -230,10 +152,8 @@ label ArtisansQuarterObjectText(object_id="", action_id=""):
                     break
             break
         if _artisans_text:
-            MainTxt = _artisans_text
-            CurLocDesc = _artisans_text
-            current_action_title = _artisans_name or "Действия"
+            scene_runtime.text = _artisans_text
+            scene_runtime.location_text = _artisans_text
+            main_ui_runtime.action_title = _artisans_name or "Действия"
     call ArtisansQuarterObjectMenu(object_id)
     return
-
-

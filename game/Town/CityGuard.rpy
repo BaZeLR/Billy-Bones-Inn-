@@ -1,39 +1,3 @@
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
-        call screen main_ui
-        return
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = CityGuardRoom.build_exit_items()
-        call screen main_ui
-        return
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
-        call screen main_ui
-        return
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = CityGuardRoom.build_exit_items()
-        call screen main_ui
-        return
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Вернуться на рынок", Jump("MarketPlace"))]
-        call screen main_ui
-        return
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = CityGuardRoom.build_exit_items()
-        call screen main_ui
-        return
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -60,7 +24,7 @@ init python:
         8: "Рыцарем быть - галимый ацтой!\nСлужи в пехоте парень простой!!!\nЧем куртуазничать в беленьких латах,\nЕбошь алебардой! будь бразер, солдатом!",
     }
 
-    CityGuardRoom = Room(
+    CityGuardRoomDefinition = Room(
         code_name="CityGuard",
         display_name="Приемная городской стражи",
         bg_picture="images/general/cityguard.jpg",
@@ -101,52 +65,55 @@ init python:
         ),
     )
 
+    def city_guard_action_items():
+        items = []
+        if len(rooms.get("CityGuard").visible_objects()) > 0:
+            items.append(MenuItem("Расписные доски", Call("CityGuardShowPlacat")))
+        if story_event_available("menu_CityGuard", "mongol_stocks"):
+            items.append(MenuItem("Осмотреть колодки у караулки", Call("checkTriggers", "menu_CityGuard", "mongol_stocks", 0)))
+        elif story_event_available("CityGuard", "enter"):
+            items.append(MenuItem("Осмотреть колодки у караулки", Call("checkTriggers", "CityGuard", "enter", 0)))
+        items.extend(rooms.get("CityGuard").build_exit_items())
+        return items
+
 
 label CityGuard:
-    $ CurrentRoom = CityGuardRoom
-    $ CurLoc = "CityGuard"
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_object_id = ""
-    $ _city_guard_desc_rows = CityGuardRoom.visible_descriptions()
+    $ renpy.dynamic("_city_guard_desc_rows")
+    $ rooms.enter("CityGuard")
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.object_id = ""
+    $ _city_guard_desc_rows = rooms.get("CityGuard").visible_descriptions()
     if len(_city_guard_desc_rows) > 0:
-        $ MainTxt = _city_guard_desc_rows[0].text
+        $ scene_runtime.text = _city_guard_desc_rows[0].text
     else:
-        $ MainTxt = "Вы зашли в приемную городской стражи."
-    $ CurLocDesc = MainTxt
-    $ CityGuardRoom.mark_visited()
+        $ scene_runtime.text = "Вы зашли в приемную городской стражи."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ rooms.get("CityGuard").mark_visited()
 
-    call RoomEnterEventGate(CurLoc, False)
+    call RoomEnterEventGate(rooms.current_code, False)
 
-    if CityGuardRoom.is_open():
-        vscene "images/zimmer/Portrait1.jpg"
+    if rooms.get("CityGuard").is_open():
+        vscene "images/zimmer/portrait1.png"
     else:
         vscene "images/general/cityguard.jpg"
 
-    $ current_action_items = []
-
-    if len(CityGuardRoom.visible_objects()) > 0:
-        $ current_action_items.append(MenuItem("Расписные доски", Call("CityGuardShowPlacat")))
-
-    if CityGuardRoom.is_open():
-        $ current_action_items.append(MenuItem("Десятник Циммерман", Call("IntZimmerTalk")))
-    if story_event_available("CityGuard", "enter"):
-        $ current_action_items.append(MenuItem("Осмотреть колодки у караулки", Call("checkTriggers", "CityGuard", "enter", 0)))
-
-    $ current_action_items.extend(CityGuardRoom.build_exit_items())
+    $ main_ui_runtime.action_items = city_guard_action_items()
     while True:
         call screen main_ui
 
 
 label CityGuardShowPlacat:
-    $ RandVar = procedural_randint(1, 8, "city_guard_placard_%s_%s" % (current_game_day(), int(clock_minutes or 0)))
-    $ MainTxt = CityGuardPlacat[RandVar]
-    $ CurLocDesc = MainTxt
-    vscene "images/general/soldierplakat/plakat[RandVar].jpg"
-    $ current_action_title = "Расписные доски"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_action_items.append(MenuItem("Посмотреть на другую доску", Call("CityGuardShowPlacat")))
-    $ current_action_items.append(MenuItem("Назад", Jump("CityGuard")))
+    $ renpy.dynamic("RandVar", "_placard_picture")
+    $ RandVar = procedural_randint(1, 8, "city_guard_placard_%s_%s" % (current_game_day(), int(calendar_v2.clock_minutes() or 0)))
+    $ scene_runtime.text = CityGuardPlacat[RandVar]
+    $ scene_runtime.location_text = scene_runtime.text
+    $ _placard_picture = "images/zimmer/soldierplakat/plakat%s.jpg" % RandVar
+    vscene _placard_picture
+    $ main_ui_runtime.action_title = "Расписные доски"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.action_items.append(MenuItem("Посмотреть на другую доску", Call("CityGuardShowPlacat")))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", city_guard_action_items()), Function(main_ui_restart_interaction)]))
     return

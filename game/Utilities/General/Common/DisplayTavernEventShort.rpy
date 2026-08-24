@@ -1,18 +1,3 @@
-    def _dtes_events_count():
-        return EventsCount
-
-    def _dtes_new_events():
-        return NewEvents
-    def _dtes_events_count():
-        return EventsCount
-
-    def _dtes_new_events():
-        return NewEvents
-    def _dtes_events_count():
-        return EventsCount
-
-    def _dtes_new_events():
-        return NewEvents
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -33,61 +18,25 @@ init python:
     def _dtes_mandatory_event_allowed(event_code, room_code=""):
         code = str(event_code or "")
         if code == "WineForDance":
-            return str(room_code or CurLoc or "") == "TavernKitchen"
+            return str(room_code or rooms.current_code or "") == "TavernKitchen"
         return True
 
-    def tavern_event_pop_code(time_period, require_room_match=False, room_code=""):
-        return tavern_work_pop_planned_event(time_period, require_room_match, room_code)
-
-    def DisplayTavernEventShort(time_period, eyewitness):
-        """
-        Python compatibility dispatcher.
-        Dequeues one event from mandatory slot 10 first, then from current slot.
-        This path is side-effect-light and used by debug/unit helpers.
-        """
-        global CurEventCode, Result
-        EventsCount = _dtes_events_count()
-        NewEvents = _dtes_new_events()
-
-        EventsCount = _dtes_events_count()
-        NewEvents = _dtes_new_events()
-
-        EventsCount = _dtes_events_count()
-        NewEvents = _dtes_new_events()
-
-        tp = _dtes_i(time_period, 0)
-        text = ""
-
-        _event_pick = tavern_event_pop_code(tp)
-        CurEventCode = str(_event_pick.get("code", "") or "")
-        if CurEventCode:
-            Result = text
-            return text if text else CurEventCode
-
-        Result = ""
-        return ""
-
 label DisplayTavernEventShort(time_period, eyewitness):
-    $ CurEventDescFin = ''
-    $ _event_pick = tavern_event_pop_code(time_period, eyewitness > 0, CurLoc)
-    $ CurEventCode = str(_event_pick.get("code", "") or "")
-    if CurEventCode == 'WineForDance':
-        call EventWineForDance(eyewitness)
-        $ CurEventDescFin = _return
-    elif CurEventCode == 'FightSmall':
-        call EventFightSmall(eyewitness)
-        $ CurEventDescFin = _return
-    elif CurEventCode == 'CleaningHarass':
-        call event_cleaning_harrass(eyewitness)
-        $ CurEventDescFin = _return
-    elif CurEventCode == 'WaitressHarass':
-        call event_waitress_harrass(eyewitness)
-        $ CurEventDescFin = _return
-    elif CurEventCode == 'AmandaLizaTalk':
-        call EventAmandaLizettTalk(eyewitness)
-        $ CurEventDescFin = _return
-    $ Result = CurEventDescFin
-    return CurEventDescFin
+    $ renpy.dynamic("_event_pick", "_event_code", "_event_target", "_event_result")
+    $ _event_pick = tavern_work_pop_planned_event(time_period, eyewitness > 0, rooms.current_code)
+    $ _event_code = str(_event_pick.get("code", "") or "")
+    $ _event_target = {
+        "WineForDance": "EventWineForDance",
+        "FightSmall": "EventFightSmall",
+        "CleaningHarass": "event_cleaning_harrass",
+        "WaitressHarass": "event_waitress_harrass",
+        "AmandaLizaTalk": "EventAmandaLizettTalk",
+    }.get(_event_code, "")
+    if not _event_target:
+        return ""
+    call expression _event_target pass (eyewitness,)
+    $ _event_result = _return
+    return _event_result
 
 # # Helper event labels (stubs)
 # label event_fight_small(eyewitness):

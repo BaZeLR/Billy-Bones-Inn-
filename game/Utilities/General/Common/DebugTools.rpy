@@ -1,133 +1,23 @@
-    $ fight_sync_loaded_weapon_state_from_inventory()            if key == "EventsCount":
-                return EventsCount
-            if key == "NewEvents":
-                return NewEvents            if key == "build_tavern_events_queue_python":
-                return build_tavern_events_queue_python        elif key == "EventsCount":
-            _dbg_set("EventsCount", {})
-        elif key == "NewEvents":
-            _dbg_set("NewEvents", {})
-
-    def _dbg_ensure_event_maps():
-        ecount = _dbg_get("EventsCount", None)
-        if not isinstance(ecount, dict):
-            ecount = _dbg_set("EventsCount", {})
-        nevents = _dbg_get("NewEvents", None)
-        if not isinstance(nevents, dict):
-            nevents = _dbg_set("NewEvents", {})
-        return ecount, nevents    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()
-    $ fight_sync_level_from_exploration()
-    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass    $ npc_schedule_sync_all()        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass    $ npc_schedule_sync_all()            if key == "DisplayTavernEventShort":
-                return DisplayTavernEventShort    $ fight_sync_loaded_weapon_state_from_inventory()            if key == "EventsCount":
-                while True:
-        call screen main_ui EventsCount
-            if key == "NewEvents":
-                while True:
-        call screen main_ui NewEvents            if key == "build_tavern_events_queue_python":
-                while True:
-        call screen main_ui build_tavern_events_queue_python        elif key == "EventsCount":
-            _dbg_set("EventsCount", {})
-        elif key == "NewEvents":
-            _dbg_set("NewEvents", {})
-
-    def _dbg_ensure_event_maps():
-        ecount = _dbg_get("EventsCount", None)
-        if not isinstance(ecount, dict):
-            ecount = _dbg_set("EventsCount", {})
-        nevents = _dbg_get("NewEvents", None)
-        if not isinstance(nevents, dict):
-            nevents = _dbg_set("NewEvents", {})
-        while True:
-        call screen main_ui ecount, nevents    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()
-    $ fight_sync_level_from_exploration()
-    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass    $ npc_schedule_sync_all()        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass    $ npc_schedule_sync_all()            if key == "DisplayTavernEventShort":
-                return DisplayTavernEventShort    $ fight_sync_loaded_weapon_state_from_inventory()            if key == "EventsCount":
-                while True:
-        call screen main_ui EventsCount
-            if key == "NewEvents":
-                while True:
-        call screen main_ui NewEvents            if key == "build_tavern_events_queue_python":
-                while True:
-        call screen main_ui build_tavern_events_queue_python        elif key == "EventsCount":
-            _dbg_set("EventsCount", {})
-        elif key == "NewEvents":
-            _dbg_set("NewEvents", {})
-
-    def _dbg_ensure_event_maps():
-        ecount = _dbg_get("EventsCount", None)
-        if not isinstance(ecount, dict):
-            ecount = _dbg_set("EventsCount", {})
-        nevents = _dbg_get("NewEvents", None)
-        if not isinstance(nevents, dict):
-            nevents = _dbg_set("NewEvents", {})
-        while True:
-        call screen main_ui ecount, nevents    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()    $ fight_sync_level_from_exploration()
-    $ fight_sync_level_from_exploration()
-    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()    $ fight_sync_supply_from_inventory()        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass    $ npc_schedule_sync_all()        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass        try:
-            npc_schedule_sync_all()
-        except Exception:
-            pass    $ npc_schedule_sync_all()            if key == "DisplayTavernEventShort":
-                return DisplayTavernEventShort# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default DebugBuilderRepairNotesPath = ""
-
 init python:
     import os
     import renpy.exports as renpy
 
     def _dbg_i(v, d=0):
         try:
-            while True:
-        call screen main_ui int(v)
+            return int(v)
         except Exception:
-            while True:
-        call screen main_ui d
+            return d
 
     def _dbg_get(name, default=None):
-        global calendar_v2.time_slot(), calendar_v2.week, calendar_v2.day, EventsCount, NewEvents
-        global calendar_v2.time_slot(), calendar_v2.week, calendar_v2.day, EventsCount, NewEvents
-        global calendar_v2.time_slot(), calendar_v2.week, calendar_v2.day, EventsCount, NewEvents
         key = str(name or "")
         try:
             if key == "time":
-                while True:
-        call screen main_ui calendar_v2.time_slot()
+                return calendar_v2.time_slot()
             if key == "week":
-                while True:
-        call screen main_ui calendar_v2.week
+                return calendar_v2.week
             if key == "day":
                 return calendar_v2.day
             if key == "_mui_location_char_keys":
@@ -144,9 +34,9 @@ init python:
 
     # Debug/test positioning only. Calendar runtime intentionally has no date-jump setter.
     def _dbg_calendar_set_fields(day_value=None, month_value=None, year_value=None, hour_value=None, minute_value=None):
-        day_i = max(1, min(28, _dbg_i(day if day_value is None else day_value, 1)))
-        month_i = max(1, min(13, _dbg_i(month if month_value is None else month_value, 1)))
-        year_i = max(CALENDAR_START_CYCLE, _dbg_i(year if year_value is None else year_value, CALENDAR_START_CYCLE))
+        day_i = max(1, min(28, _dbg_i(calendar_v2.day if day_value is None else day_value, 1)))
+        month_i = max(1, min(13, _dbg_i(calendar_v2.period if month_value is None else month_value, 1)))
+        year_i = max(CALENDAR_START_CYCLE, _dbg_i(calendar_v2.cycle if year_value is None else year_value, CALENDAR_START_CYCLE))
         day_number_i = max(0, ((year_i - CALENDAR_START_CYCLE) * 364) + ((month_i - 1) * 28) + day_i - 1)
 
         calendar_v2.day = day_i
@@ -154,14 +44,14 @@ init python:
         calendar_v2.cycle = year_i
         calendar_v2.week = (day_number_i % 7) + 1
         calendar_v2.daysInGame = day_number_i
-        calendar_v2.hour = _dbg_i(hour if hour_value is None else hour_value, 8) % 24
-        calendar_v2.minute = _dbg_i(minute if minute_value is None else minute_value, 0) % 60
+        calendar_v2.hour = _dbg_i(calendar_v2.hour if hour_value is None else hour_value, 8) % 24
+        calendar_v2.minute = _dbg_i(calendar_v2.minute if minute_value is None else minute_value, 0) % 60
         return True
 
     # Debug/test fixture setup only. Gameplay never changes weekday directly.
     def _dbg_calendar_set_weekday(weekday_value=1):
         target_week = max(1, min(7, _dbg_i(weekday_value, 1)))
-        steps = (target_week - max(1, min(7, _dbg_i(week, 1)))) % 7
+        steps = (target_week - max(1, min(7, _dbg_i(calendar_v2.week, 1)))) % 7
         while steps > 0:
             calendar_v2.day += 1
             calendar_v2.week += 1
@@ -178,7 +68,6 @@ init python:
         return True
 
     def _dbg_set(name, value):
-        global time, week, day, EventsCount, NewEvents
         key = str(name or "")
         if key == "time":
             _slot = max(0, min(7, int(value or 0)))
@@ -187,19 +76,7 @@ init python:
         elif key == "week":
             _dbg_calendar_set_weekday(value)
         elif key == "day":
-            _dbg_calendar_set_fields(value, month, year, hour, minute)
-        elif key == "EventsCount":
-            EventsCount = value
-        elif key == "NewEvents":
-            NewEvents = value
-        elif key == "EventsCount":
-            EventsCount = value
-        elif key == "NewEvents":
-            NewEvents = value
-        elif key == "EventsCount":
-            EventsCount = value
-        elif key == "NewEvents":
-            NewEvents = value
+            _dbg_calendar_set_fields(value, calendar_v2.period, calendar_v2.cycle, calendar_v2.hour, calendar_v2.minute)
         return value
 
     def _dbg_del(name):
@@ -212,20 +89,10 @@ init python:
             _dbg_set("day", 1)
 
     def _dbg_queue_for_period(period):
-        out = []
         try:
-            p = _dbg_i(period, 0)
-            ecount, nevents = _dbg_ensure_event_maps()
-            if not isinstance(ecount, dict) or not isinstance(nevents, dict):
-                return out
-            cnt = max(0, _dbg_i(ecount.get(p, 0), 0))
-            for idx in range(cnt):
-                code = str(nevents.get(str(p) + "_" + str(idx), "") or "")
-                if code:
-                    out.append(code)
+            return list(tavern_work_codes_for_period(_dbg_i(period, 0), True) or [])
         except Exception:
-            return out
-        return out
+            return []
 
     def _dbg_build_queue(include_mandatory=True):
         tavern_work_build_daily_plan()
@@ -244,12 +111,6 @@ init python:
         Build queue for debug visibility. If RNG yields empty day, inject one
         known random event so debug UI always has something to show/dispatch.
         """
-        _dbg_ensure_event_maps()
-
-        _dbg_ensure_event_maps()
-
-        _dbg_ensure_event_maps()
-
         _dbg_build_queue(True)
         day_map = _dbg_queue_day_map()
         total = 0
@@ -375,22 +236,19 @@ init python:
     def debug_builder_room_keys():
         keys = []
         for key in DEBUG_BUILDER_ROOM_KEYS:
-            if get_registered_room(key) is not None and key not in keys:
+            if rooms.get(key) is not None and key not in keys:
                 keys.append(key)
-        for key in sorted(list(roomRegistry.keys())):
+        for key in sorted(list(rooms.keys())):
             if key not in keys:
                 keys.append(key)
         return keys
 
     def debug_builder_main_text():
         try:
-            room_count = len(list(roomRegistry.keys()))
+            room_count = len(rooms)
         except Exception:
             room_count = 0
-        try:
-            people_count = len(list(peopleInfo.keys()))
-        except Exception:
-            people_count = 0
+        people_count = len(people)
         try:
             event_count = len(list(story_event_projection_rows() or []))
         except Exception:
@@ -399,36 +257,14 @@ init python:
             "Debug builder room.\n"
             "Current time slot: %s, weekday: %s, day: %s.\n"
             "Registered rooms: %s.\n"
-            "Registered peopleInfo objects: %s.\n"
+            "Registered people objects: %s.\n"
             "Projected story events now: %s.\n\n"
             "Use this room to inspect actual engine outputs: loadable pictures, room descriptions, room objects/exits, story event checks, NPC schedules, and card images."
-            % (time, week, dayspassed, room_count, people_count, event_count)
+            % (calendar_v2.time_slot(), calendar_v2.week, calendar_v2.daysInGame, room_count, people_count, event_count)
         )
 
     def debug_builder_refresh_runtime():
-        try:
-        except Exception:
-            pass
-        try:
-        except Exception:
-            pass
-        try:
-        except Exception:
-            pass
-        try:
-        except Exception:
-            pass
-        try:
-        except Exception:
-            pass
-        try:
-            npc_daily_schedule_build_all(True)
-        except Exception:
-            pass
-        try:
-            _ensure_player_chores_state()
-        except Exception:
-            pass
+        _ensure_player_chores_state()
         return True
 
     def debug_builder_set_time_slot_control(slot_id):
@@ -436,14 +272,11 @@ init python:
         calendar_v2.hour = (6, 8, 11, 13, 16, 18, 21, 23)[slot_i]
         calendar_v2.minute = 0
         debug_builder_refresh_runtime()
-        _pc_sync_ui_chores()
-        _pc_sync_ui_chores()
-        _pc_sync_ui_chores()
         main_ui_restart_interaction()
-        return int(time or 0)
+        return int(calendar_v2.time_slot())
 
     def debug_builder_step_weekday(delta):
-        target = int(week or 1) + int(delta or 0)
+        target = int(calendar_v2.week or 1) + int(delta or 0)
         while target < 1:
             target += 7
         while target > 7:
@@ -451,11 +284,11 @@ init python:
         _dbg_calendar_set_weekday(target)
         debug_builder_refresh_runtime()
         main_ui_restart_interaction()
-        return int(week or 1)
+        return int(calendar_v2.week or 1)
 
     def debug_builder_step_month(delta):
-        target_month = int(month or 1) + int(delta or 0)
-        target_year = int(year or CALENDAR_START_CYCLE)
+        target_month = int(calendar_v2.period or 1) + int(delta or 0)
+        target_year = int(calendar_v2.cycle or CALENDAR_START_CYCLE)
         while target_month < 1:
             target_year -= 1
             if target_year < CALENDAR_START_CYCLE:
@@ -466,10 +299,10 @@ init python:
         while target_month > 13:
             target_month -= 13
             target_year += 1
-        _dbg_calendar_set_fields(day, target_month, target_year, hour, minute)
+        _dbg_calendar_set_fields(calendar_v2.day, target_month, target_year, calendar_v2.hour, calendar_v2.minute)
         debug_builder_refresh_runtime()
         main_ui_restart_interaction()
-        return int(month or 1)
+        return int(calendar_v2.period or 1)
 
     def debug_builder_step_chore(chore_key="", delta=1):
         key = str(chore_key or "").strip()
@@ -478,17 +311,11 @@ init python:
         _ensure_player_chores_state()
         player.chores.weekly[key] = max(0, int(player.chores.weekly.get(key, 0) or 0) + int(delta or 0))
         main_ui_restart_interaction()
-        _pc_sync_ui_chores()
-        _pc_sync_ui_chores()
-        _pc_sync_ui_chores()
-        _pc_sync_ui_chores()
-        _pc_sync_ui_chores()
-        _pc_sync_ui_chores()
         return int(player.chores.weekly.get(key, 0) or 0)
 
     def debug_builder_room_report(room_code=""):
         room_key = str(room_code or "").strip()
-        room_obj = get_registered_room(room_key)
+        room_obj = rooms.get(room_key)
         if room_obj is None:
             return "Room not registered: %s" % room_key
 
@@ -527,10 +354,11 @@ init python:
 
         lines.append("")
         lines.append("Visible NPCs from schedule:")
-        npc_ids = list(getNPCids(room_code) or [])
+        npc_ids = list(people.ids_at(room_code) or [])
         if npc_ids:
             for npc_id in npc_ids:
-                lines.append("- %s / %s" % (npc_id, npc_display_name(npc_id)))
+                npc_info = people.get_info(npc_id)
+                lines.append("- %s / %s" % (npc_id, npc_info.display_name() if npc_info is not None else npc_id))
         else:
             lines.append("- <none visible>")
 
@@ -542,7 +370,7 @@ init python:
             if path not in paths:
                 paths.append(path)
         for key in debug_builder_room_keys()[:30]:
-            room_obj = get_registered_room(key)
+            room_obj = rooms.get(key)
             path = str(getattr(room_obj, "bg_picture", "") or "") if room_obj is not None else ""
             if path and path not in paths:
                 paths.append(path)
@@ -553,7 +381,7 @@ init python:
 
     def debug_builder_schedule_report():
         lines = [
-            "NPC schedule at week=%s time=%s clock=%02d:%02d:" % (week, time, hour, minute),
+            "NPC schedule at week=%s time=%s clock=%02d:%02d:" % (calendar_v2.week, calendar_v2.time_slot(), calendar_v2.hour, calendar_v2.minute),
             "",
             "Time slots:",
         ]
@@ -561,30 +389,25 @@ init python:
         lines.append("")
         lines.append("Resolved NPC locations:")
         seen = {}
-        keys = []
-        try:
-            keys.extend([str(k or "") for k in CurrentLoc.keys()])
-        except Exception:
-            pass
-        try:
-            keys.extend([str(k or "") for k in CurrentLoc.keys()])
-        except Exception:
-            pass
-        keys = sorted(set([k for k in keys if k]))
+        keys = people.ids()
         for key in keys:
             try:
-                loc = str(getLocation(key) or "")
+                loc = str(people.location(key) or "")
             except Exception:
                 loc = ""
             try:
-                entry = npc_schedule_resolve(key)
+                entry = people.schedule_entry(key)
             except Exception:
                 entry = None
             if entry is not None:
-                if getattr(entry, "start_hour", None) is not None and getattr(entry, "end_hour", None) is not None:
-                    interval_text = "hours=%02d-%02d" % (int(getattr(entry, "start_hour", 0) or 0), int(getattr(entry, "end_hour", 0) or 0))
-                else:
-                    interval_text = "slots=" + (",".join([str(row) for row in list(getattr(entry, "time_slots", []) or [])]) or "*")
+                start_minute = int(entry.start_minute or 0) % 1440
+                end_minute = int(entry.end_minute or 0) % 1440
+                interval_text = "clock=%02d:%02d-%02d:%02d" % (
+                    start_minute // 60,
+                    start_minute % 60,
+                    end_minute // 60,
+                    end_minute % 60,
+                )
                 entry_text = "entry=%s %s awake=%s talk=%s p=%s source=%s" % (
                     str(getattr(entry, "label", "") or ""),
                     interval_text,
@@ -602,15 +425,15 @@ init python:
         lines.append("Rooms with NPCs:")
         for loc in sorted(seen.keys()):
             try:
-                visible_ids = list(getNPCids(loc) or [])
+                visible_ids = list(people.ids_at(loc) or [])
             except Exception:
                 visible_ids = []
             lines.append("- %s: getNPCids=%s" % (loc, ", ".join(sorted(visible_ids or seen.get(loc, [])))))
         lines.append("")
         lines.append("Duplicate/source checks:")
         try:
-            missing_data = [k for k in keys if k in peopleInfo and k not in peopleData]
-            lines.append("- peopleInfo without peopleData: %s" % (", ".join(missing_data) if missing_data else "<none>"))
+            missing_data = [k for k in keys if people.get_data(k) is None]
+            lines.append("- runtime objects without definitions: %s" % (", ".join(missing_data) if missing_data else "<none>"))
         except Exception as ex:
             lines.append("- people source check error: %s" % ex)
         return debug_builder_escape_text("\n".join(lines))
@@ -633,7 +456,7 @@ init python:
             info = {}
         for slot_id in range(0, 8):
             row = dict(info.get(slot_id, {}) or {})
-            marker = " <==" if int(time or 0) == slot_id else ""
+            marker = " <==" if int(calendar_v2.time_slot()) == slot_id else ""
             rows.append(
                 "- %s: %s / %s, %s%s"
                 % (
@@ -650,24 +473,20 @@ init python:
         slot_i = max(0, min(7, int(slot_id or 0)))
         calendar_v2.hour = (6, 8, 11, 13, 16, 18, 21, 23)[slot_i]
         calendar_v2.minute = 0
-        try:
-            npc_daily_schedule_build_all(True)
-        except Exception:
-            pass
-        return int(time or 0)
+        return int(calendar_v2.time_slot())
 
     def debug_builder_schedule_room_report(room_code=""):
         room_key = str(room_code or "").strip()
-        room_obj = get_registered_room(room_key)
+        room_obj = rooms.get(room_key)
         lines = [
             "Schedule room probe: %s" % room_key,
-            "Time: week=%s slot=%s %02d:%02d" % (week, time, hour, minute),
+            "Time: week=%s slot=%s %02d:%02d" % (calendar_v2.week, calendar_v2.time_slot(), calendar_v2.hour, calendar_v2.minute),
         ]
         if room_obj is None:
             lines.append("Room is not registered.")
             return debug_builder_escape_text("\n".join(lines))
         try:
-            ids = list(getNPCids(room_key) or [])
+            ids = list(people.ids_at(room_key) or [])
         except Exception as ex:
             ids = []
             lines.append("getNPCids error: %s" % ex)
@@ -676,7 +495,7 @@ init python:
         lines.append("Rows:")
         for npc_id in sorted(set(ids)):
             try:
-                state = npc_schedule_state(npc_id)
+                state = people.schedule_state(npc_id)
             except Exception:
                 state = {}
             lines.append(
@@ -702,10 +521,6 @@ init python:
         return items
 
     def debug_builder_story_report():
-        try:
-            story_board_refresh()
-        except Exception:
-            pass
         lines = ["Projected story events now:"]
         try:
             lines.extend(list(story_board_projection_lines(20) or []))
@@ -745,7 +560,7 @@ init python:
 
     def debug_builder_room_menu_report(room_code=""):
         room_key = str(room_code or "").strip()
-        room_obj = get_registered_room(room_key)
+        room_obj = rooms.get(room_key)
         if room_obj is None:
             return "Room not registered: %s" % room_key
 
@@ -821,7 +636,7 @@ init python:
             pass
         rows = []
         try:
-            for location_key, action_map in sorted(dict(availEvents or {}).items()):
+            for location_key, action_map in sorted(dict(event_runtime.available or {}).items()):
                 for action_key, evt in sorted(dict(action_map or {}).items()):
                     if evt is None:
                         continue
@@ -830,7 +645,7 @@ init python:
             rows = []
         lines = [
             "Event condition probes:",
-            "Current location=%s week=%s time=%s day=%s" % (str(CurLoc or ""), week, time, dayspassed),
+            "Current location=%s week=%s time=%s day=%s" % (str(rooms.current_code or ""), calendar_v2.week, calendar_v2.time_slot(), calendar_v2.daysInGame),
             "",
             "Available events from availEvents[location][action]:",
         ]
@@ -854,7 +669,7 @@ init python:
         try:
             initStoryEventRuntime(True)
             findAvailableEvents(True)
-            for location_key, action_map in sorted(dict(availEvents or {}).items()):
+            for location_key, action_map in sorted(dict(event_runtime.available or {}).items()):
                 for action_key, evt in sorted(dict(action_map or {}).items()):
                     if evt is None:
                         continue
@@ -876,7 +691,7 @@ init python:
             pass
         evt = None
         try:
-            evt = dict(dict(availEvents or {}).get(loc, {}) or {}).get(action, None)
+            evt = dict(dict(event_runtime.available or {}).get(loc, {}) or {}).get(action, None)
         except Exception:
             evt = None
         if evt is None:
@@ -914,7 +729,7 @@ init python:
             "- do not add dispatch labels for one simple action.\n\n"
             "NPC schedules:\n"
             "- patch the owning NPC data schedule_entries, daily_schedule_template, or NPC/Schedules/<npc>.json.\n"
-            "- the debug schedule page shows the matched entry label, slots, awake/talkable, and priority.\n\n"
+            "- the debug schedule page shows the matched entry label, exact clock interval, awake/talkable, and priority.\n\n"
             "Story/event conditions:\n"
             "- patch the Event tuple/class definition or its condition function.\n"
             "- test through checkTriggers(location, action, 0), not direct label jumps.\n\n"
@@ -980,8 +795,8 @@ init python:
             "- Schedule owner file or JSON:",
             "- Expected weekday/time interval:",
             "- Expected location:",
-            "- Actual getLocation():",
-            "- Actual getNPCids(current_location):",
+            "- Actual people.location():",
+            "- Actual people.ids_at(current_location):",
             "- Expected awake/talkable:",
             "- Actual awake/talkable:",
             "- Expected HUD name:",
@@ -1047,15 +862,15 @@ init python:
         sections.append("")
         sections.append("## Current State")
         sections.append("")
-        sections.append("- CurLoc: `%s`" % str(CurLoc or ""))
-        sections.append("- Time slot: `%s`, clock `%02d:%02d`, weekday `%s`, day `%s`" % (str(time or ""), hour, minute, str(week or ""), str(dayspassed or "")))
+        sections.append("- rooms.current_code: `%s`" % str(rooms.current_code or ""))
+        sections.append("- Time slot: `%s`, clock `%02d:%02d`, weekday `%s`, day `%s`" % (str(calendar_v2.time_slot()), calendar_v2.hour, calendar_v2.minute, str(calendar_v2.week), str(calendar_v2.daysInGame)))
         sections.append("")
 
         sections.append("## Expected Vs Reality Checklist")
         sections.append("")
         sections.append("- Expected: room text and picture are owned by the Room object. Reality: inspect room reports below for missing/duplicated text or bad paths.")
         sections.append("- Expected: object actions are owned by room GameObjects/GameItems. Reality: inspect menu reports below for missing or redundant menu items.")
-        sections.append("- Expected: NPC presence resolves from getLocation()/getNPCids(current_location). Reality: inspect schedule report below.")
+        sections.append("- Expected: NPC presence resolves from people.location()/people.ids_at(current_location). Reality: inspect schedule report below.")
         sections.append("- Expected: events are exposed by Event/Thread checks and fired through checkTriggers. Reality: inspect event probes below.")
         sections.append("- Expected: image sequences resolve to loadable files. Reality: inspect media sequence report below.")
         sections.append("")
@@ -1146,8 +961,9 @@ init python:
             MenuItem("NPC schedules / visible NPCs", Jump("DebugBuilderSchedules")),
             MenuItem("Correction ownership notes", Jump("DebugBuilderCorrectionNotes")),
             MenuItem("Cards", Jump("DebugBuilderCards")),
+            MenuItem("Fight test room", Jump("DebugBuilderFightTests")),
             MenuItem("Random town events", Jump("DebugTownRandomEvents")),
-            MenuItem("Legacy tavern debug", Jump("DebugTestRoomLegacy")),
+            MenuItem("Tavern event debug", Jump("DebugTavernEventRoom")),
             MenuItem("Return to tavern", Jump("TavernMain")),
         ]
 
@@ -1175,22 +991,18 @@ init python:
             _dbg_set("time", 0)
             _dbg_set("week", 1)
             _dbg_set("day", 1)
-            ecount, nevents = _dbg_ensure_event_maps()
-
             # 2) build queue
             _dbg_build_queue(True)
 
             # 3) verify queue exists
-            assert isinstance(ecount, dict)
-            assert isinstance(nevents, dict)
-            assert int(ecount.get(_dbg_get("time", 0), 0)) > 0 or int(ecount.get(10, 0)) > 0
+            assert len(_dbg_queue_for_period(_dbg_get("time", 0))) > 0 or len(_dbg_queue_for_period(10)) > 0
 
             # 4) dispatch one event and verify decrement
-            b_t = int(ecount.get(_dbg_get("time", 0), 0))
-            b_m = int(ecount.get(10, 0))
+            b_t = len(_dbg_queue_for_period(_dbg_get("time", 0)))
+            b_m = len(_dbg_queue_for_period(10))
             _dbg_dispatch_unused = _dbg_get("DisplayTavernEventShort", lambda *_args, **_kwargs: "")(_dbg_get("time", 0), 1)
-            a_t = int(ecount.get(_dbg_get("time", 0), 0))
-            a_m = int(ecount.get(10, 0))
+            a_t = len(_dbg_queue_for_period(_dbg_get("time", 0)))
+            a_m = len(_dbg_queue_for_period(10))
             assert (a_t == b_t - 1) or (a_m == b_m - 1)
 
             q_today = _dbg_queue_for_period(_dbg_get("time", 0))
@@ -1256,16 +1068,14 @@ init python:
             if callable(ensure_jobs):
                 ensure_jobs(False)
 
-            ecount, _dbg_unused_events = _dbg_ensure_event_maps()
-
             t = result["time"]
-            result["before_cur"] = _dbg_i(ecount.get(t, 0), 0)
-            result["before_mandatory"] = _dbg_i(ecount.get(10, 0), 0)
+            result["before_cur"] = len(_dbg_queue_for_period(t))
+            result["before_mandatory"] = len(_dbg_queue_for_period(10))
 
             _dbg_build_queue(True)
 
-            result["after_build_cur"] = _dbg_i(ecount.get(t, 0), 0)
-            result["after_build_mandatory"] = _dbg_i(ecount.get(10, 0), 0)
+            result["after_build_cur"] = len(_dbg_queue_for_period(t))
+            result["after_build_mandatory"] = len(_dbg_queue_for_period(10))
             result["queue_today"] = _dbg_queue_for_period(t)
             result["queue_mandatory"] = _dbg_queue_for_period(10)
 
@@ -1299,7 +1109,7 @@ init python:
         t = _dbg_i(_dbg_get("time", 0), 0)
         snap = {
             "time": t,
-            "events_count": dict(_dbg_get("EventsCount", {})),
+            "event_counts": {period: len(_dbg_queue_for_period(period)) for period in (10, 0, 1, 2, 3, 4)},
             "today_queue": _dbg_queue_for_period(t),
             "mandatory_queue": _dbg_queue_for_period(10),
         }
@@ -1317,20 +1127,16 @@ init python:
         _dbg_set("time", 0)
         _dbg_set("week", 1)
         _dbg_set("day", 1)
-        ecount, nevents = _dbg_ensure_event_maps()
-
         _dbg_build_queue(True)
 
-        assert isinstance(ecount, dict)
-        assert isinstance(nevents, dict)
         t = _dbg_i(_dbg_get("time", 0), 0)
-        assert int(ecount.get(t, 0)) > 0 or int(ecount.get(10, 0)) > 0
+        assert len(_dbg_queue_for_period(t)) > 0 or len(_dbg_queue_for_period(10)) > 0
 
-        b_t = int(ecount.get(t, 0))
-        b_m = int(ecount.get(10, 0))
+        b_t = len(_dbg_queue_for_period(t))
+        b_m = len(_dbg_queue_for_period(10))
         _dbg_dispatch_unused = _dbg_get("DisplayTavernEventShort", lambda *_args, **_kwargs: "")(t, 1)
-        a_t = int(ecount.get(t, 0))
-        a_m = int(ecount.get(10, 0))
+        a_t = len(_dbg_queue_for_period(t))
+        a_m = len(_dbg_queue_for_period(10))
         assert (a_t == b_t - 1) or (a_m == b_m - 1)
 
         out = {
@@ -1353,20 +1159,20 @@ init python:
         return debug_tavern_events_unit_fn()
 
     def debug_builder_fight_stats_text():
-        dog_state = "with MC" if bool(dog.owned) and bool(dog.in_company) and dog.is_alive() else "not in fight"
+        dog_state = "with MC" if bool(dog.owned) and "dog" in player.combat.party and dog.is_alive() else "not in fight"
         lines = [
             "Fight debug setup.",
             "MC: health %d/100, energy %d/100, fun %d, sick days %d." % (int(player.condition.health or 0), int(player.condition.energy or 0), int(player.condition.fun or 0), int(player.condition.sick_days or 0)),
-            "World stats: reputation %d, notoriety %d, experience/exploration %d, tavern fame %d, money %d." % (int(reputation or 0), int(notoriety or 0), int(exploration or 0), int(player.economy.tavern_fame or 0), int(player.economy.money or 0)),
-            "Fight level: %d. Weapon: %s. Armor: %s." % (int(fight.level.get("you", 1) or 1), fight_player_weapon_name(), fight_player_armor_name()),
+            "World stats: reputation %d, notoriety %d, experience/exploration %d, tavern fame %d, money %d." % (int(player.stats.reputation or 0), int(player.stats.notoriety or 0), int(player.stats.exploration or 0), int(player.economy.tavern_fame or 0), int(player.economy.money or 0)),
+            "Fight level: %d. Weapon: %s. Armor: %s." % (fight_player_level(), fight_player_weapon_name(), fight_player_armor_name()),
             "Ammo/supplies: arrows %d, droplets %d, gunpowder %d, bandages %d, tea %d, potions %d, fire bombs %d." % (
-                int(player.combat.supply.get("arrows", 0) or 0),
-                int(player.combat.supply.get("droplets", 0) or 0),
-                int(player.combat.supply.get("gunpowder", 0) or 0),
-                int(player.combat.supply.get("bandage", 0) or 0),
-                int(player.combat.supply.get("energy_tea", 0) or 0),
-                int(player.combat.supply.get("healing_potion", 0) or 0),
-                int(player.combat.supply.get("fire_bomb", 0) or 0),
+                fight_supply_count("arrows"),
+                fight_supply_count("droplets"),
+                fight_supply_count("gunpowder"),
+                fight_supply_count("bandage"),
+                fight_supply_count("energy_tea"),
+                fight_supply_count("healing_potion"),
+                fight_supply_count("fire_bomb"),
             ),
             "Dog: %s." % dog_state,
         ]
@@ -1374,6 +1180,7 @@ init python:
 
 
 label debug_tavern_events_check:
+    $ renpy.dynamic("_dispatch", "_ev", "_idx", "_lines", "_msg", "_q_mand", "_q_today", "_r")
     python:
         _r = debug_tavern_events_probe(True)
         _lines = []
@@ -1412,6 +1219,7 @@ label debug_tavern_events_check:
 
 
 label debug_tavern_events_check_strict:
+    $ renpy.dynamic("_msg", "_r")
     python:
         try:
             _r = debug_tavern_events_strict_assert()
@@ -1431,6 +1239,7 @@ label debug_tavern_events_check_strict:
 
 
 label debug_tavern_events_build_only:
+    $ renpy.dynamic("_msg", "_r")
     python:
         _r = debug_tavern_events_probe(False)
         _msg = (
@@ -1446,6 +1255,7 @@ label debug_tavern_events_build_only:
 
 
 label debug_tavern_events_day_queue:
+    $ renpy.dynamic("_day", "_evs", "_msg", "_parts", "_period")
     python:
         _day = _dbg_ensure_queue_for_debug()
         _parts = []
@@ -1468,18 +1278,17 @@ label debug_tavern_events_day_queue:
 
 
 label debug_tavern_event_live_once:
+    $ renpy.dynamic("_a_cur", "_a_m", "_b_cur", "_b_m", "_msg", "_slot", "_event_txt")
     python:
         _dbg_ensure_queue_for_debug()
-        _ecount, _dbg_unused_events = _dbg_ensure_event_maps()
         _slot = _dbg_i(_dbg_get("time", 0), 0)
-        _b_cur = _dbg_i(_ecount.get(_slot, 0), 0)
-        _b_m = _dbg_i(_ecount.get(10, 0), 0)
-    call DisplayTavernEventShort(time, 1)
+        _b_cur = len(_dbg_queue_for_period(_slot))
+        _b_m = len(_dbg_queue_for_period(10))
+    call DisplayTavernEventShort(calendar_v2.time_slot(), 1)
     $ _event_txt = str(_return or "")
     python:
-        _ecount, _dbg_unused_events = _dbg_ensure_event_maps()
-        _a_cur = _dbg_i(_ecount.get(_slot, 0), 0)
-        _a_m = _dbg_i(_ecount.get(10, 0), 0)
+        _a_cur = len(_dbg_queue_for_period(_slot))
+        _a_m = len(_dbg_queue_for_period(10))
         _msg = (
             "LIVE event dispatch\n"
             + "slot=" + str(_slot) + " before(cur=" + str(_b_cur) + ", mandatory=" + str(_b_m) + ")\n"
@@ -1491,6 +1300,7 @@ label debug_tavern_event_live_once:
 
 
 label debug_shop_flow_check:
+    $ renpy.dynamic("_head", "_msg", "_r")
     python:
         _r = debug_shop_flow_probe()
         _head = "DEBUG shops check: " + ("PASS" if bool(_r.get("ok", False)) else "FAIL")
@@ -1500,18 +1310,18 @@ label debug_shop_flow_check:
 
 
 label debug_tavern_events_dispatch_once:
+    $ renpy.dynamic("_after_cur", "_after_m", "_before_cur", "_before_m", "_dispatcher", "_msg", "_text", "t")
     python:
         t = _dbg_i(_dbg_get("time", 0), 0)
-        _ecount, _dbg_unused_events = _dbg_ensure_event_maps()
-        _before_cur = _dbg_i(_ecount.get(t, 0), 0)
-        _before_m = _dbg_i(_ecount.get(10, 0), 0)
+        _before_cur = len(_dbg_queue_for_period(t))
+        _before_m = len(_dbg_queue_for_period(10))
         _dispatcher = _dbg_get("DisplayTavernEventShort", None)
         if callable(_dispatcher):
             _text = str(_dispatcher(t, 1) or "")
         else:
             _text = "DisplayTavernEventShort not found."
-        _after_cur = _dbg_i(_ecount.get(t, 0), 0)
-        _after_m = _dbg_i(_ecount.get(10, 0), 0)
+        _after_cur = len(_dbg_queue_for_period(t))
+        _after_m = len(_dbg_queue_for_period(10))
         _msg = (
             "DEBUG dispatch once\n"
             + "before: cur=" + str(_before_cur) + ", mandatory=" + str(_before_m) + "\n"
@@ -1522,7 +1332,7 @@ label debug_tavern_events_dispatch_once:
     return
 
 
-define DebugBuilderRoomObject = Room(
+define DebugBuilderRoomObjectDefinition = Room(
     code_name="DebugBuilderRoom",
     group_name=ROOM_GROUP_OTHER,
     display_name="Debug Builder",
@@ -1534,29 +1344,27 @@ define DebugBuilderRoomObject = Room(
 
 
 label DebugBuilderRoom:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ UI_mode = "scene"
-    $ UI_selected_char = ""
-    $ main_ui_overlay = ""
-    $ _layout_last_picture = DebugBuilderRoomObject.bg_picture
-    $ MainTxt = debug_builder_main_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Debug Builder"
-    $ current_action_content = None
-    $ current_action_items = debug_builder_main_items()
+    $ rooms.enter("DebugBuilderRoom")
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.selected_char = ""
+    $ main_ui_runtime.overlay = ""
+    $ scene_runtime.picture = rooms.get("DebugBuilderRoom").bg_picture
+    $ scene_runtime.text = debug_builder_main_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Debug Builder"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = debug_builder_main_items()
     while True:
         call screen main_ui
 
 
 label DebugBuilderPictures:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = debug_builder_picture_report()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Picture paths"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = debug_builder_picture_report()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Picture paths"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Player card", Call("DebugBuilderShowPicture", "images/general/player_card.jpg")),
         MenuItem("Amanda card", Call("DebugBuilderShowPicture", "images/amanda/amanda_card.jpg")),
         MenuItem("Melissa card", Call("DebugBuilderShowPicture", "images/melissa/melissa_card.jpg")),
@@ -1570,25 +1378,25 @@ label DebugBuilderPictures:
 
 
 label DebugBuilderShowPicture(picture_path=""):
+    $ renpy.dynamic("_debug_picture_path")
     $ _debug_picture_path = str(picture_path or "")
     if renpy.loadable(_debug_picture_path):
         call ShowImage("", "", _debug_picture_path)
-        $ _layout_last_picture = _debug_picture_path
-        $ MainTxt = "Showing picture:\n" + _debug_picture_path
+        $ scene_runtime.picture = _debug_picture_path
+        $ scene_runtime.text = "Showing picture:\n" + _debug_picture_path
     else:
-        $ MainTxt = "Missing picture:\n" + _debug_picture_path
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Missing picture:\n" + _debug_picture_path
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 
 label DebugBuilderSequences:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = debug_builder_media_sequence_report()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Picture sequences"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = debug_builder_media_sequence_report()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Picture sequences"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("MarketPlace sequence", Call("DebugBuilderShowSequence", "general", "", "LocMarketPlace", 4)),
         MenuItem("Artisans sequence", Call("DebugBuilderShowSequence", "general", "", "LocArtisansQuarter", 4)),
         MenuItem("StreetTavern sequence", Call("DebugBuilderShowSequence", "general", "", "LocStreetTavern", 2)),
@@ -1600,42 +1408,44 @@ label DebugBuilderSequences:
 
 
 label DebugBuilderShowSequence(folder1="", folder2="", image_name="", variants=0):
+    $ renpy.dynamic("_dbg_seq_folder1", "_dbg_seq_folder2", "_dbg_seq_name", "_dbg_seq_variants")
     $ _dbg_seq_folder1 = str(folder1 or "")
     $ _dbg_seq_folder2 = str(folder2 or "")
     $ _dbg_seq_name = str(image_name or "")
     $ _dbg_seq_variants = int(variants or 0)
     call ShowImageSeq(_dbg_seq_folder1, _dbg_seq_folder2, _dbg_seq_name, _dbg_seq_variants)
-    $ MainTxt = "Showing sequence:\nfolder1=%s\nfolder2=%s\nimage_name=%s\nvariants=%s" % (_dbg_seq_folder1, _dbg_seq_folder2, _dbg_seq_name, _dbg_seq_variants)
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = "Showing sequence:\nfolder1=%s\nfolder2=%s\nimage_name=%s\nvariants=%s" % (_dbg_seq_folder1, _dbg_seq_folder2, _dbg_seq_name, _dbg_seq_variants)
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 
 label DebugBuilderRooms:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = "Select a room to inspect its actual Room object output: picture, visible descriptions, visible objects, visible exits, and schedule-driven NPCs."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Rooms"
-    $ current_action_content = None
-    $ current_action_items = []
+    $ renpy.dynamic("_debug_room_key")
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = "Select a room to inspect its actual Room object output: picture, visible descriptions, visible objects, visible exits, and schedule-driven NPCs."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Rooms"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     python:
         for _debug_room_key in debug_builder_room_keys()[:24]:
-            current_action_items.append(MenuItem(_debug_room_key, Call("DebugBuilderInspectRoom", _debug_room_key)))
-        current_action_items.append(MenuItem("Back", Jump("DebugBuilderRoom")))
+            main_ui_runtime.action_items.append(MenuItem(_debug_room_key, Call("DebugBuilderInspectRoom", _debug_room_key)))
+        main_ui_runtime.action_items.append(MenuItem("Back", Jump("DebugBuilderRoom")))
     while True:
         call screen main_ui
 
 
 label DebugBuilderInspectRoom(room_code=""):
+    $ renpy.dynamic("_debug_room_code", "_debug_room_obj")
     $ _debug_room_code = str(room_code or "")
-    $ _debug_room_obj = get_registered_room(_debug_room_code)
-    $ MainTxt = debug_builder_room_report(_debug_room_code)
-    $ CurLocDesc = MainTxt
+    $ _debug_room_obj = rooms.get(_debug_room_code)
+    $ scene_runtime.text = debug_builder_room_report(_debug_room_code)
+    $ scene_runtime.location_text = scene_runtime.text
     if _debug_room_obj is not None and renpy.loadable(str(getattr(_debug_room_obj, "bg_picture", "") or "")):
-        $ _layout_last_picture = str(getattr(_debug_room_obj, "bg_picture", "") or "")
-    $ current_action_title = "Room: " + _debug_room_code
-    $ current_action_content = None
-    $ current_action_items = [
+        $ scene_runtime.picture = str(getattr(_debug_room_obj, "bg_picture", "") or "")
+    $ main_ui_runtime.action_title = "Room: " + _debug_room_code
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Show room picture", Call("DebugBuilderShowRoomPicture", _debug_room_code)),
         MenuItem("Jump to room", Jump(_debug_room_code)),
         MenuItem("Back to rooms", Jump("DebugBuilderRooms")),
@@ -1645,41 +1455,43 @@ label DebugBuilderInspectRoom(room_code=""):
 
 
 label DebugBuilderShowRoomPicture(room_code=""):
-    $ _debug_room_obj = get_registered_room(str(room_code or ""))
+    $ renpy.dynamic("_debug_room_obj", "_debug_room_pic")
+    $ _debug_room_obj = rooms.get(str(room_code or ""))
     $ _debug_room_pic = str(getattr(_debug_room_obj, "bg_picture", "") or "") if _debug_room_obj is not None else ""
     if renpy.loadable(_debug_room_pic):
         call ShowImage("", "", _debug_room_pic)
-        $ _layout_last_picture = _debug_room_pic
-        $ MainTxt = "Showing room picture:\n" + _debug_room_pic
+        $ scene_runtime.picture = _debug_room_pic
+        $ scene_runtime.text = "Showing room picture:\n" + _debug_room_pic
     else:
-        $ MainTxt = "Room picture missing:\n" + _debug_room_pic
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Room picture missing:\n" + _debug_room_pic
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 
 label DebugBuilderMenuRooms:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = "Select a room to inspect generated menu items, object actions, room actions, and exits."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Room menu probes"
-    $ current_action_content = None
-    $ current_action_items = []
+    $ renpy.dynamic("_debug_room_key")
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = "Select a room to inspect generated menu items, object actions, room actions, and exits."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Room menu probes"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     python:
         for _debug_room_key in debug_builder_room_keys()[:24]:
-            current_action_items.append(MenuItem(_debug_room_key, Call("DebugBuilderMenuRoom", _debug_room_key)))
-        current_action_items.append(MenuItem("Back", Jump("DebugBuilderRoom")))
+            main_ui_runtime.action_items.append(MenuItem(_debug_room_key, Call("DebugBuilderMenuRoom", _debug_room_key)))
+        main_ui_runtime.action_items.append(MenuItem("Back", Jump("DebugBuilderRoom")))
     while True:
         call screen main_ui
 
 
 label DebugBuilderMenuRoom(room_code=""):
+    $ renpy.dynamic("_debug_room_code")
     $ _debug_room_code = str(room_code or "")
-    $ MainTxt = debug_builder_room_menu_report(_debug_room_code)
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Menu: " + _debug_room_code
-    $ current_action_content = None
-    $ current_action_items = [
+    $ scene_runtime.text = debug_builder_room_menu_report(_debug_room_code)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Menu: " + _debug_room_code
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Jump to room", Jump(_debug_room_code)),
         MenuItem("Back to menu probes", Jump("DebugBuilderMenuRooms")),
         MenuItem("Back to builder", Jump("DebugBuilderRoom")),
@@ -1688,14 +1500,13 @@ label DebugBuilderMenuRoom(room_code=""):
 
 
 label DebugBuilderStoryEvents:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = debug_builder_story_report()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Story events"
-    $ current_action_content = None
-    $ current_action_items = [
-        MenuItem("Open story board overlay", [Function(story_board_refresh), SetVariable("main_ui_overlay", "story")]),
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = debug_builder_story_report()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Story events"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
+        MenuItem("Open story board overlay", SetField(main_ui_runtime, "overlay", "story")),
         MenuItem("Refresh event checks", Jump("DebugBuilderStoryEvents")),
         MenuItem("Back", Jump("DebugBuilderRoom")),
     ]
@@ -1704,15 +1515,14 @@ label DebugBuilderStoryEvents:
 
 
 label DebugBuilderEventProbes:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = debug_builder_event_probe_report()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Event condition probes"
-    $ current_action_content = None
-    $ current_action_items = debug_builder_event_probe_items() + [
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = debug_builder_event_probe_report()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Event condition probes"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = debug_builder_event_probe_items() + [
         MenuItem("Refresh event checks", Jump("DebugBuilderEventProbes")),
-        MenuItem("Open story board overlay", [Function(story_board_refresh), SetVariable("main_ui_overlay", "story")]),
+        MenuItem("Open story board overlay", SetField(main_ui_runtime, "overlay", "story")),
         MenuItem("Back", Jump("DebugBuilderRoom")),
     ]
     while True:
@@ -1720,13 +1530,14 @@ label DebugBuilderEventProbes:
 
 
 label DebugBuilderEventProbe(location_key="", action_key=""):
+    $ renpy.dynamic("_debug_event_location", "_debug_event_action")
     $ _debug_event_location = str(location_key or "")
     $ _debug_event_action = str(action_key or "")
-    $ MainTxt = debug_builder_event_condition_report(_debug_event_location, _debug_event_action)
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Event: " + _debug_event_location + " / " + _debug_event_action
-    $ current_action_content = None
-    $ current_action_items = [
+    $ scene_runtime.text = debug_builder_event_condition_report(_debug_event_location, _debug_event_action)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Event: " + _debug_event_location + " / " + _debug_event_action
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Fire through checkTriggers", Call("DebugBuilderFireEvent", _debug_event_location, _debug_event_action)),
         MenuItem("Back to event probes", Jump("DebugBuilderEventProbes")),
         MenuItem("Back to builder", Jump("DebugBuilderRoom")),
@@ -1735,24 +1546,23 @@ label DebugBuilderEventProbe(location_key="", action_key=""):
 
 
 label DebugBuilderFireEvent(location_key="", action_key=""):
+    $ renpy.dynamic("_debug_event_location", "_debug_event_action")
     $ _debug_event_location = str(location_key or "")
     $ _debug_event_action = str(action_key or "")
     call checkTriggers(_debug_event_location, _debug_event_action, 0)
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = "Returned from checkTriggers(%s, %s, 0)." % (_debug_event_location, _debug_event_action)
-    $ CurLocDesc = MainTxt
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = "Returned from checkTriggers(%s, %s, 0)." % (_debug_event_location, _debug_event_action)
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 
 label DebugBuilderSchedules:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = debug_builder_schedule_report()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "NPC schedules"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = debug_builder_schedule_report()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "NPC schedules"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("06:00 Early morning", [Function(debug_builder_set_time_slot, 0), Jump("DebugBuilderSchedules")]),
         MenuItem("08:00 Morning", [Function(debug_builder_set_time_slot, 1), Jump("DebugBuilderSchedules")]),
         MenuItem("11:00 Noon", [Function(debug_builder_set_time_slot, 2), Jump("DebugBuilderSchedules")]),
@@ -1769,25 +1579,23 @@ label DebugBuilderSchedules:
 
 
 label DebugBuilderScheduleRooms:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = "Choose a room. The probe lists NPC ids whose getLocation() resolves to that room for the current calendar time."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Schedule room probes"
-    $ current_action_content = None
-    $ current_action_items = debug_builder_schedule_room_items() + [MenuItem("Back", Jump("DebugBuilderSchedules"))]
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = "Choose a room. The probe lists NPC ids whose people.location() resolves to that room for the current calendar time."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Schedule room probes"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = debug_builder_schedule_room_items() + [MenuItem("Back", Jump("DebugBuilderSchedules"))]
     while True:
         call screen main_ui
 
 
 label DebugBuilderScheduleRoom(room_code=""):
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = debug_builder_schedule_room_report(room_code)
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Schedule: " + str(room_code or "")
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = debug_builder_schedule_room_report(room_code)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Schedule: " + str(room_code or "")
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Jump to room", Jump(str(room_code or ""))),
         MenuItem("Back to probes", Jump("DebugBuilderScheduleRooms")),
         MenuItem("Back to schedules", Jump("DebugBuilderSchedules")),
@@ -1796,13 +1604,12 @@ label DebugBuilderScheduleRoom(room_code=""):
 
 
 label DebugBuilderCorrectionNotes:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = debug_builder_correction_notes()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Correction notes"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = debug_builder_correction_notes()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Correction notes"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Write repair notes document", Jump("DebugBuilderWriteRepairNotes")),
         MenuItem("Preview full repair document", Jump("DebugBuilderRepairDocumentPreview")),
         MenuItem("Back", Jump("DebugBuilderRoom")),
@@ -1812,13 +1619,12 @@ label DebugBuilderCorrectionNotes:
 
 
 label DebugBuilderRepairDocumentPreview:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = debug_builder_repair_document_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Repair notes preview"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = debug_builder_repair_document_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Repair notes preview"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Write document", Jump("DebugBuilderWriteRepairNotes")),
         MenuItem("Back to notes", Jump("DebugBuilderCorrectionNotes")),
         MenuItem("Back to builder", Jump("DebugBuilderRoom")),
@@ -1828,14 +1634,14 @@ label DebugBuilderRepairDocumentPreview:
 
 
 label DebugBuilderWriteRepairNotes:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ DebugBuilderRepairNotesPath = debug_builder_write_repair_document()
-    $ MainTxt = "Repair notes document written:\n" + str(DebugBuilderRepairNotesPath or "")
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Repair notes written"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ renpy.dynamic("_debug_builder_repair_notes_path")
+    $ rooms.enter("DebugBuilderRoom")
+    $ _debug_builder_repair_notes_path = debug_builder_write_repair_document()
+    $ scene_runtime.text = "Repair notes document written:\n" + str(_debug_builder_repair_notes_path or "")
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Repair notes written"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Preview document", Jump("DebugBuilderRepairDocumentPreview")),
         MenuItem("Back to notes", Jump("DebugBuilderCorrectionNotes")),
         MenuItem("Back to builder", Jump("DebugBuilderRoom")),
@@ -1845,13 +1651,12 @@ label DebugBuilderWriteRepairNotes:
 
 
 label DebugBuilderCards:
-    $ CurLoc = "DebugBuilderRoom"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ MainTxt = "Open card panels and verify that stats and _card pictures come from the current runtime state."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Cards"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ scene_runtime.text = "Open card panels and verify that stats and _card pictures come from the current runtime state."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Cards"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Player", Function(show_player_card_main_ui_state)),
         MenuItem("Amanda", Function(show_girl_card_main_ui_state, "amanda")),
         MenuItem("Melissa", Function(show_girl_card_main_ui_state, "melissa")),
@@ -1866,14 +1671,13 @@ label DebugBuilderCards:
 
 
 label DebugBuilderFightTests:
-    $ CurLoc = "DebugBuilderFightTests"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ UI_mode = "scene"
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Fight tests"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ main_ui_runtime.mode = "scene"
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Fight tests"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Fight setup", Jump("DebugFightSetupMenu")),
         MenuItem("Launch fights", Jump("DebugFightLaunchMenu")),
         MenuItem("Back", Jump("DebugBuilderRoom")),
@@ -1883,22 +1687,22 @@ label DebugBuilderFightTests:
 
 
 label DebugFightSetupMenu:
-    $ CurLoc = "DebugBuilderFightTests"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ UI_mode = "scene"
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Fight setup"
-    $ current_action_content = None
+    $ renpy.dynamic("_debug_dog", "_debug_dog_state", "_debug_supply_caption")
+    $ rooms.enter("DebugBuilderRoom")
+    $ main_ui_runtime.mode = "scene"
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Fight setup"
+    $ main_ui_runtime.action_content = None
     $ _debug_dog = dog
-    $ _debug_dog_state = "with MC" if bool(_debug_dog.owned) and bool(_debug_dog.in_company) and _debug_dog.is_alive() else "none"
-    $ _debug_supply_caption = "Supplies: arrows %d / shot %d / bandage %d / tea %d / potion %d / fire %d / bees %d" % (int(player.combat.supply.get("arrows", 0) or 0), int(player.combat.supply.get("droplets", 0) or 0), int(player.combat.supply.get("bandage", 0) or 0), int(player.combat.supply.get("energy_tea", 0) or 0), int(player.combat.supply.get("healing_potion", 0) or 0), int(player.combat.supply.get("fire_bomb", 0) or 0), int(player.combat.supply.get("bees_bomb", 0) or 0))
-    $ current_action_items = [
+    $ _debug_dog_state = "with MC" if bool(_debug_dog.owned) and "dog" in player.combat.party and _debug_dog.is_alive() else "none"
+    $ _debug_supply_caption = "Supplies: arrows %d / shot %d / bandage %d / tea %d / potion %d / fire %d / bees %d" % (fight_supply_count("arrows"), fight_supply_count("droplets"), fight_supply_count("bandage"), fight_supply_count("energy_tea"), fight_supply_count("healing_potion"), fight_supply_count("fire_bomb"), fight_supply_count("bees_bomb"))
+    $ main_ui_runtime.action_items = [
         MenuItem("Launch fights", Jump("DebugFightLaunchMenu")),
         MenuItem("Weapon: " + fight_player_weapon_name(), Jump("DebugFightCycleWeapon")),
         MenuItem("Armor: " + fight_player_armor_name(), Jump("DebugFightCycleArmor")),
-        MenuItem("Health: %d/100" % int(health or 0), Jump("DebugFightCycleHealth")),
-        MenuItem("Experience: %d / level %d" % (int(exploration or 0), int(FightLevel.get("you", 1) or 1)), Jump("DebugFightCycleExperience")),
+        MenuItem("Health: %d/100" % int(player.condition.health or 0), Jump("DebugFightCycleHealth")),
+        MenuItem("Experience: %d / level %d" % (int(player.stats.exploration or 0), int(fight_player_level())), Jump("DebugFightCycleExperience")),
         MenuItem(_debug_supply_caption, Jump("DebugFightGrantSupplies")),
         MenuItem("Dog: " + str(_debug_dog_state), Jump("DebugFightCycleDog")),
         MenuItem("Back", Jump("DebugBuilderFightTests")),
@@ -1908,14 +1712,13 @@ label DebugFightSetupMenu:
 
 
 label DebugFightStatsMenu:
-    $ CurLoc = "DebugBuilderFightTests"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ UI_mode = "scene"
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Fight stats"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ main_ui_runtime.mode = "scene"
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Fight stats"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Renew MC stats", Jump("DebugFightRenewMCStats")),
         MenuItem("Experience +50", Jump("DebugFightExperienceUp")),
         MenuItem("Experience -50", Jump("DebugFightExperienceDown")),
@@ -1927,14 +1730,13 @@ label DebugFightStatsMenu:
 
 
 label DebugFightWeaponsMenu:
-    $ CurLoc = "DebugBuilderFightTests"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ UI_mode = "scene"
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Fight weapons"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ main_ui_runtime.mode = "scene"
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Fight weapons"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Weapon: fists", Jump("DebugFightWeaponFists")),
         MenuItem("Weapon: old axe", Jump("DebugFightWeaponAxe")),
         MenuItem("Weapon: rusty rifle", Jump("DebugFightWeaponRifle")),
@@ -1945,14 +1747,13 @@ label DebugFightWeaponsMenu:
 
 
 label DebugFightArmorMenu:
-    $ CurLoc = "DebugBuilderFightTests"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ UI_mode = "scene"
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Fight armor"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ main_ui_runtime.mode = "scene"
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Fight armor"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Armor: none", Jump("DebugFightArmorNone")),
         MenuItem("Armor: cuirass", Jump("DebugFightArmorCuirass")),
         MenuItem("Back", Jump("DebugBuilderFightTests")),
@@ -1962,14 +1763,13 @@ label DebugFightArmorMenu:
 
 
 label DebugFightSupportMenu:
-    $ CurLoc = "DebugBuilderFightTests"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ UI_mode = "scene"
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Fight support"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ main_ui_runtime.mode = "scene"
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Fight support"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Grant supplies", Jump("DebugFightGrantSupplies")),
         MenuItem("Dog with MC", Jump("DebugFightDogOn")),
         MenuItem("No dog in fight", Jump("DebugFightDogOff")),
@@ -1980,15 +1780,20 @@ label DebugFightSupportMenu:
 
 
 label DebugFightLaunchMenu:
-    $ CurLoc = "DebugBuilderFightTests"
-    $ CurrentRoom = DebugBuilderRoomObject
-    $ UI_mode = "scene"
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Launch fights"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("DebugBuilderRoom")
+    $ main_ui_runtime.mode = "scene"
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Launch fights"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Street crooks", Jump("DebugFightStreetCrooks")),
+        MenuItem("Wolf", Call("DebugFightEnemy", "wolf")),
+        MenuItem("White wolf", Call("DebugFightEnemy", "white_wolf")),
+        MenuItem("Boar", Call("DebugFightEnemy", "boar")),
+        MenuItem("Brown bear", Call("DebugFightEnemy", "brown_bear")),
+        MenuItem("Giant grizzly", Call("DebugFightEnemy", "giant_grizzly")),
+        MenuItem("Street thief", Call("DebugFightEnemy", "street_thief")),
         MenuItem("Random forest hunt roll", Jump("DebugFightRandomForestHunt")),
         MenuItem("Patrol guards", Jump("DebugFightPatrolGuards")),
         MenuItem("Back", Jump("DebugBuilderFightTests")),
@@ -1997,46 +1802,51 @@ label DebugFightLaunchMenu:
         call screen main_ui
 
 
+label DebugFightEnemy(enemy_id="wolf"):
+    $ fight_begin(enemy_id, 1, "DebugBuilderFightTests", fight_enemy_image(enemy_id), "Debug fight: " + str(enemy_id))
+    call FightLoop
+    return
+
 
 label DebugFightRenewMCStats:
-    $ health = 100
-    $ energy = 100
-    $ fun = 100
+    $ player.set_stat("health", 100)
+    $ player.set_stat("energy", 100)
+    $ player.set_stat("fun", 100)
     $ player.condition.sick_days = 0
     $ player.condition.forest_ban_until_day = 0
-    $ exploration = max(180, int(exploration or 0))
-    $ notoriety = 0
-    $ reputation = max(20, int(reputation or 0))
+    $ player.set_stat("exploration", max(180, int(player.stats.exploration or 0)))
+    $ player.set_stat("notoriety", 0)
+    $ player.set_stat("reputation", max(20, int(player.stats.reputation or 0)))
     $ player.economy.tavern_fame = int(player.economy.tavern_fame or 0)
-    $ money = max(500, int(money or 0))
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ player.set_money(max(500, int(player.economy.money or 0)))
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
 label DebugFightCycleHealth:
-    if int(health or 0) >= 100:
-        $ health = 60
-    elif int(health or 0) >= 60:
-        $ health = 25
-    elif int(health or 0) >= 25:
-        $ health = 5
+    if int(player.condition.health or 0) >= 100:
+        $ player.set_stat("health", 60)
+    elif int(player.condition.health or 0) >= 60:
+        $ player.set_stat("health", 25)
+    elif int(player.condition.health or 0) >= 25:
+        $ player.set_stat("health", 5)
     else:
-        $ health = 100
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+        $ player.set_stat("health", 100)
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
 label DebugFightCycleEnergy:
-    if int(energy or 0) >= 100:
-        $ energy = 50
-    elif int(energy or 0) >= 50:
-        $ energy = 10
+    if int(player.condition.energy or 0) >= 100:
+        $ player.set_stat("energy", 50)
+    elif int(player.condition.energy or 0) >= 50:
+        $ player.set_stat("energy", 10)
     else:
-        $ energy = 100
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+        $ player.set_stat("energy", 100)
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
@@ -2048,9 +1858,9 @@ label DebugFightCycleExperience:
     elif int(player.stats.exploration or 0) < 300:
         $ player.set_stat("exploration", 300)
     else:
-        $ exploration = 0
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+        $ player.set_stat("exploration", 0)
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
@@ -2058,21 +1868,19 @@ label DebugFightCycleWeapon:
     if str(player.equipment.weapon or "").strip() == "":
         $ player.add_item("old_axe_001", 1)
         $ player.equipment.weapon = "old_axe_001"
-        $ RustyHunterRifleLoadedAmmo = ""
-    $ fight_sync_loaded_weapon_state_from_inventory()
+        $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
     elif str(player.equipment.weapon or "").strip() == "old_axe_001":
         $ player.add_item("rusty_hunter_rifle_001", 1)
         $ player.add_item("arrows_001", 10)
         $ player.add_item("droplets_001", 8)
         $ player.add_item("gunpowder_001", 8)
         $ player.equipment.weapon = "rusty_hunter_rifle_001"
-        $ RustyHunterRifleLoadedAmmo = "arrows"
+        $ rusty_hunter_rifle_item().state["loaded_ammo"] = "arrows"
     else:
         $ player.equipment.weapon = ""
-        $ RustyHunterRifleLoadedAmmo = ""
-    $ fight_sync_loaded_weapon_state_from_inventory()
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+        $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
@@ -2082,82 +1890,80 @@ label DebugFightCycleArmor:
     else:
         $ player.add_item("old_leather_cuirass_001", 1)
         $ player.equipment.armor = "old_leather_cuirass_001"
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
 label DebugFightCycleLoadedAmmo:
     $ player.add_item("rusty_hunter_rifle_001", 1)
     $ player.equipment.weapon = "rusty_hunter_rifle_001"
-    if str(RustyHunterRifleLoadedAmmo or "").strip() == "":
+    if not rusty_hunter_rifle_loaded_ammo():
         $ player.add_item("arrows_001", 10)
-        $ RustyHunterRifleLoadedAmmo = "arrows"
-    elif str(RustyHunterRifleLoadedAmmo or "").strip() == "arrows":
+        $ rusty_hunter_rifle_item().state["loaded_ammo"] = "arrows"
+    elif rusty_hunter_rifle_loaded_ammo() == "arrows":
         $ player.add_item("droplets_001", 8)
         $ player.add_item("gunpowder_001", 8)
-        $ RustyHunterRifleLoadedAmmo = "droplets"
+        $ rusty_hunter_rifle_item().state["loaded_ammo"] = "droplets"
     else:
-        $ RustyHunterRifleLoadedAmmo = ""
-    $ fight_sync_loaded_weapon_state_from_inventory()
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+        $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
 label DebugFightCycleDog:
+    $ renpy.dynamic("_debug_dog")
     $ _debug_dog = dog
-    if bool(_debug_dog.owned) and bool(_debug_dog.in_company) and _debug_dog.is_alive():
-        $ _debug_dog.in_company = False
+    if bool(_debug_dog.owned) and "dog" in player.combat.party and _debug_dog.is_alive():
+        $ player.remove_party_member("dog")
     else:
         $ _debug_dog.met = True
         $ _debug_dog.owned = True
-        $ _debug_dog.in_company = True
+        $ player.add_party_member("dog")
         $ _debug_dog.health = max(int(getattr(_debug_dog, "health", 0) or 0), int(getattr(_debug_dog, "max_health", 40) or 40))
         $ _debug_dog.loyalty = max(int(getattr(_debug_dog, "loyalty", 0) or 0), int(getattr(_debug_dog, "max_loyalty", 40) or 40))
         $ _debug_dog.level = max(2, int(getattr(_debug_dog, "level", 0) or 0))
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
 label DebugFightExperienceUp:
-    $ exploration = max(0, int(exploration or 0) + 50)
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ player.change_stat("exploration", 50)
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightStatsMenu
 
 
 label DebugFightExperienceDown:
-    $ exploration = max(0, int(exploration or 0) - 50)
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ player.change_stat("exploration", -50)
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightStatsMenu
 
 
 label DebugFightExperienceReset:
-    $ exploration = 0
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ player.set_stat("exploration", 0)
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightStatsMenu
 
 
 label DebugFightWeaponFists:
     $ player.equipment.weapon = ""
-    $ RustyHunterRifleLoadedAmmo = ""
-    $ fight_sync_loaded_weapon_state_from_inventory()
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightWeaponsMenu
 
 
 label DebugFightWeaponAxe:
     $ player.add_item("old_axe_001", 1)
     $ player.equipment.weapon = "old_axe_001"
-    $ RustyHunterRifleLoadedAmmo = ""
-    $ fight_sync_loaded_weapon_state_from_inventory()
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightWeaponsMenu
 
 
@@ -2167,25 +1973,24 @@ label DebugFightWeaponRifle:
     $ player.add_item("droplets_001", 8)
     $ player.add_item("gunpowder_001", 8)
     $ player.equipment.weapon = "rusty_hunter_rifle_001"
-    $ RustyHunterRifleLoadedAmmo = ""
-    $ fight_sync_loaded_weapon_state_from_inventory()
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightWeaponsMenu
 
 
 label DebugFightArmorNone:
     $ player.equipment.armor = ""
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightArmorMenu
 
 
 label DebugFightArmorCuirass:
     $ player.add_item("old_leather_cuirass_001", 1)
     $ player.equipment.armor = "old_leather_cuirass_001"
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightArmorMenu
 
 
@@ -2197,32 +2002,32 @@ label DebugFightGrantSupplies:
     $ player.add_item("energy_tea_001", 3)
     $ player.add_item("healing_potion_001", 3)
     $ player.add_item("fire_bomb_001", 3)
-    $ PlayerFightSupply["bees_bomb"] = 3
-    $ fight_sync_supply_from_inventory()
-    $ PlayerFightSupply["bees_bomb"] = 3
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ player.combat.special_supply["bees_bomb"] = 3
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
 label DebugFightDogOn:
+    $ renpy.dynamic("_debug_dog")
     $ _debug_dog = dog
     $ _debug_dog.met = True
     $ _debug_dog.owned = True
-    $ _debug_dog.in_company = True
+    $ player.add_party_member("dog")
     $ _debug_dog.health = max(int(getattr(_debug_dog, "health", 0) or 0), int(getattr(_debug_dog, "max_health", 40) or 40))
     $ _debug_dog.loyalty = max(int(getattr(_debug_dog, "loyalty", 0) or 0), int(getattr(_debug_dog, "max_loyalty", 40) or 40))
     $ _debug_dog.level = max(2, int(getattr(_debug_dog, "level", 0) or 0))
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
 label DebugFightDogOff:
+    $ renpy.dynamic("_debug_dog")
     $ _debug_dog = dog
-    $ _debug_dog.in_company = False
-    $ MainTxt = debug_builder_fight_stats_text()
-    $ CurLocDesc = MainTxt
+    $ player.remove_party_member("dog")
+    $ scene_runtime.text = debug_builder_fight_stats_text()
+    $ scene_runtime.location_text = scene_runtime.text
     jump DebugFightSetupMenu
 
 
@@ -2233,6 +2038,7 @@ label DebugFightStreetCrooks:
 
 
 label DebugFightRandomForestHunt:
+    $ renpy.dynamic("_debug_hunt_roll", "_debug_hunt_enemy_id", "_debug_hunt_enemy_count", "_debug_hunt_intro")
     $ _debug_hunt_roll = fight_roll_hunt_enemy("Forest")
     $ _debug_hunt_enemy_id = str(_debug_hunt_roll.get("enemy_id", "wolf") or "wolf")
     $ _debug_hunt_enemy_count = max(1, int(_debug_hunt_roll.get("enemy_count", 1) or 1))
@@ -2248,45 +2054,22 @@ label DebugFightPatrolGuards:
     jump DebugBuilderFightTests
 
 
-label DebugTestRoom:
-    jump DebugBuilderRoom
-
-
-label RoomDebugBuilder:
-    jump DebugBuilderRoom
-
-
-label DebugRoomBuilder:
-    jump DebugBuilderRoom
-
-
-label VisualDebugRoom:
-    jump DebugBuilderRoom
-
-
-label debug_builder_room:
-    jump DebugBuilderRoom
-
-
-label debug_room_builder:
-    jump DebugBuilderRoom
-
-
-label DebugTestRoomLegacy:
-    $ CurLoc = "DebugTestRoom"
+label DebugTavernEventRoom:
+    $ renpy.dynamic("UI_char_dropdown", "_dbg_desc")
+    $ rooms.enter("DebugTestRoom")
     python:
         _dbg_desc = "Тестовая комната. Здесь можно проверять таверн-события, показывать картинки и запускать диалоги."
-        MainTxt = _dbg_desc
-        CurLocDesc = _dbg_desc
-        UI_mode = "scene"
-        UI_selected_char = ""
+        scene_runtime.text = _dbg_desc
+        scene_runtime.location_text = _dbg_desc
+        main_ui_runtime.mode = "scene"
+        main_ui_runtime.selected_char = ""
         UI_char_dropdown = False
 
     # Try to present a known safe image for visual checks.
     if renpy.loadable("images/General/LocStreetTavern1.jpg"):
-        $ _layout_last_picture = "images/General/LocStreetTavern1.jpg"
+        $ scene_runtime.picture = "images/General/LocStreetTavern1.jpg"
     elif renpy.loadable("images/general/LocStreetTavern1.jpg"):
-        $ _layout_last_picture = "images/general/LocStreetTavern1.jpg"
+        $ scene_runtime.picture = "images/general/LocStreetTavern1.jpg"
     else:
         show bg TavernMain at master
 
@@ -2354,42 +2137,23 @@ label DebugTestRoomLegacy:
                 jump TavernMain
 
 
-label debug_test_room:
-    jump DebugBuilderRoom
-
-
-label debug_test_room:
-    jump DebugBuilderRoom
-
-
-label debug_test_room:
-    jump DebugBuilderRoom
-
-
 label debug_tavern_events_snapshot:
+    $ renpy.dynamic("_return", "_snapshot", "_t", "period")
     python:
         # Deterministic setup for console/manual verification.
         procedural_seed("procedural:Utilities/General/Common/DebugTools.rpy:procedural_seed:2309:4")
         _dbg_set("time", 0)
         _dbg_set("week", 1)
         _dbg_set("day", 1)
-        _dbg_ensure_event_maps()
-
-        _dbg_ensure_event_maps()
-
-        _dbg_ensure_event_maps()
-
     call CreateTavernEvents
 
     python:
         _t = _dbg_i(_dbg_get("time", 0), 0)
         _snapshot = {
             "time": _t,
-            "events_count": dict(_dbg_get("EventsCount", {})),
+            "event_counts": {period: len(_dbg_queue_for_period(period)) for period in (10, 0, 1, 2, 3, 4)},
             "today_queue": _dbg_queue_for_period(_t),
             "mandatory_queue": _dbg_queue_for_period(10),
         }
         _return = _snapshot
     return
-
-

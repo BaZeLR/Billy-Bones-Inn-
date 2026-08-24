@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 6 python:
-    ForestSpringRoom = Room(
+    ForestSpringRoomDefinition = Room(
         code_name="ForestSpring",
         group_name=ROOM_GROUP_FOREST,
         display_name="Родник",
@@ -31,30 +31,25 @@ init 6 python:
 
 
 label ForestSpring:
-    $ CurrentRoom = ForestSpringRoom
-    $ CurLoc = "ForestSpring"
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    else:
-        $ _layout_last_picture = ""
-    $ MainTxt = ForestSpringRoom.descriptions[0].text
-    if str(getLocation("clara") or "") == "ForestSpring":
-        $ _clara_forest_picture = clara_forest_picture("ForestSpring")
+    $ renpy.dynamic("_clara_forest_picture", "_forest_spawned")
+    $ rooms.enter("ForestSpring")
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    $ scene_runtime.text = rooms.get("ForestSpring").descriptions[0].text
+    if str(people.location("clara") or "") == "ForestSpring":
+        $ _clara_forest_picture = Clara.forest_picture("ForestSpring")
         if str(_clara_forest_picture or "").strip():
-            $ _layout_last_picture = _clara_forest_picture
-        $ MainTxt = MainTxt + "\n\nУ родника вы замечаете Клариссу, которая явно наслаждается прохладой и тишиной этого места."
-    $ CurLocDesc = MainTxt
-    $ forest_room_set_saved_text(MainTxt, CurrentRoom)
-    $ _forest_spawned = forest_room_spawn(ForestSpringRoom)
+            $ scene_runtime.picture = _clara_forest_picture
+        $ scene_runtime.text = scene_runtime.text + "\n\nУ родника вы замечаете Клариссу, которая явно наслаждается прохладой и тишиной этого места."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ forest_room_set_saved_text(scene_runtime.text, rooms.current)
+    $ _forest_spawned = forest_room_spawn(rooms.get("ForestSpring"))
     if len(_forest_spawned) > 0:
-        $ MainTxt = MainTxt + "\n\nУ воды и под кустами можно кое-что найти."
-        $ CurLocDesc = MainTxt
-        $ forest_room_set_saved_text(MainTxt, CurrentRoom)
-    $ current_action_title = "Родник"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_action_items = forest_subroom_action_items(CurrentRoom)
-    call screen main_ui
-    return
-
+        $ scene_runtime.text = scene_runtime.text + "\n\nУ воды и под кустами можно кое-что найти."
+        $ scene_runtime.location_text = scene_runtime.text
+        $ forest_room_set_saved_text(scene_runtime.text, rooms.current)
+    $ main_ui_runtime.action_title = "Родник"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.action_items = forest_subroom_action_items(rooms.current)
+    while True:
+        call screen main_ui

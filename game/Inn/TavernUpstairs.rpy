@@ -3,7 +3,7 @@
 # ================================================================================
 init 6 python:
     def tavern_upstairs_can_enter_amanda_room():
-        return Amanda.var_int("kickyoufromroom", 0) == 0
+        return not Amanda.room_entry_blocked_today
 
     def tavern_upstairs_can_clean_rooms():
         try:
@@ -11,7 +11,23 @@ init 6 python:
         except Exception:
             return True
 
-    TavernUpstairsRoom = Room(
+    def tavern_upstairs_action_items():
+        items = []
+        if tavern_upstairs_can_clean_rooms():
+            items.append(MenuItem("Убрать комнаты наверху", Call("DoChore", "clean_upstairs_rooms", "TavernUpstairs", "", "")))
+        for room_exit in rooms.get("TavernUpstairs").visible_exits():
+            target = str(room_exit.target or "")
+            if target in ("TavernMain", "TavernStorage") and not player_can_leave_second_floor():
+                continue
+            if target == "TavernAmandaRoom":
+                items.append(MenuItem(room_exit.label, Call("TavernAmandaRoomDoor")))
+            else:
+                items.append(MenuItem(room_exit.label, movement_actions(target)))
+        if not player_can_leave_second_floor():
+            items.append(MenuItem(player_public_movement_block_text(), movement_actions("TavernMyRoom")))
+        return items
+
+    TavernUpstairsRoomDefinition = Room(
         code_name="TavernUpstairs",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Коридор наверху",
@@ -37,21 +53,16 @@ init 6 python:
 
 
 label TavernUpstairs:
-    $ CurrentRoom = TavernUpstairsRoom
-    $ CurLoc = "TavernUpstairs"
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    else:
-        $ _layout_last_picture = ""
-    call RoomEnterEventGate(CurLoc, False)
-    $ MainTxt = TavernUpstairsRoom.descriptions[0].text
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Наверху"
-    $ current_action_content = None
-    $ current_action_items = tavern_upstairs_action_items()
-    $ UI_mode = "scene"
+    $ rooms.enter("TavernUpstairs")
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    call RoomEnterEventGate(rooms.current_code, False)
+    $ scene_runtime.text = rooms.get("TavernUpstairs").descriptions[0].text
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Наверху"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = tavern_upstairs_action_items()
+    $ main_ui_runtime.mode = "scene"
     while True:
-    
+        call screen main_ui
 
 

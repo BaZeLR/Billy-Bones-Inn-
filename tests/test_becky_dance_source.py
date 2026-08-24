@@ -33,21 +33,25 @@ def test_becky_friday_dance_uses_thread_event_and_object_state():
     assert "return bool(Becky.dance_event_conditions_met(self))" in model
     assert "def friday_dance_base_ready(self):" in init
     assert 'location_now in ("FridayDance", "MarketPlace")' in init
-    assert 'int(self.var.get("leftdances", 0) or 0) == 0' in init
+    assert 'people_to_int(self.left_dances, 0) == 0' in init
     assert "def dance_event_conditions_met(self, event_obj):" in init
 
     assert "label story_becky_friday_dance_mc_0:" in dance
-    assert 'Becky.var["danceinvitehome"] = 0' in dance
-    assert dance.count("$ FridayDancesCount += 1") == 1
-    assert "$ FridayDancesCount = 5" in dance
-    assert 'Becky.var.get("danceinvitehome", 0)' in dance
+    assert 'rooms.get(\"FridayDance\").becky_home_invited = False' in dance
+    assert dance.count('$ rooms.get(\"FridayDance\").dance_count += 1') == 1
+    assert '$ rooms.get(\"FridayDance\").dance_count = 5' in dance
+    assert 'rooms.get(\"FridayDance\").becky_home_invited' in dance
     assert 'call BeckyInviteHome("becky")' in dance
     assert "BeckyVar" not in dance
     assert "ensure_story_defaults" not in dance
     assert "sync_from_becky_maps" not in dance
     assert "sync_becky_maps" not in dance
 
-    assert 'Becky.var["danceinvitehome"] = 1' in invite
+    assert 'rooms.get(\"FridayDance\").becky_home_invited = True' in invite
+    assert "player.appearance" not in invite
+    assert "charisma" not in invite
+    assert "danceinvitehome" not in dance
+    assert "danceinvitehome" not in invite
     assert "BeckyVar" not in invite
     assert "setdefault" not in invite
     assert "Becky.update()" not in invite

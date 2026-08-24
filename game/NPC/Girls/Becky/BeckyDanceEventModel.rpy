@@ -9,8 +9,8 @@ init -24 python:
             self,
             event_name,
             target,
-            calendar_v2.day,
-            calendar_v2.hour,
+            day,
+            hour,
             evt_day,
             probability,
             requirements,
@@ -26,8 +26,8 @@ init -24 python:
             super(BeckyDanceEvent, self).__init__(
                 (
                     target,
-                    calendar_v2.day,
-                    calendar_v2.hour,
+                    day,
+                    hour,
                     evt_day,
                     probability,
                     requirements,

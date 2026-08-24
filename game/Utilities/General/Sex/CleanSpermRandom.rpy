@@ -3,7 +3,7 @@
 # ================================================================================
 init python:
     def CleanSpermRandom(girl_name):
-        girl = getPersonInfo(girl_name)
+        girl = people.get_info(girl_name)
         if girl is None:
             return 0
 
@@ -40,5 +40,6 @@ init python:
 
 
 label CleanSpermRandom(girl_name=""):
+    $ renpy.dynamic("_tmp_clean_sperm_random")
     $ _tmp_clean_sperm_random = CleanSpermRandom(girl_name)
     return

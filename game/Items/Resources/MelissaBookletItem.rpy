@@ -1,8 +1,8 @@
 init 4 python:
     def melissa_drawings_booklet_visible():
         return (
-            str(CurLoc or "") == "TavernMelissaRoom"
-            and int(Melissa.var.get("drawings_found", 0) or 0) > 0
+            str(rooms.current_code or "") == "TavernMelissaRoom"
+            and bool(Melissa.drawings_found)
             and int(player.item_count("melissa_drawings_booklet_001") or 0) <= 0
         )
 
@@ -17,6 +17,7 @@ init 4 python:
                 label="Взять буклет",
                 hook="call",
                 target="MelissaBookletTake",
+                condition=melissa_drawings_booklet_visible,
             ),
             ObjectAction(
                 action_id="open_melissa_booklet",
@@ -29,19 +30,20 @@ init 4 python:
                 label="Прочитать буклет",
                 hook="call",
                 target="ReadMelissaBooklet",
-                args=(False,),
             ),
             ObjectAction(
                 action_id="leave_melissa_booklet",
                 label="Оставить его там, где лежал",
                 hook="call",
                 target="MelissaBookletLeaveThere",
+                condition=melissa_drawings_booklet_visible,
             ),
             ObjectAction(
                 action_id="continue_melissa_booklet_search",
                 label="Продолжить поиски",
                 hook="call",
                 target="MelissaBookletContinueSearch",
+                condition=melissa_drawings_booklet_visible,
             ),
         ],
         picture="images/melissa/bedRoomSearch/underBedBooklet.png",

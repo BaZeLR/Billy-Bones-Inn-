@@ -1,20 +1,8 @@
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default ShedNoticeText = ""
-default ShedNoticePending = False
-default ShedBucketFound = 0
-
-default ShedNoticeText = ""
-default ShedNoticePending = False
-default ShedBucketFound = 0
-
-default ShedNoticeText = ""
-default ShedNoticePending = False
-default ShedBucketFound = 0
-
 init 6 python:
-    ShedRoom = Room(
+    ShedRoomDefinition = Room(
         code_name="Shed",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Сарай",
@@ -38,12 +26,17 @@ init 6 python:
             "lumber_001",
         ],
         custom_properties={},
+        state={
+            "notice_text": "",
+            "notice_pending": False,
+            "bucket_found": False,
+        },
     )
 
     def shed_has_lumber(room_obj=None):
-        target_room = room_obj if room_obj is not None else CurrentRoom
+        target_room = room_obj if room_obj is not None else rooms.current
         if target_room is None:
-            target_room = ShedRoom
+            target_room = rooms.get("Shed")
         return _room_has_item_by_id(target_room, "lumber_001")
 
     def shed_picture():
@@ -53,7 +46,7 @@ init 6 python:
         return "images/tavern/backyard/shed/shed_night.png"
 
     def build_shed_description(include_notice=True, intro_text=""):
-        room_obj = CurrentRoom if CurrentRoom is not None else ShedRoom
+        room_obj = rooms.current if rooms.current is not None else rooms.get("Shed")
         room_item_ids = [get_object_id(row) for row in list(getattr(room_obj, "game_items", []) or [])]
         text_parts = []
 
@@ -61,8 +54,8 @@ init 6 python:
         if intro_value:
             text_parts.append(intro_value)
 
-        if include_notice and bool(ShedNoticePending) and str(ShedNoticeText or "").strip():
-            text_parts.append(str(ShedNoticeText or "").strip())
+        if include_notice and bool(rooms.get("Shed").state.get("notice_pending", False)) and str(rooms.get("Shed").state.get("notice_text", "") or "").strip():
+            text_parts.append(str(rooms.get("Shed").state.get("notice_text", "") or "").strip())
 
         chopped_count = _room_item_count_by_id(room_obj, "chopped_wood_001")
         chopped_item = get_game_item("chopped_wood_001", room_obj)
@@ -94,9 +87,9 @@ init 6 python:
         axe_name = str(axe_item.name).strip()
         if "old_axe_001" in room_item_ids:
             text_parts.append("На стене висит {}.".format(axe_name))
-        elif _player_has_item_by_id("old_axe_001") and player_has_equipped_weapon("old_axe_001"):
+        elif player.item_count("old_axe_001") > 0 and player_has_equipped_weapon("old_axe_001"):
             text_parts.append("{} заткнут у вас за пояс.".format(axe_name[:1].upper() + axe_name[1:]))
-        elif _player_has_item_by_id("old_axe_001"):
+        elif player.item_count("old_axe_001") > 0:
             text_parts.append("{} лежит у вас в сумке.".format(axe_name[:1].upper() + axe_name[1:]))
         else:
             text_parts.append("Крючок для топора пуст.")
@@ -104,7 +97,7 @@ init 6 python:
         return "\n\n".join([row for row in text_parts if str(row or "").strip()])
 
     def build_shed_action_items():
-        room_obj = CurrentRoom if CurrentRoom is not None else ShedRoom
+        room_obj = rooms.current if rooms.current is not None else rooms.get("Shed")
         items = [MenuItem("Осмотреть сарай", Call("ShedExamine"))]
         seen_object_ids = set()
         hidden_action_ids = {"examine_lumber", "examine_chopped_wood", "take_chopped_wood"}
@@ -142,61 +135,40 @@ init 6 python:
                 items.append(MenuItem("Сложить бревна в сарае x{}".format(_carried_lumber), Call("ShedStoreLumber")))
 
         if not shed_has_lumber(room_obj):
-            items.append(MenuItem("Сходить в лес за бревнами", Call("TravelToForest", "Shed")))
+            items.append(MenuItem("Сходить в лес за бревнами", [SetDict(rooms.get("Forest").state, "return_target", "Shed"), Call("TravelToForest")]))
 
-        items.append(MenuItem("Вернуться на задний двор", Call("AdvanceMovementTime", "Backyard")))
+        items.append(MenuItem("Вернуться на задний двор", movement_actions("Backyard")))
         return items
 
 
 label Shed:
-    $ CurrentRoom = ShedRoom
-    $ CurLoc = "Shed"
-    call RoomEnterEventGate(CurLoc, False)
-    $ scene_image = shed_picture() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    else:
-        $ _layout_last_picture = ""
-    $ _room_desc_rows = CurrentRoom.visible_descriptions()
+    $ renpy.dynamic("_room_desc_rows", "_shed_intro")
+    $ rooms.enter("Shed")
+    call RoomEnterEventGate(rooms.current_code, False)
+    $ scene_runtime.picture = shed_picture() or rooms.current.bg_picture or None
+    $ _room_desc_rows = rooms.current.visible_descriptions()
     if len(_room_desc_rows) > 0:
         $ _shed_intro = str(_room_desc_rows[0].text or "")
     else:
         $ _shed_intro = "Сарай."
-    $ MainTxt = build_shed_description(True, _shed_intro)
-    $ CurLocDesc = MainTxt
-    $ ShedNoticePending = False
-    $ CurrentRoom.mark_visited()
-    $ current_action_title = "Сарай"
-    $ current_action_content = None
-    call ShedRoomActions
+    $ scene_runtime.text = build_shed_description(True, _shed_intro)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ rooms.get("Shed").state["notice_pending"] = False
+    $ rooms.current.mark_visited()
+    $ main_ui_runtime.action_title = "Сарай"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = build_shed_action_items()
     while True:
-        call ShedRoomActions
-    $ _shed_ui_return = None
-    while _shed_ui_return is None:
-        $ _shed_ui_return = None
-    while _shed_ui_return is None:
         call screen main_ui
-        $ _shed_ui_return = _return
-    jump Shed
-
-
-label ShedRoomActions:
-    $ current_action_title = "Сарай"
-    $ current_action_content = None
-    $ current_action_items = build_shed_action_items()
-        $ _shed_ui_return = _return
-    jump Shed
-
-
-label ShedRoomActions:
 
 
 label ShedStoreLumber:
+    $ renpy.dynamic("_shed_lumber_count", "_shed_added_lumber", "_shed_lumber_unit", "_shed_chore_count")
     $ _shed_lumber_count = int(player.item_count("lumber_001") or 0)
     if _shed_lumber_count <= 0:
-        $ MainTxt = "У вас нет бревен, которые можно сложить в сарае."
-        $ CurLocDesc = MainTxt
-        call ShedRoomActions
+        $ scene_runtime.text = "У вас нет бревен, которые можно сложить в сарае."
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_items = build_shed_action_items()
         return
 
     $ _shed_added_lumber = 0
@@ -204,7 +176,7 @@ label ShedStoreLumber:
         for _shed_lumber_unit in range(_shed_lumber_count):
             if not player.remove_item("lumber_001", 1):
                 break
-            if _room_add_item_by_id(CurrentRoom, "lumber_001"):
+            if _room_add_item_by_id(rooms.current, "lumber_001"):
                 _shed_added_lumber += 1
             else:
                 player.add_item("lumber_001", 1)
@@ -214,48 +186,49 @@ label ShedStoreLumber:
             for _shed_chore_count in range(int(_shed_added_lumber or 0)):
                 _pc_register_chore_success("bring_woods")
         if _shed_added_lumber == 1:
-            $ ShedNoticeText = "Вы заносите бревно в сарай и складываете его к остальным запасам."
+            $ rooms.get("Shed").state["notice_text"] = "Вы заносите бревно в сарай и складываете его к остальным запасам."
         else:
-            $ ShedNoticeText = "Вы заносите {} бревна в сарай и складываете их в общую кучу.".format(_shed_added_lumber)
-        $ ShedNoticePending = True
-        $ MainTxt = build_shed_description(True, "")
+            $ rooms.get("Shed").state["notice_text"] = "Вы заносите {} бревна в сарай и складываете их в общую кучу.".format(_shed_added_lumber)
+        $ rooms.get("Shed").state["notice_pending"] = True
+        $ scene_runtime.text = build_shed_description(True, "")
     else:
-        $ MainTxt = "Сейчас не получается сложить бревна в сарае."
-    $ CurLocDesc = MainTxt
-    call ShedRoomActions
+        $ scene_runtime.text = "Сейчас не получается сложить бревна в сарае."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items = build_shed_action_items()
     return
 
 
 label ShedTakeChoppedWood(quantity=1):
+    $ renpy.dynamic("_shed_take_limit", "_shed_taken_count", "_shed_take_index")
     $ _shed_take_limit = max(1, int(quantity or 1))
     $ _shed_taken_count = 0
     python:
         for _shed_take_index in range(_shed_take_limit):
-            if not _room_remove_item_by_id(ShedRoom, "chopped_wood_001"):
+            if not _room_remove_item_by_id(rooms.get("Shed"), "chopped_wood_001"):
                 break
             player.add_item("chopped_wood_001", 1)
             _shed_taken_count += 1
     if _shed_taken_count <= 0:
-        $ ShedNoticeText = "В сарае уже нет колотых дров."
+        $ rooms.get("Shed").state["notice_text"] = "В сарае уже нет колотых дров."
     elif _shed_taken_count == 1:
-        $ ShedRoom.state["notice_text"] = "Вы берете одну охапку колотых дров. При себе теперь: {}.".format(int(player.item_count("chopped_wood_001") or 0))
+        $ rooms.get("Shed").state["notice_text"] = "Вы берете одну охапку колотых дров. При себе теперь: {}.".format(int(player.item_count("chopped_wood_001") or 0))
     else:
-        $ ShedRoom.state["notice_text"] = "Вы берете {} охапки колотых дров. При себе теперь: {}.".format(_shed_taken_count, int(player.item_count("chopped_wood_001") or 0))
-    $ ShedRoom.state["notice_pending"] = True
-    $ MainTxt = build_shed_description(True, "")
-    $ CurLocDesc = MainTxt
-    call ShedRoomActions
+        $ rooms.get("Shed").state["notice_text"] = "Вы берете {} охапки колотых дров. При себе теперь: {}.".format(_shed_taken_count, int(player.item_count("chopped_wood_001") or 0))
+    $ rooms.get("Shed").state["notice_pending"] = True
+    $ scene_runtime.text = build_shed_description(True, "")
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items = build_shed_action_items()
     call stat
     return
 
 
 label ShedExamine:
-    if not bool(ShedRoom.state["bucket_found"]) and player.item_count("bucket_001") <= 0:
-        $ ShedRoom.state["bucket_found"] = True
+    if not bool(rooms.get("Shed").state["bucket_found"]) and player.item_count("bucket_001") <= 0:
+        $ rooms.get("Shed").state["bucket_found"] = True
         $ player.add_item("bucket_001", 1)
-        $ MainTxt = "Вы внимательно осматриваете сарай и, пошарив под старыми досками и тряпьем, находите крепкое хозяйственное ведро."
+        $ scene_runtime.text = "Вы внимательно осматриваете сарай и, пошарив под старыми досками и тряпьем, находите крепкое хозяйственное ведро."
     else:
-        $ MainTxt = build_shed_description(False, "Вы внимательно осматриваете сарай.")
-    $ CurLocDesc = MainTxt
-    call ShedRoomActions
+        $ scene_runtime.text = build_shed_description(False, "Вы внимательно осматриваете сарай.")
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items = build_shed_action_items()
     return

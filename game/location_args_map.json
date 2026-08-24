@@ -4513,7 +4513,7 @@
       "incoming_links": [],
       "matching_rpy_labels": [
         {
-          "label": "int_amanda_dress_change",
+          "label": "IntAmandaDressChange",
           "params": "GirlNameIAT=\"amanda\"",
           "file": "game/Inn/IntAmandaDressChange.rpy",
           "line": 39

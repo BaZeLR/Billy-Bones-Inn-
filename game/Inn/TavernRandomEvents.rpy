@@ -1,10 +1,4 @@
-default TavernPlayedEventsToday = []
-default TavernEventReportRows = []
-default TavernWorkPlanDay = -1default TavernPlayedEventsToday = []
-default TavernEventReportRows = []
-default TavernWorkPlanDay = -1default TavernPlayedEventsToday = []
-default TavernEventReportRows = []
-default TavernWorkPlanDay = -1
+
 init -20 python:
     class TavernWorkEventDefinition(object):
         def __init__(self, code, event_type, label, periods=None, chance=0, mandatory=False, priority=0, required_job="", condition=None, report_label=None):
@@ -54,39 +48,6 @@ init -20 python:
                 return default
 
 
-    def tavern_work_job_map(job_code):
-        key = str(job_code or "")
-        if key == "jobwaitress":
-            return jobwaitress
-        if key == "jobcleaning":
-            return jobcleaning
-        if key == "jobkitchen":
-            return jobkitchen
-        return {}
-
-
-    def tavern_work_job_map(job_code):
-        key = str(job_code or "")
-        if key == "jobwaitress":
-            return jobwaitress
-        if key == "jobcleaning":
-            return jobcleaning
-        if key == "jobkitchen":
-            return jobkitchen
-        return {}
-
-
-    def tavern_work_job_map(job_code):
-        key = str(job_code or "")
-        if key == "jobwaitress":
-            return jobwaitress
-        if key == "jobcleaning":
-            return jobcleaning
-        if key == "jobkitchen":
-            return jobkitchen
-        return {}
-
-
     def tavern_work_job_candidates(job_code):
         return list(girls_by_job(str(job_code or "")) or [])
 
@@ -96,13 +57,13 @@ init -20 python:
             Liza.can_work_tavern()
             and (
                 not Liza.can_use_gloryhole()
-                or tavern_work_int(time, 0) < 2
+                or tavern_work_int(calendar_v2.time_slot(), 0) < 2
             )
         )
 
 
     def tavern_work_wine_for_dance_ready():
-        return tavern_work_int(week, 0) == 3
+        return tavern_work_int(calendar_v2.week, 0) == 3
 
 
     def tavern_work_roll(chance, key):
@@ -132,12 +93,12 @@ init -20 python:
 
     def tavern_work_planned_for(code="", location_name="", time_period=None):
         code_key = str(code or "")
-        loc_key = str(location_name or CurLoc or "")
+        loc_key = str(location_name or rooms.current_code or "")
         if loc_key != "TavernMain":
             return False
-        if tavern_work_int(week, 0) == 7 or tavern_preopening_mode():
+        if tavern_work_int(calendar_v2.week, 0) == 7 or tavern_preopening_mode():
             return False
-        tp = tavern_work_int(time if time_period is None else time_period, 0)
+        tp = tavern_work_int(calendar_v2.time_slot() if time_period is None else time_period, 0)
         for row in list(event_runtime.tavern_work_events or []):
             if bool(row.get("mandatory", False)):
                 continue
@@ -178,26 +139,23 @@ init -20 python:
 
     def tavern_work_add_report_row(row, witnessed):
         report = {
-            "day": tavern_work_int(dayspassed, 0),
+            "day": current_game_day(),
             "code": str(row.get("code", "") or ""),
             "type": str(row.get("type", "") or ""),
             "period": tavern_work_int(row.get("period", 0), 0),
             "witnessed": bool(witnessed),
         }
-        TavernEventReportRows.append(report)
+        event_runtime.tavern_report_rows.append(report)
         return report
 
 
     def tavern_work_build_daily_plan():
-        global event_runtime.tavern_work_plan_day
-        global event_runtime.tavern_work_plan_day
-        global TavernWorkPlanDay
         event_runtime.tavern_work_events[:] = []
-        TavernPlayedEventsToday[:] = []
-        TavernEventReportRows[:] = []
+        event_runtime.tavern_played_today[:] = []
+        event_runtime.tavern_report_rows[:] = []
 
-        current_day = tavern_work_int(dayspassed, 0)
-        TavernWorkPlanDay = current_day
+        current_day = current_game_day()
+        event_runtime.tavern_work_plan_day = current_day
         for event_type in tavern_work_random_type_order:
             candidates = [row for row in tavern_work_events_by_type.get(event_type, []) if row.can_schedule()]
             if len(candidates) <= 0:
@@ -224,7 +182,7 @@ init -20 python:
 
     def tavern_work_pending_mandatory_code(code="", room_code=""):
         code_key = str(code or "")
-        room_key = str(room_code or CurLoc or "")
+        room_key = str(room_code or rooms.current_code or "")
         for row in list(event_runtime.tavern_work_events or []):
             if not bool(row.get("mandatory", False)):
                 continue
@@ -238,7 +196,7 @@ init -20 python:
 
     def tavern_work_pop_mandatory_code(code="", room_code=""):
         code_key = str(code or "")
-        room_key = str(room_code or CurLoc or "")
+        room_key = str(room_code or rooms.current_code or "")
         for index, row in enumerate(list(event_runtime.tavern_work_events or [])):
             if not bool(row.get("mandatory", False)):
                 continue
@@ -248,17 +206,14 @@ init -20 python:
                 continue
             popped = event_runtime.tavern_work_events.pop(index)
             tavern_work_add_report_row(popped, True)
-            TavernPlayedEventsToday.append(str(popped.get("code", "") or ""))
-            tavern_work_sync_legacy_queue()
-            tavern_work_sync_legacy_queue()
-            tavern_work_sync_legacy_queue()
+            event_runtime.tavern_played_today.append(str(popped.get("code", "") or ""))
             return str(popped.get("code", "") or "")
         return ""
 
 
     def tavern_work_pop_planned_event(time_period, require_room_match=False, room_code=""):
         tp = tavern_work_int(time_period, 0)
-        room_key = str(room_code or CurLoc or "")
+        room_key = str(room_code or rooms.current_code or "")
 
         for index, row in enumerate(list(event_runtime.tavern_work_events or [])):
             code = str(row.get("code", "") or "")
@@ -268,10 +223,7 @@ init -20 python:
                 continue
             popped = event_runtime.tavern_work_events.pop(index)
             tavern_work_add_report_row(popped, bool(require_room_match))
-            TavernPlayedEventsToday.append(code)
-            tavern_work_sync_legacy_queue()
-            tavern_work_sync_legacy_queue()
-            tavern_work_sync_legacy_queue()
+            event_runtime.tavern_played_today.append(code)
             return {"code": code, "slot": 10}
 
         for index, row in enumerate(list(event_runtime.tavern_work_events or [])):
@@ -282,10 +234,7 @@ init -20 python:
             popped = event_runtime.tavern_work_events.pop(index)
             code = str(popped.get("code", "") or "")
             tavern_work_add_report_row(popped, bool(require_room_match))
-            TavernPlayedEventsToday.append(code)
-            tavern_work_sync_legacy_queue()
-            tavern_work_sync_legacy_queue()
-            tavern_work_sync_legacy_queue()
+            event_runtime.tavern_played_today.append(code)
             return {"code": code, "slot": tp}
 
         return {"code": "", "slot": tp}
@@ -293,7 +242,7 @@ init -20 python:
 
     def tavern_work_pop_planned_code(code="", time_period=None, require_room_match=False, room_code=""):
         code_key = str(code or "")
-        tp = tavern_work_int(time if time_period is None else time_period, 0)
+        tp = tavern_work_int(calendar_v2.time_slot() if time_period is None else time_period, 0)
         for index, row in enumerate(list(event_runtime.tavern_work_events or [])):
             if bool(row.get("mandatory", False)):
                 continue
@@ -303,10 +252,7 @@ init -20 python:
                 continue
             popped = event_runtime.tavern_work_events.pop(index)
             tavern_work_add_report_row(popped, bool(require_room_match))
-            TavernPlayedEventsToday.append(code_key)
-            tavern_work_sync_legacy_queue()
-            tavern_work_sync_legacy_queue()
-            tavern_work_sync_legacy_queue()
+            event_runtime.tavern_played_today.append(code_key)
             return dict(popped or {})
         return {}
 
@@ -341,12 +287,13 @@ define tavern_work_events_by_type = {
 
 
 label TavernWorkEventTrigger:
-    $ SignalBlockTime = 1
-    call DisplayTavernEventShort(time, 1)
-    $ TavernEventOngoing = str(_return or "")
-    if str(TavernEventOngoing or "").strip():
-        $ MainTxt = TavernEventOngoing
-        $ CurLocDesc = MainTxt
-        call screen main_ui
+    $ renpy.dynamic("_tavern_event_text")
+    call DisplayTavernEventShort(calendar_v2.time_slot(), 1)
+    $ _tavern_event_text = str(_return or "")
+    if str(_tavern_event_text or "").strip():
+        $ scene_runtime.text = _tavern_event_text
+        $ scene_runtime.location_text = scene_runtime.text
+        return True
+    if str(CurEventCode or "").strip():
         return True
     return False

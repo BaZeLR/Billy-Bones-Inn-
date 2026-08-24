@@ -1,4 +1,4 @@
-    $ bodymodel_sync_character(girl_name, RealName.get(girl_name, "Сандра"), "female")    $ Sandra.save_story_state()    $ Sandra.save_story_state()    $ bodymodel_sync_character(girl_name, RealName.get(girl_name, "Сандра"), "female")    $ Sandra.save_story_state()    $ Sandra.save_story_state()    $ bodymodel_sync_character(girl_name, RealName.get(girl_name, "Сандра"), "female")    $ Sandra.save_story_state()    $ Sandra.save_story_state()# ================================================================================
+# ================================================================================
 # Sandra authored events.
 # Event/thread availability is defined in StoryEventRuntime.rpy.
 # SandraInfo owns Sandra's mutable reward state.
@@ -45,26 +45,20 @@ init python:
     )
 
 
-label SandraWeek5WakeEvent(return_label="TavernMain"):
-    $ _sandra_target_label = str(Sandra.weekly_thanks_target_label() or "")
-    if _sandra_target_label == "":
-        return
-    call expression _sandra_target_label pass (return_label,)
-    return
-
-
 label SandraWeeklyEvaluationScene(step_index=0, return_label="TavernMain"):
+    $ renpy.dynamic("_sandra_step", "_sandra_gains", "_sandra_picture", "_sandra_lines")
     $ _sandra_step = max(0, min(int(step_index or 0), len(SANDRA_WEEKLY_EVALUATION_TEXTS) - 1))
     $ _sandra_gains = dict(SANDRA_WEEKLY_EVALUATION_STAT_GAINS[_sandra_step] or {})
-    $ Sandra.weekly_thanks_wake_seen(_sandra_step, _sandra_gains)
+    $ Sandra.rel = max(0, min(20, int(Sandra.rel or 0) + int(_sandra_gains.get("rel", 0) or 0)))
+    $ Sandra.openness = max(0, min(20, int(Sandra.openness or 0) + int(_sandra_gains.get("openness", 0) or 0)))
+    $ Sandra.corruption = max(0, min(100, int(Sandra.corruption or 0) + int(_sandra_gains.get("corruption", 0) or 0)))
     $ _sandra_picture = SANDRA_WEEKLY_EVALUATION_PICTURES[_sandra_step]
-    $ scene_image = _sandra_picture
-    $ _layout_last_picture = _sandra_picture
+    $ scene_runtime.picture = _sandra_picture
     call ShowImage("", "", _sandra_picture)
     $ _sandra_lines = list(SANDRA_WEEKLY_EVALUATION_TEXTS[_sandra_step] or [])
     "[_sandra_lines[0]]"
     "[_sandra_lines[1]]"
-    if int(Sandra.weekly_chore_score or 0) >= 6 and _sandra_step < 3:
+    if int(player.chores.last_score or 0) >= 6 and _sandra_step < 3:
         "\"И да, я заметила, что на этот раз ты вытянул неделю особенно крепко,\" добавляет Сандра уже тише. \"Такое не пропускают мимо глаз.\""
     "[_sandra_lines[2]]"
     "[_sandra_lines[3]]"
@@ -75,6 +69,7 @@ label sandraWeeklyEvaluation_0(return_label="TavernMain"):
     call SandraWeeklyEvaluationScene(0, return_label)
     $ threads["sandraWeeklyEvaluation"].day = int(current_game_day() or 0)
     $ threads["sandraWeeklyEvaluation"].advance()
+    $ threads["sandraWeeklyEvaluation"].disable()
     return
 
 
@@ -82,6 +77,7 @@ label sandraWeeklyEvaluation_1(return_label="TavernMain"):
     call SandraWeeklyEvaluationScene(1, return_label)
     $ threads["sandraWeeklyEvaluation"].day = int(current_game_day() or 0)
     $ threads["sandraWeeklyEvaluation"].advance()
+    $ threads["sandraWeeklyEvaluation"].disable()
     return
 
 
@@ -89,6 +85,7 @@ label sandraWeeklyEvaluation_2(return_label="TavernMain"):
     call SandraWeeklyEvaluationScene(2, return_label)
     $ threads["sandraWeeklyEvaluation"].day = int(current_game_day() or 0)
     $ threads["sandraWeeklyEvaluation"].advance()
+    $ threads["sandraWeeklyEvaluation"].disable()
     return
 
 
@@ -100,48 +97,53 @@ label sandraWeeklyEvaluation_3(return_label="TavernMain"):
 
 
 label TavernSandraNightThanksScene:
-    if not Sandra.night_thanks_ready() or int(hour or 0) < 22 or int(hour or 0) > 23:
-        call TavernSandraRoomBuildActions
+    $ renpy.dynamic("_sandra_secured_future_now")
+    if int(threads["sandraWeeklyEvaluation"].num or 0) != 4 or int(calendar_v2.hour or 0) < 22 or int(calendar_v2.hour or 0) > 23:
+        $ main_ui_runtime.action_title = "Комната Сандры"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
         return
-    $ Sandra.night_thanks_seen()
+    $ Sandra.rel = max(0, min(20, int(Sandra.rel or 0) + 2))
+    $ Sandra.openness = max(0, min(20, int(Sandra.openness or 0) + 2))
+    $ Sandra.corruption = max(0, min(100, int(Sandra.corruption or 0) + 3))
     $ Sandra.mark_asked()
     $ Sandra.mark_talked()
     $ _sandra_secured_future_now = tractir_apply_sandra_secured_future()
     $ player.change_stat("fun", 8)
     call PregnancyCheck("sandra", "inside", 1, "Вы")
-    $ Sandra.save_story_state()
-    $ Sandra.save_story_state()
-    $ Sandra.save_story_state()
     $ calendar_v2.advance_minutes(60)
-    $ scene_image = "images/sandra/thanks/player_room_sandra_1.png"
-    $ _layout_last_picture = scene_image
-    vscene scene_image
-    $ MainTxt = "Сандра встречает вас без обычной деловитой брони. Она закрывает дверь, коротко напоминает, что хорошая неделя в трактире заслуживает не только сухой похвалы, и сама делает шаг ближе.\n\nРазговор быстро становится тише и личнее. Сандра не торопится, но и не отступает: этой ночью она действительно благодарит вас как женщина, а не как строгая хозяйка кухни.\n\nКогда все заканчивается, она поправляет платье, смотрит на вас уже спокойнее и предупреждает, что завтра утром снова будет требовать порядка как ни в чем не бывало. Но теперь между вами остается куда более ясное понимание."
+    $ scene_runtime.picture = "images/sandra/thanks/player_room_sandra_1.png"
+    vscene scene_runtime.picture
+    $ scene_runtime.text = "Сандра встречает вас без обычной деловитой брони. Она закрывает дверь, коротко напоминает, что хорошая неделя в трактире заслуживает не только сухой похвалы, и сама делает шаг ближе.\n\nРазговор быстро становится тише и личнее. Сандра не торопится, но и не отступает: этой ночью она действительно благодарит вас как женщина, а не как строгая хозяйка кухни.\n\nКогда все заканчивается, она поправляет платье, смотрит на вас уже спокойнее и предупреждает, что завтра утром снова будет требовать порядка как ни в чем не бывало. Но теперь между вами остается куда более ясное понимание."
     if _sandra_secured_future_now:
-        $ MainTxt += "\n\nПосле первого выдержанного месяца Сандра явно понимает, что может закрепиться рядом с вами не только через кухню и счета. Она мягко, но очень уверенно забирает часть вашего внимания на себя, и это уже чувствуется даже телом: на чужие постели сил остается меньше."
-    $ CurLocDesc = MainTxt
-    call TavernSandraRoomBuildActions
+        $ scene_runtime.text += "\n\nПосле первого выдержанного месяца Сандра явно понимает, что может закрепиться рядом с вами не только через кухню и счета. Она мягко, но очень уверенно забирает часть вашего внимания на себя, и это уже чувствуется даже телом: на чужие постели сил остается меньше."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ threads["sandraWeeklyEvaluation"].advance()
+    $ main_ui_runtime.action_title = "Комната Сандры"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
     return
 
 
 label SandraSexEngine(girl_name="sandra", source_room="TavernSandraRoom"):
-    if not Sandra.sex_available():
-        $ MainTxt = "Сандра пока не готова к такой близости."
-        $ CurLocDesc = MainTxt
+    if not threads["sandraWeeklyEvaluation"].completed:
+        $ scene_runtime.text = "Сандра пока не готова к такой близости."
+        $ scene_runtime.location_text = scene_runtime.text
         if str(source_room or "") == "TavernSandraRoom":
-            call TavernSandraRoomBuildActions
+            $ main_ui_runtime.action_title = "Комната Сандры"
+            $ main_ui_runtime.action_content = None
+            $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
         return
-    $ player.intimacy.set_arousal(player.intimacy.arousal_value("You"), "You")
-    $ Sandra.set_arousal(int(PussyWetStart.get(girl_name, Sandra.arousal_value() or 20) or 20))
+    $ player.intimacy.set_arousal(player.intimacy.arousal_value())
+    $ Sandra.set_arousal(int(Sandra.sex_stat("PussyWetStart", Sandra.arousal_value() or 20) or 20))
     call ShowCurrentSex(girl_name)
     call PregnancyCheck(girl_name, "inside", 1, "Вы")
     $ Sandra.mark_fucked()
-    $ Sandra.save_story_state()
-    $ Sandra.save_story_state()
-    $ Sandra.save_story_state()
     $ calendar_v2.advance_minutes(30)
-    $ MainTxt = "Сандра не тратит вечер на лишние слова. Она закрывает дверь, поправляет волосы и смотрит на вас так, будто решение уже давно принято. После близости она снова собирает себя в привычную строгую хозяйку, но в голосе остается теплота, которую теперь уже невозможно спутать с обычной деловитостью."
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = "Сандра не тратит вечер на лишние слова. Она закрывает дверь, поправляет волосы и смотрит на вас так, будто решение уже давно принято. После близости она снова собирает себя в привычную строгую хозяйку, но в голосе остается теплота, которую теперь уже невозможно спутать с обычной деловитостью."
+    $ scene_runtime.location_text = scene_runtime.text
     if str(source_room or "") == "TavernSandraRoom":
-        call TavernSandraRoomBuildActions
+        $ main_ui_runtime.action_title = "Комната Сандры"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
     return

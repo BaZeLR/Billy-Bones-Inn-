@@ -14,9 +14,9 @@ Compile/lint helper:
 
 `tools/renpy_compile.ps1`
 
-Fixed SDK path:
+Fixed SDK runtime used by the helper:
 
-`C:\Users\blank\renpy\renpy-8.5.2-sdk\renpy.exe`
+`C:\Users\blank\renpy\renpy-8.5.2-sdk\lib\py3-windows-x86_64\python.exe C:\Users\blank\renpy\renpy-8.5.2-sdk\renpy.py`
 
 Commands:
 
@@ -73,9 +73,9 @@ may preserve old QSP names, but they are not implementation authority.
 | Kitchen cauldron | `game/Inn/TavernKitchenCauldron001.rpy` | `TavernKitchenCauldronMenu` |
 | Grocery store | `game/Town/GroceryStore.rpy` | `GroceryStoreObjectMenu` |
 | Wine store | `game/Town/WineStore.rpy` | `WineStoreObjectMenu` |
-| Hunter club | `game/Town/HunterClub.rpy` | `HunterClubObjectMenu` |
+| Hunter club | `game/Town/HunterClub.rpy` | direct room actions; no synthetic object menu |
 | Port streets | `game/Town/PortStreets.rpy` | `PortStreetsBottleMenu` |
-| Market | `game/Town/Market/MarketPlace.rpy` | `MarketPlaceObjectMenu` |
+| Market | `game/Town/Market/MarketPlace.rpy` | direct room actions; no synthetic object menu |
 
 ## NPC Class Entry Points
 

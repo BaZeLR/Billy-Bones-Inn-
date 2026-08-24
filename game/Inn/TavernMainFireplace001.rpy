@@ -3,14 +3,14 @@
 # ================================================================================
 init python:
     def tavern_main_fireplace_wood_stock():
-        loose_wood = _room_item_count_by_id(TavernMainRoom, "chopped_wood_001")
+        loose_wood = _room_item_count_by_id(rooms.get("TavernMain"), "chopped_wood_001")
         if loose_wood > 0:
-            while _room_remove_item_by_id(TavernMainRoom, "chopped_wood_001"):
+            while _room_remove_item_by_id(rooms.get("TavernMain"), "chopped_wood_001"):
                 _add_object_state_int(TavernMainFireplaceObject, "chopped_wood_stock", 1, 0)
         return _object_state_int(TavernMainFireplaceObject, "chopped_wood_stock", 0)
 
     def tavern_main_fireplace_drop_wood_visible(_obj=None):
-        return _player_has_item_by_id("chopped_wood_001")
+        return player.item_count("chopped_wood_001") > 0
 
     def tavern_main_fireplace_description():
         fire_active = _pc_fire_is_active(TavernMainFireplaceObject)
@@ -60,7 +60,7 @@ init python:
                 args=("ashes", "TavernMain", "", "fireplace_001"),
             ),
         ],
-        state={"fire_started_minute": 0, "fire_until_minute": 0, "fire_units": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0},
+        state={"fire_started_minute": 0, "fire_until_minute": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0},
         carriable=False,
         stackable=False,
     )
@@ -68,13 +68,13 @@ init python:
 
 label TavernMainFireplaceDepositWood:
     if not player.remove_item("chopped_wood_001", 1):
-        $ MainTxt = "У вас больше нет колотых дров."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "У вас больше нет колотых дров."
+        $ scene_runtime.location_text = scene_runtime.text
         call TavernMainObjectMenu("fireplace_001")
         return
     $ _add_object_state_int(TavernMainFireplaceObject, "chopped_wood_stock", 1, 0)
-    $ MainTxt = "Вы складываете колотые дрова рядом с камином. Теперь у камина лежит {b}%s{/b} шт." % str(tavern_main_fireplace_wood_stock())
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = "Вы складываете колотые дрова рядом с камином. Теперь у камина лежит {b}%s{/b} шт." % str(tavern_main_fireplace_wood_stock())
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call TavernMainObjectMenu("fireplace_001")
     return

@@ -1,92 +1,132 @@
-    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ Melissa.current_location = "TavernKitchen"    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ Melissa.current_location = "TavernKitchen"    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ werecat_state()["hunter_tease_offer_ready"] = 0    $ Melissa.current_location = "TavernKitchen"# ================================================================================
+# ================================================================================
 # Melissa authored events.
 # Event/thread availability is defined in StoryEventRuntime.rpy.
 # ================================================================================
 
 label story_melissa_storage_rat_0:
     show screen main_ui
-    $ SignalBlockTime = 1
     $ household_mark_runtime_event_seen("melissa_storage_rat")
-    vscene Melissa.image_path("tavern", "rat")
-    $ MainTxt = "В кладовой вас встречает раздраженная Мелисса: у мешков с крупой шуршит крупная крыса, а девушка уже стоит наготове с метлой в руках. \"Опять эта тварь сюда лазит,\" шепчет она. \"Если ее сейчас не прогнать, потом весь угол придется перебирать заново.\""
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
+    vscene MelissaStaticData.image_path("tavern", "rat")
+    $ scene_runtime.text = "В кладовой вас встречает раздраженная Мелисса: у мешков с крупой шуршит крупная крыса, а девушка уже стоит наготове с метлой в руках. \"Опять эта тварь сюда лазит,\" шепчет она. \"Если ее сейчас не прогнать, потом весь угол придется перебирать заново.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     menu:
         "Прибить крысу":
-            $ Melissa.var["ratKilled"] = True
-            $ Melissa.var["ratKilled"] = True
-            $ Melissa.var["ratKilled"] = True
-            $ Melissa.var["ratKilled"] = True
-            $ Melissa.var["ratKilled"] = True
-            $ Melissa.var["ratKilled"] = True
-            $ Melissa.var["storage_rat_cleared"] = 1
-            $ Melissa.var["storage_rat_last_help_day"] = int(current_game_day() or 0)
+            $ Melissa.storage_rat_help_day = int(current_game_day() or 0)
             $ werecat_state()["rat_carcass_cached"] = 1
             $ werecat_state()["rats_problem_active"] = 1
             $ werecat_state()["rat_food_loss_next_day"] = int(current_game_day() or 0) + 7
-            $ Melissa.var["work_attitude"] = int(Melissa.var.get("work_attitude", 0) or 0) + 1
             $ Melissa.skills["cleaning"] = min(100, int(Melissa.skills.get("cleaning", 0) or 0) + 1)
             $ Melissa.change_social(friend_delta=1)
             $ event_runtime.active_thread.advance()
             $ event_runtime.evaluation_time = None
             $ findAvailableEvents(True)
-            $ MainTxt = "Вы быстро расправляетесь с крысой, и Мелисса заметно расслабляется. \"Вот теперь другое дело,\" тихо говорит она, уже без прежнего раздражения. На всякий случай вы решаете не выбрасывать тушку сразу: такая приманка еще может сгодиться, если в лесу и правда водится тот необычный кошачий охотник, о котором судачат по трактирам."
+            $ scene_runtime.text = "Вы быстро расправляетесь с крысой, и Мелисса заметно расслабляется. \"Вот теперь другое дело,\" тихо говорит она, уже без прежнего раздражения. На всякий случай вы решаете не выбрасывать тушку сразу: такая приманка еще может сгодиться, если в лесу и правда водится тот необычный кошачий охотник, о котором судачат по трактирам."
         "Оставить все как есть":
-            $ MainTxt = "Вы решаете не возиться с крысой прямо сейчас. Мелисса поджимает губы и берется переставлять мешки подальше от шороха, явно недовольная тем, что проблему придется терпеть еще какое-то время."
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
+            $ scene_runtime.text = "Вы решаете не возиться с крысой прямо сейчас. Мелисса поджимает губы и берется переставлять мешки подальше от шороха, явно недовольная тем, что проблему придется терпеть еще какое-то время."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     return True
 
 
 label story_melissa_werecat_intro_0:
-    $ SignalBlockTime = 1
-    call MelissaRatBreakfastScene
+    $ werecat_state()["rat_breakfast_seen"] = 1
+    $ player.tavern_management.breakfast.today = True
+    $ player.tavern_management.breakfast.last_day = current_game_day()
+    $ player.tavern_management.breakfast.day = current_game_day()
+    $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
+    $ player.tavern_management.breakfast.event_active = True
+    vscene tavern_kitchen_breakfast_picture()
+    $ scene_runtime.text = "Мягкий утренний свет ползет по кухне, в мисках парит каша, воздух пахнет молоком, овсом и горячим хлебом. За общим столом сегодня сидят все трое.\n\nСандра, помешивая кашу с лишней силой, первой возвращается к вчерашнему: \"Крысы в доме совсем распоясались. Уже по три полных тюка припасов за неделю портят. Если так пойдет дальше, к зиме сами у пустых мешков сядем.\"\n\nАманда разваливается на скамье и, как всегда, пытается рассечь тревогу шуткой: \"А знаешь, чего этому дому по-настоящему не хватает? Хорошей сильной киски. Такой, чтоб и мышей ловила, и с вредителями умела разбираться как следует.\" Она лукаво подмигивает.\n\nМелисса сперва краснеет, потом все же хихикает: \"Да... большой, гибкой охотницы. Чтобы маленьких пакостников душила без жалости... и ночами было бы с кем согреться.\"\n\nСмех за столом быстро снимает лишнее напряжение. Даже Сандра, отвернувшись к котлу, ворчит уже заметно мягче."
+    if relationship_anger("amanda") > 0 and relationship_anger("melissa") > 0:
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда и Мелисса все равно успевают уколоть друг друга. Сандра сразу обрывает их: \"Когти оставьте для крыс. За столом не шипеть.\""
+    elif relationship_anger("amanda") > 0:
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда шутит привычно, но сегодня в каждой шутке достается именно Мелиссе. Та краснеет, но не опускает глаза."
+    elif relationship_anger("melissa") > 0:
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nМелисса смеется вместе со всеми, но на амандины насмешки отвечает коротко и зло. Еще одно слово, и завтрак снова скатится в спор."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ player.change_stat("fun", 5)
+    $ Sandra.change_social(friend_delta=1)
+    $ Melissa.change_social(friend_delta=1)
+    $ Amanda.change_social(friend_delta=1)
+    $ tavern_kitchen_set_saved_text(scene_runtime.text)
+    call stat
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    jump HunterClub
+    return True
 
 
 label story_melissa_werecat_rumor_0:
-    $ SignalBlockTime = 1
     $ werecat_state()["hunter_tease_day"] = int(calendar_v2.daysInGame or 0)
-    $ MainTxt = "У дальней стены двое охотников переговариваются вполголоса, но так, чтобы половина зала все равно слышала.\n\n\"Говорят, в чаще теперь водится лесная кошка не из простых. Хвостом водит, ушами прядает, а тело такое, что у мужика колени подломятся быстрее, чем он лук натянет.\"\n\nВторой хмыкает, уже явно смакуя чужую байку: \"Если далеко заберешься, можно и след взять. А если удача с умением сходятся, такую тварь будто бы и поймать можно. Только не для всякого поводка она годится.\"\n\nПахнет дешевой бравадой и мужицкой похабщиной, но зерно в слухе, похоже, есть."
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = "У дальней стены двое охотников переговариваются вполголоса, но так, чтобы половина зала все равно слышала.\n\n\"Говорят, в чаще теперь водится лесная кошка не из простых. Хвостом водит, ушами прядает, а тело такое, что у мужика колени подломятся быстрее, чем он лук натянет.\"\n\nВторой хмыкает, уже явно смакуя чужую байку: \"Если далеко заберешься, можно и след взять. А если удача с умением сходятся, такую тварь будто бы и поймать можно. Только не для всякого поводка она годится.\"\n\nПахнет дешевой бравадой и мужицкой похабщиной, но зерно в слухе, похоже, есть."
+    $ scene_runtime.location_text = scene_runtime.text
     vscene werecat_info_picture_path()
-    "[MainTxt]"
+    "[scene_runtime.text]"
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    jump HunterClub
+    return True
 
 
 label story_melissa_werecat_home_0:
-    $ SignalBlockTime = 1
-    call WerecatAdoptionBreakfastScene
+    $ werecat_state()["adoption_breakfast_seen"] = 1
+    $ player.tavern_management.breakfast.today = True
+    $ player.tavern_management.breakfast.last_day = current_game_day()
+    $ player.tavern_management.breakfast.day = current_game_day()
+    $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
+    $ player.tavern_management.breakfast.event_active = True
+    vscene tavern_kitchen_breakfast_picture()
+    $ scene_runtime.text = "За завтраком сегодня разговор быстро сворачивает к новой обитательнице трактира. У самого очага, настороженно щурясь, устроилась ваша необычная лесная кошка, и даже с такого расстояния видно, что она следит за каждым шорохом куда внимательнее обычного зверя.\n\nСандра первой признает очевидное: \"В кладовой ночью впервые было тихо. Если эта хвостатая и правда останется у нас, припасы хоть поживут спокойно.\" Аманда тут же расплывается в ухмылке: \"Говорила же, дому нужна хорошая киска. А эта еще и красавица, не только охотница.\" Мелисса тихо фыркает, но спорить не спешит: \"Главное, чтобы она крыс душила так же ловко, как на всех смотрит.\"\n\nПохоже, в трактире уже начинают принимать вашу странную добычу как свою. История на этом не кончается, но теперь у нее наконец есть продолжение дома, а не только в лесу."
+    if relationship_anger("amanda") > 0 and relationship_anger("melissa") > 0:
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда и Мелисса опять начинают цеплять друг друга, но кошка вдруг шипит от очага, и обе замолкают. Сандра только хмыкает: \"Вот. Даже зверю надоело.\""
+    elif relationship_anger("amanda") > 0:
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда цепляет Мелиссу за каждую реплику о кошке. Мелисса держится, но губы у нее сжаты."
+    elif relationship_anger("melissa") > 0:
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nМелисса сегодня не дает Аманде разгуляться. На каждую шутку отвечает сухо, и Сандра быстро переводит разговор обратно к кладовой."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ player.change_stat("fun", 3)
+    $ Sandra.change_social(friend_delta=1)
+    $ Melissa.change_social(friend_delta=1)
+    $ Amanda.change_social(friend_delta=1)
+    $ tavern_kitchen_set_saved_text(scene_runtime.text)
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    jump HunterClub
+    return True
 
 
 label story_melissa_werecat_home_1:
-    $ SignalBlockTime = 1
-    call WerecatMonthThanksScene
+    $ werecat_state()["first_month_thanks_day"] = current_game_day()
+    $ player.tavern_management.breakfast.today = True
+    $ player.tavern_management.breakfast.last_day = current_game_day()
+    $ player.tavern_management.breakfast.day = current_game_day()
+    $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
+    $ player.tavern_management.breakfast.event_active = True
+    vscene tavern_kitchen_breakfast_picture()
+    $ scene_runtime.text = "За общим столом сегодня куда спокойнее обычного. В кладовой уже давно не слышно прежней возни, а у самого очага, свернувшись теплым клубком, дремлет ваша необычная кошка.\n\nСандра первой нарушает молчание: \"Эта малышка и правда спасла нам припасы. Если бы не она, мы бы еще долго слушали шорох в мешках и считали, сколько еды уходит в никуда.\" Потом она смотрит уже прямо на вас и говорит мягче: \"Хорошее дело вы все-таки сделали. Такой зверь дому в радость.\"\n\nОстальные тоже заметно теплеют. Даже обычная утренняя суета сегодня кажется куда уютнее."
+    if threads["melissaBatProblem"].num >= 6:
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nПосле короткой паузы Сандра добавляет уже совсем иначе: \"А ту глупую историю с чердаком пора бы и отпустить. Дом у нас старый, люди живые, а дурных случаев без того хватает. Главное, что теперь ты не отмахнулся от настоящей беды и довел дело до ума.\" Похоже, за столом наконец начинают считать тот позорный случай скорее нелепостью, чем клеймом."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ Sandra.change_social(friend_delta=1)
+    $ Melissa.change_social(friend_delta=1)
+    $ Amanda.change_social(friend_delta=1)
+    $ player.change_stat("fun", 3)
+    $ tavern_kitchen_set_saved_text(scene_runtime.text)
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    jump HunterClub
+    return True
 
 
 label story_melissa_bat_problem_0:
-    $ SignalBlockTime = 1
     $ player.tavern_management.breakfast.present_ids = ["sandra", "amanda"]
     vscene tavern_kitchen_breakfast_picture()
     "Утренний стол уже накрыт, но одного места не хватает. Аманда первой замечает пустую скамью Мелиссы и с ленивой усмешкой тянет: \"Вот увидите, сейчас она явится с таким лицом, будто всю ночь воевала с нечистой силой.\""
-    vscene Melissa.image_path("bats", "yawns")
+    vscene MelissaStaticData.image_path("bats", "yawns")
     "В этот момент в кухню, зевая и еле переставляя ноги, входит Мелисса. Вид у нее злой и невыспавшийся."
     $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
-    vscene Melissa.image_path("kitchen", "work")
+    vscene MelissaStaticData.image_path("kitchen", "work")
     "Мелисса садится за стол и, даже взяв кружку, продолжает коситься так, будто над ее головой все еще что-то шуршит."
     "Сандра уже спокойнее говорит: \"У нас уже была крысиная проблема, из-за которой портились припасы, а теперь еще и летучие мыши? После крыс в кладовой я не хочу ждать, пока новая дрянь опять испортит дом.\""
     if relationship_anger("amanda") > 0 and relationship_anger("melissa") > 0:
@@ -101,236 +141,243 @@ label story_melissa_bat_problem_0:
     else:
         "Аманда тут же оживляется, складывает пальцы в дразнящий знак и тянет с ухмылкой: \"Мелисса, а что если ты настоящая ведьма? Крысы в подвале, мыши с крыльями под крышей... Может, это все твои любимцы сбежались?\""
         "Мелисса зло щурится: \"Если я ведьма, то первым делом заколдую кое-кому язык, чтобы он хоть за завтраком помолчал.\""
-    $ MainTxt = "Разговор за столом быстро становится серьезнее. У вас в голове остается одна ясная мысль: с комнатой Мелиссы придется разбираться всерьез."
-    $ CurLocDesc = MainTxt
-    $ TavernKitchenSavedText = MainTxt
-    "[MainTxt]"
+    $ scene_runtime.text = "Разговор за столом быстро становится серьезнее. У вас в голове остается одна ясная мысль: с комнатой Мелиссы придется разбираться всерьез."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ tavern_kitchen_set_saved_text(scene_runtime.text)
+    "[scene_runtime.text]"
     $ calendar_v2.advance_minutes(45)
-    $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 1)
     $ player.tavern_management.breakfast.today = True
     $ player.tavern_management.breakfast.last_day = int(current_game_day() or 0)
     $ player.tavern_management.breakfast.day = int(current_game_day() or 0)
     $ player.tavern_management.breakfast.event_active = True
-    $ Melissa.current_location = "TavernKitchen"
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    jump HunterClub
+    return True
 
 
 label story_melissa_bat_problem_1:
+    $ renpy.dynamic("_melissa_bat_problem_1_choice")
     show screen main_ui
-    $ SignalBlockTime = 1
     $ _melissa_bat_problem_1_choice = ""
     vscene tavern_melissa_room_picture()
-    $ MainTxt = "Проходя по коридору наверху, вы слышите из комнаты Мелиссы тревожный шум: скрип кровати, злой шепот и какое-то нервное шевеление под самым потолком. Заглянув внутрь, вы видите, что Мелисса не спит и сидит на кровати, зло глядя вверх.\n\n\"О, хорошо, что ты здесь,\" шепчет она почти сразу. \"Опять эта дрянь над головой возится. То шорох, то писк, то будто кто-то бегает по балкам. Я уже не знаю, что хуже: сам шум или то, что после такой ночи утром стоишь как пьяная. Если можешь, помоги мне с этим по-человечески.\""
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
+    $ scene_runtime.text = "Проходя по коридору наверху, вы слышите из комнаты Мелиссы тревожный шум: скрип кровати, злой шепот и какое-то нервное шевеление под самым потолком. Заглянув внутрь, вы видите, что Мелисса не спит и сидит на кровати, зло глядя вверх.\n\n\"О, хорошо, что ты здесь,\" шепчет она почти сразу. \"Опять эта дрянь над головой возится. То шорох, то писк, то будто кто-то бегает по балкам. Я уже не знаю, что хуже: сам шум или то, что после такой ночи утром стоишь как пьяная. Если можешь, помоги мне с этим по-человечески.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     menu:
         "Сказать, что вы разберетесь с этим":
             $ _melissa_bat_problem_1_choice = "promise"
-            $ MainTxt = "Вы обещаете, что не ограничитесь одними словами. Сначала вы прямо сейчас осматриваете потолок и щели в комнате, а утром подниметесь на чердак над ней.\n\nПод самым верхом действительно видны мелкие дыры в дереве, а оттуда тянет затхлым чердаком. Теперь все ясно: надо лезть наверх и смотреть, что там развелось."
+            $ scene_runtime.text = "Вы обещаете, что не ограничитесь одними словами. Сначала вы внимательно осмотрите потолок и щели в ее комнате, а утром подниметесь на чердак над ней.\n\n\"Вот это уже похоже на дело,\" тихо отвечает Мелисса. \"Ладно. Если ты и правда туда полезешь, я хотя бы буду знать, что мне не чудится.\""
         "Успокоить Мелиссу":
             $ _melissa_bat_problem_1_choice = "comfort"
-            $ MainTxt = "Вы говорите Мелиссе чуть тише и спокойнее, чем обычно, что не отмахнетесь от ее жалоб. От этого она не перестает злиться на потолок, но по голосу слышно, что ей уже легче от одного того, что кто-то наконец воспринимает проблему всерьез."
+            $ scene_runtime.text = "Вы говорите Мелиссе чуть тише и спокойнее, чем обычно, что не отмахнетесь от ее жалоб. От этого она не перестает злиться на потолок, но по голосу слышно, что ей уже легче от одного того, что кто-то наконец воспринимает проблему всерьез."
         "Оставить ее на сегодня в покое":
             $ _melissa_bat_problem_1_choice = "leave"
-            $ MainTxt = "Вы решаете пока не затягивать ночной разговор. Мелисса недовольно выдыхает, плотнее кутается в одеяло и снова косится на потолок."
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
+            $ scene_runtime.text = "Вы решаете пока не затягивать ночной разговор. Мелисса недовольно выдыхает, плотнее кутается в одеяло и снова косится на потолок."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     $ calendar_v2.advance_minutes(45)
     if _melissa_bat_problem_1_choice == "promise":
-        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
-        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
-        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
-        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
-        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
-        $ Melissa.var["AskedMCToSolveRoomProblem"] = 1
-        $ Melissa.var["bats_episode"] = 3
-        $ Melissa.var["bat_attic_check_day"] = max(int(Melissa.var.get("bat_attic_check_day", -1) or -1), int(current_game_day() or 0))
+        $ Melissa.bat_attic_check_day = max(people_to_int(Melissa.bat_attic_check_day, -1), int(current_game_day() or 0))
         $ event_runtime.active_thread.advance()
         $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
     elif _melissa_bat_problem_1_choice == "comfort":
-        $ Melissa.add_trust(1)
+        $ Melissa.change_social(friend_delta=1)
+    return True
+
+
+label story_melissa_bat_problem_room_inspect:
+    vscene tavern_melissa_room_picture()
+    $ scene_runtime.text = "Вы внимательно осматриваете потолок и верхние балки в комнате Мелиссы. Под самым потолком обнаруживаются мелкие щели и темные норки в старом дереве, а сверху тянет пылью и затхлым чердаком. Теперь ясно: шум идет не из самой комнаты — дрянь пробирается сюда через старую крышу. Утром придется подняться наверх и проверить все над ее потолком."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+    $ calendar_v2.advance_minutes(45)
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
     return True
 
 
 label story_melissa_bat_problem_2:
-    $ SignalBlockTime = 1
     vscene "images/player_room/player_room_attic_1.png"
-    $ MainTxt = "Вы медленно обходите чердак вдоль стропил и почти сразу замечаете над той частью дома, где спит Мелисса, старые щели между досками и темные ходы в подгнившей обшивке.\n\nЕще через пару шагов находится и главная причина ночного шума. Под самой кровлей набилось сухое гнездовое тряпье, комки мха, помет и целая дрянная колония, давно обжившая балки и пустоты под крышей. Одним веником тут не обойтись: сначала эту пакость придется выкурить дымом, а потом уже по-настоящему заделывать щели."
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
+    $ scene_runtime.text = "Вы медленно обходите чердак вдоль стропил и почти сразу замечаете над той частью дома, где спит Мелисса, старые щели между досками и темные ходы в подгнившей обшивке.\n\nЕще через пару шагов находится и главная причина ночного шума. Под самой кровлей набилось сухое гнездовое тряпье, комки мха, помет и целая дрянная колония, давно обжившая балки и пустоты под крышей. Одним веником тут не обойтись: сначала эту пакость придется выкурить дымом, а потом уже по-настоящему заделывать щели."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     $ calendar_v2.advance_minutes(45)
-    $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 4)
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    jump HunterClub
+    return True
 
 
 label story_melissa_bat_problem_3:
+    $ renpy.dynamic("_melissa_bat_problem_3_choice")
     show screen main_ui
-    $ SignalBlockTime = 1
     $ _melissa_bat_problem_3_choice = ""
     vscene "images/player_room/player_room_attic.png"
-    $ MainTxt = "Раздвинув старое тряпье и осторожно пригнувшись, вы находите маленькое слуховое окно над стороной дома, где расположена комната Аманды. Сквозь мутное стекло и щели в раме открывается слишком уж ясный вид на соседний двор.\n\n" + attic_neighbor_sex_scene_text() + " Вы невольно задерживаетесь у окна дольше, чем следовало бы."
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
+    $ scene_runtime.text = "Раздвинув старое тряпье и осторожно пригнувшись, вы находите маленькое слуховое окно над стороной дома, где расположена комната Аманды. Сквозь мутное стекло и щели в раме открывается слишком уж ясный вид на соседний двор.\n\n" + attic_neighbor_sex_scene_text() + " Вы невольно задерживаетесь у окна дольше, чем следовало бы."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     menu:
         "Податься ближе":
             $ _melissa_bat_problem_3_choice = "fall"
-            vscene "images/player_room/batsProblem/fell_from_attic.png"
-            "Вы тянетесь вперед еще на полшага, но старое дерево под ногами не выдерживает. Доска жалобно трещит, потом ломается, и в следующий миг вас с грохотом несет вниз вместе с пылью, щепками и куском прогнившего настила."
-            "Несколько тяжелых мгновений вы лежите среди пыли и щепок, пытаясь понять, куда именно вас выбросило. С потолка свисают обломки, над головой зияет пролом, а вокруг слишком хорошо знакомые вещи из вашей комнаты."
-            vscene "images/player_room/batsProblem/melissa in room.png"
-            "Дверь распахивается как раз тогда, когда вы пытаетесь подняться. На пороге появляется Мелисса: растрепанная, злая, с одеялом и узлом вещей в руках. Она явно собиралась переждать ночь подальше от своей комнаты, но вместо этого застает вас посреди вашей собственной спальни, под грудой чердачного мусора."
-            vscene "images/player_room/batsProblem/melissa in the room.png"
-            "Мелисса смотрит на пролом, потом на вас, потом снова вверх. На ее лице за одно мгновение сменяются испуг, понимание и обида."
-            vscene "images/player_room/batsProblem/melissa_talk.png"
-            "\"Ты... ты извращенец!\" — срывается у нее голос. — \"Подглядывал оттуда? А потом еще и свалился сюда через потолок?! Всё. Хватит. Сегодня же переберусь к Аманде. Там, по крайней мере, потолок на голову не падает!\""
-            $ MainTxt = "Вы провалились с чердака в свою комнату как раз в тот момент, когда Мелисса пришла сюда с вещами. Объясняться сейчас бесполезно: история вышла слишком громкой и слишком стыдной."
         "Отступить от окна":
             $ _melissa_bat_problem_3_choice = "retreat"
-            $ MainTxt = "Вы отступаете от окна, пока старые доски под ногами еще держат. Гнездовище найдено, но с чердаком придется разбираться осторожнее."
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
-    $ calendar_v2.advance_minutes(45)
+            $ scene_runtime.text = "Вы отступаете от окна, пока старые доски под ногами еще держат. Гнездовище найдено, но с чердаком придется разбираться осторожнее."
+    $ event_runtime.active_thread.advance()
     if _melissa_bat_problem_3_choice == "fall":
-        $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 6)
-        $ Melissa.var["drawings_ready_day"] = int(current_game_day() or 0) + 2
-        $ Melissa.var["temp_room"] = "TavernAmandaRoom"
-        $ Amanda.set_var_int("attic_window_busted", 1)
-        $ Melissa.add_trust(-7)
-        $ Amanda.change_social(friend_delta=-5)
-        $ notoriety = min(100, int(notoriety or 0) + 10)
-        $ player.economy.tavern_fame = max(-20, int(player.economy.tavern_fame or 0) - 2)
-        $ event_runtime.active_thread.advance()
+        call story_melissa_bat_problem_fall
+    else:
+        $ scene_runtime.location_text = scene_runtime.text
+        "[scene_runtime.text]"
+        $ calendar_v2.advance_minutes(45)
         $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
-    else:
-        $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 5)
+    return True
+
+
+label story_melissa_bat_problem_fall:
+    vscene "images/player_room/batsProblem/fell_from_attic.png"
+    "Вы тянетесь вперед еще на полшага, но старое дерево под ногами не выдерживает. Доска жалобно трещит, потом ломается, и в следующий миг вас с грохотом несет вниз вместе с пылью, щепками и куском прогнившего настила."
+    "Несколько тяжелых мгновений вы лежите среди пыли и щепок, пытаясь понять, куда именно вас выбросило. С потолка свисают обломки, над головой зияет пролом, а вокруг слишком хорошо знакомые вещи из вашей комнаты."
+    vscene "images/player_room/batsProblem/melissa in room.png"
+    "Дверь распахивается как раз тогда, когда вы пытаетесь подняться. На пороге появляется Мелисса: растрепанная, злая, с одеялом и узлом вещей в руках. Она явно собиралась переждать ночь подальше от своей комнаты, но вместо этого застает вас посреди вашей собственной спальни, под грудой чердачного мусора."
+    vscene "images/player_room/batsProblem/melissa in the room.png"
+    "Мелисса смотрит на пролом, потом на вас, потом снова вверх. На ее лице за одно мгновение сменяются испуг, понимание и обида."
+    vscene "images/player_room/batsProblem/melissa_talk.png"
+    "\"Ты... ты извращенец!\" — срывается у нее голос. — \"Подглядывал оттуда? А потом еще и свалился сюда через потолок?! Всё. Хватит. Сегодня же переберусь к Аманде. Там, по крайней мере, потолок на голову не падает!\""
+    $ scene_runtime.text = "Вы провалились с чердака в свою комнату как раз в тот момент, когда Мелисса пришла сюда с вещами. Объясняться сейчас бесполезно: история вышла слишком громкой и слишком стыдной."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+    $ calendar_v2.advance_minutes(45)
+    $ Melissa.drawings_ready_day = int(current_game_day() or 0) + 2
+    $ Melissa.temp_room_code = "TavernAmandaRoom"
+    $ Melissa.change_social(friend_delta=-7)
+    $ Amanda.change_social(friend_delta=-5)
+    $ player.change_stat("notoriety", 10)
+    $ player.economy.tavern_fame = max(-20, int(player.economy.tavern_fame or 0) - 2)
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
     return True
 
 
 label story_melissa_bat_problem_5:
-    $ SignalBlockTime = 1
     if int(effective_player_exploration() or 0) <= 120:
-        $ MainTxt = "Пока Мелисса вынужденно ночует у Аманды, ее собственная комната остается непривычно тихой. Вы осматриваете ее внимательнее обычного: ларь, табурет, складки одеяла, щель между стеной и кроватью. Однако за сорок пять минут поисков ничего важного в глаза так и не бросается."
-        $ CurLocDesc = MainTxt
-        "[MainTxt]"
+        $ scene_runtime.text = "Пока Мелисса вынужденно ночует у Аманды, ее собственная комната остается непривычно тихой. Вы осматриваете ее внимательнее обычного: ларь, табурет, складки одеяла, щель между стеной и кроватью. Однако за сорок пять минут поисков ничего важного в глаза так и не бросается."
+        $ scene_runtime.location_text = scene_runtime.text
+        "[scene_runtime.text]"
         $ calendar_v2.advance_minutes(45)
     else:
-        vscene Melissa.image_path("bedroom_search", "booklet")
+        vscene MelissaStaticData.image_path("bedroom_search", "booklet")
         "Пока Мелисса вынужденно ночует у Аманды, ее собственная комната остается непривычно тихой. Вы осматриваете ее внимательнее обычного: ларь, табурет, складки одеяла, щель между стеной и кроватью."
         "Под кроватью Мелиссы, задвинутый почти к самой стене, обнаруживается потертый рисованный буклет. Обложка ничего не объясняет, зато место, где его прятали, говорит само за себя."
-        $ Melissa.var["drawings_found"] = 1
-        $ MainTxt = "Под кроватью Мелиссы вы нашли {a=melissa_room_object:melissa_drawings_booklet_001}{color=#245b2b}потертый рисованный буклет{/color}{/a}. Теперь его можно рассмотреть как найденный предмет."
-        $ CurLocDesc = MainTxt
-        "[MainTxt]"
+        $ Melissa.drawings_found = True
+        $ scene_runtime.text = "Под кроватью Мелиссы вы нашли потертый рисованный буклет. Теперь его можно рассмотреть как найденный предмет."
+        $ scene_runtime.location_text = scene_runtime.text
+        "[scene_runtime.text]"
         $ calendar_v2.advance_minutes(45)
-        $ event_runtime.active_thread.advance()
         $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
-        call TavernMelissaRoomBuildActions
+        $ main_ui_runtime.action_title = "Комната Мелиссы"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
     return True
 
 
 label MelissaBookletOpenPreview:
-    vscene Melissa.image_path("bedroom_search", "lewd_pages")
-    $ MainTxt = "Вы раскрываете буклет на первых страницах. Манера уверенная, линии смелые, а сюжеты вовсе не девичьи."
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
+    vscene MelissaStaticData.image_path("bedroom_search", "lewd_pages")
+    $ scene_runtime.text = "Вы раскрываете буклет на первых страницах. Манера уверенная, линии смелые, а сюжеты вовсе не девичьи."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     $ calendar_v2.advance_minutes(5)
-    $ Melissa.var["drawings_booklet_opened"] = 1
-    call TavernMelissaRoomObjectMenu("melissa_drawings_booklet_001", True)
+    if int(player.item_count("melissa_drawings_booklet_001") or 0) > 0:
+        call PlayerCardInventoryItemMenu("melissa_drawings_booklet_001", True)
+    else:
+        call TavernMelissaRoomObjectMenu("melissa_drawings_booklet_001", True)
     return
 
 
-label ReadMelissaBooklet(return_to_location=True):
-    vscene Melissa.image_path("bedroom_search", "booklet")
+label ReadMelissaBooklet:
+    vscene MelissaStaticData.image_path("bedroom_search", "booklet")
     "Вы достаете спрятанную пачку рисунков и осторожно разворачиваете потертые листы."
-    vscene Melissa.image_path("bedroom_search", "lewd_pages")
+    vscene MelissaStaticData.image_path("bedroom_search", "lewd_pages")
     "Первые страницы выглядят почти как упражнение в линии и тени, но позы и детали быстро выдают совсем другой интерес автора."
-    vscene Melissa.cycle_image("bedroom_search", "lewd_pages", 1)
+    vscene MelissaStaticData.cycle_image("bedroom_search", "lewd_pages", 1)
     "На следующих листах осторожность исчезает: тела нарисованы смело, без стыда, будто тот, кто держал перо, слишком хорошо представлял себе каждое движение."
-    vscene Melissa.cycle_image("bedroom_search", "lewd_pages", 2)
+    vscene MelissaStaticData.cycle_image("bedroom_search", "lewd_pages", 2)
     $ player_apply_arousal_trigger("melissa_booklet", 18)
     "К концу просмотра мысли становятся тяжелее и жарче. Это уже не просто любопытство: картинки цепляют тело быстрее, чем вы успеваете отвести взгляд."
     $ calendar_v2.advance_minutes(10)
-    $ Melissa.var["drawings_booklet_opened"] = 1
-    $ Melissa.var["drawings_booklet_read"] = 1
-    if bool(return_to_location):
-        menu:
-            "Закрыть буклет":
-                jump expression CurLoc
-    call TavernMelissaRoomObjectMenu("melissa_drawings_booklet_001", True)
+    $ Melissa.drawings_booklet_read = True
+    if int(player.item_count("melissa_drawings_booklet_001") or 0) > 0:
+        call PlayerCardInventoryItemMenu("melissa_drawings_booklet_001", True)
+    else:
+        call TavernMelissaRoomObjectMenu("melissa_drawings_booklet_001", True)
     return
 
 
 label MelissaBookletTake:
     call Take("melissa_drawings_booklet_001", "TavernMelissaRoom", "", "melissa_drawings_booklet_001")
     if int(player.item_count("melissa_drawings_booklet_001") or 0) > 0:
-        $ Melissa.var["drawings_booklet_taken"] = 1
-        $ Melissa.var["drawings_booklet_left"] = 0
-    $ current_object_id = ""
-    call TavernMelissaRoomBuildActions
+        $ Melissa.drawings_booklet_left = False
+    $ main_ui_runtime.object_id = ""
+    $ main_ui_runtime.action_title = "Комната Мелиссы"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
     return
 
 
 label MelissaBookletLeaveThere:
-    vscene Melissa.image_path("bedroom_search", "booklet")
-    $ MainTxt = "Вы аккуратно возвращаете буклет туда, где нашли. Теперь вы знаете, что искать и где смотреть, не выдавая того, что уже обнаружили тайник."
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
-    $ Melissa.var["drawings_booklet_left"] = 1
-    $ Melissa.var["drawings_spy_option_unlocked"] = 1
+    vscene MelissaStaticData.image_path("bedroom_search", "booklet")
+    $ scene_runtime.text = "Вы аккуратно возвращаете буклет туда, где нашли. Теперь вы знаете, что искать и где смотреть, не выдавая того, что уже обнаружили тайник."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+    $ Melissa.drawings_booklet_left = True
     call TavernMelissaRoomObjectMenu("melissa_drawings_booklet_001", True)
     return
 
 
 label MelissaBookletContinueSearch:
-    $ current_object_id = ""
-    $ MainTxt = "Вы оставляете буклет пока лежать под кроватью и продолжаете осматривать комнату."
-    $ CurLocDesc = MainTxt
-    call TavernMelissaRoomBuildActions
+    $ main_ui_runtime.object_id = ""
+    $ scene_runtime.text = "Вы оставляете буклет пока лежать под кроватью и продолжаете осматривать комнату."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Комната Мелиссы"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = tavern_melissa_room_action_items()
     return
 
 
 label story_melissa_bat_problem_4:
-    $ SignalBlockTime = 1
-    $ _melissa_bat_problem_4_result = ""
     vscene "images/player_room/player_room_attic_1.png"
-    if int(Melissa.var.get("bats_episode", 0) or 0) < 7:
-        if int(player.item_count("bat_repellent_001") or 0) > 0:
-            $ _melissa_bat_problem_4_result = "smoke"
-            $ MainTxt = "Вы раскладываете дымную смесь между балок, даете ей как следует разгореться и быстро отступаете. Чердак наполняется густым едким дымом из мха, лаванды и трав. Из-под крыши с писком и хлопаньем вырываются летучие мыши.\n\nГнездовище вы наконец выкурили, но на одном дыме дело не закончится: пока крышу не заделают как следует, щели останутся и вся пакость со временем полезет обратно."
-        else:
-            $ MainTxt = "Теперь уже ясно, что под крышей свилось настоящее гнездовище. Просто так его не вымести: сначала нужна едкая дымная смесь, чтобы выгнать всю эту дрянь из-под кровли."
-    elif int(Melissa.var.get("roof_repair_order_day", -1) or -1) < 0:
-        if int(money or 0) >= 1000:
-            $ _melissa_bat_problem_4_result = "order_roof"
-            $ MainTxt = "Вы договариваетесь о починке старой крыши и отдаете за работу тысячу монет. Теперь остается только дождаться, пока мастера перетянут гнилые доски, забьют щели и приведут верх трактира в порядок. Обещают управиться за пару дней."
-        else:
-            $ MainTxt = "Летучих мышей вы уже выкурили, но без починки крыши дело не закончить. Денег на мастеров пока не хватает."
-    elif int(Melissa.var.get("roof_repair_complete_day", -1) or -1) < 0 or int(current_game_day() or 0) < int(Melissa.var.get("roof_repair_complete_day", -1) or -1):
-        $ _days_left = max(0, int(Melissa.var.get("roof_repair_complete_day", -1) or -1) - int(current_game_day() or 0))
-        $ MainTxt = "Крыша еще в работе. По свежим доскам и забитым щелям видно, что мастера уже начали, но до полного порядка придется подождать еще {} дн.".format(_days_left)
+    if int(player.item_count("bat_repellent_001") or 0) > 0:
+        $ scene_runtime.text = "Вы раскладываете дымную смесь между балок, даете ей как следует разгореться и быстро отступаете. Чердак наполняется густым едким дымом из мха, лаванды и трав. Из-под крыши с писком и хлопаньем вырываются летучие мыши.\n\nГнездовище вы наконец выкурили, но на одном дыме дело не закончится: пока крышу не заделают как следует, щели останутся и вся пакость со временем полезет обратно."
     else:
-        $ MainTxt = "Теперь на чердаке сразу видно, что работа завершена: щели закрыты, прогнившие доски заменены, а от старого гнездовища не осталось ничего, кроме сухой пыли."
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
+        $ scene_runtime.text = "Теперь уже ясно, что под крышей свилось настоящее гнездовище. Просто так его не вымести: сначала нужна едкая дымная смесь, чтобы выгнать всю эту дрянь из-под кровли."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     $ calendar_v2.advance_minutes(45)
-    if _melissa_bat_problem_4_result == "smoke":
+    if int(player.item_count("bat_repellent_001") or 0) > 0:
         $ player.remove_item("bat_repellent_001", 1)
-        $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 7)
-        $ Melissa.var["bat_recipe_unlocked"] = 1
-    elif _melissa_bat_problem_4_result == "order_roof":
-        $ money = int(money or 0) - 1000
-        $ Melissa.var["roof_repair_order_day"] = int(current_game_day() or 0)
-        $ Melissa.var["roof_repair_complete_day"] = int(current_game_day() or 0) + 2
         $ event_runtime.active_thread.advance()
+        $ event_runtime.evaluation_time = None
+        $ findAvailableEvents(True)
+    return True
+
+
+label story_melissa_bat_problem_roof:
+    vscene "images/player_room/player_room_attic_1.png"
+    if int(player.economy.money or 0) >= 1000:
+        $ scene_runtime.text = "Вы договариваетесь о починке старой крыши и отдаете за работу тысячу монет. Теперь остается только дождаться, пока мастера перетянут гнилые доски, забьют щели и приведут верх трактира в порядок. Обещают управиться за пару дней."
+    else:
+        $ scene_runtime.text = "Летучих мышей вы уже выкурили, но без починки крыши дело не закончить. Денег на мастеров пока не хватает."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+    $ calendar_v2.advance_minutes(45)
+    if int(player.economy.money or 0) >= 1000:
+        $ player.spend_money(1000)
+        $ Melissa.roof_repair_complete_day = int(current_game_day() or 0) + 2
         $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
         call stat
@@ -338,16 +385,14 @@ label story_melissa_bat_problem_4:
 
 
 label story_melissa_bat_problem_6:
-    $ SignalBlockTime = 1
-    vscene Melissa.image_path("portrait", "thanks")
-    $ MainTxt = "Вы говорите Мелиссе, что на этот раз все действительно закончено: чердачное гнездовище выжжено, щели под крышей забиты, а над ее комнатой теперь наконец тихо. Она сперва смотрит на вас с привычной настороженностью, будто все еще ждет подвоха, но потом сама коротко выдыхает и впервые за все это время заметно расслабляется.\n\n\"Значит, можно снова спать у себя и не ждать, что ночью над головой начнут бегать, пищать и сыпать трухой...\" Она качает головой, будто сама до конца не верит в удачу, а потом уже тише добавляет: \"Спасибо. Не за слова — за то, что ты и правда довел дело до конца.\"\n\nПохоже, история с летучими мышами и чердаком для Мелиссы наконец действительно закрыта."
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
+    vscene MelissaStaticData.image_path("portrait", "thanks")
+    $ scene_runtime.text = "Вы говорите Мелиссе, что на этот раз все действительно закончено: чердачное гнездовище выжжено, щели под крышей забиты, а над ее комнатой теперь наконец тихо. Она сперва смотрит на вас с привычной настороженностью, будто все еще ждет подвоха, но потом сама коротко выдыхает и впервые за все это время заметно расслабляется.\n\n\"Значит, можно снова спать у себя и не ждать, что ночью над головой начнут бегать, пищать и сыпать трухой...\" Она качает головой, будто сама до конца не верит в удачу, а потом уже тише добавляет: \"Спасибо. Не за слова — за то, что ты и правда довел дело до конца.\"\n\nПохоже, история с летучими мышами и чердаком для Мелиссы наконец действительно закрыта."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     $ calendar_v2.advance_minutes(45)
-    $ event_runtime.active_thread.complete()
+    $ event_runtime.active_thread.advance()
     $ Melissa.complete_bats_problem()
-    $ Melissa.add_trust(3)
-    $ Melissa.add_openness(2)
+    $ Melissa.change_social(friend_delta=3, open_delta=2)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     return True

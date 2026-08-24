@@ -1,77 +1,40 @@
-    $ sync_player_state_from_store()    hide screen tavern_report_card_overlay    hide screen time_change_card_overlay    hide screen girl_card_overlay
-    hide screen player_card_overlay    hide screen time_change_card_overlay    $ sync_player_state_from_store()    hide screen tavern_report_card_overlay    hide screen time_change_card_overlay    hide screen girl_card_overlay
-    hide screen player_card_overlay    hide screen time_change_card_overlay    $ sync_player_state_from_store()    hide screen tavern_report_card_overlay    hide screen time_change_card_overlay    hide screen girl_card_overlay
-    hide screen player_card_overlay    hide screen time_change_card_overlay# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # NextDay location - converted from legacy script
-default NextDayReportTitle = ""
-default NextDayReportBody = ""
-
 init python:
+    class NextDayRuntimeState(object):
+        def __init__(self):
+            self.report_title = ""
+            self.report_body = ""
+            self.current_day = {}
+
+        def update(self):
+            self.report_title = str(getattr(self, "report_title", "") or "")
+            self.report_body = str(getattr(self, "report_body", "") or "")
+            current_day = getattr(self, "current_day", {})
+            self.current_day = dict(current_day) if isinstance(current_day, dict) else {}
+            return self
+
     def _nextday_clean_report_text(text):
         return str(text or "").replace("<br>", "\n").strip()
 
     def nextday_started_after_midnight():
-        try:
-        except Exception:
-            pass
-
-        try:
-        except Exception:
-            pass
-
-        try:
-            try:
-            current_hour = int(calendar_v2.hour or 0) % 24
-        except Exception:
-            try:
-                current_hour = int(hour or 0) % 24
-            except Exception:
-                current_hour = 0
-
-        except Exception:
-            try:
-                current_hour = int(hour or 0) % 24
-            except Exception:
-                current_hour = 0
-
+        current_hour = int(calendar_v2.hour or 0) % 24
         return 0 <= current_hour < 6
 
-    def nextday_pick_post_sleep_event_label():
-        try:
-            Sandra.ensure_story_defaults()
-        except Exception:
-            return ""
-
-        try:
-            current_time = int(time or 0)
-        except Exception:
-            current_time = 0
-
-        if (
-            current_time == 0
-            and Sandra.weekly_thanks_event_ready()
-        ):
-            try:
-                return str(Sandra.weekly_thanks_target_label() or "")
-            except Exception:
-                return ""
-
-        return ""
-
 label NextDay(retlocname, timepassed):
+    $ renpy.dynamic("visitorshappy", "_nextday_skip_first_calendar_roll", "TotalEventsSummary", "ExtraEvents", "iDaysCount", "_nextday_girl", "TotalDay", "TotalWhoreClients", "TotalGloryHoleClients", "_weekly_msg", "CurDay", "_nextday_summary_text", "_nextday_money_delta", "NewDressCame", "dress_name", "avg_happy", "tavernlevel", "_nextday_lines", "_geo_name", "_liza_name", "_tractir_game_over_ending", "_nextday_return_label", "_girl")
+    $ next_day_runtime.update()
     $ visitorshappy = 0
-    $ SomebodyCums = 0
     $ _nextday_skip_first_calendar_roll = nextday_started_after_midnight()
     
     python:
         TotalEventsSummary = ''
         ExtraEvents = ''
         iDaysCount = 0
-        cookincr = {}
-        cleanincr = {}
-        waitressincr = {}
+        for _nextday_girl in people.girl_values():
+            _nextday_girl.reset_skill_gains()
         
         # Initialize totals dictionaries
         TotalDay = {
@@ -90,10 +53,11 @@ label NextDay(retlocname, timepassed):
                 ExtraEvents += _weekly_msg
 
         call NextDay_FinishDayEvents
-        $ CurDay = {}
+        $ next_day_runtime.current_day = {}
+        $ CurDay = next_day_runtime.current_day
         call NextDay_TavernDaily
 
-        call DisplayTavernEventsSummary(day, month, year)
+        call DisplayTavernEventsSummary(calendar_v2.day, calendar_v2.period, calendar_v2.cycle)
         $ _nextday_summary_text = _return
         if _nextday_summary_text:
             $ TotalEventsSummary += _nextday_summary_text
@@ -118,9 +82,9 @@ label NextDay(retlocname, timepassed):
         $ calendar_v2.hour = 6
         $ calendar_v2.minute = 0
         $ Clara.prepare_daily_event_rolls()
-        $ player_state(False).daily_maintenance(1)
+        $ player.daily_maintenance(1)
         
-        call NextDay_NewDayEvents
+        call NextDay_NewDayEvents(retlocname)
         call CreateTavernEvents
         
         $ iDaysCount += 1
@@ -132,28 +96,29 @@ label NextDay(retlocname, timepassed):
         TotalDay['gloryholerevenue'] = TotalGloryHoleClients['georgett']*2 + TotalGloryHoleClients['liza']*2
         
         player.economy.tavern_fame += TotalDay['loyalty']
-        money += (TotalDay['revenue'] - TotalDay['dineout'] - TotalDay['fixedcost'] +
+        _nextday_money_delta = (TotalDay['revenue'] - TotalDay['dineout'] - TotalDay['fixedcost'] +
                 TotalDay['whorerevenue'] + TotalDay['gloryholerevenue'] +
-                TotalDay['KidsMoney'] + (600 if KidBirthPosobie else 0))
+                TotalDay['KidsMoney'] + (600 if player.economy.child_birth_benefit_notice else 0))
+        player.add_money(_nextday_money_delta)
         
         NewDressCame = ''
         
         # Handle dress delivery
-        if DressProduced:
-            if DressBuyer == 'You':
-                dress_name = ShortDressName.get(DressProduced, DressProduced).lower()
+        if dress_shop.produced:
+            if dress_shop.buyer == 'You':
+                dress_name = ShortDressName.get(dress_shop.produced, dress_shop.produced).lower()
                 NewDressCame = f'Утром прибежал посыльный из лавки Фараго и принес вам ваш заказ - {dress_name}.'
-                player.appearance.add_dress(DressProduced, int(dayspassed or 0))
+                player.appearance.add_dress(dress_shop.produced, int(current_game_day()))
                 
-            if money >= 50:
+            if player.economy.money >= 50:
                 NewDressCame += f' Вы поблагодарили мальчишку, дав ему 5 мараведи, и положили обнову в ларь.'
-                money -= 5
+                player.spend_money(5)
             else:
                 NewDressCame += f' Вы забрали заказ, проигнорировав протянутую ладошку мальчишки и не дав ему ничего на чай. А обновку вы положили в ларь.'
                 Irma.change_social(friend_delta=-1)
                 
-        DressProduced = ''
-        DressBuyer = ''
+        dress_shop.produced = ''
+        dress_shop.buyer = ''
         
         # Calculate tavern level based on happiness
         avg_happy = TotalDay['happy'] / float(timepassed) if timepassed else 0
@@ -176,8 +141,8 @@ label NextDay(retlocname, timepassed):
 
     python:
         _nextday_lines = []
-        _geo_name = str(RealName.get('georgett', 'Жоржетта') or 'Жоржетта')
-        _liza_name = str(RealName.get('liza', 'Лизетта') or 'Лизетта')
+        _geo_name = str(people_display_name('georgett') or 'Жоржетта')
+        _liza_name = str(people_display_name('liza') or 'Лизетта')
 
         _nextday_lines.append("Новый день настал!")
 
@@ -192,7 +157,7 @@ label NextDay(retlocname, timepassed):
 
         if TotalDay['HorseFood'] > 0:
             if not TotalDay['HorseStolen']:
-                _nextday_lines.append("%s съел сена на %s мараведи." % (MyStallion, TotalDay['HorseFood']))
+                _nextday_lines.append("%s съел сена на %s мараведи." % (player.horse.name, TotalDay['HorseFood']))
             else:
                 _nextday_lines.append("%s Пока же он был с вами, он успел сожрать сена на %s мараведи." % (TotalDay['HorseStolen'], TotalDay['HorseFood']))
 
@@ -201,8 +166,8 @@ label NextDay(retlocname, timepassed):
         if TotalDay['dineout'] > 0:
             _nextday_lines.append("Однако вам не хватило запаса продуктов и вы вынужденны были кушать у конкурентов, потратив на это %s мараведи. Люди обратили внимание на то, что вы предпочитаете не есть собственную еду и рассказали об этом своим знакомым." % TotalDay['dineout'])
 
-        if str(KidBirthPosobie or "").strip():
-            _nextday_lines.append(str(KidBirthPosobie))
+        if str(player.economy.child_birth_benefit_notice or "").strip():
+            _nextday_lines.append(str(player.economy.child_birth_benefit_notice))
 
         if TotalDay['KidsMoney'] > 0:
             _nextday_lines.append("В воскресенье вам именем герцогини Кончитты Дель Семени было выплаченно %s мараведи воспоможения на детей." % TotalDay['KidsMoney'])
@@ -224,11 +189,8 @@ label NextDay(retlocname, timepassed):
         _nextday_lines.append("На кухне остается %s мешков продуктов." % DispFrac(player.tavern_management.productnum))
         _nextday_lines.append("В погребе остается %s бочонков вина." % DispFrac(player.tavern_management.winenum))
 
-        if CursedByEllona > 0 and CursedByEllonaDays <= 0:
-            CursedByEllona = 0
-            player.intimacy.can_cum_daily += CursedByEllonaReduce
-            CursedByEllonaDays = 0
-            CursedByEllonaReduce = 0
+        if player.intimacy.ellona_cursed and player.intimacy.ellona_curse_days <= 0:
+            player.intimacy.lift_ellona_curse()
             _nextday_lines.append("ВЫ ПОЧУВСТВОВАЛИ КАК ПРОКЛЯТЬЕ ГРАЦИИ УШЛО. ВАША МУЖСКАЯ СИЛА ВОССТАНОВИЛАСЬ.")
 
         if str(NewDressCame or "").strip():
@@ -256,32 +218,23 @@ label NextDay(retlocname, timepassed):
         for _girl in ('sandra', 'melissa', 'amanda'):
             _nextday_lines.extend(describe_skill_increase(_girl))
 
-        NextDayReportTitle = "ОТЧЕТ ЗА ДЕНЬ"
-        NextDayReportBody = "\n".join([str(_line) for _line in _nextday_lines if str(_line or "").strip()])
-        KidBirthPosobie = ''
+        next_day_runtime.report_title = "ОТЧЕТ ЗА ДЕНЬ"
+        next_day_runtime.report_body = "\n".join([str(_line) for _line in _nextday_lines if str(_line or "").strip()])
+        player.economy.child_birth_benefit_notice = ''
     
     # Reset daily variables
     $ Georgett.set_story_value("foundinchurch", 0)
-    $ player.intimacy.set_arousal(0, "You")
+    $ player.intimacy.set_arousal(0)
     $ player.intimacy.came_today = 0
-    $ energy = 100
-    $ BlockTimeAdvance = 1
+    $ player.set_stat("energy", 100)
+    $ calendar_v2.time_advance_blocked = 1
     call TractirCheckAchievements
     call TractirShowPendingAchievements
-    $ notoriety = 0
+    $ player.set_stat("notoriety", 0)
     
     # Ensure minimums
     if player.tavern_management.visitors < 0:
         $ player.tavern_management.visitors = 0
-    if money < 0:
-        $ money = 0
-        
-    if money < 0:
-        $ money = 0
-        
-    if money < 0:
-        $ money = 0
-        
     # Check game over conditions through the shared endings registry.
     call TractirCheckEndings
     $ _tractir_game_over_ending = str(_return or "")
@@ -289,7 +242,6 @@ label NextDay(retlocname, timepassed):
     call stat
     hide screen main_ui
     call screen nextday_report_card_overlay
-    $ checkpoint_tractir_progress("next_day", True)
     
     # End game or return
     if player.economy.money == 0 or player.tavern_management.visitors == 0:
@@ -298,20 +250,21 @@ label NextDay(retlocname, timepassed):
                 jump Intro
     else:
         $ _nextday_return_label = str(retlocname or "TavernMain")
-        if int(time or 0) == 0 and _nextday_return_label == "TavernMain":
+        if int(calendar_v2.time_slot() or 0) == 0 and _nextday_return_label == "TavernMain":
             $ _nextday_return_label = "TavernMyRoom"
-        $ _nextday_post_sleep_label = str(nextday_pick_post_sleep_event_label() or "")
-        if _nextday_post_sleep_label != "":
-            call expression _nextday_post_sleep_label pass (_nextday_return_label,)
+        call checkTriggers("TavernMyRoom", "sleep", 0)
         jump expression _nextday_return_label
     return
+
+
+default next_day_runtime = NextDayRuntimeState()
 
 
 screen nextday_report_card_overlay():
     zorder 130
 
-    $ _title = str(NextDayReportTitle or "ОТЧЕТ")
-    $ _body = str(NextDayReportBody or "Ничего не произошло.")
+    $ _title = str(next_day_runtime.report_title or "ОТЧЕТ")
+    $ _body = str(next_day_runtime.report_body or "Ничего не произошло.")
     $ _textbox_h = int(getattr(gui, "textbox_height", 278))
     $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
     $ _panel_w = int((config.screen_width - 36) * 0.72)

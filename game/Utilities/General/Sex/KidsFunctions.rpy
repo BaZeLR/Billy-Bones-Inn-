@@ -1,34 +1,4 @@
-        if key == "dayspassed":
-            return dayspassed            _kids_set("EventsCount", {})
-            _kids_set("NewEvents", {})        if key == "RealName":
-            return dict((girl, people_display_name(girl)) for girl in list(AllGirlNames or []))
-        if key == "RealName2":
-            names = {}
-            for girl in list(AllGirlNames or []):
-                info = getPersonInfo(girl)
-                data = getattr(info, "data", None) if info is not None else None
-                names[girl] = str(getattr(data, "genitive", "") or people_display_name(girl))
-            return names        if key == "dayspassed":
-            return dayspassed            _kids_set("EventsCount", {})
-            _kids_set("NewEvents", {})        if key == "RealName":
-            return dict((girl, people_display_name(girl)) for girl in list(AllGirlNames or []))
-        if key == "RealName2":
-            names = {}
-            for girl in list(AllGirlNames or []):
-                info = getPersonInfo(girl)
-                data = getattr(info, "data", None) if info is not None else None
-                names[girl] = str(getattr(data, "genitive", "") or people_display_name(girl))
-            return names        if key == "dayspassed":
-            return dayspassed            _kids_set("EventsCount", {})
-            _kids_set("NewEvents", {})        if key == "RealName":
-            return dict((girl, people_display_name(girl)) for girl in list(AllGirlNames or []))
-        if key == "RealName2":
-            names = {}
-            for girl in list(AllGirlNames or []):
-                info = getPersonInfo(girl)
-                data = getattr(info, "data", None) if info is not None else None
-                names[girl] = str(getattr(data, "genitive", "") or people_display_name(girl))
-            return names# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init -44 python:
@@ -42,35 +12,7 @@ init -44 python:
         state = runtime.history.setdefault("kids", {})
         state.setdefault("list", [])
         state.setdefault("next_id", 1)
-        state.setdefault("scratch", {})
         return state
-
-    def _kids_get(name, default=None):
-        key = str(name or "")
-        state = _kids_state()
-        if key == "KidsList":
-            return state["list"]
-        if key == "KidsListNextId":
-            return state["next_id"]
-        if key == "pregnancy":
-            result = {}
-            for girl in list(AllGirlNames or []):
-                info = getPersonInfo(girl)
-                if info is not None:
-                    result[girl] = info.pregnancy_days()
-            return result
-        return state["scratch"].get(key, default)
-
-    def _kids_set(name, value):
-        key = str(name or "")
-        state = _kids_state()
-        if key == "KidsList":
-            state["list"] = value if isinstance(value, list) else []
-        elif key == "KidsListNextId":
-            state["next_id"] = _kids_int(value, 1)
-        else:
-            state["scratch"][key] = value
-        return value
 
     def _kids_int(v, d=0):
         try:
@@ -81,11 +23,8 @@ init -44 python:
             except Exception:
                 return d
 
-    def _k_int(v, d=0):
-        return _kids_int(v, d)
-
     def _kids_person_stat(person_name, stat_key, default=0):
-        info = getPersonInfo(person_name)
+        info = people.get_info(person_name)
         if info is None or not hasattr(info, "sex_stat"):
             return default
         return info.sex_stat(stat_key, default)
@@ -94,17 +33,14 @@ init -44 python:
         lactate_value = _kids_person_stat(person_name, "lactate", None)
         if lactate_value is None:
             lactate_value = _kids_person_stat(person_name, "breastfeed", 0)
-        return _k_int(lactate_value, 0) != 0
+        return _kids_int(lactate_value, 0) != 0
 
     def _kids_list():
-        kids_list = _kids_get("KidsList", None)
-        if kids_list is None:
-            kids_list = []
-            _kids_set("KidsList", kids_list)
-        return kids_list
+        return _kids_state()["list"]
 
-    def _kids_row_ids():
-        return [row.get("KidId", 0) for row in _kids_list()]
+    def kids_count_for_mothers(*mom_names):
+        mothers = set(str(name or "") for name in mom_names)
+        return sum(1 for row in _kids_list() if str(row.get("MomName", "")) in mothers)
 
     def _kids_find_row(kid_id):
         kid_id = _kids_int(kid_id, 0)
@@ -113,57 +49,12 @@ init -44 python:
                 return row
         return None
 
-    def _k_rows(table_name):
-        if table_name == "KidsList":
-            return _kids_row_ids()
-        return []
-
-    def _k_cols(table_name):
-        if table_name == "KidsList":
-            return ["KidId", "MomName", "DadName", "KidName", "DayBorn", "AssumedDad", "Appearance", "DaddySuspects", "MyRelation"]
-        return []
-
-    def _k_col(table_name, wanted):
-        for c in _k_cols(table_name):
-            if str(c).lower() == str(wanted).lower():
-                return c
-        return wanted
-
-    def _k_get(table_name, row_id, col, default=""):
-        if table_name != "KidsList":
-            return default
-        row = _kids_find_row(row_id)
-        if row is None:
-            return default
-        return row.get(_k_col(table_name, col), default)
-
-    def _k_set(table_name, row_id, col, value):
-        if table_name != "KidsList":
-            return
-        row = _kids_find_row(row_id)
-        if row is None:
-            return
-        row[_k_col(table_name, col)] = value
-
-    def _k_add_row(table_name, row):
-        if table_name != "KidsList":
-            return 0
-
-        next_id = _kids_int(_kids_get("KidsListNextId", 1), 1)
-        row_copy = dict(row)
-        row_copy["KidId"] = next_id
-        _kids_list().append(row_copy)
-        _kids_set("KidsListNextId", next_id + 1)
-        return next_id
-
-    def _kids_result(value):
-        _kids_set("Result", value)
-        return value
-
     def CreateKid(MomName):
         MomName = str(MomName or "")
-        current_days = _kids_int(_kids_get("dayspassed", 0), 0)
-        Pregnancy = _kids_get("pregnancy", {})
+        current_days = _kids_int(calendar_v2.daysInGame, 0)
+        mom_info = people.get_info(MomName)
+        if mom_info is None:
+            return 0
 
         if ZaletSuspectLinesCount(MomName) == 0:
             ZaletGetSuspectList(MomName)
@@ -179,15 +70,12 @@ init -44 python:
                 break
 
         KidGender = "Male" if procedural_randint(1, 2, "kid_gender_%s_%s" % (MomName, current_days)) == 2 else "Female"
-        try:
-            if MomName in ["liza", "georgett"]:
-                KidName = RandomNameCode(KidGender, "French")
-            elif MomName in ["becky", "inga"]:
-                KidName = RandomNameCode(KidGender, "German")
-            else:
-                KidName = RandomNameCode(KidGender)
-        except Exception:
-            KidName = "Ребенок"
+        if MomName in ["liza", "georgett"]:
+            KidName = RandomNameCode(KidGender, "French")
+        elif MomName in ["becky", "inga"]:
+            KidName = RandomNameCode(KidGender, "German")
+        else:
+            KidName = RandomNameCode(KidGender)
 
         if MomName == "liza":
             if re.fullmatch(r".*негр.*", str(DaddyType).lower()):
@@ -230,22 +118,25 @@ init -44 python:
             r = procedural_randint(1, 5, "kid_hairstyle_male_2_%s_%s" % (MomName, current_days))
         KidHairStyle = "L" if r == 1 else ("K" if r == 2 else ("N" if r == 3 else ("S" if r == 4 else "Z")))
 
-        kid_id = _k_add_row("KidsList", {
+        kids_state = _kids_state()
+        kid_id = _kids_int(kids_state["next_id"], 1)
+        _kids_list().append({
+            "KidId": kid_id,
             "MomName": MomName,
             "DadName": DadName,
             "KidName": KidName,
             "DayBorn": current_days,
             "AssumedDad": AssumedDad,
             "Appearance": KidGender[:1] + KidRace + KidEyes + KidHair + KidHairStyle,
-            "DaddySuspects": _kids_int(_kids_get("PregTotalSuspects", {}).get(MomName, 0), 0),
+            "DaddySuspects": ZaletSuspectLinesCount(MomName),
             "MyRelation": 0,
         })
+        kids_state["next_id"] = kid_id + 1
 
-        kids = _kids_get("kids", {})
-        kids[MomName] = _kids_int(kids.get(MomName, 0), 0) + 1
+        mom_info.set_sex_stat("kids", _kids_int(mom_info.sex_stat("kids", 0), 0) + 1)
         ZaletClearSuspectList(MomName)
-        Pregnancy[MomName] = 0
-        _kids_get("pregfather", {})[MomName] = ""
+        mom_info.set_sex_stat("pregnancy", 0)
+        mom_info.set_sex_stat("pregfather", "")
 
         TodaySexEvents_DeleteGirl(MomName)
         if MomName in ["sandra", "melissa", "amanda"]:
@@ -260,22 +151,14 @@ init -44 python:
             TodaySexEvents_DeleteGirl("becky")
 
         if MomName in ["amanda", "melissa", "sandra"]:
-            player.economy.sync_from_store()
-            player.economy.sync_from_store()
-            player.economy.sync_from_store()
             player.economy.add_child_support(1)
-            player.economy.apply_to_store()
-            player.economy.apply_to_store()
-            player.economy.apply_to_store()
-            _kids_set("player.tavern_management.household_members", _kids_int(_kids_get("player.tavern_management.household_members", 0), 0) + 1)
-            _kids_set("KidBirthPosobie", "Так как " + str(_kids_get("RealName", {}).get(MomName, MomName)) + " родила без мужа, то именем герцогини Кончитты Дель Семени вашей семье, тоесть вам, было выплаченно единовременно 600 мараведи воспоможения. Также вы будете получать дополнительно по 15 мараведи каждое воскресенье.")
+            player.tavern_management.household_members = _kids_int(player.tavern_management.household_members, 0) + 1
+            player.economy.child_birth_benefit_notice = "Так как " + people_name(MomName, "nominative", MomName) + " родила без мужа, то именем герцогини Кончитты Дель Семени вашей семье, тоесть вам, было выплаченно единовременно 600 мараведи воспоможения. Также вы будете получать дополнительно по 15 мараведи каждое воскресенье."
         if MomName in ["liza", "georgett"]:
-            current_loc = _kids_get("CurrentLoc", {})
-            if str(current_loc.get("georgett", "")) == "TavernMain":
-                _kids_set("player.tavern_management.household_members", _kids_int(_kids_get("player.tavern_management.household_members", 0), 0) + 1)
-            _kids_set("ProstitutesKids", _kids_int(_kids_get("ProstitutesKids", 0), 0) + 1)
+            if str(people.location("georgett") or "") == "TavernMain":
+                player.tavern_management.household_members = _kids_int(player.tavern_management.household_members, 0) + 1
 
-        return _kids_result(kid_id)
+        return kid_id
 
     def GetYoungestKidAge(MomName):
         MomName = str(MomName or "")
@@ -283,40 +166,40 @@ init -44 python:
         for row in _kids_list():
             if str(row.get("MomName", "")) == MomName:
                 last = max(last, _kids_int(row.get("DayBorn", 0), 0))
-        res = -1 if last == 0 else (_kids_int(_kids_get("dayspassed", 0), 0) - last)
-        return _kids_result(res)
+        res = -1 if last == 0 else (_kids_int(calendar_v2.daysInGame, 0) - last)
+        return res
 
     def GetKidData(KidId):
         KidId = _kids_int(KidId, 0)
         row = _kids_find_row(KidId) or {}
-        current_days = _kids_int(_kids_get("dayspassed", 0), 0)
+        current_days = _kids_int(calendar_v2.daysInGame, 0)
         kid_desc_code = str(row.get("Appearance", ""))
-
-        _kids_set("KidDays", current_days - _kids_int(row.get("DayBorn", 0), 0))
-        _kids_set("KidDescCode", kid_desc_code)
-        _kids_set("KidName", str(row.get("KidName", "")))
-        _kids_set("KidMomName", str(row.get("MomName", "")))
-        _kids_set("KidAssumedDad", str(row.get("AssumedDad", "")))
-        _kids_set("KidDaddySuspects", _kids_int(row.get("DaddySuspects", 0), 0))
-        _kids_set("KidGender", kid_desc_code[0:1])
-        _kids_set("KidRace", kid_desc_code[1:2])
-        _kids_set("KidEyes", kid_desc_code[2:3])
-        _kids_set("KidHair", kid_desc_code[3:4])
-        _kids_set("KidHairStyle", kid_desc_code[4:5])
-        return _kids_result(0)
+        return {
+            "KidId": KidId,
+            "KidDays": current_days - _kids_int(row.get("DayBorn", 0), 0),
+            "KidDescCode": kid_desc_code,
+            "KidName": str(row.get("KidName", "")),
+            "KidMomName": str(row.get("MomName", "")),
+            "KidAssumedDad": str(row.get("AssumedDad", "")),
+            "KidDaddySuspects": _kids_int(row.get("DaddySuspects", 0), 0),
+            "KidGender": kid_desc_code[0:1],
+            "KidRace": kid_desc_code[1:2],
+            "KidEyes": kid_desc_code[2:3],
+            "KidHair": kid_desc_code[3:4],
+            "KidHairStyle": kid_desc_code[4:5],
+        }
 
     def ShowKidInteractionMenu(KidId):
-        GetKidData(KidId)
-        return _kids_result(_kids_get("KidName", ""))
+        return GetKidData(KidId)["KidName"]
 
     def ShowKidDesc(KidId):
-        GetKidData(KidId)
-        KidDays = _kids_int(_kids_get("KidDays", 0), 0)
-        KidGender = str(_kids_get("KidGender", "M"))
-        KidRace = str(_kids_get("KidRace", "W"))
-        KidEyes = str(_kids_get("KidEyes", "G"))
-        KidHair = str(_kids_get("KidHair", "B"))
-        KidHairStyle = str(_kids_get("KidHairStyle", "S"))
+        kid = GetKidData(KidId)
+        KidDays = _kids_int(kid["KidDays"], 0)
+        KidGender = str(kid["KidGender"] or "M")
+        KidRace = str(kid["KidRace"] or "W")
+        KidEyes = str(kid["KidEyes"] or "G")
+        KidHair = str(kid["KidHair"] or "B")
+        KidHairStyle = str(kid["KidHairStyle"] or "S")
 
         if KidDays < 180:
             desc = "новорожденн" + ("ый мальчик" if KidGender == "M" else "ая девочка")
@@ -365,10 +248,10 @@ init -44 python:
             desc += "волосы " + ("темные" if KidHair == "D" else ("платиновые" if KidHair == "P" else ("светлые" if KidHair == "L" else ("рыжие" if KidHair == "R" else "русые"))))
             desc += " и " + ("длиные" if KidHairStyle == "L" else ("кудрявые" if KidHairStyle == "K" else ("кучерявые" if KidHairStyle == "N" else ("короткие" if KidHairStyle == "S" else "в локонах")))) + "."
 
-        return _kids_result(desc)
+        return desc
 
     def ShowFullKidsListByAge(*MomNames):
-        dp = _kids_int(_kids_get("dayspassed", 0), 0)
+        dp = _kids_int(calendar_v2.daysInGame, 0)
         age1 = []
         age2 = []
         for mom in MomNames:
@@ -381,94 +264,130 @@ init -44 python:
                 elif kdays >= 400:
                     age2.append(_kids_int(row.get("KidId", 0), 0))
 
+        lines = []
         if len(age1) == 1:
-            renpy.say(None, "Вы видите, что здесь ползает и собирает с пола всякую гадость " + ShowKidInteractionMenu(age1[0]) + ".")
+            lines.append("Вы видите, что здесь ползает и собирает с пола всякую гадость " + ShowKidInteractionMenu(age1[0]) + ".")
         elif len(age1) > 1:
-            renpy.say(None, "Вы видите, что здесь ползают и собирают с пола всякую гадость " + ", ".join([ShowKidInteractionMenu(x) for x in age1]) + ".")
+            lines.append("Вы видите, что здесь ползают и собирают с пола всякую гадость " + ", ".join([ShowKidInteractionMenu(x) for x in age1]) + ".")
         if len(age2) == 1:
-            renpy.say(None, ("Также здесь " if len(age1) > 0 else "Вы видите, что здесь ") + "бегает " + ShowKidInteractionMenu(age2[0]) + ".")
+            lines.append(("Также здесь " if len(age1) > 0 else "Вы видите, что здесь ") + "бегает " + ShowKidInteractionMenu(age2[0]) + ".")
         elif len(age2) > 1:
-            renpy.say(None, ("Также здесь " if len(age1) > 0 else "Вы видите, что здесь ") + "бегают, играют, и иногда дерутся " + ", ".join([ShowKidInteractionMenu(x) for x in age2]) + ".")
-        return 0
+            lines.append(("Также здесь " if len(age1) > 0 else "Вы видите, что здесь ") + "бегают, играют, и иногда дерутся " + ", ".join([ShowKidInteractionMenu(x) for x in age2]) + ".")
+        return "\n".join(lines)
 
     def DescribeBreastFeeding(MomName, chance=0):
         MomName = str(MomName)
-        if _k_int(chance, 0) == 0:
+        if _kids_int(chance, 0) == 0:
             chance = 5
-        chance = max(1, _k_int(chance, 5))
+        chance = max(1, _kids_int(chance, 5))
         if not _kids_lactating(MomName):
-            return 0
+            return ""
 
         last_kid = 0
-        dp = _k_int(_kids_get("dayspassed", 0), 0)
+        dp = _kids_int(calendar_v2.daysInGame, 0)
         for row in _kids_list():
-            if str(row.get("MomName", "")) == MomName and dp - _k_int(row.get("DayBorn", 0), 0) < 300:
+            if str(row.get("MomName", "")) == MomName and dp - _kids_int(row.get("DayBorn", 0), 0) < 300:
                 last_kid = _kids_int(row.get("KidId", 0), 0)
         if last_kid == 0 or procedural_randint(1, chance, "breastfeed_%s_%s" % (MomName, dp)) != 1:
-            return 0
+            return ""
 
-        GetKidData(last_kid)
-        KidGender = str(_kids_get("KidGender", "M"))
-        renpy.say(None, "Вы заметили что " + str(_kids_get("RealName", {}).get(MomName, MomName)) + " решила дать " + ("своему сыночку" if KidGender == "M" else "своей дочурке") + " сисю.")
-        renpy.say(None, ("Маленький " if KidGender == "M" else "Маленькая ") + ShowKidInteractionMenu(last_kid) + " довольно сосет сисю.")
-        return 0
+        info = people.get_info(MomName)
+        KidGender = str(GetKidData(last_kid)["KidGender"] or "M")
+        bra = str(info.wardrobe.get("current_underwear", {}).get("bra", "") or "")
+        corruption = _kids_int(info.corruption, 0)
+        lines = ["Вы заметили что " + people_name(MomName, "nominative", MomName) + " решила дать " + ("своему сыночку" if KidGender == "M" else "своей дочурке") + " сисю."]
+        if corruption > 61:
+            lines.append("Не смущаясь чужих взоров, она приспустила свое платье " + ("и сняла лифчик" if bra else "под которым ожидаемо ничего не оказалось") + ". Обнажив обе набухшие от молока сиськи, она пристроила ребенка к одной из них. Вторую грудь, с увеличившимся от кормления соском, она прикрыть не удосужилась.")
+        elif corruption > 52:
+            side = "левой" if procedural_randint(1, 2, "breastfeed_side_%s_%s" % (MomName, dp)) == 1 else "правой"
+            lines.append("Не смущаясь тем, что может быть не одна, она приспустила с " + side + " стороны свое платье " + ("а затем приспустила и лифчик" if bra else "под которым ожидаемо ничего не оказалось") + ". Обнажив набухшую от молока грудь, " + people_name(MomName, "nominative", MomName) + " пристроила к ней ребенка.")
+        elif corruption > 38:
+            lines.append("Смущенно оглянувшись, она отошла в уголочек, стеснительно отвернулась, видимо обнажая грудь, и пристроила к ней ребенка. Лишь после того как он удобно обустроился, она решилась повернуться обратно.")
+        else:
+            lines.append("Покраснев и смущенно оглянувшись, она отошла в уголочек, стеснительно отвернулась, видимо обнажая грудь, и пристроила к ней ребенка. Достав откуда-то легкую шаль, скромница накрыла и грудь, и ребенка и лишь после этого решилась повернуться обратно.")
+        child = ("Маленький " if KidGender == "M" else "Маленькая ") + ShowKidInteractionMenu(last_kid)
+        if corruption > 38:
+            lines.append(child + " довольно сосет сисю. Иногда " + ("он" if KidGender == "M" else "она") + " выпускает сосок, но заботливая " + people_name(MomName, "nominative", MomName) + " немедленно помогает " + ("ему" if KidGender == "M" else "ей") + ".")
+        else:
+            lines.append(child + " довольно сосет сисю под шалью. Иногда из-под нее раздается возмущенный писк, но заботливая " + people_name(MomName, "nominative", MomName) + " приходит на помощь, что-то поправляя у себя под накидкой.")
+        return "\n".join(lines)
 
     def LactateTitsDesc(GirlName):
         GirlName = str(GirlName)
-        info = getPersonInfo(GirlName)
-        state = info.ensure_sex_state() if info is not None else {}
-        underwear = getattr(info, "wardrobe", {}).get("current_underwear", {}) if info is not None else {}
-        top_visible = _k_int(state.get("top_raised", 0), 0) == 1 or _k_int(state.get("top_removed", 0), 0) == 1
-        if top_visible and str(underwear.get("bra", "") or "") == "":
-            if _kids_lactating(GirlName) and procedural_randint(1, 2, "lactate_desc_%s_%s" % (GirlName, _k_int(_kids_get("dayspassed", 0), 0))) == 1:
-                renpy.say(None, "Из разбухшего соска с большой ареолой вытекла капелька молока.")
-        return 0
+        info = people.get_info(GirlName)
+        if info.visible_tits() and _kids_lactating(GirlName) and procedural_randint(1, 2, "lactate_desc_%s_%s" % (GirlName, _kids_int(calendar_v2.daysInGame, 0))) == 1:
+            return "Из разбухшего соска с большой ареолой вытекла капелька молока."
+        return ""
 
     def LactateTitsFondle(GirlName, PartnerName=""):
         GirlName = str(GirlName)
-        info = getPersonInfo(GirlName)
-        if info is not None and _kids_lactating(GirlName) and info.arousal_value() > 35:
-            info.set_arousal(min(65, info.arousal_value() + 8))
-        return 0
+        info = people.get_info(GirlName)
+        if not _kids_lactating(GirlName) or info.arousal_value() <= 35:
+            return ""
+        if not info.visible_tits():
+            if str(info.wardrobe.get("current_underwear", {}).get("bra", "") or "") == "":
+                return "От жамкания из доек вскоре потекло молоко, ее блузка быстро намокла и сосочки стали просвечивать через нее."
+            return ""
+        info.set_arousal(min(65, info.arousal_value() + 8))
+        if str(PartnerName or ""):
+            return "Вы заметили, что партнер уже не просто ласкает ее груди и соски, а смокчет сосок, подкармливаясь молочком."
+        return "Вдруг вы почувствовали, как вам в рот ударила струйка молока. Немного удивившись, вы продолжили ласкать сосок и сжимать груди, высасывая молочко из ее доек."
 
     def LactateTitsFuck(GirlName, PartnerName=""):
         GirlName = str(GirlName)
-        info = getPersonInfo(GirlName)
-        if info is not None and _kids_lactating(GirlName) and info.arousal_value() > 45:
-            info.set_arousal(min(65, info.arousal_value() + 6))
-            if str(PartnerName) == "":
-                player.intimacy.add_arousal(5, 100, "You")
-        return 0
+        info = people.get_info(GirlName)
+        if not _kids_lactating(GirlName) or info.arousal_value() <= 45:
+            return ""
+        info.set_arousal(min(65, info.arousal_value() + 6))
+        if str(PartnerName or ""):
+            return "При почти каждом движении члена из ее сосков струйками брызгает молоко, заливая груди и служа дополнительной смазкой."
+        player.intimacy.add_arousal(5, 100)
+        return "При почти каждом движении вашего члена из ее сосков струйками брызгает молоко. Большая его часть заливает ее титьки и ваш член, служа дополнительной смазкой, а отдельные струйки вам удается поймать ртом."
 
     def LactatePussyFuck(GirlName, PartnerName=""):
         GirlName = str(GirlName)
-        info = getPersonInfo(GirlName)
-        if info is not None and _kids_lactating(GirlName) and info.arousal_value() > 60 and procedural_randint(1, 3, "lactate_pussy_%s_%s" % (GirlName, _k_int(_kids_get("dayspassed", 0), 0))) == 1:
-            renpy.say(None, "Вы заметили, что из сосков стало побрызгивать молоко.")
-        return 0
+        info = people.get_info(GirlName)
+        if not _kids_lactating(GirlName) or info.arousal_value() <= 60 or procedural_randint(1, 3, "lactate_pussy_%s_%s" % (GirlName, _kids_int(calendar_v2.daysInGame, 0))) != 1:
+            return ""
+        if procedural_randint(1, 2, "lactate_pussy_text_%s_%s" % (GirlName, _kids_int(calendar_v2.daysInGame, 0))) == 1:
+            return "Вы заметили, что из ее сосков в такт вашим толчкам стало побрызгивать молоко."
+        return "Вы заметили, что ее возбужденные соски набухли еще больше и из них начало сочиться молочко."
 
     def KidsPeekSexCode(MomName):
         MomName = str(MomName)
-        dp = _k_int(_kids_get("dayspassed", 0), 0)
+        dp = _kids_int(calendar_v2.daysInGame, 0)
+        info = people.get_info(MomName)
+        corruption = _kids_int(info.corruption, 0)
+        base_chance = 4 if corruption > 70 else (8 if corruption > 55 else (11 if corruption > 40 else (12 if corruption > 30 else (14 if corruption > 20 else 16))))
         for row in _kids_list():
             if str(row.get("MomName", "")) != MomName:
                 continue
-            if dp - _k_int(row.get("DayBorn", 0), 0) <= 365 * 2:
+            age_days = dp - _kids_int(row.get("DayBorn", 0), 0)
+            if age_days <= 365 * 2:
                 continue
-            if procedural_randint(1, 100, "kids_peek_%s_%s_%s" % (MomName, _kids_int(row.get("KidId", 0), 0), dp)) == 1:
+            age_years = age_days // 365
+            peek_chance = 7 * base_chance * (1 if age_years >= 4 else 2)
+            if procedural_randint(1, peek_chance, "kids_peek_%s_%s_%s" % (MomName, _kids_int(row.get("KidId", 0), 0), dp)) == 1:
                 kid_id = _kids_int(row.get("KidId", 0), 0)
-                name = ShowKidInteractionMenu(kid_id)
-                kid_name = str(row.get("KidName", name))
+                kid_name = ShowKidInteractionMenu(kid_id)
                 g = str(row.get("Appearance", "M"))[0:1]
-                renpy.say(None, "Вдруг вы заметили что из-за приоткрытой двери за вами удивленно следит " + name + ", " + kid_name + ", " + ("сыночек" if g == "M" else "дочка") + " " + str(_kids_get("RealName2", {}).get(MomName, MomName)) + ".")
-                row["MyRelation"] = _k_int(row.get("MyRelation", 0), 0) + 1
-                break
-        return 0
+                text = "Вдруг вы заметили, что из-за приоткрытой двери за вами удивленно следит " + kid_name + ", " + ("сыночек" if g == "M" else "дочка") + " " + people_name(MomName, "genitive", MomName) + ". "
+                reaction_max = 3 if age_years >= 4 else (4 if age_years >= 3 else 4)
+                reaction_min = 1 if age_years >= 3 else 4
+                reaction = procedural_randint(reaction_min, reaction_max, "kids_peek_reaction_%s_%s_%s" % (MomName, kid_id, dp))
+                if reaction == 1:
+                    text += "Наблюдая за кувырканием мамочки, " + ("он усмехнулся и сделал" if g == "M" else "она рассмеялась и сделала") + " пошлый жест. "
+                elif reaction == 2:
+                    text += "На " + ("его лице" if g == "M" else "ее личике") + " застыло мечтательное выражение. "
+                elif reaction == 3:
+                    text += "От увиденного " + ("его" if g == "M" else "ее") + " глазенки расширились, а щеки стали пунцовыми. "
+                else:
+                    text += ("Он явно удивлен" if g == "M" else "Она явно удивлена") + " происходящим. "
+                if g == "M":
+                    text += "Неожиданно малой встретился с вами взглядом. Поняв, что его заметили, он сорвался и убежал."
+                else:
+                    text += "Неожиданно малая встретилась с вами взглядом. Поняв, что ее заметили, она покраснела, сорвалась и убежала."
+                row["MyRelation"] = _kids_int(row.get("MyRelation", 0), 0) + 1
+                return text
+        return ""
 
-label KidsFunctions:
-    $ _kids_functions_initialized = True
-    return
-
-label CreateKid(MomName="", CurLocArg=""):
-    $ Result = CreateKid(MomName)
-    return Result

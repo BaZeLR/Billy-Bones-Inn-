@@ -94,9 +94,8 @@ testcase becky_home_restore_gate_after_sex:
         CurLoc = "BeckyHome"
         location = CurLoc
         ArriveMode = "FromDances"
-        BeckyHomeActive = 1
-        BeckyVar["visitedhome"] = 2
-        BeckyVar["EddieTryToFuck"] = 0
+        Becky.home_visit_stage = 2
+        Becky.eddie_join_stage = 0
         MyCurDress = "citydress"
     run Jump("BeckyHome")
     advance until screen "main_ui" timeout 20.0
@@ -115,19 +114,19 @@ testcase becky_home_front_from_dance_enter_house:
         time = 3
         hour = 20
         minute = 0
-        BeckyVar["visitedhome"] = 0
-        BeckyVar["TodayFrontSexCheck"] = 0
+        Becky.home_visit_stage = 0
+        Becky.home_front_checked_today = False
         MyCurDress = "citydress"
     run Call("BeckyHomeFront", "FromDances")
     advance until screen "choice" timeout 20.0
     assert eval (str(CurLoc or "") == "BeckyHomeFront") timeout 5.0
     assert eval (str(ArriveMode or "") == "FromDances") timeout 5.0
-    assert eval (int(BeckyVar.get("visitedhome", 0) or 0) == 1) timeout 5.0
+    assert eval (int(Becky.home_visit_stage or 0) == 1) timeout 5.0
     click "Зайти в дом" until eval (str(CurLoc or "") == "BeckyHome") timeout 20.0
     advance until screen "choice" timeout 20.0
     assert eval (str(CurLoc or "") == "BeckyHome") timeout 5.0
     assert eval (str(ArriveMode or "") == "FromDances") timeout 5.0
-    assert eval (int(BeckyVar.get("visitedhome", 0) or 0) == 1) timeout 5.0
+    assert eval (int(Becky.home_visit_stage or 0) == 1) timeout 5.0
     run Jump("StreetTavern")
 
 testcase becky_dance_accept_home_order:
@@ -145,9 +144,9 @@ testcase becky_dance_accept_home_order:
         HandsDance = "ass"
         KissDance = 1
         TitsDance = 0
-        BeckyVar["danceinvitehome"] = 1
-        BeckyVar["visitedhome"] = 0
-        BeckyVar["TodayFrontSexCheck"] = 0
+        rooms.get("FridayDance").becky_home_invited = True
+        Becky.home_visit_stage = 0
+        Becky.home_front_checked_today = False
         Friends["becky"] = 20
         sluttiness["becky"] = 40
         HadSex["becky"] = 0
@@ -176,7 +175,7 @@ testcase friday_dance_find_becky_opens_becky_dance:
         minute = 0
         FridayDanceRoom.state["dance_count"] = 0
         DanceStep = 0
-        BeckyVar["leftdances"] = 0
+        Becky.left_dances = 0
         Friends["becky"] = 20
         sluttiness["becky"] = 40
     run Jump("FridayDance")

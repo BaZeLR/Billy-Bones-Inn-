@@ -1,4 +1,4 @@
-    on "show" action Function(people_sync_all)    on "show" action Function(people_sync_all)    on "show" action Function(people_sync_all)# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -7,7 +7,7 @@ init python:
         if not room_key:
             return "неизвестно"
         try:
-            room_obj = get_registered_room(room_key)
+            room_obj = rooms.get(room_key)
             if room_obj is not None:
                 title = str(getattr(room_obj, "display_name", "") or "").strip()
                 if title:
@@ -21,35 +21,30 @@ init python:
         room_key = str(room_code or "").strip()
         if not key:
             return ""
+        info = people.get_info(key)
+        if info is not None and info.talk_available_in_room(room_key):
+            return "можно говорить"
         try:
-            if npc_social_actions_available_in_room(key, room_key):
-                return "можно говорить"
-        except Exception:
-            pass
-        try:
-            if not npc_can_talk_now(key):
+            if not people.can_talk(key):
                 return "занят(а) или спит"
         except Exception:
             pass
         try:
-            if room_key and str(getLocation(key) or "") == room_key:
+            if room_key and str(people.location(key) or "") == room_key:
                 return "на месте"
         except Exception:
             pass
         return "по расписанию"
 
     def people_locate_rows():
-        people_sync_all()
-        people_sync_all()
-        people_sync_all()
         rows = []
-        for person in people_known_ids():
+        for person in people.ids():
             key = people_normalize_id(person)
             if key in ("you", "dog") or not key:
                 continue
-            info = getPersonInfo(key)
+            info = people.get_info(key)
             try:
-                loc = str(info.getLocation() if info is not None else getLocation(key) or "").strip()
+                loc = str(info.getLocation() if info is not None else people.location(key) or "").strip()
             except Exception:
                 loc = ""
             rows.append({
@@ -58,25 +53,15 @@ init python:
                 "location": loc,
                 "location_name": people_locate_room_name(loc) if loc else "неизвестно",
                 "state": people_locate_state_text(key, loc),
-                "can_jump": bool(loc and loc != "неизвестно" and renpy.has_label(loc)),
-                "can_jump": bool(loc and loc != "неизвестно" and renpy.has_label(loc)),
-                "can_jump": bool(loc and loc != "неизвестно" and renpy.has_label(loc)),
-                "here": bool(str(CurLoc or "") == loc),
+                "here": bool(str(rooms.current_code or "") == loc),
             })
         return sorted(rows, key=lambda row: (str(row.get("location_name", "")), str(row.get("name", ""))))
 
-screen people_locate_overlay():
-    use people_locate_panel(True)
-
-
-screen people_locate_panel(standalone=False):
+screen people_locate_panel():
     modal True
     zorder 210
 
-    if standalone:
-        key "K_ESCAPE" action Hide("people_locate_overlay")
-    else:
-        key "K_ESCAPE" action SetVariable("main_ui_overlay", "")
+    key "K_ESCAPE" action SetField(main_ui_runtime, "overlay", "")
 
     add Solid("#000000cc")
 
@@ -100,18 +85,9 @@ screen people_locate_panel(standalone=False):
                 textbutton "Закрыть":
                     xalign 1.0
                     text_size 20
-                    if standalone:
-                        action Hide("people_locate_overlay")
-                    else:
-                        if standalone:
-                        action Hide("people_locate_overlay")
-                    else:
-                        if standalone:
-                        action Hide("people_locate_overlay")
-                    else:
-                        action SetVariable("main_ui_overlay", "")
+                    action SetField(main_ui_runtime, "overlay", "")
 
-            text "Локации берутся из того же getLocation(), что и иконки/действия NPC в комнатах." size 18 color "#b9b0a0"
+            text "Локации берутся из того же people.location(), что и иконки/действия NPC в комнатах." size 18 color "#b9b0a0"
 
             viewport:
                 mousewheel True
@@ -129,9 +105,6 @@ screen people_locate_panel(standalone=False):
                         $ _loc = str(_row.get("location", "") or "")
                         $ _loc_name = str(_row.get("location_name", "") or _loc)
                         $ _state = str(_row.get("state", "") or "")
-                        $ _can_jump = bool(_row.get("can_jump", False))
-                        $ _can_jump = bool(_row.get("can_jump", False))
-                        $ _can_jump = bool(_row.get("can_jump", False))
                         $ _here = bool(_row.get("here", False))
                         $ _row_bg = "#21301f" if _here else "#171717"
 
@@ -150,12 +123,4 @@ screen people_locate_panel(standalone=False):
                                     text "здесь" size 18 color "#9adf8f" xminimum 70
                                 else:
                                     null width 70
-                                if _can_jump:
-                                    textbutton "Перейти":
-                                        text_size 18
-                                        if standalone:
-                                            action [Hide("people_locate_overlay"), Jump(_loc)]
-                                        else:
-                                            action [SetVariable("main_ui_overlay", ""), Jump(_loc)]
-                                else:
-                                    text "нет перехода" size 17 color "#777777"
+                                text "расписание" size 17 color "#777777"

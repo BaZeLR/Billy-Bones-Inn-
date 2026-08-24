@@ -3,7 +3,7 @@
 # ================================================================================
 init python:
     def dress_shop_worktable_has_order(_obj=None):
-        return str(DressProduced or "") != ""
+        return str(dress_shop.produced or "") != ""
 
     DressShopWorktableObject = GameObject(
         object_id="worktable_001",

@@ -22,11 +22,22 @@ init python:
     def _zalet_history_rows(girl_name):
         return sex_history_rows(girl_name)
 
+    def zalet_suspects(girl_name):
+        info = people.get_info(girl_name)
+        if info is None:
+            return []
+        state = info.ensure_sex_state()
+        suspects = state.get("pregnancy_suspects", [])
+        if not isinstance(suspects, list):
+            suspects = []
+            state["pregnancy_suspects"] = suspects
+        return suspects
+
     def ZaletSuspectLinesCount(girl_name):
-        return len(ZaletSuspectFinal.get(str(girl_name), []))
+        return len(zalet_suspects(girl_name))
 
     def ZaletSuspectGetValue(girl_name, row_ref, column, default=""):
-        suspects = ZaletSuspectFinal.get(str(girl_name), [])
+        suspects = zalet_suspects(girl_name)
         row_index = _zalet_to_int(row_ref, 0) - 1
         if row_index < 0 or row_index >= len(suspects):
             return default
@@ -34,8 +45,9 @@ init python:
 
     def ZaletClearSuspectList(girl_name):
         girl_name = str(girl_name)
-        ZaletSuspectFinal[girl_name] = []
-        PregTotalSuspects[girl_name] = 0
+        info = people.get_info(girl_name)
+        if info is not None:
+            info.ensure_sex_state()["pregnancy_suspects"] = []
         return 0
 
     def ZaletGetExactDay(girl_name):
@@ -148,8 +160,9 @@ init python:
             })
 
         final_rows.sort(key=lambda row: _zalet_to_int(row.get("Rank", 0), 0), reverse=True)
-        ZaletSuspectFinal[girl_name] = final_rows
-        PregTotalSuspects[girl_name] = len(final_rows)
+        info = people.get_info(girl_name)
+        if info is not None:
+            info.ensure_sex_state()["pregnancy_suspects"] = final_rows
         return 0
 
     def DaddyAskBuildName(girl_name, dude_name, dude_name_type, times=0):
@@ -276,9 +289,9 @@ init python:
         if ZaletSuspectLinesCount(girl_name) == 0:
             ZaletGetSuspectList(girl_name)
 
-        suspects = ZaletSuspectFinal.get(girl_name, [])
-        total = _zalet_to_int(PregTotalSuspects.get(girl_name, 0), 0)
-        real_name = RealName.get(girl_name, girl_name)
+        suspects = zalet_suspects(girl_name)
+        total = len(suspects)
+        real_name = people_display_name(girl_name)
         tmp_daddy_name = []
         tmp_daddy_times = []
 

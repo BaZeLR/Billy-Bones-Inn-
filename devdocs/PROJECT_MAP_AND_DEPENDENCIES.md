@@ -73,7 +73,8 @@ Use these from project root:
 
 ```powershell
 python -m pytest -q
-& "C:\Users\blank\renpy\renpy-8.5.2-sdk\renpy.exe" . compile
+powershell -ExecutionPolicy Bypass -File tools\renpy_compile.ps1 compile
+powershell -ExecutionPolicy Bypass -File tools\renpy_compile.ps1 lint
 ```
 
 Only call a behavior click-tested after launching the game and clicking that

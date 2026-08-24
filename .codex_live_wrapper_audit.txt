@@ -1,0 +1,8 @@
+game\Town\GroceryStore.rpy:324:label GroceryStoreBuyStockApply(cost=0, add_amount=0, bag_count=0):
+game\Town\GroceryStore.rpy:368:label GroceryStoreBuyFancyNightBowlApply:
+game\Town\WineStore.rpy:227:label WineStoreBuyStockApply(cost=0, add_amount=0, barrel_count=0):
+game\Town\HunterClub.rpy:576:label HunterClubChallengeApply(challenge_id=""):
+game\Town\HunterClub.rpy:604:label HunterClubApplyTrade(mode="buy"):
+game\Inn\TavernMainBar001.rpy:78:label TavernMainBarInviteApply(target_npc=""):
+game\Inn\TavernKitchen.rpy:462:label TavernKitchenDepositApply(item_id=""):
+game\Utilities\General\Common\DebugTools.rpy:1808:label DebugFightRenewMCStats:

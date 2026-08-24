@@ -4,6 +4,17 @@
 
 
 init -50 python:
+    game_object_registry = {}
+    room_rule_registry = {}
+
+
+    def register_room_rule(rule):
+        if callable(rule):
+            rule_name = str(getattr(rule, "__name__", "") or "").strip()
+            if rule_name and rule_name != "<lambda>":
+                room_rule_registry[rule_name] = rule
+        return rule
+
 
     def room_rule_serialize(rule):
         if rule is None:
@@ -13,6 +24,7 @@ init -50 python:
         if callable(rule):
             rule_name = str(getattr(rule, "__name__", "") or "").strip()
             if rule_name and rule_name != "<lambda>":
+                register_room_rule(rule)
                 return {"__rule_type__": "callable_name", "name": rule_name}
             return None
         return rule
@@ -23,11 +35,7 @@ init -50 python:
             rule_name = str(rule.get("name", "") or "").strip()
             if rule_name == "":
                 return None
-            if rule_name in globals():
-                return globals().get(rule_name, None)
-            if hasattr(renpy.store, rule_name):
-                return getattr(renpy.store, rule_name)
-            return None
+            return room_rule_registry.get(rule_name, None)
         return rule
 
 
@@ -35,59 +43,51 @@ init -50 python:
         row = dict(rule or {})
         rule_name = str(row.get("rule", "") or "").strip()
         if not rule_name:
-                job_map = globals().get(job_name, {})
-                if isinstance(job_map, dict) and int(job_map.get(person, 0) or 0) > 0:
-                    return True
-                job_map = globals().get(job_name, {})
-                if isinstance(job_map, dict) and int(job_map.get(person, 0) or 0) > 0:
-                    return True
-                job_map = globals().get(job_name, {})
-                if isinstance(job_map, dict) and int(job_map.get(person, 0) or 0) > 0:
-                    return True
             return False
         if rule_name == "eddie_absent_week":
-            return 22 <= int(day or 0) <= 28
+            return 22 <= int(calendar_v2.day or 0) <= 28
         if rule_name == "eddie_in_town":
             return not room_rule_named_true({"rule": "eddie_absent_week"})
         if rule_name == "becky_sandra_kitchen_visit":
-            return bool(becky_kitchen_visit_active())
+            return bool(npc_schedule_becky_sandra_kitchen_visit_active())
+        if rule_name == "clara_tavern_visit":
+            return bool(Clara.tavern_visit_active())
         if rule_name == "liza_church_with_georgett_visible":
-            return bool(Liza.can_trigger_church_service_event())
+            return bool(Liza.can_trigger_after_sermon_event())
         if rule_name == "georgett_church_visible":
-            return bool(Georgett.can_trigger_church_service_event())
+            return people_to_int(Georgett.rel, 0) >= 2
         if rule_name == "tavern_whore_work_active":
-            people = [str(item or "").strip().lower() for item in list(row.get("people", []) or [])]
-            if not people:
-                people = ["liza", "georgett"]
-            return any(room_rule_named_true({"rule": "tavern_hired", "people": [person]}) for person in people)
+            person_ids = [str(item or "").strip().lower() for item in list(row.get("people", []) or [])]
+            if not person_ids:
+                person_ids = ["liza", "georgett"]
+            return any(room_rule_named_true({"rule": "tavern_hired", "people": [person]}) for person in person_ids)
         if rule_name == "tavern_hired":
-            people = [str(item or "").strip().lower() for item in list(row.get("people", []) or [])]
-            if not people:
-                people = ["liza", "georgett"]
-            for person in people:
-                info = peopleInfo.get(person, None) if isinstance(peopleInfo, dict) else None
-                if info is not None and hasattr(info, "can_work_tavern") and info.can_work_tavern():
-                    return True
-                if int(jobwhore.get(person, 0) or 0) > 0:
+            person_ids = [str(item or "").strip().lower() for item in list(row.get("people", []) or [])]
+            if not person_ids:
+                person_ids = ["liza", "georgett"]
+            for person in person_ids:
+                info = people.get_info(person)
+                if info is not None and info.can_work_tavern():
                     return True
             return False
         if rule_name == "liza_portstreets_work_active":
             return bool(Liza.can_work_portstreets())
         if rule_name == "liza_portstreets_whore_active":
-            return bool(Liza.can_work_portstreets() and Liza.portstreet_story_unblocked())
+            return bool(Liza.can_work_portstreets() and Georgett.portstreet_story_unblocked())
         if rule_name == "georgett_portstreets":
             return bool((not Georgett.can_work_tavern()) and Georgett.portstreet_story_unblocked())
+        if rule_name == "thread_step":
+            thread_name = str(row.get("thread", "") or "").strip()
+            thread_info = threads.get(thread_name, None) if isinstance(threads, dict) else None
+            return thread_info is not None and int(thread_info.num or 0) == int(row.get("step", -1) or -1)
         if rule_name == "any_job_assigned":
             job_name = str(row.get("job", "") or "").strip()
-            people = [str(item or "").strip().lower() for item in list(row.get("people", []) or [])]
-            if not job_name or not people:
+            person_ids = [str(item or "").strip().lower() for item in list(row.get("people", []) or [])]
+            if not job_name or not person_ids:
                 return False
-            for person in people:
-                info = peopleInfo.get(person, None) if isinstance(peopleInfo, dict) else None
+            for person in person_ids:
+                info = people.get_info(person)
                 if info is not None and int(getattr(info, "jobs", {}).get(job_name, 0) or 0) > 0:
-                    return True
-                job_map = globals().get(job_name, {})
-                if isinstance(job_map, dict) and int(job_map.get(person, 0) or 0) > 0:
                     return True
             return False
         return False
@@ -133,7 +133,7 @@ init -50 python:
             self.hook = str(hook or "jump").strip()
             self.target = str(target or "").strip()
             self.args = tuple(args or ())
-            self.condition = condition
+            self.condition = register_room_rule(condition)
             self.custom_properties = dict(custom_properties or {})
 
         def is_visible(self, *args):
@@ -185,7 +185,7 @@ init -50 python:
             self.actions = list(actions or [])
             self.contents = list(contents or [])
             self.state = dict(state or {})
-            self.condition = condition
+            self.condition = register_room_rule(condition)
             self.picture = str(picture or "").strip()
             self.owner = str(owner or "").strip()
             self.price = int(price or 0)
@@ -201,6 +201,8 @@ init -50 python:
             self.weapon = bool(weapon)
             self.stackable = bool(stackable)
             self.custom_properties = dict(custom_properties or {})
+            if self.object_id:
+                game_object_registry[self.object_id] = self
 
         def is_visible(self):
             if self.hidden:
@@ -263,10 +265,7 @@ init -50 python:
         object_id = get_object_id(object_id)
         if not object_id:
             return None
-        for game_object in list(gameObjects or []):
-            if get_object_id(game_object) == object_id:
-                return game_object
-        return None
+        return dict(game_object_registry or {}).get(object_id, None)
 
 
     def get_game_item(item_id, room_obj=None):
@@ -274,13 +273,9 @@ init -50 python:
         if not item_id:
             return None
 
-        if "ensure_game_item_registry" in globals():
-            ensure_game_item_registry()
-
-        if "_all_game_item_objects" in globals():
-            for game_item in list(_all_game_item_objects() or []):
-                if get_object_id(game_item) == item_id:
-                    return game_item
+        game_item = dict(game_item_registry or {}).get(item_id, None)
+        if game_item is not None:
+            return game_item
 
         if room_obj is not None and hasattr(room_obj, "game_items"):
             for row in list(getattr(room_obj, "game_items", []) or []):

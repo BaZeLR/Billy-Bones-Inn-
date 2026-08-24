@@ -37,7 +37,8 @@ The talk label owns:
 - classic Ren'Py `menu:`;
 - branch consequences;
 - time cost;
-- return to the current room or relevant event flow.
+- `return` to the caller when the talk was called from the current room;
+- `jump` only for an intentional story continuation or actual player travel.
 
 Shared helper methods may calculate a score or preference only when the logic is
 truly common. They must not hide the authored menu, state mutation, or return

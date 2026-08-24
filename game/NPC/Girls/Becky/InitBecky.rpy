@@ -1,209 +1,7 @@
-            knowsMC[name] = bool(self.known)            npc_schedule_sync_currentloc(name)        bodymodel_sync_character(GirlName, RealName[GirlName], "female")            self.current_location = "GroceryStore"        def story_value(self, key, default=0):
-            return self.ensure_story_defaults().get(key, default)
-
-        def set_story_value(self, key, value):
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                table[name] = self.stats.get(stat_key)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                table[name] = self.skills.get(skill_key, 0)
-            self.ensure_story_defaults()[key] = value
-            return value
-            self.schedule_source = BeckyStaticData.schedule_source            self.schedule_source = BeckyStaticData.schedule_source
-            self.current_location = "GroceryStore"        def install_schedule(self):
-            name = self.code_name
-            npc_interval_schedule_load_file(name)
-            return self
-            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            knowsMC[name] = bool(self.known)            npc_schedule_sync_currentloc(name)        bodymodel_sync_character(GirlName, RealName[GirlName], "female")            self.current_location = "GroceryStore"        def story_value(self, key, default=0):
-                Becky.install_schedule()
-
-        Becky.install_schedule()
-
-    return self.ensure_story_defaults().get(key, default)
-
-        def set_story_value(self, key, value):
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                table[name] = self.stats.get(stat_key)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                table[name] = self.skills.get(skill_key, 0)
-            self.legacy_story_imported = False
-            self.ensure_story_defaults()[key] = value
-            return value
-            self.schedule_source = BeckyStaticData.schedule_source            self.schedule_source = BeckyStaticData.schedule_source
-            self.current_location = "GroceryStore"        def install_schedule(self):
-            name = self.code_name
-            npc_interval_schedule_load_file(name)
-            return self
-            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            knowsMC[name] = bool(self.known)            npc_schedule_sync_currentloc(name)        bodymodel_sync_character(GirlName, RealName[GirlName], "female")            self.current_location = "GroceryStore"        def story_value(self, key, default=0):
-                Becky.install_schedule()
-
-        Becky.install_schedule()
-
-    return self.ensure_story_defaults().get(key, default)
-
-        def set_story_value(self, key, value):
-            for table, stat_key in [
-                (kids, "kids"),
-                (beauty, "beauty"),
-                (sexacts, "sexacts"),
-                (cuminside, "cuminside"),
-                (pregnancy, "pregnancy"),
-                (pregfather, "pregfather"),
-                (ConceptionChance, "ConceptionChance"),
-                (PussyWetStart, "PussyWetStart"),
-                (virginity, "virginity"),
-                (Breastfeed, "breastfeed"),
-            ]:
-                table[name] = self.stats.get(stat_key)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
-            for table, job_key in [
-                (jobkitchen, "jobkitchen"),
-                (jobcleaning, "jobcleaning"),
-                (jobwaitress, "jobwaitress"),
-                (jobHallAvail, "jobHallAvail"),
-                (jobWhoreAvail, "jobWhoreAvail"),
-                (jobwhore, "jobwhore"),
-                (jobgloryhole, "jobgloryhole"),
-            ]:
-                table[name] = self.jobs.get(job_key, 0)
-            for table, skill_key in [(cooking, "cooking"), (cleaning, "cleaning"), (waitress, "waitress")]:
-                table[name] = self.skills.get(skill_key, 0)
-            self.legacy_story_imported = False
-            self.ensure_story_defaults()[key] = value
-            return value
-            self.schedule_source = BeckyStaticData.schedule_source            self.schedule_source = BeckyStaticData.schedule_source
-            self.current_location = "GroceryStore"        def install_schedule(self):
-            name = self.code_name
-            npc_interval_schedule_load_file(name)
-            return self
-            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    def becky_story_defaults():
-            Becky.install_schedule()
-
-        Becky.install_schedule()
-
-    return {
-            "leftdances": 0,
-            "danceinvitehome": 0,
-            "visitedhome": 0,
-            "husbandtalk": 0,
-            "eddietalk": 0,
-            "SawIngaFuck": 0,
-            "IngaSexGreet": 0,
-            "VisitScolded": 0,
-            "TodayFrontSexCheck": 0,
-            "HomeFrontCheckedDay": -1,
-            "HomeEnterCheckedDay": -1,
-            "HomeSex": 0,
-            "EddieGeorg": 0,
-            "EddieWhoreHome": 0,
-            "BeckyOpenMinet": 0,
-            "TimesVisited": 0,
-            "TalkAboutEddie": 0,
-            "GeorgMention": 0,
-            "EddieIntrReact": 0,
-            "PriestAdvice": 0,
-            "GerhardBeckyTalk": 0,
-            "AskedEddieFuck": 0,
-            "EddieTryToFuck": 0,
-            "EddieFailures": 0,
-            "EddieRobbedDay": 0,
-            "EddieRobbed": 0,
-            "KnowSherwood": 0,
-            "KnowSherwood": 0,
-            "KnowSherwood": 0,
-            "KnowSherwood": 0,
-            "KnowSherwood": 0,
-            "KnowSherwood": 0,
-            "KnowBlackwood": 0,
-            "SherwoodQuestScheduled": 0,
-            "SherwoodSuspect": 0,
-            "TradeOffer": 0,
-            "SherwoodWarn": 0,
-            "AskTradeElf": 0,
-            "TradeOfferText": "",
-            "FingalClarify": 0,
-            "AdmitSherwood": 0,
-            "RobbedByRobin": 0,
-            "ConsoleRobbery": 0,
-            "SandraKitchenVisitMonth": 0,
-            "after_sermon_stage": 0,
-            "last_store_orgasm_day": -1,
-        }
-
     class BeckyData(PeopleData):
         code_name = "becky"
 
@@ -214,7 +12,7 @@ init python:
                 fullname="Ребекка Блэнкеншип",
                 genitive="Бекки",
                 dative="Бекки",
-                default_location="GroceryStore",
+                default_location="",
                 description="Вдова Блэнкеншип, для друзей Бекки, высокая рыжеволосая женщина с полной грудью, чуть младше сорока лет.",
                 gift_preferences=["soap_001", "wild_rose_001", "pig_lard_001", "libido_tincture_001", "drink_ale_001"],
             )
@@ -225,17 +23,47 @@ init python:
 
     class BeckyInfo(Girl):
         """Becky runtime: grocery work, home visits, Eddie, church, Sherwood trade, pregnancy."""
+        talk_label = "IntBeckyTalk"
         unknown_name = "Незнакомка"
 
         def __init__(self):
             super().__init__("becky")
             self.code_name = "becky"
             self.data = BeckyStaticData
-            self.uses_own_var_state = True
             self.rel = 0
             self.openness = 0
             self.corruption = 25
             self.known = True
+            self.left_dances = 0
+            self.home_visit_stage = 0
+            self.inga_sex_greeting_seen = False
+            self.uninvited_visit_scolded = False
+            self.home_front_checked_today = False
+            self.home_sex_unlocked = False
+            self.eddie_georgett_stage = 0
+            self.eddie_home_visit_state = 0
+            self.open_oral_stage = 0
+            self.home_visit_count = 0
+            self.talked_about_eddie = False
+            self.georgett_mentioned = False
+            self.eddie_intervention_reaction = 0
+            self.priest_advice_stage = 0
+            self.gerhard_talk_stage = 0
+            self.asked_about_eddie_sex_stage = 0
+            self.eddie_join_stage = 0
+            self.eddie_join_failures = 0
+            self.eddie_robbed_day = 0
+            self.knows_blackwood = False
+            self.sherwood_suspicion = 0
+            self.trade_offer_stage = 0
+            self.sherwood_warning_stage = 0
+            self.asked_about_elf_trade = False
+            self.fingal_connection_clarified = False
+            self.admitted_sherwood_stage = 0
+            self.robin_robbery_stage = 0
+            self.robbery_consolation_count = 0
+            self.sandra_kitchen_visit_period = 0
+            self.last_store_orgasm_day = -1
             self.energy = 100
             self.energy_max = 100
             self.rebellion = 0
@@ -305,89 +133,39 @@ init python:
                     "shoes": "simpleshoes",
                 },
             }
-            self.var = {}
-            self.legacy_story_imported = False
-            self.ensure_story_defaults()
-
         def update(self):
-            self.name = self.code_name
+            super(BeckyInfo, self).update()
             self.data = BeckyStaticData
-            self.ensure_story_defaults()
             return self
 
-        def ensure_story_defaults(self):
-            if not isinstance(self.var, dict):
-                self.var = {}
-            for key, value in becky_story_defaults().items():
-                self.var.setdefault(key, value)
-            return self.var
+        def interaction_visible(self, room_code=""):
+            room_key = str(room_code or "").strip()
+            if room_key == "BeckyHome":
+                return True
+            if room_key == "BeckyHomeFront":
+                return rooms.get("BeckyHomeFront").state["arrival_mode"] == "FromDances"
+            return super(BeckyInfo, self).interaction_visible(room_key)
 
-        def publish_profile_state(self):
-            name = self.code_name
-            RealName[name] = self.data.cname
-            RealName2[name] = self.data.genitive
-            RealName3[name] = self.data.dative
-            DateOfBirth[name] = dict(self.data.birth_date)
-            girltextdesc[name] = self.data.description
-            self.location = str(self.current_location or "GroceryStore")
-            GiftPreferences[name] = list(self.gift_preferences)
-            dressdefault[name] = self.wardrobe["current_dress"]
-            bradef[name] = self.wardrobe["current_underwear"]["bra"]
-            pantiesdef[name] = self.wardrobe["current_underwear"]["panties"]
-            legsdef[name] = self.wardrobe["current_underwear"]["legs"]
-            shoesdef[name] = self.wardrobe["current_underwear"]["shoes"]
-            topdress[name] = DressTopPart.get(dressdefault[name], "")
-            bottomdress[name] = DressBottomPart.get(dressdefault[name], "")
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            self.wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            self.ensure_story_defaults()
-            return self
+        def action_data(self, where_id=""):
+            data = super(BeckyInfo, self).action_data(where_id)
+            if str(where_id or "").strip() == "GroceryStore":
+                if not self.known:
+                    data["title"] = "Торговец"
+                data["picture_path"] = grocery_store_grocer_picture(self.name)
+                data["talk_picture"] = data["picture_path"]
+            return data
 
         def initialize_new_game_state(self):
-            self.ensure_story_defaults()
-            self.publish_profile_state()
             return self
 
         def reset_daily(self, full=False):
             super(BeckyInfo, self).reset_daily(full)
-            self.talked_today = 0
-            self.flirted_today = 0
-            self.gifted_today = 0
-            self.asked_today = 0
-            self.fucked_today = 0
-            self.drunk = 0
-            self.var["TodayFrontSexCheck"] = 0
-            self.var["after_sermon_stage"] = 0
+            self.home_front_checked_today = False
             return self
-
-        def story_value(self, key, default=0):
-            return self.ensure_story_defaults().get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()[key] = value
-            return value
-
-        def add_story_value(self, key, amount=1):
-            return self.set_story_value(key, people_to_int(self.story_value(key, 0), 0) + people_to_int(amount, 0))
-
-        def set_story_value_min(self, key, value):
-            current = people_to_int(self.story_value(key, 0), 0)
-            return self.set_story_value(key, max(current, people_to_int(value, 0)))
-
-        def add_relation(self, amount=1, cap=20):
-            self.rel = max(0, min(people_to_int(cap, 20), people_to_int(self.rel, 0) + people_to_int(amount, 0)))
-            return self.rel
 
         def add_corruption(self, amount=1, floor=0, cap=100):
             self.corruption = max(people_to_int(floor, 0), min(people_to_int(cap, 100), people_to_int(self.corruption, 0) + people_to_int(amount, 0)))
             return self.corruption
-
-        def change_social(self, friend_delta=0, open_delta=0, corruption_delta=0):
-            super(BeckyInfo, self).change_social(friend_delta, open_delta, corruption_delta)
-            return self
 
         def apply_social_gate(self, rel_gate=0, open_delta=0, rel_delta=0, corruption_gate=0, corruption_delta=0, fallback_rel_delta=0):
             if people_to_int(self.rel, 0) >= people_to_int(rel_gate, 0):
@@ -428,38 +206,46 @@ init python:
                 corruption_delta -= 1
             return self
 
-        def finish_talk(self):
-            self.talked_today = people_to_int(self.talked_today, 0) + 1
-            return self.talked_today
-
-        def talk_count(self):
-            return people_to_int(self.talked_today, 0)
-
-        def home_visit_stage(self):
-            return people_to_int(self.story_value("visitedhome", 0), 0)
-
-        def home_sex_unlocked(self):
-            return people_to_int(self.story_value("HomeSex", 0), 0) > 0
-
-        def sherwood_trade_active(self):
-            return people_to_int(self.story_value("TradeOffer", 0), 0) > 0
-
-        def church_after_sermon_event_available(self):
-            return (
-                church_after_cermon_action_visible()
-                and people_to_int(self.story_value("PriestAdvice", 0), 0) > 0
-                and self.after_sermon_stage() < 4
-                and CheckIfSexEventExist(self.code_name, 99, "Priest") > 0
+        def dress_change_flags(self, girl_name="becky"):
+            girl_key = str(girl_name or self.code_name)
+            can_offer_bra_off = self.stats.get("orgasms_given", 0) >= 2 and self.rel > 8 and self.has_bra() and self.talk_count() < 2
+            can_offer_panties_off = self.stats.get("orgasms_given", 0) >= 2 and self.rel > 8 and self.has_panties() and self.talk_count() < 2
+            can_shame = self.stats.get("orgasms_given", 0) >= 2 and self.rel > 8 and self.talk_count() < 2
+            can_buy = (
+                self.rel > 8
+                and daily_events.exists("", "BuyDressTom", "") == 0
+                and daily_events.exists(girl_key, "BuyDress", "") == 0
+                and self.talk_count() < 2
+                and int(calendar_v2.week or 0) != 6
             )
+            return {
+                "can_offer_bra_off": bool(can_offer_bra_off),
+                "can_offer_panties_off": bool(can_offer_panties_off),
+                "can_shame": bool(can_shame),
+                "can_buy": bool(can_buy),
+            }
 
-        def after_sermon_stage(self):
-            return people_to_int(self.story_value("after_sermon_stage", 0), 0)
+        def dress_change_has_options(self, girl_name="becky"):
+            return any(bool(value) for value in self.dress_change_flags(girl_name).values())
 
-        def set_after_sermon_stage(self, value):
-            return self.set_story_value("after_sermon_stage", people_to_int(value, 0))
+        def dress_change_other_saw_text(self, girl_name="becky", agreed_to_redress=0):
+            if int(agreed_to_redress or 0) != 1 or self.corruption < 45:
+                return ""
+            randvar = procedural_randint(1, 6, key="procedural:NPC/Girls/Becky/IntBeckyDressChange.rpy:procedural_randint:71:1")
+            if randvar == 1:
+                text = "Какой-то мужик, зашедший за чем-то в лавку, наблюдал за этой сценкой с отвалившей челюстью. Бекки подмигнула ему и стала перекладывать овощи на прилавке как ни в чем не бывало."
+            elif randvar == 2:
+                text = "Глаза у какой-то девицы, заглянувшей в лавку за покупками, расширились от такого зрелища, но под конец она с одобрением кивнула вдове."
+            elif randvar == 3:
+                text = 'Какая-то мать семейства, заглянувшая в лавку миссис Блэнкеншип за зеленью, назидательно сказала своим двум дочкам, указывая на Бекки: "Вот видите как нужно парней привлекать, а вы все \'это платье слишком смелое\' и прочую чушь, так у меня в девках и проходите, коли за ум не возьметесь."'
+            else:
+                text = ""
+            if randvar <= 3:
+                self.apply_social_roll(0, 0, 0, 60, 2, 1)
+            return text
 
-        def pregnancy_days(self):
-            return people_to_int(self.stats.get("pregnancy", 0), 0)
+        def can_trigger_after_sermon_event(self):
+            return people_to_int(self.priest_advice_stage, 0) > 0
 
         def is_visibly_pregnant(self):
             return self.pregnancy_days() >= 120
@@ -467,51 +253,33 @@ init python:
         def can_drink_wine(self):
             return self.pregnancy_days() <= 30
 
-        def record_orgasm_given(self, amount=1):
-            self.stats["orgasms_given"] = people_to_int(self.stats.get("orgasms_given", 0), 0) + people_to_int(amount, 1)
-            return self.stats["orgasms_given"]
-
         def store_lover_modest_reaction(self):
             return (people_to_int(self.corruption, 0) <= 45 or people_to_int(self.rel, 0) < 10) and people_to_int(self.corruption, 0) <= 55
 
         def mark_store_orgasm_today(self):
-            return self.set_story_value("last_store_orgasm_day", people_to_int(current_game_day(), 0))
-
-        def apply_pregnancy_check(self, cum_place, repeat_count, dad_name="", is_dude_random=0, dad_name_type=""):
-            PregnancyCheck(self.code_name, cum_place, repeat_count, dad_name, is_dude_random, dad_name_type)
-            self.stats["sexacts"] = people_to_int(sexacts.get(self.code_name, self.stats.get("sexacts", 0)), 0)
-            self.stats["cuminside"] = people_to_int(cuminside.get(self.code_name, self.stats.get("cuminside", 0)), 0)
-            self.stats["pregnancy"] = people_to_int(pregnancy.get(self.code_name, self.stats.get("pregnancy", 0)), 0)
-            self.stats["pregfather"] = str(pregfather.get(self.code_name, self.stats.get("pregfather", "")) or "")
-            return self
+            self.last_store_orgasm_day = people_to_int(current_game_day(), 0)
+            return self.last_store_orgasm_day
 
         def has_bra(self):
             return str(self.wardrobe.get("current_underwear", {}).get("bra", "") or "") != ""
 
-        def has_panties(self):
-            return str(self.wardrobe.get("current_underwear", {}).get("panties", "") or "") != ""
-
         def set_default_bra(self, item_id):
             self.wardrobe.setdefault("current_underwear", {})["bra"] = str(item_id or "")
-            bradef[self.code_name] = str(item_id or "")
-            bra[self.code_name] = str(item_id or "")
             return self
 
         def set_default_panties(self, item_id):
             self.wardrobe.setdefault("current_underwear", {})["panties"] = str(item_id or "")
-            pantiesdef[self.code_name] = str(item_id or "")
-            panties[self.code_name] = str(item_id or "")
             return self
 
         def friday_dance_base_ready(self):
-            if not friday_dance_slot_is_active():
+            if not rooms.get("FridayDance").is_open():
                 return False
-            location_now = str(getLocation("becky") or "")
+            location_now = str(people.location("becky") or "")
             return (
                 location_now in ("FridayDance", "MarketPlace")
-                and int(self.var.get("leftdances", 0) or 0) == 0
-                and people_to_int(friday_dance_count(), 0) < 5
-                and people_to_int(DanceStep, 0) == 0
+                and people_to_int(self.left_dances, 0) == 0
+                and people_to_int(rooms.get("FridayDance").dance_count, 0) < 5
+                and people_to_int(rooms.get("FridayDance").step, 0) == 0
             )
 
         def dance_event_conditions_met(self, event_obj):
@@ -520,43 +288,11 @@ init python:
                 return self.friday_dance_base_ready()
             return False
 
-        def pregnancy_stage(self):
-            days = people_to_int(self.stats.get("pregnancy", 0), 0)
-            if days <= 0:
-                return "none"
-            if days < 120:
-                return "early"
-            if days < 210:
-                return "visible"
-            if days < 270:
-                return "late"
-            return "birth_due"
-
-        def install_schedule(self):
-            name = self.code_name
-            npc_interval_schedule_load_file(name)
-            return self
-
-        def install_schedule(self):
-            name = self.code_name
-            npc_interval_schedule_load_file(name)
-            return self
-
-        def install_schedule(self):
-            name = self.code_name
-            npc_interval_schedule_load_file(name)
-            return self
-
 define BeckyStaticData = BeckyData()
 default Becky = BeckyInfo()
 
 label InitBecky:
     python:
-        GirlName = Becky.code_name
-        peopleData[GirlName] = BeckyStaticData
         Becky.initialize_new_game_state()
-        peopleInfo[GirlName] = Becky
-        if Becky not in girls:
-            girls.append(Becky)
-        Becky.install_schedule()
+        people.register(BeckyStaticData, Becky)
     return

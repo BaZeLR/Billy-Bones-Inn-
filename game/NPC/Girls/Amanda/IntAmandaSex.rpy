@@ -5,7 +5,7 @@ init python:
     def _ias_set_arousal(who, value):
         value = min(100, max(0, int(value or 0)))
         if str(who or "").lower() == "you":
-            player.intimacy.set_arousal(value, "You")
+            player.intimacy.set_arousal(value)
             return
         if str(who or "").strip().lower() == "amanda":
             Amanda.set_arousal(value)
@@ -13,19 +13,20 @@ init python:
     def _ias_inc_arousal(who, amount):
         if str(who or "").lower() == "you":
             intimacy = player.intimacy
-            intimacy.add_arousal(int(amount or 0), 100, "You")
+            intimacy.add_arousal(int(amount or 0), 100)
             return
         if str(who or "").strip().lower() == "amanda":
             Amanda.add_arousal(int(amount or 0), 100)
 
     def _ias_arousal(who):
         if str(who or "").lower() == "you":
-            return player.intimacy.arousal_value("You")
+            return player.intimacy.arousal_value()
         if str(who or "").strip().lower() == "amanda":
             return Amanda.arousal_value()
         return 0
 
 label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
+    $ renpy.dynamic("_amanda_cumpussy_pic", "_amanda_naked_pic", "_was_fucking_amanda", "_amanda_street_fuck_pic", "_amanda_room_fuck_pic", "tmpCumInside", "CurAmandaOrgasmCount", "_cametoday", "_cancumdaily")
     python:
         Amanda.ensure_sex_state()
         CurAmandaOrgasmCount = Amanda.sex_stat("orgasms_given", 0)
@@ -34,17 +35,8 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
     label int_amanda_sex_menu:
         while True:
             python:
-                if isinstance(player.intimacy.came_today, (int, float)):
-                    _cametoday = player.intimacy.came_today
-                elif isinstance(player.intimacy.came_today, dict):
-                    _cametoday = player.intimacy.came_today.get("You", 0)
-                else:
-                    _cametoday = 0
-
-                if isinstance(player.intimacy.can_cum_daily, (int, float)):
-                    _cancumdaily = player.intimacy.can_cum_daily
-                else:
-                    _cancumdaily = 1
+                _cametoday = int(player.intimacy.came_today or 0)
+                _cancumdaily = max(1, int(player.intimacy.can_cum_daily or 1))
 
             menu:
                 "Осмотреть":
@@ -58,13 +50,13 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                         else:
                             "И теперь на ней оставался лишь лиф."
                     else:
-                        "На ваш нескромный взгляд, тело [RealName2.get(GirlNameASDS, GirlNameASDS)] было слишком закутано. Решив помочь Аманде почувствовать себя открытой и свободной, вы с энтузиазмом взялись за дело, смело вступив в битву с многочисленными крючками и застежками, скрепляющими верхнюю часть платья вместе."
+                        "На ваш нескромный взгляд, тело [people_name(GirlNameASDS, 'genitive')] было слишком закутано. Решив помочь Аманде почувствовать себя открытой и свободной, вы с энтузиазмом взялись за дело, смело вступив в битву с многочисленными крючками и застежками, скрепляющими верхнюю часть платья вместе."
                         if Amanda.clothing_layer("bra") == "":
                             "Победа над ними принесла вам приятное открытие: ваша маленькая проказница не надела лиф! Ее маленькие острые грудки доступны вашим нескромным взорам и не только им."
                         else:
                             "И вот наконец победа близка: от вожделенных сисечек вас отделяет только лиф!"
                     if Amanda.clothing_slut("top") < 4 and Amanda.layer_raised("top") == 0 and Amanda.pregnancy_days() >= 120:
-                        "Также, после избавления от блузки, стал хорошо заметен округлившийся животик [RealName2.get(GirlNameASDS, GirlNameASDS)]."
+                        "Также, после избавления от блузки, стал хорошо заметен округлившийся животик [people_name(GirlNameASDS, 'genitive')]."
                     $ Amanda.remove_clothing_layer("top")
                     $ Amanda.set_layer_raised("top", 0)
                     call ShowAmandaPortrait
@@ -72,62 +64,62 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                 "Растегнуть блузку" if Amanda.clothing_layer("top") != "" and Amanda.layer_raised("top") == 0 and not Amanda.sex_busy() and GirlModeASDS != "minet":
                     if Amanda.clothing_layer("bra") == "":
                         if Amanda.clothing_slut("top") >= 4:
-                            "Вы начали поглаживать и сжимать грудки [RealName2.get(GirlNameASDS, GirlNameASDS)] сквозь одежду, вызвав несколько сдержанных стонов у девушки. Дабы облегчить себе доступ к ним, вы начали расстегивать ее блузку и вскоре преуспели в этом, тем более что под ней не оказалось лифа. Теперь сисечки [RealName2.get(GirlNameASDS, GirlNameASDS)] с задорно торчащими сосками на свободе, блузка расстегнута до пупа."
+                            "Вы начали поглаживать и сжимать грудки [people_name(GirlNameASDS, 'genitive')] сквозь одежду, вызвав несколько сдержанных стонов у девушки. Дабы облегчить себе доступ к ним, вы начали расстегивать ее блузку и вскоре преуспели в этом, тем более что под ней не оказалось лифа. Теперь сисечки [people_name(GirlNameASDS, 'genitive')] с задорно торчащими сосками на свободе, блузка расстегнута до пупа."
                         else:
                             "Ваша скромница оделась уж как-то слишком консервативно. Непорядок. Вы начали расстегивать явно стесняющую ее блузку и не прогадали: под скромной с виду одеждой не оказалось лифчика и ее маленькие сисечки оказались полностью в вашем распоряжении."
                     else:
                         if Amanda.clothing_slut("top") >= 4:
-                            "Вы начали поглаживать и сжимать грудки [RealName2.get(GirlNameASDS, GirlNameASDS)] сквозь одежду, вызвав несколько сдержанных стонов у девушки. Дабы облегчить себе доступ к ним, вы начали расстегивать ее блузку и вскоре преуспели в этом, хотя между вами и ее грудями все еще остается лифчик."
+                            "Вы начали поглаживать и сжимать грудки [people_name(GirlNameASDS, 'genitive')] сквозь одежду, вызвав несколько сдержанных стонов у девушки. Дабы облегчить себе доступ к ним, вы начали расстегивать ее блузку и вскоре преуспели в этом, хотя между вами и ее грудями все еще остается лифчик."
                         else:
-                            "Ваша скромница оделась уж как-то слишком консервативно. Непорядок. Вы начали расстегивать явно стесняющую ее блузку, не встречая никаких возражений со стороны [RealName2.get(GirlNameASDS, GirlNameASDS)]. Как и следовало ожидать, под ней оказался лиф, последнее препятствие, лежащее между вами и ее грудями."
+                            "Ваша скромница оделась уж как-то слишком консервативно. Непорядок. Вы начали расстегивать явно стесняющую ее блузку, не встречая никаких возражений со стороны [people_name(GirlNameASDS, 'genitive')]. Как и следовало ожидать, под ней оказался лиф, последнее препятствие, лежащее между вами и ее грудями."
                     if Amanda.clothing_slut("top") < 4 and Amanda.pregnancy_days() >= 120:
-                        "Распахнутая блузка также теперь не мешает вам лицезреть округлившийся животик [RealName2.get(GirlNameASDS, GirlNameASDS)]."
+                        "Распахнутая блузка также теперь не мешает вам лицезреть округлившийся животик [people_name(GirlNameASDS, 'genitive')]."
                     $ Amanda.set_layer_raised("top", 1)
                     call ShowAmandaPortrait
 
                 "Снять лифчик" if Amanda.clothing_layer("bra") != "" and (Amanda.clothing_layer("top") == "" or Amanda.layer_raised("top")) and not Amanda.sex_busy() and GirlModeASDS != "minet":
                     if Amanda.clothing_layer("top") == "":
-                        "Выше пояса на [RealName3.get(GirlNameASDS, GirlNameASDS)] теперь остается лишь лифчик. Поцеловав и обняв Аманду, вы запустили руки ей за спину и начали его на ощупь расстегивать."
+                        "Выше пояса на [people_name(GirlNameASDS, 'dative')] теперь остается лишь лифчик. Поцеловав и обняв Аманду, вы запустили руки ей за спину и начали его на ощупь расстегивать."
                     else:
                         "Хоть блузка и распахнута настежь, но между вами и сиськами еще остается лифчик. Засунув руки под ткань блузки, вы начинаете расстегивать его на ощупь."
                     if (player.intimacy.had_sex_count >= 8 and Amanda.clothing_layer("top") == "") or player.intimacy.had_sex_count >= 16:
                         "С легкостью справившись с застежками и завязками, вы отбрасываете лиф прочь, обнажив маленькие упругие груди."
                     else:
-                        "Вы провозились с бесчисленными застежками и завязками довольно долго, не смотря на подаваемые без конца советы Аманды. И вот наконец лифчик снят, сиськи [RealName2.get(GirlNameASDS, GirlNameASDS)] на вашем обозрении."
+                        "Вы провозились с бесчисленными застежками и завязками довольно долго, не смотря на подаваемые без конца советы Аманды. И вот наконец лифчик снят, сиськи [people_name(GirlNameASDS, 'genitive')] на вашем обозрении."
                     $ Amanda.remove_clothing_layer("bra")
                     call ShowAmandaPortrait
 
                 "Поднять подол" if Amanda.clothing_layer("bottom") != "" and Amanda.layer_raised("bottom") == 0 and not Amanda.sex_busy() and GirlModeASDS != "minet":
                     if Amanda.clothing_slut("bottom") >= 4:
                         if Amanda.clothing_layer("panties") != "":
-                            "Вы впились жарким поцелуем в губы [RealName2.get(GirlNameASDS, GirlNameASDS)]. Ну а затем задрали и без того короткую юбочку Аманды до пояса, выставив ее панталончики на ваше обозрение."
+                            "Вы впились жарким поцелуем в губы [people_name(GirlNameASDS, 'genitive')]. Ну а затем задрали и без того короткую юбочку Аманды до пояса, выставив ее панталончики на ваше обозрение."
                         elif Amanda.current_underwear("panties", "") == "":
-                            "\"А что, [RealName.get(GirlNameASDS, GirlNameASDS)],\" — спросили вы, — \"юбчишку ты носишь коротенькую, небось под ней и нижнего белья-то нет?\""
-                            "\"Угадал,\" — игриво ответила вам [RealName.get(GirlNameASDS, GirlNameASDS)] и заткнула за пояс подол своей юбки, показывая, что под ним и правда ничего не было."
+                            "\"А что, [people_display_name(GirlNameASDS)],\" — спросили вы, — \"юбчишку ты носишь коротенькую, небось под ней и нижнего белья-то нет?\""
+                            "\"Угадал,\" — игриво ответила вам [people_display_name(GirlNameASDS)] и заткнула за пояс подол своей юбки, показывая, что под ним и правда ничего не было."
                         else:
-                            "Вы впились жарким поцелуем в губы [RealName2.get(GirlNameASDS, GirlNameASDS)]. Ну а затем задрали и без того короткую юбочку Аманды до пояса, выставив ее голенькую щелку на свое обозрение."
+                            "Вы впились жарким поцелуем в губы [people_name(GirlNameASDS, 'genitive')]. Ну а затем задрали и без того короткую юбочку Аманды до пояса, выставив ее голенькую щелку на свое обозрение."
                     else:
                         if Amanda.clothing_layer("panties") != "":
-                            "Вы впились жарким поцелуем в губы [RealName2.get(GirlNameASDS, GirlNameASDS)]. Ну а затем оборочка за оборочкой подняли длинный подол ее платья и завернули его за пояс, выставляя Амандины панталончики на ваше обозрение."
+                            "Вы впились жарким поцелуем в губы [people_name(GirlNameASDS, 'genitive')]. Ну а затем оборочка за оборочкой подняли длинный подол ее платья и завернули его за пояс, выставляя Амандины панталончики на ваше обозрение."
                         elif Amanda.current_underwear("panties", "") == "":
-                            "\"А что, [RealName.get(GirlNameASDS, GirlNameASDS)],\" — скептически спросили вы, — \"юбка у тебя почти до пят, раз ты такая скромница, то небось под ней у тебя еще несколько юбок и уж затем панталончики?\""
+                            "\"А что, [people_display_name(GirlNameASDS)],\" — скептически спросили вы, — \"юбка у тебя почти до пят, раз ты такая скромница, то небось под ней у тебя еще несколько юбок и уж затем панталончики?\""
                             "\"А вот и не угадал,\" — ответила вам Аманда слегка покраснев. \"Под ней у меня вообще ничего нет. Смотри!\" И она сноровисто приподняла и заткнула за пояс длинный подол своего платья. Вы были приятно удивлены, не обнаружив под ним и следов нижнего белья."
                         else:
-                            "Вы впились жарким поцелуем в губы [RealName2.get(GirlNameASDS, GirlNameASDS)]. Ну а затем оборочка за оборочкой подняли длинный подол ее платья и завернули его за пояс, выставив голенькую щелку Аманды на свое обозрение."
+                            "Вы впились жарким поцелуем в губы [people_name(GirlNameASDS, 'genitive')]. Ну а затем оборочка за оборочкой подняли длинный подол ее платья и завернули его за пояс, выставив голенькую щелку Аманды на свое обозрение."
                     $ Amanda.set_layer_raised("bottom", 1)
                     call ShowAmandaPortrait
 
                 "Снять платье" if Amanda.clothing_layer("bottom") != "" and not Amanda.sex_busy() and GirlModeASDS != "minet":
                     if Amanda.layer_raised("bottom"):
-                        "Решив, что задранного подола вам мало, вы развязали на [RealName3.get(GirlNameASDS, GirlNameASDS)] поясок и несколько завязочек и наконец окончательно стянули с нее платье."
+                        "Решив, что задранного подола вам мало, вы развязали на [people_name(GirlNameASDS, 'dative')] поясок и несколько завязочек и наконец окончательно стянули с нее платье."
                     else:
                         if Amanda.clothing_layer("panties") != "":
-                            "Вы поцеловали [RealName2.get(GirlNameASDS, GirlNameASDS)] в губы, а затем развязали поясок, и юбка упала к ногам Аманды, выставив ее кружевные панталончики на ваше обозрение."
+                            "Вы поцеловали [people_name(GirlNameASDS, 'genitive')] в губы, а затем развязали поясок, и юбка упала к ногам Аманды, выставив ее кружевные панталончики на ваше обозрение."
                         elif Amanda.current_underwear("panties", "") == "":
-                            "\"[RealName.get(GirlNameASDS, GirlNameASDS)], мне кажется что ты будешь куда лучше выглядеть в одних панталонах,\" — нагло заявили вы. — \"А ты как считаешь? Давай заценим!\""
+                            "\"[people_display_name(GirlNameASDS)], мне кажется что ты будешь куда лучше выглядеть в одних панталонах,\" — нагло заявили вы. — \"А ты как считаешь? Давай заценим!\""
                             "\"Не знаю,\" — ответила вам Аманда слегка покраснев. \"Я ведь под платьем совсем голенькая. Смотри!\" И она сноровисто распустила завязки на платье, которое незамедлительно упало к ее ногам. Вы были приятно удивлены, воочию убедившись в том, что она сказала чистую правду."
                         else:
-                            "Вы поцеловали [RealName2.get(GirlNameASDS, GirlNameASDS)] в губы, а затем развязали поясок, и юбка упала к ее ногам, выставив ее голенькую щелку на ваше обозрение."
+                            "Вы поцеловали [people_name(GirlNameASDS, 'genitive')] в губы, а затем развязали поясок, и юбка упала к ее ногам, выставив ее голенькую щелку на ваше обозрение."
                     $ Amanda.remove_clothing_layer("bottom")
                     $ Amanda.set_layer_raised("bottom", 0)
                     call ShowAmandaPortrait
@@ -136,29 +128,29 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     if Amanda.layer_raised("bottom") == 0 and Amanda.clothing_layer("bottom") != "" and Amanda.clothing_slut("bottom") >= 4:
                         "Вы засунули свои шаловливые ручки под короткую юбчонку Аманды и стащили с нее панталончики."
                     elif Amanda.layer_raised("bottom") == 0 and Amanda.clothing_layer("bottom") != "":
-                        "Вы присели перед Амандой на колени, залезли под длинный подол ее платья и медленно повели свои руки вверх. [RealName.get(GirlNameASDS, GirlNameASDS)] захихикала, видно ей было немного щекотно. Наконец вы нащупали панталоны и спустили их вниз. [RealName.get(GirlNameASDS, GirlNameASDS)] переступила через них, но длинный подол опять скрыл ее прелести."
+                        "Вы присели перед Амандой на колени, залезли под длинный подол ее платья и медленно повели свои руки вверх. [people_display_name(GirlNameASDS)] захихикала, видно ей было немного щекотно. Наконец вы нащупали панталоны и спустили их вниз. [people_display_name(GirlNameASDS)] переступила через них, но длинный подол опять скрыл ее прелести."
                     else:
-                        "Вы решаете избавиться от последнего препятствия, отделяющего вас от ее пещерки. Не теряя времени, вы аккуратно стягиваете с нее панталончики. Досадная помеха убрана, киска [RealName2.get(GirlNameASDS, GirlNameASDS)] беззащитна перед вами."
+                        "Вы решаете избавиться от последнего препятствия, отделяющего вас от ее пещерки. Не теряя времени, вы аккуратно стягиваете с нее панталончики. Досадная помеха убрана, киска [people_name(GirlNameASDS, 'genitive')] беззащитна перед вами."
                     $ Amanda.remove_clothing_layer("panties")
                     call ShowAmandaPortrait
 
                 "Вытереть сперму с лица" if (Amanda.cum_state("cum_face_you") or Amanda.cum_state("cum_face_others")) and not Amanda.sex_busy():
-                    "Вы попросили Аманду убрать с лица свидетельства ее половой жизни. [RealName.get(GirlNameASDS, GirlNameASDS)] покраснела, достала платочек и вытерла лицо и волосы от спермы."
+                    "Вы попросили Аманду убрать с лица свидетельства ее половой жизни. [people_display_name(GirlNameASDS)] покраснела, достала платочек и вытерла лицо и волосы от спермы."
                     $ Amanda.clear_cum("cum_face_you", "cum_face_others")
                     call ShowAmandaPortrait
 
                 "Вытереть сперму с грудей" if (Amanda.cum_state("cum_tits_you") or Amanda.cum_state("cum_tits_others")) and Amanda.tits_visible() and not Amanda.sex_busy():
-                    "Вы попросили Аманду убрать свидетельства ее половой жизни с сисек. [RealName.get(GirlNameASDS, GirlNameASDS)] достала платочек и, улыбаясь чуть стыдливо, вытерла сперму со своих маленьких грудок."
+                    "Вы попросили Аманду убрать свидетельства ее половой жизни с сисек. [people_display_name(GirlNameASDS)] достала платочек и, улыбаясь чуть стыдливо, вытерла сперму со своих маленьких грудок."
                     $ Amanda.clear_cum("cum_tits_you", "cum_tits_others")
                     call ShowAmandaPortrait
 
                 "Вытереть сперму с бедер" if (Amanda.cum_state("cum_inside_you") or Amanda.cum_state("cum_inside_others")) and Amanda.pussy_visible() and not Amanda.sex_busy():
-                    "\"[RealName.get(GirlNameASDS, GirlNameASDS)]\", сказали вы, \"прибери пожалуйста свою делянку. Чтобы не так очевидно было то, что ее недавно засеяли.\" Та рассмеялась, достала платочек и, чуть виновато посматривая на вас, вытерла бедра и лобок от спермы. Скорее всего сперма во влагалище еще осталась, но вы ее теперь вряд ли почувствуете."
+                    "\"[people_display_name(GirlNameASDS)]\", сказали вы, \"прибери пожалуйста свою делянку. Чтобы не так очевидно было то, что ее недавно засеяли.\" Та рассмеялась, достала платочек и, чуть виновато посматривая на вас, вытерла бедра и лобок от спермы. Скорее всего сперма во влагалище еще осталась, но вы ее теперь вряд ли почувствуете."
                     $ Amanda.clear_cum("cum_inside_you", "cum_inside_others")
                     call ShowAmandaPortrait
 
                 "Целовать" if not Amanda.sex_busy():
-                    "[RealName.get(GirlNameASDS, GirlNameASDS)] прижимается к вам всем телом и со всей страстью молодости целует вас отнюдь не семейным поцелуем."
+                    "[people_display_name(GirlNameASDS)] прижимается к вам всем телом и со всей страстью молодости целует вас отнюдь не семейным поцелуем."
                     if Amanda.cum_state("cum_face_you") > 0:
                         "На язык вам попадают капли вашего семени, которым вы обкончали девушку раньше."
                     elif Amanda.cum_state("cum_face_others") > 0:
@@ -176,20 +168,20 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                 "Лапать" if not Amanda.sex_busy():
                     if not Amanda.tits_visible():
                         if Amanda.clothing_slut("top") == 3 and Amanda.clothing_layer("bra") == "":
-                            "Вы начали поглаживать маленькую грудь [RealName2.get(GirlNameASDS, GirlNameASDS)] через тонкую ткань ее блузки."
+                            "Вы начали поглаживать маленькую грудь [people_name(GirlNameASDS, 'genitive')] через тонкую ткань ее блузки."
                         elif Amanda.clothing_slut("top") >= 4 and Amanda.clothing_layer("bra") == "":
                             "Ваши руки забрались под декольте Аманды и, не обнаружив там лифчика, начали гладить ее небольшие груди и теребить напрягшиеся сосочки."
                         elif Amanda.clothing_slut("top") >= 4 and Amanda.clothing_layer("bra") != "":
-                            "Ваши руки забрались под декольте [RealName2.get(GirlNameASDS, GirlNameASDS)] и начали мять ее сисечки через лифчик."
+                            "Ваши руки забрались под декольте [people_name(GirlNameASDS, 'genitive')] и начали мять ее сисечки через лифчик."
                         else:
-                            "Скромное одеяние девушки не отвратило вас от пошлых мыслей, вы начали гладить и мять маленькие сисечки [RealName2.get(GirlNameASDS, GirlNameASDS)] и через него."
+                            "Скромное одеяние девушки не отвратило вас от пошлых мыслей, вы начали гладить и мять маленькие сисечки [people_name(GirlNameASDS, 'genitive')] и через него."
                     else:
                         if Amanda.cum_state("cum_tits_you") > 0:
-                            "Вы припали к маленьким грудям [RealName2.get(GirlNameASDS, GirlNameASDS)], благо они помещались у вас во рту почти целиком. На языке вы почувствовали солоноватый привкус своей спермы."
+                            "Вы припали к маленьким грудям [people_name(GirlNameASDS, 'genitive')], благо они помещались у вас во рту почти целиком. На языке вы почувствовали солоноватый привкус своей спермы."
                         elif Amanda.cum_state("cum_tits_others") > 0:
-                            "Вы припали к маленьким грудям [RealName2.get(GirlNameASDS, GirlNameASDS)], благо они помещались у вас во рту почти целиком. На языке вы почувствовали солоноватый привкус чьей-то спермы."
+                            "Вы припали к маленьким грудям [people_name(GirlNameASDS, 'genitive')], благо они помещались у вас во рту почти целиком. На языке вы почувствовали солоноватый привкус чьей-то спермы."
                         else:
-                            "Вы припали к маленьким грудям [RealName2.get(GirlNameASDS, GirlNameASDS)], благо они помещались у вас во рту почти целиком."
+                            "Вы припали к маленьким грудям [people_name(GirlNameASDS, 'genitive')], благо они помещались у вас во рту почти целиком."
 
                     if Amanda.pussy_visible():
                         "Вы медленно опустили руку вниз, к вульве Аманды. Она вздрогнула от вашего прикосновения. На этом вы не остановились, запустив пару пальцев внутрь текущей девушки."
@@ -209,9 +201,9 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                             "Вы начали натирать киску Аманды сквозь панталончики."
                     if Amanda.clothing_layer("panties") == "":
                         if Amanda.cum_state("cum_inside_you") > 0:
-                            "Вдруг вы почувствовали свою сперму в пещерке [RealName2.get(GirlNameASDS, GirlNameASDS)]."
+                            "Вдруг вы почувствовали свою сперму в пещерке [people_name(GirlNameASDS, 'genitive')]."
                         elif Amanda.cum_state("cum_inside_others") > 0:
-                            "Ваши пальцы легко заскользили по пещерке [RealName2.get(GirlNameASDS, GirlNameASDS)]: похоже кто-то уже кончил в нее."
+                            "Ваши пальцы легко заскользили по пещерке [people_name(GirlNameASDS, 'genitive')]: похоже кто-то уже кончил в нее."
                     $ _ias_inc_arousal(GirlNameASDS, 12)
                     call ShowCurrentSex(GirlNameASDS)
                     if GirlLocASDS != "street":
@@ -221,14 +213,14 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                             call ShowImage(GirlNameASDS, "sexroom", "grope1")
 
                 "Лизать киску" if Amanda.pussy_visible() and not Amanda.sex_busy() and GirlModeASDS != "minet":
-                    "Вы пролезли между раздвинутых ножек [RealName2.get(GirlNameASDS, GirlNameASDS)] и начали делать Аманде куни. Это пришлось ей по душе и по кое-чему еще. [RealName.get(GirlNameASDS, GirlNameASDS)] откинулась назад и сладко стонет от ваших ласк."
+                    "Вы пролезли между раздвинутых ножек [people_name(GirlNameASDS, 'genitive')] и начали делать Аманде куни. Это пришлось ей по душе и по кое-чему еще. [people_display_name(GirlNameASDS)] откинулась назад и сладко стонет от ваших ласк."
                     if Amanda.cum_state("cum_inside_you") > 0:
                         "Ну а вы ощущаете привкус собственной спермы, медленно вытекающей из ее влагалища."
                     elif Amanda.cum_state("cum_inside_others") > 0:
                         "Ну а вы ощущаете привкус чьей-то спермы, медленно вытекающей из ее влагалища. Похоже, Аманда уже успела сегодня кому-то дать."
                     $ Amanda.record_lick_pussy()
                     if Amanda.lick_pussy_count() == 6:
-                        "\"Стефанчик, приятно-то как!\", смеясь говорит [RealName.get(GirlNameASDS, GirlNameASDS)], \"где это с кем это ты так научился? Впрочем не важно, эх, приятно-то как!\""
+                        "\"Стефанчик, приятно-то как!\", смеясь говорит [people_display_name(GirlNameASDS)], \"где это с кем это ты так научился? Впрочем не важно, эх, приятно-то как!\""
                         $ Amanda.change_social(friend_delta=1)
                     $ _ias_inc_arousal(GirlNameASDS, 25)
                     call ShowCurrentSex(GirlNameASDS)
@@ -238,14 +230,14 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                 "Минет" if _cametoday < _cancumdaily and not Amanda.sex_busy():
                     if GirlLocASDS == "street":
                         if Amanda.cock_in("mouth"):
-                            "[RealName.get(GirlNameASDS, GirlNameASDS)], не забывая посматривать по сторонам, продолжает."
+                            "[people_display_name(GirlNameASDS)], не забывая посматривать по сторонам, продолжает."
                         else:
-                            "Вы расстегнули штаны. [RealName.get(GirlNameASDS, GirlNameASDS)] метнула взгляд к выходу из переулка, убедилась что никого нет, опустилась перед вами на коленки и стала."
+                            "Вы расстегнули штаны. [people_display_name(GirlNameASDS)] метнула взгляд к выходу из переулка, убедилась что никого нет, опустилась перед вами на коленки и стала."
                     else:
                         if Amanda.cock_in("mouth"):
-                            "Вы расселись на кровати и ловите кайф, в то время как [RealName.get(GirlNameASDS, GirlNameASDS)] стоит перед вами на коленях и продолжает."
+                            "Вы расселись на кровати и ловите кайф, в то время как [people_display_name(GirlNameASDS)] стоит перед вами на коленях и продолжает."
                         else:
-                            "Вы уселись поудобней на кровати и расстегнули штаны. Умненькая [RealName.get(GirlNameASDS, GirlNameASDS)] сразу поняла что от нее требуется. Сестричка слезла с кровати, опустилась на колени и стала."
+                            "Вы уселись поудобней на кровати и расстегнули штаны. Умненькая [people_display_name(GirlNameASDS)] сразу поняла что от нее требуется. Сестричка слезла с кровати, опустилась на колени и стала."
                     if _ias_arousal("You") < 20:
                         "Облизывать ваш вялый член."
                     elif _ias_arousal("You") < 40:
@@ -282,25 +274,25 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     if GirlLocASDS == "street":
                         if Amanda.pregnancy_days() < 130:
                             if _was_fucking_amanda == 0:
-                                "Вы посмотрели Аманде прямо в глаза и, убедившись что она вас поняла, перевели взгляд на своего стоящего колом дружка. Как загипнотизированная [RealName.get(GirlNameASDS, GirlNameASDS)] последовала своим взглядом за вашим. Решив что медлить дальше не имеет смысла, вы притянули девушку к себе, крепко ее поцеловав, а затем подхватили ее и насадили прямо на свой член. [RealName.get(GirlNameASDS, GirlNameASDS)] слегка охнула, обхватила вас за шею и сжала ногами."
+                                "Вы посмотрели Аманде прямо в глаза и, убедившись что она вас поняла, перевели взгляд на своего стоящего колом дружка. Как загипнотизированная [people_display_name(GirlNameASDS)] последовала своим взглядом за вашим. Решив что медлить дальше не имеет смысла, вы притянули девушку к себе, крепко ее поцеловав, а затем подхватили ее и насадили прямо на свой член. [people_display_name(GirlNameASDS)] слегка охнула, обхватила вас за шею и сжала ногами."
                             else:
                                 "Вы стоите в переулке и сношаете на весу свою блудливую любовницу. Слава Ильматеру, она стройная и легкая, тростиночка ваша. И вы, и она, время от времени оглядываетесь по сторонам, но, к вашему счастью, никто сюда не идет. Впрочем, даже если кто вас и засечет, уличным трахом в Коитополисе никого не удивить. Ваша поза позволяет загонять вам свой член в тесное влагалище Аманды по самые яйца, почти доставая до матки."
                         else:
                             if _was_fucking_amanda == 0:
-                                "На ваше счастье в подворотне нашлась какая-то тележка, типа той на которой в ваш трактир привозили заказы. Быстро сориентировавшись в обстановке вы уложили свою залетную красотку на эту телегу пузом вверх и, закинув ее ножки себе на плечи, начали сношать девицу. Впрочем [RealName.get(GirlNameASDS, GirlNameASDS)] быстро устала держать ноги на весу и вам пришлось поменять позу, дав Аманде встать и прислониться к пресловутой тележке."
+                                "На ваше счастье в подворотне нашлась какая-то тележка, типа той на которой в ваш трактир привозили заказы. Быстро сориентировавшись в обстановке вы уложили свою залетную красотку на эту телегу пузом вверх и, закинув ее ножки себе на плечи, начали сношать девицу. Впрочем [people_display_name(GirlNameASDS)] быстро устала держать ноги на весу и вам пришлось поменять позу, дав Аманде встать и прислониться к пресловутой тележке."
                             else:
-                                "Маленький переулок стал весьма шумным местом - ваша беременная подруга стоит облокотившись на какую-то телегу, а вы трахаете ее сзади. [RealName.get(GirlNameASDS, GirlNameASDS)] уже не сдерживает стоны, но вроде пока к вам никто еще не заглянул."
+                                "Маленький переулок стал весьма шумным местом - ваша беременная подруга стоит облокотившись на какую-то телегу, а вы трахаете ее сзади. [people_display_name(GirlNameASDS)] уже не сдерживает стоны, но вроде пока к вам никто еще не заглянул."
                                 if Amanda.pregnancy_days() > 120:
-                                    "Вы чувствуете как ребенок в животике у маленькой [RealName2.get(GirlNameASDS, GirlNameASDS)] двигается каждый раз когда ваш член входит в нее."
+                                    "Вы чувствуете как ребенок в животике у маленькой [people_name(GirlNameASDS, 'genitive')] двигается каждый раз когда ваш член входит в нее."
                     else:
                         if _was_fucking_amanda == 0:
-                            "Бесстыжая [RealName.get(GirlNameASDS, GirlNameASDS)] откинулась на кровати, задрав ножки и открыв свою киску вашим нескромным взглядам. Решив не пренебрегать таким приглашением вы нацелили свой член на вход в ее пещерку. Найдя заветную дырочку вы легко проскользнули в мокренькую Аманду."
+                            "Бесстыжая [people_display_name(GirlNameASDS)] откинулась на кровати, задрав ножки и открыв свою киску вашим нескромным взглядам. Решив не пренебрегать таким приглашением вы нацелили свой член на вход в ее пещерку. Найдя заветную дырочку вы легко проскользнули в мокренькую Аманду."
                         else:
                             "Вы имеете свою не слишком целомудренную любовницу на ее собственной кровати. Ее ножки красиво обрамляют ваши плечи, а удобная поза позволяет вам загонять свой член в нее по самые яйца."
                             if Amanda.pregnancy_days() > 120:
-                                "Руками вы то теребите [RealName3.get(GirlNameASDS, GirlNameASDS)] клитор, то поглаживаете пузатый живот который та себе нагуляла."
+                                "Руками вы то теребите [people_name(GirlNameASDS, 'dative')] клитор, то поглаживаете пузатый живот который та себе нагуляла."
                             else:
-                                "Руками вы то теребите [RealName3.get(GirlNameASDS, GirlNameASDS)] клитор, то ласкаете ее груди."
+                                "Руками вы то теребите [people_name(GirlNameASDS, 'dative')] клитор, то ласкаете ее груди."
                     $ Amanda.set_cock_position("pussy")
                     $ _ias_inc_arousal("You", 25)
                     $ _ias_inc_arousal(GirlNameASDS, 20)
@@ -329,7 +321,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                             call ShowImage(GirlNameASDS, "sexroom", "fuckstart")
 
                 "Кончить в ротик" if _cametoday < _cancumdaily and _ias_arousal("You") >= 100 and (Amanda.cock_in("mouth") or Amanda.cock_in("tits")):
-                    "Вы кончили, заливая горло и рот [RealName2.get(GirlNameASDS, GirlNameASDS)] своей спермой. Девушка не сделала ни малейшей попытки отстраниться и начала жадно глотать ваше семя. Его было много, она не успела сглотнуть все, и вязкая белая жидкость потекла из уголков ее очаровательного ротика. [RealName.get(GirlNameASDS, GirlNameASDS)] выпустила ваш обмякший член из сладкого плена, облизала губы и, с томной улыбкой сказала: надеюсь тебе понравилось. Вы поспешили заверить девушку что вам очень и очень понравилось."
+                    "Вы кончили, заливая горло и рот [people_name(GirlNameASDS, 'genitive')] своей спермой. Девушка не сделала ни малейшей попытки отстраниться и начала жадно глотать ваше семя. Его было много, она не успела сглотнуть все, и вязкая белая жидкость потекла из уголков ее очаровательного ротика. [people_display_name(GirlNameASDS)] выпустила ваш обмякший член из сладкого плена, облизала губы и, с томной улыбкой сказала: надеюсь тебе понравилось. Вы поспешили заверить девушку что вам очень и очень понравилось."
                     $ _ias_set_arousal("You", 0)
                     $ Amanda.pregnancy_check("mouth", 1, "Вы")
                     $ Amanda.set_cock_position("none")
@@ -352,7 +344,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                         "колоссальным усилием воли вы вынули член из киски Аманды и направили его на ее смазливую мордашку."
                     else:
                         "вы направили свой член на ее смазливую мордашку."
-                    "Густая белая струя брызнула прямо [RealName3.get(GirlNameASDS, GirlNameASDS)] в лицо. Крупные белые капли потекли по ее щечкам и подбородку, одна струйка попала ей в левый глаз, отчего она зажмурилась, а пара капель осталась в ее белокурых локонах. Очень романтично!"
+                    "Густая белая струя брызнула прямо [people_name(GirlNameASDS, 'dative')] в лицо. Крупные белые капли потекли по ее щечкам и подбородку, одна струйка попала ей в левый глаз, отчего она зажмурилась, а пара капель осталась в ее белокурых локонах. Очень романтично!"
                     $ _ias_set_arousal("You", 0)
                     $ Amanda.pregnancy_check("face", 1, "Вы")
                     $ Amanda.set_cock_position("none")
@@ -389,22 +381,22 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                 "Кончить в Аманду" if _cametoday < _cancumdaily and _ias_arousal("You") >= 100 and Amanda.cock_in("pussy") and GirlModeASDS != "minet":
                     $ tmpCumInside = Amanda.sex_count("you", "inside")
                     if Amanda.pregnancy_days() < 120 and Amanda.corruption < 60:
-                        "Вы не особо-то прислушались к просьбе Аманды и даже не попытались вовремя вытащить. Почувствовав что ее заполняет ваше семя, Аманда попробовала оттолкнуть вас, но все было без толку: пока вы не заполнили ее киску своей спермой - члена вы не вытащили. [RealName.get(GirlNameASDS, GirlNameASDS)] с ужасом посмотрела на белую струйку, вытекающую из нее."
+                        "Вы не особо-то прислушались к просьбе Аманды и даже не попытались вовремя вытащить. Почувствовав что ее заполняет ваше семя, Аманда попробовала оттолкнуть вас, но все было без толку: пока вы не заполнили ее киску своей спермой - члена вы не вытащили. [people_display_name(GirlNameASDS)] с ужасом посмотрела на белую струйку, вытекающую из нее."
                         if tmpCumInside == 0 and int(Amanda.sex_stat("cuminside", 0) or 0) >= 2:
                             "\"Эх, и ты тоже такой же как все, кончаешь внутрь, а о последствиях и не думаешь,\" несколько туманно заметила Аманда."
                         elif tmpCumInside > 4:
-                            "\"Да сколько раз тебе говорить, чтобы в меня не кончал!\" сердито воскликнула [RealName.get(GirlNameASDS, GirlNameASDS)]. \"Вот доиграемся до детей и что тогда? Только тебе это все как об стенку горох! Мог бы хоть разок не о себе, а обо мне подумать!\""
+                            "\"Да сколько раз тебе говорить, чтобы в меня не кончал!\" сердито воскликнула [people_display_name(GirlNameASDS)]. \"Вот доиграемся до детей и что тогда? Только тебе это все как об стенку горох! Мог бы хоть разок не о себе, а обо мне подумать!\""
                         else:
                             "\"Стефан, ты чего, оглох? Я тебе сказала вытащить. А теперь что делать? А если я залечу? Чтобы это в последний раз было!\" строго отчитала вас девушка."
                         if GirlLocASDS != "street":
                             call ShowImage(GirlNameASDS, "sexroom", "cumpussyangry")
                     elif Amanda.pregnancy_days() >= 120:
-                        "Рассудив про себя что более беременной чем она есть уже не станет, вы спустили прямо в нее. Судя по всему [RealName.get(GirlNameASDS, GirlNameASDS)] разделяла ваше мнение, так как почувствовав в себе ваше горячее семя она лишь улыбнулась и сказала: \"Смотри не утопи моего маленького!\""
+                        "Рассудив про себя что более беременной чем она есть уже не станет, вы спустили прямо в нее. Судя по всему [people_display_name(GirlNameASDS)] разделяла ваше мнение, так как почувствовав в себе ваше горячее семя она лишь улыбнулась и сказала: \"Смотри не утопи моего маленького!\""
                         if GirlLocASDS != "street":
                             $ _amanda_cumpussy_pic = "cumpussy" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/IntAmandaSex.rpy:procedural_randint:455:3"))
                             call ShowImage(GirlNameASDS, "sexroom", _amanda_cumpussy_pic)
                     else:
-                        "Решив не утруждать себя вы не стали вытаскивать а кончили прямо в тесную киску [RealName2.get(GirlNameASDS, GirlNameASDS)]."
+                        "Решив не утруждать себя вы не стали вытаскивать а кончили прямо в тесную киску [people_name(GirlNameASDS, 'genitive')]."
                         "\"Ох ты,\" игриво заметила Аманда. \"Ты и в самом деле пытаешься меня обрюхатить! Посмотри, сколько ты накончал!\""
                         "С этими словами Аманда раздвинула ножки, предоставив вам на обозрение свою полную вашей спермы киску."
                         if GirlLocASDS != "street":
@@ -429,7 +421,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                         $ Amanda.apply_social_chance(3, 1, -1, 25, 1, -2, "amanda_sex_after")
                         call ShowImage(GirlNameASDS, "sexroom", "angry")
                     elif Amanda.sex_stat("orgasms_given", 0) >= CurAmandaOrgasmCount + 3:
-                        "Увидев что [RealName.get(GirlNameASDS, GirlNameASDS)], измотанная серией оргазмов, усталая лежит на кровати вы решили что хорошенького понемножку и, чмокнув ее, пошли к выходу."
+                        "Увидев что [people_display_name(GirlNameASDS)], измотанная серией оргазмов, усталая лежит на кровати вы решили что хорошенького понемножку и, чмокнув ее, пошли к выходу."
                         "\"Ну пока, я пошел, а то завтра тебе надо работать, да и мне надо выспаться,\" заметили вы по пути."
                         "\"Братик, это было просто нечто, дай мне отдохнуть, а завтра приходи еще!\" слабым голосом ответила вам она, слегка привстав на кровати."
                         "И вы вышли в коридор."
@@ -437,16 +429,16 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                         $ _amanda_naked_pic = "naked" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/IntAmandaSex.rpy:procedural_randint:488:5"))
                         call ShowImage(GirlNameASDS, "sexroom", _amanda_naked_pic)
                     else:
-                        "[RealName.get(GirlNameASDS, GirlNameASDS)], после пережитого оргазма, тяжело дыша лежала на кровати."
+                        "[people_display_name(GirlNameASDS)], после пережитого оргазма, тяжело дыша лежала на кровати."
                         "\"Ну пока, я пошел, а то завтра тебе надо работать, да и мне надо выспаться,\" заметили вы идя к дверям."
-                        "\"Да, конечно,\" ответила вам довольная [RealName.get(GirlNameASDS, GirlNameASDS)], привстав на кровати, \"все было здорово, но теперь надо и поспать.\""
+                        "\"Да, конечно,\" ответила вам довольная [people_display_name(GirlNameASDS)], привстав на кровати, \"все было здорово, но теперь надо и поспать.\""
                         "И вы вышли в коридор."
                         $ Amanda.apply_social_chance(16, 2, 1, 42, 1, 1, "amanda_sex_after")
                         $ _amanda_naked_pic = "naked" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/IntAmandaSex.rpy:procedural_randint:496:6"))
                         call ShowImage(GirlNameASDS, "sexroom", _amanda_naked_pic)
                     $ _ias_set_arousal("You", 0)
                     $ _ias_set_arousal(GirlNameASDS, 0)
-                    $ Amanda.set_var_int("kickyoufromroom", 1)
+                    $ Amanda.room_entry_blocked_today = True
                     $ Amanda.set_sex_busy(False)
                     call ShowCurrentSex(GirlNameASDS)
                     $ Amanda.reset_sex_clothing_state()
@@ -460,16 +452,16 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                         "\"Ах ты козел!\" только и смогла ответить вам Аманда, впрочем вы уже оделись и весело пошли широкой походкой к трактиру, оставив хамящую девушку в подворотне."
                         $ Amanda.apply_social_chance(3, 1, -2, 25, 1, -2, "amanda_sex_after")
                     elif Amanda.sex_stat("orgasms_given", 0) >= CurAmandaOrgasmCount + 3:
-                        "[RealName.get(GirlNameASDS, GirlNameASDS)] от пережитых оргазмов едва стоит на ногах. Решив что хорошего должно быть в меру, вы начали одеваться сами, одновременно помогая Аманде привести себя в порядок. Одевшись, вы пошли обратно к трактиру."
+                        "[people_display_name(GirlNameASDS)] от пережитых оргазмов едва стоит на ногах. Решив что хорошего должно быть в меру, вы начали одеваться сами, одновременно помогая Аманде привести себя в порядок. Одевшись, вы пошли обратно к трактиру."
                         "\"Это было просто нечто, ты самый лучший!\" сказала вам по дороге удовлетворенная Аманда. \"Ну все, пока, я в свою комнату пойду отлежаться,\" и девица упорхнула."
                         $ Amanda.apply_social_chance(20, 1, 1, 50, 1, 2, "amanda_sex_after")
                     else:
-                        "Что ж, [RealName.get(GirlNameASDS, GirlNameASDS)] кончила, пора и домой. Вы начали одеваться сами, одновременно помогая Аманде привести себя в порядок. Ну а затем вы пошли обратно к трактиру."
+                        "Что ж, [people_display_name(GirlNameASDS)] кончила, пора и домой. Вы начали одеваться сами, одновременно помогая Аманде привести себя в порядок. Ну а затем вы пошли обратно к трактиру."
                         "У входа в него Аманда сказала вам: \"Ну все, пока, я наверное уже баиньки пойду,\" и с этими словами упорхнула."
                         $ Amanda.apply_social_chance(16, 2, 1, 42, 1, 1, "amanda_sex_after")
                     $ _ias_set_arousal("You", 0)
                     $ _ias_set_arousal(GirlNameASDS, 0)
-                    $ Amanda.set_var_int("kickyoufromroom", 1)
+                    $ Amanda.room_entry_blocked_today = True
                     call ShowCurrentSex(GirlNameASDS)
                     $ Amanda.reset_sex_clothing_state()
                     $ calendar_v2.advance_minutes(60)

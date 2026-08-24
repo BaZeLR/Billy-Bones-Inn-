@@ -1,9 +1,7 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-label CreateDonationsList:
-    python:
-        ChurchRepairDesc = [
+define CHURCH_REPAIR_DESCRIPTIONS = (
             "Увеличил небо и прибавил звезды",
             "Раскрасил место рождения Ильматера",
             "Поправил одежду Святого Кутберта и Суни после искушения",
@@ -14,9 +12,9 @@ label CreateDonationsList:
             "Отделал по разу дев венценосцев",
             "Покрыл три раза Святую Лииру матом",
             "Разделал линии и поставил символы над всеми богами",
-        ]
-        ChurchRepairCost = [20, 20, 30, 150, 220, 250, 180, 190, 120, 310]
-        ChurchRepairDonat = [
+)
+define CHURCH_REPAIR_COSTS = (20, 20, 30, 150, 220, 250, 180, 190, 120, 310)
+define CHURCH_REPAIR_DONATION_TARGETS = (
             "увеличение неба и звезд.",
             "раскраску места рождения Ильматера.",
             "поправку одежды Святого Кутберта и Суни после искушения.",
@@ -27,10 +25,4 @@ label CreateDonationsList:
             "разовую отделку дев венценосцев.",
             "тройное покрытие Святой Лииры матом.",
             "разделку всех богов.",
-        ]
-        ChurchDonated = [0 for _unused_repair in ChurchRepairDesc]
-
-        SawDraupnirChurchList = 0
-        player.economy.church_donated_today = 0
-        ChurchDonatedAmount = 0
-    return
+)

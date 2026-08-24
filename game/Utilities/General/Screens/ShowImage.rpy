@@ -11,84 +11,16 @@ init python:
     import renpy as renpy_module
     import renpy.display.video as renpy_video
     import renpy.exports as renpy
-    import renpy.store as store
-    from renpy.loader import loadable, transfn
+    from renpy.loader import loadable
 
     MEDIA_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp", ".gif")
     MEDIA_VIDEO_EXTENSIONS = (".webm", ".mkv", ".ogv", ".ogg", ".avi", ".mp4", ".m4v", ".mpg", ".mpeg")
     MEDIA_EXTENSIONS = MEDIA_IMAGE_EXTENSIONS + MEDIA_VIDEO_EXTENSIONS
-    LEGACY_MEDIA_ALIASES = {
-        "images/becky/dance/wait": "images/becky/dance/waiting_0.png",
-        "images/becky/dance/wait.jpg": "images/becky/dance/waiting_0.png",
-        "images/becky/dance/invite": "images/becky/dance/waiting_0.png",
-        "images/becky/dance/invite.jpg": "images/becky/dance/waiting_0.png",
-        "images/becky/dance/smile": "images/becky/dance/you_dance_1.png",
-        "images/becky/dance/smile.jpg": "images/becky/dance/you_dance_1.png",
-        "images/becky/dance/angry": "images/becky/dance/butt_angy.png",
-        "images/becky/dance/angry.jpg": "images/becky/dance/butt_angy.png",
-        "images/becky/dance/butt": "images/becky/dance/you_dance_4.png",
-        "images/becky/dance/butt.jpg": "images/becky/dance/you_dance_4.png",
-        "images/becky/dance/buttsmile": "images/becky/dance/you_dance_5.png",
-        "images/becky/dance/buttsmile.jpg": "images/becky/dance/you_dance_5.png",
-        "images/becky/dance/buttangry": "images/becky/dance/butt_angy.png",
-        "images/becky/dance/buttangry.jpg": "images/becky/dance/butt_angy.png",
-        "images/becky/dance/kiss": "images/becky/dance/french_kiss_1.png",
-        "images/becky/dance/kiss.jpg": "images/becky/dance/french_kiss_1.png",
-        "images/becky/portraits/portrait1": "images/becky/portraits/portrait_1.png",
-        "images/becky/portraits/portrait1.jpg": "images/becky/portraits/portrait_1.png",
-        "images/becky/portraits/portrait2": "images/becky/portraits/portrait_2.png",
-        "images/becky/portraits/portrait2.jpg": "images/becky/portraits/portrait_2.png",
-        "images/becky/portraits/portrait3": "images/becky/portraits/portrait_3.png",
-        "images/becky/portraits/portrait3.jpg": "images/becky/portraits/portrait_3.png",
-        "images/becky/portraits/portrait4": "images/becky/portraits/portrait_4.png",
-        "images/becky/portraits/portrait4.jpg": "images/becky/portraits/portrait_4.png",
-        "images/amanda/portrait": "images/amanda/amanda_portrait.jpg",
-        "images/amanda/portrait.jpg": "images/amanda/amanda_portrait.jpg",
-        "images/amanda/dance/alberdancestep0": "images/amanda/dance/legare_step_0.png",
-        "images/amanda/dance/alberdancestep1": "images/amanda/dance/legare_step_1.png",
-        "images/amanda/dance/alberdancestep2": "images/amanda/dance/legare_step_2.png",
-        "images/amanda/dance/alberdancestep3": "images/amanda/dance/legare_step_3.png",
-        "images/amanda/dance/youinvite1": "images/amanda/dance/you_invite_1.png",
-        "images/amanda/dance/youinvite2": "images/amanda/dance/you_invites.png",
-        "images/amanda/dance/youclose": "images/amanda/dance/you_3.png",
-        "images/amanda/dance/youdance": "images/amanda/dance/you_2.png",
-        "images/amanda/dance/youdanceworry": "images/amanda/dance/you_worry.png",
-        "images/amanda/dance/youdanceangry": "images/amanda/dance/you_nolike_1.png",
-        "images/amanda/dance/youkiss": "images/amanda/dance/you_kiss.png",
-        "images/sandra/portrait1.jpg": "images/sandra/sandra_0.png",
-        "images/eddie/portraits/portrait1.jpg": "images/eddie/portraits/portrait_1.png",
-        "images/forest/forest_day": "images/forest/forest_1.png",
-        "images/forest/forest_day.png": "images/forest/forest_1.png",
-        "images/forest_day": "images/forest/forest_1.png",
-        "images/forest_day.png": "images/forest/forest_1.png",
-        "images/forest/forest_night": "images/forest/forest_2.png",
-        "images/forest/forest_night.png": "images/forest/forest_2.png",
-        "images/forest_night": "images/forest/forest_2.png",
-        "images/forest_night.png": "images/forest/forest_2.png",
-        "images/forest/hiddenpath": "images/forest/hidden_path.png",
-        "images/forest/hiddenpath.png": "images/forest/hidden_path.png",
-        "images/hiddenpath": "images/forest/hidden_path.png",
-        "images/hiddenpath.png": "images/forest/hidden_path.png",
-        "images/hidden_path": "images/forest/hidden_path.png",
-        "images/hidden_path.png": "images/forest/hidden_path.png",
-        "images/forest/forest_hidden_path": "images/forest/hidden_path.png",
-        "images/forest/forest_hidden_path.png": "images/forest/hidden_path.png",
-        "images/forest_hidden_path": "images/forest/hidden_path.png",
-        "images/forest_hidden_path.png": "images/forest/hidden_path.png",
-        "images/forest/cave": "images/forest/cave_day.png",
-        "images/forest/cave.png": "images/forest/cave_day.png",
-        "images/cave": "images/forest/cave_day.png",
-        "images/cave.png": "images/forest/cave_day.png",
-        "images/forest/cave_day": "images/forest/cave_day.png",
-        "images/forest/cave_day.png": "images/forest/cave_day.png",
-        "images/cave_day": "images/forest/cave_day.png",
-        "images/cave_day.png": "images/forest/cave_day.png",
-        "images/forest/cave_night": "images/forest/cave_night.png",
-        "images/forest/cave_night.png": "images/forest/cave_night.png",
-        "images/cave_night": "images/forest/cave_night.png",
-        "images/cave_night.png": "images/forest/cave_night.png",
+    MEDIA_ASSET_CASE_INDEX = {
+        str(asset_path or "").replace("\\", "/").lower(): str(asset_path or "").replace("\\", "/")
+        for asset_path in renpy.list_files()
+        if str(asset_path or "").replace("\\", "/").lower().startswith("images/")
     }
-
     def _normalize_media_ref(media_ref):
         if media_ref is None:
             return ""
@@ -101,29 +33,15 @@ init python:
         ref = _normalize_media_ref(media_ref)
         if not ref:
             return False
-        try:
-            if loadable(ref):
-                return True
-        except Exception:
-            pass
-        try:
-            return os.path.isfile(transfn(ref))
-        except Exception:
-            pass
-        try:
-            return os.path.isfile(os.path.join(renpy_module.config.gamedir, ref.replace("/", os.sep)))
-        except Exception:
-            return False
+        canonical_ref = MEDIA_ASSET_CASE_INDEX.get(ref.lower(), ref)
+        return bool(loadable(canonical_ref))
+
+    def _media_canonical_asset_ref(media_ref):
+        ref = _normalize_media_ref(media_ref)
+        return MEDIA_ASSET_CASE_INDEX.get(ref.lower(), ref)
 
     def _media_has_extension(media_ref):
         return bool(os.path.splitext(_normalize_media_ref(media_ref))[1])
-
-    def _media_alias_candidate(media_ref):
-        ref = _normalize_media_ref(media_ref)
-        if not ref:
-            return ""
-        alias = LEGACY_MEDIA_ALIASES.get(ref.lower(), "")
-        return _normalize_media_ref(alias)
 
     def _media_underscore_digit_variant(media_ref):
         ref = _normalize_media_ref(media_ref)
@@ -165,9 +83,6 @@ init python:
         if not ref:
             return []
         variants = [ref]
-        alias_variant = _media_alias_candidate(ref)
-        if alias_variant:
-            variants.append(alias_variant)
         underscore_variant = _media_underscore_digit_variant(ref)
         if underscore_variant:
             variants.append(underscore_variant)
@@ -217,13 +132,13 @@ init python:
                 return variant
             if _media_has_extension(variant):
                 if _media_asset_exists(variant) or variant == ref:
-                    return variant
+                    return _media_canonical_asset_ref(variant)
                 continue
             if "/" in variant:
                 for ext in MEDIA_EXTENSIONS:
                     candidate = variant + ext
                     if _media_asset_exists(candidate):
-                        return candidate
+                        return _media_canonical_asset_ref(candidate)
         return ref
 
     def build_media_ref(folder1="", folder2="", image_name=""):
@@ -248,13 +163,13 @@ init python:
 
     def _room_picture_time_key(time_value=None):
         try:
-            slot = int(store.time if time_value is None else time_value or 0)
+            slot = int(calendar_v2.time_slot() if time_value is None else time_value or 0)
         except Exception:
             slot = 0
         return "night" if slot >= 4 else "day"
 
     def _bg_declare_location_key(location_code=""):
-        raw_key = _normalize_media_ref(location_code or getattr(store, "CurLoc", "") or getattr(store, "location", ""))
+        raw_key = _normalize_media_ref(location_code or rooms.current_code)
         raw_key = raw_key.replace("’", "").replace("'", "")
         parts = re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)|\d+", raw_key.replace("_", " ").replace("-", " "))
         if parts:
@@ -308,7 +223,7 @@ init python:
         props = getattr(room_obj, "custom_properties", {}) or {}
         time_key = _room_picture_time_key(time_value)
         try:
-            slot_key = int(store.time if time_value is None else time_value or 0)
+            slot_key = int(calendar_v2.time_slot() if time_value is None else time_value or 0)
         except Exception:
             slot_key = 0
 
@@ -359,11 +274,10 @@ init python:
 
     def resolve_main_ui_picture(room_obj=None):
         room_base_picture = _normalize_media_ref(getattr(room_obj, "bg_picture", "") if room_obj is not None else "")
-        layout_picture = _normalize_media_ref(getattr(store, "_layout_last_picture", ""))
-        scene_picture = _normalize_media_ref(getattr(store, "scene_image", ""))
+        explicit_picture = _normalize_media_ref(scene_runtime.picture)
         current_object_picture = ""
 
-        current_object_key = str(getattr(store, "current_object_id", "") or "").strip()
+        current_object_key = str(main_ui_runtime.object_id or "").strip()
         if current_object_key:
             current_object = get_game_object(current_object_key)
             if current_object is None:
@@ -373,9 +287,7 @@ init python:
                 return media_displayable(current_object_picture)
 
         uses_room_seed = bool(room_base_picture) and (
-            not layout_picture
-            or layout_picture == room_base_picture
-            or (scene_picture == room_base_picture and layout_picture == scene_picture)
+            not explicit_picture or explicit_picture == room_base_picture
         )
 
         if room_obj is not None and uses_room_seed:
@@ -383,8 +295,7 @@ init python:
             if resolved_room_picture:
                 return media_displayable(resolved_room_picture)
 
-        explicit_picture = layout_picture or scene_picture or room_base_picture
-        return media_displayable(explicit_picture)
+        return media_displayable(explicit_picture or room_base_picture)
 
     def show_image(folder1, folder2, image_name):
         try:
@@ -398,10 +309,10 @@ init python:
         img_path = build_media_ref(folder1, folder2, image_name)
         if not img_path:
             return
-        store._layout_last_picture = img_path
+        scene_runtime.picture = img_path
 
         if graphics_on == 1:
-            # Main UI mode: image is rendered in the picture viewport from _layout_last_picture.
+            # Main UI mode: image is rendered in the picture viewport from scene_runtime.picture.
             # Avoid duplicate render on master (picture-in-picture effect).
             if renpy.get_screen("main_ui") is not None:
                 return
@@ -410,18 +321,13 @@ init python:
             renpy.show(
                 img_path,
                 what=renpy.easy.displayable(img_path),
-                at_list=[store.master],
+                at_list=[master],
                 layer="master",
             )
         else:
             renpy.say(None, "Изображение: " + img_path)
 
-    # Legacy compatibility: some converted scripts call ShowImage(...) as a function.
-    def ShowImage(folder1="", folder2="", image_name=""):
-        return show_image(folder1, folder2, image_name)
-
-    # Legacy compatibility for FUNC/GS ShowImageSeq usage from converted code.
-    def ShowImageSeq(folder1="", folder2="", image_name="", variants=0):
+    def show_image_seq(folder1="", folder2="", image_name="", variants=0):
         try:
             n = int(variants or 0)
         except Exception:
@@ -436,10 +342,10 @@ init python:
 
 
 label ShowImage(args0="", args1="", args2=""):
-    $ ShowImage(args0, args1, args2)
+    $ show_image(args0, args1, args2)
     return
 
 
 label ShowImageSeq(args0="", args1="", args2="", args3=0):
-    $ ShowImageSeq(args0, args1, args2, args3)
+    $ show_image_seq(args0, args1, args2, args3)
     return

@@ -71,8 +71,8 @@
     {
       "label": "sunday_church",
       "weekdays": [7],
-      "start": "06:00",
-      "end": "10:59",
+      "start": "08:00",
+      "end": "09:29",
       "location": "Church",
       "awake": true,
       "talkable": false,

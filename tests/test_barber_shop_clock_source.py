@@ -9,7 +9,7 @@ def test_barber_shop_open_hours_use_calendar_clock_not_display_slot():
     source = BARBER_SHOP.read_text(encoding="utf-8-sig")
     body = source.split("def barber_shop_is_open():", 1)[1].split("\n    def ", 1)[0]
 
-    assert "calendar_v2.sync_state()" in body
+    assert "calendar_v2.sync_state()" not in body
     assert "calendar_v2.week" in body
     assert "calendar_v2.hour" in body
     assert "calendar_v2.minute" in body

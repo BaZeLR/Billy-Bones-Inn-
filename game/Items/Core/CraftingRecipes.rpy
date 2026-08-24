@@ -1,106 +1,35 @@
-    def recipe_book:
-        global RecipeBook
-        if RecipeBook is None:
-            RecipeBook = RecipeBookSession()
-        return RecipeBook
-    def register_recipe_page(page_obj):
-        if page_obj is None:
-            return
-        recipe_id = str(getattr(page_obj, "recipe_id", "") or "").strip()
-        if not recipe_id:
-            return
-        recipe_pages[recipe_id] = page_obj
-        if recipe_id not in recipe_names:
-            recipe_names.append(recipe_id)
-
-    def get_recipe_page(recipe_id):
-        return recipe_pages.get(str(recipe_id or "").strip(), None)
-    def recipe_book:
-        global RecipeBook
-        if RecipeBook is None:
-            RecipeBook = RecipeBookSession()
-        return RecipeBook
-    def register_recipe_page(page_obj):
-        if page_obj is None:
-            return
-        recipe_id = str(getattr(page_obj, "recipe_id", "") or "").strip()
-        if not recipe_id:
-            return
-        recipe_pages[recipe_id] = page_obj
-        if recipe_id not in recipe_names:
-            recipe_names.append(recipe_id)
-
-    def get_recipe_page(recipe_id):
-        return recipe_pages.get(str(recipe_id or "").strip(), None)
-    def recipe_book:
-        global RecipeBook
-        if RecipeBook is None:
-            RecipeBook = RecipeBookSession()
-        return RecipeBook
-    def register_recipe_page(page_obj):
-        if page_obj is None:
-            return
-        recipe_id = str(getattr(page_obj, "recipe_id", "") or "").strip()
-        if not recipe_id:
-            return
-        recipe_pages[recipe_id] = page_obj
-        if recipe_id not in recipe_names:
-            recipe_names.append(recipe_id)
-
-    def get_recipe_page(recipe_id):
-        return recipe_pages.get(str(recipe_id or "").strip(), None)
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-define recipe_names = []
-define recipe_pages = {}
-default RecipeBookSelectedId = ""
-default RecipeBookReturnRoomCode = ""
-default RecipeBookReturnObjectId = ""
-default RecipeBookReturnPicture = ""
-default RecipeBookReadCount = 0
-default RecipeBookTinyNoteFound = 0
-default RecipeBookRiddleSeen = 0
-default RecipeBookHiddenRecipesRevealed = 0
-
-default RecipeBookSelectedId = ""
-default RecipeBookReturnRoomCode = ""
-default RecipeBookReturnObjectId = ""
-default RecipeBookReturnPicture = ""
-default RecipeBookReadCount = 0
-default RecipeBookTinyNoteFound = 0
-default RecipeBookRiddleSeen = 0
-default RecipeBookHiddenRecipesRevealed = 0
-
-default RecipeBookSelectedId = ""
-default RecipeBookReturnRoomCode = ""
-default RecipeBookReturnObjectId = ""
-default RecipeBookReturnPicture = ""
-default RecipeBookReadCount = 0
-default RecipeBookTinyNoteFound = 0
-default RecipeBookRiddleSeen = 0
-default RecipeBookHiddenRecipesRevealed = 0
-
 init 4 python:
+    class RecipeCatalog(object):
+        def __init__(self):
+            self.pages = {}
+
+        def register(self, page_obj):
+            recipe_id = str(getattr(page_obj, "recipe_id", "") or "").strip()
+            if recipe_id:
+                self.pages[recipe_id] = page_obj
+            return page_obj
+
+        def get(self, recipe_id):
+            return self.pages.get(str(recipe_id or "").strip(), None)
+
+        def ids(self):
+            return list(self.pages.keys())
+
+    recipe_catalog = RecipeCatalog()
+
     class RecipeBookSession(object):
         def __init__(self):
             self.selected_id = ""
-            self.return_room_code = ""
-            self.return_object_id = ""
-            self.return_picture = ""
-            self.return_room_code = ""
-            self.return_object_id = ""
-            self.return_picture = ""
-            self.return_room_code = ""
-            self.return_object_id = ""
-            self.return_picture = ""
 
     def recipe_book_item_state():
         item = get_game_item("recipe_book_001")
         return item.state if item is not None else {}
 
     class RecipePage(object):
-        def __init__(self, recipe_id, title, image, item_result=None, ingredients=None, unlocked=False, unlock_condition=None, result_quantity=1, notes=None, craft_handler=None):
+        def __init__(self, recipe_id, title, image, item_result=None, ingredients=None, unlocked=False, unlock_condition=None, result_quantity=1, notes=None, craft_minutes=0, craft_text="", craft_failure_text=""):
             self.recipe_id = str(recipe_id or "").strip()
             self.title = str(title or "").strip()
             self.image = str(image or "").strip()
@@ -110,23 +39,25 @@ init 4 python:
             self.unlock_condition = unlock_condition
             self.result_quantity = max(1, int(result_quantity or 1))
             self.notes = list(notes or [])
-            self.craft_handler = craft_handler
+            self.craft_minutes = max(0, int(craft_minutes or 0))
+            self.craft_text = str(craft_text or "Вы создаете новый предмет по найденному рецепту.")
+            self.craft_failure_text = str(craft_failure_text or "Не удалось взять нужные ингредиенты.")
+            recipe_catalog.register(self)
 
-    def register_recipe_page(page_obj):
-        if page_obj is None:
-            return
-        recipe_id = str(getattr(page_obj, "recipe_id", "") or "").strip()
-        if not recipe_id:
-            return
-        recipe_pages[recipe_id] = page_obj
-        if recipe_id not in recipe_names:
-            recipe_names.append(recipe_id)
-
-    def get_recipe_page(recipe_id):
-        return recipe_pages.get(str(recipe_id or "").strip(), None)
+        def craft(self, resolved_rows=None):
+            rows = list(resolved_rows if resolved_rows is not None else recipe_page_requirement_status(self.recipe_id))
+            consume_result = recipe_consume_required_ingredients(self.recipe_id, rows)
+            if not bool(consume_result.get("ok", False)):
+                return {"ok": False, "text": str(consume_result.get("text", "") or self.craft_failure_text), "recipe_id": self.recipe_id}
+            if self.item_result:
+                player.add_item(self.item_result, self.result_quantity)
+            if self.craft_minutes > 0:
+                calendar_v2.advance_minutes(self.craft_minutes)
+            update_stat_state()
+            return {"ok": True, "text": self.craft_text, "recipe_id": self.recipe_id, "item_result": self.item_result, "quantity": self.result_quantity}
 
     def recipe_page_image_path(recipe_id):
-        page = get_recipe_page(recipe_id)
+        page = recipe_catalog.get(recipe_id)
         if page is None:
             return ""
         image_path = str(getattr(page, "image", "") or "").strip()
@@ -135,7 +66,7 @@ init 4 python:
         return ""
 
     def recipe_page_is_unlocked(recipe_id):
-        page = get_recipe_page(recipe_id)
+        page = recipe_catalog.get(recipe_id)
         if page is None:
             return False
         if bool(getattr(page, "unlocked", False)):
@@ -149,7 +80,7 @@ init 4 python:
         return False
 
     def visible_recipe_pages():
-        return [recipe_id for recipe_id in list(recipe_names or []) if recipe_page_is_unlocked(recipe_id)]
+        return [recipe_id for recipe_id in recipe_catalog.ids() if recipe_page_is_unlocked(recipe_id)]
 
     def find_unmarked_numbers(count, present_numbers):
         limit = max(0, int(count or 0))
@@ -168,26 +99,26 @@ init 4 python:
             return 0
 
     def recipe_book_hidden_recipes_revealed():
-        return int(RecipeBookHiddenRecipesRevealed or 0) == 1
+        return bool(recipe_book_item_state().get("hidden_recipes_revealed", False))
 
     def recipe_book_bat_thread_started():
         try:
-            return int(Melissa.bats_stage() or 0) >= 1
+            return int(threads["melissaBatProblem"].num or 0) >= 1
         except Exception:
             return False
 
     def recipe_book_can_notice_hidden_note():
         return (
             player_has_soap_recipe_book()
-            and int(RecipeBookTinyNoteFound or 0) == 0
+            and not bool(recipe_book_item_state().get("tiny_note_found", False))
             and recipe_book_bat_thread_started()
             and recipe_book_exploration_value() >= 120
         )
 
     def recipe_book_secret_status_text():
-        if int(RecipeBookHiddenRecipesRevealed or 0) == 1:
+        if recipe_book_hidden_recipes_revealed():
             return "На нескольких страницах проступили скрытые записи: автор прятал часть рецептов в слабых винных чернилах."
-        if int(RecipeBookTinyNoteFound or 0) == 1:
+        if bool(recipe_book_item_state().get("tiny_note_found", False)):
             return "Между страницами лежит тонкая вкладка с неровной строкой: \"Сделай строки горячее и прянее; когда скрывать нечего, красота выйдет наружу.\" Похоже, пергамент надо осторожно нагреть и провести по полям вином."
         if recipe_book_can_notice_hidden_note():
             return "Теперь, когда история с летучими тварями под крышей уже началась, ваш дорожный опыт помогает заметить тонкую вкладку между страницами. Ее край почти сливается с пергаментом, но теперь вы точно видите, что это не случайный обрывок."
@@ -200,7 +131,7 @@ init 4 python:
         return "Между читаемыми страницами заметно, что в книге есть и другие записи, но чернила выцвели, а рука автора слишком неровная. Пока вы разбираете лишь самые понятные рецепты."
 
     def recipe_page_ingredient_item_ids(recipe_id):
-        page = get_recipe_page(recipe_id)
+        page = recipe_catalog.get(recipe_id)
         if page is None:
             return []
         ingredient_ids = []
@@ -349,7 +280,7 @@ init 4 python:
         }
 
     def recipe_page_requirement_status(recipe_id):
-        page = get_recipe_page(recipe_id)
+        page = recipe_catalog.get(recipe_id)
         if page is None:
             return []
         rows = []
@@ -370,7 +301,7 @@ init 4 python:
         return [rows[idx] for idx in recipe_missing_requirement_indexes(recipe_id, rows)]
 
     def recipe_page_can_craft(recipe_id):
-        page = get_recipe_page(recipe_id)
+        page = recipe_catalog.get(recipe_id)
         if page is None or not recipe_page_is_unlocked(recipe_id):
             return False
         return len(recipe_missing_requirement_indexes(recipe_id)) <= 0
@@ -379,7 +310,7 @@ init 4 python:
         return [recipe_id for recipe_id in list(visible_recipe_pages() or []) if recipe_page_can_craft(recipe_id)]
 
     def recipe_result_display_name(recipe_id):
-        page = get_recipe_page(recipe_id)
+        page = recipe_catalog.get(recipe_id)
         if page is None:
             return "предмет"
         result_item_id = str(getattr(page, "item_result", "") or "").strip()
@@ -387,7 +318,7 @@ init 4 python:
         return str(getattr(result_item, "name", result_item_id or "предмет") or result_item_id or "предмет")
 
     def recipe_page_text(recipe_id):
-        page = get_recipe_page(recipe_id)
+        page = recipe_catalog.get(recipe_id)
         if page is None:
             return "Ничего разборчивого на этой странице не осталось."
         lines = []
@@ -441,7 +372,7 @@ init 4 python:
         return ""
 
     def recipe_book_selected_title(recipe_id):
-        page = get_recipe_page(recipe_id)
+        page = recipe_catalog.get(recipe_id)
         if page is None:
             return "Рецепты"
         return "Рецепт: " + str(getattr(page, "title", recipe_id) or recipe_id)
@@ -460,7 +391,7 @@ init 4 python:
         resolved_id = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()
         if not resolved_id:
             return "Вы листаете старую книгу, но пока не можете разобрать ни одного полезного рецепта."
-        page = get_recipe_page(resolved_id)
+        page = recipe_catalog.get(resolved_id)
         if page is None:
             return "Страница выцвела настолько, что разобрать рецепт уже нельзя."
 
@@ -491,15 +422,6 @@ init 4 python:
     def recipe_book_apply_picture(recipe_id):
         return str(recipe_page_image_path(recipe_id) or "").strip()
 
-    def recipe_book_restore_picture():
-        return str(RecipeBookReturnPicture or "").strip()
-
-    def recipe_book_restore_picture():
-        return str(RecipeBookReturnPicture or "").strip()
-
-    def recipe_book_restore_picture():
-        return str(RecipeBookReturnPicture or "").strip()
-
     def recipe_book_action_state(selected_id, where_id="", object_id=""):
         resolved_id = str(selected_id or recipe_book_resolved_selected_id() or "").strip()
         action_rows = []
@@ -509,7 +431,7 @@ init 4 python:
 
         if recipe_book_can_notice_hidden_note():
             action_rows.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", where_id, object_id or "recipe_book_001", "book")))
-        elif int(RecipeBookTinyNoteFound or 0) == 1 and int(RecipeBookHiddenRecipesRevealed or 0) == 0:
+        elif bool(recipe_book_item_state().get("tiny_note_found", False)) and not recipe_book_hidden_recipes_revealed():
             action_rows.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "book")))
         action_rows.append(MenuItem("Закрыть книгу", Call("RecipeBookClose", where_id, object_id or "recipe_book_001")))
         return {
@@ -559,7 +481,7 @@ init 4 python:
         return str(default or "").strip()
 
     def apply_recipe_craft(recipe_id):
-        page = get_recipe_page(recipe_id)
+        page = recipe_catalog.get(recipe_id)
         if page is None:
             return {"ok": False, "text": "Такого рецепта у вас сейчас нет."}
         resolved_rows = recipe_page_requirement_status(recipe_id)
@@ -568,177 +490,151 @@ init 4 python:
                 return {"ok": False, "text": "Для этого рецепта у вас не хватает нужных ингредиентов или условий."}
         if not recipe_page_is_unlocked(recipe_id):
             return {"ok": False, "text": "Для этого рецепта у вас не хватает нужных ингредиентов или условий."}
-        craft_handler = getattr(page, "craft_handler", None)
-        if callable(craft_handler):
-            return dict(craft_handler() or {})
+        return dict(page.craft(resolved_rows) or {})
 
-        consume_result = recipe_consume_required_ingredients(recipe_id, resolved_rows)
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять нужные ингредиенты.")}
 
-        result_item = str(getattr(page, "item_result", "") or "").strip()
-        result_qty = max(1, int(getattr(page, "result_quantity", 1) or 1))
-        if result_item:
-            _player_add_item_by_id(result_item, result_qty)
-        return {
-            "ok": True,
-            "text": "Вы создаете новый предмет по найденному рецепту.",
-            "recipe_id": str(recipe_id or ""),
-            "item_result": result_item,
-            "quantity": result_qty,
-        }
+default recipe_book = RecipeBookSession()
 
 
 label ReadRecipeBook(what_id="", where_id="", fallback_text="", object_id="", recipe_id=""):
+    $ renpy.dynamic("_recipe_picture", "_recipe_action_state")
     $ recipe_book_item_state()["read_count"] = max(0, int(recipe_book_item_state().get("read_count", 0) or 0)) + 1
     $ recipe_book.selected_id = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()
     if not recipe_book.selected_id:
-        $ MainTxt = recipe_book_read_text()
-        $ CurLocDesc = MainTxt
-    if str(recipe_book_session().return_room_code or "").strip() == "":
-        $ recipe_book_session().return_room_code = str(where_id or CurLoc or "").strip()
-        $ recipe_book_session().return_object_id = str(object_id or what_id or "").strip()
-        $ recipe_book_session().return_picture = str(_layout_last_picture or scene_image or "") or ""
-        jump expression where_id
+        $ scene_runtime.text = recipe_book_read_text()
+        $ scene_runtime.location_text = scene_runtime.text
+        call TavernAticObjectMenu(object_id or what_id or "recipe_book_001")
+        return
     $ _recipe_picture = recipe_book_apply_picture(recipe_book.selected_id)
     if _recipe_picture:
-        $ scene_image = _recipe_picture
-        $ _layout_last_picture = _recipe_picture
-    $ MainTxt = recipe_book_page_text(recipe_book.selected_id)
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.picture = _recipe_picture
+    $ scene_runtime.text = recipe_book_page_text(recipe_book.selected_id)
+    $ scene_runtime.location_text = scene_runtime.text
     $ _recipe_action_state = recipe_book_action_state(recipe_book.selected_id, where_id, object_id or what_id)
-    $ current_action_title = _recipe_action_state["title"]
-    $ current_action_content = None
-    $ current_action_items = _recipe_action_state["items"]
+    $ main_ui_runtime.action_title = _recipe_action_state["title"]
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = _recipe_action_state["items"]
     return
 
 
 label RecipeBookFindTinyNote(where_id="", object_id="", return_context="book"):
+    $ renpy.dynamic("_recipe_action_state")
     if not recipe_book_can_notice_hidden_note():
-        $ MainTxt = "Вы еще раз просматриваете переплет и края страниц, но ничего нового не находите."
+        $ scene_runtime.text = "Вы еще раз просматриваете переплет и края страниц, но ничего нового не находите."
     else:
-        $ RecipeBookTinyNoteFound = 1
-        $ RecipeBookRiddleSeen = 1
-        $ MainTxt = "Вы осторожно вытаскиваете из сгиба тонкую вкладку. Когда я согрета и пьяна, сможешь читать меня,как открытую книгу и видеть все мои тайные места"   
+        $ recipe_book_item_state()["tiny_note_found"] = True
+        $ recipe_book_item_state()["riddle_seen"] = True
+        $ scene_runtime.text = "Вы осторожно вытаскиваете из сгиба тонкую вкладку. Когда я согрета и пьяна, сможешь читать меня,как открытую книгу и видеть все мои тайные места"   
     if str(return_context or "") == "table":
-        $ current_action_title = "Книга рецептов"
-        $ current_action_content = None
-        $ current_action_items = []
+        $ main_ui_runtime.action_title = "Книга рецептов"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = []
         if recipe_book_can_notice_hidden_note():
-            $ current_action_items.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", where_id, object_id or "recipe_book_001", "table")))
-        elif int(RecipeBookTinyNoteFound or 0) == 1 and int(RecipeBookHiddenRecipesRevealed or 0) == 0:
-            $ current_action_items.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "table")))
-        $ current_action_items.append(MenuItem("Вернуться к записям", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
-        $ current_action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
+            $ main_ui_runtime.action_items.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", where_id, object_id or "recipe_book_001", "table")))
+        elif bool(recipe_book_item_state().get("tiny_note_found", False)) and not recipe_book_hidden_recipes_revealed():
+            $ main_ui_runtime.action_items.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "table")))
+        $ main_ui_runtime.action_items.append(MenuItem("Вернуться к записям", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
+        $ main_ui_runtime.action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
     else:
         $ _recipe_action_state = recipe_book_action_state(recipe_book.selected_id, where_id, object_id or "recipe_book_001")
-        $ current_action_title = _recipe_action_state["title"]
-        $ current_action_content = None
-        $ current_action_items = _recipe_action_state["items"]
+        $ main_ui_runtime.action_title = _recipe_action_state["title"]
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = _recipe_action_state["items"]
     $ renpy.restart_interaction()
     return
 
 
 label RecipeBookRevealHiddenRecipes(where_id="", object_id="", return_context="book"):
-    if int(RecipeBookTinyNoteFound or 0) == 0:
-        $ MainTxt = "Пока вы не понимаете, что именно нужно искать на этих страницах."
-    elif int(RecipeBookHiddenRecipesRevealed or 0) == 1:
-        $ MainTxt = "Скрытые строки уже проявлены. Теперь их можно читать как обычные рецепты."
+    $ renpy.dynamic("_recipe_picture", "_recipe_action_state")
+    if not bool(recipe_book_item_state().get("tiny_note_found", False)):
+        $ scene_runtime.text = "Пока вы не понимаете, что именно нужно искать на этих страницах."
+    elif recipe_book_hidden_recipes_revealed():
+        $ scene_runtime.text = "Скрытые строки уже проявлены. Теперь их можно читать как обычные рецепты."
     elif int(player.tavern_management.winenum or 0) <= 0:
-        $ MainTxt = "Для опыта нужен хотя бы глоток вина из запасов трактира. Без него старые поля остаются пустыми."
+        $ scene_runtime.text = "Для опыта нужен хотя бы глоток вина из запасов трактира. Без него старые поля остаются пустыми."
     else:
         $ recipe_book_item_state()["hidden_recipes_revealed"] = True
         $ recipe_book.selected_id = "bat_repellent_recipe"
-        $ MainTxt = "Вы держите пергамент над ровным теплом, пока старые волокна не начинают едва темнеть, потом смачиваете край тряпки вином и осторожно проводите по полям. Через несколько минут под выцветшей желтизной проступают новые строки.\n\nАвтор прятал часть записей намеренно. Среди них есть дымная смесь из сухого мха, лаванды и резких трав - как раз то, чем можно выкурить летучих тварей из-под крыши."
-        $ Melissa.var["bat_recipe_unlocked"] = 1
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Вы держите пергамент над ровным теплом, пока старые волокна не начинают едва темнеть, потом смачиваете край тряпки вином и осторожно проводите по полям. Через несколько минут под выцветшей желтизной проступают новые строки.\n\nАвтор прятал часть записей намеренно. Среди них есть дымная смесь из сухого мха, лаванды и резких трав - как раз то, чем можно выкурить летучих тварей из-под крыши."
+    $ scene_runtime.location_text = scene_runtime.text
     if str(return_context or "") == "table":
-        $ current_action_title = "Книга рецептов"
-        $ current_action_content = None
-        $ current_action_items = []
-        if int(RecipeBookHiddenRecipesRevealed or 0) == 1:
+        $ main_ui_runtime.action_title = "Книга рецептов"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = []
+        if recipe_book_hidden_recipes_revealed():
             $ _recipe_picture = recipe_book_apply_picture(recipe_book.selected_id)
             if _recipe_picture:
-                $ scene_image = _recipe_picture
-                $ _layout_last_picture = _recipe_picture
-            $ current_action_items.append(MenuItem("Читать проявленный рецепт", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
-            $ current_action_items.append(MenuItem("Продолжить работу", Call("TavernMyRoomTableCraftMenu")))
+                $ scene_runtime.picture = _recipe_picture
+            $ main_ui_runtime.action_items.append(MenuItem("Читать проявленный рецепт", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
+            $ main_ui_runtime.action_items.append(MenuItem("Продолжить работу", Call("TavernMyRoomTableCraftMenu")))
         else:
             if recipe_book_can_notice_hidden_note():
-                $ current_action_items.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", where_id, object_id or "recipe_book_001", "table")))
-            elif int(RecipeBookTinyNoteFound or 0) == 1 and int(RecipeBookHiddenRecipesRevealed or 0) == 0:
-                $ current_action_items.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "table")))
-            $ current_action_items.append(MenuItem("Вернуться к записям", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
-        $ current_action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
+                $ main_ui_runtime.action_items.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", where_id, object_id or "recipe_book_001", "table")))
+            elif bool(recipe_book_item_state().get("tiny_note_found", False)) and not recipe_book_hidden_recipes_revealed():
+                $ main_ui_runtime.action_items.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "table")))
+            $ main_ui_runtime.action_items.append(MenuItem("Вернуться к записям", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
+        $ main_ui_runtime.action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
     else:
         $ _recipe_picture = recipe_book_apply_picture(recipe_book.selected_id)
         if _recipe_picture:
-            $ scene_image = _recipe_picture
-            $ _layout_last_picture = _recipe_picture
+            $ scene_runtime.picture = _recipe_picture
         $ _recipe_action_state = recipe_book_action_state(recipe_book.selected_id, where_id, object_id or "recipe_book_001")
-        $ current_action_title = _recipe_action_state["title"]
-        $ current_action_content = None
-        $ current_action_items = _recipe_action_state["items"]
+        $ main_ui_runtime.action_title = _recipe_action_state["title"]
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = _recipe_action_state["items"]
     $ renpy.restart_interaction()
     return
 
 
 label RecipeBookCraftMenu(where_id="", object_id=""):
-    $ _book_picture = recipe_page_image_path(recipe_book.selected_id) or str(_layout_last_picture or scene_image or "")
+    $ renpy.dynamic("_book_picture", "_craftable_count", "_recipe_id")
+    $ _book_picture = recipe_page_image_path(recipe_book.selected_id) or str(scene_runtime.picture or scene_runtime.picture or "")
     if _book_picture:
-        $ scene_image = _book_picture
-        $ _layout_last_picture = _book_picture
-    $ MainTxt = "Вы проверяете записи и откладываете в сторону только те рецепты, для которых сейчас есть все нужное."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Создать предмет"
-    $ current_action_content = None
-    $ current_action_items = []
+        $ scene_runtime.picture = _book_picture
+    $ scene_runtime.text = "Вы проверяете записи и откладываете в сторону только те рецепты, для которых сейчас есть все нужное."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Создать предмет"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     $ _craftable_count = 0
     python:
         for _recipe_id in list(craftable_recipe_pages() or []):
             _craftable_count += 1
-            current_action_items.append(MenuItem("Сделать: " + recipe_result_display_name(_recipe_id), Call("RecipeBookCraftItem", _recipe_id, where_id, object_id or "recipe_book_001")))
+            main_ui_runtime.action_items.append(MenuItem("Сделать: " + recipe_result_display_name(_recipe_id), Call("RecipeBookCraftItem", _recipe_id, where_id, object_id or "recipe_book_001")))
     if int(_craftable_count or 0) <= 0:
-        $ MainTxt = "Сейчас ни один рецепт не готов полностью. Прочитайте нужную страницу, чтобы увидеть, чего не хватает."
-        $ CurLocDesc = MainTxt
-    $ current_action_items.append(MenuItem("Читать книгу", Call("ReadRecipeBook", "recipe_book_001", where_id, "", object_id or "recipe_book_001", recipe_book.selected_id)))
-    $ current_action_items.append(MenuItem("Закрыть книгу", Call("RecipeBookClose", where_id, object_id or "recipe_book_001")))
+        $ scene_runtime.text = "Сейчас ни один рецепт не готов полностью. Прочитайте нужную страницу, чтобы увидеть, чего не хватает."
+        $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items.append(MenuItem("Читать книгу", Call("ReadRecipeBook", "recipe_book_001", where_id, "", object_id or "recipe_book_001", recipe_book.selected_id)))
+    $ main_ui_runtime.action_items.append(MenuItem("Закрыть книгу", Call("RecipeBookClose", where_id, object_id or "recipe_book_001")))
     return
 
 
 label RecipeBookCraftItem(recipe_id="", where_id="", object_id=""):
+    $ renpy.dynamic("_recipe_id", "_craft_result", "_recipe_picture", "_recipe_action_state")
     $ _recipe_id = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()
     if str(_recipe_id or "").strip() == "":
-        $ MainTxt = "Вы пока не выбрали рецепт."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Вы пока не выбрали рецепт."
+        $ scene_runtime.location_text = scene_runtime.text
         call ReadRecipeBook("recipe_book_001", where_id, "", object_id or "recipe_book_001", _recipe_id)
         return
     $ _craft_result = apply_recipe_craft(_recipe_id)
     if bool(_craft_result.get("ok", False)):
-        $ MainTxt = str(_craft_result.get("text", "") or "Вы создаете новый предмет по рецепту.") + "\n\n" + str(recipe_book_page_text(_recipe_id) or "")
+        $ scene_runtime.text = str(_craft_result.get("text", "") or "Вы создаете новый предмет по рецепту.") + "\n\n" + str(recipe_book_page_text(_recipe_id) or "")
     else:
-        $ MainTxt = str(_craft_result.get("text", "") or "Для этого рецепта у вас не хватает нужных вещей.") + "\n\n" + str(recipe_book_page_text(_recipe_id) or "")
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = str(_craft_result.get("text", "") or "Для этого рецепта у вас не хватает нужных вещей.") + "\n\n" + str(recipe_book_page_text(_recipe_id) or "")
+    $ scene_runtime.location_text = scene_runtime.text
     $ _recipe_picture = recipe_book_apply_picture(_recipe_id)
     if _recipe_picture:
-        $ scene_image = _recipe_picture
-        $ _layout_last_picture = _recipe_picture
+        $ scene_runtime.picture = _recipe_picture
     $ recipe_book.selected_id = _recipe_id
     $ _recipe_action_state = recipe_book_action_state(_recipe_id, where_id, object_id or "recipe_book_001")
-    $ current_action_title = _recipe_action_state["title"]
-    $ current_action_content = None
-    $ current_action_items = _recipe_action_state["items"]
+    $ main_ui_runtime.action_title = _recipe_action_state["title"]
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = _recipe_action_state["items"]
     return
 
 
 label RecipeBookClose(where_id="", object_id=""):
     $ recipe_book.selected_id = ""
-    $ _recipe_restore_picture = recipe_book_restore_picture()
-    $ scene_image = _recipe_restore_picture
-    $ _layout_last_picture = _recipe_restore_picture
-    $ _return_room_code = str(recipe_book_session().return_room_code or where_id or CurLoc or "").strip()
-    $ _return_object_id = str(recipe_book_session().return_object_id or object_id or "").strip()
-    $ recipe_book_session().return_room_code = ""
-    $ recipe_book_session().return_object_id = ""
-    $ recipe_book_session().return_picture = ""
-    jump expression _return_room_code
+    call TavernAticObjectMenu(object_id or "recipe_book_001")
+    return

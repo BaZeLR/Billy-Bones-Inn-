@@ -5,7 +5,7 @@ init -200 python:
     import os
     import shutil
 
-    def tractir_ensure_sync_persistent_file():
+    def tractir_ensure_persistent_backup():
         savedir = str(getattr(renpy.config, "savedir", "") or "")
         if not savedir:
             return False
@@ -25,10 +25,7 @@ init -200 python:
 
         return True
 
-    def tractir_reload_runtime_safety():
-        return tractir_ensure_sync_persistent_file()
-
-    if tractir_ensure_sync_persistent_file not in config.start_callbacks:
-        config.start_callbacks.append(tractir_ensure_sync_persistent_file)
-    if tractir_ensure_sync_persistent_file not in config.after_load_callbacks:
-        config.after_load_callbacks.append(tractir_ensure_sync_persistent_file)
+    if tractir_ensure_persistent_backup not in config.start_callbacks:
+        config.start_callbacks.append(tractir_ensure_persistent_backup)
+    if tractir_ensure_persistent_backup not in config.after_load_callbacks:
+        config.after_load_callbacks.append(tractir_ensure_persistent_backup)

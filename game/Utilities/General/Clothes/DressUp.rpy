@@ -1,22 +1,4 @@
-    for _dress_runtime_helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
-        try:
-            if hasattr(renpy.store, _dress_runtime_helper_name):
-                delattr(renpy.store, _dress_runtime_helper_name)
-        except Exception:
-            pass
-        dressup_prune_legacy_runtime_helpers()        bodymodel_sync_character(GirlNameDress)    for _dress_runtime_helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
-        try:
-            if hasattr(renpy.store, _dress_runtime_helper_name):
-                delattr(renpy.store, _dress_runtime_helper_name)
-        except Exception:
-            pass
-        dressup_prune_legacy_runtime_helpers()        bodymodel_sync_character(GirlNameDress)    for _dress_runtime_helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
-        try:
-            if hasattr(renpy.store, _dress_runtime_helper_name):
-                delattr(renpy.store, _dress_runtime_helper_name)
-        except Exception:
-            pass
-        dressup_prune_legacy_runtime_helpers()        bodymodel_sync_character(GirlNameDress)# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
@@ -26,16 +8,11 @@ init python:
         key = str(code or "").strip()
         if not key:
             return
-        try:
-            catalog = item_catalog if isinstance(item_catalog, dict) else {}
-        except Exception:
-            catalog = {}
+        item_obj = get_game_item("dress_" + key)
         if key not in ShortDressName:
-            _item = catalog.get("dress_" + key, {})
-            ShortDressName[key] = str(_item.get("name", key) or key)
+            ShortDressName[key] = str(getattr(item_obj, "name", key) or key)
         if key not in FullDressDesc:
-            _item = catalog.get("dress_" + key, {})
-            FullDressDesc[key] = str(_item.get("description", "") or "")
+            FullDressDesc[key] = str(getattr(item_obj, "description", "") or "")
 
     def dressup_ensure_dress_parts(code):
         key = str(code or "").strip()
@@ -46,70 +23,29 @@ init python:
         if key not in DressBottomPart:
             DressBottomPart[key] = ""
 
-    def dressup_prune_legacy_runtime_helpers():
-        for helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
-            try:
-                if hasattr(renpy.store, helper_name):
-                    delattr(renpy.store, helper_name)
-            except Exception:
-                pass
-
-
-    def dressup_prune_legacy_runtime_helpers():
-        for helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
-            try:
-                if hasattr(renpy.store, helper_name):
-                    delattr(renpy.store, helper_name)
-            except Exception:
-                pass
-
-
-    def dressup_prune_legacy_runtime_helpers():
-        for helper_name in ("_ensure_dress_catalog_entry", "_ensure_dress_parts"):
-            try:
-                if hasattr(renpy.store, helper_name):
-                    delattr(renpy.store, helper_name)
-            except Exception:
-                pass
-
-
 label DressUp(GirlNameDress="", IsNewDayForDress=0):
+    $ renpy.dynamic("_dress_girl_info", "_dress_wardrobe", "_dress_underwear", "TMPAllDressArray", "TMPBraArray", "TMPPantiesArray", "TMPStockingsArray")
+    $ renpy.dynamic("DUCounter", "DecideNoBra", "DecideNoPanties", "DressSlutDesireLevel", "DressSlutDesireLevelTop", "DressSlutDesireLevelBottom")
+    $ renpy.dynamic("TmpBottomSlutLevelMax", "TmpBottomSlutLevelMin", "TmpTopSlutLevelMax", "TmpTopSlutLevelMin", "TmpDressName", "TmpDressSelect", "TmpDressSelectMaxCur")
+    $ renpy.dynamic("bottom_part", "bottom_slut", "cur_bottom", "cur_default", "cur_top", "dname", "girl_slut", "lname", "top_part", "top_slut")
     $ GirlNameDress = str(GirlNameDress or "").strip()
     if not GirlNameDress:
         return
+    $ _dress_girl_info = people.get_info(GirlNameDress)
+    if _dress_girl_info is None:
+        return
     python:
-        try:
-            topdressdef
-        except NameError:
-            topdressdef = {}
-        try:
-            bottomdressdef
-        except NameError:
-            bottomdressdef = {}
-        try:
-            item_catalog
-        except NameError:
-            item_catalog = {}
-
-        dressdefault.setdefault(GirlNameDress, "")
-        topdressdef.setdefault(GirlNameDress, "")
-        bottomdressdef.setdefault(GirlNameDress, "")
-        bradef.setdefault(GirlNameDress, "")
-        pantiesdef.setdefault(GirlNameDress, "")
-        legsdef.setdefault(GirlNameDress, "")
-        shoesdef.setdefault(GirlNameDress, "")
-        topdress.setdefault(GirlNameDress, "")
-        bottomdress.setdefault(GirlNameDress, "")
-        bra.setdefault(GirlNameDress, "")
-        panties.setdefault(GirlNameDress, "")
-        legs.setdefault(GirlNameDress, "")
-        shoes.setdefault(GirlNameDress, "")
-        topraised.setdefault(GirlNameDress, 0)
-        bottomraised.setdefault(GirlNameDress, 0)
+        if not isinstance(getattr(_dress_girl_info, "wardrobe", None), dict):
+            _dress_girl_info.wardrobe = {}
+        _dress_wardrobe = _dress_girl_info.wardrobe
+        _dress_underwear = _dress_wardrobe.setdefault("current_underwear", {})
+        if not isinstance(_dress_underwear, dict):
+            _dress_underwear = {}
+            _dress_wardrobe["current_underwear"] = _dress_underwear
+        cur_default = str(_dress_wardrobe.get("current_dress", "") or "")
 
         if int(IsNewDayForDress or 0) > 0 and procedural_randint(1, 2, key="procedural:Utilities/General/Clothes/DressUp.rpy:procedural_randint:82:1") == 1:
-            dress_list_name = GirlNameDress + "Dresses"
-            TMPAllDressArray = list(getattr(renpy.store, dress_list_name, []) or [])
+            TMPAllDressArray = list(_dress_wardrobe.get("owned", []) or [])
             TMPBraArray = []
             TMPPantiesArray = []
             TMPStockingsArray = []
@@ -117,9 +53,6 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
             TmpDressSelect = 0
             TmpDressSelectMaxCur = -10000
 
-            _dress_girl_info = getPersonInfo(GirlNameDress)
-            _dress_girl_info = getPersonInfo(GirlNameDress)
-            _dress_girl_info = getPersonInfo(GirlNameDress)
             girl_slut = int(getattr(_dress_girl_info, "corruption", 0) or 0) if _dress_girl_info is not None else 0
             if girl_slut >= 70:
                 TmpTopSlutLevelMax, TmpTopSlutLevelMin = 8, 3
@@ -181,12 +114,9 @@ label DressUp(GirlNameDress="", IsNewDayForDress=0):
                         TmpDressSelect = DUCounter
 
             if TMPAllDressArray:
-                dressdefault[GirlNameDress] = TMPAllDressArray[TmpDressSelect]
+                cur_default = TMPAllDressArray[TmpDressSelect]
 
             DecideNoPanties = 0
-            cur_default = dressdefault.get(GirlNameDress, "")
-            cur_default = dressdefault.get(GirlNameDress, "")
-            cur_default = dressdefault.get(GirlNameDress, "")
             cur_bottom = DressBottomPart.get(cur_default, "")
             cur_top = DressTopPart.get(cur_default, "")
 

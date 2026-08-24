@@ -4,11 +4,8 @@
 # Amanda Sex Dance Street scene - converted from QSP to Ren'Py
 
 label AmandaAfterDanceMC:
-    $ GirlNameASDS = "amanda"
-    $ Amanda.add_var_int("mc_dance_after_seen", 1)
-    $ Amanda.set_var_int("mc_dance_last_day", current_game_day())
-    $ Amanda.set_var_int("leftdances", 1)
-    $ FridayDanceRoom.state["dance_count"] = 5
+    $ Amanda.left_friday_dance = True
+    $ rooms.get("FridayDance").dance_count = 5
     vscene "images/market/LocFridayDance.jpg"
     "Музыка стихает, но Аманда не сразу отпускает вашу руку. Она смеется тише обычного и сама тянет вас прочь от света факелов."
     "За углом шум площади становится глухим. Аманда останавливается, будто хочет что-то сказать, но вместо слов только смотрит на вас и улыбается."
@@ -21,9 +18,7 @@ label AmandaAfterDanceMC:
             jump AmandaAfterDanceMCReturn
 
 label AmandaAfterDanceMCMakeOut:
-    $ Amanda.add_var_int("mc_dance_makeout_seen", 1)
-    $ Amanda.add_var_int("mc_dance_private_walks", 1)
-    call ShowImage("amanda", "dance", "YouKiss")
+    call ShowImage("amanda", "dance", "you_kiss.png")
     "Вы наклоняетесь к ней, и Аманда отвечает сразу, будто ждала именно этого. Поцелуй выходит долгим, неловким и слишком горячим для тесного переулка у рыночной площади."
     "Она прижимается ближе, потом вдруг отстраняется, поправляет платье и смеется, пытаясь скрыть смущение."
     "\"Все, Стефан. Если мы сейчас не остановимся, я потом сама себя не узнаю.\""
@@ -34,13 +29,11 @@ label AmandaAfterDanceMCMakeOut:
             "Вы еще немного стоите рядом в темноте, держась за руки, пока шум праздника окончательно не начинает стихать."
             jump AmandaAfterDanceMCFinish
         "Увести ее глубже в переулок" if int(Amanda.sex_stat("sexacts", 0) or 0) > 0 or Amanda.var_int("suckyou", 0) == 1 or Amanda.corruption >= 35:
-            $ Amanda.add_var_int("mc_dance_sex_seen", 1)
             $ Amanda.change_mana(1, "friday_dance_after_sex")
             jump AmandaSexDanceStreet
 
 label AmandaAfterDanceMCWalkHome:
-    $ Amanda.add_var_int("mc_dance_private_walks", 1)
-    call ShowImage("amanda", "dance", "YouInvite1")
+    call ShowImage("amanda", "dance", "you_invite_1.png")
     "Вы не торопите ее. Просто идете рядом, пока огни площади остаются позади."
     "Аманда сначала молчит, потом начинает рассказывать о музыке, людях и о том, как странно было весь вечер чувствовать на себе ваш взгляд."
     "У дверей трактира она задерживается на миг и мягко сжимает вашу ладонь."
@@ -57,12 +50,13 @@ label AmandaAfterDanceMCReturn:
     jump AmandaAfterDanceMCFinish
 
 label AmandaAfterDanceMCFinish:
-    $ DanceStep = 0
-    $ Amanda.set_var_int("albernowdances", 0)
+    $ rooms.get("FridayDance").step = 0
+    $ Amanda.dancing_with_legare = False
     "Праздник для вас на сегодня закончился."
     return
 
 label AmandaSexDanceStreet:
+    $ renpy.dynamic("GirlNameASDS", "tmp_minet_or_full")
     $ GirlNameASDS = "amanda"
     "Продолжая танцевать, вы вдруг прошептали Аманде на ушко: \"Милая, а может прогуляемся немного?\"\n\"А почему бы и нет\", с улыбкой ответила вам она. Взявшись за руки вы пошли в лабиринт улочек и переулков. Увидя скрытую от глаз подворотню, вы, не сговариваясь, устремились туда."
 

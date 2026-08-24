@@ -1,12 +1,9 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-label EventFightSmall(eyewitness=0):
+label EventFightSmall(eyewitness=0, CurMoneyLoss=0, FightRand=0, PhraseEnd1EFS="", CurEventDesc="", _dog_tavern_result=None):
     $ CurMoneyLoss = procedural_randint(10, 16, key="procedural:Utilities/Fight/EventFightSmall.rpy:procedural_randint:5:1")
     $ FightRand = procedural_randint(1, 7, key="procedural:Utilities/Fight/EventFightSmall.rpy:procedural_randint:6:2")
-    $ YourReaction1 = 0
-    $ PhraseEnd1EFS = ""
-    $ CurEventDesc = ""
 
     if FightRand == 1:
         $ CurMoneyLoss *= 2
@@ -27,8 +24,8 @@ label EventFightSmall(eyewitness=0):
 
     if eyewitness > 0:
         $ CurEventDesc += "\n\nЧто вы намеренны предпринять?"
-        $ MainTxt = CurEventDesc
-        $ CurLocDesc = CurEventDesc
+        $ scene_runtime.text = CurEventDesc
+        $ scene_runtime.location_text = CurEventDesc
         show screen main_ui
         menu:
             "Выругаться и не делать ничего":
@@ -44,39 +41,36 @@ label EventFightSmall(eyewitness=0):
             "Помочь ловить" if FightRand == 4 and player.economy.money >= (4 + CurMoneyLoss) and player.tavern_management.winenum >= 2:
                 call EventFightSmallFinish(6, CurMoneyLoss, FightRand, PhraseEnd1EFS)
     else:
-        $ current_action_items = []
-        $ money -= CurMoneyLoss
+        $ player.add_money(-CurMoneyLoss)
         if FightRand == 3 or FightRand > 4:
             $ _dog_tavern_result = dog_catch_delinquent_apply("tavern_nonpayment")
             if bool(_dog_tavern_result.get("ok", False)):
                 if FightRand == 3:
-                    $ money += CurMoneyLoss
+                    $ player.add_money(CurMoneyLoss)
                 $ CurEventDesc += "\n\n" + str(_dog_tavern_result.get("text", "") or "")
         if PhraseEnd1EFS:
             $ CurEventDesc += "\n" + PhraseEnd1EFS
 
-    jump TavernMain CurEventDesc
+    return CurEventDesc
 
-label EventFightSmallFinish(reaction_code=1, CurMoneyLoss=0, FightRand=0, PhraseEnd1EFS=""):
-    $ YourReaction1 = reaction_code
-    $ extra_text = ""
+label EventFightSmallFinish(reaction_code=1, CurMoneyLoss=0, FightRand=0, PhraseEnd1EFS="", extra_text="", _dog_tavern_result=None):
     $ _dog_tavern_result = {"ok": False, "text": ""}
 
     if reaction_code == 1:
-        $ money -= CurMoneyLoss
+        $ player.add_money(-CurMoneyLoss)
     elif reaction_code == 2:
-        $ money -= CurMoneyLoss
+        $ player.add_money(-CurMoneyLoss)
         $ extra_text = "Вы кинулись бежать вслед за негодяем, но он оказался намного быстрее вас. Догнать его вы не смогли."
     elif reaction_code == 3:
-        $ money -= CurMoneyLoss
+        $ player.add_money(-CurMoneyLoss)
         $ extra_text = "Вы кинулись бежать за драчунами, но вскоре, когда они углубились в сеть темных переулков, благоразумие взяло верх и вы оставили эту затею."
     elif reaction_code == 4:
-        $ money -= CurMoneyLoss
+        $ player.add_money(-CurMoneyLoss)
         $ extra_text = "Вы попробовали потребовать возмещения ваших убытков, но наткнулись на искренне непонимание. По мнению ваших буйных посетителей они не были вам должны ничего сверх того, что они уже заплатили. А молодецкой силы, позволившей бы набить морды всей их компании, вы в себе не ощущали."
     elif reaction_code == 5:
-        $ money -= 4
+        $ player.spend_money(4)
         $ player.tavern_management.winenum -= 2
-        $ money -= CurMoneyLoss
+        $ player.add_money(-CurMoneyLoss)
         $ extra_text = "Вы выскочили за дверь и начали кричать \"Стража, Стража!\". Не прошло и каких-то 20 минут, как к вам подошли двое толстых стражников и поинтересовались, в чем собственно дело. Узнав подробности они резонно заметили, что ваши обидчики уже успели уйти далеко и поймать их будет затруднительно. Промочив горло парой кружек вина за счет заведения и взяв 4 мараведи за труды, стражи порядка удалились. Хорошо все-таки, что те, кому положенно, берегут ваш покой и неукоснительно следят за соблюдением законов!"
     elif reaction_code == 6:
         if procedural_randint(1, 2, key="procedural:Utilities/Fight/EventFightSmall.rpy:procedural_randint:87:3") == 1:
@@ -84,13 +78,13 @@ label EventFightSmallFinish(reaction_code=1, CurMoneyLoss=0, FightRand=0, Phrase
             $ PhraseEnd1EFS = "Стражники торжественно увели свою добычу, смело шагая по похрустывающим черепкам, в которые превратились многие из ваших кружек-плошек. Последним ушел капитан, поблагодарив вас за неоценимую помощь. А вы остались убирать битую посуду и считать убытки. Визит служителей закона и порядка обошелся вам в смешные {} мараведи.\n\"Ради торжества справедливости и вдвое больше потерять не жалко!\" -подумали вы.".format(CurMoneyLoss)
         else:
             $ extra_text = "Вы кинулись ловить вора, но споткнулись и растянулись на полу, выбыв из участников забавы."
-        $ money -= CurMoneyLoss
+        $ player.add_money(-CurMoneyLoss)
 
     if FightRand == 3 or FightRand > 4:
         $ _dog_tavern_result = dog_catch_delinquent_apply("tavern_nonpayment")
         if bool(_dog_tavern_result.get("ok", False)):
             if FightRand == 3:
-                $ money += CurMoneyLoss
+                $ player.add_money(CurMoneyLoss)
             if str(extra_text or "").strip():
                 $ extra_text += "\n\n" + str(_dog_tavern_result.get("text", "") or "")
             else:
@@ -101,4 +95,4 @@ label EventFightSmallFinish(reaction_code=1, CurMoneyLoss=0, FightRand=0, Phrase
     if PhraseEnd1EFS:
         "[PhraseEnd1EFS]"
 
-    jump TavernMain
+    return

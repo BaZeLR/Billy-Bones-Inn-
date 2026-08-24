@@ -1,17 +1,11 @@
-    hide screen girl_card_overlay
-    hide screen player_card_overlay    hide screen girl_card_overlay
-    hide screen player_card_overlay    hide screen girl_card_overlay
-    hide screen player_card_overlay    hide screen girl_card_overlay
-    hide screen player_card_overlay    hide screen girl_card_overlay
-    hide screen player_card_overlay    hide screen girl_card_overlay
-    hide screen player_card_overlay# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     def morning_sickness_daily_event_ready(girl_name="", location_name="TavernKitchen", time_value=None):
         girl_key = str(girl_name or "").strip()
-        loc_key = str(location_name or CurLoc or "").strip().lower()
-        current_time = time if time_value is None else time_value
+        loc_key = str(location_name or rooms.current_code or "").strip().lower()
+        current_time = calendar_v2.time_slot() if time_value is None else time_value
         for row in list(DailyEventsList or []):
             if str(row.get("GirlName", "") or "").strip() != girl_key:
                 continue
@@ -26,27 +20,26 @@ init python:
         return False
 
     def tavern_breakfast_morning_sickness_girl():
-        if int(time or 0) != 0:
+        if int(calendar_v2.time_slot() or 0) != 0:
             return ""
         for girl in ("sandra", "melissa", "amanda"):
             girl_key = str(girl or "").strip()
-            if str(getLocation(girl_key) or "") != "TavernKitchen":
+            if str(people.location(girl_key) or "") != "TavernKitchen":
                 continue
-            if morning_sickness_daily_event_ready(girl_key, "TavernKitchen", time):
+            if morning_sickness_daily_event_ready(girl_key, "TavernKitchen", calendar_v2.time_slot()):
                 return girl_key
         return ""
 
 label MorningSickness(girl_name):
+    $ renpy.dynamic("CumInsideLastDays", "girl_info", "pregnancy_days", "Zaderzhka", "ZaletOpinion", "MSickAskedDelay", "MSickZaletCommentMade", "girl_display_name")
     python:
-        import random
+        CumInsideLastDays = int(people.get_info(girl_name).sex_stat("cuminside", 0) or 0)
+        girl_info = people.get_info(girl_name)
+        pregnancy_days = girl_info.pregnancy_days() if girl_info is not None else 0
 
-        import random
-
-        CumInsideLastDays = int(cuminside.get(girl_name, 0) or 0)
-
-        if int(pregnancy.get(girl_name, 0) or 0) > 14:
-            Zaderzhka = int(pregnancy.get(girl_name, 0) or 0) - 14
-        elif int(pregnancy.get(girl_name, 0) or 0) > 0:
+        if pregnancy_days > 14:
+            Zaderzhka = pregnancy_days - 14
+        elif pregnancy_days > 0:
             Zaderzhka = 0
         else:
             Zaderzhka = 0
@@ -54,7 +47,7 @@ label MorningSickness(girl_name):
                 Zaderzhka = procedural_randint(1, 20, "morning_sickness_delay_%s_%s" % (girl_name, int(current_game_day() or 0)))
 
         ZaletOpinion = 0
-        if int(kids.get(girl_name, 0) or 0) > 0:
+        if girl_info is not None and int(girl_info.sex_stat("kids", 0) or 0) > 0:
             if CumInsideLastDays > 2 + procedural_randint(1, 8, "morning_sickness_kids_inside_%s_%s" % (girl_name, int(current_game_day() or 0))):
                 if Zaderzhka == 0:
                     ZaletOpinion = 1
@@ -88,10 +81,10 @@ label MorningSickness(girl_name):
 
         MSickAskedDelay = False
         MSickZaletCommentMade = False
-        girl_display_name = RealName.get(girl_name, girl_name)
+        girl_display_name = people_display_name(girl_name)
 
     "Вы мирно шли по своим делам, когда вдруг вам навстречу, зажав рот руками, пробежала бледная [girl_display_name]. Даже не заметив вас, она ломанулась куда-то дальше, скорее всего на свежий воздух."
-    call girls_desc(girl_name)
+    call GirlsDesc(girl_name)
 
     menu:
         "Проверить, что это с ней":
@@ -105,8 +98,9 @@ label MorningSickness(girl_name):
 
 
 label morning_sickness_step2(girl_name, ZaletOpinion, Zaderzhka, CumInsideLastDays, MSickAskedDelay=False, MSickZaletCommentMade=False):
+    $ renpy.dynamic("girl_display_name", "ms_long_delay_limit", "ms_mid_delay_limit")
     python:
-        girl_display_name = RealName.get(girl_name, girl_name)
+        girl_display_name = people_display_name(girl_name)
         ms_long_delay_limit = 20 + procedural_randint(1, 8, "morning_sickness_long_%s_%s" % (girl_name, int(current_game_day() or 0)))
         ms_mid_delay_limit = 10 + procedural_randint(1, 4, "morning_sickness_mid_%s_%s" % (girl_name, int(current_game_day() or 0)))
 
@@ -173,6 +167,7 @@ label morning_sickness_step2(girl_name, ZaletOpinion, Zaderzhka, CumInsideLastDa
 
 
 label morning_sickness_pregnancy_comment(girl_name, CumInsideLastDays, already_said=False):
+    $ renpy.dynamic("ms_many_sex_limit")
     python:
         ms_many_sex_limit = 15 + procedural_randint(1, 10, "morning_sickness_many_%s_%s" % (girl_name, int(current_game_day() or 0)))
     if already_said:
@@ -192,6 +187,7 @@ label morning_sickness_pregnancy_comment(girl_name, CumInsideLastDays, already_s
 
 
 label morning_sickness_end(girl_name):
-    $ girl_display_name = RealName.get(girl_name, girl_name)
+    $ renpy.dynamic("girl_display_name")
+    $ girl_display_name = people_display_name(girl_name)
     "\"Ну да ладно, заболталась я с тобой, а мне бежать надо.\" И [girl_display_name] отправилась по своим делам."
     return

@@ -1,24 +1,6 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default BodyInteractionProfiles = {}
-
-default BodyInteractionProfiles = {}
-
-default BodyInteractionProfiles = {}
-
-default BodyInteractionProfiles = {}
-
-default BodyInteractionProfiles = {}
-
-default BodyInteractionProfiles = {}
-
-default BodyInteractionProfiles = {}
-
-default BodyInteractionProfiles = {}
-
-default BodyInteractionProfiles = {}
-
 init python:
     BODYMODEL_PARTS = ("head", "upper", "pelvis", "lower", "feet", "hands", "palms")
     BODYMODEL_LAYERS = ("layer_0", "layer_1", "layer_2")
@@ -117,6 +99,25 @@ init python:
             for container_id in BODYMODEL_CONTAINER_IDS
         }
 
+    def bodymodel_owner_containers(char_id=""):
+        key = str(char_id or "").strip()
+        if key.lower() in ("you", "mc", "stefan", "стефан"):
+            if not isinstance(getattr(player.intimacy, "body_containers", None), dict):
+                player.intimacy.body_containers = {}
+            containers = player.intimacy.body_containers
+        else:
+            person = people.get_info(key)
+            if person is None:
+                return bodymodel_blank_containers()
+            state = person.ensure_sex_state()
+            containers = state.setdefault("body_containers", {})
+            if not isinstance(containers, dict):
+                containers = {}
+                state["body_containers"] = containers
+        for container_id, default_state in bodymodel_blank_containers().items():
+            containers.setdefault(container_id, dict(default_state))
+        return containers
+
     def bodymodel_blank_features():
         return {
             "nipples": "soft",
@@ -162,27 +163,8 @@ init python:
         profile_id = str(char_id or "").strip()
         if not profile_id:
             return {}
-        profile = dict(BodyInteractionProfiles.get(profile_id, {}) or {})
-        if not profile:
-            profile = bodymodel_blank_profile(profile_id, display_name, body_type)
-        else:
-            profile.setdefault("id", profile_id)
-            profile["display_name"] = str(display_name or profile.get("display_name", profile_id) or profile_id)
-            profile["body_type"] = str(body_type or profile.get("body_type", "female") or "female")
-            profile.setdefault("parts", {part_name: bodymodel_blank_part() for part_name in BODYMODEL_PARTS})
-            profile.setdefault("containers", bodymodel_blank_containers())
-            profile.setdefault("features", bodymodel_blank_features())
-            profile.setdefault("access", bodymodel_blank_target_access())
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
+        profile = bodymodel_blank_profile(profile_id, display_name, body_type)
+        profile["containers"] = bodymodel_owner_containers(profile_id)
         return profile
 
     def bodymodel_clear_clothing(profile):
@@ -305,12 +287,12 @@ init python:
                     profile["naked"] = False
                     return
 
-    def bodymodel_sync_character(char_id="", display_name="", body_type="female"):
+    def bodymodel_build_profile(char_id="", display_name="", body_type="female"):
         profile_id = str(char_id or "").strip()
         if not profile_id:
             return {}
 
-        person = getPersonInfo(profile_id)
+        person = people.get_info(profile_id)
         resolved_name = str(display_name or (person.display_name() if person is not None and hasattr(person, "display_name") else people_display_name(profile_id)) or profile_id)
         profile = bodymodel_register_character(profile_id, resolved_name, body_type)
         bodymodel_clear_clothing(profile)
@@ -322,7 +304,7 @@ init python:
             sex_state = {}
         else:
             wardrobe = dict(getattr(person, "wardrobe", {}) or {}) if person is not None else {}
-            default_dress = str(wardrobe.get("current_dress", "") or "")
+            default_dress = str(person.scene_dress() if person is not None and hasattr(person, "scene_dress") else wardrobe.get("current_dress", "") or "")
             underwear = dict(wardrobe.get("current_underwear", {}) or {})
             sex_state = person.ensure_sex_state() if person is not None and hasattr(person, "ensure_sex_state") else {}
 
@@ -330,8 +312,8 @@ init python:
         bottom_default = str(DressBottomPart.get(default_dress, "") or "")
         top_item = "" if int(sex_state.get("top_removed", 0) or 0) else top_default
         bottom_item = "" if int(sex_state.get("bottom_removed", 0) or 0) else bottom_default
-        bra_item = str(underwear.get("bra", "") or "")
-        panties_item = str(underwear.get("panties", "") or "")
+        bra_item = "" if int(sex_state.get("bra_removed", 0) or 0) else str(underwear.get("bra", "") or "")
+        panties_item = "" if int(sex_state.get("panties_removed", 0) or 0) else str(underwear.get("panties", "") or "")
         legs_item = str(underwear.get("legs", "") or "")
         shoes_item = str(underwear.get("shoes", "") or "")
 
@@ -355,7 +337,7 @@ init python:
         return profile
 
     def bodymodel_actions_for_target(char_id="", target_id=""):
-        profile = BodyInteractionProfiles.get(str(char_id or "").strip(), {}) or {}
+        profile = bodymodel_build_profile(str(char_id or "").strip())
         access = dict(profile.get("access", {}).get(str(target_id or ""), {}) or {})
         return [action_id for action_id in BODYMODEL_UNIVERSAL_ACTIONS if bool(access.get(action_id, False))]
 
@@ -371,14 +353,14 @@ init python:
             return str(meta.get("name", "") or "")
         return str(item_key or "")
 
-    def bodymodel_sync_profile_arousal(profile, char_id=""):
+    def bodymodel_apply_arousal_view(profile, char_id=""):
         if not isinstance(profile, dict):
             return {}
         key = str(char_id or profile.get("id", "") or "").strip()
         if key.lower() in ("you", "mc", "stefan", "стефан"):
-            profile["arousal"] = int(player.intimacy.arousal_value("You") or 0)
+            profile["arousal"] = int(player.intimacy.arousal_value() or 0)
         elif key:
-            person = getPersonInfo(key)
+            person = people.get_info(key)
             if person is not None and hasattr(person, "arousal_value"):
                 profile["arousal"] = int(person.arousal_value() or 0)
         arousal_value = int(profile.get("arousal", 0) or 0)
@@ -403,7 +385,7 @@ init python:
     def bodymodel_profile_summary_text(profile):
         if not isinstance(profile, dict):
             return ""
-        bodymodel_sync_profile_arousal(profile, profile.get("id", ""))
+        bodymodel_apply_arousal_view(profile, profile.get("id", ""))
         lines = []
         display_name = str(profile.get("display_name", profile.get("id", "")) or "")
         if bool(profile.get("naked", False)):
@@ -526,31 +508,22 @@ init python:
         if not profile_id:
             return {"allowed": False, "target": str(target_id or ""), "action": str(action_id or "")}
         profile = bodymodel_build_profile(profile_id, display_name, body_type)
-        bodymodel_sync_profile_arousal(profile, profile_id)
+        bodymodel_apply_arousal_view(profile, profile_id)
         effect = bodymodel_action_effect(profile, target_id, action_id)
         if not bool(effect.get("allowed", False)):
-            BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        BodyInteractionProfiles[profile_id] = profile
-        effect["profile"] = profile
+            effect["profile"] = profile
             effect["arousal"] = int(profile.get("arousal", 0) or 0)
             effect["container_state"] = str(profile.get("containers", {}).get(str(target_id or ""), {}).get("state", "") or "")
             return effect
-        target_person = getPersonInfo(profile_id)
+        target_person = people.get_info(profile_id)
         if profile_id.lower() in ("you", "mc", "stefan", "стефан"):
-            player.intimacy.add_arousal(effect.get("target_gain", 0), 100, "You")
+            player.intimacy.add_arousal(effect.get("target_gain", 0), 100)
         elif target_person is not None:
             target_person.add_arousal(effect.get("target_gain", 0))
         if actor_key.lower() in ("you", "mc", "stefan", "стефан"):
-            player.intimacy.add_arousal(effect.get("actor_gain", 0), 100, "You")
+            player.intimacy.add_arousal(effect.get("actor_gain", 0), 100)
         else:
-            actor_person = getPersonInfo(actor_key)
+            actor_person = people.get_info(actor_key)
             if actor_person is not None:
                 actor_person.add_arousal(effect.get("actor_gain", 0))
         container_key = str(target_id or "").strip()
@@ -558,7 +531,7 @@ init python:
             container_state = profile.setdefault("containers", {}).setdefault(container_key, {"state": "dry", "wetness": 0, "itch": 0})
             container_state["wetness"] = min(100, max(0, int(container_state.get("wetness", 0) or 0) + int(effect.get("wetness_gain", 0) or 0)))
             container_state["state"] = bodymodel_container_state_name(container_state.get("wetness", 0), container_state.get("itch", 0))
-        bodymodel_sync_profile_arousal(profile, profile_id)
+        bodymodel_apply_arousal_view(profile, profile_id)
         effect["profile"] = profile
         effect["arousal"] = int(profile.get("arousal", 0) or 0)
         effect["container_state"] = str(profile.get("containers", {}).get(container_key, {}).get("state", "") or "")

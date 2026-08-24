@@ -1,37 +1,33 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default MyStallion = ""
-default HorseSaddled = 0
-default HorsePurchasePrice = 0
-
 init python:
     def tavern_stable_horse_present(_obj=None):
-        return MyStallion != ""
+        return player.horse.owns_horse()
 
     def tavern_stable_no_horse(_obj=None):
-        return MyStallion == ""
+        return not player.horse.owns_horse()
 
     def tavern_stable_can_saddle(_obj=None):
-        return MyStallion != "" and int(HorseSaddled or 0) == 0
+        return player.horse.owns_horse() and not player.horse.saddled
 
     def tavern_stable_can_unsaddle(_obj=None):
-        return MyStallion != "" and int(HorseSaddled or 0) == 1
+        return player.horse.owns_horse() and player.horse.saddled
 
     def tavern_stable_can_start_becky_trade(_obj=None):
         hour_now = int(calendar_v2.hour or 0) % 24
-        return int(Becky.var.get('TradeOffer', 0) or 0) == 1 and int(week or 0) != 7 and 6 <= hour_now < 12
+        return int(Becky.trade_offer_stage or 0) == 1 and int(calendar_v2.week or 0) != 7 and 6 <= hour_now < 12
 
     def tavern_stable_can_ride_to_kunidell(_obj=None):
-        return tavern_stable_can_start_becky_trade() and MyStallion != "" and int(money or 0) >= 200
+        return tavern_stable_can_start_becky_trade() and player.horse.owns_horse() and int(player.economy.money or 0) >= 200
 
     def tavern_stable_can_walk_to_kunidell(_obj=None):
-        return tavern_stable_can_start_becky_trade() and int(Becky.var.get('SherwoodSuspect', 0) or 0) >= 5
+        return tavern_stable_can_start_becky_trade() and int(Becky.sherwood_suspicion or 0) >= 5
 
     def tavern_stable_picture():
         hour_now = int(calendar_v2.hour or 0) % 24
         is_day = 6 <= hour_now < 20
-        if MyStallion != "":
+        if player.horse.owns_horse():
             if is_day:
                 return "images/tavern/backyard/stables/horse-day.png"
             return "images/tavern/backyard/stables/stablehorse_night.png"
@@ -39,7 +35,7 @@ init python:
             return "images/tavern/backyard/stables/stable_empty_day.png"
         return "images/tavern/backyard/stables/stable_empy _night.png"
 
-    TavernStableRoom = Room(
+    TavernStableRoomDefinition = Room(
         code_name="TavernStable",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Конюшня",
@@ -119,82 +115,102 @@ init python:
 
     def tavern_stable_get_object(object_id):
         object_key = str(object_id or "").strip()
-        for room_object in TavernStableRoom.visible_game_items():
+        for room_object in rooms.get("TavernStable").visible_game_items():
             if getattr(room_object, "object_id", "") == object_key:
                 return room_object
         return None
 
+    def tavern_stable_action_items():
+        items = []
+        for room_object in rooms.get("TavernStable").visible_game_items():
+            items.append(MenuItem(room_object.name, Call("tavern_stable_object_menu", room_object.object_id)))
+        if tavern_stable_can_ride_to_kunidell():
+            items.append(MenuItem("Купить провизию для эльфов у Бекки и отправится в Куниделл верхом", Call("TavernStableRideToKunidell")))
+        if tavern_stable_can_walk_to_kunidell():
+            items.append(MenuItem("Пойти в Куниделл пешком и налегке", Call("TavernStableWalkToKunidell")))
+        for room_exit in rooms.get("TavernStable").visible_exits():
+            items.append(MenuItem(room_exit.label, movement_actions(room_exit.target)))
+        return items
+
     def tavern_stable_scene_text():
         desc_parts = []
-        rows = TavernStableRoom.visible_descriptions()
+        rows = rooms.get("TavernStable").visible_descriptions()
         if len(rows) > 0:
             desc_parts.append(str(rows[0].text or ""))
 
-        if MyStallion != "":
-            desc_parts.append("Сейчас в конюшне есть только один конь - %s. Хоть и не дикий, но все-таки жеребец." % str(MyStallion))
-            if int(HorseSaddled or 0) == 1:
+        if player.horse.owns_horse():
+            desc_parts.append("Сейчас в конюшне есть только один конь - %s. Хоть и не дикий, но все-таки жеребец." % str(player.horse.name))
+            if player.horse.saddled:
                 desc_parts.append("Конь уже оседлан и сбруя подогнана.")
             else:
                 desc_parts.append("Седло и сбруя висят рядом, коня можно оседлать перед дорогой.")
         else:
             desc_parts.append("Несмотря на название вашего заведения, ни жеребцов, ни кобыл, в конюшне нет. Здесь вообще никого, кроме вас, нет.")
 
-        if int(Mongol.var.get('WillTryToSteal', 0) or 0) and int(time or 0) == 4:
+        if Mongol.will_try_to_steal and calendar_v2.is_between_clock(23, 0, 5, 59):
             desc_parts.append("Вдруг со стороны ворот послышалось приглушенное лязгание, как будто кто-то незаметно пытался открыть замок. Вы повернулись на звук, нечаянно задев висящую на столбе на счастье подкову. Та звякнула. Со улицы раздались быстрые удаляющиеся шаги. Вы осторожно выглянули, но никого там не обнаружили. Присмотревшись, вы нашли на мостовой оброненный кусок парусины.\nСтранно, что бы это могло значить?")
 
         return "\n\n".join([part for part in desc_parts if str(part or "").strip()])
 
 label TavernStable:
-    $ _room = TavernStableRoom
-    $ CurrentRoom = _room
-    $ CurLoc = "TavernStable"
-    $ scene_image = tavern_stable_picture() or _room.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
+    $ renpy.dynamic("_room")
+    $ _room = rooms.get("TavernStable")
+    $ rooms.enter("TavernStable")
+    $ scene_runtime.picture = tavern_stable_picture() or _room.bg_picture or None
     $ Mongol.ensure_story_defaults()
-    $ Becky.var['TradeOffer'] = int(Becky.var.get('TradeOffer', 0) or 0)
-    $ Becky.var['SherwoodSuspect'] = int(Becky.var.get('SherwoodSuspect', 0) or 0)
-    $ MainTxt = tavern_stable_scene_text()
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = tavern_stable_scene_text()
+    $ scene_runtime.location_text = scene_runtime.text
     $ _room.mark_visited()
 
-    if Mongol.var.get('WillTryToSteal', 0) and time == 4:
-        $ Mongol.var['WillTryToSteal'] = 0
-    $ current_action_title = "Конюшня"
-    $ current_action_content = None
-    $ current_action_items = tavern_stable_action_items()
+    if Mongol.will_try_to_steal and calendar_v2.is_between_clock(23, 0, 5, 59):
+        $ Mongol.will_try_to_steal = False
+    $ main_ui_runtime.action_title = "Конюшня"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = tavern_stable_action_items()
     while True:
         call screen main_ui
 
 
 label tavern_stable_object_menu(object_id=""):
+    $ renpy.dynamic("_room_object")
+    $ renpy.dynamic("_room_action")
     if str(object_id or "") != "":
-        $ tavern_stable_object_menu_id = object_id
-    $ object_id = tavern_stable_object_menu_id
+        $ main_ui_runtime.object_id = object_id
+    $ object_id = main_ui_runtime.object_id
     $ _room_object = tavern_stable_get_object(object_id)
     if _room_object is None:
-        call TavernStableRestore
+        $ scene_runtime.text = tavern_stable_scene_text()
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_items = tavern_stable_action_items()
         return
 
-    $ current_object_id = object_id
-    $ MainTxt = str(_room_object.description or "")
-    $ CurLocDesc = MainTxt
-    $ current_action_title = str(_room_object.name or "Конюшня")
-    $ current_action_content = None
-    $ current_action_items = []
+    $ main_ui_runtime.object_id = object_id
+    $ scene_runtime.text = str(_room_object.description or "")
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = str(_room_object.name or "Конюшня")
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     python:
         for _room_action in _room_object.visible_actions():
             if _room_action.hook == "text":
-                current_action_items.append(MenuItem(_room_action.label, Call("tavern_stable_object_text", object_id, _room_action.action_id)))
+                main_ui_runtime.action_items.append(MenuItem(_room_action.label, Call("tavern_stable_object_text", object_id, _room_action.action_id)))
             elif _room_action.hook == "call" and str(_room_action.target or "") != "":
-                current_action_items.append(MenuItem(_room_action.label, Call(_room_action.target)))
+                main_ui_runtime.action_items.append(MenuItem(_room_action.label, Call(_room_action.target)))
             elif _room_action.hook == "jump" and str(_room_action.target or "") != "":
-                current_action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
-        current_action_items.append(MenuItem("Назад", Jump("TavernStable")))
+                main_ui_runtime.action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
+        main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "text", tavern_stable_scene_text()),
+            SetField(scene_runtime, "location_text", tavern_stable_scene_text()),
+            SetField(main_ui_runtime, "action_title", "Конюшня"),
+            SetField(main_ui_runtime, "action_content", None),
+            SetField(main_ui_runtime, "action_items", tavern_stable_action_items()),
+            Function(main_ui_restart_interaction),
+        ]))
     return
 
 
 label tavern_stable_object_text(object_id="", action_id=""):
+    $ renpy.dynamic("_room_action", "_room_name", "_room_object", "_room_text")
     python:
         _room_text = ""
         _room_name = ""
@@ -206,81 +222,69 @@ label tavern_stable_object_text(object_id="", action_id=""):
                     _room_text = str(_room_action.target or "")
                     break
         if _room_text:
-            MainTxt = _room_text
-            CurLocDesc = _room_text
-            current_action_title = _room_name or "Конюшня"
+            scene_runtime.text = _room_text
+            scene_runtime.location_text = _room_text
+            main_ui_runtime.action_title = _room_name or "Конюшня"
     call tavern_stable_object_menu(object_id)
     return
 
 
-label TavernStableRestore:
-    $ MainTxt = tavern_stable_scene_text()
-    $ CurLocDesc = MainTxt
-    call TavernStableBuildActions
-    return
-
-
-label TavernStableRestore:
-    $ MainTxt = tavern_stable_scene_text()
-    $ CurLocDesc = MainTxt
-    call TavernStableBuildActions
-    return
-
-
-label TavernStableRestore:
-    $ MainTxt = tavern_stable_scene_text()
-    $ CurLocDesc = MainTxt
-    call TavernStableBuildActions
-    return
-
-
 label TavernStableHorseExamine:
-    if int(HorseSaddled or 0) == 1:
-        $ MainTxt = "Вы подходите к %s и внимательно его осматриваете. Конь выглядит вполне бодрым и уже стоит под седлом." % str(MyStallion)
+    if player.horse.saddled:
+        $ scene_runtime.text = "Вы подходите к %s и внимательно его осматриваете. Конь выглядит вполне бодрым и уже стоит под седлом." % str(player.horse.name)
     else:
-        $ MainTxt = "Вы подходите к %s и внимательно его осматриваете. Конь выглядит вполне бодрым." % str(MyStallion)
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Вы подходите к %s и внимательно его осматриваете. Конь выглядит вполне бодрым." % str(player.horse.name)
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 
 label TavernStableSaddleHorse:
-    if MyStallion == "":
-        call TavernStableRestore
+    if not player.horse.owns_horse():
+        $ scene_runtime.text = tavern_stable_scene_text()
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_items = tavern_stable_action_items()
         return
-    $ HorseSaddled = 1
-    $ MainTxt = "Вы подтягиваете подпругу, проверяете ремни и оседлываете [MyStallion]."
-    $ CurLocDesc = MainTxt
+    $ player.horse.saddled = True
+    $ scene_runtime.text = "Вы подтягиваете подпругу, проверяете ремни и оседлываете %s." % player.horse.name
+    $ scene_runtime.location_text = scene_runtime.text
     call tavern_stable_object_menu("tack")
     return
 
 
 label TavernStableUnsaddleHorse:
-    if MyStallion == "":
-        call TavernStableRestore
+    if not player.horse.owns_horse():
+        $ scene_runtime.text = tavern_stable_scene_text()
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_items = tavern_stable_action_items()
         return
-    $ HorseSaddled = 0
-    $ MainTxt = "Вы снимаете с [MyStallion] седло и аккуратно развешиваете сбрую на стене."
-    $ CurLocDesc = MainTxt
+    $ player.horse.saddled = False
+    $ scene_runtime.text = "Вы снимаете с %s седло и аккуратно развешиваете сбрую на стене." % player.horse.name
+    $ scene_runtime.location_text = scene_runtime.text
     call tavern_stable_object_menu("tack")
     return
 
 
 label TavernStableRideToKunidell:
     if not tavern_stable_can_ride_to_kunidell():
-        call TavernStableRestore
+        $ scene_runtime.text = tavern_stable_scene_text()
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_items = tavern_stable_action_items()
         return
-    "С утра пораньше вы, 200 мараведи и [MyStallion] отправились к Бекки. Навьючив мешки с овощами на бедную лошадь, вы отправились в путь."
-    $ money -= 200
+    $ scene_runtime.text = "С утра пораньше вы, 200 мараведи и %s отправились к Бекки. Навьючив мешки с овощами на бедную лошадь, вы отправились в путь." % player.horse.name
+    $ scene_runtime.location_text = scene_runtime.text
+    $ player.spend_money(200)
     call ShowImageSeq("general", "", "vorota", 2)
-    call SherwoodTravel(1)
-    return
+    $ rooms.get("BlackwoodRoad").custom_properties["on_horse"] = 1
+    jump BlackwoodRoad
 
 
 label TavernStableWalkToKunidell:
     if not tavern_stable_can_walk_to_kunidell():
-        call TavernStableRestore
+        $ scene_runtime.text = tavern_stable_scene_text()
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_items = tavern_stable_action_items()
         return
     "Что-то все это предложение Бекки выглядит подозрительно. Решив все как следует выяснить, вы направились в путь пешком."
     call ShowImageSeq("general", "", "vorota", 2)
-    call SherwoodTravel(0)
-    return
+    $ rooms.get("BlackwoodRoad").custom_properties["on_horse"] = 0
+    jump BlackwoodRoad

@@ -1,84 +1,3 @@
-    def _time_return_label():
-        if CurrentRoom is not None:
-            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
-            if room_code:
-                return room_code
-        return str(CurLoc or "TavernMain")
-label ApplyTimeSkip(minutes_to_add=60):
-    $ _time_skip_minutes = max(0, int(minutes_to_add or 0))
-    if int(BlockTimeAdvance or 0) == 0 and _time_skip_minutes > 0:
-        call AdvanceTimeOnly(_time_skip_minutes)
-    $ main_ui_overlay = ""
-    $ return_loc = _time_return_label()
-    if renpy.has_label(return_loc):
-        jump expression return_loc
-    jump TavernMain
-
-    def _time_change_close_action(return_label=""):
-        if str(return_label or "") == "__main_ui_overlay__":
-            return SetVariable("main_ui_overlay", "")
-        return Hide("time_change_card_overlay")
-
-    def _time_return_label():
-        if CurrentRoom is not None:
-            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
-            if room_code:
-                return room_code
-        return str(CurLoc or "TavernMain")
-    def _time_return_label():
-        if CurrentRoom is not None:
-            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
-            if room_code:
-                return room_code
-        return str(CurLoc or "TavernMain")
-label ApplyTimeSkip(minutes_to_add=60):
-    $ _time_skip_minutes = max(0, int(minutes_to_add or 0))
-    if int(BlockTimeAdvance or 0) == 0 and _time_skip_minutes > 0:
-        call AdvanceTimeOnly(_time_skip_minutes)
-    $ main_ui_overlay = ""
-    $ return_loc = _time_return_label()
-    if renpy.has_label(return_loc):
-        jump expression return_loc
-    jump TavernMain
-
-    def _time_change_close_action(return_label=""):
-        if str(return_label or "") == "__main_ui_overlay__":
-            return SetVariable("main_ui_overlay", "")
-        return Hide("time_change_card_overlay")
-
-    def _time_return_label():
-        if CurrentRoom is not None:
-            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
-            if room_code:
-                return room_code
-        return str(CurLoc or "TavernMain")
-    def _time_return_label():
-        if CurrentRoom is not None:
-            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
-            if room_code:
-                return room_code
-        return str(CurLoc or "TavernMain")
-label ApplyTimeSkip(minutes_to_add=60):
-    $ _time_skip_minutes = max(0, int(minutes_to_add or 0))
-    if int(BlockTimeAdvance or 0) == 0 and _time_skip_minutes > 0:
-        call AdvanceTimeOnly(_time_skip_minutes)
-    $ main_ui_overlay = ""
-    $ return_loc = _time_return_label()
-    if renpy.has_label(return_loc):
-        jump expression return_loc
-    jump TavernMain
-
-    def _time_change_close_action(return_label=""):
-        if str(return_label or "") == "__main_ui_overlay__":
-            return SetVariable("main_ui_overlay", "")
-        return Hide("time_change_card_overlay")
-
-    def _time_return_label():
-        if CurrentRoom is not None:
-            room_code = str(getattr(CurrentRoom, "code_name", "") or "")
-            if room_code:
-                return room_code
-        return str(CurLoc or "TavernMain")
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -109,8 +28,8 @@ init python:
             minutes_to_add += 1440
         return minutes_to_add
 
-    def _time_skip_action(return_label="", minutes_to_add=60):
-        return [_time_change_close_action(return_label), Call("ApplyTimeSkip", int(minutes_to_add or 0))]
+    def _time_skip_action(minutes_to_add=60):
+        return [SetField(main_ui_runtime, "overlay", ""), Call("AdvanceTimeOnly", int(minutes_to_add or 0))]
 
     def _time_overview_lines():
         hud = calendar_v2.hud_data()
@@ -125,57 +44,33 @@ init python:
     def _time_change_body_text():
         lines = ["Управление временем."]
         lines.extend(_time_overview_lines())
-        if int(BlockTimeAdvance or 0) != 0:
+        if int(calendar_v2.time_advance_blocked or 0) != 0:
             lines.append("Сейчас пропуск времени недоступен.")
         else:
             lines.append("Выберите, сколько времени пропустить, либо до какого времени ждать.")
         return "\n".join(lines)
 
-    def _time_change_items(return_label=""):
+    def _time_change_items():
         items = []
-        block_advance = int(BlockTimeAdvance or 0)
+        block_advance = int(calendar_v2.time_advance_blocked or 0)
 
         if block_advance == 0:
             for minutes_to_add, caption in TIME_CHANGE_SKIP_TARGETS:
-                items.append(MenuItem(caption, _time_skip_action(return_label, minutes_to_add)))
+                items.append(MenuItem(caption, _time_skip_action(minutes_to_add)))
 
             for target_hour, caption in TIME_CHANGE_PERIOD_TARGETS:
-                items.append(MenuItem(caption, _time_skip_action(return_label, _time_minutes_to_hour(target_hour))))
+                items.append(MenuItem(caption, _time_skip_action(_time_minutes_to_hour(target_hour))))
 
-        if str(return_label or "") == "__main_ui_overlay__":
-            items.append(MenuItem("Назад", SetVariable("main_ui_overlay", "")))
-        elif str(return_label or "") == "__hide__":
-            items.append(MenuItem("Назад", Hide("time_change_card_overlay")))
-        else:
-            items.append(MenuItem("Назад", Call("HideTimeChangeMenu", return_label)))
+        items.append(MenuItem("Назад", SetField(main_ui_runtime, "overlay", "")))
         return items
 
 
-label ShowTimeChangeMenu(return_label=""):
-    $ current_action_title = "Изменить время"
-    $ current_action_content = None
-    $ current_action_items = []
-    show screen time_change_card_overlay(return_label)
-    return
-
-
-label HideTimeChangeMenu(return_label=""):
-    hide screen time_change_card_overlay
-    if CurrentRoom is not None:
-        $ current_action_title = "Действия"
-        $ current_action_content = None
-        $ current_action_items = build_room_action_items(CurrentRoom)
-    if str(return_label or "") != "":
-        call expression return_label
-    return
-
-
-screen time_change_card_overlay(return_label=""):
+screen time_change_panel():
     zorder 120
 
     $ _title = "ВРЕМЯ"
     $ _body = _time_change_body_text()
-    $ _items = _time_change_items(return_label)
+    $ _items = _time_change_items()
     $ _textbox_h = int(getattr(gui, "textbox_height", 278))
     $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
     $ _left_w = int((config.screen_width - 36) * 0.72)

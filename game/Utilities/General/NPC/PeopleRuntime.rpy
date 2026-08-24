@@ -1,510 +1,16 @@
-        def promote_from_var(self, vardict=None):
-            super().promote_from_var(vardict)
-            v = vardict if vardict is not None else self.var
-            if isinstance(v, dict):
-                for k in ("body_layers", "clothing", "sex_history", "pregnancy"):
-                    if k in v and isinstance(v[k], (dict, list)):
-                        setattr(self, k, v[k])
-            return self
-        def publish_visibility_state(self):
-            name = people_normalize_id(getattr(self, "code_name", self.name))
-            TitsVisible[name] = 1 if self.tits_visible() else 0
-            PussyVisible[name] = 1 if self.pussy_visible() else 0
-            ShortSkirtNoPanties[name] = 1 if self.short_skirt_no_panties() else 0
-            self.publish_visibility_state()
-            return self
-    def npc_schedule_sync_currentloc(npc_id="", weekday_value=None, time_value=None):
-        info = peopleInfo.get(people_normalize_id(npc_id), None)
-        if info is None:
-            return ""
-        info.location = str(info.getLocation(weekday_value, time_value) or "")
-        return info.location
-
-    def npc_schedule_sync_all(weekday_value=None, time_value=None):
-        for info in list(peopleInfo.values()):
-            if info is not None:
-                info.location = str(info.getLocation(weekday_value, time_value) or "")
-        def publish_wardrobe_state(self):
-            name = people_normalize_id(getattr(self, "code_name", self.name))
-            wardrobe = getattr(self, "wardrobe", {})
-            if not isinstance(wardrobe, dict):
-                $ dog_sync_profile()
-    $ werecat_sync_profile()
-    return self
-            underwear = wardrobe.get("current_underwear", {})
-            if not isinstance(underwear, dict):
-                underwear = {}
-                wardrobe["current_underwear"] = underwear
-            current_dress = str(wardrobe.get("current_dress", "") or "")
-            dressdefault[name] = current_dress
-            topdressdef[name] = DressTopPart.get(current_dress, "")
-            bottomdressdef[name] = DressBottomPart.get(current_dress, "")
-            bradef[name] = str(underwear.get("bra", "") or "")
-            pantiesdef[name] = str(underwear.get("panties", "") or "")
-            legsdef[name] = str(underwear.get("legs", "") or "")
-            shoesdef[name] = str(underwear.get("shoes", "") or "")
-            topdress[name] = topdressdef[name]
-            bottomdress[name] = bottomdressdef[name]
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            topraised[name] = people_to_int(topraised.get(name, 0), 0)
-            bottomraised[name] = people_to_int(bottomraised.get(name, 0), 0)
-            wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            return self
-    def people_initial_location(person=""):
-        return {
-            "sandra": "TavernMain",
-            "melissa": "TavernMain",
-            "amanda": "TavernMain",
-            "georgett": "",
-            "liza": "",
-            "becky": "GroceryStore",
-            "irma": "DressShop",
-            "inga": "BeckyHome",
-            "clara": "WineStore",
-            "eddie": "GroceryStore",
-            "alber": "WineStore",
-            "fran": "EllonaTemple",
-            "gerhard": "Church",
-            "lucas": "BeckyHome",
-            "clara_fiance": "",
-            "robin": "BlackwoodRoad",
-            "mongol": "",
-            "zimmer": "CityGuard",
-            "draupnir": "StolyarWorkshop",
-            "luisa": "HunterClub",
-            "sergio": "ArtisansQuarter",
-            "sergio_pet": "BarberShop",
-        }.get(people_normalize_id(person), "")
-            self.pregnancy_state = {}    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
-
-    def npc_daily_schedule_build_all(force=False):
-        for data in list(peopleData.values()):
-            if isinstance(data, PeopleData):
-                data.daily_schedule_build(force)
-    def npc_daily_schedule_entries(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.daily_schedule_build(False) or [])
-
-    def npc_daily_schedule_rows(npc_id=""):
-        rows = []
-        for entry in npc_daily_schedule_entries(npc_id):
-            rows.append({
-                "slot": int(entry.time_slots[0]) if list(entry.time_slots or []) else 0,
-                "location": str(getattr(entry, "location", "") or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "label": str(getattr(entry, "label", "") or ""),
-            })
-        return rows
-    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
-
-    def npc_daily_schedule_build_all(force=False):
-        for data in list(peopleData.values()):
-            if data is not None:
-                data.daily_schedule_build(force)
-    def npc_daily_schedule_entries(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.daily_schedule_build(False) or [])
-
-    def npc_daily_schedule_rows(npc_id=""):
-        rows = []
-        for entry in npc_daily_schedule_entries(npc_id):
-            rows.append({
-                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
-                "location": str(getattr(entry, "location", "") or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "label": str(getattr(entry, "label", "") or ""),
-            })
-        return rows
-    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
-
-    def npc_daily_schedule_build_all(force=False):
-        for data in list(peopleData.values()):
-            if data is not None:
-                data.daily_schedule_build(force)
-    def npc_daily_schedule_entries(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.daily_schedule_build(False) or [])
-
-    def npc_daily_schedule_rows(npc_id=""):
-        rows = []
-        for entry in npc_daily_schedule_entries(npc_id):
-            rows.append({
-                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
-                "location": str(getattr(entry, "location", "") or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "label": str(getattr(entry, "label", "") or ""),
-            })
-        return rows
-                self.relationship = self.rel        def promote_from_var(self, vardict=None):
-            super().promote_from_var(vardict)
-            v = vardict if vardict is not None else self.var
-            if isinstance(v, dict):
-                for k in ("body_layers", "clothing", "sex_history", "pregnancy"):
-                    if k in v and isinstance(v[k], (dict, list)):
-                        setattr(self, k, v[k])
-            return self
-        def publish_visibility_state(self):
-            name = people_normalize_id(getattr(self, "code_name", self.name))
-            TitsVisible[name] = 1 if self.tits_visible() else 0
-            PussyVisible[name] = 1 if self.pussy_visible() else 0
-            ShortSkirtNoPanties[name] = 1 if self.short_skirt_no_panties() else 0
-            self.publish_visibility_state()
-            return self
-    def npc_schedule_sync_currentloc(npc_id="", weekday_value=None, time_value=None):
-        info = peopleInfo.get(people_normalize_id(npc_id), None)
-        if info is None:
-            return ""
-        info.location = str(info.getLocation(weekday_value, time_value) or "")
-        return info.location
-
-    def npc_schedule_sync_all(weekday_value=None, time_value=None):
-        for info in list(peopleInfo.values()):
-            if info is not None:
-                info.location = str(info.getLocation(weekday_value, time_value) or "")
-        def publish_wardrobe_state(self):
-            name = people_normalize_id(getattr(self, "code_name", self.name))
-            wardrobe = getattr(self, "wardrobe", {})
-            if not isinstance(wardrobe, dict):
-                $ dog_sync_profile()
-    $ werecat_sync_profile()
-    return self
-            underwear = wardrobe.get("current_underwear", {})
-            if not isinstance(underwear, dict):
-                underwear = {}
-                wardrobe["current_underwear"] = underwear
-            current_dress = str(wardrobe.get("current_dress", "") or "")
-            dressdefault[name] = current_dress
-            topdressdef[name] = DressTopPart.get(current_dress, "")
-            bottomdressdef[name] = DressBottomPart.get(current_dress, "")
-            bradef[name] = str(underwear.get("bra", "") or "")
-            pantiesdef[name] = str(underwear.get("panties", "") or "")
-            legsdef[name] = str(underwear.get("legs", "") or "")
-            shoesdef[name] = str(underwear.get("shoes", "") or "")
-            topdress[name] = topdressdef[name]
-            bottomdress[name] = bottomdressdef[name]
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            topraised[name] = people_to_int(topraised.get(name, 0), 0)
-            bottomraised[name] = people_to_int(bottomraised.get(name, 0), 0)
-            wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            return self
-    def people_initial_location(person=""):
-        return {
-            "sandra": "TavernMain",
-            "melissa": "TavernMain",
-            "amanda": "TavernMain",
-            "georgett": "",
-            "liza": "",
-            "becky": "GroceryStore",
-            "irma": "DressShop",
-            "inga": "BeckyHome",
-            "clara": "WineStore",
-            "eddie": "GroceryStore",
-            "alber": "WineStore",
-            "fran": "EllonaTemple",
-            "gerhard": "Church",
-            "lucas": "BeckyHome",
-            "clara_fiance": "",
-            "robin": "BlackwoodRoad",
-            "mongol": "",
-            "zimmer": "CityGuard",
-            "draupnir": "StolyarWorkshop",
-            "luisa": "HunterClub",
-            "sergio": "ArtisansQuarter",
-            "sergio_pet": "BarberShop",
-        }.get(people_normalize_id(person), "")
-            self.pregnancy_state = {}    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
-
-    def npc_daily_schedule_build_all(force=False):
-        for data in list(peopleData.values()):
-            if isinstance(data, PeopleData):
-                data.daily_schedule_build(force)
-    def npc_daily_schedule_entries(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.daily_schedule_build(False) or [])
-
-    def npc_daily_schedule_rows(npc_id=""):
-        rows = []
-        for entry in npc_daily_schedule_entries(npc_id):
-            rows.append({
-                "slot": int(entry.time_slots[0]) if list(entry.time_slots or []) else 0,
-                "location": str(getattr(entry, "location", "") or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "label": str(getattr(entry, "label", "") or ""),
-            })
-        return rows
-    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
-
-    def npc_daily_schedule_build_all(force=False):
-        for data in list(peopleData.values()):
-            if data is not None:
-                data.daily_schedule_build(force)
-    def npc_daily_schedule_entries(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.daily_schedule_build(False) or [])
-
-    def npc_daily_schedule_rows(npc_id=""):
-        rows = []
-        for entry in npc_daily_schedule_entries(npc_id):
-            rows.append({
-                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
-                "location": str(getattr(entry, "location", "") or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "label": str(getattr(entry, "label", "") or ""),
-            })
-        return rows
-    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
-
-    def npc_daily_schedule_build_all(force=False):
-        for data in list(peopleData.values()):
-            if data is not None:
-                data.daily_schedule_build(force)
-    def npc_daily_schedule_entries(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.daily_schedule_build(False) or [])
-
-    def npc_daily_schedule_rows(npc_id=""):
-        rows = []
-        for entry in npc_daily_schedule_entries(npc_id):
-            rows.append({
-                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
-                "location": str(getattr(entry, "location", "") or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "label": str(getattr(entry, "label", "") or ""),
-            })
-        return rows
-                self.relationship = self.rel        def promote_from_var(self, vardict=None):
-            super().promote_from_var(vardict)
-            v = vardict if vardict is not None else self.var
-            if isinstance(v, dict):
-                for k in ("body_layers", "clothing", "sex_history", "pregnancy"):
-                    if k in v and isinstance(v[k], (dict, list)):
-                        setattr(self, k, v[k])
-            return self
-        def publish_visibility_state(self):
-            name = people_normalize_id(getattr(self, "code_name", self.name))
-            TitsVisible[name] = 1 if self.tits_visible() else 0
-            PussyVisible[name] = 1 if self.pussy_visible() else 0
-            ShortSkirtNoPanties[name] = 1 if self.short_skirt_no_panties() else 0
-            self.publish_visibility_state()
-            return self
-    def npc_schedule_sync_currentloc(npc_id="", weekday_value=None, time_value=None):
-        info = peopleInfo.get(people_normalize_id(npc_id), None)
-        if info is None:
-            return ""
-        info.location = str(info.getLocation(weekday_value, time_value) or "")
-        return info.location
-
-    def npc_schedule_sync_all(weekday_value=None, time_value=None):
-        for info in list(peopleInfo.values()):
-            if info is not None:
-                info.location = str(info.getLocation(weekday_value, time_value) or "")
-        def publish_wardrobe_state(self):
-            name = people_normalize_id(getattr(self, "code_name", self.name))
-            wardrobe = getattr(self, "wardrobe", {})
-            if not isinstance(wardrobe, dict):
-                $ dog_sync_profile()
-    $ werecat_sync_profile()
-    return self
-            underwear = wardrobe.get("current_underwear", {})
-            if not isinstance(underwear, dict):
-                underwear = {}
-                wardrobe["current_underwear"] = underwear
-            current_dress = str(wardrobe.get("current_dress", "") or "")
-            dressdefault[name] = current_dress
-            topdressdef[name] = DressTopPart.get(current_dress, "")
-            bottomdressdef[name] = DressBottomPart.get(current_dress, "")
-            bradef[name] = str(underwear.get("bra", "") or "")
-            pantiesdef[name] = str(underwear.get("panties", "") or "")
-            legsdef[name] = str(underwear.get("legs", "") or "")
-            shoesdef[name] = str(underwear.get("shoes", "") or "")
-            topdress[name] = topdressdef[name]
-            bottomdress[name] = bottomdressdef[name]
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            topraised[name] = people_to_int(topraised.get(name, 0), 0)
-            bottomraised[name] = people_to_int(bottomraised.get(name, 0), 0)
-            wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            return self
-    def people_initial_location(person=""):
-        return {
-            "sandra": "TavernMain",
-            "melissa": "TavernMain",
-            "amanda": "TavernMain",
-            "georgett": "",
-            "liza": "",
-            "becky": "GroceryStore",
-            "irma": "DressShop",
-            "inga": "BeckyHome",
-            "clara": "WineStore",
-            "eddie": "GroceryStore",
-            "alber": "WineStore",
-            "fran": "EllonaTemple",
-            "gerhard": "Church",
-            "lucas": "BeckyHome",
-            "clara_fiance": "",
-            "robin": "BlackwoodRoad",
-            "mongol": "",
-            "zimmer": "CityGuard",
-            "draupnir": "StolyarWorkshop",
-            "luisa": "HunterClub",
-            "sergio": "ArtisansQuarter",
-            "sergio_pet": "BarberShop",
-        }.get(people_normalize_id(person), "")
-            self.pregnancy_state = {}    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
-
-    def npc_daily_schedule_build_all(force=False):
-        for data in list(peopleData.values()):
-            if isinstance(data, PeopleData):
-                data.daily_schedule_build(force)
-    def npc_daily_schedule_entries(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.daily_schedule_build(False) or [])
-
-    def npc_daily_schedule_rows(npc_id=""):
-        rows = []
-        for entry in npc_daily_schedule_entries(npc_id):
-            rows.append({
-                "slot": int(entry.time_slots[0]) if list(entry.time_slots or []) else 0,
-                "location": str(getattr(entry, "location", "") or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "label": str(getattr(entry, "label", "") or ""),
-            })
-        return rows
-    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
-
-    def npc_daily_schedule_build_all(force=False):
-        for data in list(peopleData.values()):
-            if data is not None:
-                data.daily_schedule_build(force)
-    def npc_daily_schedule_entries(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.daily_schedule_build(False) or [])
-
-    def npc_daily_schedule_rows(npc_id=""):
-        rows = []
-        for entry in npc_daily_schedule_entries(npc_id):
-            rows.append({
-                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
-                "location": str(getattr(entry, "location", "") or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "label": str(getattr(entry, "label", "") or ""),
-            })
-        return rows
-    def npc_daily_schedule_build(npc_id="", day_marker=None, weekday_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return data.daily_schedule_build(True if day_marker is not None else False, weekday_value)
-
-    def npc_daily_schedule_build_all(force=False):
-        for data in list(peopleData.values()):
-            if data is not None:
-                data.daily_schedule_build(force)
-    def npc_daily_schedule_entries(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.daily_schedule_build(False) or [])
-
-    def npc_daily_schedule_rows(npc_id=""):
-        rows = []
-        for entry in npc_daily_schedule_entries(npc_id):
-            rows.append({
-                "slot": list(getattr(entry, "time_slots", []) or [None])[0],
-                "location": str(getattr(entry, "location", "") or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "label": str(getattr(entry, "label", "") or ""),
-            })
-        return rows
-                self.relationship = self.rel# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default peopleData = {}
-default peopleInfo = {}
-default girls = []
-default secondary_npcs = []
-
-init -1000 python:
-    peopleData = {}
-    peopleInfo = {}
-    girls = []
-    secondary_npcs = []
-
 # =============================================================================
 # BASE CLASSES (templates) - placed here in the normal people runtime file
 # as requested ("classes as definitions of templates will leave in people").
-# Using init -1000 python: (documented Ren'Py priority) so they are available
+# Using init -999 python: (documented Ren'Py priority) so they are available
 # before any later init python blocks in the per-NPC Init*.rpy files run.
 # Specific per-NPC classes (Amanda, Becky, etc.) stay defined in their own
 # game/NPC/*/Init*.rpy files. Instantiation also stays there.
 # No magic 00_ files. Only this existing people rpy + the per-NPC Inits.
 # =============================================================================
-init -1000 python:
+init -999 python:
     import json
 
     def people_to_int(value, default=0):
@@ -524,13 +30,140 @@ init -1000 python:
     def people_normalize_id(person=""):
         return str(person or "").strip().lower()
 
+    class PeopleRegistry(object):
+        """Single owner for static person definitions and saved NPC instances."""
+
+        def __init__(self):
+            self.definitions = {}
+            self.runtime = {}
+
+        def register(self, static_data, runtime_object):
+            if static_data is None or runtime_object is None:
+                raise ValueError("PeopleRegistry.register requires static data and a runtime object")
+            data_key = people_normalize_id(getattr(static_data, "name", ""))
+            runtime_key = people_normalize_id(getattr(runtime_object, "name", ""))
+            key = data_key or runtime_key
+            if not key:
+                raise ValueError("Registered person must have a stable id")
+            if data_key and runtime_key and data_key != runtime_key:
+                raise ValueError("Static/runtime person ids do not match: %s != %s" % (data_key, runtime_key))
+
+            static_data.name = key
+            runtime_object.name = key
+            runtime_object.data = static_data
+            self.definitions[key] = static_data
+            self.runtime[key] = runtime_object
+            runtime_object.update()
+            runtime_object.data = static_data
+            return runtime_object
+
+        def get_data(self, person=""):
+            return self.definitions.get(people_normalize_id(person), None)
+
+        def get_info(self, person=""):
+            return self.runtime.get(people_normalize_id(person), None)
+
+        def ids(self):
+            return sorted([key for key in self.runtime.keys() if people_normalize_id(key)])
+
+        def items(self):
+            return [(key, self.runtime[key]) for key in self.ids()]
+
+        def values(self):
+            return [row[1] for row in self.items()]
+
+        def data_values(self):
+            return [self.definitions[key] for key in sorted(self.definitions.keys())]
+
+        def girl_items(self):
+            return [(key, info) for key, info in self.items() if info.registry_group == "girl"]
+
+        def girl_values(self):
+            return [row[1] for row in self.girl_items()]
+
+        def secondary_items(self):
+            return [(key, info) for key, info in self.items() if info.registry_group == "secondary"]
+
+        def secondary_values(self):
+            return [row[1] for row in self.secondary_items()]
+
+        def location(self, person="", weekday_value=None, time_value=None):
+            info = self.get_info(person)
+            if info is None:
+                return ""
+            return str(info.getLocation(weekday_value, time_value) or "")
+
+        def ids_at(self, location="", weekday_value=None, time_value=None):
+            room_key = str(location or "").strip()
+            if not room_key:
+                return []
+            present = [
+                key for key, info in self.items()
+                if info is not None and str(info.getLocation(weekday_value, time_value) or "") == room_key
+            ]
+            return sorted(present, key=lambda key: str(self.get_info(key).display_name() or key).lower())
+
+        def action_data_for_room(self, person="", room_code=""):
+            key = people_normalize_id(person)
+            room_key = str(room_code or "").strip()
+            if not key or not room_key:
+                return None
+            info = self.get_info(key)
+            if info is None or not info.interaction_visible(room_key):
+                return None
+            return info.action_data(room_key)
+
+        def schedule_entry(self, person="", weekday_value=None, time_value=None):
+            data = self.get_data(person)
+            if data is None:
+                return None
+            return data.schedule_resolve(weekday_value, time_value)
+
+        def is_awake(self, person="", weekday_value=None, time_value=None):
+            entry = self.schedule_entry(person, weekday_value, time_value)
+            return True if entry is None else bool(entry.awake)
+
+        def can_talk(self, person="", weekday_value=None, time_value=None):
+            entry = self.schedule_entry(person, weekday_value, time_value)
+            return True if entry is None else bool(entry.awake) and bool(entry.talkable)
+
+        def schedule_state(self, person="", weekday_value=None, time_value=None):
+            data = self.get_data(person)
+            if data is None:
+                return {"location": "", "awake": True, "talkable": True, "venue_open_required": False, "label": "", "interval": "", "source": ""}
+            return data.schedule_state(weekday_value, time_value)
+
+        def repair(self):
+            for key, info in self.items():
+                data = self.get_data(key)
+                if data is None:
+                    raise ValueError("Missing static data for registered person: %s" % key)
+                info.name = key
+                info.data = data
+                info.update()
+                info.data = data
+            return self
+
+        def __len__(self):
+            return len(self.runtime)
+
+        def __contains__(self, person):
+            return people_normalize_id(person) in self.runtime
+
+    def npc_schedule_clock_minute(time_value=None):
+        if time_value is None:
+            return int(calendar_v2.clock_minutes() or 0) % 1440
+        value = int(time_value or 0)
+        if 0 <= value <= 23:
+            return value * 60
+        return value % 1440
+
     class NPCScheduleEntry(object):
-        def __init__(self, location="", weekdays=None, time_slots=None, start_hour=None, end_hour=None, awake=True, talkable=True, venue_open_required=False, condition=None, priority=0, label=""):
+        def __init__(self, location="", weekdays=None, start_hour=0, end_hour=24, awake=True, talkable=True, venue_open_required=False, condition=None, priority=0, label="", start_minute=None, end_minute=None):
             self.location = str(location or "").strip()
             self.weekdays = list(weekdays or [])
-            self.time_slots = list(time_slots or [])
-            self.start_hour = None if start_hour is None else max(0, min(23, int(start_hour or 0)))
-            self.end_hour = None if end_hour is None else max(0, min(24, int(end_hour or 0)))
+            self.start_minute = int(start_hour or 0) * 60 if start_minute is None else int(start_minute or 0)
+            self.end_minute = int(end_hour or 0) * 60 if end_minute is None else int(end_minute or 0)
             self.awake = bool(awake)
             self.talkable = bool(talkable)
             self.venue_open_required = bool(venue_open_required)
@@ -542,18 +175,14 @@ init -1000 python:
             return str(self.location or "")
 
         def matches(self, weekday_value=None, time_value=None):
-            week_value = int(week if weekday_value is None else weekday_value or 0)
-            hour_value = int(calendar_v2.hour if time_value is None else time_value or 0) % 24
-            slot_value = int(calendar_v2.slot_from_hour(hour_value))
+            week_value = int(calendar_v2.week if weekday_value is None else weekday_value or 0)
+            minute_value = npc_schedule_clock_minute(time_value)
             if self.weekdays and week_value not in self.weekdays:
                 return False
-            if self.start_hour is not None and self.end_hour is not None:
-                if self.start_hour <= self.end_hour:
-                    if not (self.start_hour <= hour_value < self.end_hour):
-                        return False
-                elif not (hour_value >= self.start_hour or hour_value < self.end_hour):
+            if self.start_minute <= self.end_minute:
+                if not (self.start_minute <= minute_value < self.end_minute):
                     return False
-            if self.time_slots and slot_value not in self.time_slots:
+            elif not (minute_value >= self.start_minute or minute_value < self.end_minute):
                 return False
             return room_rule_true(self.condition)
 
@@ -562,23 +191,16 @@ init -1000 python:
             state["condition"] = room_rule_serialize(state.get("condition", None))
             return state
 
-        def __setstate__(self, state):
-            self.__dict__.update(dict(state or {}))
-
     class NPCHourScheduleEntry(NPCScheduleEntry):
         def __init__(self, npc_id="", location="", location_choices=None, weekdays=None, start="00:00", end="23:59", awake=True, talkable=True, condition=None, priority=600, label="", source="json"):
             start_text = str(start or "0").strip()
             end_text = str(end or "23").strip()
-            start_hour = int((start_text.split(":", 1)[0] if ":" in start_text else start_text) or 0)
-            end_hour = int((end_text.split(":", 1)[0] if ":" in end_text else end_text) or 23)
-            if ":" in end_text:
-                try:
-                    end_minute = int(end_text.split(":", 1)[1] or 0)
-                except Exception:
-                    end_minute = 0
-                if end_minute > 0:
-                    end_hour = min(24, end_hour + 1)
-            super(NPCHourScheduleEntry, self).__init__(location, weekdays, [], start_hour, end_hour, awake, talkable, False, condition, priority, label)
+            start_parts = start_text.split(":", 1)
+            end_parts = end_text.split(":", 1)
+            start_minute = int(start_parts[0] or 0) * 60 + int(start_parts[1] or 0) if len(start_parts) > 1 else int(start_parts[0] or 0) * 60
+            end_minute = int(end_parts[0] or 0) * 60 + int(end_parts[1] or 0) if len(end_parts) > 1 else int(end_parts[0] or 0) * 60
+            end_minute += 1
+            super(NPCHourScheduleEntry, self).__init__(location, weekdays, awake=awake, talkable=talkable, condition=condition, priority=priority, label=label, start_minute=start_minute, end_minute=end_minute)
             self.npc_id = str(npc_id or "").strip()
             self.location_choices = list(location_choices or [])
             self.source = str(source or "json")
@@ -600,14 +222,14 @@ init -1000 python:
                 return ""
             scale = 10000
             if total_probability <= 1.000001:
-                roll = procedural_randint(1, scale, "npc_hour_%s_%s_%s_%s" % (self.npc_id, self.label, calendar_v2.daysInGame, self.start_hour))
+                roll = procedural_randint(1, scale, "npc_hour_%s_%s_%s_%s" % (self.npc_id, self.label, calendar_v2.daysInGame, self.start_minute))
                 cursor = 0
                 for row in choices:
                     cursor += int(round(max(0.0, float(row.get("probability", 0.0) or 0.0)) * scale))
                     if roll <= cursor:
                         return str(row.get("location", "") or "")
                 return ""
-            roll = procedural_randint(1, int(round(total_probability * scale)), "npc_hour_%s_%s_%s_%s" % (self.npc_id, self.label, calendar_v2.daysInGame, self.start_hour))
+            roll = procedural_randint(1, int(round(total_probability * scale)), "npc_hour_%s_%s_%s_%s" % (self.npc_id, self.label, calendar_v2.daysInGame, self.start_minute))
             cursor = 0
             for row in choices:
                 cursor += int(round(max(0.0, float(row.get("probability", 0.0) or 0.0)) * scale))
@@ -616,28 +238,20 @@ init -1000 python:
             return str(choices[-1].get("location", "") or "")
 
         def matches(self, weekday_value=None, time_value=None):
-            week_value = int(week if weekday_value is None else weekday_value or 0)
-            if self.weekdays and week_value not in self.weekdays:
+            if not super(NPCHourScheduleEntry, self).matches(weekday_value, time_value):
                 return False
-            hour_value = int(calendar_v2.hour if time_value is None else time_value or 0) % 24
-            if self.start_hour <= self.end_hour:
-                if not (self.start_hour <= hour_value < self.end_hour):
-                    return False
-            else:
-                if not (hour_value >= self.start_hour or hour_value < self.end_hour):
-                    return False
             if not str(self.selected_location() or "").strip():
                 return False
-            return room_rule_true(self.condition)
+            return True
 
-    def npc_daily_schedule_slot(slot=0, location="", awake=True, talkable=True, label="", priority=500):
-        return {"slot": int(slot or 0), "location": str(location or "").strip(), "awake": bool(awake), "talkable": bool(talkable), "label": str(label or "").strip(), "priority": int(priority or 500)}
+    def npc_daily_schedule_interval(start_hour=0, end_hour=24, location="", awake=True, talkable=True, label="", priority=500):
+        return {"start_minute": int(start_hour or 0) * 60, "end_minute": int(end_hour or 0) * 60, "location": str(location or "").strip(), "awake": bool(awake), "talkable": bool(talkable), "label": str(label or "").strip(), "priority": int(priority or 500)}
 
-    def npc_daily_schedule_choice(location="", weight=1, awake=True, talkable=True, label="", condition=None, monthly_key="", monthly_limit=0):
-        return {"location": str(location or "").strip(), "weight": max(0, int(weight or 0)), "awake": bool(awake), "talkable": bool(talkable), "label": str(label or "").strip(), "condition": condition, "monthly_key": str(monthly_key or "").strip(), "monthly_limit": int(monthly_limit or 0)}
+    def npc_daily_schedule_choice(location="", weight=1, awake=True, talkable=True, label="", condition=None):
+        return {"location": str(location or "").strip(), "weight": max(0, int(weight or 0)), "awake": bool(awake), "talkable": bool(talkable), "label": str(label or "").strip(), "condition": condition}
 
-    def npc_daily_schedule_random_slot(slot=0, choices=None, weekdays=None, label="", priority=500):
-        return {"slot": int(slot or 0), "choices": list(choices or []), "weekdays": list(weekdays or []), "label": str(label or "").strip(), "priority": int(priority or 500)}
+    def npc_daily_schedule_random_interval(start_hour=0, end_hour=24, choices=None, weekdays=None, label="", priority=500):
+        return {"start_minute": int(start_hour or 0) * 60, "end_minute": int(end_hour or 0) * 60, "choices": list(choices or []), "weekdays": list(weekdays or []), "label": str(label or "").strip(), "priority": int(priority or 500)}
 
     class PeopleData(object):
         def __init__(self, name, cname="", fullname="", genitive="", dative="",
@@ -655,15 +269,9 @@ init -1000 python:
             self.default_location = str(default_location or "")
             self.description = str(description or "")
             self.schedule_entries = list(schedule_entries or [])
-            self.daily_schedule_template = {"default_slots": [], "random_slots": []}
+            self.daily_schedule_template = {"default_intervals": [], "random_intervals": []}
             self.daily_schedule_plan_day = -1
             self.daily_schedule_plan = []
-            self.schedule_monthly_counters = {}
-            self.schedule_monthly_counters = {}
-            self.schedule_monthly_counters = {}
-            self.schedule_monthly_counters = {}
-            self.schedule_monthly_counters = {}
-            self.schedule_monthly_counters = {}
             self.interval_schedule_entries = []
             self.interval_schedule_loaded = False
             self.interval_schedule_load_error = ""
@@ -675,12 +283,12 @@ init -1000 python:
             birth_cycle = people_to_int(self.birth_date.get("cycle", 0), 0)
             if birth_cycle <= 0:
                 return 0
-            current_cycle = people_to_int(getattr(calendar_v2, "cycle", year), year)
+            current_cycle = people_to_int(getattr(calendar_v2, "cycle", CALENDAR_START_CYCLE), CALENDAR_START_CYCLE)
             age_value = current_cycle - birth_cycle
             birth_period = people_to_int(self.birth_date.get("period", 1), 1)
             birth_day = people_to_int(self.birth_date.get("day", 1), 1)
-            current_period = people_to_int(getattr(calendar_v2, "period", month), month)
-            current_day = people_to_int(getattr(calendar_v2, "day", day), day)
+            current_period = people_to_int(getattr(calendar_v2, "period", 1), 1)
+            current_day = people_to_int(getattr(calendar_v2, "day", 1), 1)
             if (current_period, current_day) < (birth_period, birth_day):
                 age_value -= 1
             return max(0, age_value)
@@ -688,10 +296,10 @@ init -1000 python:
         def getLocation(self, wday=None, hour=None):
             entry = self.schedule_resolve(wday, hour)
             if entry is not None:
-                return str(entry.selected_location() if hasattr(entry, "selected_location") else getattr(entry, "location", "") or "")
+                return str(entry.selected_location() or "")
             if self.interval_schedule_loaded and self.interval_schedule_entries:
                 return ""
-            return str(self.default_location or people_initial_location(self.name) or "")
+            return str(self.default_location or "")
 
         def set_schedule(self, entries=None):
             self.schedule_entries = list(entries or [])
@@ -702,14 +310,36 @@ init -1000 python:
                 self.schedule_entries.append(entry)
             return self.schedule_entries
 
-        def set_daily_schedule(self, default_slots=None, random_slots=None):
+        def set_daily_schedule(self, default_intervals=None, random_intervals=None):
             self.daily_schedule_template = {
-                "default_slots": list(default_slots or []),
-                "random_slots": list(random_slots or []),
+                "default_intervals": list(default_intervals or []),
+                "random_intervals": list(random_intervals or []),
             }
+            self.invalidate_daily_schedule()
+            return self.daily_schedule_template
+
+        def ensure_schedule_runtime_state(self):
+            if not isinstance(getattr(self, "schedule_entries", None), list):
+                self.schedule_entries = []
+            if not isinstance(getattr(self, "daily_schedule_template", None), dict):
+                self.daily_schedule_template = {"default_intervals": [], "random_intervals": []}
+            if not hasattr(self, "daily_schedule_plan_day"):
+                self.daily_schedule_plan_day = -1
+            if not isinstance(getattr(self, "daily_schedule_plan", None), list):
+                self.daily_schedule_plan = []
+            if not isinstance(getattr(self, "interval_schedule_entries", None), list):
+                self.interval_schedule_entries = []
+            if not hasattr(self, "interval_schedule_loaded"):
+                self.interval_schedule_loaded = False
+            if not hasattr(self, "interval_schedule_load_error"):
+                self.interval_schedule_load_error = ""
+            return self
+
+        def invalidate_daily_schedule(self):
+            self.ensure_schedule_runtime_state()
             self.daily_schedule_plan_day = -1
             self.daily_schedule_plan = []
-            return self.daily_schedule_template
+            return self
 
         def daily_schedule_choice_allowed(self, choice):
             row = dict(choice or {})
@@ -718,212 +348,47 @@ init -1000 python:
             condition = row.get("condition", None)
             if condition is not None and not room_rule_true(condition):
                 return False
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if monthly_key and monthly_limit > 0:
-                current_month = int(year or 0) * 100 + int(month or 0)
-                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-                if int(row_count.get("month", -1) or -1) != current_month:
-                    row_count = {"month": current_month, "count": 0}
-                if int(row_count.get("count", 0) or 0) >= monthly_limit:
-                    return False
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if monthly_key and monthly_limit > 0:
-                current_month = int(year or 0) * 100 + int(month or 0)
-                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-                if int(row_count.get("month", -1) or -1) != current_month:
-                    row_count = {"month": current_month, "count": 0}
-                    self.schedule_monthly_counters[monthly_key] = row_count
-                if int(row_count.get("count", 0) or 0) >= monthly_limit:
-                    return False
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if monthly_key and monthly_limit > 0:
-                current_month = int(year or 0) * 100 + int(month or 0)
-                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-                if int(row_count.get("month", -1) or -1) != current_month:
-                    row_count = {"month": current_month, "count": 0}
-                    self.schedule_monthly_counters[monthly_key] = row_count
-                if int(row_count.get("count", 0) or 0) >= monthly_limit:
-                    return False
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if monthly_key and monthly_limit > 0:
-                current_month = int(year or 0) * 100 + int(month or 0)
-                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-                if int(row_count.get("month", -1) or -1) != current_month:
-                    row_count = {"month": current_month, "count": 0}
-                    self.schedule_monthly_counters[monthly_key] = row_count
-                if int(row_count.get("count", 0) or 0) >= monthly_limit:
-                    return False
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if monthly_key and monthly_limit > 0:
-                current_month = int(year or 0) * 100 + int(month or 0)
-                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-                if int(row_count.get("month", -1) or -1) != current_month:
-                    row_count = {"month": current_month, "count": 0}
-                    self.schedule_monthly_counters[monthly_key] = row_count
-                if int(row_count.get("count", 0) or 0) >= monthly_limit:
-                    return False
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if monthly_key and monthly_limit > 0:
-                current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
-                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-                if int(row_count.get("month", -1) or -1) != current_month:
-                    row_count = {"month": current_month, "count": 0}
-                    self.schedule_monthly_counters[monthly_key] = row_count
-                if int(row_count.get("count", 0) or 0) >= monthly_limit:
-                    return False
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if monthly_key and monthly_limit > 0:
-                current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
-                row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-                if int(row_count.get("month", -1) or -1) != current_month:
-                    row_count = {"month": current_month, "count": 0}
-                if int(row_count.get("count", 0) or 0) >= monthly_limit:
-                    return False
             return True
 
-        def daily_schedule_mark_choice(self, choice):
-            row = dict(choice or {})
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if not monthly_key or monthly_limit <= 0:
-                return
-            current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
-            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-            if int(row_count.get("month", -1) or -1) != current_month:
-                row_count = {"month": current_month, "count": 0}
-            row_count["month"] = current_month
-            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
-            self.schedule_monthly_counters[monthly_key] = row_count
-
-        def daily_schedule_mark_choice(self, choice):
-            row = dict(choice or {})
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if not monthly_key or monthly_limit <= 0:
-                return
-            current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
-            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-            if int(row_count.get("month", -1) or -1) != current_month:
-                row_count = {"month": current_month, "count": 0}
-            row_count["month"] = current_month
-            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
-            self.schedule_monthly_counters[monthly_key] = row_count
-
-        def daily_schedule_mark_choice(self, choice):
-            row = dict(choice or {})
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if not monthly_key or monthly_limit <= 0:
-                return
-            current_month = int(year or 0) * 100 + int(month or 0)
-            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-            if int(row_count.get("month", -1) or -1) != current_month:
-                row_count = {"month": current_month, "count": 0}
-            row_count["month"] = current_month
-            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
-            self.schedule_monthly_counters[monthly_key] = row_count
-
-        def daily_schedule_mark_choice(self, choice):
-            row = dict(choice or {})
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if not monthly_key or monthly_limit <= 0:
-                return
-            current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
-            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-            if int(row_count.get("month", -1) or -1) != current_month:
-                row_count = {"month": current_month, "count": 0}
-            row_count["month"] = current_month
-            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
-            self.schedule_monthly_counters[monthly_key] = row_count
-
-        def daily_schedule_mark_choice(self, choice):
-            row = dict(choice or {})
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if not monthly_key or monthly_limit <= 0:
-                return
-            current_month = int(year or 0) * 100 + int(month or 0)
-            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-            if int(row_count.get("month", -1) or -1) != current_month:
-                row_count = {"month": current_month, "count": 0}
-            row_count["month"] = current_month
-            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
-            self.schedule_monthly_counters[monthly_key] = row_count
-
-        def daily_schedule_mark_choice(self, choice):
-            row = dict(choice or {})
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if not monthly_key or monthly_limit <= 0:
-                return
-            current_month = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
-            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-            if int(row_count.get("month", -1) or -1) != current_month:
-                row_count = {"month": current_month, "count": 0}
-            row_count["month"] = current_month
-            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
-            self.schedule_monthly_counters[monthly_key] = row_count
-
-        def daily_schedule_mark_choice(self, choice):
-            row = dict(choice or {})
-            monthly_key = str(row.get("monthly_key", "") or "").strip()
-            monthly_limit = int(row.get("monthly_limit", 0) or 0)
-            if not monthly_key or monthly_limit <= 0:
-                return
-            current_month = int(year or 0) * 100 + int(month or 0)
-            row_count = dict(self.schedule_monthly_counters.get(monthly_key, {}) or {})
-            if int(row_count.get("month", -1) or -1) != current_month:
-                row_count = {"month": current_month, "count": 0}
-            row_count["month"] = current_month
-            row_count["count"] = int(row_count.get("count", 0) or 0) + 1
-            self.schedule_monthly_counters[monthly_key] = row_count
-
-        def daily_schedule_pick_choice(self, choices):
+        def daily_schedule_pick_choice(self, choices, choice_key=""):
             allowed = [dict(choice or {}) for choice in list(choices or []) if self.daily_schedule_choice_allowed(choice)]
             if not allowed:
                 return None
             total_weight = sum([max(0, int(row.get("weight", 1) or 1)) for row in allowed])
             if total_weight <= 0:
                 return allowed[0]
-            roll = procedural_randint(1, total_weight, "daily_schedule_%s_%s_%s" % (self.name, int(calendar_v2.daysInGame or 0), total_weight))
+            roll = procedural_randint(1, total_weight, "daily_schedule_%s_%s_%s_%s" % (self.name, int(calendar_v2.daysInGame or 0), str(choice_key or ""), total_weight))
             cursor = 0
             for row in allowed:
                 cursor += max(0, int(row.get("weight", 1) or 1))
                 if roll <= cursor:
-                    self.daily_schedule_mark_choice(row)
                     return row
-            self.daily_schedule_mark_choice(allowed[-1])
             return allowed[-1]
 
-        def daily_schedule_entry_from_row(self, row, slot_value=None):
+        def daily_schedule_entry_from_row(self, row, weekday_value=None):
             data = dict(row or {})
-            slot = int(data.get("slot", slot_value if slot_value is not None else 0) or 0)
             return NPCScheduleEntry(
                 location=str(data.get("location", "") or ""),
-                weekdays=[int(week or 0)],
-                time_slots=[slot],
+                weekdays=[int(calendar_v2.week if weekday_value is None else weekday_value or 0)],
                 awake=bool(data.get("awake", True)),
                 talkable=bool(data.get("talkable", True)),
                 priority=int(data.get("priority", 500) or 500),
                 label=str(data.get("label", "") or ""),
+                start_minute=int(data.get("start_minute", 0) or 0),
+                end_minute=int(data.get("end_minute", 1440) or 0),
             )
 
-        def daily_schedule_build(self, force=False, weekday_value=None):
+        def daily_schedule_build(self, weekday_value=None):
             day_value = int(calendar_v2.daysInGame or 0)
-            if not force and int(self.daily_schedule_plan_day or -1) == day_value:
+            current_week = int(calendar_v2.week or 0)
+            week_value = int(current_week if weekday_value is None else weekday_value or 0)
+            cache_current_day = week_value == current_week
+            plan_day = int(self.daily_schedule_plan_day if self.daily_schedule_plan_day is not None else -1)
+            if cache_current_day and plan_day == day_value:
                 return list(self.daily_schedule_plan or [])
             template = dict(self.daily_schedule_template or {})
-            week_value = int(week if weekday_value is None else weekday_value or 0)
-            slot_rows = {}
-            for row in list(template.get("default_slots", []) or []):
+            interval_rows = {}
+            for row in list(template.get("default_intervals", []) or []):
                 data = dict(row or {})
                 weekdays = list(data.get("weekdays", []) or [])
                 if weekdays and week_value not in weekdays:
@@ -931,30 +396,32 @@ init -1000 python:
                 condition = data.get("condition", None)
                 if condition is not None and not room_rule_true(condition):
                     continue
-                slot_rows[int(data.get("slot", 0) or 0)] = data
-            for random_row in list(template.get("random_slots", []) or []):
+                interval_key = (int(data.get("start_minute", 0) or 0), int(data.get("end_minute", 1440) or 0))
+                interval_rows[interval_key] = data
+            for random_row in list(template.get("random_intervals", []) or []):
                 data = dict(random_row or {})
                 weekdays = list(data.get("weekdays", []) or [])
                 if weekdays and week_value not in weekdays:
                     continue
-                choice = self.daily_schedule_pick_choice(data.get("choices", []))
+                start_minute = int(data.get("start_minute", 0) or 0)
+                end_minute = int(data.get("end_minute", 1440) or 0)
+                choice_key = "%s:%s:%s:%s" % (week_value, start_minute, end_minute, str(data.get("label", "") or ""))
+                choice = self.daily_schedule_pick_choice(data.get("choices", []), choice_key)
                 if choice is None:
                     continue
-                slot = int(data.get("slot", 0) or 0)
-                choice["slot"] = slot
+                choice["start_minute"] = start_minute
+                choice["end_minute"] = end_minute
                 choice["priority"] = int(data.get("priority", 500) or 500)
-                slot_rows[slot] = choice
-            self.daily_schedule_plan = [self.daily_schedule_entry_from_row(slot_rows[row], row) for row in sorted(slot_rows.keys())]
-            self.daily_schedule_plan_day = day_value
-            return list(self.daily_schedule_plan or [])
+                interval_rows[(start_minute, end_minute)] = choice
+            plan = [self.daily_schedule_entry_from_row(interval_rows[row], week_value) for row in sorted(interval_rows.keys())]
+            if cache_current_day:
+                self.daily_schedule_plan = plan
+                self.daily_schedule_plan_day = day_value
+            return list(plan)
 
         def interval_location_choices_from_json(self, data):
             raw_location = data.get("location", "")
-            probabilities = data.get("location_probabilities", data.get("location probability", data.get("locaation probability", [])))
-            try:
-                probability_rows = list(probabilities or [])
-            except Exception:
-                probability_rows = []
+            probability_rows = list(data.get("location_probabilities", []) or [])
             if isinstance(raw_location, str):
                 raw_locations = [raw_location] if probability_rows else []
             else:
@@ -964,10 +431,7 @@ init -1000 python:
             fallback_probability = 1.0 / len(raw_locations)
             choices = []
             for index, loc in enumerate(raw_locations):
-                try:
-                    probability = float(probability_rows[index])
-                except Exception:
-                    probability = fallback_probability
+                probability = float(probability_rows[index]) if index < len(probability_rows) else fallback_probability
                 choices.append({"location": str(loc or "").strip(), "probability": probability})
             return choices
 
@@ -991,44 +455,41 @@ init -1000 python:
             )
 
         def load_interval_schedule(self, force=False):
+            self.ensure_schedule_runtime_state()
             if self.interval_schedule_loaded and not force:
                 return list(self.interval_schedule_entries or [])
-            self.interval_schedule_entries = []
             self.interval_schedule_load_error = ""
             path = str(getattr(self, "schedule_source", "") or "").strip()
             if not path:
-                path = "NPC/Schedules/%s.json" % self.name
+                self.interval_schedule_loaded = True
+                self.interval_schedule_entries = []
+                return []
             if path.startswith("schedules/"):
                 path = "NPC/Schedules/" + path.split("/", 1)[1]
             if not renpy.loadable(path):
                 self.interval_schedule_loaded = True
+                self.interval_schedule_load_error = "%s: not loadable" % path
+                self.interval_schedule_entries = []
+                if str(getattr(self, "schedule_source", "") or "").strip():
+                    raise ValueError(self.interval_schedule_load_error)
                 return []
-            try:
-                raw = renpy.file(path).read()
-                if hasattr(raw, "decode"):
-                    raw = raw.decode("utf-8")
-                payload = json.loads(raw)
-                rows = []
-                for row in list(dict(payload or {}).get("entries", []) or []):
-                    entry = self.interval_schedule_entry_from_json(row)
-                    if entry.location or entry.location_choices:
-                        rows.append(entry)
-                self.interval_schedule_entries = rows
-            except Exception as ex:
-                self.interval_schedule_load_error = "%s: %s" % (path, ex)
-                self.interval_schedule_entries = previous_entries
-                self.interval_schedule_entries = previous_entries
-                self.interval_schedule_entries = previous_entries
-                self.interval_schedule_entries = previous_entries
+            raw = renpy.file(path).read().decode("utf-8")
+            payload = json.loads(raw)
+            rows = []
+            for row in list(dict(payload or {}).get("entries", []) or []):
+                entry = self.interval_schedule_entry_from_json(row)
+                if entry.location or entry.location_choices:
+                    rows.append(entry)
+            self.interval_schedule_entries = rows
             self.interval_schedule_loaded = True
             return list(self.interval_schedule_entries or [])
 
-        def schedule_entries_for_today(self):
+        def schedule_entries_for_today(self, weekday_value=None):
             interval_entries = self.load_interval_schedule(False)
-            return list(interval_entries or []) + list(self.daily_schedule_build(False) or []) + list(self.schedule_entries or [])
+            return list(interval_entries or []) + list(self.daily_schedule_build(weekday_value) or []) + list(self.schedule_entries or [])
 
         def schedule_resolve(self, weekday_value=None, time_value=None):
-            entries = sorted(self.schedule_entries_for_today(), key=lambda row: int(getattr(row, "priority", 0) or 0), reverse=True)
+            entries = sorted(self.schedule_entries_for_today(weekday_value), key=lambda row: int(getattr(row, "priority", 0) or 0), reverse=True)
             for entry in entries:
                 if entry.matches(weekday_value, time_value):
                     return entry
@@ -1038,12 +499,14 @@ init -1000 python:
             entry = self.schedule_resolve(weekday_value, time_value)
             if entry is None:
                 return {"location": "", "awake": True, "talkable": True, "venue_open_required": False, "label": "", "interval": "", "source": ""}
-            if getattr(entry, "start_hour", None) is not None and getattr(entry, "end_hour", None) is not None:
-                interval_text = "%02d-%02d" % (int(getattr(entry, "start_hour", 0) or 0), int(getattr(entry, "end_hour", 0) or 0))
-            else:
-                interval_text = ",".join([str(row) for row in list(getattr(entry, "time_slots", []) or [])])
+            interval_text = "%02d:%02d-%02d:%02d" % (
+                int(getattr(entry, "start_minute", 0) or 0) // 60,
+                int(getattr(entry, "start_minute", 0) or 0) % 60,
+                (int(getattr(entry, "end_minute", 0) or 0) % 1440) // 60,
+                int(getattr(entry, "end_minute", 0) or 0) % 60,
+            )
             return {
-                "location": str(entry.selected_location() if hasattr(entry, "selected_location") else getattr(entry, "location", "") or ""),
+                "location": str(entry.selected_location() or ""),
                 "awake": bool(getattr(entry, "awake", True)),
                 "talkable": bool(getattr(entry, "talkable", True)),
                 "venue_open_required": bool(getattr(entry, "venue_open_required", False)),
@@ -1057,18 +520,11 @@ init -1000 python:
 
         def selectIcon(self, wday=None, hour=None):
             candidate = str(self.portrait or "")
-            if candidate:
-                try:
-                    if renpy.loadable(candidate):
-                        return candidate
-                except Exception:
-                    return candidate
-            try:
-                portrait = str(girl_card_portrait_path(self.name) or "")
-                if portrait and renpy.loadable(portrait):
-                    return portrait
-            except Exception:
-                pass
+            if candidate and renpy.loadable(candidate):
+                return candidate
+            portrait = str(girl_card_portrait_path(self.name) or "")
+            if portrait and renpy.loadable(portrait):
+                return portrait
             return str(self.portrait or "")
 
         @classmethod
@@ -1077,204 +533,200 @@ init -1000 python:
             row.setdefault("name", name)
             return cls(**row)
 
-    def people_schedule_data(npc_id=""):
-        key = people_normalize_id(npc_id)
-        if not key:
-            return None
-        data = peopleData.get(key, None)
-        if data is not None:
-            return data
-        info = peopleInfo.get(key, None)
-        if info is not None:
-            data = getattr(info, "data", None)
-            if data is not None:
-                return data
-        return None
-
-    def npc_schedule_set(npc_id="", entries=None):
-        data = people_schedule_data(npc_id)
-        if data is not None:
-            data.set_schedule(entries)
-
-    def npc_schedule_add(npc_id="", entry=None):
-        data = people_schedule_data(npc_id)
-        if data is not None:
-            data.add_schedule_entry(entry)
-
-    def npc_schedule_list(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.schedule_entries or [])
-
-    def npc_daily_schedule_set(npc_id="", default_slots=None, random_slots=None):
-        data = people_schedule_data(npc_id)
-        if data is not None:
-            data.set_daily_schedule(default_slots, random_slots)
-
-    def npc_daily_schedule_invalidate(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is not None:
-            data.invalidate_daily_schedule()
-
-    def npc_daily_schedule_invalidate_all():
-        for data in list(peopleData.values()):
-            if data is not None:
-                data.invalidate_daily_schedule()
-
-    def npc_interval_schedule_load_file(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return False
-        before = len(list(data.interval_schedule_entries or []))
-        rows = data.load_interval_schedule(True)
-        return len(rows) > 0 or before > 0
-
     def npc_interval_schedule_load_all(force=False):
-        for data in list(peopleData.values()):
+        for data in people.data_values():
             if data is not None:
                 data.load_interval_schedule(force)
 
-    def npc_interval_schedule_list(npc_id=""):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return []
-        return list(data.load_interval_schedule(False) or [])
-
-    def npc_interval_schedule_has_contract(npc_id=""):
-        return len(npc_interval_schedule_list(npc_id)) > 0
-
-    def npc_schedule_resolve(npc_id="", weekday_value=None, time_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return None
-        return data.schedule_resolve(weekday_value, time_value)
-
-    def npc_schedule_location(npc_id="", weekday_value=None, time_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return ""
-        return data.getLocation(weekday_value, time_value)
-
-    def npc_is_awake(npc_id="", weekday_value=None, time_value=None):
-        entry = npc_schedule_resolve(npc_id, weekday_value, time_value)
-        if entry is None:
-            return True
-        return bool(getattr(entry, "awake", True))
-
-    def npc_can_talk_now(npc_id="", weekday_value=None, time_value=None):
-        entry = npc_schedule_resolve(npc_id, weekday_value, time_value)
-        if entry is None:
-            return True
-        return bool(getattr(entry, "awake", True)) and bool(getattr(entry, "talkable", True))
-
-    def npc_schedule_state(npc_id="", weekday_value=None, time_value=None):
-        data = people_schedule_data(npc_id)
-        if data is None:
-            return {"location": "", "awake": True, "talkable": True, "venue_open_required": False, "label": "", "interval": "", "source": ""}
-        return data.schedule_state(weekday_value, time_value)
-
-    def _npc_display_name(npc_id=""):
-        key = people_normalize_id(npc_id)
-        if not key:
-            return ""
-        info = peopleInfo.get(key, None)
-        if info is None:
-            return key
-        return str(info.display_name() or key)
-
-    def getLocation(person="", weekday_value=None, time_value=None):
-        key = people_normalize_id(person)
-        if not key:
-            return ""
-        info = peopleInfo.get(key, None)
-        if info is None:
-            return ""
-        return str(info.getLocation(weekday_value, time_value) or "")
-
-    def getNPCids(location="", weekday_value=None, time_value=None):
-        room_key = str(location or "").strip()
-        if not room_key:
-            return []
-        present = []
-        for npc_id, info in peopleInfo.items():
-            npc_key = people_normalize_id(npc_id)
-            if npc_key and info is not None and str(info.getLocation(weekday_value, time_value) or "") == room_key:
-                present.append(npc_key)
-        return sorted(present, key=lambda row: _npc_display_name(row).lower())
-
-    def getNPCnames(location="", weekday_value=None, time_value=None):
-        return [_npc_display_name(npc_id) for npc_id in getNPCids(location, weekday_value, time_value)]
-
-    def isLocationEmpty(location="", weekday_value=None, time_value=None):
-        return len(getNPCids(location, weekday_value, time_value)) <= 0
-
-    def tavern_team_default_schedule_entries(work_location="TavernMain", sleep_location="TavernMyRoom", weekend_location="TavernMain"):
-        return [
-            NPCScheduleEntry(location=work_location, weekdays=[1, 2, 3, 4, 5, 6], time_slots=[0], awake=True, talkable=True, priority=100, label="morning"),
-            NPCScheduleEntry(location=work_location, weekdays=[1, 2, 3, 4, 5, 6], time_slots=[1, 2], awake=True, talkable=True, priority=100, label="working_day"),
-            NPCScheduleEntry(location=work_location, weekdays=[1, 2, 3, 4, 6], time_slots=[3], awake=True, talkable=True, priority=90, label="late_evening"),
-            NPCScheduleEntry(location=weekend_location, weekdays=[7], time_slots=[0, 1, 2, 3], awake=True, talkable=True, priority=80, label="sunday"),
-            NPCScheduleEntry(location=sleep_location, weekdays=[1, 2, 3, 4, 5, 6, 7], time_slots=[7], awake=False, talkable=False, priority=10, label="sleep"),
-        ]
+    def npc_schedule_after_load():
+        for data in people.data_values():
+            if not isinstance(data, PeopleData):
+                continue
+            data.ensure_schedule_runtime_state()
+            data.invalidate_daily_schedule()
+            data.load_interval_schedule(True)
 
     class PeopleInfo(object):
+        STORY_DEFAULTS = {}
+        OPENNESS_RELATIONSHIP_STEPS = ((6, 3), (8, 5), (11, 6), (13, 7))
+        talk_label = ""
+        talk_args = ()
+        registry_group = "secondary"
+
         def __init__(self, name, rel=0, talkToday=None, flirtToday=False, giftToday=False,
                     gifts=None, var=None, unknown_name=""):
             self.name = people_normalize_id(name)
             self.rel = people_to_int(rel, 0)
             self.talkToday = set(talkToday or [])
             self.gifts = set(gifts or [])
-            self.flirtToday = False
-            self.giftToday = False
-            self.flirtToday = False
-            self.giftToday = False
-            self.flirtToday = False
-            self.giftToday = False
             self.talked_today = 0
-            self.flirtToday = people_to_bool(flirtToday, False)
-            self.giftToday = people_to_bool(giftToday, False)
-            self.flirted_today = 0
-            self.gifted_today = 0
+            self.flirted_today = 1 if people_to_bool(flirtToday, False) else 0
+            self.gifted_today = 1 if people_to_bool(giftToday, False) else 0
             self.asked_today = 0
             self.fucked_today = 0
+            self.sex_state = {}
+            self.set_sex_busy(False)
             self.drunk = 0
             self.openness = 0
+            self.rebel_baseline = 0
             self.corruption = 0
             self.known = False
             self.unknown_name = str(unknown_name or getattr(self.__class__, "unknown_name", "") or "")
-            self.location = ""
             self.data = None
             self.var = var if var is not None else {}
-            self.sex_state = {}
-            # Hidden per-girl lunar fertility dict (for Amanda, Melissa, Clara, Sandra)
-            self.lunar_fertility = {"offset": 0, "last_phase": 0, "strength": 1.0}
-            # Hidden per-girl lunar fertility dict (for Amanda, Melissa, Clara, Sandra)
-            self.lunar_fertility = {"offset": 0, "last_phase": 0, "strength": 1.0}
-            # Hidden per-girl lunar fertility dict (for Amanda, Melissa, Clara, Sandra)
-            self.lunar_fertility = {"offset": 0, "last_phase": 0, "strength": 1.0}
+            self.harass_instruction_state = ""
 
         def update(self):
             self.name = people_normalize_id(self.name)
+            if hasattr(self, "location"):
+                delattr(self, "location")
             if not getattr(self, "unknown_name", ""):
                 self.unknown_name = str(getattr(self.__class__, "unknown_name", "") or "")
-            if isinstance(peopleData, dict) and self.name in peopleData:
-                self.data = peopleData[self.name]
-            elif self.data is None:
-                self.data = PeopleData(self.name)
-            self.flirtToday = people_to_int(getattr(self, "flirted_today", 0), 0) > 0
-            self.giftToday = people_to_int(getattr(self, "gifted_today", 0), 0) > 0
+            registered_data = people.get_data(self.name)
+            if registered_data is not None:
+                self.data = registered_data
             return self
+
+        def action_data(self, where_id=""):
+            return {
+                "npc_id": self.name,
+                "talk_label": str(self.talk_label or ""),
+                "talk_args": tuple(self.talk_args or ()),
+                "title": self.display_name(),
+                "where_id": str(where_id or ""),
+            }
+
+        def interaction_visible(self, room_code=""):
+            return bool(str(room_code or "").strip())
+
+        def talk_available_in_room(self, room_code=""):
+            room_key = str(room_code or rooms.current_code or "").strip()
+            if not room_key:
+                return False
+            breakfast = player.tavern_management.breakfast
+            if room_key == "TavernKitchen" and bool(breakfast.event_active):
+                present_ids = [people_normalize_id(row) for row in list(breakfast.present_ids or [])]
+                return self.name in present_ids
+            return (
+                bool(people.can_talk(self.name))
+                and str(self.getLocation() or "") == room_key
+                and bool(self.interaction_visible(room_key))
+                and bool(self.social_action_allowed("talk"))
+            )
+
+        def var_state(self):
+            state = getattr(self, "var", None)
+            return state if isinstance(state, dict) else {}
+
+        def var_value(self, key, default=None):
+            return self.var_state().get(str(key or ""), default)
+
+        def set_var(self, key, value):
+            if not isinstance(getattr(self, "var", None), dict):
+                self.var = {}
+            self.var[str(key or "")] = value
+            return value
+
+        def ensure_story_defaults(self):
+            if not isinstance(self.var, dict):
+                self.var = {}
+            for key, value in self.STORY_DEFAULTS.items():
+                if isinstance(value, dict):
+                    default_value = dict(value)
+                elif isinstance(value, list):
+                    default_value = list(value)
+                elif isinstance(value, set):
+                    default_value = set(value)
+                else:
+                    default_value = value
+                self.var.setdefault(key, default_value)
+            return self.var
+
+        def reset_skill_gains(self):
+            self.skill_gains_today = {}
+            return self.skill_gains_today
+
+        def record_skill_gain(self, key, amount=1):
+            if not isinstance(getattr(self, "skill_gains_today", None), dict):
+                self.skill_gains_today = {}
+            skill_key = str(key or "")
+            self.skill_gains_today[skill_key] = people_to_int(self.skill_gains_today.get(skill_key, 0), 0) + people_to_int(amount, 1)
+            return self.skill_gains_today[skill_key]
+
+        def var_int(self, key, default=0):
+            return people_to_int(self.var_value(key, default), default)
+
+        def set_var_int(self, key, value):
+            return self.set_var(key, people_to_int(value, 0))
+
+        def add_var_int(self, key, amount=1):
+            return self.set_var_int(key, self.var_int(key, 0) + people_to_int(amount, 0))
+
+        def story_value(self, key, default=0):
+            return self.var_value(key, default)
+
+        def set_story_value(self, key, value):
+            return self.set_var(key, value)
+
+        def set_story_value_min(self, key, value):
+            current = self.var_int(key, 0)
+            return self.set_var_int(key, max(current, people_to_int(value, 0)))
+
+        @property
+        def flirtToday(self):
+            return people_to_int(getattr(self, "flirted_today", 0), 0) > 0
+
+        @flirtToday.setter
+        def flirtToday(self, value):
+            self.flirted_today = 1 if people_to_bool(value, False) else 0
+
+        @property
+        def giftToday(self):
+            return people_to_int(getattr(self, "gifted_today", 0), 0) > 0
+
+        @giftToday.setter
+        def giftToday(self, value):
+            self.gifted_today = 1 if people_to_bool(value, False) else 0
 
         def mark_talked(self, amount=1):
             value = people_to_int(amount, 1)
             self.talked_today = people_to_int(getattr(self, "talked_today", 0), 0) + value
             return self
 
+        def talk_count(self):
+            return people_to_int(getattr(self, "talked_today", 0), 0)
+
+        def can_talk_today(self, limit=2):
+            return self.talk_count() < people_to_int(limit, 2)
+
+        def finish_talk(self):
+            self.talked_today = self.talk_count() + 1
+            return self.talked_today
+
+        def add_relation(self, amount=1, cap=20):
+            self.rel = max(
+                0,
+                min(
+                    people_to_int(cap, 20),
+                    people_to_int(getattr(self, "rel", 0), 0) + people_to_int(amount, 0),
+                ),
+            )
+            return self.rel
+
         def mark_asked(self, amount=1):
             value = people_to_int(amount, 1)
             self.asked_today = people_to_int(getattr(self, "asked_today", 0), 0) + value
             return self
+
+        def mark_asked_topic(self, topic_flag, relation_gain=1):
+            flag = str(topic_flag or "")
+            first_time = people_to_int(self.story_value(flag, 0), 0) == 0
+            if first_time:
+                self.set_story_value(flag, 1)
+                if relation_gain:
+                    self.add_relation(relation_gain)
+            self.mark_asked()
+            return first_time
 
         def mark_fucked(self, amount=1):
             value = people_to_int(amount, 1)
@@ -1286,8 +738,8 @@ init -1000 python:
                 self.sex_state = {}
             self.sex_state.setdefault("arousal", 0)
             self.sex_state.setdefault("somebody_cums", 0)
-            self.sex_state.setdefault("cock_position", "none")
-            self.sex_state.setdefault("partner_positions", {})
+            if not isinstance(self.sex_state.get("partner_positions"), dict):
+                self.sex_state["partner_positions"] = {}
             self.sex_state.setdefault("cum_inside_you", 0)
             self.sex_state.setdefault("cum_face_you", 0)
             self.sex_state.setdefault("cum_tits_you", 0)
@@ -1299,26 +751,31 @@ init -1000 python:
             return self.sex_state
 
         def set_cock_position(self, position="none", actor="You"):
-            position_key = str(position or "none").strip().lower()
-            if position_key not in ("none", "pussy", "mouth", "tits", "ass"):
-                position_key = "none"
-            actor_key = str(actor or "You").strip() or "You"
-            state = self.sex_clothing_state()
-            state["partner_positions"][actor_key] = position_key
-            if actor_key.lower() == "you":
-                state["cock_position"] = position_key
+            try:
+                position_key = {0: "none", 1: "pussy", 2: "mouth", 3: "tits", 4: "ass"}.get(int(position or 0), "none")
+            except (TypeError, ValueError):
+                position_key = str(position or "none").strip().lower()
+                if position_key not in ("none", "pussy", "mouth", "tits", "ass"):
+                    position_key = "none"
+            actor_key = str(actor or "you").strip().lower()
+            state = self.ensure_sex_state()
+            if position_key == "none":
+                state["partner_positions"].pop(actor_key, None)
+            else:
+                state["partner_positions"][actor_key] = position_key
             return position_key
 
         def cock_position(self, actor="You"):
-            actor_key = str(actor or "You").strip() or "You"
-            state = self.sex_clothing_state()
-            return str(state.get("partner_positions", {}).get(actor_key, state.get("cock_position", "none")) or "none")
+            actor_key = str(actor or "you").strip().lower()
+            state = self.sex_state if isinstance(getattr(self, "sex_state", None), dict) else {}
+            return str(state.get("partner_positions", {}).get(actor_key, "none") or "none")
 
         def cock_in(self, position="none", actor="You"):
             return self.cock_position(actor) == str(position or "none").strip().lower()
 
         def arousal_value(self):
-            return people_clamp(self.ensure_sex_state().get("arousal", 0), 0, 100)
+            state = self.sex_state if isinstance(getattr(self, "sex_state", None), dict) else {}
+            return people_clamp(state.get("arousal", 0), 0, 100)
 
         def set_arousal(self, value):
             self.ensure_sex_state()["arousal"] = people_clamp(value, 0, 100)
@@ -1328,17 +785,19 @@ init -1000 python:
             return self.set_arousal(min(people_to_int(cap, 100), self.arousal_value() + people_to_int(amount, 0)))
 
         def sex_busy(self):
-            return people_to_int(self.ensure_sex_state().get("somebody_cums", 0), 0) != 0
+            state = self.sex_state if isinstance(getattr(self, "sex_state", None), dict) else {}
+            return people_to_int(state.get("somebody_cums", 0), 0) != 0
 
         def set_sex_busy(self, value):
             self.ensure_sex_state()["somebody_cums"] = 1 if value else 0
             return self.sex_state["somebody_cums"]
 
         def cum_state(self, key):
-            return people_to_int(self.ensure_sex_state().get(str(key or ""), 0), 0)
+            state = self.sex_state if isinstance(getattr(self, "sex_state", None), dict) else {}
+            return people_to_int(state.get(str(key or ""), 0), 0)
 
         def set_cum_state(self, key, value=1):
-            state = self.sex_clothing_state()
+            state = self.ensure_sex_state()
             state[str(key or "")] = 1 if people_to_int(value, 0) else 0
             return state[str(key or "")]
 
@@ -1389,22 +848,10 @@ init -1000 python:
             self.jobs[str(key or "")] = value
             return value
 
-        def reset_skill_gains(self):
-            self.skill_gains_today = {}
-            return self.skill_gains_today
-
-        def record_skill_gain(self, key, amount=1):
-            if not isinstance(getattr(self, "skill_gains_today", None), dict):
-                self.skill_gains_today = {}
-            skill_key = str(key or "")
-            self.skill_gains_today[skill_key] = people_to_int(self.skill_gains_today.get(skill_key, 0), 0) + people_to_int(amount, 1)
-            return self.skill_gains_today[skill_key]
-
         def sex_stat(self, key, default=0):
             stats = getattr(self, "stats", None)
             if not isinstance(stats, dict):
-                self.stats = {}
-                stats = self.stats
+                return default
             return stats.get(str(key or ""), default)
 
         def set_sex_stat(self, key, value):
@@ -1443,11 +890,7 @@ init -1000 python:
             if place_key not in ("inside", "mouth", "tits", "face"):
                 place_key = "outside"
             state = self.ensure_sex_state()
-            try:
-                intimacy = player.intimacy
-                intimacy.record_cum(calendar_v2.daysInGame)
-            except Exception:
-                pass
+            player.intimacy.record_cum(calendar_v2.daysInGame)
             self.add_sex_stat("sexacts", 1)
             self.mark_fucked(1)
             if place_key == "inside":
@@ -1472,14 +915,17 @@ init -1000 python:
         def change_social(self, friend_delta=0, open_delta=0, corruption_delta=0):
             relationship_cap = max(20, people_to_int(getattr(self, "relationship_cap", 20), 20))
             self.rel = max(0, min(relationship_cap, people_to_int(getattr(self, "rel", 0), 0) + people_to_int(friend_delta, 0)))
-            if hasattr(self, "relationship"):
-            if hasattr(self, "relationship"):
-            if hasattr(self, "relationship"):
-            if hasattr(self, "relationship"):
-            if hasattr(self, "relationship"):
             self.openness = max(0, min(20, people_to_int(getattr(self, "openness", 0), 0) + people_to_int(open_delta, 0)))
             self.corruption = max(0, min(100, people_to_int(getattr(self, "corruption", 0), 0) + people_to_int(corruption_delta, 0)))
             return self
+
+        def reset_openness_from_relationship(self):
+            self.openness = 0
+            relationship = people_to_int(self.rel, 0)
+            for relationship_minimum, openness_value in self.OPENNESS_RELATIONSHIP_STEPS:
+                if relationship >= relationship_minimum and self.openness <= openness_value:
+                    self.openness = openness_value
+            return self.openness
 
         def apply_social_chance(self, friend_limit=0, friend_chance=0, friend_delta=0, corruption_limit=0, corruption_chance=0, corruption_delta=0, reason="social"):
             friend_delta = people_to_int(friend_delta, 0)
@@ -1499,10 +945,10 @@ init -1000 python:
             return {"rel": self.rel, "corruption": self.corruption, "mana": self.mana}
 
         def change_rebellion(self, amount=0, reason=""):
-            self.player.stats.rebellion = max(0, min(100, people_to_int(getattr(self, "rebellion", 0), 0) + people_to_int(amount, 0)))
+            self.rebellion = max(0, min(100, people_to_int(getattr(self, "rebellion", 0), 0) + people_to_int(amount, 0)))
             if isinstance(getattr(self, "reaction_state", None), dict):
                 self.reaction_state["last_rebellion_reason"] = str(reason or "")
-            return self.player.stats.rebellion
+            return self.rebellion
 
         def change_anger(self, amount=0, reason=""):
             self.anger_with_player = max(0, min(100, people_to_int(getattr(self, "anger_with_player", 0), 0) + people_to_int(amount, 0)))
@@ -1534,15 +980,11 @@ init -1000 python:
             return self.change_mana(-abs(people_to_int(amount, 1)), reason)
 
         def harass_instruction(self):
-            if not isinstance(getattr(self, "var", None), dict):
-                self.var = {}
-            return str(self.var.get("harass_instruction", "") or "")
+            return str(self.harass_instruction_state or "")
 
         def set_harass_instruction(self, value=""):
-            if not isinstance(getattr(self, "var", None), dict):
-                self.var = {}
-            self.var["harass_instruction"] = str(value or "")
-            return self.var["harass_instruction"]
+            self.harass_instruction_state = str(value or "")
+            return self.harass_instruction_state
 
         def reset_daily(self, full=False):
             """Reset per-girl daily interaction counters.
@@ -1564,26 +1006,18 @@ init -1000 python:
             return self
 
         def getLocation(self, wday=None, hour=None):
-            try:
-                if bool(TavernBreakfastEventActive) and TavernBreakfastPresentIds is not None:
-                    breakfast_ids = [people_normalize_id(row) for row in list(TavernBreakfastPresentIds or [])]
-                    if self.name in breakfast_ids:
-                        return "TavernKitchen"
-            authored_location = str(getattr(self, "location", "") or "").strip()
-            if authored_location:
-                return authored_location
-            authored_location = str(getattr(self, "location", "") or "").strip()
-            if authored_location:
-                return authored_location
-            authored_location = str(getattr(self, "location", "") or "").strip()
-            if authored_location:
-                return authored_location
+            if bool(player.tavern_management.breakfast.event_active) and player.tavern_management.breakfast.present_ids is not None:
+                breakfast_ids = [people_normalize_id(row) for row in list(player.tavern_management.breakfast.present_ids or [])]
+                if self.name in breakfast_ids:
+                    return "TavernKitchen"
             data_owner = getattr(self, "data", None)
-                if data_owner is None:
-                    return ""
-                return str(data_owner.getLocation(wday, hour) or "")
-            except Exception:
-                return str(self.location or "")
+            if data_owner is None:
+                return ""
+            scheduled_location = str(data_owner.getLocation(wday, hour) or "")
+            if bool(getattr(self, "uses_tavern_client_room", False)) and scheduled_location == "TavernMain":
+                if str(rooms.get("TavernMain").state.get("client_room_girl", "") or "") == self.name:
+                    return "TavernClientRoom"
+            return scheduled_location
 
         def isInLocation(self, location, wday=None, hour=None):
             return str(self.getLocation(wday, hour) or "") == str(location or "")
@@ -1592,11 +1026,8 @@ init -1000 python:
             action_key = str(action or "").strip().lower()
             if action_key in ("look", "talk"):
                 return True
-            try:
-                allowed, reason = relationship_social_action_allowed(self.name, action_key, item_id)
-                return bool(allowed)
-            except Exception:
-                return False
+            allowed, reason = relationship_social_action_allowed(self.name, action_key, item_id)
+            return bool(allowed)
 
     class BaseNPC(PeopleInfo):
         """Base for all NPCs (secondaries + simple)."""
@@ -1606,60 +1037,16 @@ init -1000 python:
                 self.unknown_name = str(getattr(self.__class__, "unknown_name", "") or "")
             self.jobs = {}
             self.skills = {}
-            self.clothing = {}
-            self.body_state = {}
-            self.sex_history = []
-            self.story_flags = {}
-            self.knows_mc = {}
 
-        def promote_from_var(self, vardict=None):
-            v = vardict if vardict is not None else self.var
-            if not isinstance(v, dict):
-                return self
-            for key in list(v.keys()):
-                if key.lower() in ("knowhim", "knowcomplaint", "mongolsafepass", "playerhandledrobin",
-                                "missionupdatedbyplayer", "stocksreleased", "sawmomsex", "visitedhome",
-                                "homesex", "eddiegeorg"):
-                    self.story_flags[key] = v[key]
-            if "napVars" in v and isinstance(v["napVars"], dict):
-                self.story_flags.update(v["napVars"])
-            return self
-            self.clothing = {}
-            self.body_state = {}
-            self.sex_history = []
-            self.story_flags = {}
-            self.knows_mc = {}
+        def skill_value(self, key, default=0):
+            return people_to_int(self.skills.get(str(key or ""), default), default)
 
-        def promote_from_var(self, vardict=None):
-            v = vardict if vardict is not None else self.var
-            if not isinstance(v, dict):
-                return self
-            for key in list(v.keys()):
-                if key.lower() in ("knowhim", "knowcomplaint", "mongolsafepass", "playerhandledrobin",
-                                "missionupdatedbyplayer", "stocksreleased", "sawmomsex", "visitedhome",
-                                "homesex", "eddiegeorg"):
-                    self.story_flags[key] = v[key]
-            if "napVars" in v and isinstance(v["napVars"], dict):
-                self.story_flags.update(v["napVars"])
-            return self
-            self.clothing = {}
-            self.body_state = {}
-            self.sex_history = []
-            self.story_flags = {}
-            self.knows_mc = {}
+        def set_skill(self, key, value):
+            self.skills[str(key or "")] = max(0, min(100, people_to_int(value, 0)))
+            return self.skills[str(key or "")]
 
-        def promote_from_var(self, vardict=None):
-            v = vardict if vardict is not None else self.var
-            if not isinstance(v, dict):
-                return self
-            for key in list(v.keys()):
-                if key.lower() in ("knowhim", "knowcomplaint", "mongolsafepass", "playerhandledrobin",
-                                "missionupdatedbyplayer", "stocksreleased", "sawmomsex", "visitedhome",
-                                "homesex", "eddiegeorg"):
-                    self.story_flags[key] = v[key]
-            if "napVars" in v and isinstance(v["napVars"], dict):
-                self.story_flags.update(v["napVars"])
-            return self
+        def change_skill(self, key, amount=0):
+            return self.set_skill(key, self.skill_value(key, 0) + people_to_int(amount, 0))
 
         def mark_known(self):
             self.known = True
@@ -1672,25 +1059,40 @@ init -1000 python:
 
     class Girl(BaseNPC):
         """Girls with body layers, pregnancy, detailed history, lunar fertility."""
+        registry_group = "girl"
         def __init__(self, name, **kwargs):
             super().__init__(name, **kwargs)
-            self.body_layers = {}
-            self.insertion_state = {}
-            self.clothing_layers = {}
             self.detailed_sex_history = []
-            if not getattr(self, 'lunar_fertility', None):
-                self.lunar_fertility = {"offset": hash(name) % 7, "last_phase": 0, "strength": 1.0}
+
+        def can_work_tavern(self):
+            return people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
+
+        def set_hired(self, hired=True):
+            hired_value = bool(hired)
+            self.jobs["jobWhoreAvail"] = 1 if hired_value else 0
+            self.jobs["jobwhore"] = 1 if hired_value else 0
+            return hired_value
+
+        def can_use_gloryhole(self):
+            return people_to_int(self.jobs.get("jobGloryHoleAvail", 0), 0) > 0
+
+        def portstreet_visible_now(self):
+            return self.portstreet_work_active() and not self.portstreet_client_event_available()
+
+        def mark_portstreet_clients_seen(self):
+            self.var["portstreet_clients_seen_today"] = 1
+            return self.set_story_value("seeclients", 1)
+
+        def church_after_sermon_event_available(self):
+            return (
+                church_after_cermon_action_visible()
+                and self.can_trigger_after_sermon_event()
+                and CheckIfSexEventExist(self.code_name, 99, "Priest") > 0
+            )
 
         def sex_clothing_state(self):
-            state = self.ensure_sex_state()
-            state.setdefault("top_removed", 0)
-            state.setdefault("bottom_removed", 0)
-            state.setdefault("bra_removed", 0)
-            state.setdefault("panties_removed", 0)
-            state.setdefault("top_raised", 0)
-            state.setdefault("bottom_raised", 0)
-            state.setdefault("lick_pussy", 0)
-            return state
+            state = getattr(self, "sex_state", None)
+            return state if isinstance(state, dict) else {}
 
         def current_dress(self):
             wardrobe = getattr(self, "wardrobe", {}) or {}
@@ -1704,46 +1106,10 @@ init -1000 python:
                 return str(state.get("dress_override", "") or "")
             return self.current_dress()
 
-        def scene_dress(self):
-            state = self.ensure_sex_state()
-            if "dress_override" in state:
-                return str(state.get("dress_override", "") or "")
-            return self.current_dress()
-
-        def scene_dress(self):
-            state = self.ensure_sex_state()
-            if "dress_override" in state:
-                return str(state.get("dress_override", "") or "")
-            return self.current_dress()
-
-        def scene_dress(self):
-            state = self.ensure_sex_state()
-            if "dress_override" in state:
-                return str(state.get("dress_override", "") or "")
-            return self.current_dress()
-
-        def scene_dress(self):
-            state = self.ensure_sex_state()
-            if "dress_override" in state:
-                return str(state.get("dress_override", "") or "")
-            return self.current_dress()
-
-        def scene_dress(self):
-            state = self.ensure_sex_state()
-            if "dress_override" in state:
-                return str(state.get("dress_override", "") or "")
-            return self.current_dress()
-
-        def scene_dress(self):
-            state = self.ensure_sex_state()
-            if "dress_override" in state:
-                return str(state.get("dress_override", "") or "")
-            return self.current_dress()
-
         def clothing_layer(self, layer):
             layer_key = str(layer or "").strip().lower()
             state = self.sex_clothing_state()
-            dress = self.current_dress()
+            dress = self.scene_dress()
             if layer_key == "top":
                 if people_to_int(state.get("top_removed", 0), 0):
                     return ""
@@ -1784,13 +1150,14 @@ init -1000 python:
             if layer_key not in ("top", "bottom", "bra", "panties"):
                 return ""
             removed = self.clothing_layer(layer_key)
-            self.sex_clothing_state()["%s_removed" % layer_key] = 1
+            self.ensure_sex_state()["%s_removed" % layer_key] = 1
             return removed
 
         def reset_sex_clothing_state(self):
-            state = self.sex_clothing_state()
+            state = self.ensure_sex_state()
             for key in ("top_removed", "bottom_removed", "bra_removed", "panties_removed", "top_raised", "bottom_raised"):
                 state[key] = 0
+            state.pop("dress_override", None)
             return self
 
         def tits_visible(self):
@@ -1803,7 +1170,7 @@ init -1000 python:
             return self.clothing_layer("panties") == "" and not self.layer_raised("bottom") and self.clothing_slut("bottom") >= 4
 
         def record_lick_pussy(self):
-            state = self.sex_clothing_state()
+            state = self.ensure_sex_state()
             state["lick_pussy"] = people_to_int(state.get("lick_pussy", 0), 0) + 1
             return state["lick_pussy"]
 
@@ -1846,7 +1213,7 @@ init -1000 python:
         def last_decision_reaction(self, action_name=""):
             action_key = str(action_name or "").strip().lower()
             if action_key:
-                return dict(GirlDecisionLast.get("%s:%s" % (self.code_name, action_key), {}) or {})
+                return dict(self.var.get("decision_results", {}).get(action_key, {}) or {})
             if isinstance(getattr(self, "reaction_log", None), list) and self.reaction_log:
                 return dict(self.reaction_log[-1])
             return {}
@@ -1862,227 +1229,30 @@ init -1000 python:
                 self.change_mana(-1, mana_reason)
             return score
 
-    def _register_people_lists():
-        """Fill girls / secondary_npcs from peopleInfo after registrations."""
-        global girls, secondary_npcs
-        if not isinstance(girls, list):
-            girls = []
-        if not isinstance(secondary_npcs, list):
-            secondary_npcs = []
-        try:
-            pinfo = peopleInfo if isinstance(peopleInfo, dict) else {}
-            girl_keys = set([people_normalize_id(row) for row in list(getattr(renpy.store, "AllGirlNames", []) or [])])
-            secondary_keys = set([people_normalize_id(row) for row in list(getattr(renpy.store, "SECONDARY_NPC_KEYS", []) or [])])
-            for key, info in pinfo.items():
-                norm_key = people_normalize_id(key)
-                if (norm_key in girl_keys or isinstance(info, Girl)) and info not in girls:
-                    girls.append(info)
-                elif (norm_key in secondary_keys or (isinstance(info, BaseNPC) and not isinstance(info, Girl))) and info not in secondary_npcs:
-                    secondary_npcs.append(info)
-        except Exception:
-            pass
-        return girls, secondary_npcs
+default people = PeopleRegistry()
 
 # Normal init python for the remaining runtime helpers (classes + core helpers already defined early above in this same file).
 init python:
-    def people_known_ids_from_current_state():
-        keys = set()
-        if isinstance(peopleData, dict):
-            keys.update([people_normalize_id(row) for row in list(peopleData.keys())])
-        if isinstance(peopleInfo, dict):
-            keys.update([people_normalize_id(row) for row in list(peopleInfo.keys())])
-        try:
-            keys.update([people_normalize_id(row) for row in list(AllGirlNames)])
-        except Exception:
-            pass
-        return sorted([row for row in keys if row])
-
-    def people_portrait_for(person):
-        key = people_normalize_id(person)
-        try:
-            return str(girl_card_portrait_path(key) or "")
-        except Exception:
-            return ""
-
-    def build_people_dataset_from_current_state():
-        dataset = {}
-
-        for person in people_known_ids_from_current_state():
-            existing_data = peopleData.get(person, None) if isinstance(peopleData, dict) else None
-            if isinstance(existing_data, PeopleData):
-                dataset[person] = existing_data
-                continue
-            try:
-                schedule_entries = npc_schedule_list(person)
-            except Exception:
-                schedule_entries = []
-            dataset[person] = {
-                "name": person,
-                "cname": person,
-                "fullname": person,
-                "genitive": person,
-                "dative": person,
-                "portrait": people_portrait_for(person),
-                "birth_date": {},
-                "default_location": str(people_initial_location(person) or ""),
-                "description": "",
-                "schedule_entries": schedule_entries,
-                "gift_preferences": [],
-            }
-
-        return dataset
-
-    def loadPeopleData(idata=None):
-        rows = idata if idata is not None else build_people_dataset_from_current_state()
-        if isinstance(rows, dict) and "people" in rows:
-            rows = rows.get("people", {})
-        loaded = {}
-        if isinstance(rows, dict):
-            iterable = rows.items()
-        else:
-            iterable = [(row.get("name", ""), row) for row in list(rows or []) if isinstance(row, dict)]
-        for name, payload in iterable:
-            key = people_normalize_id(name)
-            if not key:
-                continue
-            if isinstance(payload, PeopleData):
-                payload.name = key
-                loaded[key] = payload
-            else:
-                loaded[key] = PeopleData.from_dict(key, payload)
-        return loaded
-
-    def initPeople(idata=None):
-        global peopleData, peopleInfo
-        existing_people_data = peopleData if isinstance(peopleData, dict) else {}
-        loaded_people_data = loadPeopleData(idata)
-        for person, data in list(existing_people_data.items()):
-            if isinstance(data, PeopleData) and data.__class__ is not PeopleData:
-                loaded_people_data[people_normalize_id(person)] = data
-        peopleData = loaded_people_data
-        if not isinstance(peopleInfo, dict):
-            peopleInfo = {}
-
-        for person in sorted(peopleData.keys()):
-            info = peopleInfo.get(person, None)
-            if isinstance(info, PeopleInfo):
-                info.name = person
-                info.update()
-            else:
-                info = PeopleInfo(person)
-            peopleInfo[person] = info
-
-        # Populate canonical girls + secondary_npcs lists (defined in the early block above in this same file)
-        try:
-            _register_people_lists()
-        except Exception:
-            pass
-        # Also direct append for anything that registered itself in its Init*.rpy
-        try:
-            if isinstance(girls, list):
-                for k, info in peopleInfo.items():
-                    if isinstance(info, Girl) and info not in girls:
-                        girls.append(info)
-            if isinstance(secondary_npcs, list):
-                for k, info in peopleInfo.items():
-                    if isinstance(info, BaseNPC) and not isinstance(info, Girl) and info not in secondary_npcs:
-                        secondary_npcs.append(info)
-        except Exception:
-            pass
-
-        return peopleInfo
-
-    def getPersonData(person=""):
-        key = people_normalize_id(person)
-        if not key:
-            return None
-        if isinstance(peopleData, dict):
-            return peopleData.get(key, None)
-        return None
-
-    def getPersonInfo(person=""):
-        key = people_normalize_id(person)
-        if not key:
-            return None
-        info = peopleInfo.get(key, None) if isinstance(peopleInfo, dict) else None
-        if isinstance(info, PeopleInfo):
-            return info.update()
-        return None
-
-    def people_sync_person(person=""):
-        key = people_normalize_id(person)
-        if not key:
-            return None
-        info = peopleInfo.get(key, None) if isinstance(peopleInfo, dict) else None
-        if isinstance(info, PeopleInfo):
-            return info.update()
-        return None
-
-    def people_sync_all():
-        if isinstance(peopleInfo, dict):
-            for person in list(peopleInfo.keys()):
-                people_sync_person(person)
-            _register_people_lists()
-        return peopleInfo
-
     def people_reset_daily_interactions(names=None):
-        if not isinstance(peopleInfo, dict):
-            return peopleInfo
         if names is None:
-            reset_names = set([people_normalize_id(row) for row in list(peopleInfo.keys())])
+            reset_names = set(people.ids())
         else:
             reset_names = set([people_normalize_id(row) for row in list(names or [])])
         for person in sorted([row for row in reset_names if row]):
-            info = peopleInfo.get(person, None)
+            info = people.get_info(person)
             if isinstance(info, PeopleInfo):
                 info.reset_daily(True)
-        return peopleInfo
+        return people
 
     def people_display_name(person=""):
-        data = getPersonData(person)
+        data = people.get_data(person)
         if data is not None:
             return str(data.cname or data.fullname or data.name)
         return people_normalize_id(person)
 
     def people_name(person="", grammatical_case="nominative", fallback=""):
         key = people_normalize_id(person)
-        data = getPersonData(key)
-        if data is None:
-            return str(fallback or key)
-        case_key = str(grammatical_case or "nominative").strip().lower()
-        if case_key == "genitive":
-            return str(data.genitive or data.fullname or data.cname or key)
-        if case_key == "dative":
-            return str(data.dative or data.fullname or data.cname or key)
-        return str(data.cname or data.fullname or key)
-
-    def people_name(person="", grammatical_case="nominative", fallback=""):
-        key = people_normalize_id(person)
-        data = getPersonData(key)
-        if data is None:
-            return str(fallback or key)
-        case_key = str(grammatical_case or "nominative").strip().lower()
-        if case_key == "genitive":
-            return str(data.genitive or data.fullname or data.cname or key)
-        if case_key == "dative":
-            return str(data.dative or data.fullname or data.cname or key)
-        return str(data.cname or data.fullname or key)
-
-    def people_name(person="", grammatical_case="nominative", fallback=""):
-        key = people_normalize_id(person)
-        data = getPersonData(key)
-        if data is None:
-            return str(fallback or key)
-        case_key = str(grammatical_case or "nominative").strip().lower()
-        if case_key == "genitive":
-            return str(data.genitive or data.fullname or data.cname or key)
-        if case_key == "dative":
-            return str(data.dative or data.fullname or data.cname or key)
-        return str(data.cname or data.fullname or key)
-
-    def people_name(person="", grammatical_case="nominative", fallback=""):
-        key = people_normalize_id(person)
-        data = getPersonData(key)
+        data = people.get_data(key)
         if data is None:
             return str(fallback or key)
         case_key = str(grammatical_case or "nominative").strip().lower()
@@ -2093,29 +1263,19 @@ init python:
         return str(data.cname or data.fullname or key)
 
     def people_age(person="", fallback=0):
-        data = getPersonData(person)
+        data = people.get_data(person)
         if data is None:
             return people_to_int(fallback, 0)
-        age_value = data.age(calendar_v2.cycle, calendar_v2.period, calendar_v2.day)
+        age_value = data.age_years()
         return people_to_int(age_value, fallback)
 
     def people_birth_date(person=""):
-        data = getPersonData(person)
+        data = people.get_data(person)
         return dict(data.birth_date or {}) if data is not None else {}
 
     def people_gift_preferences(person=""):
-        data = getPersonData(person)
+        data = people.get_data(person)
         return list(data.gift_preferences or []) if data is not None else []
-
-    def people_known_ids():
-        if isinstance(peopleInfo, dict):
-            return sorted([people_normalize_id(row) for row in list(peopleInfo.keys()) if people_normalize_id(row)])
-        return []
-
-label InitPeople:
-    $ initPeople()
-    return
-
 
 label InitGameNPCs:
     call InitSandra
@@ -2127,25 +1287,18 @@ label InitGameNPCs:
     call InitGeorgett
     call InitLiza
     call InitInga
-    call register_inga_secondary
-    $ init_secondary_npc_profiles()
-    call register_inga_secondary
-    $ init_secondary_npc_profiles()
-    call InitRobin
-    call InitZimmer
-    call InitEddie
+    call register_robin_secondary
+    call register_zimmer_secondary
+    call register_eddie_secondary
     call register_alber_secondary
-    call InitFrancheska
+    call register_francheska_secondary
     call register_luisa_secondary
     call register_sergio_secondary
     call register_gerhard_secondary
-    call register_lucas_secondary
-    call register_clara_fiance_secondary
-    call register_sergio_pet_secondary
-    call InitDraupnir
-    call InitMongol
+    call register_draupnir_secondary
+    call register_mongol_secondary
     call InitDog
     call InitWerecat
-    $ initPeople()
+    $ people.repair()
     $ npc_interval_schedule_load_all(True)
     return

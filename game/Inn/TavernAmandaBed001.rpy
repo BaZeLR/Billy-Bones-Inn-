@@ -2,9 +2,6 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    def tavern_amanda_bed_action_available():
-        return time >= 4 and player.intimacy.came_today < player.intimacy.can_cum_daily
-
     TavernAmandaBedObject = GameObject(
         object_id="bed_002",
         name="Кровать",
@@ -16,7 +13,7 @@ init python:
                 hook="call",
                 target="checkTriggers",
                 args=("TavernAmandaRoom", "amanda_grope", 0),
-                condition=tavern_amanda_bed_action_available,
+                condition=AmandaRoomNightApproach.canTrigger,
             ),
             ObjectAction(
                 action_id="examine_bed",

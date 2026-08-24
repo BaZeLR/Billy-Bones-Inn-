@@ -2,6 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label GirlSuggestDressFunc(GirlName="", DressToBuy="", ShowOffLevel=-1, DressBuyIsRelative=-1):
+    $ renpy.dynamic("_rn", "_rn2", "_rn3")
     if str(GirlName or "") == "" or str(DressToBuy or "") == "":
         return
 
@@ -13,11 +14,11 @@ label GirlSuggestDressFunc(GirlName="", DressToBuy="", ShowOffLevel=-1, DressBuy
     if DressBuyIsRelative < 0:
         $ DressBuyIsRelative = _gds_relative_type(GirlName)
 
-    $ _rn = _gds_name("RealName", GirlName)
-    $ _rn2 = _gds_name("RealName2", GirlName)
-    $ _rn3 = _gds_name("RealName3", GirlName)
+    $ _rn = people_display_name(GirlName)
+    $ _rn2 = people_name(GirlName, 'genitive')
+    $ _rn3 = people_name(GirlName, 'dative')
 
-    $ GirlDressBlock = 1
+    $ dress_shop.girl_dress_block = 1
 
     menu:
         "Подождать, пока Ирма снимет мерку":
@@ -27,7 +28,7 @@ label GirlSuggestDressFunc(GirlName="", DressToBuy="", ShowOffLevel=-1, DressBuy
         "Пройти вместе с девушками за занавеску":
             '[_rn] взяла образец и пошла за занавеску. Ирма собрала свои булавки, мелки, мерные веревочки и поспешила за ней. Вы, в свою очередь, подумали, что сидеть в одиночестве будет скучновато, и решили присоединиться к их компании.'
             'По хозяйски отодвинув ширмочку, вы увидели Ирму с булавками в зубах и веревкой в руках, а напротив нее стояла уже начавшая раздеваться [_rn].'
-            if str(_gds_get_dict("bra").get(GirlName, "") or "") != "":
+            if people.get_info(GirlName).clothing_layer("bra") != "":
                 'Шнуровка верха платья уже была распущена, открыв вам ее груди, прикрытые, впрочем, лифом.'
             else:
                 'Шнуровка верха платья уже была распущена, открыв вам ее голые груди с торчащими от холода сосочками.'
@@ -51,7 +52,7 @@ label GirlSuggestDressFunc(GirlName="", DressToBuy="", ShowOffLevel=-1, DressBuy
                                 '"Так получается? Знаешь что, ищи себе других, а я не такая!"'
                             '"Да пошел ты!" И с этими словами [_rn] одним движением застегнула платье и была такова.'
                             call SlutFriendsIncrease(GirlName, 6, 1, -3, 20, 1, -3)
-                            jump ArtisansQuarter
+                            return
                         else:
                             '"Ой, ну ладно," глупо засмеялась [_rn]. "От меня не убудет, коли тебе покажу. А платьичко новенькое такое хорошенькое. Смотри, если хочешь!"'
                             call GirlDressBuyShowInside(GirlName, DressToBuy, ShowOffLevel, DressBuyIsRelative)
@@ -73,30 +74,31 @@ label GirlSuggestDressFunc(GirlName="", DressToBuy="", ShowOffLevel=-1, DressBuy
 
 label GirlDressBuyPay(GirlName="", DressToBuy=""):
     if str(GirlName or "") == "" or str(DressToBuy or "") == "":
-        jump ArtisansQuarter
+        return
 
     $ _gds_apply_purchase(GirlName, DressToBuy, set_produced=True)
-    jump ArtisansQuarter
+    return
 
 
 label GirlDressBuyPregRemark(GirlName=""):
     if str(GirlName or "") == "":
         return
 
-    if int(_gds_get_dict("pregnancy").get(GirlName, 0) or 0) > 120:
-        'Ирма обратила внимание на то, что клиентка находится в положении. "От мужа или нагуляла?" спросила она у покрасневшей [_gds_name("RealName2", GirlName)].'
+    if people.get_info(GirlName) is not None and people.get_info(GirlName).pregnancy_days() > 120:
+        'Ирма обратила внимание на то, что клиентка находится в положении. "От мужа или нагуляла?" спросила она у покрасневшей [people_name(GirlName, 'genitive')].'
         '"То беда небольшая, у всех моих платьев талия шнуровкой меняется. Сейчас чуть распустим, потом затянем."'
-        $ Irma.var["KnowInfertility"] = max(int(Irma.var.get("KnowInfertility", 0) or 0), 1)
+        $ Irma.infertility_known = True
 
     return
 
 
 label GirlDressBuyWaitPay(GirlName="", DressToBuy=""):
+    $ renpy.dynamic("_rn", "_rn2")
     if str(GirlName or "") == "" or str(DressToBuy or "") == "":
         return
 
-    $ _rn = _gds_name("RealName", GirlName)
-    $ _rn2 = _gds_name("RealName2", GirlName)
+    $ _rn = people_display_name(GirlName)
+    $ _rn2 = people_name(GirlName, 'genitive')
 
     'Минут пять-десять вы терпеливо слушали ойканье, хихиканье и прочие звуки, доносящиеся из-за ширмочки. Но вот наконец [_rn] выпорхнула обратно, сказав: "Стефанчик, ты просто прелесть! Ирмочка говорит, что мое платье будет готово уже завтра. Я так рада!"'
     'К вашему разочарованию, благодарность [_rn2] этими словами и ограничилась, по крайней мере на данный момент: довольная девица быстрым и легким шагом направилась к выходу, оставив вас расплачиваться.'
@@ -108,11 +110,12 @@ label GirlDressBuyWaitPay(GirlName="", DressToBuy=""):
 
 
 label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBuyIsRelative=0):
+    $ renpy.dynamic("_rn", "_rn2")
     if str(GirlName or "") == "" or str(DressToBuy or "") == "":
         return
 
-    $ _rn = _gds_name("RealName", GirlName)
-    $ _rn2 = _gds_name("RealName2", GirlName)
+    $ _rn = people_display_name(GirlName)
+    $ _rn2 = people_name(GirlName, 'genitive')
 
     if DressBuyIsRelative == 1:
         '"А тебе не стыдно так на меня пялиться?" продолжила она, чуть помедлив. "Совсем нет, Сандра, я просто восхищаюсь, какая ты красивая," ловко парировали вы.'
@@ -125,9 +128,9 @@ label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBu
 
     'С помощью загадочно улыбающейся Ирмы, платье было наконец снято.'
 
-    if str(_gds_get_dict("panties").get(GirlName, "") or "") == "":
+    if people.get_info(GirlName).clothing_layer("panties") == "":
         'Панталончиков под ним не оказалось.'
-        if (int(getPersonInfo(GirlName).corruption or 0) > 49 and int(getPersonInfo(GirlName).sex_stat("sexacts", 0) or 0) > 0) or int(getPersonInfo(GirlName).corruption or 0) > 62:
+        if (int(people.get_info(GirlName).corruption or 0) > 49 and int(people.get_info(GirlName).sex_stat("sexacts", 0) or 0) > 0) or int(people.get_info(GirlName).corruption or 0) > 62:
             'Впрочем, [_rn] ничуть не смутилась от такой мелочи. Она поймала ваш похотливый взгляд, улыбнулась и сказала: "Что, нравится? Смотри!"'
             if DressBuyIsRelative == 1:
                 '"Вот что значит доверие в доме!" добавила разбитная Сандра.'
@@ -153,7 +156,7 @@ label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBu
                     '"Ах, вот зачем ты меня сюда привел! Чтобы я тебе представление устроила?" возмутилась [_rn].'
                 '"Ноги моей здесь не будет!" и с этими словами она быстро накинула на себя платье и вылетела из примерочной.'
                 call SlutFriendsIncrease(GirlName, 4, 1, -2, 20, 1, -3)
-                jump ArtisansQuarter
+                return
             else:
                 if int(Irma.rel or 0) < 4:
                     '"Знаете что, молодой человек, вы мне своими глупостями мешаете нормально работать. Посидите пока снаружи," сказала вам Ирма.'
@@ -162,9 +165,9 @@ label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBu
                             'Делать нечего, вы покинули примерочную и стали ждать.'
                             call GirlDressBuyWaitPay(GirlName, DressToBuy)
 
-                        "Предложить на чай 10 мараведи" if int(getattr(store, "money", 0) or 0) >= 10:
+                        "Предложить на чай 10 мараведи" if int(player.economy.money or 0) >= 10:
                             '"Слушай, зачем сразу уходить? Может мои скромные чаевые компенсируют неудобства," сказали вы и протянули Ирме 10 мараведи.'
-                            $ money -= 10
+                            $ player.spend_money(10)
                             call SlutFriendsIncrease("irma", 5, 2, 1, 0, 0, 0)
                             call GirlDressBuyJerkoff(GirlName, DressToBuy, DressBuyIsRelative)
                 else:
@@ -175,11 +178,12 @@ label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBu
 
 
 label GirlDressBuyJerkoff(GirlName="", DressToBuy="", DressBuyIsRelative=0):
+    $ renpy.dynamic("_rn", "_rn2")
     if str(GirlName or "") == "" or str(DressToBuy or "") == "":
         return
 
-    $ _rn = _gds_name("RealName", GirlName)
-    $ _rn2 = _gds_name("RealName2", GirlName)
+    $ _rn = people_display_name(GirlName)
+    $ _rn2 = people_name(GirlName, 'genitive')
 
     call SlutFriendsIncrease("irma", 10, 1, 1, 50, 2, 1)
     call SlutFriendsIncrease(GirlName, 16, 1, 1, 60, 1, 1)
@@ -198,7 +202,7 @@ label GirlDressBuyJerkoff(GirlName="", DressToBuy="", DressBuyIsRelative=0):
         "Продолжить свое грязное занятие":
             'Вы продолжали наяривать свой член все то время, пока Ирма снимала мерку. Но все хорошее быстро заканчивается: Ирма закончила свои измерения, а вы... просто кончили.'
 
-            if int(_gds_get_dict("HadSex").get(GirlName, 0) or 0) > 0 and procedural_randint(1, 2, key="procedural:NPC/Girls/Common/GirlSuggestDressFunc.rpy:procedural_randint:202:1") == 1:
+            if int(people.get_info(GirlName).sex_stat("sexacts", 0) or 0) > 0 and procedural_randint(1, 2, key="procedural:NPC/Girls/Common/GirlSuggestDressFunc.rpy:procedural_randint:202:1") == 1:
                 'В последний момент [_rn] быстро наклонилась и обхватила губами головку вашего члена. Вы разрядились ей прямо в ротик.'
                 call PregnancyCheck(GirlName, "mouth", 1, "Вы")
                 call SlutFriendsIncrease(GirlName, 15, 2, 1, 50, 1, 1)
@@ -209,7 +213,7 @@ label GirlDressBuyJerkoff(GirlName="", DressToBuy="", DressBuyIsRelative=0):
             else:
                 'Основной поток приземлился на лице [_rn2], немного попало на Ирму. Однако драму предотвратила обходительная Ирма, немедленно доставшая полотенце и воду.'
                 call PregnancyCheck(GirlName, "face", 1, "Вы")
-                $ _gds_get_dict("CumFaceYou")[GirlName] = 0
+                $ people.get_info(GirlName).set_cum_state("cum_face_you", 0)
                 call SlutFriendsIncrease(GirlName, 6, 2, -1, 45, 1, 1)
 
             'Получив заверения Ирмы что платье будет готово к завтрашнему утру, вы отправились восвояси.'
@@ -218,11 +222,12 @@ label GirlDressBuyJerkoff(GirlName="", DressToBuy="", DressBuyIsRelative=0):
     return
 
 
-label GirlDressBuyShowOutside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBuyIsRelative=0):
+label GirlDressBuyShowOutside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBuyIsRelative=0, rand_var=0):
+    $ renpy.dynamic("_rn")
     if str(GirlName or "") == "" or str(DressToBuy or "") == "":
         return
 
-    $ _rn = _gds_name("RealName", GirlName)
+    $ _rn = people_display_name(GirlName)
 
     '"Примерить прямо на месте? А почему бы и нет," с готовностью отозвалась [_rn].'
     if DressBuyIsRelative == 1:
@@ -234,27 +239,27 @@ label GirlDressBuyShowOutside(GirlName="", DressToBuy="", ShowOffLevel=0, DressB
 
     '"Желание клиента для меня закон," отозвалась Ирма. Приободренная этими словами, [_rn] начала распускать шнуровку на платье.'
 
-    if str(_gds_get_dict("bra").get(GirlName, "") or "") == "" and str(_gds_get_dict("panties").get(GirlName, "") or "") == "":
+    if people.get_info(GirlName).clothing_layer("bra") == "" and people.get_info(GirlName).clothing_layer("panties") == "":
         'Вскоре она осталась чем мать родила.'
-    elif str(_gds_get_dict("panties").get(GirlName, "") or "") == "":
+    elif people.get_info(GirlName).clothing_layer("panties") == "":
         'Вскоре она осталась выше пояса в одном лифчике.'
-    elif str(_gds_get_dict("bra").get(GirlName, "") or "") == "":
+    elif people.get_info(GirlName).clothing_layer("bra") == "":
         'Вскоре она осталась в одних панталончиках.'
     else:
         'Вскоре она осталась в нижнем белье.'
 
     call GirlDressBuyPregRemark(GirlName)
 
-    $ RandVar = procedural_randint(1, 5, key="procedural:NPC/Girls/Common/GirlSuggestDressFunc.rpy:procedural_randint:249:3")
-    if RandVar <= 3:
+    $ rand_var = procedural_randint(1, 5, key="procedural:NPC/Girls/Common/GirlSuggestDressFunc.rpy:procedural_randint:249:3")
+    if rand_var <= 3:
         'Ваше внимание привлек шум за окном: похоже, зрители у примерки все же нашлись.'
         call SlutFriendsIncrease(GirlName, 0, 1, 0, 57, 1, 1)
 
-    if RandVar == 1:
+    if rand_var == 1:
         'Какой-то пацаненок заглянул в окно и так и остался стоять с открытым от удивления ртом.'
-    elif RandVar == 2:
+    elif rand_var == 2:
         'Какой-то мужичок, по виду грузчик, стоял у окна и с интересом наблюдал за открывшимся зрелищем.'
-    elif RandVar == 3:
+    elif rand_var == 3:
         'Две монашки заглянули в окно, покачали головами и быстро удалились.'
 
     'Все хорошее имеет тенденцию быстро кончаться, закончилась и примерка. Бросив вам пару многозначительных взглядов, [_rn] оделась и отправилась восвояси, оставив вас расплачиваться.'

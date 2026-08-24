@@ -3,13 +3,13 @@
 # ================================================================================
 init 6 python:
     def forest_cave_picture():
-        if int(time or 0) >= 4 and renpy.loadable("images/forest/cave_night.png"):
+        if forest_after_dusk() and renpy.loadable("images/forest/cave_night.png"):
             return "images/forest/cave_night.png"
         if renpy.loadable("images/forest/cave_day.png"):
             return "images/forest/cave_day.png"
         return ""
 
-    ForestCaveRoom = Room(
+    ForestCaveRoomDefinition = Room(
         code_name="ForestCave",
         group_name=ROOM_GROUP_FOREST,
         display_name="Пещера",
@@ -36,25 +36,20 @@ init 6 python:
 
 
 label ForestCave:
-    $ CurrentRoom = ForestCaveRoom
-    $ CurLoc = "ForestCave"
-    $ scene_image = forest_cave_picture() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    else:
-        $ _layout_last_picture = ""
-    $ MainTxt = ForestCaveRoom.descriptions[0].text
-    $ CurLocDesc = MainTxt
-    $ forest_room_set_saved_text(MainTxt, CurrentRoom)
-    $ _forest_spawned = forest_room_spawn(ForestCaveRoom)
+    $ renpy.dynamic("_forest_spawned")
+    $ rooms.enter("ForestCave")
+    $ scene_runtime.picture = forest_cave_picture() or rooms.current.bg_picture or None
+    $ scene_runtime.text = rooms.get("ForestCave").descriptions[0].text
+    $ scene_runtime.location_text = scene_runtime.text
+    $ forest_room_set_saved_text(scene_runtime.text, rooms.current)
+    $ _forest_spawned = forest_room_spawn(rooms.get("ForestCave"))
     if len(_forest_spawned) > 0:
-        $ MainTxt = MainTxt + "\n\nДаже здесь можно отыскать кое-что съедобное или полезное."
-        $ CurLocDesc = MainTxt
-        $ forest_room_set_saved_text(MainTxt, CurrentRoom)
-    $ current_action_title = "Пещера"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_action_items = forest_subroom_action_items(CurrentRoom)
-    call screen main_ui
-    return
-
+        $ scene_runtime.text = scene_runtime.text + "\n\nДаже здесь можно отыскать кое-что съедобное или полезное."
+        $ scene_runtime.location_text = scene_runtime.text
+        $ forest_room_set_saved_text(scene_runtime.text, rooms.current)
+    $ main_ui_runtime.action_title = "Пещера"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.action_items = forest_subroom_action_items(rooms.current)
+    while True:
+        call screen main_ui

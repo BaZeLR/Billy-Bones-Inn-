@@ -1,129 +1,3 @@
-default SocialTalkTopicSeen = {}    def social_topic_return_label(girl_name=""):
-        key = social_topic_key(girl_name)
-        if key == "amanda":
-            return "IntAmandaTalk"
-        if key == "melissa":
-            return "IntMelissaTalk"
-        if key == "sandra":
-            return "IntSandraTalk"
-        if key == "clara":
-            return "IntClaraTalkMenu"
-        if key == "becky":
-            return "IntBeckyTalk"
-        if key == "irma":
-            return "IntIrmaTalkRefresh"
-        if key == "inga":
-            return "IntIngaTalk"
-        if key == "liza":
-            return "IntLizaTalkMenu"
-        if key == "georgett":
-            return "IntGeorgettTalkRefresh"
-        return ""
-    def social_topic_return_label(girl_name=""):
-        key = social_topic_key(girl_name)
-        if key == "amanda":
-            return "IntAmandaTalk"
-        if key == "melissa":
-            return "IntMelissaTalkRefresh"
-        if key == "sandra":
-            return "IntSandraTalk"
-        if key == "clara":
-            return "IntClaraTalkMenu"
-        if key == "becky":
-            return "IntBeckyTalk"
-        if key == "irma":
-            return "IntIrmaTalk"
-        if key == "inga":
-            return "IntIngaTalk"
-        if key == "liza":
-            return "IntLizaTalkMenu"
-        if key == "georgett":
-            return "IntGeorgettTalk"
-        return ""
-default SocialTalkTopicSeen = {}    def social_topic_return_label(girl_name=""):
-        key = social_topic_key(girl_name)
-        if key == "amanda":
-            return "IntAmandaTalk"
-        if key == "melissa":
-            return "IntMelissaTalk"
-        if key == "sandra":
-            return "IntSandraTalk"
-        if key == "clara":
-            return "IntClaraTalkMenu"
-        if key == "becky":
-            return "IntBeckyTalk"
-        if key == "irma":
-            return "IntIrmaTalkRefresh"
-        if key == "inga":
-            return "IntIngaTalk"
-        if key == "liza":
-            return "IntLizaTalkMenu"
-        if key == "georgett":
-            return "IntGeorgettTalkRefresh"
-        return ""
-    def social_topic_return_label(girl_name=""):
-        key = social_topic_key(girl_name)
-        if key == "amanda":
-            return "IntAmandaTalk"
-        if key == "melissa":
-            return "IntMelissaTalkRefresh"
-        if key == "sandra":
-            return "IntSandraTalk"
-        if key == "clara":
-            return "IntClaraTalkMenu"
-        if key == "becky":
-            return "IntBeckyTalk"
-        if key == "irma":
-            return "IntIrmaTalk"
-        if key == "inga":
-            return "IntIngaTalk"
-        if key == "liza":
-            return "IntLizaTalkMenu"
-        if key == "georgett":
-            return "IntGeorgettTalk"
-        return ""
-default SocialTalkTopicSeen = {}    def social_topic_return_label(girl_name=""):
-        key = social_topic_key(girl_name)
-        if key == "amanda":
-            return "IntAmandaTalk"
-        if key == "melissa":
-            return "IntMelissaTalk"
-        if key == "sandra":
-            return "IntSandraTalk"
-        if key == "clara":
-            return "IntClaraTalkMenu"
-        if key == "becky":
-            return "IntBeckyTalk"
-        if key == "irma":
-            return "IntIrmaTalkRefresh"
-        if key == "inga":
-            return "IntIngaTalk"
-        if key == "liza":
-            return "IntLizaTalkMenu"
-        if key == "georgett":
-            return "IntGeorgettTalkRefresh"
-        return ""
-    def social_topic_return_label(girl_name=""):
-        key = social_topic_key(girl_name)
-        if key == "amanda":
-            return "IntAmandaTalk"
-        if key == "melissa":
-            return "IntMelissaTalkRefresh"
-        if key == "sandra":
-            return "IntSandraTalk"
-        if key == "clara":
-            return "IntClaraTalkMenu"
-        if key == "becky":
-            return "IntBeckyTalk"
-        if key == "irma":
-            return "IntIrmaTalk"
-        if key == "inga":
-            return "IntIngaTalk"
-        if key == "liza":
-            return "IntLizaTalkMenu"
-        if key == "georgett":
-            return "IntGeorgettTalk"
-        return ""
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -209,7 +83,7 @@ init -39 python:
     }
 
     def social_person_info(girl_name=""):
-        return getPersonInfo(social_topic_key(girl_name))
+        return people.get_info(social_topic_key(girl_name))
 
     def social_rel_value(girl_name=""):
         info = social_person_info(girl_name)
@@ -487,13 +361,25 @@ init -39 python:
     def social_topic_seen_key(girl_name="", mode="talk", topic_id=""):
         return "%s:%s:%s:%s" % (int(current_game_day() or 0), social_topic_key(girl_name), str(mode or "talk").strip().lower(), str(topic_id or "").strip())
 
+    def social_topic_seen_state(girl_name=""):
+        info = social_person_info(girl_name)
+        if info is None:
+            return {}
+        if not isinstance(info.var, dict):
+            info.var = {}
+        state = info.var.get("social_topic_seen", None)
+        if not isinstance(state, dict):
+            state = {}
+            info.var["social_topic_seen"] = state
+        return state
+
     def social_topic_already_seen(girl_name="", mode="talk", topic_id=""):
-        return social_topic_seen_key(girl_name, mode, topic_id) in dict(SocialTalkTopicSeen or {})
+        return social_topic_seen_key(girl_name, mode, topic_id) in social_topic_seen_state(girl_name)
 
     def social_topic_seen_count(girl_name="", mode="talk"):
         prefix = "%s:%s:%s:" % (int(current_game_day() or 0), social_topic_key(girl_name), str(mode or "talk").strip().lower())
         count = 0
-        for seen_key in list(dict(SocialTalkTopicSeen or {}).keys()):
+        for seen_key in list(social_topic_seen_state(girl_name).keys()):
             if str(seen_key or "").startswith(prefix):
                 count += 1
         return count
@@ -504,7 +390,7 @@ init -39 python:
     def social_talk_positive_score_today(girl_name=""):
         prefix = "%s:%s:talk:" % (int(current_game_day() or 0), social_topic_key(girl_name))
         total = 0
-        for seen_key, seen_value in dict(SocialTalkTopicSeen or {}).items():
+        for seen_key, seen_value in social_topic_seen_state(girl_name).items():
             if str(seen_key or "").startswith(prefix):
                 total += max(0, int(seen_value or 0))
         return total
@@ -516,11 +402,11 @@ init -39 python:
         stat_key = str(stat_name or "").strip().lower()
         try:
             if stat_key == "charisma":
-                return int(charisma or 0)
+                return int(player_charisma_breakdown().get("charisma", 0) or 0)
             if stat_key == "look":
-                return int(look or 0)
+                return int(player_look_breakdown().get("look", 0) or 0)
             if stat_key == "reputation":
-                return int(reputation or 0)
+                return int(player_reputation_breakdown().get("reputation", 0) or 0)
             if stat_key == "exploration":
                 return int(effective_player_exploration() or 0)
         except Exception:
@@ -564,7 +450,7 @@ init -39 python:
         return profile
 
     def social_favorite_topic_ids(girl_name=""):
-        info = getPersonInfo(girl_name)
+        info = people.get_info(girl_name)
         preferences = getattr(info, "talk_preferences", {}) if info is not None else {}
         return [str(row or "").strip() for row in list(dict(preferences or {}).get("favorite_topics", []) or []) if str(row or "").strip()]
 
@@ -575,10 +461,7 @@ init -39 python:
         if key == "":
             return False
         if key == "clara" and mode_key == "flirt":
-            try:
-                if not Clara.can_start_social_events():
-                    return False
-            except Exception:
+            if not Clara.can_start_social_events():
                 return False
         if mode_key == "talk" and social_talk_session_remaining(key) <= 0:
             return False
@@ -690,7 +573,7 @@ init -39 python:
         if mode_key == "talk" and score > 0:
             score = min(score, social_talk_positive_score_remaining(key))
         if mode_key == "flirt":
-            apply_social_interaction_base(key, "flirt", score, 2 if score > 0 else 0, 30, 1, 1, 0, 0, True)
+            apply_social_interaction_base(key, "flirt", score, 2 if score > 0 else 0, 30, 1, 1, 0, 0)
             if score > 0:
                 info = social_person_info(key)
                 if info is not None:
@@ -703,15 +586,15 @@ init -39 python:
             talk_already_today = social_talked_today_value(key) > 0
             talk_minutes = 0 if talk_already_today else 30
             talk_today_delta = 0 if talk_already_today else 1
-            apply_social_interaction_base(key, "talk", score, 1, talk_minutes, 1, 0, 0, talk_today_delta, True)
+            apply_social_interaction_base(key, "talk", score, 1, talk_minutes, 1, 0, 0, talk_today_delta)
             if score > 0:
                 info = social_person_info(key)
                 if info is not None:
                     info.change_social(open_delta=max(1, score // 2))
         actual_score = social_score_delta_for(key, friends_before)
-        SocialTalkTopicSeen[social_topic_seen_key(key, mode_key, topic_key)] = score
+        social_topic_seen_state(key)[social_topic_seen_key(key, mode_key, topic_key)] = score
         try:
-            info = getPersonInfo(key)
+            info = people.get_info(key)
             if info is not None and mode_key == "talk":
                 info.talkToday.add(topic_key)
         except Exception:
@@ -803,33 +686,21 @@ init -39 python:
         item_key = str(item_id or "").strip()
         if key == "":
             return False
-        try:
-            info = getPersonInfo(key)
-            if info is not None and hasattr(info, "social_action_allowed"):
-                if not info.social_action_allowed(action_key, item_key):
-                    return False
-        except Exception:
-            pass
+        info = people.get_info(key)
+        if info is not None and hasattr(info, "social_action_allowed"):
+            if not info.social_action_allowed(action_key, item_key):
+                return False
         if key == "melissa" and action_key in ("flirt", "gift", "share"):
             if action_key in ("gift", "share") and social_flirted_today_value(key) <= 0:
                 return False
-            try:
-                return bool(melissa_relationship_allows(key, action_key))
-            except Exception:
-                return False
+            return bool(Melissa.relationship_allows(action_key))
         if key == "clara":
             if action_key == "flirt":
-                try:
-                    return bool(Clara.can_start_social_events()) and social_external_requirement_met(key, "flirt")
-                except Exception:
-                    return False
+                return bool(Clara.can_start_social_events()) and social_external_requirement_met(key, "flirt")
             if action_key == "gift":
                 if social_flirted_today_value(key) <= 0:
                     return False
-                try:
-                    return bool((Clara.can_receive_gifts() or Clara.has_caught_cat_gift()) and Clara.has_giftable_entries())
-                except Exception:
-                    return False
+                return bool((Clara.can_receive_gifts() or Clara.has_caught_cat_gift()) and Clara.has_giftable_entries())
             if action_key == "share":
                 if social_flirted_today_value(key) <= 0:
                     return False
@@ -846,121 +717,72 @@ init -39 python:
         allowed, reason = relationship_social_action_allowed(key, action_key, item_key)
         return bool(allowed)
 
-    def social_core_action_items(girl_name="", return_label=""):
-        key = social_topic_key(girl_name)
-        ret = str(return_label or social_topic_return_label(key) or "").strip()
-        items = []
-        if social_has_visible_topics(key, "talk"):
-            items.append(MenuItem("Поговорить о...", Call("SocialTalkTopicMenu", key, "talk", ret)))
-        if social_has_visible_topics(key, "flirt") and social_interaction_allowed_for_npc(key, "flirt"):
-            items.append(MenuItem("Флиртовать...", Call("SocialTalkTopicMenu", key, "flirt", ret)))
-        if social_gifted_today_value(key) == 0 and social_interaction_allowed_for_npc(key, "gift"):
-            if key == "clara":
-                items.append(MenuItem("Сделать Клариссе подарок", Call("IntClaraGiftMenu", key)))
-            else:
-                items.append(MenuItem("Подарить что-нибудь", Call("PlayerCardGiftToFixedTargetMenu", key)))
-            if player_card_has_shareable_items() and social_interaction_allowed_for_npc(key, "share"):
-                items.append(MenuItem("Поделиться угощением", Call("PlayerCardShareToFixedTargetMenu", key)))
-        return items
-
-
-    def social_core_action_items(girl_name="", return_label=""):
-        key = social_topic_key(girl_name)
-        ret = str(return_label or social_topic_return_label(key) or "").strip()
-        items = []
-        if social_has_visible_topics(key, "talk"):
-            items.append(MenuItem("Поговорить о...", Call("SocialTalkTopicMenu", key, "talk", ret)))
-        if social_has_visible_topics(key, "flirt") and social_interaction_allowed_for_npc(key, "flirt"):
-            items.append(MenuItem("Флиртовать...", Call("SocialTalkTopicMenu", key, "flirt", ret)))
-        if social_gifted_today_value(key) == 0 and social_interaction_allowed_for_npc(key, "gift"):
-            if key == "clara":
-                items.append(MenuItem("Сделать Клариссе подарок", Call("IntClaraGiftMenu", key)))
-            else:
-                items.append(MenuItem("Подарить что-нибудь", Call("PlayerCardGiftToFixedTargetMenu", key)))
-            if player_card_has_shareable_items() and social_interaction_allowed_for_npc(key, "share"):
-                items.append(MenuItem("Поделиться угощением", Call("PlayerCardShareToFixedTargetMenu", key)))
-        return items
-
-
-    def social_core_action_items(girl_name="", return_label=""):
-        key = social_topic_key(girl_name)
-        ret = str(return_label or social_topic_return_label(key) or "").strip()
-        items = []
-        if social_has_visible_topics(key, "talk"):
-            items.append(MenuItem("Поговорить о...", Call("SocialTalkTopicMenu", key, "talk", ret)))
-        if social_has_visible_topics(key, "flirt") and social_interaction_allowed_for_npc(key, "flirt"):
-            items.append(MenuItem("Флиртовать...", Call("SocialTalkTopicMenu", key, "flirt", ret)))
-        if social_gifted_today_value(key) == 0 and social_interaction_allowed_for_npc(key, "gift"):
-            if key == "clara":
-                items.append(MenuItem("Сделать Клариссе подарок", Call("IntClaraGiftMenu", key)))
-            else:
-                items.append(MenuItem("Подарить что-нибудь", Call("PlayerCardGiftToFixedTargetMenu", key)))
-            if player_card_has_shareable_items() and social_interaction_allowed_for_npc(key, "share"):
-                items.append(MenuItem("Поделиться угощением", Call("PlayerCardShareToFixedTargetMenu", key)))
-        return items
-
-
-    def social_core_action_items(girl_name="", return_label=""):
-        key = social_topic_key(girl_name)
-        ret = str(return_label or social_topic_return_label(key) or "").strip()
-        items = []
-        if social_has_visible_topics(key, "talk"):
-            items.append(MenuItem("Поговорить о...", Call("SocialTalkTopicMenu", key, "talk", ret)))
-        if social_has_visible_topics(key, "flirt") and social_interaction_allowed_for_npc(key, "flirt"):
-            items.append(MenuItem("Флиртовать...", Call("SocialTalkTopicMenu", key, "flirt", ret)))
-        if social_gifted_today_value(key) == 0 and social_interaction_allowed_for_npc(key, "gift"):
-            if key == "clara":
-                items.append(MenuItem("Сделать Клариссе подарок", Call("IntClaraGiftMenu", key)))
-            else:
-                items.append(MenuItem("Подарить что-нибудь", Call("PlayerCardGiftToFixedTargetMenu", key)))
-            if player_card_has_shareable_items() and social_interaction_allowed_for_npc(key, "share"):
-                items.append(MenuItem("Поделиться угощением", Call("PlayerCardShareToFixedTargetMenu", key)))
-        return items
-
-
-label SocialTalkTopicMenu(girl_name="", mode="talk", return_label=""):
+label SocialTalkTopicMenu(girl_name="", mode="talk", _social_girl="", _social_mode="", _social_parent_mode="", _social_visible_ids=None, _social_topic_id="", _social_result=None):
     $ _social_girl = social_topic_key(girl_name)
     $ _social_mode = str(mode or "talk").strip().lower()
-    $ main_ui_begin_talk_state("Разговор с %s" % _action_display_name(_social_girl), _social_girl)
-    $ main_ui_begin_talk_state("Разговор с %s" % _action_display_name(_social_girl), _social_girl)
-    $ _social_return = str(return_label or social_topic_return_label(_social_girl) or "").strip()
-    $ main_ui_begin_talk_state("Разговор с %s" % _action_display_name(_social_girl), _social_girl)
-    $ current_action_title = "О чем говорить" if _social_mode == "talk" else "Как флиртовать"
-    $ current_action_content = None
-    $ current_action_items = []
-    python:
-        _remaining_topics = social_talk_session_remaining(_social_girl) if _social_mode == "talk" else 999
-        for _topic in social_visible_topic_entries(_social_girl, _social_mode):
-            if _remaining_topics <= 0:
-                break
-            current_action_items.append(MenuItem(str(_topic.get("label", "") or ""), Call("SocialTalkTopicApply", _social_girl, _social_mode, str(_topic.get("id", "") or ""), _social_return)))
-            _remaining_topics -= 1
-        if len(current_action_items) <= 0:
-            if _social_mode == "talk" and social_talk_session_remaining(_social_girl) <= 0:
-                MainTxt = "На сегодня вы уже достаточно поговорили."
-            else:
-                MainTxt = "Сейчас подходящих тем нет."
-            CurLocDesc = MainTxt
-    if _social_return != "":
-        $ current_action_items.append(MenuItem("Назад", Call(_social_return, _social_girl)))
-    else:
-        $ current_action_items.append(MenuItem("Назад", Function(main_ui_end_talk_state)))
-    return
-
-
-label SocialTalkTopicApply(girl_name="", mode="talk", topic_id="", return_label=""):
-    $ _social_girl = social_topic_key(girl_name)
-    $ _social_return = str(return_label or social_topic_return_label(_social_girl) or "").strip()
-    $ _social_result = social_apply_topic(_social_girl, mode, topic_id)
-    $ MainTxt = str(_social_result.get("text", "") or "")
-    $ CurLocDesc = MainTxt
+    $ _social_parent_mode = str(main_ui_runtime.mode or "scene")
+    if _social_parent_mode != "talk":
+        $ main_ui_begin_talk_state("Разговор с %s" % _action_display_name(_social_girl), _social_girl)
+    $ _social_visible_ids = {str(row.get("id", "") or "") for row in social_visible_topic_entries(_social_girl, _social_mode)}
+    if not _social_visible_ids:
+        if _social_mode == "talk" and social_talk_session_remaining(_social_girl) <= 0:
+            $ scene_runtime.text = "На сегодня вы уже достаточно поговорили."
+        else:
+            $ scene_runtime.text = "Сейчас подходящих тем нет."
+        $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "О работе и распорядке" if _social_mode == "talk" and "job_routine" in _social_visible_ids:
+            $ _social_topic_id = "job_routine"
+        "Просто поболтать" if _social_mode == "talk" and "chat" in _social_visible_ids:
+            $ _social_topic_id = "chat"
+        "О танцах" if _social_mode == "talk" and "dances" in _social_visible_ids:
+            $ _social_topic_id = "dances"
+        "О слухах" if _social_mode == "talk" and "gossip" in _social_visible_ids:
+            $ _social_topic_id = "gossip"
+        "О лесе" if _social_mode == "talk" and "forest" in _social_visible_ids:
+            $ _social_topic_id = "forest"
+        "Послушать истории" if _social_mode == "talk" and "stories" in _social_visible_ids:
+            $ _social_topic_id = "stories"
+        "О еде" if _social_mode == "talk" and "food" in _social_visible_ids:
+            $ _social_topic_id = "food"
+        "Об одежде и внешности" if _social_mode == "talk" and "fashion" in _social_visible_ids:
+            $ _social_topic_id = "fashion"
+        "О деньгах" if _social_mode == "talk" and "money" in _social_visible_ids:
+            $ _social_topic_id = "money"
+        "О семье и доме" if _social_mode == "talk" and "family_life" in _social_visible_ids:
+            $ _social_topic_id = "family_life"
+        "Сказать игривую шутку" if _social_mode == "flirt" and "joke" in _social_visible_ids:
+            $ _social_topic_id = "joke"
+        "Мягко перейти к прикосновениям" if _social_mode == "flirt" and "kino" in _social_visible_ids:
+            $ _social_topic_id = "kino"
+        "Открыто заигрывать" if _social_mode == "flirt" and "flirt" in _social_visible_ids:
+            $ _social_topic_id = "flirt"
+        "Заговорить о близости" if _social_mode == "flirt" and "sex_topics" in _social_visible_ids:
+            $ _social_topic_id = "sex_topics"
+        "Мягко подразнить Аманду" if _social_mode == "flirt" and _social_girl == "amanda" and "amanda_tease" in _social_visible_ids:
+            $ _social_topic_id = "amanda_tease"
+        "Намекнуть на танцы и взгляды" if _social_mode == "flirt" and _social_girl == "amanda" and "amanda_dance_hint" in _social_visible_ids:
+            $ _social_topic_id = "amanda_dance_hint"
+        "Сблизиться без нажима" if _social_mode == "flirt" and _social_girl == "melissa" and "melissa_gentle" in _social_visible_ids:
+            $ _social_topic_id = "melissa_gentle"
+        "Намекнуть на укромное место" if _social_mode == "flirt" and _social_girl == "melissa" and "melissa_private_place" in _social_visible_ids:
+            $ _social_topic_id = "melissa_private_place"
+        "Сделать уважительный комплимент" if _social_mode == "flirt" and _social_girl == "sandra" and "sandra_respect" in _social_visible_ids:
+            $ _social_topic_id = "sandra_respect"
+        "Поблагодарить ее теплее обычного" if _social_mode == "flirt" and _social_girl == "sandra" and "sandra_warmth" in _social_visible_ids:
+            $ _social_topic_id = "sandra_warmth"
+        "Затеять светскую игру" if _social_mode == "flirt" and _social_girl == "clara" and "clara_clever_game" in _social_visible_ids:
+            $ _social_topic_id = "clara_clever_game"
+        "Говорить намеками" if _social_mode == "flirt" and _social_girl == "clara" and "clara_between_lines" in _social_visible_ids:
+            $ _social_topic_id = "clara_between_lines"
+        "Назад":
+            if _social_parent_mode != "talk":
+                $ main_ui_end_talk_state()
+            return
+    $ _social_result = social_apply_topic(_social_girl, _social_mode, _social_topic_id)
+    $ scene_runtime.text = str(_social_result.get("text", "") or "")
+    $ scene_runtime.location_text = scene_runtime.text
     $ update_stat_state()
-    if str(mode or "talk").strip().lower() == "talk" and social_talk_session_remaining(_social_girl) > 0 and social_has_visible_topics(_social_girl, "talk"):
-        call SocialTalkTopicMenu(_social_girl, "talk", _social_return)
-        return
-    if _social_return != "":
-        call expression _social_return pass (_social_girl)
+    if _social_parent_mode != "talk":
+        $ main_ui_end_talk_state()
     return
-
-
-

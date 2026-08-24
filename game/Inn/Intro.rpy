@@ -26,9 +26,11 @@ label Intro:
 
 К сожалению вы мало что понимаете в уборке, готовке и прочем. Но это не важно, ведь теперь вы управляете трактиром и должны руководить. Основную работу выполняет ваша команда: Сандра, Мелисса и Аманда. Ваше незавидное финансовое положение не позволяет вам пока нанять кого-то еще."""
 
-        MainTxt = _intro_notice + "\n\n" + _intro_story
+        rooms.enter("Intro")
+        scene_runtime.text = _intro_notice + "\n\n" + _intro_story
+        scene_runtime.location_text = scene_runtime.text
 
-    "[MainTxt]"
+    "[scene_runtime.text]"
 
     menu:
         "Приступить к управлению трактиром":
@@ -37,6 +39,7 @@ label Intro:
 
 
 label dev_after_report_checkpoint:
+    $ renpy.dynamic("revision")
     call InitGameNPCs
     call NextDay_NewDayEvents
     call CreateTavernEvents

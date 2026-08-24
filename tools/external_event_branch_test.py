@@ -143,51 +143,44 @@ testcase event_{safe_name}:
         threads = createThreads()
         initEvents()
         initStoryEventRuntime(True)
-        week = 7
-        time = 2
-        hour = 12
-        minute = 0
-        dayspassed = max(int(dayspassed or 0), 30)
-        exploration = max(int(exploration or 0), 250)
-        money = max(int(money or 0), 500)
+        calendar_v2.week = 7
+        calendar_v2.hour = 12
+        calendar_v2.minute = 0
+        calendar_v2.daysInGame = max(int(calendar_v2.daysInGame or 0), 30)
+        player.stats.exploration = max(int(player.stats.exploration or 0), 250)
+        player.set_money(max(int(player.economy.money or 0), 500))
         for _girl in ("amanda", "sandra", "melissa", "clara", "georgett", "liza", "becky"):
-            Friends[_girl] = max(int(Friends.get(_girl, 0) or 0), 20)
-            sluttiness[_girl] = max(int(sluttiness.get(_girl, 0) or 0), 20)
-            otkroven[_girl] = max(int(otkroven.get(_girl, 0) or 0), 20)
-            AskedToday[_girl] = 0
-        SandraVar["RoomUnlocked"] = 1
-        BedroomDoorStates["TavernSandraRoom"] = 0
-        MelissaVar["drawings_found"] = 1
-        MelissaVar["bats_episode"] = max(int(MelissaVar.get("bats_episode", 0) or 0), 8)
-        ClaraVar["tavern_melissa_visit_count"] = max(int(ClaraVar.get("tavern_melissa_visit_count", 0) or 0), 3)
-        ClaraVar["drawings_secret_known"] = 1
-        ClaraVar["paintings_melissa_asked"] = 1
-        ClaraVar["flirt"] = max(int(ClaraVar.get("flirt", 0) or 0), 1)
-        ClaraVar["comfort_pending"] = 1
-        ClaraVar["second_ask_unlocked"] = 1
-        ClaraVar["source_known"] = 1
-        ClaraVar["fiance_church_seen"] = 1
-        ClaraVar["fiance_barber_seen"] = 1
-        ClaraVar["commission_started"] = 1
-        ClaraVar["commission_followup_day"] = 0
-        ClaraVar["commission_followup_done"] = 1
-        ClaraVar["peek_done"] = 1
-        ClaraVar["confession_done"] = 1
-        ClaraVar["murder_day"] = 0
+            _girl_info = getPersonInfo(_girl)
+            _girl_info.rel = max(int(_girl_info.rel or 0), 20)
+            _girl_info.corruption = max(int(_girl_info.corruption or 0), 20)
+            _girl_info.openness = max(int(_girl_info.openness or 0), 20)
+            _girl_info.asked_today = 0
+        set_bedroom_door_locked("TavernSandraRoom", False)
+        Melissa.drawings_found = True
+        threads["melissaBatProblem"].advanceTo(8, complete_at_end=True)
+        Clara.drawings_secret_known = True
+        Clara.flirt_count = max(int(Clara.flirt_count or 0), 1)
+        Clara.commission_followup_day = 0
+        Clara.murder_day = 0
         werecat_state()["adopted"] = 1
         CurLoc = "TavernMain"
         location = CurLoc
         thread = None
+        thread_stage = None
         for _thread_name, _thread_info in dict(threads or {{}}).items():
-            for _trigger_group in list(getattr(getattr(_thread_info, "data", None), "triggers", []) or []):
+            for _thread_index, _trigger_group in enumerate(list(getattr(getattr(_thread_info, "data", None), "triggers", []) or [])):
                 for _evt in list(_trigger_group or []):
                     if str(getattr(_evt, "target", "") or "") == "{label_name}":
                         thread = _thread_info
+                        thread_stage = _thread_index
                         break
-                if event_runtime.active_thread is not None:
+                if thread is not None:
                     break
-            if event_runtime.active_thread is not None:
+            if thread is not None:
                 break
+        if thread is not None and thread_stage is not None:
+            thread.advanceTo(thread_stage, force_active=True)
+        event_runtime.active_thread = thread
         print("EVENT_LABEL_START", "{label_name}")
     run Call("{label_name}")
     pause 0.1
@@ -208,51 +201,44 @@ testcase event_{safe_name}_branch_{branch_index}:
         threads = createThreads()
         initEvents()
         initStoryEventRuntime(True)
-        week = 7
-        time = 2
-        hour = 12
-        minute = 0
-        dayspassed = max(int(dayspassed or 0), 30)
-        exploration = max(int(exploration or 0), 250)
-        money = max(int(money or 0), 500)
+        calendar_v2.week = 7
+        calendar_v2.hour = 12
+        calendar_v2.minute = 0
+        calendar_v2.daysInGame = max(int(calendar_v2.daysInGame or 0), 30)
+        player.stats.exploration = max(int(player.stats.exploration or 0), 250)
+        player.set_money(max(int(player.economy.money or 0), 500))
         for _girl in ("amanda", "sandra", "melissa", "clara", "georgett", "liza", "becky"):
-            Friends[_girl] = max(int(Friends.get(_girl, 0) or 0), 20)
-            sluttiness[_girl] = max(int(sluttiness.get(_girl, 0) or 0), 20)
-            otkroven[_girl] = max(int(otkroven.get(_girl, 0) or 0), 20)
-            AskedToday[_girl] = 0
-        SandraVar["RoomUnlocked"] = 1
-        BedroomDoorStates["TavernSandraRoom"] = 0
-        MelissaVar["drawings_found"] = 1
-        MelissaVar["bats_episode"] = max(int(MelissaVar.get("bats_episode", 0) or 0), 8)
-        ClaraVar["tavern_melissa_visit_count"] = max(int(ClaraVar.get("tavern_melissa_visit_count", 0) or 0), 3)
-        ClaraVar["drawings_secret_known"] = 1
-        ClaraVar["paintings_melissa_asked"] = 1
-        ClaraVar["flirt"] = max(int(ClaraVar.get("flirt", 0) or 0), 1)
-        ClaraVar["comfort_pending"] = 1
-        ClaraVar["second_ask_unlocked"] = 1
-        ClaraVar["source_known"] = 1
-        ClaraVar["fiance_church_seen"] = 1
-        ClaraVar["fiance_barber_seen"] = 1
-        ClaraVar["commission_started"] = 1
-        ClaraVar["commission_followup_day"] = 0
-        ClaraVar["commission_followup_done"] = 1
-        ClaraVar["peek_done"] = 1
-        ClaraVar["confession_done"] = 1
-        ClaraVar["murder_day"] = 0
+            _girl_info = getPersonInfo(_girl)
+            _girl_info.rel = max(int(_girl_info.rel or 0), 20)
+            _girl_info.corruption = max(int(_girl_info.corruption or 0), 20)
+            _girl_info.openness = max(int(_girl_info.openness or 0), 20)
+            _girl_info.asked_today = 0
+        set_bedroom_door_locked("TavernSandraRoom", False)
+        Melissa.drawings_found = True
+        threads["melissaBatProblem"].advanceTo(8, complete_at_end=True)
+        Clara.drawings_secret_known = True
+        Clara.flirt_count = max(int(Clara.flirt_count or 0), 1)
+        Clara.commission_followup_day = 0
+        Clara.murder_day = 0
         werecat_state()["adopted"] = 1
         CurLoc = "TavernMain"
         location = CurLoc
         thread = None
+        thread_stage = None
         for _thread_name, _thread_info in dict(threads or {{}}).items():
-            for _trigger_group in list(getattr(getattr(_thread_info, "data", None), "triggers", []) or []):
+            for _thread_index, _trigger_group in enumerate(list(getattr(getattr(_thread_info, "data", None), "triggers", []) or [])):
                 for _evt in list(_trigger_group or []):
                     if str(getattr(_evt, "target", "") or "") == "{label_name}":
                         thread = _thread_info
+                        thread_stage = _thread_index
                         break
-                if event_runtime.active_thread is not None:
+                if thread is not None:
                     break
-            if event_runtime.active_thread is not None:
+            if thread is not None:
                 break
+        if thread is not None and thread_stage is not None:
+            thread.advanceTo(thread_stage, force_active=True)
+        event_runtime.active_thread = thread
     run Call("{label_name}")
     pause 0.1
     python:

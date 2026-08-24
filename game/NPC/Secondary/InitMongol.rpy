@@ -1,93 +1,4 @@
-        def var_int(self, key, default=0):
-            self.ensure_story_defaults()
-            return people_to_int(self.var.get(key, default), default)
-
-        def set_var_int(self, key, value):
-            self.ensure_story_defaults()
-            value = people_to_int(value, 0)
-            self.var[key] = value
-            return value
-        def story_value(self, key, default=0):
-            self.ensure_story_defaults()
-            return self.var.get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()
-            self.var[key] = value
-            return value
-
-
-label _auto_register_mongol:
-    call register_mongol_secondary from _call_mongol_reg
-    return        def var_int(self, key, default=0):
-            self.ensure_story_defaults()
-            return people_to_int(self.var.get(key, default), default)
-
-        def set_var_int(self, key, value):
-            self.ensure_story_defaults()
-            value = people_to_int(value, 0)
-            self.var[key] = value
-            self.promote_from_var(self.var)
-            return value
-        def story_value(self, key, default=0):
-            self.ensure_story_defaults()
-            return self.var.get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()
-            self.var[key] = value
-            self.promote_from_var(self.var)
-            return value
-
-
-label _auto_register_mongol:
-    call register_mongol_secondary from _call_mongol_reg
-    return        def var_int(self, key, default=0):
-            self.ensure_story_defaults()
-            return people_to_int(self.var.get(key, default), default)
-
-        def set_var_int(self, key, value):
-            self.ensure_story_defaults()
-            value = people_to_int(value, 0)
-            self.var[key] = value
-            self.promote_from_var(self.var)
-            return value
-        def story_value(self, key, default=0):
-            self.ensure_story_defaults()
-            return self.var.get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()
-            self.var[key] = value
-            self.promote_from_var(self.var)
-            return value
-
-
-label _auto_register_mongol:
-    call register_mongol_secondary from _call_mongol_reg
-    returninit python:
-    def mongol_story_defaults():
-        return {
-            "StocksReleased": 0,
-            "WillTryToSteal": 0,
-            "StocksFoodDay": -1,
-            "StocksArrestDay": -1,
-            "StocksSeen": 0,
-            "GuardGiftSent": 0,
-            "GuardCaptainKnown": 0,
-            "MarketRollDay": -1,
-            "MarketRoll": 0,
-            "GypsyAsk": 0,
-            "AskPriceIncr": 0,
-            "ZimmerKnow": 0,
-            "HorsePrice": 1000,
-            "DiscountAsk": 0,
-            "TheftAsk": 0,
-            "AskSawStolen": 0,
-            "SawStolen": 0,
-            "HorsesBought": 0,
-        }
-
+init python:
     class MongolData(PeopleData):
         code_name = "mongol"
 
@@ -106,101 +17,65 @@ label _auto_register_mongol:
 
     class MongolInfo(BaseNPC):
         """Mongol: horse trader, stocks prisoner, theft and Clara merchant hooks."""
+        talk_label = "MarketPlaceTalkMongol"
         unknown_name = "Мужик в красной рубахе"
 
         def __init__(self, name="mongol", **kwargs):
             super().__init__(name, **kwargs)
             self.data = MongolStaticData
             self.known = False
-            self.location = ""
-            self.var = {}
-            self.ensure_story_defaults()
+            self.will_try_to_steal = False
+            self.stocks_food_day = -1
+            self.stocks_arrest_day = -1
+            self.guard_captain_known = False
+            self.market_roll_day = -1
+            self.market_roll = False
+            self.asked_about_gypsy = False
+            self.asked_price_increase = False
+            self.zimmer_knows_horse_theft = False
+            self.horse_price = 1000
+            self.discount_asked = False
+            self.theft_asked = False
+            self.asked_about_seen_stolen = False
+            self.seen_with_stolen_horse = False
+            self.horses_bought = 0
 
         def update(self):
             self.name = people_normalize_id(self.name)
             self.data = MongolStaticData
-            self.location = ""
-            self.ensure_story_defaults()
             return self
 
-        def ensure_story_defaults(self):
-            if not isinstance(self.var, dict):
-                self.var = {}
-            for key, value in mongol_story_defaults().items():
-                self.var.setdefault(key, value)
-            self.promote_from_var(self.var)
-            return self.var
-
-        def story_value(self, key, default=0):
-            self.ensure_story_defaults()
-            return self.var.get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()
-            self.var[key] = value
-            self.promote_from_var(self.var)
-            return value
-
-        def var_int(self, key, default=0):
-            self.ensure_story_defaults()
-            return people_to_int(self.var.get(key, default), default)
-
-        def set_var_int(self, key, value):
-            self.ensure_story_defaults()
-            value = people_to_int(value, 0)
-            self.var[key] = value
-            self.promote_from_var(self.var)
-            return value
-
         def reset_market_trade(self):
-            self.set_var_int("HorsePrice", 1100 if self.var_int("ZimmerKnow", 0) else 1000)
-            self.set_var_int("DiscountAsk", 0)
-            return self.var_int("HorsePrice", 1000)
+            self.horse_price = 1100 if self.zimmer_knows_horse_theft else 1000
+            self.discount_asked = False
+            return self.horse_price
 
         def prepare_market_roll(self):
-            self.ensure_story_defaults()
-            current_day = int(dayspassed or 0)
-            if self.var_int("MarketRollDay", -1) != current_day:
-                self.set_var_int("MarketRollDay", current_day)
-                self.set_var_int("MarketRoll", 1 if procedural_randint(1, 4, "mongol_market_%s" % current_day) == 1 else 0)
-            return self.var_int("MarketRoll", 0)
+            current_day = current_game_day()
+            if self.market_roll_day != current_day:
+                self.market_roll_day = current_day
+                self.market_roll = procedural_randint(1, 4, "mongol_market_%s" % current_day) == 1
+            return self.market_roll
 
         def is_market_visible(self):
-            if str(MyStallion or "") != "":
+            if player.horse.owns_horse():
                 return False
-            try:
-                if not MarketPlaceRoom.is_open():
-                    return False
-            except Exception:
+            if not rooms.get("MarketPlace").is_open():
                 return False
             return self.prepare_market_roll() == 1
+
+        def interaction_visible(self, room_code=""):
+            if str(room_code or "").strip() == "MarketPlace":
+                return self.is_market_visible()
+            return super(MongolInfo, self).interaction_visible(room_code)
 
 define MongolStaticData = MongolData()
 default Mongol = MongolInfo()
 
-label InitMongol:
-    call register_mongol_secondary from _call_init_mongol_register
-    return
-
-
-label InitMongol:
-    call register_mongol_secondary from _call_init_mongol_register
-    return
-
-
-label InitMongol:
-    call register_mongol_secondary from _call_init_mongol_register
-    return
-
-
 label register_mongol_secondary:
     python:
-        peopleData["mongol"] = MongolStaticData
         MongolStaticData.set_schedule([
             NPCScheduleEntry(location="MarketPlace", weekdays=[1, 2, 3, 4, 5, 6], start_hour=6, end_hour=19, awake=True, talkable=True, condition=marketplace_mongol_visible, priority=100, label="market_horse_trade"),
         ])
-        Mongol.update()
-        peopleInfo["mongol"] = Mongol
-        if Mongol not in secondary_npcs:
-            secondary_npcs.append(Mongol)
+        people.register(MongolStaticData, Mongol)
     return

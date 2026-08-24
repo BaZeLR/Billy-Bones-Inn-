@@ -23,6 +23,8 @@ def test_calendar_days_in_game_is_object_owned_and_incremented_by_day_rollover()
     assert "self.daysInGame += 1" in source
     assert "while self.minute >= 60:" in source
     assert "while self.hour >= 24:" in source
+    advance_body = source.split("def advance_minutes(self, minutes):", 1)[1].split("def clock_minutes(self):", 1)[0]
+    assert "sync_state" not in advance_body
     assert '"days_in_game": int(self.daysInGame)' in source
 
 
@@ -79,3 +81,26 @@ def test_runtime_uses_calendar_object_methods_not_global_calendar_helpers():
         source = path.read_text(encoding="utf-8-sig")
         for token in forbidden:
             assert token not in source, "%s still contains %s" % (path.relative_to(PROJECT_ROOT), token)
+
+
+def test_calendar_has_no_scalar_or_display_mirrors():
+    script = (PROJECT_ROOT / "game" / "script.rpy").read_text(encoding="utf-8-sig")
+    game_sources = "\n".join(
+        path.read_text(encoding="utf-8-sig")
+        for path in (PROJECT_ROOT / "game").rglob("*.rpy")
+    )
+
+    for name in ("day", "month", "year", "week", "hour", "minute", "time", "dayspassed", "clock_minutes"):
+        assert f"default {name} =" not in script
+    for name in (
+        "week_name", "month_name", "week_name_en", "month_name_en", "datestr",
+        "calendar_weekday_name_ru", "calendar_month_name_ru",
+        "calendar_weekday_name_en", "calendar_month_name_en",
+        "calendar_cycle_name_ru", "calendar_cycle_name_en",
+        "calendar_time_slot_name_ru", "calendar_time_slot_name_en",
+    ):
+        assert f"default {name} =" not in script
+    assert "def sync_state(self):" not in script
+    assert "calendar_v2.sync_state()" not in game_sources
+    assert "calendar_v2.daysInGame" in game_sources
+    assert "calendar_v2.time_slot()" in game_sources

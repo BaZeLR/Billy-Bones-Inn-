@@ -2,53 +2,52 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label ShowChurchDraupnirList:
+    $ renpy.dynamic("IList", "StrList", "entry", "show_list")
     python:
         StrList = []
-        for IList in range(len(ChurchRepairDesc)):
-            entry = "{}. {}: {} мараведи.".format(IList + 1, ChurchRepairDesc[IList], ChurchRepairCost[IList])
-            if ChurchDonated[IList] > 0:
+        for IList in range(len(CHURCH_REPAIR_DESCRIPTIONS)):
+            entry = "{}. {}: {} мараведи.".format(IList + 1, CHURCH_REPAIR_DESCRIPTIONS[IList], CHURCH_REPAIR_COSTS[IList])
+            if player.economy.church_repair_is_donated(IList):
                 entry = "[s]{}[/s]".format(entry)
             StrList.append(entry)
         show_list = "\n".join(StrList)
-        SawDraupnirChurchList = 1
 
-    $ MainTxt = "Вы с интересом ознакомились со счетом, выставленным мастером Драупниром:\n\n" + show_list
+    $ scene_runtime.text = "Вы с интересом ознакомились со счетом, выставленным мастером Драупниром:\n\n" + show_list
     if player.economy.church_donated_today > 0:
-        $ MainTxt = MainTxt + "\n\nВы сегодня уже сделали пожертвование святой церкви и на душе у вас благостно и возвышенно, а карманы малость полегчали."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = scene_runtime.text + "\n\nВы сегодня уже сделали пожертвование святой церкви и на душе у вас благостно и возвышенно, а карманы малость полегчали."
+    $ scene_runtime.location_text = scene_runtime.text
     vscene "images/church/confessionEntry.png"
-    $ current_action_title = "Листок на столике"
-    $ current_action_content = None
-    $ current_action_items = []
+    $ main_ui_runtime.action_title = "Листок на столике"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
 
     python:
-        for IList in range(len(ChurchRepairDesc)):
-            if player.economy.money > ChurchRepairCost[IList] and player.economy.church_donated_today == 0 and ChurchDonated[IList] == 0 and SawDraupnirChurchList > 0:
-                current_action_items.append(MenuItem("Пожертвовать {} мараведи на {}".format(ChurchRepairCost[IList], ChurchRepairDonat[IList]), Call("ChurchDonate", IList)))
+        for IList in range(len(CHURCH_REPAIR_DESCRIPTIONS)):
+            if player.economy.money > CHURCH_REPAIR_COSTS[IList] and player.economy.church_donated_today == 0 and not player.economy.church_repair_is_donated(IList):
+                main_ui_runtime.action_items.append(MenuItem("Пожертвовать {} мараведи на {}".format(CHURCH_REPAIR_COSTS[IList], CHURCH_REPAIR_DONATION_TARGETS[IList]), Call("ChurchDonate", IList)))
 
-    $ current_action_items.append(MenuItem("Назад", Jump("Church")))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", Jump("Church")))
     $ renpy.restart_interaction()
     return
 
 
 label ChurchDonate(donation_idx=0):
+    $ renpy.dynamic("idx", "cost")
     $ idx = int(donation_idx or 0)
-    $ cost = ChurchRepairCost[idx]
-    $ ChurchDonated[idx] = 1
-    $ player.economy.church_donated_today = 1
-    $ ChurchDonatedAmount += cost
-    $ money -= cost
-    $ notoriety = 0
+    $ cost = CHURCH_REPAIR_COSTS[idx]
+    $ player.spend_money(cost)
+    $ player.economy.record_church_donation(idx, cost)
+    $ player.set_stat("notoriety", 0)
 
-    $ MainTxt = "Решив, что грех будет не помочь святому отцу, вы полезли в кошелек и с радостным сердцем отсчитали {} мараведи.\n\n\"Вот, святой отец,\" сказали вы, \"жертвую на {}\"".format(cost, ChurchRepairDonat[idx])
+    $ scene_runtime.text = "Решив, что грех будет не помочь святому отцу, вы полезли в кошелек и с радостным сердцем отсчитали {} мараведи.\n\n\"Вот, святой отец,\" сказали вы, \"жертвую на {}\"".format(cost, CHURCH_REPAIR_DONATION_TARGETS[idx])
     if cost < 100:
-        $ MainTxt = MainTxt + "\n\n\"Да пребудет с тобой благословение Ильматера\", сказал жрец, немного скептически осмотрев ваше скромное пожертвование. Спрятав деньги, он осенил вас святым знаком и вернулся к своим делам.\n\nНа душе у вас сразу стало светло и празднично. Благовейно поклонившись статуе Ильматера вы направились восвояси."
+        $ scene_runtime.text = scene_runtime.text + "\n\n\"Да пребудет с тобой благословение Ильматера\", сказал жрец, немного скептически осмотрев ваше скромное пожертвование. Спрятав деньги, он осенил вас святым знаком и вернулся к своим делам.\n\nНа душе у вас сразу стало светло и празднично. Благовейно поклонившись статуе Ильматера вы направились восвояси."
     else:
-        $ MainTxt = MainTxt + "\n\n\"Да пребудет с тобой благословение Ильматера\", радостно сказал жрец, одной рукой осеняя вас святым знаком а другой ловко пряча деньги. \"Побольше бы столь щедрых прихожан.\"\n\nНа душе у вас сразу стало светло и празднично. Благовейно поклонившись статуе Ильматера вы направились восвояси."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = scene_runtime.text + "\n\n\"Да пребудет с тобой благословение Ильматера\", радостно сказал жрец, одной рукой осеняя вас святым знаком а другой ловко пряча деньги. \"Побольше бы столь щедрых прихожан.\"\n\nНа душе у вас сразу стало светло и празднично. Благовейно поклонившись статуе Ильматера вы направились восвояси."
+    $ scene_runtime.location_text = scene_runtime.text
     call ShowImageSeq("gerhard", "", "donate", 2)
     call stat
-    $ current_action_title = "Пожертвование"
-    $ current_action_content = None
-    $ current_action_items = [MenuItem("Вернуться в собор", Jump("Church"))]
+    $ main_ui_runtime.action_title = "Пожертвование"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [MenuItem("Вернуться в собор", Jump("Church"))]
     return

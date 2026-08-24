@@ -1,99 +1,87 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-init python:
-    def _adsl_i(value, default=0):
-        try:
-            return int(value)
-        except Exception:
-            return default
+label AmandaLegareReactOnYouSee:
+    $ renpy.dynamic("AmandaLegareReactionRoll")
+    if not Amanda.knows_player_is_watching_legare_sex:
+        return
 
-    def _adsl_pick_sex_type():
-        try:
-            return max(0, min(5, int(Amanda.legare_sex_type())))
-        except Exception:
-            return 0
+    $ AmandaLegareReactionRoll = procedural_randint(1, 4, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:27:1")
+    if AmandaLegareReactionRoll == 1:
+        "Вспомнив о вас, Аманда обернулась и подмигнула в сторону бочек."
+    elif AmandaLegareReactionRoll == 2:
+        "Аманда обернулась к укрытию и демонстративно провела рукой между ног."
+    elif AmandaLegareReactionRoll == 3:
+        "Аманда явно помнит, что вы наблюдаете, и посылает вам воздушный поцелуй."
+    return
 
-    def _adsl_nesluh():
-        try:
-            return int(Amanda.nesluh_value())
-        except Exception:
-            return 0
 
-    def _adsl_react_on_you_see():
-        if Amanda.var_int("knowyouseesex", 0) == 0:
-            return
-
-        roll = procedural_randint(1, 4, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:27:1")
-        if roll == 1:
-            renpy.say(None, "Вспомнив о вас, Аманда обернулась и подмигнула в сторону бочек.")
-        elif roll == 2:
-            renpy.say(None, "Аманда обернулась к укрытию и демонстративно провела рукой между ног.")
-        elif roll == 3:
-            renpy.say(None, "Аманда явно помнит, что вы наблюдаете, и посылает вам воздушный поцелуй.")
-
-    def _adsl_minet_finish():
-        if procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:36:2") == 1:
-            renpy.say(None, "Легаре не предупредил Аманду и кончил ей прямо в рот.")
-            if Amanda.corruption >= 40 or _adsl_i(Amanda.sex_stat("sexacts", 0), 0) > 12:
-                renpy.say(None, "Аманда проглотила почти все, лишь несколько струек осталось на лице.")
-            else:
-                renpy.say(None, "Она растерялась, но быстро начала сглатывать семя.")
+label AmandaLegareMinetFinish:
+    if procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:36:2") == 1:
+        "Легаре не предупредил Аманду и кончил ей прямо в рот."
+        if Amanda.corruption >= 40 or Amanda.sex_stat("sexacts", 0) > 12:
+            "Аманда проглотила почти все, лишь несколько струек осталось на лице."
         else:
-            renpy.say(None, "Легаре вытащил член и обрызгал спермой лицо Аманды.")
+            "Она растерялась, но быстро начала сглатывать семя."
+    else:
+        "Легаре вытащил член и обрызгал спермой лицо Аманды."
 
-        Amanda.set_var_int("sucklegare", 1)
-        Amanda.add_var_int("alberfriends", 1)
-        Amanda.change_social(corruption_delta=1)
-        Amanda.pregnancy_check("mouthface", 1, "legare")
+    $ Amanda.performed_oral_with_legare = True
+    $ Amanda.legare_affection += 1
+    $ Amanda.change_social(corruption_delta=1)
+    $ Amanda.pregnancy_check("mouthface", 1, "legare")
+    return
 
-    def _adsl_sex_finish(tmpLegareSexType):
-        if procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:51:3") <= 2:
-            renpy.say(None, "Легаре засадил Аманде глубже и замер, кончая прямо в нее.")
-            if _adsl_i(Amanda.sex_stat("cuminside", 0), 0) < 2:
-                renpy.say(None, "Аманда наивно разглядывает капли на пальцах и спрашивает про детей.")
-            if _adsl_i(Amanda.sex_stat("pregnancy", 0), 0) > 120:
-                renpy.say(None, "Аманда шутит, что беременнее уже не станет.")
-            elif Amanda.corruption >= 48:
-                renpy.say(None, "Ей откровенно нравится ощущение тепла внутри.")
-            elif tmpLegareSexType == 2:
-                renpy.say(None, "Аманда переживает из-за первого раза, а Легаре ее успокаивает.")
-            else:
-                renpy.say(None, "Аманда укоряет Легаре за риск, а он обещает в следующий раз быть осторожнее.")
 
-            if tmpLegareSexType in (2, 3):
-                ShowImage("amanda", "albersex", "cuminside" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:65:4")))
-            elif tmpLegareSexType == 4:
-                ShowImage("amanda", "albersex", "spermpussymouth")
-            else:
-                ShowImage("amanda", "albersex", "spermpussy")
-
-            Amanda.pregnancy_check("inside", 1, "legare")
-            Amanda.add_var_int("alberfriends", 1)
-            Amanda.change_social(corruption_delta=2)
+label AmandaLegareSexFinish(tmpLegareSexType):
+    if procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:51:3") <= 2:
+        "Легаре засадил Аманде глубже и замер, кончая прямо в нее."
+        if Amanda.sex_stat("cuminside", 0) < 2:
+            "Аманда наивно разглядывает капли на пальцах и спрашивает про детей."
+        if Amanda.sex_stat("pregnancy", 0) > 120:
+            "Аманда шутит, что беременнее уже не станет."
+        elif Amanda.corruption >= 48:
+            "Ей откровенно нравится ощущение тепла внутри."
+        elif tmpLegareSexType == 2:
+            "Аманда переживает из-за первого раза, а Легаре ее успокаивает."
         else:
-            renpy.say(None, "Легаре вытащил и кончил Аманде на ягодицы.")
-            if _adsl_i(Amanda.sex_stat("cuminside", 0), 0) < 2:
-                renpy.say(None, "Аманда снова интересуется, от этого ли появляются дети.")
-            if _adsl_i(Amanda.sex_stat("pregnancy", 0), 0) > 120:
-                renpy.say(None, "С беременным животом она относится к этому спокойно.")
-            elif Amanda.corruption >= 48:
-                renpy.say(None, "Аманда признается, что ей было бы приятнее получить все внутрь.")
-            else:
-                renpy.say(None, "Она радуется, что Легаре не кончил внутрь.")
+            "Аманда укоряет Легаре за риск, а он обещает в следующий раз быть осторожнее."
 
-            Amanda.pregnancy_check("outside", 1, "legare")
-            Amanda.add_var_int("alberfriends", 2)
-            Amanda.change_social(corruption_delta=2)
+        if tmpLegareSexType in (2, 3):
+            call ShowImage("amanda", "albersex", "cuminside" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:65:4")))
+        elif tmpLegareSexType == 4:
+            call ShowImage("amanda", "albersex", "spermpussymouth")
+        else:
+            call ShowImage("amanda", "albersex", "spermpussy")
 
-        Amanda.set_var_int("fucklegare", 1)
+        $ Amanda.pregnancy_check("inside", 1, "legare")
+        $ Amanda.legare_affection += 1
+        $ Amanda.change_social(corruption_delta=2)
+    else:
+        "Легаре вытащил и кончил Аманде на ягодицы."
+        if Amanda.sex_stat("cuminside", 0) < 2:
+            "Аманда снова интересуется, от этого ли появляются дети."
+        if Amanda.sex_stat("pregnancy", 0) > 120:
+            "С беременным животом она относится к этому спокойно."
+        elif Amanda.corruption >= 48:
+            "Аманда признается, что ей было бы приятнее получить все внутрь."
+        else:
+            "Она радуется, что Легаре не кончил внутрь."
+
+        $ Amanda.pregnancy_check("outside", 1, "legare")
+        $ Amanda.legare_affection += 2
+        $ Amanda.change_social(corruption_delta=2)
+
+    $ Amanda.had_sex_with_legare = True
+    return
 
 
 label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
+    $ renpy.dynamic("MaxStep", "AmandaNesluh")
     $ main_ui_begin_native_scene_state("Аманда и Легаре")
-    if CurSexStep == 0 and _adsl_i(tmpLegareSexType, -1) < 0:
-        $ tmpLegareSexType = _adsl_pick_sex_type()
-        if tmpLegareSexType == 4 and _adsl_i(Amanda.sex_stat("pregnancy", 0), 0) <= 120 and procedural_randint(1, 4, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:96:5") <= 3:
+    if CurSexStep == 0 and tmpLegareSexType < 0:
+        $ tmpLegareSexType = Amanda.legare_sex_type()
+        if tmpLegareSexType == 4 and Amanda.sex_stat("pregnancy", 0) <= 120 and procedural_randint(1, 4, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:96:5") <= 3:
             $ tmpLegareSexType = 5
 
     if CurSexStep == 0:
@@ -110,11 +98,11 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
 
     elif CurSexStep == 1:
         "Вы прислушались к их разговору. Легаре успокаивает Аманду, уверяя, что жена ничего не узнает, а здесь им никто не помешает. Аманда то смущается, то хихикает, но уходить явно не собирается."
-        $ Alber.set_var_int("hearabouthiswife", 1)
+        $ Alber.heard_about_wife = True
 
     elif CurSexStep == 2:
         if tmpLegareSexType == 0:
-            if _adsl_i(Amanda.sex_stat("pregnancy", 0), 0) < 120:
+            if Amanda.sex_stat("pregnancy", 0) < 120:
                 "Послышалось шуршание юбки и затем голос Аманды: \"Ой, вот он какой. И как быстро растет!\" Легаре показывает ей член и подталкивает к более смелым ласкам."
                 call ShowImage("amanda", "alberseduce", "showcock")
             else:
@@ -122,7 +110,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
         elif tmpLegareSexType == 1:
             "Послышалось шуршание юбки и затем голос Аманды: \"Ой, Альберчик, я еще не готова так. Давай я тебе как в прошлый раз?\" Заглянув в щель между бочками, вы увидели, что Аманда торопливо расстегивает Альберу штаны, выпуская на свободу его маленького друга."
             call ShowImage("amanda", "alberseduce", "suck")
-            $ Amanda.set_var_int("sucklegare", 1)
+            $ Amanda.performed_oral_with_legare = True
         elif tmpLegareSexType == 2:
             "Послышалось шуршание юбки и затем голос Аманды: \"Ой, Альберчик, это будет мой первый раз, я ведь еще девочка! Может пока еще не надо?\" Такой ответ отнюдь не обескуражил месье. Он обнял Аманду, положив одну руку на ее талию, а другую на грудь, заглушая слабые протесты ласками и поцелуями."
             call ShowImage("amanda", "albersex", "grope" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:128:6")))
@@ -135,47 +123,47 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
         else:
             "От поцелуйчиков парочка быстро перешла к менее невинным развлечениям. Зрелый и опытный развратник запустил свои загребущие лапы прямо в декольте Аманды, лапая ее за груди. Впрочем, Аманде такое обращение пришлось по нраву."
             call ShowImage("amanda", "albersex", "grope" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:137:8")))
-        $ Amanda.set_var_int("knowlegaresex", 1)
-        $ Amanda.set_var_int("sawlegaresex", 1)
+        $ Amanda.player_knows_legare_sex = True
+        $ Amanda.player_saw_legare_sex = True
 
     elif CurSexStep == 3:
         if tmpLegareSexType == 0:
             "Аманда встает перед Легаре на колени и старательно начинает делать ему минет."
             call ShowImage("amanda", "alberseduce", "suck")
-            $ Amanda.set_var_int("sucklegare", 1)
+            $ Amanda.performed_oral_with_legare = True
         elif tmpLegareSexType == 1:
             "В конце концов усилия Аманды, старательно обхаживающей член месье Легаре, принесли свои плоды."
-            $ _adsl_minet_finish()
+            call AmandaLegareMinetFinish
         elif tmpLegareSexType == 2:
             "От ласк месье пошел дальше: он сноровисто стащил с Аманды платье, а затем принялся ласкать ее языком. Убедившись в том, что девочка созрела, он развернул ее, положив ее руки на бочку, и пристроился к ней сзади со своим стоящим колом членом. Писк Аманды, струйка крови, и вот негодяй уже внутри."
-            $ Amanda.set_var_int("fucklegare", 1)
+            $ Amanda.had_sex_with_legare = True
             $ Amanda.set_sex_stat("virginity", False)
-            $ Amanda.set_var_int("deflowerlegare", 1)
-            $ Amanda.set_var_int("knowdeflowerlegare", 1)
+            $ Amanda.lost_virginity_to_legare = True
+            $ Amanda.player_knows_legare_deflowered = True
             $ Amanda.set_var_int("knownotvirgin", 1)
             call ShowImage("amanda", "albersex", "fuckbarrelstart")
         elif tmpLegareSexType == 3:
             "От ласк месье пошел дальше: он сноровисто стащил с Аманды платье, а сама Аманда успела аккуратно убрать белье. Потом он усадил ее на бочку, разогрел языком, развернул и пристроился к ней сзади со своим стоящим колом членом. И вот негодяй уже внутри, не встретив никаких преград."
-            $ Amanda.set_var_int("fucklegare", 1)
+            $ Amanda.had_sex_with_legare = True
             $ Amanda.set_var_int("knownotvirgin", 1)
             call ShowImage("amanda", "albersex", "fuckbarrelstart")
         elif tmpLegareSexType == 4:
             "Аманда быстро доводит Легаре ртом до оргазма."
-            $ Amanda.set_var_int("sucklegare", 1)
-            $ _adsl_minet_finish()
+            $ Amanda.performed_oral_with_legare = True
+            call AmandaLegareMinetFinish
         else:
             "Вскоре платье и белье покинули Аманду. Месье поднял ее, без труда насадил на свой член и стал сношать у стены. Впрочем годы берут свое, выносливость у Альбера подкачала."
             if Amanda.current_underwear("bra", "") != "":
                 "Лифчик тоже долго не задержался."
             $ Amanda.set_var_int("knownotvirgin", 1)
-            $ Amanda.set_var_int("fucklegare", 1)
+            $ Amanda.had_sex_with_legare = True
             call ShowImage("amanda", "albersex", "fuckwall")
-        $ _adsl_react_on_you_see()
+        call AmandaLegareReactOnYouSee
 
     elif CurSexStep == 4:
         if tmpLegareSexType == 0:
             "Хоть опыта у Аманды было не так уж и много, возбужденный торговец быстро дошел до конца. Должно быть, его возбуждала сама мысль о новой победе."
-            $ _adsl_minet_finish()
+            call AmandaLegareMinetFinish
         elif tmpLegareSexType == 1:
             "\"Как тебе, милый?\" спросила Альбера Аманда, вытирая подбородок от остатков спермы. \"Ты была бесподобна, как всегда, мой мышонок!\" куртуазно заверил ее месье, не забывая между тем приводить себя в порядок. \"Давай я тебя провожу, а то уже поздно.\" И они направились на улицу, в сторону трактира."
         elif tmpLegareSexType == 2:
@@ -186,25 +174,25 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
             call ShowImage("amanda", "albersex", "fuckbarrel" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:186:10")))
         elif tmpLegareSexType == 4:
             "Забавы парочки были еще далеки от завершения. Аманда продолжила сосать обмякший было член своего кавалера, вернув ему прежнюю бодрость и свежесть. Убедившись в этом, она развернулась и наклонилась, призывно подставив свое сокровище похотливому торгашу. Тот не замедлил воспользоваться приглашением, и, войдя в нее одним быстрым движением, начал сношать уже текущую девушку."
-            if _adsl_i(Amanda.sex_stat("pregnancy", 0), 0) >= 120:
+            if Amanda.sex_stat("pregnancy", 0) >= 120:
                 "Беременный живот Аманда гладит рукой, пока Легаре продолжает."
             "Аманда быстро доходит до оргазма на его члене."
             $ Amanda.set_var_int("knownotvirgin", 1)
-            $ Amanda.set_var_int("fucklegare", 1)
+            $ Amanda.had_sex_with_legare = True
             call ShowImage("amanda", "albersex", "fuck" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:194:11")))
         else:
             "Аманду это не смутило. Соскользнув на секунду с члена своего любовника, она тут же развернулась и наклонилась, призывно подставив себя похотливому торгашу. Тот не замедлил воспользоваться приглашением и начал сношать уже потекшую девушку."
             call ShowImage("amanda", "albersex", "fuck" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:197:12")))
-        $ _adsl_react_on_you_see()
+        call AmandaLegareReactOnYouSee
 
     elif CurSexStep == 5:
         if tmpLegareSexType == 0:
             "\"Как тебе, я была не слишком неуклюжа?\" трогательно спросила Альбера Аманда, вытирая подбородок от остатков спермы. \"Тебе понравилось, хоть капельку?\" \"Ты была бесподобна,\" заверил ее месье, приводя себя в порядок. \"Давай я тебя провожу, а то уже поздно.\" И они направились на улицу, в сторону трактира."
         elif tmpLegareSexType >= 2:
-            $ _adsl_sex_finish(tmpLegareSexType)
-            $ _adsl_react_on_you_see()
+            call AmandaLegareSexFinish(tmpLegareSexType)
+            call AmandaLegareReactOnYouSee
             if tmpLegareSexType == 2:
-                $ Amanda.add_var_int("alberfriends", 2)
+                $ Amanda.legare_affection += 2
                 $ Amanda.change_social(corruption_delta=2)
 
     elif CurSexStep == 6:
@@ -222,11 +210,11 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
         $ MaxStep = 4
 
     menu:
-        "Послушать о чем они болтают" if CurSexStep == 0 and Alber.var_int("hearabouthiswife", 0) == 0:
+        "Послушать о чем они болтают" if CurSexStep == 0 and not Alber.heard_about_wife:
             call AfterDanceSexLegare(CurSexStep + 1, tmpLegareSexType, FollowMode)
             return
 
-        "Смотреть чего будет дальше" if CurSexStep == 0 and Alber.var_int("hearabouthiswife", 0) != 0:
+        "Смотреть чего будет дальше" if CurSexStep == 0 and Alber.heard_about_wife:
             call AfterDanceSexLegare(CurSexStep + 2, tmpLegareSexType, FollowMode)
             return
 
@@ -266,12 +254,12 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
             call AfterDanceSexLegare(CurSexStep + 1, tmpLegareSexType, FollowMode)
             return
 
-        "Прервать это непотребство" if CurSexStep < MaxStep - 1 and Amanda.var_int("knowyouseesex", 0) == 0:
-            $ Amanda.set_var_int("alberprohibit", 1)
-            $ Amanda.set_var_int("knowyousawlegaresex", 1)
-            $ Amanda.set_var_int("knowyouseesex", 1)
-            $ Amanda.add_var_int("alberfriends", -1)
-            $ AmandaNesluh = _adsl_nesluh()
+        "Прервать это непотребство" if CurSexStep < MaxStep - 1 and not Amanda.knows_player_is_watching_legare_sex:
+            $ Amanda.legare_forbidden = True
+            $ Amanda.knows_player_saw_legare_sex = True
+            $ Amanda.knows_player_is_watching_legare_sex = True
+            $ Amanda.legare_affection -= 1
+            $ AmandaNesluh = Amanda.nesluh_value()
 
             if AmandaNesluh == 2:
                 "Аманда отреагировала на вашу ругань совсем не так, как вы ожидали. Будучи не в состоянии увидеть вас из-за груды бочек, она заорала чуть в сторону от того места, где вы действительно находились."
@@ -288,7 +276,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                         return
                     "Я на это смотреть не могу и пойду отсюда":
                         if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
-                            $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
+                            $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
                         $ calendar_v2.advance_minutes(60)
                         jump StreetTavern
 
@@ -296,19 +284,19 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                 "Ваша тирада не слишком впечатлила Аманду. Она лишь пожала плечами и спросила у своего любовника: \"Альберчик, может мы в дом зайдем, где мой настырный хозяин не будет нас донимать?\" У Альберчика, к вашей досаде, не нашлось никаких возражений, и парочка быстро скрылась в доме, где вы уже не могли им помешать."
                 $ Amanda.change_social(friend_delta=(1 if Amanda.rel >= 7 else -1), corruption_delta=2)
                 if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
-                    $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
+                    $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
                 $ calendar_v2.advance_minutes(60)
                 jump StreetTavern
 
             else:
                 "Аманда пугается вашего крика, спешно одевается и убегает в трактир."
-                $ Amanda.add_var_int("alberfriends", -2)
+                $ Amanda.legare_affection -= 2
                 $ Amanda.change_social(friend_delta=(1 if Amanda.rel >= 3 else -2), corruption_delta=(1 if Amanda.corruption >= 20 else -3))
                 $ calendar_v2.advance_minutes(60)
                 jump StreetTavern
 
-        "Дать знать им о том, что вы наблюдаете за ними" if CurSexStep < MaxStep - 1 and Amanda.var_int("knowyouseesex", 0) == 0 and Amanda.var_int("knowyousawlegaresex", 0):
-            $ Amanda.set_var_int("knowyouseesex", 1)
+        "Дать знать им о том, что вы наблюдаете за ними" if CurSexStep < MaxStep - 1 and not Amanda.knows_player_is_watching_legare_sex and Amanda.knows_player_saw_legare_sex:
+            $ Amanda.knows_player_is_watching_legare_sex = True
             "Решив зачем-то намекнуть Аманде о том, что вы за ней подглядываете, вы намеренно с шумом скинули на землю камень, лежавший на одной из бочек. Чтобы ваше присутствие стало совсем явным, вы еще глухо и неразборчиво выругались."
 
             if Amanda.corruption > 45 or (Amanda.corruption > 32 and procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AfterDanceSexLegare.rpy:procedural_randint:314:13") == 1):
@@ -320,31 +308,31 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                         return
                     "Плюнуть и идти обратно в трактир":
                         if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
-                            $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
+                            $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
                         $ calendar_v2.advance_minutes(60)
                         jump StreetTavern
             else:
                 "После небольшой заминки Аманда заявляет, что так не может, потому что вдруг это действительно Стефан и ей стыдно. С этими словами она утягивает немного ошалевшего Альбера в дом. Почему-то ваша идея обернулась вам не на пользу."
                 if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
-                    $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
+                    $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
                 $ calendar_v2.advance_minutes(60)
                 jump StreetTavern
 
-        "Я на это смотреть не могу и пойду отсюда" if CurSexStep < MaxStep - 1 and Amanda.var_int("knowyouseesex", 0) == 1:
+        "Я на это смотреть не могу и пойду отсюда" if CurSexStep < MaxStep - 1 and Amanda.knows_player_is_watching_legare_sex:
             if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
-                $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
+                $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
             $ calendar_v2.advance_minutes(60)
             jump StreetTavern
 
-        "Ухожу, даже и не собираюсь на это смотреть" if CurSexStep < MaxStep and Amanda.var_int("knowyouseesex", 0) == 0:
+        "Ухожу, даже и не собираюсь на это смотреть" if CurSexStep < MaxStep and not Amanda.knows_player_is_watching_legare_sex:
             if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
-                $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
+                $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
             $ calendar_v2.advance_minutes(60)
             jump StreetTavern
 
         "Пойду-ка и я" if (CurSexStep == 4 and tmpLegareSexType == 1) or (CurSexStep == 5 and tmpLegareSexType == 0) or (CurSexStep >= 6):
             if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
-                $ apply_legare_amanda_let_go_code(1, tmpLegareSexType)
+                $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
             $ calendar_v2.advance_minutes(60)
             jump StreetTavern
 

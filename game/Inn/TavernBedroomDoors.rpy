@@ -1,34 +1,20 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default BedroomDoorStates = {}
-
-default BedroomDoorStates = {}
-
-default BedroomDoorStates = {}
-
 init -20 python:
-    if "BedroomDoorStates" not in globals() or not isinstance(globals().get("BedroomDoorStates", {}), dict):
-        BedroomDoorStates = {}
-
-    if "BedroomDoorStates" not in globals() or not isinstance(globals().get("BedroomDoorStates", {}), dict):
-        BedroomDoorStates = {}
-
-    if "BedroomDoorStates" not in globals() or not isinstance(globals().get("BedroomDoorStates", {}), dict):
-        BedroomDoorStates = {}
-
     def bedroom_door_default_locked(room_code=""):
         room_key = str(room_code or "").strip()
         if room_key == "TavernSandraRoom":
-            return not (int(Sandra.rel or 0) >= 10 or Sandra.room_unlocked())
+            return not (int(Sandra.rel or 0) >= 10 or int(threads["sandraWeeklyEvaluation"].num or 0) > 0)
         return False
 
     def bedroom_door_locked(room_code="", default_locked=None):
         room_key = str(room_code or "").strip()
         if room_key == "":
             return bool(default_locked)
-        if isinstance(BedroomDoorStates, dict) and room_key in BedroomDoorStates:
-            return bool(BedroomDoorStates.get(room_key, 0))
+        room = rooms.get(room_key)
+        if room is not None and "door_locked" in room.state:
+            return bool(room.state.get("door_locked", False))
         if default_locked is not None:
             return bool(default_locked)
         return bedroom_door_default_locked(room_key)
@@ -37,8 +23,11 @@ init -20 python:
         room_key = str(room_code or "").strip()
         if room_key == "":
             return False
-        BedroomDoorStates[room_key] = 1 if bool(locked) else 0
-        return bool(BedroomDoorStates[room_key])
+        room = rooms.get(room_key)
+        if room is None:
+            return False
+        room.state["door_locked"] = bool(locked)
+        return bool(room.state["door_locked"])
 
     def bedroom_door_status_text(room_code="", owner_name=""):
         room_key = str(room_code or "").strip()
@@ -80,12 +69,12 @@ init -20 python:
 
 
 label BedroomDoorInspect(room_code="", owner_name="", object_id=""):
-    $ MainTxt = bedroom_door_status_text(room_code, owner_name)
-    $ CurLocDesc = MainTxt
-    if str(CurLoc or "") == "TavernAmandaRoom":
+    $ scene_runtime.text = bedroom_door_status_text(room_code, owner_name)
+    $ scene_runtime.location_text = scene_runtime.text
+    if str(rooms.current_code or "") == "TavernAmandaRoom":
         call tavern_amanda_room_object_menu(object_id)
-    elif str(CurLoc or "") == "TavernMelissaRoom":
+    elif str(rooms.current_code or "") == "TavernMelissaRoom":
         call TavernMelissaRoomObjectMenu(object_id)
-    elif str(CurLoc or "") == "TavernSandraRoom":
+    elif str(rooms.current_code or "") == "TavernSandraRoom":
         call TavernSandraRoomObjectMenu(object_id)
     return

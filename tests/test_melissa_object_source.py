@@ -1,8 +1,16 @@
-        "AskedMCToSolveRoomProblem",        "def install_schedule",        "AskedMCToSolveRoomProblem",        "def install_schedule",        "AskedMCToSolveRoomProblem",        "def install_schedule",from pathlib import Path
+from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MELISSA_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "InitMelissa.rpy"
+MELISSA_TALK = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissaTalk.rpy"
+MELISSA_DRESS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissaDressChange.rpy"
+MELISSA_SEX = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissaSex.rpy"
+MELISSA_EVENTS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "MelissaEvents.rpy"
+WERECAT_QUEST = PROJECT_ROOT / "game" / "NPC" / "Secondary" / "MelissaWerecatQuest.rpy"
+HOUSEHOLD_EVENTS = PROJECT_ROOT / "game" / "Inn" / "HouseholdRuntimeEvents.rpy"
+MELISSA_ROOM = PROJECT_ROOT / "game" / "Inn" / "TavernMelissaRoom.rpy"
+TAVERN_ATTIC = PROJECT_ROOT / "game" / "Inn" / "TavernAtic.rpy"
 PEOPLE_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
 GIRL_DECISION = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "GirlDecisionModel.rpy"
 
@@ -14,8 +22,7 @@ def test_melissa_uses_data_info_runtime_shape():
     assert "class MelissaInfo(Girl):" in source
     assert "define MelissaStaticData = MelissaData()" in source
     assert "default Melissa = MelissaInfo()" in source
-    assert "peopleData[GirlName] = MelissaStaticData" in source
-    assert "peopleInfo[GirlName] = Melissa" in source
+    assert "people.register(MelissaStaticData, Melissa)" in source
     assert "register_melissa_runtime" not in source
 
 
@@ -34,50 +41,173 @@ def test_melissa_data_keeps_identity_not_runtime_maps():
     assert "self.var" not in data_block
 
 
-def test_melissa_story_defaults_cover_live_melissavar_keys():
+def test_melissa_static_data_is_the_only_image_manifest_api_owner():
     source = MELISSA_INIT.read_text(encoding="utf-8-sig")
-    required_keys = [
-        "MomDressComplaint",
-        "AskedAboutClaraDay",
-        "StartDay",
-        "StartCount",
-        "StartTotal",
+    data_block, info_block = source.split("class MelissaData(PeopleData):", 1)[1].split("class MelissaInfo(Girl):", 1)
+    game_source = "\n".join(
+        path.read_text(encoding="utf-8-sig")
+        for path in (PROJECT_ROOT / "game").rglob("*.rpy")
+    )
+
+    assert "self.image_manifest = {" in data_block
+    assert "def image_sequence(self" in data_block
+    assert "def image_path(self" in data_block
+    assert "def cycle_image(self" in data_block
+    assert "def image_sequence(self" not in info_block
+    assert "def image_path(self" not in info_block
+    assert "def cycle_image(self" not in info_block
+    assert "Melissa.image_sequence(" not in game_source
+    assert "Melissa.image_path(" not in game_source
+    assert "Melissa.cycle_image(" not in game_source
+    assert "MelissaStaticData.image_path(" in game_source
+
+
+def test_melissa_story_state_has_explicit_npc_properties_without_var_authority():
+    source = MELISSA_INIT.read_text(encoding="utf-8-sig")
+    info_block = source.split("class MelissaInfo(Girl):", 1)[1]
+    required_properties = [
+        "mom_dress_complaint_count",
+        "asked_about_clara_day",
+        "intimacy_start_day",
+        "intimacy_start_count",
+        "intimacy_start_total",
         "private_context_day",
         "private_context_origin",
-        "private_context_place",
-        "private_place_heat",
-        "RoomProblemAskDay",
-        "RoomProblemAskDay",
-        "RoomProblemAskDay",
-        "StorageThanksDay",
-        "AtticFindingsDay",
-        "bats_episode",
-        "temp_room",
-        "storage_rat_last_help_day",
-        "room_pests_last_help_day",
+        "storage_thanks_day",
+        "temp_room_code",
+        "storage_rat_help_day",
         "bat_attic_check_day",
         "drawings_ready_day",
         "drawings_found",
+        "drawings_booklet_left",
+        "drawings_booklet_read",
         "drawings_returned",
-        "bat_recipe_clue_seen",
-        "bat_recipe_unlocked",
-        "bats_completed",
-        "bats_completed",
-        "bats_completed",
-        "bats_completion_day",
-        "room_returned",
-        "sex_engine_unlocked",
-        "room_returned",
-        "sex_engine_unlocked",
-        "room_returned",
-        "sex_engine_unlocked",
-        "roof_repair_order_day",
         "roof_repair_complete_day",
         "breakfast_tease_day",
     ]
 
-    for key in required_keys:
-        assert f'"{key}"' in source
+    for property_name in required_properties:
+        assert f"self.{property_name} =" in source
+
+    assert "STORY_DEFAULTS = {" not in info_block
+    assert "self.var =" not in info_block
+    assert "self.ensure_story_defaults()" not in info_block
+    assert "def ensure_story_defaults(" not in info_block
+    assert "try:" not in info_block
+    assert "except" not in info_block
+
+    for retired_key in (
+        "RoomProblemAskDay",
+        "AtticFindingsDay",
+        "bat_recipe_clue_seen",
+        "bats_episode",
+        "ratKilled",
+        "AskedMCToSolveRoomProblem",
+        "bats_completed",
+        "room_returned",
+        "sex_engine_unlocked",
+        "drawings_booklet_taken",
+        "drawings_booklet_opened",
+        "drawings_spy_option_unlocked",
+        "bat_recipe_unlocked",
+        "private_context_place",
+        "private_place_heat",
+        "sex_times_today",
+        "room_pests_last_help_day",
+        "bats_completion_day",
+    ):
+        assert f'"{retired_key}"' not in source
+
+
+def test_melissa_live_runtime_has_no_var_map_reads_or_writes():
+    game_root = PROJECT_ROOT / "game"
+    runtime_source = "\n".join(
+        path.read_text(encoding="utf-8-sig")
+        for path in game_root.rglob("*.rpy")
+        if path.name != "TractirSaveSync.rpy"
+    )
+
+    assert "Melissa.var" not in runtime_source
+    assert "Melissa.set_var" not in runtime_source
+    assert "Melissa.var_int" not in runtime_source
+
+
+def test_melissa_save_migration_consumes_legacy_map_once():
+    migration = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
+    block = migration.split("def updateSave_V50():", 1)[1].split("label before_load:", 1)[0]
+
+    for legacy_key in (
+        "MomDressComplaint", "AskedAboutClaraDay", "StartDay", "StartCount", "StartTotal",
+        "private_context_day", "private_context_origin", "StorageThanksDay", "temp_room",
+        "storage_rat_cleared", "storage_rat_last_help_day", "bat_attic_check_day",
+        "drawings_ready_day", "drawings_found", "drawings_booklet_left",
+        "drawings_booklet_read", "drawings_returned", "roof_repair_order_day",
+        "roof_repair_complete_day", "breakfast_tease_day", "work_attitude",
+    ):
+        assert f'"{legacy_key}"' in block
+    assert "def updateSave_V50():" in migration
+    assert "if loaded_version < 51:" in migration
+    assert "updateSave_V50()" in migration
+
+
+def test_melissa_revealing_dress_request_is_thread_owned_and_code_backed():
+    init_source = MELISSA_INIT.read_text(encoding="utf-8-sig")
+    household = HOUSEHOLD_EVENTS.read_text(encoding="utf-8-sig")
+    story = (PROJECT_ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
+    tavern_main = (PROJECT_ROOT / "game/Inn/TavernMain.rpy").read_text(encoding="utf-8-sig")
+    breakfast = (PROJECT_ROOT / "game/Inn/TavernKitchenBreakfast.rpy").read_text(encoding="utf-8-sig")
+    migration = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
+
+    assert 'self.revealing_dress_code = ""' in init_source
+    assert 'LThreadData(0, "melissa", "RevealingDressRequest"' in story
+    assert story.count('"MelissaDressRequestEvent"') >= 2
+    assert '"TavernMain", "melissa_dress_request"' in story
+    assert '"TavernKitchen", "melissa_dress_request"' in story
+    assert 'Melissa.revealing_dress_code = dress_name' in household
+    assert '$ threads["melissaRevealingDressRequest"].complete()' in household
+    assert "melissa_revealing_dress_request_ready" not in household + tavern_main + breakfast
+    assert 'story_event_available("TavernMain", "melissa_dress_request")' in tavern_main
+    assert 'story_event_available("TavernKitchen", "melissa_dress_request")' in breakfast
+    for retired_key in ("revealing_dress_ordered", "revealing_dress_request_seen"):
+        assert f'Melissa.var.get("{retired_key}"' not in household
+        assert f'Melissa.var["{retired_key}"]' not in household
+
+    migration_block = migration.split("def updateSave_V49():", 1)[1].split("label before_load:", 1)[0]
+    assert 'Melissa.revealing_dress_code = ""' in migration_block
+    assert 'melissa_var.pop("revealing_dress_ordered", None)' in migration_block
+    assert 'melissa_var.pop("revealing_dress_request_seen", 0)' in migration_block
+    assert 'threads.get("melissaRevealingDressRequest", None)' in migration_block
+
+
+def test_melissa_recipe_unlock_has_one_recipe_book_authority():
+    init_source = MELISSA_INIT.read_text(encoding="utf-8-sig")
+    event_source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")
+    recipe_source = (PROJECT_ROOT / "game" / "Items" / "Core" / "CraftingRecipes.rpy").read_text(encoding="utf-8-sig")
+    craft_source = (PROJECT_ROOT / "game" / "Items" / "Crafting" / "SoapCraftAndAtticItems.rpy").read_text(encoding="utf-8-sig")
+
+    assert 'recipe_book_item_state()["hidden_recipes_revealed"] = True' in recipe_source
+    assert "unlock_condition=recipe_book_hidden_recipes_revealed" in craft_source
+    assert "bat_recipe_unlocked" not in init_source
+    assert "bat_recipe_unlocked" not in event_source
+    assert "Melissa.bat_repellent_recipe_unlocked" not in craft_source
+
+    migration_source = (PROJECT_ROOT / "game" / "TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
+    migration_block = migration_source.split("def updateSave_V48():", 1)[1].split("label before_load:", 1)[0]
+    for retired_key in (
+        "bat_recipe_unlocked", "private_context_place", "private_place_heat", "sex_times_today",
+        "room_pests_last_help_day", "bats_completion_day",
+    ):
+        assert f'"{retired_key}"' in migration_block
+
+
+def test_melissa_room_uses_thread_events_without_disabled_pests_duplicate():
+    room_source = MELISSA_ROOM.read_text(encoding="utf-8-sig")
+    household_source = HOUSEHOLD_EVENTS.read_text(encoding="utf-8-sig")
+
+    assert "call RoomEnterEventGate(rooms.current_code, False)" in room_source
+    assert "tavern_melissa_room_pests_event_ready" not in room_source
+    assert "tavern_melissa_room_pests_event_ready" not in household_source
+    assert "label MelissaRoomPestsEvent" not in household_source
 
 
 def test_melissa_info_owns_runtime_defaults_without_legacy_sync():
@@ -113,6 +243,7 @@ def test_melissa_info_owns_runtime_defaults_without_legacy_sync():
         "def sync_melissa_maps",
         "Melissa.var =",
         "MelissaVar",
+        "sync_room_problem_state",
     ]:
         assert token not in source
 
@@ -144,7 +275,7 @@ def test_melissa_info_owns_runtime_defaults_without_legacy_sync():
     decision_source = GIRL_DECISION.read_text(encoding="utf-8-sig")
     for token in [
         'GIRL_DECISION_CORE_IDS = ("amanda", "melissa", "sandra")',
-        "girl_info = getPersonInfo(girl)",
+        "girl_info = people.get_info(girl)",
         "girl in GIRL_DECISION_CORE_IDS",
         '"mana_bad_probability": girl_info.mana_bad_probability()',
         "in GIRL_DECISION_CORE_IDS:",
@@ -159,6 +290,152 @@ def test_melissa_has_five_valid_favorite_talk_topics():
     assert '"clothes"' not in source
 
 
+def test_melissa_talk_keeps_native_flow_and_room_problem_choices_reachable():
+    talk_source = MELISSA_TALK.read_text(encoding="utf-8-sig")
+    household_source = HOUSEHOLD_EVENTS.read_text(encoding="utf-8-sig")
+
+    talk_menu = talk_source.split('label IntMelissaTalk(girl_name="melissa"):', 1)[1].split("label IntMelissaStartMenu", 1)[0]
+    assert "while True:" not in talk_menu
+    assert '"Обсудить, где Мелиссе переночевать" if melissa_room_problem_available():' in talk_source
+    assert "call IntMelissaRoomProblemAdviceMenu(girl_name)" in talk_source
+    assert 'label IntMelissaRoomProblemAdviceMenu(girl_name="melissa"):' in talk_source
+    assert '"Предложить пока ночевать у вас":' in talk_source
+    assert '"Предложить перебраться к Аманде":' in talk_source
+    assert '"Предложить занять пустую комнату":' in talk_source
+    assert "if _melissa_talk_new:" in talk_menu
+    assert "jump IntMelissaTalk" not in talk_menu
+    assert talk_menu.rstrip().endswith("return")
+    assert "jump IntMelissaStartMenu" not in talk_source
+    assert "call OldPointSmallTalkMenu" not in talk_menu
+    assert "call OldPointFlirtAttempt" not in talk_menu
+    assert "call PlayerCardGiftToFixedTargetMenu" not in talk_menu
+    assert "call OldPointKinoAttempt" not in talk_menu
+    assert "call OldPointApology" not in talk_menu
+    assert "call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)" in talk_menu
+    assert "Melissa.change_social(friend_delta=6" not in talk_menu
+    assert "RoomProblemAskDay" not in talk_source
+    assert "and stage == 3" in household_source
+    assert 'and temp_room == ""' in household_source
+
+
+def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
+    init_source = MELISSA_INIT.read_text(encoding="utf-8-sig")
+    talk_source = MELISSA_TALK.read_text(encoding="utf-8-sig")
+    sex_source = MELISSA_SEX.read_text(encoding="utf-8-sig")
+
+    for method_name in (
+        "relationship_stage",
+        "relationship_allows",
+        "room_is_private",
+        "private_place_offer",
+        "start_action_available",
+        "start_scene_count",
+        "start_intro_text",
+    ):
+        assert f"def {method_name}(self" in init_source
+        assert f"def melissa_{method_name}(" not in talk_source
+    assert 'Melissa.relationship_allows("intimacy")' in talk_source
+    assert "Melissa.private_place_offer(" in talk_source
+    assert 'Melissa.relationship_allows("sex")' in sex_source
+
+
+def test_melissa_intimacy_refresh_does_not_reset_arousal_or_proxy_owned_state():
+    source = MELISSA_SEX.read_text(encoding="utf-8-sig")
+
+    for helper_name in (
+        "_ims_player_cum_count",
+        "_ims_player_cum_limit",
+        "_ims_set_arousal",
+        "_ims_arousal",
+        "_ims_prepare_scene_state",
+        "_ims_clear_contact_states",
+        "_ims_set_inserted_container",
+        "_ims_current_inserted_container",
+    ):
+        assert helper_name not in source
+    assert 'Melissa.set_arousal(int(Melissa.stats.get("PussyWetStart"' not in source
+    assert "player.intimacy.arousal_value()" in source
+    assert "Melissa.arousal_value()" in source
+
+
+def test_melissa_werecat_event_labels_own_their_scenes_and_thread_advancement():
+    event_source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")
+    werecat_source = WERECAT_QUEST.read_text(encoding="utf-8-sig")
+
+    for label_name in (
+        "story_melissa_werecat_intro_0",
+        "story_melissa_werecat_home_0",
+        "story_melissa_werecat_home_1",
+    ):
+        block = event_source.split(f"label {label_name}:", 1)[1].split("\nlabel ", 1)[0]
+        assert "vscene tavern_kitchen_breakfast_picture()" in block
+        assert "event_runtime.active_thread.advance()" in block
+    for wrapper_name in (
+        "MelissaRatBreakfastScene",
+        "WerecatAdoptionBreakfastScene",
+        "WerecatMonthThanksScene",
+    ):
+        assert f"call {wrapper_name}" not in event_source
+        assert f"label {wrapper_name}:" not in werecat_source
+
+
+def test_melissa_dress_action_does_not_open_a_duplicate_menu():
+    talk_source = MELISSA_TALK.read_text(encoding="utf-8-sig")
+    dress_source = MELISSA_DRESS.read_text(encoding="utf-8-sig")
+
+    assert '"Предложить купить сестренке обновку" if' in talk_source
+    assert "call IntMelissaDressChange(girl_name)" in talk_source
+    assert "menu:" not in dress_source
+    assert '"Назад":' not in dress_source
+    assert "daily_events.add(" in dress_source
+
+
+def test_melissa_room_time_logic_uses_hour_schedule_not_display_slots():
+    household_source = HOUSEHOLD_EVENTS.read_text(encoding="utf-8-sig")
+    room_source = MELISSA_ROOM.read_text(encoding="utf-8-sig")
+
+    assert "calendar_v2.time_slot()" not in household_source.split("def melissa_room_problem_available():", 1)[1].split("def melissa_temp_room_text():", 1)[0]
+    assert "int(calendar_v2.hour or 0) >= 16" in household_source
+    assert 'not people.is_awake("melissa")' in room_source
+    assert "calendar_v2.time_slot()" not in room_source
+
+
+def test_melissa_room_object_menu_has_no_unused_text_dispatcher():
+    room_source = MELISSA_ROOM.read_text(encoding="utf-8-sig")
+
+    assert "def tavern_melissa_room_text():" in room_source
+    assert "TavernMelissaRoomObjectText" not in room_source
+    assert '_room_action.hook == "text"' not in room_source
+    assert room_source.count("tavern_melissa_room_text()") >= 3
+
+
+def test_melissa_uses_common_relationship_mutator_without_alias_methods():
+    init_source = MELISSA_INIT.read_text(encoding="utf-8-sig")
+    event_source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")
+    werecat_source = WERECAT_QUEST.read_text(encoding="utf-8-sig")
+
+    assert "def add_trust(" not in init_source
+    assert "def add_openness(" not in init_source
+    assert "Melissa.add_trust(" not in event_source + werecat_source
+    assert "Melissa.add_openness(" not in event_source + werecat_source
+    assert "Melissa.change_social(" in event_source
+
+
+def test_melissa_attic_actions_have_one_event_owned_path():
+    attic_source = TAVERN_ATTIC.read_text(encoding="utf-8-sig")
+
+    assert 'story_event_available("TavernAtic", "melissa_bats")' in attic_source
+    assert 'Call("checkTriggers", "TavernAtic", "melissa_bats", 0)' in attic_source
+    for dead_label in (
+        "MelissaAtticColonySearch",
+        "MelissaAtticWindowPeek",
+        "MelissaBurnAtticColony",
+        "MelissaOrderRoofRepair",
+        "MelissaCheckRoofRepair",
+    ):
+        assert f"label {dead_label}:" not in attic_source
+
+
 def test_melissa_removed_hidden_conditional_class_registration():
     source = MELISSA_INIT.read_text(encoding="utf-8-sig")
 
@@ -169,3 +446,12 @@ def test_melissa_removed_hidden_conditional_class_registration():
     assert "globals()" not in source
     assert "renpy.store" not in source
     assert "calendar_make_birth_record" not in source
+
+
+def test_melissa_bat_progress_uses_the_story_thread_directly():
+    source = MELISSA_INIT.read_text(encoding="utf-8-sig")
+
+    assert "def bats_stage(self):" not in source
+    assert 'threads["melissaBatProblem"].num' in source
+    assert '_story_thread_lookup("melissaBatProblem")' not in source
+    assert 'self.var["bats_episode"]' not in source

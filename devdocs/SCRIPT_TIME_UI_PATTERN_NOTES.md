@@ -120,9 +120,11 @@ Practical rule for Tractir:
 
 - Use `calendar_*` helpers for actual time math.
 - Use `time` slots for event conditions and schedules.
-- Use `AdvanceMovementTime` for moving rooms.
+- Use `movement_actions(target, minutes)` for room buttons. It applies the time
+  mutation, then jumps to the destination.
 - Use `AdvanceTime` or `NextDay` for deliberate waiting/rest.
-- After time changes, call `npc_schedule_sync_all()` and any local sync like `werecat_sync_profile()`.
+- Schedule location is projected directly from each `PeopleData` owner. Do not
+  synchronize or copy it into NPC instances after time changes.
 
 Tractir's equivalent daily flow should be:
 
@@ -238,7 +240,8 @@ Tractir already has a different UI contract that should be preserved.
 
 - `game/Inn/my_layouts/build_room_action_items.rpy`
   - Builds object and exit actions from room data.
-  - Movement exits call `AdvanceMovementTime`.
+  - Movement exits use `movement_actions()` so the old room is not retained on
+    Ren'Py's return stack.
 
 - `game/Inn/StoryEventRuntime.rpy`
   - Now matches the FamilyLife style better: event/thread classes are the blueprint, conditions are constructed into event rows, and availability is checked through thread/event methods.
@@ -254,17 +257,17 @@ For a readable room/event label:
 ```renpy
 label SomeRoomEvent:
     $ main_ui_begin_native_scene_state("Событие")
+    show screen main_ui
     vscene "images/path/to/picture.jpg"
     "Scene text."
 
-    $ main_ui_set_action_panel(
-        "Действия",
-        [
-            MenuItem("Продолжить", Call("SomeRoomEventContinue")),
-            MenuItem("Вернуться", Call("ReturnMainUISceneMode")),
-        ],
-        ui_mode="event",
-    )
+    menu:
+        "Продолжить":
+            call SomeRoomEventContinue
+        "Вернуться":
+            pass
+
+    $ main_ui_end_native_scene_state()
     return
 ```
 

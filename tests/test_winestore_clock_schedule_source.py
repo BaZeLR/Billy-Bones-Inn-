@@ -50,15 +50,15 @@ def _wine_matches(path, weekday, clock_text):
     ]
 
 
-def test_winestore_room_open_hours_are_clock_based_0800_to_1700_with_friday_1500_close():
+def test_winestore_room_open_hours_are_clock_based_0600_to_1700_with_friday_1500_close():
     source = _source(WINESTORE_ROOM)
     schedule_block = source.split("schedule=RoomSchedule(", 1)[1].split("custom_properties={", 1)[0]
 
     assert "def wine_store_open_now():" in source
     assert "if current_week == 5:" in source
-    assert "return 8 * 60 <= current_minutes <= 15 * 60" in source
-    assert "return 8 * 60 <= current_minutes <= 17 * 60" in source
-    assert 'start="08:00"' in schedule_block
+    assert "return 6 * 60 <= current_minutes <= 15 * 60" in source
+    assert "return 6 * 60 <= current_minutes <= 17 * 60" in source
+    assert 'start="06:00"' in schedule_block
     assert 'end="17:00"' in schedule_block
     assert "condition=wine_store_open_now" in schedule_block
     assert "time_slots=" not in schedule_block
@@ -68,11 +68,15 @@ def test_winestore_room_open_hours_are_clock_based_0800_to_1700_with_friday_1500
 
 def test_winestore_npc_presence_uses_hour_intervals_not_display_slots():
     clara = _source(CLARA_INIT)
+    schedule_runtime = _source(PROJECT_ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy")
 
     assert "def clara_wine_store_shift_active" not in clara
-    assert "npc_interval_schedule_load_file(name)" in clara
+    assert 'self.schedule_source = "schedules/clara.json"' in clara
+    assert "$ npc_interval_schedule_load_all(True)" in schedule_runtime
+    assert "npc_interval_schedule_load_file(name)" not in clara
     assert "return time_value in (0, 1)" not in clara
 
+    assert _wine_matches(CLARA_SCHEDULE, 1, "06:00")
     assert _wine_matches(CLARA_SCHEDULE, 1, "08:00")
     assert not _wine_matches(ALBER_SCHEDULE, 1, "08:00")
 

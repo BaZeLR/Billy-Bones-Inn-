@@ -1,263 +1,103 @@
-        ("story_give_birth_amanda", None, None, None, 1, None, ["#int(calendar_v2.daysInGame or 0) > 0", "#Amanda.pregnancy_days() >= 240", "#str(Amanda.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 7),        ("story_give_birth_amanda", None, None, None, 1, None, ["#int(calendar_v2.daysInGame or 0) > 0", "#Amanda.pregnancy_days() >= 240", "#str(Amanda.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 7),        ("story_give_birth_amanda", None, None, None, 1, None, ["#int(calendar_v2.daysInGame or 0) > 0", "#Amanda.pregnancy_days() >= 240", "#str(Amanda.sex_stat('pregfather', '') or '') != ''"], None, "TavernMain", "enter", 7),# ================================================================================
+# ================================================================================
 # FamilyLife-style story event runtime split.
 # Engine code lives in conditions.rpy, threads.rpy, and events.rpy.
 # Authored thread definitions and event labels stay in StoryEventRuntime.rpy for now.
 # ================================================================================
 
+define amandaRevealingDressRequestConditions = [
+    "#bool(str(Sandra.revealing_dress_code or '').strip())",
+    "#bool(str(Melissa.revealing_dress_code or '').strip())",
+    "#not str(Amanda.revealing_dress_code or '').strip()",
+    "#daily_events.exists('', 'BuyDressTom', '') == 0",
+    "#daily_events.exists('amanda', 'BuyDress', '') == 0",
+    "#int(Amanda.rel or 0) >= 5",
+    "#int(Amanda.talked_today or 0) == 0",
+]
+
 define amandaThreadList = [
+    LThreadData(0, "amanda", "RevealingDressRequest", None, [[
+        (
+            "AmandaDressRequestEvent",
+            None, None, None,
+            1, None, amandaRevealingDressRequestConditions, None,
+            "TavernMain", "amanda_dress_request", 0,
+        ),
+        (
+            "AmandaDressRequestEvent",
+            None, None, None,
+            1, None, amandaRevealingDressRequestConditions, None,
+            "TavernKitchen", "amanda_dress_request", 0,
+        ),
+    ]], highlight=False, threaded=True),
     LThreadData(0, "amanda", "LegareDance", None, [
-        amanda_dance_event("AmandaLegareDance_0", "story_amanda_legare_dance_0", "FridayDance", "enter", 0, "legare_intro", 0, "intro"),
-        amanda_dance_event("AmandaLegareDance_1", "story_amanda_legare_dance_1", "FridayDance", "amanda_dance_legare", 1, "legare", 1, "talking"),
-        amanda_dance_event("AmandaLegareDance_2", "story_amanda_legare_dance_2", "FridayDance", "amanda_dance_legare", 2, "legare", 2, "groping"),
-        amanda_dance_event("AmandaLegareDance_3", "story_amanda_legare_dance_3", "FridayDance", "amanda_dance_legare", 3, "legare", 3, "kissing"),
-        amanda_dance_event("AmandaLegareDance_4", "story_amanda_legare_dance_4", "FridayDance", "amanda_dance_legare", 4, "legare", 4, "after_dance"),
+        AmandaLegareDanceIntro,
+        AmandaLegareDanceTalking,
+        AmandaLegareDanceGroping,
+        AmandaLegareDanceKissing,
+        AmandaLegareDanceAfter,
     ], highlight=False, threaded=True),
     LThreadData(0, "amanda", "FridayDanceMC", None, [
-        amanda_dance_event("AmandaDance_0", "story_amanda_friday_dance_mc_0", "FridayDance", "amanda_dance_mc", 10, "mc", 0, "mc_dance", True),
+        AmandaFridayDanceMC,
     ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "FridayDanceLegare", None, [
-        amanda_dance_event("AmandaFridayDanceLegare_0", "story_amanda_friday_dance_legare_0", "FridayDance", "amanda_dance_legare", 20, "legare", 1, "talking", True),
+        AmandaFridayDanceLegare,
     ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "TavernSeductions", None, [
-        (
-            "story_amanda_tavern_seduction_0",
-            (1, 2, 3, 4, 6), (12, 21), None,
-            0.35,
-            [
-                "#int(Clara.var.get('source_known', 0) or 0) == 1",
-                "#int(Clara.var.get('fiance_church_seen', 0) or 0) == 0",
-            ],
-            [
-                "#amanda_tavern_seduction_ready()",
-            ],
-            [
-                "#int(Clara.var.get('second_ask_unlocked', 0) or 0) == 1",
-                "#int(Clara.var.get('source_known', 0) or 0) == 0",
-            ],
-            "TavernMain",
-            "enter",
-            210,
-        ),
+        AmandaTavernSeduction,
     ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "LizaWorkTalk", None, [
-        (
-            "story_amanda_liza_talk_work_0",
-            (1, 2, 3, 4, 5, 6), (12, 17), None,
-            1,
-            [
-                "#int(Clara.var.get('source_known', 0) or 0) == 1",
-                "#int(Clara.var.get('fiance_church_seen', 0) or 0) == 0",
-            ],
-            [
-                "#amanda_liza_talk_work_ready()",
-            ],
-            [
-                "#int(Clara.var.get('second_ask_unlocked', 0) or 0) == 1",
-                "#int(Clara.var.get('source_known', 0) or 0) == 0",
-            ],
-            "TavernMain",
-            "tavern_work",
-            230,
-        ),
-    ], highlight=False, threaded=False),
-    LThreadData(0, "amanda", "LizaGloryInvite", None, [
-        (
-            "story_amanda_liza_glory_invite_0",
-            (1, 2, 3, 4, 6), (12, 21), None,
-            1,
-            [
-                "#int(Clara.var.get('source_known', 0) or 0) == 1",
-                "#int(Clara.var.get('fiance_church_seen', 0) or 0) == 0",
-            ],
-            [
-                "#amanda_liza_glory_invite_ready()",
-            ],
-            [
-                "#int(Clara.var.get('second_ask_unlocked', 0) or 0) == 1",
-                "#int(Clara.var.get('source_known', 0) or 0) == 0",
-            ],
-            "TavernMain",
-            "enter",
-            208,
-        ),
-    ], highlight=False, threaded=False),
-    LThreadData(0, "amanda", "GloryAftermath", None, [
-        (
-            "story_amanda_glory_tavern_aftermath_0",
-            (1, 2, 3, 4, 6), (12, 21), None,
-            1,
-            None,
-            [
-                "#amanda_glory_tavern_aftermath_ready()",
-            ],
-            None,
-            "TavernMain",
-            "enter",
-            207,
-        ),
-        (
-            "story_amanda_night_after_glory_0",
-            None, (18, 23), None,
-            1,
-            None,
-            [
-                "#amanda_night_after_glory_ready()",
-            ],
-            None,
-            "TavernAmandaRoom",
-            "enter",
-            20,
-        ),
-    ], highlight=False, threaded=False),
-    LThreadData(0, "amanda", "TalkHub", None, [
-        (
-            "story_amanda_talk_hub_0",
-            None, None, None,
-            1,
-            None,
-            [
-                "#amanda_talk_hub_ready()",
-            ],
-            None,
-            "talk",
-            "amanda",
-            10,
-        ),
-    ], highlight=False, threaded=False),
-    LThreadData(0, "amanda", "DressChange", None, [
-        (
-            "story_amanda_dress_change_0",
-            None, None, None,
-            1,
-            None,
-            [
-                "#amanda_dress_change_thread_ready()",
-            ],
-            None,
-            "talk_amanda",
-            "dress_change",
-            20,
-        ),
+        AmandaLizaWorkTalk,
     ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "RoomNightApproach", None, [
-        (
-            "story_amanda_room_grope_0",
-            None, (18, 23), None,
-            1,
-            None,
-            [
-                "#tavern_amanda_bed_action_available()",
-            ],
-            None,
-            "TavernAmandaRoom",
-            "amanda_grope",
-            30,
-        ),
+        AmandaRoomNightApproach,
     ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "GloryHoleTry", None, [
-        (
-            "story_amanda_gloryhole_try_0",
-            None, (12, 21), None,
-            1,
-            None,
-            [
-                "#amanda_gloryhole_try_ready()",
-            ],
-            None,
-            "TavernGloryHole",
-            "amanda_gloryhole_try",
-            40,
-        ),
+        AmandaGloryHoleTry,
+    ], highlight=False, threaded=False),
+    LThreadData(0, "amanda", "MorningWindowEpisode", None, [
+        AmandaMorningWindowEpisode,
+    ], highlight=False, threaded=False),
+    LThreadData(0, "amanda", "NightBowlWindow", None, [
+        AmandaNightBowlWindow,
     ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "Birth", None, [
-        (
-            "story_amanda_give_birth_0",
-            None, None, None,
-            1,
-            None,
-            [
-                "#amanda_birth_ready()",
-            ],
-            None,
-            "TavernMain",
-            "enter",
-            7,
-        ),
+        AmandaBirth,
     ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "LegareTavernVisits", None, [
-        (
-            "story_amanda_legare_tavern_visit_0",
-            (1, 2, 3, 4, 6), (18, 21), None,
-            0.5,
-            None,
-            [
-                "#amanda_legare_tavern_visit_ready()",
-            ],
-            None,
-            "TavernMain",
-            "enter",
-            205,
-        ),
+        AmandaLegareTavernVisit,
     ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "StreetLegareSightings", None, [
-        (
-            "story_amanda_street_legare_sighting_0",
-            (1, 2, 3, 4, 6), (12, 21), None,
-            0.25,
-            None,
-            [
-                "#amanda_street_legare_sighting_ready(CurLoc)",
-            ],
-            None,
-            "StreetTavern",
-            "enter",
-            650,
-        ),
-        (
-            "story_amanda_street_legare_sighting_0",
-            (1, 2, 3, 4, 6), (12, 21), None,
-            0.25,
-            None,
-            [
-                "#amanda_street_legare_sighting_ready(CurLoc)",
-            ],
-            None,
-            "MarketPlace",
-            "enter",
-            650,
-        ),
+        [AmandaStreetLegareSightingStreet, AmandaStreetLegareSightingMarket],
     ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "StreetLoverEncounters", None, [
-        (
-            "story_amanda_street_lover_encounter_0",
-            (1, 2, 3, 4, 6), (12, 21), None,
-            0.2,
-            None,
-            [
-                "#amanda_street_lover_encounter_ready(CurLoc)",
-            ],
-            None,
-            "StreetTavern",
-            "enter",
-            660,
-        ),
-        (
-            "story_amanda_street_lover_encounter_0",
-            (1, 2, 3, 4, 6), (12, 21), None,
-            0.2,
-            None,
-            [
-                "#amanda_street_lover_encounter_ready(CurLoc)",
-            ],
-            None,
-            "MarketPlace",
-            "enter",
-            660,
-        ),
+        [AmandaStreetLoverEncounterStreet, AmandaStreetLoverEncounterMarket],
     ], highlight=False, threaded=False),
 ]
 
+define melissaRevealingDressRequestConditions = [
+    "#bool(str(Sandra.revealing_dress_code or '').strip())",
+    "#not str(Melissa.revealing_dress_code or '').strip()",
+    "#daily_events.exists('', 'BuyDressTom', '') == 0",
+    "#daily_events.exists('melissa', 'BuyDress', '') == 0",
+    "#int(Melissa.rel or 0) >= 6",
+    "#int(Melissa.talked_today or 0) == 0",
+]
+
 define melissaThreadList = [
+    LThreadData(0, "melissa", "RevealingDressRequest", None, [[
+        (
+            "MelissaDressRequestEvent",
+            None, None, None,
+            1, None, melissaRevealingDressRequestConditions, None,
+            "TavernMain", "melissa_dress_request", 0,
+        ),
+        (
+            "MelissaDressRequestEvent",
+            None, None, None,
+            1, None, melissaRevealingDressRequestConditions, None,
+            "TavernKitchen", "melissa_dress_request", 0,
+        ),
+    ]], highlight=False, threaded=True),
     #
     # melissa_rat_problem
     #
@@ -271,8 +111,8 @@ define melissaThreadList = [
             1,
             None,
             [
-                "#int(Melissa.var.get('storage_rat_cleared', 0) or 0) == 0",
-                "#str(getLocation('melissa') or '') == 'TavernStorage'",
+                "#people_to_int(Melissa.storage_rat_help_day, -1) < 0",
+                "#str(people.location('melissa') or '') == 'TavernStorage'",
                 "#not household_runtime_event_seen_today('melissa_storage_rat')",
             ],
             None,
@@ -293,8 +133,7 @@ define melissaThreadList = [
             [
                 "#not (int(werecat_state().get('sold', 0) or 0) == 0 and int(werecat_state().get('adopted_count', 0) or 0) >= 1)",
                 "#int(werecat_state().get('rats_problem_active', 0) or 0) == 1",
-                "#int(Melissa.var.get('storage_rat_cleared', 0) or 0) == 1",
-                "#int(Melissa.var.get('storage_rat_last_help_day', -1) or -1) >= 0",
+                "#people_to_int(Melissa.storage_rat_help_day, -1) >= 0",
                 "#int(werecat_state().get('adopted', 0) or 0) == 0",
                 "#int(werecat_state().get('sold', 0) or 0) == 0",
                 "#int(werecat_state().get('hunter_tease_day', -1) or -1) < 0",
@@ -366,9 +205,8 @@ define melissaThreadList = [
             1,
             None,
             [
-                "#int(Melissa.var.get('bats_episode', 0) or 0) <= 0",
-                "#int(Melissa.var.get('storage_rat_last_help_day', -1) or -1) >= 0",
-                "#calendar_v2.moon_phase_name_en(calendar_v2.day) == 'Full Moon'",
+                "#people_to_int(Melissa.storage_rat_help_day, -1) >= 0",
+                "#day_delta_ready(Melissa.storage_rat_help_day, 2)",
                 "#not bool(player.tavern_management.breakfast.today)",
             ],
             None,
@@ -381,13 +219,24 @@ define melissaThreadList = [
             None, (16, 17), None,
             1,
             None,
-            [
-                "#int(Melissa.var.get('bats_episode', 0) or 0) == 1",
-            ],
+            None,
             None,
             "TavernUpstairs",
             "enter",
             1,
+        ),
+        (
+            "story_melissa_bat_problem_room_inspect",
+            None, None, None,
+            1,
+            None,
+            [
+                "#int(effective_player_exploration() or 0) >= 100",
+            ],
+            None,
+            "TavernMelissaRoom",
+            "room_search",
+            2,
         ),
         (
             "story_melissa_bat_problem_2",
@@ -395,8 +244,7 @@ define melissaThreadList = [
             1,
             None,
             [
-                "#int(Melissa.var.get('bats_episode', 0) or 0) == 3",
-                "#int(current_game_day() or 0) >= int(Melissa.var.get('bat_attic_check_day', -1) or -1)",
+                "#int(current_game_day() or 0) >= people_to_int(Melissa.bat_attic_check_day, -1)",
             ],
             None,
             "TavernAtic",
@@ -408,70 +256,113 @@ define melissaThreadList = [
             None, None, None,
             1,
             None,
-            [
-                "#int(Melissa.var.get('bats_episode', 0) or 0) in (4, 5)",
-            ],
+            None,
             None,
             "TavernAtic",
             "melissa_bats",
             3,
         ),
         (
-            "story_melissa_bat_problem_5",
+            "story_melissa_bat_problem_fall",
             None, None, None,
             1,
             None,
-            [
-                "#int(Melissa.var.get('bats_episode', 0) or 0) >= 6",
-                "#int(Melissa.var.get('bats_episode', 0) or 0) < 8",
-                "#str(Melissa.var.get('temp_room', '') or '') == 'TavernAmandaRoom'",
-                "#int(Melissa.var.get('drawings_found', 0) or 0) == 0",
-                "#int(current_game_day() or 0) >= int(Melissa.var.get('drawings_ready_day', -1) or -1)",
-            ],
             None,
-            "TavernMelissaRoom",
-            "room_search",
-            4,
-        ),
-        (
-            "story_melissa_bat_problem_4",
-            None, None, None,
-            1,
-            None,
-            [
-                "#int(Melissa.var.get('bats_episode', 0) or 0) >= 6",
-                "#int(Melissa.var.get('bats_episode', 0) or 0) < 8",
-            ],
             None,
             "TavernAtic",
             "melissa_bats",
-            5,
+            4,
         ),
-        (
-            "story_melissa_bat_problem_6",
-            None, None, None,
-            1,
-            None,
-            [
-                "#int(Melissa.var.get('bats_episode', 0) or 0) == 7",
-                "#int(Melissa.var.get('roof_repair_complete_day', -1) or -1) >= 0",
-                "#int(current_game_day() or 0) >= int(Melissa.var.get('roof_repair_complete_day', -1) or -1)",
-                "#int(Melissa.var.get('drawings_returned', 0) or 0) == 1",
-            ],
-            None,
-            "TavernMain",
-            "melissa_talk",
-            6,
-        ),
+        [
+            (
+                "story_melissa_bat_problem_5",
+                None, None, None,
+                1,
+                None,
+                [
+                    "#str(Melissa.temp_room_code or '') == 'TavernAmandaRoom'",
+                    "#not bool(Melissa.drawings_found)",
+                    "#int(current_game_day() or 0) >= people_to_int(Melissa.drawings_ready_day, -1)",
+                ],
+                None,
+                "TavernMelissaRoom",
+                "room_search",
+                4,
+            ),
+            (
+                "story_melissa_bat_problem_4",
+                None, None, None,
+                1,
+                None,
+                [
+                    "#bool(Melissa.drawings_found)",
+                ],
+                None,
+                "TavernAtic",
+                "melissa_bats",
+                5,
+            ),
+        ],
+        [
+            (
+                "story_melissa_bat_problem_roof",
+                None, None, None,
+                1,
+                None,
+                [
+                    "#people_to_int(Melissa.roof_repair_complete_day, -1) < 0",
+                ],
+                None,
+                "TavernAtic",
+                "melissa_bats",
+                6,
+            ),
+            (
+                "story_melissa_bat_problem_6",
+                None, None, None,
+                1,
+                None,
+                [
+                    "#people_to_int(Melissa.roof_repair_complete_day, -1) >= 0",
+                    "#int(current_game_day() or 0) >= people_to_int(Melissa.roof_repair_complete_day, -1)",
+                    "#bool(Melissa.drawings_returned)",
+                ],
+                None,
+                "TavernMain",
+                "melissa_talk",
+                6,
+            ),
+        ],
     ], highlight=False, threaded=True),
 ]
 
 define sandraThreadList = [
-    LThreadData(0, "sandra", "WeeklyEvaluation", None, [
-        ("sandraWeeklyEvaluation_0", None, None, None, 1, None, ["#Sandra.weekly_thanks_event_ready()"], None, "TavernMyRoom", "sleep", 0),
-        ("sandraWeeklyEvaluation_1", None, None, None, 1, None, ["#Sandra.weekly_thanks_event_ready()"], None, "TavernMyRoom", "sleep", 1),
-        ("sandraWeeklyEvaluation_2", None, None, None, 1, None, ["#Sandra.weekly_thanks_event_ready()"], None, "TavernMyRoom", "sleep", 2),
-        ("sandraWeeklyEvaluation_3", None, None, None, 1, None, ["#Sandra.weekly_thanks_event_ready()"], None, "TavernMyRoom", "sleep", 3),
+    LThreadData(0, "sandra", "WeeklyEvaluation", "sandraWeeklyEvaluationEnabled", [
+        ("sandraWeeklyEvaluation_0", None, None, 0, 1, None, None, None, "TavernMyRoom", "sleep", 0),
+        ("sandraWeeklyEvaluation_1", None, None, 0, 1, None, None, None, "TavernMyRoom", "sleep", 1),
+        ("sandraWeeklyEvaluation_2", None, None, 0, 1, None, None, None, "TavernMyRoom", "sleep", 2),
+        ("sandraWeeklyEvaluation_3", None, None, 0, 1, None, None, None, "TavernMyRoom", "sleep", 3),
+        ("TavernSandraNightThanksScene", None, (22, 23), 0, 1, None, None, None, "TavernSandraRoom", "sandra_night_thanks", 0),
+    ], highlight=False, threaded=True),
+    LThreadData(0, "sandra", "RevealingDressInitiative", None, [
+        (
+            "SandraDressInitiativeEvent",
+            None, None, None,
+            1,
+            None,
+            [
+                "#int(Becky.home_visit_stage or 0) >= 3",
+                "#not str(Sandra.revealing_dress_code or '').strip()",
+                "#daily_events.exists('', 'BuyDressTom', '') == 0",
+                "#daily_events.exists('sandra', 'BuyDress', '') == 0",
+                "#int(Sandra.rel or 0) >= 7",
+                "#int(Sandra.talked_today or 0) == 0",
+            ],
+            None,
+            "TavernKitchen",
+            "sandra_dress_initiative",
+            0,
+        ),
     ], highlight=False, threaded=True),
 ]
 define claraThreadList = [
@@ -482,42 +373,37 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('market_day_roll_day', -1) or -1) == int(dayspassed or 0)",
-                "#int(Clara.var.get('market_day_roll', 0) or 0) == 1",
-                "#int(Clara.var.get('booklet_market_seen', 0) or 0) == 0",
-                "#not (int(Clara.var.get('market_follow_failed_day', -1) or -1) == int(dayspassed or 0) and int(Clara.var.get('market_follow_failed_hour', -1) or -1) == int(hour or 0))",
+                "#people_to_int(Clara.market_day_roll_day, -1) == int(calendar_v2.daysInGame or 0)",
+                "#bool(Clara.market_day_roll)",
+                "#not (people_to_int(Clara.market_follow_failed_day, -1) == int(calendar_v2.daysInGame or 0) and people_to_int(Clara.market_follow_failed_hour, -1) == int(calendar_v2.hour or 0))",
             ],
             None,
             "MarketPlace",
             "enter",
-            900,
+            0,
         ),
         (
             "story_clara_market_booklet_2",
-            [1, 2, 3, 4, 6], (13, 15), None,
+            [1, 2, 3, 4, 6], (18, 18), None,
             1,
             None,
             [
-                "#int(Clara.var.get('market_evening_roll_day', -1) or -1) == int(dayspassed or 0)",
-                "#int(Clara.var.get('market_evening_roll', 0) or 0) == 1",
-                "#int(Clara.var.get('booklet_market_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('market_evening_intro_seen', 0) or 0) == 0",
+                "#people_to_int(Clara.market_evening_roll_day, -1) == int(calendar_v2.daysInGame or 0)",
+                "#bool(Clara.market_evening_roll)",
             ],
             None,
             "MarketPlace",
             "enter",
-            900,
+            1,
         ),
         (
             "story_clara_market_booklet_3",
-            [1, 2, 3, 4, 6], (13, 15), None,
+            [1, 2, 3, 4, 6], (18, 18), None,
             1,
             None,
             [
-                "#int(Clara.var.get('market_evening_roll_day', -1) or -1) == int(dayspassed or 0)",
-                "#int(Clara.var.get('market_evening_roll', 0) or 0) == 1",
-                "#int(Clara.var.get('market_evening_intro_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('mongol_theft_seen', 0) or 0) == 0",
+                "#people_to_int(Clara.market_evening_roll_day, -1) == int(calendar_v2.daysInGame or 0)",
+                "#bool(Clara.market_evening_roll)",
             ],
             None,
             "MarketPlace",
@@ -529,10 +415,7 @@ define claraThreadList = [
             None, None, None,
             1,
             None,
-            [
-                "#int(Clara.var.get('mongol_theft_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('escape_confessed', 0) or 0) == 0",
-            ],
+            None,
             None,
             "WineStore",
             "clara_talk",
@@ -543,10 +426,7 @@ define claraThreadList = [
             None, None, None,
             1,
             None,
-            [
-                "#int(Clara.var.get('escape_confessed', 0) or 0) == 1",
-                "#int(Mongol.var.get('StocksArrestDay', -1) or -1) < 0",
-            ],
+            None,
             None,
             "HunterClub",
             "overheard",
@@ -557,27 +437,21 @@ define claraThreadList = [
             None, None, None,
             1,
             None,
-            [
-                "#int(Mongol.var.get('StocksArrestDay', -1) or -1) >= 0",
-                "#int(Mongol.var.get('StocksSeen', 0) or 0) == 0",
-            ],
             None,
-            "CityGuard",
-            "enter",
+            None,
+            "menu_CityGuard",
+            "mongol_stocks",
             5,
         ),
         (
             "story_clara_market_booklet_7",
-            None, (16, 17), None,
+            None, (21, 23), None,
             1,
             None,
-            [
-                "#int(Mongol.var.get('StocksSeen', 0) or 0) == 1",
-                "#int(Mongol.var.get('StocksFoodDay', -1) or -1) < 0",
-            ],
             None,
-            "CityGuard",
-            "enter",
+            None,
+            "menu_CityGuard",
+            "mongol_stocks",
             6,
         ),
         (
@@ -586,8 +460,7 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Mongol.var.get('StocksFoodDay', -1) or -1) >= 0",
-                "#int(DraupnirVar.get('MongolLockpickOrderDay', -1) or -1) < 0",
+                "#Draupnir.mongol_lockpick_order_day < 0",
             ],
             None,
             "StolyarWorkshop",
@@ -596,17 +469,16 @@ define claraThreadList = [
         ),
         (
             "story_clara_market_booklet_9",
-            None, (16, 17), None,
+            None, (21, 23), None,
             1,
             None,
             [
-                "#int(DraupnirVar.get('MongolLockpickOrderDay', -1) or -1) >= 0",
-                "#int(Mongol.var.get('StocksReleased', 0) or 0) == 0",
-                "#int(current_game_day() or 0) > int(Mongol.var.get('StocksFoodDay', -1) or -1)",
+                "#Draupnir.mongol_lockpick_order_day >= 0",
+                "#int(current_game_day() or 0) > Mongol.stocks_food_day",
             ],
             None,
-            "CityGuard",
-            "enter",
+            "menu_CityGuard",
+            "mongol_stocks",
             8,
         ),
     ], highlight=False, threaded=True),
@@ -623,8 +495,7 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Melissa.var.get('drawings_found', 0) or 0) == 1",
-                "#int(Clara.var.get('paintings_melissa_asked', 0) or 0) == 0",
+                "#bool(Melissa.drawings_found)",
                 "#people_to_int(Melissa.asked_today, 0) == 0",
             ],
             None,
@@ -638,9 +509,7 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('paintings_melissa_asked', 0) or 0) == 1",
-                "#int(Clara.var.get('cellar_seen', 0) or 0) == 0",
-                "#int(Clara.var.get('flirt', 0) or 0) > 0",
+                "#int(Clara.flirt_count or 0) > 0",
             ],
             None,
             "WineStore",
@@ -653,9 +522,7 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('comfort_pending', 0) or 0) == 1",
-                "#int(Clara.var.get('comfort_done', 0) or 0) == 0",
-                "#str(getLocation('clara') or '') == 'WineStore'",
+                "#str(people.location('clara') or '') == 'WineStore'",
             ],
             None,
             "WineStore",
@@ -667,10 +534,7 @@ define claraThreadList = [
             None, None, None,
             1,
             None,
-            [
-                "#int(Clara.var.get('second_ask_unlocked', 0) or 0) == 1",
-                "#int(Clara.var.get('source_known', 0) or 0) == 0",
-            ],
+            None,
             None,
             "WineStore",
             "clara_paintings",
@@ -681,10 +545,7 @@ define claraThreadList = [
             7, (6, 12), None,
             1,
             None,
-            [
-                "#int(Clara.var.get('source_known', 0) or 0) == 1",
-                "#int(Clara.var.get('fiance_church_seen', 0) or 0) == 0",
-            ],
+            None,
             None,
             "Church",
             "clara_paintings",
@@ -692,14 +553,10 @@ define claraThreadList = [
         ),
         (
             "story_clara_paintings_barber_5",
-            None, None, None,
+            None, (8, 10), None,
             1,
             None,
-            [
-                "#int(Clara.var.get('fiance_church_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('fiance_barber_seen', 0) or 0) == 0",
-                "#(8 <= int(hour or 0) <= 10 or ((int(hour or 0) >= 23 or int(hour or 0) <= 5) and int(Clara.var.get('fiance_barber_night_roll', 0) or 0) == 1))",
-            ],
+            None,
             None,
             "BarberShop",
             "clara_fiance",
@@ -711,9 +568,7 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('fiance_barber_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('commission_started', 0) or 0) == 0",
-                "#str(getLocation('clara') or '') == 'TavernMain'",
+                "#str(people.location('clara') or '') == 'TavernMain'",
             ],
             None,
             "TavernMain",
@@ -726,10 +581,8 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('commission_started', 0) or 0) == 1",
-                "#int(Clara.var.get('commission_followup_done', 0) or 0) == 0",
-                "#int(current_game_day() or 0) >= int(Clara.var.get('commission_followup_day', 999999) or 999999)",
-                "#str(getLocation('clara') or '') == 'WineStore'",
+                "#int(current_game_day() or 0) >= people_to_int(Clara.commission_followup_day, 999999)",
+                "#str(people.location('clara') or '') == 'WineStore'",
             ],
             None,
             "WineStore",
@@ -738,17 +591,13 @@ define claraThreadList = [
         ),
         (
             "story_clara_paintings_evening_peek_8",
-            None, (13, 15), None,
+            None, (19, 21), None,
             1,
             None,
-            [
-                "#int(Clara.var.get('commission_followup_done', 0) or 0) == 1",
-                "#int(Clara.var.get('peek_done', 0) or 0) == 0",
-                "#str(getLocation('clara') or '') == 'WineStore'",
-            ],
             None,
-            "WineStore",
-            "clara_paintings",
+            None,
+            "ArtisansQuarter",
+            "enter",
             8,
         ),
         (
@@ -757,10 +606,8 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('peek_done', 0) or 0) == 1",
-                "#int(Clara.var.get('confession_done', 0) or 0) == 0",
-                "#str(getLocation('clara') or '') == 'TavernMelissaRoom'",
-                "#str(getLocation('melissa') or '') == 'TavernMelissaRoom'",
+                "#str(people.location('clara') or '') == 'TavernMelissaRoom'",
+                "#str(people.location('melissa') or '') == 'TavernMelissaRoom'",
             ],
             None,
             "TavernMelissaRoom",
@@ -773,9 +620,7 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('confession_done', 0) or 0) == 1",
-                "#int(Clara.var.get('murder_seen', 0) or 0) == 0",
-                "#int(current_game_day() or 0) >= int(Clara.var.get('murder_day', 999999) or 999999)",
+                "#int(current_game_day() or 0) >= people_to_int(Clara.murder_day, 999999)",
             ],
             None,
             "CityGuard",
@@ -795,11 +640,8 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('fiance_barber_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('commission_started', 0) or 0) == 0",
-                "#str(getLocation('clara') or '') == 'TavernMain'",
-                "#str(getLocation('melissa') or '') == 'TavernMain'",
-                "#int(Clara.var.get('tavern_visit_bar_0_seen', 0) or 0) == 0",
+                "#str(people.location('clara') or '') == 'TavernMain'",
+                "#str(people.location('melissa') or '') == 'TavernMain'",
                 "#not household_runtime_event_seen_today('clara_tavern_visit')",
             ],
             None,
@@ -813,14 +655,9 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('fiance_barber_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('commission_started', 0) or 0) == 0",
-                "#str(getLocation('clara') or '') == 'TavernMain'",
-                "#str(getLocation('melissa') or '') == 'TavernMain'",
-                "#int(Clara.var.get('tavern_visit_bar_0_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('tavern_visit_bar_1_seen', 0) or 0) == 0",
-                "#Amanda.var_int('attic_window_busted', 0) == 1",
-                "#int(Melissa.var.get('bats_episode', 0) or 0) >= 6",
+                "#str(people.location('clara') or '') == 'TavernMain'",
+                "#str(people.location('melissa') or '') == 'TavernMain'",
+                "#threads['melissaBatProblem'].num >= 6",
                 "#not household_runtime_event_seen_today('clara_tavern_visit')",
             ],
             None,
@@ -834,13 +671,9 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('fiance_barber_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('commission_started', 0) or 0) == 0",
-                "#str(getLocation('clara') or '') == 'TavernMain'",
-                "#str(getLocation('melissa') or '') == 'TavernMain'",
-                "#int(Clara.var.get('tavern_visit_bar_1_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('tavern_visit_bar_2_seen', 0) or 0) == 0",
-                "#int(Melissa.var.get('drawings_booklet_read', 0) or 0) == 1 or int(Melissa.var.get('drawings_booklet_left', 0) or 0) == 1",
+                "#str(people.location('clara') or '') == 'TavernMain'",
+                "#str(people.location('melissa') or '') == 'TavernMain'",
+                "#int(player.item_count('melissa_drawings_booklet_001') or 0) > 0 or bool(Melissa.drawings_booklet_read) or bool(Melissa.drawings_booklet_left)",
                 "#not household_runtime_event_seen_today('clara_tavern_visit')",
             ],
             None,
@@ -854,13 +687,10 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('peek_done', 0) or 0) == 1",
-                "#int(Clara.var.get('confession_done', 0) or 0) == 0",
-                "#str(getLocation('clara') or '') == 'TavernMelissaRoom'",
-                "#str(getLocation('melissa') or '') == 'TavernMelissaRoom'",
-                "#int(Melissa.var.get('bats_episode', 0) or 0) >= 8",
-                "#int(Melissa.var.get('drawings_found', 0) or 0) == 1",
-                "#int(Clara.var.get('melissa_room_visit_0_seen', 0) or 0) == 0",
+                "#str(people.location('clara') or '') == 'TavernMelissaRoom'",
+                "#str(people.location('melissa') or '') == 'TavernMelissaRoom'",
+                "#threads['melissaBatProblem'].num >= 8",
+                "#bool(Melissa.drawings_found)",
                 "#not household_runtime_event_seen_today('clara_melissa_room_visit')",
             ],
             None,
@@ -874,13 +704,9 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('peek_done', 0) or 0) == 1",
-                "#int(Clara.var.get('confession_done', 0) or 0) == 0",
-                "#str(getLocation('clara') or '') == 'TavernMelissaRoom'",
-                "#str(getLocation('melissa') or '') == 'TavernMelissaRoom'",
-                "#int(Melissa.var.get('bats_episode', 0) or 0) >= 8",
-                "#int(Clara.var.get('melissa_room_visit_0_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('melissa_room_visit_1_seen', 0) or 0) == 0",
+                "#str(people.location('clara') or '') == 'TavernMelissaRoom'",
+                "#str(people.location('melissa') or '') == 'TavernMelissaRoom'",
+                "#threads['melissaBatProblem'].num >= 8",
                 "#not household_runtime_event_seen_today('clara_melissa_room_visit')",
             ],
             None,
@@ -894,13 +720,9 @@ define claraThreadList = [
             1,
             None,
             [
-                "#int(Clara.var.get('peek_done', 0) or 0) == 1",
-                "#int(Clara.var.get('confession_done', 0) or 0) == 0",
-                "#str(getLocation('clara') or '') == 'TavernMelissaRoom'",
-                "#str(getLocation('melissa') or '') == 'TavernMelissaRoom'",
-                "#int(Melissa.var.get('bats_episode', 0) or 0) >= 8",
-                "#int(Clara.var.get('melissa_room_visit_1_seen', 0) or 0) == 1",
-                "#int(Clara.var.get('melissa_room_visit_2_seen', 0) or 0) == 0",
+                "#str(people.location('clara') or '') == 'TavernMelissaRoom'",
+                "#str(people.location('melissa') or '') == 'TavernMelissaRoom'",
+                "#threads['melissaBatProblem'].num >= 8",
                 "#not household_runtime_event_seen_today('clara_melissa_room_visit')",
             ],
             None,
@@ -914,211 +736,50 @@ define beckyThreadList = [
     LThreadData(0, "becky", "FridayDanceMC", None, [
         becky_dance_event("BeckyDance_0", "story_becky_friday_dance_mc_0", "FridayDance", "becky_dance_mc", 10, "mc", 0, "mc_dance", True),
     ], highlight=False, threaded=False),
-    LThreadData(0, "becky", "IngaFirstTalk", None, [
+    LThreadData(0, "becky", "IngaLucasPath", None, [
+        ("becky_homefront_share_with_becky", None, None, None, 1, None, [
+            "#str(rooms.get('BeckyHomeFront').state.get('arrival_mode', '') or '') == 'FromDances'",
+        ], None, "BeckyHomeFront", "inga_discovery", 10),
         ("story_becky_talk_inga_0", None, None, None, 1, None, [
-            "#Becky.var.get('SawIngaFuck', 0) == 1",
             "#Becky.talk_count() < 2",
-        ], None, "talk_becky", "becky_talk_inga1", 10),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "IngaSecondTalk", None, [
+        ], None, "talk_becky", "becky_talk_inga1", 20),
         ("story_becky_talk_inga_1", None, None, None, 1, None, [
-            "#Becky.var.get('SawIngaFuck', 0) == 2",
             "#Becky.talk_count() < 2",
-        ], None, "talk_becky", "becky_talk_inga2", 20),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "LucasTalk", None, [
+        ], None, "talk_becky", "becky_talk_inga2", 30),
         ("story_becky_talk_lucas_0", None, None, None, 1, None, [
-            "#Becky.var.get('SawIngaFuck', 0) == 3",
             "#Becky.talk_count() < 2",
-        ], None, "talk_becky", "becky_talk_lucas", 30),
+        ], None, "talk_becky", "becky_talk_lucas", 40),
     ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "HusbandFirstTalk", None, [
+    LThreadData(0, "becky", "HusbandBackstory", [
+        "#int(Becky.stats.get('orgasms_given', 0) or 0) > 0",
+        "#int(Becky.stats.get('sexacts', 0) or 0) > 0",
+    ], [
         ("story_becky_talk_husband_0", None, None, None, 1, None, [
-            "#Becky.var.get('husbandtalk', 0) == 1",
             "#Becky.rel > 13",
             "#Becky.talk_count() < 2",
         ], None, "talk_becky", "becky_talk_husband1", 40),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "HusbandSecondTalk", None, [
         ("story_becky_talk_husband_1", None, None, None, 1, None, [
-            "#Becky.var.get('husbandtalk', 0) == 2",
             "#Becky.talk_count() < 2",
         ], None, "talk_becky", "becky_talk_husband2", 50),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "HusbandThirdTalk", None, [
         ("story_becky_talk_husband_2", None, None, None, 1, None, [
-            "#Becky.var.get('husbandtalk', 0) == 3",
             "#Becky.talk_count() < 2",
         ], None, "talk_becky", "becky_talk_husband3", 60),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "HusbandFourthTalk", None, [
         ("story_becky_talk_husband_3", None, None, None, 1, None, [
-            "#Becky.var.get('husbandtalk', 0) == 4",
             "#Becky.talk_count() < 2",
         ], None, "talk_becky", "becky_talk_husband4", 70),
     ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "EddieFirstTalk", None, [
+    LThreadData(0, "becky", "EddieBackstory", None, [
         ("story_becky_talk_eddie_0", None, None, None, 1, None, [
-            "#Becky.var.get('eddietalk', 0) == 0",
             "#Becky.rel > 6",
             "#Becky.talk_count() < 2",
         ], None, "talk_becky", "becky_talk_eddie1", 80),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "EddieGeorgettTalk", None, [
         ("story_becky_talk_eddie_georgett_0", None, None, None, 1, None, [
-            "#int(Eddie.var.get('TalkedAboutGeorgett', 0) or 0) > 0",
-            "#Becky.var.get('husbandtalk', 0) > 0",
-            "#Becky.var.get('eddietalk', 0) > 0",
+            "#Eddie.talked_about_georgett",
+            "#(threads.get('beckyHusbandBackstory', None) is not None and (threads['beckyHusbandBackstory'].checkActive() or int(threads['beckyHusbandBackstory'].num or 0) > 0))",
             "#Becky.rel > 8",
             "#Becky.talk_count() < 2",
         ], None, "talk_becky", "becky_talk_eddie2", 90),
     ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "HomeInviteTalk", None, [
-        ("story_becky_home_invite_talk_0", None, None, None, 1, None, [
-            "#Becky.var.get('visitedhome', 0) == 2",
-            "#Becky.rel > 12",
-            "#Becky.talk_count() < 2",
-            "#str(player.appearance.current_dress or '') == 'citydress'",
-            "#int(charisma or 0) > 75",
-        ], None, "talk_becky", "becky_talk_invite", 100),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "HomeLastVisitTalk", None, [
-        ("story_becky_home_last_visit_talk_0", None, None, None, 1, None, [
-            "#Becky.var.get('TimesVisited', 0) > 0",
-            "#Becky.talk_count() < 2",
-        ], None, "talk_becky", "becky_talk_lastvisit", 110),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "EddieBehaviorTalk", None, [
-        ("story_becky_talk_eddie_behavior_0", None, None, None, 1, None, [
-            "#Becky.var.get('visitedhome', 0) >= 3",
-            "#int(Eddie.var.get('SawMomSex', 0) or 0) > 0 or Becky.var.get('HomeSex', 0) > 0",
-            "#Becky.var.get('visitedhome', 0) < 7",
-            "#Becky.var.get('EddieTryToFuck', 0) < 4",
-            "#Becky.talk_count() < 2",
-        ], None, "talk_becky", "becky_talk_eddie3", 120),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "EddieGeorgMentionTalk", None, [
-        ("story_becky_talk_eddie_georgett_1", None, None, None, 1, None, [
-            "#Becky.var.get('EddieGeorg', 0) > 1",
-            "#Becky.var.get('visitedhome', 0) < 7",
-            "#Becky.talk_count() < 2",
-        ], None, "talk_becky", "becky_talk_eddie4", 130),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "EddieReactionTalk", None, [
-        ("story_becky_talk_eddie_reaction_0", None, None, None, 1, None, [
-            "#Becky.var.get('GeorgMention', 0) == 1",
-            "#Becky.var.get('visitedhome', 0) < 7",
-            "#Becky.talk_count() < 2",
-        ], None, "talk_becky", "becky_talk_eddie5", 140),
-        ("story_becky_talk_eddie_reaction_1", None, None, None, 1, None, [
-            "#Becky.var.get('GeorgMention', 0) == 1",
-            "#Becky.var.get('visitedhome', 0) < 7",
-            "#Becky.talk_count() < 2",
-        ], None, "talk_becky", "becky_talk_eddie6", 141),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "EddieAfterSexTalk", None, [
-        ("story_becky_talk_eddie_after_sex_0", None, None, None, 1, None, [
-            "#(Becky.var.get('EddieTryToFuck', 0) == 4 and Becky.var.get('AskedEddieFuck', 0) == 0) or (Becky.var.get('visitedhome', 0) >= 7 and Becky.var.get('AskedEddieFuck', 0) < 2)",
-            "#Becky.talk_count() < 2",
-        ], None, "talk_becky", "becky_talk_eddie7", 150),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "PregnancyFatherTalk", None, [
-        ("story_becky_talk_pregnancy_0", None, None, None, 1, None, [
-            "#Becky.talk_count() < 2",
-            "#Becky.rel >= 8",
-            "#int(Becky.stats.get('pregnancy', 0) or 0) >= 120",
-            "#str(DaddyAskBuildPhrase('becky') or '') != ''",
-        ], None, "talk_becky", "becky_talk_pregnancy", 160),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "SherwoodOfferTalk", None, [
-        ("story_becky_sherwood_offer_0", None, None, None, 1, None, [
-            "#Becky.talk_count() < 2",
-            "#Becky.var.get('TradeOffer', 0) == 2",
-        ], None, "talk_becky", "becky_talk_sherwood_offer", 170),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "SherwoodElvesTalk", None, [
-        ("story_becky_sherwood_elves_0", None, None, None, 1, None, [
-            "#Becky.talk_count() < 2",
-            "#Becky.var.get('TradeOffer', 0) == 1",
-            "#Becky.var.get('AskTradeElf', 0) == 0",
-        ], None, "talk_becky", "becky_talk_sherwood_elves", 171),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "SherwoodFingalTalk", None, [
-        ("story_becky_sherwood_fingal_0", None, None, None, 1, None, [
-            "#Becky.var.get('TradeOffer', 0) == 1",
-            "#int(Eddie.var.get('FingalTalk', 0) or 0) > 0",
-            "#Becky.var.get('FingalClarify', 0) == 0",
-            "#Becky.var.get('AdmitSherwood', 0) == 0",
-        ], None, "talk_becky", "becky_talk_sherwood_fingal", 172),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "SherwoodWarnTalk", None, [
-        ("story_becky_sherwood_warn_0", None, None, None, 1, None, [
-            "#Becky.var.get('TradeOffer', 0) == 1",
-            "#Becky.var.get('SherwoodWarn', 0) == 1",
-            "#Becky.var.get('AdmitSherwood', 0) == 0",
-        ], None, "talk_becky", "becky_talk_sherwood_warn", 173),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "SherwoodRoadTalk", None, [
-        ("story_becky_sherwood_road_0", None, None, None, 1, None, [
-            "#Becky.talk_count() < 2",
-            "#Becky.var.get('TradeOffer', 0) == 1",
-            "#Becky.var.get('AdmitSherwood', 0) == 0",
-            "#Becky.var.get('KnowSherwood', 0) == 1",
-        ], None, "talk_becky", "becky_talk_sherwood_road", 174),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "SherwoodLiedTalk", None, [
-        ("story_becky_sherwood_lied_0", None, None, None, 1, None, [
-            "#Becky.var.get('TradeOffer', 0) == 1",
-            "#Becky.var.get('AdmitSherwood', 0) == 1",
-        ], None, "talk_becky", "becky_talk_sherwood_lied", 175),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "SherwoodRobbedTalk", None, [
-        ("story_becky_sherwood_robbed_0", None, None, None, 1, None, [
-            "#Becky.talk_count() < 2",
-            "#Becky.var.get('RobbedByRobin', 0) == 1",
-        ], None, "talk_becky", "becky_talk_sherwood_robbed", 176),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "SherwoodHowToTalk", None, [
-        ("story_becky_sherwood_howto_0", None, None, None, 1, None, [
-            "#Becky.talk_count() < 2",
-            "#Becky.var.get('ConsoleRobbery', 0) == 0",
-            "#Becky.var.get('RobbedByRobin', 0) >= 2",
-        ], None, "talk_becky", "becky_talk_sherwood_howto", 177),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "SherwoodWarnedTalk", None, [
-        ("story_becky_sherwood_warned_0", None, None, None, 1, None, [
-            "#Becky.var.get('RobbedByRobin', 0) == 2",
-            "#Becky.var.get('AdmitSherwood', 0) == 0",
-        ], None, "talk_becky", "becky_talk_sherwood_warned", 178),
-    ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "HomeFrontIngaLucas", None, [
-        ("story_becky_home_front_inga_0", None, None, None, 1, None, [
-            "#int(Becky.var.get('HomeFrontCheckedDay', -1) or -1) != int(current_game_day() or 0)",
-            "#int(Becky.var.get('TodayFrontSexCheck', 0) or 0) == 0",
-        ], None, "BeckyHomeFront", "enter", 300),
-    ], highlight=False, threaded=False),
-    LThreadData(0, "becky", "HomeVisitEntry", None, [
-        ("story_becky_home_visit_0", None, None, None, 1, None, [
-            "#str(ArriveMode or '') == ''",
-            "#int(Becky.var.get('HomeEnterCheckedDay', -1) or -1) != int(current_game_day() or 0)",
-        ], None, "BeckyHome", "enter", 310),
-    ], highlight=False, threaded=False),
-    LThreadData(0, "becky", "HomeDanceArrival", None, [
-        ("story_becky_home_from_dances_0", None, None, None, 1, None, [
-            "#str(ArriveMode or '') == 'FromDances'",
-            "#int(Becky.var.get('visitedhome', 0) or 0) < 5",
-        ], None, "BeckyHome", "enter", 320),
-    ], highlight=False, threaded=False),
-    LThreadData(0, "becky", "HomeDinnerBedroom", None, [
-        ("story_becky_home_from_dinner_0", None, None, None, 1, None, [
-            "#str(ArriveMode or '') == 'FromDinner'",
-        ], None, "BeckyHome", "enter", 330),
-    ], highlight=False, threaded=False),
-    LThreadData(0, "becky", "HomeEddieBedroom", None, [
-        ("story_becky_home_svalnyi_greh_0", None, None, None, 1, None, [
-            "#str(ArriveMode or '') == 'SvalnyiGreh'",
-        ], None, "BeckyHome", "enter", 340),
-    ], highlight=False, threaded=False),
     LThreadData(0, "becky", "GeorgettHomeVisit", None, [
         (
             "GeorgettBeckyVisit",
@@ -1126,10 +787,10 @@ define beckyThreadList = [
             1,
             None,
             [
-                "#int(Becky.var.get('EddieWhoreHome', 0) or 0) == 4",
-                "#int(Becky.var.get('visitedhome', 0) or 0) >= 5",
-                "#int(Becky.var.get('HomeSex', 0) or 0) > 0",
-                "#int(Eddie.var.get('SawMomSex', 0) or 0) > 0",
+                "#int(Becky.eddie_home_visit_state or 0) == 4",
+                "#int(Becky.home_visit_stage or 0) >= 5",
+                "#bool(Becky.home_sex_unlocked)",
+                "#Eddie.saw_mother_sex",
                 "#CheckIfSexEventExist('georgett', 99, 'EddieHomeVisit') > 0",
             ],
             None,
@@ -1145,10 +806,6 @@ define beckyThreadList = [
             1,
             None,
             [
-                "#church_after_cermon_action_visible()",
-                "#int(Becky.var.get('PriestAdvice', 0) or 0) > 0",
-                "#Becky.after_sermon_stage() < 4",
-                "#CheckIfSexEventExist('becky', 99, 'Priest') > 0",
                 "#Becky.church_after_sermon_event_available()",
             ],
             None,
@@ -1171,8 +828,8 @@ define robinThreadList = [
             1,
             None,
             [
-                "#int(Becky.var.get('TradeOffer', 0) or 0) == 1",
-                "#str(CurLoc or '') == 'BlackwoodRoad'",
+                "#int(Becky.trade_offer_stage or 0) == 1",
+                "#str(rooms.current_code or '') == 'BlackwoodRoad'",
             ],
             None,
             "BlackwoodRoad",
@@ -1190,7 +847,7 @@ define tavernThreadList = [
             1,
             None,
             [
-                "#tavern_work_planned_for('WaitressHarass', CurLoc, time)",
+                "#tavern_work_planned_for('WaitressHarass', rooms.current_code, calendar_v2.time_slot())",
             ],
             None,
             "TavernMain",
@@ -1202,7 +859,7 @@ define tavernThreadList = [
             1,
             None,
             [
-                "#tavern_work_planned_for('CleaningHarass', CurLoc, time)",
+                "#tavern_work_planned_for('CleaningHarass', rooms.current_code, calendar_v2.time_slot())",
             ],
             None,
             "TavernMain",
@@ -1214,7 +871,7 @@ define tavernThreadList = [
             1,
             None,
             [
-                "#tavern_work_planned_for('FightSmall', CurLoc, time)",
+                "#tavern_work_planned_for('FightSmall', rooms.current_code, calendar_v2.time_slot())",
             ],
             None,
             "TavernMain",
@@ -1224,6 +881,30 @@ define tavernThreadList = [
     ]], highlight=False, threaded=False),
 ]
 define cityThreadList = [
+    LThreadData(0, "city", "BlindPirateFall", None, [
+        (
+            "story_city_blind_pirate_fall_0",
+            None, None, None,
+            1,
+            None,
+            marketplace_blind_pirate_event_ready,
+            None,
+            "MarketPlace",
+            "enter",
+            -100,
+        ),
+        (
+            "TavernKitchenBreakfastBlindPirateStory",
+            None, None, None,
+            1,
+            None,
+            None,
+            None,
+            "Breakfast",
+            "market_talk",
+            0,
+        ),
+    ], highlight=False, threaded=True),
     RThreadData(0, "city", "StreetChronicles", None, [1, [
         # (target, day, hour, delay, probability, reqs, condition, item, location, action, priority)
         (
@@ -1231,12 +912,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetPatrolEvent')",
-                "#int(GuardCaptainVar.get('street_pass', 0) or 0) == 0",
-                "#town_street.patrol_allowed(CurLoc)",
+                "#TownStreet.patrol_allowed(rooms.current_code)",
             ],
             None,
             "StreetTavern",
@@ -1248,12 +924,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetThugsEvent')",
-                "#int(TownStreetFightToday or 0) == 0",
-                "#town_street.thug_allowed(CurLoc)",
+                "#TownStreet.thug_allowed(rooms.current_code)",
             ],
             None,
             "StreetTavern",
@@ -1265,11 +936,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetHelpEvent')",
-                "#town_street.help_allowed(CurLoc)",
+                "#TownStreet.help_allowed(rooms.current_code)",
             ],
             None,
             "StreetTavern",
@@ -1281,10 +948,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownRandomChronicleEvent')",
+                "#TownStreet.chronicle_allowed(rooms.current_code)",
             ],
             None,
             "StreetTavern",
@@ -1296,12 +960,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetPatrolEvent')",
-                "#int(GuardCaptainVar.get('street_pass', 0) or 0) == 0",
-                "#town_street.patrol_allowed(CurLoc)",
+                "#TownStreet.patrol_allowed(rooms.current_code)",
             ],
             None,
             "MarketPlace",
@@ -1313,12 +972,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetThugsEvent')",
-                "#int(TownStreetFightToday or 0) == 0",
-                "#town_street.thug_allowed(CurLoc)",
+                "#TownStreet.thug_allowed(rooms.current_code)",
             ],
             None,
             "MarketPlace",
@@ -1330,11 +984,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetHelpEvent')",
-                "#town_street.help_allowed(CurLoc)",
+                "#TownStreet.help_allowed(rooms.current_code)",
             ],
             None,
             "MarketPlace",
@@ -1346,10 +996,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownRandomChronicleEvent')",
+                "#TownStreet.chronicle_allowed(rooms.current_code)",
             ],
             None,
             "MarketPlace",
@@ -1361,12 +1008,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetPatrolEvent')",
-                "#int(GuardCaptainVar.get('street_pass', 0) or 0) == 0",
-                "#town_street.patrol_allowed(CurLoc)",
+                "#TownStreet.patrol_allowed(rooms.current_code)",
             ],
             None,
             "PortStreets",
@@ -1378,12 +1020,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetThugsEvent')",
-                "#int(TownStreetFightToday or 0) == 0",
-                "#town_street.thug_allowed(CurLoc)",
+                "#TownStreet.thug_allowed(rooms.current_code)",
             ],
             None,
             "PortStreets",
@@ -1395,11 +1032,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetHelpEvent')",
-                "#town_street.help_allowed(CurLoc)",
+                "#TownStreet.help_allowed(rooms.current_code)",
             ],
             None,
             "PortStreets",
@@ -1411,10 +1044,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownRandomChronicleEvent')",
+                "#TownStreet.chronicle_allowed(rooms.current_code)",
             ],
             None,
             "PortStreets",
@@ -1426,12 +1056,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetPatrolEvent')",
-                "#int(GuardCaptainVar.get('street_pass', 0) or 0) == 0",
-                "#town_street.patrol_allowed(CurLoc)",
+                "#TownStreet.patrol_allowed(rooms.current_code)",
             ],
             None,
             "ArtisansQuarter",
@@ -1443,12 +1068,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetThugsEvent')",
-                "#int(TownStreetFightToday or 0) == 0",
-                "#town_street.thug_allowed(CurLoc)",
+                "#TownStreet.thug_allowed(rooms.current_code)",
             ],
             None,
             "ArtisansQuarter",
@@ -1460,11 +1080,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownStreetHelpEvent')",
-                "#town_street.help_allowed(CurLoc)",
+                "#TownStreet.help_allowed(rooms.current_code)",
             ],
             None,
             "ArtisansQuarter",
@@ -1476,10 +1092,7 @@ define cityThreadList = [
             1,
             None,
             [
-                "#town_street.location_allowed(CurLoc)",
-                "#int(TownStreetEventsToday or 0) < 2",
-                "#not town_street.random_seen_this_slot(CurLoc)",
-                "#town_street.planned_for(CurLoc, 'TownRandomChronicleEvent')",
+                "#TownStreet.chronicle_allowed(rooms.current_code)",
             ],
             None,
             "ArtisansQuarter",
@@ -1512,7 +1125,7 @@ define lizaThreadList = [
             None,
             [
                 "#Liza.can_work_tavern()",
-                "#str(TavernMainClientRoomGirl or '') == 'liza'",
+                "#str(rooms.get('TavernMain').state.get('client_room_girl', '') or '') == 'liza'",
                 "#int(player.tavern_management.client_room_hole or 0) > 0",
                 "#CheckIfSexEventExist('liza', 3, 'Prostitution') > 0",
             ],
@@ -1529,7 +1142,6 @@ define lizaThreadList = [
             1,
             None,
             [
-                "#church_after_cermon_action_visible()",
                 "#Liza.church_after_sermon_event_available()",
             ],
             None,
@@ -1549,9 +1161,8 @@ define georgettThreadList = [
             [
                 "#church_service_action_visible()",
                 "#bool(Georgett.known) or people_to_int(Georgett.rel, 0) > 0",
-                "#npc_schedule_georgett_church_visible()",
                 "#people_to_int(Georgett.story_value('foundinchurch', 0), 0) > 0",
-                "#Georgett.can_player_cum()",
+                "#player.intimacy.can_cum()",
                 "#people_to_int(Georgett.rel, 0) >= 6",
                 "#people_to_int(Georgett.corruption, 0) >= 50",
                 "#people_to_int(Georgett.sex_stat('sexacts', 0), 0) >= 3",
@@ -1571,9 +1182,8 @@ define georgettThreadList = [
             [
                 "#church_service_action_visible()",
                 "#bool(Georgett.known) or people_to_int(Georgett.rel, 0) > 0",
-                "#npc_schedule_georgett_church_visible()",
                 "#people_to_int(Georgett.story_value('foundinchurch', 0), 0) > 0",
-                "#Georgett.can_player_cum()",
+                "#player.intimacy.can_cum()",
                 "#people_to_int(Georgett.rel, 0) >= 6",
                 "#people_to_int(Georgett.corruption, 0) >= 50",
                 "#people_to_int(Georgett.sex_stat('sexacts', 0), 0) >= 3",
@@ -1593,11 +1203,10 @@ define georgettThreadList = [
             [
                 "#church_service_action_visible()",
                 "#bool(Georgett.known) or people_to_int(Georgett.rel, 0) > 0",
-                "#npc_schedule_georgett_church_visible()",
                 "#people_to_int(Georgett.story_value('foundinchurch', 0), 0) > 0",
                 "#people_to_int(Georgett.story_value('askkids', 0), 0) > 0",
                 "#people_to_int(Georgett.story_value('fuckinchurch', 0), 0) > 0",
-                "#Georgett.can_player_cum()",
+                "#player.intimacy.can_cum()",
                 "#people_to_int(Georgett.rel, 0) >= 6",
                 "#people_to_int(Georgett.corruption, 0) >= 50",
                 "#people_to_int(Georgett.sex_stat('sexacts', 0), 0) >= 3",
@@ -1631,7 +1240,7 @@ define georgettThreadList = [
             None,
             [
                 "#Georgett.can_work_tavern()",
-                "#str(TavernMainClientRoomGirl or '') == 'georgett'",
+                "#str(rooms.get('TavernMain').state.get('client_room_girl', '') or '') == 'georgett'",
                 "#int(player.tavern_management.client_room_hole or 0) > 0",
                 "#CheckIfSexEventExist('georgett', 3, 'Prostitution') > 0",
             ],
@@ -1648,7 +1257,6 @@ define georgettThreadList = [
             1,
             None,
             [
-                "#church_after_cermon_action_visible()",
                 "#Georgett.church_after_sermon_event_available()",
             ],
             None,

@@ -135,9 +135,20 @@ label ExampleRoom:
     if scene_image:
         vscene scene_image
     $ MainTxt = CurrentRoom.current_description_text(CurrentRoom.display_name)
-    call screen main_ui
-    return
+    while True:
+        call screen main_ui
 ```
+
+`Call(...)` actions in `main_ui` end the current screen statement before they
+call their label. The iterative loop is therefore the room's stable interaction
+owner: local procedures return into it, while exit actions use `Jump` and leave
+it without growing the return stack. Do not replace this with `jump ExampleRoom`,
+a refresh label, or a dispatcher.
+
+Parameterized detail labels invoked by `Call(...)` do not own another screen
+loop. They prepare the detail text/actions and `return`; the room/root loop
+continues displaying `main_ui`. Only labels entered as navigation roots own the
+iterative interaction loop.
 
 ## Visible Objects
 

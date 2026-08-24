@@ -1,4 +1,4 @@
-        global PlayerArousalReasons        global PlayerMorningArousalDay, PlayerWakeStateNotice        global PlayerLastHelpResult        global PlayerArousalReasons        global PlayerMorningArousalDay, PlayerWakeStateNotice        global PlayerLastHelpResult        global PlayerArousalReasons        global PlayerMorningArousalDay, PlayerWakeStateNotice        global PlayerLastHelpResult# ================================================================================
+# ================================================================================
 # Player intimacy, sleep layer, and arousal state.
 # (Defaults centralized in script.rpy to avoid duplicate default errors)
 # ================================================================================
@@ -30,16 +30,16 @@ init python:
 
     def player_mark_sex_day(reason="", target=""):
         intimacy = player.intimacy
-        intimacy.last_sex_day = player_intimacy_int(dayspassed, 0)
-        intimacy.last_cum_day = player_intimacy_int(dayspassed, 0)
+        intimacy.last_sex_day = current_game_day()
+        intimacy.last_cum_day = current_game_day()
         return intimacy.last_sex_day
 
     def player_record_orgasm(reason="", target=""):
         intimacy = player.intimacy
-        result = intimacy.record_cum(dayspassed)
+        result = intimacy.record_cum(current_game_day())
         target_key = str(target or "").strip().lower()
         if target_key:
-            partner = getPersonInfo(target_key)
+            partner = people.get_info(target_key)
             if partner is not None:
                 partner.mark_fucked(1)
                 partner.record_sex_history("You", str(reason or ""), "orgasm")
@@ -47,26 +47,26 @@ init python:
 
     def player_days_without_sex():
         last_day = player_intimacy_int(player.intimacy.last_sex_day, -1)
-        today = player_intimacy_int(dayspassed, 0)
+        today = current_game_day()
         if last_day < 0:
             return max(0, today)
         return max(0, today - last_day)
 
     def player_ensure_nightwear_in_chest():
         appearance = player.appearance
-        appearance.ensure_nightwear(player_intimacy_int(dayspassed, 0))
+        appearance.ensure_nightwear(current_game_day())
         return True
 
-    def player_sync_body_state():
+    def player_body_profile():
         try:
-            return bodymodel_sync_character("You", "Стефан", "male")
+            return bodymodel_build_profile("You", "Стефан", "male")
         except Exception:
             return {}
 
     def player_set_sleep_layer(mode="daywear"):
         appearance = player.appearance
-        appearance.set_sleep_layer(mode, player_intimacy_int(dayspassed, 0))
-        player_sync_body_state()
+        appearance.set_sleep_layer(mode, current_game_day())
+        player_body_profile()
         return appearance.sleep_bottom_layer
 
     def player_is_naked():
@@ -84,7 +84,7 @@ init python:
         return not player_is_naked()
 
     def player_arousal_state_line():
-        value = player.intimacy.arousal_value("You")
+        value = player.intimacy.arousal_value()
         if player_cum_count() >= player_cum_limit():
             return "Мужская сила на сегодня уже истрачена."
         if value < 20:
@@ -98,7 +98,7 @@ init python:
         return "Вы уже не можете сдерживаться."
 
     def player_body_state_lines():
-        player_sync_body_state()
+        player_profile = player_body_profile()
         lines = []
         if player_is_naked():
             lines.append("На вас сейчас нет одежды.")
@@ -116,10 +116,10 @@ init python:
         days_wait = player_days_without_sex()
         if days_wait >= 2:
             lines.append("Без секса уже %s дня; тело реагирует быстрее обычного." % days_wait)
-        if str(PlayerWakeStateNotice or "").strip() and player_intimacy_int(PlayerMorningArousalDay, -1) == player_intimacy_int(dayspassed, 0):
-            lines.append(str(PlayerWakeStateNotice))
+        if str(player.intimacy.wake_state_notice or "").strip() and player_intimacy_int(player.intimacy.morning_arousal_day, -1) == current_game_day():
+            lines.append(str(player.intimacy.wake_state_notice))
         try:
-            body_text = bodymodel_profile_summary_text(BodyInteractionProfiles.get("You", {}) or {})
+            body_text = bodymodel_profile_summary_text(player_profile)
             if body_text:
                 lines.append(body_text)
         except Exception:
@@ -129,44 +129,42 @@ init python:
     def player_apply_arousal_trigger(trigger_code="", amount=0):
         trigger_key = str(trigger_code or "context").strip()
         intimacy = player.intimacy
-        current = player_intimacy_int(intimacy.arousal_value("You"), 0)
+        current = player_intimacy_int(intimacy.arousal_value(), 0)
         if player_cum_count() >= player_cum_limit():
-            intimacy.set_arousal(0, "You")
+            intimacy.set_arousal(0)
             return 0
         new_value = player_intimacy_clamp(current + player_intimacy_int(amount, 0), 0, 95)
-        intimacy.set_arousal(new_value, "You")
-        if not isinstance(PlayerArousalReasons, list):
-            PlayerArousalReasons = []
-        if trigger_key and trigger_key not in PlayerArousalReasons:
-            PlayerArousalReasons.append(trigger_key)
+        intimacy.set_arousal(new_value)
+        if trigger_key and trigger_key not in player.intimacy.arousal_reasons:
+            player.intimacy.arousal_reasons.append(trigger_key)
         return new_value
 
     def player_apply_morning_state(location_code=""):
-        if str(location_code or CurLoc or "") != "TavernMyRoom":
+        if str(location_code or rooms.current_code or "") != "TavernMyRoom":
             return ""
-        today = player_intimacy_int(dayspassed, 0)
-        if player_intimacy_int(PlayerMorningArousalDay, -1) == today:
-            return str(PlayerWakeStateNotice or "")
-        PlayerMorningArousalDay = today
+        today = current_game_day()
+        if player_intimacy_int(player.intimacy.morning_arousal_day, -1) == today:
+            return str(player.intimacy.wake_state_notice or "")
+        player.intimacy.morning_arousal_day = today
         days_wait = player_days_without_sex()
-        seed = (today * 37 + player_intimacy_int(hour, 0) * 11 + player_intimacy_int(time, 0) * 19) % 100
-        should_rise = int(time or 0) == 0 and (days_wait >= 2 or seed < 18 or player_is_naked() or player_is_in_nightwear())
+        seed = (today * 37 + int(calendar_v2.hour or 0) * 11 + int(calendar_v2.time_slot()) * 19) % 100
+        should_rise = int(calendar_v2.time_slot()) == 0 and (days_wait >= 2 or seed < 18 or player_is_naked() or player_is_in_nightwear())
         if not should_rise:
-            PlayerWakeStateNotice = ""
+            player.intimacy.wake_state_notice = ""
             return ""
         amount = 18 + min(35, days_wait * 8)
         if player_is_naked() or player_is_in_nightwear():
             amount += 7
         player_apply_arousal_trigger("wake", amount)
-        PlayerWakeStateNotice = "Вы проснулись с заметным утренним стояком."
-        return PlayerWakeStateNotice
+        player.intimacy.wake_state_notice = "Вы проснулись с заметным утренним стояком."
+        return player.intimacy.wake_state_notice
 
     def player_npc_exposed_for_arousal(npc_id=""):
         key = str(npc_id or "").strip().lower()
         if not key:
             return False
         try:
-            profile = bodymodel_sync_character(key, RealName.get(key, key), "female")
+            profile = bodymodel_build_profile(key, people_display_name(key), "female")
             if bool(profile.get("naked", False)):
                 return True
             access = dict(profile.get("access", {}) or {})
@@ -176,31 +174,32 @@ init python:
                 return True
         except Exception:
             pass
-        return int(TitsVisible.get(key, 0) or 0) > 0 or int(PussyVisible.get(key, 0) or 0) > 0
+        info = people.get_info(key)
+        return bool(info is not None and (info.tits_visible() or info.pussy_visible()))
 
     def player_observe_npc_body(npc_id="", where_id=""):
         key = str(npc_id or "").strip().lower()
         if not key or not player_npc_exposed_for_arousal(key):
             return 0
-        if not isinstance(PlayerObservedNakedNpcDay, dict):
+        if not isinstance(player.intimacy.observed_naked_npc_day, dict):
             return 0
-        today = player_intimacy_int(dayspassed, 0)
-        if player_intimacy_int(PlayerObservedNakedNpcDay.get(key, -1), -1) == today:
-            return player.intimacy.arousal_value("You")
-        PlayerObservedNakedNpcDay[key] = today
+        today = current_game_day()
+        if player_intimacy_int(player.intimacy.observed_naked_npc_day.get(key, -1), -1) == today:
+            return player.intimacy.arousal_value()
+        player.intimacy.observed_naked_npc_day[key] = today
         return player_apply_arousal_trigger("saw_naked_" + key, 12 + min(18, player_days_without_sex() * 3))
 
     def player_intimacy_help_kind(girl_name="", profile=None):
         data = dict(profile or build_girl_decision_profile(girl_name))
         oral_score = float(data.get("oral_pref", 0.0) or 0.0) + float(data.get("sexual_openness", 0.0) or 0.0) + float(data.get("arousal", 0.0) or 0.0)
-        seed = (player_intimacy_int(dayspassed, 0) * 29 + sum([ord(ch) for ch in str(girl_name or "")])) % 100
+        seed = (current_game_day() * 29 + sum([ord(ch) for ch in str(girl_name or "")])) % 100
         if oral_score >= 1.15 and seed < int(35 + oral_score * 25):
             return "blowjob"
         return "handjob"
 
     def player_apply_intimacy_help_penalty(girl_name=""):
         key = str(girl_name or "").strip().lower()
-        info = getPersonInfo(key)
+        info = people.get_info(key)
         before = player_intimacy_int(getattr(info, "corruption", 0), 0) if info is not None else 0
         reduction = max(1, int(round(float(before) * 0.35))) if before > 0 else 0
         if info is not None:
@@ -227,7 +226,7 @@ init python:
             decision = {"reaction": "neutral", "profile": profile}
         reaction = str(decision.get("reaction", "neutral") or "neutral")
         positive = reaction in ("good", "capricious_bad_is_good")
-        name = str(RealName.get(key, key) or key)
+        name = str(people_display_name(key) or key)
         if positive:
             kind = player_intimacy_help_kind(key, decision.get("profile", profile))
             if kind == "blowjob":
@@ -235,7 +234,7 @@ init python:
             else:
                 text = "%s соглашается помочь без лишнего шума. Она устраивается ближе, берет ваш член рукой и доводит вас до разрядки быстрым, уверенным движением." % name
             player_record_orgasm("npc_help_" + kind, key)
-            info = getPersonInfo(key)
+            info = people.get_info(key)
             if info is not None:
                 info.change_social(friend_delta=1, corruption_delta=1)
             result = {"ok": True, "girl": key, "kind": kind, "reaction": reaction, "text": text}
@@ -243,7 +242,7 @@ init python:
             penalty = player_apply_intimacy_help_penalty(key)
             text = "%s воспринимает просьбу как оскорбление. Она резко отстраняется, смотрит холодно и дает понять, что вы перепутали близость с правом требовать. Ее доверие падает, а распущенность заметно остывает." % name
             result = {"ok": False, "girl": key, "kind": "", "reaction": reaction, "penalty": penalty, "text": text}
-        PlayerLastHelpResult = dict(result)
+        player.intimacy.last_help_result = dict(result)
         return dict(result)
 
     def player_can_ask_intimacy_help(girl_name=""):
@@ -252,25 +251,23 @@ init python:
             return False
         if player_cum_count() >= player_cum_limit():
             return False
-        if player_intimacy_int(player.intimacy.arousal_value("You"), 0) < 40:
+        if player_intimacy_int(player.intimacy.arousal_value(), 0) < 40:
             return False
         return True
 
 
 label PlayerIntimacyHelpAsk(girl_name="", return_label=""):
+    $ renpy.dynamic("_pih_result")
     $ _pih_result = player_intimacy_help_result(girl_name)
-    if str(girl_name or "").strip().lower() == "amanda":
-        $ Amanda.set_var_int("night_tease_resolved", 1)
-        $ Amanda.set_var_int("night_tease_scene_active", 0)
-    $ MainTxt = str(_pih_result.get("text", "") or "")
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
-    $ current_action_title = "Просьба о помощи"
-    $ current_action_content = None
-    $ current_action_items = []
+    $ scene_runtime.text = str(_pih_result.get("text", "") or "")
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+    $ main_ui_runtime.action_title = "Просьба о помощи"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     if str(return_label or "").strip() != "":
-        $ current_action_items.append(MenuItem("Назад", Call(return_label)))
+        $ main_ui_runtime.action_items.append(MenuItem("Назад", Call(return_label)))
     else:
-        $ current_action_items.append(MenuItem("Назад", Jump(str(CurLoc or ""))))
+        $ main_ui_runtime.action_items.append(MenuItem("Назад", Jump(str(rooms.current_code or ""))))
     $ renpy.restart_interaction()
     return

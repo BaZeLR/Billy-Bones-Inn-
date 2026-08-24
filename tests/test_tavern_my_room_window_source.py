@@ -21,10 +21,13 @@ def test_player_room_window_uses_three_real_player_room_pictures():
 def test_player_room_window_uses_calendar_hour_for_day_night_choice():
     source = read_rel("game/Inn/TavernMyRoomWindow001.rpy")
 
-    assert "$ calendar_v2.sync_state()" in source
+    assert "$ calendar_v2.sync_state()" not in source
     assert "$ _window_hour = int(calendar_v2.hour or 0)" in source
     assert "$ _window_is_night = _window_hour >= 18 or _window_hour < 6" in source
-    assert "amanda_night_bowl_window_event_ready()" in source
+    assert 'call checkTriggers("TavernMyRoom", "window_look", 0)' in source
+    assert "label story_amanda_night_bowl_window_0:" in source
+    assert "amanda_night_bowl_window_event_ready" not in source
+    assert "night_bowl_window_seen_day" not in source
 
 
 def test_player_room_window_has_distinct_descriptions_for_each_state():

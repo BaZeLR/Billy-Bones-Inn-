@@ -10,6 +10,9 @@ TAVERN_BAR = PROJECT_ROOT / "game" / "Inn" / "TavernMainBar001.rpy"
 MELISSA_ROOM = PROJECT_ROOT / "game" / "Inn" / "TavernMelissaRoom.rpy"
 CLARA_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Clara" / "InitClara.rpy"
 STORY_BOARD = PROJECT_ROOT / "game" / "Utilities" / "General" / "Screens" / "StoryThreadBoard.rpy"
+CLARA_SCHEDULE = PROJECT_ROOT / "game" / "NPC" / "Schedules" / "clara.json"
+MELISSA_SCHEDULE = PROJECT_ROOT / "game" / "NPC" / "Schedules" / "melissa.json"
+SCHEDULE_RULES = PROJECT_ROOT / "game" / "Utilities" / "General" / "Classes" / "GameObjectTemplate.rpy"
 
 
 def read(path):
@@ -40,21 +43,37 @@ def test_clara_tavern_visit_thread_is_clara_owned():
 def test_clara_visit_conditions_use_clock_schedule_and_classes():
     source = read(STORY_RUNTIME)
     labels = read(CLARA_TAVERN_VISIT)
+    clara_init = read(CLARA_INIT)
+    schedule_rules = read(SCHEDULE_RULES)
 
     clara_block = source.split("# clara_tavern_visit", 1)[1].split("define eddieThreadList", 1)[0]
     assert "(12, 17)" in clara_block
     assert "(18, 22)" in clara_block
     assert "(16, 22)" in clara_block
     assert "clock_minutes" not in clara_block
-    assert "str(getLocation('clara') or '') == 'TavernMain'" in source
-    assert "str(getLocation('melissa') or '') == 'TavernMain'" in source
-    assert "str(getLocation('clara') or '') == 'TavernMelissaRoom'" in source
-    assert "str(getLocation('melissa') or '') == 'TavernMelissaRoom'" in source
-    assert "Clara.var.get('tavern_visit_bar_0_seen'" in source
-    assert "Melissa.var.get('drawings_booklet_read'" in source
+    assert "str(people.location('clara') or '') == 'TavernMain'" in source
+    assert "str(people.location('melissa') or '') == 'TavernMain'" in source
+    assert "str(people.location('clara') or '') == 'TavernMelissaRoom'" in source
+    assert "str(people.location('melissa') or '') == 'TavernMelissaRoom'" in source
+    assert "Clara.var.get('tavern_visit_bar_0_seen'" not in source
+    assert "bool(Melissa.drawings_booklet_read)" in source
+    assert "bool(Melissa.drawings_booklet_left)" in source
+    assert "player.item_count('melissa_drawings_booklet_001')" in source
     assert "calendar_v2.advance_minutes(45)" in labels
+    assert "event_runtime.active_thread.advance()" in labels
     assert "Clara.sync_clara_maps()" not in labels
     assert "Clara.change_social(" in labels
+    assert "def tavern_visit_active(self):" in clara_init
+    assert "return ((current_game_day() + week_value) % 4) == 0" in clara_init
+    assert "def clara_tavern_visit_active" not in clara_init
+    assert "def clara_melissa_visit_active" not in clara_init
+    assert "return bool(Clara.tavern_visit_active())" in schedule_rules
+    for schedule_path in (CLARA_SCHEDULE, MELISSA_SCHEDULE):
+        schedule = read(schedule_path)
+        assert '"rule": "clara_tavern_visit"' in schedule
+        assert '"location": "TavernMain"' in schedule
+        assert '"start": "12:00"' in schedule
+        assert '"end": "17:59"' in schedule
 
 
 def test_room_files_no_longer_own_clara_visit_state():
@@ -64,8 +83,8 @@ def test_room_files_no_longer_own_clara_visit_state():
 
     assert "def tavern_main_register_clara_melissa_visit" not in tavern_main
     assert "tavern_melissa_visit_count" not in tavern_main
-    assert "story_event_available(\"TavernMain\", \"clara_tavern_visit\")" in tavern_main
-    assert "checkTriggers\", \"TavernMain\", \"clara_tavern_visit\"" in tavern_main
+    assert "story_event_available(\"TavernMain\", \"clara_tavern_visit\")" not in tavern_main
+    assert "checkTriggers\", \"TavernMain\", \"clara_tavern_visit\"" not in tavern_main
     assert "story_event_available(\"TavernMain\", \"clara_tavern_visit\")" in tavern_bar
     assert "checkTriggers(\"TavernMain\", \"clara_tavern_visit\", 0)" in tavern_bar
 
@@ -77,11 +96,13 @@ def test_room_files_no_longer_own_clara_visit_state():
     assert "checkTriggers\", \"TavernMelissaRoom\", \"clara_room_visit\"" in melissa_room
 
 
-def test_clara_defaults_and_story_board_include_new_thread():
+def test_clara_thread_stage_replaces_visit_boolean_mirrors():
     init_source = read(CLARA_INIT)
+    runtime_source = read(STORY_RUNTIME)
+    label_source = read(CLARA_TAVERN_VISIT)
     board_source = read(STORY_BOARD)
 
-    for flag in (
+    for mirror in (
         "tavern_visit_bar_0_seen",
         "tavern_visit_bar_1_seen",
         "tavern_visit_bar_2_seen",
@@ -90,8 +111,11 @@ def test_clara_defaults_and_story_board_include_new_thread():
         "melissa_room_visit_2_seen",
         "melissa_room_visit_count",
     ):
-        assert flag in init_source
+        assert mirror not in init_source
+        assert mirror not in runtime_source
+        assert mirror not in label_source
 
+    assert 'LThreadData(2, "clara", "TavernVisit"' in runtime_source
     assert "story_clara_tavern_visit_bar_0" in board_source
     assert "story_clara_melissa_room_visit_0" in board_source
     assert "story_clara_market_booklet_0" in board_source

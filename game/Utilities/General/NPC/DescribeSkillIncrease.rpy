@@ -19,28 +19,31 @@ init python:
                 return 'заметно'
             return 'немного'
 
-        name = RealName.get(girl_name, girl_name)
+        info = people.get_info(girl_name)
+        if info is None:
+            return []
+        name = people_display_name(girl_name)
+        gains = getattr(info, "skill_gains_today", {}) or {}
         messages = []
 
-        if cookincr.get(girl_name, 0) > 0:
-            level = level_text(cookincr[girl_name])
+        if gains.get("cooking", 0) > 0:
+            level = level_text(gains["cooking"])
             messages.append(f"{name} {level} улучшила свое умение готовить.")
 
-        if cleanincr.get(girl_name, 0) > 0:
-            level = level_text(cleanincr[girl_name])
+        if gains.get("cleaning", 0) > 0:
+            level = level_text(gains["cleaning"])
             messages.append(f"{name} {level} улучшила свое умение убираться.")
 
-        if waitressincr.get(girl_name, 0) > 0:
-            level = level_text(waitressincr[girl_name])
+        if gains.get("waitress", 0) > 0:
+            level = level_text(gains["waitress"])
             messages.append(f"{name} {level} улучшила свои навыки официантки.")
 
         return messages
 
-label DescribeSkillIncrease(girl_name=None):
+label DescribeSkillIncrease(girl_name=""):
     # Help label: shows describe_skill_increase() lines to the player.
+    $ renpy.dynamic("line")
     python:
-        if girl_name is None:
-            girl_name = GirlName if 'GirlName' in locals() else None
         if girl_name:
             for line in describe_skill_increase(girl_name):
                 renpy_module.say(None, line)

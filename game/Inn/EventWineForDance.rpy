@@ -1,84 +1,3 @@
-default player.tavern_management.breakfast.dance_sponsor_announced_day = -1    def wine_for_dance_apply_choice(reaction_code=1):
-        code = int(reaction_code or 0)
-        costs = wine_for_dance_costs()
-
-        if code == 1:
-            return {
-                "text": "Вы решили поддержать народные гуляния.",
-                "dance_sponsor": 1,
-                "wine_delta": -int(costs["wine"]),
-                "product_delta": -int(costs["products"]),
-                "money_delta": -int(costs["money"]),
-            }
-        if code == 2:
-            return {
-                "text": "Вы бы были и рады поддержать оные гуляния, но, к сожалению, у вас было недостаточно вина и продуктов для столь благородной затеи.",
-                "dance_sponsor": 0,
-                "wine_delta": 0,
-                "product_delta": 0,
-                "money_delta": 0,
-            }
-        return {
-            "text": "Вы решили что ваши финансы не позволяют участвовать в такой затее.",
-            "dance_sponsor": 0,
-            "wine_delta": 0,
-            "product_delta": 0,
-            "money_delta": 0,
-        }
-default player.tavern_management.breakfast.dance_sponsor_announced_day = -1    def wine_for_dance_apply_choice(reaction_code=1):
-        code = int(reaction_code or 0)
-        costs = wine_for_dance_costs()
-
-        if code == 1:
-            return {
-                "text": "Вы решили поддержать народные гуляния.",
-                "dance_sponsor": 1,
-                "wine_delta": -int(costs["wine"]),
-                "product_delta": -int(costs["products"]),
-                "money_delta": -int(costs["money"]),
-            }
-        if code == 2:
-            return {
-                "text": "Вы бы были и рады поддержать оные гуляния, но, к сожалению, у вас было недостаточно вина и продуктов для столь благородной затеи.",
-                "dance_sponsor": 0,
-                "wine_delta": 0,
-                "product_delta": 0,
-                "money_delta": 0,
-            }
-        return {
-            "text": "Вы решили что ваши финансы не позволяют участвовать в такой затее.",
-            "dance_sponsor": 0,
-            "wine_delta": 0,
-            "product_delta": 0,
-            "money_delta": 0,
-        }
-default player.tavern_management.breakfast.dance_sponsor_announced_day = -1    def wine_for_dance_apply_choice(reaction_code=1):
-        code = int(reaction_code or 0)
-        costs = wine_for_dance_costs()
-
-        if code == 1:
-            return {
-                "text": "Вы решили поддержать народные гуляния.",
-                "dance_sponsor": 1,
-                "wine_delta": -int(costs["wine"]),
-                "product_delta": -int(costs["products"]),
-                "money_delta": -int(costs["money"]),
-            }
-        if code == 2:
-            return {
-                "text": "Вы бы были и рады поддержать оные гуляния, но, к сожалению, у вас было недостаточно вина и продуктов для столь благородной затеи.",
-                "dance_sponsor": 0,
-                "wine_delta": 0,
-                "product_delta": 0,
-                "money_delta": 0,
-            }
-        return {
-            "text": "Вы решили что ваши финансы не позволяют участвовать в такой затее.",
-            "dance_sponsor": 0,
-            "wine_delta": 0,
-            "product_delta": 0,
-            "money_delta": 0,
-        }
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
@@ -89,15 +8,15 @@ init python:
     def wine_for_dance_can_sponsor():
         costs = wine_for_dance_costs()
         return (
-            int(winenum or 0) >= int(costs["wine"])
-            and int(productnum or 0) >= int(costs["products"])
-            and int(money or 0) >= int(costs["money"])
+            int(player.tavern_management.winenum or 0) >= int(costs["wine"])
+            and int(player.tavern_management.productnum or 0) >= int(costs["products"])
+            and int(player.economy.money or 0) >= int(costs["money"])
         )
 
     def tavern_breakfast_can_offer_dance_sponsorship():
         return (
-            int(hour or 0) < 12
-            and int(week ==3)
+            int(calendar_v2.hour or 0) < 12
+            and int(calendar_v2.week or 0) == 3
             and tavern_work_pending_mandatory_code("WineForDance", "TavernKitchen") == "WineForDance"
         )
 
@@ -107,88 +26,62 @@ init python:
     def wine_for_dance_breakfast_appreciation():
         present_ids = []
         for npc_id in ("sandra", "melissa", "amanda"):
-            if str(getLocation(npc_id) or "") == "TavernKitchen":
+            if str(people.location(npc_id) or "") == "TavernKitchen":
                 present_ids.append(npc_id)
-        if str(getLocation("becky") or "") == "TavernKitchen":
+        if str(people.location("becky") or "") == "TavernKitchen":
             present_ids.append("becky")
         for npc_id in present_ids:
-            npc_info = getPersonInfo(npc_id)
+            npc_info = people.get_info(npc_id)
             if npc_info is not None:
                 npc_info.change_social(friend_delta=1)
         return present_ids
 
-default DanceSponsorPledgeDay = -1
-default TavernBreakfastDanceSponsorAnnouncedDay = -1
-
-default DanceSponsorPledgeDay = -1
-
-default DanceSponsorPledgeDay = -1
-default TavernBreakfastDanceSponsorAnnouncedDay = -1
-
-default DanceSponsorPledgeDay = -1
-
-default DanceSponsorPledgeDay = -1
-default TavernBreakfastDanceSponsorAnnouncedDay = -1
-
-default DanceSponsorPledgeDay = -1
-
-label EventWineForDance(eyewitness=0):
-    $ YourReaction1 = 0
-    $ Result = "К вам подошла Сандра, ваша кухарка и фактическая распорядительница трактирного хозяйства, и сказала:\n\"Стефан, дорогой, ты помнишь же, что в пятницу вечером будут гуляния и танцы? Мы можем тоже поучаствовать и выставить на них выпивку и угощение за счет нашего трактира. Это конечно обойдется в копеечку, так как, если уж мы за это возьмемся то придется выставить 5 бочонков вина и наготовить закуски из 4 мешков продуктов, да еще на шатер уйдет 20 мараведи. Но, с другой, стороны, такая щедрость привлечет к нам людей.\""
+label EventWineForDance(eyewitness=0, result=""):
+    $ result = "К вам подошла Сандра, ваша кухарка и фактическая распорядительница трактирного хозяйства, и сказала:\n\"Стефан, дорогой, ты помнишь же, что в пятницу вечером будут гуляния и танцы? Мы можем тоже поучаствовать и выставить на них выпивку и угощение за счет нашего трактира. Это конечно обойдется в копеечку, так как, если уж мы за это возьмемся то придется выставить 5 бочонков вина и наготовить закуски из 4 мешков продуктов, да еще на шатер уйдет 20 мараведи. Но, с другой, стороны, такая щедрость привлечет к нам людей.\""
 
     if eyewitness > 0:
-        $ current_action_title = "Ваше решение"
-        $ current_action_content = None
-        $ _wine_choices = []
+        $ result += "\n\nСобираетесь ли вы пожертвовать на общегородской праздник?"
+        $ scene_runtime.text = result
+        $ scene_runtime.location_text = scene_runtime.text
+        show screen main_ui
+        menu:
+            "Отправить вино и начать готовить закуску" if wine_for_dance_can_sponsor():
+                call WineForDanceOutcome(1)
 
-        if wine_for_dance_can_sponsor():
-            $ _wine_choices.append(MenuItem("Отправить вино и начать готовить закуску", [SetVariable("current_action_items", []), Call("EventWineForDanceApply", 1)]))
-        else:
-            $ _wine_choices.append(MenuItem("Вы посокрушались о нехватке запасов", [SetVariable("current_action_items", []), Call("EventWineForDanceApply", 2)]))
+            "Посокрушаться о нехватке запасов" if not wine_for_dance_can_sponsor():
+                call WineForDanceOutcome(2)
 
-        $ _wine_choices.append(MenuItem("Отказаться", [SetVariable("current_action_items", []), Call("EventWineForDanceApply", 3)]))
-        $ current_action_items = _wine_choices
-        $ Result += "\n\nСобираетесь ли вы пожертвовать на общегородской праздник?"
+            "Отказаться":
+                call WineForDanceOutcome(3)
     else:
-        $ current_action_items = []
-        $ Result = ""
+        $ result = ""
 
-    return Result
+    return result
 
-label EventWineForDanceApply(reaction_code=1):
+label WineForDanceOutcome(reaction_code=1, _crew_appreciation=None):
     $ consume_wine_for_dance_breakfast_event()
-    $ YourReaction1 = reaction_code
-    $ _wine_outcome = wine_for_dance_apply_choice(reaction_code)
-    $ MainTxt = str(_wine_outcome.get("text", "") or "")
-    $ CurLocDesc = MainTxt
-    $ DanceSponsor = int(_wine_outcome.get("dance_sponsor", 0) or 0)
-    if int(DanceSponsor or 0) == 1:
-        $ DanceSponsorPledgeDay = int(dayspassed or 0)
-    $ winenum += int(_wine_outcome.get("wine_delta", 0) or 0)
-    $ productnum += int(_wine_outcome.get("product_delta", 0) or 0)
-    $ money += int(_wine_outcome.get("money_delta", 0) or 0)
-    if int(DanceSponsor or 0) == 1 and str(CurLoc or "") == "TavernKitchen" and int(hour or 0) < 12:
+    if int(reaction_code or 0) == 1 and wine_for_dance_can_sponsor():
+        $ player.tavern_management.dance_sponsor = 1
+        $ player.tavern_management.dance_sponsor_pledge_day = current_game_day()
+        $ player.tavern_management.winenum -= 50
+        $ player.tavern_management.productnum -= 40
+        $ player.spend_money(20)
+        $ scene_runtime.text = "Вы соглашаетесь выставить на пятничных танцах пять бочонков вина, закуску и шатер от имени трактира. Сандра одобрительно кивает и сразу начинает прикидывать приготовления."
+    elif int(reaction_code or 0) == 2:
+        $ scene_runtime.text = "Вы с сожалением признаете, что сейчас в кладовой и кошельке не хватает запасов для такого щедрого жеста. Сандра принимает ответ и откладывает разговор."
+    else:
+        $ scene_runtime.text = "Вы решаете не тратить припасы трактира на городские танцы. Сандра спорить не начинает, хотя явно рассчитывала на другой ответ."
+    $ scene_runtime.location_text = scene_runtime.text
+    if int(player.tavern_management.dance_sponsor or 0) == 1 and str(rooms.current_code or "") == "TavernKitchen" and int(calendar_v2.hour or 0) < 12:
         $ _crew_appreciation = wine_for_dance_breakfast_appreciation()
-        $ fun = _player_clamp(int(fun or 0) + 20, 0, 100)
+        $ player.change_stat("fun", 20)
         if len(list(_crew_appreciation or [])) > 0:
-            $ MainTxt = str(MainTxt or "") + "\n\nЗа столом решение встречают заметно теплее. Домашние переглядываются с одобрением: щедрый жест явно поднимает всем настроение."
-            $ CurLocDesc = MainTxt
+            $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nЗа столом решение встречают заметно теплее. Домашние переглядываются с одобрением: щедрый жест явно поднимает всем настроение."
+            $ scene_runtime.location_text = scene_runtime.text
     call stat
-    if str(CurLoc or "") == "TavernKitchen" and bool(player.tavern_management.breakfast.event_active):
-        $ TavernKitchenSavedText = MainTxt
-        call TavernKitchenBreakfastShowText(MainTxt)
+    if str(rooms.current_code or "") == "TavernKitchen" and bool(player.tavern_management.breakfast.event_active):
+        $ tavern_kitchen_set_saved_text(scene_runtime.text)
+        call TavernKitchenBreakfastShowText(scene_runtime.text)
         return
-    $ current_action_title = ""
-    $ current_action_content = None
-    $ current_action_items = [MenuItem("Вернуться к своим делам", Call("EventWineForDanceFinish"))]
-    call ReturnToMainUI
+    "[scene_runtime.text]"
     return
-
-
-label EventWineForDanceFinish:
-    $ _wine_return_room = str(getattr(CurrentRoom, "code_name", "") or CurLoc or "TavernMain")
-    if _wine_return_room == "TavernKitchen":
-        jump TavernKitchen
-    elif _wine_return_room == "TavernMain":
-        jump TavernMain
-    jump expression _wine_return_room

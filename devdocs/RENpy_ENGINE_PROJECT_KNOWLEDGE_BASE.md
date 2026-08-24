@@ -185,7 +185,8 @@ Important methods:
 Movement:
 
 - `RoomExit` becomes a `MenuItem`.
-- `MoveToRoom` and `AdvanceMovementTime` handle time cost and label jumping.
+- `movement_actions(target, minutes)` composes a returnable time-cost call with
+  a `Jump(target)` action. The called procedure never jumps.
 
 Preservation rule:
 
@@ -208,7 +209,7 @@ File: `game/Inn/my_layouts/build_room_action_items.rpy`
 It uses:
 
 - object access: `Call(object_menu_label, obj.object_id)`
-- movement: `Call("AdvanceMovementTime", exit_obj.target)`
+- movement: `movement_actions(exit_obj.target)`
 
 Preservation rule:
 
@@ -245,9 +246,12 @@ Preservation rule:
 
 ## 8. NPC Schedule Model
 
-File: `game/Inn/NPCScheduleModel.rpy`
+File: `game/Utilities/General/NPC/PeopleRuntime.rpy`
 
-The active project schedule system is `NPCSchedules`.
+The active schedule owner is each NPC's `PeopleData` instance. Interval rows
+loaded from `game/NPC/Schedules/<npc>.json`, class-authored schedule entries,
+and the owner's cached daily plan are resolved together; there is no parallel
+`NPCSchedules` or `CurrentLoc` authority.
 
 Main data class:
 
@@ -255,8 +259,8 @@ Main data class:
 NPCScheduleEntry(
     location="TavernMain",
     weekdays=[1, 2, 3, 4, 5, 6, 7],
-    start="08:00",
-    end="17:59",
+    start_hour=8,
+    end_hour=18,
     awake=True,
     talkable=True,
     condition=None,
@@ -272,23 +276,23 @@ Main APIs:
 - `npc_schedule_resolve(npc_id, weekday_value, time_value)`
 - `npc_schedule_location(npc_id, weekday_value, time_value)`
 - `npc_schedule_state(npc_id, weekday_value, time_value)`
-- `npc_schedule_sync_currentloc(npc_id, weekday_value, time_value)`
-- `npc_schedule_sync_all(weekday_value, time_value)`
+- `npc_daily_schedule_invalidate(npc_id)` after a condition affecting that
+  NPC's already-built daily plan changes
 - `getLocation(person, weekday_value, time_value)`
 - `getNPCids(location, weekday_value, time_value)`
 
-The model supports conditional schedule rules:
-
-- `tavern_team_match`
-- `werecat_active`
-- `werecat_roam_match`
+The model supports declarative `condition` rules through `room_rule_true(...)`.
 
 Preservation rule:
 
-- `NPCSchedules` is the schedule source.
-- `CurrentLoc[npc_id]` is a synced projection plus explicit overrides.
+- The NPC's `PeopleData` schedule is the source of truth.
+- `PeopleInfo.location` is only an explicit, bounded story override; it is not
+  a schedule projection or cache.
 - Room/NPC visibility should call `getLocation`, `getNPCids`, or `npc_schedule_location`, not hand-rolled checks.
-- Events that change where somebody is should sync schedule state or make a deliberate override.
+- Schedule reads and visibility gates must not mutate, repair, rebuild, or copy
+  location state.
+- When an owned state change affects a cached random daily plan, invalidate
+  only that NPC's plan. Do not force-rebuild all schedules.
 - New or touched schedules should use real clock intervals (`start` / `end`) or
   `calendar_v2.hour` / `calendar_v2.minute` checks. Display slots are UI
   display only and should not decide gameplay availability.
@@ -435,13 +439,14 @@ For new event scenes:
 2. Use `vscene`, text, and normal Ren'Py `menu:`.
 3. Mutate vars directly at the choice branch or call a real shared helper label.
 4. Advance time with `calendar_v2.advance_minutes(...)` where appropriate.
-5. Return to the owning room label with `jump expression CurLoc` or a direct
-   room label.
+5. A called dialogue/event/helper returns to its caller. Use a room `jump` only
+   when the branch intentionally moves the player or continues the story there.
 
 For NPC presence:
 
 1. Add/adjust NPC schedule rows using real clock ranges where possible.
-2. Ensure `npc_schedule_sync_currentloc()` or `npc_schedule_sync_all()` runs after time/location changes.
+2. Keep schedule reads pure. Invalidate only the affected NPC's cached daily
+   plan when an owned condition changes after that plan was built.
 3. Ensure the NPC data/info class has the right talk/info/examine ownership.
 4. Let `getLocation()`/`getNPCids(current_location)` and the character grid
    expose the visible NPC.

@@ -2,6 +2,8 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
+    $ renpy.dynamic("_liza_licks")
+    $ renpy.dynamic("_liza_name", "_liza_name2", "_liza_busy", "_liza_top", "_liza_bottom", "_liza_panties", "_liza_top_raised", "_liza_bottom_raised", "_liza_tits_visible", "_liza_pussy_visible", "_liza_arousal", "_you_arousal", "_can_player_cum", "_sex_ctx")
     $ GirlNameILSS = "liza"
     $ Liza.sex_setup(GirlLocILSS)
     call ShowLizaPortrait
@@ -20,8 +22,8 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                 _liza_tits_visible = Liza.tits_visible()
                 _liza_pussy_visible = Liza.pussy_visible()
                 _liza_arousal = Liza.arousal_value()
-                _you_arousal = Liza.player_arousal()
-                _can_player_cum = Liza.can_player_cum()
+                _you_arousal = player.intimacy.arousal_value()
+                _can_player_cum = player.intimacy.can_cum()
                 _sex_ctx = "sextraktir" if GirlLocILSS == "tavern" else "sexstreet"
 
             menu:
@@ -78,8 +80,8 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         "Вы чувствуете солоноватый привкус чужой спермы. Шустрая девчонка уже успела у кого-то отсосать до вас!"
                     if Liza.arousal_value() < 50:
                         $ Liza.add_arousal(8)
-                    if Liza.player_arousal() < 50:
-                        $ Liza.add_player_arousal(8)
+                    if player.intimacy.arousal_value() < 50:
+                        $ player.intimacy.add_arousal(8)
                     $ Liza.set_cock_position("none")
                     call ShowCurrentSex(GirlNameILSS)
 
@@ -129,20 +131,20 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         "[_liza_name] сидит перед вами на коленках и продолжает "
                     else:
                         "[_liza_name] опустилась перед вами на коленки и стала "
-                    if Liza.player_arousal() < 20:
+                    if player.intimacy.arousal_value() < 20:
                         "облизывать ваш вялый член."
-                    elif Liza.player_arousal() < 40:
+                    elif player.intimacy.arousal_value() < 40:
                         "облизывать головку вашего напрягшегося члена."
                     elif Liza.corruption < 40:
                         "неумело, но с энтузиазмом сосать ваш член."
-                    elif Liza.player_arousal() < 60:
+                    elif player.intimacy.arousal_value() < 60:
                         "умело сосать ваш член."
                     else:
                         "заглатывать ваш член по самые яйца."
                     if Liza.corruption < 40:
-                        $ Liza.add_player_arousal(14)
+                        $ player.intimacy.add_arousal(14)
                     else:
-                        $ Liza.add_player_arousal(20)
+                        $ player.intimacy.add_arousal(20)
                     $ Liza.set_cock_position("mouth")
                     call ShowCurrentSex(GirlNameILSS)
                     if renpy.has_label("ShowImage"):
@@ -183,14 +185,14 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                                 else:
                                     call ShowImage(GirlNameILSS, "sexstreet", "rakom" + str(procedural_randint(1, 6, key="procedural:NPC/Girls/Liza/IntLizaSex.rpy:procedural_randint:262:11")))
 
-                    $ Liza.add_player_arousal(20)
+                    $ player.intimacy.add_arousal(20)
                     $ Liza.add_arousal(26)
                     $ Liza.set_cock_position("pussy")
                     call ShowCurrentSex(GirlNameILSS)
 
                 "Кончить в ротик" if _can_player_cum and _you_arousal >= 100 and (Liza.cock_in("mouth") or Liza.cock_in("tits")):
                     "Вы прижали голову мулатки к себе и разрядились ей в рот, залив горло и подбородок семенем."
-                    $ Liza.set_player_arousal(0)
+                    $ player.intimacy.set_arousal(0)
                     call PregnancyCheck(GirlNameILSS, "mouthface", 1, "Вы")
                     $ Liza.set_cock_position("none")
                     $ Liza.set_sex_busy(True)
@@ -202,7 +204,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
 
                 "Кончить на лицо" if _can_player_cum and _you_arousal >= 100:
                     "Вы вытащили член и несколькими струями залили лицо девушки."
-                    $ Liza.set_player_arousal(0)
+                    $ player.intimacy.set_arousal(0)
                     call PregnancyCheck(GirlNameILSS, "face", 1, "Вы")
                     $ Liza.set_cock_position("none")
                     $ Liza.set_sex_busy(True)
@@ -211,7 +213,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
 
                 "Кончить на груди" if _can_player_cum and _you_arousal >= 100 and _liza_tits_visible:
                     "Вы вытащили член и залили спермой ее маленькие грудки."
-                    $ Liza.set_player_arousal(0)
+                    $ player.intimacy.set_arousal(0)
                     call PregnancyCheck(GirlNameILSS, "tits", 1, "Вы")
                     $ Liza.set_cock_position("none")
                     $ Liza.set_sex_busy(True)
@@ -224,7 +226,7 @@ label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street"):
                         "\"Дяденька Стефан, и вы тоже меня не послушали!\" — обреченно проговорила девушка."
                     else:
                         "Вы, насадив худенькую смуглянку на член, начали заливать ее киску горячим семенем."
-                    $ Liza.set_player_arousal(0)
+                    $ player.intimacy.set_arousal(0)
                     $ Liza.add_arousal(3)
                     call PregnancyCheck(GirlNameILSS, "inside", 1, "Вы")
                     $ Liza.set_cock_position("none")

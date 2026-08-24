@@ -1,0 +1,107 @@
+game\Utilities\Time\NextDay_NewDayEvents.rpy:118:            ChanceVar = 6
+game\Utilities\Time\NextDay_NewDayEvents.rpy:120:                ChanceVar -= 1
+game\Utilities\Time\NextDay_NewDayEvents.rpy:122:                ChanceVar -= 1
+game\Utilities\Time\NextDay_NewDayEvents.rpy:124:                ChanceVar -= 1
+game\Utilities\Time\NextDay_NewDayEvents.rpy:126:                ChanceVar += 5
+game\Utilities\Time\NextDay_NewDayEvents.rpy:128:                ChanceVar += 2
+game\Utilities\Time\NextDay_NewDayEvents.rpy:129:            if procedural_randint(1, ChanceVar, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:176:10") == 1:
+game\Utilities\Time\NextDay_NewDayEvents.rpy:132:            ChanceVar = 4
+game\Utilities\Time\NextDay_NewDayEvents.rpy:134:                ChanceVar -= 1
+game\Utilities\Time\NextDay_NewDayEvents.rpy:136:                ChanceVar -= 1
+game\Utilities\Time\NextDay_NewDayEvents.rpy:138:                ChanceVar += 5
+game\Utilities\Time\NextDay_NewDayEvents.rpy:139:            if procedural_randint(1, ChanceVar, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:186:11") == 1:
+game\TractirSaveSync.rpy:24:        legacy_current_day = globals().pop("CurDay", None)
+game\TractirSaveSync.rpy:28:        globals().pop("TotalEventsSummary", None)
+game\TractirSaveSync.rpy:37:        globals().pop("BeckyAdmit", None)
+game\TractirSaveSync.rpy:38:        globals().pop("SergioPet", None)
+game\TractirSaveSync.rpy:39:        globals().pop("SergioPetStaticData", None)
+game\TractirSaveSync.rpy:43:        dog_obj = globals().get("dog")
+game\TractirSaveSync.rpy:51:        melissa_obj = globals().get("Melissa")
+game\TractirSaveSync.rpy:57:        amanda_obj = globals().get("Amanda")
+game\TractirSaveSync.rpy:79:        clara_obj = globals().get("Clara")
+game\TractirSaveSync.rpy:98:        becky_obj = globals().get("Becky")
+game\TractirSaveSync.rpy:109:            character_obj = globals().get(character_name)
+game\TractirSaveSync.rpy:114:        gerhard_obj = globals().get("Gerhard")
+game\TractirSaveSync.rpy:123:        sandra_obj = globals().get("Sandra")
+game\TractirSaveSync.rpy:141:        robin_obj = globals().get("Robin")
+game\TractirSaveSync.rpy:147:        zimmer_obj = globals().get("Zimmer")
+game\TractirSaveSync.rpy:240:        retired_info = globals().pop("people" + "Info", {})
+game\TractirSaveSync.rpy:241:        retired_data = globals().pop("people" + "Data", {})
+game\TractirSaveSync.rpy:242:        globals().pop("girl" + "s", None)
+game\TractirSaveSync.rpy:243:        globals().pop("secondary_" + "npcs", None)
+game\TractirSaveSync.rpy:464:        melissa_obj = globals().get("Melissa")
+game\TractirSaveSync.rpy:471:            character_obj = globals().get(character_name)
+game\TractirSaveSync.rpy:476:        werecat_state_obj = globals().get("werecat")
+game\TractirSaveSync.rpy:493:            fire_object = globals().get(object_name)
+game\TractirSaveSync.rpy:503:        water_object = globals().get("TavernKitchenCauldronObject")
+game\TractirSaveSync.rpy:511:        becky_obj = globals().get("Becky")
+game\TractirSaveSync.rpy:517:        combat_state = getattr(globals().get("player"), "combat", None)
+game\TractirSaveSync.rpy:531:        werecat_obj = globals().get("werecat")
+game\TractirSaveSync.rpy:546:        sandra_obj = globals().get("Sandra")
+game\TractirSaveSync.rpy:578:        amanda_obj = globals().get("Amanda")
+game\TractirSaveSync.rpy:604:        clara_obj = globals().get("Clara")
+game\TractirSaveSync.rpy:613:            character_obj = globals().get(character_name)
+game\TractirSaveSync.rpy:618:        daily_runtime = globals().get("daily_events")
+game\TractirSaveSync.rpy:641:            character_obj = globals().get(character_name)
+game\TractirSaveSync.rpy:645:        dog_obj = globals().get("dog")
+game\TractirSaveSync.rpy:648:            globals()["dog"] = dog_obj
+game\TractirSaveSync.rpy:687:            character_obj = globals().get(character_name)
+game\TractirSaveSync.rpy:691:        mongol_obj = globals().get("Mongol")
+game\TractirSaveSync.rpy:747:        melissa_obj = globals().get("Melissa")
+game\TractirSaveSync.rpy:752:        bat_thread = globals().get("threads", {}).get("melissaBatProblem", None)
+game\TractirSaveSync.rpy:764:        becky_obj = globals().get("Becky")
+game\TractirSaveSync.rpy:767:        thread_rows = globals().get("threads", {})
+game\TractirSaveSync.rpy:786:        becky_obj = globals().get("Becky")
+game\TractirSaveSync.rpy:789:        thread_rows = globals().get("threads", {})
+game\TractirSaveSync.rpy:812:        becky_obj = globals().get("Becky")
+game\TractirSaveSync.rpy:815:        thread_rows = globals().get("threads", {})
+game\TractirSaveSync.rpy:828:        thread_rows = globals().get("threads", {})
+game\TractirSaveSync.rpy:843:        thread_rows = globals().get("threads", {})
+game\TractirSaveSync.rpy:873:        sandra_obj = globals().get("Sandra")
+game\TractirSaveSync.rpy:874:        sandra_thread = globals().get("threads", {}).get("sandraWeeklyEvaluation", None)
+game\TractirSaveSync.rpy:875:        chores_obj = getattr(globals().get("player"), "chores", None)
+game\TractirSaveSync.rpy:923:        legacy_movie = bool(globals().pop("sceneMovie", False))
+game\TractirSaveSync.rpy:924:        legacy_fullscreen = bool(globals().pop("sceneFullScreen", False))
+game\TractirSaveSync.rpy:925:        globals().pop("vcFromTimer", None)
+game\TractirSaveSync.rpy:934:        globals().pop("_tractir_progress_revision", None)
+game\TractirSaveSync.rpy:935:        globals().pop("_tractir_last_autosave_reason", None)
+game\TractirSaveSync.rpy:949:        globals().pop("room_entry_runtime", None)
+game\TractirSaveSync.rpy:955:        legacy_layout_present = "_layout_last_picture" in globals()
+game\TractirSaveSync.rpy:956:        legacy_scene_present = "scene_image" in globals()
+game\TractirSaveSync.rpy:957:        legacy_layout = globals().pop("_layout_last_picture", "")
+game\TractirSaveSync.rpy:958:        legacy_scene = globals().pop("scene_image", "")
+game\TractirSaveSync.rpy:969:        legacy_code = str(globals().pop("CurLoc", "") or "").strip()
+game\TractirSaveSync.rpy:970:        legacy_room = globals().pop("CurrentRoom", None)
+game\TractirSaveSync.rpy:1039:            value = globals().pop(old_name, default_value)
+game\TractirSaveSync.rpy:1048:        scene_runtime.text = globals().pop("MainTxt", getattr(scene_runtime, "text", ""))
+game\TractirSaveSync.rpy:1049:        scene_runtime.location_text = globals().pop("CurLocDesc", getattr(scene_runtime, "location_text", ""))
+game\TractirSaveSync.rpy:1064:            globals().pop(old_name, None)
+game\TractirSaveSync.rpy:1068:        globals().pop("SignalBlockTime", None)
+game\TractirSaveSync.rpy:1072:        globals().pop("AgreedToRedress", None)
+game\TractirSaveSync.rpy:1076:        globals().pop("Result", None)
+game\TractirSaveSync.rpy:1097:            if old_name in globals():
+game\TractirSaveSync.rpy:1098:                setattr(dance_room, field_name, globals().pop(old_name))
+game\TractirSaveSync.rpy:1100:            int(globals().pop("DanceMaxIAD", 0) or 0),
+game\TractirSaveSync.rpy:1101:            int(globals().pop("DanceMaxIBD", 0) or 0),
+game\TractirSaveSync.rpy:1109:            globals().pop(old_name, None)
+game\TractirSaveSync.rpy:1112:            globals().pop(old_name, None)
+game\TractirSaveSync.rpy:1115:            globals().pop(old_name, None)
+game\TractirSaveSync.rpy:1116:        globals().pop("module_runtime", None)
+game\TractirSaveSync.rpy:1117:        globals().pop("GirlNameIGSS", None)
+game\TractirSaveSync.rpy:1118:        globals().pop("GirlLocIGSS", None)
+game\TractirSaveSync.rpy:1119:        globals().pop("SomebodyCums", None)
+game\TractirSaveSync.rpy:1134:            old_values = globals().pop(old_name, {})
+game\TractirSaveSync.rpy:1147:        old_lick_values = globals().pop("LickPussy", {})
+game\TractirSaveSync.rpy:1186:            globals().pop(old_name, None)
+game\Town\CityGuard.rpy:107:    $ renpy.dynamic("RandVar", "_placard_picture")
+game\Town\CityGuard.rpy:108:    $ RandVar = procedural_randint(1, 8, "city_guard_placard_%s_%s" % (current_game_day(), int(calendar_v2.clock_minutes() or 0)))
+game\Town\CityGuard.rpy:109:    $ scene_runtime.text = CityGuardPlacat[RandVar]
+game\Town\CityGuard.rpy:111:    $ _placard_picture = "images/zimmer/soldierplakat/plakat%s.jpg" % RandVar
+game\Utilities\Fight\FightResult.rpy:28:        RandVar = procedural_randint(
+game\Utilities\Fight\FightResult.rpy:34:        if RandVar == 1:
+game\Utilities\Fight\FightResult.rpy:36:        elif DrawPossible == 1 and RandVar <= 4:
+game\NPC\Girls\Irma\IrmaShortStories.rpy:7:        RandVar = procedural_randint(1, 3, key="procedural:NPC/Girls/Irma/IrmaShortStories.rpy:procedural_randint:8:1")
+game\NPC\Girls\Irma\IrmaShortStories.rpy:12:            if RandVar == 1:
+game\NPC\Girls\Irma\IrmaShortStories.rpy:15:            elif RandVar == 2:
+game\NPC\Girls\Irma\IrmaShortStories.rpy:22:            if RandVar == 1:
+game\NPC\Girls\Irma\IrmaShortStories.rpy:25:            elif RandVar == 2:

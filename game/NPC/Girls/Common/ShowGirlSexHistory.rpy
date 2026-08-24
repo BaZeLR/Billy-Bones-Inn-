@@ -1,7 +1,8 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-label ShowGirlSexHistory(args0=""):
+label ShowGirlSexHistory(args0="", result=""):
+    $ renpy.dynamic("iTableLineNum", "table_rows", "_girl_name")
     python:
         iTableLineNum = [1]
         table_rows = ["<table border=1>"]
@@ -14,7 +15,7 @@ label ShowGirlSexHistory(args0=""):
             for tmpSexActShow in history_rows:
                 _day = _day_to_text_local((tmpSexActShow.get("Day", 0) or 0) - 1)
                 _girl_name = str(tmpSexActShow.get("GirlName", "") or "")
-                _real_name = RealName.get(_girl_name, _girl_name)
+                _real_name = people_display_name(_girl_name)
                 _dude_name = str(tmpSexActShow.get("DudeName", "") or "")
                 _is_dude_random = str(tmpSexActShow.get("IsDudeRandom", "") or "")
                 _dude_name_type = str(tmpSexActShow.get("DudeNameType", "") or "")
@@ -40,7 +41,7 @@ label ShowGirlSexHistory(args0=""):
             _append_history_rows(sex_history_rows(args0))
 
         table_rows.append("</table>")
-        Result = "".join(table_rows)
+        result = "".join(table_rows)
 
-    "[Result]"
+    "[result]"
     return

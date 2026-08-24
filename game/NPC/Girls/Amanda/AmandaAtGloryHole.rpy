@@ -1,26 +1,6 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default AmandaGloryCurState = 0
-
-
-init python:
-    def amanda_gloryhole_try_ready():
-        try:
-            glory_state = int(AmandaGloryCurState or 0)
-        except Exception:
-            glory_state = 0
-        return str(CurLoc or "") == "TavernGloryHole" and glory_state >= 1
-
-
-label AmandaAtGloryHoleEventEntry:
-    call checkTriggers("TavernGloryHole", "amanda_gloryhole_try", 0)
-    if _return:
-        return True
-    call AmandaAtGloryHole
-    return True
-
-
 label story_amanda_gloryhole_try_0:
     call AmandaAtGloryHole
     return True
@@ -33,7 +13,9 @@ label AmandaAtGloryHole:
 
 
 label AmandaAtGloryHole_menu:
-    if AmandaGloryCurState >= 10:
+    $ renpy.dynamic("VirginNotKnow", "tmpCumInside", "_amanda_glory_state", "_kiss_image", "_cumpussy_image")
+    $ _amanda_glory_state = Amanda.var_int("glory_cur_state", 0)
+    if _amanda_glory_state >= 10:
         menu:
             "Осмотреть Лизетту":
                 $ Amanda.set_var_int("gloryyouknow", 1)
@@ -44,7 +26,7 @@ label AmandaAtGloryHole_menu:
                 jump TavernMain
 
     menu:
-        "Осмотреть Аманду" if AmandaGloryCurState < 10:
+        "Осмотреть Аманду" if _amanda_glory_state < 10:
             $ Amanda.set_var_int("gloryyouknow", 1)
             call GirlsDesc("amanda")
             jump AmandaAtGloryHole_menu
@@ -54,7 +36,7 @@ label AmandaAtGloryHole_menu:
             call GirlsDesc("liza")
             jump AmandaAtGloryHole_menu
 
-        "Отругать" if AmandaGloryCurState <= 2 or AmandaGloryCurState == 4:
+        "Отругать" if _amanda_glory_state <= 2 or _amanda_glory_state == 4:
             
             if Amanda.var_int("gloryscold", 0) or Amanda.var_int("prohibitliza", 0):
                 "Ах ты шлюха! Я тебе что, непонятно объяснил чтобы ты с Лизкой не шарилась? У тебя мозги вообще есть, шмакодявка тупая?! Или у тебя в одно ухо влетело, в другое вылетело?"
@@ -84,13 +66,13 @@ label AmandaAtGloryHole_menu:
             $ Amanda.set_var_int("glory_cur_state", 10)
             jump TavernMain
 
-        "Развернуться и уйти, ничего не говоря" if AmandaGloryCurState <= 2 or AmandaGloryCurState == 4:
+        "Развернуться и уйти, ничего не говоря" if _amanda_glory_state <= 2 or _amanda_glory_state == 4:
             
             $ Amanda.clear_cum("cum_face_you")
             $ Amanda.set_var_int("glorywalkout", 1)
             jump TavernMain
 
-        "Предложить ей сделать то, что она собиралась" if AmandaGloryCurState <= 2 or AmandaGloryCurState == 4:
+        "Предложить ей сделать то, что она собиралась" if _amanda_glory_state <= 2 or _amanda_glory_state == 4:
             
             if Amanda.var_int("glorysuck", 0) or Amanda.var_int("suckyou", 0):
                 "\"Ах, Амандочка,\" сказали вы, \"если ты уж так настроенна сделать минет, то начинай, тебе же не в первой!\""
@@ -122,7 +104,7 @@ label AmandaAtGloryHole_menu:
             call ShowImageSeq("amanda", "gloryfirst", "minet", 3)
             jump AmandaAtGloryHole_menu
 
-        "Предложить ей продолжить" if AmandaGloryCurState == 1:
+        "Предложить ей продолжить" if _amanda_glory_state == 1:
             
             "\"Ах, Аманда, Аманда,\" сказали вы. \"Это ведь ты только что у меня отсасывала? Так что же ты остановилась, продолжай же!\" С этими словами вы придвинули свой член, на котором уже блестели капли слюны Аманды к ее губкам."
             if int(Amanda.sex_stat("sexacts", 0) or 0) < 15:
@@ -144,7 +126,7 @@ label AmandaAtGloryHole_menu:
             call ShowImageSeq("amanda", "gloryfirst", "minet", 3)
             jump AmandaAtGloryHole_menu
 
-        "Кончить на лицо" if AmandaGloryCurState == 2:
+        "Кончить на лицо" if _amanda_glory_state == 2:
             
             "Перед самым оргазмом вы вытащили член изо рта Аманды и кончили ей на лицо. Крупные белые капли потекли по ее щечкам и подбородку, одна струйка попала ей в левый глаз, отчего она зажмурилась, а пара капель осталась в ее белокурых локонах."
             "Лизетта, которая надрачивала себя глядя на вас, подскочила, слизала несколько капель с лица Аманды, сказав \"ням-ням\"."
@@ -157,7 +139,7 @@ label AmandaAtGloryHole_menu:
             call ShowImage("amanda", "gloryfirst", "cummouth")
             jump AmandaAtGloryHole_menu
 
-        "Кончить в рот" if AmandaGloryCurState == 3:
+        "Кончить в рот" if _amanda_glory_state == 3:
             
             "Вы и не подумали вытащить член изо рта Аманды когда начали кончать."
             if Amanda.corruption >= 40 or int(Amanda.sex_stat("sexacts", 0) or 0) > 12:
@@ -176,7 +158,7 @@ label AmandaAtGloryHole_menu:
             call ShowImage("amanda", "gloryfirst", "cummouth")
             jump AmandaAtGloryHole_menu
 
-        "Поцеловать Аманду" if AmandaGloryCurState == 4:
+        "Поцеловать Аманду" if _amanda_glory_state == 4:
             
             "Не говоря ни слова, вы наклонились и поцеловали Аманду, чувствуя на ее губах и языке привкус собственной спермы. Аманда с радостью ответила на ваш поцелуй, переплетя ваш язык своим. Продолжая целоваться вы вдруг почуствовали жаркий ротик Лизетты на своем обмякшем было члене. Поцелуи Аманды и лизеттин ротик начали быстро приводить вас обратно в полную готовность."
             $ Amanda.set_var_int("glory_cur_state", 5)
@@ -185,7 +167,7 @@ label AmandaAtGloryHole_menu:
             call ShowImage("amanda", "gloryfirst", _kiss_image)
             jump AmandaAtGloryHole_menu
 
-        "Поблагодарить Аманду" if AmandaGloryCurState == 4:
+        "Поблагодарить Аманду" if _amanda_glory_state == 4:
             
             "Вы пылко поблагодарили Аманду, сказав что вам было очень приятно и вы ей очень признательны. Аманда зарделась, пробормотала \"Я тоже люблю тебя, Стефанчик\" и убежала."
             $ Amanda.apply_social_chance(15, 1, 1, 0, 0, 0, "glory_hole_thanks")
@@ -195,7 +177,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.set_var_int("glory_cur_state", 10)
             jump TavernMain
 
-        "Трахнуть Аманду" if AmandaGloryCurState == 4 or AmandaGloryCurState == 5:
+        "Трахнуть Аманду" if _amanda_glory_state == 4 or _amanda_glory_state == 5:
             
             if Amanda.sex_stat("virginity", True):
                 "Преодолев слабое сопротивление вы уложили Аманду на лавочку. Она поняла, что сейчас произойдет, но и не подумала возразить, наоборот, сама раздвинула ножки, только сказала: \"Стефанчик, я еще девушка, будь нежным\". Лизетта направила своей рукой ваш стоящий колом член прямо в киску своей подруги. Резкий толчок, вскрик Аманды и вот Аманда уже больше не девочка."
@@ -214,7 +196,7 @@ label AmandaAtGloryHole_menu:
                     "\"Оба-на, а ведь Аманда-то уже не девочка!\" потрясенно осознали вы."
                     if int(Amanda.sex_stat("pregnancy", 0) or 0) > 120:
                         "\"Наличие отсутствия девственности прекрасно объясняет ее округлившийся животик,\" решили вы, отбросив прежние гипотезы о непорочном зачатии и божественном вмешательстве."
-                    elif Amanda.var_int("knowlegaresex", 0) or Amanda.var_int("sawlegaresex", 0):
+                    elif Amanda.player_knows_legare_sex or Amanda.player_saw_legare_sex:
                         "Собственно, после забав Аманды с месье Легаре удивительным было бы обратное."
                     elif Amanda.var_int("knowsexactive", 0):
                         "Учитывая, что в последнее время она позволяла мужчинам не столь уж мало, удивительным для вас данный факт не был."
@@ -234,7 +216,7 @@ label AmandaAtGloryHole_menu:
             call ShowImageSeq("amanda", "gloryfirst", "fuck", 6)
             jump AmandaAtGloryHole_menu
 
-        "Кончить в Аманду" if AmandaGloryCurState == 6:
+        "Кончить в Аманду" if _amanda_glory_state == 6:
             
             "Даже и не подумав вытащить свой член из Аманды вы начали кончать. Струи вашего семени ударили в маточку Аманды, заполняя ее до краев. Когда ваш обмякший член в конце концов вывалился из Аманды, то из влагалища девушки медленно начало вытекать ваше семя."
             if Amanda.sex_stat("virginity", True):
@@ -281,7 +263,7 @@ label AmandaAtGloryHole_menu:
             call ShowImage("amanda", "gloryfirst", _cumpussy_image)
             jump TavernMain
 
-        "Кончить на животик" if AmandaGloryCurState == 6:
+        "Кончить на животик" if _amanda_glory_state == 6:
             "Не желая рисковать вы в последний момент вытащили свой член и кончили Аманде на животик. С трудом пришедшая в себя после оргазма Аманда собрала пару капель пальцем."
             if Amanda.corruption >= 45 and int(Amanda.sex_stat("sexacts", 0) or 0) > 15:
                 "Она с аппетитом скушала их, похотливо улыбнувшись."

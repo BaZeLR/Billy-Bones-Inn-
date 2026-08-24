@@ -9,6 +9,7 @@ BLACKWOOD = ROOT / "game" / "NPC" / "Secondary" / "SherwoodTravel.rpy"
 STORY_RUNTIME = ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy"
 CLARA_BOOKLET = ROOT / "game" / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy"
 PEOPLE_RUNTIME = ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
+MIGRATION = ROOT / "game" / "TractirSaveSync.rpy"
 
 
 def _source(path: Path) -> str:
@@ -23,21 +24,45 @@ def test_robin_is_default_secondary_npc_object():
     assert "class RobinInfo(BaseNPC):" in source
     assert "define RobinStaticData = RobinData()" in source
     assert "default Robin = RobinInfo()" in source
-    assert 'peopleData["robin"] = RobinStaticData' in source
-    assert 'peopleInfo["robin"] = Robin' in source
+    assert "people.register(RobinStaticData, Robin)" in source
     assert 'default_location="BlackwoodRoad"' in source
-    assert 'self.location = "BlackwoodRoad"' in source
-    assert '"robin": "BlackwoodRoad"' in people
+    assert 'self.location = "BlackwoodRoad"' not in source
+    assert 'Robin.location = "BlackwoodRoad"' not in _source(BLACKWOOD)
+    assert "def people_initial_location" not in people
+
+    info_class = source.split("class RobinInfo(BaseNPC):", 1)[1]
+    assert "STORY_DEFAULTS" not in info_class
+    assert "ensure_story_defaults" not in info_class
+    assert "def robin_story_defaults(" not in source
+    for field_name in (
+        "identity_known", "complaint_explained", "place_explained",
+        "weapon_source_explained", "robbery_count", "negotiation_stage",
+        "knows_big_tits_village", "mongol_safe_pass", "kunidell_opened",
+        "kunidell_deliveries", "blackwood_road_open",
+    ):
+        assert "self.%s =" % field_name in info_class
+
+    live_source = "\n".join((source, _source(ROBIN_TALK), _source(BLACKWOOD)))
+    for legacy_access in (
+        "Robin.var", "Robin.var_int", "Robin.set_var_int", "Robin.add_var_int",
+        "Robin.set_story_value_min",
+    ):
+        assert legacy_access not in live_source
+
+    assert "Robin.knows_big_tits_village = True" in _source(BLACKWOOD)
 
 
 def test_blackwood_road_owns_robin_ambush_room_and_labels():
     source = _source(BLACKWOOD)
+    room_entry = source.split("label BlackwoodRoad:", 1)[1].split(
+        "label story_robin_blackwood_ambush_0:", 1
+    )[0]
 
-    assert 'BlackwoodRoadRoom = Room(' in source
+    assert 'BlackwoodRoadRoomDefinition = Room(' in source
     assert 'code_name="BlackwoodRoad"' in source
     assert "label BlackwoodRoad:" in source
-    assert "label SherwoodTravel(OnHorse=0):" in source
-    assert "jump BlackwoodRoad" in source
+    assert "label SherwoodTravel" not in source
+    assert '"legacy_location"' not in source
     for label in [
         "label story_robin_blackwood_ambush_0:",
         "label story_robin_blackwood_approach:",
@@ -51,6 +76,9 @@ def test_blackwood_road_owns_robin_ambush_room_and_labels():
     assert 'vscene "images/Robin/robin.png"' in source
     assert 'vscene "images/Robin/mongolAndRobin1.png"' in source
     assert "renpy.random" not in source
+    assert "jump BlackwoodRoad" not in room_entry
+    assert "while True:\n        call screen main_ui" in room_entry
+    assert room_entry.rstrip().endswith("call screen main_ui")
 
 
 def test_robin_thread_and_mongol_escape_unlock_use_objects():
@@ -62,7 +90,32 @@ def test_robin_thread_and_mongol_escape_unlock_use_objects():
     assert '"robin": robinThreadList' in runtime
     assert '"story_robin_blackwood_ambush_0"' in runtime
     assert '"BlackwoodRoad"' in runtime
-    assert 'Robin.var["MongolSafePass"] = 1' in booklet
-    assert 'Robin.var["BlackwoodRoadOpen"] = 1' in booklet
+    assert "Robin.mongol_safe_pass = True" in booklet
+    assert "Robin.blackwood_road_open = True" in booklet
     assert "RobinVar" not in talk
     assert 'vscene "images/Robin/robin1.png"' in talk
+
+
+def test_robin_v58_migration_consumes_old_map_once():
+    migration = _source(MIGRATION)
+    block = migration.split("def updateSave_V58():", 1)[1].split("label before_load:", 1)[0]
+
+    assert "define currentVersion = 69" in migration
+    assert "if loaded_version < 59:" in migration
+    assert "updateSave_V58()" in migration
+    for old_key, field_name in (
+        ("KnowHim", "identity_known"),
+        ("KnowComplaint", "complaint_explained"),
+        ("KnowPlace", "place_explained"),
+        ("KnowWeapon", "weapon_source_explained"),
+        ("RobbedNum", "robbery_count"),
+        ("Negotiate", "negotiation_stage"),
+        ("KnowBigTitsVillage", "knows_big_tits_village"),
+        ("MongolSafePass", "mongol_safe_pass"),
+        ("KunidellOpened", "kunidell_opened"),
+        ("KunidellDeliveries", "kunidell_deliveries"),
+        ("BlackwoodRoadOpen", "blackwood_road_open"),
+    ):
+        assert 'robin_var.pop("%s"' % old_key in block
+        assert "Robin.%s =" % field_name in block
+    assert 'globals().pop("RobinVar", None)' in block

@@ -99,6 +99,12 @@ init -25 python:
             except Exception:
                 self.blocks = []
 
+        def disable(self):
+            self.enabled = False
+            self.metconds = False
+            self.blocked = False
+            return self
+
         def advanceTo(self, num, complete_at_end=False, force_active=False):
             target = max(0, min(_story_to_int(num, 0), int(self.data.length or 0)))
             self.adjustLen()
@@ -188,6 +194,13 @@ init -25 python:
             super(LThreadInfo, self).__init__(data)
 
         def advance(self):
+            if self.num < self.data.length:
+                self.done[self.num] = True
+            self.num += 1
+            if self.num >= self.data.length:
+                self.completed = True
+
+        def complete(self):
             if self.num < self.data.length:
                 self.done[self.num] = True
             self.num += 1

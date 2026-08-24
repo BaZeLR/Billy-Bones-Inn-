@@ -14,12 +14,25 @@
     {
       "label": "wine_store",
       "weekdays": [1, 2, 3, 4, 5, 6],
-      "start": "08:00",
+      "start": "06:00",
       "end": "11:59",
       "location": "WineStore",
       "awake": true,
       "talkable": true,
       "priority": 600
+    },
+    {
+      "label": "melissa_tavern_visit",
+      "weekdays": [1, 2, 3, 4, 5, 6],
+      "start": "12:00",
+      "end": "17:59",
+      "location": "TavernMain",
+      "awake": true,
+      "talkable": true,
+      "priority": 780,
+      "condition": {
+        "rule": "clara_tavern_visit"
+      }
     },
     {
       "label": "market_visit_day",
@@ -35,8 +48,8 @@
     {
         "label": "market_visit_evening",
         "weekdays": [1, 2],
-        "start": "19:00",
-        "end": "22:59",
+        "start": "18:00",
+        "end": "18:59",
         "location": "MarketPlace",
         "location_probabilities": [0.25],
         "awake": true,
@@ -73,6 +86,21 @@
         "awake": true,
         "talkable": false
       },
+    {
+      "label": "paintings_confession",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "22:00",
+      "end": "22:59",
+      "location": "TavernMelissaRoom",
+      "awake": true,
+      "talkable": true,
+      "priority": 870,
+      "condition": {
+        "rule": "thread_step",
+        "thread": "claraPaintingsPath",
+        "step": 9
+      }
+    },
     {
       "label": "evening_home",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],

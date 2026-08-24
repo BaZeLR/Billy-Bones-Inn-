@@ -3,66 +3,6 @@
 # Owns Event objects, availability projection, and trigger entry labels.
 # ================================================================================
 
-default active_event = None
-default random_events = []
-default story_events = []
-default tavern_work_events = []
-
-default availEvents = {}
-default evalTime = None
-default active_event = None
-default random_events = []
-default story_events = []
-default tavern_work_events = []
-
-default availEvents = {}
-default evalTime = None
-default active_event = None
-default random_events = []
-default story_events = []
-default tavern_work_events = []
-
-default availEvents = {}
-default evalTime = None
-default thread = None
-default eventLocations = set()
-default eventPeople = set()
-default eventTalk = set()
-default eventOptions = set()
-default eventItems = set()
-default eventPath = set()
-default eventProjectionRows = []
-default eventRouteHints = {}
-default story_thread_levels = {}
-default StoryEventFiredDay = -1
-default StoryEventFiredKeysToday = []
-default eventLocations = set()
-default eventPeople = set()
-default eventTalk = set()
-default eventOptions = set()
-default eventItems = set()
-default eventPath = set()
-default eventProjectionRows = []
-default eventRouteHints = {}
-default story_thread_levels = {}
-default StoryEventFiredDay = -1
-default StoryEventFiredKeysToday = []
-default eventLocations = set()
-default eventPeople = set()
-default eventTalk = set()
-default eventOptions = set()
-default eventItems = set()
-default eventPath = set()
-default eventProjectionRows = []
-default eventRouteHints = {}
-default story_thread_levels = {}
-default StoryEventFiredDay = -1
-default StoryEventFiredKeysToday = []
-
-default thread = None
-
-default thread = None
-
 init -25 python:
     import renpy.exports as renpy
 
@@ -87,7 +27,7 @@ init -25 python:
             self.conds = makeConditions(self.condStr)
 
         def canTrigger(self, evtDay=0):
-            if story_event_fired_today(self):
+            if not bool(getattr(self, "repeatable", False)) and story_event_fired_today(self):
                 return False
             if not self.checkDay():
                 return False
@@ -116,10 +56,7 @@ init -25 python:
                 })
 
             target_key = str(self.target or "").strip()
-            try:
-                target_ok = bool(target_key and renpy.has_label(target_key))
-            except Exception:
-                target_ok = bool(target_key)
+            target_ok = bool(target_key and renpy.has_label(target_key))
             add("target", target_ok, target_key)
 
             location_key = str(self.location or "").strip()
@@ -142,12 +79,10 @@ init -25 python:
             return rows
 
         def checkDay(self):
-            current_day = _story_named_number("week", 0)
-            return checkEventTime(current_day, self.day)
+            return checkEventTime(calendar_v2.week, self.day)
 
         def checkHour(self):
-            current_hour = _story_named_number("hour", 0)
-            return checkEventTime(current_hour, self.hour)
+            return checkEventTime(calendar_v2.hour, self.hour)
 
         def checkNumDay(self, evt_numDay):
             return _story_delay_ready(self.evtDay, evt_numDay)
@@ -158,7 +93,7 @@ init -25 python:
             roster = list(_story_named_value("AllGirlNames", []) or [])
             for stat, limit in dict(self.reqs).items():
                 threshold = _story_to_int(limit, 0)
-                person_info = getPersonInfo(stat) if stat in roster else None
+                person_info = people.get_info(stat) if stat in roster else None
                 if person_info is not None:
                     current_value = _story_to_int(getattr(person_info, "rel", 0), 0)
                 else:
@@ -176,23 +111,12 @@ init -25 python:
             probability = self.prob
             if probability in (None, 1, 1.0):
                 return True
-            try:
-                return procedural_random(key="procedural:Utilities/General/Events/events.rpy:procedural_random:140:1") < float(probability)
-            except Exception:
-                return False
+            return procedural_random(key="procedural:Utilities/General/Events/events.rpy:procedural_random:140:1") < float(probability)
 
         def checkItem(self):
             if not self.item:
                 return True
-            inventory = _story_named_value("playerItems", None)
-            if inventory is None:
-                return False
-            try:
-                if hasattr(inventory, "items"):
-                    return int(inventory.get(self.item, 0) or 0) > 0
-                return self.item in inventory
-            except Exception:
-                return False
+            return player.item_count(self.item) > 0
 
         def checkBlocks(self):
             return _story_conditions_blocked(self.conds)
@@ -210,6 +134,9 @@ init -25 python:
             )
 
     def story_event_day_key(evt):
+        daily_key = str(getattr(evt, "daily_key", "") or "").strip()
+        if daily_key:
+            return daily_key
         return "%s:%s:%s" % (
             str(getattr(evt, "target", "") or "").strip(),
             str(getattr(evt, "location", "") or "").strip(),
@@ -217,27 +144,22 @@ init -25 python:
         )
 
     def story_event_reset_fired_today_if_needed():
-        global event_runtime.fired_day, event_runtime.fired_keys_today
-        global event_runtime.fired_day, event_runtime.fired_keys_today
-        global StoryEventFiredDay, StoryEventFiredKeysToday
         day_value = _story_num_day()
-        if int(StoryEventFiredDay or -1) != int(day_value):
-            StoryEventFiredDay = int(day_value)
-            StoryEventFiredKeysToday = []
+        fired_day_value = event_runtime.fired_day
+        if int(fired_day_value if fired_day_value is not None else -1) != int(day_value):
+            event_runtime.fired_day = int(day_value)
+            event_runtime.fired_keys_today = []
 
     def story_event_fired_today(evt):
         story_event_reset_fired_today_if_needed()
         key = story_event_day_key(evt)
-        return bool(key and key in list(StoryEventFiredKeysToday or []))
+        return bool(key and key in list(event_runtime.fired_keys_today or []))
 
     def story_event_mark_fired_today(evt):
-        global event_runtime.fired_keys_today
-        global event_runtime.fired_keys_today
-        global StoryEventFiredKeysToday
         story_event_reset_fired_today_if_needed()
         key = story_event_day_key(evt)
-        if key and key not in StoryEventFiredKeysToday:
-            StoryEventFiredKeysToday.append(key)
+        if key and key not in event_runtime.fired_keys_today:
+            event_runtime.fired_keys_today.append(key)
 
     def initEvents():
         for _name, tdata in dict(threadData or {}).items():
@@ -257,26 +179,20 @@ init -25 python:
         if location_key == "gift":
             return action_key.strip().lower()
         thread_name = str(getattr(evt, "thread_name", "") or "").strip()
-        try:
-            tinfo = dict(threads or {}).get(thread_name, None)
-            data = getattr(tinfo, "data", None)
-            person = str(getattr(data, "person", "") or "").strip().lower()
-            if person and person not in ("event", "story", "system"):
-                return person
-        except Exception:
-            pass
+        tinfo = dict(threads or {}).get(thread_name, None)
+        data = getattr(tinfo, "data", None)
+        person = str(getattr(data, "person", "") or "").strip().lower()
+        if person and person not in ("event", "story", "system"):
+            return person
         return ""
 
     def _story_person_location(person):
         key = str(person or "").strip().lower()
         if not key:
             return ""
-        try:
-            loc = getLocation(key)
-            if loc:
-                return str(loc)
-        except Exception:
-            pass
+        loc = people.location(key)
+        if loc:
+            return str(loc)
         return ""
 
     def _story_event_projection_location(evt):
@@ -298,17 +214,11 @@ init -25 python:
         room_key = str(room_code or "").strip()
         if not room_key:
             return []
-        try:
-            room_obj = get_registered_room(room_key)
-        except Exception:
-            room_obj = None
+        room_obj = rooms.get(room_key)
         if room_obj is None:
             return []
         out = []
-        try:
-            exits = list(room_obj.visible_exits())
-        except Exception:
-            exits = list(getattr(room_obj, "exits", []) or [])
+        exits = list(room_obj.visible_exits())
         for exit_row in exits:
             target = str(getattr(exit_row, "target", "") or "").strip()
             if target and target not in out:
@@ -335,26 +245,17 @@ init -25 python:
         return target_key
 
     def _story_project_available_events():
-        global event_runtime.locations, event_runtime.people, event_runtime.talk, event_runtime.options, event_runtime.items
-        global event_runtime.paths, event_runtime.projection_rows, event_runtime.route_hints
+        current_location = str(rooms.current_code or "").strip()
+        event_runtime.locations = set()
+        event_runtime.people = set()
+        event_runtime.talk = set()
+        event_runtime.options = set()
+        event_runtime.items = set()
+        event_runtime.paths = set()
+        event_runtime.projection_rows = []
+        event_runtime.route_hints = {}
 
-        global event_runtime.locations, event_runtime.people, event_runtime.talk, event_runtime.options, event_runtime.items
-        global event_runtime.paths, event_runtime.projection_rows, event_runtime.route_hints
-
-        global eventLocations, eventPeople, eventTalk, eventOptions, eventItems
-        global eventPath, eventProjectionRows, eventRouteHints
-
-        current_location = str(_story_named_value("CurLoc", _story_named_value("location", "")) or "").strip()
-        eventLocations = set()
-        eventPeople = set()
-        eventTalk = set()
-        eventOptions = set()
-        eventItems = set()
-        eventPath = set()
-        eventProjectionRows = []
-        eventRouteHints = {}
-
-        for raw_location, action_map in sorted(dict(availEvents or {}).items()):
+        for raw_location, action_map in sorted(dict(event_runtime.available or {}).items()):
             for raw_action, evt in sorted(dict(action_map or {}).items()):
                 if evt is None:
                     continue
@@ -366,21 +267,21 @@ init -25 python:
                 first_step = _story_first_route_step(current_location, projected_location)
 
                 if projected_location:
-                    eventLocations.add(projected_location)
+                    event_runtime.locations.add(projected_location)
                     if first_step:
-                        eventPath.add(first_step)
-                        eventRouteHints[projected_location] = first_step
+                        event_runtime.paths.add(first_step)
+                        event_runtime.route_hints[projected_location] = first_step
                 if person_key:
-                    eventPeople.add(person_key)
+                    event_runtime.people.add(person_key)
                 if location_key.startswith("talk_") or location_key == "talk" or action_key.endswith("_talk"):
                     if person_key:
-                        eventTalk.add(person_key)
+                        event_runtime.talk.add(person_key)
                 if action_key and action_key not in ("enter", "sleep"):
-                    eventOptions.add(action_key)
+                    event_runtime.options.add(action_key)
                 if missing_item:
-                    eventItems.add(str(getattr(evt, "item", "") or ""))
+                    event_runtime.items.add(str(getattr(evt, "item", "") or ""))
 
-                eventProjectionRows.append({
+                event_runtime.projection_rows.append({
                     "thread": str(getattr(evt, "thread_name", "") or ""),
                     "target": str(getattr(evt, "target", "") or ""),
                     "person": person_key,
@@ -395,57 +296,31 @@ init -25 python:
                 })
 
     def story_event_projection_rows():
-        try:
-            findAvailableEvents(False)
-        except Exception:
-            pass
-        return list(eventProjectionRows or [])
+        findAvailableEvents(False)
+        return list(event_runtime.projection_rows or [])
 
     def story_event_path_targets():
-        try:
-            findAvailableEvents(False)
-        except Exception:
-            pass
-        return set(eventPath or set())
+        findAvailableEvents(False)
+        return set(event_runtime.paths or set())
 
     def story_event_location_has_signal(location_name=""):
         key = str(location_name or "").strip()
         if not key:
             return False
-        try:
-            findAvailableEvents(False)
-        except Exception:
-            pass
-        return key in set(eventLocations or set()) or key in set(eventPath or set())
+        findAvailableEvents(False)
+        return key in set(event_runtime.locations or set()) or key in set(event_runtime.paths or set())
 
     def findAvailableEvents(forced=False):
-        global event_runtime.available, event_runtime.evaluation_time
-        global event_runtime.locations, event_runtime.people, event_runtime.talk, event_runtime.options, event_runtime.items
-        global event_runtime.story_events
-
-        global event_runtime.available, event_runtime.evaluation_time
-        global event_runtime.locations, event_runtime.people, event_runtime.talk, event_runtime.options, event_runtime.items
-        global event_runtime.story_events
-
-        global availEvents, evalTime
-        global eventLocations, eventPeople, eventTalk, eventOptions, eventItems
-        global story_events
-
-        global availEvents, evalTime
-        global eventLocations, eventPeople, eventTalk, eventOptions, eventItems
-        global eventLocations, eventPeople, eventTalk, eventOptions, eventItems
-        global story_events
-
         eval_key = (
             _story_num_day(),
-            _story_named_number("week", 1),
-            _story_named_number("hour", 0),
-            _story_named_number("minute", 0),
-            str(_story_named_value("CurLoc", "") or ""),
+            int(calendar_v2.week),
+            int(calendar_v2.hour),
+            int(calendar_v2.minute),
+            str(rooms.current_code or ""),
         )
-        if (not forced) and evalTime == eval_key:
+        if (not forced) and event_runtime.evaluation_time == eval_key:
             return
-        evalTime = eval_key
+        event_runtime.evaluation_time = eval_key
 
         initEvents()
 
@@ -453,33 +328,32 @@ init -25 python:
         for _name, thread_info in dict(threads or {}).items():
             tmp_events.extend(thread_info.getAvailableEvents())
 
-        availEvents = {}
+        event_runtime.available = {}
         for evt in tmp_events:
             location_key = str(evt.location or "").strip()
             action_key = str(evt.action or "").strip()
             if location_key == "" or action_key == "":
                 continue
-            if location_key not in availEvents:
-                availEvents[location_key] = {action_key: [evt]}
-            elif action_key not in availEvents[location_key]:
-                availEvents[location_key][action_key] = [evt]
+            if location_key not in event_runtime.available:
+                event_runtime.available[location_key] = {action_key: [evt]}
+            elif action_key not in event_runtime.available[location_key]:
+                event_runtime.available[location_key][action_key] = [evt]
             else:
-                availEvents[location_key][action_key].append(evt)
+                event_runtime.available[location_key][action_key].append(evt)
 
-        for location_name in list(availEvents.keys()):
-            for action_name in list(availEvents[location_name].keys()):
-                availEvents[location_name][action_name].sort(key=lambda item: int(item.priority or 0))
+        for location_name in list(event_runtime.available.keys()):
+            for action_name in list(event_runtime.available[location_name].keys()):
+                event_runtime.available[location_name][action_name].sort(key=lambda item: int(item.priority or 0))
                 chosen = None
-                for evt in availEvents[location_name][action_name]:
+                for evt in event_runtime.available[location_name][action_name]:
                     if evt.checkItem():
                         chosen = evt
                         break
-                if chosen is None and len(availEvents[location_name][action_name]) > 0:
-                    chosen = availEvents[location_name][action_name][0]
-                availEvents[location_name][action_name] = chosen
+                if chosen is None and len(event_runtime.available[location_name][action_name]) > 0:
+                    chosen = event_runtime.available[location_name][action_name][0]
+                event_runtime.available[location_name][action_name] = chosen
 
         _story_project_available_events()
-        story_events = list(dict(threadData or {}).keys())
 
     def initStoryEventRuntime(force=False):
         initThreads()
@@ -488,10 +362,7 @@ init -25 python:
         findAvailableEvents(True if force else False)
 
     def _story_after_load_init():
-        try:
-            initStoryEventRuntime(True)
-        except Exception:
-            pass
+        initStoryEventRuntime(True)
 
     if _story_after_load_init not in config.after_load_callbacks:
         config.after_load_callbacks.append(_story_after_load_init)
@@ -519,8 +390,10 @@ init python:
             return "Поговорить об одежде"
         if action_key == "amanda_grope":
             return "Подойти к Аманде"
+        if action_key == "sandra_night_thanks":
+            return "Принять ночную благодарность Сандры"
         if person_key:
-            person_info = getPersonInfo(person_key)
+            person_info = people.get_info(person_key)
             person_name = str(getattr(person_info, "name", "") or person_key)
             if action_key.endswith("_talk"):
                 return "Поговорить с %s" % person_name
@@ -531,11 +404,8 @@ init python:
         location_key = str(location_name or "").strip()
         if not location_key:
             return []
-        try:
-            findAvailableEvents(False)
-        except Exception:
-            return []
-        action_map = dict(availEvents.get(location_key, {}) or {})
+        findAvailableEvents(False)
+        action_map = dict(event_runtime.available.get(location_key, {}) or {})
         if not action_map:
             return []
 
@@ -559,34 +429,23 @@ init python:
         action_key = str(action_name or "").strip()
         if location_key == "" or action_key == "":
             return False
-        try:
-            findAvailableEvents(False)
-        except Exception:
-            return False
+        # Authored labels can change event conditions without advancing
+        # the calendar or changing rooms.current_code. A direct query must inspect
+        # that current state instead of the passive HUD projection cache.
+        findAvailableEvents(True)
         return (
-            isinstance(availEvents, dict)
-            and location_key in availEvents
-            and action_key in dict(availEvents.get(location_key, {}) or {})
-            and availEvents[location_key].get(action_key, None) is not None
+            isinstance(event_runtime.available, dict)
+            and location_key in event_runtime.available
+            and action_key in dict(event_runtime.available.get(location_key, {}) or {})
+            and event_runtime.available[location_key].get(action_key, None) is not None
         )
 
     def story_thread_advance_current():
-        global event_runtime.evaluation_time
-        global evalTime
-        try:
-            current_thread = thread
-        except NameError:
-            current_thread = None
-        if current_event_runtime.active_thread is not None:
-            try:
-                current_thread.advance()
-            except Exception:
-                pass
-        evalTime = None
-        try:
-            findAvailableEvents(True)
-        except Exception:
-            pass
+        current_thread = event_runtime.active_thread
+        if current_thread is not None:
+            current_thread.advance()
+        event_runtime.evaluation_time = None
+        findAvailableEvents(True)
 
 label before_main_menu:
     $ initStoryEventRuntime(True)
@@ -594,36 +453,38 @@ label before_main_menu:
 
 
 label checkTriggers(location, action, numpop=0):
+    $ renpy.dynamic("_story_location", "_story_action", "evt")
     $ _story_location = str(location or "").strip()
     $ _story_action = str(action or "").strip()
     $ findAvailableEvents(False)
-    if _story_location not in availEvents:
+    if _story_location not in event_runtime.available:
         return False
-    if _story_action not in availEvents[_story_location]:
+    if _story_action not in event_runtime.available[_story_location]:
         return False
-    $ evt = availEvents[_story_location][_story_action]
+    $ evt = event_runtime.available[_story_location][_story_action]
     if evt is None or not evt.target:
         return False
     if evt.item and not evt.checkItem():
         return False
-    $ active_event = evt
     $ story_event_mark_fired_today(evt)
     if numpop == 2:
         $ renpy.pop_call()
     elif numpop == 1:
         $ renpy.pop_call()
     call preEvent(evt.thread_name if evt.threaded else None)
+    if str(rooms.current_code or "") != "Intro":
+        show screen main_ui
     jump expression evt.target
 
 
 label preEvent(thread_name=None):
-    $ evalTime = None
+    $ event_runtime.evaluation_time = None
     if thread_name:
         if thread_name in threads:
-            $ thread = threads[thread_name]
-            $ thread.setDay()
+            $ event_runtime.active_thread = threads[thread_name]
+            $ event_runtime.active_thread.setDay()
         else:
-            $ thread = None
+            $ event_runtime.active_thread = None
     else:
-        $ thread = None
+        $ event_runtime.active_thread = None
     return

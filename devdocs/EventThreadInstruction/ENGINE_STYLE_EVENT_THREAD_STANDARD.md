@@ -111,34 +111,28 @@ Long strings hide mistakes, especially wrong room names and missing helper funct
 
 If multiple event alternatives are grouped in one thread step, that step is blocked only when all alternatives are blocked. This matches the FamilyLife `checkBlocksList` behavior.
 
-## Story Flags As Chapters
+## Thread Num As Chapters
 
-Use story flags and counters as readable chapter markers, not as scattered one-off booleans.
+For every ordered story thread, `thread.num` is the chapter/stage. Do not mirror
+that number in `NPC.var["arc_stage"]` or another progress map.
 
-Good examples:
+NPC/system fields record facts that the thread does not contain, for example:
 
-- `Melissa.var["bats_episode"]`: ordered chapter number for the bat problem.
-- `Werecat.var["rat_breakfast_seen"]`: one-shot scene gate.
-- `Werecat.var["adopted_count"]`: repeatable progression counter.
-- `Clara.var["paintings_stage"]`: ordered investigation branch stage.
+- `Werecat.var["rat_breakfast_seen"]`: a one-shot outcome used outside its thread;
+- `Werecat.var["adopted_count"]`: a repeatable gameplay counter;
+- `Melissa.var["temp_room"]`: the temporary room selected by the player;
+- `Melissa.var["roof_repair_complete_day"]`: the day a timed repair completes.
 
-When adding an arc, prefer:
+Multiple available actions may share one ordered stage by placing multiple event
+tuples in the same `LThreadData` trigger list. Only the real stage-changing
+outcome calls `thread.advance()`.
 
-```renpy
-Person.var["arc_stage"] = 0
-Person.var["arc_scene_seen"] = 0
-Person.var["arc_repeat_count"] = 0
-Person.var["arc_last_day"] = -1
-```
+Event conditions at the current step check only real facts such as location,
+hour, items, outcome flags, or elapsed days. The `LThreadInfo` cursor already
+selects `thread.num`; repeating that stage check in an NPC field is redundant.
 
-Then point thread rows at those markers through explicit readiness helpers:
-
-```renpy
-def some_arc_scene_2_ready():
-    return Person.var_int("arc_stage", 0) == 2 and Person.var_int("arc_last_day", -1) != dayspassed
-```
-
-This makes the story board act like a chapter map. A human should be able to read the flags and understand which scene is next, which scenes repeat, and which branch has already locked or completed.
+This makes the story board act like a chapter map: `thread.num` identifies the
+current scene group, while named facts explain why an event is waiting.
 
 ## Event Label Shape
 

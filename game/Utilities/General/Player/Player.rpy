@@ -1,639 +1,4 @@
-        def sync_from_store(self):
-            self.items = player_normalize_inventory(globals().get("playerItems", self.items))
-            return self
-
-        def apply_to_store(self):
-            globals()["playerItems"] = dict(player_normalize_inventory(self.items))
-            return self
-        def sync_from_store(self):
-            self.weapon = str(globals().get("EquippedWeapon", self.weapon) or "")
-            self.armor = str(globals().get("EquippedArmor", self.armor) or "")
-            return self
-
-        def apply_to_store(self):
-            globals()["EquippedWeapon"] = str(self.weapon or "")
-            globals()["EquippedArmor"] = str(self.armor or "")
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.days_since_wash = max(0, player_to_int(g.get("dayssincewash", self.days_since_wash), 0))
-            self.days_since_haircut = max(0, player_to_int(g.get("dayssincehaircut", self.days_since_haircut), 0))
-            self.haircut_day = max(0, player_to_int(g.get("PlayerHaircutDaySt", self.haircut_day), 0))
-            self.washDays = max(0, player_to_int(g.get("washDays", self.WASH_FRESH_DAYS - self.days_since_wash), 0))
-            self.hairCutdays = max(0, player_to_int(g.get("hairCutdays", self.HAIRCUT_FRESH_DAYS - self.days_since_haircut), 0))
-            self.costume_condition = player_clamp_value(g.get("costumecondition", self.costume_condition), 0, 100)
-            dress_days = g.get("PlayerDressDaySt", self.dress_days)
-            if isinstance(dress_days, dict):
-                self.dress_days = dict(dress_days or {})
-            dress_life_days = g.get("PlayerDressLifeDays", self.dress_life_days)
-            if isinstance(dress_life_days, dict):
-                self.dress_life_days = dict(dress_life_days or {})
-            destroyed_dresses = g.get("PlayerDestroyedDresses", self.destroyed_dresses)
-            if isinstance(destroyed_dresses, (list, tuple, set)):
-                self.destroyed_dresses = player_normalize_id_list(destroyed_dresses)
-            else:
-                self.destroyed_dresses = []
-            self.owned_dresses = [
-                row for row in player_normalize_id_list(self.owned_dresses)
-                if row not in self.destroyed_dresses
-            ]
-            if str(self.current_dress or "").strip() in self.destroyed_dresses:
-                self.current_dress = ""
-                self.sleep_bottom_layer = "nothing"
-            if str(self.current_dress or "").strip() == "":
-                self.sleep_bottom_layer = "nothing"
-            item_life_days = g.get("PlayerItemLifeDays", self.item_life_days)
-            if isinstance(item_life_days, dict):
-                self.item_life_days = dict(item_life_days or {})
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["washDays"] = max(0, player_to_int(self.washDays, 0))
-            g["hairCutdays"] = max(0, player_to_int(self.hairCutdays, 0))
-            g["dayssincewash"] = max(0, player_to_int(self.days_since_wash, 0))
-            g["dayssincehaircut"] = max(0, player_to_int(self.days_since_haircut, 0))
-            g["PlayerHaircutDaySt"] = max(0, player_to_int(self.haircut_day, 0))
-            g["PlayerDressDaySt"] = dict(self.dress_days or {})
-            g["PlayerDressLifeDays"] = dict(self.dress_life_days or {})
-            g["PlayerDestroyedDresses"] = list(self.destroyed_dresses or [])
-            g["PlayerItemLifeDays"] = dict(self.item_life_days or {})
-            g["costumecondition"] = player_clamp_value(self.costume_condition, 0, 100)
-            return self
-        def sync_from_store(self):
-            g = globals()
-            if not isinstance(getattr(self, "cock_positions", None), dict):
-                self.cock_positions = {}
-            self.can_cum_daily = player_to_int(g.get("cancumdaily", self.can_cum_daily), 2)
-            self.came_today = player_to_int(g.get("cametoday", self.came_today), 0)
-            self.last_sex_day = player_to_int(g.get("LastDaySex", self.last_sex_day), -1)
-            self.last_cum_day = player_to_int(g.get("PlayerLastCumDay", self.last_cum_day), -1)
-            had_sex = g.get("HadSex", {})
-            if isinstance(had_sex, dict):
-                self.had_sex_count = player_to_int(had_sex.get("You", had_sex.get("you", self.had_sex_count)), 0)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["cancumdaily"] = player_to_int(self.can_cum_daily, 2)
-            g["cametoday"] = player_to_int(self.came_today, 0)
-            g["LastDaySex"] = player_to_int(self.last_sex_day, -1)
-            g["PlayerLastCumDay"] = player_to_int(self.last_cum_day, -1)
-            had_sex = g.get("HadSex", {})
-            if not isinstance(had_sex, dict):
-                had_sex = {}
-            had_sex["You"] = player_to_int(self.had_sex_count, 0)
-            g["HadSex"] = had_sex
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.weekly = dict(g.get("PlayerChoresWeek", self.weekly) or {})
-            self.ui = dict(g.get("UI_chores", self.ui) or {})
-            for key in self.KEYS:
-                self.counters[key] = player_to_int(g.get(key, self.counters.get(key, 0)), 0)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["PlayerChoresWeek"] = dict(self.weekly or {})
-            g["UI_chores"] = dict(self.ui or {})
-            for key in self.KEYS:
-                g[key] = player_to_int(self.counters.get(key, 0), 0)
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.productnum = player_to_int(g.get("productnum", self.productnum), 0)
-            self.winenum = player_to_int(g.get("winenum", self.winenum), 0)
-            self.cleanliness = player_to_int(g.get("taverncleanliness", self.cleanliness), 60)
-            self.upstairs_rooms_dirty = player_to_int(g.get("upstairsroomsdirty", self.upstairs_rooms_dirty), 0)
-            self.ashes_dirty_days = player_to_int(g.get("ashesdirtydays", self.ashes_dirty_days), 0)
-            self.weekly_visitors = dict(g.get("WeeklyVisitorsTrack", self.weekly_visitors) or {})
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["productnum"] = player_to_int(self.productnum, 0)
-            g["winenum"] = player_to_int(self.winenum, 0)
-            g["taverncleanliness"] = player_to_int(self.cleanliness, 60)
-            g["upstairsroomsdirty"] = player_to_int(self.upstairs_rooms_dirty, 0)
-            g["ashesdirtydays"] = player_to_int(self.ashes_dirty_days, 0)
-            g["WeeklyVisitorsTrack"] = dict(self.weekly_visitors or {})
-            return self
-        def sync_from_store(self):
-            g = globals()
-            party = []
-            if isinstance(g.get("player_company", []), list):
-                party.extend(list(g.get("player_company", []) or []))
-            self.party = player_normalize_id_list(party)
-            self.fight_level["you"] = max(1, player_to_int(self.fight_level.get("you", 1), 1))
-            supply = dict(self.supply or {})
-            self.supply = dict(self.FIGHT_SUPPLY_DEFAULTS)
-            for key, value in supply.items():
-                self.supply[str(key or "")] = max(0, player_to_int(value, 0))
-            self.mana = player_clamp_value(self.mana, 0, 100)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["player_company"] = list(self.party or [])
-            self.fight_level["you"] = max(1, player_to_int(self.fight_level.get("you", 1), 1))
-            for key, value in self.FIGHT_SUPPLY_DEFAULTS.items():
-                self.supply.setdefault(key, value)
-            self.mana = player_clamp_value(self.mana, 0, 100)
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.health = player_clamp_value(g.get("health", self.health), 0, 100)
-            self.energy = player_clamp_value(g.get("energy", self.energy), 0, 100)
-            self.fun = player_clamp_value(g.get("fun", self.fun), 0, 100)
-            self.sick_days = player_to_int(g.get("SickDays", self.sick_days), 0)
-            self.forest_ban_until_day = player_to_int(g.get("PlayerForestBanUntilDay", self.forest_ban_until_day), 0)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["health"] = player_clamp_value(self.health, 0, 100)
-            g["energy"] = player_clamp_value(self.energy, 0, 100)
-            g["fun"] = player_clamp_value(self.fun, 0, 100)
-            g["SickDays"] = player_to_int(self.sick_days, 0)
-            g["PlayerForestBanUntilDay"] = player_to_int(self.forest_ban_until_day, 0)
-            return self
-        def sync_from_store(self):
-            self.money = player_to_int(globals().get("money", self.money), 10000)
-            self.tavern_fame = player_to_int(globals().get("tavernfame", self.tavern_fame), 0)
-            self.child_support_count = max(0, player_to_int(globals().get("KidsPosobie", self.child_support_count), 0))
-            return self
-
-        def apply_to_store(self):
-            globals()["money"] = player_to_int(self.money, 0)
-            globals()["tavernfame"] = player_to_int(self.tavern_fame, 0)
-            globals()["KidsPosobie"] = max(0, player_to_int(self.child_support_count, 0))
-            return self
-        def sync_from_store(self):
-            self.age = player_to_int(globals().get("age", self.age), 18)
-            return self
-
-        def apply_to_store(self):
-            globals()["age"] = player_to_int(self.age, 18)
-            return self
-        def sync_from_store(self):
-            for attr in ("charisma", "reputation", "notoriety", "exploration", "rebellion", "look"):
-                setattr(self, attr, player_to_int(globals().get(attr, getattr(self, attr)), getattr(self, attr)))
-            return self
-
-        def apply_to_store(self):
-            for attr in ("charisma", "reputation", "notoriety", "exploration", "rebellion", "look"):
-                globals()[attr] = player_to_int(getattr(self, attr), 0)
-            return self
-        def sync_from_store(self):
-            for feature in (self.identity, self.condition, self.stats, self.economy, self.inventory,
-                            self.equipment, self.appearance, self.intimacy, self.chores,
-                            self.chores,
-                            self.tavern_management, self.combat):
-                feature.sync_from_store()
-            return self
-
-        def apply_to_store(self):
-            for feature in (self.identity, self.condition, self.stats, self.economy,
-                            self.tavern_management, self.combat):
-                feature.apply_to_store()
-            return self
-    def ensure_player_runtime():
-        global player, mc
-        if "player" not in globals() or not isinstance(globals().get("player"), Player):
-            player = Player()
-        if "mc" not in globals() or not isinstance(globals().get("mc"), Player):
-            mc = player
-        if mc is not player:
-            mc = player
-        return player
-            self.blind_pirate_breakfast_pending = False            self.text_pages = []
-            self.text_page_index = 0
-            self.text_return_label = ""        def sync_from_store(self):
-            self.items = player_normalize_inventory(globals().get("playerItems", self.items))
-            return self
-
-        def apply_to_store(self):
-            globals()["playerItems"] = dict(player_normalize_inventory(self.items))
-            return self
-        def sync_from_store(self):
-            self.weapon = str(globals().get("EquippedWeapon", self.weapon) or "")
-            self.armor = str(globals().get("EquippedArmor", self.armor) or "")
-            return self
-
-        def apply_to_store(self):
-            globals()["EquippedWeapon"] = str(self.weapon or "")
-            globals()["EquippedArmor"] = str(self.armor or "")
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.days_since_wash = max(0, player_to_int(g.get("dayssincewash", self.days_since_wash), 0))
-            self.days_since_haircut = max(0, player_to_int(g.get("dayssincehaircut", self.days_since_haircut), 0))
-            self.haircut_day = max(0, player_to_int(g.get("PlayerHaircutDaySt", self.haircut_day), 0))
-            self.washDays = max(0, player_to_int(g.get("washDays", self.WASH_FRESH_DAYS - self.days_since_wash), 0))
-            self.hairCutdays = max(0, player_to_int(g.get("hairCutdays", self.HAIRCUT_FRESH_DAYS - self.days_since_haircut), 0))
-            self.costume_condition = player_clamp_value(g.get("costumecondition", self.costume_condition), 0, 100)
-            dress_days = g.get("PlayerDressDaySt", self.dress_days)
-            if isinstance(dress_days, dict):
-                self.dress_days = dict(dress_days or {})
-            dress_life_days = g.get("PlayerDressLifeDays", self.dress_life_days)
-            if isinstance(dress_life_days, dict):
-                self.dress_life_days = dict(dress_life_days or {})
-            destroyed_dresses = g.get("PlayerDestroyedDresses", self.destroyed_dresses)
-            if isinstance(destroyed_dresses, (list, tuple, set)):
-                self.destroyed_dresses = player_normalize_id_list(destroyed_dresses)
-            else:
-                self.destroyed_dresses = []
-            self.owned_dresses = [
-                row for row in player_normalize_id_list(self.owned_dresses)
-                if row not in self.destroyed_dresses
-            ]
-            if str(self.current_dress or "").strip() in self.destroyed_dresses:
-                self.current_dress = ""
-                self.sleep_bottom_layer = "nothing"
-            if str(self.current_dress or "").strip() == "":
-                self.sleep_bottom_layer = "nothing"
-            item_life_days = g.get("PlayerItemLifeDays", self.item_life_days)
-            if isinstance(item_life_days, dict):
-                self.item_life_days = dict(item_life_days or {})
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["washDays"] = max(0, player_to_int(self.washDays, 0))
-            g["hairCutdays"] = max(0, player_to_int(self.hairCutdays, 0))
-            g["dayssincewash"] = max(0, player_to_int(self.days_since_wash, 0))
-            g["dayssincehaircut"] = max(0, player_to_int(self.days_since_haircut, 0))
-            g["PlayerHaircutDaySt"] = max(0, player_to_int(self.haircut_day, 0))
-            g["PlayerDressDaySt"] = dict(self.dress_days or {})
-            g["PlayerDressLifeDays"] = dict(self.dress_life_days or {})
-            g["PlayerDestroyedDresses"] = list(self.destroyed_dresses or [])
-            g["PlayerItemLifeDays"] = dict(self.item_life_days or {})
-            g["costumecondition"] = player_clamp_value(self.costume_condition, 0, 100)
-            return self
-        def sync_from_store(self):
-            g = globals()
-            if not isinstance(getattr(self, "cock_positions", None), dict):
-                self.cock_positions = {}
-            self.can_cum_daily = player_to_int(g.get("cancumdaily", self.can_cum_daily), 2)
-            self.came_today = player_to_int(g.get("cametoday", self.came_today), 0)
-            self.last_sex_day = player_to_int(g.get("LastDaySex", self.last_sex_day), -1)
-            self.last_cum_day = player_to_int(g.get("PlayerLastCumDay", self.last_cum_day), -1)
-            had_sex = g.get("HadSex", {})
-            if isinstance(had_sex, dict):
-                self.had_sex_count = player_to_int(had_sex.get("You", had_sex.get("you", self.had_sex_count)), 0)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["cancumdaily"] = player_to_int(self.can_cum_daily, 2)
-            g["cametoday"] = player_to_int(self.came_today, 0)
-            g["LastDaySex"] = player_to_int(self.last_sex_day, -1)
-            g["PlayerLastCumDay"] = player_to_int(self.last_cum_day, -1)
-            had_sex = g.get("HadSex", {})
-            if not isinstance(had_sex, dict):
-                had_sex = {}
-            had_sex["You"] = player_to_int(self.had_sex_count, 0)
-            g["HadSex"] = had_sex
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.weekly = dict(g.get("PlayerChoresWeek", self.weekly) or {})
-            self.ui = dict(g.get("UI_chores", self.ui) or {})
-            for key in self.KEYS:
-                self.counters[key] = player_to_int(g.get(key, self.counters.get(key, 0)), 0)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["PlayerChoresWeek"] = dict(self.weekly or {})
-            g["UI_chores"] = dict(self.ui or {})
-            for key in self.KEYS:
-                g[key] = player_to_int(self.counters.get(key, 0), 0)
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.productnum = player_to_int(g.get("productnum", self.productnum), 0)
-            self.winenum = player_to_int(g.get("winenum", self.winenum), 0)
-            self.cleanliness = player_to_int(g.get("taverncleanliness", self.cleanliness), 60)
-            self.upstairs_rooms_dirty = player_to_int(g.get("upstairsroomsdirty", self.upstairs_rooms_dirty), 0)
-            self.ashes_dirty_days = player_to_int(g.get("ashesdirtydays", self.ashes_dirty_days), 0)
-            self.weekly_visitors = dict(g.get("WeeklyVisitorsTrack", self.weekly_visitors) or {})
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["productnum"] = player_to_int(self.productnum, 0)
-            g["winenum"] = player_to_int(self.winenum, 0)
-            g["taverncleanliness"] = player_to_int(self.cleanliness, 60)
-            g["upstairsroomsdirty"] = player_to_int(self.upstairs_rooms_dirty, 0)
-            g["ashesdirtydays"] = player_to_int(self.ashes_dirty_days, 0)
-            g["WeeklyVisitorsTrack"] = dict(self.weekly_visitors or {})
-            return self
-        def sync_from_store(self):
-            g = globals()
-            party = []
-            if isinstance(g.get("player_company", []), list):
-                party.extend(list(g.get("player_company", []) or []))
-            self.party = player_normalize_id_list(party)
-            self.fight_level["you"] = max(1, player_to_int(self.fight_level.get("you", 1), 1))
-            supply = dict(self.supply or {})
-            self.fight_level = {"you": 1}
-            self.supply = dict(self.FIGHT_SUPPLY_DEFAULTS)
-            for key, value in supply.items():
-                self.supply[str(key or "")] = max(0, player_to_int(value, 0))
-            self.mana = player_clamp_value(self.mana, 0, 100)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["player_company"] = list(self.party or [])
-            self.fight_level["you"] = max(1, player_to_int(self.fight_level.get("you", 1), 1))
-            for key, value in self.FIGHT_SUPPLY_DEFAULTS.items():
-                self.supply.setdefault(key, value)
-            self.mana = player_clamp_value(self.mana, 0, 100)
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.health = player_clamp_value(g.get("health", self.health), 0, 100)
-            self.energy = player_clamp_value(g.get("energy", self.energy), 0, 100)
-            self.fun = player_clamp_value(g.get("fun", self.fun), 0, 100)
-            self.sick_days = player_to_int(g.get("SickDays", self.sick_days), 0)
-            self.forest_ban_until_day = player_to_int(g.get("PlayerForestBanUntilDay", self.forest_ban_until_day), 0)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["health"] = player_clamp_value(self.health, 0, 100)
-            g["energy"] = player_clamp_value(self.energy, 0, 100)
-            g["fun"] = player_clamp_value(self.fun, 0, 100)
-            g["SickDays"] = player_to_int(self.sick_days, 0)
-            g["PlayerForestBanUntilDay"] = player_to_int(self.forest_ban_until_day, 0)
-            return self
-        def sync_from_store(self):
-            self.money = player_to_int(globals().get("money", self.money), 10000)
-            self.tavern_fame = player_to_int(globals().get("tavernfame", self.tavern_fame), 0)
-            self.child_support_count = max(0, player_to_int(globals().get("KidsPosobie", self.child_support_count), 0))
-            return self
-
-        def apply_to_store(self):
-            globals()["money"] = player_to_int(self.money, 0)
-            globals()["tavernfame"] = player_to_int(self.tavern_fame, 0)
-            globals()["KidsPosobie"] = max(0, player_to_int(self.child_support_count, 0))
-            return self
-        def sync_from_store(self):
-            self.age = player_to_int(globals().get("age", self.age), 18)
-            return self
-
-        def apply_to_store(self):
-            globals()["age"] = player_to_int(self.age, 18)
-            return self
-        def sync_from_store(self):
-            for attr in ("charisma", "reputation", "notoriety", "exploration", "rebellion", "look"):
-                setattr(self, attr, player_to_int(globals().get(attr, getattr(self, attr)), getattr(self, attr)))
-            return self
-
-        def apply_to_store(self):
-            for attr in ("charisma", "reputation", "notoriety", "exploration", "rebellion", "look"):
-                globals()[attr] = player_to_int(getattr(self, attr), 0)
-            return self
-        def sync_from_store(self):
-            for feature in (self.identity, self.condition, self.stats, self.economy, self.inventory,
-                            self.equipment, self.appearance, self.intimacy, self.chores,
-                            self.chores,
-                            self.tavern_management, self.combat):
-                feature.sync_from_store()
-            return self
-
-        def apply_to_store(self):
-            for feature in (self.identity, self.condition, self.stats, self.economy,
-                            self.tavern_management, self.combat):
-                feature.apply_to_store()
-            return self
-    def ensure_player_runtime():
-        global player, mc
-        if "player" not in globals() or not isinstance(globals().get("player"), Player):
-            player = Player()
-        if "mc" not in globals() or not isinstance(globals().get("mc"), Player):
-            mc = player
-        if mc is not player:
-            mc = player
-        return player
-            self.blind_pirate_breakfast_pending = False            self.text_pages = []
-            self.text_page_index = 0
-            self.text_return_label = ""        def sync_from_store(self):
-            self.items = player_normalize_inventory(globals().get("playerItems", self.items))
-            return self
-
-        def apply_to_store(self):
-            globals()["playerItems"] = dict(player_normalize_inventory(self.items))
-            return self
-        def sync_from_store(self):
-            self.weapon = str(globals().get("EquippedWeapon", self.weapon) or "")
-            self.armor = str(globals().get("EquippedArmor", self.armor) or "")
-            return self
-
-        def apply_to_store(self):
-            globals()["EquippedWeapon"] = str(self.weapon or "")
-            globals()["EquippedArmor"] = str(self.armor or "")
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.days_since_wash = max(0, player_to_int(g.get("dayssincewash", self.days_since_wash), 0))
-            self.days_since_haircut = max(0, player_to_int(g.get("dayssincehaircut", self.days_since_haircut), 0))
-            self.haircut_day = max(0, player_to_int(g.get("PlayerHaircutDaySt", self.haircut_day), 0))
-            self.washDays = max(0, player_to_int(g.get("washDays", self.WASH_FRESH_DAYS - self.days_since_wash), 0))
-            self.hairCutdays = max(0, player_to_int(g.get("hairCutdays", self.HAIRCUT_FRESH_DAYS - self.days_since_haircut), 0))
-            self.costume_condition = player_clamp_value(g.get("costumecondition", self.costume_condition), 0, 100)
-            dress_days = g.get("PlayerDressDaySt", self.dress_days)
-            if isinstance(dress_days, dict):
-                self.dress_days = dict(dress_days or {})
-            dress_life_days = g.get("PlayerDressLifeDays", self.dress_life_days)
-            if isinstance(dress_life_days, dict):
-                self.dress_life_days = dict(dress_life_days or {})
-            destroyed_dresses = g.get("PlayerDestroyedDresses", self.destroyed_dresses)
-            if isinstance(destroyed_dresses, (list, tuple, set)):
-                self.destroyed_dresses = player_normalize_id_list(destroyed_dresses)
-            else:
-                self.destroyed_dresses = []
-            self.owned_dresses = [
-                row for row in player_normalize_id_list(self.owned_dresses)
-                if row not in self.destroyed_dresses
-            ]
-            if str(self.current_dress or "").strip() in self.destroyed_dresses:
-                self.current_dress = ""
-                self.sleep_bottom_layer = "nothing"
-            if str(self.current_dress or "").strip() == "":
-                self.sleep_bottom_layer = "nothing"
-            item_life_days = g.get("PlayerItemLifeDays", self.item_life_days)
-            if isinstance(item_life_days, dict):
-                self.item_life_days = dict(item_life_days or {})
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["washDays"] = max(0, player_to_int(self.washDays, 0))
-            g["hairCutdays"] = max(0, player_to_int(self.hairCutdays, 0))
-            g["dayssincewash"] = max(0, player_to_int(self.days_since_wash, 0))
-            g["dayssincehaircut"] = max(0, player_to_int(self.days_since_haircut, 0))
-            g["PlayerHaircutDaySt"] = max(0, player_to_int(self.haircut_day, 0))
-            g["PlayerDressDaySt"] = dict(self.dress_days or {})
-            g["PlayerDressLifeDays"] = dict(self.dress_life_days or {})
-            g["PlayerDestroyedDresses"] = list(self.destroyed_dresses or [])
-            g["PlayerItemLifeDays"] = dict(self.item_life_days or {})
-            g["costumecondition"] = player_clamp_value(self.costume_condition, 0, 100)
-            return self
-        def sync_from_store(self):
-            g = globals()
-            if not isinstance(getattr(self, "cock_positions", None), dict):
-                self.cock_positions = {}
-            self.can_cum_daily = player_to_int(g.get("cancumdaily", self.can_cum_daily), 2)
-            self.came_today = player_to_int(g.get("cametoday", self.came_today), 0)
-            self.last_sex_day = player_to_int(g.get("LastDaySex", self.last_sex_day), -1)
-            self.last_cum_day = player_to_int(g.get("PlayerLastCumDay", self.last_cum_day), -1)
-            had_sex = g.get("HadSex", {})
-            if isinstance(had_sex, dict):
-                self.had_sex_count = player_to_int(had_sex.get("You", had_sex.get("you", self.had_sex_count)), 0)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["cancumdaily"] = player_to_int(self.can_cum_daily, 2)
-            g["cametoday"] = player_to_int(self.came_today, 0)
-            g["LastDaySex"] = player_to_int(self.last_sex_day, -1)
-            g["PlayerLastCumDay"] = player_to_int(self.last_cum_day, -1)
-            had_sex = g.get("HadSex", {})
-            if not isinstance(had_sex, dict):
-                had_sex = {}
-            had_sex["You"] = player_to_int(self.had_sex_count, 0)
-            g["HadSex"] = had_sex
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.weekly = dict(g.get("PlayerChoresWeek", self.weekly) or {})
-            self.ui = dict(g.get("UI_chores", self.ui) or {})
-            for key in self.KEYS:
-                self.counters[key] = player_to_int(g.get(key, self.counters.get(key, 0)), 0)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["PlayerChoresWeek"] = dict(self.weekly or {})
-            g["UI_chores"] = dict(self.ui or {})
-            for key in self.KEYS:
-                g[key] = player_to_int(self.counters.get(key, 0), 0)
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.productnum = player_to_int(g.get("productnum", self.productnum), 0)
-            self.winenum = player_to_int(g.get("winenum", self.winenum), 0)
-            self.cleanliness = player_to_int(g.get("taverncleanliness", self.cleanliness), 60)
-            self.upstairs_rooms_dirty = player_to_int(g.get("upstairsroomsdirty", self.upstairs_rooms_dirty), 0)
-            self.ashes_dirty_days = player_to_int(g.get("ashesdirtydays", self.ashes_dirty_days), 0)
-            self.weekly_visitors = dict(g.get("WeeklyVisitorsTrack", self.weekly_visitors) or {})
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["productnum"] = player_to_int(self.productnum, 0)
-            g["winenum"] = player_to_int(self.winenum, 0)
-            g["taverncleanliness"] = player_to_int(self.cleanliness, 60)
-            g["upstairsroomsdirty"] = player_to_int(self.upstairs_rooms_dirty, 0)
-            g["ashesdirtydays"] = player_to_int(self.ashes_dirty_days, 0)
-            g["WeeklyVisitorsTrack"] = dict(self.weekly_visitors or {})
-            return self
-        def sync_from_store(self):
-            g = globals()
-            party = []
-            if isinstance(g.get("player_company", []), list):
-                party.extend(list(g.get("player_company", []) or []))
-            self.party = player_normalize_id_list(party)
-            self.fight_level["you"] = max(1, player_to_int(self.fight_level.get("you", 1), 1))
-            supply = dict(self.supply or {})
-            self.fight_level = {"you": 1}
-            self.supply = dict(self.FIGHT_SUPPLY_DEFAULTS)
-            for key, value in supply.items():
-                self.supply[str(key or "")] = max(0, player_to_int(value, 0))
-            self.mana = player_clamp_value(self.mana, 0, 100)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["player_company"] = list(self.party or [])
-            self.fight_level["you"] = max(1, player_to_int(self.fight_level.get("you", 1), 1))
-            for key, value in self.FIGHT_SUPPLY_DEFAULTS.items():
-                self.supply.setdefault(key, value)
-            self.mana = player_clamp_value(self.mana, 0, 100)
-            return self
-        def sync_from_store(self):
-            g = globals()
-            self.health = player_clamp_value(g.get("health", self.health), 0, 100)
-            self.energy = player_clamp_value(g.get("energy", self.energy), 0, 100)
-            self.fun = player_clamp_value(g.get("fun", self.fun), 0, 100)
-            self.sick_days = player_to_int(g.get("SickDays", self.sick_days), 0)
-            self.forest_ban_until_day = player_to_int(g.get("PlayerForestBanUntilDay", self.forest_ban_until_day), 0)
-            return self
-
-        def apply_to_store(self):
-            g = globals()
-            g["health"] = player_clamp_value(self.health, 0, 100)
-            g["energy"] = player_clamp_value(self.energy, 0, 100)
-            g["fun"] = player_clamp_value(self.fun, 0, 100)
-            g["SickDays"] = player_to_int(self.sick_days, 0)
-            g["PlayerForestBanUntilDay"] = player_to_int(self.forest_ban_until_day, 0)
-            return self
-        def sync_from_store(self):
-            self.money = player_to_int(globals().get("money", self.money), 10000)
-            self.tavern_fame = player_to_int(globals().get("tavernfame", self.tavern_fame), 0)
-            self.child_support_count = max(0, player_to_int(globals().get("KidsPosobie", self.child_support_count), 0))
-            return self
-
-        def apply_to_store(self):
-            globals()["money"] = player_to_int(self.money, 0)
-            globals()["tavernfame"] = player_to_int(self.tavern_fame, 0)
-            globals()["KidsPosobie"] = max(0, player_to_int(self.child_support_count, 0))
-            return self
-        def sync_from_store(self):
-            self.age = player_to_int(globals().get("age", self.age), 18)
-            return self
-
-        def apply_to_store(self):
-            globals()["age"] = player_to_int(self.age, 18)
-            return self
-        def sync_from_store(self):
-            for attr in ("charisma", "reputation", "notoriety", "exploration", "rebellion", "look"):
-                setattr(self, attr, player_to_int(globals().get(attr, getattr(self, attr)), getattr(self, attr)))
-            return self
-
-        def apply_to_store(self):
-            for attr in ("charisma", "reputation", "notoriety", "exploration", "rebellion", "look"):
-                globals()[attr] = player_to_int(getattr(self, attr), 0)
-            return self
-        def sync_from_store(self):
-            for feature in (self.identity, self.condition, self.stats, self.economy, self.inventory,
-                            self.equipment, self.appearance, self.intimacy, self.chores,
-                            self.chores,
-                            self.tavern_management, self.combat):
-                feature.sync_from_store()
-            return self
-
-        def apply_to_store(self):
-            for feature in (self.identity, self.condition, self.stats, self.economy,
-                            self.tavern_management, self.combat):
-                feature.apply_to_store()
-            return self
-    def ensure_player_runtime():
-        global player, mc
-        if "player" not in globals() or not isinstance(globals().get("player"), Player):
-            player = Player()
-        if "mc" not in globals() or not isinstance(globals().get("mc"), Player):
-            mc = player
-        if mc is not player:
-            mc = player
-        return player
-            self.blind_pirate_breakfast_pending = False            self.text_pages = []
-            self.text_page_index = 0
-            self.text_return_label = ""# ================================================================================
+# ================================================================================
 # Player runtime owner.
 #
 # Player is the saved MC root. Feature classes own the concrete slices so Player
@@ -694,12 +59,14 @@ init -998 python:
             self.fun = 50
             self.sick_days = 0
             self.forest_ban_until_day = 0
+            self.notice_state = {}
 
         def change(self, stat_name, delta, minimum=0, maximum=100):
             key = str(stat_name or "").strip()
             if not hasattr(self, key):
                 return None
-            value = player_clamp_value(player_to_int(getattr(self, key), 0) + player_to_int(delta, 0), minimum, maximum)
+            raw_value = player_to_int(getattr(self, key), 0) + player_to_int(delta, 0)
+            value = player_clamp_value(raw_value, minimum, maximum)
             setattr(self, key, value)
             return value
 
@@ -710,18 +77,16 @@ init -998 python:
             self.notoriety = 0
             self.exploration = 0
             self.rebellion = 0
-            self.look = 40
-            self.look = 40
-            self.look = 40
-            self.look = 40
-            self.look = 40
-            self.look = 40
 
         def change(self, stat_name, delta, minimum=0, maximum=100):
             key = str(stat_name or "").strip()
             if not hasattr(self, key):
                 return None
-            value = player_clamp_value(player_to_int(getattr(self, key), 0) + player_to_int(delta, 0), minimum, maximum)
+            raw_value = player_to_int(getattr(self, key), 0) + player_to_int(delta, 0)
+            if key == "exploration" and maximum == 100:
+                value = max(player_to_int(minimum, 0), raw_value)
+            else:
+                value = player_clamp_value(raw_value, minimum, maximum)
             setattr(self, key, value)
             return value
 
@@ -730,9 +95,17 @@ init -998 python:
             self.money = 10000
             self.tavern_fame = 0
             self.child_support_count = 0
+            self.child_birth_benefit_notice = ""
+            self.church_donated_amount = 0
+            self.church_donated_today = 0
+            self.church_repairs_donated = [0] * 10
 
         def add_money(self, amount):
             self.money = max(0, player_to_int(self.money, 0) + player_to_int(amount, 0))
+            return self.money
+
+        def set_money(self, amount):
+            self.money = max(0, player_to_int(amount, 0))
             return self.money
 
         def spend_money(self, amount):
@@ -748,6 +121,16 @@ init -998 python:
 
         def weekly_child_support_money(self):
             return 15 * max(0, player_to_int(self.child_support_count, 0))
+
+        def church_repair_is_donated(self, repair_index):
+            return bool(self.church_repairs_donated[player_to_int(repair_index, 0)])
+
+        def record_church_donation(self, repair_index, amount):
+            index = player_to_int(repair_index, 0)
+            self.church_repairs_donated[index] = 1
+            self.church_donated_today = 1
+            self.church_donated_amount += max(0, player_to_int(amount, 0))
+            return self.church_donated_amount
 
     class PlayerInventory(object):
         def __init__(self, items=None):
@@ -792,11 +175,6 @@ init -998 python:
                         result.append(item_key)
                 else:
                     result.append(item_key)
-            if target is self.stats:
-                target.apply_to_store()
-            if target is self.stats:
-                target.apply_to_store()
-            target.apply_to_store()
             return result
 
     class PlayerEquipment(object):
@@ -842,13 +220,13 @@ init -998 python:
             self.dress_life_days = {"villagedress": self.DRESS_LIFE_DAYS}
             self.destroyed_dresses = []
             self.item_life_days = {}
-            self.haircut_day = 0
-            self.washDays = self.WASH_FRESH_DAYS
-            self.hairCutdays = self.HAIRCUT_FRESH_DAYS
             self.days_since_haircut = 0
             self.days_since_wash = 0
             self.costume_condition = 100
             self.sleep_bottom_layer = "daywear"
+            self.girl_dresses_bought = 0
+            self.soap_look_bonus = 0
+            self.soap_look_bonus_until_day = -1
 
         def has_dress(self, dress_code):
             dress_key = str(dress_code or "").strip()
@@ -925,19 +303,21 @@ init -998 python:
 
         def wash(self):
             self.days_since_wash = 0
-            self.washDays = self.WASH_FRESH_DAYS
             return True
+
+        def wash_with_soap(self, current_day=0, bonus=10, duration_days=1):
+            self.wash()
+            self.soap_look_bonus = max(0, player_to_int(bonus, 10))
+            self.soap_look_bonus_until_day = player_to_int(current_day, 0) + max(0, player_to_int(duration_days, 1))
+            return self.soap_look_bonus
 
         def increment_wash_days(self, amount=1):
             amount_value = max(0, player_to_int(amount, 1))
             self.days_since_wash = max(0, player_to_int(self.days_since_wash, 0) + amount_value)
-            self.washDays = max(0, player_to_int(self.washDays, self.WASH_FRESH_DAYS) - amount_value)
             return self.days_since_wash
 
-        def mark_haircut(self, current_day=0):
-            self.haircut_day = player_to_int(current_day, 0)
+        def mark_haircut(self):
             self.days_since_haircut = 0
-            self.hairCutdays = self.HAIRCUT_FRESH_DAYS
             return True
 
         def item_default_life(self, item_id):
@@ -968,8 +348,6 @@ init -998 python:
                 return self
             self.days_since_wash = max(0, player_to_int(self.days_since_wash, 0) + amount)
             self.days_since_haircut = max(0, player_to_int(self.days_since_haircut, 0) + amount)
-            self.washDays = max(0, player_to_int(self.washDays, self.WASH_FRESH_DAYS) - amount)
-            self.hairCutdays = max(0, player_to_int(self.hairCutdays, self.HAIRCUT_FRESH_DAYS) - amount)
 
             self.owned_dresses = player_normalize_id_list(self.owned_dresses)
             if not isinstance(self.dress_life_days, dict):
@@ -1029,66 +407,74 @@ init -998 python:
 
     class PlayerIntimacy(object):
         def __init__(self):
-            self.arousal = {"you": 0}
+            self.arousal = 0
             self.can_cum_daily = 2
             self.came_today = 0
             self.last_sex_day = -1
             self.last_cum_day = -1
-            self.cock_positions = {}
             self.history = {}
             self.had_sex_count = 0
+            self.morning_arousal_day = -1
+            self.wake_state_notice = ""
+            self.arousal_reasons = []
+            self.observed_naked_npc_day = {}
+            self.last_help_result = {}
+            self.body_containers = {}
+            self.ellona_blessed = 0
+            self.ellona_cursed = 0
+            self.ellona_curse_days = 0
+            self.ellona_curse_reduction = 0
+            self.ellona_grace_blessings = [0, 0, 0, 0, 0, 0]
 
-        def normalize_arousal(self):
-            if not isinstance(self.arousal, dict):
-                self.arousal = {"You": 0, "you": 0}
-            self.arousal.setdefault("You", self.arousal.get("you", 0))
-            self.arousal.setdefault("you", self.arousal.get("You", 0))
+        def arousal_value(self):
+            self.arousal = player_clamp_value(self.arousal, 0, 100)
             return self.arousal
 
-        def arousal_value(self, actor="You"):
-            self.normalize_arousal()
-            key = str(actor or "You")
-            return player_to_int(self.arousal.get(key, self.arousal.get(key.lower(), 0)), 0)
+        def set_arousal(self, value):
+            self.arousal = player_clamp_value(value, 0, 100)
+            return self.arousal
 
-        def set_arousal(self, value, actor="You"):
-            self.normalize_arousal()
-            new_value = player_clamp_value(value, 0, 100)
-            key = str(actor or "You")
-            self.arousal[key] = new_value
-            self.arousal[key.lower()] = new_value
-            return new_value
-
-        def add_arousal(self, amount=0, cap=100, actor="You"):
-            return self.set_arousal(min(player_to_int(cap, 100), self.arousal_value(actor) + player_to_int(amount, 0)), actor)
-
-        def set_cock_position(self, target_id="", position="none"):
-            target_key = str(target_id or "").strip().lower()
-            position_key = str(position or "none").strip().lower()
-            if not target_key:
-                return "none"
-            if position_key not in ("none", "pussy", "mouth", "tits", "ass"):
-                position_key = "none"
-            self.cock_positions[target_key] = position_key
-            return position_key
-
-        def cock_position(self, target_id=""):
-            target_key = str(target_id or "").strip().lower()
-            if not target_key:
-                return "none"
-            return str(self.cock_positions.get(target_key, "none") or "none")
-
-        def cock_in(self, target_id="", position="none"):
-            return self.cock_position(target_id) == str(position or "none").strip().lower()
+        def add_arousal(self, amount=0, cap=100):
+            return self.set_arousal(min(player_to_int(cap, 100), self.arousal_value() + player_to_int(amount, 0)))
 
         def can_cum(self):
             return player_to_int(self.came_today, 0) < max(1, player_to_int(self.can_cum_daily, 1))
+
+        def grant_ellona_grace(self, grace_index):
+            self.ellona_grace_blessings[player_to_int(grace_index, 0)] = 1
+            return sum(player_to_int(value, 0) for value in self.ellona_grace_blessings)
+
+        def grant_ellona_blessing(self):
+            if not self.ellona_blessed:
+                self.ellona_blessed = 1
+                self.can_cum_daily += 1
+            return self.can_cum_daily
+
+        def apply_ellona_curse(self, days=14):
+            self.ellona_cursed = 1
+            self.ellona_curse_reduction = max(0, player_to_int(self.can_cum_daily, 0))
+            self.can_cum_daily = 0
+            self.ellona_curse_days = max(0, player_to_int(days, 14))
+            return self.ellona_curse_days
+
+        def extend_ellona_curse(self, days=7):
+            self.ellona_curse_days += max(0, player_to_int(days, 7))
+            return self.ellona_curse_days
+
+        def lift_ellona_curse(self):
+            if self.ellona_cursed:
+                self.can_cum_daily += max(0, player_to_int(self.ellona_curse_reduction, 0))
+            self.ellona_cursed = 0
+            self.ellona_curse_days = 0
+            self.ellona_curse_reduction = 0
+            return self.can_cum_daily
 
         def record_cum(self, day_value=0):
             self.came_today = player_to_int(self.came_today, 0) + 1
             self.had_sex_count = player_to_int(self.had_sex_count, 0) + 1
             self.last_sex_day = player_to_int(day_value, 0)
             self.last_cum_day = player_to_int(day_value, 0)
-            self.set_arousal(0, "You")
+            self.set_arousal(0)
             return self.came_today
 
     class PlayerChores(object):
@@ -1096,18 +482,8 @@ init -998 python:
 
         def __init__(self):
             self.weekly = {}
-            self.ui = {}
-            self.counters = dict((key, 0) for key in self.KEYS)
-            self.ui = {}
-            self.counters = dict((key, 0) for key in self.KEYS)
-            self.ui = {}
-            self.counters = dict((key, 0) for key in self.KEYS)
-            self.ui = {}
-            self.counters = dict((key, 0) for key in self.KEYS)
-            self.ui = {}
-            self.counters = dict((key, 0) for key in self.KEYS)
-            self.ui = {}
-            self.counters = dict((key, 0) for key in self.KEYS)
+            self.last_score = 0
+            self.last_evaluation = ""
 
     class PlayerBreakfastState(object):
         def __init__(self):
@@ -1140,31 +516,116 @@ init -998 python:
             self.ale_team_talk_done = 0
             self.dance_sponsor_announced_day = -1
 
+    class PlayerGloryHoleSessionState(object):
+        def __init__(self):
+            self.reset()
+
+        def reset(self):
+            self.girl_name = ""
+            self.current_step = 0
+            self.cock_inserted = 0
+            self.inside = 0
+            self.inside_once = 0
+            self.works = 0
+            self.client_line1 = ""
+            self.client_line2 = ""
+            self.client_line3 = ""
+            self.girl_line0 = ""
+            self.girl_line1 = ""
+            self.girl_line2 = ""
+            self.girl_line3 = ""
+            self.menu_blocked = 0
+            self.amanda_present = 0
+            self.player_line1 = "Вы засунули свое самое дорогое в дырку. Однако с той стороны никто не поспешил вам на помощь. Вы, еще на что-то надеясь, подождали немного, но безрезультатно. Продолжать стоять дальше с засунутым в отверстие в стене членом в гнетущей тишине показалось вам глуповатым, и, со вздохом разочарования, вы убрали свое хозяйство обратно в штаны. <br>В голове у вас возникло несколько гипотез, объясняющих произошедшее. Возможно вы пришли слишком рано, а может пришли вовремя, но не назначили никого работать у глорихола. Надо провести тщательное расследование."
+            self.player_line2 = ""
+            self.player_line3 = ""
+
+        def roll_inside(self, worker_corruption=0):
+            self.inside = 0
+            self.inside_once = 0
+            if not self.works or self.amanda_present or not self.girl_name:
+                return
+
+            corruption = max(0, player_to_int(worker_corruption, 0))
+            if corruption >= 80:
+                if procedural_randint(1, 4, key="procedural:Inn/TavernGloryHole.rpy:inside:80") == 1:
+                    self.inside = 1
+            elif corruption >= 50:
+                if procedural_randint(1, 8, key="procedural:Inn/TavernGloryHole.rpy:inside:50") == 1:
+                    self.inside = 1
+
+            if self.inside == 0 and corruption >= 40 and procedural_randint(1, 3, key="procedural:Inn/TavernGloryHole.rpy:inside_once") == 1:
+                self.inside_once = 1
+
+            self.player_line1 = "Вы засунули свое самое дорогое в дырку, в пугающую неизвестность. И ваша смелость была вознагражденна: чей-то страстный язычок с другой стороны глорихола начал облизывать головку вашего члена. Вскоре незнакомка стала посасывать ваш, уже принявший полную боевую готовность, агрегат, делая вам весьма и весьма приятно."
+            if self.inside or self.inside_once:
+                self.player_line2 = "Только вы начали входить во вкус, как вдруг минет неожиданно прекращается. Вы с трудом сдерживаете стон разочарования, но тут же вместо ротика на ваш член насаживается что-то теплое и влажное. Вы с трудом верите в происходящее: развратная незнакомка стала трахать вас своей киской! Вы уже очень близки к оргазму."
+                if self.inside:
+                    self.player_line3 = "Влагалище вашей невидимой любовницы сжимается и из-за ширмы слышится протяжный стон - она кончила. Вы не выдерживаете и тоже кончаете прямо внутрь, заливая ее своим семенем. Хотя ваш обмякший член и выскользнул из жаркой пещерки, но это было еще не все - ловкая незнакомка развернулась у себя за ширмой и ее язычок слизал остатки спермы с вашего обмякшего члена. Удовлетворенный вы застегнули штаны."
+                else:
+                    self.player_line3 = "Вы уже собирались было кончить во влагалище вашей невидимой подружки, но плутовка как видно угадала ваше намерение и в последний момент соскользнула с вашего ствола, впрочем, быстро взяв его обратно в свой страстный ротик, в который вы и разрядились. Напоследок вам слизали остатки спермы с вашего обмякшего члена. Удовлетворенный вы застегнули штаны."
+            else:
+                self.player_line2 = "Вы продолжаете наслаждаться минетом от невидимой прелестницы, которая теперь уже заглатывает ваш член почти по самые яйца. Долго такого вы выдержать не можете, вы уже на грани, еще немного и вы кончите."
+                self.player_line3 = "Громкий стон по ту сторону ширмы известил вас, что ваша невидимая подруга кончила, лаская себя. Вы решили последовать ее примеру и взорвались, заполняя ее ротик потоками своего семени. Вы почуствовали как чей-то ловкий язычок слизал остатки спермы с вашего обмякшего члена. Удовлетворенный вы застегнули штаны."
+
+    class PlayerTavernServiceState(object):
+        def __init__(self):
+            self.kitchen_score = 0.0
+            self.cleanliness_score = 0.0
+            self.waitress_score = 0.0
+            self.kitchen_quality = "невыносимо"
+            self.cleanliness_quality = "тараканы с трудом могут пробраться сквозь липкую грязь покрывающую все"
+            self.waitress_quality = "не ведется вообще, заказать что-либо у вас невозможно."
+
     class PlayerTavernManagement(object):
         def __init__(self):
-            self.productnum = 0
-            self.winenum = 0
+            self.productnum = 200
+            self.winenum = 100
+            self.visitors = 40
+            self.slogan_state = 0
+            self.client_room_hole = 0
+            self.glory_hole = 0
+            self.glory_hole_look = 0
+            self.glory_hole_session = PlayerGloryHoleSessionState()
+            self.dance_sponsor = 0
+            self.dance_sponsor_pledge_day = -1
+            self.household_members = 4
+            self.breakfast = PlayerBreakfastState()
             self.cleanliness = 60
             self.upstairs_rooms_dirty = 0
             self.ashes_dirty_days = 0
             self.weekly_visitors = {"sum": 0, "days": 0, "prev_avg": 0.0}
+            self.weekly_chores_last_eval_stamp = ""
+            self.breakfast_share_perks = {}
+            self.service = PlayerTavernServiceState()
+
+    class PlayerHorse(object):
+        def __init__(self):
+            self.name = ""
+            self.saddled = False
+            self.purchase_price = 0
+            self.stolen_days = 0
+
+        def owns_horse(self):
+            return bool(str(self.name or "").strip())
+
+        def acquire(self, name, purchase_price=0, saddled=True):
+            self.name = str(name or "").strip()
+            self.purchase_price = max(0, player_to_int(purchase_price, 0))
+            self.saddled = bool(saddled) and self.owns_horse()
+            return self.owns_horse()
+
+        def remove(self):
+            old_name = str(self.name or "")
+            self.name = ""
+            self.saddled = False
+            self.purchase_price = 0
+            return old_name
 
     class PlayerCombat(object):
-        FIGHT_SUPPLY_DEFAULTS = {
-            "arrows": 0,
-            "droplets": 0,
-            "gunpowder": 0,
-            "bees_bomb": 0,
-            "fire_bomb": 0,
-            "bandage": 0,
-            "energy_tea": 0,
-            "healing_potion": 0,
-        }
-
         def __init__(self):
             self.party = []
-            self.fight_level = {"you": 1}
-            self.supply = dict(self.FIGHT_SUPPLY_DEFAULTS)
+            self.special_supply = {"bees_bomb": 0}
             self.mana = 50
 
         def add_party_member(self, member_id):
@@ -1195,9 +656,12 @@ init -998 python:
             self.intimacy = PlayerIntimacy()
             self.chores = PlayerChores()
             self.tavern_management = PlayerTavernManagement()
+            self.horse = PlayerHorse()
             self.combat = PlayerCombat()
             self.history = {}
             self.events = []
+            self.sleep_wake_hour_override = -1
+            self.sleep_wake_minute_override = 0
 
         @property
         def code_name(self):
@@ -1208,147 +672,77 @@ init -998 python:
             return self.identity.display_name
 
         def add_money(self, amount):
-            self.sync_from_store()
-            value = self.economy.add_money(amount)
-            self.economy.apply_to_store()
-            return value
+            return self.economy.add_money(amount)
+
+        def set_money(self, amount):
+            return self.economy.set_money(amount)
 
         def change_tavern_fame(self, amount):
-            self.sync_from_store()
             self.economy.tavern_fame = player_to_int(self.economy.tavern_fame, 0) + player_to_int(amount, 0)
-            self.economy.apply_to_store()
             return self.economy.tavern_fame
 
         def spend_money(self, amount):
-            self.sync_from_store()
-            ok = self.economy.spend_money(amount)
-            if ok:
-                self.economy.apply_to_store()
-            return ok
+            return self.economy.spend_money(amount)
 
         def change_stat(self, stat_name, delta, minimum=0, maximum=100):
-            self.sync_from_store()
-            result = self.condition.change(stat_name, delta, minimum, maximum)
-            if result is None:
-                result = self.stats.change(stat_name, delta, minimum, maximum)
-            self.condition.apply_to_store()
-            self.stats.apply_to_store()
-            return result
+            key = str(stat_name or "").strip()
+            if hasattr(self.condition, key):
+                return self.condition.change(key, delta, minimum, maximum)
+            return self.stats.change(key, delta, minimum, maximum)
 
         def set_stat(self, stat_name, value, minimum=0, maximum=100):
             key = str(stat_name or "").strip()
             target = self.condition if hasattr(self.condition, key) else self.stats
             if not hasattr(target, key):
                 return None
-            result = player_clamp_value(value, minimum, maximum)
+            if target is self.stats and key == "exploration" and maximum == 100:
+                result = max(player_to_int(minimum, 0), player_to_int(value, 0))
+            else:
+                result = player_clamp_value(value, minimum, maximum)
             setattr(target, key, result)
             return result
 
         def item_count(self, item_id):
-            self.inventory.sync_from_store()
             return self.inventory.count(item_id)
 
         def add_item(self, item_id, quantity=1):
-            self.inventory.sync_from_store()
             ok = self.inventory.add(item_id, quantity)
             if ok:
-                self.inventory.apply_to_store()
-                self.appearance.sync_from_store()
-                self.appearance.sync_from_store()
                 self.appearance.ensure_item_life(item_id)
-                self.appearance.apply_to_store()
-                self.appearance.apply_to_store()
             return ok
 
         def remove_item(self, item_id, quantity=1):
-            self.inventory.sync_from_store()
-            ok = self.inventory.remove(item_id, quantity)
-            if ok:
-                self.inventory.apply_to_store()
-            return ok
+            return self.inventory.remove(item_id, quantity)
 
         def equip(self, item_id, slot=""):
-            self.sync_from_store()
             if self.inventory.count(item_id) <= 0:
                 return False
-            ok = self.equipment.equip(item_id, slot)
-            if ok:
-                self.equipment.apply_to_store()
-            return ok
+            return self.equipment.equip(item_id, slot)
 
         def unequip(self, slot=""):
-            self.equipment.sync_from_store()
-            ok = self.equipment.unequip(slot)
-            if ok:
-                self.equipment.apply_to_store()
-            return ok
+            return self.equipment.unequip(slot)
 
         def wear_dress(self, dress_code):
-            self.appearance.sync_from_store()
-            ok = self.appearance.wear_dress(dress_code, globals().get("dayspassed", 0))
-            if ok:
-                self.appearance.apply_to_store()
-            return ok
+            return self.appearance.wear_dress(dress_code, calendar_v2.daysInGame)
 
         def remove_current_dress(self, dress_code=""):
-            self.appearance.sync_from_store()
-            ok = self.appearance.remove_current_dress(dress_code)
-            if ok:
-                self.appearance.apply_to_store()
-            return ok
+            return self.appearance.remove_current_dress(dress_code)
 
         def daily_maintenance(self, days=1):
-            self.sync_from_store()
             item_ids = self.inventory.ids(False)
             self.appearance.age_daily(days, item_ids)
-            self.appearance.apply_to_store()
             return self
 
         def add_party_member(self, member_id):
-            self.combat.sync_from_store()
-            ok = self.combat.add_party_member(member_id)
-            if ok:
-                self.combat.apply_to_store()
-            return ok
+            return self.combat.add_party_member(member_id)
 
         def remove_party_member(self, member_id):
-            self.combat.sync_from_store()
-            ok = self.combat.remove_party_member(member_id)
-            if ok:
-                self.combat.apply_to_store()
-            return ok
-
-    def sync_player_state_from_store():
-        return ensure_player_runtime().sync_from_store()
-
-    def sync_player_state_to_store():
-        return ensure_player_runtime().apply_to_store()
-
-    def player_state(sync=True):
-        runtime = ensure_player_runtime()
-        if bool(sync):
-            runtime.sync_from_store()
-        return runtime
-
-    def player_after_load_init():
-        sync_player_state_from_store()
+            return self.combat.remove_party_member(member_id)
 
     def player_equipped_weapon_id():
-        return str(player_state().equipment.weapon or "").strip()
+        return str(player.equipment.weapon or "").strip()
 
     def player_has_equipped_weapon(item_id=""):
         return player_equipped_weapon_id() == player_normalize_item_id(item_id)
 
-    if player_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(player_after_load_init)
-
-    if player_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(player_after_load_init)
-
-    if player_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(player_after_load_init)
-
 default player = Player()
-default mc = player
-default mc = player
-default mc = player

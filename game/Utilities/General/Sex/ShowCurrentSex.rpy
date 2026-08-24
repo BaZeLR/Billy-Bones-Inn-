@@ -5,12 +5,10 @@
 
 init python:
     def _show_current_sex_allows_kids_peek(girl_name):
-        girl = getPersonInfo(girl_name)
+        girl = people.get_info(girl_name)
         if girl is None:
             return False
-        location_code = str(getattr(girl, "location", "") or "")
-        if hasattr(girl, "getLocation"):
-            location_code = str(girl.getLocation() or location_code)
+        location_code = str(girl.getLocation() or "")
         if str(girl_name or "").strip().lower() == "georgett" and location_code not in ("TavernMain", "TavernKitchen", "TavernStorage", "TavernMyRoom"):
             return False
         if str(girl_name or "").strip().lower() == "amanda" and location_code == "street":
@@ -29,10 +27,11 @@ init python:
 
 
 label ShowCurrentSex(GirlNameSCS=""):
+    $ renpy.dynamic("_scs_girl", "_scs_intimacy", "_scs_real_name", "_scs_real_name2", "_scs_key", "_scs_arousal_you", "_scs_arousal_girl", "_scs_corruption", "_scs_pregnancy", "_scs_cuminside", "_scs_you_pussy", "_scs_you_mouth", "_scs_eddie", "_scs_eddie_arousal", "_scs_eddie_pussy", "_scs_eddie_mouth", "_scs_kids_peek_text", "_scs_orgasm_count", "_scs_any_cums")
     if not GirlNameSCS:
         return
 
-    $ _scs_girl = getPersonInfo(GirlNameSCS)
+    $ _scs_girl = people.get_info(GirlNameSCS)
     if _scs_girl is None:
         return
 
@@ -42,20 +41,22 @@ label ShowCurrentSex(GirlNameSCS=""):
     $ _scs_real_name = sex_current_name(_scs_girl)
     $ _scs_real_name2 = sex_current_name(_scs_girl, "genitive")
     $ _scs_key = str(getattr(_scs_girl, "name", GirlNameSCS) or GirlNameSCS).strip().lower()
-    $ _scs_arousal_you = int(_scs_intimacy.arousal_value("You") or 0)
+    $ _scs_arousal_you = int(_scs_intimacy.arousal_value() or 0)
     $ _scs_arousal_girl = int(_scs_girl.arousal_value() or 0)
     $ _scs_corruption = int(getattr(_scs_girl, "corruption", 0) or 0)
     $ _scs_pregnancy = int(_scs_girl.pregnancy_days() or 0)
     $ _scs_cuminside = int(_scs_girl.sex_stat("cuminside", 0) or 0)
     $ _scs_you_pussy = bool(_scs_girl.cock_in("pussy", "You"))
     $ _scs_you_mouth = bool(_scs_girl.cock_in("mouth", "You"))
-    $ _scs_eddie = getPersonInfo("eddie")
+    $ _scs_eddie = people.get_info("eddie")
     $ _scs_eddie_arousal = int(_scs_eddie.arousal_value() or 0) if _scs_eddie is not None else 0
     $ _scs_eddie_pussy = bool(_scs_girl.cock_in("pussy", "eddie"))
     $ _scs_eddie_mouth = bool(_scs_girl.cock_in("mouth", "eddie"))
 
     if _show_current_sex_allows_kids_peek(_scs_key):
-        $ KidsPeekSexCode(_scs_key)
+        $ _scs_kids_peek_text = KidsPeekSexCode(_scs_key)
+        if _scs_kids_peek_text:
+            "[_scs_kids_peek_text]"
 
     if _scs_arousal_you >= 100:
         if _scs_you_pussy:
@@ -135,6 +136,6 @@ label ShowCurrentSex(GirlNameSCS=""):
             $ _scs_girl.set_arousal(0)
         $ _scs_girl.set_sex_stat("last_orgasm_day", current_game_day())
 
-    $ _scs_any_cums = int(_scs_intimacy.arousal_value("You") >= 100 or _scs_girl.arousal_value() >= 100 or _scs_eddie_arousal >= 100)
+    $ _scs_any_cums = int(_scs_intimacy.arousal_value() >= 100 or _scs_girl.arousal_value() >= 100 or _scs_eddie_arousal >= 100)
     $ _scs_girl.set_sex_busy(_scs_any_cums)
     return

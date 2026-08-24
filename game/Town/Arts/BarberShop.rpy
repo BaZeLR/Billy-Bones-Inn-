@@ -1,18 +1,6 @@
-default BarberFirstTipSeen = 0
-default BarberInvitePending = {}
-default BarberVisitLastDay = {}default BarberFirstTipSeen = 0
-default BarberInvitePending = {}
-default BarberVisitLastDay = {}default BarberFirstTipSeen = 0
-default BarberInvitePending = {}
-default BarberVisitLastDay = {}# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default BarberShopSavedText = ""
-
-default BarberShopSavedText = ""
-
-default BarberShopSavedText = ""
-
 init python:
     BARBER_MALE_HAIRCUT_PRICE = 90
     BARBER_FEMALE_HAIRCUT_PRICE = 120
@@ -21,7 +9,7 @@ init python:
 
     def barber_shop_discount_percent():
         try:
-            return max(0, min(90, int(Clara.var.get("sergio_discount", 0) or 0)))
+            return max(0, min(90, int(tractir_progress.sergio_discount_percent or 0)))
         except Exception:
             return 0
 
@@ -62,10 +50,9 @@ init python:
             return False
 
     def barber_shop_pending_npc_id():
-        if not isinstance(BarberInvitePending, dict):
-            return ""
         for npc_id in ("sandra", "melissa", "amanda", "becky", "clara"):
-            if int(BarberInvitePending.get(npc_id, 0) or 0) == 1:
+            info = people.get_info(npc_id)
+            if info is not None and int(info.var.get("barber_invite_pending", 0) or 0) == 1:
                 return npc_id
         return ""
 
@@ -73,7 +60,7 @@ init python:
         npc_id = barber_shop_pending_npc_id()
         if npc_id == "":
             return ""
-        return str(RealName.get(npc_id, npc_id) or npc_id)
+        return str(people_display_name(npc_id) or npc_id)
 
     def barber_shop_can_buy_olive_oil():
         return True
@@ -104,7 +91,7 @@ init python:
         ) % (barber_shop_haircut_price("male"), barber_shop_haircut_price("female"))
 
     def barber_shop_talk_text():
-        if int(BarberFirstTipSeen or 0) == 0:
+        if not bool(rooms.get("BarberShop").state.get("first_tip_seen", False)):
             return (
                 "Серджио с самого порога понижает голос и ухмыляется: \"Запомните первую хорошую шутку цирюльника, сударь. "
                 "Домашнее мыло не только грязь смывает. Если дама моется им как следует, все у нее становится и чище, и аккуратнее, и уже, где надо. "
@@ -117,7 +104,7 @@ init python:
         ]
         return str(procedural_choice(rumors, key="procedural:Town/Arts/BarberShop.rpy:procedural_choice:112:1"))
 
-    BarberShopRoom = Room(
+    BarberShopRoomDefinition = Room(
         code_name="BarberShop",
         group_name=ROOM_GROUP_CITY,
         display_name="Цирюльня Серджио Пета",
@@ -140,184 +127,187 @@ init python:
 
 
 label BarberShop:
-    $ CurrentRoom = BarberShopRoom
-    $ CurLoc = "BarberShop"
-    $ scene_image = barber_shop_picture_path()
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_object_id = ""
-    $ GirlDressBlock = 0
+    $ rooms.enter("BarberShop")
+    $ scene_runtime.picture = barber_shop_picture_path()
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.object_id = ""
+    $ dress_shop.girl_dress_block = 0
 
-    if BarberShopRoom.is_open():
-        $ MainTxt = barber_shop_intro_text() + "\n\n" + barber_shop_status_text()
+    if rooms.get("BarberShop").is_open():
+        $ scene_runtime.text = barber_shop_intro_text() + "\n\n" + barber_shop_status_text()
     else:
-        $ MainTxt = barber_shop_intro_text() + "\n\n" + barber_shop_status_text()
-    $ CurLocDesc = MainTxt
-    $ BarberShopSavedText = MainTxt
-    $ BarberShopSavedText = MainTxt
-    $ BarberShopSavedText = MainTxt
+        $ scene_runtime.text = barber_shop_intro_text() + "\n\n" + barber_shop_status_text()
+    $ scene_runtime.location_text = scene_runtime.text
     call ShowImage("", "", barber_shop_picture_path())
 
     if story_event_available("BarberShop", "clara_fiance"):
         call checkTriggers("BarberShop", "clara_fiance", 0)
-        call screen main_ui
-        jump BarberShop
-        call screen main_ui
-        jump BarberShop
-        call screen main_ui
-        jump BarberShop
-        call screen main_ui
-        jump BarberShop
 
-    if not BarberShopRoom.is_open():
-        $ current_action_items = [MenuItem("Вернуться в квартал ремесленников", Jump("ArtisansQuarter"))]
+    if not rooms.get("BarberShop").is_open():
+        $ main_ui_runtime.action_items = rooms.get("BarberShop").build_exit_items()
         while True:
             call screen main_ui
 
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    call BarberShopBuildActions
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = rooms.get("BarberShop").build_exit_items()
     while True:
         call screen main_ui
 
 
 label BarberShopTalk:
-    $ MainTxt = barber_shop_talk_text()
-    if int(BarberFirstTipSeen or 0) == 0:
-        $ BarberFirstTipSeen = 1
-    $ CurLocDesc = MainTxt
+    $ renpy.dynamic("_barber_haircut_price", "_barber_oil_price", "_barber_guest_name")
+    $ Sergio.mark_known()
+    $ main_ui_begin_talk_state("Разговор с Серджио", "sergio")
+    $ scene_runtime.text = barber_shop_talk_text()
+    if not bool(rooms.get("BarberShop").state.get("first_tip_seen", False)):
+        $ rooms.get("BarberShop").state["first_tip_seen"] = True
+    $ scene_runtime.location_text = scene_runtime.text
     call ShowImage("", "", barber_shop_picture_path())
-    call BarberShopBuildActions
-    return
+    while True:
+        $ _barber_haircut_price = int(barber_shop_player_haircut_price() or 0)
+        $ _barber_oil_price = int(barber_shop_discounted_price(BARBER_OLIVE_OIL_PRICE) or 0)
+        $ _barber_guest_name = barber_shop_pending_npc_name()
+        menu:
+            "Поболтать с Серджио":
+                $ scene_runtime.text = barber_shop_talk_text()
+                $ scene_runtime.location_text = scene_runtime.text
+
+            "Подстричься за [_barber_haircut_price] мараведи":
+                call BarberShopHaircut
+
+            "Купить оливковое масло за [_barber_oil_price] мараведи" if barber_shop_can_buy_olive_oil():
+                call BarberShopBuyOliveOil
+
+            "Улучшить мыло оливковым маслом" if barber_shop_can_refine_luxury_soap():
+                call BarberShopRefineLuxurySoap
+
+            "Продать роскошное мыло Серджио" if barber_shop_can_sell_luxury_soap():
+                call BarberShopSellLuxurySoap
+
+            "Оплатить визит [_barber_guest_name] к цирюльнику" if barber_shop_can_serve_pending_guest():
+                call BarberShopServePendingGuest
+
+            "Назад":
+                $ main_ui_end_talk_state()
+                return
 
 
 label BarberShopHaircut:
+    $ renpy.dynamic("_restriction_text", "_barber_price")
     $ _restriction_text = str(action_restriction_text(None, 5, (4, 5), None) or "")
     if str(_restriction_text or "").strip() != "":
-        $ MainTxt = _restriction_text
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = _restriction_text
+        $ scene_runtime.location_text = scene_runtime.text
         call ShowImage("", "", barber_shop_picture_path())
-        call BarberShopBuildActions
         return
 
     if barber_shop_player_recent_haircut():
-        $ MainTxt = "Я совсем недавно уже приводил волосы в порядок. Серджио только хмыкает и говорит, что сейчас максимум можно испортить хорошую стрижку, а не улучшить ее."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Я совсем недавно уже приводил волосы в порядок. Серджио только хмыкает и говорит, что сейчас максимум можно испортить хорошую стрижку, а не улучшить ее."
+        $ scene_runtime.location_text = scene_runtime.text
         call ShowImage("", "", barber_shop_picture_path())
-        call BarberShopBuildActions
         return
 
     $ _barber_price = int(barber_shop_player_haircut_price() or 0)
-    if int(money or 0) < _barber_price:
-        $ MainTxt = "Серджио сочувственно разводит руками: \"С такими карманами, сударь, мне остается только пожалеть ваши волосы. Возвращайтесь, когда при вас будет хотя бы %d мараведи.\" " % _barber_price
-        $ CurLocDesc = MainTxt
+    if int(player.economy.money or 0) < _barber_price:
+        $ scene_runtime.text = "Серджио сочувственно разводит руками: \"С такими карманами, сударь, мне остается только пожалеть ваши волосы. Возвращайтесь, когда при вас будет хотя бы %d мараведи.\" " % _barber_price
+        $ scene_runtime.location_text = scene_runtime.text
         call ShowImage("", "", barber_shop_picture_path())
-        call BarberShopBuildActions
         return
 
-    $ money -= _barber_price
+    $ player.spend_money(_barber_price)
     $ calendar_v2.advance_minutes(30)
-    $ player_state().appearance.mark_haircut(int(dayspassed or 0))
-    $ player_state().appearance.apply_to_store()
+    $ player.appearance.mark_haircut()
     $ update_stat_state()
-    $ MainTxt = "Серджио долго щелкает ножницами, приглаживает волосы душистой водой и, не умолкая, пересказывает вам свежие городские сплетни. Когда он заканчивает, вы выглядите куда опрятнее, а карман худеет на %d мараведи." % _barber_price
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = "Серджио долго щелкает ножницами, приглаживает волосы душистой водой и, не умолкая, пересказывает вам свежие городские сплетни. Когда он заканчивает, вы выглядите куда опрятнее, а карман худеет на %d мараведи." % _barber_price
+    $ scene_runtime.location_text = scene_runtime.text
     call ShowImage("", "", barber_shop_picture_path())
-    call BarberShopBuildActions
     return
 
 
 label BarberShopBuyOliveOil:
+    $ renpy.dynamic("_olive_oil_price")
     $ _olive_oil_price = int(barber_shop_discounted_price(BARBER_OLIVE_OIL_PRICE) or 0)
-    if int(money or 0) < _olive_oil_price:
-        $ MainTxt = "Серджио покачивает маленький пузатый пузырек и сочувственно хмыкает: \"Оливковое масло у меня не из воздуха берется. Возвращайтесь с %d мараведи.\" " % _olive_oil_price
-        $ CurLocDesc = MainTxt
+    if int(player.economy.money or 0) < _olive_oil_price:
+        $ scene_runtime.text = "Серджио покачивает маленький пузатый пузырек и сочувственно хмыкает: \"Оливковое масло у меня не из воздуха берется. Возвращайтесь с %d мараведи.\" " % _olive_oil_price
+        $ scene_runtime.location_text = scene_runtime.text
         call ShowImage("", "", barber_shop_picture_path())
-        call BarberShopBuildActions
         return
-    $ money -= _olive_oil_price
-    $ _player_add_item_by_id("olive_oil_001", 1)
-    $ MainTxt = "Серджио продает вам маленький пузырек оливкового масла и советует беречь его не только для кухни: \"Хорошее масло и волосы пригладит, и мыло благороднее сделает.\""
-    $ CurLocDesc = MainTxt
+    $ player.spend_money(_olive_oil_price)
+    $ player.add_item("olive_oil_001", 1)
+    $ scene_runtime.text = "Серджио продает вам маленький пузырек оливкового масла и советует беречь его не только для кухни: \"Хорошее масло и волосы пригладит, и мыло благороднее сделает.\""
+    $ scene_runtime.location_text = scene_runtime.text
     call ShowImage("", "", barber_shop_picture_path())
-    call BarberShopBuildActions
     return
 
 
 label BarberShopRefineLuxurySoap:
     if not barber_shop_can_refine_luxury_soap():
-        $ MainTxt = "У вас нет под рукой и домашнего мыла, и оливкового масла одновременно."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "У вас нет под рукой и домашнего мыла, и оливкового масла одновременно."
+        $ scene_runtime.location_text = scene_runtime.text
         call ShowImage("", "", barber_shop_picture_path())
-        call BarberShopBuildActions
         return
-    $ _player_remove_item_by_id("soap_001", 1)
-    $ _player_remove_item_by_id("olive_oil_001", 1)
-    $ _player_add_item_by_id("luxury_soap_001", 1)
+    $ player.remove_item("soap_001", 1)
+    $ player.remove_item("olive_oil_001", 1)
+    $ player.add_item("luxury_soap_001", 1)
     $ calendar_v2.advance_minutes(20)
-    $ MainTxt = "Серджио показывает, как осторожно втереть оливковое масло в уже готовое мыло. Брусок становится глаже, пахнет мягче и выглядит куда дороже простого домашнего куска. У вас теперь есть роскошное мыло."
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = "Серджио показывает, как осторожно втереть оливковое масло в уже готовое мыло. Брусок становится глаже, пахнет мягче и выглядит куда дороже простого домашнего куска. У вас теперь есть роскошное мыло."
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call ShowImage("", "", barber_shop_picture_path())
-    call BarberShopBuildActions
     return
 
 
 label BarberShopSellLuxurySoap:
     if not barber_shop_can_sell_luxury_soap():
-        $ MainTxt = "Продавать сейчас нечего."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Продавать сейчас нечего."
+        $ scene_runtime.location_text = scene_runtime.text
         call ShowImage("", "", barber_shop_picture_path())
-        call BarberShopBuildActions
         return
-    $ _player_remove_item_by_id("luxury_soap_001", 1)
-    $ money += int(BARBER_LUXURY_SOAP_BUY_PRICE or 0)
-    $ MainTxt = "Серджио довольно крутит брусок в пальцах, нюхает его и без лишних торгов выкладывает вам %d мараведи. \"Вот это уже товар, а не просто мыло. Такое и я с удовольствием поставлю у себя на полку,\" признает он." % int(BARBER_LUXURY_SOAP_BUY_PRICE or 0)
-    $ CurLocDesc = MainTxt
+    $ player.remove_item("luxury_soap_001", 1)
+    $ player.add_money(int(BARBER_LUXURY_SOAP_BUY_PRICE or 0))
+    $ scene_runtime.text = "Серджио довольно крутит брусок в пальцах, нюхает его и без лишних торгов выкладывает вам %d мараведи. \"Вот это уже товар, а не просто мыло. Такое и я с удовольствием поставлю у себя на полку,\" признает он." % int(BARBER_LUXURY_SOAP_BUY_PRICE or 0)
+    $ scene_runtime.location_text = scene_runtime.text
     call ShowImage("", "", barber_shop_picture_path())
-    call BarberShopBuildActions
     return
 
 
 label BarberShopServePendingGuest:
+    $ renpy.dynamic("_barber_guest", "_barber_guest_name", "_barber_guest_price", "_barber_guest_info")
     $ _barber_guest = barber_shop_pending_npc_id()
     if str(_barber_guest or "") == "":
-        $ MainTxt = "Сейчас никто из ваших знакомых не ждет визита к Серджио."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Сейчас никто из ваших знакомых не ждет визита к Серджио."
+        $ scene_runtime.location_text = scene_runtime.text
         call ShowImage("", "", barber_shop_picture_path())
-        call BarberShopBuildActions
         return
-    $ _barber_guest_name = str(RealName.get(_barber_guest, _barber_guest) or _barber_guest)
+    $ _barber_guest_name = people_display_name(_barber_guest)
     $ _barber_guest_price = int(barber_shop_haircut_price("female") or 0)
-    if int(money or 0) < _barber_guest_price:
-        $ MainTxt = "Серджио разводит руками: \"За %s я возьмусь с радостью, но мои ножницы не работают в долг. Нужны %d мараведи.\" " % (_barber_guest_name, _barber_guest_price)
-        $ CurLocDesc = MainTxt
+    if int(player.economy.money or 0) < _barber_guest_price:
+        $ scene_runtime.text = "Серджио разводит руками: \"За %s я возьмусь с радостью, но мои ножницы не работают в долг. Нужны %d мараведи.\" " % (_barber_guest_name, _barber_guest_price)
+        $ scene_runtime.location_text = scene_runtime.text
         call ShowImage("", "", barber_shop_picture_path())
-        call BarberShopBuildActions
         return
-    $ money -= _barber_guest_price
+    $ player.spend_money(_barber_guest_price)
     $ calendar_v2.advance_minutes(45)
-    $ BarberInvitePending[_barber_guest] = 0
-    $ BarberVisitLastDay[_barber_guest] = int(dayspassed or 0)
-    $ _barber_guest_info = getPersonInfo(_barber_guest)
+    $ household.barber_visit_last_day[_barber_guest] = current_game_day()
+    $ _barber_guest_info = people.get_info(_barber_guest)
     if _barber_guest_info is not None:
+        $ _barber_guest_info.set_var_int("barber_invite_pending", 0)
         $ _barber_guest_info.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
-    $ beauty[_barber_guest] = min(100, int(beauty.get(_barber_guest, 0) or 0) + 3)
-    if _barber_guest == "sandra":
-        $ cooking[_barber_guest] = min(100, int(cooking.get(_barber_guest, 0) or 0) + 1)
-        $ cleaning[_barber_guest] = min(100, int(cleaning.get(_barber_guest, 0) or 0) + 1)
-    elif _barber_guest == "melissa":
-        $ cleaning[_barber_guest] = min(100, int(cleaning.get(_barber_guest, 0) or 0) + 1)
-        $ waitress[_barber_guest] = min(100, int(waitress.get(_barber_guest, 0) or 0) + 1)
-    elif _barber_guest == "amanda":
-        $ waitress[_barber_guest] = min(100, int(waitress.get(_barber_guest, 0) or 0) + 2)
-    $ tavernfame = int(tavernfame or 0) + 1
-    $ MainTxt = "Вы приводите %s к Серджио и оплачиваете визит. Цирюльник долго возится с волосами, душистой водой и острыми ножницами, при этом без остановки болтая о женщинах, тканях, нижнем белье и о том, как ухоженный вид меняет весь дом. Когда все заканчивается, %s выглядит заметно ухоженнее и явно уходит от Серджио с новыми мыслями о себе." % (_barber_guest_name, _barber_guest_name)
-    $ CurLocDesc = MainTxt
+        $ _barber_guest_info.set_sex_stat("beauty", min(100, int(_barber_guest_info.sex_stat("beauty", 0) or 0) + 3))
+        if _barber_guest == "sandra":
+            $ _barber_guest_info.change_skill("cooking", 1)
+            $ _barber_guest_info.change_skill("cleaning", 1)
+        elif _barber_guest == "melissa":
+            $ _barber_guest_info.change_skill("cleaning", 1)
+            $ _barber_guest_info.change_skill("waitress", 1)
+        elif _barber_guest == "amanda":
+            $ _barber_guest_info.change_skill("waitress", 2)
+    $ player.economy.tavern_fame = int(player.economy.tavern_fame or 0) + 1
+    $ scene_runtime.text = "Вы приводите %s к Серджио и оплачиваете визит. Цирюльник долго возится с волосами, душистой водой и острыми ножницами, при этом без остановки болтая о женщинах, тканях, нижнем белье и о том, как ухоженный вид меняет весь дом. Когда все заканчивается, %s выглядит заметно ухоженнее и явно уходит от Серджио с новыми мыслями о себе." % (_barber_guest_name, _barber_guest_name)
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call ShowImage("", "", barber_shop_picture_path())
-    call BarberShopBuildActions
     return

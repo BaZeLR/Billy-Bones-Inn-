@@ -3,7 +3,7 @@
 # ================================================================================
 init python:
     def _girl_job_value(girl_name, jobtype):
-        info = getPersonInfo(girl_name)
+        info = people.get_info(girl_name)
         jobs = getattr(info, "jobs", {}) if info is not None else {}
         try:
             return int(jobs.get(str(jobtype or ""), 0) or 0)
@@ -20,7 +20,7 @@ init python:
                 continue
             if _girl_job_value(girl_key, job_key) <= 0:
                 continue
-            if room_key and str(getLocation(girl_key) or "") != room_key:
+            if room_key and str(people.location(girl_key) or "") != room_key:
                 continue
             candidates.append(girl_key)
         return candidates

@@ -1,81 +1,4 @@
-        def var_int(self, key, default=0):
-            self.ensure_story_defaults()
-            return people_to_int(self.var.get(key, default), default)
-
-        def set_var_int(self, key, value):
-            self.ensure_story_defaults()
-            value = people_to_int(value, 0)
-            self.var[key] = value
-            return value
-        def story_value(self, key, default=0):
-            self.ensure_story_defaults()
-            return self.var.get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()
-            self.var[key] = value
-            return value
-
-
-label _auto_register_eddie:
-    call register_eddie_secondary from _call_eddie_reg
-    return        def var_int(self, key, default=0):
-            self.ensure_story_defaults()
-            return people_to_int(self.var.get(key, default), default)
-
-        def set_var_int(self, key, value):
-            self.ensure_story_defaults()
-            value = people_to_int(value, 0)
-            self.var[key] = value
-            return value
-        def story_value(self, key, default=0):
-            self.ensure_story_defaults()
-            return self.var.get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()
-            self.var[key] = value
-            return value
-
-
-label _auto_register_eddie:
-    call register_eddie_secondary from _call_eddie_reg
-    return        def var_int(self, key, default=0):
-            self.ensure_story_defaults()
-            return people_to_int(self.var.get(key, default), default)
-
-        def set_var_int(self, key, value):
-            self.ensure_story_defaults()
-            value = people_to_int(value, 0)
-            self.var[key] = value
-            return value
-        def story_value(self, key, default=0):
-            self.ensure_story_defaults()
-            return self.var.get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()
-            self.var[key] = value
-            return value
-
-
-label _auto_register_eddie:
-    call register_eddie_secondary from _call_eddie_reg
-    returninit python:
-    def eddie_story_defaults():
-        return {
-            "TalkedAboutWhores": 0,
-            "SawWithGeorgett": 0,
-            "TalkedAboutGeorgett": 0,
-            "SawMomSex": 0,
-            "FingalTalk": 0,
-            "FingalTalkDestination": 0,
-            "FingalTalkComplain": 0,
-            "RidiculeFollow": 0,
-            "OthersSawWithMom": 0,
-            "WhoreVisitFreq": 6,
-        }
-
+init python:
     class EddieData(PeopleData):
         code_name = "eddie"
 
@@ -86,85 +9,56 @@ label _auto_register_eddie:
                 fullname="Эдди",
                 genitive="Эдди",
                 dative="Эдди",
-                default_location="GroceryStore",
+                default_location="",
                 description="Эдди - сын Ребекки, подросток и помощник в бакалейной лавке. Связан с событиями Бекки, Жоржетты и Лукаса.",
                 birth_date={"day": 1, "period": 1, "cycle": 1083},
                 portrait="images/eddie/portraits/portrait_0.png",
             )
+            self.schedule_source = "schedules/eddie.json"
 
     class EddieInfo(BaseNPC):
         """Eddie: Becky's son, group scenes, Georgett crossover."""
+        talk_label = "IntEddieTalk"
         unknown_name = "Незнакомец"
+        whore_visit_frequency = 6
 
         def __init__(self, name="eddie", **kwargs):
             super().__init__(name, **kwargs)
             self.data = EddieStaticData
             self.known = False
-            self.location = "GroceryStore"
-            self.var = {}
-            self.ensure_story_defaults()
+            self.told_about_tavern_whores = False
+            self.seen_with_georgett = False
+            self.talked_about_georgett = False
+            self.saw_mother_sex = False
+            self.fingal_talk_stage = 0
+            self.asked_fingal_destination = False
+            self.asked_fingal_guard_complaint = False
+            self.ridiculed_follow_attempt = False
+            self.others_saw_with_mother = False
 
         def update(self):
             self.name = people_normalize_id(self.name)
             self.data = EddieStaticData
-            self.location = "GroceryStore"
-            self.location = "GroceryStore"
-            self.ensure_story_defaults()
             return self
 
-        def ensure_story_defaults(self):
-            if not isinstance(self.var, dict):
-                self.var = {}
-            for key, value in eddie_story_defaults().items():
-                self.var.setdefault(key, value)
-            self.promote_from_var(self.var)
-            return self.var
+        def interaction_visible(self, room_code=""):
+            if str(room_code or "").strip() == "BeckyHome":
+                return rooms.get("BeckyHomeFront").state["arrival_mode"] in ("SvalnyiGreh", "")
+            return super(EddieInfo, self).interaction_visible(room_code)
 
-        def story_value(self, key, default=0):
-            self.ensure_story_defaults()
-            return self.var.get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()
-            self.var[key] = value
-            self.promote_from_var(self.var)
-            return value
-
-        def var_int(self, key, default=0):
-            self.ensure_story_defaults()
-            return people_to_int(self.var.get(key, default), default)
-
-        def set_var_int(self, key, value):
-            self.ensure_story_defaults()
-            value = people_to_int(value, 0)
-            self.var[key] = value
-            self.promote_from_var(self.var)
-            return value
+        def action_data(self, where_id=""):
+            data = super(EddieInfo, self).action_data(where_id)
+            if str(where_id or "").strip() == "GroceryStore":
+                if not self.known:
+                    data["title"] = "Торговец"
+                data["picture_path"] = grocery_store_grocer_picture(self.name)
+                data["talk_picture"] = data["picture_path"]
+            return data
 
 define EddieStaticData = EddieData()
 default Eddie = EddieInfo()
 
-label InitEddie:
-    call register_eddie_secondary from _call_init_eddie_register
-    return
-
-
-label InitEddie:
-    call register_eddie_secondary from _call_init_eddie_register
-    return
-
-
-label InitEddie:
-    call register_eddie_secondary from _call_init_eddie_register
-    return
-
-
 label register_eddie_secondary:
     python:
-        peopleData["eddie"] = EddieStaticData
-        Eddie.update()
-        peopleInfo["eddie"] = Eddie
-        if Eddie not in secondary_npcs:
-            secondary_npcs.append(Eddie)
-    $ EddieProfile = "Эдди — сын Ребекки, подросток. Участвует в событиях дома с Жоржеттой и Лукасом (GeorgettBeckyVisit.txt)."
+        people.register(EddieStaticData, Eddie)
     return

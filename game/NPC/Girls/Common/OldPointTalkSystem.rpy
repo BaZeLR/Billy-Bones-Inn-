@@ -1,4 +1,4 @@
-            info.relationship = info.rel            info.relationship = info.rel            info.relationship = info.rel# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init -40 python:
@@ -23,7 +23,7 @@ init -40 python:
     }
 
     def old_point_talk_info(girl_name=""):
-        return getPersonInfo(str(girl_name or "").strip().lower())
+        return people.get_info(str(girl_name or "").strip().lower())
 
     def old_point_rel_cap(info=None):
         if info is None:
@@ -36,7 +36,6 @@ init -40 python:
             return 0
         cap = old_point_rel_cap(info)
         info.rel = max(0, min(cap, people_to_int(getattr(info, "rel", 0), 0) + people_to_int(amount, 0)))
-        if hasattr(info, "relationship"):
         return info.rel
 
     def old_point_preferred_topics(girl_name=""):
@@ -252,124 +251,88 @@ init -40 python:
 
 
 label OldPointSmallTalkMenu(girl_name=""):
+    $ renpy.dynamic("_old_talk_result", "_old_talk_name")
     $ _old_talk_name = str(girl_name or "").strip().lower()
     $ main_ui_begin_talk_state("Обычный разговор", _old_talk_name)
     if not old_point_smalltalk_available(_old_talk_name):
-        $ MainTxt = "%s сегодня не готова к обычной болтовне." % _action_display_name(_old_talk_name)
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "%s сегодня не готова к обычной болтовне." % _action_display_name(_old_talk_name)
+        $ scene_runtime.location_text = scene_runtime.text
         return
     $ old_point_smalltalk_start(_old_talk_name)
     while old_point_smalltalk_available(_old_talk_name) and old_point_smalltalk_turn_count(_old_talk_name) < 10:
         menu:
             "О работе в трактире" if old_point_smalltalk_topic_available(_old_talk_name, "job_routine"):
                 $ _old_talk_result = old_point_smalltalk_apply(_old_talk_name, "job_routine")
-                $ MainTxt = str(_old_talk_result.get("text", "") or "")
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = str(_old_talk_result.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
             "О простой болтовне" if old_point_smalltalk_topic_available(_old_talk_name, "chat"):
                 $ _old_talk_result = old_point_smalltalk_apply(_old_talk_name, "chat")
-                $ MainTxt = str(_old_talk_result.get("text", "") or "")
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = str(_old_talk_result.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
             "О танцах" if old_point_smalltalk_topic_available(_old_talk_name, "dances"):
                 $ _old_talk_result = old_point_smalltalk_apply(_old_talk_name, "dances")
-                $ MainTxt = str(_old_talk_result.get("text", "") or "")
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = str(_old_talk_result.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
             "О городских слухах" if old_point_smalltalk_topic_available(_old_talk_name, "gossip"):
                 $ _old_talk_result = old_point_smalltalk_apply(_old_talk_name, "gossip")
-                $ MainTxt = str(_old_talk_result.get("text", "") or "")
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = str(_old_talk_result.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
             "О лесе и прогулках" if old_point_smalltalk_topic_available(_old_talk_name, "forest"):
                 $ _old_talk_result = old_point_smalltalk_apply(_old_talk_name, "forest")
-                $ MainTxt = str(_old_talk_result.get("text", "") or "")
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = str(_old_talk_result.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
             "О старых историях" if old_point_smalltalk_topic_available(_old_talk_name, "stories"):
                 $ _old_talk_result = old_point_smalltalk_apply(_old_talk_name, "stories")
-                $ MainTxt = str(_old_talk_result.get("text", "") or "")
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = str(_old_talk_result.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
             "О еде и угощениях" if old_point_smalltalk_topic_available(_old_talk_name, "food"):
                 $ _old_talk_result = old_point_smalltalk_apply(_old_talk_name, "food")
-                $ MainTxt = str(_old_talk_result.get("text", "") or "")
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = str(_old_talk_result.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
             "О платьях и внешности" if old_point_smalltalk_topic_available(_old_talk_name, "fashion"):
                 $ _old_talk_result = old_point_smalltalk_apply(_old_talk_name, "fashion")
-                $ MainTxt = str(_old_talk_result.get("text", "") or "")
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = str(_old_talk_result.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
             "О деньгах и выгоде" if old_point_smalltalk_topic_available(_old_talk_name, "money"):
                 $ _old_talk_result = old_point_smalltalk_apply(_old_talk_name, "money")
-                $ MainTxt = str(_old_talk_result.get("text", "") or "")
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = str(_old_talk_result.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
             "О доме и семье" if old_point_smalltalk_topic_available(_old_talk_name, "family_life"):
                 $ _old_talk_result = old_point_smalltalk_apply(_old_talk_name, "family_life")
-                $ MainTxt = str(_old_talk_result.get("text", "") or "")
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = str(_old_talk_result.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
             "Закончить болтовню" if old_point_smalltalk_turn_count(_old_talk_name) > 0:
-                $ MainTxt = old_point_smalltalk_finish(_old_talk_name)
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = old_point_smalltalk_finish(_old_talk_name)
+                $ scene_runtime.location_text = scene_runtime.text
                 return
             "Назад":
                 if old_point_smalltalk_turn_count(_old_talk_name) > 0:
-                    $ MainTxt = old_point_smalltalk_finish(_old_talk_name)
-                $ CurLocDesc = MainTxt
+                    $ scene_runtime.text = old_point_smalltalk_finish(_old_talk_name)
+                $ scene_runtime.location_text = scene_runtime.text
                 return
     if old_point_smalltalk_turn_count(_old_talk_name) >= 10 and not old_point_smalltalk_done_today(_old_talk_name):
-        $ MainTxt = old_point_smalltalk_finish(_old_talk_name)
-        $ CurLocDesc = MainTxt
-    return
-
-
-label OldPointSmallTalkApply(girl_name="", topic_id=""):
-    $ _old_talk_result = old_point_smalltalk_apply(girl_name, topic_id)
-    $ MainTxt = str(_old_talk_result.get("text", "") or "")
-    $ CurLocDesc = MainTxt
-    return
-
-
-label OldPointSmallTalkFinish(girl_name=""):
-    $ MainTxt = old_point_smalltalk_finish(girl_name)
-    $ CurLocDesc = MainTxt
-    return
-
-
-label OldPointSmallTalkApply(girl_name="", topic_id=""):
-    $ _old_talk_result = old_point_smalltalk_apply(girl_name, topic_id)
-    $ MainTxt = str(_old_talk_result.get("text", "") or "")
-    $ CurLocDesc = MainTxt
-    return
-
-
-label OldPointSmallTalkFinish(girl_name=""):
-    $ MainTxt = old_point_smalltalk_finish(girl_name)
-    $ CurLocDesc = MainTxt
-    return
-
-
-label OldPointSmallTalkApply(girl_name="", topic_id=""):
-    $ _old_talk_result = old_point_smalltalk_apply(girl_name, topic_id)
-    $ MainTxt = str(_old_talk_result.get("text", "") or "")
-    $ CurLocDesc = MainTxt
-    return
-
-
-label OldPointSmallTalkFinish(girl_name=""):
-    $ MainTxt = old_point_smalltalk_finish(girl_name)
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = old_point_smalltalk_finish(_old_talk_name)
+        $ scene_runtime.location_text = scene_runtime.text
     return
 
 
 label OldPointFlirtAttempt(girl_name=""):
+    $ renpy.dynamic("_old_flirt_result")
     $ _old_flirt_result = old_point_flirt_attempt(girl_name)
-    $ MainTxt = str(_old_flirt_result.get("text", "") or "")
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = str(_old_flirt_result.get("text", "") or "")
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 
 label OldPointKinoAttempt(girl_name=""):
+    $ renpy.dynamic("_old_kino_result")
     $ _old_kino_result = old_point_kino_attempt(girl_name)
-    $ MainTxt = str(_old_kino_result.get("text", "") or "")
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = str(_old_kino_result.get("text", "") or "")
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 
 label OldPointApology(girl_name=""):
-    $ MainTxt = old_point_apology_apply(girl_name)
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = old_point_apology_apply(girl_name)
+    $ scene_runtime.location_text = scene_runtime.text
     return

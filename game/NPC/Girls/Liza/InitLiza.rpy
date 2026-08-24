@@ -1,236 +1,14 @@
-            knowsMC[name] = bool(self.known)        def sync_from_shared_state(self):
-            self.ensure_story_defaults()
-            self.ensure_sex_state()
-            return self
-
-        def sync_shared_state(self):
-            name = self.code_name
-            RealName[name] = self.data.fullname
-            RealName2[name] = self.data.genitive
-            RealName3[name] = self.data.dative
-            DateOfBirth[name] = dict(self.data.birth_date)
-            girltextdesc[name] = self.data.description
-            self.location = str(self.current_location or "PortStreets")
-            GiftPreferences[name] = list(self.gift_preferences)
-            dressdefault[name] = self.wardrobe["current_dress"]
-            bradef[name] = self.wardrobe["current_underwear"]["bra"]
-            pantiesdef[name] = self.wardrobe["current_underwear"]["panties"]
-            legsdef[name] = self.wardrobe["current_underwear"]["legs"]
-            shoesdef[name] = self.wardrobe["current_underwear"]["shoes"]
-            topdress[name] = DressTopPart.get(dressdefault[name], "")
-            bottomdress[name] = DressBottomPart.get(dressdefault[name], "")
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            self.wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            self.ensure_story_defaults()
-            return self
-            self.current_location = "PortStreets"            self.current_location = "TavernMain" if self.hired else "PortStreets"            self.hired = False        def story_value(self, key, default=0):
-            self.sync_shared_state()
-            return self.ensure_story_defaults().get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()[key] = value
-            self.sync_shared_state()
-            return value
-            self.schedule_source = LizaStaticData.schedule_source            self.schedule_source = LizaStaticData.schedule_source
-            self.current_location = "PortStreets"            self.hired = False        def sync_from_shared_state(self):
-            self.ensure_story_defaults()
-            self.ensure_sex_state()
-            return self
-
-        def sync_shared_state(self):
-            name = self.code_name
-            RealName[name] = self.data.fullname
-            RealName2[name] = self.data.genitive
-            RealName3[name] = self.data.dative
-            DateOfBirth[name] = dict(self.data.birth_date)
-            girltextdesc[name] = self.data.description
-            self.location = str(self.current_location or "PortStreets")
-            GiftPreferences[name] = list(self.gift_preferences)
-            dressdefault[name] = self.wardrobe["current_dress"]
-            bradef[name] = self.wardrobe["current_underwear"]["bra"]
-            pantiesdef[name] = self.wardrobe["current_underwear"]["panties"]
-            legsdef[name] = self.wardrobe["current_underwear"]["legs"]
-            shoesdef[name] = self.wardrobe["current_underwear"]["shoes"]
-            topdress[name] = DressTopPart.get(dressdefault[name], "")
-            bottomdress[name] = DressBottomPart.get(dressdefault[name], "")
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            self.wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            self.ensure_story_defaults()
-            return self
-            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            knowsMC[name] = bool(self.known)        def sync_from_shared_state(self):
-            self.ensure_story_defaults()
-            self.ensure_sex_state()
-            self.sync_shared_state()
-            return self
-
-        def sync_shared_state(self):
-            name = self.code_name
-            RealName[name] = self.data.fullname
-            RealName2[name] = self.data.genitive
-            RealName3[name] = self.data.dative
-            DateOfBirth[name] = dict(self.data.birth_date)
-            girltextdesc[name] = self.data.description
-            self.location = str(self.current_location or "PortStreets")
-            GiftPreferences[name] = list(self.gift_preferences)
-            dressdefault[name] = self.wardrobe["current_dress"]
-            bradef[name] = self.wardrobe["current_underwear"]["bra"]
-            pantiesdef[name] = self.wardrobe["current_underwear"]["panties"]
-            legsdef[name] = self.wardrobe["current_underwear"]["legs"]
-            shoesdef[name] = self.wardrobe["current_underwear"]["shoes"]
-            topdress[name] = DressTopPart.get(dressdefault[name], "")
-            bottomdress[name] = DressBottomPart.get(dressdefault[name], "")
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            self.wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            self.ensure_story_defaults()
-            return self
-            self.current_location = "PortStreets"            self.current_location = "TavernMain" if self.hired else "PortStreets"            self.hired = False        def story_value(self, key, default=0):
-            self.sync_shared_state()
-            return self.ensure_story_defaults().get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()[key] = value
-            self.sync_shared_state()
-            return value
-            self.schedule_source = LizaStaticData.schedule_source            self.schedule_source = LizaStaticData.schedule_source
-            self.current_location = "PortStreets"            self.hired = False        def sync_from_shared_state(self):
-            self.ensure_story_defaults()
-            self.ensure_sex_state()
-            return self
-
-        def sync_shared_state(self):
-            name = self.code_name
-            RealName[name] = self.data.fullname
-            RealName2[name] = self.data.genitive
-            RealName3[name] = self.data.dative
-            DateOfBirth[name] = dict(self.data.birth_date)
-            girltextdesc[name] = self.data.description
-            self.location = str(self.current_location or "PortStreets")
-            GiftPreferences[name] = list(self.gift_preferences)
-            dressdefault[name] = self.wardrobe["current_dress"]
-            bradef[name] = self.wardrobe["current_underwear"]["bra"]
-            pantiesdef[name] = self.wardrobe["current_underwear"]["panties"]
-            legsdef[name] = self.wardrobe["current_underwear"]["legs"]
-            shoesdef[name] = self.wardrobe["current_underwear"]["shoes"]
-            topdress[name] = DressTopPart.get(dressdefault[name], "")
-            bottomdress[name] = DressBottomPart.get(dressdefault[name], "")
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            self.wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            self.ensure_story_defaults()
-            return self
-            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel            knowsMC[name] = bool(self.known)        def sync_from_shared_state(self):
-            self.ensure_story_defaults()
-            self.ensure_sex_state()
-            self.sync_shared_state()
-            return self
-
-        def sync_shared_state(self):
-            name = self.code_name
-            RealName[name] = self.data.fullname
-            RealName2[name] = self.data.genitive
-            RealName3[name] = self.data.dative
-            DateOfBirth[name] = dict(self.data.birth_date)
-            girltextdesc[name] = self.data.description
-            self.location = str(self.current_location or "PortStreets")
-            GiftPreferences[name] = list(self.gift_preferences)
-            dressdefault[name] = self.wardrobe["current_dress"]
-            bradef[name] = self.wardrobe["current_underwear"]["bra"]
-            pantiesdef[name] = self.wardrobe["current_underwear"]["panties"]
-            legsdef[name] = self.wardrobe["current_underwear"]["legs"]
-            shoesdef[name] = self.wardrobe["current_underwear"]["shoes"]
-            topdress[name] = DressTopPart.get(dressdefault[name], "")
-            bottomdress[name] = DressBottomPart.get(dressdefault[name], "")
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            self.wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            self.ensure_story_defaults()
-            return self
-            self.current_location = "PortStreets"            self.current_location = "TavernMain" if self.hired else "PortStreets"            self.hired = False        def story_value(self, key, default=0):
-            self.sync_shared_state()
-            return self.ensure_story_defaults().get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()[key] = value
-            self.sync_shared_state()
-            return value
-            self.schedule_source = LizaStaticData.schedule_source            self.schedule_source = LizaStaticData.schedule_source
-            self.current_location = "PortStreets"            self.hired = False        def sync_from_shared_state(self):
-            self.ensure_story_defaults()
-            self.ensure_sex_state()
-            return self
-
-        def sync_shared_state(self):
-            name = self.code_name
-            RealName[name] = self.data.fullname
-            RealName2[name] = self.data.genitive
-            RealName3[name] = self.data.dative
-            DateOfBirth[name] = dict(self.data.birth_date)
-            girltextdesc[name] = self.data.description
-            self.location = str(self.current_location or "PortStreets")
-            GiftPreferences[name] = list(self.gift_preferences)
-            dressdefault[name] = self.wardrobe["current_dress"]
-            bradef[name] = self.wardrobe["current_underwear"]["bra"]
-            pantiesdef[name] = self.wardrobe["current_underwear"]["panties"]
-            legsdef[name] = self.wardrobe["current_underwear"]["legs"]
-            shoesdef[name] = self.wardrobe["current_underwear"]["shoes"]
-            topdress[name] = DressTopPart.get(dressdefault[name], "")
-            bottomdress[name] = DressBottomPart.get(dressdefault[name], "")
-            bra[name] = bradef[name]
-            panties[name] = pantiesdef[name]
-            legs[name] = legsdef[name]
-            shoes[name] = shoesdef[name]
-            self.wardrobe["current_layers"] = [row for row in [dressdefault[name], bradef[name], pantiesdef[name], legsdef[name], shoesdef[name]] if str(row or "")]
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            self.ensure_story_defaults()
-            return self
-            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label InitLiza:
     python:
-        GirlName = Liza.code_name
-        peopleData[GirlName] = LizaStaticData
         Liza.initialize_new_game_state()
-        peopleInfo[GirlName] = Liza
-        if Liza not in girls:
-            girls.append(Liza)
+        people.register(LizaStaticData, Liza)
 
     return
 
 init python:
-    def liza_story_defaults():
-        return {
-            "SawChurchAfterCermon": 0,
-            "TalkChurchAfterCermon": 0,
-            "TalkChurchAfterCermonGeorgett": 0,
-            "ProstStart": 0,
-            "seeclients": 0,
-            "askclients": 0,
-            "askpregnancy": 0,
-            "asksex": 0,
-            "after_sermon_stage": 0,
-            "GloryHoleMentioned": 0,
-            "GloryHoleAsked": 0,
-        }
-
     class LizaData(PeopleData):
         code_name = "liza"
 
@@ -241,7 +19,7 @@ init python:
                 fullname="Лизетта",
                 genitive="Лизетты",
                 dative="Лизетте",
-                default_location="PortStreets",
+                default_location="",
                 description="Лизетта Брюно - худенькая молоденькая мулатка, ростом чуть меньше 145 сантиметров. У нее шоколадная кожа, зеленые глаза и маленькие грудки. Ее длинные темные волосы собранны в две косички. У нее стройные длинные ножки и немного оттопыреная попка, привлекающая мужские взгляды.",
                 gift_preferences=["berries_001", "wild_rose_001", "soap_001"],
             )
@@ -250,17 +28,31 @@ init python:
 
     class LizaInfo(Girl):
         """Lizette runtime: port work, tavern relocation, church story, pregnancy state."""
+
+        talk_label = "IntLizaTalk"
+        OPENNESS_RELATIONSHIP_STEPS = ((4, 3), (7, 5), (6, 6), (8, 7))
+
+        uses_tavern_client_room = True
         unknown_name = "Молодая женщина"
 
         def __init__(self):
             super().__init__("liza")
             self.code_name = "liza"
             self.data = LizaStaticData
-            self.uses_own_var_state = True
             self.rel = 0
             self.openness = 0
             self.corruption = 35
             self.known = True
+            self.witnessed_church_after_sermon = False
+            self.discussed_georgett_gerhard = False
+            self.prostitution_started = False
+            self.has_seen_clients = False
+            self.asked_about_clients = False
+            self.asked_about_pregnancy = False
+            self.asked_about_sex = False
+            self.glory_hole_mentioned = False
+            self.glory_hole_asked = False
+            self.portstreet_clients_seen_today = False
             self.talked_today = 0
             self.gifted_today = 0
             self.asked_today = 0
@@ -311,23 +103,11 @@ init python:
                     "shoes": "highshoes",
                 },
             }
-            self.var = {}
-            self.ensure_story_defaults()
-
         def update(self):
             super(LizaInfo, self).update()
             self.data = LizaStaticData
-            self.ensure_story_defaults()
             self.ensure_sex_state()
-            self.sync_shared_state()
             return self
-
-        def ensure_story_defaults(self):
-            if not isinstance(self.var, dict):
-                self.var = {}
-            for key, value in liza_story_defaults().items():
-                self.var.setdefault(key, value)
-            return self.var
 
         def ensure_sex_state(self):
             state = super(LizaInfo, self).ensure_sex_state()
@@ -352,115 +132,81 @@ init python:
             self.set_cock_position("none")
             return self.sex_state
 
-        def player_arousal(self):
-            return people_to_int(player.intimacy.arousal_value("You"), 0)
-
-        def set_player_arousal(self, value):
-            intimacy = player.intimacy
-            result = intimacy.set_arousal(value, "You")
-            return result
-
-        def add_player_arousal(self, amount=0, cap=100):
-            intimacy = player.intimacy
-            result = intimacy.add_arousal(amount, cap, "You")
-            return result
-
-        def can_player_cum(self):
-            return player.intimacy.can_cum() or self.player_arousal() >= 100
-
         def remove_top_for_sex(self):
             self.remove_clothing_layer("top")
-            self.publish_visibility_state()
             self.set_cock_position("none")
             return self.sex_state
 
         def raise_top_for_sex(self):
             self.set_layer_raised("top", 1)
-            self.publish_visibility_state()
             self.set_cock_position("none")
             return self.sex_state
 
         def raise_bottom_for_sex(self):
             self.set_layer_raised("bottom", 1)
-            self.publish_visibility_state()
             self.set_cock_position("none")
             return self.sex_state
 
         def remove_panties_for_sex(self):
             self.remove_clothing_layer("panties")
-            self.publish_visibility_state()
             self.set_cock_position("none")
             return self.sex_state
 
         def clear_visible_cum(self, *keys):
             self.clear_cum(*keys)
-            self.publish_visibility_state()
             self.set_cock_position("none")
             return self.sex_state
 
         def initialize_new_game_state(self):
-            self.ensure_story_defaults()
             self.ensure_sex_state()
-            self.sync_shared_state()
             return self
 
         def reset_daily(self, full=False):
             super(LizaInfo, self).reset_daily(full)
-            self.talked_today = 0
-            self.gifted_today = 0
-            self.asked_today = 0
-            self.fucked_today = 0
-            self.drunk = 0
-            self.var["after_sermon_stage"] = 0
-            self.var["portstreet_clients_seen_today"] = 0
+            self.portstreet_clients_seen_today = False
             return self
 
         def reset_tavern_work_day(self):
             self.jobs["jobwhore"] = 0
             self.jobs["jobgloryhole"] = 0
-            self.sync_shared_state()
-            self.sync_shared_state()
-            self.sync_shared_state()
-            self.sync_shared_state()
-            self.sync_shared_state()
-            self.sync_shared_state()
             return self.jobs
 
-        def story_value(self, key, default=0):
-            return self.ensure_story_defaults().get(key, default)
-
-        def set_story_value(self, key, value):
-            self.ensure_story_defaults()[key] = value
-            self.sync_shared_state()
-            return value
-
-        def talk_count(self):
-            return people_to_int(self.talked_today, 0)
-
-        def can_talk_today(self, limit=2):
-            return self.talk_count() < people_to_int(limit, 2)
-
-        def add_relation(self, amount=1, cap=20):
-            self.rel = max(0, min(people_to_int(cap, 20), people_to_int(self.rel, 0) + people_to_int(amount, 0)))
-            self.sync_shared_state()
-            self.sync_shared_state()
-            return self.rel
-
-        def finish_talk(self):
-            self.talked_today = people_to_int(self.talked_today, 0) + 1
-            self.sync_shared_state()
-            return self.talked_today
-
-        def mark_asked_topic(self, topic_flag, relation_gain=1):
-            flag = str(topic_flag or "")
-            first_time = people_to_int(self.story_value(flag, 0), 0) == 0
-            if first_time:
-                self.set_story_value(flag, 1)
-                if relation_gain:
-                    self.add_relation(relation_gain)
-            self.asked_today = people_to_int(self.asked_today, 0) + 1
-            self.sync_shared_state()
-            return first_time
+        def dress_change_other_saw_text(self, agreed_to_redress=0):
+            if agreed_to_redress != 1 or int(self.corruption or 0) < 50:
+                return ""
+            rand_var = procedural_randint(1, 9, key="procedural:NPC/Girls/Liza/IntLizaDressChange.rpy:procedural_randint:10:1")
+            if rand_var == 1:
+                if int(Sandra.corruption or 0) >= 35:
+                    text = "Обернувшись, вы вдруг встретились взглядом с Сандрой, наблюдающей за этой сценкой. Но она всего лишь усмехнулась, покачала головой и пошла по своим делам."
+                else:
+                    text = 'Обернувшись, вы вдруг встретились взглядом с Сандрой, наблюдающей за этой сценкой. И увиденное ей явно не понравилось. Она подошла и сердито сказала: "Стефан, я понимаю что без этих шлюх мы можем концы с концами не свести, но хоть крупицу стыда иметь надо?"\nВы еле смогли успокоить Сандру и заболтать тему.'
+            elif rand_var == 2:
+                if int(Melissa.corruption or 0) >= 35:
+                    text = "Вы заметили, что за вами наблюдала Мелисса. Но увиденное ее совсем не шокировало, скорее позабавило."
+                else:
+                    text = 'Вы заметили, что за вами наблюдала Мелисса. И этот стриптиз ее немного шокировал. Она подошла и выговорила вам: "Знаешь что, Стефан, держи своих шлюх так, чтобы по крайней мере девочкам не приходилось пялиться на их прелести. У тебя ведь и младшая есть, она еще мала на такое смотреть!"'
+            elif rand_var == 3:
+                if int(Amanda.corruption or 0) >= 35:
+                    text = "Вы заметили, что за вами наблюдала Аманда. Стриптиз подруги ее позабавил, она даже от возбуждения слегка потерла у себя между ножек."
+                else:
+                    text = 'Вы заметили, что за вами наблюдала Аманда. Причем наблюдала с открытым ртом, публичное раздевание для нее явно было в новинку и шокировало. "Пусть учится смотреть на вещи шире," подумали вы.'
+                    Amanda.apply_social_chance(0, 0, 0, 21, 1, 1, "liza_dress_change_seen")
+            elif rand_var == 4:
+                text = "Вы заметили, что за снимающей на людях панталоны дочкой с улыбкой наблюдала Жоржетта, одобрительно кивая."
+            elif rand_var == 5:
+                text = "Из-за ближайшего стола послышался одобрительный свист, посетителям стриптиз Лизетты пришелся по душе."
+            elif rand_var == 6:
+                text = "Один из увидевших это непотребство посетителей не выдержал, подскочил к Лизетте и крепко ее поцеловал, а рукой залез под ее подол, лаская пальцами киску. Его друзья встретили такой поступок одобрительным улюлюканием."
+            elif rand_var == 7:
+                text = 'Один из посетителей наблюдал за этой сценкой с отвалившей челюстью. Лизетта весело подмигнула ему и сказала: "Десять мараведи, красавчик!" смутив скромнягу еще больше.'
+            else:
+                text = ""
+            if rand_var <= 2:
+                self.apply_social_chance(0, 0, 0, 60, 2, 1, "dress_change_seen")
+            if 5 <= rand_var <= 7:
+                self.apply_social_chance(0, 0, 0, 60, 1, 1, "dress_change_seen")
+                player.economy.tavern_fame += 1
+            return text
 
         def can_ask_topic(self, topic):
             key = str(topic or "")
@@ -468,123 +214,44 @@ init python:
                 return False
             rel_value = people_to_int(self.rel, 0)
             if key == "clients":
-                return people_to_int(self.story_value("seeclients", 0), 0) > 0 and rel_value >= 5
+                return self.has_seen_clients and rel_value >= 5
             if key in ("sex", "pregnancy"):
-                return people_to_int(self.story_value("askclients", 0), 0) > 0 and rel_value >= 5
+                return self.asked_about_clients and rel_value >= 5
             if key == "georgett_gerhard":
-                self.sync_from_shared_state()
-            self.sync_from_shared_state()
-            self.sync_from_shared_state()
-            return (
+                return (
                     people_to_int(Georgett.story_value("SawChurchAfterCermon", 0), 0) > 0
                     and rel_value >= 5
-                    and people_to_int(self.story_value("TalkChurchAfterCermonGeorgett", 0), 0) == 0
+                    and not self.discussed_georgett_gerhard
                 )
             if key == "work":
                 return self.can_work_tavern()
             if key == "holglor":
-                return self.can_work_tavern() and people_to_int(self.story_value("GloryHoleAsked", 0), 0) == 0 and people_to_int(self.story_value("GloryHoleMentioned", 0), 0) == 1
+                return self.can_work_tavern() and not self.glory_hole_asked and self.glory_hole_mentioned
             return False
 
-        def getLocation(self, wday=None, hour=None):
-            location_value = super(LizaInfo, self).getLocation(wday, hour)
-            return location_value
-
-        def getLocation(self, wday=None, hour=None):
-            location_value = super(LizaInfo, self).getLocation(wday, hour)
-            return location_value
-
-        def getLocation(self, wday=None, hour=None):
-            location_value = super(LizaInfo, self).getLocation(wday, hour)
-            return location_value
-
-        def getLocation(self, wday=None, hour=None):
-            location_value = super(LizaInfo, self).getLocation(wday, hour)
-            return location_value
-
         def can_work_portstreets(self):
-            return people_to_int(self.story_value("ProstStart", 0), 0) > 0 and not self.can_work_tavern()
-
-        def portstreet_work_hour(self):
-            return people_to_int(calendar_v2.hour, 0) >= 19 and people_to_int(week, 0) != 5
+            return self.prostitution_started and not self.can_work_tavern()
 
         def portstreet_work_active(self):
             return (
                 self.can_work_portstreets()
                 and str(self.getLocation() or "") == "PortStreets"
                 and Georgett.portstreet_story_unblocked()
-                and self.portstreet_work_hour()
             )
 
-        def portstreet_visible_now(self):
-            return self.portstreet_work_active() and not self.portstreet_client_event_available()
+        def interaction_visible(self, room_code=""):
+            if str(room_code or "").strip() == "PortStreets":
+                return self.portstreet_visible_now()
+            return super(LizaInfo, self).interaction_visible(room_code)
 
         def portstreet_client_event_available(self):
-            return self.portstreet_work_active() and people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0 and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
-
-        def mark_portstreet_clients_seen(self):
-            self.var["portstreet_clients_seen_today"] = 1
-            return self.set_story_value("seeclients", 1)
-
-        def can_work_tavern(self):
-            self.hired = people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
-            return self.hired
-
-        def set_hired(self, hired=True):
-            self.hired = bool(hired)
-            self.jobs["jobWhoreAvail"] = 1 if self.hired else 0
-            self.jobs["jobwhore"] = 1 if self.hired else 0
-            self.current_location = "TavernMain" if self.hired else "PortStreets"
-            self.sync_shared_state()
-            return self.hired
-
-        def can_use_gloryhole(self):
-            return people_to_int(self.jobs.get("jobGloryHoleAvail", 0), 0) > 0
+            return self.portstreet_work_active() and not self.portstreet_clients_seen_today and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
 
         def can_ask_about_clients(self):
-            return people_to_int(self.story_value("seeclients", 0), 0) > 0 and people_to_int(self.rel, 0) >= 5
-
-        def can_ask_about_priest(self):
-            return people_to_int(self.story_value("SawChurchAfterCermon", 0), 0) > 0
+            return self.has_seen_clients and people_to_int(self.rel, 0) >= 5
 
         def can_trigger_after_sermon_event(self):
-            return self.can_trigger_church_service_event()
-
-        def can_trigger_church_service_event(self):
             return people_to_int(Georgett.story_value("churchlizaadmit", 0), 0) > 0
-
-        def after_sermon_stage(self):
-            return people_to_int(self.story_value("after_sermon_stage", 0), 0)
-
-        def set_after_sermon_stage(self, value):
-            return self.set_story_value("after_sermon_stage", people_to_int(value, 0))
-
-        def church_after_sermon_event_available(self):
-            self.sync_from_shared_state()
-            return (
-                church_after_cermon_action_visible()
-                and self.can_trigger_church_service_event()
-                and self.after_sermon_stage() < 4
-                and CheckIfSexEventExist(self.code_name, 99, "Priest") > 0
-            )
-
-        def can_schedule_dress_shop_visit(self):
-            return self.can_work_tavern() and people_to_int(self.rel, 0) > 5
-
-        def can_schedule_barber_visit(self):
-            return self.can_work_tavern()
-
-        def pregnancy_stage(self):
-            days = people_to_int(self.stats.get("pregnancy", 0), 0)
-            if days <= 0:
-                return "none"
-            if days < 120:
-                return "early"
-            if days < 210:
-                return "visible"
-            if days < 270:
-                return "late"
-            return "birth_due"
 
 define LizaStaticData = LizaData()
 default Liza = LizaInfo()

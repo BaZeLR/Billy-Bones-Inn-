@@ -1,38 +1,20 @@
-label int_inga_talk(show_menu=True):
-    call IntIngaTalk(show_menu)
-    return
-
-label int_inga_talk(show_menu=True):
-    call IntIngaTalk(show_menu)
-    return
-
-label int_inga_talk(show_menu=True):
-    call IntIngaTalk(show_menu)
-    return
-
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntIngaTalk(show_menu=True):
-    $ Inga.ensure_story_defaults()
-    if str(CurLoc or "") == "GroceryStore":
+    if str(rooms.current_code or "") == "GroceryStore":
         vscene "images/inga/StreetSex/minet1.jpg"
 
     if not bool(show_menu):
         call GirlsDesc("inga")
         return
 
+    $ Inga.mark_known()
     $ main_ui_begin_talk_state("Разговор с Ингенборг", "inga")
-    $ current_action_title = "Разговор с Ингенборг"
-    $ current_action_content = None
-    $ current_action_items = [
-        MenuItem("Осмотреть", Call("IntIngaTalk", False)),
-        MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
-    ]
-
-    return
-
-
-label int_inga_talk(show_menu=True):
-    call IntIngaTalk(show_menu)
+    menu:
+        "Осмотреть":
+            call GirlsDesc("inga")
+        "Закончить разговор":
+            pass
+    $ main_ui_end_talk_state()
     return

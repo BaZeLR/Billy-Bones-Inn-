@@ -1,7 +1,7 @@
 # ================================================================================
 # Becky home room objects.
 # GameObject definitions own object text and object actions.
-# BeckyHomeRoom / BeckyHomeFrontRoom only list these object ids.
+# rooms.get("BeckyHome") / rooms.get("BeckyHomeFront") only list these object ids.
 # ================================================================================
 
 init python:
@@ -57,36 +57,3 @@ init python:
         stackable=False,
     )
 
-    BeckyHomeBackDoorObject = GameObject(
-        object_id="becky_home_back_door",
-        name="Черный ход",
-        description="Неприметная дверь со стороны боковой улочки ведет прямо в дом Бекки.",
-        picture="images/becky/Home/door.jpg",
-        actions=[
-            ObjectAction(
-                action_id="enter_house",
-                label="Зайти в дом",
-                hook="call",
-                target="BeckyHome",
-            ),
-        ],
-        carriable=False,
-        stackable=False,
-    )
-
-    BeckyHomeDarkCornerObject = GameObject(
-        object_id="becky_home_dark_corner",
-        name="Темный угол за крыльцом",
-        description="За крыльцом есть темный угол, где вполне может происходить что-нибудь интересное.",
-        picture="images/becky/Home/house2.jpg",
-        actions=[
-            ObjectAction(
-                action_id="peek_corner",
-                label="Осторожно заглянуть за угол",
-                hook="call",
-                target="becky_homefront_peek",
-            ),
-        ],
-        carriable=False,
-        stackable=False,
-    )

@@ -15,17 +15,17 @@ init python:
         action_args = tuple(getattr(room_action, "args", ()) or ())
 
         if hook in ("ui_call", "context_call") and target != "":
-            return MenuItem(caption, Function(main_ui_call_label, target, *action_args))
+            return MenuItem(caption, Call(target, *action_args))
         if hook == "call" and target != "":
             return MenuItem(caption, Call(target, *action_args))
         if hook == "jump" and target != "":
             return MenuItem(caption, Jump(target))
         if hook == "movement" and target != "":
-            return MenuItem(caption, Call("AdvanceMovementTime", target))
+            return MenuItem(caption, movement_actions(target))
         if hook == "text":
             return MenuItem(caption, [
-                SetVariable("MainTxt", target),
-                SetVariable("CurLocDesc", target),
+                SetField(scene_runtime, "text", target),
+                SetField(scene_runtime, "location_text", target),
                 Function(main_ui_restart_interaction),
             ])
 
@@ -46,8 +46,8 @@ init python:
             items.append(MenuItem(
                 obj.name,
                 [
-                    SetVariable("current_action_title", obj.name),
-                    SetVariable("current_object_id", obj.object_id),
+                    SetField(main_ui_runtime, "action_title", obj.name),
+                    SetField(main_ui_runtime, "object_id", obj.object_id),
                     Call(object_menu_label, obj.object_id),
                 ]
             ))
@@ -60,6 +60,6 @@ init python:
         for exit_obj in room.visible_exits():
             items.append(MenuItem(
                 exit_obj.label,
-                Call("AdvanceMovementTime", exit_obj.target)
+                movement_actions(exit_obj.target, getattr(exit_obj, "minutes_to_pass", 5))
             ))
         return items

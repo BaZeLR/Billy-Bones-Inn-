@@ -2,12 +2,15 @@
 
 This file is an index and correction target for Amanda events.
 
-Important distinction:
+Current runtime status:
 
-- Desired model: Amanda events are class/object records owned by Amanda's event/thread model.
-- Current runtime: several Amanda events are still registered as `LThreadData` tuples and use external `*_ready()` helper functions.
+- Amanda's non-dance story events are named `AmandaEvent` subclasses in `AmandaEventModel.rpy`.
+- Common day/hour/probability/location/action checks remain owned by `Event.canTrigger()`; subclasses contain only Amanda-specific facts.
+- `event_runtime.fired_keys_today` owns once-per-day event identity. Retired `*_seen_day` mirrors are removed during save repair.
+- `AmandaLegareDance.num` is the only ordered Legare-dance stage. The former parallel stage/cache values are retired.
+- Alternative events that belong to the same ordered stage are nested together in one trigger stage, matching the Family Life thread model.
 
-Do not treat the current anonymous tuple definitions as the final architecture. They instantiate `Event` objects today, but Amanda-specific event data should become named event classes/subclasses or named event data records that still use the `Event` method contract.
+The remaining audit target is Amanda's dance-event factory and non-story action predicates. Keep genuine action availability methods, but do not reintroduce external event-ready wrappers or parallel progress state.
 
 ## Source Authority
 
@@ -289,52 +292,6 @@ Amanda-owned state used by these checks must come from `Amanda.var` and Amanda m
   - call the Amanda/Lizett talk scene.
 - Source:
   - original Amanda/Lizett talk content must remain aligned with source text unless explicitly rewritten.
-
-### AmandaLizaGloryInviteEvent
-
-- Thread: `LizaGloryBridge`
-- Current runtime: `story_amanda_liza_glory_invite_0`
-- Start binding: `TavernMain / enter`
-- Time gate: Monday, Tuesday, Wednesday, Thursday, Saturday; `12..21`
-- `Event.canTrigger()` fields plus Amanda-specific conditions:
-  - current room is `TavernMain`;
-  - Amanda has seen Liza glory invite setup;
-  - Amanda has not tried gloryhole yet;
-  - Liza glory hint day exists;
-  - invite day is today or yesterday;
-  - invite event has not been seen today;
-  - tavern gloryhole is built/unlocked to state `2`.
-- Start:
-  - prompt MC to go to the gloryhole or not intervene.
-
-### AmandaGloryTavernAftermathEvent
-
-- Thread: `GloryAftermath`
-- Current runtime: `story_amanda_glory_tavern_aftermath_0`
-- Start binding: `TavernMain / enter`
-- Time gate: Monday, Tuesday, Wednesday, Thursday, Saturday; `12..21`
-- `Event.canTrigger()` fields plus Amanda-specific conditions:
-  - current room is `TavernMain`;
-  - Amanda glory event happened today or yesterday;
-  - tavern aftermath not seen today;
-  - Amanda has tried gloryhole.
-- Start:
-  - show tavern aftermath text according to Amanda glory outcome state.
-
-### AmandaGloryNightAfterEvent
-
-- Thread: `GloryAftermath`
-- Current runtime: `story_amanda_night_after_glory_0`
-- Start binding: `TavernAmandaRoom / enter`
-- Time gate: any day, `18..23`
-- `Event.canTrigger()` fields plus Amanda-specific conditions:
-  - current room is `TavernAmandaRoom`;
-  - current time is night;
-  - Amanda glory event happened within the last two days;
-  - night aftermath not seen today;
-  - Amanda has tried gloryhole.
-- Start:
-  - show Amanda bedroom aftermath text according to prior gloryhole outcome.
 
 ### AmandaTalkHubEvent
 

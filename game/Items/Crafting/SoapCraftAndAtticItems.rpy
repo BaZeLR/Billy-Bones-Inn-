@@ -1,283 +1,17 @@
-        global fun, energy        global fun, energydefault UpstairsRoomSearchState = {}default RustyHunterRifleLoadedAmmo = ""        global fun, SoapExpireDay, SoapAshBarrelReadyDay, HouseholdSoapLastBatchProfile        global SoapExpireDaydefault AtticLootFound = 0
-default AtticSupplyLootFound = 0
-    def crafting:
-        global Crafting
-        if Crafting is None:
-            Crafting = CraftingInfo()
-        return Crafting
-    register_recipe_page(SoapRecipePage)    register_recipe_page(LuxurySoapRecipePage)    register_recipe_page(TorchRecipePage)    register_recipe_page(EthanolRecipePage)    register_recipe_page(EnergyTeaRecipePage)    register_recipe_page(LibidoRecipePage)    register_recipe_page(SpecialCreamRecipePage)    register_recipe_page(DryMossRecipePage)    register_recipe_page(MossGunpowderRecipePage)    register_recipe_page(HealingPotionRecipePage)    register_recipe_page(BandageRecipePage)    register_recipe_page(ClothRopeRecipePage)    register_recipe_page(FireBombRecipePage)    register_recipe_page(BatRepellentRecipePage)label ShootingPracticeReturn(room_code=""):
-    $ _shoot_room_code = str(room_code or CurLoc or "").strip()
-    if _shoot_room_code == "Backyard":
-        call BackyardRestore
-        return
-    if _shoot_room_code == "Forest":
-        call ForestRestore
-        return
-    if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
-        call ForestSubroomRestore
-        return
-    jump expression _shoot_room_code
-
-
-label UseEnergyTeaItem:
-    call UseDrinkItem("energy_tea_001")
-    if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
-        call expression str(restore_label or "")
-        return
-    jump expression _up_room_code
-
-
-label UseLibidoTinctureItem:
-    call UseDrinkItem("libido_tincture_001")
-    return
-
-
-
-        SoapExpireDay = 0            self.soap_look_bonus_until_day = -1label ShootingPracticeReturn(room_code=""):
-    $ _shoot_room_code = str(room_code or CurLoc or "").strip()
-    if _shoot_room_code == "Backyard":
-        jump Backyard
-    if _shoot_room_code == "Forest":
-        jump Forest
-    if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
-        jump expression _shoot_room_code
-    jump expression _shoot_room_code
-
-
-label UseEnergyTeaItem:
-    call UseDrinkItem("energy_tea_001")
-    if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
-        call expression str(restore_label or "")
-        return
-    jump expression _up_room_code
-
-
-label UseLibidoTinctureItem:
-    call UseDrinkItem("libido_tincture_001")
-    returnlabel ShootingPracticeReturn(room_code=""):
-    $ _shoot_room_code = str(room_code or CurLoc or "").strip()
-    if _shoot_room_code == "Backyard":
-        jump Backyard
-    if _shoot_room_code == "Forest":
-        jump Forest
-    if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
-        jump expression _shoot_room_code
-    jump expression _shoot_room_code
-
-
-label UseEnergyTeaItem:
-    call UseDrinkItem("energy_tea_001")
-    if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
-        call expression str(restore_label or "")
-        return
-    jump expression _up_room_code
-
-
-label UseLibidoTinctureItem:
-    call UseDrinkItem("libido_tincture_001")
-    return        global fun, energy        global fun, energydefault UpstairsRoomSearchState = {}default RustyHunterRifleLoadedAmmo = ""        global fun, SoapExpireDay, SoapAshBarrelReadyDay, HouseholdSoapLastBatchProfile        global SoapExpireDaydefault AtticLootFound = 0
-default AtticSupplyLootFound = 0
-    def crafting:
-        global Crafting
-        if Crafting is None:
-            Crafting = CraftingInfo()
-        return Crafting
-    register_recipe_page(SoapRecipePage)    register_recipe_page(LuxurySoapRecipePage)    register_recipe_page(TorchRecipePage)    register_recipe_page(EthanolRecipePage)    register_recipe_page(EnergyTeaRecipePage)    register_recipe_page(LibidoRecipePage)    register_recipe_page(SpecialCreamRecipePage)    register_recipe_page(DryMossRecipePage)    register_recipe_page(MossGunpowderRecipePage)    register_recipe_page(HealingPotionRecipePage)    register_recipe_page(BandageRecipePage)    register_recipe_page(ClothRopeRecipePage)    register_recipe_page(FireBombRecipePage)    register_recipe_page(BatRepellentRecipePage)label ShootingPracticeReturn(room_code=""):
-    $ _shoot_room_code = str(room_code or CurLoc or "").strip()
-    if _shoot_room_code == "Backyard":
-        call BackyardRestore
-        return
-    if _shoot_room_code == "Forest":
-        call ForestRestore
-        return
-    if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
-        call ForestSubroomRestore
-        return
-    jump expression _shoot_room_code
-
-
-label UseEnergyTeaItem:
-    call UseDrinkItem("energy_tea_001")
-    if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
-        call expression str(restore_label or "")
-        return
-    jump expression _up_room_code
-
-
-label UseLibidoTinctureItem:
-    call UseDrinkItem("libido_tincture_001")
-    return
-
-
-
-        SoapExpireDay = 0            self.soap_look_bonus_until_day = -1label ShootingPracticeReturn(room_code=""):
-    $ _shoot_room_code = str(room_code or CurLoc or "").strip()
-    if _shoot_room_code == "Backyard":
-        jump Backyard
-    if _shoot_room_code == "Forest":
-        jump Forest
-    if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
-        jump expression _shoot_room_code
-    jump expression _shoot_room_code
-
-
-label UseEnergyTeaItem:
-    call UseDrinkItem("energy_tea_001")
-    if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
-        call expression str(restore_label or "")
-        return
-    jump expression _up_room_code
-
-
-label UseLibidoTinctureItem:
-    call UseDrinkItem("libido_tincture_001")
-    returnlabel ShootingPracticeReturn(room_code=""):
-    $ _shoot_room_code = str(room_code or CurLoc or "").strip()
-    if _shoot_room_code == "Backyard":
-        jump Backyard
-    if _shoot_room_code == "Forest":
-        jump Forest
-    if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
-        jump expression _shoot_room_code
-    jump expression _shoot_room_code
-
-
-label UseEnergyTeaItem:
-    call UseDrinkItem("energy_tea_001")
-    if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
-        call expression str(restore_label or "")
-        return
-    jump expression _up_room_code
-
-
-label UseLibidoTinctureItem:
-    call UseDrinkItem("libido_tincture_001")
-    return        global fun, energy        global fun, energydefault UpstairsRoomSearchState = {}default RustyHunterRifleLoadedAmmo = ""        global fun, SoapExpireDay, SoapAshBarrelReadyDay, HouseholdSoapLastBatchProfile        global SoapExpireDaydefault AtticLootFound = 0
-default AtticSupplyLootFound = 0
-    def crafting:
-        global Crafting
-        if Crafting is None:
-            Crafting = CraftingInfo()
-        return Crafting
-    register_recipe_page(SoapRecipePage)    register_recipe_page(LuxurySoapRecipePage)    register_recipe_page(TorchRecipePage)    register_recipe_page(EthanolRecipePage)    register_recipe_page(EnergyTeaRecipePage)    register_recipe_page(LibidoRecipePage)    register_recipe_page(SpecialCreamRecipePage)    register_recipe_page(DryMossRecipePage)    register_recipe_page(MossGunpowderRecipePage)    register_recipe_page(HealingPotionRecipePage)    register_recipe_page(BandageRecipePage)    register_recipe_page(ClothRopeRecipePage)    register_recipe_page(FireBombRecipePage)    register_recipe_page(BatRepellentRecipePage)label ShootingPracticeReturn(room_code=""):
-    $ _shoot_room_code = str(room_code or CurLoc or "").strip()
-    if _shoot_room_code == "Backyard":
-        call BackyardRestore
-        return
-    if _shoot_room_code == "Forest":
-        call ForestRestore
-        return
-    if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
-        call ForestSubroomRestore
-        return
-    jump expression _shoot_room_code
-
-
-label UseEnergyTeaItem:
-    call UseDrinkItem("energy_tea_001")
-    if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
-        call expression str(restore_label or "")
-        return
-    jump expression _up_room_code
-
-
-label UseLibidoTinctureItem:
-    call UseDrinkItem("libido_tincture_001")
-    return
-
-
-
-        SoapExpireDay = 0            self.soap_look_bonus_until_day = -1label ShootingPracticeReturn(room_code=""):
-    $ _shoot_room_code = str(room_code or CurLoc or "").strip()
-    if _shoot_room_code == "Backyard":
-        jump Backyard
-    if _shoot_room_code == "Forest":
-        jump Forest
-    if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
-        jump expression _shoot_room_code
-    jump expression _shoot_room_code
-
-
-label UseEnergyTeaItem:
-    call UseDrinkItem("energy_tea_001")
-    if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
-        call expression str(restore_label or "")
-        return
-    jump expression _up_room_code
-
-
-label UseLibidoTinctureItem:
-    call UseDrinkItem("libido_tincture_001")
-    returnlabel ShootingPracticeReturn(room_code=""):
-    $ _shoot_room_code = str(room_code or CurLoc or "").strip()
-    if _shoot_room_code == "Backyard":
-        jump Backyard
-    if _shoot_room_code == "Forest":
-        jump Forest
-    if room_in_group(_shoot_room_code, ROOM_GROUP_FOREST):
-        jump expression _shoot_room_code
-    jump expression _shoot_room_code
-
-
-label UseEnergyTeaItem:
-    call UseDrinkItem("energy_tea_001")
-    if str(restore_label or "") != "" and renpy.has_label(str(restore_label or "")):
-        call expression str(restore_label or "")
-        return
-    jump expression _up_room_code
-
-
-label UseLibidoTinctureItem:
-    call UseDrinkItem("libido_tincture_001")
-    return# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default SoapExpireDay = 0
-default SoapAshBarrelInstalled = 0
-default SoapAshBarrelReadyDay = 0
-default SoapPendingBatches = []
-default SoapStoredBatches = []
-default SoapLookBonusUntilDay = -1
-default SoapRequestQueue = {}
-default HouseholdSoapSampleIntroDone = 0
-default HouseholdSoapSampleGiven = {}
-default HouseholdSoapLastBatchProfile = {}
-default SoapExpireDay = 0
-default SoapAshBarrelInstalled = 0
-default SoapAshBarrelReadyDay = 0
-default SoapPendingBatches = []
-default SoapStoredBatches = []
-default SoapLookBonusUntilDay = -1
-default SoapRequestQueue = {}
-default HouseholdSoapSampleIntroDone = 0
-default HouseholdSoapSampleGiven = {}
-default HouseholdSoapLastBatchProfile = {}
-default SoapExpireDay = 0
-default SoapAshBarrelInstalled = 0
-default SoapAshBarrelReadyDay = 0
-default SoapPendingBatches = []
-default SoapStoredBatches = []
-default SoapLookBonusUntilDay = -1
-default SoapRequestQueue = {}
-default HouseholdSoapSampleIntroDone = 0
-default HouseholdSoapSampleGiven = {}
-default HouseholdSoapLastBatchProfile = {}
 init 4 python:
     class CraftingInfo(object):
         def __init__(self):
-            self.soap_expire_day = 0
-            self.soap_expire_day = 0
             self.ash_barrel_installed = False
             self.ash_barrel_ready_day = 0
             self.pending_soap_batches = []
-            self.stored_soap_batches = []
-            self.soap_look_bonus_until_day = -1
-            self.stored_soap_batches = []
-            self.soap_look_bonus_until_day = -1
             self.soap_requests = {}
             self.soap_sample_intro_done = False
             self.soap_sample_given = {}
             self.last_soap_batch_profile = {}
+            self.special_cream_recipe_unlocked = False
 
     SOAP_HOUSEHOLD_IDS = ("sandra", "melissa", "amanda")
     SOAP_PREFERRED_AROMAS = {
@@ -347,7 +81,8 @@ init 4 python:
         return int(getattr(rifle_item, "state", {}).get("oiled", 0) or 0) == 1
 
     def rusty_hunter_rifle_loaded_ammo():
-        return str(RustyHunterRifleLoadedAmmo or "").strip()
+        rifle_item = rusty_hunter_rifle_item()
+        return str(getattr(rifle_item, "state", {}).get("loaded_ammo", "") or "").strip() if rifle_item is not None else ""
 
     def rusty_hunter_rifle_ammo_name(ammo_code=""):
         ammo_key = str(ammo_code or "").strip()
@@ -412,18 +147,18 @@ init 4 python:
         return False
 
     def soap_recipe_chain_discovered():
-        return player_has_soap_recipe_book() or int(AtticLootFound or 0) == 1
+        return player_has_soap_recipe_book() or bool(rooms.get("TavernAtic").state.get("loot_found", False))
 
     def player_has_soap_recipe_book():
         if player.item_count("recipe_book_001") > 0:
             return True
         try:
-            if _room_has_item_by_id(TavernMyRoomRoom, "recipe_book_001"):
+            if _room_has_item_by_id(rooms.get("TavernMyRoom"), "recipe_book_001"):
                 return True
         except Exception:
             pass
         try:
-            if CurrentRoom is not None and _room_has_item_by_id(CurrentRoom, "recipe_book_001"):
+            if rooms.current is not None and _room_has_item_by_id(rooms.current, "recipe_book_001"):
                 return True
         except Exception:
             pass
@@ -507,7 +242,7 @@ init 4 python:
     def soap_ash_barrel_is_ready():
         if not crafting.ash_barrel_installed:
             return False
-        return int(dayspassed or 0) >= int(SoapAshBarrelReadyDay or 0)
+        return current_game_day() >= int(crafting.ash_barrel_ready_day or 0)
 
     def player_has_rifle_loading_ammo(ammo_code=""):
         ammo_key = str(ammo_code or "").strip()
@@ -526,13 +261,7 @@ init 4 python:
             and rusty_hunter_rifle_is_cleaned()
             and not rusty_hunter_rifle_is_oiled()
             and player.item_count("weapon_oil_001") > 0
-            craft_handler=libido_recipe_craft_handler,
-        craft_handler=luxury_soap_recipe_craft_handler,
-        craft_handler=libido_recipe_craft_handler,
-        craft_handler=luxury_soap_recipe_craft_handler,
-        craft_handler=libido_recipe_craft_handler,
-        craft_handler=luxury_soap_recipe_craft_handler,
-    )
+        )
 
     def rusty_hunter_rifle_can_load(ammo_code=""):
         return (
@@ -556,14 +285,14 @@ init 4 python:
         return player_has_rifle_loading_ammo("arrows") or player_has_rifle_loading_ammo("droplets")
 
     def shooting_practice_intro_text(room_code=""):
-        room_key = str(room_code or CurLoc or "").strip()
+        room_key = str(room_code or rooms.current_code or "").strip()
         if room_key == "Backyard":
             return "Вы присматриваете безопасное место во дворе, ставите у стены старую доску и готовитесь проверить оружие на деле."
         return "Вы выбираете в лесу сухой пень и устраиваете короткую тренировку, чтобы почувствовать оружие в руках."
 
     def shooting_practice_fire_text(ammo_code="", room_code=""):
         ammo_key = str(ammo_code or "").strip()
-        room_key = str(room_code or CurLoc or "").strip()
+        room_key = str(room_code or rooms.current_code or "").strip()
         if ammo_key == "droplets":
             if room_key == "Backyard":
                 return "Вы даете короткий выстрел дробью по доске у стены. Грохот прокатывается по двору, а заряд выбивает из дерева облако щепок."
@@ -573,12 +302,12 @@ init 4 python:
         return "Вы выпускаете стрелу в лесную мишень. Она с глухим стуком вонзается в древесину, и рука запоминает правильное усилие."
 
     def soap_can_cook_at_backyard():
-        if str(CurLoc or "") != "Backyard":
+        if str(rooms.current_code or "") != "Backyard":
             return False
         return recipe_page_can_craft("soap_recipe")
 
     def soap_can_cook_luxury_at_backyard():
-        if str(CurLoc or "") != "Backyard":
+        if str(rooms.current_code or "") != "Backyard":
             return False
         return recipe_page_can_craft("luxury_soap_recipe")
 
@@ -673,83 +402,52 @@ init 4 python:
             return {"ok": False, "text": "На вас уже нечему рваться."}
         return player_tear_wardrobe_dress(current_dress, True, context_text)
 
-    def _soap_recipe_craft_handler(result_item_id="soap_001", use_olive_oil=False, recipe_id="soap_recipe"):
+    class SoapBatchRecipePage(RecipePage):
+        def __init__(self, use_olive_oil=False, **kwargs):
+            self.use_olive_oil = bool(use_olive_oil)
+            super(SoapBatchRecipePage, self).__init__(**kwargs)
 
-        item_result = str(result_item_id or "soap_001").strip()
-        olive_required = bool(use_olive_oil)
-        resolved_rows = recipe_page_requirement_status(recipe_id)
-        soap_flower = recipe_resolved_item_id(resolved_rows, "flower_mix", soap_selected_flower_item())
-        soap_flower_name = str(get_game_item(soap_flower).name if get_game_item(soap_flower) else "травы")
-        soap_additives = [soap_flower]
-        if player.item_count("special_herbs_001") > 0:
-            soap_additives.append("special_herbs_001")
-        if player.item_count("honey_comb_001") > 0:
-            soap_additives.append("honey_comb_001")
-        if olive_required:
-            soap_additives.append("olive_oil_001")
-        batch_profile = soap_batch_profile(soap_additives)
-        consume_result = recipe_consume_required_ingredients(recipe_id, resolved_rows)
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять нужные вещи для мыла."), "recipe_id": recipe_id}
-        if "special_herbs_001" in list(batch_profile.get("aroma_ids", ()) or ()):
-            player.remove_item("special_herbs_001", 1)
-        if "honey_comb_001" in list(batch_profile.get("aroma_ids", ()) or ()):
-            player.remove_item("honey_comb_001", 1)
-        fun = _player_clamp(fun + 20, 0, 100)
-        calendar_v2.advance_minutes(120)
-        crafting.last_soap_batch_profile = dict(batch_profile)
-        crafting.pending_soap_batches.append({
-            "item_id": item_result,
-            "quantity": 4,
-            "ready_day": int(dayspassed or 0) + 7,
-            "profile": dict(batch_profile),
-        })
-        SoapAshBarrelReadyDay = int(dayspassed or 0) + 7
-        update_stat_state()
-        result_name = "роскошное мыло" if item_result == "luxury_soap_001" else "хозяйственное мыло"
-        return {
-            "ok": True,
-            "text": "Вы разводите огонь во дворе, берете настоявшийся щелок из зольной бочки, кипятите его с {} и затем раскладываете густую массу по формам. Это будет {}; запах у партии выходит {}. Теперь мылу нужно как следует вылежаться: партия будет готова примерно через {{b}}неделю{{/b}}. В бочке уже поставлена новая зольная вода, и следующий щелок тоже настоится через неделю.".format(batch_profile.get("craft_text", soap_flower_name), result_name, batch_profile.get("label", soap_flower_name)),
-            "recipe_id": recipe_id,
-            "item_result": item_result,
-            "quantity": 4,
-        }
+        def craft(self, resolved_rows=None):
+            rows = list(resolved_rows if resolved_rows is not None else recipe_page_requirement_status(self.recipe_id))
+            soap_flower = recipe_resolved_item_id(rows, "flower_mix", soap_selected_flower_item())
+            soap_flower_name = str(get_game_item(soap_flower).name if get_game_item(soap_flower) else "травы")
+            soap_additives = [soap_flower]
+            if player.item_count("special_herbs_001") > 0:
+                soap_additives.append("special_herbs_001")
+            if player.item_count("honey_comb_001") > 0:
+                soap_additives.append("honey_comb_001")
+            if self.use_olive_oil:
+                soap_additives.append("olive_oil_001")
+            batch_profile = soap_batch_profile(soap_additives)
+            consume_result = recipe_consume_required_ingredients(self.recipe_id, rows)
+            if not bool(consume_result.get("ok", False)):
+                return {"ok": False, "text": str(consume_result.get("text", "") or self.craft_failure_text), "recipe_id": self.recipe_id}
+            if "special_herbs_001" in list(batch_profile.get("aroma_ids", ()) or ()):
+                player.remove_item("special_herbs_001", 1)
+            if "honey_comb_001" in list(batch_profile.get("aroma_ids", ()) or ()):
+                player.remove_item("honey_comb_001", 1)
+            player.change_stat("fun", 20)
+            calendar_v2.advance_minutes(self.craft_minutes)
+            crafting.last_soap_batch_profile = dict(batch_profile)
+            crafting.pending_soap_batches.append({"item_id": self.item_result, "quantity": self.result_quantity, "ready_day": current_game_day() + 7, "profile": dict(batch_profile)})
+            crafting.ash_barrel_ready_day = current_game_day() + 7
+            update_stat_state()
+            result_name = "роскошное мыло" if self.item_result == "luxury_soap_001" else "хозяйственное мыло"
+            return {"ok": True, "text": "Вы разводите огонь во дворе, берете настоявшийся щелок из зольной бочки, кипятите его с {} и затем раскладываете густую массу по формам. Это будет {}; запах у партии выходит {}. Теперь мылу нужно как следует вылежаться: партия будет готова примерно через {{b}}неделю{{/b}}.".format(batch_profile.get("craft_text", soap_flower_name), result_name, batch_profile.get("label", soap_flower_name)), "recipe_id": self.recipe_id, "item_result": self.item_result, "quantity": self.result_quantity}
 
-    def soap_recipe_craft_handler():
-        return _soap_recipe_craft_handler("soap_001", False, "soap_recipe")
-
-    def luxury_soap_recipe_craft_handler():
-        return _soap_recipe_craft_handler("luxury_soap_001", True, "luxury_soap_recipe")
-
-    def ethanol_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("ethanol_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для спирта."), "recipe_id": "ethanol_recipe"}
-        player.add_item("ethanol_001", 1)
-        calendar_v2.advance_minutes(90)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы давите ягоды, смешиваете их с медовой сладостью, даете настою дойти и затем аккуратно переливаете его в пустую бутылку. В итоге у вас получается бутылка крепкого спирта.",
-            "recipe_id": "ethanol_recipe",
-            "item_result": "ethanol_001",
-            "quantity": 1,
-        }
-
-    def energy_tea_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("energy_tea_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для чая."), "recipe_id": "energy_tea_recipe"}
-        player.add_item("energy_tea_001", 1)
-        calendar_v2.advance_minutes(30)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы завариваете редкие травы с грибной щепотью и медовой сладостью. Настой выходит терпким, но бодрящим, и у вас получается порция бодрящего чая.",
-            "recipe_id": "energy_tea_recipe",
-            "item_result": "energy_tea_001",
-            "quantity": 1,
-        }
+    class LibidoTinctureRecipePage(RecipePage):
+        def craft(self, resolved_rows=None):
+            rows = list(resolved_rows if resolved_rows is not None else recipe_page_requirement_status(self.recipe_id))
+            consume_result = recipe_consume_required_ingredients(self.recipe_id, rows)
+            if not bool(consume_result.get("ok", False)):
+                return {"ok": False, "text": str(consume_result.get("text", "") or self.craft_failure_text), "recipe_id": self.recipe_id}
+            flavor_item = recipe_consumed_item_id(consume_result.get("consumed", []), "flavor_mix", "")
+            if self.item_result:
+                player.add_item(self.item_result, self.result_quantity)
+            calendar_v2.advance_minutes(self.craft_minutes)
+            update_stat_state()
+            flavor_name = "терпкие травы" if flavor_item == "special_herbs_001" else "раздавленные ягоды"
+            return {"ok": True, "text": self.craft_text.format(flavor_name), "recipe_id": self.recipe_id, "item_result": self.item_result, "quantity": self.result_quantity}
 
     def libido_recipe_selected_flavor_item():
         if player.item_count("special_herbs_001") > 0:
@@ -758,355 +456,20 @@ init 4 python:
             return "berries_001"
         return ""
 
-    def libido_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("libido_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для настойки."), "recipe_id": "libido_recipe"}
-        flavor_item = recipe_consumed_item_id(consume_result.get("consumed", []), "flavor_mix", libido_recipe_selected_flavor_item())
-        if flavor_item == "":
-            return {
-                "ok": False,
-                "text": "У вас нет ни редких трав, ни ягод, чтобы довести настой до ума.",
-                "recipe_id": "libido_recipe",
-            }
-        player.add_item("libido_tincture_001", 1)
-        calendar_v2.advance_minutes(50)
-        update_stat_state()
-        flavor_name = "терпкие травы" if flavor_item == "special_herbs_001" else "раздавленные ягоды"
-        return {
-            "ok": True,
-            "text": "Вы смешиваете крепкий спирт с медом и добавляете {}. Напиток получается куда мягче исходного настоя и хорошо годится для подарка, дружеской посиделки или продажи.".format(flavor_name),
-            "recipe_id": "libido_recipe",
-            "item_result": "libido_tincture_001",
-            "quantity": 1,
-        }
-
-    def dry_moss_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("dry_moss_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять сырой мох."), "recipe_id": "dry_moss_recipe"}
-        player.add_item("dried_moss_001", 1)
-        calendar_v2.advance_minutes(30)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы раскладываете сырой мох в сухом месте, даете ему как следует подсохнуть и перетираете его в сухую крошку. Получается заготовка для дальнейших смесей.",
-            "recipe_id": "dry_moss_recipe",
-            "item_result": "dried_moss_001",
-            "quantity": 1,
-        }
-
-    def moss_gunpowder_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("moss_gunpowder_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять сушеный мох."), "recipe_id": "moss_gunpowder_recipe"}
-        player.add_item("gunpowder_001", 1)
-        calendar_v2.advance_minutes(40)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы мелко перетираете высушенный мох и доводите смесь до плотного темного порошка. Получается самодельный пороховой заряд.",
-            "recipe_id": "moss_gunpowder_recipe",
-            "item_result": "gunpowder_001",
-            "quantity": 1,
-        }
-
-    def healing_potion_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("healing_potion_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для зелья."), "recipe_id": "healing_potion_recipe"}
-        player.add_item("healing_potion_001", 1)
-        calendar_v2.advance_minutes(45)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы заливаете сушеный мох горячей водой, добавляете редкие травы и даете настою набрать силу. После этого аккуратно разливаете лечебный отвар по бутылке.",
-            "recipe_id": "healing_potion_recipe",
-            "item_result": "healing_potion_001",
-            "quantity": 1,
-        }
-
-    def bandage_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("bandage_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять материалы для бинта."), "recipe_id": "bandage_recipe"}
-        player.add_item("bandage_001", 1)
-        calendar_v2.advance_minutes(20)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы сворачиваете лоскут ткани с сухим мхом и получаете простой, но полезный перевязочный бинт.",
-            "recipe_id": "bandage_recipe",
-            "item_result": "bandage_001",
-            "quantity": 1,
-        }
-
-    def cloth_rope_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("cloth_rope_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять лоскуты для веревки."), "recipe_id": "cloth_rope_recipe"}
-        player.add_item("rope_001", 1)
-        calendar_v2.advance_minutes(40)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы долго скручиваете полосы ткани в плотный жгут, пока из них не выходит крепкая хозяйственная веревка.",
-            "recipe_id": "cloth_rope_recipe",
-            "item_result": "rope_001",
-            "quantity": 1,
-        }
-
-    def fire_bomb_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("fire_bomb_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для огненной бутылки."), "recipe_id": "fire_bomb_recipe"}
-        player.add_item("fire_bomb_001", 1)
-        calendar_v2.advance_minutes(30)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы смешиваете масло со спиртом, добавляете сухой мох и плотно набиваете этим бутылку. Получается огненная бутылка, которую лучше держать подальше от открытого огня.",
-            "recipe_id": "fire_bomb_recipe",
-            "item_result": "fire_bomb_001",
-            "quantity": 1,
-        }
-
-    def bat_repellent_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("bat_repellent_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для дымной смеси."), "recipe_id": "bat_repellent_recipe"}
-        player.add_item("bat_repellent_001", 1)
-        calendar_v2.advance_minutes(35)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы перетираете сушеный мох с лавандой и редкими травами, завариваете густую душную смесь и разливаете ее в бутылку. Получается едкий дымный состав, которым можно выкуривать дрянь из-под крыши.",
-            "recipe_id": "bat_repellent_recipe",
-            "item_result": "bat_repellent_001",
-            "quantity": 1,
-        }
-
-    def dry_moss_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("dry_moss_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять сырой мох."), "recipe_id": "dry_moss_recipe"}
-        player.add_item("dried_moss_001", 1)
-        calendar_v2.advance_minutes(30)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы раскладываете сырой мох в сухом месте, даете ему как следует подсохнуть и перетираете его в сухую крошку. Получается заготовка для дальнейших смесей.",
-            "recipe_id": "dry_moss_recipe",
-            "item_result": "dried_moss_001",
-            "quantity": 1,
-        }
-
-    def moss_gunpowder_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("moss_gunpowder_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять сушеный мох."), "recipe_id": "moss_gunpowder_recipe"}
-        player.add_item("gunpowder_001", 1)
-        calendar_v2.advance_minutes(40)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы мелко перетираете высушенный мох и доводите смесь до плотного темного порошка. Получается самодельный пороховой заряд.",
-            "recipe_id": "moss_gunpowder_recipe",
-            "item_result": "gunpowder_001",
-            "quantity": 1,
-        }
-
-    def healing_potion_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("healing_potion_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для зелья."), "recipe_id": "healing_potion_recipe"}
-        player.add_item("healing_potion_001", 1)
-        calendar_v2.advance_minutes(45)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы заливаете сушеный мох горячей водой, добавляете редкие травы и даете настою набрать силу. После этого аккуратно разливаете лечебный отвар по бутылке.",
-            "recipe_id": "healing_potion_recipe",
-            "item_result": "healing_potion_001",
-            "quantity": 1,
-        }
-
-    def bandage_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("bandage_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять материалы для бинта."), "recipe_id": "bandage_recipe"}
-        player.add_item("bandage_001", 1)
-        calendar_v2.advance_minutes(20)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы сворачиваете лоскут ткани с сухим мхом и получаете простой, но полезный перевязочный бинт.",
-            "recipe_id": "bandage_recipe",
-            "item_result": "bandage_001",
-            "quantity": 1,
-        }
-
-    def cloth_rope_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("cloth_rope_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять лоскуты для веревки."), "recipe_id": "cloth_rope_recipe"}
-        player.add_item("rope_001", 1)
-        calendar_v2.advance_minutes(40)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы долго скручиваете полосы ткани в плотный жгут, пока из них не выходит крепкая хозяйственная веревка.",
-            "recipe_id": "cloth_rope_recipe",
-            "item_result": "rope_001",
-            "quantity": 1,
-        }
-
-    def fire_bomb_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("fire_bomb_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для огненной бутылки."), "recipe_id": "fire_bomb_recipe"}
-        player.add_item("fire_bomb_001", 1)
-        calendar_v2.advance_minutes(30)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы смешиваете масло со спиртом, добавляете сухой мох и плотно набиваете этим бутылку. Получается огненная бутылка, которую лучше держать подальше от открытого огня.",
-            "recipe_id": "fire_bomb_recipe",
-            "item_result": "fire_bomb_001",
-            "quantity": 1,
-        }
-
-    def bat_repellent_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("bat_repellent_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для дымной смеси."), "recipe_id": "bat_repellent_recipe"}
-        player.add_item("bat_repellent_001", 1)
-        calendar_v2.advance_minutes(35)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы перетираете сушеный мох с лавандой и редкими травами, завариваете густую душную смесь и разливаете ее в бутылку. Получается едкий дымный состав, которым можно выкуривать дрянь из-под крыши.",
-            "recipe_id": "bat_repellent_recipe",
-            "item_result": "bat_repellent_001",
-            "quantity": 1,
-        }
-
-    def dry_moss_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("dry_moss_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять сырой мох."), "recipe_id": "dry_moss_recipe"}
-        player.add_item("dried_moss_001", 1)
-        calendar_v2.advance_minutes(30)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы раскладываете сырой мох в сухом месте, даете ему как следует подсохнуть и перетираете его в сухую крошку. Получается заготовка для дальнейших смесей.",
-            "recipe_id": "dry_moss_recipe",
-            "item_result": "dried_moss_001",
-            "quantity": 1,
-        }
-
-    def moss_gunpowder_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("moss_gunpowder_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять сушеный мох."), "recipe_id": "moss_gunpowder_recipe"}
-        player.add_item("gunpowder_001", 1)
-        calendar_v2.advance_minutes(40)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы мелко перетираете высушенный мох и доводите смесь до плотного темного порошка. Получается самодельный пороховой заряд.",
-            "recipe_id": "moss_gunpowder_recipe",
-            "item_result": "gunpowder_001",
-            "quantity": 1,
-        }
-
-    def healing_potion_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("healing_potion_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для зелья."), "recipe_id": "healing_potion_recipe"}
-        player.add_item("healing_potion_001", 1)
-        calendar_v2.advance_minutes(45)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы заливаете сушеный мох горячей водой, добавляете редкие травы и даете настою набрать силу. После этого аккуратно разливаете лечебный отвар по бутылке.",
-            "recipe_id": "healing_potion_recipe",
-            "item_result": "healing_potion_001",
-            "quantity": 1,
-        }
-
-    def bandage_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("bandage_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять материалы для бинта."), "recipe_id": "bandage_recipe"}
-        player.add_item("bandage_001", 1)
-        calendar_v2.advance_minutes(20)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы сворачиваете лоскут ткани с сухим мхом и получаете простой, но полезный перевязочный бинт.",
-            "recipe_id": "bandage_recipe",
-            "item_result": "bandage_001",
-            "quantity": 1,
-        }
-
-    def cloth_rope_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("cloth_rope_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять лоскуты для веревки."), "recipe_id": "cloth_rope_recipe"}
-        player.add_item("rope_001", 1)
-        calendar_v2.advance_minutes(40)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы долго скручиваете полосы ткани в плотный жгут, пока из них не выходит крепкая хозяйственная веревка.",
-            "recipe_id": "cloth_rope_recipe",
-            "item_result": "rope_001",
-            "quantity": 1,
-        }
-
-    def fire_bomb_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("fire_bomb_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для огненной бутылки."), "recipe_id": "fire_bomb_recipe"}
-        player.add_item("fire_bomb_001", 1)
-        calendar_v2.advance_minutes(30)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы смешиваете масло со спиртом, добавляете сухой мох и плотно набиваете этим бутылку. Получается огненная бутылка, которую лучше держать подальше от открытого огня.",
-            "recipe_id": "fire_bomb_recipe",
-            "item_result": "fire_bomb_001",
-            "quantity": 1,
-        }
-
-    def bat_repellent_recipe_craft_handler():
-        consume_result = recipe_consume_required_ingredients("bat_repellent_recipe")
-        if not bool(consume_result.get("ok", False)):
-            return {"ok": False, "text": str(consume_result.get("text", "") or "Не удалось взять ингредиенты для дымной смеси."), "recipe_id": "bat_repellent_recipe"}
-        player.add_item("bat_repellent_001", 1)
-        calendar_v2.advance_minutes(35)
-        update_stat_state()
-        return {
-            "ok": True,
-            "text": "Вы перетираете сушеный мох с лавандой и редкими травами, завариваете густую душную смесь и разливаете ее в бутылку. Получается едкий дымный состав, которым можно выкуривать дрянь из-под крыши.",
-            "recipe_id": "bat_repellent_recipe",
-            "item_result": "bat_repellent_001",
-            "quantity": 1,
-        }
+    """
+    Retired callback implementations were replaced by RecipePage.craft and the two
+    recipe subclasses above. Keeping the old bodies would create a second crafting
+    authority, so standard consume/produce/time behavior now lives on each page.
+    """
 
     def player_can_use_soap():
         return player.item_count("soap_001") > 0
 
-    def soap_sync_batches():
-        crafting = crafting
-
-        crafting = crafting
-
-        current_day = int(dayspassed or 0)
+    def crafting_release_ready_soap_batches():
+        current_day = current_game_day()
         remaining_pending = []
-        for batch in list(SoapPendingBatches or []):
+        released = 0
+        for batch in list(crafting.pending_soap_batches or []):
             batch_data = dict(batch or {})
             quantity = max(0, int(batch_data.get("quantity", 0) or 0))
             ready_day = int(batch_data.get("ready_day", 0) or 0)
@@ -1117,19 +480,8 @@ init 4 python:
             if quantity <= 0:
                 continue
             if current_day >= ready_day:
-                _player_add_item_by_id(item_id, quantity)
-                SoapStoredBatches.append({
-                    "item_id": item_id,
-                    "quantity": quantity,
-                    "ready_day": ready_day,
-                    "profile": profile,
-                })
-                SoapStoredBatches.append({
-                    "item_id": item_id,
-                    "quantity": quantity,
-                    "ready_day": ready_day,
-                    "profile": profile,
-                })
+                player.add_item(item_id, quantity)
+                released += quantity
             else:
                 remaining_pending.append({
                     "item_id": item_id,
@@ -1137,47 +489,19 @@ init 4 python:
                     "ready_day": ready_day,
                     "profile": profile,
                 })
-        SoapPendingBatches = remaining_pending
-
-        if len(list(SoapStoredBatches or [])) > 0:
-            remaining_stored = []
-            for batch in list(SoapStoredBatches or []):
-                batch_data = dict(batch or {})
-                quantity = max(0, int(batch_data.get("quantity", 0) or 0))
-                if quantity <= 0:
-                    continue
-                profile = dict(batch_data.get("profile", {}) or {})
-                item_id = str(batch_data.get("item_id", "") or "").strip()
-                if item_id == "":
-                    item_id = "luxury_soap_001" if "olive_oil_001" in list(profile.get("aroma_ids", ()) or ()) else "soap_001"
-                remaining_stored.append({
-                    "item_id": item_id,
-                    "quantity": quantity,
-                    "ready_day": int(batch_data.get("ready_day", current_day) or current_day),
-                    "profile": profile,
-                })
-            SoapStoredBatches = remaining_stored
-            SoapExpireDay = 0
-            return
-
-        crafting.soap_expire_day = 0
-
-    def soap_expire_if_needed():
-
-        soap_sync_batches()
-        SoapExpireDay = 0
-
-    def sync_soap_batches_with_day():
-        soap_sync_batches()
-        return int(_player_item_count_by_id("soap_001") or 0)
+        crafting.pending_soap_batches = remaining_pending
+        return released
 
     def upstairs_room_search_done(room_code):
         room_key = str(room_code or "").strip()
-        return int(dict(UpstairsRoomSearchState or {}).get(room_key, 0) or 0) > 0
+        room = rooms.get(room_key)
+        return bool(room is not None and room.state.get("searched", False))
 
     def upstairs_room_mark_searched(room_code):
         room_key = str(room_code or "").strip()
-        UpstairsRoomSearchState[room_key] = 1
+        room = rooms.get(room_key)
+        if room is not None:
+            room.state["searched"] = True
 
     def upstairs_room_search_text(room_code):
         room_key = str(room_code or "").strip()
@@ -1188,11 +512,11 @@ init 4 python:
         if room_key == "TavernSandraRoom":
             return "Вы осматриваете комнату Сандры. Здесь все сложено аккуратно, так что поиски не приносят ничего, кроме уважения к ее хозяйственности."
         if room_key == "TavernMelissaRoom":
-            if int(effective_player_exploration() or 0) >= 100 and int(Melissa.var.get("bats_episode", 0) or 0) >= 2 and int(Melissa.var.get("bats_episode", 0) or 0) < 3:
+            if int(effective_player_exploration() or 0) >= 100 and 2 <= threads["melissaBatProblem"].num < 3:
                 return "Вы осматриваете комнату Мелиссы внимательнее и замечаете под самым потолком несколько совсем маленьких щелей и норок в старом дереве. Оттуда тянет пылью и затхлым чердаком. Похоже, часть дряни лезет сюда не из самой комнаты, а сверху, через старую крышу и балки."
-            if int(Melissa.var.get("bats_episode", 0) or 0) >= 3 and int(Melissa.var.get("bats_episode", 0) or 0) < 4:
+            if 3 <= threads["melissaBatProblem"].num < 4:
                 return "Теперь, когда вы знаете про щели под крышей, становится ясно: без осмотра чердака над комнатой Мелиссы эта история не закончится."
-            if int(Melissa.var.get("bats_episode", 0) or 0) >= 4 and int(Melissa.var.get("bats_episode", 0) or 0) < 8:
+            if 4 <= threads["melissaBatProblem"].num < 8:
                 return "Вы еще раз осматриваете комнату Мелиссы и убеждаетесь, что без чистки чердака и заделки крыши мелкая дрянь будет возвращаться снова и снова."
             return "Вы осматриваете комнату Мелиссы. Ничего ценного не находится, зато становится ясно, что она старается держать свои пожитки в порядке."
         if room_key == "TavernEmptyRoom":
@@ -1201,9 +525,9 @@ init 4 python:
 
     def amanda_night_bowl_available(_obj=None):
         return (
-            str(CurLoc or "") == "TavernAmandaRoom"
-            and int(time or 0) < 4
-            and not amanda_has_given_night_bowl()
+            str(rooms.current_code or "") == "TavernAmandaRoom"
+            and int(calendar_v2.time_slot() or 0) < 4
+            and not Amanda.has_given_night_bowl()
         )
 
     RecipeBookItem = GameItem(
@@ -1592,7 +916,7 @@ init 4 python:
         },
     )
 
-    SoapRecipePage = RecipePage(use_olive_oil=False,
+    SoapRecipePage = SoapBatchRecipePage(use_olive_oil=False,
         recipe_id="soap_recipe",
         title="Хозяйственное мыло",
         image="images/recipe_book/soap_recipe.png",
@@ -1626,15 +950,17 @@ init 4 python:
         unlocked=False,
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=4,
+        craft_minutes=120,
+        craft_text="Вы варите партию мыла и раскладываете ее по формам.",
+        craft_failure_text="Не удалось взять нужные вещи для мыла.",
         notes=[
             "Варить мыло лучше во дворе, где есть огонь и место для большой посуды.",
             "Щелок готовится неделю, а сваренная партия вылеживается еще неделю.",
             "Оливковое масло лучше пустить в отдельную туалетную партию, а не в хозяйственное мыло.",
         ],
-        craft_handler=soap_recipe_craft_handler,
     )
 
-    LuxurySoapRecipePage = RecipePage(use_olive_oil=False,
+    LuxurySoapRecipePage = SoapBatchRecipePage(use_olive_oil=True,
         recipe_id="luxury_soap_recipe",
         title="Туалетное мыло с оливковым маслом",
         image="images/recipe_book/soap_recipe.png",
@@ -1673,6 +999,9 @@ init 4 python:
         unlocked=False,
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=4,
+        craft_minutes=120,
+        craft_text="Вы варите партию туалетного мыла и раскладываете ее по формам.",
+        craft_failure_text="Не удалось взять нужные вещи для туалетного мыла.",
         notes=[
             "Это мыло годится для купания, ухода и подарков, а не только для хозяйственных нужд.",
             "Щелок готовится неделю, а сваренная партия вылеживается еще неделю.",
@@ -1691,6 +1020,9 @@ init 4 python:
         },
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=1,
+        craft_minutes=30,
+        craft_text="Вы обматываете палку вощеной веревкой и получаете надежный факел.",
+        craft_failure_text="Не удалось взять материалы для факела.",
         notes=[
             "Вощеная обмотка и крепкая палка позволяют сделать простой, но надежный факел.",
         ],
@@ -1709,6 +1041,9 @@ init 4 python:
         },
         unlock_condition=soap_recipe_chain_discovered,
         result_quantity=1,
+        craft_minutes=90,
+        craft_text="Вы давите ягоды, смешиваете их с медом и аккуратно переливаете получившийся крепкий спирт в бутылку.",
+        craft_failure_text="Не удалось взять ингредиенты для спирта.",
         notes=[
             "Сладкая ягодная брага дает крепкий настой, если с ней не торопиться.",
             "Готовый спирт лучше сразу перелить в пустую бутылку.",
@@ -1728,6 +1063,9 @@ init 4 python:
         },
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=1,
+        craft_minutes=30,
+        craft_text="Вы завариваете редкие травы с грибной щепотью и медовой сладостью. Настой выходит терпким, но бодрящим, и у вас получается порция бодрящего чая.",
+        craft_failure_text="Не удалось взять ингредиенты для чая.",
         notes=[
             "Правильно заваренные травы и немного медовой сладости хорошо снимают усталость.",
         ],
@@ -1750,6 +1088,9 @@ init 4 python:
         },
         unlock_condition=soap_recipe_chain_discovered,
         result_quantity=1,
+        craft_minutes=50,
+        craft_text="Вы смешиваете крепкий спирт с медом и добавляете {}. Напиток получается мягким и пряным.",
+        craft_failure_text="Не удалось взять ингредиенты для настойки.",
         notes=[
             "Такая настойка уже годится не только для хозяйства, но и для дружеских разговоров.",
             "После пары глотков люди обычно становятся заметно разговорчивее и смелее.",
@@ -1771,7 +1112,7 @@ init 4 python:
                 "note": "Для запаха и мягкости подойдет лаванда, дикая роза или редкие травы.",
             },
         },
-        unlock_condition=clara_paintings_special_cream_recipe_unlocked,
+        unlock_condition=lambda: bool(crafting.special_cream_recipe_unlocked),
         result_quantity=1,
         notes=[
             "Серджио записал рецепт после того, как его отпустили по делу столичного жениха.",
@@ -1789,6 +1130,9 @@ init 4 python:
         },
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=1,
+        craft_minutes=30,
+        craft_text="Вы раскладываете сырой мох в сухом месте, даете ему как следует подсохнуть и перетираете его в сухую крошку. Получается заготовка для дальнейших смесей.",
+        craft_failure_text="Не удалось взять сырой мох.",
         notes=[
             "Сырой мох сперва надо хорошо просушить, иначе он только испортит смесь.",
         ],
@@ -1804,6 +1148,9 @@ init 4 python:
         },
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=1,
+        craft_minutes=40,
+        craft_text="Вы мелко перетираете высушенный мох и доводите смесь до плотного темного порошка. Получается самодельный пороховой заряд.",
+        craft_failure_text="Не удалось взять сушеный мох.",
         notes=[
             "Из хорошо высушенного мха выходит грубый, но годный порошок для старого охотничьего снаряжения.",
         ],
@@ -1822,6 +1169,9 @@ init 4 python:
         },
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=1,
+        craft_minutes=45,
+        craft_text="Вы заливаете сушеный мох горячей водой, добавляете редкие травы и даете настою набрать силу. После этого аккуратно разливаете лечебный отвар по бутылке.",
+        craft_failure_text="Не удалось взять ингредиенты для зелья.",
         notes=[
             "Сушеный мох и редкие травы дают густой лечебный отвар, если заварить их в горячей воде.",
         ],
@@ -1838,6 +1188,9 @@ init 4 python:
         },
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=1,
+        craft_minutes=20,
+        craft_text="Вы сворачиваете лоскут ткани с сухим мхом и получаете простой, но полезный перевязочный бинт.",
+        craft_failure_text="Не удалось взять материалы для бинта.",
         notes=[
             "Чистый лоскут и сухой мох дают простую, но полезную перевязку.",
         ],
@@ -1853,6 +1206,9 @@ init 4 python:
         },
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=1,
+        craft_minutes=40,
+        craft_text="Вы долго скручиваете полосы ткани в плотный жгут, пока из них не выходит крепкая хозяйственная веревка.",
+        craft_failure_text="Не удалось взять лоскуты для веревки.",
         notes=[
             "Если ткани накопилось достаточно, ее можно пустить на грубую, но крепкую веревку.",
         ],
@@ -1871,6 +1227,9 @@ init 4 python:
         },
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=1,
+        craft_minutes=30,
+        craft_text="Вы смешиваете масло со спиртом, добавляете сухой мох и плотно набиваете этим бутылку. Получается огненная бутылка, которую лучше держать подальше от открытого огня.",
+        craft_failure_text="Не удалось взять ингредиенты для огненной бутылки.",
         notes=[
             "Это уже не хозяйственная поделка, а грубое зажигательное оружие.",
         ],
@@ -1887,30 +1246,46 @@ init 4 python:
             "lavender_001": {"quantity": 1, "unit": "веточка"},
             "empty_bottle_001": {"quantity": 1, "unit": "бутылка"},
         },
-        unlock_condition=lambda: Melissa.bat_repellent_recipe_unlocked(),
+        unlock_condition=recipe_book_hidden_recipes_revealed,
         result_quantity=1,
+        craft_minutes=35,
+        craft_text="Вы перетираете сушеный мох с лавандой и редкими травами, завариваете густую душную смесь и разливаете ее в бутылку. Получается едкий дымный состав, которым можно выкуривать дрянь из-под крыши.",
+        craft_failure_text="Не удалось взять ингредиенты для дымной смеси.",
         notes=[
             "Смесь годится не для лечения, а чтобы выкуривать из-под крыши мелкую дрянь и летучих тварей.",
         ],
     )
 
 
+default crafting = CraftingInfo()
+
+
 label AtticInventoryMenu(return_context="attic", room_code="TavernAtic"):
-    $ current_action_title = "Вещи"
-    $ current_action_content = None
-    $ current_action_items = []
+    $ renpy.dynamic("_item_id")
+    $ main_ui_runtime.action_title = "Вещи"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     python:
         for _item_id in attic_manageable_item_ids():
             if player.item_count(_item_id) > 0:
-                current_action_items.append(MenuItem(attic_item_menu_caption(_item_id), Call("AtticInventoryItemMenu", _item_id, return_context, room_code)))
-        if len(current_action_items) <= 0:
-            MainTxt = "Сейчас у вас нет найденных на чердаке вещей при себе."
-            CurLocDesc = MainTxt
-        current_action_items.append(MenuItem("Назад", Call("AtticInventoryReturn", return_context, room_code)))
+                main_ui_runtime.action_items.append(MenuItem(attic_item_menu_caption(_item_id), Call("AtticInventoryItemMenu", _item_id, return_context, room_code)))
+        if len(main_ui_runtime.action_items) <= 0:
+            scene_runtime.text = "Сейчас у вас нет найденных на чердаке вещей при себе."
+            scene_runtime.location_text = scene_runtime.text
+        if str(return_context or "") == "chest":
+            main_ui_runtime.action_items.append(MenuItem("Назад", Call("TavernMyRoomOpenChest")))
+        else:
+            main_ui_runtime.action_items.append(MenuItem("Назад", [
+                SetField(main_ui_runtime, "action_title", "Действия"),
+                SetField(main_ui_runtime, "action_content", None),
+                SetField(main_ui_runtime, "action_items", tavern_atic_action_items()),
+                Function(main_ui_restart_interaction),
+            ]))
     return
 
 
 label AtticInventoryItemMenu(item_id="", return_context="attic", room_code="TavernAtic", preserve_text=False):
+    $ renpy.dynamic("_item_id", "_item_obj", "_status_text")
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
     if _item_obj is None or player.item_count(_item_id) <= 0:
@@ -1919,55 +1294,57 @@ label AtticInventoryItemMenu(item_id="", return_context="attic", room_code="Tave
     $ _status_text = attic_item_equipped_text(_item_id)
     if not bool(preserve_text):
         if str(_status_text or "").strip() != "":
-            $ MainTxt = runtime_item_description_text(_item_id) + "\n\n" + str(_status_text or "")
+            $ scene_runtime.text = runtime_item_description_text(_item_id) + "\n\n" + str(_status_text or "")
         else:
-            $ MainTxt = runtime_item_description_text(_item_id)
+            $ scene_runtime.text = runtime_item_description_text(_item_id)
         if _item_id == "rusty_hunter_rifle_001":
-            $ MainTxt = str(MainTxt or "") + "\n\n" + "\n".join(rusty_hunter_rifle_status_lines())
-        $ CurLocDesc = MainTxt
-    $ current_action_title = runtime_item_display_name(_item_id) or str(_item_obj.name or "Вещь")
-    $ current_action_content = None
-    $ current_action_items = []
+            $ scene_runtime.text = str(scene_runtime.text or "") + "\n\n" + "\n".join(rusty_hunter_rifle_status_lines())
+        $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = runtime_item_display_name(_item_id) or str(_item_obj.name or "Вещь")
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     if bool(getattr(_item_obj, "readable", False)):
-        $ current_action_items.append(MenuItem("Прочитать", Call("AtticInventoryReadItem", _item_id, return_context, room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Прочитать", Call("AtticInventoryReadItem", _item_id, return_context, room_code)))
     if _item_id == "soap_001" and player_can_use_soap():
-        $ current_action_items.append(MenuItem("Использовать мыло", Call("AtticInventoryUseSoap", _item_id, return_context, room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Использовать мыло", Call("AtticInventoryUseSoap", _item_id, return_context, room_code)))
     if _item_id == "cork_001":
-        $ current_action_items.append(MenuItem("Использовать пробку", Call("AtticInventoryUseCork", _item_id, return_context, room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Использовать пробку", Call("AtticInventoryUseCork", _item_id, return_context, room_code)))
     if _item_id == "rusty_hunter_rifle_001":
         if rusty_hunter_rifle_can_clean():
-            $ current_action_items.append(MenuItem("Счистить ржавчину", Call("AtticInventoryRifleCleanRust", return_context, room_code)))
+            $ main_ui_runtime.action_items.append(MenuItem("Счистить ржавчину", Call("AtticInventoryRifleCleanRust", return_context, room_code)))
         if rusty_hunter_rifle_can_oil():
-            $ current_action_items.append(MenuItem("Смазать механизм", Call("AtticInventoryRifleOil", return_context, room_code)))
+            $ main_ui_runtime.action_items.append(MenuItem("Смазать механизм", Call("AtticInventoryRifleOil", return_context, room_code)))
         if rusty_hunter_rifle_can_load("arrows"):
-            $ current_action_items.append(MenuItem("Зарядить стрелой", Call("AtticInventoryRifleLoadAmmo", "arrows", return_context, room_code)))
+            $ main_ui_runtime.action_items.append(MenuItem("Зарядить стрелой", Call("AtticInventoryRifleLoadAmmo", "arrows", return_context, room_code)))
         if rusty_hunter_rifle_can_load("droplets"):
-            $ current_action_items.append(MenuItem("Зарядить дробью", Call("AtticInventoryRifleLoadAmmo", "droplets", return_context, room_code)))
+            $ main_ui_runtime.action_items.append(MenuItem("Зарядить дробью", Call("AtticInventoryRifleLoadAmmo", "droplets", return_context, room_code)))
         if rusty_hunter_rifle_can_unload():
-            $ current_action_items.append(MenuItem("Разрядить оружие", Call("AtticInventoryRifleUnload", return_context, room_code)))
+            $ main_ui_runtime.action_items.append(MenuItem("Разрядить оружие", Call("AtticInventoryRifleUnload", return_context, room_code)))
     if str(_item_id) == str(player.equipment.weapon or ""):
-        $ current_action_items.append(MenuItem("Убрать оружие", Call("AtticInventoryUnequipItem", _item_id, return_context, room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Убрать оружие", Call("AtticInventoryUnequipItem", _item_id, return_context, room_code)))
     elif str(getattr(_item_obj, "custom_properties", {}).get("item_kind", "") or "") == "weapon":
-        $ current_action_items.append(MenuItem("Вооружиться", Call("AtticInventoryEquipItem", _item_id, return_context, room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Вооружиться", Call("AtticInventoryEquipItem", _item_id, return_context, room_code)))
     if str(_item_id) == str(player.equipment.armor or ""):
-        $ current_action_items.append(MenuItem("Снять", Call("AtticInventoryUnequipItem", _item_id, return_context, room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Снять", Call("AtticInventoryUnequipItem", _item_id, return_context, room_code)))
     elif str(getattr(_item_obj, "custom_properties", {}).get("item_kind", "") or "") == "armor":
-        $ current_action_items.append(MenuItem("Надеть", Call("AtticInventoryEquipItem", _item_id, return_context, room_code)))
-    $ current_action_items.append(MenuItem("Оставить здесь", Call("AtticInventoryDropItem", _item_id, return_context, room_code)))
-    $ current_action_items.append(MenuItem("Назад", Call("AtticInventoryMenu", return_context, room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Надеть", Call("AtticInventoryEquipItem", _item_id, return_context, room_code)))
+    $ main_ui_runtime.action_items.append(MenuItem("Оставить здесь", Call("AtticInventoryDropItem", _item_id, return_context, room_code)))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", Call("AtticInventoryMenu", return_context, room_code)))
     return
 
 
 label AtticInventoryReadItem(item_id="", return_context="attic", room_code="TavernAtic"):
+    $ renpy.dynamic("_item_id")
     $ _item_id = str(item_id or "").strip()
     if _item_id == "recipe_book_001":
-        $ MainTxt = recipe_book_read_text()
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = recipe_book_read_text()
+        $ scene_runtime.location_text = scene_runtime.text
     call AtticInventoryItemMenu(_item_id, return_context, room_code, True)
     return
 
 
 label AtticInventoryEquipItem(item_id="", return_context="attic", room_code="TavernAtic"):
+    $ renpy.dynamic("_item_id", "_item_obj")
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
     if _item_obj is None or player.item_count(_item_id) <= 0:
@@ -1975,19 +1352,20 @@ label AtticInventoryEquipItem(item_id="", return_context="attic", room_code="Tav
         return
     if str(getattr(_item_obj, "custom_properties", {}).get("item_kind", "") or "") == "weapon":
         $ player.equipment.weapon = _item_id
-        $ MainTxt = "Вы берете при себе " + runtime_item_display_name(_item_id) + "."
+        $ scene_runtime.text = "Вы берете при себе " + runtime_item_display_name(_item_id) + "."
     elif str(getattr(_item_obj, "custom_properties", {}).get("item_kind", "") or "") == "armor":
         $ player.equipment.armor = _item_id
-        $ MainTxt = "Вы надеваете " + runtime_item_display_name(_item_id) + "."
+        $ scene_runtime.text = "Вы надеваете " + runtime_item_display_name(_item_id) + "."
     else:
-        $ MainTxt = "Сейчас это нельзя надеть."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Сейчас это нельзя надеть."
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call AtticInventoryItemMenu(_item_id, return_context, room_code, True)
     return
 
 
 label AtticInventoryUnequipItem(item_id="", return_context="attic", room_code="TavernAtic"):
+    $ renpy.dynamic("_item_id", "_item_obj")
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
     if _item_obj is None:
@@ -1995,34 +1373,35 @@ label AtticInventoryUnequipItem(item_id="", return_context="attic", room_code="T
         return
     if _item_id == str(player.equipment.weapon or ""):
         $ player.equipment.weapon = ""
-        $ MainTxt = "Вы убираете " + str(_item_obj.name or _item_id) + "."
+        $ scene_runtime.text = "Вы убираете " + str(_item_obj.name or _item_id) + "."
     elif _item_id == str(player.equipment.armor or ""):
         $ player.equipment.armor = ""
-        $ MainTxt = "Вы снимаете " + str(_item_obj.name or _item_id) + "."
+        $ scene_runtime.text = "Вы снимаете " + str(_item_obj.name or _item_id) + "."
     else:
-        $ MainTxt = "Сейчас это и так не надето."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Сейчас это и так не надето."
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call AtticInventoryItemMenu(_item_id, return_context, room_code, True)
     return
 
 
 label AtticInventoryDropItem(item_id="", return_context="attic", room_code="TavernAtic"):
+    $ renpy.dynamic("_item_id", "_item_obj", "_drop_result")
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
     if _item_id == str(player.equipment.weapon or ""):
         $ player.equipment.weapon = ""
     if _item_id == str(player.equipment.armor or ""):
         $ player.equipment.armor = ""
-    $ _drop_result = player_drop_item(CurrentRoom, _item_id)
+    $ _drop_result = player_drop_item(rooms.current, _item_id)
     if _drop_result.get("ok", False):
         if _item_obj is not None:
-            $ MainTxt = "Вы оставляете здесь " + str(_item_obj.name or _item_id) + "."
+            $ scene_runtime.text = "Вы оставляете здесь " + str(_item_obj.name or _item_id) + "."
         else:
-            $ MainTxt = str(_drop_result.get("text", "") or "Вы оставляете предмет здесь.")
+            $ scene_runtime.text = str(_drop_result.get("text", "") or "Вы оставляете предмет здесь.")
     else:
-        $ MainTxt = str(_drop_result.get("text", "") or "У вас этого нет.")
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = str(_drop_result.get("text", "") or "У вас этого нет.")
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call AtticInventoryMenu(return_context, room_code)
     return
@@ -2030,81 +1409,83 @@ label AtticInventoryDropItem(item_id="", return_context="attic", room_code="Tave
 
 label AtticInventoryUseSoap(item_id="", return_context="attic", room_code="TavernAtic"):
     if player.item_count("soap_001") <= 0:
-        $ MainTxt = "У вас больше не осталось мыла."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "У вас больше не осталось мыла."
+        $ scene_runtime.location_text = scene_runtime.text
         call AtticInventoryMenu(return_context, room_code)
         return
     $ player.remove_item("soap_001", 1)
-    $ player_state().appearance.wash()
-    $ SoapLookBonusUntilDay = int(dayspassed or 0) + 1
-    $ fun = _player_clamp(fun + 2, 0, 100)
+    $ player.appearance.wash_with_soap(current_game_day(), 10, 1)
+    $ player.change_stat("fun", 2)
     call stat
-    $ MainTxt = "Вы тщательно моетесь душистым домашним мылом. Кожа становится чище, запах приятнее, а выглядите вы заметно лучше. Чистота и свежесть еще какое-то время будут работать на ваш вид."
+    $ scene_runtime.text = "Вы тщательно моетесь душистым домашним мылом. Кожа становится чище, запах приятнее, а выглядите вы заметно лучше. Чистота и свежесть еще какое-то время будут работать на ваш вид."
     if player.item_count("soap_001") <= 0:
-        $ MainTxt = MainTxt + "\n\nЭто был последний кусок обычного мыла."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = scene_runtime.text + "\n\nЭто был последний кусок обычного мыла."
+    $ scene_runtime.location_text = scene_runtime.text
     call AtticInventoryMenu(return_context, room_code)
     return
 
 
 label AtticInventoryUseCork(item_id="", return_context="attic", room_code="TavernAtic"):
     if int(player.item_count("cork_001") or 0) <= 0:
-        $ MainTxt = "У вас сейчас нет пробки."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "У вас сейчас нет пробки."
+        $ scene_runtime.location_text = scene_runtime.text
         call AtticInventoryMenu(return_context, room_code)
         return
     if int(player.item_count("empty_bottle_001") or 0) <= 0 and int(player.item_count("ethanol_001") or 0) <= 0:
-        $ MainTxt = "Пробку пока не к чему применить. У вас нет под рукой подходящей бутылки."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Пробку пока не к чему применить. У вас нет под рукой подходящей бутылки."
+        $ scene_runtime.location_text = scene_runtime.text
         call AtticInventoryMenu(return_context, room_code)
         return
     $ player.remove_item("cork_001", 1)
-    $ MainTxt = "Вы плотно затыкаете бутылку пробкой. Теперь содержимое не расплещется по дороге."
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = "Вы плотно затыкаете бутылку пробкой. Теперь содержимое не расплещется по дороге."
+    $ scene_runtime.location_text = scene_runtime.text
     call AtticInventoryMenu(return_context, room_code)
     return
 
 
 label AtticInventoryRifleCleanRust(return_context="attic", room_code="TavernAtic"):
+    $ renpy.dynamic("_rifle_item")
     $ _rifle_item = rusty_hunter_rifle_item()
     if _rifle_item is None or player.item_count("rusty_hunter_rifle_001") <= 0:
         call AtticInventoryMenu(return_context, room_code)
         return
     if rusty_hunter_rifle_is_cleaned():
-        $ MainTxt = "Вы уже счистили основную ржавчину с механизма."
+        $ scene_runtime.text = "Вы уже счистили основную ржавчину с механизма."
     else:
         $ _rifle_item.state["rust_cleaned"] = 1
-        $ MainTxt = "Вы долго скоблите металл, снимаете рыжий налет и понемногу приводите механизм в порядок. Оружие уже не выглядит совсем уж мертвым."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Вы долго скоблите металл, снимаете рыжий налет и понемногу приводите механизм в порядок. Оружие уже не выглядит совсем уж мертвым."
+    $ scene_runtime.location_text = scene_runtime.text
     call AtticInventoryItemMenu("rusty_hunter_rifle_001", return_context, room_code, True)
     return
 
 
 label AtticInventoryRifleOil(return_context="attic", room_code="TavernAtic"):
+    $ renpy.dynamic("_rifle_item")
     $ _rifle_item = rusty_hunter_rifle_item()
     if _rifle_item is None or player.item_count("rusty_hunter_rifle_001") <= 0:
         call AtticInventoryMenu(return_context, room_code)
         return
     if not rusty_hunter_rifle_is_cleaned():
-        $ MainTxt = "Сначала нужно счистить ржавчину, иначе толку от масла будет мало."
+        $ scene_runtime.text = "Сначала нужно счистить ржавчину, иначе толку от масла будет мало."
     elif rusty_hunter_rifle_is_oiled():
-        $ MainTxt = "Механизм уже смазан и ходит заметно мягче."
+        $ scene_runtime.text = "Механизм уже смазан и ходит заметно мягче."
     elif player.item_count("weapon_oil_001") <= 0:
-        $ MainTxt = "У вас нет оружейного масла."
+        $ scene_runtime.text = "У вас нет оружейного масла."
     else:
         $ player.remove_item("weapon_oil_001", 1)
         $ _rifle_item.state["oiled"] = 1
-        $ MainTxt = "Вы аккуратно смазываете механизм оружейным маслом. Скрип уходит, а детали начинают двигаться куда увереннее."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Вы аккуратно смазываете механизм оружейным маслом. Скрип уходит, а детали начинают двигаться куда увереннее."
+    $ scene_runtime.location_text = scene_runtime.text
     call AtticInventoryItemMenu("rusty_hunter_rifle_001", return_context, room_code, True)
     return
 
 
 label AtticInventoryRifleLoadAmmo(ammo_code="arrows", return_context="attic", room_code="TavernAtic"):
+    $ renpy.dynamic("_ammo_code")
     $ _ammo_code = str(ammo_code or "").strip()
     if not rusty_hunter_rifle_can_load(_ammo_code):
-        $ MainTxt = "Сейчас оружие нельзя так зарядить."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Сейчас оружие нельзя так зарядить."
+        $ scene_runtime.location_text = scene_runtime.text
         call AtticInventoryItemMenu("rusty_hunter_rifle_001", return_context, room_code, True)
         return
     if _ammo_code == "arrows":
@@ -2112,18 +1493,19 @@ label AtticInventoryRifleLoadAmmo(ammo_code="arrows", return_context="attic", ro
     elif _ammo_code == "droplets":
         $ player.remove_item("droplets_001", 1)
         $ player.remove_item("gunpowder_001", 1)
-    $ RustyHunterRifleLoadedAmmo = _ammo_code
-    $ MainTxt = "Вы заряжаете оружие {} и осторожно ставите механизм наготове.".format(rusty_hunter_rifle_ammo_name(_ammo_code))
-    $ CurLocDesc = MainTxt
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = _ammo_code
+    $ scene_runtime.text = "Вы заряжаете оружие {} и осторожно ставите механизм наготове.".format(rusty_hunter_rifle_ammo_name(_ammo_code))
+    $ scene_runtime.location_text = scene_runtime.text
     call AtticInventoryItemMenu("rusty_hunter_rifle_001", return_context, room_code, True)
     return
 
 
 label AtticInventoryRifleUnload(return_context="attic", room_code="TavernAtic"):
+    $ renpy.dynamic("_loaded_ammo")
     $ _loaded_ammo = rusty_hunter_rifle_loaded_ammo()
     if _loaded_ammo == "":
-        $ MainTxt = "Оружие и так уже разряжено."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Оружие и так уже разряжено."
+        $ scene_runtime.location_text = scene_runtime.text
         call AtticInventoryItemMenu("rusty_hunter_rifle_001", return_context, room_code, True)
         return
     if _loaded_ammo == "arrows":
@@ -2131,81 +1513,81 @@ label AtticInventoryRifleUnload(return_context="attic", room_code="TavernAtic"):
     elif _loaded_ammo == "droplets":
         $ player.add_item("droplets_001", 1)
         $ player.add_item("gunpowder_001", 1)
-    $ RustyHunterRifleLoadedAmmo = ""
-    $ MainTxt = "Вы осторожно разряжаете оружие и убираете заряд."
-    $ CurLocDesc = MainTxt
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
+    $ scene_runtime.text = "Вы осторожно разряжаете оружие и убираете заряд."
+    $ scene_runtime.location_text = scene_runtime.text
     call AtticInventoryItemMenu("rusty_hunter_rifle_001", return_context, room_code, True)
     return
 
 
-label AtticInventoryReturn(return_context="attic", room_code="TavernAtic"):
-    if str(return_context or "") == "chest":
-        call TavernMyRoomOpenChest
-        return
-    if str(room_code or "") == "TavernAtic":
-        call TavernAticRestore
-        return
-    jump expression room_code
-
-
-label UpstairsRoomSearch(room_code="", restore_label=""):
-    $ _up_room_code = str(room_code or CurLoc or "")
+label UpstairsRoomSearch(room_code=""):
+    $ renpy.dynamic("_up_room_code")
+    $ _up_room_code = str(room_code or rooms.current_code or "")
     $ findAvailableEvents(True)
     if story_event_available(_up_room_code, "room_search"):
         call checkTriggers(_up_room_code, "room_search", 0)
         return
-    $ MainTxt = upstairs_room_search_text(_up_room_code)
-    $ CurLocDesc = MainTxt
-    if str(_up_room_code or "") == "TavernMelissaRoom" and int(effective_player_exploration() or 0) >= 100 and int(Melissa.var.get("bats_episode", 0) or 0) >= 2 and int(Melissa.var.get("bats_episode", 0) or 0) < 3:
-        $ Melissa.var["bats_episode"] = 3
+    $ scene_runtime.text = upstairs_room_search_text(_up_room_code)
+    $ scene_runtime.location_text = scene_runtime.text
     $ upstairs_room_mark_searched(_up_room_code)
     return
 
 
 label BackyardCookSoap(recipe_id="soap_recipe"):
+    $ renpy.dynamic("_soap_recipe_id", "_soap_craft_result")
     $ _soap_recipe_id = str(recipe_id or "soap_recipe").strip()
     if not recipe_page_can_craft(_soap_recipe_id):
-        $ MainTxt = "У вас нет необходимых ингредиентов, чтобы сварить мыло."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "У вас нет необходимых ингредиентов, чтобы сварить мыло."
+        $ scene_runtime.location_text = scene_runtime.text
         call BackyardObjectMenu("backyard_ash_barrel", True)
         return
 
     $ _soap_craft_result = apply_recipe_craft(_soap_recipe_id)
-    $ MainTxt = str(_soap_craft_result.get("text", "") or "Вы варите мыло.")
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = str(_soap_craft_result.get("text", "") or "Вы варите мыло.")
+    $ scene_runtime.location_text = scene_runtime.text
     call BackyardObjectMenu("backyard_ash_barrel", True)
     return
 
 
 label ShootingPracticeMenu(room_code=""):
-    $ _shoot_room_code = str(room_code or CurLoc or "").strip()
+    $ renpy.dynamic("_shoot_room_code", "_shoot_return_items")
+    $ _shoot_room_code = str(room_code or rooms.current_code or "").strip()
+    if _shoot_room_code == "Backyard":
+        $ _shoot_return_items = backyard_action_items()
+    elif _shoot_room_code == "Forest":
+        $ _shoot_return_items = forest_action_items()
+    else:
+        $ _shoot_return_items = forest_subroom_action_items(rooms.current)
     if not player_can_train_shooting():
-        $ MainTxt = "Сейчас вам нечем как следует потренироваться в стрельбе."
-        $ CurLocDesc = MainTxt
-        call ShootingPracticeReturn(_shoot_room_code)
+        $ scene_runtime.text = "Сейчас вам нечем как следует потренироваться в стрельбе."
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_title = "Действия"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = _shoot_return_items
         return
-    $ MainTxt = shooting_practice_intro_text(_shoot_room_code)
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Стрельба"
-    $ current_action_content = None
-    $ current_action_items = []
+    $ scene_runtime.text = shooting_practice_intro_text(_shoot_room_code)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Стрельба"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     if rusty_hunter_rifle_loaded_ammo() != "":
-        $ current_action_items.append(MenuItem("Сделать пробный выстрел ({})".format(rusty_hunter_rifle_ammo_name(rusty_hunter_rifle_loaded_ammo())), Call("ShootingPracticeFire", _shoot_room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Сделать пробный выстрел ({})".format(rusty_hunter_rifle_ammo_name(rusty_hunter_rifle_loaded_ammo())), Call("ShootingPracticeFire", _shoot_room_code)))
     if rusty_hunter_rifle_can_load("arrows"):
-        $ current_action_items.append(MenuItem("Зарядить стрелой", Call("ShootingPracticeLoadAmmo", "arrows", _shoot_room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Зарядить стрелой", Call("ShootingPracticeLoadAmmo", "arrows", _shoot_room_code)))
     if rusty_hunter_rifle_can_load("droplets"):
-        $ current_action_items.append(MenuItem("Зарядить дробью", Call("ShootingPracticeLoadAmmo", "droplets", _shoot_room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Зарядить дробью", Call("ShootingPracticeLoadAmmo", "droplets", _shoot_room_code)))
     if rusty_hunter_rifle_can_unload():
-        $ current_action_items.append(MenuItem("Разрядить оружие", Call("ShootingPracticeUnload", _shoot_room_code)))
-    $ current_action_items.append(MenuItem("Назад", Call("ShootingPracticeReturn", _shoot_room_code)))
+        $ main_ui_runtime.action_items.append(MenuItem("Разрядить оружие", Call("ShootingPracticeUnload", _shoot_room_code)))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", _shoot_return_items), Function(main_ui_restart_interaction)]))
     return
 
 
 label ShootingPracticeLoadAmmo(ammo_code="arrows", room_code=""):
+    $ renpy.dynamic("_ammo_code")
     $ _ammo_code = str(ammo_code or "").strip()
     if not rusty_hunter_rifle_can_load(_ammo_code):
-        $ MainTxt = "Сейчас оружие нельзя так зарядить."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Сейчас оружие нельзя так зарядить."
+        $ scene_runtime.location_text = scene_runtime.text
         call ShootingPracticeMenu(room_code)
         return
     if _ammo_code == "arrows":
@@ -2213,18 +1595,19 @@ label ShootingPracticeLoadAmmo(ammo_code="arrows", room_code=""):
     elif _ammo_code == "droplets":
         $ player.remove_item("droplets_001", 1)
         $ player.remove_item("gunpowder_001", 1)
-    $ RustyHunterRifleLoadedAmmo = _ammo_code
-    $ MainTxt = "Вы спокойно заряжаете оружие {} для тренировки.".format(rusty_hunter_rifle_ammo_name(_ammo_code))
-    $ CurLocDesc = MainTxt
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = _ammo_code
+    $ scene_runtime.text = "Вы спокойно заряжаете оружие {} для тренировки.".format(rusty_hunter_rifle_ammo_name(_ammo_code))
+    $ scene_runtime.location_text = scene_runtime.text
     call ShootingPracticeMenu(room_code)
     return
 
 
 label ShootingPracticeUnload(room_code=""):
+    $ renpy.dynamic("_loaded_ammo")
     $ _loaded_ammo = rusty_hunter_rifle_loaded_ammo()
     if _loaded_ammo == "":
-        $ MainTxt = "Оружие и так уже разряжено."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Оружие и так уже разряжено."
+        $ scene_runtime.location_text = scene_runtime.text
         call ShootingPracticeMenu(room_code)
         return
     if _loaded_ammo == "arrows":
@@ -2232,27 +1615,28 @@ label ShootingPracticeUnload(room_code=""):
     elif _loaded_ammo == "droplets":
         $ player.add_item("droplets_001", 1)
         $ player.add_item("gunpowder_001", 1)
-    $ RustyHunterRifleLoadedAmmo = ""
-    $ MainTxt = "Вы снимаете заряд и снова оставляете оружие разряженным."
-    $ CurLocDesc = MainTxt
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
+    $ scene_runtime.text = "Вы снимаете заряд и снова оставляете оружие разряженным."
+    $ scene_runtime.location_text = scene_runtime.text
     call ShootingPracticeMenu(room_code)
     return
 
 
 label ShootingPracticeFire(room_code=""):
+    $ renpy.dynamic("_loaded_ammo")
     $ _loaded_ammo = rusty_hunter_rifle_loaded_ammo()
     if _loaded_ammo == "":
-        $ MainTxt = "Сначала нужно зарядить оружие."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Сначала нужно зарядить оружие."
+        $ scene_runtime.location_text = scene_runtime.text
         call ShootingPracticeMenu(room_code)
         return
     python:
         calendar_v2.advance_minutes(30)
-        fun = _player_clamp(fun + 3, 0, 100)
-        energy = _player_clamp(energy - 4, 0, 100)
-    $ MainTxt = shooting_practice_fire_text(_loaded_ammo, room_code)
-    $ CurLocDesc = MainTxt
-    $ RustyHunterRifleLoadedAmmo = ""
+        player.change_stat("fun", 3)
+        player.change_stat("energy", -4)
+    $ scene_runtime.text = shooting_practice_fire_text(_loaded_ammo, room_code)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
     call stat
     call ShootingPracticeMenu(room_code)
     return

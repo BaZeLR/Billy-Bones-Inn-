@@ -4,27 +4,27 @@
 init python:
     def tavern_bar_clara_melissa_gossip_available():
         return (
-            str(CurLoc or "") == "TavernMain"
-            and str(getLocation("clara") or "") == "TavernMain"
-            and str(getLocation("melissa") or "") == "TavernMain"
+            str(rooms.current_code or "") == "TavernMain"
+            and str(people.location("clara") or "") == "TavernMain"
+            and str(people.location("melissa") or "") == "TavernMain"
             and story_event_available("TavernMain", "clara_tavern_visit")
         )
 
     def tavern_bar_invite_targets():
         targets = []
-        clara_info = getPersonInfo("clara")
-        becky_info = getPersonInfo("becky")
-        if str(getLocation("clara") or "") == "TavernMain" and clara_info is not None and int(clara_info.gifted_today or 0) == 0:
+        clara_info = people.get_info("clara")
+        becky_info = people.get_info("becky")
+        if str(people.location("clara") or "") == "TavernMain" and clara_info is not None and int(clara_info.gifted_today or 0) == 0:
             targets.append(("clara", "Клариссу"))
-        if str(getLocation("becky") or "") == "TavernMain" and becky_info is not None and int(becky_info.gifted_today or 0) == 0:
+        if str(people.location("becky") or "") == "TavernMain" and becky_info is not None and int(becky_info.gifted_today or 0) == 0:
             targets.append(("becky", "Бекки"))
         for npc_id, caption in (
             ("sandra", "Сандру"),
             ("melissa", "Мелиссу"),
             ("amanda", "Аманду"),
         ):
-            npc_info = getPersonInfo(npc_id)
-            if str(getLocation(npc_id) or "") == "TavernMain" and npc_info is not None and int(npc_info.gifted_today or 0) == 0:
+            npc_info = people.get_info(npc_id)
+            if str(people.location(npc_id) or "") == "TavernMain" and npc_info is not None and int(npc_info.gifted_today or 0) == 0:
                 targets.append((npc_id, caption))
         return targets
 
@@ -51,7 +51,7 @@ init python:
                 action_id="bar_random_event",
                 label="Задержаться у стойки в ожидании истории",
                 hook="call",
-                target="TavernMainBarPlaceholderEvent",
+                target="TavernMainBarListenEvent",
             ),
         ],
         carriable=False,
@@ -60,55 +60,55 @@ init python:
 
 
 label TavernMainBarInviteMenu:
-    $ current_action_title = "Кого позвать к стойке"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ MainTxt = "У стойки сейчас можно спокойно перекинуться парой слов и разделить по кружке эля."
-    $ CurLocDesc = MainTxt
+    $ renpy.dynamic("_caption", "_npc_id")
+    $ main_ui_runtime.action_title = "Кого позвать к стойке"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ scene_runtime.text = "У стойки сейчас можно спокойно перекинуться парой слов и разделить по кружке эля."
+    $ scene_runtime.location_text = scene_runtime.text
     python:
         for _npc_id, _caption in tavern_bar_invite_targets():
-            current_action_items.append(MenuItem("Позвать %s выпить" % _caption, Call("TavernMainBarInviteApply", _npc_id)))
-        if len(current_action_items) <= 0:
-            MainTxt = "Сейчас рядом нет никого, кого стоило бы звать к стойке, или на сегодня вы уже угощали всех, кого могли."
-            CurLocDesc = MainTxt
-        current_action_items.append(MenuItem("Назад", Call("TavernMainObjectMenu", "bar_001")))
+            main_ui_runtime.action_items.append(MenuItem("Позвать %s выпить" % _caption, Call("TavernMainBarInviteApply", _npc_id)))
+        if len(main_ui_runtime.action_items) <= 0:
+            scene_runtime.text = "Сейчас рядом нет никого, кого стоило бы звать к стойке, или на сегодня вы уже угощали всех, кого могли."
+            scene_runtime.location_text = scene_runtime.text
+        main_ui_runtime.action_items.append(MenuItem("Назад", Call("TavernMainObjectMenu", "bar_001")))
     return
 
 
 label TavernMainBarInviteApply(target_npc=""):
+    $ renpy.dynamic("_bar_target", "_bar_info", "_bar_effect")
     $ _bar_target = str(target_npc or "").strip().lower()
     if _bar_target == "":
         call TavernMainBarInviteMenu
         return
-    if int(money or 0) < 2:
-        $ MainTxt = "На угощение сейчас не хватает денег."
-        $ CurLocDesc = MainTxt
+    if int(player.economy.money or 0) < 2:
+        $ scene_runtime.text = "На угощение сейчас не хватает денег."
+        $ scene_runtime.location_text = scene_runtime.text
         call TavernMainBarInviteMenu
         return
-    $ money = int(money or 0) - 2
+    $ player.spend_money(2)
     $ calendar_v2.advance_minutes(30)
-    $ _bar_info = getPersonInfo(_bar_target)
+    $ _bar_info = people.get_info(_bar_target)
     if _bar_info is not None:
         $ _bar_info.mark_talked(1)
         $ _bar_info.gifted_today = int(_bar_info.gifted_today or 0) + 1
-        $ _bar_info.giftToday = True
         $ _bar_info.change_social(friend_delta=1)
-    $ fun = _player_clamp(int(fun or 0) + 4, 0, 100)
+    $ player.change_stat("fun", 4)
     $ _bar_effect = player_apply_item_social_effects(_bar_target, "drink_ale_001", True)
     if _bar_target == "clara":
-        $ Clara.var["trust"] = min(20, int(Clara.var.get("trust", 0) or 0) + 1)
-    if _bar_target == "becky":
-        $ Becky.var["BarDrinkDay"] = int(current_game_day() or 0)
-    $ MainTxt = "Вы зовете %s к стойке и ставите по кружке эля. Разговор быстро становится свободнее и теплее обычного." % _action_display_name(_bar_target)
+        $ Clara.trust = min(20, int(Clara.trust or 0) + 1)
+    $ scene_runtime.text = "Вы зовете %s к стойке и ставите по кружке эля. Разговор быстро становится свободнее и теплее обычного." % _action_display_name(_bar_target)
     if str((_bar_effect or {}).get("text", "") or "").strip() != "":
-        $ MainTxt = str(MainTxt or "") + "\n\n" + str((_bar_effect or {}).get("text", "") or "")
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\n" + str((_bar_effect or {}).get("text", "") or "")
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call TavernMainObjectMenu("bar_001")
     return
 
 
-label TavernMainBarPlaceholderEvent:
+label TavernMainBarListenEvent:
+    $ renpy.dynamic("_bar_events", "_bar_index")
     if tavern_bar_clara_melissa_gossip_available():
         call checkTriggers("TavernMain", "clara_tavern_visit", 0)
         return
@@ -118,8 +118,8 @@ label TavernMainBarPlaceholderEvent:
             "Пока вы стоите у стойки, трактир словно ненадолго становится центром всего околотка. Именно отсюда удобнее всего подмечать чужие привычки, обрывки разговоров и назревающие истории.",
             "У барной стойки легче всего сделать вид, что вы просто заняты делом, и при этом слушать вполуха все, что происходит вокруг. Позже из таких мелочей наверняка будут рождаться новые события.",
         ]
-        _bar_index = int((current_game_day() or 0) + (hour or 0) + (minute or 0)) % len(_bar_events)
-        MainTxt = _bar_events[_bar_index]
-        CurLocDesc = MainTxt
+        _bar_index = int(current_game_day() + int(calendar_v2.hour or 0) + int(calendar_v2.minute or 0)) % len(_bar_events)
+        scene_runtime.text = _bar_events[_bar_index]
+        scene_runtime.location_text = scene_runtime.text
     call TavernMainObjectMenu("bar_001")
     return

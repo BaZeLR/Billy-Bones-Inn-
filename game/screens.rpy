@@ -282,26 +282,31 @@ screen choice_panel(items, label=None):
             textbutton i.caption action i.action:
                 id "choice_panel_button_%d" % int(_choice_index)
                 alt "choice_panel_button_%d" % int(_choice_index)
-                text_size 20
+                style "mui_hud_button"
+                text_style "mui_hud_button_text"
 
 screen choice(items, label=None, menu_name=None):
     style_prefix "choice"
     zorder 220
-    if str(UI_mode or "") in ("talk", "event") and str(CurLoc or "") != "Intro":
+    if str(rooms.current_code or "") != "Intro":
+        if renpy.get_screen("main_ui") is None:
+            on "show" action Show("main_ui")
         $ _choice_right_x = 12 + int((config.screen_width - 36) * 0.72) + 12
         $ _choice_right_w = int((config.screen_width - 36) * 0.28)
-        $ _choice_y = 12 + 220 + 10 + 52
-        viewport:
-            xpos _choice_right_x + 20
+        $ _choice_y = MAIN_UI_NATIVE_CHOICE_TOP
+        frame:
+            xpos _choice_right_x
             ypos _choice_y
-            xsize max(240, _choice_right_w - 40)
-            ymaximum 260
-            draggable True
-            mousewheel True
+            xsize _choice_right_w
+            ysize MAIN_UI_NATIVE_CHOICE_HEIGHT
+            padding (10, 10)
+            background None
+            has vbox
+            spacing 10
+            text (label or main_ui_runtime.action_title or "Ваши действия") size 22 xalign 0.5
             vbox:
+                xfill True
                 spacing 6
-                if label:
-                    text label size 20 xalign 0.5
                 for _choice_index, i in enumerate(items):
                     textbutton i.caption action i.action:
                         id "choice_panel_button_%d" % int(_choice_index)

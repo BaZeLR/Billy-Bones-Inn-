@@ -1,34 +1,31 @@
 # ================================================================================
 # First Eddie/Becky bedroom attempt.
-# Called from story_becky_home_from_dinner_0 when Becky.var["EddieTryToFuck"] == 1.
+# Called from the live BeckyHome FromDinner branch when Becky.eddie_join_stage == 1.
 # ================================================================================
 
 label BeckyEddieJoinFirst:
     show screen main_ui
     "Вдова, как обычно, закрыла дверь на засов и потянула вас к кровати. Вы вспомнили о разговоре с Эдди."
-    $ scene_image = "images/becky/Home/doorclose.jpg"
-    $ _layout_last_picture = scene_image
-    vscene scene_image
+    $ scene_runtime.picture = "images/becky/Home/doorclose.jpg"
+    vscene scene_runtime.picture
 
     menu:
         "Поцеловать Бекки и незаметно открыть засов":
-            if Becky.var.get("PriestAdvice", 0) < 3 and procedural_randint(1, 2, "becky_eddie_join_latch_%s" % int(current_game_day() or 0)) == 1:
+            if Becky.priest_advice_stage < 3 and procedural_randint(1, 2, "becky_eddie_join_latch_%s" % int(current_game_day() or 0)) == 1:
                 "Одной рукой вы обняли вдовушку, а другой попробовали незаметно отодвинуть засов. Однако Ребекка засекла ваше движение, погрозила вам пальчиком и задвинула его обратно: \"Ай-ай озорник, я все-таки еще не готова заниматься с тобой любовью с дверью настежь. А вдруг кто-то из домашних зайдет?\""
                 call BeckyEddieJoinFirst_EddieFailureCode
                 return
 
             "Одной рукой вы обняли вдовушку, а другой незаметно отодвинули засов."
-            $ scene_image = "images/becky/Home/dooropen.jpg"
-            $ _layout_last_picture = scene_image
-            vscene scene_image
+            $ scene_runtime.picture = "images/becky/Home/dooropen.jpg"
+            vscene scene_runtime.picture
             "Продолжая целоваться, вы подошли к кровати и вместе упали на нее, сбрасывая с себя одежду. Усевшись на кровати, вы показали вдове на ваш стоящий, как корабельная мачта, член. Бекки не потребовалось что-либо объяснять, она наклонилась над вами и стала ласкать ваш член своими монументальными дойками."
             "И тут дверь скрипнула и в комнату зашел Эдди. Парень предусмотрительно разделся, а его член был направлен прямо на киску хозяйки лавки."
-            $ scene_image = "images/becky/sexeddie/eddieentry.jpg"
-            $ _layout_last_picture = scene_image
-            vscene scene_image
+            $ scene_runtime.picture = "images/becky/sexeddie/eddieentry.jpg"
+            vscene scene_runtime.picture
 
-            if Becky.var.get("PriestAdvice", 0) < 3:
-                if Becky.var.get("EddieFailures", 0) == 0:
+            if Becky.priest_advice_stage < 3:
+                if Becky.eddie_join_failures == 0:
                     "Бекки отпустила ваш орган и подскочила от неожиданности. Увидев же голого управляющего, она аж взвизгнула: \"Ты что здесь делаешь?! Что это ты такое себе вообразил? Ты что себе позволяешь?! Ах ты козел, урод, после всего, что я для тебя сделала?!\""
                     "От такого напора Эдди аж попятился. А хозяйка лавки налетела на него как тигрица и в мгновение ока вытолкала за дверь."
                     "Следом же она обернулась к вам: \"Стефан?! Я знаю, это твои шутки. Ты что себе такое позволяешь. Кто я такая по-твоему? А ну вон отседова.\""
@@ -44,8 +41,8 @@ label BeckyEddieJoinFirst:
                     $ Becky.add_corruption(-5, 25)
 
                 "Как вы очутились на улице, вы и сами не очень хорошо поняли, но все-таки вы там очутились. Что-то вы в вашем плане явно не учли..."
-                $ Becky.var["EddieTryToFuck"] = 2
-                $ Becky.var["EddieFailures"] = Becky.var.get("EddieFailures", 0) + 1
+                $ Becky.eddie_join_stage = 2
+                $ Becky.eddie_join_failures += 1
                 $ calendar_v2.advance_minutes(60)
                 jump MarketPlace
 
@@ -82,13 +79,12 @@ label BeckyEddieJoinFirst_EddieFailureCode:
     else:
         "Бекки тоже услышала шум и хмыкнула: \"Домашние, домашние, вечно пытаются всюду свой нос всунуть,\" - и впилась в ваши губы поцелуем."
 
-    $ Becky.var["EddieTryToFuck"] = 3
+    $ Becky.eddie_join_stage = 3
     $ Eddie.change_social(friend_delta=-2)
     $ Becky.apply_social_gate(0, 0, 0, 35, 1, -1)
     "Вы и миссис Блэнкеншип находитесь в ее спальне."
-    $ scene_image = "images/becky/sexeddie/eddiespy.jpg"
-    $ _layout_last_picture = scene_image
-    vscene scene_image
+    $ scene_runtime.picture = "images/becky/sexeddie/eddiespy.jpg"
+    vscene scene_runtime.picture
     return
 
 
@@ -106,6 +102,6 @@ label BeckyEddieJoinFirst_EddieFirstCumCode:
     $ Becky.add_corruption(5)
     $ Becky.add_relation(1)
     $ Eddie.change_social(friend_delta=5)
-    $ Becky.var["EddieTryToFuck"] = 4
+    $ Becky.eddie_join_stage = 4
     $ calendar_v2.advance_minutes(60)
     jump MarketPlace

@@ -1,11 +1,11 @@
-    hide screen girl_card_overlay    hide screen girl_card_overlay    hide screen girl_card_overlay# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     def girl_dress_buy_actions(girl_name):
         options = [
             MenuItem("Осмотреть портниху", Call("GirlsDesc", "irma")),
-            MenuItem("Посмотреть во что одета " + str(_gds_name("RealName", girl_name)), Call("GirlsDesc", girl_name)),
+            MenuItem("Посмотреть во что одета " + str(people_display_name(girl_name)), Call("GirlsDesc", girl_name)),
         ]
 
         for dress_code in list(_gds_get_list("FemaleDressCodes")):
@@ -14,7 +14,7 @@ init python:
                 continue
             cost = _gds_dress_cost(code)
             has_dress = _gds_has_dress_for_girl(girl_name, code)
-            if int(getattr(store, "money", 0) or 0) >= cost and (not has_dress) and str(getattr(store, "DressProduced", "") or "") == "" and int(getattr(store, "GirlDressBlock", 0) or 0) == 0:
+            if int(player.economy.money or 0) >= cost and (not has_dress) and str(dress_shop.produced or "") == "" and int(dress_shop.girl_dress_block or 0) == 0:
                 caption = "Заказать " + str(_gds_get_dict("ShortDressName").get(code, code)).lower()
                 options.append(MenuItem(caption, Call("GirlDressSuggest", girl_name, code)))
 
@@ -23,6 +23,7 @@ init python:
 
 
 label GirlDressBuy(GirlName="", CurLocArg=""):
+    $ renpy.dynamic("_girl_dress_buy_args", "DressObman", "_rn", "_rn3")
     if str(GirlName or "") == "":
         python:
             _girl_dress_buy_args = _args if isinstance(_args, (list, tuple)) else ()
@@ -36,52 +37,45 @@ label GirlDressBuy(GirlName="", CurLocArg=""):
 
     $ DressObman = _gds_get_dict("DressObman")
     $ DressObman[GirlName] = 0
-    $ GirlDressesBought = 0
-    $ GirlDressBlock = 0
+    $ player.appearance.girl_dresses_bought = 0
+    $ dress_shop.girl_dress_block = 0
 
-    if renpy.has_label("delete_daily_event"):
-        call delete_daily_event(GirlName, "DressNoShow", "")
+    $ daily_events.delete(GirlName, "DressNoShow", "")
 
-    $ _rn = _gds_name("RealName", GirlName)
-    $ _rn3 = _gds_name("RealName3", GirlName)
+    $ _rn = people_display_name(GirlName)
+    $ _rn3 = people_name(GirlName, 'dative')
 
-    $ MainTxt = "Вы зашли в лавку очаровательной Ирмы. Там вас уже ожидала %s. Она обрадованно улыбнулась, увидев вас, и сразу же вернулась к рассматриванию образцов разнообразных платьев, юбок и блузок, развешанных вдоль левой стены. Вы тоже можете на них поглазеть. Ну а если вы наконец определились с выбором, то можете предложить %s примерить и заказать одно из платьев." % (_gds_name("RealName", GirlName), _gds_name("RealName3", GirlName))
-    $ CurLocDesc = MainTxt
-    $ UI_mode = "scene"
-    $ CurLoc = "GirlDressBuy"
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ MainTxt = "Вы зашли в лавку очаровательной Ирмы. Там вас уже ожидала [_gds_name('RealName', GirlName)]. Она обрадованно улыбнулась, увидев вас, и сразу же вернулась к рассматриванию образцов разнообразных платьев, юбок и блузок, развешанных вдоль левой стены. Вы тоже можете на них поглазеть. Ну а если вы наконец определились с выбором, то можете предложить [_gds_name('RealName3', GirlName)] примерить и заказать одно из платьев."
-    $ CurLocDesc = MainTxt
-    $ MainTxt = "Вы зашли в лавку очаровательной Ирмы. Там вас уже ожидала [_gds_name('RealName', GirlName)]. Она обрадованно улыбнулась, увидев вас, и сразу же вернулась к рассматриванию образцов разнообразных платьев, юбок и блузок, развешанных вдоль левой стены. Вы тоже можете на них поглазеть. Ну а если вы наконец определились с выбором, то можете предложить [_gds_name('RealName3', GirlName)] примерить и заказать одно из платьев."
-    $ CurLocDesc = MainTxt
-    $ MainTxt = "Вы зашли в лавку очаровательной Ирмы. Там вас уже ожидала [_gds_name('RealName', GirlName)]. Она обрадованно улыбнулась, увидев вас, и сразу же вернулась к рассматриванию образцов разнообразных платьев, юбок и блузок, развешанных вдоль левой стены. Вы тоже можете на них поглазеть. Ну а если вы наконец определились с выбором, то можете предложить [_gds_name('RealName3', GirlName)] примерить и заказать одно из платьев."
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = "Вы зашли в лавку очаровательной Ирмы. Там вас уже ожидала %s. Она обрадованно улыбнулась, увидев вас, и сразу же вернулась к рассматриванию образцов разнообразных платьев, юбок и блузок, развешанных вдоль левой стены. Вы тоже можете на них поглазеть. Ну а если вы наконец определились с выбором, то можете предложить %s примерить и заказать одно из платьев." % (people_display_name(GirlName), people_name(GirlName, 'dative'))
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
     call ShowImage("", "", irma_working_picture_path())
-    $ current_action_items = girl_dress_buy_actions(GirlName)
+    $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
     while True:
         call screen main_ui
 
 
 label GirlDressBuyLeave(GirlName=""):
-    $ _rn = _gds_name("RealName", GirlName)
-    if int(GirlDressesBought or 0) <= 0:
-        $ MainTxt = "Осмотрев предлагаемый товар и обратив особое внимание на цены, вы буркнули: \"Покупать нечего, зайдем в другой раз!\" и бодро направились к выходу.\n\n[_rn] ваше мнение, судя по всему, не разделяла и попыталась вас остановить: \"Стефан, давай еще посмотрим, ты же обещал мне что-нибудь купить!\""
-        $ CurLocDesc = MainTxt
-        $ GirlDressBlock = 1
-        $ current_action_title = "Ответить"
-        $ current_action_content = None
-        $ current_action_items = [
+    $ renpy.dynamic("_rn")
+    $ _rn = people_display_name(GirlName)
+    if int(player.appearance.girl_dresses_bought or 0) <= 0:
+        $ scene_runtime.text = "Осмотрев предлагаемый товар и обратив особое внимание на цены, вы буркнули: \"Покупать нечего, зайдем в другой раз!\" и бодро направились к выходу.\n\n%s ваше мнение, судя по всему, не разделяла и попыталась вас остановить: \"Стефан, давай еще посмотрим, ты же обещал мне что-нибудь купить!\"" % str(_rn)
+        $ scene_runtime.location_text = scene_runtime.text
+        $ dress_shop.girl_dress_block = 1
+        $ main_ui_runtime.action_title = "Ответить"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = [
             MenuItem("Ну мало ли что на ком и где я обещал!", Call("GirlDressBuyRefuse", GirlName)),
             MenuItem("Ну если ты так считаешь...", Call("GirlDressBuyContinue", GirlName)),
         ]
         return
 
-    $ MainTxt = "\"Ну, хорошенького понемножку,\" сказали вы и пошли к выходу. [_rn] же осталась в магазине, пощебетать еще немножко, всего полчасика или часик, с Ирмой о купленной обновке."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = [MenuItem("Выйти из лавки", Jump("ArtisansQuarter"))]
+    $ scene_runtime.text = "\"Ну, хорошенького понемножку,\" сказали вы и пошли к выходу. %s же осталась в магазине, пощебетать еще немножко, всего полчасика или часик, с Ирмой о купленной обновке." % str(_rn)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [MenuItem("Выйти из лавки", Jump("ArtisansQuarter"))]
     return
 
 
@@ -95,47 +89,5 @@ label GirlDressBuyRefuse(GirlName=""):
 label GirlDressBuyContinue(GirlName=""):
     "Вы решили не обманывать надежды и вернулись к осмотру одеяний."
     $ dress_shop.girl_dress_block = 0
-    call GirlDressBuyReturnFromSuggestion(GirlName)
-    return
-
-
-label GirlDressBuyRefuse(GirlName=""):
-    "\"Я же сказал, смотреть здесь не на что, покупать нечего, цены запре.., да не в ценах дело, просто выбор убогий!\" назидательно сказали вы и вышли на улицу."
-    call SlutFriendsIncrease("irma", 0, 2, -1, 0, 0, 0)
-    call SlutFriendsIncrease(GirlName, 5, 1, -1, 0, 0, 0)
-    jump ArtisansQuarter
-
-
-label GirlDressBuyContinue(GirlName=""):
-    "Вы решили не обманывать надежды и вернулись к осмотру одеяний."
-    $ dress_shop.girl_dress_block = 0
-    call GirlDressBuyReturnFromSuggestion(GirlName)
-    return
-
-
-label GirlDressBuyRefuse(GirlName=""):
-    "\"Я же сказал, смотреть здесь не на что, покупать нечего, цены запре.., да не в ценах дело, просто выбор убогий!\" назидательно сказали вы и вышли на улицу."
-    call SlutFriendsIncrease("irma", 0, 2, -1, 0, 0, 0)
-    call SlutFriendsIncrease(GirlName, 5, 1, -1, 0, 0, 0)
-    jump ArtisansQuarter
-
-
-label GirlDressBuyContinue(GirlName=""):
-    "Вы решили не обманывать надежды и вернулись к осмотру одеяний."
-    $ dress_shop.girl_dress_block = 0
-    call GirlDressBuyReturnFromSuggestion(GirlName)
-    return
-
-
-label GirlDressBuyRefuse(GirlName=""):
-    "\"Я же сказал, смотреть здесь не на что, покупать нечего, цены запре.., да не в ценах дело, просто выбор убогий!\" назидательно сказали вы и вышли на улицу."
-    call SlutFriendsIncrease("irma", 0, 2, -1, 0, 0, 0)
-    call SlutFriendsIncrease(GirlName, 5, 1, -1, 0, 0, 0)
-    jump ArtisansQuarter
-
-
-label GirlDressBuyContinue(GirlName=""):
-    "Вы решили не обманывать надежды и вернулись к осмотру одеяний."
-    $ GirlDressBlock = 0
-    call GirlDressBuyRefresh(GirlName)
+    $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
     return

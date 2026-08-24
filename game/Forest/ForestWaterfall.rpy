@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 6 python:
-    ForestWaterfallRoom = Room(
+    ForestWaterfallRoomDefinition = Room(
         code_name="ForestWaterfall",
         group_name=ROOM_GROUP_FOREST,
         display_name="Водопад",
@@ -31,25 +31,20 @@ init 6 python:
 
 
 label ForestWaterfall:
-    $ CurrentRoom = ForestWaterfallRoom
-    $ CurLoc = "ForestWaterfall"
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    else:
-        $ _layout_last_picture = ""
-    $ MainTxt = ForestWaterfallRoom.descriptions[0].text
-    $ CurLocDesc = MainTxt
-    $ forest_room_set_saved_text(MainTxt, CurrentRoom)
-    $ _forest_spawned = forest_room_spawn(ForestWaterfallRoom)
+    $ renpy.dynamic("_forest_spawned")
+    $ rooms.enter("ForestWaterfall")
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    $ scene_runtime.text = rooms.get("ForestWaterfall").descriptions[0].text
+    $ scene_runtime.location_text = scene_runtime.text
+    $ forest_room_set_saved_text(scene_runtime.text, rooms.current)
+    $ _forest_spawned = forest_room_spawn(rooms.get("ForestWaterfall"))
     if len(_forest_spawned) > 0:
-        $ MainTxt = MainTxt + "\n\nУ сырых камней можно заметить кое-какую лесную добычу."
-        $ CurLocDesc = MainTxt
-        $ forest_room_set_saved_text(MainTxt, CurrentRoom)
-    $ current_action_title = "Водопад"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_action_items = forest_subroom_action_items(CurrentRoom)
-    call screen main_ui
-    return
-
+        $ scene_runtime.text = scene_runtime.text + "\n\nУ сырых камней можно заметить кое-какую лесную добычу."
+        $ scene_runtime.location_text = scene_runtime.text
+        $ forest_room_set_saved_text(scene_runtime.text, rooms.current)
+    $ main_ui_runtime.action_title = "Водопад"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.action_items = forest_subroom_action_items(rooms.current)
+    while True:
+        call screen main_ui

@@ -3,9 +3,10 @@
 # ================================================================================
 init python:
     def update_tavern_service_levels():
-        sandradiv = int(jobkitchen.get("sandra", 0) or 0) + int(jobcleaning.get("sandra", 0) or 0) + int(jobwaitress.get("sandra", 0) or 0)
-        melissadiv = int(jobkitchen.get("melissa", 0) or 0) + int(jobcleaning.get("melissa", 0) or 0) + int(jobwaitress.get("melissa", 0) or 0)
-        amandadiv = int(jobkitchen.get("amanda", 0) or 0) + int(jobcleaning.get("amanda", 0) or 0) + int(jobwaitress.get("amanda", 0) or 0)
+        service = player.tavern_management.service
+        sandradiv = int(Sandra.job_value("jobkitchen", 0) or 0) + int(Sandra.job_value("jobcleaning", 0) or 0) + int(Sandra.job_value("jobwaitress", 0) or 0)
+        melissadiv = int(Melissa.job_value("jobkitchen", 0) or 0) + int(Melissa.job_value("jobcleaning", 0) or 0) + int(Melissa.job_value("jobwaitress", 0) or 0)
+        amandadiv = int(Amanda.job_value("jobkitchen", 0) or 0) + int(Amanda.job_value("jobcleaning", 0) or 0) + int(Amanda.job_value("jobwaitress", 0) or 0)
 
         if sandradiv == 0:
             sandradiv = 1
@@ -15,89 +16,89 @@ init python:
             amandadiv = 1
 
         kitchen_score = (
-            int(jobkitchen.get("sandra", 0) or 0) * float(cooking.get("sandra", 0) or 0) / sandradiv
-            + int(jobkitchen.get("melissa", 0) or 0) * float(cooking.get("melissa", 0) or 0) / melissadiv
-            + int(jobkitchen.get("amanda", 0) or 0) * float(cooking.get("amanda", 0) or 0) / amandadiv
+            int(Sandra.job_value("jobkitchen", 0) or 0) * float(Sandra.skill_value("cooking", 0) or 0) / sandradiv
+            + int(Melissa.job_value("jobkitchen", 0) or 0) * float(Melissa.skill_value("cooking", 0) or 0) / melissadiv
+            + int(Amanda.job_value("jobkitchen", 0) or 0) * float(Amanda.skill_value("cooking", 0) or 0) / amandadiv
         )
         kitchen_max = max(
-            int(jobkitchen.get("sandra", 0) or 0) * float(cooking.get("sandra", 0) or 0),
-            int(jobkitchen.get("melissa", 0) or 0) * float(cooking.get("melissa", 0) or 0),
-            int(jobkitchen.get("amanda", 0) or 0) * float(cooking.get("amanda", 0) or 0),
+            int(Sandra.job_value("jobkitchen", 0) or 0) * float(Sandra.skill_value("cooking", 0) or 0),
+            int(Melissa.job_value("jobkitchen", 0) or 0) * float(Melissa.skill_value("cooking", 0) or 0),
+            int(Amanda.job_value("jobkitchen", 0) or 0) * float(Amanda.skill_value("cooking", 0) or 0),
         )
         kitchen_score = min(kitchen_score, kitchen_max)
 
         clean_score = (
-            int(jobcleaning.get("sandra", 0) or 0) * float(cleaning.get("sandra", 0) or 0) / sandradiv
-            + int(jobcleaning.get("melissa", 0) or 0) * float(cleaning.get("melissa", 0) or 0) / melissadiv
-            + int(jobcleaning.get("amanda", 0) or 0) * float(cleaning.get("amanda", 0) or 0) / amandadiv
+            int(Sandra.job_value("jobcleaning", 0) or 0) * float(Sandra.skill_value("cleaning", 0) or 0) / sandradiv
+            + int(Melissa.job_value("jobcleaning", 0) or 0) * float(Melissa.skill_value("cleaning", 0) or 0) / melissadiv
+            + int(Amanda.job_value("jobcleaning", 0) or 0) * float(Amanda.skill_value("cleaning", 0) or 0) / amandadiv
         )
 
         waitress_score = (
-            int(jobwaitress.get("sandra", 0) or 0) * float(waitress.get("sandra", 0) or 0) / sandradiv
-            + int(jobwaitress.get("melissa", 0) or 0) * float(waitress.get("melissa", 0) or 0) / melissadiv
-            + int(jobwaitress.get("amanda", 0) or 0) * float(waitress.get("amanda", 0) or 0) / amandadiv
+            int(Sandra.job_value("jobwaitress", 0) or 0) * float(Sandra.skill_value("waitress", 0) or 0) / sandradiv
+            + int(Melissa.job_value("jobwaitress", 0) or 0) * float(Melissa.skill_value("waitress", 0) or 0) / melissadiv
+            + int(Amanda.job_value("jobwaitress", 0) or 0) * float(Amanda.skill_value("waitress", 0) or 0) / amandadiv
         )
         waitress_max = max(
-            int(jobwaitress.get("sandra", 0) or 0) * float(waitress.get("sandra", 0) or 0),
-            int(jobwaitress.get("melissa", 0) or 0) * float(waitress.get("melissa", 0) or 0),
-            int(jobwaitress.get("amanda", 0) or 0) * float(waitress.get("amanda", 0) or 0),
+            int(Sandra.job_value("jobwaitress", 0) or 0) * float(Sandra.skill_value("waitress", 0) or 0),
+            int(Melissa.job_value("jobwaitress", 0) or 0) * float(Melissa.skill_value("waitress", 0) or 0),
+            int(Amanda.job_value("jobwaitress", 0) or 0) * float(Amanda.skill_value("waitress", 0) or 0),
         )
         waitress_score = min(waitress_score, waitress_max)
 
-        store.tavernkitchen_value = kitchen_score
-        store.tavernclean_value = clean_score
-        store.tavernwaitress_value = waitress_score
+        service.kitchen_score = kitchen_score
+        service.cleanliness_score = clean_score
+        service.waitress_score = waitress_score
 
         if kitchen_score > 90:
-            store.tavernkitchen = "божественно"
+            service.kitchen_quality = "божественно"
         elif kitchen_score > 70:
-            store.tavernkitchen = "пальчики оближешь"
+            service.kitchen_quality = "пальчики оближешь"
         elif kitchen_score > 60:
-            store.tavernkitchen = "вкусно"
+            service.kitchen_quality = "вкусно"
         elif kitchen_score > 50:
-            store.tavernkitchen = "сносно"
+            service.kitchen_quality = "сносно"
         elif kitchen_score > 30:
-            store.tavernkitchen = "терпимо"
+            service.kitchen_quality = "терпимо"
         elif kitchen_score > 14:
-            store.tavernkitchen = "отвратительно"
+            service.kitchen_quality = "отвратительно"
         else:
-            store.tavernkitchen = "невыносимо"
+            service.kitchen_quality = "невыносимо"
 
         if clean_score > 90:
-            store.tavernclean = "идеально чисто"
+            service.cleanliness_quality = "идеально чисто"
         elif clean_score > 80:
-            store.tavernclean = "практически ни пылинки"
+            service.cleanliness_quality = "практически ни пылинки"
         elif clean_score > 55:
-            store.tavernclean = "чисто"
+            service.cleanliness_quality = "чисто"
         elif clean_score > 45:
-            store.tavernclean = "скорее чисто, чем грязно"
+            service.cleanliness_quality = "скорее чисто, чем грязно"
         elif clean_score > 34:
-            store.tavernclean = "грязновато"
+            service.cleanliness_quality = "грязновато"
         elif clean_score > 20:
-            store.tavernclean = "грязно"
+            service.cleanliness_quality = "грязно"
         elif clean_score > 5:
-            store.tavernclean = "очень грязно"
+            service.cleanliness_quality = "очень грязно"
         else:
-            store.tavernclean = "тараканы с трудом могут пробраться сквозь липкую грязь покрывающую все"
+            service.cleanliness_quality = "тараканы с трудом могут пробраться сквозь липкую грязь покрывающую все"
 
         if waitress_score > 90:
-            store.tavernwaitress = "идет так, что и король позавидовал бы"
+            service.waitress_quality = "идет так, что и король позавидовал бы"
         elif waitress_score > 80:
-            store.tavernwaitress = "поставленно прекрасно"
+            service.waitress_quality = "поставленно прекрасно"
         elif waitress_score > 70:
-            store.tavernwaitress = "очень хорошее"
+            service.waitress_quality = "очень хорошее"
         elif waitress_score > 55:
-            store.tavernwaitress = "на уровне"
+            service.waitress_quality = "на уровне"
         elif waitress_score > 40:
-            store.tavernwaitress = "так себе"
+            service.waitress_quality = "так себе"
         elif waitress_score > 25:
-            store.tavernwaitress = "медленное и неумелое"
+            service.waitress_quality = "медленное и неумелое"
         elif waitress_score > 15:
-            store.tavernwaitress = "почти не производится"
+            service.waitress_quality = "почти не производится"
         elif waitress_score > 1:
-            store.tavernwaitress = "идет так, что только счастливчики могут получить свой заказ, после пары часов ожидания. Обычно же приносят не то, что просили или не приносят вовсе."
+            service.waitress_quality = "идет так, что только счастливчики могут получить свой заказ, после пары часов ожидания. Обычно же приносят не то, что просили или не приносят вовсе."
         else:
-            store.tavernwaitress = "не ведется вообще, заказать что-либо у вас невозможно."
+            service.waitress_quality = "не ведется вообще, заказать что-либо у вас невозможно."
 
 
 label SetTavernServiceLevels:

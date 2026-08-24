@@ -1,77 +1,5 @@
-    def _pc_sync_ui_chores():
-        player.chores.ui.clear()
-        player.chores.ui.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-        sync_player_state_from_store()
-        if not isinstance(player.chores.ui, dict):
-            player.chores.ui = {}
-        _pc_sync_ui_chores()
-    def _pc_sync_ui_chores():
-        player.chores.ui.clear()
-        player.chores.ui.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-        if not isinstance(player.chores.ui, dict):
-            player.chores.ui = {}
-        _pc_sync_ui_chores()
-    def _pc_sync_ui_chores():
-        player.chores.ui.clear()
-        player.chores.ui.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-        if not isinstance(player.chores.ui, dict):
-            player.chores.ui = {}
-        _pc_sync_ui_chores()
-        global player.tavern_management.weekly_visitors        global player.stats.exploration        global neshlush        global neshlush        global player.tavern_management.weekly_visitors, WeeklyChoresLastEvalStamp, player.tavern_management.weekly_visitors
-        global WeeklyChoresLastEvalStamp
-            _set_object_state_int(_fire_object, "fire_units", 0)            _set_object_state_int(_water_object, "hot_water_units", 0)    def _pc_sync_ui_chores():
-        UI_chores.clear()
-        UI_chores.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-    def _pc_sync_ui_chores():
-        player.chores.ui.clear()
-        player.chores.ui.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-        sync_player_state_from_store()
-        if not isinstance(player.chores.ui, dict):
-            player.chores.ui = {}
-        _pc_sync_ui_chores()
-    def _pc_sync_ui_chores():
-        player.chores.ui.clear()
-        player.chores.ui.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-        if not isinstance(player.chores.ui, dict):
-            player.chores.ui = {}
-        _pc_sync_ui_chores()
-    def _pc_sync_ui_chores():
-        player.chores.ui.clear()
-        player.chores.ui.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-        if not isinstance(player.chores.ui, dict):
-            player.chores.ui = {}
-        _pc_sync_ui_chores()
-        global player.tavern_management.weekly_visitors        global player.stats.exploration        global neshlush        global neshlush        global player.tavern_management.weekly_visitors, WeeklyChoresLastEvalStamp, player.tavern_management.weekly_visitors
-        global WeeklyChoresLastEvalStamp
-            _set_object_state_int(_fire_object, "fire_units", 0)            _set_object_state_int(_water_object, "hot_water_units", 0)    def _pc_sync_ui_chores():
-        UI_chores.clear()
-        UI_chores.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-    def _pc_sync_ui_chores():
-        player.chores.ui.clear()
-        player.chores.ui.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-        sync_player_state_from_store()
-        if not isinstance(player.chores.ui, dict):
-            player.chores.ui = {}
-        _pc_sync_ui_chores()
-    def _pc_sync_ui_chores():
-        player.chores.ui.clear()
-        player.chores.ui.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-        if not isinstance(player.chores.ui, dict):
-            player.chores.ui = {}
-        _pc_sync_ui_chores()
-    def _pc_sync_ui_chores():
-        player.chores.ui.clear()
-        player.chores.ui.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
-        if not isinstance(player.chores.ui, dict):
-            player.chores.ui = {}
-        _pc_sync_ui_chores()
-        global player.tavern_management.weekly_visitors        global player.stats.exploration        global neshlush        global neshlush        global player.tavern_management.weekly_visitors, WeeklyChoresLastEvalStamp, player.tavern_management.weekly_visitors
-        global WeeklyChoresLastEvalStamp
-            _set_object_state_int(_fire_object, "fire_units", 0)            _set_object_state_int(_water_object, "hot_water_units", 0)    def _pc_sync_ui_chores():
-        UI_chores.clear()
-        UI_chores.update({key: int(player.chores.weekly.get(key, 0) or 0) for key in PLAYER_CHORE_KEYS})
 # ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init -45 python:
     import renpy.exports as renpy
@@ -94,7 +22,7 @@ init -45 python:
         item_key = str(item_id or "").strip()
         if not item_key:
             return False
-        return _player_has_item_by_id(item_key)
+        return player.item_count(item_key) > 0
 
     def _pc_advance_minutes(minutes_to_add):
         try:
@@ -112,21 +40,21 @@ init -45 python:
         return TavernKitchenCauldronObject
 
     def _pc_room_by_code(where_id=""):
-        room_code = str(where_id or getattr(CurrentRoom, "code_name", "") or CurLoc or "").strip()
+        room_code = str(where_id or getattr(rooms.current, "code_name", "") or rooms.current_code or "").strip()
         if room_code == "TavernKitchen":
             try:
-                return TavernKitchenRoom
+                return rooms.get("TavernKitchen")
             except Exception:
-                return CurrentRoom
+                return rooms.current
         if room_code == "TavernMain":
             try:
-                return TavernMainRoom
+                return rooms.get("TavernMain")
             except Exception:
-                return CurrentRoom
-        return CurrentRoom
+                return rooms.current
+        return rooms.current
 
     def _pc_calendar_total_minutes():
-        return max(0, _pc_to_int(dayspassed, 0)) * 1440 + (_pc_to_int(hour, 0) * 60) + _pc_to_int(minute, 0)
+        return current_game_day() * 1440 + (_pc_to_int(calendar_v2.hour, 0) * 60) + _pc_to_int(calendar_v2.minute, 0)
 
     def _pc_fire_duration_minutes():
         return 12 * 60
@@ -134,13 +62,7 @@ init -45 python:
     def _pc_fire_until_minute(fire_object):
         if fire_object is None:
             return 0
-        until_minute = _object_state_int(fire_object, "fire_until_minute", 0)
-        legacy_units = _object_state_int(fire_object, "fire_units", 0)
-        if until_minute <= 0 and legacy_units > 0:
-            until_minute = _pc_calendar_total_minutes() + (legacy_units * _pc_fire_duration_minutes())
-            _set_object_state_int(fire_object, "fire_until_minute", until_minute)
-            _set_object_state_int(fire_object, "fire_units", 0)
-        return until_minute
+        return _object_state_int(fire_object, "fire_until_minute", 0)
 
     def _pc_fire_started_minute(fire_object):
         if fire_object is None:
@@ -164,37 +86,17 @@ init -45 python:
     def _pc_hot_water_until_minute(water_object):
         if water_object is None:
             return 0
-        until_minute = _object_state_int(water_object, "hot_water_until_minute", 0)
-        legacy_units = _object_state_int(water_object, "hot_water_units", 0)
-        if until_minute <= 0 and legacy_units > 0:
-            until_minute = _pc_calendar_total_minutes() + (legacy_units * 24 * 60)
-            _set_object_state_int(water_object, "hot_water_until_minute", until_minute)
-            _set_object_state_int(water_object, "hot_water_units", 0)
-        return until_minute
+        return _object_state_int(water_object, "hot_water_until_minute", 0)
 
     def _pc_fire_is_active(fire_object):
-        active = _pc_fire_until_minute(fire_object) > _pc_calendar_total_minutes()
-        _set_object_state_int(fire_object, "fireOn", 1 if active else 0)
-        try:
-            if fire_object is TavernKitchenHearthObject:
-                _set_object_state_int(TavernKitchenCauldronObject, "canBoilWater", 1 if active else 0)
-        except Exception:
-            pass
-        return active
+        return _pc_fire_until_minute(fire_object) > _pc_calendar_total_minutes()
 
     def _pc_hot_water_is_ready(water_object):
         return _pc_hot_water_until_minute(water_object) > _pc_calendar_total_minutes()
 
-    def tavern_kitchen_sync_hearth_state():
-        fire_on = 1 if _pc_fire_is_active(TavernKitchenHearthObject) else 0
-        _set_object_state_int(TavernKitchenHearthObject, "fireOn", fire_on)
-        _set_object_state_int(TavernKitchenCauldronObject, "canBoilWater", fire_on)
-        return fire_on
-
     def tavern_kitchen_reset_daily_hearth_state():
         _set_object_state_int(TavernKitchenHearthObject, "madeFireToday", 0)
         _set_object_state_int(TavernKitchenCauldronObject, "boiledWaterToday", 0)
-        tavern_kitchen_sync_hearth_state()
         return True
 
     def _pc_fire_fuel_available(where_id="", object_id=""):
@@ -205,12 +107,6 @@ init -45 python:
             or _room_has_item_by_id(room_obj, "chopped_wood_001")
             or _object_state_int(fire_object, "chopped_wood_stock", 0) > 0
         )
-
-        sync_player_state_from_store()
-
-        sync_player_state_from_store()
-
-        sync_player_state_from_store()
 
     def _pc_chore_display_name(chore_key):
         names = {
@@ -231,9 +127,6 @@ init -45 python:
         key = str(chore_key or "").strip()
         cur = _pc_to_int(player.chores.weekly.get(key, 0), 0)
         player.chores.weekly[key] = cur + 1
-        _pc_sync_ui_chores()
-        _pc_sync_ui_chores()
-        _pc_sync_ui_chores()
         return True
 
     def can_do_player_chore(chore_key, where_id="", object_id=""):
@@ -244,44 +137,34 @@ init -45 python:
         restriction = str(action_restriction_message("chore") or "").strip()
         if restriction:
             return False, restriction
-        if _pc_to_int(fun, 0) < 26:
+        if _pc_to_int(player.condition.fun, 0) < 26:
             return False, "У вас слишком плохое настроение для такой работы."
-        if _pc_to_int(energy, 0) <= 0:
+        if _pc_to_int(player.condition.energy, 0) <= 0:
             return False, "У вас не осталось сил."
         if key == "bring_woods" and not _pc_player_has_item("old_axe_001"):
             return False, "Без топора идти за дровами бессмысленно."
         if key == "chop_wood":
             if not _pc_player_has_item("old_axe_001"):
                 return False, "Без топора колоть дрова не выйдет."
-            if not _room_has_item_by_id(ShedRoom, "lumber_001") and not _pc_player_has_item("lumber_001"):
+            if not _room_has_item_by_id(rooms.get("Shed"), "lumber_001") and not _pc_player_has_item("lumber_001"):
                 return False, "Сначала нужно принести бревна."
         if key == "make_fire" and not _pc_fire_fuel_available(where_id, object_id):
             room_obj = _pc_room_by_code(where_id)
-            if _pc_player_has_item("lumber_001") or _room_has_item_by_id(room_obj, "lumber_001") or _room_has_item_by_id(ShedRoom, "lumber_001"):
+            if _pc_player_has_item("lumber_001") or _room_has_item_by_id(room_obj, "lumber_001") or _room_has_item_by_id(rooms.get("Shed"), "lumber_001"):
                 return False, "Сначала нужно наколоть бревна на дрова."
             return False, "Нечем топить камин."
         if key == "boil_water":
             if not _pc_fire_is_active(_pc_fire_object(where_id, object_id)):
                 return False, "Сначала нужно разжечь огонь."
-            if _object_state_int(_pc_water_object(where_id, object_id), "canBoilWater", 0) <= 0:
-                return False, "Сначала нужно разжечь огонь."
-            if _object_state_int(_pc_water_object(where_id, object_id), "canBoilWater", 0) <= 0:
-                return False, "Сначала нужно разжечь огонь."
-            if _object_state_int(_pc_water_object(where_id, object_id), "canBoilWater", 0) <= 0:
-                return False, "Сначала нужно разжечь огонь."
         return True, ""
 
     def _ensure_player_chores_state():
-        global player.chores.weekly, UI_chores, player.tavern_management.weekly_visitors
-
         if not isinstance(player.chores.weekly, dict):
             player.chores.weekly = {}
         for key in PLAYER_CHORE_KEYS:
             player.chores.weekly[key] = max(0, _pc_to_int(player.chores.weekly.get(key, 0), 0))
-
-        if not isinstance(UI_chores, dict):
-            UI_chores = {}
-        _pc_sync_ui_chores()
+        player.chores.last_score = max(0, _pc_to_int(getattr(player.chores, "last_score", 0), 0))
+        player.chores.last_evaluation = str(getattr(player.chores, "last_evaluation", "") or "")
 
         if not isinstance(player.tavern_management.weekly_visitors, dict):
             player.tavern_management.weekly_visitors = {}
@@ -292,32 +175,19 @@ init -45 python:
         except Exception:
             player.tavern_management.weekly_visitors["prev_avg"] = 0.0
 
-        if not isinstance(WeeklyChoresLastEvalStamp, str):
-            WeeklyChoresLastEvalStamp = str(WeeklyChoresLastEvalStamp or "")
+        if not isinstance(player.tavern_management.weekly_chores_last_eval_stamp, str):
+            player.tavern_management.weekly_chores_last_eval_stamp = str(player.tavern_management.weekly_chores_last_eval_stamp or "")
 
-        if not isinstance(neshlush, dict):
-            neshlush = {}
         for girl in PLAYER_CORE_OTHER_GIRLS:
-            if girl not in neshlush:
-                info = getPersonInfo(girl)
-                base_open = int(getattr(info, "openness", 0) or 0) if info is not None else 0
-                neshlush[girl] = max(0, 5 - base_open)
-            info = getPersonInfo(girl)
+            info = people.get_info(girl)
             if info is not None and not hasattr(info, "rebel_baseline"):
-                info.rebel_baseline = neshlush[girl]
+                info.rebel_baseline = max(0, 5 - int(info.openness or 0))
 
     def get_player_chores_ui_state():
         _ensure_player_chores_state()
         return {k: int(player.chores.weekly.get(k, 0) or 0) for k in PLAYER_CHORE_KEYS}
 
     def do_player_chore(chore_key, where_id="", object_id=""):
-        global exploration, player.tavern_management.cleanliness
-        global player.tavern_management.ashes_dirty_days, player.tavern_management.upstairs_rooms_dirty, taverncleanliness
-        global ashesdirtydays, upstairsroomsdirty
-        global exploration, player.tavern_management.cleanliness
-        global player.tavern_management.ashes_dirty_days, player.tavern_management.upstairs_rooms_dirty, player.tavern_management.cleanliness
-        global player.tavern_management.ashes_dirty_days, player.tavern_management.upstairs_rooms_dirty, taverncleanliness
-        global ashesdirtydays, upstairsroomsdirty
         _ensure_player_chores_state()
         key = str(chore_key or "").strip()
         allowed, reason = can_do_player_chore(key, where_id, object_id)
@@ -331,23 +201,23 @@ init -45 python:
 
         if key == "bring_woods":
             _pc_advance_minutes(8 * 60)
-            fun = _pc_clamp(fun + 25, 0, 100)
-            energy = _pc_clamp(energy - 40, 0, 100)
-            exploration = max(0, _pc_to_int(exploration, 0) + 1)
-            taverncleanliness = _pc_clamp(taverncleanliness - 15, 0, 100)
-            _room_add_item_by_id(ShedRoom, "lumber_001")
+            player.change_stat("fun", 25)
+            player.change_stat("energy", -40)
+            player.change_stat("exploration", 1)
+            player.tavern_management.cleanliness = _pc_clamp(player.tavern_management.cleanliness - 15, 0, 100)
+            _room_add_item_by_id(rooms.get("Shed"), "lumber_001")
             result_text = "Вы уходите в лес за дровами. К вечеру удается притащить {b}одно крепкое бревно{/b} для хозяйства."
         elif key == "chop_wood":
             if _pc_player_has_item("lumber_001"):
                 player.remove_item("lumber_001")
             else:
-                _room_remove_item_by_id(ShedRoom, "lumber_001")
-            _room_add_item_units(ShedRoom, "chopped_wood_001", 10)
+                _room_remove_item_by_id(rooms.get("Shed"), "lumber_001")
+            _room_add_item_units(rooms.get("Shed"), "chopped_wood_001", 10)
             _pc_advance_minutes(60)
-            fun = _pc_clamp(fun + 5, 0, 100)
-            energy = _pc_clamp(energy - 20, 0, 100)
-            exploration = max(0, _pc_to_int(exploration, 0) + 3)
-            _total_wood = _room_item_count_by_id(ShedRoom, "chopped_wood_001")
+            player.change_stat("fun", 5)
+            player.change_stat("energy", -20)
+            player.change_stat("exploration", 3)
+            _total_wood = _room_item_count_by_id(rooms.get("Shed"), "chopped_wood_001")
             result_text = "Вы ставите бревно на колоду и рубите его на поленья. В сарае теперь {b}%s{/b} единиц колотых дров." % str(_total_wood)
         elif key == "make_fire":
             _fire_object = _pc_fire_object(where_id, object_id)
@@ -362,26 +232,15 @@ init -45 python:
                 _room_remove_item_by_id(_fuel_room, "chopped_wood_001")
             _set_object_state_int(_fire_object, "fire_started_minute", _fire_now)
             _set_object_state_int(_fire_object, "fire_until_minute", _fire_now + _pc_fire_duration_minutes())
-            _set_object_state_int(_fire_object, "fire_units", 0)
-            _set_object_state_int(_fire_object, "fire_units", 0)
-            _set_object_state_int(_fire_object, "fireOn", 1)
-            _set_object_state_int(_fire_object, "fireOn", 1)
-            _set_object_state_int(_fire_object, "fireOn", 1)
             _set_object_state_int(_fire_object, "madeFireToday", 1)
             _set_object_state_int(_fire_object, "ash_dirty", 1)
-            if _fire_object is TavernKitchenHearthObject:
-                _set_object_state_int(TavernKitchenCauldronObject, "canBoilWater", 1)
-            if _fire_object is TavernKitchenHearthObject:
-                _set_object_state_int(TavernKitchenCauldronObject, "canBoilWater", 1)
-            if _fire_object is TavernKitchenHearthObject:
-                _set_object_state_int(TavernKitchenCauldronObject, "canBoilWater", 1)
             if _fire_was_active:
                 _add_object_state_int(_fire_object, "fire_adds", 1, 0)
             else:
                 _set_object_state_int(_fire_object, "fire_adds", 0)
-            fun = _pc_clamp(fun + 5, 0, 100)
-            energy = _pc_clamp(energy - 5, 0, 100)
-            exploration = max(0, _pc_to_int(exploration, 0) + 1)
+            player.change_stat("fun", 5)
+            player.change_stat("energy", -5)
+            player.change_stat("exploration", 1)
             if _fire_was_active:
                 result_text = "Вы подкладываете колотые дрова в {b}%s{/b}. Огонь снова будет держаться примерно {b}двенадцать часов{/b}." % str(_fire_object.name).strip().lower()
             else:
@@ -389,31 +248,30 @@ init -45 python:
         elif key == "clean_ashes":
             _fire_object = _pc_fire_object(where_id, object_id)
             _set_object_state_int(_fire_object, "ash_dirty", 0)
-            ashesdirtydays = 0
+            player.tavern_management.ashes_dirty_days = 0
             _pc_advance_minutes(30)
-            fun = _pc_clamp(fun - 10, 0, 100)
-            energy = _pc_clamp(energy - 20, 0, 100)
+            player.change_stat("fun", -10)
+            player.change_stat("energy", -20)
             player.appearance.increment_wash_days(1)
-            exploration = max(0, _pc_to_int(exploration, 0) + 1)
+            player.change_stat("exploration", 1)
             result_text = "Вы выгребаете золу и приводите очаг в порядок."
         elif key == "boil_water":
             _fire_object = _pc_fire_object(where_id, object_id)
             _water_object = _pc_water_object(where_id, object_id)
             _pc_advance_minutes(60)
             _set_object_state_int(_water_object, "hot_water_until_minute", _pc_calendar_total_minutes() + (24 * 60))
-            _set_object_state_int(_water_object, "hot_water_units", 0)
             _set_object_state_int(_water_object, "boiledWaterToday", 1)
-            fun = _pc_clamp(fun - 10, 0, 100)
-            energy = _pc_clamp(energy - 5, 0, 100)
-            taverncleanliness = _pc_clamp(taverncleanliness - 4, 0, 100)
-            exploration = max(0, _pc_to_int(exploration, 0) + 1)
+            player.change_stat("fun", -10)
+            player.change_stat("energy", -5)
+            player.tavern_management.cleanliness = _pc_clamp(player.tavern_management.cleanliness - 4, 0, 100)
+            player.change_stat("exploration", 1)
             result_text = "Вы ставите воду греться. В {b}%s{/b} теперь будет горячая вода до {b}следующего дня{/b}." % str(_water_object.name).strip().lower()
         elif key == "clean_upstairs_rooms":
-            fun = _pc_clamp(fun - 25, 0, 100)
-            energy = _pc_clamp(energy - 15, 0, 100)
+            player.change_stat("fun", -25)
+            player.change_stat("energy", -15)
             player.appearance.increment_wash_days(1)
-            exploration = max(0, _pc_to_int(exploration, 0) + 1)
-            upstairsroomsdirty = 0
+            player.change_stat("exploration", 1)
+            player.tavern_management.upstairs_rooms_dirty = 0
             result_text = "Вы тратите время на уборку комнат наверху и к концу работы валитесь с ног."
         else:
             result_text = "Дело выполнено."
@@ -422,7 +280,6 @@ init -45 python:
         return {"ok": True, "text": result_text, "chore_key": key}
 
     def record_weekly_tavern_visitors(visitors_count):
-        global player.tavern_management.weekly_visitors
         _ensure_player_chores_state()
         if not isinstance(player.tavern_management.weekly_visitors, dict):
             player.tavern_management.weekly_visitors = {}
@@ -433,7 +290,7 @@ init -45 python:
         key = str(girl_key or "").strip()
         if not key:
             return
-        info = getPersonInfo(key)
+        info = people.get_info(key)
         if info is not None:
             info.change_social(friend_delta=_pc_to_int(delta, 0))
 
@@ -447,13 +304,11 @@ init -45 python:
         chores_state=None,
         visitors_track=None,
         sandra_friend=0,
-        sandra_flags=None,
         rebel_state=None,
         hour_now=None,
     ):
         chores_state = dict(chores_state or {})
         visitors_track = dict(visitors_track or {})
-        sandra_flags = dict(sandra_flags or {})
         rebel_state = dict(rebel_state or {})
 
         chores = {key: max(0, _pc_to_int(chores_state.get(key, 0), 0)) for key in PLAYER_CHORE_KEYS}
@@ -463,14 +318,6 @@ init -45 python:
             "prev_avg": float(visitors_track.get("prev_avg", 0.0) or 0.0),
         }
         sandra_friend_value = max(0, _pc_to_int(sandra_friend, 0))
-        next_flags = {
-            "MCVisitFirstReady": max(0, _pc_to_int(sandra_flags.get("MCVisitFirstReady", 0), 0)),
-            "MCVisitFirstPending": max(0, _pc_to_int(sandra_flags.get("MCVisitFirstPending", 0), 0)),
-            "WeeklyChoreCheckScore": max(0, _pc_to_int(sandra_flags.get("WeeklyChoreCheckScore", 0), 0)),
-            "WeeklyChoreCheckCounter": max(0, _pc_to_int(sandra_flags.get("WeeklyChoreCheckCounter", 0), 0)),
-            "Week5WakePending": max(0, _pc_to_int(sandra_flags.get("Week5WakePending", 0), 0)),
-            "WeeklyChoreCheckEval": str(sandra_flags.get("WeeklyChoreCheckEval", "") or ""),
-        }
         next_rebel = {girl: max(0, _pc_to_int(rebel_state.get(girl, 0), 0)) for girl in PLAYER_CORE_OTHER_GIRLS}
 
         week_value = _pc_to_int(week_now, 1)
@@ -489,7 +336,8 @@ init -45 python:
             "chores": chores,
             "visitors": week_vis,
             "sandra_friend": sandra_friend_value,
-            "sandra_flags": next_flags,
+            "chore_score": 0,
+            "chore_evaluation": "",
             "rebel": next_rebel,
         }
 
@@ -510,22 +358,17 @@ init -45 python:
                 chore_score += 1
             else:
                 chores_ok = False
-        next_flags["WeeklyChoreCheckScore"] = chore_score
         if chore_score >= 5:
-            next_flags["WeeklyChoreCheckEval"] = "good"
+            chore_evaluation = "good"
             reward_lines.append("Сандра признала, что по хозяйству неделя вышла {b}хорошей{/b}.")
         elif chore_score >= 3:
-            next_flags["WeeklyChoreCheckEval"] = "neutral"
+            chore_evaluation = "neutral"
             reward_lines.append("Сандра признала, что по хозяйству неделя вышла {b}средней{/b}.")
         else:
-            next_flags["WeeklyChoreCheckEval"] = "bad"
+            chore_evaluation = "bad"
             reward_lines.append("Сандра признала, что по хозяйству неделя вышла {b}плохой{/b}.")
         if chore_score >= 4:
-            next_flags["WeeklyChoreCheckCounter"] = max(0, _pc_to_int(next_flags.get("WeeklyChoreCheckCounter", 0), 0)) + 1
-            next_flags["Week5WakePending"] = 1
             reward_lines.append("Сандра отметила, что по хозяйству вы закрыли %d из %d еженедельных дел." % (chore_score, len(PLAYER_CHORE_KEYS)))
-        else:
-            next_flags["Week5WakePending"] = 0
         if chores_ok:
             sandra_gain += 1
             reward_lines.append("Сандра заметила, что вы не запускали хозяйские дела всю неделю.")
@@ -551,11 +394,6 @@ init -45 python:
             if reduced:
                 reward_lines.append("После ее благодарности остальные стали посговорчивее.")
 
-        if sandra_friend_value >= 10 and _pc_to_int(next_flags.get("MCVisitFirstReady", 0), 0) == 0:
-            next_flags["MCVisitFirstReady"] = 1
-            next_flags["MCVisitFirstPending"] = 1
-            reward_lines.append("Сандра явно готова впервые зайти к вам утром в комнату.")
-
         for key in PLAYER_CHORE_KEYS:
             chores[key] = 0
         week_vis["prev_avg"] = cur_avg
@@ -567,99 +405,63 @@ init -45 python:
         preview["chores"] = chores
         preview["visitors"] = week_vis
         preview["sandra_friend"] = sandra_friend_value
-        preview["sandra_flags"] = next_flags
+        preview["chore_score"] = chore_score
+        preview["chore_evaluation"] = chore_evaluation
         preview["rebel"] = next_rebel
         preview["message"] = ("<br>" + "<br>".join(reward_lines) + "<br>") if reward_lines else ""
         return preview
 
     def evaluate_weekly_chores_and_rewards():
-        global player.chores.weekly, player.tavern_management.weekly_visitors
-        global neshlush, UI_chores
-
         _ensure_player_chores_state()
-        Sandra.ensure_story_defaults()
 
         preview = weekly_chores_evaluation_preview(
-            week_now=week,
-            time_now=time,
-            hour_now=hour,
-            year_now=year,
-            month_now=month,
-            day_now=day,
-            last_stamp=WeeklyChoresLastEvalStamp,
+            week_now=calendar_v2.week,
+            time_now=calendar_v2.time_slot(),
+            hour_now=calendar_v2.hour,
+            year_now=calendar_v2.cycle,
+            month_now=calendar_v2.period,
+            day_now=calendar_v2.day,
+            last_stamp=player.tavern_management.weekly_chores_last_eval_stamp,
             chores_state=player.chores.weekly,
             visitors_track=player.tavern_management.weekly_visitors,
             sandra_friend=Sandra.rel,
-            sandra_flags=Sandra.var,
-            rebel_state=neshlush,
+            rebel_state={girl: int(people.get_info(girl).rebel_baseline or 0) for girl in PLAYER_CORE_OTHER_GIRLS if people.get_info(girl) is not None},
         )
         if not bool(preview.get("applied", False)):
             return ""
 
-        WeeklyChoresLastEvalStamp = str(preview.get("stamp", "") or WeeklyChoresLastEvalStamp)
-        preview_flags = dict(preview.get("sandra_flags", {}) or {})
-        Sandra.weekly_report_finished(
-            score=preview_flags.get("WeeklyChoreCheckScore", 0),
-            evaluation=preview_flags.get("WeeklyChoreCheckEval", ""),
-            counter=preview_flags.get("WeeklyChoreCheckCounter", 0),
-            wake_pending=preview_flags.get("Week5WakePending", 0),
-            visit_first_ready=preview_flags.get("MCVisitFirstReady", 0),
-            visit_first_pending=preview_flags.get("MCVisitFirstPending", 0),
-            friend_value=preview.get("sandra_friend", Sandra.rel),
-        )
-        if Sandra.weekly_wake_pending and "sandraWeeklyEvaluation" in threads:
-            threads["sandraWeeklyEvaluation"].advanceTo(Sandra.weekly_wake_num, force_active=True)
+        player.tavern_management.weekly_chores_last_eval_stamp = str(preview.get("stamp", "") or player.tavern_management.weekly_chores_last_eval_stamp)
+        player.chores.last_score = max(0, _pc_to_int(preview.get("chore_score", 0), 0))
+        player.chores.last_evaluation = str(preview.get("chore_evaluation", "") or "").strip().lower()
+        Sandra.rel = max(0, min(20, _pc_to_int(preview.get("sandra_friend", Sandra.rel), Sandra.rel)))
+        if player.chores.last_evaluation == "good":
+            Sandra.change_mana(3, "weekly_check_good")
+            Sandra.change_fear(-5, "weekly_check_good")
+            Sandra.trust = max(0, min(100, _pc_to_int(Sandra.trust, 0) + 3))
+        elif player.chores.last_evaluation == "bad":
+            Sandra.change_mana(-3, "weekly_check_bad")
+            Sandra.change_fear(5, "weekly_check_bad")
+            if _pc_to_int(Sandra.anger_with_player, 0) > 40:
+                Sandra.rebellion = max(0, min(100, _pc_to_int(Sandra.rebellion, 0) + 2))
+
+        sandra_thread = threads["sandraWeeklyEvaluation"]
+        if player.chores.last_score >= 4 and not sandra_thread.completed:
+            sandra_thread.forceEnable()
+            sandra_thread.day = int(current_game_day() or 0)
 
         preview_rebel = dict(preview.get("rebel", {}) or {})
         for girl in PLAYER_CORE_OTHER_GIRLS:
-            neshlush[girl] = max(0, _pc_to_int(preview_rebel.get(girl, neshlush.get(girl, 0)), 0))
+            info = people.get_info(girl)
+            if info is not None:
+                info.rebel_baseline = max(0, _pc_to_int(preview_rebel.get(girl, info.rebel_baseline), 0))
 
-            # Respect that girls are now class instances (PeopleInfo/Girl), not just dict keys
-            try:
-                info = peopleInfo.get(girl)
-                if isinstance(info, PeopleInfo):
-                    info.openness = otkroven.get(girl, info.openness)
-                    # Store rebel baseline on the object as well for consistency with OOP layer
-                    if not hasattr(info, "rebel_baseline"):
-                        info.rebel_baseline = 0
-                    info.rebel_baseline = neshlush.get(girl, info.rebel_baseline)
-            except Exception:
-                pass
-
-        try:
-            relationship_apply_weekly_chore_evaluation(preview)
-        except Exception:
-            pass
+        relationship_apply_weekly_chore_evaluation(preview)
 
         preview_chores = dict(preview.get("chores", {}) or {})
         for key in PLAYER_CHORE_KEYS:
             player.chores.weekly[key] = max(0, _pc_to_int(preview_chores.get(key, 0), 0))
-        _pc_sync_ui_chores()
-
-        _pc_sync_ui_chores()
-
-        _pc_sync_ui_chores()
-
-        _pc_sync_ui_chores()
-
-        _pc_sync_ui_chores()
-
-        _pc_sync_ui_chores()
-
-        _pc_sync_ui_chores()
-
-        _pc_sync_ui_chores()
-
-        _pc_sync_ui_chores()
-
         preview_visitors = dict(preview.get("visitors", {}) or {})
         player.tavern_management.weekly_visitors["prev_avg"] = float(preview_visitors.get("prev_avg", 0.0) or 0.0)
         player.tavern_management.weekly_visitors["sum"] = max(0, _pc_to_int(preview_visitors.get("sum", 0), 0))
         player.tavern_management.weekly_visitors["days"] = max(0, _pc_to_int(preview_visitors.get("days", 0), 0))
-        sync_player_state_from_store()
-
-        sync_player_state_from_store()
-
-        sync_player_state_from_store()
-
         return str(preview.get("message", "") or "")

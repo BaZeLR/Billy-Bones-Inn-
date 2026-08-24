@@ -1,21 +1,6 @@
-default RelationshipMoodState = {}        try:
-            people_sync_person(key)
-        except Exception:
-            passdefault RelationshipMoodState = {}        try:
-            people_sync_person(key)
-        except Exception:
-            passdefault RelationshipMoodState = {}        try:
-            people_sync_person(key)
-        except Exception:
-            pass# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default RelationshipInteractionScore = {}
-
-default RelationshipInteractionScore = {}
-
-default RelationshipInteractionScore = {}
-
 init -42 python:
     RELATIONSHIP_HOUSEHOLD_NPCS = ("amanda", "melissa", "sandra")
     RELATIONSHIP_CORE_NPCS = ("amanda", "melissa", "sandra", "clara", "becky", "irma", "inga", "liza", "georgett")
@@ -51,7 +36,7 @@ init -42 python:
             "private_talk": {"score": 10, "friend": 3, "open": 2, "slut": 0},
             "gift": {"score": 0, "friend": 30, "open": 0, "slut": 0},
             "share": {"score": 7, "friend": 3, "open": 0, "slut": 0},
-            "flirt": {"score": 0, "friend": 10, "open": 0, "slut": 0},
+            "flirt": {"score": 0, "friend": 5, "open": 0, "slut": 0},
         },
         "becky": {
             "private_talk": {"score": 8, "friend": 2, "open": 1, "slut": 0},
@@ -95,52 +80,45 @@ init -42 python:
         return str(person or "").strip().lower()
 
     def relationship_state(person=""):
-        global RelationshipMoodState
-        global RelationshipMoodState
-        global RelationshipMoodState
         key = relationship_key(person)
         if not key:
             return {}
-        if not isinstance(RelationshipMoodState, dict):
-            RelationshipMoodState = {}
-        row = RelationshipMoodState.get(key, None)
+        info = people.get_info(key)
+        if info is None:
+            return {}
+        row = info.var.get("relationship_mood", None)
         if not isinstance(row, dict):
             row = {}
-            RelationshipMoodState[key] = row
+            info.var["relationship_mood"] = row
         row.setdefault("anger", 0)
         row.setdefault("anger_until_day", -1)
         row.setdefault("anger_reason", "")
         row.setdefault("last_bad_action_day", -1)
+        row.setdefault("interaction_score", 0)
         return row
 
     def relationship_interaction_score(person=""):
         key = relationship_key(person)
         if not key:
             return 0
-        info = getPersonInfo(key)
+        info = people.get_info(key)
         friend_value = relationship_int(getattr(info, "rel", 0), 0) if info is not None else 0
         open_value = relationship_int(getattr(info, "openness", 0), 0) if info is not None else 0
         talked_value = relationship_int(getattr(info, "talked_today", 0), 0) if info is not None else 0
         inferred = max(0, friend_value * 3 + open_value + min(10, talked_value * 2))
-        if not isinstance(RelationshipInteractionScore, dict):
-            return inferred
-        return max(inferred, relationship_int(RelationshipInteractionScore.get(key, 0), 0))
+        row = relationship_state(key)
+        return max(inferred, relationship_int(row.get("interaction_score", 0), 0))
 
     def relationship_add_interaction_score(person="", action="", raw_score=0):
-        global RelationshipInteractionScore
         key = relationship_key(person)
         if not key:
             return 0
-        if not isinstance(RelationshipInteractionScore, dict):
-            RelationshipInteractionScore = {}
-        action_key = str(action or "").strip().lower()
-        action_key = str(action or "").strip().lower()
-        action_key = str(action or "").strip().lower()
         score = max(0, relationship_int(raw_score, 0))
         if score <= 0:
             return relationship_interaction_score(key)
         gain = max(1, score)
-        RelationshipInteractionScore[key] = min(999, relationship_interaction_score(key) + gain)
+        row = relationship_state(key)
+        row["interaction_score"] = min(999, relationship_interaction_score(key) + gain)
         return relationship_interaction_score(key)
 
     def relationship_action_requirement_key(action="", item_id=""):
@@ -172,7 +150,7 @@ init -42 python:
         open_need = relationship_int(requirement.get("open", 0), 0)
         slut_need = relationship_int(requirement.get("slut", 0), 0)
         score_value = relationship_interaction_score(key)
-        info = getPersonInfo(key)
+        info = people.get_info(key)
         friend_value = relationship_int(getattr(info, "rel", 0), 0) if info is not None else 0
         open_value = relationship_int(getattr(info, "openness", 0), 0) if info is not None else 0
         slut_value = relationship_int(getattr(info, "corruption", 0), 0) if info is not None else 0
@@ -192,7 +170,7 @@ init -42 python:
             return False, "Некого выбрать."
         requirement = relationship_action_requirement(key, action, item_id)
         score_value = relationship_interaction_score(key)
-        info = getPersonInfo(key)
+        info = people.get_info(key)
         friend_value = relationship_int(getattr(info, "rel", 0), 0) if info is not None else 0
         open_value = relationship_int(getattr(info, "openness", 0), 0) if info is not None else 0
         slut_value = relationship_int(getattr(info, "corruption", 0), 0) if info is not None else 0
@@ -216,7 +194,7 @@ init -42 python:
             return 0
         anger = max(0, relationship_int(row.get("anger", 0), 0))
         until_day = relationship_int(row.get("anger_until_day", -1), -1)
-        if anger > 0 and until_day >= 0 and relationship_int(dayspassed, 0) > until_day:
+        if anger > 0 and until_day >= 0 and int(current_game_day()) > until_day:
             row["anger"] = 0
             row["anger_reason"] = ""
             return 0
@@ -228,9 +206,9 @@ init -42 python:
             return 0
         current = relationship_anger(person)
         row["anger"] = max(0, min(5, current + relationship_int(amount, 1)))
-        row["anger_until_day"] = max(relationship_int(row.get("anger_until_day", -1), -1), relationship_int(dayspassed, 0) + max(1, relationship_int(days, 1)))
+        row["anger_until_day"] = max(relationship_int(row.get("anger_until_day", -1), -1), int(current_game_day()) + max(1, relationship_int(days, 1)))
         row["anger_reason"] = str(reason or row.get("anger_reason", "") or "bad_action")
-        row["last_bad_action_day"] = relationship_int(dayspassed, 0)
+        row["last_bad_action_day"] = int(current_game_day())
         return relationship_anger(person)
 
     def relationship_calm(person="", amount=1):
@@ -244,22 +222,17 @@ init -42 python:
         return relationship_anger(person)
 
     def relationship_weekly_chore_eval():
-        try:
-            return str(Sandra.weekly_chore_eval or "").strip().lower()
-        except Exception:
-            return ""
+        return str(player.chores.last_evaluation or "").strip().lower()
 
     def relationship_rebel_value(person=""):
         key = relationship_key(person)
-        try:
-            return max(0, relationship_int(neshlush.get(key, 0), 0))
-        except Exception:
-            return 0
+        info = people.get_info(key)
+        return max(0, relationship_int(getattr(info, "rebel_baseline", 0), 0)) if info is not None else 0
 
     def relationship_has_talked_today(person=""):
         key = relationship_key(person)
         try:
-            info = getPersonInfo(key)
+            info = people.get_info(key)
             if info is not None and relationship_int(getattr(info, "talked_today", 0), 0) > 0:
                 return True
             if info is not None and len(getattr(info, "talkToday", set()) or set()) > 0:
@@ -270,7 +243,7 @@ init -42 python:
 
     def relationship_social_stage(person=""):
         key = relationship_key(person)
-        info = getPersonInfo(key)
+        info = people.get_info(key)
         friend_value = relationship_int(getattr(info, "rel", 0), 0) if info is not None else 0
         open_value = relationship_int(getattr(info, "openness", 0), 0) if info is not None else 0
         corruption_value = relationship_int(getattr(info, "corruption", 0), 0) if info is not None else 0
@@ -313,7 +286,7 @@ init -42 python:
         if anger > 0:
             return False, relationship_block_text(key, action_key)
 
-        info = getPersonInfo(key)
+        info = people.get_info(key)
         friend_value = relationship_int(getattr(info, "rel", 0), 0) if info is not None else 0
         weekly_eval = relationship_weekly_chore_eval()
 
@@ -376,27 +349,25 @@ init -42 python:
             return
         if not bool(accepted) or score < 0:
             relationship_set_anger(key, 1 if score >= -2 else 2, 1 if action_key == "talk" else 2, action_key)
-            if key in RELATIONSHIP_HOUSEHOLD_NPCS and isinstance(neshlush, dict):
-                neshlush[key] = max(0, relationship_int(neshlush.get(key, 0), 0) + 1)
+            info = people.get_info(key)
+            if key in RELATIONSHIP_HOUSEHOLD_NPCS and info is not None:
+                info.rebel_baseline = max(0, relationship_int(info.rebel_baseline, 0) + 1)
         elif score > 0:
             relationship_calm(key, 1)
             relationship_add_interaction_score(key, action_key, score)
-            if key in RELATIONSHIP_HOUSEHOLD_NPCS and isinstance(neshlush, dict):
-                neshlush[key] = max(0, relationship_int(neshlush.get(key, 0), 0) - 1)
+            info = people.get_info(key)
+            if key in RELATIONSHIP_HOUSEHOLD_NPCS and info is not None:
+                info.rebel_baseline = max(0, relationship_int(info.rebel_baseline, 0) - 1)
 
     def relationship_apply_weekly_chore_evaluation(preview=None):
         result = ""
         score = 0
         if isinstance(preview, dict):
-            flags = dict(preview.get("sandra_flags", {}) or {})
-            result = str(flags.get("WeeklyChoreCheckEval", "") or "").strip().lower()
-            score = relationship_int(flags.get("WeeklyChoreCheckScore", 0), 0)
+            result = str(preview.get("chore_evaluation", "") or "").strip().lower()
+            score = relationship_int(preview.get("chore_score", 0), 0)
         if not result:
             result = relationship_weekly_chore_eval()
-            try:
-                score = relationship_int(Sandra.weekly_chore_score, 0)
-            except Exception:
-                score = 0
+            score = relationship_int(player.chores.last_score, 0)
         if result == "good":
             for person in RELATIONSHIP_HOUSEHOLD_NPCS:
                 relationship_calm(person, 2)
@@ -406,8 +377,9 @@ init -42 python:
             relationship_set_anger("sandra", 2, 3, "weekly_chores")
             for person in ("amanda", "melissa"):
                 relationship_set_anger(person, 1, 2, "weekly_chores")
-                if isinstance(neshlush, dict):
-                    neshlush[person] = max(0, relationship_int(neshlush.get(person, 0), 0) + 1)
+                info = people.get_info(person)
+                if info is not None:
+                    info.rebel_baseline = max(0, relationship_int(info.rebel_baseline, 0) + 1)
         return score
 
     def relationship_card_status_line(person=""):

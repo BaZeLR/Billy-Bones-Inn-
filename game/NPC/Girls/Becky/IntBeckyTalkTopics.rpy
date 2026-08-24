@@ -30,10 +30,9 @@ label story_becky_talk_inga_0(girl_name="becky"):
     "Вы решили спросить Бекки про дочку и ее развлечения и она охотно начала хвастаться:"
     "\"Ингенборг, доченька моя старшая, такая скромница,\" рассказывает вам вдова. \"Прямо как я в молодости. Несколько лет ничего мальчикам не позволяла, ну кроме минета, конечно. Да еще и смущалась так трогательно. Помню несколько лет назад увидела я как она с парнем соседским в сарай пошла, интересно мне стало и я за ними зашла. Так она меня увидела, член изо рта выронила, покраснела вся с головы до пят, убежала и потом два дня от меня пряталась, смущалась, краснела - вот какая она у меня скромница!\" - поведала вам Бекки. Ее рассказ вас заинтересовал."
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
-    $ Becky.var["SawIngaFuck"] = 2
     $ Becky.finish_talk()
     if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
+        $ event_runtime.active_thread.advance()
     return
 
 
@@ -42,10 +41,9 @@ label story_becky_talk_inga_1(girl_name="becky"):
     "\"Я ее, конечно, за тот раз наругала, разве можно так парня обламывать и убегать! Так можно ведь и славу плохую заработать, парни избегать будут. Так что в следующий раз когда я нечаянно на нее с юнгой каким-то наткнулась, она хоть и покраснела, но ничего не выплевала а продолжала сосать. Но как же неумело она это делала! Пришлось все-таки мне их прервать и показать как правильно - так она все время как я ей объясняла и показывала, мялась и краснела. Какая же она у меня скромная и приличная!"
     "Может даже слишком, время шло, а она у меня так девкой и оставалась, говорила что решиться никак не может, мы уже волноваться начали, все ли с ней в порядке.\" - рассказала вам Бекки."
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
-    $ Becky.var["SawIngaFuck"] = 3
     $ Becky.finish_talk()
     if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
+        $ event_runtime.active_thread.advance()
     return
 
 
@@ -53,10 +51,9 @@ label story_becky_talk_lucas_0(girl_name="becky"):
     "Бекки с готовностью отозвалась на ваш вопрос, видно что она гордится и дочкой, и женихом:"
     "\"Лукас парень хваткий, с ним не забалуешь. Инга-то у меня девушка скромная и приличная, она мне говорила что ни разу на первом свидании даже минета не делала, все второго, а то и третьего дожидалась. А уж большего и вовсе не позволяла. К Лукасу она девкой попала, так он ее на первом же свидании, как она мне потом рассказала, от этой обузы и избавил, она сама не поняла как так случилось! Теперь она в нем души не чает, хвостиком за ним ходит, а он тоже к ней проникся, даже жениться обещает. Если выполнит, то прям как я будет, выйдет замуж за того, кто ее первый трахнул. А это ведь такая редкость!\""
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
-    $ Becky.var["SawIngaFuck"] = 4
     $ Becky.finish_talk()
     if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
+        $ event_runtime.active_thread.advance()
     return
 
 
@@ -64,10 +61,9 @@ label story_becky_talk_husband_0(girl_name="becky"):
     "Глаза Бекки затуманились от приятных воспоминаний:"
     "\"Эрик мой был на нашей улице первым парнем. И сильный, и разумный, и семья богатая. Девки наши, конечно, на него вешались. А я тогда все никак не могла решится с мальчиком-то попробовать, все боялась чего-то. Грета, сестренка моя младшая, хоть и на два года младше меня, уже второй раз пузо нагуляла. Матушка с батюшкой меня попрекали, что мол Гретка внучками их радует, а я, хоть мне уже семнадцать, нет. И тут Эрик. На танцульках меня пригласил я в его руках и растаяла, даже не заметила, как мы на сеновале оказались. Так я и стала одной из трех его любовниц постоянных. Озорником он был большим, игры всякие любил. Например в угадайку - ложился, глаза завязывал, а кто-то из нас ему на член садился. Точно ведь угадывал! Мы и других девчонок приглашали, но он почти всех угадывал, и Грету, и маменьку мою смог угадать! Вот какой он был!\""
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
-    $ Becky.var["husbandtalk"] = 2
     $ Becky.finish_talk()
     if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
+        $ event_runtime.active_thread.advance()
     return
 
 
@@ -75,10 +71,9 @@ label story_becky_talk_husband_1(girl_name="becky"):
     "Вдовушка охотно продолжила свой нескромный рассказ:"
     "\"Животик конечно от таких игр у меня, как и остальных его подружек округлился, я уж думала потеряет он ко мне интерес. Но тут вдруг мой Эрик сватов заслал, оказывается договорились наши родители о приданном. Вместе нам эту лавку купили. Гретка-то мне обзавидовалась! Ее-то замуж только через год выдали, за сына мельника. Все у нас столько лет хорошо было, пятеро деток у нас родилось, но когда была эпидемия орочьей лихорадки, не уберегся Эрик мой. За три дня слег, позеленел и умер. Слава Ильматеру, дети уцелели. С тех пор одна я и осталась.\""
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
-    $ Becky.var["husbandtalk"] = 3
     $ Becky.finish_talk()
     if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
+        $ event_runtime.active_thread.advance()
     return
 
 
@@ -86,10 +81,9 @@ label story_becky_talk_husband_2(girl_name="becky"):
     "Бекки на секунду остановила поток своих рассказов, пытаясь вспомнить:"
     "\"Ну одна из них Роза, подружка моя лучшая. Она меня с Эриком впервые и познакомила. Ревновала меня немного, не без этого, ведь она уже с ним пару месяцев была когда он меня девичества лишил, но без злобы. Клауса, старшенького своего, тоже раньше меня родила, на свадьбе моей с Эриком уже с младенцем была. Потом она в городе служанкой работала, замуж вышла.  К нам с Эриком в гости захаживала не раз, сначала с парнями своими, а потом с мужем. Мы по старой памяти мужиками менялись, Эрик Розочку охаживал, а ее муженек меня. Весело было!\" - вспомнила веселая вдовушка."
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
-    $ Becky.var["husbandtalk"] = 4
     $ Becky.finish_talk()
     if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
+        $ event_runtime.active_thread.advance()
     return
 
 
@@ -97,10 +91,9 @@ label story_becky_talk_husband_3(girl_name="becky"):
     "Бекки сморщила свой лобик, вспомная:"
     "\"Еще Кристинка была, старосты дочка. Но она шебутная была, как сестренка моя, Грета - как парня увидит, так ноги у нее и раздвигаются. Может Эрик ей дочку заделал, а может и еще кто, она сама думала что Эрик, но не уверена была точно. Эрик то на ней хотел конечно женится, но куда ему - он простой деревенский парень, хоть и из зажиточной семьи, а она дочка самого старосты. Гретка еще, сестренка моя, говорит что Мартина, третья дочка ее, от Эрика может быть. Она Мартинкой затяжелела на свадьбе своей, ее там почти все гости отсношали. Ну и Эрик мой, конечно, не отстал. Еще у него девицы конечно были, но сейчас уже и не упомнить, времени-то сколько прошло,\" - поделилась с вами воспоминаниями Бекки."
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
-    $ Becky.var["husbandtalk"] = 5
     $ Becky.finish_talk()
     if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
+        $ event_runtime.active_thread.advance()
     return
 
 
@@ -108,115 +101,107 @@ label story_becky_talk_eddie_0(girl_name="becky"):
     "Бекки явно гордилась своим управляющим:"
     "\"Эдди я подобрала еще сиротой: без дома, без денег, совсем пропащий был мальчишка. Сначала взяла помощником и слугой при лавке, а теперь он уже почти всем товаром заведует. Девицам окрестным прохода не дает, а они ему! А однажды ко мне подруга моя зашла, Нора, а меня дома тогда не было. Прихожу - а Эдди ей уже юбку завернул и сношает. Не смогла устоять, как она мне сказала. Вот какой мой управляющий неотразимый!\" - похвасталась вам Бекки. Вы про себя подумали что дело могло быть не только в неотразимости Эдди, но и в том что эта самая Нора довольно страшновата. Но, по здравом размышлении, вы решили не делится этим соображением с Бекки."
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
-    $ Becky.var["eddietalk"] = 1
     $ Becky.finish_talk()
     if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
+        $ event_runtime.active_thread.advance()
     return
 
 
-label story_becky_talk_eddie_georgett_0(girl_name="becky"):
+label story_becky_talk_eddie_georgett_0(girl_name="becky", tmp_rnd=0):
     if procedural_randint(1, 2, "becky_eddie2_open_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
         "Вы рассказали Бекки про то, как Эдди просит Жоржетту играть ее роль."
         "\"Где же он мог такие мысли подхватить?!\" - удивилась Бекки."
     else:
         "Вы напомнили Бекки про то, как Эдди просит Жоржетту играть ее роль."
         "\"И все таки, что его на такое надоумило?\" - стала размышлять вслух Бекки."
-    $ tmpRnd = procedural_randint(1, 3, "becky_eddie2_memory_%s_%s" % (current_game_day(), Becky.talk_count()))
-    if tmpRnd == 1:
+    $ tmp_rnd = procedural_randint(1, 3, "becky_eddie2_memory_%s_%s" % (current_game_day(), Becky.talk_count()))
+    if tmp_rnd == 1:
         "\"А, знаю! Наверное это от того случая, когда мы с Эриком играли в карты с месье Легаре и Элоизочкой. Эрик поставил на кон меня, а Альбер Элоизу. Альбер выиграл и хочешь не хочешь, пришлось мне на него залезть и попрыгать. И только я во вкус вошла, как Эдди вошел, что-то спросить хотел. Я хотела его прогнать, но не могла, так как рот был мужниным членом занят. А сам Эрик только ухмылялся.\" - поделилась с вами своим предположением Бекки."
-    elif tmpRnd == 2:
+    elif tmp_rnd == 2:
         "\"Хм, вот же был какой случай! Месье Годен, мой поставщик, всегда мне доставлял самы лучший товар. Вот я, чтобы отблагодарить его, и начала ему минет делать. А Эдди нас увидел. Не могла же я огорчить месье Годена! Я помахала Эдди, дабы он ушел и довела дело до конца. Эдди, правда, был черезчур любопытным и досмотрел до конца.\" - поделилась с вами своим предположением Бекки."
     else:
         "\"Может это он когда меня с дружками своими застукал, у него такие мысли появились? Но я же ведь ему объяснила, что просто попробовать этих милых мальчиков хотела!\" - поделилась с вами своим предположением Бекки."
     $ Becky.apply_social_roll(15, 1, 1, 0, 0, 0)
-    if Becky.var.get("eddietalk", 0) < 2:
-        $ Becky.var["eddietalk"] = 2
     $ Becky.finish_talk()
     if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
+        $ event_runtime.active_thread.advance()
     return
 
 
-label story_becky_home_invite_talk_0(girl_name="becky"):
-    if not (str(player.appearance.current_dress or "") == "citydress" and int(charisma or 0) > 75):
-        "Бекки смеряет вас внимательным взглядом и качает головой: к ней домой с такими просьбами нужно приходить прилично одетым и уверенным в себе."
-        $ Becky.finish_talk()
-        if event_runtime.active_thread is not None:
-            $ event_runtime.active_thread.complete()
-        return
+label story_becky_home_invite_talk_0(girl_name="becky", _becky_inga_thread=None, _becky_husband_thread=None, _becky_eddie_thread=None, _becky_husband_unlocked=False, _becky_husband_stage=0, invite_points=0):
+    $ _becky_inga_thread = threads.get("beckyIngaLucasPath", None)
+    $ _becky_husband_thread = threads.get("beckyHusbandBackstory", None)
+    $ _becky_eddie_thread = threads.get("beckyEddieBackstory", None)
+    $ _becky_husband_unlocked = _becky_husband_thread is not None and (_becky_husband_thread.checkActive() or int(_becky_husband_thread.num or 0) > 0)
+    $ _becky_husband_stage = int(_becky_husband_thread.num or 0) if _becky_husband_thread is not None else 0
     "Вы решили попробовать напросится в гости к вдовушке: \"Бекки, сладкая моя, может я к тебе домой зайду как-нибудь вечерком?\" - предложили вы."
-    if Becky.var.get("husbandtalk", 0) == 0:
+    if not _becky_husband_unlocked:
         "\"Да нет, Стефанчик, я же тебя почти совсем не знаю, люди еще увидят, говорить будут, не, извини, но нет!\" - ответила вам вдова."
     else:
-        $ InvitePoints = 0
+        $ invite_points = 0
         "\"Стефанчик, я бы и рада тебя пригласить, но что мои домашние скажут, как я им тебя представлю? Они же не маленькие, все поймут. Вот Эдди, мой управляющий, как я ему в глаза буду смотреть?\" - спросила вас вдова."
-        if Becky.var.get("eddietalk", 0) >= 2:
+        if _becky_eddie_thread is not None and int(_becky_eddie_thread.num or 0) >= 2:
             "\"Вот именно что не маленькие\", ответили вы не растерявшись."
             "\"Я же тебе рассказывал, что Эдди в моем трактире девиц снимает. Что ему, если хозяйка лавки своего любовника к себе приведет, не удивишь его этим.\""
-            $ InvitePoints += 1
+            $ invite_points += 1
         else:
             "Вы не нашлись с ответом и промолчали."
         "\"А дочка моя старшая, Ингеборг, что я ей скажу?\" - смотря вам в глаза спросила Бекки."
-        if Becky.var.get("SawIngaFuck", 0) >= 4:
+        if _becky_inga_thread is not None and int(_becky_inga_thread.num or 0) >= 4:
             "\"Как что? Чтобы она с мамы пример брала и не по подворотням со своим парнем пряталась, а домой его приглашала.\" - нашлись вы с ответом. Ребекка не нашлась как вам возразить."
-            $ InvitePoints += 1
+            $ invite_points += 1
         else:
             "Вы попытались заговорить Бекки зубы, но поняв, что говорите неубедительно, замолкли на полуслове."
         "\"А муж мой покойный, он бы как на это посмотрел?\" - всплеснув руками заявила вдовица."
-        if Becky.var.get("husbandtalk", 0) >= 3:
+        if _becky_husband_stage >= 2:
             "\"Ну, судя по тому, что ты о нем рассказывала, посмотрел бы он на это с интересом, вожделением и стремлением принять участие.\" - отетили вы."
             "\"И то правда!\", засмеялась Бекки."
-            $ InvitePoints += 1
+            $ invite_points += 1
         else:
             "Вам представился суровый дух усопшего мужа и вы пристыженно примолкли."
         if str(player.appearance.current_dress or "") == "citydress":
             "\"Одно хорошо\", отметила Бекки. - \"Ты хотя бы прилично одет.\""
-            $ InvitePoints += 1
+            $ invite_points += 1
         else:
             "\"А костюмчик-то у тебя приличный и в меру скромный есть?\" поинтересовалась благонравная вдовица."
             if player.appearance.has_dress("citydress"):
                 "\"За кого ты меня принимаешь?! Конечно есть.\" ответили вы."
-                $ InvitePoints += 1
+                $ invite_points += 1
             else:
                 "\"Ну пока нет, но скоро будет\", ничтоже сумнявшись заявили вы. Скромница, однако, отнеслась к вашим уверениям скептически: \"Вот когда будет, тогда и поговорим!\""
-        if InvitePoints >= 4:
+        if invite_points >= 4:
             "\"Вот черт языкастый!\", воскликнула в сердцах Бекки. -\"Уболтал, можешь по вечерам в гости ко мне приходить\""
-            if Becky.var.get("visitedhome", 0) < 3:
-                $ Becky.var["visitedhome"] = 3
+            if Becky.home_visit_stage < 3:
+                $ Becky.home_visit_stage = 3
         else:
             "\"Ну вот, сам видишь, что в гости ко мне тебе лучше не приходить.\" - торжествуеще сказала вдовица. Вам ничего не оставалось делать, как с ней согласиться."
     $ Becky.finish_talk()
-    if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
     return
 
 
 label story_becky_talk_pregnancy_0(girl_name="becky"):
-    $ MainTxt = DaddyAskBuildPhrase(girl_name)
-    $ CurLocDesc = MainTxt
-    if str(MainTxt or "") != "":
+    $ scene_runtime.text = DaddyAskBuildPhrase(girl_name)
+    $ scene_runtime.location_text = scene_runtime.text
+    if str(scene_runtime.text or "") != "":
         $ Becky.finish_talk()
-        if event_runtime.active_thread is not None:
-            $ event_runtime.active_thread.complete()
     return
 
 
-label story_becky_home_last_visit_talk_0(girl_name="becky"):
-    if Becky.var.get("visitedhome", 0) >= 6:
+label story_becky_home_last_visit_talk_0(girl_name="becky", rand_var=0):
+    if Becky.home_visit_stage >= 6:
         "\"Бекки, как тебе завершение ужина?\" - осведомились вы."
-        if procedural_randint(1, max(1, 3 + Becky.var.get("BeckyOpenMinet", 0)), "becky_lastvisit_inga_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
+        if procedural_randint(1, max(1, 3 + Becky.open_oral_stage), "becky_lastvisit_inga_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
             "\"А ты заметил, что Ингенборг, доча моя, совсем большая стала?\" ответила вам мать семейства."
-        elif Becky.var.get("BeckyOpenMinet", 0) > 0:
+        elif Becky.open_oral_stage > 0:
             if Becky.corruption < 48:
                 "\"Ну я не знаю, все-таки как-то неловко мне было на глазах Эдди и Инги.\""
             else:
-                $ RandVar = procedural_randint(1, 4, "becky_lastvisit_memory_%s_%s" % (current_game_day(), Becky.talk_count()))
-                if RandVar == 1:
+                $ rand_var = procedural_randint(1, 4, "becky_lastvisit_memory_%s_%s" % (current_game_day(), Becky.talk_count()))
+                if rand_var == 1:
                     "\"Неплохо, но ты заметил, Стефан, как на меня Эдди смотрел? Даже, пожалуй почаще чем на свою Жоржетту. Не такая я уж и старая видно, что на меня не только ты, но даже и управляющий мой так смотрит.\" гордо заявила вам в ответ вдова."
-                elif RandVar == 2:
+                elif rand_var == 2:
                     "\"А ведь Жоржетта эта, которую Эдди привел, по возрасту мне ровесница, небось чуть ли не вдвое старше его. И чего он на нее запал, а не на молоденькую?\" задумчиво сказала Бекки."
-                elif RandVar == 3:
+                elif rand_var == 3:
                     "\"Ну ты приходи почаще, а то я без твоего члена уже и заснуть спокойно не могу,\" игриво заметила Бекки."
                 else:
                     "\"Ох, так я еще не отрывалась с того дня, когда Эрик, мой покойный муж, пригласил своих братьев с женами к нам в гости.\" отозвалась Ребекка. \"Мы тогда выпили малость лишнего, правда, а сейчас ведь я почти трезвой была\", добавила она."
@@ -224,9 +209,9 @@ label story_becky_home_last_visit_talk_0(girl_name="becky"):
             "\"Хорошо было, а ведь Эдди-то уже совсем большой стал, любовниц приводит.\""
     else:
         "\"Бекки, спасибо за ужин и за гостеприимство,\" сказали вы."
-        if Becky.var.get("TimesVisited", 0) <= 2:
+        if Becky.home_visit_count <= 2:
             "\"Ой, я так рада что ты к нам зашел, с семьей моей познакомился. У нас уже пару месяцев как гостей не было.\""
-        elif Becky.var.get("HomeSex", 0) == 1:
+        elif Becky.home_sex_unlocked:
             if procedural_randint(1, 2, "becky_lastvisit_homesex_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
                 if Becky.corruption >= 42:
                     "\"Ну ты приходи почаще, а то я без твоего члена уже и заснуть спокойно не могу,\" игриво заметила Бекки."
@@ -234,33 +219,29 @@ label story_becky_home_last_visit_talk_0(girl_name="becky"):
                     "\"Ох, и подумать только, я с тобой, на глазах у детей, пошла прямо в спальню. Как вспомню, так коленки до сих пор дрожат.\" - поделилась с вами вдова. \"И внизу мокро,\" добавила она приглушенным голосом."
             else:
                 "\"А ты заметил, что Ингенборг, доча моя, совсем большая стала?\" ответила вам мать семейства."
-        elif Becky.var.get("HomeSex", 0) == 0 and Becky.var.get("visitedhome", 0) >= 5:
+        elif not Becky.home_sex_unlocked and Becky.home_visit_stage >= 5:
             "\"А ты заметил, что Ингенборг, доча моя, совсем большая стала?\" ответила вам мать семейства."
         else:
             "\"Хорошо было, ты еще приходи, не стесняйся.\""
     $ Becky.finish_talk()
-    if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
     return
 
 
 label story_becky_talk_eddie_behavior_0(girl_name="becky"):
     "\"Дорогая, а ты заметила как на тебя смотрит твой управляющий?\" невзначай осведомились вы. \"Кажется, что у него встает при одной мысли о тебе.\""
     if Becky.corruption >= 50:
-        if Becky.var.get("TalkAboutEddie", 0) == 0:
+        if not Becky.talked_about_eddie:
             "\"Заметила, как же не заметить,\" отозвалась Бекки. \"Даже не знаю, что и делать. Вижу что он мучается, мне как хозяйке и покровительнице это больно видеть. Но я же его из грязи вытащила, работу дала. Хорошо, что он себе какую-то женщину нашел, моего возраста, может хоть это его успокоит.\""
         else:
             "\"Так я же уже сказала, что заметила, я же не слепая.\""
     else:
-        if Becky.var.get("TalkAboutEddie", 0) == 0:
+        if not Becky.talked_about_eddie:
             "\"Заметила, как же не заметить,\" отозвалась Бекки. \"Стыд-то какой и позор. Будь он помладше, выпорола бы его как сидор свою козу. А сейчас вон он какой вымахал, уже лавкой распоряжается, а ни ума, ни совести. Даже и говорить об этом не хочу.\""
         else:
             "\"Я тебе уже отвечала, не хочу это даже обсуждать.\""
             $ Becky.apply_social_roll(10, 3, -1, 35, 3, -1)
-    $ Becky.var["TalkAboutEddie"] = 1
+    $ Becky.talked_about_eddie = True
     $ Becky.finish_talk()
-    if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
     return
 
 
@@ -268,7 +249,7 @@ label story_becky_talk_eddie_georgett_1(girl_name="becky"):
     "\"Бекки, дорогуша, я тут наблюдал преинтереснейшую сценку,\" как бы между делом упомянули вы. \"Представляешь, твой управляющий трахал эту свою Жоржетту.\""
     "\"И что?\" удивленно подняла бровь Бекки."
     "\"Так вот, он ее попросил играть строгую леди-босс, а сам Жоржетту называл госпожой Блэнкеншип и Бекки. Прямо как тебя зовут. Вот такая у твоего помощника бурная фантазия.\""
-    $ Becky.var["GeorgMention"] = 1
+    $ Becky.georgett_mentioned = True
     if Becky.corruption <= 35:
         "\"Ах он подлец и извращенец!\" заоорала в сердцах вдова, \"Да как он посмел только! Спасибо что сказал, ну я ему задам!\""
     elif Becky.corruption <= 50:
@@ -279,103 +260,93 @@ label story_becky_talk_eddie_georgett_1(girl_name="becky"):
         else:
             "\"Эх, затейник,\" ответила вам разбитная хозяйка Эдди, \"Значит не стара я еще, что на меня мальчики заглядываются. Сначала ты, а теперь и управляющий мой обо мне фантазирует.\""
     $ Becky.finish_talk()
-    if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
     return
 
 
-label story_becky_talk_eddie_reaction_0(girl_name="becky"):
+label story_becky_talk_eddie_reaction_0(girl_name="becky", change_mind=0):
     "\"Да твой Эдди наглец, свинья неблагодарная, онанист недоделанный!\" в гневе закричали вы, \"Да как он только посмел так смотреть на женщину, которая его подобрала и в люди вывела!\""
-    $ ChangeMind = 0
-    if Becky.var.get("EddieIntrReact", 0) == 2:
-        $ ChangeMind = 1
-    if Becky.var.get("EddieIntrReact", 0) == 1:
-        $ ChangeMind = 2
-    $ Becky.var["EddieIntrReact"] = 1
+    $ change_mind = 0
+    if Becky.eddie_intervention_reaction == 2:
+        $ change_mind = 1
+    if Becky.eddie_intervention_reaction == 1:
+        $ change_mind = 2
+    $ Becky.eddie_intervention_reaction = 1
     if Becky.corruption <= 35:
         "\"Стефан, как же ты все правильно говоришь\", поддакнула вам Бекки, \"вот так и помогаешь человеку, а потом - никакого уважения к хозяйке.\""
-        if ChangeMind < 2:
+        if change_mind < 2:
             $ Becky.apply_social_roll(15, 2, 1, 35, 2, -1)
     elif Becky.corruption <= 52:
         "\"Ну, Стефанчик, наверное ты прав,\" неуверенно согласилась с вами Бекки, \"но ты все-таки слишком строг. Это у него наверное возрастное.\""
-        if ChangeMind < 2:
+        if change_mind < 2:
             $ Becky.apply_social_roll(0, 0, 0, 35, 2, -1)
     else:
         "\"Да ладно тебе, Стефан, ты наверное просто ревнуешь,\" возразила вам вдова. Кажется, вы задели ее гордость за Эдди. \"Не смей так говорить о нем, он все-таки не чужой мне человек.\""
         $ Becky.apply_social_roll(9, 1, -1, 55, 2, 1)
-    if ChangeMind == 1:
+    if change_mind == 1:
         "\"Хотя, погоди-ка, раньше же ты совсем по другому говорил, разве нет?\" с подозрением заметила миссис Блэнкеншип."
     $ Becky.finish_talk()
-    if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
     return
 
 
-label story_becky_talk_eddie_reaction_1(girl_name="becky"):
+label story_becky_talk_eddie_reaction_1(girl_name="becky", change_mind=0):
     "\"Бекки, любимая, раз Эдди так по тебе сохнет, может не стоит его мучать?\" заявили вы, демонстрируя широту своих взглядов. \"Он уже повзрослел, лавкой управляет и видит в тебе женщину, а не только хозяйку. Не смотри на него, как на подобранного мальчишку.\""
-    $ ChangeMind = 0
-    if Becky.var.get("EddieIntrReact", 0) == 2:
-        $ ChangeMind = 2
-    if Becky.var.get("EddieIntrReact", 0) == 1:
-        $ ChangeMind = 1
-    $ Becky.var["EddieIntrReact"] = 2
-    if Becky.corruption <= 35 and Becky.var.get("PriestAdvice", 0) == 0:
+    $ change_mind = 0
+    if Becky.eddie_intervention_reaction == 2:
+        $ change_mind = 2
+    if Becky.eddie_intervention_reaction == 1:
+        $ change_mind = 1
+    $ Becky.eddie_intervention_reaction = 2
+    if Becky.corruption <= 35 and Becky.priest_advice_stage == 0:
         "\"Так,\" гневно сказала вдова, отступая от вас на шаг. \"Это мне показалось, или ты только что предложил мне заняться любовью с человеком, которого я подобрала сиротой и выучила делу?! Хорошо же ты обо мне думаешь. Ну ты и подонок, Стефан! Вон из моей лавки!\""
         "\"Да, надо было держать язык за зубами\" - эту мудрую мысль вы додумали уже на улице."
         $ Becky.apply_social_roll(5, 1, -1, 25, 1, -1)
-        if event_runtime.active_thread is not None:
-            $ event_runtime.active_thread.complete()
         jump MarketPlace
     elif Becky.corruption <= 48:
         "\"Да ты смеешься, что ли?\" мрачно посмотрела на вас Ребекка."
         "\"Я с тобой хотела по-серьезному обсудить, что мне делать с Эдди, а ты издеваешься. Не назвал бы ты меня любимой, так вообще бы за такие шутки за дверь бы выставила.\""
-        if ChangeMind < 2:
+        if change_mind < 2:
             $ Becky.apply_social_roll(12, 4, -1, 35, 4, -1)
     else:
-        if Becky.var.get("PriestAdvice", 0) <= 1:
+        if Becky.priest_advice_stage <= 1:
             if Becky.pregnancy_days() > 60:
                 "\"Ты так думаешь?\" спросила Бекки, \"я над этим уже думала, я сейчас в тягости и второй раз забеременеть мне не грозит. Но все-таки Эдди вырос у меня на глазах, он моложе, а я ему хозяйка дома и лавки. Не могу я просто так на такое пойти, потеряю весь авторитет. Может с отцом Герхардом пойти посоветоваться, что он думает...\" - вдова уже разговаривала сама с собой."
-                if ChangeMind < 2:
+                if change_mind < 2:
                     $ Becky.apply_social_roll(17, 2, 1, 56, 1, 1)
-                $ Becky.var["PriestAdvice"] = 1
+                $ Becky.priest_advice_stage = 1
             elif Becky.corruption <= 52:
                 "\"Ты так думаешь?\" спросила Бекки, \"я над этим уже думала, но я так не могу. А если залечу от собственного управляющего? Я ведь ему хозяйка, дом на мне держится. Сестренка моя непутевая, Грета, правда и не такое вытворяла, но я не она, нет, стыд-то какой, даже и не говори об этом.\""
-                if ChangeMind < 2:
+                if change_mind < 2:
                     $ Becky.apply_social_roll(17, 2, 1, 54, 1, 1)
             else:
                 "\"Ты так думаешь?\" спросила Бекки, \"даже и не знаю, вдруг я от Эдди залечу? Сестренка моя непутевая, Грета, правда и не такое вытворяла, но все-таки это грех. А с другой стороны Эдди мучается, он у нас в доме и лавке не чужой, а я только о себе и думаю. Только я старше, я хозяйка, и боюсь, что после такого он уже не станет смотреть на меня как на хозяйку. Даже и не знаю что делать. Может с отцом Герхардом пойти посоветоваться, что он думает...\" - вдова уже разговаривала сама с собой."
-                if ChangeMind < 2:
+                if change_mind < 2:
                     $ Becky.apply_social_roll(17, 2, 1, 58, 1, 1)
-                $ Becky.var["PriestAdvice"] = 1
-        elif Becky.var.get("PriestAdvice", 0) == 2:
+                $ Becky.priest_advice_stage = 1
+        elif Becky.priest_advice_stage == 2:
             "\"Так я с отцом Герхардом посоветовалась, он сказал что такое грех великий, не стоит мне на себя такое брать,\" резонно ответила вам почтенная матрона."
         else:
             "\"Даже и не знаю, отец Герхард говорит что ничего такого в том, что я отдамся Эдди, нет, но как мне ему об этом сказать? Я все-таки его хозяйка, не девчонка с улицы,\" - поделилась вдова своими сомнениями."
         $ Becky.apply_social_roll(9, 1, -1, 55, 2, 1)
-    if ChangeMind == 1:
+    if change_mind == 1:
         "\"Хотя, погоди-ка, раньше же ты совсем по другому говорил, разве нет?\" с подозрением заметила миссис Блэнкеншип."
     $ Becky.finish_talk()
-    if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
     return
 
 
 label story_becky_talk_eddie_after_sex_0(girl_name="becky"):
-    if Becky.var.get("visitedhome", 0) < 7:
+    if Becky.home_visit_stage < 7:
         "\"И как тебе прошлая ночь с Эдди?\" осведомились вы у Ребекки."
         "\"Ох, даже не знаю что на меня нашло,\" ответила вам почтенная матрона. \"Отдаться Эдди?! А если я от него затяжелею? Я ведь ему хозяйка, я старше, я не девчонка с танцев. И не такая, как моя непутевая сестрица Грета, нет. Ну и подставил же ты меня, Стефан!\" упрекнула вас скромница Бекки."
         "\"Эй, да ведь ты сама этого хотела,\" возразили вы. \"Я же видел как ты текла когда Эдди тебя трахал.\""
         "\"Ну и что? Один раз слабость стоило проявить так теперь ты меня этим попрекать будешь? Нетушки, одного раза вполне хватит пока. Мне еще надо понять, как после такого хозяйкой в доме оставаться.\" - отрезала вдова."
         "\"Надо будет еще со святым отцом посоветоваться,\" вполголоса добавила она."
-        $ Becky.var["AskedEddieFuck"] = 1
+        $ Becky.asked_about_eddie_sex_stage = 1
     else:
         "\"Все развратничаешь с Эдди?\" поинтересовались вы у миссис Блэнкеншип."
         "\"Ох, ну и грубиян же ты, Стефанчик, \" засмеялась Бекки и легонько ткнула вас в плечо."
         "\"А даже если и так, то что? Отец Герхард говорит, что то грех небольшой. Надо же бедной вдове как то скрашивать свои вечера. Но и тебе в нашем доме мы всегда рады.\""
-        $ Becky.var["AskedEddieFuck"] = 2
+        $ Becky.asked_about_eddie_sex_stage = 2
     $ Becky.finish_talk()
-    if event_runtime.active_thread is not None:
-        $ event_runtime.active_thread.complete()
     return
 
 

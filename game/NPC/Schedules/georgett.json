@@ -4,8 +4,8 @@
     {
       "label": "sunday_mass",
       "weekdays": [7],
-      "start": "06:00",
-      "end": "07:59",
+      "start": "08:00",
+      "end": "09:29",
       "location": "Church",
       "awake": true,
       "talkable": true,
@@ -58,8 +58,8 @@
     {
       "label": "portstreets_work",
       "weekdays": [1, 2, 3, 4, 6],
-      "start": "19:00",
-      "end": "22:30",
+      "start": "13:00",
+      "end": "15:59",
       "location": "PortStreets",
       "awake": true,
       "talkable": true,

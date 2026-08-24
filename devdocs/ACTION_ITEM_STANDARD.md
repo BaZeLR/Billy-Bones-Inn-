@@ -2,7 +2,8 @@
 
 Family Life uses `actions.rpy` as a simple file of real Ren'Py action labels.
 Those labels show/select pictures, write text, mutate stats/time/items/state,
-and return. The owning room/location label then jumps or calls back to itself.
+and return. In Tractir they return into the owning room's iterative `main_ui`
+interaction loop; the room is not jumped to or called again.
 
 Tractir should follow that design while keeping its existing `main_ui` shell.
 The active current file is `game/Utilities/General/Common/Actions.rpy`, but its
@@ -152,7 +153,7 @@ Preferred flow:
 room/object/NPC exposes action
 -> button calls real label
 -> label performs effect and returns
--> owning room/object/NPC flow is restored directly
+-> owning room interaction loop displays the updated state directly
 ```
 
 Good room/location style:
@@ -161,8 +162,8 @@ Good room/location style:
 label TavernExample:
     $ CurrentRoom = TavernExampleRoom
     $ MainTxt = TavernExampleRoom.descriptions[0].text
-    call screen main_ui
-    return
+    while True:
+        call screen main_ui
 ```
 
 Good action style:
@@ -177,8 +178,8 @@ label TavernExampleClean:
     return
 ```
 
-The caller should return to the owning room or object directly, not through a
-generic refresh label.
+The action should return to the owning room interaction loop directly, not
+through a room re-entry jump or generic refresh label.
 
 ## Present Tractir Code Comparison
 

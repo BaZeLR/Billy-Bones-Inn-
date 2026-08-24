@@ -1,719 +1,98 @@
-        global Francheska.var    def _fran_topic_select(topic_code):
-        code = str(topic_code or "")
-
-        # Keep the location picture synced with dialog actions.
-        _fran_show_topic_picture(code)
-
-        if code == "meet":
-            _fran_topic(0, 0, 3, "meet", 1)
-            Francheska.mark_met()
-            return
-        if code == "ellona":
-            _fran_topic(1, 1, 2, "ellonaask", 1)
-            return
-        if code == "grace":
-            _fran_topic(2, 2, 2, "graceask", 1)
-            return
-        if code == "grace_more":
-            _fran_topic(10, 10, 2, "graceask", 2)
-            return
-        if code == "conchita":
-            _fran_topic(3, 3, 3, "conchitaask", 1)
-            return
-        if code == "duke":
-            _fran_topic(4, 4, 3, "dukeask", 1)
-            return
-        if code == "stark":
-            _fran_topic(5, 5, 3, "starkask", 1)
-            return
-        if code == "state":
-            _fran_topic(6, 6, 2, "stateask", 1)
-            return
-        if code == "king":
-            _fran_topic(7, 7, 3, "kingask", 1)
-            return
-        if code == "rebel":
-            _fran_topic(8, 8, 2, "rebelask", 1)
-            return
-        if code == "alien":
-            _fran_topic(9, 9, 2, "alienask", 1)
-            return
-        if code == "random":
-            _fran_random_topic(3)
-            return
-        global Francheska.var    def _fran_topic_select(topic_code):
-        code = str(topic_code or "")
-
-        # Keep the location picture synced with dialog actions.
-        _fran_show_topic_picture(code)
-
-        if code == "meet":
-            _fran_topic(0, 0, 3, "meet", 1)
-            Francheska.mark_met()
-            return
-        if code == "ellona":
-            _fran_topic(1, 1, 2, "ellonaask", 1)
-            return
-        if code == "grace":
-            _fran_topic(2, 2, 2, "graceask", 1)
-            return
-        if code == "grace_more":
-            _fran_topic(10, 10, 2, "graceask", 2)
-            return
-        if code == "conchita":
-            _fran_topic(3, 3, 3, "conchitaask", 1)
-            return
-        if code == "duke":
-            _fran_topic(4, 4, 3, "dukeask", 1)
-            return
-        if code == "stark":
-            _fran_topic(5, 5, 3, "starkask", 1)
-            return
-        if code == "state":
-            _fran_topic(6, 6, 2, "stateask", 1)
-            return
-        if code == "king":
-            _fran_topic(7, 7, 3, "kingask", 1)
-            return
-        if code == "rebel":
-            _fran_topic(8, 8, 2, "rebelask", 1)
-            return
-        if code == "alien":
-            _fran_topic(9, 9, 2, "alienask", 1)
-            return
-        if code == "random":
-            _fran_random_topic(3)
-            return
-        global Francheska.var    def _fran_topic_select(topic_code):
-        code = str(topic_code or "")
-
-        # Keep the location picture synced with dialog actions.
-        _fran_show_topic_picture(code)
-
-        if code == "meet":
-            _fran_topic(0, 0, 3, "meet", 1)
-            Francheska.mark_met()
-            return
-        if code == "ellona":
-            _fran_topic(1, 1, 2, "ellonaask", 1)
-            return
-        if code == "grace":
-            _fran_topic(2, 2, 2, "graceask", 1)
-            return
-        if code == "grace_more":
-            _fran_topic(10, 10, 2, "graceask", 2)
-            return
-        if code == "conchita":
-            _fran_topic(3, 3, 3, "conchitaask", 1)
-            return
-        if code == "duke":
-            _fran_topic(4, 4, 3, "dukeask", 1)
-            return
-        if code == "stark":
-            _fran_topic(5, 5, 3, "starkask", 1)
-            return
-        if code == "state":
-            _fran_topic(6, 6, 2, "stateask", 1)
-            return
-        if code == "king":
-            _fran_topic(7, 7, 3, "kingask", 1)
-            return
-        if code == "rebel":
-            _fran_topic(8, 8, 2, "rebelask", 1)
-            return
-        if code == "alien":
-            _fran_topic(9, 9, 2, "alienask", 1)
-            return
-        if code == "random":
-            _fran_random_topic(3)
-            return
-# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
-# ================================================================================
-init python:
-    import os
-    import re
-    import renpy.exports as renpy
-
-    _FRAN_PHRASE_CACHE = None
-
-    def _fran_read_source_text():
-        text = ""
-        rel_path = "Inn/FrancheskaTalk.txt"
-        # Use Ren'Py VFS loader first (works for packed/unpacked projects).
-        try:
-            if renpy.loadable(rel_path):
-                raw = renpy.file(rel_path).read()
-                for enc in ("utf-8", "utf-8-sig", "cp1251"):
-                    try:
-                        text = raw.decode(enc)
-                        break
-                    except Exception:
-                        text = ""
-        except Exception:
-            text = ""
-
-        if text:
-            return text
-
-        # Fallback to direct filesystem read.
-        root_dir = os.path.dirname(renpy.config.gamedir)
-        for path in (
-            os.path.join(renpy.config.gamedir, "Inn", "FrancheskaTalk.txt"),
-            os.path.join(root_dir, "textLocRef", "FrancheskaTalk.txt"),
-            os.path.join(renpy.config.gamedir, "textLocRef", "FrancheskaTalk.txt"),
-        ):
-            for enc in ("utf-8", "utf-8-sig", "cp1251"):
-                try:
-                    with open(path, "r", encoding=enc) as fh:
-                        text = fh.read()
-                    break
-                except Exception:
-                    text = ""
-            if text:
-                break
-        return text
-
-    def _fran_normalize_text(raw):
-        val = str(raw or "")
-        val = val.replace("<br>", "\n").replace("<br/>", "\n").replace("<br />", "\n")
-        return val.strip()
-
-    def _fran_extract_phrase_map(source_text, var_name):
-        out = {}
-        # Capture QSP single-quoted payloads, including doubled quote escapes.
-        pattern = r"\$%s\[(\d+)\]='((?:''|[^'])*)'" % re.escape(var_name)
-        for m in re.finditer(pattern, source_text, flags=re.S):
-            idx = int(m.group(1))
-            out[idx] = _fran_normalize_text(m.group(2).replace("''", "'"))
-        return out
-
-    def _fran_extract_phrase_single(source_text, var_name, idx):
-        # Exact-index fallback for cases where bulk map extraction misses an entry.
-        pattern = (
-            r"\$%s\[%d\]='(.*?)'\s*(?=\r?\n\s*\$|\r?\n\s*GS\s+'Menu\.Create'|$)"
-            % (re.escape(str(var_name or "")), int(idx or 0))
-        )
-        m = re.search(pattern, str(source_text or ""), flags=re.S)
-        if not m:
-            return ""
-        return _fran_normalize_text(m.group(1).replace("''", "'"))
-
-    def _fran_load_phrases():
-        global _FRAN_PHRASE_CACHE
-        if (
-            isinstance(_FRAN_PHRASE_CACHE, dict)
-            and isinstance(_FRAN_PHRASE_CACHE.get("main", None), dict)
-            and len(_FRAN_PHRASE_CACHE.get("main", {})) > 0
-        ):
-            return _FRAN_PHRASE_CACHE
-
-        source = _fran_read_source_text()
-        start_map = _fran_extract_phrase_map(source, "FranPhraseStart")
-        second_map = _fran_extract_phrase_map(source, "FranPhraseSecond")
-        main_map = _fran_extract_phrase_map(source, "FranPhrase")
-
-        # In TXT several second-phrases are aliases to start-phrases.
-        for m in re.finditer(
-            r"\$FranPhraseSecond\[(\d+)\]=\$FranPhraseStart\[(\d+)\]",
-            source,
-            flags=re.S,
-        ):
-            second_idx = int(m.group(1))
-            start_idx = int(m.group(2))
-            if second_idx not in second_map and start_idx in start_map:
-                second_map[second_idx] = start_map[start_idx]
-
-        _FRAN_PHRASE_CACHE = {
-            "start": start_map,
-            "second": second_map,
-            "main": main_map,
-            "source": source,
-        }
-        return _FRAN_PHRASE_CACHE
-
-    def _fran_phrase(kind, idx):
-        data = _fran_load_phrases()
-        k = str(kind or "main").lower()
-        i = int(idx or 0)
-        if k == "start":
-            val = data.get("start", {}).get(i, "")
-            if not val:
-                val = _fran_extract_phrase_single(data.get("source", ""), "FranPhraseStart", i)
-            return val
-        if k == "second":
-            val = data.get("second", {}).get(i, data.get("start", {}).get(i, ""))
-            if not val:
-                val = _fran_extract_phrase_single(data.get("source", ""), "FranPhraseSecond", i)
-            if not val:
-                val = _fran_extract_phrase_single(data.get("source", ""), "FranPhraseStart", i)
-            return val
-        val = data.get("main", {}).get(i, "")
-        if not val:
-            val = _fran_extract_phrase_single(data.get("source", ""), "FranPhrase", i)
-        return val
-
-    def _fran_publish_location_text(start_text, main_text):
-        global CurLocDesc
-        global MainTxt
-        chunks = []
-        if start_text:
-            chunks.append(str(start_text))
-        if main_text:
-            chunks.append(str(main_text))
-        if not chunks:
-            return
-        combined = "\n\n".join(chunks).strip()
-        if combined:
-            CurLocDesc = combined
-            MainTxt = combined
-
-    def _fran_clean(lines=2):
-        if renpy.has_label("CleanScreenOverflow"):
-            try:
-                renpy.call("CleanScreenOverflow", int(lines or 1))
-            except Exception:
-                renpy.call("CleanScreenOverflow")
-        elif renpy.has_label("clean_screen_overflow"):
-            try:
-                renpy.call("clean_screen_overflow", int(lines or 1))
-            except Exception:
-                renpy.call("clean_screen_overflow")
-        else:
-            renpy.say(None, "\n")
-
-    def _fran_clean(lines=2):
-        if renpy.has_label("CleanScreenOverflow"):
-            try:
-                renpy.call("CleanScreenOverflow", int(lines or 1))
-            except Exception:
-                renpy.call("CleanScreenOverflow")
-        elif renpy.has_label("clean_screen_overflow"):
-            try:
-                renpy.call("clean_screen_overflow", int(lines or 1))
-            except Exception:
-                renpy.call("clean_screen_overflow")
-        else:
-            renpy.say(None, "\n")
-
-    def _fran_clean(lines=2):
-        if renpy.has_label("CleanScreenOverflow"):
-            try:
-                renpy.call("CleanScreenOverflow", int(lines or 1))
-            except Exception:
-                renpy.call("CleanScreenOverflow")
-        elif renpy.has_label("clean_screen_overflow"):
-            try:
-                renpy.call("clean_screen_overflow", int(lines or 1))
-            except Exception:
-                renpy.call("clean_screen_overflow")
-        else:
-            renpy.say(None, "\n")
-
-    def _fran_clean(lines=2):
-        if renpy.has_label("CleanScreenOverflow"):
-            try:
-                renpy.call("CleanScreenOverflow", int(lines or 1))
-            except Exception:
-                renpy.call("CleanScreenOverflow")
-        elif renpy.has_label("clean_screen_overflow"):
-            try:
-                renpy.call("clean_screen_overflow", int(lines or 1))
-            except Exception:
-                renpy.call("clean_screen_overflow")
-        else:
-            renpy.say(None, "\n")
-
-    def _fran_clean(lines=2):
-        if renpy.has_label("CleanScreenOverflow"):
-            try:
-                renpy.call("CleanScreenOverflow", int(lines or 1))
-            except Exception:
-                renpy.call("CleanScreenOverflow")
-        elif renpy.has_label("clean_screen_overflow"):
-            try:
-                renpy.call("clean_screen_overflow", int(lines or 1))
-            except Exception:
-                renpy.call("clean_screen_overflow")
-        else:
-            renpy.say(None, "\n")
-
-    def _fran_clean(lines=2):
-        if renpy.has_label("CleanScreenOverflow"):
-            try:
-                renpy.call("CleanScreenOverflow", int(lines or 1))
-            except Exception:
-                renpy.call("CleanScreenOverflow")
-        elif renpy.has_label("clean_screen_overflow"):
-            try:
-                renpy.call("clean_screen_overflow", int(lines or 1))
-            except Exception:
-                renpy.call("clean_screen_overflow")
-        else:
-            renpy.say(None, "\n")
-
-    def _fran_inc_talk():
-        Francheska.mark_talked(1)
-
-    def _fran_topic(start_idx, main_idx, clean_lines=2, update_key=None, update_val=1):
-        global FranVar
-        start_text = _fran_phrase("start", start_idx)
-        main_text = _fran_phrase("main", main_idx)
-        _fran_publish_location_text(start_text, main_text)
-        if update_key:
-            FranVar[update_key] = update_val
-        _fran_inc_talk()
-
-    def _fran_random_topic(clean_lines=3):
-        idx = procedural_randint(0, 10, key="procedural:NPC/Secondary/IntFrancheskaTalk.rpy:procedural_randint:170:1")
-        second_text = _fran_phrase("second", idx)
-        main_text = _fran_phrase("main", idx)
-        _fran_publish_location_text(second_text, main_text)
-        _fran_inc_talk()
-
-    def _fran_show_picture_path(picture_paths):
-        for picture_path in list(picture_paths or []):
-            if renpy.loadable(str(picture_path or "")):
-                ShowImage("", "", str(picture_path or ""))
-                return
-        try:
-            ShowImageSeq("ellona", "", "Fran", 4)
-        except Exception:
-            pass
-
-    def _fran_show_topic_picture(topic_code=""):
-        code = str(topic_code or "")
-        if code == "meet":
-            _fran_show_picture_path(("images/ellona/Fran2.jpg", "images/ellona/Fran1.jpg"))
-            return
-        if code in ("ellona", "grace"):
-            _fran_show_picture_path(("images/ellona/stories.png", "images/ellona/statue1.jpg"))
-            return
-        if code == "grace_more":
-            _fran_show_picture_path(("images/ellona/agla1.jpg", "images/ellona/agla2.jpg", "images/ellona/alga3.jpg"))
-            return
-        if code in ("conchita", "duke", "stark", "state", "king", "rebel"):
-            _fran_show_picture_path(("images/ellona/Fran4.jpg", "images/ellona/Fran2.jpg"))
-            return
-        if code == "alien":
-            _fran_show_picture_path(("images/ellona/aliens.png", "images/ellona/Fran4.jpg"))
-            return
-        if code == "random":
-            _fran_show_picture_path(("images/ellona/Fran4.jpg", "images/ellona/stories.png", "images/ellona/Fran2.jpg"))
-            return
-        _fran_show_picture_path(("images/ellona/Fran1.jpg",))
-
-    def _fran_prepare_state():
-        global Francheska.var
-        global dayspassed
-
-        global FranVar
-        global dayspassed
-
-        global Francheska.var
-        global dayspassed
-
-        global Francheska.var
-        global dayspassed
-
-        global FranVar
-        global dayspassed
-
-        def _fran_i(value, default=0):
-            try:
-                return int(value)
-            except Exception:
-                return default
-
-        day_now = max(0, _fran_i(dayspassed, 0))
-        last_talk_day = _fran_i(FranVar.get("lasttalkday", -1), -1)
-        if last_talk_day != day_now:
-            Francheska.talked_today = 0
-            FranVar["lasttalkday"] = day_now
-        FranVar["meet"] = max(0, _fran_i(FranVar.get("meet", 0), 0))
-        FranVar["ellonaask"] = max(0, _fran_i(FranVar.get("ellonaask", 0), 0))
-        FranVar["graceask"] = max(0, _fran_i(FranVar.get("graceask", 0), 0))
-        FranVar["conchitaask"] = max(0, _fran_i(FranVar.get("conchitaask", 0), 0))
-        FranVar["dukeask"] = max(0, _fran_i(FranVar.get("dukeask", 0), 0))
-        FranVar["starkask"] = max(0, _fran_i(FranVar.get("starkask", 0), 0))
-        FranVar["stateask"] = max(0, _fran_i(FranVar.get("stateask", 0), 0))
-        FranVar["kingask"] = max(0, _fran_i(FranVar.get("kingask", 0), 0))
-        FranVar["rebelask"] = max(0, _fran_i(FranVar.get("rebelask", 0), 0))
-        FranVar["alienask"] = max(0, _fran_i(FranVar.get("alienask", 0), 0))
-        return FranVar
-
-    def _fran_topic_select(topic_code):
-        code = str(topic_code or "")
-
-        # Keep the location picture synced with dialog actions.
-        _fran_show_topic_picture(code)
-
-        if code == "meet":
-            _fran_topic(0, 0, 3, "meet", 1)
-            Francheska.mark_met()
-            return
-        if code == "ellona":
-            _fran_topic(1, 1, 2, "ellonaask", 1)
-            return
-        if code == "grace":
-            _fran_topic(2, 2, 2, "graceask", 1)
-            return
-        if code == "grace_more":
-            _fran_topic(10, 10, 2, "graceask", 2)
-            return
-        if code == "conchita":
-            _fran_topic(3, 3, 3, "conchitaask", 1)
-            return
-        if code == "duke":
-            _fran_topic(4, 4, 3, "dukeask", 1)
-            return
-        if code == "stark":
-            _fran_topic(5, 5, 3, "starkask", 1)
-            return
-        if code == "state":
-            _fran_topic(6, 6, 2, "stateask", 1)
-            return
-        if code == "king":
-            _fran_topic(7, 7, 3, "kingask", 1)
-            return
-        if code == "rebel":
-            _fran_topic(8, 8, 2, "rebelask", 1)
-            return
-        if code == "alien":
-            _fran_topic(9, 9, 2, "alienask", 1)
-            return
-        if code == "random":
-            _fran_random_topic(3)
-            return
-
-    def _fran_topic_select(topic_code):
-        code = str(topic_code or "")
-
-        # Keep the location picture synced with dialog actions.
-        _fran_show_topic_picture(code)
-
-        if code == "meet":
-            _fran_topic(0, 0, 3, "meet", 1)
-            Francheska.mark_met()
-            return
-        if code == "ellona":
-            _fran_topic(1, 1, 2, "ellonaask", 1)
-            return
-        if code == "grace":
-            _fran_topic(2, 2, 2, "graceask", 1)
-            return
-        if code == "grace_more":
-            _fran_topic(10, 10, 2, "graceask", 2)
-            return
-        if code == "conchita":
-            _fran_topic(3, 3, 3, "conchitaask", 1)
-            return
-        if code == "duke":
-            _fran_topic(4, 4, 3, "dukeask", 1)
-            return
-        if code == "stark":
-            _fran_topic(5, 5, 3, "starkask", 1)
-            return
-        if code == "state":
-            _fran_topic(6, 6, 2, "stateask", 1)
-            return
-        if code == "king":
-            _fran_topic(7, 7, 3, "kingask", 1)
-            return
-        if code == "rebel":
-            _fran_topic(8, 8, 2, "rebelask", 1)
-            return
-        if code == "alien":
-            _fran_topic(9, 9, 2, "alienask", 1)
-            return
-        if code == "random":
-            _fran_random_topic(3)
-            return
-
-    def _fran_topic_select(topic_code):
-        code = str(topic_code or "")
-
-        # Keep the location picture synced with dialog actions.
-        _fran_show_topic_picture(code)
-
-        if code == "meet":
-            _fran_topic(0, 0, 3, "meet", 1)
-            Francheska.mark_met()
-            return
-        if code == "ellona":
-            _fran_topic(1, 1, 2, "ellonaask", 1)
-            return
-        if code == "grace":
-            _fran_topic(2, 2, 2, "graceask", 1)
-            return
-        if code == "grace_more":
-            _fran_topic(10, 10, 2, "graceask", 2)
-            return
-        if code == "conchita":
-            _fran_topic(3, 3, 3, "conchitaask", 1)
-            return
-        if code == "duke":
-            _fran_topic(4, 4, 3, "dukeask", 1)
-            return
-        if code == "stark":
-            _fran_topic(5, 5, 3, "starkask", 1)
-            return
-        if code == "state":
-            _fran_topic(6, 6, 2, "stateask", 1)
-            return
-        if code == "king":
-            _fran_topic(7, 7, 3, "kingask", 1)
-            return
-        if code == "rebel":
-            _fran_topic(8, 8, 2, "rebelask", 1)
-            return
-        if code == "alien":
-            _fran_topic(9, 9, 2, "alienask", 1)
-            return
-        if code == "random":
-            _fran_random_topic(3)
-            return
-
-    def _fran_topic_select(topic_code):
-        code = str(topic_code or "")
-
-        # Keep the location picture synced with dialog actions.
-        _fran_show_topic_picture(code)
-
-        if code == "meet":
-            _fran_topic(0, 0, 3, "meet", 1)
-            Francheska.mark_met()
-            return
-        if code == "ellona":
-            _fran_topic(1, 1, 2, "ellonaask", 1)
-            return
-        if code == "grace":
-            _fran_topic(2, 2, 2, "graceask", 1)
-            return
-        if code == "grace_more":
-            _fran_topic(10, 10, 2, "graceask", 2)
-            return
-        if code == "conchita":
-            _fran_topic(3, 3, 3, "conchitaask", 1)
-            return
-        if code == "duke":
-            _fran_topic(4, 4, 3, "dukeask", 1)
-            return
-        if code == "stark":
-            _fran_topic(5, 5, 3, "starkask", 1)
-            return
-        if code == "state":
-            _fran_topic(6, 6, 2, "stateask", 1)
-            return
-        if code == "king":
-            _fran_topic(7, 7, 3, "kingask", 1)
-            return
-        if code == "rebel":
-            _fran_topic(8, 8, 2, "rebelask", 1)
-            return
-        if code == "alien":
-            _fran_topic(9, 9, 2, "alienask", 1)
-            return
-        if code == "random":
-            _fran_random_topic(3)
-            return
-
-    def _fran_topic_select(topic_code):
-        code = str(topic_code or "")
-
-        # Keep the location picture synced with dialog actions.
-        _fran_show_topic_picture(code)
-
-        if code == "meet":
-            _fran_topic(0, 0, 3, "meet", 1)
-            Francheska.mark_met()
-            return
-        if code == "ellona":
-            _fran_topic(1, 1, 2, "ellonaask", 1)
-            return
-        if code == "grace":
-            _fran_topic(2, 2, 2, "graceask", 1)
-            return
-        if code == "grace_more":
-            _fran_topic(10, 10, 2, "graceask", 2)
-            return
-        if code == "conchita":
-            _fran_topic(3, 3, 3, "conchitaask", 1)
-            return
-        if code == "duke":
-            _fran_topic(4, 4, 3, "dukeask", 1)
-            return
-        if code == "stark":
-            _fran_topic(5, 5, 3, "starkask", 1)
-            return
-        if code == "state":
-            _fran_topic(6, 6, 2, "stateask", 1)
-            return
-        if code == "king":
-            _fran_topic(7, 7, 3, "kingask", 1)
-            return
-        if code == "rebel":
-            _fran_topic(8, 8, 2, "rebelask", 1)
-            return
-        if code == "alien":
-            _fran_topic(9, 9, 2, "alienask", 1)
-            return
-        if code == "random":
-            _fran_random_topic(3)
-            return
-
-    def _fran_topic_select(topic_code):
-        code = str(topic_code or "")
-
-        # Keep the location picture synced with dialog actions.
-        _fran_show_topic_picture(code)
-
-        if code == "meet":
-            _fran_topic(0, 0, 3, "meet", 1)
-            Francheska.mark_met()
-            return
-        if code == "ellona":
-            _fran_topic(1, 1, 2, "ellonaask", 1)
-            return
-        if code == "grace":
-            _fran_topic(2, 2, 2, "graceask", 1)
-            return
-        if code == "grace_more":
-            _fran_topic(10, 10, 2, "graceask", 2)
-            return
-        if code == "conchita":
-            _fran_topic(3, 3, 3, "conchitaask", 1)
-            return
-        if code == "duke":
-            _fran_topic(4, 4, 3, "dukeask", 1)
-            return
-        if code == "stark":
-            _fran_topic(5, 5, 3, "starkask", 1)
-            return
-        if code == "state":
-            _fran_topic(6, 6, 2, "stateask", 1)
-            return
-        if code == "king":
-            _fran_topic(7, 7, 3, "kingask", 1)
-            return
-        if code == "rebel":
-            _fran_topic(8, 8, 2, "rebelask", 1)
-            return
-        if code == "alien":
-            _fran_topic(9, 9, 2, "alienask", 1)
-            return
-        if code == "random":
-            _fran_random_topic(3)
-            return
+# Francheska talk logic ported from textLocRef/FrancheskaTalk.txt.
+# Static dialogue text lives in FrancheskaTalkData.rpy; this label owns choices and consequences.
 
 label FrancheskaTalk:
-    python:
-        global _FRAN_PHRASE_CACHE
-        _FRAN_PHRASE_CACHE = None
-    $ _fran_prepare_state()
+    $ renpy.dynamic("_fran_text", "_fran_topic_index")
+    $ Francheska.mark_known()
     $ main_ui_begin_talk_state("Что обсудить с Франческой?", "fran")
-    $ current_action_title = "Что обсудить с Франческой?"
-    $ current_action_content = None
-    call BuildFrancheskaTalkMenu
-    $ current_action_items = list(_return or [])
+
+    menu:
+        "Порасспрашивать об этом месте" if not Francheska.met and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/Fran2.jpg"
+            $ _fran_text = FRANCHESKA_TALK_START[0] + "\n\n" + FRANCHESKA_TALK_MAIN[0]
+            "[_fran_text]"
+            $ Francheska.met = True
+            $ Francheska.mark_talked(1)
+
+        "Порасспрашивать Франческу о богине Эллоне" if Francheska.met and not Francheska.asked_about_ellona and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/stories.png"
+            $ _fran_text = FRANCHESKA_TALK_START[1] + "\n\n" + FRANCHESKA_TALK_MAIN[1]
+            "[_fran_text]"
+            $ Francheska.asked_about_ellona = True
+            $ Francheska.mark_talked(1)
+
+        "Порасспрашивать Франческу о грациях" if Francheska.asked_about_ellona and Francheska.graces_stage == 0 and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/stories.png"
+            $ _fran_text = FRANCHESKA_TALK_START[2] + "\n\n" + FRANCHESKA_TALK_MAIN[2]
+            "[_fran_text]"
+            $ Francheska.graces_stage = 1
+            $ Francheska.mark_talked(1)
+
+        "Узнать больше о грациях" if Francheska.graces_stage == 1 and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/agla1.jpg"
+            $ _fran_text = FRANCHESKA_TALK_START[10] + "\n\n" + FRANCHESKA_TALK_MAIN[10]
+            "[_fran_text]"
+            $ Francheska.graces_stage = 2
+            $ Francheska.mark_talked(1)
+
+        "Порасспрашивать Франческу о герцогине" if Francheska.met and not Francheska.asked_about_duchess and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/Fran4.jpg"
+            $ _fran_text = FRANCHESKA_TALK_START[3] + "\n\n" + FRANCHESKA_TALK_MAIN[3]
+            "[_fran_text]"
+            $ Francheska.asked_about_duchess = True
+            $ Francheska.mark_talked(1)
+
+        "Спросить Франческу о герцоге" if Francheska.asked_about_duchess and not Francheska.asked_about_duke and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/Fran4.jpg"
+            $ _fran_text = FRANCHESKA_TALK_START[4] + "\n\n" + FRANCHESKA_TALK_MAIN[4]
+            "[_fran_text]"
+            $ Francheska.asked_about_duke = True
+            $ Francheska.mark_talked(1)
+
+        "Узнать больше о предателе" if Francheska.asked_about_duke and not Francheska.asked_about_stark and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/Fran4.jpg"
+            $ _fran_text = FRANCHESKA_TALK_START[5] + "\n\n" + FRANCHESKA_TALK_MAIN[5]
+            "[_fran_text]"
+            $ Francheska.asked_about_stark = True
+            $ Francheska.mark_talked(1)
+
+        "Порасспрашивать Франческу о герцогстве" if Francheska.asked_about_duchess and not Francheska.asked_about_duchy and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/Fran4.jpg"
+            $ _fran_text = FRANCHESKA_TALK_START[6] + "\n\n" + FRANCHESKA_TALK_MAIN[6]
+            "[_fran_text]"
+            $ Francheska.asked_about_duchy = True
+            $ Francheska.mark_talked(1)
+
+        "Узнать больше о короле" if Francheska.asked_about_duchy and not Francheska.asked_about_king and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/Fran4.jpg"
+            $ _fran_text = FRANCHESKA_TALK_START[7] + "\n\n" + FRANCHESKA_TALK_MAIN[7]
+            "[_fran_text]"
+            $ Francheska.asked_about_king = True
+            $ Francheska.mark_talked(1)
+
+        "Узнать больше об отношениях с королевством" if Francheska.asked_about_king and not Francheska.asked_about_kingdom_relations and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/Fran4.jpg"
+            $ _fran_text = FRANCHESKA_TALK_START[8] + "\n\n" + FRANCHESKA_TALK_MAIN[8]
+            "[_fran_text]"
+            $ Francheska.asked_about_kingdom_relations = True
+            $ Francheska.mark_talked(1)
+
+        "Расспросить про нелюдей" if Francheska.asked_about_duchy and not Francheska.asked_about_aliens and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/aliens.png"
+            $ _fran_text = FRANCHESKA_TALK_START[9] + "\n\n" + FRANCHESKA_TALK_MAIN[9]
+            "[_fran_text]"
+            $ Francheska.asked_about_aliens = True
+            $ Francheska.mark_talked(1)
+
+        "Поболтать с Франческой" if Francheska.asked_about_kingdom_relations and Francheska.asked_about_aliens and Francheska.asked_about_stark and Francheska.graces_stage == 2 and int(Francheska.talked_today or 0) < 3:
+            vscene "images/ellona/Fran4.jpg"
+            $ _fran_topic_index = procedural_randint(0, 10, key="procedural:NPC/Secondary/IntFrancheskaTalk.rpy:random_topic")
+            $ _fran_text = FRANCHESKA_TALK_SECOND[_fran_topic_index] + "\n\n" + FRANCHESKA_TALK_MAIN[_fran_topic_index]
+            "[_fran_text]"
+            $ Francheska.mark_talked(1)
+
+        "Закончить разговор":
+            pass
+
+    $ main_ui_end_talk_state()
     return

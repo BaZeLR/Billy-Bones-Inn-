@@ -3,7 +3,7 @@
 # ================================================================================
 init python:
     def add_others_sperm_apply(girl_name, chance):
-        girl = getPersonInfo(girl_name)
+        girl = people.get_info(girl_name)
         if girl is None:
             return 0
 

@@ -69,6 +69,17 @@ def test_story_runtime_uses_familylife_style_split_files():
     assert "label preEvent(thread_name=None):" in events
 
 
+def test_linear_thread_complete_advances_the_authoritative_stage_cursor():
+    source = RUNTIME_PATH.read_text(encoding="utf-8-sig")
+    linear_thread = source.split("class LThreadInfo(ThreadInfo):", 1)[1].split("class RThreadInfo(ThreadInfo):", 1)[0]
+    complete = function_body(linear_thread, "complete")
+
+    assert "self.done[self.num] = True" in complete
+    assert "self.num += 1" in complete
+    assert "if self.num >= self.data.length:" in complete
+    assert "self.completed = True" in complete
+
+
 def test_check_triggers_uses_cached_events_and_marks_event_once_per_day():
     source = EVENTS_PATH.read_text(encoding="utf-8-sig")
     body = source.split("label checkTriggers(location, action, numpop=0):", 1)[1].split("\n\nlabel ", 1)[0]
@@ -84,6 +95,9 @@ def test_story_events_are_blocked_after_firing_today():
     body = function_body(source, "canTrigger")
 
     assert "story_event_fired_today(self)" in body
+    assert 'getattr(self, "repeatable", False)' in body
     assert "return False" in body
     assert "def story_event_reset_fired_today_if_needed" in source
     assert "event_runtime.fired_keys_today = []" in source
+    assert "event_runtime.fired_day or -1" not in source
+    assert "fired_day_value if fired_day_value is not None else -1" in source

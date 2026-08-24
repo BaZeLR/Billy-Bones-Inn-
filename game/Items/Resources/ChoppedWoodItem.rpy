@@ -3,7 +3,7 @@
 # ================================================================================
 init 4 python:
     def chopped_wood_in_shed(_obj=None):
-        return CurrentRoom is not None and str(getattr(CurrentRoom, "code_name", "") or "") == "Shed" and _room_has_item_by_id(CurrentRoom, "chopped_wood_001")
+        return rooms.current is not None and str(getattr(rooms.current, "code_name", "") or "") == "Shed" and _room_has_item_by_id(rooms.current, "chopped_wood_001")
 
     ChoppedWoodItem = GameItem(
         object_id="chopped_wood_001",

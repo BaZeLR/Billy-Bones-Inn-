@@ -2,12 +2,13 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label AfterDanceLegare(arg=""):
+    $ renpy.dynamic("AmandaNesluh", "AmandaArgue1", "AmandaArgue2")
     
     if arg == "Prohibit":
         # Original "Prohibit" path - when you try to prevent Amanda from going with Alber
         "Вы догнали сладкую парочку и схватили Аманду за руку. Аманда изумленно ахнула, увидев вас. Не дав ей даже рта раскрыть вы стали возмущенно отчитывать виноторговца: \"Месье, куда это вы повели Аманду?!"
         
-        if Amanda.var_int("alberprohibit", 0) == 1:
+        if Amanda.legare_forbidden:
             extend " И это уже ведь не первый раз, как я прошу вас от нее отстать, что вам непонятно?\nА ты?\" -обратили вы свое внимание на Аманду. \"Я ведь тебе уже раньше говорил, чтобы ты даже не смотрела на него, что, все по нескольку раз повторять нужно?! А ну живо домой!\""
         else:
             extend " Я вас настоятельно прошу оставить ее в покое.\"\nА ты?\" -обратили вы свое внимание на Аманду. \"Что ты с ним путаешься, куда это он тебя вел? А ну живо домой пошла!\""
@@ -22,7 +23,7 @@ label AfterDanceLegare(arg=""):
         
         if AmandaNesluh == 0:
             "Аманда расплакалась от вашей отповеди и убежала. Альбер хмуро посмотрел на вас и пошел восовояси. Что же, вы всего лишь сделали то, что были должны сделать, не правда ли?"
-            $ Amanda.add_var_int("alberfriends", -2)
+            $ Amanda.legare_affection -= 2
             $ Amanda.apply_social_chance(3, 1, -2, 20, 1, -3, "after_dance_legare_prohibit")
             
             menu:
@@ -31,7 +32,7 @@ label AfterDanceLegare(arg=""):
         
         elif AmandaNesluh == 1:
             "Аманда мрачно буркнула \"Не твое дело, Стефан, пойдем, Альбер,\" и резким движением выдернула свою руку из вашего хвата."
-            $ Amanda.add_var_int("alberfriends", 1)
+            $ Amanda.legare_affection += 1
             $ Amanda.apply_social_chance(5, 1, -1, 25, 1, 2, "after_dance_legare_prohibit")
             
         elif AmandaNesluh == 2:
@@ -43,15 +44,15 @@ label AfterDanceLegare(arg=""):
                 $ AmandaArgue2 = "в рот запихал"
                 
             "Нагло смотря вам в глаза Аманда процедила: \"Да ты ревнуешь, Стефан! Думаешь что раз я [AmandaArgue1], то теперь на других и смотреть не могу? Чем меня учить и указывать с кем я могу гулять а с кем нет, лучше бы на себя посмотрел, мне свой хрен [AmandaArgue2], а теперь еще моей жизни учишь, тоже мне, учитель выискался!\"\nС этими словами она выдернула руку и потянула Альбера за собой."
-            $ Amanda.add_var_int("alberfriends", 2)
+            $ Amanda.legare_affection += 2
             $ Amanda.apply_social_chance(5, 1, -1, 30, 1, 3, "after_dance_legare_prohibit")
             
-        $ Amanda.set_var_int("alberprohibit", 1)
+        $ Amanda.legare_forbidden = True
         
         if AmandaNesluh > 0:
             menu:
                 "Дать им уйти":
-                    $ apply_legare_amanda_let_go_code()
+                    $ Amanda.resolve_legare_let_go()
                     "Будучи огорошенны такой отповедью, вы остались стоять столбом посреди улицы, а Аманда гордо удалилась под ручку с Альбером."
                     menu:
                         "Вернуться на танцы":
@@ -72,10 +73,10 @@ label AfterDanceLegare(arg=""):
 
 # Separated the fight portion into its own label
 label AfterDanceLegare_Fight:
-    $ FridayDanceRoom.state["dance_count"] = 5
-    $ _amanda_dance_fight_level = player_state(False).combat.fight_level
-    $ Randvar = FightResult(_amanda_dance_fight_level.get("you", 1), _amanda_dance_fight_level.get("legare", 1), 1)
-    $ Alber.set_var_int("FightYouAmanda", 1)
+    $ renpy.dynamic("Randvar")
+    $ rooms.get("FridayDance").dance_count = 5
+    $ Randvar = FightResult(fight_player_level(), 1, 1)
+    $ Alber.amanda_conflict_stage = 1
     
     "Решив, что виной такому поведению Аманды - месье Легаре, вы, без лишних разговоров, заехали ему в челюсть."
     
@@ -92,9 +93,9 @@ label AfterDanceLegare_Fight:
     elif Randvar == 2:
         $ Alber.add_relation(-3)
         $ Amanda.change_social(friend_delta=-2)
-        $ Amanda.add_var_int("alberfriends", 2)
+        $ Amanda.legare_affection += 2
         $ Amanda.apply_social_chance(0, 0, 0, 32, 1, 1, "after_dance_legare_fight")
-        $ apply_legare_amanda_let_go_code()
+        $ Amanda.resolve_legare_let_go()
         
         "Однако месье был готов к такому обороту событий и врасплох вы его застать не смогли. Альбер ловко уклонился и, пользуясь тем, что вы вложили в удар весь свой вес, сделал вам подсечку и заодно заехал по затылку. \"А меня-то за что?!\" успели подумать вы пока булыжная мостовая летела вам прямо в лицо. Когда вы пришли в себя, ни Легаре, ни Аманды рядом уже не было."
         call ShowImageSeq("alber", "fight", "streetlost", 2)
@@ -106,16 +107,16 @@ label AfterDanceLegare_Fight:
     else: # Draw
         $ Alber.add_relation(-2)
         $ Amanda.change_social(friend_delta=-1)
-        $ Amanda.add_var_int("alberfriends", 1)
+        $ Amanda.legare_affection += 1
         $ Amanda.apply_social_chance(0, 0, 0, 32, 1, 1, "after_dance_legare_fight")
-        $ apply_legare_amanda_let_go_code()
+        $ Amanda.resolve_legare_let_go()
         
         "Альбер ловко уклонился и попробовал сбить вас с ног. Правда, это ему не удалось. Аманда несколько секунд смотрела на вашу драку, а потом закричала: \"Стража, стража!\"\n\nК вам подошло пара толстых стражей порядка. \"Так, так, так, что это у нас тут?\" вопросил один из них.\n\"Драка? Значит так, господа хорошие, за драку полагается посидеть денек, подумать, но я сегодня добрый, так что предлагаю заменить вам отсидку штрафом.\" с этими словами страж порядка оглянулся. Убедившись, что других неподкупных слуг закона, кроме него и его напарника, поблизости нет, он продолжил: \"Всего 50 мараведи с каждого, платить нужно непосредственно мне и прямо сейчас.\"\n\n\"Конечно, господин сержант,\" с готовностью ответил месье Легаре и несколько монет поменяло хозяина."
         call ShowImage("alber", "fight", "streetdraw")
         
         menu:
-            "Дать 50 мараведи" if money >= 50:
-                $ money -= 50
+            "Дать 50 мараведи" if player.economy.money >= 50:
+                $ player.spend_money(50)
                 "Вы вынули руку из кармана вместе с искомой суммой, и пожали стражнику его протянутую руку. \"Большое вам спасибо, сэр,\" вежливо сказали вы, слегка поклонившись. \"Вам спасибо,\" ответил слуга закона и пошел своей дорогой. Вы оглянулись, но Аманда с Альбером успели воспользоваться вашим общением со стражей и незаметно исчезнуть."
                 menu:
                     "Вернуться к трактиру в расстроенных чувствах":
@@ -130,8 +131,9 @@ label AfterDanceLegare_Fight:
 
 # Police intervention path
 label AfterDanceLegare_Police:
+    $ renpy.dynamic("AlberBribe")
     $ AlberBribe = 0
-    $ FridayDanceRoom.state["dance_count"] = 5
+    $ rooms.get("FridayDance").dance_count = 5
     $ Alber.add_relation(-2)
     $ Amanda.change_social(friend_delta=-2)
     
@@ -162,13 +164,13 @@ label AfterDanceLegare_Police:
             else:
                 "\"С другой стороны, далеко не у всех юных мисс, к сожалению, сиськи растут с той скоростью, что нам хотелось бы,\" засмеялся его напарник. \"Так что извините нас, но повода для вмешательства я пока не вижу, Аманда вольна вести себя как ей вздумается, даже к нам в казарму на огонек заглянуть.\""
                 
-                if Amanda.var_int("alberfriends", 0) >= 11 and procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AfterDanceLegare.rpy:procedural_randint:165:4") == 1:
+                if Amanda.legare_affection >= 11 and procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/AfterDanceLegare.rpy:procedural_randint:165:4") == 1:
                     "Тут Альбер достал что-то из кармана и сунул старшему стражнику. Тот просветлел и сказал вам:\n\"Тем более, что этот почтенный господин только что предъявил нам убедительные аргументы в пользу того, что эта юная мисс уже совсем взрослая. Так что шли бы, мил человек отсюда по хорошему!\"\n\nВам осталось только проследить за тем, как Альбер уводит Аманду."
                     $ AlberBribe = 1
         
         menu:
             "Дать Аманде уйти":
-                $ apply_legare_amanda_let_go_code()
+                $ Amanda.resolve_legare_let_go()
                 "Аргументы стражи вас убедили, да и денег было жалко, чай не казенные, так что вы проводили парочку взглядом и пошли обратно к трактиру."
                 $ Amanda.apply_social_chance(0, 0, 0, 32, 1, 2, "after_dance_legare_police")
                 
@@ -180,8 +182,8 @@ label AfterDanceLegare_Police:
             "Альбер и Аманда уже было развернулись и собрались уходить, как один из стражей оглянулся по сторонам и прошептал вам: \"Впрочем, всего за 200 мараведи мы можем встать на вашу сторону в данном вопросе.\""
             
             menu:
-                "Дать взятку 200 мараведи" if money >= 200:
-                    $ money -= 200
+                "Дать взятку 200 мараведи" if player.economy.money >= 200:
+                    $ player.spend_money(200)
                     "Не раздумывая ни секунды вы полезли в карман за деньгами. Мараведи можно еще заработать, а оставлять Аманду этому хлыщу вы не имеете права. Как только деньги перешли из рук в руки, лица слуг закона сразу посуровели. Один из них грубо схватил Альбера за плечо и строго сказал: \"Сожалею, но мы не можем оставить эту девочку с вами. Она должна пойти с вами.\"\n\"Как?\" удивился виноторговец, \"но...\"\n\"Никаких но\", отрезал стражник, \"и порадуйтесь, что мы вас еще не забрали!\"\n\nВы отвели Аманду обратно в трактир, глаза у нее были на мокром месте."
                     $ Amanda.change_social(corruption_delta=-2)
                     

@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    EllonaTempleRoom = Room(
+    EllonaTempleRoomDefinition = Room(
         code_name="EllonaTemple",
         group_name=ROOM_GROUP_CITY,
         display_name="Храм Эллоны",
@@ -14,27 +14,27 @@ init python:
             ),
             RoomDescription(
                 text="Сейчас она заперта и оттуда доносятся стоны.",
-                condition=francheska_busy_now,
+                condition=lambda: Francheska.busy_now(),
                 priority=150,
             ),
             RoomDescription(
                 text="В храме присутствует и ваша знакомая жрица Франческа. Несмотря на свои годы, шустрая старушенция выглядит еще вполне бодро.",
-                condition=francheska_known_now,
+                condition=lambda: Francheska.known_now(),
                 priority=140,
             ),
             RoomDescription(
                 text="В храме присутствует и старая жрица, может когда она и была красивой, но годы давным давно уже взяли свое. Впрочем старушенция выглядит еще вполне бодро.",
-                condition=francheska_unknown_now,
+                condition=lambda: Francheska.unknown_now(),
                 priority=130,
             ),
             RoomDescription(
                 text="До вашего прихода она спала на топчанчике, но услышав что кто-то вошел сразу вскочила, видно сон старушки был чуток, а вы его потревожили.",
-                condition=francheska_sleep_note_now,
+                condition=lambda: Francheska.sleep_note_now(),
                 priority=120,
             ),
         ],
         exits=[
-            RoomExit(label="Зайти в помещение для родов", target="EllonaBirthRoom", condition=francheska_birth_room_available),
+            RoomExit(label="Зайти в помещение для родов", target="EllonaBirthRoom", condition=lambda: Francheska.birth_room_available()),
             RoomExit(label="Вернуться в порт", target="PortStreets"),
         ],
         game_items=[
@@ -49,7 +49,7 @@ init python:
         },
     )
 
-    EllonaBirthRoomRoom = Room(
+    EllonaBirthRoomRoomDefinition = Room(
         code_name="EllonaBirthRoom",
         display_name="Родильная зала",
         bg_picture="images/ellona/ante2.jpg",
@@ -74,62 +74,58 @@ init python:
     )
 
 label EllonaTemple:
+    $ renpy.dynamic("_room")
+    $ renpy.dynamic("_ellona_desc_parts", "_room_desc", "_room_desc_rows")
     scene black
-    $ CurrentRoom = EllonaTempleRoom
-    $ CurLoc = "EllonaTemple"
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ _room = EllonaTempleRoom
+    $ rooms.enter("EllonaTemple")
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ _room = rooms.get("EllonaTemple")
     python:
         _room_desc_rows = _room.visible_descriptions()
         _ellona_desc_parts = []
         for _room_desc in _room_desc_rows:
             _ellona_desc_parts.append(str(_room_desc.text or ""))
-        CurLocDesc = "\n\n".join([part for part in _ellona_desc_parts if str(part or "").strip()])
-        MainTxt = CurLocDesc
+        scene_runtime.location_text = "\n\n".join([part for part in _ellona_desc_parts if str(part or "").strip()])
+        scene_runtime.text = scene_runtime.location_text
 
     $ _room.mark_visited()
 
-    call RoomEnterEventGate(CurLoc, False)
+    call RoomEnterEventGate(rooms.current_code, False)
 
     if Francheska.busy_now():
-        $ scene_image = "images/ellona/afterBirth.png"
-        $ _layout_last_picture = scene_image
-        vscene scene_image
-        $ MainTxt = CurLocDesc + "\n\nДверь родильной на миг открывается. Усталая Франческа выходит наружу с тазом испачканных тряпок, не задерживаясь ни на разговоры, ни на объяснения. Затем дверь снова закрывается. Франческа занята, и в родильную сейчас не пройти."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.picture = "images/ellona/afterBirth.png"
+        vscene scene_runtime.picture
+        $ scene_runtime.text = scene_runtime.location_text + "\n\nДверь родильной на миг открывается. Усталая Франческа выходит наружу с тазом испачканных тряпок, не задерживаясь ни на разговоры, ни на объяснения. Затем дверь снова закрывается. Франческа занята, и в родильную сейчас не пройти."
+        $ scene_runtime.location_text = scene_runtime.text
     else:
         call ShowImageSeq("ellona", "", "Fran", 4)
 
-    $ current_action_items = CurrentRoom.build_action_items() + CurrentRoom.build_exit_items()
+    $ main_ui_runtime.action_items = rooms.current.build_action_items() + rooms.current.build_exit_items()
     while True:
         call screen main_ui
 
 
 label EllonaBirthRoom:
+    $ renpy.dynamic("_room")
     scene black
     if Francheska.busy_now():
-        jump EllonaTemple
-    $ CurrentRoom = EllonaBirthRoomRoom
-    $ CurLoc = "EllonaBirthRoom"
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ _room = EllonaBirthRoomRoom
+        return
+    $ rooms.enter("EllonaBirthRoom")
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ _room = rooms.get("EllonaBirthRoom")
 
-    $ CurLocDesc = _room.descriptions[0].text
-    $ MainTxt = CurLocDesc
+    $ scene_runtime.location_text = _room.descriptions[0].text
+    $ scene_runtime.text = scene_runtime.location_text
     $ _room.mark_visited()
     if Francheska.visible_now():
         call ShowImageSeq("ellona", "", "Fran", 4)
 
-    $ current_action_items = CurrentRoom.build_action_items() + CurrentRoom.build_exit_items()
+    $ main_ui_runtime.action_items = rooms.current.build_action_items() + rooms.current.build_exit_items()
     while True:
         call screen main_ui

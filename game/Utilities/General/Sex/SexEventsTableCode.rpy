@@ -124,7 +124,7 @@ init -44 python:
         return _sexevents_normalize_dude_name(dude_name)
 
     def sex_history_rows(girl_name):
-        girl = getPersonInfo(girl_name)
+        girl = people.get_info(girl_name)
         rows = list(getattr(girl, "detailed_sex_history", []) or []) if girl is not None else []
         normalized = []
         for index, row in enumerate(rows, start=1):
@@ -192,7 +192,7 @@ init -44 python:
         row = SexEvents.girl_dance.pop(row_index - 1)
         if str(GirlNameSE or "") == "amanda":
             SexEvents.dance_watch_line[6] = str(row.get("GoPhrase", "") or "")
-            Amanda.set_var_int("LegareGo", _sexevents_int(row.get("GoOut", 0), 0))
+            Amanda.legare_departure_code = _sexevents_int(row.get("GoOut", 0), 0)
         return row_index
 
     def GetDanceJustLeft(GirlNameSE, PartnerNameSE, DanceNumSE):

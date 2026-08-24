@@ -6,33 +6,25 @@ init python:
     def sandra_dress_change_can_buy(girl_name="sandra"):
         return (
             int(Sandra.rel or 0) > 8
-            and CheckDailyEventExists("", "BuyDressTom", "") == 0
-            and CheckDailyEventExists("sandra", "BuyDress", "") == 0
+            and daily_events.exists("", "BuyDressTom", "") == 0
+            and daily_events.exists("sandra", "BuyDress", "") == 0
             and int(Sandra.talked_today or 0) < 2
-            and week != 6
+            and int(calendar_v2.week or 0) != 6
         )
 
 
 label IntSandraOfferBuyDress(GirlNameIST="sandra"):
     $ GirlNameIST = str(GirlNameIST or "sandra")
-    $ current_action_title = "Одежда Сандры"
-    $ current_action_content = None
+    $ main_ui_runtime.action_title = "Одежда Сандры"
+    $ main_ui_runtime.action_content = None
 
     if not sandra_dress_change_can_buy(GirlNameIST):
-        $ MainTxt = "Сандра сейчас не готова обсуждать покупку нового наряда."
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [
-            MenuItem("Вернуться к разговору", Call("IntSandraTalk", GirlNameIST)),
-            MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
-        ]
+        $ scene_runtime.text = "Сандра сейчас не готова обсуждать покупку нового наряда."
+        $ scene_runtime.location_text = scene_runtime.text
         return
 
-    $ MainTxt = "\"Сандра, дорогая, я хочу тебе что-нибудь подарить! Ты у меня такая замечательная! Давай я тебе какой-нибудь наряд подарю! Хочешь?\" - порадовали вы Сандру.\n\n\"Какой ты у меня хороший, Стефан! Не могу на тебя нарадоваться!\" засмеялась Сандра. \"Конечно хочу!\"\n\n\"Ну давай тогда завтра, с утра пораньше, встретимся у Ирмы Фараго, я буду тебя там ждать, вместе и выберем!\" заверили вы ее."
-    $ DailyEventsList_Add(GirlNameIST, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy")
+    $ scene_runtime.text = "\"Мамочка, дорогая, я хочу тебе что-нибудь подарить! Ты у меня такая замечательная! Давай я тебе какой-нибудь наряд подарю! Хочешь?\" - порадовали вы маму.\n\n\"Какой ты у меня хороший сыночек! Не могу на тебя нарадоваться!\" засмеялась мама. \"Конечно хочу!\"\n\n\"Ну давай тогда завтра, с утра пораньше, встретимся у Ирмы Фараго, я буду тебя там ждать, вместе и выберем!\" заверили вы маму."
+    $ daily_events.add(GirlNameIST, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy", "girl_location")
     $ Sandra.mark_talked()
-    $ CurLocDesc = MainTxt
-    $ current_action_items = [
-        MenuItem("Вернуться к разговору", Call("IntSandraTalk", GirlNameIST)),
-        MenuItem("Закончить разговор", Function(main_ui_end_talk_state)),
-    ]
+    $ scene_runtime.location_text = scene_runtime.text
     return

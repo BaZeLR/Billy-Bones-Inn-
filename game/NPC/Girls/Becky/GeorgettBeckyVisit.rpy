@@ -1,16 +1,17 @@
 # ================================================================================
 # Becky dinner crossover with Georgette.
-# Called from IntBeckyGuest when Becky.var["EddieWhoreHome"] == 4 at dinner time.
+# Called from IntBeckyGuest when Becky's Eddie home-visit state is 4 at dinner time.
 # ================================================================================
 
 label GeorgettBeckyVisit:
+    $ renpy.dynamic("georgedinnersex", "BeckyGuestSexDesc", "KidsWatch", "beckyminetagree")
     show screen main_ui
     $ georgedinnersex = 1
     $ GetSexEventFromTable("georgett", 99, "EddieHomeVisit")
     $ BeckyGuestSexDesc = "\n\n"
 
     "Ужин уже практически закончился, как вдруг послышался негромкий стук в дверь."
-    if Becky.var.get("EddieGeorg", 0) == 1:
+    if Becky.eddie_georgett_stage == 1:
         "Эдди, услышав его, вскочил и побежал отпирать дверь. И вот на пороге показалась ваша старая знакомая - Жоржетта."
         "\"Мама, ты же сказала Инге чтобы она не стеснялась, приводила своего Лукаса к нам, мол дело молодое? Я так понял, что это и ко мне относится. Вот подружка моя, Жоржетта,\" - скороговоркой протарабанил Эдди."
         "\"Эдди, ну да, то что относится к Инге относится и к тебе, но ведь твоя подруга вроде намного старше тебя?\" - в смятении ответила ему Ребекка."
@@ -25,14 +26,12 @@ label GeorgettBeckyVisit:
     "Жоржетта решительно приспустила с парня штаны, обнажив его быстро твердеющий член. Дав возможность всем присутствующим насладиться зрелищем Эддиного члена, Жоржетта сначала ловко облизала головку своим язычком, а потом, после того как член Эдди встал во всей красе, стала профессионально и умело делать ему минет."
     "Происходящее не оставило окружающих безучастными. Лукас шепнул на ушко пару слов Ингенборг, встал, расстегнул штаны. Инга, метнув быстрый взгляд на мать, начала отсасывать своему женишку."
     "Дыхание Ребекки участилось, щеки покрылись румянцем, рука автоматически полезла вниз. Вдова явно была в растерянности."
-    $ Becky.var["visitedhome"] = max(Becky.var.get("visitedhome", 0), 6)
-    $ scene_image = "images/becky/dinner/AllMinet1.jpg"
-    $ _layout_last_picture = scene_image
-    vscene scene_image
+    $ Becky.home_visit_stage = max(Becky.home_visit_stage, 6)
+    $ scene_runtime.picture = "images/becky/dinner/AllMinet1.jpg"
+    vscene scene_runtime.picture
     "Все присутствующие на мгновение словно забыли про ужин."
-    $ scene_image = "images/becky/dinner/AllMinet2.jpg"
-    $ _layout_last_picture = scene_image
-    vscene scene_image
+    $ scene_runtime.picture = "images/becky/dinner/AllMinet2.jpg"
+    vscene scene_runtime.picture
 
     $ KidsWatch = procedural_randint(1, 6, "becky_georgett_kids_%s" % int(current_game_day() or 0))
     if KidsWatch <= 3:
@@ -64,12 +63,10 @@ label GeorgettBeckyVisit:
                 "Первым кончил неопытный Эдди, в последний момент он выдернул свой член изо рта Жоржетты и выстрелил потоками спермы ей на лицо. Та, ничуть не смутившись, опять поймала его член своим ротиком и начисто его облизала."
                 "За Эдди настал черед и Лукаса. Прижав голову Инги к своей промежности, он накончал ей полный рот. Вдова, не отрываясь, смотрела на Эдди и Ингу, ее руки неосознанно мяли собственную грудь, выдавая возбуждение."
                 "Вдруг, поняв что все закончилось, Бекки пришла в себя и строго сказала первое, что пришло ей на ум: \"Дети, если вы закончили, то помогите убрать со стола.\""
-                $ scene_image = "images/becky/dinner/SurpMinet1.jpg"
-                $ _layout_last_picture = scene_image
-                vscene scene_image
-                $ scene_image = "images/becky/dinner/SurpMinet2.jpg"
-                $ _layout_last_picture = scene_image
-                vscene scene_image
+                $ scene_runtime.picture = "images/becky/dinner/SurpMinet1.jpg"
+                vscene scene_runtime.picture
+                $ scene_runtime.picture = "images/becky/dinner/SurpMinet2.jpg"
+                vscene scene_runtime.picture
                 call PregnancyCheck("inga", "mouth", 1, "Лукас")
                 call PregnancyCheck("georgett", "mouthface", 1, "eddie")
                 $ Inga.apply_social_chance(0, 0, 0, 50, 1, 1, "georgett_becky_visit")
@@ -81,7 +78,7 @@ label GeorgettBeckyVisit:
                 $ beckyminetagree = procedural_randint(1, 3, "becky_georgett_minet_agree_%s" % int(current_game_day() or 0))
                 if Becky.corruption < 40:
                     $ beckyminetagree = 3
-                elif Becky.var.get("BeckyOpenMinet", 0) > 0 and Becky.corruption + dinnerbeckyorgasm * 5 > 44:
+                elif Becky.open_oral_stage > 0 and Becky.corruption + dinnerbeckyorgasm * 5 > 44:
                     $ beckyminetagree = 1
                 elif Becky.corruption + dinnerbeckyorgasm * 5 > 46 and beckyminetagree == 2:
                     $ beckyminetagree = 1
@@ -93,7 +90,7 @@ label GeorgettBeckyVisit:
                     if beckyminetagree > 1:
                         "Однако ее реакция оказалась совсем не такой, как вы надеялись."
                         "\"Да ты что, Стефан, обалдел?!\" - воскликнула вдова."
-                        if Becky.var.get("BeckyOpenMinet", 0) > 0:
+                        if Becky.open_oral_stage > 0:
                             "\"Если я один раз тебе уступила, это не значит, что я тебе теперь всегда буду отсасывать по мановению твоего пальчика. Ты зарываешься. Так что на сегодня - пока, сейчас тебе пожалуй лучше всего будет уйти.\""
                         else:
                             "\"Да, я сказала Инге и Эдди не стесняться, но к тебе-то это не относилось. Так что сейчас тебе пожалуй лучше всего будет уйти.\""
@@ -109,23 +106,19 @@ label GeorgettBeckyVisit:
                     else:
                         "Несколько секунд она мялась, однако все-таки наклонилась к вашему другу и начала облизывать головку. Постепенно распаляясь, Бекки начала умело делать вам минет."
                         "Млея от наслаждения, вы вдруг заметили полный похоти взгляд, которым Эдди одарил свою мамочку. Впрочем, вскоре вы выкинули это из головы, так как Бекки почти довела вас до разрядки."
-                        $ scene_image = "images/becky/dinner/BeckyMinet1.jpg"
-                        $ _layout_last_picture = scene_image
-                        vscene scene_image
-                        $ scene_image = "images/becky/dinner/BeckyMinet2.jpg"
-                        $ _layout_last_picture = scene_image
-                        vscene scene_image
+                        $ scene_runtime.picture = "images/becky/dinner/BeckyMinet1.jpg"
+                        vscene scene_runtime.picture
+                        $ scene_runtime.picture = "images/becky/dinner/BeckyMinet2.jpg"
+                        vscene scene_runtime.picture
                 else:
                     "Вы поймали взгляд вдовы, направленный на ваши вздувшиеся бугром штаны. Облизав губы в предвкушении вкусняшки, Ребекка, не смущаясь присутствием своего сына и дочки, встала перед вами на колени, приспустила штаны и начала облизывать ваш поднявшийся орган, лаская себя правой рукой под подолом платья."
                     "Млея от наслаждения, вы вдруг заметили полный похоти взгляд, которым Эдди одарил свою мамочку. Взгляд, который она ему вернула. Впрочем, вскоре вы выкинули это из головы, так как Бекки почти довела вас до разрядки."
-                    $ scene_image = "images/becky/dinner/BeckyMinet1.jpg"
-                    $ _layout_last_picture = scene_image
-                    vscene scene_image
-                    $ scene_image = "images/becky/dinner/BeckyMinet2.jpg"
-                    $ _layout_last_picture = scene_image
-                    vscene scene_image
+                    $ scene_runtime.picture = "images/becky/dinner/BeckyMinet1.jpg"
+                    vscene scene_runtime.picture
+                    $ scene_runtime.picture = "images/becky/dinner/BeckyMinet2.jpg"
+                    vscene scene_runtime.picture
 
-                $ Becky.var["BeckyOpenMinet"] = max(1, Becky.var.get("BeckyOpenMinet", 0))
+                $ Becky.open_oral_stage = max(1, Becky.open_oral_stage)
                 $ Becky.apply_social_roll(20, 2, 1, 55, 1, 1)
                 call PregnancyCheck("inga", "mouth", 1, "Лукас")
                 call PregnancyCheck("georgett", "mouthface", 1, "eddie")

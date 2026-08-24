@@ -6,7 +6,7 @@ init 6 python:
         return int(player.tavern_management.client_room_hole or 0) > 0
 
     def tavern_empty_room_peephole_has_client():
-        return str(TavernMainRoom.state.get("closed_text", "") or "") == "" and int(player.tavern_management.client_room_hole or 0) > 0 and story_event_available("TavernEmptyRoom", "tavern_client_room")
+        return tavern_main_closed_text() == "" and int(player.tavern_management.client_room_hole or 0) > 0 and story_event_available("TavernEmptyRoom", "tavern_client_room")
 
     def tavern_empty_room_peephole_no_client():
         return int(player.tavern_management.client_room_hole or 0) > 0 and not tavern_empty_room_peephole_has_client()
@@ -21,14 +21,14 @@ init 6 python:
             ObjectAction(
                 action_id="peek_client_room",
                 label="Подглядеть в комнату",
-                hook="jump",
+                hook="call",
                 target="TavernEmptyRoomPeekClient",
                 condition=tavern_empty_room_peephole_has_client,
             ),
             ObjectAction(
                 action_id="peek_empty_client_room",
                 label="Проверить окошко",
-                hook="jump",
+                hook="call",
                 target="TavernEmptyRoomPeekEmpty",
                 condition=tavern_empty_room_peephole_no_client,
             ),
@@ -36,7 +36,18 @@ init 6 python:
         custom_properties={},
     )
 
-    TavernEmptyRoomRoom = Room(
+    def tavern_empty_room_action_items():
+        items = []
+        for room_object in rooms.get("TavernEmptyRoom").visible_objects():
+            items.append(MenuItem(room_object.name, Call("TavernEmptyRoomObjectMenu", room_object.object_id)))
+        if tavern_upstairs_can_clean_rooms():
+            items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernEmptyRoom", "", "")))
+        items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernEmptyRoom")))
+        for room_exit in rooms.get("TavernEmptyRoom").visible_exits():
+            items.append(MenuItem(room_exit.label, movement_actions(room_exit.target)))
+        return items
+
+    TavernEmptyRoomRoomDefinition = Room(
         code_name="TavernEmptyRoom",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Пустая комната",
@@ -60,64 +71,62 @@ init 6 python:
 
 
 label TavernEmptyRoom:
-    $ CurrentRoom = TavernEmptyRoomRoom
-    $ CurLoc = "TavernEmptyRoom"
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ MainTxt = TavernEmptyRoomRoom.descriptions[0].text
-    $ CurLocDesc = MainTxt
-    call TavernEmptyRoomBuildActions
-    $ _empty_room_ui_return = None
-    while _empty_room_ui_return is None:
-        call screen main_ui
-        $ _empty_room_ui_return = _return
-    jump TavernEmptyRoom
-
-
-label TavernEmptyRoomBuildActions:
-    $ current_action_title = "Пустая комната"
-    $ current_action_content = None
-    $ current_action_items = tavern_empty_room_action_items()
+    $ rooms.enter("TavernEmptyRoom")
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    $ scene_runtime.text = rooms.get("TavernEmptyRoom").descriptions[0].text
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Пустая комната"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = tavern_empty_room_action_items()
     while True:
         call screen main_ui
 
 
 label TavernEmptyRoomObjectMenu(object_id=""):
+    $ renpy.dynamic("_peephole_action")
     if str(object_id or "") != "tavern_empty_room_peephole":
-        call TavernEmptyRoomBuildActions
         return
-    $ current_object_id = object_id
-    $ current_action_title = TavernEmptyRoomPeepholeObject.name
-    $ current_action_content = None
-    $ MainTxt = TavernEmptyRoomPeepholeObject.description
-    $ CurLocDesc = MainTxt
+    $ main_ui_runtime.object_id = object_id
+    $ main_ui_runtime.action_title = TavernEmptyRoomPeepholeObject.name
+    $ main_ui_runtime.action_content = None
+    $ scene_runtime.text = TavernEmptyRoomPeepholeObject.description
+    $ scene_runtime.location_text = scene_runtime.text
     if str(TavernEmptyRoomPeepholeObject.picture or ""):
-        $ _layout_last_picture = TavernEmptyRoomPeepholeObject.picture
-    $ current_action_items = []
+        $ scene_runtime.picture = TavernEmptyRoomPeepholeObject.picture
+    $ main_ui_runtime.action_items = []
     python:
         for _peephole_action in TavernEmptyRoomPeepholeObject.visible_actions():
-            if _peephole_action.hook == "jump" and str(_peephole_action.target or ""):
-                current_action_items.append(MenuItem(_peephole_action.label, Jump(_peephole_action.target)))
-            elif _peephole_action.hook == "call" and str(_peephole_action.target or ""):
-                current_action_items.append(MenuItem(_peephole_action.label, Call(_peephole_action.target, *tuple(getattr(_peephole_action, "args", ()) or ()))))
-        current_action_items.append(MenuItem("Назад", Jump("TavernEmptyRoom")))
+            if _peephole_action.hook == "call" and str(_peephole_action.target or ""):
+                main_ui_runtime.action_items.append(MenuItem(_peephole_action.label, Call(_peephole_action.target, *tuple(getattr(_peephole_action, "args", ()) or ()))))
+        main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "text", rooms.get("TavernEmptyRoom").descriptions[0].text),
+            SetField(scene_runtime, "location_text", rooms.get("TavernEmptyRoom").descriptions[0].text),
+            SetField(main_ui_runtime, "action_title", "Пустая комната"),
+            SetField(main_ui_runtime, "action_content", None),
+            SetField(main_ui_runtime, "action_items", tavern_empty_room_action_items()),
+            Function(main_ui_restart_interaction),
+        ]))
     return
 
 
 label TavernEmptyRoomPeekClient:
     if not tavern_empty_room_peephole_has_client():
-        jump TavernEmptyRoomPeekEmpty
+        call TavernEmptyRoomPeekEmpty
+        return
     call checkTriggers("TavernEmptyRoom", "tavern_client_room", 0)
-    jump TavernEmptyRoom
+    return
 
 
 label TavernEmptyRoomPeekEmpty:
-    $ _layout_last_picture = "images/amanda/Room/emptyroom.jpg"
-    $ MainTxt = "Вы осторожно проверяете потайное окошко, но в комнате сейчас никого нет. Остается только вернуться позже, когда кто-нибудь из посетителей уединится наверху."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Потайное окошко"
-    $ current_action_content = None
-    $ current_action_items = [MenuItem("Вернуться в комнату", Jump("TavernEmptyRoom"))]
-    call screen main_ui
-    jump TavernEmptyRoom
+    $ scene_runtime.picture = "images/amanda/Room/emptyroom.jpg"
+    $ scene_runtime.text = "Вы осторожно проверяете потайное окошко, но в комнате сейчас никого нет. Остается только вернуться позже, когда кто-нибудь из посетителей уединится наверху."
+    $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Вернуться в комнату":
+            $ scene_runtime.text = rooms.get("TavernEmptyRoom").descriptions[0].text
+            $ scene_runtime.location_text = scene_runtime.text
+            $ main_ui_runtime.action_title = "Пустая комната"
+            $ main_ui_runtime.action_items = tavern_empty_room_action_items()
+            $ main_ui_restart_interaction()
+            return

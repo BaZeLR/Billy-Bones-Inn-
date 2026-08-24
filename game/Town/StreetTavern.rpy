@@ -12,7 +12,7 @@ init python:
         return player.tavern_management.slogan_state > 1
 
     def street_tavern_draupnir_donkey_visible():
-        return TavernGloryHole == 1
+        return player.tavern_management.glory_hole == 1
 
     def street_tavern_exit_minutes(target_room=""):
         target_key = str(target_room or "").strip()
@@ -24,7 +24,7 @@ init python:
             return 10
         return navigation_group_travel_minutes()
 
-    StreetTavernRoom = Room(
+    StreetTavernRoomDefinition = Room(
         code_name="StreetTavern",
         group_name=ROOM_GROUP_CITY,
         display_name="Улица Мясников",
@@ -98,23 +98,30 @@ init python:
 
     def street_tavern_get_object(object_id):
         object_key = str(object_id or "").strip()
-        for room_object in StreetTavernRoom.visible_game_items():
+        for room_object in rooms.get("StreetTavern").visible_game_items():
             if getattr(room_object, "object_id", "") == object_key:
                 return room_object
         return None
 
+    def street_tavern_action_items():
+        items = []
+        for room_object in rooms.get("StreetTavern").visible_game_items():
+            items.append(MenuItem(room_object.name, Call("StreetTavernObjectMenu", room_object.object_id)))
+        for room_exit in rooms.get("StreetTavern").visible_exits():
+            items.append(MenuItem(room_exit.label, movement_actions(room_exit.target, street_tavern_exit_minutes(room_exit.target))))
+        return items
+
 label StreetTavern:
+    $ renpy.dynamic("_street_tavern_event_check_block", "_desc_row", "_street_desc_parts", "_street_desc_rows")
     scene black
     show bg StreetTavern at master
-    $ dog_prepare_current_spawn()
-    $ CurrentRoom = StreetTavernRoom
-    $ CurLoc = "StreetTavern"
-    $ scene_image = CurrentRoom.bg_picture or None
-    $ current_action_title = "Куда идти"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_girl_key = ""
-    $ current_object_id = ""
+    $ rooms.enter("StreetTavern")
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    $ main_ui_runtime.action_title = "Куда идти"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.girl_key = ""
+    $ main_ui_runtime.object_id = ""
 
     call ShowImageSeq("general", "", "LocStreetTavern", 2)
     python:
@@ -124,84 +131,48 @@ label StreetTavern:
             _street_tavern_event_check_block = ""
 
     if _street_tavern_event_check_block != "EventCheckBlock":
-        call RoomEnterEventGate(CurLoc, False)
+        call RoomEnterEventGate(rooms.current_code, False)
 
     python:
-        _street_desc_rows = StreetTavernRoom.visible_descriptions()
+        _street_desc_rows = rooms.get("StreetTavern").visible_descriptions()
         _street_desc_parts = []
         for _desc_row in _street_desc_rows:
             _street_desc_parts.append(str(_desc_row.text or ""))
-        CurLocDesc = "\n\n".join([part for part in _street_desc_parts if str(part or "").strip()])
-        if dog_is_here("StreetTavern"):
-            CurLocDesc += "\n\nНеподалеку от входа крутится бродячий пес, время от времени принюхиваясь к прохожим."
-        MainTxt = CurLocDesc
-        for _street_exit in StreetTavernRoom.visible_exits():
-            current_action_items.append(MenuItem(_street_exit.label, Call("MoveToRoom", _street_exit.target, street_tavern_exit_minutes(_street_exit.target))))
-    $ StreetTavernRoom.mark_visited()
+        scene_runtime.location_text = "\n\n".join([part for part in _street_desc_parts if str(part or "").strip()])
+        if dog.is_stray_here("StreetTavern"):
+            scene_runtime.location_text += "\n\nНеподалеку от входа крутится бродячий пес, время от времени принюхиваясь к прохожим."
+        scene_runtime.text = scene_runtime.location_text
+        main_ui_runtime.action_items = street_tavern_action_items()
+    $ rooms.get("StreetTavern").mark_visited()
 
     while True:
         call screen main_ui
 
 
-label street_tavern_menu:
-    $ _street_room = StreetTavernRoom
-    python:
-        _street_choices = []
-        for _street_object in _street_room.visible_game_items():
-            _street_choices.append((_street_object.name, ("object", _street_object.object_id)))
-        for _street_exit in _street_room.visible_exits():
-            _street_choices.append((_street_exit.label, ("jump", _street_exit.target)))
-        _street_pick = renpy.display_menu(_street_choices)
-
-    if isinstance(_street_pick, tuple) and len(_street_pick) >= 2:
-        if _street_pick[0] == "object":
-            call street_tavern_object_menu(_street_pick[1])
-            jump street_tavern_menu
-        if _street_pick[0] == "jump":
-            jump expression _street_pick[1]
-    return
-
-
-label street_tavern_object_menu(object_id=""):
-    if str(object_id or "") != "":
-        $ street_tavern_object_menu_id = object_id
-    $ object_id = street_tavern_object_menu_id
+label StreetTavernObjectMenu(object_id=""):
+    $ renpy.dynamic("_street_object")
+    $ renpy.dynamic("_street_action", "_street_menu_item")
     $ _street_object = street_tavern_get_object(object_id)
     if _street_object is None:
-        jump street_tavern_menu
-
-    "[_street_object.description]"
-
+        $ main_ui_runtime.action_title = "Куда идти"
+        $ main_ui_runtime.action_items = street_tavern_action_items()
+        return
+    $ scene_runtime.text = str(_street_object.description or "")
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = str(_street_object.name or "Объект")
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     python:
-        _street_object_choices = []
         for _street_action in _street_object.visible_actions():
-            _street_object_choices.append((_street_action.label, ("action", _street_action.action_id)))
-        _street_object_choices.append(("Назад", "__back__"))
-        _street_object_pick = renpy.display_menu(_street_object_choices)
-        _selected_street_action = None
-        if isinstance(_street_object_pick, tuple) and len(_street_object_pick) >= 2:
-            for _street_action in _street_object.visible_actions():
-                if getattr(_street_action, "action_id", "") == _street_object_pick[1]:
-                    _selected_street_action = _street_action
-                    break
-
-    if _street_object_pick == "__back__":
-        jump street_tavern_menu
-
-    if _selected_street_action is not None:
-        if _selected_street_action.hook == "text":
-            "[_selected_street_action.target]"
-            $ street_tavern_object_menu_id = object_id
-            jump street_tavern_object_menu
-        if _selected_street_action.hook == "call" and _selected_street_action.target != "":
-            call expression _selected_street_action.target
-            $ street_tavern_object_menu_id = object_id
-            jump street_tavern_object_menu
-        if _selected_street_action.hook == "jump" and _selected_street_action.target != "":
-            jump expression _selected_street_action.target
-
-    $ street_tavern_object_menu_id = object_id
-    jump street_tavern_object_menu
+            _street_menu_item = room_action_menu_item(_street_action)
+            if _street_menu_item is not None:
+                main_ui_runtime.action_items.append(_street_menu_item)
+        main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(main_ui_runtime, "action_title", "Куда идти"),
+            SetField(main_ui_runtime, "action_items", street_tavern_action_items()),
+            Function(main_ui_restart_interaction),
+        ]))
+    return
 
 
 label StreetTavernExamineSignboard:

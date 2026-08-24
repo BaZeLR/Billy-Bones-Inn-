@@ -1,45 +1,6 @@
-    def init_relationship_levels_runtime(force=False):
-        if force or len(dict(RelationshipLevels or {})) <= 0:
-            sync_relationship_levels()
-
-    def _relationship_after_load_init():
-        try:
-            init_relationship_levels_runtime(True)
-        except Exception:
-            pass
-
-    if _relationship_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(_relationship_after_load_init)    def init_relationship_levels_runtime(force=False):
-        if force or len(dict(RelationshipLevels or {})) <= 0:
-            sync_relationship_levels()
-
-    def _relationship_after_load_init():
-        try:
-            init_relationship_levels_runtime(True)
-        except Exception:
-            pass
-
-    if _relationship_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(_relationship_after_load_init)    def init_relationship_levels_runtime(force=False):
-        if force or len(dict(RelationshipLevels or {})) <= 0:
-            sync_relationship_levels()
-
-    def _relationship_after_load_init():
-        try:
-            init_relationship_levels_runtime(True)
-        except Exception:
-            pass
-
-    if _relationship_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(_relationship_after_load_init)# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default RelationshipLevels = {}
-
-default RelationshipLevels = {}
-
-default RelationshipLevels = {}
-
 init -20 python:
     RELATIONSHIP_FRIEND_THRESHOLDS = (5, 8, 11, 15)
     RELATIONSHIP_CORRUPTION_THRESHOLDS = (10, 20, 35, 55)
@@ -81,12 +42,12 @@ init -20 python:
 
     def npc_friend_value(npc_id=""):
         key = str(npc_id or "").strip().lower()
-        info = getPersonInfo(key)
+        info = people.get_info(key)
         return _relationship_int(getattr(info, "rel", 0), 0) if info is not None and key else 0
 
     def npc_corruption_value(npc_id=""):
         key = str(npc_id or "").strip().lower()
-        info = getPersonInfo(key)
+        info = people.get_info(key)
         return _relationship_int(getattr(info, "corruption", 0), 0) if info is not None and key else 0
 
     def _relationship_level_from_thresholds(value, thresholds):
@@ -145,38 +106,11 @@ init -20 python:
             "phase_index": _relationship_int(phase.get("index", 0), 0),
         }
 
-    def sync_npc_relationship_level(npc_id=""):
-        key = str(npc_id or "").strip().lower()
-        if key == "":
-            return {}
-        profile = build_npc_relationship_level(key)
-        RelationshipLevels[key] = dict(profile)
-        return dict(profile)
-
-    def sync_relationship_levels(npc_ids=None):
-        if npc_ids is None:
-            npc_ids = list(AllGirlNames) if isinstance(AllGirlNames, list) else list(RelationshipLevels.keys())
-        for npc_id in list(npc_ids or []):
-            sync_npc_relationship_level(npc_id)
-        return dict(RelationshipLevels)
-
     def npc_relationship_level(npc_id=""):
         key = str(npc_id or "").strip().lower()
         if key == "":
             return {}
-        cached = dict(RelationshipLevels.get(key, {}) or {})
-        if not cached:
-            return sync_npc_relationship_level(key)
-        current_friend = npc_friend_value(key)
-        current_corruption = npc_corruption_value(key)
-        if _relationship_int(cached.get("friend_value", -999), -999) != current_friend:
-            return sync_npc_relationship_level(key)
-        if _relationship_int(cached.get("corruption_value", -999), -999) != current_corruption:
-            return sync_npc_relationship_level(key)
-        return cached
+        return build_npc_relationship_level(key)
 
     def npc_relationship_label(npc_id=""):
         return str(npc_relationship_level(npc_id).get("phase_label", "") or "")
-
-
-

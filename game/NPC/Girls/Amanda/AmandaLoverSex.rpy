@@ -4,6 +4,7 @@
 # Amanda Lover Sex scene - converted from QSP to Ren'Py
 
 label AmandaLoverSex:
+    $ renpy.dynamic("amanda_agree_sex", "rand_var", "random_street", "tmp_girl_name", "tmp_guy_known", "tmp_guy_name")
     $ main_ui_begin_native_scene_state("Аманда")
     python:
         tmp_guy_known = 0
@@ -127,6 +128,7 @@ label AmandaLoverSex:
 
 # Supporting functions and scene code
 label amanda_lover_show_sex_scene(scene_type, guy_name):
+    $ renpy.dynamic("amanda_lover_build", "amanda_lover_build_cum_in", "amanda_lover_build_get_in")
     $ main_ui_begin_native_scene_state("Аманда")
     python:
         amanda_lover_build = Amanda.dynamic_roll(1, 2, "lover_build")
@@ -161,19 +163,19 @@ label amanda_lover_show_sex_scene(scene_type, guy_name):
             
             if scene_type == "minet":
                 "[guy_name] стоит, прислонившись к телеге, а Аманда стоит перед ним на коленях и отсасывает. Вдруг он попробовал было вытащить свой член из ее рта, но она протестующе замычала, принимая весь заряд его семени в рот.\nЗакончив сглатывать, она подняла на него глаза и сказала: \"Но-но, головой надо думать иногда! Если бы твоя сперма попала мне на платье, то как бы потом я его отстирывала? Говорят, что в республике Атлантида именно так уличили в измене жене тамошнего дожа!\"\nНда, не ожидали вы от Аманды такой эрудиции."
-                $ ShowImageSeq("amanda", "RandomSex", "minet", 5)
+                $ show_image_seq("amanda", "RandomSex", "minet", 5)
             else:
                 "[guy_name] разложил Аманду на телеге и невозбранно трахает ее. Той, похоже, это нравится. Впрочем, вы похоже застали уже самое окончание совокупления, если так можно выразиться."
-                $ ShowImage("amanda", "RandomSex", "sex")
+                $ show_image("amanda", "RandomSex", "sex")
         else:
             "Подставив пару ящиков, вы залезли достаточно высоко чтобы осторожно заглянуть в окно. Там вы увидели то, что и ожидали."
             
             if scene_type == "minet":
                 "[guy_name] развалился на куче сена, а Аманда, склонившись над ним, делала ему приятное. Собственно вы застали самый финал, когда Аманда получила полный заряд прямо в рот. И что характерно, все проглотила."
-                $ ShowImageSeq("amanda", "RandomSex", "minet", 5)
+                $ show_image_seq("amanda", "RandomSex", "minet", 5)
             else:
                 "[guy_name] уложил Аманду на куче сена и трахает ее, а та ему с энтузиазмом подмахивает. Причем похоже, что дело близится к концу. Так и есть!"
-                $ ShowImage("amanda", "RandomSex", "sex")
+                $ show_image("amanda", "RandomSex", "sex")
         
         if amanda_lover_build_cum_in == 2:
             "[guy_name] даже и не озаботился вытащить свой член из Аманды и кончил прямо в нее."

@@ -11,7 +11,7 @@ init python:
         return max(1, chance + bonus)
 
     def slut_friends_increase(girl, limit_friend, friend_chance, inc_decr_friends, limit_sluttiness, sluttiness_chance, inc_decr_sluttiness):
-        girl_info = getPersonInfo(girl)
+        girl_info = people.get_info(girl)
         if girl_info is None:
             return
         positive_friend_chance = social_friend_roll_chance(friend_chance, girl, True)

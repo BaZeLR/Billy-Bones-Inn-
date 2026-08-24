@@ -1,27 +1,6 @@
-        global player.intimacy.can_cum_daily        global player.intimacy.can_cum_daily        global player.intimacy.can_cum_daily        global player.intimacy.can_cum_daily        global player.intimacy.can_cum_daily        global player.intimacy.can_cum_daily# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default tractir_activated_achievements = set()
-default tractir_achieved = set()
-default tractir_endings = set()
-default tractir_progress_view = "achievements"
-default TractirEndingTitle = ""
-default TractirEndingBody = ""
-
-default tractir_activated_achievements = set()
-default tractir_achieved = set()
-default tractir_endings = set()
-default tractir_progress_view = "achievements"
-default TractirEndingTitle = ""
-default TractirEndingBody = ""
-
-default tractir_activated_achievements = set()
-default tractir_achieved = set()
-default tractir_endings = set()
-default tractir_progress_view = "achievements"
-default TractirEndingTitle = ""
-default TractirEndingBody = ""
-
 define tractir_achievement_order = [
     "first_month_survived",
     "sandra_secured_future",
@@ -73,6 +52,18 @@ define tractir_ending_desc = {
 }
 
 init -20 python:
+    class TractirProgressRuntimeState(object):
+        def __init__(self):
+            self.activated_achievements = set()
+            self.achieved = set()
+            self.endings = set()
+            self.view = "achievements"
+            self.boss_fatal_enemy = ""
+            self.maid_revenge_ready = False
+            self.maid_revenge_reason = ""
+            self.sandra_secured_future_day = -1
+            self.sergio_discount_percent = 0
+
     def _tractir_progress_int(value, default=0):
         try:
             return int(value)
@@ -86,26 +77,26 @@ init -20 python:
         aid = str(achievement_id or "").strip()
         if aid == "" or aid not in tractir_achievements:
             return False
-        if aid in tractir_achieved:
+        if aid in tractir_progress.achieved:
             return False
-        tractir_activated_achievements.add(aid)
+        tractir_progress.activated_achievements.add(aid)
         return True
 
     def tractir_record_ending(ending_id):
         eid = str(ending_id or "").strip()
         if eid == "" or eid not in tractir_ending_desc:
             return False
-        tractir_endings.add(eid)
+        tractir_progress.endings.add(eid)
         return True
 
     def tractir_check_achievements_apply():
-        day_count = _tractir_progress_int(globals().get("dayspassed", 0), 0)
-        notoriety_value = _tractir_progress_int(globals().get("notoriety", 0), 0)
+        day_count = _tractir_progress_int(calendar_v2.daysInGame, 0)
+        notoriety_value = _tractir_progress_int(player.stats.notoriety, 0)
 
         if day_count >= 28:
             tractir_activate_achievement("first_month_survived")
 
-        if _tractir_progress_int(Sandra.var.get("SecuredFuture", 0), 0) > 0:
+        if _tractir_progress_int(tractir_progress.sandra_secured_future_day, -1) >= 0:
             tractir_activate_achievement("sandra_secured_future")
 
         if notoriety_value >= 25:
@@ -117,48 +108,34 @@ init -20 python:
         return True
 
     def tractir_first_active_ending():
-        if _tractir_progress_int(globals().get("money", 0), 0) <= 0:
+        if _tractir_progress_int(player.economy.money, 0) <= 0:
             return "bankrupt"
-        if _tractir_progress_int(globals().get("player.tavern_management.visitors", 0), 0) <= 0:
+        if _tractir_progress_int(player.tavern_management.visitors, 0) <= 0:
             return "empty_tavern"
-        if _tractir_progress_int(Sandra.var.get("MaidRevengeEnding", 0), 0) > 0:
+        if bool(tractir_progress.maid_revenge_ready):
             return "maid_revenge"
-        try:
-            if _tractir_progress_int(fight.enemy_state.get("fatal_loss", 0), 0) > 0:
-                return "boss_death"
-        except Exception:
-            pass
+        if str(tractir_progress.boss_fatal_enemy or "").strip():
+            return "boss_death"
         return ""
 
     def tractir_mark_maid_revenge_ready(reason=""):
-        Sandra.var["MaidRevengeEnding"] = 1
-        Sandra.var["MaidRevengeReason"] = str(reason or "")
+        tractir_progress.maid_revenge_ready = True
+        tractir_progress.maid_revenge_reason = str(reason or "")
         return True
 
     def tractir_mark_boss_fatal_loss(enemy_id=""):
-        try:
-            fight_state = fight.enemy_state
-        except Exception:
-            return False
-        fight_state["fatal_loss"] = 1
-        fight_state["fatal_enemy"] = str(enemy_id or "")
+        tractir_progress.boss_fatal_enemy = str(enemy_id or "unknown")
         return True
 
     def tractir_apply_sandra_secured_future():
-        global player.intimacy.can_cum_daily
-        global player.intimacy.can_cum_daily
-        if _tractir_progress_int(globals().get("dayspassed", 0), 0) < 28:
+        if _tractir_progress_int(calendar_v2.daysInGame, 0) < 28:
             return False
-        if _tractir_progress_int(Sandra.var.get("SecuredFuture", 0), 0) > 0:
+        if _tractir_progress_int(tractir_progress.sandra_secured_future_day, -1) >= 0:
             return False
-        Sandra.var["SecuredFuture"] = 1
-        Sandra.var["SecuredFutureDay"] = _tractir_progress_int(globals().get("dayspassed", 0), 0)
+        tractir_progress.sandra_secured_future_day = _tractir_progress_int(calendar_v2.daysInGame, 0)
         player.intimacy.can_cum_daily = max(1, _tractir_progress_int(player.intimacy.can_cum_daily, 2) - 1)
         tractir_activate_achievement("sandra_secured_future")
-        try:
-            renpy.notify("После ночи с Сандрой сил на чужие постели стало меньше.")
-        except Exception:
-            pass
+        renpy.notify("После ночи с Сандрой сил на чужие постели стало меньше.")
         return True
 
     def tractir_progress_rows(mode="achievements"):
@@ -170,7 +147,7 @@ init -20 python:
                     "id": eid,
                     "title": title,
                     "desc": desc,
-                    "unlocked": eid in tractir_endings,
+                    "unlocked": eid in tractir_progress.endings,
                 })
             return rows
         for aid in tractir_achievement_order:
@@ -179,9 +156,12 @@ init -20 python:
                 "id": aid,
                 "title": title,
                 "desc": desc,
-                "unlocked": aid in tractir_achieved,
+                "unlocked": aid in tractir_progress.achieved,
             })
         return rows
+
+
+default tractir_progress = TractirProgressRuntimeState()
 
 
 label TractirCheckAchievements:
@@ -190,28 +170,30 @@ label TractirCheckAchievements:
 
 
 label TractirShowPendingAchievements:
-    $ _tractir_pending = [aid for aid in list(tractir_activated_achievements) if aid not in tractir_achieved]
+    $ renpy.dynamic("_tractir_pending", "_tractir_aid", "_tractir_title")
+    $ _tractir_pending = [aid for aid in list(tractir_progress.activated_achievements) if aid not in tractir_progress.achieved]
     $ _tractir_pending.sort(key=lambda aid: tractir_achievement_order.index(aid) if aid in tractir_achievement_order else 999)
     while len(_tractir_pending) > 0:
         $ _tractir_aid = _tractir_pending.pop(0)
         $ _tractir_title = tractir_achievements.get(_tractir_aid, ("Достижение", ""))[0]
-        $ tractir_achieved.add(_tractir_aid)
+        $ tractir_progress.achieved.add(_tractir_aid)
         $ renpy.notify("Достижение: " + str(_tractir_title))
     return
 
 
 label TractirShowEnding(ending_id):
+    $ renpy.dynamic("_tractir_eid")
     $ _tractir_eid = str(ending_id or "").strip()
     if _tractir_eid == "" or _tractir_eid not in tractir_ending_desc:
         return
     $ tractir_record_ending(_tractir_eid)
-    $ TractirEndingTitle = tractir_ending_desc[_tractir_eid][0]
-    $ TractirEndingBody = tractir_ending_desc[_tractir_eid][1]
-    call screen tractir_result_card_overlay(TractirEndingTitle, TractirEndingBody)
+    $ _tractir_ending_title, _tractir_ending_body = tractir_ending_desc[_tractir_eid]
+    call screen tractir_result_card_overlay(_tractir_ending_title, _tractir_ending_body)
     return
 
 
 label TractirCheckEndings:
+    $ renpy.dynamic("_tractir_ending_id", "_unlocked", "_title_color", "_row_bg")
     $ _tractir_ending_id = tractir_first_active_ending()
     if _tractir_ending_id != "":
         call TractirShowEnding(_tractir_ending_id)
@@ -258,14 +240,14 @@ screen tractir_progress_panel():
                 spacing 12
                 textbutton "Достижения":
                     text_size 20
-                    action SetVariable("tractir_progress_view", "achievements")
+                    action SetField(tractir_progress, "view", "achievements")
                 textbutton "Финалы":
                     text_size 20
-                    action SetVariable("tractir_progress_view", "endings")
+                    action SetField(tractir_progress, "view", "endings")
                 textbutton "Закрыть":
                     xalign 1.0
                     text_size 20
-                    action SetVariable("main_ui_overlay", "")
+                    action SetField(main_ui_runtime, "overlay", "")
             viewport:
                 xfill True
                 yfill True
@@ -273,7 +255,7 @@ screen tractir_progress_panel():
                 mousewheel True
                 vbox:
                     spacing 8
-                    for _row in tractir_progress_rows(tractir_progress_view):
+                    for _row in tractir_progress_rows(tractir_progress.view):
                         $ _unlocked = bool(_row.get("unlocked", False))
                         $ _title_color = "#f2d49a" if _unlocked else "#777777"
                         $ _row_bg = "#1f1a14" if _unlocked else "#121212"

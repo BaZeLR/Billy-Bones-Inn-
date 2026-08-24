@@ -1,12 +1,6 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default GirlDecisionLast = {}
-
-default GirlDecisionLast = {}
-
-default GirlDecisionLast = {}
-
 init -34 python:
     import math
 
@@ -190,8 +184,8 @@ init -34 python:
         girl = str(girl_name or "").strip().lower()
         if girl not in GIRL_DECISION_CYCLE_IDS:
             return {"phase": "none", "horny": 0.0, "critical": 0.0, "fertility": 0.0}
-        offset = (sum([ord(ch) for ch in girl]) + girl_decision_int(DateOfBirth.get(girl, {}).get("day", 0) if isinstance(DateOfBirth.get(girl, None), dict) else 0, 0)) % 28
-        day_index = (girl_decision_int(dayspassed, 0) + offset) % 28
+        offset = (sum([ord(ch) for ch in girl]) + girl_decision_int(people_birth_date(girl).get("day", 0), 0)) % 28
+        day_index = (current_game_day() + offset) % 28
         if day_index in (0, 1, 2):
             return {"phase": "critical", "horny": 0.05, "critical": 1.0, "fertility": 0.25}
         if 10 <= day_index <= 15:
@@ -202,17 +196,12 @@ init -34 python:
 
     def girl_decision_recent_barber_bonus(girl_name=""):
         girl = str(girl_name or "").strip().lower()
-        try:
-            last_day = girl_decision_int(BarberVisitLastDay.get(girl, -99), -99)
-            if last_day >= 0 and girl_decision_int(dayspassed, 0) - last_day <= 14:
-                return 1.0
-        except Exception:
-            pass
-        try:
-            if int(BarberInvitePending.get(girl, 0) or 0) == 1:
-                return 0.35
-        except Exception:
-            pass
+        last_day = girl_decision_int(household.barber_visit_last_day.get(girl, -99), -99)
+        if last_day >= 0 and current_game_day() - last_day <= 14:
+            return 1.0
+        info = people.get_info(girl)
+        if info is not None and int(info.var.get("barber_invite_pending", 0) or 0) == 1:
+            return 0.35
         return 0.0
 
     def girl_decision_soap_bonus(girl_name=""):
@@ -229,7 +218,7 @@ init -34 python:
         except Exception:
             pass
         try:
-            if int(dayspassed or 0) - int(HouseholdSoapRequestLastDay.get(girl, -99) or -99) <= 7:
+            if current_game_day() - int(household.soap_request_last_day.get(girl, -99) or -99) <= 7:
                 score += 0.20
         except Exception:
             pass
@@ -239,14 +228,14 @@ init -34 python:
         girl = str(girl_name or "").strip().lower()
         score = 0.0
         try:
-            if int(week or 0) == 7 and str(getLocation(girl) or "") == "Church":
+            if int(calendar_v2.week or 0) == 7 and str(people.location(girl) or "") == "Church":
                 score += 0.35
         except Exception:
             pass
         try:
             if int(player.economy.church_donated_today or 0) > 0:
                 score += 0.15
-            score += min(0.35, max(0.0, float(girl_decision_int(ChurchDonatedAmount, 0)) / 1000.0))
+            score += min(0.35, max(0.0, float(girl_decision_int(player.economy.church_donated_amount, 0)) / 1000.0))
         except Exception:
             pass
         return girl_decision_clamp(score)
@@ -281,7 +270,7 @@ init -34 python:
         girl = str(girl_name or "").strip().lower()
         if girl == "amanda":
             score = 0.0
-            if Amanda.var_int("alberfriends", 0) >= 10 and Amanda.var_int("alberprohibit", 0) == 0:
+            if Amanda.legare_affection >= 10 and not Amanda.legare_forbidden:
                 score += 0.25
             if Amanda.var_int("prohibitwithguys", 0) > 0:
                 score += 0.25
@@ -293,7 +282,7 @@ init -34 python:
     def build_girl_decision_profile(girl_name=""):
         girl = str(girl_name or "").strip().lower()
         cycle = girl_decision_cycle_state(girl)
-        girl_info = getPersonInfo(girl)
+        girl_info = people.get_info(girl)
         if girl_info is not None:
             friend = girl_decision_int(getattr(girl_info, "rel", 0), 0)
             open_value = girl_decision_int(getattr(girl_info, "openness", 0), 0)
@@ -366,9 +355,9 @@ init -34 python:
                 "amanda_suckyou": girl_decision_int(Amanda.var_int("suckyou", 0), 0),
                 "amanda_fuckyou": girl_decision_int(Amanda.var_int("fuckyou", 0), 0),
                 "amanda_knowsexactive": girl_decision_int(Amanda.var_int("knowsexactive", 0), 0),
-                "amanda_alberfriends": girl_decision_int(Amanda.var_int("alberfriends", 0), 0),
+                "amanda_alberfriends": girl_decision_int(Amanda.legare_affection, 0),
                 "amanda_lizafriends": girl_decision_int(Amanda.var_int("lizafriends", 0), 0),
-                "amanda_alberprohibit": girl_decision_int(Amanda.var_int("alberprohibit", 0), 0),
+                "amanda_alberprohibit": girl_decision_int(Amanda.legare_forbidden, 0),
                 "amanda_prohibitwithguys": girl_decision_int(Amanda.var_int("prohibitwithguys", 0), 0),
             })
         return profile
@@ -429,10 +418,10 @@ init -34 python:
 
     def girl_decision_roll_value(girl_name="", action_name=""):
         seed = (
-            girl_decision_int(dayspassed, 0) * 37
-            + girl_decision_int(hour, 0) * 11
-            + girl_decision_int(minute, 0) * 3
-            + girl_decision_int(time, 0) * 19
+            current_game_day() * 37
+            + girl_decision_int(calendar_v2.hour, 0) * 11
+            + girl_decision_int(calendar_v2.minute, 0) * 3
+            + girl_decision_int(calendar_v2.time_slot(), 0) * 19
             + sum([ord(ch) for ch in str(girl_name or "") + ":" + str(action_name or "")])
         ) % 1000
         return float(seed) / 1000.0
@@ -458,7 +447,9 @@ init -34 python:
             "profile": data,
             "probabilities": probs,
         }
-        GirlDecisionLast["%s:%s" % (girl, action_key)] = result
+        info = people.get_info(girl)
+        if info is not None:
+            info.var.setdefault("decision_results", {})[action_key] = dict(result)
         return result
 
     def girl_decision_good_probability(girl_name="", action_name="", profile=None):

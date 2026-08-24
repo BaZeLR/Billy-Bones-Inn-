@@ -240,8 +240,13 @@ def collect_event_tuples(node: ast.AST, list_name: str, thread_name: str, constr
     return events
 
 
-def parse_story_threads(source: str, report: RuntimeLogicReport) -> list[StoryThread]:
+def parse_story_threads(
+    source: str,
+    report: RuntimeLogicReport,
+    named_event_objects: set[str] | None = None,
+) -> list[StoryThread]:
     threads: list[StoryThread] = []
+    named_event_objects = named_event_objects or set()
     for list_name in THREAD_LIST_NAMES:
         expr = extract_balanced_assignment(source, list_name)
         if not expr:
@@ -267,9 +272,19 @@ def parse_story_threads(source: str, report: RuntimeLogicReport) -> list[StoryTh
             cond = ast_literal(call.args[3], None)
             thread_name = person + subname
             thread_events = collect_event_tuples(call.args[4], list_name, thread_name, func_name)
+            named_events = {
+                node.id
+                for node in ast.walk(call.args[4])
+                if isinstance(node, ast.Name) and node.id in named_event_objects
+            }
             if not thread_events:
-                report.fail("threads", f"{thread_name} has no event tuples")
-            list_events += len(thread_events)
+                generated_events = [
+                    node for node in ast.walk(call.args[4])
+                    if isinstance(node, ast.Call) and ast_name(node.func).endswith("_event")
+                ]
+                if not generated_events and not named_events:
+                    report.fail("threads", f"{thread_name} has no event definitions")
+            list_events += len(thread_events) + len(named_events)
             threads.append(
                 StoryThread(
                     list_name=list_name,
@@ -474,8 +489,15 @@ def check_thread_events(project_root: Path, report: RuntimeLogicReport) -> None:
         report.fail("threads", "StoryEventRuntime.rpy is missing")
         return
     source = read_text(story_path)
-    labels = collect_labels(project_root / "game")
-    threads = parse_story_threads(source, report)
+    game_dir = project_root / "game"
+    labels = collect_labels(game_dir)
+    named_event_re = re.compile(
+        r"(?m)^\s*([A-Za-z_]\w*)\s*=\s*[A-Za-z_]\w*Event\s*\("
+    )
+    named_event_objects: set[str] = set()
+    for path in iter_rpy_files(game_dir):
+        named_event_objects.update(named_event_re.findall(read_text(path)))
+    threads = parse_story_threads(source, report, named_event_objects)
     validate_thread_blueprints(threads, report)
     events = [event for story_thread in threads for event in story_thread.events]
     if not events:
@@ -580,7 +602,7 @@ def check_recipe_items(project_root: Path, report: RuntimeLogicReport) -> None:
         "craftable_recipe_pages",
         "RecipeBookCraftMenu",
         "apply_recipe_craft",
-        "_player_add_item_by_id",
+        "player.add_item",
     ):
         if token not in crafting_source:
             report.fail("recipes", f"{token} is missing from CraftingRecipes.rpy")
@@ -644,9 +666,10 @@ def check_required_hooks(project_root: Path, report: RuntimeLogicReport) -> None
         "progress": (
             project_root / "game" / "Utilities" / "General" / "Common" / "AchievementsEndings.rpy",
             (
-                "tractir_activated_achievements",
-                "tractir_achieved",
-                "tractir_endings",
+                "class TractirProgressRuntimeState",
+                "tractir_progress.activated_achievements",
+                "tractir_progress.achieved",
+                "tractir_progress.endings",
                 "tractir_achievement_order",
                 "tractir_achievements",
                 "tractir_ending_desc",
@@ -666,7 +689,7 @@ def check_required_hooks(project_root: Path, report: RuntimeLogicReport) -> None
             project_root / "game" / "Town" / "RandomTownEvents.rpy",
             (
                 "class TownStreetRuntime",
-                "TownStreetEventsToday",
+                "TownStreet.events_today",
                 "TownStreetPatrolEvent",
                 "TownStreetThugsEvent",
                 "TownStreetHelpEvent",
@@ -736,7 +759,7 @@ def check_room_enter_gates(project_root: Path, report: RuntimeLogicReport) -> No
         source = read_text(path)
         if f"label {label}:" not in source:
             report.fail("room_enter", f"{label} label is missing")
-        if "call RoomEnterEventGate(CurLoc, False)" not in source:
+        if "call RoomEnterEventGate(rooms.current_code, False)" not in source:
             report.fail("room_enter", f"{label} does not call RoomEnterEventGate")
     report.pass_("room_enter", f"checked {len(checks)} room enter gates")
 

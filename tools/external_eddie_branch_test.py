@@ -98,12 +98,12 @@ testcase eddie_talk_opens_becky_join_setup:
         Talked["eddie"] = 0
         EddieVar["SawWithGeorgett"] = 1
         EddieVar["SawMomSex"] = 1
-        BeckyVar["HomeSex"] = 1
-        BeckyVar["EddieTryToFuck"] = 0
+        Becky.home_sex_unlocked = True
+        Becky.eddie_join_stage = 0
     run Call("IntEddieTalk")
     advance until screen "main_ui" timeout 20.0
     assert eval (any(getattr(item, "caption", "") == "Предложить помочь подкатится к хозяйке лавки." for item in current_action_items)) timeout 5.0
-    click "Предложить помочь подкатится к хозяйке лавки." until eval (int(BeckyVar.get("EddieTryToFuck", 0) or 0) == 1) timeout 20.0
+    click "Предложить помочь подкатится к хозяйке лавки." until eval (int(Becky.eddie_join_stage or 0) == 1) timeout 20.0
     assert eval (int(Talked.get("eddie", 0) or 0) == 1) timeout 5.0
 
 testcase becky_from_dinner_runs_eddie_first_join:
@@ -114,11 +114,10 @@ testcase becky_from_dinner_runs_eddie_first_join:
         CurLoc = "BeckyHome"
         location = CurLoc
         MyCurDress = "citydress"
-        BeckyHomeActive = 0
-        BeckyVar["visitedhome"] = 5
-        BeckyVar["HomeSex"] = 1
-        BeckyVar["EddieTryToFuck"] = 1
-        BeckyVar["PriestAdvice"] = 3
+        Becky.home_visit_stage = 5
+        Becky.home_sex_unlocked = True
+        Becky.eddie_join_stage = 1
+        Becky.priest_advice_stage = 3
         Friends["becky"] = 20
         Friends["eddie"] = 10
         sluttiness["becky"] = 55
@@ -127,7 +126,7 @@ testcase becky_from_dinner_runs_eddie_first_join:
     click "Поцеловать Бекки и незаметно открыть засов"
     advance until screen "choice" timeout 20.0
     click "Кивком показать Эдди, чтобы он уважил просьбу Бекки"
-    advance until eval (int(BeckyVar.get("EddieTryToFuck", 0) or 0) == 4) timeout 20.0
+    advance until eval (int(Becky.eddie_join_stage or 0) == 4) timeout 20.0
 
 testcase georgett_sponsor_creates_eddie_home_visit:
     run Jump("Intro")
@@ -139,17 +138,17 @@ testcase georgett_sponsor_creates_eddie_home_visit:
         CurrentLoc["georgett"] = "TavernMain"
         Friends["georgett"] = 10
         Talked["georgett"] = 0
-        BeckyVar["EddieGeorg"] = 1
-        BeckyVar["EddieWhoreHome"] = 0
-        BeckyVar["visitedhome"] = 5
-        BeckyVar["HomeSex"] = 1
+        Becky.eddie_georgett_stage = 1
+        Becky.eddie_home_visit_state = 0
+        Becky.home_visit_stage = 5
+        Becky.home_sex_unlocked = True
         EddieVar["SawMomSex"] = 1
         EddieVar["WhoreVisitFreq"] = 1
         money = 100
     run Call("IntGeorgettTalk", "georgett", "tavern")
     advance until screen "main_ui" timeout 20.0
     assert eval (any(getattr(item, "caption", "") == "Предложить Жоржетте проспонсировать ее визит к Эдди домой" for item in current_action_items)) timeout 5.0
-    click "Предложить Жоржетте проспонсировать ее визит к Эдди домой" until eval (int(BeckyVar.get("EddieWhoreHome", 0) or 0) == 1) timeout 20.0
+    click "Предложить Жоржетте проспонсировать ее визит к Эдди домой" until eval (int(Becky.eddie_home_visit_state or 0) == 1) timeout 20.0
     python:
         _eddie_saved_randint = renpy.random.randint
         renpy.random.randint = lambda a, b: 1
@@ -159,7 +158,7 @@ testcase georgett_sponsor_creates_eddie_home_visit:
     run Call("NextDay_NewDayEvents")
     python:
         renpy.random.randint = _eddie_saved_randint
-    assert eval (int(BeckyVar.get("EddieWhoreHome", 0) or 0) == 4) timeout 5.0
+    assert eval (int(Becky.eddie_home_visit_state or 0) == 4) timeout 5.0
     assert eval (any(row.get("GirlName") == "georgett" and row.get("Place") == "EddieHomeVisit" for row in TodaySexEvents)) timeout 5.0
 
 testcase eddie_tavern_client_event_uses_same_view:
@@ -193,17 +192,17 @@ testcase sherwood_offer_stable_and_robbery_flow:
     python:
         CurLoc = "MarketPlace"
         location = CurLoc
-        BeckyVar["TradeOffer"] = 0
-        BeckyVar["SherwoodWarn"] = 0
-        BeckyVar["SherwoodSuspect"] = 0
+        Becky.trade_offer_stage = 0
+        Becky.sherwood_warning_stage = 0
+        Becky.sherwood_suspicion = 0
         Friends["becky"] = 20
         GiveOrgasms["becky"] = 10
     run Call("BeckyQuestInit")
     advance until screen "choice" timeout 20.0
     click "А кто ж не хочет?"
     advance until screen "choice" timeout 20.0
-    assert eval (int(BeckyVar.get("TradeOffer", 0) or 0) == 1) timeout 5.0
-    assert eval (int(BeckyVar.get("SherwoodWarn", 0) or 0) == 1) timeout 5.0
+    assert eval (int(Becky.trade_offer_stage or 0) == 1) timeout 5.0
+    assert eval (int(Becky.sherwood_warning_stage or 0) == 1) timeout 5.0
     click "Пойти подумать над предложением" until screen "main_ui" timeout 20.0
 
     python:
@@ -213,8 +212,8 @@ testcase sherwood_offer_stable_and_robbery_flow:
         money = 500
         time = 0
         week = 1
-        BeckyVar["TradeOffer"] = 1
-        BeckyVar["SherwoodSuspect"] = 5
+        Becky.trade_offer_stage = 1
+        Becky.sherwood_suspicion = 5
     run Jump("TavernStable")
     advance until screen "main_ui" timeout 20.0
     assert eval (any(getattr(item, "caption", "") == "Купить провизию для эльфов у Бекки и отправится в Куниделл верхом" for item in current_action_items)) timeout 5.0
@@ -226,8 +225,9 @@ testcase sherwood_offer_stable_and_robbery_flow:
         RobinVar["RobbedNum"] = 0
         RobinVar["KnowHim"] = 0
         RobinVar["MongolSafePass"] = 0
-        BeckyVar["RobbedByRobin"] = 0
-    run Call("SherwoodTravel", 1)
+        Becky.robin_robbery_stage = 0
+    $ BlackwoodRoadRoom.custom_properties["on_horse"] = 1
+    run Jump("BlackwoodRoad")
     advance until screen "choice" timeout 20.0
     click "Ехать дальше"
     advance until screen "choice" timeout 20.0
@@ -236,7 +236,7 @@ testcase sherwood_offer_stable_and_robbery_flow:
     click "Попрощаться"
     advance until screen "choice" timeout 20.0
     assert eval (int(RobinVar.get("RobbedNum", 0) or 0) == 1) timeout 5.0
-    assert eval (int(BeckyVar.get("RobbedByRobin", 0) or 0) >= 1) timeout 5.0
+    assert eval (int(Becky.robin_robbery_stage or 0) >= 1) timeout 5.0
     assert eval (str(MyStallion or "") == "") timeout 5.0
     assert eval (int(money or 0) == 50) timeout 5.0
     click "Домой" until screen "main_ui" timeout 20.0

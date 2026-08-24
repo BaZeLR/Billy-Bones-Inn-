@@ -1,22 +1,27 @@
-    hide screen girl_card_overlay    hide screen girl_card_overlay        hide screen girl_card_overlay    hide screen girl_card_overlay    hide screen girl_card_overlay    hide screen girl_card_overlay        hide screen girl_card_overlay    hide screen girl_card_overlay    hide screen girl_card_overlay    hide screen girl_card_overlay        hide screen girl_card_overlay    hide screen girl_card_overlay# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default DressProduced = ""
-default DressBuyer = ""
-default IrmaMeasureShopStage = 0
-default IrmaSexShopStep = 0
+default dress_shop = DressShopRuntimeState()
 
 init python:
+    class DressShopRuntimeState(object):
+        def __init__(self):
+            self.produced = ""
+            self.buyer = ""
+            self.measure_stage = 0
+            self.sex_step = 0
+            self.girl_dress_block = 0
+
     def dress_shop_irma_working_idle():
-        return str(DressProduced or "") == ""
+        return str(dress_shop.produced or "") == ""
 
     def dress_shop_irma_working_order():
-        return str(DressProduced or "") != ""
+        return str(dress_shop.produced or "") != ""
 
     def dress_shop_clara_present():
-        return str(getLocation("clara") or "") == "DressShop"
+        return str(people.location("clara") or "") == "DressShop"
 
-    DressShopRoom = Room(
+    DressShopRoomDefinition = Room(
         code_name="DressShop",
         group_name=ROOM_GROUP_CITY,
         display_name="Лавка портнихи",
@@ -61,15 +66,6 @@ init python:
             "object_menu_label": "DressShopObjectMenu",
         },
     )
-
-
-
-default dress_shop = DressShopRuntimeState()
-
-
-
-default dress_shop = DressShopRuntimeState()
-
     def dress_shop_get_object(object_id):
         return get_game_object(object_id)
 
@@ -93,14 +89,41 @@ default dress_shop = DressShopRuntimeState()
             return []
         return list(rack_obj.visible_contents())
 
+    def dress_shop_catalog_action_items(rack_type):
+        rack_key = str(rack_type or "").strip().lower()
+        items = []
+        for dress_item in dress_shop_catalog_items(rack_key):
+            dress_code = str(dress_item.custom_properties.get("dress_code", "") or "")
+            dress_name = str(dress_item.name or dress_code)
+            dress_price = int(getattr(dress_item, "price", 0) or 0)
+            if rack_key == "male":
+                if dress_shop_item_owned(dress_item):
+                    caption = "%s — уже куплено" % dress_name
+                    action = NullAction()
+                else:
+                    caption = "%s — %s мараведи" % (dress_name, dress_price)
+                    action = Call("DressShopBuyMaleItem", dress_code)
+            else:
+                caption = "%s — подробнее" % dress_name
+                action = Call("DressShopFemaleBuyInfo", dress_code)
+            items.append(MenuItem(caption, action))
+        items.append(MenuItem("Назад в лавку", [
+            SetField(main_ui_runtime, "object_id", ""),
+            SetField(main_ui_runtime, "action_title", "Действия"),
+            SetField(main_ui_runtime, "action_content", None),
+            SetField(main_ui_runtime, "action_items", dress_shop_room_action_items()),
+            Function(main_ui_restart_interaction),
+        ]))
+        return items
+
+    def dress_shop_room_action_items():
+        return rooms.get("DressShop").build_object_items() + rooms.get("DressShop").build_exit_items()
+
     def dress_shop_buy_male_item(dress_code):
-        global money
-        global money
-        global money
         code = str(dress_code or "").strip()
         if not code:
             return "invalid"
-        if str(DressProduced or "") != "":
+        if str(dress_shop.produced or "") != "":
             return "busy"
         item_obj = get_game_item("dress_" + code)
         if item_obj is None:
@@ -108,167 +131,114 @@ default dress_shop = DressShopRuntimeState()
         if player.appearance.has_dress(code) and not dress_shop_item_depreciated(item_obj):
             return "owned"
         price = int(getattr(item_obj, "price", 0) or 0)
-        if int(money or 0) < price:
+        if int(player.economy.money or 0) < price:
             return "no_money"
-        money = max(0, int(money or 0) - price)
+        player.spend_money(price)
         return "success"
 
 label DressShop:
-    $ CurrentRoom = DressShopRoom
-    $ CurLoc = "DressShop"
-    $ current_action_title = "Действия"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_object_id = ""
-    $ GirlDressBlock = 0
-    call RoomEnterEventGate(CurLoc, False)
+    show screen main_ui
+    $ rooms.enter("DressShop")
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.object_id = ""
+    $ dress_shop.girl_dress_block = 0
+    call RoomEnterEventGate(rooms.current_code, False)
 
-    if not DressShopRoom.is_open():
-        $ MainTxt = DressShopRoom.schedule.closed_text
-        $ CurLocDesc = MainTxt
-        $ scene_image = build_media_ref("general", "", "LocArtisansQuarter" + str(procedural_randint(1, 4, key="procedural:Town/Arts/Dress/DressShop.rpy:procedural_randint:120:1")))
-        $ _layout_last_picture = ""
-        $ current_action_items = DressShopRoom.build_exit_items()
+    if not rooms.get("DressShop").is_open():
+        $ scene_runtime.text = rooms.get("DressShop").schedule.closed_text
+        $ scene_runtime.location_text = scene_runtime.text
+        $ scene_runtime.picture = ""
+        $ main_ui_runtime.action_items = rooms.get("DressShop").build_exit_items()
         while True:
             call screen main_ui
 
-    $ MainTxt = "\n\n".join([row.text for row in DressShopRoom.visible_descriptions()])
-    $ CurLocDesc = MainTxt
-    $ scene_image = CurrentRoom.bg_picture
-    $ _layout_last_picture = ""
+    $ scene_runtime.text = "\n\n".join([row.text for row in rooms.get("DressShop").visible_descriptions()])
+    $ scene_runtime.location_text = scene_runtime.text
+    $ scene_runtime.picture = ""
 
-    if renpy.has_label("CheckDailyEvent") and int(calendar_v2.hour or 0) < 12:
+    if renpy.has_label("check_daily_event") and int(calendar_v2.hour or 0) < 12:
         call check_daily_event("", "BuyDress", "DressShop", 0)
 
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = DressShopRoom.build_exit_items()
-    else:
-        if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = DressShopRoom.build_exit_items()
-    else:
-        if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = DressShopRoom.build_exit_items()
-    else:
-        $ current_action_items = DressShopRoom.build_object_items() + DressShopRoom.build_exit_items()
+    $ main_ui_runtime.action_items = rooms.get("DressShop").build_object_items() + rooms.get("DressShop").build_exit_items()
     while True:
         call screen main_ui
 
 
 label DressShopOpenCatalog(rack_type=""):
+    $ renpy.dynamic("_rack_type", "_rack_object")
     $ _rack_type = str(rack_type or "")
     if _rack_type not in ("female", "male"):
-        if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = DressShopRoom.build_exit_items()
-        $ _dress_ui_return = None
-        while _dress_ui_return is None:
-            call screen main_ui
-            $ _dress_ui_return = _return
-        jump DressShop
-
-    call DressShopRoomActions
-        call DressShopRoomActions
-        if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = DressShopRoom.build_exit_items()
-        $ _dress_ui_return = None
-        while _dress_ui_return is None:
-            call screen main_ui
-            $ _dress_ui_return = _return
-        jump DressShop
-
-    if navigation_only_mode_enabled():
-        $ MainTxt = MainTxt + "\n\n" + navigation_only_message() + "\n\n" + navigation_only_time_note()
-        $ CurLocDesc = MainTxt
-        $ current_action_items = DressShopRoom.build_exit_items()
-        $ _dress_ui_return = None
-        while _dress_ui_return is None:
-            call screen main_ui
-            $ _dress_ui_return = _return
-        jump DressShop
-
-    call DressShopRoomActions
         return
 
     $ dress_shop_populate_rack_contents()
-    $ current_action_content = None
-    $ current_action_title = "Действия"
-    $ current_object_id = "female_samples_001" if _rack_type == "female" else "male_samples_001"
-    $ _rack_object = dress_shop_get_object(current_object_id)
-    $ MainTxt = str(getattr(_rack_object, "description", "") or "")
-    $ CurLocDesc = MainTxt
-    if _rack_type == "female":
-        show screen dress_shop_female_catalog_overlay
-        hide screen dress_shop_male_catalog_overlay
-    else:
-        show screen dress_shop_male_catalog_overlay
-        hide screen dress_shop_female_catalog_overlay
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_title = "Женские платья" if _rack_type == "female" else "Мужские костюмы"
+    $ main_ui_runtime.object_id = "female_samples_001" if _rack_type == "female" else "male_samples_001"
+    $ _rack_object = dress_shop_get_object(main_ui_runtime.object_id)
+    $ scene_runtime.text = str(getattr(_rack_object, "description", "") or "")
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items = dress_shop_catalog_action_items(_rack_type)
     return
 
 
 label DressShopBuyMaleItem(dress_code=""):
+    $ renpy.dynamic("_dress_code", "_buy_result")
     $ _dress_code = str(dress_code or "")
     $ _buy_result = dress_shop_buy_male_item(_dress_code)
     if _buy_result != "success":
         if _buy_result == "busy":
-            $ MainTxt = "Ирма сейчас уже работает над вашим заказом."
+            $ scene_runtime.text = "Ирма сейчас уже работает над вашим заказом."
         elif _buy_result == "owned":
-            $ MainTxt = "Этот костюм уже лежит среди вашей одежды."
+            $ scene_runtime.text = "Этот костюм уже лежит среди вашей одежды."
         elif _buy_result == "no_money":
-            $ MainTxt = "У вас не хватает денег на этот костюм."
+            $ scene_runtime.text = "У вас не хватает денег на этот костюм."
         else:
-            $ MainTxt = "Вы не выбрали костюм."
-        $ CurLocDesc = MainTxt
-        $ current_action_content = None
-        $ current_action_title = "Действия"
-        $ current_object_id = "male_samples_001"
-        hide screen dress_shop_female_catalog_overlay
-        show screen dress_shop_male_catalog_overlay
+            $ scene_runtime.text = "Вы не выбрали костюм."
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_title = "Мужские костюмы"
+        $ main_ui_runtime.object_id = "male_samples_001"
+        $ main_ui_runtime.action_items = dress_shop_catalog_action_items("male")
         return
 
-    hide screen dress_shop_male_catalog_overlay
-    hide screen dress_shop_female_catalog_overlay
-    $ current_object_id = ""
+    $ main_ui_runtime.object_id = ""
     call DressTry("You", _dress_code)
     return
 
 
 label DressShopFemaleBuyInfo(dress_code=""):
+    $ renpy.dynamic("_dress_code", "_dress_item")
     $ _dress_code = str(dress_code or "")
     if _dress_code == "":
         call DressShopOpenCatalog("female")
         return
     $ _dress_item = get_game_item("dress_" + _dress_code)
-    $ MainTxt = str(getattr(_dress_item, "description", _dress_code) or _dress_code)
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = str(getattr(_dress_item, "description", _dress_code) or _dress_code)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items = dress_shop_catalog_action_items("female")
     return
 
 label DressShopObjectMenu(object_id=""):
+    $ renpy.dynamic("_room_object")
+    $ renpy.dynamic("_menu_item", "_room_action")
     $ _room_object = dress_shop_get_object(object_id)
     if _room_object is None:
-        call DressShopRoomActions
         return
 
-    $ MainTxt = _room_object.description
-    $ CurLocDesc = MainTxt
-    $ current_action_title = _room_object.name
-    $ current_object_id = object_id
-    $ current_action_content = None
-    $ current_action_items = []
+    $ scene_runtime.text = _room_object.description
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = _room_object.name
+    $ main_ui_runtime.object_id = object_id
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
 
     python:
         for _room_action in _room_object.visible_actions():
             _menu_item = room_action_menu_item(_room_action)
             if _menu_item is not None:
-                current_action_items.append(_menu_item)
+                main_ui_runtime.action_items.append(_menu_item)
 
-    $ current_action_items.append(MenuItem("Назад", Call("DressShopRoomActions")))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "object_id", ""), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", dress_shop_room_action_items()), Function(main_ui_restart_interaction)]))
     return

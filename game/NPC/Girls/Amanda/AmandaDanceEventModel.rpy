@@ -10,12 +10,6 @@ init -24 python:
             self,
             event_name,
             target,
-            calendar_v2.day,
-            calendar_v2.hour,
-            evt_day,
-            probability,
-            requirements,
-            item,
             location,
             action,
             priority,
@@ -27,13 +21,13 @@ init -24 python:
             super(AmandaDanceEvent, self).__init__(
                 (
                     target,
-                    calendar_v2.day,
-                    calendar_v2.hour,
-                    evt_day,
-                    probability,
-                    requirements,
+                    5,
+                    (18, 21),
                     None,
-                    item,
+                    1,
+                    None,
+                    None,
+                    None,
                     location,
                     action,
                     priority,
@@ -47,47 +41,36 @@ init -24 python:
             self.repeatable = bool(repeatable)
             self.stage_kind = str(stage_kind or "")
 
-        def canTrigger(self, evtDay=0):
-            if not self.repeatable and story_event_fired_today(self):
-                return False
-            if not self.checkDay():
-                return False
-            if not self.checkHour():
-                return False
-            if not self.checkConditions():
-                return False
-            if not self.checkNumDay(evtDay):
-                return False
-            if not self.checkReqs():
-                return False
-            if not self.checkProb():
-                return False
-            if not self.checkItem():
-                return False
-            if not _story_location_is_open(self.location):
-                return False
-            return True
-
         def checkConditions(self):
             return bool(Amanda.dance_event_conditions_met(self))
 
 
-    def amanda_dance_event(event_name, target, location, action, priority, partner="mc", sequence=0, stage_kind="", repeatable=False):
-        return AmandaDanceEvent(
-            event_name=event_name,
-            target=target,
-            day=5,
-            hour=(18, 21),
-            evt_day=None,
-            probability=1,
-            requirements=None,
-            item=None,
-            location=location,
-            action=action,
-            priority=priority,
-            partner=partner,
-            sequence=sequence,
-            repeatable=repeatable,
-            stage_kind=stage_kind,
-        )
+    AmandaLegareDanceIntro = AmandaDanceEvent(
+        "AmandaLegareDance_0", "story_amanda_legare_dance_0", "FridayDance", "enter", 0,
+        partner="legare_intro", sequence=0, stage_kind="intro",
+    )
+    AmandaLegareDanceTalking = AmandaDanceEvent(
+        "AmandaLegareDance_1", "story_amanda_legare_dance_1", "FridayDance", "amanda_dance_legare", 1,
+        partner="legare", sequence=1, stage_kind="talking",
+    )
+    AmandaLegareDanceGroping = AmandaDanceEvent(
+        "AmandaLegareDance_2", "story_amanda_legare_dance_2", "FridayDance", "amanda_dance_legare", 2,
+        partner="legare", sequence=2, stage_kind="groping",
+    )
+    AmandaLegareDanceKissing = AmandaDanceEvent(
+        "AmandaLegareDance_3", "story_amanda_legare_dance_3", "FridayDance", "amanda_dance_legare", 3,
+        partner="legare", sequence=3, stage_kind="kissing",
+    )
+    AmandaLegareDanceAfter = AmandaDanceEvent(
+        "AmandaLegareDance_4", "story_amanda_legare_dance_4", "FridayDance", "amanda_dance_legare", 4,
+        partner="legare", sequence=4, stage_kind="after_dance",
+    )
+    AmandaFridayDanceMC = AmandaDanceEvent(
+        "AmandaDance_0", "story_amanda_friday_dance_mc_0", "FridayDance", "amanda_dance_mc", 10,
+        partner="mc", sequence=0, stage_kind="mc_dance", repeatable=True,
+    )
+    AmandaFridayDanceLegare = AmandaDanceEvent(
+        "AmandaFridayDanceLegare_0", "story_amanda_friday_dance_legare_0", "FridayDance", "amanda_dance_legare", 20,
+        partner="legare", sequence=1, stage_kind="talking", repeatable=True,
+    )
 

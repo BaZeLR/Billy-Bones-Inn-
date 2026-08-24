@@ -2,14 +2,15 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntGeorgettDressChange(GirlNameIGT="georgett"):
+    $ renpy.dynamic("_can_shame", "_can_buy")
     python:
         _can_shame = Georgett.rel > 8 and Georgett.talk_count() < 2
         _can_buy = (
             Georgett.rel > 8
-            and CheckDailyEventExists("", "BuyDressTom", "") == 0
-            and CheckDailyEventExists(GirlNameIGT, "BuyDress", "") == 0
+            and daily_events.exists("", "BuyDressTom", "") == 0
+            and daily_events.exists(GirlNameIGT, "BuyDress", "") == 0
             and Georgett.talk_count() < 2
-            and week != 6
+            and int(calendar_v2.week or 0) != 6
         )
 
     if not (_can_shame or _can_buy):
@@ -23,7 +24,6 @@ label IntGeorgettDressChange(GirlNameIGT="georgett"):
             return
 
         "Постыдить Жоржетту за отстутсвие панталон" if _can_shame:
-            $ AgreedToRedress = 0
             "\"Жоржетт, у тебя юбочка и до пупа не достает, а ты еще и без панталон ходишь. Как говорится что на прилавке то и в лавке. Людей бы постыдилась! Я понимаю, что в твоем ремесле они скорее мешают, но стыд-то знать надо?\" - попробовали вы пристыдить ее."
             "\"Знаешь, что мой юный работадатель!\" в сердцах ответила вам Жоржетта. \"Не тебе меня учить как трахаться и как клиентов завлекать. Я первый раз свою киску продала, когда ты еще пешком под стол ходил. И, между прочим, помни, что с каждого клиента я тебе три мараведи отстегиваю. Меньше клиентов у меня - меньше денег у тебя!\""
             $ Georgett.finish_talk()
@@ -33,7 +33,7 @@ label IntGeorgettDressChange(GirlNameIGT="georgett"):
             "\"Жоржи, шлюшка ты моя ненаглядная, а хочешь я тебе обновку куплю?\" - в порыве щедрости задали вы вопрос жрице любви."
             "\"За твой счет, тоесть в подарок?\" удивилась та. \"Конечно хочу, что я, дура что ли от подарков отказываться!\""
             "\"Ну тогда завтра, с утра пораньше, дуй к Ирме Фараго, я буду тебя там ждать, вместе и выберем!\" заверили вы девицу."
-            $ DailyEventsList_Add(GirlNameIGT, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy")
+            $ daily_events.add(GirlNameIGT, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy", "girl_location")
             $ Georgett.finish_talk()
             return
 

@@ -5,11 +5,17 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$RenpyExe = "C:\Users\blank\renpy\renpy-8.5.2-sdk\renpy.exe"
+$RenpySdk = "C:\Users\blank\renpy\renpy-8.5.2-sdk"
+$RenpyPython = Join-Path $RenpySdk "lib\py3-windows-x86_64\python.exe"
+$RenpyScript = Join-Path $RenpySdk "renpy.py"
 $ProjectRoot = "C:\Users\blank\Documents\RenPy_Projects\Tractir"
 
-if (-not (Test-Path -LiteralPath $RenpyExe)) {
-    throw "Ren'Py executable not found: $RenpyExe"
+if (-not (Test-Path -LiteralPath $RenpyPython)) {
+    throw "Ren'Py Python runtime not found: $RenpyPython"
+}
+
+if (-not (Test-Path -LiteralPath $RenpyScript)) {
+    throw "Ren'Py launcher script not found: $RenpyScript"
 }
 
 if (-not (Test-Path -LiteralPath $ProjectRoot)) {
@@ -18,7 +24,7 @@ if (-not (Test-Path -LiteralPath $ProjectRoot)) {
 
 Push-Location -LiteralPath $ProjectRoot
 try {
-    & $RenpyExe . $Mode
+    & $RenpyPython $RenpyScript . $Mode
     exit $LASTEXITCODE
 }
 finally {

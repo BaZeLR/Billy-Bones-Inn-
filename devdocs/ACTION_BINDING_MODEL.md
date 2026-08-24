@@ -76,7 +76,10 @@ Example:
 
 Then build logic turns exits into menu actions, usually through:
 
-- `Call("AdvanceMovementTime", exit.target)`
+- `movement_actions(exit.target, exit.minutes_to_pass)`
+
+The returned action list runs `apply_movement_time` and then jumps. This keeps
+location changes off the return stack.
 
 So movement actions are not looked up from a global movement registry.
 They are created from the current room's visible exits.

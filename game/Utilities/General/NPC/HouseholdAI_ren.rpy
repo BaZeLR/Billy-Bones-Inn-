@@ -1,153 +1,6 @@
-        HouseholdNPCState[npc_id] = row    def household:
-        global Household
-        if Household is None:
-            Household = HouseholdInfo()
-        return Household
-        HouseholdNPCState[npc_id] = row    def household:
-        global Household
-        if Household is None:
-            Household = HouseholdInfo()
-        return Household
-        HouseholdNPCState[npc_id] = row    def household:
-        global Household
-        if Household is None:
-            Household = HouseholdInfo()
-        return Household
 # game/Utilities/General/NPC/HouseholdAI_ren.rpy
 
-default HouseholdAIState = {
-    "pressure": 0.0,
-    "friction": 0.2,
-    "convergence": 0.0,
-    "external_threat": 0.0,
-    "last_event_day": -1,
-    "last_event_slot": -1,
-    "last_event_code": "",
-}
-
-default HouseholdNPCState = {
-    "amanda": {
-        "drive": 0.0,
-        "resistance": 0.75,
-        "threshold": 0.62,
-        "stability": 0.35,
-        "rivalry": 0.65,
-        "obedience": 0.45,
-        "path": "undecided",
-    },
-    "melissa": {
-        "drive": 0.0,
-        "resistance": 0.45,
-        "threshold": 0.50,
-        "stability": 0.45,
-        "rivalry": 0.35,
-        "obedience": 0.50,
-        "path": "adaptive",
-    },
-    "sandra": {
-        "drive": 0.0,
-        "resistance": 0.60,
-        "threshold": 0.58,
-        "stability": 0.65,
-        "rivalry": 0.40,
-        "obedience": 0.75,
-        "path": "household_order",
-    },
-}
-
-default HouseholdAISeen = {}
-
-
-default HouseholdAIState = {
-    "pressure": 0.0,
-    "friction": 0.2,
-    "convergence": 0.0,
-    "external_threat": 0.0,
-    "last_event_day": -1,
-    "last_event_slot": -1,
-    "last_event_code": "",
-}
-
-default HouseholdNPCState = {
-    "amanda": {
-        "drive": 0.0,
-        "resistance": 0.75,
-        "threshold": 0.62,
-        "stability": 0.35,
-        "rivalry": 0.65,
-        "obedience": 0.45,
-        "path": "undecided",
-    },
-    "melissa": {
-        "drive": 0.0,
-        "resistance": 0.45,
-        "threshold": 0.50,
-        "stability": 0.45,
-        "rivalry": 0.35,
-        "obedience": 0.50,
-        "path": "adaptive",
-    },
-    "sandra": {
-        "drive": 0.0,
-        "resistance": 0.60,
-        "threshold": 0.58,
-        "stability": 0.65,
-        "rivalry": 0.40,
-        "obedience": 0.75,
-        "path": "household_order",
-    },
-}
-
-default HouseholdAISeen = {}
-
-
-default HouseholdAIState = {
-    "pressure": 0.0,
-    "friction": 0.2,
-    "convergence": 0.0,
-    "external_threat": 0.0,
-    "last_event_day": -1,
-    "last_event_slot": -1,
-    "last_event_code": "",
-}
-
-default HouseholdNPCState = {
-    "amanda": {
-        "drive": 0.0,
-        "resistance": 0.75,
-        "threshold": 0.62,
-        "stability": 0.35,
-        "rivalry": 0.65,
-        "obedience": 0.45,
-        "path": "undecided",
-    },
-    "melissa": {
-        "drive": 0.0,
-        "resistance": 0.45,
-        "threshold": 0.50,
-        "stability": 0.45,
-        "rivalry": 0.35,
-        "obedience": 0.50,
-        "path": "adaptive",
-    },
-    "sandra": {
-        "drive": 0.0,
-        "resistance": 0.60,
-        "threshold": 0.58,
-        "stability": 0.65,
-        "rivalry": 0.40,
-        "obedience": 0.75,
-        "path": "household_order",
-    },
-}
-
-default HouseholdAISeen = {}
-
-
 init 5 python:
-    import renpy.store as store
-    import renpy.store as store
-    import renpy.store as store
 
     def household_ai_float(value, default=0.0):
         try:
@@ -169,9 +22,9 @@ init 5 python:
 
     def household_ai_seen_key(event_code="", location_code=""):
         return "%s|%s|%s|%s" % (
-            household_ai_int(dayspassed, 0),
-            household_ai_int(time, 0),
-            str(location_code or CurLoc or ""),
+            current_game_day(),
+            household_ai_int(calendar_v2.time_slot(), 0),
+            str(location_code or rooms.current_code or ""),
             str(event_code or ""),
         )
 
@@ -179,10 +32,10 @@ init 5 python:
         return household_ai_int(household.seen.get(household_ai_seen_key(event_code, location_code), 0), 0) == 1
 
     def household_ai_mark_seen(event_code="", location_code=""):
-        HouseholdAISeen[household_ai_seen_key(event_code, location_code)] = 1
-        HouseholdAIState["last_event_day"] = household_ai_int(dayspassed, 0)
-        HouseholdAIState["last_event_slot"] = household_ai_int(time, 0)
-        HouseholdAIState["last_event_code"] = str(event_code or "")
+        household.seen[household_ai_seen_key(event_code, location_code)] = 1
+        household.meta["last_event_day"] = current_game_day()
+        household.meta["last_event_slot"] = household_ai_int(calendar_v2.time_slot(), 0)
+        household.meta["last_event_code"] = str(event_code or "")
 
     def household_ai_resource_pressure():
         """
@@ -190,15 +43,24 @@ init 5 python:
         Player success lowers pressure.
         Low money / dirty tavern / weak supplies raise it.
         """
-        money_pressure = 1.0 if household_ai_int(money, 0) < 150 else 0.65 if household_ai_int(money, 0) < 500 else 0.25
+        money_pressure = 1.0 if household_ai_int(player.economy.money, 0) < 150 else 0.65 if household_ai_int(player.economy.money, 0) < 500 else 0.25
 
-        clean_value = household_ai_int(taverncleanliness, 0)
+        clean_value = household_ai_int(player.tavern_management.cleanliness, 0)
         dirt_pressure = 1.0 if clean_value < 20 else 0.55 if clean_value < 45 else 0.15
 
-        # Optional variables: safe fallback if not created yet.
-        food_value = household_ai_int(getattr(store, "food_stock", 10), 10)
-        fur_value = household_ai_int(getattr(store, "fur_supply", 0), 0)
-        cloth_value = household_ai_int(getattr(store, "cloth_supply", 0), 0)
+        food_value = household_ai_int(player.tavern_management.productnum, 0) + household_ai_int(tavern_kitchen_food_stock_count(), 0)
+        fur_value = sum(
+            household_ai_int(player.item_count(item_id), 0)
+            for item_id in (
+                "wolf_skin_001",
+                "white_wolf_skin_001",
+                "bear_fur_brown_001",
+                "bear_fur_grizzly_001",
+                "warm_fur_cloak_001",
+                "fur_bedroll_001",
+            )
+        )
+        cloth_value = household_ai_int(player.item_count("cloth_scrap_001"), 0)
 
         supply_pressure = 0.0
         if food_value <= 0:
@@ -215,8 +77,8 @@ init 5 python:
         meta = household.meta
         external = household_ai_clamp(meta.get("external_threat", 0.0), 0.0, 1.0)
 
-        friction = household_ai_clamp(HouseholdAIState.get("friction", 0.2), 0.0, 1.0)
-        convergence = household_ai_clamp(HouseholdAIState.get("convergence", 0.0), 0.0, 1.0)
+        friction = household_ai_clamp(meta.get("friction", 0.2), 0.0, 1.0)
+        convergence = household_ai_clamp(meta.get("convergence", 0.0), 0.0, 1.0)
 
         # Scarcity increases friction; stability lowers it.
         friction += pressure * 0.08
@@ -231,14 +93,14 @@ init 5 python:
             convergence += 0.06
             friction -= 0.03
 
-        HouseholdAIState["pressure"] = household_ai_clamp(pressure)
-        HouseholdAIState["friction"] = household_ai_clamp(friction)
-        HouseholdAIState["convergence"] = household_ai_clamp(convergence)
+        meta["pressure"] = household_ai_clamp(pressure)
+        meta["friction"] = household_ai_clamp(friction)
+        meta["convergence"] = household_ai_clamp(convergence)
 
-        return HouseholdAIState
+        return meta
 
     def household_ai_update_npc_drive(npc_id):
-        row = HouseholdNPCState.get(npc_id, {})
+        row = household_ai_npc_state(npc_id)
         meta = household.meta
         pressure = household_ai_clamp(meta.get("pressure", 0.0))
         friction = household_ai_clamp(meta.get("friction", 0.0))
@@ -256,21 +118,18 @@ init 5 python:
         drive -= convergence * 0.10
 
         row["drive"] = household_ai_clamp(drive)
-        HouseholdNPCState[npc_id] = row
-        HouseholdNPCState[npc_id] = row
-        HouseholdNPCState[npc_id] = row
         return row
 
     def household_ai_npcs_present(location_code=""):
-        loc = str(location_code or CurLoc or "")
+        loc = str(location_code or rooms.current_code or "")
         try:
-            return list(getNPCids(loc) or [])
+            return list(people.ids_at(loc) or [])
         except Exception:
             return []
 
     def household_ai_context(location_code="", mode="room"):
         household_ai_update_meta()
-        loc = str(location_code or CurLoc or "")
+        loc = str(location_code or rooms.current_code or "")
         present = household_ai_npcs_present(loc)
 
         for npc_id in ("amanda", "melissa", "sandra"):
@@ -279,9 +138,9 @@ init 5 python:
         return {
             "location": loc,
             "mode": str(mode or "room"),
-            "day": household_ai_int(dayspassed, 0),
-            "slot": household_ai_int(time, 0),
-            "hour": household_ai_int(hour, household_ai_int(time, 0) * 6),
+            "day": current_game_day(),
+            "slot": household_ai_int(calendar_v2.time_slot(), 0),
+            "hour": household_ai_int(calendar_v2.hour, 0),
             "present": present,
             "pressure": household_ai_clamp(household.meta.get("pressure", 0.0)),
             "friction": household_ai_clamp(household.meta.get("friction", 0.0)),
@@ -338,7 +197,7 @@ init 5 python:
         return labels.get(str(event_code or ""), "")
 
     def household_ai_reduce_drive(npc_id, amount=0.25):
-        row = HouseholdNPCState.get(npc_id, {})
+        row = household_ai_npc_state(npc_id)
         row["drive"] = household_ai_clamp(row.get("drive", 0.0) - amount)
 
     def household_ai_raise_friction(amount=0.1):
@@ -352,6 +211,10 @@ init 5 python:
             self.seen = {}
             self.runtime_event_seen = {}
             self.morning_state = {}
+            self.soap_request_last_day = {}
+            self.barber_request_last_day = {}
+            self.barber_visit_last_day = {}
+            self.warm_drink_last_day = {}
 
     HOUSEHOLD_NPC_DEFAULTS = {
         "amanda": {"drive": 0.0, "resistance": 0.75, "threshold": 0.62, "stability": 0.35, "rivalry": 0.65, "obedience": 0.45, "path": "undecided"},
@@ -360,7 +223,10 @@ init 5 python:
     }
 
     def household_ai_npc_state(npc_id):
-        info = getPersonInfo(str(npc_id or "").lower())
+        info = people.get_info(str(npc_id or "").lower())
         if info is None:
             return {}
         return info.var.setdefault("household_ai", dict(HOUSEHOLD_NPC_DEFAULTS.get(str(npc_id or "").lower(), {})))
+
+
+default household = HouseholdInfo()

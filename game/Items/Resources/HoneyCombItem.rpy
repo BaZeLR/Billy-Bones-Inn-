@@ -35,16 +35,16 @@ init 4 python:
 
 label UseHoneyCombItem:
     if int(player.item_count("honey_comb_001") or 0) <= 0:
-        $ MainTxt = "Медовых сот у вас при себе не осталось."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Медовых сот у вас при себе не осталось."
+        $ scene_runtime.location_text = scene_runtime.text
         call PlayerCardInventoryMenu
         return
 
     $ player.remove_item("honey_comb_001", 1)
-    $ energy = _player_clamp(int(energy or 0) + 7, 0, 100)
-    $ fun = _player_clamp(int(fun or 0) + 3, 0, 100)
-    $ MainTxt = "Вы разламываете соты и с удовольствием жуете сладкий мед. Это быстро поднимает и силы, и настроение."
-    $ CurLocDesc = MainTxt
+    $ player.change_stat("energy", 7)
+    $ player.change_stat("fun", 3)
+    $ scene_runtime.text = "Вы разламываете соты и с удовольствием жуете сладкий мед. Это быстро поднимает и силы, и настроение."
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call PlayerCardInventoryItemMenu("honey_comb_001", True)
     return

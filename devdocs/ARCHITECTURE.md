@@ -346,7 +346,7 @@ menu in the persistent HUD action area.
 Preferred:
 
 ```renpy
-MenuItem("Kitchen", Call("MoveToRoom", "TavernKitchen", 5))
+MenuItem("Kitchen", movement_actions("TavernKitchen", 5))
 MenuItem("Look", Jump("LookAtBooklet"))
 ```
 
@@ -387,19 +387,19 @@ Screens only display.
 
 # 17. Movement Rules
 
-Canonical movement:
+Canonical room-button movement:
 
 ```renpy
-MoveToRoom(target, minutes)
+MenuItem("Kitchen", movement_actions("TavernKitchen", 5))
 ```
 
-Compatibility-only:
+`movement_actions()` runs the authoritative movement-time mutation and then
+uses a `Jump` action for the destination. Never call a label that jumps to
+another room from a screen action: that leaves the old room on Ren'Py's return
+stack and can later re-enter it unexpectedly.
 
-```renpy
-AdvanceMovementTime
-```
-
-Avoid maintaining multiple movement systems.
+There is one movement-time implementation. Do not recreate `MoveToRoom` or
+`AdvanceMovementTime` wrappers.
 
 ---
 
@@ -426,22 +426,37 @@ Returning to the location label IS the refresh.
 
 ---
 
-# 19. Loop Prevention Rules
+# 19. Main UI Interaction Loop Rules
 
-Never create:
+Never create a recursive room re-entry:
 
 ```text
 label → call screen → immediate jump same label
 ```
 
-Correct flow:
+Ren'Py's screen `Call(...)` action ends the active `call screen` statement before
+calling its target label. A room therefore owns one iterative interaction loop.
+Called local actions return into that loop; movement uses `Jump` and replaces
+the room flow without adding a return-stack entry.
 
-```text
-setup state
-call screen main_ui
-user action
-jump/call next label
+Correct room flow:
+
+```renpy
+label ExampleRoom:
+    # Set up the room once.
+    while True:
+        call screen main_ui
 ```
+
+This is not a recursive menu loop: it does not jump back into the room label,
+rerun entry events, or grow the call stack. Do not add loop-control flags,
+refresh labels, or rebuild dispatchers around it.
+
+Only a navigation/root label owns that loop. A parameterized detail label
+opened with `Call("DetailLabel", value)` is a returnable procedure: it updates
+`MainTxt`/`current_action_items` and returns to the existing owner. It must not
+start a second `call screen main_ui` loop, because nested interaction owners
+produce an invalid widget stack and obscure which label owns navigation.
 
 ---
 
@@ -859,11 +874,11 @@ The canonical reference is Family Life's simple action pattern:
 
 ```text
 room/location label
+-> iterative main_ui interaction loop
 -> normal Ren'Py menu or Tractir main_ui action button
 -> call a real action label
 -> action label shows/selects picture, writes text, mutates stats/time/items/state
--> return
--> owning room/location explicitly jumps/calls back to itself
+-> return into the owning room interaction loop
 ```
 
 Family Life does use screens, but only for normal UI surfaces:
@@ -905,7 +920,7 @@ For Tractir, `main_ui` remains the gameplay shell instead of Family Life's
 * the real action label owns the effect
 * picture and description may be attached to the room/object/action definition
 * stat/time/item mutations must remain visible in the action label or in a tiny, clearly named helper
-* the caller returns to the owning room/object/NPC flow directly
+* the called action returns to the owning room interaction loop directly
 
 Do NOT preserve or add these as architecture:
 

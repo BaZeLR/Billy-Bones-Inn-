@@ -1,31 +1,8 @@
-label show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    returnlabel show_current_cock_state(dude_name="You", dude_name_full="", dude_name_full2=""):
-    call ShowCurrentCockState(dude_name, dude_name_full, dude_name_full2)
-    return# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
+    $ renpy.dynamic("is_you", "_cock_intimacy", "_cock_actor", "_cock_state", "cur_arousal", "cur_came", "cur_limit")
     python:
         if not DudeNameFull:
             DudeNameFull = DudeName
@@ -35,11 +12,11 @@ label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
         is_you = str(DudeName).lower() == "you"
         if is_you:
             _cock_intimacy = player.intimacy
-            cur_arousal = _cock_intimacy.arousal_value("You")
+            cur_arousal = _cock_intimacy.arousal_value()
             cur_came = int(_cock_intimacy.came_today or 0)
             cur_limit = max(1, int(_cock_intimacy.can_cum_daily or 1))
         else:
-            _cock_actor = getPersonInfo(DudeName)
+            _cock_actor = people.get_info(DudeName)
             if _cock_actor is not None:
                 _cock_state = _cock_actor.ensure_sex_state()
                 cur_arousal = int(_cock_actor.arousal_value() or 0)
@@ -53,7 +30,7 @@ label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
     if str(DudeName).lower() == "you":
         if cur_came >= cur_limit:
             "То что упало - подняться не может. По крайней мере сегодня. Вот завтра силы к вам, быть может, вернутся."
-            $ player.intimacy.set_arousal(0, "You")
+            $ player.intimacy.set_arousal(0)
         else:
             if cur_arousal < 20:
                 "Вы спокойны. Ваш член какой-то вялый."
@@ -71,7 +48,7 @@ label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
     else:
         if cur_came >= cur_limit:
             "[DudeNameFull] совсем выдохся, бедолага. Сомнительно, чтобы его боец еще раз смог подняться для новой схватки. По крайней мере сегодня."
-            $ _cock_actor = getPersonInfo(DudeName)
+            $ _cock_actor = people.get_info(DudeName)
             if _cock_actor is not None:
                 $ _cock_actor.set_arousal(0)
         else:

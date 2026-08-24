@@ -19,20 +19,20 @@ init 6 python:
             return ""
         if backyard_ash_barrel_ready():
             return "У стены стоит поставленная Драупниром зольная бочка. Щелок в ней уже настоялся, и теперь ее можно пустить в дело."
-        days_left = max(0, int(SoapAshBarrelReadyDay or 0) - int(dayspassed or 0))
+        days_left = max(0, int(crafting.ash_barrel_ready_day or 0) - current_game_day())
         if days_left <= 0:
             return "У стены стоит поставленная Драупниром зольная бочка. Щелок почти готов, осталось совсем немного подождать."
         return "У стены стоит поставленная Драупниром зольная бочка. Щелок в ней еще настаивается, до готовности остается примерно %s дн." % str(days_left)
 
     def backyard_dynamic_picture():
-        if int(hour or 0) < 12 and int(week or 0) != 7:
-            if str(getLocation("melissa") or "") == "Backyard":
-                melissa_backyard = Melissa.image_sequence("tavern", "backyard")
+        if int(calendar_v2.hour or 0) < 12 and int(calendar_v2.week or 0) != 7:
+            if str(people.location("melissa") or "") == "Backyard":
+                melissa_backyard = MelissaStaticData.image_sequence("tavern", "backyard")
                 if len(melissa_backyard) > 0:
-                    return melissa_backyard[int((dayspassed or 0) + (hour or 0) + (minute or 0)) % len(melissa_backyard)]
-            if str(getLocation("amanda") or "") == "Backyard" and renpy.loadable("images/tavern/backyard/backyard_chop_woods.png"):
+                    return melissa_backyard[int(calendar_v2.daysInGame + calendar_v2.hour + calendar_v2.minute) % len(melissa_backyard)]
+            if str(people.location("amanda") or "") == "Backyard" and renpy.loadable("images/tavern/backyard/backyard_chop_woods.png"):
                 return "images/tavern/backyard/backyard_chop_woods.png"
-        return str(BackyardRoom.bg_picture or "")
+        return str(rooms.get("Backyard").bg_picture or "")
 
     def player_has_plain_soap():
         return player.item_count("soap_001") > 0
@@ -45,7 +45,7 @@ init 6 python:
 
     def backyard_dynamic_text():
         base_text = backyard_base_text()
-        if int(hour or 0) < 12 and int(week or 0) != 7:
+        if int(calendar_v2.hour or 0) < 12 and int(calendar_v2.week or 0) != 7:
             names_here = tavern_household_present_names("Backyard")
             if str(names_here or "").strip() and str(names_here or "") != "никто":
                 base_text += "\n\nДо полудня во дворе возятся: %s." % str(names_here)
@@ -121,7 +121,7 @@ init 6 python:
         condition=backyard_has_dog_booth,
     )
 
-    BackyardRoom = Room(
+    BackyardRoomDefinition = Room(
         code_name="Backyard",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Задний двор",
@@ -150,72 +150,85 @@ init 6 python:
         },
     )
 
-
-default BackyardToiletBusy = 0
+    def backyard_action_items():
+        items = []
+        if player_can_train_shooting():
+            items.append(MenuItem("Потренироваться в стрельбе", Call("ShootingPracticeMenu", "Backyard")))
+        for yard_object in rooms.get("Backyard").visible_objects():
+            items.append(MenuItem(yard_object.name, Call("BackyardObjectMenu", yard_object.object_id)))
+        for yard_exit in rooms.get("Backyard").visible_exits():
+            items.append(MenuItem(yard_exit.label, movement_actions(yard_exit.target)))
+        return items
 
 
 label Backyard:
-    $ dog_prepare_current_spawn()
-    $ CurrentRoom = BackyardRoom
-    $ CurLoc = "Backyard"
-    call RoomEnterEventGate(CurLoc, False)
-    $ scene_image = backyard_dynamic_picture() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    else:
-        $ _layout_last_picture = ""
-    $ MainTxt = backyard_dynamic_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Задний двор"
-    $ current_action_content = None
-    $ current_action_items = backyard_action_items()
+    $ rooms.enter("Backyard")
+    call RoomEnterEventGate(rooms.current_code, False)
+    $ scene_runtime.picture = backyard_dynamic_picture() or rooms.current.bg_picture or None
+    $ scene_runtime.text = backyard_dynamic_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Задний двор"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = backyard_action_items()
     while True:
         call screen main_ui
 
 
-label BackyardObjectMenu(object_id="", refresh_only=False):
+label BackyardObjectMenu(object_id="", display_text=""):
+    $ renpy.dynamic("_room_object", "_yard_object", "_yard_action", "_yard_args")
     if str(object_id or "") == "backyard_dog_booth":
         call BackyardInspectDogBooth
         return
 
     $ _yard_object = None
     python:
-        for _room_object in BackyardRoom.visible_objects():
+        for _room_object in rooms.get("Backyard").visible_objects():
             if getattr(_room_object, "object_id", "") == str(object_id or ""):
                 _yard_object = _room_object
                 break
 
     if _yard_object is None:
-        call BackyardBuildActions
+        $ main_ui_runtime.action_items = backyard_action_items()
         return
 
-    if not refresh_only:
-        $ MainTxt = _yard_object.description
-        $ CurLocDesc = MainTxt
+    if str(display_text or "") != "":
+        $ scene_runtime.text = str(display_text or "")
+        $ scene_runtime.location_text = scene_runtime.text
+    else:
+        $ scene_runtime.text = _yard_object.description
+        $ scene_runtime.location_text = scene_runtime.text
     if str(getattr(_yard_object, "picture", "") or "").strip():
-        $ _layout_last_picture = str(getattr(_yard_object, "picture", "") or "").strip()
-    $ current_action_title = _yard_object.name
-    $ current_action_content = None
-    $ current_action_items = []
+        $ scene_runtime.picture = str(getattr(_yard_object, "picture", "") or "").strip()
+    $ main_ui_runtime.action_title = _yard_object.name
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
 
     python:
         for _yard_action in _yard_object.visible_actions():
             _yard_args = tuple(getattr(_yard_action, "args", ()) or ())
             if _yard_action.hook == "text":
-                current_action_items.append(MenuItem(_yard_action.label, Call("BackyardObjectText", object_id, _yard_action.action_id)))
+                main_ui_runtime.action_items.append(MenuItem(_yard_action.label, Call("BackyardObjectText", object_id, _yard_action.action_id)))
             elif _yard_action.hook == "call" and str(_yard_action.target or "") != "":
-                current_action_items.append(MenuItem(_yard_action.label, Call(_yard_action.target, *_yard_args)))
+                main_ui_runtime.action_items.append(MenuItem(_yard_action.label, Call(_yard_action.target, *_yard_args)))
             elif _yard_action.hook == "jump" and str(_yard_action.target or "") != "":
-                current_action_items.append(MenuItem(_yard_action.label, Jump(_yard_action.target)))
-    $ current_action_items.append(MenuItem("Назад", Jump("Backyard")))
+                main_ui_runtime.action_items.append(MenuItem(_yard_action.label, Jump(_yard_action.target)))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [
+        SetField(scene_runtime, "text", backyard_dynamic_text()),
+        SetField(scene_runtime, "location_text", backyard_dynamic_text()),
+        SetField(main_ui_runtime, "action_title", "Задний двор"),
+        SetField(main_ui_runtime, "action_content", None),
+        SetField(main_ui_runtime, "action_items", backyard_action_items()),
+        Function(main_ui_restart_interaction),
+    ]))
     return
 
 
 label BackyardObjectText(object_id="", action_id=""):
+    $ renpy.dynamic("_room_action", "_room_object", "_yard_name", "_yard_text")
     python:
         _yard_text = ""
         _yard_name = ""
-        for _room_object in BackyardRoom.visible_objects():
+        for _room_object in rooms.get("Backyard").visible_objects():
             if getattr(_room_object, "object_id", "") != str(object_id or ""):
                 continue
             _yard_name = str(getattr(_room_object, "name", "") or "")
@@ -225,95 +238,58 @@ label BackyardObjectText(object_id="", action_id=""):
                     break
             break
         if _yard_text:
-            MainTxt = _yard_text
-            CurLocDesc = _yard_text
-            current_action_title = _yard_name or "Действия"
-    call BackyardObjectMenu(object_id)
-    $ MainTxt = str(_yard_text or MainTxt or "")
-    $ CurLocDesc = MainTxt
-    $ current_action_title = str(_yard_name or current_action_title or "Действия")
+            scene_runtime.text = _yard_text
+            scene_runtime.location_text = _yard_text
+            main_ui_runtime.action_title = _yard_name or "Действия"
+    call BackyardObjectMenu(object_id, _yard_text)
     return
 
 
 label BackyardToiletExamine:
-    if int(BackyardToiletBusy or 0) == 1:
-        $ MainTxt = "Дверца нужника заперта изнутри. Похоже, там сейчас занято."
+    if bool(BackyardToiletObject.state.get("busy", False)):
+        $ scene_runtime.text = "Дверца нужника заперта изнутри. Похоже, там сейчас занято."
     else:
-        $ MainTxt = "Дверца нужника приоткрыта. Сейчас внутри свободно, хотя заходить туда без нужды желания не возникает."
-    $ CurLocDesc = MainTxt
-    call BackyardObjectMenu("backyard_toilet", True)
+        $ scene_runtime.text = "Дверца нужника приоткрыта. Сейчас внутри свободно, хотя заходить туда без нужды желания не возникает."
+    $ scene_runtime.location_text = scene_runtime.text
+    call BackyardObjectMenu("backyard_toilet", scene_runtime.text)
     return
 
 
 label BackyardWashAtBarrel:
-    $ player_state().appearance.wash()
-    $ _layout_last_picture = "images/tavern/backyard/washing_MC.png"
-    $ MainTxt = "Вы умываетесь и наскоро обмываетесь холодной дождевой водой из бочки. Это освежает и помогает привести себя в порядок."
-    $ CurLocDesc = MainTxt
-    call BackyardObjectMenu("backyard_water_barrel", True)
+    $ player.appearance.wash()
+    $ scene_runtime.picture = "images/tavern/backyard/washing_MC.png"
+    $ scene_runtime.text = "Вы умываетесь и наскоро обмываетесь холодной дождевой водой из бочки. Это освежает и помогает привести себя в порядок."
+    $ scene_runtime.location_text = scene_runtime.text
+    call BackyardObjectMenu("backyard_water_barrel", scene_runtime.text)
     return
 
 
 label BackyardWashAtBarrelWithSoap(soap_id="soap_001"):
+    $ renpy.dynamic("_soap_id")
     $ _soap_id = str(soap_id or "soap_001").strip()
     if player.item_count(_soap_id) <= 0:
-        $ MainTxt = "У вас нет подходящего мыла."
-        $ CurLocDesc = MainTxt
-        call BackyardObjectMenu("backyard_water_barrel", True)
+        $ scene_runtime.text = "У вас нет подходящего мыла."
+        $ scene_runtime.location_text = scene_runtime.text
+        call BackyardObjectMenu("backyard_water_barrel", scene_runtime.text)
         return
     $ player.remove_item(_soap_id, 1)
-    $ player.appearance.wash()
-    $ _layout_last_picture = "images/tavern/backyard/washing_MC.png"
+    $ player.appearance.wash_with_soap(current_game_day(), 10 if _soap_id == "luxury_soap_001" else 5, 2 if _soap_id == "luxury_soap_001" else 1)
+    $ scene_runtime.picture = "images/tavern/backyard/washing_MC.png"
     if _soap_id == "luxury_soap_001":
-        $ player_state().change_stat("look", 3)
-        $ MainTxt = "Вы тщательно моетесь у бочки, не жалея хорошего душистого мыла. Холодная вода бодрит, кожа пахнет чище, и выглядите вы заметно лучше."
+        $ scene_runtime.text = "Вы тщательно моетесь у бочки, не жалея хорошего душистого мыла. Холодная вода бодрит, кожа пахнет чище, и выглядите вы заметно лучше."
     else:
-        $ player_state().change_stat("look", 1)
-        $ MainTxt = "Вы моетесь у бочки с куском обычного мыла. Холодная дождевая вода быстро смывает грязь, а мыло помогает привести себя в более приличный вид."
-    $ CurLocDesc = MainTxt
-    call BackyardObjectMenu("backyard_water_barrel", True)
-    return
-
-
-label BackyardRestore:
-    $ BackyardSavedText = backyard_dynamic_text()
-    $ MainTxt = BackyardSavedText
-    $ CurLocDesc = MainTxt
-    $ scene_image = backyard_dynamic_picture() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    call BackyardBuildActions
-    return
-
-
-label BackyardRestore:
-    $ BackyardSavedText = backyard_dynamic_text()
-    $ MainTxt = BackyardSavedText
-    $ CurLocDesc = MainTxt
-    $ scene_image = backyard_dynamic_picture() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    call BackyardBuildActions
-    return
-
-
-label BackyardRestore:
-    $ BackyardSavedText = backyard_dynamic_text()
-    $ MainTxt = BackyardSavedText
-    $ CurLocDesc = MainTxt
-    $ scene_image = backyard_dynamic_picture() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    call BackyardBuildActions
+        $ scene_runtime.text = "Вы моетесь у бочки с куском обычного мыла. Холодная дождевая вода быстро смывает грязь, а мыло помогает привести себя в более приличный вид."
+    $ scene_runtime.location_text = scene_runtime.text
+    call BackyardObjectMenu("backyard_water_barrel", scene_runtime.text)
     return
 
 
 label BackyardInspectAshBarrel:
-    $ MainTxt = backyard_ash_barrel_description_text() or "Зольной бочки здесь пока нет."
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = backyard_ash_barrel_description_text() or "Зольной бочки здесь пока нет."
+    $ scene_runtime.location_text = scene_runtime.text
     if backyard_has_ash_barrel() and renpy.loadable("images/tavern/backyard/soap_backyard.png"):
-        $ _layout_last_picture = "images/tavern/backyard/soap_backyard.png"
-    call BackyardObjectMenu("backyard_ash_barrel", True)
+        $ scene_runtime.picture = "images/tavern/backyard/soap_backyard.png"
+    call BackyardObjectMenu("backyard_ash_barrel", scene_runtime.text)
     return
 
 
@@ -322,9 +298,7 @@ label BackyardInspectDogBooth:
         call IntDogTalk("Backyard")
         return
     else:
-        $ MainTxt = "Собачьей будки здесь пока нет."
-    $ CurLocDesc = MainTxt
-    call BackyardObjectMenu("backyard_dog_booth", True)
+        $ scene_runtime.text = "Собачьей будки здесь пока нет."
+    $ scene_runtime.location_text = scene_runtime.text
+    call BackyardObjectMenu("backyard_dog_booth", scene_runtime.text)
     return
-
-

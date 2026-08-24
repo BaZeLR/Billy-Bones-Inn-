@@ -4,10 +4,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 GROCERY = ROOT / "game" / "Town" / "GroceryStore.rpy"
 WINESTORE = ROOT / "game" / "Town" / "WineStore.rpy"
-CHARACTER_HUB = ROOT / "game" / "Utilities" / "General" / "NPC" / "CharacterActionHub.rpy"
+PEOPLE_RUNTIME = ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
 EDDIE_TALK_INIT = ROOT / "game" / "NPC" / "Secondary" / "InitEddieTalk.rpy"
 EDDIE_TALK = ROOT / "game" / "NPC" / "Secondary" / "IntEddieTalk.rpy"
 BECKY_TALK = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalk.rpy"
+BECKY_TOPICS = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkTopics.rpy"
+BECKY_SHERWOOD = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkSherwood.rpy"
+GROCERY_NPC_OWNERS = [
+    ROOT / "game" / "NPC" / "Secondary" / "InitEddie.rpy",
+    ROOT / "game" / "NPC" / "Girls" / "Becky" / "InitBecky.rpy",
+    ROOT / "game" / "NPC" / "Girls" / "Inga" / "InitInga.rpy",
+]
 
 
 def _source(path):
@@ -20,44 +27,59 @@ def test_grocery_uses_merchant_picture_sequences_not_hunter_store():
     assert 'bg_picture="images/general/butchers_street.png"' in source
     assert "images/general/hunter_store.jpg" not in source
     assert "grocery_store_grocer_picture" in source
-    assert '"images/eddie/portraits/portrait_%s.png"' in source
-    assert '"images/becky/portraits/portrait_%s.png"' in source
+    assert '"images/eddie/portraits/portrait_0.png"' in source
+    assert '"images/eddie/portraits/portrait_2.png"' in source
+    assert '"images/becky/portraits/portrait_1.png"' in source
+    assert '"images/becky/portraits/portrait_4.png"' in source
 
 
-def test_grocery_merchant_state_is_room_custom_properties_not_grocer_global():
+def test_grocery_merchant_state_comes_from_npc_schedule_not_room_mirror():
     source = _source(GROCERY)
 
     assert '"first_visit_seen": False' in source
-    assert '"current_grocer_id": ""' in source
-    assert '"current_grocer_name": "продавец"' in source
+    assert "def grocery_store_active_grocer_id" in source
+    assert 'people.location("eddie")' in source
+    assert 'people.location("inga")' in source
+    assert 'people.location("becky")' in source
+    assert "current_grocer_id" not in source
+    assert "current_grocer_name" not in source
     assert "GrocerName" not in source
     assert "label GroceryStoreBuildActions" not in source
     assert "while _grocery_ui_return is None" not in source
 
 
 def test_grocery_visible_npc_is_merchant_until_known():
-    hub_source = _source(CHARACTER_HUB)
+    people_runtime = _source(PEOPLE_RUNTIME)
     grocery_source = _source(GROCERY)
 
-    assert 'room_key == "GroceryStore" and key in ("eddie", "becky", "inga")' in hub_source
-    assert 'data["unknown_name"] = "Торговец"' in hub_source
-    assert 'data["title"] = "Торговец"' in hub_source
-    assert 'str(grocer_data.get("title", "") or "Торговец")' in grocery_source
+    registry = people_runtime.split("class PeopleRegistry(object):", 1)[1].split(
+        "def npc_schedule_clock_minute", 1
+    )[0]
+    assert 'room_key == "GroceryStore" and key in ("eddie", "becky", "inga")' not in registry
+    assert "grocery_store_grocer_picture" not in registry
+    for owner_path in GROCERY_NPC_OWNERS:
+        owner_source = _source(owner_path)
+        assert 'if str(where_id or "").strip() == "GroceryStore":' in owner_source
+        assert "if not self.known:" in owner_source
+        assert 'data["title"] = "Торговец"' in owner_source
+        assert 'data["picture_path"] = grocery_store_grocer_picture(self.name)' in owner_source
+    assert 'data = info.action_data("GroceryStore") if info is not None else {}' in grocery_source
+    assert 'str(data.get("title", "") or "Торговец")' in grocery_source
 
 
-def test_grocery_provision_object_uses_room_owned_action_menu_state():
+def test_grocery_provision_object_uses_direct_object_labels():
     source = _source(GROCERY)
 
     assert 'object_id="food_stock"' in source
     assert 'ObjectAction(action_id="buy_provisions", label="Купить провизию", hook="call", target="GroceryStoreBuyStockMenu"' in source
-    assert "def grocery_store_open_object_menu_state" in source
-    assert "def grocery_store_show_object_text_state" in source
-    assert "Function(grocery_store_open_object_menu_state" in source
-    assert "Function(grocery_store_show_object_text_state" in source
-    assert "items.extend(GroceryStoreRoom.build_object_items())" not in source
-    assert '"object_menu_label": "GroceryStoreObjectMenu"' not in source
-    assert "label GroceryStoreObjectMenu" not in source
-    assert "label GroceryStoreObjectText" not in source
+    assert "def grocery_store_open_object_menu_state" not in source
+    assert "def grocery_store_show_object_text_state" not in source
+    assert "Function(grocery_store_open_object_menu_state" not in source
+    assert "Function(grocery_store_show_object_text_state" not in source
+    assert "items.extend(rooms.get(\"GroceryStore\").build_object_items())" not in source
+    assert "def grocery_store_action_items():" in source
+    assert "label GroceryStoreObjectMenu" in source
+    assert "label GroceryStoreObjectText" in source
 
 
 def test_grocery_buy_stock_is_direct_room_flow():
@@ -68,11 +90,12 @@ def test_grocery_buy_stock_is_direct_room_flow():
     assert "label GroceryStoreBuyMenu" not in source
     assert "label GroceryStoreBuyApply" not in source
     assert 'Call("GroceryStoreBuyStockApply"' in buy_menu
-    assert "call ReturnToMainUI" in buy_menu
-    assert "$ productnum += int(add_amount or 0)" in buy_apply
-    assert "$ money -= int(cost or 0)" in buy_apply
-    assert "$ grocery_store_set_notice(MainTxt)" in buy_apply
-    assert "jump GroceryStore" in buy_apply
+    assert "call screen main_ui" not in buy_menu
+    assert "$ player.tavern_management.productnum += int(add_amount or 0)" in buy_apply
+    assert "$ player.spend_money(int(cost or 0))" in buy_apply
+    assert "$ grocery_store_set_notice(scene_runtime.text)" in buy_apply
+    assert "jump GroceryStore" not in buy_apply
+    assert "call GroceryStoreBuyStockMenu(True)" in buy_apply
 
 
 def test_grocery_and_wine_store_use_same_stock_purchase_flow():
@@ -92,19 +115,22 @@ def test_grocery_and_wine_store_use_same_stock_purchase_flow():
     wine_apply = wine.split("label WineStoreBuyStockApply", 1)[1]
 
     for menu in (grocery_menu, wine_menu):
-        assert "current_action_title" in menu
-        assert "current_action_items = [MenuItem(\"Ничего не покупать\"" in menu
-        assert "call ReturnToMainUI" in menu
+        assert "main_ui_runtime.action_title" in menu
+        assert "main_ui_runtime.action_items = [MenuItem(\"Ничего не покупать\"" in menu
+        assert "call screen main_ui" not in menu
 
-    assert "$ productnum += int(add_amount or 0)" in grocery_apply
-    assert "$ winenum += int(add_amount or 0)" in wine_apply
-    for apply_block, room_label, notice_fn in (
-        (grocery_apply, "GroceryStore", "grocery_store_set_notice"),
-        (wine_apply, "WineStore", "wine_store_set_notice"),
+    assert "$ player.tavern_management.productnum += int(add_amount or 0)" in grocery_apply
+    assert "$ player.tavern_management.winenum += int(add_amount or 0)" in wine_apply
+    for apply_block, notice_fn in (
+        (grocery_apply, "grocery_store_set_notice"),
+        (wine_apply, "wine_store_set_notice"),
     ):
-        assert "$ money -= int(cost or 0)" in apply_block
-        assert "%s(MainTxt)" % notice_fn in apply_block
-        assert "jump %s" % room_label in apply_block
+        assert "$ player.spend_money(int(cost or 0))" in apply_block
+        assert "%s(scene_runtime.text)" % notice_fn in apply_block
+    assert "jump GroceryStore" not in grocery_apply
+    assert "call GroceryStoreBuyStockMenu(True)" in grocery_apply
+    assert "jump WineStore" not in wine_apply
+    assert 'call WineStoreObjectMenu("wine_stock", True)' in wine_apply
 
 
 def test_grocery_talk_identifies_eddie_and_becky():
@@ -127,8 +153,35 @@ def test_grocery_talk_pictures_use_room_sequence_for_eddie_and_becky():
     assert '"images/becky/portraits/portrait_1.png"' not in becky_source
 
 
-def test_action_menu_preserves_custom_entity_data_for_talk_and_look():
-    hub_source = _source(CHARACTER_HUB)
+def test_becky_talk_uses_native_menu_for_all_story_topics():
+    source = _source(BECKY_TALK)
 
-    assert "Function(NpcActionTalkState, npc_key, room_key, dict(normalized))" in hub_source
-    assert "Function(NpcActionLookState, npc_key, room_key, dict(normalized))" in hub_source
+    assert "label IntBeckyTalkMenu:" not in source
+    assert "while True:" not in source
+    assert "jump IntBeckyTalkMenu" not in source
+    assert "menu:" in source
+    assert "main_ui_runtime.action_items" not in source
+    assert "MenuItem(" not in source
+    assert 'story_event_available("talk_becky", "becky_talk_inga1")' in source
+    assert 'call story_becky_talk_eddie_after_sex_0(_becky_name)' in source
+    assert 'call story_becky_sherwood_warned_0(_becky_name)' in source
+    assert 'call checkTriggers("talk_becky", "becky_talk_inga1", 0)' in source
+    assert 'Becky.robin_robbery_stage == 2' in source
+    assert "$ main_ui_end_talk_state()" in source
+    assert "jump IntBeckyTalk" not in _source(BECKY_TOPICS)
+    assert "jump IntBeckyTalk" not in _source(BECKY_SHERWOOD)
+
+
+def test_visible_npc_buttons_use_npc_owned_talk_data_directly():
+    people_runtime = _source(PEOPLE_RUNTIME)
+    layout_source = _source(ROOT / "game/Utilities/General/Screens/main_layout.rpy")
+
+    registry = people_runtime.split("class PeopleRegistry(object):", 1)[1].split(
+        "def npc_schedule_clock_minute", 1
+    )[0]
+    assert "return info.action_data(room_key)" in registry
+    assert "def npc_action_data(" not in registry
+    assert "npc_examine_label" not in registry
+    assert "people.action_data_for_room(npc_key, current_location)" in layout_source
+    assert "Call(_talk_label, *_talk_args)" in layout_source
+    assert "call_in_new_context" not in registry

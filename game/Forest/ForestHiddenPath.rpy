@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 6 python:
-    ForestHiddenPathRoom = Room(
+    ForestHiddenPathRoomDefinition = Room(
         code_name="ForestHiddenPath",
         group_name=ROOM_GROUP_FOREST,
         display_name="Скрытая тропа",
@@ -30,25 +30,20 @@ init 6 python:
 
 
 label ForestHiddenPath:
-    $ CurrentRoom = ForestHiddenPathRoom
-    $ CurLoc = "ForestHiddenPath"
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    else:
-        $ _layout_last_picture = ""
-    $ MainTxt = ForestHiddenPathRoom.descriptions[0].text
-    $ CurLocDesc = MainTxt
-    $ forest_room_set_saved_text(MainTxt, CurrentRoom)
-    $ _forest_spawned = forest_room_spawn(ForestHiddenPathRoom)
+    $ renpy.dynamic("_forest_spawned")
+    $ rooms.enter("ForestHiddenPath")
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    $ scene_runtime.text = rooms.get("ForestHiddenPath").descriptions[0].text
+    $ scene_runtime.location_text = scene_runtime.text
+    $ forest_room_set_saved_text(scene_runtime.text, rooms.current)
+    $ _forest_spawned = forest_room_spawn(rooms.get("ForestHiddenPath"))
     if len(_forest_spawned) > 0:
-        $ MainTxt = MainTxt + "\n\nВ зарослях у тропы можно кое-что собрать."
-        $ CurLocDesc = MainTxt
-        $ forest_room_set_saved_text(MainTxt, CurrentRoom)
-    $ current_action_title = "Скрытая тропа"
-    $ current_action_content = None
-    $ current_action_items = []
-    $ current_action_items = forest_subroom_action_items(CurrentRoom)
-    call screen main_ui
-    return
-
+        $ scene_runtime.text = scene_runtime.text + "\n\nВ зарослях у тропы можно кое-что собрать."
+        $ scene_runtime.location_text = scene_runtime.text
+        $ forest_room_set_saved_text(scene_runtime.text, rooms.current)
+    $ main_ui_runtime.action_title = "Скрытая тропа"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.action_items = forest_subroom_action_items(rooms.current)
+    while True:
+        call screen main_ui

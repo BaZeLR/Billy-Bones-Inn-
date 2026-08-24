@@ -1,21 +1,15 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default TavernMyRoomAtticHatchFound = 0
-
-default TavernMyRoomAtticHatchFound = 0
-
-default TavernMyRoomAtticHatchFound = 0
-
 init 5 python:
     def tavern_my_room_attic_hatch_visible():
-        return int(exploration or 0) >= 15 or Melissa.bats_stage() >= 3
+        return int(player.stats.exploration or 0) >= 15 or threads["melissaBatProblem"].num >= 3
 
     def tavern_my_room_attic_hatch_can_search(_obj=None):
-        return tavern_my_room_attic_hatch_visible() and int(TavernMyRoomAtticHatchFound or 0) == 0
+        return tavern_my_room_attic_hatch_visible() and not bool(rooms.get("TavernMyRoom").state.get("attic_hatch_found", False))
 
     def tavern_my_room_attic_hatch_can_enter(_obj=None):
-        return tavern_my_room_attic_hatch_visible() and (int(TavernMyRoomAtticHatchFound or 0) == 1 or Melissa.bats_stage() >= 3)
+        return tavern_my_room_attic_hatch_visible() and (bool(rooms.get("TavernMyRoom").state.get("attic_hatch_found", False)) or threads["melissaBatProblem"].num >= 3)
 
     TavernMyRoomAtticHatchObject = GameObject(
         object_id="myroom_attic_hatch_001",
@@ -52,12 +46,12 @@ init 5 python:
 
 label TavernMyRoomAtticHatchSearch:
     if not tavern_my_room_attic_hatch_visible():
-        $ MainTxt = "Пока вы слишком плохо ориентируетесь в хозяйстве трактира, чтобы заметить здесь что-то полезное."
-    elif int(TavernMyRoomAtticHatchFound or 0) == 0:
-        $ TavernMyRoomAtticHatchFound = 1
-        $ MainTxt = "Вы подтаскиваете табурет, ощупываете потолочную балку и понимаете, что люк на чердак держится на простом крюке. Теперь вы знаете, как его открыть."
+        $ scene_runtime.text = "Пока вы слишком плохо ориентируетесь в хозяйстве трактира, чтобы заметить здесь что-то полезное."
+    elif not bool(rooms.get("TavernMyRoom").state.get("attic_hatch_found", False)):
+        $ rooms.get("TavernMyRoom").state["attic_hatch_found"] = True
+        $ scene_runtime.text = "Вы подтаскиваете табурет, ощупываете потолочную балку и понимаете, что люк на чердак держится на простом крюке. Теперь вы знаете, как его открыть."
     else:
-        $ MainTxt = "Вы уже разобрались, как открыть этот люк на чердак."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Вы уже разобрались, как открыть этот люк на чердак."
+    $ scene_runtime.location_text = scene_runtime.text
     call TavernMyRoomObjectMenu("myroom_attic_hatch_001")
     return

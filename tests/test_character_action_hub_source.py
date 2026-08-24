@@ -3,13 +3,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HUB = ROOT / "game" / "Utilities" / "General" / "NPC" / "CharacterActionHub.rpy"
+PEOPLE_RUNTIME = ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
 DOG = ROOT / "game" / "NPC" / "Secondary" / "DogCompanion.rpy"
 MAIN_LAYOUT = ROOT / "game" / "Utilities" / "General" / "Screens" / "main_layout.rpy"
-ROOM_TEMPLATE = ROOT / "game" / "Utilities" / "General" / "Classes" / "RoomTemplate.rpy"
+TALK_OWNERS = {
+    "IntAmandaTalk": ROOT / "game/NPC/Girls/Amanda/InitAmanda.rpy",
+    "IntClaraTalk": ROOT / "game/NPC/Girls/Clara/InitClara.rpy",
+    "IntMelissaTalk": ROOT / "game/NPC/Girls/Melissa/InitMelissa.rpy",
+    "IntSandraTalk": ROOT / "game/NPC/Girls/Sandra/InitSandra.rpy",
+}
 
 
-def _source():
-    return HUB.read_text(encoding="utf-8-sig")
+def _runtime_source():
+    return PEOPLE_RUNTIME.read_text(encoding="utf-8-sig")
 
 
 def _game_sources():
@@ -17,128 +23,133 @@ def _game_sources():
         yield path, path.read_text(encoding="utf-8-sig")
 
 
-def test_action_hub_uses_people_info_var_not_legacy_var_router():
-    source = _source()
-    state_block = source.split("def npc_unique_state", 1)[1].split("def _npc_explicit_picture", 1)[0]
+def test_character_action_hub_and_single_npc_card_wrappers_are_removed():
+    assert not HUB.exists()
 
-    assert "getPersonInfo" in state_block
-    assert 'getattr(info, "var", None)' in state_block
-    for token in ["AmandaVar", "MelissaVar", "SandraVar", "ClaraVar", "BeckyVar", "GeorgettVar", "LizaVar", "IrmaVar"]:
-        assert token not in state_block
+    game_source = "\n".join(source for _, source in _game_sources())
+    assert "def npc_action_data_for_room" not in game_source
+    for label in (
+        "ShowAmandaCard",
+        "ShowMelissaCard",
+        "ShowSandraCard",
+        "ShowClaraCard",
+        "ShowBeckyCard",
+        "ShowIrmaCard",
+    ):
+        assert "label %s:" % label not in game_source
 
 
-def test_action_hub_has_one_npc_menu_builder_path():
-    source = _source()
+def test_visible_npc_buttons_call_npc_owned_talk_labels_directly():
     main_layout = MAIN_LAYOUT.read_text(encoding="utf-8-sig")
-    dog_source = DOG.read_text(encoding="utf-8-sig")
-    room_template = ROOM_TEMPLATE.read_text(encoding="utf-8-sig")
-    opener_block = source.split("def open_npc_action_menu_state", 1)[1].split("def npc_action_data", 1)[0]
 
-    assert "normalized = npc_action_data(npc_id, where_id, entity_data)" in opener_block
-    assert "def _normalize_entity_action_data" not in source
-    assert "def _character_action_text" not in source
-    assert "def _character_action_display_name" not in source
-    assert "def entity_knows_mc" not in source
-    assert "def _entity_unknown_title" not in source
-    assert "def entity_presented_name" not in source
-    assert "def _entity_action_can_examine" not in source
-    assert "def _character_action_entity_talk_args" not in source
-    assert "def _character_action_grid_entries" not in source
-    assert "def open_entity_action_menu_state" not in source
-    assert "def action_menu_handle_talk_state" not in source
-    assert "def action_menu_handle_look_state" not in source
-    assert "def show_entity_examine_main_ui_state" not in source
-    assert "action_menu_entity_" not in source
-    assert "action_menu_entity_" not in main_layout
-    assert "store.action_menu_entity_type" not in opener_block
-    assert "store.action_menu_specs" not in source
-    assert "store.action_menu_actions" not in source
-    assert "default action_menu_specs" not in source
-    assert "default action_menu_actions" not in source
-    assert "def action_menu_handle_back_state" not in source
-    assert "label ActionMenuHandleBack" not in source
-    assert "label OpenEntityActionMenu" not in source
-    assert "label OpenNpcActionMenu" not in source
-    assert "label NpcActionTalk" not in source
-    assert "label NpcActionLook" not in source
-    assert "label ActionMenuHandleTalk" not in source
-    assert "label ActionMenuHandleLook" not in source
-    assert "ActionMenuRunSpec" not in source
-    assert "ActionMenuRunSpec" not in main_layout
-    assert "screen npc_action_menu" not in main_layout
-    assert "main_ui_entity_button_spec" not in main_layout
-    assert 'Call("OpenEntityActionMenu"' not in main_layout
-    assert 'Call("OpenNpcActionMenu"' not in main_layout
-    assert "action_menu_specs" not in main_layout
-    assert "action_menu_actions" not in main_layout
-    assert "_character_action_grid_entries" not in main_layout
-    assert "_room.visible_npcs()" in main_layout
-    for checked_source in (source, main_layout, dog_source, room_template):
-        assert "globals()" not in checked_source
-        assert "renpy.store" not in checked_source
-        assert "renpy_pkg.store" not in checked_source
-        assert "renpy_module.store" not in checked_source
-    visible_npcs_block = room_template.split("def visible_npcs", 1)[1].split("def visible_actions", 1)[0]
-    assert "_npc_known_ids()" in visible_npcs_block
-    assert "getLocation(npc_key)" in visible_npcs_block
-    assert "getNPCids(" not in visible_npcs_block
-    assert "npc_action_data_for_room" not in visible_npcs_block
-    assert '"talk_label"' not in visible_npcs_block
-    assert '"actions"' not in visible_npcs_block
-    for path, game_source in _game_sources():
-        assert "OpenEntityActionMenu" not in game_source, path
-        assert "OpenNpcActionMenu" not in game_source, path
-        assert "ActionMenuHandleTalk" not in game_source, path
-        assert "ActionMenuHandleLook" not in game_source, path
-        assert "_normalize_entity_action_data" not in game_source, path
-        assert "entity_presented_name" not in game_source, path
+    assert "open_npc_action_menu_state" not in main_layout
+    assert "$ _talk_label =" in main_layout
+    assert "$ _talk_args =" in main_layout
+    assert "Call(_talk_label, *_talk_args)" in main_layout
+    assert "people.ids_at(current_location)" in main_layout
+    assert "people.action_data_for_room(npc_key, current_location)" in main_layout
 
 
-def test_action_hub_uses_direct_menu_actions_not_spec_dispatcher():
-    source = _source()
-    menu_block = source.split("def open_npc_action_menu_state", 1)[1].split("def npc_action_data", 1)[0]
+def test_people_registry_selects_npc_owned_action_data_without_owning_talk_flow():
+    runtime = _runtime_source()
+    registry = runtime.split("class PeopleRegistry(object):", 1)[1].split(
+        "def npc_schedule_clock_minute", 1
+    )[0]
 
-    assert "menu_specs" not in menu_block
-    assert 'Call("ActionMenuRunSpec"' not in menu_block
-    assert 'Function(NpcActionTalkState' in menu_block
-    assert 'Function(NpcActionLookState' in menu_block
-    assert 'Call("SocialTalkTopicMenu"' in menu_block
+    assert "def action_data_for_room(self, person=\"\", room_code=\"\"):" in registry
+    assert "info = self.get_info(key)" in registry
+    assert "not info.interaction_visible(room_key)" in registry
+    assert "return info.action_data(room_key)" in registry
+    assert "NPC_META" not in registry
+    assert "GroceryStore" not in registry
+    assert "PortStreets" not in registry
+    assert "call_in_new_context" not in registry
+    assert "MenuItem(" not in registry
 
 
-def test_end_talk_jumps_to_current_room_label():
+def test_special_talk_labels_stay_distinct_behind_the_same_visible_button_path():
     main_layout = MAIN_LAYOUT.read_text(encoding="utf-8-sig")
-    end_talk_block = main_layout.split("def main_ui_end_talk_state", 1)[1].split("def main_ui_begin_native_scene_state", 1)[0]
-    end_scene_block = main_layout.split("def main_ui_end_native_scene_state", 1)[1].split("def tractir_after_load_restore_ui", 1)[0]
+    visible_panel = main_layout.split('text "Персонажи"', 1)[1].split(
+        'if str(main_ui_runtime.overlay or "") == "story":', 1
+    )[0]
 
-    for block in (end_talk_block, end_scene_block):
-        assert 'str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()' in block
-        assert "renpy_module.jump(room_label)" in block
+    assert "Call(_talk_label, *_talk_args)" in visible_panel
+    for talk_label, owner_path in TALK_OWNERS.items():
+        assert 'Call("%s"' % talk_label not in visible_panel
+        assert 'talk_label = "%s"' % talk_label in owner_path.read_text(encoding="utf-8-sig")
 
 
-def test_action_hub_does_not_guess_npc_pictures_from_room_tokens():
-    source = _source()
+def test_known_state_is_owned_by_talk_labels_not_the_ui_router():
+    talk_entries = {
+        "game/NPC/Secondary/IntEddieTalk.rpy": ("label IntEddieTalk:", "Eddie.mark_known()"),
+        "game/NPC/Girls/Inga/IntIngaTalk.rpy": ("label IntIngaTalk(show_menu=True):", "Inga.mark_known()"),
+        "game/NPC/Secondary/IntAlberTalk.rpy": ("label IntAlberTalk:", "Alber.mark_known()"),
+        "game/NPC/Secondary/IntDraupnirTalk.rpy": ("label IntDraupnirTalk:", "Draupnir.mark_known()"),
+        "game/NPC/Secondary/IntZimmerTalk.rpy": ("label IntZimmerTalk:", "Zimmer.mark_known()"),
+        "game/Town/Arts/BarberShop.rpy": ("label BarberShopTalk:", "Sergio.mark_known()"),
+        "game/NPC/Secondary/WerecatNPC.rpy": ("label IntWerecatTalk(room_code=\"\"):", "werecat.mark_known()"),
+        "game/NPC/Secondary/IntFrancheskaTalk.rpy": ("label FrancheskaTalk:", "Francheska.mark_known()"),
+        "game/Town/Market/MarketPlace.rpy": ("label MarketPlaceApproachMongol(mode_code=\"\"):", "Mongol.mark_known()"),
+        "game/NPC/Secondary/IntRobinTalk.rpy": ("label IntRobinTalk:", "Robin.mark_known()"),
+    }
+    for relative_path, (entry_label, mark_call) in talk_entries.items():
+        talk_source = (ROOT / relative_path).read_text(encoding="utf-8-sig")
+        talk_block = talk_source.split(entry_label, 1)[1].split("\nlabel ", 1)[0]
+        assert mark_call in talk_block, relative_path
 
-    assert "_character_action_room_picture_tokens" not in source
-    assert "_character_action_picture_files" not in source
-    assert "media_hints" not in source
-    assert "room_hint_map" not in source
-    assert "best_score" not in source
-    assert "renpy.list_files" not in source
+    port_source = (ROOT / "game/Town/PortStreets.rpy").read_text(encoding="utf-8-sig")
+    first_meet = port_source.split("label PortStreetsMeetGeorgett:", 1)[1].split("\nlabel ", 1)[0]
+    assert "Georgett.mark_known()" in first_meet
+
+
+def test_end_talk_restores_caller_ui_without_reentering_room_label():
+    main_layout = MAIN_LAYOUT.read_text(encoding="utf-8-sig")
+    end_talk_block = main_layout.split("def main_ui_end_talk_state", 1)[1].split(
+        "def main_ui_begin_native_scene_state", 1
+    )[0]
+
+    assert "main_ui_runtime.talk_origin" in end_talk_block
+    assert "main_ui_restore_context(origin)" in end_talk_block
+    assert "renpy_module.jump" not in end_talk_block
+
+
+def test_npc_selection_does_not_guess_pictures_or_dispatch_social_actions():
+    runtime = _runtime_source()
+    registry = runtime.split("class PeopleRegistry(object):", 1)[1].split(
+        "def npc_schedule_clock_minute", 1
+    )[0]
+
+    for token in (
+        "_npc_picture_cache",
+        "npc_context_picture_path",
+        "npc_picture_for_action",
+        "show_npc_picture_main_ui_state",
+        "media_hints",
+        "room_hint_map",
+        "npc_social_actions_available_in_room",
+        "npc_gift_action_available",
+    ):
+        assert token not in registry
 
 
 def test_dog_action_data_belongs_to_dog_runtime():
-    hub_source = _source()
+    runtime = _runtime_source()
     dog_source = DOG.read_text(encoding="utf-8-sig")
 
-    assert "def dog_action_data" not in hub_source
-    assert "def DogActionTalkState" not in hub_source
-    assert "def DogActionLookState" not in hub_source
-    assert "def open_dog_action_menu_state" not in hub_source
-    assert "dog_main_ui_action_items" not in hub_source
-    assert "show_dog_card_main_ui_state" not in hub_source
-    assert "dog_card_portrait_path" not in hub_source
-    assert "def dog_action_data" in dog_source
-    assert "def dog_action_talk_state" in dog_source
-    assert "def dog_action_look_state" in dog_source
-    assert "def dog_open_action_menu_state" in dog_source
+    assert "def dog_action_data" not in runtime
+    assert "dog_main_ui_action_items" not in runtime
+    assert "def action_data(self, where_id=\"\")" in dog_source
+    assert "def dog_action_talk_state" not in dog_source
+    assert "def dog_action_look_state" not in dog_source
+    assert "def dog_open_action_menu_state" not in dog_source
+    assert "label IntDogTalkMenu:" not in dog_source
+    assert "jump IntDogTalkMenu" not in dog_source
+    assert "while True:" in dog_source
     assert '"talk_label": "IntDogTalk"' in dog_source
+
+
+def test_becky_inspect_calls_the_generic_returnable_card_procedure():
+    talk = (ROOT / "game/NPC/Girls/Becky/IntBeckyTalk.rpy").read_text(encoding="utf-8-sig")
+
+    assert "call ShowGirlCard(_becky_name)" in talk
+    assert "ShowBeckyCard" not in talk

@@ -418,20 +418,20 @@ init 4 python:
 
 label UseBandageItem:
     if int(player.item_count("bandage_001") or 0) <= 0:
-        $ MainTxt = "При себе у вас больше нет бинтов."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "При себе у вас больше нет бинтов."
+        $ scene_runtime.location_text = scene_runtime.text
         call PlayerCardInventoryMenu
         return
-    if int(health or 0) >= 100:
-        $ MainTxt = "Сейчас ваши раны уже перевязаны настолько хорошо, насколько это возможно."
-        $ CurLocDesc = MainTxt
+    if int(player.condition.health or 0) >= 100:
+        $ scene_runtime.text = "Сейчас ваши раны уже перевязаны настолько хорошо, насколько это возможно."
+        $ scene_runtime.location_text = scene_runtime.text
         call PlayerCardInventoryItemMenu("bandage_001", True)
         return
 
     $ player.remove_item("bandage_001", 1)
-    $ health = _player_clamp(health + 12, 0, 100)
-    $ MainTxt = "Вы неторопливо перевязываете раны и чувствуете себя немного лучше."
-    $ CurLocDesc = MainTxt
+    $ player.change_stat("health", 12)
+    $ scene_runtime.text = "Вы неторопливо перевязываете раны и чувствуете себя немного лучше."
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call PlayerCardInventoryItemMenu("bandage_001", True)
     return
@@ -439,15 +439,15 @@ label UseBandageItem:
 
 label UseHealingPotionItem:
     if int(player.item_count("healing_potion_001") or 0) <= 0:
-        $ MainTxt = "При себе у вас больше нет лечебного зелья."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "При себе у вас больше нет лечебного зелья."
+        $ scene_runtime.location_text = scene_runtime.text
         call PlayerCardInventoryMenu
         return
 
     $ player.remove_item("healing_potion_001", 1)
-    $ health = _player_clamp(health + 25, 0, 100)
-    $ MainTxt = "Вы выпиваете лечебное зелье. Горечь быстро сменяется ощущением, что силы возвращаются."
-    $ CurLocDesc = MainTxt
+    $ player.change_stat("health", 25)
+    $ scene_runtime.text = "Вы выпиваете лечебное зелье. Горечь быстро сменяется ощущением, что силы возвращаются."
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call PlayerCardInventoryItemMenu("healing_potion_001", True)
     return

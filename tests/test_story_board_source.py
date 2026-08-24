@@ -3,6 +3,8 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 BOARD_PATH = PROJECT_ROOT / "game" / "Utilities" / "General" / "Screens" / "StoryThreadBoard.rpy"
+MAIN_LAYOUT_PATH = PROJECT_ROOT / "game" / "Utilities" / "General" / "Screens" / "main_layout.rpy"
+DEBUG_TOOLS_PATH = PROJECT_ROOT / "game" / "Utilities" / "General" / "Common" / "DebugTools.rpy"
 
 
 def test_story_board_has_no_thread_mutation_controls():
@@ -20,12 +22,18 @@ def test_story_board_has_no_thread_mutation_controls():
 
 def test_story_board_is_read_only_for_normal_clicks():
     source = BOARD_PATH.read_text(encoding="utf-8-sig")
+    main_layout = MAIN_LAYOUT_PATH.read_text(encoding="utf-8-sig")
+    debug_tools = DEBUG_TOOLS_PATH.read_text(encoding="utf-8-sig")
 
     assert "renpy.call_replay" not in source
     assert "ToggleField(tinfo" not in source
     assert "action Show(\"story_thread_control\"" not in source
     assert "action Function(story_board_show_scene" not in source
     assert "action NullAction()" in source
+    assert "def story_board_refresh" not in source
+    assert 'on "show" action Function(story_board_refresh)' not in source
+    assert "story_board_refresh" not in main_layout
+    assert "story_board_refresh" not in debug_tools
 
 
 def test_story_board_conditions_use_familylife_style_rows():

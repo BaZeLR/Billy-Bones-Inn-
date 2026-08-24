@@ -1,19 +1,19 @@
-            "fire_units": 0,            "fire_units": 0,            "fire_units": 0,            "fire_units": 0,            "fire_units": 0,            "fire_units": 0,# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     def tavern_kitchen_hearth_wood_stock():
-        loose_wood = _room_item_count_by_id(TavernKitchenRoom, "chopped_wood_001")
+        loose_wood = _room_item_count_by_id(rooms.get("TavernKitchen"), "chopped_wood_001")
         if loose_wood > 0:
-            while _room_remove_item_by_id(TavernKitchenRoom, "chopped_wood_001"):
+            while _room_remove_item_by_id(rooms.get("TavernKitchen"), "chopped_wood_001"):
                 _add_object_state_int(TavernKitchenHearthObject, "chopped_wood_stock", 1, 0)
         return _object_state_int(TavernKitchenHearthObject, "chopped_wood_stock", 0)
 
     def tavern_kitchen_hearth_drop_wood_visible(_obj=None):
-        return _player_has_item_by_id("chopped_wood_001")
+        return player.item_count("chopped_wood_001") > 0
 
     def tavern_kitchen_hearth_description():
-        fire_active = tavern_kitchen_sync_hearth_state() > 0
+        fire_active = _pc_fire_is_active(TavernKitchenHearthObject)
         ash_dirty = _object_state_int(TavernKitchenHearthObject, "ash_dirty", 0)
         wood_stock = tavern_kitchen_hearth_wood_stock()
         if fire_active and ash_dirty > 0:
@@ -61,9 +61,6 @@ init python:
             ),
         ],
         state={
-            "fireOn": 0,
-            "fireOn": 0,
-            "fireOn": 0,
             "madeFireToday": 0,
             "fire_started_minute": 0,
             "fire_until_minute": 0,
@@ -77,16 +74,17 @@ init python:
     )
 
 
-label TavernKitchenHearthMenu(object_id="hearth_001", refresh_only=False):
+label TavernKitchenHearthMenu(object_id="hearth_001"):
+    $ renpy.dynamic("_hearth_action", "_hearth_args", "_hearth_label")
     $ tavern_kitchen_hearth_wood_stock()
-    $ current_object_id = "hearth_001"
-    $ current_action_title = str(TavernKitchenHearthObject.name or "Очаг")
-    $ current_action_content = None
-    $ current_action_items = []
+    $ main_ui_runtime.object_id = "hearth_001"
+    $ main_ui_runtime.action_title = str(TavernKitchenHearthObject.name or "Очаг")
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     if str(TavernKitchenHearthObject.picture or "").strip() and renpy.loadable(str(TavernKitchenHearthObject.picture or "").strip()):
-        $ _layout_last_picture = str(TavernKitchenHearthObject.picture or "").strip()
-    $ MainTxt = tavern_kitchen_hearth_description()
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.picture = str(TavernKitchenHearthObject.picture or "").strip()
+    $ scene_runtime.text = tavern_kitchen_hearth_description()
+    $ scene_runtime.location_text = scene_runtime.text
     python:
         for _hearth_action in TavernKitchenHearthObject.visible_actions():
             _hearth_args = tuple(getattr(_hearth_action, "args", ()) or ())
@@ -94,16 +92,24 @@ label TavernKitchenHearthMenu(object_id="hearth_001", refresh_only=False):
             if str(getattr(_hearth_action, "action_id", "") or "") == "make_fire" and _pc_fire_is_active(TavernKitchenHearthObject):
                 _hearth_label = "Подложить дрова"
             if _hearth_action.hook == "text":
-                current_action_items.append(MenuItem(_hearth_label, Call("TavernKitchenHearthText", _hearth_action.action_id)))
+                main_ui_runtime.action_items.append(MenuItem(_hearth_label, Call("TavernKitchenHearthText", _hearth_action.action_id)))
             elif _hearth_action.hook == "call" and str(_hearth_action.target or "") != "":
-                current_action_items.append(MenuItem(_hearth_label, Call(_hearth_action.target, *_hearth_args)))
+                main_ui_runtime.action_items.append(MenuItem(_hearth_label, Call(_hearth_action.target, *_hearth_args)))
             elif _hearth_action.hook == "jump" and str(_hearth_action.target or "") != "":
-                current_action_items.append(MenuItem(_hearth_label, Jump(_hearth_action.target)))
-        current_action_items.append(MenuItem("Назад", Jump("TavernKitchen")))
+                main_ui_runtime.action_items.append(MenuItem(_hearth_label, Jump(_hearth_action.target)))
+        main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "text", tavern_kitchen_saved_text()),
+            SetField(scene_runtime, "location_text", tavern_kitchen_saved_text()),
+            SetField(main_ui_runtime, "action_title", "Кухня"),
+            SetField(main_ui_runtime, "action_content", None),
+            SetField(main_ui_runtime, "action_items", tavern_kitchen_action_items()),
+            Function(main_ui_restart_interaction),
+        ]))
     return
 
 
 label TavernKitchenHearthText(action_id=""):
+    $ renpy.dynamic("_hearth_action", "_hearth_text")
     python:
         _hearth_text = ""
         for _hearth_action in TavernKitchenHearthObject.visible_actions():
@@ -111,22 +117,22 @@ label TavernKitchenHearthText(action_id=""):
                 _hearth_text = str(_hearth_action.target or "")
                 break
         if _hearth_text:
-            MainTxt = _hearth_text
-            CurLocDesc = _hearth_text
-            current_action_title = str(TavernKitchenHearthObject.name or "Очаг")
+            scene_runtime.text = _hearth_text
+            scene_runtime.location_text = _hearth_text
+            main_ui_runtime.action_title = str(TavernKitchenHearthObject.name or "Очаг")
     call TavernKitchenHearthMenu
     return
 
 
 label TavernKitchenHearthDepositWood:
     if not player.remove_item("chopped_wood_001", 1):
-        $ MainTxt = "У вас больше нет колотых дров."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "У вас больше нет колотых дров."
+        $ scene_runtime.location_text = scene_runtime.text
         call TavernKitchenHearthMenu
         return
     $ _add_object_state_int(TavernKitchenHearthObject, "chopped_wood_stock", 1, 0)
-    $ MainTxt = "Вы складываете колотые дрова рядом с очагом. Теперь у очага лежит {b}%s{/b} шт." % str(tavern_kitchen_hearth_wood_stock())
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = "Вы складываете колотые дрова рядом с очагом. Теперь у очага лежит {b}%s{/b} шт." % str(tavern_kitchen_hearth_wood_stock())
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     call TavernKitchenHearthMenu
     return

@@ -1,67 +1,20 @@
-        Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()label TavernAticRestore:
-    $ scene_image = attic_room_picture_path() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ MainTxt = TavernAticRoom.descriptions[0].text
-    if int(AtticLootFound or 0) == 1:
-        $ MainTxt = MainTxt + "\n\nВы уже перерыли здесь хлам и теперь знаете, где лежат найденные вещи."
-    $ CurLocDesc = MainTxt
-    call TavernAticBuildActions
-    return        Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()label TavernAticRestore:
-    $ scene_image = attic_room_picture_path() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ MainTxt = TavernAticRoom.descriptions[0].text
-    if int(AtticLootFound or 0) == 1:
-        $ MainTxt = MainTxt + "\n\nВы уже перерыли здесь хлам и теперь знаете, где лежат найденные вещи."
-    $ CurLocDesc = MainTxt
-    call TavernAticBuildActions
-    return        Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()    $ Melissa.sync_room_problem_state()label TavernAticRestore:
-    $ scene_image = attic_room_picture_path() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ MainTxt = TavernAticRoom.descriptions[0].text
-    if int(AtticLootFound or 0) == 1:
-        $ MainTxt = MainTxt + "\n\nВы уже перерыли здесь хлам и теперь знаете, где лежат найденные вещи."
-    $ CurLocDesc = MainTxt
-    call TavernAticBuildActions
-    return# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init 6 python:
     def tavern_atic_search_available():
-        return int(AtticLootFound or 0) == 0
+        return not bool(rooms.get("TavernAtic").state.get("loot_found", False))
 
     def tavern_atic_supply_search_available():
-        return int(AtticLootFound or 0) == 1 and int(AtticSupplyLootFound or 0) == 0
-
-    def tavern_atic_melissa_investigation_active():
-        Melissa.sync_room_problem_state()
-        return (
-            Melissa.bats_stage() >= 3
-            and Melissa.bats_stage() < 6
-            and int(current_game_day() or 0) >= int(Melissa.var.get("bat_attic_check_day", -1) or -1)
-        )
-
-    def tavern_atic_melissa_colony_search_available():
-        return (
-            tavern_atic_melissa_investigation_active()
-            and Melissa.bats_stage() == 3
-        )
-
-    def tavern_atic_melissa_window_search_available():
-        return (
-            tavern_atic_melissa_investigation_active()
-            and Melissa.bats_stage() == 4
-        )
+        return bool(rooms.get("TavernAtic").state.get("loot_found", False)) and not bool(rooms.get("TavernAtic").state.get("supply_loot_found", False))
 
     def tavern_atic_visible_items():
         items = []
         seen_item_ids = set()
-        for row in list(getattr(TavernAticRoom, "game_items", []) or []):
+        for row in list(getattr(rooms.get("TavernAtic"), "game_items", []) or []):
             item_obj = row
             if isinstance(row, str):
-                item_obj = get_game_item(row, TavernAticRoom)
+                item_obj = get_game_item(row, rooms.get("TavernAtic"))
             if item_obj is None:
                 continue
             item_id = str(getattr(item_obj, "object_id", "") or "").strip()
@@ -73,7 +26,26 @@ init 6 python:
             items.append(item_obj)
         return items
 
-    TavernAticRoom = Room(
+    def tavern_atic_action_items():
+        items = []
+        if tavern_atic_search_available():
+            items.append(MenuItem("Порыться в старом хламе", Call("TavernAticSearch")))
+        elif tavern_atic_supply_search_available():
+            items.append(MenuItem("Порыться в старом хламе еще раз", Call("TavernAticSupplySearch")))
+        if story_event_available("TavernAtic", "melissa_bats"):
+            items.append(MenuItem(Melissa.bat_attic_event_caption(), Call("checkTriggers", "TavernAtic", "melissa_bats", 0)))
+        for attic_item in tavern_atic_visible_items():
+            item_id = str(getattr(attic_item, "object_id", "") or "")
+            item_count = _room_item_count_by_id(rooms.get("TavernAtic"), item_id)
+            caption = str(attic_item.name or item_id)
+            if item_count > 1:
+                caption = "{} x{}".format(caption, item_count)
+            items.append(MenuItem(caption, Call("TavernAticObjectMenu", item_id)))
+        for room_exit in rooms.get("TavernAtic").visible_exits():
+            items.append(MenuItem(room_exit.label, movement_actions(room_exit.target)))
+        return items
+
+    TavernAticRoomDefinition = Room(
         code_name="TavernAtic",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Чердак",
@@ -89,159 +61,69 @@ init 6 python:
         ],
         game_items=[],
         custom_properties={},
+        state={
+            "loot_found": False,
+            "supply_loot_found": False,
+        },
     )
 
 
 label TavernAtic:
-    $ CurrentRoom = TavernAticRoom
-    $ CurLoc = "TavernAtic"
-    $ scene_image = attic_room_picture_path() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    else:
-        $ _layout_last_picture = ""
-    $ MainTxt = TavernAticRoom.descriptions[0].text
-    $ CurLocDesc = MainTxt
-    $ Melissa.sync_room_problem_state()
-    $ Melissa.sync_room_problem_state()
-    $ Melissa.sync_room_problem_state()
-    $ current_action_title = "Чердак"
-    $ current_action_content = None
-    call TavernAticBuildActions
-    call screen main_ui
-    return
+    $ rooms.enter("TavernAtic")
+    $ scene_runtime.picture = attic_room_picture_path() or rooms.current.bg_picture or None
+    $ scene_runtime.text = rooms.get("TavernAtic").descriptions[0].text
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Чердак"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = tavern_atic_action_items()
+    while True:
+        call screen main_ui
 
 
 label TavernAticSearch:
-    if int(AtticLootFound or 0) == 0:
-        $ AtticLootFound = 1
+    $ renpy.dynamic("_loot_id")
+    if not bool(rooms.get("TavernAtic").state.get("loot_found", False)):
+        $ rooms.get("TavernAtic").state["loot_found"] = True
         python:
             for _loot_id in ("recipe_book_001", "rusty_hunter_rifle_001", "old_leather_cuirass_001"):
-                if not _room_has_item_by_id(TavernAticRoom, _loot_id):
-                    _room_add_item_by_id(TavernAticRoom, _loot_id)
-        $ MainTxt = "Вы долго роетесь среди ящиков, тряпья и обломков мебели. В дальнем углу под кучей пыли находятся {b}очень старая книга с рецептами{/b}, {b}ржавая охотничья винтовка-арбалет{/b} и {b}старый кожаный кирас{/b}."
+                if not _room_has_item_by_id(rooms.get("TavernAtic"), _loot_id):
+                    _room_add_item_by_id(rooms.get("TavernAtic"), _loot_id)
+        $ scene_runtime.text = "Вы долго роетесь среди ящиков, тряпья и обломков мебели. В дальнем углу под кучей пыли находятся {b}очень старая книга с рецептами{/b}, {b}ржавая охотничья винтовка-арбалет{/b} и {b}старый кожаный кирас{/b}."
     else:
-        $ MainTxt = "Вы снова шевелите старый хлам, но больше ничего ценного не обнаруживаете."
-    $ CurLocDesc = MainTxt
-    call TavernAticBuildActions
+        $ scene_runtime.text = "Вы снова шевелите старый хлам, но больше ничего ценного не обнаруживаете."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items = tavern_atic_action_items()
     return
 
 
 label TavernAticSupplySearch:
-    if int(AtticSupplyLootFound or 0) == 0:
-        $ AtticSupplyLootFound = 1
+    if not bool(rooms.get("TavernAtic").state.get("supply_loot_found", False)):
+        $ rooms.get("TavernAtic").state["supply_loot_found"] = True
         $ player.add_item("droplets_001", 5)
         $ player.add_item("gunpowder_001", 5)
-        $ MainTxt = "Вы снова перетряхиваете старый хлам и в дальнем ящике находите завернутые в промасленную тряпку припасы: {b}дробь{/b} и {b}порох{/b}. Этого хватит примерно на пять хороших выстрелов. Вы сразу забираете находку с собой."
+        $ scene_runtime.text = "Вы снова перетряхиваете старый хлам и в дальнем ящике находите завернутые в промасленную тряпку припасы: {b}дробь{/b} и {b}порох{/b}. Этого хватит примерно на пять хороших выстрелов. Вы сразу забираете находку с собой."
     else:
-        $ MainTxt = "После второго тщательного обыска чердак больше ничем полезным не радует."
-    $ CurLocDesc = MainTxt
-    call TavernAticBuildActions
+        $ scene_runtime.text = "После второго тщательного обыска чердак больше ничем полезным не радует."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items = tavern_atic_action_items()
     return
 
 
-label MelissaAtticColonySearch:
-    if not tavern_atic_melissa_colony_search_available():
-        call TavernAticBuildActions
+label TavernAticObjectMenu(object_id=""):
+    $ renpy.dynamic("_atic_item")
+    $ renpy.dynamic("_atic_action", "_atic_args", "_atic_has_take_action")
+    $ _atic_item = get_game_item(object_id, rooms.get("TavernAtic"))
+    if _atic_item is None or not _room_has_item_by_id(rooms.get("TavernAtic"), object_id):
+        $ main_ui_runtime.action_items = tavern_atic_action_items()
         return
-    vscene "images/player_room/player_room_attic_1.png"
-    # Stage 4: attic colony was found.
-    $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 4)
-    $ MainTxt = "Вы медленно обходите чердак вдоль стропил и почти сразу замечаете над той частью дома, где спит Мелисса, старые щели между досками и темные ходы в подгнившей обшивке. Значит, подозрение было верным: снизу она видела не просто трещины в потолке, а настоящий выход под самую крышу.\n\nЕще через пару шагов находится и главная причина ночного шума. Под самой кровлей набилось сухое гнездовое тряпье, комки мха, помет и целая дрянная колония, давно обжившая балки и пустоты под крышей. Теперь ясно, почему внизу по ночам все шуршит и пищит. Одним веником тут не обойтись: сначала эту пакость придется выкурить дымом, а потом уже по-настоящему заделывать щели и приводить крышу в порядок."
-    $ CurLocDesc = MainTxt
-    call TavernAticBuildActions
-    return
-
-
-label MelissaAtticWindowPeek:
-    if not tavern_atic_melissa_window_search_available():
-        call TavernAticBuildActions
-        return
-    # Stage 5: attic window peek happened and the scandal can trigger.
-    $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 5)
-    $ MainTxt = "Раздвинув старое тряпье и осторожно пригнувшись, вы находите маленькое слуховое окно над стороной дома, где расположена комната Аманды. Сквозь мутное стекло и щели в раме открывается слишком уж ясный вид на соседний двор.\n\n" + attic_neighbor_sex_scene_text() + " Вы невольно задерживаетесь у окна дольше, чем следовало бы."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Чердак"
-    $ current_action_content = None
-    $ current_action_items = [MenuItem("Податься ближе", Call("checkTriggers", "TavernAtic", "melissa_bats", 0)), MenuItem("Отступить от окна", Call("TavernAticBuildActions"))]
-    $ _paged_text = str(MainTxt or "")
-    call QueuePagedPanelText(_paged_text, current_action_title, current_action_items, "plain")
-    return
-
-
-label MelissaBurnAtticColony:
-    if int(player.item_count("bat_repellent_001") or 0) <= 0 or Melissa.bats_stage() < 4:
-        call TavernAticBuildActions
-        return
-    $ player.remove_item("bat_repellent_001", 1)
-    # Stage 7: colony was smoked out; roof repair / final cleanup still pending.
-    $ Melissa.var["bats_episode"] = max(int(Melissa.var.get("bats_episode", 0) or 0), 7)
-    $ Melissa.var["bat_recipe_unlocked"] = 1
-    $ MainTxt = "Вы раскладываете дымную смесь между балок, даете ей как следует разгореться и быстро отступаете. Чердак наполняется густым едким дымом из мха, лаванды и трав. Из-под крыши с писком и хлопаньем вырываются летучие мыши, а мышиная дрянь начинает в панике разбегаться по щелям.\n\nГнездовище вы наконец выкурили, но на одном дыме дело не закончится: пока крышу не заделают как следует, щели останутся и вся пакость со временем полезет обратно."
-    $ CurLocDesc = MainTxt
-    call TavernAticBuildActions
-    return
-
-
-label MelissaOrderRoofRepair:
-    if Melissa.bats_stage() < 7 or int(Melissa.var.get("roof_repair_order_day", -1) or -1) >= 0:
-        call TavernAticBuildActions
-        return
-    if int(money or 0) < 1000:
-        $ MainTxt = "На починку крыши сейчас не хватает денег."
-        $ CurLocDesc = MainTxt
-        call TavernAticBuildActions
-        return
-    $ money = int(money or 0) - 1000
-    $ Melissa.var["roof_repair_order_day"] = int(current_game_day() or 0)
-    $ Melissa.var["roof_repair_complete_day"] = int(current_game_day() or 0) + 2
-    $ MainTxt = "Вы договариваетесь о починке старой крыши и отдаете за работу тысячу монет. Теперь остается только дождаться, пока мастера перетянут гнилые доски, забьют щели и приведут верх трактира в порядок. Обещают управиться за пару дней."
-    $ CurLocDesc = MainTxt
-    $ story_thread_advance_current()
-    call stat
-    call TavernAticBuildActions
-    return
-
-
-label MelissaCheckRoofRepair:
-    $ Melissa.sync_room_problem_state()
-    $ Melissa.sync_room_problem_state()
-    $ Melissa.sync_room_problem_state()
-    if Melissa.bats_stage() >= 8 or Melissa.bats_repair_complete():
-        $ MainTxt = "Теперь все видно сразу: крыша над комнатой Мелиссы наконец подлатана, щели закрыты, а прежнее гнездовище выжжено и вычищено. Похоже, на этот раз проблема действительно решена."
-        $ CurLocDesc = MainTxt
-        call TavernAticBuildActions
-        return
-    if int(Melissa.var.get("roof_repair_complete_day", -1) or -1) > int(current_game_day() or 0):
-        $ _days_left = int(Melissa.var.get("roof_repair_complete_day", -1) or -1) - int(current_game_day() or 0)
-        $ MainTxt = "Работа над крышей еще не закончена. Придется подождать еще примерно {} дн.".format(_days_left)
-        $ CurLocDesc = MainTxt
-        call TavernAticBuildActions
-        return
-    $ Melissa.sync_room_problem_state()
-    $ Melissa.sync_room_problem_state()
-    $ Melissa.sync_room_problem_state()
-    $ MainTxt = "Крыша уже должна быть готова. Судя по виду балок и свежим заплатам, мастера и правда сделали свое дело. Теперь под потолком тихо, и дряни сверху больше взяться неоткуда."
-    $ CurLocDesc = MainTxt
-        call TavernAticBuildActions
-    return
-
-
-label TavernAticObjectMenu(object_id="", refresh_only=False):
-    $ _atic_item = get_game_item(object_id, TavernAticRoom)
-    if _atic_item is None or not _room_has_item_by_id(TavernAticRoom, object_id):
-        call TavernAticBuildActions
-        return
-    $ scene_image = attic_item_picture_path(object_id) or attic_room_picture_path() or CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ MainTxt = str(_atic_item.description or "")
-    if _room_item_count_by_id(TavernAticRoom, object_id) > 1:
-        $ MainTxt = MainTxt + "\n\nЗдесь лежит несколько одинаковых предметов: {}.".format(_room_item_count_by_id(TavernAticRoom, object_id))
-    $ CurLocDesc = MainTxt
-    $ current_action_title = str(_atic_item.name or "Чердак")
-    $ current_action_content = None
-    $ current_action_items = []
+    $ scene_runtime.picture = attic_item_picture_path(object_id) or attic_room_picture_path() or rooms.current.bg_picture or None
+    $ scene_runtime.text = str(_atic_item.description or "")
+    if _room_item_count_by_id(rooms.get("TavernAtic"), object_id) > 1:
+        $ scene_runtime.text = scene_runtime.text + "\n\nЗдесь лежит несколько одинаковых предметов: {}.".format(_room_item_count_by_id(rooms.get("TavernAtic"), object_id))
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = str(_atic_item.name or "Чердак")
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     python:
         _atic_has_take_action = False
         for _atic_action in _atic_item.visible_actions():
@@ -249,30 +131,37 @@ label TavernAticObjectMenu(object_id="", refresh_only=False):
             if str(getattr(_atic_action, "target", "") or "") == "Take":
                 _atic_has_take_action = True
             if _atic_action.hook == "text":
-                current_action_items.append(MenuItem(_atic_action.label, Call("TavernAticObjectText", object_id, _atic_action.action_id)))
+                main_ui_runtime.action_items.append(MenuItem(_atic_action.label, Call("TavernAticObjectText", object_id, _atic_action.action_id)))
             elif _atic_action.hook == "call" and str(_atic_action.target or "") != "":
-                current_action_items.append(MenuItem(_atic_action.label, Call(_atic_action.target, *_atic_args)))
+                main_ui_runtime.action_items.append(MenuItem(_atic_action.label, Call(_atic_action.target, *_atic_args)))
             elif _atic_action.hook == "jump" and str(_atic_action.target or "") != "":
-                current_action_items.append(MenuItem(_atic_action.label, Jump(_atic_action.target)))
+                main_ui_runtime.action_items.append(MenuItem(_atic_action.label, Jump(_atic_action.target)))
         if bool(getattr(_atic_item, "carriable", False)) and not _atic_has_take_action:
-            current_action_items.append(MenuItem("Взять", Call("Take", object_id, "TavernAtic", "", object_id)))
-    $ current_action_items.append(MenuItem("Назад", Jump("TavernAtic")))
+            main_ui_runtime.action_items.append(MenuItem("Взять", Call("Take", object_id, "TavernAtic", "", object_id)))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [
+        SetField(scene_runtime, "text", rooms.get("TavernAtic").descriptions[0].text),
+        SetField(scene_runtime, "location_text", rooms.get("TavernAtic").descriptions[0].text),
+        SetField(main_ui_runtime, "action_title", "Чердак"),
+        SetField(main_ui_runtime, "action_content", None),
+        SetField(main_ui_runtime, "action_items", tavern_atic_action_items()),
+        Function(main_ui_restart_interaction),
+    ]))
     return
 
 
 label TavernAticObjectText(object_id="", action_id=""):
+    $ renpy.dynamic("_atic_action", "_atic_item", "_atic_text")
     python:
         _atic_text = ""
-        _atic_item = get_game_item(object_id, TavernAticRoom)
+        _atic_item = get_game_item(object_id, rooms.get("TavernAtic"))
         if _atic_item is not None:
             for _atic_action in _atic_item.visible_actions():
                 if getattr(_atic_action, "action_id", "") == str(action_id or ""):
                     _atic_text = str(_atic_action.target or "")
                     break
         if _atic_text:
-            MainTxt = _atic_text
-            CurLocDesc = _atic_text
+            scene_runtime.text = _atic_text
+            scene_runtime.location_text = _atic_text
     call TavernAticObjectMenu(object_id)
     return
-
 

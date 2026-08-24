@@ -1,34 +1,4 @@
-label ChangeTommorowHallJob(girl_name=None):
-    $ apply_tomorrow_hall_job(girl_name)
-    returnlabel ChangeTommorowHallJob(girl_name=None):
-    python:
-        if girl_name is None:
-            girl_name = GirlName if 'GirlName' in locals() else None
-        if girl_name:
-            apply_tomorrow_hall_job(girl_name)
-    returnlabel ChangeTommorowHallJob(girl_name=None):
-    $ apply_tomorrow_hall_job(girl_name)
-    returnlabel ChangeTommorowHallJob(girl_name=None):
-    $ apply_tomorrow_hall_job(girl_name)
-    returnlabel ChangeTommorowHallJob(girl_name=None):
-    python:
-        if girl_name is None:
-            girl_name = GirlName if 'GirlName' in locals() else None
-        if girl_name:
-            apply_tomorrow_hall_job(girl_name)
-    returnlabel ChangeTommorowHallJob(girl_name=None):
-    $ apply_tomorrow_hall_job(girl_name)
-    returnlabel ChangeTommorowHallJob(girl_name=None):
-    $ apply_tomorrow_hall_job(girl_name)
-    returnlabel ChangeTommorowHallJob(girl_name=None):
-    python:
-        if girl_name is None:
-            girl_name = GirlName if 'GirlName' in locals() else None
-        if girl_name:
-            apply_tomorrow_hall_job(girl_name)
-    returnlabel ChangeTommorowHallJob(girl_name=None):
-    $ apply_tomorrow_hall_job(girl_name)
-    return# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # ChangeTommorowHallJob.rpy
@@ -40,15 +10,15 @@ init python:
         if not person:
             return
 
-        kitchen_value = int(jobkitchentomorrow.get(person, jobkitchen.get(person, 0)) or 0)
-        cleaning_value = int(jobcleaningtomorrow.get(person, jobcleaning.get(person, 0)) or 0)
-        waitress_value = int(jobwaitresstomorrow.get(person, jobwaitress.get(person, 0)) or 0)
-
-        jobkitchen[person] = kitchen_value
-        jobcleaning[person] = cleaning_value
-        jobwaitress[person] = waitress_value
-
-        jobkitchentomorrow[person] = kitchen_value
-        jobcleaningtomorrow[person] = cleaning_value
-        jobwaitresstomorrow[person] = waitress_value
+        info = people.get_info(person)
+        if info is None:
+            return
+        for current_key, tomorrow_key in (
+            ("jobkitchen", "jobkitchentomorrow"),
+            ("jobcleaning", "jobcleaningtomorrow"),
+            ("jobwaitress", "jobwaitresstomorrow"),
+        ):
+            value = int(info.job_value(tomorrow_key, info.job_value(current_key, 0)) or 0)
+            info.set_job_value(current_key, value)
+            info.set_job_value(tomorrow_key, value)
 

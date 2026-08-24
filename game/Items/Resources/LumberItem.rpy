@@ -3,10 +3,10 @@
 # ================================================================================
 init 4 python:
     def lumber_in_shed(_obj=None):
-        return CurrentRoom is not None and str(getattr(CurrentRoom, "code_name", "") or "") == "Shed" and _room_has_item_by_id(CurrentRoom, "lumber_001")
+        return rooms.current is not None and str(getattr(rooms.current, "code_name", "") or "") == "Shed" and _room_has_item_by_id(rooms.current, "lumber_001")
 
     def lumber_ready_for_chop(_obj=None):
-        return lumber_in_shed(_obj) and _player_has_item_by_id("old_axe_001")
+        return lumber_in_shed(_obj) and player.item_count("old_axe_001") > 0
 
     LumberItem = GameItem(
         object_id="lumber_001",
@@ -38,60 +38,60 @@ init 4 python:
 
 
 label Chop(what_id="", where_id="", fallback_text="", object_id=""):
+    $ renpy.dynamic("_chop_block", "item_id", "_current_room_code", "_chop_picture", "_chopped_item", "_chopped_total", "_used_room_item")
     $ _chop_block = action_restriction_result("heavy_chore", "chop")
     if not _chop_block.get("ok", False):
-        $ MainTxt = str(_chop_block.get("text", "") or fallback_text or "Сейчас это не получится.")
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = str(_chop_block.get("text", "") or fallback_text or "Сейчас это не получится.")
+        $ scene_runtime.location_text = scene_runtime.text
         return
     $ item_id = get_object_id(what_id)
-    $ _current_room_code = str(getattr(CurrentRoom, "code_name", "") or CurLoc or "")
+    $ _current_room_code = str(getattr(rooms.current, "code_name", "") or rooms.current_code or "")
     if item_id == "":
-        $ MainTxt = "Непонятно, что именно вы собираетесь рубить."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Непонятно, что именно вы собираетесь рубить."
+        $ scene_runtime.location_text = scene_runtime.text
         return
-    if not _player_has_item_by_id("old_axe_001"):
-        $ MainTxt = "Без топора колоть дрова не выйдет. Сначала возьмите старый топор."
-        $ CurLocDesc = MainTxt
+    if player.item_count("old_axe_001") <= 0:
+        $ scene_runtime.text = "Без топора колоть дрова не выйдет. Сначала возьмите старый топор."
+        $ scene_runtime.location_text = scene_runtime.text
         return
-    if CurrentRoom is None:
-        $ MainTxt = "Сейчас рубить дрова негде."
-        $ CurLocDesc = MainTxt
+    if rooms.current is None:
+        $ scene_runtime.text = "Сейчас рубить дрова негде."
+        $ scene_runtime.location_text = scene_runtime.text
         return
-    if not _room_has_item_by_id(CurrentRoom, item_id) and not _player_has_item_by_id(item_id):
-        $ MainTxt = "Колоть сейчас нечего. Сначала нужно принести бревен из леса."
-        $ CurLocDesc = MainTxt
+    if not _room_has_item_by_id(rooms.current, item_id) and player.item_count(item_id) <= 0:
+        $ scene_runtime.text = "Колоть сейчас нечего. Сначала нужно принести бревен из леса."
+        $ scene_runtime.location_text = scene_runtime.text
         return
     $ _chop_picture = "images/tavern/backyard/backyard_chop_woods.png"
     if renpy.loadable(_chop_picture):
-        $ scene_image = _chop_picture
-        $ _layout_last_picture = _chop_picture
+        $ scene_runtime.picture = _chop_picture
         call ShowImage("", "", _chop_picture)
     python:
-        _used_room_item = _room_has_item_by_id(CurrentRoom, item_id)
+        _used_room_item = _room_has_item_by_id(rooms.current, item_id)
         if _used_room_item:
-            _room_remove_item_by_id(CurrentRoom, item_id)
+            _room_remove_item_by_id(rooms.current, item_id)
         else:
             player.remove_item(item_id)
-        _room_add_item_units(CurrentRoom, "chopped_wood_001", 10)
-        _chopped_item = get_game_item("chopped_wood_001", CurrentRoom)
-        _chopped_total = _room_item_count_by_id(CurrentRoom, "chopped_wood_001")
+        _room_add_item_units(rooms.current, "chopped_wood_001", 10)
+        _chopped_item = get_game_item("chopped_wood_001", rooms.current)
+        _chopped_total = _room_item_count_by_id(rooms.current, "chopped_wood_001")
         try:
             _pc_register_chore_success("chop_wood")
         except (AttributeError, NameError, TypeError, ValueError):
             pass
         calendar_v2.advance_minutes(60)
         update_stat_state()
-        fun = _player_clamp(fun + 5, 0, 100)
-        energy = _player_clamp(energy - 20, 0, 100)
-        exploration = max(0, int(exploration or 0) + 15)
-        ShedNoticeText = "Вы ставите бревно на колоду и рубите его на поленья. Из одного бревна выходит 10 охапок дров. В сарае теперь есть {}. Всего: {} охапок.".format(str(_chopped_item.name).strip(), _chopped_total)
-        ShedNoticePending = True
+        player.change_stat("fun", 5)
+        player.change_stat("energy", -20)
+        player.change_stat("exploration", 15)
+        rooms.get("Shed").state["notice_text"] = "Вы ставите бревно на колоду и рубите его на поленья. Из одного бревна выходит 10 охапок дров. В сарае теперь есть {}. Всего: {} охапок.".format(str(_chopped_item.name).strip(), _chopped_total)
+        rooms.get("Shed").state["notice_pending"] = True
     if _current_room_code == "Shed":
-        $ MainTxt = build_shed_description(True, "")
-        call ShedRoomActions
+        $ scene_runtime.text = build_shed_description(True, "")
+        $ main_ui_runtime.action_items = build_shed_action_items()
     else:
-        $ MainTxt = str(ShedNoticeText or "")
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = str(rooms.get("Shed").state.get("notice_text", "") or "")
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
     $ renpy.restart_interaction()
     return

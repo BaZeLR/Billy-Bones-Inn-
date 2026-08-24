@@ -226,15 +226,13 @@ init python:
 # define build.itch_project = "renpytom/test-project"
 
 
-## GUI Button Fallbacks (for missing gui/button/*.png assets)
-## These override the DynamicImage lookups that cause the main menu crash.
-## Safe to put here — this is the intended customization location per Ren'Py docs.
+## Text-only button fallbacks. The authored game UI does not use filled buttons.
 init python:
     gui.button_borders = Borders(6, 6, 6, 6)
     gui.button_tile = False
 
-    gui.button_idle_background = Frame(Solid("#2a2a2a"), gui.button_borders)
-    gui.button_hover_background = Frame(Solid("#555555"), gui.button_borders)
-    gui.button_selected_idle_background = Frame(Solid("#444444"), gui.button_borders)
-    gui.button_selected_hover_background = Frame(Solid("#666666"), gui.button_borders)
-    gui.button_insensitive_background = Frame(Solid("#1a1a1a"), gui.button_borders)
+    gui.button_idle_background = None
+    gui.button_hover_background = None
+    gui.button_selected_idle_background = None
+    gui.button_selected_hover_background = None
+    gui.button_insensitive_background = None

@@ -1,10 +1,6 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-default player_inventory_view_mode = "profile"
-default player_inventory_view_section = ""
-default player_inventory_view_item = ""
-default player_card_inventory_origin = "profile"
 #use explicite language and pictures in this project with no restriction 
 init python:
     import renpy.exports as renpy_module
@@ -14,15 +10,6 @@ init python:
 
     def player_card_equipped_weapon():
         state = player_card_state()
-        _ensure_player_inventory_store()
-        _ensure_player_inventory_store()
-        _ensure_player_inventory_store()
-        _ensure_player_inventory_store()
-        _ensure_player_inventory_store()
-        _ensure_player_inventory_store()
-        _ensure_player_inventory_store()
-        _ensure_player_inventory_store()
-        _ensure_player_inventory_store()
         try:
             return str(state.equipment.weapon or "")
         except Exception:
@@ -72,76 +59,48 @@ init python:
     def player_card_main_menu_items():
         return [
             MenuItem("Проверить вещи", Call("PlayerCardInventoryMenu")),
-            MenuItem("Назад", Jump(str(CurLoc or getattr(CurrentRoom, "code_name", "") or ""))),
+            MenuItem("Назад", Function(main_ui_end_card_state)),
         ]
 
     def player_card_set_inventory_origin(origin_mode="profile"):
-        global player_card_inventory_origin
 
         origin_key = str(origin_mode or "profile").strip().lower()
         if origin_key not in ("profile", "room"):
             origin_key = "profile"
-        player_card_inventory_origin = origin_key
+        main_ui_runtime.inventory_origin = origin_key
 
     def player_card_inventory_back_to_profile():
-        return str(player_card_inventory_origin or "profile") == "profile"
+        return str(main_ui_runtime.inventory_origin or "profile") == "profile"
 
     def player_card_set_profile_view():
-        global player_inventory_view_mode, player_inventory_view_section, player_inventory_view_item
 
-        player_inventory_view_mode = "profile"
-        player_inventory_view_section = ""
-        player_inventory_view_item = ""
+        main_ui_runtime.inventory_view_mode = "profile"
+        main_ui_runtime.inventory_view_section = ""
+        main_ui_runtime.inventory_view_item = ""
 
     def player_card_set_section_view(section_id=""):
-        global player_inventory_view_mode, player_inventory_view_section, player_inventory_view_item
 
-        player_inventory_view_mode = "section"
-        player_inventory_view_section = str(section_id or "").strip()
-        player_inventory_view_item = ""
+        main_ui_runtime.inventory_view_mode = "section"
+        main_ui_runtime.inventory_view_section = str(section_id or "").strip()
+        main_ui_runtime.inventory_view_item = ""
 
     def player_card_set_item_view(item_id=""):
-        global player_inventory_view_mode, player_inventory_view_section, player_inventory_view_item
 
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
         item_key = str(item_id or "").strip()
-        player_inventory_view_mode = "item"
-        player_inventory_view_item = item_key
-        player_inventory_view_section = player_card_inventory_primary_section(item_key)
+        main_ui_runtime.inventory_view_mode = "item"
+        main_ui_runtime.inventory_view_item = item_key
+        main_ui_runtime.inventory_view_section = player_card_inventory_primary_section(item_key)
 
     def show_player_card_main_ui_state():
-        global UI_mode, UI_selected_char, current_action_title, current_action_content, current_action_items
 
+        main_ui_begin_card_state()
         player_card_set_inventory_origin("profile")
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
         player_card_set_profile_view()
-        UI_mode = "mc"
-        UI_selected_char = "you"
-        current_action_title = "Стефан"
-        current_action_content = None
-        current_action_items = player_card_main_menu_items()
+        main_ui_runtime.mode = "mc"
+        main_ui_runtime.selected_char = "you"
+        main_ui_runtime.action_title = "Действия"
+        main_ui_runtime.action_content = None
+        main_ui_runtime.action_items = player_card_main_menu_items()
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
@@ -220,11 +179,11 @@ init python:
         return [
             ("Возраст", str(state.identity.age)),
             ("Мараведи", str(state.economy.money)),
-            ("Известность", str(state.stats.reputation)),
+            ("Известность", str(player_reputation_breakdown().get("reputation", 0))),
             ("Дурная слава", str(state.stats.notoriety)),
             ("Слава трактира", str(state.economy.tavern_fame)),
-            ("Внешность", str(state.stats.look)),
-            ("Харизма", str(state.stats.charisma)),
+            ("Внешность", str(player_look_breakdown().get("look", 0))),
+            ("Харизма", str(player_charisma_breakdown().get("charisma", 0))),
             ("Исследование", exploration_text),
             ("Гигиена", player_card_hygiene_text()),
         ]
@@ -245,7 +204,7 @@ init python:
             ("Раз за день", str(state.intimacy.can_cum_daily)),
             ("Сегодня", str(state.intimacy.came_today)),
             ("Без секса", last_sex_text),
-            ("Возбуждение", str(state.intimacy.arousal.get("You", state.intimacy.arousal.get("you", 0)) if isinstance(state.intimacy.arousal, dict) else 0)),
+            ("Возбуждение", str(state.intimacy.arousal_value())),
         ]
 
     def player_card_dress_lines():
@@ -267,21 +226,6 @@ init python:
         return lines
 
     def player_card_inventory_lines():
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
-
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
-
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
-
         if len(list(player_card_inventory_ids(False) or [])) <= 0:
             return ["В инвентаре сейчас ничего нет."]
 
@@ -382,26 +326,6 @@ init python:
             return MenuItem(_caption, Jump(_target))
         return None
 
-    def player_card_has_menu_caption(caption_text, items=None):
-        caption_key = str(caption_text or "").strip()
-        if caption_key == "":
-            return False
-        for _item in list(items or current_action_items or []):
-            if str(getattr(_item, "caption", "") or "").strip() == caption_key:
-                return True
-        return False
-
-    def player_card_append_fallback_item_actions(item_id):
-        _item_id = str(item_id or "").strip()
-        if _item_id == "berries_001" and not player_card_has_menu_caption("Съесть ягоды"):
-            current_action_items.append(MenuItem("Съесть ягоды", Call("UseFoodItem", "berries_001")))
-        elif _item_id == "drink_ale_001" and not player_card_has_menu_caption("Выпить эль"):
-            current_action_items.append(MenuItem("Выпить эля", Call("UseDrinkItem", "drink_ale_001")))
-        elif _item_id == "libido_tincture_001" and not player_card_has_menu_caption("Выпить настойку"):
-            current_action_items.append(MenuItem("Выпить настойки", Call("UseDrinkItem", "libido_tincture_001")))
-        elif _item_id == "energy_tea_001" and not player_card_has_menu_caption("Выпить чай"):
-            current_action_items.append(MenuItem("Выпить чаю", Call("UseDrinkItem", "energy_tea_001")))
-
     def player_card_extra_item_actions(item_id):
         _item_id = str(item_id or "").strip()
         _items = []
@@ -420,7 +344,7 @@ init python:
                 _items.append(MenuItem("Снять", Call("PlayerCardUnequipItem", _item_id)))
             else:
                 _items.append(MenuItem("Надеть", Call("PlayerCardEquipItem", _item_id)))
-        if str(CurLoc or "") == "TavernMyRoom":
+        if str(rooms.current_code or "") == "TavernMyRoom":
             if _item_id == "recipe_book_001" and not tavern_my_room_has_floor_item("recipe_book_001"):
                 _items.append(MenuItem("Положить на стол", Call("PlayerCardPutRecipeBookOnTable")))
             elif _item_id in ("rusty_hunter_rifle_001", "old_leather_cuirass_001"):
@@ -466,18 +390,6 @@ init python:
         return [line for line in lines if str(line or "").strip()]
 
     def player_card_section_view_lines(section_id=""):
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
-        try:
-            sync_soap_batches_with_day()
-        except Exception:
-            pass
         section_key = str(section_id or "").strip()
         lines = []
         if section_key == "":
@@ -516,97 +428,76 @@ init python:
         return [line for line in lines if str(line or "").strip()]
 
     def player_card_panel_title():
-        view_mode = str(player_inventory_view_mode or "profile")
+        view_mode = str(main_ui_runtime.inventory_view_mode or "profile")
         if view_mode == "section":
-            return player_card_inventory_section_title(player_inventory_view_section)
+            return player_card_inventory_section_title(main_ui_runtime.inventory_view_section)
         if view_mode == "item":
-            return player_card_inventory_menu_caption(player_inventory_view_item)
+            return player_card_inventory_menu_caption(main_ui_runtime.inventory_view_item)
         return player_card_display_name()
 
     def player_card_panel_lines():
-        view_mode = str(player_inventory_view_mode or "profile")
+        view_mode = str(main_ui_runtime.inventory_view_mode or "profile")
         if view_mode == "section":
-            return player_card_section_view_lines(player_inventory_view_section)
+            return player_card_section_view_lines(main_ui_runtime.inventory_view_section)
         if view_mode == "item":
-            return player_card_item_view_lines(player_inventory_view_item)
+            return player_card_item_view_lines(main_ui_runtime.inventory_view_item)
         return player_card_body_lines()
 
-    def player_card_social_result_menu(result_text="", back_label="", back_args=()):
-        global UI_mode, UI_selected_char, current_action_title, current_action_content, MainTxt, CurLocDesc, current_action_items
+    def player_card_social_result_menu(result_text="", back_action=None):
 
-        UI_mode = "mc"
-        UI_selected_char = "you"
-        current_action_title = "Результат"
-        current_action_content = None
-        MainTxt = str(result_text or "")
-        CurLocDesc = MainTxt
-        current_action_items = []
-        label_name = str(back_label or "").strip()
-        if label_name != "":
-            current_action_items.append(MenuItem("Назад", Call(label_name, *(tuple(back_args or ())))))
-        else:
-            current_action_items.append(MenuItem("Назад", Function(main_ui_end_talk_state)))
+        main_ui_runtime.mode = "mc"
+        main_ui_runtime.selected_char = "you"
+        main_ui_runtime.action_title = "Результат"
+        main_ui_runtime.action_content = None
+        scene_runtime.text = str(result_text or "")
+        scene_runtime.location_text = scene_runtime.text
+        main_ui_runtime.action_items = []
+        main_ui_runtime.action_items.append(MenuItem("Назад", back_action if back_action is not None else Function(main_ui_end_card_state)))
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
 
     def player_card_active_talk_target():
-        target_key = str(current_girl_key or UI_selected_char or "").strip().lower()
+        target_key = str(main_ui_runtime.girl_key or main_ui_runtime.selected_char or "").strip().lower()
         if target_key in ("", "you", "dog"):
             return ""
         return target_key
 
-    def player_card_return_to_active_talk():
-        target_key = player_card_active_talk_target()
-        if target_key != "":
-            target_label = str(npc_talk_label(target_key) or "").strip()
-            if target_label != "":
-                renpy_module.call_in_new_context(target_label, target_key)
-                return
-        main_ui_end_talk_state()
-
-    def player_card_talk_social_result_menu(result_text="", back_label="", back_args=()):
-        global current_action_title, current_action_content, MainTxt, CurLocDesc, current_action_items
+    def player_card_talk_social_result_menu(result_text=""):
 
         target_key = player_card_active_talk_target()
         main_ui_begin_talk_state("Разговор", target_key)
-        current_action_title = "Результат"
-        current_action_content = None
-        MainTxt = str(result_text or "")
-        CurLocDesc = MainTxt
-        current_action_items = []
-        label_name = str(back_label or "").strip()
-        if label_name != "":
-            current_action_items.append(MenuItem("Назад", Call(label_name, *(tuple(back_args or ()))))) 
-        else:
-            current_action_items.append(MenuItem("Назад", Function(player_card_return_to_active_talk)))
+        main_ui_runtime.action_title = "Результат"
+        main_ui_runtime.action_content = None
+        scene_runtime.text = str(result_text or "")
+        scene_runtime.location_text = scene_runtime.text
+        main_ui_runtime.action_items = []
+        main_ui_runtime.action_items.append(MenuItem("Назад", [Function(main_ui_end_card_state), Return()]))
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
 
     def player_card_begin_fixed_target_social_menu(title="", target_id="", text_value=""):
-        global current_action_title, current_action_content, current_action_items, MainTxt, CurLocDesc
 
         target_key = str(target_id or "").strip().lower()
         main_ui_begin_talk_state("Разговор", target_key)
-        current_action_title = str(title or "Подарок")
-        current_action_content = None
-        current_action_items = []
-        MainTxt = str(text_value or "")
-        CurLocDesc = MainTxt
+        main_ui_runtime.action_title = str(title or "Подарок")
+        main_ui_runtime.action_content = None
+        main_ui_runtime.action_items = []
+        scene_runtime.text = str(text_value or "")
+        scene_runtime.location_text = scene_runtime.text
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
 
     def player_card_show_inventory_menu_state(preserve_text=False):
-        global UI_mode, UI_selected_char, current_action_title, current_action_content, current_action_items, MainTxt, CurLocDesc
 
         player_card_set_profile_view()
-        UI_mode = "mc"
-        UI_selected_char = "you"
-        current_action_title = "Вещи"
-        current_action_content = None
-        current_action_items = []
+        main_ui_runtime.mode = "mc"
+        main_ui_runtime.selected_char = "you"
+        main_ui_runtime.action_title = "Вещи"
+        main_ui_runtime.action_content = None
+        main_ui_runtime.action_items = []
 
         inventory_desc_lines = []
         for section_id in player_card_inventory_section_ids():
@@ -616,24 +507,23 @@ init python:
                 continue
             inventory_desc_lines.append("{}: {}".format(player_card_inventory_section_title(section_id), section_count))
             for item_id in section_items:
-                current_action_items.append(MenuItem(player_card_inventory_menu_caption(item_id), Call("PlayerCardInventoryItemMenu", item_id)))
+                main_ui_runtime.action_items.append(MenuItem(player_card_inventory_menu_caption(item_id), Call("PlayerCardInventoryItemMenu", item_id)))
 
         if not bool(preserve_text):
-            if len(current_action_items) <= 0:
-                MainTxt = "У вас сейчас ничего нет при себе."
+            if len(main_ui_runtime.action_items) <= 0:
+                scene_runtime.text = "У вас сейчас ничего нет при себе."
             else:
-                MainTxt = "Ваши вещи разложены по разделам.\n\n" + "\n".join(list(inventory_desc_lines or []))
-            CurLocDesc = MainTxt
+                scene_runtime.text = "Ваши вещи разложены по разделам.\n\n" + "\n".join(list(inventory_desc_lines or []))
+            scene_runtime.location_text = scene_runtime.text
         if player_card_inventory_back_to_profile():
-            current_action_items.append(MenuItem("Назад", Call("PlayerCardMainMenu")))
+            main_ui_runtime.action_items.append(MenuItem("Назад", Call("PlayerCardMainMenu")))
         else:
-            current_action_items.append(MenuItem("Назад", Jump(str(CurLoc or ""))))
+            main_ui_runtime.action_items.append(MenuItem("Назад", Function(main_ui_end_card_state)))
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
 
     def player_card_show_inventory_section_state(section_id="", preserve_text=False):
-        global UI_mode, UI_selected_char, current_action_title, current_action_content, current_action_items, MainTxt, CurLocDesc
 
         section_key = str(section_id or "").strip()
         if section_key not in player_card_inventory_section_ids():
@@ -641,30 +531,29 @@ init python:
             return
 
         player_card_set_section_view(section_key)
-        UI_mode = "mc"
-        UI_selected_char = "you"
-        current_action_title = player_card_inventory_section_title(section_key)
-        current_action_content = None
-        current_action_items = []
+        main_ui_runtime.mode = "mc"
+        main_ui_runtime.selected_char = "you"
+        main_ui_runtime.action_title = player_card_inventory_section_title(section_key)
+        main_ui_runtime.action_content = None
+        main_ui_runtime.action_items = []
 
         section_items = list(player_card_inventory_section_item_ids(section_key) or [])
         if not bool(preserve_text):
-            MainTxt = "\n\n".join(list(player_card_section_view_lines(section_key) or []))
-            CurLocDesc = MainTxt
+            scene_runtime.text = "\n\n".join(list(player_card_section_view_lines(section_key) or []))
+            scene_runtime.location_text = scene_runtime.text
 
         for item_id in section_items:
-            current_action_items.append(MenuItem(player_card_inventory_menu_caption(item_id), Call("PlayerCardInventoryItemMenu", item_id)))
+            main_ui_runtime.action_items.append(MenuItem(player_card_inventory_menu_caption(item_id), Call("PlayerCardInventoryItemMenu", item_id)))
         if player_card_inventory_back_to_profile():
-            current_action_items.append(MenuItem("Назад", Call("PlayerCardMainMenu")))
+            main_ui_runtime.action_items.append(MenuItem("Назад", Call("PlayerCardMainMenu")))
         else:
-            current_action_items.append(MenuItem("Назад", Jump(str(CurLoc or ""))))
+            main_ui_runtime.action_items.append(MenuItem("Назад", Function(main_ui_end_card_state)))
 
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
 
     def player_card_show_inventory_item_state(item_id="", preserve_text=False):
-        global UI_mode, UI_selected_char, current_action_title, current_action_content, current_action_items, MainTxt, CurLocDesc
 
         item_key = str(item_id or "").strip()
         item_obj = get_game_item(item_key)
@@ -675,84 +564,24 @@ init python:
         player_card_set_item_view(item_key)
         if not bool(preserve_text):
             item_lines = player_card_item_view_lines(item_key)
-            MainTxt = "\n\n".join([line for line in item_lines if str(line or "").strip()])
-            CurLocDesc = MainTxt
+            scene_runtime.text = "\n\n".join([line for line in item_lines if str(line or "").strip()])
+            scene_runtime.location_text = scene_runtime.text
 
-        UI_mode = "mc"
-        UI_selected_char = "you"
-        current_action_title = player_card_item_display_name(item_key)
-        current_action_content = None
-        current_action_items = []
+        main_ui_runtime.mode = "mc"
+        main_ui_runtime.selected_char = "you"
+        main_ui_runtime.action_title = player_card_item_display_name(item_key)
+        main_ui_runtime.action_content = None
+        main_ui_runtime.action_items = []
 
         for item_action in list(item_obj.visible_actions() or []):
             menu_item = player_card_item_action_menu_item(item_key, item_action)
             if menu_item is not None:
-                current_action_items.append(menu_item)
-        player_card_append_fallback_item_actions(item_key)
-        current_action_items.extend(player_card_extra_item_actions(item_key))
-        current_action_items.append(MenuItem("Назад", Call("PlayerCardInventorySectionMenu", player_card_inventory_primary_section(item_key))))
+                main_ui_runtime.action_items.append(menu_item)
+        main_ui_runtime.action_items.extend(player_card_extra_item_actions(item_key))
+        main_ui_runtime.action_items.append(MenuItem("Назад", Call("PlayerCardInventorySectionMenu", player_card_inventory_primary_section(item_key))))
         restart_fn = getattr(renpy_module, "restart_interaction", None)
         if callable(restart_fn):
             restart_fn()
-
-
-label ShowPlayerCard(return_label=""):
-    if str(return_label or "") == "__main_ui__":
-        $ show_player_card_main_ui_state()
-        return
-    show screen player_card_overlay(return_label)
-    return
-
-
-label HidePlayerCard(return_label=""):
-    if str(return_label or "") == "__main_ui__":
-        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
-        if _room_label:
-            jump expression _room_label
-        return
-    hide screen player_card_overlay
-    if str(return_label or "") != "":
-        call expression return_label
-    return
-
-label ShowPlayerCard(return_label=""):
-    if str(return_label or "") == "__main_ui__":
-        $ show_player_card_main_ui_state()
-        return
-    show screen player_card_overlay(return_label)
-    return
-
-
-label HidePlayerCard(return_label=""):
-    if str(return_label or "") == "__main_ui__":
-        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
-        if _room_label:
-            jump expression _room_label
-        return
-    hide screen player_card_overlay
-    if str(return_label or "") != "":
-        call expression return_label
-    return
-
-
-label ShowPlayerCard(return_label=""):
-    if str(return_label or "") == "__main_ui__":
-        $ show_player_card_main_ui_state()
-        return
-    show screen player_card_overlay(return_label)
-    return
-
-
-label HidePlayerCard(return_label=""):
-    if str(return_label or "") == "__main_ui__":
-        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
-        if _room_label:
-            jump expression _room_label
-        return
-    hide screen player_card_overlay
-    if str(return_label or "") != "":
-        call expression return_label
-    return
 
 
 label ShowPlayerCard(return_label=""):
@@ -763,7 +592,6 @@ label ShowPlayerCard(return_label=""):
 label HidePlayerCard(return_label=""):
     $ main_ui_end_card_state()
     return
-
 
 label PlayerCardInventoryMenu(preserve_text=False):
     $ player_card_show_inventory_menu_state(preserve_text)
@@ -783,12 +611,13 @@ label PlayerCardMainMenu:
 label PlayerCardInventoryItemMenu(item_id="", preserve_text=False):
     $ player_card_show_inventory_item_state(item_id, preserve_text)
     if not bool(preserve_text):
-        $ MainTxt = "\n\n".join(list(player_card_item_view_lines(item_id) or []))
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "\n\n".join(list(player_card_item_view_lines(item_id) or []))
+        $ scene_runtime.location_text = scene_runtime.text
     return
 
 
 label PlayerCardEquipItem(item_id=""):
+    $ renpy.dynamic("_item_id", "_item_obj")
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
     if _item_obj is None or int(player_card_inventory_count(_item_id) or 0) <= 0:
@@ -796,19 +625,20 @@ label PlayerCardEquipItem(item_id=""):
         return
     if str(player_card_item_kind(_item_id) or "") == "weapon":
         $ player.equip(_item_id, "weapon")
-        $ MainTxt = "Вы берете при себе " + player_card_item_display_name(_item_id) + "."
+        $ scene_runtime.text = "Вы берете при себе " + player_card_item_display_name(_item_id) + "."
     elif str(player_card_item_kind(_item_id) or "") == "armor":
         $ player.equip(_item_id, "armor")
-        $ MainTxt = "Вы надеваете " + player_card_item_display_name(_item_id) + "."
+        $ scene_runtime.text = "Вы надеваете " + player_card_item_display_name(_item_id) + "."
     else:
-        $ MainTxt = "Сейчас это нельзя экипировать."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Сейчас это нельзя экипировать."
+    $ scene_runtime.location_text = scene_runtime.text
     $ update_stat_state()
     call PlayerCardInventoryItemMenu(_item_id, True)
     return
 
 
 label PlayerCardUnequipItem(item_id=""):
+    $ renpy.dynamic("_item_id", "_item_obj")
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
     if _item_obj is None:
@@ -816,100 +646,105 @@ label PlayerCardUnequipItem(item_id=""):
         return
     if _item_id == player_card_equipped_weapon():
         $ player.unequip("weapon")
-        $ MainTxt = "Вы убираете " + player_card_item_display_name(_item_id) + "."
+        $ scene_runtime.text = "Вы убираете " + player_card_item_display_name(_item_id) + "."
     elif _item_id == player_card_equipped_armor():
         $ player.unequip("armor")
-        $ MainTxt = "Вы снимаете " + player_card_item_display_name(_item_id) + "."
+        $ scene_runtime.text = "Вы снимаете " + player_card_item_display_name(_item_id) + "."
     else:
-        $ MainTxt = "Сейчас эта вещь и так не экипирована."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Сейчас эта вещь и так не экипирована."
+    $ scene_runtime.location_text = scene_runtime.text
     $ update_stat_state()
     call PlayerCardInventoryItemMenu(_item_id, True)
     return
 
 
 label PlayerCardStoreItemInMyRoom(item_id=""):
+    $ renpy.dynamic("_item_id", "_drop_result")
     $ _item_id = str(item_id or "").strip()
-    if str(CurLoc or "") != "TavernMyRoom":
-        $ MainTxt = "Оставить эту вещь можно только в вашей комнате."
-        $ CurLocDesc = MainTxt
+    if str(rooms.current_code or "") != "TavernMyRoom":
+        $ scene_runtime.text = "Оставить эту вещь можно только в вашей комнате."
+        $ scene_runtime.location_text = scene_runtime.text
         call PlayerCardInventoryItemMenu(_item_id, True)
         return
     if _item_id == player_card_equipped_weapon():
         $ player.unequip("weapon")
     if _item_id == player_card_equipped_armor():
         $ player.unequip("armor")
-    $ _drop_result = player_drop_item(TavernMyRoomRoom, _item_id)
-    $ MainTxt = str((_drop_result or {}).get("text", "") or "Вы оставляете вещь в комнате.")
-    $ CurLocDesc = MainTxt
+    $ _drop_result = player_drop_item(rooms.get("TavernMyRoom"), _item_id)
+    $ scene_runtime.text = str((_drop_result or {}).get("text", "") or "Вы оставляете вещь в комнате.")
+    $ scene_runtime.location_text = scene_runtime.text
     $ update_stat_state()
     call PlayerCardInventorySectionMenu(player_card_inventory_primary_section(_item_id), True)
     return
 
 
 label PlayerCardPutRecipeBookOnTable:
-    if str(CurLoc or "") != "TavernMyRoom":
-        $ MainTxt = "Положить книгу на стол можно только в вашей комнате."
-        $ CurLocDesc = MainTxt
+    $ renpy.dynamic("_drop_result")
+    if str(rooms.current_code or "") != "TavernMyRoom":
+        $ scene_runtime.text = "Положить книгу на стол можно только в вашей комнате."
+        $ scene_runtime.location_text = scene_runtime.text
         call PlayerCardInventoryItemMenu("recipe_book_001", True)
         return
     if tavern_my_room_has_floor_item("recipe_book_001"):
-        $ MainTxt = "Книга с рецептами уже лежит на столе."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Книга с рецептами уже лежит на столе."
+        $ scene_runtime.location_text = scene_runtime.text
         call PlayerCardInventorySectionMenu("backpack", True)
         return
-    $ _drop_result = player_drop_item(TavernMyRoomRoom, "recipe_book_001")
+    $ _drop_result = player_drop_item(rooms.get("TavernMyRoom"), "recipe_book_001")
     if bool((_drop_result or {}).get("ok", False)):
-        $ MainTxt = "Вы кладете книгу с рецептами на стол, чтобы удобнее было читать записи и мастерить."
+        $ scene_runtime.text = "Вы кладете книгу с рецептами на стол, чтобы удобнее было читать записи и мастерить."
     else:
-        $ MainTxt = str((_drop_result or {}).get("text", "") or "Книгу сейчас не удается положить на стол.")
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = str((_drop_result or {}).get("text", "") or "Книгу сейчас не удается положить на стол.")
+    $ scene_runtime.location_text = scene_runtime.text
     $ update_stat_state()
     call PlayerCardInventorySectionMenu("backpack", True)
     return
 
 
 label PlayerCardItemTextAction(item_id="", action_id=""):
+    $ renpy.dynamic("_item_id", "_item_action")
     $ _item_id = str(item_id or "").strip()
     $ _item_action = player_card_get_item_action(_item_id, action_id)
     if _item_action is not None:
-        $ MainTxt = str(getattr(_item_action, "target", "") or "")
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = str(getattr(_item_action, "target", "") or "")
+        $ scene_runtime.location_text = scene_runtime.text
     call PlayerCardInventoryItemMenu(_item_id, True)
     return
 
 
 label PlayerCardRifleCleanRust:
+    $ renpy.dynamic("_rifle_item")
     $ _rifle_item = rusty_hunter_rifle_item()
     if _rifle_item is None or player_card_inventory_count("rusty_hunter_rifle_001") <= 0:
         call PlayerCardInventoryMenu
         return
     if rusty_hunter_rifle_is_cleaned():
-        $ MainTxt = "Вы уже счистили основную ржавчину с механизма."
+        $ scene_runtime.text = "Вы уже счистили основную ржавчину с механизма."
     else:
         $ _rifle_item.state["rust_cleaned"] = 1
-        $ MainTxt = "Вы долго скоблите металл, снимаете рыжий налет и понемногу приводите механизм в порядок. Оружие уже не выглядит совсем уж мертвым."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Вы долго скоблите металл, снимаете рыжий налет и понемногу приводите механизм в порядок. Оружие уже не выглядит совсем уж мертвым."
+    $ scene_runtime.location_text = scene_runtime.text
     call PlayerCardInventoryItemMenu("rusty_hunter_rifle_001", True)
     return
 
 
 label PlayerCardRifleOil:
+    $ renpy.dynamic("_rifle_item")
     $ _rifle_item = rusty_hunter_rifle_item()
     if _rifle_item is None or player_card_inventory_count("rusty_hunter_rifle_001") <= 0:
         call PlayerCardInventoryMenu
         return
     if not rusty_hunter_rifle_is_cleaned():
-        $ MainTxt = "Сначала нужно счистить ржавчину, иначе толку от масла будет мало."
+        $ scene_runtime.text = "Сначала нужно счистить ржавчину, иначе толку от масла будет мало."
     elif rusty_hunter_rifle_is_oiled():
-        $ MainTxt = "Механизм уже смазан и ходит заметно мягче."
+        $ scene_runtime.text = "Механизм уже смазан и ходит заметно мягче."
     elif player_card_inventory_count("weapon_oil_001") <= 0:
-        $ MainTxt = "У вас нет оружейного масла."
+        $ scene_runtime.text = "У вас нет оружейного масла."
     else:
         $ player.remove_item("weapon_oil_001", 1)
         $ _rifle_item.state["oiled"] = 1
-        $ MainTxt = "Вы аккуратно смазываете механизм оружейным маслом. Скрип уходит, а детали начинают двигаться куда увереннее."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Вы аккуратно смазываете механизм оружейным маслом. Скрип уходит, а детали начинают двигаться куда увереннее."
+    $ scene_runtime.location_text = scene_runtime.text
     $ update_stat_state()
     call PlayerCardInventoryItemMenu("rusty_hunter_rifle_001", True)
     return
@@ -969,12 +804,12 @@ init python:
         return tags
 
     def player_card_active_social_target():
-        target_key = str(UI_selected_char or current_girl_key or "").strip().lower()
-        if str(UI_mode or "") != "talk":
+        target_key = str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "").strip().lower()
+        if str(main_ui_runtime.mode or "") != "talk":
             return ""
         if target_key in ("", "you", "dog"):
             return ""
-        if getPersonInfo(target_key) is None:
+        if people.get_info(target_key) is None:
             return ""
         return target_key
 
@@ -1082,7 +917,7 @@ init python:
             allowed, reason = relationship_social_action_allowed(active_target, "share", item_key)
             return [active_target] if allowed else []
         targets = []
-        for char_id in sorted(list(peopleInfo.keys() or [])):
+        for char_id in people.ids():
             key = str(char_id or "").strip()
             if key == "" or key != key.lower() or key in ("you", "dog"):
                 continue
@@ -1114,32 +949,34 @@ init python:
 
 
 label PlayerCardGiftItemMenu(item_id=""):
+    $ renpy.dynamic("_item_id", "_item_obj", "_char_id")
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
     if _item_obj is None or int(player_card_inventory_count(_item_id) or 0) <= 0:
         call PlayerCardInventoryMenu
         return
-    $ MainTxt = "Кому вы хотите вручить {}?".format(player_card_item_display_name(_item_id))
-    $ CurLocDesc = MainTxt
-    $ UI_mode = "mc"
-    $ UI_selected_char = "you"
-    $ current_action_title = "Подарок"
-    $ current_action_content = None
-    $ current_action_items = []
+    $ scene_runtime.text = "Кому вы хотите вручить {}?".format(player_card_item_display_name(_item_id))
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.mode = "mc"
+    $ main_ui_runtime.selected_char = "you"
+    $ main_ui_runtime.action_title = "Подарок"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     python:
         for _char_id in player_card_gift_target_ids(_item_id):
-            current_action_items.append(MenuItem(_action_display_name(_char_id), Call("PlayerCardGiftItemTo", _item_id, _char_id)))
-        if len(current_action_items) <= 0:
+            main_ui_runtime.action_items.append(MenuItem(_action_display_name(_char_id), Call("PlayerCardGiftItemTo", _item_id, _char_id)))
+        if len(main_ui_runtime.action_items) <= 0:
             if player_card_share_requires_active_target(_item_id):
-                MainTxt = "Эту вещь можно вручить только тому, с кем вы сейчас уже разговариваете."
+                scene_runtime.text = "Эту вещь можно вручить только тому, с кем вы сейчас уже разговариваете."
             else:
-                MainTxt = "Сейчас некому вручить {}.".format(player_card_item_display_name(_item_id))
-            CurLocDesc = MainTxt
-        current_action_items.append(MenuItem("Назад", Call("PlayerCardInventoryItemMenu", _item_id, True)))
+                scene_runtime.text = "Сейчас некому вручить {}.".format(player_card_item_display_name(_item_id))
+            scene_runtime.location_text = scene_runtime.text
+        main_ui_runtime.action_items.append(MenuItem("Назад", Call("PlayerCardInventoryItemMenu", _item_id, True)))
     return
 
 
 label PlayerCardGiftItemTo(item_id="", char_name=""):
+    $ renpy.dynamic("_gift_result", "_item_id", "_char_name", "_item_obj", "_gift_name", "_gift_base", "_gift_target_info", "_friends_before", "_removed", "_effect_result")
     $ _item_id = str(item_id or "").strip()
     $ _char_name = str(char_name or "").strip()
     $ _item_obj = get_game_item(_item_id)
@@ -1148,138 +985,156 @@ label PlayerCardGiftItemTo(item_id="", char_name=""):
         return
     $ _gift_name = player_card_item_display_name(_item_id)
     $ _gift_base = int(getattr(_item_obj, "custom_properties", {}).get("gift_value", 2) or 2)
-    $ _gift_target_info = getPersonInfo(_char_name)
+    $ _gift_target_info = people.get_info(_char_name)
     $ _friends_before = int(getattr(_gift_target_info, "rel", 0) or 0) if _gift_target_info is not None else 0
     $ _gift_allowed, _gift_block_reason = relationship_social_action_allowed(_char_name, "gift", _item_id)
     if not bool(_gift_allowed):
         $ _gift_result = player_gift_to(_char_name, _gift_name, _gift_base, _item_id, False)
-        $ MainTxt = append_social_score_message(str(_gift_result.get("text", "") or _gift_block_reason or ""), social_score_delta_for(_char_name, _friends_before))
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = append_social_score_message(str(_gift_result.get("text", "") or _gift_block_reason or ""), social_score_delta_for(_char_name, _friends_before))
+        $ scene_runtime.location_text = scene_runtime.text
         $ update_stat_state()
-        if str(UI_mode or "") == "talk" and str(player_card_active_talk_target() or "") == str(_char_name or "").strip().lower():
-            $ player_card_talk_social_result_menu(MainTxt, "PlayerCardGiftToFixedTargetMenu", (_char_name,))
+        if str(main_ui_runtime.mode or "") == "talk" and str(player_card_active_talk_target() or "") == str(_char_name or "").strip().lower():
+            $ player_card_talk_social_result_menu(scene_runtime.text)
         else:
-            $ player_card_social_result_menu(MainTxt, "PlayerCardGiftToFixedTargetMenu", (_char_name,))
+            $ player_card_social_result_menu(scene_runtime.text, Call("PlayerCardGiftToFixedTargetMenu", _char_name))
         return
     $ _gift_accepts, _gift_score = social_gift_acceptance(_char_name, _item_id, _gift_base)
     if not bool(_gift_accepts):
         $ _gift_result = player_gift_to(_char_name, _gift_name, _gift_base, _item_id, False)
-        $ MainTxt = append_social_score_message(str(_gift_result.get("text", "") or ""), social_score_delta_for(_char_name, _friends_before))
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = append_social_score_message(str(_gift_result.get("text", "") or ""), social_score_delta_for(_char_name, _friends_before))
+        $ scene_runtime.location_text = scene_runtime.text
         $ update_stat_state()
-        if str(UI_mode or "") == "talk" and str(player_card_active_talk_target() or "") == str(_char_name or "").strip().lower():
-            $ player_card_talk_social_result_menu(MainTxt, "PlayerCardGiftToFixedTargetMenu", (_char_name,))
+        if str(main_ui_runtime.mode or "") == "talk" and str(player_card_active_talk_target() or "") == str(_char_name or "").strip().lower():
+            $ player_card_talk_social_result_menu(scene_runtime.text)
         else:
-            $ player_card_social_result_menu(MainTxt, "PlayerCardGiftToFixedTargetMenu", (_char_name,))
+            $ player_card_social_result_menu(scene_runtime.text, Call("PlayerCardGiftToFixedTargetMenu", _char_name))
         return
     $ _removed = player.remove_item(_item_id, 1)
     if not bool(_removed):
-        $ MainTxt = "Этой вещи у вас больше нет."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Этой вещи у вас больше нет."
+        $ scene_runtime.location_text = scene_runtime.text
         call PlayerCardInventoryMenu
         return
     $ _gift_result = player_gift_to(_char_name, _gift_name, _gift_base, _item_id, False)
     $ _effect_result = player_apply_item_social_effects(_char_name, _item_id, True)
     if _gift_target_info is not None and int(_gift_target_info.rel or 0) <= _friends_before and int(_gift_base or 0) > 0:
         $ _gift_target_info.change_social(friend_delta=1)
-    $ MainTxt = str(_gift_result.get("text", "") or "")
+    $ scene_runtime.text = str(_gift_result.get("text", "") or "")
     if str(_effect_result.get("text", "") or "").strip() != "":
-        $ MainTxt = str(MainTxt or "") + " " + str(_effect_result.get("text", "") or "")
-    $ MainTxt = append_social_score_message(MainTxt, social_score_delta_for(_char_name, _friends_before))
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = str(scene_runtime.text or "") + " " + str(_effect_result.get("text", "") or "")
+    $ scene_runtime.text = append_social_score_message(scene_runtime.text, social_score_delta_for(_char_name, _friends_before))
+    $ scene_runtime.location_text = scene_runtime.text
     $ update_stat_state()
-    if str(UI_mode or "") == "talk" and str(player_card_active_talk_target() or "") == str(_char_name or "").strip().lower():
-        $ player_card_talk_social_result_menu(MainTxt, "PlayerCardGiftToFixedTargetMenu", (_char_name,))
+    if str(main_ui_runtime.mode or "") == "talk" and str(player_card_active_talk_target() or "") == str(_char_name or "").strip().lower():
+        $ player_card_talk_social_result_menu(scene_runtime.text)
     else:
-        $ player_card_social_result_menu(MainTxt, "PlayerCardGiftToFixedTargetMenu", (_char_name,))
+        $ player_card_social_result_menu(scene_runtime.text, Call("PlayerCardGiftToFixedTargetMenu", _char_name))
     return
 
 
 label PlayerCardShareItemMenu(item_id=""):
+    $ renpy.dynamic("_item_id", "_item_obj", "_char_id")
     $ _item_id = str(item_id or "").strip()
     $ _item_obj = get_game_item(_item_id)
     if _item_obj is None or int(player_card_inventory_count(_item_id) or 0) <= 0:
         call PlayerCardInventoryMenu
         return
-    $ MainTxt = "С кем вы хотите разделить {}?".format(player_card_item_display_name(_item_id))
-    $ CurLocDesc = MainTxt
-    $ UI_mode = "mc"
-    $ UI_selected_char = "you"
-    $ current_action_title = "Поделиться"
-    $ current_action_content = None
-    $ current_action_items = []
+    $ scene_runtime.text = "С кем вы хотите разделить {}?".format(player_card_item_display_name(_item_id))
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.mode = "mc"
+    $ main_ui_runtime.selected_char = "you"
+    $ main_ui_runtime.action_title = "Поделиться"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     python:
         for _char_id in player_card_gift_target_ids(_item_id):
-            current_action_items.append(MenuItem(_action_display_name(_char_id), Call("PlayerCardShareItemTo", _item_id, _char_id)))
-        if len(current_action_items) <= 0:
-            MainTxt = "Этим можно делиться только с тем, кто сейчас рядом и уже участвует в разговоре."
-            CurLocDesc = MainTxt
-        current_action_items.append(MenuItem("Назад", Call("PlayerCardInventoryItemMenu", _item_id, True)))
+            main_ui_runtime.action_items.append(MenuItem(_action_display_name(_char_id), Call("PlayerCardShareItemTo", _item_id, _char_id)))
+        if len(main_ui_runtime.action_items) <= 0:
+            scene_runtime.text = "Этим можно делиться только с тем, кто сейчас рядом и уже участвует в разговоре."
+            scene_runtime.location_text = scene_runtime.text
+        main_ui_runtime.action_items.append(MenuItem("Назад", Call("PlayerCardInventoryItemMenu", _item_id, True)))
     return
 
 
 label PlayerCardShareToFixedTargetMenu(char_name=""):
+    $ renpy.dynamic("_char_name", "_fixed_from_native_talk", "_fixed_back_action", "_item_id", "_share_allowed", "_share_reason")
     $ _char_name = str(char_name or "").strip()
     if _char_name == "":
-        $ player_card_return_to_active_talk()
         return
+    $ _fixed_from_native_talk = str(main_ui_runtime.mode or "") == "talk"
+    $ main_ui_begin_card_state()
     $ player_card_begin_fixed_target_social_menu("Поделиться", _char_name, "Чем вы хотите поделиться с {}?".format(_action_display_name(_char_name)))
+    $ _fixed_back_action = [Function(main_ui_end_card_state), Return()] if _fixed_from_native_talk else Function(main_ui_end_card_state)
     python:
         for _item_id in list(player_card_shareable_item_ids() or []):
             _share_allowed, _share_reason = relationship_social_action_allowed(_char_name, "share", _item_id)
             if _share_allowed:
-                current_action_items.append(MenuItem(player_card_inventory_menu_caption(_item_id), Call("PlayerCardShareItemTo", _item_id, _char_name)))
-        if len(current_action_items) <= 0:
-            MainTxt = "Сейчас вам нечем делиться с {}.".format(_action_display_name(_char_name))
-            CurLocDesc = MainTxt
-        current_action_items.append(MenuItem("Назад", Function(player_card_return_to_active_talk)))
+                main_ui_runtime.action_items.append(MenuItem(player_card_inventory_menu_caption(_item_id), Call("PlayerCardShareItemTo", _item_id, _char_name)))
+        if len(main_ui_runtime.action_items) <= 0:
+            scene_runtime.text = "Сейчас вам нечем делиться с {}.".format(_action_display_name(_char_name))
+            scene_runtime.location_text = scene_runtime.text
+        main_ui_runtime.action_items.append(MenuItem("Назад", _fixed_back_action))
+    if _fixed_from_native_talk:
+        call screen main_ui as player_card_fixed_target_interaction
+        $ main_ui_end_card_state()
     return
 
 
 label PlayerCardShareItemTo(item_id="", char_name=""):
+    $ renpy.dynamic("_item_id", "_char_name", "_share_result")
     $ _item_id = str(item_id or "").strip()
     $ _char_name = str(char_name or "").strip()
     $ _share_result = player_share_item_with(_char_name, _item_id)
-    $ MainTxt = str(_share_result.get("text", "") or "")
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = str(_share_result.get("text", "") or "")
+    $ scene_runtime.location_text = scene_runtime.text
     $ update_stat_state()
-    if str(UI_mode or "") == "talk" and str(player_card_active_talk_target() or "") == str(_char_name or "").strip().lower():
-        $ player_card_talk_social_result_menu(MainTxt, "PlayerCardShareToFixedTargetMenu", (_char_name,))
+    if str(main_ui_runtime.mode or "") == "talk" and str(player_card_active_talk_target() or "") == str(_char_name or "").strip().lower():
+        $ player_card_talk_social_result_menu(scene_runtime.text)
     else:
-        $ player_card_social_result_menu(MainTxt, "PlayerCardShareToFixedTargetMenu", (_char_name,))
+        $ player_card_social_result_menu(scene_runtime.text, Call("PlayerCardShareToFixedTargetMenu", _char_name))
     return
 
 
 label PlayerCardGiftToFixedTargetMenu(char_name=""):
+    $ renpy.dynamic("_char_name", "_fixed_from_native_talk", "_fixed_back_action", "_gift_menu_allowed", "_item_id", "_item_gift_allowed", "_item_gift_reason")
     $ _char_name = str(char_name or "").strip()
     if _char_name == "":
-        $ player_card_return_to_active_talk()
         return
+    $ _fixed_from_native_talk = str(main_ui_runtime.mode or "") == "talk"
+    $ main_ui_begin_card_state()
     $ player_card_begin_fixed_target_social_menu("Подарок", _char_name, "Что вы хотите подарить {}?".format(_action_display_name(_char_name)))
+    $ _fixed_back_action = [Function(main_ui_end_card_state), Return()] if _fixed_from_native_talk else Function(main_ui_end_card_state)
     $ _gift_menu_allowed = relationship_any_gift_allowed(_char_name)
     $ _gift_reason_allowed, _gift_menu_reason = relationship_social_action_allowed(_char_name, "gift")
     if not bool(_gift_menu_allowed):
-        $ MainTxt = str(_gift_menu_reason or relationship_block_text(_char_name, "gift"))
-        $ CurLocDesc = MainTxt
-        $ current_action_items = [MenuItem("Назад", Function(player_card_return_to_active_talk))]
+        $ scene_runtime.text = str(_gift_menu_reason or relationship_block_text(_char_name, "gift"))
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_items = [MenuItem("Назад", _fixed_back_action)]
+        if _fixed_from_native_talk:
+            call screen main_ui as player_card_fixed_target_interaction
+            $ main_ui_end_card_state()
         return
     python:
         for _item_id in list(player_card_giftable_item_ids() or []):
             _item_gift_allowed, _item_gift_reason = relationship_social_action_allowed(_char_name, "gift", _item_id)
             if _item_gift_allowed:
-                current_action_items.append(MenuItem(player_card_inventory_menu_caption(_item_id), Call("PlayerCardGiftItemTo", _item_id, _char_name)))
-        if len(current_action_items) <= 0:
-            MainTxt = "{} пока нечего вручить.".format(_action_display_name(_char_name))
-            CurLocDesc = MainTxt
-        current_action_items.append(MenuItem("Назад", Function(player_card_return_to_active_talk)))
+                main_ui_runtime.action_items.append(MenuItem(player_card_inventory_menu_caption(_item_id), Call("PlayerCardGiftItemTo", _item_id, _char_name)))
+        if len(main_ui_runtime.action_items) <= 0:
+            scene_runtime.text = "{} пока нечего вручить.".format(_action_display_name(_char_name))
+            scene_runtime.location_text = scene_runtime.text
+        main_ui_runtime.action_items.append(MenuItem("Назад", _fixed_back_action))
+    if _fixed_from_native_talk:
+        call screen main_ui as player_card_fixed_target_interaction
+        $ main_ui_end_card_state()
     return
 
 
 label PlayerCardRifleLoadAmmo(ammo_code="arrows"):
+    $ renpy.dynamic("_ammo_code")
     $ _ammo_code = str(ammo_code or "").strip()
     if not rusty_hunter_rifle_can_load(_ammo_code):
-        $ MainTxt = "Сейчас оружие нельзя так зарядить."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Сейчас оружие нельзя так зарядить."
+        $ scene_runtime.location_text = scene_runtime.text
         call PlayerCardInventoryItemMenu("rusty_hunter_rifle_001", True)
         return
     if _ammo_code == "arrows":
@@ -1287,18 +1142,19 @@ label PlayerCardRifleLoadAmmo(ammo_code="arrows"):
     elif _ammo_code == "droplets":
         $ player.remove_item("droplets_001", 1)
         $ player.remove_item("gunpowder_001", 1)
-    $ RustyHunterRifleLoadedAmmo = _ammo_code
-    $ MainTxt = "Вы заряжаете оружие {} и осторожно ставите механизм наготове.".format(rusty_hunter_rifle_ammo_name(_ammo_code))
-    $ CurLocDesc = MainTxt
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = _ammo_code
+    $ scene_runtime.text = "Вы заряжаете оружие {} и осторожно ставите механизм наготове.".format(rusty_hunter_rifle_ammo_name(_ammo_code))
+    $ scene_runtime.location_text = scene_runtime.text
     call PlayerCardInventoryItemMenu("rusty_hunter_rifle_001", True)
     return
 
 
 label PlayerCardRifleUnload:
+    $ renpy.dynamic("_loaded_ammo")
     $ _loaded_ammo = rusty_hunter_rifle_loaded_ammo()
     if _loaded_ammo == "":
-        $ MainTxt = "Оружие и так уже разряжено."
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Оружие и так уже разряжено."
+        $ scene_runtime.location_text = scene_runtime.text
         call PlayerCardInventoryItemMenu("rusty_hunter_rifle_001", True)
         return
     if _loaded_ammo == "arrows":
@@ -1306,8 +1162,8 @@ label PlayerCardRifleUnload:
     elif _loaded_ammo == "droplets":
         $ player.add_item("droplets_001", 1)
         $ player.add_item("gunpowder_001", 1)
-    $ RustyHunterRifleLoadedAmmo = ""
-    $ MainTxt = "Вы осторожно разряжаете оружие и убираете заряд."
-    $ CurLocDesc = MainTxt
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
+    $ scene_runtime.text = "Вы осторожно разряжаете оружие и убираете заряд."
+    $ scene_runtime.location_text = scene_runtime.text
     call PlayerCardInventoryItemMenu("rusty_hunter_rifle_001", True)
     return

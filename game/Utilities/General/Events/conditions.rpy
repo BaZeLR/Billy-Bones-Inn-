@@ -1,4 +1,4 @@
-            "isOpen": isOpen,            "npc_schedule_georgett_church_visible": npc_schedule_georgett_church_visible,            "isOpen": isOpen,            "npc_schedule_georgett_church_visible": npc_schedule_georgett_church_visible,            "isOpen": isOpen,            "npc_schedule_georgett_church_visible": npc_schedule_georgett_church_visible,# ================================================================================
+# ================================================================================
 # Story event conditions runtime.
 # Conditions are readable gates used by thread/event definitions and board display.
 # ================================================================================
@@ -12,10 +12,14 @@ init -25 python:
         key = str(name or "").strip()
         if key == "":
             return default
+        scope = _story_condition_scope()
+        if key in scope:
+            return scope[key]
         try:
-            return globals()[key]
+            renpy.log("Unknown story condition name: %s" % key)
         except Exception:
-            return default
+            pass
+        return default
 
     def _story_to_int(value, default=0):
         try:
@@ -27,7 +31,7 @@ init -25 python:
                 return default
 
     def _story_num_day():
-        return _story_to_int(_story_get("dayspassed", 0), 0)
+        return _story_to_int(calendar_v2.daysInGame, 0)
 
     def _story_named_value(name, default=None):
         calendar_values = {
@@ -53,7 +57,7 @@ init -25 python:
         return value if callable(value) else None
 
     def _story_current_location():
-        return str(_story_named_value("CurLoc", _story_named_value("location", "")) or "")
+        return str(rooms.current_code or "")
 
     def _story_map_int(map_name, key, default=0):
         source = _story_named_value(map_name, {})
@@ -66,7 +70,6 @@ init -25 python:
         return {
             "Amanda": Amanda,
             "Becky": Becky,
-            "BeckyHomeFrontRoom": BeckyHomeFrontRoom,
             "Clara": Clara,
             "Draupnir": Draupnir,
             "Eddie": Eddie,
@@ -77,37 +80,27 @@ init -25 python:
             "Melissa": Melissa,
             "Mongol": Mongol,
             "Sandra": Sandra,
-            "TavernMainRoom": TavernMainRoom,
+            "people": people,
+            "rooms": rooms,
             "TownStreet": TownStreet,
             "Zimmer": Zimmer,
-            "CurLoc": CurLoc,
-            "location": CurLoc,
+            "location": rooms.current_code,
             "calendar_v2": calendar_v2,
+            "daily_events": daily_events,
             "event_runtime": event_runtime,
             "player": player,
             "threads": threads,
             "CheckIfSexEventExist": CheckIfSexEventExist,
             "DaddyAskBuildPhrase": DaddyAskBuildPhrase,
-            "amanda_birth_ready": amanda_birth_ready,
-            "amanda_dress_change_thread_ready": amanda_dress_change_thread_ready,
-            "amanda_glory_tavern_aftermath_ready": amanda_glory_tavern_aftermath_ready,
-            "amanda_gloryhole_try_ready": amanda_gloryhole_try_ready,
-            "amanda_legare_tavern_visit_ready": amanda_legare_tavern_visit_ready,
-            "amanda_liza_glory_invite_ready": amanda_liza_glory_invite_ready,
-            "amanda_liza_talk_work_ready": amanda_liza_talk_work_ready,
-            "amanda_night_after_glory_ready": amanda_night_after_glory_ready,
-            "amanda_street_legare_sighting_ready": amanda_street_legare_sighting_ready,
-            "amanda_street_lover_encounter_ready": amanda_street_lover_encounter_ready,
-            "amanda_talk_hub_ready": amanda_talk_hub_ready,
-            "amanda_tavern_seduction_ready": amanda_tavern_seduction_ready,
             "church_after_cermon_action_visible": church_after_cermon_action_visible,
             "church_service_action_visible": church_service_action_visible,
+            "current_game_day": current_game_day,
             "day_delta_ready": day_delta_ready,
-            "getLocation": getLocation,
+            "effective_player_exploration": effective_player_exploration,
             "household_runtime_event_seen_today": household_runtime_event_seen_today,
             "npc_relationship_level": npc_relationship_level,
             "people_to_int": people_to_int,
-            "tavern_amanda_bed_action_available": tavern_amanda_bed_action_available,
+            "player_charisma_breakdown": player_charisma_breakdown,
             "tavern_work_planned_for": tavern_work_planned_for,
             "werecat_state": werecat_state,
             "bool": bool,
@@ -130,7 +123,7 @@ init -25 python:
                 return _story_to_int(profile.get("phase_index", 0), 0)
             except Exception:
                 pass
-        info = getPersonInfo(key)
+        info = people.get_info(key)
         friend_value = _story_to_int(getattr(info, "rel", 0), 0) if info is not None else 0
         corruption_value = _story_to_int(getattr(info, "corruption", 0), 0) if info is not None else 0
         if friend_value >= 15 and corruption_value >= 55:
@@ -152,24 +145,22 @@ init -25 python:
         person_key = str(person or "").strip().lower()
         if required_level <= 0:
             return True
-        if person_key and person_key not in ("event", "story", "system"):
+        person_info = people.get_info(person_key) if person_key else None
+        if person_info is not None:
             return _story_relationship_level(person_key) >= required_level
         levels_map = _story_named_value("story_thread_levels", {})
         if not isinstance(levels_map, dict):
             return True
-        return bool(levels_map.get(level, True))
+        return bool(levels_map.get(required_level, True))
 
     def _story_location_is_open(location_name):
         location_key = str(location_name or "").strip()
         if location_key == "":
             return True
-        is_open_fn = _story_named_callable("isOpen")
-        if callable(is_open_fn):
-            try:
-                return bool(is_open_fn(location_key))
-            except Exception:
-                return False
-        return True
+        room_obj = rooms.get(location_key)
+        if room_obj is None:
+            return True
+        return bool(room_obj.is_open())
 
     def checkEventTime(current_value, spec):
         if spec is None:
@@ -238,6 +229,10 @@ init -25 python:
         key = str(thread_name or "").strip()
         if key == "":
             return None
+        active_thread = event_runtime.active_thread
+        active_data = getattr(active_thread, "data", None)
+        if active_thread is not None and str(getattr(active_data, "name", "") or "") == key:
+            return active_thread
         current_threads = _story_named_value("threads", {})
         if isinstance(current_threads, dict) and key in current_threads:
             return current_threads[key]

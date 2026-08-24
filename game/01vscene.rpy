@@ -20,8 +20,18 @@ transform big_master:
 image big_movie = Movie(channel='movie', size=(1440,810), align=(720,405))
 image small_movie = Movie(channel='movie', size=(500,500), yalign=0.4)
 
-default sceneMovie = False
-default sceneFullScreen = False
+python early:
+    class SceneRuntimeState(object):
+        def __init__(self):
+            self.picture = ""
+            self.text = ""
+            self.location_text = ""
+            self.movie = False
+            self.fullscreen = False
+            self.controller_from_timer = False
+
+
+default scene_runtime = SceneRuntimeState()
 
 python early:
 
@@ -34,23 +44,24 @@ python early:
 
 
     def vscene_execute(obj):
-        global sceneMovie, sceneFullScreen
         expression, fullscreen = obj
 
         renpy.scene()
         # Keep full viewport consistently black around the media viewport.
         renpy.show("_layout_black_bg", what=renpy.easy.displayable("#000"), layer="master")
 
-        if (sceneFullScreen):
+        if scene_runtime.fullscreen:
             renpy.hide_screen("controller")
             #renpy.show_screen("status")
-        if (sceneMovie):
+        if scene_runtime.movie:
             renpy.music.stop("movie")
 
         if (not expression):
+            scene_runtime.picture = ""
             return
 
         filename = renpy.python.py_eval(expression)
+        scene_runtime.picture = str(filename or "")
         movie = str(filename or "").lower().endswith(VSCENE_MOVIE_EXTENSIONS)
 
         if (movie):
@@ -68,8 +79,8 @@ python early:
             image = renpy.easy.displayable(filename)
             renpy.show(filename, at_list=[master], layer='master', what=image)
 
-        sceneMovie = movie
-        sceneFullScreen = fullscreen
+        scene_runtime.movie = movie
+        scene_runtime.fullscreen = fullscreen
 
 
     def vscene_predict(obj):
@@ -83,13 +94,15 @@ python early:
 
     def vscene_lint(obj):
         expression, fullscreen = obj
+        source = str(expression or "").strip()
+        if len(source) < 2 or source[0] not in ("'", '"') or source[-1] != source[0]:
+            return
         try:
-            filename = renpy.python.py_eval(expression)
-            if (not renpy.loadable(filename)):
+            filename = renpy.python.py_eval(source)
+            if filename and not renpy.loadable(filename):
                 renpy.error("Unable to find %s" % filename)
-        except:
-            pass
-            #renpy.error("Unable to parse filename %s" % expression)
+        except Exception:
+            return
 
 
     renpy.register_statement("vscene", parse=vscene_parse,
@@ -105,12 +118,9 @@ screen controller():
     timer 0.1 action Function(vcUpdateBar) repeat True
 
 init python:
-    vcFromTimer = False
-
     def vcSetPosition(val):
-        global vcFromTimer
-        if (vcFromTimer):
-            vcFromTimer = False
+        if scene_runtime.controller_from_timer:
+            scene_runtime.controller_from_timer = False
             return
         duration = renpy.music.get_duration("movie")
         filename = renpy.music.get_playing("movie")
@@ -120,12 +130,11 @@ init python:
             renpy.play(filename, channel="movie")
 
     def vcUpdateBar():
-        global vcFromTimer
         duration = renpy.music.get_duration("movie")
         duration = duration if duration else 1.0
         pos = renpy.music.get_pos("movie")
         pos = pos if pos else 0.0
-        vcFromTimer = True
+        scene_runtime.controller_from_timer = True
         vcAdjustor.change(1000*pos//duration)
         return
 

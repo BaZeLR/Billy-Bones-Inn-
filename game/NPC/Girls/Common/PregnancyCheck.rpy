@@ -1,30 +1,9 @@
-# Remove duplicate pregnancy declaration - it's already declared in InitAmanda.rpy
-# default pregnancy = {}default cametoday_npc = {}# Remove duplicate pregnancy declaration - it's already declared in InitAmanda.rpy
-# default pregnancy = {}default cametoday_npc = {}# Remove duplicate pregnancy declaration - it's already declared in InitAmanda.rpy
-# default pregnancy = {}default cametoday_npc = {}# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # PregnancyCheck.rpy
 # Converted from PregnancyCheck.txt
 # Handles pregnancy logic for a given girl and event
-
-# Default variable statements - only declare if not already declared elsewhere
-default sexacts = {}
-default ConceptionChance = {}
-default cuminside = {}
-# default pregfather = {}
-
-# Default variable statements - only declare if not already declared elsewhere
-default sexacts = {}
-default ConceptionChance = {}
-default cuminside = {}
-# default pregfather = {}
-
-# Default variable statements - only declare if not already declared elsewhere
-default sexacts = {}
-default ConceptionChance = {}
-default cuminside = {}
-# default pregfather = {}
 
 init python:
     import renpy
@@ -35,13 +14,14 @@ init python:
             return 0
         try:
             if callable(tavern_kitchen_fertility_bonus_active) and tavern_kitchen_fertility_bonus_active():
-                base_chance = int(ConceptionChance.get(girl, 0) or 0)
+                info = people.get_info(girl)
+                base_chance = int(info.sex_stat("ConceptionChance", 0) or 0) if info is not None else 0
                 return max(4, int(base_chance * 0.5))
         except Exception:
             return 0
         return 0
 
-    def PregnancyCheck(girl_name, cum_place, repeat_count, dad_name='', is_dude_random=0, dad_name_type=''):
+    def pregnancy_check(girl_name, cum_place, repeat_count, dad_name='', is_dude_random=0, dad_name_type=''):
         """
         girl_name: str - name of the girl
         cum_place: str - where the cum landed (inside, mouth, tits, mouthface, face, outside)
@@ -59,7 +39,7 @@ init python:
         
         # Argument normalization
         girl = str(girl_name or "").strip().lower()
-        girl_info = getPersonInfo(girl)
+        girl_info = people.get_info(girl)
         if girl_info is None:
             return 0
         dad = dad_name
@@ -138,7 +118,7 @@ init python:
                     girl_info.set_cum_state("cum_mouth_others", 1)
                 if cum_place == '':
                     girl_info.clear_cum("cum_face_others", "cum_tits_others")
-                dad_info = getPersonInfo(dad)
+                dad_info = people.get_info(dad)
                 if dad_info is not None:
                     dad_state = dad_info.ensure_sex_state()
                     dad_state["came_today"] = int(dad_state.get("came_today", 0) or 0) + 1
@@ -184,5 +164,5 @@ init python:
 # Ren'Py label for script compatibility
 label PregnancyCheck(girl_name, cum_place, repeat_count, dad_name='', is_dude_random=0, dad_name_type=''):
     python:
-        PregnancyCheck(girl_name, cum_place, repeat_count, dad_name, is_dude_random, dad_name_type)
+        pregnancy_check(girl_name, cum_place, repeat_count, dad_name, is_dude_random, dad_name_type)
     return

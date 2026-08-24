@@ -1,26 +1,5 @@
-            Melissa.sync_room_problem_state()            Melissa.sync_room_problem_state()        $ Amanda.relationship = Amanda.rel    $ Amanda.current_location = "TavernAmandaRoom"        $ current_action_title = "Дверь Аманды"
-        $ current_action_content = None    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None        $ current_action_title = "Дверь Аманды"
-        $ current_action_content = None    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None        $ current_action_title = "Комната Аманды"
-        $ current_action_content = None    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None    $ Amanda.location = "TavernAmandaRoom"
-    $ Amanda.current_location = "TavernAmandaRoom"            Melissa.sync_room_problem_state()            Melissa.sync_room_problem_state()        $ Amanda.relationship = Amanda.rel    $ Amanda.current_location = "TavernAmandaRoom"        $ current_action_title = "Дверь Аманды"
-        $ current_action_content = None    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None        $ current_action_title = "Дверь Аманды"
-        $ current_action_content = None    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None        $ current_action_title = "Комната Аманды"
-        $ current_action_content = None    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None    $ Amanda.location = "TavernAmandaRoom"
-    $ Amanda.current_location = "TavernAmandaRoom"            Melissa.sync_room_problem_state()            Melissa.sync_room_problem_state()        $ Amanda.relationship = Amanda.rel    $ Amanda.current_location = "TavernAmandaRoom"        $ current_action_title = "Дверь Аманды"
-        $ current_action_content = None    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None        $ current_action_title = "Дверь Аманды"
-        $ current_action_content = None    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None        $ current_action_title = "Комната Аманды"
-        $ current_action_content = None    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None    $ Amanda.location = "TavernAmandaRoom"
-    $ Amanda.current_location = "TavernAmandaRoom"# ================================================================================
-# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
+# ================================================================================
+# YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
     def tavern_amanda_room_sleep_dress():
@@ -39,10 +18,18 @@ init python:
                 return candidate_ref
         return str(fallback or "")
 
+    def tavern_amanda_room_sleep_scene():
+        return (
+            not people.is_awake("amanda")
+            or (
+                str(household_morning_issue_type("amanda") or "") == "sleepy"
+                and int(calendar_v2.hour or 0) < 12
+            )
+        )
+
     def tavern_amanda_room_picture(sleep_dress=None):
         dress_state = tavern_amanda_room_sleep_dress() if sleep_dress is None else int(sleep_dress or 0)
-        room_issue = str(household_morning_issue_type("amanda") or "")
-        is_sleep_scene = int(time or 0) >= 4 or (room_issue == "sleepy" and int(hour or 0) < 12)
+        is_sleep_scene = tavern_amanda_room_sleep_scene()
         if is_sleep_scene:
             if dress_state >= 2:
                 return tavern_amanda_room_pick_picture([
@@ -63,11 +50,11 @@ init python:
                 "images/amanda/Room/amanda_sleeps_1.jpg",
                 "images/amanda/Room/amanda_bedroom_003.jpeg",
             ], "bg amanda_room")
-        if str(getLocation("amanda") or "") != "TavernAmandaRoom":
+        if str(people.location("amanda") or "") != "TavernAmandaRoom":
             return tavern_amanda_room_pick_picture([
                 "images/amanda/Room/emptyroom.jpg",
             ], "bg amanda_room")
-        if amanda_attic_busted():
+        if Amanda.attic_busted():
             return tavern_amanda_room_pick_picture([
                 "images/amanda/Room/amanda_sleeps_10.png",
                 "images/amanda/Room/amandaInbed_004.jpeg",
@@ -82,7 +69,7 @@ init python:
 
     def tavern_amanda_room_issue_text():
         issue_code = str(household_morning_issue_type("amanda") or "").strip()
-        if int(time or 0) >= 4:
+        if int(calendar_v2.hour or 0) >= 12:
             return ""
         if issue_code == "sick":
             return "Аманда с утра расклеилась и так и осталась у себя в комнате. Похоже, ей бы не помешало лечебное зелье."
@@ -90,7 +77,7 @@ init python:
             if household_morning_issue_indecent("amanda"):
                 return "Аманда проспала общий подъем и до сих пор валяется в постели, раскрывшись куда сильнее приличного."
             return "Аманда проспала общий подъем и до сих пор спит у себя в комнате."
-        if str(getLocation("amanda") or "") != "TavernAmandaRoom":
+        if str(people.location("amanda") or "") != "TavernAmandaRoom":
             return "Как вы и ожидали, ее самой там не оказалось."
         return ""
 
@@ -103,25 +90,16 @@ init python:
         return "Аманда спит в длинной ночной рубашке до пят."
 
     def tavern_amanda_room_busted_entry_text():
-        if not amanda_attic_busted():
+        if not Amanda.attic_busted():
             return ""
-        if int(time or 0) >= 4 or str(getLocation("amanda") or "") != "TavernAmandaRoom":
+        if tavern_amanda_room_sleep_scene() or str(people.location("amanda") or "") != "TavernAmandaRoom":
             return ""
         return "Вы входите в комнату Аманды как раз в тот момент, когда она, едва прикрытая одеялом, сидит на кровати слишком близко к окну. Услышав вас, девушка быстро подбирает ткань к груди, пересаживается глубже на постель и демонстративно отворачивается от окна, будто надеется, что это сразу сделает сцену приличнее."
 
     def tavern_amanda_room_window_scene_text():
-        if not amanda_attic_busted():
+        if not Amanda.attic_busted():
             return "Окно выходит прямо на стену соседнего дома. Вид так себе, зато света днем хватает."
         return "Вы осторожно подходите к окну и сразу понимаете, отчего Аманда так поспешно от него отстранилась. Стоит только выбрать угол между рамой и соседней стеной, как взгляд уходит в тот самый соседний двор.\n\n" + attic_neighbor_sex_scene_text() + " Теперь понятно, что именно отсюда она и высматривала ту же самую похабную сцену, что открывалась вам с чердака."
-
-    def tavern_amanda_morning_window_episode_ready():
-        return (
-            amanda_attic_busted()
-            and str(household_morning_issue_type("amanda") or "") == "sleepy"
-            and int(time or 0) == 0
-            and int(hour or 0) < 12
-            and Amanda.var_int("attic_window_morning_day", -1) != int(dayspassed or 0)
-        )
 
     def tavern_amanda_morning_window_outcome():
         friend_value = int(Amanda.rel or 0)
@@ -145,7 +123,7 @@ init python:
         return "later"
 
     def tavern_amanda_room_main_text(room_obj=None, sleep_dress=0):
-        room_ref = room_obj if room_obj is not None else TavernAmandaRoomRoom
+        room_ref = room_obj if room_obj is not None else rooms.get("TavernAmandaRoom")
         desc_rows = list(room_ref.visible_descriptions() or [])
         issue_text = tavern_amanda_room_issue_text()
         busted_text = tavern_amanda_room_busted_entry_text()
@@ -154,7 +132,7 @@ init python:
         if len(desc_rows) > 0:
             parts.append(str(desc_rows[0].text or "").strip())
 
-        if int(time or 0) >= 4:
+        if tavern_amanda_room_sleep_scene():
             parts.append(tavern_amanda_room_sleep_text(sleep_dress))
         elif str(issue_text or "").strip():
             parts.append(str(issue_text or "").strip())
@@ -167,28 +145,7 @@ init python:
         elif len(desc_rows) > 1:
             parts.append(str(desc_rows[1].text or "").strip())
 
-        try:
-            Melissa.sync_room_problem_state()
-        except Exception:
-            pass
-        try:
-        except Exception:
-            pass
-        try:
-            Melissa.sync_room_problem_state()
-        except Exception:
-            pass
-        try:
-        except Exception:
-            pass
-        try:
-            Melissa.sync_room_problem_state()
-        except Exception:
-            pass
-        try:
-        except Exception:
-            pass
-        if str(getLocation("melissa") or "") == "TavernAmandaRoom":
+        if str(people.location("melissa") or "") == "TavernAmandaRoom":
             parts.append("Похоже, Мелисса пока ночует здесь, у Аманды: у стены лежит ее узел с вещами, а по комнате заметно, что место теперь делят две девушки.")
         parts.append(werecat_visible_text("TavernAmandaRoom"))
 
@@ -196,22 +153,15 @@ init python:
         return "\n\n".join(parts) if len(parts) > 0 else "Комната Аманды."
 
     def tavern_amanda_room_locked_for_melissa_booklet():
-        try:
-        except Exception:
-            pass
-        try:
-            Melissa.sync_room_problem_state()
-        except Exception:
-            pass
         return (
-            int(time or 0) >= 4
-            and str(Melissa.var.get("temp_room", "") or "") == "TavernAmandaRoom"
-            and int(Melissa.var.get("drawings_found", 0) or 0) == 0
-            and Melissa.bats_stage() >= 6
-            and Melissa.bats_stage() < 8
+            not people.is_awake("amanda")
+            and str(Melissa.temp_room_code or "") == "TavernAmandaRoom"
+            and not bool(Melissa.drawings_found)
+            and threads["melissaBatProblem"].num >= 6
+            and threads["melissaBatProblem"].num < 8
         )
 
-    TavernAmandaRoomRoom = Room(
+    TavernAmandaRoomRoomDefinition = Room(
         code_name="TavernAmandaRoom",
         group_name=ROOM_GROUP_TAVERN,
         display_name="Комната Аманды",
@@ -269,18 +219,15 @@ init python:
         object_key = str(object_id or "").strip()
         if object_key == "bed_002":
             return get_game_object(object_key)
-        for room_object in TavernAmandaRoomRoom.visible_game_items():
+        for room_object in rooms.get("TavernAmandaRoom").visible_game_items():
             if getattr(room_object, "object_id", "") == object_key:
                 return room_object
         return None
 
     def tavern_amanda_room_sleeping_now():
         return (
-            str(getLocation("amanda") or "") == "TavernAmandaRoom"
-            and (
-                int(time or 0) >= 4
-                or str(household_morning_issue_type("amanda") or "") == "sleepy"
-            )
+            str(people.location("amanda") or "") == "TavernAmandaRoom"
+            and tavern_amanda_room_sleep_scene()
         )
 
     def tavern_amanda_current_dress_text():
@@ -289,12 +236,6 @@ init python:
         if isinstance(wardrobe, dict):
             dress_code = str(wardrobe.get("current_dress", "") or "").strip()
         if not dress_code:
-            dress_code = str(dressdefault.get("amanda", "") or "").strip()
-        if not dress_code:
-            dress_code = str(dressdefault.get("amanda", "") or "").strip()
-        if not dress_code:
-            dress_code = str(dressdefault.get("amanda", "") or "").strip()
-        if not dress_code:
             return ""
         dress_name = str(ShortDressName.get(dress_code, dress_code) or dress_code).lower()
         dress_desc = str(FullDressDesc.get(dress_code, "") or "").strip()
@@ -302,190 +243,167 @@ init python:
             return "На ней %s. %s." % (dress_name, dress_desc)
         return "На ней %s." % dress_name
 
+    def tavern_amanda_room_action_items():
+        items = []
+        if story_event_available("TavernAmandaRoom", "amanda_morning_window"):
+            items.append(MenuItem("Поймать Аманду у окна", Call("checkTriggers", "TavernAmandaRoom", "amanda_morning_window", 0)))
+        for issue_action in list(household_room_issue_action_specs("amanda") or []):
+            items.append(MenuItem(str(issue_action.get("label", "") or ""), Call(str(issue_action.get("target", "") or ""), *tuple(issue_action.get("args", ()) or ()))))
+        if tavern_upstairs_can_clean_rooms():
+            items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernAmandaRoom", "", "")))
+        items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernAmandaRoom")))
+        if story_event_available("TavernAmandaRoom", "melissa_bats"):
+            items.append(MenuItem(Melissa.bat_drawings_event_caption(), Call("checkTriggers", "TavernAmandaRoom", "melissa_bats", 0)))
+        for room_object in rooms.get("TavernAmandaRoom").visible_game_items():
+            items.append(MenuItem(room_object.name, Call("tavern_amanda_room_object_menu", room_object.object_id)))
+        items.extend(rooms.get("TavernAmandaRoom").build_exit_items())
+        return items
+
 label TavernAmandaRoom:
-    $ _room = TavernAmandaRoomRoom
-    $ CurrentRoom = _room
-    $ CurLoc = "TavernAmandaRoom"
-    $ tmpSleepDress = tavern_amanda_room_sleep_dress()
+    $ renpy.dynamic("_room", "_amanda_sleep_dress", "_amanda_room_picture")
+    $ _room = rooms.get("TavernAmandaRoom")
+    $ rooms.enter("TavernAmandaRoom")
+    $ _amanda_sleep_dress = tavern_amanda_room_sleep_dress()
     if tavern_amanda_room_locked_for_melissa_booklet():
-        $ _amanda_room_picture = tavern_amanda_room_picture(tmpSleepDress)
-        $ scene_image = _amanda_room_picture or None
+        $ _amanda_room_picture = tavern_amanda_room_picture(_amanda_sleep_dress)
+        $ scene_runtime.picture = _amanda_room_picture or None
         if str(_amanda_room_picture or "").strip():
-            $ _layout_last_picture = _amanda_room_picture
+            $ scene_runtime.picture = _amanda_room_picture
             vscene _amanda_room_picture
-        $ MainTxt = "Дверь закрыта изнутри. За ней слышны приглушенные голоса, шорох и короткий смешок."
-        $ CurLocDesc = MainTxt
-        $ current_action_title = "Комната Аманды"
-        $ current_action_content = None
-        $ current_action_items = [MenuItem("Вернуться в коридор", Call("AdvanceMovementTime", "TavernUpstairs"))]
+        $ scene_runtime.text = "Дверь закрыта изнутри. За ней слышны приглушенные голоса, шорох и короткий смешок."
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_title = "Комната Аманды"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = [MenuItem("Вернуться в коридор", movement_actions("TavernUpstairs"))]
         while True:
             call screen main_ui
-    call RoomEnterEventGate(CurLoc, False)
-    if story_event_available(CurLoc, "melissa_bats"):
-        call checkTriggers(CurLoc, "melissa_bats", 0)
-    $ _amanda_room_picture = tavern_amanda_room_picture(tmpSleepDress)
-    $ scene_image = _amanda_room_picture or None
-    $ _layout_last_picture = _amanda_room_picture or ""
+    call RoomEnterEventGate(rooms.current_code, False)
+    if story_event_available(rooms.current_code, "melissa_bats"):
+        call checkTriggers(rooms.current_code, "melissa_bats", 0)
+    $ _amanda_room_picture = tavern_amanda_room_picture(_amanda_sleep_dress)
+    $ scene_runtime.picture = _amanda_room_picture or ""
     if str(_amanda_room_picture or "").strip():
         vscene _amanda_room_picture
     $ _room.mark_visited()
-    if int(time or 0) >= 4:
-        call DressForNight("amanda", tmpSleepDress)
-    $ MainTxt = tavern_amanda_room_main_text(_room, tmpSleepDress)
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Комната Аманды"
-    $ current_action_content = None
-    $ current_action_items = tavern_amanda_room_action_items()
+    if tavern_amanda_room_sleep_scene():
+        call dress_for_night("amanda", _amanda_sleep_dress)
+    $ scene_runtime.text = tavern_amanda_room_main_text(_room, _amanda_sleep_dress)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Комната Аманды"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = tavern_amanda_room_action_items()
     while True:
         call screen main_ui
 
 
 label TavernAmandaRoomDoor:
-    $ CurrentRoom = TavernUpstairsRoom
-    $ CurLoc = "TavernUpstairs"
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ MainTxt = "Вы стоите перед дверью комнаты Аманды."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None
-    $ current_action_items = [
+    $ rooms.enter("TavernUpstairs")
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    $ scene_runtime.text = "Вы стоите перед дверью комнаты Аманды."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Дверь Аманды"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [
         MenuItem("Постучать", Call("TavernAmandaRoomKnock")),
         MenuItem("Войти в комнату", Call("TavernAmandaRoomEnterWithoutKnock")),
-        MenuItem("Уйти", Call("TavernAmandaRoomDoorLeave")),
+        MenuItem("Уйти", Jump("TavernUpstairs")),
     ]
     return
 
 
 label TavernAmandaRoomKnock:
+    $ renpy.dynamic("_amanda_knock_roll")
     $ _amanda_knock_roll = procedural_randint(1, 100, key="procedural:Inn/TavernAmandaRoom.rpy:procedural_randint:323:1")
-    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None
+    $ main_ui_runtime.action_title = "Дверь Аманды"
+    $ main_ui_runtime.action_content = None
     if _amanda_knock_roll <= 50:
-        $ MainTxt = "Вы стучите в дверь. Через несколько секунд Аманда отвечает: \"Войдите.\""
-        $ current_action_items = [MenuItem("Войти", Jump("TavernAmandaRoom")), MenuItem("Уйти", Call("TavernAmandaRoomDoorLeave"))]
+        $ scene_runtime.text = "Вы стучите в дверь. Через несколько секунд Аманда отвечает: \"Войдите.\""
+        $ main_ui_runtime.action_items = [MenuItem("Войти", movement_actions("TavernAmandaRoom")), MenuItem("Уйти", Jump("TavernUpstairs"))]
     elif _amanda_knock_roll <= 75:
-        $ MainTxt = "Вы стучите в дверь. Из комнаты доносится осторожное: \"Кто там?\""
-        $ current_action_items = [MenuItem("Назваться", Call("TavernAmandaRoomKnockAnswer")), MenuItem("Уйти", Call("TavernAmandaRoomDoorLeave"))]
+        $ scene_runtime.text = "Вы стучите в дверь. Из комнаты доносится осторожное: \"Кто там?\""
+        $ main_ui_runtime.action_items = [MenuItem("Назваться", Call("TavernAmandaRoomKnockAnswer")), MenuItem("Уйти", Jump("TavernUpstairs"))]
     else:
-        $ MainTxt = "Вы постучали в дверь, но ответа не последовало."
-        $ current_action_items = [MenuItem("Попробовать войти", Call("TavernAmandaRoomEnterWithoutKnock")), MenuItem("Уйти", Call("TavernAmandaRoomDoorLeave"))]
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = "Вы постучали в дверь, но ответа не последовало."
+        $ main_ui_runtime.action_items = [MenuItem("Попробовать войти", Call("TavernAmandaRoomEnterWithoutKnock")), MenuItem("Уйти", Jump("TavernUpstairs"))]
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 
 label TavernAmandaRoomKnockAnswer:
-    $ MainTxt = "Вы называете себя. За дверью слышится короткая возня, потом Аманда отвечает: \"Хорошо, входите.\""
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None
-    $ current_action_items = [MenuItem("Войти", Jump("TavernAmandaRoom")), MenuItem("Уйти", Call("TavernAmandaRoomDoorLeave"))]
+    $ scene_runtime.text = "Вы называете себя. За дверью слышится короткая возня, потом Аманда отвечает: \"Хорошо, входите.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Дверь Аманды"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [MenuItem("Войти", movement_actions("TavernAmandaRoom")), MenuItem("Уйти", Jump("TavernUpstairs"))]
     return
 
 
 label TavernAmandaRoomEnterWithoutKnock:
+    $ renpy.dynamic("_amanda_dress_text")
+    $ apply_movement_time(5, "TavernAmandaRoom")
     if tavern_amanda_room_sleeping_now():
         $ Amanda.rel = max(0, int(Amanda.rel or 0) - 5)
         $ _amanda_dress_text = tavern_amanda_current_dress_text()
-        $ MainTxt = "Вы открываете дверь без стука. Аманда сидит на кровати и торопливо пытается прикрыться, на лице у нее тяжелый румянец.\n\n\"Ох... доброе утро, мессир Стефан. В следующий раз вам стоит постучать,\" выдыхает она, явно сбитая с толку."
+        $ scene_runtime.text = "Вы открываете дверь без стука. Аманда сидит на кровати и торопливо пытается прикрыться, на лице у нее тяжелый румянец.\n\n\"Ох... доброе утро, мессир Стефан. В следующий раз вам стоит постучать,\" выдыхает она, явно сбитая с толку."
         if str(_amanda_dress_text or "").strip():
-            $ MainTxt = MainTxt + "\n\n" + _amanda_dress_text
-        $ CurLocDesc = MainTxt
-        $ current_action_title = "Комната Аманды"
-        $ current_action_content = None
-        $ current_action_items = [MenuItem("Извиниться", Call("TavernAmandaRoomApologizeForEntry")), MenuItem("Выйти", Call("TavernAmandaRoomDoorLeave"))]
+            $ scene_runtime.text = scene_runtime.text + "\n\n" + _amanda_dress_text
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_title = "Комната Аманды"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = [MenuItem("Извиниться", Call("TavernAmandaRoomApologizeForEntry")), MenuItem("Выйти", Jump("TavernUpstairs"))]
         call stat
         return
     jump TavernAmandaRoom
 
 
 label TavernAmandaRoomApologizeForEntry:
-    $ MainTxt = "Вы извиняетесь и отступаете к двери, давая Аманде возможность прийти в себя. Она все еще краснеет, но коротко кивает, принимая извинение."
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Дверь Аманды"
-    $ current_action_content = None
-    $ current_action_items = [MenuItem("Выйти в коридор", Call("TavernAmandaRoomDoorLeave"))]
+    $ scene_runtime.text = "Вы извиняетесь и отступаете к двери, давая Аманде возможность прийти в себя. Она все еще краснеет, но коротко кивает, принимая извинение."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Дверь Аманды"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [MenuItem("Выйти в коридор", Jump("TavernUpstairs"))]
     return
 
 
-label TavernAmandaRoomDoorLeave:
-    $ CurrentRoom = TavernUpstairsRoom
-    $ CurLoc = "TavernUpstairs"
-    $ location = CurLoc
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ MainTxt = TavernUpstairsRoom.descriptions[0].text
-    $ CurLocDesc = MainTxt
-    call TavernUpstairsBuildActions
-    return
-
-
-label TavernAmandaRoomDoorLeave:
-    $ CurrentRoom = TavernUpstairsRoom
-    $ CurLoc = "TavernUpstairs"
-    $ location = CurLoc
-    $ scene_image = CurrentRoom.bg_picture or None
-    if scene_image:
-        $ _layout_last_picture = scene_image
-    $ MainTxt = TavernUpstairsRoom.descriptions[0].text
-    $ CurLocDesc = MainTxt
-    call TavernUpstairsBuildActions
-    return
-
-
-label TavernAmandaRoomBuildActions:
-    $ current_action_title = "Комната Аманды"
-    $ current_action_content = None
-    $ current_action_items = []
-    if tavern_amanda_morning_window_episode_ready():
-        $ current_action_items.append(MenuItem("Поймать Аманду у окна", Call("TavernAmandaRoomMorningWindowEpisode")))
-    python:
-        for _issue_action in list(household_room_issue_action_specs("amanda") or []):
-            current_action_items.append(MenuItem(str(_issue_action.get("label", "") or ""), Call(str(_issue_action.get("target", "") or ""), *tuple(_issue_action.get("args", ()) or ()))))
-    if tavern_upstairs_can_clean_rooms():
-        $ current_action_items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernAmandaRoom", "", "")))
-    $ current_action_items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernAmandaRoom", "TavernAmandaRoomBuildActions")))
-    if story_event_available("TavernAmandaRoom", "melissa_bats"):
-        $ current_action_items.append(MenuItem(Melissa.bat_drawings_event_caption(), Call("checkTriggers", "TavernAmandaRoom", "melissa_bats", 0)))
-    python:
-        for _room_object in TavernAmandaRoomRoom.visible_game_items():
-            current_action_items.append(MenuItem(_room_object.name, Call("tavern_amanda_room_object_menu", _room_object.object_id)))
-        for _room_exit in TavernAmandaRoomRoom.visible_exits():
-            current_action_items.append(MenuItem(_room_exit.label, Call("AdvanceMovementTime", _room_exit.target)))
-    return
-
-
-label tavern_amanda_room_object_menu(object_id="", refresh_only=False):
+label tavern_amanda_room_object_menu(object_id=""):
+    $ renpy.dynamic("_room_object")
+    $ renpy.dynamic("_room_action", "_room_args")
     if str(object_id or "") != "":
-        $ tavern_amanda_room_object_menu_id = object_id
-    $ object_id = tavern_amanda_room_object_menu_id
+        $ main_ui_runtime.object_id = object_id
+    $ object_id = main_ui_runtime.object_id
     $ _room_object = tavern_amanda_room_get_object(object_id)
     if _room_object is None:
-        call TavernAmandaRoomBuildActions
+        $ main_ui_runtime.action_items = tavern_amanda_room_action_items()
         return
 
-    $ current_object_id = object_id
-    $ MainTxt = bedroom_door_object_text(_room_object)
-    $ CurLocDesc = MainTxt
-    $ current_action_title = str(_room_object.name or "Комната Аманды")
-    $ current_action_content = None
-    $ current_action_items = []
+    $ main_ui_runtime.object_id = object_id
+    $ scene_runtime.text = bedroom_door_object_text(_room_object)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = str(_room_object.name or "Комната Аманды")
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     python:
         for _room_action in _room_object.visible_actions():
             if _room_action.hook == "text":
-                current_action_items.append(MenuItem(_room_action.label, Call("tavern_amanda_room_object_text", object_id, _room_action.action_id)))
+                main_ui_runtime.action_items.append(MenuItem(_room_action.label, Call("tavern_amanda_room_object_text", object_id, _room_action.action_id)))
             elif _room_action.hook == "call" and str(_room_action.target or "") != "":
                 _room_args = tuple(getattr(_room_action, "args", ()) or ())
-                current_action_items.append(MenuItem(_room_action.label, Call(_room_action.target, *_room_args)))
+                main_ui_runtime.action_items.append(MenuItem(_room_action.label, Call(_room_action.target, *_room_args)))
             elif _room_action.hook == "jump" and str(_room_action.target or "") != "":
-                current_action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
-        current_action_items.append(MenuItem("Назад", Jump("TavernAmandaRoom")))
+                main_ui_runtime.action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
+        main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "text", tavern_amanda_room_main_text(rooms.get("TavernAmandaRoom"), tavern_amanda_room_sleep_dress())),
+            SetField(scene_runtime, "location_text", tavern_amanda_room_main_text(rooms.get("TavernAmandaRoom"), tavern_amanda_room_sleep_dress())),
+            SetField(main_ui_runtime, "action_title", "Комната Аманды"),
+            SetField(main_ui_runtime, "action_content", None),
+            SetField(main_ui_runtime, "action_items", tavern_amanda_room_action_items()),
+            Function(main_ui_restart_interaction),
+        ]))
     return
 
 
 label tavern_amanda_room_object_text(object_id="", action_id=""):
+    $ renpy.dynamic("_room_action", "_room_name", "_room_object", "_room_text")
     python:
         _room_text = ""
         _room_name = ""
@@ -497,77 +415,64 @@ label tavern_amanda_room_object_text(object_id="", action_id=""):
                     _room_text = str(_room_action.target or "")
                     break
         if _room_text:
-            MainTxt = _room_text
-            CurLocDesc = _room_text
-            current_action_title = _room_name or "Комната Аманды"
+            scene_runtime.text = _room_text
+            scene_runtime.location_text = _room_text
+            main_ui_runtime.action_title = _room_name or "Комната Аманды"
     call tavern_amanda_room_object_menu(object_id)
     return
 
 
 label TavernAmandaRoomWindowLook:
-    $ MainTxt = tavern_amanda_room_window_scene_text()
-    $ CurLocDesc = MainTxt
-    $ current_action_title = "Окно"
-    $ current_action_content = None
-    $ current_action_items = [MenuItem("Назад", Call("tavern_amanda_room_object_menu", "window"))]
+    $ scene_runtime.text = tavern_amanda_room_window_scene_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Окно"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [MenuItem("Назад", Call("tavern_amanda_room_object_menu", "window"))]
     return
 
 
-label TavernAmandaRoomMorningWindowEpisode:
-    if not tavern_amanda_morning_window_episode_ready():
-        call TavernAmandaRoomRestore
-        return
-    $ Amanda.set_var_int("attic_window_morning_day", int(dayspassed or 0))
+label story_amanda_room_morning_window_0:
+    $ renpy.dynamic("_amanda_window_outcome", "_amanda_sleep_dress", "_amanda_room_picture")
     $ _amanda_window_outcome = tavern_amanda_morning_window_outcome()
     $ calendar_v2.advance_minutes(20)
     $ household_clear_morning_issue("amanda")
-    $ Amanda.location = "TavernAmandaRoom"
-    $ Amanda.location = "TavernAmandaRoom"
-    $ Amanda.location = "TavernAmandaRoom"
-    $ MainTxt = "Аманда не спит. Вы застаете ее у окна ровно в тот момент, когда она резко отдергивает руку от занавески и пытается сделать вид, будто просто смотрела во двор.\n\n\"Ну что, Аманда? Кто у нас теперь извращенец?\" спрашиваете вы.\n\nОна вспыхивает, но не уходит от ответа: \"Ничего не могу поделать... иногда так зудит, что хоть на стену лезь.\" Вы спокойно отвечаете: \"Могу помочь, если хочешь.\""
+    $ scene_runtime.text = "Аманда не спит. Вы застаете ее у окна ровно в тот момент, когда она резко отдергивает руку от занавески и пытается сделать вид, будто просто смотрела во двор.\n\n\"Ну что, Аманда? Кто у нас теперь извращенец?\" спрашиваете вы.\n\nОна вспыхивает, но не уходит от ответа: \"Ничего не могу поделать... иногда так зудит, что хоть на стену лезь.\" Вы спокойно отвечаете: \"Могу помочь, если хочешь.\""
     if _amanda_window_outcome == "oral":
-        $ player.intimacy.set_arousal(max(35, int(player.intimacy.arousal_value("You") or 0)), "You")
+        $ player.intimacy.set_arousal(max(35, int(player.intimacy.arousal_value() or 0)))
         $ Amanda.set_arousal(max(35, Amanda.arousal_value()))
         $ Amanda.change_social(open_delta=1, corruption_delta=2)
-        $ CurLocDesc = MainTxt
+        $ scene_runtime.location_text = scene_runtime.text
         call IntAmandaSex("amanda", "home", "minet")
-        $ MainTxt = "После этого Аманда уже не спорит насчет окна. Она только быстро приводит себя в порядок и, все еще краснея, просит не разносить эту сцену по всему дому."
+        $ scene_runtime.text = "После этого Аманда уже не спорит насчет окна. Она только быстро приводит себя в порядок и, все еще краснея, просит не разносить эту сцену по всему дому."
     elif _amanda_window_outcome == "mutual":
-        $ player.intimacy.set_arousal(max(30, int(player.intimacy.arousal_value("You") or 0) + 10), "You")
+        $ player.intimacy.set_arousal(max(30, int(player.intimacy.arousal_value() or 0) + 10))
         $ Amanda.add_arousal(10, 100)
         $ Amanda.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
-        $ MainTxt = str(MainTxt or "") + "\n\nАманда долго смотрит на вас, потом сама делает шаг ближе. Дальше все остается на грани игры и взаимной смелости: достаточно, чтобы обоим стало трудно делать вид, будто это обычное утро, но недостаточно, чтобы она потом могла назвать это чем-то большим.\n\nЧерез несколько минут она уже торопливо поправляет платье и шепчет, что на сегодня с нее хватит."
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда долго смотрит на вас, потом сама делает шаг ближе. Дальше все остается на грани игры и взаимной смелости: достаточно, чтобы обоим стало трудно делать вид, будто это обычное утро, но недостаточно, чтобы она потом могла назвать это чем-то большим.\n\nЧерез несколько минут она уже торопливо поправляет платье и шепчет, что на сегодня с нее хватит."
     else:
         $ Amanda.change_social(friend_delta=1)
-        $ MainTxt = str(MainTxt or "") + "\n\nАманда кусает губу, но все же качает головой. \"Не сейчас. Увидимся позже, если ты умеешь держать язык за зубами.\" На этом она быстро собирается и делает вид, будто вы разбудили ее самым обычным способом."
-    $ CurLocDesc = MainTxt
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда кусает губу, но все же качает головой. \"Не сейчас. Увидимся позже, если ты умеешь держать язык за зубами.\" На этом она быстро собирается и делает вид, будто вы разбудили ее самым обычным способом."
+    $ scene_runtime.location_text = scene_runtime.text
     call stat
-    call TavernAmandaRoomRestore
-    return
-
-
-label TavernAmandaRoomRestore:
-    $ _amanda_room_picture = tavern_amanda_room_picture(tmpSleepDress if int(time or 0) >= 4 else None)
-    $ scene_image = _amanda_room_picture or None
-    $ _layout_last_picture = _amanda_room_picture or ""
-    $ MainTxt = tavern_amanda_room_main_text(TavernAmandaRoomRoom, tmpSleepDress if int(time or 0) >= 4 else 0)
-    $ CurLocDesc = MainTxt
-    call TavernAmandaRoomBuildActions
-    return
-
-
-label story_amanda_room_grope_0:
-    call TavernAmandaRoomGropeAction
+    $ _amanda_sleep_dress = tavern_amanda_room_sleep_dress()
+    $ _amanda_room_picture = tavern_amanda_room_picture(_amanda_sleep_dress)
+    $ scene_runtime.picture = _amanda_room_picture or ""
+    $ scene_runtime.text = tavern_amanda_room_main_text(rooms.get("TavernAmandaRoom"), _amanda_sleep_dress)
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items = tavern_amanda_room_action_items()
     return True
 
 
-label TavernAmandaRoomGropeAction:
+label story_amanda_room_grope_0:
+    $ renpy.dynamic("tmpSexType", "_amanda_sleep_dress", "_grope_sleep_dress", "tmpGropeReact", "tmpRand")
+    $ _grope_sleep_dress = tavern_amanda_room_sleep_dress()
+    $ _amanda_sleep_dress = _grope_sleep_dress
     "\nОтбросив сомнения вы подошли к спящей девушке и поцеловали ее прямо в губы."
-    if tmpSleepDress == 2:
+    if _grope_sleep_dress == 2:
         "Одной рукой вы начали массировать ее обнаженный клитор, а другой ласкать сисечки."
-    elif tmpSleepDress == 1:
+    elif _grope_sleep_dress == 1:
         "Руками же вы начали массировать ее обнаженные сисечки."
-    if tmpSleepDress >= 2:
+    if _grope_sleep_dress >= 2:
         call ShowImage("amanda", "room", "wakenaked")
     else:
         call ShowImage("amanda", "room", "wakedress")
@@ -587,7 +492,7 @@ label TavernAmandaRoomGropeAction:
     if tmpGropeReact == 1:
         "Проснувшаяся от вашего поцелуя Аманда не казалась через чур уж обескураженной вашим пылом. Тем не менее она все-таки оттолкнула вас, прошептав: 'Стефан, ты что?'"
         python:
-            tmpRand = procedural_randint(1, 3, "amanda_room_grope_soft_refusal_1_%s" % int(dayspassed or 0))
+            tmpRand = procedural_randint(1, 3, "amanda_room_grope_soft_refusal_1_%s" % int(current_game_day()))
             if tmpRand == 1:
                 renpy.say(None, 'За стенкой Сандра и остальные спят, да и я спать хочу, намаялась за день.')
             elif tmpRand == 2:
@@ -595,7 +500,7 @@ label TavernAmandaRoomGropeAction:
             else:
                 renpy.say(None, 'Нашел время.')
         python:
-            tmpRand = procedural_randint(1, 3, "amanda_room_grope_soft_refusal_2_%s" % int(dayspassed or 0))
+            tmpRand = procedural_randint(1, 3, "amanda_room_grope_soft_refusal_2_%s" % int(current_game_day()))
             if tmpRand == 1:
                 renpy.say(None, 'Давай, иди к себе, водичкой холодной облейся если невтерпеж.')
             elif tmpRand == 2:
@@ -603,14 +508,14 @@ label TavernAmandaRoomGropeAction:
             else:
                 renpy.say(None, 'Если совсем невмоготу, то в узел завяжи себе, а меня сейчас не трогай.')
         "<br>Увидев, что Аманда настроена вежливо, но решительно дать вам отпор, вы не стали шуметь и спорить, а вернулись в зал."
-        $ Amanda.set_var_int("kickyoufromroom", 1)
+        $ Amanda.room_entry_blocked_today = True
         jump TavernMain
     elif tmpGropeReact == 2:
         "Аманда, почувствовав ваши прикосновения, раскрыла глаза. 'Ага, заявился, подонок,' не очень-то романтично огорошила вас своенравная девица
         ."
         call CodeAmandaListScold
         "Вы открыли рот чтобы оправдаться, но такого шанса вам не дали, не став слушать ваших оправданий Аманда твердо и решительно произнесла: 'Вон отсюда, пока я не закричала.'<br>Вы попробовали еще что-то сказать, но в ответ услышали лишь снова 'Вон!'. Почуствовав твердость в голосе девушки, вы решили попробовать сделать свой заход позже, а пока временно отступить в главный зал.<br>"
-        $ Amanda.set_var_int("kickyoufromroom", 1)
+        $ Amanda.room_entry_blocked_today = True
         if Amanda.rel > 5:
             $ Amanda.change_social(friend_delta=-1)
         if Amanda.corruption > 30:

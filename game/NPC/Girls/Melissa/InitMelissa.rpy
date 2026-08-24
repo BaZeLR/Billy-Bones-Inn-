@@ -1,199 +1,13 @@
-        npc_schedule_sync_currentloc(schedule_name)        bodymodel_sync_character(GirlName, Melissa.data.fullname, "female")            self.current_location = "TavernMain"            self.current_location = "TavernMelissaRoom"            "AskedMCToSolveRoomProblem": 0,            "RoomProblemAskDay": -1,            self.schedule_source = MelissaStaticData.schedule_source            self.schedule_source = MelissaStaticData.schedule_source
-            self.current_location = "TavernMain"            "AskedMCToSolveRoomProblem": 0,            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel        npc_schedule_sync_currentloc(schedule_name)        bodymodel_sync_character(GirlName, Melissa.data.fullname, "female")            self.current_location = "TavernMain"            self.current_location = "TavernMelissaRoom"            "AskedMCToSolveRoomProblem": 0,            "RoomProblemAskDay": -1,            self.schedule_source = MelissaStaticData.schedule_source            self.schedule_source = MelissaStaticData.schedule_source
-            self.current_location = "TavernMain"            "AskedMCToSolveRoomProblem": 0,            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel        npc_schedule_sync_currentloc(schedule_name)        bodymodel_sync_character(GirlName, Melissa.data.fullname, "female")            self.current_location = "TavernMain"            self.current_location = "TavernMelissaRoom"            "AskedMCToSolveRoomProblem": 0,            "RoomProblemAskDay": -1,            self.schedule_source = MelissaStaticData.schedule_source            self.schedule_source = MelissaStaticData.schedule_source
-            self.current_location = "TavernMain"            "AskedMCToSolveRoomProblem": 0,            self.relationship = self.rel            self.relationship = self.rel            self.relationship = self.rel# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-init -1 python:
-    def melissa_schedule_clara_paintings_confession_ready():
-            Melissa.install_schedule()
-
-        Melissa.install_schedule()
-
-        Melissa.install_schedule()
-
-        Melissa.install_schedule()
-
-        Melissa.install_schedule()
-
-        Melissa.install_schedule()
-
-    return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
-
-    def melissa_install_schedule(girl_name="melissa"):
-        schedule_name = str(girl_name or "melissa").strip()
-        schedule_data = people_schedule_data(schedule_name)
-        if schedule_data is not None:
-            schedule_data.set_daily_schedule([], [])
-            schedule_data.load_interval_schedule(True)
-        npc_schedule_set(
-            schedule_name,
-            [
-                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
-            ],
-        )
-
-init -1 python:
-    def melissa_schedule_clara_paintings_confession_ready():
-        return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
-
-    def melissa_install_schedule(girl_name="melissa"):
-        schedule_name = str(girl_name or "melissa").strip()
-        schedule_data = people_schedule_data(schedule_name)
-        if schedule_data is not None:
-            schedule_data.set_daily_schedule([], [])
-            schedule_data.load_interval_schedule(True)
-        npc_schedule_set(
-            schedule_name,
-            [
-                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
-            ],
-        )
-
-init -1 python:
-    def melissa_schedule_clara_paintings_confession_ready():
-        return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
-
-    def melissa_install_schedule(girl_name="melissa"):
-        schedule_name = str(girl_name or "melissa").strip()
-        schedule_data = people_schedule_data(schedule_name)
-        if schedule_data is not None:
-            schedule_data.set_daily_schedule([], [])
-            schedule_data.load_interval_schedule(True)
-        npc_schedule_set(
-            schedule_name,
-            [
-                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
-            ],
-        )
-
-init -1 python:
-    def melissa_schedule_clara_paintings_confession_ready():
-        return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
-
-    def melissa_install_schedule(girl_name="melissa"):
-        schedule_name = str(girl_name or "melissa").strip()
-        schedule_data = people_schedule_data(schedule_name)
-        if schedule_data is not None:
-            schedule_data.set_daily_schedule([], [])
-            schedule_data.load_interval_schedule(True)
-        npc_schedule_set(
-            schedule_name,
-            [
-                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
-            ],
-        )
-
-init -1 python:
-    def melissa_schedule_clara_paintings_confession_ready():
-        return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
-
-    def melissa_install_schedule(girl_name="melissa"):
-        schedule_name = str(girl_name or "melissa").strip()
-        schedule_data = people_schedule_data(schedule_name)
-        if schedule_data is not None:
-            schedule_data.set_daily_schedule([], [])
-            schedule_data.load_interval_schedule(True)
-        npc_schedule_set(
-            schedule_name,
-            [
-                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
-            ],
-        )
-
-init -1 python:
-    def melissa_schedule_clara_paintings_confession_ready():
-        return int(Clara.var.get("peek_done", 0) or 0) == 1 and int(Clara.var.get("confession_done", 0) or 0) == 0
-
-    def melissa_install_schedule(girl_name="melissa"):
-        schedule_name = str(girl_name or "melissa").strip()
-        schedule_data = people_schedule_data(schedule_name)
-        if schedule_data is not None:
-            schedule_data.set_daily_schedule([], [])
-            schedule_data.load_interval_schedule(True)
-        npc_schedule_set(
-            schedule_name,
-            [
-                NPCHourScheduleEntry(npc_id=schedule_name, location="TavernMelissaRoom", weekdays=[1, 2, 3, 4, 5, 6, 7], start="22:00", end="23:00", awake=True, talkable=True, condition=melissa_schedule_clara_paintings_confession_ready, priority=870, label="clara_paintings_confession", source="rpy_condition"),
-            ],
-        )
-
 label InitMelissa:
     python:
-        GirlName = Melissa.code_name
-        peopleData[GirlName] = MelissaStaticData
         Melissa.initialize_new_game_state()
-        peopleInfo[GirlName] = Melissa
-        if Melissa not in girls:
-            girls.append(Melissa)
-        Melissa.install_schedule()
-        Melissa.install_schedule()
-        Melissa.install_schedule()
+        people.register(MelissaStaticData, Melissa)
     return
 
 init python:
-    def melissa_story_defaults():
-        return {
-            "MomDressComplaint": 0,
-            "AskedAboutClaraDay": -1,
-            "StartDay": -1,
-            "StartCount": 0,
-            "StartTotal": 0,
-            "private_context_day": -1,
-            "private_context_origin": "",
-            "private_context_place": "",
-            "private_place_heat": 0,
-            "RoomProblemAskDay": -1,
-            "StorageThanksDay": -1,
-            "AtticFindingsDay": -1,
-            "bats_episode": 0,
-            "temp_room": "",
-            "ratKilled": False,
-            "ratKilled": False,
-            "ratKilled": False,
-            "ratKilled": False,
-            "ratKilled": False,
-            "ratKilled": False,
-            "storage_rat_cleared": 0,
-            "storage_rat_last_help_day": -1,
-            "room_pests_last_help_day": -1,
-            "bat_attic_check_day": -1,
-            "drawings_ready_day": -1,
-            "drawings_found": 0,
-            "drawings_booklet_taken": 0,
-            "drawings_booklet_left": 0,
-            "drawings_booklet_opened": 0,
-            "drawings_booklet_read": 0,
-            "drawings_spy_option_unlocked": 0,
-            "drawings_returned": 0,
-            "bat_recipe_clue_seen": 0,
-            "bat_recipe_unlocked": 0,
-            "bats_completed": 0,
-            "bats_completed": 0,
-            "bats_completed": 0,
-            "bats_completed": 0,
-            "bats_completed": 0,
-            "bats_completed": 0,
-            "bats_completion_day": -1,
-            "room_returned": 0,
-            "sex_engine_unlocked": 0,
-            "room_returned": 0,
-            "sex_engine_unlocked": 0,
-            "room_returned": 0,
-            "sex_engine_unlocked": 0,
-            "room_returned": 0,
-            "sex_engine_unlocked": 0,
-            "room_returned": 0,
-            "sex_engine_unlocked": 0,
-            "room_returned": 0,
-            "sex_engine_unlocked": 0,
-            "roof_repair_order_day": -1,
-            "roof_repair_complete_day": -1,
-            "breakfast_tease_day": -1,
-            "sex_times_today": 0,
-            "harass_instruction": "",
-        }
-
     class MelissaData(PeopleData):
         code_name = "melissa"
 
@@ -355,19 +169,63 @@ init python:
                 return candidates[0]
             return ""
 
+        def cycle_image(self, context="", key="default", salt=0):
+            candidates = self.image_sequence(context, key)
+            if len(candidates) <= 0:
+                return ""
+            return candidates[people_to_int(salt, 0) % len(candidates)]
+
     class MelissaInfo(Girl):
         """Melissa runtime: tavern work, bats quest, social state, body state."""
+        talk_label = "IntMelissaTalk"
         unknown_name = "Незнакомка"
-
+        INTIMACY_PRIVATE_ROOMS = {
+            "TavernMelissaRoom",
+            "TavernMyRoom",
+            "TavernAmandaRoom",
+            "TavernSandraRoom",
+            "TavernEmptyRoom",
+            "TavernStorage",
+            "Shed",
+        }
+        INTIMACY_SECLUDED_ROOMS = {
+            "Forest",
+            "ForestClearing",
+            "ForestDarkWoods",
+            "ForestWaterfall",
+            "ForestLake",
+            "ForestSpring",
+            "ForestCave",
+            "ForestHiddenPath",
+            "Backyard",
+        }
         def __init__(self):
             super().__init__("melissa")
             self.code_name = "melissa"
-            self.uses_own_var_state = True
             self.data = MelissaStaticData
             self.rel = 5
             self.openness = 0
             self.corruption = 3
             self.known = True
+            self.revealing_dress_code = ""
+            self.mom_dress_complaint_count = 0
+            self.asked_about_clara_day = -1
+            self.intimacy_start_day = -1
+            self.intimacy_start_count = 0
+            self.intimacy_start_total = 0
+            self.private_context_day = -1
+            self.private_context_origin = ""
+            self.storage_thanks_day = -1
+            self.temp_room_code = ""
+            self.storage_rat_help_day = -1
+            self.bat_attic_check_day = -1
+            self.drawings_ready_day = -1
+            self.drawings_found = False
+            self.drawings_booklet_left = False
+            self.drawings_booklet_read = False
+            self.drawings_returned = False
+            self.roof_repair_complete_day = -1
+            self.breakfast_tease_day = -1
             self.energy = 100
             self.energy_max = 100
             self.rebellion = 0
@@ -437,157 +295,220 @@ init python:
                     "shoes": "simpleshoes",
                 },
             }
-            self.var = {}
-            self.ensure_story_defaults()
-
         def update(self):
-            self.name = self.code_name
+            super(MelissaInfo, self).update()
             self.data = MelissaStaticData
-            self.ensure_story_defaults()
             return self
-
-        def ensure_story_defaults(self):
-            if not isinstance(self.var, dict):
-                self.var = {}
-            for key, value in melissa_story_defaults().items():
-                self.var.setdefault(key, value)
-            return self.var
 
         def initialize_new_game_state(self):
             self.data = MelissaStaticData
             self.known = True
-            self.ensure_story_defaults()
             return self
-
-        def image_sequence(self, context="", key="default"):
-            return self.data.image_sequence(context, key)
-
-        def image_path(self, context="", key="default"):
-            return self.data.image_path(context, key)
-
-        def cycle_image(self, context="", key="default", salt=0):
-            candidates = self.image_sequence(context, key)
-            if len(candidates) <= 0:
-                return ""
-            return candidates[people_to_int(salt, 0) % len(candidates)]
 
         def reset_daily(self, full=False):
             super(MelissaInfo, self).reset_daily(full)
-            self.ensure_story_defaults()
-            self.var["private_context_day"] = -1
-            self.var["private_context_origin"] = ""
-            self.var["private_context_place"] = ""
-            self.var["private_place_heat"] = 0
-            self.var["sex_times_today"] = 0
+            self.private_context_day = -1
+            self.private_context_origin = ""
             return self
 
-        def install_schedule(self):
-            melissa_install_schedule(self.code_name)
-            return self
+        def relationship_stage(self):
+            friend_value = people_to_int(self.rel, 0)
+            open_value = people_to_int(self.openness, 0)
+            corruption_value = people_to_int(self.corruption, 0)
+            start_progress = max(0, people_to_int(self.intimacy_start_total, 0))
+            stage = 0
+            if friend_value >= 5 and (open_value >= 2 or corruption_value >= 5):
+                stage = 1
+            if friend_value >= 10 and (open_value >= 4 or corruption_value >= 8):
+                stage = 2
+            if start_progress >= 3 or (friend_value >= 13 and (open_value >= 7 or corruption_value >= 14)):
+                stage = 3
+            if (
+                threads["melissaBatProblem"].num >= 8
+                and start_progress >= 5
+                and friend_value >= 15
+                and open_value >= 9
+                and corruption_value >= 18
+            ):
+                stage = 4
+            return stage
 
-        def install_schedule(self):
-            melissa_install_schedule(self.code_name)
-            return self
+        def relationship_allows(self, action_code="talk"):
+            action_key = str(action_code or "talk").strip().lower()
+            if action_key == "talk":
+                return True
+            if action_key == "gift":
+                return relationship_any_gift_allowed(self.code_name)
+            if action_key in ("share", "flirt"):
+                allowed, reason = relationship_social_action_allowed(self.code_name, action_key)
+                return bool(allowed)
+            if action_key == "start":
+                return self.relationship_stage() >= 2
+            if action_key == "intimacy":
+                return self.relationship_stage() >= 3
+            if action_key == "sex":
+                return self.relationship_stage() >= 4
+            return False
 
-        def install_schedule(self):
-            melissa_install_schedule(self.code_name)
-            return self
-
-        def install_schedule(self):
-            melissa_install_schedule(self.code_name)
-            return self
-
-        def getLocation(self, wday=None, hour=None):
-            location_value = super(MelissaInfo, self).getLocation(wday, hour)
-            temp_room = str(self.var.get("temp_room", "") or "").strip()
-            if str(self.location or "").strip() in (temp_room, "TavernMelissaRoom", "TavernAmandaRoom"):
-                self.location = ""
-            if temp_room and self.temp_room_active(temp_room, hour, wday):
-                self.location = temp_room
-                return temp_room
-            return location_value
-
-        def bats_stage(self):
-            return max(0, people_to_int(self.var.get("bats_episode", 0), 0))
-
-        def bats_repair_complete(self):
-            repair_day = people_to_int(self.var.get("roof_repair_complete_day", -1), -1)
+        def private_context_active(self, room_code=""):
+            room_key = str(room_code or rooms.current_code or "").strip()
             return (
-                self.bats_stage() >= 7
-                and repair_day >= 0
-                and people_to_int(dayspassed, 0) >= repair_day
+                people_to_int(self.private_context_day, -1) == current_game_day()
+                and str(self.private_context_origin or "").strip() == room_key
             )
 
-        def sync_room_problem_state(self):
-            stage = self.bats_stage()
-            if stage >= 8:
-                self.var["temp_room"] = ""
-                self.var["roof_repair_complete_day"] = -1
-                self.var["roof_repair_order_day"] = -1
-            self.var["bats_episode"] = stage
-            return stage >= 8 or self.bats_repair_complete()
+        def room_is_private(self, room_code=""):
+            room_key = str(room_code or rooms.current_code or "").strip()
+            return room_key in self.INTIMACY_PRIVATE_ROOMS or room_key in self.INTIMACY_SECLUDED_ROOMS or self.private_context_active(room_key)
+
+        def wet_enough_to_find_place(self):
+            wet_value = max(
+                people_to_int(self.arousal_value(), 0),
+                people_to_int(self.stats.get("PussyWetStart", 0), 0),
+            )
+            return wet_value >= 35 or people_to_int(self.corruption, 0) >= 24
+
+        def private_place_offer(self, room_code=""):
+            room_key = str(room_code or rooms.current_code or "").strip()
+            if not self.relationship_allows("intimacy"):
+                return {"ok": False, "place": "", "text": ""}
+            if self.room_is_private(room_key):
+                return {"ok": True, "place": room_key, "text": ""}
+            if not self.wet_enough_to_find_place():
+                return {"ok": False, "place": "", "text": ""}
+            if room_key == "WineStore":
+                return {
+                    "ok": True,
+                    "place": "wine_cellar",
+                    "text": "Мелисса быстро оглядывается и кивает в сторону дальнего подвальчика за винными стеллажами. Там достаточно темно и тесно, чтобы вас не видели с прилавка.",
+                }
+            if room_key == "MarketPlace":
+                return {
+                    "ok": True,
+                    "place": "market_shelves",
+                    "text": "Мелисса ведет вас к глухому проходу за стеллажами и ящиками, где шум рынка остается совсем рядом, но прямых взглядов уже нет.",
+                }
+            if room_key in self.INTIMACY_SECLUDED_ROOMS:
+                return {
+                    "ok": True,
+                    "place": room_key,
+                    "text": "Мелисса сама выбирает место в стороне от тропы, где ветки и тени закрывают вас от случайных глаз.",
+                }
+            return {"ok": False, "place": "", "text": ""}
+
+        def start_scene_count(self):
+            if people_to_int(self.intimacy_start_day, -1) != current_game_day():
+                return 0
+            return max(0, min(5, people_to_int(self.intimacy_start_count, 0)))
+
+        def start_scene_remaining(self):
+            return max(0, 5 - self.start_scene_count())
+
+        def start_honey_bonus_active(self):
+            return bool(tavern_kitchen_honey_bonus_active())
+
+        def start_action_available(self, action_code=""):
+            if not self.relationship_allows("start"):
+                return False
+            action_key = str(action_code or "").strip().lower()
+            current_count = self.start_scene_count()
+            if current_count >= 5:
+                return False
+            friend_value = people_to_int(self.rel, 0)
+            corruption_value = people_to_int(self.corruption, 0)
+            open_value = people_to_int(self.openness, 0)
+            mood_bonus = 2 if self.start_honey_bonus_active() else 0
+            if action_key == "caress":
+                return True
+            if action_key == "kiss":
+                return current_count >= 1 or friend_value >= 13 or open_value + mood_bonus >= 8
+            if action_key == "deepkiss":
+                return current_count >= 1 and (friend_value >= 14 or open_value + mood_bonus >= 10 or corruption_value + mood_bonus >= 12)
+            if action_key == "fondle":
+                return current_count >= 2 and (friend_value >= 15 or corruption_value + mood_bonus >= 14)
+            if action_key == "underclothes":
+                return current_count >= 3 and (friend_value >= 16 or corruption_value + mood_bonus >= 18 or open_value + mood_bonus >= 12)
+            return False
+
+        def start_intro_text(self):
+            current_count = self.start_scene_count()
+            lines = []
+            if current_count <= 0:
+                lines.append("Мелисса задерживает на вас взгляд дольше обычного. Между вами уже достаточно доверия, чтобы не сводить разговор только к делам, но торопиться все равно не стоит.")
+            else:
+                lines.append("Мелисса уже не так шарахается от вашей близости, как раньше. Похоже, сегодня она готова пройти с вами еще несколько осторожных шагов, если вы не будете давить.")
+            lines.append("На сегодня у вас осталось %s спокойных, но все более смелых шага." % self.start_scene_remaining())
+            if self.start_honey_bonus_active():
+                lines.append("После сладких кухонных угощений Мелисса кажется чуть мягче и отзывчивее обычного.")
+            if 4 <= threads["melissaBatProblem"].num < 8:
+                lines.append("Она все еще заметно лучше держится рядом с вами, когда разговор заходит о ее комнате и чердаке над ней.")
+            if people_to_int(self.rel, 0) >= 15:
+                lines.append("Доверия между вами уже достаточно, чтобы Мелисса не принимала каждое прикосновение за угрозу.")
+            return "\n\n".join(lines)
+
+        def getLocation(self, wday=None, hour=None):
+            temp_room = str(self.temp_room_code or "").strip()
+            if temp_room and self.temp_room_active(temp_room, hour, wday):
+                return temp_room
+            return super(MelissaInfo, self).getLocation(wday, hour)
+
+        def bats_repair_complete(self):
+            repair_day = people_to_int(self.roof_repair_complete_day, -1)
+            return (
+                threads["melissaBatProblem"].num >= 7
+                and repair_day >= 0
+                and current_game_day() >= repair_day
+            )
 
         def temp_room_active(self, room_code="", hour_value=None, weekday_value=None):
-            self.sync_room_problem_state()
             room_key = str(room_code or "").strip()
-            temp_room = str(self.var.get("temp_room", "") or "").strip()
+            temp_room = str(self.temp_room_code or "").strip()
             hour_num = people_to_int(calendar_v2.hour if hour_value is None else hour_value, 0)
-            week_num = people_to_int(week if weekday_value is None else weekday_value, 0)
+            week_num = people_to_int(calendar_v2.week if weekday_value is None else weekday_value, 0)
             if temp_room == "" or temp_room != room_key:
                 return False
-            if self.bats_stage() >= 8:
+            if threads["melissaBatProblem"].num >= 8:
                 return False
-            scheduled_room = ""
-            try:
-                scheduled_room = str(npc_schedule_location(self.code_name, week_num, hour_num) or "")
-            except Exception:
-                scheduled_room = ""
+            scheduled_room = str(self.data.getLocation(week_num, hour_num) or "")
             if scheduled_room == "TavernMelissaRoom":
                 return True
             return hour_num < 10
 
         def attic_scandal_ready(self):
-            self.sync_room_problem_state()
-            return self.bats_stage() == 5
+            return threads["melissaBatProblem"].num == 5
 
         def drawings_scene_ready(self):
             return (
-                self.bats_stage() >= 6
-                and self.bats_stage() < 8
-                and str(self.var.get("temp_room", "") or "") == "TavernAmandaRoom"
-                and people_to_int(self.var.get("drawings_found", 0), 0) == 0
-                and people_to_int(dayspassed, 0) >= people_to_int(self.var.get("drawings_ready_day", -1), -1)
-                and str(CurLoc or "") == "TavernMelissaRoom"
-            )
-
-        def drawings_return_ready(self):
-            return (
-                people_to_int(self.var.get("drawings_found", 0), 0) == 1
-                and people_to_int(self.var.get("drawings_returned", 0), 0) == 0
+                threads["melissaBatProblem"].num >= 6
+                and threads["melissaBatProblem"].num < 8
+                and str(self.temp_room_code or "") == "TavernAmandaRoom"
+                and not bool(self.drawings_found)
+                and current_game_day() >= people_to_int(self.drawings_ready_day, -1)
+                and str(rooms.current_code or "") == "TavernMelissaRoom"
             )
 
         def bat_attic_colony_event_ready(self):
             return (
-                str(CurLoc or "") == "TavernAtic"
-                and self.bats_stage() == 3
-                and people_to_int(dayspassed, 0) >= people_to_int(self.var.get("bat_attic_check_day", -1), -1)
+                str(rooms.current_code or "") == "TavernAtic"
+                and threads["melissaBatProblem"].num == 3
+                and current_game_day() >= people_to_int(self.bat_attic_check_day, -1)
             )
 
         def bat_attic_window_event_ready(self):
-            return str(CurLoc or "") == "TavernAtic" and self.bats_stage() in (4, 5)
+            return str(rooms.current_code or "") == "TavernAtic" and threads["melissaBatProblem"].num in (4, 5)
 
         def bat_attic_cleanup_event_ready(self):
             return (
-                str(CurLoc or "") == "TavernAtic"
-                and self.bats_stage() >= 6
-                and self.bats_stage() < 8
+                str(rooms.current_code or "") == "TavernAtic"
+                and threads["melissaBatProblem"].num >= 6
+                and threads["melissaBatProblem"].num < 8
             )
 
         def bat_completion_talk_event_ready(self):
-            return str(CurLoc or "") == "TavernMain" and self.bats_completion_ready()
+            return str(rooms.current_code or "") == "TavernMain" and self.bats_completion_ready()
 
         def bat_attic_event_caption(self):
-            stage = self.bats_stage()
+            stage = threads["melissaBatProblem"].num
             if stage == 3:
                 return "Осмотреть балки и щели под крышей"
             if stage == 4:
@@ -598,8 +519,8 @@ init python:
                 if int(player.item_count("bat_repellent_001") or 0) > 0:
                     return "Выжечь гнездо дымной смесью"
                 return "Осмотреть, как выкурить гнездо"
-            if people_to_int(self.var.get("roof_repair_order_day", -1), -1) < 0:
-                if people_to_int(money, 0) >= 1000:
+            if people_to_int(self.roof_repair_complete_day, -1) < 0:
+                if people_to_int(player.economy.money, 0) >= 1000:
                     return "Заказать починку крыши за 1000"
                 return "Прикинуть, сколько обойдется починка крыши"
             return "Осмотреть починку крыши"
@@ -610,41 +531,17 @@ init python:
         def bat_completion_talk_caption(self):
             return "Сказать Мелиссе, что с ее комнатой наконец покончено"
 
-        def bat_repellent_recipe_unlocked(self):
-            return (
-                people_to_int(self.var.get("bat_recipe_unlocked", 0), 0) == 1
-                or recipe_book_hidden_recipes_revealed()
-            )
-
         def bats_completion_ready(self):
-            self.sync_room_problem_state()
             return (
-                self.bats_stage() == 7
+                threads["melissaBatProblem"].num == 7
                 and self.bats_repair_complete()
-                and people_to_int(self.var.get("drawings_returned", 0), 0) == 1
+                and bool(self.drawings_returned)
             )
 
         def complete_bats_problem(self):
-            self.var["bats_episode"] = 8
-            self.var["bats_completed"] = 1
-            self.var["bats_completion_day"] = people_to_int(dayspassed, 0)
-            self.var["temp_room"] = ""
-            self.var["room_returned"] = 1
-            self.var["sex_engine_unlocked"] = 1
-            self.var["roof_repair_complete_day"] = -1
-            self.var["roof_repair_order_day"] = -1
-            self.current_location = "TavernMelissaRoom"
-            self.var["AskedMCToSolveRoomProblem"] = 0
-            self.current_location = "TavernMelissaRoom"
+            self.temp_room_code = ""
+            self.roof_repair_complete_day = -1
             return True
-
-        def add_trust(self, amount, cap=20):
-            self.rel = min(people_to_int(cap, 20), max(0, people_to_int(self.rel, 0) + people_to_int(amount, 0)))
-            return self.rel
-
-        def add_openness(self, amount, cap=20):
-            self.openness = min(people_to_int(cap, 20), max(0, people_to_int(self.openness, 0) + people_to_int(amount, 0)))
-            return self.openness
 
 define MelissaStaticData = MelissaData()
 default Melissa = MelissaInfo()

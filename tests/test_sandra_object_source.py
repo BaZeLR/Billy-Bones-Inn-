@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 
@@ -7,8 +8,13 @@ SANDRA_ROOM = PROJECT_ROOT / "game" / "Inn" / "TavernSandraRoom.rpy"
 SANDRA_TALK = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "IntSandraTalk.rpy"
 SANDRA_DRESS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "IntSandraDressChange.rpy"
 SANDRA_EVENTS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Sandra" / "SandraEvents.rpy"
+SANDRA_SCHEDULE = PROJECT_ROOT / "game" / "NPC" / "Schedules" / "sandra.json"
+SAVE_SYNC = PROJECT_ROOT / "game" / "TractirSaveSync.rpy"
 PLAYER_CHORES = PROJECT_ROOT / "game" / "Inn" / "PlayerChoresSystem.rpy"
+PLAYER_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "Player" / "Player.rpy"
 STORY_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy"
+THREAD_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "Events" / "threads.rpy"
+NEXT_DAY = PROJECT_ROOT / "game" / "Utilities" / "Time" / "NextDay.rpy"
 SOCIAL_TOPICS = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "SocialTalkTopics.rpy"
 PEOPLE_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
 HARASS_REACTION = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Common" / "PartEventGirlHarrassmentReaction.rpy"
@@ -24,8 +30,7 @@ def test_sandra_uses_data_info_runtime_shape():
     assert "class SandraInfo(Girl):" in source
     assert "define SandraStaticData = SandraData()" in source
     assert "default Sandra = SandraInfo()" in source
-    assert 'peopleData["sandra"] = SandraStaticData' in source
-    assert 'peopleInfo["sandra"] = Sandra' in source
+    assert "people.register(SandraStaticData, Sandra)" in source
     assert "register_sandra_runtime" not in source
 
 
@@ -46,38 +51,34 @@ def test_sandra_data_keeps_only_immutable_identity_references():
     assert "gift_preferences=" not in data_block
 
 
-def test_sandra_story_defaults_cover_live_sandravar_keys():
+def test_sandra_custom_state_has_typed_owners_instead_of_story_map_keys():
     source = SANDRA_INIT.read_text(encoding="utf-8-sig")
-    required_keys = [
-        "knowmolodost",
-        "WeeklyChoreCheckScore",
-        "WeeklyChoreCheckCounter",
-        "Week5WakePending",
-        "WeeklyChoreCheckEval",
-        "RoomUnlocked",
-        "MCVisitFirstReady",
-        "MCVisitFirstPending",
-        "MCVisitFirstDone",
-        "FinalRewardDone",
-        "NightThanksReady",
-        "NightThanksLastDay",
-        "SandraSex",
-        "revealing_dress_ordered",
-        "revealing_dress_code",
-        "revealing_dress_initiative_seen",
-        "MaidRevengeEnding",
-        "harass_instruction",
-    ]
+    info_block = source.split("class SandraInfo(Girl):", 1)[1]
+    assert "self.knows_molodost = False" in info_block
+    assert 'self.revealing_dress_code = ""' in info_block
+    assert "STORY_DEFAULTS = {" not in info_block
+    assert "self.uses_own_var_state" not in info_block
+    assert "self.ensure_story_defaults()" not in info_block
+    assert "def ensure_story_defaults(" not in info_block
 
-    for key in required_keys:
-        assert f'"{key}"' in source
+    for retired_key in (
+        "knowmolodost", "revealing_dress_ordered", "revealing_dress_initiative_seen",
+        "MaidRevengeEnding", "MaidRevengeReason", "SecuredFuture", "SecuredFutureDay",
+        "harass_instruction", "kitchen_regular_breakfast_requests", "kitchen_client_manners_requests",
+        "WeeklyChoreCheckScore", "WeeklyChoreCheckCounter", "Week5WakePending",
+        "WeeklyChoreCheckEval", "RoomUnlocked", "MCVisitFirstReady",
+        "MCVisitFirstPending", "MCVisitFirstDone", "FinalRewardDone",
+        "NightThanksReady", "NightThanksLastDay", "SandraSex",
+    ):
+        assert f'"{retired_key}"' not in source
+    assert "def save_story_state" not in source
 
 
 def test_sandra_is_instantiated_from_init_label_not_eager_init_block():
     source = SANDRA_INIT.read_text(encoding="utf-8-sig")
     init_block = source.split("init python:", 1)[1]
 
-    assert 'peopleInfo["sandra"] = Sandra' in source
+    assert "people.register(SandraStaticData, Sandra)" in source
     assert "default Sandra = SandraInfo()" in source
     assert "SandraNPC" not in source
     assert "current =" not in init_block
@@ -85,13 +86,13 @@ def test_sandra_is_instantiated_from_init_label_not_eager_init_block():
     assert "peopleInfo['sandra'] = Sandra" not in init_block
 
 
-def test_people_runtime_preserves_class_data_without_sandra_specific_overwrite():
+def test_people_runtime_registers_class_data_without_sandra_specific_overwrite():
     runtime = (PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
 
-    assert "existing_people_data = peopleData if isinstance(peopleData, dict) else {}" in runtime
-    assert "data.__class__ is not PeopleData" in runtime
+    assert "class PeopleRegistry(object):" in runtime
+    assert "runtime_object.data = static_data" in runtime
     assert '"SandraStaticData" in globals()' not in runtime
-    assert 'peopleData["sandra"] = SandraStaticData' not in runtime
+    assert 'people.register(SandraStaticData, Sandra)' not in runtime
 
 
 def test_sandra_runtime_has_hidden_reaction_state_and_methods():
@@ -100,7 +101,6 @@ def test_sandra_runtime_has_hidden_reaction_state_and_methods():
 
     for token in [
         "self.energy = 100",
-        "self.uses_own_var_state = True",
         "self.rebellion = 0",
         "self.anger_with_player = 0",
         "self.trust = 0",
@@ -110,18 +110,17 @@ def test_sandra_runtime_has_hidden_reaction_state_and_methods():
         "self.reaction_log = []",
         "def daily_mana_update",
         "def reaction_score",
-        "self.weekly_chore_score = 0",
-        "self.weekly_wake_pending = 0",
-        "self.night_thanks_ready_flag = 0",
-        "self.sandraSex = False",
-        "def weekly_report_finished",
-        "def weekly_thanks_wake_seen",
-        "def night_thanks_seen",
-        "def weekly_thanks_event_ready",
-        "def weekly_thanks_target_label",
-        "def sex_available",
     ]:
         assert token in source
+
+    for retired in (
+        "weekly_chore_score", "weekly_chore_counter", "weekly_chore_eval",
+        "weekly_wake_pending", "room_unlocked_flag", "final_reward_flag",
+        "night_thanks_ready_flag", "night_thanks_last_day",
+        "weekly_thanks_event_ready", "weekly_thanks_target_label",
+        "def sex_available",
+    ):
+        assert retired not in source
 
     for token in [
         "def reset_daily",
@@ -169,6 +168,31 @@ def test_sandra_runtime_has_hidden_reaction_state_and_methods():
         assert token not in sandra_info_block
 
 
+def test_sandra_story_thread_is_the_only_sex_unlock_authority():
+    source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+    room = SANDRA_ROOM.read_text(encoding="utf-8-sig")
+    events = SANDRA_EVENTS.read_text(encoding="utf-8-sig")
+    talk = SANDRA_TALK.read_text(encoding="utf-8-sig")
+
+    assert "self.sandraSex" not in source
+    assert "mc_visit_first_" not in source
+    assert "self.weekly_wake_num" not in source
+    assert "final_reward_flag" not in source
+    assert 'threads["sandraWeeklyEvaluation"].completed' in room
+    assert 'threads["sandraWeeklyEvaluation"].completed' in events
+    assert 'threads["sandraWeeklyEvaluation"].completed' in talk
+
+
+def test_sandra_schedule_is_unique_and_hour_based():
+    schedule = json.loads(SANDRA_SCHEDULE.read_text(encoding="utf-8-sig"))
+    entries = list(schedule["entries"])
+    labels = [entry["label"] for entry in entries]
+
+    assert len(labels) == len(set(labels))
+    assert all("start" in entry and "end" in entry for entry in entries)
+    assert all("time_slots" not in entry for entry in entries)
+
+
 def test_sandra_harassment_uses_girl_class_state_not_old_maps():
     sources = {
         "reaction": HARASS_REACTION.read_text(encoding="utf-8-sig"),
@@ -178,9 +202,14 @@ def test_sandra_harassment_uses_girl_class_state_not_old_maps():
     }
     combined = "\n".join(sources.values())
 
-    assert "getPersonInfo(" in combined
+    assert "people.get_info(" in combined
+    assert "getPersonInfo(" not in combined
     assert ".harass_instruction()" in combined
     assert ".set_harass_instruction(" in combined
+    runtime = PEOPLE_RUNTIME.read_text(encoding="utf-8-sig")
+    assert 'self.harass_instruction_state = ""' in runtime
+    assert 'return str(self.harass_instruction_state or "")' in runtime
+    assert 'self.var["harass_instruction"]' not in runtime
     assert ".change_social(" in combined
     assert ".change_mana(" in combined
     assert ".change_rebellion(" in combined
@@ -198,12 +227,56 @@ def test_sandra_harassment_uses_girl_class_state_not_old_maps():
         assert forbidden not in combined
 
 
+def test_sandra_dress_event_and_progress_have_single_typed_authorities():
+    household = (PROJECT_ROOT / "game/Inn/HouseholdRuntimeEvents.rpy").read_text(encoding="utf-8-sig")
+    kitchen = (PROJECT_ROOT / "game/Inn/TavernKitchen.rpy").read_text(encoding="utf-8-sig")
+    breakfast = (PROJECT_ROOT / "game/Inn/TavernKitchenBreakfast.rpy").read_text(encoding="utf-8-sig")
+    threads_source = STORY_RUNTIME.read_text(encoding="utf-8-sig")
+    progress_source = (PROJECT_ROOT / "game/Utilities/General/Common/AchievementsEndings.rpy").read_text(encoding="utf-8-sig")
+    migration = SAVE_SYNC.read_text(encoding="utf-8-sig")
+    live_sources = "\n".join((household, kitchen, breakfast, progress_source))
+
+    assert 'LThreadData(0, "sandra", "RevealingDressInitiative"' in threads_source
+    assert '"SandraDressInitiativeEvent"' in threads_source
+    assert '"TavernKitchen"' in threads_source
+    assert '"sandra_dress_initiative"' in threads_source
+    conditions_source = (PROJECT_ROOT / "game/Utilities/General/Events/conditions.rpy").read_text(encoding="utf-8-sig")
+    assert '"daily_events": daily_events' in conditions_source
+    assert 'story_event_available("TavernKitchen", "sandra_dress_initiative")' in kitchen
+    assert 'story_event_available("TavernKitchen", "sandra_dress_initiative")' in breakfast
+    assert '$ threads["sandraRevealingDressInitiative"].complete()' in household
+    assert 'Sandra.revealing_dress_code = dress_name' in household
+    assert "sandra_revealing_dress_initiative_ready" not in live_sources
+    assert "Sandra.var" not in live_sources
+    assert "kitchen_regular_breakfast_requests" not in kitchen
+    assert "kitchen_client_manners_requests" not in kitchen
+
+    assert "tractir_progress.maid_revenge_ready = True" in progress_source
+    assert "tractir_progress.maid_revenge_reason = str(reason or \"\")" in progress_source
+    assert "tractir_progress.sandra_secured_future_day" in progress_source
+    assert "Sandra.var" not in progress_source
+
+    migration_block = migration.split("def updateSave_V49():", 1)[1].split("label before_load:", 1)[0]
+    for retired_key in (
+        "knowmolodost", "revealing_dress_ordered", "revealing_dress_code",
+        "revealing_dress_initiative_seen", "harass_instruction", "SecuredFuture",
+        "SecuredFutureDay", "MaidRevengeEnding", "MaidRevengeReason",
+        "kitchen_regular_breakfast_requests", "kitchen_client_manners_requests",
+    ):
+        assert f'"{retired_key}"' in migration_block
+    assert "initThreads()" in migration_block
+
+
 def test_sandra_night_thanks_uses_current_late_night_time_contract():
     room_source = SANDRA_ROOM.read_text(encoding="utf-8-sig")
+    event_source = SANDRA_EVENTS.read_text(encoding="utf-8-sig")
+    story_source = STORY_RUNTIME.read_text(encoding="utf-8-sig")
 
     assert "int(time or 0) == 3" not in room_source
-    assert "int(hour or 0) >= 22" in room_source
-    assert "int(hour or 0) <= 23" in room_source
+    assert '"TavernSandraRoom", "sandra_night_thanks"' in story_source
+    assert "(22, 23)" in story_source
+    assert "int(calendar_v2.hour or 0) < 22" in event_source
+    assert "int(calendar_v2.hour or 0) > 23" in event_source
 
 
 def test_sandra_topics_use_existing_general_topic_ids_only():
@@ -231,6 +304,8 @@ def test_sandra_dress_change_is_direct_action_not_refresh_dispatcher():
     assert "label int_sandra_dress_change" not in dress_source
     assert "IntSandraOfferBuyDress" in talk_source
     assert "IntSandraDressChangeApply" not in talk_source
+    assert "main_ui_runtime.action_items" not in dress_source
+    assert "MenuItem(" not in dress_source
 
 
 def test_sandra_talk_is_direct_entry_not_refresh_apply_dispatcher():
@@ -248,34 +323,63 @@ def test_sandra_talk_is_direct_entry_not_refresh_apply_dispatcher():
     assert "call IntSandraTalkRefresh" not in talk_source
     assert '"IntSandraTalkApply"' not in talk_source
     assert '"IntSandraTalkRefresh"' not in dress_source
-    assert 'return "IntSandraTalk"' in social_source
+    assert "social_topic_return_label" not in social_source
     assert 'return "IntSandraTalkRefresh"' not in social_source
+    assert "while True:" not in talk_source
+    assert "jump IntSandraTalk" not in talk_source
+    assert "main_ui_runtime.action_items" not in talk_source
+    assert "MenuItem(" not in talk_source
+    assert '"Попробовать помириться с мамой"' in talk_source
+    assert '"Предложить купить мамуле обновку"' in talk_source
+    assert "call OldPointSmallTalkMenu" not in talk_source
+    assert "call OldPointFlirtAttempt" not in talk_source
+    assert "call PlayerCardGiftToFixedTargetMenu" not in talk_source
+    assert "call OldPointKinoAttempt" not in talk_source
+    assert "call OldPointApology" not in talk_source
+    assert 'if not getPersonInfo(girl_name).social_action_allowed("talk"):' not in talk_source
+    assert "menu:" in talk_source
+    assert "$ main_ui_end_talk_state()" in talk_source
 
 
-def test_sandra_weekly_rewards_use_sandra_info_state_methods():
+def test_sandra_weekly_rewards_use_player_system_and_story_thread_authorities():
     init_source = SANDRA_INIT.read_text(encoding="utf-8-sig")
     chores_source = PLAYER_CHORES.read_text(encoding="utf-8-sig")
+    player_source = PLAYER_RUNTIME.read_text(encoding="utf-8-sig")
     events_source = SANDRA_EVENTS.read_text(encoding="utf-8-sig")
     room_source = SANDRA_ROOM.read_text(encoding="utf-8-sig")
     story_source = STORY_RUNTIME.read_text(encoding="utf-8-sig")
+    thread_source = THREAD_RUNTIME.read_text(encoding="utf-8-sig")
+    next_day_source = NEXT_DAY.read_text(encoding="utf-8-sig")
 
-    assert "def weekly_report_finished" in init_source
-    assert "def weekly_thanks_wake_seen" in init_source
-    assert "def night_thanks_seen" in init_source
-    assert "Sandra.weekly_report_finished(" in chores_source
+    assert "self.last_score = 0" in player_source
+    assert 'self.last_evaluation = ""' in player_source
+    assert "def weekly_report_finished" not in init_source
+    assert "def weekly_thanks_wake_seen" not in init_source
+    assert "def night_thanks_seen" not in init_source
     assert "sandra_friend=Sandra.rel" in chores_source
-    assert "sandra_flags=Sandra.var" in chores_source
-    assert "threads[\"sandraWeeklyEvaluation\"].advanceTo(Sandra.weekly_wake_num, force_active=True)" in chores_source
+    assert "sandra_state={" not in chores_source
+    assert "player.chores.last_score" in chores_source
+    assert "player.chores.last_evaluation" in chores_source
+    assert "sandra_flags=Sandra.var" not in chores_source
+    assert 'sandra_thread = threads["sandraWeeklyEvaluation"]' in chores_source
+    assert "sandra_thread.forceEnable()" in chores_source
+    assert "mc_visit_first_" not in chores_source
     assert 'Friends["sandra"] = max(0, _pc_to_int(preview.get("sandra_friend", 0), 0))' not in chores_source
     assert 'SandraVar["WeeklyChoreCheckCounter"]' not in chores_source
-    assert "Sandra.weekly_thanks_wake_seen(" in events_source
+    assert "Sandra.weekly_thanks_wake_seen(" not in events_source
     assert "def sandra_week5_apply_step_gains" not in events_source
     assert 'SandraVar["Week5WakePending"] = 0' not in events_source
     assert 'SandraVar["NightThanksReady"] = 1' not in events_source
-    assert "Sandra.night_thanks_seen()" in events_source
+    assert "Sandra.night_thanks_seen()" not in events_source
     assert 'call PregnancyCheck("sandra", "inside", 1, "Вы")' in events_source
     assert 'call PregnancyCheck(girl_name, "inside", 1, "Вы")' in events_source
-    assert '["#Sandra.weekly_thanks_event_ready()"]' in story_source
+    assert '"sandraWeeklyEvaluationEnabled"' in story_source
+    assert '"TavernSandraNightThanksScene"' in story_source
+    assert 'threads["sandraWeeklyEvaluation"].advance()' in events_source
+    assert 'threads["sandraWeeklyEvaluation"].disable()' in events_source
+    assert "def disable(self):" in thread_source
+    assert 'call checkTriggers("TavernMyRoom", "sleep", 0)' in next_day_source
+    assert "nextday_pick_post_sleep_event_label" not in next_day_source
     assert 'SandraVar["NightThanksReady"] = 0' not in room_source
     assert 'Friends["sandra"] = min(20, int(Friends.get("sandra", 0) or 0) + 2)' not in room_source
     assert 'self.stats["sexacts"] = people_to_int(self.stats.get("sexacts", 0), 0) + 1' not in init_source

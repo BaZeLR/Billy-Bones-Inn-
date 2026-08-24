@@ -24,9 +24,12 @@ init python:
         if DrawPossible != 0:
             DrawPossible = 1
         
-        # Calculate random outcome based on level difference and draw possibility
-        import random
-        RandVar = random.randint(1, 1 + DrawPossible * 3 + 1 + LevelDiff * 3)
+        # Use the project RNG so rollback/replay produces the same outcome.
+        RandVar = procedural_randint(
+            1,
+            1 + DrawPossible * 3 + 1 + LevelDiff * 3,
+            key="fight_result:%s:%s:%s:%s" % (Enemy1, Enemy2, DrawPossible, calendar_v2.clock_minutes()),
+        )
         
         if RandVar == 1:
             Winner = 2  # Weaker opponent wins (upset)

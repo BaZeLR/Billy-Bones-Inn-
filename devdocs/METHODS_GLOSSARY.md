@@ -31,7 +31,7 @@ Update rule:
 | --- | --- | --- |
 | `register_room_runtime(room_obj)` | Register a room object in the runtime registry. | `game/Inn/RoomTemplate.rpy` |
 | `get_registered_room(room_code)` | Resolve the runtime `Room` object from a room code. | `game/Inn/RoomTemplate.rpy` |
-| `MoveToRoom(target_label, movement_minutes=0)` | Canonical room-to-room movement label. | `game/Inn/RoomTemplate.rpy` |
+| `movement_actions(target_label, movement_minutes=0)` | Builds a returnable time-cost call followed by a room jump, without nesting locations on Ren'Py's return stack. | `game/Utilities/Time/TimeTurnSystem.rpy` |
 | `main_ui_restore_room_scene_state()` | Restore room HUD state after temporary menus/scenes. | `game/Inn/my_layouts/main_layout.rpy` |
 | `main_ui_open_inventory_section(section_id)` | Canonical HUD entry into categorized inventory browsing. | `game/Inn/my_layouts/main_layout.rpy` |
 | `main_ui_begin_talk_state(title, selected_char)` | Enter talk UI mode. | `game/Inn/my_layouts/main_layout.rpy` |

@@ -1,0 +1,19 @@
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_social_actions_do_not_reverse_sync_authored_openness_from_relationship():
+    game_sources = "\n".join(
+        path.read_text(encoding="utf-8-sig")
+        for path in (ROOT / "game").rglob("*.rpy")
+    )
+    actions = (ROOT / "game/Utilities/General/Common/Actions.rpy").read_text(
+        encoding="utf-8-sig"
+    )
+
+    assert "adjust_otkroven" not in game_sources
+    assert "_action_sync_openness" not in game_sources
+    assert "sync_openness" not in actions
+    assert "info.change_social(friend_delta=" in actions

@@ -2,7 +2,7 @@
 
 **Purpose**: Canonical reference for all Georgett story progression. Every flag is a direct int milestone in GeorgettVar. All events, talk options, and repeatable content (especially the post-hire sex engine path) must be defined/defaulted with pictures and texts using only these flags. No boolean wrappers, no middleware, no bridges, no fallbacks, no bloat.
 
-**Rules (Melissa bats_episode precedent + strict project standard)**:
+**Rules (ordered `thread.num` stage precedent + strict project standard)**:
 - All checks: `int(GeorgettVar.get("key", 0) or 0) == 1` (or `> 0`, `>= N`).
 - No `def georgett_*_ready():` functions that return booleans.
 - No extra layers. Logic lives only in `game/NPC/Girls/Georgett/` files.

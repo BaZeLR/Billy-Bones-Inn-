@@ -284,7 +284,7 @@ define gui.main_menu_text_xalign = 1.0
 
 ## Frames ######################################################################
 ##
-## These variables control the player.stats.look of frames that can contain user interface
+## These variables control the appearance of frames that can contain user interface
 ## components when an overlay or window is not present.
 
 ## Generic frames.
@@ -305,7 +305,7 @@ define gui.frame_tile = False
 
 ## Bars, Scrollbars, and Sliders ###############################################
 ##
-## These control the player.stats.look and size of bars, scrollbars, and sliders.
+## These control the appearance and size of bars, scrollbars, and sliders.
 ##
 ## The default GUI only uses sliders and vertical scrollbars. All of the other
 ## bars are only used in creator-written screens.

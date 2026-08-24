@@ -1,21 +1,15 @@
 # People Data/Info Standard
 
-This project now has a FamilyLife-style people layer in `game/Inn/PeopleRuntime.rpy`.
-
-The layer does not replace the existing Tractir maps. It exposes the same state through OOP objects:
+The authoritative people layer is `game/Utilities/General/NPC/PeopleRuntime.rpy`.
 
 - `peopleData[id]` is static or mostly-static person data: display names, age, portrait, default room, description, gift preferences, and schedule entries.
 - `peopleInfo[id]` is save-state runtime info: relation, openness, corruption, known flag, daily talk/flirt/gift/ask counters, current location, and personal topic/gift history.
 
-Existing maps remain authoritative for old code:
-
-- `Friends`
-- `otkroven`
-- `sluttiness`
-- `knowsMC`
-- `TalkedToday`, `FlirtedToday`, `GiftedToday`, `AskedToday`
-- `CurrentLoc`
-- `NPCSchedules`
+Do not add scalar or dictionary mirrors for these values. Runtime relationship and
+story state belongs to the `PeopleInfo` subclass instance. Static metadata and all
+schedule definitions/caches belong to its `PeopleData` owner. `getLocation()` and
+`getNPCids()` are projections of that schedule; reads must not write a copied
+location into NPC state.
 
 Use these helpers in new event/thread code:
 
@@ -34,8 +28,12 @@ $ room = melissa_data.getLocation()
 When adding a new person:
 
 1. Add names to `NamesSet.rpy` or another init source.
-2. Set existing maps in that person's `Init*.rpy`: `CurrentLoc`, `Friends`, `sluttiness`, `otkroven`, `knowsMC`, `age_girls`, `girltextdesc`.
-3. Add schedule entries with `npc_schedule_set`.
-4. `call InitPeople` rebuilds `peopleData`/`peopleInfo` after all current init labels.
+2. Define one `PeopleData` subclass/instance for metadata and schedule ownership.
+3. Define one `PeopleInfo`, `Girl`, or `BaseNPC` subclass/instance for mutable state.
+4. Register those objects in the person's `Init*.rpy` label. `InitGameNPCs` calls
+   `initPeople()` once after registrations and then loads interval schedules.
 
-For loaded saves, `people_after_load_update()` rebuilds the layer without removing existing event or UI state.
+On load, `npc_schedule_after_load()` repairs missing schedule-runtime attributes
+from older saves, invalidates only the derived daily plan, and reloads JSON interval
+entries. It does not rebuild `peopleInfo`, overwrite story state, or copy schedule
+locations into NPC instances.

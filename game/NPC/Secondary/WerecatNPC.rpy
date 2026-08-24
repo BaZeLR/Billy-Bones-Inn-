@@ -1,129 +1,4 @@
-            "hunter_tease_offer_ready": 0,
-            "hunter_tease_offer_day": -1,            "hunter_tease_offer_day": -1,
-            "hunter_tease_offer_ready": 0,    def werecat_sync_profile():
-        display_name = str(werecat_display_name() or "Луна")
-        # werecat is a creature/animal (pet), not a human girl — skip DateOfBirth entirely
-        # (no birth records, pregnancy logic, etc. for non-human entities)
-        desc = "Невысокая гибкая кошкодевочка с внимательными золотистыми глазами, мягкими ушами и пушистым хвостом. Двигается бесшумно, настороженно и слишком ловко для обычной домашней любимицы."
-
-        # Use the object model only for werecat (creature/pet). Do NOT write to legacy girltextdesc here —
-        # that dict may not exist this early in NextDay init, and werecat is now a BaseNPC object.
-        # Set description directly on the instance so .description / self.description works everywhere.
-        if "werecat" in peopleInfo:
-            info = peopleInfo["werecat"]
-            if hasattr(info, "data") and info.data is not None:
-                info.data.cname = display_name
-                info.data.fullname = display_name
-                info.data.genitive = display_name
-                info.data.dative = display_name
-                info.data.description = desc
-            # Direct attribute for code that does werecat.description or info.description
-            info.description = desc
-        info = peopleInfo.get("werecat", None)
-        if info is not None and werecat_is_living_with_household():
-            info.known = True
-        if not werecat_is_living_with_household():
-            if info is not None:
-                info.location = ""
-            return ""
-        location_value = str(getLocation("werecat") or "Backyard")
-        if info is not None:
-            info.location = location_value
-        return location_value
-    def _werecat_after_load_init():
-        try:
-            werecat_sync_profile()
-        except Exception:
-            pass
-
-    if _werecat_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(_werecat_after_load_init)
-            "hunter_tease_offer_day": -1,
-            "hunter_tease_offer_ready": 0,            "hunter_tease_offer_ready": 0,
-            "hunter_tease_offer_day": -1,            "hunter_tease_offer_day": -1,
-            "hunter_tease_offer_ready": 0,    def werecat_sync_profile():
-        display_name = str(werecat_display_name() or "Луна")
-        # werecat is a creature/animal (pet), not a human girl — skip DateOfBirth entirely
-        # (no birth records, pregnancy logic, etc. for non-human entities)
-        desc = "Невысокая гибкая кошкодевочка с внимательными золотистыми глазами, мягкими ушами и пушистым хвостом. Двигается бесшумно, настороженно и слишком ловко для обычной домашней любимицы."
-
-        # Use the object model only for werecat (creature/pet). Do NOT write to legacy girltextdesc here —
-        # that dict may not exist this early in NextDay init, and werecat is now a BaseNPC object.
-        # Set description directly on the instance so .description / self.description works everywhere.
-        if "werecat" in peopleInfo:
-            info = peopleInfo["werecat"]
-            if hasattr(info, "data") and info.data is not None:
-                info.data.cname = display_name
-                info.data.fullname = display_name
-                info.data.genitive = display_name
-                info.data.dative = display_name
-                info.data.description = desc
-            # Direct attribute for code that does werecat.description or info.description
-            info.description = desc
-        info = peopleInfo.get("werecat", None)
-        if info is not None and werecat_is_living_with_household():
-            info.known = True
-        $ werecat_sync_profile()
-    if not werecat_is_living_with_household():
-            if info is not None:
-                info.location = ""
-            return ""
-        location_value = str(getLocation("werecat") or "Backyard")
-        if info is not None:
-            info.location = location_value
-        return location_value
-    def _werecat_after_load_init():
-        try:
-            werecat_sync_profile()
-        except Exception:
-            pass
-
-    if _werecat_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(_werecat_after_load_init)
-            "hunter_tease_offer_day": -1,
-            "hunter_tease_offer_ready": 0,            "hunter_tease_offer_ready": 0,
-            "hunter_tease_offer_day": -1,            "hunter_tease_offer_day": -1,
-            "hunter_tease_offer_ready": 0,    def werecat_sync_profile():
-        display_name = str(werecat_display_name() or "Луна")
-        # werecat is a creature/animal (pet), not a human girl — skip DateOfBirth entirely
-        # (no birth records, pregnancy logic, etc. for non-human entities)
-        desc = "Невысокая гибкая кошкодевочка с внимательными золотистыми глазами, мягкими ушами и пушистым хвостом. Двигается бесшумно, настороженно и слишком ловко для обычной домашней любимицы."
-
-        # Use the object model only for werecat (creature/pet). Do NOT write to legacy girltextdesc here —
-        # that dict may not exist this early in NextDay init, and werecat is now a BaseNPC object.
-        # Set description directly on the instance so .description / self.description works everywhere.
-        if "werecat" in peopleInfo:
-            info = peopleInfo["werecat"]
-            if hasattr(info, "data") and info.data is not None:
-                info.data.cname = display_name
-                info.data.fullname = display_name
-                info.data.genitive = display_name
-                info.data.dative = display_name
-                info.data.description = desc
-            # Direct attribute for code that does werecat.description or info.description
-            info.description = desc
-        info = peopleInfo.get("werecat", None)
-        if info is not None and werecat_is_living_with_household():
-            info.known = True
-        $ werecat_sync_profile()
-    if not werecat_is_living_with_household():
-            if info is not None:
-                info.location = ""
-            return ""
-        location_value = str(getLocation("werecat") or "Backyard")
-        if info is not None:
-            info.location = location_value
-        return location_value
-    def _werecat_after_load_init():
-        try:
-            werecat_sync_profile()
-        except Exception:
-            pass
-
-    if _werecat_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(_werecat_after_load_init)
-            "hunter_tease_offer_day": -1,
-            "hunter_tease_offer_ready": 0,# ================================================================================
+# ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init -8 python:
@@ -136,24 +11,6 @@ init -8 python:
             "tracks_seen": 0,
             "tracks_first_text_seen": 0,
             "tracks_room": "",
-            "trap_active": 0,
-            "trap_room": "",
-            "trap_day": -1,
-            "trap_active": 0,
-            "trap_room": "",
-            "trap_day": -1,
-            "trap_active": 0,
-            "trap_room": "",
-            "trap_day": -1,
-            "trap_active": 0,
-            "trap_room": "",
-            "trap_day": -1,
-            "trap_active": 0,
-            "trap_room": "",
-            "trap_day": -1,
-            "trap_active": 0,
-            "trap_room": "",
-            "trap_day": -1,
             "trap_rooms": {},
             "caught": 0,
             "adopted": 0,
@@ -178,39 +35,20 @@ init -8 python:
             "comfort": 0,
         }
 
-    def werecat_info():
-        if "werecat" not in peopleData:
-            peopleData["werecat"] = PeopleData(
-                "werecat",
-                cname="Кошка",
-                fullname="Луна",
-                genitive="Луны",
-                dative="Луне",
-                portrait="images/general/kitty.png",
-                default_location="",
-                description="Домовая кошка-оборотень, если она решила остаться при трактире.",
-            )
-        if "werecat" not in peopleInfo:
-            peopleInfo["werecat"] = BaseNPC("werecat")
-        info = peopleInfo["werecat"]
-        info.data = peopleData["werecat"]
-        if not isinstance(getattr(info, "var", None), dict):
-            info.var = {}
-        if not isinstance(getattr(info, "stats", None), dict):
-            info.stats = {}
-        for key, value in werecat_story_defaults().items():
-            if key not in info.var:
-                info.var[key] = dict(value) if isinstance(value, dict) else value
-        for key, value in werecat_pet_defaults().items():
-            if key not in info.stats:
-                info.stats[key] = value
-        return info
+    class WerecatInfo(BaseNPC):
+        talk_label = "IntWerecatTalk"
+        unknown_name = "Кошкодевочка"
+
+        def __init__(self):
+            super().__init__("werecat")
+            self.var = werecat_story_defaults()
+            self.stats = werecat_pet_defaults()
 
     def werecat_state():
-        return werecat_info().var
+        return werecat.var
 
     def werecat_pet_state():
-        return werecat_info().stats
+        return werecat.stats
 
     def werecat_is_living_with_household():
         state = werecat_state()
@@ -219,371 +57,16 @@ init -8 python:
             adopted_count = max(1, adopted_count)
         return adopted_count >= 1 and int(state.get("sold", 0) or 0) == 0
 
-    WERECAT_ROAM_ROOMS = {
-        0: ("TavernKitchen", "TavernMain", "TavernStorage"),
-        1: ("Backyard", "TavernKitchen", "TavernStorage"),
-        2: ("Backyard", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom"),
-        3: ("TavernKitchen", "Backyard", "TavernStorage"),
-        4: ("TavernMain", "TavernKitchen", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom", "TavernSandraRoom", "TavernMyRoom", "Backyard"),
-    }
-    WERECAT_ROAM_ROOMS = {
-        0: ("TavernKitchen", "TavernMain", "TavernStorage"),
-        1: ("Backyard", "TavernKitchen", "TavernStorage"),
-        2: ("Backyard", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom"),
-        3: ("TavernKitchen", "Backyard", "TavernStorage"),
-        4: ("TavernMain", "TavernKitchen", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom", "TavernSandraRoom", "TavernMyRoom", "Backyard"),
-    }
-    WERECAT_ROAM_ROOMS = {
-        0: ("TavernKitchen", "TavernMain", "TavernStorage"),
-        1: ("Backyard", "TavernKitchen", "TavernStorage"),
-        2: ("Backyard", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom"),
-        3: ("TavernKitchen", "Backyard", "TavernStorage"),
-        4: ("TavernMain", "TavernKitchen", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom", "TavernSandraRoom", "TavernMyRoom", "Backyard"),
-    }
-    WERECAT_ROAM_ROOMS = {
-        0: ("TavernKitchen", "TavernMain", "TavernStorage"),
-        1: ("Backyard", "TavernKitchen", "TavernStorage"),
-        2: ("Backyard", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom"),
-        3: ("TavernKitchen", "Backyard", "TavernStorage"),
-        4: ("TavernMain", "TavernKitchen", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom", "TavernSandraRoom", "TavernMyRoom", "Backyard"),
-    }
-    WERECAT_ROAM_ROOMS = {
-        0: ("TavernKitchen", "TavernMain", "TavernStorage"),
-        1: ("Backyard", "TavernKitchen", "TavernStorage"),
-        2: ("Backyard", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom"),
-        3: ("TavernKitchen", "Backyard", "TavernStorage"),
-        4: ("TavernMain", "TavernKitchen", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom", "TavernSandraRoom", "TavernMyRoom", "Backyard"),
-    }
-    WERECAT_ROAM_ROOMS = {
-        0: ("TavernKitchen", "TavernMain", "TavernStorage"),
-        1: ("Backyard", "TavernKitchen", "TavernStorage"),
-        2: ("Backyard", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom"),
-        3: ("TavernKitchen", "Backyard", "TavernStorage"),
-        4: ("TavernMain", "TavernKitchen", "TavernStorage", "TavernMelissaRoom", "TavernAmandaRoom", "TavernSandraRoom", "TavernMyRoom", "Backyard"),
-    }
     WERECAT_MILK_ITEM_IDS = ("milk_pitcher_001",)
 
-    def werecat_sleep_location():
-        return werecat_roam_location() or "Backyard"
-
-    def werecat_roam_location():
-        if not werecat_is_living_with_household():
-            return ""
-        slot_value = int(calendar_v2.time_slot() or 0)
-        rooms = list(WERECAT_ROAM_ROOMS.get(slot_value, WERECAT_ROAM_ROOMS.get(1, ("Backyard",))))
-        if not rooms:
-            return "Backyard"
-        seed_value = int(calendar_v2.daysInGame or 0) * 17 + int(calendar_v2.day or 0) * 7 + int(calendar_v2.period or 0) * 11 + int(calendar_v2.week or 0) * 5 + slot_value * 13
-        return str(rooms[seed_value % len(rooms)] or "Backyard")
-
-    def werecat_roam_matches(location=""):
-        return werecat_is_living_with_household() and str(werecat_roam_location() or "") == str(location or "")
-
-    def werecat_schedule_tavern_kitchen():
-        return werecat_roam_matches("TavernKitchen")
-
-    def werecat_schedule_tavern_main():
-        return werecat_roam_matches("TavernMain")
-
-    def werecat_schedule_tavern_storage():
-        return werecat_roam_matches("TavernStorage")
-
-    def werecat_schedule_backyard():
-        return werecat_roam_matches("Backyard")
-
-    def werecat_schedule_melissa_room():
-        return werecat_roam_matches("TavernMelissaRoom")
-
-    def werecat_schedule_amanda_room():
-        return werecat_roam_matches("TavernAmandaRoom")
-
-    def werecat_schedule_sandra_room():
-        return werecat_roam_matches("TavernSandraRoom")
-
-    def werecat_schedule_player_room():
-        return werecat_roam_matches("TavernMyRoom")
-
-    WERECAT_ROAM_CONDITIONS = {
-        "TavernKitchen": werecat_schedule_tavern_kitchen,
-        "TavernMain": werecat_schedule_tavern_main,
-        "TavernStorage": werecat_schedule_tavern_storage,
-        "Backyard": werecat_schedule_backyard,
-        "TavernMelissaRoom": werecat_schedule_melissa_room,
-        "TavernAmandaRoom": werecat_schedule_amanda_room,
-        "TavernSandraRoom": werecat_schedule_sandra_room,
-        "TavernMyRoom": werecat_schedule_player_room,
-    }
-
-    werecat_info()
-
-    def werecat_sleep_location():
-        return werecat_roam_location() or "Backyard"
-
-    def werecat_roam_location():
-        if not werecat_is_living_with_household():
-            return ""
-        slot_value = int(time or 0)
-        rooms = list(WERECAT_ROAM_ROOMS.get(slot_value, WERECAT_ROAM_ROOMS.get(1, ("Backyard",))))
-        if not rooms:
-            return "Backyard"
-        seed_value = int(dayspassed or 0) * 17 + int(day or 0) * 7 + int(month or 0) * 11 + int(week or 0) * 5 + slot_value * 13
-        return str(rooms[seed_value % len(rooms)] or "Backyard")
-
-    def werecat_roam_matches(location=""):
-        return werecat_is_living_with_household() and str(werecat_roam_location() or "") == str(location or "")
-
-    def werecat_schedule_tavern_kitchen():
-        return werecat_roam_matches("TavernKitchen")
-
-    def werecat_schedule_tavern_main():
-        return werecat_roam_matches("TavernMain")
-
-    def werecat_schedule_tavern_storage():
-        return werecat_roam_matches("TavernStorage")
-
-    def werecat_schedule_backyard():
-        return werecat_roam_matches("Backyard")
-
-    def werecat_schedule_melissa_room():
-        return werecat_roam_matches("TavernMelissaRoom")
-
-    def werecat_schedule_amanda_room():
-        return werecat_roam_matches("TavernAmandaRoom")
-
-    def werecat_schedule_sandra_room():
-        return werecat_roam_matches("TavernSandraRoom")
-
-    def werecat_schedule_player_room():
-        return werecat_roam_matches("TavernMyRoom")
-
-    WERECAT_ROAM_CONDITIONS = {
-        "TavernKitchen": werecat_schedule_tavern_kitchen,
-        "TavernMain": werecat_schedule_tavern_main,
-        "TavernStorage": werecat_schedule_tavern_storage,
-        "Backyard": werecat_schedule_backyard,
-        "TavernMelissaRoom": werecat_schedule_melissa_room,
-        "TavernAmandaRoom": werecat_schedule_amanda_room,
-        "TavernSandraRoom": werecat_schedule_sandra_room,
-        "TavernMyRoom": werecat_schedule_player_room,
-    }
-
-    def werecat_sleep_location():
-        return werecat_roam_location() or "Backyard"
-
-    def werecat_roam_location():
-        if not werecat_is_living_with_household():
-            return ""
-        slot_value = int(calendar_v2.time_slot() or 0)
-        rooms = list(WERECAT_ROAM_ROOMS.get(slot_value, WERECAT_ROAM_ROOMS.get(1, ("Backyard",))))
-        if not rooms:
-            return "Backyard"
-        seed_value = int(calendar_v2.daysInGame or 0) * 17 + int(calendar_v2.day or 0) * 7 + int(calendar_v2.period or 0) * 11 + int(calendar_v2.week or 0) * 5 + slot_value * 13
-        return str(rooms[seed_value % len(rooms)] or "Backyard")
-
-    def werecat_roam_matches(location=""):
-        return werecat_is_living_with_household() and str(werecat_roam_location() or "") == str(location or "")
-
-    def werecat_schedule_tavern_kitchen():
-        return werecat_roam_matches("TavernKitchen")
-
-    def werecat_schedule_tavern_main():
-        return werecat_roam_matches("TavernMain")
-
-    def werecat_schedule_tavern_storage():
-        return werecat_roam_matches("TavernStorage")
-
-    def werecat_schedule_backyard():
-        return werecat_roam_matches("Backyard")
-
-    def werecat_schedule_melissa_room():
-        return werecat_roam_matches("TavernMelissaRoom")
-
-    def werecat_schedule_amanda_room():
-        return werecat_roam_matches("TavernAmandaRoom")
-
-    def werecat_schedule_sandra_room():
-        return werecat_roam_matches("TavernSandraRoom")
-
-    def werecat_schedule_player_room():
-        return werecat_roam_matches("TavernMyRoom")
-
-    WERECAT_ROAM_CONDITIONS = {
-        "TavernKitchen": werecat_schedule_tavern_kitchen,
-        "TavernMain": werecat_schedule_tavern_main,
-        "TavernStorage": werecat_schedule_tavern_storage,
-        "Backyard": werecat_schedule_backyard,
-        "TavernMelissaRoom": werecat_schedule_melissa_room,
-        "TavernAmandaRoom": werecat_schedule_amanda_room,
-        "TavernSandraRoom": werecat_schedule_sandra_room,
-        "TavernMyRoom": werecat_schedule_player_room,
-    }
-
-    werecat_info()
-
-    def werecat_sleep_location():
-        return werecat_roam_location() or "Backyard"
-
-    def werecat_roam_location():
-        if not werecat_is_living_with_household():
-            return ""
-        slot_value = int(time or 0)
-        rooms = list(WERECAT_ROAM_ROOMS.get(slot_value, WERECAT_ROAM_ROOMS.get(1, ("Backyard",))))
-        if not rooms:
-            return "Backyard"
-        seed_value = int(dayspassed or 0) * 17 + int(day or 0) * 7 + int(month or 0) * 11 + int(week or 0) * 5 + slot_value * 13
-        return str(rooms[seed_value % len(rooms)] or "Backyard")
-
-    def werecat_roam_matches(location=""):
-        return werecat_is_living_with_household() and str(werecat_roam_location() or "") == str(location or "")
-
-    def werecat_schedule_tavern_kitchen():
-        return werecat_roam_matches("TavernKitchen")
-
-    def werecat_schedule_tavern_main():
-        return werecat_roam_matches("TavernMain")
-
-    def werecat_schedule_tavern_storage():
-        return werecat_roam_matches("TavernStorage")
-
-    def werecat_schedule_backyard():
-        return werecat_roam_matches("Backyard")
-
-    def werecat_schedule_melissa_room():
-        return werecat_roam_matches("TavernMelissaRoom")
-
-    def werecat_schedule_amanda_room():
-        return werecat_roam_matches("TavernAmandaRoom")
-
-    def werecat_schedule_sandra_room():
-        return werecat_roam_matches("TavernSandraRoom")
-
-    def werecat_schedule_player_room():
-        return werecat_roam_matches("TavernMyRoom")
-
-    WERECAT_ROAM_CONDITIONS = {
-        "TavernKitchen": werecat_schedule_tavern_kitchen,
-        "TavernMain": werecat_schedule_tavern_main,
-        "TavernStorage": werecat_schedule_tavern_storage,
-        "Backyard": werecat_schedule_backyard,
-        "TavernMelissaRoom": werecat_schedule_melissa_room,
-        "TavernAmandaRoom": werecat_schedule_amanda_room,
-        "TavernSandraRoom": werecat_schedule_sandra_room,
-        "TavernMyRoom": werecat_schedule_player_room,
-    }
-
-    def werecat_sleep_location():
-        return werecat_roam_location() or "Backyard"
-
-    def werecat_roam_location():
-        $ werecat_sync_profile()
-    if not werecat_is_living_with_household():
-            return ""
-        slot_value = int(calendar_v2.time_slot() or 0)
-        rooms = list(WERECAT_ROAM_ROOMS.get(slot_value, WERECAT_ROAM_ROOMS.get(1, ("Backyard",))))
-        if not rooms:
-            return "Backyard"
-        seed_value = int(calendar_v2.daysInGame or 0) * 17 + int(calendar_v2.day or 0) * 7 + int(calendar_v2.period or 0) * 11 + int(calendar_v2.week or 0) * 5 + slot_value * 13
-        return str(rooms[seed_value % len(rooms)] or "Backyard")
-
-    def werecat_roam_matches(location=""):
-        return werecat_is_living_with_household() and str(werecat_roam_location() or "") == str(location or "")
-
-    def werecat_schedule_tavern_kitchen():
-        return werecat_roam_matches("TavernKitchen")
-
-    def werecat_schedule_tavern_main():
-        return werecat_roam_matches("TavernMain")
-
-    def werecat_schedule_tavern_storage():
-        return werecat_roam_matches("TavernStorage")
-
-    def werecat_schedule_backyard():
-        return werecat_roam_matches("Backyard")
-
-    def werecat_schedule_melissa_room():
-        return werecat_roam_matches("TavernMelissaRoom")
-
-    def werecat_schedule_amanda_room():
-        return werecat_roam_matches("TavernAmandaRoom")
-
-    def werecat_schedule_sandra_room():
-        return werecat_roam_matches("TavernSandraRoom")
-
-    def werecat_schedule_player_room():
-        return werecat_roam_matches("TavernMyRoom")
-
-    WERECAT_ROAM_CONDITIONS = {
-        "TavernKitchen": werecat_schedule_tavern_kitchen,
-        "TavernMain": werecat_schedule_tavern_main,
-        "TavernStorage": werecat_schedule_tavern_storage,
-        "Backyard": werecat_schedule_backyard,
-        "TavernMelissaRoom": werecat_schedule_melissa_room,
-        "TavernAmandaRoom": werecat_schedule_amanda_room,
-        "TavernSandraRoom": werecat_schedule_sandra_room,
-        "TavernMyRoom": werecat_schedule_player_room,
-    }
-
-    werecat_info()
-
-    def werecat_sleep_location():
-        return werecat_roam_location() or "Backyard"
-
-    def werecat_roam_location():
-        if not werecat_is_living_with_household():
-            return ""
-        slot_value = int(time or 0)
-        rooms = list(WERECAT_ROAM_ROOMS.get(slot_value, WERECAT_ROAM_ROOMS.get(1, ("Backyard",))))
-        if not rooms:
-            return "Backyard"
-        seed_value = int(dayspassed or 0) * 17 + int(day or 0) * 7 + int(month or 0) * 11 + int(week or 0) * 5 + slot_value * 13
-        return str(rooms[seed_value % len(rooms)] or "Backyard")
-
-    def werecat_roam_matches(location=""):
-        return werecat_is_living_with_household() and str(werecat_roam_location() or "") == str(location or "")
-
-    def werecat_schedule_tavern_kitchen():
-        return werecat_roam_matches("TavernKitchen")
-
-    def werecat_schedule_tavern_main():
-        return werecat_roam_matches("TavernMain")
-
-    def werecat_schedule_tavern_storage():
-        return werecat_roam_matches("TavernStorage")
-
-    def werecat_schedule_backyard():
-        return werecat_roam_matches("Backyard")
-
-    def werecat_schedule_melissa_room():
-        return werecat_roam_matches("TavernMelissaRoom")
-
-    def werecat_schedule_amanda_room():
-        return werecat_roam_matches("TavernAmandaRoom")
-
-    def werecat_schedule_sandra_room():
-        return werecat_roam_matches("TavernSandraRoom")
-
-    def werecat_schedule_player_room():
-        return werecat_roam_matches("TavernMyRoom")
-
-    WERECAT_ROAM_CONDITIONS = {
-        "TavernKitchen": werecat_schedule_tavern_kitchen,
-        "TavernMain": werecat_schedule_tavern_main,
-        "TavernStorage": werecat_schedule_tavern_storage,
-        "Backyard": werecat_schedule_backyard,
-        "TavernMelissaRoom": werecat_schedule_melissa_room,
-        "TavernAmandaRoom": werecat_schedule_amanda_room,
-        "TavernSandraRoom": werecat_schedule_sandra_room,
-        "TavernMyRoom": werecat_schedule_player_room,
-    }
-
     def werecat_is_in_room(room_code=""):
-        room_key = str(room_code or CurLoc or "").strip()
+        room_key = str(room_code or rooms.current_code or "").strip()
         if room_key == "" or not werecat_is_living_with_household():
             return False
-        return str(getLocation("werecat") or "") == room_key
+        return str(people.location("werecat") or "") == room_key
 
     def werecat_ambient_text(room_code=""):
-        room_key = str(room_code or CurLoc or "").strip()
+        room_key = str(room_code or rooms.current_code or "").strip()
         name_value = str(werecat_display_name() or "Кошка")
         seed_value = werecat_scene_seed()
         if room_key == "TavernKitchen":
@@ -624,21 +107,9 @@ init -8 python:
         return options[seed_value % len(options)]
 
     def werecat_visible_text(room_code=""):
-        room_key = str(room_code or CurLoc or "").strip()
+        room_key = str(room_code or rooms.current_code or "").strip()
         if not room_key:
             return ""
-        try:
-            werecat_sync_profile()
-        except Exception:
-            pass
-        try:
-            werecat_sync_profile()
-        except Exception:
-            pass
-        try:
-            werecat_sync_profile()
-        except Exception:
-            pass
         if not werecat_is_in_room(room_key):
             return ""
         return str(werecat_ambient_text(room_key) or "")
@@ -653,7 +124,7 @@ init -8 python:
         return result
 
     def werecat_can_play_with_dog(room_code=""):
-        room_key = str(room_code or CurLoc or "").strip()
+        room_key = str(room_code or rooms.current_code or "").strip()
         if not werecat_is_in_room(room_key):
             return False
         try:
@@ -665,7 +136,7 @@ init -8 python:
         return room_key in ("Backyard", "TavernMain", "TavernKitchen", "TavernStorage")
 
     def werecat_has_milk_available(room_code=""):
-        room_key = str(room_code or CurLoc or "").strip()
+        room_key = str(room_code or rooms.current_code or "").strip()
         for item_id in WERECAT_MILK_ITEM_IDS:
             try:
                 if int(player.item_count(item_id) or 0) > 0:
@@ -680,7 +151,7 @@ init -8 python:
         return False
 
     def werecat_consume_milk(room_code=""):
-        room_key = str(room_code or CurLoc or "").strip()
+        room_key = str(room_code or rooms.current_code or "").strip()
         for item_id in WERECAT_MILK_ITEM_IDS:
             try:
                 if int(player.item_count(item_id) or 0) > 0:
@@ -737,10 +208,10 @@ init -8 python:
         return ""
 
     def werecat_scene_seed():
-        return int(current_game_day() or 0) + int(day or 0) + int(month or 0) + int(time or 0)
+        return int(current_game_day()) + int(calendar_v2.day or 0) + int(calendar_v2.period or 0) + int(calendar_v2.time_slot() or 0)
 
     def werecat_talk_intro_text(room_code=""):
-        room_key = str(room_code or CurLoc or "").strip()
+        room_key = str(room_code or rooms.current_code or "").strip()
         if room_key == "TavernKitchen":
             if werecat_scene_seed() % 2 == 0:
                 return "%s устроилась у самого очага и с деловым видом лакает оставленное ей блюдце молока. Кажется, кухню она уже считает своим законным теплым углом." % str(werecat_display_name() or "Кошка")
@@ -761,15 +232,15 @@ init -8 python:
         ]
         if int(werecat_state().get("rats_problem_active", 0) or 0) == 0:
             lines.append("С тех пор в кладовой стало заметно тише: крысы больше не хозяйничают, как раньше.")
-        if str(getLocation("werecat") or "") == "TavernKitchen":
+        if str(people.location("werecat") or "") == "TavernKitchen":
             lines.append("Сейчас держится поближе к теплу кухни и временами лакает оставленное для нее молоко.")
-        elif str(getLocation("werecat") or "") == "TavernMain":
+        elif str(people.location("werecat") or "") == "TavernMain":
             lines.append("Сейчас осваивается в общем зале и любит дремать поближе к камину.")
-        elif str(getLocation("werecat") or "") == "Backyard":
+        elif str(people.location("werecat") or "") == "Backyard":
             lines.append("Сейчас предпочитает двор, где можно и спрятаться, и выбрать удобный угол.")
-        elif str(getLocation("werecat") or "") == "TavernStorage":
+        elif str(people.location("werecat") or "") == "TavernStorage":
             lines.append("Сейчас держится у припасов и явно прислушивается к подполу.")
-        elif str(getLocation("werecat") or "") in ("TavernMelissaRoom", "TavernAmandaRoom", "TavernSandraRoom", "TavernMyRoom"):
+        elif str(people.location("werecat") or "") in ("TavernMelissaRoom", "TavernAmandaRoom", "TavernSandraRoom", "TavernMyRoom"):
             lines.append("Сейчас выбрала одну из комнат наверху и устроилась там как в тихом логове.")
         return lines
 
@@ -792,18 +263,17 @@ init -8 python:
             ("Доверие", str(trust_value)),
             ("Уют", str(comfort_value)),
             ("Состояние", trust_text),
-            ("Дом", str(getLocation("werecat") or "нет")),
+            ("Дом", str(people.location("werecat") or "нет")),
         ]
 
 
 
 init 2 python:
-    npc_daily_schedule_set(
-        "werecat",
-        default_slots=[],
-        random_slots=[
-            npc_daily_schedule_random_slot(
-                0,
+    WerecatStaticData.set_daily_schedule(
+        default_intervals=[],
+        random_intervals=[
+            npc_daily_schedule_random_interval(
+                6, 8,
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
                 label="morning_roam",
                 choices=[
@@ -813,8 +283,8 @@ init 2 python:
                     npc_daily_schedule_choice("Backyard", 1, True, True, "yard_roam", condition=werecat_is_living_with_household),
                 ],
             ),
-            npc_daily_schedule_random_slot(
-                1,
+            npc_daily_schedule_random_interval(
+                8, 11,
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
                 label="noon_roam",
                 choices=[
@@ -824,8 +294,8 @@ init 2 python:
                     npc_daily_schedule_choice("TavernMelissaRoom", 1, True, True, "melissa_room", condition=werecat_is_living_with_household),
                 ],
             ),
-            npc_daily_schedule_random_slot(
-                2,
+            npc_daily_schedule_random_interval(
+                11, 13,
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
                 label="day_roam",
                 choices=[
@@ -835,8 +305,8 @@ init 2 python:
                     npc_daily_schedule_choice("TavernAmandaRoom", 1, True, True, "amanda_room", condition=werecat_is_living_with_household),
                 ],
             ),
-            npc_daily_schedule_random_slot(
-                3,
+            npc_daily_schedule_random_interval(
+                13, 16,
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
                 label="evening_roam",
                 choices=[
@@ -846,8 +316,8 @@ init 2 python:
                     npc_daily_schedule_choice("TavernMain", 1, True, True, "evening_hall", condition=werecat_is_living_with_household),
                 ],
             ),
-            npc_daily_schedule_random_slot(
-                4,
+            npc_daily_schedule_random_interval(
+                16, 18,
                 weekdays=[1, 2, 3, 4, 5, 6, 7],
                 label="night_roam",
                 choices=[
@@ -862,43 +332,46 @@ init 2 python:
         ],
     )
 
-    _werecat_schedule_entries = []
-    for _werecat_slot, _werecat_rooms in WERECAT_ROAM_ROOMS.items():
-        for _werecat_room in _werecat_rooms:
-            _werecat_schedule_entries.append(NPCScheduleEntry(
-                location=_werecat_room,
-                weekdays=[1, 2, 3, 4, 5, 6, 7],
-                time_slots=[_werecat_slot],
-                awake=True,
-                talkable=True,
-                condition=WERECAT_ROAM_CONDITIONS.get(_werecat_room, werecat_is_living_with_household),
-                priority=120,
-                label="werecat_roam",
-            ))
-    npc_schedule_set("werecat", _werecat_schedule_entries)
+define WerecatStaticData = PeopleData(
+    "werecat",
+    cname="Кошка",
+    fullname="Луна",
+    genitive="Луны",
+    dative="Луне",
+    portrait="images/general/kitty.png",
+    default_location="",
+    description="Домовая кошка-оборотень, если она решила остаться при трактире.",
+)
+default werecat = WerecatInfo()
+
+label InitWerecat:
+    $ people.register(WerecatStaticData, werecat)
+    return
 
 
 label IntWerecatTalk(room_code=""):
+    $ renpy.dynamic("_werecat_room", "_werecat_picture", "_werecat_pet_state", "_werecat_dog")
     if not werecat_is_living_with_household():
         return
-    $ _werecat_room = str(room_code or CurLoc or "").strip()
+    $ _werecat_room = str(room_code or rooms.current_code or "").strip()
     if not werecat_is_in_room(_werecat_room):
         return
+    $ werecat.mark_known()
     $ main_ui_begin_talk_state(str(werecat_display_name() or "Луна"), "werecat")
     $ _werecat_picture = werecat_picture_path()
     if str(_werecat_picture or "").strip():
         vscene _werecat_picture
-    $ MainTxt = werecat_talk_intro_text(_werecat_room)
-    $ CurLocDesc = MainTxt
+    $ scene_runtime.text = werecat_talk_intro_text(_werecat_room)
+    $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     while True:
-        "[MainTxt]"
+        "[scene_runtime.text]"
         $ _werecat_pet_state = werecat_pet_state()
         menu:
             "Осмотреть":
                 call ShowWerecatCard
-                $ MainTxt = werecat_talk_intro_text(_werecat_room)
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = werecat_talk_intro_text(_werecat_room)
+                $ scene_runtime.location_text = scene_runtime.text
 
             "Погладить кошку" if int(_werecat_pet_state.get("pet_day", -1) or -1) != int(calendar_v2.daysInGame or 0):
                 $ _werecat_pet_state["pet_day"] = int(calendar_v2.daysInGame or 0)
@@ -906,8 +379,8 @@ label IntWerecatTalk(room_code=""):
                 $ _werecat_pet_state["comfort"] = min(20, int(_werecat_pet_state.get("comfort", 0) or 0) + 1)
                 $ player.change_stat("fun", 2)
                 $ player.change_stat("health", 1)
-                $ MainTxt = werecat_reaction_text("pet", _werecat_room)
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = werecat_reaction_text("pet", _werecat_room)
+                $ scene_runtime.location_text = scene_runtime.text
                 call stat
 
             "Дать молока" if int(_werecat_pet_state.get("milk_day", -1) or -1) != int(calendar_v2.daysInGame or 0) and werecat_has_milk_available(_werecat_room):
@@ -918,11 +391,11 @@ label IntWerecatTalk(room_code=""):
                     $ player.change_stat("fun", 2)
                     $ player.change_stat("energy", 3)
                     $ player.change_stat("health", 2)
-                    $ MainTxt = werecat_reaction_text("milk", _werecat_room)
+                    $ scene_runtime.text = werecat_reaction_text("milk", _werecat_room)
                     call stat
                 else:
-                    $ MainTxt = "Молока под рукой нет."
-                $ CurLocDesc = MainTxt
+                    $ scene_runtime.text = "Молока под рукой нет."
+                $ scene_runtime.location_text = scene_runtime.text
 
             "Поиграть с кошкой" if int(_werecat_pet_state.get("play_day", -1) or -1) != int(calendar_v2.daysInGame or 0):
                 $ _werecat_pet_state["play_day"] = int(calendar_v2.daysInGame or 0)
@@ -931,14 +404,14 @@ label IntWerecatTalk(room_code=""):
                 $ player.change_stat("fun", 5)
                 $ player.change_stat("energy", 1)
                 $ player.change_stat("health", 1)
-                $ MainTxt = werecat_reaction_text("play", _werecat_room)
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = werecat_reaction_text("play", _werecat_room)
+                $ scene_runtime.location_text = scene_runtime.text
                 call stat
 
             "Понаблюдать за кошкой":
                 $ _werecat_pet_state["comfort"] = min(20, int(_werecat_pet_state.get("comfort", 0) or 0) + 1)
-                $ MainTxt = werecat_ambient_text(_werecat_room)
-                $ CurLocDesc = MainTxt
+                $ scene_runtime.text = werecat_ambient_text(_werecat_room)
+                $ scene_runtime.location_text = scene_runtime.text
 
             "Поиграть с кошкой и псом" if werecat_can_play_with_dog(_werecat_room):
                 $ _werecat_dog = dog
@@ -949,11 +422,11 @@ label IntWerecatTalk(room_code=""):
                     $ player.change_stat("fun", 4)
                     $ player.change_stat("energy", 1)
                     $ player.change_stat("health", 1)
-                    $ MainTxt = werecat_reaction_text("dog_play", _werecat_room)
+                    $ scene_runtime.text = werecat_reaction_text("dog_play", _werecat_room)
                     call stat
                 else:
-                    $ MainTxt = "Пса сейчас рядом нет."
-                $ CurLocDesc = MainTxt
+                    $ scene_runtime.text = "Пса сейчас рядом нет."
+                $ scene_runtime.location_text = scene_runtime.text
 
             "Закончить разговор":
                 $ main_ui_end_talk_state()
@@ -961,15 +434,17 @@ label IntWerecatTalk(room_code=""):
 
 
 label ShowWerecatCard(return_label=""):
+    $ renpy.dynamic("_werecat_card_picture")
+    $ main_ui_begin_card_state()
     $ _werecat_card_picture = werecat_picture_path()
     if str(_werecat_card_picture or "").strip():
         vscene _werecat_card_picture
-    $ MainTxt = "\n".join(werecat_card_lines())
-    $ CurLocDesc = MainTxt
-    "[MainTxt]"
+    $ scene_runtime.text = "\n".join(werecat_card_lines())
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+    $ main_ui_end_card_state()
     return
 
 
 label HideWerecatCard(return_label=""):
     return
-

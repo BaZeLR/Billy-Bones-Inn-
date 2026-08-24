@@ -1,843 +1,9 @@
-            CurrentLoc.setdefault(person, "TavernMain")default HouseholdMorningState = {}        global HouseholdMorningState
-        global HouseholdMorningState
-                Melissa.sync_room_problem_state()                Melissa.sync_room_problem_state()    def _tavern_effective_location(person, time_value=None):
-        key = str(person or "").strip().lower()
-        if not key:
-            return
-        if target == "gloryhole":
-            jobgloryholeTommorow[person] = 1
-            jobwhoreTommorow[person] = 0
-        elif target == "whore":
-            jobgloryholeTommorow[person] = 0
-            jobwhoreTommorow[person] = 1
-        _tavern_restart_interaction() ""
-
-        current_locations = _tavern_dict_value(CurrentLoc)
-        explicit_loc = str(current_locations.get(key, "") or "")
-        tavern_rooms = {
-            "TavernMain",
-            "TavernKitchen",
-            "TavernSandraRoom",
-            "TavernMelissaRoom",
-            "TavernAmandaRoom",
-        }
-
-        hour_value = _tavern_int(calendar_v2.hour if time_value is None else time_value, 0)
-        if key == "melissa":
-            try:
-                if Melissa.temp_room_active("TavernMyRoom", hour_value):
-                    return "TavernMyRoom"
-                if Melissa.temp_room_active("TavernAmandaRoom", hour_value):
-                    return "TavernAmandaRoom"
-                if Melissa.temp_room_active("TavernEmptyRoom", hour_value):
-                    return "TavernEmptyRoom"
-            except Exception:
-                pass
-        if explicit_loc == "TavernKitchen" and slot == 0 and _tavern_int(calendar_v2.hour, 8) < 12:
-            return explicit_loc
-        morning_issue = household_morning_issue_type(key, slot, calendar_v2.hour)
-        if morning_issue in ("sick", "sleepy"):
-            return _tavern_private_room(key)
-
-        schedule_time_value = None if time_value is None else slot
-        schedule_loc = str(npc_schedule_location(key, _tavern_int(calendar_v2.week, 1), schedule_time_value) or "")
-        if schedule_loc:
-            return schedule_loc
-
-        if explicit_loc and explicit_loc not in tavern_rooms:
-            return explicit_loc
-
-        sunday_loc = _tavern_household_sunday_location(key, slot)
-        if sunday_loc:
-            return sunday_loc
-
-        friday_evening_loc = _tavern_household_friday_evening_location(key, slot)
-        if friday_evening_loc:
-            return friday_evening_loc
-
-        preopening_loc = _tavern_household_preopening_location(key, slot)
-        if preopening_loc:
-            return preopening_loc
-
-        private_room = _tavern_private_room(key)
-        if private_room and slot >= 4:
-            return private_room
-
-        if key in ("sandra", "melissa", "amanda"):
-            if _girl_job_value(key, "jobkitchen"):
-                return "TavernKitchen"
-            if _girl_job_value(key, "jobcleaning"):
-                return "TavernMain"
-            if _girl_job_value(key, "jobwaitress"):
-                return "TavernMain"
-            if private_room:
-                return private_room
-
-        return explicit_loc
-            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))label menu_tavernstat:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_overview:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_person(person):
-    call ShowTavernReportPerson(person, "")
-    returnlabel menu_tavernstat:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_overview:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_person(person):
-    call ShowTavernReportPerson(person, "")
-    return
-
-label menu_tavernstat:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_overview:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_person(person):
-    call ShowTavernReportPerson(person, "")
-    return    def _tavern_household_seed(person, hour_value=None, day_marker=None, weekday=None):
-        key = str(person or "").strip().lower()
-        hour_num = _tavern_int(hour if hour_value is None else hour_value, 8)
-        day_num = _tavern_int(dayspassed if day_marker is None else day_marker, 0)
-        week_num = _tavern_int(week if weekday is None else weekday, 1)
-        offsets = {"sandra": 1, "melissa": 3, "amanda": 5}
-        return day_num + week_num + hour_num + int(offsets.get(key, 0))
-
-    def _tavern_household_preopening_location(person, time_value=None, hour_value=None):
-        key = str(person or "").strip().lower()
-        slot = _tavern_int(time if time_value is None else time_value, 0)
-        hour_num = _tavern_int(hour if hour_value is None else hour_value, 8)
-        weekday_num = _tavern_int(week, 1)
-
-        if key not in ("sandra", "melissa", "amanda"):
-            return ""
-        if weekday_num == 7:
-            return ""
-        if slot >= 4 or hour_num >= 12:
-            return ""
-        if hour_num < 9:
-            return "TavernKitchen"
-
-        if hour_num < 10:
-            options_map = {
-                "sandra": ["TavernKitchen", "TavernStorage", "TavernKitchen", "TavernMain"],
-                "melissa": ["TavernKitchen", "TavernStorage", "TavernMain", "Backyard"],
-                "amanda": ["TavernKitchen", "TavernMain", "Backyard", "TavernAmandaRoom"],
-            }
-        elif hour_num < 11:
-            options_map = {
-                "sandra": ["TavernStorage", "TavernMain", "TavernKitchen", "Backyard"],
-                "melissa": ["TavernStorage", "TavernMain", "Backyard", "TavernKitchen"],
-                "amanda": ["TavernMain", "Backyard", "TavernStorage", "TavernAmandaRoom"],
-            }
-        else:
-            options_map = {
-                "sandra": ["TavernMain", "TavernKitchen", "TavernStorage", "Backyard"],
-                "melissa": ["TavernMain", "TavernKitchen", "Backyard", "TavernMelissaRoom"],
-                "amanda": ["TavernMain", "TavernKitchen", "Backyard", "TavernAmandaRoom"],
-            }
-
-        options = list(options_map.get(key, []))
-        if not options:
-            return ""
-        return options[_tavern_household_seed(key, hour_num) % len(options)]
-
-    def _tavern_household_sunday_location(person, time_value=None, hour_value=None):
-        key = str(person or "").strip().lower()
-        slot = _tavern_int(time if time_value is None else time_value, 0)
-        hour_num = _tavern_int(hour if hour_value is None else hour_value, 8)
-        weekday_num = _tavern_int(week, 1)
-
-        if key not in ("sandra", "melissa", "amanda"):
-            return ""
-        if weekday_num != 7:
-            return ""
-        if slot <= 1:
-            return "Church"
-        if hour_num >= 18:
-            return _tavern_private_room(key) or "TavernMain"
-
-        options_map = {
-            "sandra": ["TavernKitchen", "Backyard", "TavernSandraRoom", "TavernMain"],
-            "melissa": ["TavernMelissaRoom", "Backyard", "TavernMain", "TavernKitchen"],
-            "amanda": ["TavernAmandaRoom", "Backyard", "TavernMain", "TavernKitchen"],
-        }
-        options = list(options_map.get(key, []))
-        if not options:
-            return ""
-        return options[_tavern_household_seed(key, hour_num) % len(options)]
-
-    def _tavern_household_friday_evening_location(person, time_value=None):
-        key = str(person or "").strip().lower()
-        slot = _tavern_int(time if time_value is None else time_value, 0)
-        weekday_num = _tavern_int(week, 1)
-        if key not in ("sandra", "melissa", "amanda"):
-            return ""
-        if weekday_num != 5 or slot != 3:
-            return ""
-        if key == "amanda":
-            return "FridayDance"
-        options_map = {
-            "sandra": ["FridayDance", "TavernSandraRoom"],
-            "melissa": ["FridayDance", "TavernMelissaRoom"],
-        }
-        options = list(options_map.get(key, []))
-        if not options:
-            return ""
-        return options[_tavern_household_seed(key, 18) % len(options)]
-    def _tavern_effective_location(person, time_value=None):
-        key = str(person or "").strip().lower()
-        if not key:
-            return ""
-
-        info = getPersonInfo(key)
-        explicit_loc = str(getattr(info, "location", "") or "")
-        tavern_rooms = {
-            "TavernMain",
-            "TavernKitchen",
-            "TavernSandraRoom",
-            "TavernMelissaRoom",
-            "TavernAmandaRoom",
-        }
-
-        hour_value = _tavern_int(calendar_v2.hour if time_value is None else time_value, 0)
-        if key == "melissa":
-            try:
-                Melissa.sync_room_problem_state()
-                if Melissa.temp_room_active("TavernMyRoom", hour_value):
-                    return "TavernMyRoom"
-                if Melissa.temp_room_active("TavernAmandaRoom", hour_value):
-                    return "TavernAmandaRoom"
-                if Melissa.temp_room_active("TavernEmptyRoom", hour_value):
-                    return "TavernEmptyRoom"
-            except Exception:
-                pass
-        if explicit_loc == "TavernKitchen" and slot == 0 and _tavern_int(hour, 8) < 12:
-            return explicit_loc
-        morning_issue = household_morning_issue_type(key, slot, hour)
-        if morning_issue in ("sick", "sleepy"):
-            return _tavern_private_room(key)
-
-        schedule_time_value = None if time_value is None else slot
-        schedule_loc = str(npc_schedule_location(key, _tavern_int(week, 1), schedule_time_value) or "")
-        if schedule_loc:
-            return schedule_loc
-
-        if explicit_loc and explicit_loc not in tavern_rooms:
-            return explicit_loc
-
-        sunday_loc = _tavern_household_sunday_location(key, slot)
-        if sunday_loc:
-            return sunday_loc
-
-        friday_evening_loc = _tavern_household_friday_evening_location(key, slot)
-        if friday_evening_loc:
-            return friday_evening_loc
-
-        preopening_loc = _tavern_household_preopening_location(key, slot)
-        if preopening_loc:
-            return preopening_loc
-
-        private_room = _tavern_private_room(key)
-        if private_room and slot >= 4:
-            return private_room
-
-        if key in ("sandra", "melissa", "amanda"):
-            if _girl_job_value(key, "jobkitchen"):
-                return "TavernKitchen"
-            if _girl_job_value(key, "jobcleaning"):
-                return "TavernMain"
-            if _girl_job_value(key, "jobwaitress"):
-                return "TavernMain"
-            if private_room:
-                return private_room
-
-        return explicit_loc
-            CurrentLoc.setdefault(person, "TavernMain")default HouseholdMorningState = {}        global HouseholdMorningState
-        global HouseholdMorningState
-                Melissa.sync_room_problem_state()                Melissa.sync_room_problem_state()    def _tavern_effective_location(person, time_value=None):
-        key = str(person or "").strip().lower()
-        if not key:
-            return
-        if target == "gloryhole":
-            jobgloryholeTommorow[person] = 1
-            jobwhoreTommorow[person] = 0
-        elif target == "whore":
-            jobgloryholeTommorow[person] = 0
-            jobwhoreTommorow[person] = 1
-        _tavern_restart_interaction() ""
-
-        current_locations = _tavern_dict_value(CurrentLoc)
-        explicit_loc = str(current_locations.get(key, "") or "")
-        tavern_rooms = {
-            "TavernMain",
-            "TavernKitchen",
-            "TavernSandraRoom",
-            "TavernMelissaRoom",
-            "TavernAmandaRoom",
-        }
-
-        hour_value = _tavern_int(calendar_v2.hour if time_value is None else time_value, 0)
-        if key == "melissa":
-            try:
-                if Melissa.temp_room_active("TavernMyRoom", hour_value):
-                    return "TavernMyRoom"
-                if Melissa.temp_room_active("TavernAmandaRoom", hour_value):
-                    return "TavernAmandaRoom"
-                if Melissa.temp_room_active("TavernEmptyRoom", hour_value):
-                    return "TavernEmptyRoom"
-            except Exception:
-                pass
-        if explicit_loc == "TavernKitchen" and slot == 0 and _tavern_int(calendar_v2.hour, 8) < 12:
-            return explicit_loc
-        morning_issue = household_morning_issue_type(key, slot, calendar_v2.hour)
-        if morning_issue in ("sick", "sleepy"):
-            return _tavern_private_room(key)
-
-        schedule_time_value = None if time_value is None else slot
-        schedule_loc = str(npc_schedule_location(key, _tavern_int(calendar_v2.week, 1), schedule_time_value) or "")
-        if schedule_loc:
-            return schedule_loc
-
-        if explicit_loc and explicit_loc not in tavern_rooms:
-            return explicit_loc
-
-        sunday_loc = _tavern_household_sunday_location(key, slot)
-        if sunday_loc:
-            return sunday_loc
-
-        friday_evening_loc = _tavern_household_friday_evening_location(key, slot)
-        if friday_evening_loc:
-            return friday_evening_loc
-
-        preopening_loc = _tavern_household_preopening_location(key, slot)
-        if preopening_loc:
-            return preopening_loc
-
-        private_room = _tavern_private_room(key)
-        if private_room and slot >= 4:
-            return private_room
-
-        if key in ("sandra", "melissa", "amanda"):
-            if _girl_job_value(key, "jobkitchen"):
-                return "TavernKitchen"
-            if _girl_job_value(key, "jobcleaning"):
-                return "TavernMain"
-            if _girl_job_value(key, "jobwaitress"):
-                return "TavernMain"
-            if private_room:
-                return private_room
-
-        return explicit_loc
-            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))label menu_tavernstat:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_overview:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_person(person):
-    call ShowTavernReportPerson(person, "")
-    returnlabel menu_tavernstat:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_overview:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_person(person):
-    call ShowTavernReportPerson(person, "")
-    return
-
-label menu_tavernstat:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_overview:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_person(person):
-    call ShowTavernReportPerson(person, "")
-    return    def _tavern_household_seed(person, hour_value=None, day_marker=None, weekday=None):
-        key = str(person or "").strip().lower()
-        hour_num = _tavern_int(hour if hour_value is None else hour_value, 8)
-        day_num = _tavern_int(dayspassed if day_marker is None else day_marker, 0)
-        week_num = _tavern_int(week if weekday is None else weekday, 1)
-        offsets = {"sandra": 1, "melissa": 3, "amanda": 5}
-        return day_num + week_num + hour_num + int(offsets.get(key, 0))
-
-    def _tavern_household_preopening_location(person, time_value=None, hour_value=None):
-        key = str(person or "").strip().lower()
-        slot = _tavern_int(time if time_value is None else time_value, 0)
-        hour_num = _tavern_int(hour if hour_value is None else hour_value, 8)
-        weekday_num = _tavern_int(week, 1)
-
-        if key not in ("sandra", "melissa", "amanda"):
-            return ""
-        if weekday_num == 7:
-            return ""
-        if slot >= 4 or hour_num >= 12:
-            return ""
-        if hour_num < 9:
-            return "TavernKitchen"
-
-        if hour_num < 10:
-            options_map = {
-                "sandra": ["TavernKitchen", "TavernStorage", "TavernKitchen", "TavernMain"],
-                "melissa": ["TavernKitchen", "TavernStorage", "TavernMain", "Backyard"],
-                "amanda": ["TavernKitchen", "TavernMain", "Backyard", "TavernAmandaRoom"],
-            }
-        elif hour_num < 11:
-            options_map = {
-                "sandra": ["TavernStorage", "TavernMain", "TavernKitchen", "Backyard"],
-                "melissa": ["TavernStorage", "TavernMain", "Backyard", "TavernKitchen"],
-                "amanda": ["TavernMain", "Backyard", "TavernStorage", "TavernAmandaRoom"],
-            }
-        else:
-            options_map = {
-                "sandra": ["TavernMain", "TavernKitchen", "TavernStorage", "Backyard"],
-                "melissa": ["TavernMain", "TavernKitchen", "Backyard", "TavernMelissaRoom"],
-                "amanda": ["TavernMain", "TavernKitchen", "Backyard", "TavernAmandaRoom"],
-            }
-
-        options = list(options_map.get(key, []))
-        if not options:
-            return ""
-        return options[_tavern_household_seed(key, hour_num) % len(options)]
-
-    def _tavern_household_sunday_location(person, time_value=None, hour_value=None):
-        key = str(person or "").strip().lower()
-        slot = _tavern_int(time if time_value is None else time_value, 0)
-        hour_num = _tavern_int(hour if hour_value is None else hour_value, 8)
-        weekday_num = _tavern_int(week, 1)
-
-        if key not in ("sandra", "melissa", "amanda"):
-            return ""
-        if weekday_num != 7:
-            return ""
-        if slot <= 1:
-            return "Church"
-        if hour_num >= 18:
-            return _tavern_private_room(key) or "TavernMain"
-
-        options_map = {
-            "sandra": ["TavernKitchen", "Backyard", "TavernSandraRoom", "TavernMain"],
-            "melissa": ["TavernMelissaRoom", "Backyard", "TavernMain", "TavernKitchen"],
-            "amanda": ["TavernAmandaRoom", "Backyard", "TavernMain", "TavernKitchen"],
-        }
-        options = list(options_map.get(key, []))
-        if not options:
-            return ""
-        return options[_tavern_household_seed(key, hour_num) % len(options)]
-
-    def _tavern_household_friday_evening_location(person, time_value=None):
-        key = str(person or "").strip().lower()
-        slot = _tavern_int(time if time_value is None else time_value, 0)
-        weekday_num = _tavern_int(week, 1)
-        if key not in ("sandra", "melissa", "amanda"):
-            return ""
-        if weekday_num != 5 or slot != 3:
-            return ""
-        if key == "amanda":
-            return "FridayDance"
-        options_map = {
-            "sandra": ["FridayDance", "TavernSandraRoom"],
-            "melissa": ["FridayDance", "TavernMelissaRoom"],
-        }
-        options = list(options_map.get(key, []))
-        if not options:
-            return ""
-        return options[_tavern_household_seed(key, 18) % len(options)]
-    def _tavern_effective_location(person, time_value=None):
-        key = str(person or "").strip().lower()
-        if not key:
-            return ""
-
-        info = getPersonInfo(key)
-        explicit_loc = str(getattr(info, "location", "") or "")
-        tavern_rooms = {
-            "TavernMain",
-            "TavernKitchen",
-            "TavernSandraRoom",
-            "TavernMelissaRoom",
-            "TavernAmandaRoom",
-        }
-
-        hour_value = _tavern_int(calendar_v2.hour if time_value is None else time_value, 0)
-        if key == "melissa":
-            try:
-                Melissa.sync_room_problem_state()
-                if Melissa.temp_room_active("TavernMyRoom", hour_value):
-                    return "TavernMyRoom"
-                if Melissa.temp_room_active("TavernAmandaRoom", hour_value):
-                    return "TavernAmandaRoom"
-                if Melissa.temp_room_active("TavernEmptyRoom", hour_value):
-                    return "TavernEmptyRoom"
-            except Exception:
-                pass
-        if explicit_loc == "TavernKitchen" and slot == 0 and _tavern_int(hour, 8) < 12:
-            return explicit_loc
-        morning_issue = household_morning_issue_type(key, slot, hour)
-        if morning_issue in ("sick", "sleepy"):
-            return _tavern_private_room(key)
-
-        schedule_time_value = None if time_value is None else slot
-        schedule_loc = str(npc_schedule_location(key, _tavern_int(week, 1), schedule_time_value) or "")
-        if schedule_loc:
-            return schedule_loc
-
-        if explicit_loc and explicit_loc not in tavern_rooms:
-            return explicit_loc
-
-        sunday_loc = _tavern_household_sunday_location(key, slot)
-        if sunday_loc:
-            return sunday_loc
-
-        friday_evening_loc = _tavern_household_friday_evening_location(key, slot)
-        if friday_evening_loc:
-            return friday_evening_loc
-
-        preopening_loc = _tavern_household_preopening_location(key, slot)
-        if preopening_loc:
-            return preopening_loc
-
-        private_room = _tavern_private_room(key)
-        if private_room and slot >= 4:
-            return private_room
-
-        if key in ("sandra", "melissa", "amanda"):
-            if _girl_job_value(key, "jobkitchen"):
-                return "TavernKitchen"
-            if _girl_job_value(key, "jobcleaning"):
-                return "TavernMain"
-            if _girl_job_value(key, "jobwaitress"):
-                return "TavernMain"
-            if private_room:
-                return private_room
-
-        return explicit_loc
-            CurrentLoc.setdefault(person, "TavernMain")default HouseholdMorningState = {}        global HouseholdMorningState
-        global HouseholdMorningState
-                Melissa.sync_room_problem_state()                Melissa.sync_room_problem_state()    def _tavern_effective_location(person, time_value=None):
-        key = str(person or "").strip().lower()
-        if not key:
-            return
-        if target == "gloryhole":
-            jobgloryholeTommorow[person] = 1
-            jobwhoreTommorow[person] = 0
-        elif target == "whore":
-            jobgloryholeTommorow[person] = 0
-            jobwhoreTommorow[person] = 1
-        _tavern_restart_interaction() ""
-
-        current_locations = _tavern_dict_value(CurrentLoc)
-        explicit_loc = str(current_locations.get(key, "") or "")
-        tavern_rooms = {
-            "TavernMain",
-            "TavernKitchen",
-            "TavernSandraRoom",
-            "TavernMelissaRoom",
-            "TavernAmandaRoom",
-        }
-
-        hour_value = _tavern_int(calendar_v2.hour if time_value is None else time_value, 0)
-        if key == "melissa":
-            try:
-                if Melissa.temp_room_active("TavernMyRoom", hour_value):
-                    return "TavernMyRoom"
-                if Melissa.temp_room_active("TavernAmandaRoom", hour_value):
-                    return "TavernAmandaRoom"
-                if Melissa.temp_room_active("TavernEmptyRoom", hour_value):
-                    return "TavernEmptyRoom"
-            except Exception:
-                pass
-        if explicit_loc == "TavernKitchen" and slot == 0 and _tavern_int(calendar_v2.hour, 8) < 12:
-            return explicit_loc
-        morning_issue = household_morning_issue_type(key, slot, calendar_v2.hour)
-        if morning_issue in ("sick", "sleepy"):
-            return _tavern_private_room(key)
-
-        schedule_time_value = None if time_value is None else slot
-        schedule_loc = str(npc_schedule_location(key, _tavern_int(calendar_v2.week, 1), schedule_time_value) or "")
-        if schedule_loc:
-            return schedule_loc
-
-        if explicit_loc and explicit_loc not in tavern_rooms:
-            return explicit_loc
-
-        sunday_loc = _tavern_household_sunday_location(key, slot)
-        if sunday_loc:
-            return sunday_loc
-
-        friday_evening_loc = _tavern_household_friday_evening_location(key, slot)
-        if friday_evening_loc:
-            return friday_evening_loc
-
-        preopening_loc = _tavern_household_preopening_location(key, slot)
-        if preopening_loc:
-            return preopening_loc
-
-        private_room = _tavern_private_room(key)
-        if private_room and slot >= 4:
-            return private_room
-
-        if key in ("sandra", "melissa", "amanda"):
-            if _girl_job_value(key, "jobkitchen"):
-                return "TavernKitchen"
-            if _girl_job_value(key, "jobcleaning"):
-                return "TavernMain"
-            if _girl_job_value(key, "jobwaitress"):
-                return "TavernMain"
-            if private_room:
-                return private_room
-
-        return explicit_loc
-            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))label menu_tavernstat:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_overview:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_person(person):
-    call ShowTavernReportPerson(person, "")
-    returnlabel menu_tavernstat:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_overview:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_person(person):
-    call ShowTavernReportPerson(person, "")
-    return
-
-label menu_tavernstat:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_overview:
-    call ShowTavernReport("")
-    return
-
-label menu_tavernstat_person(person):
-    call ShowTavernReportPerson(person, "")
-    return    def _tavern_household_seed(person, hour_value=None, day_marker=None, weekday=None):
-        key = str(person or "").strip().lower()
-        hour_num = _tavern_int(hour if hour_value is None else hour_value, 8)
-        day_num = _tavern_int(dayspassed if day_marker is None else day_marker, 0)
-        week_num = _tavern_int(week if weekday is None else weekday, 1)
-        offsets = {"sandra": 1, "melissa": 3, "amanda": 5}
-        return day_num + week_num + hour_num + int(offsets.get(key, 0))
-
-    def _tavern_household_preopening_location(person, time_value=None, hour_value=None):
-        key = str(person or "").strip().lower()
-        slot = _tavern_int(time if time_value is None else time_value, 0)
-        hour_num = _tavern_int(hour if hour_value is None else hour_value, 8)
-        weekday_num = _tavern_int(week, 1)
-
-        if key not in ("sandra", "melissa", "amanda"):
-            return ""
-        if weekday_num == 7:
-            return ""
-        if slot >= 4 or hour_num >= 12:
-            return ""
-        if hour_num < 9:
-            return "TavernKitchen"
-
-        if hour_num < 10:
-            options_map = {
-                "sandra": ["TavernKitchen", "TavernStorage", "TavernKitchen", "TavernMain"],
-                "melissa": ["TavernKitchen", "TavernStorage", "TavernMain", "Backyard"],
-                "amanda": ["TavernKitchen", "TavernMain", "Backyard", "TavernAmandaRoom"],
-            }
-        elif hour_num < 11:
-            options_map = {
-                "sandra": ["TavernStorage", "TavernMain", "TavernKitchen", "Backyard"],
-                "melissa": ["TavernStorage", "TavernMain", "Backyard", "TavernKitchen"],
-                "amanda": ["TavernMain", "Backyard", "TavernStorage", "TavernAmandaRoom"],
-            }
-        else:
-            options_map = {
-                "sandra": ["TavernMain", "TavernKitchen", "TavernStorage", "Backyard"],
-                "melissa": ["TavernMain", "TavernKitchen", "Backyard", "TavernMelissaRoom"],
-                "amanda": ["TavernMain", "TavernKitchen", "Backyard", "TavernAmandaRoom"],
-            }
-
-        options = list(options_map.get(key, []))
-        if not options:
-            return ""
-        return options[_tavern_household_seed(key, hour_num) % len(options)]
-
-    def _tavern_household_sunday_location(person, time_value=None, hour_value=None):
-        key = str(person or "").strip().lower()
-        slot = _tavern_int(time if time_value is None else time_value, 0)
-        hour_num = _tavern_int(hour if hour_value is None else hour_value, 8)
-        weekday_num = _tavern_int(week, 1)
-
-        if key not in ("sandra", "melissa", "amanda"):
-            return ""
-        if weekday_num != 7:
-            return ""
-        if slot <= 1:
-            return "Church"
-        if hour_num >= 18:
-            return _tavern_private_room(key) or "TavernMain"
-
-        options_map = {
-            "sandra": ["TavernKitchen", "Backyard", "TavernSandraRoom", "TavernMain"],
-            "melissa": ["TavernMelissaRoom", "Backyard", "TavernMain", "TavernKitchen"],
-            "amanda": ["TavernAmandaRoom", "Backyard", "TavernMain", "TavernKitchen"],
-        }
-        options = list(options_map.get(key, []))
-        if not options:
-            return ""
-        return options[_tavern_household_seed(key, hour_num) % len(options)]
-
-    def _tavern_household_friday_evening_location(person, time_value=None):
-        key = str(person or "").strip().lower()
-        slot = _tavern_int(time if time_value is None else time_value, 0)
-        weekday_num = _tavern_int(week, 1)
-        if key not in ("sandra", "melissa", "amanda"):
-            return ""
-        if weekday_num != 5 or slot != 3:
-            return ""
-        if key == "amanda":
-            return "FridayDance"
-        options_map = {
-            "sandra": ["FridayDance", "TavernSandraRoom"],
-            "melissa": ["FridayDance", "TavernMelissaRoom"],
-        }
-        options = list(options_map.get(key, []))
-        if not options:
-            return ""
-        return options[_tavern_household_seed(key, 18) % len(options)]
-    def _tavern_effective_location(person, time_value=None):
-        key = str(person or "").strip().lower()
-        if not key:
-            return ""
-
-        info = getPersonInfo(key)
-        explicit_loc = str(getattr(info, "location", "") or "")
-        tavern_rooms = {
-            "TavernMain",
-            "TavernKitchen",
-            "TavernSandraRoom",
-            "TavernMelissaRoom",
-            "TavernAmandaRoom",
-        }
-
-        hour_value = _tavern_int(calendar_v2.hour if time_value is None else time_value, 0)
-        if key == "melissa":
-            try:
-                Melissa.sync_room_problem_state()
-                if Melissa.temp_room_active("TavernMyRoom", hour_value):
-                    return "TavernMyRoom"
-                if Melissa.temp_room_active("TavernAmandaRoom", hour_value):
-                    return "TavernAmandaRoom"
-                if Melissa.temp_room_active("TavernEmptyRoom", hour_value):
-                    return "TavernEmptyRoom"
-            except Exception:
-                pass
-        if explicit_loc == "TavernKitchen" and slot == 0 and _tavern_int(hour, 8) < 12:
-            return explicit_loc
-        morning_issue = household_morning_issue_type(key, slot, hour)
-        if morning_issue in ("sick", "sleepy"):
-            return _tavern_private_room(key)
-
-        schedule_time_value = None if time_value is None else slot
-        schedule_loc = str(npc_schedule_location(key, _tavern_int(week, 1), schedule_time_value) or "")
-        if schedule_loc:
-            return schedule_loc
-
-        if explicit_loc and explicit_loc not in tavern_rooms:
-            return explicit_loc
-
-        sunday_loc = _tavern_household_sunday_location(key, slot)
-        if sunday_loc:
-            return sunday_loc
-
-        friday_evening_loc = _tavern_household_friday_evening_location(key, slot)
-        if friday_evening_loc:
-            return friday_evening_loc
-
-        preopening_loc = _tavern_household_preopening_location(key, slot)
-        if preopening_loc:
-            return preopening_loc
-
-        private_room = _tavern_private_room(key)
-        if private_room and slot >= 4:
-            return private_room
-
-        if key in ("sandra", "melissa", "amanda"):
-            if _girl_job_value(key, "jobkitchen"):
-                return "TavernKitchen"
-            if _girl_job_value(key, "jobcleaning"):
-                return "TavernMain"
-            if _girl_job_value(key, "jobwaitress"):
-                return "TavernMain"
-            if private_room:
-                return private_room
-
-        return explicit_loc
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 
 init python:
     import renpy.exports as renpy_module
-    import random as tavern_random
-    import random as tavern_random
-    import random as tavern_random
-    import random as tavern_random
-    import random as tavern_random
-    import random as tavern_random
 
     def _tavern_dict_value(value):
         return value if isinstance(value, dict) else {}
@@ -848,16 +14,25 @@ init python:
             fn()
 
     def show_tavern_report_main_ui_state(person=""):
-        global TavernReportSelectedPerson, UI_mode, current_action_content, current_action_title, current_action_items
-        TavernReportSelectedPerson = str(person or "")
-        UI_mode = "tavern"
-        current_action_content = None
-        if TavernReportSelectedPerson:
-            current_action_title = "Назначения: " + _tavern_name(TavernReportSelectedPerson)
-            current_action_items = _tavern_worker_action_items(TavernReportSelectedPerson, "__main_ui__")
+        if str(main_ui_runtime.mode or "") != "tavern" and main_ui_runtime.tavern_report_origin is None:
+            main_ui_runtime.tavern_report_origin = main_ui_context_snapshot()
+        main_ui_runtime.tavern_report_person = str(person or "")
+        main_ui_runtime.mode = "tavern"
+        main_ui_runtime.action_content = None
+        if main_ui_runtime.tavern_report_person:
+            main_ui_runtime.action_title = "Назначения: " + _tavern_name(main_ui_runtime.tavern_report_person)
+            main_ui_runtime.action_items = _tavern_worker_action_items(main_ui_runtime.tavern_report_person, "__main_ui__")
         else:
-            current_action_title = "Трактир"
-            current_action_items = _tavern_report_action_items("__main_ui__")
+            main_ui_runtime.action_title = "Трактир"
+            main_ui_runtime.action_items = _tavern_report_action_items("__main_ui__")
+        _tavern_restart_interaction()
+
+    def hide_tavern_report_main_ui_state():
+        origin = main_ui_runtime.tavern_report_origin
+        main_ui_runtime.tavern_report_origin = None
+        main_ui_runtime.tavern_report_person = ""
+        if origin is not None:
+            main_ui_restore_context(origin)
         _tavern_restart_interaction()
 
     def _tavern_int(value, default=0):
@@ -865,255 +40,6 @@ init python:
             return int(value)
         except Exception:
             return default
-
-    def ensure_default_tavern_jobs(sync_tomorrow=True):
-        hall_workers = {
-            "sandra": {"kitchen": 1, "cleaning": 0, "waitress": 0},
-            "melissa": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-            "amanda": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-        }
-        optional_workers = ("georgett", "liza", "becky", "irma", "inga", "clara")
-
-        for person, jobs in hall_workers.items():
-            jobHallAvail.setdefault(person, 1)
-            jobWhoreAvail.setdefault(person, 0)
-            jobGloryHoleAvail.setdefault(person, 0)
-            jobkitchen.setdefault(person, jobs["kitchen"])
-            jobcleaning.setdefault(person, jobs["cleaning"])
-            jobwaitress.setdefault(person, jobs["waitress"])
-            jobwhore.setdefault(person, 0)
-            jobgloryhole.setdefault(person, 0)
-            if sync_tomorrow:
-                jobkitchentomorrow.setdefault(person, jobkitchen.get(person, 0))
-                jobcleaningtomorrow.setdefault(person, jobcleaning.get(person, 0))
-                jobwaitresstomorrow.setdefault(person, jobwaitress.get(person, 0))
-                jobwhoreTommorow.setdefault(person, jobwhore.get(person, 0))
-                jobgloryholeTommorow.setdefault(person, jobgloryhole.get(person, 0))
-
-        for person in optional_workers:
-            jobHallAvail.setdefault(person, 0)
-            jobWhoreAvail.setdefault(person, 0)
-            jobGloryHoleAvail.setdefault(person, 0)
-            jobkitchen.setdefault(person, 0)
-            jobcleaning.setdefault(person, 0)
-            jobwaitress.setdefault(person, 0)
-            jobwhore.setdefault(person, 0)
-            jobgloryhole.setdefault(person, 0)
-            if sync_tomorrow:
-                jobkitchentomorrow.setdefault(person, jobkitchen.get(person, 0))
-                jobcleaningtomorrow.setdefault(person, jobcleaning.get(person, 0))
-                jobwaitresstomorrow.setdefault(person, jobwaitress.get(person, 0))
-                jobwhoreTommorow.setdefault(person, jobwhore.get(person, 0))
-                jobgloryholeTommorow.setdefault(person, jobgloryhole.get(person, 0))
-
-        return True
-
-    def ensure_default_tavern_jobs(sync_tomorrow=True):
-        hall_workers = {
-            "sandra": {"kitchen": 1, "cleaning": 0, "waitress": 0},
-            "melissa": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-            "amanda": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-        }
-        optional_workers = ("georgett", "liza", "becky", "irma", "inga", "clara")
-
-        for person, jobs in hall_workers.items():
-            jobHallAvail.setdefault(person, 1)
-            jobWhoreAvail.setdefault(person, 0)
-            jobGloryHoleAvail.setdefault(person, 0)
-            jobkitchen.setdefault(person, jobs["kitchen"])
-            jobcleaning.setdefault(person, jobs["cleaning"])
-            jobwaitress.setdefault(person, jobs["waitress"])
-            jobwhore.setdefault(person, 0)
-            jobgloryhole.setdefault(person, 0)
-            if sync_tomorrow:
-                jobkitchentomorrow.setdefault(person, jobkitchen.get(person, 0))
-                jobcleaningtomorrow.setdefault(person, jobcleaning.get(person, 0))
-                jobwaitresstomorrow.setdefault(person, jobwaitress.get(person, 0))
-                jobwhoreTommorow.setdefault(person, jobwhore.get(person, 0))
-                jobgloryholeTommorow.setdefault(person, jobgloryhole.get(person, 0))
-
-        for person in optional_workers:
-            jobHallAvail.setdefault(person, 0)
-            jobWhoreAvail.setdefault(person, 0)
-            jobGloryHoleAvail.setdefault(person, 0)
-            jobkitchen.setdefault(person, 0)
-            jobcleaning.setdefault(person, 0)
-            jobwaitress.setdefault(person, 0)
-            jobwhore.setdefault(person, 0)
-            jobgloryhole.setdefault(person, 0)
-            if sync_tomorrow:
-                jobkitchentomorrow.setdefault(person, jobkitchen.get(person, 0))
-                jobcleaningtomorrow.setdefault(person, jobcleaning.get(person, 0))
-                jobwaitresstomorrow.setdefault(person, jobwaitress.get(person, 0))
-                jobwhoreTommorow.setdefault(person, jobwhore.get(person, 0))
-                jobgloryholeTommorow.setdefault(person, jobgloryhole.get(person, 0))
-
-        return True
-
-    def ensure_default_tavern_jobs(sync_tomorrow=True):
-        hall_workers = {
-            "sandra": {"kitchen": 1, "cleaning": 0, "waitress": 0},
-            "melissa": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-            "amanda": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-        }
-        optional_workers = ("georgett", "liza", "becky", "irma", "inga", "clara")
-
-        for person, jobs in hall_workers.items():
-            jobHallAvail.setdefault(person, 1)
-            jobWhoreAvail.setdefault(person, 0)
-            jobGloryHoleAvail.setdefault(person, 0)
-            jobkitchen.setdefault(person, jobs["kitchen"])
-            jobcleaning.setdefault(person, jobs["cleaning"])
-            jobwaitress.setdefault(person, jobs["waitress"])
-            jobwhore.setdefault(person, 0)
-            jobgloryhole.setdefault(person, 0)
-            if sync_tomorrow:
-                jobkitchentomorrow.setdefault(person, jobkitchen.get(person, 0))
-                jobcleaningtomorrow.setdefault(person, jobcleaning.get(person, 0))
-                jobwaitresstomorrow.setdefault(person, jobwaitress.get(person, 0))
-                jobwhoreTommorow.setdefault(person, jobwhore.get(person, 0))
-                jobgloryholeTommorow.setdefault(person, jobgloryhole.get(person, 0))
-
-        for person in optional_workers:
-            jobHallAvail.setdefault(person, 0)
-            jobWhoreAvail.setdefault(person, 0)
-            jobGloryHoleAvail.setdefault(person, 0)
-            jobkitchen.setdefault(person, 0)
-            jobcleaning.setdefault(person, 0)
-            jobwaitress.setdefault(person, 0)
-            jobwhore.setdefault(person, 0)
-            jobgloryhole.setdefault(person, 0)
-            if sync_tomorrow:
-                jobkitchentomorrow.setdefault(person, jobkitchen.get(person, 0))
-                jobcleaningtomorrow.setdefault(person, jobcleaning.get(person, 0))
-                jobwaitresstomorrow.setdefault(person, jobwaitress.get(person, 0))
-                jobwhoreTommorow.setdefault(person, jobwhore.get(person, 0))
-                jobgloryholeTommorow.setdefault(person, jobgloryhole.get(person, 0))
-
-        return True
-
-    def ensure_default_tavern_jobs(sync_tomorrow=True):
-        hall_workers = {
-            "sandra": {"kitchen": 1, "cleaning": 0, "waitress": 0},
-            "melissa": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-            "amanda": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-        }
-        optional_workers = ("georgett", "liza", "becky", "irma", "inga", "clara")
-
-        for person, jobs in hall_workers.items():
-            info = _tavern_person_info(person)
-            if info is None:
-                continue
-            defaults = {
-                "jobHallAvail": 1, "jobWhoreAvail": 0, "jobGloryHoleAvail": 0,
-                "jobkitchen": jobs["kitchen"], "jobcleaning": jobs["cleaning"],
-                "jobwaitress": jobs["waitress"], "jobwhore": 0, "jobgloryhole": 0,
-            }
-            for job_key, value in defaults.items():
-                info.jobs.setdefault(job_key, value)
-            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))
-
-        for person in optional_workers:
-            info = _tavern_person_info(person)
-            if info is None:
-                continue
-            for job_key in ("jobHallAvail", "jobWhoreAvail", "jobGloryHoleAvail", "jobkitchen", "jobcleaning", "jobwaitress", "jobwhore", "jobgloryhole"):
-                info.jobs.setdefault(job_key, 0)
-            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))
-
-        return True
-
-    def ensure_default_tavern_jobs(sync_tomorrow=True):
-        hall_workers = {
-            "sandra": {"kitchen": 1, "cleaning": 0, "waitress": 0},
-            "melissa": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-            "amanda": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-        }
-        optional_workers = ("georgett", "liza", "becky", "irma", "inga", "clara")
-
-        for person, jobs in hall_workers.items():
-            info = _tavern_person_info(person)
-            if info is None:
-                continue
-            defaults = {
-                "jobHallAvail": 1, "jobWhoreAvail": 0, "jobGloryHoleAvail": 0,
-                "jobkitchen": jobs["kitchen"], "jobcleaning": jobs["cleaning"],
-                "jobwaitress": jobs["waitress"], "jobwhore": 0, "jobgloryhole": 0,
-            }
-            for job_key, value in defaults.items():
-                info.jobs.setdefault(job_key, value)
-            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))
-
-        for person in optional_workers:
-            info = _tavern_person_info(person)
-            if info is None:
-                continue
-            for job_key in ("jobHallAvail", "jobWhoreAvail", "jobGloryHoleAvail", "jobkitchen", "jobcleaning", "jobwaitress", "jobwhore", "jobgloryhole"):
-                info.jobs.setdefault(job_key, 0)
-            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))
-
-        return True
-
-    def ensure_default_tavern_jobs(sync_tomorrow=True):
-        hall_workers = {
-            "sandra": {"kitchen": 1, "cleaning": 0, "waitress": 0},
-            "melissa": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-            "amanda": {"kitchen": 0, "cleaning": 1, "waitress": 1},
-        }
-        optional_workers = ("georgett", "liza", "becky", "irma", "inga", "clara")
-
-        for person, jobs in hall_workers.items():
-            info = _tavern_person_info(person)
-            if info is None:
-                continue
-            defaults = {
-                "jobHallAvail": 1, "jobWhoreAvail": 0, "jobGloryHoleAvail": 0,
-                "jobkitchen": jobs["kitchen"], "jobcleaning": jobs["cleaning"],
-                "jobwaitress": jobs["waitress"], "jobwhore": 0, "jobgloryhole": 0,
-            }
-            for job_key, value in defaults.items():
-                info.jobs.setdefault(job_key, value)
-            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))
-
-        for person in optional_workers:
-            info = _tavern_person_info(person)
-            if info is None:
-                continue
-            for job_key in ("jobHallAvail", "jobWhoreAvail", "jobGloryHoleAvail", "jobkitchen", "jobcleaning", "jobwaitress", "jobwhore", "jobgloryhole"):
-                info.jobs.setdefault(job_key, 0)
-            if sync_tomorrow:
-                info.jobs.setdefault("jobkitchentomorrow", info.job_value("jobkitchen", 0))
-                info.jobs.setdefault("jobcleaningtomorrow", info.job_value("jobcleaning", 0))
-                info.jobs.setdefault("jobwaitresstomorrow", info.job_value("jobwaitress", 0))
-                info.jobs.setdefault("jobwhoreTommorow", info.job_value("jobwhore", 0))
-                info.jobs.setdefault("jobgloryholeTommorow", info.job_value("jobgloryhole", 0))
-
-        return True
 
     def _tavern_get_stat(mapping, person, default=0):
         mapping = _tavern_dict_value(mapping)
@@ -1132,7 +58,7 @@ init python:
         return str(person).capitalize()
 
     def _tavern_person_info(person):
-        return getPersonInfo(str(person or "").strip().lower())
+        return people.get_info(str(person or "").strip().lower())
 
     def _tavern_person_corruption(person):
         info = _tavern_person_info(person)
@@ -1151,7 +77,7 @@ init python:
         }.get(key, "")
 
     def _household_morning_state_key(person="", day_marker=None):
-        return "%s:%s" % (str(person or "").strip().lower(), int(dayspassed if day_marker is None else day_marker or 0))
+        return "%s:%s" % (str(person or "").strip().lower(), current_game_day() if day_marker is None else int(day_marker or 0))
 
     def _household_sleep_indecent_possible(person=""):
         key = str(person or "").strip().lower()
@@ -1172,9 +98,9 @@ init python:
         if not isinstance(entry, dict):
             issue_code = ""
             indecent_flag = 0
-            if int(week or 0) != 7 and tavern_random.randint(1, 100) <= 15:
-                issue_code = "sick" if tavern_random.randint(1, 2) == 1 else "sleepy"
-                if issue_code == "sleepy" and _household_sleep_indecent_possible(key) and tavern_random.randint(1, 100) <= 45:
+            if int(calendar_v2.week or 0) != 7 and procedural_randint(1, 100, "household_morning_issue_%s_%s" % (key, current_game_day())) <= 15:
+                issue_code = "sick" if procedural_randint(1, 2, "household_morning_kind_%s_%s" % (key, current_game_day())) == 1 else "sleepy"
+                if issue_code == "sleepy" and _household_sleep_indecent_possible(key) and procedural_randint(1, 100, "household_morning_indecent_%s_%s" % (key, current_game_day())) <= 45:
                     indecent_flag = 1
             entry = {
                 "issue": issue_code,
@@ -1186,11 +112,11 @@ init python:
 
     def household_morning_issue_type(person="", time_value=None, hour_value=None):
         key = str(person or "").strip().lower()
-        slot = _tavern_int(time if time_value is None else time_value, 0)
-        hour_num = _tavern_int(hour if hour_value is None else hour_value, 8)
+        slot = _tavern_int(calendar_v2.time_slot() if time_value is None else time_value, 0)
+        hour_num = _tavern_int(calendar_v2.hour if hour_value is None else hour_value, 8)
         if key not in ("sandra", "melissa", "amanda"):
             return ""
-        if _tavern_int(week, 1) == 7 or slot >= 4 or hour_num >= 12:
+        if _tavern_int(calendar_v2.week, 1) == 7 or slot >= 4 or hour_num >= 12:
             return ""
         entry = _ensure_household_morning_state(key)
         if int(entry.get("resolved", 0) or 0) != 0:
@@ -1217,7 +143,7 @@ init python:
         return key in ("sandra", "melissa", "amanda") and _tavern_person_relation(key) < 5 and talked_today < 3
 
     def player_recent_sex_count(day_span=2):
-        min_day = max(0, int(dayspassed or 0) - max(1, int(day_span or 2)) + 1)
+        min_day = max(0, current_game_day() - max(1, int(day_span or 2)) + 1)
         total = 0
         seen_rows = set()
         for girl_name in list(AllGirlNames or []):
@@ -1250,11 +176,11 @@ init python:
             return [str(row or "").strip().lower() for row in list(player.tavern_management.breakfast.present_ids or []) if str(row or "").strip()]
 
         try:
-            visible_ids = set([str(row or "").strip().lower() for row in list(getNPCids("TavernKitchen") or [])])
+            visible_ids = set([str(row or "").strip().lower() for row in list(people.ids_at("TavernKitchen") or [])])
         except Exception:
             visible_ids = set()
             for npc_id in ("sandra", "melissa", "amanda", "becky"):
-                if str(getLocation(npc_id) or "") == "TavernKitchen":
+                if str(people.location(npc_id) or "") == "TavernKitchen":
                     visible_ids.add(npc_id)
 
         return [npc_id for npc_id in ("sandra", "melissa", "amanda", "becky") if npc_id in visible_ids]
@@ -1269,7 +195,7 @@ init python:
         for npc_id in ("sandra", "melissa", "amanda"):
             if absent_ids and npc_id not in absent_ids:
                 continue
-            if str(getLocation(npc_id) or "") == "TavernKitchen":
+            if str(people.location(npc_id) or "") == "TavernKitchen":
                 continue
             npc_name = _tavern_name(npc_id)
             issue_code = household_morning_issue_type(npc_id)
@@ -1283,17 +209,10 @@ init python:
         key = str(person or "").strip().lower()
         lines = []
         if key == "melissa":
-            try:
-                Melissa.sync_room_problem_state()
-            except Exception:
-                pass
-            try:
-            except Exception:
-                pass
-            if Melissa.bats_stage() >= 7 and Melissa.bats_stage() < 8:
-                repair_day = int(Melissa.var.get("roof_repair_complete_day", -1) or -1)
-                if repair_day > int(dayspassed or 0):
-                    days_left = repair_day - int(dayspassed or 0)
+            if threads["melissaBatProblem"].num >= 7 and threads["melissaBatProblem"].num < 8:
+                repair_day = people_to_int(Melissa.roof_repair_complete_day, -1)
+                if repair_day > current_game_day():
+                    days_left = repair_day - current_game_day()
                     lines.append("Над комнатой Мелиссы уже заказана починка крыши. Мастерам осталось еще примерно %s дн., прежде чем можно будет окончательно считать дело закрытым." % days_left)
                 elif Melissa.bats_repair_complete():
                     lines.append("Похоже, мастера уже закончили с крышей: над комнатой стало тихо, щели подлатаны, и теперь можно сказать Мелиссе, что она может окончательно возвращаться к себе.")
@@ -1316,7 +235,7 @@ init python:
 
     def tavern_household_present_names(room_code=""):
         room_key = str(room_code or "").strip()
-        keys = [name for name in ("sandra", "melissa", "amanda") if str(getLocation(name) or "") == room_key]
+        keys = [name for name in ("sandra", "melissa", "amanda") if str(people.location(name) or "") == room_key]
         return _tavern_join_names(keys)
 
     def _tavern_job_room(job_type):
@@ -1351,21 +270,17 @@ init python:
         return str(int_part) + "," + str(frac_part)
 
     def _tavern_worker_dress(person):
-        dressdefault_map = _tavern_dict_value(dressdefault)
         dressdesc_map = _tavern_dict_value(DressDesc)
         fulldesc_map = _tavern_dict_value(FullDressDesc)
-        topdress_map = _tavern_dict_value(topdress)
-        bottomdress_map = _tavern_dict_value(bottomdress)
-        dress_top_map = _tavern_dict_value(DressTopPart)
-        dress_bottom_map = _tavern_dict_value(DressBottomPart)
         part_desc_map = _tavern_dict_value(DressPartDesc)
 
-        dress_code = str(dressdefault_map.get(person, ""))
+        info = people.get_info(person)
+        dress_code = str(info.current_dress() if info is not None and hasattr(info, "current_dress") else "")
         if dress_code and dress_code in dressdesc_map:
             return str(dressdesc_map[dress_code])
 
-        top_code = str(topdress_map.get(person, "")) or str(dress_top_map.get(dress_code, ""))
-        bottom_code = str(bottomdress_map.get(person, "")) or str(dress_bottom_map.get(dress_code, ""))
+        top_code = str(info.clothing_layer("top") if info is not None and hasattr(info, "clothing_layer") else "")
+        bottom_code = str(info.clothing_layer("bottom") if info is not None and hasattr(info, "clothing_layer") else "")
         top_line = str(part_desc_map.get(top_code, "")).strip()
         bottom_line = str(part_desc_map.get(bottom_code, "")).strip()
         if top_line and bottom_line:
@@ -1412,11 +327,11 @@ init python:
 
     def _tavern_worker_tomorrow_jobs(person):
         tomorrow_jobs = []
-        if _tavern_int(_tavern_dict_value(jobkitchentomorrow).get(person, 0), 0):
+        if _girl_job_value(person, "jobkitchentomorrow"):
             tomorrow_jobs.append("кухня")
-        if _tavern_int(_tavern_dict_value(jobcleaningtomorrow).get(person, 0), 0):
+        if _girl_job_value(person, "jobcleaningtomorrow"):
             tomorrow_jobs.append("уборка")
-        if _tavern_int(_tavern_dict_value(jobwaitresstomorrow).get(person, 0), 0):
+        if _girl_job_value(person, "jobwaitresstomorrow"):
             tomorrow_jobs.append("зал")
         if _girl_job_value(person, "jobwhoreTommorow"):
             tomorrow_jobs.append("интим")
@@ -1426,33 +341,24 @@ init python:
             return "без назначения"
         return ", ".join(tomorrow_jobs)
 
-    def _tavern_job_button_caption(job_dict, person, title):
-        if job_dict is jobwhoreTommorow:
-            assigned = _girl_job_value(person, "jobwhoreTommorow")
-        elif job_dict is jobgloryholeTommorow:
-            assigned = _girl_job_value(person, "jobgloryholeTommorow")
-        else:
-            assigned = _tavern_int(_tavern_dict_value(job_dict).get(person, 0), 0)
+    def _tavern_job_button_caption(job_key, person, title):
+        assigned = _girl_job_value(person, job_key)
         prefix = "(x) " if assigned else "( ) "
         return prefix + title
 
     def _tavern_team_keys():
         ordered = []
         roster = list(AllGirlNames) if isinstance(AllGirlNames, list) else []
-        hall_tomorrow = (
-            _tavern_dict_value(jobkitchentomorrow),
-            _tavern_dict_value(jobcleaningtomorrow),
-            _tavern_dict_value(jobwaitresstomorrow),
-        )
+        hall_tomorrow = ("jobkitchentomorrow", "jobcleaningtomorrow", "jobwaitresstomorrow")
         special_tomorrow_keys = ("jobwhoreTommorow", "jobgloryholeTommorow")
 
         def add(person):
             if person and person not in ordered:
                 ordered.append(person)
 
-        def in_any(person, mappings):
-            for mapping in mappings:
-                if _tavern_int(mapping.get(person, 0), 0) != 0:
+        def in_any(person, job_keys):
+            for job_key in job_keys:
+                if _girl_job_value(person, job_key):
                     return True
             return False
 
@@ -1461,21 +367,6 @@ init python:
                 if _girl_job_value(person, job_key):
                     return True
             return False
-
-        for mapping in hall_tomorrow:
-            for person, value in mapping.items():
-                if _tavern_int(value, 0) != 0:
-                    add(person)
-
-        for mapping in hall_tomorrow:
-            for person, value in mapping.items():
-                if _tavern_int(value, 0) != 0:
-                    add(person)
-
-        for mapping in hall_tomorrow:
-            for person, value in mapping.items():
-                if _tavern_int(value, 0) != 0:
-                    add(person)
 
         for person in roster:
             info = _tavern_person_info(person)
@@ -1510,51 +401,48 @@ init python:
         tomorrow = _girl_job_value(person, "jobwhoreTommorow")
         return bool(avail and tomorrow == 0)
 
-    def toggle_job_assignment(job_dict, person):
-        """Переключает назначение сотрудника в указанном словаре на завтра."""
-        job_dict[person] = (job_dict.get(person, 0) + 1) % 2
+    def toggle_job_assignment(job_key, person):
+        info = _tavern_person_info(person)
+        if info is None:
+            return
+        info.set_job_value(job_key, (people_to_int(info.job_value(job_key, 0), 0) + 1) % 2)
         _tavern_restart_interaction()
 
-    def _tavern_job_load(job_dict):
-        if not isinstance(job_dict, dict):
-            return 0
-        total = 0
-        for _job_key, assigned in job_dict.items():
-            if _tavern_int(assigned, 0) != 0:
-                total += 1
-        return total
+    def _tavern_job_load(job_key):
+        return sum(1 for person in list(AllGirlNames or []) if _girl_job_value(person, job_key))
 
-    def _tavern_can_toggle_hall_job(job_dict, person, max_slots=3):
-        current = _tavern_int(job_dict.get(person, 0), 0)
+    def _tavern_can_toggle_hall_job(job_key, person, max_slots=3):
+        current = _girl_job_value(person, job_key)
         if current != 0:
             return True
-        return _tavern_job_load(job_dict) < _tavern_int(max_slots, 3)
+        return _tavern_job_load(job_key) < _tavern_int(max_slots, 3)
 
-    def toggle_hall_job_with_limit(job_dict, person, max_slots=3):
+    def toggle_hall_job_with_limit(job_key, person, max_slots=3):
         """
         Переключает назначение на завтра по работе в зале с лимитом слотов.
         По умолчанию лимит = 3 человека на позицию.
         """
-        if not isinstance(job_dict, dict) or not person:
+        info = _tavern_person_info(person)
+        if info is None or not person:
             return
 
-        current = _tavern_int(job_dict.get(person, 0), 0)
+        current = _girl_job_value(person, job_key)
         if current != 0:
-            job_dict[person] = 0
+            info.set_job_value(job_key, 0)
             _tavern_restart_interaction()
             return
 
-        if _tavern_job_load(job_dict) >= _tavern_int(max_slots, 3):
-            renpy.notify("Лимит: %d/%d на этой позиции." % (_tavern_job_load(job_dict), _tavern_int(max_slots, 3)))
+        if _tavern_job_load(job_key) >= _tavern_int(max_slots, 3):
+            renpy.notify("Лимит: %d/%d на этой позиции." % (_tavern_job_load(job_key), _tavern_int(max_slots, 3)))
             return
 
-        job_dict[person] = 1
+        info.set_job_value(job_key, 1)
         _tavern_restart_interaction()
 
     def assign_special_job(person, target):
         """Переназначает сотрудника на особую работу (глорихол или шлюха)."""
         info = _tavern_person_info(person)
-        if info is not None and hasattr(info, "set_job_value"):
+        if info is not None:
             if target == "gloryhole":
                 info.set_job_value("jobgloryholeTommorow", 1)
                 info.set_job_value("jobwhoreTommorow", 0)
@@ -1565,17 +453,7 @@ init python:
             return
 
     def BuildTavernReport():
-        try:
-            ensure_default_tavern_jobs(False)
-        except NameError:
-            pass
-
-        try:
-            update_tavern_service_levels()
-        except NameError:
-            pass
-        except Exception:
-            pass
+        update_tavern_service_levels()
 
         kitchen_keys = _tavern_job_keys("jobkitchen")
         cleaning_keys = _tavern_job_keys("jobcleaning")
@@ -1583,34 +461,13 @@ init python:
         whore_keys = _tavern_job_keys("jobwhore")
         gloryhole_keys = _tavern_job_keys("jobgloryhole")
 
-        try:
-            visitors_value = player.tavern_management.visitors
-        except NameError:
-            visitors_value = 40
-        try:
-            kitchen_quality_value = tavernkitchen
-        except NameError:
-            kitchen_quality_value = "пальчики оближешь"
-        try:
-            clean_quality_value = tavernclean
-        except NameError:
-            clean_quality_value = "грязновато"
-        try:
-            service_quality_value = tavernwaitress
-        except NameError:
-            service_quality_value = "почти не производится"
-        try:
-            products_value = player.tavern_management.productnum
-        except NameError:
-            products_value = 20
-        try:
-            wine_value = player.tavern_management.winenum
-        except NameError:
-            wine_value = 10
-        try:
-            gloryhole_level = TavernGloryHole
-        except NameError:
-            gloryhole_level = 0
+        visitors_value = player.tavern_management.visitors
+        kitchen_quality_value = player.tavern_management.service.kitchen_quality
+        clean_quality_value = player.tavern_management.service.cleanliness_quality
+        service_quality_value = player.tavern_management.service.waitress_quality
+        products_value = player.tavern_management.productnum
+        wine_value = player.tavern_management.winenum
+        gloryhole_level = player.tavern_management.glory_hole
 
         return {
             "visitors": _tavern_int(visitors_value, 40),
@@ -1625,9 +482,9 @@ init python:
             "whore_list": _tavern_join_names(whore_keys),
             "gloryhole_list": _tavern_join_names(gloryhole_keys),
             "gloryhole_level": _tavern_int(gloryhole_level, 0),
-            "kitchen_slots": _tavern_job_load(jobkitchentomorrow),
-            "cleaning_slots": _tavern_job_load(jobcleaningtomorrow),
-            "waitress_slots": _tavern_job_load(jobwaitresstomorrow),
+            "kitchen_slots": _tavern_job_load("jobkitchentomorrow"),
+            "cleaning_slots": _tavern_job_load("jobcleaningtomorrow"),
+            "waitress_slots": _tavern_job_load("jobwaitresstomorrow"),
             "team_keys": _tavern_team_keys(),
         }
     def _tavern_report_label(report):
@@ -1677,515 +534,39 @@ init python:
         items = []
         for person in report["team_keys"]:
             items.append(MenuItem("Назначения: " + _tavern_name(person), Call("ShowTavernReportPerson", person, return_label)))
-        items.append(MenuItem("Закрыть", Call("HideTavernReport", return_label)))
+        items.append(MenuItem("Назад", Call("HideTavernReport", return_label)))
         return items
 
     def _tavern_worker_action_items(person, return_label=""):
         items = []
 
         if renpy.game.script.has_label("ShowGirlCard"):
-            items.append(MenuItem("Осмотреть", [Hide("tavern_report_card_overlay"), Call("ShowGirlCard", person, "")]))
+            items.append(MenuItem("Осмотреть", Call("ShowGirlCard", person)))
 
-        items.append(MenuItem(JobMenuDesc(jobkitchentomorrow.get(person, 0), 1), Call("TavernReportApplyAction", person, "kitchen", return_label)))
-        items.append(MenuItem(JobMenuDesc(jobcleaningtomorrow.get(person, 0), 2), Call("TavernReportApplyAction", person, "cleaning", return_label)))
-        items.append(MenuItem(JobMenuDesc(jobwaitresstomorrow.get(person, 0), 3), Call("TavernReportApplyAction", person, "waitress", return_label)))
+        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobkitchentomorrow"), 1), [Function(toggle_hall_job_with_limit, "jobkitchentomorrow", person, 2), Function(show_tavern_report_main_ui_state, person)]))
+        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobcleaningtomorrow"), 2), [Function(toggle_hall_job_with_limit, "jobcleaningtomorrow", person, 2), Function(show_tavern_report_main_ui_state, person)]))
+        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobwaitresstomorrow"), 3), [Function(toggle_hall_job_with_limit, "jobwaitresstomorrow", person, 2), Function(show_tavern_report_main_ui_state, person)]))
 
         if _tavern_can_assign_gloryhole(person):
-            items.append(MenuItem("Назначить завтра работать у глорихола", Call("TavernReportApplyAction", person, "gloryhole", return_label)))
+            items.append(MenuItem("Назначить завтра работать у глорихола", [Function(assign_special_job, person, "gloryhole"), Function(show_tavern_report_main_ui_state, person)]))
         if _tavern_can_assign_whore(person):
-            items.append(MenuItem("Назначить завтра работать шлюхой", Call("TavernReportApplyAction", person, "whore", return_label)))
+            items.append(MenuItem("Назначить завтра работать шлюхой", [Function(assign_special_job, person, "whore"), Function(show_tavern_report_main_ui_state, person)]))
 
         items.append(MenuItem("Общий отчет", Call("ShowTavernReport", return_label)))
-        items.append(MenuItem("Закрыть", Call("HideTavernReport", return_label)))
+        items.append(MenuItem("Назад", Call("HideTavernReport", return_label)))
         return items
 
 
-default TavernReportSelectedPerson = ""
-
-
 label ShowTavernReport(return_label=""):
-    $ TavernReportSelectedPerson = ""
-    if str(return_label or "") == "__main_ui__":
-        $ show_tavern_report_main_ui_state("")
-        return
-    $ current_action_title = "Трактир"
-    $ current_action_content = None
-    $ current_action_items = _tavern_report_action_items(return_label)
-    show screen tavern_report_card_overlay(return_label)
+    $ show_tavern_report_main_ui_state("")
     return
 
 
 label ShowTavernReportPerson(person="", return_label=""):
-    $ TavernReportSelectedPerson = str(person or "")
-    if str(return_label or "") == "__main_ui__":
-        $ show_tavern_report_main_ui_state(TavernReportSelectedPerson)
-        return
-    $ current_action_title = "Назначения: " + _tavern_name(TavernReportSelectedPerson)
-    $ current_action_content = None
-    $ current_action_items = _tavern_worker_action_items(TavernReportSelectedPerson, return_label)
-    show screen tavern_report_card_overlay(return_label)
-    return
-
-
-label TavernReportApplyAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit(jobkitchentomorrow, _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit(jobcleaningtomorrow, _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit(jobwaitresstomorrow, _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReportPerson(_tavern_person, return_label)
-    return
-
-
-label TavernReportApplyOverviewAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit(jobkitchentomorrow, _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit(jobcleaningtomorrow, _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit(jobwaitresstomorrow, _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReport(return_label)
+    $ show_tavern_report_main_ui_state(person)
     return
 
 
 label HideTavernReport(return_label=""):
-    if str(return_label or "") == "__main_ui__":
-        $ TavernReportSelectedPerson = ""
-        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
-        if _room_label:
-            jump expression _room_label
-        return
-    hide screen tavern_report_card_overlay
-    $ TavernReportSelectedPerson = ""
-    if CurrentRoom is not None:
-        $ current_action_title = "Действия"
-        $ current_action_content = None
-        $ current_action_items = build_room_action_items(CurrentRoom)
-    if str(return_label or "") == "__hide__":
-        return
-    if str(return_label or "") != "":
-        call expression return_label
-    return
-
-
-default TavernReportSelectedPerson = ""
-
-
-label ShowTavernReport(return_label=""):
-    $ TavernReportSelectedPerson = ""
-    if str(return_label or "") == "__main_ui__":
-        $ show_tavern_report_main_ui_state("")
-        return
-    $ current_action_title = "Трактир"
-    $ current_action_content = None
-    $ current_action_items = _tavern_report_action_items(return_label)
-    show screen tavern_report_card_overlay(return_label)
-    return
-
-
-label ShowTavernReportPerson(person="", return_label=""):
-    $ TavernReportSelectedPerson = str(person or "")
-    if str(return_label or "") == "__main_ui__":
-        $ show_tavern_report_main_ui_state(TavernReportSelectedPerson)
-        return
-    $ current_action_title = "Назначения: " + _tavern_name(TavernReportSelectedPerson)
-    $ current_action_content = None
-    $ current_action_items = _tavern_worker_action_items(TavernReportSelectedPerson, return_label)
-    show screen tavern_report_card_overlay(return_label)
-    return
-
-
-label TavernReportApplyAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit(jobkitchentomorrow, _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit(jobcleaningtomorrow, _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit(jobwaitresstomorrow, _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReportPerson(_tavern_person, return_label)
-    return
-
-
-label TavernReportApplyOverviewAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit(jobkitchentomorrow, _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit(jobcleaningtomorrow, _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit(jobwaitresstomorrow, _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReport(return_label)
-    return
-
-
-label TavernReportApplyAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReportPerson(_tavern_person, return_label)
-    return
-
-
-label TavernReportApplyOverviewAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReport(return_label)
-    return
-
-
-label TavernReportApplyAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReportPerson(_tavern_person, return_label)
-    return
-
-
-label TavernReportApplyOverviewAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReport(return_label)
-    return
-
-
-label HideTavernReport(return_label=""):
-    if str(return_label or "") == "__main_ui__":
-        $ TavernReportSelectedPerson = ""
-        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
-        if _room_label:
-            jump expression _room_label
-        return
-    hide screen tavern_report_card_overlay
-    $ TavernReportSelectedPerson = ""
-    if CurrentRoom is not None:
-        $ current_action_title = "Действия"
-        $ current_action_content = None
-        $ current_action_items = build_room_action_items(CurrentRoom)
-    if str(return_label or "") == "__hide__":
-        return
-    if str(return_label or "") != "":
-        call expression return_label
-    return
-
-
-default TavernReportSelectedPerson = ""
-
-
-label ShowTavernReport(return_label=""):
-    $ TavernReportSelectedPerson = ""
-    if str(return_label or "") == "__main_ui__":
-        $ show_tavern_report_main_ui_state("")
-        return
-    $ current_action_title = "Трактир"
-    $ current_action_content = None
-    $ current_action_items = _tavern_report_action_items(return_label)
-    show screen tavern_report_card_overlay(return_label)
-    return
-
-
-label ShowTavernReportPerson(person="", return_label=""):
-    $ TavernReportSelectedPerson = str(person or "")
-    if str(return_label or "") == "__main_ui__":
-        $ show_tavern_report_main_ui_state(TavernReportSelectedPerson)
-        return
-    $ current_action_title = "Назначения: " + _tavern_name(TavernReportSelectedPerson)
-    $ current_action_content = None
-    $ current_action_items = _tavern_worker_action_items(TavernReportSelectedPerson, return_label)
-    show screen tavern_report_card_overlay(return_label)
-    return
-
-
-label TavernReportApplyAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit(jobkitchentomorrow, _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit(jobcleaningtomorrow, _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit(jobwaitresstomorrow, _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReportPerson(_tavern_person, return_label)
-    return
-
-
-label TavernReportApplyOverviewAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit(jobkitchentomorrow, _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit(jobcleaningtomorrow, _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit(jobwaitresstomorrow, _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReport(return_label)
-    return
-
-
-label TavernReportApplyAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReportPerson(_tavern_person, return_label)
-    return
-
-
-label TavernReportApplyOverviewAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReport(return_label)
-    return
-
-
-label TavernReportApplyAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReportPerson(_tavern_person, return_label)
-    return
-
-
-label TavernReportApplyOverviewAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReport(return_label)
-    return
-
-
-label HideTavernReport(return_label=""):
-    if str(return_label or "") == "__main_ui__":
-        $ TavernReportSelectedPerson = ""
-        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
-        if _room_label:
-            jump expression _room_label
-        return
-    hide screen tavern_report_card_overlay
-    $ TavernReportSelectedPerson = ""
-    if CurrentRoom is not None:
-        $ current_action_title = "Действия"
-        $ current_action_content = None
-        $ current_action_items = build_room_action_items(CurrentRoom)
-    if str(return_label or "") == "__hide__":
-        return
-    if str(return_label or "") != "":
-        call expression return_label
-    return
-
-
-label ShowTavernReport(return_label=""):
-    $ main_ui_runtime.tavern_report_person = ""
-    if str(return_label or "") == "__main_ui__":
-        $ show_tavern_report_main_ui_state("")
-        return
-    $ current_action_title = "Трактир"
-    $ current_action_content = None
-    $ current_action_items = _tavern_report_action_items(return_label)
-    show screen tavern_report_card_overlay(return_label)
-    return
-
-
-label ShowTavernReportPerson(person="", return_label=""):
-    $ main_ui_runtime.tavern_report_person = str(person or "")
-    if str(return_label or "") == "__main_ui__":
-        $ show_tavern_report_main_ui_state(main_ui_runtime.tavern_report_person)
-        return
-    $ current_action_title = "Назначения: " + _tavern_name(main_ui_runtime.tavern_report_person)
-    $ current_action_content = None
-    $ current_action_items = _tavern_worker_action_items(main_ui_runtime.tavern_report_person, return_label)
-    show screen tavern_report_card_overlay(return_label)
-    return
-
-
-label TavernReportApplyAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReportPerson(_tavern_person, return_label)
-    return
-
-
-label TavernReportApplyOverviewAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReport(return_label)
-    return
-
-
-label TavernReportApplyAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReportPerson(_tavern_person, return_label)
-    return
-
-
-label TavernReportApplyOverviewAction(person="", action_code="", return_label=""):
-    $ _tavern_person = str(person or "")
-    $ _tavern_action = str(action_code or "")
-    if _tavern_action == "kitchen":
-        $ toggle_hall_job_with_limit("jobkitchentomorrow", _tavern_person, 2)
-    elif _tavern_action == "cleaning":
-        $ toggle_hall_job_with_limit("jobcleaningtomorrow", _tavern_person, 2)
-    elif _tavern_action == "waitress":
-        $ toggle_hall_job_with_limit("jobwaitresstomorrow", _tavern_person, 2)
-    elif _tavern_action == "gloryhole":
-        $ assign_special_job(_tavern_person, "gloryhole")
-    elif _tavern_action == "whore":
-        $ assign_special_job(_tavern_person, "whore")
-    call ShowTavernReport(return_label)
-    return
-
-
-label HideTavernReport(return_label=""):
-    if str(return_label or "") == "__main_ui__":
-        $ main_ui_runtime.tavern_report_person = ""
-        $ _room_label = str(CurLoc or getattr(CurrentRoom, "code_name", "") or "").strip()
-        if _room_label:
-            jump expression _room_label
-        return
-    hide screen tavern_report_card_overlay
-    $ main_ui_runtime.tavern_report_person = ""
-    if CurrentRoom is not None:
-        $ current_action_title = "Действия"
-        $ current_action_content = None
-        $ current_action_items = build_room_action_items(CurrentRoom)
-    if str(return_label or "") == "__hide__":
-        return
-    if str(return_label or "") != "":
-        call expression return_label
+    $ hide_tavern_report_main_ui_state()
     return

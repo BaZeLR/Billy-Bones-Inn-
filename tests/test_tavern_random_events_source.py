@@ -42,7 +42,7 @@ def test_create_tavern_events_has_no_forced_waitress_fallback():
     source = read_rel("game/Inn/CreateTavernEvents.rpy")
 
     assert "$ tavern_work_build_daily_plan()" in source
-    assert 'NewEvents["2_0"] = "WaitressHarass"' not in source
+    assert ("New" + "Events") not in source
     assert "if _total_random <= 0" not in source
 
 
@@ -56,9 +56,14 @@ def test_tavern_daily_plan_appends_random_selection():
 def test_tavern_dispatch_uses_planned_event_pop():
     source = read_rel("game/Utilities/General/Common/DisplayTavernEventShort.rpy")
 
-    assert "return tavern_work_pop_planned_event(time_period, require_room_match, room_code)" in source
-    assert "EventsCount[10] = event_idx" not in source
-    assert "EventsCount[tp] = event_idx" not in source
+    assert "tavern_work_pop_planned_event(time_period, eyewitness > 0, rooms.current_code)" in source
+    assert "def tavern_event_pop_code" not in source
+    assert "call expression _event_target pass (eyewitness,)" in source
+    assert 'return _event_result' in source
+    assert "CurEventCode" not in source
+    assert "CurEventDescFin" not in source
+    assert ("Events" + "Count") not in source
+    assert "tavern_work_codes_for_period" in read_rel("game/Inn/TavernRandomEvents.rpy")
 
 
 def test_tavern_mandatory_wine_uses_planned_list():
@@ -71,11 +76,10 @@ def test_tavern_mandatory_wine_uses_planned_list():
 
 
 def test_breakfast_tease_uses_step_picture_assets():
-    kitchen_source = read_rel("game/Inn/TavernKitchen.rpy")
+    kitchen_source = read_rel("game/Inn/TavernKitchenBreakfast.rpy")
 
     assert "def tavern_breakfast_tease_picture" in kitchen_source
-    assert '"images/breakfast/amanda_breakfast/amanda_tease_%d.jpg" % step' in kitchen_source
-    assert '"images/amanda/brekfastTease/breakfasttease1.jpg"' in kitchen_source
-    assert '"images/amanda/brekfastTease/breakfasttease3.jpg"' in kitchen_source
-    assert '"images/amanda/brekfastTease/breakfasttease6.jpg"' in kitchen_source
-    assert "vscene tavern_breakfast_tease_picture(_tease_girl, _tease_tier)" in kitchen_source
+    assert '"images/breakfast/amanda_breakfast/amanda_tease_1.jpg"' in kitchen_source
+    assert '"images/breakfast/amanda_breakfast/amanda_tease_3.jpg"' in kitchen_source
+    assert '"images/breakfast/amanda_breakfast/amanda_tease_5.jpg"' in kitchen_source
+    assert "tavern_breakfast_tease_picture(_tease_girl, _tease_tier)" in kitchen_source

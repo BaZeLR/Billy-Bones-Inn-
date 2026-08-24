@@ -6,14 +6,14 @@ label AmandaAtHomeCode:
 
 
 label CodeAmandaKickFromRoom(reason=""):
-    if Amanda.var_int("kickyoufromroomcount", 0) >= 3:
+    if Amanda.room_rejection_count >= 3:
         if reason == "afterdeny":
             "Аманда дернулась, отпихивая вас обеими руками. \"Ах!\" — завизжала она. \"Значит по-хорошему ты не понимаешь!\""
         else:
             "Аманда проснулась от уже знакомых и неприятных ощущений. \"Опять ты!\" — завизжала она."
         "Прежде чем вы успели что-либо сделать, девушка заорала во весь голос: \"Помогите! Насилуют!\""
         "Двери распахнулись: в комнату ворвалась тетушка Сандра, а за ней Мелисса. Осыпанные ударами, вы с позором ретировались в зал."
-        $ Amanda.set_var_int("kickedwithmomhelp", 1)
+        $ Amanda.room_rescue_called = True
         python:
             Amanda.apply_social_chance(0, 1, -3, 0, 0, 0, "amanda_home")
             Sandra.apply_social_chance(0, 1, -7, 0, 0, 0, "amanda_home")
@@ -26,8 +26,8 @@ label CodeAmandaKickFromRoom(reason=""):
         "\"Да ты что делаешь, Стефан?! Вон отсюда, пока я не закричала!\""
         "В растерянности вы ретировались в главный зал."
 
-    $ Amanda.add_var_int("kickyoufromroomcount", 1)
-    $ Amanda.set_var_int("kickyoufromroom", 1)
+    $ Amanda.room_rejection_count += 1
+    $ Amanda.room_entry_blocked_today = True
     python:
         Amanda.apply_social_chance(0, 1, -5, 18, 1, -3, "amanda_home")
     jump TavernMain
@@ -36,7 +36,7 @@ label CodeAmandaKickFromRoom(reason=""):
 label CodeAmandaListScold:
     if Amanda.var_int("prohibitliza", 0):
         "С Лизкой, значит, и словом не перемолвись — дурное влияние, мол."
-    if Amanda.var_int("alberprohibit", 0) and Amanda.var_int("alberfriends", 0) >= 5:
+    if Amanda.legare_forbidden and Amanda.legare_affection >= 5:
         "Про Легаре вы ей запрещали, а теперь сами пришли в ее комнату ночью."
     if Amanda.var_int("gloryscold", 0):
         "У глорихола вы ее отчитали, а теперь сами пристаете."
@@ -47,7 +47,8 @@ label CodeAmandaListScold:
 
 
 label CodeAmandaSorryChoices:
-    $ _has_revert_options = Amanda.var_int("prohibitliza", 0) or (Amanda.var_int("alberprohibit", 0) and Amanda.var_int("alberfriends", 0) >= 5) or Amanda.var_int("gloryscold", 0) or Amanda.var_int("prohibitwithguys", 0)
+    $ renpy.dynamic("_amanda_confirm_msg", "_has_revert_options")
+    $ _has_revert_options = Amanda.var_int("prohibitliza", 0) or (Amanda.legare_forbidden and Amanda.legare_affection >= 5) or Amanda.var_int("gloryscold", 0) or Amanda.var_int("prohibitwithguys", 0)
 
     if _has_revert_options:
         menu:
@@ -55,7 +56,7 @@ label CodeAmandaSorryChoices:
                 "\"Аманда, ты все не так поняла,\" — заявили вы и демонстративно вышли."
                 python:
                     Amanda.apply_social_chance(10, 1, -1, 25, 1, -1, "amanda_home")
-                $ Amanda.set_var_int("kickyoufromroom", 1)
+                $ Amanda.room_entry_blocked_today = True
                 jump TavernMain
 
             "Не обращать внимание на ее слова и поцеловать покрепче":
@@ -70,13 +71,13 @@ label CodeAmandaSorryChoices:
                 $ Amanda.set_var_int("prohibitliza", 0)
                 jump CodeAmandaSorryChoices
 
-            "Взять назад слова про месье Легаре" if Amanda.var_int("alberprohibit", 0) and Amanda.var_int("alberfriends", 0) >= 5:
+            "Взять назад слова про месье Легаре" if Amanda.legare_forbidden and Amanda.legare_affection >= 5:
                 "\"Да ладно тебе,\" — сказали вы. \"Про Легаре это я вспылил. Если он тебе так нравится, то можешь с ним видеться. Ну и что, что он женат и у него дети старше тебя. Подумаешь...\""
                 $ _amanda_confirm_msg = Amanda.happy_confirm_text()
                 "[_amanda_confirm_msg]"
                 python:
                     Amanda.apply_social_chance(18, 1, 1, 45, 2, 1, "amanda_home")
-                $ Amanda.set_var_int("alberprohibit", 0)
+                $ Amanda.legare_forbidden = False
                 jump CodeAmandaSorryChoices
 
             "Взять назад слова про глорихол" if Amanda.var_int("gloryscold", 0):
@@ -107,7 +108,7 @@ label CodeAmandaSorryChoices:
 
 
 label CodeAmandaSexStart:
-    $ Amanda.set_var_int("kickyoufromroom", 0)
+    $ Amanda.room_entry_blocked_today = False
 
     if tmpSexType == 0:
         "Вдоволь начмокавшись, она оторвалась от вас, сказав:"
@@ -119,7 +120,7 @@ label CodeAmandaSexStart:
             "\"Я тебе могу сейчас отсосать, но я пока не готова на большее. Не, я так не могу еще.\""
 
         menu:
-            "Попенять на ее связь с Легаре" if Amanda.var_int("knowlegaresex", 0) or Amanda.var_int("sawlegaresex", 0):
+            "Попенять на ее связь с Легаре" if Amanda.player_knows_legare_sex or Amanda.player_saw_legare_sex:
                 "\"Ага, значит с этим месье, как его, Легаре ты путаешься,\" — обиженно заявили вы, — \"а я для тебя недостаточно хорош. Так получается?!\""
                 call CodeAmandaSexPush
 
@@ -147,9 +148,9 @@ label CodeAmandaSexStart:
         "Вдруг Аманда отстранилась от вас, посерьезнела и, доверчиво глядя прямо вам в глаза, просто сказала:"
         "\"Стефан, ты будешь у меня первым, пожалуйста, будь нежен.\""
         "Обрадованный таким развитием событий, вы не замедлили еще раз поцеловать Аманду взасос, заверяя ее в правильности сделанного выбора."
-        if tmpSleepDress > 0:
+        if _amanda_sleep_dress > 0:
             "Тем временем ваши руки ласкали ее обнаженные груди, а потом вы сместились ниже, начав щекотать ее напрягшиеся сосочки своим языком."
-        if tmpSleepDress < 2:
+        if _amanda_sleep_dress < 2:
             call CodeAmandaSexBedUndress
         else:
             call CodeAmandaSexBedDeflower(0)
@@ -158,37 +159,31 @@ label CodeAmandaSexStart:
     else:
         python:
             Amanda.apply_social_chance(20, 1, 1, 50, 5, 1, "amanda_home")
-        if tmpSleepDress > 0:
+        if _amanda_sleep_dress > 0:
             "Не теряя времени, вы начали ласкать ее обнаженные груди, а потом, сместившись ниже, пощекотали ее напрягшиеся сосочки своим языком."
         call CodeAmandaSexBedUndress
         return
 
 
 label CodeAmandaSexBedUndress:
-    if tmpSleepDress == 0:
+    if _amanda_sleep_dress == 0:
         menu:
             "Снять ночнушку":
                 "Тем временем ваши руки сами потянулись к подолу ее ночнушки и потянули его вверх. Аманда с готовностью подняла руки, позволяя вам стянуть с нее рубашку, обнажив ее маленькие острые грудки с торчащими от возбуждения сосочками. К коим вы и не замедлили припасть."
-                $ tmpSleepDress = 1
+                $ _amanda_sleep_dress = 1
                 $ Amanda.remove_clothing_layer("top")
                 $ Amanda.remove_clothing_layer("bottom")
                 jump CodeAmandaSexBedUndress
-                jump CodeAmandaSexBedUndress
-                jump CodeAmandaSexBedUndress
-                jump CodeAmandaSexBedUndress
 
-    if tmpSleepDress == 1:
+    if _amanda_sleep_dress == 1:
         menu:
             "Снять панталончики":
                 "Продолжая ласкать ее сисечки, вы начали потихоньку стягивать с постанывающей от наслаждения Аманды ее панталончики. Чтобы помочь вам, она задрала свои очаровательные ножки. Совместными усилиями вы избавились от этой помехи, закинув их в угол."
                 $ Amanda.remove_clothing_layer("panties")
-                $ tmpSleepDress = 2
-                jump CodeAmandaSexBedUndress
-                jump CodeAmandaSexBedUndress
-                jump CodeAmandaSexBedUndress
+                $ _amanda_sleep_dress = 2
                 jump CodeAmandaSexBedUndress
 
-    if tmpSleepDress >= 2:
+    if _amanda_sleep_dress >= 2:
         if tmpSexType == 1:
             call CodeAmandaSexBedDeflower(0)
         else:
@@ -281,7 +276,7 @@ label CodeAmandaSexBedDeflower(tmpCurSexStep=0):
     menu:
         "Распрощаться и вернуться в зал":
             "Поняв, что она права, вы поцеловали ее на прощание и покинули комнату, в которую чуть ранее столь удачно зашли."
-            $ Amanda.set_var_int("kickyoufromroom", 1)
+            $ Amanda.room_entry_blocked_today = True
             jump TavernMain
     return
 
@@ -299,12 +294,13 @@ label CodeAmandaSexScene:
     if tmpSexType == 0:
         menu:
             "Вернуться в общий зал":
-                $ Amanda.set_var_int("kickyoufromroom", 1)
+                $ Amanda.room_entry_blocked_today = True
                 jump TavernMain
     return
 
 
 label CodeAmandaSexPush:
+    $ renpy.dynamic("tmpReactPush", "tmpSexType")
     $ tmpReactPush = 0
 
     if Amanda.sex_stat("virginity", True):
@@ -367,7 +363,7 @@ label CodeAmandaSexAgreeLeave(mode=""):
             "И, оставив Аманду размышлять над тем, как связаны отказ от ваших домогательств с предполагаемым отсутствием у нее совести, вы покинули ее комнату."
             python:
                 Amanda.apply_social_chance(10, 1, -1, 25, 1, -1, "amanda_home")
-            $ Amanda.set_var_int("kickyoufromroom", 1)
+            $ Amanda.room_entry_blocked_today = True
             jump TavernMain
 
         "Проигнорировать ее лепет и продолжить приставать":

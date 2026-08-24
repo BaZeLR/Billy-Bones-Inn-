@@ -15,26 +15,14 @@ init python:
             return False
         if not player.appearance.has_dress(dress_code):
             return False
-        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
-            return False
-        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
-            return False
-        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
-            return False
-        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
-            return False
-        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
-            return False
-        if "player_current_dress_age_days" not in globals() or "player_dress_condition_from_age" not in globals():
-            return False
         return int(player_dress_condition_from_age(player_current_dress_age_days(dress_code)) or 0) <= 0
 
     def dress_shop_can_buy_item(item_obj):
         dress_code = dress_shop_item_code(item_obj)
         item_price = int(getattr(item_obj, "price", 0) or 0)
-        if str(DressProduced or "") != "":
+        if str(dress_shop.produced or "") != "":
             return False
-        if not bool(dress_code) or item_price > int(money or 0):
+        if not bool(dress_code) or item_price > int(player.economy.money or 0):
             return False
         return not player.appearance.has_dress(dress_code) or dress_shop_item_depreciated(item_obj)
 
@@ -88,16 +76,9 @@ init python:
         return item_obj
 
     def dress_shop_rack_items(rack_type):
-        if "ensure_game_item_registry" in globals():
-            if "ensure_game_item_registry" in globals():
-            if "ensure_game_item_registry" in globals():
-            if "ensure_game_item_registry" in globals():
-            if "ensure_game_item_registry" in globals():
-            if "ensure_game_item_registry" in globals():
-            ensure_game_item_registry()
         items = []
         if str(rack_type or "") == "female":
-            for item_id in list(womenDress or []):
+            for item_id in FEMALE_DRESS_ITEM_IDS:
                 item_obj = get_game_item(item_id)
                 code = dress_shop_item_code(item_obj)
                 if not item_obj or not code or code == "nightshirt":
@@ -106,7 +87,7 @@ init python:
                 if dress_item is not None:
                     items.append(dress_item)
         else:
-            for item_id in list(menDress or []):
+            for item_id in MALE_DRESS_ITEM_IDS:
                 item_obj = get_game_item(item_id)
                 code = dress_shop_item_code(item_obj)
                 if not code:

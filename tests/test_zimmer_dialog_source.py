@@ -1,10 +1,11 @@
-    assert "CityGuardBuildActions" not in source    assert "CityGuardBuildActions" not in source    assert "CityGuardBuildActions" not in sourcefrom pathlib import Path
+from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 ZIMMER_TALK = ROOT / "game" / "NPC" / "Secondary" / "IntZimmerTalk.rpy"
 CITY_GUARD = ROOT / "game" / "Town" / "CityGuard.rpy"
-CITY_GUARD = ROOT / "game" / "Town" / "CityGuard.rpy"
+CHARACTER_HUB = ROOT / "game" / "Utilities" / "General" / "NPC" / "CharacterActionHub.rpy"
+ZIMMER_INIT = ROOT / "game" / "NPC" / "Secondary" / "InitZimmer.rpy"
 
 
 def _source(path: Path) -> str:
@@ -14,14 +15,23 @@ def _source(path: Path) -> str:
 def test_zimmer_dialogs_are_explicit_sublabels_not_dispatcher():
     source = _source(ZIMMER_TALK)
 
+    assert "label IntZimmerTalkMenu:" not in source
+    assert "while True:" in source
+    assert "jump IntZimmerTalk" not in source
+    assert "jump IntZimmerTalkMenu" not in source
+    assert "menu:" in source
+    assert "main_ui_runtime.action_items" not in source
+    assert "MenuItem(" not in source
     assert "label IntZimmerTalkRefresh" not in source
     assert "label IntZimmerTalkApply" not in source
     assert 'str(choice_code or "")' not in source
-    assert "Zimmer.var" in source
+    assert "Zimmer.var" not in source
+    assert "_zimmer_var" not in source
     assert "ZimmerVar" not in source
     assert "renpy.random" not in source
     assert "CityGuardRestore" not in source
     assert "action_menu_specs" not in source
+    assert "if _zimmer_talk_new:" in source
 
     for label in [
         "label IntZimmerTalkLook:",
@@ -38,26 +48,20 @@ def test_zimmer_dialogs_are_explicit_sublabels_not_dispatcher():
         assert label in source
 
 
-def test_city_guard_builds_real_actions_inline_without_room_loop_wrapper():
+def test_city_guard_builds_canonical_actions_without_room_loop_label():
     source = _source(CITY_GUARD)
+    zimmer_init = _source(ZIMMER_INIT)
 
     assert "label CityGuardBuildActions:" not in source
     assert "call CityGuardBuildActions" not in source
     assert 'Call("CityGuardShowPlacat")' in source
-    assert 'Call("IntZimmerTalk")' in source
+    assert 'Call("IntZimmerTalk")' not in source
+    assert 'talk_label = "IntZimmerTalk"' in zimmer_init
+    assert not CHARACTER_HUB.exists()
     assert 'Call("checkTriggers", "CityGuard", "enter", 0)' in source
-    assert "CityGuardRoom.build_exit_items()" in source
-
-
-def test_city_guard_builds_real_actions_inline_without_room_loop_wrapper():
-    source = _source(CITY_GUARD)
-
-    assert "label CityGuardBuildActions:" not in source
-    assert "call CityGuardBuildActions" not in source
-    assert 'Call("CityGuardShowPlacat")' in source
-    assert 'Call("IntZimmerTalk")' in source
-    assert 'Call("checkTriggers", "CityGuard", "enter", 0)' in source
-    assert "CityGuardRoom.build_exit_items()" in source
+    assert "rooms.get(\"CityGuard\").build_exit_items()" in source
+    assert "calendar_v2.clock_minutes()" in source
+    assert "int(clock_minutes or 0)" not in source
 
 
 def test_zimmer_dialog_menu_has_reference_choices_and_mongol_distraction():
@@ -77,15 +81,17 @@ def test_zimmer_dialog_menu_has_reference_choices_and_mongol_distraction():
     ]:
         assert choice in source
 
-    assert 'int(_mongol_var.get("StocksSeen", 0) or 0) == 1' in source
-    assert 'int(_mongol_var.get("StocksFoodDay", -1)) >= 0' in source
-    assert '_mongol_var["GuardCaptainKnown"] = 1' in source
+    assert 'int(_clara_booklet_thread.num or 0) == 8' in source
+    assert "not Mongol.guard_captain_known" in source
+    assert "_mongol_var" not in source
+    assert "Mongol.guard_captain_known = True" in source
 
 
 def test_zimmer_dialog_uses_vscene_and_room_restore_end():
     source = _source(ZIMMER_TALK)
 
-    assert 'vscene "images/zimmer/Portrait1.jpg"' in source
-    assert 'vscene "images/zimmer/Talk.jpg"' in source
-    assert 'MenuItem("Закончить разговор", Function(main_ui_end_talk_state))' in source
+    assert 'vscene "images/zimmer/portrait1.png"' in source
+    assert 'vscene "images/zimmer/talk.png"' in source
+    assert '"Закончить разговор":' in source
+    assert "$ main_ui_end_talk_state()" in source
     assert "jump CityGuard" not in source

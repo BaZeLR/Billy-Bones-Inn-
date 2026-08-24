@@ -1,49 +1,7 @@
-    def _girls_desc_stat_value(key, *map_names, **kwargs):
-        default = kwargs.get("default", 0)
-        for map_name in map_names:
-            mapping = _girls_desc_map(map_name, {})
-            value = _girls_desc_get(mapping, key, None)
-            if value is not None:
-                return value
-        return default
-    def _girls_desc_stat_value(key, *map_names, **kwargs):
-        default = kwargs.get("default", 0)
-        for map_name in map_names:
-            mapping = _girls_desc_map(map_name, {})
-            value = _girls_desc_get(mapping, key, None)
-            if value is not None:
-                return value
-        return default
-    def _girls_desc_stat_value(key, *map_names, **kwargs):
-        default = kwargs.get("default", 0)
-        for map_name in map_names:
-            mapping = _girls_desc_map(map_name, {})
-            value = _girls_desc_get(mapping, key, None)
-            if value is not None:
-                return value
-        return default
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    def _girls_desc_map(name, default=None):
-        value = getattr(renpy.store, str(name or ""), default)
-        if value is None:
-            return default
-        return value
-
-    def _girls_desc_map(name, default=None):
-        value = getattr(renpy.store, str(name or ""), default)
-        if value is None:
-            return default
-        return value
-
-    def _girls_desc_map(name, default=None):
-        value = getattr(renpy.store, str(name or ""), default)
-        if value is None:
-            return default
-        return value
-
     def _girls_desc_get(mapping, key, default=None):
         if mapping is None:
             return default
@@ -71,62 +29,8 @@ init python:
 
         return default
 
-    def _girls_desc_alias_name(girl_name):
-        raw = str(girl_name or "").strip()
-        if not raw:
-            return ""
-        aliases = {
-            "georgette": "georgett",
-            "lizette": "liza",
-            "lizzette": "liza",
-            "francesca": "fran",
-            "franchesca": "fran",
-            "francheska": "fran",
-            "clarisse": "Clara",
-            "clara": "Clara",
-        }
-        return aliases.get(raw.lower(), raw)
-
     def _girls_desc_resolve_key(girl_name):
-        base = _girls_desc_alias_name(girl_name)
-        if not base:
-            return ""
-
-        variants = []
-        for v in (base, str(base).lower(), str(base).capitalize(), str(base).upper()):
-            if v not in variants:
-                variants.append(v)
-
-        probe_maps = (
-            _girls_desc_map("girltextdesc", {}),
-            _girls_desc_map("RealName", {}),
-            _girls_desc_map("RealName2", {}),
-            _girls_desc_map("age", {}),
-            _girls_desc_map("beauty", {}),
-            _girls_desc_map("pregnancy", {}),
-            _girls_desc_map("topdress", {}),
-            _girls_desc_map("bottomdress", {}),
-            _girls_desc_map("topdress", {}),
-            _girls_desc_map("bottomdress", {}),
-            _girls_desc_map("topdress", {}),
-            _girls_desc_map("bottomdress", {}),
-        )
-
-        for mapping in probe_maps:
-            if not isinstance(mapping, dict):
-                continue
-            for cand in variants:
-                if cand in mapping:
-                    return cand
-            lower_index = {}
-            for mk in mapping.keys():
-                lower_index[str(mk).lower()] = mk
-            for cand in variants:
-                found = lower_index.get(str(cand).lower(), None)
-                if found is not None:
-                    return found
-
-        return base
+        return people_normalize_id(girl_name)
 
     def _girls_desc_skill_text(value):
         try:
@@ -182,11 +86,8 @@ init python:
         key = str(girl_key or "").strip().lower()
         if key not in ("sandra", "melissa", "amanda", "becky", "clara"):
             return ""
-        try:
-            last_day = int(_girls_desc_get(_girls_desc_map("BarberVisitLastDay", {}), key, -99) or -99)
-            current_day = int(getattr(renpy.store, "dayspassed", 0) or 0)
-        except Exception:
-            return ""
+        last_day = int(household.barber_visit_last_day.get(key, -99) or -99)
+        current_day = int(calendar_v2.daysInGame or 0)
         if last_day < 0 or current_day - last_day > 14:
             return ""
         if key == "sandra":
@@ -203,33 +104,32 @@ init python:
         g = _girls_desc_resolve_key(girl_name)
         if not g:
             g = str(girl_name or "")
+        girl_info = people.get_info(g)
 
-        def gm(name):
-            return _girls_desc_map(name, {})
-
-        real_name = _girls_desc_get(gm("RealName"), g, g)
-        real_name2 = _girls_desc_get(gm("RealName2"), g, real_name)
+        person_data = people.get_data(g)
+        real_name = str(person_data.cname or person_data.fullname or g) if person_data is not None else g
+        real_name2 = str(person_data.genitive or real_name) if person_data is not None else real_name
         lines = []
 
-        base_desc = _girls_desc_get(gm("girltextdesc"), g, "")
+        base_desc = str(person_data.description or "") if person_data is not None else ""
         if base_desc:
             lines.append(base_desc)
         barber_line = _girls_desc_recent_barber_line(g)
         if barber_line:
             lines.append(barber_line)
 
-        top = _girls_desc_get(gm("topdress"), g, "")
-        bra = _girls_desc_get(gm("bra"), g, "")
-        bottom = _girls_desc_get(gm("bottomdress"), g, "")
-        panties = _girls_desc_get(gm("panties"), g, "")
-        legs = _girls_desc_get(gm("legs"), g, "")
-        shoes = _girls_desc_get(gm("shoes"), g, "")
-        topraised = bool(_girls_desc_get(gm("topraised"), g, 0))
-        bottomraised = bool(_girls_desc_get(gm("bottomraised"), g, 0))
-        dress_part_desc = gm("DressPartDesc")
-        dress_part_slut = gm("DressPartSlut")
+        top = girl_info.clothing_layer("top") if girl_info is not None else ""
+        bra = girl_info.clothing_layer("bra") if girl_info is not None else ""
+        bottom = girl_info.clothing_layer("bottom") if girl_info is not None else ""
+        panties = girl_info.clothing_layer("panties") if girl_info is not None else ""
+        legs = girl_info.current_underwear("legs", "") if girl_info is not None else ""
+        shoes = girl_info.current_underwear("shoes", "") if girl_info is not None else ""
+        top_raised = bool(girl_info.layer_raised("top")) if girl_info is not None else False
+        bottom_raised = bool(girl_info.layer_raised("bottom")) if girl_info is not None else False
+        dress_part_desc = DressPartDesc
+        dress_part_slut = DressPartSlut
 
-        if int(_girls_desc_get(gm("Lactate"), g, 0) or 0) == 1:
+        if girl_info is not None and int(girl_info.sex_stat("lactate", 0) or 0) == 1:
             lactated_tits_desc = (
                 "Видно что груди %s набухли, а соски увеличились. "
                 "Ткань напротив них слегка промокла." % real_name2
@@ -243,7 +143,7 @@ init python:
             top_slut = int(_girls_desc_get(dress_part_slut, top, 0) or 0)
 
             if not bra:
-                if topraised:
+                if top_raised:
                     line += ". Сейчас эта блузка бесстыдно распахнута и не стесненные лифом груди вырвались на свободу."
                 elif top_slut >= 6:
                     line += ". Под ней нет лифчика и соски проглядывают через тонкую ткань. " + lactated_tits_desc
@@ -254,7 +154,7 @@ init python:
                 else:
                     line += "."
             else:
-                if topraised:
+                if top_raised:
                     line += ". Сейчас эта блузка бесстыдно распахнута и груди прикрыты лишь лифчиком. " + lactated_tits_desc
                 elif top_slut >= 4:
                     line += ". Глубокий вырез блузки открывал бы прекрасный вид на груди %s, если бы не лиф. %s" % (real_name2, lactated_tits_desc)
@@ -265,7 +165,7 @@ init python:
 
             lines.append(line.strip())
         elif bra:
-            bra_desc = _girls_desc_get(gm("FullDressDesc"), bra, bra).lower()
+            bra_desc = _girls_desc_get(FullDressDesc, bra, bra).lower()
             line = "Она одета только в %s." % bra_desc
             if lactated_tits_desc:
                 line += " " + lactated_tits_desc
@@ -277,7 +177,7 @@ init python:
             line = prefix + bottom_desc
             bottom_slut = int(_girls_desc_get(dress_part_slut, bottom, 0) or 0)
 
-            if bottomraised:
+            if bottom_raised:
                 if bottom_slut >= 4:
                     line += ", которая бесстыдно задрана до пояса."
                 else:
@@ -300,14 +200,14 @@ init python:
 
             lines.append(line)
         elif panties and bottom != "nightshirtbottom":
-            panties_desc = _girls_desc_get(gm("FullDressDesc"), panties, panties).lower()
+            panties_desc = _girls_desc_get(FullDressDesc, panties, panties).lower()
             prefix = "Также она одета в " if (top or bra) else "Она одета в "
             lines.append(prefix + panties_desc + ".")
 
-        if (bottomraised or not bottom or int(_girls_desc_get(dress_part_slut, bottom, 0) or 0) >= 4) and legs:
+        if (bottom_raised or not bottom or int(_girls_desc_get(dress_part_slut, bottom, 0) or 0) >= 4) and legs:
             legs_desc = _girls_desc_get(dress_part_desc, legs, legs)
             line = "Ее ножки обтянуты %s" % legs_desc
-            if (not bottomraised) and bottom and int(_girls_desc_get(dress_part_slut, bottom, 0) or 0) >= 5:
+            if (not bottom_raised) and bottom and int(_girls_desc_get(dress_part_slut, bottom, 0) or 0) >= 5:
                 line += ", эротично кончающимися чуть ниже юбочки."
             else:
                 line += "."
@@ -318,36 +218,36 @@ init python:
         elif shoes == "highshoes":
             lines.append("На ее ногах башмачки на очень высоком каблуке.")
 
-        if int(_girls_desc_get(gm("TitsVisible"), g, 0) or 0):
+        if girl_info is not None and girl_info.tits_visible():
             line = "Ее сиськи бесстыдно обнажены."
             if lactated_tits_desc:
                 line += " " + lactated_tits_desc
             lines.append(line)
 
-        if int(_girls_desc_get(gm("PussyVisible"), g, 0) or 0):
+        if girl_info is not None and girl_info.pussy_visible():
             lines.append("Ее влагалище ничем не прикрыто от нескромных взглядов.")
 
-        cum_face_you = int(_girls_desc_get(gm("CumFaceYou"), g, 0) or 0)
-        cum_face_others = int(_girls_desc_get(gm("CumFaceOthers"), g, 0) or 0)
-        cum_tits_you = int(_girls_desc_get(gm("CumTitsYou"), g, 0) or 0)
-        cum_tits_others = int(_girls_desc_get(gm("CumTitsOthers"), g, 0) or 0)
-        cum_inside_you = int(_girls_desc_get(gm("CumInsideYou"), g, 0) or 0)
-        cum_inside_others = int(_girls_desc_get(gm("CumInsideOthers"), g, 0) or 0)
-        short_skirt_no_panties = int(_girls_desc_get(gm("ShortSkirtNoPanties"), g, 0) or 0)
+        cum_face_you = girl_info.cum_state("cum_face_you") if girl_info is not None else 0
+        cum_face_others = girl_info.cum_state("cum_face_others") if girl_info is not None else 0
+        cum_tits_you = girl_info.cum_state("cum_tits_you") if girl_info is not None else 0
+        cum_tits_others = girl_info.cum_state("cum_tits_others") if girl_info is not None else 0
+        cum_inside_you = girl_info.cum_state("cum_inside_you") if girl_info is not None else 0
+        cum_inside_others = girl_info.cum_state("cum_inside_others") if girl_info is not None else 0
+        short_skirt_no_panties = girl_info.short_skirt_no_panties() if girl_info is not None else False
 
         if cum_face_you > 0:
             lines.append("На личике и волосах %s видны крупные белые капли вашей спермы." % real_name2)
         elif cum_face_others > 0:
             lines.append("На личике и волосах %s видны крупные белые капли чьей-то спермы." % real_name2)
 
-        if cum_tits_you > 0 and int(_girls_desc_get(gm("TitsVisible"), g, 0) or 0):
+        if cum_tits_you > 0 and girl_info is not None and girl_info.tits_visible():
             lines.append("Груди %s перемазаны в вашем семени." % real_name2)
-        elif cum_tits_others > 0 and int(_girls_desc_get(gm("TitsVisible"), g, 0) or 0):
+        elif cum_tits_others > 0 and girl_info is not None and girl_info.tits_visible():
             lines.append("Груди %s перемазаны в чьем-то семени." % real_name2)
 
-        if cum_inside_you > 0 and int(_girls_desc_get(gm("PussyVisible"), g, 0) or 0):
+        if cum_inside_you > 0 and girl_info is not None and girl_info.pussy_visible():
             lines.append("Из влагалища %s медленно вытекает сперма." % real_name2)
-        elif cum_inside_others > 0 and int(_girls_desc_get(gm("PussyVisible"), g, 0) or 0):
+        elif cum_inside_others > 0 and girl_info is not None and girl_info.pussy_visible():
             lines.append("Из влагалища %s медленно вытекает сперма." % real_name2)
 
         if cum_inside_you > 0 and short_skirt_no_panties:
@@ -355,28 +255,25 @@ init python:
         elif cum_inside_others > 0 and short_skirt_no_panties:
             lines.append("Вы видите следы чьей-то спермы на бедрах %s." % real_name2)
 
-        preg = int(_girls_desc_get(gm("pregnancy"), g, 0) or 0)
+        preg = girl_info.pregnancy_days() if girl_info is not None else 0
         top_slut = int(_girls_desc_get(dress_part_slut, top, 0) or 0)
 
-        if (not top or topraised) and preg >= 120:
+        if (not top or top_raised) and preg >= 120:
             lines.append("%s явно беременна, о чем свидетельствует ее округлившийся животик." % real_name)
-        elif top and (not topraised) and top_slut >= 3 and preg >= 120:
+        elif top and (not top_raised) and top_slut >= 3 and preg >= 120:
             lines.append("%s явно беременна, из-под легкой блузки виден округлившийся животик." % real_name)
-        elif top and (not topraised) and top_slut < 3 and preg >= 180:
+        elif top and (not top_raised) and top_slut < 3 and preg >= 180:
             lines.append("Даже закрытая одежда уже не может скрыть беременность %s." % real_name2)
 
-        if int(_girls_desc_get(gm("Drunk"), g, 0) or 0) > 0:
+        if girl_info is not None and int(getattr(girl_info, "drunk", 0) or 0) > 0:
             lines.append("%s слегка выпила, расслабилась и подобрела." % real_name)
 
-        girl_info = getPersonInfo(g)
-        girl_info = getPersonInfo(g)
-        girl_info = getPersonInfo(g)
-        age_val = int(_girls_desc_stat_value(g, "age_girls", "age", default=0) or 0)
+        age_val = people_age(g, 0)
         friends_val = int(getattr(girl_info, "rel", 0) or 0) if girl_info is not None else 0
         lines.append("Ей %d лет." % age_val)
         lines.append("Уровень дружбы: %d." % friends_val)
 
-        beauty_val = int(_girls_desc_get(gm("beauty"), g, 0) or 0)
+        beauty_val = int(girl_info.sex_stat("beauty", 0) or 0) if girl_info is not None else 0
         lines.append(_girls_desc_beauty_text(beauty_val))
 
         otkroven = int(getattr(girl_info, "openness", 0) or 0) if girl_info is not None else 0
@@ -384,17 +281,17 @@ init python:
         if otkroven >= 3:
             lines.append("Ее распущенность: %d." % sluttiness_val)
 
-        cooking_val = int(_girls_desc_get(gm("cooking"), g, 0) or 0)
-        cleaning_val = int(_girls_desc_get(gm("cleaning"), g, 0) or 0)
-        waitress_val = int(_girls_desc_get(gm("waitress"), g, 0) or 0)
+        cooking_val = int(girl_info.skill_value("cooking", 0) or 0) if girl_info is not None else 0
+        cleaning_val = int(girl_info.skill_value("cleaning", 0) or 0) if girl_info is not None else 0
+        waitress_val = int(girl_info.skill_value("waitress", 0) or 0) if girl_info is not None else 0
         lines.append("Она %s кухарка." % _girls_desc_skill_text(cooking_val))
         lines.append("Она %s уборщица." % _girls_desc_skill_text(cleaning_val))
         lines.append("Она %s официантка." % _girls_desc_skill_text(waitress_val))
 
         if otkroven >= 7:
-            sexacts_val = int(_girls_desc_get(gm("sexacts"), g, 0) or 0)
-            virginity_val = int(_girls_desc_get(gm("virginity"), g, 0) or 0)
-            cuminside_val = int(_girls_desc_get(gm("cuminside"), g, 0) or 0)
+            sexacts_val = int(girl_info.sex_stat("sexacts", 0) or 0)
+            virginity_val = int(girl_info.sex_stat("virginity", True))
+            cuminside_val = int(girl_info.sex_stat("cuminside", 0) or 0)
             if sexacts_val == 0:
                 lines.append("Она девственница.")
             elif virginity_val == 1:
@@ -408,7 +305,7 @@ init python:
         if preg < 120:
             lines.append("На вид она не беременна.")
         else:
-            if bool(getattr(renpy.store, "DebugFlag", False)):
+            if bool(config.developer):
                 lines.append("Она беременна на %d неделе." % int(preg / 7))
             if preg >= 210:
                 lines.append("%s беременна и находится на позднем сроке." % real_name)
@@ -418,7 +315,7 @@ init python:
                 lines.append("Видно, что %s нагуляла себе животик, но он еще не очень заметен." % real_name)
 
         if otkroven >= 6:
-            kids_val = int(_girls_desc_get(gm("kids"), g, 0) or 0)
+            kids_val = int(girl_info.sex_stat("kids", 0) or 0) if girl_info is not None else 0
             if kids_val == 0:
                 lines.append("У нее нет детей.")
             elif kids_val == 1:
@@ -429,6 +326,7 @@ init python:
         return [line for line in lines if line]
 
 label GirlsDesc(girl_name):
+    $ renpy.dynamic("_gd_key", "_gd_id", "_gd_lines", "_gd_line")
     scene black
     $ _gd_key = _girls_desc_resolve_key(girl_name)
     $ _gd_id = str(_gd_key or girl_name or "").lower()
