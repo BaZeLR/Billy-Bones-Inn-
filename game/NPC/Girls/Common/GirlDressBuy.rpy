@@ -8,22 +8,12 @@ init python:
             MenuItem("Посмотреть во что одета " + str(people_display_name(girl_name)), Call("GirlsDesc", girl_name)),
         ]
 
-        for dress_code in list(_gds_get_list("FemaleDressCodes")):
-            code = str(dress_code or "").strip()
-            if not code or code == "nightshirt":
-                continue
-            cost = _gds_dress_cost(code)
-            has_dress = _gds_has_dress_for_girl(girl_name, code)
-            if int(player.economy.money or 0) >= cost and (not has_dress) and str(dress_shop.produced or "") == "" and int(dress_shop.girl_dress_block or 0) == 0:
-                caption = "Заказать " + str(_gds_get_dict("ShortDressName").get(code, code)).lower()
-                options.append(MenuItem(caption, Call("GirlDressSuggest", girl_name, code)))
-
         options.append(MenuItem("Уйти из лавки", Call("GirlDressBuyLeave", girl_name)))
         return options
 
 
 label GirlDressBuy(GirlName="", CurLocArg=""):
-    $ renpy.dynamic("_girl_dress_buy_args", "DressObman", "_rn", "_rn3")
+    $ renpy.dynamic("_girl_dress_buy_args", "_rn", "_rn3")
     if str(GirlName or "") == "":
         python:
             _girl_dress_buy_args = _args if isinstance(_args, (list, tuple)) else ()
@@ -32,11 +22,10 @@ label GirlDressBuy(GirlName="", CurLocArg=""):
     if str(GirlName or "") == "":
         return
 
+    hide screen dress_shop_catalog_page
     $ _gds_ensure_stats(GirlName)
     $ _gds_ensure_stats("irma")
 
-    $ DressObman = _gds_get_dict("DressObman")
-    $ DressObman[GirlName] = 0
     $ player.appearance.girl_dresses_bought = 0
     $ dress_shop.girl_dress_block = 0
 
@@ -52,12 +41,14 @@ label GirlDressBuy(GirlName="", CurLocArg=""):
     $ main_ui_runtime.action_content = None
     call ShowImage("", "", irma_working_picture_path())
     $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+    show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
     while True:
         call screen main_ui
 
 
 label GirlDressBuyLeave(GirlName=""):
     $ renpy.dynamic("_rn")
+    hide screen dress_shop_catalog_page
     $ _rn = people_display_name(GirlName)
     if int(player.appearance.girl_dresses_bought or 0) <= 0:
         $ scene_runtime.text = "Осмотрев предлагаемый товар и обратив особое внимание на цены, вы буркнули: \"Покупать нечего, зайдем в другой раз!\" и бодро направились к выходу.\n\n%s ваше мнение, судя по всему, не разделяла и попыталась вас остановить: \"Стефан, давай еще посмотрим, ты же обещал мне что-нибудь купить!\"" % str(_rn)
@@ -80,6 +71,7 @@ label GirlDressBuyLeave(GirlName=""):
 
 
 label GirlDressBuyRefuse(GirlName=""):
+    hide screen dress_shop_catalog_page
     "\"Я же сказал, смотреть здесь не на что, покупать нечего, цены запре.., да не в ценах дело, просто выбор убогий!\" назидательно сказали вы и вышли на улицу."
     call SlutFriendsIncrease("irma", 0, 2, -1, 0, 0, 0)
     call SlutFriendsIncrease(GirlName, 5, 1, -1, 0, 0, 0)
@@ -90,4 +82,5 @@ label GirlDressBuyContinue(GirlName=""):
     "Вы решили не обманывать надежды и вернулись к осмотру одеяний."
     $ dress_shop.girl_dress_block = 0
     $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+    show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
     return

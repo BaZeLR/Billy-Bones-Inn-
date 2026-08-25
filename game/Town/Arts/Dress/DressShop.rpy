@@ -21,6 +21,11 @@ init python:
     def dress_shop_clara_present():
         return str(people.location("clara") or "") == "DressShop"
 
+    def dress_shop_room_text():
+        return "\n\n".join(
+            row.text for row in rooms.get("DressShop").visible_descriptions()
+        )
+
     DressShopRoomDefinition = Room(
         code_name="DressShop",
         group_name=ROOM_GROUP_CITY,
@@ -69,52 +74,8 @@ init python:
     def dress_shop_get_object(object_id):
         return get_game_object(object_id)
 
-    def dress_shop_populate_rack_contents():
-        male_items = list(dress_shop_rack_items("male"))
-        female_items = list(dress_shop_rack_items("female"))
-
-        male_rack = dress_shop_get_object("male_samples_001")
-        if male_rack is not None:
-            male_rack.contents = list(male_items)
-        female_rack = dress_shop_get_object("female_samples_001")
-        if female_rack is not None:
-            female_rack.contents = list(female_items)
-
-        return True
-
     def dress_shop_catalog_items(rack_type):
-        rack_id = "female_samples_001" if str(rack_type or "") == "female" else "male_samples_001"
-        rack_obj = dress_shop_get_object(rack_id)
-        if rack_obj is None:
-            return []
-        return list(rack_obj.visible_contents())
-
-    def dress_shop_catalog_action_items(rack_type):
-        rack_key = str(rack_type or "").strip().lower()
-        items = []
-        for dress_item in dress_shop_catalog_items(rack_key):
-            dress_code = str(dress_item.custom_properties.get("dress_code", "") or "")
-            dress_name = str(dress_item.name or dress_code)
-            dress_price = int(getattr(dress_item, "price", 0) or 0)
-            if rack_key == "male":
-                if dress_shop_item_owned(dress_item):
-                    caption = "%s — уже куплено" % dress_name
-                    action = NullAction()
-                else:
-                    caption = "%s — %s мараведи" % (dress_name, dress_price)
-                    action = Call("DressShopBuyMaleItem", dress_code)
-            else:
-                caption = "%s — подробнее" % dress_name
-                action = Call("DressShopFemaleBuyInfo", dress_code)
-            items.append(MenuItem(caption, action))
-        items.append(MenuItem("Назад в лавку", [
-            SetField(main_ui_runtime, "object_id", ""),
-            SetField(main_ui_runtime, "action_title", "Действия"),
-            SetField(main_ui_runtime, "action_content", None),
-            SetField(main_ui_runtime, "action_items", dress_shop_room_action_items()),
-            Function(main_ui_restart_interaction),
-        ]))
-        return items
+        return list(dress_shop_rack_items(rack_type))
 
     def dress_shop_room_action_items():
         return rooms.get("DressShop").build_object_items() + rooms.get("DressShop").build_exit_items()
@@ -136,7 +97,152 @@ init python:
         player.spend_money(price)
         return "success"
 
+
+init -5:
+    style dress_shop_catalog_button is button:
+        background Solid("#3d2919")
+        hover_background Solid("#5a3a24")
+        insensitive_background Solid("#8a7963")
+        padding (14, 6)
+
+    style dress_shop_catalog_button_text is button_text:
+        size 18
+        color "#f5ead3"
+        hover_color "#ffffff"
+        insensitive_color "#d2c5b0"
+
+
+screen dress_shop_catalog_page(rack_type="male", girl_name=""):
+    zorder 120
+    default catalog_page = 0
+
+    $ _rack_type = "female" if str(rack_type or "").strip().lower() == "female" else "male"
+    $ _girl_name = str(girl_name or "").strip()
+    $ _catalog_items = list(dress_shop_catalog_items(_rack_type) or [])
+    $ _page_size = 3
+    $ _page_count = max(1, (len(_catalog_items) + _page_size - 1) // _page_size)
+    $ _current_page = max(0, min(int(catalog_page or 0), _page_count - 1))
+    $ _page_start = _current_page * _page_size
+    $ _page_items = _catalog_items[_page_start:_page_start + _page_size]
+    $ _textbox_h = int(getattr(gui, "textbox_height", 278))
+    $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
+    $ _left_w = int((config.screen_width - 36) * 0.72)
+    $ _left_h = _usable_h - 24
+    $ _catalog_title = "ЖЕНСКИЕ ПЛАТЬЯ" if _rack_type == "female" else "МУЖСКИЕ КОСТЮМЫ"
+    if _rack_type == "female" and _girl_name:
+        $ _catalog_intro = "Выберите одежду, которую хотите предложить %s." % people_name(_girl_name, "dative")
+    else:
+        $ _catalog_intro = "Образцы женской одежды с левой стены лавки." if _rack_type == "female" else "Костюмы и камзолы с правой стены лавки."
+
+    fixed:
+        xpos 12
+        ypos 12
+        xsize _left_w
+        ysize _left_h
+
+        add Transform("images/rpg_message_bg.png", fit="cover")
+
+        vbox:
+            xpos 28
+            ypos 22
+            xsize _left_w - 56
+            ysize _left_h - 44
+            spacing 10
+
+            text _catalog_title size 30 color "#1e130c" xalign 0.5
+            text _catalog_intro size 17 color "#5a3a24" xalign 0.5
+
+            for _dress_item in _page_items:
+                $ _dress_code = dress_shop_item_code(_dress_item)
+                $ _dress_name = str(getattr(_dress_item, "name", "") or _dress_code)
+                $ _dress_desc = str(getattr(_dress_item, "description", "") or "")
+                $ _dress_price = int(getattr(_dress_item, "price", 0) or 0)
+
+                frame:
+                    xfill True
+                    yminimum 168
+                    padding (14, 10)
+                    background Solid("#f5ead3d9")
+
+                    hbox:
+                        xfill True
+                        spacing 18
+
+                        vbox:
+                            xmaximum _left_w - 320
+                            spacing 5
+                            text _dress_name size 23 color "#1e130c"
+                            text _dress_desc size 16 color "#2d1d12"
+
+                        vbox:
+                            xminimum 205
+                            spacing 8
+                            text "[_dress_price] мараведи" size 20 color "#1e130c" xalign 0.5
+
+                            if _rack_type == "male":
+                                if dress_shop_item_owned(_dress_item):
+                                    text "Уже куплено" size 17 color "#5a3a24" xalign 0.5
+                                elif str(dress_shop.produced or "") != "":
+                                    text "Ирма занята заказом" size 17 color "#5a3a24" xalign 0.5
+                                else:
+                                    textbutton "Купить":
+                                        id "dress_shop_catalog_buy_" + _dress_code
+                                        alt "dress_shop_catalog_buy_" + _dress_code
+                                        style "dress_shop_catalog_button"
+                                        text_style "dress_shop_catalog_button_text"
+                                        xalign 0.5
+                                        sensitive dress_shop_can_buy_item(_dress_item)
+                                        action Call("DressShopBuyMaleItem", _dress_code)
+                            else:
+                                $ _girl_has_dress = bool(_girl_name) and _gds_has_dress_for_girl(_girl_name, _dress_code)
+                                $ _female_can_offer = bool(_girl_name) and not _girl_has_dress and str(dress_shop.produced or "") == "" and int(dress_shop.girl_dress_block or 0) == 0 and _dress_price <= int(player.economy.money or 0)
+
+                                textbutton "Выбрать":
+                                    id "dress_shop_catalog_offer_" + _dress_code
+                                    alt "dress_shop_catalog_offer_" + _dress_code
+                                    style "dress_shop_catalog_button"
+                                    text_style "dress_shop_catalog_button_text"
+                                    xalign 0.5
+                                    sensitive _female_can_offer
+                                    action ([Hide("dress_shop_catalog_page"), Call("GirlDressSuggest", _girl_name, _dress_code)] if _girl_name else NullAction())
+
+                                if not _girl_name:
+                                    text "Выбор доступен при совместном визите" size 15 color "#5a3a24" xalign 0.5 text_align 0.5
+                                elif _girl_has_dress:
+                                    text "Уже куплено" size 15 color "#5a3a24" xalign 0.5
+                                elif str(dress_shop.produced or "") != "":
+                                    text "Ирма занята заказом" size 15 color "#5a3a24" xalign 0.5
+                                elif int(dress_shop.girl_dress_block or 0) != 0:
+                                    text "Выбор закрыт" size 15 color "#5a3a24" xalign 0.5
+                                elif _dress_price > int(player.economy.money or 0):
+                                    text "Не хватает денег" size 15 color "#5a3a24" xalign 0.5
+
+            null yfill True
+
+            hbox:
+                xalign 0.5
+                spacing 18
+
+                textbutton "<":
+                    id "dress_shop_catalog_previous"
+                    alt "dress_shop_catalog_previous"
+                    style "dress_shop_catalog_button"
+                    text_style "dress_shop_catalog_button_text"
+                    sensitive _current_page > 0
+                    action SetScreenVariable("catalog_page", _current_page - 1)
+
+                text "Страница [_current_page + 1] из [_page_count]" size 19 color "#1e130c" yalign 0.5
+
+                textbutton ">":
+                    id "dress_shop_catalog_next"
+                    alt "dress_shop_catalog_next"
+                    style "dress_shop_catalog_button"
+                    text_style "dress_shop_catalog_button_text"
+                    sensitive _current_page + 1 < _page_count
+                    action SetScreenVariable("catalog_page", _current_page + 1)
+
 label DressShop:
+    hide screen dress_shop_catalog_page
     show screen main_ui
     $ rooms.enter("DressShop")
     $ main_ui_runtime.action_title = "Действия"
@@ -154,7 +260,7 @@ label DressShop:
         while True:
             call screen main_ui
 
-    $ scene_runtime.text = "\n\n".join([row.text for row in rooms.get("DressShop").visible_descriptions()])
+    $ scene_runtime.text = dress_shop_room_text()
     $ scene_runtime.location_text = scene_runtime.text
     $ scene_runtime.picture = ""
 
@@ -172,14 +278,25 @@ label DressShopOpenCatalog(rack_type=""):
     if _rack_type not in ("female", "male"):
         return
 
-    $ dress_shop_populate_rack_contents()
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_title = "Женские платья" if _rack_type == "female" else "Мужские костюмы"
     $ main_ui_runtime.object_id = "female_samples_001" if _rack_type == "female" else "male_samples_001"
     $ _rack_object = dress_shop_get_object(main_ui_runtime.object_id)
     $ scene_runtime.text = str(getattr(_rack_object, "description", "") or "")
     $ scene_runtime.location_text = scene_runtime.text
-    $ main_ui_runtime.action_items = dress_shop_catalog_action_items(_rack_type)
+    $ main_ui_runtime.action_items = [
+        MenuItem("Назад", [
+            Hide("dress_shop_catalog_page"),
+            SetField(main_ui_runtime, "object_id", ""),
+            SetField(main_ui_runtime, "action_title", "Действия"),
+            SetField(main_ui_runtime, "action_content", None),
+            SetField(main_ui_runtime, "action_items", dress_shop_room_action_items()),
+            SetField(scene_runtime, "text", dress_shop_room_text()),
+            SetField(scene_runtime, "location_text", dress_shop_room_text()),
+            Function(main_ui_restart_interaction),
+        ]),
+    ]
+    show screen dress_shop_catalog_page(rack_type=_rack_type)
     return
 
 
@@ -197,27 +314,14 @@ label DressShopBuyMaleItem(dress_code=""):
         else:
             $ scene_runtime.text = "Вы не выбрали костюм."
         $ scene_runtime.location_text = scene_runtime.text
-        $ main_ui_runtime.action_content = None
         $ main_ui_runtime.action_title = "Мужские костюмы"
         $ main_ui_runtime.object_id = "male_samples_001"
-        $ main_ui_runtime.action_items = dress_shop_catalog_action_items("male")
+        show screen dress_shop_catalog_page(rack_type="male")
         return
 
+    hide screen dress_shop_catalog_page
     $ main_ui_runtime.object_id = ""
     call DressTry("You", _dress_code)
-    return
-
-
-label DressShopFemaleBuyInfo(dress_code=""):
-    $ renpy.dynamic("_dress_code", "_dress_item")
-    $ _dress_code = str(dress_code or "")
-    if _dress_code == "":
-        call DressShopOpenCatalog("female")
-        return
-    $ _dress_item = get_game_item("dress_" + _dress_code)
-    $ scene_runtime.text = str(getattr(_dress_item, "description", _dress_code) or _dress_code)
-    $ scene_runtime.location_text = scene_runtime.text
-    $ main_ui_runtime.action_items = dress_shop_catalog_action_items("female")
     return
 
 label DressShopObjectMenu(object_id=""):

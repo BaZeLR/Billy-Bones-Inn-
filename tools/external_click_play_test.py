@@ -340,15 +340,27 @@ testcase external_actual_tailor_buy_dress_measure_flow:
     $ Irma.extra_fee_refused = False
     $ player.intimacy.came_today = 0
     $ player.intimacy.can_cum_daily = 3
+    $ dress_shop.produced = ""
+    $ dress_shop.buyer = ""
+    $ player.appearance.owned_dresses = []
     run Jump("DressShop")
     advance until screen "main_ui" timeout 20.0
-    $ renpy.call_in_new_context("DressShopOpenCatalog", "male")
+    $ _female_rack_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Женские образцы")
+    click id ("choice_panel_button_%d" % int(_female_rack_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.object_id or "") == "female_samples_001") timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "dress_shop_catalog_page" timeout 20.0
+    assert eval (str(renpy.get_screen("dress_shop_catalog_page").scope.get("rack_type", "") or "") == "female" and len(dress_shop_catalog_items("female")) > 3) timeout 5.0
+    $ _female_browse_code = dress_shop_item_code(dress_shop_catalog_items("female")[0])
+    assert eval (renpy.get_widget("dress_shop_catalog_page", "dress_shop_catalog_offer_" + _female_browse_code) is not None) timeout 5.0
+    click id "dress_shop_catalog_next" pos (0.5, 0.5) until eval (int(renpy.get_screen("dress_shop_catalog_page").scope.get("catalog_page", 0) or 0) == 1) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("dress_shop_catalog_page") is None and str(main_ui_runtime.object_id or "") == "") timeout 20.0
+    $ _male_rack_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Мужские образцы")
     $ _male_item = dress_shop_catalog_items("male")[0]
     $ _male_code = str(_male_item.custom_properties.get("dress_code", "") or "")
-    $ player.appearance.owned_dresses = []
     $ player.economy.money = int(getattr(_male_item, "price", 0) or 0) + 100
-    run Call("DressShopBuyMaleItem", _male_code)
-    advance until screen "choice" timeout 20.0
+    click id ("choice_panel_button_%d" % int(_male_rack_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.object_id or "") == "male_samples_001") timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "dress_shop_catalog_page" timeout 20.0
+    click id ("dress_shop_catalog_buy_" + _male_code) pos (0.5, 0.5) until screen "choice" timeout 20.0
+    assert eval (renpy.get_screen("dress_shop_catalog_page") is None) timeout 5.0
     assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) == 2) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
     assert eval ("measure1" in str(scene_runtime.picture or "") and "нижнего белья" in str(scene_runtime.text or "")) timeout 5.0
@@ -381,6 +393,74 @@ testcase external_actual_tailor_buy_dress_measure_flow:
     click id "choice_panel_button_1" pos (0.5, 0.5) until eval ("sex9" in str(scene_runtime.picture or "") and "20 мараведи" in str(scene_runtime.text or "") and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) == 2) timeout 5.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until eval (bool(Irma.extra_fee_refused)) timeout 20.0
+
+testcase external_female_tailor_choose_agree_purchase_flow:
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 8, 0)
+    $ external_calendar_set_weekday(1)
+    $ threads["cityBlindPirateFall"].advanceTo(threads["cityBlindPirateFall"].data.length, complete_at_end=True)
+    run Call("InitIrma")
+    run Call("InitAmanda")
+    $ rooms.enter("DressShop")
+    $ people.get_data("irma").set_schedule([NPCScheduleEntry(location="DressShop", start_minute=0, end_minute=1440, priority=999)])
+    $ Amanda.corruption = 0
+    $ Amanda.rel = 0
+    $ _female_item = get_game_item("dress_modestworkdress")
+    $ _female_code = dress_shop_item_code(_female_item)
+    assert eval (_female_item is not None and _female_code == "modestworkdress") timeout 5.0
+    $ Amanda.wardrobe["owned"] = [code for code in _gds_get_dress_list_for_girl("amanda") if str(code or "") != _female_code]
+    $ dress_shop.produced = ""
+    $ dress_shop.buyer = ""
+    $ dress_shop.girl_dress_block = 0
+    $ player.appearance.girl_dresses_bought = 0
+    $ player.set_money(int(getattr(_female_item, "price", 0) or 0) + 100)
+    $ _female_money_before = int(player.economy.money or 0)
+    $ daily_events.delete("amanda", "BuyDress", "")
+    $ daily_events.add("amanda", "dressshop", 0, "=", 1, 1, "BuyDress", "GirlDressBuy", "girl_location")
+    run Jump("DressShop")
+    advance until screen "dress_shop_catalog_page" timeout 20.0
+    assert eval (str(renpy.get_screen("dress_shop_catalog_page").scope.get("girl_name", "") or "") == "amanda") timeout 5.0
+    assert eval ([str(item.caption or "") for item in main_ui_runtime.action_items] == ["Осмотреть портниху", "Посмотреть во что одета Аманда", "Уйти из лавки"]) timeout 5.0
+    assert eval (_female_code in [dress_shop_item_code(item) for item in dress_shop_catalog_items("female")[:3]]) timeout 5.0
+    assert eval (not _gds_has_dress_for_girl("amanda", _female_code) and str(dress_shop.produced or "") == "" and int(player.economy.money or 0) >= int(getattr(_female_item, "price", 0) or 0)) timeout 5.0
+    click id ("dress_shop_catalog_offer_" + _female_code) pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (renpy.get_screen("dress_shop_catalog_page") is None) timeout 5.0
+    advance until screen "choice" timeout 20.0
+    assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) == 3) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 900) until eval (str(rooms.current_code or "") == "ArtisansQuarter") timeout 20.0
+    assert eval (str(dress_shop.produced or "") == _female_code) timeout 5.0
+    assert eval (_female_code in _gds_get_dress_list_for_girl("amanda")) timeout 5.0
+    assert eval (int(player.economy.money or 0) == _female_money_before - int(getattr(_female_item, "price", 0) or 0)) timeout 5.0
+    assert eval (int(player.appearance.girl_dresses_bought or 0) == 1) timeout 5.0
+    assert eval (renpy.get_screen("dress_shop_catalog_page") is None) timeout 5.0
+
+testcase external_female_tailor_refusal_returns_to_catalog:
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 8, 0)
+    $ external_calendar_set_weekday(1)
+    $ threads["cityBlindPirateFall"].advanceTo(threads["cityBlindPirateFall"].data.length, complete_at_end=True)
+    run Call("InitIrma")
+    run Call("InitAmanda")
+    $ people.get_data("irma").set_schedule([NPCScheduleEntry(location="DressShop", start_minute=0, end_minute=1440, priority=999)])
+    $ Amanda.corruption = 0
+    $ Amanda.rel = 0
+    $ _refused_item = get_game_item("dress_openworkdress")
+    $ _refused_code = dress_shop_item_code(_refused_item)
+    $ Amanda.wardrobe["owned"] = [code for code in _gds_get_dress_list_for_girl("amanda") if str(code or "") != _refused_code]
+    $ dress_shop.produced = ""
+    $ dress_shop.buyer = ""
+    $ player.appearance.girl_dresses_bought = 0
+    $ player.set_money(int(getattr(_refused_item, "price", 0) or 0) + 100)
+    $ _refused_money_before = int(player.economy.money or 0)
+    $ daily_events.delete("amanda", "BuyDress", "")
+    $ daily_events.add("amanda", "dressshop", 0, "=", 1, 1, "BuyDress", "GirlDressBuy", "girl_location")
+    run Jump("DressShop")
+    advance until screen "dress_shop_catalog_page" timeout 20.0
+    click id "dress_shop_catalog_next" pos (0.5, 0.5) until eval (int(renpy.get_screen("dress_shop_catalog_page").scope.get("catalog_page", 0) or 0) == 1) timeout 20.0
+    click id ("dress_shop_catalog_offer_" + _refused_code) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 900) until screen "dress_shop_catalog_page" timeout 20.0
+    assert eval (str(renpy.get_screen("dress_shop_catalog_page").scope.get("girl_name", "") or "") == "amanda") timeout 5.0
+    assert eval (str(dress_shop.produced or "") == "" and int(player.economy.money or 0) == _refused_money_before) timeout 5.0
+    assert eval (_refused_code not in _gds_get_dress_list_for_girl("amanda") and int(player.appearance.girl_dresses_bought or 0) == 0) timeout 5.0
 
 '''
 
@@ -3750,8 +3830,7 @@ init -1 python:
             captions = []
         overlay_screens = []
         for screen_name in (
-            "dress_shop_female_catalog_overlay",
-            "dress_shop_male_catalog_overlay",
+            "dress_shop_catalog_page",
             "girl_card_overlay",
             "player_card_overlay",
             "story_thread_board",
@@ -5747,6 +5826,8 @@ def main() -> int:
             "external_shop_action_logic",
             "external_tavern_report_state_defaults",
             "external_actual_tailor_buy_dress_measure_flow",
+            "external_female_tailor_choose_agree_purchase_flow",
+            "external_female_tailor_refusal_returns_to_catalog",
             "external_dog_entity_actions",
             "external_backyard_barrel_object_actions",
             "external_grocery_store_object_purchase_actions",
@@ -5899,6 +5980,8 @@ def main() -> int:
             "external_shop_action_logic",
             "external_tavern_report_state_defaults",
             "external_actual_tailor_buy_dress_measure_flow",
+            "external_female_tailor_choose_agree_purchase_flow",
+            "external_female_tailor_refusal_returns_to_catalog",
             "external_dog_entity_actions",
             "external_backyard_barrel_object_actions",
             "external_grocery_store_object_purchase_actions",

@@ -40,8 +40,15 @@ def test_dress_shop_has_no_refresh_label_or_recursive_room_reentry():
     assert shop.count("call screen main_ui") == 2
     assert "dress_shop_male_catalog_overlay" not in shop
     assert "dress_shop_female_catalog_overlay" not in shop
-    assert "def dress_shop_catalog_action_items(rack_type):" in shop
-    assert "main_ui_runtime.action_items = dress_shop_catalog_action_items(_rack_type)" in shop
+    assert "def dress_shop_catalog_action_items(rack_type):" not in shop
+    assert 'screen dress_shop_catalog_page(rack_type="male", girl_name=""):' in shop
+    assert 'show screen dress_shop_catalog_page(rack_type=_rack_type)' in shop
+    catalog = shop.split('screen dress_shop_catalog_page(rack_type="male", girl_name=""):', 1)[1].split(
+        "label DressShop:", 1
+    )[0]
+    assert "viewport:" not in catalog
+    assert 'SetScreenVariable("catalog_page"' in catalog
+    assert 'for _dress_item in _page_items:' in catalog
     assert 'call ShowGirlCard("irma")' in talk
 
 

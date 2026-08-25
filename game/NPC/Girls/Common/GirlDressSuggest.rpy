@@ -64,18 +64,20 @@ init python:
             wardrobe.append(dress)
 
     def _gds_dress_cost(dress_code):
-        cost_map = _gds_get_dict("DressCost")
-        return int(cost_map.get(str(dress_code or ""), 0) or 0)
+        item_obj = get_game_item("dress_" + str(dress_code or ""))
+        return int(getattr(item_obj, "price", 0) or 0)
+
+    def _gds_dress_name(dress_code):
+        code = str(dress_code or "")
+        item_obj = get_game_item("dress_" + code)
+        return str(getattr(item_obj, "name", "") or code)
 
     def _gds_dress_top_bottom_slut(dress_code):
-        top_map = _gds_get_dict("DressTopPart")
-        bottom_map = _gds_get_dict("DressBottomPart")
-        part_slut = _gds_get_dict("DressPartSlut")
         d = str(dress_code or "")
-        top_name = str(top_map.get(d, "") or "")
-        bottom_name = str(bottom_map.get(d, "") or "")
-        top_slut = int(part_slut.get(top_name, 0) or 0)
-        bottom_slut = int(part_slut.get(bottom_name, 0) or 0)
+        top_name = str(DressTopPart.get(d, "") or "")
+        bottom_name = str(DressBottomPart.get(d, "") or "")
+        top_slut = int(DressPartSlut.get(top_name, 0) or 0)
+        bottom_slut = int(DressPartSlut.get(bottom_name, 0) or 0)
         return top_slut, bottom_slut
 
     def _gds_apply_purchase(girl_name, dress_code, set_legsdef=False, set_legs=False, set_produced=False):
@@ -127,6 +129,7 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
     if str(GirlName or "") == "" or str(DressToBuy or "") == "":
         return
 
+    hide screen dress_shop_catalog_page
     $ _gds_ensure_stats(GirlName)
     $ _gds_ensure_stats("irma")
 
@@ -135,7 +138,7 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
 
 
     $ _rn = people_display_name(GirlName)
-    $ _short_name = str(_gds_get_dict("ShortDressName").get(DressToBuy, DressToBuy)).lower()
+    $ _short_name = _gds_dress_name(DressToBuy).lower()
 
     '"[_rn]", предложили вы, а давай я куплю тебе [_short_name]?'
 
@@ -155,6 +158,7 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         else:
             '"Лифчик?" удивилась [_rn]. "Не, спасибо конечно, но он мне не нужен!"'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
     if _is_panties:
@@ -163,12 +167,14 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         else:
             '"Панталончики?" удивилась [_rn]. "Не, спасибо конечно, но они мне не нужны!"'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
     if _is_stockings:
         if _slut < 15:
             '"Ой, чулочки! Ну не знаю, нужны ли они мне?" скромно заметила [_rn]. "Наверное нет, я же никому свои ножки показывать не собираюсь. Давай лучше еще что-то посмотрим."'
             $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+            show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
             return
 
         if ShowOffLevel > 1:
@@ -176,12 +182,12 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
             $ _panties_now = str(people.get_info(GirlName).clothing_layer("panties") or "")
 
             if _legs_now != "":
-                '"О, еще чулочки," обрадованно сказала [_rn]. Лукаво посмотрев на вас, она присела на лавочку, сбросила обувку, и начала стягивать с себя [str(_gds_get_dict("ShortDressName").get(_legs_now, _legs_now)).lower()] дабы примерить обновку.'
+                '"О, еще чулочки," обрадованно сказала [_rn]. Лукаво посмотрев на вас, она присела на лавочку, сбросила обувку, и начала стягивать с себя [_gds_dress_name(_legs_now).lower()] дабы примерить обновку.'
             else:
                 '"О, чулочки," обрадованно сказала [_rn]. Лукаво посмотрев на вас, она присела на лавочку, сбросила обувку, и начала натягивать подарок на свои стройные ножки.'
 
             if _panties_now != "":
-                'Задравшийся при этом подол платья ее ничуть не обеспокоил. Впрочем, под ним обнаружились [str(_gds_get_dict("ShortDressName").get(_panties_now, _panties_now)).lower()], скрывшие все самое интересное от вашего любопытного взора.'
+                'Задравшийся при этом подол платья ее ничуть не обеспокоил. Впрочем, под ним обнаружились [_gds_dress_name(_panties_now).lower()], скрывшие все самое интересное от вашего любопытного взора.'
             else:
                 'Подол ее платья задрался и вы увидели что под ним ничего не было. Шалунья сначала убедилась в том, что вам удалось полюбоваться ее щелкой.'
 
@@ -199,6 +205,7 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
             $ _gds_apply_purchase(GirlName, DressToBuy, set_legsdef=True, set_legs=True, set_produced=False)
             call stat
             $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+            show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
             return
 
         '"Ой, какие хорошенькие чулочки," восхитилась [_rn]. "Они мне?! Спасибочки!" С этими словами она взяла ваш подарочек, явно намереваясь одеть его позже.'
@@ -208,6 +215,7 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
         $ _gds_apply_purchase(GirlName, DressToBuy, set_legsdef=True, set_legs=False, set_produced=False)
         call stat
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
     $ _top_slut, _bottom_slut = _gds_dress_top_bottom_slut(DressToBuy)
@@ -215,36 +223,43 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
     if _slut < 40 and _top_slut >= 5:
         '"Не, ну ты чего?" удивилась вашему выбору [_rn]. "Тут же сиськи практически наружу. Да если и не поворачиваться - все равно все будет видно. Я такое не то, что одевать, в комнате своей не хочу хранить."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
     if _slut < 20 and _top_slut >= 3:
         '"Стефан, ты видел эту блузку? В ней же все открыто. Она на грани приличия, вернее уже за гранью," попеняла вам [_rn]. "А я девушка приличная и мне нужны приличные платья."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
     if _slut < 10 and _top_slut >= 2:
         '"Стефан, это платье конечно милое, но какое-то черезчур смелое. Не думаю, что я смогу такое, с вырезом, носить," засмущалась [_rn]. "Давай пока посмотрим другие платья, поскромнее."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
     if _slut < 55 and _bottom_slut >= 5:
         '"Ну ты и выбрал! Наверное членом думал," прокоментировала ваш выбор [_rn]. "С такой юбочкой наклонишься и все видно. Сам такое носи."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
     if _slut < 35 and _bottom_slut >= 3:
         '"Долго думал? Я такую юбочку не то что на люди, в комнате своей не одену," не одобрила ваш выбор [_rn]. "Если хочешь мне подарок сделать, то давай что-то другое купим."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
     if _slut < 20 and _bottom_slut >= 2:
         '"Ну все таки такое платье слишком смелое," зарделась [_rn]. "Давай посмотрим другие, такие чтоб подол до пола был."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
     if ((_slut >= 35 and _top_slut < 2) or (_slut >= 55 and _top_slut < 3) or (_slut >= 70 and _top_slut < 6) or (_slut >= 45 and _bottom_slut < 2) or (_slut >= 60 and _bottom_slut < 3) or (_slut >= 75 and _bottom_slut < 6)):
         '"Стефан, я по твоему кто? Грымза какая или серая мышка? Зачем ты мне суешь это платье, которое слишком скромно и для сорокалетней девственницы? Давай другие посмотрим, понаряднее и попривлекательней."'
         $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+        show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
         return
 
     '"Ой какое миленькое платье!" обрадовалась [_rn]. "Ты хочешь мне такое заказать?"'
@@ -252,5 +267,8 @@ label GirlDressSuggest(GirlName="", DressToBuy=""):
     '"Ой, здорово. Тогда пусть Ирмочка с меня мерку сейчас и снимет, чтобы уже сегодня могла начать кроить и шить!"'
 
     call GirlSuggestDressFunc(GirlName, DressToBuy, ShowOffLevel, DressBuyIsRelative)
+    if str(dress_shop.produced or "") == str(DressToBuy or ""):
+        jump ArtisansQuarter
     $ main_ui_runtime.action_items = girl_dress_buy_actions(GirlName)
+    show screen dress_shop_catalog_page(rack_type="female", girl_name=GirlName)
     return
