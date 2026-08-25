@@ -16,13 +16,16 @@ def test_native_menu_choice_uses_main_ui_action_region_and_restores_the_hud():
     choice = source[start:end]
 
     assert 'if str(rooms.current_code or "") != "Intro":' in choice
-    assert 'if renpy.get_screen("main_ui") is None:' in choice
     assert 'on "show" action Show("main_ui")' in choice
+    assert 'if renpy.get_screen("main_ui") is None:' not in choice
     assert 'str(main_ui_runtime.mode or "") in ("talk", "event")' not in choice
-    assert '$ _choice_y = MAIN_UI_NATIVE_CHOICE_TOP' in choice
-    assert 'ysize MAIN_UI_NATIVE_CHOICE_HEIGHT' in choice
-    assert 'style "mui_hud_button"' in choice
-    assert 'id "choice_panel_button_%d"' in choice
+    non_intro = choice.split('if str(rooms.current_code or "") != "Intro":', 1)[1].split(
+        "    else:", 1
+    )[0]
+    assert "        null" in non_intro
+    assert "frame:" not in non_intro
+    assert "textbutton i.caption" not in non_intro
+    assert "MAIN_UI_NATIVE_CHOICE" not in choice
     assert "viewport:" not in choice
     assert 'scrollbars "vertical"' not in choice
     assert "mousewheel True" not in choice
@@ -32,12 +35,17 @@ def test_native_menu_choice_uses_main_ui_action_region_and_restores_the_hud():
 def test_native_menu_uses_the_named_main_ui_action_region_contract():
     source = MAIN_LAYOUT.read_text(encoding="utf-8")
 
-    assert "define MAIN_UI_NATIVE_CHOICE_TOP = 242" in source
-    assert "define MAIN_UI_NATIVE_CHOICE_HEIGHT = 300" in source
+    assert "MAIN_UI_NATIVE_CHOICE_TOP" not in source
+    assert "MAIN_UI_NATIVE_CHOICE_HEIGHT" not in source
     assert "yminimum 300" in source
-    assert 'if renpy.get_screen("choice") is None:' in source
-    assert 'style "mui_hud_button"' in source
-    action_region = source.split('if renpy.get_screen("choice") is None:', 1)[1].split(
+    assert 'screen current_action_panel(native_choice=None):' in source
+    assert 'if native_choice is not None:' in source
+    assert 'native_choice.scope.get("items", [])' in source
+    assert "use choice_panel(_native_choice_items)" in source
+    assert '$ _native_choice_screen = renpy.get_screen("choice")' in source
+    assert 'use current_action_panel(_native_choice_screen)' in source
+    assert 'if renpy.get_screen("choice") is None:' not in source
+    action_region = source.split('$ _native_choice_screen = renpy.get_screen("choice")', 1)[1].split(
         'if str(main_ui_runtime.mode or "") != "event":', 1
     )[0]
     assert "viewport:" not in action_region
@@ -54,8 +62,10 @@ def test_room_and_object_action_buttons_use_the_same_hud_button_design():
         "screen choice(items, label=None, menu_name=None):", 1
     )[0]
 
-    assert 'style "mui_hud_button"' in panel
-    assert 'text_style "mui_hud_button_text"' in panel
+    assert 'style "mui_action_button"' in panel
+    assert 'text_style "mui_action_button_text"' in panel
+    assert "style mui_action_button is mui_hud_button:" in layout
+    assert "style mui_action_button_text is mui_hud_button_text:" in layout
     hud_style = layout.split("style mui_hud_button is button:", 1)[1].split(
         "style mui_hud_button_text", 1
     )[0]
@@ -66,6 +76,19 @@ def test_room_and_object_action_buttons_use_the_same_hud_button_design():
     assert "gui.button_hover_background = None" in options
     assert "style.button.background = None" in script
     assert "style.button.hover_background = None" in script
+
+
+def test_actions_stay_above_the_bottom_character_block_without_scrollbars():
+    source = MAIN_LAYOUT.read_text(encoding="utf-8-sig")
+    main_ui = source.split("screen main_ui():", 1)[1].split("screen main_ui_left_panel", 1)[0]
+    action_position = main_ui.index("use current_action_panel")
+    spacer_position = main_ui.index("null yfill True", action_position)
+    character_position = main_ui.index('text "Персонажи" size 20', spacer_position)
+
+    assert action_position < spacer_position < character_position
+    assert "yminimum 180" in main_ui[spacer_position:character_position]
+    assert "viewport:" not in main_ui[action_position:character_position]
+    assert 'scrollbars "vertical"' not in main_ui[action_position:character_position]
 
 
 def test_intro_uses_its_authored_full_text_and_single_start_action():

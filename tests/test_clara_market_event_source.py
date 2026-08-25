@@ -267,7 +267,8 @@ def test_clara_market_thread_file_has_no_direct_wrappers_or_paged_panels():
     assert 'call checkTriggers("WineStore", "clara_talk", 0)' in clara_talk
     assert 'story_event_available("menu_CityGuard", "mongol_stocks")' in city_guard
     assert 'Call("checkTriggers", "menu_CityGuard", "mongol_stocks", 0)' in city_guard
-    assert 'Call("checkTriggers", "StolyarWorkshop", "enter", 0)' in stolyar
+    assert 'target="checkTriggers", args=("StolyarWorkshop", "enter", 0)' in stolyar
+    assert 'condition=stolyar_workshop_lockpick_event_available' in stolyar
     assert "rooms.get(\"HunterClub\").build_action_items()" in hunter
 
 

@@ -1087,20 +1087,31 @@ testcase external_actual_draupnir_talk_menu:
     $ external_calendar_set_weekday(1)
     $ player.tavern_management.slogan_state = 0
     $ Draupnir.slogan_quote_received = False
+    $ player.set_money(500)
     $ main_ui_runtime.overlay = ""
     $ main_ui_runtime.inventory_dropdown_open = False
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.mode = "scene"
     run Jump("StolyarWorkshop")
     advance until screen "main_ui" timeout 20.0
-    assert eval (all("ремонте вывески" not in str(i.caption or "") for i in main_ui_runtime.action_items)) timeout 5.0
+    assert eval ("Спросить о ремонте вывески" in [str(i.caption or "") for i in build_room_action_items(rooms.current)]) timeout 5.0
     click id "main_ui_entity_button_npc_draupnir" pos (0.5, 0.5) until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "talk") timeout 5.0
-    assert eval ("Спросить о ремонте вывески" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    $ _draupnir_slogan_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить о ремонте вывески")
+    assert eval ("Поболтать с гномом" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Спросить о ремонте вывески" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval (main_ui_talk_picture_path("draupnir") == "images/draupnir/dwarf1.jpg" and renpy.loadable(main_ui_talk_picture_path("draupnir"))) timeout 5.0
+    $ _draupnir_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
+    $ _draupnir_back_button = "choice_panel_button_%d" % int(_draupnir_back_index)
+    click id _draupnir_back_button pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    $ _draupnir_slogan_index = [str(i.caption or "") for i in build_room_action_items(rooms.current)].index("Спросить о ремонте вывески")
     $ _draupnir_slogan_button = "choice_panel_button_%d" % int(_draupnir_slogan_index)
     click id _draupnir_slogan_button pos (0.5, 0.5) until eval (Draupnir.slogan_quote_received) timeout 20.0
-    assert eval (renpy.get_screen("choice") is not None) timeout 5.0
+    assert eval ("Заплатить 200 мараведи за ремонт вывески" in [str(i.caption or "") for i in build_room_action_items(rooms.current)]) timeout 5.0
+    $ _draupnir_pay_index = [str(i.caption or "") for i in build_room_action_items(rooms.current)].index("Заплатить 200 мараведи за ремонт вывески")
+    $ _draupnir_pay_button = "choice_panel_button_%d" % int(_draupnir_pay_index)
+    click id _draupnir_pay_button pos (0.5, 0.5) until eval (int(player.tavern_management.slogan_state or 0) == 1) timeout 20.0
+    assert eval (int(player.economy.money or 0) == 300 and people.get_data("draupnir").getLocation() == "StreetTavern") timeout 5.0
+    assert eval ("Заплатить 200 мараведи за ремонт вывески" not in [str(i.caption or "") for i in build_room_action_items(rooms.current)]) timeout 5.0
 
 testcase external_actual_market_click:
     run Call("InitGameNPCs")

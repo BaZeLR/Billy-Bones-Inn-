@@ -19,7 +19,9 @@ def test_custom_shop_menus_reuse_their_room_exit_actions():
 
     assert barber.count("rooms.get(\"BarberShop\").build_exit_items()") == 2
     assert 'Jump("ArtisansQuarter")' not in barber
-    assert stolyar.count("rooms.get(\"StolyarWorkshop\").build_exit_items()") == 3
+    assert stolyar.count("rooms.get(\"StolyarWorkshop\").build_exit_items()") == 2
+    assert 'RoomExit(label="Вернуться в квартал ремесленников", target="ArtisansQuarter", minutes_to_pass=10)' in stolyar
+    assert "$ main_ui_runtime.action_items = []" in stolyar
     assert 'Jump("ArtisansQuarter")' not in stolyar
     assert "rooms.get(\"GroceryStore\").build_exit_items()" in grocery
     assert 'MenuItem("Вернуться на рынок", Jump("MarketPlace"))' not in grocery

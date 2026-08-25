@@ -66,9 +66,11 @@ def test_live_game_has_no_detached_display_menu_or_global_result_scratch():
 
 def test_native_choice_replaces_underlying_main_ui_action_panel():
     source = _source("game/Utilities/General/Screens/main_layout.rpy")
-    panel = source.split("screen current_action_panel():", 1)[1].split("screen main_ui_status_item", 1)[0]
-    assert 'if renpy.get_screen("choice") is not None:' in panel
-    assert panel.index('if renpy.get_screen("choice") is not None:') < panel.index("elif main_ui_runtime.action_items:")
+    panel = source.split("screen current_action_panel(native_choice=None):", 1)[1].split("screen main_ui_status_item", 1)[0]
+    assert "if native_choice is not None:" in panel
+    assert 'native_choice.scope.get("items", [])' in panel
+    assert "use choice_panel(_native_choice_items)" in panel
+    assert panel.index("if native_choice is not None:") < panel.index("elif main_ui_runtime.action_items:")
 
 
 def test_unused_legacy_dress_catalog_is_removed():

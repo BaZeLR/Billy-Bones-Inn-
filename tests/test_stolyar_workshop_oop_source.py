@@ -8,7 +8,7 @@ INIT = (ROOT / "game/NPC/Secondary/InitDraupnir.rpy").read_text(encoding="utf-8"
 MIGRATION = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8")
 
 
-def test_workshop_orders_belong_to_draupnir_talk_not_the_room_menu():
+def test_workshop_orders_are_room_actions_without_legacy_menu_wrappers():
     assert "def stolyar_workshop_action_items():" not in SOURCE
     assert "label StolyarWorkshopBuildActions:" not in SOURCE
     assert "call StolyarWorkshopBuildActions" not in SOURCE
@@ -17,6 +17,10 @@ def test_workshop_orders_belong_to_draupnir_talk_not_the_room_menu():
     assert "_stolyar_closed_ui_return" not in SOURCE
     assert "_stolyar_order_ui_return" not in SOURCE
     assert "jump StolyarWorkshop" not in SOURCE
+    assert "action_menus=[" in SOURCE
+    assert 'RoomAction(action_id="inspect_draupnir", label="Осмотреть", hook="call", target="StolyarWorkshopLook")' in SOURCE
+    assert 'condition=stolyar_workshop_can_ask_slogan' in SOURCE
+    assert 'condition=stolyar_workshop_can_pay_slogan' in SOURCE
     assert 'main_ui_begin_talk_state("Разговор с Драупниром", "draupnir")' in TALK
     assert "menu:" in TALK
     assert "while True:" in TALK
@@ -24,7 +28,9 @@ def test_workshop_orders_belong_to_draupnir_talk_not_the_room_menu():
     assert "IntDraupnirTalkApply" not in TALK
     assert "main_ui_runtime.action_items" not in TALK
     assert "if _draupnir_talk_new:" in TALK
-    assert "rooms.get(\"StolyarWorkshop\").build_exit_items()" in SOURCE
+    assert '"Поболтать с гномом":' in TALK
+    assert '"Спросить о ремонте вывески"' not in TALK
+    assert '"Поговорить с Драупниром об отмычках"' not in TALK
 
 
 def test_workshop_preserves_every_order_and_lockpick_event():
@@ -36,16 +42,26 @@ def test_workshop_preserves_every_order_and_lockpick_event():
         "StolyarWorkshopPayDogBooth",
     )
     for action in actions:
-        assert f"call {action}" in TALK
+        assert f'target="{action}"' in SOURCE
         assert f"label {action}:" in SOURCE
+        assert f"call {action}" not in TALK
     assert "StolyarWorkshopApply" not in SOURCE
     assert "choice_code" not in SOURCE
-    assert 'call checkTriggers("StolyarWorkshop", "enter", 0)' in TALK
+    assert 'target="checkTriggers", args=("StolyarWorkshop", "enter", 0)' in SOURCE
+    assert 'condition=stolyar_workshop_lockpick_event_available' in SOURCE
     assert "player.spend_money(200)" in SOURCE
     assert "player.spend_money(100)" in SOURCE
     assert "player.spend_money(700)" in SOURCE
     assert "player.spend_money(75)" in SOURCE
     assert 'Draupnir.location = "StreetTavern"' not in SOURCE
+
+
+def test_secondary_npc_talk_portrait_uses_registered_people_data():
+    layout = (ROOT / "game/Utilities/General/Screens/main_layout.rpy").read_text(encoding="utf-8-sig")
+
+    assert 'npc_data = people.get_data(key)' in layout
+    assert 'candidates.append(getattr(npc_data, "portrait", ""))' in layout
+    assert 'portrait="images/draupnir/dwarf1.jpg"' in INIT
 
 
 def test_draupnir_story_state_is_explicit_and_instance_owned():

@@ -3,9 +3,6 @@
 # ================================================================================
 default main_ui_runtime = MainUIRuntimeState()
 
-define MAIN_UI_NATIVE_CHOICE_TOP = 242
-define MAIN_UI_NATIVE_CHOICE_HEIGHT = 300
-
 init python:
     import renpy.exports as renpy_module
 
@@ -125,6 +122,9 @@ init python:
                 "images/clara/portrait2.jpg",
             ])
         else:
+            npc_data = people.get_data(key)
+            if npc_data is not None:
+                candidates.append(getattr(npc_data, "portrait", ""))
             try:
                 candidates.append(girl_card_portrait_path(key))
             except Exception:
@@ -257,6 +257,13 @@ init -5:
         selected_color "#f0d08a"
         selected_hover_color "#ffffff"
 
+    style mui_action_button is mui_hud_button:
+        yminimum 34
+        padding (8, 2)
+
+    style mui_action_button_text is mui_hud_button_text:
+        size 18
+
     style mui_hud_subbutton is mui_hud_button:
         yminimum 34
         left_padding 18
@@ -274,9 +281,10 @@ init -5:
     style mui_status_value is default:
         size 18
 
-screen current_action_panel():
-    if renpy.get_screen("choice") is not None:
-        null
+screen current_action_panel(native_choice=None):
+    if native_choice is not None:
+        $ _native_choice_items = list(native_choice.scope.get("items", []) or [])
+        use choice_panel(_native_choice_items)
     elif str(main_ui_runtime.mode or "") in ("dog", "werecat") and main_ui_runtime.card_origin is not None:
         textbutton "Назад":
             style "mui_hud_button"
@@ -542,21 +550,24 @@ screen main_ui():
                         yminimum 300
                         padding (10, 10)
                         background "#000000ff"
-                        if renpy.get_screen("choice") is None:
+                        $ _native_choice_screen = renpy.get_screen("choice")
+                        $ _native_choice_label = _native_choice_screen.scope.get("label", None) if _native_choice_screen is not None else None
+                        vbox:
+                            spacing 10
+
+                            text (_native_choice_label or main_ui_runtime.action_title) size 22 xalign 0.5
+
                             vbox:
-                                spacing 10
-
-                                text main_ui_runtime.action_title size 22 xalign 0.5
-
-                                vbox:
-                                    xfill True
-                                    spacing 6
-                                    use current_action_panel
+                                xfill True
+                                spacing 6
+                                use current_action_panel(_native_choice_screen)
 
                     if str(main_ui_runtime.mode or "") != "event":
+                        null yfill True
+
                         frame:
                             xfill True
-                            yminimum 230
+                            yminimum 180
                             padding (10, 8)
                             background "#000000ff"
                             vbox:

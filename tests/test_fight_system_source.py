@@ -175,7 +175,7 @@ def test_fight_has_explicit_flow_labels_and_escape_actions():
     assert "Попытаться сбежать" in source
     assert "fight_enemy_move_resolution(enemy, defence_mode)" in source
     assert "fight_enemy_response(result_lines, \"normal\")" in source
-    action_panel = layout.split("screen current_action_panel():", 1)[1].split("screen main_ui_status_item", 1)[0]
+    action_panel = layout.split("screen current_action_panel(native_choice=None):", 1)[1].split("screen main_ui_status_item", 1)[0]
     assert 'str(main_ui_runtime.mode or "") == "event"' in action_panel
     assert 'in ("fight", "event")' not in action_panel
     assert "use expression main_ui_runtime.action_content" in action_panel

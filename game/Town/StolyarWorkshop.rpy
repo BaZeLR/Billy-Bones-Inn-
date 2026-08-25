@@ -3,6 +3,91 @@
 # ================================================================================
 
 init python:
+    def stolyar_workshop_georgett_services_available():
+        return int(Georgett.job_value("jobWhoreAvail", 0) or 0) > 0
+
+
+    def stolyar_workshop_can_ask_slogan():
+        return int(player.tavern_management.slogan_state or 0) == 0 and not Draupnir.slogan_quote_received
+
+
+    def stolyar_workshop_can_pay_slogan():
+        return (
+            int(player.tavern_management.slogan_state or 0) == 0
+            and Draupnir.slogan_quote_received
+            and int(player.economy.money or 0) >= 200
+        )
+
+
+    def stolyar_workshop_can_ask_hole():
+        return (
+            stolyar_workshop_georgett_services_available()
+            and not Draupnir.peep_hole_quote_received
+            and int(player.tavern_management.client_room_hole or 0) == 0
+        )
+
+
+    def stolyar_workshop_can_pay_hole():
+        return (
+            stolyar_workshop_georgett_services_available()
+            and Draupnir.peep_hole_quote_received
+            and int(player.tavern_management.client_room_hole or 0) == 0
+            and int(player.economy.money or 0) >= 100
+            and rooms.get("StolyarWorkshop").is_open()
+        )
+
+
+    def stolyar_workshop_can_ask_glory():
+        return (
+            stolyar_workshop_georgett_services_available()
+            and not Draupnir.glory_hole_quote_received
+            and int(player.tavern_management.glory_hole or 0) == 0
+            and int(Georgett.story_value("GloryHoleExplained", 0) or 0) == 1
+        )
+
+
+    def stolyar_workshop_can_pay_glory():
+        return (
+            stolyar_workshop_georgett_services_available()
+            and Draupnir.glory_hole_quote_received
+            and int(player.tavern_management.glory_hole or 0) == 0
+            and int(player.economy.money or 0) >= 700
+            and rooms.get("StolyarWorkshop").is_open()
+        )
+
+
+    def stolyar_workshop_can_ask_soap_barrel():
+        return soap_recipe_chain_discovered() and not crafting.ash_barrel_installed and not Draupnir.soap_barrel_quote_received
+
+
+    def stolyar_workshop_can_pay_soap_barrel():
+        return (
+            soap_recipe_chain_discovered()
+            and not crafting.ash_barrel_installed
+            and Draupnir.soap_barrel_quote_received
+            and int(player.economy.money or 0) >= 75
+            and rooms.get("StolyarWorkshop").is_open()
+        )
+
+
+    def stolyar_workshop_can_ask_dog_booth():
+        return dog.owned and int(dog.booth_built or 0) == 0 and not Draupnir.dog_booth_quote_received
+
+
+    def stolyar_workshop_can_pay_dog_booth():
+        return (
+            dog.owned
+            and int(dog.booth_built or 0) == 0
+            and Draupnir.dog_booth_quote_received
+            and int(player.economy.money or 0) >= 100
+            and rooms.get("StolyarWorkshop").is_open()
+        )
+
+
+    def stolyar_workshop_lockpick_event_available():
+        return story_event_available("StolyarWorkshop", "enter")
+
+
     StolyarWorkshopRoomDefinition = Room(
         code_name="StolyarWorkshop",
         group_name=ROOM_GROUP_CITY,
@@ -13,6 +98,20 @@ init python:
                 text="Вы находитесь в мастерской известного столяра Драупнира. Всему городу известно что гном Драупнир хоть и дерет дорого, но работу свою исполняет не за страх, а за совесть. Мало кто, а точнее никто, может сравниться с ним в столярном ремесле. В его лавке приятно пахнет деревом и всюду висят рубанки, пилы, стамески, топоры и прочий инструмент. В глубине мастерской, за верстаком, что-то тачает сам хозяин - приземистый и крепко сбитый гном.",
                 priority=100,
             ),
+        ],
+        action_menus=[
+            RoomAction(action_id="inspect_draupnir", label="Осмотреть", hook="call", target="StolyarWorkshopLook"),
+            RoomAction(action_id="ask_slogan", label="Спросить о ремонте вывески", hook="call", target="StolyarWorkshopAskSlogan", condition=stolyar_workshop_can_ask_slogan),
+            RoomAction(action_id="pay_slogan", label="Заплатить 200 мараведи за ремонт вывески", hook="call", target="StolyarWorkshopPaySlogan", condition=stolyar_workshop_can_pay_slogan),
+            RoomAction(action_id="ask_hole", label="Спросить о дырке в стене", hook="call", target="StolyarWorkshopAskHole", condition=stolyar_workshop_can_ask_hole),
+            RoomAction(action_id="pay_hole", label="Заплатить 100 мараведи за обзорное отверстие", hook="call", target="StolyarWorkshopPayHole", condition=stolyar_workshop_can_pay_hole),
+            RoomAction(action_id="ask_glory", label="Спросить о глорихоле", hook="call", target="StolyarWorkshopAskGlory", condition=stolyar_workshop_can_ask_glory),
+            RoomAction(action_id="pay_glory", label="Заплатить 700 мараведи за устройство глорихола", hook="call", target="StolyarWorkshopPayGlory", condition=stolyar_workshop_can_pay_glory),
+            RoomAction(action_id="ask_soap_barrel", label="Спросить о бочке для щелока", hook="call", target="StolyarWorkshopAskSoapBarrel", condition=stolyar_workshop_can_ask_soap_barrel),
+            RoomAction(action_id="pay_soap_barrel", label="Заплатить 75 мараведи за зольную бочку", hook="call", target="StolyarWorkshopPaySoapBarrel", condition=stolyar_workshop_can_pay_soap_barrel),
+            RoomAction(action_id="ask_dog_booth", label="Спросить о собачьей будке", hook="call", target="StolyarWorkshopAskDogBooth", condition=stolyar_workshop_can_ask_dog_booth),
+            RoomAction(action_id="pay_dog_booth", label="Заплатить 100 мараведи за собачью будку", hook="call", target="StolyarWorkshopPayDogBooth", condition=stolyar_workshop_can_pay_dog_booth),
+            RoomAction(action_id="draupnir_lockpicks", label="Поговорить с Драупниром об отмычках", hook="call", target="checkTriggers", args=("StolyarWorkshop", "enter", 0), condition=stolyar_workshop_lockpick_event_available),
         ],
         exits=[
             RoomExit(label="Вернуться в квартал ремесленников", target="ArtisansQuarter", minutes_to_pass=10),
@@ -97,9 +196,6 @@ label StolyarWorkshop:
     call ShowImageSeq("draupnir", "", "dwarf", 3)
 
     $ main_ui_runtime.action_items = []
-    if story_event_available("StolyarWorkshop", "enter"):
-        $ main_ui_runtime.action_items.append(MenuItem("Поговорить с Драупниром об отмычках", Call("checkTriggers", "StolyarWorkshop", "enter", 0)))
-    $ main_ui_runtime.action_items += rooms.get("StolyarWorkshop").build_exit_items()
     while True:
         call screen main_ui
 
