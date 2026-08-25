@@ -229,10 +229,13 @@ label TavernMain:
     $ scene_runtime.picture = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
     if tavern_preopening_mode():
         $ scene_runtime.picture = tavern_main_preopening_background()
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.selected_char = ""
+    $ main_ui_runtime.talk_picture = ""
+    $ main_ui_runtime.clear_contexts()
+    $ main_ui_runtime.action_title = "Действия в трактире"
+    $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
-    #$ main_ui_runtime.action_title = "Действия в трактире"####### OLD CODE 
-    #$ main_ui_runtime.action_content = None
-    #$ main_ui_runtime.action_items = []
     $ main_ui_runtime.girl_key = ""
     $ main_ui_runtime.object_id = ""
     python:
@@ -268,8 +271,6 @@ label TavernMain:
 
         if ShouldDispatchTavernEvent:
             call checkTriggers("TavernMain", "tavern_work", 0)
-            if _return:
-                return
     
     $ GirlNameTS1 = "georgett"
     $ GirlNameTS2 = "liza"
