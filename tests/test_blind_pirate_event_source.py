@@ -16,7 +16,17 @@ def test_blind_pirate_uses_event_engine_and_authored_label():
 
     assert '$ findAvailableEvents(forced=True)' in market
     assert 'call checkTriggers("MarketPlace", "enter", 0)' in market
-    assert market.index('call checkTriggers("MarketPlace", "enter", 0)') < market.index('$ scene_runtime.text = _market_room.descriptions[0].text')
+    picture_seed = 'vscene _market_room.bg_picture'
+    trigger = 'call checkTriggers("MarketPlace", "enter", 0)'
+    description = '$ scene_runtime.text = _market_room.descriptions[0].text'
+    room_mode = '$ main_ui_runtime.mode = "scene"'
+    clear_contexts = '$ main_ui_runtime.clear_contexts()'
+    assert market.count(picture_seed) == 2
+    assert market.index(room_mode) < market.index(clear_contexts) < market.index(picture_seed)
+    assert '$ main_ui_runtime.selected_char = ""' in market
+    assert '$ main_ui_runtime.talk_picture = ""' in market
+    assert market.index(picture_seed) < market.index(trigger)
+    assert market.index(trigger) < market.rindex(picture_seed) < market.index(description)
     assert "label MarketPlaceBlindPirateEvent:" not in market
     assert "town_street" not in market
     assert "vscene " in event

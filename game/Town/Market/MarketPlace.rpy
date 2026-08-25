@@ -89,12 +89,17 @@ label MarketPlace:
     $ renpy.dynamic("_market_room")
     scene black
     $ rooms.enter("MarketPlace")
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.selected_char = ""
+    $ main_ui_runtime.talk_picture = ""
+    $ main_ui_runtime.clear_contexts()
     $ main_ui_runtime.action_title = "Действия"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
     $ main_ui_runtime.girl_key = ""
     $ main_ui_runtime.object_id = ""
     $ _market_room = rooms.get("MarketPlace")
+    vscene _market_room.bg_picture
     $ findAvailableEvents(forced=True)
     call checkTriggers("MarketPlace", "enter", 0)
 
@@ -132,12 +137,14 @@ label MarketPlace:
         while True:
             call screen main_ui
 
+    # Restore the room-owned scene after an entry event changes its media.
+    vscene _market_room.bg_picture
+
     # Main marketplace description
     $ scene_runtime.text = _market_room.descriptions[0].text + "\n\n" + _market_room.descriptions[1].text
     if dog.is_stray_here("MarketPlace"):
         $ scene_runtime.text += "\n\nУ одной из лавок вертится бродячий пес, внимательно следящий за руками торговцев и покупателей."
     $ scene_runtime.location_text = scene_runtime.text
-    $ scene_runtime.picture = _market_room.bg_picture
 
     # Random encounter with Mongol
     if marketplace_mongol_visible():
