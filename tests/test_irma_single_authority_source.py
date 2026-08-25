@@ -69,17 +69,28 @@ def test_irma_v62_migration_consumes_old_map_once():
     assert 'globals().pop("IrmaVar", None)' in block
 
 
-def test_irma_authored_scenes_use_native_menus_without_action_handlers():
+def test_irma_has_no_duplicate_mc_measurement_or_sex_flow():
     source = (ROOT / "game/NPC/Girls/Irma/IrmaTailorEvents.rpy").read_text(
+        encoding="utf-8-sig"
+    )
+    dress_try = (ROOT / "game/Utilities/General/Clothes/DressTry.rpy").read_text(
+        encoding="utf-8-sig"
+    )
+    init_source = (ROOT / "game/NPC/Girls/Irma/InitIrma.rpy").read_text(
         encoding="utf-8-sig"
     )
 
     assert "menu:" in source
     assert "main_ui_runtime.action_items" not in source
     assert "MenuItem(" not in source
+    assert "label IrmaShopFlirtScene" not in source
+    assert "label IrmaMeasureRoomMenu" not in source
+    assert "label IrmaSexSequence" not in source
     assert "label IrmaMeasureRoomStage" not in source
     assert "label IrmaMeasureEndScene" not in source
-    assert "label IrmaMeasureRoomMenu(irma_measure_stage=0):" in source
-    assert "label IrmaSexSequence(irma_sex_step=0):" in source
     assert "IrmaMeasureShopStage" not in source
     assert "IrmaSexShopStep" not in source
+    assert "def irma_flirting_picture_path" not in init_source
+    assert "def irma_shop_end_picture_path" not in init_source
+    assert "label DressTry(dress_buyer=\"You\", dress_code=\"\"):" in dress_try
+    assert "label DressTryServiceFinish(finish=\"\"):" in dress_try

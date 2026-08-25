@@ -16,13 +16,20 @@ def test_dress_try_story_flow_uses_native_menus_and_returns_to_shop_owner():
     source = (ROOT / "game/Utilities/General/Clothes/DressTry.rpy").read_text(encoding="utf-8-sig")
     shop = (ROOT / "game/Town/Arts/Dress/DressShop.rpy").read_text(encoding="utf-8-sig")
 
-    assert source.count("menu:") == 3
+    assert source.count("menu:") == 8
     assert "main_ui_runtime.action_items" not in source
     assert "DressShopRoomActions" not in source
     assert "label DressTryPayExtra:" not in source
     assert "label DressTryRefuseExtra:" not in source
     assert "jump DressShop" not in source
+    assert '"Назад в лавку":' not in source
+    assert source.count('"Одеться и уйти":') == 5
+    assert '"[scene_runtime.text]"' not in source
+    assert '"Раздеться до белья":' in source
+    assert '"Полностью раздеться и думать о высоком" if player.intimacy.had_sex_count >= 3:' in source
+    assert '"Полностью раздеться и представить, как вы имеете Ирму" if player.intimacy.had_sex_count >= 5' in source
     assert 'call DressTry("You", _dress_code)' in shop
+    assert 'call DressTry("You", _dress_code)\n    jump ArtisansQuarter' in shop
     assert "main_ui_runtime.action_items = rooms.get(\"DressShop\").build_object_items() + rooms.get(\"DressShop\").build_exit_items()" in shop
     assert "show screen main_ui" in shop
     assert '$ pregnancy_check("irma", "mouth", 1, "Вы")' in source

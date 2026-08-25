@@ -322,7 +322,7 @@ label DressShopBuyMaleItem(dress_code=""):
     hide screen dress_shop_catalog_page
     $ main_ui_runtime.object_id = ""
     call DressTry("You", _dress_code)
-    return
+    jump ArtisansQuarter
 
 label DressShopObjectMenu(object_id=""):
     $ renpy.dynamic("_room_object")

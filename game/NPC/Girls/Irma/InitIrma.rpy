@@ -40,9 +40,6 @@ init python:
         ]
         return measure_paths[stage_id]
 
-    def irma_flirting_picture_path():
-        return "images/irma/flirts.png"
-
     def irma_sex_picture_path(stage=0):
         try:
             stage_id = int(stage or 0)
@@ -66,9 +63,6 @@ init python:
             "images/irma/clara_visit/tailor_shop_clara_3.png",
         ]
         return clara_paths[max(0, min(stage_id, len(clara_paths) - 1))]
-
-    def irma_shop_end_picture_path():
-        return "images/irma/portraits/portrait2.png"
 
     def irma_angry_picture_path():
         return "images/irma/portraits/portrait1.png"

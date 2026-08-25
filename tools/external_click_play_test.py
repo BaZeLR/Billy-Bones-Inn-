@@ -361,27 +361,28 @@ testcase external_actual_tailor_buy_dress_measure_flow:
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "dress_shop_catalog_page" timeout 20.0
     click id ("dress_shop_catalog_buy_" + _male_code) pos (0.5, 0.5) until screen "choice" timeout 20.0
     assert eval (renpy.get_screen("dress_shop_catalog_page") is None) timeout 5.0
-    assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) == 2) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
-    assert eval ("measure1" in str(scene_runtime.picture or "") and "нижнего белья" in str(scene_runtime.text or "")) timeout 5.0
-    click pos (960, 900)
-    pause 0.2
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Раздеться до белья"] and "Как вы хотите" in str(scene_runtime.text or "") and "measure0" in str(scene_runtime.picture or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Одеться и уйти"]) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and "measure1" in str(scene_runtime.picture or "") and "нижнего белья" in str(scene_runtime.text or "") and "Как вы хотите" not in str(scene_runtime.text or "") and str(scene_runtime.location_text or "") == str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "ArtisansQuarter") timeout 20.0
 
     $ player.intimacy.had_sex_count = 3
     run Call("DressTry", "You", _male_code)
     advance until screen "choice" timeout 20.0
-    click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
-    assert eval ("measure2" in str(scene_runtime.picture or "") and "думать о птичках" in str(scene_runtime.text or "")) timeout 5.0
-    click pos (960, 900)
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Раздеться до белья", "Полностью раздеться и думать о высоком"]) timeout 5.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Одеться и уйти"]) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and "measure2" in str(scene_runtime.picture or "") and "думать о птичках" in str(scene_runtime.text or "") and "Как вы хотите" not in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
     pause 0.2
 
     $ player.intimacy.had_sex_count = 5
     $ Irma.rel = 0
     run Call("DressTry", "You", _male_code)
     advance until screen "choice" timeout 20.0
-    click id "choice_panel_button_2" pos (0.5, 0.5) until screen "say" timeout 20.0
-    assert eval ("measure3" in str(scene_runtime.picture or "") and "Это я тебе настолько нравлюсь" in str(scene_runtime.text or "")) timeout 5.0
-    click pos (960, 900)
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Раздеться до белья", "Полностью раздеться и думать о высоком", "Полностью раздеться и представить, как вы имеете Ирму"]) timeout 5.0
+    click id "choice_panel_button_2" pos (0.5, 0.5) until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Одеться и уйти"]) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and "measure3" in str(scene_runtime.picture or "") and "Это я тебе настолько нравлюсь" in str(scene_runtime.text or "") and "Как вы хотите" not in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
     pause 0.2
 
     $ Irma.rel = 5
@@ -391,8 +392,24 @@ testcase external_actual_tailor_buy_dress_measure_flow:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_2" pos (0.5, 0.5) until eval ("sex0" in str(scene_runtime.picture or "") and renpy.get_screen("choice") is not None) timeout 20.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until eval ("sex9" in str(scene_runtime.picture or "") and "20 мараведи" in str(scene_runtime.text or "") and renpy.get_screen("choice") is not None) timeout 20.0
-    assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) == 2) timeout 5.0
-    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (bool(Irma.extra_fee_refused)) timeout 20.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Промолчать и оплатить", "Возмутиться"] and "Кончить в рот" not in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (bool(Irma.extra_fee_refused) and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Одеться и уйти"]) timeout 20.0
+    assert eval ("обдираловку" in str(scene_runtime.text or "") and "20 мараведи" not in str(scene_runtime.text or "") and str(scene_runtime.location_text or "") == str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    pause 0.2
+
+    $ Irma.rel = 5
+    $ Irma.extra_fee_refused = False
+    $ player.economy.money = 100
+    $ _money_before_extra_fee = int(player.economy.money or 0)
+    run Call("DressTry", "You", _male_code)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_2" pos (0.5, 0.5) until eval ("sex0" in str(scene_runtime.picture or "") and renpy.get_screen("choice") is not None) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("sex8" in str(scene_runtime.picture or "") and "20 мараведи" in str(scene_runtime.text or "") and renpy.get_screen("choice") is not None) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Одеться и уйти"]) timeout 20.0
+    assert eval (int(player.economy.money or 0) == _money_before_extra_fee - 20 and "решили промолчать" in str(scene_runtime.text or "") and "20 мараведи" not in str(scene_runtime.text or "") and str(scene_runtime.location_text or "") == str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    pause 0.2
 
 testcase external_female_tailor_choose_agree_purchase_flow:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 8, 0)
