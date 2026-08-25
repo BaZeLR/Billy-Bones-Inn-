@@ -53,3 +53,11 @@ def test_report_and_progress_have_no_legacy_save_authority():
     assert "tractir_save_migrate_report_and_progress_runtime" not in migration
     assert 'globals().pop("_tractir_progress_revision", None)' in migration
     assert 'globals().pop("_tractir_last_autosave_reason", None)' in migration
+
+
+def test_next_day_report_renders_composed_text_without_interpolation():
+    source = (ROOT / "game/Utilities/Time/NextDay.rpy").read_text(encoding="utf-8-sig")
+    screen = source.split("screen nextday_report_card_overlay():", 1)[1]
+    body_text = screen.split("text _body:", 1)[1].split('textbutton "Назад":', 1)[0]
+
+    assert "substitute False" in body_text

@@ -291,7 +291,11 @@ screen nextday_report_card_overlay():
                 spacing 10
 
                 text _title size 30 color "#000000" italic True xalign 0.5
-                text _body size 18 color "#000000" italic True
+                text _body:
+                    size 18
+                    color "#000000"
+                    italic True
+                    substitute False
 
                 textbutton "Назад":
                     text_size 22
