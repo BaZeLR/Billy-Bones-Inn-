@@ -1254,8 +1254,15 @@ testcase external_actual_market_blind_pirate_first_entry:
     $ MyStallion = "test-horse"
     run Jump("MarketPlace")
     advance until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/market/blindPirate.png") timeout 5.0
+    assert eval ("Слишком ясно становится" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ("Вы пришли на шумный городской рынок" not in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (len(main_ui_runtime.action_items or []) == 0) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
-    advance until screen "main_ui" timeout 20.0
+    advance until eval ('Зайти в охотничий клуб' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 20.0
+    assert eval (str(rooms.current_code or "") == "MarketPlace") timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == str(rooms.get("MarketPlace").bg_picture or "")) timeout 5.0
+    assert eval ("Вы пришли на шумный городской рынок" in str(scene_runtime.text or "")) timeout 5.0
     assert eval (int(threads["cityBlindPirateFall"].num or 0) == 1) timeout 5.0
     assert eval (not threads["cityBlindPirateFall"].completed) timeout 5.0
     assert eval (int(threads["claraBookletMarket"].num or 0) == 0 and not threads["claraBookletMarket"].completed) timeout 5.0

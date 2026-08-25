@@ -16,10 +16,14 @@ def test_blind_pirate_uses_event_engine_and_authored_label():
 
     assert '$ findAvailableEvents(forced=True)' in market
     assert 'call checkTriggers("MarketPlace", "enter", 0)' in market
-    assert market.index('$ scene_runtime.text = _market_room.descriptions[0].text') < market.index('$ findAvailableEvents(forced=True)')
+    assert market.index('call checkTriggers("MarketPlace", "enter", 0)') < market.index('$ scene_runtime.text = _market_room.descriptions[0].text')
     assert "label MarketPlaceBlindPirateEvent:" not in market
     assert "town_street" not in market
     assert "vscene " in event
+    assert event.count('$ scene_runtime.text = ') == 4
+    assert event.count('"[scene_runtime.text]"') == 4
+    assert "_market_room.descriptions" not in event
+    assert "scene_runtime.location_text" not in event
     assert "menu:" in event
     assert 'threads["cityBlindPirateFall"].advance()' in event
     assert "jump MarketPlace" not in event
