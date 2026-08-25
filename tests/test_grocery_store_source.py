@@ -90,6 +90,7 @@ def test_grocery_buy_stock_is_direct_room_flow():
     assert "label GroceryStoreBuyMenu" not in source
     assert "label GroceryStoreBuyApply" not in source
     assert 'Call("GroceryStoreBuyStockApply"' in buy_menu
+    assert 'MenuItem("Назад", Call("GroceryStoreObjectMenu", "food_stock", True))' in buy_menu
     assert "call screen main_ui" not in buy_menu
     assert "$ player.tavern_management.productnum += int(add_amount or 0)" in buy_apply
     assert "$ player.spend_money(int(cost or 0))" in buy_apply

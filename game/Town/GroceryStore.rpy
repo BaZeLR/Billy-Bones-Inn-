@@ -322,6 +322,7 @@ label GroceryStoreBuyStockMenu(preserve_text=False):
         $ main_ui_runtime.action_items.append(MenuItem("Купить пятьдесят мешков", Call("GroceryStoreBuyStockApply", 6 * 50, 500, 50)))
     if player.economy.money >= 6 * 200:
         $ main_ui_runtime.action_items.append(MenuItem("Купить двести мешков", Call("GroceryStoreBuyStockApply", 6 * 200, 2000, 200)))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", Call("GroceryStoreObjectMenu", "food_stock", True)))
 
     return
 
