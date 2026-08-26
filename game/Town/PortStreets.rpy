@@ -81,6 +81,12 @@ init python:
 label PortStreets:
     $ renpy.dynamic("_port_temple_road_pics", "_port_temple_road_pic")
     $ rooms.enter("PortStreets")
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.selected_char = ""
+    $ main_ui_runtime.talk_picture = ""
+    $ main_ui_runtime.clear_contexts()
+    $ main_ui_runtime.girl_key = ""
+    $ main_ui_runtime.object_id = ""
     call RoomEnterEventGate(rooms.current_code, False)
     $ port_streets_prepare_bottle_spawn()
     $ scene_runtime.picture = rooms.current.bg_picture or None

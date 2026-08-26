@@ -700,8 +700,18 @@ testcase external_port_streets_georgette_liza_flow:
     $ TownStreet.events_today = 2
     $ TownStreet.story_seen_keys.append("%s:PortStreets:%s" % (calendar_v2.daysInGame, calendar_v2.time_slot()))
     $ TodaySexEvents_Clear()
+    $ main_ui_runtime.mode = "mc"
+    $ main_ui_runtime.selected_char = "georgett"
+    $ main_ui_runtime.girl_key = "georgett"
+    $ main_ui_runtime.talk_picture = "images/georgett/portraits/portrait.jpg"
     run Jump("PortStreets")
     advance until screen "main_ui" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "scene") timeout 5.0
+    assert eval (str(main_ui_runtime.selected_char or "") == "") timeout 5.0
+    assert eval (str(main_ui_runtime.girl_key or "") == "") timeout 5.0
+    assert eval (str(main_ui_runtime.talk_picture or "") == "") timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/georgett/Port/wait.jpg") timeout 5.0
+    assert eval (str(renpy.get_screen("main_ui").scope.get("_picture", "") or "") == "images/georgett/Port/wait.jpg") timeout 5.0
     assert eval ("georgett" in list(people.ids_at("PortStreets") or [])) timeout 5.0
     assert eval ("liza" not in list(people.ids_at("PortStreets") or [])) timeout 5.0
     assert eval (people.action_data_for_room("georgett", "PortStreets") is not None) timeout 5.0

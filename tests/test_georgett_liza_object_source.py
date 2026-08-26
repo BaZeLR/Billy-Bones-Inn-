@@ -342,6 +342,13 @@ def test_georgett_first_meeting_is_owned_by_the_scheduled_npc_talk_label():
     talk = _source(GEORGETT_TALK)
     georgett = _source(GEORGETT_INIT)
 
+    entry = port.split("label PortStreets:", 1)[1].split("label PortStreetsBackAlley", 1)[0]
+    assert '$ main_ui_runtime.mode = "scene"' in entry
+    assert '$ main_ui_runtime.selected_char = ""' in entry
+    assert '$ main_ui_runtime.talk_picture = ""' in entry
+    assert "$ main_ui_runtime.clear_contexts()" in entry
+    assert '$ main_ui_runtime.girl_key = ""' in entry
+    assert '$ main_ui_runtime.object_id = ""' in entry
     assert "people_to_int(Georgett.rel, 0) == 0" in port
     assert 'action_id="meet_georgett"' not in port
     assert 'target="PortStreetsMeetGeorgett"' not in port
