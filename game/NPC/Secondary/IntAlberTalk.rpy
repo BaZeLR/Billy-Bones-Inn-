@@ -7,12 +7,12 @@ label IntAlberTalk:
     $ Alber.mark_known()
     $ _alber_provoked = 0
     $ _alber_talk_new = str(main_ui_runtime.mode or "") != "talk" or str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "").strip().lower() != "alber"
+    $ main_ui_begin_talk_state("Разговор с Альбером", "alber")
     if _alber_talk_new:
         if str(rooms.current_code or "") == "WineStore":
             $ _alber_talk_picture = str(alber_random_portrait() or "").strip()
             if _alber_talk_picture:
                 vscene _alber_talk_picture
-    $ main_ui_begin_talk_state("Разговор с Альбером", "alber")
     if _alber_talk_new:
         $ scene_runtime.text = "Альбер Легаре вопросительно смотрит на вас, ожидая продолжения разговора."
         $ scene_runtime.location_text = scene_runtime.text

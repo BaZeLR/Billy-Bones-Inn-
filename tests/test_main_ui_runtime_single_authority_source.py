@@ -71,3 +71,14 @@ def test_retired_ui_globals_are_consumed_only_by_one_save_migration():
     for retired_name in RETIRED_UI_GLOBALS:
         assert '"%s"' % retired_name in migration_block
     assert "globals().pop(old_name, default_value)" in migration_block
+
+
+def test_talk_panel_displays_label_owned_scene_picture_changes():
+    runtime = RUNTIME.read_text(encoding="utf-8-sig")
+    panel = runtime.split('screen main_ui_talk_panel(girl_name="", room_name="", desc=""):', 1)[1].split(
+        "screen main_ui_player_card_panel", 1
+    )[0]
+
+    assert 'dict(main_ui_runtime.talk_origin or {}).get("picture", "")' in panel
+    assert "_scene_picture != _talk_origin_picture" in panel
+    assert "_portrait = _scene_picture if" in panel

@@ -1016,12 +1016,22 @@ testcase external_actual_grocery_click:
     $ player.set_money(max(100, int(player.economy.money or 0)))
     run Jump("GroceryStore")
     advance until screen "main_ui" timeout 20.0
+    $ _grocery_room_picture = str(scene_runtime.picture or "")
+    $ _grocery_room_text = str(scene_runtime.text or "")
     assert eval (str(people.location("becky") or "") == "GroceryStore") timeout 5.0
     assert eval ("becky" in list(people.ids_at("GroceryStore") or [])) timeout 5.0
     assert eval (str(grocery_store_active_grocer_id() or "") == "becky") timeout 5.0
-    assert eval (bool(str(scene_runtime.picture or "")) and renpy.loadable(str(scene_runtime.picture or ""))) timeout 5.0
+    assert eval (_grocery_room_picture == str(rooms.get("GroceryStore").bg_picture or "") and renpy.loadable(_grocery_room_picture)) timeout 5.0
+    assert eval (str(rooms.get("GroceryStore").descriptions[0].text or "") in _grocery_room_text and "За прилавком стоит сама Бекки" not in _grocery_room_text) timeout 5.0
     assert eval (any(str(row.get("id", "") or "") == "becky" for row in renpy.get_screen("main_ui").scope.get("_char_entries", []))) timeout 5.0
     assert eval ('Провизия' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    click id "main_ui_entity_button_npc_becky" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval ("За прилавком стоит сама Бекки" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") != _grocery_room_picture and renpy.loadable(str(scene_runtime.picture or ""))) timeout 5.0
+    $ _grocery_talk_end_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    $ _grocery_talk_end_button_id = "choice_panel_button_%d" % int(_grocery_talk_end_index)
+    click id _grocery_talk_end_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _grocery_room_picture and str(scene_runtime.text or "") == _grocery_room_text) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == 'Провизия') timeout 20.0
     assert eval ('Купить провизию' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     $ _grocery_buy_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Купить провизию")

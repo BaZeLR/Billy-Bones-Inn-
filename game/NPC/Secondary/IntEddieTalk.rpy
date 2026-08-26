@@ -9,6 +9,7 @@ label IntEddieTalk:
     $ _eddie_name = "eddie"
     $ Eddie.update()
     $ _eddie_talk_new = str(main_ui_runtime.mode or "") != "talk" or str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "").strip().lower() != "eddie"
+    $ main_ui_begin_talk_state("Разговор с Эдди", _eddie_name)
     if _eddie_talk_new:
         if str(rooms.current_code or "") == "GroceryStore":
             vscene grocery_store_grocer_picture("eddie")
@@ -16,7 +17,6 @@ label IntEddieTalk:
             $ _eddie_picture = str(Eddie.data.portrait or "images/eddie/portraits/portrait_0.png")
             if str(_eddie_picture or "").strip():
                 vscene _eddie_picture
-    $ main_ui_begin_talk_state("Разговор с Эдди", _eddie_name)
     if _eddie_talk_new:
         $ scene_runtime.text = eddie_talk_intro_text()
         $ scene_runtime.location_text = scene_runtime.text

@@ -12,6 +12,7 @@ BECKY_TALK = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalk.rpy"
 BECKY_TOPICS = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkTopics.rpy"
 BECKY_SHERWOOD = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkSherwood.rpy"
 BECKY_SCHEDULE = ROOT / "game" / "NPC" / "Schedules" / "becky.json"
+GROCERY_ROOM_PICTURE = ROOT / "game" / "images" / "general" / "butchers_street.png"
 GROCERY_NPC_OWNERS = [
     ROOT / "game" / "NPC" / "Secondary" / "InitEddie.rpy",
     ROOT / "game" / "NPC" / "Girls" / "Becky" / "InitBecky.rpy",
@@ -35,9 +36,18 @@ def test_becky_staffs_grocery_store_until_the_store_closes():
 
 def test_grocery_uses_merchant_picture_sequences_not_hunter_store():
     source = _source(GROCERY)
+    entry = source.split("label GroceryStore:", 1)[1].split("label GroceryStoreObjectMenu", 1)[0]
+    main_text = source.split("def grocery_store_main_text():", 1)[1].split("def grocery_store_set_notice", 1)[0]
 
     assert 'bg_picture="images/general/butchers_street.png"' in source
+    assert GROCERY_ROOM_PICTURE.is_file()
     assert "images/general/hunter_store.jpg" not in source
+    assert "$ scene_runtime.picture = _grocery_room.bg_picture" in entry
+    assert "grocery_store_background_picture" not in source
+    assert "grocery_store_eddie_picture()" not in entry
+    assert "grocery_store_inga_picture()" not in entry
+    assert "grocery_store_becky_picture()" not in entry
+    assert "active_grocer" not in main_text
     assert "grocery_store_grocer_picture" in source
     assert '"images/eddie/portraits/portrait_0.png"' in source
     assert '"images/eddie/portraits/portrait_2.png"' in source
@@ -161,6 +171,8 @@ def test_grocery_talk_pictures_use_room_sequence_for_eddie_and_becky():
 
     assert 'vscene grocery_store_grocer_picture("eddie")' in eddie_source
     assert 'vscene grocery_store_grocer_picture("becky")' in becky_source
+    assert eddie_source.index("main_ui_begin_talk_state") < eddie_source.index('vscene grocery_store_grocer_picture("eddie")')
+    assert becky_source.index("main_ui_begin_talk_state") < becky_source.index('vscene grocery_store_grocer_picture("becky")')
     assert 'vscene "images/eddie/portraits/portrait_0.png"' not in eddie_source
     assert 'vscene "images/eddie/portraits/fingal.png"' not in eddie_source
     assert '"images/becky/portraits/portrait_1.png"' not in becky_source

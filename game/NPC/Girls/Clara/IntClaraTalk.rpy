@@ -1,11 +1,11 @@
 label IntClaraTalk(girl_name="clara"):
     $ renpy.dynamic("_clara_picture", "_clara_talk_new", "_clara_talk_picture", "_clara_flirted_before", "_clara_ride_location", "_clara_repeat_menu")
     $ _clara_talk_new = str(main_ui_runtime.mode or "") != "talk" or str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "").strip().lower() != str(girl_name or "clara").strip().lower()
+    $ main_ui_begin_talk_state("Разговор с Клариссой", girl_name)
     if _clara_talk_new and str(rooms.current_code or "") == "WineStore":
         $ _clara_talk_picture = str(Clara.wine_store_talk_picture() or "").strip()
         if _clara_talk_picture:
             vscene _clara_talk_picture
-    $ main_ui_begin_talk_state("Разговор с Клариссой", girl_name)
     $ update_stat_state()
     if str(scene_runtime.text or "").strip() == "":
         $ scene_runtime.text = "Кларисса вопросительно смотрит на вас, ожидая, что вы скажете дальше."

@@ -691,7 +691,9 @@ screen main_ui_left_panel(room_name, desc, picture):
 screen main_ui_talk_panel(girl_name="", room_name="", desc=""):
     $ _girl_key = girl_card_resolved_key(girl_name)
     $ _title = str(main_ui_runtime.action_title or ("Разговор с %s" % girl_card_display_name(_girl_key)))
-    $ _portrait = str(main_ui_runtime.talk_picture or main_ui_talk_picture_path(_girl_key) or "")
+    $ _talk_origin_picture = str(dict(main_ui_runtime.talk_origin or {}).get("picture", "") or "")
+    $ _scene_picture = str(scene_runtime.picture or "")
+    $ _portrait = _scene_picture if _scene_picture and _scene_picture != _talk_origin_picture else str(main_ui_runtime.talk_picture or main_ui_talk_picture_path(_girl_key) or "")
     $ _text = str(scene_runtime.text or scene_runtime.location_text or desc or "")
     $ _usable_h = max(360, int(config.screen_height) - int(getattr(gui, "textbox_height", 278)))
     $ _picture_h = int((_usable_h - 24) * 0.68)

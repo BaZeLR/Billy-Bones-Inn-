@@ -37,26 +37,6 @@ init python:
     def grocery_store_fancy_night_bowl_action_visible(_obj=None):
         return grocery_store_service_available() and grocery_store_fancy_night_bowl_visible()
 
-    def grocery_store_background_picture():
-        active_grocer = grocery_store_active_grocer_id()
-        if active_grocer == "eddie":
-            picture = grocery_store_eddie_picture()
-        elif active_grocer == "inga":
-            picture = grocery_store_inga_picture()
-        elif active_grocer == "becky":
-            picture = grocery_store_becky_picture()
-        else:
-            picture = ""
-        if str(picture or "").strip():
-            return picture
-        if active_grocer == "eddie":
-            return "images/eddie/portraits/portrait_0.png"
-        if active_grocer == "inga":
-            return "images/inga/StreetSex/minet1.jpg"
-        if active_grocer == "becky":
-            return "images/becky/portraits/portrait_1.png"
-        return "images/general/becky_inStore.png"
-
     def grocery_store_pick_picture(candidates, randomize=False):
         loadable = [row for row in candidates if str(row or "").strip() and renpy.loadable(row)]
         if len(loadable) <= 0:
@@ -113,25 +93,6 @@ init python:
 
     def grocery_store_main_text():
         parts = [str(rooms.get("GroceryStore").descriptions[0].text or "").strip()]
-        active_grocer = grocery_store_active_grocer_id()
-
-        if active_grocer == "eddie":
-            parts.append("Сейчас утро, и за прилавком стоит Эдди, управляющий лавкой Блэнкеншип. Это здоровый рыжий парень примерно вашего возраста; Бекки когда-то подобрала его сиротой и взяла помощником.")
-            if Becky.eddie_robbed_day > 0 and Becky.eddie_robbed_day + 12 >= current_game_day():
-                parts.append("Вы заметили, что у Эдди красуется большой синяк под глазом и распухло ухо.")
-            parts.append("Вы можете с ним поболтать.")
-        elif active_grocer == "inga":
-            parts.append("Утреннюю смену у прилавка сегодня держит Ингенборг. Старшая дочка Бекки выглядит как молодая копия своей матери и уверенно распоряжается в семейной лавке.")
-            parts.append("Вы можете с ней поболтать.")
-        elif active_grocer == "becky":
-            parts.append("За прилавком стоит сама Бекки Блэнкеншип. Это высокая рыжая женщина с полной грудью, ей на вид немного меньше сорока. Ее муж умер от болезни примерно за год до того, как ваш дядя купил \"Дикого Жеребца\".")
-            parts.append("Вы можете с ней поболтать.")
-            if current_game_day() > 30 and current_game_day() <= 70:
-                parts.append("Вы знаете, что Сандра с ней недавно подружилась.")
-            elif current_game_day() > 70:
-                parts.append("Она с Сандрой - лучшие подруги.")
-        else:
-            parts.append("Лавка открыта, но за прилавком сейчас никого нет: видно, хозяйка и ее управляющий заняты в другом месте.")
 
         notice = str(rooms.get("GroceryStore").state.pop("notice", "") or "")
         if notice:
@@ -208,16 +169,21 @@ init python:
     )
 
 label GroceryStore:
-    $ renpy.dynamic("_grocery_picture", "_grocery_room", "_grocery_breastfeeding_text", "_grocery_kids_text")
+    $ renpy.dynamic("_grocery_room")
     scene black
     $ rooms.enter("GroceryStore")
-    $ scene_runtime.picture = grocery_store_background_picture()
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.selected_char = ""
+    $ main_ui_runtime.talk_picture = ""
+    $ main_ui_runtime.clear_contexts()
     $ main_ui_runtime.action_title = "Действия"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
     $ main_ui_runtime.girl_key = ""
     $ main_ui_runtime.object_id = ""
     $ _grocery_room = rooms.get("GroceryStore")
+    $ scene_runtime.picture = _grocery_room.bg_picture
+    vscene scene_runtime.picture
     # Check if the store is closed
     if not _grocery_room.is_open():
         $ scene_runtime.text = _grocery_room.schedule.closed_text
@@ -231,29 +197,8 @@ label GroceryStore:
     $ scene_runtime.text = grocery_store_main_text()
     $ scene_runtime.location_text = scene_runtime.text
 
-    # Character interaction
-    if grocery_store_active_grocer_id() == "eddie":
-        $ _grocery_picture = grocery_store_eddie_picture()
-        if str(_grocery_picture or "").strip():
-            $ scene_runtime.picture = _grocery_picture
-            vscene scene_runtime.picture
-    elif grocery_store_active_grocer_id() == "inga":
-        $ _grocery_picture = grocery_store_inga_picture()
-        if str(_grocery_picture or "").strip():
-            $ scene_runtime.picture = _grocery_picture
-            vscene scene_runtime.picture
-    elif grocery_store_active_grocer_id() == "becky":
+    if grocery_store_active_grocer_id() == "becky":
         call BeckyLoversInStore
-        $ _grocery_picture = grocery_store_becky_picture()
-        if str(_grocery_picture or "").strip():
-            $ scene_runtime.picture = _grocery_picture
-            vscene scene_runtime.picture
-        $ _grocery_breastfeeding_text = DescribeBreastFeeding('becky', 3)
-        $ _grocery_kids_text = ShowFullKidsListByAge('becky', 'inga')
-        if _grocery_breastfeeding_text:
-            $ scene_runtime.text += "\n\n" + _grocery_breastfeeding_text
-        if _grocery_kids_text:
-            $ scene_runtime.text += "\n\n" + _grocery_kids_text
         call check_daily_event('becky')
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = "Действия"
