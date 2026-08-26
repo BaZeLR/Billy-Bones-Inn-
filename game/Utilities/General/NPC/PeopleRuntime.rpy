@@ -546,6 +546,9 @@ init -999 python:
             data.invalidate_daily_schedule()
             data.load_interval_schedule(True)
 
+    if npc_schedule_after_load not in config.after_load_callbacks:
+        config.after_load_callbacks.append(npc_schedule_after_load)
+
     class PeopleInfo(object):
         STORY_DEFAULTS = {}
         OPENNESS_RELATIONSHIP_STEPS = ((6, 3), (8, 5), (11, 6), (13, 7))

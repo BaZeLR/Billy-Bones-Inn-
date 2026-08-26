@@ -1001,7 +1001,10 @@ testcase external_main_ui_does_not_repeat_active_dialogue_text:
 
 testcase external_actual_grocery_click:
     run Call("InitGameNPCs")
-    $ external_calendar_set_fields(1, 1, CALENDAR_START_CYCLE, 8, 0)
+    $ people.get_data("becky").interval_schedule_entries = []
+    $ people.get_data("becky").interval_schedule_loaded = True
+    $ npc_schedule_after_load()
+    $ external_calendar_set_fields(1, 1, CALENDAR_START_CYCLE, 16, 0)
     $ external_calendar_set_weekday(1)
     $ BlockTimeAdvance = 0
     $ TavernEventOngoing = ""
@@ -1010,15 +1013,20 @@ testcase external_actual_grocery_click:
     $ main_ui_runtime.inventory_dropdown_open = False
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.mode = "scene"
-    $ people.get_data("eddie").set_schedule([NPCScheduleEntry(location="GroceryStore", start_minute=0, end_minute=1440, priority=999)])
     $ player.set_money(max(100, int(player.economy.money or 0)))
     run Jump("GroceryStore")
     advance until screen "main_ui" timeout 20.0
+    assert eval (str(people.location("becky") or "") == "GroceryStore") timeout 5.0
+    assert eval ("becky" in list(people.ids_at("GroceryStore") or [])) timeout 5.0
+    assert eval (str(grocery_store_active_grocer_id() or "") == "becky") timeout 5.0
+    assert eval (bool(str(scene_runtime.picture or "")) and renpy.loadable(str(scene_runtime.picture or ""))) timeout 5.0
+    assert eval (any(str(row.get("id", "") or "") == "becky" for row in renpy.get_screen("main_ui").scope.get("_char_entries", []))) timeout 5.0
     assert eval ('Провизия' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == 'Провизия') timeout 20.0
     assert eval ('Купить провизию' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
-    run Call("GroceryStoreBuyStockMenu")
-    advance until screen "main_ui" timeout 20.0
+    $ _grocery_buy_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Купить провизию")
+    $ _grocery_buy_button_id = "choice_panel_button_%d" % int(_grocery_buy_index)
+    click id _grocery_buy_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == 'Покупка провизии') timeout 20.0
     assert eval (str(main_ui_runtime.action_title or "") == 'Покупка провизии') timeout 5.0
     assert eval ('Купить один мешок' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
 

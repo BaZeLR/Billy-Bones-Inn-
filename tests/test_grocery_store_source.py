@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,6 +11,7 @@ EDDIE_TALK = ROOT / "game" / "NPC" / "Secondary" / "IntEddieTalk.rpy"
 BECKY_TALK = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalk.rpy"
 BECKY_TOPICS = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkTopics.rpy"
 BECKY_SHERWOOD = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkSherwood.rpy"
+BECKY_SCHEDULE = ROOT / "game" / "NPC" / "Schedules" / "becky.json"
 GROCERY_NPC_OWNERS = [
     ROOT / "game" / "NPC" / "Secondary" / "InitEddie.rpy",
     ROOT / "game" / "NPC" / "Girls" / "Becky" / "InitBecky.rpy",
@@ -19,6 +21,16 @@ GROCERY_NPC_OWNERS = [
 
 def _source(path):
     return path.read_text(encoding="utf-8-sig")
+
+
+def test_becky_staffs_grocery_store_until_the_store_closes():
+    schedule = json.loads(_source(BECKY_SCHEDULE))
+    entries = {row["label"]: row for row in schedule["entries"]}
+    people_runtime = _source(PEOPLE_RUNTIME)
+
+    assert entries["grocery_afternoon_shift"]["end"] == "17:59"
+    assert entries["eddie_absent_grocery_cover"]["end"] == "17:59"
+    assert "config.after_load_callbacks.append(npc_schedule_after_load)" in people_runtime
 
 
 def test_grocery_uses_merchant_picture_sequences_not_hunter_store():
