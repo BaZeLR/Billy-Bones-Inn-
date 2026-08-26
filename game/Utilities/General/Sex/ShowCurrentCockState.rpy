@@ -29,7 +29,7 @@ label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
 
     if str(DudeName).lower() == "you":
         if cur_came >= cur_limit:
-            "То что упало - подняться не может. По крайней мере сегодня. Вот завтра силы к вам, быть может, вернутся."
+            "[PLAYER_DAILY_EXHAUSTION_TEXT]"
             $ player.intimacy.set_arousal(0)
         else:
             if cur_arousal < 20:

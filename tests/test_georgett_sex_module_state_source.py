@@ -45,7 +45,47 @@ def test_georgett_sex_choices_use_native_choice_screen_without_apply_panel():
     assert "GeorgettSexApply" not in source
     assert "georgett_sex_action_panel" not in source
     assert "main_ui_runtime.action_items" not in source
-    assert '"\\n".join(georgett_sex_state_lines())' in source
+    assert "georgett_sex_state_lines" not in source
+
+
+def test_georgett_hire_uses_authored_paid_routes_and_one_time_owner():
+    talk = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy").read_text(encoding="utf-8-sig")
+    sex = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettSex.rpy").read_text(encoding="utf-8-sig")
+
+    hire = talk.split('label IntGeorgettHire(girl_name="georgett", girl_loc="street"):', 1)[1].split("label IntGeorgettGrope", 1)[0]
+    assert 'call SexProstTavern(1, "georgett")' in hire
+    assert 'call SexPort(1, "georgett")' in hire
+    assert 'call IntGeorgettSex(' not in hire
+    assert "main_ui_end_talk_state()" in hire
+    assert "main_ui_begin_native_scene_state" in hire
+    assert "main_ui_end_native_scene_state" in hire
+    assert "GeorgettSexFinish" not in sex
+    assert '"Закончить":\n                $ Georgett.set_sex_busy(0)\n                return' in sex
+
+
+def test_georgett_free_grope_rejection_returns_to_talk_owner():
+    talk = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy").read_text(encoding="utf-8-sig")
+    grope = talk.split('label IntGeorgettGrope(girl_name="georgett", girl_loc="street"):', 1)[1].split("label IntGeorgettAskDad", 1)[0]
+
+    assert "def georgett_grope_outcome" not in talk
+    assert "if Georgett.rel < 10:" in grope
+    rejection = grope.split("if Georgett.rel < 10:", 1)[1].split("return", 1)[0]
+    assert "ShowCurrentSex" not in rejection
+    assert "Сначала заплати, а потом уже лапай!" in rejection
+    assert "call ShowCurrentSex(girl_name)" in grope
+
+
+def test_georgett_daily_limit_uses_player_authority_and_canonical_text():
+    sex = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettSex.rpy").read_text(encoding="utf-8-sig")
+    talk = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy").read_text(encoding="utf-8-sig")
+    intimacy = (ROOT / "game/Utilities/General/Sex/PlayerIntimacyState.rpy").read_text(encoding="utf-8-sig")
+    cock = (ROOT / "game/Utilities/General/Sex/ShowCurrentCockState.rpy").read_text(encoding="utf-8-sig")
+
+    assert "if not player.intimacy.can_cum():" in sex + talk
+    assert "PLAYER_DAILY_EXHAUSTION_TEXT" in sex + talk
+    assert intimacy.count("То что упало - подняться не может.") == 1
+    assert "[PLAYER_DAILY_EXHAUSTION_TEXT]" in cock
+    assert "То что упало - подняться не может." not in sex + talk + cock
 
 
 def test_georgett_uses_shared_girl_visibility_without_saved_or_method_mirrors():

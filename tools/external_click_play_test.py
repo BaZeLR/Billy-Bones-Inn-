@@ -788,7 +788,7 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
     $ renpy.call_in_new_context("InitDressDesc")
     $ external_calendar_set_fields(1, 1, 1100, 19, 0)
-    $ Georgett.rel = 10
+    $ Georgett.rel = 5
     $ Georgett.known = True
     $ Georgett.set_story_value("TalkChurchAfterCermonLiza", 0)
     $ Liza.prostitution_started = False
@@ -811,9 +811,24 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     $ player.intimacy.came_today = 0
     $ _georgett_hire_money_before = int(player.economy.money or 0)
     click id "main_ui_entity_button_npc_georgett" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Снять" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _georgett_grope_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Лапать")
+    $ _georgett_grope_button_id = "choice_panel_button_%d" % int(_georgett_grope_index)
+    click id _georgett_grope_button_id pos (0.5, 0.5) until eval ("Сначала заплати, а потом уже лапай!" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 5.0
+    assert eval ("Снять" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Лапать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ Georgett.rel = 10
+    $ _georgett_hire_clock_before = int(calendar_v2.clock_minutes() or 0)
     $ _georgett_hire_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Снять")
     $ _georgett_hire_button_id = "choice_panel_button_%d" % int(_georgett_hire_index)
-    click id _georgett_hire_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("choice") is not None and "Растегнуть блузку" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id _georgett_hire_button_id pos (0.5, 0.5)
+    advance until screen "say" timeout 20.0
+    assert eval ("Вы заплатили Жоржетте восемь мараведи" in str(renpy.get_screen("say").scope.get("what", "") or "")) timeout 5.0
+    click pos (0.5, 0.5)
+    advance until screen "say" timeout 20.0
+    assert eval ("Вы находитесь в переулке. Рядом с вами страстная Жоржетта." in str(renpy.get_screen("say").scope.get("what", "") or "")) timeout 5.0
+    click pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and "Растегнуть блузку" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval (int(player.economy.money or 0) == _georgett_hire_money_before - 8) timeout 5.0
     assert eval (str(main_ui_runtime.selected_char or "") == "" and str(main_ui_runtime.girl_key or "") == "" and str(main_ui_runtime.talk_picture or "") == "") timeout 5.0
     assert eval (str(scene_runtime.picture or "").startswith("images/georgett/portraits/portrait") and renpy.loadable(scene_runtime.picture)) timeout 5.0
@@ -825,6 +840,7 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     $ _georgett_hire_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
     $ _georgett_hire_finish_button_id = "choice_panel_button_%d" % int(_georgett_hire_finish_index)
     click id _georgett_hire_finish_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    assert eval (int(calendar_v2.clock_minutes() or 0) - _georgett_hire_clock_before == 40) timeout 5.0
     $ Georgett.openness = 0
     $ Georgett.talked_today = 0
     $ Georgett.gifted_today = 0
@@ -871,9 +887,17 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     assert eval (renpy.get_screen("main_ui") is not None and renpy.get_screen("choice") is not None) timeout 5.0
     assert eval ("Кончить на лицо" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Кончить на груди" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    $ Georgett.player_cum("face")
+    $ player.intimacy.came_today = 1
+    $ _georgett_cum_face_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Кончить на лицо")
+    $ _georgett_cum_face_button_id = "choice_panel_button_%d" % int(_georgett_cum_face_index)
+    click id _georgett_cum_face_button_id pos (0.5, 0.5) until eval (PLAYER_DAILY_EXHAUSTION_TEXT in str(scene_runtime.text or "") and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (int(Georgett.cum_state("cum_face_you") or 0) == 1) timeout 5.0
-    assert eval (int(player.intimacy.came_today or 0) == 1) timeout 5.0
+    assert eval (int(player.intimacy.came_today or 0) == 2 and not player.intimacy.can_cum()) timeout 5.0
+    assert eval ("То что упало - подняться не может." in str(renpy.get_screen("main_ui").scope.get("_desc", "") or "")) timeout 5.0
+    assert eval ("Предложить отсосать" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and not any(str(i.caption or "").startswith("Кончить") for i in renpy.get_screen("choice").scope.get("items", []))) timeout 5.0
+    $ _georgett_exhausted_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
+    $ _georgett_exhausted_finish_button_id = "choice_panel_button_%d" % int(_georgett_exhausted_finish_index)
+    click id _georgett_exhausted_finish_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
 
 testcase external_sexport_finish_does_not_show_advance_time_developer_text:
     $ _history_list = []

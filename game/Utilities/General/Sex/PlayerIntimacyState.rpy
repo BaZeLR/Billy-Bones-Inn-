@@ -3,6 +3,8 @@
 # (Defaults centralized in script.rpy to avoid duplicate default errors)
 # ================================================================================
 
+define PLAYER_DAILY_EXHAUSTION_TEXT = "То что упало - подняться не может. По крайней мере сегодня. Вот завтра силы к вам, быть может, вернутся."
+
 init python:
     def player_intimacy_int(value, default=0):
         try:

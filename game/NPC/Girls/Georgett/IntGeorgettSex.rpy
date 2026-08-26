@@ -47,25 +47,6 @@ init 6 python:
             elif cur_sperm0 == 0 and cur_sperm1 == 0 and cur_sperm2 == 0:
                 georgett_sex_set_picture("georgett", "portraits", "strip11")
 
-    def georgett_sex_state_lines():
-        runtime = player
-        intimacy = runtime.intimacy
-        mc_arousal = intimacy.arousal_value()
-        mc_came = people_to_int(intimacy.came_today, 0)
-        mc_limit = max(1, people_to_int(intimacy.can_cum_daily, 1))
-        girl_arousal = Georgett.arousal_value()
-        lines = [
-            "Стефан: возбуждение %d/100, разрядка %d/%d." % (mc_arousal, mc_came, mc_limit),
-            "Жоржетта: возбуждение %d/100." % girl_arousal,
-        ]
-        if mc_came >= mc_limit:
-            lines.append("На сегодня вы уже выжаты.")
-        elif mc_arousal >= 100:
-            lines.append("Вы на грани и можете кончить.")
-        elif mc_arousal >= 20:
-            lines.append("Вы достаточно возбуждены для продолжения.")
-        return lines
-
 label IntGeorgettSexSetup(GirlNameIGSS="georgett", GirlLocIGSS="street"):
     $ Georgett.sex_setup(GirlLocIGSS)
     if Georgett.needs_dress_up():
@@ -106,7 +87,10 @@ label IntGeorgettSexRaiseSkirt(GirlNameIGSS="georgett"):
 
 
 label GeorgettSexStatus(GirlLocIGSS="street", _georgett_orgasm_count=0):
-    if player.intimacy.arousal_value() >= 100:
+    if not player.intimacy.can_cum():
+        $ georgett_sex_add_text(PLAYER_DAILY_EXHAUSTION_TEXT)
+        $ player.intimacy.set_arousal(0)
+    elif player.intimacy.arousal_value() >= 100:
         if Georgett.cock_in("pussy"):
             $ georgett_sex_add_text("[Georgett.real_name()] чувствует, что вы уже готовы кончить, и нежно шепчет вам, чтобы вы не сдерживались.")
         else:
@@ -154,7 +138,6 @@ label GeorgettSexMenu:
     $ main_ui_runtime.talk_picture = ""
     $ main_ui_runtime.action_title = "Жоржетта"
     while True:
-        $ main_ui_runtime.action_content = "\n".join(georgett_sex_state_lines())
         menu:
             "Осмотреть":
                 call GeorgettSexLook
@@ -193,7 +176,7 @@ label GeorgettSexMenu:
             "Кончить внутрь" if player.intimacy.can_cum() and player.intimacy.arousal_value() >= 100 and Georgett.cock_in("pussy"):
                 call GeorgettSexCumInside
             "Закончить":
-                call GeorgettSexFinish
+                $ Georgett.set_sex_busy(0)
                 return
         if str(scene_runtime.picture or "").strip():
             vscene scene_runtime.picture
@@ -427,9 +410,4 @@ label GeorgettSexFuck(GirlNameIGSS="georgett", GirlLocIGSS="", _lactate_pussy_fu
     $ Georgett.add_arousal(14)
     $ Georgett.set_cock_position("pussy")
     call GeorgettSexStatus(GirlLocIGSS)
-    return
-
-label GeorgettSexFinish:
-    $ Georgett.set_sex_busy(0)
-    call AdvanceTimeOnly(40)
     return

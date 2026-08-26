@@ -1,29 +1,6 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-init python:
-    def georgett_grope_outcome(girl_name="georgett", girl_loc="street"):
-        loc_key = str(girl_loc or "street")
-        has_paid_context = (player.economy.money >= 8 or (player.economy.money >= 4 and loc_key == "tavern")) and player.intimacy.can_cum()
-
-        if not has_paid_context:
-            if not player.intimacy.can_cum():
-                grope_text = "«На сегодня с тебя уже хватит, красавчик», - усмехнулась %s. «Приходи завтра, если захочешь еще.»" % Georgett.real_name()
-            else:
-                grope_text = "«Эй, осади лошадей!» говорит вам %s. «Сначала заплати, а потом уже лапай!»" % Georgett.real_name()
-            return {"text": grope_text, "show_current_sex": False}
-
-        if Georgett.rel >= 10:
-            grope_text = "Вы начали мять сиськи %s через тонкую ткань ее блузки.\nВы сунули руку под короткую юбочку вашей любовницы и стали наминать ее вульву." % Georgett.real_name2()
-            if Georgett.cum_state("cum_inside_you") > 0:
-                grope_text += "\n\nВы почувствовали свою сперму в пещерке %s." % Georgett.real_name2()
-            elif Georgett.cum_state("cum_inside_others") > 0:
-                grope_text += "\n\nВаши пальцы заскользили по пещерке %s, похоже кто-то уже кончил в нее." % Georgett.real_name2()
-        else:
-            grope_text = "«Эй, осади лошадей!» говорит вам %s. «Сначала заплати, а потом уже лапай!»" % Georgett.real_name()
-
-        return {"text": grope_text, "show_current_sex": True}
-
 label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
     $ renpy.dynamic("_georgett_talk_new", "_georgett_first_meeting", "_georgett_picture")
     if not girl_loc:
@@ -297,25 +274,34 @@ label IntGeorgettAskEddieVisit(girl_name="georgett", girl_loc="street"):
 
 
 label IntGeorgettHire(girl_name="georgett", girl_loc="street"):
+    if not player.intimacy.can_cum():
+        $ scene_runtime.text = PLAYER_DAILY_EXHAUSTION_TEXT
+        $ scene_runtime.location_text = scene_runtime.text
+        return
+    $ main_ui_end_talk_state()
+    $ main_ui_begin_native_scene_state("Жоржетта")
     if girl_loc == "tavern":
         $ player.spend_money(4)
-        call IntGeorgettSex("georgett", "tavern")
-        $ scene_runtime.location_text = scene_runtime.text
+        call SexProstTavern(1, "georgett")
     else:
         $ player.spend_money(8)
-        call IntGeorgettSex("georgett", "street")
-        $ scene_runtime.location_text = scene_runtime.text
-        $ main_ui_end_talk_state()
+        call SexPort(1, "georgett")
+    $ main_ui_end_native_scene_state()
     return
 
 
 label IntGeorgettGrope(girl_name="georgett", girl_loc="street"):
-    $ renpy.dynamic("_grope_result")
-    $ _grope_result = georgett_grope_outcome(girl_name, girl_loc)
-    $ scene_runtime.text = str(_grope_result.get("text", "") or "")
+    if Georgett.rel < 10:
+        $ scene_runtime.text = "«Эй, осади лошадей!» говорит вам %s. «Сначала заплати, а потом уже лапай!»" % Georgett.real_name()
+        $ scene_runtime.location_text = scene_runtime.text
+        return
+    $ scene_runtime.text = "Вы начали мять сиськи %s через тонкую ткань ее блузки.\n\nВы сунули руку под короткую юбочку вашей любовницы и стали наминать ее вульву." % Georgett.real_name2()
+    if Georgett.cum_state("cum_inside_you") > 0:
+        $ scene_runtime.text += "\n\nВы почувствовали свою сперму в пещерке %s." % Georgett.real_name2()
+    elif Georgett.cum_state("cum_inside_others") > 0:
+        $ scene_runtime.text += "\n\nВаши пальцы заскользили по пещерке %s, похоже кто-то уже кончил в нее." % Georgett.real_name2()
     $ scene_runtime.location_text = scene_runtime.text
-    if bool(_grope_result.get("show_current_sex", False)):
-        call ShowCurrentSex(girl_name)
+    call ShowCurrentSex(girl_name)
     return
 
 
