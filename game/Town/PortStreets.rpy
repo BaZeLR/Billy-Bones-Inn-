@@ -4,15 +4,6 @@
 # PortStreets location - converted from legacy script
 
 init python:
-    def port_streets_georgett_can_talk():
-        return Georgett.portstreet_visible_now() and people_to_int(Georgett.rel, 0) != 0
-
-    def port_streets_georgett_first_meeting_available():
-        return Georgett.portstreet_work_active() and people_to_int(Georgett.rel, 0) == 0
-
-    def port_streets_liza_can_talk():
-        return Liza.portstreet_visible_now()
-
     def port_streets_prepare_bottle_spawn():
         current_day = int(current_game_day())
         if int(rooms.get("PortStreets").custom_properties.get("bottle_spawn_day", -1) or -1) == current_day:
@@ -72,13 +63,6 @@ init python:
         ],
         action_menus=[
             RoomAction(
-                action_id="meet_georgett",
-                label="Заговорить с ней",
-                hook="call",
-                target="PortStreetsMeetGeorgett",
-                condition=port_streets_georgett_first_meeting_available,
-            ),
-            RoomAction(
                 action_id="examine_port_lanes",
                 label="Осмотреть переулки",
                 hook="call",
@@ -107,7 +91,7 @@ label PortStreets:
     $ main_ui_runtime.action_items = []
 
     $ scene_runtime.location_text = rooms.get("PortStreets").descriptions[0].text
-    if port_streets_georgett_first_meeting_available():
+    if Georgett.portstreet_visible_now() and people_to_int(Georgett.rel, 0) == 0:
         vscene "images/georgett/Port/wait.jpg"
         $ scene_runtime.location_text += "\n\nНа углу стоит молодая женщина, не очень высокого роста, чуть пухленькая и с большой налитой грудью, одетая в прозрачную блузку и короткую юбку. Она белокура и кареглаза. Ее внешность и повадки не дают никаких сомнений в том, что она выбрала себе путь отнюдь не монашки."
         if Georgett.pregnancy_days() >= 210:
@@ -135,17 +119,6 @@ label PortStreets:
     $ rooms.get("PortStreets").mark_visited()
     while True:
         call screen main_ui
-
-
-label PortStreetsMeetGeorgett:
-    $ scene_runtime.text = "-Привет красавчик! Не хочешь ли поразвлечься? Всего восемь мараведи!\n\nВы поговорили с ней и узнали, что ее зовут Жоржетта Брюно, она шлюха и промышляет здесь уже давно."
-    $ scene_runtime.location_text = scene_runtime.text
-    $ Georgett.add_relation(1)
-    $ Georgett.mark_known()
-    $ main_ui_runtime.action_title = "Действия"
-    $ main_ui_runtime.action_items = rooms.current.build_action_items() + rooms.current.build_exit_items()
-    return
-
 
 label PortStreetsBackAlley(girl_name=""):
     $ main_ui_runtime.mode = "scene"

@@ -97,8 +97,8 @@ def test_known_state_is_owned_by_talk_labels_not_the_ui_router():
         talk_block = talk_source.split(entry_label, 1)[1].split("\nlabel ", 1)[0]
         assert mark_call in talk_block, relative_path
 
-    port_source = (ROOT / "game/Town/PortStreets.rpy").read_text(encoding="utf-8-sig")
-    first_meet = port_source.split("label PortStreetsMeetGeorgett:", 1)[1].split("\nlabel ", 1)[0]
+    georgett_source = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy").read_text(encoding="utf-8-sig")
+    first_meet = georgett_source.split('label IntGeorgettTalk(girl_name="georgett", girl_loc=""):', 1)[1].split("\nlabel ", 1)[0]
     assert "Georgett.mark_known()" in first_meet
 
 

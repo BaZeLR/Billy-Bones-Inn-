@@ -259,7 +259,7 @@ init python:
 
         def interaction_visible(self, room_code=""):
             if str(room_code or "").strip() == "PortStreets":
-                return self.portstreet_visible_now() and people_to_int(self.rel, 0) != 0
+                return self.portstreet_visible_now()
             return super(GeorgettInfo, self).interaction_visible(room_code)
 
         def action_data(self, where_id=""):

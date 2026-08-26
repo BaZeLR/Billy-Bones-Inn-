@@ -337,28 +337,26 @@ def test_liza_v55_migration_consumes_legacy_state_once():
     assert 'globals().pop("LizaVar", None)' in block
 
 
-def test_georgett_first_meeting_is_the_qsp_owned_port_streets_action():
+def test_georgett_first_meeting_is_owned_by_the_scheduled_npc_talk_label():
     port = _source(PORT_STREETS)
     talk = _source(GEORGETT_TALK)
+    georgett = _source(GEORGETT_INIT)
 
-    assert "def port_streets_georgett_first_meeting_available():" in port
     assert "people_to_int(Georgett.rel, 0) == 0" in port
-    assert 'action_id="meet_georgett"' in port
-    assert 'label="Заговорить с ней"' in port
-    assert 'target="PortStreetsMeetGeorgett"' in port
-    assert "label PortStreetsMeetGeorgett:" in port
+    assert 'action_id="meet_georgett"' not in port
+    assert 'target="PortStreetsMeetGeorgett"' not in port
+    assert "label PortStreetsMeetGeorgett:" not in port
     assert "На углу стоит молодая женщина" in port
-    assert "-Привет красавчик! Не хочешь ли поразвлечься? Всего восемь мараведи!" in port
-    assert "Georgett.add_relation(1)" in port
-    assert "Georgett.mark_known()" in port
     assert 'vscene "images/georgett/Port/wait.jpg"' in port
+    assert "return self.portstreet_visible_now()" in georgett
+    assert "return self.portstreet_visible_now() and people_to_int(self.rel, 0) != 0" not in georgett
 
     first_talk = talk.split('label IntGeorgettTalk(girl_name="georgett", girl_loc=""):', 1)[1].split(
         "label IntGeorgettSmalltalk", 1
     )[0]
-    assert "Georgett.mark_known()" not in first_talk
-    assert "-Привет красавчик!" not in first_talk
-    assert "Georgett.add_relation(1)" not in first_talk
+    assert "Georgett.mark_known()" in first_talk
+    assert "-Привет красавчик!" in first_talk
+    assert "Georgett.add_relation(1)" in first_talk
 
 
 def test_portstreets_clients_are_repeatable_action_events_from_classes():
@@ -374,12 +372,12 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
     assert "def portstreet_client_event_available" in liza
     georgett_schedule = _source(GEORGETT_SCHEDULE)
     liza_schedule = _source(LIZA_SCHEDULE)
-    assert '"weekdays": [1, 2, 3, 4, 6]' in georgett_schedule
-    assert '"start": "13:00"' in georgett_schedule
-    assert '"end": "15:59"' in georgett_schedule
-    assert '"weekdays": [1, 2, 3, 4, 6]' in liza_schedule
-    assert '"start": "13:00"' in liza_schedule
-    assert '"end": "15:59"' in liza_schedule
+    assert '"weekdays": [1, 2, 3, 4, 6, 7]' in georgett_schedule
+    assert '"start": "19:00"' in georgett_schedule
+    assert '"end": "21:30"' in georgett_schedule
+    assert '"weekdays": [1, 2, 3, 4, 6, 7]' in liza_schedule
+    assert '"start": "19:00"' in liza_schedule
+    assert '"end": "21:30"' in liza_schedule
     assert "def portstreet_work_hour" not in georgett
     assert "def portstreet_work_hour" not in liza
     assert "calendar_v2.clock_minutes()" not in georgett
