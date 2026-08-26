@@ -4,19 +4,18 @@
 
 init -39 python:
     SOCIAL_TALK_SESSION_LIMIT = 10
-    SOCIAL_TALK_SESSION_POSITIVE_CAP = 5
 
     SOCIAL_TALK_TOPICS = [
-        {"id": "job_routine", "label": "О работе и распорядке", "min_friend": 0, "min_open": 0},
-        {"id": "chat", "label": "Просто поболтать", "min_friend": 0, "min_open": 0},
-        {"id": "dances", "label": "О танцах", "min_friend": 2, "min_open": 0},
-        {"id": "gossip", "label": "О слухах", "min_friend": 2, "min_open": 1},
-        {"id": "forest", "label": "О лесе", "min_friend": 1, "min_open": 0},
-        {"id": "stories", "label": "Послушать истории", "min_friend": 3, "min_open": 2, "private": True},
-        {"id": "food", "label": "О еде", "min_friend": 0, "min_open": 0},
-        {"id": "fashion", "label": "Об одежде и внешности", "min_friend": 3, "min_open": 2, "private": True},
-        {"id": "money", "label": "О деньгах", "min_friend": 4, "min_open": 2, "private": True},
-        {"id": "family_life", "label": "О семье и доме", "min_friend": 1, "min_open": 0},
+        {"id": "job_routine", "label": "О работе и распорядке"},
+        {"id": "chat", "label": "Просто поболтать"},
+        {"id": "dances", "label": "О танцах"},
+        {"id": "gossip", "label": "О слухах"},
+        {"id": "forest", "label": "О лесе"},
+        {"id": "stories", "label": "Послушать истории"},
+        {"id": "food", "label": "О еде"},
+        {"id": "fashion", "label": "Об одежде и внешности"},
+        {"id": "money", "label": "О деньгах"},
+        {"id": "family_life", "label": "О семье и доме"},
     ]
 
     SOCIAL_FLIRT_TOPICS = [
@@ -28,24 +27,12 @@ init -39 python:
 
     SOCIAL_NPC_TOPIC_PACKS = {
         "amanda": {
-            "talk": [
-                {"id": "amanda_boys", "label": "О парнях", "min_friend": 2, "min_open": 1},
-                {"id": "sex_topics", "label": "О близости и желаниях", "min_friend": 7, "min_open": 4, "private": True},
-                {"id": "amanda_freedom", "label": "О свободе и запретах", "min_friend": 4, "min_open": 1},
-                {"id": "amanda_future", "label": "О ее будущем", "min_friend": 7, "min_open": 2, "private": True},
-                {"id": "amanda_attention", "label": "О том, чего ей не хватает", "min_friend": 10, "min_open": 4, "private": True},
-            ],
             "flirt": [
                 {"id": "amanda_tease", "label": "Мягко подразнить Аманду", "min_friend": 6, "min_open": 1, "min_slut": 0},
                 {"id": "amanda_dance_hint", "label": "Намекнуть на танцы и взгляды", "min_friend": 8, "min_open": 3, "min_slut": 4},
             ],
         },
         "melissa": {
-            "talk": [
-                {"id": "melissa_safety", "label": "О безопасности и доме", "min_friend": 3, "min_open": 1},
-                {"id": "melissa_quiet", "label": "О тихом вечере без шума", "min_friend": 5, "min_open": 2},
-                {"id": "melissa_secrets", "label": "О ее тайнах", "min_friend": 9, "min_open": 4, "private": True},
-            ],
             "flirt": [
                 {"id": "melissa_gentle", "label": "Сблизиться без нажима", "min_friend": 7, "min_open": 2, "min_slut": 0},
                 {"id": "melissa_private_place", "label": "Намекнуть на укромное место", "min_friend": 10, "min_open": 5, "min_slut": 8},
@@ -58,11 +45,6 @@ init -39 python:
             ],
         },
         "clara": {
-            "talk": [
-                {"id": "clara_wine_trade", "label": "О винной лавке и рынке", "min_friend": 2, "min_open": 0},
-                {"id": "clara_city_masks", "label": "О городских масках и слухах", "min_friend": 5, "min_open": 2},
-                {"id": "clara_drawings", "label": "О рисунках и тайных увлечениях", "min_friend": 8, "min_open": 3, "private": True},
-            ],
             "flirt": [
                 {"id": "clara_clever_game", "label": "Затеять светскую игру", "min_friend": 5, "min_open": 2, "min_slut": 0},
                 {"id": "clara_between_lines", "label": "Говорить намеками", "min_friend": 8, "min_open": 4, "min_slut": 2},
@@ -70,10 +52,7 @@ init -39 python:
         },
     }
 
-    SOCIAL_DEFAULT_PROFILE = {
-        "talk": {"job_routine": 1, "chat": 1, "dances": 1, "gossip": 1, "forest": 1, "stories": 1, "food": 1, "fashion": 1, "money": 1, "family_life": 1},
-        "flirt": {"joke": 1, "kino": 1, "flirt": 1, "sex_topics": 1},
-    }
+    SOCIAL_DEFAULT_FLIRT_PROFILE = {"joke": 1, "kino": 1, "flirt": 1, "sex_topics": 1}
 
     SOCIAL_FLIRT_STAT_REQUIREMENTS = {
         "amanda": {"look": 45},
@@ -113,41 +92,32 @@ init -39 python:
         info = social_person_info(girl_name)
         return int(getattr(info, "drunk", 0) or 0) if info is not None else 0
 
-    SOCIAL_TALK_PROFILES = {
+    SOCIAL_FLIRT_PROFILES = {
         "amanda": {
-            "talk": {"job_routine": -1, "chat": 2, "dances": 4, "gossip": 4, "forest": 0, "stories": 1, "food": 1, "fashion": 4, "money": 4, "family_life": 2, "sex_topics": 3, "amanda_boys": 4, "amanda_freedom": 3, "amanda_future": 2, "amanda_attention": 4},
             "flirt": {"joke": 3, "kino": 2, "flirt": 3, "sex_topics": 2, "amanda_tease": 3, "amanda_dance_hint": 4},
         },
         "melissa": {
-            "talk": {"job_routine": 3, "chat": 1, "dances": 0, "gossip": -1, "forest": 2, "stories": 3, "food": 2, "fashion": 1, "money": 0, "family_life": 4, "melissa_safety": 4, "melissa_quiet": 3, "melissa_secrets": 3},
             "flirt": {"joke": 1, "kino": 2, "flirt": 1, "sex_topics": -2, "melissa_gentle": 4, "melissa_private_place": 3},
         },
         "sandra": {
-            "talk": {"job_routine": 4, "chat": 0, "dances": -1, "gossip": 1, "forest": 1, "stories": 0, "food": 4, "fashion": 2, "money": 3, "family_life": 4},
             "flirt": {"joke": 0, "kino": -1, "flirt": -2, "sex_topics": -4, "sandra_respect": 3, "sandra_warmth": 2},
         },
         "clara": {
-            "talk": {"job_routine": 1, "chat": 2, "dances": 2, "gossip": 4, "forest": 3, "stories": 3, "food": 0, "fashion": 4, "money": 2, "family_life": 1, "clara_wine_trade": 3, "clara_city_masks": 4, "clara_drawings": 4},
             "flirt": {"joke": 2, "kino": 3, "flirt": 4, "sex_topics": 3, "clara_clever_game": 4, "clara_between_lines": 4},
         },
         "becky": {
-            "talk": {"job_routine": 1, "chat": 3, "dances": 3, "gossip": 2, "forest": 2, "stories": 4, "food": 2, "fashion": 2, "money": 3},
             "flirt": {"joke": 3, "kino": 2, "flirt": 3, "sex_topics": 2},
         },
         "irma": {
-            "talk": {"job_routine": 3, "chat": 1, "dances": 0, "gossip": 1, "forest": 1, "stories": 1, "food": 0, "fashion": 4, "money": 3},
             "flirt": {"joke": 1, "kino": 1, "flirt": 2, "sex_topics": 0},
         },
         "inga": {
-            "talk": {"job_routine": 1, "chat": 2, "dances": 1, "gossip": 2, "forest": 1, "stories": 1, "food": 1, "fashion": 2, "money": 1},
             "flirt": {"joke": 1, "kino": 1, "flirt": 1, "sex_topics": 0},
         },
         "liza": {
-            "talk": {"job_routine": 0, "chat": 3, "dances": 2, "gossip": 3, "forest": 0, "stories": 2, "food": 1, "fashion": 3, "money": 2},
             "flirt": {"joke": 2, "kino": 2, "flirt": 3, "sex_topics": 2},
         },
         "georgett": {
-            "talk": {"job_routine": 0, "chat": 2, "dances": 2, "gossip": 3, "forest": 0, "stories": 3, "food": 1, "fashion": 3, "money": 2},
             "flirt": {"joke": 2, "kino": 2, "flirt": 3, "sex_topics": 3},
         },
     }
@@ -251,63 +221,6 @@ init -39 python:
     }
 
     SOCIAL_CUSTOM_TOPIC_TEXT = {
-        "talk": {
-            "amanda_boys": {
-                "good": "Разговор о парнях быстро оживляет Аманду. Она смеется, спорит и выдает больше, чем собиралась, потому что тема ей явно по вкусу.",
-                "neutral": "Аманда поддерживает разговор о парнях с насмешкой и интересом, но пока не слишком раскрывается.",
-                "bad": "Тема парней звучит неудачно. Аманда решает, что ее дразнят, и отвечает колко.",
-            },
-            "sex_topics": {
-                "good": "Вы говорите с Амандой о близости осторожно, без грубого нажима. Она краснеет, но не уходит от темы и слушает внимательнее обычного.",
-                "neutral": "Аманда слышит разговор о близости и отвечает дерзкой шуткой. Интерес есть, но доверия пока мало.",
-                "bad": "Разговор о близости выходит слишком прямым. Аманда закрывается и делает вид, что ей скучно.",
-            },
-            "amanda_freedom": {
-                "good": "Вы говорите с Амандой о свободе без приказного тона. Она сперва держится дерзко, но быстро понимает, что вы слушаете ее всерьез.",
-                "neutral": "Аманда охотно спорит о запретах и свободе, но пока больше проверяет ваши границы, чем раскрывается.",
-                "bad": "Разговор о свободе звучит для Аманды как новый запрет в мягкой обертке. Она замыкается.",
-            },
-            "amanda_future": {
-                "good": "Вы спрашиваете Аманду о будущем, и она неожиданно говорит честнее обычного: ей хочется выбора, внимания и места, где ее не будут только использовать.",
-                "neutral": "Аманда слушает разговор о будущем, но отвечает осторожно, словно не уверена, что такие планы вообще имеют вес.",
-                "bad": "Разговор о будущем раздражает Аманду. Сейчас ей кажется, что вы просто хотите заранее решить все за нее.",
-            },
-            "amanda_attention": {
-                "good": "Вы прямо спрашиваете, чего Аманде не хватает. Она прячет улыбку, но отвечает почти без бравады: ей важно, чтобы ее замечали не только тогда, когда она полезна.",
-                "neutral": "Аманда принимает вопрос о внимании с привычной насмешкой. Тема задевает ее, но она пока не готова говорить глубже.",
-                "bad": "Вопрос о том, чего ей не хватает, выходит слишком резким. Аманда решает, что ее снова пытаются поймать на слабости.",
-            },
-            "melissa_safety": {
-                "good": "Вы обсуждаете с Мелиссой безопасность дома. Практичный тон успокаивает ее, и она заметно теплеет.",
-                "neutral": "Мелисса кивает: безопасность важна, но разговор остается сухим и коротким.",
-                "bad": "Мелисса слышит в разговоре о безопасности только тревогу и давление. Она становится тише.",
-            },
-            "melissa_quiet": {
-                "good": "Вы говорите о тихом вечере без суеты. Мелисса улыбается почти незаметно: такой покой ей действительно нужен.",
-                "neutral": "Мелисса поддерживает разговор о спокойном вечере, но не спешит показывать, насколько ей это важно.",
-                "bad": "Тема тихого вечера звучит не вовремя. Мелисса думает о делах и не входит в настроение.",
-            },
-            "melissa_secrets": {
-                "good": "Вы осторожно касаетесь ее тайн и не давите. Мелисса не рассказывает всего, но явно ценит, что вы оставляете ей право молчать.",
-                "neutral": "Мелисса слушает вопрос о тайнах с настороженной улыбкой. Она отвечает уклончиво, но без холода.",
-                "bad": "Вы заходите слишком далеко. Мелисса закрывается и дает понять, что доверие нельзя вытянуть силой.",
-            },
-            "clara_wine_trade": {
-                "good": "Вы обсуждаете с Клариссой винную лавку и рынок. Она оживляется: в этой теме есть и расчет, и игра, которые ей нравятся.",
-                "neutral": "Кларисса отвечает о торговле охотно, но держит разговор на безопасной светской дистанции.",
-                "bad": "Вы говорите о лавке слишком прямолинейно. Кларисса улыбается, но за улыбкой прячется скука.",
-            },
-            "clara_city_masks": {
-                "good": "Разговор о городских масках и слухах явно забавляет Клариссу. Она отвечает намеками и смотрит внимательнее обычного.",
-                "neutral": "Кларисса поддерживает разговор о слухах, оставляя за каждым ответом недосказанность.",
-                "bad": "Кларисса решает, что вы путаете тонкую игру со сплетней. Ее ответы становятся холоднее.",
-            },
-            "clara_drawings": {
-                "good": "Вы говорите о рисунках осторожно и без насмешки. Кларисса заметно напряжена, но в конце разговора доверия становится больше.",
-                "neutral": "Кларисса не отрицает тему рисунков, но почти все оставляет между строк.",
-                "bad": "Вы задеваете тайное увлечение слишком резко. Кларисса закрывает тему улыбкой, в которой нет тепла.",
-            },
-        },
         "flirt": {
             "amanda_tease": {
                 "good": "Вы мягко поддразниваете Аманду, и она отвечает той же монетой. В этот раз дерзость работает на сближение.",
@@ -387,17 +300,6 @@ init -39 python:
     def social_talk_session_remaining(girl_name=""):
         return max(0, int(SOCIAL_TALK_SESSION_LIMIT or 10) - social_topic_seen_count(girl_name, "talk"))
 
-    def social_talk_positive_score_today(girl_name=""):
-        prefix = "%s:%s:talk:" % (int(current_game_day() or 0), social_topic_key(girl_name))
-        total = 0
-        for seen_key, seen_value in social_topic_seen_state(girl_name).items():
-            if str(seen_key or "").startswith(prefix):
-                total += max(0, int(seen_value or 0))
-        return total
-
-    def social_talk_positive_score_remaining(girl_name=""):
-        return max(0, int(SOCIAL_TALK_SESSION_POSITIVE_CAP or 5) - social_talk_positive_score_today(girl_name))
-
     def social_player_stat_value(stat_name=""):
         stat_key = str(stat_name or "").strip().lower()
         try:
@@ -442,11 +344,10 @@ init -39 python:
                 return str(row.get("label", "") or topic_key)
         return topic_key
 
-    def social_topic_profile(girl_name="", mode="talk"):
+    def social_flirt_topic_profile(girl_name=""):
         key = social_topic_key(girl_name)
-        mode_key = str(mode or "talk").strip().lower()
-        profile = dict(dict(SOCIAL_DEFAULT_PROFILE.get(mode_key, {}) or {}))
-        profile.update(dict(dict(SOCIAL_TALK_PROFILES.get(key, {}) or {}).get(mode_key, {}) or {}))
+        profile = dict(SOCIAL_DEFAULT_FLIRT_PROFILE)
+        profile.update(dict(dict(SOCIAL_FLIRT_PROFILES.get(key, {}) or {}).get("flirt", {}) or {}))
         return profile
 
     def social_favorite_topic_ids(girl_name=""):
@@ -467,6 +368,8 @@ init -39 python:
             return False
         if mode_key == "talk" and social_topic_already_seen(key, mode_key, topic_key):
             return False
+        if mode_key == "talk":
+            return any(str(row.get("id", "") or "") == topic_key for row in SOCIAL_TALK_TOPICS)
         if mode_key == "flirt" and social_flirted_today_value(key) > 0:
             return False
         if mode_key == "flirt" and not social_external_requirement_met(key, "flirt"):
@@ -481,10 +384,6 @@ init -39 python:
                 return False
             if social_open_value(key) < int(row.get("min_open", 0) or 0):
                 return False
-            if mode_key == "talk" and bool(row.get("private", False)):
-                private_allowed, private_reason = relationship_social_action_allowed(key, "private_talk")
-                if not private_allowed:
-                    return False
             if mode_key == "flirt" and social_corruption_value(key) < int(row.get("min_slut", 0) or 0):
                 return False
             return True
@@ -504,10 +403,11 @@ init -39 python:
         key = social_topic_key(girl_name)
         mode_key = str(mode or "talk").strip().lower()
         topic_key = str(topic_id or "").strip()
-        base = int(social_topic_profile(key, mode_key).get(topic_key, 0) or 0)
+        if mode_key == "talk":
+            points = procedural_randint(1, 2, "social_talk_%s_%s_%s" % (key, topic_key, current_game_day()))
+            return points if topic_key in social_favorite_topic_ids(key) else -points
+        base = int(social_flirt_topic_profile(key).get(topic_key, 0) or 0)
         mood = 0
-        if mode_key == "talk" and topic_key in social_favorite_topic_ids(key):
-            mood += 2
         if social_rel_value(key) >= 10:
             mood += 1
         if social_open_value(key) >= 8:
@@ -552,7 +452,10 @@ init -39 python:
     def social_topic_text(girl_name="", mode="talk", topic_id="", score=0):
         mode_key = str(mode or "talk").strip().lower()
         topic_key = str(topic_id or "").strip()
-        kind = social_topic_result_kind(score)
+        if mode_key == "talk":
+            kind = "good" if int(score or 0) > 0 else "bad"
+        else:
+            kind = social_topic_result_kind(score)
         text = str(dict(dict(SOCIAL_CUSTOM_TOPIC_TEXT.get(mode_key, {}) or {}).get(topic_key, {}) or {}).get(kind, "") or "")
         if not text:
             text = str(dict(dict(SOCIAL_TOPIC_TEXT.get(mode_key, {}) or {}).get(topic_key, {}) or {}).get(kind, "") or "")
@@ -568,10 +471,8 @@ init -39 python:
             allowed, reason = relationship_social_action_allowed(key, mode_key)
             return {"ok": False, "text": str(reason or "Сейчас этот разговор не складывается."), "score": 0}
         friends_before = social_rel_value(key)
-        topic_score = int(social_topic_profile(key, mode_key).get(topic_key, 0) or 0)
         score = social_topic_score(key, mode_key, topic_key)
-        if mode_key == "talk" and score > 0:
-            score = min(score, social_talk_positive_score_remaining(key))
+        topic_score = score if mode_key == "talk" else int(social_flirt_topic_profile(key).get(topic_key, 0) or 0)
         if mode_key == "flirt":
             apply_social_interaction_base(key, "flirt", score, 2 if score > 0 else 0, 30, 1, 1, 0, 0)
             if score > 0:
@@ -584,28 +485,20 @@ init -39 python:
                     info.change_social(open_delta=score)
         else:
             talk_already_today = social_talked_today_value(key) > 0
-            talk_minutes = 0 if talk_already_today else 30
             talk_today_delta = 0 if talk_already_today else 1
-            apply_social_interaction_base(key, "talk", score, 1, talk_minutes, 1, 0, 0, talk_today_delta)
-            if score > 0:
-                info = social_person_info(key)
-                if info is not None:
-                    info.change_social(open_delta=max(1, score // 2))
+            apply_social_interaction_base(key, "talk", score, 0, 5, 0, 0, 0, talk_today_delta)
         actual_score = social_score_delta_for(key, friends_before)
         social_topic_seen_state(key)[social_topic_seen_key(key, mode_key, topic_key)] = score
-        try:
-            info = people.get_info(key)
-            if info is not None and mode_key == "talk":
-                info.talkToday.add(topic_key)
-        except Exception:
-            pass
         relationship_after_social_result(key, mode_key, score, True)
-        result_text = append_social_score_message(social_topic_text(key, mode_key, topic_key, score), actual_score, True)
-        social_topic_notify_result(key, mode_key, topic_key, topic_score, score, actual_score)
-        try:
-            player_social_condition_notify(key)
-        except Exception:
-            pass
+        if mode_key == "talk":
+            result_text = append_social_score_message(social_topic_text(key, mode_key, topic_key, score), actual_score, False)
+        else:
+            result_text = append_social_score_message(social_topic_text(key, mode_key, topic_key, score), actual_score, True)
+            social_topic_notify_result(key, mode_key, topic_key, topic_score, score, actual_score)
+            try:
+                player_social_condition_notify(key)
+            except Exception:
+                pass
         return {"ok": True, "text": result_text, "score": actual_score, "raw_score": score}
 
     def social_gift_score(girl_name="", item_id="", base_gain=2):
@@ -625,7 +518,7 @@ init -39 python:
             score = max(1, min(4, base))
         else:
             score = 0
-            if key in SOCIAL_TALK_PROFILES and social_rel_value(key) < 5:
+            if key in SOCIAL_FLIRT_PROFILES and social_rel_value(key) < 5:
                 score = -2
         affinity = social_custom_gift_affinity(key, item_key)
         if affinity > 0:
@@ -647,7 +540,7 @@ init -39 python:
         score = social_gift_score(key, item_key, base_gain)
         if item_key in SOCIAL_EARLY_CARE_GIFT_IDS:
             return True, score
-        if key in SOCIAL_TALK_PROFILES and social_rel_value(key) < 3 and score <= 0:
+        if key in SOCIAL_FLIRT_PROFILES and social_rel_value(key) < 3 and score <= 0:
             return False, score
         return True, score
 
@@ -723,66 +616,77 @@ label SocialTalkTopicMenu(girl_name="", mode="talk", _social_girl="", _social_mo
     $ _social_parent_mode = str(main_ui_runtime.mode or "scene")
     if _social_parent_mode != "talk":
         $ main_ui_begin_talk_state("Разговор с %s" % _action_display_name(_social_girl), _social_girl)
-    $ _social_visible_ids = {str(row.get("id", "") or "") for row in social_visible_topic_entries(_social_girl, _social_mode)}
-    if not _social_visible_ids:
-        if _social_mode == "talk" and social_talk_session_remaining(_social_girl) <= 0:
-            $ scene_runtime.text = "На сегодня вы уже достаточно поговорили."
-        else:
-            $ scene_runtime.text = "Сейчас подходящих тем нет."
-        $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "О работе и распорядке" if _social_mode == "talk" and "job_routine" in _social_visible_ids:
-            $ _social_topic_id = "job_routine"
-        "Просто поболтать" if _social_mode == "talk" and "chat" in _social_visible_ids:
-            $ _social_topic_id = "chat"
-        "О танцах" if _social_mode == "talk" and "dances" in _social_visible_ids:
-            $ _social_topic_id = "dances"
-        "О слухах" if _social_mode == "talk" and "gossip" in _social_visible_ids:
-            $ _social_topic_id = "gossip"
-        "О лесе" if _social_mode == "talk" and "forest" in _social_visible_ids:
-            $ _social_topic_id = "forest"
-        "Послушать истории" if _social_mode == "talk" and "stories" in _social_visible_ids:
-            $ _social_topic_id = "stories"
-        "О еде" if _social_mode == "talk" and "food" in _social_visible_ids:
-            $ _social_topic_id = "food"
-        "Об одежде и внешности" if _social_mode == "talk" and "fashion" in _social_visible_ids:
-            $ _social_topic_id = "fashion"
-        "О деньгах" if _social_mode == "talk" and "money" in _social_visible_ids:
-            $ _social_topic_id = "money"
-        "О семье и доме" if _social_mode == "talk" and "family_life" in _social_visible_ids:
-            $ _social_topic_id = "family_life"
-        "Сказать игривую шутку" if _social_mode == "flirt" and "joke" in _social_visible_ids:
-            $ _social_topic_id = "joke"
-        "Мягко перейти к прикосновениям" if _social_mode == "flirt" and "kino" in _social_visible_ids:
-            $ _social_topic_id = "kino"
-        "Открыто заигрывать" if _social_mode == "flirt" and "flirt" in _social_visible_ids:
-            $ _social_topic_id = "flirt"
-        "Заговорить о близости" if _social_mode == "flirt" and "sex_topics" in _social_visible_ids:
-            $ _social_topic_id = "sex_topics"
-        "Мягко подразнить Аманду" if _social_mode == "flirt" and _social_girl == "amanda" and "amanda_tease" in _social_visible_ids:
-            $ _social_topic_id = "amanda_tease"
-        "Намекнуть на танцы и взгляды" if _social_mode == "flirt" and _social_girl == "amanda" and "amanda_dance_hint" in _social_visible_ids:
-            $ _social_topic_id = "amanda_dance_hint"
-        "Сблизиться без нажима" if _social_mode == "flirt" and _social_girl == "melissa" and "melissa_gentle" in _social_visible_ids:
-            $ _social_topic_id = "melissa_gentle"
-        "Намекнуть на укромное место" if _social_mode == "flirt" and _social_girl == "melissa" and "melissa_private_place" in _social_visible_ids:
-            $ _social_topic_id = "melissa_private_place"
-        "Сделать уважительный комплимент" if _social_mode == "flirt" and _social_girl == "sandra" and "sandra_respect" in _social_visible_ids:
-            $ _social_topic_id = "sandra_respect"
-        "Поблагодарить ее теплее обычного" if _social_mode == "flirt" and _social_girl == "sandra" and "sandra_warmth" in _social_visible_ids:
-            $ _social_topic_id = "sandra_warmth"
-        "Затеять светскую игру" if _social_mode == "flirt" and _social_girl == "clara" and "clara_clever_game" in _social_visible_ids:
-            $ _social_topic_id = "clara_clever_game"
-        "Говорить намеками" if _social_mode == "flirt" and _social_girl == "clara" and "clara_between_lines" in _social_visible_ids:
-            $ _social_topic_id = "clara_between_lines"
-        "Назад":
+    while True:
+        $ _social_visible_ids = {str(row.get("id", "") or "") for row in social_visible_topic_entries(_social_girl, _social_mode)}
+        if not _social_visible_ids:
             if _social_parent_mode != "talk":
                 $ main_ui_end_talk_state()
             return
-    $ _social_result = social_apply_topic(_social_girl, _social_mode, _social_topic_id)
-    $ scene_runtime.text = str(_social_result.get("text", "") or "")
-    $ scene_runtime.location_text = scene_runtime.text
-    $ update_stat_state()
-    if _social_parent_mode != "talk":
-        $ main_ui_end_talk_state()
-    return
+        $ _social_topic_id = ""
+        menu:
+            "О работе и распорядке" if _social_mode == "talk" and "job_routine" in _social_visible_ids:
+                $ _social_topic_id = "job_routine"
+            "Просто поболтать" if _social_mode == "talk" and "chat" in _social_visible_ids:
+                $ _social_topic_id = "chat"
+            "О танцах" if _social_mode == "talk" and "dances" in _social_visible_ids:
+                $ _social_topic_id = "dances"
+            "О слухах" if _social_mode == "talk" and "gossip" in _social_visible_ids:
+                $ _social_topic_id = "gossip"
+            "О лесе" if _social_mode == "talk" and "forest" in _social_visible_ids:
+                $ _social_topic_id = "forest"
+            "Послушать истории" if _social_mode == "talk" and "stories" in _social_visible_ids:
+                $ _social_topic_id = "stories"
+            "О еде" if _social_mode == "talk" and "food" in _social_visible_ids:
+                $ _social_topic_id = "food"
+            "Об одежде и внешности" if _social_mode == "talk" and "fashion" in _social_visible_ids:
+                $ _social_topic_id = "fashion"
+            "О деньгах" if _social_mode == "talk" and "money" in _social_visible_ids:
+                $ _social_topic_id = "money"
+            "О семье и доме" if _social_mode == "talk" and "family_life" in _social_visible_ids:
+                $ _social_topic_id = "family_life"
+            "Сказать игривую шутку" if _social_mode == "flirt" and "joke" in _social_visible_ids:
+                $ _social_topic_id = "joke"
+            "Мягко перейти к прикосновениям" if _social_mode == "flirt" and "kino" in _social_visible_ids:
+                $ _social_topic_id = "kino"
+            "Открыто заигрывать" if _social_mode == "flirt" and "flirt" in _social_visible_ids:
+                $ _social_topic_id = "flirt"
+            "Заговорить о близости" if _social_mode == "flirt" and "sex_topics" in _social_visible_ids:
+                $ _social_topic_id = "sex_topics"
+            "Мягко подразнить Аманду" if _social_mode == "flirt" and _social_girl == "amanda" and "amanda_tease" in _social_visible_ids:
+                $ _social_topic_id = "amanda_tease"
+            "Намекнуть на танцы и взгляды" if _social_mode == "flirt" and _social_girl == "amanda" and "amanda_dance_hint" in _social_visible_ids:
+                $ _social_topic_id = "amanda_dance_hint"
+            "Сблизиться без нажима" if _social_mode == "flirt" and _social_girl == "melissa" and "melissa_gentle" in _social_visible_ids:
+                $ _social_topic_id = "melissa_gentle"
+            "Намекнуть на укромное место" if _social_mode == "flirt" and _social_girl == "melissa" and "melissa_private_place" in _social_visible_ids:
+                $ _social_topic_id = "melissa_private_place"
+            "Сделать уважительный комплимент" if _social_mode == "flirt" and _social_girl == "sandra" and "sandra_respect" in _social_visible_ids:
+                $ _social_topic_id = "sandra_respect"
+            "Поблагодарить ее теплее обычного" if _social_mode == "flirt" and _social_girl == "sandra" and "sandra_warmth" in _social_visible_ids:
+                $ _social_topic_id = "sandra_warmth"
+            "Затеять светскую игру" if _social_mode == "flirt" and _social_girl == "clara" and "clara_clever_game" in _social_visible_ids:
+                $ _social_topic_id = "clara_clever_game"
+            "Говорить намеками" if _social_mode == "flirt" and _social_girl == "clara" and "clara_between_lines" in _social_visible_ids:
+                $ _social_topic_id = "clara_between_lines"
+            "Закончить разговор" if _social_mode == "talk":
+                $ scene_runtime.text = "Вы заканчиваете разговор."
+                $ scene_runtime.location_text = scene_runtime.text
+                if _social_parent_mode != "talk":
+                    $ main_ui_end_talk_state()
+                return
+            "Назад" if _social_mode != "talk":
+                if _social_parent_mode != "talk":
+                    $ main_ui_end_talk_state()
+                return
+        $ _social_result = social_apply_topic(_social_girl, _social_mode, _social_topic_id)
+        $ scene_runtime.text = str(_social_result.get("text", "") or "")
+        $ scene_runtime.location_text = scene_runtime.text
+        $ update_stat_state()
+        if _social_mode != "talk":
+            if _social_parent_mode != "talk":
+                $ main_ui_end_talk_state()
+            return
+        if social_talk_session_remaining(_social_girl) <= 0:
+            if _social_parent_mode != "talk":
+                $ main_ui_end_talk_state()
+            return

@@ -275,7 +275,7 @@ testcase external_shop_action_logic:
 )
     $ scene_runtime.text = rooms.get("MarketPlace").descriptions[0].text + "\n\n" + rooms.get("MarketPlace").descriptions[1].text + "\n\n" + rooms.get("MarketPlace").descriptions[2].text
     $ scene_runtime.location_text = scene_runtime.text
-    $ MyStallion = "test-horse"
+    $ player.horse.acquire("test-horse")
     $ scene_runtime.picture = rooms.get("MarketPlace").bg_picture
     $ _market_picture_before = str(scene_runtime.picture or "")
     $ main_ui_runtime.action_title = "Действия"
@@ -955,7 +955,6 @@ ACTUAL_ACTION_BUTTON_CLICK_CHECKS = r'''
 init -1 python:
     def external_prepare_market_click_state():
         global BlockTimeAdvance, TavernEventOngoing
-        global MyStallion
         external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 0)
         external_calendar_set_weekday(1)
         BlockTimeAdvance = 0
@@ -973,7 +972,7 @@ init -1 python:
 )
         scene_runtime.text = rooms.get("MarketPlace").descriptions[0].text + "\n\n" + rooms.get("MarketPlace").descriptions[1].text + "\n\n" + rooms.get("MarketPlace").descriptions[2].text
         scene_runtime.location_text = scene_runtime.text
-        MyStallion = "test-horse"
+        player.horse.acquire("test-horse")
         scene_runtime.picture = rooms.get("MarketPlace").bg_picture
         main_ui_runtime.action_title = "Действия"
 
@@ -1037,6 +1036,51 @@ testcase external_actual_wine_click:
     assert eval ('Купить вино' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == 'Покупка вина') timeout 20.0
     assert eval ('Купить один бочонок' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+
+testcase external_wine_store_return_restores_market_scene_once:
+    run Call("InitGameNPCs")
+    $ player.horse.remove()
+    $ player.horse.stolen_days = 0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 0)
+    $ external_calendar_set_weekday(1)
+    $ Mongol.known = True
+    $ Mongol.market_roll_day = int(current_game_day())
+    $ Mongol.market_roll = False
+    $ BlockTimeAdvance = 0
+    $ TavernEventOngoing = ""
+    $ people.get_data("clara").set_schedule([])
+    $ threads["cityBlindPirateFall"].advanceTo(threads["cityBlindPirateFall"].data.length, complete_at_end=True)
+    $ main_ui_runtime.overlay = ""
+    $ main_ui_runtime.inventory_dropdown_open = False
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.mode = "scene"
+    run Jump("WineStore")
+    advance until screen "main_ui" timeout 20.0
+    $ main_ui_runtime.mode = "talk"
+    $ main_ui_runtime.selected_char = "clara"
+    $ main_ui_runtime.girl_key = "clara"
+    $ main_ui_runtime.talk_picture = main_ui_talk_picture_path("clara")
+    $ _wine_market_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Вернуться на рынок")
+    $ _wine_market_button = "choice_panel_button_%d" % int(_wine_market_index)
+    click id _wine_market_button pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(rooms.current_code or "") == "MarketPlace") timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == str(rooms.get("MarketPlace").bg_picture or "")) timeout 5.0
+    assert eval (str(renpy.get_screen("main_ui").scope.get("_picture", "") or "") == str(rooms.get("MarketPlace").bg_picture or "")) timeout 5.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Случайное событие") timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Идти дальше"]) timeout 5.0
+    assert eval (renpy.get_screen("say") is None) timeout 5.0
+    assert eval (str(renpy.get_screen("main_ui").scope.get("_desc", "") or "") == str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (str(rooms.current_code or "") == "MarketPlace" and 'Зайти в охотничий клуб' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "scene") timeout 5.0
+    assert eval (str(main_ui_runtime.selected_char or "") == "" and str(main_ui_runtime.talk_picture or "") == "") timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == str(rooms.get("MarketPlace").bg_picture or "")) timeout 5.0
+    assert eval (str(renpy.get_screen("main_ui").scope.get("_picture", "") or "") == str(rooms.get("MarketPlace").bg_picture or "")) timeout 5.0
+    assert eval (str(scene_runtime.text or "").count(rooms.get("MarketPlace").descriptions[0].text) == 1) timeout 5.0
+    assert eval (str(scene_runtime.text or "").count(rooms.get("MarketPlace").descriptions[1].text) == 1) timeout 5.0
+    assert eval (str(scene_runtime.text or "").count(rooms.get("MarketPlace").descriptions[2].text) == 1) timeout 5.0
+    assert eval (renpy.get_screen("say") is None) timeout 5.0
 
 testcase external_actual_wine_for_dance_menu:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 0)
@@ -1313,7 +1357,7 @@ testcase external_actual_market_blind_pirate_first_entry:
     $ main_ui_runtime.inventory_dropdown_open = False
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.mode = "scene"
-    $ MyStallion = "test-horse"
+    $ player.horse.acquire("test-horse")
     run Jump("MarketPlace")
     advance until screen "choice" timeout 20.0
     assert eval (str(scene_runtime.picture or "") == "images/market/blindPirate.png") timeout 5.0
@@ -2519,8 +2563,8 @@ testcase external_mongol_market_schedule_rolls_once_per_day:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 10, 0)
     $ week = 2
-    $ MyStallion = ""
-    $ KnowMongol = 1
+    $ player.horse.remove()
+    $ Mongol.known = True
     $ threads["cityBlindPirateFall"].advanceTo(threads["cityBlindPirateFall"].data.length, complete_at_end=True)
     $ TavernEventOngoing = ""
     $ people.get_data("clara").set_schedule([])
@@ -2538,7 +2582,7 @@ testcase external_mongol_market_schedule_rolls_once_per_day:
     $ week = 2
     $ Mongol.market_roll_day = int(current_game_day())
     $ Mongol.market_roll = True
-    assert eval (str(MyStallion or "") == "") timeout 5.0
+    assert eval (not player.horse.owns_horse()) timeout 5.0
     assert eval (rooms.get("MarketPlace").is_open()) timeout 5.0
     assert eval (Mongol.market_roll_day == int(current_game_day()) and Mongol.market_roll) timeout 5.0
     assert eval (marketplace_mongol_visible()) timeout 5.0
@@ -3497,7 +3541,7 @@ testcase external_sandra_talk_opens_from_npc_button:
     click id "main_ui_entity_button_npc_sandra" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and str(main_ui_runtime.action_title or "") == "Разговор с Сандрой" and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval ("Осмотреть" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Назад" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    assert eval ("Поговорить" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Поговорить" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Флиртовать" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Подарить маленький подарок" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Коснуться ее смелее" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
@@ -5715,15 +5759,37 @@ testcase external_smalltalk_main_ui_portraits:
 
     $ _talk_girl = "amanda"
     $ external_prepare_smalltalk_picture_check(_talk_girl)
-    run Call("SocialTalkTopicMenu", _talk_girl, "talk")
+    $ Amanda.rel = 10
+    $ _smalltalk_clock_before = int(calendar_v2.clock_minutes() or 0)
+    $ _smalltalk_rel_before = int(Amanda.rel or 0)
+    run Call("IntAmandaTalk", _talk_girl)
     advance until screen "choice" timeout 20.0
+    $ _smalltalk_talk_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Поговорить")
+    $ _smalltalk_talk_button_id = "choice_panel_button_%d" % int(_smalltalk_talk_index)
+    click id _smalltalk_talk_button_id pos (0.5, 0.5) until eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) == 11) timeout 20.0
     assert eval (renpy.get_screen("main_ui") is not None and renpy.get_screen("choice") is not None and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
     assert eval (str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "") == _talk_girl) timeout 5.0
     assert eval (str(main_ui_runtime.talk_picture or "") == str(main_ui_talk_picture_path(_talk_girl) or "") and renpy.loadable(main_ui_runtime.talk_picture)) timeout 5.0
-    assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) > 1) timeout 5.0
+    assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) == 11) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 1) timeout 20.0
+    assert eval (renpy.get_screen("choice") is not None and int(calendar_v2.clock_minutes() or 0) - _smalltalk_clock_before == 5) timeout 5.0
+    assert eval (renpy.get_screen("say") is None) timeout 5.0
+    assert eval (renpy.get_screen("notify") is None) timeout 5.0
+    assert eval (_smalltalk_rel_before - int(Amanda.rel or 0) in (1, 2)) timeout 5.0
+    assert eval ("О работе и распорядке" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _smalltalk_rel_after_bad = int(Amanda.rel or 0)
+    $ _smalltalk_favorite_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("О танцах")
+    $ _smalltalk_favorite_button_id = "choice_panel_button_%d" % int(_smalltalk_favorite_index)
+    click id _smalltalk_favorite_button_id pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 2) timeout 20.0
+    assert eval (renpy.get_screen("choice") is not None and int(calendar_v2.clock_minutes() or 0) - _smalltalk_clock_before == 10) timeout 5.0
+    assert eval (int(Amanda.rel or 0) - _smalltalk_rel_after_bad in (1, 2)) timeout 5.0
+    $ _smalltalk_quit_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    $ _smalltalk_quit_button_id = "choice_panel_button_%d" % int(_smalltalk_quit_index)
+    click id _smalltalk_quit_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Осмотреть" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Назад" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (renpy.get_screen("say") is None) timeout 5.0
+    assert eval (int(calendar_v2.clock_minutes() or 0) - _smalltalk_clock_before == 10) timeout 5.0
     $ _smalltalk_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
     $ _smalltalk_back_button_id = "choice_panel_button_%d" % int(_smalltalk_back_index)
-    scroll amount 20 pos (1700, 760)
     click id _smalltalk_back_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
 
     $ _talk_girl = "melissa"
@@ -5734,10 +5800,9 @@ testcase external_smalltalk_main_ui_portraits:
     assert eval (str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "") == _talk_girl) timeout 5.0
     assert eval (str(main_ui_runtime.talk_picture or "") == str(main_ui_talk_picture_path(_talk_girl) or "") and renpy.loadable(main_ui_runtime.talk_picture)) timeout 5.0
     assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) > 1) timeout 5.0
-    $ _smalltalk_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
-    $ _smalltalk_back_button_id = "choice_panel_button_%d" % int(_smalltalk_back_index)
-    scroll amount 20 pos (1700, 760)
-    click id _smalltalk_back_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+    $ _smalltalk_quit_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    $ _smalltalk_quit_button_id = "choice_panel_button_%d" % int(_smalltalk_quit_index)
+    click id _smalltalk_quit_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
 
     $ _talk_girl = "sandra"
     $ external_prepare_smalltalk_picture_check(_talk_girl)
@@ -5747,23 +5812,31 @@ testcase external_smalltalk_main_ui_portraits:
     assert eval (str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "") == _talk_girl) timeout 5.0
     assert eval (str(main_ui_runtime.talk_picture or "") == str(main_ui_talk_picture_path(_talk_girl) or "") and renpy.loadable(main_ui_runtime.talk_picture)) timeout 5.0
     assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) > 1) timeout 5.0
-    $ _smalltalk_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
-    $ _smalltalk_back_button_id = "choice_panel_button_%d" % int(_smalltalk_back_index)
-    scroll amount 20 pos (1700, 760)
-    click id _smalltalk_back_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+    $ _smalltalk_quit_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    $ _smalltalk_quit_button_id = "choice_panel_button_%d" % int(_smalltalk_quit_index)
+    click id _smalltalk_quit_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
 
     $ _talk_girl = "clara"
     $ external_prepare_smalltalk_picture_check(_talk_girl)
+    $ _smalltalk_clock_before = int(calendar_v2.clock_minutes() or 0)
     run Call("SocialTalkTopicMenu", _talk_girl, "talk")
     advance until screen "choice" timeout 20.0
     assert eval (renpy.get_screen("main_ui") is not None and renpy.get_screen("choice") is not None and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
     assert eval (str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "") == _talk_girl) timeout 5.0
     assert eval (str(main_ui_runtime.talk_picture or "") == str(main_ui_talk_picture_path(_talk_girl) or "") and renpy.loadable(main_ui_runtime.talk_picture)) timeout 5.0
     assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) > 1) timeout 5.0
-    $ _smalltalk_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
-    $ _smalltalk_back_button_id = "choice_panel_button_%d" % int(_smalltalk_back_index)
-    scroll amount 20 pos (1700, 760)
-    click id _smalltalk_back_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 1) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 2) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 3) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 4) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 5) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 6) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 7) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 8) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 9) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (social_topic_seen_count(_talk_girl, "talk") == 10 and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (int(calendar_v2.clock_minutes() or 0) - _smalltalk_clock_before == 50) timeout 5.0
+    assert eval (social_talk_session_remaining(_talk_girl) == 0) timeout 5.0
 '''
 
 
@@ -5977,6 +6050,7 @@ def main() -> int:
             "external_main_ui_does_not_repeat_active_dialogue_text",
             "external_actual_grocery_click",
             "external_actual_wine_click",
+            "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
             "external_tavern_random_event_plan_consumes_once",
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
@@ -6131,6 +6205,7 @@ def main() -> int:
             "external_main_ui_does_not_repeat_active_dialogue_text",
             "external_actual_grocery_click",
             "external_actual_wine_click",
+            "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
             "external_tavern_random_event_plan_consumes_once",
             "external_tavern_unwitnessed_event_report_consumes_leftovers",

@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntAmandaTalk(girl_name="amanda"):
-    $ renpy.dynamic("_legare_text", "_can_dress_change", "_dad_phrase", "_amanda_special_entry")
+    $ renpy.dynamic("_legare_text", "_can_dress_change", "_dad_phrase", "_amanda_special_entry", "_amanda_repeat_menu")
     $ main_ui_begin_talk_state("Разговор с Амандой", girl_name)
     $ main_ui_runtime.action_title = "Разговор с Амандой"
     $ main_ui_runtime.action_content = None
@@ -13,52 +13,56 @@ label IntAmandaTalk(girl_name="amanda"):
     $ _can_dress_change = Amanda.dress_change_has_options()
     $ _dad_phrase = DaddyAskBuildPhrase(girl_name) if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and int(Amanda.rel or 0) >= 8 and Amanda.pregnancy_days() >= 120 else ""
     $ _amanda_special_entry = household_special_talk_entry(girl_name) if int(Amanda.asked_today or 0) == 0 and household_special_talk_available(girl_name) else None
-    menu:
-        "Осмотреть":
-            call ShowGirlCard(girl_name)
-        "Поговорить" if old_point_smalltalk_available(girl_name):
-            call OldPointSmallTalkMenu(girl_name)
-        "Флиртовать" if old_point_action_unlocked(girl_name, "flirt"):
-            call OldPointFlirtAttempt(girl_name)
-        "Подарить маленький подарок" if old_point_action_unlocked(girl_name, "gift"):
-            call PlayerCardGiftToFixedTargetMenu(girl_name)
-        "Коснуться ее смелее" if old_point_action_unlocked(girl_name, "kino"):
-            call OldPointKinoAttempt(girl_name)
-        "Извиниться перед Амандой" if old_point_apology_available(girl_name):
-            call OldPointApology(girl_name)
-        "Сказать Аманде что вы передумали и она может встречаться с Альбером" if int(Amanda.talked_today or 0) < 3 and Amanda.legare_forbidden:
-            call IntAmandaAllowAlber(girl_name)
-        "Разрешить Аманде болтать с Лизеттой" if int(Amanda.talked_today or 0) < 3 and Amanda.var_int("prohibitliza", 0) > 0:
-            call IntAmandaAllowLiza(girl_name)
-        "Сказать Аманде что она может ходить к Лизетте в глорихолл" if int(Amanda.talked_today or 0) < 3 and Amanda.var_int("gloryscold", 0) > 0:
-            call IntAmandaAllowGlory(girl_name)
-        "Сказать Аманде что она может встречаться с парнями" if int(Amanda.talked_today or 0) < 3 and Amanda.var_int("prohibitwithguys", 0) > 0:
-            call IntAmandaAllowGuys(girl_name)
-        "Сказать Аманде что она может иногда брать перерывы" if int(Amanda.talked_today or 0) < 3 and Amanda.warned_about_not_working:
-            call IntAmandaAllowBreaks(girl_name)
-        "Спросить где она потеряла девственность" if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and Amanda.var_int("knownotvirgin", 0) > 0 and not Amanda.player_knows_legare_deflowered and Amanda.lost_virginity_to_legare:
-            call IntAmandaAskVirginity(girl_name)
-        "[_legare_text]" if int(Amanda.talked_today or 0) < 3 and Amanda.player_knows_legare_sex and not Amanda.legare_forbidden:
-            call IntAmandaBanAlber(girl_name)
-        "Запретить ей трахаться с соседскими парнями" if int(Amanda.talked_today or 0) < 3 and Amanda.var_int("sawwithguys", 0) > 0 and Amanda.var_int("prohibitwithguys", 0) == 0:
-            call IntAmandaBanGuys(girl_name)
-        "Спросить не боиться ли она залететь" if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and Amanda.var_int("knowsexactive", 0) > 0 and Amanda.pregnancy_days() < 120 and not Amanda.pregnancy_risk_asked_today and not Amanda.sex_stat("virginity", True):
-            call IntAmandaAskPregnancy(girl_name)
-        "Спросить, знает ли она от кого пузо нагуляла" if str(_dad_phrase or "") != "":
-            call IntAmandaAskDad(girl_name)
-        "Попросить у Аманды ее ночную миску" if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and Amanda.can_be_asked_for_night_bowl():
-            call IntAmandaAskNightBowl(girl_name)
-        "Подарить Аманде красивую ночную миску" if Amanda.can_receive_fancy_night_bowl():
-            call IntAmandaGiftFancyNightBowl(girl_name)
-        "[_amanda_special_entry.get('label', 'Спросить о чем-то важном')]" if _amanda_special_entry is not None:
-            call IntAmandaHouseholdInsight(girl_name)
-        "Спросить, чего ей сейчас хочется больше всего" if int(Amanda.asked_today or 0) == 0 and int(Amanda.rel or 0) >= 15:
-            call IntAmandaHouseholdPriorities(girl_name)
-        "Переодеть Аманду" if _can_dress_change:
-            call int_amanda_dress_change(girl_name)
-        "Назад":
-            $ main_ui_end_talk_state()
-            return
+    $ _amanda_repeat_menu = True
+    while _amanda_repeat_menu:
+        $ _amanda_repeat_menu = False
+        menu:
+            "Осмотреть":
+                call ShowGirlCard(girl_name)
+            "Поговорить" if social_has_visible_topics(girl_name, "talk"):
+                call SocialTalkTopicMenu(girl_name, "talk")
+                $ _amanda_repeat_menu = True
+            "Флиртовать" if old_point_action_unlocked(girl_name, "flirt"):
+                call OldPointFlirtAttempt(girl_name)
+            "Подарить маленький подарок" if old_point_action_unlocked(girl_name, "gift"):
+                call PlayerCardGiftToFixedTargetMenu(girl_name)
+            "Коснуться ее смелее" if old_point_action_unlocked(girl_name, "kino"):
+                call OldPointKinoAttempt(girl_name)
+            "Извиниться перед Амандой" if old_point_apology_available(girl_name):
+                call OldPointApology(girl_name)
+            "Сказать Аманде что вы передумали и она может встречаться с Альбером" if int(Amanda.talked_today or 0) < 3 and Amanda.legare_forbidden:
+                call IntAmandaAllowAlber(girl_name)
+            "Разрешить Аманде болтать с Лизеттой" if int(Amanda.talked_today or 0) < 3 and Amanda.var_int("prohibitliza", 0) > 0:
+                call IntAmandaAllowLiza(girl_name)
+            "Сказать Аманде что она может ходить к Лизетте в глорихолл" if int(Amanda.talked_today or 0) < 3 and Amanda.var_int("gloryscold", 0) > 0:
+                call IntAmandaAllowGlory(girl_name)
+            "Сказать Аманде что она может встречаться с парнями" if int(Amanda.talked_today or 0) < 3 and Amanda.var_int("prohibitwithguys", 0) > 0:
+                call IntAmandaAllowGuys(girl_name)
+            "Сказать Аманде что она может иногда брать перерывы" if int(Amanda.talked_today or 0) < 3 and Amanda.warned_about_not_working:
+                call IntAmandaAllowBreaks(girl_name)
+            "Спросить где она потеряла девственность" if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and Amanda.var_int("knownotvirgin", 0) > 0 and not Amanda.player_knows_legare_deflowered and Amanda.lost_virginity_to_legare:
+                call IntAmandaAskVirginity(girl_name)
+            "[_legare_text]" if int(Amanda.talked_today or 0) < 3 and Amanda.player_knows_legare_sex and not Amanda.legare_forbidden:
+                call IntAmandaBanAlber(girl_name)
+            "Запретить ей трахаться с соседскими парнями" if int(Amanda.talked_today or 0) < 3 and Amanda.var_int("sawwithguys", 0) > 0 and Amanda.var_int("prohibitwithguys", 0) == 0:
+                call IntAmandaBanGuys(girl_name)
+            "Спросить не боиться ли она залететь" if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and Amanda.var_int("knowsexactive", 0) > 0 and Amanda.pregnancy_days() < 120 and not Amanda.pregnancy_risk_asked_today and not Amanda.sex_stat("virginity", True):
+                call IntAmandaAskPregnancy(girl_name)
+            "Спросить, знает ли она от кого пузо нагуляла" if str(_dad_phrase or "") != "":
+                call IntAmandaAskDad(girl_name)
+            "Попросить у Аманды ее ночную миску" if int(Amanda.asked_today or 0) == 0 and int(Amanda.talked_today or 0) < 3 and Amanda.can_be_asked_for_night_bowl():
+                call IntAmandaAskNightBowl(girl_name)
+            "Подарить Аманде красивую ночную миску" if Amanda.can_receive_fancy_night_bowl():
+                call IntAmandaGiftFancyNightBowl(girl_name)
+            "[_amanda_special_entry.get('label', 'Спросить о чем-то важном')]" if _amanda_special_entry is not None:
+                call IntAmandaHouseholdInsight(girl_name)
+            "Спросить, чего ей сейчас хочется больше всего" if int(Amanda.asked_today or 0) == 0 and int(Amanda.rel or 0) >= 15:
+                call IntAmandaHouseholdPriorities(girl_name)
+            "Переодеть Аманду" if _can_dress_change:
+                call int_amanda_dress_change(girl_name)
+            "Назад":
+                $ main_ui_end_talk_state()
+                return
     return
 
 

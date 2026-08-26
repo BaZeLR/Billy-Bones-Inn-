@@ -144,14 +144,13 @@ def test_item_consumption_uses_direct_action_labels_without_apply_dispatcher():
     assert 'label EatItem(what_id="", where_id="", fallback_text="", object_id=""):' in source
 
 
-def test_old_point_smalltalk_choices_apply_topics_without_label_wrappers():
-    source = read("game/NPC/Girls/Common/OldPointTalkSystem.rpy")
+def test_old_point_system_no_longer_duplicates_authoritative_smalltalk():
+    old_point = read("game/NPC/Girls/Common/OldPointTalkSystem.rpy")
+    amanda = read("game/NPC/Girls/Amanda/IntAmandaTalk.rpy")
 
-    assert "OldPointSmallTalkApply" not in source
-    assert "OldPointSmallTalkFinish" not in source
-    assert "menu:" in source
-    assert "old_point_smalltalk_apply(_old_talk_name" in source
-    assert "old_point_smalltalk_finish(_old_talk_name)" in source
+    assert "old_point_smalltalk" not in old_point
+    assert "OldPointSmallTalkMenu" not in old_point
+    assert 'call SocialTalkTopicMenu(girl_name, "talk")' in amanda
 
 
 def test_tavern_report_actions_call_job_owners_without_dispatch_labels():

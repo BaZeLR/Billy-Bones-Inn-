@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntSandraTalk(girl_name="sandra"):
-    $ renpy.dynamic("_sandra_special_entry")
+    $ renpy.dynamic("_sandra_special_entry", "_sandra_repeat_menu")
     $ main_ui_begin_talk_state("Разговор с Сандрой", girl_name)
     $ main_ui_runtime.action_title = "Разговор с Сандрой"
     $ main_ui_runtime.action_content = None
@@ -10,22 +10,28 @@ label IntSandraTalk(girl_name="sandra"):
         $ scene_runtime.text = "Сандра внимательно смотрит на вас, ожидая, что вы скажете."
         $ scene_runtime.location_text = scene_runtime.text
     $ _sandra_special_entry = household_special_talk_entry(girl_name) if int(Sandra.asked_today or 0) == 0 and household_special_talk_available(girl_name) else None
-    menu:
-        "Осмотреть":
-            call ShowGirlCard(girl_name)
-        "Попробовать помириться с мамой" if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:
-            call IntSandraReconcile(girl_name)
-        "Предложить купить мамуле обновку" if sandra_dress_change_can_buy(girl_name):
-            call IntSandraOfferBuyDress(girl_name)
-        "[_sandra_special_entry.get('label', 'Спросить о чем-то важном')]" if _sandra_special_entry is not None:
-            call IntSandraHouseholdInsight(girl_name)
-        "Спросить, что для нее сейчас важнее всего по хозяйству" if int(Sandra.asked_today or 0) == 0 and int(Sandra.rel or 0) >= 15:
-            call IntSandraHouseholdPriorities(girl_name)
-        "Уединиться с Сандрой" if threads["sandraWeeklyEvaluation"].completed and str(rooms.current_code or "") == "TavernSandraRoom":
-            call SandraSexEngine(girl_name, rooms.current_code)
-        "Назад":
-            $ main_ui_end_talk_state()
-            return
+    $ _sandra_repeat_menu = True
+    while _sandra_repeat_menu:
+        $ _sandra_repeat_menu = False
+        menu:
+            "Осмотреть":
+                call ShowGirlCard(girl_name)
+            "Поговорить" if social_has_visible_topics(girl_name, "talk"):
+                call SocialTalkTopicMenu(girl_name, "talk")
+                $ _sandra_repeat_menu = True
+            "Попробовать помириться с мамой" if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:
+                call IntSandraReconcile(girl_name)
+            "Предложить купить мамуле обновку" if sandra_dress_change_can_buy(girl_name):
+                call IntSandraOfferBuyDress(girl_name)
+            "[_sandra_special_entry.get('label', 'Спросить о чем-то важном')]" if _sandra_special_entry is not None:
+                call IntSandraHouseholdInsight(girl_name)
+            "Спросить, что для нее сейчас важнее всего по хозяйству" if int(Sandra.asked_today or 0) == 0 and int(Sandra.rel or 0) >= 15:
+                call IntSandraHouseholdPriorities(girl_name)
+            "Уединиться с Сандрой" if threads["sandraWeeklyEvaluation"].completed and str(rooms.current_code or "") == "TavernSandraRoom":
+                call SandraSexEngine(girl_name, rooms.current_code)
+            "Назад":
+                $ main_ui_end_talk_state()
+                return
     return
 
 

@@ -536,31 +536,30 @@ def check_social_topics(project_root: Path, report: RuntimeLogicReport) -> None:
         report.fail("social", "SocialTalkTopics.rpy is missing")
         return
     source = read_text(path)
-    expr = extract_python_assignment(source, "SOCIAL_TALK_PROFILES")
+    expr = extract_python_assignment(source, "SOCIAL_FLIRT_PROFILES")
     if not expr:
-        report.fail("social", "SOCIAL_TALK_PROFILES assignment was not found")
+        report.fail("social", "SOCIAL_FLIRT_PROFILES assignment was not found")
         return
     try:
         profiles = ast.literal_eval(expr)
     except Exception as exc:
-        report.fail("social", f"SOCIAL_TALK_PROFILES cannot be parsed: {exc}")
+        report.fail("social", f"SOCIAL_FLIRT_PROFILES cannot be parsed: {exc}")
         return
     for person in CORE_PEOPLE:
         if person not in profiles:
-            report.fail("social", f"{person} has no talk profile")
+            report.fail("social", f"{person} has no flirt profile")
             continue
         row = profiles.get(person, {})
-        for mode in ("talk", "flirt"):
-            mode_scores = row.get(mode, {})
-            if not isinstance(mode_scores, dict) or not mode_scores:
-                report.fail("social", f"{person} has no {mode} scores")
-                continue
-            for topic, value in mode_scores.items():
-                if not isinstance(value, int):
-                    report.fail("social", f"{person}/{mode}/{topic} score is not int")
-                elif value < -5 or value > 5:
-                    report.fail("social", f"{person}/{mode}/{topic} score {value} outside -5..+5")
-    report.pass_("social", "core talk/flirt topic scores are present and bounded")
+        mode_scores = row.get("flirt", {})
+        if not isinstance(mode_scores, dict) or not mode_scores:
+            report.fail("social", f"{person} has no flirt scores")
+            continue
+        for topic, value in mode_scores.items():
+            if not isinstance(value, int):
+                report.fail("social", f"{person}/flirt/{topic} score is not int")
+            elif value < -5 or value > 5:
+                report.fail("social", f"{person}/flirt/{topic} score {value} outside -5..+5")
+    report.pass_("social", "core flirt topic scores are present and bounded")
 
 
 def collect_game_item_ids(project_root: Path) -> set[str]:

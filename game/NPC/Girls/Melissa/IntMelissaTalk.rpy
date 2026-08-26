@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntMelissaTalk(girl_name="melissa"):
-    $ renpy.dynamic("_melissa_talk_new", "_melissa_special_entry", "_melissa_bat_caption")
+    $ renpy.dynamic("_melissa_talk_new", "_melissa_special_entry", "_melissa_bat_caption", "_melissa_repeat_menu")
     $ _melissa_talk_new = str(main_ui_runtime.mode or "") != "talk" or str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "").strip().lower() != str(girl_name or "melissa").strip().lower()
     $ main_ui_begin_talk_state("Разговор с Мелиссой", girl_name)
     $ main_ui_runtime.action_title = "Разговор с Мелиссой"
@@ -12,59 +12,65 @@ label IntMelissaTalk(girl_name="melissa"):
         $ scene_runtime.location_text = scene_runtime.text
     $ _melissa_special_entry = household_special_talk_entry(girl_name) if int(Melissa.asked_today or 0) == 0 and household_special_talk_available(girl_name) else None
     $ _melissa_bat_caption = Melissa.bat_completion_talk_caption()
-    menu:
-        "Осмотреть":
-            call ShowGirlCard(girl_name)
-        "Послушать, что Мелисса скажет о кладовой" if melissa_storage_thanks_available():
-            $ Melissa.storage_thanks_day = int(current_game_day() or 0)
-            $ Melissa.change_social(friend_delta=1)
-            $ scene_runtime.text = "Мелисса сама возвращается к теме кладовой и уже без колкости благодарит вас за помощь. \"Когда знаешь, что с этой дрянью внизу не придется возиться одной, работать куда легче,\" говорит она. Потом, помедлив, добавляет, что если крысы опять полезут к мешкам, она скорее позовет вас сразу, чем будет молча злиться."
-            $ scene_runtime.location_text = scene_runtime.text
-        "Спросить Мелиссу о найденных рисунках" if story_event_available("talk_melissa", "clara_paintings"):
-            call checkTriggers("talk_melissa", "clara_paintings", 0)
-        "[_melissa_bat_caption]" if story_event_available(str(rooms.current_code or ""), "melissa_talk"):
-            call checkTriggers(rooms.current_code, "melissa_talk", 0)
-        "Обсудить, где Мелиссе переночевать" if melissa_room_problem_available():
-            call IntMelissaRoomProblemAdviceMenu(girl_name)
-        "Уединиться с Мелиссой" if Melissa.relationship_allows("intimacy") and Melissa.room_is_private(rooms.current_code):
-            call IntMelissaSex(girl_name, rooms.current_code)
-        "Найти укромное место с Мелиссой" if Melissa.relationship_allows("intimacy") and bool(Melissa.private_place_offer(rooms.current_code).get("ok", False)):
-            call IntMelissaFindPrivatePlace(girl_name, rooms.current_code)
-        "Сблизиться с Мелиссой" if Melissa.relationship_allows("start") and people_to_int(Melissa.intimacy_start_day, -1) != int(current_game_day() or 0):
-            call IntMelissaStartMenu(girl_name)
-        "Спросить Мелиссу о Клариссе" if str(rooms.current_code or "") == "TavernMain" and str(people.location("clara") or "") == "TavernMain" and people_to_int(Melissa.asked_about_clara_day, -1) != int(current_game_day() or 0) and int(Melissa.asked_today or 0) == 0:
-            $ Melissa.mark_asked()
-            $ Melissa.asked_about_clara_day = int(current_game_day() or 0)
-            $ Melissa.change_social(friend_delta=1)
-            $ scene_runtime.text = "Вы осторожно расспрашиваете Мелиссу о Клариссе. Мелисса с улыбкой признается, что Кларисса любит заглядывать к вам не только ради болтовни, а еще потому, что у вас в трактире ей заметно свободнее дышится. «Она хорошая, просто привыкла скрывать это за светскими манерами», - тихо добавляет Мелисса."
-            $ scene_runtime.location_text = scene_runtime.text
-        "[_melissa_special_entry.get('label', 'Спросить о чем-то важном')]" if _melissa_special_entry is not None:
-            $ Melissa.mark_asked()
-            $ Melissa.mark_talked()
-            $ Melissa.change_social(friend_delta=1, open_delta=1)
-            $ household_advance_special_talk(girl_name)
-            $ scene_runtime.text = str(_melissa_special_entry.get("text", "") or "")
-            $ scene_runtime.location_text = scene_runtime.text
-        "Попробовать помириться с Мелиссой" if int(Melissa.talked_today or 0) < 3 and int(Melissa.rel or 0) < 5:
-            $ scene_runtime.text = "Вы подошли к своей сестренке и извинились за то, что были к ней несколько невнимательны и грубы последнее время. В свое оправдание вы заметили, что уберечь трактир от разорения очень сложно и вы все должны дружно работать вместе, чтобы преуспеть."
-            if procedural_randint(1, 3, key="procedural:NPC/Girls/Melissa/IntMelissaTalk.rpy:reconcile") == 1:
-                $ scene_runtime.text += "\n\nМелисса благосклонно выслушала вас, обняла, поцеловала в щечку и сказала, что вы для нее всегда будете любимым братом и она все понимает!"
-                call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)
-            else:
-                $ scene_runtime.text += "\n\nМелисса холодно выслушала вас, презрительно отвернулась и пошла прочь."
-            $ Melissa.mark_talked()
-            $ scene_runtime.location_text = scene_runtime.text
-        "Предложить купить сестренке обновку" if int(Melissa.rel or 0) > 8 and daily_events.exists("", "BuyDressTom") == 0 and daily_events.exists(girl_name, "BuyDress") == 0 and int(Melissa.talked_today or 0) < 2 and int(calendar_v2.week or 0) != 6:
-            call IntMelissaDressChange(girl_name)
-        "Спросить, что для нее сейчас важнее всего" if int(Melissa.asked_today or 0) == 0 and int(Melissa.rel or 0) >= 15:
-            $ Melissa.mark_asked()
-            $ Melissa.mark_talked()
-            $ Melissa.change_social(friend_delta=1, open_delta=1)
-            $ scene_runtime.text = "Вы спрашиваете Мелиссу, что для нее сейчас важнее всего. Она на миг задумывается, потом отвечает спокойно и неожиданно открыто.\n\n\"Чтобы в доме было тише и ровнее. Чтобы можно было работать без постоянной ругани и чтобы меня не дергали по пустякам. Но еще мне важно знать, что меня здесь слушают, а не просто считают одной из рабочих рук,\" говорит Мелисса, поднимая на вас внимательный взгляд."
-            $ scene_runtime.location_text = scene_runtime.text
-        "Назад":
-            $ main_ui_end_talk_state()
-            return
+    $ _melissa_repeat_menu = True
+    while _melissa_repeat_menu:
+        $ _melissa_repeat_menu = False
+        menu:
+            "Осмотреть":
+                call ShowGirlCard(girl_name)
+            "Поговорить" if social_has_visible_topics(girl_name, "talk"):
+                call SocialTalkTopicMenu(girl_name, "talk")
+                $ _melissa_repeat_menu = True
+            "Послушать, что Мелисса скажет о кладовой" if melissa_storage_thanks_available():
+                $ Melissa.storage_thanks_day = int(current_game_day() or 0)
+                $ Melissa.change_social(friend_delta=1)
+                $ scene_runtime.text = "Мелисса сама возвращается к теме кладовой и уже без колкости благодарит вас за помощь. \"Когда знаешь, что с этой дрянью внизу не придется возиться одной, работать куда легче,\" говорит она. Потом, помедлив, добавляет, что если крысы опять полезут к мешкам, она скорее позовет вас сразу, чем будет молча злиться."
+                $ scene_runtime.location_text = scene_runtime.text
+            "Спросить Мелиссу о найденных рисунках" if story_event_available("talk_melissa", "clara_paintings"):
+                call checkTriggers("talk_melissa", "clara_paintings", 0)
+            "[_melissa_bat_caption]" if story_event_available(str(rooms.current_code or ""), "melissa_talk"):
+                call checkTriggers(rooms.current_code, "melissa_talk", 0)
+            "Обсудить, где Мелиссе переночевать" if melissa_room_problem_available():
+                call IntMelissaRoomProblemAdviceMenu(girl_name)
+            "Уединиться с Мелиссой" if Melissa.relationship_allows("intimacy") and Melissa.room_is_private(rooms.current_code):
+                call IntMelissaSex(girl_name, rooms.current_code)
+            "Найти укромное место с Мелиссой" if Melissa.relationship_allows("intimacy") and bool(Melissa.private_place_offer(rooms.current_code).get("ok", False)):
+                call IntMelissaFindPrivatePlace(girl_name, rooms.current_code)
+            "Сблизиться с Мелиссой" if Melissa.relationship_allows("start") and people_to_int(Melissa.intimacy_start_day, -1) != int(current_game_day() or 0):
+                call IntMelissaStartMenu(girl_name)
+            "Спросить Мелиссу о Клариссе" if str(rooms.current_code or "") == "TavernMain" and str(people.location("clara") or "") == "TavernMain" and people_to_int(Melissa.asked_about_clara_day, -1) != int(current_game_day() or 0) and int(Melissa.asked_today or 0) == 0:
+                $ Melissa.mark_asked()
+                $ Melissa.asked_about_clara_day = int(current_game_day() or 0)
+                $ Melissa.change_social(friend_delta=1)
+                $ scene_runtime.text = "Вы осторожно расспрашиваете Мелиссу о Клариссе. Мелисса с улыбкой признается, что Кларисса любит заглядывать к вам не только ради болтовни, а еще потому, что у вас в трактире ей заметно свободнее дышится. «Она хорошая, просто привыкла скрывать это за светскими манерами», - тихо добавляет Мелисса."
+                $ scene_runtime.location_text = scene_runtime.text
+            "[_melissa_special_entry.get('label', 'Спросить о чем-то важном')]" if _melissa_special_entry is not None:
+                $ Melissa.mark_asked()
+                $ Melissa.mark_talked()
+                $ Melissa.change_social(friend_delta=1, open_delta=1)
+                $ household_advance_special_talk(girl_name)
+                $ scene_runtime.text = str(_melissa_special_entry.get("text", "") or "")
+                $ scene_runtime.location_text = scene_runtime.text
+            "Попробовать помириться с Мелиссой" if int(Melissa.talked_today or 0) < 3 and int(Melissa.rel or 0) < 5:
+                $ scene_runtime.text = "Вы подошли к своей сестренке и извинились за то, что были к ней несколько невнимательны и грубы последнее время. В свое оправдание вы заметили, что уберечь трактир от разорения очень сложно и вы все должны дружно работать вместе, чтобы преуспеть."
+                if procedural_randint(1, 3, key="procedural:NPC/Girls/Melissa/IntMelissaTalk.rpy:reconcile") == 1:
+                    $ scene_runtime.text += "\n\nМелисса благосклонно выслушала вас, обняла, поцеловала в щечку и сказала, что вы для нее всегда будете любимым братом и она все понимает!"
+                    call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)
+                else:
+                    $ scene_runtime.text += "\n\nМелисса холодно выслушала вас, презрительно отвернулась и пошла прочь."
+                $ Melissa.mark_talked()
+                $ scene_runtime.location_text = scene_runtime.text
+            "Предложить купить сестренке обновку" if int(Melissa.rel or 0) > 8 and daily_events.exists("", "BuyDressTom") == 0 and daily_events.exists(girl_name, "BuyDress") == 0 and int(Melissa.talked_today or 0) < 2 and int(calendar_v2.week or 0) != 6:
+                call IntMelissaDressChange(girl_name)
+            "Спросить, что для нее сейчас важнее всего" if int(Melissa.asked_today or 0) == 0 and int(Melissa.rel or 0) >= 15:
+                $ Melissa.mark_asked()
+                $ Melissa.mark_talked()
+                $ Melissa.change_social(friend_delta=1, open_delta=1)
+                $ scene_runtime.text = "Вы спрашиваете Мелиссу, что для нее сейчас важнее всего. Она на миг задумывается, потом отвечает спокойно и неожиданно открыто.\n\n\"Чтобы в доме было тише и ровнее. Чтобы можно было работать без постоянной ругани и чтобы меня не дергали по пустякам. Но еще мне важно знать, что меня здесь слушают, а не просто считают одной из рабочих рук,\" говорит Мелисса, поднимая на вас внимательный взгляд."
+                $ scene_runtime.location_text = scene_runtime.text
+            "Назад":
+                $ main_ui_end_talk_state()
+                return
     return
 
 

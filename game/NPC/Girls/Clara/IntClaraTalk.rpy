@@ -1,5 +1,5 @@
 label IntClaraTalk(girl_name="clara"):
-    $ renpy.dynamic("_clara_picture", "_clara_talk_new", "_clara_talk_picture", "_clara_flirted_before", "_clara_ride_location")
+    $ renpy.dynamic("_clara_picture", "_clara_talk_new", "_clara_talk_picture", "_clara_flirted_before", "_clara_ride_location", "_clara_repeat_menu")
     $ _clara_talk_new = str(main_ui_runtime.mode or "") != "talk" or str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "").strip().lower() != str(girl_name or "clara").strip().lower()
     if _clara_talk_new and str(rooms.current_code or "") == "WineStore":
         $ _clara_talk_picture = str(Clara.wine_store_talk_picture() or "").strip()
@@ -10,12 +10,16 @@ label IntClaraTalk(girl_name="clara"):
     if str(scene_runtime.text or "").strip() == "":
         $ scene_runtime.text = "Кларисса вопросительно смотрит на вас, ожидая, что вы скажете дальше."
         $ scene_runtime.location_text = scene_runtime.text
-    menu:
+    $ _clara_repeat_menu = True
+    while _clara_repeat_menu:
+        $ _clara_repeat_menu = False
+        menu:
             "Осмотреть":
                 call ShowGirlCard(girl_name)
 
-            "Поговорить" if social_interaction_allowed_for_npc(girl_name, "talk"):
+            "Поговорить" if social_has_visible_topics(girl_name, "talk"):
                 call SocialTalkTopicMenu(girl_name, "talk")
+                $ _clara_repeat_menu = True
 
             "Флиртовать" if social_interaction_allowed_for_npc(girl_name, "flirt"):
                 $ _clara_flirted_before = Clara.flirted_today
