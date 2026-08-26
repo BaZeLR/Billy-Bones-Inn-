@@ -948,23 +948,26 @@ screen main_ui_tavern_report_panel():
                                     action Call("ShowTavernReportPerson", _worker, "__main_ui__")
 
                                 textbutton _tavern_job_button_caption("jobkitchentomorrow", _worker, "Кухня"):
+                                    id "tavern_schedule_%s_kitchen" % _worker
                                     xminimum 120
                                     text_size 18
                                     text_bold True
                                     text_color "#6d1020"
-                                    action Call("TavernReportApplyOverviewAction", _worker, "kitchen", "__main_ui__")
+                                    action Function(toggle_hall_job_with_limit, "jobkitchentomorrow", _worker, 2)
 
                                 textbutton _tavern_job_button_caption("jobcleaningtomorrow", _worker, "Уборка"):
+                                    id "tavern_schedule_%s_cleaning" % _worker
                                     xminimum 130
                                     text_size 18
                                     text_bold True
                                     text_color "#6d1020"
-                                    action Call("TavernReportApplyOverviewAction", _worker, "cleaning", "__main_ui__")
+                                    action Function(toggle_hall_job_with_limit, "jobcleaningtomorrow", _worker, 2)
 
                                 textbutton _tavern_job_button_caption("jobwaitresstomorrow", _worker, "Зал"):
+                                    id "tavern_schedule_%s_waitress" % _worker
                                     xminimum 120
                                     text_size 18
                                     text_bold True
                                     text_color "#6d1020"
-                                    action Call("TavernReportApplyOverviewAction", _worker, "waitress", "__main_ui__")
+                                    action Function(toggle_hall_job_with_limit, "jobwaitresstomorrow", _worker, 2)
 

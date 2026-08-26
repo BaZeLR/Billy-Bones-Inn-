@@ -319,6 +319,10 @@ testcase external_tavern_report_state_defaults:
     assert eval ("sandra" in BuildTavernReport()["team_keys"] and "melissa" in BuildTavernReport()["team_keys"] and "amanda" in BuildTavernReport()["team_keys"]) timeout 5.0
     assert eval (str(people.get_info("sandra").getLocation() or "") != "") timeout 5.0
     assert eval (len(people_locate_rows()) >= 3) timeout 5.0
+    $ _sandra_kitchen_tomorrow_before = int(Sandra.job_value("jobkitchentomorrow", 0) or 0)
+    click id "tavern_schedule_sandra_kitchen" pos (0.5, 0.5) until eval (int(Sandra.job_value("jobkitchentomorrow", 0) or 0) != _sandra_kitchen_tomorrow_before) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "tavern" and str(main_ui_runtime.tavern_report_person or "") == "") timeout 5.0
+    assert eval (renpy.get_screen("main_ui") is not None and renpy.get_screen("say") is None) timeout 5.0
     $ hide_tavern_report_main_ui_state()
     assert eval (str(main_ui_runtime.mode or "") == "scene") timeout 5.0
 '''
