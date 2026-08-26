@@ -693,7 +693,7 @@ testcase external_port_streets_georgette_liza_flow:
     assert eval ("georgett" not in list(people.ids_at("PortStreets") or [])) timeout 5.0
     assert eval ("liza" not in list(people.ids_at("PortStreets") or [])) timeout 5.0
 
-    $ external_calendar_set_fields(1, 1, 1100, 13, 0)
+    $ external_calendar_set_fields(1, 1, 1100, 19, 0)
     $ Georgett.rel = 0
     $ Liza.prostitution_started = False
     $ Georgett.set_story_value("TalkChurchAfterCermonLiza", 0)
@@ -704,18 +704,17 @@ testcase external_port_streets_georgette_liza_flow:
     advance until screen "main_ui" timeout 20.0
     assert eval ("georgett" in list(people.ids_at("PortStreets") or [])) timeout 5.0
     assert eval ("liza" not in list(people.ids_at("PortStreets") or [])) timeout 5.0
-    assert eval (port_streets_georgett_first_meeting_available()) timeout 5.0
-    assert eval (people.action_data_for_room("georgett", "PortStreets") is None) timeout 5.0
-    assert eval ("Заговорить с ней" in [str(getattr(i, "caption", "") or "") for i in main_ui_runtime.action_items]) timeout 5.0
-    $ _georgett_meet_index = [str(getattr(i, "caption", "") or "") for i in main_ui_runtime.action_items].index("Заговорить с ней")
-    $ _georgett_meet_button_id = "choice_panel_button_%d" % int(_georgett_meet_index)
-    click id _georgett_meet_button_id pos (0.5, 0.5) until eval (int(Georgett.rel or 0) == 1 and bool(Georgett.known)) timeout 20.0
+    assert eval (people.action_data_for_room("georgett", "PortStreets") is not None) timeout 5.0
+    assert eval ("Заговорить с ней" not in [str(getattr(i, "caption", "") or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    assert eval (renpy.get_screen("main_ui").scope.get("_char_entries", [])[1]["title"] == "Молодая женщина") timeout 5.0
+    click id "main_ui_entity_button_npc_georgett" pos (0.5, 0.5) until eval (int(Georgett.rel or 0) == 1 and bool(Georgett.known) and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (int(Georgett.rel or 0) == 1 and bool(Georgett.known)) timeout 5.0
     assert eval ("Жоржетта Брюно" in str(scene_runtime.text or "")) timeout 5.0
-    assert eval ("Заговорить с ней" not in [str(getattr(i, "caption", "") or "") for i in main_ui_runtime.action_items]) timeout 5.0
-    assert eval (people.action_data_for_room("georgett", "PortStreets") is not None) timeout 5.0
+    $ _georgett_end_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    $ _georgett_end_button_id = "choice_panel_button_%d" % int(_georgett_end_index)
+    click id _georgett_end_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
 
-    $ external_calendar_set_fields(1, 1, 1100, 13, 0)
+    $ external_calendar_set_fields(1, 1, 1100, 19, 0)
     $ Georgett.rel = 1
     $ Liza.prostitution_started = True
     $ TownStreet.events_today = 2
@@ -727,7 +726,7 @@ testcase external_port_streets_georgette_liza_flow:
     assert eval ("georgett" in list(people.ids_at("PortStreets") or [])) timeout 5.0
     assert eval ("liza" in list(people.ids_at("PortStreets") or [])) timeout 5.0
 
-    $ external_calendar_set_fields(5, 1, 1100, 13, 0)
+    $ external_calendar_set_fields(5, 1, 1100, 19, 0)
     $ Georgett.rel = 0
     $ Liza.prostitution_started = True
     $ TownStreet.events_today = 2
@@ -738,7 +737,7 @@ testcase external_port_streets_georgette_liza_flow:
     assert eval ("georgett" not in list(people.ids_at("PortStreets") or [])) timeout 5.0
     assert eval ("liza" not in list(people.ids_at("PortStreets") or [])) timeout 5.0
 
-    $ external_calendar_set_fields(1, 1, 1100, 13, 0)
+    $ external_calendar_set_fields(1, 1, 1100, 19, 0)
     $ Georgett.rel = 0
     $ Liza.prostitution_started = False
     $ Georgett.set_story_value("TalkChurchAfterCermonLiza", 1)
@@ -750,6 +749,19 @@ testcase external_port_streets_georgette_liza_flow:
     assert eval ("georgett" not in list(people.ids_at("PortStreets") or [])) timeout 5.0
     assert eval ("liza" not in list(people.ids_at("PortStreets") or [])) timeout 5.0
 
+    $ external_calendar_set_fields(1, 1, 1100, 19, 0)
+    $ external_calendar_set_weekday(7)
+    $ Georgett.rel = 1
+    $ Georgett.known = True
+    $ Georgett.set_story_value("TalkChurchAfterCermonLiza", 0)
+    $ Liza.prostitution_started = False
+    $ TodaySexEvents_Clear()
+    run Jump("PortStreets")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(people.location("georgett") or "") == "PortStreets") timeout 5.0
+    assert eval (people.action_data_for_room("georgett", "PortStreets") is not None) timeout 5.0
+
+    $ external_calendar_set_fields(1, 1, 1100, 13, 0)
     $ dog.met = True
     $ dog.owned = False
     $ player.remove_party_member("dog")
@@ -765,7 +777,7 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
     $ renpy.call_in_new_context("InitDressDesc")
-    $ external_calendar_set_fields(1, 1, 1100, 13, 0)
+    $ external_calendar_set_fields(1, 1, 1100, 19, 0)
     $ Georgett.rel = 10
     $ Georgett.known = True
     $ Georgett.set_story_value("TalkChurchAfterCermonLiza", 0)
@@ -1582,8 +1594,8 @@ testcase external_georgette_back_alley_not_visible_in_port_streets:
     $ Georgett.var["portstreet_clients_seen_today"] = 1
     $ Georgett.rel = 0
     assert eval (str(people.location("georgett") or "") == "PortStreets") timeout 5.0
-    assert eval (people.action_data_for_room("georgett", "PortStreets") is None) timeout 5.0
-    assert eval (not Georgett.talk_available_in_room("PortStreets")) timeout 5.0
+    assert eval (people.action_data_for_room("georgett", "PortStreets") is not None) timeout 5.0
+    assert eval (Georgett.talk_available_in_room("PortStreets")) timeout 5.0
     $ Georgett.rel = 1
     assert eval (str(people.location("georgett") or "") == "PortStreets") timeout 5.0
     assert eval ("georgett" in list(people.ids_at("PortStreets") or [])) timeout 5.0
