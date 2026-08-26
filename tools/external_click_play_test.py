@@ -1049,6 +1049,32 @@ testcase external_actual_grocery_click:
     click id _grocery_object_back_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == 'Действия') timeout 20.0
     assert eval (str(scene_runtime.picture or "") == _grocery_room_picture and str(scene_runtime.text or "") == _grocery_room_text and str(main_ui_runtime.object_id or "") == "") timeout 5.0
 
+testcase external_becky_store_event_replaces_room_text:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(3, 1, 1100, 16, 0)
+    $ external_calendar_set_weekday(1)
+    $ people.get_data("becky").set_schedule([NPCScheduleEntry(location="GroceryStore", start_minute=0, end_minute=1440, priority=999)])
+    $ Becky.rel = 20
+    $ Becky.corruption = 60
+    $ TodaySexEvents_Clear()
+    $ TodaySexEvents_Add("becky", 99, 3, "StoreLover")
+    python:
+        for _becky_store_event_day in range(1, 200):
+            calendar_v2.daysInGame = _becky_store_event_day
+            if procedural_randint(1, 3, "becky_store_lover_%s" % _becky_store_event_day) == 1:
+                break
+    run Jump("GroceryStore")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Событие") timeout 5.0
+    assert eval (rooms.get("GroceryStore").descriptions[0].text not in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") != str(rooms.get("GroceryStore").bg_picture or "") and renpy.loadable(str(scene_runtime.picture or ""))) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к покупкам"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == str(rooms.get("GroceryStore").bg_picture or "") and str(scene_runtime.text or "") == str(rooms.get("GroceryStore").descriptions[0].text or "")) timeout 5.0
+    assert eval (int(Becky.last_store_orgasm_day or -1) == int(current_game_day() or 0)) timeout 5.0
+
 testcase external_actual_wine_click:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 0)
     $ external_calendar_set_weekday(1)
@@ -6114,6 +6140,7 @@ def main() -> int:
             "external_story_event_audit_methods_cover_tuple_attributes",
             "external_main_ui_does_not_repeat_active_dialogue_text",
             "external_actual_grocery_click",
+            "external_becky_store_event_replaces_room_text",
             "external_actual_wine_click",
             "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
@@ -6270,6 +6297,7 @@ def main() -> int:
             "external_story_event_audit_methods_cover_tuple_attributes",
             "external_main_ui_does_not_repeat_active_dialogue_text",
             "external_actual_grocery_click",
+            "external_becky_store_event_replaces_room_text",
             "external_actual_wine_click",
             "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",

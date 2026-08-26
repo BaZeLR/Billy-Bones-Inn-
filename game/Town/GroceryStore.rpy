@@ -169,7 +169,7 @@ init python:
     )
 
 label GroceryStore:
-    $ renpy.dynamic("_grocery_room")
+    $ renpy.dynamic("_grocery_room", "_grocery_store_event_played")
     scene black
     $ rooms.enter("GroceryStore")
     $ main_ui_runtime.mode = "scene"
@@ -199,6 +199,13 @@ label GroceryStore:
 
     if grocery_store_active_grocer_id() == "becky":
         call BeckyLoversInStore
+        $ _grocery_store_event_played = bool(_return)
+        if _grocery_store_event_played:
+            $ main_ui_runtime.mode = "scene"
+            $ scene_runtime.picture = _grocery_room.bg_picture
+            vscene scene_runtime.picture
+            $ scene_runtime.text = _grocery_room.descriptions[0].text
+            $ scene_runtime.location_text = scene_runtime.text
         call check_daily_event('becky')
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = "Действия"

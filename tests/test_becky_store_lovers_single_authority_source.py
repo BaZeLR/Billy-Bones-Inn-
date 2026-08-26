@@ -18,6 +18,18 @@ def test_becky_store_lover_event_keeps_original_gates_and_consequences():
     assert "Becky.mark_store_orgasm_today()" in source
 
 
+def test_becky_store_lover_event_replaces_room_text_and_uses_native_continue():
+    source = SOURCE.read_text(encoding="utf-8-sig")
+
+    assert 'main_ui_runtime.mode = "event"' in source
+    assert 'vscene grocery_store_grocer_picture("becky")' in source
+    assert '"[scene_runtime.text]"' in source
+    assert '"Вернуться к покупкам":' in source
+    assert "scene_runtime.text +=" not in source
+    assert "return True" in source
+    assert "return False" in source
+
+
 def test_becky_store_lover_scene_scratch_is_local_to_the_authored_label():
     source = SOURCE.read_text(encoding="utf-8-sig")
 
