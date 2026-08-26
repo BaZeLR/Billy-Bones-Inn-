@@ -1,9 +1,12 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-label event_cleaning_harrass_part2(girl_name, eyewitness=0, your_reaction1=0, harass_type=1, cur_event_desc_part2="", girl_run_away=0, girl_slapped=0, _girl_info=None, girl_slut=0):
+label event_cleaning_harrass_part2(girl_name, eyewitness=0, your_reaction1=0, harass_type=1, cur_event_desc_part2="", girl_run_away=0, girl_slapped=0, _girl_info=None, girl_slut=0, _girl_reaction_text=""):
     call PartEventGirlHarrassmentReaction(girl_name, "cleaning", eyewitness, your_reaction1)
-    $ cur_event_desc_part2, girl_run_away, girl_slapped = _return
+    $ _girl_reaction_text, girl_run_away, girl_slapped = _return
+    if str(cur_event_desc_part2 or "").strip() and str(_girl_reaction_text or "").strip():
+        $ cur_event_desc_part2 += "\n\n"
+    $ cur_event_desc_part2 += str(_girl_reaction_text or "")
 
     if girl_slapped > 0 and your_reaction1 != 3:
         if harass_type == 1:
@@ -67,8 +70,7 @@ label event_cleaning_harrass_part2(girl_name, eyewitness=0, your_reaction1=0, ha
     if eyewitness > 0:
         $ scene_runtime.text = format_tavern_event_text(cur_event_desc_part2)
         $ scene_runtime.location_text = scene_runtime.text
-        "[scene_runtime.text]"
-        call PartEventAfterHarrassment(girl_name, girl_slapped, your_reaction1)
-        return
+        call PartEventAfterHarrassment(girl_name, girl_slapped, your_reaction1, _event_text=cur_event_desc_part2)
+        return scene_runtime.text
 
     return cur_event_desc_part2

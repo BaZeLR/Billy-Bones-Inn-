@@ -55,7 +55,7 @@ label PartEventYourFirstReaction(GirlNamePEYFR, SecondPartFuncName, EyewitnessPE
             call PartEventYourFirstReactionOutcome(GirlNamePEYFR, SecondPartFuncName, EyewitnessPEYFR, HarassTypePEYFR, 3)
     return
 
-label PartEventYourFirstReactionOutcome(GirlNamePEYFR, SecondPartFuncName, Eyewitness, HarassType, reaction_code=1, _player_reaction_text="", follow_text="", _followup_text=""):
+label PartEventYourFirstReactionOutcome(GirlNamePEYFR, SecondPartFuncName, Eyewitness, HarassType, reaction_code=1, _player_reaction_text=""):
     $ _player_reaction_text = ""
 
     if reaction_code == 1:
@@ -65,17 +65,5 @@ label PartEventYourFirstReactionOutcome(GirlNamePEYFR, SecondPartFuncName, Eyewi
     else:
         $ _player_reaction_text = "Вы со всей поспешностью кинулись на выручку {}.".format(people_name(GirlNamePEYFR, 'dative'))
 
-    call expression SecondPartFuncName pass (GirlNamePEYFR, Eyewitness, reaction_code, HarassType)
-    $ follow_text = _coerce_panel_text_value(_return)
-
-    $ _followup_text = _player_reaction_text
-    if str(follow_text or "").strip():
-        if str(_followup_text or "").strip():
-            $ _followup_text += "\n\n" + str(follow_text)
-        else:
-            $ _followup_text = str(follow_text)
-
-    $ scene_runtime.text = format_tavern_event_text(_followup_text)
-    $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
+    call expression SecondPartFuncName pass (GirlNamePEYFR, Eyewitness, reaction_code, HarassType, _player_reaction_text)
     return

@@ -110,7 +110,6 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
 
     $ scene_runtime.text = format_tavern_event_text(_discussion_text)
     $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
     menu:
         "Вернуться к делам":
             return

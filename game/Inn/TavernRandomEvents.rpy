@@ -224,7 +224,9 @@ init -20 python:
             popped = event_runtime.tavern_work_events.pop(index)
             tavern_work_add_report_row(popped, bool(require_room_match))
             event_runtime.tavern_played_today.append(code)
-            return {"code": code, "slot": 10}
+            result = dict(popped)
+            result["slot"] = 10
+            return result
 
         for index, row in enumerate(list(event_runtime.tavern_work_events or [])):
             if bool(row.get("mandatory", False)):
@@ -235,7 +237,9 @@ init -20 python:
             code = str(popped.get("code", "") or "")
             tavern_work_add_report_row(popped, bool(require_room_match))
             event_runtime.tavern_played_today.append(code)
-            return {"code": code, "slot": tp}
+            result = dict(popped)
+            result["slot"] = tp
+            return result
 
         return {"code": "", "slot": tp}
 
@@ -294,6 +298,4 @@ label TavernWorkEventTrigger:
         $ scene_runtime.text = _tavern_event_text
         $ scene_runtime.location_text = scene_runtime.text
         return True
-    if str(CurEventCode or "").strip():
-        return True
-    return False
+    return True

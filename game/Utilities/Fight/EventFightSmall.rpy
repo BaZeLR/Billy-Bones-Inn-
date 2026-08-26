@@ -23,6 +23,7 @@ label EventFightSmall(eyewitness=0, CurMoneyLoss=0, FightRand=0, PhraseEnd1EFS="
         $ CurEventDesc = "В вашем трактире произошла драка! Двое пьяных моряков начали выяснять отношения и в процессе расколотили горшков и тарелок на {} мараведи, а потом смылись, не заплатив!".format(CurMoneyLoss)
 
     if eyewitness > 0:
+        $ main_ui_begin_native_scene_state("Событие в трактире")
         $ CurEventDesc += "\n\nЧто вы намеренны предпринять?"
         $ scene_runtime.text = CurEventDesc
         $ scene_runtime.location_text = CurEventDesc
@@ -40,6 +41,7 @@ label EventFightSmall(eyewitness=0, CurMoneyLoss=0, FightRand=0, PhraseEnd1EFS="
                 call EventFightSmallFinish(5, CurMoneyLoss, FightRand, PhraseEnd1EFS)
             "Помочь ловить" if FightRand == 4 and player.economy.money >= (4 + CurMoneyLoss) and player.tavern_management.winenum >= 2:
                 call EventFightSmallFinish(6, CurMoneyLoss, FightRand, PhraseEnd1EFS)
+        $ main_ui_end_native_scene_state()
     else:
         $ player.add_money(-CurMoneyLoss)
         if FightRand == 3 or FightRand > 4:
@@ -53,7 +55,7 @@ label EventFightSmall(eyewitness=0, CurMoneyLoss=0, FightRand=0, PhraseEnd1EFS="
 
     return CurEventDesc
 
-label EventFightSmallFinish(reaction_code=1, CurMoneyLoss=0, FightRand=0, PhraseEnd1EFS="", extra_text="", _dog_tavern_result=None):
+label EventFightSmallFinish(reaction_code=1, CurMoneyLoss=0, FightRand=0, PhraseEnd1EFS="", extra_text="", _dog_tavern_result=None, _finish_text=""):
     $ _dog_tavern_result = {"ok": False, "text": ""}
 
     if reaction_code == 1:
@@ -90,9 +92,16 @@ label EventFightSmallFinish(reaction_code=1, CurMoneyLoss=0, FightRand=0, Phrase
             else:
                 $ extra_text = str(_dog_tavern_result.get("text", "") or "")
 
-    if extra_text:
-        "[extra_text]"
-    if PhraseEnd1EFS:
-        "[PhraseEnd1EFS]"
+    $ _finish_text = str(extra_text or "").strip()
+    if str(PhraseEnd1EFS or "").strip():
+        if _finish_text:
+            $ _finish_text += "\n\n"
+        $ _finish_text += str(PhraseEnd1EFS)
+    if _finish_text:
+        $ scene_runtime.text = _finish_text
+        $ scene_runtime.location_text = _finish_text
+        menu:
+            "Вернуться к своим делам":
+                pass
 
     return

@@ -58,3 +58,17 @@ def test_tavern_room_establishes_scene_context_before_work_event():
     assert '$ main_ui_runtime.talk_picture = ""' in entry
     assert '$ main_ui_runtime.action_title = "Действия в трактире"' in entry
     assert "main_ui_runtime.clear_contexts()" in entry
+
+
+def test_small_fight_owns_text_and_native_choices_until_event_completion():
+    source = (ROOT / "game/Utilities/Fight/EventFightSmall.rpy").read_text(encoding="utf-8-sig")
+    witnessed = source.split("if eyewitness > 0:", 1)[1].split("else:", 1)[0]
+    finish = source.split("label EventFightSmallFinish", 1)[1]
+
+    assert 'main_ui_begin_native_scene_state("Событие в трактире")' in witnessed
+    assert "$ scene_runtime.text = CurEventDesc" in witnessed
+    assert "menu:" in witnessed
+    assert "main_ui_end_native_scene_state()" in witnessed
+    assert '"[extra_text]"' not in finish
+    assert '"[PhraseEnd1EFS]"' not in finish
+    assert '"Вернуться к своим делам":' in finish

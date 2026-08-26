@@ -1105,10 +1105,11 @@ testcase external_actual_wine_for_dance_menu:
     $ main_ui_runtime.mode = "scene"
     run Jump("TavernKitchen")
     advance until screen "choice" timeout 20.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к своим делам"]) timeout 20.0
     assert eval (int(player.tavern_management.dance_sponsor or 0) == 1) timeout 5.0
     assert eval (int(player.tavern_management.dance_sponsor_pledge_day or -1) == int(calendar_v2.daysInGame or 0)) timeout 5.0
-    assert eval ("Вы соглашаетесь выставить на пятничных танцах" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("say") is None and "Вы соглашаетесь выставить на пятничных танцах" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene") timeout 20.0
 
 testcase external_tavern_random_event_plan_consumes_once:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 13, 0)
@@ -1128,9 +1129,42 @@ testcase external_tavern_random_event_plan_consumes_once:
     $ findAvailableEvents(True)
     assert eval ("TavernMain" in event_runtime.available and "tavern_work" in event_runtime.available["TavernMain"] and str(event_runtime.available["TavernMain"]["tavern_work"].target or "") == "TavernWorkEventTrigger") timeout 5.0
     run Jump("TavernMain")
-    advance until screen "main_ui" timeout 20.0
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("say") is None and "Что вы будете делать?" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Не обращать внимания", "Стоять и смотреть", "[_help_caption]"]) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") != "images/tavern/mainhall/main_hall.png" and _media_asset_exists(scene_runtime.picture)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Промолчать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("say") is None and "Вы отвернулись от происходящего" in str(scene_runtime.text or "")) timeout 5.0
+    $ _harass_silence_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Промолчать")
+    $ _harass_silence_button = "choice_panel_button_%d" % int(_harass_silence_index)
+    click id _harass_silence_button pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к делам"]) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and "Вы решили ничего не говорить" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
     assert eval ("WaitressHarass" in list(event_runtime.tavern_played_today or [])) timeout 5.0
     assert eval (len(list(event_runtime.tavern_work_events or [])) == 0 and not tavern_work_has_period(calendar_v2.time_slot(), False)) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/tavern/mainhall/main_hall.png" and "Действия в трактире" == str(main_ui_runtime.action_title or "")) timeout 5.0
+
+testcase external_tavern_small_fight_native_event_flow:
+    $ rooms.enter("TavernMain")
+    $ scene_runtime.picture = "images/tavern/mainhall/main_hall.png"
+    $ scene_runtime.text = "Тестовое описание главной залы."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.action_title = "Действия в трактире"
+    $ main_ui_runtime.action_items = [MenuItem("Тестовое действие", NullAction())]
+    $ _fight_event_randint = procedural_randint
+    $ procedural_randint = lambda low, high, key="": int(low)
+    run Call("EventFightSmall", 1)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("say") is None and "В вашем трактире произошла драка!" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ("Выругаться и не делать ничего" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к своим делам"]) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and "Ущерб составил 20 мараведи." in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/tavern/mainhall/main_hall.png" and str(scene_runtime.text or "") == "Тестовое описание главной залы." and [str(i.caption or "") for i in main_ui_runtime.action_items] == ["Тестовое действие"]) timeout 5.0
+    $ procedural_randint = _fight_event_randint
 
 testcase external_tavern_unwitnessed_event_report_consumes_leftovers:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 16, 0)
@@ -6057,6 +6091,7 @@ def main() -> int:
             "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
             "external_tavern_random_event_plan_consumes_once",
+            "external_tavern_small_fight_native_event_flow",
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
             "external_breakfast_dance_sponsor_announcement",
             "external_breakfast_attendance_location_wins",
@@ -6212,6 +6247,7 @@ def main() -> int:
             "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
             "external_tavern_random_event_plan_consumes_once",
+            "external_tavern_small_fight_native_event_flow",
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
             "external_breakfast_dance_sponsor_announcement",
             "external_breakfast_attendance_location_wins",

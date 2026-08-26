@@ -361,7 +361,7 @@ init python:
 
 label TavernKitchen:
     $ renpy.dynamic("_kitchen_request_girl", "_kitchen_request_type")
-    $ renpy.dynamic("_kitchen_wine_event_text", "_kitchen_pending_event", "_kitchen_event_picture")
+    $ renpy.dynamic("_kitchen_pending_event", "_kitchen_event_picture")
     $ rooms.enter("TavernKitchen")
     $ tavern_kitchen_hearth_wood_stock()
     $ scene_runtime.picture = tavern_kitchen_picture() or rooms.current.bg_picture or None
@@ -378,36 +378,27 @@ label TavernKitchen:
     if npc_schedule_becky_sandra_kitchen_visit_active():
         $ Becky.sandra_kitchen_visit_period = int(calendar_v2.period or 0)
 
-    $ _kitchen_wine_event_text = ""
     $ _kitchen_pending_event = tavern_kitchen_pending_mandatory_event_code()
     if str(_kitchen_pending_event or "") == "WineForDance" and not tavern_breakfast_available():
         $ _kitchen_event_picture = tavern_kitchen_wine_donation_picture()
         if str(_kitchen_event_picture or "").strip():
             $ scene_runtime.picture = _kitchen_event_picture
         call DisplayTavernEventShort(calendar_v2.time_slot(), 1)
-        $ _kitchen_wine_event_text = str(_return or "")
+        $ scene_runtime.picture = tavern_kitchen_picture() or rooms.current.bg_picture or None
 
-    if str(_kitchen_wine_event_text or "").strip():
-        $ scene_runtime.text = _kitchen_wine_event_text
-        $ scene_runtime.location_text = scene_runtime.text
-        $ tavern_kitchen_set_saved_text(scene_runtime.text)
-        $ main_ui_runtime.action_content = None
-        if str(CurEventCode or "") != "WineForDance" or len(list(main_ui_runtime.action_items or [])) <= 0:
-            $ main_ui_runtime.action_items = tavern_kitchen_action_items()
+    $ scene_runtime.text = build_kitchen_description()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ tavern_kitchen_set_saved_text(scene_runtime.text)
+    $ main_ui_runtime.action_title = "Кухня"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = tavern_kitchen_action_items()
+    if story_event_available("TavernKitchen", "sandra_dress_initiative"):
+        call SandraDressInitiativeEvent
     else:
-        $ scene_runtime.text = build_kitchen_description()
-        $ scene_runtime.location_text = scene_runtime.text
-        $ tavern_kitchen_set_saved_text(scene_runtime.text)
-        $ main_ui_runtime.action_title = "Кухня"
-        $ main_ui_runtime.action_content = None
-        $ main_ui_runtime.action_items = tavern_kitchen_action_items()
-        if story_event_available("TavernKitchen", "sandra_dress_initiative"):
-            call SandraDressInitiativeEvent
-        else:
-            python:
-                _kitchen_request_type, _kitchen_request_girl = household_pending_request_girl("TavernKitchen")
-            if str(_kitchen_request_type or "") == "soap":
-                call HouseholdSoapRequestEvent(_kitchen_request_girl)
+        python:
+            _kitchen_request_type, _kitchen_request_girl = household_pending_request_girl("TavernKitchen")
+        if str(_kitchen_request_type or "") == "soap":
+            call HouseholdSoapRequestEvent(_kitchen_request_girl)
     while True:
         call screen main_ui
 

@@ -1,7 +1,8 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-label PartEventAfterHarrassment(GirlNamePEAH, GirlSlapped, YourReaction1, result="", _girl_info=None, _girl_corruption=0, _girl_rel=0, _harass_instruction=""):
+label PartEventAfterHarrassment(GirlNamePEAH, GirlSlapped, YourReaction1, result="", _girl_info=None, _girl_corruption=0, _girl_rel=0, _harass_instruction="", _event_text=""):
+    $ _event_text = _normalize_tavern_event_text(_event_text)
     $ result = "\n"
     $ _girl_info = people.get_info(GirlNamePEAH)
     $ _girl_corruption = int(getattr(_girl_info, "corruption", 0) or 0)
@@ -54,8 +55,7 @@ label PartEventAfterHarrassment(GirlNamePEAH, GirlSlapped, YourReaction1, result
     elif GirlNamePEAH == "amanda":
         call HarassDiscussImage(GirlNamePEAH, 1)
 
-    $ scene_runtime.text = format_tavern_event_text(result)
+    $ scene_runtime.text = format_tavern_event_text(_event_text + "\n\n" + result)
     $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
     call IntHarrassmentDiscuss(GirlNamePEAH, YourReaction1)
     return

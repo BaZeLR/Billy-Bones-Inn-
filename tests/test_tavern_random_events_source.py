@@ -59,6 +59,11 @@ def test_tavern_dispatch_uses_planned_event_pop():
     assert "tavern_work_pop_planned_event(time_period, eyewitness > 0, rooms.current_code)" in source
     assert "def tavern_event_pop_code" not in source
     assert "call expression _event_target pass (eyewitness,)" in source
+    assert '_event_pick.get("label", "")' in source
+    assert '"WaitressHarass":' not in source
+    assert '"CleaningHarass":' not in source
+    assert '"FightSmall":' not in source
+    assert '"AmandaLizaTalk":' not in source
     assert 'return _event_result' in source
     assert "CurEventCode" not in source
     assert "CurEventDescFin" not in source

@@ -21,12 +21,13 @@ label event_cleaning_harrass(eyewitness=0, result="", cur_event_desc="", harass_
             $ harass_action = "ass"
 
         if eyewitness > 0:
+            $ main_ui_begin_native_scene_state("Событие в трактире")
             call HarassShowImage(girl_name, harass_action, 0, eyewitness, "cleaning")
-            $ scene_runtime.text = format_tavern_event_text(cur_event_desc)
+            $ scene_runtime.text = format_tavern_event_text(cur_event_desc + "\n\nЧто вы будете делать?")
             $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
             call PartEventYourFirstReaction(girl_name, "event_cleaning_harrass_part2", eyewitness, harass_type)
             $ result = scene_runtime.text
+            $ main_ui_end_native_scene_state()
         else:
             call event_cleaning_harrass_part2(girl_name, eyewitness, 1, harass_type)
             $ part2_result = _return

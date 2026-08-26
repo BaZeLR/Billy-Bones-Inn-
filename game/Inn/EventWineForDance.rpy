@@ -40,6 +40,7 @@ label EventWineForDance(eyewitness=0, result=""):
     $ result = "К вам подошла Сандра, ваша кухарка и фактическая распорядительница трактирного хозяйства, и сказала:\n\"Стефан, дорогой, ты помнишь же, что в пятницу вечером будут гуляния и танцы? Мы можем тоже поучаствовать и выставить на них выпивку и угощение за счет нашего трактира. Это конечно обойдется в копеечку, так как, если уж мы за это возьмемся то придется выставить 5 бочонков вина и наготовить закуски из 4 мешков продуктов, да еще на шатер уйдет 20 мараведи. Но, с другой, стороны, такая щедрость привлечет к нам людей.\""
 
     if eyewitness > 0:
+        $ main_ui_begin_native_scene_state("Пятничные танцы")
         $ result += "\n\nСобираетесь ли вы пожертвовать на общегородской праздник?"
         $ scene_runtime.text = result
         $ scene_runtime.location_text = scene_runtime.text
@@ -53,6 +54,7 @@ label EventWineForDance(eyewitness=0, result=""):
 
             "Отказаться":
                 call WineForDanceOutcome(3)
+        $ main_ui_end_native_scene_state()
     else:
         $ result = ""
 
@@ -83,5 +85,7 @@ label WineForDanceOutcome(reaction_code=1, _crew_appreciation=None):
         $ tavern_kitchen_set_saved_text(scene_runtime.text)
         call TavernKitchenBreakfastShowText(scene_runtime.text)
         return
-    "[scene_runtime.text]"
+    menu:
+        "Вернуться к своим делам":
+            pass
     return
