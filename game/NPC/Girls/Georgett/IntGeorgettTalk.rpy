@@ -6,17 +6,17 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
     if not girl_loc:
         $ girl_loc = "tavern" if str(rooms.current_code or "") == "TavernMain" else "street"
     $ _georgett_first_meeting = girl_loc == "street" and people_to_int(Georgett.rel, 0) <= 0
-    if _georgett_first_meeting:
-        $ scene_runtime.text = "-Привет красавчик! Не хочешь ли поразвлечься? Всего восемь мараведи!\n\nВы поговорили с ней и узнали, что ее зовут Жоржетта Брюно, она шлюха и промышляет здесь уже давно."
-        $ scene_runtime.location_text = scene_runtime.text
-        $ Georgett.add_relation(1)
-        $ Georgett.mark_known()
     $ _georgett_talk_new = str(main_ui_runtime.mode or "") != "talk" or str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "").strip().lower() != str(girl_name or "georgett").strip().lower()
     $ main_ui_begin_talk_state("Разговор с Жоржеттой", girl_name)
     $ _georgett_picture = "images/georgett/Port/wait.jpg" if girl_loc == "street" and renpy.loadable("images/georgett/Port/wait.jpg") else str(girl_card_portrait_path(girl_name) or "")
     if _georgett_talk_new and _georgett_picture and renpy.loadable(_georgett_picture):
         $ scene_runtime.picture = _georgett_picture
-    if _georgett_talk_new and not _georgett_first_meeting:
+    if _georgett_first_meeting:
+        $ scene_runtime.text = "-Привет красавчик! Не хочешь ли поразвлечься? Всего восемь мараведи!\n\nВы поговорили с ней и узнали, что ее зовут Жоржетта Брюно, она шлюха и промышляет здесь уже давно."
+        $ scene_runtime.location_text = scene_runtime.text
+        $ Georgett.add_relation(1)
+        $ Georgett.mark_known()
+    elif _georgett_talk_new:
         $ scene_runtime.text = "Жоржетта вопросительно смотрит на вас, ожидая, о чем вы захотите поговорить."
         $ scene_runtime.location_text = scene_runtime.text
     while True:

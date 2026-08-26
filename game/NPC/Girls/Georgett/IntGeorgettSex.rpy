@@ -121,9 +121,11 @@ label GeorgettSexStatus(GirlLocIGSS="street", _georgett_orgasm_count=0):
     return
 
 
-label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
+label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street", SceneTextIGSS=""):
     call IntGeorgettSexSetup(GirlNameIGSS, GirlLocIGSS)
     $ georgett_sex_begin_text()
+    if str(SceneTextIGSS or "").strip():
+        $ georgett_sex_add_text(SceneTextIGSS)
     $ georgett_sex_set_portrait()
     if str(scene_runtime.picture or "").strip():
         vscene scene_runtime.picture

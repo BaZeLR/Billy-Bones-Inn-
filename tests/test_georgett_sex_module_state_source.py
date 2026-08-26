@@ -51,6 +51,8 @@ def test_georgett_sex_choices_use_native_choice_screen_without_apply_panel():
 def test_georgett_hire_uses_authored_paid_routes_and_one_time_owner():
     talk = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy").read_text(encoding="utf-8-sig")
     sex = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettSex.rpy").read_text(encoding="utf-8-sig")
+    port = (ROOT / "game/Utilities/General/Sex/SexPort.rpy").read_text(encoding="utf-8-sig")
+    tavern = (ROOT / "game/Utilities/General/Sex/SexProstTavern.rpy").read_text(encoding="utf-8-sig")
 
     hire = talk.split('label IntGeorgettHire(girl_name="georgett", girl_loc="street"):', 1)[1].split("label IntGeorgettGrope", 1)[0]
     assert 'call SexProstTavern(1, "georgett")' in hire
@@ -61,6 +63,18 @@ def test_georgett_hire_uses_authored_paid_routes_and_one_time_owner():
     assert "main_ui_end_native_scene_state" in hire
     assert "GeorgettSexFinish" not in sex
     assert '"Закончить":\n                $ Georgett.set_sex_busy(0)\n                return' in sex
+    assert 'label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street", SceneTextIGSS=""):' in sex
+    assert 'call IntGeorgettSex(GirlNameSP, "street", "Вы заплатили Жоржетте' in port
+    assert 'call IntGeorgettSex(GirlNameSP, "tavern", "Вы заплатили Жоржетте' in tavern
+    assert '\n        "Вы заплатили Жоржетте' not in port + tavern
+
+
+def test_georgett_first_meeting_snapshots_room_before_writing_npc_scene():
+    talk = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy").read_text(encoding="utf-8-sig")
+    first_talk = talk.split('label IntGeorgettTalk(girl_name="georgett", girl_loc=""):', 1)[1].split("while True:", 1)[0]
+
+    assert first_talk.index('main_ui_begin_talk_state("Разговор с Жоржеттой", girl_name)') < first_talk.index('scene_runtime.text = "-Привет красавчик!')
+    assert "Georgett.mark_known()" in first_talk
 
 
 def test_georgett_free_grope_rejection_returns_to_talk_owner():
