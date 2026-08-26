@@ -804,8 +804,27 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     $ Georgett.reset_sex_clothing_state()
     $ TownStreet.events_today = 2
     $ TownStreet.story_seen_keys.append("%s:PortStreets:%s" % (calendar_v2.daysInGame, calendar_v2.time_slot()))
+    $ TodaySexEvents_Clear()
     run Jump("PortStreets")
     advance until screen "main_ui" timeout 20.0
+    $ player.economy.money = 100
+    $ player.intimacy.came_today = 0
+    $ _georgett_hire_money_before = int(player.economy.money or 0)
+    click id "main_ui_entity_button_npc_georgett" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Снять" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _georgett_hire_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Снять")
+    $ _georgett_hire_button_id = "choice_panel_button_%d" % int(_georgett_hire_index)
+    click id _georgett_hire_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("choice") is not None and "Растегнуть блузку" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (int(player.economy.money or 0) == _georgett_hire_money_before - 8) timeout 5.0
+    assert eval (str(main_ui_runtime.selected_char or "") == "" and str(main_ui_runtime.girl_key or "") == "" and str(main_ui_runtime.talk_picture or "") == "") timeout 5.0
+    assert eval (str(scene_runtime.picture or "").startswith("images/georgett/portraits/portrait") and renpy.loadable(scene_runtime.picture)) timeout 5.0
+    assert eval (str(renpy.get_screen("main_ui").scope.get("_picture", "") or "") == str(scene_runtime.picture or "")) timeout 5.0
+    $ _georgett_unbutton_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Растегнуть блузку")
+    $ _georgett_unbutton_button_id = "choice_panel_button_%d" % int(_georgett_unbutton_index)
+    click id _georgett_unbutton_button_id pos (0.5, 0.5) until eval (Georgett.layer_raised("top") and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") != "" and renpy.loadable(scene_runtime.picture)) timeout 5.0
+    $ _georgett_hire_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
+    $ _georgett_hire_finish_button_id = "choice_panel_button_%d" % int(_georgett_hire_finish_index)
+    click id _georgett_hire_finish_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
     $ Georgett.openness = 0
     $ Georgett.talked_today = 0
     $ Georgett.gifted_today = 0

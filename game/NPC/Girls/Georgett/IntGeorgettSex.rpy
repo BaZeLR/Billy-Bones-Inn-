@@ -149,6 +149,9 @@ label IntGeorgettSex(GirlNameIGSS="georgett", GirlLocIGSS="street"):
 
 label GeorgettSexMenu:
     $ main_ui_runtime.mode = "event"
+    $ main_ui_runtime.selected_char = ""
+    $ main_ui_runtime.girl_key = ""
+    $ main_ui_runtime.talk_picture = ""
     $ main_ui_runtime.action_title = "Жоржетта"
     while True:
         $ main_ui_runtime.action_content = "\n".join(georgett_sex_state_lines())

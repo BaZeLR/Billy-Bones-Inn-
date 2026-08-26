@@ -315,7 +315,7 @@ init -44 python:
     def LactateTitsDesc(GirlName):
         GirlName = str(GirlName)
         info = people.get_info(GirlName)
-        if info.visible_tits() and _kids_lactating(GirlName) and procedural_randint(1, 2, "lactate_desc_%s_%s" % (GirlName, _kids_int(calendar_v2.daysInGame, 0))) == 1:
+        if info.tits_visible() and _kids_lactating(GirlName) and procedural_randint(1, 2, "lactate_desc_%s_%s" % (GirlName, _kids_int(calendar_v2.daysInGame, 0))) == 1:
             return "Из разбухшего соска с большой ареолой вытекла капелька молока."
         return ""
 
@@ -324,7 +324,7 @@ init -44 python:
         info = people.get_info(GirlName)
         if not _kids_lactating(GirlName) or info.arousal_value() <= 35:
             return ""
-        if not info.visible_tits():
+        if not info.tits_visible():
             if str(info.wardrobe.get("current_underwear", {}).get("bra", "") or "") == "":
                 return "От жамкания из доек вскоре потекло молоко, ее блузка быстро намокла и сосочки стали просвечивать через нее."
             return ""

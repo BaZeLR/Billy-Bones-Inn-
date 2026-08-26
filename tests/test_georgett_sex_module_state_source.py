@@ -37,6 +37,10 @@ def test_georgett_sex_choices_use_native_choice_screen_without_apply_panel():
     source = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettSex.rpy").read_text(encoding="utf-8-sig")
     menu_source = source.split("label GeorgettSexMenu:", 1)[1]
     assert "menu:" in menu_source
+    assert '$ main_ui_runtime.mode = "event"' in menu_source
+    assert '$ main_ui_runtime.selected_char = ""' in menu_source
+    assert '$ main_ui_runtime.girl_key = ""' in menu_source
+    assert '$ main_ui_runtime.talk_picture = ""' in menu_source
     assert "renpy.display_menu" not in menu_source
     assert "GeorgettSexApply" not in source
     assert "georgett_sex_action_panel" not in source
@@ -48,6 +52,7 @@ def test_georgett_uses_shared_girl_visibility_without_saved_or_method_mirrors():
     info_source = (ROOT / "game/NPC/Girls/Georgett/InitGeorgett.rpy").read_text(encoding="utf-8-sig")
     sex_source = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettSex.rpy").read_text(encoding="utf-8-sig")
     portrait_source = (ROOT / "game/NPC/Girls/Georgett/ShowGeorgettPortrait.rpy").read_text(encoding="utf-8-sig")
+    kids_source = (ROOT / "game/Utilities/General/Sex/KidsFunctions.rpy").read_text(encoding="utf-8-sig")
 
     assert 'def visible_tits(self):' not in info_source
     assert 'def visible_pussy(self):' not in info_source
@@ -57,6 +62,8 @@ def test_georgett_uses_shared_girl_visibility_without_saved_or_method_mirrors():
     assert 'def bottom_is_raised(self):' not in info_source
     assert "Georgett.tits_visible()" in sex_source + portrait_source
     assert "Georgett.pussy_visible()" in sex_source + portrait_source
+    assert "info.tits_visible()" in kids_source
+    assert "info.visible_tits()" not in kids_source
     assert 'Georgett.clothing_layer("top")' in sex_source
     assert 'Georgett.clothing_layer("bottom")' in sex_source
     assert 'Georgett.layer_raised("top")' in sex_source
