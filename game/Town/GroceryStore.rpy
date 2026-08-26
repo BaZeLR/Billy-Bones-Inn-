@@ -142,7 +142,7 @@ init python:
         code_name="GroceryStore",
         group_name=ROOM_GROUP_CITY,
         display_name="Продуктовая лавка",
-        bg_picture="images/general/butchers_street.png",
+        bg_picture="images/general/grocery_shop.png",
         descriptions=[
             RoomDescription(
                 text="Вы в лавке вдовы Блэнкеншип. По всей лавке навалены мешки с овощами, сложены кочаны капусты, сквозь приоткрытую дверь, ведущую в ледниковую комнату, видны коровьи и свиные туши.",
@@ -220,6 +220,10 @@ label GroceryStoreObjectMenu(object_id="", preserve_text=False):
     $ main_ui_runtime.action_title = str(_grocery_object.name or "")
     $ main_ui_runtime.action_content = None
     if not preserve_text:
+        if str(object_id or "") == "food_stock":
+            $ scene_runtime.picture = grocery_store_grocer_picture()
+            if str(scene_runtime.picture or "").strip():
+                vscene scene_runtime.picture
         $ scene_runtime.text = str(_grocery_object.description or "")
         $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_items = []
@@ -231,7 +235,7 @@ label GroceryStoreObjectMenu(object_id="", preserve_text=False):
                 main_ui_runtime.action_items.append(MenuItem(_grocery_action.label, Jump(_grocery_action.target)))
             elif _grocery_action.hook == "call" and str(_grocery_action.target or ""):
                 main_ui_runtime.action_items.append(MenuItem(_grocery_action.label, Call(_grocery_action.target, *tuple(_grocery_action.args or ()))))
-    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", grocery_store_action_items()), Function(main_ui_restart_interaction)]))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(scene_runtime, "picture", rooms.get("GroceryStore").bg_picture), SetField(scene_runtime, "text", rooms.get("GroceryStore").descriptions[0].text), SetField(scene_runtime, "location_text", rooms.get("GroceryStore").descriptions[0].text), SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", grocery_store_action_items()), SetField(main_ui_runtime, "object_id", "")]))
     return
 
 

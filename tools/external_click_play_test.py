@@ -1033,12 +1033,21 @@ testcase external_actual_grocery_click:
     click id _grocery_talk_end_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
     assert eval (str(scene_runtime.picture or "") == _grocery_room_picture and str(scene_runtime.text or "") == _grocery_room_text) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == 'Провизия') timeout 20.0
+    assert eval (str(scene_runtime.picture or "") != _grocery_room_picture and renpy.loadable(str(scene_runtime.picture or ""))) timeout 5.0
+    assert eval (str(scene_runtime.text or "") == str(GroceryStoreFoodStockObject.description or "")) timeout 5.0
     assert eval ('Купить провизию' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     $ _grocery_buy_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Купить провизию")
     $ _grocery_buy_button_id = "choice_panel_button_%d" % int(_grocery_buy_index)
     click id _grocery_buy_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == 'Покупка провизии') timeout 20.0
     assert eval (str(main_ui_runtime.action_title or "") == 'Покупка провизии') timeout 5.0
     assert eval ('Купить один мешок' in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    $ _grocery_buy_back_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Назад")
+    $ _grocery_buy_back_button_id = "choice_panel_button_%d" % int(_grocery_buy_back_index)
+    click id _grocery_buy_back_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == 'Провизия') timeout 20.0
+    $ _grocery_object_back_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Назад")
+    $ _grocery_object_back_button_id = "choice_panel_button_%d" % int(_grocery_object_back_index)
+    click id _grocery_object_back_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == 'Действия') timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _grocery_room_picture and str(scene_runtime.text or "") == _grocery_room_text and str(main_ui_runtime.object_id or "") == "") timeout 5.0
 
 testcase external_actual_wine_click:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 0)

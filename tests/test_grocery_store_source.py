@@ -12,7 +12,7 @@ BECKY_TALK = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalk.rpy"
 BECKY_TOPICS = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkTopics.rpy"
 BECKY_SHERWOOD = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkSherwood.rpy"
 BECKY_SCHEDULE = ROOT / "game" / "NPC" / "Schedules" / "becky.json"
-GROCERY_ROOM_PICTURE = ROOT / "game" / "images" / "general" / "butchers_street.png"
+GROCERY_ROOM_PICTURE = ROOT / "game" / "images" / "general" / "grocery_shop.png"
 GROCERY_NPC_OWNERS = [
     ROOT / "game" / "NPC" / "Secondary" / "InitEddie.rpy",
     ROOT / "game" / "NPC" / "Girls" / "Becky" / "InitBecky.rpy",
@@ -39,7 +39,7 @@ def test_grocery_uses_merchant_picture_sequences_not_hunter_store():
     entry = source.split("label GroceryStore:", 1)[1].split("label GroceryStoreObjectMenu", 1)[0]
     main_text = source.split("def grocery_store_main_text():", 1)[1].split("def grocery_store_set_notice", 1)[0]
 
-    assert 'bg_picture="images/general/butchers_street.png"' in source
+    assert 'bg_picture="images/general/grocery_shop.png"' in source
     assert GROCERY_ROOM_PICTURE.is_file()
     assert "images/general/hunter_store.jpg" not in source
     assert "$ scene_runtime.picture = _grocery_room.bg_picture" in entry
@@ -48,6 +48,9 @@ def test_grocery_uses_merchant_picture_sequences_not_hunter_store():
     assert "grocery_store_inga_picture()" not in entry
     assert "grocery_store_becky_picture()" not in entry
     assert "active_grocer" not in main_text
+    assert '$ scene_runtime.picture = grocery_store_grocer_picture()' in source
+    assert 'SetField(scene_runtime, "picture", rooms.get("GroceryStore").bg_picture)' in source
+    assert "main_ui_restart_interaction" not in source
     assert "grocery_store_grocer_picture" in source
     assert '"images/eddie/portraits/portrait_0.png"' in source
     assert '"images/eddie/portraits/portrait_2.png"' in source
