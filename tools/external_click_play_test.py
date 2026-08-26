@@ -1353,13 +1353,19 @@ testcase external_actual_random_town_continue_click:
     $ main_ui_runtime.inventory_dropdown_open = False
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.action_title = "Статичное меню локации"
+    $ main_ui_runtime.action_items = [MenuItem("Старое действие локации", NullAction())]
     $ renpy.random.seed(11)
     run Call("TownRandomChronicleEvent")
     advance until screen "choice" timeout 20.0
     assert eval (len(str(scene_runtime.text or "")) > 80 and TownStreet.events_today == 1) timeout 5.0
     assert eval (len(list(TownStreet.story_seen_keys or [])) >= 1 and event_runtime.evaluation_time is None) timeout 5.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Случайное событие") timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Идти дальше"]) timeout 5.0
+    assert eval (main_ui_runtime.action_items == [] and renpy.get_screen("say") is None) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
-    pause 0.2
+    advance until eval (str(main_ui_runtime.mode or "") == "scene") timeout 5.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Старое действие локации"]) timeout 5.0
 
 testcase external_actual_random_town_click:
     $ renpy.test.testsettings._test.timeout = 60.0

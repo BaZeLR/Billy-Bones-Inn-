@@ -347,15 +347,16 @@ default TownStreet = TownStreetRuntime()
 
 
 label TownRandomChronicleEvent:
+    $ main_ui_begin_native_scene_state("Случайное событие")
     $ TownStreet.events_today += 1
     $ TownStreet.mark_seen(rooms.current_code, "TownRandomChronicleEvent")
     $ scene_runtime.text = TownStreet.random_chronicle(TownStreet.time_event_key())
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
-    "[scene_runtime.text]"
     menu:
         "Идти дальше":
             pass
+    $ main_ui_end_native_scene_state()
     return True
 
 
