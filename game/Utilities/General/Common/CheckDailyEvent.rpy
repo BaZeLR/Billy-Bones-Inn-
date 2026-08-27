@@ -57,7 +57,7 @@ init -25 python:
             })
             return len(self.rows)
 
-        def exists(self, girl_name="", event_type="", location_name=""):
+        def exists(self, girl_name="", event_type="", location_name="", current_time=None):
             filter_girl = str(girl_name or "").strip()
             filter_event_type = str(event_type or "").strip()
             filter_location = str(location_name or "").strip().lower()
@@ -69,7 +69,9 @@ init -25 python:
                     continue
                 if filter_event_type != "" and row_event != filter_event_type:
                     continue
-                if filter_location != "" and row_loc not in ("alllocs", filter_location):
+                if filter_location != "" and row_loc not in ("", "alllocs", filter_location):
+                    continue
+                if current_time is not None and not _daily_match_time(current_time, row.get("Time", 0), row.get("TimeCheckExpr", "=")):
                     continue
                 return 1
             return 0

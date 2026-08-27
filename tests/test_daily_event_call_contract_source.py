@@ -42,3 +42,18 @@ def test_live_daily_event_callers_use_the_defined_procedure_label():
     assert "label check_daily_event(" in game_sources
     assert "call CheckDailyEvent" not in game_sources
     assert 'renpy.has_label("CheckDailyEvent")' not in game_sources
+
+
+def test_morning_sickness_queries_the_daily_event_owner_without_a_global_mirror():
+    runtime = (ROOT / "game/Utilities/General/Common/CheckDailyEvent.rpy").read_text(encoding="utf-8-sig")
+    morning = (ROOT / "game/NPC/Girls/Common/MorningSickness.rpy").read_text(encoding="utf-8-sig")
+    live_sources = "\n".join(
+        path.read_text(encoding="utf-8-sig")
+        for path in (ROOT / "game").rglob("*.rpy")
+        if path.name != "TractirSaveSync.rpy"
+    )
+
+    assert "DailyEventsList" not in live_sources
+    assert "def exists(self, girl_name=\"\", event_type=\"\", location_name=\"\", current_time=None):" in runtime
+    assert "daily_events.exists(" in morning
+    assert "def morning_sickness_daily_event_ready(" not in morning

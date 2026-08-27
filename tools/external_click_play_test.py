@@ -1354,6 +1354,29 @@ testcase external_breakfast_window_and_call_all_click:
     $ main_ui_runtime.action_items = tavern_kitchen_action_items()
     assert eval ("Позавтракать" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
 
+testcase external_kitchen_entry_morning_sickness_event:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 6, 30)
+    $ external_calendar_set_weekday(1)
+    $ player.tavern_management.breakfast.today = False
+    $ player.tavern_management.breakfast.event_active = False
+    $ player.tavern_management.breakfast.present_ids = None
+    $ daily_events.rows[:] = []
+    $ daily_events.add("sandra", "TavernKitchen", 1, "<", 1, 8, "MorningSickness", "MorningSickness", "girl")
+    $ people.get_data("sandra").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
+    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
+    run Jump("TavernKitchen")
+    advance until screen "main_ui" timeout 20.0
+    $ _breakfast_action_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Позавтракать")
+    $ _breakfast_action_button = "choice_panel_button_%d" % int(_breakfast_action_index)
+    click id _breakfast_action_button pos (0.5, 0.5) until screen "say" timeout 20.0
+    advance until screen "choice" timeout 30.0
+    assert eval (str(rooms.current_code or "") == "TavernKitchen") timeout 5.0
+    assert eval (daily_events.exists("sandra", "MorningSickness", "TavernKitchen") == 0) timeout 5.0
+
 testcase external_actual_barber_actions_click:
     run Call("InitGameNPCs")
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 14, 0)
@@ -6199,6 +6222,7 @@ def main() -> int:
             "external_breakfast_attendance_location_wins",
             "external_breakfast_angry_amanda_melissa_mockery",
             "external_breakfast_window_and_call_all_click",
+            "external_kitchen_entry_morning_sickness_event",
             "external_actual_barber_actions_click",
             "external_actual_draupnir_talk_menu",
             "external_actual_market_click",
@@ -6357,6 +6381,7 @@ def main() -> int:
             "external_breakfast_attendance_location_wins",
             "external_breakfast_angry_amanda_melissa_mockery",
             "external_breakfast_window_and_call_all_click",
+            "external_kitchen_entry_morning_sickness_event",
             "external_actual_barber_actions_click",
             "external_actual_draupnir_talk_menu",
             "external_actual_market_click",

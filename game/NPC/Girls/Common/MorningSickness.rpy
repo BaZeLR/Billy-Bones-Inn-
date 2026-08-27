@@ -2,23 +2,6 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    def morning_sickness_daily_event_ready(girl_name="", location_name="TavernKitchen", time_value=None):
-        girl_key = str(girl_name or "").strip()
-        loc_key = str(location_name or rooms.current_code or "").strip().lower()
-        current_time = calendar_v2.time_slot() if time_value is None else time_value
-        for row in list(DailyEventsList or []):
-            if str(row.get("GirlName", "") or "").strip() != girl_key:
-                continue
-            if str(row.get("EventType", "") or "").strip() != "MorningSickness":
-                continue
-            row_loc = str(row.get("Location", "") or "").strip().lower()
-            if row_loc not in ("", "alllocs", loc_key):
-                continue
-            if not _daily_match_time(current_time, row.get("Time", 0), row.get("TimeCheckExpr", "=")):
-                continue
-            return True
-        return False
-
     def tavern_breakfast_morning_sickness_girl():
         if int(calendar_v2.time_slot() or 0) != 0:
             return ""
@@ -26,7 +9,7 @@ init python:
             girl_key = str(girl or "").strip()
             if str(people.location(girl_key) or "") != "TavernKitchen":
                 continue
-            if morning_sickness_daily_event_ready(girl_key, "TavernKitchen", calendar_v2.time_slot()):
+            if daily_events.exists(girl_key, "MorningSickness", "TavernKitchen", calendar_v2.time_slot()):
                 return girl_key
         return ""
 
