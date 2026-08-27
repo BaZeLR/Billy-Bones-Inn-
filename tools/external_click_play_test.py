@@ -328,6 +328,9 @@ testcase external_tavern_report_state_defaults:
     assert eval ("sandra" in BuildTavernReport()["team_keys"] and "melissa" in BuildTavernReport()["team_keys"] and "amanda" in BuildTavernReport()["team_keys"]) timeout 5.0
     assert eval (str(people.get_info("sandra").getLocation() or "") != "") timeout 5.0
     assert eval (len(people_locate_rows()) >= 3) timeout 5.0
+    assert eval (int(BuildTavernReport()["hall_job_capacity"] or 0) == 3 and int(BuildTavernReport()["cleaning_slots"] or 0) == 2) timeout 5.0
+    click id "tavern_schedule_sandra_cleaning" pos (0.5, 0.5) until eval (int(Sandra.job_value("jobcleaningtomorrow", 0) or 0) == 1) timeout 20.0
+    assert eval (int(Sandra.job_value("jobcleaning", 0) or 0) == 0 and int(BuildTavernReport()["cleaning_slots"] or 0) == 3) timeout 5.0
     $ _sandra_kitchen_tomorrow_before = int(Sandra.job_value("jobkitchentomorrow", 0) or 0)
     click id "tavern_schedule_sandra_kitchen" pos (0.5, 0.5) until eval (int(Sandra.job_value("jobkitchentomorrow", 0) or 0) != _sandra_kitchen_tomorrow_before) timeout 20.0
     assert eval (int(Sandra.job_value("jobkitchen", 0) or 0) == 1 and int(Sandra.job_value("jobkitchentomorrow", 0) or 0) == 0) timeout 5.0

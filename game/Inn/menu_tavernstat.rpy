@@ -2,6 +2,8 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 
+define TAVERN_HALL_JOB_CAPACITY = 3
+
 init python:
     import renpy.exports as renpy_module
 
@@ -412,17 +414,13 @@ init python:
     def _tavern_job_load(job_key):
         return sum(1 for person in list(AllGirlNames or []) if _girl_job_value(person, job_key))
 
-    def _tavern_can_toggle_hall_job(job_key, person, max_slots=3):
+    def _tavern_can_toggle_hall_job(job_key, person):
         current = _girl_job_value(person, job_key)
         if current != 0:
             return True
-        return _tavern_job_load(job_key) < _tavern_int(max_slots, 3)
+        return _tavern_job_load(job_key) < TAVERN_HALL_JOB_CAPACITY
 
-    def toggle_hall_job_with_limit(job_key, person, max_slots=3):
-        """
-        Переключает назначение на завтра по работе в зале с лимитом слотов.
-        По умолчанию лимит = 3 человека на позицию.
-        """
+    def toggle_hall_job_with_limit(job_key, person):
         info = _tavern_person_info(person)
         if info is None or not person:
             return
@@ -433,8 +431,8 @@ init python:
             _tavern_restart_interaction()
             return
 
-        if _tavern_job_load(job_key) >= _tavern_int(max_slots, 3):
-            renpy.notify("Лимит: %d/%d на этой позиции." % (_tavern_job_load(job_key), _tavern_int(max_slots, 3)))
+        if _tavern_job_load(job_key) >= TAVERN_HALL_JOB_CAPACITY:
+            renpy.notify("Лимит: %d/%d на этой позиции." % (_tavern_job_load(job_key), TAVERN_HALL_JOB_CAPACITY))
             return
 
         info.set_job_value(job_key, 1)
@@ -486,6 +484,7 @@ init python:
             "kitchen_slots": _tavern_job_load("jobkitchentomorrow"),
             "cleaning_slots": _tavern_job_load("jobcleaningtomorrow"),
             "waitress_slots": _tavern_job_load("jobwaitresstomorrow"),
+            "hall_job_capacity": TAVERN_HALL_JOB_CAPACITY,
             "team_keys": _tavern_team_keys(),
         }
     def _tavern_report_label(report):
@@ -510,10 +509,13 @@ init python:
             lines.append("У глорихола трудится: %s" % report["gloryhole_list"])
 
         lines.extend([
-            "Слоты на завтра: кухня %d/3, уборка %d/3, обслуживание %d/3." % (
+            "Слоты на завтра: кухня %d/%d, уборка %d/%d, обслуживание %d/%d." % (
                 report["kitchen_slots"],
+                report["hall_job_capacity"],
                 report["cleaning_slots"],
+                report["hall_job_capacity"],
                 report["waitress_slots"],
+                report["hall_job_capacity"],
             ),
             "",
             "У вас трудятся следующие работницы и работники:",
@@ -544,9 +546,9 @@ init python:
         if renpy.game.script.has_label("ShowGirlCard"):
             items.append(MenuItem("Осмотреть", Call("ShowGirlCard", person)))
 
-        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobkitchentomorrow"), 1), [Function(toggle_hall_job_with_limit, "jobkitchentomorrow", person, 2), Function(show_tavern_report_main_ui_state, person)]))
-        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobcleaningtomorrow"), 2), [Function(toggle_hall_job_with_limit, "jobcleaningtomorrow", person, 2), Function(show_tavern_report_main_ui_state, person)]))
-        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobwaitresstomorrow"), 3), [Function(toggle_hall_job_with_limit, "jobwaitresstomorrow", person, 2), Function(show_tavern_report_main_ui_state, person)]))
+        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobkitchentomorrow"), 1), [Function(toggle_hall_job_with_limit, "jobkitchentomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
+        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobcleaningtomorrow"), 2), [Function(toggle_hall_job_with_limit, "jobcleaningtomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
+        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobwaitresstomorrow"), 3), [Function(toggle_hall_job_with_limit, "jobwaitresstomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
 
         if _tavern_can_assign_gloryhole(person):
             items.append(MenuItem("Назначить завтра работать у глорихола", [Function(assign_special_job, person, "gloryhole"), Function(show_tavern_report_main_ui_state, person)]))

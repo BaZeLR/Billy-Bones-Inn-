@@ -61,3 +61,15 @@ def test_report_and_staff_cards_share_job_text_projection():
     assert "_tavern_worker_current_jobs(person)" in report_source
     assert '("Работа сегодня", _tavern_worker_current_jobs(key))' in card_source
     assert '("Работа завтра", _tavern_worker_tomorrow_jobs(key))' in card_source
+
+
+def test_each_hall_job_uses_one_three_worker_capacity_rule():
+    report_source = (ROOT / "game/Inn/menu_tavernstat.rpy").read_text(encoding="utf-8-sig")
+    layout_source = (ROOT / "game/Utilities/General/Screens/main_layout.rpy").read_text(encoding="utf-8-sig")
+
+    assert "define TAVERN_HALL_JOB_CAPACITY = 3" in report_source
+    assert "def toggle_hall_job_with_limit(job_key, person):" in report_source
+    assert "def _tavern_can_toggle_hall_job(job_key, person):" in report_source
+    assert "max_slots" not in report_source
+    assert '"hall_job_capacity": TAVERN_HALL_JOB_CAPACITY' in report_source
+    assert "toggle_hall_job_with_limit, \"jobkitchentomorrow\", _worker, 2" not in layout_source
