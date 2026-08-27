@@ -67,6 +67,24 @@ def test_people_registry_selects_npc_owned_action_data_without_owning_talk_flow(
     assert "MenuItem(" not in registry
 
 
+def test_closed_room_hides_normal_npc_interaction_without_moving_the_npc():
+    runtime = _runtime_source()
+    registry = runtime.split("class PeopleRegistry(object):", 1)[1].split(
+        "def npc_schedule_clock_minute", 1
+    )[0]
+    action_projection = registry.split(
+        'def action_data_for_room(self, person="", room_code=""):', 1
+    )[1].split("def schedule_entry", 1)[0]
+    location_projection = registry.split(
+        'def ids_at(self, location="", weekday_value=None, time_value=None):', 1
+    )[1].split("def action_data_for_room", 1)[0]
+
+    assert "room = rooms.get(room_key)" in action_projection
+    assert "room is not None and not room.is_open()" in action_projection
+    assert "is_open" not in location_projection
+    assert "venue_open_required" not in runtime
+
+
 def test_special_talk_labels_stay_distinct_behind_the_same_visible_button_path():
     main_layout = MAIN_LAYOUT.read_text(encoding="utf-8-sig")
     visible_panel = main_layout.split('text "Персонажи"', 1)[1].split(

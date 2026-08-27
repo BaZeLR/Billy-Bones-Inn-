@@ -5318,6 +5318,20 @@ testcase external_npc_schedule_room_visibility_agreement:
     assert eval ("eddie" not in _forced_kitchen) timeout 5.0
     $ player.tavern_management.breakfast.event_active = False
     $ player.tavern_management.breakfast.present_ids = []
+    $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="WineStore", start_minute=0, end_minute=1440, awake=True, talkable=True, priority=999)])
+    $ external_calendar_set_fields(3, 1, 1100, 20, 0)
+    $ external_calendar_set_weekday(1)
+    run Jump("WineStore")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (not rooms.get("WineStore").is_open()) timeout 5.0
+    assert eval (str(people.location("clara") or "") == "WineStore" and "clara" in list(people.ids_at("WineStore") or [])) timeout 5.0
+    assert eval (people.action_data_for_room("clara", "WineStore") is None and not Clara.talk_available_in_room("WineStore")) timeout 5.0
+    assert eval (renpy.get_displayable("main_ui", "main_ui_entity_button_npc_clara") is None) timeout 5.0
+    $ external_calendar_set_fields(3, 1, 1100, 8, 0)
+    run Jump("WineStore")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (rooms.get("WineStore").is_open() and people.action_data_for_room("clara", "WineStore") is not None) timeout 5.0
+    assert eval (renpy.get_displayable("main_ui", "main_ui_entity_button_npc_clara") is not None) timeout 5.0
 
 testcase external_right_side_npc_buttons_open_default_menu:
     run Jump("Intro")

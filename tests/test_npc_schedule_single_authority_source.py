@@ -252,7 +252,7 @@ def test_people_location_panel_reports_schedule_without_teleporting_story_flow()
     assert '"state": people_locate_state_text(key, loc)' in source
     assert "info.talk_available_in_room(room_key)" in source
     assert "def talk_available_in_room(self, room_code=\"\"):" in runtime
-    assert "self.interaction_visible(room_key)" in runtime
+    assert "people.action_data_for_room(self.name, room_key) is not None" in runtime
     assert "def npc_social_actions_available_in_room" not in runtime
 
 

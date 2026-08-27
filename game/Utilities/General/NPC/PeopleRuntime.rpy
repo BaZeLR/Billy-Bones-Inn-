@@ -108,6 +108,9 @@ init -999 python:
             room_key = str(room_code or "").strip()
             if not key or not room_key:
                 return None
+            room = rooms.get(room_key)
+            if room is not None and not room.is_open():
+                return None
             info = self.get_info(key)
             if info is None or not info.interaction_visible(room_key):
                 return None
@@ -130,7 +133,7 @@ init -999 python:
         def schedule_state(self, person="", weekday_value=None, time_value=None):
             data = self.get_data(person)
             if data is None:
-                return {"location": "", "awake": True, "talkable": True, "venue_open_required": False, "label": "", "interval": "", "source": ""}
+                return {"location": "", "awake": True, "talkable": True, "label": "", "interval": "", "source": ""}
             return data.schedule_state(weekday_value, time_value)
 
         def repair(self):
@@ -159,14 +162,13 @@ init -999 python:
         return value % 1440
 
     class NPCScheduleEntry(object):
-        def __init__(self, location="", weekdays=None, start_hour=0, end_hour=24, awake=True, talkable=True, venue_open_required=False, condition=None, priority=0, label="", start_minute=None, end_minute=None):
+        def __init__(self, location="", weekdays=None, start_hour=0, end_hour=24, awake=True, talkable=True, condition=None, priority=0, label="", start_minute=None, end_minute=None):
             self.location = str(location or "").strip()
             self.weekdays = list(weekdays or [])
             self.start_minute = int(start_hour or 0) * 60 if start_minute is None else int(start_minute or 0)
             self.end_minute = int(end_hour or 0) * 60 if end_minute is None else int(end_minute or 0)
             self.awake = bool(awake)
             self.talkable = bool(talkable)
-            self.venue_open_required = bool(venue_open_required)
             self.condition = condition
             self.priority = int(priority or 0)
             self.label = str(label or "").strip()
@@ -498,7 +500,7 @@ init -999 python:
         def schedule_state(self, weekday_value=None, time_value=None):
             entry = self.schedule_resolve(weekday_value, time_value)
             if entry is None:
-                return {"location": "", "awake": True, "talkable": True, "venue_open_required": False, "label": "", "interval": "", "source": ""}
+                return {"location": "", "awake": True, "talkable": True, "label": "", "interval": "", "source": ""}
             interval_text = "%02d:%02d-%02d:%02d" % (
                 int(getattr(entry, "start_minute", 0) or 0) // 60,
                 int(getattr(entry, "start_minute", 0) or 0) % 60,
@@ -509,7 +511,6 @@ init -999 python:
                 "location": str(entry.selected_location() or ""),
                 "awake": bool(getattr(entry, "awake", True)),
                 "talkable": bool(getattr(entry, "talkable", True)),
-                "venue_open_required": bool(getattr(entry, "venue_open_required", False)),
                 "label": str(getattr(entry, "label", "") or ""),
                 "interval": interval_text,
                 "source": str(getattr(entry, "source", "rpy") or "rpy"),
@@ -613,7 +614,7 @@ init -999 python:
             return (
                 bool(people.can_talk(self.name))
                 and str(self.getLocation() or "") == room_key
-                and bool(self.interaction_visible(room_key))
+                and people.action_data_for_room(self.name, room_key) is not None
                 and bool(self.social_action_allowed("talk"))
             )
 
