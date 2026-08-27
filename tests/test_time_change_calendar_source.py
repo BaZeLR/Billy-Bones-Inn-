@@ -36,3 +36,16 @@ def test_nextday_after_midnight_detection_uses_calendar_hour_not_old_slot():
     assert "return 0 <= current_hour < 6" in body
     assert "current_time = int(time or 0)" not in body
     assert "current_time == 4" not in body
+
+
+def test_nextday_blocks_time_during_report_then_releases_it_before_room_return():
+    source = (PROJECT_ROOT / "game" / "Utilities" / "Time" / "NextDay.rpy").read_text(encoding="utf-8-sig")
+    body = source.split("label NextDay(", 1)[1].split("default next_day_runtime", 1)[0]
+
+    block_start = body.index("$ calendar_v2.time_advance_blocked = 1")
+    report = body.index("call screen nextday_report_card_overlay")
+    sleep_events = body.index('call checkTriggers("TavernMyRoom", "sleep", 0)')
+    block_end = body.index("$ calendar_v2.time_advance_blocked = 0")
+    room_return = body.index("jump expression _nextday_return_label")
+
+    assert block_start < report < sleep_events < block_end < room_return

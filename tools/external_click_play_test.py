@@ -1711,6 +1711,31 @@ testcase external_sleep_after_midnight_detector:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 6, 0)
     assert eval (not nextday_started_after_midnight()) timeout 5.0
 
+testcase external_next_day_report_releases_time_block:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ player.set_money(1000)
+    $ player.tavern_management.visitors = 40
+    $ player.tavern_management.productnum = 200
+    $ player.tavern_management.winenum = 100
+    $ calendar_v2.time_advance_blocked = 1
+    $ tractir_save_patch_loaded_state()
+    assert eval (int(calendar_v2.time_advance_blocked or 0) == 0) timeout 5.0
+    $ external_calendar_set_fields(1, 1, CALENDAR_START_CYCLE, 23, 0)
+    $ _nextday_test_day = int(calendar_v2.daysInGame or 0)
+    run Call("NextDay", "TavernMain", 1)
+    advance until screen "nextday_report_card_overlay" timeout 30.0
+    assert eval (int(calendar_v2.time_advance_blocked or 0) == 1) timeout 5.0
+    assert eval (int(calendar_v2.daysInGame or 0) == _nextday_test_day + 1 and int(calendar_v2.hour or 0) == 6 and int(calendar_v2.minute or 0) == 0) timeout 5.0
+    assert eval (str(next_day_runtime.report_title or "") == "ОТЧЕТ ЗА ДЕНЬ" and "Новый день настал!" in str(next_day_runtime.report_body or "")) timeout 5.0
+    click id "nextday_report_back_button" pos (0.5, 0.5) until eval (renpy.get_screen("nextday_report_card_overlay") is None) timeout 20.0
+    advance until eval (str(rooms.current_code or "") == "TavernMyRoom" and renpy.get_screen("main_ui") is not None) timeout 30.0
+    assert eval (int(calendar_v2.time_advance_blocked or 0) == 0) timeout 5.0
+    $ _nextday_test_clock = int(calendar_v2.clock_minutes() or 0)
+    $ apply_movement_time(5)
+    assert eval (int(calendar_v2.clock_minutes() or 0) == _nextday_test_clock + 5) timeout 5.0
+
 testcase external_town_thugs_shout_result:
     $ external_calendar_set_fields(3, 1, CALENDAR_START_CYCLE, 18, 0)
     $ rooms.enter("StreetTavern")
@@ -6182,6 +6207,7 @@ def main() -> int:
             "external_actual_random_town_continue_click",
             "external_actual_random_town_click",
             "external_sleep_after_midnight_detector",
+            "external_next_day_report_releases_time_block",
             "external_town_thugs_shout_result",
             "external_town_thugs_fight_victory_result",
             "external_georgette_back_alley_not_visible_in_port_streets",

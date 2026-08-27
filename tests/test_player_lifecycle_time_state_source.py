@@ -29,3 +29,12 @@ def test_lifecycle_and_time_have_no_legacy_save_authority():
     for legacy_name in LEGACY_NAMES:
         assert legacy_name not in migration
     assert "tractir_save_migrate_time_and_lifecycle_state" not in migration
+
+
+def test_loaded_saves_release_transient_time_block_without_a_second_owner():
+    migration = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
+    patch = migration.split("def tractir_save_patch_loaded_state():", 1)[1].split(
+        "def tractir_save_clear_retired_npc_state():", 1
+    )[0]
+
+    assert patch.count("calendar_v2.time_advance_blocked = 0") == 1

@@ -253,6 +253,7 @@ label NextDay(retlocname, timepassed):
         if int(calendar_v2.time_slot() or 0) == 0 and _nextday_return_label == "TavernMain":
             $ _nextday_return_label = "TavernMyRoom"
         call checkTriggers("TavernMyRoom", "sleep", 0)
+        $ calendar_v2.time_advance_blocked = 0
         jump expression _nextday_return_label
     return
 
@@ -298,6 +299,7 @@ screen nextday_report_card_overlay():
                     substitute False
 
                 textbutton "Назад":
+                    id "nextday_report_back_button"
                     text_size 22
                     text_color "#f7f0de"
                     background "#3a2214"

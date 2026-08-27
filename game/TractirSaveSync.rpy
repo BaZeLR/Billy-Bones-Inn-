@@ -21,6 +21,7 @@ init -100 python:
         ensure_game_item_registry()
         people.repair()
         rooms.repair()
+        calendar_v2.time_advance_blocked = 0
         legacy_current_day = globals().pop("CurDay", None)
         next_day_runtime.update()
         if isinstance(legacy_current_day, dict):
