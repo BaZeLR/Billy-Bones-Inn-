@@ -3659,6 +3659,19 @@ testcase external_amanda_talk_opens_from_npc_button:
     assert eval ("Осмотреть" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Назад" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Спросить, чего ей сейчас хочется больше всего" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Флиртовать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ player.condition.fun = 10
+    $ _amanda_flirt_start = int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0)
+    $ _amanda_flirt_talked = int(Amanda.talked_today or 0)
+    $ _amanda_flirted = int(Amanda.flirted_today or 0)
+    $ _amanda_flirt_openness = int(Amanda.openness or 0)
+    $ _amanda_flirt_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Флиртовать")
+    $ _amanda_flirt_button_id = "choice_panel_button_%d" % int(_amanda_flirt_index)
+    click id _amanda_flirt_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and int(Amanda.flirted_today or 0) == _amanda_flirted + 1) timeout 20.0
+    assert eval (int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0) == _amanda_flirt_start + 30) timeout 5.0
+    assert eval (int(Amanda.talked_today or 0) == _amanda_flirt_talked + 1 and int(player.condition.fun or 0) == 14) timeout 5.0
+    assert eval (int(Amanda.openness or 0) == _amanda_flirt_openness and len(str(scene_runtime.text or "")) > 0) timeout 5.0
+    click id "main_ui_entity_button_npc_amanda" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
     $ _amanda_priority_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить, чего ей сейчас хочется больше всего")
     $ _amanda_priority_button_id = "choice_panel_button_%d" % int(_amanda_priority_index)
     click id _amanda_priority_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is None and int(Amanda.asked_today or 0) == 1) timeout 20.0
@@ -3668,6 +3681,16 @@ testcase external_amanda_talk_opens_from_npc_button:
     $ _amanda_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
     $ _amanda_back_button_id = "choice_panel_button_%d" % int(_amanda_back_index)
     click id _amanda_back_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and str(rooms.current_code or "") == "TavernMain") timeout 20.0
+    $ Amanda.rel = 100
+    $ Amanda.openness = 7
+    $ _amanda_kino_start = int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0)
+    $ _amanda_kino_talked = int(Amanda.talked_today or 0)
+    $ _amanda_kino_flirted = int(Amanda.flirted_today or 0)
+    $ _amanda_kino_result = old_point_kino_attempt("amanda")
+    assert eval (bool(_amanda_kino_result.get("ok", False)) and len(str(_amanda_kino_result.get("text", "") or "")) > 0) timeout 5.0
+    assert eval (int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0) == _amanda_kino_start + 30) timeout 5.0
+    assert eval (int(Amanda.talked_today or 0) == _amanda_kino_talked + 1 and int(Amanda.flirted_today or 0) == _amanda_kino_flirted) timeout 5.0
+    assert eval (int(Amanda.openness or 0) == 7 and int(player.condition.fun or 0) == 19) timeout 5.0
 
 testcase external_amanda_daily_talk_actions:
     run Jump("Intro")

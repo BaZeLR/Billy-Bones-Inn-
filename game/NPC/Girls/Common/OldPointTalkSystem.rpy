@@ -60,7 +60,7 @@ init -40 python:
         before = people_to_int(getattr(info, "rel", 0), 0)
         score = old_point_social_attempt_score(key, "flirt")
         gain = 1 if score > 1 else (-1 if score < 0 else 0)
-        apply_social_interaction_base(key, "flirt", gain, 4, 30, 1, 1, 0, 0, True)
+        apply_social_interaction_base(key, "flirt", gain, 4, 30, 1, 1, 0, 0)
         relationship_after_social_result(key, "flirt", score, score >= 0)
         actual = people_to_int(getattr(info, "rel", 0), 0) - before
         if score > 1:
@@ -81,7 +81,7 @@ init -40 python:
         before = people_to_int(getattr(info, "rel", 0), 0)
         score = old_point_social_attempt_score(key, "kino")
         gain = 1 if score > 0 else (-1 if score < -1 else 0)
-        apply_social_interaction_base(key, "kino", gain, 5, 30, 1, 0, 0, 0, True)
+        apply_social_interaction_base(key, "kino", gain, 5, 30, 1, 0, 0, 0)
         if score > 0:
             info.change_social(corruption_delta=1)
             relationship_after_social_result(key, "kino", score, True)
