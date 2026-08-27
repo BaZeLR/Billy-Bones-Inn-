@@ -1777,6 +1777,23 @@ testcase external_next_day_report_releases_time_block:
     $ _nextday_test_clock = int(calendar_v2.clock_minutes() or 0)
     $ apply_movement_time(5)
     assert eval (int(calendar_v2.clock_minutes() or 0) == _nextday_test_clock + 5) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 1, 20)
+    $ _nextday_current_day = int(calendar_v2.daysInGame or 0)
+    $ _nextday_today_date = calendar_v2.format_date_ru(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, None, False)
+    $ _nextday_previous_parts = calendar_v2.day_number_to_parts(_nextday_current_day - 1)
+    $ _nextday_previous_date = calendar_v2.format_date_ru(_nextday_previous_parts["day"], _nextday_previous_parts["month"], _nextday_previous_parts["year"], None, False)
+    $ player.appearance.remove_dress("citydress")
+    $ dress_shop.produced = "citydress"
+    $ dress_shop.buyer = "You"
+    run Call("NextDay", "TavernMain", 1)
+    advance until screen "nextday_report_card_overlay" timeout 30.0
+    assert eval (int(calendar_v2.daysInGame or 0) == _nextday_current_day and int(calendar_v2.hour or 0) == 6) timeout 5.0
+    assert eval (("События за %s" % _nextday_previous_date) in str(next_day_runtime.report_body or "")) timeout 5.0
+    assert eval (("События за %s" % _nextday_today_date) not in str(next_day_runtime.report_body or "")) timeout 5.0
+    assert eval ("Утром прибежал посыльный из лавки Фараго" in str(next_day_runtime.report_body or "")) timeout 5.0
+    assert eval (player.appearance.has_dress("citydress") and int(player.appearance.dress_days.get("citydress", -1) or -1) == _nextday_current_day) timeout 5.0
+    click id "nextday_report_back_button" pos (0.5, 0.5) until eval (renpy.get_screen("nextday_report_card_overlay") is None) timeout 20.0
+    advance until eval (int(calendar_v2.time_advance_blocked or 0) == 0 and renpy.get_screen("main_ui") is not None) timeout 30.0
 
 testcase external_town_thugs_shout_result:
     $ external_calendar_set_fields(3, 1, CALENDAR_START_CYCLE, 18, 0)

@@ -56,3 +56,5 @@ def test_tavern_summary_uses_label_local_accumulators():
     assert 'today_events_summary=""' in header
     assert "TodayEventsSummary" not in source
     assert "TimePeriodEvents" not in source
+    assert '"\\n\\n{i}События за %s{/i}%s" % (calendar_v2.format_date_ru(day, month, year, None, False), today_events_summary)' in source
+    assert "[calendar_v2.format_date_ru(" not in source

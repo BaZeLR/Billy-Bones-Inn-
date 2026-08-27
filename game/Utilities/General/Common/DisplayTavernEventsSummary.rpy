@@ -22,6 +22,6 @@ label DisplayTavernEventsSummary(day, month, year, result="", time_period_events
         $ time_period_events += 1
     if today_events_summary == '':
         $ today_events_summary = '\n\nНичего не произошло!'
-    $ today_events_summary = "\n\n{i}События за [calendar_v2.format_date_ru(day, month, year, None, False)]{/i}" + today_events_summary
+    $ today_events_summary = "\n\n{i}События за %s{/i}%s" % (calendar_v2.format_date_ru(day, month, year, None, False), today_events_summary)
     $ result = today_events_summary
     return result

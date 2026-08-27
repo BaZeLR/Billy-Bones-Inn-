@@ -24,7 +24,7 @@ init python:
         return 0 <= current_hour < 6
 
 label NextDay(retlocname, timepassed):
-    $ renpy.dynamic("visitorshappy", "_nextday_skip_first_calendar_roll", "TotalEventsSummary", "ExtraEvents", "iDaysCount", "_nextday_girl", "TotalDay", "TotalWhoreClients", "TotalGloryHoleClients", "_weekly_msg", "CurDay", "_nextday_summary_text", "_nextday_money_delta", "NewDressCame", "dress_name", "avg_happy", "tavernlevel", "_nextday_lines", "_geo_name", "_liza_name", "_tractir_game_over_ending", "_nextday_return_label", "_girl")
+    $ renpy.dynamic("visitorshappy", "_nextday_skip_first_calendar_roll", "TotalEventsSummary", "ExtraEvents", "iDaysCount", "_nextday_girl", "TotalDay", "TotalWhoreClients", "TotalGloryHoleClients", "_weekly_msg", "CurDay", "_nextday_event_day_number", "_nextday_event_date", "_nextday_summary_text", "_nextday_money_delta", "NewDressCame", "dress_name", "avg_happy", "tavernlevel", "_nextday_lines", "_geo_name", "_liza_name", "_tractir_game_over_ending", "_nextday_return_label", "_girl")
     $ next_day_runtime.update()
     $ visitorshappy = 0
     $ _nextday_skip_first_calendar_roll = nextday_started_after_midnight()
@@ -57,7 +57,12 @@ label NextDay(retlocname, timepassed):
         $ CurDay = next_day_runtime.current_day
         call NextDay_TavernDaily
 
-        call DisplayTavernEventsSummary(calendar_v2.day, calendar_v2.period, calendar_v2.cycle)
+        python:
+            _nextday_event_day_number = int(calendar_v2.daysInGame or 0)
+            if _nextday_skip_first_calendar_roll and iDaysCount == 0:
+                _nextday_event_day_number = max(0, _nextday_event_day_number - 1)
+            _nextday_event_date = calendar_v2.day_number_to_parts(_nextday_event_day_number)
+        call DisplayTavernEventsSummary(_nextday_event_date["day"], _nextday_event_date["month"], _nextday_event_date["year"])
         $ _nextday_summary_text = _return
         if _nextday_summary_text:
             $ TotalEventsSummary += _nextday_summary_text
