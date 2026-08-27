@@ -31,7 +31,11 @@ def test_authored_reconciliation_paths_remain_reachable():
     assert "любимым братом" in melissa
     assert '"Попробовать помириться с мамой" if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:' in sandra
     assert "call IntSandraReconcile(girl_name)" in sandra
-    assert "Вы подошли к маме и извинились" in sandra
+    reconcile = sandra.split('label IntSandraReconcile(girl_name="sandra"):', 1)[1].split("label IntSandraHouseholdInsight", 1)[0]
+    assert "Вы подошли к Сандре и извинились" in reconcile
+    assert "Сандра благосклонно выслушала вас" in reconcile
+    assert "Сандра холодно выслушала вас" in reconcile
+    assert "мам" not in reconcile.lower()
     assert "она всегда будет вас любить" in sandra
 
 

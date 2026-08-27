@@ -3715,6 +3715,14 @@ testcase external_sandra_talk_opens_from_npc_button:
     $ _sandra_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
     $ _sandra_back_button_id = "choice_panel_button_%d" % int(_sandra_back_index)
     click id _sandra_back_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and str(rooms.current_code or "") == "TavernKitchen") timeout 20.0
+    $ Sandra.rel = 0
+    $ Sandra.talked_today = 0
+    click id "main_ui_entity_button_npc_sandra" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval ("Попробовать помириться с мамой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _sandra_reconcile_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Попробовать помириться с мамой")
+    $ _sandra_reconcile_button_id = "choice_panel_button_%d" % int(_sandra_reconcile_index)
+    click id _sandra_reconcile_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and "Вы подошли к Сандре и извинились" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval ("Сандра" in str(scene_runtime.text or "") and "мам" not in str(scene_runtime.text or "").lower()) timeout 5.0
 
 testcase external_sandra_weekly_thread_progression:
     run Jump("Intro")
