@@ -2009,6 +2009,15 @@ testcase external_amanda_room_night_bed_action_uses_thread_event:
     assert eval (int(threads["amandaStreetLoverEncounters"].data.length or 0) == 1 and sorted([str(evt.location or "") for evt in threads["amandaStreetLoverEncounters"].data.triggers[0]]) == ["MarketPlace", "StreetTavern"]) timeout 5.0
     assert eval (story_event_day_key(AmandaStreetLoverEncounterStreet) == story_event_day_key(AmandaStreetLoverEncounterMarket)) timeout 5.0
 
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 14, 0)
+    $ external_calendar_set_weekday(1)
+    assert eval (str(people.location("amanda") or "") == "TavernMain") timeout 5.0
+    $ rooms.enter("TavernUpstairs")
+    run Call("TavernAmandaRoomKnock")
+    assert eval (str(scene_runtime.text or "") == "Вы постучали в дверь, но ответа не последовало.") timeout 5.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Попробовать войти", "Уйти"]) timeout 5.0
+    assert eval ("Кто там?" not in str(scene_runtime.text or "") and "Аманда отвечает" not in str(scene_runtime.text or "")) timeout 5.0
+
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 22, 0)
     $ Melissa.temp_room_code = ""
     $ Melissa.drawings_found = False

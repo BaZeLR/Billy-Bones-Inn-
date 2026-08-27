@@ -313,18 +313,22 @@ label TavernAmandaRoomDoor:
 
 label TavernAmandaRoomKnock:
     $ renpy.dynamic("_amanda_knock_roll")
-    $ _amanda_knock_roll = procedural_randint(1, 100, key="procedural:Inn/TavernAmandaRoom.rpy:procedural_randint:323:1")
     $ main_ui_runtime.action_title = "Дверь Аманды"
     $ main_ui_runtime.action_content = None
-    if _amanda_knock_roll <= 50:
-        $ scene_runtime.text = "Вы стучите в дверь. Через несколько секунд Аманда отвечает: \"Войдите.\""
-        $ main_ui_runtime.action_items = [MenuItem("Войти", movement_actions("TavernAmandaRoom")), MenuItem("Уйти", Jump("TavernUpstairs"))]
-    elif _amanda_knock_roll <= 75:
-        $ scene_runtime.text = "Вы стучите в дверь. Из комнаты доносится осторожное: \"Кто там?\""
-        $ main_ui_runtime.action_items = [MenuItem("Назваться", Call("TavernAmandaRoomKnockAnswer")), MenuItem("Уйти", Jump("TavernUpstairs"))]
-    else:
+    if str(people.location("amanda") or "") != "TavernAmandaRoom":
         $ scene_runtime.text = "Вы постучали в дверь, но ответа не последовало."
         $ main_ui_runtime.action_items = [MenuItem("Попробовать войти", Call("TavernAmandaRoomEnterWithoutKnock")), MenuItem("Уйти", Jump("TavernUpstairs"))]
+    else:
+        $ _amanda_knock_roll = procedural_randint(1, 100, key="procedural:Inn/TavernAmandaRoom.rpy:procedural_randint:323:1")
+        if _amanda_knock_roll <= 50:
+            $ scene_runtime.text = "Вы стучите в дверь. Через несколько секунд Аманда отвечает: \"Войдите.\""
+            $ main_ui_runtime.action_items = [MenuItem("Войти", movement_actions("TavernAmandaRoom")), MenuItem("Уйти", Jump("TavernUpstairs"))]
+        elif _amanda_knock_roll <= 75:
+            $ scene_runtime.text = "Вы стучите в дверь. Из комнаты доносится осторожное: \"Кто там?\""
+            $ main_ui_runtime.action_items = [MenuItem("Назваться", Call("TavernAmandaRoomKnockAnswer")), MenuItem("Уйти", Jump("TavernUpstairs"))]
+        else:
+            $ scene_runtime.text = "Вы постучали в дверь, но ответа не последовало."
+            $ main_ui_runtime.action_items = [MenuItem("Попробовать войти", Call("TavernAmandaRoomEnterWithoutKnock")), MenuItem("Уйти", Jump("TavernUpstairs"))]
     $ scene_runtime.location_text = scene_runtime.text
     return
 

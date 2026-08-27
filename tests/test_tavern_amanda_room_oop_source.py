@@ -58,3 +58,15 @@ def test_called_morning_episode_returns_without_overriding_schedule_location():
     assert "tavern_amanda_morning_window_episode_ready" not in SOURCE
     assert "attic_window_morning_day" not in SOURCE
     assert "main_ui_runtime.action_items = tavern_amanda_room_action_items()" in block
+
+
+def test_knock_uses_authoritative_schedule_presence_before_any_response_roll():
+    block = SOURCE.split("label TavernAmandaRoomKnock:", 1)[1].split(
+        "label TavernAmandaRoomKnockAnswer:", 1
+    )[0]
+
+    presence_check = 'if str(people.location("amanda") or "") != "TavernAmandaRoom":'
+    assert presence_check in block
+    assert block.index(presence_check) < block.index("procedural_randint(")
+    assert 'scene_runtime.text = "Вы постучали в дверь, но ответа не последовало."' in block
+    assert 'MenuItem("Попробовать войти", Call("TavernAmandaRoomEnterWithoutKnock"))' in block
