@@ -315,16 +315,32 @@ testcase external_tavern_report_state_defaults:
     assert eval ([str(item.caption or "") for item in main_ui_runtime.action_items][-1] == "Назад") timeout 5.0
     assert eval ("Закрыть" not in [str(item.caption or "") for item in main_ui_runtime.action_items]) timeout 5.0
     assert eval (isinstance(Sandra.jobs, dict) and isinstance(Melissa.jobs, dict) and isinstance(Amanda.jobs, dict)) timeout 5.0
+    assert eval ([Sandra.job_value("jobkitchen"), Sandra.job_value("jobcleaning"), Sandra.job_value("jobwaitress")] == [1, 0, 0]) timeout 5.0
+    assert eval ([Sandra.job_value("jobkitchentomorrow"), Sandra.job_value("jobcleaningtomorrow"), Sandra.job_value("jobwaitresstomorrow")] == [1, 0, 0]) timeout 5.0
+    assert eval ([Melissa.job_value("jobkitchen"), Melissa.job_value("jobcleaning"), Melissa.job_value("jobwaitress")] == [0, 1, 1]) timeout 5.0
+    assert eval ([Melissa.job_value("jobkitchentomorrow"), Melissa.job_value("jobcleaningtomorrow"), Melissa.job_value("jobwaitresstomorrow")] == [0, 1, 1]) timeout 5.0
+    assert eval ([Amanda.job_value("jobkitchen"), Amanda.job_value("jobcleaning"), Amanda.job_value("jobwaitress")] == [0, 1, 1]) timeout 5.0
+    assert eval ([Amanda.job_value("jobkitchentomorrow"), Amanda.job_value("jobcleaningtomorrow"), Amanda.job_value("jobwaitresstomorrow")] == [0, 1, 1]) timeout 5.0
+    assert eval (_tavern_worker_current_jobs("sandra") == "кухня" and _tavern_worker_tomorrow_jobs("sandra") == "кухня") timeout 5.0
+    assert eval (_tavern_worker_current_jobs("melissa") == "уборка, зал" and _tavern_worker_tomorrow_jobs("melissa") == "уборка, зал") timeout 5.0
+    assert eval ("завтра кухня" in _tavern_report_label(BuildTavernReport())) timeout 5.0
     assert eval (len(BuildTavernReport()["team_keys"]) >= 3) timeout 5.0
     assert eval ("sandra" in BuildTavernReport()["team_keys"] and "melissa" in BuildTavernReport()["team_keys"] and "amanda" in BuildTavernReport()["team_keys"]) timeout 5.0
     assert eval (str(people.get_info("sandra").getLocation() or "") != "") timeout 5.0
     assert eval (len(people_locate_rows()) >= 3) timeout 5.0
     $ _sandra_kitchen_tomorrow_before = int(Sandra.job_value("jobkitchentomorrow", 0) or 0)
     click id "tavern_schedule_sandra_kitchen" pos (0.5, 0.5) until eval (int(Sandra.job_value("jobkitchentomorrow", 0) or 0) != _sandra_kitchen_tomorrow_before) timeout 20.0
+    assert eval (int(Sandra.job_value("jobkitchen", 0) or 0) == 1 and int(Sandra.job_value("jobkitchentomorrow", 0) or 0) == 0) timeout 5.0
     assert eval (str(main_ui_runtime.mode or "") == "tavern" and str(main_ui_runtime.tavern_report_person or "") == "") timeout 5.0
     assert eval (renpy.get_screen("main_ui") is not None and renpy.get_screen("say") is None) timeout 5.0
     $ hide_tavern_report_main_ui_state()
     assert eval (str(main_ui_runtime.mode or "") == "scene") timeout 5.0
+    $ apply_tomorrow_hall_job("sandra")
+    assert eval (int(Sandra.job_value("jobkitchen", 0) or 0) == 0 and int(Sandra.job_value("jobkitchentomorrow", 0) or 0) == 0) timeout 5.0
+    $ Sandra.set_job_value("jobcleaning", 1)
+    $ Sandra.jobs.pop("jobcleaningtomorrow", None)
+    $ tractir_save_normalize_tavern_staff_jobs()
+    assert eval (int(Sandra.job_value("jobcleaningtomorrow", 0) or 0) == 1) timeout 5.0
 '''
 
 
@@ -5484,6 +5500,7 @@ testcase external_player_and_girl_cards_render:
     $ Melissa.known = True
     $ _melissa_rows = girl_card_stat_rows("melissa")
     assert eval (("Локация", people.location("melissa")) in _melissa_rows and len(_melissa_rows) >= 5) timeout 5.0
+    assert eval (("Работа сегодня", "уборка, зал") in _melissa_rows and ("Работа завтра", "уборка, зал") in _melissa_rows) timeout 5.0
     $ SandraStaticData.birth_date = {"day": int(calendar_v2.day or 1), "period": int(calendar_v2.period or 1), "cycle": int(calendar_v2.cycle or 0) - 35}
     $ Sandra.rel = 11
     $ Sandra.openness = 7
@@ -5498,6 +5515,7 @@ testcase external_player_and_girl_cards_render:
     assert eval (("Красота", "77") in girl_card_stat_rows("sandra")) timeout 5.0
     assert eval (("Дети", "4") in girl_card_stat_rows("sandra")) timeout 5.0
     assert eval (("Кухня", "88") in girl_card_stat_rows("sandra")) timeout 5.0
+    assert eval (("Работа сегодня", "кухня") in girl_card_stat_rows("sandra") and ("Работа завтра", "кухня") in girl_card_stat_rows("sandra")) timeout 5.0
     assert eval (str(girl_card_portrait_path("amanda") or "") != "" and renpy.loadable(girl_card_portrait_path("amanda"))) timeout 5.0
     assert eval (str(girl_card_portrait_path("melissa") or "") != "" and renpy.loadable(girl_card_portrait_path("melissa"))) timeout 5.0
     assert eval (str(girl_card_portrait_path("sandra") or "") != "" and renpy.loadable(girl_card_portrait_path("sandra"))) timeout 5.0

@@ -296,14 +296,7 @@ init python:
             return dress_code
         return "обычная рабочая одежда"
 
-    def _tavern_worker_summary(person):
-        info = _tavern_person_info(person)
-        skills = getattr(info, "skills", {}) if info is not None else {}
-        cooking_value = _tavern_int(skills.get("cooking", 0), 0)
-        cleaning_value = _tavern_int(skills.get("cleaning", 0), 0)
-        waitress_value = _tavern_int(skills.get("waitress", 0), 0)
-        friends_value = _tavern_person_relation(person)
-
+    def _tavern_worker_current_jobs(person):
         current_jobs = []
         if _girl_job_value(person, "jobkitchen"):
             current_jobs.append("кухня")
@@ -315,14 +308,22 @@ init python:
             current_jobs.append("интим")
         if _girl_job_value(person, "jobgloryhole"):
             current_jobs.append("глорихол")
+        return ", ".join(current_jobs) if current_jobs else "без смены"
 
-        jobs_text = ", ".join(current_jobs) if current_jobs else "без смены"
+    def _tavern_worker_summary(person):
+        info = _tavern_person_info(person)
+        skills = getattr(info, "skills", {}) if info is not None else {}
+        cooking_value = _tavern_int(skills.get("cooking", 0), 0)
+        cleaning_value = _tavern_int(skills.get("cleaning", 0), 0)
+        waitress_value = _tavern_int(skills.get("waitress", 0), 0)
+        friends_value = _tavern_person_relation(person)
+
         return "Навыки: кухня %d / уборка %d / зал %d. Дружба: %d. Сейчас: %s." % (
             cooking_value,
             cleaning_value,
             waitress_value,
             friends_value,
-            jobs_text,
+            _tavern_worker_current_jobs(person),
         )
 
     def _tavern_worker_tomorrow_jobs(person):

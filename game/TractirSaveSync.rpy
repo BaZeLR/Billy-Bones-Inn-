@@ -21,6 +21,7 @@ init -100 python:
         ensure_game_item_registry()
         people.repair()
         rooms.repair()
+        tractir_save_normalize_tavern_staff_jobs()
         calendar_v2.time_advance_blocked = 0
         legacy_current_day = globals().pop("CurDay", None)
         next_day_runtime.update()
@@ -35,6 +36,20 @@ init -100 python:
         tractir_save_normalize_rooms()
         tractir_save_remove_owned_unique_items_from_rooms()
         tractir_save_clear_room_ui_cache()
+
+    def tractir_save_normalize_tavern_staff_jobs():
+        for person in ("sandra", "melissa", "amanda"):
+            info = people.get_info(person)
+            jobs = getattr(info, "jobs", None) if info is not None else None
+            if not isinstance(jobs, dict):
+                continue
+            for current_key, tomorrow_key in (
+                ("jobkitchen", "jobkitchentomorrow"),
+                ("jobcleaning", "jobcleaningtomorrow"),
+                ("jobwaitress", "jobwaitresstomorrow"),
+            ):
+                if tomorrow_key not in jobs:
+                    info.set_job_value(tomorrow_key, int(info.job_value(current_key, 0) or 0))
 
     def tractir_save_clear_retired_npc_state():
         globals().pop("SergioPet", None)

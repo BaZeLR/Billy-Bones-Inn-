@@ -18,7 +18,7 @@ init python:
             ("jobcleaning", "jobcleaningtomorrow"),
             ("jobwaitress", "jobwaitresstomorrow"),
         ):
-            value = int(info.job_value(tomorrow_key, info.job_value(current_key, 0)) or 0)
+            value = int(info.job_value(tomorrow_key, 0) or 0)
             info.set_job_value(current_key, value)
             info.set_job_value(tomorrow_key, value)
 

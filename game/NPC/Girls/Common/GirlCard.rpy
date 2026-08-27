@@ -200,6 +200,9 @@ init python:
         status_line = relationship_card_status_line(key)
         if status_line:
             rows.append(("Отношение", status_line))
+        if info is not None and int(info.job_value("jobHallAvail", 0) or 0) != 0:
+            rows.append(("Работа сегодня", _tavern_worker_current_jobs(key)))
+            rows.append(("Работа завтра", _tavern_worker_tomorrow_jobs(key)))
         return rows
 
     def girl_card_body_lines(girl_name):
