@@ -5012,12 +5012,23 @@ testcase external_ellona_temple_sunday_story_event:
     assert eval (story_event_available("EllonaTemple", "enter")) timeout 5.0
     assert eval (str(event_runtime.available["EllonaTemple"]["enter"].target or "") == "story_ellona_temple_sunday_stories") timeout 5.0
     run Jump("EllonaTemple")
-    advance until screen "say" timeout 20.0
-    click pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (0.5, 0.5) until screen "main_ui" timeout 20.0
+    advance until screen "choice" timeout 20.0
+    assert eval (renpy.get_screen("main_ui") is not None and str(main_ui_runtime.mode or "") == "event") timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Осмотреться в храме"]) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/ellona/Fran5.png" and "Во дворике храма Франческа сегодня не одна" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
     assert eval (str(rooms.current_code or "") == "EllonaTemple") timeout 5.0
     assert eval (Francheska.sunday_stories_seen_day == int(calendar_v2.daysInGame or 0)) timeout 5.0
+    assert eval ("Во дворике храма Франческа сегодня не одна" not in str(scene_runtime.text or "") and str(scene_runtime.text or "") == str(scene_runtime.location_text or "")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in list(main_ui_runtime.action_items or [])] == ["Осмотреть дворик-клуатр", "Зайти в помещение для родов", "Вернуться в порт"]) timeout 5.0
+    $ _ellona_room_text = str(scene_runtime.location_text or "")
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "choice" timeout 20.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Рассмотреть статую", "Рассмотреть портрет справа от входа в храм", "Рассмотреть портрет слева от входа в храм", "Рассмотреть портрет над родильной комнатой", "Рассмотреть портрет справа от входа в родильную комнату", "Рассмотреть портрет слева от входа в родильную комнату", "Закончить осмотр"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(scene_runtime.picture or "") == "images/ellona/statue1.jpg") timeout 20.0
+    assert eval (str(scene_runtime.location_text or "") == _ellona_room_text and "\nЭто заметно и здесь" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "choice" timeout 20.0
+    click id "choice_panel_button_3" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(scene_runtime.picture or "") in ["images/ellona/agla1.jpg", "images/ellona/agla2.jpg", "images/ellona/alga3.jpg"]) timeout 20.0
+    assert eval (str(scene_runtime.location_text or "") == _ellona_room_text and "\n\nНа холсте" in str(scene_runtime.text or "")) timeout 5.0
     $ initStoryEventRuntime(True)
     assert eval (not story_event_available("EllonaTemple", "enter")) timeout 5.0
 

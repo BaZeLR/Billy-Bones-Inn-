@@ -98,8 +98,7 @@ label EllonaTemple:
     if Francheska.busy_now():
         $ scene_runtime.picture = "images/ellona/afterBirth.png"
         vscene scene_runtime.picture
-        $ scene_runtime.text = scene_runtime.location_text + "\n\nДверь родильной на миг открывается. Усталая Франческа выходит наружу с тазом испачканных тряпок, не задерживаясь ни на разговоры, ни на объяснения. Затем дверь снова закрывается. Франческа занята, и в родильную сейчас не пройти."
-        $ scene_runtime.location_text = scene_runtime.text
+        $ scene_runtime.text = scene_runtime.location_text
     else:
         call ShowImageSeq("ellona", "", "Fran", 4)
 

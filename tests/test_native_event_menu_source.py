@@ -27,6 +27,20 @@ def test_ellona_inspection_uses_native_menus_without_apply_dispatchers():
     assert "jump PortStreets" not in source
     assert "label EllonaTemplePasiphaeaPortrait:" in source
     assert "label EllonaTempleThaliaPortrait:" in source
+    assert "scene_runtime.location_text = scene_runtime.text" not in source
+    assert 'call ShowImage("", "", "images/ellona/ante2.jpg")' not in source
+    assert '"images/ellona/agla1.jpg", "images/ellona/agla2.jpg", "images/ellona/alga3.jpg"' in source
+
+
+def test_ellona_sunday_event_uses_main_ui_event_text_and_native_continue():
+    source = _source("game/Town/Temple/EllonaTempleEvents.rpy")
+
+    assert 'main_ui_begin_native_scene_state("Воскресные истории")' in source
+    assert 'vscene "images/ellona/Fran5.png"' in source
+    assert 'show screen main_ui' in source
+    assert '"Осмотреться в храме"' in source
+    assert 'main_ui_end_native_scene_state()' in source
+    assert source.count('"[scene_runtime.text]"') == 0
 
 
 def test_ellona_rooms_do_not_recursively_reenter_after_main_ui():
