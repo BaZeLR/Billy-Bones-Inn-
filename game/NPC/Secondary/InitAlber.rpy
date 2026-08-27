@@ -40,7 +40,7 @@ init python:
 
         def interaction_visible(self, room_code=""):
             if str(room_code or "").strip() == "WineStore":
-                return str(self.getLocation() or "") == "WineStore" and bool(people.can_talk(self.name))
+                return wine_store_seller_id() == self.name
             return super(AlberInfo, self).interaction_visible(room_code)
 
     def alber_random_portrait():

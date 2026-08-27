@@ -5332,6 +5332,15 @@ testcase external_npc_schedule_room_visibility_agreement:
     advance until screen "main_ui" timeout 20.0
     assert eval (rooms.get("WineStore").is_open() and people.action_data_for_room("clara", "WineStore") is not None) timeout 5.0
     assert eval (renpy.get_displayable("main_ui", "main_ui_entity_button_npc_clara") is not None) timeout 5.0
+    $ people.get_data("alber").set_schedule([NPCScheduleEntry(location="WineStore", start_minute=0, end_minute=1440, awake=True, talkable=True, priority=999)])
+    $ external_calendar_set_fields(3, 1, 1100, 11, 30)
+    run Jump("WineStore")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(people.location("clara") or "") == "WineStore" and str(people.location("alber") or "") == "WineStore") timeout 5.0
+    assert eval (wine_store_seller_id() == "alber") timeout 5.0
+    assert eval (people.action_data_for_room("clara", "WineStore") is None and people.action_data_for_room("alber", "WineStore") is not None) timeout 5.0
+    assert eval (renpy.get_displayable("main_ui", "main_ui_entity_button_npc_clara") is None) timeout 5.0
+    assert eval (renpy.get_displayable("main_ui", "main_ui_entity_button_npc_alber") is not None) timeout 5.0
 
 testcase external_right_side_npc_buttons_open_default_menu:
     run Jump("Intro")

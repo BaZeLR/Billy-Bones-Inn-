@@ -133,8 +133,11 @@ init python:
             return self
 
         def interaction_visible(self, room_code=""):
-            if str(room_code or "").strip() == "MarketPlace":
+            room_key = str(room_code or "").strip()
+            if room_key == "MarketPlace":
                 return False
+            if room_key == "WineStore":
+                return wine_store_seller_id() == self.name
             return super(ClaraInfo, self).interaction_visible(room_code)
 
         def wine_store_talk_picture(self):

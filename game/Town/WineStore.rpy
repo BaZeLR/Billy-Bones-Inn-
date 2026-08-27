@@ -14,10 +14,10 @@ init python:
         return 6 * 60 <= current_minutes <= 17 * 60
 
     def wine_store_seller_id():
-        if str(people.location("clara") or "") == "WineStore" and bool(people.can_talk("clara")):
-            return "clara"
         if str(people.location("alber") or "") == "WineStore" and bool(people.can_talk("alber")):
             return "alber"
+        if str(people.location("clara") or "") == "WineStore" and bool(people.can_talk("clara")):
+            return "clara"
         return ""
 
     def wine_store_seller_name():

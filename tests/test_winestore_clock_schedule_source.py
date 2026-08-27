@@ -93,6 +93,21 @@ def test_winestore_npc_presence_uses_hour_intervals_not_display_slots():
     assert not _wine_matches(ALBER_SCHEDULE, 5, "15:01")
 
 
+def test_alber_owns_the_visible_seller_interaction_during_schedule_overlap():
+    wine_store = _source(WINESTORE_ROOM)
+    clara = _source(CLARA_INIT)
+    alber = _source(ALBER_INIT)
+    seller_projection = wine_store.split("def wine_store_seller_id():", 1)[1].split(
+        "def wine_store_seller_name", 1
+    )[0]
+
+    assert seller_projection.index('people.location("alber")') < seller_projection.index(
+        'people.location("clara")'
+    )
+    assert 'return wine_store_seller_id() == self.name' in clara
+    assert 'return wine_store_seller_id() == self.name' in alber
+
+
 def test_alber_portrait_source_is_secondary_npc_not_clara_or_wine_store_duplicate():
     clara = _source(CLARA_INIT)
     wine_store = _source(WINESTORE_ROOM)
