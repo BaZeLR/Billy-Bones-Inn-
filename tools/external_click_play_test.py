@@ -576,6 +576,19 @@ testcase external_dog_entity_actions:
     advance until screen "choice" timeout 20.0
     assert eval (renpy.get_screen("main_ui") is not None and renpy.get_screen("choice") is not None) timeout 5.0
     assert eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) >= 4) timeout 5.0
+    assert eval (renpy.get_screen("say") is None and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+
+    $ _dog_play_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Поиграть с псом")
+    $ _dog_play_button_id = "choice_panel_button_%d" % int(_dog_play_index)
+    click id _dog_play_button_id pos (0.5, 0.5) until eval (int(dog.last_play_day or -1) == int(calendar_v2.daysInGame or 0) and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and "Вы валяетесь с псом" in str(scene_runtime.text or "")) timeout 5.0
+
+    $ _dog_card_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Осмотреть")
+    $ _dog_card_button_id = "choice_panel_button_%d" % int(_dog_card_index)
+    click id _dog_card_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "dog" and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and str(scene_runtime.text or "") == str(dog_talk_intro_text("Backyard") or "")) timeout 5.0
 '''
 
 

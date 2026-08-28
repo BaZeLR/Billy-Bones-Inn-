@@ -499,20 +499,16 @@ init 2 python:
 
 
 label ShowDogCard(return_label=""):
-    $ renpy.dynamic("_dog_card_picture")
     $ main_ui_begin_card_state()
-    $ _dog_card_picture = dog_card_portrait_path()
-    if str(_dog_card_picture or "").strip():
-        vscene _dog_card_picture
-    $ scene_runtime.text = "\n".join(dog_card_lines())
-    $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
-    $ main_ui_end_card_state()
-    return
-
-
-label HideDogCard(return_label=""):
-    return
+    $ main_ui_runtime.mode = "dog"
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_restart_interaction()
+    menu:
+        "Назад":
+            $ main_ui_end_card_state()
+            return
 
 
 label IntDogTalk(room_code=""):
@@ -524,9 +520,7 @@ label IntDogTalk(room_code=""):
         vscene _dog_picture
     $ scene_runtime.text = dog_talk_intro_text(_dog_room)
     $ scene_runtime.location_text = scene_runtime.text
-    show screen main_ui
     while True:
-        "[scene_runtime.text]"
         menu:
             "Осмотреть":
                 call ShowDogCard
@@ -653,8 +647,8 @@ label IntDogTalk(room_code=""):
 
 
 label IntDogAdoptNameMenu(room_code=""):
-    show screen main_ui
-    "Пес уже готов идти с вами. Осталось надеть ошейник и выбрать кличку."
+    $ scene_runtime.text = "Пес уже готов идти с вами. Осталось надеть ошейник и выбрать кличку."
+    $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Sharik":
             return "Sharik"
