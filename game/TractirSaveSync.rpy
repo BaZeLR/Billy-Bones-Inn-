@@ -21,6 +21,7 @@ init -100 python:
         ensure_game_item_registry()
         people.repair()
         rooms.repair()
+        household.repair()
         tractir_save_normalize_tavern_staff_jobs()
         calendar_v2.time_advance_blocked = 0
         legacy_current_day = globals().pop("CurDay", None)
@@ -56,11 +57,6 @@ init -100 python:
         globals().pop("SergioPetStaticData", None)
         people.runtime.pop("sergio_pet", None)
         people.definitions.pop("sergio_pet", None)
-
-        legacy_barber_appointments = getattr(household, "barber_appointments", {})
-        if not isinstance(legacy_barber_appointments, dict):
-            legacy_barber_appointments = {}
-        household.barber_appointments = legacy_barber_appointments
 
         for person_info in people.values():
             if person_info is None:
@@ -2361,6 +2357,11 @@ init -100 python:
         if people_to_int(Melissa.sex_stat("sexacts", 0), 0) > 0:
             courtship.advanceTo(courtship.data.length, complete_at_end=True)
 
+    # Saved objects must be upgraded before Ren'Py evaluates any loaded
+    # statement or another subsystem reads their current schema.
+    if updateSave not in config.after_load_callbacks:
+        config.after_load_callbacks.insert(0, updateSave)
+
 
 label before_load:
     $ beforeLoadTractirSave()
@@ -2368,7 +2369,8 @@ label before_load:
 
 
 label after_load:
-    $ updateSave()
     $ npc_schedule_after_load()
+    $ initStoryEventRuntime(True)
+    $ tractir_after_load_restore_ui()
     $ renpy.block_rollback()
     return

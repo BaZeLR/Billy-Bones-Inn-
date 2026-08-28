@@ -206,16 +206,43 @@ init 5 python:
     def household_ai_raise_convergence(amount=0.1):
         household.meta["convergence"] = household_ai_clamp(household.meta.get("convergence", 0.0) + amount)
     class HouseholdInfo(object):
+        META_DEFAULTS = {
+            "pressure": 0.0,
+            "friction": 0.2,
+            "convergence": 0.0,
+            "external_threat": 0.0,
+            "last_event_day": -1,
+            "last_event_slot": -1,
+            "last_event_code": "",
+        }
+        DICT_FIELDS = (
+            "seen",
+            "runtime_event_seen",
+            "morning_state",
+            "soap_request_last_day",
+            "barber_request_last_day",
+            "barber_appointments",
+            "barber_visit_last_day",
+            "warm_drink_last_day",
+        )
+
         def __init__(self):
-            self.meta = {"pressure": 0.0, "friction": 0.2, "convergence": 0.0, "external_threat": 0.0, "last_event_day": -1, "last_event_slot": -1, "last_event_code": ""}
-            self.seen = {}
-            self.runtime_event_seen = {}
-            self.morning_state = {}
-            self.soap_request_last_day = {}
-            self.barber_request_last_day = {}
-            self.barber_appointments = {}
-            self.barber_visit_last_day = {}
-            self.warm_drink_last_day = {}
+            self.meta = dict(self.META_DEFAULTS)
+            for field_name in self.DICT_FIELDS:
+                setattr(self, field_name, {})
+
+        def repair(self):
+            saved_meta = getattr(self, "meta", None)
+            repaired_meta = dict(self.META_DEFAULTS)
+            if isinstance(saved_meta, dict):
+                repaired_meta.update(saved_meta)
+            self.meta = repaired_meta
+            for field_name in self.DICT_FIELDS:
+                saved_value = getattr(self, field_name, None)
+                if not isinstance(saved_value, dict):
+                    saved_value = {}
+                setattr(self, field_name, saved_value)
+            return self
 
     HOUSEHOLD_NPC_DEFAULTS = {
         "amanda": {"drive": 0.0, "resistance": 0.75, "threshold": 0.62, "stability": 0.35, "rivalry": 0.65, "obedience": 0.45, "path": "undecided"},

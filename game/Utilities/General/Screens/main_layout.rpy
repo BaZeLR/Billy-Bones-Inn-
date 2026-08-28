@@ -230,9 +230,6 @@ init python:
         except Exception:
             pass
 
-    if tractir_after_load_restore_ui not in config.after_load_callbacks:
-        config.after_load_callbacks.append(tractir_after_load_restore_ui)
-
 init -5:
     style mui_text is default
     style mui_text:

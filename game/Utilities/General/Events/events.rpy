@@ -361,13 +361,6 @@ init -25 python:
         findBlockedThreads(threads)
         findAvailableEvents(True if force else False)
 
-    def _story_after_load_init():
-        initStoryEventRuntime(True)
-
-    if _story_after_load_init not in config.after_load_callbacks:
-        config.after_load_callbacks.append(_story_after_load_init)
-
-
 init python:
     def story_event_action_caption(evt):
         action_key = str(getattr(evt, "action", "") or "").strip()

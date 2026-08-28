@@ -48,8 +48,10 @@ def test_household_owns_the_only_barber_visit_day_map():
         for path in (ROOT / "game").rglob("*.rpy")
     )
 
-    assert "self.barber_visit_last_day = {}" in household
-    assert "self.barber_appointments = {}" in household
+    assert '"barber_visit_last_day",' in household
+    assert '"barber_appointments",' in household
+    assert "for field_name in self.DICT_FIELDS:" in household
+    assert "def repair(self):" in household
     assert 'household.barber_visit_last_day.get(girl, -99)' in decision
     assert 'household.barber_visit_last_day.get(key, -99)' in descriptions
     assert 'household.barber_visit_last_day.get(npc_id, -99)' in breakfast

@@ -41,7 +41,8 @@ def test_all_appointed_women_resolve_to_the_open_barber_shop():
     assert 'household.barber_appointments.get(self.name, 0)' in girl_block
     assert 'barber_shop_is_open_at(wday, hour)' in girl_block
     assert 'return "BarberShop"' in girl_block
-    assert "self.barber_appointments = {}" in household
+    assert '"barber_appointments",' in household
+    assert "def repair(self):" in household
 
 
 def test_barber_event_gate_continues_to_the_room_interaction_owner():

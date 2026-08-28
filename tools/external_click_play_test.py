@@ -1413,7 +1413,7 @@ testcase external_actual_barber_actions_click:
     run Call("InitGameNPCs")
     $ household.__dict__.pop("barber_appointments", None)
     $ Sandra.var["barber_invite_pending"] = 1
-    $ tractir_save_clear_retired_npc_state()
+    $ tractir_save_patch_loaded_state()
     assert eval (household.barber_appointments == {"sandra": 1} and "barber_invite_pending" not in Sandra.var) timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 14, 0)
     $ player.economy.money = max(int(player.economy.money or 0), 500)
@@ -4825,6 +4825,8 @@ label external_player_actual_load_probe:
     $ player.appearance.days_since_haircut = 16
     $ player.combat.party = ["dog"]
     $ player.history["external_actual_load_probe"] = "saved"
+    $ household.__dict__.pop("barber_appointments", None)
+    $ Sandra.var["barber_invite_pending"] = 1
     $ saveVersion = currentVersion
     $ renpy.save("external-player-actual-load")
     if external_player_load_marker_exists():
@@ -4849,10 +4851,15 @@ label external_player_actual_load_probe:
 testcase external_player_actual_load_parity:
     $ external_player_clear_load_marker()
     run Call("external_player_actual_load_probe")
+    # Ren'Py's test executor resumes its own node after renpy.load(), so invoke
+    # the engine's normal load continuation explicitly for this regression.
+    assert eval (config.after_load_callbacks[0] is updateSave) timeout 5.0
+    run Call("_after_load")
     assert eval (isinstance(player, Player) and isinstance(player.appearance, PlayerAppearance) and isinstance(player.combat, PlayerCombat)) timeout 5.0
     assert eval (int(player.economy.money or 0) == 2468) timeout 5.0
     assert eval (int(player.appearance.days_since_wash or 0) == 2 and int(player.appearance.days_since_haircut or 0) == 16) timeout 5.0
     assert eval (list(player.combat.party or []) == ["dog"] and player.history.get("external_actual_load_probe") == "saved") timeout 5.0
+    assert eval (household.barber_appointments == {"sandra": 1} and "barber_invite_pending" not in Sandra.var) timeout 5.0
     assert eval (int(saveVersion or 0) == int(currentVersion or 0)) timeout 5.0
     assert eval (people.get_info("amanda") is Amanda and people.get_data("amanda") is AmandaStaticData and Amanda.data is AmandaStaticData) timeout 5.0
     python:

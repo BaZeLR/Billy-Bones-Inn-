@@ -31,7 +31,9 @@ def test_becky_staffs_grocery_store_until_the_store_closes():
 
     assert entries["grocery_afternoon_shift"]["end"] == "17:59"
     assert entries["eddie_absent_grocery_cover"]["end"] == "17:59"
-    assert "config.after_load_callbacks.append(npc_schedule_after_load)" in people_runtime
+    save_sync = _source(ROOT / "game" / "TractirSaveSync.rpy")
+    assert "config.after_load_callbacks.append(npc_schedule_after_load)" not in people_runtime
+    assert "$ npc_schedule_after_load()" in save_sync
 
 
 def test_grocery_uses_merchant_picture_sequences_not_hunter_store():
