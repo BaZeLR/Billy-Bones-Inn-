@@ -199,8 +199,7 @@ init -34 python:
         last_day = girl_decision_int(household.barber_visit_last_day.get(girl, -99), -99)
         if last_day >= 0 and current_game_day() - last_day <= 14:
             return 1.0
-        info = people.get_info(girl)
-        if info is not None and int(info.var.get("barber_invite_pending", 0) or 0) == 1:
+        if int(household.barber_appointments.get(girl, 0) or 0) == 1:
             return 0.35
         return 0.0
 

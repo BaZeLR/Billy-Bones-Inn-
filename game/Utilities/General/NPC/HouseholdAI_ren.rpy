@@ -213,6 +213,7 @@ init 5 python:
             self.morning_state = {}
             self.soap_request_last_day = {}
             self.barber_request_last_day = {}
+            self.barber_appointments = {}
             self.barber_visit_last_day = {}
             self.warm_drink_last_day = {}
 

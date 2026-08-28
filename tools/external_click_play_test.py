@@ -1398,9 +1398,16 @@ testcase external_kitchen_entry_morning_sickness_event:
 
 testcase external_actual_barber_actions_click:
     run Call("InitGameNPCs")
+    $ household.__dict__.pop("barber_appointments", None)
+    $ Sandra.var["barber_invite_pending"] = 1
+    $ tractir_save_clear_retired_npc_state()
+    assert eval (household.barber_appointments == {"sandra": 1} and "barber_invite_pending" not in Sandra.var) timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 14, 0)
-    $ external_calendar_set_weekday(1)
     $ player.economy.money = max(int(player.economy.money or 0), 500)
+    $ household.barber_appointments = {"sandra": 1, "melissa": 1, "amanda": 1}
+    $ external_calendar_set_weekday(2)
+    assert eval (all(npc_id not in people.ids_at("BarberShop") for npc_id in ("sandra", "melissa", "amanda"))) timeout 5.0
+    $ external_calendar_set_weekday(1)
     $ player.appearance.days_since_haircut = 30
     $ main_ui_runtime.overlay = ""
     $ main_ui_runtime.inventory_dropdown_open = False
@@ -1408,6 +1415,8 @@ testcase external_actual_barber_actions_click:
     $ main_ui_runtime.mode = "scene"
     run Jump("BarberShop")
     advance until screen "main_ui" timeout 20.0
+    assert eval (all(npc_id in people.ids_at("BarberShop") for npc_id in ("sandra", "melissa", "amanda", "sergio"))) timeout 5.0
+    assert eval (all(renpy.get_widget("main_ui", "main_ui_entity_button_npc_%s" % npc_id) is not None for npc_id in ("sandra", "melissa", "amanda"))) timeout 5.0
     assert eval (all("Подстричься" not in str(i.caption or "") for i in main_ui_runtime.action_items)) timeout 5.0
     click id "main_ui_entity_button_npc_sergio" pos (0.5, 0.5) until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "talk") timeout 5.0
@@ -1416,6 +1425,10 @@ testcase external_actual_barber_actions_click:
     $ _barber_haircut_button = "choice_panel_button_%d" % int(_barber_haircut_index)
     click id _barber_haircut_button pos (0.5, 0.5) until eval ("выглядите куда опрятнее" in str(scene_runtime.text or "")) timeout 20.0
     assert eval (int(player.appearance.days_since_haircut or 0) == 0) timeout 5.0
+    advance until screen "choice" timeout 20.0
+    $ _barber_guest_index = ["Оплатить визит" in str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index(True)
+    click id ("choice_panel_button_%d" % int(_barber_guest_index)) pos (0.5, 0.5) until eval ("sandra" not in household.barber_appointments) timeout 20.0
+    assert eval (all(npc_id in people.ids_at("BarberShop") for npc_id in ("melissa", "amanda")) and "sandra" not in people.ids_at("BarberShop")) timeout 5.0
 
 testcase external_actual_draupnir_talk_menu:
     run Call("InitGameNPCs")

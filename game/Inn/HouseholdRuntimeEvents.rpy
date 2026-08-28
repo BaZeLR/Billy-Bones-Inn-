@@ -257,7 +257,7 @@ init python:
         girl_info = people.get_info(girl)
         if girl_info is not None and int(girl_info.talked_today or 0) != 0:
             return False
-        if int(girl_info.var.get("barber_invite_pending", 0) or 0) == 1:
+        if int(household.barber_appointments.get(girl, 0) or 0) == 1:
             return False
         if current_game_day() - int(household.barber_visit_last_day.get(girl, -14) or -14) < 14:
             return False
@@ -403,7 +403,7 @@ label HouseholdBarberRequestEvent(girl_name=""):
     menu:
         "Пообещать визит к Серджио":
             if _barber_info is not None:
-                $ _barber_info.var["barber_invite_pending"] = 1
+                $ household.barber_appointments[_barber_girl] = 1
                 $ _barber_info.change_social(friend_delta=1)
             $ scene_runtime.text = "Вы обещаете, что при первом удобном открытом дне Серджио отведете ее к цирюльнику. Просьбу явно услышали с удовольствием."
 

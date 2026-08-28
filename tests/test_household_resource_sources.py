@@ -49,8 +49,11 @@ def test_household_owns_the_only_barber_visit_day_map():
     )
 
     assert "self.barber_visit_last_day = {}" in household
+    assert "self.barber_appointments = {}" in household
     assert 'household.barber_visit_last_day.get(girl, -99)' in decision
     assert 'household.barber_visit_last_day.get(key, -99)' in descriptions
     assert 'household.barber_visit_last_day.get(npc_id, -99)' in breakfast
     assert 'info.var.get("barber_visit_last_day"' not in game_sources
     assert 'people.get_info(npc_id).var.get("barber_visit_last_day"' not in game_sources
+    assert 'var.get("barber_invite_pending"' not in game_sources
+    assert 'var["barber_invite_pending"]' not in game_sources

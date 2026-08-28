@@ -201,11 +201,14 @@ init python:
             return location_key
 
         def getLocation(self, wday=None, hour=None):
+            scheduled_location = super(ClaraInfo, self).getLocation(wday, hour)
+            if scheduled_location == "BarberShop":
+                return scheduled_location
             override_day = people_to_int(self.day_location_override_day, -1)
             override_location = str(self.day_location_override_code or "").strip()
             if override_location and override_day == int(calendar_v2.daysInGame or 0):
                 return override_location
-            return super(ClaraInfo, self).getLocation(wday, hour)
+            return scheduled_location
 
         def can_start_social_events(self):
             update_stat_state()

@@ -393,10 +393,13 @@ init python:
             return {"ok": False, "place": "", "text": ""}
 
         def getLocation(self, wday=None, hour=None):
+            scheduled_location = super(MelissaInfo, self).getLocation(wday, hour)
+            if scheduled_location == "BarberShop":
+                return scheduled_location
             temp_room = str(self.temp_room_code or "").strip()
             if temp_room and self.temp_room_active(temp_room, hour, wday):
                 return temp_room
-            return super(MelissaInfo, self).getLocation(wday, hour)
+            return scheduled_location
 
         def bats_repair_complete(self):
             repair_day = people_to_int(self.roof_repair_complete_day, -1)

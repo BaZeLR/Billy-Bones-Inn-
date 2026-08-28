@@ -1068,6 +1068,11 @@ init -999 python:
             super().__init__(name, **kwargs)
             self.detailed_sex_history = []
 
+        def getLocation(self, wday=None, hour=None):
+            if bool(household.barber_appointments.get(self.name, 0)) and barber_shop_is_open_at(wday, hour):
+                return "BarberShop"
+            return super(Girl, self).getLocation(wday, hour)
+
         def can_work_tavern(self):
             return people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0
 

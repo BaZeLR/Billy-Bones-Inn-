@@ -26,14 +26,17 @@ init python:
             return picture_path
         return "images/general/LocArtisansQuarter1.jpg"
 
-    def barber_shop_is_open():
-        weekday = int(calendar_v2.week or 0)
-        current_minutes = int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)
+    def barber_shop_is_open_at(weekday_value=None, time_value=None):
+        weekday = int(calendar_v2.week if weekday_value is None else weekday_value or 0)
+        current_minutes = npc_schedule_clock_minute(time_value)
         if weekday in (1, 3):
             return 12 * 60 <= current_minutes <= 17 * 60 + 59
         if weekday == 6:
             return 8 * 60 <= current_minutes <= 11 * 60 + 59
         return False
+
+    def barber_shop_is_open():
+        return barber_shop_is_open_at()
 
     def barber_shop_haircut_price(customer_gender="male"):
         if str(customer_gender or "").strip().lower() in ("female", "woman", "girl"):
@@ -51,8 +54,7 @@ init python:
 
     def barber_shop_pending_npc_id():
         for npc_id in ("sandra", "melissa", "amanda", "becky", "clara"):
-            info = people.get_info(npc_id)
-            if info is not None and int(info.var.get("barber_invite_pending", 0) or 0) == 1:
+            if int(household.barber_appointments.get(npc_id, 0) or 0) == 1:
                 return npc_id
         return ""
 
@@ -292,9 +294,9 @@ label BarberShopServePendingGuest:
     $ player.spend_money(_barber_guest_price)
     $ calendar_v2.advance_minutes(45)
     $ household.barber_visit_last_day[_barber_guest] = current_game_day()
+    $ household.barber_appointments.pop(_barber_guest, None)
     $ _barber_guest_info = people.get_info(_barber_guest)
     if _barber_guest_info is not None:
-        $ _barber_guest_info.set_var_int("barber_invite_pending", 0)
         $ _barber_guest_info.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
         $ _barber_guest_info.set_sex_stat("beauty", min(100, int(_barber_guest_info.sex_stat("beauty", 0) or 0) + 3))
         if _barber_guest == "sandra":

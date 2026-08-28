@@ -57,8 +57,18 @@ init -100 python:
         people.runtime.pop("sergio_pet", None)
         people.definitions.pop("sergio_pet", None)
 
+        legacy_barber_appointments = getattr(household, "barber_appointments", {})
+        if not isinstance(legacy_barber_appointments, dict):
+            legacy_barber_appointments = {}
+        household.barber_appointments = legacy_barber_appointments
+
         for person_info in people.values():
-            if person_info is not None and hasattr(person_info, "location"):
+            if person_info is None:
+                continue
+            person_var = getattr(person_info, "var", None)
+            if isinstance(person_var, dict) and people_to_int(person_var.pop("barber_invite_pending", 0), 0) == 1:
+                household.barber_appointments[people_normalize_id(person_info.name)] = 1
+            if hasattr(person_info, "location"):
                 delattr(person_info, "location")
 
         dog_obj = globals().get("dog")
