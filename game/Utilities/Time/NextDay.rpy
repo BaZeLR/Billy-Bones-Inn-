@@ -24,7 +24,7 @@ init python:
         return 0 <= current_hour < 6
 
 label NextDay(retlocname, timepassed):
-    $ renpy.dynamic("visitorshappy", "_nextday_skip_first_calendar_roll", "TotalEventsSummary", "ExtraEvents", "iDaysCount", "_nextday_girl", "TotalDay", "TotalWhoreClients", "TotalGloryHoleClients", "_weekly_msg", "CurDay", "_nextday_event_day_number", "_nextday_event_date", "_nextday_summary_text", "_nextday_money_delta", "NewDressCame", "dress_name", "avg_happy", "tavernlevel", "_nextday_lines", "_geo_name", "_liza_name", "_tractir_game_over_ending", "_nextday_return_label", "_girl")
+    $ renpy.dynamic("visitorshappy", "_nextday_skip_first_calendar_roll", "TotalEventsSummary", "ExtraEvents", "iDaysCount", "_nextday_girl", "TotalDay", "TotalWhoreClients", "TotalGloryHoleClients", "_weekly_msg", "CurDay", "_nextday_event_day_number", "_nextday_event_date", "_nextday_summary_text", "_nextday_money_delta", "NewDressCame", "dress_name", "avg_happy", "tavernlevel", "_nextday_lines", "_geo_name", "_liza_name", "_tractir_game_over_ending", "_nextday_return_label", "_day_start_save_name", "_girl")
     $ next_day_runtime.update()
     $ visitorshappy = 0
     $ _nextday_skip_first_calendar_roll = nextday_started_after_midnight()
@@ -259,6 +259,9 @@ label NextDay(retlocname, timepassed):
             $ _nextday_return_label = "TavernMyRoom"
         call checkTriggers("TavernMyRoom", "sleep", 0)
         $ calendar_v2.time_advance_blocked = 0
+        if _nextday_return_label == "TavernMyRoom":
+            $ _day_start_save_name = "Начало дня — " + calendar_v2.format_date_ru(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, None, False)
+            $ renpy.save("day-1", extra_info=_day_start_save_name, include_screenshot=False)
         jump expression _nextday_return_label
     return
 

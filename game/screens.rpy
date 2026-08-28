@@ -849,6 +849,8 @@ screen file_slots(title):
 
                 textbutton ui_tr("<") action FilePagePrevious()
 
+                textbutton "Утро" action FilePage("day")
+
                 if config.has_autosave:
                     textbutton ui_tr("{#auto_page}A") action FilePage("auto")
 
