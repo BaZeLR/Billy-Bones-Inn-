@@ -34,10 +34,10 @@ label IntMelissaTalk(girl_name="melissa"):
                 call IntMelissaRoomProblemAdviceMenu(girl_name)
             "Уединиться с Мелиссой" if Melissa.relationship_allows("intimacy") and Melissa.room_is_private(rooms.current_code):
                 call IntMelissaSex(girl_name, rooms.current_code)
+                $ _melissa_repeat_menu = True
             "Найти укромное место с Мелиссой" if Melissa.relationship_allows("intimacy") and bool(Melissa.private_place_offer(rooms.current_code).get("ok", False)):
                 call IntMelissaFindPrivatePlace(girl_name, rooms.current_code)
-            "Сблизиться с Мелиссой" if Melissa.relationship_allows("start") and people_to_int(Melissa.intimacy_start_day, -1) != int(current_game_day() or 0):
-                call IntMelissaStartMenu(girl_name)
+                $ _melissa_repeat_menu = True
             "Спросить Мелиссу о Клариссе" if str(rooms.current_code or "") == "TavernMain" and str(people.location("clara") or "") == "TavernMain" and people_to_int(Melissa.asked_about_clara_day, -1) != int(current_game_day() or 0) and int(Melissa.asked_today or 0) == 0:
                 $ Melissa.mark_asked()
                 $ Melissa.asked_about_clara_day = int(current_game_day() or 0)
@@ -71,64 +71,6 @@ label IntMelissaTalk(girl_name="melissa"):
             "Назад":
                 $ main_ui_end_talk_state()
                 return
-    return
-
-
-label IntMelissaStartMenu(girl_name="melissa"):
-    $ renpy.dynamic("_melissa_start_action", "_melissa_scene_count")
-    $ main_ui_begin_talk_state("Разговор с Мелиссой", girl_name)
-    $ main_ui_runtime.action_title = "Сближение с Мелиссой"
-    $ main_ui_runtime.action_content = None
-    while Melissa.start_scene_remaining() > 0:
-        $ scene_runtime.text = Melissa.start_intro_text()
-        $ scene_runtime.location_text = scene_runtime.text
-        menu:
-            "Осторожно приласкать ее" if Melissa.start_action_available("caress"):
-                $ _melissa_start_action = "caress"
-            "Поцеловать ее" if Melissa.start_action_available("kiss"):
-                $ _melissa_start_action = "kiss"
-            "Поцеловать ее глубже" if Melissa.start_action_available("deepkiss"):
-                $ _melissa_start_action = "deepkiss"
-            "Позволить рукам стать смелее" if Melissa.start_action_available("fondle"):
-                $ _melissa_start_action = "fondle"
-            "Пустить руки под одежду" if Melissa.start_action_available("underclothes"):
-                $ _melissa_start_action = "underclothes"
-            "Остановиться на сегодня":
-                $ main_ui_runtime.action_title = "Разговор с Мелиссой"
-                return
-        $ _melissa_scene_count = Melissa.start_scene_count() + 1
-        $ Melissa.intimacy_start_day = int(current_game_day() or 0)
-        $ Melissa.intimacy_start_count = _melissa_scene_count
-        $ Melissa.intimacy_start_total = max(int(Melissa.intimacy_start_total or 0), 0) + 1
-        if _melissa_start_action == "underclothes":
-            $ Melissa.change_social(friend_delta=1, open_delta=2, corruption_delta=3)
-            $ player.change_stat("fun", 3)
-            $ scene_runtime.text = "Ваши руки скользят уже смелее, под ткань и вдоль теплой кожи. Мелисса вздрагивает, судорожно выдыхает вам в плечо и все же не останавливает, только шепотом просит не заходить дальше, чем она сейчас готова выдержать."
-        elif _melissa_start_action == "deepkiss":
-            $ Melissa.change_social(friend_delta=1, open_delta=2, corruption_delta=2)
-            $ player.change_stat("fun", 2)
-            $ scene_runtime.text = "Поцелуй становится заметно глубже и дольше. Мелисса отвечает уже не из одной только осторожности: сперва несмело, потом все горячее, будто сама удивляется тому, как быстро перестает считать секунды."
-        elif _melissa_start_action == "kiss":
-            $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
-            $ player.change_stat("fun", 2)
-            $ scene_runtime.text = "Вы не спешите и сначала просто касаетесь ее руки. Мелисса не отстраняется, а когда вы осторожно целуете ее, отвечает коротко, неловко, но уже без прежней настороженности."
-        elif _melissa_start_action == "fondle":
-            $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
-            $ player.change_stat("fun", 2)
-            $ scene_runtime.text = "Вы держитесь мягко, но позволяете себе чуть больше близости, чем раньше. Мелисса краснеет, шепотом просит не давить на нее и все же остается рядом, явно запоминая это как шаг, который она сама разрешила."
-        else:
-            $ Melissa.change_social(open_delta=1, corruption_delta=1)
-            $ player.change_stat("fun", 1)
-            $ scene_runtime.text = "Вы осторожно прикасаетесь к Мелиссе, будто заранее давая ей возможность остановить вас. Она тихо выдыхает, смотрит в сторону и почти неслышно говорит, что так можно."
-        if Melissa.start_honey_bonus_active():
-            $ Melissa.change_social(corruption_delta=1)
-            $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nПохоже, медовые сладости за общим столом все еще делают ее заметно мягче и отзывчивее."
-        if _melissa_scene_count < 5:
-            $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nНа сегодня между вами остается место еще для нескольких осторожных шагов, если не ломать этот ритм."
-        else:
-            $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nПосле нескольких таких шагов подряд вы оба все же останавливаетесь на сегодня, чтобы не спугнуть то доверие, которое только-только между вами укрепилось."
-        $ scene_runtime.location_text = scene_runtime.text
-    $ main_ui_runtime.action_title = "Разговор с Мелиссой"
     return
 
 

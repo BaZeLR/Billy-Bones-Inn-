@@ -124,6 +124,14 @@ init -100 python:
                 if hasattr(sandra_obj, field_name):
                     delattr(sandra_obj, field_name)
 
+        melissa_obj = globals().get("Melissa")
+        if melissa_obj is not None:
+            for field_name in (
+                "intimacy_start_day", "intimacy_start_count", "intimacy_start_total",
+            ):
+                if hasattr(melissa_obj, field_name):
+                    delattr(melissa_obj, field_name)
+
         robin_obj = globals().get("Robin")
         robin_var = getattr(robin_obj, "var", None)
         if isinstance(robin_var, dict):
@@ -1495,15 +1503,9 @@ init -100 python:
         Melissa.asked_about_clara_day = people_to_int(
             melissa_var.pop("AskedAboutClaraDay", getattr(Melissa, "asked_about_clara_day", -1)), -1
         )
-        Melissa.intimacy_start_day = people_to_int(
-            melissa_var.pop("StartDay", getattr(Melissa, "intimacy_start_day", -1)), -1
-        )
-        Melissa.intimacy_start_count = max(0, min(5, people_to_int(
-            melissa_var.pop("StartCount", getattr(Melissa, "intimacy_start_count", 0)), 0
-        )))
-        Melissa.intimacy_start_total = max(0, people_to_int(
-            melissa_var.pop("StartTotal", getattr(Melissa, "intimacy_start_total", 0)), 0
-        ))
+        melissa_var.pop("StartDay", None)
+        melissa_var.pop("StartCount", None)
+        melissa_var.pop("StartTotal", None)
         Melissa.private_context_day = people_to_int(
             melissa_var.pop("private_context_day", getattr(Melissa, "private_context_day", -1)), -1
         )

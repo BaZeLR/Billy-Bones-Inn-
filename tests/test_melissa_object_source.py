@@ -68,9 +68,6 @@ def test_melissa_story_state_has_explicit_npc_properties_without_var_authority()
     required_properties = [
         "mom_dress_complaint_count",
         "asked_about_clara_day",
-        "intimacy_start_day",
-        "intimacy_start_count",
-        "intimacy_start_total",
         "private_context_day",
         "private_context_origin",
         "storage_thanks_day",
@@ -148,6 +145,11 @@ def test_melissa_save_migration_consumes_legacy_map_once():
     assert "def updateSave_V50():" in migration
     assert "if loaded_version < 51:" in migration
     assert "updateSave_V50()" in migration
+    for retired_field in (
+        "intimacy_start_day", "intimacy_start_count", "intimacy_start_total",
+    ):
+        assert f'self.{retired_field} =' not in MELISSA_INIT.read_text(encoding="utf-8-sig")
+        assert f'"{retired_field}"' in migration
 
 
 def test_melissa_revealing_dress_request_is_thread_owned_and_code_backed():
@@ -328,15 +330,38 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
         "relationship_allows",
         "room_is_private",
         "private_place_offer",
-        "start_action_available",
-        "start_scene_count",
-        "start_intro_text",
     ):
         assert f"def {method_name}(self" in init_source
         assert f"def melissa_{method_name}(" not in talk_source
+    for removed_parallel_flow in (
+        "start_action_available",
+        "start_scene_count",
+        "start_scene_remaining",
+        "start_intro_text",
+        "IntMelissaStartMenu",
+    ):
+        assert removed_parallel_flow not in init_source + talk_source
+    assert 'threads["melissaBatProblem"].completed and self.relationship_stage() >= 2' in init_source
     assert 'Melissa.relationship_allows("intimacy")' in talk_source
     assert "Melissa.private_place_offer(" in talk_source
+    assert talk_source.count("$ _melissa_repeat_menu = True") >= 3
     assert 'Melissa.relationship_allows("sex")' in sex_source
+
+
+def test_melissa_intimacy_uses_one_native_scene_until_explicit_finish():
+    sex_source = MELISSA_SEX.read_text(encoding="utf-8-sig")
+    sex_menu = sex_source.split('label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):', 1)[1].split(
+        'label IntMelissaSexState(girl_name="melissa"):', 1
+    )[0]
+
+    assert 'main_ui_begin_native_scene_state("Мелисса")' in sex_menu
+    assert "while True:" in sex_menu
+    assert '"Остановиться":' in sex_menu
+    assert "call int_melissa_sex_finish" in sex_menu
+    assert 'vscene scene_runtime.picture' in sex_menu
+    assert '"[scene_runtime.text]"' not in sex_menu
+    assert "call ShowCurrentSex" not in sex_menu
+    assert "main_ui_end_native_scene_state()" in sex_source
 
 
 def test_melissa_intimacy_refresh_does_not_reset_arousal_or_proxy_owned_state():

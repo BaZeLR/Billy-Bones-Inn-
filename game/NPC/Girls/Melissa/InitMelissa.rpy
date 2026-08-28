@@ -210,9 +210,6 @@ init python:
             self.revealing_dress_code = ""
             self.mom_dress_complaint_count = 0
             self.asked_about_clara_day = -1
-            self.intimacy_start_day = -1
-            self.intimacy_start_count = 0
-            self.intimacy_start_total = 0
             self.private_context_day = -1
             self.private_context_origin = ""
             self.storage_thanks_day = -1
@@ -318,17 +315,15 @@ init python:
             friend_value = people_to_int(self.rel, 0)
             open_value = people_to_int(self.openness, 0)
             corruption_value = people_to_int(self.corruption, 0)
-            start_progress = max(0, people_to_int(self.intimacy_start_total, 0))
             stage = 0
             if friend_value >= 5 and (open_value >= 2 or corruption_value >= 5):
                 stage = 1
             if friend_value >= 10 and (open_value >= 4 or corruption_value >= 8):
                 stage = 2
-            if start_progress >= 3 or (friend_value >= 13 and (open_value >= 7 or corruption_value >= 14)):
+            if friend_value >= 13 and (open_value >= 7 or corruption_value >= 14):
                 stage = 3
             if (
-                threads["melissaBatProblem"].num >= 8
-                and start_progress >= 5
+                threads["melissaBatProblem"].completed
                 and friend_value >= 15
                 and open_value >= 9
                 and corruption_value >= 18
@@ -345,10 +340,8 @@ init python:
             if action_key in ("share", "flirt"):
                 allowed, reason = relationship_social_action_allowed(self.code_name, action_key)
                 return bool(allowed)
-            if action_key == "start":
-                return self.relationship_stage() >= 2
             if action_key == "intimacy":
-                return self.relationship_stage() >= 3
+                return threads["melissaBatProblem"].completed and self.relationship_stage() >= 2
             if action_key == "sex":
                 return self.relationship_stage() >= 4
             return False
@@ -398,56 +391,6 @@ init python:
                     "text": "Мелисса сама выбирает место в стороне от тропы, где ветки и тени закрывают вас от случайных глаз.",
                 }
             return {"ok": False, "place": "", "text": ""}
-
-        def start_scene_count(self):
-            if people_to_int(self.intimacy_start_day, -1) != current_game_day():
-                return 0
-            return max(0, min(5, people_to_int(self.intimacy_start_count, 0)))
-
-        def start_scene_remaining(self):
-            return max(0, 5 - self.start_scene_count())
-
-        def start_honey_bonus_active(self):
-            return bool(tavern_kitchen_honey_bonus_active())
-
-        def start_action_available(self, action_code=""):
-            if not self.relationship_allows("start"):
-                return False
-            action_key = str(action_code or "").strip().lower()
-            current_count = self.start_scene_count()
-            if current_count >= 5:
-                return False
-            friend_value = people_to_int(self.rel, 0)
-            corruption_value = people_to_int(self.corruption, 0)
-            open_value = people_to_int(self.openness, 0)
-            mood_bonus = 2 if self.start_honey_bonus_active() else 0
-            if action_key == "caress":
-                return True
-            if action_key == "kiss":
-                return current_count >= 1 or friend_value >= 13 or open_value + mood_bonus >= 8
-            if action_key == "deepkiss":
-                return current_count >= 1 and (friend_value >= 14 or open_value + mood_bonus >= 10 or corruption_value + mood_bonus >= 12)
-            if action_key == "fondle":
-                return current_count >= 2 and (friend_value >= 15 or corruption_value + mood_bonus >= 14)
-            if action_key == "underclothes":
-                return current_count >= 3 and (friend_value >= 16 or corruption_value + mood_bonus >= 18 or open_value + mood_bonus >= 12)
-            return False
-
-        def start_intro_text(self):
-            current_count = self.start_scene_count()
-            lines = []
-            if current_count <= 0:
-                lines.append("Мелисса задерживает на вас взгляд дольше обычного. Между вами уже достаточно доверия, чтобы не сводить разговор только к делам, но торопиться все равно не стоит.")
-            else:
-                lines.append("Мелисса уже не так шарахается от вашей близости, как раньше. Похоже, сегодня она готова пройти с вами еще несколько осторожных шагов, если вы не будете давить.")
-            lines.append("На сегодня у вас осталось %s спокойных, но все более смелых шага." % self.start_scene_remaining())
-            if self.start_honey_bonus_active():
-                lines.append("После сладких кухонных угощений Мелисса кажется чуть мягче и отзывчивее обычного.")
-            if 4 <= threads["melissaBatProblem"].num < 8:
-                lines.append("Она все еще заметно лучше держится рядом с вами, когда разговор заходит о ее комнате и чердаке над ней.")
-            if people_to_int(self.rel, 0) >= 15:
-                lines.append("Доверия между вами уже достаточно, чтобы Мелисса не принимала каждое прикосновение за угрозу.")
-            return "\n\n".join(lines)
 
         def getLocation(self, wday=None, hour=None):
             temp_room = str(self.temp_room_code or "").strip()

@@ -3899,8 +3899,7 @@ testcase external_sandra_weekly_thread_progression:
             "work_attitude": 99,
         })
         for _melissa_field in (
-            "mom_dress_complaint_count", "asked_about_clara_day", "intimacy_start_day",
-            "intimacy_start_count", "intimacy_start_total", "private_context_day",
+            "mom_dress_complaint_count", "asked_about_clara_day", "private_context_day",
             "private_context_origin", "storage_thanks_day", "temp_room_code",
             "storage_rat_help_day", "bat_attic_check_day", "drawings_ready_day",
             "drawings_found", "drawings_booklet_left", "drawings_booklet_read",
@@ -3908,7 +3907,8 @@ testcase external_sandra_weekly_thread_progression:
         ):
             Melissa.__dict__.pop(_melissa_field, None)
     $ updateSave_V50()
-    assert eval (Melissa.mom_dress_complaint_count == 2 and Melissa.asked_about_clara_day == 11 and Melissa.intimacy_start_day == 12 and Melissa.intimacy_start_count == 3 and Melissa.intimacy_start_total == 4) timeout 5.0
+    assert eval (Melissa.mom_dress_complaint_count == 2 and Melissa.asked_about_clara_day == 11) timeout 5.0
+    assert eval (not any(hasattr(Melissa, field) for field in ("intimacy_start_day", "intimacy_start_count", "intimacy_start_total"))) timeout 5.0
     assert eval (Melissa.private_context_day == 13 and Melissa.private_context_origin == "MarketPlace" and Melissa.storage_thanks_day == 14 and Melissa.temp_room_code == "TavernAmandaRoom") timeout 5.0
     assert eval (Melissa.storage_rat_help_day == 15 and Melissa.bat_attic_check_day == 16 and Melissa.drawings_ready_day == 17 and Melissa.drawings_found and Melissa.drawings_booklet_left and Melissa.drawings_booklet_read and Melissa.drawings_returned) timeout 5.0
     assert eval (Melissa.roof_repair_complete_day == 22 and Melissa.breakfast_tease_day == 23) timeout 5.0
@@ -4048,8 +4048,7 @@ testcase external_melissa_engagement_clothing_state_and_no_full_sex:
     $ Melissa.rel = 16
     $ Melissa.openness = 12
     $ Melissa.corruption = 16
-    $ Melissa.intimacy_start_total = 3
-    $ threads["melissaBatProblem"].advanceTo(6, force_active=True)
+    $ threads["melissaBatProblem"].advanceTo(7, force_active=True)
     $ Melissa.temp_room_code = "TavernAmandaRoom"
     $ Melissa.wardrobe["current_dress"] = "workdress"
     $ Melissa.wardrobe["current_underwear"]["bra"] = "simplebra"
@@ -4058,25 +4057,39 @@ testcase external_melissa_engagement_clothing_state_and_no_full_sex:
     $ player.intimacy.set_arousal(95)
     $ Melissa.set_arousal(95)
     $ Melissa.set_sex_busy(False)
+    assert eval (not Melissa.relationship_allows("intimacy")) timeout 5.0
+    $ threads["melissaBatProblem"].advanceTo(8, force_active=True)
+    assert eval (not Melissa.relationship_allows("intimacy")) timeout 5.0
+    $ threads["melissaBatProblem"].advanceTo(8, complete_at_end=True)
+    assert eval (Melissa.relationship_allows("intimacy") and not Melissa.relationship_allows("sex")) timeout 5.0
 
-    run Call("IntMelissaSex", "melissa", "TavernMyRoom")
+    run Call("IntMelissaTalk", "melissa")
     advance until screen "choice" timeout 20.0
+    assert eval ("Уединиться с Мелиссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _melissa_intimacy_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Уединиться с Мелиссой")
+    click id ("choice_panel_button_%d" % int(_melissa_intimacy_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("choice") is not None and "Осмотреть Мелиссу" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Мелисса") timeout 5.0
     assert eval (int(Melissa.arousal_value() or 0) == 95 and int(player.intimacy.arousal_value() or 0) == 95) timeout 5.0
     assert eval ("Подставить ей член" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Войти в нее" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Кончить на лицо" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Лизать киску" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    click id "choice_panel_button_2" pos (0.5, 0.5) until screen "say" timeout 20.0
-    advance until screen "choice" timeout 20.0
+    $ _melissa_remove_blouse_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Снять блузку")
+    click id ("choice_panel_button_%d" % int(_melissa_remove_blouse_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and Melissa.clothing_layer("top") == "") timeout 20.0
     assert eval (int(Melissa.arousal_value() or 0) == 95) timeout 5.0
     $ _melissa_engagement_summary = _ims_scene_summary("melissa")
     assert eval ("Верх: одежда снята" in str(_melissa_engagement_summary or "")) timeout 5.0
     assert eval ("Сейчас это еще не полноценный секс" in str(_melissa_engagement_summary or "")) timeout 5.0
-    click id "choice_panel_button_4" pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (960, 560) until screen "say" timeout 20.0
+    $ _melissa_fondle_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Ласкать грудь")
+    click id ("choice_panel_button_%d" % int(_melissa_fondle_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "начинаете ласкать грудь" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.picture or "") == "images/melissa/Grope/titsShy.png") timeout 5.0
     assert eval (int(player.intimacy.arousal_value() or 0) <= 85) timeout 5.0
     assert eval (int(Melissa.arousal_value() or 0) <= 90) timeout 5.0
     assert eval (not Melissa.sex_busy()) timeout 5.0
+    $ _melissa_stop_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Остановиться")
+    click id ("choice_panel_button_%d" % int(_melissa_stop_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None and "Уединиться с Мелиссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _melissa_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
+    click id ("choice_panel_button_%d" % int(_melissa_back_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
 '''
 
 
@@ -5438,7 +5451,6 @@ testcase external_people_objects_are_single_source:
     $ Melissa.rel = 17
     $ Melissa.openness = 10
     $ Melissa.corruption = 20
-    $ Melissa.intimacy_start_total = 5
     assert eval (Melissa.rel == 17 and Melissa.relationship_stage() >= 3) timeout 5.0
     assert eval (all(people.get_info(key).data is people.get_data(key) for key in ["melissa", "sandra", "clara"])) timeout 5.0
     $ Amanda.talked_today = 2
