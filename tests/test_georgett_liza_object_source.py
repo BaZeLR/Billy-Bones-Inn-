@@ -425,6 +425,9 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
     assert "jump PortStreets" not in georgett_events
     assert "jump PortStreets" not in liza_events
     assert 'GetSexEventFromTable(girl_name, 3, "Prostitution")' in clients
+    assert "$ main_ui_begin_native_scene_state(\"Подворотня\")" in clients
+    assert "show screen main_ui" in clients
+    assert '"Вернуться в переулок"' in clients
 
 
 def test_port_back_alley_uses_native_menu_and_returns_to_event_owner():
@@ -436,9 +439,19 @@ def test_port_back_alley_uses_native_menu_and_returns_to_event_owner():
     assert "menu:" in back_alley
     assert "main_ui_runtime.action_items" not in back_alley
     assert "call screen main_ui" not in back_alley
+    assert "$ main_ui_begin_native_scene_state(\"Подворотня\")" in back_alley
+    assert "show screen main_ui" in back_alley
     assert "jump PortStreets" not in back_alley
     assert "call street_clients_watch" in back_alley
     assert "_port_ui_return" not in port
+
+
+def test_portstreets_explains_georgett_client_absence_from_npc_authority():
+    port = _source(PORT_STREETS)
+    entry = port.split("label PortStreets:", 1)[1].split("label PortStreetsBackAlley", 1)[0]
+
+    assert "if Georgett.portstreet_client_event_available():" in entry
+    assert "Почему-то Жоржетты сейчас нет на ее обычном месте. Где же она может быть?" in entry
 
 
 def test_georgett_and_liza_extend_the_shared_sex_state_schema():

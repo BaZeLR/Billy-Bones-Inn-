@@ -97,7 +97,9 @@ label PortStreets:
     $ main_ui_runtime.action_items = []
 
     $ scene_runtime.location_text = rooms.get("PortStreets").descriptions[0].text
-    if Georgett.portstreet_visible_now() and people_to_int(Georgett.rel, 0) == 0:
+    if Georgett.portstreet_client_event_available():
+        $ scene_runtime.location_text += "\n\nПочему-то Жоржетты сейчас нет на ее обычном месте. Где же она может быть?"
+    elif Georgett.portstreet_visible_now() and people_to_int(Georgett.rel, 0) == 0:
         vscene "images/georgett/Port/wait.jpg"
         $ scene_runtime.location_text += "\n\nНа углу стоит молодая женщина, не очень высокого роста, чуть пухленькая и с большой налитой грудью, одетая в прозрачную блузку и короткую юбку. Она белокура и кареглаза. Ее внешность и повадки не дают никаких сомнений в том, что она выбрала себе путь отнюдь не монашки."
         if Georgett.pregnancy_days() >= 210:
@@ -127,7 +129,7 @@ label PortStreets:
         call screen main_ui
 
 label PortStreetsBackAlley(girl_name=""):
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_begin_native_scene_state("Подворотня")
     $ scene_runtime.picture = "images/general/port_streets.png"
     if scene_runtime.picture:
         vscene scene_runtime.picture
@@ -138,11 +140,13 @@ label PortStreetsBackAlley(girl_name=""):
     else:
         $ scene_runtime.text = "Вы проверяете подворотню, но сегодня здесь пусто."
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
     menu:
         "Подсмотреть" if str(girl_name or "") in ("georgett", "liza") and CheckIfSexEventExist(girl_name, 3, "Prostitution") > 0:
             call street_clients_watch(1, girl_name, calendar_v2.time_slot())
         "Вернуться в портовые переулки":
-            return
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 

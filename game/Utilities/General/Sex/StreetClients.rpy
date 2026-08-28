@@ -4,6 +4,7 @@
 label street_clients_watch(client_type=1, girl_name="", event_time=None):
     if int(client_type or 0) != 1:
         return
+    $ main_ui_begin_native_scene_state("Подворотня")
 
 label street_clients_watch_event:
     $ renpy.dynamic("SexEventType", "_street_client_picture")
@@ -16,6 +17,11 @@ label street_clients_watch_event:
     if SexEventType <= 0:
         $ scene_runtime.text = "Вы осторожно проверяете переулок, но сегодня здесь уже нечего увидеть."
         $ scene_runtime.location_text = scene_runtime.text
+        show screen main_ui
+        menu:
+            "Вернуться в переулок":
+                pass
+        $ main_ui_end_native_scene_state()
         return
 
     if girl_name == "liza":
@@ -79,8 +85,11 @@ label street_clients_watch_event:
     if str(_street_client_picture or "").strip():
         $ scene_runtime.picture = str(_street_client_picture or "")
         vscene scene_runtime.picture
+    show screen main_ui
     menu:
         "Смотреть дальше" if CheckIfSexEventExist(girl_name, 3, "Prostitution") > 0:
             jump street_clients_watch_event
         "Вернуться в переулок":
-            return
+            pass
+    $ main_ui_end_native_scene_state()
+    return
