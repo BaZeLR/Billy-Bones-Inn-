@@ -340,7 +340,7 @@ label ChurchServiceBlanken:
     $ renpy.dynamic("_church_picture")
     $ scene_runtime.text = "Вдова Блэнкеншип, высокая рыжая женщина с полной грудью, чуть младше сорока лет. Она на первый взгляд слушает отца Герхарда, но если присмотреться, то видно, что ее мысли витают где-то далеко. Рядом с ней стоит Эдди, ее рыжий управляющий лавкой и ваш ровесник. Поблизости ее дети - Ингенборг, Ивар, Эмма и Лаура."
     $ scene_runtime.location_text = scene_runtime.text
-    $ _church_picture = church_blacken_picture()
+    $ _church_picture = church_blanken_picture()
     if str(_church_picture or "").strip():
         call ShowImage("", "", _church_picture)
     else:

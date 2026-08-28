@@ -2595,6 +2595,11 @@ testcase external_church_service_action_links_work:
     assert eval ("Найти Сандру" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     assert eval ("Найти сестричек" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     assert eval ("Найти Жоржетту Брюно" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    $ _church_blanken_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Найти семейство Блэнкеншип")
+    $ _church_blanken_button = "choice_panel_button_%d" % int(_church_blanken_index)
+    click id _church_blanken_button pos (0.5, 0.5) until eval ("Вдова Блэнкеншип" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") in ("images/becky/church/cermon.png", "images/becky/church/talk1.jpg", "images/becky/church/talk2.jpg")) timeout 5.0
+    assert eval (str(main_ui_runtime.action_title or "") == "Прихожане") timeout 5.0
     assert eval (not story_event_available("Church", "georgett_church_service_bench")) timeout 5.0
     assert eval (not story_event_available("Church", "georgett_church_service_doggy")) timeout 5.0
     assert eval (not story_event_available("Church", "georgett_church_service_with_liza")) timeout 5.0

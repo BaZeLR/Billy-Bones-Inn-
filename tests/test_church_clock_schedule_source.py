@@ -84,6 +84,14 @@ def test_church_room_phase_pictures_use_church_folder_vscene_assets():
     assert 'call ShowImageSeq("general", "", "LocChurchClosed", 2)' not in source
 
 
+def test_blanken_family_service_action_uses_its_defined_picture_resolver():
+    source = _source(CHURCH_ROOM)
+    service = source.split("label ChurchServiceBlanken:", 1)[1].split("label becky_church_talk:", 1)[0]
+
+    assert "$ _church_picture = church_blanken_picture()" in service
+    assert "church_blacken_picture" not in source
+
+
 def test_church_location_files_do_not_use_old_general_church_pictures():
     church_dir = PROJECT_ROOT / "game" / "Town" / "Church"
     combined = "\n".join(path.read_text(encoding="utf-8-sig") for path in church_dir.glob("*.rpy"))
