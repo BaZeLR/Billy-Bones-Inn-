@@ -65,6 +65,8 @@ def test_talk_cycle_keeps_native_menu_open_and_costs_five_minutes_per_topic():
     assert "Обсуждено тем" not in source
     assert "все десять тем" not in source
     assert 'append_social_score_message(social_topic_text(key, mode_key, topic_key, score), actual_score, False)' in source
+    assert 'social_talked_today_value(girl_name) > 0' in source
+    assert '$ social_person_info(_social_girl).mark_talked()' in label
 
 
 def test_ordinary_talk_has_no_second_profile_or_old_point_authority():

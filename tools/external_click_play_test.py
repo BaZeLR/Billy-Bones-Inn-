@@ -4061,33 +4061,84 @@ testcase external_sandra_night_thanks_hours_work:
 
 
 MELISSA_SEX_ENGINE_CHECKS = r'''
-testcase external_melissa_engagement_clothing_state_and_no_full_sex:
+testcase external_melissa_courtship_is_slow_and_daily:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
-    $ renpy.call_in_new_context("InitDressDesc")
-    $ _melissa_engagement_date = calendar_v2.day_number_to_parts(90)
-    $ external_calendar_set_fields(int(_melissa_engagement_date.get("day", 1) or 1), int(_melissa_engagement_date.get("month", 1) or 1), int(_melissa_engagement_date.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 23, 0)
-    $ rooms.enter("TavernMyRoom"
-)
+    $ _melissa_courtship_date = calendar_v2.day_number_to_parts(90)
+    $ external_calendar_set_fields(int(_melissa_courtship_date.get("day", 1) or 1), int(_melissa_courtship_date.get("month", 1) or 1), int(_melissa_courtship_date.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 23, 0)
+    $ rooms.enter("TavernMyRoom")
     $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMyRoom", start_hour=0, end_hour=24, priority=999)])
     $ Melissa.rel = 16
     $ Melissa.openness = 12
-    $ Melissa.corruption = 16
-    $ threads["melissaBatProblem"].advanceTo(7, force_active=True)
-    $ Melissa.temp_room_code = "TavernAmandaRoom"
-    $ Melissa.wardrobe["current_dress"] = "workdress"
-    $ Melissa.wardrobe["current_underwear"]["bra"] = "simplebra"
-    $ Melissa.wardrobe["current_underwear"]["panties"] = "simplepanties"
-    $ Melissa.reset_sex_clothing_state()
-    $ player.intimacy.set_arousal(95)
-    $ Melissa.set_arousal(95)
-    $ Melissa.set_sex_busy(False)
-    assert eval (not Melissa.relationship_allows("intimacy")) timeout 5.0
-    $ threads["melissaBatProblem"].advanceTo(8, force_active=True)
-    assert eval (not Melissa.relationship_allows("intimacy")) timeout 5.0
+    $ Melissa.corruption = 18
+    $ Melissa.storage_rat_help_day = 1
+    $ Melissa.roof_repair_complete_day = 1
+    $ Melissa.drawings_returned = True
+    $ Melissa.drawings_booklet_left = False
     $ threads["melissaBatProblem"].advanceTo(8, complete_at_end=True)
-    assert eval (Melissa.relationship_allows("intimacy") and not Melissa.relationship_allows("sex")) timeout 5.0
+    $ threads["melissaCourtship"].reset()
+    $ Melissa.reset_daily()
+    $ initStoryEventRuntime(True)
+    assert eval (not story_event_available("talk_melissa", "melissa_intimacy")) timeout 5.0
+
+    $ Melissa.drawings_booklet_left = True
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("talk_melissa", "melissa_intimacy")) timeout 5.0
+    assert eval (not Melissa.relationship_allows("intimacy") and not Melissa.relationship_allows("sex")) timeout 5.0
+
+    run Call("IntMelissaTalk", "melissa")
+    advance until screen "choice" timeout 20.0
+    $ _melissa_talk_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Поговорить")
+    click id ("choice_panel_button_%d" % int(_melissa_talk_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _melissa_end_talk_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    click id ("choice_panel_button_%d" % int(_melissa_end_talk_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Сблизиться с Мелиссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (int(Melissa.talked_today or 0) == 1 and "Поговорить" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Сблизиться с Мелиссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Уединиться с Мелиссой" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _melissa_courtship_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Сблизиться с Мелиссой")
+    click id ("choice_panel_button_%d" % int(_melissa_courtship_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Осторожно коснуться Мелиссы" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval ("Осторожно поцеловать Мелиссу" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _melissa_touch_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Осторожно коснуться Мелиссы")
+    click id ("choice_panel_button_%d" % int(_melissa_touch_index)) pos (0.5, 0.5) until eval (int(threads["melissaCourtship"].num or 0) == 1 and renpy.get_screen("say") is not None) timeout 20.0
+    assert eval (int(Melissa.fucked_today or 0) == 1 and "так можно" in str(scene_runtime.text or "")) timeout 5.0
+    advance until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (not story_event_available("talk_melissa", "melissa_intimacy")) timeout 5.0
+
+    $ _melissa_next_date = calendar_v2.day_number_to_parts(current_game_day() + 1)
+    $ external_calendar_set_fields(int(_melissa_next_date.get("day", 1) or 1), int(_melissa_next_date.get("month", 1) or 1), int(_melissa_next_date.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 23, 0)
+    $ Melissa.reset_daily()
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("talk_melissa", "melissa_intimacy")) timeout 5.0
+
+    run Call("IntMelissaTalk", "melissa")
+    advance until screen "choice" timeout 20.0
+    $ _melissa_courtship_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Сблизиться с Мелиссой")
+    click id ("choice_panel_button_%d" % int(_melissa_courtship_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Осторожно поцеловать Мелиссу" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _melissa_wait_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Не торопить события")
+    click id ("choice_panel_button_%d" % int(_melissa_wait_index)) pos (0.5, 0.5) until eval (renpy.get_screen("say") is not None) timeout 20.0
+    advance until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+
+testcase external_melissa_finished_intimacy_returns_to_room_and_closes_for_day:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ _melissa_intimacy_date = calendar_v2.day_number_to_parts(90)
+    $ external_calendar_set_fields(int(_melissa_intimacy_date.get("day", 1) or 1), int(_melissa_intimacy_date.get("month", 1) or 1), int(_melissa_intimacy_date.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 23, 0)
+    $ rooms.enter("TavernMyRoom")
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMyRoom", start_hour=0, end_hour=24, priority=999)])
+    $ Melissa.rel = 18
+    $ Melissa.openness = 14
+    $ Melissa.corruption = 22
+    $ Melissa.storage_rat_help_day = 1
+    $ Melissa.roof_repair_complete_day = 1
+    $ Melissa.drawings_returned = True
+    $ Melissa.drawings_booklet_left = True
+    $ threads["melissaBatProblem"].advanceTo(8, complete_at_end=True)
+    $ threads["melissaCourtship"].advanceTo(5, complete_at_end=True)
+    $ Melissa.reset_daily()
+    $ initStoryEventRuntime(True)
+    assert eval (Melissa.relationship_allows("intimacy") and Melissa.relationship_allows("sex")) timeout 5.0
 
     run Call("IntMelissaTalk", "melissa")
     advance until screen "choice" timeout 20.0
@@ -4095,27 +4146,9 @@ testcase external_melissa_engagement_clothing_state_and_no_full_sex:
     $ _melissa_intimacy_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Уединиться с Мелиссой")
     click id ("choice_panel_button_%d" % int(_melissa_intimacy_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("choice") is not None and "Осмотреть Мелиссу" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Мелисса") timeout 5.0
-    assert eval (int(Melissa.arousal_value() or 0) == 95 and int(player.intimacy.arousal_value() or 0) == 95) timeout 5.0
-    assert eval ("Подставить ей член" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    assert eval ("Войти в нее" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    assert eval ("Кончить на лицо" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    assert eval ("Лизать киску" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    $ _melissa_remove_blouse_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Снять блузку")
-    click id ("choice_panel_button_%d" % int(_melissa_remove_blouse_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and Melissa.clothing_layer("top") == "") timeout 20.0
-    assert eval (int(Melissa.arousal_value() or 0) == 95) timeout 5.0
-    $ _melissa_engagement_summary = _ims_scene_summary("melissa")
-    assert eval ("Верх: одежда снята" in str(_melissa_engagement_summary or "")) timeout 5.0
-    assert eval ("Сейчас это еще не полноценный секс" in str(_melissa_engagement_summary or "")) timeout 5.0
-    $ _melissa_fondle_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Ласкать грудь")
-    click id ("choice_panel_button_%d" % int(_melissa_fondle_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "начинаете ласкать грудь" in str(scene_runtime.text or "")) timeout 20.0
-    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.picture or "") == "images/melissa/Grope/titsShy.png") timeout 5.0
-    assert eval (int(player.intimacy.arousal_value() or 0) <= 85) timeout 5.0
-    assert eval (int(Melissa.arousal_value() or 0) <= 90) timeout 5.0
-    assert eval (not Melissa.sex_busy()) timeout 5.0
     $ _melissa_stop_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Остановиться")
-    click id ("choice_panel_button_%d" % int(_melissa_stop_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None and "Уединиться с Мелиссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
-    $ _melissa_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
-    click id ("choice_panel_button_%d" % int(_melissa_back_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    click id ("choice_panel_button_%d" % int(_melissa_stop_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    assert eval (int(Melissa.fucked_today or 0) == 1 and not Melissa.relationship_allows("intimacy")) timeout 5.0
 '''
 
 
@@ -6466,7 +6499,8 @@ def main() -> int:
             "external_sandra_talk_opens_from_npc_button",
             "external_sandra_weekly_thread_progression",
             "external_sandra_night_thanks_hours_work",
-            "external_melissa_engagement_clothing_state_and_no_full_sex",
+            "external_melissa_courtship_is_slow_and_daily",
+            "external_melissa_finished_intimacy_returns_to_room_and_closes_for_day",
             "external_player_intimacy_state_sleep_arousal_and_help",
             "external_clara_evening_follow_finishes_in_melissa_room",
             "external_household_ai_kitchen_event_fires",
@@ -6624,7 +6658,8 @@ def main() -> int:
             "external_sandra_talk_opens_from_npc_button",
             "external_sandra_weekly_thread_progression",
             "external_sandra_night_thanks_hours_work",
-            "external_melissa_engagement_clothing_state_and_no_full_sex",
+            "external_melissa_courtship_is_slow_and_daily",
+            "external_melissa_finished_intimacy_returns_to_room_and_closes_for_day",
             "external_player_intimacy_state_sleep_arousal_and_help",
             "external_clara_evening_follow_finishes_in_melissa_room",
             "external_household_ai_kitchen_event_fires",

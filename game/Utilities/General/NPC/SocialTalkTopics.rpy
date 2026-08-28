@@ -397,6 +397,8 @@ init -39 python:
         return rows
 
     def social_has_visible_topics(girl_name="", mode="talk"):
+        if str(mode or "talk").strip().lower() == "talk" and social_talked_today_value(girl_name) > 0:
+            return False
         return len(social_visible_topic_entries(girl_name, mode)) > 0
 
     def social_topic_score(girl_name="", mode="talk", topic_id=""):
@@ -616,6 +618,12 @@ label SocialTalkTopicMenu(girl_name="", mode="talk", _social_girl="", _social_mo
     $ _social_parent_mode = str(main_ui_runtime.mode or "scene")
     if _social_parent_mode != "talk":
         $ main_ui_begin_talk_state("Разговор с %s" % _action_display_name(_social_girl), _social_girl)
+    if _social_mode == "talk" and social_talked_today_value(_social_girl) > 0:
+        if _social_parent_mode != "talk":
+            $ main_ui_end_talk_state()
+        return
+    if _social_mode == "talk":
+        $ social_person_info(_social_girl).mark_talked()
     while True:
         $ _social_visible_ids = {str(row.get("id", "") or "") for row in social_visible_topic_entries(_social_girl, _social_mode)}
         if not _social_visible_ids:

@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 69
+define currentVersion = 70
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -609,6 +609,10 @@ init -100 python:
         if loaded_version < 69:
             updateSave_V68()
             loaded_version = 69
+
+        if loaded_version < 70:
+            updateSave_V69()
+            loaded_version = 70
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2347,6 +2351,15 @@ init -100 python:
             converted.__dict__.pop("data", None)
             converted_party.append(converted)
         fight.enemy_party = converted_party
+
+    def updateSave_V69():
+        # Existing saves with recorded Melissa sex history have already passed
+        # the new courtship sequence. The thread is the only live progression
+        # owner after this one-time promotion.
+        initThreads()
+        courtship = threads["melissaCourtship"]
+        if people_to_int(Melissa.sex_stat("sexacts", 0), 0) > 0:
+            courtship.advanceTo(courtship.data.length, complete_at_end=True)
 
 
 label before_load:

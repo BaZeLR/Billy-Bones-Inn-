@@ -327,6 +327,7 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
 
     for method_name in (
         "relationship_stage",
+        "intimacy_story_ready",
         "relationship_allows",
         "room_is_private",
         "private_place_offer",
@@ -341,11 +342,52 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
         "IntMelissaStartMenu",
     ):
         assert removed_parallel_flow not in init_source + talk_source
-    assert 'threads["melissaBatProblem"].completed and self.relationship_stage() >= 2' in init_source
+    assert 'and threads["melissaCourtship"].completed' in init_source
+    assert 'self.intimacy_story_ready()' in init_source
+    assert 'people_to_int(self.fucked_today, 0) == 0' in init_source
     assert 'Melissa.relationship_allows("intimacy")' in talk_source
     assert "Melissa.private_place_offer(" in talk_source
-    assert talk_source.count("$ _melissa_repeat_menu = True") >= 3
+    assert 'story_event_available("talk_melissa", "melissa_intimacy")' in talk_source
+    assert 'call checkTriggers("talk_melissa", "melissa_intimacy", 0)' in talk_source
+    assert talk_source.count("$ _melissa_repeat_menu = True") == 2
+    intimacy_call = talk_source.split('call IntMelissaSex(girl_name, rooms.current_code)', 1)[1]
+    assert intimacy_call.split("\n", 2)[1].strip() == "return"
     assert 'Melissa.relationship_allows("sex")' in sex_source
+    assert "$ Melissa.mark_fucked()" in sex_source
+
+
+def test_melissa_courtship_is_one_ordered_story_thread_without_parallel_counters():
+    runtime_source = (PROJECT_ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
+    event_source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")
+
+    assert 'LThreadData(0, "melissa", "Courtship"' in runtime_source
+    assert runtime_source.count('"talk_melissa", "melissa_intimacy", 0') == 5
+    assert runtime_source.count("None, None, 1,") >= 4
+    for stage_label in (
+        "story_melissa_courtship_touch_0",
+        "story_melissa_courtship_kiss_1",
+        "story_melissa_courtship_deep_kiss_2",
+        "story_melissa_courtship_fondle_3",
+        "story_melissa_courtship_underclothes_4",
+    ):
+        assert f"label {stage_label}:" in event_source
+    assert event_source.count("$ event_runtime.active_thread.advance()") >= 5
+    assert event_source.count("$ Melissa.mark_fucked()") == 5
+    for retired_counter in ("intimacy_start_day", "intimacy_start_count", "intimacy_start_total"):
+        assert retired_counter not in runtime_source + event_source
+
+
+def test_melissa_courtship_save_upgrade_promotes_only_recorded_sex_history():
+    migration_source = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
+    migration = migration_source.split("def updateSave_V69():", 1)[1].split("label before_load:", 1)[0]
+
+    assert "define currentVersion = 70" in migration_source
+    assert 'courtship = threads["melissaCourtship"]' in migration
+    assert 'Melissa.sex_stat("sexacts", 0)' in migration
+    assert "courtship.advanceTo(courtship.data.length, complete_at_end=True)" in migration
+    assert "Melissa.rel" not in migration
+    assert "Melissa.openness" not in migration
+    assert "Melissa.corruption" not in migration
 
 
 def test_melissa_intimacy_uses_one_native_scene_until_explicit_finish():

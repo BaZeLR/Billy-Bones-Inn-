@@ -32,12 +32,18 @@ label IntMelissaTalk(girl_name="melissa"):
                 call checkTriggers(rooms.current_code, "melissa_talk", 0)
             "Обсудить, где Мелиссе переночевать" if melissa_room_problem_available():
                 call IntMelissaRoomProblemAdviceMenu(girl_name)
+            "Сблизиться с Мелиссой" if story_event_available("talk_melissa", "melissa_intimacy"):
+                $ main_ui_end_talk_state()
+                call checkTriggers("talk_melissa", "melissa_intimacy", 0)
+                return
             "Уединиться с Мелиссой" if Melissa.relationship_allows("intimacy") and Melissa.room_is_private(rooms.current_code):
+                $ main_ui_end_talk_state()
                 call IntMelissaSex(girl_name, rooms.current_code)
-                $ _melissa_repeat_menu = True
+                return
             "Найти укромное место с Мелиссой" if Melissa.relationship_allows("intimacy") and bool(Melissa.private_place_offer(rooms.current_code).get("ok", False)):
+                $ main_ui_end_talk_state()
                 call IntMelissaFindPrivatePlace(girl_name, rooms.current_code)
-                $ _melissa_repeat_menu = True
+                return
             "Спросить Мелиссу о Клариссе" if str(rooms.current_code or "") == "TavernMain" and str(people.location("clara") or "") == "TavernMain" and people_to_int(Melissa.asked_about_clara_day, -1) != int(current_game_day() or 0) and int(Melissa.asked_today or 0) == 0:
                 $ Melissa.mark_asked()
                 $ Melissa.asked_about_clara_day = int(current_game_day() or 0)

@@ -336,6 +336,7 @@ label int_melissa_sex_after_cum:
 label int_melissa_sex_finish:
     $ scene_runtime.text = _ims_finish_scene(GirlNameIMS, _ims_start_orgasms)
     $ scene_runtime.location_text = scene_runtime.text
+    $ Melissa.mark_fucked()
     $ player.intimacy.set_arousal(0)
     $ Melissa.set_arousal(0)
     $ Melissa.set_sex_busy(False)

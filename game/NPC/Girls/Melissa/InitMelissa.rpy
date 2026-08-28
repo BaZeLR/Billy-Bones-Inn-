@@ -324,12 +324,26 @@ init python:
                 stage = 3
             if (
                 threads["melissaBatProblem"].completed
+                and threads["melissaCourtship"].completed
                 and friend_value >= 15
                 and open_value >= 9
                 and corruption_value >= 18
             ):
                 stage = 4
             return stage
+
+        def intimacy_story_ready(self):
+            booklet_resolved = (
+                bool(self.drawings_booklet_left)
+                or int(player.item_count("melissa_drawings_booklet_001") or 0) > 0
+            )
+            return (
+                people_to_int(self.storage_rat_help_day, -1) >= 0
+                and threads["melissaBatProblem"].completed
+                and people_to_int(self.roof_repair_complete_day, -1) >= 0
+                and bool(self.drawings_returned)
+                and booklet_resolved
+            )
 
         def relationship_allows(self, action_code="talk"):
             action_key = str(action_code or "talk").strip().lower()
@@ -341,9 +355,19 @@ init python:
                 allowed, reason = relationship_social_action_allowed(self.code_name, action_key)
                 return bool(allowed)
             if action_key == "intimacy":
-                return threads["melissaBatProblem"].completed and self.relationship_stage() >= 2
+                return (
+                    self.intimacy_story_ready()
+                    and threads["melissaCourtship"].completed
+                    and self.relationship_stage() >= 3
+                    and people_to_int(self.fucked_today, 0) == 0
+                )
             if action_key == "sex":
-                return self.relationship_stage() >= 4
+                return (
+                    self.intimacy_story_ready()
+                    and threads["melissaCourtship"].completed
+                    and self.relationship_stage() >= 4
+                    and people_to_int(self.fucked_today, 0) == 0
+                )
             return False
 
         def private_context_active(self, room_code=""):

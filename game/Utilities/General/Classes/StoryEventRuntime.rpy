@@ -83,6 +83,11 @@ define melissaRevealingDressRequestConditions = [
     "#int(Melissa.talked_today or 0) == 0",
 ]
 
+define melissaCourtshipBaseConditions = [
+    "#Melissa.intimacy_story_ready()",
+    "#int(Melissa.fucked_today or 0) == 0",
+]
+
 define melissaThreadList = [
     LThreadData(0, "melissa", "RevealingDressRequest", None, [[
         (
@@ -98,6 +103,64 @@ define melissaThreadList = [
             "TavernKitchen", "melissa_dress_request", 0,
         ),
     ]], highlight=False, threaded=True),
+    LThreadData(0, "melissa", "Courtship", None, [
+        (
+            "story_melissa_courtship_touch_0",
+            None, None, None,
+            1, None,
+            melissaCourtshipBaseConditions + [
+                "#Melissa.relationship_stage() >= 2",
+            ],
+            None,
+            "talk_melissa", "melissa_intimacy", 0,
+        ),
+        (
+            "story_melissa_courtship_kiss_1",
+            None, None, 1,
+            1, None,
+            melissaCourtshipBaseConditions + [
+                "#int(Melissa.rel or 0) >= 13",
+                "#int(Melissa.openness or 0) >= 8",
+            ],
+            None,
+            "talk_melissa", "melissa_intimacy", 0,
+        ),
+        (
+            "story_melissa_courtship_deep_kiss_2",
+            None, None, 1,
+            1, None,
+            melissaCourtshipBaseConditions + [
+                "#int(Melissa.rel or 0) >= 14",
+                "#int(Melissa.openness or 0) >= 10",
+                "#int(Melissa.corruption or 0) >= 12",
+            ],
+            None,
+            "talk_melissa", "melissa_intimacy", 0,
+        ),
+        (
+            "story_melissa_courtship_fondle_3",
+            None, None, 1,
+            1, None,
+            melissaCourtshipBaseConditions + [
+                "#int(Melissa.rel or 0) >= 15",
+                "#int(Melissa.corruption or 0) >= 14",
+            ],
+            None,
+            "talk_melissa", "melissa_intimacy", 0,
+        ),
+        (
+            "story_melissa_courtship_underclothes_4",
+            None, None, 1,
+            1, None,
+            melissaCourtshipBaseConditions + [
+                "#int(Melissa.rel or 0) >= 16",
+                "#int(Melissa.openness or 0) >= 12",
+                "#int(Melissa.corruption or 0) >= 18",
+            ],
+            None,
+            "talk_melissa", "melissa_intimacy", 0,
+        ),
+    ], highlight=False, threaded=True),
     #
     # melissa_rat_problem
     #
