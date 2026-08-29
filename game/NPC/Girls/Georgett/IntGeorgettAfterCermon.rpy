@@ -28,8 +28,6 @@ label story_georgett_church_after_sermon_look_1:
         "Посмотреть еще":
             call story_georgett_church_after_sermon_look_2
             return
-        "Вернуться в собор":
-            return
 
 
 label story_georgett_church_after_sermon_look_2:
@@ -52,8 +50,6 @@ label story_georgett_church_after_sermon_look_2:
         "Смотреть дальше":
             call story_georgett_church_after_sermon_look_3
             return
-        "Вернуться в собор":
-            return
 
 
 label story_georgett_church_after_sermon_look_3:
@@ -74,8 +70,6 @@ label story_georgett_church_after_sermon_look_3:
         "Смотреть не отрываясь":
             call story_georgett_church_after_sermon_look_4
             return
-        "Вернуться в собор":
-            return
 
 
 label story_georgett_church_after_sermon_look_4:
@@ -94,4 +88,4 @@ label story_georgett_church_after_sermon_look_4:
     menu:
         "Вернуться в собор":
             $ calendar_v2.advance_minutes(60)
-            return
+            jump Church

@@ -106,11 +106,15 @@ def test_church_location_files_do_not_use_old_general_church_pictures():
 def test_church_event_rows_show_same_clock_gate_conditions():
     runtime = _source(STORY_RUNTIME)
     people_runtime = _source(PEOPLE_RUNTIME)
+    church = _source(CHURCH_ROOM)
 
-    assert '"#church_service_action_visible()"' in runtime
+    assert '"ChurchServiceBench"' not in runtime
+    assert '"ChurchServiceDoggy"' not in runtime
+    assert '"ChurchServiceWithLiza"' not in runtime
+    assert 'if player.intimacy.can_cum() and people_to_int(Georgett.rel, 0) >= 2' in church
     assert "church_after_cermon_action_visible()" in people_runtime
     assert '"#church_after_cermon_action_visible()"' not in runtime
-    assert '7, (8, 9), None' in runtime
+    assert '7, (11, 12), None' in runtime[runtime.find("define georgettThreadList"):]
     assert '7, (6, 7), None' not in runtime[runtime.find("define georgettThreadList"):]
 
 

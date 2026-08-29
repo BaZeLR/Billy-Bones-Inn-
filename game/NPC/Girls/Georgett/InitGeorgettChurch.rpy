@@ -1,188 +1,112 @@
 label ChurchServiceGeorgett:
+    show screen main_ui
     $ scene_runtime.text = "В одном из углов собора вы находите вашу ветренную знакомую - Жоржетту Брюно, шлюху из портового квартала. Это молодая белокурая и кареглазая женщина, среднего роста, чуть пухленькая и с большой налитой грудью. В собор она нарядилась чуть скромнее, чем обычно, но не слишком: на ней красное платье до колен и блузка с глубоким декольте, на этот раз хотя бы не прозрачная. Вы замечаете, что прихожане-мужчины обращают на нее гораздо больше внимания, чем на проповедь с амвона."
     if Georgett.story_value("askkids", 0):
         if Liza.rel > 0:
-            $ scene_runtime.text = scene_runtime.text + "\n\nРядом с ней вы видите ее старшую дочь Лизетту - молоденькую мулатку, на вид - ровесницу Аманды. Ее волосы забранны в две косички а груди только начали расти. Ее шоколадное тело закрывают юбка и блузка, такие же как у ее мамы."
+            $ scene_runtime.text = scene_runtime.text + "\n\nРядом с ней вы видите ее старшую дочь Лизетту - молоденькую мулатку, на вид - ровесницу вашей сестры Аманды. Ее волосы забранны в две косички а груди только начали расти. Ее шоколадное тело закрывают юбка и блузка, такие же как у ее мамы."
         else:
-            $ scene_runtime.text = scene_runtime.text + "\n\nРядом с ней вы видите молоденькую мулатку, на вид - ровесницу Аманды. Ее волосы забранны в две косички а груди только начали расти. Судя по всему это Лизетта - старшая дочь Жоржетты. Ее шоколадное тело закрывают юбка и блузка, такие же как у ее мамы."
+            $ scene_runtime.text = scene_runtime.text + "\n\nРядом с ней вы видите молоденькую мулатку, на вид - ровесницу вашей сестры Аманды. Ее волосы забранны в две косички а груди только начали расти. Судя по всему это Лизетта - старшая дочь Жоржетты. Ее шоколадное тело закрывают юбка и блузка, такие же как у ее мамы."
         vscene "images/georgett/church/cermonliza.jpg"
     else:
         vscene "images/georgett/church/cermon.jpg"
     $ scene_runtime.location_text = scene_runtime.text
     $ Georgett.set_story_value("foundinchurch", 1)
-    $ findAvailableEvents(False)
-    menu:
-        "Предложить найти тихое место" if story_event_available("Church", "georgett_church_service_bench"):
-            call checkTriggers("Church", "georgett_church_service_bench", 0)
-            return
-        "Предложить сделать это прямо здесь" if story_event_available("Church", "georgett_church_service_doggy"):
-            call checkTriggers("Church", "georgett_church_service_doggy", 0)
-            return
-        "Предложить, чтобы Лизетта посмотрела" if story_event_available("Church", "georgett_church_service_with_liza"):
-            call checkTriggers("Church", "georgett_church_service_with_liza", 0)
-            return
-        "Вернуться в собор":
-            return
+    call ChurchServiceMenu(False)
+    return
 
 
-label story_georgett_church_service_bench:
+label ChurchGeorgettQuickSex:
+    $ renpy.dynamic("_church_georgett_variant", "_church_georgett_picture_prefix")
     show screen main_ui
     if Georgett.story_value("askkids", 0):
         vscene "images/georgett/church/cermonliza.jpg"
     else:
         vscene "images/georgett/church/cermon.jpg"
-    "Вы предлагаете Жоржетте найти укромное место, где вас никто не увидит."
 
+    $ scene_runtime.text = "В одном из углов собора вы находите вашу ветренную знакомую и шепчете ей на ухо ваше нескромное предложение."
     if Georgett.rel < 6:
-        "«Ты что, сдурел!» - отвечает вам она. «Это же собор!»"
-        call ChurchServiceGeorgett
+        $ scene_runtime.text = scene_runtime.text + "\n\n\"Ты что, сдурел!\" - отвечает вам она. \"Это же собор!\""
+        $ scene_runtime.location_text = scene_runtime.text
+        "[scene_runtime.text]"
+        call ChurchServiceMenu(False)
         return
 
-    "«Какой ты пошлый! Поиметь меня прямо на церковной службе!» - смеется Жоржетта. «Это обойдется тебе в 15 мараведи!»"
-
+    $ scene_runtime.text = scene_runtime.text + "\n\n\"Какой ты пошлый! Поиметь меня прямо на церковной службе!\" - смеется Жоржетта. \"Это обойдется тебе в 15 мараведи!\""
     if int(player.economy.money or 0) < 15:
-        "«Ой, а у меня столько нет», говорите вы."
-        "«Ну нет так нет», следует резонный ответ."
-        call ChurchServiceGeorgett
+        $ scene_runtime.text = scene_runtime.text + "\n\n\"Ой, а у меня столько нет\", говорите вы.\n\n\"Ну нет так нет\", следует резонный ответ."
+        $ scene_runtime.location_text = scene_runtime.text
+        "[scene_runtime.text]"
+        call ChurchServiceMenu(False)
         return
 
-    vscene "images/georgett/church/bench/bench1.jpg"
-    "Жоржетта берет монеты и ведет вас к одной из скамей в темном углу собора."
+    $ _church_georgett_variant = "bench"
+    if Georgett.story_value("askkids", 0):
+        $ _church_georgett_variant = "withliza"
+        if Liza.rel == 0:
+            $ scene_runtime.text = scene_runtime.text + "\n\nЖоржетта поворачивается к молоденькой мулатке-шоколадке, стоящей рядом с ней: \"Стефан, познакомься, это моя старшая доченька Лизетта, я тебе про нее рассказывала. Лизетта, познакомься, это дядя Стефан.\""
+            $ Liza.add_relation(1)
+        if Georgett.story_value("lizasawinchurch", 0):
+            $ scene_runtime.text = scene_runtime.text + "\n\n\"Лизетточка, мы сейчас с дядей Стефаном пойдем потрахаемся\", - без тени смущения говорит ваша подруга своей дочке. \"Оставайся здесь, или, если хочешь, можешь посмотреть. Только тихо.\""
+        else:
+            $ scene_runtime.text = scene_runtime.text + "\n\n\"Лизетточка, мы сейчас с дядей Стефаном отойдем поговорить, а ты нас здесь подожди, хорошо?\" - говорит ваша подруга своей дочке. \"Хорошо, мама.\""
+    elif procedural_randint(1, 2, "church_georgett_variant_%s_%s" % (int(current_game_day()), int(player_cum_count()))) == 1:
+        $ _church_georgett_variant = "doggy"
 
-    menu:
-        "Дальше":
-            pass
+    if _church_georgett_variant == "doggy":
+        $ scene_runtime.text = scene_runtime.text + "\n\nВы отдаете деньги Жоржетте и она ведет вас к одной из скамей в дальнем темном углу собора. Вы внимательно осматриваетесь и замечаете, что скамья, колонны, сложенная утварь и прочее барахло заслоняют вас от взглядов толпы. Судя по всему к таким же выводам приходит и Жоржетта, так как она решительным движением снимает с себя юбку под которой, как вы и ожидали, ничего не оказалось. А сняв, Жоржетта наклоняется, опираясь о скамью, приглашающе выставив свою киску. Поняв намек, вы, не теряя времени, спускаете штаны и одним движением входите в развратницу."
+    else:
+        $ scene_runtime.text = scene_runtime.text + "\n\nВы отдаете деньги Жоржетте и она ведет вас к одной из скамей в дальнем темном углу собора. Вы оба садитесь на нее. Видно, что колонны и прислоненная к ним церковная утварь заслоняют вас от взглядов толпы. Жоржетта быстро приспускает ваши штаны, выпуская на волю ваш уже вставший член. Затем она садится вам на колени, ловко заправляя ваш член в себя. Вы с удовлетворением отмечаете, что Жоржетта даже в церкви не изменила своей привычке ходить без нижнего белья. Оперевшись на следующую скамью ваша подружка начинает плавно двигаться, осторожно но уверенно доводя вас обеих до разрядки."
 
-    vscene "images/georgett/church/bench/bench2.jpg"
-    menu:
-        "Дальше":
-            pass
+    if Georgett.story_value("askkids", 0):
+        $ scene_runtime.text = scene_runtime.text + "\n\nВдруг вы замечаете, как кто-то наблюдает за вами из тени. Вы извещаете об этом свою подругу, та всматривается в тени и вдруг призывно машет рукой. Наблюдателем оказывается Лизетта, она выходит из своего укрытия и садится рядом с вами.\n\n\"Лизетточка, доченька, видишь, мы с дядей Стефаном трахаемся. Если хочешь посмотреть - то смотри. Только тихо\". С этими словами ваша подруга возобновила свои движения. Лизетта же, смотря на вас, медленно возбуждается и начинает ласкать себя через одежду."
 
-    vscene "images/georgett/church/bench/bench3.jpg"
-    menu:
-        "Дальше":
-            pass
-
-    vscene "images/georgett/church/bench/bench4.jpg"
-    menu:
-        "Дальше":
-            pass
-
-    vscene "images/georgett/church/bench/bench5.jpg"
-    menu:
-        "Дальше":
-            pass
-
-    "Через несколько минут вы оба приводите себя в порядок и возвращаетесь к звукам службы."
+    $ scene_runtime.text = scene_runtime.text + "\n\nВы сношаетесь минут десять, когда ваша подружка не выдерживает, и сжав зубы, чтобы не застонать, кончает. Сразу следом за ней кончаете и вы, заполняя ее незащищенную матку своей спермой. Жоржетта встает с вашего члена и протирает лобок подолом платья, вы же быстро натягиваете приспущенные штаны."
+    if Georgett.story_value("askkids", 0):
+        $ scene_runtime.text = scene_runtime.text + "\n\n\"Мама, он что, в тебя кончил?\" - вдруг раздается голосок. \"Шшш, доченька, ну конечно в меня, я же тебе говорила что ничего в этом страшного нет.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
 
     $ player.spend_money(15)
-    $ player.change_stat("fun", 4)
     $ Georgett.set_story_value("fuckinchurch", 1)
-    $ Georgett.set_story_value("church_bench_seen", 1)
-    $ player_record_orgasm("georgett_church_bench", "georgett")
+    if Georgett.story_value("askkids", 0):
+        $ Georgett.set_story_value("lizasawinchurch", 1)
     $ pregnancy_check("georgett", "inside", 1, "Вы")
-    vscene "images/georgett/church/bench/bench6.jpg"
+
+    if _church_georgett_variant == "doggy":
+        $ _church_georgett_picture_prefix = "images/georgett/church/doggy/doggy"
+    elif _church_georgett_variant == "withliza":
+        $ _church_georgett_picture_prefix = "images/georgett/church/withLiza.jpg/withliza"
+    else:
+        $ _church_georgett_picture_prefix = "images/georgett/church/bench/bench"
+
+    $ scene_runtime.picture = _church_georgett_picture_prefix + "1.jpg"
+    vscene scene_runtime.picture
+    menu:
+        "Дальше":
+            pass
+    $ scene_runtime.picture = _church_georgett_picture_prefix + "2.jpg"
+    vscene scene_runtime.picture
+    menu:
+        "Дальше":
+            pass
+    $ scene_runtime.picture = _church_georgett_picture_prefix + "3.jpg"
+    vscene scene_runtime.picture
+    menu:
+        "Дальше":
+            pass
+    $ scene_runtime.picture = _church_georgett_picture_prefix + "4.jpg"
+    vscene scene_runtime.picture
+    menu:
+        "Дальше":
+            pass
+    $ scene_runtime.picture = _church_georgett_picture_prefix + "5.jpg"
+    vscene scene_runtime.picture
+    menu:
+        "Дальше":
+            pass
+    $ scene_runtime.picture = _church_georgett_picture_prefix + "6.jpg"
+    vscene scene_runtime.picture
     menu:
         "Вернуться в собор":
             $ calendar_v2.advance_minutes(60)
-            return
-
-
-label story_georgett_church_service_doggy:
-    show screen main_ui
-    vscene "images/georgett/church/cermon.jpg"
-    "Вы предлагаете Жоржетте не искать укрытия и рискнуть прямо здесь."
-
-    if int(player.economy.money or 0) < 15:
-        "«Ну нет так нет», отвечает Жоржетта, услышав, что у вас не хватает денег."
-        call ChurchServiceGeorgett
-        return
-
-    vscene "images/georgett/church/doggy/doggy1.jpg"
-    "Жоржетта принимает монеты и, бросив быстрый взгляд по сторонам, соглашается на вашу дерзкую идею."
-
-    menu:
-        "Дальше":
-            pass
-
-    vscene "images/georgett/church/doggy/doggy2.jpg"
-    menu:
-        "Дальше":
-            pass
-
-    vscene "images/georgett/church/doggy/doggy3.jpg"
-    menu:
-        "Дальше":
-            pass
-
-    vscene "images/georgett/church/doggy/doggy4.jpg"
-    menu:
-        "Дальше":
-            pass
-
-    vscene "images/georgett/church/doggy/doggy5.jpg"
-    "Вы едва удерживаетесь от лишнего шума, пока служба продолжается совсем рядом."
-
-    $ player.spend_money(15)
-    $ player.change_stat("fun", 4)
-    $ Georgett.set_story_value("fuckinchurch", 1)
-    $ Georgett.set_story_value("church_doggy_seen", 1)
-    $ player_record_orgasm("georgett_church_doggy", "georgett")
-    $ pregnancy_check("georgett", "inside", 1, "Вы")
-    vscene "images/georgett/church/doggy/doggy6.jpg"
-    menu:
-        "Вернуться в собор":
-            $ calendar_v2.advance_minutes(60)
-            return
-
-
-label story_georgett_church_service_with_liza:
-    show screen main_ui
-    vscene "images/georgett/church/cermonliza.jpg"
-    "В следующий раз Жоржетта уже не делает вид, что не понимает вашего намека, и сама зовет Лизетту ближе."
-
-    if int(player.economy.money or 0) < 15:
-        "Жоржетта только пожимает плечами: без денег она не собирается рисковать."
-        call ChurchServiceGeorgett
-        return
-
-    if Liza.rel == 0:
-        $ Liza.add_relation(1)
-
-    vscene "images/georgett/church/withLiza.jpg/withliza1.jpg"
-    "Лизетта замечает происходящее и остается наблюдать, пока Жоржетта просит ее молчать."
-
-    menu:
-        "Дальше":
-            pass
-
-    vscene "images/georgett/church/withLiza.jpg/withliza2.jpg"
-    menu:
-        "Дальше":
-            pass
-
-    vscene "images/georgett/church/withLiza.jpg/withliza3.jpg"
-    menu:
-        "Дальше":
-            pass
-
-    vscene "images/georgett/church/withLiza.jpg/withliza4.jpg"
-    menu:
-        "Дальше":
-            pass
-
-    vscene "images/georgett/church/withLiza.jpg/withliza5.jpg"
-    "Когда все заканчивается, Жоржетта спокойно поправляет платье, а Лизетта старается не смотреть вам прямо в глаза."
-
-    $ player.spend_money(15)
-    $ player.change_stat("fun", 40)
-    $ Georgett.set_story_value("fuckinchurch", 1)
-    $ Georgett.set_story_value("church_liza_seen", 1)
-    $ Georgett.set_story_value("lizasawinchurch", 1)
-    $ player_record_orgasm("georgett_church_liza", "georgett")
-    $ pregnancy_check("georgett", "inside", 1, "Вы")
-    vscene "images/georgett/church/withLiza.jpg/withliza6.jpg"
-    menu:
-        "Вернуться в собор":
-            $ calendar_v2.advance_minutes(60)
-            return
+            jump Church

@@ -102,6 +102,10 @@ init -100 python:
             character_var = getattr(character_obj, "var", None)
             if isinstance(character_var, dict):
                 character_var.pop("after_sermon_stage", None)
+                if character_name == "Georgett":
+                    character_var.pop("church_bench_seen", None)
+                    character_var.pop("church_doggy_seen", None)
+                    character_var.pop("church_liza_seen", None)
 
         gerhard_obj = globals().get("Gerhard")
         gerhard_var = getattr(gerhard_obj, "var", None)

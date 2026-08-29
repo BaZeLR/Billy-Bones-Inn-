@@ -24,6 +24,7 @@ CHURCH_ROOM = PROJECT_ROOT / "game" / "Town" / "Church" / "Church.rpy"
 NEXT_DAY_NEW_EVENTS = PROJECT_ROOT / "game" / "Utilities" / "Time" / "NextDay_NewDayEvents.rpy"
 PEOPLE_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
 MIGRATION = PROJECT_ROOT / "game" / "TractirSaveSync.rpy"
+STORY_BOARD = PROJECT_ROOT / "game" / "Utilities" / "General" / "Screens" / "StoryThreadBoard.rpy"
 
 
 def _source(path):
@@ -577,88 +578,65 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     assert "Liza.can_trigger_church_service_event()" not in next_day
 
 
-def test_georgett_church_service_events_are_threaded_from_explicit_conditions():
+def test_georgett_church_service_preserves_the_single_authored_action_flow():
     georgett = _source(GEORGETT_INIT)
     georgett_church_events = _source(GEORGETT_CHURCH_EVENTS)
     runtime = _source(STORY_RUNTIME)
+    story_board = _source(STORY_BOARD)
     church = _source(CHURCH_ROOM)
 
     assert "def church_service_quick_sex_event_available" not in georgett
     assert "def can_trigger_church_service_event" not in georgett
     assert "def knows_player" not in georgett
-    assert '"church_bench_seen": 0' in georgett
-    assert '"church_doggy_seen": 0' in georgett
-    assert '"church_liza_seen": 0' in georgett
+    assert '"church_bench_seen": 0' not in georgett
+    assert '"church_doggy_seen": 0' not in georgett
+    assert '"church_liza_seen": 0' not in georgett
+    assert '"ChurchServiceBench"' not in runtime
+    assert '"ChurchServiceDoggy"' not in runtime
+    assert '"ChurchServiceWithLiza"' not in runtime
+    assert "georgett_church_service_bench" not in story_board
+    assert "georgett_church_service_doggy" not in story_board
+    assert "georgett_church_service_with_liza" not in story_board
 
-    assert '"ChurchServiceBench"' in runtime
-    assert '"ChurchServiceDoggy"' in runtime
-    assert '"ChurchServiceWithLiza"' in runtime
-    assert '"story_georgett_church_service_bench"' in runtime
-    assert '"story_georgett_church_service_doggy"' in runtime
-    assert '"story_georgett_church_service_with_liza"' in runtime
-    assert '7, (8, 9), None' in runtime
-    assert '"#church_service_action_visible()"' in runtime
-    assert '"#bool(Georgett.known) or people_to_int(Georgett.rel, 0) > 0"' in runtime
-    assert "knowsMC" not in runtime
-    assert '"#Georgett.can_trigger_church_service_event()"' not in runtime
-    assert "npc_schedule_georgett_church_visible" not in runtime
-    assert '"#people_to_int(Georgett.story_value(\'foundinchurch\', 0), 0) > 0"' in runtime
-    assert '"#people_to_int(Georgett.story_value(\'askkids\', 0), 0) > 0"' in runtime
-    assert '"#people_to_int(Georgett.story_value(\'fuckinchurch\', 0), 0) > 0"' in runtime
-    assert '"#player.intimacy.can_cum()"' in runtime
-    assert '"#people_to_int(Georgett.rel, 0) >= 6"' in runtime
-    assert '"#people_to_int(Georgett.corruption, 0) >= 50"' in runtime
-    assert '"#people_to_int(Georgett.sex_stat(\'sexacts\', 0), 0) >= 3"' in runtime
-    assert '"Church"' in runtime
-    assert '"georgett_church_service_bench"' in runtime
-    assert '"georgett_church_service_doggy"' in runtime
-    assert '"georgett_church_service_with_liza"' in runtime
-
-    assert "def church_georgett_quick_sex_visible" not in church
-    assert 'Georgett.can_trigger_church_service_event()' not in church
     assert "label ChurchServiceGeorgett:" not in church
-    assert "label story_georgett_church_service_bench:" not in church
-    assert "label story_georgett_church_service_doggy:" not in church
-    assert "label story_georgett_church_service_with_liza:" not in church
     assert "label ChurchServiceGeorgett:" in georgett_church_events
-    assert "label story_georgett_church_service_bench:" in georgett_church_events
-    assert "label story_georgett_church_service_doggy:" in georgett_church_events
-    assert "label story_georgett_church_service_with_liza:" in georgett_church_events
-    assert 'story_event_available("Church", "georgett_church_service_bench")' in georgett_church_events
-    assert 'story_event_available("Church", "georgett_church_service_doggy")' in georgett_church_events
-    assert 'story_event_available("Church", "georgett_church_service_with_liza")' in georgett_church_events
-    assert 'findAvailableEvents(False)' in georgett_church_events
-    assert 'findAvailableEvents(True)' not in georgett_church_events
-    assert 'call checkTriggers("Church", "georgett_church_service_bench", 0)' in georgett_church_events
-    assert 'call checkTriggers("Church", "georgett_church_service_doggy", 0)' in georgett_church_events
-    assert 'call checkTriggers("Church", "georgett_church_service_with_liza", 0)' in georgett_church_events
+    assert "label ChurchGeorgettQuickSex:" in georgett_church_events
+    assert 'MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex"))' in church
+    assert 'player.intimacy.can_cum()' in church
+    assert 'people_to_int(Georgett.rel, 0) >= 2' in church
+    assert 'people_to_int(Georgett.sex_stat("sexacts", 0), 0) >= 3' in church
+    assert 'Georgett.corruption' not in church.split("label ChurchServiceMenu", 1)[1].split("label ChurchServiceMother", 1)[0]
+    assert '$ Georgett.set_story_value("foundinchurch", 0)' in church
+    assert '$ Georgett.set_story_value("foundinchurch", 1)' in georgett_church_events
+    assert 'if Georgett.rel < 6:' in georgett_church_events
+    assert '"Ты что, сдурел!' in georgett_church_events
+    assert 'procedural_randint(1, 2, "church_georgett_variant_' in georgett_church_events
+    assert 'if Georgett.story_value("askkids", 0):' in georgett_church_events
+    assert '$ _church_georgett_variant = "withliza"' in georgett_church_events
     assert 'call ChurchRestore' not in georgett_church_events
     assert 'AdvanceTimeAndRestore' not in georgett_church_events
     assert 'call AdvanceTime(' not in georgett_church_events
-    assert 'jump Church' not in georgett_church_events
-    assert 'return' in georgett_church_events
+    assert 'jump Church' in georgett_church_events
     assert 'calendar_v2.advance_minutes(60)' in georgett_church_events
     assert 'vscene "images/georgett/church/cermon.jpg"' in georgett_church_events
     assert 'vscene "images/georgett/church/cermonliza.jpg"' in georgett_church_events
-    assert 'vscene "images/georgett/church/bench/bench1.jpg"' in georgett_church_events
-    assert 'vscene "images/georgett/church/doggy/doggy1.jpg"' in georgett_church_events
-    assert 'vscene "images/georgett/church/withLiza.jpg/withliza1.jpg"' in georgett_church_events
-    assert 'Georgett.set_story_value("church_bench_seen", 1)' in georgett_church_events
-    assert 'Georgett.set_story_value("church_doggy_seen", 1)' in georgett_church_events
-    assert 'Georgett.set_story_value("church_liza_seen", 1)' in georgett_church_events
-    assert 'player_record_orgasm("georgett_church_bench", "georgett")' in georgett_church_events
-    assert 'player_record_orgasm("georgett_church_doggy", "georgett")' in georgett_church_events
-    assert 'player_record_orgasm("georgett_church_liza", "georgett")' in georgett_church_events
-    assert 'player.change_stat("fun", 4)' in georgett_church_events
-    assert "label church_georgett_sex:" not in church
+    assert '"images/georgett/church/bench/bench"' in georgett_church_events
+    assert '"images/georgett/church/doggy/doggy"' in georgett_church_events
+    assert '"images/georgett/church/withLiza.jpg/withliza"' in georgett_church_events
+    assert 'Georgett.set_story_value("fuckinchurch", 1)' in georgett_church_events
+    assert 'Georgett.set_story_value("lizasawinchurch", 1)' in georgett_church_events
+    assert 'player_record_orgasm("georgett_church", "georgett")' not in georgett_church_events
+    assert 'player.change_stat("fun"' not in georgett_church_events
     assert 'GeorgettVar["foundinchurch"]' not in church
     assert 'GeorgettVar["fuckinchurch"]' not in church
     assert 'GeorgettVar["lizasawinchurch"]' not in church
 
     confession = _source(CHURCH_ISPOVED)
-    assert 'Georgett.story_value("church_bench_seen", 0)' in confession
-    assert 'Georgett.story_value("church_doggy_seen", 0)' in confession
-    assert 'Georgett.story_value("church_liza_seen", 0)' in confession
+    assert 'Georgett.story_value("fuckinchurch", 0)' in confession
+    assert 'Georgett.story_value("lizasawinchurch", 0)' in confession
+    assert 'Georgett.story_value("church_bench_seen", 0)' not in confession
+    assert 'Georgett.story_value("church_doggy_seen", 0)' not in confession
+    assert 'Georgett.story_value("church_liza_seen", 0)' not in confession
     assert "menu:" in confession
     assert "main_ui_runtime.action_items" not in confession
     assert "ChurchIspovedChoice" not in confession

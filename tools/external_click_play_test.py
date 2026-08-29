@@ -2570,8 +2570,8 @@ testcase external_church_service_action_links_work:
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.mode = "scene"
     $ Georgett.known = True
-    $ Georgett.rel = 6
-    $ Georgett.corruption = 80
+    $ Georgett.rel = 2
+    $ Georgett.corruption = 0
     $ Georgett.set_sex_stat("sexacts", 3)
     $ player.intimacy.came_today = 0
     $ player.intimacy.can_cum_daily = 3
@@ -2600,34 +2600,50 @@ testcase external_church_service_action_links_work:
     click id _church_blanken_button pos (0.5, 0.5) until eval ("Вдова Блэнкеншип" in str(scene_runtime.text or "")) timeout 20.0
     assert eval (str(scene_runtime.picture or "") in ("images/becky/church/cermon.png", "images/becky/church/talk1.jpg", "images/becky/church/talk2.jpg")) timeout 5.0
     assert eval (str(main_ui_runtime.action_title or "") == "Прихожане") timeout 5.0
-    assert eval (not story_event_available("Church", "georgett_church_service_bench")) timeout 5.0
-    assert eval (not story_event_available("Church", "georgett_church_service_doggy")) timeout 5.0
-    assert eval (not story_event_available("Church", "georgett_church_service_with_liza")) timeout 5.0
-    $ Georgett.set_story_value("foundinchurch", 1)
-    $ Georgett.corruption = 80
-    $ findAvailableEvents(True)
-    assert eval ((Georgett.known or people_to_int(Georgett.rel, 0) > 0)) timeout 5.0
+    assert eval (not Georgett.story_value("foundinchurch", 0)) timeout 5.0
+    $ _church_georgett_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Найти Жоржетту Брюно")
+    $ _church_georgett_button = "choice_panel_button_%d" % int(_church_georgett_index)
+    click id _church_georgett_button pos (0.5, 0.5) until eval (people_to_int(Georgett.story_value("foundinchurch", 0), 0) == 1) timeout 20.0
     assert eval (str(people.location("georgett") or "") == "Church" and str(people.schedule_state("georgett").get("label", "") or "") == "sunday_mass") timeout 5.0
-    assert eval (people_to_int(Georgett.story_value("foundinchurch", 0), 0) > 0) timeout 5.0
-    assert eval (player.intimacy.can_cum()) timeout 5.0
-    assert eval (people_to_int(Georgett.rel, 0) >= 6) timeout 5.0
-    assert eval (people_to_int(Georgett.corruption, 0) >= 50) timeout 5.0
-    assert eval (people_to_int(Georgett.sex_stat("sexacts", 0), 0) >= 3) timeout 5.0
-    assert eval (story_event_available("Church", "georgett_church_service_bench")) timeout 5.0
-    assert eval (story_event_available("Church", "georgett_church_service_doggy")) timeout 5.0
-    assert eval (not story_event_available("Church", "georgett_church_service_with_liza")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/georgett/church/cermon.jpg") timeout 5.0
+    assert eval ("Предложить Жоржетте перепихнуться по быстрому" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    $ _church_quick_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Предложить Жоржетте перепихнуться по быстрому")
+    $ _church_quick_button = "choice_panel_button_%d" % int(_church_quick_index)
+    click id _church_quick_button pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval ("Ты что, сдурел" in str(scene_runtime.text or "")) timeout 5.0
+    click pos (960, 900) until eval (renpy.get_screen("say") is None and str(main_ui_runtime.action_title or "") == "Прихожане") timeout 20.0
+
+    $ Georgett.rel = 6
+    $ player.economy.money = 14
+    $ renpy.call_in_new_context("ChurchServiceMenu", False)
+    advance until screen "main_ui" timeout 20.0
+    $ _church_quick_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Предложить Жоржетте перепихнуться по быстрому")
+    click id ("choice_panel_button_%d" % int(_church_quick_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval ("столько нет" in str(scene_runtime.text or "") and int(player.economy.money or 0) == 14) timeout 5.0
+    click pos (960, 900) until eval (renpy.get_screen("say") is None and str(main_ui_runtime.action_title or "") == "Прихожане") timeout 20.0
+
     $ Georgett.set_story_value("askkids", 1)
-    $ Georgett.set_story_value("fuckinchurch", 1)
-    $ findAvailableEvents(True)
-    assert eval (story_event_available("Church", "georgett_church_service_with_liza")) timeout 5.0
-    assert eval ("Предложить Жоржетте перепихнуться по быстрому" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
-    $ renpy.call_in_new_context("ChurchServiceMother")
-    assert eval ("Сандра" in str(scene_runtime.text or "")) timeout 5.0
-    run Jump("Church")
+    $ Georgett.set_story_value("fuckinchurch", 0)
+    $ Georgett.set_story_value("lizasawinchurch", 0)
+    $ Liza.rel = 0
+    $ player.economy.money = 100
+    $ renpy.call_in_new_context("ChurchServiceMenu", False)
     advance until screen "main_ui" timeout 20.0
-    $ renpy.call_in_new_context("ChurchServiceMenu", True)
-    advance until screen "main_ui" timeout 20.0
-    assert eval (str(main_ui_runtime.action_title or "") == "Прихожане") timeout 5.0
+    $ _church_quick_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Предложить Жоржетте перепихнуться по быстрому")
+    click id ("choice_panel_button_%d" % int(_church_quick_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval ("Лизетточка" in str(scene_runtime.text or "")) timeout 5.0
+    click pos (960, 900) until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/georgett/church/withLiza.jpg/withliza1.jpg") timeout 5.0
+    assert eval (int(player.economy.money or 0) == 85) timeout 5.0
+    assert eval (int(player.intimacy.came_today or 0) == 1) timeout 5.0
+    assert eval (Georgett.story_value("fuckinchurch", 0) == 1 and Georgett.story_value("lizasawinchurch", 0) == 1 and int(Liza.rel or 0) == 1) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza2.jpg")) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza3.jpg")) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza4.jpg")) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza5.jpg")) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza6.jpg")) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "Church" and int(calendar_v2.hour or 0) == 9) timeout 20.0
+    assert eval (Georgett.story_value("foundinchurch", 0) == 0 and str(main_ui_runtime.action_title or "") == "Действия") timeout 5.0
 
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 10, 0)
     run Jump("Church")
@@ -2637,7 +2653,8 @@ testcase external_church_service_action_links_work:
     click id "main_ui_entity_button_npc_gerhard" pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 900) until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (960, 900) until eval (renpy.get_screen("say") is None and renpy.get_screen("choice") is None) timeout 20.0
+    click pos (960, 900) until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "Church") timeout 20.0
     assert eval (str(rooms.current_code or "") == "Church") timeout 5.0
 
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 0)
