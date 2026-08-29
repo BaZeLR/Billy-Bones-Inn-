@@ -890,12 +890,13 @@ init -46 python:
             "item_id": item_key,
         }
 
-    def player_eat_meal(item_name, item_energy):
+    def player_eat_meal(item_name, item_energy, minutes_to_pass=30):
 
         item_label = str(item_name or "еду").strip() or "еду"
         energy_gain = max(0, int(item_energy or 0))
+        meal_minutes = max(0, int(minutes_to_pass or 0))
 
-        calendar_v2.advance_minutes(30)
+        calendar_v2.advance_minutes(meal_minutes)
         update_stat_state()
         player.change_stat("energy", energy_gain)
         player.change_stat("fun", 5)

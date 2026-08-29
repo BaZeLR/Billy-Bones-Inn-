@@ -11,10 +11,11 @@ init python:
 
     def tavern_sunday_dinner_available():
         return (
-            int(calendar_v2.week or 0) == 7
-            and int(calendar_v2.time_slot() or 0) in (1, 2)
-            and int(calendar_v2.hour or 0) >= 12
-            and int(calendar_v2.hour or 0) < 18
+            all(
+                str(people.schedule_state(npc_id).get("label", "") or "") == "sunday_dinner"
+                and str(people.schedule_state(npc_id).get("location", "") or "") == "TavernKitchen"
+                for npc_id in ("sandra", "melissa", "amanda")
+            )
             and int(player.tavern_management.breakfast.sunday_dinner_last_day or -1) != current_game_day()
         )
 
@@ -776,10 +777,11 @@ init python:
             and int(player.tavern_management.breakfast.spicy_drink_day or -1) != current_game_day()
         )
 
-    def tavern_sunday_dinner_can_serve_spicy_tincture():
+    def tavern_sunday_dinner_can_serve_spicy_tincture(present_ids=None):
+        dinner_ids = list(tavern_sunday_dinner_present_ids() if present_ids is None else present_ids)
         return (
             int(player.item_count("libido_tincture_001") or 0) > 0
-            and len(list(tavern_sunday_dinner_present_ids() or [])) >= 2
+            and len(dinner_ids) >= 2
             and int(player.tavern_management.breakfast.sunday_dinner_spicy_drink_day or -1) != current_game_day()
         )
 
@@ -869,12 +871,15 @@ init python:
         return tavern_kitchen_event_picture("kitchen_sundaydinnerAll_0")
 
     def tavern_sunday_dinner_present_ids():
+        kitchen_ids = set(people.ids_at("TavernKitchen") or [])
         rows = []
         for npc_id in ("sandra", "melissa", "amanda"):
+            if npc_id not in kitchen_ids:
+                continue
             if household_morning_issue_type(npc_id) in ("sick", "sleepy"):
                 continue
             rows.append(npc_id)
-        if str(people.location("becky") or "") in ("TavernKitchen", "TavernMain"):
+        if "becky" in kitchen_ids:
             rows.append("becky")
         return rows
 
@@ -1011,8 +1016,8 @@ init python:
         lines.extend(list(tavern_barber_sunday_dinner_lines() or []))
         return lines
 
-    def tavern_sunday_dinner_apply_social_bonus():
-        present_ids = tavern_sunday_dinner_present_ids()
+    def tavern_sunday_dinner_apply_social_bonus(present_ids=None):
+        present_ids = list(tavern_sunday_dinner_present_ids() if present_ids is None else present_ids)
         for npc_id in present_ids:
             info = people.get_info(npc_id)
             if info is not None:
@@ -1613,14 +1618,14 @@ label TavernKitchenSundayDinnerMenu:
 
 
 label TavernKitchenSundayDinner(serve_spicy=0):
-    $ renpy.dynamic("_eat_result", "_sunday_social_ids", "_sunday_lines")
+    $ renpy.dynamic("_eat_result", "_sunday_present_ids", "_sunday_social_ids", "_sunday_lines")
     if not tavern_sunday_dinner_available():
         $ scene_runtime.text = "Сегодня вы уже сидели за воскресным обедом."
         $ scene_runtime.location_text = scene_runtime.text
         $ main_ui_runtime.action_items = tavern_kitchen_action_items()
         return
+    $ _sunday_present_ids = list(tavern_sunday_dinner_present_ids() or [])
     $ player.tavern_management.breakfast.sunday_dinner_last_day = current_game_day()
-    $ calendar_v2.advance_minutes(45)
     vscene tavern_kitchen_sunday_dinner_picture()
     python:
         _sunday_lines = [
@@ -1631,19 +1636,19 @@ label TavernKitchenSundayDinner(serve_spicy=0):
         _sunday_lines.extend(tavern_sunday_dinner_dialogue_lines())
         scene_runtime.text = "\n\n".join([row for row in _sunday_lines if str(row or "").strip()])
         scene_runtime.location_text = scene_runtime.text
-    $ _eat_result = player_eat_meal("воскресный обед для всей челяди", 22)
+    $ _eat_result = player_eat_meal("воскресный обед для всей челяди", 22, 45)
     if str(_eat_result.get("text", "") or "").strip():
         $ scene_runtime.text = str(scene_runtime.text or "") + "\n" + str(_eat_result.get("text", "") or "")
         $ scene_runtime.location_text = scene_runtime.text
-    $ _sunday_social_ids = tavern_sunday_dinner_apply_social_bonus()
+    $ _sunday_social_ids = tavern_sunday_dinner_apply_social_bonus(_sunday_present_ids)
     if len(list(tavern_recent_barber_ids() or [])) > 0:
         $ player.tavern_management.breakfast.sunday_dinner_barber_talk_day = current_game_day()
     if len(list(_sunday_social_ids or [])) > 0:
         $ scene_runtime.text = str(scene_runtime.text or "") + "\nСпокойный воскресный стол немного сближает вас с теми, кто сейчас обедает вместе с вами."
         $ scene_runtime.location_text = scene_runtime.text
-    if int(serve_spicy or 0) == 1 and tavern_sunday_dinner_can_serve_spicy_tincture():
+    if int(serve_spicy or 0) == 1 and tavern_sunday_dinner_can_serve_spicy_tincture(_sunday_present_ids):
         $ player.tavern_management.breakfast.sunday_dinner_spicy_drink_day = current_game_day()
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n" + tavern_kitchen_spicy_tincture_apply(tavern_sunday_dinner_present_ids())
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\n" + tavern_kitchen_spicy_tincture_apply(_sunday_present_ids)
         $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
     call stat

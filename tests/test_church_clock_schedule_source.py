@@ -69,6 +69,19 @@ def test_sunday_service_npc_schedules_match_the_church_clock_phase():
         assert after_mass[0]["end"] == "12:59", npc_id
 
 
+def test_household_sunday_dinner_uses_one_shared_kitchen_window():
+    schedule_dir = PROJECT_ROOT / "game" / "NPC" / "Schedules"
+
+    for npc_id in ("sandra", "melissa", "amanda"):
+        payload = json.loads((schedule_dir / (npc_id + ".json")).read_text(encoding="utf-8-sig"))
+        dinner_entries = [row for row in payload["entries"] if row.get("label") == "sunday_dinner"]
+        assert len(dinner_entries) == 1, npc_id
+        assert dinner_entries[0]["weekdays"] == [7], npc_id
+        assert dinner_entries[0]["start"] == "12:30", npc_id
+        assert dinner_entries[0]["end"] == "13:30", npc_id
+        assert dinner_entries[0]["location"] == "TavernKitchen", npc_id
+
+
 def test_church_room_phase_pictures_use_church_folder_vscene_assets():
     source = _source(CHURCH_ROOM)
 

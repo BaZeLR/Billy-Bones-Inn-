@@ -344,6 +344,35 @@ testcase external_tavern_report_state_defaults:
     $ Sandra.jobs.pop("jobcleaningtomorrow", None)
     $ tractir_save_normalize_tavern_staff_jobs()
     assert eval (int(Sandra.job_value("jobcleaningtomorrow", 0) or 0) == 1) timeout 5.0
+
+testcase external_tavern_sunday_dinner_schedule_and_stats:
+    run Call("InitGameNPCs")
+    $ external_calendar_set_fields(7, 1, 1100, 12, 29)
+    $ external_calendar_set_weekday(7)
+    $ player.tavern_management.breakfast.sunday_dinner_last_day = -1
+    assert eval (not tavern_sunday_dinner_available()) timeout 5.0
+
+    $ external_calendar_set_fields(7, 1, 1100, 12, 30)
+    assert eval (tavern_sunday_dinner_available()) timeout 5.0
+    assert eval (all(str(people.location(npc_id) or "") == "TavernKitchen" for npc_id in ("sandra", "melissa", "amanda"))) timeout 5.0
+    assert eval (tavern_sunday_dinner_present_ids() == ["sandra", "melissa", "amanda"]) timeout 5.0
+    assert eval ("Сесть за воскресный обед" in [str(item.caption or "") for item in tavern_kitchen_action_items()]) timeout 5.0
+
+    $ Sandra.rel = 5
+    $ Melissa.rel = 5
+    $ Amanda.rel = 5
+    $ _sunday_open_before = (Sandra.openness, Melissa.openness, Amanda.openness)
+    $ _sunday_corruption_before = (Sandra.corruption, Melissa.corruption, Amanda.corruption)
+    $ external_calendar_set_fields(7, 1, 1100, 13, 30)
+    assert eval (tavern_sunday_dinner_available() and tavern_sunday_dinner_present_ids() == ["sandra", "melissa", "amanda"]) timeout 5.0
+    run Call("TavernKitchenSundayDinner", 0)
+    advance until screen "say" timeout 20.0
+    assert eval ((Sandra.rel, Melissa.rel, Amanda.rel) == (6, 6, 6)) timeout 5.0
+    assert eval ((Sandra.openness, Melissa.openness, Amanda.openness) == _sunday_open_before) timeout 5.0
+    assert eval ((Sandra.corruption, Melissa.corruption, Amanda.corruption) == _sunday_corruption_before) timeout 5.0
+    assert eval (int(calendar_v2.hour or 0) == 14 and int(calendar_v2.minute or 0) == 15) timeout 5.0
+    assert eval (int(player.tavern_management.breakfast.sunday_dinner_last_day or -1) == current_game_day()) timeout 5.0
+    assert eval (not tavern_sunday_dinner_available()) timeout 5.0
 '''
 
 
@@ -6486,6 +6515,7 @@ def main() -> int:
             "external_room_clock_clicks",
             "external_shop_action_logic",
             "external_tavern_report_state_defaults",
+            "external_tavern_sunday_dinner_schedule_and_stats",
             "external_actual_tailor_buy_dress_measure_flow",
             "external_female_tailor_choose_agree_purchase_flow",
             "external_female_tailor_refusal_returns_to_catalog",
@@ -6648,6 +6678,7 @@ def main() -> int:
             "external_room_clock_clicks",
             "external_shop_action_logic",
             "external_tavern_report_state_defaults",
+            "external_tavern_sunday_dinner_schedule_and_stats",
             "external_actual_tailor_buy_dress_measure_flow",
             "external_female_tailor_choose_agree_purchase_flow",
             "external_female_tailor_refusal_returns_to_catalog",

@@ -322,7 +322,7 @@ init python:
             text_parts.append("На кухне работают: " + crew_names + ".")
         if npc_schedule_becky_sandra_kitchen_visit_active():
             text_parts.append("Сегодня сюда заглянула Бекки Блэнкеншип. Она что-то негромко обсуждает с Сандрой у разделочного стола.")
-        if int(calendar_v2.week or 0) == 7 and int(calendar_v2.time_slot() or 0) == 1:
+        if tavern_sunday_dinner_available():
             text_parts.append("Судя по запахам и приготовленным блюдам, Сандра решила устроить для всей трактирной челяди воскресный обед поосновательнее обычного.")
         if tavern_kitchen_food_stock_count() > 0:
             text_parts.append("В кладовой уже отложены принесенные вами припасы для кухни: %s." % tavern_kitchen_food_stock_summary())
