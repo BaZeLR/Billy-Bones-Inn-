@@ -49,8 +49,13 @@ label IntLizaTalk(girl_name_ilt="liza", girl_loc_ilt=""):
             return
 
 
-label IntLizaTalkSmalltalk(girl_name_ilt="liza", girl_loc_ilt=""):
+label IntLizaTalkSmalltalk(girl_name_ilt="liza", girl_loc_ilt="", _liza_busy_text=""):
     $ renpy.dynamic("girl_friends", "give_orgasms_count", "lick_pussy_count")
+    $ _liza_busy_text = Liza.interrupt_work()
+    if _liza_busy_text:
+        $ scene_runtime.text = _liza_busy_text
+        $ scene_runtime.location_text = scene_runtime.text
+        return
     python:
         scene_runtime.text = "Вы некоторое время болтаете с Лизеттой о разных вещах."
         if Liza.talk_count() <= 2 and procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaTalk.rpy:procedural_randint:86:1") == 1:

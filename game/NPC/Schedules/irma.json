@@ -9,6 +9,7 @@
       "location": "DressShop",
       "awake": true,
       "talkable": true,
+      "working": true,
       "priority": 600
     },
     {

@@ -612,12 +612,20 @@ init -39 python:
         allowed, reason = relationship_social_action_allowed(key, action_key, item_key)
         return bool(allowed)
 
-label SocialTalkTopicMenu(girl_name="", mode="talk", _social_girl="", _social_mode="", _social_parent_mode="", _social_visible_ids=None, _social_topic_id="", _social_result=None):
+label SocialTalkTopicMenu(girl_name="", mode="talk", _social_girl="", _social_mode="", _social_parent_mode="", _social_visible_ids=None, _social_topic_id="", _social_result=None, _social_busy_text=""):
     $ _social_girl = social_topic_key(girl_name)
     $ _social_mode = str(mode or "talk").strip().lower()
     $ _social_parent_mode = str(main_ui_runtime.mode or "scene")
     if _social_parent_mode != "talk":
         $ main_ui_begin_talk_state("Разговор с %s" % _action_display_name(_social_girl), _social_girl)
+    $ _social_busy_text = social_person_info(_social_girl).interrupt_work()
+    if _social_busy_text:
+        $ scene_runtime.text = _social_busy_text
+        $ scene_runtime.location_text = scene_runtime.text
+        if _social_parent_mode != "talk":
+            "[_social_busy_text]"
+            $ main_ui_end_talk_state()
+        return
     if _social_mode == "talk" and social_talked_today_value(_social_girl) > 0:
         if _social_parent_mode != "talk":
             $ main_ui_end_talk_state()

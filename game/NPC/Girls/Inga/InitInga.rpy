@@ -35,6 +35,7 @@ init python:
                         end_hour=8,
                         awake=True,
                         talkable=True,
+                        working=True,
                         condition=inga_grocery_store_active,
                         priority=230,
                         label="inga_grocery_cover",

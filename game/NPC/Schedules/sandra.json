@@ -52,6 +52,7 @@
       "location": "TavernKitchen",
       "awake": true,
       "talkable": true,
+      "working": true,
       "priority": 600
     },
     {
@@ -75,6 +76,7 @@
       "location": "TavernMain",
       "awake": true,
       "talkable": true,
+      "working": true,
       "priority": 600
     },
     {

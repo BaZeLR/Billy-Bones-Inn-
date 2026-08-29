@@ -54,10 +54,13 @@ init -40 python:
 
     def old_point_flirt_attempt(girl_name=""):
         key = str(girl_name or "").strip().lower()
+        info = old_point_talk_info(key)
+        before = people_to_int(getattr(info, "rel", 0), 0) if info is not None else 0
+        busy_text = info.interrupt_work() if info is not None else ""
+        if busy_text:
+            return {"ok": False, "text": busy_text, "gain": people_to_int(getattr(info, "rel", 0), 0) - before}
         if not old_point_action_unlocked(key, "flirt"):
             return {"ok": False, "text": relationship_block_text(key, "flirt"), "gain": 0}
-        info = old_point_talk_info(key)
-        before = people_to_int(getattr(info, "rel", 0), 0)
         score = old_point_social_attempt_score(key, "flirt")
         gain = 1 if score > 1 else (-1 if score < 0 else 0)
         apply_social_interaction_base(key, "flirt", gain, 4, 30, 1, 1, 0, 0)

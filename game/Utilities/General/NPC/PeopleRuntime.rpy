@@ -133,7 +133,7 @@ init -999 python:
         def schedule_state(self, person="", weekday_value=None, time_value=None):
             data = self.get_data(person)
             if data is None:
-                return {"location": "", "awake": True, "talkable": True, "label": "", "interval": "", "source": ""}
+                return {"location": "", "awake": True, "talkable": True, "working": False, "label": "", "interval": "", "source": ""}
             return data.schedule_state(weekday_value, time_value)
 
         def repair(self):
@@ -162,13 +162,14 @@ init -999 python:
         return value % 1440
 
     class NPCScheduleEntry(object):
-        def __init__(self, location="", weekdays=None, start_hour=0, end_hour=24, awake=True, talkable=True, condition=None, priority=0, label="", start_minute=None, end_minute=None):
+        def __init__(self, location="", weekdays=None, start_hour=0, end_hour=24, awake=True, talkable=True, condition=None, priority=0, label="", start_minute=None, end_minute=None, working=False):
             self.location = str(location or "").strip()
             self.weekdays = list(weekdays or [])
             self.start_minute = int(start_hour or 0) * 60 if start_minute is None else int(start_minute or 0)
             self.end_minute = int(end_hour or 0) * 60 if end_minute is None else int(end_minute or 0)
             self.awake = bool(awake)
             self.talkable = bool(talkable)
+            self.working = bool(working)
             self.condition = condition
             self.priority = int(priority or 0)
             self.label = str(label or "").strip()
@@ -194,7 +195,7 @@ init -999 python:
             return state
 
     class NPCHourScheduleEntry(NPCScheduleEntry):
-        def __init__(self, npc_id="", location="", location_choices=None, weekdays=None, start="00:00", end="23:59", awake=True, talkable=True, condition=None, priority=600, label="", source="json"):
+        def __init__(self, npc_id="", location="", location_choices=None, weekdays=None, start="00:00", end="23:59", awake=True, talkable=True, condition=None, priority=600, label="", source="json", working=False):
             start_text = str(start or "0").strip()
             end_text = str(end or "23").strip()
             start_parts = start_text.split(":", 1)
@@ -202,7 +203,7 @@ init -999 python:
             start_minute = int(start_parts[0] or 0) * 60 + int(start_parts[1] or 0) if len(start_parts) > 1 else int(start_parts[0] or 0) * 60
             end_minute = int(end_parts[0] or 0) * 60 + int(end_parts[1] or 0) if len(end_parts) > 1 else int(end_parts[0] or 0) * 60
             end_minute += 1
-            super(NPCHourScheduleEntry, self).__init__(location, weekdays, awake=awake, talkable=talkable, condition=condition, priority=priority, label=label, start_minute=start_minute, end_minute=end_minute)
+            super(NPCHourScheduleEntry, self).__init__(location, weekdays, awake=awake, talkable=talkable, working=working, condition=condition, priority=priority, label=label, start_minute=start_minute, end_minute=end_minute)
             self.npc_id = str(npc_id or "").strip()
             self.location_choices = list(location_choices or [])
             self.source = str(source or "json")
@@ -246,11 +247,11 @@ init -999 python:
                 return False
             return True
 
-    def npc_daily_schedule_interval(start_hour=0, end_hour=24, location="", awake=True, talkable=True, label="", priority=500):
-        return {"start_minute": int(start_hour or 0) * 60, "end_minute": int(end_hour or 0) * 60, "location": str(location or "").strip(), "awake": bool(awake), "talkable": bool(talkable), "label": str(label or "").strip(), "priority": int(priority or 500)}
+    def npc_daily_schedule_interval(start_hour=0, end_hour=24, location="", awake=True, talkable=True, label="", priority=500, working=False):
+        return {"start_minute": int(start_hour or 0) * 60, "end_minute": int(end_hour or 0) * 60, "location": str(location or "").strip(), "awake": bool(awake), "talkable": bool(talkable), "working": bool(working), "label": str(label or "").strip(), "priority": int(priority or 500)}
 
-    def npc_daily_schedule_choice(location="", weight=1, awake=True, talkable=True, label="", condition=None):
-        return {"location": str(location or "").strip(), "weight": max(0, int(weight or 0)), "awake": bool(awake), "talkable": bool(talkable), "label": str(label or "").strip(), "condition": condition}
+    def npc_daily_schedule_choice(location="", weight=1, awake=True, talkable=True, label="", condition=None, working=False):
+        return {"location": str(location or "").strip(), "weight": max(0, int(weight or 0)), "awake": bool(awake), "talkable": bool(talkable), "working": bool(working), "label": str(label or "").strip(), "condition": condition}
 
     def npc_daily_schedule_random_interval(start_hour=0, end_hour=24, choices=None, weekdays=None, label="", priority=500):
         return {"start_minute": int(start_hour or 0) * 60, "end_minute": int(end_hour or 0) * 60, "choices": list(choices or []), "weekdays": list(weekdays or []), "label": str(label or "").strip(), "priority": int(priority or 500)}
@@ -374,6 +375,7 @@ init -999 python:
                 weekdays=[int(calendar_v2.week if weekday_value is None else weekday_value or 0)],
                 awake=bool(data.get("awake", True)),
                 talkable=bool(data.get("talkable", True)),
+                working=bool(data.get("working", False)),
                 priority=int(data.get("priority", 500) or 500),
                 label=str(data.get("label", "") or ""),
                 start_minute=int(data.get("start_minute", 0) or 0),
@@ -450,6 +452,7 @@ init -999 python:
                 end=str(data.get("end", "23:59") or "23:59"),
                 awake=bool(data.get("awake", True)),
                 talkable=bool(data.get("talkable", True)),
+                working=bool(data.get("working", False)),
                 condition=data.get("condition", None),
                 priority=int(data.get("priority", 600) or 600),
                 label=str(data.get("label", "") or ""),
@@ -500,7 +503,7 @@ init -999 python:
         def schedule_state(self, weekday_value=None, time_value=None):
             entry = self.schedule_resolve(weekday_value, time_value)
             if entry is None:
-                return {"location": "", "awake": True, "talkable": True, "label": "", "interval": "", "source": ""}
+                return {"location": "", "awake": True, "talkable": True, "working": False, "label": "", "interval": "", "source": ""}
             interval_text = "%02d:%02d-%02d:%02d" % (
                 int(getattr(entry, "start_minute", 0) or 0) // 60,
                 int(getattr(entry, "start_minute", 0) or 0) % 60,
@@ -511,6 +514,7 @@ init -999 python:
                 "location": str(entry.selected_location() or ""),
                 "awake": bool(getattr(entry, "awake", True)),
                 "talkable": bool(getattr(entry, "talkable", True)),
+                "working": bool(getattr(entry, "working", False)),
                 "label": str(getattr(entry, "label", "") or ""),
                 "interval": interval_text,
                 "source": str(getattr(entry, "source", "rpy") or "rpy"),
@@ -1069,6 +1073,23 @@ init -999 python:
             if bool(household.barber_appointments.get(self.name, 0)) and barber_shop_is_open_at(wday, hour):
                 return "BarberShop"
             return super(Girl, self).getLocation(wday, hour)
+
+        def is_working(self, wday=None, hour=None):
+            entry = people.schedule_entry(self.name, wday, hour)
+            if entry is None or not bool(getattr(entry, "working", False)):
+                return False
+            return str(entry.selected_location() or "") == str(self.getLocation(wday, hour) or "")
+
+        def interrupt_work(self):
+            if not self.is_working():
+                return ""
+            before = people_to_int(self.rel, 0)
+            self.change_social(friend_delta=-1)
+            lost = before - people_to_int(self.rel, 0)
+            text = "Она сейчас занята работой и просит вас не отвлекать ее. Ваша настойчивость явно ее раздражает."
+            if lost > 0:
+                text += "\n\nОтношения: -%d." % lost
+            return text
 
         def can_work_tavern(self):
             return people_to_int(self.jobs.get("jobWhoreAvail", 0), 0) > 0

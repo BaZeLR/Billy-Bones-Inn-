@@ -35,6 +35,7 @@
       "location": "TavernMain",
       "awake": true,
       "talkable": true,
+      "working": true,
       "priority": 760,
       "condition": {
         "rule": "tavern_whore_work_active",
@@ -49,6 +50,7 @@
       "location": "TavernMain",
       "awake": true,
       "talkable": true,
+      "working": true,
       "priority": 760,
       "condition": {
         "rule": "tavern_whore_work_active",
@@ -63,6 +65,7 @@
       "location": "PortStreets",
       "awake": true,
       "talkable": true,
+      "working": true,
       "priority": 700,
       "condition": {
         "rule": "liza_portstreets_work_active"

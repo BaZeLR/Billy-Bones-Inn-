@@ -19,6 +19,7 @@
       "location": "WineStore",
       "awake": true,
       "talkable": true,
+      "working": true,
       "priority": 600
     },
     {

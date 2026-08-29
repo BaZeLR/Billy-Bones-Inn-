@@ -4,7 +4,12 @@
 # IntBeckyTalkTopics.rpy
 # Extracted from RuntimeCompat: Becky talk topic labels.
 
-label _int_becky_talk_smalltalk(girl_name="becky"):
+label _int_becky_talk_smalltalk(girl_name="becky", _becky_busy_text=""):
+    $ _becky_busy_text = Becky.interrupt_work()
+    if _becky_busy_text:
+        $ scene_runtime.text = _becky_busy_text
+        $ scene_runtime.location_text = scene_runtime.text
+        return
     "Вы некоторое время болтаете со вдовой Блэнкеншип о несущественных вещах."
     if Becky.talk_count() <= 2 and procedural_randint(1, 2, "becky_smalltalk_%s_%s" % (current_game_day(), Becky.talk_count())) == 1 and Becky.rel < 3:
         "Вы немного сдружились с Бекки."
@@ -15,7 +20,12 @@ label _int_becky_talk_smalltalk(girl_name="becky"):
     return
 
 
-label _int_becky_talk_personal(girl_name="becky"):
+label _int_becky_talk_personal(girl_name="becky", _becky_busy_text=""):
+    $ _becky_busy_text = Becky.interrupt_work()
+    if _becky_busy_text:
+        $ scene_runtime.text = _becky_busy_text
+        $ scene_runtime.location_text = scene_runtime.text
+        return
     "Вы некоторое время болтаете с Бекки Блэнкеншип о том, как ей живется без мужа."
     if Becky.talk_count() <= 2 and procedural_randint(1, 2, "becky_personal_%s_%s" % (current_game_day(), Becky.talk_count())) == 1 and Becky.rel <= 5:
         "Вдова несколько раз заинтересованно поглядывает на вас."

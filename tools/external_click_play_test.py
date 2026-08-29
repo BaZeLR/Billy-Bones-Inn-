@@ -6192,6 +6192,36 @@ init python:
             info.var["social_topic_seen"] = {}
         return True
 
+testcase external_working_girl_talk_penalty:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("amanda") is not None) timeout 20.0
+    $ external_calendar_set_fields(3, 1, 1100, 12, 0)
+    $ external_calendar_set_weekday(1)
+    $ Amanda.known = True
+    $ Amanda.rel = 11
+    $ Amanda.talked_today = 0
+    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999, working=True)])
+    $ rooms.enter("TavernMain")
+    run Call("IntAmandaTalk", "amanda")
+    advance until screen "choice" timeout 20.0
+    assert eval (Amanda.is_working() and "Поговорить" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _work_talk_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Поговорить")
+    $ _work_talk_button_id = "choice_panel_button_%d" % int(_work_talk_index)
+    click id _work_talk_button_id pos (0.5, 0.5) until eval ("занята работой" in str(scene_runtime.text or "") and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (int(Amanda.rel or 0) == 10 and int(Amanda.talked_today or 0) == 0) timeout 5.0
+    assert eval ("Осмотреть" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Назад" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _work_flirted_before = int(Amanda.flirted_today or 0)
+    $ _work_flirt_result = old_point_flirt_attempt("amanda")
+    assert eval (not bool(_work_flirt_result.get("ok", True)) and int(_work_flirt_result.get("gain", 0)) == -1 and "занята работой" in str(_work_flirt_result.get("text", "") or "")) timeout 5.0
+    assert eval (int(Amanda.rel or 0) == 9 and int(Amanda.flirted_today or 0) == _work_flirted_before) timeout 5.0
+    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999, working=True), NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=1000, label="planned_scene", working=False)])
+    assert eval (not Amanda.is_working()) timeout 5.0
+    $ _work_talk_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Поговорить")
+    $ _work_talk_button_id = "choice_panel_button_%d" % int(_work_talk_index)
+    click id _work_talk_button_id pos (0.5, 0.5) until eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) == 11) timeout 20.0
+    assert eval (int(Amanda.rel or 0) == 9 and int(Amanda.talked_today or 0) == 1) timeout 5.0
+
 testcase external_smalltalk_main_ui_portraits:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -6441,6 +6471,7 @@ def main() -> int:
             "external_backyard_barrel_object_actions",
             "external_grocery_store_object_purchase_actions",
             "external_fight_system_runtime_flow",
+            "external_working_girl_talk_penalty",
             "external_smalltalk_main_ui_portraits",
             "external_port_streets_georgette_liza_flow",
             "external_georgette_portstreet_relationship_talk_and_sex_flow",
@@ -6601,6 +6632,7 @@ def main() -> int:
             "external_backyard_barrel_object_actions",
             "external_grocery_store_object_purchase_actions",
             "external_fight_system_runtime_flow",
+            "external_working_girl_talk_penalty",
             "external_smalltalk_main_ui_portraits",
             "external_port_streets_georgette_liza_flow",
             "external_georgette_portstreet_relationship_talk_and_sex_flow",

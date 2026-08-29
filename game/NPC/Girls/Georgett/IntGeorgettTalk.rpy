@@ -67,7 +67,12 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
         if str(main_ui_runtime.mode or "") != "talk":
             return
 
-label IntGeorgettSmalltalk(girl_name="georgett", girl_loc="street"):
+label IntGeorgettSmalltalk(girl_name="georgett", girl_loc="street", _georgett_busy_text=""):
+    $ _georgett_busy_text = Georgett.interrupt_work()
+    if _georgett_busy_text:
+        $ scene_runtime.text = _georgett_busy_text
+        $ scene_runtime.location_text = scene_runtime.text
+        return
     $ scene_runtime.text = "Вы некоторое время болтаете с Жоржеттой о разных вещах."
     if Georgett.talk_count() <= 2 and procedural_randint(1, 2, key="procedural:NPC/Girls/Georgett/IntGeorgettTalk.rpy:procedural_randint:148:1") == 1:
         if Georgett.rel < 3 or (Georgett.sex_state.get("lick_pussy", 0) >= 4 and Georgett.rel < 5) or (int(Georgett.sex_stat("orgasms_given", 0) or 0) >= 2 and Georgett.sex_state.get("lick_pussy", 0) >= 4 and Georgett.rel < 7):
