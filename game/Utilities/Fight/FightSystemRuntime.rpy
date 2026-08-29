@@ -855,7 +855,8 @@ init -20 python:
         else:
             defence_points = max(0, int(fight_player_defence_roll() or 0))
 
-        total_damage = 0
+        player_damage = 0
+        dog_damage = 0
         for enemy in active_rows:
             move_row = fight_enemy_move_resolution(enemy, defence_mode)
             phase_lines.append(str(move_row.get("text", "") or ""))
@@ -864,19 +865,29 @@ init -20 python:
                 continue
             enemy_defence_slice = max(0, int(defence_points / max(1, len(active_rows))))
             applied_damage = max(0, move_damage - enemy_defence_slice)
-            total_damage += applied_damage
-            if applied_damage > 0:
+            if applied_damage <= 0:
+                continue
+            if str(enemy.enemy_type or "") == "beast" and bool(fight_dog_support_state().get("active", False)) and procedural_randint(1, 2, fight_rng_key("enemy_target")) == 2:
+                dog.receive_damage(applied_damage)
+                dog_damage += applied_damage
+            else:
+                player_damage += applied_damage
                 move_code = str(move_row.get("move", "") or "")
                 if move_code == "dead_lock":
                     fight_apply_player_status("locked_turns", 1)
                 elif move_code in ("ram", "strike"):
                     fight_apply_player_status("stagger_turns", 1)
 
-        player.change_stat("health", -total_damage)
-        if total_damage <= 0:
+        player.change_stat("health", -player_damage)
+        if player_damage <= 0 and dog_damage <= 0:
             phase_lines.append("Вы выдерживаете натиск и не получаете заметного урона.")
         else:
-            phase_lines.append("К концу вражеского натиска вы теряете {} здоровья.".format(int(total_damage or 0)))
+            if player_damage > 0:
+                phase_lines.append("К концу вражеского натиска вы теряете {} здоровья.".format(int(player_damage or 0)))
+            if dog_damage > 0:
+                phase_lines.append("Пес принимает часть натиска и теряет {} здоровья.".format(int(dog_damage or 0)))
+                if not dog.is_alive():
+                    phase_lines.append("Пес тяжело ранен и больше не может продолжать бой.")
         return "\n\n".join([row for row in phase_lines if str(row or "").strip() != ""])
 
     def fight_start_player_action():
@@ -1374,7 +1385,11 @@ label FightLoop:
 
 
 label FightStartHuntCurrentRoom:
-    $ renpy.dynamic("_hunt_roll", "_fight_room_code", "_fight_picture", "_fight_enemy_id", "_fight_enemy_count", "_fight_intro_text")
+    $ renpy.dynamic("_hunt_roll", "_hunt_loaded_ammo", "_hunt_has_ranged_ammo", "_fight_room_code", "_fight_picture", "_fight_enemy_id", "_fight_enemy_count", "_fight_intro_text")
+    $ _hunt_loaded_ammo = str(rusty_hunter_rifle_loaded_ammo() or "").strip()
+    $ _hunt_has_ranged_ammo = _hunt_loaded_ammo != "" or fight_supply_count("arrows") > 0 or (fight_supply_count("droplets") > 0 and fight_supply_count("gunpowder") > 0)
+    if not _hunt_has_ranged_ammo and player.item_count("old_axe_001") > 0 and str(player.equipment.weapon or "") in ("", "rusty_hunter_rifle_001"):
+        $ player.equip("old_axe_001", "weapon")
     $ _hunt_roll = fight_roll_hunt_enemy(str(getattr(rooms.current, "code_name", "") or rooms.current_code or ""))
     $ _fight_room_code = str(getattr(rooms.current, "code_name", "") or rooms.current_code or "")
     $ _fight_picture = str(scene_runtime.picture or "")

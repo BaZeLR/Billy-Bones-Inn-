@@ -5943,6 +5943,24 @@ testcase external_fight_system_runtime_flow:
     assert eval (str(rooms.current_code or "") == "Forest" and str(scene_runtime.picture or "") == "images/forest/forest_1.png" and rusty_hunter_rifle_loaded_ammo() == "arrows") timeout 5.0
     assert eval (str(main_ui_runtime.action_content or "") == "" and "Выслеживать добычу" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
 
+    $ player.inventory.items = {}
+    $ player.add_item("rusty_hunter_rifle_001", 1)
+    $ player.add_item("old_axe_001", 1)
+    $ player.equip("rusty_hunter_rifle_001", "weapon")
+    $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
+    run Call("FightStartHuntCurrentRoom")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "fight" and str(player.equipment.weapon or "") == "old_axe_001") timeout 5.0
+    assert eval ("Атаковать: старый топор" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    $ fight.enemy_party = []
+    $ main_ui_runtime.action_items = fight_action_items()
+    $ renpy.restart_interaction()
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+
+    $ player.remove_item("old_axe_001", 1)
+    $ player.add_item("arrows_001", 2)
+    $ player.add_item("bandage_001", 1)
+    $ player.equip("rusty_hunter_rifle_001", "weapon")
     $ rusty_hunter_rifle_item().state["loaded_ammo"] = ""
     $ fight_begin("wolf", 1, "Forest", scene_runtime.picture, "Тестовая схватка.")
     run Call("FightLoop")
@@ -6101,6 +6119,26 @@ testcase external_fight_system_runtime_flow:
     assert eval (sum(int(enemy.health or 0) for enemy in fight.enemy_party) < _command_enemy_health_before and "пес" in str(scene_runtime.text or "").lower()) timeout 5.0
     $ fight_finish_to_room("Проверка прямых боевых команд завершена.")
     assert eval (str(main_ui_runtime.mode or "") == "scene" and str(rooms.current_code or "") == "StreetTavern") timeout 5.0
+
+    $ player.set_stat("health", 100)
+    $ dog.health = int(dog.max_health or 1)
+    $ fight_begin("wolf", 1, "Forest", "images/hunt/lonely_wolf_attack.png", "Проверка целей зверя.")
+    $ fight.enemy_party[0].attack_min = 100
+    $ fight.enemy_party[0].attack_max = 100
+    $ fight.enemy_party[0].moves = ["attack"]
+    python:
+        _beast_hit_player = False
+        _beast_hit_dog = False
+        for _beast_target_try in range(20):
+            player.set_stat("health", 100)
+            dog.health = int(dog.max_health or 1)
+            _beast_phase_text = fight_apply_enemy_phase("normal")
+            if int(player.condition.health or 0) < 100:
+                _beast_hit_player = True
+            if int(dog.health or 0) < int(dog.max_health or 1):
+                _beast_hit_dog = True
+    assert eval (_beast_hit_player and _beast_hit_dog) timeout 5.0
+    $ fight_finish_to_room("Проверка выбора цели зверем завершена.")
 
     python:
         _legacy_fight_enemy = object.__new__(FightEnemyInstance)

@@ -230,6 +230,29 @@ def test_forest_hunt_return_restores_owning_room_actions_without_reentry():
     assert 'if return_room and return_room != str(rooms.current_code or ""):' in source
 
 
+def test_hunt_uses_owned_axe_when_the_ranged_weapon_has_no_usable_ammo():
+    source = _source(FIGHT)
+    start = source.split("label FightStartHuntCurrentRoom:", 1)[1].split("\nlabel ", 1)[0]
+
+    assert "rusty_hunter_rifle_loaded_ammo()" in start
+    assert 'fight_supply_count("arrows") > 0' in start
+    assert 'fight_supply_count("droplets") > 0 and fight_supply_count("gunpowder") > 0' in start
+    assert 'player.item_count("old_axe_001") > 0' in start
+    assert 'str(player.equipment.weapon or "") in ("", "rusty_hunter_rifle_001")' in start
+    assert 'player.equip("old_axe_001", "weapon")' in start
+
+
+def test_hunt_animals_can_damage_the_mc_or_the_active_dog_companion():
+    source = _source(FIGHT)
+    enemy_phase = source.split('def fight_apply_enemy_phase(defence_mode="normal"):', 1)[1].split("\n    def ", 1)[0]
+
+    assert 'str(enemy.enemy_type or "") == "beast"' in enemy_phase
+    assert 'procedural_randint(1, 2, fight_rng_key("enemy_target")) == 2' in enemy_phase
+    assert "dog.receive_damage(applied_damage)" in enemy_phase
+    assert 'player.change_stat("health", -player_damage)' in enemy_phase
+    assert "if not dog.is_alive():" in enemy_phase
+
+
 def test_debug_builder_can_launch_real_fight_cases():
     source = _source(DEBUG_TOOLS)
 
