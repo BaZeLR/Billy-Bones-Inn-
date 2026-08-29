@@ -91,6 +91,18 @@ def test_fight_ui_shows_combat_stats_without_a_duplicate_outcome_popup():
     assert "mousewheel True" in screen
 
 
+def test_hunt_picture_fills_existing_fight_frame_without_moving_info_panels():
+    screen = _source(FIGHT_SCREEN)
+    panel = screen.split("screen main_ui_fight_panel():", 1)[1]
+
+    assert '_fight_picture.replace("\\\\", "/").lower().startswith("images/hunt/")' in panel
+    assert 'add Transform(_fight_picture, fit="cover", xalign=0.5, yalign=0.5)' in panel
+    assert "use fight_player_info_window(_company_rows if _company_rows else [_player_row], _ammo_text)" in panel
+    assert "use fight_enemy_info_window(_enemy_rows if _enemy_rows else [_enemy_row])" in panel
+    assert "$ _top_h = int((config.screen_height - int(getattr(gui, \"textbox_height\", 278)) - 24) * 0.55)" in panel
+    assert "$ _text_h = int((config.screen_height - int(getattr(gui, \"textbox_height\", 278)) - 24) * 0.30)" in panel
+
+
 def test_fight_flow_has_no_refresh_preview_or_store_bloat():
     source = _source(FIGHT)
 
