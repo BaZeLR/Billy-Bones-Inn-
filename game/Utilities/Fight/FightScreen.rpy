@@ -124,10 +124,7 @@ screen main_ui_fight_panel():
                 xfill True
                 ysize _top_h
 
-                if _fight_picture.replace("\\", "/").lower().startswith("images/hunt/"):
-                    add Transform(_fight_picture, fit="cover", xalign=0.5, yalign=0.5)
-                else:
-                    use BGIMAGE(_fight_picture)
+                use BGIMAGE(_fight_picture)
                 use fight_player_info_window(_company_rows if _company_rows else [_player_row], _ammo_text)
                 use fight_enemy_info_window(_enemy_rows if _enemy_rows else [_enemy_row])
 
