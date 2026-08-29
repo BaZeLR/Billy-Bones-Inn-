@@ -2606,29 +2606,30 @@ testcase external_church_service_action_links_work:
     click id _church_georgett_button pos (0.5, 0.5) until eval (people_to_int(Georgett.story_value("foundinchurch", 0), 0) == 1) timeout 20.0
     assert eval (str(people.location("georgett") or "") == "Church" and str(people.schedule_state("georgett").get("label", "") or "") == "sunday_mass") timeout 5.0
     assert eval (str(scene_runtime.picture or "") == "images/georgett/church/cermon.jpg") timeout 5.0
-    assert eval ("Предложить Жоржетте перепихнуться по быстрому" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    assert eval (str(main_ui_runtime.action_title or "") == "Жоржетта" and [str(i.caption or "") for i in main_ui_runtime.action_items] == ["Предложить Жоржетте перепихнуться по быстрому", "Назад"]) timeout 5.0
     $ _church_quick_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Предложить Жоржетте перепихнуться по быстрому")
     $ _church_quick_button = "choice_panel_button_%d" % int(_church_quick_index)
-    click id _church_quick_button pos (0.5, 0.5) until screen "say" timeout 20.0
-    assert eval ("Ты что, сдурел" in str(scene_runtime.text or "")) timeout 5.0
-    click pos (960, 900) until eval (renpy.get_screen("say") is None and str(main_ui_runtime.action_title or "") == "Прихожане") timeout 20.0
+    click id _church_quick_button pos (0.5, 0.5) until eval ("Ты что, сдурел" in str(scene_runtime.text or "") and str(main_ui_runtime.action_title or "") == "Разговор с Жоржеттой") timeout 20.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Жоржетта") timeout 20.0
+    $ _church_back_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Назад")
+    click id ("choice_panel_button_%d" % int(_church_back_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Прихожане") timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/church/churchEntryDay.png") timeout 5.0
 
     $ Georgett.rel = 6
     $ player.economy.money = 14
-    $ renpy.call_in_new_context("ChurchServiceMenu", False)
-    advance until screen "main_ui" timeout 20.0
+    $ _church_georgett_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Найти Жоржетту Брюно")
+    click id ("choice_panel_button_%d" % int(_church_georgett_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Жоржетта") timeout 20.0
     $ _church_quick_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Предложить Жоржетте перепихнуться по быстрому")
-    click id ("choice_panel_button_%d" % int(_church_quick_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
-    assert eval ("столько нет" in str(scene_runtime.text or "") and int(player.economy.money or 0) == 14) timeout 5.0
-    click pos (960, 900) until eval (renpy.get_screen("say") is None and str(main_ui_runtime.action_title or "") == "Прихожане") timeout 20.0
+    click id ("choice_panel_button_%d" % int(_church_quick_index)) pos (0.5, 0.5) until eval ("столько нет" in str(scene_runtime.text or "") and str(main_ui_runtime.action_title or "") == "Разговор с Жоржеттой") timeout 20.0
+    assert eval (int(player.economy.money or 0) == 14 and [str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Жоржетта") timeout 20.0
 
     $ Georgett.set_story_value("askkids", 1)
     $ Georgett.set_story_value("fuckinchurch", 0)
     $ Georgett.set_story_value("lizasawinchurch", 0)
     $ Liza.rel = 0
     $ player.economy.money = 100
-    $ renpy.call_in_new_context("ChurchServiceMenu", False)
-    advance until screen "main_ui" timeout 20.0
     $ _church_quick_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Предложить Жоржетте перепихнуться по быстрому")
     click id ("choice_panel_button_%d" % int(_church_quick_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
     assert eval ("Лизетточка" in str(scene_runtime.text or "")) timeout 5.0

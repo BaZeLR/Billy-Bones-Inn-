@@ -7,6 +7,7 @@ CHURCH_ROOM = PROJECT_ROOT / "game" / "Town" / "Church" / "Church.rpy"
 CHURCH_AFTER = PROJECT_ROOT / "game" / "Town" / "Church" / "ChurchAfterCermon.rpy"
 BECKY_CHURCH = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyAfterCermon.rpy"
 BECKY_INIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Becky" / "InitBecky.rpy"
+GEORGETT_SERVICE = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Georgett" / "InitGeorgettChurch.rpy"
 STORY_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy"
 PEOPLE_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
 FINISH_DAY = PROJECT_ROOT / "game" / "Utilities" / "Time" / "NextDay_FinishDayEvents.rpy"
@@ -107,11 +108,12 @@ def test_church_event_rows_show_same_clock_gate_conditions():
     runtime = _source(STORY_RUNTIME)
     people_runtime = _source(PEOPLE_RUNTIME)
     church = _source(CHURCH_ROOM)
+    georgett_service = _source(GEORGETT_SERVICE)
 
     assert '"ChurchServiceBench"' not in runtime
     assert '"ChurchServiceDoggy"' not in runtime
     assert '"ChurchServiceWithLiza"' not in runtime
-    assert 'if player.intimacy.can_cum() and people_to_int(Georgett.rel, 0) >= 2' in church
+    assert 'if player.intimacy.can_cum() and people_to_int(Georgett.rel, 0) >= 2' in georgett_service
     assert "church_after_cermon_action_visible()" in people_runtime
     assert '"#church_after_cermon_action_visible()"' not in runtime
     assert '7, (11, 12), None' in runtime[runtime.find("define georgettThreadList"):]

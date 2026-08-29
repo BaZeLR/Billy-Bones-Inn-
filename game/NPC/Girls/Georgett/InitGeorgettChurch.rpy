@@ -11,7 +11,14 @@ label ChurchServiceGeorgett:
         vscene "images/georgett/church/cermon.jpg"
     $ scene_runtime.location_text = scene_runtime.text
     $ Georgett.set_story_value("foundinchurch", 1)
-    call ChurchServiceMenu(False)
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.action_title = "Жоржетта"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    if player.intimacy.can_cum() and people_to_int(Georgett.rel, 0) >= 2 and people_to_int(Georgett.sex_stat("sexacts", 0), 0) >= 3:
+        $ main_ui_runtime.action_items.append(MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex")))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", Call("ChurchServiceMenu", True)))
+    $ renpy.restart_interaction()
     return
 
 
@@ -27,16 +34,22 @@ label ChurchGeorgettQuickSex:
     if Georgett.rel < 6:
         $ scene_runtime.text = scene_runtime.text + "\n\n\"Ты что, сдурел!\" - отвечает вам она. \"Это же собор!\""
         $ scene_runtime.location_text = scene_runtime.text
-        "[scene_runtime.text]"
-        call ChurchServiceMenu(False)
+        $ main_ui_runtime.mode = "scene"
+        $ main_ui_runtime.action_title = "Разговор с Жоржеттой"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = [MenuItem("Назад", Call("ChurchServiceGeorgett"))]
+        $ renpy.restart_interaction()
         return
 
     $ scene_runtime.text = scene_runtime.text + "\n\n\"Какой ты пошлый! Поиметь меня прямо на церковной службе!\" - смеется Жоржетта. \"Это обойдется тебе в 15 мараведи!\""
     if int(player.economy.money or 0) < 15:
         $ scene_runtime.text = scene_runtime.text + "\n\n\"Ой, а у меня столько нет\", говорите вы.\n\n\"Ну нет так нет\", следует резонный ответ."
         $ scene_runtime.location_text = scene_runtime.text
-        "[scene_runtime.text]"
-        call ChurchServiceMenu(False)
+        $ main_ui_runtime.mode = "scene"
+        $ main_ui_runtime.action_title = "Разговор с Жоржеттой"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = [MenuItem("Назад", Call("ChurchServiceGeorgett"))]
+        $ renpy.restart_interaction()
         return
 
     $ _church_georgett_variant = "bench"
@@ -64,6 +77,10 @@ label ChurchGeorgettQuickSex:
     if Georgett.story_value("askkids", 0):
         $ scene_runtime.text = scene_runtime.text + "\n\n\"Мама, он что, в тебя кончил?\" - вдруг раздается голосок. \"Шшш, доченька, ну конечно в меня, я же тебе говорила что ничего в этом страшного нет.\""
     $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.mode = "event"
+    $ main_ui_runtime.action_title = "Событие"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
     "[scene_runtime.text]"
 
     $ player.spend_money(15)

@@ -26,3 +26,11 @@ def test_completed_church_events_jump_to_the_real_room_without_wrappers():
     assert 'show screen main_ui' in combined
     assert 'menu:' in combined
     assert '$ calendar_v2.advance_minutes(60)' in combined
+
+
+def test_church_room_entry_restores_scene_mode_after_events():
+    church = _source(Path("game") / "Town" / "Church" / "Church.rpy")
+    room_entry = church.split("label Church:", 1)[1].split("label ChurchServiceMenu", 1)[0]
+
+    assert '$ rooms.enter("Church")' in room_entry
+    assert '$ main_ui_runtime.mode = "scene"' in room_entry

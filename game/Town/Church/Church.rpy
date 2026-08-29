@@ -240,6 +240,7 @@ label Church:
     $ renpy.dynamic("_church_action", "_church_exit", "_church_menu_item")
     scene black
     $ rooms.enter("Church")
+    $ main_ui_runtime.mode = "scene"
     $ Georgett.set_story_value("foundinchurch", 0)
     $ scene_runtime.picture = rooms.current.bg_picture or None
     $ main_ui_runtime.action_title = "Действия"
@@ -286,6 +287,7 @@ label ChurchServiceMenu(show_attendees=True):
     if show_attendees:
         $ scene_runtime.text = church_service_attendees_text()
         $ scene_runtime.location_text = scene_runtime.text
+        vscene "images/church/churchEntryDay.png"
     $ main_ui_runtime.action_title = "Прихожане"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
@@ -295,8 +297,6 @@ label ChurchServiceMenu(show_attendees=True):
     $ main_ui_runtime.action_items.append(MenuItem("Найти семейство Блэнкеншип", Call("ChurchServiceBlanken")))
     if people_to_int(Georgett.rel, 0) >= 2:
         $ main_ui_runtime.action_items.append(MenuItem("Найти Жоржетту Брюно", Call("ChurchServiceGeorgett")))
-    if player.intimacy.can_cum() and people_to_int(Georgett.rel, 0) >= 2 and people_to_int(Georgett.sex_stat("sexacts", 0), 0) >= 3 and people_to_int(Georgett.story_value("foundinchurch", 0), 0) > 0:
-        $ main_ui_runtime.action_items.append(MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex")))
     $ main_ui_runtime.action_items.append(MenuItem("Вернуться к службе", Jump("Church")))
     $ renpy.restart_interaction()
     return

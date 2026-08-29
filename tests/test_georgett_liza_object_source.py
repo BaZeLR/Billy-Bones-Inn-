@@ -601,15 +601,21 @@ def test_georgett_church_service_preserves_the_single_authored_action_flow():
     assert "label ChurchServiceGeorgett:" not in church
     assert "label ChurchServiceGeorgett:" in georgett_church_events
     assert "label ChurchGeorgettQuickSex:" in georgett_church_events
-    assert 'MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex"))' in church
-    assert 'player.intimacy.can_cum()' in church
-    assert 'people_to_int(Georgett.rel, 0) >= 2' in church
-    assert 'people_to_int(Georgett.sex_stat("sexacts", 0), 0) >= 3' in church
+    service_menu = church.split("label ChurchServiceMenu", 1)[1].split("label ChurchServiceMother", 1)[0]
+    assert 'MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex"))' not in service_menu
+    assert 'MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex"))' in georgett_church_events
+    assert 'player.intimacy.can_cum()' in georgett_church_events
+    assert 'people_to_int(Georgett.rel, 0) >= 2' in georgett_church_events
+    assert 'people_to_int(Georgett.sex_stat("sexacts", 0), 0) >= 3' in georgett_church_events
     assert 'Georgett.corruption' not in church.split("label ChurchServiceMenu", 1)[1].split("label ChurchServiceMother", 1)[0]
     assert '$ Georgett.set_story_value("foundinchurch", 0)' in church
     assert '$ Georgett.set_story_value("foundinchurch", 1)' in georgett_church_events
     assert 'if Georgett.rel < 6:' in georgett_church_events
     assert '"Ты что, сдурел!' in georgett_church_events
+    assert '$ main_ui_runtime.action_title = "Жоржетта"' in georgett_church_events
+    assert '$ main_ui_runtime.action_title = "Разговор с Жоржеттой"' in georgett_church_events
+    assert 'MenuItem("Назад", Call("ChurchServiceMenu", True))' in georgett_church_events
+    assert 'main_ui_runtime.action_items = [MenuItem("Назад", Call("ChurchServiceGeorgett"))]' in georgett_church_events
     assert 'procedural_randint(1, 2, "church_georgett_variant_' in georgett_church_events
     assert 'if Georgett.story_value("askkids", 0):' in georgett_church_events
     assert '$ _church_georgett_variant = "withliza"' in georgett_church_events
