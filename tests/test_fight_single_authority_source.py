@@ -116,7 +116,7 @@ def test_v68_migration_consumes_in_progress_enemy_data_maps_once():
     migration = source("game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V68():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 70" in migration
+    assert "define currentVersion = 71" in migration
     assert "if loaded_version < 69:" in migration
     assert "updateSave_V68()" in migration
     assert 'legacy_data = getattr(old_enemy, "data", None)' in block

@@ -190,7 +190,11 @@ init python:
                 key = str(npc_id or "").strip()
                 if key == "":
                     continue
-                names.append(str(people_display_name(key) or _action_display_name(key)))
+                info = people.get_info(key)
+                if info is not None:
+                    names.append(str(info.display_name() or key))
+                else:
+                    names.append(str(_action_display_name(key) or key))
             if len(names) > 0:
                 lines.append("Среди тех, кого вы можете узнать: " + ", ".join(names) + ".")
         lines.append("Если хотите присмотреться внимательнее, выберите кого искать среди прихожан.")

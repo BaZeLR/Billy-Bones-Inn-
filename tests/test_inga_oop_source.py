@@ -78,7 +78,7 @@ def test_v53_migrates_inga_map_once():
     assert 'globals().pop("IngaVar", None)' in migration
     assert "if loaded_version < 54:" in MIGRATION
     assert "updateSave_V53()" in MIGRATION
-    assert "define currentVersion = 70" in MIGRATION
+    assert "define currentVersion = 71" in MIGRATION
 
 
 def test_becky_daily_reset_extends_base_without_repeating_base_fields():

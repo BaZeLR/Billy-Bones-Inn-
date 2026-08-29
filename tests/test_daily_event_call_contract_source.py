@@ -25,7 +25,7 @@ def test_daily_event_rows_own_their_call_contract():
 def test_saved_daily_events_gain_call_contract_once_on_load():
     migration = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
 
-    assert "define currentVersion = 70" in migration
+    assert "define currentVersion = 71" in migration
     assert "def updateSave_V16():" in migration
     assert "def updateSave_V22():" in migration
     assert "def updateSave_V23():" in migration

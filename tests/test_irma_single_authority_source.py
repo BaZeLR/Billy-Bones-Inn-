@@ -54,7 +54,7 @@ def test_irma_v62_migration_consumes_old_map_once():
     migration = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
     block = migration.split("def updateSave_V62():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 70" in migration
+    assert "define currentVersion = 71" in migration
     assert "if loaded_version < 63:" in migration
     assert "updateSave_V62()" in migration
     for old_key, field_name in (

@@ -66,6 +66,8 @@ def test_liza_uses_data_info_runtime_shape():
     assert "default Liza = LizaInfo()" in source
     assert "people.register(LizaStaticData, Liza)" in source
     assert "class Liza(Girl):" not in source
+    assert 'unknown_name = "Молодая женщина"' in source
+    assert "self.known = False" in source
 
 
 def test_liza_has_no_legacy_var_runtime_owner():
@@ -317,7 +319,7 @@ def test_liza_v55_migration_consumes_legacy_state_once():
     migration = _source(MIGRATION)
     block = migration.split("def updateSave_V55():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 70" in migration
+    assert "define currentVersion = 71" in migration
     assert "if loaded_version < 56:" in migration
     assert "updateSave_V55()" in migration
     for old_key, field_name in (
@@ -336,6 +338,14 @@ def test_liza_v55_migration_consumes_legacy_state_once():
         assert "Liza.%s =" % field_name in block
     assert 'liza_var.pop("TalkChurchAfterCermon", None)' in block
     assert 'globals().pop("LizaVar", None)' in block
+
+    identity_migration = migration.split("def updateSave_V70():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+    assert "if loaded_version < 71:" in migration
+    assert "updateSave_V70()" in migration
+    assert "Liza.known = bool(" in identity_migration
+    assert "people_to_int(Liza.rel, 0) > 0" in identity_migration
 
 
 def test_georgett_first_meeting_is_owned_by_the_scheduled_npc_talk_label():
@@ -602,6 +612,12 @@ def test_georgett_church_service_preserves_the_single_authored_action_flow():
     assert "label ChurchServiceGeorgett:" in georgett_church_events
     assert "label ChurchGeorgettQuickSex:" in georgett_church_events
     service_menu = church.split("label ChurchServiceMenu", 1)[1].split("label ChurchServiceMother", 1)[0]
+    attendee_text = church.split("def church_service_attendees_text():", 1)[1].split(
+        "ChurchRoomDefinition = Room(", 1
+    )[0]
+    assert "info = people.get_info(key)" in attendee_text
+    assert "info.display_name()" in attendee_text
+    assert "people_display_name(key)" not in attendee_text
     assert 'MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex"))' not in service_menu
     assert 'MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex"))' in georgett_church_events
     assert 'player.intimacy.can_cum()' in georgett_church_events
@@ -618,6 +634,7 @@ def test_georgett_church_service_preserves_the_single_authored_action_flow():
     assert 'main_ui_runtime.action_items = [MenuItem("Назад", Call("ChurchServiceGeorgett"))]' in georgett_church_events
     assert 'procedural_randint(1, 2, "church_georgett_variant_' in georgett_church_events
     assert 'if Georgett.story_value("askkids", 0):' in georgett_church_events
+    assert '$ Liza.mark_known()' in georgett_church_events
     assert '$ _church_georgett_variant = "withliza"' in georgett_church_events
     assert 'call ChurchRestore' not in georgett_church_events
     assert 'AdvanceTimeAndRestore' not in georgett_church_events

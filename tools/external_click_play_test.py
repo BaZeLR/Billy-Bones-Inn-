@@ -2573,6 +2573,8 @@ testcase external_church_service_action_links_work:
     $ Georgett.rel = 2
     $ Georgett.corruption = 0
     $ Georgett.set_sex_stat("sexacts", 3)
+    $ Georgett.set_story_value("askkids", 0)
+    $ Liza.known = False
     $ player.intimacy.came_today = 0
     $ player.intimacy.can_cum_daily = 3
     $ initStoryEventRuntime(True)
@@ -2606,6 +2608,7 @@ testcase external_church_service_action_links_work:
     click id _church_georgett_button pos (0.5, 0.5) until eval (people_to_int(Georgett.story_value("foundinchurch", 0), 0) == 1) timeout 20.0
     assert eval (str(people.location("georgett") or "") == "Church" and str(people.schedule_state("georgett").get("label", "") or "") == "sunday_mass") timeout 5.0
     assert eval (str(scene_runtime.picture or "") == "images/georgett/church/cermon.jpg") timeout 5.0
+    assert eval ("Лизет" not in str(scene_runtime.text or "") and not Liza.known) timeout 5.0
     assert eval (str(main_ui_runtime.action_title or "") == "Жоржетта" and [str(i.caption or "") for i in main_ui_runtime.action_items] == ["Предложить Жоржетте перепихнуться по быстрому", "Назад"]) timeout 5.0
     $ _church_quick_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Предложить Жоржетте перепихнуться по быстрому")
     $ _church_quick_button = "choice_panel_button_%d" % int(_church_quick_index)
@@ -2629,6 +2632,7 @@ testcase external_church_service_action_links_work:
     $ Georgett.set_story_value("fuckinchurch", 0)
     $ Georgett.set_story_value("lizasawinchurch", 0)
     $ Liza.rel = 0
+    $ Liza.known = False
     $ player.economy.money = 100
     $ _church_quick_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Предложить Жоржетте перепихнуться по быстрому")
     click id ("choice_panel_button_%d" % int(_church_quick_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
@@ -2637,7 +2641,7 @@ testcase external_church_service_action_links_work:
     assert eval (str(scene_runtime.picture or "") == "images/georgett/church/withLiza.jpg/withliza1.jpg") timeout 5.0
     assert eval (int(player.economy.money or 0) == 85) timeout 5.0
     assert eval (int(player.intimacy.came_today or 0) == 1) timeout 5.0
-    assert eval (Georgett.story_value("fuckinchurch", 0) == 1 and Georgett.story_value("lizasawinchurch", 0) == 1 and int(Liza.rel or 0) == 1) timeout 5.0
+    assert eval (Georgett.story_value("fuckinchurch", 0) == 1 and Georgett.story_value("lizasawinchurch", 0) == 1 and int(Liza.rel or 0) == 1 and Liza.known) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza2.jpg")) timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza3.jpg")) timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza4.jpg")) timeout 20.0
@@ -2665,6 +2669,24 @@ testcase external_church_service_action_links_work:
     run Call("ChurchAfterCermon", 1)
     advance until screen "say" timeout 20.0
     assert eval ("Ничего интересного" in str(scene_runtime.text or "")) timeout 5.0
+
+testcase external_liza_identity_save_migration:
+    run Call("InitGameNPCs")
+    $ Liza.known = True
+    $ Liza.rel = 0
+    $ Liza.prostitution_started = False
+    $ Liza.witnessed_church_after_sermon = False
+    $ Georgett.set_story_value("lizasawinchurch", 0)
+    $ Georgett.set_story_value("churchlizaadmit", 0)
+    $ saveVersion = 70
+    $ updateSave()
+    assert eval (int(saveVersion or 0) == 71 and not Liza.known) timeout 5.0
+
+    $ Liza.known = False
+    $ Liza.rel = 1
+    $ saveVersion = 70
+    $ updateSave()
+    assert eval (int(saveVersion or 0) == 71 and Liza.known) timeout 5.0
 '''
 
 
@@ -6558,6 +6580,7 @@ def main() -> int:
             "external_melissa_werecat_forest_actions_rebuild",
             "external_melissa_werecat_thread_condition_sequence",
             "external_church_service_action_links_work",
+            "external_liza_identity_save_migration",
             "external_georgett_liza_church_after_sermon_events",
             "external_becky_church_after_sermon_uses_daily_event_authority",
             "external_clara_market_event_repeats_until_exploration_success",
@@ -6718,6 +6741,7 @@ def main() -> int:
             "external_melissa_werecat_forest_actions_rebuild",
             "external_melissa_werecat_thread_condition_sequence",
             "external_church_service_action_links_work",
+            "external_liza_identity_save_migration",
             "external_georgett_liza_church_after_sermon_events",
             "external_becky_church_after_sermon_uses_daily_event_authority",
             "external_clara_market_event_repeats_until_exploration_success",

@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 70
+define currentVersion = 71
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -613,6 +613,10 @@ init -100 python:
         if loaded_version < 70:
             updateSave_V69()
             loaded_version = 70
+
+        if loaded_version < 71:
+            updateSave_V70()
+            loaded_version = 71
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2360,6 +2364,18 @@ init -100 python:
         courtship = threads["melissaCourtship"]
         if people_to_int(Melissa.sex_stat("sexacts", 0), 0) > 0:
             courtship.advanceTo(courtship.data.length, complete_at_end=True)
+
+    def updateSave_V70():
+        # Lisette is introduced by Georgette in the church scene. Older saves
+        # initialized her as known before that scene, so recover identity from
+        # the progression that can only exist after the introduction.
+        Liza.known = bool(
+            people_to_int(Liza.rel, 0) > 0
+            or bool(Liza.prostitution_started)
+            or bool(Liza.witnessed_church_after_sermon)
+            or people_to_int(Georgett.story_value("lizasawinchurch", 0), 0) > 0
+            or people_to_int(Georgett.story_value("churchlizaadmit", 0), 0) > 0
+        )
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

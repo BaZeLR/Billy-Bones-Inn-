@@ -42,7 +42,7 @@ init python:
             self.rel = 0
             self.openness = 0
             self.corruption = 35
-            self.known = True
+            self.known = False
             self.witnessed_church_after_sermon = False
             self.discussed_georgett_gerhard = False
             self.prostitution_started = False
