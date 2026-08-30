@@ -3915,9 +3915,11 @@ testcase external_friday_amanda_legare_go_phrase_survives_create_dance:
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     assert eval (int(rooms.get("FridayDance").state["dance_count"] or 0) == 1) timeout 5.0
     assert eval (Amanda.dancing_with_legare) timeout 5.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.text or "") == "" and str(scene_runtime.location_text or "") == "") timeout 5.0
     assert eval (CheckIfDanceExist("amanda", "legare", 0) <= 0) timeout 5.0
     assert eval (str(SexEvents.dance_watch_line.get(6, "") or "") == "LEGARE_GO_TEST_PHRASE") timeout 5.0
     advance until screen "choice" timeout 20.0
+    assert eval ("images/amanda/dance/legare_step_" in str(scene_runtime.picture or "").lower()) timeout 5.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0

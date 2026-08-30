@@ -103,6 +103,27 @@ def test_amanda_mc_dance_owns_its_scene_instead_of_showing_market_description():
     assert "$ main_ui_end_native_scene_state()" in scene
 
 
+def test_amanda_alber_dances_own_their_scenes_and_images():
+    dance_source = (GAME / "NPC" / "Girls" / "Amanda" / "IntAmandaDance.rpy").read_text(encoding="utf-8-sig")
+    sequence_source = (GAME / "NPC" / "Girls" / "Amanda" / "AmandaLegareDanceSequence.rpy").read_text(encoding="utf-8-sig")
+    repeatable_scene = dance_source.split("label story_amanda_friday_dance_legare_0:", 1)[1].split("label IntAmandaDance", 1)[0]
+
+    for scene in [repeatable_scene] + [
+        sequence_source.split("label story_amanda_legare_dance_{}:".format(stage), 1)[1].split(
+            "label story_amanda_legare_dance_{}:".format(stage + 1) if stage < 4 else "label AmandaLegareDanceSequence",
+            1,
+        )[0]
+        for stage in range(5)
+    ]:
+        assert "main_ui_begin_native_scene_state(" in scene
+        assert '$ scene_runtime.text = ""' in scene
+        assert '$ scene_runtime.location_text = ""' in scene
+        assert "$ main_ui_end_native_scene_state()" in scene
+
+    assert 'call ShowImage("amanda", "dance", "legare_step_0")' in repeatable_scene
+    assert sequence_source.count('call ShowImage("amanda", "dance", "legare_step_0")') == 3
+
+
 def test_friday_dance_featured_partners_follow_the_venue_schedule():
     amanda_rows = json.loads(AMANDA_SCHEDULE.read_text(encoding="utf-8-sig"))["entries"]
     becky_rows = json.loads(BECKY_SCHEDULE.read_text(encoding="utf-8-sig"))["entries"]

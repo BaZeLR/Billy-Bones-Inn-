@@ -6,13 +6,20 @@
 # To be called from FridayDance or related event chains.
 
 label story_amanda_legare_dance_0:
+    $ main_ui_begin_native_scene_state("Аманда и Альбер")
+    $ scene_runtime.text = ""
+    $ scene_runtime.location_text = ""
     vscene "images/market/LocFridayDance.jpg"
     "У края танцующей толпы Аманда замечает, что месье Легаре смотрит на нее с терпеливым интересом."
     "Она делает вид, что ей все равно, но между песнями ее взгляд снова и снова возвращается к нему."
     $ Amanda.mark_legare_intro_seen()
     $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
     return
 label story_amanda_legare_dance_1:
+    $ main_ui_begin_native_scene_state("Танец Аманды с Альбером")
+    $ scene_runtime.text = ""
+    $ scene_runtime.location_text = ""
     vscene "images/market/LocFridayDance.jpg"
     $ GetDanceFromTable("amanda", "legare", rooms.get("FridayDance").dance_count)
     $ Amanda.dancing_with_legare = True
@@ -24,9 +31,13 @@ label story_amanda_legare_dance_1:
     $ rooms.get("FridayDance").step = 1
     $ event_runtime.active_thread.advance()
     call IntAmandaDance
+    $ main_ui_end_native_scene_state()
     return
 
 label story_amanda_legare_dance_2:
+    $ main_ui_begin_native_scene_state("Танец Аманды с Альбером")
+    $ scene_runtime.text = ""
+    $ scene_runtime.location_text = ""
     vscene "images/market/LocFridayDance.jpg"
     $ GetDanceFromTable("amanda", "legare", rooms.get("FridayDance").dance_count)
     $ Amanda.dancing_with_legare = True
@@ -39,9 +50,13 @@ label story_amanda_legare_dance_2:
     $ rooms.get("FridayDance").step = 1
     $ event_runtime.active_thread.advance()
     call IntAmandaDance
+    $ main_ui_end_native_scene_state()
     return
 
 label story_amanda_legare_dance_3:
+    $ main_ui_begin_native_scene_state("Танец Аманды с Альбером")
+    $ scene_runtime.text = ""
+    $ scene_runtime.location_text = ""
     vscene "images/market/LocFridayDance.jpg"
     $ GetDanceFromTable("amanda", "legare", rooms.get("FridayDance").dance_count)
     $ Amanda.dancing_with_legare = True
@@ -54,9 +69,13 @@ label story_amanda_legare_dance_3:
     $ rooms.get("FridayDance").step = 1
     $ event_runtime.active_thread.advance()
     call IntAmandaDance
+    $ main_ui_end_native_scene_state()
     return
 
 label story_amanda_legare_dance_4:
+    $ main_ui_begin_native_scene_state("Аманда и Альбер")
+    $ scene_runtime.text = ""
+    $ scene_runtime.location_text = ""
     vscene "images/market/LocFridayDance.jpg"
     $ GetDanceFromTable("amanda", "legare", rooms.get("FridayDance").dance_count)
     "Вы находите Аманду уже после танца. Легаре держит ее под руку и что-то тихо говорит, склонившись к самому уху."
@@ -65,6 +84,7 @@ label story_amanda_legare_dance_4:
     $ Amanda.left_friday_dance = True
     $ event_runtime.active_thread.advance()
     call LegareAmandaGoMenu
+    $ main_ui_end_native_scene_state()
     return
 
 label AmandaLegareDanceSequence(dance_created=0, force_legare_first_dance=False, go_phrase="", dance_index=0, created_index=0):
@@ -135,13 +155,16 @@ label LegareAmandaGoMenu():
     $ Amanda.dancing_with_legare = False
     menu:
         "Проследить за ними":
+            $ main_ui_end_native_scene_state()
             jump AfterDanceSexLegare
         "Продолжить танцевать":
             # Show message and run let-go code
             "Решив не вмешиваться в личную жизнь Аманды, вы проводили парочку взглядом и остались танцевать."
             $ Amanda.resolve_legare_let_go()
+            $ main_ui_end_native_scene_state()
             jump FridayDance
         "Остановить их и отправить Аманду домой":
             call AfterDanceLegare("Prohibit")
+            $ main_ui_end_native_scene_state()
             jump FridayDance
     return

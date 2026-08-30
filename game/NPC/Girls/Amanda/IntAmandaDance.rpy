@@ -20,6 +20,9 @@ label story_amanda_friday_dance_mc_0:
     return
 
 label story_amanda_friday_dance_legare_0:
+    $ main_ui_begin_native_scene_state("Танец Аманды с Альбером")
+    $ scene_runtime.text = ""
+    $ scene_runtime.location_text = ""
     vscene "images/market/LocFridayDance.jpg"
     $ GetDanceFromTable("amanda", "legare", rooms.get("FridayDance").dance_count)
     $ Amanda.dancing_with_legare = True
@@ -29,11 +32,13 @@ label story_amanda_friday_dance_legare_0:
         "Вы попробовали найти Аманду, но к своему удивлению не смогли этого сделать. На площади ее не было. Вокруг площади тоже. Может она отправилась домой, а может ее этот хрен Легаре за собой уволок, а может еще что стряслось, но так или иначе вы упустили Аманду."
         $ Amanda.left_friday_dance = True
         call FridayDanceCounterShow
+        $ main_ui_end_native_scene_state()
         return
     "Вы прошлись по площади, ища Аманду, и обнаружили ее c мессиром Легаре."
     call ShowImage("amanda", "dance", "legare_step_0")
     $ rooms.get("FridayDance").step = 1
     call IntAmandaDance
+    $ main_ui_end_native_scene_state()
     return
 
 label IntAmandaDance():
