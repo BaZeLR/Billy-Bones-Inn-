@@ -1027,7 +1027,7 @@ init python:
 
 
 label TavernKitchenBreakfast:
-    $ renpy.dynamic("_breakfast_morning_sick_girl", "_eat_result", "_breakfast_social_ids", "_soap_intro_text", "_breakfast_lines")
+    $ renpy.dynamic("_breakfast_morning_sick_girl", "_eat_result", "_breakfast_social_ids", "_soap_intro_text", "_breakfast_lines", "_breakfast_line_index")
     if not tavern_breakfast_available():
         $ scene_runtime.text = "Сегодня вы уже завтракали."
         $ scene_runtime.location_text = scene_runtime.text
@@ -1072,35 +1072,37 @@ label TavernKitchenBreakfast:
             _breakfast_lines.append("За столом уже чувствуется, что утро может вытянуть за собой и разговор, и новости, и чьи-нибудь старые счеты.")
         else:
             _breakfast_lines.append("Ничего особенного за столом пока не происходит: обычное домашнее утро без лишней суеты.")
-        scene_runtime.text = "\n\n".join([row for row in _breakfast_lines if str(row or "").strip()])
-        scene_runtime.location_text = scene_runtime.text
+        _breakfast_lines = [str(row or "").strip() for row in _breakfast_lines if str(row or "").strip()]
     if int(player.tavern_management.dance_sponsor or 0) == 1 and int(player.tavern_management.breakfast.dance_sponsor_announced_day or -1) != current_game_day():
         $ player.tavern_management.breakfast.dance_sponsor_announced_day = current_game_day()
     $ _eat_result = player_eat_meal("утреннюю кашу и свежий хлеб", 16)
     if str(_eat_result.get("text", "") or "").strip():
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\n" + str(_eat_result.get("text", "") or "")
-        $ scene_runtime.location_text = scene_runtime.text
+        $ _breakfast_lines.append(str(_eat_result.get("text", "") or "").strip())
     $ _breakfast_social_ids = tavern_breakfast_apply_social_bonus()
     if len(list(_breakfast_social_ids or [])) > 0:
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nСовместный завтрак заметно сближает вас с теми, кто сидит с вами за столом."
-        $ scene_runtime.location_text = scene_runtime.text
+        $ _breakfast_lines.append("Совместный завтрак заметно сближает вас с теми, кто сидит с вами за столом.")
     if tavern_breakfast_can_give_first_soap_samples():
         $ _soap_intro_text = tavern_breakfast_apply_first_soap_samples()
         if str(_soap_intro_text or "").strip():
-            $ scene_runtime.text = str(scene_runtime.text or "") + "\n\n" + str(_soap_intro_text or "")
-            $ scene_runtime.location_text = scene_runtime.text
+            $ _breakfast_lines.append(str(_soap_intro_text or "").strip())
     elif soap_available_piece_count() > 0 and int(player.tavern_management.breakfast.soap_announced_day or -1) != current_game_day():
         $ player.tavern_management.breakfast.soap_announced_day = current_game_day()
         $ player.change_stat("fun", 3)
     if len(list(tavern_recent_barber_ids() or [])) > 0:
         $ player.tavern_management.breakfast.barber_talk_day = current_game_day()
-    $ player.tavern_management.breakfast.base_text = str(scene_runtime.text or "")
-    $ player.tavern_management.breakfast.base_shown_day = -1
-    $ tavern_kitchen_set_saved_text(scene_runtime.text)
     call stat
     if _breakfast_morning_sick_girl != "":
         call check_daily_event(_breakfast_morning_sick_girl, "MorningSickness", "TavernKitchen", 0)
-    call TavernKitchenBreakfastShowText(scene_runtime.text)
+    $ _breakfast_line_index = 0
+    while _breakfast_line_index < len(_breakfast_lines):
+        $ scene_runtime.text = _breakfast_lines[_breakfast_line_index]
+        $ scene_runtime.location_text = scene_runtime.text
+        $ tavern_kitchen_set_saved_text(scene_runtime.text)
+        menu:
+            "Продолжить":
+                $ _breakfast_line_index += 1
+    $ player.tavern_management.breakfast.base_text = str(scene_runtime.text or "")
+    $ player.tavern_management.breakfast.base_shown_day = -1
     call TavernKitchenBreakfastMenu
     return
 

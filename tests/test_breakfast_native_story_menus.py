@@ -49,3 +49,16 @@ def test_breakfast_hub_has_one_native_choice_authority_without_paging_state():
     for stale_name in ("text_pages", "text_page_index", "text_return_label"):
         assert stale_name not in player_source
         assert stale_name not in sync_source
+
+
+def test_breakfast_entry_shows_one_paragraph_per_continue_beat():
+    source = SOURCE.read_text(encoding="utf-8-sig")
+    entry = _label_block(source, "TavernKitchenBreakfast:", "TavernKitchenBreakfastMenu:")
+
+    assert 'scene_runtime.text = "\\n\\n".join' not in entry
+    assert 'scene_runtime.text = _breakfast_lines[_breakfast_line_index]' in entry
+    assert 'while _breakfast_line_index < len(_breakfast_lines):' in entry
+    assert entry.count('"\u041f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442\u044c":') == 1
+    assert '_breakfast_lines.append(str(_eat_result.get("text", "") or "").strip())' in entry
+    assert '_breakfast_lines.append("\u0421\u043e\u0432\u043c\u0435\u0441\u0442\u043d\u044b\u0439 \u0437\u0430\u0432\u0442\u0440\u0430\u043a' in entry
+    assert 'player.tavern_management.breakfast.base_text = str(scene_runtime.text or "")' in entry

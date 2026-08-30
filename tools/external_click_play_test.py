@@ -1488,6 +1488,34 @@ testcase external_breakfast_window_and_call_all_click:
     $ main_ui_runtime.action_items = tavern_kitchen_action_items()
     assert eval ("Позавтракать" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
 
+testcase external_breakfast_entry_paragraph_continue_beats:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 8, 0)
+    $ external_calendar_set_weekday(1)
+    $ player.tavern_management.breakfast.today = False
+    $ player.tavern_management.breakfast.event_active = False
+    $ player.tavern_management.breakfast.present_ids = None
+    $ daily_events.rows[:] = []
+    $ Melissa.storage_rat_help_day = -1
+    $ threads["melissaBatProblem"].advanceTo(8, complete_at_end=True)
+    $ werecat_state()["rats_problem_active"] = 0
+    $ werecat_state()["rat_breakfast_seen"] = 1
+    $ werecat_state()["adoption_breakfast_seen"] = 1
+    $ people.get_data("sandra").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
+    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
+    run Call("TavernKitchenBreakfast")
+    assert screen "choice"
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    assert eval ("\n\n" not in str(scene_runtime.text or "") and len(str(scene_runtime.text or "").strip()) > 0) timeout 5.0
+    $ _first_breakfast_beat = str(scene_runtime.text or "")
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and str(scene_runtime.text or "") != _first_breakfast_beat) timeout 10.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    assert eval ("\n\n" not in str(scene_runtime.text or "") and str(scene_runtime.text or "") != _first_breakfast_beat) timeout 5.0
+
 testcase external_kitchen_entry_morning_sickness_event:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -6662,6 +6690,7 @@ def main() -> int:
             "external_sandra_weekly_visit_native_beats",
             "external_melissa_bat_breakfast_single_finish",
             "external_breakfast_window_and_call_all_click",
+            "external_breakfast_entry_paragraph_continue_beats",
             "external_kitchen_entry_morning_sickness_event",
             "external_actual_barber_actions_click",
             "external_actual_draupnir_talk_menu",
@@ -6827,6 +6856,7 @@ def main() -> int:
             "external_sandra_weekly_visit_native_beats",
             "external_melissa_bat_breakfast_single_finish",
             "external_breakfast_window_and_call_all_click",
+            "external_breakfast_entry_paragraph_continue_beats",
             "external_kitchen_entry_morning_sickness_event",
             "external_actual_barber_actions_click",
             "external_actual_draupnir_talk_menu",
