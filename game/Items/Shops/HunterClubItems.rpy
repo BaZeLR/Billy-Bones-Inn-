@@ -254,7 +254,7 @@ init 4 python:
     BoarMeatItem = GameItem(
         object_id="boar_meat_001",
         name="кабанье мясо",
-        description="Тяжелый кусок свежего кабаньего мяса.",
+        description="Тяжелый кусок свежего кабаньего мяса. Если отнести его на кухню, оно разогреет трактирную команду, а после разделки останутся три порции костей для пса.",
         price=45,
         carriable=True,
         stackable=True,
@@ -262,6 +262,10 @@ init 4 python:
             "item_kind": "animal_loot",
             "animal_kind": "boar",
             "loot_kind": "meat",
+            "kitchen_deposit_team_arousal_bonus": 5,
+            "kitchen_deposit_team_corruption_bonus": 1,
+            "kitchen_deposit_team_mana_bonus": 1,
+            "kitchen_deposit_outputs": (("dog_bone_001", 3),),
         },
     )
 

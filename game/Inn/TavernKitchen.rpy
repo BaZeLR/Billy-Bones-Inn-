@@ -153,12 +153,20 @@ init python:
         effects[key] = max(0, int(effects.get(key, 0) or 0)) + max(1, int(days_value or 1))
         return int(effects.get(key, 0) or 0)
 
-    def tavern_kitchen_deposit_effect_text(item_id=""):
+    def tavern_kitchen_deposit_effect_text(item_id="", item_count=1):
         item_key = str(item_id or "").strip()
         if item_key == "honey_comb_001":
             return "Мед сразу откладывают для сладких добавок к завтракам и напиткам. Такие угощения заметно теплят настроение в доме и делают разговоры смелее."
         if item_key == "boar_meat_001":
-            return "Кабанье мясо идет в общий котел: сытная еда экономит основные припасы, но гостям под нее обычно требуется чуть больше вина."
+            units = max(1, int(item_count or 1))
+            boar_item = get_game_item(item_key)
+            properties = dict(getattr(boar_item, "custom_properties", {}) or {}) if boar_item is not None else {}
+            bones_per_unit = 0
+            for output_id, output_count in tuple(properties.get("kitchen_deposit_outputs", ()) or ()):
+                if str(output_id or "").strip() == "dog_bone_001":
+                    bones_per_unit = max(0, int(output_count or 0))
+                    break
+            return "Кабанье мясо идет в общий котел: сытная еда заметно разогревает кровь у трактирной команды. После разделки вы забираете для пса кости x%s." % (bones_per_unit * units)
         if item_key == "milk_pitcher_001":
             return "Свежее молоко сразу убирают в прохладу: с медом оно отлично пойдет и в кашу, и в сладкие утренние блюда."
         if item_key in ("berries_001", "mushroom_001"):
@@ -179,12 +187,26 @@ init python:
                     npc_info.change_mana(1, "kitchen_honey")
             return "honey"
         if item_key == "boar_meat_001":
+            boar_item = get_game_item(item_key)
+            properties = dict(getattr(boar_item, "custom_properties", {}) or {}) if boar_item is not None else {}
+            arousal_bonus = max(0, int(properties.get("kitchen_deposit_team_arousal_bonus", 0) or 0)) * units
+            corruption_bonus = int(properties.get("kitchen_deposit_team_corruption_bonus", 0) or 0)
+            mana_bonus = int(properties.get("kitchen_deposit_team_mana_bonus", 0) or 0)
             tavern_kitchen_add_food_effect("boar_days", min(3, max(1, units)))
             for npc_id in ("sandra", "melissa", "amanda"):
                 npc_info = people.get_info(npc_id)
-                if npc_info is not None:
-                    npc_info.change_social(corruption_delta=1)
-                    npc_info.change_mana(1, "kitchen_boar")
+                if npc_info is None:
+                    continue
+                npc_info.add_arousal(arousal_bonus)
+                if corruption_bonus:
+                    npc_info.change_social(corruption_delta=corruption_bonus)
+                if mana_bonus:
+                    npc_info.change_mana(mana_bonus, "kitchen_boar")
+            for output_id, output_count in tuple(properties.get("kitchen_deposit_outputs", ()) or ()):
+                output_key = str(output_id or "").strip()
+                output_total = max(0, int(output_count or 0)) * units
+                if output_key and output_total > 0:
+                    player.add_item(output_key, output_total)
             return "boar"
         if item_key == "milk_pitcher_001":
             tavern_kitchen_add_food_effect("milk_days", min(3, max(1, units)))
@@ -464,7 +486,7 @@ label TavernKitchenDepositApply(item_id=""):
         $ scene_runtime.text = "Вы относите в кладовую %s x%s." % (_kitchen_item_name, _kitchen_deposited)
         if str(people.location("sandra") or "") == "TavernKitchen":
             $ scene_runtime.text = str(scene_runtime.text or "") + "\nСандра деловито осматривает припасы у кладовой, одобрительно кивает и сразу начинает прикидывать, как лучше пустить их в дело."
-        $ _kitchen_deposit_effect_text = tavern_kitchen_deposit_effect_text(_kitchen_item_id)
+        $ _kitchen_deposit_effect_text = tavern_kitchen_deposit_effect_text(_kitchen_item_id, _kitchen_deposited)
         if str(_kitchen_deposit_effect_text or "").strip():
             $ scene_runtime.text = str(scene_runtime.text or "") + "\n" + str(_kitchen_deposit_effect_text or "")
     if tavern_kitchen_food_stock_count() > 0:

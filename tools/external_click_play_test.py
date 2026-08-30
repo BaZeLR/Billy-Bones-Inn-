@@ -373,6 +373,25 @@ testcase external_tavern_sunday_dinner_schedule_and_stats:
     assert eval (int(calendar_v2.hour or 0) == 14 and int(calendar_v2.minute or 0) == 15) timeout 5.0
     assert eval (int(player.tavern_management.breakfast.sunday_dinner_last_day or -1) == current_game_day()) timeout 5.0
     assert eval (not tavern_sunday_dinner_available()) timeout 5.0
+
+testcase external_boar_meat_kitchen_deposit_rewards:
+    run Call("InitGameNPCs")
+    $ player.remove_item("boar_meat_001", player.item_count("boar_meat_001")) if player.item_count("boar_meat_001") > 0 else False
+    $ player.remove_item("dog_bone_001", player.item_count("dog_bone_001")) if player.item_count("dog_bone_001") > 0 else False
+    $ tavern_storage_supplies_stock().pop("boar_meat_001", None)
+    $ Sandra.set_arousal(0)
+    $ Melissa.set_arousal(0)
+    $ Amanda.set_arousal(0)
+    $ player.add_item("boar_meat_001", 2)
+    $ _boar_deposited = tavern_kitchen_deposit_food("boar_meat_001")
+    assert eval (_boar_deposited == 2) timeout 5.0
+    assert eval (player.item_count("boar_meat_001") == 0 and tavern_kitchen_food_stock_count("boar_meat_001") == 2) timeout 5.0
+    assert eval (player.item_count("dog_bone_001") == 6) timeout 5.0
+    assert eval ((Sandra.arousal_value(), Melissa.arousal_value(), Amanda.arousal_value()) == (10, 10, 10)) timeout 5.0
+    $ _stored_boar = tavern_kitchen_take_food_from_stock(["boar_meat_001"])
+    assert eval (_stored_boar == "boar_meat_001" and tavern_kitchen_food_stock_count("boar_meat_001") == 1) timeout 5.0
+    assert eval (player.item_count("dog_bone_001") == 6) timeout 5.0
+    assert eval ((Sandra.arousal_value(), Melissa.arousal_value(), Amanda.arousal_value()) == (10, 10, 10)) timeout 5.0
 '''
 
 
@@ -6617,6 +6636,7 @@ def main() -> int:
             "external_shop_action_logic",
             "external_tavern_report_state_defaults",
             "external_tavern_sunday_dinner_schedule_and_stats",
+            "external_boar_meat_kitchen_deposit_rewards",
             "external_actual_tailor_buy_dress_measure_flow",
             "external_female_tailor_choose_agree_purchase_flow",
             "external_female_tailor_refusal_returns_to_catalog",
@@ -6783,6 +6803,7 @@ def main() -> int:
             "external_shop_action_logic",
             "external_tavern_report_state_defaults",
             "external_tavern_sunday_dinner_schedule_and_stats",
+            "external_boar_meat_kitchen_deposit_rewards",
             "external_actual_tailor_buy_dress_measure_flow",
             "external_female_tailor_choose_agree_purchase_flow",
             "external_female_tailor_refusal_returns_to_catalog",

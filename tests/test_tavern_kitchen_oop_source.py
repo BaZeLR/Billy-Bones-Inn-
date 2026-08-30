@@ -44,6 +44,20 @@ def test_kitchen_preserves_meals_storage_tea_sandra_objects_and_breakfast():
     assert "label TavernKitchenFinishBreakfastEvent:" in BREAKFAST
 
 
+def test_boar_meat_deposit_is_the_single_owner_of_team_arousal_and_dog_bones():
+    item_source = (GAME / "Items/Shops/HunterClubItems.rpy").read_text(encoding="utf-8-sig")
+    actions = (GAME / "Utilities/General/Common/Actions.rpy").read_text(encoding="utf-8-sig")
+    boar_branch = KITCHEN.split('if item_key == "boar_meat_001":', 2)[2].split('\n        if item_key == "milk_pitcher_001":', 1)[0]
+
+    assert '"kitchen_deposit_team_arousal_bonus": 5' in item_source
+    assert '"kitchen_deposit_outputs": (("dog_bone_001", 3),)' in item_source
+    assert 'npc_info.add_arousal(arousal_bonus)' in boar_branch
+    assert 'properties.get("kitchen_deposit_outputs", ())' in boar_branch
+    assert 'player.add_item(output_key, output_total)' in boar_branch
+    assert 'tavern_kitchen_apply_deposit_effect(item_key, item_count)' in KITCHEN
+    assert "kitchen_deposit_outputs" not in BREAKFAST + actions
+
+
 def test_sunday_dinner_uses_schedule_attendance_and_applies_each_girls_planned_reward():
     availability = BREAKFAST.split("def tavern_sunday_dinner_available():", 1)[1].split("\n    def ", 1)[0]
     attendance = BREAKFAST.split("def tavern_sunday_dinner_present_ids():", 1)[1].split("\n    def ", 1)[0]
