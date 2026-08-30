@@ -12,6 +12,17 @@ def test_repeatable_becky_talk_random_choices_are_label_local():
     assert "RandVar" not in TOPICS
     assert "tmp_rnd=0" in TOPICS
     assert "rand_var=0" in TOPICS
+
+
+def test_becky_talk_repeats_the_same_native_menu_until_explicit_exit():
+    assert 'while str(main_ui_runtime.mode or "") == "talk":' in TALK
+    lifecycle = TALK.split('while str(main_ui_runtime.mode or "") == "talk":', 1)[1]
+
+    assert lifecycle.index("$ initStoryEventRuntime(True)") < lifecycle.index("menu:")
+    assert TALK.count("$ main_ui_end_talk_state()") == 1
+    assert "IntBeckyTalkRefresh" not in TALK
+    assert "IntBeckyTalkApply" not in TALK
+    assert "jump IntBeckyTalk" not in TALK
 MIGRATION = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
 
 

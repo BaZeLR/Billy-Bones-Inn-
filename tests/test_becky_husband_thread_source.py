@@ -38,10 +38,11 @@ def test_becky_husband_labels_advance_thread_without_parallel_stage():
     assert "husbandtalk" not in husband_labels
 
 
-def test_becky_talk_returns_to_npc_context_after_one_selected_action():
+def test_becky_talk_keeps_npc_context_until_explicit_exit():
     assert "while True:" not in TALK
+    assert 'while str(main_ui_runtime.mode or "") == "talk":' in TALK
     assert "menu:" in TALK
-    assert TALK.count("main_ui_end_talk_state()") >= 2
+    assert TALK.count("main_ui_end_talk_state()") == 1
 
 
 def test_retired_husband_stage_is_absent_from_live_gameplay_sources():

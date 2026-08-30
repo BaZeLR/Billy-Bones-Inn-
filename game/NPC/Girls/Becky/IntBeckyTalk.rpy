@@ -29,9 +29,9 @@ label IntBeckyTalk(girl_name="becky"):
         $ scene_runtime.text = "Бекки внимательно смотрит на вас, ожидая, что вы захотите обсудить."
         $ scene_runtime.location_text = scene_runtime.text
 
-    $ initStoryEventRuntime(True)
-
-    menu:
+    while str(main_ui_runtime.mode or "") == "talk":
+        $ initStoryEventRuntime(True)
+        menu:
             "Осмотреть":
                 call ShowGirlCard(_becky_name)
             "Поболтать со вдовой Блэнкеншип о разной фигне":
@@ -96,5 +96,4 @@ label IntBeckyTalk(girl_name="becky"):
                 $ main_ui_end_talk_state()
                 return
 
-    $ main_ui_end_talk_state()
     return

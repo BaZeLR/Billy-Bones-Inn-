@@ -188,6 +188,7 @@ def test_becky_talk_uses_native_menu_for_all_story_topics():
 
     assert "label IntBeckyTalkMenu:" not in source
     assert "while True:" not in source
+    assert 'while str(main_ui_runtime.mode or "") == "talk":' in source
     assert "jump IntBeckyTalkMenu" not in source
     assert "menu:" in source
     assert "main_ui_runtime.action_items" not in source

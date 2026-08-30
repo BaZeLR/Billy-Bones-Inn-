@@ -6015,19 +6015,31 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
-    run Call("IntBeckyTalk", "becky")
-    advance until screen "choice" timeout 20.0
+    $ external_calendar_set_fields(3, 1, 1100, 13, 0)
+    $ external_calendar_set_weekday(1)
+    $ Becky.trade_offer_stage = 2
+    $ Becky.asked_about_elf_trade = False
+    $ Becky.talked_today = 0
+    run Jump("GroceryStore")
+    advance until eval (str(rooms.current_code or "") == "GroceryStore" and renpy.get_screen("main_ui") is not None) timeout 20.0
+    assert eval (str(people.location("becky") or "") == "GroceryStore" and renpy.get_displayable("main_ui", "main_ui_entity_button_npc_becky") is not None) timeout 5.0
+    click id "main_ui_entity_button_npc_becky" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") in [grocery_store_becky_picture(False), grocery_store_becky_picture(True)]) timeout 5.0
     $ _becky_inspect_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Осмотреть")
     $ _becky_inspect_button_id = "choice_panel_button_%d" % int(_becky_inspect_index)
     click id _becky_inspect_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "char" and str(main_ui_runtime.selected_char or "") == "becky") timeout 20.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Назад"]) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
-    $ Becky.talked_today = 0
-    run Call("IntBeckyTalk", "becky")
-    advance until screen "choice" timeout 20.0
-    click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 1 and renpy.get_screen("choice") is None) timeout 20.0
-    assert eval (int(Becky.talked_today or 0) == 1 and renpy.get_screen("choice") is None) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval ("Насчет твоего предложения, в чем там все-таки дело?" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _becky_offer_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Насчет твоего предложения, в чем там все-таки дело?")
+    $ _becky_offer_button_id = "choice_panel_button_%d" % int(_becky_offer_index)
+    click id _becky_offer_button_id pos (0.5, 0.5) until eval (int(Becky.trade_offer_stage or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "talk" and int(Becky.talked_today or 0) == 1) timeout 5.0
+    assert eval ("А чего ты сама с эльфами не торгуешь?" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Насчет твоего предложения, в чем там все-таки дело?" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _becky_exit_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    $ _becky_exit_button_id = "choice_panel_button_%d" % int(_becky_exit_index)
+    click id _becky_exit_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == str(rooms.get("GroceryStore").bg_picture or "") and str(scene_runtime.text or "") == str(rooms.get("GroceryStore").descriptions[0].text or "")) timeout 5.0
 
 testcase external_people_objects_are_single_source:
     run Jump("Intro")
