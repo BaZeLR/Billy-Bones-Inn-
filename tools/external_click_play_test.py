@@ -856,7 +856,7 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "main_ui" timeout 20.0
     $ renpy.call_in_new_context("InitDressDesc")
     $ external_calendar_set_fields(1, 1, 1100, 19, 0)
-    $ Georgett.rel = 5
+    $ Georgett.rel = 0
     $ Georgett.known = True
     $ Georgett.set_story_value("TalkChurchAfterCermonLiza", 0)
     $ Liza.prostitution_started = False
@@ -875,10 +875,30 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     $ TodaySexEvents_Clear()
     run Jump("PortStreets")
     advance until screen "main_ui" timeout 20.0
+    assert eval (not Georgett.is_working()) timeout 5.0
+    click id "main_ui_entity_button_npc_georgett" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (int(Georgett.rel or 0) == 0 and "Как прошел твой день?" in str(scene_runtime.text or "") and "узнали, что ее зовут" not in str(scene_runtime.text or "")) timeout 5.0
+    $ _georgett_known_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    click id ("choice_panel_button_%d" % int(_georgett_known_back_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    $ Georgett.set_sex_stat("orgasms_given", 0)
+    $ Georgett.set_arousal(100)
+    run Call("GeorgettSexStatus", "street")
+    assert eval (int(Georgett.sex_stat("orgasms_given", 0) or 0) == 1 and int(Georgett.rel or 0) == 1) timeout 5.0
+    $ Georgett.set_sex_busy(0)
+    $ Georgett.set_arousal(100)
+    run Call("GeorgettSexStatus", "street")
+    assert eval (int(Georgett.sex_stat("orgasms_given", 0) or 0) == 2 and int(Georgett.rel or 0) == 2) timeout 5.0
+    $ Georgett.rel = 7
+    $ Georgett.set_story_value("seeclients", 1)
+    $ Georgett.talked_today = 0
+    $ Georgett.sex_state["lick_pussy"] = 4
+    run Call("IntGeorgettSmalltalk", "georgett", "street")
+    assert eval (int(Georgett.rel or 0) == 7 and int(Georgett.talked_today or 0) == 1 and "занята работой" not in str(scene_runtime.text or "")) timeout 5.0
     $ player.economy.money = 100
     $ player.intimacy.came_today = 0
     $ _georgett_hire_money_before = int(player.economy.money or 0)
     click id "main_ui_entity_button_npc_georgett" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Снять" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval ("Спросить о клиентах" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _georgett_grope_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Лапать")
     $ _georgett_grope_button_id = "choice_panel_button_%d" % int(_georgett_grope_index)
     click id _georgett_grope_button_id pos (0.5, 0.5) until eval ("Сначала заплати, а потом уже лапай!" in str(scene_runtime.text or "")) timeout 20.0

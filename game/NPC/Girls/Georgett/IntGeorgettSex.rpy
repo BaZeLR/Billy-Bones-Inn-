@@ -112,7 +112,6 @@ label GeorgettSexStatus(GirlLocIGSS="street", _georgett_orgasm_count=0):
         $ _georgett_orgasm_count = Georgett.record_orgasm_given()
         if _georgett_orgasm_count == 2:
             $ georgett_sex_add_text("\"Какой ты заботливый\", сказала [Georgett.real_name()], с трудом отдышавшись после бурного оргазма. \"Не то, что другие, думающие только о своем удовольствии.\"")
-            $ Georgett.add_relation(1, 100)
         if Georgett.cock_in("pussy"):
             $ Georgett.set_arousal(20)
         else:

@@ -32,6 +32,7 @@ init python:
         """Georgette runtime: port work, tavern relocation, church story, pregnancy state."""
 
         talk_label = "IntGeorgettTalk"
+        ORGASM_FRIENDSHIP_GAIN = 1
         OPENNESS_RELATIONSHIP_STEPS = ((5, 3), (8, 5), (9, 6), (10, 7))
 
         STORY_DEFAULTS = {

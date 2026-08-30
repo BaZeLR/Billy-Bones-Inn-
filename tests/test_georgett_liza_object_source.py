@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 
@@ -375,6 +376,9 @@ def test_georgett_first_meeting_is_owned_by_the_scheduled_npc_talk_label():
     assert "Georgett.mark_known()" in first_talk
     assert "-Привет красавчик!" in first_talk
     assert "Georgett.add_relation(1)" in first_talk
+    assert 'girl_loc == "street" and not bool(Georgett.known)' in first_talk
+    assert 'girl_loc == "street" and people_to_int(Georgett.rel, 0) <= 0' not in first_talk
+    assert "Как прошел твой день?" in first_talk
 
 
 def test_portstreets_clients_are_repeatable_action_events_from_classes():
@@ -403,6 +407,13 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
     assert 'CheckIfSexEventExist(self.code_name, 3, "Prostitution")' in georgett
     assert 'CheckIfSexEventExist(self.code_name, 3, "Prostitution")' in liza
     assert 'return people_to_int(self.rel, 0) > 0 and self.portstreet_work_active()' in georgett
+
+    georgett_schedule_data = json.loads(georgett_schedule)
+    georgett_port_entry = next(
+        entry for entry in georgett_schedule_data["entries"] if entry["label"] == "portstreets_work"
+    )
+    assert georgett_port_entry["talkable"] is True
+    assert georgett_port_entry.get("working", False) is False
 
     assert '"story_georgett_portstreet_clients"' in runtime
     assert '"story_liza_portstreet_clients"' in runtime

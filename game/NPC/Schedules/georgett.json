@@ -65,7 +65,6 @@
       "location": "PortStreets",
       "awake": true,
       "talkable": true,
-      "working": true,
       "priority": 700,
       "condition": {
         "rule": "georgett_portstreets"

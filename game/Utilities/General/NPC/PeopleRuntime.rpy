@@ -875,6 +875,9 @@ init -999 python:
         def record_orgasm_given(self):
             count = self.add_sex_stat("orgasms_given", 1)
             self.set_sex_stat("last_orgasm_day", people_to_int(calendar_v2.daysInGame, 0))
+            friendship_gain = people_to_int(getattr(self, "ORGASM_FRIENDSHIP_GAIN", 0), 0)
+            if friendship_gain:
+                self.change_social(friend_delta=friendship_gain)
             return count
 
         def record_sex_history(self, partner="You", place="", cum_target="", day_value=None):

@@ -155,6 +155,27 @@ def test_georgett_does_not_wrap_player_intimacy_or_shared_lick_counter():
     assert "Georgett.record_lick_pussy()" in sex_source
 
 
+def test_georgett_owns_the_friendship_reward_for_every_orgasm():
+    info_source = (ROOT / "game/NPC/Girls/Georgett/InitGeorgett.rpy").read_text(encoding="utf-8-sig")
+    sex_source = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettSex.rpy").read_text(encoding="utf-8-sig")
+    shared_source = (ROOT / "game/Utilities/General/Sex/ShowCurrentSex.rpy").read_text(encoding="utf-8-sig")
+    people_source = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
+
+    assert "ORGASM_FRIENDSHIP_GAIN = 1" in info_source
+    assert "def record_orgasm_given(self):" not in info_source
+    orgasm_owner = people_source.split("def record_orgasm_given(self):", 1)[1].split("def record_sex_history", 1)[0]
+    assert 'getattr(self, "ORGASM_FRIENDSHIP_GAIN", 0)' in orgasm_owner
+    assert "self.change_social(friend_delta=friendship_gain)" in orgasm_owner
+    georgett_custom_branch = sex_source.split("if _georgett_orgasm_count == 2:", 1)[1].split(
+        'if Georgett.cock_in("pussy")', 1
+    )[0]
+    assert "add_relation" not in georgett_custom_branch
+    georgett_shared_branch = shared_source.split('if _scs_key == "georgett"', 1)[1].split(
+        'if _scs_key == "liza"', 1
+    )[0]
+    assert "change_social" not in georgett_shared_branch
+
+
 def test_georgett_church_continue_beats_do_not_write_dummy_state():
     church = (ROOT / "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy").read_text(
         encoding="utf-8-sig"
