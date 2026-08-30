@@ -138,13 +138,16 @@ init -999 python:
 
         def repair(self):
             for key, info in self.items():
-                data = self.get_data(key)
-                if data is None:
+                registered_data = self.get_data(key)
+                if registered_data is None:
                     raise ValueError("Missing static data for registered person: %s" % key)
                 info.name = key
-                info.data = data
+                info.data = registered_data
                 info.update()
-                info.data = data
+                canonical_data = getattr(info, "data", None)
+                if canonical_data is None or people_normalize_id(getattr(canonical_data, "name", "")) != key:
+                    raise ValueError("Invalid canonical static data for registered person: %s" % key)
+                self.definitions[key] = canonical_data
             return self
 
         def __len__(self):

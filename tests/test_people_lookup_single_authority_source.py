@@ -63,3 +63,16 @@ def test_people_registry_is_the_only_live_people_collection_owner():
     assert "default people = PeopleRegistry()" in runtime
     for retired_name in ("peopleData", "peopleInfo", "secondary_npcs"):
         assert retired_name not in game_sources
+
+
+def test_registry_repair_promotes_runtime_canonical_static_data():
+    runtime = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(
+        encoding="utf-8-sig"
+    )
+    repair = runtime.split("def repair(self):", 1)[1].split("def __len__(self):", 1)[0]
+
+    assert "info.data = registered_data" in repair
+    assert "info.update()" in repair
+    assert 'canonical_data = getattr(info, "data", None)' in repair
+    assert "self.definitions[key] = canonical_data" in repair
+    assert "info.data = registered_data\n            return self" not in repair

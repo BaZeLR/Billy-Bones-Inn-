@@ -5521,6 +5521,17 @@ testcase external_player_actual_load_parity:
     assert eval (int(threads["melissaBatProblem"].num or 0) == 6 and threads["melissaBatProblem"].enabled and not threads["melissaBatProblem"].completed) timeout 5.0
     $ external_player_clear_load_marker()
 
+testcase external_people_registry_repairs_stale_amanda_data:
+    run Call("InitGameNPCs")
+    $ _stale_amanda_data = AmandaData.__new__(AmandaData)
+    $ _stale_amanda_data.name = "amanda"
+    $ people.definitions["amanda"] = _stale_amanda_data
+    $ Amanda.data = _stale_amanda_data
+    assert eval (not hasattr(people.get_data("amanda"), "image_manifest")) timeout 5.0
+    $ people.repair()
+    assert eval (people.get_data("amanda") is AmandaStaticData and Amanda.data is AmandaStaticData) timeout 5.0
+    assert eval (len(people.get_data("amanda").image_sequence("tavern", "hall_cleaning")) > 0) timeout 5.0
+
 testcase external_player_appearance_v47_migration:
     $ external_calendar_set_fields(23, 2, 1100, 8, 0)
     $ player.appearance.days_since_wash = 1
@@ -7124,6 +7135,7 @@ def main() -> int:
             "external_room_registry_pickle_round_trip",
             "external_player_save_payload_parity",
             "external_player_actual_load_parity",
+            "external_people_registry_repairs_stale_amanda_data",
             "external_player_appearance_v47_migration",
             "external_hunter_club_reputation_challenge_and_trade",
             "external_hour_based_room_and_npc_schedule_adjustment",
@@ -7302,6 +7314,7 @@ def main() -> int:
             "external_room_registry_pickle_round_trip",
             "external_player_save_payload_parity",
             "external_player_actual_load_parity",
+            "external_people_registry_repairs_stale_amanda_data",
             "external_player_appearance_v47_migration",
             "external_hunter_club_reputation_challenge_and_trade",
             "external_hour_based_room_and_npc_schedule_adjustment",
