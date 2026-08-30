@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 
@@ -5,6 +6,8 @@ ROOT = Path(__file__).resolve().parents[1]
 GAME = ROOT / "game"
 FRIDAY_DANCE = GAME / "Town" / "Market" / "FridayDance.rpy"
 SAVE_SYNC = GAME / "TractirSaveSync.rpy"
+AMANDA_SCHEDULE = GAME / "NPC" / "Schedules" / "amanda.json"
+BECKY_SCHEDULE = GAME / "NPC" / "Schedules" / "becky.json"
 
 
 def _live_runtime_source():
@@ -75,10 +78,27 @@ def test_friday_dance_public_menu_loops_without_reentering_the_room_label():
     assert "while True:" in source
     assert "jump FridayDance" not in source
     assert 'call checkTriggers("FridayDance", "enter", 0)' in source
+    assert source.index('call checkTriggers("FridayDance", "enter", 0)') < source.index("while True:")
+    assert 'story_event_available("FridayDance", "amanda_dance_mc")' in source
+    assert 'story_event_available("FridayDance", "becky_dance_mc")' in source
     assert 'rooms.get("FridayDance").step = 0' in source
     assert "python hide:" in source
     for retired_name in ("GirlsCounter", "CurrentActions", "AddDancePhraseTmp"):
         assert retired_name not in source
+
+
+def test_friday_dance_featured_partners_cover_the_full_venue_schedule():
+    amanda_rows = json.loads(AMANDA_SCHEDULE.read_text(encoding="utf-8-sig"))["entries"]
+    becky_rows = json.loads(BECKY_SCHEDULE.read_text(encoding="utf-8-sig"))["entries"]
+    amanda_dance = next(row for row in amanda_rows if row.get("label") == "friday_dance")
+    becky_dance = next(row for row in becky_rows if row.get("label") == "friday_dance")
+
+    for row in (amanda_dance, becky_dance):
+        assert row["weekdays"] == [5]
+        assert row["start"] == "18:00"
+        assert row["end"] == "21:59"
+        assert row["location"] == "FridayDance"
+        assert "location_probabilities" not in row
 
 
 def test_old_friday_dance_globals_are_consumed_only_by_save_migration():

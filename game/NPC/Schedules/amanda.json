@@ -61,10 +61,9 @@
     {
       "label": "friday_dance",
       "weekdays": [5],
-      "start": "19:00",
+      "start": "18:00",
       "end": "21:59",
-      "location": ["FridayDance", "TavernAmandaRoom"],
-      "location_probabilities": [0.6, 0.4],
+      "location": "FridayDance",
       "awake": true,
       "talkable": true,
       "priority": 650

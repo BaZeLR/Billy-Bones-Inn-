@@ -3755,6 +3755,69 @@ testcase external_robin_blackwood_room_thread_and_mongol_pass:
 
 
 FRIDAY_DANCE_AMANDA_CHECKS = r'''
+testcase external_friday_public_amanda_button_starts_dance:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 18, 0)
+    $ external_calendar_set_weekday(5)
+    $ npc_interval_schedule_load_all(True)
+    $ rooms.get("FridayDance").dance_count = 0
+    $ rooms.get("FridayDance").step = 0
+    $ GirlDance_Clear()
+    $ Amanda.legare_affection = 1
+    $ Amanda.left_friday_dance = False
+    $ Becky.left_dances = 0
+    $ Amanda.rel = 8
+    $ Amanda.corruption = 16
+    $ event_runtime.fired_keys_today = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (str(people.location("amanda") or "") == "FridayDance" and str(people.location("becky") or "") == "FridayDance") timeout 5.0
+    assert eval (story_event_available("FridayDance", "amanda_dance_mc") and story_event_available("FridayDance", "becky_dance_mc")) timeout 5.0
+    run Jump("FridayDance")
+    advance until screen "choice" timeout 20.0
+    assert eval ("Найти Аманду" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _friday_amanda_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Найти Аманду")
+    click id ("choice_panel_button_%d" % int(_friday_amanda_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1) timeout 5.0
+    click pos (960, 560) until eval (renpy.get_screen("choice") is not None and "Пригласить потанцевать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _friday_amanda_invite_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Пригласить потанцевать")
+    click id ("choice_panel_button_%d" % int(_friday_amanda_invite_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval ("Продолжить танцевать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+
+testcase external_friday_public_becky_button_starts_dance:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 18, 0)
+    $ external_calendar_set_weekday(5)
+    $ npc_interval_schedule_load_all(True)
+    $ rooms.get("FridayDance").dance_count = 0
+    $ rooms.get("FridayDance").step = 0
+    $ GirlDance_Clear()
+    $ Amanda.legare_affection = 1
+    $ Amanda.left_friday_dance = True
+    $ Becky.left_dances = 0
+    $ Becky.rel = 7
+    $ Becky.corruption = 19
+    $ event_runtime.fired_keys_today = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (str(people.location("becky") or "") == "FridayDance" and story_event_available("FridayDance", "becky_dance_mc")) timeout 5.0
+    run Jump("FridayDance")
+    advance until screen "choice" timeout 20.0
+    assert eval ("Найти Бекки Блэнкеншип" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _friday_becky_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Найти Бекки Блэнкеншип")
+    click id ("choice_panel_button_%d" % int(_friday_becky_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1) timeout 5.0
+    click pos (960, 560) until eval (renpy.get_screen("choice") is not None and "Пригласить потанцевать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _friday_becky_invite_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Пригласить потанцевать")
+    click id ("choice_panel_button_%d" % int(_friday_becky_invite_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval ("Продолжить танцевать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+
 testcase external_friday_amanda_bad_invite_uses_one_dance:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -3784,11 +3847,11 @@ testcase external_friday_amanda_bad_invite_uses_one_dance:
     assert eval (int(rooms.get("FridayDance").state["dance_count"] or 0) == 0) timeout 5.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     assert eval (int(rooms.get("FridayDance").state["dance_count"] or 0) == 1) timeout 5.0
-    advance until screen "choice" timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
     assert eval (int(rooms.get("FridayDance").step or 0) == 1) timeout 5.0
     click id "choice_panel_button_2" pos (0.5, 0.5) until screen "say" timeout 20.0
     assert eval (int(rooms.get("FridayDance").state["dance_count"] or 0) == 1) timeout 5.0
-    advance until screen "choice" timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
     assert eval (int(rooms.get("FridayDance").state["dance_count"] or 0) == 1) timeout 5.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until eval (int(rooms.get("FridayDance").step or 0) == 0) timeout 20.0
     assert eval (int(rooms.get("FridayDance").state["dance_count"] or 0) == 1) timeout 5.0
@@ -3879,7 +3942,7 @@ testcase external_friday_becky_inner_actions_do_not_spend_extra_dances:
     run Call("int_becky_dance")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
-    advance until screen "choice" timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
     assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1 and int(rooms.get("FridayDance").step or 0) == 6) timeout 5.0
 '''
 
@@ -6820,6 +6883,8 @@ def main() -> int:
             "external_zimmer_mongol_wine_distraction_dialog",
             "external_robin_v58_migration",
             "external_robin_blackwood_room_thread_and_mongol_pass",
+            "external_friday_public_amanda_button_starts_dance",
+            "external_friday_public_becky_button_starts_dance",
             "external_friday_amanda_bad_invite_uses_one_dance",
             "external_friday_amanda_legare_go_phrase_survives_create_dance",
             "external_amanda_legare_sex_scene_label_procedures",
@@ -6987,6 +7052,8 @@ def main() -> int:
             "external_zimmer_mongol_wine_distraction_dialog",
             "external_robin_v58_migration",
             "external_robin_blackwood_room_thread_and_mongol_pass",
+            "external_friday_public_amanda_button_starts_dance",
+            "external_friday_public_becky_button_starts_dance",
             "external_friday_amanda_bad_invite_uses_one_dance",
             "external_friday_amanda_legare_go_phrase_survives_create_dance",
             "external_amanda_legare_sex_scene_label_procedures",

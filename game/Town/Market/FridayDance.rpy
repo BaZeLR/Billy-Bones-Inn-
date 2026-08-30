@@ -92,9 +92,11 @@ label FridayDance(add_dance_phrase_tmp=""):
     if not rooms.get("FridayDance").is_open():
         jump StreetTavern
 
+    $ rooms.get("FridayDance").step = 0
+    call checkTriggers("FridayDance", "enter", 0)
+
     while True:
         $ rooms.get("FridayDance").step = 0
-        call checkTriggers("FridayDance", "enter", 0)
 
         call ShowImage("", "", "images/market/LocFridayDance.jpg")
 
@@ -124,12 +126,12 @@ label FridayDance(add_dance_phrase_tmp=""):
                     $ rooms.get("FridayDance").dance_count += 1
                     "[result]"
                     call FridayDanceCounterShow
-                "Найти Аманду" if rooms.get("FridayDance").dance_count < 5 and rooms.get("FridayDance").step == 0 and not Amanda.left_friday_dance:
+                "Найти Аманду" if rooms.get("FridayDance").dance_count < 5 and rooms.get("FridayDance").step == 0 and not Amanda.left_friday_dance and (story_event_available("FridayDance", "amanda_dance_legare") or story_event_available("FridayDance", "amanda_dance_mc")):
                     if CheckIfDanceExist('amanda', 'legare', rooms.get("FridayDance").dance_count) > 0:
                         call checkTriggers("FridayDance", "amanda_dance_legare", 0)
                     else:
                         call checkTriggers("FridayDance", "amanda_dance_mc", 0)
-                "Найти Бекки Блэнкеншип" if rooms.get("FridayDance").dance_count < 5 and rooms.get("FridayDance").step == 0 and Becky.left_dances == 0:
+                "Найти Бекки Блэнкеншип" if rooms.get("FridayDance").dance_count < 5 and rooms.get("FridayDance").step == 0 and Becky.left_dances == 0 and story_event_available("FridayDance", "becky_dance_mc"):
                     call checkTriggers("FridayDance", "becky_dance_mc", 0)
                 "Заметить Мелиссу и Клариссу среди танцующих" if rooms.get("FridayDance").dance_count < 5 and rooms.get("FridayDance").step == 0 and Clara.visible_at_friday_dance():
                     $ rooms.get("FridayDance").dance_count += 1
