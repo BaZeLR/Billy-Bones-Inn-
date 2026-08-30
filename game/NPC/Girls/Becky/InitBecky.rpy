@@ -272,11 +272,9 @@ init python:
             return self
 
         def friday_dance_base_ready(self):
-            if not rooms.get("FridayDance").is_open():
-                return False
             location_now = str(people.location("becky") or "")
             return (
-                location_now in ("FridayDance", "MarketPlace")
+                location_now == "FridayDance"
                 and people_to_int(self.left_dances, 0) == 0
                 and people_to_int(rooms.get("FridayDance").dance_count, 0) < 5
                 and people_to_int(rooms.get("FridayDance").step, 0) == 0

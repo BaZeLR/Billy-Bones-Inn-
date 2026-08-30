@@ -8,6 +8,12 @@ FRIDAY_DANCE = GAME / "Town" / "Market" / "FridayDance.rpy"
 SAVE_SYNC = GAME / "TractirSaveSync.rpy"
 AMANDA_SCHEDULE = GAME / "NPC" / "Schedules" / "amanda.json"
 BECKY_SCHEDULE = GAME / "NPC" / "Schedules" / "becky.json"
+AMANDA_DANCE_MODEL = GAME / "NPC" / "Girls" / "Amanda" / "AmandaDanceEventModel.rpy"
+BECKY_DANCE_MODEL = GAME / "NPC" / "Girls" / "Becky" / "BeckyDanceEventModel.rpy"
+AMANDA_INFO = GAME / "NPC" / "Girls" / "Amanda" / "InitAmanda.rpy"
+BECKY_INFO = GAME / "NPC" / "Girls" / "Becky" / "InitBecky.rpy"
+ROOM_TEMPLATE = GAME / "Utilities" / "General" / "Classes" / "RoomTemplate.rpy"
+PEOPLE_RUNTIME = GAME / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
 
 
 def _live_runtime_source():
@@ -87,18 +93,56 @@ def test_friday_dance_public_menu_loops_without_reentering_the_room_label():
         assert retired_name not in source
 
 
-def test_friday_dance_featured_partners_cover_the_full_venue_schedule():
+def test_friday_dance_featured_partners_follow_the_venue_schedule():
     amanda_rows = json.loads(AMANDA_SCHEDULE.read_text(encoding="utf-8-sig"))["entries"]
     becky_rows = json.loads(BECKY_SCHEDULE.read_text(encoding="utf-8-sig"))["entries"]
     amanda_dance = next(row for row in amanda_rows if row.get("label") == "friday_dance")
     becky_dance = next(row for row in becky_rows if row.get("label") == "friday_dance")
 
     for row in (amanda_dance, becky_dance):
-        assert row["weekdays"] == [5]
-        assert row["start"] == "18:00"
-        assert row["end"] == "21:59"
         assert row["location"] == "FridayDance"
+        assert row["follows_room_schedule"] is True
+        assert "weekdays" not in row
+        assert "start" not in row
+        assert "end" not in row
         assert "location_probabilities" not in row
+
+
+def test_npc_room_schedule_relationship_uses_the_room_api_directly():
+    room_source = ROOM_TEMPLATE.read_text(encoding="utf-8-sig")
+    people_source = PEOPLE_RUNTIME.read_text(encoding="utf-8-sig")
+
+    assert "def is_open(self, week_value=None, time_value=None):" in room_source
+    assert "return self.schedule.is_open(week_value, time_value)" in room_source
+    assert "self.follows_room_schedule = bool(follows_room_schedule)" in people_source
+    assert "room_obj.is_open(weekday_value, time_value)" in people_source
+    assert 'data.get("follows_room_schedule", False)' in people_source
+
+
+def test_friday_dance_venue_schedule_is_the_only_event_time_authority():
+    amanda_model = AMANDA_DANCE_MODEL.read_text(encoding="utf-8-sig")
+    becky_model = BECKY_DANCE_MODEL.read_text(encoding="utf-8-sig")
+
+    for model in (amanda_model, becky_model):
+        event_tuple = model.split("super(", 1)[1].split("self.event_name", 1)[0]
+        assert "                    None,\n                    None," in event_tuple
+        assert "(18, 21)" not in model
+        assert "def canTrigger(" not in model
+
+    assert "def becky_dance_event(" not in becky_model
+
+
+def test_friday_dance_partner_objects_own_only_personal_eligibility():
+    amanda = AMANDA_INFO.read_text(encoding="utf-8-sig")
+    becky = BECKY_INFO.read_text(encoding="utf-8-sig")
+    amanda_ready = amanda.split("def friday_dance_base_ready(self):", 1)[1].split("def friday_dance_legare_row", 1)[0]
+    becky_ready = becky.split("def friday_dance_base_ready(self):", 1)[1].split("def dance_event_conditions_met", 1)[0]
+
+    for ready in (amanda_ready, becky_ready):
+        assert 'rooms.get("FridayDance").is_open()' not in ready
+    assert 'self.is_at("FridayDance")' in amanda_ready
+    assert 'location_now == "FridayDance"' in becky_ready
+    assert '"MarketPlace"' not in becky_ready
 
 
 def test_old_friday_dance_globals_are_consumed_only_by_save_migration():

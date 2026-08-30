@@ -800,7 +800,7 @@ define claraThreadList = [
 ]
 define beckyThreadList = [
     LThreadData(0, "becky", "FridayDanceMC", None, [
-        becky_dance_event("BeckyDance_0", "story_becky_friday_dance_mc_0", "FridayDance", "becky_dance_mc", 10, "mc", 0, "mc_dance", True),
+        BeckyFridayDanceMC,
     ], highlight=False, threaded=False),
     LThreadData(0, "becky", "IngaLucasPath", None, [
         ("becky_homefront_share_with_becky", None, None, None, 1, None, [

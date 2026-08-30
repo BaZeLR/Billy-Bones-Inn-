@@ -508,8 +508,6 @@ init python:
             return not Clara.visible_at_friday_dance()
 
         def friday_dance_base_ready(self):
-            if not rooms.get("FridayDance").is_open():
-                return False
             return (
                 self.is_at("FridayDance")
                 and not self.left_friday_dance

@@ -195,7 +195,7 @@ init -999 python:
             return state
 
     class NPCHourScheduleEntry(NPCScheduleEntry):
-        def __init__(self, npc_id="", location="", location_choices=None, weekdays=None, start="00:00", end="23:59", awake=True, talkable=True, condition=None, priority=600, label="", source="json", working=False):
+        def __init__(self, npc_id="", location="", location_choices=None, weekdays=None, start="00:00", end="23:59", awake=True, talkable=True, condition=None, priority=600, label="", source="json", working=False, follows_room_schedule=False):
             start_text = str(start or "0").strip()
             end_text = str(end or "23").strip()
             start_parts = start_text.split(":", 1)
@@ -207,6 +207,7 @@ init -999 python:
             self.npc_id = str(npc_id or "").strip()
             self.location_choices = list(location_choices or [])
             self.source = str(source or "json")
+            self.follows_room_schedule = bool(follows_room_schedule)
 
         def selected_location(self):
             choices = []
@@ -243,8 +244,15 @@ init -999 python:
         def matches(self, weekday_value=None, time_value=None):
             if not super(NPCHourScheduleEntry, self).matches(weekday_value, time_value):
                 return False
-            if not str(self.selected_location() or "").strip():
+            selected_location = str(self.selected_location() or "").strip()
+            if not selected_location:
                 return False
+            if self.follows_room_schedule:
+                room_obj = rooms.get(selected_location)
+                if room_obj is None or getattr(room_obj, "schedule", None) is None:
+                    return False
+                if not room_obj.is_open(weekday_value, time_value):
+                    return False
             return True
 
     def npc_daily_schedule_interval(start_hour=0, end_hour=24, location="", awake=True, talkable=True, label="", priority=500, working=False):
@@ -457,6 +465,7 @@ init -999 python:
                 priority=int(data.get("priority", 600) or 600),
                 label=str(data.get("label", "") or ""),
                 source=str(data.get("source", "json") or "json"),
+                follows_room_schedule=bool(data.get("follows_room_schedule", False)),
             )
 
         def load_interval_schedule(self, force=False):

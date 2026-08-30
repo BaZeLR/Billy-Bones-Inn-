@@ -21,8 +21,8 @@ init -24 python:
             super(AmandaDanceEvent, self).__init__(
                 (
                     target,
-                    5,
-                    (18, 21),
+                    None,
+                    None,
                     None,
                     1,
                     None,

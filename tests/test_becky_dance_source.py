@@ -24,7 +24,8 @@ def test_becky_friday_dance_uses_thread_event_and_object_state():
     invite = _source(BECKY_INVITE)
 
     assert 'LThreadData(0, "becky", "FridayDanceMC"' in runtime
-    assert 'becky_dance_event("BeckyDance_0", "story_becky_friday_dance_mc_0", "FridayDance", "becky_dance_mc"' in runtime
+    assert "BeckyFridayDanceMC" in runtime
+    assert 'BeckyFridayDanceMC = BeckyDanceEvent(' in model
     assert 'call checkTriggers("FridayDance", "becky_dance_mc", 0)' in friday
     assert "call int_becky_dance" not in friday
     assert "BeckyVar" not in friday
@@ -32,7 +33,7 @@ def test_becky_friday_dance_uses_thread_event_and_object_state():
     assert "class BeckyDanceEvent(Event):" in model
     assert "return bool(Becky.dance_event_conditions_met(self))" in model
     assert "def friday_dance_base_ready(self):" in init
-    assert 'location_now in ("FridayDance", "MarketPlace")' in init
+    assert 'location_now == "FridayDance"' in init
     assert 'people_to_int(self.left_dances, 0) == 0' in init
     assert "def dance_event_conditions_met(self, event_obj):" in init
 

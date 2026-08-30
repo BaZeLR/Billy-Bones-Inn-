@@ -3755,6 +3755,30 @@ testcase external_robin_blackwood_room_thread_and_mongol_pass:
 
 
 FRIDAY_DANCE_AMANDA_CHECKS = r'''
+testcase external_friday_dance_reopens_with_both_partners:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ rooms.get("FridayDance").dance_count = 5
+    $ rooms.get("FridayDance").step = 4
+    $ Amanda.left_friday_dance = True
+    $ Becky.left_dances = 1
+    $ next_day_finish_day_events()
+    assert eval (int(rooms.get("FridayDance").dance_count or 0) == 0 and not Amanda.left_friday_dance and int(Becky.left_dances or 0) == 0) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 18, 0)
+    $ external_calendar_set_weekday(5)
+    $ npc_interval_schedule_load_all(True)
+    $ rooms.get("FridayDance").step = 0
+    $ GirlDance_Clear()
+    $ Amanda.legare_affection = 1
+    $ event_runtime.fired_keys_today = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("FridayDance", "amanda_dance_mc") and story_event_available("FridayDance", "becky_dance_mc")) timeout 5.0
+    run Jump("FridayDance")
+    advance until screen "choice" timeout 20.0
+    assert eval ("Найти Аманду" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Найти Бекки Блэнкеншип" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+
 testcase external_friday_public_amanda_button_starts_dance:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -6883,6 +6907,7 @@ def main() -> int:
             "external_zimmer_mongol_wine_distraction_dialog",
             "external_robin_v58_migration",
             "external_robin_blackwood_room_thread_and_mongol_pass",
+            "external_friday_dance_reopens_with_both_partners",
             "external_friday_public_amanda_button_starts_dance",
             "external_friday_public_becky_button_starts_dance",
             "external_friday_amanda_bad_invite_uses_one_dance",
@@ -7052,6 +7077,7 @@ def main() -> int:
             "external_zimmer_mongol_wine_distraction_dialog",
             "external_robin_v58_migration",
             "external_robin_blackwood_room_thread_and_mongol_pass",
+            "external_friday_dance_reopens_with_both_partners",
             "external_friday_public_amanda_button_starts_dance",
             "external_friday_public_becky_button_starts_dance",
             "external_friday_amanda_bad_invite_uses_one_dance",

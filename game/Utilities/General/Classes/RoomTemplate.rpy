@@ -234,7 +234,7 @@ init -40 python:
             except Exception:
                 return int(default or 0)
 
-        def is_open(self, week_value=None):
+        def is_open(self, week_value=None, time_value=None):
             if not room_rule_true(self.condition):
                 return False
             if week_value is None:
@@ -244,7 +244,11 @@ init -40 python:
             start_text = str(getattr(self, "start", "") or "")
             end_text = str(getattr(self, "end", "") or "")
             if start_text or end_text:
-                current_value = (int(calendar_v2.hour or 0) % 24) * 60 + (int(calendar_v2.minute or 0) % 60)
+                if time_value is None:
+                    current_value = (int(calendar_v2.hour or 0) % 24) * 60 + (int(calendar_v2.minute or 0) % 60)
+                else:
+                    explicit_value = int(time_value or 0)
+                    current_value = explicit_value * 60 if 0 <= explicit_value <= 23 else explicit_value % 1440
                 start_value = self._clock_value(start_text, 0)
                 end_value = self._clock_value(end_text, 1439)
                 if start_value <= end_value:
@@ -355,13 +359,13 @@ init -40 python:
         def visible_actions(self):
             return [row for row in self.action_menus if hasattr(row, "is_visible") and row.is_visible()]
 
-        def is_open(self, week_value=None):
+        def is_open(self, week_value=None, time_value=None):
             if self.open_override is not None:
                 return bool(self.open_override)
             if self.schedule is None:
                 return True
             if hasattr(self.schedule, "is_open"):
-                return self.schedule.is_open(week_value)
+                return self.schedule.is_open(week_value, time_value)
             return True
 
         # ---------- NEW SHARED BUILDERS ----------
