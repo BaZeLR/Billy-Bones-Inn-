@@ -1390,6 +1390,10 @@ testcase external_amanda_breakfast_tease_picture_series:
     assert eval (tavern_breakfast_tease_picture("amanda", 3) == AMANDA_BREAKFAST_TEASE_PICTURES[4]) timeout 5.0
     assert eval (tavern_breakfast_tease_picture("amanda", 4) == AMANDA_BREAKFAST_TEASE_PICTURES[6]) timeout 5.0
     assert eval (all(renpy.loadable(path) for path in AMANDA_BREAKFAST_TEASE_PICTURES.values())) timeout 5.0
+    assert eval (tavern_breakfast_look_picture("melissa") == MELISSA_BREAKFAST_TEASE_PICTURES[1]) timeout 5.0
+    assert eval (all(tavern_breakfast_tease_picture("melissa", tier) == MELISSA_BREAKFAST_TEASE_PICTURES[tier] for tier in range(1, 5))) timeout 5.0
+    assert eval (all(renpy.loadable(path) for path in MELISSA_BREAKFAST_TEASE_PICTURES.values())) timeout 5.0
+    assert eval (renpy.loadable(BREAKFAST_GIRLS_TEASE_PICTURE)) timeout 5.0
     run Call("_external_amanda_breakfast_tease_for_test")
     advance until screen "say" timeout 20.0
     assert eval (str(scene_runtime.picture or "") == AMANDA_BREAKFAST_TEASE_PICTURES[4]) timeout 5.0
@@ -1456,6 +1460,11 @@ testcase external_breakfast_angry_amanda_melissa_mockery:
     assert eval ("Бекки" not in list(tavern_breakfast_present_names() or [])) timeout 5.0
     assert eval ("Крысы?" in " ".join(list(tavern_breakfast_dialogue_lines() or []))) timeout 5.0
     assert eval (len([row for row in tavern_breakfast_dialogue_lines() if "Пальцы из кисок" in str(row or "")]) == 1) timeout 5.0
+    $ threads["melissaBatProblem"].advanceTo(3)
+    $ player.tavern_management.breakfast.melissa_amanda_gerhard_day = -1
+    run Call("TavernKitchenBreakfastMelissaAmandaGerhard")
+    advance until screen "say" timeout 10.0
+    assert eval (str(scene_runtime.picture or "") == BREAKFAST_GIRLS_TEASE_PICTURE) timeout 5.0
 testcase external_sandra_weekly_visit_native_beats:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0

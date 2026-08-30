@@ -14,6 +14,13 @@ init python:
         5: "images/amanda/breakfastTease/breakfastTease5.jpg",
         6: "images/amanda/breakfastTease/breakfastTease6.jpg",
     }
+    MELISSA_BREAKFAST_TEASE_PICTURES = {
+        1: "images/breakfast/melissa_breakfast/melissa_breakfast_0.jpg",
+        2: "images/breakfast/melissa_breakfast/melissa_breakfast_1.jpg",
+        3: "images/breakfast/melissa_breakfast/melissa_breakfast_2.jpg",
+        4: "images/breakfast/melissa_breakfast/melissa_breakfast_3.jpg",
+    }
+    BREAKFAST_GIRLS_TEASE_PICTURE = "images/breakfast/tavent_girls.jpg"
 
     def tavern_breakfast_available():
         return int(calendar_v2.hour or 0) < 12 and not bool(player.tavern_management.breakfast.today)
@@ -423,6 +430,8 @@ init python:
         key = str(npc_id or "").strip().lower()
         if key == "amanda":
             return AMANDA_BREAKFAST_TEASE_PICTURES[1]
+        if key == "melissa":
+            return MELISSA_BREAKFAST_TEASE_PICTURES[1]
         candidates = {
             "sandra": [
                 "images/sandra/tavern/kitchen_sandra_0.jpg",
@@ -443,7 +452,6 @@ init python:
                 "images/tavern/kitchen/kitchen_sandra_3.jpg",
                 "images/tavern/kitchen/kitchen_sandra_4.jpg",
             ],
-            "melissa": MelissaStaticData.image_sequence("kitchen", "breakfast"),
         }.get(key, [])
         for picture_path in candidates:
             if renpy.loadable(picture_path):
@@ -831,7 +839,6 @@ init python:
         candidates = [
             "images/kitchen/kitchen_breakfast.jpg",
             "images/tavern/kitchen/kitchen_breakfast.jpg",
-            "images/breakfast/tavent_girls.jpg",
             "images/breakfast/tavern_girls_impregnat.jpg",
             "images/breakfast/tavern_girls_impregnat_1.jpg",
             "images/breakfast/amanda_b.png",
@@ -854,21 +861,8 @@ init python:
                 picture_number = tease_tier
             return AMANDA_BREAKFAST_TEASE_PICTURES[picture_number]
         if key == "melissa":
-            candidates = [
-                "images/breakfast/melissa_breakfast/melissa breakfast_2.jpg",
-                "images/breakfast/melissa_breakfast/melissa breakfast.jpg",
-                "images/breakfast/melissa_breakfast/melissa_breakfast_1.jpg",
-                "images/breakfast/melissa_breakfast/melissa_breakfast.jpg",
-            ]
-        else:
-            candidates = [
-                "images/breakfast/tavern_girls_impregnat.jpg",
-                "images/breakfast/tavern_girls_impregnat_1.jpg",
-                "images/breakfast/tavent_girls.jpg",
-            ]
-        for candidate in candidates:
-            if renpy.loadable(candidate):
-                return candidate
+            tease_tier = max(1, min(4, int(tier or 0)))
+            return MELISSA_BREAKFAST_TEASE_PICTURES[tease_tier]
         return tavern_kitchen_breakfast_picture()
 
     def tavern_kitchen_sunday_dinner_picture():
@@ -1276,6 +1270,7 @@ label TavernKitchenBreakfastAmandaAtticExpose:
 label TavernKitchenBreakfastMelissaAmandaGerhard:
     if not tavern_breakfast_melissa_amanda_gerhard_ready():
         return
+    vscene BREAKFAST_GIRLS_TEASE_PICTURE
     $ scene_runtime.text = "Завтрак еще не успевает толком начаться, как Сандра снова заводит про кладовую.\n\n\"Крысы лезут к мешкам, будто им там ярмарку открыли,\" ворчит она. \"Еще пара таких ночей, и мы будем кормить не гостей, а хвостатую сволочь.\"\n\nМелисса тут же подхватывает, злая и невыспавшаяся: \"Крысы снизу, летучие мыши сверху, по крыше шуршит, по стенам скребет. Я ночью уже не знаю, то ли одеялом накрываться, то ли метлой отбиваться.\"\n\nАманда усмехается в миску. \"Так заведите кошечку. Только не простую. Клариссу, например. Пусть эта благородная киска в кладовой помурлычет, может, крысы от стыда сами уйдут.\"\n\nМелисса фыркает слишком громко, а Аманда смотрит на нее так, будто специально ждет грязной догадки. Сандра тут же хлопает ладонью по столу.\n\n\"Хватит мне ваших кошечек, кисок и ночных воздыханий,\" срезает она. \"Пальцы из пизд вынули обе и слушайте старших. Самоуспокоение закончится тем, что брат Герхард устроит вам дьявольское покаяние, а этого в доме никто не хочет. Крысы, мыши и чердак — вот о чем речь, а не о ваших мокрых фантазиях.\""
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"

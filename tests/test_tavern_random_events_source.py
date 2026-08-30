@@ -86,10 +86,15 @@ def test_breakfast_tease_uses_step_picture_assets():
     assert "def tavern_breakfast_tease_picture" in kitchen_source
     for picture_number in range(1, 7):
         assert '"images/amanda/breakfastTease/breakfastTease%s.jpg"' % picture_number in kitchen_source
+    for picture_number in range(4):
+        assert '"images/breakfast/melissa_breakfast/melissa_breakfast_%s.jpg"' % picture_number in kitchen_source
     assert "AMANDA_BREAKFAST_TEASE_PICTURES[picture_number]" in kitchen_source
+    assert "MELISSA_BREAKFAST_TEASE_PICTURES[tease_tier]" in kitchen_source
+    assert "vscene BREAKFAST_GIRLS_TEASE_PICTURE" in kitchen_source
     assert "horny_state = int(Amanda.arousal_value() or 0) >= 65" in kitchen_source
     assert "picture_number = 6 if horny_state else 5" in kitchen_source
     assert "picture_number = 4 if horny_state else 3" in kitchen_source
     assert "images/breakfast/amanda_breakfast" not in kitchen_source
+    assert "MelissaStaticData.image_sequence(\"kitchen\", \"breakfast\")" not in kitchen_source
     assert not (ROOT / "game/images/breakfast/amanda_breakfast").exists()
     assert "tavern_breakfast_tease_picture(_tease_girl, _tease_tier)" in kitchen_source
