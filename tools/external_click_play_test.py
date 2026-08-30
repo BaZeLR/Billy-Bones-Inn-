@@ -3811,6 +3811,7 @@ testcase external_friday_public_amanda_button_starts_dance:
     $ _friday_amanda_invite_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Пригласить потанцевать")
     click id ("choice_panel_button_%d" % int(_friday_amanda_invite_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/amanda/dance/you_invites.png" and _media_asset_exists(scene_runtime.picture)) timeout 5.0
     assert eval ("Продолжить танцевать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
 
 testcase external_friday_public_becky_button_starts_dance:
@@ -3919,7 +3920,7 @@ testcase external_friday_amanda_legare_go_phrase_survives_create_dance:
     assert eval (CheckIfDanceExist("amanda", "legare", 0) <= 0) timeout 5.0
     assert eval (str(SexEvents.dance_watch_line.get(6, "") or "") == "LEGARE_GO_TEST_PHRASE") timeout 5.0
     advance until screen "choice" timeout 20.0
-    assert eval ("images/amanda/dance/legare_step_" in str(scene_runtime.picture or "").lower()) timeout 5.0
+    assert eval ("images/amanda/dance/legare_step_" in str(scene_runtime.picture or "").lower() and _media_asset_exists(scene_runtime.picture)) timeout 5.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0

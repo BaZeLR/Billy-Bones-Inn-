@@ -59,7 +59,7 @@ label IntAmandaDance():
                 if procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/IntAmandaDance.rpy:procedural_randint:50:2") == 1:
                     $ Amanda.change_social(friend_delta=1)
                     "Кажется, Аманда стала еще больше восхищаться вами!"
-            call ShowImage(GirlNameIAD, "dance", "you_invite_1.png")
+            call ShowImage(GirlNameIAD, "dance", "you_invite_1")
             $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step
             jump IntAmandaDance
         "Попросить об одолжении" if rooms.get("FridayDance").step == 1 and not Amanda.dancing_with_legare and Amanda.can_be_asked_for_night_bowl_favor():
@@ -77,14 +77,14 @@ label IntAmandaDance():
             $ rooms.get("FridayDance").tits = 0
             if Amanda.rel >= 8 and Amanda.corruption > 15:
                 "Она с радостью согласилась, вы взяли ее под руку и вскоре вы закружились в танце."
-                call ShowImage(GirlNameIAD, "dance", "you_invites.png")
+                call ShowImage(GirlNameIAD, "dance", "you_invites")
             elif Amanda.rel >= 5 and Amanda.corruption >= 5:
                 "Она с сомнением сказала: 'Ты же Стефан, зачем это мне с тобой танцевать?', но все таки взяла вашу руку и вскоре вы закружились в танце."
-                call ShowImage(GirlNameIAD, "dance", "you_invite_1.png")
+                call ShowImage(GirlNameIAD, "dance", "you_invite_1")
             else:
                 '"Ты что, Стефан, сдурел?!" ответила вам Аманда. Расстроенный отказом, вы отправились восвояси.'
                 $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step
-                call ShowImage(GirlNameIAD, "dance", "you_invite_1.png")
+                call ShowImage(GirlNameIAD, "dance", "you_invite_1")
             $ rooms.get("FridayDance").step += 1
             if rooms.get("FridayDance").step == rooms.get("FridayDance").max_step:
                 "Танец закончился и вы вернулись к колоннаде."
@@ -113,18 +113,18 @@ label IntAmandaDance():
                 "Она улыбнулась и придвинулась к вам поближе, продолжая танец."
                 $ Amanda.apply_social_chance(8, 5, 1, 14, 5, 1, "friday_dance_waist")
                 $ rooms.get("FridayDance").hands = 'waist'
-                call ShowImage(GirlNameIAD, "dance", "you_3.png")
+                call ShowImage(GirlNameIAD, "dance", "you_3")
             elif Amanda.rel >= 5 and Amanda.corruption >= 6:
                 "Аманда поморщилась, но возражать не стала."
                 $ Amanda.apply_social_chance(8, 5, 1, 14, 5, 1, "friday_dance_waist")
                 $ rooms.get("FridayDance").hands = 'waist'
-                call ShowImage(GirlNameIAD, "dance", "you_worry.png")
+                call ShowImage(GirlNameIAD, "dance", "you_worry")
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда. Вы попробовали объяснить, что так обычно танцуют, но обнаружили что разговариваете с пустотой, Аманда ушла.'
                 $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step
                 $ Amanda.apply_social_chance(2, 2, -1, 0, 0, 0, "friday_dance_waist_reject")
                 $ rooms.get("FridayDance").hands = ''
-                call ShowImage(GirlNameIAD, "dance", "you_nolike_1.png")
+                call ShowImage(GirlNameIAD, "dance", "you_nolike_1")
             $ rooms.get("FridayDance").step += 1
             if rooms.get("FridayDance").step == rooms.get("FridayDance").max_step:
                 "Танец закончился и вы вернулись к колоннаде."
@@ -138,23 +138,23 @@ label IntAmandaDance():
                 "Аманда улыбнулась и придвинулась к вам поближе, продолжая танец."
                 $ Amanda.apply_social_chance(9, 3, 1, 18, 3, 1, "friday_dance_ass")
                 $ rooms.get("FridayDance").hands = 'ass'
-                call ShowImage(GirlNameIAD, "dance", "you_3.png")
+                call ShowImage(GirlNameIAD, "dance", "you_3")
             elif Amanda.rel >= 6 and Amanda.corruption >= 12:
                 '"Стефан, что ты делаешь?!" прошептала Аманда. Впрочем танцевать она не перестала и рук ваших не убрала.'
                 $ Amanda.apply_social_chance(9, 3, 1, 18, 3, 1, "friday_dance_ass")
                 $ rooms.get("FridayDance").hands = 'ass'
-                call ShowImage(GirlNameIAD, "dance", "you_2.png")
+                call ShowImage(GirlNameIAD, "dance", "you_2")
             elif Amanda.rel >= 5 and Amanda.corruption >= 9:
                 '"Стефан, что ты делаешь?!" прошептала Аманда и передвинула ваши руки с попы на талию.'
                 $ Amanda.apply_social_chance(9, 4, 1, 14, 4, 1, "friday_dance_ass_worry")
                 $ rooms.get("FridayDance").hands = 'waist'
-                call ShowImage(GirlNameIAD, "dance", "you_worry.png")
+                call ShowImage(GirlNameIAD, "dance", "you_worry")
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда, с размаху дала вам смачную пощечину, развернулась и ушла, оставив вас в одиночестве.'
                 $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step
                 $ Amanda.apply_social_chance(0, 1, -1, 0, 1, -1, "friday_dance_ass_reject")
                 $ rooms.get("FridayDance").hands = ''
-                call ShowImage(GirlNameIAD, "dance", "you_nolike_1.png")
+                call ShowImage(GirlNameIAD, "dance", "you_nolike_1")
             $ rooms.get("FridayDance").step += 1
             if rooms.get("FridayDance").step == rooms.get("FridayDance").max_step:
                 "Танец закончился и вы вернулись к колоннаде."
@@ -166,23 +166,23 @@ label IntAmandaDance():
                 $ Amanda.apply_social_chance(11, 4, 1, 22, 3, 1, "friday_dance_grope")
                 $ rooms.get("FridayDance").hands = 'ass2'
                 $ rooms.get("FridayDance").tits = 1
-                call ShowImage(GirlNameIAD, "dance", "you_3.png")
+                call ShowImage(GirlNameIAD, "dance", "you_3")
             elif Amanda.rel >= 8 and Amanda.corruption >= 16:
                 '"Стефанчик, что ты делаешь?! Мы же все-таки не на виду у всех" прошептала Аманда, но не сделала ничего, чтобы остановить вас.'
                 $ Amanda.apply_social_chance(11, 4, 1, 22, 3, 1, "friday_dance_grope")
                 $ rooms.get("FridayDance").hands = 'ass2'
-                call ShowImage(GirlNameIAD, "dance", "you_2.png")
+                call ShowImage(GirlNameIAD, "dance", "you_2")
             elif Amanda.rel >= 7 and Amanda.corruption >= 13:
                 '"Стефан, что ты делаешь?!" прошептала Аманда и передвинула ваши руки с попы на талию.'
                 $ Amanda.apply_social_chance(9, 4, 1, 16, 4, 1, "friday_dance_grope_worry")
                 $ rooms.get("FridayDance").hands = 'waist'
-                call ShowImage(GirlNameIAD, "dance", "you_worry.png")
+                call ShowImage(GirlNameIAD, "dance", "you_worry")
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда, с размаху дала вам смачную пощечину, развернулась и ушла, оставив вас в одиночестве.'
                 $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step
                 $ Amanda.apply_social_chance(0, 1, -1, 0, 1, -1, "friday_dance_grope_reject")
                 $ rooms.get("FridayDance").hands = ''
-                call ShowImage(GirlNameIAD, "dance", "you_nolike_1.png")
+                call ShowImage(GirlNameIAD, "dance", "you_nolike_1")
             $ rooms.get("FridayDance").step += 1
             if rooms.get("FridayDance").step == rooms.get("FridayDance").max_step:
                 "Танец закончился и вы вернулись к колоннаде."
@@ -193,23 +193,23 @@ label IntAmandaDance():
                 "Аманда с готовностью ответила на ваш поцелуй, страстно переплетаясь с вами языками."
                 $ Amanda.apply_social_chance(11, 4, 1, 24, 3, 1, "friday_dance_kiss")
                 $ rooms.get("FridayDance").kiss = 2
-                call ShowImage(GirlNameIAD, "dance", "you_kiss.png")
+                call ShowImage(GirlNameIAD, "dance", "you_kiss")
             elif Amanda.rel >= 8 and Amanda.corruption >= 16:
                 "Преодолев секундное замешательство, Аманда откликнулась на ваш поцелуй, хотя и без особого энтузиазма."
                 $ Amanda.apply_social_chance(11, 4, 1, 24, 3, 1, "friday_dance_kiss")
                 $ rooms.get("FridayDance").kiss = 1
-                call ShowImage(GirlNameIAD, "dance", "you_kiss.png")
+                call ShowImage(GirlNameIAD, "dance", "you_kiss")
             elif Amanda.rel >= 7 and Amanda.corruption >= 13:
                 '"Стефанчик, что ты делаешь?!" прошептала Аманда и отстранилась от вас.'
                 $ Amanda.apply_social_chance(9, 6, 1, 16, 6, 1, "friday_dance_kiss_worry")
                 $ rooms.get("FridayDance").kiss = 0
-                call ShowImage(GirlNameIAD, "dance", "you_worry.png")
+                call ShowImage(GirlNameIAD, "dance", "you_worry")
             else:
                 '"Стефан, что ты такое делаешь?!" закричала Аманда, с размаху дала вам смачную пощечину, развернулась и ушла, оставив вас в одиночестве.'
                 $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step
                 $ Amanda.apply_social_chance(0, 1, -1, 0, 1, -1, "friday_dance_kiss_reject")
                 $ rooms.get("FridayDance").kiss = 0
-                call ShowImage(GirlNameIAD, "dance", "you_nolike_1.png")
+                call ShowImage(GirlNameIAD, "dance", "you_nolike_1")
             $ rooms.get("FridayDance").step += 1
             if rooms.get("FridayDance").step == rooms.get("FridayDance").max_step:
                 "Танец закончился и вы вернулись к колоннаде."
@@ -221,19 +221,19 @@ label IntAmandaDance():
                 '"Ага, значит то ты меня ругаешь, шлюхой обзываешь, учишь скромности и всякому возвышенному да? Ф как танцы - так все мигом забыл и мало что за задницу лапаешь, так еще и в подворотню тащищь?" обругала ваше двуличие Аманда.{p}"Знаешь что, иди себе сам в свою подворотню и сам с собою там что хочешь то и делай. Впрочем, ты только одного и хочешь. А я пока пойду!" гневно сказала Аманда, слово с делом у нее не разошлись и она развернулась и ушла, оставив вас в одиночестве.'
                 $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step
                 $ Amanda.apply_social_chance(0, 3, -1, 0, 3, -1, "friday_dance_walk_reject")
-                call ShowImage(GirlNameIAD, "dance", "you_nolike_1.png")
+                call ShowImage(GirlNameIAD, "dance", "you_nolike_1")
             elif tmpGropeReact >= 3:
                 $ Amanda.left_friday_dance = True
                 $ GirlDance_DeleteGirl('amanda')
                 $ rooms.get("FridayDance").dance_count = 5
-                call ShowImage(GirlNameIAD, "dance", "you_invites.png")
+                call ShowImage(GirlNameIAD, "dance", "you_invites")
                 jump AmandaAfterDanceMC
             else:
                 "Продолжая танцевать, вы вдруг прошептали Аманде на ушко: 'Милая, а может прогуляемся немного?'"
                 '"Стефан, ты что, предлагаешь мне пойти с тобой в какую-то подворотню? Мне?!" гневно сказала Аманда, развернулась и ушла, оставив вас в одиночестве.'
                 $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step
                 $ Amanda.apply_social_chance(0, 1, -1, 0, 1, -1, "friday_dance_walk_reject")
-                call ShowImage(GirlNameIAD, "dance", "you_nolike_1.png")
+                call ShowImage(GirlNameIAD, "dance", "you_nolike_1")
             jump IntAmandaDance
             
         "Наблюдать за Амандой и мессиром Легаре" if rooms.get("FridayDance").step >= 1 and rooms.get("FridayDance").step < rooms.get("FridayDance").max_step + 2 and Amanda.dancing_with_legare:
@@ -252,7 +252,7 @@ label IntAmandaDance():
                 $ dance_message = SexEvents.dance_watch_line[0]
             
             "[dance_message]"
-            call ShowImage("amanda", "dance", "legare_step_" + str(min(rooms.get("FridayDance").step, 3)) + ".png")
+            call ShowImage("amanda", "dance", "legare_step_" + str(min(rooms.get("FridayDance").step, 3)))
             
             if rooms.get("FridayDance").step == 6 and Amanda.legare_departure_code == 1:
                 $ legare_go_message = str(SexEvents.dance_watch_line.get(6, "") or "")

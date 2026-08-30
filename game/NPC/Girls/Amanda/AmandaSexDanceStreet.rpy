@@ -18,7 +18,7 @@ label AmandaAfterDanceMC:
             jump AmandaAfterDanceMCReturn
 
 label AmandaAfterDanceMCMakeOut:
-    call ShowImage("amanda", "dance", "you_kiss.png")
+    call ShowImage("amanda", "dance", "you_kiss")
     "Вы наклоняетесь к ней, и Аманда отвечает сразу, будто ждала именно этого. Поцелуй выходит долгим, неловким и слишком горячим для тесного переулка у рыночной площади."
     "Она прижимается ближе, потом вдруг отстраняется, поправляет платье и смеется, пытаясь скрыть смущение."
     "\"Все, Стефан. Если мы сейчас не остановимся, я потом сама себя не узнаю.\""
@@ -33,7 +33,7 @@ label AmandaAfterDanceMCMakeOut:
             jump AmandaSexDanceStreet
 
 label AmandaAfterDanceMCWalkHome:
-    call ShowImage("amanda", "dance", "you_invite_1.png")
+    call ShowImage("amanda", "dance", "you_invite_1")
     "Вы не торопите ее. Просто идете рядом, пока огни площади остаются позади."
     "Аманда сначала молчит, потом начинает рассказывать о музыке, людях и о том, как странно было весь вечер чувствовать на себе ваш взгляд."
     "У дверей трактира она задерживается на миг и мягко сжимает вашу ладонь."
