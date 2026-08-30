@@ -1225,6 +1225,8 @@ label TavernKitchenBreakfastHearDialogue:
 
 label TavernKitchenBreakfastAmandaAltCure1:
     $ Amanda.attic_window_breakfast_bj_day = current_game_day()
+    if int(Amanda.attic_window_favor_stage or 0) in (1, 2):
+        $ Amanda.attic_window_favor_stage = 3
     $ player_apply_arousal_trigger("breakfast_amanda_alt_cure", max(0, 35 - int(player.intimacy.arousal_value() or 0)))
     $ Amanda.set_arousal(max(30, int(Amanda.arousal_value() or 0)))
     $ scene_runtime.text = "За общим столом Аманда сегодня на редкость притихла. Несколько раз она украдкой встречается с вами взглядом, потом криво улыбается и будто невзначай касается вашей ноги под столом. Колкость про Мелиссу так и не срывается с ее языка.\n\nЧерез пару минут ее ступня уже гладит вас куда смелее, а сама она наклоняется ближе и почти беззвучно шепчет, что после той неловкой истории с окном ей почему-то самой теперь труднее делать вид, будто ничего такого в доме не бывает.\n\nПока остальные заняты едой и разговорами, Аманда незаметно скользит ниже под край стола и решает загладить свою дерзость способом куда приятнее обычных извинений."

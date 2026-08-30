@@ -57,6 +57,9 @@ define amandaThreadList = [
     LThreadData(0, "amanda", "MorningWindowEpisode", None, [
         AmandaMorningWindowEpisode,
     ], highlight=False, threaded=False),
+    LThreadData(0, "amanda", "KitchenWindowFavor", None, [
+        AmandaKitchenWindowFavor,
+    ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "NightBowlWindow", None, [
         AmandaNightBowlWindow,
     ], highlight=False, threaded=False),

@@ -2264,6 +2264,62 @@ testcase external_amanda_room_night_bed_action_uses_thread_event:
     advance until screen "main_ui" timeout 20.0
     assert eval (str(main_ui_runtime.action_title or "") == "Кровать") timeout 5.0
     assert eval ("Пристать к Аманде" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+
+testcase external_amanda_window_secret_favor_kitchen_event:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+
+    $ Amanda.attic_mock_exposed = False
+    $ Amanda.attic_window_breakfast_bj_day = -1
+    $ Amanda.attic_mock_response_day = 12
+    $ delattr(Amanda, "attic_window_favor_stage")
+    $ tractir_save_patch_loaded_state()
+    assert eval (Amanda.attic_window_favor_stage == 2) timeout 5.0
+
+    $ Amanda.attic_window_favor_stage = 1
+    $ Amanda.attic_mock_stopped = False
+    $ player.tavern_management.breakfast.today = True
+    $ player.tavern_management.breakfast.event_active = False
+    $ event_runtime.fired_day = -1
+    $ event_runtime.fired_keys_today = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernKitchen", "enter")) timeout 5.0
+    assert eval (str(event_runtime.available["TavernKitchen"]["enter"].target or "") == "story_amanda_kitchen_window_favor_0") timeout 5.0
+
+    run Jump("TavernKitchen")
+    advance until screen "say" timeout 20.0
+    assert eval (Amanda.attic_window_favor_stage == 2 and Amanda.attic_mock_stopped) timeout 5.0
+    assert eval (renpy.showing("images/amanda/kitchen_help.png")) timeout 5.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Предложить Аманде вернуть услугу сейчас", "Оставить услугу за ней"]) timeout 5.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (Amanda.attic_window_favor_stage == 2 and "долг не оспаривает" in str(scene_runtime.text or "")) timeout 5.0
+    click pos (960, 560) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene" and str(main_ui_runtime.action_title or "") == "Кухня") timeout 20.0
+    assert eval (str(rooms.current_code or "") == "TavernKitchen" and Amanda.attic_window_favor_stage == 2) timeout 5.0
+
+    $ player.intimacy.came_today = 0
+    $ player.intimacy.can_cum_daily = 3
+    $ player.intimacy.set_arousal(100)
+    $ Amanda.set_sex_busy(False)
+    $ Amanda.set_cock_position("none")
+    $ rooms.enter("TavernUpstairs")
+    $ event_runtime.fired_keys_today = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    run Jump("TavernKitchen")
+    advance until screen "say" timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (renpy.get_screen("choice") is not None and "Минет" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _amanda_favor_oral_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Минет")
+    click id ("choice_panel_button_%d" % int(_amanda_favor_oral_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (int(player.intimacy.came_today or 0) == 1 and renpy.get_screen("choice") is not None and "Закончить" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _amanda_favor_end_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
+    click id ("choice_panel_button_%d" % int(_amanda_favor_end_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (Amanda.attic_window_favor_stage == 3 and Amanda.attic_window_breakfast_bj_day == current_game_day()) timeout 5.0
+    assert eval ("долг между вами закрыт" in str(scene_runtime.text or "")) timeout 5.0
 '''
 
 
@@ -6726,6 +6782,7 @@ def main() -> int:
             "external_georgette_back_alley_not_visible_in_port_streets",
             "external_debug_builder_room_visual_surfaces",
             "external_amanda_room_night_bed_action_uses_thread_event",
+            "external_amanda_window_secret_favor_kitchen_event",
             "external_my_room_recipe_book_table_link",
             "external_my_room_window_day_night_amanda_pictures",
             "external_tavern_room_movement_resets_picture_state",
@@ -6892,6 +6949,7 @@ def main() -> int:
             "external_georgette_back_alley_not_visible_in_port_streets",
             "external_debug_builder_room_visual_surfaces",
             "external_amanda_room_night_bed_action_uses_thread_event",
+            "external_amanda_window_secret_favor_kitchen_event",
             "external_my_room_recipe_book_table_link",
             "external_my_room_window_day_night_amanda_pictures",
             "external_tavern_room_movement_resets_picture_state",

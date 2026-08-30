@@ -37,6 +37,14 @@ init -100 python:
         tractir_save_normalize_rooms()
         tractir_save_remove_owned_unique_items_from_rooms()
         tractir_save_clear_room_ui_cache()
+        amanda_obj = globals().get("Amanda")
+        if amanda_obj is not None and not hasattr(amanda_obj, "attic_window_favor_stage"):
+            if bool(getattr(amanda_obj, "attic_mock_exposed", False)) or people_to_int(getattr(amanda_obj, "attic_window_breakfast_bj_day", -1), -1) >= 0:
+                amanda_obj.attic_window_favor_stage = 3
+            elif people_to_int(getattr(amanda_obj, "attic_mock_response_day", -1), -1) >= 0:
+                amanda_obj.attic_window_favor_stage = 2
+            else:
+                amanda_obj.attic_window_favor_stage = 0
 
     def tractir_save_normalize_tavern_staff_jobs():
         for person in ("sandra", "melissa", "amanda"):

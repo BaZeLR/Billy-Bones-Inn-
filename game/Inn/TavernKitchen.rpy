@@ -449,6 +449,55 @@ label TavernKitchenShareTeaWithSandraAndBecky:
     return
 
 
+label story_amanda_kitchen_window_favor_0:
+    $ main_ui_begin_native_scene_state("Аманда: услуга за молчание")
+    $ Amanda.attic_window_favor_stage = 2
+    $ Amanda.attic_mock_stopped = True
+    vscene "images/amanda/kitchen_help.png"
+    $ scene_runtime.text = "Стоит вам спуститься на кухню, как Аманда перехватывает вас у самого входа и быстро отводит к краю очага, пока остальные не успели прислушаться. Она все еще краснеет после сцены у окна, но смотрит прямо.\n\n\"Ты ведь не станешь за завтраком рассказывать, чем я там занималась?\" тихо спрашивает она. Вы обещаете сохранить ее тайну, но напоминаете, что за такое молчание она остается должна вам одну услугу. Аманда кривит губы, затем коротко кивает: \"Ладно. Одну. Только без рассказов за столом.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+    menu:
+        "Предложить Аманде вернуть услугу сейчас":
+            call AmandaKitchenWindowFavorRepayment
+
+        "Оставить услугу за ней":
+            $ scene_runtime.text = "Вы отвечаете, что пока не станете торопить ее. Аманда заметно расслабляется, но ваш долг не оспаривает: \"Хорошо. Тогда сама скажешь, когда захочешь получить свое.\""
+            $ scene_runtime.location_text = scene_runtime.text
+            "[scene_runtime.text]"
+    $ main_ui_end_native_scene_state()
+    $ scene_runtime.picture = tavern_kitchen_picture() or rooms.get("TavernKitchen").bg_picture or None
+    return True
+
+
+label AmandaKitchenWindowFavorRepayment:
+    $ renpy.dynamic("_amanda_favor_came_before")
+    if int(Amanda.attic_window_favor_stage or 0) != 2:
+        $ scene_runtime.text = "Эта услуга между вами уже закрыта."
+        $ scene_runtime.location_text = scene_runtime.text
+        "[scene_runtime.text]"
+        return
+    if int(player.intimacy.came_today or 0) >= int(player.intimacy.can_cum_daily or 0):
+        $ scene_runtime.text = "Вы уже слишком вымотаны, чтобы требовать такую услугу сейчас. Аманда усмехается и напоминает, что долг никуда не делся."
+        $ scene_runtime.location_text = scene_runtime.text
+        "[scene_runtime.text]"
+        return
+    $ scene_runtime.text = "Вы киваете в сторону тихого угла кухни и предлагаете Аманде вернуть услугу так, чтобы ваш язык был занят чем-нибудь приятнее пересказа ее утреннего секрета. Она вспыхивает, но после короткой паузы согласно кивает."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+    $ _amanda_favor_came_before = int(player.intimacy.came_today or 0)
+    call IntAmandaSex("amanda", "kitchen", "minet")
+    if int(player.intimacy.came_today or 0) > int(_amanda_favor_came_before or 0):
+        $ Amanda.attic_window_favor_stage = 3
+        $ Amanda.attic_window_breakfast_bj_day = current_game_day()
+        $ scene_runtime.text = "Когда Аманда заканчивает, она быстро приводит себя в порядок и испытующе смотрит на вас. \"Все. Услугу вернула. А про окно за завтраком — ни слова,\" напоминает она. Теперь этот долг между вами закрыт."
+    else:
+        $ scene_runtime.text = "Вы все же не доводите дело до конца. Аманда поправляет одежду и пожимает плечами: раз услуга не получена, долг пока остается за ней."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+    return
+
+
 label TavernKitchenDepositMenu:
     $ renpy.dynamic("_deposit_row")
     $ main_ui_runtime.action_title = "Кладовые припасы"

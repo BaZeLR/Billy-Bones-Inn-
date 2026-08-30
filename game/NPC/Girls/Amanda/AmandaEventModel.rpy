@@ -171,6 +171,27 @@ init -24 python:
             )
 
 
+    class AmandaKitchenWindowFavorEvent(AmandaEvent):
+        def __init__(self):
+            super(AmandaKitchenWindowFavorEvent, self).__init__(
+                "kitchen_window_favor",
+                "story_amanda_kitchen_window_favor_0",
+                None,
+                None,
+                1,
+                "TavernKitchen",
+                "enter",
+                -20,
+                source_refs=["TavernAmandaRoom.rpy", "TavernKitchen.rpy"],
+            )
+
+        def checkAmandaConditions(self):
+            return (
+                int(Amanda.attic_window_favor_stage or 0) in (1, 2)
+                and not bool(player.tavern_management.breakfast.event_active)
+            )
+
+
     class AmandaBirthEvent(AmandaEvent):
         def __init__(self):
             super(AmandaBirthEvent, self).__init__(
@@ -253,6 +274,7 @@ init -24 python:
     AmandaGloryHoleTry = AmandaGloryHoleTryEvent()
     AmandaMorningWindowEpisode = AmandaMorningWindowEpisodeEvent()
     AmandaNightBowlWindow = AmandaNightBowlWindowEvent()
+    AmandaKitchenWindowFavor = AmandaKitchenWindowFavorEvent()
     AmandaBirth = AmandaBirthEvent()
     AmandaLegareTavernVisit = AmandaLegareTavernVisitEvent()
     AmandaStreetLegareSightingStreet = AmandaStreetLegareSightingEvent("StreetTavern")

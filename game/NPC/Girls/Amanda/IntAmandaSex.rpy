@@ -233,6 +233,11 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                             "[people_display_name(GirlNameASDS)], не забывая посматривать по сторонам, продолжает."
                         else:
                             "Вы расстегнули штаны. [people_display_name(GirlNameASDS)] метнула взгляд к выходу из переулка, убедилась что никого нет, опустилась перед вами на коленки и стала."
+                    elif GirlLocASDS == "kitchen":
+                        if Amanda.cock_in("mouth"):
+                            "Спрятавшись с вами в укромном углу кухни, [people_display_name(GirlNameASDS)] продолжает возвращать обещанную услугу."
+                        else:
+                            "Вы вместе отходите в укромный угол кухни. [people_display_name(GirlNameASDS)] еще раз убеждается, что никто не смотрит, опускается перед вами на колени и принимается возвращать обещанную услугу."
                     else:
                         if Amanda.cock_in("mouth"):
                             "Вы расселись на кровати и ловите кайф, в то время как [people_display_name(GirlNameASDS)] стоит перед вами на коленях и продолжает."

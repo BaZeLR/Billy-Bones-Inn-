@@ -232,6 +232,7 @@ def test_amanda_attic_breakfast_state_is_explicit_and_fall_stage_is_thread_owned
         "attic_mock_response_day",
         "attic_mock_stopped",
         "attic_mock_exposed",
+        "attic_window_favor_stage",
         "breakfast_tease_day",
     ):
         assert "self.%s =" % field_name in init_source
@@ -245,6 +246,31 @@ def test_amanda_attic_breakfast_state_is_explicit_and_fall_stage_is_thread_owned
     assert "Amanda.attic_mock_stopped" in breakfast_source
     assert "Amanda.attic_mock_exposed" in breakfast_source
     assert "Amanda.breakfast_tease_day" in breakfast_source
+
+
+def test_amanda_window_secret_favor_uses_one_object_stage_and_story_event():
+    init_source = _source(AMANDA_INIT)
+    event_model = _source(AMANDA_EVENT_MODEL)
+    runtime = _source(STORY_RUNTIME)
+    room = _source(TAVERN_AMANDA_ROOM)
+    kitchen = _source(PROJECT_ROOT / "game/Inn/TavernKitchen.rpy")
+    breakfast = _source(PROJECT_ROOT / "game/Inn/TavernKitchenBreakfast.rpy")
+    migration = _source(PROJECT_ROOT / "game/TractirSaveSync.rpy")
+
+    assert "self.attic_window_favor_stage = 0" in init_source
+    assert "class AmandaKitchenWindowFavorEvent(AmandaEvent):" in event_model
+    assert '"story_amanda_kitchen_window_favor_0"' in event_model
+    assert '"TavernKitchen"' in event_model and '"enter"' in event_model
+    assert '"KitchenWindowFavor"' in runtime
+    assert "AmandaKitchenWindowFavor" in runtime
+    assert "Amanda.attic_window_favor_stage = 1" in room
+    assert "label story_amanda_kitchen_window_favor_0:" in kitchen
+    assert 'call IntAmandaSex("amanda", "kitchen", "minet")' in kitchen
+    assert 'elif GirlLocASDS == "kitchen":' in _source(PROJECT_ROOT / "game/NPC/Girls/Amanda/IntAmandaSex.rpy")
+    assert "Amanda.attic_window_favor_stage = 3" in kitchen
+    assert "Amanda.attic_window_favor_stage = 3" in breakfast
+    assert 'not hasattr(amanda_obj, "attic_window_favor_stage")' in migration
+    assert "attic_window_favor_stage" not in _source(PROJECT_ROOT / "game/script.rpy")
 
 
 def test_amanda_v64_migration_discards_attic_mirror_and_consumes_breakfast_keys():

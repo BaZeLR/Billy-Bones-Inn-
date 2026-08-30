@@ -456,6 +456,8 @@ label story_amanda_room_morning_window_0:
     else:
         $ Amanda.change_social(friend_delta=1)
         $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда кусает губу, но все же качает головой. \"Не сейчас. Увидимся позже, если ты умеешь держать язык за зубами.\" На этом она быстро собирается и делает вид, будто вы разбудили ее самым обычным способом."
+    if int(Amanda.attic_window_favor_stage or 0) == 0:
+        $ Amanda.attic_window_favor_stage = 1
     $ scene_runtime.location_text = scene_runtime.text
     call stat
     $ _amanda_sleep_dress = tavern_amanda_room_sleep_dress()

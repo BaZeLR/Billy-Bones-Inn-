@@ -102,6 +102,7 @@ init python:
             self.attic_mock_response_day = -1
             self.attic_mock_stopped = False
             self.attic_mock_exposed = False
+            self.attic_window_favor_stage = 0
             self.breakfast_tease_day = -1
             self.warned_about_not_working = False
             self.pregnancy_risk_asked_today = False
