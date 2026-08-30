@@ -93,6 +93,16 @@ def test_friday_dance_public_menu_loops_without_reentering_the_room_label():
         assert retired_name not in source
 
 
+def test_amanda_mc_dance_owns_its_scene_instead_of_showing_market_description():
+    source = (GAME / "NPC" / "Girls" / "Amanda" / "IntAmandaDance.rpy").read_text(encoding="utf-8-sig")
+    scene = source.split("label story_amanda_friday_dance_mc_0:", 1)[1].split("label story_amanda_friday_dance_legare_0:", 1)[0]
+
+    assert '$ main_ui_begin_native_scene_state("Танец с Амандой")' in scene
+    assert '$ scene_runtime.text = ""' in scene
+    assert '$ scene_runtime.location_text = ""' in scene
+    assert "$ main_ui_end_native_scene_state()" in scene
+
+
 def test_friday_dance_featured_partners_follow_the_venue_schedule():
     amanda_rows = json.loads(AMANDA_SCHEDULE.read_text(encoding="utf-8-sig"))["entries"]
     becky_rows = json.loads(BECKY_SCHEDULE.read_text(encoding="utf-8-sig"))["entries"]

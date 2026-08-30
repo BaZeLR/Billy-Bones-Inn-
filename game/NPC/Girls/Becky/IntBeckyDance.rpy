@@ -4,6 +4,9 @@
 # ================================================================================
 
 label story_becky_friday_dance_mc_0:
+    $ main_ui_begin_native_scene_state("Танец с Бекки")
+    $ scene_runtime.text = ""
+    $ scene_runtime.location_text = ""
     vscene "images/market/LocFridayDance.jpg"
     $ rooms.get("FridayDance").becky_home_invited = False
     $ rooms.get("FridayDance").dance_count += 1
@@ -11,6 +14,7 @@ label story_becky_friday_dance_mc_0:
     call ShowImage("becky", "dance", "waiting_0.png")
     $ rooms.get("FridayDance").step = 1
     call int_becky_dance
+    $ main_ui_end_native_scene_state()
     return
 
 label int_becky_dance():
@@ -216,6 +220,7 @@ label int_becky_dance():
                     "Танец закончился и вы вернулись к колоннаде."
 
             "Принять предложение вдовы" if rooms.get("FridayDance").becky_home_invited:
+                $ main_ui_end_native_scene_state()
                 call becky_accept_home_invitation
                 return
 

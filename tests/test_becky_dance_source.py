@@ -38,6 +38,11 @@ def test_becky_friday_dance_uses_thread_event_and_object_state():
     assert "def dance_event_conditions_met(self, event_obj):" in init
 
     assert "label story_becky_friday_dance_mc_0:" in dance
+    becky_scene = dance.split("label story_becky_friday_dance_mc_0:", 1)[1].split("label int_becky_dance", 1)[0]
+    assert '$ main_ui_begin_native_scene_state("Танец с Бекки")' in becky_scene
+    assert '$ scene_runtime.text = ""' in becky_scene
+    assert '$ scene_runtime.location_text = ""' in becky_scene
+    assert "$ main_ui_end_native_scene_state()" in becky_scene
     assert 'rooms.get(\"FridayDance\").becky_home_invited = False' in dance
     assert dance.count('$ rooms.get(\"FridayDance\").dance_count += 1') == 1
     assert '$ rooms.get(\"FridayDance\").dance_count = 5' in dance
@@ -56,6 +61,9 @@ def test_becky_friday_dance_uses_thread_event_and_object_state():
     assert "BeckyVar" not in invite
     assert "setdefault" not in invite
     assert "Becky.update()" not in invite
+
+    accept_branch = dance.split('"Принять предложение вдовы"', 1)[1].split('"Отойти"', 1)[0]
+    assert accept_branch.index("main_ui_end_native_scene_state()") < accept_branch.index("call becky_accept_home_invitation")
 
 
 def test_becky_dance_preserves_reference_choices():

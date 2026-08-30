@@ -3805,7 +3805,9 @@ testcase external_friday_public_amanda_button_starts_dance:
     $ _friday_amanda_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Найти Аманду")
     click id ("choice_panel_button_%d" % int(_friday_amanda_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
     assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1) timeout 5.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.text or "") == "" and str(scene_runtime.location_text or "") == "") timeout 5.0
     click pos (960, 560) until eval (renpy.get_screen("choice") is not None and "Пригласить потанцевать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval ("images/amanda/dance/" in str(scene_runtime.picture or "").lower()) timeout 5.0
     $ _friday_amanda_invite_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Пригласить потанцевать")
     click id ("choice_panel_button_%d" % int(_friday_amanda_invite_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
@@ -3836,7 +3838,9 @@ testcase external_friday_public_becky_button_starts_dance:
     $ _friday_becky_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Найти Бекки Блэнкеншип")
     click id ("choice_panel_button_%d" % int(_friday_becky_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
     assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1) timeout 5.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.text or "") == "" and str(scene_runtime.location_text or "") == "") timeout 5.0
     click pos (960, 560) until eval (renpy.get_screen("choice") is not None and "Пригласить потанцевать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval ("images/becky/dance/" in str(scene_runtime.picture or "").lower()) timeout 5.0
     $ _friday_becky_invite_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Пригласить потанцевать")
     click id ("choice_panel_button_%d" % int(_friday_becky_invite_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0

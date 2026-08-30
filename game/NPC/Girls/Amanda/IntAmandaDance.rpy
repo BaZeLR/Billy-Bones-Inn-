@@ -6,6 +6,9 @@
 # To be called from FridayDance or related event chains.
 
 label story_amanda_friday_dance_mc_0:
+    $ main_ui_begin_native_scene_state("Танец с Амандой")
+    $ scene_runtime.text = ""
+    $ scene_runtime.location_text = ""
     vscene "images/market/LocFridayDance.jpg"
     $ Amanda.dancing_with_legare = False
     $ rooms.get("FridayDance").dance_count += 1
@@ -13,6 +16,7 @@ label story_amanda_friday_dance_mc_0:
     call ShowImage("amanda", "dance", "wait" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/IntAmandaDance.rpy:procedural_randint:14:1")))
     $ rooms.get("FridayDance").step = 1
     call IntAmandaDance
+    $ main_ui_end_native_scene_state()
     return
 
 label story_amanda_friday_dance_legare_0:
