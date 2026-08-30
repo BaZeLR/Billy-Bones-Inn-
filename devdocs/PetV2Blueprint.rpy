@@ -298,7 +298,6 @@ init python:
                 story_defaults={
                     "mode": "wild",
                     "rats_problem_active": 0,
-                    "rat_breakfast_seen": 0,
                     "adoption_breakfast_seen": 0,
                     "woods_exploration": 0,
                     "tracks_seen": 0,

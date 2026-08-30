@@ -17,12 +17,27 @@ init -100 python:
     def beforeLoadTractirSave():
         ensure_game_item_registry()
 
+    def tractir_save_normalize_werecat_intro_thread():
+        state = werecat_state()
+        if not isinstance(state, dict) or "rat_breakfast_seen" not in state:
+            return
+        state.pop("rat_breakfast_seen", None)
+        werecat_thread = globals().get("threads", {}).get("melissaWerecatProblem")
+        if werecat_thread is None:
+            return
+        old_stage = people_to_int(getattr(werecat_thread, "num", 0), 0)
+        if old_stage < 2 and int(state.get("rats_problem_active", 0) or 0) == 0:
+            werecat_thread.advanceTo(2)
+        elif old_stage == 1:
+            werecat_thread.advanceTo(0)
+
     def tractir_save_patch_loaded_state():
         ensure_game_item_registry()
         people.repair()
         rooms.repair()
         household.repair()
         tractir_save_normalize_tavern_staff_jobs()
+        tractir_save_normalize_werecat_intro_thread()
         calendar_v2.time_advance_blocked = 0
         legacy_current_day = globals().pop("CurDay", None)
         next_day_runtime.update()

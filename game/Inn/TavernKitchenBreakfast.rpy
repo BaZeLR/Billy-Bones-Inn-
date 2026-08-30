@@ -927,11 +927,14 @@ init python:
         lines = []
         present_ids = tavern_breakfast_present_ids()
         lines.extend(list(tavern_breakfast_relaxed_appearance_lines() or []))
-        rat_problem = int(werecat_state().get("rats_problem_active", 0) or 0) == 1 or int(next_day_runtime.current_day.get("rat_food_loss", 0) or 0) > 0
+        rat_problem = int(werecat_state().get("rats_problem_active", 0) or 0) == 1
         bats_stage = int(threads["melissaBatProblem"].num or 0)
 
         if "sandra" in present_ids:
-            lines.append("Сандра ставит миски так, будто гвозди забивает. \"Жуйте быстрее. Крысы сами из кладовой не уйдут, пол сам себя не вымоет, а гости с пустыми кружками ждать не любят.\"")
+            if rat_problem:
+                lines.append("Сандра ставит миски так, будто гвозди забивает. \"Жуйте быстрее. Крысы сами из кладовой не уйдут, пол сам себя не вымоет, а гости с пустыми кружками ждать не любят.\"")
+            else:
+                lines.append("Сандра ставит миски так, будто гвозди забивает. \"Жуйте быстрее. Пол сам себя не вымоет, а гости с пустыми кружками ждать не любят.\"")
             lines.append("Она ворчит, что трактир держится не на красивых речах, а на том, кто утром поднял задницу раньше прочих.")
             if rat_problem:
                 lines.append("\"И еще раз говорю: у нас крысиная беда,\" бросает Сандра. \"Если эти твари опять доберутся до мешков, я кому-нибудь этой кашей прямо в уши налью.\"")
@@ -950,9 +953,10 @@ init python:
                 lines.append("Стоит за столом всплыть слову \"чердак\", как Аманда многозначительно тянет: \"Главное, Стефан, теперь не падать сверху в чужие комнаты без стука.\" Мелисса тут же фыркает, но уголки ее губ все равно дрожат.")
         if "amanda" in present_ids:
             lines.append("Аманда ест быстро, но все равно успевает строить рожи и цеплять всех подряд, будто завтрак без подколок ей в горло не лезет.")
-            lines.append("\"Крысы?\" Аманда пожимает плечом. \"Нужна кошечка. Только не простая. Есть одна такая, благородная, коготки чистые, носик вверх... Может, Клариссу в кладовую запереть?\"")
-            if rat_problem and "sandra" in present_ids:
-                lines.append("Сандра смотрит на нее так, что Аманда сразу утыкается в миску. \"Еще раз про чужих кошечек за столом мяукнешь, сама полезешь к крысам с веником.\"")
+            if rat_problem:
+                lines.append("\"Крысы?\" Аманда пожимает плечом. \"Нужна кошечка. Только не простая. Есть одна такая, благородная, коготки чистые, носик вверх... Может, Клариссу в кладовую запереть?\"")
+                if "sandra" in present_ids:
+                    lines.append("Сандра смотрит на нее так, что Аманда сразу утыкается в миску. \"Еще раз про чужих кошечек за столом мяукнешь, сама полезешь к крысам с веником.\"")
         if "sandra" in present_ids and "melissa" in present_ids and "amanda" in present_ids and (rat_problem or bats_stage >= 3):
             lines.append("Когда разговор снова съезжает на ночные шорохи и девичьи комнаты, Аманда хихикает слишком грязно, а Мелисса краснеет не вовремя. Сандра хлопает ладонью по столу: \"Пальцы из кисок вынули обе. Самоуспокоение закончится тем, что брат Герхард устроит вам дьявольское покаяние, а этого в доме никто не хочет.\"")
         if "becky" in present_ids:
@@ -1194,7 +1198,9 @@ label TavernKitchenBreakfastShowText(text=""):
     $ scene_runtime.text = str(text or "")
     $ scene_runtime.location_text = scene_runtime.text
     $ tavern_kitchen_set_saved_text(scene_runtime.text)
-    "[scene_runtime.text]"
+    menu:
+        "Продолжить":
+            pass
     return
 
 
@@ -1243,7 +1249,6 @@ label TavernKitchenBreakfastAmandaAtticMock:
     $ Amanda.attic_mock_response_day = current_game_day()
     $ scene_runtime.text = "Стоит за завтраком снова всплыть слову \"чердак\", Аманда тут же цепляет вас взглядом и слишком невинно спрашивает, не собираетесь ли вы опять падать туда, куда приличные люди хотя бы стучатся."
     $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
     menu:
         "Рассказать всем, что вы видели у окна Аманды":
             jump TavernKitchenBreakfastAmandaAtticExpose
@@ -1422,7 +1427,6 @@ label TavernKitchenBreakfastMorningIssue:
     $ scene_runtime.location_text = scene_runtime.text
     $ _breakfast_issue_code = str(household_morning_issue_type(_breakfast_issue_girl) or "").strip()
     $ _breakfast_issue_name = _action_display_name(_breakfast_issue_girl)
-    "[scene_runtime.text]"
     menu:
         "Проверить, не притворяется ли Аманда" if _breakfast_issue_girl == "amanda" and _breakfast_issue_code == "sick":
             call HouseholdAmandaFakeSicknessWake
@@ -1592,7 +1596,6 @@ label TavernKitchenBreakfastDanceMenu:
     $ renpy.dynamic("_dance_text")
     $ _dance_text = "За столом приходится быстро решить, готовы ли вы вложиться в пятничные танцы вином и закуской или пока отступите."
     $ tavern_breakfast_restore_ui_state(_dance_text)
-    "[_dance_text]"
     menu:
         "Отправить вино и начать готовить закуску" if wine_for_dance_can_sponsor():
             call WineForDanceOutcome(1)

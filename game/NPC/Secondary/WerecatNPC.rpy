@@ -5,7 +5,6 @@ init -8 python:
     def werecat_story_defaults():
         return {
             "rats_problem_active": 1,
-            "rat_breakfast_seen": 0,
             "adoption_breakfast_seen": 0,
             "woods_exploration": 0,
             "tracks_seen": 0,

@@ -436,10 +436,16 @@ def test_melissa_werecat_event_labels_own_their_scenes_and_thread_advancement():
     werecat_source = WERECAT_QUEST.read_text(encoding="utf-8-sig")
 
     intro_block = event_source.split("label story_melissa_werecat_intro_0:", 1)[1].split("\nlabel ", 1)[0]
+    assert 'vscene MelissaStaticData.image_path("bats", "sleepless")' in intro_block
+    assert 'vscene MelissaStaticData.image_path("bats", "yawns")' in intro_block
     assert 'vscene "images/kitchen/need_kitty_1.png"' in intro_block
     assert 'vscene "images/kitchen/need_kitty_2.png"' in intro_block
+    assert intro_block.index('"sleepless"') < intro_block.index('"yawns"')
+    assert intro_block.index('"yawns"') < intro_block.index("need_kitty_1.png")
     assert intro_block.index("need_kitty_1.png") < intro_block.index("need_kitty_2.png")
-    assert intro_block.count('"Продолжить":') == 2
+    assert intro_block.count('"Продолжить":') == 4
+    assert '"Закончить завтрак":' in intro_block
+    assert '"rat_breakfast_seen"' not in intro_block
     assert "vscene tavern_kitchen_breakfast_picture()" not in intro_block
 
     for label_name in (
@@ -456,6 +462,22 @@ def test_melissa_werecat_event_labels_own_their_scenes_and_thread_advancement():
     ):
         assert f"call {wrapper_name}" not in event_source
         assert f"label {wrapper_name}:" not in werecat_source
+
+
+def test_werecat_intro_thread_stage_is_the_only_breakfast_progress_owner():
+    runtime_source = (PROJECT_ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
+    owner_source = (PROJECT_ROOT / "game/NPC/Secondary/WerecatNPC.rpy").read_text(encoding="utf-8-sig")
+    migration_source = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
+    thread_block = runtime_source.split('LThreadData(0, "melissa", "WerecatProblem", None, [', 1)[1].split(
+        "    ], highlight=False, threaded=True),", 1
+    )[0]
+
+    assert thread_block.index('"story_melissa_werecat_intro_0"') < thread_block.index('"story_melissa_werecat_rumor_0"')
+    assert '"TavernKitchen"' in thread_block
+    assert '"HunterClub"' in thread_block
+    assert '"rat_breakfast_seen"' not in runtime_source
+    assert '"rat_breakfast_seen"' not in owner_source
+    assert 'state.pop("rat_breakfast_seen", None)' in migration_source
 
 
 def test_melissa_bat_breakfast_has_one_authored_finish_and_no_second_hub():

@@ -1586,7 +1586,6 @@ testcase external_breakfast_window_and_call_all_click:
     $ Melissa.storage_rat_help_day = -1
     $ threads["melissaBatProblem"].advanceTo(threads["melissaBatProblem"].data.length, complete_at_end=True)
     $ werecat_state()["rats_problem_active"] = 0
-    $ werecat_state()["rat_breakfast_seen"] = 1
     $ werecat_state()["adoption_breakfast_seen"] = 1
     $ people.get_data("sandra").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
     $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
@@ -1623,7 +1622,6 @@ testcase external_breakfast_entry_paragraph_continue_beats:
     $ Melissa.storage_rat_help_day = -1
     $ threads["melissaBatProblem"].advanceTo(threads["melissaBatProblem"].data.length, complete_at_end=True)
     $ werecat_state()["rats_problem_active"] = 0
-    $ werecat_state()["rat_breakfast_seen"] = 1
     $ werecat_state()["adoption_breakfast_seen"] = 1
     $ people.get_data("sandra").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
     $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
@@ -2778,8 +2776,7 @@ testcase external_melissa_werecat_thread_condition_sequence:
     $ player.tavern_management.breakfast.event_active = False
     $ Melissa.initialize_new_game_state()
     $ Melissa.storage_rat_help_day = -1
-    $ werecat_state()["rats_problem_active"] = 0
-    $ werecat_state()["rat_breakfast_seen"] = 0
+    $ werecat_state()["rats_problem_active"] = 1
     $ werecat_state()["hunter_tease_day"] = -1
     $ werecat_state()["adopted"] = 0
     $ werecat_state()["adopted_count"] = 0
@@ -2796,8 +2793,8 @@ testcase external_melissa_werecat_thread_condition_sequence:
     $ initStoryEventRuntime(True)
     $ findAvailableEvents(True)
     assert eval (threads["melissaRatProblem"].currentTarget() == "story_melissa_storage_rat_0") timeout 5.0
-    assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_rumor_0") timeout 5.0
-    assert eval (not threads["melissaWerecatProblem"].checkActive()) timeout 5.0
+    assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_intro_0") timeout 5.0
+    assert eval (threads["melissaWerecatProblem"].checkActive()) timeout 5.0
     $ _rat_evt = threads["melissaRatProblem"].getevent(0)
     $ _rat_check_fields = [str(row.get("field", "") or "") for row in _rat_evt.auditChecks(threads["melissaRatProblem"].day)]
     assert eval (int(Melissa.storage_rat_help_day or -1) < 0) timeout 5.0
@@ -2814,44 +2811,12 @@ testcase external_melissa_werecat_thread_condition_sequence:
     assert eval (_rat_check_map.get("location_open", False)) timeout 5.0
     assert eval (story_event_available("TavernStorage", "enter")) timeout 5.0
 
-    $ Melissa.storage_rat_help_day = current_game_day()
-    $ Melissa.temp_room_code = ""
-    $ werecat_state()["rats_problem_active"] = 1
-    $ threads["melissaRatProblem"].advance()
-    $ external_calendar_set_fields(3, 1, 1100, 8, 0)
-    $ rooms.enter("HunterClub")
-    $ event_runtime.evaluation_time = None
-    $ initStoryEventRuntime(True)
-    $ findAvailableEvents(True)
-    assert eval (threads["melissaRatProblem"].completed) timeout 5.0
-    assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_rumor_0") timeout 5.0
-    $ _rumor_evt = threads["melissaWerecatProblem"].getevent(0)
-    $ _rumor_check_map = {str(row.get("field", "") or ""): bool(row.get("ok", False)) for row in _rumor_evt.auditChecks(threads["melissaWerecatProblem"].day)}
-    assert eval (_rumor_check_map.get("day", False)) timeout 5.0
-    assert eval (_rumor_check_map.get("hour", False)) timeout 5.0
-    assert eval (_rumor_check_map.get("delay", False)) timeout 5.0
-    assert eval (_rumor_check_map.get("requirements", False)) timeout 5.0
-    assert eval (_rumor_check_map.get("conditions", False)) timeout 5.0
-    assert eval (_rumor_check_map.get("location_open", False)) timeout 5.0
-    assert eval (story_event_available("HunterClub", "overheard")) timeout 5.0
-
-    $ event_runtime.active_thread = threads["melissaWerecatProblem"]
-    $ event_runtime.active_thread.setDay()
-    run Call("story_melissa_werecat_rumor_0")
-    assert eval (int(werecat_state().get("hunter_tease_day", -1) or -1) == current_game_day()) timeout 5.0
-    advance until eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_intro_0") timeout 10.0
-    assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_intro_0") timeout 5.0
-
-    $ external_calendar_set_fields(3, 1, 1100, 7, 0)
     $ rooms.enter("TavernKitchen")
     $ player.tavern_management.breakfast.today = False
     $ event_runtime.evaluation_time = None
     $ initStoryEventRuntime(True)
     $ findAvailableEvents(True)
-    assert eval (rooms.get("TavernKitchen").is_open()) timeout 5.0
-    assert eval (rooms.get("TavernKitchen") is rooms.get("TavernKitchen")) timeout 5.0
-    assert eval (rooms.get("TavernKitchen").is_open()) timeout 5.0
-    $ _intro_evt = threads["melissaWerecatProblem"].getevent(1)
+    $ _intro_evt = threads["melissaWerecatProblem"].getevent(0)
     $ _intro_check_map = {str(row.get("field", "") or ""): bool(row.get("ok", False)) for row in _intro_evt.auditChecks(threads["melissaWerecatProblem"].day)}
     assert eval (_intro_check_map.get("day", False)) timeout 5.0
     assert eval (_intro_check_map.get("hour", False)) timeout 5.0
@@ -2865,15 +2830,56 @@ testcase external_melissa_werecat_thread_condition_sequence:
     $ event_runtime.active_thread.setDay()
     run Call("story_melissa_werecat_intro_0")
     advance until screen "choice" timeout 10.0
-    assert eval (str(scene_runtime.picture or "") == "images/kitchen/need_kitty_1.png") timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/melissa/bats/sleepless.png") timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and str(scene_runtime.picture or "") == "images/melissa/bats/yawns.png") timeout 10.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and str(scene_runtime.picture or "") == "images/kitchen/need_kitty_1.png") timeout 10.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval (renpy.get_screen("choice") is not None and str(scene_runtime.picture or "") == "images/kitchen/need_kitty_2.png") timeout 10.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закончить завтрак"]) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_rumor_0") timeout 10.0
+    assert eval ("rat_breakfast_seen" not in werecat_state()) timeout 5.0
+    assert eval (not player.tavern_management.breakfast.event_active and player.tavern_management.breakfast.present_ids is None) timeout 5.0
+
+    $ Melissa.storage_rat_help_day = current_game_day()
+    $ Melissa.temp_room_code = ""
+    $ threads["melissaRatProblem"].advance()
+    $ external_calendar_set_fields(3, 1, 1100, 8, 0)
+    $ rooms.enter("HunterClub")
+    $ event_runtime.evaluation_time = None
+    $ initStoryEventRuntime(True)
+    $ findAvailableEvents(True)
+    assert eval (threads["melissaRatProblem"].completed) timeout 5.0
+    assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_rumor_0") timeout 5.0
+    $ _rumor_evt = threads["melissaWerecatProblem"].getevent(1)
+    $ _rumor_check_map = {str(row.get("field", "") or ""): bool(row.get("ok", False)) for row in _rumor_evt.auditChecks(threads["melissaWerecatProblem"].day)}
+    assert eval (_rumor_check_map.get("day", False)) timeout 5.0
+    assert eval (_rumor_check_map.get("hour", False)) timeout 5.0
+    assert eval (_rumor_check_map.get("delay", False)) timeout 5.0
+    assert eval (_rumor_check_map.get("requirements", False)) timeout 5.0
+    assert eval (_rumor_check_map.get("conditions", False)) timeout 5.0
+    assert eval (_rumor_check_map.get("location_open", False)) timeout 5.0
+    assert eval (story_event_available("HunterClub", "overheard")) timeout 5.0
+
+    $ event_runtime.active_thread = threads["melissaWerecatProblem"]
+    $ event_runtime.active_thread.setDay()
+    run Call("story_melissa_werecat_rumor_0")
+    assert eval (int(werecat_state().get("hunter_tease_day", -1) or -1) == current_game_day()) timeout 5.0
     advance until eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_home_0") timeout 10.0
-    assert eval (int(werecat_state().get("rat_breakfast_seen", 0) or 0) == 1) timeout 5.0
     assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_home_0") timeout 5.0
+
+    $ werecat_state()["rats_problem_active"] = 0
+    $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
+    $ _solved_rat_breakfast_lines = tavern_breakfast_dialogue_lines()
+    assert eval (not any("Нужна кошечка" in str(row or "") for row in _solved_rat_breakfast_lines)) timeout 5.0
+    assert eval (not any("Крысы сами из кладовой" in str(row or "") for row in _solved_rat_breakfast_lines)) timeout 5.0
 
     $ werecat_state()["adopted"] = 1
     $ werecat_state()["adopted_count"] = 1
@@ -2901,6 +2907,25 @@ testcase external_melissa_werecat_thread_condition_sequence:
     run Jump("TavernKitchen")
     advance until eval (int(werecat_state().get("adoption_breakfast_seen", 0) or 0) == 1) timeout 20.0
     assert eval (int(werecat_state().get("adoption_breakfast_seen", 0) or 0) == 1) timeout 5.0
+
+testcase external_werecat_intro_load_migration:
+    run Call("InitGameNPCs")
+    $ threads.clear()
+    $ initStoryEventRuntime(True)
+    $ werecat_state()["rats_problem_active"] = 1
+    $ werecat_state()["hunter_tease_day"] = current_game_day()
+    $ werecat_state()["rat_breakfast_seen"] = 0
+    $ threads["melissaWerecatProblem"].advanceTo(1, force_active=True)
+    $ tractir_save_normalize_werecat_intro_thread()
+    assert eval ("rat_breakfast_seen" not in werecat_state()) timeout 5.0
+    assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_intro_0") timeout 5.0
+
+    $ werecat_state()["rats_problem_active"] = 0
+    $ werecat_state()["rat_breakfast_seen"] = 1
+    $ threads["melissaWerecatProblem"].advanceTo(1, force_active=True)
+    $ tractir_save_normalize_werecat_intro_thread()
+    assert eval ("rat_breakfast_seen" not in werecat_state()) timeout 5.0
+    assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_home_0") timeout 5.0
 '''
 
 
@@ -2917,7 +2942,6 @@ testcase external_melissa_werecat_forest_actions_rebuild:
     $ ForestReturnTarget = "StreetTavern"
     $ ForestSavedText = ""
     $ werecat_state()["rats_problem_active"] = 1
-    $ werecat_state()["rat_breakfast_seen"] = 1
     $ werecat_state()["hunter_tease_day"] = current_game_day()
     $ werecat_state()["adopted"] = 0
     $ werecat_state()["adopted_count"] = 0
@@ -7178,6 +7202,7 @@ def main() -> int:
             "external_melissa_recipe_unlock_single_authority",
             "external_melissa_werecat_forest_actions_rebuild",
             "external_melissa_werecat_thread_condition_sequence",
+            "external_werecat_intro_load_migration",
             "external_church_service_action_links_work",
             "external_liza_identity_save_migration",
             "external_georgett_liza_church_after_sermon_events",
@@ -7354,6 +7379,7 @@ def main() -> int:
             "external_melissa_recipe_unlock_single_authority",
             "external_melissa_werecat_forest_actions_rebuild",
             "external_melissa_werecat_thread_condition_sequence",
+            "external_werecat_intro_load_migration",
             "external_church_service_action_links_work",
             "external_liza_identity_save_migration",
             "external_georgett_liza_church_after_sermon_events",

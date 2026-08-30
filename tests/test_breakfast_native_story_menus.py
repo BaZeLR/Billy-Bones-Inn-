@@ -42,6 +42,9 @@ def test_breakfast_hub_has_one_native_choice_authority_without_paging_state():
     assert "TavernKitchenBreakfastTextPage" not in source
     assert "return_label" not in show_text
     assert "jump expression" not in show_text
+    assert '"[scene_runtime.text]"' not in show_text
+    assert '"Продолжить":' in show_text
+    assert "\n    menu:\n" in show_text
     assert "\n    return\n" in show_text
 
     player_source = (ROOT / "game/Utilities/General/Player/Player.rpy").read_text(encoding="utf-8-sig")
@@ -87,3 +90,16 @@ def test_melissa_amanda_breakfast_story_replaces_each_paragraph_in_main_ui():
     assert "\\n\\n" not in response
     assert opening.count('"Продолжить":') == 1
     assert response.count('"Продолжить":') == 1
+
+
+def test_solved_rat_problem_cannot_emit_breakfast_kitty_dialogue():
+    source = SOURCE.read_text(encoding="utf-8-sig")
+    dialogue = source.split("def tavern_breakfast_dialogue_lines():", 1)[1].split(
+        "def tavern_breakfast_apply_social_bonus():", 1
+    )[0]
+
+    assert 'rat_problem = int(werecat_state().get("rats_problem_active", 0) or 0) == 1' in dialogue
+    assert 'next_day_runtime.current_day.get("rat_food_loss"' not in dialogue
+    kitty_line = 'lines.append("\\\"Крысы?\\\" Аманда пожимает плечом.'
+    assert kitty_line in dialogue
+    assert dialogue.index("if rat_problem:", dialogue.index('if "amanda" in present_ids:')) < dialogue.index(kitty_line)

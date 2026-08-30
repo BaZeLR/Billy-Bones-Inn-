@@ -118,7 +118,6 @@ that number in `NPC.var["arc_stage"]` or another progress map.
 
 NPC/system fields record facts that the thread does not contain, for example:
 
-- `Werecat.var["rat_breakfast_seen"]`: a one-shot outcome used outside its thread;
 - `Werecat.var["adopted_count"]`: a repeatable gameplay counter;
 - `Melissa.var["temp_room"]`: the temporary room selected by the player;
 - `Melissa.var["roof_repair_complete_day"]`: the day a timed repair completes.

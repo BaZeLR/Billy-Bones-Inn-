@@ -33,7 +33,10 @@ def test_reports_and_progress_have_aggregate_runtime_owners():
     assert 'renpy.dynamic("visitorshappy"' in runtime
     assert "$ CurDay = next_day_runtime.current_day" in runtime
     breakfast = (ROOT / "game/Inn/TavernKitchenBreakfast.rpy").read_text(encoding="utf-8-sig")
-    assert 'next_day_runtime.current_day.get("rat_food_loss", 0)' in breakfast
+    next_day = (ROOT / "game/Utilities/Time/NextDay_TavernDaily.rpy").read_text(encoding="utf-8-sig")
+    assert "CurDay['rat_food_loss']" in next_day
+    assert 'next_day_runtime.current_day.get("rat_food_loss", 0)' not in breakfast
+    assert 'werecat_state().get("rats_problem_active", 0)' in breakfast
     assert "class TractirProgressRuntimeState" in runtime
     assert "default tractir_progress = TractirProgressRuntimeState()" in runtime
     assert "self.maid_revenge_ready = False" in runtime

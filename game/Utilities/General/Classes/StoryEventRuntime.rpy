@@ -190,7 +190,21 @@ define melissaThreadList = [
     #
     # melissa_werecat_problem
     #
-    LThreadData(0, "melissa", "WerecatProblem", "melissaRatProblem_0", [
+    LThreadData(0, "melissa", "WerecatProblem", None, [
+        (
+            "story_melissa_werecat_intro_0",
+            (1, 7), (6, 7), None,
+            1,
+            None,
+            [
+                "#int(werecat_state().get('rats_problem_active', 0) or 0) == 1",
+                "#not bool(player.tavern_management.breakfast.today)",
+            ],
+            None,
+            "TavernKitchen",
+            "enter",
+            0,
+        ),
         (
             "story_melissa_werecat_rumor_0",
             None, None, None,
@@ -207,22 +221,6 @@ define melissaThreadList = [
             None,
             "HunterClub",
             "overheard",
-            0,
-        ),
-        (
-            "story_melissa_werecat_intro_0",
-            (1, 7), (6, 7), None,
-            1,
-            None,
-            [
-                "#int(werecat_state().get('rats_problem_active', 0) or 0) == 1",
-                "#int(werecat_state().get('rat_breakfast_seen', 0) or 0) == 0",
-                "#int(werecat_state().get('hunter_tease_day', -1) or -1) >= 0",
-                "#not bool(player.tavern_management.breakfast.today)",
-            ],
-            None,
-            "TavernKitchen",
-            "enter",
             1,
         ),
         (

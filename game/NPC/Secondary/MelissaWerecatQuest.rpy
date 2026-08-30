@@ -75,15 +75,6 @@ init -1 python:
             and not bool(player.tavern_management.breakfast.today)
         )
 
-    def werecat_rat_breakfast_ready():
-        return (
-            int(werecat_state().get("rats_problem_active", 0) or 0) == 1
-            and int(werecat_state().get("rat_breakfast_seen", 0) or 0) == 0
-            and people_to_int(Melissa.storage_rat_help_day, -1) >= 0
-            and day_delta_ready(Melissa.storage_rat_help_day, 1)
-            and not bool(player.tavern_management.breakfast.today)
-        )
-
     def werecat_hunter_tease_ready():
         if werecat_first_home_exists():
             return False

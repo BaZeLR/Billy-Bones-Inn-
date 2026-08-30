@@ -164,21 +164,22 @@ class MelissaThreadEventModelTest(unittest.TestCase):
         self.assertEqual(
             [event.target for event in werecat_thread.events],
             [
-                "story_melissa_werecat_rumor_0",
                 "story_melissa_werecat_intro_0",
+                "story_melissa_werecat_rumor_0",
                 "story_melissa_werecat_home_0",
                 "story_melissa_werecat_home_1",
             ],
         )
         self.assertIn("melissaRatProblem_0", self.source)
         self.assertNotIn("melissaRatSolution", self.source)
-        self.assertEqual(werecat_thread.cond, "melissaRatProblem_0")
+        self.assertIsNone(werecat_thread.cond)
         self.assertEqual(bat_thread.cond, "melissaRatProblem_0")
 
     def test_rat_problem_is_active_from_new_game_but_werecat_tracking_waits_for_cleanup(self):
         self.assertIn('"rats_problem_active": 1', self.werecat_owner_source)
         self.assertIn('"rat_food_loss_next_day": 7', self.werecat_owner_source)
         self.assertIn('people_to_int(Melissa.storage_rat_help_day, -1) >= 0', self.melissa_werecat_source)
+        self.assertNotIn('"rat_breakfast_seen"', self.werecat_owner_source)
 
     def test_melissa_event_targets_are_existing_runtime_labels(self):
         problems = []
