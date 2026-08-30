@@ -62,3 +62,28 @@ def test_breakfast_entry_shows_one_paragraph_per_continue_beat():
     assert '_breakfast_lines.append(str(_eat_result.get("text", "") or "").strip())' in entry
     assert '_breakfast_lines.append("\u0421\u043e\u0432\u043c\u0435\u0441\u0442\u043d\u044b\u0439 \u0437\u0430\u0432\u0442\u0440\u0430\u043a' in entry
     assert 'player.tavern_management.breakfast.base_text = str(scene_runtime.text or "")' in entry
+
+
+def test_melissa_amanda_breakfast_story_replaces_each_paragraph_in_main_ui():
+    source = SOURCE.read_text(encoding="utf-8-sig")
+    opening = _label_block(
+        source,
+        "TavernKitchenBreakfastMelissaAmandaGerhard:",
+        "TavernKitchenBreakfastMelissaAmandaGerhardNatural:",
+    )
+    response = _label_block(
+        source,
+        "TavernKitchenBreakfastMelissaAmandaGerhardNatural:",
+        "TavernKitchenBreakfastAmandaAtticStop:",
+    )
+
+    assert "_breakfast_story_lines[_breakfast_story_line_index]" in opening
+    assert "_breakfast_response_lines[_breakfast_response_line_index]" in response
+    assert "while _breakfast_story_line_index < len(_breakfast_story_lines):" in opening
+    assert "while _breakfast_response_line_index < len(_breakfast_response_lines):" in response
+    assert '"[scene_runtime.text]"' not in opening
+    assert '"[scene_runtime.text]"' not in response
+    assert "\\n\\n" not in opening
+    assert "\\n\\n" not in response
+    assert opening.count('"Продолжить":') == 1
+    assert response.count('"Продолжить":') == 1

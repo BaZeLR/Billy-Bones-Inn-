@@ -1504,8 +1504,23 @@ testcase external_breakfast_angry_amanda_melissa_mockery:
     $ threads["melissaBatProblem"].advanceTo(3)
     $ player.tavern_management.breakfast.melissa_amanda_gerhard_day = -1
     run Call("TavernKitchenBreakfastMelissaAmandaGerhard")
-    advance until screen "say" timeout 10.0
+    advance until screen "choice" timeout 10.0
     assert eval (str(scene_runtime.picture or "") == BREAKFAST_GIRLS_TEASE_PICTURE) timeout 5.0
+    assert eval (renpy.get_screen("say") is None and str(scene_runtime.text or "").startswith("Завтрак еще не успевает")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.text or "").startswith("\"Крысы лезут")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.text or "").startswith("Мелисса тут же подхватывает")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.text or "").startswith("Аманда усмехается")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.text or "").startswith("Мелисса фыркает")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.text or "").startswith("\"Хватит мне ваших")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Сказать, что сначала надо решить крыс и чердак", "Не лезть в девичью перепалку"]) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.text or "").startswith("Вы обрываете спор")) timeout 10.0
+    assert eval (renpy.get_screen("say") is None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.text or "").startswith("Сандра хмуро кивает")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.text or "").startswith("Аманда закатывает глаза")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.text or "").startswith("Сандра под конец")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 10.0
+    assert eval (int(player.tavern_management.breakfast.melissa_amanda_gerhard_day) == int(current_game_day() or 0)) timeout 5.0
 testcase external_sandra_weekly_visit_native_beats:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
