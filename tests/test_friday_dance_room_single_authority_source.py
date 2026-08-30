@@ -14,6 +14,7 @@ AMANDA_INFO = GAME / "NPC" / "Girls" / "Amanda" / "InitAmanda.rpy"
 BECKY_INFO = GAME / "NPC" / "Girls" / "Becky" / "InitBecky.rpy"
 ROOM_TEMPLATE = GAME / "Utilities" / "General" / "Classes" / "RoomTemplate.rpy"
 PEOPLE_RUNTIME = GAME / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
+MARKETPLACE = GAME / "Town" / "Market" / "MarketPlace.rpy"
 
 
 def _live_runtime_source():
@@ -91,6 +92,27 @@ def test_friday_dance_public_menu_loops_without_reentering_the_room_label():
     assert "python hide:" in source
     for retired_name in ("GirlsCounter", "CurrentActions", "AddDancePhraseTmp"):
         assert retired_name not in source
+
+
+def test_fifth_dance_returns_to_normal_market_authority_at_the_scheduled_close():
+    source = FRIDAY_DANCE.read_text(encoding="utf-8-sig")
+    ending = source.split('            $ _friday_dance_finish_minute', 1)[1].split("\n\n    return", 1)[0]
+
+    assert 'rooms.get("FridayDance").schedule.end' in ending
+    assert 'rooms.get("FridayDance").schedule._clock_value' in ending
+    assert "call AdvanceTimeOnly(_friday_dance_minutes_remaining)" in ending
+    assert "jump MarketPlace" in ending
+    assert "menu:" not in ending
+    assert "LocFridayDance.jpg" not in ending
+
+
+def test_friday_market_becky_link_uses_the_existing_dance_invitation_state():
+    source = MARKETPLACE.read_text(encoding="utf-8-sig")
+    predicate = source.split("def marketplace_becky_home_visible():", 1)[1].split("def marketplace_mongol_visible():", 1)[0]
+
+    assert 'rooms.get("FridayDance").dance_count >= 5' in predicate
+    assert 'return rooms.get("FridayDance").becky_home_invited' in predicate
+    assert "becky_home_invited =" not in source
 
 
 def test_amanda_mc_dance_owns_its_scene_instead_of_showing_market_description():

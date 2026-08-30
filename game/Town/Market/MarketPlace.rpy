@@ -9,6 +9,8 @@ init python:
 
     def marketplace_becky_home_visible():
         minute_now = int(calendar_v2.clock_minutes() or 0) % 1440
+        if int(calendar_v2.week or 0) == 5 and rooms.get("FridayDance").dance_count >= 5:
+            return rooms.get("FridayDance").becky_home_invited
         return Becky.home_visit_stage >= 2 and int(calendar_v2.week or 0) != 5 and 13 * 60 <= minute_now <= 15 * 60 + 59
 
     def marketplace_mongol_visible():

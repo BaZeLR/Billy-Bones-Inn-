@@ -86,7 +86,7 @@ init 6 python:
     )
 
 label FridayDance(add_dance_phrase_tmp=""):
-    $ renpy.dynamic("rand_friday_dance", "result")
+    $ renpy.dynamic("rand_friday_dance", "result", "_friday_dance_finish_minute", "_friday_dance_minutes_remaining")
     $ rooms.enter("FridayDance")
 
     if not rooms.get("FridayDance").is_open():
@@ -98,9 +98,8 @@ label FridayDance(add_dance_phrase_tmp=""):
     while True:
         $ rooms.get("FridayDance").step = 0
 
-        call ShowImage("", "", "images/market/LocFridayDance.jpg")
-
         if rooms.get("FridayDance").dance_count < 5:
+            call ShowImage("", "", "images/market/LocFridayDance.jpg")
             "Вы находитесь на рыночной площади. Сейчас вечер пятницы и площадь расчищена от лотков и палаток, которые занимают ее в обычное время. На стенах домов, на колоннах, в общем всюду, висят факелы освещающие праздник хоть и тусклым и колеблющимся, но светом. А народу, похоже, собралось больше чем днем. Кажется полгорода пришло сюда послушать музыку, которую играет маленький оркестр, стоящий на возвышении в центре площади. Ну и конечно потанцевать, куда же без этого. "
             call FridayDanceCounterShow
             if player.tavern_management.dance_sponsor == 1:
@@ -142,10 +141,10 @@ label FridayDance(add_dance_phrase_tmp=""):
                     "[result]"
                     call FridayDanceCounterShow
         else:
-            "Праздник закончился и народ расходится."
-            menu:
-                "Вернуться к трактиру":
-                    jump StreetTavern
+            $ _friday_dance_finish_minute = rooms.get("FridayDance").schedule._clock_value(rooms.get("FridayDance").schedule.end, 21 * 60 + 59) + 1
+            $ _friday_dance_minutes_remaining = max(0, _friday_dance_finish_minute - int(calendar_v2.clock_minutes() or 0))
+            call AdvanceTimeOnly(_friday_dance_minutes_remaining)
+            jump MarketPlace
 
     return
 

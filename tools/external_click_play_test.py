@@ -2412,11 +2412,13 @@ testcase external_tavern_room_movement_resets_picture_state:
     assert eval ("kitchen" in str(scene_runtime.picture or "").lower()) timeout 5.0
 
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 22, 0)
+    $ external_calendar_set_weekday(5)
     run Jump("TavernMain")
     advance until screen "main_ui" timeout 20.0
     assert eval (str(rooms.current_code or "") == "TavernMain") timeout 5.0
     assert eval (str(main_ui_runtime.object_id or "") == "") timeout 5.0
     assert eval (str(scene_runtime.picture or "") == "images/tavern/mainhall/main_hall_night.png") timeout 5.0
+    assert eval (str(tavern_main_closed_text() or "") == "" and str(scene_runtime.location_text or "") == str(tavern_main_build_description() or "")) timeout 5.0
 
 testcase external_room_exit_time_costs:
     run Jump("Intro")
@@ -3755,6 +3757,28 @@ testcase external_robin_blackwood_room_thread_and_mongol_pass:
 
 
 FRIDAY_DANCE_AMANDA_CHECKS = r'''
+testcase external_friday_dance_end_restores_night_market:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 20, 0)
+    $ external_calendar_set_weekday(5)
+    $ npc_interval_schedule_load_all(True)
+    $ rooms.get("FridayDance").dance_count = 5
+    $ rooms.get("FridayDance").becky_home_invited = False
+    run Jump("FridayDance")
+    advance until eval (str(rooms.current_code or "") == "MarketPlace" and renpy.get_screen("main_ui") is not None) timeout 30.0
+    assert eval (int(calendar_v2.hour or 0) == 22 and int(calendar_v2.minute or 0) == 0) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == str(MARKETPLACE_CLOSED_PICTURE or "")) timeout 5.0
+    assert eval (str(scene_runtime.text or "") == str(rooms.get("MarketPlace").schedule.closed_text or "")) timeout 5.0
+    assert eval ("Вернуться к трактиру" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    assert eval ("Идти в гости в дом к вдове Блэнкеншип" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    assert eval (all(str(people.location(key) or "") != "FridayDance" for key in ("amanda", "becky", "alber", "clara", "melissa", "sandra"))) timeout 5.0
+    $ rooms.get("FridayDance").becky_home_invited = True
+    run Jump("MarketPlace")
+    advance until eval (str(rooms.current_code or "") == "MarketPlace" and renpy.get_screen("main_ui") is not None) timeout 20.0
+    assert eval ("Идти в гости в дом к вдове Блэнкеншип" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+
 testcase external_friday_dance_reopens_with_both_partners:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -6914,6 +6938,7 @@ def main() -> int:
             "external_zimmer_mongol_wine_distraction_dialog",
             "external_robin_v58_migration",
             "external_robin_blackwood_room_thread_and_mongol_pass",
+            "external_friday_dance_end_restores_night_market",
             "external_friday_dance_reopens_with_both_partners",
             "external_friday_public_amanda_button_starts_dance",
             "external_friday_public_becky_button_starts_dance",
@@ -7084,6 +7109,7 @@ def main() -> int:
             "external_zimmer_mongol_wine_distraction_dialog",
             "external_robin_v58_migration",
             "external_robin_blackwood_room_thread_and_mongol_pass",
+            "external_friday_dance_end_restores_night_market",
             "external_friday_dance_reopens_with_both_partners",
             "external_friday_public_amanda_button_starts_dance",
             "external_friday_public_becky_button_starts_dance",
