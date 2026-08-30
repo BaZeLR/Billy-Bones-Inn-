@@ -161,6 +161,21 @@ label _external_amanda_wake_for_test(indecent=0):
     call HouseholdWakeSleepyGirl("amanda")
     return
 
+label _external_amanda_breakfast_tease_for_test:
+    $ player.tavern_management.breakfast.event_active = True
+    $ player.tavern_management.breakfast.present_ids = ["amanda"]
+    $ Amanda.rel = 11
+    $ Amanda.openness = 7
+    $ Amanda.corruption = 45
+    $ Amanda.breakfast_tease_day = -1
+    $ Amanda.set_arousal(65)
+    $ Amanda.set_sex_stat("sexacts", 0)
+    $ Amanda.var["suckyou"] = 0
+    $ Amanda.var["fuckyou"] = 0
+    $ Melissa.breakfast_tease_day = current_game_day()
+    call TavernKitchenBreakfastTease
+    return
+
 testsuite global:
     teardown:
         exit
@@ -1360,6 +1375,24 @@ testcase external_breakfast_dance_sponsor_announcement:
     run Call("TavernKitchenBreakfast")
     advance until screen "say" timeout 20.0
     assert eval ("трактир уже выставит вино и закуски" in str((player.tavern_management.breakfast.base_text or tavern_kitchen_saved_text() or scene_runtime.text) or "")) timeout 5.0
+
+testcase external_amanda_breakfast_tease_picture_series:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ Amanda.set_arousal(0)
+    assert eval (tavern_breakfast_look_picture("amanda") == AMANDA_BREAKFAST_TEASE_PICTURES[1]) timeout 5.0
+    assert eval (tavern_breakfast_tease_picture("amanda", 1) == AMANDA_BREAKFAST_TEASE_PICTURES[1]) timeout 5.0
+    assert eval (tavern_breakfast_tease_picture("amanda", 2) == AMANDA_BREAKFAST_TEASE_PICTURES[2]) timeout 5.0
+    assert eval (tavern_breakfast_tease_picture("amanda", 3) == AMANDA_BREAKFAST_TEASE_PICTURES[3]) timeout 5.0
+    assert eval (tavern_breakfast_tease_picture("amanda", 4) == AMANDA_BREAKFAST_TEASE_PICTURES[5]) timeout 5.0
+    $ Amanda.set_arousal(65)
+    assert eval (tavern_breakfast_tease_picture("amanda", 3) == AMANDA_BREAKFAST_TEASE_PICTURES[4]) timeout 5.0
+    assert eval (tavern_breakfast_tease_picture("amanda", 4) == AMANDA_BREAKFAST_TEASE_PICTURES[6]) timeout 5.0
+    assert eval (all(renpy.loadable(path) for path in AMANDA_BREAKFAST_TEASE_PICTURES.values())) timeout 5.0
+    run Call("_external_amanda_breakfast_tease_for_test")
+    advance until screen "say" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == AMANDA_BREAKFAST_TEASE_PICTURES[4]) timeout 5.0
 
 testcase external_breakfast_attendance_location_wins:
     run Call("InitGameNPCs")
@@ -6945,6 +6978,7 @@ def main() -> int:
             "external_tavern_small_fight_native_event_flow",
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
             "external_breakfast_dance_sponsor_announcement",
+            "external_amanda_breakfast_tease_picture_series",
             "external_breakfast_attendance_location_wins",
             "external_breakfast_angry_amanda_melissa_mockery",
             "external_sandra_weekly_visit_native_beats",
@@ -7118,6 +7152,7 @@ def main() -> int:
             "external_tavern_small_fight_native_event_flow",
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
             "external_breakfast_dance_sponsor_announcement",
+            "external_amanda_breakfast_tease_picture_series",
             "external_breakfast_attendance_location_wins",
             "external_breakfast_angry_amanda_melissa_mockery",
             "external_sandra_weekly_visit_native_beats",

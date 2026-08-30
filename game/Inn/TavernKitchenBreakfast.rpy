@@ -6,6 +6,15 @@
 init python:
     import renpy.exports as renpy
 
+    AMANDA_BREAKFAST_TEASE_PICTURES = {
+        1: "images/amanda/breakfastTease/breakfastTease1.jpg",
+        2: "images/amanda/breakfastTease/breakfastTease2.jpg",
+        3: "images/amanda/breakfastTease/breakfastTease3.jpg",
+        4: "images/amanda/breakfastTease/breakfastTease4.jpg",
+        5: "images/amanda/breakfastTease/breakfastTease5.jpg",
+        6: "images/amanda/breakfastTease/breakfastTease6.jpg",
+    }
+
     def tavern_breakfast_available():
         return int(calendar_v2.hour or 0) < 12 and not bool(player.tavern_management.breakfast.today)
 
@@ -412,6 +421,8 @@ init python:
 
     def tavern_breakfast_look_picture(npc_id=""):
         key = str(npc_id or "").strip().lower()
+        if key == "amanda":
+            return AMANDA_BREAKFAST_TEASE_PICTURES[1]
         candidates = {
             "sandra": [
                 "images/sandra/tavern/kitchen_sandra_0.jpg",
@@ -433,14 +444,6 @@ init python:
                 "images/tavern/kitchen/kitchen_sandra_4.jpg",
             ],
             "melissa": MelissaStaticData.image_sequence("kitchen", "breakfast"),
-            "amanda": [
-                "images/breakfast/amanda_breakfast/amanda_tease_1.jpg",
-                "images/breakfast/amanda_breakfast/amanda_tease.jpg",
-                "images/breakfast/amanda_b.png",
-                "images/amanda/kitchen_help.png",
-                "images/amanda/amanda_card.jpg",
-                "images/amanda/amanda_portrait.jpg",
-            ],
         }.get(key, [])
         for picture_path in candidates:
             if renpy.loadable(picture_path):
@@ -841,15 +844,16 @@ init python:
     def tavern_breakfast_tease_picture(girl_name="", tier=0):
         key = str(girl_name or "").strip().lower()
         if key == "amanda":
-            candidates = [
-                "images/breakfast/amanda_breakfast/amanda_tease_5.jpg",
-                "images/breakfast/amanda_breakfast/amanda_tease_4.jpg",
-                "images/breakfast/amanda_breakfast/amanda_tease_3.jpg",
-                "images/breakfast/amanda_breakfast/amanda_tease_2.jpg",
-                "images/breakfast/amanda_breakfast/amanda_tease_1.jpg",
-                "images/breakfast/amanda_breakfast/amanda_tease.jpg",
-            ]
-        elif key == "melissa":
+            tease_tier = max(1, min(4, int(tier or 0)))
+            horny_state = int(Amanda.arousal_value() or 0) >= 65
+            if tease_tier >= 4:
+                picture_number = 6 if horny_state else 5
+            elif tease_tier >= 3:
+                picture_number = 4 if horny_state else 3
+            else:
+                picture_number = tease_tier
+            return AMANDA_BREAKFAST_TEASE_PICTURES[picture_number]
+        if key == "melissa":
             candidates = [
                 "images/breakfast/melissa_breakfast/melissa breakfast_2.jpg",
                 "images/breakfast/melissa_breakfast/melissa breakfast.jpg",
