@@ -91,16 +91,17 @@ def test_fight_ui_shows_combat_stats_without_a_duplicate_outcome_popup():
     assert "mousewheel True" in screen
 
 
-def test_fight_picture_uses_single_unsplit_renderer_without_moving_info_panels():
+def test_hunt_picture_is_larger_with_unsplit_renderer_and_unchanged_info_panels():
     screen = _source(FIGHT_SCREEN)
     panel = screen.split("screen main_ui_fight_panel():", 1)[1]
 
     assert "use BGIMAGE(_fight_picture)" in panel
     assert 'fit="cover"' not in panel
-    assert 'startswith("images/hunt/")' not in panel
+    assert '_is_hunt_picture = _fight_picture.replace("\\\\", "/").lower().startswith("images/hunt/")' in panel
+    assert "_top_ratio = 0.68 if _is_hunt_picture else 0.55" in panel
+    assert '$ _top_h = int((config.screen_height - int(getattr(gui, "textbox_height", 278)) - 24) * _top_ratio)' in panel
     assert "use fight_player_info_window(_company_rows if _company_rows else [_player_row], _ammo_text)" in panel
     assert "use fight_enemy_info_window(_enemy_rows if _enemy_rows else [_enemy_row])" in panel
-    assert "$ _top_h = int((config.screen_height - int(getattr(gui, \"textbox_height\", 278)) - 24) * 0.55)" in panel
     assert "$ _text_h = int((config.screen_height - int(getattr(gui, \"textbox_height\", 278)) - 24) * 0.30)" in panel
 
 

@@ -108,7 +108,9 @@ screen main_ui_fight_panel():
     $ _ammo_text = _loaded_text + "\nСтрелы: " + str(fight_supply_count("arrows")) + " / дробь: " + str(fight_supply_count("droplets"))
     $ _fight_picture = str(fight_selected_enemy_image() or scene_runtime.picture or "")
     $ _fight_text = str(scene_runtime.text or fight_preview_text() or "")
-    $ _top_h = int((config.screen_height - int(getattr(gui, "textbox_height", 278)) - 24) * 0.55)
+    $ _is_hunt_picture = _fight_picture.replace("\\", "/").lower().startswith("images/hunt/")
+    $ _top_ratio = 0.68 if _is_hunt_picture else 0.55
+    $ _top_h = int((config.screen_height - int(getattr(gui, "textbox_height", 278)) - 24) * _top_ratio)
     $ _text_h = int((config.screen_height - int(getattr(gui, "textbox_height", 278)) - 24) * 0.30)
 
     fixed:
