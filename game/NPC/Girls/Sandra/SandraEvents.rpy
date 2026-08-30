@@ -12,10 +12,10 @@ init python:
         {"rel": 2, "openness": 2, "corruption": 4},
     )
     SANDRA_WEEKLY_EVALUATION_PICTURES = (
-        "images/sandra/player_room_sandra_0.jpg",
-        "images/sandra/thanks/player_room_1.jpg",
-        "images/sandra/thanks/player_room_sandra_1.png",
-        "images/sandra/thanks/player_room_sandra_1.png",
+        "images/sandra/portrait2.jpg",
+        "images/sandra/portrait3.jpg",
+        "images/sandra/portrait4.jpg",
+        "images/sandra/portrait4.jpg",
     )
     SANDRA_WEEKLY_EVALUATION_TEXTS = (
         (
@@ -53,15 +53,37 @@ label SandraWeeklyEvaluationScene(step_index=0, return_label="TavernMain"):
     $ Sandra.openness = max(0, min(20, int(Sandra.openness or 0) + int(_sandra_gains.get("openness", 0) or 0)))
     $ Sandra.corruption = max(0, min(100, int(Sandra.corruption or 0) + int(_sandra_gains.get("corruption", 0) or 0)))
     $ _sandra_picture = SANDRA_WEEKLY_EVALUATION_PICTURES[_sandra_step]
-    $ scene_runtime.picture = _sandra_picture
-    call ShowImage("", "", _sandra_picture)
     $ _sandra_lines = list(SANDRA_WEEKLY_EVALUATION_TEXTS[_sandra_step] or [])
-    "[_sandra_lines[0]]"
-    "[_sandra_lines[1]]"
+    $ main_ui_begin_native_scene_state("Визит Сандры")
+    show screen main_ui
+    vscene _sandra_picture
+    $ scene_runtime.text = _sandra_lines[0]
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = _sandra_lines[1]
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
     if int(player.chores.last_score or 0) >= 6 and _sandra_step < 3:
-        "\"И да, я заметила, что на этот раз ты вытянул неделю особенно крепко,\" добавляет Сандра уже тише. \"Такое не пропускают мимо глаз.\""
-    "[_sandra_lines[2]]"
-    "[_sandra_lines[3]]"
+        $ scene_runtime.text = "\"И да, я заметила, что на этот раз ты вытянул неделю особенно крепко,\" добавляет Сандра уже тише. \"Такое не пропускают мимо глаз.\""
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Продолжить":
+                pass
+    $ scene_runtime.text = _sandra_lines[2]
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = _sandra_lines[3]
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 

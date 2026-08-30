@@ -446,6 +446,22 @@ def test_melissa_werecat_event_labels_own_their_scenes_and_thread_advancement():
         assert f"label {wrapper_name}:" not in werecat_source
 
 
+def test_melissa_bat_breakfast_has_one_authored_finish_and_no_second_hub():
+    source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")
+    scene = source.split("label story_melissa_bat_problem_0:", 1)[1].split(
+        "label story_melissa_bat_problem_1:", 1
+    )[0]
+
+    assert 'main_ui_begin_native_scene_state("Завтрак: летучие мыши")' in scene
+    assert scene.count('"Продолжить":') >= 6
+    assert scene.count('"Закончить завтрак":') == 1
+    assert scene.count("call TavernKitchenFinishBreakfastEvent") == 1
+    assert "call TavernKitchenBreakfastMenu" not in scene
+    assert '"[scene_runtime.text]"' not in scene
+    assert "event_runtime.active_thread.advance()" in scene
+    assert "main_ui_end_native_scene_state()" in scene
+
+
 def test_melissa_dress_action_does_not_open_a_duplicate_menu():
     talk_source = MELISSA_TALK.read_text(encoding="utf-8-sig")
     dress_source = MELISSA_DRESS.read_text(encoding="utf-8-sig")

@@ -120,39 +120,80 @@ label story_melissa_werecat_home_1:
 
 
 label story_melissa_bat_problem_0:
+    $ main_ui_begin_native_scene_state("Завтрак: летучие мыши")
+    show screen main_ui
     $ player.tavern_management.breakfast.present_ids = ["sandra", "amanda"]
+    $ player.tavern_management.breakfast.event_active = True
     vscene tavern_kitchen_breakfast_picture()
-    "Утренний стол уже накрыт, но одного места не хватает. Аманда первой замечает пустую скамью Мелиссы и с ленивой усмешкой тянет: \"Вот увидите, сейчас она явится с таким лицом, будто всю ночь воевала с нечистой силой.\""
+    $ scene_runtime.text = "Утренний стол уже накрыт, но одного места не хватает. Аманда первой замечает пустую скамью Мелиссы и с ленивой усмешкой тянет: \"Вот увидите, сейчас она явится с таким лицом, будто всю ночь воевала с нечистой силой.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
     vscene MelissaStaticData.image_path("bats", "yawns")
-    "В этот момент в кухню, зевая и еле переставляя ноги, входит Мелисса. Вид у нее злой и невыспавшийся."
+    $ scene_runtime.text = "В этот момент в кухню, зевая и еле переставляя ноги, входит Мелисса. Вид у нее злой и невыспавшийся."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
     $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
     vscene MelissaStaticData.image_path("kitchen", "work")
-    "Мелисса садится за стол и, даже взяв кружку, продолжает коситься так, будто над ее головой все еще что-то шуршит."
-    "Сандра уже спокойнее говорит: \"У нас уже была крысиная проблема, из-за которой портились припасы, а теперь еще и летучие мыши? После крыс в кладовой я не хочу ждать, пока новая дрянь опять испортит дом.\""
+    $ scene_runtime.text = "Мелисса садится за стол и, даже взяв кружку, продолжает коситься так, будто над ее головой все еще что-то шуршит."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "Сандра уже спокойнее говорит: \"У нас уже была крысиная проблема, из-за которой портились припасы, а теперь еще и летучие мыши? После крыс в кладовой я не хочу ждать, пока новая дрянь опять испортит дом.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
     if relationship_anger("amanda") > 0 and relationship_anger("melissa") > 0:
-        "Аманда не удерживается: \"Может, это все за тобой ходит? Крысы, летучие мыши... Ведьма у нас завелась, вот и зверье сбежалось.\""
-        "Мелисса ставит кружку на стол. \"Если я ведьма, Аманда, начну с тебя. Заколдую, чтобы ты одно утро помолчала.\""
+        $ scene_runtime.text = "Аманда не удерживается: \"Может, это все за тобой ходит? Крысы, летучие мыши... Ведьма у нас завелась, вот и зверье сбежалось.\""
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Продолжить":
+                pass
+        $ scene_runtime.text = "Мелисса ставит кружку на стол. \"Если я ведьма, Аманда, начну с тебя. Заколдую, чтобы ты одно утро помолчала.\""
     elif relationship_anger("amanda") > 0:
-        "Аманда цепляет ее резче обычного: \"Крысы, летучие мыши... Может, они все к тебе, Мелисса? Ведьма при хозяйстве, да?\""
-        "Мелисса зло щурится: \"Если я ведьма, то первым делом заколдую кое-кому язык, чтобы он хоть за завтраком помолчал.\""
+        $ scene_runtime.text = "Аманда цепляет ее резче обычного: \"Крысы, летучие мыши... Может, они все к тебе, Мелисса? Ведьма при хозяйстве, да?\""
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Продолжить":
+                pass
+        $ scene_runtime.text = "Мелисса зло щурится: \"Если я ведьма, то первым делом заколдую кое-кому язык, чтобы он хоть за завтраком помолчал.\""
     elif relationship_anger("melissa") > 0:
-        "Аманда тут же оживляется, складывает пальцы в дразнящий знак и тянет с ухмылкой: \"Мелисса, а что если ты настоящая ведьма? Крысы в подвале, мыши с крыльями под крышей... Может, это все твои любимцы сбежались?\""
-        "Мелисса отвечает ровно: \"Продолжай. Если я ведьма, мне как раз нужен кто-то болтливый для первого проклятия.\""
+        $ scene_runtime.text = "Аманда тут же оживляется, складывает пальцы в дразнящий знак и тянет с ухмылкой: \"Мелисса, а что если ты настоящая ведьма? Крысы в подвале, мыши с крыльями под крышей... Может, это все твои любимцы сбежались?\""
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Продолжить":
+                pass
+        $ scene_runtime.text = "Мелисса отвечает ровно: \"Продолжай. Если я ведьма, мне как раз нужен кто-то болтливый для первого проклятия.\""
     else:
-        "Аманда тут же оживляется, складывает пальцы в дразнящий знак и тянет с ухмылкой: \"Мелисса, а что если ты настоящая ведьма? Крысы в подвале, мыши с крыльями под крышей... Может, это все твои любимцы сбежались?\""
-        "Мелисса зло щурится: \"Если я ведьма, то первым делом заколдую кое-кому язык, чтобы он хоть за завтраком помолчал.\""
+        $ scene_runtime.text = "Аманда тут же оживляется, складывает пальцы в дразнящий знак и тянет с ухмылкой: \"Мелисса, а что если ты настоящая ведьма? Крысы в подвале, мыши с крыльями под крышей... Может, это все твои любимцы сбежались?\""
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Продолжить":
+                pass
+        $ scene_runtime.text = "Мелисса зло щурится: \"Если я ведьма, то первым делом заколдую кое-кому язык, чтобы он хоть за завтраком помолчал.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
     $ scene_runtime.text = "Разговор за столом быстро становится серьезнее. У вас в голове остается одна ясная мысль: с комнатой Мелиссы придется разбираться всерьез."
     $ scene_runtime.location_text = scene_runtime.text
-    $ tavern_kitchen_set_saved_text(scene_runtime.text)
-    "[scene_runtime.text]"
+    menu:
+        "Закончить завтрак":
+            pass
     $ calendar_v2.advance_minutes(45)
     $ player.tavern_management.breakfast.today = True
     $ player.tavern_management.breakfast.last_day = int(current_game_day() or 0)
     $ player.tavern_management.breakfast.day = int(current_game_day() or 0)
-    $ player.tavern_management.breakfast.event_active = True
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
+    call TavernKitchenFinishBreakfastEvent
     return True
 
 

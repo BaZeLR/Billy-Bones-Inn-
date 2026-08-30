@@ -1379,6 +1379,59 @@ testcase external_breakfast_angry_amanda_melissa_mockery:
     assert eval ("Бекки" not in list(tavern_breakfast_present_names() or [])) timeout 5.0
     assert eval ("Крысы?" in " ".join(list(tavern_breakfast_dialogue_lines() or []))) timeout 5.0
     assert eval (len([row for row in tavern_breakfast_dialogue_lines() if "Пальцы из кисок" in str(row or "")]) == 1) timeout 5.0
+testcase external_sandra_weekly_visit_native_beats:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("sandra") is not None) timeout 20.0
+    $ rooms.enter("TavernMyRoom")
+    $ player.chores.last_score = 0
+    run Call("SandraWeeklyEvaluationScene", 0, "TavernMain")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/sandra/portrait2.jpg") timeout 5.0
+    assert eval ("осторожный стук" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("держал хозяйство" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Если вечером захочешь" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("День уже начинается" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") != "event" and renpy.get_screen("choice") is None) timeout 10.0
+
+testcase external_melissa_bat_breakfast_single_finish:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("melissa") is not None) timeout 20.0
+    $ rooms.enter("TavernKitchen")
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 8, 0)
+    $ player.tavern_management.breakfast.today = False
+    $ player.tavern_management.breakfast.event_active = False
+    $ player.tavern_management.breakfast.present_ids = None
+    $ threads["melissaBatProblem"].advanceTo(0, force_active=True)
+    $ event_runtime.active_thread = threads["melissaBatProblem"]
+    $ Amanda.var.pop("relationship_mood", None)
+    $ Melissa.var.pop("relationship_mood", None)
+    $ _bat_breakfast_start = int(calendar_v2.clock_minutes() or 0)
+    run Call("story_melissa_bat_problem_0")
+    advance until screen "choice" timeout 20.0
+    assert eval ("одного места не хватает" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("злой и невыспавшийся" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("продолжает коситься" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("крысиная проблема" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("настоящая ведьма" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("первым делом заколдую" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("придется разбираться всерьез" in str(scene_runtime.text or "")) timeout 10.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закончить завтрак"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (int(threads["melissaBatProblem"].num or 0) == 1 and not bool(player.tavern_management.breakfast.event_active) and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (bool(player.tavern_management.breakfast.today)) timeout 5.0
+    assert eval (player.tavern_management.breakfast.present_ids is None) timeout 5.0
+    assert eval (int(calendar_v2.clock_minutes() or 0) - _bat_breakfast_start == 45) timeout 5.0
+    assert eval ("Позавтракать" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
 testcase external_breakfast_window_and_call_all_click:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -6586,6 +6639,8 @@ def main() -> int:
             "external_breakfast_dance_sponsor_announcement",
             "external_breakfast_attendance_location_wins",
             "external_breakfast_angry_amanda_melissa_mockery",
+            "external_sandra_weekly_visit_native_beats",
+            "external_melissa_bat_breakfast_single_finish",
             "external_breakfast_window_and_call_all_click",
             "external_kitchen_entry_morning_sickness_event",
             "external_actual_barber_actions_click",
@@ -6749,6 +6804,8 @@ def main() -> int:
             "external_breakfast_dance_sponsor_announcement",
             "external_breakfast_attendance_location_wins",
             "external_breakfast_angry_amanda_melissa_mockery",
+            "external_sandra_weekly_visit_native_beats",
+            "external_melissa_bat_breakfast_single_finish",
             "external_breakfast_window_and_call_all_click",
             "external_kitchen_entry_morning_sickness_event",
             "external_actual_barber_actions_click",

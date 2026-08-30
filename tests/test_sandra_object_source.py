@@ -279,6 +279,23 @@ def test_sandra_night_thanks_uses_current_late_night_time_contract():
     assert "int(calendar_v2.hour or 0) > 23" in event_source
 
 
+def test_sandra_weekly_visit_uses_canonical_portraits_and_native_event_beats():
+    source = SANDRA_EVENTS.read_text(encoding="utf-8-sig")
+    pictures = source.split("SANDRA_WEEKLY_EVALUATION_PICTURES = (", 1)[1].split(")", 1)[0]
+    scene = source.split("label SandraWeeklyEvaluationScene", 1)[1].split(
+        "label sandraWeeklyEvaluation_0", 1
+    )[0]
+
+    assert '"images/sandra/portrait2.jpg"' in pictures
+    assert '"images/sandra/portrait3.jpg"' in pictures
+    assert '"images/sandra/portrait4.jpg"' in pictures
+    assert "player_room_sandra" not in pictures
+    assert "main_ui_begin_native_scene_state(\"Визит Сандры\")" in scene
+    assert "vscene _sandra_picture" in scene
+    assert scene.count('"Продолжить":') >= 4
+    assert "call ShowImage" not in scene
+
+
 def test_sandra_topics_use_existing_general_topic_ids_only():
     init_source = SANDRA_INIT.read_text(encoding="utf-8-sig")
     social_source = SOCIAL_TOPICS.read_text(encoding="utf-8-sig")
