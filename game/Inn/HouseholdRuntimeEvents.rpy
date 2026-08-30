@@ -591,7 +591,7 @@ label HouseholdAmandaFakeSicknessWake:
         call TavernKitchenBreakfastShowText(scene_runtime.text)
     return
 label HouseholdWakeSleepyGirl(girl_name=""):
-    $ renpy.dynamic("_wake_girl", "_wake_indecent", "_wake_bulge", "_wake_info")
+    $ renpy.dynamic("_wake_girl", "_wake_indecent", "_wake_bulge", "_wake_info", "_wake_amanda_sleep_dress", "_wake_amanda_picture")
     $ _wake_girl = str(girl_name or "").strip().lower()
     if household_morning_issue_type(_wake_girl) != "sleepy":
         if player.tavern_management.breakfast.event_active:
@@ -600,9 +600,12 @@ label HouseholdWakeSleepyGirl(girl_name=""):
         return
     $ _wake_indecent = household_morning_issue_indecent(_wake_girl)
     $ _wake_bulge = 1 if _wake_indecent and player_has_visible_morning_bulge() else 0
+    $ _wake_amanda_sleep_dress = tavern_amanda_room_sleep_dress() if _wake_girl == "amanda" else 0
     $ calendar_v2.advance_minutes(20)
     $ household_clear_morning_issue(_wake_girl)
     if _wake_girl == "amanda":
+        $ _wake_amanda_picture = tavern_amanda_room_wake_picture(_wake_amanda_sleep_dress)
+        vscene _wake_amanda_picture
         $ Amanda.change_social(friend_delta=1)
     elif _wake_girl == "melissa":
         $ Melissa.change_social(friend_delta=1)

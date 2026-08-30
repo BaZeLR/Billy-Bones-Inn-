@@ -2,6 +2,27 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
+    AMANDA_ROOM_SLEEP_PICTURES = {
+        1: "images/amanda/Room/amanda_sleeps_1.jpg",
+        2: "images/amanda/Room/amanda_sleeps_2.png",
+        3: "images/amanda/Room/amanda_sleeps_3.png",
+        4: "images/amanda/Room/amanda_sleeps_4.png",
+        6: "images/amanda/Room/amanda_sleeps_6.png",
+        7: "images/amanda/Room/amanda_sleeps_7.png",
+        8: "images/amanda/Room/amanda_sleeps_7.png",
+        9: "images/amanda/Room/amanda_sleeps_9.png",
+        10: "images/amanda/Room/amanda_sleeps_10.png",
+        11: "images/amanda/Room/amanda_sleeps_11.png",
+    }
+
+    AMANDA_ROOM_BEDROOM_PICTURES = {
+        1: "images/amanda/Room/amanda_bedroom_001.jpeg",
+        2: "images/amanda/Room/amanda_bedroom_002.jpeg",
+        3: "images/amanda/Room/amanda_bedroom_003.jpeg",
+        4: "images/amanda/Room/amanda_bedroom_004.jpeg",
+        5: "images/amanda/Room/amanda_bedroom_005.jpeg",
+    }
+
     def tavern_amanda_room_sleep_dress():
         sleep_dress = 0
         if not bool(Amanda.sex_stat("virginity", True)):
@@ -10,13 +31,6 @@ init python:
             if int(Amanda.corruption or 0) >= 50:
                 sleep_dress = 2
         return sleep_dress
-
-    def tavern_amanda_room_pick_picture(candidates, fallback=""):
-        for candidate in list(candidates or []):
-            candidate_ref = str(candidate or "").strip()
-            if candidate_ref and renpy.loadable(candidate_ref):
-                return candidate_ref
-        return str(fallback or "")
 
     def tavern_amanda_room_sleep_scene():
         return (
@@ -29,43 +43,28 @@ init python:
 
     def tavern_amanda_room_picture(sleep_dress=None):
         dress_state = tavern_amanda_room_sleep_dress() if sleep_dress is None else int(sleep_dress or 0)
-        is_sleep_scene = tavern_amanda_room_sleep_scene()
-        if is_sleep_scene:
-            if dress_state >= 2:
-                return tavern_amanda_room_pick_picture([
-                    "images/amanda/Room/amandanaked.jpg",
-                    "images/amanda/Room/amanda_sleeps_11.png",
-                    "images/amanda/Room/amanda_sleeps_10.png",
-                ], "images/amanda/Room/amandanaked.jpg")
-            if dress_state == 1:
-                return tavern_amanda_room_pick_picture([
-                    "images/amanda/Room/amanda_sleeps_10.png",
-                    "images/amanda/Room/amanda_sleep_6.png",
-                    "images/amanda/Room/amandaInbed_004.jpeg",
-                    "images/amanda/Room/amanda_sleeps_9.png",
-                ], "images/amanda/Room/amanda_sleeps_10.png")
-            return tavern_amanda_room_pick_picture([
-                "images/amanda/Room/amanda_sleeps_3.png",
-                "images/amanda/Room/amanda_sleeps_4.png",
-                "images/amanda/Room/amanda_sleeps_1.jpg",
-                "images/amanda/Room/amanda_bedroom_003.jpeg",
-            ], "bg amanda_room")
+        corruption_level = npc_corruption_level("amanda")
+        horny_state = int(Amanda.arousal_value() or 0) >= 65
+        if tavern_amanda_room_sleep_scene():
+            if horny_state:
+                sleep_picture_number = 9 + max(0, min(2, dress_state))
+            elif dress_state >= 2:
+                sleep_picture_number = 8 if corruption_level >= 4 else 7
+            elif dress_state == 1:
+                sleep_picture_number = 6
+            else:
+                sleep_picture_number = min(4, corruption_level + 1)
+            return AMANDA_ROOM_SLEEP_PICTURES[sleep_picture_number]
         if str(people.location("amanda") or "") != "TavernAmandaRoom":
-            return tavern_amanda_room_pick_picture([
-                "images/amanda/Room/emptyroom.jpg",
-            ], "bg amanda_room")
-        if Amanda.attic_busted():
-            return tavern_amanda_room_pick_picture([
-                "images/amanda/Room/amanda_sleeps_10.png",
-                "images/amanda/Room/amandaInbed_004.jpeg",
-                "images/amanda/Room/amanda_sleeps_9.png",
-                "images/amanda/Room/amanda_bedroom_003.jpeg",
-            ], "bg amanda_room")
-        return tavern_amanda_room_pick_picture([
-            "images/amanda/Room/amanda_bedroom_003.jpeg",
-            "images/amanda/Room/amanda_bedroom_002.jpeg",
-            "images/amanda/Room/amanda_bedroom.jpeg",
-        ], "bg amanda_room")
+            return "images/amanda/Room/emptyroom.jpg"
+        bedroom_picture_number = min(5, corruption_level + 1 + (1 if horny_state else 0))
+        return AMANDA_ROOM_BEDROOM_PICTURES[bedroom_picture_number]
+
+    def tavern_amanda_room_wake_picture(sleep_dress=None):
+        dress_state = tavern_amanda_room_sleep_dress() if sleep_dress is None else int(sleep_dress or 0)
+        if dress_state >= 2:
+            return "images/amanda/Room/wakenaked.jpg"
+        return "images/amanda/Room/wakedress.jpg"
 
     def tavern_amanda_room_issue_text():
         issue_code = str(household_morning_issue_type("amanda") or "").strip()
@@ -470,7 +469,7 @@ label story_amanda_room_morning_window_0:
 
 
 label story_amanda_room_grope_0:
-    $ renpy.dynamic("tmpSexType", "_amanda_sleep_dress", "_grope_sleep_dress", "tmpGropeReact", "tmpRand")
+    $ renpy.dynamic("tmpSexType", "_amanda_sleep_dress", "_amanda_wake_picture", "_grope_sleep_dress", "tmpGropeReact", "tmpRand")
     $ _grope_sleep_dress = tavern_amanda_room_sleep_dress()
     $ _amanda_sleep_dress = _grope_sleep_dress
     "\nОтбросив сомнения вы подошли к спящей девушке и поцеловали ее прямо в губы."
@@ -478,10 +477,8 @@ label story_amanda_room_grope_0:
         "Одной рукой вы начали массировать ее обнаженный клитор, а другой ласкать сисечки."
     elif _grope_sleep_dress == 1:
         "Руками же вы начали массировать ее обнаженные сисечки."
-    if _grope_sleep_dress >= 2:
-        call ShowImage("amanda", "room", "wakenaked")
-    else:
-        call ShowImage("amanda", "room", "wakedress")
+    $ _amanda_wake_picture = tavern_amanda_room_wake_picture(_grope_sleep_dress)
+    vscene _amanda_wake_picture
     $ tmpGropeReact = Amanda.sex_offer_reaction()
     $ tmpSexType = 0
     if bool(Amanda.sex_stat("virginity", True)):

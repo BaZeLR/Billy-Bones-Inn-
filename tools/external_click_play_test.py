@@ -156,6 +156,11 @@ init python:
                 return day_number_i
         raise AssertionError("No canonical Clara/Melissa tavern visit time found: %r" % diagnostics)
 
+label _external_amanda_wake_for_test(indecent=0):
+    $ household.morning_state[_household_morning_state_key("amanda")] = {"issue": "sleepy", "resolved": 0, "indecent": int(indecent or 0)}
+    call HouseholdWakeSleepyGirl("amanda")
+    return
+
 testsuite global:
     teardown:
         exit
@@ -2227,6 +2232,67 @@ testcase external_debug_builder_room_visual_surfaces:
 
 
 AMANDA_ROOM_NIGHT_EVENT_CHECKS = r'''
+testcase external_amanda_room_state_picture_series_and_wake_images:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 23, 0)
+    $ external_calendar_set_weekday(1)
+    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernAmandaRoom", start_minute=0, end_minute=1440, awake=False, talkable=False, priority=999)])
+    $ Amanda.set_sex_stat("virginity", 1)
+    $ Amanda.set_arousal(0)
+    $ Amanda.corruption = 0
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_sleeps_1.jpg") timeout 5.0
+    $ Amanda.corruption = 15
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_sleeps_2.png") timeout 5.0
+    $ Amanda.corruption = 25
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_sleeps_3.png") timeout 5.0
+    $ Amanda.corruption = 40
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_sleeps_4.png") timeout 5.0
+    $ Amanda.set_sex_stat("virginity", 0)
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_sleeps_6.png") timeout 5.0
+    $ Amanda.corruption = 52
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_sleeps_7.png") timeout 5.0
+    $ Amanda.corruption = 60
+    assert eval (AMANDA_ROOM_SLEEP_PICTURES[8] == AMANDA_ROOM_SLEEP_PICTURES[7] and tavern_amanda_room_picture() == "images/amanda/Room/amanda_sleeps_7.png") timeout 5.0
+    $ Amanda.set_arousal(65)
+    $ Amanda.corruption = 25
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_sleeps_9.png") timeout 5.0
+    $ Amanda.corruption = 40
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_sleeps_10.png") timeout 5.0
+    $ Amanda.corruption = 60
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_sleeps_11.png") timeout 5.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 14, 0)
+    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernAmandaRoom", start_minute=0, end_minute=1440, awake=True, talkable=True, priority=999)])
+    $ Amanda.set_arousal(0)
+    $ Amanda.corruption = 0
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_bedroom_001.jpeg") timeout 5.0
+    $ Amanda.corruption = 15
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_bedroom_002.jpeg") timeout 5.0
+    $ Amanda.corruption = 25
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_bedroom_003.jpeg") timeout 5.0
+    $ Amanda.corruption = 40
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_bedroom_004.jpeg") timeout 5.0
+    $ Amanda.corruption = 60
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_bedroom_005.jpeg") timeout 5.0
+    $ Amanda.corruption = 25
+    $ Amanda.set_arousal(65)
+    assert eval (tavern_amanda_room_picture() == "images/amanda/Room/amanda_bedroom_004.jpeg") timeout 5.0
+    assert eval (all(renpy.loadable(path) for path in list(AMANDA_ROOM_SLEEP_PICTURES.values()) + list(AMANDA_ROOM_BEDROOM_PICTURES.values()))) timeout 5.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 8, 0)
+    $ external_calendar_set_weekday(1)
+    $ Amanda.set_sex_stat("virginity", 1)
+    $ Amanda.corruption = 0
+    run Call("_external_amanda_wake_for_test", 0)
+    assert eval (str(scene_runtime.picture or "") == "images/amanda/Room/wakedress.jpg") timeout 5.0
+    $ Amanda.set_sex_stat("virginity", 0)
+    $ Amanda.corruption = 60
+    run Call("_external_amanda_wake_for_test", 1)
+    assert eval (str(scene_runtime.picture or "") == "images/amanda/Room/wakenaked.jpg") timeout 5.0
+
 testcase external_amanda_room_night_bed_action_uses_thread_event:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -6899,6 +6965,7 @@ def main() -> int:
             "external_town_thugs_fight_victory_result",
             "external_georgette_back_alley_not_visible_in_port_streets",
             "external_debug_builder_room_visual_surfaces",
+            "external_amanda_room_state_picture_series_and_wake_images",
             "external_amanda_room_night_bed_action_uses_thread_event",
             "external_amanda_window_secret_favor_kitchen_event",
             "external_my_room_recipe_book_table_link",
@@ -7070,6 +7137,7 @@ def main() -> int:
             "external_town_thugs_fight_victory_result",
             "external_georgette_back_alley_not_visible_in_port_streets",
             "external_debug_builder_room_visual_surfaces",
+            "external_amanda_room_state_picture_series_and_wake_images",
             "external_amanda_room_night_bed_action_uses_thread_event",
             "external_amanda_window_secret_favor_kitchen_event",
             "external_my_room_recipe_book_table_link",

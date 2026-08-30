@@ -3,6 +3,8 @@ from pathlib import Path
 
 SOURCE = (Path(__file__).resolve().parents[1] / "game/Inn/TavernAmandaRoom.rpy").read_text(encoding="utf-8-sig")
 SEX_FLOW_SOURCE = (Path(__file__).resolve().parents[1] / "game/NPC/Girls/Amanda/AmandaAtHomeCode.rpy").read_text(encoding="utf-8-sig")
+HOUSEHOLD_SOURCE = (Path(__file__).resolve().parents[1] / "game/Inn/HouseholdRuntimeEvents.rpy").read_text(encoding="utf-8-sig")
+ROOM_ASSETS = Path(__file__).resolve().parents[1] / "game/images/amanda/Room"
 
 
 def test_amanda_room_has_one_action_source_without_builder_restore_or_loops():
@@ -23,6 +25,48 @@ def test_amanda_room_has_no_object_or_sleep_presentation_mirrors():
     assert "calendar_v2.time_slot()" not in SOURCE
     assert 'not people.is_awake("amanda")' in SOURCE
     assert "tavern_amanda_room_sleep_scene()" in SOURCE
+    assert "tavern_amanda_room_pick_picture" not in SOURCE
+
+
+def test_amanda_room_picture_catalog_uses_corruption_and_owned_arousal_state():
+    assert 'corruption_level = npc_corruption_level("amanda")' in SOURCE
+    assert "horny_state = int(Amanda.arousal_value() or 0) >= 65" in SOURCE
+    assert "sleep_picture_number = 9 + max(0, min(2, dress_state))" in SOURCE
+    assert '7: "images/amanda/Room/amanda_sleeps_7.png"' in SOURCE
+    assert '8: "images/amanda/Room/amanda_sleeps_7.png"' in SOURCE
+    assert "bedroom_picture_number = min(5, corruption_level + 1 + (1 if horny_state else 0))" in SOURCE
+
+    for picture_name in (
+        "amanda_sleeps_1.jpg",
+        "amanda_sleeps_2.png",
+        "amanda_sleeps_3.png",
+        "amanda_sleeps_4.png",
+        "amanda_sleeps_6.png",
+        "amanda_sleeps_7.png",
+        "amanda_sleeps_9.png",
+        "amanda_sleeps_10.png",
+        "amanda_sleeps_11.png",
+        "amanda_bedroom_001.jpeg",
+        "amanda_bedroom_002.jpeg",
+        "amanda_bedroom_003.jpeg",
+        "amanda_bedroom_004.jpeg",
+        "amanda_bedroom_005.jpeg",
+        "wakedress.jpg",
+        "wakenaked.jpg",
+    ):
+        assert (ROOM_ASSETS / picture_name).is_file()
+
+
+def test_both_amanda_wake_flows_use_the_authored_wake_pictures():
+    household_wake = HOUSEHOLD_SOURCE.split('label HouseholdWakeSleepyGirl(girl_name=""):', 1)[1].split("label MelissaNightWakeEvent:", 1)[0]
+    night_wake = SOURCE.split("label story_amanda_room_grope_0:", 1)[1]
+
+    assert 'return "images/amanda/Room/wakenaked.jpg"' in SOURCE
+    assert 'return "images/amanda/Room/wakedress.jpg"' in SOURCE
+    assert "def tavern_amanda_room_wake_picture(sleep_dress=None):" in SOURCE
+    assert "call ShowImage" not in household_wake + night_wake
+    assert "vscene _wake_amanda_picture" in household_wake
+    assert "vscene _amanda_wake_picture" in night_wake
 
 
 def test_amanda_sleep_dress_is_one_scene_local_value_across_the_authored_call_chain():
