@@ -133,3 +133,25 @@ def test_story_runtime_has_no_clara_authored_labels():
     assert "label story_clara_market_booklet_0:" not in runtime_source
     assert "label story_clara_market_booklet_0:" in booklet_source
     assert "label story_clara_market_booklet_release_mongol:" in booklet_source
+
+
+def test_clara_visit_media_remains_until_native_continue_then_restores_room():
+    labels = read(CLARA_TAVERN_VISIT)
+    expected_pictures = (
+        "images/clara/tavern_visit.png",
+        "images/clara/tavern_visit_size.png",
+        "images/clara/melissa_talk.png",
+        "images/clara/melissa Pillow fight.png",
+        "images/clara/melissa_doodleTimes.png",
+        "images/clara/melissa_doodles.png",
+    )
+
+    assert labels.count("main_ui_begin_native_scene_state(") == 6
+    assert labels.count("main_ui_end_native_scene_state()") == 6
+    assert labels.count("show screen main_ui") == 6
+    assert labels.count("menu:") == 6
+    for picture in expected_pictures:
+        assert f'vscene "{picture}"' in labels
+
+    for block in labels.split("\nlabel story_clara_")[1:]:
+        assert block.index("vscene ") < block.index("menu:") < block.index("main_ui_end_native_scene_state()") < block.index("return True")

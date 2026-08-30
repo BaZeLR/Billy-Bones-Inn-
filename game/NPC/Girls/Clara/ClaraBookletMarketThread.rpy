@@ -13,8 +13,8 @@
 # - follow: exploration >= 80 succeeds, reveals booklet merchant, optionally confronts Clara, advances thread
 # - ignore: keeps thread on this stage and records retry cooldown
 label story_clara_market_booklet_0:
+    $ main_ui_begin_native_scene_state("Кларисса на рынке")
     show screen main_ui
-    $ main_ui_runtime.mode = "event"
 
     vscene "images/clara/market_day.png"
     if bool(Clara.market_intro_seen):
@@ -44,7 +44,7 @@ label story_clara_market_booklet_ignore:
     $ calendar_v2.advance_minutes(15)
     $ player.change_stat("energy", -2)
     call stat
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -61,7 +61,7 @@ label story_clara_market_booklet_follow:
         $ calendar_v2.advance_minutes(30)
         $ player.change_stat("energy", -5)
         call stat
-        $ main_ui_runtime.mode = "scene"
+        $ main_ui_end_native_scene_state()
         return True
 
     vscene "images/clara/market_bookletDeal.png"
@@ -82,7 +82,7 @@ label story_clara_market_booklet_follow_success_leave:
     $ player.change_stat("energy", -5)
     call stat
     $ event_runtime.active_thread.advance()
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -116,8 +116,8 @@ label story_clara_market_booklet_confront:
 # - follow: exploration >= 100 succeeds, advances to the Mongol deal scene
 # - leave: keeps thread on this stage
 label story_clara_market_booklet_2:
+    $ main_ui_begin_native_scene_state("Кларисса на вечернем рынке")
     show screen main_ui
-    $ main_ui_runtime.mode = "event"
 
     vscene "images/clara/market_night.png"
     $ scene_runtime.text = "Вечером рынок закрыт, и площадь выглядит почти пустой. У закрытых лавок задержались лишь несколько человек, поэтому фигура в плаще сразу бросается в глаза. Когда она проходит ближе к фонарю, вы узнаете Клариссу.\n\nСтоит ей заметить ваш взгляд, как девушка глубже натягивает капюшон и быстро уходит в сторону закутка у конного торга. Хм. Очень интересно, что она делает здесь в такое время.\n\nПохоже, на этот раз дело идет уже не о книжечках, а о чем-то более грязном."
@@ -141,7 +141,7 @@ label story_clara_market_booklet_2_ignore:
     $ calendar_v2.advance_minutes(15)
     $ player.change_stat("energy", -2)
     call stat
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -157,7 +157,7 @@ label story_clara_market_booklet_2_follow:
         $ calendar_v2.advance_minutes(30)
         $ player.change_stat("energy", -5)
         call stat
-        $ main_ui_runtime.mode = "scene"
+        $ main_ui_end_native_scene_state()
         return True
 
     $ calendar_v2.advance_minutes(30)
@@ -170,8 +170,8 @@ label story_clara_market_booklet_2_follow:
 # Event: Clara and Mongol horse-theft deal.
 # Consequence: the deal is seen and the thread advances.
 label story_clara_market_booklet_3:
+    $ main_ui_begin_native_scene_state("Кларисса и Монгол")
     show screen main_ui
-    $ main_ui_runtime.mode = "event"
 
     vscene "images/clara/mongolTalk.png"
     $ scene_runtime.text = "На этот раз вы держитесь достаточно далеко и не выдаете себя ни шагом, ни тенью. Кларисса уводит вас к самому краю рынка, где ее уже ждет Монгол. Разговор идет быстро и вполголоса, но вы успеваете разобрать главное.\n\nКларисса велит ему взять не первую попавшуюся клячу, а хорошую лошадь, чтобы потом продать ее с наваром. Деньги она требует делить честно, потому что именно она нашла покупателя и подсказала, где можно взять товар так, чтобы шум поднялся не сразу. Монгол в ответ ухмыляется, обещает свою долю и, будто нарочно, поддевает ее, что в ее любимом бандитском костюме она выглядела бы среди его людей вовсе как своя.\n\nТеперь уже ясно, что Кларисса не просто прячет от вас книжечки. Она сознательно полезла в настоящую грязь."
@@ -184,7 +184,7 @@ label story_clara_market_booklet_3:
 
     $ Clara.openness = min(20, int(Clara.openness or 0) + 1)
     $ event_runtime.active_thread.advance()
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -192,8 +192,8 @@ label story_clara_market_booklet_3:
 # Consequence: confession is marked, openness/friendship change, and the thread advances.
 label story_clara_market_booklet_4:
     $ renpy.dynamic("_clara_escape_bonus")
+    $ main_ui_begin_native_scene_state("Признание Клариссы")
     show screen main_ui
-    $ main_ui_runtime.mode = "event"
 
     vscene "images/clara/mongolTalk.png"
     $ scene_runtime.text = "Вы дожидаетесь удобного момента и без окриков говорите Клариссе, что видели ее вечерний разговор с Монголом. Девушка сначала белеет, потом зло сжимает губы, но быстро понимает, что вы пришли не сдавать ее отцу.\n\n\"Да, это я его подбила,\" признается она наконец. \"Мне нужны деньги. Отец уже подбирает мне старого хрыча в столице, и весь этот брак будет не для меня, а для его торговли. Я не собираюсь ехать туда смирной куклой.\" Она нервно усмехается и добавляет, что книжечки, рисунки и все разговоры про свободу для нее давно перестали быть просто романтической чушью. \"Хочется хоть раз жить не по чужому счету. А Монгол обещал, что если я соберу достаточно денег, то в его тайном кругу мне найдут место. Хоть кем. Хоть рисовальщицей, хоть этой их девкой для сценок. Знаю, звучит грязно. Но это все равно лучше, чем лечь под старого вонючего дурака по приказу отца.\"\n\nСказав это, Кларисса смотрит на вас уже не как на случайного покупателя, а как на человека, который теперь знает слишком много."
@@ -215,15 +215,15 @@ label story_clara_market_booklet_4:
     $ calendar_v2.advance_minutes(30)
     call stat
     $ event_runtime.active_thread.advance()
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_end_native_scene_state()
     return True
 
 
 # Event: HunterClub rumor reveals Mongol's arrest.
 # Consequence: the stocks arrest day is recorded and the thread advances.
 label story_clara_market_booklet_5:
+    $ main_ui_begin_native_scene_state("Слухи в охотничьем клубе")
     show screen main_ui
-    $ main_ui_runtime.mode = "event"
 
     vscene "images/general/hunter_store_catInfo.png"
     $ scene_runtime.text = "Едва вы входите в охотничий клуб, как из угла до вас доносится горячий пересказ свежей городской новости. Охотники с явным удовольствием обсуждают, как стража наконец-то сцапала конокрада, слишком уж долго крутившегося вокруг рынка и конного торга.\n\n\"Сидит теперь у караулки в колодках, вместе с парой таких же голодранцев,\" хмыкает один. \"Пусть народ посмотрит, может поумнеют.\" Другой замечает, что десятник Циммерман теперь ходит важный, как будто сам лично всю шайку выволок за шкирку.\n\nСудя по обрывкам слов, речь идет о Монголе."
@@ -238,15 +238,15 @@ label story_clara_market_booklet_5:
     $ calendar_v2.advance_minutes(15)
     call stat
     $ event_runtime.active_thread.advance()
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_end_native_scene_state()
     return True
 
 
 # Event: the player sees Mongol in the stocks.
 # Consequence: stocks seen flag is recorded and the thread advances.
 label story_clara_market_booklet_6:
+    $ main_ui_begin_native_scene_state("Монгол в колодках")
     show screen main_ui
-    $ main_ui_runtime.mode = "event"
 
     vscene "images/mongolStock.png"
     $ scene_runtime.text = "На рыночной площади, возле караулки, стоят тяжелые колодки. В них вместе с еще парой помятых головорезов сидит и Монгол. От прежней ярмарочной ухмылки в нем мало что осталось: губа разбита, рубаха грязная, но глаза все еще бегают живо.\n\nЗаметив вас, он дергается и шипит сквозь зубы: \"Стефан, брат, не губи. Я тут с голоду загнусь раньше, чем меня судить начнут. Принеси ночью пожрать, а там, может, и поговорим. Я добро помню. И про Клариссу тоже помню.\""
@@ -258,7 +258,7 @@ label story_clara_market_booklet_6:
             pass
 
     $ event_runtime.active_thread.advance()
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -267,8 +267,8 @@ label story_clara_market_booklet_6:
 # - give food: consumes food, records the day, advances thread
 # - leave: keeps thread on this stage
 label story_clara_market_booklet_7:
+    $ main_ui_begin_native_scene_state("Монгол в колодках")
     show screen main_ui
-    $ main_ui_runtime.mode = "event"
 
     vscene "images/mongolStock.png"
     $ scene_runtime.text = "Ночью у караулки тихо, только где-то внутри переговариваются сонные стражи. Монгол в колодках шевелится и, увидев вас, сразу подается вперед.\n\n\"Ну что, принес чего-нибудь?\" шепчет он. \"Я тут второй день на одной воде. Помоги сейчас, и я потом не забуду.\""
@@ -280,7 +280,7 @@ label story_clara_market_booklet_7:
             jump story_clara_market_booklet_feed_mongol
 
         "Уйти и вернуться позже":
-            $ main_ui_runtime.mode = "scene"
+            $ main_ui_end_native_scene_state()
             return True
 
 
@@ -295,7 +295,7 @@ label story_clara_market_booklet_feed_mongol:
     $ calendar_v2.advance_minutes(15)
     call stat
     $ event_runtime.active_thread.advance()
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -304,8 +304,8 @@ label story_clara_market_booklet_feed_mongol:
 # - pay: consumes money, records lockpick order, advances thread
 # - leave: keeps thread on this stage
 label story_clara_market_booklet_8:
+    $ main_ui_begin_native_scene_state("Заказ у Драупнира")
     show screen main_ui
-    $ main_ui_runtime.mode = "event"
 
     vscene "images/draupnir/dwarf1.jpg"
     $ scene_runtime.text = "Вы находите Драупнира за верстаком и, не мудрствуя лукаво, объясняете, что вам нужны очень тонкие отмычки. Гном сперва косится на вас с подозрением, потом только фыркает.\n\n\"Ничего не знаю и знать не хочу, для какой двери тебе такая железяка,\" ворчит он. \"Но если работа тонкая и молчаливая, то это ко мне. За сорок мараведи сделаю хороший набор, который и в сапог спрятать не стыдно.\""
@@ -317,7 +317,7 @@ label story_clara_market_booklet_8:
             jump story_clara_market_booklet_lockpicks_order
 
         "Не заказывать пока":
-            $ main_ui_runtime.mode = "scene"
+            $ main_ui_end_native_scene_state()
             return True
 
 
@@ -332,7 +332,7 @@ label story_clara_market_booklet_lockpicks_order:
     $ calendar_v2.advance_minutes(15)
     call stat
     $ event_runtime.active_thread.advance()
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -341,8 +341,8 @@ label story_clara_market_booklet_lockpicks_order:
 # - release: consumes food/wine, updates consequences, completes the thread
 # - leave: keeps thread on this stage
 label story_clara_market_booklet_9:
+    $ main_ui_begin_native_scene_state("Освобождение Монгола")
     show screen main_ui
-    $ main_ui_runtime.mode = "event"
 
     vscene "images/mongolStock.png"
     $ scene_runtime.text = "Следующей ночью вы возвращаетесь к караулке уже подготовленным. Монгол сразу понимает это по вашему лицу и только сильнее вжимается в колодки, чтобы не привлекать лишних взглядов.\n\nТеперь все упирается в одно: если вы хотите вытащить его отсюда, надо сперва умаслить стражу и отвлечь ее чем-то приятнее ночного дежурства."
@@ -354,7 +354,7 @@ label story_clara_market_booklet_9:
             jump story_clara_market_booklet_release_mongol
 
         "Передумать и уйти":
-            $ main_ui_runtime.mode = "scene"
+            $ main_ui_end_native_scene_state()
             return True
 
 
@@ -374,5 +374,5 @@ label story_clara_market_booklet_release_mongol:
     $ calendar_v2.advance_minutes(30)
     call stat
     $ event_runtime.active_thread.complete()
-    $ main_ui_runtime.mode = "scene"
+    $ main_ui_end_native_scene_state()
     return True

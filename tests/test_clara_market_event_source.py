@@ -272,6 +272,17 @@ def test_clara_market_thread_file_has_no_direct_wrappers_or_paged_panels():
     assert "rooms.get(\"HunterClub\").build_action_items()" in hunter
 
 
+def test_clara_market_events_restore_the_calling_picture_and_ui_context():
+    labels = _source(Path("game") / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy")
+
+    assert 'main_ui_runtime.mode = "event"' not in labels
+    assert 'main_ui_runtime.mode = "scene"' not in labels
+    assert labels.count("main_ui_begin_native_scene_state(") == 9
+    assert labels.count("main_ui_end_native_scene_state()") == 15
+    assert labels.index('main_ui_begin_native_scene_state("Кларисса на рынке")') < labels.index('vscene "images/clara/market_day.png"')
+    assert labels.index('main_ui_begin_native_scene_state("Признание Клариссы")') < labels.index('vscene "images/clara/mongolTalk.png"', labels.index("label story_clara_market_booklet_4:"))
+
+
 def test_main_ui_keeps_standard_three_section_layout():
     layout = _source(Path("game") / "Utilities" / "General" / "Screens" / "main_layout.rpy")
 

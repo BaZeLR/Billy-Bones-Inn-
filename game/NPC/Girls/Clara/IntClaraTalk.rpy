@@ -2,9 +2,15 @@ label IntClaraTalk(girl_name="clara"):
     $ renpy.dynamic("_clara_picture", "_clara_talk_new", "_clara_talk_picture", "_clara_flirted_before", "_clara_ride_location", "_clara_repeat_menu")
     $ _clara_talk_new = str(main_ui_runtime.mode or "") != "talk" or str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "").strip().lower() != str(girl_name or "clara").strip().lower()
     $ main_ui_begin_talk_state("Разговор с Клариссой", girl_name)
-    if _clara_talk_new and str(rooms.current_code or "") == "WineStore":
-        $ _clara_talk_picture = str(Clara.wine_store_talk_picture() or "").strip()
+    if _clara_talk_new:
+        if str(rooms.current_code or "") == "WineStore":
+            $ _clara_talk_picture = str(Clara.wine_store_talk_picture() or "").strip()
+        elif str(rooms.current_code or "") in ("ForestClearing", "ForestSpring", "ForestLake"):
+            $ _clara_talk_picture = str(Clara.forest_picture(str(rooms.current_code or "")) or "").strip()
+        else:
+            $ _clara_talk_picture = ""
         if _clara_talk_picture:
+            $ main_ui_runtime.talk_picture = _clara_talk_picture
             vscene _clara_talk_picture
     $ update_stat_state()
     if str(scene_runtime.text or "").strip() == "":
@@ -16,6 +22,7 @@ label IntClaraTalk(girl_name="clara"):
         menu:
             "Осмотреть":
                 call ShowGirlCard(girl_name)
+                $ _clara_repeat_menu = True
 
             "Поговорить" if social_has_visible_topics(girl_name, "talk"):
                 call SocialTalkTopicMenu(girl_name, "talk")
@@ -34,15 +41,19 @@ label IntClaraTalk(girl_name="clara"):
                 call SocialTalkTopicMenu(girl_name, "flirt")
                 if Clara.flirted_today > _clara_flirted_before:
                     $ Clara.flirt_count = max(0, int(Clara.flirt_count or 0)) + 1
+                $ _clara_repeat_menu = True
 
             "Подарить маленький подарок" if old_point_action_unlocked(girl_name, "gift") and Clara.has_giftable_entries():
                 call IntClaraGiftMenu(girl_name)
+                $ _clara_repeat_menu = True
 
             "Коснуться ее смелее" if old_point_action_unlocked(girl_name, "kino"):
                 call OldPointKinoAttempt(girl_name)
+                $ _clara_repeat_menu = True
 
             "Извиниться перед Клариссой" if old_point_apology_available(girl_name):
                 call OldPointApology(girl_name)
+                $ _clara_repeat_menu = True
 
             "Проследить за Клариссой по рынку" if str(rooms.current_code or "") == "MarketPlace" and int(player.stats.exploration or 0) >= 100 and int(Clara.asked_today or 0) == 0:
                 $ Clara.mark_asked()
@@ -56,9 +67,11 @@ label IntClaraTalk(girl_name="clara"):
 
             "Осторожно заговорить о ее вечерних делах" if story_event_available("WineStore", "clara_talk"):
                 call checkTriggers("WineStore", "clara_talk", 0)
+                $ _clara_repeat_menu = True
 
             "Поговорить с Клариссой о рисунках" if story_event_available("WineStore", "clara_paintings"):
                 call checkTriggers("WineStore", "clara_paintings", 0)
+                $ _clara_repeat_menu = True
 
             "Спросить Клариссу о семье" if int(Clara.asked_today or 0) == 0 and int(Clara.rel or 0) >= 6:
                 $ Clara.mark_asked()
@@ -67,6 +80,7 @@ label IntClaraTalk(girl_name="clara"):
                 $ Clara.change_social(friend_delta=1)
                 $ scene_runtime.text = "Вы осторожно спрашиваете Клариссу о ее семье. Девушка сначала держится по-прежнему светски, но потом все же смягчается.\n\n\"У нас дома все устроено правильно и чинно, но иногда от этой правильности устаешь сильнее, чем от любой работы,\" признается она. — \"Отец много требует, мать следит за внешними приличиями, а мне все чаще хочется хоть иногда бывать там, где можно говорить свободнее.\""
                 $ scene_runtime.location_text = scene_runtime.text
+                $ _clara_repeat_menu = True
 
             "Спросить Клариссу о ней самой" if int(Clara.asked_today or 0) == 0 and int(Clara.rel or 0) >= 6:
                 $ Clara.mark_asked()
@@ -75,6 +89,7 @@ label IntClaraTalk(girl_name="clara"):
                 $ Clara.change_social(friend_delta=1)
                 $ scene_runtime.text = "Вы просите Клариссу рассказать о себе самой, а не о том, что от нее ждут дома. Она коротко смеется и, поколебавшись, все же отвечает честнее обычного.\n\n\"Я люблю смотреть, как люди ведут дела и как один и тот же город меняется в зависимости от того, с кем ты говоришь. Наверное, мне нравится наблюдать и делать выводы. Просто дома не всякому понравится, если девушка слишком много замечает,\" говорит Кларисса."
                 $ scene_runtime.location_text = scene_runtime.text
+                $ _clara_repeat_menu = True
 
             "Спросить Клариссу об укромных местах" if int(Clara.asked_today or 0) == 0 and int(Clara.rel or 0) >= 6 and not bool(Clara.old_water_pump_hint_seen) and threads["melissaBatProblem"].num >= 5:
                 $ Clara.mark_asked()
@@ -84,6 +99,7 @@ label IntClaraTalk(girl_name="clara"):
                 $ Clara.change_social(friend_delta=1)
                 $ scene_runtime.text = "Кларисса, чуть усмехнувшись, признает, что в городе есть места, куда люди ходят не за водой и не за прогулкой.\n\n\"У старой водокачки, за лесной тропой, часто встречаются те, кому не хочется лишних глаз,\" говорит она. — \"Если после того, что ты уже слышал с чердака, тебе все еще нужны доказательства, ищи не на главной дороге. Секреты любят обходные тропы.\""
                 $ scene_runtime.location_text = scene_runtime.text
+                $ _clara_repeat_menu = True
 
             "Осторожно заговорить о ее тайных рисунках" if int(Clara.asked_today or 0) == 0 and int(Clara.rel or 0) >= 6 and (bool(Clara.drawings_secret_known) or bool(Melissa.drawings_found)):
                 $ Clara.mark_asked()
@@ -92,6 +108,7 @@ label IntClaraTalk(girl_name="clara"):
                 $ Clara.change_social(friend_delta=1)
                 $ scene_runtime.text = "Вы осторожно даете Клариссе понять, что знаете о ее тайных непристойных рисунках и не собираетесь поднимать из-за этого шум. Она сперва цепенеет, но потом, поняв ваш тон, только шумно выдыхает.\n\n\"Дома за такое меня бы живьем съели,\" признается она. — \"Отец требует приличий, мать — судьбы по правилам, а мне иногда хочется хотя бы на бумаге жить не так, как велено. Потому я и наблюдаю за людьми, и слушаю лишнее. Иначе совсем задохнешься в чужих ожиданиях.\""
                 $ scene_runtime.location_text = scene_runtime.text
+                $ _clara_repeat_menu = True
 
             "Предложить подвезти Клариссу на коне" if Clara.can_accept_horse_ride(rooms.current_code):
                 $ _clara_ride_location = str(rooms.current_code or "")

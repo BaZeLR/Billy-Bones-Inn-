@@ -157,7 +157,11 @@ def test_clara_social_and_gift_logic_belongs_to_clara_instance():
     assert "jump IntClaraTalkMenu" not in talk_source
     assert "while True:" not in talk_source
     assert "jump IntClaraTalk" not in talk_source
-    assert "if _clara_talk_new and" in talk_source
+    assert "if _clara_talk_new:" in talk_source
+    assert 'main_ui_runtime.talk_picture = _clara_talk_picture' in talk_source
+    assert 'str(rooms.current_code or "") == "WineStore"' in talk_source
+    assert 'str(rooms.current_code or "") in ("ForestClearing", "ForestSpring", "ForestLake")' in talk_source
+    assert talk_source.index('main_ui_begin_talk_state("Разговор с Клариссой", girl_name)') < talk_source.index("vscene _clara_talk_picture")
     assert "Clara.can_receive_gifts()" not in people_runtime
     assert "def npc_gift_action_available" not in people_runtime
     assert "Clara.has_giftable_entries()" not in people_runtime

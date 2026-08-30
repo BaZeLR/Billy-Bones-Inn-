@@ -3102,6 +3102,7 @@ testcase external_clara_market_event_repeats_until_exploration_success:
     $ threads["cityBlindPirateFall"].advanceTo(threads["cityBlindPirateFall"].data.length, complete_at_end=True)
     $ findAvailableEvents(True)
     assert eval (story_event_available("MarketPlace", "enter")) timeout 5.0
+    $ _clara_market_origin_picture = str(scene_runtime.picture or "")
     run Call("checkTriggers", "MarketPlace", "enter", 0)
     advance until screen "choice" timeout 20.0
     assert eval ("Проследить за Клариссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
@@ -3110,8 +3111,10 @@ testcase external_clara_market_event_repeats_until_exploration_success:
     $ _clara_follow_energy_before = int(player.condition.energy or 0)
     $ _clara_follow_minutes_before = (int(calendar_v2.daysInGame or 0) * 1440) + int(calendar_v2.clock_minutes() or 0)
     click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval ("Похоже, без лучшей сноровки" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/clara/market_day.png") timeout 5.0
     advance until eval (people_to_int(Clara.market_follow_failed_day, -1) == int(calendar_v2.daysInGame or 0)) timeout 20.0
-    assert eval ("Похоже, без лучшей сноровки" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == _clara_market_origin_picture and "Похоже, без лучшей сноровки" not in str(scene_runtime.text or "") and str(main_ui_runtime.mode or "") == "scene") timeout 5.0
     assert eval (renpy.get_screen("main_ui") is not None) timeout 5.0
     assert eval (((int(calendar_v2.daysInGame or 0) * 1440) + int(calendar_v2.clock_minutes() or 0)) - _clara_follow_minutes_before == 30) timeout 5.0
     assert eval (int(player.condition.energy or 0) == max(0, _clara_follow_energy_before - 5)) timeout 5.0
@@ -3135,15 +3138,17 @@ testcase external_clara_market_event_repeats_until_exploration_success:
     assert eval (story_event_available("MarketPlace", "enter")) timeout 5.0
     $ event_runtime.active_thread = threads["claraBookletMarket"]
     $ player.stats.exploration = 100
+    $ _clara_market_origin_picture = str(scene_runtime.picture or "")
     run Call("checkTriggers", "MarketPlace", "enter", 0)
     advance until screen "choice" timeout 20.0
     assert eval ("Проследить за Клариссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _clara_follow_energy_before = int(player.condition.energy or 0)
     $ _clara_follow_minutes_before = (int(calendar_v2.daysInGame or 0) * 1440) + int(calendar_v2.clock_minutes() or 0)
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Кларисса что-то сбывает" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/clara/market_bookletDeal.png") timeout 5.0
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraBookletMarket"].num or 0) == 1) timeout 20.0
-    assert eval ("Кларисса что-то сбывает" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == _clara_market_origin_picture and "Кларисса что-то сбывает" not in str(scene_runtime.text or "") and str(main_ui_runtime.mode or "") == "scene") timeout 5.0
     assert eval (((int(calendar_v2.daysInGame or 0) * 1440) + int(calendar_v2.clock_minutes() or 0)) - _clara_follow_minutes_before == 30) timeout 5.0
     assert eval (int(player.condition.energy or 0) == max(0, _clara_follow_energy_before - 5)) timeout 5.0
     assert eval (int(threads["claraBookletMarket"].num or 0) == 1 and threads["claraBookletMarket"].currentTarget() == "story_clara_market_booklet_2") timeout 5.0
@@ -3176,15 +3181,18 @@ testcase external_clara_market_follow_finishes_without_self_loop:
     $ findAvailableEvents(True)
 
     assert eval (story_event_available("MarketPlace", "enter")) timeout 5.0
+    $ _clara_market_origin_text = str(scene_runtime.text or "")
+    $ _clara_market_origin_picture = str(scene_runtime.picture or "")
     run Call("checkTriggers", "MarketPlace", "enter", 0)
     advance until screen "choice" timeout 20.0
     assert eval ("Проследить за Клариссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _clara_follow_energy_before = int(player.condition.energy or 0)
     $ _clara_follow_minutes_before = (int(calendar_v2.daysInGame or 0) * 1440) + int(calendar_v2.clock_minutes() or 0)
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Кларисса что-то сбывает" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/clara/market_bookletDeal.png") timeout 5.0
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraBookletMarket"].num or 0) == 1) timeout 20.0
-    assert eval ("Кларисса что-то сбывает" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(scene_runtime.text or "") == _clara_market_origin_text and str(scene_runtime.picture or "") == _clara_market_origin_picture) timeout 5.0
     assert eval (((int(calendar_v2.daysInGame or 0) * 1440) + int(calendar_v2.clock_minutes() or 0)) - _clara_follow_minutes_before == 30) timeout 5.0
     assert eval (int(player.condition.energy or 0) == max(0, _clara_follow_energy_before - 5)) timeout 5.0
     assert eval (int(threads["claraBookletMarket"].num or 0) == 1 and threads["claraBookletMarket"].currentTarget() == "story_clara_market_booklet_2") timeout 5.0
@@ -3255,9 +3263,14 @@ testcase external_clara_melissa_bar_gossip_click_fires_ready_dialog:
     assert eval ("Задержаться у стойки в ожидании истории" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     $ _clara_visit_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Задержаться у стойки в ожидании истории")
     $ _clara_visit_button_id = "choice_panel_button_%d" % int(_clara_visit_index)
-    click id _clara_visit_button_id pos (0.5, 0.5) until eval (int(threads["claraTavernVisit"].num or 0) == 1) timeout 20.0
+    $ _clara_visit_origin_text = str(scene_runtime.text or "")
+    $ _clara_visit_origin_picture = str(scene_runtime.picture or "")
+    click id _clara_visit_button_id pos (0.5, 0.5) until screen "choice" timeout 20.0
     assert eval ('Мелисса, едва сдерживая смех' in str(scene_runtime.text or "")) timeout 5.0
-    assert eval (renpy.showing("images/clara/tavern_visit.png")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/clara/tavern_visit.png") timeout 5.0
+    assert eval (int(threads["claraTavernVisit"].num or 0) == 0) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraTavernVisit"].num or 0) == 1) timeout 20.0
+    assert eval (str(scene_runtime.text or "") == _clara_visit_origin_text and str(scene_runtime.picture or "") == _clara_visit_origin_picture) timeout 5.0
     assert eval (threads["claraTavernVisit"].currentTarget() == "story_clara_tavern_visit_bar_1") timeout 5.0
 
     $ threads["melissaBatProblem"].advanceTo(6, force_active=True)
@@ -3272,9 +3285,14 @@ testcase external_clara_melissa_bar_gossip_click_fires_ready_dialog:
     assert eval ("Задержаться у стойки в ожидании истории" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     $ _clara_visit_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Задержаться у стойки в ожидании истории")
     $ _clara_visit_button_id = "choice_panel_button_%d" % int(_clara_visit_index)
-    click id _clara_visit_button_id pos (0.5, 0.5) until eval (int(threads["claraTavernVisit"].num or 0) == 2) timeout 20.0
+    $ _clara_visit_origin_text = str(scene_runtime.text or "")
+    $ _clara_visit_origin_picture = str(scene_runtime.picture or "")
+    click id _clara_visit_button_id pos (0.5, 0.5) until screen "choice" timeout 20.0
     assert eval ('Если б я была царица' in str(scene_runtime.text or "")) timeout 5.0
-    assert eval (renpy.showing("images/clara/tavern_visit_size.png")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/clara/tavern_visit_size.png") timeout 5.0
+    assert eval (int(threads["claraTavernVisit"].num or 0) == 1) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraTavernVisit"].num or 0) == 2) timeout 20.0
+    assert eval (str(scene_runtime.text or "") == _clara_visit_origin_text and str(scene_runtime.picture or "") == _clara_visit_origin_picture) timeout 5.0
     assert eval (threads["claraTavernVisit"].currentTarget() == "story_clara_tavern_visit_bar_2") timeout 5.0
 
 testcase external_clara_booklet_mongol_night_buttons_advance:
@@ -4168,8 +4186,8 @@ testcase external_clara_flirt_unlocks_paintings_gate:
     click id _clara_flirt_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Затеять светскую игру" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     $ _clara_topic_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index(str([i.caption for i in renpy.get_screen("choice").scope.get("items", []) if str(i.caption or "") != "Назад"][0]))
     $ _clara_topic_button_id = "choice_panel_button_%d" % int(_clara_topic_index)
-    click id _clara_topic_button_id pos (0.5, 0.5) until eval (int(Clara.flirted_today or 0) == 1 and int(Clara.flirt_count or 0) == 1 and str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is None) timeout 20.0
-    click id "main_ui_entity_button_npc_clara" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
+    click id _clara_topic_button_id pos (0.5, 0.5) until eval (int(Clara.flirted_today or 0) == 1 and int(Clara.flirt_count or 0) == 1 and str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None and "Назад" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (str(main_ui_runtime.talk_picture or "") == str(Clara.wine_store_talk_picture() or "") and str(scene_runtime.picture or "").startswith("images/clara/wineSellar_clara_flirt_")) timeout 5.0
     $ _clara_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
     $ _clara_back_button_id = "choice_panel_button_%d" % int(_clara_back_index)
     click id _clara_back_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and str(rooms.current_code or "") == "WineStore") timeout 20.0
@@ -4722,7 +4740,10 @@ testcase external_clara_evening_follow_finishes_in_melissa_room:
     $ findAvailableEvents(True)
 
     run Jump("ArtisansQuarter")
-    advance until screen "main_ui" timeout 20.0
+    advance until screen "choice" timeout 20.0
+    assert eval ("Вечером вы с Клариссой" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (int(threads["claraPaintingsPath"].num or 0) == 8) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 9) timeout 20.0
     assert eval (int(threads["claraPaintingsPath"].num or 0) == 9) timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 22, 0)
     $ npc_interval_schedule_load_all(True)
@@ -4731,9 +4752,15 @@ testcase external_clara_evening_follow_finishes_in_melissa_room:
     run Jump("TavernMelissaRoom")
     advance until screen "main_ui" timeout 20.0
     assert eval ("Выслушать Клариссу и Мелиссу" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
-    $ renpy.call_in_new_context("checkTriggers", "TavernMelissaRoom", "clara_paintings", 0)
-    assert eval (int(threads["claraPaintingsPath"].num or 0) == 10) timeout 5.0
+    $ _clara_room_origin_text = str(scene_runtime.text or "")
+    $ _clara_room_origin_picture = str(scene_runtime.picture or "")
+    run Call("checkTriggers", "TavernMelissaRoom", "clara_paintings", 0)
+    advance until screen "choice" timeout 20.0
     assert eval ("Кларисса наконец срывается" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (int(threads["claraPaintingsPath"].num or 0) == 9) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 10) timeout 20.0
+    assert eval (int(threads["claraPaintingsPath"].num or 0) == 10) timeout 5.0
+    assert eval (str(scene_runtime.text or "") == _clara_room_origin_text and str(scene_runtime.picture or "") == _clara_room_origin_picture) timeout 5.0
 
 '''
 
