@@ -278,7 +278,7 @@ init python:
         present_ids = list(tavern_breakfast_present_ids() or [])
         return (
             (int(threads["melissaBatProblem"].num or 0) >= 3 or int(werecat_state().get("rats_problem_active", 0) or 0) == 1)
-            and int(threads["melissaBatProblem"].num or 0) < 8
+            and not bool(threads["melissaBatProblem"].completed)
             and "melissa" in present_ids
             and "amanda" in present_ids
             and "sandra" in present_ids
@@ -1341,7 +1341,7 @@ label TavernKitchenBreakfastTease:
     if _tease_girl == "amanda":
         $ _tease_private_unlocked = _tease_private_unlocked or Amanda.var_int("suckyou", 0) == 1 or Amanda.var_int("fuckyou", 0) == 1
     elif _tease_girl == "melissa":
-        $ _tease_private_unlocked = _tease_private_unlocked or threads["melissaBatProblem"].num >= 8
+        $ _tease_private_unlocked = _tease_private_unlocked or bool(threads["melissaBatProblem"].completed)
     if _tease_private_unlocked:
         "[scene_runtime.text]"
         menu:

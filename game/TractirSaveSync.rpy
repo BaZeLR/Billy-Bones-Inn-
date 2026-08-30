@@ -45,6 +45,9 @@ init -100 python:
                 amanda_obj.attic_window_favor_stage = 2
             else:
                 amanda_obj.attic_window_favor_stage = 0
+        melissa_obj = globals().get("Melissa")
+        if melissa_obj is not None and hasattr(melissa_obj, "drawings_ready_day"):
+            delattr(melissa_obj, "drawings_ready_day")
 
     def tractir_save_normalize_tavern_staff_jobs():
         for person in ("sandra", "melissa", "amanda"):
@@ -934,7 +937,7 @@ init -100 python:
             return
         legacy_stage = max(0, min(int(melissa_var.pop("bats_episode", 0) or 0), 8))
         if legacy_stage >= 8:
-            bat_thread.advanceTo(8, complete_at_end=True, force_active=False)
+            bat_thread.advanceTo(bat_thread.data.length, complete_at_end=True, force_active=False)
             return
         bat_thread.advanceTo(legacy_stage, force_active=legacy_stage > 0)
 
@@ -1555,9 +1558,9 @@ init -100 python:
         Melissa.bat_attic_check_day = people_to_int(
             melissa_var.pop("bat_attic_check_day", getattr(Melissa, "bat_attic_check_day", -1)), -1
         )
-        Melissa.drawings_ready_day = people_to_int(
-            melissa_var.pop("drawings_ready_day", getattr(Melissa, "drawings_ready_day", -1)), -1
-        )
+        melissa_var.pop("drawings_ready_day", None)
+        if hasattr(Melissa, "drawings_ready_day"):
+            delattr(Melissa, "drawings_ready_day")
         Melissa.drawings_found = bool(people_to_int(
             melissa_var.pop("drawings_found", getattr(Melissa, "drawings_found", False)), 0
         ))

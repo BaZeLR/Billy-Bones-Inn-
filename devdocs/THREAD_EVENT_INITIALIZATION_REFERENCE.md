@@ -99,7 +99,8 @@ which checks day, hour, conditions, delay, requirements, probability, and whethe
 npc,thread_constructor,thread_level,thread_subname,thread_condition,target_label,day,hour,delay,probability,requirements,conditions,item,location,action,priority
 melissa,LThreadData,0,RatProblem,None,story_melissa_storage_rat_0,None,None,None,1,None,"CurLoc == TavernStorage; storage_rat_cleared == 0; melissa_storage_rat not seen today",None,TavernStorage,enter,0
 melissa,LThreadData,0,WerecatProblem,melissaRatProblem_0,story_melissa_werecat_rumor_0,None,None,None,1,None,"rats_problem_active == 1; storage_rat_cleared == 1; adopted == 0; sold == 0",None,HunterClub,overheard,0
-melissa,LThreadData,0,BatProblem,melissaRatProblem_0,story_melissa_bat_problem_5,None,None,None,1,None,"thread.num == 6; temp_room == TavernAmandaRoom; drawings_found == 0; current_game_day() >= drawings_ready_day",None,TavernMelissaRoom,room_search,5
+melissa,LThreadData,0,BatProblem,melissaRatProblem_0,story_melissa_bat_problem_5,None,None,None,1,None,"thread.num == 7; roof_repair_complete_day reached; temp_room == TavernAmandaRoom",None,TavernAmandaRoom,melissa_bats,5
+melissa,LThreadData,0,BatProblem,melissaRatProblem_0,story_melissa_bat_problem_booklet_search,None,None,None,1,None,"thread.num == 8; drawings_found == 0",None,TavernMelissaRoom,room_search,5
 clara,LThreadData,0,BookletMarket,None,story_clara_market_booklet_0,None,None,None,1,None,"CurLoc == MarketPlace; week in 1..6; time == 2; market day roll active; booklet_market_seen == 0",None,MarketPlace,enter,0
 clara,LThreadData,1,PaintingsPath,None,story_clara_paintings_melissa_0,None,None,None,1,None,"drawings_found == 1; paintings_melissa_asked == 0",None,talk_melissa,clara_paintings,0
 ```

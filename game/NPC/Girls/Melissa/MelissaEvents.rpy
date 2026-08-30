@@ -304,7 +304,6 @@ label story_melissa_bat_problem_fall:
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
     $ calendar_v2.advance_minutes(45)
-    $ Melissa.drawings_ready_day = int(current_game_day() or 0) + 2
     $ Melissa.temp_room_code = "TavernAmandaRoom"
     $ Melissa.change_social(friend_delta=-7)
     $ Amanda.change_social(friend_delta=-5)
@@ -317,20 +316,56 @@ label story_melissa_bat_problem_fall:
 
 
 label story_melissa_bat_problem_5:
+    $ main_ui_begin_native_scene_state("Потерянная тетрадь Мелиссы")
+    show screen main_ui
+    vscene MelissaStaticData.cycle_image("amanda_room", "under_bed_search", 0)
+    $ scene_runtime.text = "Когда вы заходите в комнату Аманды, Мелисса не замечает вас сразу. Она стоит на коленях у кровати и торопливо перебирает вещи, заглядывая под раму и ощупывая щели у стены."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+
+    vscene MelissaStaticData.cycle_image("amanda_room", "under_bed_search", 1)
+    $ scene_runtime.text = "На скрип двери Мелисса резко оборачивается. По ее испуганному лицу ясно, что ищет она не обычную ленту или потерянную монету. После короткой паузы девушка признается, что не может найти небольшую тетрадь, которую привезла с собой из своей комнаты."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+
+    vscene MelissaStaticData.cycle_image("amanda_room", "under_bed_search", 2)
+    $ scene_runtime.text = "Мелисса просит не говорить Аманде о пропаже и снова проверяет под кроватью, но тетради там нет. Похоже, она могла оставить ее в своей комнате, когда в спешке перебиралась сюда из-за летучих мышей."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Оставить Мелиссу продолжать поиски":
+            pass
+
+    $ calendar_v2.advance_minutes(45)
+    $ Melissa.temp_room_code = ""
+    $ event_runtime.active_thread.advance()
+    if bool(Melissa.drawings_found):
+        $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_melissa_bat_problem_booklet_search:
     if int(effective_player_exploration() or 0) <= 120:
-        $ scene_runtime.text = "Пока Мелисса вынужденно ночует у Аманды, ее собственная комната остается непривычно тихой. Вы осматриваете ее внимательнее обычного: ларь, табурет, складки одеяла, щель между стеной и кроватью. Однако за сорок пять минут поисков ничего важного в глаза так и не бросается."
+        $ scene_runtime.text = "После встревоженных поисков Мелиссы вы внимательнее осматриваете ее комнату: ларь, табурет, складки одеяла, щель между стеной и кроватью. Однако за сорок пять минут ничего похожего на потерянную тетрадь в глаза так и не бросается."
         $ scene_runtime.location_text = scene_runtime.text
         "[scene_runtime.text]"
         $ calendar_v2.advance_minutes(45)
     else:
         vscene MelissaStaticData.image_path("bedroom_search", "booklet")
-        "Пока Мелисса вынужденно ночует у Аманды, ее собственная комната остается непривычно тихой. Вы осматриваете ее внимательнее обычного: ларь, табурет, складки одеяла, щель между стеной и кроватью."
+        "Вспомнив, как Мелисса искала пропажу у Аманды, вы осматриваете ее комнату внимательнее обычного: ларь, табурет, складки одеяла, щель между стеной и кроватью."
         "Под кроватью Мелиссы, задвинутый почти к самой стене, обнаруживается потертый рисованный буклет. Обложка ничего не объясняет, зато место, где его прятали, говорит само за себя."
-        $ Melissa.drawings_found = True
         $ scene_runtime.text = "Под кроватью Мелиссы вы нашли потертый рисованный буклет. Теперь его можно рассмотреть как найденный предмет."
         $ scene_runtime.location_text = scene_runtime.text
         "[scene_runtime.text]"
+        $ Melissa.drawings_found = True
         $ calendar_v2.advance_minutes(45)
+        $ event_runtime.active_thread.advance()
         $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
         $ main_ui_runtime.action_title = "Комната Мелиссы"
@@ -421,15 +456,15 @@ label story_melissa_bat_problem_4:
 
 label story_melissa_bat_problem_roof:
     vscene "images/player_room/player_room_attic_1.png"
-    if int(player.economy.money or 0) >= 1000:
-        $ scene_runtime.text = "Вы договариваетесь о починке старой крыши и отдаете за работу тысячу монет. Теперь остается только дождаться, пока мастера перетянут гнилые доски, забьют щели и приведут верх трактира в порядок. Обещают управиться за пару дней."
+    if int(player.economy.money or 0) >= 2000:
+        $ scene_runtime.text = "Вы договариваетесь о починке старой крыши и отдаете за работу две тысячи монет. Теперь остается только дождаться, пока мастера перетянут гнилые доски, забьют щели и приведут верх трактира в порядок. Обещают управиться за пару дней."
     else:
         $ scene_runtime.text = "Летучих мышей вы уже выкурили, но без починки крыши дело не закончить. Денег на мастеров пока не хватает."
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
     $ calendar_v2.advance_minutes(45)
-    if int(player.economy.money or 0) >= 1000:
-        $ player.spend_money(1000)
+    if int(player.economy.money or 0) >= 2000:
+        $ player.spend_money(2000)
         $ Melissa.roof_repair_complete_day = int(current_game_day() or 0) + 2
         $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)

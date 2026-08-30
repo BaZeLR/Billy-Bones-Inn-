@@ -4,19 +4,17 @@ This document reflects the current live code path for Melissa's bats quest.
 
 Core rule:
 - `melissaBatProblem` thread state is the sole progression source of truth.
-- `Melissa.bats_stage()` derives the readable `0..8` phase from that thread; it does not store a second phase value.
+- Live gates read `threads["melissaBatProblem"].num` or `completed`; there is no second bats-stage field.
 
 Timing fields:
-- `Melissa.var["storage_rat_last_help_day"]`
-- `Melissa.var["bat_attic_check_day"]`
-- `Melissa.var["drawings_ready_day"]`
-- `Melissa.var["roof_repair_order_day"]`
-- `Melissa.var["roof_repair_complete_day"]`
+- `Melissa.storage_rat_help_day`
+- `Melissa.bat_attic_check_day`
+- `Melissa.roof_repair_complete_day`
 
 Side state:
-- `Melissa.var["temp_room"]`
+- `Melissa.temp_room_code`
 
-The old `bats_episode`, `ratKilled`, `AskedMCToSolveRoomProblem`, `bats_completed`, `room_returned`, and `sex_engine_unlocked` fields are retired. Save migration promotes the old bat phase into `melissaBatProblem` once and removes the mirror; live gates use `Melissa.bats_stage()`.
+The old `bats_episode`, `ratKilled`, `AskedMCToSolveRoomProblem`, `bats_completed`, `room_returned`, `sex_engine_unlocked`, and `drawings_ready_day` fields are retired. Save migration promotes the old bat phase into `melissaBatProblem` once and removes the mirrors.
 
 ## Real Trigger Sequence
 
@@ -82,9 +80,11 @@ This is the real stage-2 room episode.
 | `3` | Room episode complete | Ceiling holes discovered; this includes the room-side discovery and goodnight outcome. Temporary lodging may be chosen. | On or after `bat_attic_check_day`, go to the attic and run `MelissaAtticColonySearch`. |
 | `4` | Attic colony found | The colony is confirmed on the attic search. | Use `MelissaAtticWindowPeek`. |
 | `5` | Window peek done | The voyeur window step is done. | Use `MelissaAtticFallScene`. |
-| `6` | Fall scandal / aftermath | Melissa catches the player after the fall, moves to Amanda's room, and the drawings side branch can start later. | Use `MelissaBurnAtticColony` once repellent is available. |
-| `7` | Colony smoked out / roof repair path | Bats are smoked out, roof repair may be ordered and then completed by day threshold. | Wait for roof completion, then take `MelissaBatsCompletionScene`. |
-| `8` | Completed | Melissa gets the explicit completion talk and the room problem is closed. | Final stage. |
+| `6` | Fall scandal | Melissa catches the player after the fall and moves to Amanda's room. | Smoke out the colony once repellent is available. |
+| `7` | Colony smoked out / roof repair | Order the repair for `2000`; `roof_repair_complete_day` is set two days ahead. | After the threshold, enter Amanda's room in the morning and catch Melissa searching under the bed. |
+| `8` | Lost-booklet aftermath | Melissa has returned from Amanda's room and revealed that a private booklet is missing. | Search Melissa's room; a successful exploration check reveals the booklet. |
+| `9` | Booklet found | The physical booklet is visible in Melissa's room and the Clara paintings continuation can resolve its origin. | After the drawings conversation is resolved, use Melissa's completion talk. |
+| `10` | Completed | Melissa gets the explicit completion talk and the room problem is closed. | Final stage. |
 
 ## Detailed Advancement Rules
 
@@ -137,9 +137,26 @@ Advance by:
 
 ### Stage `7 -> 8`
 Requirements:
-- roof repair ordered
+- pay `2000` to order the roof repair
 - `dayspassed >= roof_repair_complete_day`
-- completion talk still not taken
+- Melissa is still temporarily staying in Amanda's room
+
+Advance by:
+- enter Amanda's room and play the three-picture lost-booklet scene
+
+Existing saves from the former, incorrect order may already have `drawings_found` at stage `7`. They still play the required three-picture scene, then advance directly to stage `9` so the same physical booklet is not discovered or created twice.
+
+### Stage `8 -> 9`
+Requirements:
+- search Melissa's room
+- effective exploration is above `120`
+
+Advance by:
+- discover the booklet under Melissa's bed
+
+### Stage `9 -> 10`
+Requirements:
+- resolve the first Clara paintings conversation so `drawings_returned` is true
 
 Advance by:
 - Melissa completion follow-up scene
@@ -175,9 +192,11 @@ For this quest to play smoothly, the intended visible order is:
 9. Bat colony picture
 10. Window peek
 11. Fall scene
-12. Drawings aftermath
-13. Smoke out colony
-14. Repair roof
-15. Melissa completion talk
+12. Smoke out colony
+13. Pay `2000` and wait two days for the roof repair
+14. Catch Melissa searching under Amanda's bed
+15. Search Melissa's room and discover the booklet
+16. Resolve the drawings continuation
+17. Melissa completion talk
 
 That is the sequence the live code is now aiming to preserve.

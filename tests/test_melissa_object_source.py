@@ -81,7 +81,6 @@ def test_melissa_story_state_has_explicit_npc_properties_without_var_authority()
         "temp_room_code",
         "storage_rat_help_day",
         "bat_attic_check_day",
-        "drawings_ready_day",
         "drawings_found",
         "drawings_booklet_left",
         "drawings_booklet_read",
@@ -153,7 +152,7 @@ def test_melissa_save_migration_consumes_legacy_map_once():
     assert "if loaded_version < 51:" in migration
     assert "updateSave_V50()" in migration
     for retired_field in (
-        "intimacy_start_day", "intimacy_start_count", "intimacy_start_total",
+        "intimacy_start_day", "intimacy_start_count", "intimacy_start_total", "drawings_ready_day",
     ):
         assert f'self.{retired_field} =' not in MELISSA_INIT.read_text(encoding="utf-8-sig")
         assert f'"{retired_field}"' in migration

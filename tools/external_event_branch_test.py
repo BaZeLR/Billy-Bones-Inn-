@@ -157,7 +157,7 @@ testcase event_{safe_name}:
             _girl_info.asked_today = 0
         set_bedroom_door_locked("TavernSandraRoom", False)
         Melissa.drawings_found = True
-        threads["melissaBatProblem"].advanceTo(8, complete_at_end=True)
+        threads["melissaBatProblem"].advanceTo(threads["melissaBatProblem"].data.length, complete_at_end=True)
         Clara.drawings_secret_known = True
         Clara.flirt_count = max(int(Clara.flirt_count or 0), 1)
         Clara.commission_followup_day = 0
@@ -215,7 +215,7 @@ testcase event_{safe_name}_branch_{branch_index}:
             _girl_info.asked_today = 0
         set_bedroom_door_locked("TavernSandraRoom", False)
         Melissa.drawings_found = True
-        threads["melissaBatProblem"].advanceTo(8, complete_at_end=True)
+        threads["melissaBatProblem"].advanceTo(threads["melissaBatProblem"].data.length, complete_at_end=True)
         Clara.drawings_secret_known = True
         Clara.flirt_count = max(int(Clara.flirt_count or 0), 1)
         Clara.commission_followup_day = 0

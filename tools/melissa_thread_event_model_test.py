@@ -47,6 +47,10 @@ MELISSA_ROUTE_TOKENS = {
         ("game/Inn/TavernAtic.rpy", 'story_event_available("TavernAtic", "melissa_bats")'),
         ("game/Inn/TavernAtic.rpy", 'Call("checkTriggers", "TavernAtic", "melissa_bats", 0)'),
     ),
+    ("TavernAmandaRoom", "melissa_bats"): (
+        ("game/Inn/TavernAmandaRoom.rpy", 'story_event_available(rooms.current_code, "melissa_bats")'),
+        ("game/Inn/TavernAmandaRoom.rpy", 'call checkTriggers(rooms.current_code, "melissa_bats", 0)'),
+    ),
     ("TavernKitchen", "enter"): (
         ("game/Inn/TavernKitchen.rpy", "call RoomEnterEventGate(rooms.current_code, False)"),
         ("game/Utilities/General/Common/RoomEnterPipeline.rpy", 'story_event_available(_room_enter_code, "enter")'),
@@ -67,6 +71,10 @@ MELISSA_ROUTE_TOKENS = {
     ("TavernMain", "overheard"): (
         ("game/Inn/TavernMain.rpy", 'story_event_available("TavernMain", "overheard")'),
         ("game/Inn/TavernMain.rpy", 'Call("checkTriggers", "TavernMain", "overheard", 0)'),
+    ),
+    ("talk_melissa", "melissa_intimacy"): (
+        ("game/NPC/Girls/Melissa/IntMelissaTalk.rpy", 'story_event_available("talk_melissa", "melissa_intimacy")'),
+        ("game/NPC/Girls/Melissa/IntMelissaTalk.rpy", 'call checkTriggers("talk_melissa", "melissa_intimacy", 0)'),
     ),
     ("TavernMelissaRoom", "room_search"): (
         ("game/Inn/TavernMelissaRoom.rpy", 'Call("UpstairsRoomSearch", "TavernMelissaRoom")'),
@@ -139,7 +147,7 @@ class MelissaThreadEventModelTest(unittest.TestCase):
         self.assertGreaterEqual(len(self.melissa_events), 10)
         self.assertEqual(
             {thread.name for thread in self.melissa_threads},
-            {"melissaBatProblem", "melissaRatProblem", "melissaWerecatProblem", "melissaRevealingDressRequest"},
+            {"melissaBatProblem", "melissaRatProblem", "melissaWerecatProblem", "melissaRevealingDressRequest", "melissaCourtship"},
         )
         for thread in self.melissa_threads:
             self.assertEqual(thread.person, "melissa")
@@ -214,13 +222,16 @@ class MelissaThreadEventModelTest(unittest.TestCase):
                     problems.append(f"{route_key}: missing route token {token!r} in {rel_path}")
         self.assertFalse(problems, "\n".join(problems))
 
-    def test_melissa_bats_drawings_are_next_after_attic_fall(self):
+    def test_melissa_bats_roof_and_booklet_aftermath_follow_smoke(self):
         bat_thread = next(thread for thread in self.melissa_threads if thread.name == "melissaBatProblem")
         ordered_targets = [event.target for event in bat_thread.events]
         self.assertEqual(ordered_targets[4], "story_melissa_bat_problem_3")
         self.assertEqual(ordered_targets[5], "story_melissa_bat_problem_fall")
-        self.assertEqual(ordered_targets[6], "story_melissa_bat_problem_5")
-        self.assertEqual(ordered_targets[7], "story_melissa_bat_problem_4")
+        self.assertEqual(ordered_targets[6], "story_melissa_bat_problem_4")
+        self.assertEqual(ordered_targets[7], "story_melissa_bat_problem_roof")
+        self.assertEqual(ordered_targets[8], "story_melissa_bat_problem_5")
+        self.assertEqual(ordered_targets[9], "story_melissa_bat_problem_booklet_search")
+        self.assertEqual(ordered_targets[10], "story_melissa_bat_problem_6")
 
     def test_melissa_bat_events_cost_45_minutes(self):
         for target in (
@@ -237,14 +248,26 @@ class MelissaThreadEventModelTest(unittest.TestCase):
             body = self.melissa_event_bodies.get(target, "")
             self.assertEqual(body.count("calendar_v2.advance_minutes(45)"), 1, target)
             self.assertGreater(body.find("calendar_v2.advance_minutes(45)"), body.rfind('"[scene_runtime.text]"'), target)
-        body = self.melissa_event_bodies.get("story_melissa_bat_problem_5", "")
-        self.assertEqual(body.count("calendar_v2.advance_minutes(45)"), 2, "story_melissa_bat_problem_5")
-        self.assertEqual(body.count('"[scene_runtime.text]"'), 2, "story_melissa_bat_problem_5")
-        self.assertGreater(body.find("calendar_v2.advance_minutes(45)"), body.find('"[scene_runtime.text]"'), "story_melissa_bat_problem_5")
-        self.assertGreater(body.rfind("calendar_v2.advance_minutes(45)"), body.rfind('"[scene_runtime.text]"'), "story_melissa_bat_problem_5")
+        body = self.melissa_event_bodies.get("story_melissa_bat_problem_booklet_search", "")
+        self.assertEqual(body.count("calendar_v2.advance_minutes(45)"), 2, "story_melissa_bat_problem_booklet_search")
+        self.assertEqual(body.count('"[scene_runtime.text]"'), 2, "story_melissa_bat_problem_booklet_search")
+        self.assertGreater(body.find("calendar_v2.advance_minutes(45)"), body.find('"[scene_runtime.text]"'), "story_melissa_bat_problem_booklet_search")
+        self.assertGreater(body.rfind("calendar_v2.advance_minutes(45)"), body.rfind('"[scene_runtime.text]"'), "story_melissa_bat_problem_booklet_search")
+
+    def test_melissa_roof_cost_and_catch_scene_use_authored_sequence(self):
+        roof_body = self.melissa_event_bodies.get("story_melissa_bat_problem_roof", "")
+        catch_body = self.melissa_event_bodies.get("story_melissa_bat_problem_5", "")
+        self.assertIn("player.spend_money(2000)", roof_body)
+        self.assertIn("current_game_day() or 0) + 2", roof_body)
+        self.assertNotIn("spend_money(1000)", roof_body)
+        for image_index in range(3):
+            self.assertIn('MelissaStaticData.cycle_image("amanda_room", "under_bed_search", %d)' % image_index, catch_body)
+        self.assertIn("main_ui_begin_native_scene_state", catch_body)
+        self.assertEqual(catch_body.count("event_runtime.active_thread.advance()"), 2)
+        self.assertIn("if bool(Melissa.drawings_found):", catch_body)
 
     def test_melissa_booklet_search_requires_exploration_and_reveals_room_item(self):
-        body = self.melissa_event_bodies.get("story_melissa_bat_problem_5", "")
+        body = self.melissa_event_bodies.get("story_melissa_bat_problem_booklet_search", "")
         self.assertIn("int(effective_player_exploration() or 0) <= 120", body)
         self.assertNotIn('_room_add_item_by_id(TavernMelissaRoomRoom, "melissa_drawings_booklet_001")', body)
         self.assertIn('"melissa_drawings_booklet_001"', read_text(ROOT / "game/Inn/TavernMelissaRoom.rpy"))
@@ -255,7 +278,7 @@ class MelissaThreadEventModelTest(unittest.TestCase):
         self.assertIn("player.item_count('melissa_drawings_booklet_001')", self.source)
         self.assertNotIn("MelissaFoundBookletObjectMenu", self.melissa_events_source)
         self.assertGreater(body.find("Melissa.drawings_found = True"), body.find("effective_player_exploration"))
-        self.assertNotIn("event_runtime.active_thread.advance()", body)
+        self.assertIn("event_runtime.active_thread.advance()", body)
 
     def test_melissa_booklet_item_is_registered_and_readable(self):
         self.assertIn('object_id="melissa_drawings_booklet_001"', self.melissa_booklet_item_source)

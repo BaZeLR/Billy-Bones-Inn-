@@ -189,7 +189,6 @@ init python:
             self.temp_room_code = ""
             self.storage_rat_help_day = -1
             self.bat_attic_check_day = -1
-            self.drawings_ready_day = -1
             self.drawings_found = False
             self.drawings_booklet_left = False
             self.drawings_booklet_read = False
@@ -425,11 +424,8 @@ init python:
 
         def drawings_scene_ready(self):
             return (
-                threads["melissaBatProblem"].num >= 6
-                and threads["melissaBatProblem"].num < 8
-                and str(self.temp_room_code or "") == "TavernAmandaRoom"
+                threads["melissaBatProblem"].num == 8
                 and not bool(self.drawings_found)
-                and current_game_day() >= people_to_int(self.drawings_ready_day, -1)
                 and str(rooms.current_code or "") == "TavernMelissaRoom"
             )
 
@@ -466,8 +462,8 @@ init python:
                     return "Выжечь гнездо дымной смесью"
                 return "Осмотреть, как выкурить гнездо"
             if people_to_int(self.roof_repair_complete_day, -1) < 0:
-                if people_to_int(player.economy.money, 0) >= 1000:
-                    return "Заказать починку крыши за 1000"
+                if people_to_int(player.economy.money, 0) >= 2000:
+                    return "Заказать починку крыши за 2000"
                 return "Прикинуть, сколько обойдется починка крыши"
             return "Осмотреть починку крыши"
 
@@ -479,14 +475,12 @@ init python:
 
         def bats_completion_ready(self):
             return (
-                threads["melissaBatProblem"].num == 7
-                and self.bats_repair_complete()
+                threads["melissaBatProblem"].num == 9
                 and bool(self.drawings_returned)
             )
 
         def complete_bats_problem(self):
             self.temp_room_code = ""
-            self.roof_repair_complete_day = -1
             return True
 
 define MelissaStaticData = MelissaData()
