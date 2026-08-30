@@ -429,8 +429,14 @@ def test_melissa_werecat_event_labels_own_their_scenes_and_thread_advancement():
     event_source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")
     werecat_source = WERECAT_QUEST.read_text(encoding="utf-8-sig")
 
+    intro_block = event_source.split("label story_melissa_werecat_intro_0:", 1)[1].split("\nlabel ", 1)[0]
+    assert 'vscene "images/kitchen/need_kitty_1.png"' in intro_block
+    assert 'vscene "images/kitchen/need_kitty_2.png"' in intro_block
+    assert intro_block.index("need_kitty_1.png") < intro_block.index("need_kitty_2.png")
+    assert intro_block.count('"Продолжить":') == 2
+    assert "vscene tavern_kitchen_breakfast_picture()" not in intro_block
+
     for label_name in (
-        "story_melissa_werecat_intro_0",
         "story_melissa_werecat_home_0",
         "story_melissa_werecat_home_1",
     ):

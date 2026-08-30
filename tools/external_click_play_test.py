@@ -2766,6 +2766,14 @@ testcase external_melissa_werecat_thread_condition_sequence:
     $ event_runtime.active_thread = threads["melissaWerecatProblem"]
     $ event_runtime.active_thread.setDay()
     run Call("story_melissa_werecat_intro_0")
+    advance until screen "choice" timeout 10.0
+    assert eval (str(scene_runtime.picture or "") == "images/kitchen/need_kitty_1.png") timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and str(scene_runtime.picture or "") == "images/kitchen/need_kitty_2.png") timeout 10.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_home_0") timeout 10.0
     assert eval (int(werecat_state().get("rat_breakfast_seen", 0) or 0) == 1) timeout 5.0
     assert eval (threads["melissaWerecatProblem"].currentTarget() == "story_melissa_werecat_home_0") timeout 5.0
 

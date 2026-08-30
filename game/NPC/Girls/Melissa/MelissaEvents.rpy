@@ -30,21 +30,32 @@ label story_melissa_storage_rat_0:
 
 
 label story_melissa_werecat_intro_0:
+    $ main_ui_begin_native_scene_state("Завтрак: кошечка")
+    show screen main_ui
     $ werecat_state()["rat_breakfast_seen"] = 1
     $ player.tavern_management.breakfast.today = True
     $ player.tavern_management.breakfast.last_day = current_game_day()
     $ player.tavern_management.breakfast.day = current_game_day()
     $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
     $ player.tavern_management.breakfast.event_active = True
-    vscene tavern_kitchen_breakfast_picture()
-    $ scene_runtime.text = "Мягкий утренний свет ползет по кухне, в мисках парит каша, воздух пахнет молоком, овсом и горячим хлебом. За общим столом сегодня сидят все трое.\n\nСандра, помешивая кашу с лишней силой, первой возвращается к вчерашнему: \"Крысы в доме совсем распоясались. Уже по три полных тюка припасов за неделю портят. Если так пойдет дальше, к зиме сами у пустых мешков сядем.\"\n\nАманда разваливается на скамье и, как всегда, пытается рассечь тревогу шуткой: \"А знаешь, чего этому дому по-настоящему не хватает? Хорошей сильной киски. Такой, чтоб и мышей ловила, и с вредителями умела разбираться как следует.\" Она лукаво подмигивает.\n\nМелисса сперва краснеет, потом все же хихикает: \"Да... большой, гибкой охотницы. Чтобы маленьких пакостников душила без жалости... и ночами было бы с кем согреться.\"\n\nСмех за столом быстро снимает лишнее напряжение. Даже Сандра, отвернувшись к котлу, ворчит уже заметно мягче."
-    if relationship_anger("amanda") > 0 and relationship_anger("melissa") > 0:
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда и Мелисса все равно успевают уколоть друг друга. Сандра сразу обрывает их: \"Когти оставьте для крыс. За столом не шипеть.\""
-    elif relationship_anger("amanda") > 0:
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда шутит привычно, но сегодня в каждой шутке достается именно Мелиссе. Та краснеет, но не опускает глаза."
-    elif relationship_anger("melissa") > 0:
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nМелисса смеется вместе со всеми, но на амандины насмешки отвечает коротко и зло. Еще одно слово, и завтрак снова скатится в спор."
+    vscene "images/kitchen/need_kitty_1.png"
+    $ scene_runtime.text = "Мягкий утренний свет ползет по кухне, в мисках парит каша, воздух пахнет молоком, овсом и горячим хлебом. За общим столом сегодня сидят все трое. Сандра, помешивая кашу с лишней силой, первой возвращается к вчерашнему: \"Крысы в доме совсем распоясались. Уже по три полных тюка припасов за неделю портят. Если так пойдет дальше, к зиме сами у пустых мешков сядем.\" Аманда разваливается на скамье и, как всегда, пытается рассечь тревогу шуткой: \"А знаешь, чего этому дому по-настоящему не хватает? Хорошей сильной киски. Такой, чтоб и мышей ловила, и с вредителями умела разбираться как следует.\" Она лукаво подмигивает."
     $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    vscene "images/kitchen/need_kitty_2.png"
+    $ scene_runtime.text = "Мелисса сперва краснеет, потом все же хихикает: \"Да... большой, гибкой охотницы. Чтобы маленьких пакостников душила без жалости... и ночами было бы с кем согреться.\" Смех за столом быстро снимает лишнее напряжение. Даже Сандра, отвернувшись к котлу, ворчит уже заметно мягче."
+    if relationship_anger("amanda") > 0 and relationship_anger("melissa") > 0:
+        $ scene_runtime.text = str(scene_runtime.text or "") + " Аманда и Мелисса все равно успевают уколоть друг друга. Сандра сразу обрывает их: \"Когти оставьте для крыс. За столом не шипеть.\""
+    elif relationship_anger("amanda") > 0:
+        $ scene_runtime.text = str(scene_runtime.text or "") + " Аманда шутит привычно, но сегодня в каждой шутке достается именно Мелиссе. Та краснеет, но не опускает глаза."
+    elif relationship_anger("melissa") > 0:
+        $ scene_runtime.text = str(scene_runtime.text or "") + " Мелисса смеется вместе со всеми, но на амандины насмешки отвечает коротко и зло. Еще одно слово, и завтрак снова скатится в спор."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
     $ player.change_stat("fun", 5)
     $ Sandra.change_social(friend_delta=1)
     $ Melissa.change_social(friend_delta=1)
@@ -54,6 +65,7 @@ label story_melissa_werecat_intro_0:
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     return True
 
 
