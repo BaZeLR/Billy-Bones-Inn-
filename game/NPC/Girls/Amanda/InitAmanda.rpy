@@ -20,6 +20,23 @@ init python:
             self.birth_date = {"day": 10, "period": 9, "cycle": 1082}
             self.card_image = "images/amanda/amanda_card.jpg"
             self.schedule_source = "schedules/amanda.json"
+            self.image_manifest = {
+                "tavern": {
+                    "hall_cleaning": [
+                        "images/amanda/tavern/cleaner.webp",
+                        "images/amanda/tavern/cleaning1.jpg",
+                        "images/amanda/tavern/cleaning2.jpg",
+                    ],
+                    "waitress": [
+                        "images/amanda/tavern/waitress.png",
+                        "images/amanda/tavern/waitress1.jpeg",
+                        "images/amanda/tavern/waitress2.jpeg",
+                        "images/amanda/tavern/waitress3.jpeg",
+                        "images/amanda/tavern/waitress4.jpg",
+                        "images/amanda/tavern/waitress5.jpg",
+                    ],
+                },
+            }
 
     class AmandaInfo(Girl):
         """Amanda runtime: tavern household, Legare path, social state, body state."""

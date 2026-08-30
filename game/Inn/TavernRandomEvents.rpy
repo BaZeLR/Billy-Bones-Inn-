@@ -1,7 +1,7 @@
 
 init -20 python:
     class TavernWorkEventDefinition(object):
-        def __init__(self, code, event_type, label, periods=None, chance=0, mandatory=False, priority=0, required_job="", condition=None, report_label=None):
+        def __init__(self, code, event_type, label, periods=None, chance=0, mandatory=False, priority=0, required_job="", condition=None, play_condition=None, report_label=None):
             self.code = str(code or "")
             self.event_type = str(event_type or "")
             self.label = str(label or self.code)
@@ -11,6 +11,7 @@ init -20 python:
             self.priority = int(priority or 0)
             self.required_job = str(required_job or "")
             self.condition = condition
+            self.play_condition = play_condition
             self.report_label = str(report_label or self.label)
             self.event = Event(
                 (
@@ -37,6 +38,13 @@ init -20 python:
                 return bool(self.condition())
             return True
 
+        def can_play(self, room_code=""):
+            if self.required_job and len(tavern_work_job_candidates(self.required_job, room_code)) <= 0:
+                return False
+            if callable(self.play_condition):
+                return bool(self.play_condition(str(room_code or "")))
+            return True
+
 
     def tavern_work_int(value, default=0):
         try:
@@ -48,8 +56,8 @@ init -20 python:
                 return default
 
 
-    def tavern_work_job_candidates(job_code):
-        return list(girls_by_job(str(job_code or "")) or [])
+    def tavern_work_job_candidates(job_code, room_code=""):
+        return list(girls_by_job(str(job_code or ""), str(room_code or "") or None) or [])
 
 
     def tavern_work_liza_talk_ready():
@@ -64,6 +72,18 @@ init -20 python:
 
     def tavern_work_wine_for_dance_ready():
         return tavern_work_int(calendar_v2.week, 0) == 3
+
+
+    def tavern_work_melissa_waitress_fall_scheduled():
+        return int(Melissa.job_value("jobwaitress", 0) or 0) > 0
+
+
+    def tavern_work_melissa_waitress_fall_playable(room_code=""):
+        return (
+            str(room_code or "") == "TavernMain"
+            and int(Melissa.job_value("jobwaitress", 0) or 0) > 0
+            and str(people.location("melissa") or "") == "TavernMain"
+        )
 
 
     def tavern_work_roll(chance, key):
@@ -102,9 +122,12 @@ init -20 python:
         for row in list(event_runtime.tavern_work_events or []):
             if bool(row.get("mandatory", False)):
                 continue
-            if str(row.get("code", "") or "") != code_key:
+            if code_key and str(row.get("code", "") or "") != code_key:
                 continue
             if tavern_work_int(row.get("period", 0), 0) == tp:
+                event_def = tavern_work_definition(str(row.get("code", "") or ""))
+                if event_def is not None and not event_def.can_play(loc_key):
+                    continue
                 return True
         return False
 
@@ -233,6 +256,10 @@ init -20 python:
                 continue
             if tavern_work_int(row.get("period", 0), 0) != tp:
                 continue
+            if require_room_match:
+                event_def = tavern_work_definition(str(row.get("code", "") or ""))
+                if event_def is not None and not event_def.can_play(room_key):
+                    continue
             popped = event_runtime.tavern_work_events.pop(index)
             code = str(popped.get("code", "") or "")
             tavern_work_add_report_row(popped, bool(require_room_match))
@@ -263,18 +290,32 @@ init -20 python:
 
 define tavern_work_type_chances = {
     "harrass": 55,
+    "work_mishap": 25,
     "small_fight": 20,
     "tavern_story": 25,
     "theft": 0,
     "big_fight": 0,
 }
 
-define tavern_work_random_type_order = ("harrass", "small_fight", "tavern_story", "theft", "big_fight")
+define tavern_work_random_type_order = ("harrass", "work_mishap", "small_fight", "tavern_story", "theft", "big_fight")
 
 define tavern_work_events_by_type = {
     "harrass": [
-        TavernWorkEventDefinition("WaitressHarass", "harrass", "event_waitress_harrass", periods=(0, 1, 2, 3, 4), chance=55, required_job="jobwaitress", priority=20),
-        TavernWorkEventDefinition("CleaningHarass", "harrass", "event_cleaning_harrass", periods=(0, 1, 2, 3, 4), chance=55, required_job="jobcleaning", priority=30),
+        TavernWorkEventDefinition("WaitressHarass", "harrass", "event_waitress_harrass", periods=(2, 3, 4), chance=55, required_job="jobwaitress", priority=20),
+        TavernWorkEventDefinition("CleaningHarass", "harrass", "event_cleaning_harrass", periods=(2, 3, 4), chance=55, required_job="jobcleaning", priority=30),
+    ],
+    "work_mishap": [
+        TavernWorkEventDefinition(
+            "MelissaWaitressFall",
+            "work_mishap",
+            "event_melissa_waitress_fall",
+            periods=(2, 3, 4),
+            chance=25,
+            required_job="jobwaitress",
+            condition=tavern_work_melissa_waitress_fall_scheduled,
+            play_condition=tavern_work_melissa_waitress_fall_playable,
+            priority=25,
+        ),
     ],
     "small_fight": [
         TavernWorkEventDefinition("FightSmall", "small_fight", "EventFightSmall", periods=(3, 4), chance=20, priority=40),

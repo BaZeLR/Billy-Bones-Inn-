@@ -1,74 +1,43 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-init python:    
-    def tavern_main_morning_event_data():
-        event_pool = []
+init python:
+    def tavern_main_routine_visual_data():
+        preopening = tavern_preopening_mode()
+        phase_key = "preopening" if preopening else "open"
+        assignments = []
+        for job_key, image_key in (("jobcleaning", "hall_cleaning"), ("jobwaitress", "waitress")):
+            for person in girls_by_job(job_key, "TavernMain"):
+                person_data = people.get_data(person)
+                pictures = person_data.image_sequence("tavern", image_key) if person_data is not None else []
+                if pictures:
+                    assignments.append({
+                        "person": str(person or ""),
+                        "job": job_key,
+                        "pictures": list(pictures),
+                    })
 
-        if str(people.location("sandra") or "") == "TavernMain" and renpy.loadable("images/sandra/tavern/cleaning1.jpg"):
-            event_pool.append({
-                "picture": "images/sandra/tavern/cleaning1.jpg",
-                "text": "Сандра уже выбралась в главный зал и сразу находит себе дело: поправляет лавки, оглядывает половицы и ворчит, что к полудню все должно выглядеть так, будто дом сам себя держит в порядке.",
-            })
+        assignment = procedural_choice(assignments, "tavern_main_routine_%s_assignment" % phase_key)
+        if assignment is None:
+            default_picture = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+            return {"picture": default_picture, "text": ""}
 
-        if str(people.location("melissa") or "") == "TavernMain":
-            melissa_hall_loadable = MelissaStaticData.image_sequence("tavern", "hall_cleaning")
-            if len(melissa_hall_loadable) > 0:
-                event_pool.append({
-                    "picture": melissa_hall_loadable[int(current_game_day() + int(calendar_v2.hour or 0)) % len(melissa_hall_loadable)],
-                    "text": "Мелисса тихо возится в зале, протирая столы и выправляя мелочи, которые вечером никто бы уже не заметил, а утром они сразу бросаются в глаза.",
-                })
-
-        if str(people.location("amanda") or "") == "TavernMain":
-            amanda_hall_candidates = [
-                "images/amanda/tavern/cleaning1.jpg",
-                "images/amanda/tavern/cleaning2.jpg",
-            ]
-            amanda_hall_loadable = [row for row in amanda_hall_candidates if renpy.loadable(row)]
-            if len(amanda_hall_loadable) > 0:
-                event_pool.append({
-                    "picture": amanda_hall_loadable[int(current_game_day() + int(calendar_v2.minute or 0)) % len(amanda_hall_loadable)],
-                    "text": "Аманда носится по залу с утренней торопливостью, словно первые посетители уже вот-вот ввалятся с улицы, хотя до настоящей работы еще остается время.",
-                })
-
-        if str(people.location("amanda") or "") == "TavernMain" or str(people.location("melissa") or "") == "TavernMain":
-            event_pool.append({
-                "picture": "images/tavern/mainhall/bar_mainHall.png",
-                "text": "Пока до открытия еще далеко, в зале больше всего возни у стойки: кто-то переставляет кружки и кувшины, кто-то протирает доски, а Аманда успевает суетиться сразу в нескольких местах.",
-            })
-
-        if str(people.location("sandra") or "") == "TavernMain":
-            event_pool.append({
-                "picture": "images/tavern/mainhall/camin_mainHall.png",
-                "text": "Сандра заглядывает в зал и сразу замечает любую мелочь: где лавка стоит криво, где пепел не убран, а где к полудню понадобится еще дров и горячей воды.",
-            })
-
-        if str(people.location("sandra") or "") == "TavernStorage" or str(people.location("melissa") or "") == "Backyard" or str(people.location("amanda") or "") == "Backyard":
-            event_pool.append({
-                "picture": "images/tavern/mainhall/tavern_crew.jpg",
-                "text": "Утренние хлопоты пока разбросаны по всему хозяйству: кто-то возится с припасами, кто-то занят двором, и весь дом живет скорее общим бытом, чем трактирной работой.",
-            })
-
-        event_pool.append({
-            "picture": "images/tavern/mainhall/main_hall.png",
-            "text": "Пока трактир еще не открылся, главная зала стоит почти пустой и тихой: только утренние приготовления напоминают, что к полудню здесь снова станет шумно.",
-        })
-
-        loadable_pool = []
-        for row in list(event_pool or []):
-            picture = str(dict(row or {}).get("picture", "") or "").strip()
-            text = str(dict(row or {}).get("text", "") or "").strip()
-            if picture != "" and renpy.loadable(picture):
-                loadable_pool.append({"picture": picture, "text": text})
-
-        if len(loadable_pool) <= 0:
-            return {"picture": "images/tavern/mainhall/main_hall.png", "text": ""}
-
-        try:
-            event_index = int(current_game_day() + int(calendar_v2.hour or 0) + int(calendar_v2.minute or 0) + int(calendar_v2.day or 0) + int(calendar_v2.period or 0)) % len(loadable_pool)
-        except Exception:
-            event_index = 0
-        return dict(loadable_pool[event_index] or {})
+        person = str(assignment.get("person", "") or "")
+        job_key = str(assignment.get("job", "") or "")
+        picture = procedural_choice(
+            assignment.get("pictures", []),
+            "tavern_main_routine_%s_%s_%s_picture" % (phase_key, person, job_key),
+        )
+        name = people_display_name(person)
+        if preopening and job_key == "jobcleaning":
+            text = "%s занимается утренней уборкой зала, чтобы к открытию столы, лавки и пол были приведены в порядок." % name
+        elif preopening:
+            text = "%s готовит зал к открытию: расставляет кружки, проверяет столы и собирает все необходимое для обслуживания гостей." % name
+        elif job_key == "jobcleaning":
+            text = "%s поддерживает порядок в зале, убирая со столов и не давая трактирной суете превратиться в полный беспорядок." % name
+        else:
+            text = "%s работает в зале, разнося посетителям еду и выпивку между заполненными столами." % name
+        return {"picture": str(picture or ""), "text": text}
 
     def tavern_preopening_mode():
         return tavern_main_closed_text() == "" and int(calendar_v2.week or 0) != 7 and 6 <= int(calendar_v2.hour or 0) < 12
@@ -98,38 +67,18 @@ init python:
     def tavern_main_glory_hole_visible():
         return tavern_main_closed_text() == "" and player.tavern_management.glory_hole == 2
 
-    def tavern_main_morning_routine_text():
-        routine_pool = [
-            "Сандра уже успела открыть ставни и теперь гоняет домашних, чтобы к полудню все выглядело прилично. Мелисса протирает столы, а Аманда то носит кувшины, то отвлекается на болтовню.",
-            "Утренней суеты пока куда больше, чем настоящей работы: кто-то перетаскивает кувшины, кто-то вытряхивает тряпки, а Сандра с привычной строгостью следит, чтобы все не ленились.",
-            "До настоящего наплыва гостей еще есть время, и потому в зале царит домашняя возня: столы выправляют, лавки двигают, а между делом успевают перекинуться парой слов и даже посмеяться.",
-        ]
-        if len(routine_pool) <= 0:
-            return ""
-        try:
-            routine_index = int(current_game_day() + int(calendar_v2.day or 0) + int(calendar_v2.period or 0)) % len(routine_pool)
-        except Exception:
-            routine_index = 0
-        return str(routine_pool[routine_index] or "")
-
-    def tavern_main_preopening_background():
-        return str(tavern_main_morning_event_data().get("picture", "") or "images/tavern/mainhall/main_hall.png")
-
-    def tavern_main_morning_event_text():
-        return str(tavern_main_morning_event_data().get("text", "") or "")
-
     def tavern_main_build_description():
         base_desc = str(rooms.get("TavernMain").descriptions[0].text or "")
         desc_parts = [base_desc]
         closed_text = tavern_main_closed_text()
+        routine_visual = tavern_main_routine_visual_data()
 
         if closed_text:
             desc_parts.append(closed_text)
         else:
             if tavern_preopening_mode():
                 desc_parts.append("Утро в трактире еще не перешло в обычный рабочий ритм. До полудня вы и ваши домочадцы только готовите зал, кухню и припасы к дневной суете.")
-                desc_parts.append(tavern_main_morning_routine_text())
-                desc_parts.append(tavern_main_morning_event_text())
+                desc_parts.append(str(routine_visual.get("text", "") or ""))
                 desc_parts.append("На кухне с утра возятся: " + str(tavern_household_present_names("TavernKitchen") or "никто") + ".")
                 desc_parts.append("В зале сейчас видны: " + str(tavern_household_present_names("TavernMain") or "никто") + ".")
                 desc_parts.append("По двору и кладовым шныряют: " + str(_tavern_join_names([name for name in ("sandra", "melissa", "amanda") if str(people.location(name) or "") in ("Backyard", "TavernStorage")]) or "никто") + ".")
@@ -138,6 +87,7 @@ init python:
                 desc_parts.append("На кухне в вашем трактире работают: " + str(NamesList("jobkitchen", "TavernKitchen") or "никто") + ".")
                 desc_parts.append("За чистоту и порядок отвечают: " + str(NamesList("jobcleaning", "TavernMain") or "никто") + ".")
                 desc_parts.append("Еду и выпивку пьяным, трезвым, похотливым, скромным и прочим посетителям разносят: " + str(NamesList("jobwaitress", "TavernMain") or "никто") + ".")
+                desc_parts.append(str(routine_visual.get("text", "") or ""))
                 desc_parts.append("Вы можете пообщаться с участницами своей команды через список персонажей справа.")
 
             if str(people.location("becky") or "") == "TavernMain":
@@ -220,15 +170,16 @@ init python:
 
 label TavernMain:
     $ renpy.dynamic("_household_request_girl", "_household_request_type")
-    $ renpy.dynamic("_tavern_main_base_desc", "_glory_quest_started", "_cur_desc_low", "_draupnir_gh_asked", "ShouldDispatchTavernEvent", "GirlNameTS1", "GirlNameTS2", "kitchenlist", "cleaninglist", "waitresslist", "_liza_whore_work", "_georgett_whore_work", "randvarPS", "_tavern_kids_description", "_tmp_bf_sandra", "_tmp_bf_amanda", "_tmp_bf_melissa", "_tmp_bf_georgett", "_tmp_bf_liza", "_tmp_kids_list")
+    $ renpy.dynamic("_tavern_main_base_desc", "_tavern_routine_visual", "_glory_quest_started", "_cur_desc_low", "_draupnir_gh_asked", "ShouldDispatchTavernEvent", "GirlNameTS1", "GirlNameTS2", "kitchenlist", "cleaninglist", "waitresslist", "_liza_whore_work", "_georgett_whore_work", "randvarPS", "_tavern_kids_description", "_tmp_bf_sandra", "_tmp_bf_amanda", "_tmp_bf_melissa", "_tmp_bf_georgett", "_tmp_bf_liza", "_tmp_kids_list")
     $ _tavern_main_base_desc = rooms.get("TavernMain").descriptions[0].text
     $ scene_runtime.text = _tavern_main_base_desc
     $ scene_runtime.location_text = _tavern_main_base_desc
     $ rooms.enter("TavernMain")
     $ tavern_main_fireplace_wood_stock()
     $ scene_runtime.picture = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
-    if tavern_preopening_mode():
-        $ scene_runtime.picture = tavern_main_preopening_background()
+    if tavern_main_closed_text() == "":
+        $ _tavern_routine_visual = tavern_main_routine_visual_data()
+        $ scene_runtime.picture = str(_tavern_routine_visual.get("picture", "") or scene_runtime.picture)
     $ main_ui_runtime.mode = "scene"
     $ main_ui_runtime.selected_char = ""
     $ main_ui_runtime.talk_picture = ""
@@ -303,7 +254,8 @@ label TavernMain:
                     randvarPS = procedural_randint(1, 3, key="procedural:Inn/TavernMain.rpy:procedural_randint:351:3")
                 if randvarPS == 1 and CheckIfSexEventExist(GirlNameTS1, calendar_v2.time_slot()) > 0:
                     $ rooms.get("TavernMain").state["client_room_girl"] = "georgett"
-        $ scene_runtime.picture = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+        $ _tavern_routine_visual = tavern_main_routine_visual_data()
+        $ scene_runtime.picture = str(_tavern_routine_visual.get("picture", "") or "images/tavern/mainhall/main_hall.png")
 
     call RoomEnterEventGate(rooms.current_code, False)
     $ _tavern_kids_description = []

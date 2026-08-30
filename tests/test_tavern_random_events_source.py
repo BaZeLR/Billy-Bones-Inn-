@@ -15,10 +15,10 @@ def test_tavern_random_events_are_typed_definitions():
     assert "self.event = Event(" in source
     assert 'define tavern_work_events_by_type = {' in source
 
-    for event_type in ("harrass", "small_fight", "tavern_story", "theft", "big_fight", "mandatory"):
+    for event_type in ("harrass", "work_mishap", "small_fight", "tavern_story", "theft", "big_fight", "mandatory"):
         assert f'"{event_type}"' in source
 
-    for code in ("WaitressHarass", "CleaningHarass", "FightSmall", "AmandaLizaTalk", "WineForDance"):
+    for code in ("WaitressHarass", "CleaningHarass", "MelissaWaitressFall", "FightSmall", "AmandaLizaTalk", "WineForDance"):
         assert code in source
 
 
@@ -34,6 +34,8 @@ def test_tavern_random_events_are_wired_to_thread_runtime():
     assert "+ tavernThreadList" in runtime
     assert "def tavern_work_planned_for" in tavern
     assert "label TavernWorkEventTrigger:" in tavern
+    assert "tavern_work_planned_for('', rooms.current_code, calendar_v2.time_slot())" in runtime
+    assert runtime.count('"TavernWorkEventTrigger", None, None, None') == 1
     assert 'call checkTriggers("TavernMain", "tavern_work", 0)' in main
     assert "call DisplayTavernEventShort(time, 1)" not in main
 
@@ -51,6 +53,16 @@ def test_tavern_daily_plan_appends_random_selection():
 
     assert "event_runtime.tavern_work_events.append(tavern_work_plan_row(selected, period))" in source
     assert "continue\n                event_runtime.tavern_work_events.append" not in source
+
+
+def test_tavern_work_events_respect_open_work_phase_and_present_assigned_staff():
+    source = read_rel("game/Inn/TavernRandomEvents.rpy")
+
+    assert 'periods=(2, 3, 4)' in source
+    assert 'play_condition=tavern_work_melissa_waitress_fall_playable' in source
+    assert 'str(people.location("melissa") or "") == "TavernMain"' in source
+    assert "event_def.can_play(loc_key)" in source
+    assert "event_def.can_play(room_key)" in source
 
 
 def test_tavern_dispatch_uses_planned_event_pop():

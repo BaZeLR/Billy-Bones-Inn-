@@ -913,36 +913,12 @@ define tavernThreadList = [
             1,
             None,
             [
-                "#tavern_work_planned_for('WaitressHarass', rooms.current_code, calendar_v2.time_slot())",
+                "#tavern_work_planned_for('', rooms.current_code, calendar_v2.time_slot())",
             ],
             None,
             "TavernMain",
             "tavern_work",
             200,
-        ),
-        (
-            "TavernWorkEventTrigger", None, None, None,
-            1,
-            None,
-            [
-                "#tavern_work_planned_for('CleaningHarass', rooms.current_code, calendar_v2.time_slot())",
-            ],
-            None,
-            "TavernMain",
-            "tavern_work",
-            210,
-        ),
-        (
-            "TavernWorkEventTrigger", None, None, None,
-            1,
-            None,
-            [
-                "#tavern_work_planned_for('FightSmall', rooms.current_code, calendar_v2.time_slot())",
-            ],
-            None,
-            "TavernMain",
-            "tavern_work",
-            220,
         ),
     ]], highlight=False, threaded=False),
 ]

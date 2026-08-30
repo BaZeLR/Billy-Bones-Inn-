@@ -24,6 +24,26 @@ init python:
             self.birth_date = {"day": 1, "period": 1, "cycle": 1066}
             self.card_image = "images/sandra/sandra_card.jpg"
             self.schedule_source = "schedules/sandra.json"
+            self.image_manifest = {
+                "kitchen": {
+                    "work": [
+                        "images/sandra/tavern/kitchen_sandra_0.jpg",
+                        "images/sandra/tavern/kitchen_sandra_1.jpg",
+                        "images/sandra/tavern/kitchen_sandra_2.jpg",
+                        "images/sandra/tavern/kitchen_sandra_3.jpg",
+                        "images/sandra/tavern/kitchen_sandra_4.jpg",
+                    ],
+                },
+                "tavern": {
+                    "hall_cleaning": ["images/sandra/tavern/cleaning1.jpg"],
+                    "waitress": [
+                        "images/sandra/tavern/waitress1.jpg",
+                        "images/sandra/tavern/waitress2.jpg",
+                        "images/sandra/tavern/waitress3.jpg",
+                        "images/sandra/tavern/waitress4.jpg",
+                    ],
+                },
+            }
 
     class SandraInfo(Girl):
         """Sandra runtime: household authority, chore rewards, room access."""

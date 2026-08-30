@@ -27,9 +27,12 @@ init 6 python:
     def backyard_dynamic_picture():
         if int(calendar_v2.hour or 0) < 12 and int(calendar_v2.week or 0) != 7:
             if str(people.location("melissa") or "") == "Backyard":
-                melissa_backyard = MelissaStaticData.image_sequence("tavern", "backyard")
+                melissa_backyard = (
+                    MelissaStaticData.image_sequence("backyard", "laundry")
+                    + MelissaStaticData.image_sequence("tavern", "backyard")
+                )
                 if len(melissa_backyard) > 0:
-                    return melissa_backyard[int(calendar_v2.daysInGame + calendar_v2.hour + calendar_v2.minute) % len(melissa_backyard)]
+                    return procedural_choice(melissa_backyard, "backyard_melissa_morning_routine")
             if str(people.location("amanda") or "") == "Backyard" and renpy.loadable("images/tavern/backyard/backyard_chop_woods.png"):
                 return "images/tavern/backyard/backyard_chop_woods.png"
         return str(rooms.get("Backyard").bg_picture or "")

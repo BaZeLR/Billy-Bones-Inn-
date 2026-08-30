@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label event_cleaning_harrass(eyewitness=0, result="", cur_event_desc="", harass_type=1, girl_name="", harass_action="", part2_result=None):
-    $ girl_name = get_random_girl_by_job("jobcleaning")
+    $ girl_name = get_random_girl_by_job("jobcleaning", "TavernMain" if eyewitness > 0 else None)
 
     if girl_name:
         $ harass_type = procedural_randint(1, 4, key="procedural:NPC/Girls/Common/EventCleaningHarrass.rpy:procedural_randint:11:1")

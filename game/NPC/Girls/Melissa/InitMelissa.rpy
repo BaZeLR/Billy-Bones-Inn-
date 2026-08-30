@@ -94,6 +94,12 @@ init python:
                         "images/melissa/amandaRoom/underBedsearch_2.png",
                     ],
                 },
+                "backyard": {
+                    "laundry": [
+                        "images/melissa/making laundry.png",
+                        "images/melissa/hanging laundry.png",
+                    ],
+                },
                 "bedroom_search": {
                     "booklet": ["images/melissa/bedRoomSearch/underBedBooklet.png"],
                     "lewd_pages": [
@@ -141,30 +147,6 @@ init python:
                     "blowjob_finish": ["images/melissa/sexyTimes/blowjobFinish.jpg"],
                 },
             }
-
-        def image_sequence(self, context="", key="default"):
-            context_key = str(context or "").strip()
-            image_key = str(key or "default").strip()
-            context_row = self.image_manifest.get(context_key, {})
-            if isinstance(context_row, list):
-                candidates = context_row
-            else:
-                candidates = context_row.get(image_key, [])
-            if isinstance(candidates, str):
-                candidates = [candidates]
-            return [str(path) for path in list(candidates or []) if str(path or "").strip() and renpy.loadable(str(path))]
-
-        def image_path(self, context="", key="default"):
-            candidates = self.image_sequence(context, key)
-            if len(candidates) > 0:
-                return candidates[0]
-            return ""
-
-        def cycle_image(self, context="", key="default", salt=0):
-            candidates = self.image_sequence(context, key)
-            if len(candidates) <= 0:
-                return ""
-            return candidates[people_to_int(salt, 0) % len(candidates)]
 
     class MelissaInfo(Girl):
         """Melissa runtime: tavern work, bats quest, social state, body state."""

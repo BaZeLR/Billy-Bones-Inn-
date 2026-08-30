@@ -25,8 +25,8 @@ init python:
             candidates.append(girl_key)
         return candidates
 
-    def get_random_girl_by_job(jobtype):
-        candidates = girls_by_job(jobtype)
+    def get_random_girl_by_job(jobtype, room_code=None):
+        candidates = girls_by_job(jobtype, room_code)
         if candidates:
             return procedural_choice(candidates, key="procedural:NPC/Girls/Common/GetRandomGirlByJob.rpy:procedural_choice:31:1")
         return ""

@@ -1316,7 +1316,48 @@ testcase external_tavern_random_event_plan_consumes_once:
     advance until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
     assert eval ("WaitressHarass" in list(event_runtime.tavern_played_today or [])) timeout 5.0
     assert eval (len(list(event_runtime.tavern_work_events or [])) == 0 and not tavern_work_has_period(calendar_v2.time_slot(), False)) timeout 5.0
-    assert eval (str(scene_runtime.picture or "") == "images/tavern/mainhall/main_hall.png" and "Действия в трактире" == str(main_ui_runtime.action_title or "")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") in AmandaStaticData.image_sequence("tavern", "waitress") and "Действия в трактире" == str(main_ui_runtime.action_title or "")) timeout 5.0
+
+testcase external_melissa_waitress_fall_event_lifecycle:
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 13, 0)
+    $ external_calendar_set_weekday(1)
+    run Call("InitMelissa")
+    $ Melissa.set_job_value("jobwaitress", 1)
+    $ Melissa.set_job_value("jobcleaning", 0)
+    $ Melissa.set_job_value("jobkitchen", 0)
+    $ Amanda.set_job_value("jobwaitress", 0)
+    $ Amanda.set_job_value("jobcleaning", 0)
+    $ Sandra.set_job_value("jobwaitress", 0)
+    $ Sandra.set_job_value("jobcleaning", 0)
+    $ MelissaStaticData.set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999, working=True)])
+    $ rooms.enter("TavernMain")
+    assert eval (str(people.location("melissa") or "") == "TavernMain" and "melissa" in list(girls_by_job("jobwaitress", "TavernMain") or [])) timeout 5.0
+    $ player.tavern_management.winenum = max(10, int(player.tavern_management.winenum or 0))
+    $ _melissa_fall_wine_before = int(player.tavern_management.winenum or 0)
+    $ _melissa_fall_rel_before = int(Melissa.rel or 0)
+    $ event_runtime.tavern_work_events = [{"code": "MelissaWaitressFall", "type": "work_mishap", "label": "event_melissa_waitress_fall", "period": calendar_v2.time_slot(), "mandatory": False, "priority": 25}]
+    $ event_runtime.tavern_played_today = []
+    $ event_runtime.tavern_report_rows = []
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernMain", "tavern_work")) timeout 5.0
+    run Jump("TavernMain")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Подойти к Мелиссе"]) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == MelissaStaticData.cycle_image("tavern", "clumsy_waitress", 0)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Помочь Мелиссе подняться", "Не обращать внимания", "Отчитать за неуклюжесть и потерю"]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == MelissaStaticData.cycle_image("tavern", "clumsy_waitress", 1)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к работе"]) timeout 20.0
+    assert eval (int(Melissa.rel or 0) > _melissa_fall_rel_before and int(player.tavern_management.winenum or 0) == _melissa_fall_wine_before - 1) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == MelissaStaticData.cycle_image("tavern", "clumsy_waitress", 2)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval ("MelissaWaitressFall" in list(event_runtime.tavern_played_today or []) and len(list(event_runtime.tavern_work_events or [])) == 0) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") in MelissaStaticData.image_sequence("tavern", "waitress") and str(scene_runtime.location_text or "") == str(tavern_main_build_description() or "")) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 9, 0)
+    run Jump("TavernMain")
+    advance until eval (tavern_preopening_mode() and str(scene_runtime.picture or "") in MelissaStaticData.image_sequence("tavern", "waitress")) timeout 20.0
+    assert eval ("готовит зал к открытию" in str(scene_runtime.location_text or "") and str(scene_runtime.location_text or "") == str(tavern_main_build_description() or "")) timeout 5.0
+
 
 testcase external_tavern_small_fight_native_event_flow:
     $ rooms.enter("TavernMain")
@@ -7040,6 +7081,7 @@ def main() -> int:
             "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
             "external_tavern_random_event_plan_consumes_once",
+            "external_melissa_waitress_fall_event_lifecycle",
             "external_tavern_small_fight_native_event_flow",
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
             "external_breakfast_dance_sponsor_announcement",
@@ -7215,6 +7257,7 @@ def main() -> int:
             "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
             "external_tavern_random_event_plan_consumes_once",
+            "external_melissa_waitress_fall_event_lifecycle",
             "external_tavern_small_fight_native_event_flow",
             "external_tavern_unwitnessed_event_report_consumes_leftovers",
             "external_breakfast_dance_sponsor_announcement",

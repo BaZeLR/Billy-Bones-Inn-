@@ -41,18 +41,25 @@ def test_melissa_data_keeps_identity_not_runtime_maps():
     assert "self.var" not in data_block
 
 
-def test_melissa_static_data_is_the_only_image_manifest_api_owner():
+def test_people_data_owns_shared_image_manifest_api_and_melissa_owns_its_catalog():
     source = MELISSA_INIT.read_text(encoding="utf-8-sig")
     data_block, info_block = source.split("class MelissaData(PeopleData):", 1)[1].split("class MelissaInfo(Girl):", 1)
+    people_source = PEOPLE_RUNTIME.read_text(encoding="utf-8-sig")
     game_source = "\n".join(
         path.read_text(encoding="utf-8-sig")
         for path in (PROJECT_ROOT / "game").rglob("*.rpy")
     )
 
     assert "self.image_manifest = {" in data_block
-    assert "def image_sequence(self" in data_block
-    assert "def image_path(self" in data_block
-    assert "def cycle_image(self" in data_block
+    assert "def image_sequence(self" in people_source
+    assert "def image_path(self" in people_source
+    assert "def cycle_image(self" in people_source
+    assert game_source.count("def image_sequence(self") == 1
+    assert game_source.count("def image_path(self") == 1
+    assert game_source.count("def cycle_image(self") == 1
+    assert "def image_sequence(self" not in data_block
+    assert "def image_path(self" not in data_block
+    assert "def cycle_image(self" not in data_block
     assert "def image_sequence(self" not in info_block
     assert "def image_path(self" not in info_block
     assert "def cycle_image(self" not in info_block

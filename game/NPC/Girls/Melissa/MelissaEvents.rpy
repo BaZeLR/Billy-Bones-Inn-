@@ -579,3 +579,51 @@ label story_melissa_courtship_underclothes_4:
             "[scene_runtime.text]"
     $ main_ui_end_native_scene_state()
     return True
+
+
+label event_melissa_waitress_fall(eyewitness=0, result="", tavern_loss=0, relationship_delta=0, outcome_text=""):
+    $ tavern_loss = min(1, max(0, int(player.tavern_management.winenum or 0)))
+    $ player.tavern_management.winenum = max(0, int(player.tavern_management.winenum or 0) - tavern_loss)
+    $ result = "Во время работы в зале Мелисса зацепилась ногой за край доски, растянулась на полу и расплескала кружку выпивки."
+    if tavern_loss > 0:
+        $ result += " Потеряно %s бочонка вина." % DispFrac(tavern_loss)
+
+    if eyewitness > 0:
+        $ main_ui_begin_native_scene_state("Событие: неуклюжая официантка")
+        show screen main_ui
+        vscene MelissaStaticData.cycle_image("tavern", "clumsy_waitress", 0)
+        $ scene_runtime.text = "Мелисса торопится между столами с полной кружкой, цепляется ногой за неровную половицу и с шумом падает. Выпивка растекается по полу, а посетители поворачиваются посмотреть на переполох."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Подойти к Мелиссе":
+                pass
+
+        vscene MelissaStaticData.cycle_image("tavern", "clumsy_waitress", 1)
+        $ scene_runtime.text = "Мелисса сидит на полу возле опрокинутой кружки. Она явно ушиблась и теперь со стыдом ждет, как вы отреагируете на ее падение и потерянную выпивку."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Помочь Мелиссе подняться":
+                $ relationship_delta = procedural_randint(1, 2, "melissa_waitress_fall_help_%s" % current_game_day())
+                $ Melissa.change_social(friend_delta=relationship_delta)
+                vscene MelissaStaticData.cycle_image("tavern", "clumsy_waitress", 2)
+                $ outcome_text = "Вы протягиваете Мелиссе руку и помогаете подняться, не позволяя насмешкам посетителей разгореться. Она благодарно улыбается и, немного смущаясь, возвращается к работе."
+            "Не обращать внимания":
+                $ relationship_delta = procedural_randint(-1, 0, "melissa_waitress_fall_ignore_%s" % current_game_day())
+                $ Melissa.change_social(friend_delta=relationship_delta)
+                if relationship_delta < 0:
+                    $ outcome_text = "Вы оставляете Мелиссу разбираться самой. Она молча поднимается и убирает разлитое, но ваш демонстративный холод явно ее задел."
+                else:
+                    $ outcome_text = "Вы не вмешиваетесь. Мелисса быстро приходит в себя, убирает разлитое и возвращается к столам, стараясь больше не привлекать внимания."
+            "Отчитать за неуклюжесть и потерю":
+                $ relationship_delta = -procedural_randint(1, 2, "melissa_waitress_fall_scold_%s" % current_game_day())
+                $ Melissa.change_social(friend_delta=relationship_delta)
+                $ outcome_text = "Вы резко отчитываете Мелиссу за неуклюжесть и испорченную выпивку. Она краснеет, торопливо убирает за собой и возвращается к работе, избегая смотреть в вашу сторону."
+
+        $ scene_runtime.text = outcome_text
+        $ scene_runtime.location_text = outcome_text
+        menu:
+            "Вернуться к работе":
+                pass
+        $ main_ui_end_native_scene_state()
+
+    return result
