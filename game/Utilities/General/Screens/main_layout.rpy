@@ -270,6 +270,24 @@ init -5:
     style mui_hud_subbutton_text is mui_hud_button_text:
         size 18
 
+    style mui_inventory_item_button is button:
+        yminimum 54
+        padding (14, 8)
+        background Solid("#d8c7a6dd")
+        hover_background Solid("#eadbbcff")
+        insensitive_background Solid("#b5a78dcc")
+
+    style mui_inventory_item_name is default:
+        size 20
+        color "#2d1d12"
+        hover_color "#120b07"
+
+    style mui_inventory_item_quantity is default:
+        size 20
+        bold True
+        color "#704c20"
+        hover_color "#3f280f"
+
     style mui_status_label is default:
         size 18
         color "#a39a8b"
@@ -529,6 +547,7 @@ screen main_ui():
                                     if bool(main_ui_runtime.inventory_dropdown_open):
                                         for _inv_section in player_card_inventory_section_ids():
                                             textbutton player_card_inventory_section_button_caption(_inv_section):
+                                                id ("main_ui_inventory_section_%s" % _inv_section)
                                                 style "mui_hud_subbutton"
                                                 action [
                                                     Function(main_ui_open_inventory_section, _inv_section),
@@ -732,8 +751,12 @@ screen main_ui_player_card_panel():
     $ _stats_left = player_card_stat_rows_left()
     $ _stats_right = player_card_stat_rows_right()
     $ _lines = player_card_panel_lines()
+    $ _inventory_mode = str(main_ui_runtime.inventory_view_mode or "profile")
+    $ _inventory_ids = list(player_card_inventory_ids(False) or []) if _inventory_mode == "inventory" else (list(player_card_inventory_section_item_ids(main_ui_runtime.inventory_view_section) or []) if _inventory_mode == "section" else [])
+    $ _inventory_rows = [_inventory_ids[index:index + 2] for index in range(0, len(_inventory_ids), 2)]
     $ _usable_h = max(360, int(config.screen_height) - int(getattr(gui, "textbox_height", 278)))
     $ _left_h = _usable_h - 24
+    $ _inventory_column_width = int((((config.screen_width - 36) * 0.72) - 72) / 2)
 
     fixed:
         xfill True
@@ -754,7 +777,7 @@ screen main_ui_player_card_panel():
 
                 text _title.upper() size 30 color "#1e130c" xalign 0.5
 
-                if str(main_ui_runtime.inventory_view_mode or "profile") == "profile":
+                if _inventory_mode == "profile":
                     hbox:
                         spacing 12
 
@@ -776,7 +799,36 @@ screen main_ui_player_card_panel():
                                     text "%s: %s" % (_row[0], _row[1]) size 18 color "#1e130c"
 
                 for _line in _lines:
-                    text _line size 16 color "#2d1d12"
+                    text _line size (18 if _inventory_mode in ("inventory", "section") else 16) color "#2d1d12"
+
+                if _inventory_mode in ("inventory", "section") and len(_inventory_rows) > 0:
+                    null height 4
+                    vbox:
+                        spacing 10
+                        for _inventory_row in _inventory_rows:
+                            hbox:
+                                spacing 16
+                                for _item_id in _inventory_row:
+                                    $ _item_name = player_card_inventory_menu_caption(_item_id, False)
+                                    $ _item_quantity = int(player_card_inventory_count(_item_id) or 0)
+                                    button:
+                                        id ("main_ui_inventory_item_%s" % _item_id)
+                                        style "mui_inventory_item_button"
+                                        xsize _inventory_column_width
+                                        action Call("PlayerCardInventoryItemMenu", _item_id)
+
+                                        hbox:
+                                            xfill True
+                                            text _item_name:
+                                                style "mui_inventory_item_name"
+                                                xsize _inventory_column_width - 100
+                                            text "x%s" % _item_quantity:
+                                                style "mui_inventory_item_quantity"
+                                                xsize 60
+                                                xalign 1.0
+
+                                if len(_inventory_row) < 2:
+                                    null width _inventory_column_width
 
 screen main_ui_girl_card_panel(girl_name=""):
     $ _girl_key = girl_card_resolved_key(girl_name)

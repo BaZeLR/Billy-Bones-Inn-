@@ -4,6 +4,7 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME = ROOT / "game/Utilities/General/Screens/main_layout.rpy"
+PLAYER_CARD = ROOT / "game/Utilities/General/Screens/PlayerCard.rpy"
 MIGRATION = ROOT / "game/TractirSaveSync.rpy"
 
 
@@ -82,3 +83,28 @@ def test_talk_panel_displays_label_owned_scene_picture_changes():
     assert 'dict(main_ui_runtime.talk_origin or {}).get("picture", "")' in panel
     assert "_scene_picture != _talk_origin_picture" in panel
     assert "_portrait = _scene_picture if" in panel
+
+
+def test_inventory_items_render_on_left_with_one_quantity_authority_and_fixed_back():
+    runtime = RUNTIME.read_text(encoding="utf-8-sig")
+    player_card = PLAYER_CARD.read_text(encoding="utf-8-sig")
+    inventory_state = player_card.split("def player_card_show_inventory_menu_state", 1)[1].split(
+        "def player_card_show_inventory_section_state", 1
+    )[0]
+    section_state = player_card.split("def player_card_show_inventory_section_state", 1)[1].split(
+        "def player_card_show_inventory_item_state", 1
+    )[0]
+    panel = runtime.split("screen main_ui_player_card_panel():", 1)[1].split(
+        "screen main_ui_girl_card_panel", 1
+    )[0]
+
+    assert 'main_ui_runtime.inventory_view_mode = "inventory"' in inventory_state
+    assert 'MenuItem(player_card_inventory_menu_caption(item_id)' not in inventory_state
+    assert 'MenuItem(player_card_inventory_menu_caption(item_id)' not in section_state
+    assert 'MenuItem("Назад"' in inventory_state
+    assert 'MenuItem("Назад"' in section_state
+    assert "_inventory_ids[index:index + 2]" in panel
+    assert 'id ("main_ui_inventory_item_%s" % _item_id)' in panel
+    assert "player_card_inventory_count(_item_id)" in panel
+    assert 'action Call("PlayerCardInventoryItemMenu", _item_id)' in panel
+    assert "player.inventory.items" not in panel

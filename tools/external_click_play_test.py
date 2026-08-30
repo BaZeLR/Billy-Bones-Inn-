@@ -6288,6 +6288,26 @@ testcase external_player_and_girl_cards_render:
     $ main_ui_end_card_state()
     assert eval (str(main_ui_runtime.mode or "") == "scene" and str(rooms.current_code or "") == _card_return_room) timeout 5.0
 
+testcase external_inventory_bag_left_grid_back_flow:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ _inventory_return_room = str(rooms.current_code or "")
+    $ player.inventory.items["olive_oil_001"] = 4
+    $ player.inventory.items["cork_001"] = 2
+    $ player.inventory.items["bat_repellent_001"] = 3
+    click id "main_ui_inventory_button" pos (0.5, 0.5) until eval (bool(main_ui_runtime.inventory_dropdown_open)) timeout 20.0
+    click id "main_ui_inventory_section_backpack" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "mc" and str(main_ui_runtime.inventory_view_mode or "") == "section" and str(main_ui_runtime.inventory_view_section or "") == "backpack") timeout 20.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"]) timeout 5.0
+    assert eval (int(player_card_inventory_count("olive_oil_001") or 0) == 4 and int(player_card_inventory_count("cork_001") or 0) == 2 and int(player_card_inventory_count("bat_repellent_001") or 0) == 3) timeout 5.0
+    click id "main_ui_inventory_item_bat_repellent_001" pos (0.5, 0.5) until eval (str(main_ui_runtime.inventory_view_mode or "") == "item" and str(main_ui_runtime.inventory_view_item or "") == "bat_repellent_001") timeout 20.0
+    assert eval ("Назад" in [str(i.caption or "") for i in main_ui_runtime.action_items] and int(player_card_inventory_count("bat_repellent_001") or 0) == 3) timeout 5.0
+    $ _inventory_item_back_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Назад")
+    $ _inventory_item_back_button_id = "choice_panel_button_%d" % int(_inventory_item_back_index)
+    click id _inventory_item_back_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.inventory_view_mode or "") == "section" and str(main_ui_runtime.inventory_view_section or "") == "backpack") timeout 20.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and str(rooms.current_code or "") == _inventory_return_room) timeout 20.0
+
 testcase external_mongol_horse_purchase_once_and_amanda_room_presence:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -7009,6 +7029,7 @@ def main() -> int:
             "external_right_side_npc_buttons_open_default_menu",
             "external_people_locate_matches_schedule",
             "external_player_and_girl_cards_render",
+            "external_inventory_bag_left_grid_back_flow",
             "external_mongol_horse_purchase_once_and_amanda_room_presence",
             "external_clara_object_thread_conditions",
             "external_story_event_audit_methods_cover_tuple_attributes",
@@ -7183,6 +7204,7 @@ def main() -> int:
             "external_right_side_npc_buttons_open_default_menu",
             "external_people_locate_matches_schedule",
             "external_player_and_girl_cards_render",
+            "external_inventory_bag_left_grid_back_flow",
             "external_mongol_horse_purchase_once_and_amanda_room_presence",
             "external_clara_object_thread_conditions",
             "external_story_event_audit_methods_cover_tuple_attributes",

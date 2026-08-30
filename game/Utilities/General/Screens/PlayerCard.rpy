@@ -252,7 +252,7 @@ init python:
     def player_card_item_description_text(item_id):
         return runtime_item_description_text(item_id)
 
-    def player_card_inventory_menu_caption(item_id):
+    def player_card_inventory_menu_caption(item_id, include_count=True):
         _item_id = str(item_id or "").strip()
         _item_name = player_card_item_display_name(_item_id)
         _item_count = int(player_card_inventory_count(_item_id) or 0)
@@ -270,7 +270,7 @@ init python:
             _suffixes.append("надето")
 
         _caption = _item_name
-        if _item_count > 1:
+        if bool(include_count) and _item_count > 1:
             _caption = "%s x%s" % (_caption, _item_count)
         if len(_suffixes) > 0:
             _caption = "%s (%s)" % (_caption, ", ".join(_suffixes))
@@ -413,7 +413,7 @@ init python:
             return lines
 
         lines.append("Раздел \"%s\" содержит %s предметов." % (section_title, section_count))
-        lines.append("Выберите предмет справа, чтобы посмотреть описание и доступные действия.")
+        lines.append("Выберите предмет в списке слева, чтобы посмотреть описание и доступные действия.")
         return lines
 
     def player_card_item_view_lines(item_id=""):
@@ -429,6 +429,8 @@ init python:
 
     def player_card_panel_title():
         view_mode = str(main_ui_runtime.inventory_view_mode or "profile")
+        if view_mode == "inventory":
+            return "Инвентарь"
         if view_mode == "section":
             return player_card_inventory_section_title(main_ui_runtime.inventory_view_section)
         if view_mode == "item":
@@ -437,6 +439,14 @@ init python:
 
     def player_card_panel_lines():
         view_mode = str(main_ui_runtime.inventory_view_mode or "profile")
+        if view_mode == "inventory":
+            item_count = len(list(player_card_inventory_ids(False) or []))
+            if item_count <= 0:
+                return ["У вас сейчас ничего нет при себе."]
+            return [
+                "Все вещи, которые вы несете с собой. Количество каждого предмета указано справа.",
+                "Выберите предмет, чтобы посмотреть его описание и доступные действия.",
+            ]
         if view_mode == "section":
             return player_card_section_view_lines(main_ui_runtime.inventory_view_section)
         if view_mode == "item":
@@ -492,7 +502,9 @@ init python:
 
     def player_card_show_inventory_menu_state(preserve_text=False):
 
-        player_card_set_profile_view()
+        main_ui_runtime.inventory_view_mode = "inventory"
+        main_ui_runtime.inventory_view_section = ""
+        main_ui_runtime.inventory_view_item = ""
         main_ui_runtime.mode = "mc"
         main_ui_runtime.selected_char = "you"
         main_ui_runtime.action_title = "Вещи"
@@ -506,11 +518,9 @@ init python:
             if section_count <= 0:
                 continue
             inventory_desc_lines.append("{}: {}".format(player_card_inventory_section_title(section_id), section_count))
-            for item_id in section_items:
-                main_ui_runtime.action_items.append(MenuItem(player_card_inventory_menu_caption(item_id), Call("PlayerCardInventoryItemMenu", item_id)))
 
         if not bool(preserve_text):
-            if len(main_ui_runtime.action_items) <= 0:
+            if len(list(player_card_inventory_ids(False) or [])) <= 0:
                 scene_runtime.text = "У вас сейчас ничего нет при себе."
             else:
                 scene_runtime.text = "Ваши вещи разложены по разделам.\n\n" + "\n".join(list(inventory_desc_lines or []))
@@ -542,8 +552,6 @@ init python:
             scene_runtime.text = "\n\n".join(list(player_card_section_view_lines(section_key) or []))
             scene_runtime.location_text = scene_runtime.text
 
-        for item_id in section_items:
-            main_ui_runtime.action_items.append(MenuItem(player_card_inventory_menu_caption(item_id), Call("PlayerCardInventoryItemMenu", item_id)))
         if player_card_inventory_back_to_profile():
             main_ui_runtime.action_items.append(MenuItem("Назад", Call("PlayerCardMainMenu")))
         else:
