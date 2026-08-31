@@ -184,6 +184,77 @@ init python:
             return 0
         return 1
 
+    def household_outfit_favor_available(girl_name="", favor_type=""):
+        girl_info = people.get_info(girl_name)
+        if girl_info is None:
+            return False
+        corruption = int(girl_info.corruption or 0)
+        return corruption >= {
+            "show": 15,
+            "handjob": 40,
+            "oral": 65,
+        }.get(str(favor_type or "").strip().lower(), 101)
+
+    def household_begin_outfit_request(girl_name="", favor_type="surprise"):
+        girl = people_normalize_id(girl_name)
+        favor = str(favor_type or "surprise").strip().lower()
+        if people.get_info(girl) is None or favor not in ("surprise", "show", "handjob", "oral"):
+            return 0
+        household.outfit_requests[girl] = favor
+        if daily_events.exists(girl, "BuyDressTom", "") == 0:
+            daily_events.add(girl, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy", "girl_location")
+        return 1
+
+    def household_cancel_outfit_request(girl_name=""):
+        household.outfit_requests.pop(people_normalize_id(girl_name), None)
+        return 0
+
+    def household_outfit_spontaneous_reward(girl_name=""):
+        girl_info = people.get_info(girl_name)
+        if girl_info is None or int(girl_info.rel or 0) < 12:
+            return ""
+        corruption = int(girl_info.corruption or 0)
+        if corruption >= 60:
+            return "oral"
+        if corruption >= 35:
+            return "handjob"
+        return "show"
+
+    def household_schedule_outfit_reward(girl_name=""):
+        girl = people_normalize_id(girl_name)
+        requested = str(household.outfit_requests.get(girl, "") or "").strip().lower()
+        if requested == "":
+            return ""
+        spontaneous = requested == "surprise"
+        reward = household_outfit_spontaneous_reward(girl) if spontaneous else requested
+        if reward == "":
+            household.outfit_requests.pop(girl, None)
+            return ""
+        household.outfit_requests[girl] = ("surprise_" + reward) if spontaneous else reward
+        daily_events.delete(girl, "OutfitReward", "")
+        daily_events.add(girl, "alllocs", -1, ">", 1, 7, "OutfitReward", "HouseholdOutfitRewardEvent", "girl")
+        return reward
+
+    def household_reschedule_outfit_reward(girl_name=""):
+        girl = people_normalize_id(girl_name)
+        if str(household.outfit_requests.get(girl, "") or "").strip() == "":
+            return 0
+        if daily_events.exists(girl, "OutfitReward", "") == 0:
+            daily_events.add(girl, "alllocs", -1, ">", 1, 7, "OutfitReward", "HouseholdOutfitRewardEvent", "girl")
+        return 1
+
+    def household_outfit_reward_picture(girl_name="", reward_type="", finished=False):
+        data = people.get_data(girl_name)
+        key = str(reward_type or "show").strip().lower()
+        if finished:
+            finish_picture = data.image_path("outfit_reward", key + "_finish") if data is not None else ""
+            if str(finish_picture or "").strip():
+                return finish_picture
+        picture = data.image_path("outfit_reward", key) if data is not None else ""
+        if str(picture or "").strip():
+            return picture
+        return girl_card_portrait_path(girl_name)
+
     def household_soap_request_ready(girl_name=""):
         girl = str(girl_name or "").strip().lower()
         if girl == "":
@@ -415,6 +486,76 @@ label HouseholdBarberRequestEvent(girl_name=""):
     return
 
 
+label HouseholdOutfitRequestTerms(girl_name=""):
+    $ renpy.dynamic("_outfit_girl", "_outfit_info", "_outfit_name")
+    $ _outfit_girl = people_normalize_id(girl_name)
+    $ _outfit_info = people.get_info(_outfit_girl)
+    $ _outfit_name = people_display_name(_outfit_girl)
+    if _outfit_info is None:
+        return
+
+    menu:
+        "Пообещать купить наряд без условий":
+            $ household_begin_outfit_request(_outfit_girl, "surprise")
+            $ _outfit_info.change_social(friend_delta=1)
+            if _outfit_girl == "sandra":
+                $ scene_runtime.text = "Вы обещаете Сандре подобрать у Ирмы наряд посмелее, ничего не требуя взамен. Она делает вид, что это пустяк, но довольную полуулыбку скрыть не может."
+            elif _outfit_girl == "melissa":
+                $ scene_runtime.text = "Вы обещаете Мелиссе подобрать у Ирмы красивый наряд без всяких условий. Она заметно оживляется и тихо благодарит вас."
+            elif _outfit_girl == "amanda":
+                $ scene_runtime.text = "Вы обещаете Аманде, что подберете ей новый наряд просто потому, что хотите ее порадовать. Девушка сияет так, будто обновка уже висит у нее в шкафу."
+            else:
+                $ scene_runtime.text = "Вы обещаете [_outfit_name] подобрать у Ирмы красивый наряд без всяких условий. Она тепло благодарит вас."
+
+        "Сказать, что пока не до обновок":
+            $ household_cancel_outfit_request(_outfit_girl)
+            if _outfit_girl == "sandra":
+                $ scene_runtime.text = "Вы отвечаете Сандре, что с обновкой пока лучше не торопиться. Она фыркает, возвращается к делам и делает вид, что разговор ничего для нее не значил."
+            elif _outfit_girl == "melissa":
+                $ scene_runtime.text = "Вы мягко советуете Мелиссе пока не спешить с обновкой. Девушка кивает, хотя по голосу слышно, что надеялась на другой ответ."
+            elif _outfit_girl == "amanda":
+                $ scene_runtime.text = "Вы говорите Аманде, что пока хватит и чужих обновок. Она недовольно надувает губы, но спорить не продолжает."
+            else:
+                $ scene_runtime.text = "Вы говорите [_outfit_name], что сейчас не время покупать обновку. Она принимает отказ и возвращается к своим делам."
+
+        "Попросить потом показать больше, чем новый наряд скрывает" if household_outfit_favor_available(_outfit_girl, "show"):
+            $ household_begin_outfit_request(_outfit_girl, "show")
+            $ _outfit_info.change_social(open_delta=1, corruption_delta=1)
+            if _outfit_girl == "sandra":
+                $ scene_runtime.text = "Вы соглашаетесь заплатить, но просите Сандру потом показать обновку наедине — и не только ее. Сандра прищуривается, однако после паузы кивает: раз уж сама попросила, маленькое представление будет честной благодарностью."
+            elif _outfit_girl == "melissa":
+                $ scene_runtime.text = "Вы обещаете платье в обмен на маленький показ без лишних глаз. Мелисса краснеет, долго мнет край передника, но наконец тихо соглашается."
+            elif _outfit_girl == "amanda":
+                $ scene_runtime.text = "Вы просите Аманду после покупки показать вам чуть больше, чем будет видно остальным. Она лукаво улыбается и отвечает, что за хороший подарок сумеет устроить хороший показ."
+            else:
+                $ scene_runtime.text = "Вы обещаете [_outfit_name] наряд в обмен на маленький показ без лишних глаз. После короткой паузы она соглашается."
+
+        "Попросить отблагодарить вас рукой" if household_outfit_favor_available(_outfit_girl, "handjob"):
+            $ household_begin_outfit_request(_outfit_girl, "handjob")
+            $ _outfit_info.change_social(open_delta=1, corruption_delta=1)
+            if _outfit_girl == "sandra":
+                $ scene_runtime.text = "Вы прямо называете услугу, которую хотите получить после покупки. Сандра качает головой на вашу наглость, но все же соглашается: в укромном углу она вернет долг своими умелыми руками."
+            elif _outfit_girl == "melissa":
+                $ scene_runtime.text = "Услышав ваше условие, Мелисса вспыхивает до ушей. И все же желание получить обновку побеждает: она шепотом обещает отблагодарить вас руками, когда никто не увидит."
+            elif _outfit_girl == "amanda":
+                $ scene_runtime.text = "Аманда хихикает, услышав вашу цену, и заговорщически обещает после покупки утащить вас туда, где ее ловкие пальчики никто не заметит."
+            else:
+                $ scene_runtime.text = "Вы прямо называете услугу, которую хотите получить после покупки. [_outfit_name] соглашается вернуть долг руками, когда никто не увидит."
+
+        "Попросить отблагодарить вас ртом" if household_outfit_favor_available(_outfit_girl, "oral"):
+            $ household_begin_outfit_request(_outfit_girl, "oral")
+            $ _outfit_info.change_social(open_delta=1, corruption_delta=1)
+            if _outfit_girl == "sandra":
+                $ scene_runtime.text = "Вы без обиняков просите за подарок особую благодарность. Сандра усмехается вашей смелости и обещает после покупки найти тихий угол, где сможет заставить вас забыть о потраченных монетах."
+            elif _outfit_girl == "melissa":
+                $ scene_runtime.text = "Мелисса замирает от вашего предложения, затем украдкой оглядывается и очень тихо соглашается. После покупки она сама найдет место, где сможет выполнить обещание."
+            elif _outfit_girl == "amanda":
+                $ scene_runtime.text = "Аманда облизывает губы, притворно задумывается и соглашается: если вы выполните обещание с платьем, она выполнит свое — в самом укромном уголке трактира."
+            else:
+                $ scene_runtime.text = "Вы без обиняков просите особую благодарность за подарок. [_outfit_name] соглашается после покупки найти тихий угол, где сможет выполнить обещание."
+    return
+
+
 label SandraDressInitiativeEvent:
     $ renpy.dynamic("_sandra_scene")
     $ threads["sandraRevealingDressInitiative"].complete()
@@ -424,14 +565,7 @@ label SandraDressInitiativeEvent:
     $ scene_runtime.text = "Сандра, улучив минуту без лишних ушей, задерживает вас у стола и вдруг говорит куда мягче обычного.\n\n\"Слушай, Стефан... после всех этих разговоров о Бекки я тут подумала. Если уж вдова может себе позволить иногда выглядеть поинтереснее, то, может, и мне пора перестать рядиться только в самое практичное. Не в девках ведь дело, а в том, чтобы и на меня иной раз посмотрели как на женщину. Если надумаешь, подбери мне у Ирмы что-нибудь посмелее обычного.\""
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
-    menu:
-        "Пообещать подобрать Сандре более смелый наряд":
-            $ daily_events.add("sandra", "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy", "girl_location")
-            $ Sandra.change_social(friend_delta=1)
-            $ scene_runtime.text = "Вы киваете Сандре и обещаете, что в ближайшее время заглянете с ней к Ирме и подберете что-нибудь заметно смелее ее обычных платьев. Сандра делает вид, что это пустяк, но по довольной полуулыбке видно: такой ответ ей пришелся по душе."
-
-        "Сказать, что пока не время":
-            $ scene_runtime.text = "Вы отвечаете Сандре, что с этим пока лучше не торопиться. Она только фыркает, возвращается к кастрюлям и делает вид, что разговор ничего для нее не значил."
+    call HouseholdOutfitRequestTerms("sandra")
     $ scene_runtime.location_text = scene_runtime.text
     if player.tavern_management.breakfast.event_active:
         call TavernKitchenBreakfastShowText(scene_runtime.text)
@@ -447,14 +581,7 @@ label MelissaDressRequestEvent:
     $ scene_runtime.text = "Мелисса, дождавшись пока вокруг станет потише, смущенно признается: \"Я видела, какой наряд ты выбрал для Сандры. Если уж ей можно что-то посмелее, может и мне когда-нибудь подберешь платье не только для работы, но и чтобы самой себе нравиться?\"\n\nСказав это, она тут же опускает глаза, но по голосу слышно, что мысль ей давно не дает покоя."
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
-    menu:
-        "Согласиться подобрать Мелиссе похожий наряд":
-            $ daily_events.add("melissa", "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy", "girl_location")
-            $ Melissa.change_social(friend_delta=1)
-            $ scene_runtime.text = "Вы обещаете Мелиссе, что не забудете о ее просьбе и подберете у Ирмы что-нибудь похожее, но по ее характеру. Мелисса заметно оживляется и тихо благодарит вас."
-
-        "Посоветовать ей пока не спешить":
-            $ scene_runtime.text = "Вы мягко советуете Мелиссе пока не спешить с такими обновками. Девушка кивает, хотя по голосу слышно, что надеялась на другой ответ."
+    call HouseholdOutfitRequestTerms("melissa")
     $ scene_runtime.location_text = scene_runtime.text
     if player.tavern_management.breakfast.event_active:
         call TavernKitchenBreakfastShowText(scene_runtime.text)
@@ -463,23 +590,146 @@ label MelissaDressRequestEvent:
 
 label AmandaDressRequestEvent:
     $ threads["amandaRevealingDressRequest"].complete()
-    if renpy.loadable("images/amanda/amanda_portrate.jpg"):
-        $ scene_runtime.picture = "images/amanda/amanda_portrate.jpg"
+    $ scene_runtime.picture = girl_card_portrait_path("amanda")
     $ scene_runtime.text = "Аманда сама подскакивает к вам, едва улучив момент. \"Стефан, это нечестно! У Сандры теперь наряд посмелее, Мелиссе ты тоже обещаешь что-то красивое, а я что, хуже? Мне тоже хочется платье, чтобы ахнули, а не только подносы таскать!\"\n\nПохоже, увиденное окончательно раззадорило ее самолюбие."
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
-    menu:
-        "Пообещать подобрать Аманде такой же смелый наряд":
-            $ daily_events.add("amanda", "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy", "girl_location")
-            $ Amanda.change_social(friend_delta=1)
-            $ scene_runtime.text = "Вы соглашаетесь, что раз уж в доме одна за другой появляются новые наряды, то и Аманду обделять не стоит. Услышав это, девушка сияет так, будто обновка уже висит у нее в шкафу."
-
-        "Сказать, что пока хватит и чужих обновок":
-            $ scene_runtime.text = "Вы осаживаете Аманду и говорите, что пока хватит и тех обновок, что уже обсуждаются в доме. Аманда недовольно надувает губы, но спорить не продолжает."
+    call HouseholdOutfitRequestTerms("amanda")
     $ scene_runtime.location_text = scene_runtime.text
     if player.tavern_management.breakfast.event_active:
         call TavernKitchenBreakfastShowText(scene_runtime.text)
     return
+
+
+label HouseholdOutfitRewardEvent(girl_name=""):
+    $ renpy.dynamic("_outfit_reward_girl", "_outfit_reward_info", "_outfit_reward_saved", "_outfit_reward_type", "_outfit_reward_spontaneous", "_outfit_reward_done", "_outfit_reward_name")
+    $ _outfit_reward_girl = people_normalize_id(girl_name)
+    $ _outfit_reward_info = people.get_info(_outfit_reward_girl)
+    $ _outfit_reward_saved = str(household.outfit_requests.get(_outfit_reward_girl, "") or "").strip().lower()
+    if _outfit_reward_info is None or _outfit_reward_saved == "":
+        $ household_cancel_outfit_request(_outfit_reward_girl)
+        return
+    if not str(rooms.current_code or "").startswith("Tavern"):
+        $ household_reschedule_outfit_reward(_outfit_reward_girl)
+        return
+
+    $ _outfit_reward_spontaneous = _outfit_reward_saved.startswith("surprise_")
+    $ _outfit_reward_type = _outfit_reward_saved.split("surprise_", 1)[1] if _outfit_reward_spontaneous else _outfit_reward_saved
+    $ _outfit_reward_name = people_display_name(_outfit_reward_girl)
+    $ scene_runtime.picture = household_outfit_reward_picture(_outfit_reward_girl, _outfit_reward_type)
+    $ main_ui_begin_native_scene_state("Благодарность за новый наряд")
+    if _outfit_reward_spontaneous:
+        $ scene_runtime.text = "[_outfit_reward_name] сама находит вас после покупки наряда. Убедившись, что никто особенно не следит, она берет вас за руку и шепчет: \"Ты выполнил обещание. Теперь моя очередь тебя порадовать. Пойдем, я знаю в трактире укромный угол.\""
+    else:
+        $ scene_runtime.text = "[_outfit_reward_name] напоминает о вашей договоренности после покупки наряда. Она украдкой оглядывает зал и тихо говорит: \"Я помню, что обещала. Если хочешь получить свою благодарность, пойдем туда, где нам не помешают.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+
+    menu:
+        "Пойти с ней":
+            if _outfit_reward_type == "oral":
+                call HouseholdOutfitRewardOralScene(_outfit_reward_girl)
+            elif _outfit_reward_type == "handjob":
+                call HouseholdOutfitRewardHandjobScene(_outfit_reward_girl)
+            else:
+                call HouseholdOutfitRewardShowScene(_outfit_reward_girl)
+            $ _outfit_reward_done = bool(_return)
+            if _outfit_reward_done:
+                $ household_cancel_outfit_request(_outfit_reward_girl)
+            else:
+                $ household_reschedule_outfit_reward(_outfit_reward_girl)
+
+        "Попросить вернуться к этому позже":
+            $ scene_runtime.text = "Вы просите [_outfit_reward_name] пока не начинать. Она кивает и обещает снова найти вас в трактире, когда представится подходящий момент."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Вернуться к делам":
+                    $ household_reschedule_outfit_reward(_outfit_reward_girl)
+
+    $ main_ui_end_native_scene_state()
+    return
+
+
+label HouseholdOutfitRewardShowScene(girl_name=""):
+    $ renpy.dynamic("_outfit_show_girl", "_outfit_show_info", "_outfit_show_name")
+    $ _outfit_show_girl = people_normalize_id(girl_name)
+    $ _outfit_show_info = people.get_info(_outfit_show_girl)
+    $ _outfit_show_name = people_display_name(_outfit_show_girl)
+    $ scene_runtime.picture = household_outfit_reward_picture(_outfit_show_girl, "show")
+    $ scene_runtime.text = "[_outfit_show_name] проводит вас за дальнюю кладовую перегородку, куда из зала не падает свет. Она медленно поворачивается перед вами в выбранном наряде, позволяя рассмотреть, как он сидит на ней, а затем принимается расстегивать его."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить смотреть":
+            if _outfit_show_girl == "sandra":
+                $ scene_runtime.text = "Сандра освобождает грудь из одежды и несколько долгих мгновений позволяет вам любоваться собой. \"Подарок я оценила,\" говорит она, снова поправляя наряд. \"А теперь и ты получил то, о чем просил.\""
+            elif _outfit_show_girl == "melissa":
+                $ scene_runtime.text = "Мелисса, краснея, показывает вам грудь и приподнимает подол ровно настолько, чтобы обещанный показ нельзя было назвать обманом. Потом торопливо одергивает платье, но улыбается уже без прежней неловкости."
+            elif _outfit_show_girl == "amanda":
+                $ scene_runtime.text = "Аманда с явным удовольствием превращает примерку в маленькое представление: распахивает верх, приподнимает юбку и смеется, заметив ваш взгляд. Лишь дав вам налюбоваться, она снова приводит наряд в порядок."
+            else:
+                $ scene_runtime.text = "[_outfit_show_name] медленно распахивает наряд и позволяет вам рассмотреть себя без одежды. Выполнив обещание, она снова приводит платье в порядок."
+            $ scene_runtime.location_text = scene_runtime.text
+            $ _outfit_show_info.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
+            $ calendar_v2.advance_minutes(10)
+            menu:
+                "Вернуться в зал":
+                    return True
+
+
+label HouseholdOutfitRewardHandjobScene(girl_name=""):
+    $ renpy.dynamic("_outfit_hand_girl", "_outfit_hand_info", "_outfit_hand_name")
+    $ _outfit_hand_girl = people_normalize_id(girl_name)
+    $ _outfit_hand_info = people.get_info(_outfit_hand_girl)
+    $ _outfit_hand_name = people_display_name(_outfit_hand_girl)
+    if not player.intimacy.can_cum():
+        $ scene_runtime.text = "[_outfit_hand_name] уже тянется к завязкам на ваших штанах, но быстро понимает, что на сегодня мужские силы исчерпаны. Она усмехается и обещает закончить благодарность после отдыха."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Отложить до следующего раза":
+                return False
+
+    $ scene_runtime.picture = household_outfit_reward_picture(_outfit_hand_girl, "handjob")
+    $ scene_runtime.text = "В укромном углу [_outfit_hand_name] прижимается к вам, расстегивает штаны и обхватывает вставший член ладонью. Она начинает медленно двигать рукой, время от времени прислушиваясь, не идет ли кто-нибудь по коридору."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Позволить ей продолжить":
+            $ scene_runtime.picture = household_outfit_reward_picture(_outfit_hand_girl, "handjob", True)
+            $ scene_runtime.text = "Ее ладонь движется все быстрее. Вскоре вы перестаете сдерживаться и кончаете ей на пальцы. [_outfit_hand_name] вытирает руку заранее приготовленной тряпицей и с довольной улыбкой напоминает, что теперь за новый наряд никто никому ничего не должен."
+            $ scene_runtime.location_text = scene_runtime.text
+            $ _outfit_hand_info.player_cum("outside")
+            $ _outfit_hand_info.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
+            $ calendar_v2.advance_minutes(20)
+            menu:
+                "Вернуться в зал":
+                    return True
+
+
+label HouseholdOutfitRewardOralScene(girl_name=""):
+    $ renpy.dynamic("_outfit_oral_girl", "_outfit_oral_info", "_outfit_oral_name")
+    $ _outfit_oral_girl = people_normalize_id(girl_name)
+    $ _outfit_oral_info = people.get_info(_outfit_oral_girl)
+    $ _outfit_oral_name = people_display_name(_outfit_oral_girl)
+    if not player.intimacy.can_cum():
+        $ scene_runtime.text = "[_outfit_oral_name] опускается перед вами на колени, но быстро замечает, что сегодня вы уже слишком вымотаны. Она облизывает губы и обещает выполнить свою часть сделки после того, как вы отдохнете."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Отложить до следующего раза":
+                return False
+
+    $ scene_runtime.picture = household_outfit_reward_picture(_outfit_oral_girl, "oral")
+    $ scene_runtime.text = "Спрятавшись от посетителей за дальней перегородкой, [_outfit_oral_name] опускается перед вами на колени, освобождает член и медленно проводит языком по головке. Затем она берет его в рот и начинает выполнять обещанную благодарность."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Позволить ей продолжить":
+            $ scene_runtime.picture = household_outfit_reward_picture(_outfit_oral_girl, "oral", True)
+            $ scene_runtime.text = "[_outfit_oral_name] не отстраняется, когда вы доходите до предела. Она принимает семя в рот, аккуратно сглатывает и лишь после этого встает, поправляя одежду. \"Вот теперь мы в расчете,\" шепчет она перед возвращением в зал."
+            $ scene_runtime.location_text = scene_runtime.text
+            $ _outfit_oral_info.player_cum("mouth")
+            $ _outfit_oral_info.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
+            $ calendar_v2.advance_minutes(20)
+            menu:
+                "Вернуться в зал":
+                    return True
 
 
 label TavernStorageRatEvent:

@@ -43,6 +43,13 @@ init python:
                         "images/sandra/tavern/waitress4.jpg",
                     ],
                 },
+                "outfit_reward": {
+                    "show": ["images/sandra/portrait4.jpg"],
+                    "handjob": ["images/sandra/thanks/player_room_1.jpg"],
+                    "handjob_finish": ["images/sandra/thanks/player_room_sandra_1.png"],
+                    "oral": ["images/sandra/portrait3.jpg"],
+                    "oral_finish": ["images/sandra/portrait4.jpg"],
+                },
             }
 
     class SandraInfo(Girl):

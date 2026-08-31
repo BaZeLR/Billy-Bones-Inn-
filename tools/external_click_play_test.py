@@ -598,6 +598,48 @@ testcase external_girl_dress_inside_uses_player_intimacy:
     advance until screen "choice" timeout 20.0
     assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить смотреть", "Подрочить на зрелище"]) timeout 5.0
 
+testcase external_tavern_outfit_request_purchase_reward_flow:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ household.outfit_requests.clear()
+    $ daily_events.delete("", "BuyDressTom", "")
+    $ daily_events.delete("", "OutfitReward", "")
+    $ rooms.enter("TavernMain")
+    $ Amanda.rel = 15
+    $ Amanda.corruption = 45
+    $ Amanda.wardrobe["owned"] = [code for code in _gds_get_dress_list_for_girl("amanda") if str(code or "") != "modestworkdress"]
+    $ player.set_money(1000)
+    $ player.intimacy.came_today = 0
+    $ player.intimacy.can_cum_daily = 3
+    $ _outfit_reward_came_before = int(player.intimacy.came_today or 0)
+    $ _outfit_reward_sex_before = int(Amanda.sex_stat("sexacts", 0) or 0)
+    run Call("HouseholdOutfitRequestTerms", "amanda")
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Пообещать купить наряд без условий", "Сказать, что пока не до обновок", "Попросить потом показать больше, чем новый наряд скрывает", "Попросить отблагодарить вас рукой"]) timeout 5.0
+    click id "choice_panel_button_3" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (str(household.outfit_requests.get("amanda", "") or "") == "handjob" and daily_events.exists("amanda", "BuyDressTom", "") == 1) timeout 5.0
+    $ _gds_apply_purchase("amanda", "modestworkdress", set_produced=True)
+    assert eval (str(household.outfit_requests.get("amanda", "") or "") == "handjob" and daily_events.exists("amanda", "OutfitReward", "") == 1) timeout 5.0
+    run Call("check_daily_event", "amanda", "OutfitReward", "TavernMain", 1)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event") timeout 5.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Пойти с ней", "Попросить вернуться к этому позже"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Позволить ей продолжить"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться в зал"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+    assert eval ("amanda" not in household.outfit_requests and daily_events.exists("amanda", "OutfitReward", "") == 0) timeout 5.0
+    assert eval (int(player.intimacy.came_today or 0) == _outfit_reward_came_before + 1 and int(Amanda.sex_stat("sexacts", 0) or 0) == _outfit_reward_sex_before + 1) timeout 5.0
+
+    $ Sandra.rel = 12
+    $ Sandra.corruption = 20
+    $ Sandra.wardrobe["owned"] = [code for code in _gds_get_dress_list_for_girl("sandra") if str(code or "") != "modestworkdress"]
+    $ household_begin_outfit_request("sandra", "surprise")
+    $ _gds_apply_purchase("sandra", "modestworkdress", set_produced=True)
+    assert eval (str(household.outfit_requests.get("sandra", "") or "") == "surprise_show" and daily_events.exists("sandra", "OutfitReward", "") == 1) timeout 5.0
+    $ household_cancel_outfit_request("sandra")
+    $ daily_events.delete("sandra", "OutfitReward", "")
+
 '''
 
 DOG_ENTITY_ACTION_CHECKS = r'''
@@ -7205,6 +7247,7 @@ def main() -> int:
             "external_female_tailor_refusal_returns_to_catalog",
             "external_all_girl_dress_appointments_use_shared_pipeline",
             "external_girl_dress_inside_uses_player_intimacy",
+            "external_tavern_outfit_request_purchase_reward_flow",
             "external_dog_entity_actions",
             "external_backyard_barrel_object_actions",
             "external_grocery_store_object_purchase_actions",
@@ -7387,6 +7430,7 @@ def main() -> int:
             "external_female_tailor_refusal_returns_to_catalog",
             "external_all_girl_dress_appointments_use_shared_pipeline",
             "external_girl_dress_inside_uses_player_intimacy",
+            "external_tavern_outfit_request_purchase_reward_flow",
             "external_dog_entity_actions",
             "external_backyard_barrel_object_actions",
             "external_grocery_store_object_purchase_actions",

@@ -146,6 +146,13 @@ init python:
                     ],
                     "blowjob_finish": ["images/melissa/sexyTimes/blowjobFinish.jpg"],
                 },
+                "outfit_reward": {
+                    "show": ["images/melissa/thanks.png"],
+                    "handjob": ["images/melissa/thanks1.png"],
+                    "handjob_finish": ["images/melissa/thanks.png"],
+                    "oral": ["images/melissa/sexyTimes/blowjob0.png"],
+                    "oral_finish": ["images/melissa/sexyTimes/blowjobFinish.jpg"],
+                },
             }
 
     class MelissaInfo(Girl):

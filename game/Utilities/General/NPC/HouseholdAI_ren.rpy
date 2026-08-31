@@ -224,6 +224,7 @@ init 5 python:
             "barber_appointments",
             "barber_visit_last_day",
             "warm_drink_last_day",
+            "outfit_requests",
         )
 
         def __init__(self):

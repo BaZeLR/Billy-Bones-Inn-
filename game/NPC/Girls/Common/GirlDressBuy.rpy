@@ -72,6 +72,7 @@ label GirlDressBuyLeave(GirlName=""):
 
 label GirlDressBuyRefuse(GirlName=""):
     hide screen dress_shop_catalog_page
+    $ household_cancel_outfit_request(GirlName)
     "\"Я же сказал, смотреть здесь не на что, покупать нечего, цены запре.., да не в ценах дело, просто выбор убогий!\" назидательно сказали вы и вышли на улицу."
     call SlutFriendsIncrease("irma", 0, 2, -1, 0, 0, 0)
     call SlutFriendsIncrease(GirlName, 5, 1, -1, 0, 0, 0)

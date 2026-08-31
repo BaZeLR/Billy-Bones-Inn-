@@ -70,6 +70,7 @@ label DressNoShow(girl_name_dns):
             '"Ты, ты, ты..." с трудом выдавила [_dns_real_name], пораженная вашим разумным, логичным и исполненным собственного достоинства ответом.'
             '"Ну и козел же ты!" продолжила она, подтверждая лишний раз ту простую истину, что женщинам недоступна логика, и отвернулась. Похоже, разговор с вами закончился.'
             $ slut_friends_increase(_dns_girl, 1, 1, -4, 0, 0, 0)
+            $ household_cancel_outfit_request(_dns_girl)
             jump DressNoShow_End
 
         "Извиниться":
@@ -92,6 +93,7 @@ label DressNoShow(girl_name_dns):
             '"Ну ладно." [_dns_real_name] слегка повеселела.'
             $ slut_friends_increase(_dns_girl, 20, 2, 1, 0, 0, 0)
             $ player.spend_money(50)
+            $ household_cancel_outfit_request(_dns_girl)
             call stat
             jump DressNoShow_End
 

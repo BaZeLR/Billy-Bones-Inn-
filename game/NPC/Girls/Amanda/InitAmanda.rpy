@@ -36,6 +36,13 @@ init python:
                         "images/amanda/tavern/waitress5.jpg",
                     ],
                 },
+                "outfit_reward": {
+                    "show": ["images/amanda/grope/dressFlirt1.png"],
+                    "handjob": ["images/amanda/grope/handjob1.jpg"],
+                    "handjob_finish": ["images/amanda/grope/handjob4.jpg"],
+                    "oral": ["images/amanda/RandomSex/minet1.jpg"],
+                    "oral_finish": ["images/amanda/RandomSex/minet5.jpg"],
+                },
             }
 
     class AmandaInfo(Girl):

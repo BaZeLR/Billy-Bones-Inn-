@@ -100,10 +100,9 @@ init python:
 
         if set_produced:
             dress_shop.produced = d
-            try:
-                household_mark_revealing_dress_order(g, d)
-            except Exception:
-                pass
+            household_mark_revealing_dress_order(g, d)
+
+        household_schedule_outfit_reward(g)
 
         return cost
 

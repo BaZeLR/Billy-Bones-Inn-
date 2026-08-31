@@ -13,10 +13,12 @@ def test_household_authored_requests_use_native_label_menus():
     source = SOURCE.read_text(encoding="utf-8-sig")
     slices = (
         ("HouseholdSoapRequestEvent", "HouseholdSoapRequestGiveNow"),
-        ("HouseholdBarberRequestEvent", "SandraDressInitiativeEvent"),
-        ("SandraDressInitiativeEvent", "MelissaDressRequestEvent"),
-        ("MelissaDressRequestEvent", "AmandaDressRequestEvent"),
-        ("AmandaDressRequestEvent", "HouseholdMorningIssueCure"),
+        ("HouseholdBarberRequestEvent", "HouseholdOutfitRequestTerms"),
+        ("HouseholdOutfitRequestTerms", "SandraDressInitiativeEvent"),
+        ("HouseholdOutfitRewardEvent", "HouseholdOutfitRewardShowScene"),
+        ("HouseholdOutfitRewardShowScene", "HouseholdOutfitRewardHandjobScene"),
+        ("HouseholdOutfitRewardHandjobScene", "HouseholdOutfitRewardOralScene"),
+        ("HouseholdOutfitRewardOralScene", "TavernStorageRatEvent"),
     )
 
     for label_name, next_label in slices:
@@ -24,6 +26,15 @@ def test_household_authored_requests_use_native_label_menus():
         assert "\n    menu:\n" in block
         assert "QueuePagedPanelText" not in block
         assert "ReturnToMainUI" not in block
+        assert "MenuItem(" not in block
+
+    for girl_name, label_name, next_label in (
+        ("sandra", "SandraDressInitiativeEvent", "MelissaDressRequestEvent"),
+        ("melissa", "MelissaDressRequestEvent", "AmandaDressRequestEvent"),
+        ("amanda", "AmandaDressRequestEvent", "HouseholdOutfitRewardEvent"),
+    ):
+        block = _label_block(source, label_name, next_label)
+        assert f'call HouseholdOutfitRequestTerms("{girl_name}")' in block
         assert "MenuItem(" not in block
 
     assert "label HouseholdBarberRequestChoice" not in source
