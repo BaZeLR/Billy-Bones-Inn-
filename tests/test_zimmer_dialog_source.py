@@ -81,7 +81,7 @@ def test_zimmer_dialog_menu_has_reference_choices_and_mongol_distraction():
     ]:
         assert choice in source
 
-    assert 'int(_clara_booklet_thread.num or 0) == 8' in source
+    assert 'int(_clara_booklet_thread.num or 0) == 7' in source
     assert "not Mongol.guard_captain_known" in source
     assert "_mongol_var" not in source
     assert "Mongol.guard_captain_known = True" in source

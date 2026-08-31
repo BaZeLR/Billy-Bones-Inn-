@@ -2,13 +2,13 @@ init 4 python:
     ClaraPantaloonsItem = GameItem(
         object_id="clara_pantaloons_001",
         name="панталоны Клариссы",
-        description="Потерянные в винном подвале панталоны Клариссы. На внутренней стороне пояса углем нанесены приметы лесной тропы и знак старой водокачки.",
+        description="Оставленные Клариссой у лесного озера панталоны. На внутренней стороне пояса углем нанесены приметы скрытой тропы, старой водокачки и тайника.",
         carriable=True,
         stackable=False,
         custom_properties={
             "item_kind": "quest_clue",
             "owner": "clara",
-            "source_thread": "claraPaintingsPath",
+            "source_thread": "claraForestSofa",
         },
     )
 

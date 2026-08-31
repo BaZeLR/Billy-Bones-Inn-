@@ -120,3 +120,51 @@ label story_clara_melissa_room_visit_2:
         $ event_runtime.active_thread.advance()
     $ main_ui_end_native_scene_state()
     return True
+
+
+# Event: after receiving protection, Clarissa keeps her promise to the household.
+# Consequence: tavern service improves, new clientele arrives, and Clarissa
+# prepares Melissa for anal intimacy without replacing Melissa's sex engine.
+label story_clara_tavern_protection_lessons_6:
+    $ main_ui_begin_native_scene_state("Уроки Клариссы")
+    show screen main_ui
+    $ household_mark_runtime_event_seen("clara_tavern_visit")
+
+    vscene "images/clara/tavern_visit.png"
+    $ scene_runtime.text = "Кларисса собирает Сандру, Аманду и Мелиссу у стойки и без прежних насмешек объясняет, чему ее годами учил Альбер: как встретить богатого гостя, рассадить компанию, принять заказ без суеты и не позволить дворянину принять вежливость за слабость. Сандра быстро превращает светские советы в рабочие правила, Аманда упражняется в поклонах, а Мелисса учится держаться увереннее."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+
+    menu:
+        "Продолжить урок":
+            pass
+
+    vscene "images/clara/melissa_doodleTimes.png"
+    $ scene_runtime.text = "После общего занятия Кларисса остается с Мелиссой. Они снова раскладывают уголь и бумагу, но теперь непристойные рисунки служат не обману Легаре, а честному разговору о желаниях и границах. Кларисса спокойно объясняет подруге, как подготовиться к близости сзади, не спешить и вовремя остановить партнера. Мелисса смущается, однако внимательно запоминает советы."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+
+    menu:
+        "Поблагодарить Клариссу за помощь":
+            pass
+
+    $ Sandra.skills["waitress"] = min(100, int(Sandra.skills.get("waitress", 0) or 0) + 5)
+    $ Amanda.skills["waitress"] = min(100, int(Amanda.skills.get("waitress", 0) or 0) + 5)
+    $ Melissa.skills["waitress"] = min(100, int(Melissa.skills.get("waitress", 0) or 0) + 5)
+    $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
+    $ Clara.change_social(friend_delta=2, open_delta=1)
+    $ player.tavern_management.visitors = max(0, int(player.tavern_management.visitors or 0) + 5)
+    $ player.change_tavern_fame(3)
+    $ scene_runtime.text = "Новые манеры быстро становятся частью работы. По городу расходится слух, что в \"Диком Жеребце\" теперь умеют принять не только грузчиков и матросов: в трактир начинают заглядывать состоятельные купцы и дворяне, а обычное число посетителей растет."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+
+    menu:
+        "Вернуться к делам трактира":
+            pass
+
+    $ calendar_v2.advance_minutes(60)
+    call stat
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True

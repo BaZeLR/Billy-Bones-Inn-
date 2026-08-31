@@ -22,12 +22,12 @@ init python:
         if booklet_thread is None:
             return False
         stage = int(booklet_thread.num or 0)
-        if stage == 5:
+        if stage == 4:
             return True
         return (
-            (stage == 6 and minute_now >= 16 * 60)
+            (stage == 5 and minute_now >= 16 * 60)
             or (
-                stage == 8
+                stage == 7
                 and Draupnir.mongol_lockpick_order_day >= 0
                 and minute_now >= 16 * 60
                 and int(calendar_v2.daysInGame or 0) > Mongol.stocks_food_day

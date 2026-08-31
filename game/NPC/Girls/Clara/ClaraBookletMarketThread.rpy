@@ -188,37 +188,6 @@ label story_clara_market_booklet_3:
     return True
 
 
-# Event: Clara confesses her reason in WineStore talk.
-# Consequence: confession is marked, openness/friendship change, and the thread advances.
-label story_clara_market_booklet_4:
-    $ renpy.dynamic("_clara_escape_bonus")
-    $ main_ui_begin_native_scene_state("Признание Клариссы")
-    show screen main_ui
-
-    vscene "images/clara/mongolTalk.png"
-    $ scene_runtime.text = "Вы дожидаетесь удобного момента и без окриков говорите Клариссе, что видели ее вечерний разговор с Монголом. Девушка сначала белеет, потом зло сжимает губы, но быстро понимает, что вы пришли не сдавать ее отцу.\n\n\"Да, это я его подбила,\" признается она наконец. \"Мне нужны деньги. Отец уже подбирает мне старого хрыча в столице, и весь этот брак будет не для меня, а для его торговли. Я не собираюсь ехать туда смирной куклой.\" Она нервно усмехается и добавляет, что книжечки, рисунки и все разговоры про свободу для нее давно перестали быть просто романтической чушью. \"Хочется хоть раз жить не по чужому счету. А Монгол обещал, что если я соберу достаточно денег, то в его тайном кругу мне найдут место. Хоть кем. Хоть рисовальщицей, хоть этой их девкой для сценок. Знаю, звучит грязно. Но это все равно лучше, чем лечь под старого вонючего дурака по приказу отца.\"\n\nСказав это, Кларисса смотрит на вас уже не как на случайного покупателя, а как на человека, который теперь знает слишком много."
-    $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
-
-    menu:
-        "Оставить услышанное между вами":
-            pass
-
-    $ _clara_escape_bonus = 1
-    if str(player.appearance.current_dress or "") == "thiefdress":
-        $ _clara_escape_bonus += 1
-    if int(Clara.rel or 0) >= 7:
-        $ _clara_escape_bonus += 1
-    $ Clara.drawings_secret_known = True
-    $ Clara.openness = min(20, int(Clara.openness or 0) + _clara_escape_bonus)
-    $ Clara.trust = min(20, int(Clara.trust or 0) + max(1, _clara_escape_bonus - 1))
-    $ calendar_v2.advance_minutes(30)
-    call stat
-    $ event_runtime.active_thread.advance()
-    $ main_ui_end_native_scene_state()
-    return True
-
-
 # Event: HunterClub rumor reveals Mongol's arrest.
 # Consequence: the stocks arrest day is recorded and the thread advances.
 label story_clara_market_booklet_5:
@@ -353,6 +322,9 @@ label story_clara_market_booklet_9:
         "Послать стражникам вино и угощение, а затем освободить Монгола" if int(player.tavern_management.productnum or 0) > 0 and int(player.tavern_management.winenum or 0) > 0:
             jump story_clara_market_booklet_release_mongol
 
+        "Оставить Монгола отвечать за конокрадство":
+            jump story_clara_market_booklet_leave_mongol
+
         "Передумать и уйти":
             $ main_ui_end_native_scene_state()
             return True
@@ -367,12 +339,56 @@ label story_clara_market_booklet_release_mongol:
     $ player.tavern_management.productnum = max(0, int(player.tavern_management.productnum or 0) - 1)
     $ player.tavern_management.winenum = max(0, int(player.tavern_management.winenum or 0) - 1)
     $ player.economy.tavern_fame = int(player.economy.tavern_fame or 0) + 2
-    $ Zimmer.change_social(friend_delta=1)
+    $ Mongol.stocks_fate = "released"
     $ Mongol.guard_captain_known = True
     $ Robin.mongol_safe_pass = True
     $ Robin.blackwood_road_open = True
     $ calendar_v2.advance_minutes(30)
     call stat
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+label story_clara_market_booklet_leave_mongol:
+    show screen main_ui
+    vscene "images/mongolStock.png"
+    $ scene_runtime.text = "Вы убираете отмычки и прямо говорите Монголу, что вытаскивать его после организованного конокрадства не станете. Он сначала ругается, потом обещает золотые горы, но вы уходите, не оборачиваясь.\n\nУтром Циммерман узнает, что вы не вмешались в работу стражи. Десятник запоминает это как редкий для города случай, когда личная выгода не перевесила порядок. Люди Робина, напротив, не получат от Монгола доброго слова о вас."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+
+    menu:
+        "Оставить решение в силе":
+            pass
+
+    $ Mongol.stocks_fate = "convicted"
+    $ Mongol.zimmer_knows_horse_theft = True
+    $ Zimmer.change_social(friend_delta=1)
+    $ player.economy.tavern_fame = int(player.economy.tavern_fame or 0) + 2
+    $ calendar_v2.advance_minutes(15)
+    call stat
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return True
+
+
+# Event: Hunter Club confirms the consequences of Mongol's fate.
+# Consequence: the horse-theft thread completes after the chosen outcome is public.
+label story_clara_market_booklet_10:
+    $ main_ui_begin_native_scene_state("Развязка дела конокрадов")
+    show screen main_ui
+    vscene "images/general/hunter_store_catInfo.png"
+    if str(Mongol.stocks_fate or "") == "released":
+        $ scene_runtime.text = "В охотничьем клубе наперебой пересказывают ночную новость: Монгол исчез из колодок, а стража обнаружила открытый замок лишь под утро. Одни смеются над караульными, другие уверены, что беглецу помог человек с деньгами и связями.\n\nДля вас последствия яснее слухов: люди Робина теперь знают, кому Монгол обязан свободой, и дорога через их земли для вас открыта. Циммерман же запомнил побег и будет внимательнее относиться к каждому вашему делу со стражей."
+    else:
+        $ scene_runtime.text = "В охотничьем клубе обсуждают, что шайка конокрадов так и осталась в руках стражи. Монгол пойдет под суд вместе с сообщниками, а Циммерман получает редкую похвалу за доведенное дело.\n\nДесятник отдельно отметил, что вы могли вмешаться, но не стали мешать закону. Его отношение к вам заметно потеплело, зато рассчитывать на доброе слово Монгола перед людьми Робина больше не приходится."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+
+    menu:
+        "Запомнить последствия":
+            pass
+
     $ event_runtime.active_thread.complete()
     $ main_ui_end_native_scene_state()
     return True

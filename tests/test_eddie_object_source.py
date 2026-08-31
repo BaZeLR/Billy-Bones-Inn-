@@ -85,7 +85,7 @@ def test_eddie_v60_migration_consumes_old_map_once():
     migration = read_rel("game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V60():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 73" in migration
+    assert "define currentVersion = 74" in migration
     assert "if loaded_version < 61:" in migration
     assert "updateSave_V60()" in migration
     for old_key, field_name in (

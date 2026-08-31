@@ -30,6 +30,7 @@ def test_clara_tavern_visit_thread_is_clara_owned():
     assert '"story_clara_melissa_room_visit_0"' in source
     assert '"story_clara_melissa_room_visit_1"' in source
     assert '"story_clara_melissa_room_visit_2"' in source
+    assert '"story_clara_tavern_protection_lessons_6"' in source
     assert '"TavernMain",\n            "clara_tavern_visit"' in source
     assert '"TavernMelissaRoom",\n            "clara_room_visit"' in source
     assert "melissaClaraOverheard" not in source
@@ -148,10 +149,10 @@ def test_clara_visit_media_remains_until_native_continue_then_restores_room():
         "images/clara/melissa_doodles.png",
     )
 
-    assert labels.count("main_ui_begin_native_scene_state(") == 6
-    assert labels.count("main_ui_end_native_scene_state()") == 6
-    assert labels.count("show screen main_ui") == 6
-    assert labels.count("menu:") == 6
+    assert labels.count("main_ui_begin_native_scene_state(") == 7
+    assert labels.count("main_ui_end_native_scene_state()") == 7
+    assert labels.count("show screen main_ui") == 7
+    assert labels.count("menu:") == 9
     for picture in expected_pictures:
         assert f'vscene "{picture}"' in labels
 
@@ -167,3 +168,20 @@ def test_third_bar_talk_reveals_clara_and_melissa_as_close_friends():
     assert "тихие стоны и звуки поцелуев" in third_bar
     assert "очень близкими подругами" in third_bar
     assert 'vscene "images/clara/melissa_talk.png"' in third_bar
+
+
+def test_protection_lesson_updates_domain_owners_without_replacing_melissa_sex_rules():
+    runtime = read(STORY_RUNTIME)
+    labels = read(CLARA_TAVERN_VISIT)
+    melissa_sex = read(PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissaSex.rpy")
+
+    assert "#int(threads['claraForestSofa'].num or 0) >= 1" in runtime
+    assert 'Sandra.skills["waitress"]' in labels
+    assert 'Amanda.skills["waitress"]' in labels
+    assert 'Melissa.skills["waitress"]' in labels
+    assert "player.tavern_management.visitors" in labels
+    assert "clara_anal_training" not in runtime
+    assert "clara_anal_training" not in labels
+    assert "clara_anal_training" not in melissa_sex
+    assert '"Войти сзади" if _ims_full_engine and player.intimacy.came_today' in melissa_sex
+    assert 'threads["claraTavernVisit"].completed' in melissa_sex

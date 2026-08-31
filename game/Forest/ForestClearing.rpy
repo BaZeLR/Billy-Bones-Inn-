@@ -36,11 +36,14 @@ label ForestClearing:
     $ rooms.enter("ForestClearing")
     $ scene_runtime.picture = rooms.current.bg_picture or None
     $ scene_runtime.text = rooms.get("ForestClearing").descriptions[0].text
-    if str(people.location("clara") or "") == "ForestClearing":
+    if str(people.location("clara") or "") == "ForestClearing" or story_event_available("ForestClearing", "clara_follow"):
         $ _clara_forest_picture = Clara.forest_picture("ForestClearing")
         if str(_clara_forest_picture or "").strip():
             $ scene_runtime.picture = _clara_forest_picture
-        $ scene_runtime.text = scene_runtime.text + "\n\nНа краю поляны вы замечаете Клариссу, явно вышедшую сюда прогуляться и подышать лесным воздухом."
+        if story_event_available("ForestClearing", "clara_follow"):
+            $ scene_runtime.text = scene_runtime.text + "\n\nНа краю поляны вы замечаете Клариссу. Она уверена, что за ней никто не следит, и быстро сворачивает к узкой тропе в сторону озера."
+        else:
+            $ scene_runtime.text = scene_runtime.text + "\n\nНа краю поляны вы замечаете Клариссу, явно вышедшую сюда прогуляться и подышать лесным воздухом."
     $ scene_runtime.location_text = scene_runtime.text
     $ forest_room_set_saved_text(scene_runtime.text, rooms.current)
     $ _forest_spawned = forest_room_spawn(rooms.get("ForestClearing"))

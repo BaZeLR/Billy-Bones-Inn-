@@ -27,6 +27,7 @@ init python:
             self.will_try_to_steal = False
             self.stocks_food_day = -1
             self.stocks_arrest_day = -1
+            self.stocks_fate = ""
             self.guard_captain_known = False
             self.market_roll_day = -1
             self.market_roll = False
@@ -58,6 +59,8 @@ init python:
             return self.market_roll
 
         def is_market_visible(self):
+            if str(self.stocks_fate or "") == "convicted":
+                return False
             if player.horse.owns_horse():
                 return False
             if not rooms.get("MarketPlace").is_open():

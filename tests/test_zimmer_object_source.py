@@ -73,5 +73,5 @@ def test_zimmer_v54_migration_consumes_old_map_once():
     for key in ("ComplainHorse", "SherwoodStory", "ComplainRobin", "RobinInvestigationDay", "street_pass"):
         assert f'zimmer_var.pop("{key}"' in migration
     assert 'globals().pop("ZimmerVar", None)' in migration
-    assert "define currentVersion = 73" in migration_source
+    assert "define currentVersion = 74" in migration_source
     assert "if loaded_version < 55:" in migration_source

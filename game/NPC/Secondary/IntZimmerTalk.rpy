@@ -34,7 +34,7 @@ label IntZimmerTalk:
                 call IntZimmerTalkHaggle
             "Узнать как там расследование" if int(Zimmer.talked_today or 0) < 2 and Zimmer.robin_complaint_stage == 2:
                 call IntZimmerTalkInvestigation
-            "Похвастаться вином для ночной стражи" if int(Zimmer.talked_today or 0) < 2 and _clara_booklet_thread is not None and int(_clara_booklet_thread.num or 0) == 8 and not Mongol.guard_captain_known and int(player.tavern_management.winenum or 0) > 0:
+            "Похвастаться вином для ночной стражи" if int(Zimmer.talked_today or 0) < 2 and _clara_booklet_thread is not None and int(_clara_booklet_thread.num or 0) == 7 and not Mongol.guard_captain_known and int(player.tavern_management.winenum or 0) > 0:
                 call IntZimmerTalkMongolWineDistraction
             "Закончить разговор":
                 $ main_ui_end_talk_state()

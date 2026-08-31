@@ -265,7 +265,7 @@ init python:
                 rows.append("Луиза советует не ходить далеко без бинтов, ловушек и заряженного оружия.")
         except Exception:
             pass
-        if int(threads["claraBookletMarket"].num or 0) >= 5:
+        if int(threads["claraBookletMarket"].num or 0) >= 4:
             rows.append("У стойки снова обсуждают арест конокрада: городская стража теперь смотрит на рынок строже.")
         return "\n\n".join(rows)
 

@@ -95,16 +95,16 @@ def test_mongol_stocks_progress_uses_thread_stage_without_mirror_flags():
     assert "StocksSeen" not in combined
     assert "StocksReleased" not in combined
     assert 'threads.get("claraBookletMarket")' in market
+    assert "stage == 4" in market
     assert "stage == 5" in market
-    assert "stage == 6" in market
-    assert "stage == 8" in market
+    assert "stage == 7" in market
 
 
 def test_mongol_v61_migration_consumes_old_map_once():
     migration = read_rel("game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V61():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 73" in migration
+    assert "define currentVersion = 74" in migration
     assert "if loaded_version < 62:" in migration
     assert "updateSave_V61()" in migration
     for old_key, field_name in (

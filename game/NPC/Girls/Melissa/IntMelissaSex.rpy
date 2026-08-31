@@ -236,7 +236,10 @@ label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):
                 "Войти сзади" if _ims_full_engine and player.intimacy.came_today < player.intimacy.can_cum_daily and not Melissa.sex_busy() and "insert" in bodymodel_actions_for_target(GirlNameIMS, "ass") and player.intimacy.arousal_value() >= 30 and Melissa.arousal_value() >= 40:
                     $ Melissa.set_cock_position("ass")
                     $ _ims_effect = bodymodel_apply_action(GirlNameIMS, "ass", "insert", "You", Melissa.data.fullname, "female")
-                    $ scene_runtime.text = "Вы входите сзади, медленно и без спешки. Мелисса вцепляется в край стола и привыкает к новому давлению."
+                    if threads["claraTavernVisit"].completed and int(threads["claraForestSofa"].num or 0) >= 1 and not bool(threads["claraForestSofa"].aborted):
+                        $ scene_runtime.text = "Вспомнив советы Клариссы, Мелисса сама задает медленный темп и показывает, когда можно продолжить. Вы входите сзади без спешки; она привыкает к новому давлению и не позволяет вам торопиться."
+                    else:
+                        $ scene_runtime.text = "Вы входите сзади, медленно и без спешки. Мелисса вцепляется в край стола и привыкает к новому давлению."
                     call IntMelissaSexState(GirlNameIMS)
 
                 "Кончить в рот" if _ims_can_cum and Melissa.cock_in("mouth"):

@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 73
+define currentVersion = 74
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -653,6 +653,10 @@ init -100 python:
         if loaded_version < 73:
             updateSave_V72()
             loaded_version = 73
+
+        if loaded_version < 74:
+            updateSave_V73()
+            loaded_version = 74
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2437,6 +2441,36 @@ init -100 python:
             bat_thread.advanceTo(11)
         elif old_num >= 8:
             bat_thread.advanceTo(11 if bool(Melissa.drawings_found) else 10)
+
+    def updateSave_V73():
+        # The horse-theft rumor now follows the witnessed market deal directly.
+        # Preserve the equivalent authored stage while removing the obsolete
+        # Wine Store confession step; no compatibility flag remains afterward.
+        initThreads()
+        booklet_thread = threads.get("claraBookletMarket")
+        if booklet_thread is not None:
+            old_num = int(booklet_thread.num or 0)
+            was_completed = bool(booklet_thread.completed)
+            if was_completed:
+                if not hasattr(Mongol, "stocks_fate") or not str(Mongol.stocks_fate or ""):
+                    Mongol.stocks_fate = "released" if bool(Robin.mongol_safe_pass) else "convicted"
+                booklet_thread.advanceTo(8, force_active=True)
+            else:
+                mapped_num = old_num - 1 if old_num >= 4 else old_num
+                booklet_thread.advanceTo(mapped_num, force_active=bool(booklet_thread.metconds or mapped_num > 0))
+
+        if not hasattr(Mongol, "stocks_fate"):
+            Mongol.stocks_fate = ""
+        tavern_visit = threads.get("claraTavernVisit")
+        forest_sofa = threads.get("claraForestSofa")
+        if (
+            tavern_visit is not None
+            and forest_sofa is not None
+            and bool(tavern_visit.completed)
+            and int(forest_sofa.num or 0) >= 1
+            and not bool(forest_sofa.aborted)
+        ):
+            tavern_visit.advanceTo(6, force_active=True)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

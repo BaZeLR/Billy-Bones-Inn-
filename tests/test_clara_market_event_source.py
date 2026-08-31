@@ -265,7 +265,8 @@ def test_clara_market_thread_file_has_no_direct_wrappers_or_paged_panels():
     assert "ShowImage" not in labels
     assert "ClaraVar" not in labels
     assert "Clara.var" not in labels
-    assert 'call checkTriggers("WineStore", "clara_talk", 0)' in clara_talk
+    assert 'story_event_available("WineStore", "clara_talk")' not in clara_talk
+    assert 'call checkTriggers("WineStore", "clara_talk", 0)' not in clara_talk
     assert 'story_event_available("menu_CityGuard", "mongol_stocks")' in city_guard
     assert 'Call("checkTriggers", "menu_CityGuard", "mongol_stocks", 0)' in city_guard
     assert 'target="checkTriggers", args=("StolyarWorkshop", "enter", 0)' in stolyar
@@ -279,9 +280,49 @@ def test_clara_market_events_restore_the_calling_picture_and_ui_context():
     assert 'main_ui_runtime.mode = "event"' not in labels
     assert 'main_ui_runtime.mode = "scene"' not in labels
     assert labels.count("main_ui_begin_native_scene_state(") == 9
-    assert labels.count("main_ui_end_native_scene_state()") == 15
+    assert labels.count("main_ui_end_native_scene_state()") == 16
     assert labels.index('main_ui_begin_native_scene_state("Кларисса на рынке")') < labels.index('vscene "images/clara/market_day.png"')
-    assert labels.index('main_ui_begin_native_scene_state("Признание Клариссы")') < labels.index('vscene "images/clara/mongolTalk.png"', labels.index("label story_clara_market_booklet_4:"))
+    assert labels.index('label story_clara_market_booklet_3:') < labels.index('label story_clara_market_booklet_5:')
+    assert 'label story_clara_market_booklet_4:' not in labels
+
+
+def test_hunter_rumor_immediately_follows_market_horse_theft_and_owns_mongol_fate():
+    events = _source(Path("game") / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy")
+    labels = _source(Path("game") / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy")
+    block = events.split('LThreadData(0, "clara", "BookletMarket"', 1)[1].split(
+        'LThreadData(1, "clara", "PaintingsPath"', 1
+    )[0]
+
+    ordered = [
+        '"story_clara_market_booklet_3"',
+        '"story_clara_market_booklet_5"',
+        '"story_clara_market_booklet_6"',
+        '"story_clara_market_booklet_7"',
+        '"story_clara_market_booklet_8"',
+        '"story_clara_market_booklet_9"',
+        '"story_clara_market_booklet_10"',
+    ]
+    assert [block.index(stage) for stage in ordered] == sorted(block.index(stage) for stage in ordered)
+    assert '"HunterClub",\n            "overheard",\n            3,' in block
+    assert '"WineStore",\n            "clara_talk"' not in block
+    assert 'Mongol.stocks_fate = "released"' in labels
+    assert 'Mongol.stocks_fate = "convicted"' in labels
+    assert labels.count('event_runtime.active_thread.complete()') == 1
+
+
+def test_v73_save_migration_preserves_clara_story_positions_without_live_mirrors():
+    migration = _source(Path("game") / "TractirSaveSync.rpy")
+    block = migration.split("def updateSave_V73():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+
+    assert "define currentVersion = 74" in migration
+    assert "if loaded_version < 74:" in migration
+    assert "updateSave_V73()" in migration
+    assert "mapped_num = old_num - 1 if old_num >= 4 else old_num" in block
+    assert "booklet_thread.advanceTo(8, force_active=True)" in block
+    assert "tavern_visit.advanceTo(6, force_active=True)" in block
+    assert "clara_anal_training" not in block
 
 
 def test_main_ui_keeps_standard_three_section_layout():

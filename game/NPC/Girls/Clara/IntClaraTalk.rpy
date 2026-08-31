@@ -65,10 +65,6 @@ label IntClaraTalk(girl_name="clara"):
                 $ main_ui_end_talk_state()
                 return
 
-            "Осторожно заговорить о ее вечерних делах" if story_event_available("WineStore", "clara_talk"):
-                call checkTriggers("WineStore", "clara_talk", 0)
-                $ _clara_repeat_menu = True
-
             "Поговорить с Клариссой о рисунках" if story_event_available("WineStore", "clara_paintings"):
                 call checkTriggers("WineStore", "clara_paintings", 0)
                 $ _clara_repeat_menu = True
