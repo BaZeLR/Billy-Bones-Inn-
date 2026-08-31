@@ -59,6 +59,16 @@ def test_dress_shop_has_no_refresh_label_or_recursive_room_reentry():
     assert 'call ShowGirlCard("irma")' in talk
 
 
+def test_girl_dress_scene_reads_player_intimacy_authority_directly():
+    suggest = (ROOT / "game/NPC/Girls/Common/GirlDressSuggest.rpy").read_text(encoding="utf-8-sig")
+    scene = (ROOT / "game/NPC/Girls/Common/GirlSuggestDressFunc.rpy").read_text(encoding="utf-8-sig")
+
+    assert '"Подрочить на зрелище" if player.intimacy.had_sex_count > 5 and player.intimacy.can_cum():' in scene
+    assert "_gds_player_hadsex" not in scene + suggest
+    assert "_gds_player_cum_today" not in scene + suggest
+    assert "_gds_player_cum_cap" not in scene + suggest
+
+
 def test_girl_card_does_not_accept_fake_navigation_callback():
     source = (ROOT / "game/NPC/Girls/Common/GirlCard.rpy").read_text(encoding="utf-8-sig")
 

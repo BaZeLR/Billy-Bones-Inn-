@@ -588,6 +588,16 @@ testcase external_all_girl_dress_appointments_use_shared_pipeline:
             )
     assert eval (all(_dress_appointment_results.get(name) == (True, name, "GirlDressBuy", "girl_location") for name in _dress_appointment_names)) timeout 5.0
 
+testcase external_girl_dress_inside_uses_player_intimacy:
+    run Call("InitAmanda")
+    $ _inside_dress_code = "modestworkdress"
+    $ player.intimacy.had_sex_count = 6
+    $ player.intimacy.came_today = 0
+    $ player.intimacy.can_cum_daily = 3
+    run Call("GirlDressBuyShowInside", "amanda", _inside_dress_code, 3, 2)
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить смотреть", "Подрочить на зрелище"]) timeout 5.0
+
 '''
 
 DOG_ENTITY_ACTION_CHECKS = r'''
@@ -7194,6 +7204,7 @@ def main() -> int:
             "external_female_tailor_choose_agree_purchase_flow",
             "external_female_tailor_refusal_returns_to_catalog",
             "external_all_girl_dress_appointments_use_shared_pipeline",
+            "external_girl_dress_inside_uses_player_intimacy",
             "external_dog_entity_actions",
             "external_backyard_barrel_object_actions",
             "external_grocery_store_object_purchase_actions",
@@ -7375,6 +7386,7 @@ def main() -> int:
             "external_female_tailor_choose_agree_purchase_flow",
             "external_female_tailor_refusal_returns_to_catalog",
             "external_all_girl_dress_appointments_use_shared_pipeline",
+            "external_girl_dress_inside_uses_player_intimacy",
             "external_dog_entity_actions",
             "external_backyard_barrel_object_actions",
             "external_grocery_store_object_purchase_actions",

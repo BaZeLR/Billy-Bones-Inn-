@@ -145,7 +145,7 @@ label GirlDressBuyShowInside(GirlName="", DressToBuy="", ShowOffLevel=0, DressBu
             call SlutFriendsIncrease(GirlName, 15, 2, 1, 45, 2, 1)
             call GirlDressBuyPay(GirlName, DressToBuy)
 
-        "Подрочить на зрелище" if _gds_player_hadsex() > 5 and _gds_player_cum_today() < _gds_player_cum_cap():
+        "Подрочить на зрелище" if player.intimacy.had_sex_count > 5 and player.intimacy.can_cum():
             'Зрелище вас немало возбудило, и вы недолго думая достали из широких штанов свое сокровище.'
             if ShowOffLevel < 3:
                 if DressBuyIsRelative == 1:

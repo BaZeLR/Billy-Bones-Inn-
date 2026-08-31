@@ -107,12 +107,6 @@ init python:
 
         return cost
 
-    def _gds_player_cum_today():
-        return int(player.intimacy.came_today or 0)
-
-    def _gds_player_cum_cap():
-        return max(1, int(player.intimacy.can_cum_daily or 1))
-
     def _gds_relative_callout_name(girl_name):
         girl = str(girl_name or "").strip().lower()
         if girl == "sandra":
