@@ -81,10 +81,12 @@ This is the real stage-2 room episode.
 | `4` | Attic colony found | The colony is confirmed on the attic search. | Use `MelissaAtticWindowPeek`. |
 | `5` | Window peek done | The voyeur window step is done. | Use `MelissaAtticFallScene`. |
 | `6` | Fall scandal | Melissa catches the player after the fall and moves to Amanda's room. | Smoke out the colony once repellent is available. |
-| `7` | Colony smoked out / roof repair | Order the repair for `2000`; `roof_repair_complete_day` is set two days ahead. | After the threshold, enter Amanda's room in the morning and catch Melissa searching under the bed. |
-| `8` | Lost-booklet aftermath | Melissa has returned from Amanda's room and revealed that a private booklet is missing. | Search Melissa's room; a successful exploration check reveals the booklet. |
-| `9` | Booklet found | The physical booklet is visible in Melissa's room and the Clara paintings continuation can resolve its origin. | After the drawings conversation is resolved, use Melissa's completion talk. |
-| `10` | Completed | Melissa gets the explicit completion talk and the room problem is closed. | Final stage. |
+| `7` | Colony smoked out / roof repair | Order the repair for `2000`; `roof_repair_complete_day` is set two days ahead. | After the threshold, speak to Melissa in the Tavern Hall and ask her to attend tomorrow's common breakfast. |
+| `8` | Breakfast invitation accepted | The thread's own day marker records the invitation day. | On the following morning, enter the kitchen before breakfast is consumed. |
+| `9` | Booklet argument heard | Melissa and Amanda argue about the missing booklet at breakfast. | Enter Amanda's room and catch Melissa searching under the bed. |
+| `10` | Lost-booklet aftermath | Melissa has searched Amanda's room and concluded that the booklet may be in her own room. | Search Melissa's room; a successful exploration check reveals the booklet. |
+| `11` | Booklet found | The physical booklet is visible in Melissa's room and the Clara paintings continuation can resolve its origin. | After the drawings conversation is resolved, open Melissa's NPC conversation; she thanks the player before the normal choices appear. |
+| `12` | Completed | Melissa's thanks closes the room problem and the existing courtship action becomes available from the same conversation. | Final stage. |
 
 ## Detailed Advancement Rules
 
@@ -139,14 +141,28 @@ Advance by:
 Requirements:
 - pay `2000` to order the roof repair
 - `dayspassed >= roof_repair_complete_day`
-- Melissa is still temporarily staying in Amanda's room
 
 Advance by:
-- enter Amanda's room and play the three-picture lost-booklet scene
-
-Existing saves from the former, incorrect order may already have `drawings_found` at stage `7`. They still play the required three-picture scene, then advance directly to stage `9` so the same physical booklet is not discovered or created twice.
+- speak to Melissa from the Tavern Hall NPC list
+- choose `Попросить Мелиссу прийти завтра на общий завтрак`
 
 ### Stage `8 -> 9`
+Requirements:
+- at least one day has passed since the invitation
+- breakfast has not already been consumed
+- enter the kitchen during the morning
+
+Advance by:
+- play the paragraph-by-paragraph Melissa/Amanda booklet argument
+- finish that breakfast
+
+### Stage `9 -> 10`
+Advance by:
+- enter Amanda's room and play the three-picture under-bed search scene
+
+Existing saves from the former order may already have `drawings_found`. They still play the required three-picture scene, then advance directly to stage `11` so the same physical booklet is not discovered or created twice.
+
+### Stage `10 -> 11`
 Requirements:
 - search Melissa's room
 - effective exploration is above `120`
@@ -154,12 +170,14 @@ Requirements:
 Advance by:
 - discover the booklet under Melissa's bed
 
-### Stage `9 -> 10`
+### Stage `11 -> 12`
 Requirements:
 - resolve the first Clara paintings conversation so `drawings_returned` is true
 
 Advance by:
-- Melissa completion follow-up scene
+- open Melissa's NPC conversation in the Tavern Hall
+- Melissa's completion thanks plays automatically
+- the existing courtship option is then available in the same conversation
 
 ## Recipe Book Note
 
@@ -194,9 +212,11 @@ For this quest to play smoothly, the intended visible order is:
 11. Fall scene
 12. Smoke out colony
 13. Pay `2000` and wait two days for the roof repair
-14. Catch Melissa searching under Amanda's bed
-15. Search Melissa's room and discover the booklet
-16. Resolve the drawings continuation
-17. Melissa completion talk
+14. Ask Melissa in the Tavern Hall to attend tomorrow's common breakfast
+15. Hear the Melissa/Amanda booklet argument at the next morning's breakfast
+16. Catch Melissa searching under Amanda's bed
+17. Search Melissa's room and discover the booklet
+18. Resolve the drawings continuation
+19. Open Melissa's NPC conversation, receive her thanks, and continue into the existing courtship flow
 
 That is the sequence the live code is now aiming to preserve.

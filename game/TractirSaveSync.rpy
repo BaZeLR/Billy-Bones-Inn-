@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 72
+define currentVersion = 73
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -647,6 +647,10 @@ init -100 python:
         if loaded_version < 72:
             updateSave_V71()
             loaded_version = 72
+
+        if loaded_version < 73:
+            updateSave_V72()
+            loaded_version = 73
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2415,6 +2419,22 @@ init -100 python:
         paintings = threads.get("claraPaintingsPath")
         if paintings is not None and paintings.aborted and int(paintings.num or 0) == 1:
             paintings.advanceTo(2, force_active=True)
+
+    def updateSave_V72():
+        # Two authored stages now sit between the repaired roof and Melissa's
+        # booklet search. Move existing saves to the equivalent thread stage;
+        # the thread remains the sole owner of quest progression.
+        initThreads()
+        bat_thread = threads.get("melissaBatProblem")
+        if bat_thread is None:
+            return
+        old_num = int(bat_thread.num or 0)
+        if bool(bat_thread.completed) or old_num >= 10:
+            bat_thread.advanceTo(bat_thread.data.length, complete_at_end=True)
+        elif old_num >= 9:
+            bat_thread.advanceTo(11)
+        elif old_num >= 8:
+            bat_thread.advanceTo(11 if bool(Melissa.drawings_found) else 10)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

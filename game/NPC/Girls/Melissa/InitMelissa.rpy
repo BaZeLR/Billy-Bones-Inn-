@@ -419,7 +419,7 @@ init python:
             week_num = people_to_int(calendar_v2.week if weekday_value is None else weekday_value, 0)
             if temp_room == "" or temp_room != room_key:
                 return False
-            if threads["melissaBatProblem"].num >= 8:
+            if threads["melissaBatProblem"].num >= 10:
                 return False
             scheduled_room = str(self.data.getLocation(week_num, hour_num) or "")
             if scheduled_room == "TavernMelissaRoom":
@@ -431,7 +431,7 @@ init python:
 
         def drawings_scene_ready(self):
             return (
-                threads["melissaBatProblem"].num == 8
+                threads["melissaBatProblem"].num == 10
                 and not bool(self.drawings_found)
                 and str(rooms.current_code or "") == "TavernMelissaRoom"
             )
@@ -474,15 +474,9 @@ init python:
                 return "Прикинуть, сколько обойдется починка крыши"
             return "Осмотреть починку крыши"
 
-        def bat_drawings_event_caption(self):
-            return "Присмотреться, чем шуршит Мелисса у кровати"
-
-        def bat_completion_talk_caption(self):
-            return "Сказать Мелиссе, что с ее комнатой наконец покончено"
-
         def bats_completion_ready(self):
             return (
-                threads["melissaBatProblem"].num == 9
+                threads["melissaBatProblem"].num == 11
                 and bool(self.drawings_returned)
             )
 

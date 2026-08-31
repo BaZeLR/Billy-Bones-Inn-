@@ -84,13 +84,16 @@ def test_amanda_room_preserves_events_issues_search_objects_and_exits():
         'household_room_issue_action_specs("amanda")',
         'Call("DoChore", "clean_upstairs_rooms", "TavernAmandaRoom", "", "")',
         'Call("UpstairsRoomSearch", "TavernAmandaRoom")',
-        'story_event_available("TavernAmandaRoom", "melissa_bats")',
-        'Call("checkTriggers", "TavernAmandaRoom", "melissa_bats", 0)',
+        'story_event_available(rooms.current_code, "melissa_bats")',
+        'call checkTriggers(rooms.current_code, "melissa_bats", 0)',
         "rooms.get(\"TavernAmandaRoom\").visible_game_items()",
         "rooms.get(\"TavernAmandaRoom\").build_exit_items()",
         "label story_amanda_room_grope_0:",
     ):
         assert token in SOURCE
+
+    action_builder = SOURCE.split("def tavern_amanda_room_action_items():", 1)[1].split("label TavernAmandaRoom:", 1)[0]
+    assert 'Call("checkTriggers", "TavernAmandaRoom", "melissa_bats", 0)' not in action_builder
     assert "TavernAmandaRoomGropeAction" not in SOURCE
 
 

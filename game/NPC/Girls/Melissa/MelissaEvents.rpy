@@ -336,6 +336,80 @@ label story_melissa_bat_problem_fall:
     return True
 
 
+label story_melissa_bat_problem_breakfast_invite:
+    show screen main_ui
+    vscene MelissaStaticData.image_path("portrait", "default")
+    $ scene_runtime.text = "Вы просите Мелиссу завтра утром прийти на общий завтрак. Теперь, когда крыша починена, пора спокойно обсудить возвращение в ее комнату и закончить эту историю всем вместе."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "Мелисса сперва удивленно поднимает брови, но затем кивает. \"Хорошо. Приду. Только пусть Аманда хоть раз даст нормально договорить,\" — отвечает она и благодарит вас за то, что вы не бросили ремонт на полпути."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Договорились":
+            pass
+    $ calendar_v2.advance_minutes(5)
+    $ event_runtime.active_thread.setDay(0)
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    return True
+
+
+label story_melissa_bat_problem_breakfast_argument:
+    $ main_ui_begin_native_scene_state("Завтрак: потерянный буклет")
+    show screen main_ui
+    $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
+    $ player.tavern_management.breakfast.event_active = True
+    vscene BREAKFAST_GIRLS_TEASE_PICTURE
+    $ scene_runtime.text = "На следующее утро Мелисса, как и обещала, приходит к общему столу. Но вместо спокойного разговора о починенной крыше она почти сразу поворачивается к Аманде, сжимая пальцы вокруг кружки."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "\"Дура коровья, ты потеряла буклет! Если Сандра узнает, она нас обеих выпорет,\" — шипит Мелисса."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "Аманда вскидывается: \"Клянусь, я его не брала!\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "\"Тогда слушай,\" — не отступает Мелисса. — \"Если меня из-за него выпорют, я расскажу Сандре, как ты играла со своей киской и подглядывала за всякими непристойностями.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "\"Ах ты сука, Мел! Имей совесть — мы ведь делали это вместе!\" — огрызается Аманда."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "Мелисса краснеет, но тут же бросает в ответ: \"А еще я видела, как ты сосала Стефану член!\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "\"Сука! Сука!\" — только и находит что ответить Аманда. Сандра резко требует прекратить перепалку, а Мелисса поднимается из-за стола с таким видом, будто уже решила сама проверить все места, где Аманда могла спрятать пропажу."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Закончить завтрак":
+            pass
+    $ calendar_v2.advance_minutes(45)
+    $ player.tavern_management.breakfast.today = True
+    $ player.tavern_management.breakfast.last_day = int(current_game_day() or 0)
+    $ player.tavern_management.breakfast.day = int(current_game_day() or 0)
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
+    call TavernKitchenFinishBreakfastEvent
+    return True
+
+
 label story_melissa_bat_problem_5:
     $ main_ui_begin_native_scene_state("Потерянная тетрадь Мелиссы")
     show screen main_ui
@@ -347,14 +421,14 @@ label story_melissa_bat_problem_5:
             pass
 
     vscene MelissaStaticData.cycle_image("amanda_room", "under_bed_search", 1)
-    $ scene_runtime.text = "На скрип двери Мелисса резко оборачивается. По ее испуганному лицу ясно, что ищет она не обычную ленту или потерянную монету. После короткой паузы девушка признается, что не может найти небольшую тетрадь, которую привезла с собой из своей комнаты."
+    $ scene_runtime.text = "На скрип двери Мелисса резко оборачивается. После утренней перепалки уже ясно, что именно она ищет: пропавший рисованный буклет. Мелисса признается, что подозревала Аманду и решила проверить пространство под ее кроватью."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Продолжить":
             pass
 
     vscene MelissaStaticData.cycle_image("amanda_room", "under_bed_search", 2)
-    $ scene_runtime.text = "Мелисса просит не говорить Аманде о пропаже и снова проверяет под кроватью, но тетради там нет. Похоже, она могла оставить ее в своей комнате, когда в спешке перебиралась сюда из-за летучих мышей."
+    $ scene_runtime.text = "Мелисса снова проверяет под кроватью, но буклета там нет. Ее уверенность сменяется тревогой: похоже, она могла оставить его в собственной комнате, когда в спешке переносила вещи из-за летучих мышей."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Оставить Мелиссу продолжать поиски":
@@ -494,10 +568,13 @@ label story_melissa_bat_problem_roof:
 
 
 label story_melissa_bat_problem_6:
+    show screen main_ui
     vscene MelissaStaticData.image_path("portrait", "thanks")
     $ scene_runtime.text = "Вы говорите Мелиссе, что на этот раз все действительно закончено: чердачное гнездовище выжжено, щели под крышей забиты, а над ее комнатой теперь наконец тихо. Она сперва смотрит на вас с привычной настороженностью, будто все еще ждет подвоха, но потом сама коротко выдыхает и впервые за все это время заметно расслабляется.\n\n\"Значит, можно снова спать у себя и не ждать, что ночью над головой начнут бегать, пищать и сыпать трухой...\" Она качает головой, будто сама до конца не верит в удачу, а потом уже тише добавляет: \"Спасибо. Не за слова — за то, что ты и правда довел дело до конца.\"\n\nПохоже, история с летучими мышами и чердаком для Мелиссы наконец действительно закрыта."
     $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
+    menu:
+        "Продолжить":
+            pass
     $ calendar_v2.advance_minutes(45)
     $ event_runtime.active_thread.advance()
     $ Melissa.complete_bats_problem()

@@ -151,15 +151,6 @@ init python:
         parts = [row for row in parts if str(row or "").strip()]
         return "\n\n".join(parts) if len(parts) > 0 else "Комната Аманды."
 
-    def tavern_amanda_room_locked_for_melissa_booklet():
-        return (
-            not people.is_awake("amanda")
-            and str(Melissa.temp_room_code or "") == "TavernAmandaRoom"
-            and not bool(Melissa.drawings_found)
-            and threads["melissaBatProblem"].num >= 6
-            and threads["melissaBatProblem"].num < 8
-        )
-
     TavernAmandaRoomRoomDefinition = Room(
         code_name="TavernAmandaRoom",
         group_name=ROOM_GROUP_TAVERN,
@@ -251,8 +242,6 @@ init python:
         if tavern_upstairs_can_clean_rooms():
             items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernAmandaRoom", "", "")))
         items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernAmandaRoom")))
-        if story_event_available("TavernAmandaRoom", "melissa_bats"):
-            items.append(MenuItem(Melissa.bat_drawings_event_caption(), Call("checkTriggers", "TavernAmandaRoom", "melissa_bats", 0)))
         for room_object in rooms.get("TavernAmandaRoom").visible_game_items():
             items.append(MenuItem(room_object.name, Call("tavern_amanda_room_object_menu", room_object.object_id)))
         items.extend(rooms.get("TavernAmandaRoom").build_exit_items())
@@ -263,19 +252,6 @@ label TavernAmandaRoom:
     $ _room = rooms.get("TavernAmandaRoom")
     $ rooms.enter("TavernAmandaRoom")
     $ _amanda_sleep_dress = tavern_amanda_room_sleep_dress()
-    if tavern_amanda_room_locked_for_melissa_booklet():
-        $ _amanda_room_picture = tavern_amanda_room_picture(_amanda_sleep_dress)
-        $ scene_runtime.picture = _amanda_room_picture or None
-        if str(_amanda_room_picture or "").strip():
-            $ scene_runtime.picture = _amanda_room_picture
-            vscene _amanda_room_picture
-        $ scene_runtime.text = "Дверь закрыта изнутри. За ней слышны приглушенные голоса, шорох и короткий смешок."
-        $ scene_runtime.location_text = scene_runtime.text
-        $ main_ui_runtime.action_title = "Комната Аманды"
-        $ main_ui_runtime.action_content = None
-        $ main_ui_runtime.action_items = [MenuItem("Вернуться в коридор", movement_actions("TavernUpstairs"))]
-        while True:
-            call screen main_ui
     call RoomEnterEventGate(rooms.current_code, False)
     if story_event_available(rooms.current_code, "melissa_bats"):
         call checkTriggers(rooms.current_code, "melissa_bats", 0)

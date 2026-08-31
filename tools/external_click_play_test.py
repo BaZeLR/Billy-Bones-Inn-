@@ -2776,7 +2776,7 @@ testcase external_melissa_bats_room_search_after_wait:
     $ threads["melissaBatProblem"].advanceTo(6, force_active=True)
     $ findAvailableEvents(True)
 
-    assert eval (int(threads["melissaBatProblem"].data.length or 0) == 10) timeout 5.0
+    assert eval (int(threads["melissaBatProblem"].data.length or 0) == 12) timeout 5.0
     assert eval (int(threads["melissaBatProblem"].num or 0) == 6) timeout 5.0
     assert eval ([str(evt.target or "") for evt in threads["melissaBatProblem"].data.triggers[6]] == ["story_melissa_bat_problem_4"]) timeout 5.0
     assert eval (not story_event_available("TavernMelissaRoom", "room_search")) timeout 5.0
@@ -2809,7 +2809,31 @@ testcase external_melissa_bats_room_search_after_wait:
     assert eval (not story_event_available("TavernAmandaRoom", "melissa_bats")) timeout 5.0
 
     $ Melissa.roof_repair_complete_day = int(current_game_day() or 0)
-    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 8, 0)
+    $ rooms.enter("TavernMain")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("talk_melissa", "melissa_breakfast_invite")) timeout 5.0
+    run Call("checkTriggers", "talk_melissa", "melissa_breakfast_invite", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval ("прийти на общий завтрак" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 8) timeout 15.0
+
+    $ _melissa_breakfast_date = calendar_v2.day_number_to_parts(int(current_game_day() or 0) + 1)
+    $ external_calendar_set_fields(int(_melissa_breakfast_date.get("day", 1) or 1), int(_melissa_breakfast_date.get("month", 1) or 1), int(_melissa_breakfast_date.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 8, 0)
+    $ player.tavern_management.breakfast.today = False
+    $ player.tavern_management.breakfast.event_active = False
+    $ rooms.enter("TavernKitchen")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernKitchen", "enter")) timeout 5.0
+    assert eval (str(event_runtime.available["TavernKitchen"]["enter"].target or "") == "story_melissa_bat_problem_breakfast_argument") timeout 5.0
+    run Jump("TavernKitchen")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/breakfast/tavent_girls.jpg") timeout 5.0
+    assert eval ("как и обещала" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 9) timeout 25.0
+    assert eval (bool(player.tavern_management.breakfast.today)) timeout 5.0
+
     $ rooms.enter("TavernAmandaRoom")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
@@ -2819,7 +2843,7 @@ testcase external_melissa_bats_room_search_after_wait:
     assert eval (str(scene_runtime.picture or "").endswith("underBedsearch_0.png")) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("underBedsearch_1.png")) timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("underBedsearch_2.png")) timeout 10.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 8) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 10) timeout 10.0
     assert eval (str(Melissa.temp_room_code or "") == "") timeout 5.0
 
     $ rooms.enter("TavernMelissaRoom")
@@ -2833,17 +2857,25 @@ testcase external_melissa_bats_room_search_after_wait:
     assert eval ("пачка непристойных рисунков" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 10.0
     click pos (0.5, 0.5) until eval (bool(Melissa.drawings_found)) timeout 10.0
-    assert eval (int(threads["melissaBatProblem"].num or 0) == 9) timeout 5.0
+    assert eval (int(threads["melissaBatProblem"].num or 0) == 11) timeout 5.0
     assert eval (int(_room_item_count_by_id(rooms.get("TavernMelissaRoom"), "melissa_drawings_booklet_001") or 0) == 1) timeout 5.0
 
     $ Melissa.drawings_returned = True
+    $ Melissa.drawings_booklet_left = True
+    $ Melissa.storage_rat_help_day = int(current_game_day() or 0)
+    $ Melissa.rel = max(10, int(Melissa.rel or 0))
+    $ Melissa.openness = max(4, int(Melissa.openness or 0))
+    $ Melissa.corruption = max(8, int(Melissa.corruption or 0))
     $ rooms.enter("TavernMain")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     assert eval (story_event_available("TavernMain", "melissa_talk")) timeout 5.0
-    run Call("checkTriggers", "TavernMain", "melissa_talk", 0)
-    click pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 10) timeout 10.0
+    run Call("IntMelissaTalk", "melissa")
+    advance until screen "choice" timeout 20.0
+    assert eval ("Спасибо" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 12) timeout 15.0
     assert eval (bool(threads["melissaBatProblem"].completed)) timeout 5.0
+    assert eval (story_event_available("talk_melissa", "melissa_intimacy")) timeout 5.0
     assert eval (int(Melissa.roof_repair_complete_day or -1) >= 0) timeout 5.0
 
 testcase external_melissa_bats_existing_booklet_after_roof:
@@ -2862,15 +2894,31 @@ testcase external_melissa_bats_existing_booklet_after_roof:
     $ event_runtime.available.clear()
     $ event_runtime.evaluation_time = None
     $ initStoryEventRuntime(True)
-    $ threads["melissaBatProblem"].advanceTo(7, force_active=True)
+    $ threads["melissaBatProblem"].advanceTo(9, force_active=True)
     $ findAvailableEvents(True)
     assert eval (story_event_available("TavernAmandaRoom", "melissa_bats")) timeout 5.0
     run Call("checkTriggers", "TavernAmandaRoom", "melissa_bats", 0)
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("underBedsearch_1.png")) timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("underBedsearch_2.png")) timeout 10.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 9) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 11) timeout 10.0
     assert eval (bool(Melissa.drawings_found) and str(Melissa.temp_room_code or "") == "") timeout 5.0
+
+testcase external_melissa_v72_breakfast_stage_migration:
+    run Call("InitGameNPCs")
+    $ threads["melissaBatProblem"].advanceTo(8, force_active=True)
+    $ Melissa.drawings_found = False
+    $ updateSave_V72()
+    assert eval (int(threads["melissaBatProblem"].num or 0) == 10 and not threads["melissaBatProblem"].completed) timeout 5.0
+
+    $ threads["melissaBatProblem"].advanceTo(9, force_active=True)
+    $ updateSave_V72()
+    assert eval (int(threads["melissaBatProblem"].num or 0) == 11 and not threads["melissaBatProblem"].completed) timeout 5.0
+
+    $ threads["melissaBatProblem"].advanceTo(10, force_active=True)
+    $ threads["melissaBatProblem"].completed = True
+    $ updateSave_V72()
+    assert eval (int(threads["melissaBatProblem"].num or 0) == int(threads["melissaBatProblem"].data.length or 0) and threads["melissaBatProblem"].completed) timeout 5.0
 
 testcase external_melissa_werecat_thread_condition_sequence:
     $ external_calendar_set_fields(3, 1, 1100, 6, 0)
@@ -7463,6 +7511,7 @@ def main() -> int:
             "external_tavern_room_movement_resets_picture_state",
             "external_melissa_bats_room_search_after_wait",
             "external_melissa_bats_existing_booklet_after_roof",
+            "external_melissa_v72_breakfast_stage_migration",
             "external_melissa_recipe_unlock_single_authority",
             "external_melissa_werecat_forest_actions_rebuild",
             "external_melissa_werecat_thread_condition_sequence",
@@ -7646,6 +7695,7 @@ def main() -> int:
             "external_tavern_room_movement_resets_picture_state",
             "external_melissa_bats_room_search_after_wait",
             "external_melissa_bats_existing_booklet_after_roof",
+            "external_melissa_v72_breakfast_stage_migration",
             "external_melissa_recipe_unlock_single_authority",
             "external_melissa_werecat_forest_actions_rebuild",
             "external_melissa_werecat_thread_condition_sequence",

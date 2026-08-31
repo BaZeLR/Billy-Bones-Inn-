@@ -139,7 +139,7 @@ init python:
         temp_room = str(Melissa.temp_room_code or "")
         repair_day = people_to_int(Melissa.roof_repair_complete_day, -1)
         waiting_for_repair = repair_day >= 0
-        if temp_room == "" or threads["melissaBatProblem"].num >= 8:
+        if temp_room == "" or threads["melissaBatProblem"].num >= 10:
             return ""
         if temp_room == "TavernMyRoom":
             if waiting_for_repair:

@@ -10,7 +10,7 @@ init 6 python:
 
     def tavern_melissa_room_can_show_sleeping():
         temp_room = str(Melissa.temp_room_code or "").strip()
-        if temp_room and threads["melissaBatProblem"].num < 8:
+        if temp_room and threads["melissaBatProblem"].num < 10:
             return False
         if str(people.location("melissa") or "") != "TavernMelissaRoom":
             return False

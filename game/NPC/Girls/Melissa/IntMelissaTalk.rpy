@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntMelissaTalk(girl_name="melissa"):
-    $ renpy.dynamic("_melissa_talk_new", "_melissa_special_entry", "_melissa_bat_caption", "_melissa_repeat_menu")
+    $ renpy.dynamic("_melissa_talk_new", "_melissa_special_entry", "_melissa_repeat_menu")
     $ _melissa_talk_new = str(main_ui_runtime.mode or "") != "talk" or str(main_ui_runtime.selected_char or main_ui_runtime.girl_key or "").strip().lower() != str(girl_name or "melissa").strip().lower()
     $ main_ui_begin_talk_state("Разговор с Мелиссой", girl_name)
     $ main_ui_runtime.action_title = "Разговор с Мелиссой"
@@ -10,8 +10,9 @@ label IntMelissaTalk(girl_name="melissa"):
     if _melissa_talk_new:
         $ scene_runtime.text = "Мелисса вопросительно смотрит на вас, ожидая продолжения разговора."
         $ scene_runtime.location_text = scene_runtime.text
+    if story_event_available(str(rooms.current_code or ""), "melissa_talk"):
+        call checkTriggers(rooms.current_code, "melissa_talk", 0)
     $ _melissa_special_entry = household_special_talk_entry(girl_name) if int(Melissa.asked_today or 0) == 0 and household_special_talk_available(girl_name) else None
-    $ _melissa_bat_caption = Melissa.bat_completion_talk_caption()
     $ _melissa_repeat_menu = True
     while _melissa_repeat_menu:
         $ _melissa_repeat_menu = False
@@ -34,8 +35,9 @@ label IntMelissaTalk(girl_name="melissa"):
                 $ scene_runtime.location_text = scene_runtime.text
             "Спросить Мелиссу о найденных рисунках" if story_event_available("talk_melissa", "clara_paintings"):
                 call checkTriggers("talk_melissa", "clara_paintings", 0)
-            "[_melissa_bat_caption]" if story_event_available(str(rooms.current_code or ""), "melissa_talk"):
-                call checkTriggers(rooms.current_code, "melissa_talk", 0)
+            "Попросить Мелиссу прийти завтра на общий завтрак" if story_event_available("talk_melissa", "melissa_breakfast_invite"):
+                call checkTriggers("talk_melissa", "melissa_breakfast_invite", 0)
+                $ _melissa_repeat_menu = True
             "Обсудить, где Мелиссе переночевать" if melissa_room_problem_available():
                 call IntMelissaRoomProblemAdviceMenu(girl_name)
             "Сблизиться с Мелиссой" if story_event_available("talk_melissa", "melissa_intimacy"):

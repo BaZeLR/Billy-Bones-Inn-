@@ -355,7 +355,8 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
     assert "Melissa.private_place_offer(" in talk_source
     assert 'story_event_available("talk_melissa", "melissa_intimacy")' in talk_source
     assert 'call checkTriggers("talk_melissa", "melissa_intimacy", 0)' in talk_source
-    assert talk_source.count("$ _melissa_repeat_menu = True") == 4
+    invite_branch = talk_source.split('"Попросить Мелиссу прийти завтра на общий завтрак"', 1)[1]
+    assert '$ _melissa_repeat_menu = True' in invite_branch.split('"Обсудить, где Мелиссе переночевать"', 1)[0]
     intimacy_call = talk_source.split('call IntMelissaSex(girl_name, rooms.current_code)', 1)[1]
     assert intimacy_call.split("\n", 2)[1].strip() == "return"
     assert 'Melissa.relationship_allows("sex")' in sex_source
@@ -387,7 +388,7 @@ def test_melissa_courtship_save_upgrade_promotes_only_recorded_sex_history():
     migration_source = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
     migration = migration_source.split("def updateSave_V69():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 72" in migration_source
+    assert "define currentVersion = 73" in migration_source
     assert 'courtship = threads["melissaCourtship"]' in migration
     assert 'Melissa.sex_stat("sexacts", 0)' in migration
     assert "courtship.advanceTo(courtship.data.length, complete_at_end=True)" in migration
@@ -572,3 +573,30 @@ def test_melissa_bat_progress_uses_the_story_thread_directly():
     assert 'threads["melissaBatProblem"].num' in source
     assert '_story_thread_lookup("melissaBatProblem")' not in source
     assert 'self.var["bats_episode"]' not in source
+
+
+def test_melissa_booklet_aftermath_is_one_ordered_thread_flow():
+    runtime_source = (PROJECT_ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
+    event_source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")
+    talk_source = MELISSA_TALK.read_text(encoding="utf-8-sig")
+    amanda_room_source = (PROJECT_ROOT / "game/Inn/TavernAmandaRoom.rpy").read_text(encoding="utf-8-sig")
+    migration_source = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
+
+    bat_thread = runtime_source.split('LThreadData(0, "melissa", "BatProblem"', 1)[1].split('], highlight=False, threaded=True)', 1)[0]
+    ordered_labels = (
+        "story_melissa_bat_problem_breakfast_invite",
+        "story_melissa_bat_problem_breakfast_argument",
+        "story_melissa_bat_problem_5",
+        "story_melissa_bat_problem_booklet_search",
+        "story_melissa_bat_problem_6",
+    )
+    positions = [bat_thread.index(label) for label in ordered_labels]
+    assert positions == sorted(positions)
+    assert '"talk_melissa",\n                "melissa_breakfast_invite"' in bat_thread
+    assert '"TavernKitchen",\n            "enter"' in bat_thread
+    assert '"TavernAmandaRoom",\n            "melissa_bats"' in bat_thread
+    assert '"Попросить Мелиссу прийти завтра на общий завтрак"' in talk_source
+    assert 'call checkTriggers(rooms.current_code, "melissa_talk", 0)' in talk_source
+    assert "tavern_amanda_room_locked_for_melissa_booklet" not in amanda_room_source
+    assert "breakfast_invited" not in runtime_source + event_source + migration_source
+    assert "def updateSave_V72():" in migration_source

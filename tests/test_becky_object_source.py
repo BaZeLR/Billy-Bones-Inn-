@@ -94,6 +94,6 @@ def test_v52_migrates_becky_map_once_and_every_load_does_not_clean_it():
     )[0]
     assert "becky_var" not in always_cleanup
     assert "BeckyAdmit" not in always_cleanup
-    assert "define currentVersion = 72" in MIGRATION
+    assert "define currentVersion = 73" in MIGRATION
     assert "if loaded_version < 53:" in MIGRATION
     assert "updateSave_V52()" in MIGRATION

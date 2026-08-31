@@ -41,8 +41,10 @@
 
 ### Bat problem / hidden booklet
 - Thread: `melissaBatProblem`
-- Search stage: `story_melissa_bat_problem_5`
-- Location/action: `TavernMelissaRoom` / `room_search`
+- Amanda-room search stage: `story_melissa_bat_problem_5`
+- Amanda-room location/action: `TavernAmandaRoom` / `melissa_bats`
+- Physical booklet search stage: `story_melissa_bat_problem_booklet_search`
+- Physical search location/action: `TavernMelissaRoom` / `room_search`
 - Gate: booklet search succeeds only when `effective_player_exploration() > 120`.
 - Found object: `melissa_drawings_booklet_001`
 - Item source of truth: `MelissaBookletItem` in `game/Items/Resources/MelissaBookletItem.rpy`

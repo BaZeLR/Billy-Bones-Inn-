@@ -64,6 +64,10 @@ MELISSA_ROUTE_TOKENS = {
         ("game/NPC/Girls/Melissa/IntMelissaTalk.rpy", 'story_event_available(str(rooms.current_code or ""), "melissa_talk")'),
         ("game/NPC/Girls/Melissa/IntMelissaTalk.rpy", 'call checkTriggers(rooms.current_code, "melissa_talk", 0)'),
     ),
+    ("talk_melissa", "melissa_breakfast_invite"): (
+        ("game/NPC/Girls/Melissa/IntMelissaTalk.rpy", 'story_event_available("talk_melissa", "melissa_breakfast_invite")'),
+        ("game/NPC/Girls/Melissa/IntMelissaTalk.rpy", 'call checkTriggers("talk_melissa", "melissa_breakfast_invite", 0)'),
+    ),
     ("TavernMain", "melissa_dress_request"): (
         ("game/Inn/TavernMain.rpy", 'story_event_available("TavernMain", "melissa_dress_request")'),
         ("game/Inn/TavernMain.rpy", "call MelissaDressRequestEvent"),
@@ -230,9 +234,11 @@ class MelissaThreadEventModelTest(unittest.TestCase):
         self.assertEqual(ordered_targets[5], "story_melissa_bat_problem_fall")
         self.assertEqual(ordered_targets[6], "story_melissa_bat_problem_4")
         self.assertEqual(ordered_targets[7], "story_melissa_bat_problem_roof")
-        self.assertEqual(ordered_targets[8], "story_melissa_bat_problem_5")
-        self.assertEqual(ordered_targets[9], "story_melissa_bat_problem_booklet_search")
-        self.assertEqual(ordered_targets[10], "story_melissa_bat_problem_6")
+        self.assertEqual(ordered_targets[8], "story_melissa_bat_problem_breakfast_invite")
+        self.assertEqual(ordered_targets[9], "story_melissa_bat_problem_breakfast_argument")
+        self.assertEqual(ordered_targets[10], "story_melissa_bat_problem_5")
+        self.assertEqual(ordered_targets[11], "story_melissa_bat_problem_booklet_search")
+        self.assertEqual(ordered_targets[12], "story_melissa_bat_problem_6")
 
     def test_melissa_bat_events_cost_45_minutes(self):
         for target in (
@@ -244,6 +250,7 @@ class MelissaThreadEventModelTest(unittest.TestCase):
             "story_melissa_bat_problem_fall",
             "story_melissa_bat_problem_4",
             "story_melissa_bat_problem_roof",
+            "story_melissa_bat_problem_breakfast_argument",
             "story_melissa_bat_problem_6",
         ):
             body = self.melissa_event_bodies.get(target, "")
@@ -253,6 +260,9 @@ class MelissaThreadEventModelTest(unittest.TestCase):
         self.assertEqual(body.count("calendar_v2.advance_minutes(45)"), 2, "story_melissa_bat_problem_booklet_search")
         self.assertEqual(body.count('"[scene_runtime.text]"'), 2, "story_melissa_bat_problem_booklet_search")
         self.assertGreater(body.find("calendar_v2.advance_minutes(45)"), body.find('"[scene_runtime.text]"'), "story_melissa_bat_problem_booklet_search")
+
+        invite_body = self.melissa_event_bodies.get("story_melissa_bat_problem_breakfast_invite", "")
+        self.assertEqual(invite_body.count("calendar_v2.advance_minutes(5)"), 1)
         self.assertGreater(body.rfind("calendar_v2.advance_minutes(45)"), body.rfind('"[scene_runtime.text]"'), "story_melissa_bat_problem_booklet_search")
 
     def test_melissa_roof_cost_and_catch_scene_use_authored_sequence(self):
