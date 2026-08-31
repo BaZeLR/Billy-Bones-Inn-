@@ -293,7 +293,11 @@ init python:
             return pictures[procedural_randint(0, len(pictures) - 1, "georgett_portstreets_scene_%s" % people_to_int(current_game_day(), 0))]
 
         def portstreet_client_event_available(self):
-            return people_to_int(self.rel, 0) > 0 and self.portstreet_work_active() and people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0 and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
+            has_player_history = any(
+                str(row.get("partner", row.get("DudeName", "")) or "").strip().lower() in ("you", "вы")
+                for row in list(getattr(self, "detailed_sex_history", []) or [])
+            )
+            return has_player_history and self.portstreet_work_active() and people_to_int(self.var.get("portstreet_clients_seen_today", 0), 0) == 0 and CheckIfSexEventExist(self.code_name, 3, "Prostitution") > 0
 
         def can_invite_to_tavern(self):
             return (

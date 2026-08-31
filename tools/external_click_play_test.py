@@ -2207,30 +2207,40 @@ testcase external_georgette_back_alley_not_visible_in_port_streets:
 
     $ Georgett.var["portstreet_clients_seen_today"] = 0
     $ Georgett.known = True
+    $ Georgett.rel = 7
+    $ Georgett.talked_today = 0
+    $ Georgett.set_story_value("seeclients", 0)
     $ Georgett.set_story_value("TalkChurchAfterCermonLiza", 0)
+    $ Georgett.detailed_sex_history = []
     $ TodaySexEvents_Clear()
     $ TodaySexEvents_Add("georgett", 3, 1, "Prostitution")
     $ initStoryEventRuntime(True)
+    assert eval (not Georgett.portstreet_client_event_available()) timeout 5.0
+    $ Georgett.record_sex_history("You", "street", "inside")
+    $ initStoryEventRuntime(True)
+    assert eval (Georgett.portstreet_client_event_available()) timeout 5.0
     run Jump("PortStreets")
     advance until screen "main_ui" timeout 20.0
     assert eval ("Почему-то Жоржетты сейчас нет на ее обычном месте. Где же она может быть?" in str(scene_runtime.text or "")) timeout 5.0
     assert eval (str(people.location("georgett") or "") == "PortStreets" and people.action_data_for_room("georgett", "PortStreets") is None) timeout 5.0
     assert eval ("Пойти проверить подворотню" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     $ _georgett_alley_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Пойти проверить подворотню")
-    click id ("choice_panel_button_%d" % int(_georgett_alley_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Подсмотреть" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id ("choice_panel_button_%d" % int(_georgett_alley_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Вернуться в переулок" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     assert eval (renpy.get_screen("main_ui") is not None and str(main_ui_runtime.mode or "") == "event") timeout 5.0
-    $ _georgett_peek_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Подсмотреть")
-    click id ("choice_panel_button_%d" % int(_georgett_peek_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Вернуться в переулок" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
-    assert eval (renpy.get_screen("main_ui") is not None and "Вы видите стоящую раком Жоржетту" in str(scene_runtime.text or "") and str(scene_runtime.picture or "").startswith("images/georgett/portevents/event1_")) timeout 5.0
+    assert eval ("Подсмотреть" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Смотреть дальше" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Вы решили пойти и проверить подворотню" in str(scene_runtime.text or "") and "Вы видите стоящую раком Жоржетту" in str(scene_runtime.text or "") and str(scene_runtime.picture or "").startswith("images/georgett/portevents/event1_")) timeout 5.0
+    assert eval (int(Georgett.story_value("seeclients", 0) or 0) == 1 and int(Georgett.var.get("portstreet_clients_seen_today", 0) or 0) == 1) timeout 5.0
     $ _georgett_client_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Вернуться в переулок")
     click id ("choice_panel_button_%d" % int(_georgett_client_back_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
-    assert eval (str(rooms.current_code or "") == "PortStreets" and renpy.get_screen("main_ui") is not None) timeout 5.0
+    assert eval (str(rooms.current_code or "") == "PortStreets" and renpy.get_screen("main_ui") is not None and str(scene_runtime.picture or "") == str(rooms.current.bg_picture or "")) timeout 5.0
+    assert eval (str(scene_runtime.text or "") == str(rooms.current.descriptions[0].text or "") and "Пойти проверить подворотню" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    assert eval (people.action_data_for_room("georgett", "PortStreets") is not None) timeout 5.0
 
     run Call("IntGeorgettTalk", "georgett", "street")
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 5.0
     assert eval ("Болтать" in [str(getattr(i, "caption", "") or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    $ Georgett.rel = 0
+    assert eval ("Спросить о клиентах" in [str(getattr(i, "caption", "") or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval (str(people.location("georgett") or "") == "PortStreets") timeout 5.0
 
 '''

@@ -29,7 +29,7 @@ label IntBeckyTalk(girl_name="becky"):
         $ scene_runtime.text = "Бекки внимательно смотрит на вас, ожидая, что вы захотите обсудить."
         $ scene_runtime.location_text = scene_runtime.text
 
-    while str(main_ui_runtime.mode or "") == "talk":
+    while True:
         $ initStoryEventRuntime(True)
         menu:
             "Осмотреть":

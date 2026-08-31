@@ -737,8 +737,10 @@ screen main_ui_talk_panel(girl_name="", room_name="", desc=""):
             background "#000000ff"
 
             viewport:
+                id ("main_ui_talk_text_%s" % hash(_text))
                 xfill True
                 yfill True
+                yinitial 0.0
                 draggable True
                 mousewheel True
 

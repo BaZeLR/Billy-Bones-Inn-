@@ -128,28 +128,6 @@ label PortStreets:
     while True:
         call screen main_ui
 
-label PortStreetsBackAlley(girl_name=""):
-    $ main_ui_begin_native_scene_state("Подворотня")
-    $ scene_runtime.picture = "images/general/port_streets.png"
-    if scene_runtime.picture:
-        vscene scene_runtime.picture
-    if str(girl_name or "") == "liza":
-        $ scene_runtime.text = "Вы сворачиваете с портовой улицы в темную подворотню Лизетты. Из глубины уже доносятся приглушенные звуки."
-    elif str(girl_name or "") == "georgett":
-        $ scene_runtime.text = "Вы сворачиваете с портовой улицы в знакомую подворотню Жоржетты. Из темноты доносится возня и приглушенные голоса."
-    else:
-        $ scene_runtime.text = "Вы проверяете подворотню, но сегодня здесь пусто."
-    $ scene_runtime.location_text = scene_runtime.text
-    show screen main_ui
-    menu:
-        "Подсмотреть" if str(girl_name or "") in ("georgett", "liza") and CheckIfSexEventExist(girl_name, 3, "Prostitution") > 0:
-            call street_clients_watch(1, girl_name, calendar_v2.time_slot())
-        "Вернуться в портовые переулки":
-            pass
-    $ main_ui_end_native_scene_state()
-    return
-
-
 label PortStreetsBottleMenu(object_id="port_empty_bottle"):
     $ renpy.dynamic("_port_bottle", "_room_object", "_port_bottle_action")
     $ _port_bottle = None

@@ -5,9 +5,7 @@ label street_clients_watch(client_type=1, girl_name="", event_time=None):
     if int(client_type or 0) != 1:
         return
     $ main_ui_begin_native_scene_state("Подворотня")
-
-label street_clients_watch_event:
-    $ renpy.dynamic("SexEventType", "_street_client_picture")
+    $ renpy.dynamic("SexEventType", "_street_client_picture", "_street_client_intro")
 
     $ rooms.enter("PortStreets")
     $ main_ui_runtime.mode = "event"
@@ -25,6 +23,7 @@ label street_clients_watch_event:
         return
 
     if girl_name == "liza":
+        $ _street_client_intro = "Вы уверенным шагом пошли к знакомой подворотне. Как вы и ожидали, вскоре стали слышны приглушенные девичьи стоны. Как можно тише и аккуратнее вы преодолели оставшееся расстояние и осторожно заглянули за угол. Открывшаяся вам картина послужила вполне достойным вознаграждением за ваши хлопоты."
         $ Liza.portstreet_clients_seen_today = True
         $ Liza.has_seen_clients = True
         if SexEventType == 1:
@@ -49,6 +48,7 @@ label street_clients_watch_event:
             $ pregnancy_check(girl_name, "face", 1, "", 1, "Неизвестный стражник")
             $ _street_client_picture = build_media_ref(girl_name, "portevents", "event4_" + str(procedural_randint(1, 4, "street_client_liza_4_%s" % int(current_game_day() or 0))))
     else:
+        $ _street_client_intro = "Вы решили пойти и проверить подворотню, где вы сношали Жоржетту в прошлый раз. Не доходя до нее нескольких шагов, вы услышали приглушенные стоны. Желая остаться незамеченным, вы как можно тише преодолели оставшееся расстояние и осторожно заглянули за угол. Открывшаяся вам картина послужила вполне достойным вознаграждением за ваши хлопоты."
         $ Georgett.mark_portstreet_clients_seen()
         if SexEventType == 1:
             $ scene_runtime.text = "Вы видите стоящую раком Жоржетту. Ее короткая юбчонка задрана до пояса, а сзади ее наяривает огромный мужик, судя по одежде портовый грузчик. Шлюшка жалобно попискивает при каждом движении его огромного шланга. Наконец грузчик разряжается прямо в киску Жоржетты."
@@ -79,6 +79,7 @@ label street_clients_watch_event:
             $ pregnancy_check(girl_name, "tits", 1, "", 1, "Неизвестный стражник")
             $ _street_client_picture = build_media_ref(girl_name, "portevents", "event4_" + str(procedural_randint(1, 3, "street_client_georgett_4_%s" % int(current_game_day() or 0))))
 
+    $ scene_runtime.text = _street_client_intro + "\n\n" + scene_runtime.text
     $ CleanSpermRandom(girl_name)
     $ calendar_v2.advance_minutes(40)
     $ scene_runtime.location_text = scene_runtime.text
@@ -87,9 +88,13 @@ label street_clients_watch_event:
         vscene scene_runtime.picture
     show screen main_ui
     menu:
-        "Смотреть дальше" if CheckIfSexEventExist(girl_name, 3, "Prostitution") > 0:
-            jump street_clients_watch_event
         "Вернуться в переулок":
             pass
     $ main_ui_end_native_scene_state()
+    $ scene_runtime.picture = rooms.current.bg_picture or None
+    $ scene_runtime.text = rooms.current.descriptions[0].text
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = rooms.current.build_action_items() + rooms.current.build_exit_items()
     return

@@ -354,7 +354,7 @@ def test_georgett_first_meeting_is_owned_by_the_scheduled_npc_talk_label():
     talk = _source(GEORGETT_TALK)
     georgett = _source(GEORGETT_INIT)
 
-    entry = port.split("label PortStreets:", 1)[1].split("label PortStreetsBackAlley", 1)[0]
+    entry = port.split("label PortStreets:", 1)[1].split("label PortStreetsBottleMenu", 1)[0]
     assert '$ main_ui_runtime.mode = "scene"' in entry
     assert '$ main_ui_runtime.selected_char = ""' in entry
     assert '$ main_ui_runtime.talk_picture = ""' in entry
@@ -406,7 +406,8 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
     assert "calendar_v2.clock_minutes()" not in liza
     assert 'CheckIfSexEventExist(self.code_name, 3, "Prostitution")' in georgett
     assert 'CheckIfSexEventExist(self.code_name, 3, "Prostitution")' in liza
-    assert 'return people_to_int(self.rel, 0) > 0 and self.portstreet_work_active()' in georgett
+    assert 'str(row.get("partner", row.get("DudeName", "")) or "").strip().lower() in ("you", "вы")' in georgett
+    assert "return has_player_history and self.portstreet_work_active()" in georgett
 
     georgett_schedule_data = json.loads(georgett_schedule)
     georgett_port_entry = next(
@@ -437,7 +438,6 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
     assert 'LizaVar["seeclients"]' not in clients
     assert 'GeorgettVar["seeclients"]' not in clients
     assert "call screen main_ui" not in clients
-    assert "main_ui_runtime.action_items" not in clients
     assert "jump PortStreets" not in clients
     assert "menu:" in clients
     assert "label story_georgett_portstreet_clients:" not in clients
@@ -450,27 +450,30 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
     assert "$ main_ui_begin_native_scene_state(\"Подворотня\")" in clients
     assert "show screen main_ui" in clients
     assert '"Вернуться в переулок"' in clients
+    assert '"Смотреть дальше"' not in clients
+    assert "jump street_clients_watch_event" not in clients
+    assert "Georgett.mark_portstreet_clients_seen()" in clients
+    assert 'scene_runtime.text = _street_client_intro + "\\n\\n" + scene_runtime.text' in clients
+    assert "rooms.current.build_action_items() + rooms.current.build_exit_items()" in clients
 
 
-def test_port_back_alley_uses_native_menu_and_returns_to_event_owner():
+def test_port_client_event_has_one_native_menu_owner():
     port = _source(PORT_STREETS)
-    back_alley = port.split("label PortStreetsBackAlley", 1)[1].split(
-        "label PortStreetsBottleMenu", 1
-    )[0]
+    clients = _source(STREET_CLIENTS)
+    georgett_events = _source(GEORGETT_EVENTS)
+    liza_events = _source(LIZA_EVENTS)
 
-    assert "menu:" in back_alley
-    assert "main_ui_runtime.action_items" not in back_alley
-    assert "call screen main_ui" not in back_alley
-    assert "$ main_ui_begin_native_scene_state(\"Подворотня\")" in back_alley
-    assert "show screen main_ui" in back_alley
-    assert "jump PortStreets" not in back_alley
-    assert "call street_clients_watch" in back_alley
+    assert "label PortStreetsBackAlley" not in port
+    assert "menu:" in clients
+    assert clients.count("$ main_ui_begin_native_scene_state(\"Подворотня\")") == 1
+    assert 'call street_clients_watch(1, "georgett", calendar_v2.time_slot())' in georgett_events
+    assert 'call street_clients_watch(1, "liza", calendar_v2.time_slot())' in liza_events
     assert "_port_ui_return" not in port
 
 
 def test_portstreets_explains_georgett_client_absence_from_npc_authority():
     port = _source(PORT_STREETS)
-    entry = port.split("label PortStreets:", 1)[1].split("label PortStreetsBackAlley", 1)[0]
+    entry = port.split("label PortStreets:", 1)[1].split("label PortStreetsBottleMenu", 1)[0]
 
     assert "if Georgett.portstreet_client_event_available():" in entry
     assert "Почему-то Жоржетты сейчас нет на ее обычном месте. Где же она может быть?" in entry

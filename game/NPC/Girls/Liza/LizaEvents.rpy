@@ -3,5 +3,5 @@
 # ================================================================================
 
 label story_liza_portstreet_clients:
-    call PortStreetsBackAlley("liza")
+    call street_clients_watch(1, "liza", calendar_v2.time_slot())
     return

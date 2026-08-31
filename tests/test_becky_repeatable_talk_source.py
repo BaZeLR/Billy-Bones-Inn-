@@ -7,6 +7,7 @@ PEOPLE = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(encod
 BECKY = (ROOT / "game/NPC/Girls/Becky/InitBecky.rpy").read_text(encoding="utf-8-sig")
 TALK = (ROOT / "game/NPC/Girls/Becky/IntBeckyTalk.rpy").read_text(encoding="utf-8-sig")
 TOPICS = (ROOT / "game/NPC/Girls/Becky/IntBeckyTalkTopics.rpy").read_text(encoding="utf-8-sig")
+MAIN_LAYOUT = (ROOT / "game/Utilities/General/Screens/main_layout.rpy").read_text(encoding="utf-8-sig")
 
 
 def test_repeatable_becky_talk_random_choices_are_label_local():
@@ -34,14 +35,26 @@ def test_becky_store_smalltalk_remains_the_authored_friendship_path():
 
 
 def test_becky_talk_repeats_the_same_native_menu_until_explicit_exit():
-    assert 'while str(main_ui_runtime.mode or "") == "talk":' in TALK
-    lifecycle = TALK.split('while str(main_ui_runtime.mode or "") == "talk":', 1)[1]
+    assert "while True:" in TALK
+    assert 'while str(main_ui_runtime.mode or "") == "talk":' not in TALK
+    assert "_becky_repeat_menu" not in TALK
+    lifecycle = TALK.split("while True:", 1)[1]
 
     assert lifecycle.index("$ initStoryEventRuntime(True)") < lifecycle.index("menu:")
     assert TALK.count("$ main_ui_end_talk_state()") == 1
     assert "IntBeckyTalkRefresh" not in TALK
     assert "IntBeckyTalkApply" not in TALK
     assert "jump IntBeckyTalk" not in TALK
+
+
+def test_talk_text_viewport_starts_at_the_first_line():
+    talk_panel = MAIN_LAYOUT.split('screen main_ui_talk_panel(girl_name="", room_name="", desc=""):', 1)[1].split(
+        "screen main_ui_player_card_panel", 1
+    )[0]
+
+    assert "viewport:" in talk_panel
+    assert 'id ("main_ui_talk_text_%s" % hash(_text))' in talk_panel
+    assert "yinitial 0.0" in talk_panel
 MIGRATION = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
 
 
