@@ -358,6 +358,8 @@ init -100 python:
             player.economy.church_donated_today = 0
         if not hasattr(player.tavern_management, "service"):
             player.tavern_management.service = PlayerTavernServiceState()
+        if not hasattr(Sandra, "breakfast_tease_day"):
+            Sandra.breakfast_tease_day = -1
 
         try:
             loaded_version = int(saveVersion or 1)

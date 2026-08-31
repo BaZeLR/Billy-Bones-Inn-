@@ -103,3 +103,37 @@ def test_solved_rat_problem_cannot_emit_breakfast_kitty_dialogue():
     kitty_line = 'lines.append("\\\"Крысы?\\\" Аманда пожимает плечом.'
     assert kitty_line in dialogue
     assert dialogue.index("if rat_problem:", dialogue.index('if "amanda" in present_ids:')) < dialogue.index(kitty_line)
+
+
+def test_breakfast_flirts_cover_household_girls_and_complete_at_chosen_place():
+    source = SOURCE.read_text(encoding="utf-8-sig")
+    sandra_source = (ROOT / "game/NPC/Girls/Sandra/InitSandra.rpy").read_text(encoding="utf-8-sig")
+    migration_source = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
+    candidate = source.split("def tavern_breakfast_tease_candidate():", 1)[1].split(
+        "def tavern_breakfast_tease_ready():", 1
+    )[0]
+    private_date = _label_block(
+        source,
+        "TavernKitchenBreakfastTeasePrivate(girl_name=\"\", place_code=\"storage\"):",
+        "TavernKitchenBreakfastTalkAbsent:",
+    )
+
+    assert 'npc_id not in ("sandra", "amanda", "melissa")' in candidate
+    assert 'getattr(info, "breakfast_tease_day", -1)' in candidate
+    tease = _label_block(source, "TavernKitchenBreakfastTease:", "TavernKitchenBreakfastTeasePrivate")
+    assert "_tease_private_unlocked" not in tease
+    assert 'call TavernKitchenBreakfastTeasePrivate(_tease_girl, "storage")' in tease
+    assert 'call TavernKitchenBreakfastTeasePrivate(_tease_girl, "shed")' in tease
+    assert "self.breakfast_tease_day = -1" in sandra_source
+    assert 'if not hasattr(Sandra, "breakfast_tease_day"):' in migration_source
+    assert "Sandra.breakfast_tease_day = -1" in migration_source
+    assert '"TavernStorage" if str(place_code or "") == "storage" else "Shed"' in private_date
+    assert "call TavernKitchenFinishBreakfastEvent" in private_date
+    assert "call SandraSexEngine(_tease_private_girl, _tease_private_room)" in private_date
+    assert "call IntAmandaSex(_tease_private_girl, _tease_private_room)" in private_date
+    assert "call IntMelissaSex(_tease_private_girl, _tease_private_room)" in private_date
+    assert "if _tease_private_elapsed_minutes < 30:" in private_date
+    assert "calendar_v2.advance_minutes(30 - _tease_private_elapsed_minutes)" in private_date
+    assert '"Продолжить свидание":' in private_date
+    assert '"Закончить свидание":' in private_date
+    assert "daily_events" not in private_date

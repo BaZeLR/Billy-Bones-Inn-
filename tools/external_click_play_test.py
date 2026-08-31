@@ -1627,6 +1627,49 @@ testcase external_sandra_weekly_visit_native_beats:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("День уже начинается" in str(scene_runtime.text or "")) timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") != "event" and renpy.get_screen("choice") is None) timeout 10.0
 
+testcase external_sandra_breakfast_flirt_date_destination:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("sandra") is Sandra) timeout 20.0
+    $ rooms.enter("TavernKitchen")
+    $ player.tavern_management.breakfast.event_active = True
+    $ Amanda.rel = 11
+    $ Amanda.openness = 7
+    $ Amanda.corruption = 45
+    $ Amanda.breakfast_tease_day = -1
+    $ Melissa.rel = 11
+    $ Melissa.openness = 7
+    $ Melissa.corruption = 45
+    $ Melissa.breakfast_tease_day = current_game_day()
+    $ Sandra.rel = 11
+    $ Sandra.openness = 7
+    $ Sandra.corruption = 45
+    $ Sandra.breakfast_tease_day = current_game_day()
+    $ player.tavern_management.breakfast.present_ids = ["amanda"]
+    assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "amanda") timeout 5.0
+    $ Amanda.breakfast_tease_day = current_game_day()
+    $ Melissa.breakfast_tease_day = -1
+    $ player.tavern_management.breakfast.present_ids = ["melissa"]
+    assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "melissa") timeout 5.0
+    $ Melissa.breakfast_tease_day = current_game_day()
+    $ Sandra.breakfast_tease_day = -1
+    $ player.tavern_management.breakfast.present_ids = ["sandra"]
+    assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "sandra") timeout 5.0
+    $ threads["sandraWeeklyEvaluation"].advanceTo(threads["sandraWeeklyEvaluation"].data.length, complete_at_end=True)
+    $ Sandra.fucked_today = 0
+    $ _sandra_date_rel = int(Sandra.rel or 0)
+    $ _sandra_date_open = int(Sandra.openness or 0)
+    $ _sandra_date_start = int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0)
+    run Call("TavernKitchenBreakfastTeasePrivate", "sandra", "storage")
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить свидание"]) timeout 5.0
+    assert eval (str(rooms.current_code or "") == "TavernStorage" and not bool(player.tavern_management.breakfast.event_active)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закончить свидание"]) timeout 20.0
+    assert eval (int(Sandra.rel or 0) == _sandra_date_rel + 1 and int(Sandra.openness or 0) == _sandra_date_open + 1) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(rooms.current_code or "") == "TavernStorage" and str(main_ui_runtime.action_title or "") == "Кладовая") timeout 20.0
+    assert eval (int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0) - _sandra_date_start == 30) timeout 5.0
+
 testcase external_melissa_bat_breakfast_single_finish:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -7486,6 +7529,7 @@ def main() -> int:
             "external_breakfast_attendance_location_wins",
             "external_breakfast_angry_amanda_melissa_mockery",
             "external_sandra_weekly_visit_native_beats",
+            "external_sandra_breakfast_flirt_date_destination",
             "external_melissa_bat_breakfast_single_finish",
             "external_breakfast_window_and_call_all_click",
             "external_breakfast_entry_paragraph_continue_beats",
@@ -7671,6 +7715,7 @@ def main() -> int:
             "external_breakfast_attendance_location_wins",
             "external_breakfast_angry_amanda_melissa_mockery",
             "external_sandra_weekly_visit_native_beats",
+            "external_sandra_breakfast_flirt_date_destination",
             "external_melissa_bat_breakfast_single_finish",
             "external_breakfast_window_and_call_all_click",
             "external_breakfast_entry_paragraph_continue_beats",

@@ -304,10 +304,10 @@ init python:
     def tavern_breakfast_tease_candidate():
         candidates = []
         for npc_id in list(tavern_breakfast_present_ids() or []):
-            if npc_id not in ("amanda", "melissa"):
+            if npc_id not in ("sandra", "amanda", "melissa"):
                 continue
             info = people.get_info(npc_id)
-            last_tease_day = Amanda.breakfast_tease_day if npc_id == "amanda" else people_to_int(Melissa.breakfast_tease_day, -1)
+            last_tease_day = people_to_int(getattr(info, "breakfast_tease_day", -1), -1)
             if last_tease_day == current_game_day():
                 continue
             friend_value = int(getattr(info, "rel", 0) or 0)
@@ -850,6 +850,8 @@ init python:
 
     def tavern_breakfast_tease_picture(girl_name="", tier=0):
         key = str(girl_name or "").strip().lower()
+        if key == "sandra":
+            return "images/sandra/talk_0.png"
         if key == "amanda":
             tease_tier = max(1, min(4, int(tier or 0)))
             horny_state = int(Amanda.arousal_value() or 0) >= 65
@@ -1340,16 +1342,16 @@ label TavernKitchenBreakfastAmandaAtticStop:
 
 
 label TavernKitchenBreakfastTease:
-    $ renpy.dynamic("_tease_private_unlocked", "_tease_data", "_tease_girl", "_tease_tier", "_breakfast_tease_picture", "_tease_info")
+    $ renpy.dynamic("_tease_data", "_tease_girl", "_tease_tier", "_breakfast_tease_picture", "_tease_info")
     $ _tease_data = tavern_breakfast_tease_candidate()
     $ _tease_girl = str(_tease_data.get("girl", "") or "")
     $ _tease_tier = int(_tease_data.get("tier", 0) or 0)
     if _tease_girl == "":
         return
-    if _tease_girl == "amanda":
-        $ Amanda.breakfast_tease_day = current_game_day()
-    else:
-        $ Melissa.breakfast_tease_day = current_game_day()
+    $ _tease_info = people.get_info(_tease_girl)
+    if _tease_info is None:
+        return
+    $ _tease_info.breakfast_tease_day = current_game_day()
     $ _breakfast_tease_picture = tavern_breakfast_tease_picture(_tease_girl, _tease_tier)
     if str(_breakfast_tease_picture or "").strip():
         vscene _breakfast_tease_picture
@@ -1364,45 +1366,69 @@ label TavernKitchenBreakfastTease:
     else:
         $ scene_runtime.text = "{} незаметно приподнимает край юбки ровно настолько, чтобы вы успели заметить белье, а потом с невинным видом возвращается к завтраку.".format(people_display_name(_tease_girl))
     $ player_apply_arousal_trigger("breakfast_tease", 5 + _tease_tier)
-    $ _tease_info = people.get_info(_tease_girl)
-    if _tease_info is not None:
-        $ _tease_info.add_arousal(3 + _tease_tier)
-        $ _tease_info.change_social(corruption_delta=1)
+    $ _tease_info.add_arousal(3 + _tease_tier)
+    $ _tease_info.change_social(corruption_delta=1)
     $ scene_runtime.location_text = scene_runtime.text
     call stat
-    $ _tease_private_unlocked = bool(_tease_info is not None and people_to_int(_tease_info.sex_stat("sexacts", 0), 0) > 0)
-    if _tease_girl == "amanda":
-        $ _tease_private_unlocked = _tease_private_unlocked or Amanda.var_int("suckyou", 0) == 1 or Amanda.var_int("fuckyou", 0) == 1
-    elif _tease_girl == "melissa":
-        $ _tease_private_unlocked = _tease_private_unlocked or bool(threads["melissaBatProblem"].completed)
-    if _tease_private_unlocked:
-        "[scene_runtime.text]"
-        menu:
-            "Намекнуть на склад после завтрака":
-                call TavernKitchenBreakfastTeasePrivate(_tease_girl, "storage")
+    "[scene_runtime.text]"
+    menu:
+        "Намекнуть на склад после завтрака":
+            call TavernKitchenBreakfastTeasePrivate(_tease_girl, "storage")
 
-            "Намекнуть на сарай после завтрака":
-                call TavernKitchenBreakfastTeasePrivate(_tease_girl, "shed")
+        "Намекнуть на сарай после завтрака":
+            call TavernKitchenBreakfastTeasePrivate(_tease_girl, "shed")
 
-            "Сделать вид, что ничего не заметили":
-                return
-        return
-    call TavernKitchenBreakfastShowText(scene_runtime.text)
+        "Сделать вид, что ничего не заметили":
+            return
     return
 
 
 label TavernKitchenBreakfastTeasePrivate(girl_name="", place_code="storage"):
-    $ renpy.dynamic("_tease_private_girl", "_tease_private_place", "_tease_private_info")
+    $ renpy.dynamic("_tease_private_girl", "_tease_private_place", "_tease_private_place_where", "_tease_private_info", "_tease_private_room", "_tease_private_picture", "_tease_private_start_minutes", "_tease_private_elapsed_minutes")
     $ _tease_private_girl = str(girl_name or "").strip().lower()
-    $ _tease_private_place = "склад" if str(place_code or "") == "storage" else "сарай"
+    if _tease_private_girl not in ("sandra", "amanda", "melissa") or str(place_code or "") not in ("storage", "shed"):
+        return
+    $ _tease_private_room = "TavernStorage" if str(place_code or "") == "storage" else "Shed"
+    $ _tease_private_place = "кладовую" if _tease_private_room == "TavernStorage" else "сарай"
+    $ _tease_private_place_where = "кладовой" if _tease_private_room == "TavernStorage" else "сарае"
     $ _tease_private_info = people.get_info(_tease_private_girl)
-    if _tease_private_info is not None:
-        $ _tease_private_info.change_social(friend_delta=1, open_delta=1)
-    $ scene_runtime.text = "{} понимает ваш намек про {} без лишних объяснений. Пока за столом еще шумят ложками и спорят о работе, она только коротко улыбается: этот разговор явно можно будет продолжить там, где никто не станет мешать.".format(people_display_name(_tease_private_girl), _tease_private_place)
+    if _tease_private_info is None:
+        return
+    call TavernKitchenFinishBreakfastEvent
+    $ rooms.enter(_tease_private_room)
+    $ _tease_private_start_minutes = int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0)
+    $ main_ui_begin_native_scene_state("Свидание")
+    $ _tease_private_picture = "bg StolyarWorkshop" if _tease_private_room == "TavernStorage" else shed_picture()
+    if str(_tease_private_picture or "").strip():
+        vscene _tease_private_picture
+    $ scene_runtime.text = "После завтрака вы уходите в {}. {} приходит следом, прикрывает за собой дверь и с улыбкой напоминает о вашем недавнем намеке. Теперь никто за столом не мешает вам продолжить начатый флирт.".format(_tease_private_place, people_display_name(_tease_private_girl))
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить свидание":
+            pass
+    if _tease_private_girl == "sandra":
+        call SandraSexEngine(_tease_private_girl, _tease_private_room)
+    elif _tease_private_girl == "amanda":
+        call IntAmandaSex(_tease_private_girl, _tease_private_room)
+    else:
+        call IntMelissaSex(_tease_private_girl, _tease_private_room)
+    $ _tease_private_elapsed_minutes = int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0) - _tease_private_start_minutes
+    if _tease_private_elapsed_minutes < 30:
+        $ calendar_v2.advance_minutes(30 - _tease_private_elapsed_minutes)
+    $ _tease_private_info.change_social(friend_delta=1, open_delta=1)
+    $ _tease_private_picture = "bg StolyarWorkshop" if _tease_private_room == "TavernStorage" else shed_picture()
+    if str(_tease_private_picture or "").strip():
+        vscene _tease_private_picture
+    $ scene_runtime.text = "Свидание заканчивается без лишнего шума. {} первой возвращается к своим делам, а вы остаетесь в {}.".format(people_display_name(_tease_private_girl), _tease_private_place_where)
     $ scene_runtime.location_text = scene_runtime.text
     call stat
-    call TavernKitchenBreakfastShowText(scene_runtime.text)
-    return
+    menu:
+        "Закончить свидание":
+            pass
+    $ main_ui_end_native_scene_state()
+    if _tease_private_room == "TavernStorage":
+        jump TavernStorage
+    jump Shed
 
 
 label TavernKitchenBreakfastTalkAbsent:

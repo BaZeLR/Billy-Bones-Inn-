@@ -263,7 +263,7 @@ def test_amanda_attic_breakfast_state_is_explicit_and_fall_stage_is_thread_owned
     assert "Amanda.attic_mock_response_day" in breakfast_source
     assert "Amanda.attic_mock_stopped" in breakfast_source
     assert "Amanda.attic_mock_exposed" in breakfast_source
-    assert "Amanda.breakfast_tease_day" in breakfast_source
+    assert "_tease_info.breakfast_tease_day" in breakfast_source
 
 
 def test_amanda_window_secret_favor_uses_one_object_stage_and_story_event():

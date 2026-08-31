@@ -119,6 +119,7 @@ init python:
             self.gifted_today = 0
             self.asked_today = 0
             self.fucked_today = 0
+            self.breakfast_tease_day = -1
             self.drunk = 0
 
             self.stats = {
