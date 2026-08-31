@@ -125,6 +125,8 @@ def test_breakfast_flirts_cover_household_girls_and_complete_at_chosen_place():
     assert 'call TavernKitchenBreakfastTeasePrivate(_tease_girl, "storage")' in tease
     assert 'call TavernKitchenBreakfastTeasePrivate(_tease_girl, "shed")' in tease
     assert "self.breakfast_tease_day = -1" in sandra_source
+    assert '"flirt": ["images/sandra/thanks/sandra_thanks.webm"]' in sandra_source
+    assert 'return SandraStaticData.image_path("breakfast", "flirt")' in source
     assert 'if not hasattr(Sandra, "breakfast_tease_day"):' in migration_source
     assert "Sandra.breakfast_tease_day = -1" in migration_source
     assert '"TavernStorage" if str(place_code or "") == "storage" else "Shed"' in private_date

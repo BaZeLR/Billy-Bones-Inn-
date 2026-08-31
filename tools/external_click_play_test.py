@@ -1656,14 +1656,26 @@ testcase external_sandra_breakfast_flirt_date_destination:
     $ player.tavern_management.breakfast.present_ids = ["sandra"]
     assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "sandra") timeout 5.0
     $ threads["sandraWeeklyEvaluation"].advanceTo(threads["sandraWeeklyEvaluation"].data.length, complete_at_end=True)
+    assert eval (SandraStaticData.image_path("breakfast", "flirt") == "images/sandra/thanks/sandra_thanks.webm" and renpy.loadable(SandraStaticData.image_path("breakfast", "flirt"))) timeout 5.0
+    $ player.tavern_management.breakfast.present_ids = ["sandra", "amanda", "melissa"]
+    $ _sandra_open_table_result = tavern_breakfast_talk_result()
+    assert eval (str(_sandra_open_table_result.get("speaker", "") or "") == "sandra" and "Жить свободно" in str(_sandra_open_table_result.get("text", "") or "")) timeout 5.0
+    $ player.tavern_management.breakfast.present_ids = ["sandra"]
     $ Sandra.fucked_today = 0
+    $ player.intimacy.set_arousal(100)
     $ _sandra_date_rel = int(Sandra.rel or 0)
     $ _sandra_date_open = int(Sandra.openness or 0)
+    $ _sandra_date_inside = int(Sandra.sex_stat("cuminside", 0) or 0)
     $ _sandra_date_start = int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0)
     run Call("TavernKitchenBreakfastTeasePrivate", "sandra", "storage")
     advance until screen "choice" timeout 20.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить свидание"]) timeout 5.0
     assert eval (str(rooms.current_code or "") == "TavernStorage" and not bool(player.tavern_management.breakfast.event_active)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])][0] == "Кончить внутрь") timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закончить"]) timeout 20.0
+    assert eval (int(Sandra.sex_stat("cuminside", 0) or 0) == _sandra_date_inside + 1) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закончить свидание"]) timeout 20.0
     assert eval (int(Sandra.rel or 0) == _sandra_date_rel + 1 and int(Sandra.openness or 0) == _sandra_date_open + 1) timeout 5.0
@@ -4874,20 +4886,29 @@ testcase external_sandra_night_thanks_hours_work:
     $ rooms.enter("TavernSandraRoom")
     $ people.get_data("sandra").set_schedule([NPCScheduleEntry(location="TavernSandraRoom", start_minute=0, end_minute=1440, priority=999)])
     $ threads["sandraWeeklyEvaluation"].advanceTo(4, force_active=True)
+    $ Sandra.fucked_today = 0
+    $ player.intimacy.set_arousal(100)
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 22, 0)
     $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
     assert eval ("Принять ночную благодарность Сандры" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     run Call("checkTriggers", "TavernSandraRoom", "sandra_night_thanks", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])][0] == "Кончить внутрь") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (threads["sandraWeeklyEvaluation"].completed and int(threads["sandraWeeklyEvaluation"].num or 0) == 5) timeout 30.0
     assert eval (threads["sandraWeeklyEvaluation"].completed and int(threads["sandraWeeklyEvaluation"].num or 0) == 5) timeout 5.0
     assert eval (not hasattr(Sandra, "final_reward_flag") and not hasattr(Sandra, "sandraSex")) timeout 5.0
     $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
     assert eval ("Уединиться с Сандрой" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
 
     $ threads["sandraWeeklyEvaluation"].advanceTo(4, force_active=True)
+    $ Sandra.fucked_today = 0
+    $ player.intimacy.set_arousal(100)
     $ external_calendar_set_fields(calendar_v2.day + 1, calendar_v2.period, calendar_v2.cycle, 23, 0)
     $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
     assert eval ("Принять ночную благодарность Сандры" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     run Call("checkTriggers", "TavernSandraRoom", "sandra_night_thanks", 0)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (threads["sandraWeeklyEvaluation"].completed and int(threads["sandraWeeklyEvaluation"].num or 0) == 5) timeout 30.0
     assert eval (threads["sandraWeeklyEvaluation"].completed and int(threads["sandraWeeklyEvaluation"].num or 0) == 5) timeout 5.0
 '''
 

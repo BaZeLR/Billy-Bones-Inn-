@@ -167,12 +167,22 @@ init python:
                 tier = 2 if (friend_level >= 3 and corruption_level >= 3) else 1
                 candidates.append((tier, friend_level + corruption_level, npc_id))
 
-        if len(candidates) <= 0:
+        sandra_open_table = (
+            threads["sandraWeeklyEvaluation"].completed
+            and "sandra" in present_ids
+            and "amanda" in present_ids
+            and "melissa" in present_ids
+        )
+        if len(candidates) <= 0 and not sandra_open_table:
             return {"text": tavern_breakfast_banter_text(), "arousal_gain": 0}
 
-        candidates.sort(reverse=True)
-        talk_tier = int(candidates[0][0] or 0)
-        talk_npc = str(candidates[0][2] or "")
+        if sandra_open_table:
+            talk_tier = 2
+            talk_npc = "sandra"
+        else:
+            candidates.sort(reverse=True)
+            talk_tier = int(candidates[0][0] or 0)
+            talk_npc = str(candidates[0][2] or "")
         recent_barber_ids = set(tavern_recent_barber_ids() or [])
         lines = []
         arousal_gain = 0
@@ -194,7 +204,11 @@ init python:
                 lines.append("Мелисса, заметно смущаясь, все же признает, что ухоженная женщина и сама двигается иначе: будто знает, что ее будут рассматривать внимательнее обычного.")
                 arousal_gain = 2
         elif talk_npc == "sandra":
-            if talk_tier >= 2:
+            if threads["sandraWeeklyEvaluation"].completed and "amanda" in present_ids and "melissa" in present_ids:
+                lines.append("Сандра переводит взгляд с Аманды на Мелиссу и впервые говорит с ними о постели без привычной проповеди: \"Запомните обе. Жить свободно и ложиться с тем, кого сами хотите, не позор. Позор — врать, прятаться и потом сваливать последствия на весь дом.\"")
+                lines.append("Аманда удивленно поднимает брови, Мелисса краснеет до ушей, а Сандра только пожимает плечом: \"Свободная жизнь хороша, когда голова остается на месте. Вот этому и учитесь.\"")
+                arousal_gain = 6
+            elif talk_tier >= 2:
                 lines.append("Сандра без лишней деликатности замечает, что тонкие чулки, хорошее белье и гладкая кожа под платьем действуют на мужчин вполне предсказуемо, и притворяться тут особенно нечего.")
                 lines.append("Сухой хозяйский тон делает эти слова только откровеннее.")
                 arousal_gain = 5
@@ -851,7 +865,7 @@ init python:
     def tavern_breakfast_tease_picture(girl_name="", tier=0):
         key = str(girl_name or "").strip().lower()
         if key == "sandra":
-            return "images/sandra/talk_0.png"
+            return SandraStaticData.image_path("breakfast", "flirt")
         if key == "amanda":
             tease_tier = max(1, min(4, int(tier or 0)))
             horny_state = int(Amanda.arousal_value() or 0) >= 65

@@ -43,6 +43,9 @@ init python:
                         "images/sandra/tavern/waitress4.jpg",
                     ],
                 },
+                "breakfast": {
+                    "flirt": ["images/sandra/thanks/sandra_thanks.webm"],
+                },
                 "outfit_reward": {
                     "show": ["images/sandra/portrait4.jpg"],
                     "handjob": ["images/sandra/thanks/player_room_1.jpg"],

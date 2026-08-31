@@ -279,6 +279,45 @@ def test_sandra_night_thanks_uses_current_late_night_time_contract():
     assert "int(calendar_v2.hour or 0) > 23" in event_source
 
 
+def test_sandra_sex_engine_uses_native_choices_and_pregnancy_authority_once():
+    init_source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+    event_source = SANDRA_EVENTS.read_text(encoding="utf-8-sig")
+    engine = event_source.split('label SandraSexEngine(girl_name="sandra", source_room="TavernSandraRoom"):', 1)[1]
+    night_thanks = event_source.split("label TavernSandraNightThanksScene:", 1)[1].split(
+        "label SandraSexEngine", 1
+    )[0]
+
+    assert '"breakfast": {' in init_source
+    assert '"flirt": ["images/sandra/thanks/sandra_thanks.webm"]' in init_source
+    assert 'call SandraSexEngine("sandra", "TavernSandraRoom")' in night_thanks
+    assert 'call PregnancyCheck("sandra", "inside", 1, "Вы")' not in night_thanks
+    assert 'main_ui_begin_native_scene_state("Сандра")' in engine
+    assert 'SandraStaticData.image_path("outfit_reward", "handjob")' in engine
+    assert '"Кончить внутрь" if player.intimacy.can_cum()' in engine
+    assert '$ pregnancy_check(girl_name, "inside", 1, "Вы")' in engine
+    assert '$ pregnancy_check(girl_name, "tits", 1, "Вы")' in engine
+    assert '$ pregnancy_check(girl_name, "face", 1, "Вы")' in engine
+    assert '$ Sandra.mark_fucked()' not in engine
+    assert '"Остановиться":' in engine
+    assert '"Закончить":' in engine
+    assert "$ main_ui_end_native_scene_state()" in engine
+
+
+def test_sandra_post_sex_breakfast_talk_uses_story_thread_not_mirror_flag():
+    breakfast = (PROJECT_ROOT / "game/Inn/TavernKitchenBreakfast.rpy").read_text(encoding="utf-8-sig")
+    talk_result = breakfast.split("def tavern_breakfast_talk_result():", 1)[1].split(
+        "def tavern_breakfast_amanda_alt_cure_possible():", 1
+    )[0]
+
+    assert 'threads["sandraWeeklyEvaluation"].completed' in talk_result
+    assert 'and "sandra" in present_ids' in talk_result
+    assert 'and "amanda" in present_ids' in talk_result
+    assert 'and "melissa" in present_ids' in talk_result
+    assert 'talk_npc = "sandra"' in talk_result
+    assert "Жить свободно и ложиться с тем, кого сами хотите, не позор" in talk_result
+    assert "sandra_free_love" not in breakfast
+
+
 def test_sandra_weekly_visit_uses_canonical_portraits_and_native_event_beats():
     source = SANDRA_EVENTS.read_text(encoding="utf-8-sig")
     pictures = source.split("SANDRA_WEEKLY_EVALUATION_PICTURES = (", 1)[1].split(")", 1)[0]
@@ -388,8 +427,8 @@ def test_sandra_weekly_rewards_use_player_system_and_story_thread_authorities():
     assert 'SandraVar["Week5WakePending"] = 0' not in events_source
     assert 'SandraVar["NightThanksReady"] = 1' not in events_source
     assert "Sandra.night_thanks_seen()" not in events_source
-    assert 'call PregnancyCheck("sandra", "inside", 1, "Вы")' in events_source
-    assert 'call PregnancyCheck(girl_name, "inside", 1, "Вы")' in events_source
+    assert 'call SandraSexEngine("sandra", "TavernSandraRoom")' in events_source
+    assert '$ pregnancy_check(girl_name, "inside", 1, "Вы")' in events_source
     assert '"sandraWeeklyEvaluationEnabled"' in story_source
     assert '"TavernSandraNightThanksScene"' in story_source
     assert 'threads["sandraWeeklyEvaluation"].advance()' in events_source
