@@ -3,6 +3,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME = (ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
+PEOPLE = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
+BECKY = (ROOT / "game/NPC/Girls/Becky/InitBecky.rpy").read_text(encoding="utf-8-sig")
 TALK = (ROOT / "game/NPC/Girls/Becky/IntBeckyTalk.rpy").read_text(encoding="utf-8-sig")
 TOPICS = (ROOT / "game/NPC/Girls/Becky/IntBeckyTalkTopics.rpy").read_text(encoding="utf-8-sig")
 
@@ -12,6 +14,23 @@ def test_repeatable_becky_talk_random_choices_are_label_local():
     assert "RandVar" not in TOPICS
     assert "tmp_rnd=0" in TOPICS
     assert "rand_var=0" in TOPICS
+
+
+def test_becky_store_smalltalk_remains_the_authored_friendship_path():
+    repeatable = TOPICS.split("label _int_becky_talk_smalltalk", 1)[1].split(
+        "label story_becky_talk_inga_0", 1
+    )[0]
+
+    interrupt_work = PEOPLE.split("def interrupt_work(self):", 1)[1].split(
+        "def can_work_tavern", 1
+    )[0]
+
+    assert 'work_socializing_locations = ("GroceryStore",)' in BECKY
+    assert "self.work_socializing_locations" in interrupt_work
+    assert repeatable.count("Becky.interrupt_work()") == 2
+    assert "Becky.add_relation(1, 3)" in repeatable
+    assert "Becky.add_relation(1, 6)" in repeatable
+    assert repeatable.count("Becky.finish_talk()") == 2
 
 
 def test_becky_talk_repeats_the_same_native_menu_until_explicit_exit():

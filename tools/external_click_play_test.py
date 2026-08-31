@@ -570,6 +570,24 @@ testcase external_female_tailor_refusal_returns_to_catalog:
     assert eval (str(dress_shop.produced or "") == "" and int(player.economy.money or 0) == _refused_money_before) timeout 5.0
     assert eval (_refused_code not in _gds_get_dress_list_for_girl("amanda") and int(player.appearance.girl_dresses_bought or 0) == 0) timeout 5.0
 
+testcase external_all_girl_dress_appointments_use_shared_pipeline:
+    run Call("InitGameNPCs")
+    $ _dress_appointment_names = ("melissa", "sandra", "amanda", "becky", "georgett", "liza")
+    $ _dress_appointment_results = {}
+    python:
+        for _dress_girl_name in _dress_appointment_names:
+            daily_events.rows[:] = []
+            daily_events.add(_dress_girl_name, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy", "girl_location")
+            daily_events.end_day(1)
+            _dress_row = daily_events.pop_match("", "BuyDress", "DressShop", 0)
+            _dress_appointment_results[_dress_girl_name] = (
+                people.get_info(_dress_girl_name) is not None,
+                str(_dress_row.get("GirlName", "") or ""),
+                str(_dress_row.get("EventCode", "") or ""),
+                str(_dress_row.get("CallMode", "") or ""),
+            )
+    assert eval (all(_dress_appointment_results.get(name) == (True, name, "GirlDressBuy", "girl_location") for name in _dress_appointment_names)) timeout 5.0
+
 '''
 
 DOG_ENTITY_ACTION_CHECKS = r'''
@@ -6141,7 +6159,7 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
-    $ external_calendar_set_fields(3, 1, 1100, 13, 0)
+    $ external_calendar_set_fields(3, 1, 1100, 16, 0)
     $ external_calendar_set_weekday(1)
     $ Becky.trade_offer_stage = 2
     $ Becky.asked_about_elf_trade = False
@@ -6151,6 +6169,15 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     assert eval (str(people.location("becky") or "") == "GroceryStore" and renpy.get_displayable("main_ui", "main_ui_entity_button_npc_becky") is not None) timeout 5.0
     click id "main_ui_entity_button_npc_becky" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (str(scene_runtime.picture or "") in [grocery_store_becky_picture(False), grocery_store_becky_picture(True)]) timeout 5.0
+    $ Becky.rel = 0
+    $ Becky.talked_today = 0
+    $ _becky_smalltalk_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Поболтать со вдовой Блэнкеншип о разной фигне")
+    $ _becky_smalltalk_button_id = "choice_panel_button_%d" % int(_becky_smalltalk_index)
+    click id _becky_smalltalk_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (int(Becky.rel or 0) == 1 and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+    assert eval ("занята работой" not in str(scene_runtime.text or "")) timeout 5.0
+    $ Becky.talked_today = 0
     $ _becky_inspect_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Осмотреть")
     $ _becky_inspect_button_id = "choice_panel_button_%d" % int(_becky_inspect_index)
     click id _becky_inspect_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "char" and str(main_ui_runtime.selected_char or "") == "becky") timeout 20.0
@@ -7156,6 +7183,7 @@ def main() -> int:
             "external_actual_tailor_buy_dress_measure_flow",
             "external_female_tailor_choose_agree_purchase_flow",
             "external_female_tailor_refusal_returns_to_catalog",
+            "external_all_girl_dress_appointments_use_shared_pipeline",
             "external_dog_entity_actions",
             "external_backyard_barrel_object_actions",
             "external_grocery_store_object_purchase_actions",
@@ -7336,6 +7364,7 @@ def main() -> int:
             "external_actual_tailor_buy_dress_measure_flow",
             "external_female_tailor_choose_agree_purchase_flow",
             "external_female_tailor_refusal_returns_to_catalog",
+            "external_all_girl_dress_appointments_use_shared_pipeline",
             "external_dog_entity_actions",
             "external_backyard_barrel_object_actions",
             "external_grocery_store_object_purchase_actions",

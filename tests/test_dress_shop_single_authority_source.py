@@ -85,3 +85,24 @@ def test_female_catalog_selects_through_existing_girl_agreement_flow():
     assert "DressObman" not in buy
     assert 'if str(dress_shop.produced or "") == str(DressToBuy or ""):' in suggest
     assert "jump ArtisansQuarter" in suggest
+
+
+def test_all_authored_girls_schedule_the_same_dress_purchase_pipeline():
+    appointments = {
+        "melissa": ("game/NPC/Girls/Melissa/IntMelissaDressChange.rpy", "GirlNameIMT"),
+        "sandra": ("game/NPC/Girls/Sandra/IntSandraDressChange.rpy", "GirlNameIST"),
+        "amanda": ("game/NPC/Girls/Amanda/IntAmandaDressChange.rpy", "GirlNameIAT"),
+        "becky": ("game/NPC/Girls/Becky/IntBeckyDressChange.rpy", "GirlName"),
+        "georgett": ("game/NPC/Girls/Georgett/IntGeorgettDressChange.rpy", "GirlNameIGT"),
+        "liza": ("game/NPC/Girls/Liza/IntLizaDressChange.rpy", "GirlNameILT"),
+    }
+
+    for path, girl_argument in appointments.values():
+        source = read(ROOT / path)
+        assert (
+            f'daily_events.add({girl_argument}, "dressshop", 0, "=", 1, 1, '
+            '"BuyDressTom", "GirlDressBuy", "girl_location")'
+        ) in source
+
+    daily_runtime = read(ROOT / "game/Utilities/General/Common/CheckDailyEvent.rpy")
+    assert 'self.add(girl_name, "dressshop", 0, "=", 1, 0, "BuyDress", "GirlDressBuy", "girl_location")' in daily_runtime
