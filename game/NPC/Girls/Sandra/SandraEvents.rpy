@@ -171,7 +171,6 @@ label TavernSandraNightThanksScene:
     $ _sandra_secured_future_now = tractir_apply_sandra_secured_future()
     $ player.change_stat("fun", 8)
     call HouseholdSexEngine("sandra", "TavernSandraRoom")
-    $ calendar_v2.advance_minutes(30)
     if _sandra_secured_future_now:
         $ main_ui_begin_native_scene_state("Сандра")
         $ scene_runtime.picture = SandraStaticData.image_path("outfit_reward", "handjob_finish")

@@ -81,7 +81,24 @@ def test_sandra_and_melissa_share_one_intimacy_procedure_with_distinct_gates():
     assert 'call HouseholdSexEngine("sandra", "TavernSandraRoom")' in sandra_events
     assert "call HouseholdSexEngine" in melissa_talk
     assert "call HouseholdSexEngine" in sandra_talk
-    for finish in ('"Кончить в рот"', '"Кончить на грудь"', '"Кончить на лицо"', '"Кончить внутрь"'):
+    assert '"Попросить помочь рукой" if _hse_full_engine' in engine
+    assert '"Попросить сделать минет" if _hse_full_engine' in engine
+    assert '"Кончить в рот" if _hse_can_cum' in engine
+    assert '"Кончить в киску" if _hse_can_cum' in engine
+    assert '"Кончить в попку" if _hse_can_cum' in engine
+    assert '"Кончить на грудь" if _hse_can_cum' in engine
+    assert '"Кончить на лицо" if _hse_can_cum' in engine
+
+
+def test_anal_finish_is_recorded_without_using_vaginal_conception_state():
+    engine = read("NPC/Girls/Melissa/IntMelissaSex.rpy")
+    pregnancy = read("NPC/Girls/Common/PregnancyCheck.rpy")
+
+    assert '$ pregnancy_check(_hse_girl, "ass", 1, "Вы")' in engine
+    assert "['inside', 'ass', 'mouth', 'tits', 'mouthface', 'face', 'outside']" in pregnancy
+    assert "if cum_place == 'inside':" in pregnancy
+    assert '"CumTarget": str(cum_place or "")' in pregnancy
+    for finish in ('"Кончить в рот"', '"Кончить на грудь"', '"Кончить на лицо"', '"Кончить в киску"', '"Кончить в попку"'):
         assert finish in engine
 
 

@@ -63,10 +63,9 @@ init python:
         return False
 
     def household_sex_finish_inside_text(girl_name="", container_id=""):
-        girl_accusative = people_display_name(girl_name)
         if str(container_id or "").strip().lower() == "ass":
-            return "Вы удерживаете {} ближе к себе и кончаете внутрь.".format(girl_accusative)
-        return "Вы удерживаете {} ближе к себе и кончаете прямо в нее.".format(girl_accusative)
+            return "Вы удерживаете ее ближе к себе и кончаете ей в попку."
+        return "Вы удерживаете ее ближе к себе и кончаете ей в киску."
 
     def household_sex_scene_summary(girl_name="", full_engine=False):
         girl = str(girl_name or "").strip().lower()
@@ -293,7 +292,15 @@ label HouseholdSexEngine(girl_name="melissa", source_room=""):
                     $ scene_runtime.text = household_sex_touch_text(_hse_girl, "ass", "insert", _hse_effect, _hse_full_engine)
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
-                "Подставить ей член" if _hse_full_engine and player.intimacy.can_cum() and not _hse_info.sex_busy():
+                "Попросить помочь рукой" if _hse_full_engine and player.intimacy.can_cum() and not _hse_info.sex_busy():
+                    $ _hse_info.set_cock_position("none")
+                    $ player.intimacy.add_arousal(30, 100)
+                    $ _hse_info.add_arousal(5)
+                    $ scene_runtime.text = "Вы просите ее помочь вам рукой. Она устраивается ближе, обхватывает ваш член ладонью и начинает двигать ею в ровном, уверенном ритме."
+                    $ scene_runtime.picture = _hse_data.image_path("outfit_reward", "handjob")
+                    call HouseholdSexState(_hse_girl, _hse_full_engine)
+
+                "Попросить сделать минет" if _hse_full_engine and player.intimacy.can_cum() and not _hse_info.sex_busy():
                     $ _hse_info.set_cock_position("mouth")
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "mouth", "suck", "You", _hse_data.fullname, "female")
                     $ scene_runtime.text = household_sex_touch_text(_hse_girl, "mouth", "suck", _hse_effect, _hse_full_engine)
@@ -351,12 +358,24 @@ label HouseholdSexEngine(girl_name="melissa", source_room=""):
                     if _return:
                         return
 
-                "Кончить внутрь" if _hse_can_cum and _hse_info.cock_position() in ("pussy", "ass"):
-                    $ _hse_inside_container = _hse_info.cock_position()
+                "Кончить в киску" if _hse_can_cum and _hse_info.cock_in("pussy"):
+                    $ _hse_inside_container = "pussy"
                     $ scene_runtime.text = household_sex_finish_inside_text(_hse_girl, _hse_inside_container)
-                    $ pregnancy_check(_hse_girl, "inside" if _hse_inside_container == "pussy" else "outside", 1, "Вы")
+                    $ pregnancy_check(_hse_girl, "inside", 1, "Вы")
                     $ player.intimacy.set_arousal(0)
                     $ _hse_info.set_cum_state("cum_inside_you", 1)
+                    $ _hse_info.set_sex_busy(True)
+                    $ _hse_info.set_cock_position("none")
+                    $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
+                    call HouseholdSexAfterCum
+                    if _return:
+                        return
+
+                "Кончить в попку" if _hse_can_cum and _hse_info.cock_in("ass"):
+                    $ _hse_inside_container = "ass"
+                    $ scene_runtime.text = household_sex_finish_inside_text(_hse_girl, _hse_inside_container)
+                    $ pregnancy_check(_hse_girl, "ass", 1, "Вы")
+                    $ player.intimacy.set_arousal(0)
                     $ _hse_info.set_sex_busy(True)
                     $ _hse_info.set_cock_position("none")
                     $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")

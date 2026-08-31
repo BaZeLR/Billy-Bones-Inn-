@@ -292,14 +292,19 @@ def test_sandra_sex_engine_uses_native_choices_and_pregnancy_authority_once():
     assert '"breakfast": {' in init_source
     assert '"flirt": ["images/sandra/thanks/sandra_thanks.webm"]' in init_source
     assert 'call HouseholdSexEngine("sandra", "TavernSandraRoom")' in night_thanks
+    assert '$ calendar_v2.advance_minutes(30)' not in night_thanks
     assert 'call PregnancyCheck("sandra", "inside", 1, "Вы")' not in night_thanks
     assert 'label HouseholdSexEngine(girl_name="melissa", source_room=""):' in engine
     assert 'main_ui_begin_native_scene_state(_hse_display)' in engine
     assert '_hse_data.image_path("portrait", "default")' in engine
-    assert '"Кончить внутрь" if _hse_can_cum' in engine
+    assert '"Попросить помочь рукой" if _hse_full_engine' in engine
+    assert '"Попросить сделать минет" if _hse_full_engine' in engine
+    assert '"Кончить в киску" if _hse_can_cum' in engine
+    assert '"Кончить в попку" if _hse_can_cum' in engine
     assert '$ pregnancy_check(_hse_girl, "tits", 1, "Вы")' in engine
     assert '$ pregnancy_check(_hse_girl, "face", 1, "Вы")' in engine
-    assert '"inside" if _hse_inside_container == "pussy" else "outside"' in engine
+    assert '$ pregnancy_check(_hse_girl, "inside", 1, "Вы")' in engine
+    assert '$ pregnancy_check(_hse_girl, "ass", 1, "Вы")' in engine
     assert '$ Sandra.mark_fucked()' not in engine
     assert '"Остановиться":' in engine
     assert '"Закончить близость":' in engine

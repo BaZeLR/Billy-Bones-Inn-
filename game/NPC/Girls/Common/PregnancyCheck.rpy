@@ -24,7 +24,7 @@ init python:
     def pregnancy_check(girl_name, cum_place, repeat_count, dad_name='', is_dude_random=0, dad_name_type=''):
         """
         girl_name: str - name of the girl
-        cum_place: str - where the cum landed (inside, mouth, tits, mouthface, face, outside)
+        cum_place: str - where the cum landed (inside, ass, mouth, tits, mouthface, face, outside)
         repeat_count: int - how many times to repeat the check
         dad_name: str - name of the father (optional)
         is_dude_random: int - if 1, randomize dad
@@ -57,7 +57,7 @@ init python:
             dad_type = 'NPC'
         dad_type_reset = 1 if is_random and dad_type == '' else 0
         dad_name_reset = 1 if dad == '' else 0
-        cum_place_reset = 1 if cum_place not in ['inside', 'mouth', 'tits', 'mouthface', 'face', 'outside'] else 0
+        cum_place_reset = 1 if cum_place not in ['inside', 'ass', 'mouth', 'tits', 'mouthface', 'face', 'outside'] else 0
         fun_awarded = 0
         
         for _unused_pregnancy_check in range(int(repeat_count)):
