@@ -57,7 +57,7 @@ def test_clara_market_event_checks_are_explicit_tuple_conditions():
     assert "#bool(Clara.market_day_roll)" in clara_thread
     assert "#people_to_int(Clara.market_evening_roll_day, -1) == int(calendar_v2.daysInGame or 0)" in clara_thread
     assert "#bool(Clara.market_evening_roll)" in clara_thread
-    assert clara_thread.count("(18, 18)") == 2
+    assert clara_thread.count("(18, 22)") == 2
 
 
 def test_clara_paintings_events_use_event_checks_not_ready_helpers():
@@ -122,7 +122,8 @@ def test_clara_story_labels_use_thread_methods_directly():
 
     assert "story_thread_advance_current()" not in combined
     assert "$ event_runtime.active_thread.advance()" in combined
-    assert "event_runtime.active_thread.abort()" in paintings
+    assert 'fight_begin("legare"' in paintings
+    assert "event_runtime.active_thread.abort()" not in paintings
     assert "event_runtime.active_thread.advanceTo(" not in booklet
 
 

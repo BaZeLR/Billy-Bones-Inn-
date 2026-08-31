@@ -207,7 +207,7 @@ def test_amanda_v63_migration_consumes_old_night_bowl_keys_once():
     migration = _source(PROJECT_ROOT / "game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V63():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 71" in migration
+    assert "define currentVersion = 72" in migration
     assert "if loaded_version < 64:" in migration
     assert "updateSave_V63()" in migration
     for old_key, field_name in (
@@ -277,7 +277,7 @@ def test_amanda_v64_migration_discards_attic_mirror_and_consumes_breakfast_keys(
     migration = _source(PROJECT_ROOT / "game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V64():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 71" in migration
+    assert "define currentVersion = 72" in migration
     assert "if loaded_version < 65:" in migration
     assert "updateSave_V64()" in migration
     assert 'amanda_var.pop("attic_window_busted", None)' in block
@@ -323,7 +323,7 @@ def test_amanda_v65_migration_consumes_daily_and_misc_keys_once():
     migration = _source(PROJECT_ROOT / "game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V65():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 71" in migration
+    assert "define currentVersion = 72" in migration
     assert "if loaded_version < 66:" in migration
     assert "updateSave_V65()" in migration
     for old_key, field_name in (
@@ -368,7 +368,7 @@ def test_amanda_v66_migration_consumes_room_rejection_keys_once():
     migration = _source(PROJECT_ROOT / "game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V66():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 71" in migration
+    assert "define currentVersion = 72" in migration
     assert "if loaded_version < 67:" in migration
     assert "updateSave_V66()" in migration
     for old_key, field_name in (
@@ -432,7 +432,7 @@ def test_amanda_v67_migration_consumes_complete_legare_state_once():
     migration = _source(PROJECT_ROOT / "game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V67():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 71" in migration
+    assert "define currentVersion = 72" in migration
     assert "if loaded_version < 68:" in migration
     assert "updateSave_V67()" in migration
     assert 'amanda_var.pop("alberfriends", 0)' in block

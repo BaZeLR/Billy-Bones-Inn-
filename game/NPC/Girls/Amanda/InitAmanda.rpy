@@ -688,6 +688,20 @@ init python:
                         reaction = 1
             return reaction
 
+        def can_grant_sexual_favor(self):
+            return (
+                people_to_int(self.fucked_today, 0) == 0
+                and player.intimacy.can_cum()
+                and not self.is_working()
+                and str(rooms.current_code or "") in (
+                    "TavernMain",
+                    "TavernKitchen",
+                    "TavernMyRoom",
+                    "TavernAmandaRoom",
+                )
+                and self.sex_offer_reaction() in (1, 4)
+            )
+
         def legare_sex_type(self):
             if not self.performed_oral_with_legare:
                 sex_type = 0

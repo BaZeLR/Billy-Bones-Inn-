@@ -84,6 +84,10 @@ label ClaraSecretMerchantMenu:
     $ _secret_market_month_key = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
     while True:
         menu:
+            "Купить старинный диван за 600" if threads["claraForestSofa"].num == 2 and not cursed_sofa_installed():
+                call ClaraSecretMerchantBuySofa
+                if people_to_int(Clara.merchant_contact_month_key, -1) == _secret_market_month_key:
+                    return
             "Купить роскошное мыло за 45":
                 call ClaraSecretMerchantBuy("luxury_soap_001", 45)
                 if people_to_int(Clara.merchant_contact_month_key, -1) == _secret_market_month_key:
@@ -116,6 +120,28 @@ label ClaraSecretMerchantBuy(item_id="", price_value=0):
     $ player.add_item(_secret_item, 1)
     $ Clara.merchant_contact_month_key = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
     $ scene_runtime.text = "Монгол быстро прячет деньги и столь же быстро передает вам сверток. \"На этот месяц хватит. Дальше только в следующий раз,\" предупреждает он."
+    $ scene_runtime.location_text = scene_runtime.text
+    call stat
+    return
+
+
+label ClaraSecretMerchantBuySofa:
+    if threads["claraForestSofa"].num != 2 or cursed_sofa_installed():
+        $ scene_runtime.text = "Монгол разводит руками: старинного дивана среди его тайного товара больше нет."
+        $ scene_runtime.location_text = scene_runtime.text
+        return
+    if people_to_int(Clara.merchant_contact_month_key, -1) == (int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)):
+        $ scene_runtime.text = "На этот месяц Монгол уже показал вам весь доступный особый товар."
+        $ scene_runtime.location_text = scene_runtime.text
+        return
+    if int(player.economy.money or 0) < CLARA_CURSED_SOFA_PRICE:
+        $ scene_runtime.text = "На старинный диван у вас не хватает денег. Монгол требует шестьсот мараведи и торговаться отказывается."
+        $ scene_runtime.location_text = scene_runtime.text
+        return
+    $ player.spend_money(CLARA_CURSED_SOFA_PRICE)
+    $ _room_add_item_by_id(rooms.get("TavernMain"), "cursed_sofa_001")
+    $ Clara.merchant_contact_month_key = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
+    $ scene_runtime.text = "Монгол принимает шестьсот мараведи и обещает доставить тяжелый старинный диван прямо в главную залу вашего трактира. Перед расставанием он советует не пугаться, если мебель начнет ворчать: прежний хозяин тоже жаловался, но потом внезапно уехал из города."
     $ scene_runtime.location_text = scene_runtime.text
     call stat
     return

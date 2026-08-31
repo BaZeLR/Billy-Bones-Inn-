@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 71
+define currentVersion = 72
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -643,6 +643,10 @@ init -100 python:
         if loaded_version < 71:
             updateSave_V70()
             loaded_version = 71
+
+        if loaded_version < 72:
+            updateSave_V71()
+            loaded_version = 72
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2402,6 +2406,15 @@ init -100 python:
             or people_to_int(Georgett.story_value("lizasawinchurch", 0), 0) > 0
             or people_to_int(Georgett.story_value("churchlizaadmit", 0), 0) > 0
         )
+
+    def updateSave_V71():
+        # The cellar confrontation used to abort Clarissa's complete path.
+        # Resume that same thread at its next authored stage without creating
+        # a compatibility flag or replaying the cellar scene.
+        initThreads()
+        paintings = threads.get("claraPaintingsPath")
+        if paintings is not None and paintings.aborted and int(paintings.num or 0) == 1:
+            paintings.advanceTo(2, force_active=True)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

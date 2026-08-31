@@ -74,6 +74,14 @@ init python:
                 return room_object
         return None
 
+    def clara_cellar_pantaloons_visible(_obj=None):
+        thread = threads.get("claraPaintingsPath")
+        return (
+            thread is not None
+            and int(thread.num or 0) >= 2
+            and int(player.item_count("clara_pantaloons_001") or 0) <= 0
+        )
+
     def wine_store_action_items():
         items = []
         for room_object in rooms.get("WineStore").visible_objects():
@@ -99,6 +107,7 @@ init python:
         description="Дальше вглубь уходит еще более тесный и заставленный подвал.",
         actions=[
             ObjectAction(action_id="examine_cellar", label="Осмотреть подвал", hook="text", target="Подвал забит винными запасами еще плотнее, чем сама лавка."),
+            ObjectAction(action_id="take_clara_pantaloons", label="Поднять панталоны Клариссы", hook="call", target="ClaraCellarTakePantaloons", condition=clara_cellar_pantaloons_visible),
         ],
     )
 
@@ -203,6 +212,20 @@ label WineStoreObjectText(object_id="", action_id=""):
                     scene_runtime.location_text = scene_runtime.text
                     break
     call WineStoreObjectMenu(object_id, True)
+    return
+
+
+label ClaraCellarTakePantaloons:
+    if not clara_cellar_pantaloons_visible():
+        $ scene_runtime.text = "На полу подвала больше ничего не лежит."
+        $ scene_runtime.location_text = scene_runtime.text
+        call WineStoreObjectMenu("cellar", True)
+        return
+    $ player.add_item("clara_pantaloons_001", 1)
+    $ scene_runtime.text = "У ножки стола вы замечаете скомканные панталоны, потерянные Клариссой во время сцены с Легаре. На внутренней стороне пояса углем выведены приметы лесной тропы и знак старой водокачки. Вы забираете находку."
+    $ scene_runtime.location_text = scene_runtime.text
+    call stat
+    call WineStoreObjectMenu("cellar", True)
     return
 
 

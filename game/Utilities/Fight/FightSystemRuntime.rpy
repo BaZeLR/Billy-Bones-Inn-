@@ -235,6 +235,16 @@ init -20 python:
             money_max=5,
             exploration_reward=2,
         ),
+        "legare": FightEnemyDefinition(
+            "legare", "Месье Легаре", "human", 60, 10, 19, 8, 15,
+            moves=["attack", "strike", "dodge", "defend"],
+            skills=["brawl", "dirty_fighting"],
+            weapon="трость",
+            tactics="counter",
+            company_min=1,
+            company_max=1,
+            exploration_reward=4,
+        ),
     }
     def fight_player_level():
         return 1 + max(0, int(effective_player_exploration() or 0)) // 50

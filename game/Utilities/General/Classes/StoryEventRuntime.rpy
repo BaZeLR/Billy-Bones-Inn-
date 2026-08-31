@@ -455,7 +455,7 @@ define claraThreadList = [
         ),
         (
             "story_clara_market_booklet_2",
-            [1, 2, 3, 4, 6], (18, 18), None,
+            [1, 2, 3, 4, 6], (18, 22), None,
             1,
             None,
             [
@@ -469,7 +469,7 @@ define claraThreadList = [
         ),
         (
             "story_clara_market_booklet_3",
-            [1, 2, 3, 4, 6], (18, 18), None,
+            [1, 2, 3, 4, 6], (18, 22), None,
             1,
             None,
             [
@@ -697,6 +697,73 @@ define claraThreadList = [
             "CityGuard",
             "enter",
             10,
+        ),
+    ], highlight=False, threaded=True),
+    #
+    # clara_forest_sofa
+    #
+    # The thread owns only ordered story availability. The clue and shovel are
+    # inventory items, the installed sofa belongs to TavernMain, and the final
+    # capacity reward belongs to PlayerIntimacy.
+    LThreadData(1, "clara", "ForestSofa", [
+        "#threads['claraBookletMarket'].completed",
+        "#int(threads['claraPaintingsPath'].num or 0) >= 2",
+    ], [
+        (
+            "story_clara_forest_sofa_market_0",
+            [1, 2, 3, 4, 6], (19, 22), None,
+            1,
+            None,
+            None,
+            None,
+            "MarketPlace",
+            "enter",
+            3,
+        ),
+        (
+            "story_clara_forest_sofa_stash_1",
+            None, (6, 19), None,
+            1,
+            None,
+            [
+                "#int(player.item_count('clara_pantaloons_001') or 0) > 0",
+                "#int(player.item_count('shovel_001') or 0) > 0",
+            ],
+            None,
+            "ForestHiddenPath",
+            "clara_stash",
+            1,
+        ),
+        (
+            "story_clara_sofa_first_talk_2",
+            None, None, None,
+            1,
+            None,
+            [
+                "#'cursed_sofa_001' in rooms.get('TavernMain').game_items",
+            ],
+            None,
+            "CursedSofa",
+            "talk",
+            0,
+        ),
+        (
+            "story_clara_sofa_ritual_3",
+            None, None, None,
+            1,
+            None,
+            [
+                "#'cursed_sofa_001' in rooms.get('TavernMain').game_items",
+                "#threads['claraPaintingsPath'].completed",
+                "#bool(Clara.sex_stat('virginity', True))",
+                "#bool(Melissa.sex_stat('virginity', True))",
+                "#str(people.location('clara') or '') == 'TavernMain'",
+                "#str(people.location('melissa') or '') == 'TavernMain'",
+            ],
+            None,
+            "CursedSofa",
+            "talk",
+            0,
         ),
     ], highlight=False, threaded=True),
     #

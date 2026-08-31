@@ -46,6 +46,7 @@ init python:
         {"item_id": "dog_bone_001", "price": 1},
         {"item_id": "dog_collar_001", "price": 10},
         {"item_id": "hunting_trap_001", "price": 18},
+        {"item_id": "shovel_001", "price": 24},
         {"item_id": "lumber_001", "price": 8},
         {"item_id": "arrows_001", "price": 6},
         {"item_id": "droplets_001", "price": 11},

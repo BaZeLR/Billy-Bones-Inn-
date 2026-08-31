@@ -451,6 +451,7 @@ label TavernKitchenShareTeaWithSandraAndBecky:
 
 label story_amanda_kitchen_window_favor_0:
     $ main_ui_begin_native_scene_state("Аманда: услуга за молчание")
+    show screen main_ui
     $ Amanda.attic_window_favor_stage = 2
     $ Amanda.attic_mock_stopped = True
     vscene "images/amanda/kitchen_help.png"

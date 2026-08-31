@@ -28,6 +28,12 @@ label IntAmandaTalk(girl_name="amanda"):
                 call PlayerCardGiftToFixedTargetMenu(girl_name)
             "Коснуться ее смелее" if old_point_action_unlocked(girl_name, "kino"):
                 call OldPointKinoAttempt(girl_name)
+            "Попросить Аманду о сексуальном одолжении" if Amanda.can_grant_sexual_favor():
+                $ main_ui_end_talk_state()
+                $ scene_runtime.text = "Вы тихо просите Аманду помочь вам без лишних свидетелей. Она оценивает ваш тон, отношения между вами и, наконец, с озорной улыбкой ведет вас в укромный угол трактира."
+                $ scene_runtime.location_text = scene_runtime.text
+                call IntAmandaSex(girl_name, "kitchen", "minet")
+                return
             "Извиниться перед Амандой" if old_point_apology_available(girl_name):
                 call OldPointApology(girl_name)
             "Сказать Аманде что вы передумали и она может встречаться с Альбером" if int(Amanda.talked_today or 0) < 3 and Amanda.legare_forbidden:

@@ -4795,7 +4795,7 @@ testcase external_melissa_courtship_is_slow_and_daily:
     click id ("choice_panel_button_%d" % int(_melissa_end_talk_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Сблизиться с Мелиссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     assert eval (int(Melissa.talked_today or 0) == 1 and "Поговорить" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Сблизиться с Мелиссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    assert eval ("Уединиться с Мелиссой" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Попросить Мелиссу о сексуальном одолжении" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _melissa_courtship_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Сблизиться с Мелиссой")
     click id ("choice_panel_button_%d" % int(_melissa_courtship_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Осторожно коснуться Мелиссы" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     assert eval ("Осторожно поцеловать Мелиссу" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
@@ -4842,8 +4842,8 @@ testcase external_melissa_finished_intimacy_returns_to_room_and_closes_for_day:
 
     run Call("IntMelissaTalk", "melissa")
     advance until screen "choice" timeout 20.0
-    assert eval ("Уединиться с Мелиссой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    $ _melissa_intimacy_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Уединиться с Мелиссой")
+    assert eval ("Попросить Мелиссу о сексуальном одолжении" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _melissa_intimacy_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Попросить Мелиссу о сексуальном одолжении")
     click id ("choice_panel_button_%d" % int(_melissa_intimacy_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("choice") is not None and "Осмотреть Мелиссу" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Мелисса") timeout 5.0
     $ _melissa_stop_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Остановиться")
@@ -6651,6 +6651,78 @@ testcase external_clara_object_thread_conditions:
     assert eval (people.location("clara") == "TavernMelissaRoom" and people.location("melissa") == "TavernMelissaRoom") timeout 5.0
     assert eval (story_event_available("TavernMelissaRoom", "clara_paintings")) timeout 5.0
 
+testcase external_clara_forest_sofa_story_flow:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ threads["claraBookletMarket"].advanceTo(threads["claraBookletMarket"].data.length, complete_at_end=True)
+    $ threads["claraPaintingsPath"].advanceTo(2, force_active=True)
+    $ threads["claraForestSofa"].advanceTo(0, force_active=True)
+    $ Clara.rel = max(5, int(Clara.rel or 0))
+    $ external_calendar_set_fields(3, 1, 1100, 20, 0)
+    $ external_calendar_set_weekday(1)
+    $ rooms.enter("MarketPlace")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ _sofa_market_event = threads["claraForestSofa"].getevent(0)
+    assert eval (threads["claraForestSofa"].checkActive()) timeout 5.0
+    assert eval (_sofa_market_event.checkDay()) timeout 5.0
+    assert eval (_sofa_market_event.checkHour()) timeout 5.0
+    assert eval (_sofa_market_event.checkConditions()) timeout 5.0
+    assert eval (_sofa_market_event.checkNumDay(threads["claraForestSofa"].day)) timeout 5.0
+    assert eval (not _story_location_is_open("MarketPlace")) timeout 5.0
+    assert eval (story_event_available("MarketPlace", "enter")) timeout 5.0
+
+    $ threads["claraForestSofa"].advanceTo(1, force_active=True)
+    $ rooms.enter("ForestHiddenPath")
+    $ player.remove_item("clara_pantaloons_001", player.item_count("clara_pantaloons_001"))
+    $ player.remove_item("shovel_001", player.item_count("shovel_001"))
+    $ external_calendar_set_fields(3, 1, 1100, 12, 0)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("ForestHiddenPath", "clara_stash")) timeout 5.0
+    $ player.add_item("clara_pantaloons_001", 1)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("ForestHiddenPath", "clara_stash")) timeout 5.0
+    $ player.add_item("shovel_001", 1)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("ForestHiddenPath", "clara_stash")) timeout 5.0
+
+    $ threads["claraForestSofa"].advanceTo(2, force_active=True)
+    $ _room_remove_item_by_id(rooms.get("TavernMain"), "cursed_sofa_001")
+    $ Clara.merchant_contact_month_key = -1
+    $ player.set_money(1000)
+    run Call("ClaraSecretMerchantBuySofa")
+    assert eval (_room_item_count_by_id(rooms.get("TavernMain"), "cursed_sofa_001") == 1 and int(player.economy.money or 0) == 400) timeout 5.0
+    run Call("ClaraSecretMerchantBuySofa")
+    assert eval (_room_item_count_by_id(rooms.get("TavernMain"), "cursed_sofa_001") == 1 and int(player.economy.money or 0) == 400) timeout 5.0
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("CursedSofa", "talk")) timeout 5.0
+    run Call("checkTriggers", "CursedSofa", "talk", 0)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 3) timeout 20.0
+
+    $ threads["claraPaintingsPath"].advanceTo(threads["claraPaintingsPath"].data.length, complete_at_end=True)
+    $ Clara.set_sex_stat("virginity", True)
+    $ Melissa.set_sex_stat("virginity", True)
+    $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999)])
+    $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999)])
+    $ rooms.enter("TavernMain")
+    $ _sofa_limit_before = int(player.intimacy.can_cum_daily or 0)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("CursedSofa", "talk")) timeout 5.0
+    run Call("checkTriggers", "CursedSofa", "talk", 0)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (bool(threads["claraForestSofa"].completed)) timeout 20.0
+    assert eval (int(player.intimacy.can_cum_daily or 0) == _sofa_limit_before + 1) timeout 5.0
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("CursedSofa", "talk")) timeout 5.0
+
 testcase external_story_event_audit_methods_cover_tuple_attributes:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -7304,6 +7376,7 @@ def main() -> int:
             "external_inventory_bag_left_grid_back_flow",
             "external_mongol_horse_purchase_once_and_amanda_room_presence",
             "external_clara_object_thread_conditions",
+            "external_clara_forest_sofa_story_flow",
             "external_story_event_audit_methods_cover_tuple_attributes",
             "external_main_ui_does_not_repeat_active_dialogue_text",
             "external_actual_grocery_click",
@@ -7487,6 +7560,7 @@ def main() -> int:
             "external_inventory_bag_left_grid_back_flow",
             "external_mongol_horse_purchase_once_and_amanda_room_presence",
             "external_clara_object_thread_conditions",
+            "external_clara_forest_sofa_story_flow",
             "external_story_event_audit_methods_cover_tuple_attributes",
             "external_main_ui_does_not_repeat_active_dialogue_text",
             "external_actual_grocery_click",

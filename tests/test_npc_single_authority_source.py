@@ -47,7 +47,7 @@ def test_francheska_v57_migration_consumes_old_story_and_schedule_maps():
     migration = _source("game/TractirSaveSync.rpy")
     block = migration.split("def updateSave_V57():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 71" in migration
+    assert "define currentVersion = 72" in migration
     assert "if loaded_version < 58:" in migration
     assert "updateSave_V57()" in migration
     for old_key, field_name in (

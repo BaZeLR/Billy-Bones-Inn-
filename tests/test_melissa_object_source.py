@@ -316,7 +316,7 @@ def test_melissa_talk_keeps_native_flow_and_room_problem_choices_reachable():
     assert "jump IntMelissaStartMenu" not in talk_source
     assert "call OldPointSmallTalkMenu" not in talk_menu
     assert "call OldPointFlirtAttempt" not in talk_menu
-    assert "call PlayerCardGiftToFixedTargetMenu" not in talk_menu
+    assert "call PlayerCardGiftToFixedTargetMenu(girl_name)" in talk_menu
     assert "call OldPointKinoAttempt" not in talk_menu
     assert "call OldPointApology" not in talk_menu
     assert "call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)" in talk_menu
@@ -355,7 +355,7 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
     assert "Melissa.private_place_offer(" in talk_source
     assert 'story_event_available("talk_melissa", "melissa_intimacy")' in talk_source
     assert 'call checkTriggers("talk_melissa", "melissa_intimacy", 0)' in talk_source
-    assert talk_source.count("$ _melissa_repeat_menu = True") == 2
+    assert talk_source.count("$ _melissa_repeat_menu = True") == 4
     intimacy_call = talk_source.split('call IntMelissaSex(girl_name, rooms.current_code)', 1)[1]
     assert intimacy_call.split("\n", 2)[1].strip() == "return"
     assert 'Melissa.relationship_allows("sex")' in sex_source
@@ -387,7 +387,7 @@ def test_melissa_courtship_save_upgrade_promotes_only_recorded_sex_history():
     migration_source = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
     migration = migration_source.split("def updateSave_V69():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 71" in migration_source
+    assert "define currentVersion = 72" in migration_source
     assert 'courtship = threads["melissaCourtship"]' in migration
     assert 'Melissa.sex_stat("sexacts", 0)' in migration
     assert "courtship.advanceTo(courtship.data.length, complete_at_end=True)" in migration

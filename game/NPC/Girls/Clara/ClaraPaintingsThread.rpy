@@ -62,16 +62,30 @@ label story_clara_paintings_cellar_1:
 
 
 label story_clara_paintings_confront_legare:
+    $ renpy.dynamic("_legare_fight_outcome")
     show screen main_ui
     $ Alber.amanda_conflict_stage = 1
     $ Amanda.legare_departure_code = max(2, Amanda.legare_departure_code)
-    $ Clara.change_social(friend_delta=1)
-    $ scene_runtime.text = "Вы выходите из-за стеллажей и прямо говорите Легаре, что его семейные распоряжения перестали быть только семейным делом. Легаре быстро закрывает подвал за спиной Клариссы и встречает вас уже без торговой улыбки.\n\nДрака выходит короткой и злой: несколько ударов, сбитая бутылка, хруст стекла под сапогом. Легаре отступает первым, но по его лицу ясно, что теперь вы для него не помеха, а враг. Перед уходом он почти спокойно бросает, что раз вы вмешиваетесь в его дом, он займется вашим домом куда настойчивее.\n\nПохоже, он ускорит свои попытки добраться до Аманды."
+    $ fight_begin("legare", 1, "WineStore", "images/Alber/fight/streetdraw.jpg", "Вы выходите из-за стеллажей и прямо говорите Легаре, что его семейные распоряжения перестали быть только семейным делом. Он закрывает подвал за спиной Клариссы, перехватывает трость и встречает вас уже без торговой улыбки.")
+    call FightLoop
+    $ _legare_fight_outcome = str(fight.last_result.get("outcome", "") or "")
+    if _legare_fight_outcome == "victory":
+        $ Alber.add_relation(-5)
+        $ Clara.change_social(friend_delta=2, open_delta=1)
+        $ scene_runtime.text = "Легаре первым отступает среди разбитых бутылок. Кларисса успевает подобрать платье и смотрит на вас уже не как на случайного покупателя. Перед уходом ее отец обещает, что теперь займется вашим домом куда настойчивее. Похоже, он ускорит попытки добраться до Аманды."
+    elif _legare_fight_outcome == "defeat":
+        $ Alber.add_relation(-3)
+        $ Clara.change_social(friend_delta=1)
+        $ scene_runtime.text = "Легаре сбивает вас на каменный пол и велит больше не вмешиваться в дела его семьи. Но Кларисса успевает выскользнуть из подвала, а сам факт вашего вмешательства она не забудет. Вражда с Легаре теперь стала открытой."
+    else:
+        $ Alber.add_relation(-2)
+        $ Clara.change_social(friend_delta=1)
+        $ scene_runtime.text = "Вы отступаете из тесного подвала прежде, чем Легаре успевает загнать вас между бочками. Кларисса остается позади, но теперь знает, что вы были готовы вмешаться. Легаре же больше не считает вас просто назойливым трактирщиком."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Продолжить":
             pass
-    $ event_runtime.active_thread.abort()
+    $ event_runtime.active_thread.advance()
     $ main_ui_end_native_scene_state()
     return
 

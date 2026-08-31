@@ -41,7 +41,9 @@ init -25 python:
                 return False
             if not self.checkProb():
                 return False
-            if not _story_location_is_open(self.location):
+            # A planned entry event owns the closed-location exception. Normal
+            # room/NPC actions still require the location to be open.
+            if str(self.action or "").strip() != "enter" and not _story_location_is_open(self.location):
                 return False
             return True
 
@@ -69,7 +71,7 @@ init -25 python:
             add("conditions", self.checkConditions(), str(self.condStr))
             if include_item:
                 add("item", self.checkItem(), str(self.item or "None"))
-            add("location_open", _story_location_is_open(self.location), location_key or "-")
+            add("location_open", action_key == "enter" or _story_location_is_open(self.location), location_key or "-")
             if self.prob in (None, 1, 1.0):
                 add("probability", True, "100%")
             elif roll_probability:

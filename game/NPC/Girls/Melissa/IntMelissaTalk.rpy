@@ -21,6 +21,12 @@ label IntMelissaTalk(girl_name="melissa"):
             "Поговорить" if social_has_visible_topics(girl_name, "talk"):
                 call SocialTalkTopicMenu(girl_name, "talk")
                 $ _melissa_repeat_menu = True
+            "Флиртовать" if social_interaction_allowed_for_npc(girl_name, "flirt"):
+                call SocialTalkTopicMenu(girl_name, "flirt")
+                $ _melissa_repeat_menu = True
+            "Подарить маленький подарок" if social_interaction_allowed_for_npc(girl_name, "gift"):
+                call PlayerCardGiftToFixedTargetMenu(girl_name)
+                $ _melissa_repeat_menu = True
             "Послушать, что Мелисса скажет о кладовой" if melissa_storage_thanks_available():
                 $ Melissa.storage_thanks_day = int(current_game_day() or 0)
                 $ Melissa.change_social(friend_delta=1)
@@ -36,11 +42,11 @@ label IntMelissaTalk(girl_name="melissa"):
                 $ main_ui_end_talk_state()
                 call checkTriggers("talk_melissa", "melissa_intimacy", 0)
                 return
-            "Уединиться с Мелиссой" if Melissa.relationship_allows("intimacy") and Melissa.room_is_private(rooms.current_code):
+            "Попросить Мелиссу о сексуальном одолжении" if not Melissa.is_working() and Melissa.relationship_allows("intimacy") and Melissa.room_is_private(rooms.current_code):
                 $ main_ui_end_talk_state()
                 call IntMelissaSex(girl_name, rooms.current_code)
                 return
-            "Найти укромное место с Мелиссой" if Melissa.relationship_allows("intimacy") and bool(Melissa.private_place_offer(rooms.current_code).get("ok", False)):
+            "Попросить Мелиссу найти укромное место" if not Melissa.is_working() and Melissa.relationship_allows("intimacy") and not Melissa.room_is_private(rooms.current_code) and bool(Melissa.private_place_offer(rooms.current_code).get("ok", False)):
                 $ main_ui_end_talk_state()
                 call IntMelissaFindPrivatePlace(girl_name, rooms.current_code)
                 return

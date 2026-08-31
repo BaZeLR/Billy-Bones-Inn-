@@ -288,6 +288,8 @@ init python:
         if forest_after_dusk():
             return [MenuItem("Вернуться к трактиру", Call("ForestReturnToTavernAfterDusk"))]
         items = [MenuItem("Осмотреться", Call("ForestSubroomExplore"))]
+        if story_event_available(room_code, "clara_stash"):
+            items.append(MenuItem("Найти тайник Клариссы", Call("checkTriggers", room_code, "clara_stash", 0)))
         if werecat_can_set_bait(room_code):
             items.append(MenuItem("Поставить крысиную приманку", Call("WerecatSetTrap", room_code)))
         elif werecat_can_check_bait(room_code):

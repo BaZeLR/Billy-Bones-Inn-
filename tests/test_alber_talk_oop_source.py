@@ -65,7 +65,7 @@ def test_alber_provocation_is_label_local_not_persistent_npc_state():
 def test_alber_v56_migration_consumes_old_map_and_scalar_once():
     block = MIGRATION.split("def updateSave_V56():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 71" in MIGRATION
+    assert "define currentVersion = 72" in MIGRATION
     assert "if loaded_version < 57:" in MIGRATION
     assert "updateSave_V56()" in MIGRATION
     for old_key, field_name in (
