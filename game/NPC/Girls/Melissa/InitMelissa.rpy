@@ -20,6 +20,7 @@ init python:
                 dative="Мелиссе",
                 portrait="images/melissa/melissa_portrait_0.jpg",
                 description="Мелисса - молодая девушка. В ее сложении немного проступают восточные черты. Она немного отличается от остальных работниц трактира. У нее оливкового цвета кожа, черные глаза, волосы цвета вороньего крыла и полные, похожие на мячи груди размера С.",
+                gift_preferences=["soap_001", "lavender_001", "wild_rose_001", "energy_tea_001", "drink_ale_001", "libido_tincture_001"],
             )
             self.birth_date = {"day": 25, "period": 6, "cycle": 1082}
             self.card_image = "images/melissa/melissa_card.jpg"
@@ -145,6 +146,7 @@ init python:
                         "images/melissa/sexyTimes/blowjob5.png",
                     ],
                     "blowjob_finish": ["images/melissa/sexyTimes/blowjobFinish.jpg"],
+                    "finish": ["images/melissa/thanks.png"],
                 },
                 "outfit_reward": {
                     "show": ["images/melissa/thanks.png"],
@@ -159,26 +161,6 @@ init python:
         """Melissa runtime: tavern work, bats quest, social state, body state."""
         talk_label = "IntMelissaTalk"
         unknown_name = "Незнакомка"
-        INTIMACY_PRIVATE_ROOMS = {
-            "TavernMelissaRoom",
-            "TavernMyRoom",
-            "TavernAmandaRoom",
-            "TavernSandraRoom",
-            "TavernEmptyRoom",
-            "TavernStorage",
-            "Shed",
-        }
-        INTIMACY_SECLUDED_ROOMS = {
-            "Forest",
-            "ForestClearing",
-            "ForestDarkWoods",
-            "ForestWaterfall",
-            "ForestLake",
-            "ForestSpring",
-            "ForestCave",
-            "ForestHiddenPath",
-            "Backyard",
-        }
         def __init__(self):
             super().__init__("melissa")
             self.code_name = "melissa"
@@ -257,7 +239,6 @@ init python:
                 "jobwhore": 0,
                 "jobgloryhole": 0,
             }
-            self.gift_preferences = ["soap_001", "lavender_001", "wild_rose_001", "energy_tea_001", "drink_ale_001", "libido_tincture_001"]
             self.relationship_cap = 100
             self.talk_preferences = {
                 "favorite_topics": ["job_routine", "family_life", "forest", "stories", "food"],
@@ -357,8 +338,7 @@ init python:
             )
 
         def room_is_private(self, room_code=""):
-            room_key = str(room_code or rooms.current_code or "").strip()
-            return room_key in self.INTIMACY_PRIVATE_ROOMS or room_key in self.INTIMACY_SECLUDED_ROOMS or self.private_context_active(room_key)
+            return household_intimacy_room_is_private(self.code_name, room_code)
 
         def wet_enough_to_find_place(self):
             wet_value = max(
@@ -387,7 +367,7 @@ init python:
                     "place": "market_shelves",
                     "text": "Мелисса ведет вас к глухому проходу за стеллажами и ящиками, где шум рынка остается совсем рядом, но прямых взглядов уже нет.",
                 }
-            if room_key in self.INTIMACY_SECLUDED_ROOMS:
+            if room_key in HOUSEHOLD_INTIMACY_SECLUDED_ROOMS:
                 return {
                     "ok": True,
                     "place": room_key,

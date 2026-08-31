@@ -1,10 +1,11 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-label IntHarrassmentDiscuss(GirlNameMHD, YourReaction1, _girl_info=None, _harass_instruction="", _girl_dative=""):
+label IntHarrassmentDiscuss(GirlNameMHD, YourReaction1, _girl_info=None, _harass_instruction="", _girl_dative="", _girl_unhappy=False):
     $ _girl_info = people.get_info(GirlNameMHD)
     $ _harass_instruction = _girl_info.harass_instruction() if _girl_info is not None else ""
     $ _girl_dative = people_name(GirlNameMHD, 'dative')
+    $ _girl_unhappy = _girl_info is not None and YourReaction1 in (1, 2) and (int(getattr(_girl_info, "corruption", 0) or 0) < 30 or int(getattr(_girl_info, "anger_with_player", 0) or 0) > 0)
     show screen main_ui
     menu:
         "Сказать что она не должна позволять себя лапать":
@@ -18,6 +19,12 @@ label IntHarrassmentDiscuss(GirlNameMHD, YourReaction1, _girl_info=None, _harass
 
         "Сказать [_girl_dative], чтобы она поступала как считает нужным" if _harass_instruction != "":
             call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 4)
+
+        "Сказать, что вы обдумаете проблему" if _girl_unhappy:
+            call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 6)
+
+        "Выгнать наглого клиента" if _girl_unhappy:
+            call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 7)
 
         "Промолчать":
             call IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, 5)
@@ -105,6 +112,23 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
             $ _girl_info.change_social(friend_delta=1)
             $ _girl_info.change_mana(1, "harass_free_choice")
             $ _girl_info.change_rebellion(-1, "harass_free_choice")
+    elif choice_code == 6:
+        $ _discussion_text = "Вы не стали отделываться приказом и пообещали {}, что обдумаете, как защитить девушек от наглых рук, не превращая трактир в постоянное поле боя. Пока решение не принято, вы попросили сразу звать вас, если посетитель снова перейдет черту.".format(people_name(GirlNameMHD, 'dative'))
+        call HarassDiscussImage(GirlNameMHD, 2)
+        if _girl_info is not None:
+            $ _girl_info.change_social(friend_delta=1)
+            $ _girl_info.change_mana(1, "harass_promised_solution")
+            $ _girl_info.change_anger(-1, "harass_promised_solution")
+    elif choice_code == 7:
+        $ _discussion_text = "Вы находите наглого посетителя, отрываете его от стола и выставляете за дверь. Затем вы говорите {}, что в вашем трактире никто не покупает право унижать ее вместе с кружкой эля.".format(people_name(GirlNameMHD, 'dative'))
+        call HarassDiscussImage(GirlNameMHD, 2)
+        if _girl_info is not None:
+            $ _girl_info.set_harass_instruction("notallow")
+            $ _girl_info.change_social(friend_delta=1)
+            $ _girl_info.change_mana(2, "harass_customer_ejected")
+            $ _girl_info.change_rebellion(-1, "harass_customer_ejected")
+            $ _girl_info.change_anger(-1, "harass_customer_ejected")
+        $ player.change_tavern_fame(-1)
     else:
         $ _discussion_text = "Вы решили ничего не говорить {}, а пойти лучше дальше по своим делам.".format(people_name(GirlNameMHD, 'dative'))
 

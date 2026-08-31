@@ -22,6 +22,8 @@ label IntLizaTalk(girl_name_ilt="liza", girl_loc_ilt=""):
                 call ShowGirlCard(girl_name_ilt)
             "Болтать":
                 call IntLizaTalkSmalltalk(girl_name_ilt, girl_loc_ilt)
+            "Подарить маленький подарок" if social_interaction_allowed_for_npc(girl_name_ilt, "gift"):
+                call PlayerCardGiftToFixedTargetMenu(girl_name_ilt)
             "Спросить о клиентах" if Liza.can_ask_topic("clients"):
                 call IntLizaTalkAskClients(girl_name_ilt, girl_loc_ilt)
             "Спросить о сексе" if Liza.can_ask_topic("sex"):

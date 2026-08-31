@@ -462,6 +462,24 @@ define sandraThreadList = [
             0,
         ),
     ], highlight=False, threaded=True),
+    LThreadData(0, "sandra", "KitchenHouseholdRespect", None, [
+        (
+            "story_sandra_kitchen_household_respect_0",
+            None, (6, 10), None,
+            1,
+            None,
+            [
+                "#threads['sandraWeeklyEvaluation'].completed",
+                "#household_morning_issue_type('sandra') == ''",
+                "#household_morning_issue_type('melissa') == ''",
+                "#household_morning_issue_type('amanda') == ''",
+            ],
+            None,
+            "TavernKitchen",
+            "enter",
+            5,
+        ),
+    ], highlight=False, threaded=True),
 ]
 define claraThreadList = [
     LThreadData(0, "clara", "BookletMarket", None, [

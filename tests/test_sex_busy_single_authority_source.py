@@ -20,9 +20,9 @@ def test_npc_sex_state_is_the_single_busy_owner():
     assert "Becky.set_sex_busy(True)" in becky
     assert "Becky.set_sex_busy(False)" in becky
     assert "Becky.sex_busy()" in eddie
-    assert "Melissa.sex_busy()" in melissa
-    assert "Melissa.set_sex_busy(True)" in melissa
-    assert "Melissa.set_sex_busy(False)" in melissa
+    assert "_hse_info.sex_busy()" in melissa
+    assert "_hse_info.set_sex_busy(True)" in melissa
+    assert "_hse_info.set_sex_busy(False)" in melissa
 
 
 def test_retired_shared_sex_busy_flag_is_migration_only():

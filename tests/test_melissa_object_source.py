@@ -357,10 +357,11 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
     assert 'call checkTriggers("talk_melissa", "melissa_intimacy", 0)' in talk_source
     invite_branch = talk_source.split('"Попросить Мелиссу прийти завтра на общий завтрак"', 1)[1]
     assert '$ _melissa_repeat_menu = True' in invite_branch.split('"Обсудить, где Мелиссе переночевать"', 1)[0]
-    intimacy_call = talk_source.split('call IntMelissaSex(girl_name, rooms.current_code)', 1)[1]
+    intimacy_call = talk_source.split('call HouseholdSexEngine(girl_name, rooms.current_code)', 1)[1]
     assert intimacy_call.split("\n", 2)[1].strip() == "return"
-    assert 'Melissa.relationship_allows("sex")' in sex_source
-    assert "$ Melissa.mark_fucked()" in sex_source
+    assert 'return bool(info.relationship_allows(action_code))' in sex_source
+    assert '$ _hse_info.mark_fucked()' in sex_source
+    assert 'if int(player.intimacy.came_today or 0) == _hse_start_player_cums:' in sex_source
 
 
 def test_melissa_courtship_is_one_ordered_story_thread_without_parallel_counters():
@@ -388,7 +389,7 @@ def test_melissa_courtship_save_upgrade_promotes_only_recorded_sex_history():
     migration_source = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
     migration = migration_source.split("def updateSave_V69():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 74" in migration_source
+    assert "define currentVersion = 75" in migration_source
     assert 'courtship = threads["melissaCourtship"]' in migration
     assert 'Melissa.sex_stat("sexacts", 0)' in migration
     assert "courtship.advanceTo(courtship.data.length, complete_at_end=True)" in migration
@@ -399,14 +400,14 @@ def test_melissa_courtship_save_upgrade_promotes_only_recorded_sex_history():
 
 def test_melissa_intimacy_uses_one_native_scene_until_explicit_finish():
     sex_source = MELISSA_SEX.read_text(encoding="utf-8-sig")
-    sex_menu = sex_source.split('label IntMelissaSex(GirlNameIMS="melissa", GirlLocIMS=""):', 1)[1].split(
-        'label IntMelissaSexState(girl_name="melissa"):', 1
+    sex_menu = sex_source.split('label HouseholdSexEngine(girl_name="melissa", source_room=""):', 1)[1].split(
+        'label HouseholdSexState(girl_name="melissa", full_engine=False):', 1
     )[0]
 
-    assert 'main_ui_begin_native_scene_state("Мелисса")' in sex_menu
+    assert 'main_ui_begin_native_scene_state(_hse_display)' in sex_menu
     assert "while True:" in sex_menu
     assert '"Остановиться":' in sex_menu
-    assert "call int_melissa_sex_finish" in sex_menu
+    assert "call HouseholdSexFinish" in sex_menu
     assert 'vscene scene_runtime.picture' in sex_menu
     assert '"[scene_runtime.text]"' not in sex_menu
     assert "call ShowCurrentSex" not in sex_menu
@@ -429,7 +430,7 @@ def test_melissa_intimacy_refresh_does_not_reset_arousal_or_proxy_owned_state():
         assert helper_name not in source
     assert 'Melissa.set_arousal(int(Melissa.stats.get("PussyWetStart"' not in source
     assert "player.intimacy.arousal_value()" in source
-    assert "Melissa.arousal_value()" in source
+    assert "_hse_info.arousal_value()" in source
 
 
 def test_melissa_werecat_event_labels_own_their_scenes_and_thread_advancement():

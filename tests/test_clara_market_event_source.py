@@ -316,7 +316,7 @@ def test_v73_save_migration_preserves_clara_story_positions_without_live_mirrors
         "# Saved objects must be upgraded", 1
     )[0]
 
-    assert "define currentVersion = 74" in migration
+    assert "define currentVersion = 75" in migration
     assert "if loaded_version < 74:" in migration
     assert "updateSave_V73()" in migration
     assert "mapped_num = old_num - 1 if old_num >= 4 else old_num" in block

@@ -66,7 +66,7 @@ init 6 python:
             items.append(MenuItem("Сесть с Сандрой над трактирной книгой", Call("TavernSandraLedgerScene")))
         items.extend(story_event_action_items("TavernSandraRoom"))
         if threads["sandraWeeklyEvaluation"].completed:
-            items.append(MenuItem("Уединиться с Сандрой", Call("SandraSexEngine", "sandra", "TavernSandraRoom")))
+            items.append(MenuItem("Уединиться с Сандрой", Call("HouseholdSexEngine", "sandra", "TavernSandraRoom")))
         if tavern_upstairs_can_clean_rooms():
             items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernSandraRoom", "", "")))
         items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernSandraRoom")))

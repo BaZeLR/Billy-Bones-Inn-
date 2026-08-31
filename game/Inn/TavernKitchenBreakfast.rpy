@@ -353,6 +353,22 @@ init python:
     def tavern_breakfast_tease_ready():
         return str(tavern_breakfast_tease_candidate().get("girl", "") or "") != ""
 
+    def tavern_breakfast_private_date_available(girl_name=""):
+        girl = str(girl_name or "").strip().lower()
+        if girl == "melissa":
+            return Melissa.relationship_allows("intimacy")
+        if girl == "sandra":
+            return (
+                threads["sandraWeeklyEvaluation"].completed
+                and int(Sandra.fucked_today or 0) < 2
+            )
+        if girl == "amanda":
+            return (
+                int(Amanda.fucked_today or 0) == 0
+                and Amanda.sex_offer_reaction() in (1, 4)
+            )
+        return False
+
     def tavern_breakfast_player_perk_score(npc_id=""):
         key = str(npc_id or "").strip().lower()
         if key not in ("sandra", "melissa", "amanda"):
@@ -1382,15 +1398,25 @@ label TavernKitchenBreakfastTease:
     $ player_apply_arousal_trigger("breakfast_tease", 5 + _tease_tier)
     $ _tease_info.add_arousal(3 + _tease_tier)
     $ _tease_info.change_social(corruption_delta=1)
+    $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nУже тише {} предлагает после завтрака выбраться вдвоем: можно уединиться в трактире, прогуляться к лесному озеру или, если у вас есть лошадь, прокатиться за городом.".format(people_display_name(_tease_girl))
     $ scene_runtime.location_text = scene_runtime.text
     call stat
     "[scene_runtime.text]"
     menu:
-        "Намекнуть на склад после завтрака":
+        "Предложить встретиться на складе после завтрака" if tavern_breakfast_private_date_available(_tease_girl):
             call TavernKitchenBreakfastTeasePrivate(_tease_girl, "storage")
 
-        "Намекнуть на сарай после завтрака":
+        "Предложить встретиться в сарае после завтрака" if tavern_breakfast_private_date_available(_tease_girl):
             call TavernKitchenBreakfastTeasePrivate(_tease_girl, "shed")
+
+        "Пригласить ее в свою комнату после завтрака" if tavern_breakfast_private_date_available(_tease_girl):
+            call TavernKitchenBreakfastTeasePrivate(_tease_girl, "player_room")
+
+        "Согласиться на прогулку к лесному озеру":
+            call TavernKitchenBreakfastOutdoorDate(_tease_girl, "lake")
+
+        "Согласиться на верховую прогулку" if player.horse.owns_horse():
+            call TavernKitchenBreakfastOutdoorDate(_tease_girl, "horse")
 
         "Сделать вид, что ничего не заметили":
             return
@@ -1400,11 +1426,22 @@ label TavernKitchenBreakfastTease:
 label TavernKitchenBreakfastTeasePrivate(girl_name="", place_code="storage"):
     $ renpy.dynamic("_tease_private_girl", "_tease_private_place", "_tease_private_place_where", "_tease_private_info", "_tease_private_room", "_tease_private_picture", "_tease_private_start_minutes", "_tease_private_elapsed_minutes")
     $ _tease_private_girl = str(girl_name or "").strip().lower()
-    if _tease_private_girl not in ("sandra", "amanda", "melissa") or str(place_code or "") not in ("storage", "shed"):
+    if _tease_private_girl not in ("sandra", "amanda", "melissa") or str(place_code or "") not in ("storage", "shed", "player_room"):
         return
-    $ _tease_private_room = "TavernStorage" if str(place_code or "") == "storage" else "Shed"
-    $ _tease_private_place = "кладовую" if _tease_private_room == "TavernStorage" else "сарай"
-    $ _tease_private_place_where = "кладовой" if _tease_private_room == "TavernStorage" else "сарае"
+    if not tavern_breakfast_private_date_available(_tease_private_girl):
+        return
+    if str(place_code or "") == "storage":
+        $ _tease_private_room = "TavernStorage"
+        $ _tease_private_place = "кладовую"
+        $ _tease_private_place_where = "кладовой"
+    elif str(place_code or "") == "shed":
+        $ _tease_private_room = "Shed"
+        $ _tease_private_place = "сарай"
+        $ _tease_private_place_where = "сарае"
+    else:
+        $ _tease_private_room = "TavernMyRoom"
+        $ _tease_private_place = "вашу комнату"
+        $ _tease_private_place_where = "своей комнате"
     $ _tease_private_info = people.get_info(_tease_private_girl)
     if _tease_private_info is None:
         return
@@ -1412,7 +1449,12 @@ label TavernKitchenBreakfastTeasePrivate(girl_name="", place_code="storage"):
     $ rooms.enter(_tease_private_room)
     $ _tease_private_start_minutes = int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0)
     $ main_ui_begin_native_scene_state("Свидание")
-    $ _tease_private_picture = "bg StolyarWorkshop" if _tease_private_room == "TavernStorage" else shed_picture()
+    if _tease_private_room == "TavernStorage":
+        $ _tease_private_picture = "bg StolyarWorkshop"
+    elif _tease_private_room == "Shed":
+        $ _tease_private_picture = shed_picture()
+    else:
+        $ _tease_private_picture = player_room_image_path("room")
     if str(_tease_private_picture or "").strip():
         vscene _tease_private_picture
     $ scene_runtime.text = "После завтрака вы уходите в {}. {} приходит следом, прикрывает за собой дверь и с улыбкой напоминает о вашем недавнем намеке. Теперь никто за столом не мешает вам продолжить начатый флирт.".format(_tease_private_place, people_display_name(_tease_private_girl))
@@ -1421,16 +1463,21 @@ label TavernKitchenBreakfastTeasePrivate(girl_name="", place_code="storage"):
         "Продолжить свидание":
             pass
     if _tease_private_girl == "sandra":
-        call SandraSexEngine(_tease_private_girl, _tease_private_room)
+        call HouseholdSexEngine(_tease_private_girl, _tease_private_room)
     elif _tease_private_girl == "amanda":
         call IntAmandaSex(_tease_private_girl, _tease_private_room)
     else:
-        call IntMelissaSex(_tease_private_girl, _tease_private_room)
+        call HouseholdSexEngine(_tease_private_girl, _tease_private_room)
     $ _tease_private_elapsed_minutes = int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0) - _tease_private_start_minutes
     if _tease_private_elapsed_minutes < 30:
         $ calendar_v2.advance_minutes(30 - _tease_private_elapsed_minutes)
     $ _tease_private_info.change_social(friend_delta=1, open_delta=1)
-    $ _tease_private_picture = "bg StolyarWorkshop" if _tease_private_room == "TavernStorage" else shed_picture()
+    if _tease_private_room == "TavernStorage":
+        $ _tease_private_picture = "bg StolyarWorkshop"
+    elif _tease_private_room == "Shed":
+        $ _tease_private_picture = shed_picture()
+    else:
+        $ _tease_private_picture = player_room_image_path("room")
     if str(_tease_private_picture or "").strip():
         vscene _tease_private_picture
     $ scene_runtime.text = "Свидание заканчивается без лишнего шума. {} первой возвращается к своим делам, а вы остаетесь в {}.".format(people_display_name(_tease_private_girl), _tease_private_place_where)
@@ -1442,7 +1489,55 @@ label TavernKitchenBreakfastTeasePrivate(girl_name="", place_code="storage"):
     $ main_ui_end_native_scene_state()
     if _tease_private_room == "TavernStorage":
         jump TavernStorage
-    jump Shed
+    if _tease_private_room == "Shed":
+        jump Shed
+    jump TavernMyRoom
+
+
+label TavernKitchenBreakfastOutdoorDate(girl_name="", date_code="lake"):
+    $ renpy.dynamic("_outdoor_date_girl", "_outdoor_date_info", "_outdoor_date_picture")
+    $ _outdoor_date_girl = str(girl_name or "").strip().lower()
+    if _outdoor_date_girl not in ("sandra", "amanda", "melissa") or str(date_code or "") not in ("lake", "horse"):
+        return
+    if str(date_code or "") == "horse" and not player.horse.owns_horse():
+        return
+    $ _outdoor_date_info = people.get_info(_outdoor_date_girl)
+    if _outdoor_date_info is None:
+        return
+    call TavernKitchenFinishBreakfastEvent
+    $ main_ui_begin_native_scene_state("Свидание")
+    if str(date_code or "") == "lake":
+        $ rooms.enter("ForestLake")
+        $ _outdoor_date_picture = str(rooms.get("ForestLake").bg_picture or "")
+        if str(_outdoor_date_picture or "").strip():
+            vscene _outdoor_date_picture
+        $ scene_runtime.text = "После завтрака {} сама возвращается к вашему флирту и предлагает выбраться к уединенному лесному озеру. Вы уходите из трактира вместе, добираетесь до тихого берега и наконец разговариваете без работы, посетителей и чужих ушей.".format(people_display_name(_outdoor_date_girl))
+    else:
+        $ rooms.enter("TavernStable")
+        $ _outdoor_date_picture = tavern_stable_picture()
+        if str(_outdoor_date_picture or "").strip():
+            vscene _outdoor_date_picture
+        $ scene_runtime.text = "После завтрака {} просит прокатиться вместе. Вы выводите {}, проверяете сбрую и отправляетесь по спокойной дороге за городом. Вдали от трактира разговор быстро становится теплее и откровеннее.".format(people_display_name(_outdoor_date_girl), player.horse.name)
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить прогулку":
+            pass
+    $ calendar_v2.advance_minutes(90 if str(date_code or "") == "lake" else 60)
+    $ _outdoor_date_info.mark_asked()
+    $ _outdoor_date_info.mark_talked()
+    $ _outdoor_date_info.change_social(friend_delta=2, open_delta=1)
+    $ _outdoor_date_info.add_arousal(5)
+    $ player.change_stat("fun", 8)
+    $ scene_runtime.text = "Прогулка заканчивается без спешки. {} благодарит вас за время вдвоем и дает понять, что охотно повторит такое свидание в другой день.".format(people_display_name(_outdoor_date_girl))
+    $ scene_runtime.location_text = scene_runtime.text
+    call stat
+    menu:
+        "Закончить свидание":
+            pass
+    $ main_ui_end_native_scene_state()
+    if str(date_code or "") == "lake":
+        jump ForestLake
+    jump TavernStable
 
 
 label TavernKitchenBreakfastTalkAbsent:

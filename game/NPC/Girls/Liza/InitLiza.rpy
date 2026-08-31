@@ -87,7 +87,6 @@ init python:
                 "jobwhoreTommorow": 0,
                 "jobgloryholeTommorow": 0,
             }
-            self.gift_preferences = list(LizaStaticData.gift_preferences)
             self.talk_preferences = {
                 "favorite_topics": ["clients", "sex", "pregnancy", "family", "work"],
                 "blocked_topics": ["flirt"],

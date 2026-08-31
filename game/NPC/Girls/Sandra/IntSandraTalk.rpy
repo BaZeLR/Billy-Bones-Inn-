@@ -19,6 +19,9 @@ label IntSandraTalk(girl_name="sandra"):
             "Поговорить" if social_has_visible_topics(girl_name, "talk"):
                 call SocialTalkTopicMenu(girl_name, "talk")
                 $ _sandra_repeat_menu = True
+            "Подарить маленький подарок" if social_interaction_allowed_for_npc(girl_name, "gift"):
+                call PlayerCardGiftToFixedTargetMenu(girl_name)
+                $ _sandra_repeat_menu = True
             "Попробовать помириться с мамой" if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:
                 call IntSandraReconcile(girl_name)
             "Предложить купить мамуле обновку" if sandra_dress_change_can_buy(girl_name):
@@ -28,7 +31,7 @@ label IntSandraTalk(girl_name="sandra"):
             "Спросить, что для нее сейчас важнее всего по хозяйству" if int(Sandra.asked_today or 0) == 0 and int(Sandra.rel or 0) >= 15:
                 call IntSandraHouseholdPriorities(girl_name)
             "Уединиться с Сандрой" if threads["sandraWeeklyEvaluation"].completed and str(rooms.current_code or "") == "TavernSandraRoom":
-                call SandraSexEngine(girl_name, rooms.current_code)
+                call HouseholdSexEngine(girl_name, rooms.current_code)
             "Назад":
                 $ main_ui_end_talk_state()
                 return

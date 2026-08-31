@@ -19,12 +19,17 @@ init python:
                 fullname="Сандра",
                 genitive="Сандры",
                 dative="Сандре",
+                portrait="images/sandra/portrait2.jpg",
                 description="Сандра - женщина в самом соку. У нее темные волосы, зеленые глаза и грудь размера DD.",
+                gift_preferences=["soap_001", "wild_rose_001", "lavender_001", "berries_001", "mushroom_001", "honey_comb_001", "energy_tea_001", "drink_ale_001"],
             )
             self.birth_date = {"day": 1, "period": 1, "cycle": 1066}
             self.card_image = "images/sandra/sandra_card.jpg"
             self.schedule_source = "schedules/sandra.json"
             self.image_manifest = {
+                "portrait": {
+                    "default": ["images/sandra/portrait2.jpg"],
+                },
                 "kitchen": {
                     "work": [
                         "images/sandra/tavern/kitchen_sandra_0.jpg",
@@ -45,6 +50,16 @@ init python:
                 },
                 "breakfast": {
                     "flirt": ["images/sandra/thanks/sandra_thanks.webm"],
+                },
+                "grope": {
+                    "ass_ok": ["images/sandra/thanks/player_room_1.jpg"],
+                    "tit_ok": ["images/sandra/thanks/player_room_1.jpg"],
+                    "tits_shy": ["images/sandra/portrait3.jpg"],
+                },
+                "sexy_times": {
+                    "blowjob": ["images/sandra/portrait3.jpg"],
+                    "blowjob_finish": ["images/sandra/portrait4.jpg"],
+                    "finish": ["images/sandra/thanks/player_room_sandra_1.png"],
                 },
                 "outfit_reward": {
                     "show": ["images/sandra/portrait4.jpg"],
@@ -154,7 +169,6 @@ init python:
                 "jobwhore": 0,
                 "jobgloryhole": 0,
             }
-            self.gift_preferences = ["soap_001", "wild_rose_001", "lavender_001", "berries_001", "mushroom_001", "honey_comb_001", "energy_tea_001", "drink_ale_001"]
             self.relationship_cap = 100
             self.talk_preferences = {
                 "favorite_topics": ["job_routine", "food", "money", "family_life", "fashion"],

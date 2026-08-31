@@ -178,7 +178,6 @@ init python:
                 "jobwhore": 0,
                 "jobgloryhole": 0,
             }
-            self.gift_preferences = list(AmandaStaticData.gift_preferences)
             self.relationship_cap = 100
             self.talk_preferences = {
                 "favorite_topics": ["fashion", "dances", "gossip", "money", "stories"],

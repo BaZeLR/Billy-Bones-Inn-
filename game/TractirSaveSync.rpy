@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 74
+define currentVersion = 75
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -657,6 +657,10 @@ init -100 python:
         if loaded_version < 74:
             updateSave_V73()
             loaded_version = 74
+
+        if loaded_version < 75:
+            updateSave_V74()
+            loaded_version = 75
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2471,6 +2475,14 @@ init -100 python:
             and not bool(forest_sofa.aborted)
         ):
             tavern_visit.advanceTo(6, force_active=True)
+
+    def updateSave_V74():
+        # Gift preferences now exist only on immutable PeopleData definitions.
+        # Remove obsolete runtime copies from loaded NPC objects, then register
+        # the new Sandra kitchen thread without altering completed progression.
+        for person in (Amanda, Melissa, Sandra, Becky, Georgett, Liza, Irma, Clara, Inga):
+            person.__dict__.pop("gift_preferences", None)
+        initThreads()
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

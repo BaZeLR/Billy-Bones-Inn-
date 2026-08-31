@@ -27,6 +27,7 @@ init python:
                 description="Старшей дочке вдовы Блэнкеншип в привлекательности не откажешь. Рыжая, высокая, зеленоглазая, с большой налитой грудью, Ингенборг выглядит как молодая и еще более привлекательная копия своей матушки.",
                 birth_date={"day": 1, "period": 1, "cycle": 1078},
                 portrait="images/inga/StreetSex/minet1.jpg",
+                gift_preferences=["wild_rose_001", "soap_001", "lavender_001"],
                 schedule_entries=[
                     NPCScheduleEntry(
                         location="GroceryStore",
@@ -114,7 +115,6 @@ init python:
                 "jobwhore": 0,
                 "jobgloryhole": 0,
             }
-            self.gift_preferences = ["wild_rose_001", "soap_001", "lavender_001"]
             self.wardrobe = {
                 "owned": ["openworkdress", "simplebra", "simplepanties", "redstockings", "simpleshoes"],
                 "gifted": [],

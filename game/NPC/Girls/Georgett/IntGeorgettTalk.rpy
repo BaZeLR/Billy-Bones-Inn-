@@ -25,6 +25,8 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
                 call ShowGirlCard(girl_name)
             "Болтать":
                 call IntGeorgettSmalltalk(girl_name, girl_loc)
+            "Подарить маленький подарок" if social_interaction_allowed_for_npc(girl_name, "gift"):
+                call PlayerCardGiftToFixedTargetMenu(girl_name)
             "Спросить о клиентах" if Georgett.can_ask_topic("clients"):
                 call IntGeorgettAskClients(girl_name, girl_loc)
             "Спросить о сексе" if Georgett.can_ask_topic("sex"):

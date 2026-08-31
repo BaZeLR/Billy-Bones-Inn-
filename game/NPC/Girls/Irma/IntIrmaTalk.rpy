@@ -85,6 +85,9 @@ label IntIrmaTalk:
             "Осмотреть":
                 call ShowGirlCard("irma")
 
+            "Подарить маленький подарок" if social_interaction_allowed_for_npc("irma", "gift"):
+                call PlayerCardGiftToFixedTargetMenu("irma")
+
             "Спросить, когда будет готово" if str(dress_shop.produced or "") != "":
                 $ scene_runtime.text = "Вы осведомились у Ирмы, скоро ли будет готов ваш заказ. Она ответила, что закончит работу к завтрашнему утру."
                 $ scene_runtime.location_text = scene_runtime.text

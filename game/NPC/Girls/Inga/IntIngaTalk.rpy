@@ -12,10 +12,12 @@ label IntIngaTalk(show_menu=True):
     $ main_ui_begin_talk_state("Разговор с Ингенборг", "inga")
     if str(rooms.current_code or "") == "GroceryStore":
         vscene "images/inga/StreetSex/minet1.jpg"
-    menu:
-        "Осмотреть":
-            call GirlsDesc("inga")
-        "Закончить разговор":
-            pass
-    $ main_ui_end_talk_state()
-    return
+    while True:
+        menu:
+            "Осмотреть":
+                call GirlsDesc("inga")
+            "Подарить маленький подарок" if social_interaction_allowed_for_npc("inga", "gift"):
+                call PlayerCardGiftToFixedTargetMenu("inga")
+            "Закончить разговор":
+                $ main_ui_end_talk_state()
+                return

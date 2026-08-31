@@ -177,15 +177,14 @@ init python:
         if bool(player.tavern_management.breakfast.event_active) and player.tavern_management.breakfast.present_ids is not None:
             return [str(row or "").strip().lower() for row in list(player.tavern_management.breakfast.present_ids or []) if str(row or "").strip()]
 
-        try:
-            visible_ids = set([str(row or "").strip().lower() for row in list(people.ids_at("TavernKitchen") or [])])
-        except Exception:
-            visible_ids = set()
-            for npc_id in ("sandra", "melissa", "amanda", "becky"):
-                if str(people.location(npc_id) or "") == "TavernKitchen":
-                    visible_ids.add(npc_id)
-
-        return [npc_id for npc_id in ("sandra", "melissa", "amanda", "becky") if npc_id in visible_ids]
+        attendees = [
+            npc_id
+            for npc_id in ("sandra", "melissa", "amanda")
+            if household_morning_issue_type(npc_id) == ""
+        ]
+        if str(people.location("becky") or "") == "TavernKitchen":
+            attendees.append("becky")
+        return attendees
 
     def household_breakfast_absence_lines():
         lines = []

@@ -118,6 +118,44 @@ label sandraWeeklyEvaluation_3(return_label="TavernMain"):
     return
 
 
+# One-time household conversation after Sandra accepts the player as landlord.
+# The label owns every story beat, consequence, and completion point directly.
+label story_sandra_kitchen_household_respect_0:
+    $ renpy.dynamic("_sandra_kitchen_respect_picture")
+    $ main_ui_begin_native_scene_state("Разговор на кухне")
+    show screen main_ui
+    $ _sandra_kitchen_respect_picture = SandraStaticData.image_path("kitchen", "work")
+    if str(_sandra_kitchen_respect_picture or "").strip():
+        vscene _sandra_kitchen_respect_picture
+    $ scene_runtime.text = "Едва вы входите на кухню, Аманда и Мелисса наперебой жалуются Сандре на посетителей. Одни распускают руки, другие щиплют за ягодицы и делают вид, будто монета за кружку дает им право трогать служанок."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "Сандра выслушивает их и отвечает строго: \"Внимание посетителей — часть работы в людном трактире, но терпеть всякую наглость вы не обязаны. Если кто-то переходит черту, говорите хозяину сразу, а не копите обиду и не устраивайте драку посреди зала.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "Потом Сандра поворачивается уже к девушкам: \"И еще запомните: Стефан здесь хозяин и наш домовладелец. Его надо уважать, ценить то, что он держит этот дом, и самим давать ему достаточно тепла, чтобы он не искал ее у случайных женщин на стороне. Дом держится не только на работе, но и на внимании друг к другу.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "Вы отвечаете, что подумаете, как защитить девушек от наглых рук и при этом не превратить каждый вечер в драку с посетителями. Если после происшествия кто-то из них будет по-настоящему несчастна, решение о клиенте останется за вами."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Закончить разговор":
+            pass
+    $ Sandra.change_social(friend_delta=1, open_delta=1)
+    $ Melissa.change_mana(1, "kitchen_landlord_respect")
+    $ Amanda.change_mana(1, "kitchen_landlord_respect")
+    $ calendar_v2.advance_minutes(5)
+    $ event_runtime.active_thread.complete()
+    $ main_ui_end_native_scene_state()
+    return
+
+
 label TavernSandraNightThanksScene:
     $ renpy.dynamic("_sandra_secured_future_now")
     if int(threads["sandraWeeklyEvaluation"].num or 0) != 4 or int(calendar_v2.hour or 0) < 22 or int(calendar_v2.hour or 0) > 23:
@@ -132,7 +170,7 @@ label TavernSandraNightThanksScene:
     $ Sandra.mark_talked()
     $ _sandra_secured_future_now = tractir_apply_sandra_secured_future()
     $ player.change_stat("fun", 8)
-    call SandraSexEngine("sandra", "TavernSandraRoom")
+    call HouseholdSexEngine("sandra", "TavernSandraRoom")
     $ calendar_v2.advance_minutes(30)
     if _sandra_secured_future_now:
         $ main_ui_begin_native_scene_state("Сандра")
@@ -149,101 +187,4 @@ label TavernSandraNightThanksScene:
     $ main_ui_runtime.action_title = "Комната Сандры"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
-    return
-
-
-label SandraSexEngine(girl_name="sandra", source_room="TavernSandraRoom"):
-    $ renpy.dynamic("_sandra_sex_active", "_sandra_sex_first_thanks", "_sandra_sex_finished", "_sandra_sex_picture", "_sandra_sex_unlocked")
-    $ _sandra_sex_unlocked = threads["sandraWeeklyEvaluation"].completed or int(threads["sandraWeeklyEvaluation"].num or 0) == 4
-    if not _sandra_sex_unlocked:
-        $ scene_runtime.text = "Сандра пока не готова к такой близости."
-        $ scene_runtime.location_text = scene_runtime.text
-        if str(source_room or "") == "TavernSandraRoom":
-            $ main_ui_runtime.action_title = "Комната Сандры"
-            $ main_ui_runtime.action_content = None
-            $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
-        return
-    if int(Sandra.fucked_today or 0) >= 2:
-        $ main_ui_begin_native_scene_state("Сандра")
-        $ scene_runtime.text = "Сандра останавливает вас коротким взглядом. \"На сегодня хватит. Даже свободная жизнь не отменяет ни усталости, ни завтрашней работы.\""
-        $ scene_runtime.location_text = scene_runtime.text
-        menu:
-            "Назад":
-                pass
-        $ main_ui_end_native_scene_state()
-        return
-    $ _sandra_sex_first_thanks = not threads["sandraWeeklyEvaluation"].completed and int(threads["sandraWeeklyEvaluation"].num or 0) == 4
-    $ _sandra_sex_finished = False
-    $ _sandra_sex_active = True
-    $ main_ui_begin_native_scene_state("Сандра")
-    $ _sandra_sex_picture = SandraStaticData.image_path("outfit_reward", "handjob")
-    if str(_sandra_sex_picture or "").strip():
-        $ scene_runtime.picture = _sandra_sex_picture
-        vscene scene_runtime.picture
-    if _sandra_sex_first_thanks:
-        $ scene_runtime.text = "Сандра встречает вас без обычной деловитой брони. Она закрывает дверь, коротко напоминает, что хорошая неделя в трактире заслуживает не только сухой похвалы, и сама делает шаг ближе. \"Сегодня без проповедей. Я сама решила, чего хочу.\""
-    else:
-        $ scene_runtime.text = "Сандра закрывает дверь и говорит уже без прежней неловкости: \"Если мы оба этого хотим, незачем делать вид, будто свободная постельная жизнь — преступление. Только завтра работу не проспи.\""
-    $ scene_runtime.location_text = scene_runtime.text
-    $ player.intimacy.set_arousal(player.intimacy.arousal_value())
-    $ Sandra.set_arousal(int(Sandra.sex_stat("PussyWetStart", Sandra.arousal_value() or 20) or 20))
-    $ Sandra.set_cock_position("pussy")
-    while _sandra_sex_active:
-        menu:
-            "Прижать Сандру к себе" if player.intimacy.arousal_value() < 100:
-                $ player.intimacy.add_arousal(35)
-                $ Sandra.add_arousal(35)
-                $ scene_runtime.text = "Вы притягиваете Сандру ближе. Она не прячет ни желание, ни голос и сама задает более быстрый ритм, открыто говоря, что именно ей нравится."
-
-            "Позволить Сандре вести" if player.intimacy.arousal_value() < 100:
-                $ player.intimacy.add_arousal(45)
-                $ Sandra.add_arousal(30)
-                $ scene_runtime.text = "Сандра заставляет вас лечь удобнее и садится сверху. \"Вот так. Свободная жизнь тем и хороша, что женщина тоже может прямо сказать, чего хочет,\" бросает она, не замедляясь."
-
-            "Кончить внутрь" if player.intimacy.can_cum() and player.intimacy.arousal_value() >= 100:
-                $ scene_runtime.text = "В последний момент Сандра лишь крепче прижимается к вам, позволяя кончить глубоко внутри нее. Теперь именно этот выбор может привести к беременности."
-                $ pregnancy_check(girl_name, "inside", 1, "Вы")
-                $ _sandra_sex_finished = True
-                $ _sandra_sex_active = False
-
-            "Кончить на грудь" if player.intimacy.can_cum() and player.intimacy.arousal_value() >= 100:
-                $ scene_runtime.text = "Вы выходите из Сандры в последний момент и кончаете ей на грудь. Она смотрит на следы спермы без стыда и только сухо замечает, что простыни хотя бы останутся чистыми."
-                $ pregnancy_check(girl_name, "tits", 1, "Вы")
-                $ _sandra_sex_finished = True
-                $ _sandra_sex_active = False
-
-            "Кончить на лицо" if player.intimacy.can_cum() and player.intimacy.arousal_value() >= 100:
-                $ scene_runtime.text = "Вы выходите из Сандры и кончаете ей на лицо. Она спокойно проводит пальцами по щеке и напоминает, что утром снова будет хозяйкой кухни, сколько бы свободы ни позволила себе ночью."
-                $ pregnancy_check(girl_name, "face", 1, "Вы")
-                $ _sandra_sex_finished = True
-                $ _sandra_sex_active = False
-
-            "Остановиться":
-                $ scene_runtime.text = "Вы останавливаетесь. Сандра принимает решение без обиды: свобода для нее означает и право начать, и право закончить без лишних оправданий."
-                $ _sandra_sex_active = False
-
-        if Sandra.arousal_value() >= 100:
-            $ Sandra.record_orgasm_given()
-            $ Sandra.set_arousal(20)
-            $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nСандра срывается на хриплый стон, на миг теряет свой обычный контроль, а затем требует не останавливаться."
-        $ scene_runtime.location_text = scene_runtime.text
-    $ Sandra.set_cock_position("none")
-    $ _sandra_sex_picture = SandraStaticData.image_path("outfit_reward", "handjob_finish")
-    if str(_sandra_sex_picture or "").strip():
-        $ scene_runtime.picture = _sandra_sex_picture
-        vscene scene_runtime.picture
-    $ calendar_v2.advance_minutes(30)
-    if _sandra_sex_finished:
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nПосле близости Сандра снова собирает себя в привычную строгую хозяйку, но теперь уже не притворяется, будто желание и свободная половая жизнь делают женщину хуже."
-    else:
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nСандра поправляет одежду и спокойно дает понять, что ваше решение ничего между вами не испортило."
-    $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "Закончить":
-            pass
-    $ main_ui_end_native_scene_state()
-    if str(source_room or "") == "TavernSandraRoom":
-        $ main_ui_runtime.action_title = "Комната Сандры"
-        $ main_ui_runtime.action_content = None
-        $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
     return

@@ -98,6 +98,7 @@ init -25 python:
             "day_delta_ready": day_delta_ready,
             "effective_player_exploration": effective_player_exploration,
             "household_runtime_event_seen_today": household_runtime_event_seen_today,
+            "household_morning_issue_type": household_morning_issue_type,
             "npc_relationship_level": npc_relationship_level,
             "people_to_int": people_to_int,
             "player_charisma_breakdown": player_charisma_breakdown,

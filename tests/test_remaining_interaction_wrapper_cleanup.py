@@ -209,7 +209,7 @@ def test_core_sex_action_menus_iterate_without_recursive_self_jumps():
         ("game/NPC/Girls/Amanda/IntAmandaSex.rpy", "int_amanda_sex_menu"),
         ("game/NPC/Girls/Becky/IntBeckySex.rpy", "int_becky_sex_menu"),
         ("game/NPC/Girls/Liza/IntLizaSex.rpy", "int_liza_sex_menu"),
-        ("game/NPC/Girls/Melissa/IntMelissaSex.rpy", "int_melissa_sex_menu"),
+        ("game/NPC/Girls/Melissa/IntMelissaSex.rpy", "household_sex_menu"),
         ("game/NPC/Secondary/IntEddieBeckySex.rpy", "int_eddie_becky_sex_menu"),
         ("game/NPC/Girls/Georgett/IntGeorgettSex.rpy", "GeorgettSexMenu"),
     )

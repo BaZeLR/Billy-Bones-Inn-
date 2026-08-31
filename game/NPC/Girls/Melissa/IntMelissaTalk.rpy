@@ -46,7 +46,7 @@ label IntMelissaTalk(girl_name="melissa"):
                 return
             "Попросить Мелиссу о сексуальном одолжении" if not Melissa.is_working() and Melissa.relationship_allows("intimacy") and Melissa.room_is_private(rooms.current_code):
                 $ main_ui_end_talk_state()
-                call IntMelissaSex(girl_name, rooms.current_code)
+                call HouseholdSexEngine(girl_name, rooms.current_code)
                 return
             "Попросить Мелиссу найти укромное место" if not Melissa.is_working() and Melissa.relationship_allows("intimacy") and not Melissa.room_is_private(rooms.current_code) and bool(Melissa.private_place_offer(rooms.current_code).get("ok", False)):
                 $ main_ui_end_talk_state()
@@ -99,7 +99,7 @@ label IntMelissaFindPrivatePlace(girl_name="melissa", source_room=""):
     $ Melissa.private_context_origin = str(source_room or rooms.current_code or "")
     $ scene_runtime.text = str(_melissa_private_offer.get("text", "") or "Мелисса сама находит место в стороне, где вы можете остаться без чужих взглядов.")
     $ scene_runtime.location_text = scene_runtime.text
-    call IntMelissaSex(girl_name, source_room)
+    call HouseholdSexEngine(girl_name, source_room)
     return
 
 

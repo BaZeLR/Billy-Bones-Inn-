@@ -118,7 +118,6 @@ init python:
                 "jobwhore": 0,
                 "jobgloryhole": 0,
             }
-            self.gift_preferences = list(BeckyStaticData.gift_preferences)
             self.talk_preferences = {
                 "favorite_topics": ["family", "husband", "eddie", "inga", "sherwood"],
                 "blocked_topics": [],

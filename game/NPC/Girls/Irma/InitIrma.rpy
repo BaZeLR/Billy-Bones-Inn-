@@ -146,7 +146,6 @@ init python:
                 "jobwhore": 0,
                 "jobgloryhole": 0,
             }
-            self.gift_preferences = list(IrmaStaticData.gift_preferences)
             self.talk_preferences = {
                 "favorite_topics": ["fashion", "tailoring", "family", "secrets", "work"],
                 "blocked_topics": [],

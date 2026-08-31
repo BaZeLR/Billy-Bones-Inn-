@@ -183,5 +183,5 @@ def test_protection_lesson_updates_domain_owners_without_replacing_melissa_sex_r
     assert "clara_anal_training" not in runtime
     assert "clara_anal_training" not in labels
     assert "clara_anal_training" not in melissa_sex
-    assert '"Войти сзади" if _ims_full_engine and player.intimacy.came_today' in melissa_sex
+    assert '"Войти сзади" if _hse_full_engine and player.intimacy.can_cum()' in melissa_sex
     assert 'threads["claraTavernVisit"].completed' in melissa_sex

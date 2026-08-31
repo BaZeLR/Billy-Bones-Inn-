@@ -36,6 +36,8 @@ label IntBeckyTalk(girl_name="becky"):
                 call ShowGirlCard(_becky_name)
             "Поболтать со вдовой Блэнкеншип о разной фигне":
                 call _int_becky_talk_smalltalk(_becky_name)
+            "Подарить маленький подарок" if social_interaction_allowed_for_npc(_becky_name, "gift"):
+                call PlayerCardGiftToFixedTargetMenu(_becky_name)
             "Поболтать с Бекки о более личных вещах" if Becky.rel >= 3:
                 call _int_becky_talk_personal(_becky_name)
             "Поговорить с Бекки об одежде" if Becky.dress_change_has_options(_becky_name):

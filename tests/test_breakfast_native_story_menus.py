@@ -124,18 +124,24 @@ def test_breakfast_flirts_cover_household_girls_and_complete_at_chosen_place():
     assert "_tease_private_unlocked" not in tease
     assert 'call TavernKitchenBreakfastTeasePrivate(_tease_girl, "storage")' in tease
     assert 'call TavernKitchenBreakfastTeasePrivate(_tease_girl, "shed")' in tease
+    assert 'call TavernKitchenBreakfastTeasePrivate(_tease_girl, "player_room")' in tease
+    assert 'call TavernKitchenBreakfastOutdoorDate(_tease_girl, "lake")' in tease
+    assert 'call TavernKitchenBreakfastOutdoorDate(_tease_girl, "horse")' in tease
     assert "self.breakfast_tease_day = -1" in sandra_source
     assert '"flirt": ["images/sandra/thanks/sandra_thanks.webm"]' in sandra_source
     assert 'return SandraStaticData.image_path("breakfast", "flirt")' in source
     assert 'if not hasattr(Sandra, "breakfast_tease_day"):' in migration_source
     assert "Sandra.breakfast_tease_day = -1" in migration_source
-    assert '"TavernStorage" if str(place_code or "") == "storage" else "Shed"' in private_date
+    assert '$ _tease_private_room = "TavernStorage"' in private_date
+    assert '$ _tease_private_room = "Shed"' in private_date
+    assert '$ _tease_private_room = "TavernMyRoom"' in private_date
     assert "call TavernKitchenFinishBreakfastEvent" in private_date
-    assert "call SandraSexEngine(_tease_private_girl, _tease_private_room)" in private_date
+    assert private_date.count("call HouseholdSexEngine(_tease_private_girl, _tease_private_room)") == 2
     assert "call IntAmandaSex(_tease_private_girl, _tease_private_room)" in private_date
-    assert "call IntMelissaSex(_tease_private_girl, _tease_private_room)" in private_date
     assert "if _tease_private_elapsed_minutes < 30:" in private_date
     assert "calendar_v2.advance_minutes(30 - _tease_private_elapsed_minutes)" in private_date
     assert '"Продолжить свидание":' in private_date
     assert '"Закончить свидание":' in private_date
+    assert 'label TavernKitchenBreakfastOutdoorDate(girl_name="", date_code="lake"):' in private_date
+    assert 'player.horse.owns_horse()' in private_date
     assert "daily_events" not in private_date

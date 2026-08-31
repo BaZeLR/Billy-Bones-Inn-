@@ -23,10 +23,10 @@ def test_sandra_room_preserves_reputation_events_search_objects_and_exits():
         'household_room_issue_action_specs("sandra")',
         'Call("TavernSandraLedgerScene")',
         'story_event_action_items("TavernSandraRoom")',
-        'Call("SandraSexEngine", "sandra", "TavernSandraRoom")',
+        'Call("HouseholdSexEngine", "sandra", "TavernSandraRoom")',
         'Call("UpstairsRoomSearch", "TavernSandraRoom")',
         "rooms.get(\"TavernSandraRoom\").visible_game_items()",
         "rooms.get(\"TavernSandraRoom\").visible_exits()",
     ):
         assert token in ROOM
-    assert EVENTS.count("tavern_sandra_room_action_items()") == 4
+    assert EVENTS.count("tavern_sandra_room_action_items()") == 2

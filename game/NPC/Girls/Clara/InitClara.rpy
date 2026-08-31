@@ -15,6 +15,7 @@ init python:
                 genitive="Клариссы",
                 dative="Клариссе",
                 description="Кларисса, старшая дочь мессира Легаре, молодая девушка из зажиточного купеческого дома. Это очень приветливая и игривая блондинка чуть младше вас, с большими искрящимися серыми глазами, пухлыми губами и удивительно легкой, грациозной походкой. На ней обычно свободное длинное повседневное платье из легкой ткани, похожее на удобный сарафан; на ярком свету ткань кажется чуть прозрачной. Грудь Клариссы размера B мягко и соблазнительно колышется при каждом движении. От нее пахнет лавандой и дорогими модными духами.",
+                gift_preferences=["dress_thiefdress", "soap_001", "special_mushroom_001", "dress_simplebra", "dress_simplepanties", "dress_blackstockings", "dress_redstockings", "libido_tincture_001", "werecat_caught_cat"],
             )
             self.birth_date = {"day":20, "period":11, "cycle": 1081}
             self.card_image = "images/clara/portrait1.jpg"
@@ -100,17 +101,6 @@ init python:
                 "jobwhore": 0,
                 "jobgloryhole": 0,
             }
-            self.gift_preferences = [
-                "dress_thiefdress",
-                "soap_001",
-                "special_mushroom_001",
-                "dress_simplebra",
-                "dress_simplepanties",
-                "dress_blackstockings",
-                "dress_redstockings",
-                "libido_tincture_001",
-                "werecat_caught_cat",
-            ]
             self.relationship_cap = 100
             self.talk_preferences = {
                 "favorite_topics": ["fashion", "stories", "gossip", "money", "family_life"],
