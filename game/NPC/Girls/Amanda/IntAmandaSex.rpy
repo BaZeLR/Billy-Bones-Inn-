@@ -26,21 +26,36 @@ init python:
         return 0
 
 label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
-    $ renpy.dynamic("_amanda_cumpussy_pic", "_amanda_naked_pic", "_was_fucking_amanda", "_amanda_street_fuck_pic", "_amanda_room_fuck_pic", "tmpCumInside", "CurAmandaOrgasmCount", "_cametoday", "_cancumdaily")
+    $ renpy.dynamic("_amanda_cumpussy_pic", "_amanda_naked_pic", "_was_fucking_amanda", "_amanda_street_fuck_pic", "_amanda_room_fuck_pic", "tmpCumInside", "CurAmandaOrgasmCount", "_cametoday", "_cancumdaily", "_ias_started_native_scene", "_ias_parent_title", "_ias_text_parts", "_ias_scene_active")
     python:
         Amanda.ensure_sex_state()
         CurAmandaOrgasmCount = Amanda.sex_stat("orgasms_given", 0)
+        _ias_started_native_scene = main_ui_runtime.scene_origin is None
+        _ias_parent_title = str(main_ui_runtime.action_title or "")
+        _ias_scene_active = True
+    $ main_ui_begin_native_scene_state("Аманда")
     call ShowAmandaPortrait
+    $ scene_runtime.text = str(Amanda.data.description or "")
+    $ scene_runtime.location_text = scene_runtime.text
 
     label int_amanda_sex_menu:
         while True:
+            if not _ias_scene_active:
+                if _ias_started_native_scene:
+                    $ main_ui_end_native_scene_state()
+                else:
+                    $ main_ui_runtime.mode = "event"
+                    $ main_ui_runtime.action_title = _ias_parent_title
+                    $ main_ui_restart_interaction()
+                return
             python:
                 _cametoday = int(player.intimacy.came_today or 0)
                 _cancumdaily = max(1, int(player.intimacy.can_cum_daily or 1))
 
             menu:
                 "Осмотреть":
-                    call GirlsDesc(GirlNameASDS)
+                    $ scene_runtime.text = str(Amanda.data.description or "")
+                    $ scene_runtime.location_text = scene_runtime.text
 
                 "Снять блузку" if Amanda.clothing_layer("top") != "" and not Amanda.sex_busy() and GirlModeASDS != "minet":
                     if Amanda.clothing_slut("top") >= 4 or Amanda.layer_raised("top"):
@@ -150,273 +165,313 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     call ShowAmandaPortrait
 
                 "Целовать" if not Amanda.sex_busy():
-                    "[people_display_name(GirlNameASDS)] прижимается к вам всем телом и со всей страстью молодости целует вас отнюдь не семейным поцелуем."
+                    $ _ias_text_parts = ["[people_display_name(GirlNameASDS)] прижимается к вам всем телом и со всей страстью молодости целует вас отнюдь не семейным поцелуем."]
                     if Amanda.cum_state("cum_face_you") > 0:
-                        "На язык вам попадают капли вашего семени, которым вы обкончали девушку раньше."
+                        $ _ias_text_parts.append("На язык вам попадают капли вашего семени, которым вы обкончали девушку раньше.")
                     elif Amanda.cum_state("cum_face_others") > 0:
-                        "Вы чувствуете солоноватый привкус чужой спермы. Похоже, Аманда уже успела сегодня у кого-то отсосать!"
+                        $ _ias_text_parts.append("Вы чувствуете солоноватый привкус чужой спермы. Похоже, Аманда уже успела сегодня у кого-то отсосать!")
                     $ _ias_inc_arousal(GirlNameASDS, 14)
                     if _ias_arousal("You") < 50:
                         $ _ias_inc_arousal("You", 9)
-                    call ShowCurrentSex(GirlNameASDS)
                     if GirlLocASDS != "street":
                         if Amanda.tits_visible() and Amanda.pussy_visible():
-                            call ShowImage(GirlNameASDS, "sexroom", "kissnaked")
+                            $ show_image(GirlNameASDS, "sexroom", "kissnaked")
                         else:
-                            call ShowImage(GirlNameASDS, "sexroom", "kiss")
+                            $ show_image(GirlNameASDS, "sexroom", "kiss")
+                    $ scene_runtime.text = "\n\n".join([renpy.substitute(_ias_line) for _ias_line in _ias_text_parts])
+                    $ scene_runtime.location_text = scene_runtime.text
+                    if str(scene_runtime.picture or "").strip():
+                        vscene scene_runtime.picture
+                    call ShowCurrentSex(GirlNameASDS)
 
                 "Лапать" if not Amanda.sex_busy():
+                    $ _ias_text_parts = []
                     if not Amanda.tits_visible():
                         if Amanda.clothing_slut("top") == 3 and Amanda.clothing_layer("bra") == "":
-                            "Вы начали поглаживать маленькую грудь [people_name(GirlNameASDS, 'genitive')] через тонкую ткань ее блузки."
+                            $ _ias_text_parts.append("Вы начали поглаживать маленькую грудь [people_name(GirlNameASDS, 'genitive')] через тонкую ткань ее блузки.")
                         elif Amanda.clothing_slut("top") >= 4 and Amanda.clothing_layer("bra") == "":
-                            "Ваши руки забрались под декольте Аманды и, не обнаружив там лифчика, начали гладить ее небольшие груди и теребить напрягшиеся сосочки."
+                            $ _ias_text_parts.append("Ваши руки забрались под декольте Аманды и, не обнаружив там лифчика, начали гладить ее небольшие груди и теребить напрягшиеся сосочки.")
                         elif Amanda.clothing_slut("top") >= 4 and Amanda.clothing_layer("bra") != "":
-                            "Ваши руки забрались под декольте [people_name(GirlNameASDS, 'genitive')] и начали мять ее сисечки через лифчик."
+                            $ _ias_text_parts.append("Ваши руки забрались под декольте [people_name(GirlNameASDS, 'genitive')] и начали мять ее сисечки через лифчик.")
                         else:
-                            "Скромное одеяние девушки не отвратило вас от пошлых мыслей, вы начали гладить и мять маленькие сисечки [people_name(GirlNameASDS, 'genitive')] и через него."
+                            $ _ias_text_parts.append("Скромное одеяние девушки не отвратило вас от пошлых мыслей, вы начали гладить и мять маленькие сисечки [people_name(GirlNameASDS, 'genitive')] и через него.")
                     else:
                         if Amanda.cum_state("cum_tits_you") > 0:
-                            "Вы припали к маленьким грудям [people_name(GirlNameASDS, 'genitive')], благо они помещались у вас во рту почти целиком. На языке вы почувствовали солоноватый привкус своей спермы."
+                            $ _ias_text_parts.append("Вы припали к маленьким грудям [people_name(GirlNameASDS, 'genitive')], благо они помещались у вас во рту почти целиком. На языке вы почувствовали солоноватый привкус своей спермы.")
                         elif Amanda.cum_state("cum_tits_others") > 0:
-                            "Вы припали к маленьким грудям [people_name(GirlNameASDS, 'genitive')], благо они помещались у вас во рту почти целиком. На языке вы почувствовали солоноватый привкус чьей-то спермы."
+                            $ _ias_text_parts.append("Вы припали к маленьким грудям [people_name(GirlNameASDS, 'genitive')], благо они помещались у вас во рту почти целиком. На языке вы почувствовали солоноватый привкус чьей-то спермы.")
                         else:
-                            "Вы припали к маленьким грудям [people_name(GirlNameASDS, 'genitive')], благо они помещались у вас во рту почти целиком."
+                            $ _ias_text_parts.append("Вы припали к маленьким грудям [people_name(GirlNameASDS, 'genitive')], благо они помещались у вас во рту почти целиком.")
 
                     if Amanda.pussy_visible():
-                        "Вы медленно опустили руку вниз, к вульве Аманды. Она вздрогнула от вашего прикосновения. На этом вы не остановились, запустив пару пальцев внутрь текущей девушки."
+                        $ _ias_text_parts.append("Вы медленно опустили руку вниз, к вульве Аманды. Она вздрогнула от вашего прикосновения. На этом вы не остановились, запустив пару пальцев внутрь текущей девушки.")
                     else:
                         if Amanda.layer_raised("bottom") == 0 and Amanda.clothing_layer("bottom") != "":
                             if Amanda.clothing_slut("bottom") >= 4:
                                 if Amanda.clothing_layer("panties") != "":
-                                    "Вы сунули руку под короткую юбчонку Аманды и начали натирать ее киску сквозь панталончики."
+                                    $ _ias_text_parts.append("Вы сунули руку под короткую юбчонку Аманды и начали натирать ее киску сквозь панталончики.")
                                 else:
-                                    "Вы сунули руку под короткую юбчонку Аманды и пролезли ловким пальчиком в ее не стесненную нижним бельем киску."
+                                    $ _ias_text_parts.append("Вы сунули руку под короткую юбчонку Аманды и пролезли ловким пальчиком в ее не стесненную нижним бельем киску.")
                             else:
                                 if Amanda.clothing_layer("panties") != "":
-                                    "Вы наклонились дабы залезть шаловливыми ручонками под длинную юбку Аманды. На этом вы не остановились, а стали потихоньку двигаться наверх, к заветному месту и начали натирать ее киску сквозь панталончики."
+                                    $ _ias_text_parts.append("Вы наклонились дабы залезть шаловливыми ручонками под длинную юбку Аманды. На этом вы не остановились, а стали потихоньку двигаться наверх, к заветному месту и начали натирать ее киску сквозь панталончики.")
                                 else:
-                                    "Вы наклонились дабы залезть шаловливыми ручонками под длинную юбку Аманды. На этом вы не остановились, а стали потихоньку двигаться наверх, к заветному месту и пролезли ловким пальчиком в ее не стесненную нижним бельем киску."
+                                    $ _ias_text_parts.append("Вы наклонились дабы залезть шаловливыми ручонками под длинную юбку Аманды. На этом вы не остановились, а стали потихоньку двигаться наверх, к заветному месту и пролезли ловким пальчиком в ее не стесненную нижним бельем киску.")
                         else:
-                            "Вы начали натирать киску Аманды сквозь панталончики."
+                            $ _ias_text_parts.append("Вы начали натирать киску Аманды сквозь панталончики.")
                     if Amanda.clothing_layer("panties") == "":
                         if Amanda.cum_state("cum_inside_you") > 0:
-                            "Вдруг вы почувствовали свою сперму в пещерке [people_name(GirlNameASDS, 'genitive')]."
+                            $ _ias_text_parts.append("Вдруг вы почувствовали свою сперму в пещерке [people_name(GirlNameASDS, 'genitive')].")
                         elif Amanda.cum_state("cum_inside_others") > 0:
-                            "Ваши пальцы легко заскользили по пещерке [people_name(GirlNameASDS, 'genitive')]: похоже кто-то уже кончил в нее."
+                            $ _ias_text_parts.append("Ваши пальцы легко заскользили по пещерке [people_name(GirlNameASDS, 'genitive')]: похоже кто-то уже кончил в нее.")
                     $ _ias_inc_arousal(GirlNameASDS, 12)
-                    call ShowCurrentSex(GirlNameASDS)
                     if GirlLocASDS != "street":
                         if Amanda.tits_visible() and Amanda.pussy_visible():
-                            call ShowImage(GirlNameASDS, "sexroom", "grope2")
+                            $ show_image(GirlNameASDS, "sexroom", "grope2")
                         elif Amanda.pussy_visible():
-                            call ShowImage(GirlNameASDS, "sexroom", "grope1")
+                            $ show_image(GirlNameASDS, "sexroom", "grope1")
+                    $ scene_runtime.text = "\n\n".join([renpy.substitute(_ias_line) for _ias_line in _ias_text_parts])
+                    $ scene_runtime.location_text = scene_runtime.text
+                    if str(scene_runtime.picture or "").strip():
+                        vscene scene_runtime.picture
+                    call ShowCurrentSex(GirlNameASDS)
 
                 "Лизать киску" if Amanda.pussy_visible() and not Amanda.sex_busy() and GirlModeASDS != "minet":
-                    "Вы пролезли между раздвинутых ножек [people_name(GirlNameASDS, 'genitive')] и начали делать Аманде куни. Это пришлось ей по душе и по кое-чему еще. [people_display_name(GirlNameASDS)] откинулась назад и сладко стонет от ваших ласк."
+                    $ _ias_text_parts = ["Вы пролезли между раздвинутых ножек [people_name(GirlNameASDS, 'genitive')] и начали делать Аманде куни. Это пришлось ей по душе и по кое-чему еще. [people_display_name(GirlNameASDS)] откинулась назад и сладко стонет от ваших ласк."]
                     if Amanda.cum_state("cum_inside_you") > 0:
-                        "Ну а вы ощущаете привкус собственной спермы, медленно вытекающей из ее влагалища."
+                        $ _ias_text_parts.append("Ну а вы ощущаете привкус собственной спермы, медленно вытекающей из ее влагалища.")
                     elif Amanda.cum_state("cum_inside_others") > 0:
-                        "Ну а вы ощущаете привкус чьей-то спермы, медленно вытекающей из ее влагалища. Похоже, Аманда уже успела сегодня кому-то дать."
+                        $ _ias_text_parts.append("Ну а вы ощущаете привкус чьей-то спермы, медленно вытекающей из ее влагалища. Похоже, Аманда уже успела сегодня кому-то дать.")
                     $ Amanda.record_lick_pussy()
                     if Amanda.lick_pussy_count() == 6:
-                        "\"Стефанчик, приятно-то как!\", смеясь говорит [people_display_name(GirlNameASDS)], \"где это с кем это ты так научился? Впрочем не важно, эх, приятно-то как!\""
+                        $ _ias_text_parts.append('"Стефанчик, приятно-то как!", смеясь говорит [people_display_name(GirlNameASDS)], "где это с кем это ты так научился? Впрочем не важно, эх, приятно-то как!"')
                         $ Amanda.change_social(friend_delta=1)
                     $ _ias_inc_arousal(GirlNameASDS, 25)
-                    call ShowCurrentSex(GirlNameASDS)
                     if GirlLocASDS != "street":
-                        call ShowImage(GirlNameASDS, "sexroom", "cuni")
+                        $ show_image(GirlNameASDS, "sexroom", "cuni")
+                    $ scene_runtime.text = "\n\n".join([renpy.substitute(_ias_line) for _ias_line in _ias_text_parts])
+                    $ scene_runtime.location_text = scene_runtime.text
+                    if str(scene_runtime.picture or "").strip():
+                        vscene scene_runtime.picture
+                    call ShowCurrentSex(GirlNameASDS)
 
                 "Минет" if _cametoday < _cancumdaily and not Amanda.sex_busy():
+                    $ _ias_text_parts = []
                     if GirlLocASDS == "street":
                         if Amanda.cock_in("mouth"):
-                            "[people_display_name(GirlNameASDS)], не забывая посматривать по сторонам, продолжает."
+                            $ _ias_text_parts.append("[people_display_name(GirlNameASDS)], не забывая посматривать по сторонам, продолжает.")
                         else:
-                            "Вы расстегнули штаны. [people_display_name(GirlNameASDS)] метнула взгляд к выходу из переулка, убедилась что никого нет, опустилась перед вами на коленки и стала."
+                            $ _ias_text_parts.append("Вы расстегнули штаны. [people_display_name(GirlNameASDS)] метнула взгляд к выходу из переулка, убедилась что никого нет, опустилась перед вами на коленки и стала.")
                     elif GirlLocASDS == "kitchen":
                         if Amanda.cock_in("mouth"):
-                            "Спрятавшись с вами в укромном углу кухни, [people_display_name(GirlNameASDS)] продолжает возвращать обещанную услугу."
+                            $ _ias_text_parts.append("Спрятавшись с вами в укромном углу кухни, [people_display_name(GirlNameASDS)] продолжает возвращать обещанную услугу.")
                         else:
-                            "Вы вместе отходите в укромный угол кухни. [people_display_name(GirlNameASDS)] еще раз убеждается, что никто не смотрит, опускается перед вами на колени и принимается возвращать обещанную услугу."
+                            $ _ias_text_parts.append("Вы вместе отходите в укромный угол кухни. [people_display_name(GirlNameASDS)] еще раз убеждается, что никто не смотрит, опускается перед вами на колени и принимается возвращать обещанную услугу.")
                     else:
                         if Amanda.cock_in("mouth"):
-                            "Вы расселись на кровати и ловите кайф, в то время как [people_display_name(GirlNameASDS)] стоит перед вами на коленях и продолжает."
+                            $ _ias_text_parts.append("Вы расселись на кровати и ловите кайф, в то время как [people_display_name(GirlNameASDS)] стоит перед вами на коленях и продолжает.")
                         else:
-                            "Вы уселись поудобней на кровати и расстегнули штаны. Умненькая [people_display_name(GirlNameASDS)] сразу поняла что от нее требуется. Сестричка слезла с кровати, опустилась на колени и стала."
+                            $ _ias_text_parts.append("Вы уселись поудобней на кровати и расстегнули штаны. Умненькая [people_display_name(GirlNameASDS)] сразу поняла что от нее требуется. Сестричка слезла с кровати, опустилась на колени и стала.")
                     if _ias_arousal("You") < 20:
-                        "Облизывать ваш вялый член."
+                        $ _ias_text_parts.append("Облизывать ваш вялый член.")
                     elif _ias_arousal("You") < 40:
-                        "Облизывать головку вашего напрягшегося члена."
+                        $ _ias_text_parts.append("Облизывать головку вашего напрягшегося члена.")
                     elif Amanda.corruption < 40:
-                        "Неумело, но с энтузиазмом сосать ваш член."
+                        $ _ias_text_parts.append("Неумело, но с энтузиазмом сосать ваш член.")
                     elif _ias_arousal("You") < 60:
-                        "Умело сосать ваш член."
+                        $ _ias_text_parts.append("Умело сосать ваш член.")
                     else:
-                        "Заглатывать ваш член по самые яйца."
+                        $ _ias_text_parts.append("Заглатывать ваш член по самые яйца.")
                     $ Amanda.set_cock_position("mouth")
                     if Amanda.corruption < 40:
                         $ _ias_inc_arousal("You", 18)
                     else:
                         $ _ias_inc_arousal("You", 22)
                     $ Amanda.set_var_int("suckyou", 1)
-                    call ShowCurrentSex(GirlNameASDS)
                     if GirlLocASDS == "street":
                         if _ias_arousal("You") < 20:
-                            call ShowImage(GirlNameASDS, "sexafterdance", "minet1")
+                            $ show_image(GirlNameASDS, "sexafterdance", "minet1")
                         elif _ias_arousal("You") < 40:
-                            call ShowImage(GirlNameASDS, "sexafterdance", "minet2")
+                            $ show_image(GirlNameASDS, "sexafterdance", "minet2")
                         elif Amanda.corruption < 40:
-                            call ShowImage(GirlNameASDS, "sexafterdance", "minet3")
+                            $ show_image(GirlNameASDS, "sexafterdance", "minet3")
                         elif _ias_arousal("You") < 60:
-                            call ShowImage(GirlNameASDS, "sexafterdance", "minet4")
+                            $ show_image(GirlNameASDS, "sexafterdance", "minet4")
                         else:
-                            call ShowImage(GirlNameASDS, "sexafterdance", "minet5")
+                            $ show_image(GirlNameASDS, "sexafterdance", "minet5")
                     else:
-                        call ShowImageSeq(GirlNameASDS, "sexroom", "minet", 12)
+                        $ show_image_seq(GirlNameASDS, "sexroom", "minet", 12)
+                    $ scene_runtime.text = "\n\n".join([renpy.substitute(_ias_line) for _ias_line in _ias_text_parts])
+                    $ scene_runtime.location_text = scene_runtime.text
+                    if str(scene_runtime.picture or "").strip():
+                        vscene scene_runtime.picture
+                    call ShowCurrentSex(GirlNameASDS)
 
                 "Трахать" if _cametoday < _cancumdaily and not Amanda.sex_busy() and _ias_arousal("You") >= 20 and _ias_arousal(GirlNameASDS) >= 20 and Amanda.pussy_visible() and not Amanda.cock_in("pussy", "eddie") and GirlModeASDS != "minet":
                     $ _was_fucking_amanda = int(Amanda.cock_in("pussy") or 0)
+                    $ _ias_text_parts = []
                     if GirlLocASDS == "street":
                         if Amanda.pregnancy_days() < 130:
                             if _was_fucking_amanda == 0:
-                                "Вы посмотрели Аманде прямо в глаза и, убедившись что она вас поняла, перевели взгляд на своего стоящего колом дружка. Как загипнотизированная [people_display_name(GirlNameASDS)] последовала своим взглядом за вашим. Решив что медлить дальше не имеет смысла, вы притянули девушку к себе, крепко ее поцеловав, а затем подхватили ее и насадили прямо на свой член. [people_display_name(GirlNameASDS)] слегка охнула, обхватила вас за шею и сжала ногами."
+                                $ _ias_text_parts.append("Вы посмотрели Аманде прямо в глаза и, убедившись что она вас поняла, перевели взгляд на своего стоящего колом дружка. Как загипнотизированная [people_display_name(GirlNameASDS)] последовала своим взглядом за вашим. Решив что медлить дальше не имеет смысла, вы притянули девушку к себе, крепко ее поцеловав, а затем подхватили ее и насадили прямо на свой член. [people_display_name(GirlNameASDS)] слегка охнула, обхватила вас за шею и сжала ногами.")
                             else:
-                                "Вы стоите в переулке и сношаете на весу свою блудливую любовницу. Слава Ильматеру, она стройная и легкая, тростиночка ваша. И вы, и она, время от времени оглядываетесь по сторонам, но, к вашему счастью, никто сюда не идет. Впрочем, даже если кто вас и засечет, уличным трахом в Коитополисе никого не удивить. Ваша поза позволяет загонять вам свой член в тесное влагалище Аманды по самые яйца, почти доставая до матки."
+                                $ _ias_text_parts.append("Вы стоите в переулке и сношаете на весу свою блудливую любовницу. Слава Ильматеру, она стройная и легкая, тростиночка ваша. И вы, и она, время от времени оглядываетесь по сторонам, но, к вашему счастью, никто сюда не идет. Впрочем, даже если кто вас и засечет, уличным трахом в Коитополисе никого не удивить. Ваша поза позволяет загонять вам свой член в тесное влагалище Аманды по самые яйца, почти доставая до матки.")
                         else:
                             if _was_fucking_amanda == 0:
-                                "На ваше счастье в подворотне нашлась какая-то тележка, типа той на которой в ваш трактир привозили заказы. Быстро сориентировавшись в обстановке вы уложили свою залетную красотку на эту телегу пузом вверх и, закинув ее ножки себе на плечи, начали сношать девицу. Впрочем [people_display_name(GirlNameASDS)] быстро устала держать ноги на весу и вам пришлось поменять позу, дав Аманде встать и прислониться к пресловутой тележке."
+                                $ _ias_text_parts.append("На ваше счастье в подворотне нашлась какая-то тележка, типа той на которой в ваш трактир привозили заказы. Быстро сориентировавшись в обстановке вы уложили свою залетную красотку на эту телегу пузом вверх и, закинув ее ножки себе на плечи, начали сношать девицу. Впрочем [people_display_name(GirlNameASDS)] быстро устала держать ноги на весу и вам пришлось поменять позу, дав Аманде встать и прислониться к пресловутой тележке.")
                             else:
-                                "Маленький переулок стал весьма шумным местом - ваша беременная подруга стоит облокотившись на какую-то телегу, а вы трахаете ее сзади. [people_display_name(GirlNameASDS)] уже не сдерживает стоны, но вроде пока к вам никто еще не заглянул."
+                                $ _ias_text_parts.append("Маленький переулок стал весьма шумным местом - ваша беременная подруга стоит облокотившись на какую-то телегу, а вы трахаете ее сзади. [people_display_name(GirlNameASDS)] уже не сдерживает стоны, но вроде пока к вам никто еще не заглянул.")
                                 if Amanda.pregnancy_days() > 120:
-                                    "Вы чувствуете как ребенок в животике у маленькой [people_name(GirlNameASDS, 'genitive')] двигается каждый раз когда ваш член входит в нее."
+                                    $ _ias_text_parts.append("Вы чувствуете как ребенок в животике у маленькой [people_name(GirlNameASDS, 'genitive')] двигается каждый раз когда ваш член входит в нее.")
                     else:
                         if _was_fucking_amanda == 0:
-                            "Бесстыжая [people_display_name(GirlNameASDS)] откинулась на кровати, задрав ножки и открыв свою киску вашим нескромным взглядам. Решив не пренебрегать таким приглашением вы нацелили свой член на вход в ее пещерку. Найдя заветную дырочку вы легко проскользнули в мокренькую Аманду."
+                            $ _ias_text_parts.append("Бесстыжая [people_display_name(GirlNameASDS)] откинулась на кровати, задрав ножки и открыв свою киску вашим нескромным взглядам. Решив не пренебрегать таким приглашением вы нацелили свой член на вход в ее пещерку. Найдя заветную дырочку вы легко проскользнули в мокренькую Аманду.")
                         else:
-                            "Вы имеете свою не слишком целомудренную любовницу на ее собственной кровати. Ее ножки красиво обрамляют ваши плечи, а удобная поза позволяет вам загонять свой член в нее по самые яйца."
+                            $ _ias_text_parts.append("Вы имеете свою не слишком целомудренную любовницу на ее собственной кровати. Ее ножки красиво обрамляют ваши плечи, а удобная поза позволяет вам загонять свой член в нее по самые яйца.")
                             if Amanda.pregnancy_days() > 120:
-                                "Руками вы то теребите [people_name(GirlNameASDS, 'dative')] клитор, то поглаживаете пузатый живот который та себе нагуляла."
+                                $ _ias_text_parts.append("Руками вы то теребите [people_name(GirlNameASDS, 'dative')] клитор, то поглаживаете пузатый живот который та себе нагуляла.")
                             else:
-                                "Руками вы то теребите [people_name(GirlNameASDS, 'dative')] клитор, то ласкаете ее груди."
+                                $ _ias_text_parts.append("Руками вы то теребите [people_name(GirlNameASDS, 'dative')] клитор, то ласкаете ее груди.")
                     $ Amanda.set_cock_position("pussy")
                     $ _ias_inc_arousal("You", 25)
                     $ _ias_inc_arousal(GirlNameASDS, 20)
                     $ Amanda.set_var_int("fuckyou", 1)
                     if Amanda.var_int("knownotvirgin", 0) == 0 and Amanda.sex_stat("virginity", True) == False:
-                        "Кстати, вы легко и без препятствий вошли в Аманду. Похоже, она уже не девочка. Может стоит потом ее об этом расспросить."
+                        $ _ias_text_parts.append("Кстати, вы легко и без препятствий вошли в Аманду. Похоже, она уже не девочка. Может стоит потом ее об этом расспросить.")
                         $ Amanda.set_var_int("knownotvirgin", 1)
                     if Amanda.sex_stat("virginity", True):
                         $ Amanda.set_sex_stat("virginity", False)
                         $ Amanda.set_var_int("knownotvirgin", 1)
-                    call ShowCurrentSex(GirlNameASDS)
                     if GirlLocASDS == "street":
                         if Amanda.pregnancy_days() < 130:
                             $ _amanda_street_fuck_pic = "fuck" + str(procedural_randint(1, 4, key="procedural:NPC/Girls/Amanda/IntAmandaSex.rpy:procedural_randint:367:1"))
-                            call ShowImage(GirlNameASDS, "sexafterdance", _amanda_street_fuck_pic)
+                            $ show_image(GirlNameASDS, "sexafterdance", _amanda_street_fuck_pic)
                         else:
                             if _was_fucking_amanda == 0:
-                                call ShowImage(GirlNameASDS, "sexafterdance", "fuckarba1")
+                                $ show_image(GirlNameASDS, "sexafterdance", "fuckarba1")
                             else:
-                                call ShowImage(GirlNameASDS, "sexafterdance", "fuckarba2")
+                                $ show_image(GirlNameASDS, "sexafterdance", "fuckarba2")
                     else:
                         if _was_fucking_amanda == 1:
                             $ _amanda_room_fuck_pic = "fuck" + str(procedural_randint(1, 6, key="procedural:NPC/Girls/Amanda/IntAmandaSex.rpy:procedural_randint:376:2"))
-                            call ShowImage(GirlNameASDS, "sexroom", _amanda_room_fuck_pic)
+                            $ show_image(GirlNameASDS, "sexroom", _amanda_room_fuck_pic)
                         else:
-                            call ShowImage(GirlNameASDS, "sexroom", "fuckstart")
+                            $ show_image(GirlNameASDS, "sexroom", "fuckstart")
+                    $ scene_runtime.text = "\n\n".join([renpy.substitute(_ias_line) for _ias_line in _ias_text_parts])
+                    $ scene_runtime.location_text = scene_runtime.text
+                    if str(scene_runtime.picture or "").strip():
+                        vscene scene_runtime.picture
+                    call ShowCurrentSex(GirlNameASDS)
 
                 "Кончить в ротик" if _cametoday < _cancumdaily and _ias_arousal("You") >= 100 and (Amanda.cock_in("mouth") or Amanda.cock_in("tits")):
-                    "Вы кончили, заливая горло и рот [people_name(GirlNameASDS, 'genitive')] своей спермой. Девушка не сделала ни малейшей попытки отстраниться и начала жадно глотать ваше семя. Его было много, она не успела сглотнуть все, и вязкая белая жидкость потекла из уголков ее очаровательного ротика. [people_display_name(GirlNameASDS)] выпустила ваш обмякший член из сладкого плена, облизала губы и, с томной улыбкой сказала: надеюсь тебе понравилось. Вы поспешили заверить девушку что вам очень и очень понравилось."
+                    $ _ias_text_parts = ["Вы кончили, заливая горло и рот [people_name(GirlNameASDS, 'genitive')] своей спермой. Девушка не сделала ни малейшей попытки отстраниться и начала жадно глотать ваше семя. Его было много, она не успела сглотнуть все, и вязкая белая жидкость потекла из уголков ее очаровательного ротика. [people_display_name(GirlNameASDS)] выпустила ваш обмякший член из сладкого плена, облизала губы и, с томной улыбкой сказала: надеюсь тебе понравилось. Вы поспешили заверить девушку что вам очень и очень понравилось."]
                     $ _ias_set_arousal("You", 0)
                     $ Amanda.pregnancy_check("mouth", 1, "Вы")
                     $ Amanda.set_cock_position("none")
                     $ Amanda.set_sex_busy(True)
                     $ Amanda.set_cum_state("cum_face_you", 1)
-                    call ShowCurrentSex(GirlNameASDS)
                     if GirlLocASDS == "street":
-                        call ShowImage(GirlNameASDS, "sexafterdance", "cumface")
+                        $ show_image(GirlNameASDS, "sexafterdance", "cumface")
                     else:
-                        call ShowImageSeq(GirlNameASDS, "sexroom", "come", 2)
+                        $ show_image_seq(GirlNameASDS, "sexroom", "come", 2)
+                    $ scene_runtime.text = "\n\n".join([renpy.substitute(_ias_line) for _ias_line in _ias_text_parts])
+                    $ scene_runtime.location_text = scene_runtime.text
+                    if str(scene_runtime.picture or "").strip():
+                        vscene scene_runtime.picture
+                    call ShowCurrentSex(GirlNameASDS)
                     call int_amanda_sex_after_cum
                     if _return:
-                        return
+                        $ _ias_scene_active = False
 
                 "Кончить на лицо" if _cametoday < _cancumdaily and _ias_arousal("You") >= 100:
-                    "Перед самым оргазмом"
+                    $ _ias_text_parts = ["Перед самым оргазмом"]
                     if Amanda.cock_in("mouth"):
-                        "вы вытащили член изо рта Аманды и кончили ей на мордашку."
+                        $ _ias_text_parts.append("вы вытащили член изо рта Аманды и кончили ей на мордашку.")
                     elif Amanda.cock_in("pussy"):
-                        "колоссальным усилием воли вы вынули член из киски Аманды и направили его на ее смазливую мордашку."
+                        $ _ias_text_parts.append("колоссальным усилием воли вы вынули член из киски Аманды и направили его на ее смазливую мордашку.")
                     else:
-                        "вы направили свой член на ее смазливую мордашку."
-                    "Густая белая струя брызнула прямо [people_name(GirlNameASDS, 'dative')] в лицо. Крупные белые капли потекли по ее щечкам и подбородку, одна струйка попала ей в левый глаз, отчего она зажмурилась, а пара капель осталась в ее белокурых локонах. Очень романтично!"
+                        $ _ias_text_parts.append("вы направили свой член на ее смазливую мордашку.")
+                    $ _ias_text_parts.append("Густая белая струя брызнула прямо [people_name(GirlNameASDS, 'dative')] в лицо. Крупные белые капли потекли по ее щечкам и подбородку, одна струйка попала ей в левый глаз, отчего она зажмурилась, а пара капель осталась в ее белокурых локонах. Очень романтично!")
                     $ _ias_set_arousal("You", 0)
                     $ Amanda.pregnancy_check("face", 1, "Вы")
                     $ Amanda.set_cock_position("none")
                     $ Amanda.set_sex_busy(True)
                     $ Amanda.set_cum_state("cum_face_you", 1)
-                    call ShowCurrentSex(GirlNameASDS)
                     if GirlLocASDS == "street":
-                        call ShowImage(GirlNameASDS, "sexafterdance", "cumface")
+                        $ show_image(GirlNameASDS, "sexafterdance", "cumface")
                     else:
-                        call ShowImage(GirlNameASDS, "sexroom", "comeface")
+                        $ show_image(GirlNameASDS, "sexroom", "comeface")
+                    $ scene_runtime.text = "\n\n".join([renpy.substitute(_ias_line) for _ias_line in _ias_text_parts])
+                    $ scene_runtime.location_text = scene_runtime.text
+                    if str(scene_runtime.picture or "").strip():
+                        vscene scene_runtime.picture
+                    call ShowCurrentSex(GirlNameASDS)
                     call int_amanda_sex_after_cum
                     if _return:
-                        return
+                        $ _ias_scene_active = False
 
                 "Кончить на груди" if _cametoday < _cancumdaily and _ias_arousal("You") >= 100 and Amanda.tits_visible() and GirlModeASDS != "minet":
-                    "Почувствовав наступление оргазма"
+                    $ _ias_text_parts = ["Почувствовав наступление оргазма"]
                     if Amanda.cock_in("mouth"):
-                        "вы вытащили член изо рта Аманды и нацелили его на маленькие сисечки."
+                        $ _ias_text_parts.append("вы вытащили член изо рта Аманды и нацелили его на маленькие сисечки.")
                     elif Amanda.cock_in("pussy"):
-                        "колоссальным усилием воли вы вынули член из киски Аманды и направили его на маленькие сисечки."
+                        $ _ias_text_parts.append("колоссальным усилием воли вы вынули член из киски Аманды и направили его на маленькие сисечки.")
                     else:
-                        "вы решили обкончать ее маленькие сисечки."
-                    "Сказано - сделано! Двумя точными струями вы заляпали оба шарика своим семенем."
+                        $ _ias_text_parts.append("вы решили обкончать ее маленькие сисечки.")
+                    $ _ias_text_parts.append("Сказано - сделано! Двумя точными струями вы заляпали оба шарика своим семенем.")
                     $ _ias_set_arousal("You", 0)
                     $ Amanda.pregnancy_check("tits", 1, "Вы")
                     $ Amanda.set_cock_position("none")
                     $ Amanda.set_sex_busy(True)
                     $ Amanda.set_cum_state("cum_tits_you", 1)
+                    $ scene_runtime.text = "\n\n".join([renpy.substitute(_ias_line) for _ias_line in _ias_text_parts])
+                    $ scene_runtime.location_text = scene_runtime.text
+                    if str(scene_runtime.picture or "").strip():
+                        vscene scene_runtime.picture
                     call ShowCurrentSex(GirlNameASDS)
                     call int_amanda_sex_after_cum
                     if _return:
-                        return
+                        $ _ias_scene_active = False
 
                 "Кончить в Аманду" if _cametoday < _cancumdaily and _ias_arousal("You") >= 100 and Amanda.cock_in("pussy") and GirlModeASDS != "minet":
                     $ tmpCumInside = Amanda.sex_count("you", "inside")
+                    $ _ias_text_parts = []
                     if Amanda.pregnancy_days() < 120 and Amanda.corruption < 60:
-                        "Вы не особо-то прислушались к просьбе Аманды и даже не попытались вовремя вытащить. Почувствовав что ее заполняет ваше семя, Аманда попробовала оттолкнуть вас, но все было без толку: пока вы не заполнили ее киску своей спермой - члена вы не вытащили. [people_display_name(GirlNameASDS)] с ужасом посмотрела на белую струйку, вытекающую из нее."
+                        $ _ias_text_parts.append("Вы не особо-то прислушались к просьбе Аманды и даже не попытались вовремя вытащить. Почувствовав что ее заполняет ваше семя, Аманда попробовала оттолкнуть вас, но все было без толку: пока вы не заполнили ее киску своей спермой - члена вы не вытащили. [people_display_name(GirlNameASDS)] с ужасом посмотрела на белую струйку, вытекающую из нее.")
                         if tmpCumInside == 0 and int(Amanda.sex_stat("cuminside", 0) or 0) >= 2:
-                            "\"Эх, и ты тоже такой же как все, кончаешь внутрь, а о последствиях и не думаешь,\" несколько туманно заметила Аманда."
+                            $ _ias_text_parts.append('"Эх, и ты тоже такой же как все, кончаешь внутрь, а о последствиях и не думаешь," несколько туманно заметила Аманда.')
                         elif tmpCumInside > 4:
-                            "\"Да сколько раз тебе говорить, чтобы в меня не кончал!\" сердито воскликнула [people_display_name(GirlNameASDS)]. \"Вот доиграемся до детей и что тогда? Только тебе это все как об стенку горох! Мог бы хоть разок не о себе, а обо мне подумать!\""
+                            $ _ias_text_parts.append('"Да сколько раз тебе говорить, чтобы в меня не кончал!" сердито воскликнула [people_display_name(GirlNameASDS)]. "Вот доиграемся до детей и что тогда? Только тебе это все как об стенку горох! Мог бы хоть разок не о себе, а обо мне подумать!"')
                         else:
-                            "\"Стефан, ты чего, оглох? Я тебе сказала вытащить. А теперь что делать? А если я залечу? Чтобы это в последний раз было!\" строго отчитала вас девушка."
+                            $ _ias_text_parts.append('"Стефан, ты чего, оглох? Я тебе сказала вытащить. А теперь что делать? А если я залечу? Чтобы это в последний раз было!" строго отчитала вас девушка.')
                         if GirlLocASDS != "street":
-                            call ShowImage(GirlNameASDS, "sexroom", "cumpussyangry")
+                            $ show_image(GirlNameASDS, "sexroom", "cumpussyangry")
                     elif Amanda.pregnancy_days() >= 120:
-                        "Рассудив про себя что более беременной чем она есть уже не станет, вы спустили прямо в нее. Судя по всему [people_display_name(GirlNameASDS)] разделяла ваше мнение, так как почувствовав в себе ваше горячее семя она лишь улыбнулась и сказала: \"Смотри не утопи моего маленького!\""
+                        $ _ias_text_parts.append('Рассудив про себя что более беременной чем она есть уже не станет, вы спустили прямо в нее. Судя по всему [people_display_name(GirlNameASDS)] разделяла ваше мнение, так как почувствовав в себе ваше горячее семя она лишь улыбнулась и сказала: "Смотри не утопи моего маленького!"')
                         if GirlLocASDS != "street":
                             $ _amanda_cumpussy_pic = "cumpussy" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/IntAmandaSex.rpy:procedural_randint:455:3"))
-                            call ShowImage(GirlNameASDS, "sexroom", _amanda_cumpussy_pic)
+                            $ show_image(GirlNameASDS, "sexroom", _amanda_cumpussy_pic)
                     else:
-                        "Решив не утруждать себя вы не стали вытаскивать а кончили прямо в тесную киску [people_name(GirlNameASDS, 'genitive')]."
-                        "\"Ох ты,\" игриво заметила Аманда. \"Ты и в самом деле пытаешься меня обрюхатить! Посмотри, сколько ты накончал!\""
-                        "С этими словами Аманда раздвинула ножки, предоставив вам на обозрение свою полную вашей спермы киску."
+                        $ _ias_text_parts.append("Решив не утруждать себя вы не стали вытаскивать а кончили прямо в тесную киску [people_name(GirlNameASDS, 'genitive')].")
+                        $ _ias_text_parts.append('"Ох ты," игриво заметила Аманда. "Ты и в самом деле пытаешься меня обрюхатить! Посмотри, сколько ты накончал!"')
+                        $ _ias_text_parts.append("С этими словами Аманда раздвинула ножки, предоставив вам на обозрение свою полную вашей спермы киску.")
                         if GirlLocASDS != "street":
                             $ _amanda_cumpussy_pic = "cumpussy" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/IntAmandaSex.rpy:procedural_randint:462:4"))
-                            call ShowImage(GirlNameASDS, "sexroom", _amanda_cumpussy_pic)
+                            $ show_image(GirlNameASDS, "sexroom", _amanda_cumpussy_pic)
                     $ _ias_set_arousal("You", 0)
                     $ _ias_inc_arousal(GirlNameASDS, 3)
                     $ Amanda.pregnancy_check("inside", 1, "Вы")
                     $ Amanda.set_cock_position("none")
                     $ Amanda.set_sex_busy(True)
                     $ Amanda.set_cum_state("cum_inside_you", 1)
+                    $ scene_runtime.text = "\n\n".join([renpy.substitute(_ias_line) for _ias_line in _ias_text_parts])
+                    $ scene_runtime.location_text = scene_runtime.text
+                    if str(scene_runtime.picture or "").strip():
+                        vscene scene_runtime.picture
                     call ShowCurrentSex(GirlNameASDS)
                     call int_amanda_sex_after_cum
                     if _return:
-                        return
+                        $ _ias_scene_active = False
 
                 "Попрощаться и уйти" if not Amanda.sex_busy() and GirlLocASDS == "home" and GirlModeASDS != "minet":
                     if CurAmandaOrgasmCount == Amanda.sex_stat("orgasms_given", 0):
@@ -447,6 +502,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     $ Amanda.set_sex_busy(False)
                     call ShowCurrentSex(GirlNameASDS)
                     $ Amanda.reset_sex_clothing_state()
+                    $ main_ui_end_native_scene_state()
                     jump TavernMain
 
                 "Привести себя в порядок и вернуться" if not Amanda.sex_busy() and GirlLocASDS == "street" and GirlModeASDS != "minet":
@@ -471,10 +527,11 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     $ Amanda.reset_sex_clothing_state()
                     $ calendar_v2.advance_minutes(60)
                     $ Amanda.set_sex_busy(False)
+                    $ main_ui_end_native_scene_state()
                     jump TavernMain
 
                 "Закончить":
-                    return
+                    $ _ias_scene_active = False
 
     label int_amanda_sex_after_cum:
         menu:

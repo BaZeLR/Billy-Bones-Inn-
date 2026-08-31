@@ -2476,8 +2476,12 @@ testcase external_amanda_window_secret_favor_kitchen_event:
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 560) until eval (renpy.get_screen("choice") is not None and "Минет" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     $ _amanda_favor_oral_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Минет")
-    click id ("choice_panel_button_%d" % int(_amanda_favor_oral_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (960, 560) until eval (int(player.intimacy.came_today or 0) == 1 and renpy.get_screen("choice") is not None and "Закончить" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id ("choice_panel_button_%d" % int(_amanda_favor_oral_index)) pos (0.5, 0.5) until eval (Amanda.cock_in("mouth")) timeout 20.0
+    advance until eval (renpy.get_screen("choice") is not None and "Кончить в ротик" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (int(player.intimacy.came_today or 0) == 0) timeout 5.0
+    $ _amanda_favor_cum_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Кончить в ротик")
+    click id ("choice_panel_button_%d" % int(_amanda_favor_cum_index)) pos (0.5, 0.5) until eval (int(player.intimacy.came_today or 0) == 1) timeout 20.0
+    advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить", "Закончить"]) timeout 20.0
     $ _amanda_favor_end_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
     click id ("choice_panel_button_%d" % int(_amanda_favor_end_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
     assert eval (Amanda.attic_window_favor_stage == 3 and Amanda.attic_window_breakfast_bj_day == current_game_day()) timeout 5.0
@@ -4768,6 +4772,44 @@ testcase external_melissa_finished_intimacy_returns_to_room_and_closes_for_day:
 '''
 
 
+AMANDA_SEX_ENGINE_CHECKS = r'''
+testcase external_amanda_sex_scene_keeps_text_picture_and_finish_menu:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ rooms.enter("TavernAmandaRoom")
+    $ player.intimacy.came_today = 0
+    $ player.intimacy.can_cum_daily = 2
+    $ player.intimacy.set_arousal(82)
+    $ Amanda.set_arousal(0)
+    $ Amanda.set_cock_position("none")
+    $ Amanda.set_sex_busy(False)
+
+    run Call("IntAmandaSex", "amanda", "home", "minet")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Аманда") timeout 5.0
+    assert eval ("Минет" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+
+    $ _amanda_blowjob_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Минет")
+    click id ("choice_panel_button_%d" % int(_amanda_blowjob_index)) pos (0.5, 0.5) until eval (Amanda.cock_in("mouth") and player.intimacy.arousal_value() == 100) timeout 20.0
+    advance until eval (renpy.get_screen("choice") is not None and "Кончить в ротик" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (player.intimacy.arousal_value() == 100) timeout 5.0
+    assert eval (Amanda.cock_in("mouth")) timeout 5.0
+    assert eval ("Кончить в ротик" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("аманда" in str(scene_runtime.text or "").lower() and "sexroom/minet" in str(scene_runtime.picture or "").replace("\\", "/").lower()) timeout 5.0
+
+    $ _amanda_cum_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Кончить в ротик")
+    click id ("choice_panel_button_%d" % int(_amanda_cum_index)) pos (0.5, 0.5) until eval (player.intimacy.came_today == 1 and not Amanda.cock_in("mouth")) timeout 20.0
+    advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить", "Закончить"]) timeout 20.0
+    assert eval ("заливая горло" in str(scene_runtime.text or "").lower() and "sexroom/come" in str(scene_runtime.picture or "").replace("\\", "/").lower()) timeout 5.0
+
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Минет" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(rooms.current_code or "") == "TavernAmandaRoom") timeout 5.0
+    $ _amanda_end_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
+    click id ("choice_panel_button_%d" % int(_amanda_end_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+'''
+
+
 PLAYER_INTIMACY_STATE_CHECKS = r'''
 testcase external_player_intimacy_state_sleep_arousal_and_help:
     run Jump("Intro")
@@ -6970,7 +7012,7 @@ def build_test_rpy() -> str:
     )
     return TEST_HEADER + "".join(
         ROOM_CHECK_TEMPLATE.format(room_name=room_name) for room_name in ROOM_LABELS
-    ) + "\n\n" + SHOP_ACTION_CHECKS + "\n\n" + TAVERN_REPORT_STATE_CHECKS + "\n\n" + TAILOR_PURCHASE_FLOW_CHECKS + "\n\n" + DOG_ENTITY_ACTION_CHECKS + "\n\n" + BACKYARD_BARREL_OBJECT_CHECKS + "\n\n" + GROCERY_STORE_OBJECT_PURCHASE_CHECKS + "\n\n" + FIGHT_SYSTEM_RUNTIME_CHECKS + "\n\n" + SMALLTALK_MAIN_UI_CHECKS + "\n\n" + PORT_STREETS_FLOW_CHECKS + "\n\n" + CALENDAR_TIME_CHECKS + "\n\n" + ROOM_REGISTRY_SAVE_CHECKS + "\n\n" + PLAYER_SAVE_PARITY_CHECKS + "\n\n" + TAVERN_HELP_FLOW_CHECKS + "\n\n" + MEDIA_RESOLUTION_CHECKS + "\n\n" + HARASSMENT_IMAGE_CHECKS + "\n\n" + GIRL_OBJECT_RUNTIME_CHECKS + "\n\n" + ACTUAL_ACTION_BUTTON_CLICK_CHECKS + "\n\n" + ACTUAL_RANDOM_TOWN_CLICK_CHECKS + "\n\n" + TARGETED_CURRENT_BUG_CHECKS + "\n\n" + DEBUG_BUILDER_ROOM_CHECKS + "\n\n" + AMANDA_ROOM_NIGHT_EVENT_CHECKS + "\n\n" + MY_ROOM_RECIPE_BOOK_ACTION_CHECKS + "\n\n" + MY_ROOM_WINDOW_ACTION_CHECKS + "\n\n" + TAVERN_ROOM_PICTURE_STATE_CHECKS + "\n\n" + MELISSA_BATS_DRAWINGS_CHECKS + "\n\n" + MELISSA_WERECAT_FOREST_ACTION_CHECKS + "\n\n" + CHURCH_LINK_CHECKS + "\n\n" + CHURCH_AFTER_SERMON_EVENT_CHECKS + "\n\n" + CLARA_MELISSA_TAVERN_BAR_GOSSIP_CHECKS + "\n\n" + FRIDAY_DANCE_AMANDA_CHECKS + "\n\n" + SANDRA_NIGHT_THANKS_CHECKS + "\n\n" + MELISSA_SEX_ENGINE_CHECKS + "\n\n" + PLAYER_INTIMACY_STATE_CHECKS + "\n\n" + CLARA_AMANDA_SCHEDULE_FLOW_CHECKS + "\n\n" + HOUSEHOLD_AI_EVENT_CHECKS + "\n\n" + all_room_action_click_checks + "\n\n" + BECKY_HOME_GUEST_CHECKS
+    ) + "\n\n" + SHOP_ACTION_CHECKS + "\n\n" + TAVERN_REPORT_STATE_CHECKS + "\n\n" + TAILOR_PURCHASE_FLOW_CHECKS + "\n\n" + DOG_ENTITY_ACTION_CHECKS + "\n\n" + BACKYARD_BARREL_OBJECT_CHECKS + "\n\n" + GROCERY_STORE_OBJECT_PURCHASE_CHECKS + "\n\n" + FIGHT_SYSTEM_RUNTIME_CHECKS + "\n\n" + SMALLTALK_MAIN_UI_CHECKS + "\n\n" + PORT_STREETS_FLOW_CHECKS + "\n\n" + CALENDAR_TIME_CHECKS + "\n\n" + ROOM_REGISTRY_SAVE_CHECKS + "\n\n" + PLAYER_SAVE_PARITY_CHECKS + "\n\n" + TAVERN_HELP_FLOW_CHECKS + "\n\n" + MEDIA_RESOLUTION_CHECKS + "\n\n" + HARASSMENT_IMAGE_CHECKS + "\n\n" + GIRL_OBJECT_RUNTIME_CHECKS + "\n\n" + ACTUAL_ACTION_BUTTON_CLICK_CHECKS + "\n\n" + ACTUAL_RANDOM_TOWN_CLICK_CHECKS + "\n\n" + TARGETED_CURRENT_BUG_CHECKS + "\n\n" + DEBUG_BUILDER_ROOM_CHECKS + "\n\n" + AMANDA_ROOM_NIGHT_EVENT_CHECKS + "\n\n" + MY_ROOM_RECIPE_BOOK_ACTION_CHECKS + "\n\n" + MY_ROOM_WINDOW_ACTION_CHECKS + "\n\n" + TAVERN_ROOM_PICTURE_STATE_CHECKS + "\n\n" + MELISSA_BATS_DRAWINGS_CHECKS + "\n\n" + MELISSA_WERECAT_FOREST_ACTION_CHECKS + "\n\n" + CHURCH_LINK_CHECKS + "\n\n" + CHURCH_AFTER_SERMON_EVENT_CHECKS + "\n\n" + CLARA_MELISSA_TAVERN_BAR_GOSSIP_CHECKS + "\n\n" + FRIDAY_DANCE_AMANDA_CHECKS + "\n\n" + SANDRA_NIGHT_THANKS_CHECKS + "\n\n" + MELISSA_SEX_ENGINE_CHECKS + "\n\n" + AMANDA_SEX_ENGINE_CHECKS + "\n\n" + PLAYER_INTIMACY_STATE_CHECKS + "\n\n" + CLARA_AMANDA_SCHEDULE_FLOW_CHECKS + "\n\n" + HOUSEHOLD_AI_EVENT_CHECKS + "\n\n" + all_room_action_click_checks + "\n\n" + BECKY_HOME_GUEST_CHECKS
 
 
 def project_root() -> Path:
@@ -7263,6 +7305,7 @@ def main() -> int:
             "external_sandra_night_thanks_hours_work",
             "external_melissa_courtship_is_slow_and_daily",
             "external_melissa_finished_intimacy_returns_to_room_and_closes_for_day",
+            "external_amanda_sex_scene_keeps_text_picture_and_finish_menu",
             "external_player_intimacy_state_sleep_arousal_and_help",
             "external_clara_evening_follow_finishes_in_melissa_room",
             "external_household_ai_kitchen_event_fires",

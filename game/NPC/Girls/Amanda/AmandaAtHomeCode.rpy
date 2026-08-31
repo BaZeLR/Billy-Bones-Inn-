@@ -289,8 +289,6 @@ label CodeAmandaSexScene:
     else:
         call IntAmandaSex("amanda", "home")
 
-    call GirlsDesc("amanda")
-
     if tmpSexType == 0:
         menu:
             "Вернуться в общий зал":

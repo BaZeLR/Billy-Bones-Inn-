@@ -43,8 +43,7 @@ label ShowCurrentCockState(DudeName="You", DudeNameFull="", DudeNameFull2=""):
             elif cur_arousal < 100:
                 "Вы на грани оргазма. Вы еле-еле сдерживаете рвущийся на ружу поток семени."
             else:
-                "Вы кончаете!"
-                $ player_record_orgasm("arousal")
+                "Вы готовы кончить и можете выбрать, как закончить."
     else:
         if cur_came >= cur_limit:
             "[DudeNameFull] совсем выдохся, бедолага. Сомнительно, чтобы его боец еще раз смог подняться для новой схватки. По крайней мере сегодня."
