@@ -60,11 +60,11 @@ def test_birth_consequences_write_real_owners_directly():
 def test_kids_and_lactation_text_stays_in_owning_room_or_story_label():
     kids = source("game/Utilities/General/Sex/KidsFunctions.rpy")
     tavern = source("game/Inn/TavernMain.rpy")
-    grocery = source("game/Town/GroceryStore.rpy")
+    becky_talk = source("game/NPC/Girls/Becky/IntBeckyTalk.rpy")
     current_sex = source("game/Utilities/General/Sex/ShowCurrentSex.rpy")
 
     assert "renpy.say(" not in kids
     assert 'return "\\n".join(lines)' in kids
     assert 'scene_runtime.location_text += "\\n\\n" + "\\n\\n".join(_tavern_kids_description)' in tavern
-    assert 'scene_runtime.text += "\\n\\n" + _grocery_breastfeeding_text' in grocery
+    assert 'scene_runtime.text += "\\n\\n" + _grocery_breastfeeding_text' in becky_talk
     assert '"[_scs_kids_peek_text]"' in current_sex

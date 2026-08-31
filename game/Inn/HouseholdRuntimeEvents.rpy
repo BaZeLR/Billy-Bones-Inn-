@@ -505,7 +505,7 @@ label HouseholdOutfitRequestTerms(girl_name=""):
             elif _outfit_girl == "amanda":
                 $ scene_runtime.text = "Вы обещаете Аманде, что подберете ей новый наряд просто потому, что хотите ее порадовать. Девушка сияет так, будто обновка уже висит у нее в шкафу."
             else:
-                $ scene_runtime.text = "Вы обещаете [_outfit_name] подобрать у Ирмы красивый наряд без всяких условий. Она тепло благодарит вас."
+                $ scene_runtime.text = "Вы обещаете %s подобрать у Ирмы красивый наряд без всяких условий. Она тепло благодарит вас." % _outfit_name
 
         "Сказать, что пока не до обновок":
             $ household_cancel_outfit_request(_outfit_girl)
@@ -516,7 +516,7 @@ label HouseholdOutfitRequestTerms(girl_name=""):
             elif _outfit_girl == "amanda":
                 $ scene_runtime.text = "Вы говорите Аманде, что пока хватит и чужих обновок. Она недовольно надувает губы, но спорить не продолжает."
             else:
-                $ scene_runtime.text = "Вы говорите [_outfit_name], что сейчас не время покупать обновку. Она принимает отказ и возвращается к своим делам."
+                $ scene_runtime.text = "Вы говорите %s, что сейчас не время покупать обновку. Она принимает отказ и возвращается к своим делам." % _outfit_name
 
         "Попросить потом показать больше, чем новый наряд скрывает" if household_outfit_favor_available(_outfit_girl, "show"):
             $ household_begin_outfit_request(_outfit_girl, "show")
@@ -528,7 +528,7 @@ label HouseholdOutfitRequestTerms(girl_name=""):
             elif _outfit_girl == "amanda":
                 $ scene_runtime.text = "Вы просите Аманду после покупки показать вам чуть больше, чем будет видно остальным. Она лукаво улыбается и отвечает, что за хороший подарок сумеет устроить хороший показ."
             else:
-                $ scene_runtime.text = "Вы обещаете [_outfit_name] наряд в обмен на маленький показ без лишних глаз. После короткой паузы она соглашается."
+                $ scene_runtime.text = "Вы обещаете %s наряд в обмен на маленький показ без лишних глаз. После короткой паузы она соглашается." % _outfit_name
 
         "Попросить отблагодарить вас рукой" if household_outfit_favor_available(_outfit_girl, "handjob"):
             $ household_begin_outfit_request(_outfit_girl, "handjob")
@@ -540,7 +540,7 @@ label HouseholdOutfitRequestTerms(girl_name=""):
             elif _outfit_girl == "amanda":
                 $ scene_runtime.text = "Аманда хихикает, услышав вашу цену, и заговорщически обещает после покупки утащить вас туда, где ее ловкие пальчики никто не заметит."
             else:
-                $ scene_runtime.text = "Вы прямо называете услугу, которую хотите получить после покупки. [_outfit_name] соглашается вернуть долг руками, когда никто не увидит."
+                $ scene_runtime.text = "Вы прямо называете услугу, которую хотите получить после покупки. %s соглашается вернуть долг руками, когда никто не увидит." % _outfit_name
 
         "Попросить отблагодарить вас ртом" if household_outfit_favor_available(_outfit_girl, "oral"):
             $ household_begin_outfit_request(_outfit_girl, "oral")
@@ -552,7 +552,7 @@ label HouseholdOutfitRequestTerms(girl_name=""):
             elif _outfit_girl == "amanda":
                 $ scene_runtime.text = "Аманда облизывает губы, притворно задумывается и соглашается: если вы выполните обещание с платьем, она выполнит свое — в самом укромном уголке трактира."
             else:
-                $ scene_runtime.text = "Вы без обиняков просите особую благодарность за подарок. [_outfit_name] соглашается после покупки найти тихий угол, где сможет выполнить обещание."
+                $ scene_runtime.text = "Вы без обиняков просите особую благодарность за подарок. %s соглашается после покупки найти тихий угол, где сможет выполнить обещание." % _outfit_name
     return
 
 
@@ -619,9 +619,9 @@ label HouseholdOutfitRewardEvent(girl_name=""):
     $ scene_runtime.picture = household_outfit_reward_picture(_outfit_reward_girl, _outfit_reward_type)
     $ main_ui_begin_native_scene_state("Благодарность за новый наряд")
     if _outfit_reward_spontaneous:
-        $ scene_runtime.text = "[_outfit_reward_name] сама находит вас после покупки наряда. Убедившись, что никто особенно не следит, она берет вас за руку и шепчет: \"Ты выполнил обещание. Теперь моя очередь тебя порадовать. Пойдем, я знаю в трактире укромный угол.\""
+        $ scene_runtime.text = "%s сама находит вас после покупки наряда. Убедившись, что никто особенно не следит, она берет вас за руку и шепчет: \"Ты выполнил обещание. Теперь моя очередь тебя порадовать. Пойдем, я знаю в трактире укромный угол.\"" % _outfit_reward_name
     else:
-        $ scene_runtime.text = "[_outfit_reward_name] напоминает о вашей договоренности после покупки наряда. Она украдкой оглядывает зал и тихо говорит: \"Я помню, что обещала. Если хочешь получить свою благодарность, пойдем туда, где нам не помешают.\""
+        $ scene_runtime.text = "%s напоминает о вашей договоренности после покупки наряда. Она украдкой оглядывает зал и тихо говорит: \"Я помню, что обещала. Если хочешь получить свою благодарность, пойдем туда, где нам не помешают.\"" % _outfit_reward_name
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
 
@@ -640,7 +640,7 @@ label HouseholdOutfitRewardEvent(girl_name=""):
                 $ household_reschedule_outfit_reward(_outfit_reward_girl)
 
         "Попросить вернуться к этому позже":
-            $ scene_runtime.text = "Вы просите [_outfit_reward_name] пока не начинать. Она кивает и обещает снова найти вас в трактире, когда представится подходящий момент."
+            $ scene_runtime.text = "Вы просите %s пока не начинать. Она кивает и обещает снова найти вас в трактире, когда представится подходящий момент." % _outfit_reward_name
             $ scene_runtime.location_text = scene_runtime.text
             menu:
                 "Вернуться к делам":
@@ -656,7 +656,7 @@ label HouseholdOutfitRewardShowScene(girl_name=""):
     $ _outfit_show_info = people.get_info(_outfit_show_girl)
     $ _outfit_show_name = people_display_name(_outfit_show_girl)
     $ scene_runtime.picture = household_outfit_reward_picture(_outfit_show_girl, "show")
-    $ scene_runtime.text = "[_outfit_show_name] проводит вас за дальнюю кладовую перегородку, куда из зала не падает свет. Она медленно поворачивается перед вами в выбранном наряде, позволяя рассмотреть, как он сидит на ней, а затем принимается расстегивать его."
+    $ scene_runtime.text = "%s проводит вас за дальнюю кладовую перегородку, куда из зала не падает свет. Она медленно поворачивается перед вами в выбранном наряде, позволяя рассмотреть, как он сидит на ней, а затем принимается расстегивать его." % _outfit_show_name
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Продолжить смотреть":
@@ -667,7 +667,7 @@ label HouseholdOutfitRewardShowScene(girl_name=""):
             elif _outfit_show_girl == "amanda":
                 $ scene_runtime.text = "Аманда с явным удовольствием превращает примерку в маленькое представление: распахивает верх, приподнимает юбку и смеется, заметив ваш взгляд. Лишь дав вам налюбоваться, она снова приводит наряд в порядок."
             else:
-                $ scene_runtime.text = "[_outfit_show_name] медленно распахивает наряд и позволяет вам рассмотреть себя без одежды. Выполнив обещание, она снова приводит платье в порядок."
+                $ scene_runtime.text = "%s медленно распахивает наряд и позволяет вам рассмотреть себя без одежды. Выполнив обещание, она снова приводит платье в порядок." % _outfit_show_name
             $ scene_runtime.location_text = scene_runtime.text
             $ _outfit_show_info.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
             $ calendar_v2.advance_minutes(10)
@@ -682,19 +682,19 @@ label HouseholdOutfitRewardHandjobScene(girl_name=""):
     $ _outfit_hand_info = people.get_info(_outfit_hand_girl)
     $ _outfit_hand_name = people_display_name(_outfit_hand_girl)
     if not player.intimacy.can_cum():
-        $ scene_runtime.text = "[_outfit_hand_name] уже тянется к завязкам на ваших штанах, но быстро понимает, что на сегодня мужские силы исчерпаны. Она усмехается и обещает закончить благодарность после отдыха."
+        $ scene_runtime.text = "%s уже тянется к завязкам на ваших штанах, но быстро понимает, что на сегодня мужские силы исчерпаны. Она усмехается и обещает закончить благодарность после отдыха." % _outfit_hand_name
         $ scene_runtime.location_text = scene_runtime.text
         menu:
             "Отложить до следующего раза":
                 return False
 
     $ scene_runtime.picture = household_outfit_reward_picture(_outfit_hand_girl, "handjob")
-    $ scene_runtime.text = "В укромном углу [_outfit_hand_name] прижимается к вам, расстегивает штаны и обхватывает вставший член ладонью. Она начинает медленно двигать рукой, время от времени прислушиваясь, не идет ли кто-нибудь по коридору."
+    $ scene_runtime.text = "В укромном углу %s прижимается к вам, расстегивает штаны и обхватывает вставший член ладонью. Она начинает медленно двигать рукой, время от времени прислушиваясь, не идет ли кто-нибудь по коридору." % _outfit_hand_name
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Позволить ей продолжить":
             $ scene_runtime.picture = household_outfit_reward_picture(_outfit_hand_girl, "handjob", True)
-            $ scene_runtime.text = "Ее ладонь движется все быстрее. Вскоре вы перестаете сдерживаться и кончаете ей на пальцы. [_outfit_hand_name] вытирает руку заранее приготовленной тряпицей и с довольной улыбкой напоминает, что теперь за новый наряд никто никому ничего не должен."
+            $ scene_runtime.text = "Ее ладонь движется все быстрее. Вскоре вы перестаете сдерживаться и кончаете ей на пальцы. %s вытирает руку заранее приготовленной тряпицей и с довольной улыбкой напоминает, что теперь за новый наряд никто никому ничего не должен." % _outfit_hand_name
             $ scene_runtime.location_text = scene_runtime.text
             $ _outfit_hand_info.player_cum("outside")
             $ _outfit_hand_info.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
@@ -710,19 +710,19 @@ label HouseholdOutfitRewardOralScene(girl_name=""):
     $ _outfit_oral_info = people.get_info(_outfit_oral_girl)
     $ _outfit_oral_name = people_display_name(_outfit_oral_girl)
     if not player.intimacy.can_cum():
-        $ scene_runtime.text = "[_outfit_oral_name] опускается перед вами на колени, но быстро замечает, что сегодня вы уже слишком вымотаны. Она облизывает губы и обещает выполнить свою часть сделки после того, как вы отдохнете."
+        $ scene_runtime.text = "%s опускается перед вами на колени, но быстро замечает, что сегодня вы уже слишком вымотаны. Она облизывает губы и обещает выполнить свою часть сделки после того, как вы отдохнете." % _outfit_oral_name
         $ scene_runtime.location_text = scene_runtime.text
         menu:
             "Отложить до следующего раза":
                 return False
 
     $ scene_runtime.picture = household_outfit_reward_picture(_outfit_oral_girl, "oral")
-    $ scene_runtime.text = "Спрятавшись от посетителей за дальней перегородкой, [_outfit_oral_name] опускается перед вами на колени, освобождает член и медленно проводит языком по головке. Затем она берет его в рот и начинает выполнять обещанную благодарность."
+    $ scene_runtime.text = "Спрятавшись от посетителей за дальней перегородкой, %s опускается перед вами на колени, освобождает член и медленно проводит языком по головке. Затем она берет его в рот и начинает выполнять обещанную благодарность." % _outfit_oral_name
     $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Позволить ей продолжить":
             $ scene_runtime.picture = household_outfit_reward_picture(_outfit_oral_girl, "oral", True)
-            $ scene_runtime.text = "[_outfit_oral_name] не отстраняется, когда вы доходите до предела. Она принимает семя в рот, аккуратно сглатывает и лишь после этого встает, поправляя одежду. \"Вот теперь мы в расчете,\" шепчет она перед возвращением в зал."
+            $ scene_runtime.text = "%s не отстраняется, когда вы доходите до предела. Она принимает семя в рот, аккуратно сглатывает и лишь после этого встает, поправляя одежду. \"Вот теперь мы в расчете,\" шепчет она перед возвращением в зал." % _outfit_oral_name
             $ scene_runtime.location_text = scene_runtime.text
             $ _outfit_oral_info.player_cum("mouth")
             $ _outfit_oral_info.change_social(friend_delta=1, open_delta=1, corruption_delta=1)

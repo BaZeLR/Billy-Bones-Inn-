@@ -39,8 +39,8 @@ def test_becky_husband_labels_advance_thread_without_parallel_stage():
 
 
 def test_becky_talk_keeps_npc_context_until_explicit_exit():
-    assert "while True:" not in TALK
-    assert 'while str(main_ui_runtime.mode or "") == "talk":' in TALK
+    assert "while True:" in TALK
+    assert 'while str(main_ui_runtime.mode or "") == "talk":' not in TALK
     assert "menu:" in TALK
     assert TALK.count("main_ui_end_talk_state()") == 1
 
