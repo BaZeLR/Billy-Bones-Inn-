@@ -3,7 +3,7 @@
 # ================================================================================
 label ShowAmandaPortrait():
     $ renpy.dynamic("_amanda_portrait_picture")
-    $ _amanda_portrait_picture = "images/amanda/amanda_portrait.jpg"
+    $ _amanda_portrait_picture = str(AmandaStaticData.portrait or "")
     if str(_amanda_portrait_picture or "").strip():
         $ scene_runtime.picture = _amanda_portrait_picture
         vscene _amanda_portrait_picture

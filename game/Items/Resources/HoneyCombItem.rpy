@@ -25,6 +25,7 @@ init 4 python:
         custom_properties={
             "item_kind": "forest_resource",
             "resource_kind": "honey_comb",
+            "kitchen_depositable": True,
             "gift_value": 1,
             "social_fun_bonus": 2,
             "social_openness_bonus": 1,

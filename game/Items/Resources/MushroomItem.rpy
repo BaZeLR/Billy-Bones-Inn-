@@ -25,6 +25,7 @@ init 4 python:
         custom_properties={
             "item_kind": "forest_resource",
             "resource_kind": "mushroom",
+            "kitchen_depositable": True,
             "consume_action": "eat",
             "consume_minutes": 15,
             "consume_energy": 6,

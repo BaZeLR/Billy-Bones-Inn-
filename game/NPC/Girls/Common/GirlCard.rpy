@@ -154,7 +154,7 @@ init python:
         if key_l == "melissa":
             return MelissaStaticData.image_path("card", "default") or MelissaStaticData.image_path("portrait", "default")
         if key_l == "amanda":
-            return "images/amanda/amanda_card.jpg" if renpy.loadable("images/amanda/amanda_card.jpg") else "images/amanda/amanda_portrait.jpg"
+            return AmandaStaticData.card_image if renpy.loadable(AmandaStaticData.card_image) else AmandaStaticData.portrait
         if key_l == "becky":
             return "images/becky/portraits/portrait_1.png"
         if key_l == "georgett":

@@ -10,6 +10,9 @@ AMANDA_DANCE_EVENT_MODEL = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / 
 AMANDA_EVENT_MODEL = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "AmandaEventModel.rpy"
 AMANDA_AFTER_DANCE = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "AmandaSexDanceStreet.rpy"
 AMANDA_STREET_EVENTS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "AmandaLegareStreetEvents.rpy"
+AMANDA_PORTRAIT = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "ShowAmandaPortrait.rpy"
+MAIN_LAYOUT = PROJECT_ROOT / "game" / "Utilities" / "General" / "Screens" / "main_layout.rpy"
+GIRL_CARD = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Common" / "GirlCard.rpy"
 AMANDA_LIZA_GLORY_EVENTS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "AmandaLizaGloryEvents.rpy"
 AMANDA_LIZA_TALK_ITEMS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "InitAmandaLizaTalkItems.rpy"
 AMANDA_AT_GLORY_HOLE = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "AmandaAtGloryHole.rpy"
@@ -50,6 +53,21 @@ def test_amanda_uses_data_info_runtime_shape():
     assert "default Amanda = AmandaInfo()" in source
     assert "people.register(AmandaStaticData, Amanda)" in source
     assert "default AmandaNPC" not in source
+
+
+def test_amanda_portrait_path_comes_only_from_static_data():
+    init_source = _source(AMANDA_INIT)
+    street_events = _source(AMANDA_STREET_EVENTS)
+    portrait = _source(AMANDA_PORTRAIT)
+    layout = _source(MAIN_LAYOUT)
+    card = _source(GIRL_CARD)
+
+    assert 'portrait="images/amanda/amanda_portrait.jpg"' in init_source
+    assert street_events.count('call ShowImage("", "", AmandaStaticData.portrait)') == 3
+    assert 'call ShowImage("amanda", "", "amanda_portrait.jpg")' not in street_events
+    assert '_amanda_portrait_picture = str(AmandaStaticData.portrait or "")' in portrait
+    assert "candidates.append(AmandaStaticData.portrait)" in layout
+    assert "else AmandaStaticData.portrait" in card
 
 
 def test_amanda_data_keeps_static_identity_only():

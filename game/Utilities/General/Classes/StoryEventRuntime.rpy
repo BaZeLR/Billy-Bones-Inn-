@@ -805,7 +805,7 @@ define claraThreadList = [
         ),
         (
             "story_clara_tavern_visit_bar_2",
-            [1, 2, 3, 4, 5, 6], (18, 22), None,
+            [1, 2, 3, 4, 5, 6], (12, 17), None,
             1,
             None,
             [

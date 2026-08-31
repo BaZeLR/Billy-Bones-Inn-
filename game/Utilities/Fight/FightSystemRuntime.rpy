@@ -758,7 +758,12 @@ init -20 python:
                 continue
             item_obj = get_game_item(item_id)
             item_name = str(getattr(item_obj, "name", item_id) or item_id)
-            rows.append("{} x{}".format(item_name, int(qty or 0)))
+            gained_count = max(0, int(qty or 0))
+            total_count = max(0, int(player.item_count(item_id) or 0))
+            if total_count > gained_count:
+                rows.append("{} x{} (всего x{})".format(item_name, gained_count, total_count))
+            else:
+                rows.append("{} x{}".format(item_name, gained_count))
         return ", ".join(rows)
 
     def fight_apply_end_consequences(outcome=""):

@@ -1,6 +1,6 @@
 label story_amanda_tavern_seduction_0:
     show screen main_ui
-    call ShowImage("amanda", "", "amanda_portrait.jpg")
+    call ShowImage("", "", AmandaStaticData.portrait)
     "В зале Аманда задержалась у стойки дольше обычного. Она будто ждала, пока вы заметите ее новое платье, поправила волосы и улыбнулась слишком невинно."
     "Это еще не прямое приглашение, но уже и не простая болтовня работницы с хозяином."
     menu:
@@ -44,7 +44,7 @@ label story_amanda_street_legare_sighting_0:
     $ renpy.dynamic("_amanda_legare_event")
     show screen main_ui
     $ _amanda_legare_event = None
-    call ShowImage("amanda", "", "amanda_portrait.jpg")
+    call ShowImage("", "", AmandaStaticData.portrait)
     if str(rooms.current_code or "") == "MarketPlace":
         "Между лавками вы заметили Аманду. Она шла быстро, то и дело оглядываясь, а впереди у винных рядов ее явно ждал месье Легаре."
     else:
@@ -73,7 +73,7 @@ label story_amanda_street_legare_sighting_0:
 
 label story_amanda_street_lover_encounter_0:
     show screen main_ui
-    call ShowImage("amanda", "", "amanda_portrait.jpg")
+    call ShowImage("", "", AmandaStaticData.portrait)
     "На улице вы заметили Аманду рядом с каким-то молодым горожанином. Он что-то торопливо доказывал, а она смеялась и не спешила уходить."
     menu:
         "Подойти ближе":

@@ -64,7 +64,12 @@ init python:
         return npc_schedule_becky_sandra_kitchen_visit_active() and str(people.location("sandra") or "") == "TavernKitchen" and int(player.item_count("energy_tea_001") or 0) > 0
 
     def tavern_kitchen_depositable_food_ids():
-        return ("berries_001", "mushroom_001", "honey_comb_001", "boar_meat_001", "milk_pitcher_001")
+        item_ids = []
+        for item_id, item_obj in dict(game_item_registry or {}).items():
+            properties = dict(getattr(item_obj, "custom_properties", {}) or {})
+            if bool(properties.get("kitchen_depositable", False)):
+                item_ids.append(str(item_id or ""))
+        return tuple(sorted(item_ids, key=lambda item_id: str(getattr(get_game_item(item_id), "name", item_id) or item_id)))
 
     def tavern_kitchen_food_stock_count(item_id=""):
         item_key = str(item_id or "").strip()
@@ -101,24 +106,37 @@ init python:
             entries.append({
                 "item_id": item_id,
                 "count": item_count,
-                "caption": "Отнести в кладовую %s x%s" % (item_name, item_count),
+                "name": item_name,
             })
         return entries
 
-    def tavern_kitchen_deposit_food(item_id=""):
+    def tavern_kitchen_deposit_food(item_id="", quantity=0):
         item_key = str(item_id or "").strip()
-        if item_key == "":
+        if item_key == "" or item_key not in tavern_kitchen_depositable_food_ids():
             return 0
         item_count = int(player.item_count(item_key) or 0)
         if item_count <= 0:
             return 0
-        removed = player.remove_item(item_key, item_count)
+        requested_count = max(0, int(quantity or 0))
+        deposit_count = item_count if requested_count <= 0 else min(item_count, requested_count)
+        removed = player.remove_item(item_key, deposit_count)
         if not removed:
             return 0
         stock = tavern_storage_supplies_stock()
-        stock[item_key] = max(0, int(stock.get(item_key, 0) or 0)) + item_count
-        tavern_kitchen_apply_deposit_effect(item_key, item_count)
-        return item_count
+        stock[item_key] = max(0, int(stock.get(item_key, 0) or 0)) + deposit_count
+        tavern_kitchen_apply_deposit_effect(item_key, deposit_count)
+        return deposit_count
+
+    def tavern_kitchen_deposit_all_food():
+        deposited = {}
+        for item_id in tavern_kitchen_depositable_food_ids():
+            item_count = int(player.item_count(item_id) or 0)
+            if item_count <= 0:
+                continue
+            moved_count = tavern_kitchen_deposit_food(item_id, item_count)
+            if moved_count > 0:
+                deposited[item_id] = moved_count
+        return deposited
 
     def tavern_kitchen_take_food_from_stock(preferred_ids=None):
         preferred = list(preferred_ids or [])
@@ -500,7 +518,7 @@ label AmandaKitchenWindowFavorRepayment:
 
 
 label TavernKitchenDepositMenu:
-    $ renpy.dynamic("_deposit_row")
+    $ renpy.dynamic("_deposit_row", "_deposit_item_id", "_deposit_name", "_deposit_count")
     $ main_ui_runtime.action_title = "Кладовые припасы"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
@@ -509,8 +527,15 @@ label TavernKitchenDepositMenu:
         $ scene_runtime.text = str(scene_runtime.text or "") + "\nСейчас в кладовой уже лежат: %s." % tavern_kitchen_food_stock_summary()
     $ scene_runtime.location_text = scene_runtime.text
     python:
+        if len(tavern_kitchen_deposit_entries()) > 0:
+            main_ui_runtime.action_items.append(MenuItem("Отнести все съедобные припасы", Call("TavernKitchenDepositAll")))
         for _deposit_row in tavern_kitchen_deposit_entries():
-            main_ui_runtime.action_items.append(MenuItem(str(_deposit_row.get("caption", "") or ""), Call("TavernKitchenDepositApply", str(_deposit_row.get("item_id", "") or ""))))
+            _deposit_item_id = str(_deposit_row.get("item_id", "") or "")
+            _deposit_name = str(_deposit_row.get("name", _deposit_item_id) or _deposit_item_id)
+            _deposit_count = max(1, int(_deposit_row.get("count", 1) or 1))
+            main_ui_runtime.action_items.append(MenuItem("Отнести одну порцию: %s (при себе x%s)" % (_deposit_name, _deposit_count), Call("TavernKitchenDepositApply", _deposit_item_id, 1)))
+            if _deposit_count > 1:
+                main_ui_runtime.action_items.append(MenuItem("Отнести весь запас: %s x%s" % (_deposit_name, _deposit_count), Call("TavernKitchenDepositApply", _deposit_item_id, _deposit_count)))
         if len(list(main_ui_runtime.action_items or [])) <= 0:
             scene_runtime.text = "Сейчас у вас при себе нет ничего подходящего для кухонных запасов."
             scene_runtime.location_text = scene_runtime.text
@@ -525,11 +550,11 @@ label TavernKitchenDepositMenu:
     return
 
 
-label TavernKitchenDepositApply(item_id=""):
+label TavernKitchenDepositApply(item_id="", quantity=0):
     $ renpy.dynamic("_kitchen_item_id", "_kitchen_item_name", "_kitchen_deposited", "_kitchen_deposit_effect_text")
     $ _kitchen_item_id = str(item_id or "").strip()
     $ _kitchen_item_name = tavern_kitchen_food_item_name(_kitchen_item_id)
-    $ _kitchen_deposited = tavern_kitchen_deposit_food(_kitchen_item_id)
+    $ _kitchen_deposited = tavern_kitchen_deposit_food(_kitchen_item_id, quantity)
     if int(_kitchen_deposited or 0) <= 0:
         $ scene_runtime.text = "Нечего отдавать."
     else:
@@ -539,6 +564,26 @@ label TavernKitchenDepositApply(item_id=""):
         $ _kitchen_deposit_effect_text = tavern_kitchen_deposit_effect_text(_kitchen_item_id, _kitchen_deposited)
         if str(_kitchen_deposit_effect_text or "").strip():
             $ scene_runtime.text = str(scene_runtime.text or "") + "\n" + str(_kitchen_deposit_effect_text or "")
+    if tavern_kitchen_food_stock_count() > 0:
+        $ scene_runtime.text = str(scene_runtime.text or "") + "\nТеперь в кладовых запасах лежат: %s." % tavern_kitchen_food_stock_summary()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items = tavern_kitchen_action_items()
+    return
+
+
+label TavernKitchenDepositAll:
+    $ renpy.dynamic("_kitchen_all_deposited", "_kitchen_all_parts", "_kitchen_all_item_id", "_kitchen_all_count")
+    $ _kitchen_all_deposited = tavern_kitchen_deposit_all_food()
+    if len(_kitchen_all_deposited) <= 0:
+        $ scene_runtime.text = "Нечего отдавать."
+    else:
+        python:
+            _kitchen_all_parts = []
+            for _kitchen_all_item_id, _kitchen_all_count in _kitchen_all_deposited.items():
+                _kitchen_all_parts.append("%s x%s" % (tavern_kitchen_food_item_name(_kitchen_all_item_id), int(_kitchen_all_count or 0)))
+            scene_runtime.text = "Вы относите в кладовую все съедобные припасы: %s." % ", ".join(_kitchen_all_parts)
+        if str(people.location("sandra") or "") == "TavernKitchen":
+            $ scene_runtime.text = str(scene_runtime.text or "") + "\nСандра деловито осматривает принесенные запасы и сразу начинает прикидывать, как лучше пустить их в дело."
     if tavern_kitchen_food_stock_count() > 0:
         $ scene_runtime.text = str(scene_runtime.text or "") + "\nТеперь в кладовых запасах лежат: %s." % tavern_kitchen_food_stock_summary()
     $ scene_runtime.location_text = scene_runtime.text

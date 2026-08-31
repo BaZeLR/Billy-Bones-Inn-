@@ -224,10 +224,10 @@ init -45 python:
             _fuel_room = _pc_room_by_code(where_id)
             _fire_was_active = _pc_fire_is_active(_fire_object)
             _fire_now = _pc_calendar_total_minutes()
-            if _pc_player_has_item("chopped_wood_001"):
-                player.remove_item("chopped_wood_001")
-            elif _object_state_int(_fire_object, "chopped_wood_stock", 0) > 0:
+            if _object_state_int(_fire_object, "chopped_wood_stock", 0) > 0:
                 _add_object_state_int(_fire_object, "chopped_wood_stock", -1, 0)
+            elif _pc_player_has_item("chopped_wood_001"):
+                player.remove_item("chopped_wood_001")
             elif _room_has_item_by_id(_fuel_room, "chopped_wood_001"):
                 _room_remove_item_by_id(_fuel_room, "chopped_wood_001")
             _set_object_state_int(_fire_object, "fire_started_minute", _fire_now)

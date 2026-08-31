@@ -54,8 +54,33 @@ def test_boar_meat_deposit_is_the_single_owner_of_team_arousal_and_dog_bones():
     assert 'npc_info.add_arousal(arousal_bonus)' in boar_branch
     assert 'properties.get("kitchen_deposit_outputs", ())' in boar_branch
     assert 'player.add_item(output_key, output_total)' in boar_branch
-    assert 'tavern_kitchen_apply_deposit_effect(item_key, item_count)' in KITCHEN
+    assert 'tavern_kitchen_apply_deposit_effect(item_key, deposit_count)' in KITCHEN
     assert "kitchen_deposit_outputs" not in BREAKFAST + actions
+
+
+def test_kitchen_food_catalog_and_transfer_quantities_have_one_authority():
+    item_sources = "\n".join(
+        (GAME / relative).read_text(encoding="utf-8-sig")
+        for relative in (
+            "Items/Resources/BerriesItem.rpy",
+            "Items/Resources/MushroomItem.rpy",
+            "Items/Resources/HoneyCombItem.rpy",
+            "Items/Resources/FoodBaleItem.rpy",
+            "Items/Shops/HunterClubItems.rpy",
+            "Items/Shops/GroceryStoreItems.rpy",
+        )
+    )
+    catalog = KITCHEN.split("def tavern_kitchen_depositable_food_ids():", 1)[1].split("\n    def ", 1)[0]
+    deposit = KITCHEN.split('def tavern_kitchen_deposit_food(item_id="", quantity=0):', 1)[1].split("\n    def ", 1)[0]
+
+    assert item_sources.count('"kitchen_depositable": True') == 6
+    assert "game_item_registry" in catalog
+    assert 'properties.get("kitchen_depositable", False)' in catalog
+    assert 'return ("berries_001"' not in catalog
+    assert "deposit_count = item_count if requested_count <= 0 else min(item_count, requested_count)" in deposit
+    assert 'MenuItem("Отнести все съедобные припасы", Call("TavernKitchenDepositAll"))' in KITCHEN
+    assert 'Call("TavernKitchenDepositApply", _deposit_item_id, 1)' in KITCHEN
+    assert 'Call("TavernKitchenDepositApply", _deposit_item_id, _deposit_count)' in KITCHEN
 
 
 def test_sunday_dinner_uses_schedule_attendance_and_applies_each_girls_planned_reward():

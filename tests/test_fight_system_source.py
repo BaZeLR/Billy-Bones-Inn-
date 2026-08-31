@@ -61,6 +61,15 @@ def test_fight_uses_hunt_images_and_varied_loot_tables():
     assert "def fight_roll_loot_quantity(raw_qty):" in source
 
 
+def test_hunt_loot_reports_this_reward_and_the_cumulative_inventory_total():
+    source = _source(FIGHT)
+    loot_text = source.split("def fight_loot_text():", 1)[1].split("\n    def ", 1)[0]
+
+    assert "gained_count = max(0, int(qty or 0))" in loot_text
+    assert "total_count = max(0, int(player.item_count(item_id) or 0))" in loot_text
+    assert '"{} x{} (всего x{})".format(item_name, gained_count, total_count)' in loot_text
+
+
 def test_fight_ui_shows_combat_stats_without_a_duplicate_outcome_popup():
     source = _source(FIGHT)
     screen = _source(FIGHT_SCREEN)

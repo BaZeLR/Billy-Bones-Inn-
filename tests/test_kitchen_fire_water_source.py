@@ -50,3 +50,14 @@ def test_chores_mutate_tavern_management_owner_without_scalar_mirrors():
     assert "global taverncleanliness" not in source
     assert "global ashesdirtydays" not in source
     assert "global upstairsroomsdirty" not in source
+
+
+def test_fire_consumes_the_local_wood_stock_before_carried_wood():
+    source = CHORES_PATH.read_text(encoding="utf-8-sig")
+    fire_branch = source.split('elif key == "make_fire":', 1)[1].split('elif key == "boil_water":', 1)[0]
+
+    stock_check = 'if _object_state_int(_fire_object, "chopped_wood_stock", 0) > 0:'
+    carried_check = 'elif _pc_player_has_item("chopped_wood_001"):'
+    assert stock_check in fire_branch
+    assert carried_check in fire_branch
+    assert fire_branch.index(stock_check) < fire_branch.index(carried_check)

@@ -48,7 +48,9 @@ def test_clara_visit_conditions_use_clock_schedule_and_classes():
 
     clara_block = source.split("# clara_tavern_visit", 1)[1].split("define eddieThreadList", 1)[0]
     assert "(12, 17)" in clara_block
-    assert "(18, 22)" in clara_block
+    bar_2_time_line = clara_block.split('"story_clara_tavern_visit_bar_2"', 1)[1].splitlines()[1]
+    assert "(12, 17)" in bar_2_time_line
+    assert "(18, 22)" not in bar_2_time_line
     assert "(16, 22)" in clara_block
     assert "clock_minutes" not in clara_block
     assert "str(people.location('clara') or '') == 'TavernMain'" in source
@@ -155,3 +157,13 @@ def test_clara_visit_media_remains_until_native_continue_then_restores_room():
 
     for block in labels.split("\nlabel story_clara_")[1:]:
         assert block.index("vscene ") < block.index("menu:") < block.index("main_ui_end_native_scene_state()") < block.index("return True")
+
+
+def test_third_bar_talk_reveals_clara_and_melissa_as_close_friends():
+    labels = read(CLARA_TAVERN_VISIT)
+    third_bar = labels.split("label story_clara_tavern_visit_bar_2:", 1)[1].split("\n\nlabel ", 1)[0]
+
+    assert "приглушенный смех" in third_bar
+    assert "тихие стоны и звуки поцелуев" in third_bar
+    assert "очень близкими подругами" in third_bar
+    assert 'vscene "images/clara/melissa_talk.png"' in third_bar

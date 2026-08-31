@@ -92,11 +92,7 @@ init python:
         candidates = []
 
         if key == "amanda":
-            candidates.extend([
-                "images/amanda/amanda_portrait.jpg",
-                "images/amanda/close up.jpg",
-                "images/amanda/amanda_card.jpg",
-            ])
+            candidates.append(AmandaStaticData.portrait)
         elif key == "melissa":
             try:
                 candidates.append(MelissaStaticData.image_path("portrait", "default"))

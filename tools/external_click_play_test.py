@@ -396,22 +396,42 @@ testcase external_tavern_sunday_dinner_schedule_and_stats:
 
 testcase external_boar_meat_kitchen_deposit_rewards:
     run Call("InitGameNPCs")
-    $ player.remove_item("boar_meat_001", player.item_count("boar_meat_001")) if player.item_count("boar_meat_001") > 0 else False
+    python:
+        for _kitchen_test_food_id in tavern_kitchen_depositable_food_ids():
+            _kitchen_test_food_count = int(player.item_count(_kitchen_test_food_id) or 0)
+            if _kitchen_test_food_count > 0:
+                player.remove_item(_kitchen_test_food_id, _kitchen_test_food_count)
+            tavern_storage_supplies_stock().pop(_kitchen_test_food_id, None)
     $ player.remove_item("dog_bone_001", player.item_count("dog_bone_001")) if player.item_count("dog_bone_001") > 0 else False
-    $ tavern_storage_supplies_stock().pop("boar_meat_001", None)
     $ Sandra.set_arousal(0)
     $ Melissa.set_arousal(0)
     $ Amanda.set_arousal(0)
     $ player.add_item("boar_meat_001", 2)
-    $ _boar_deposited = tavern_kitchen_deposit_food("boar_meat_001")
-    assert eval (_boar_deposited == 2) timeout 5.0
-    assert eval (player.item_count("boar_meat_001") == 0 and tavern_kitchen_food_stock_count("boar_meat_001") == 2) timeout 5.0
+    $ player.add_item("berries_001", 2)
+    $ _boar_deposited = tavern_kitchen_deposit_food("boar_meat_001", 1)
+    assert eval (_boar_deposited == 1) timeout 5.0
+    assert eval (player.item_count("boar_meat_001") == 1 and tavern_kitchen_food_stock_count("boar_meat_001") == 1) timeout 5.0
+    assert eval (player.item_count("dog_bone_001") == 3) timeout 5.0
+    assert eval ((Sandra.arousal_value(), Melissa.arousal_value(), Amanda.arousal_value()) == (5, 5, 5)) timeout 5.0
+    $ _all_food_deposited = tavern_kitchen_deposit_all_food()
+    assert eval (_all_food_deposited == {"berries_001": 2, "boar_meat_001": 1}) timeout 5.0
+    assert eval (player.item_count("boar_meat_001") == 0 and player.item_count("berries_001") == 0) timeout 5.0
+    assert eval (tavern_kitchen_food_stock_count("boar_meat_001") == 2 and tavern_kitchen_food_stock_count("berries_001") == 2) timeout 5.0
     assert eval (player.item_count("dog_bone_001") == 6) timeout 5.0
     assert eval ((Sandra.arousal_value(), Melissa.arousal_value(), Amanda.arousal_value()) == (10, 10, 10)) timeout 5.0
     $ _stored_boar = tavern_kitchen_take_food_from_stock(["boar_meat_001"])
     assert eval (_stored_boar == "boar_meat_001" and tavern_kitchen_food_stock_count("boar_meat_001") == 1) timeout 5.0
     assert eval (player.item_count("dog_bone_001") == 6) timeout 5.0
     assert eval ((Sandra.arousal_value(), Melissa.arousal_value(), Amanda.arousal_value()) == (10, 10, 10)) timeout 5.0
+    $ TavernKitchenHearthObject.state["chopped_wood_stock"] = 2
+    $ player.add_item("chopped_wood_001", 3)
+    $ player.set_stat("fun", 100)
+    $ player.set_stat("energy", 100)
+    $ TavernKitchenHearthObject.state["fire_until_minute"] = 0
+    $ _hearth_result = do_player_chore("make_fire", "TavernKitchen", "hearth_001")
+    assert eval (bool(_hearth_result.get("ok", False))) timeout 5.0
+    assert eval (_object_state_int(TavernKitchenHearthObject, "chopped_wood_stock", 0) == 1) timeout 5.0
+    assert eval (player.item_count("chopped_wood_001") == 3) timeout 5.0
 '''
 
 
@@ -3491,6 +3511,27 @@ testcase external_clara_melissa_bar_gossip_click_fires_ready_dialog:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraTavernVisit"].num or 0) == 2) timeout 20.0
     assert eval (str(scene_runtime.text or "") == _clara_visit_origin_text and str(scene_runtime.picture or "") == _clara_visit_origin_picture) timeout 5.0
     assert eval (threads["claraTavernVisit"].currentTarget() == "story_clara_tavern_visit_bar_2") timeout 5.0
+
+    $ Melissa.drawings_booklet_read = True
+    $ _clara_visit_day = external_position_clara_tavern_visit(int(_clara_visit_day or 0) + 1)
+    $ household.runtime_event_seen.clear()
+    $ rooms.enter("TavernMain")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernMain", "clara_tavern_visit")) timeout 5.0
+    run Call("TavernMainObjectMenu", "bar_001")
+    advance until screen "main_ui" timeout 20.0
+    $ _clara_visit_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Задержаться у стойки в ожидании истории")
+    $ _clara_visit_button_id = "choice_panel_button_%d" % int(_clara_visit_index)
+    $ _clara_visit_origin_text = str(scene_runtime.text or "")
+    $ _clara_visit_origin_picture = str(scene_runtime.picture or "")
+    click id _clara_visit_button_id pos (0.5, 0.5) until screen "choice" timeout 20.0
+    assert eval ("тихие стоны и звуки поцелуев" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ("очень близкими подругами" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/clara/melissa_talk.png") timeout 5.0
+    assert eval (int(threads["claraTavernVisit"].num or 0) == 2) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraTavernVisit"].num or 0) == 3) timeout 20.0
+    assert eval (str(scene_runtime.text or "") == _clara_visit_origin_text and str(scene_runtime.picture or "") == _clara_visit_origin_picture) timeout 5.0
 
 testcase external_clara_booklet_mongol_night_buttons_advance:
     run Jump("Intro")
@@ -6764,6 +6805,10 @@ testcase external_fight_system_runtime_flow:
     $ player.set_stat("energy", 100)
     $ player.set_stat("exploration", 120)
     $ player.inventory.items = {}
+    $ player.add_item("wolf_skin_001", 3)
+    $ fight.victory_loot = {"wolf_skin_001": 1}
+    assert eval ("волчья шкура x1 (всего x3)" in fight_loot_text()) timeout 5.0
+    $ player.remove_item("wolf_skin_001", 3)
     $ player.add_item("rusty_hunter_rifle_001", 1)
     $ player.equip("rusty_hunter_rifle_001", "weapon")
     $ player.unequip("armor")

@@ -12,5 +12,6 @@ init 4 python:
         custom_properties={
             "item_kind": "grocery_good",
             "grocery_kind": "milk",
+            "kitchen_depositable": True,
         },
     )

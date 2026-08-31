@@ -12,6 +12,7 @@ init 4 python:
         stackable=True,
         custom_properties={
             "item_kind": "food",
+            "kitchen_depositable": True,
             "supply_units": 10,
             "energy": 20,
             "fun": 5,
