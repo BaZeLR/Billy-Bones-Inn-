@@ -70,4 +70,6 @@ def test_story_board_gives_the_thread_event_pane_more_readable_space():
     assert source.count("xsize STORY_BOARD_DETAIL_WIDTH") == 2
     assert "xsize STORY_BOARD_THREAD_TITLE_WIDTH ysize STORY_BOARD_ROW_HEIGHT" in source
     assert "xysize (STORY_BOARD_CELL_SIZE, STORY_BOARD_CELL_SIZE)" in source
-    assert source.count("spacing STORY_BOARD_EMPTY_ROW_HEIGHT") == 2
+    assert source.count("null height STORY_BOARD_EMPTY_ROW_HEIGHT") == 2
+    assert "if _pos > 0:" in source
+    assert "spacing STORY_BOARD_EMPTY_ROW_HEIGHT" not in source

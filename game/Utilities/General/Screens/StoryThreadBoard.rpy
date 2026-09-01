@@ -529,7 +529,7 @@ screen story_thread_board_panel(person=None, standalone=False):
             action SetField(main_ui_runtime, "overlay", "")
 
     vbox:
-        spacing STORY_BOARD_EMPTY_ROW_HEIGHT
+        spacing 5
         xpos 50
         ypos 50
 
@@ -546,11 +546,14 @@ screen story_thread_board_panel(person=None, standalone=False):
             mousewheel True
 
             vbox:
-                spacing STORY_BOARD_EMPTY_ROW_HEIGHT
+                spacing 0
+                null height STORY_BOARD_EMPTY_ROW_HEIGHT
                 if not _rows:
                     text "No story threads registered for this person."
                 $ _pos = 0
                 for _thread_name, _tinfo in _rows:
+                    if _pos > 0:
+                        null height STORY_BOARD_EMPTY_ROW_HEIGHT
                     hbox:
                         $ _offset = int(getattr(_tinfo.data, "level", 0) or 0)
                         use story_board_toggle_highlight(_tinfo)
