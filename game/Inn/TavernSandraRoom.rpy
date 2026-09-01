@@ -65,8 +65,11 @@ init 6 python:
         if str(people.location("sandra") or "") == "TavernSandraRoom" and people.can_talk("sandra") and int(Sandra.rel or 0) >= 5 and int(Sandra.asked_today or 0) == 0:
             items.append(MenuItem("Сесть с Сандрой над трактирной книгой", Call("TavernSandraLedgerScene")))
         items.extend(story_event_action_items("TavernSandraRoom"))
-        if threads["sandraWeeklyEvaluation"].completed:
-            items.append(MenuItem("Уединиться с Сандрой", Call("HouseholdSexEngine", "sandra", "TavernSandraRoom")))
+        if threads["sandraWeeklyEvaluation"].completed and str(people.location("sandra") or "") == "TavernSandraRoom":
+            items.append(MenuItem("Заняться сексом с Сандрой", Call("HouseholdSexEngine", "sandra", "TavernSandraRoom", "sex")))
+            if player.intimacy.can_cum():
+                items.append(MenuItem("Попросить Сандру помочь рукой", Call("HouseholdSexEngine", "sandra", "TavernSandraRoom", "handjob")))
+                items.append(MenuItem("Попросить Сандру сделать минет", Call("HouseholdSexEngine", "sandra", "TavernSandraRoom", "blowjob")))
         if tavern_upstairs_can_clean_rooms():
             items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernSandraRoom", "", "")))
         items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernSandraRoom")))

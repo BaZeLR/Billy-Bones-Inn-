@@ -294,7 +294,7 @@ def test_sandra_sex_engine_uses_native_choices_and_pregnancy_authority_once():
     assert 'call HouseholdSexEngine("sandra", "TavernSandraRoom")' in night_thanks
     assert '$ calendar_v2.advance_minutes(30)' not in night_thanks
     assert 'call PregnancyCheck("sandra", "inside", 1, "Вы")' not in night_thanks
-    assert 'label HouseholdSexEngine(girl_name="melissa", source_room=""):' in engine
+    assert 'label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="sex"):' in engine
     assert 'main_ui_begin_native_scene_state(_hse_display)' in engine
     assert '_hse_data.image_path("portrait", "default")' in engine
     assert '"Попросить помочь рукой" if _hse_full_engine' in engine
@@ -398,6 +398,12 @@ def test_sandra_talk_is_direct_entry_not_refresh_apply_dispatcher():
     assert "call OldPointSmallTalkMenu" not in talk_source
     assert "call OldPointFlirtAttempt" not in talk_source
     assert "call PlayerCardGiftToFixedTargetMenu" in talk_source
+    assert '"Заняться сексом с Сандрой"' in talk_source
+    assert 'call HouseholdSexEngine(girl_name, rooms.current_code, "sex")' in talk_source
+    assert '"Попросить Сандру помочь рукой"' in talk_source
+    assert 'call HouseholdSexEngine(girl_name, rooms.current_code, "handjob")' in talk_source
+    assert '"Попросить Сандру сделать минет"' in talk_source
+    assert 'call HouseholdSexEngine(girl_name, rooms.current_code, "blowjob")' in talk_source
     assert "call OldPointKinoAttempt" not in talk_source
     assert "call OldPointApology" not in talk_source
     assert 'if not getPersonInfo(girl_name).social_action_allowed("talk"):' not in talk_source

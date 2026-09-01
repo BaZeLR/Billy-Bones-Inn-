@@ -30,8 +30,12 @@ label IntSandraTalk(girl_name="sandra"):
                 call IntSandraHouseholdInsight(girl_name)
             "Спросить, что для нее сейчас важнее всего по хозяйству" if int(Sandra.asked_today or 0) == 0 and int(Sandra.rel or 0) >= 15:
                 call IntSandraHouseholdPriorities(girl_name)
-            "Уединиться с Сандрой" if threads["sandraWeeklyEvaluation"].completed and str(rooms.current_code or "") == "TavernSandraRoom":
-                call HouseholdSexEngine(girl_name, rooms.current_code)
+            "Заняться сексом с Сандрой" if threads["sandraWeeklyEvaluation"].completed and str(rooms.current_code or "") == "TavernSandraRoom":
+                call HouseholdSexEngine(girl_name, rooms.current_code, "sex")
+            "Попросить Сандру помочь рукой" if threads["sandraWeeklyEvaluation"].completed and str(rooms.current_code or "") == "TavernSandraRoom" and player.intimacy.can_cum():
+                call HouseholdSexEngine(girl_name, rooms.current_code, "handjob")
+            "Попросить Сандру сделать минет" if threads["sandraWeeklyEvaluation"].completed and str(rooms.current_code or "") == "TavernSandraRoom" and player.intimacy.can_cum():
+                call HouseholdSexEngine(girl_name, rooms.current_code, "blowjob")
             "Назад":
                 $ main_ui_end_talk_state()
                 return

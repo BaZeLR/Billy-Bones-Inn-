@@ -400,7 +400,7 @@ def test_melissa_courtship_save_upgrade_promotes_only_recorded_sex_history():
 
 def test_melissa_intimacy_uses_one_native_scene_until_explicit_finish():
     sex_source = MELISSA_SEX.read_text(encoding="utf-8-sig")
-    sex_menu = sex_source.split('label HouseholdSexEngine(girl_name="melissa", source_room=""):', 1)[1].split(
+    sex_menu = sex_source.split('label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="sex"):', 1)[1].split(
         'label HouseholdSexState(girl_name="melissa", full_engine=False):', 1
     )[0]
 

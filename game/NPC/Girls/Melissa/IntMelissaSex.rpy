@@ -164,9 +164,10 @@ init python:
         return "Вы даете ей перевести дыхание. По взгляду {} видно, что этот раз она запомнит как что-то по-настоящему важное.".format(people_name(girl_name, "genitive"))
 
 
-label HouseholdSexEngine(girl_name="melissa", source_room=""):
-    $ renpy.dynamic("_hse_girl", "_hse_info", "_hse_data", "_hse_display", "_hse_effect", "_hse_picture", "_hse_stage", "_hse_full_engine", "_hse_can_cum", "_hse_daily_limit", "_hse_inside_container", "_hse_start_orgasms", "_hse_start_player_cums")
+label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="sex"):
+    $ renpy.dynamic("_hse_girl", "_hse_info", "_hse_data", "_hse_display", "_hse_effect", "_hse_picture", "_hse_stage", "_hse_full_engine", "_hse_can_cum", "_hse_daily_limit", "_hse_inside_container", "_hse_initial_action", "_hse_start_orgasms", "_hse_start_player_cums")
     $ _hse_girl = str(girl_name or "").strip().lower()
+    $ _hse_initial_action = str(initial_action or "sex").strip().lower()
     $ _hse_info = people.get_info(_hse_girl)
     $ _hse_data = people.get_data(_hse_girl)
     if _hse_girl not in ("melissa", "sandra") or _hse_info is None or _hse_data is None:
@@ -194,6 +195,19 @@ label HouseholdSexEngine(girl_name="melissa", source_room=""):
         vscene scene_runtime.picture
     $ scene_runtime.text = household_sex_scene_summary(_hse_girl, _hse_full_engine)
     $ scene_runtime.location_text = scene_runtime.text
+    if _hse_initial_action == "handjob":
+        $ _hse_info.set_cock_position("none")
+        $ player.intimacy.add_arousal(30, 100)
+        $ _hse_info.add_arousal(5)
+        $ scene_runtime.text = "Вы просите ее помочь вам рукой. Она соглашается, устраивается ближе, обхватывает ваш член ладонью и начинает двигать ею в ровном, уверенном ритме."
+        $ scene_runtime.picture = _hse_data.image_path("outfit_reward", "handjob")
+        call HouseholdSexState(_hse_girl, _hse_full_engine)
+    elif _hse_initial_action == "blowjob":
+        $ _hse_info.set_cock_position("mouth")
+        $ _hse_effect = bodymodel_apply_action(_hse_girl, "mouth", "suck", "You", _hse_data.fullname, "female")
+        $ scene_runtime.text = household_sex_touch_text(_hse_girl, "mouth", "suck", _hse_effect, _hse_full_engine)
+        $ scene_runtime.picture = _hse_data.cycle_image("sexy_times", "blowjob", _hse_info.arousal_value())
+        call HouseholdSexState(_hse_girl, _hse_full_engine)
 
     label household_sex_menu:
         while True:

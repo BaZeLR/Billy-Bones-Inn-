@@ -4967,7 +4967,7 @@ testcase external_sandra_night_thanks_hours_work:
     assert eval (threads["sandraWeeklyEvaluation"].completed and int(threads["sandraWeeklyEvaluation"].num or 0) == 5) timeout 5.0
     assert eval (not hasattr(Sandra, "final_reward_flag") and not hasattr(Sandra, "sandraSex")) timeout 5.0
     $ main_ui_runtime.action_items = tavern_sandra_room_action_items()
-    assert eval ("Уединиться с Сандрой" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items if "Санд" in str(i.caption or "")] == ["Заняться сексом с Сандрой", "Попросить Сандру помочь рукой", "Попросить Сандру сделать минет"]) timeout 5.0
 
     $ threads["sandraWeeklyEvaluation"].advanceTo(4, force_active=True)
     $ Sandra.fucked_today = 0
