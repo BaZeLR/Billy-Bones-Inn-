@@ -175,7 +175,7 @@ def test_protection_lesson_updates_domain_owners_without_replacing_melissa_sex_r
     labels = read(CLARA_TAVERN_VISIT)
     melissa_sex = read(PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissaSex.rpy")
 
-    assert "#int(threads['claraForestSofa'].num or 0) >= 1" in runtime
+    assert "#int(threads['claraForestSofa'].num or 0) >= 6" in runtime
     assert 'Sandra.skills["waitress"]' in labels
     assert 'Amanda.skills["waitress"]' in labels
     assert 'Melissa.skills["waitress"]' in labels
@@ -185,3 +185,4 @@ def test_protection_lesson_updates_domain_owners_without_replacing_melissa_sex_r
     assert "clara_anal_training" not in melissa_sex
     assert '"Войти сзади" if _hse_full_engine and player.intimacy.can_cum()' in melissa_sex
     assert 'threads["claraTavernVisit"].completed' in melissa_sex
+    assert 'int(threads["claraForestSofa"].num or 0) >= 6' in melissa_sex

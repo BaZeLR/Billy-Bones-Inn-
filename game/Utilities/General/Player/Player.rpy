@@ -604,6 +604,7 @@ init -998 python:
             self.name = ""
             self.saddled = False
             self.purchase_price = 0
+            self.stolen_purchase_price = 0
             self.stolen_days = 0
 
         def owns_horse(self):
@@ -620,6 +621,15 @@ init -998 python:
             self.name = ""
             self.saddled = False
             self.purchase_price = 0
+            return old_name
+
+        def mark_stolen(self, days=14):
+            old_name = str(self.name or "")
+            self.stolen_purchase_price = max(0, player_to_int(self.purchase_price, 0))
+            self.name = ""
+            self.saddled = False
+            self.purchase_price = 0
+            self.stolen_days = max(0, player_to_int(days, 14))
             return old_name
 
     class PlayerCombat(object):

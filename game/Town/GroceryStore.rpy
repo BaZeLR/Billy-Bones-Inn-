@@ -170,6 +170,7 @@ init python:
 
 label GroceryStore:
     $ renpy.dynamic("_grocery_room", "_grocery_store_event_played")
+    $ _grocery_store_event_played = False
     scene black
     $ rooms.enter("GroceryStore")
     $ main_ui_runtime.mode = "scene"
@@ -197,7 +198,16 @@ label GroceryStore:
     $ scene_runtime.text = grocery_store_main_text()
     $ scene_runtime.location_text = scene_runtime.text
 
-    if grocery_store_active_grocer_id() == "becky":
+    call RoomEnterEventGate(rooms.current_code, False)
+    $ _grocery_store_event_played = bool(_return)
+    if _grocery_store_event_played:
+        $ main_ui_runtime.mode = "scene"
+        $ scene_runtime.picture = _grocery_room.bg_picture
+        vscene scene_runtime.picture
+        $ scene_runtime.text = grocery_store_main_text()
+        $ scene_runtime.location_text = scene_runtime.text
+
+    if grocery_store_active_grocer_id() == "becky" and not _grocery_store_event_played:
         call BeckyLoversInStore
         $ _grocery_store_event_played = bool(_return)
         if _grocery_store_event_played:

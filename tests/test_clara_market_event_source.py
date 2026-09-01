@@ -105,11 +105,11 @@ def test_clara_paintings_events_use_event_checks_not_ready_helpers():
     assert 'call preEvent("claraPaintingsPath")' not in labels
     assert '"rule": "thread_step"' in melissa_schedule
     assert '"thread": "claraPaintingsPath"' in melissa_schedule
-    assert '"step": 9' in melissa_schedule
+    assert '"step": 11' in melissa_schedule
     assert '"thread": "claraPaintingsPath"' in clara_schedule
-    assert '"step": 9' in clara_schedule
+    assert '"step": 11' in clara_schedule
     assert '"location": "TavernMelissaRoom"' in clara_schedule
-    assert '"ArtisansQuarter",\n            "enter",\n            8,' in paintings_thread
+    assert '"ArtisansQuarter",\n            "enter",\n            10,' in paintings_thread
     assert 'if rule_name == "thread_step":' in room_rules
     assert "thread_info.num" in room_rules
 
@@ -339,7 +339,7 @@ def test_v73_save_migration_preserves_clara_story_positions_without_live_mirrors
         "# Saved objects must be upgraded", 1
     )[0]
 
-    assert "define currentVersion = 77" in migration
+    assert "define currentVersion = 78" in migration
     assert "if loaded_version < 74:" in migration
     assert "updateSave_V73()" in migration
     assert "mapped_num = old_num - 1 if old_num >= 4 else old_num" in block

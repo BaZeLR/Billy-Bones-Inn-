@@ -252,6 +252,8 @@ init python:
                 "redstockings",
             )
             for dress_code in dress_codes:
+                if dress_code == "thiefdress" and int(threads["claraForestSofa"].num or 0) < 3:
+                    continue
                 if not player.appearance.has_dress(dress_code):
                     continue
                 if str(player.appearance.current_dress or "") == str(dress_code or ""):
@@ -291,6 +293,8 @@ init python:
                     return False
                 appearance = player.appearance
                 result = appearance.remove_dress(dress_code)
+                if result:
+                    _gds_add_dress_for_girl(self.name, dress_code)
                 return result
 
             item_id = str(row.get("gift_id", "") or "")

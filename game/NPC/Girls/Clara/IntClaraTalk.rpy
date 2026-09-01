@@ -65,8 +65,16 @@ label IntClaraTalk(girl_name="clara"):
                 $ main_ui_end_talk_state()
                 return
 
-            "Поговорить с Клариссой о рисунках" if story_event_available("WineStore", "clara_paintings"):
+            "Спросить Клариссу о Легаре" if story_event_available("WineStore", "clara_paintings") and int(threads["claraPaintingsPath"].num or 0) == 5:
                 call checkTriggers("WineStore", "clara_paintings", 0)
+                $ _clara_repeat_menu = True
+
+            "Поговорить с Клариссой о рисунках" if story_event_available("WineStore", "clara_paintings") and int(threads["claraPaintingsPath"].num or 0) != 5:
+                call checkTriggers("WineStore", "clara_paintings", 0)
+                $ _clara_repeat_menu = True
+
+            "Поговорить с Клариссой о найденном тайнике" if story_event_available("WineStore", "clara_truth"):
+                call checkTriggers("WineStore", "clara_truth", 0)
                 $ _clara_repeat_menu = True
 
             "Спросить Клариссу о семье" if int(Clara.asked_today or 0) == 0 and int(Clara.rel or 0) >= 6:
@@ -150,7 +158,7 @@ label IntClaraGiftMenu(girl_name="clara"):
             call ClaraGiveGift(girl_name, "luxury_soap_001")
         "Пряная настойка" if "libido_tincture_001" in _clara_gift_ids:
             call ClaraGiveGift(girl_name, "libido_tincture_001")
-        "Воровское платье" if "dress_thiefdress" in _clara_gift_ids:
+        "Подарить костюм бандита" if "dress_thiefdress" in _clara_gift_ids:
             call ClaraGiveGift(girl_name, "dress_thiefdress")
         "Простой лиф" if "dress_simplebra" in _clara_gift_ids:
             call ClaraGiveGift(girl_name, "dress_simplebra")

@@ -114,8 +114,7 @@ label NextDay_TavernDaily():
                 Zimmer.horse_complaint_stage = 0
             else:
                 TotalDay['HorseStolen'] = '{b}НЕГОДЯИ ПОД ПОКРОВОМ НОЧИ УКРАЛИ У ВАС ВАШЕГО КОНИКА, ВАШЕГО НЕНАГЛЯДНОГО %s. УТРОМ ВЫ ОБНАРУЖИЛИ ЧТО ЗАМОК НА ВОРОТАХ КОНЮШНИ ВЗЛОМАН, А ЛОШАДИ И СЛЕД ПРОСТЫЛ. НИКТО НИЧЕГО НЕ ВИДЕЛ И НЕ СЛЫШАЛ.{/b}\n' % player.horse.name.upper()
-                player.horse.remove()
-                player.horse.stolen_days = 14
+                player.horse.mark_stolen(14)
                 Mongol.theft_asked = False
                 Mongol.asked_about_seen_stolen = False
                 Mongol.seen_with_stolen_horse = False

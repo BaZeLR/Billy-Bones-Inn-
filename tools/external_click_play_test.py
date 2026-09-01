@@ -5265,15 +5265,15 @@ testcase external_clara_evening_follow_finishes_in_melissa_room:
     $ event_runtime.available.clear()
     $ event_runtime.evaluation_time = None
     $ initStoryEventRuntime(True)
-    $ threads["claraPaintingsPath"].advanceTo(8, force_active=True)
+    $ threads["claraPaintingsPath"].advanceTo(10, force_active=True)
     $ findAvailableEvents(True)
 
     run Jump("ArtisansQuarter")
     advance until screen "choice" timeout 20.0
     assert eval ("Вечером вы с Клариссой" in str(scene_runtime.text or "")) timeout 5.0
-    assert eval (int(threads["claraPaintingsPath"].num or 0) == 8) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 9) timeout 20.0
-    assert eval (int(threads["claraPaintingsPath"].num or 0) == 9) timeout 5.0
+    assert eval (int(threads["claraPaintingsPath"].num or 0) == 10) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 11) timeout 20.0
+    assert eval (int(threads["claraPaintingsPath"].num or 0) == 11) timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 22, 0)
     $ npc_interval_schedule_load_all(True)
     assert eval (str(people.location("clara") or "") == "TavernMelissaRoom") timeout 5.0
@@ -5286,9 +5286,9 @@ testcase external_clara_evening_follow_finishes_in_melissa_room:
     run Call("checkTriggers", "TavernMelissaRoom", "clara_paintings", 0)
     advance until screen "choice" timeout 20.0
     assert eval ("Кларисса наконец срывается" in str(scene_runtime.text or "")) timeout 5.0
-    assert eval (int(threads["claraPaintingsPath"].num or 0) == 9) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 10) timeout 20.0
-    assert eval (int(threads["claraPaintingsPath"].num or 0) == 10) timeout 5.0
+    assert eval (int(threads["claraPaintingsPath"].num or 0) == 11) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 12) timeout 20.0
+    assert eval (int(threads["claraPaintingsPath"].num or 0) == 12) timeout 5.0
     assert eval (str(scene_runtime.text or "") == _clara_room_origin_text and str(scene_runtime.picture or "") == _clara_room_origin_picture) timeout 5.0
 
 '''
@@ -6935,13 +6935,36 @@ testcase external_clara_object_thread_conditions:
     $ findAvailableEvents(True)
     assert eval (not story_event_available("WineStore", "clara_paintings")) timeout 5.0
     $ external_calendar_set_fields(3, 1, 1100, 6, 0)
+    $ threads["claraPaintingsPath"].advanceTo(3, force_active=True)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    run Call("checkTriggers", "WineStore", "clara_paintings", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval ("впервые спрашиваете Клариссу" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 4) timeout 20.0
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    run Call("checkTriggers", "WineStore", "clara_paintings", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval ("второй раз возвращаетесь к теме рисунков" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 5) timeout 20.0
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("WineStore", "clara_paintings")) timeout 5.0
+    run Call("checkTriggers", "WineStore", "clara_paintings", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval ("почему среди ее самых откровенных сюжетов" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    assert eval ("Легаре не ее настоящий отец" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraPaintingsPath"].num or 0) == 6) timeout 20.0
     $ Clara.commission_followup_day = int(calendar_v2.daysInGame or 0)
-    $ threads["claraPaintingsPath"].advanceTo(7, force_active=True)
+    $ threads["claraPaintingsPath"].advanceTo(9, force_active=True)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     assert eval (story_event_available("WineStore", "clara_paintings")) timeout 5.0
     $ external_calendar_set_fields(3, 1, 1100, 21, 0)
-    $ threads["claraPaintingsPath"].advanceTo(8, force_active=True)
+    $ threads["claraPaintingsPath"].advanceTo(10, force_active=True)
     $ rooms.enter("ArtisansQuarter")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
@@ -6949,11 +6972,22 @@ testcase external_clara_object_thread_conditions:
     $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999)])
     $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMelissaRoom", start_minute=0, end_minute=1440, priority=999)])
     $ external_calendar_set_fields(3, 1, 1100, 22, 0)
-    $ threads["claraPaintingsPath"].advanceTo(9, force_active=True)
+    $ threads["claraPaintingsPath"].advanceTo(11, force_active=True)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     assert eval (people.location("clara") == "TavernMelissaRoom" and people.location("melissa") == "TavernMelissaRoom") timeout 5.0
     assert eval (story_event_available("TavernMelissaRoom", "clara_paintings")) timeout 5.0
+    $ threads["claraPaintingsPath"].advanceTo(4, force_active=True)
+    $ threads["claraForestSofa"].advanceTo(2, force_active=True)
+    $ player.horse.__dict__.pop("stolen_purchase_price", None)
+    $ player.horse.stolen_days = 5
+    $ Mongol.horse_price = 800
+    $ saveVersion = 77
+    $ updateSave()
+    assert eval (int(saveVersion or 0) == 78) timeout 5.0
+    assert eval (int(threads["claraPaintingsPath"].num or 0) == 5) timeout 5.0
+    assert eval (int(threads["claraForestSofa"].num or 0) == 6) timeout 5.0
+    assert eval (int(player.horse.stolen_purchase_price or 0) == 800) timeout 5.0
 
 testcase external_clara_forest_sofa_story_flow:
     run Jump("Intro")
@@ -6963,24 +6997,79 @@ testcase external_clara_forest_sofa_story_flow:
     $ threads["claraPaintingsPath"].advanceTo(2, force_active=True)
     $ threads["claraForestSofa"].advanceTo(0, force_active=True)
     $ Clara.rel = max(5, int(Clara.rel or 0))
-    $ external_calendar_set_fields(3, 1, 1100, 20, 0)
+    $ external_calendar_set_fields(3, 1, 1100, 15, 0)
     $ external_calendar_set_weekday(1)
-    $ rooms.enter("MarketPlace")
+    $ rooms.enter("ForestClearing")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    $ _sofa_market_event = threads["claraForestSofa"].getevent(0)
+    $ _sofa_follow_event = threads["claraForestSofa"].getevent(0)
     assert eval (threads["claraForestSofa"].checkActive()) timeout 5.0
-    assert eval (_sofa_market_event.checkDay()) timeout 5.0
-    assert eval (_sofa_market_event.checkHour()) timeout 5.0
-    assert eval (_sofa_market_event.checkConditions()) timeout 5.0
-    assert eval (_sofa_market_event.checkNumDay(threads["claraForestSofa"].day)) timeout 5.0
-    assert eval (not _story_location_is_open("MarketPlace")) timeout 5.0
-    assert eval (story_event_available("MarketPlace", "enter")) timeout 5.0
+    assert eval (_sofa_follow_event.checkDay()) timeout 5.0
+    assert eval (_sofa_follow_event.checkHour()) timeout 5.0
+    assert eval (_sofa_follow_event.checkConditions()) timeout 5.0
+    assert eval (_sofa_follow_event.checkNumDay(threads["claraForestSofa"].day)) timeout 5.0
+    assert eval (story_event_available("ForestClearing", "clara_follow")) timeout 5.0
+    run Call("checkTriggers", "ForestClearing", "clara_follow", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval (any("тихо проследить" in str(i.caption or "").lower() for i in renpy.get_screen("choice").scope.get("items", []))) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 1) timeout 20.0
 
-    $ threads["claraForestSofa"].advanceTo(1, force_active=True)
+    $ threads["claraForestSofa"].day = int(calendar_v2.daysInGame or 0) - 1
+    $ rooms.enter("ForestLake")
+    $ player.horse.remove()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("ForestLake", "clara_horse_prank")) timeout 5.0
+    $ player.horse.acquire("Test horse", 900, True)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("ForestLake", "clara_horse_prank")) timeout 5.0
+    run Call("ForestLakeWashHorse")
+    advance until screen "choice" timeout 20.0
+    assert eval (any("закончить купание и чистку коня" in str(i.caption or "").lower() for i in renpy.get_screen("choice").scope.get("items", []))) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 2) timeout 20.0
+
+    $ threads["claraForestSofa"].day = int(calendar_v2.daysInGame or 0) - 1
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("ForestLake", "clara_bath")) timeout 5.0
+    run Call("ForestLakeBath")
+    advance until screen "choice" timeout 20.0
+    assert eval (any("раздеться и войти следом" in str(i.caption or "").lower() for i in renpy.get_screen("choice").scope.get("items", []))) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 3) timeout 20.0
+    assert eval (int(player.item_count("clara_pantaloons_001") or 0) == 1) timeout 5.0
+    assert eval (any(str(row.get("gift_id", "") or "") == "dress_thiefdress" for row in Clara.giftable_entries()) == player.appearance.has_dress("thiefdress")) timeout 5.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 0)
+    $ threads["claraForestSofa"].day = int(calendar_v2.daysInGame or 0) - 1
+    $ rooms.enter("GroceryStore")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("GroceryStore", "enter")) timeout 5.0
+    run Call("RoomEnterEventGate", "GroceryStore", False)
+    advance until screen "choice" timeout 20.0
+    assert eval (any("откуда на туфлях лесная грязь" in str(i.caption or "").lower() for i in renpy.get_screen("choice").scope.get("items", []))) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 4) timeout 20.0
+
     $ rooms.enter("ForestHiddenPath")
     $ player.remove_item("clara_pantaloons_001", player.item_count("clara_pantaloons_001"))
     $ player.remove_item("shovel_001", player.item_count("shovel_001"))
+    $ dog.owned = False
+    $ player.combat.remove_party_member("dog")
     $ external_calendar_set_fields(3, 1, 1100, 12, 0)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
@@ -6992,9 +7081,36 @@ testcase external_clara_forest_sofa_story_flow:
     $ player.add_item("shovel_001", 1)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    assert eval (not story_event_available("ForestHiddenPath", "clara_stash")) timeout 5.0
+    $ dog.owned = True
+    $ dog.health = max(1, int(dog.health or 0))
+    $ player.combat.add_party_member("dog")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
     assert eval (story_event_available("ForestHiddenPath", "clara_stash")) timeout 5.0
+    run Call("checkTriggers", "ForestHiddenPath", "clara_stash", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval ("[dog.pet_name]" not in str(scene_runtime.text or "") and "сразу берет след" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 5) timeout 20.0
 
-    $ threads["claraForestSofa"].advanceTo(2, force_active=True)
+    $ rooms.enter("WineStore")
+    $ player.horse.stolen_purchase_price = 900
+    $ _clara_refund_money_before = int(player.economy.money or 0)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("WineStore", "clara_truth")) timeout 5.0
+    run Call("checkTriggers", "WineStore", "clara_truth", 0)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    assert eval ("450 мараведи" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 6) timeout 20.0
+    assert eval (int(player.economy.money or 0) == _clara_refund_money_before + 450) timeout 5.0
+    assert eval (int(player.item_count("clara_pantaloons_001") or 0) == 0 and int(player.horse.stolen_purchase_price or 0) == 0) timeout 5.0
+    assert eval (bool(Clara.merchant_contact_unlocked)) timeout 5.0
+
     $ _room_remove_item_by_id(rooms.get("TavernMain"), "cursed_sofa_001")
     $ Clara.merchant_contact_month_key = -1
     $ player.set_money(1000)
@@ -7007,11 +7123,13 @@ testcase external_clara_forest_sofa_story_flow:
     assert eval (story_event_available("CursedSofa", "talk")) timeout 5.0
     run Call("checkTriggers", "CursedSofa", "talk", 0)
     advance until screen "choice" timeout 20.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 3) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 7) timeout 20.0
 
     $ threads["claraPaintingsPath"].advanceTo(threads["claraPaintingsPath"].data.length, complete_at_end=True)
     $ Clara.set_sex_stat("virginity", True)
     $ Melissa.set_sex_stat("virginity", True)
+    $ player.tavern_management.client_room_hole = 1
+    $ player.tavern_management.glory_hole = 2
     $ people.get_data("clara").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999)])
     $ people.get_data("melissa").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999)])
     $ rooms.enter("TavernMain")

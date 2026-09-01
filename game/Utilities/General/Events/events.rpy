@@ -443,6 +443,7 @@ init python:
         findAvailableEvents(True)
 
 label before_main_menu:
+    $ household.repair()
     $ initStoryEventRuntime(True)
     return
 

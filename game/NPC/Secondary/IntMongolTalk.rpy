@@ -84,7 +84,7 @@ label ClaraSecretMerchantMenu:
     $ _secret_market_month_key = int(calendar_v2.cycle or 0) * 100 + int(calendar_v2.period or 0)
     while True:
         menu:
-            "Купить старинный диван за 600" if threads["claraForestSofa"].num == 2 and not cursed_sofa_installed():
+            "Купить старинный диван за 600" if threads["claraForestSofa"].num == 6 and not cursed_sofa_installed():
                 call ClaraSecretMerchantBuySofa
                 if people_to_int(Clara.merchant_contact_month_key, -1) == _secret_market_month_key:
                     return
@@ -126,7 +126,7 @@ label ClaraSecretMerchantBuy(item_id="", price_value=0):
 
 
 label ClaraSecretMerchantBuySofa:
-    if threads["claraForestSofa"].num != 2 or cursed_sofa_installed():
+    if threads["claraForestSofa"].num != 6 or cursed_sofa_installed():
         $ scene_runtime.text = "Монгол разводит руками: старинного дивана среди его тайного товара больше нет."
         $ scene_runtime.location_text = scene_runtime.text
         return

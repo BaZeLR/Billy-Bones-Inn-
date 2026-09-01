@@ -15,16 +15,25 @@ def test_clara_continuation_has_one_ordered_story_authority():
     )[0]
 
     stages = [
-        "story_clara_forest_lake_0",
-        "story_clara_forest_sofa_stash_1",
-        "story_clara_sofa_first_talk_2",
-        "story_clara_sofa_ritual_3",
+        "story_clara_forest_follow_0",
+        "story_clara_forest_horse_prank_1",
+        "story_clara_forest_shared_bath_2",
+        "story_clara_grocery_dirt_3",
+        "story_clara_forest_sofa_stash_4",
+        "story_clara_forest_confession_5",
+        "story_clara_sofa_first_talk_6",
+        "story_clara_sofa_ritual_7",
     ]
     assert all(block.count(stage) == 1 for stage in stages)
     assert [block.index(stage) for stage in stages] == sorted(block.index(stage) for stage in stages)
     assert "#threads['claraBookletMarket'].completed" in block
     assert "#int(threads['claraPaintingsPath'].num or 0) >= 2" not in block
-    assert "people.location('clara')" not in block.split('"story_clara_forest_sofa_stash_1"', 1)[0]
+    assert "#player.horse.owns_horse()" in block
+    assert "#int(player.item_count('clara_pantaloons_001') or 0) > 0" in block
+    assert "#int(player.item_count('shovel_001') or 0) > 0" in block
+    assert "#bool(dog.owned)" in block
+    assert "#'dog' in player.combat.party" in block
+    assert "#bool(dog.is_alive())" in block
 
 
 def test_planned_entry_event_can_run_after_a_location_closes():
@@ -66,7 +75,7 @@ def test_clara_clue_tool_and_sofa_use_their_domain_owners():
 def test_sofa_ritual_uses_existing_story_and_npc_state_then_rewards_once():
     runtime = source("game/Utilities/General/Classes/StoryEventRuntime.rpy")
     sofa = source("game/Inn/TavernCursedSofa.rpy")
-    ritual = sofa.split("label story_clara_sofa_ritual_3:", 1)[1].split(
+    ritual = sofa.split("label story_clara_sofa_ritual_7:", 1)[1].split(
         "label CursedSofaRepeatStory:", 1
     )[0]
 
@@ -89,21 +98,54 @@ def test_forest_confession_uses_native_branch_and_thread_as_protection_authority
 
     assert '"ForestClearing",\n            "clara_follow"' in runtime
     assert 'Call("checkTriggers", room_code, "clara_follow", 0)' in forest
+    assert 'story_event_available("ForestLake", "clara_horse_prank")' in forest
+    assert 'story_event_available("ForestLake", "clara_bath")' in forest
     assert 'vscene "images/clara/forest_clara_bath.png"' in labels
     assert 'vscene "images/clara/forest_clara_bath_4.png"' in labels
-    assert '"Простить Клариссу и взять под свою защиту":' in labels
-    assert '"Отказать и не скрывать ее вину":' in labels
+    assert '"Простить Клариссу, вернуть тайник и панталоны":' in labels
+    assert '"Отказать в защите и передать доказательства страже":' in labels
+    assert "player.horse.stolen_purchase_price" in labels
+    assert "_clara_stash_take = 600 + _clara_horse_refund" in labels
+    assert 'player.remove_item("clara_pantaloons_001", 1)' in labels
     assert 'event_runtime.active_thread.abort()' in labels
     for mirror in ("protection_granted", "clara_protected", "forest_confession_seen"):
         assert mirror not in runtime
         assert mirror not in labels
 
 
+def test_shared_bath_unlocks_bandit_costume_gift_without_a_parallel_flag():
+    clara = source("game/NPC/Girls/Clara/InitClara.rpy")
+    talk = source("game/NPC/Girls/Clara/IntClaraTalk.rpy")
+
+    assert 'dress_code == "thiefdress" and int(threads["claraForestSofa"].num or 0) < 3' in clara
+    assert '_gds_add_dress_for_girl(self.name, dress_code)' in clara
+    assert '"dress_thiefdress" in _clara_gift_ids' in talk
+    for mirror in ("bandit_costume_unlocked", "clara_bandit_dress", "forest_bath_seen"):
+        assert mirror not in clara
+        assert mirror not in talk
+
+
+def test_v77_save_migration_maps_existing_clara_threads_and_horse_claim_once():
+    migration = source("game/TractirSaveSync.rpy")
+    block = migration.split("def updateSave_V77():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+
+    assert "define currentVersion = 78" in migration
+    assert "if loaded_version < 78:" in migration
+    assert "updateSave_V77()" in migration
+    assert "paintings_map = {" in block
+    assert "forest_sofa_map = {0: 0, 1: 4, 2: 6, 3: 7}" in block
+    assert 'not hasattr(player.horse, "stolen_purchase_price")' in block
+    assert "horse_theft_known = bool(" in block
+    assert "player.horse.stolen_purchase_price" in block
+
+
 def test_legare_confrontation_uses_fight_authority_and_keeps_story_alive():
     fight_runtime = source("game/Utilities/Fight/FightSystemRuntime.rpy")
     paintings = source("game/NPC/Girls/Clara/ClaraPaintingsThread.rpy")
     confrontation = paintings.split("label story_clara_paintings_confront_legare:", 1)[1].split(
-        "label story_clara_paintings_artisans_2:", 1
+        "label story_clara_paintings_wait_comfort:", 1
     )[0]
 
     assert '"legare": FightEnemyDefinition(' in fight_runtime

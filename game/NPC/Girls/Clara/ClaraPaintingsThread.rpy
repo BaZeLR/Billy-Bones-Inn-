@@ -117,7 +117,22 @@ label story_clara_paintings_comfort_2:
     return
 
 
-label story_clara_paintings_second_ask_3:
+label story_clara_paintings_first_ask_3:
+    $ main_ui_begin_native_scene_state("Рисунки Клариссы")
+    show screen main_ui
+    $ Clara.trust = min(20, int(Clara.trust or 0) + 1)
+    $ Clara.change_social(friend_delta=1, open_delta=1)
+    $ scene_runtime.text = "Вы впервые спрашиваете Клариссу прямо о ее рисунках. Девушка мгновенно понимает, какие именно листки вы имеете в виду, но отвечает осторожно.\n\n\"Я рисую то, о чем приличные люди предпочитают только шептаться,\" признается она. \"Иногда это фантазия, иногда увиденная сцена, а иногда заказ. Но имена я тебе пока не назову. Если хочешь услышать больше, сначала докажи, что умеешь хранить чужие тайны.\"\n\nКларисса не отрицает ни рисунков, ни их продажи, однако за разговором явно скрывается история, которую она пока не готова открыть."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Не давить и вернуться к разговору позже":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return
+
+
+label story_clara_paintings_second_ask_4:
     $ main_ui_begin_native_scene_state("Разговор с Клариссой")
     show screen main_ui
     $ Clara.trust = min(20, int(Clara.trust or 0) + 2)
@@ -132,7 +147,28 @@ label story_clara_paintings_second_ask_3:
     return
 
 
-label story_clara_paintings_church_4:
+label story_clara_paintings_legare_5:
+    $ main_ui_begin_native_scene_state("Кларисса и Легаре")
+    show screen main_ui
+    vscene "images/clara/wineSellar_clara_talk_5.png"
+    $ Clara.trust = min(20, int(Clara.trust or 0) + 2)
+    $ Clara.change_social(open_delta=2)
+    $ scene_runtime.text = "После второго разговора о рисунках Кларисса уже не может спрятаться за светскими шутками. Вы спрашиваете, почему среди ее самых откровенных сюжетов снова и снова появляется Легаре. Девушка долго молчит, затем запирает дверь в дальнюю кладовую.\n\nОна признается, что отношения с Легаре давно переступили границу между властным опекуном и приемной дочерью. Он пользовался ее зависимостью и ее страхом перед навязанным браком; Кларисса то подчинялась, то пыталась обратить эту связь в средство получить свободу. Именно поэтому в рисунках так много стыда, злости и попыток взять происходящее под собственный контроль."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Спросить, почему она называет его приемным отцом":
+            pass
+    $ scene_runtime.text = "Кларисса отвечает, что Альбер Легаре не ее настоящий отец. Ее мать Элоиза уже растила маленькую дочь, когда вышла за него замуж; кто был биологическим отцом, она сама, вероятно, не знает. Легаре дал Клариссе свое имя, вырастил ее в своем доме и привык считать ее частью собственной собственности.\n\nТеперь вы понимаете, почему Кларисса одновременно боится его, зависит от него и так яростно ищет тайную жизнь вне семьи."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Пообещать не выдавать ее признание":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ main_ui_end_native_scene_state()
+    return
+
+
+label story_clara_paintings_church_6:
     $ main_ui_begin_native_scene_state("Семья Легаре в церкви")
     show screen main_ui
     $ scene_runtime.text = "У колонны рядом с семьей Легаре сегодня стоит незнакомый молодой дворянин из столицы. Кларисса держится рядом с ним так ровно, что это выглядит почти болезненно. Легаре, напротив, доволен: он представляет гостя как человека из хорошего дома и будущего союзника семьи.\n\nКларисса не произносит слова \"жених\", но оно и так висит между ними. Теперь понятно, что столичная договоренность уже не слух и не отдаленная угроза."
@@ -145,7 +181,7 @@ label story_clara_paintings_church_4:
     return
 
 
-label story_clara_paintings_barber_5:
+label story_clara_paintings_barber_7:
     $ main_ui_begin_native_scene_state("Жених Клариссы")
     show screen main_ui
     if int(calendar_v2.time_slot() or 0) == 0:
@@ -175,7 +211,7 @@ label story_clara_paintings_barber_peek:
     return
 
 
-label story_clara_paintings_commission_6:
+label story_clara_paintings_commission_8:
     $ main_ui_begin_native_scene_state("Поручение Клариссы")
     show screen main_ui
     $ Clara.commission_followup_day = int(current_game_day() or 0) + 1
@@ -189,7 +225,7 @@ label story_clara_paintings_commission_6:
     return
 
 
-label story_clara_paintings_commission_followup_7:
+label story_clara_paintings_commission_followup_9:
     $ main_ui_begin_native_scene_state("Поручение Клариссы")
     show screen main_ui
     $ scene_runtime.text = "Утром в винной лавке Кларисса сразу понимает, зачем вы пришли. Вы пересказываете ей все без лишних украшений. Она не перебивает, только сжимает пальцы на краю стойки.\n\n\"Вечером,\" решает она наконец. \"Если я увижу сама, я смогу нарисовать не слух, а правду. И тогда отецу будет куда сложнее продать меня за красивую столичную легенду.\""
@@ -202,7 +238,7 @@ label story_clara_paintings_commission_followup_7:
     return
 
 
-label story_clara_paintings_evening_peek_8:
+label story_clara_paintings_evening_peek_10:
     $ main_ui_begin_native_scene_state("Кларисса у цирюльни")
     show screen main_ui
     $ Clara.murder_day = int(current_game_day() or 0) + 1
@@ -216,7 +252,7 @@ label story_clara_paintings_evening_peek_8:
     return True
 
 
-label story_clara_paintings_confession_9:
+label story_clara_paintings_confession_11:
     $ main_ui_begin_native_scene_state("Признание Клариссы")
     show screen main_ui
     $ Clara.change_social(friend_delta=2)
@@ -231,7 +267,7 @@ label story_clara_paintings_confession_9:
     return
 
 
-label story_clara_paintings_murder_10:
+label story_clara_paintings_murder_12:
     $ main_ui_begin_native_scene_state("Смерть жениха Клариссы")
     show screen main_ui
     $ scene_runtime.text = "У караулки шумно: стражники переговариваются вполголоса, а десятник Циммерман выглядит куда серьезнее обычного. Столичный жених Клариссы найден мертвым.\n\nЦиммерман не спешит называть виновного. Вместо этого он бросает вам странную загадку: \"Кто режет ближе всех, но держит лезвие чистым? Кто слышит тайны, но продает только видимость порядка? Ответишь верно - помогу тебе разобраться и сам.\""

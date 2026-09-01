@@ -27,9 +27,16 @@ def test_unused_button_to_current_location_dispatcher_is_removed():
     assert "jump expression CurLoc" not in source
 
 
+def test_loaded_household_schema_is_repaired_before_story_schedule_evaluation():
+    source = read("game/Utilities/General/Events/events.rpy")
+    block = source.split("label before_main_menu:", 1)[1].split("\nlabel ", 1)[0]
+
+    assert block.index("household.repair()") < block.index("initStoryEventRuntime(True)")
+
+
 def test_clara_paintings_event_returns_to_trigger_caller_without_room_reentry():
     source = read("game/NPC/Girls/Clara/ClaraPaintingsThread.rpy")
-    block = source.split("label story_clara_paintings_evening_peek_8:", 1)[1].split("\nlabel ", 1)[0]
+    block = source.split("label story_clara_paintings_evening_peek_10:", 1)[1].split("\nlabel ", 1)[0]
 
     assert "jump TavernMelissaRoom" not in block
     assert block.rstrip().endswith("return True")

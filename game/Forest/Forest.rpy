@@ -598,6 +598,10 @@ label ForestSubroomTakeSpawnedItem(item_id=""):
 
 
 label ForestLakeBath:
+    if story_event_available("ForestLake", "clara_bath"):
+        call checkTriggers("ForestLake", "clara_bath", 0)
+        $ main_ui_runtime.action_items = forest_subroom_action_items()
+        return
     python:
         calendar_v2.advance_minutes(60)
         player.appearance.wash()
@@ -613,6 +617,10 @@ label ForestLakeBath:
 
 label ForestLakeWashHorse:
     if not forest_has_horse():
+        $ main_ui_runtime.action_items = forest_subroom_action_items()
+        return
+    if story_event_available("ForestLake", "clara_horse_prank"):
+        call checkTriggers("ForestLake", "clara_horse_prank", 0)
         $ main_ui_runtime.action_items = forest_subroom_action_items()
         return
     python:

@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 77
+define currentVersion = 78
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -669,6 +669,10 @@ init -100 python:
         if loaded_version < 77:
             updateSave_V76()
             loaded_version = 77
+
+        if loaded_version < 78:
+            updateSave_V77()
+            loaded_version = 78
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2556,6 +2560,67 @@ init -100 python:
             church_thread.done = list(church_done)
             church_thread.num = sum(1 for value in church_done if value)
             church_thread.completed = church_thread.num >= church_thread.data.length
+
+    def updateSave_V77():
+        # Clarissa's existing threads gained authored intermediate scenes. Map
+        # old indices once so loaded games neither repeat completed scenes nor
+        # point at a different event after the thread definitions are rebound.
+        paintings = threads.get("claraPaintingsPath")
+        forest_sofa = threads.get("claraForestSofa")
+        paintings_state = None
+        forest_sofa_state = None
+        if paintings is not None:
+            paintings_state = (
+                int(paintings.num or 0),
+                bool(paintings.completed),
+                bool(paintings.aborted),
+                bool(paintings.metconds),
+            )
+        if forest_sofa is not None:
+            forest_sofa_state = (
+                int(forest_sofa.num or 0),
+                bool(forest_sofa.completed),
+                bool(forest_sofa.aborted),
+                bool(forest_sofa.metconds),
+            )
+
+        initThreads()
+
+        if paintings is not None and paintings_state is not None:
+            old_num, was_completed, was_aborted, was_active = paintings_state
+            paintings_map = {
+                0: 0, 1: 1, 2: 2, 3: 3, 4: 5, 5: 7,
+                6: 8, 7: 9, 8: 10, 9: 11, 10: 12,
+            }
+            if was_completed or old_num >= 11:
+                paintings.advanceTo(paintings.data.length, complete_at_end=True)
+            else:
+                mapped_num = paintings_map.get(old_num, paintings.data.length)
+                paintings.advanceTo(mapped_num, force_active=bool(was_active or mapped_num > 0))
+                paintings.aborted = was_aborted
+
+        if forest_sofa is not None and forest_sofa_state is not None:
+            old_num, was_completed, was_aborted, was_active = forest_sofa_state
+            forest_sofa_map = {0: 0, 1: 4, 2: 6, 3: 7}
+            if was_completed or old_num >= 4:
+                forest_sofa.advanceTo(forest_sofa.data.length, complete_at_end=True)
+            else:
+                mapped_num = forest_sofa_map.get(old_num, forest_sofa.data.length)
+                forest_sofa.advanceTo(mapped_num, force_active=bool(was_active or mapped_num > 0))
+                forest_sofa.aborted = was_aborted
+
+        if not hasattr(player.horse, "stolen_purchase_price"):
+            horse_theft_known = bool(
+                int(player.horse.stolen_days or 0) > 0
+                or bool(Mongol.theft_asked)
+                or bool(Mongol.asked_about_seen_stolen)
+                or bool(Mongol.seen_with_stolen_horse)
+                or int(Zimmer.horse_complaint_stage or 0) > 0
+            )
+            if horse_theft_known:
+                player.horse.stolen_purchase_price = max(0, int(Mongol.horse_price or 1000))
+            else:
+                player.horse.stolen_purchase_price = 0
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

@@ -330,7 +330,7 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                 "Войти сзади" if _hse_full_engine and player.intimacy.can_cum() and not _hse_info.sex_busy() and "insert" in bodymodel_actions_for_target(_hse_girl, "ass") and player.intimacy.arousal_value() >= 30 and _hse_info.arousal_value() >= 40:
                     $ _hse_info.set_cock_position("ass")
                     $ _hse_effect = bodymodel_apply_action(_hse_girl, "ass", "insert", "You", _hse_data.fullname, "female")
-                    if _hse_girl == "melissa" and threads["claraTavernVisit"].completed and int(threads["claraForestSofa"].num or 0) >= 1 and not bool(threads["claraForestSofa"].aborted):
+                    if _hse_girl == "melissa" and threads["claraTavernVisit"].completed and int(threads["claraForestSofa"].num or 0) >= 6 and not bool(threads["claraForestSofa"].aborted):
                         $ scene_runtime.text = "Вспомнив советы Клариссы, Мелисса сама задает медленный темп и показывает, когда можно продолжить. Вы входите сзади без спешки; она привыкает к новому давлению и не позволяет вам торопиться."
                     else:
                         $ scene_runtime.text = "Вы входите сзади медленно и без спешки. Она сама показывает, когда можно продолжить, и не позволяет вам торопиться."

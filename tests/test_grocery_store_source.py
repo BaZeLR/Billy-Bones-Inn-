@@ -73,6 +73,8 @@ def test_grocery_merchant_state_comes_from_npc_schedule_not_room_mirror():
     assert "GrocerName" not in source
     assert "label GroceryStoreBuildActions" not in source
     assert "while _grocery_ui_return is None" not in source
+    assert "$ _grocery_store_event_played = False" in source
+    assert "call RoomEnterEventGate(rooms.current_code, False)" in source
 
 
 def test_grocery_visible_npc_is_merchant_until_known():

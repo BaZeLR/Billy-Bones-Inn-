@@ -7,14 +7,14 @@ init 4 python:
 
     def cursed_sofa_story_active(_obj=None):
         thread = threads.get("claraForestSofa")
-        return thread is not None and not thread.completed and int(thread.num or 0) in (2, 3)
+        return thread is not None and not thread.completed and int(thread.num or 0) in (6, 7)
 
     def cursed_sofa_story_available(_obj=None):
         return cursed_sofa_story_active() and story_event_available("CursedSofa", "talk")
 
     def cursed_sofa_waiting_for_ritual(_obj=None):
         thread = threads.get("claraForestSofa")
-        return thread is not None and not thread.completed and int(thread.num or 0) == 3 and not story_event_available("CursedSofa", "talk")
+        return thread is not None and not thread.completed and int(thread.num or 0) == 7 and not story_event_available("CursedSofa", "talk")
 
     def cursed_sofa_freed(_obj=None):
         thread = threads.get("claraForestSofa")
@@ -55,7 +55,7 @@ init 4 python:
     )
 
 
-label story_clara_sofa_first_talk_2:
+label story_clara_sofa_first_talk_6:
     $ main_ui_begin_native_scene_state("Говорящий диван")
     show screen main_ui
     $ scene_runtime.text = "Едва вы остаетесь рядом с покупкой один, из обивки раздается сухой кашель. Диван представляется душой древнего придворного сказителя, которого ревнивый колдун проклял за слишком удачную шутку о королевском парике. С тех пор его таскают по рынкам, на нем торгуются, спят и однажды даже перевозили козу. Последнее он вспоминает с особенной ненавистью."
@@ -90,7 +90,7 @@ label CursedSofaRitualRequirements:
     return
 
 
-label story_clara_sofa_ritual_3:
+label story_clara_sofa_ritual_7:
     $ main_ui_begin_native_scene_state("Пробуждение дивана")
     show screen main_ui
     $ scene_runtime.text = "Кларисса и Мелисса сначала принимают вашу просьбу за очередную нелепую шутку. Но диван сам приветствует их, жалуется на три века чужих сапог и объясняет настоящее условие: обе должны добровольно доверить вам свою невинность в один вечер. Гостевая комната закрыта, глорихол отвлекает любопытных посетителей, и девушки после короткого разговора вместе соглашаются."

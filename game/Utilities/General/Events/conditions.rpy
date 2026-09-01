@@ -87,6 +87,7 @@ init -25 python:
             "location": rooms.current_code,
             "calendar_v2": calendar_v2,
             "daily_events": daily_events,
+            "dog": dog,
             "event_runtime": event_runtime,
             "player": player,
             "threads": threads,
