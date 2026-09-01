@@ -17,22 +17,7 @@ init python:
         return bool(Mongol.is_market_visible())
 
     def marketplace_stocks_visible():
-        minute_now = int(calendar_v2.clock_minutes() or 0) % 1440
-        booklet_thread = threads.get("claraBookletMarket")
-        if booklet_thread is None:
-            return False
-        stage = int(booklet_thread.num or 0)
-        if stage == 4:
-            return True
-        return (
-            (stage == 5 and minute_now >= 16 * 60)
-            or (
-                stage == 7
-                and Draupnir.mongol_lockpick_order_day >= 0
-                and minute_now >= 16 * 60
-                and int(calendar_v2.daysInGame or 0) > Mongol.stocks_food_day
-            )
-        )
+        return story_event_available("menu_CityGuard", "mongol_stocks")
 
     def marketplace_exit_minutes(target_room=""):
         if str(target_room or "").strip() == "StreetTavern":

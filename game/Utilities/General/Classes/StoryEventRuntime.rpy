@@ -580,6 +580,8 @@ define claraThreadList = [
             [
                 "#Draupnir.mongol_lockpick_order_day >= 0",
                 "#int(current_game_day() or 0) > Mongol.stocks_food_day",
+                "#int(player.tavern_management.productnum or 0) > 0",
+                "#int(player.tavern_management.winenum or 0) > 0",
             ],
             None,
             "menu_CityGuard",

@@ -188,6 +188,29 @@ def test_clara_booklet_progress_has_no_boolean_stage_mirrors():
     assert "advanceTo(4" not in hunter
 
 
+def test_mongol_release_projects_one_authoritative_event_gate():
+    market = _source(Path("game") / "Town" / "Market" / "MarketPlace.rpy")
+    events = _source(Path("game") / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy")
+    labels = _source(Path("game") / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy")
+
+    visibility = market.split("def marketplace_stocks_visible():", 1)[1].split("def marketplace_exit_minutes", 1)[0]
+    release_event = events.split('"story_clara_market_booklet_9"', 1)[1].split('"story_clara_market_booklet_10"', 1)[0]
+    release_menu = labels.split("label story_clara_market_booklet_9:", 1)[1].split("label story_clara_market_booklet_release_mongol:", 1)[0]
+
+    assert 'return story_event_available("menu_CityGuard", "mongol_stocks")' in visibility
+    assert "claraBookletMarket" not in visibility
+    assert "mongol_lockpick_order_day" not in visibility
+    assert "stocks_food_day" not in visibility
+    assert "clock_minutes" not in visibility
+    assert "None, (21, 23), None" in release_event
+    assert "#Draupnir.mongol_lockpick_order_day >= 0" in release_event
+    assert "#int(current_game_day() or 0) > Mongol.stocks_food_day" in release_event
+    assert "#int(player.tavern_management.productnum or 0) > 0" in release_event
+    assert "#int(player.tavern_management.winenum or 0) > 0" in release_event
+    assert '"Послать стражникам вино и угощение, а затем освободить Монгола":' in release_menu
+    assert '"Послать стражникам вино и угощение, а затем освободить Монгола" if' not in release_menu
+
+
 def test_clara_market_ignore_prepares_state_without_self_loop():
     labels = _source(Path("game") / "NPC" / "Girls" / "Clara" / "ClaraBookletMarketThread.rpy")
     ignore = labels.split("label story_clara_market_booklet_ignore:", 1)[1].split("label story_clara_market_booklet_follow:", 1)[0]

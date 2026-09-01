@@ -63,7 +63,7 @@ def test_mongol_market_flow_uses_class_methods():
     assert "return bool(Mongol.is_market_visible())" in source
     assert "Mongol.reset_market_trade()" in source
     assert "Mongol.horse_price" in source
-    assert 'threads.get("claraBookletMarket")' in source
+    assert 'return story_event_available("menu_CityGuard", "mongol_stocks")' in source
 
 
 def test_mongol_talk_uses_one_native_menu_without_recursive_loop_or_dispatcher():
@@ -94,10 +94,10 @@ def test_mongol_stocks_progress_uses_thread_stage_without_mirror_flags():
     combined = "\n".join((runtime, labels, market))
     assert "StocksSeen" not in combined
     assert "StocksReleased" not in combined
-    assert 'threads.get("claraBookletMarket")' in market
-    assert "stage == 4" in market
-    assert "stage == 5" in market
-    assert "stage == 7" in market
+    stocks_visibility = market.split("def marketplace_stocks_visible():", 1)[1].split("def marketplace_exit_minutes", 1)[0]
+    assert 'return story_event_available("menu_CityGuard", "mongol_stocks")' in stocks_visibility
+    assert 'threads.get("claraBookletMarket")' not in stocks_visibility
+    assert "stage ==" not in stocks_visibility
 
 
 def test_mongol_v61_migration_consumes_old_map_once():

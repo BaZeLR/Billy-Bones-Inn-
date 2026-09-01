@@ -319,7 +319,7 @@ label story_clara_market_booklet_9:
     "[scene_runtime.text]"
 
     menu:
-        "Послать стражникам вино и угощение, а затем освободить Монгола" if int(player.tavern_management.productnum or 0) > 0 and int(player.tavern_management.winenum or 0) > 0:
+        "Послать стражникам вино и угощение, а затем освободить Монгола":
             jump story_clara_market_booklet_release_mongol
 
         "Оставить Монгола отвечать за конокрадство":
