@@ -55,3 +55,17 @@ def test_story_board_marks_active_threads_with_distinct_color():
     assert "def story_board_thread_status_label" in source
     assert 'text "Status: " + story_board_thread_status_label(tinfo) color story_board_thread_color(tinfo)' in source
     assert "Thread colors: active blue" in source
+
+
+def test_story_board_gives_the_thread_event_pane_more_readable_space():
+    source = BOARD_PATH.read_text(encoding="utf-8-sig")
+
+    assert "STORY_BOARD_LEFT_WIDTH = 1120" in source
+    assert "STORY_BOARD_DETAIL_WIDTH = 800" in source
+    assert "STORY_BOARD_THREAD_TITLE_WIDTH = 280" in source
+    assert "STORY_BOARD_ROW_HEIGHT = 24" in source
+    assert "STORY_BOARD_CELL_SIZE = 24" in source
+    assert source.count("xpos STORY_BOARD_LEFT_WIDTH") == 2
+    assert source.count("xsize STORY_BOARD_DETAIL_WIDTH") == 2
+    assert "xsize STORY_BOARD_THREAD_TITLE_WIDTH ysize STORY_BOARD_ROW_HEIGHT" in source
+    assert "xysize (STORY_BOARD_CELL_SIZE, STORY_BOARD_CELL_SIZE)" in source

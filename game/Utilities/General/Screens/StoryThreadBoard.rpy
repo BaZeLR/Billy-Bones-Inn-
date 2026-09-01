@@ -1,6 +1,20 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
+init -10 python:
+    STORY_BOARD_TITLE_TEXT_SIZE = 24
+    STORY_BOARD_LEGEND_TEXT_SIZE = 18
+    STORY_BOARD_TAB_TEXT_SIZE = 18
+    STORY_BOARD_SECTION_TEXT_SIZE = 18
+    STORY_BOARD_ROW_TEXT_SIZE = 18
+    STORY_BOARD_DETAIL_TEXT_SIZE = 18
+    STORY_BOARD_CONTROL_TITLE_SIZE = 18
+    STORY_BOARD_LEFT_WIDTH = 1120
+    STORY_BOARD_DETAIL_WIDTH = 800
+    STORY_BOARD_THREAD_TITLE_WIDTH = 280
+    STORY_BOARD_ROW_HEIGHT = 24
+    STORY_BOARD_CELL_SIZE = 24
+
 init python:
     STORY_BOARD_PERSON_ORDER = [
         "melissa",
@@ -108,15 +122,6 @@ init python:
         "complete": "#1f9d55",
         "unknown": "#334155",
     }
-
-    STORY_BOARD_TITLE_TEXT_SIZE = 24
-    STORY_BOARD_LEGEND_TEXT_SIZE = 18
-    STORY_BOARD_TAB_TEXT_SIZE = 18
-    STORY_BOARD_SECTION_TEXT_SIZE = 18
-    STORY_BOARD_ROW_TEXT_SIZE = 18
-    STORY_BOARD_DETAIL_TEXT_SIZE = 18
-    STORY_BOARD_CONTROL_TITLE_SIZE = 18
-    STORY_BOARD_CELL_SIZE = 20
 
     def story_board_safe_text(value):
         return str(value or "").replace("[", "[[")
@@ -449,7 +454,7 @@ init python:
 init -5:
     style scene is button
     style scene:
-        xysize (20, 15)
+        xysize (STORY_BOARD_CELL_SIZE, STORY_BOARD_CELL_SIZE)
         margin (5, 5, 5, 0)
         padding (0, 0)
 
@@ -548,9 +553,9 @@ screen story_thread_board_panel(person=None, standalone=False):
                     hbox:
                         $ _offset = int(getattr(_tinfo.data, "level", 0) or 0)
                         use story_board_toggle_highlight(_tinfo)
-                        textbutton story_board_thread_title(_tinfo) xsize 180 ysize 16:
+                        textbutton story_board_thread_title(_tinfo) xsize STORY_BOARD_THREAD_TITLE_WIDTH ysize STORY_BOARD_ROW_HEIGHT:
                             text_color story_board_thread_color(_tinfo)
-                            text_size 16
+                            text_size STORY_BOARD_ROW_TEXT_SIZE
                             text_hover_color "#ffff00"
                             action NullAction()
                             hovered Show("story_thread_screen", None, _tinfo)
@@ -568,17 +573,17 @@ screen story_thread_board_panel(person=None, standalone=False):
 
 
 screen story_board_toggle_highlight(tinfo):
-    text ("[[x]" if getattr(tinfo, "highlight", False) else "[[ ]") size 16 xsize 40
+    text ("[[x]" if getattr(tinfo, "highlight", False) else "[[ ]") size STORY_BOARD_ROW_TEXT_SIZE xsize 40
 
 
 screen story_thread_screen(tinfo):
     style_prefix "event"
     zorder 211
     frame:
-        xpos 920
+        xpos STORY_BOARD_LEFT_WIDTH
         ypos 50
         background Solid("#000000")
-        xsize 1000
+        xsize STORY_BOARD_DETAIL_WIDTH
         ysize 200
         vbox:
             text "Thread: " + tinfo.data.name
@@ -592,10 +597,10 @@ screen story_event_screen(tinfo, i, evt):
     style_prefix "event"
     zorder 211
     frame:
-        xpos 920
+        xpos STORY_BOARD_LEFT_WIDTH
         ypos 50
         background Solid("#000000")
-        xsize 1000
+        xsize STORY_BOARD_DETAIL_WIDTH
         ysize 200
         vbox:
             hbox:
