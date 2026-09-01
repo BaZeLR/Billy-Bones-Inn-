@@ -623,11 +623,15 @@ def test_georgett_has_three_location_story_threads_without_old_rows():
     assert '"story_georgett_portstreet_clients"' in rows
     assert '"IntGeorgettAskClients"' in rows
     assert '"IntGeorgettInviteTavern"' in rows
+    assert '"#int(Georgett.rel or 0) >= 10"' in rows
+    assert '"#int(Liza.rel or 0) >= 8"' in rows
     assert '"IntGeorgettAskPirate"' in rows
     assert '"IntGeorgettGloryholeTerms"' in rows
     assert '"TavernProstClients"' not in rows
     assert '"ChurchServiceGeorgett"' in rows
     assert '"ChurchGeorgettQuickSex"' in rows
+    assert '"#int(Georgett.rel or 0) >= 6"' in rows
+    assert '"#int(player.economy.money or 0) >= 15"' in rows
     assert '"story_georgett_church_confession_regular"' in rows
     assert '"story_georgett_church_confession_service"' in rows
     assert '"story_georgett_church_after_sermon"' in rows

@@ -41,8 +41,11 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
                     call IntGeorgettAskGerhard(girl_name, girl_loc)
             "Рассказать про Лизетту и отца Герхарда" if Liza.witnessed_church_after_sermon and Georgett.can_talk_today():
                 call IntGeorgettTellLizaGerhard(girl_name, girl_loc)
-            "Предложить работать у себя в трактире" if story_event_available("talk_georgett", "invite_tavern"):
-                call checkTriggers("talk_georgett", "invite_tavern", 0)
+            "Предложить работать у себя в трактире" if Georgett.can_invite_to_tavern():
+                if story_event_available("talk_georgett", "invite_tavern"):
+                    call checkTriggers("talk_georgett", "invite_tavern", 0)
+                else:
+                    call IntGeorgettInviteTavern(girl_name, girl_loc)
             "Спросить как работается у вас в трактире" if Georgett.can_work_tavern() and Georgett.can_talk_today():
                 call IntGeorgettAskWork(girl_name, girl_loc)
             "Спросить про работу в Пьяном Пирате" if story_event_available("talk_georgett", "explain_gloryhole"):
