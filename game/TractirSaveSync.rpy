@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 76
+define currentVersion = 77
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -665,6 +665,10 @@ init -100 python:
         if loaded_version < 76:
             updateSave_V75()
             loaded_version = 76
+
+        if loaded_version < 77:
+            updateSave_V76()
+            loaded_version = 77
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2499,6 +2503,59 @@ init -100 python:
             "georgettChurchAfterSermon",
         ):
             threads.pop(old_name, None)
+
+    def updateSave_V76():
+        # Georgette's three location rows now expose their real authored
+        # milestones. Recover completed cells from the owning NPC fields once;
+        # afterward the thread objects advance only from their story labels.
+        initThreads()
+
+        port_thread = threads.get("georgettPortStreet")
+        if port_thread is not None:
+            port_done = [
+                bool(Georgett.known),
+                people_to_int(Georgett.story_value("seeclients", 0), 0) > 0,
+                people_to_int(Georgett.story_value("askclients", 0), 0) > 0,
+                people_to_int(Georgett.story_value("asksex", 0), 0) > 0,
+                people_to_int(Georgett.story_value("askparents", 0), 0) > 0,
+                people_to_int(Georgett.story_value("askpregnancy", 0), 0) > 0,
+                people_to_int(Georgett.story_value("askkids", 0), 0) > 0,
+                bool(Georgett.can_work_tavern()),
+            ]
+            port_thread.done = list(port_done)
+            port_thread.num = sum(1 for value in port_done if value)
+            port_thread.completed = port_thread.num >= port_thread.data.length
+
+        tavern_thread = threads.get("georgettTavern")
+        if tavern_thread is not None:
+            tavern_done = [
+                people_to_int(Georgett.story_value("GloryHoleExplained", 0), 0) > 0,
+                people_to_int(Georgett.story_value("GloryHoleAgreed", 0), 0) > 0,
+            ]
+            tavern_thread.done = list(tavern_done)
+            tavern_thread.num = sum(1 for value in tavern_done if value)
+            tavern_thread.completed = tavern_thread.num >= tavern_thread.data.length
+
+        church_thread = threads.get("georgettChurch")
+        if church_thread is not None:
+            church_downstream = any([
+                people_to_int(Georgett.story_value("fuckinchurch", 0), 0) > 0,
+                people_to_int(Georgett.story_value("georgettadmit", 0), 0) > 0,
+                people_to_int(Georgett.story_value("churchgeorgettadmit", 0), 0) > 0,
+                people_to_int(Georgett.story_value("SawChurchAfterCermon", 0), 0) > 0,
+                people_to_int(Georgett.story_value("TalkChurchAfterCermon", 0), 0) > 0,
+            ])
+            church_done = [
+                church_downstream,
+                people_to_int(Georgett.story_value("fuckinchurch", 0), 0) > 0,
+                people_to_int(Georgett.story_value("georgettadmit", 0), 0) > 0,
+                people_to_int(Georgett.story_value("churchgeorgettadmit", 0), 0) > 0,
+                people_to_int(Georgett.story_value("SawChurchAfterCermon", 0), 0) > 0,
+                people_to_int(Georgett.story_value("TalkChurchAfterCermon", 0), 0) > 0,
+            ]
+            church_thread.done = list(church_done)
+            church_thread.num = sum(1 for value in church_done if value)
+            church_thread.completed = church_thread.num >= church_thread.data.length
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

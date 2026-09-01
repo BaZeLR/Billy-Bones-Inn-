@@ -281,8 +281,10 @@ def test_georgett_liza_talk_labels_use_class_topic_state():
     georgett = _source(GEORGETT_TALK)
     liza = _source(LIZA_TALK)
 
-    assert 'Georgett.can_ask_topic("clients")' in georgett
+    assert 'story_event_available("talk_georgett", "ask_clients")' in georgett
+    assert 'call checkTriggers("talk_georgett", "ask_clients", 0)' in georgett
     assert 'Georgett.mark_asked_topic("askclients")' in georgett
+    assert 'event_runtime.active_thread is threads.get("georgettPortStreet")' in georgett
     assert "Georgett.finish_talk()" in georgett
     assert "GeorgettVar[" not in georgett
     assert "GeorgettVar.get" not in georgett
@@ -320,7 +322,7 @@ def test_liza_v55_migration_consumes_legacy_state_once():
     migration = _source(MIGRATION)
     block = migration.split("def updateSave_V55():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 76" in migration
+    assert "define currentVersion = 77" in migration
     assert "if loaded_version < 56:" in migration
     assert "updateSave_V55()" in migration
     for old_key, field_name in (
@@ -349,10 +351,11 @@ def test_liza_v55_migration_consumes_legacy_state_once():
     assert "people_to_int(Liza.rel, 0) > 0" in identity_migration
 
 
-def test_georgett_first_meeting_is_owned_by_the_scheduled_npc_talk_label():
+def test_georgett_first_meeting_is_owned_by_the_npc_story_event():
     port = _source(PORT_STREETS)
     talk = _source(GEORGETT_TALK)
     georgett = _source(GEORGETT_INIT)
+    events = _source(GEORGETT_EVENTS)
 
     entry = port.split("label PortStreets:", 1)[1].split("label PortStreetsBottleMenu", 1)[0]
     assert '$ main_ui_runtime.mode = "scene"' in entry
@@ -373,9 +376,11 @@ def test_georgett_first_meeting_is_owned_by_the_scheduled_npc_talk_label():
     first_talk = talk.split('label IntGeorgettTalk(girl_name="georgett", girl_loc=""):', 1)[1].split(
         "label IntGeorgettSmalltalk", 1
     )[0]
-    assert "Georgett.mark_known()" in first_talk
-    assert "-Привет красавчик!" in first_talk
-    assert "Georgett.add_relation(1)" in first_talk
+    assert 'call checkTriggers("talk_georgett", "intro", 0)' in first_talk
+    assert "Georgett.mark_known()" in events
+    assert "-Привет красавчик!" in events
+    assert "Georgett.add_relation(1)" in events
+    assert 'event_runtime.active_thread.seen(0)' in events
     assert 'girl_loc == "street" and not bool(Georgett.known)' in first_talk
     assert 'girl_loc == "street" and people_to_int(Georgett.rel, 0) <= 0' not in first_talk
     assert "Как прошел твой день?" in first_talk
@@ -609,13 +614,24 @@ def test_georgett_has_three_location_story_threads_without_old_rows():
         "define franThreadList", 1
     )[0]
 
-    assert rows.count('LThreadData(0, "georgett",') == 3
-    assert 'LThreadData(0, "georgett", "PortStreet",' in rows
-    assert 'LThreadData(0, "georgett", "Tavern",' in rows
-    assert 'LThreadData(0, "georgett", "Church",' in rows
+    assert rows.count('UThreadData(0, "georgett",') == 3
+    assert 'UThreadData(0, "georgett", "PortStreet",' in rows
+    assert 'UThreadData(0, "georgett", "Tavern",' in rows
+    assert 'UThreadData(0, "georgett", "Church",' in rows
+    assert 'highlight=False, threaded=True' in rows
+    assert '"story_georgett_portstreet_first_meet"' in rows
     assert '"story_georgett_portstreet_clients"' in rows
-    assert '"TavernProstClients"' in rows
+    assert '"IntGeorgettAskClients"' in rows
+    assert '"IntGeorgettInviteTavern"' in rows
+    assert '"IntGeorgettAskPirate"' in rows
+    assert '"IntGeorgettGloryholeTerms"' in rows
+    assert '"TavernProstClients"' not in rows
+    assert '"ChurchServiceGeorgett"' in rows
+    assert '"ChurchGeorgettQuickSex"' in rows
+    assert '"story_georgett_church_confession_regular"' in rows
+    assert '"story_georgett_church_confession_service"' in rows
     assert '"story_georgett_church_after_sermon"' in rows
+    assert '"IntGeorgettAskGerhard"' in rows
     assert '"PortStreetClients"' not in rows
     assert '"TavernClientRoom"' not in rows
     assert '"ChurchAfterSermon"' not in rows
@@ -623,7 +639,7 @@ def test_georgett_has_three_location_story_threads_without_old_rows():
     migration_block = migration.split("def updateSave_V75():", 1)[1].split(
         "# Saved objects must be upgraded", 1
     )[0]
-    assert "define currentVersion = 76" in migration
+    assert "define currentVersion = 77" in migration
     assert "if loaded_version < 76:" in migration
     assert "updateSave_V75()" in migration
     for old_name in (
@@ -633,6 +649,18 @@ def test_georgett_has_three_location_story_threads_without_old_rows():
     ):
         assert '"%s"' % old_name in migration_block
     assert "threads.pop(old_name, None)" in migration_block
+
+    progress_migration = migration.split("def updateSave_V76():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+    assert "if loaded_version < 77:" in migration
+    assert "updateSave_V76()" in migration
+    assert 'threads.get("georgettPortStreet")' in progress_migration
+    assert 'threads.get("georgettTavern")' in progress_migration
+    assert 'threads.get("georgettChurch")' in progress_migration
+    assert 'Georgett.story_value("askclients", 0)' in progress_migration
+    assert 'Georgett.story_value("GloryHoleExplained", 0)' in progress_migration
+    assert 'Georgett.story_value("churchgeorgettadmit", 0)' in progress_migration
 
 
 def test_georgett_church_service_preserves_the_single_authored_action_flow():

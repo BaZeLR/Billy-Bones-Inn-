@@ -87,5 +87,9 @@ label story_georgett_church_after_sermon_look_4:
 
     menu:
         "Вернуться в собор":
+            if event_runtime.active_thread is threads.get("georgettChurch") and not event_runtime.active_thread.done[4]:
+                $ event_runtime.active_thread.seen(4)
+                $ event_runtime.evaluation_time = None
+                $ findAvailableEvents(True)
             $ calendar_v2.advance_minutes(60)
             jump Church

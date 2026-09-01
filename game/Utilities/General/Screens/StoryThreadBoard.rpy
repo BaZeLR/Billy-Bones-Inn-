@@ -72,7 +72,22 @@ init python:
         "story_clara_melissa_room_visit_1": "Clarissa and Melissa room: drawings",
         "story_clara_melissa_room_visit_2": "Clarissa and Melissa room: private doodles",
         "story_clara_tavern_protection_lessons_6": "Clarissa tavern: protection lessons",
+        "story_georgett_portstreet_first_meet": "Georgette port: first meeting",
+        "story_georgett_portstreet_clients": "Georgette port: first client scene",
+        "IntGeorgettAskClients": "Georgette port: clients talk",
+        "IntGeorgettAskSex": "Georgette port: sex history talk",
+        "IntGeorgettAskFamily": "Georgette port: family talk",
+        "IntGeorgettAskPregnancy": "Georgette port: pregnancy talk",
+        "IntGeorgettAskKids": "Georgette port: children talk",
+        "IntGeorgettInviteTavern": "Georgette port: tavern invitation",
+        "IntGeorgettAskPirate": "Georgette tavern: explain the gloryhole",
+        "IntGeorgettGloryholeTerms": "Georgette tavern: agree gloryhole terms",
+        "ChurchServiceGeorgett": "Georgette church: find her at service",
+        "ChurchGeorgettQuickSex": "Georgette church: first quick encounter",
+        "story_georgett_church_confession_regular": "Georgette church: confess regular sex",
+        "story_georgett_church_confession_service": "Georgette church: confess during service",
         "story_georgett_church_after_sermon": "Georgette church: after-sermon spy scene",
+        "IntGeorgettAskGerhard": "Georgette church: ask about Gerhard",
         "story_liza_church_after_sermon": "Lizette church: after-sermon scene",
         "story_becky_church_after_sermon": "Becky church: after-sermon confession",
     }
@@ -82,6 +97,20 @@ init python:
         "clara_room_visit": "Clarissa visits Melissa room",
         "after_cermon_walk": "After-sermon walk",
         "street_clients": "Port street clients",
+        "intro": "First meeting",
+        "ask_clients": "Ask about clients",
+        "ask_sex": "Ask about sex",
+        "ask_family": "Ask about family",
+        "ask_pregnancy": "Ask about pregnancy",
+        "ask_kids": "Ask about children",
+        "invite_tavern": "Invite to the tavern",
+        "explain_gloryhole": "Ask about the Drunken Pirate",
+        "agree_gloryhole_terms": "Agree gloryhole terms",
+        "georgett_service": "Find Georgette at service",
+        "georgett_quick_sex": "Offer a quick encounter",
+        "georgett_regular_confession": "Confess regular sex",
+        "georgett_service_confession": "Confess sex during service",
+        "ask_gerhard": "Ask about Gerhard",
     }
 
     STORY_BOARD_TARGET_FILES = {
@@ -105,7 +134,21 @@ init python:
         "story_clara_melissa_room_visit_1": "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy",
         "story_clara_melissa_room_visit_2": "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy",
         "story_clara_tavern_protection_lessons_6": "game/NPC/Girls/Clara/ClaraTavernVisitThread.rpy",
+        "story_georgett_portstreet_first_meet": "game/NPC/Girls/Georgett/GeorgettEvents.rpy",
         "story_georgett_church_after_sermon": "game/NPC/Girls/Georgett/IntGeorgettAfterCermon.rpy",
+        "IntGeorgettAskClients": "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy",
+        "IntGeorgettAskSex": "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy",
+        "IntGeorgettAskFamily": "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy",
+        "IntGeorgettAskPregnancy": "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy",
+        "IntGeorgettAskKids": "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy",
+        "IntGeorgettInviteTavern": "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy",
+        "IntGeorgettAskPirate": "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy",
+        "IntGeorgettGloryholeTerms": "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy",
+        "IntGeorgettAskGerhard": "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy",
+        "ChurchServiceGeorgett": "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy",
+        "ChurchGeorgettQuickSex": "game/NPC/Girls/Georgett/InitGeorgettChurch.rpy",
+        "story_georgett_church_confession_regular": "game/Town/Church/ChurchIspoved.rpy",
+        "story_georgett_church_confession_service": "game/Town/Church/ChurchIspoved.rpy",
         "story_liza_church_after_sermon": "game/NPC/Girls/Liza/IntLizettAfterCermon.rpy",
         "story_georgett_portstreet_clients": "game/NPC/Girls/Georgett/GeorgettEvents.rpy",
         "story_liza_portstreet_clients": "game/NPC/Girls/Liza/LizaEvents.rpy",
@@ -278,6 +321,8 @@ init python:
                 return "blocked"
             if bool(getattr(tinfo, "completed", False)):
                 return "done"
+            if isinstance(tinfo, UThreadInfo) and tinfo.checkActive():
+                return "available" if story_board_event_available(tinfo, index) else "waiting"
             if int(getattr(tinfo, "num", 0) or 0) == int(index or 0) and tinfo.checkActive():
                 return "available" if story_board_event_available(tinfo, index) else "waiting"
             if int(index or 0) > int(getattr(tinfo, "num", 0) or 0):

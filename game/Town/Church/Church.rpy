@@ -300,7 +300,10 @@ label ChurchServiceMenu(show_attendees=True):
     $ main_ui_runtime.action_items.append(MenuItem("Найти семейство Легаре", Call("ChurchServiceLegare")))
     $ main_ui_runtime.action_items.append(MenuItem("Найти семейство Блэнкеншип", Call("ChurchServiceBlanken")))
     if people_to_int(Georgett.rel, 0) >= 2:
-        $ main_ui_runtime.action_items.append(MenuItem("Найти Жоржетту Брюно", Call("ChurchServiceGeorgett")))
+        if story_event_available("Church", "georgett_service"):
+            $ main_ui_runtime.action_items.append(MenuItem("Найти Жоржетту Брюно", Call("checkTriggers", "Church", "georgett_service", 0)))
+        else:
+            $ main_ui_runtime.action_items.append(MenuItem("Найти Жоржетту Брюно", Call("ChurchServiceGeorgett")))
     $ main_ui_runtime.action_items.append(MenuItem("Вернуться к службе", Jump("Church")))
     $ renpy.restart_interaction()
     return

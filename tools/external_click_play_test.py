@@ -903,7 +903,6 @@ testcase external_port_streets_georgette_liza_flow:
     run Call("InitLiza")
     run Call("InitDog")
     $ external_calendar_set_fields(1, 1, 1100, 12, 0)
-    $ story_event_available = lambda location_name="", action_name="": False
     $ Georgett.rel = 0
     $ Georgett.known = False
     $ Liza.prostitution_started = False
@@ -944,6 +943,7 @@ testcase external_port_streets_georgette_liza_flow:
     $ _georgett_first_meeting_room_picture = str(scene_runtime.picture or "")
     click id "main_ui_entity_button_npc_georgett" pos (0.5, 0.5) until eval (int(Georgett.rel or 0) == 1 and bool(Georgett.known) and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (int(Georgett.rel or 0) == 1 and bool(Georgett.known)) timeout 5.0
+    assert eval (bool(threads["georgettPortStreet"].done[0])) timeout 5.0
     assert eval ("Жоржетта Брюно" in str(scene_runtime.text or "")) timeout 5.0
     $ _georgett_end_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
     $ _georgett_end_button_id = "choice_panel_button_%d" % int(_georgett_end_index)
@@ -2456,6 +2456,7 @@ testcase external_georgette_back_alley_not_visible_in_port_streets:
     assert eval (int(Georgett.story_value("seeclients", 0) or 0) == 1 and int(Georgett.var.get("portstreet_clients_seen_today", 0) or 0) == 1) timeout 5.0
     $ _georgett_client_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Вернуться в переулок")
     click id ("choice_panel_button_%d" % int(_georgett_client_back_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    assert eval (bool(threads["georgettPortStreet"].done[1])) timeout 5.0
     assert eval (str(rooms.current_code or "") == "PortStreets" and renpy.get_screen("main_ui") is not None and str(scene_runtime.picture or "") == str(rooms.current.bg_picture or "")) timeout 5.0
     assert eval (str(scene_runtime.text or "") == str(rooms.current.descriptions[0].text or "") and "Пойти проверить подворотню" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     assert eval (people.action_data_for_room("georgett", "PortStreets") is not None) timeout 5.0
@@ -3443,6 +3444,7 @@ testcase external_georgett_liza_church_after_sermon_events:
     $ external_calendar_set_fields(7, 1, 1100, 12, 0)
     $ rooms.enter("Church")
     $ TodaySexEvents_Clear()
+    $ Georgett.known = True
     $ Georgett.set_story_value("churchgeorgettadmit", 1)
     $ Georgett.set_story_value("churchlizaadmit", 0)
     $ TodaySexEvents_Add("georgett", 99, 99, "Priest")

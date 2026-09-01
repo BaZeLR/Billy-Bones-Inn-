@@ -71,10 +71,13 @@ def test_georgett_hire_uses_authored_paid_routes_and_one_time_owner():
 
 def test_georgett_first_meeting_snapshots_room_before_writing_npc_scene():
     talk = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy").read_text(encoding="utf-8-sig")
+    events = (ROOT / "game/NPC/Girls/Georgett/GeorgettEvents.rpy").read_text(encoding="utf-8-sig")
     first_talk = talk.split('label IntGeorgettTalk(girl_name="georgett", girl_loc=""):', 1)[1].split("while True:", 1)[0]
 
-    assert first_talk.index('main_ui_begin_talk_state("Разговор с Жоржеттой", girl_name)') < first_talk.index('scene_runtime.text = "-Привет красавчик!')
-    assert "Georgett.mark_known()" in first_talk
+    assert first_talk.index('main_ui_begin_talk_state("Разговор с Жоржеттой", girl_name)') < first_talk.index('call checkTriggers("talk_georgett", "intro", 0)')
+    assert 'label story_georgett_portstreet_first_meet:' in events
+    assert 'scene_runtime.text = "-Привет красавчик!' in events
+    assert "Georgett.mark_known()" in events
 
 
 def test_georgett_free_grope_rejection_returns_to_talk_owner():

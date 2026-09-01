@@ -15,7 +15,10 @@ init python:
         return int(rooms.get("PortStreets").custom_properties.get("bottle_present", 0) or 0) == 1
 
     def port_streets_client_event_available():
-        return story_event_available("PortStreets", "street_clients")
+        return story_event_available("PortStreets", "street_clients") or port_streets_repeat_georgett_client_event_available()
+
+    def port_streets_repeat_georgett_client_event_available():
+        return int(Georgett.story_value("seeclients", 0) or 0) > 0 and Georgett.portstreet_client_event_available()
 
     def port_streets_examine_lanes_visible():
         return not port_streets_client_event_available()
@@ -62,6 +65,13 @@ init python:
             ),
         ],
         action_menus=[
+            RoomAction(
+                action_id="street_clients",
+                label="Пойти проверить подворотню",
+                hook="call",
+                target="story_georgett_portstreet_clients",
+                condition=port_streets_repeat_georgett_client_event_available,
+            ),
             RoomAction(
                 action_id="examine_port_lanes",
                 label="Осмотреть переулки",

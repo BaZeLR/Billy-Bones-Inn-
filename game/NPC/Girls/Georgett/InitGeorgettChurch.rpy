@@ -11,12 +11,19 @@ label ChurchServiceGeorgett:
         vscene "images/georgett/church/cermon.jpg"
     $ scene_runtime.location_text = scene_runtime.text
     $ Georgett.set_story_value("foundinchurch", 1)
+    if event_runtime.active_thread is threads.get("georgettChurch") and not event_runtime.active_thread.done[0]:
+        $ event_runtime.active_thread.seen(0)
+        $ event_runtime.evaluation_time = None
+        $ findAvailableEvents(True)
     $ main_ui_runtime.mode = "scene"
     $ main_ui_runtime.action_title = "Жоржетта"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
     if player.intimacy.can_cum() and people_to_int(Georgett.rel, 0) >= 2 and people_to_int(Georgett.sex_stat("sexacts", 0), 0) >= 3:
-        $ main_ui_runtime.action_items.append(MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex")))
+        if story_event_available("Church", "georgett_quick_sex"):
+            $ main_ui_runtime.action_items.append(MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("checkTriggers", "Church", "georgett_quick_sex", 0)))
+        else:
+            $ main_ui_runtime.action_items.append(MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex")))
     $ main_ui_runtime.action_items.append(MenuItem("Назад", Call("ChurchServiceMenu", True)))
     $ renpy.restart_interaction()
     return
@@ -88,6 +95,10 @@ label ChurchGeorgettQuickSex:
     $ Georgett.set_story_value("fuckinchurch", 1)
     if Georgett.story_value("askkids", 0):
         $ Georgett.set_story_value("lizasawinchurch", 1)
+    if event_runtime.active_thread is threads.get("georgettChurch") and not event_runtime.active_thread.done[1]:
+        $ event_runtime.active_thread.seen(1)
+        $ event_runtime.evaluation_time = None
+        $ findAvailableEvents(True)
     $ pregnancy_check("georgett", "inside", 1, "Вы")
 
     if _church_georgett_variant == "doggy":

@@ -6,7 +6,12 @@ init 6 python:
         return int(player.tavern_management.client_room_hole or 0) > 0
 
     def tavern_empty_room_peephole_has_client():
-        return tavern_main_closed_text() == "" and int(player.tavern_management.client_room_hole or 0) > 0 and story_event_available("TavernEmptyRoom", "tavern_client_room")
+        if tavern_main_closed_text() != "" or int(player.tavern_management.client_room_hole or 0) <= 0:
+            return False
+        girl_name = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
+        if girl_name == "georgett":
+            return 13 <= int(calendar_v2.hour or 0) <= 15 and Georgett.can_work_tavern() and CheckIfSexEventExist("georgett", 3, "Prostitution") > 0
+        return story_event_available("TavernEmptyRoom", "tavern_client_room")
 
     def tavern_empty_room_peephole_no_client():
         return int(player.tavern_management.client_room_hole or 0) > 0 and not tavern_empty_room_peephole_has_client()
@@ -113,7 +118,10 @@ label TavernEmptyRoomPeekClient:
     if not tavern_empty_room_peephole_has_client():
         call TavernEmptyRoomPeekEmpty
         return
-    call checkTriggers("TavernEmptyRoom", "tavern_client_room", 0)
+    if str(rooms.get("TavernMain").state.get("client_room_girl", "") or "") == "georgett":
+        call TavernProstClients("georgett")
+    else:
+        call checkTriggers("TavernEmptyRoom", "tavern_client_room", 0)
     return
 
 

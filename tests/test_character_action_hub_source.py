@@ -116,8 +116,11 @@ def test_known_state_is_owned_by_talk_labels_not_the_ui_router():
         assert mark_call in talk_block, relative_path
 
     georgett_source = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy").read_text(encoding="utf-8-sig")
+    georgett_events = (ROOT / "game/NPC/Girls/Georgett/GeorgettEvents.rpy").read_text(encoding="utf-8-sig")
     first_meet = georgett_source.split('label IntGeorgettTalk(girl_name="georgett", girl_loc=""):', 1)[1].split("\nlabel ", 1)[0]
-    assert "Georgett.mark_known()" in first_meet
+    assert 'call checkTriggers("talk_georgett", "intro", 0)' in first_meet
+    assert "label story_georgett_portstreet_first_meet:" in georgett_events
+    assert "Georgett.mark_known()" in georgett_events
 
 
 def test_end_talk_restores_caller_ui_without_reentering_room_label():

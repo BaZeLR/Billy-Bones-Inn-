@@ -12,10 +12,7 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
     if _georgett_talk_new and _georgett_picture and renpy.loadable(_georgett_picture):
         $ scene_runtime.picture = _georgett_picture
     if _georgett_first_meeting:
-        $ scene_runtime.text = "-Привет красавчик! Не хочешь ли поразвлечься? Всего восемь мараведи!\n\nВы поговорили с ней и узнали, что ее зовут Жоржетта Брюно, она шлюха и промышляет здесь уже давно."
-        $ scene_runtime.location_text = scene_runtime.text
-        $ Georgett.add_relation(1)
-        $ Georgett.mark_known()
+        call checkTriggers("talk_georgett", "intro", 0)
     elif _georgett_talk_new:
         $ scene_runtime.text = "«Привет, красавчик! Как прошел твой день?» — приветствует вас Жоржетта."
         $ scene_runtime.location_text = scene_runtime.text
@@ -27,28 +24,31 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
                 call IntGeorgettSmalltalk(girl_name, girl_loc)
             "Подарить маленький подарок" if social_interaction_allowed_for_npc(girl_name, "gift"):
                 call PlayerCardGiftToFixedTargetMenu(girl_name)
-            "Спросить о клиентах" if Georgett.can_ask_topic("clients"):
-                call IntGeorgettAskClients(girl_name, girl_loc)
-            "Спросить о сексе" if Georgett.can_ask_topic("sex"):
-                call IntGeorgettAskSex(girl_name, girl_loc)
-            "Спросить о семье" if Georgett.can_ask_topic("family"):
-                call IntGeorgettAskFamily(girl_name, girl_loc)
-            "Спросить о беременности" if Georgett.can_ask_topic("pregnancy"):
-                call IntGeorgettAskPregnancy(girl_name, girl_loc)
-            "Спросить о детях" if Georgett.can_ask_topic("kids"):
-                call IntGeorgettAskKids(girl_name, girl_loc)
+            "Спросить о клиентах" if story_event_available("talk_georgett", "ask_clients"):
+                call checkTriggers("talk_georgett", "ask_clients", 0)
+            "Спросить о сексе" if story_event_available("talk_georgett", "ask_sex"):
+                call checkTriggers("talk_georgett", "ask_sex", 0)
+            "Спросить о семье" if story_event_available("talk_georgett", "ask_family"):
+                call checkTriggers("talk_georgett", "ask_family", 0)
+            "Спросить о беременности" if story_event_available("talk_georgett", "ask_pregnancy"):
+                call checkTriggers("talk_georgett", "ask_pregnancy", 0)
+            "Спросить о детях" if story_event_available("talk_georgett", "ask_kids"):
+                call checkTriggers("talk_georgett", "ask_kids", 0)
             "Спросить об отце Герхарде" if Georgett.can_ask_topic("gerhard"):
-                call IntGeorgettAskGerhard(girl_name, girl_loc)
+                if story_event_available("talk_georgett", "ask_gerhard"):
+                    call checkTriggers("talk_georgett", "ask_gerhard", 0)
+                else:
+                    call IntGeorgettAskGerhard(girl_name, girl_loc)
             "Рассказать про Лизетту и отца Герхарда" if Liza.witnessed_church_after_sermon and Georgett.can_talk_today():
                 call IntGeorgettTellLizaGerhard(girl_name, girl_loc)
-            "Предложить работать у себя в трактире" if Georgett.can_invite_to_tavern() and Georgett.can_talk_today():
-                call IntGeorgettInviteTavern(girl_name, girl_loc)
+            "Предложить работать у себя в трактире" if story_event_available("talk_georgett", "invite_tavern"):
+                call checkTriggers("talk_georgett", "invite_tavern", 0)
             "Спросить как работается у вас в трактире" if Georgett.can_work_tavern() and Georgett.can_talk_today():
                 call IntGeorgettAskWork(girl_name, girl_loc)
-            "Спросить про работу в Пьяном Пирате" if Georgett.can_work_tavern() and Georgett.can_talk_today() and Liza.glory_hole_asked and int(Georgett.story_value("GloryHoleExplained",0) or 0)==0:
-                call IntGeorgettAskPirate(girl_name, girl_loc)
-            "Договориться об условиях работы у глорихола" if Georgett.can_work_tavern() and Georgett.can_talk_today() and player.tavern_management.glory_hole==2 and int(Georgett.story_value("GloryHoleAgreed",0) or 0)==0:
-                call IntGeorgettGloryholeTerms(girl_name, girl_loc)
+            "Спросить про работу в Пьяном Пирате" if story_event_available("talk_georgett", "explain_gloryhole"):
+                call checkTriggers("talk_georgett", "explain_gloryhole", 0)
+            "Договориться об условиях работы у глорихола" if story_event_available("talk_georgett", "agree_gloryhole_terms"):
+                call checkTriggers("talk_georgett", "agree_gloryhole_terms", 0)
             "Обсудить Эдди" if Georgett.can_talk_today() and ((int(Georgett.story_value("TellAboutEddieMomSex",0) or 0)==0 and (Becky.eddie_join_stage==4 or Becky.home_visit_stage>=7)) or (Becky.eddie_georgett_stage==0 and Eddie.talked_about_georgett and Becky.home_visit_stage>=3 and (Eddie.saw_mother_sex or Becky.home_sex_unlocked))):
                 call IntGeorgettTalkEddie(girl_name, girl_loc)
             "Предложить Жоржетте проспонсировать ее визит к Эдди домой" if Becky.eddie_georgett_stage>0 and Becky.eddie_home_visit_state==0 and (player.economy.money>25 or (Becky.eddie_georgett_stage>1 and player.economy.money>10)) and Georgett.talk_count()<2:
@@ -93,6 +93,10 @@ label IntGeorgettAskClients(girl_name="georgett", girl_loc="street"):
     $ scene_runtime.text = "«Ну в день у меня обычно бывает от трех до пяти клиентов. Хотя конечно день на день не приходится, например, помню, в гавань зашла военная эскадра. Ох, как тогда имели всех девочек! Меня отодрали человек двадцать, наверное, а то и больше. Я спускала и спускала, ох, как же сладко было тогда!» - говорит Жоржетта, автоматически поглаживая промежность сквозь юбку."
     if Georgett.mark_asked_topic("askclients"):
         $ scene_runtime.text += "\n\nВас немного возбудил рассказ Жоржетты."
+        if event_runtime.active_thread is threads.get("georgettPortStreet") and not event_runtime.active_thread.done[2]:
+            $ event_runtime.active_thread.seen(2)
+            $ event_runtime.evaluation_time = None
+            $ findAvailableEvents(True)
     $ Georgett.finish_talk()
     $ scene_runtime.location_text = scene_runtime.text
     return
@@ -102,6 +106,10 @@ label IntGeorgettAskSex(girl_name="georgett", girl_loc="street"):
     $ scene_runtime.text = "«Ох, красавчик, мне всегда нравился секс. Маленькой еще была, за другими подсматривала и писю теребила. За сестренками старшими, как они с мальчишками то на сеновале, то в саду забавлялись, за маменькой как она то с папкой, то с дядей мельником, то с дядей молочником, то с сестренкиными дружками кувыркалась. За папкой, как он с соседками да с сестриными подружками сношался. Ну а когда Кристоф и Мишель, парни с соседней улицы, после танцев меня в уголке зажали и стали лапать, то я и не ломалась совсем и вскоре у меня в киске вместо девственной плевы было две порции свежего семени. Ну а потом пошло-поехало, никому я почитай и не отказывала, больно приятно это было. Потом я здесь, в городе устроилась, здесь мне за это и деньги платят. Вот еще бы все клиенты были как ты, внимательные. А то многие только о себе и думают, а девушке кончить не дают. Бывает за день только пару раз и разрядишься.» - рассказывает Жоржетта."
     if Georgett.mark_asked_topic("asksex"):
         $ scene_runtime.text += "\n\nВас немного возбудил рассказ Жоржетты."
+        if event_runtime.active_thread is threads.get("georgettPortStreet") and not event_runtime.active_thread.done[3]:
+            $ event_runtime.active_thread.seen(3)
+            $ event_runtime.evaluation_time = None
+            $ findAvailableEvents(True)
     $ Georgett.finish_talk()
     $ scene_runtime.location_text = scene_runtime.text
     return
@@ -111,6 +119,10 @@ label IntGeorgettAskFamily(girl_name="georgett", girl_loc="street"):
     $ scene_runtime.text = "«Даже не знаю, папка мой действительно ли мне папка, мамочка-то моя на передок всегда слаба была. Да и батяня за всеми юбками бегал, да и сейчас бегает. Любили они потрахаться, и от нас даже этого не скрывали. А уж на праздниках-то! Помню, однажды на празднике урожая мамка моя, сестренка старшая, Симона, и Жанна, мельникова дочка, в такой раж вошли что голыми на столах танцевали. Ну а уж после их гости и оприходовали. Папенька тот тоже, Симоне борозду-то распахал и засеял, не посмотрел что дочка. Симонка-то после того случая понесла ведь, и не поймешь от кого, может и от папки. Ну а вообще да, хорошо жили, дружно. Я тоже с папкой да с братцами несколько раз перепихнулась.» - рассказывает Жоржетта."
     if Georgett.mark_asked_topic("askparents"):
         $ scene_runtime.text += "\n\nВас немного возбудил рассказ Жоржетты."
+        if event_runtime.active_thread is threads.get("georgettPortStreet") and not event_runtime.active_thread.done[4]:
+            $ event_runtime.active_thread.seen(4)
+            $ event_runtime.evaluation_time = None
+            $ findAvailableEvents(True)
     $ Georgett.finish_talk()
     $ scene_runtime.location_text = scene_runtime.text
     return
@@ -120,6 +132,10 @@ label IntGeorgettAskPregnancy(girl_name="georgett", girl_loc="street"):
     $ scene_runtime.text = "«Беременность? Ну а как же без нее-то? Мужики они-то любят девушкам своим семенем прямо в маточку брызнуть, а от этого, как всем известно, детки родятся. Вот Симонка, сестра моя старшая, прежде чем замуж выскочила, целых троих нагуляла. А себя вспомнить - первый раз у меня животик округлился когда только-только первые волосики на письке пробиваться начали. Но мамочка моя всегда говорила, что ребенок есть ребенок, ему всегда рады, и ничего страшного в залете нет.» - поведала вам Жоржетта."
     if Georgett.mark_asked_topic("askpregnancy"):
         $ scene_runtime.text += "\n\nВас немного возбудил рассказ Жоржетты."
+        if event_runtime.active_thread is threads.get("georgettPortStreet") and not event_runtime.active_thread.done[5]:
+            $ event_runtime.active_thread.seen(5)
+            $ event_runtime.evaluation_time = None
+            $ findAvailableEvents(True)
     $ Georgett.finish_talk()
     $ scene_runtime.location_text = scene_runtime.text
     return
@@ -133,6 +149,10 @@ label IntGeorgettAskKids(girl_name="georgett", girl_loc="street"):
         $ scene_runtime.text += "\n\n«Насчет остальных же троих я не так уверенна. От кого угодно могла я залететь. Детки же мои сейчас с мамой и папой моими живут, а Лизетта вот уже ко мне перебралась, помогает.»"
     if Georgett.mark_asked_topic("askkids"):
         $ scene_runtime.text += "\n\nВас немного возбудил рассказ Жоржетты."
+        if event_runtime.active_thread is threads.get("georgettPortStreet") and not event_runtime.active_thread.done[6]:
+            $ event_runtime.active_thread.seen(6)
+            $ event_runtime.evaluation_time = None
+            $ findAvailableEvents(True)
     $ Georgett.finish_talk()
     $ scene_runtime.location_text = scene_runtime.text
     return
@@ -142,6 +162,10 @@ label IntGeorgettAskGerhard(girl_name="georgett", girl_loc="street"):
     $ scene_runtime.text = "«Отец Герхард? Кто-то, наверное ты, негодник, рассказал ему что мы с тобой во время службы трахались. Вот он меня и раскрутил на исповеди. Теперь он меня порой после воскресной службы потрахивает. Оргазм и благословление это конечно не мараведи, но тоже неплохо, так что я не в обиде.»"
     if Georgett.mark_asked_topic("TalkChurchAfterCermon"):
         $ scene_runtime.text += "\n\nВас немного возбудил рассказ Жоржетты."
+        if event_runtime.active_thread is threads.get("georgettChurch") and not event_runtime.active_thread.done[5]:
+            $ event_runtime.active_thread.seen(5)
+            $ event_runtime.evaluation_time = None
+            $ findAvailableEvents(True)
     $ Georgett.finish_talk()
     $ scene_runtime.location_text = scene_runtime.text
     return
@@ -178,6 +202,10 @@ label IntGeorgettInviteTavern(girl_name="georgett", girl_loc="street"):
         $ Liza.set_hired(True)
         $ player.tavern_management.breakfast.georgett_liza_pending = 1
         $ player.tavern_management.household_members = int(player.tavern_management.household_members) + 2 + kids_count_for_mothers("georgett", "liza")
+        if event_runtime.active_thread is threads.get("georgettPortStreet") and not event_runtime.active_thread.done[7]:
+            $ event_runtime.active_thread.seen(7)
+            $ event_runtime.evaluation_time = None
+            $ findAvailableEvents(True)
         $ Georgett.finish_talk()
         call NextDay("TavernMain", 1)
     return
@@ -199,6 +227,10 @@ label IntGeorgettAskWork(girl_name="georgett", girl_loc="street"):
 label IntGeorgettAskPirate(girl_name="georgett", girl_loc="street"):
     $ scene_runtime.text = "Вы расспрашиваете Жоржетту про ее работу в трактире «Пьяный Пират».\n«Ох Лизетта, Лизетта! Вечно все перепутает! Не Холглор, а глорихол! Занятная штука. С ним на одного клиента меньше времени уходит, поэтому можно дешевле брать и люди им чаще пользуются. И работать с ним удобно! Все хотела спросить почему у тебя такого нет, но решила что тебе виднее и промолчала.»\nВас заинтересовал рассказ девушки и вы уточнили у нее устройство данной конструкции.\n«Хм, а ведь хороший мастер такое должен бы быстро суметь сделать...» - подумали вы, выслушав ее рассказ."
     $ Georgett.mark_asked_topic("GloryHoleExplained", 0)
+    if event_runtime.active_thread is threads.get("georgettTavern") and not event_runtime.active_thread.done[0]:
+        $ event_runtime.active_thread.seen(0)
+        $ event_runtime.evaluation_time = None
+        $ findAvailableEvents(True)
     $ Georgett.finish_talk()
     $ scene_runtime.location_text = scene_runtime.text
     return
@@ -209,6 +241,10 @@ label IntGeorgettGloryholeTerms(girl_name="georgett", girl_loc="street"):
     $ Georgett.mark_asked_topic("GloryHoleAgreed", 0)
     $ Georgett.jobs["jobGloryHoleAvail"] = 1
     $ Liza.jobs["jobGloryHoleAvail"] = 1
+    if event_runtime.active_thread is threads.get("georgettTavern") and not event_runtime.active_thread.done[1]:
+        $ event_runtime.active_thread.seen(1)
+        $ event_runtime.evaluation_time = None
+        $ findAvailableEvents(True)
     $ Georgett.finish_talk()
     $ scene_runtime.location_text = scene_runtime.text
     return

@@ -93,6 +93,7 @@ init -25 python:
             "CheckIfSexEventExist": CheckIfSexEventExist,
             "DaddyAskBuildPhrase": DaddyAskBuildPhrase,
             "church_after_cermon_action_visible": church_after_cermon_action_visible,
+            "church_confession_action_visible": church_confession_action_visible,
             "church_service_action_visible": church_service_action_visible,
             "current_game_day": current_game_day,
             "day_delta_ready": day_delta_ready,
