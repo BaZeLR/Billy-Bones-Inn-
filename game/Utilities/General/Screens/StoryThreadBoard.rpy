@@ -13,6 +13,7 @@ init -10 python:
     STORY_BOARD_DETAIL_WIDTH = 800
     STORY_BOARD_THREAD_TITLE_WIDTH = 280
     STORY_BOARD_ROW_HEIGHT = 24
+    STORY_BOARD_EMPTY_ROW_HEIGHT = 24
     STORY_BOARD_CELL_SIZE = 24
 
 init python:
@@ -528,7 +529,7 @@ screen story_thread_board_panel(person=None, standalone=False):
             action SetField(main_ui_runtime, "overlay", "")
 
     vbox:
-        spacing 5
+        spacing STORY_BOARD_EMPTY_ROW_HEIGHT
         xpos 50
         ypos 50
 
@@ -545,7 +546,7 @@ screen story_thread_board_panel(person=None, standalone=False):
             mousewheel True
 
             vbox:
-                spacing 5
+                spacing STORY_BOARD_EMPTY_ROW_HEIGHT
                 if not _rows:
                     text "No story threads registered for this person."
                 $ _pos = 0
