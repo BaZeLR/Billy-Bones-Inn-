@@ -41,7 +41,9 @@ def test_backyard_preserves_objects_shooting_exits_dog_and_crafting():
     assert 'Call("ShootingPracticeMenu", "Backyard")' in ROOM
     assert "rooms.get(\"Backyard\").visible_exits()" in ROOM
     assert "call IntDogTalk(\"Backyard\")" in ROOM
-    assert "BackyardCookSoap" in ROOM
+    assert 'target="BackyardChooseSoapRecipe"' in ROOM
+    assert "label BackyardChooseSoapRecipe:" in CRAFT
+    assert 'call BackyardCookSoap("soap_recipe")' in CRAFT
     assert DOG.count("backyard_action_items()") == 3
     assert "stolyar_workshop_action_items()" not in DOG
 

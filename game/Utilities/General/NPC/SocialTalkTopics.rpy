@@ -122,8 +122,6 @@ init -39 python:
         },
     }
 
-    SOCIAL_EARLY_CARE_GIFT_IDS = ("soap_001", "luxury_soap_001", "energy_tea_001", "berries_001", "lavender_001", "wild_rose_001")
-
     SOCIAL_CUSTOM_GIFT_AFFINITY = {
         "amanda": {
             "good": ("lavender_001", "wild_rose_001", "luxury_soap_001", "libido_tincture_001"),
@@ -516,7 +514,7 @@ init -39 python:
             preferred = False
         if preferred:
             score = max(2, base + 1)
-        elif item_key in SOCIAL_EARLY_CARE_GIFT_IDS:
+        elif relationship_is_care_gift(item_key):
             score = max(1, min(4, base))
         else:
             score = 0
@@ -540,7 +538,7 @@ init -39 python:
         if not allowed:
             return False, -3
         score = social_gift_score(key, item_key, base_gain)
-        if item_key in SOCIAL_EARLY_CARE_GIFT_IDS:
+        if relationship_is_care_gift(item_key):
             return True, score
         if key in SOCIAL_FLIRT_PROFILES and social_rel_value(key) < 3 and score <= 0:
             return False, score

@@ -43,7 +43,7 @@ init 4 python:
         return attic_room_picture_path()
 
     def attic_manageable_item_ids():
-        return ("recipe_book_001", "rusty_hunter_rifle_001", "old_leather_cuirass_001", "soap_001", "cork_001")
+        return tuple(["recipe_book_001", "rusty_hunter_rifle_001", "old_leather_cuirass_001", "cork_001"] + soap_inventory_item_ids())
 
     def player_has_attic_manageable_items():
         for item_id in attic_manageable_item_ids():
@@ -167,18 +167,37 @@ init 4 python:
     def player_has_soap_bowl():
         return _soap_player_has_any(("night_bowl_001", "bucket_001"))
 
-    def soap_selected_flower_item():
-        if player.item_count("lavender_001") > 0:
-            return "lavender_001"
-        if player.item_count("wild_rose_001") > 0:
-            return "wild_rose_001"
-        return ""
+    def soap_inventory_item_ids(include_luxury=True):
+        soap_ids = []
+        for item_id, item_obj in dict(game_item_registry or {}).items():
+            properties = dict(getattr(item_obj, "custom_properties", {}) or {})
+            if str(properties.get("crafted_kind", "") or "").strip() != "soap":
+                continue
+            if not bool(include_luxury) and str(properties.get("soap_grade", "ordinary") or "ordinary").strip() == "luxury":
+                continue
+            soap_ids.append(str(item_id))
+        return soap_ids
 
     def soap_available_piece_count():
-        return max(0, int(player.item_count("soap_001") or 0))
+        return sum(max(0, int(player.item_count(item_id) or 0)) for item_id in soap_inventory_item_ids(False))
 
     def soap_total_piece_count():
-        return max(0, int(player.item_count("soap_001") or 0)) + max(0, int(player.item_count("luxury_soap_001") or 0))
+        return sum(max(0, int(player.item_count(item_id) or 0)) for item_id in soap_inventory_item_ids())
+
+    def player_remove_soap_pieces(quantity=1, include_luxury=False):
+        remaining = max(0, int(quantity or 0))
+        available = soap_total_piece_count() if bool(include_luxury) else soap_available_piece_count()
+        if remaining <= 0 or available < remaining:
+            return False
+        for item_id in soap_inventory_item_ids(include_luxury):
+            owned = max(0, int(player.item_count(item_id) or 0))
+            take = min(owned, remaining)
+            if take > 0:
+                player.remove_item(item_id, take)
+                remaining -= take
+            if remaining <= 0:
+                return True
+        return False
 
     def household_soap_preferred_aroma_text(girl_name=""):
         girl = str(girl_name or "").strip().lower()
@@ -302,14 +321,11 @@ init 4 python:
         return "Вы выпускаете стрелу в лесную мишень. Она с глухим стуком вонзается в древесину, и рука запоминает правильное усилие."
 
     def soap_can_cook_at_backyard():
-        if str(rooms.current_code or "") != "Backyard":
-            return False
-        return recipe_page_can_craft("soap_recipe")
-
-    def soap_can_cook_luxury_at_backyard():
-        if str(rooms.current_code or "") != "Backyard":
-            return False
-        return recipe_page_can_craft("luxury_soap_recipe")
+        return (
+            str(rooms.current_code or "") == "Backyard"
+            and soap_ash_barrel_is_ready()
+            and player_has_soap_recipe_book()
+        )
 
     CLOTH_DRESS_SCRAP_YIELD = {
         "villagedress": 3,
@@ -402,38 +418,49 @@ init 4 python:
             return {"ok": False, "text": "На вас уже нечему рваться."}
         return player_tear_wardrobe_dress(current_dress, True, context_text)
 
-    class SoapBatchRecipePage(RecipePage):
-        def __init__(self, use_olive_oil=False, **kwargs):
-            self.use_olive_oil = bool(use_olive_oil)
-            super(SoapBatchRecipePage, self).__init__(**kwargs)
+    def soap_recipe_ingredients(*additive_ids):
+        ingredients = {
+            "soap_container": {
+                "quantity": 1,
+                "unit": "штука",
+                "special": "soap_container",
+                "consume": False,
+                "note": "Подойдет ведро или ночная миска.",
+            },
+            "ash_barrel_ready": {
+                "quantity": 1,
+                "unit": "штука",
+                "special": "soap_ash_barrel_ready",
+                "consume": False,
+                "note": "Нужен щелок из зольной бочки, простоявший не меньше недели.",
+            },
+            "pig_lard_001": {"quantity": 1, "unit": "кусок"},
+        }
+        for item_id in tuple(additive_ids or ()):
+            ingredients[str(item_id)] = {"quantity": 1, "unit": "порция"}
+        return ingredients
 
+    class SoapBatchRecipePage(RecipePage):
         def craft(self, resolved_rows=None):
             rows = list(resolved_rows if resolved_rows is not None else recipe_page_requirement_status(self.recipe_id))
-            soap_flower = recipe_resolved_item_id(rows, "flower_mix", soap_selected_flower_item())
-            soap_flower_name = str(get_game_item(soap_flower).name if get_game_item(soap_flower) else "травы")
-            soap_additives = [soap_flower]
-            if player.item_count("special_herbs_001") > 0:
-                soap_additives.append("special_herbs_001")
-            if player.item_count("honey_comb_001") > 0:
-                soap_additives.append("honey_comb_001")
-            if self.use_olive_oil:
-                soap_additives.append("olive_oil_001")
-            batch_profile = soap_batch_profile(soap_additives)
             consume_result = recipe_consume_required_ingredients(self.recipe_id, rows)
             if not bool(consume_result.get("ok", False)):
                 return {"ok": False, "text": str(consume_result.get("text", "") or self.craft_failure_text), "recipe_id": self.recipe_id}
-            if "special_herbs_001" in list(batch_profile.get("aroma_ids", ()) or ()):
-                player.remove_item("special_herbs_001", 1)
-            if "honey_comb_001" in list(batch_profile.get("aroma_ids", ()) or ()):
-                player.remove_item("honey_comb_001", 1)
+            soap_additives = [
+                str(row.get("item_id", "") or "")
+                for row in list(consume_result.get("consumed", []) or [])
+                if str(row.get("item_id", "") or "") in ("lavender_001", "wild_rose_001", "special_herbs_001", "honey_comb_001", "olive_oil_001")
+            ]
+            batch_profile = soap_batch_profile(soap_additives)
             player.change_stat("fun", 20)
             calendar_v2.advance_minutes(self.craft_minutes)
             crafting.last_soap_batch_profile = dict(batch_profile)
             crafting.pending_soap_batches.append({"item_id": self.item_result, "quantity": self.result_quantity, "ready_day": current_game_day() + 7, "profile": dict(batch_profile)})
             crafting.ash_barrel_ready_day = current_game_day() + 7
             update_stat_state()
-            result_name = "роскошное мыло" if self.item_result == "luxury_soap_001" else "хозяйственное мыло"
-            return {"ok": True, "text": "Вы разводите огонь во дворе, берете настоявшийся щелок из зольной бочки, кипятите его с {} и затем раскладываете густую массу по формам. Это будет {}; запах у партии выходит {}. Теперь мылу нужно как следует вылежаться: партия будет готова примерно через {{b}}неделю{{/b}}.".format(batch_profile.get("craft_text", soap_flower_name), result_name, batch_profile.get("label", soap_flower_name)), "recipe_id": self.recipe_id, "item_result": self.item_result, "quantity": self.result_quantity}
+            result_item = get_game_item(self.item_result)
+            result_name = str(getattr(result_item, "name", self.item_result) or self.item_result)
+            return {"ok": True, "text": "Вы разводите огонь во дворе, берете настоявшийся щелок из зольной бочки, кипятите его с {} и затем раскладываете густую массу по формам. Получится {}; запах у партии выходит {}. Теперь мылу нужно как следует вылежаться: партия будет готова примерно через {{b}}неделю{{/b}}.".format(batch_profile.get("craft_text", "травами"), result_name, batch_profile.get("label", "травяной")), "recipe_id": self.recipe_id, "item_result": self.item_result, "quantity": self.result_quantity}
 
     class LibidoTinctureRecipePage(RecipePage):
         def craft(self, resolved_rows=None):
@@ -462,8 +489,9 @@ init 4 python:
     authority, so standard consume/produce/time behavior now lives on each page.
     """
 
-    def player_can_use_soap():
-        return player.item_count("soap_001") > 0
+    def player_can_use_soap(item_id=""):
+        item_key = str(item_id or "").strip()
+        return item_key in soap_inventory_item_ids() and player.item_count(item_key) > 0
 
     def crafting_release_ready_soap_batches():
         current_day = current_game_day()
@@ -475,9 +503,7 @@ init 4 python:
             ready_day = int(batch_data.get("ready_day", 0) or 0)
             profile = dict(batch_data.get("profile", {}) or {})
             item_id = str(batch_data.get("item_id", "") or "").strip()
-            if item_id == "":
-                item_id = "luxury_soap_001" if "olive_oil_001" in list(profile.get("aroma_ids", ()) or ()) else "soap_001"
-            if quantity <= 0:
+            if item_id == "" or quantity <= 0:
                 continue
             if current_day >= ready_day:
                 player.add_item(item_id, quantity)
@@ -678,15 +704,68 @@ init 4 python:
 
     SoapItem = GameItem(
         object_id="soap_001",
-        name="мыло",
-        description="Кусок домашнего мыла с легким травяным запахом.",
+        name="лавандовое хозяйственное мыло",
+        description="Кусок домашнего мыла с чистым лавандовым запахом.",
         price=4,
         carriable=True,
         stackable=True,
         custom_properties={
             "item_kind": "crafted_good",
             "crafted_kind": "soap",
+            "soap_aroma": "lavender",
+            "social_effect_family": "soap",
             "gift_value": 1,
+            "attraction_bonus": 1,
+        },
+    )
+
+    LavenderHerbalSoapItem = GameItem(
+        object_id="lavender_herbal_soap_001",
+        name="лавандово-травяное мыло",
+        description="Домашнее мыло с лавандой и редкими душистыми травами. Именно такой терпкий запах любит Сандра.",
+        price=9,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "crafted_good",
+            "crafted_kind": "soap",
+            "soap_aroma": "lavender_herbal",
+            "social_effect_family": "soap",
+            "gift_value": 2,
+            "attraction_bonus": 1,
+        },
+    )
+
+    LavenderRoseSoapItem = GameItem(
+        object_id="lavender_rose_soap_001",
+        name="лавандово-розовое мыло",
+        description="Душистое домашнее мыло, в котором лаванда смешана с мягким ароматом дикой розы. Такой запах особенно нравится Мелиссе.",
+        price=10,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "crafted_good",
+            "crafted_kind": "soap",
+            "soap_aroma": "lavender_rose",
+            "social_effect_family": "soap",
+            "gift_value": 2,
+            "attraction_bonus": 1,
+        },
+    )
+
+    RoseHoneySoapItem = GameItem(
+        object_id="rose_honey_soap_001",
+        name="розово-медовое мыло",
+        description="Мягкое домашнее мыло с дикой розой и теплой медовой сладостью. Аманда как раз любит такие яркие запахи.",
+        price=10,
+        carriable=True,
+        stackable=True,
+        custom_properties={
+            "item_kind": "crafted_good",
+            "crafted_kind": "soap",
+            "soap_aroma": "rose_honey",
+            "social_effect_family": "soap",
+            "gift_value": 2,
             "attraction_bonus": 1,
         },
     )
@@ -713,7 +792,10 @@ init 4 python:
         stackable=True,
         custom_properties={
             "item_kind": "crafted_good",
-            "crafted_kind": "luxury_soap",
+            "crafted_kind": "soap",
+            "soap_grade": "luxury",
+            "soap_aroma": "lavender_olive",
+            "social_effect_family": "luxury_soap",
             "gift_value": 2,
             "attraction_bonus": 2,
             "social_fun_bonus": 1,
@@ -916,37 +998,12 @@ init 4 python:
         },
     )
 
-    SoapRecipePage = SoapBatchRecipePage(use_olive_oil=False,
+    SoapRecipePage = SoapBatchRecipePage(
         recipe_id="soap_recipe",
-        title="Хозяйственное мыло",
+        title="Лавандовое хозяйственное мыло",
         image="images/recipe_book/soap_recipe.png",
         item_result="soap_001",
-        ingredients={
-            "soap_container": {
-                "quantity": 1,
-                "unit": "штука",
-                "special": "soap_container",
-                "consume": False,
-                "note": "Подойдет ведро или ночная миска.",
-            },
-            "ash_barrel_ready": {
-                "quantity": 1,
-                "unit": "штука",
-                "special": "soap_ash_barrel_ready",
-                "consume": False,
-                "note": "Нужен щелок из зольной бочки, простоявший не меньше недели.",
-            },
-            "pig_lard_001": {
-                "quantity": 1,
-                "unit": "кусок",
-            },
-            "flower_mix": {
-                "quantity": 1,
-                "unit": "пучок",
-                "alternatives": ["lavender_001", "wild_rose_001"],
-                "note": "Для запаха берут лаванду или дикую розу. Если под рукой есть редкие травы или мед, мастер пустит их в ту же партию.",
-            },
-        },
+        ingredients=soap_recipe_ingredients("lavender_001"),
         unlocked=False,
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=4,
@@ -960,42 +1017,51 @@ init 4 python:
         ],
     )
 
-    LuxurySoapRecipePage = SoapBatchRecipePage(use_olive_oil=True,
+    LavenderHerbalSoapRecipePage = SoapBatchRecipePage(
+        recipe_id="lavender_herbal_soap_recipe",
+        title="Лавандово-травяное мыло",
+        image="images/recipe_book/soap_recipe.png",
+        item_result="lavender_herbal_soap_001",
+        ingredients=soap_recipe_ingredients("lavender_001", "special_herbs_001"),
+        unlock_condition=player_has_soap_recipe_book,
+        result_quantity=4,
+        craft_minutes=120,
+        craft_failure_text="Не удалось взять нужные вещи для лавандово-травяного мыла.",
+        notes=["Терпкий лавандово-травяной запах особенно нравится Сандре."],
+    )
+
+    LavenderRoseSoapRecipePage = SoapBatchRecipePage(
+        recipe_id="lavender_rose_soap_recipe",
+        title="Лавандово-розовое мыло",
+        image="images/recipe_book/soap_recipe.png",
+        item_result="lavender_rose_soap_001",
+        ingredients=soap_recipe_ingredients("lavender_001", "wild_rose_001"),
+        unlock_condition=player_has_soap_recipe_book,
+        result_quantity=4,
+        craft_minutes=120,
+        craft_failure_text="Не удалось взять нужные вещи для лавандово-розового мыла.",
+        notes=["Сочетание лаванды и дикой розы особенно нравится Мелиссе."],
+    )
+
+    RoseHoneySoapRecipePage = SoapBatchRecipePage(
+        recipe_id="rose_honey_soap_recipe",
+        title="Розово-медовое мыло",
+        image="images/recipe_book/soap_recipe.png",
+        item_result="rose_honey_soap_001",
+        ingredients=soap_recipe_ingredients("wild_rose_001", "honey_comb_001"),
+        unlock_condition=player_has_soap_recipe_book,
+        result_quantity=4,
+        craft_minutes=120,
+        craft_failure_text="Не удалось взять нужные вещи для розово-медового мыла.",
+        notes=["Яркий запах розы с медовой сладостью особенно нравится Аманде."],
+    )
+
+    LuxurySoapRecipePage = SoapBatchRecipePage(
         recipe_id="luxury_soap_recipe",
-        title="Туалетное мыло с оливковым маслом",
+        title="Лавандовое туалетное мыло с оливковым маслом",
         image="images/recipe_book/soap_recipe.png",
         item_result="luxury_soap_001",
-        ingredients={
-            "soap_container": {
-                "quantity": 1,
-                "unit": "штука",
-                "special": "soap_container",
-                "consume": False,
-                "note": "Подойдет ведро или ночная миска.",
-            },
-            "ash_barrel_ready": {
-                "quantity": 1,
-                "unit": "штука",
-                "special": "soap_ash_barrel_ready",
-                "consume": False,
-                "note": "Нужен щелок из зольной бочки, простоявший не меньше недели.",
-            },
-            "pig_lard_001": {
-                "quantity": 1,
-                "unit": "кусок",
-            },
-            "flower_mix": {
-                "quantity": 1,
-                "unit": "пучок",
-                "alternatives": ["lavender_001", "wild_rose_001"],
-                "note": "Для запаха берут лаванду или дикую розу.",
-            },
-            "olive_oil_001": {
-                "quantity": 1,
-                "unit": "пузырек",
-                "note": "Оливковое масло делает эту партию более мягкой и дорогой.",
-            },
-        },
+        ingredients=soap_recipe_ingredients("lavender_001", "olive_oil_001"),
         unlocked=False,
         unlock_condition=player_has_soap_recipe_book,
         result_quantity=4,
@@ -1305,7 +1371,7 @@ label AtticInventoryItemMenu(item_id="", return_context="attic", room_code="Tave
     $ main_ui_runtime.action_items = []
     if bool(getattr(_item_obj, "readable", False)):
         $ main_ui_runtime.action_items.append(MenuItem("Прочитать", Call("AtticInventoryReadItem", _item_id, return_context, room_code)))
-    if _item_id == "soap_001" and player_can_use_soap():
+    if player_can_use_soap(_item_id):
         $ main_ui_runtime.action_items.append(MenuItem("Использовать мыло", Call("AtticInventoryUseSoap", _item_id, return_context, room_code)))
     if _item_id == "cork_001":
         $ main_ui_runtime.action_items.append(MenuItem("Использовать пробку", Call("AtticInventoryUseCork", _item_id, return_context, room_code)))
@@ -1408,18 +1474,22 @@ label AtticInventoryDropItem(item_id="", return_context="attic", room_code="Tave
 
 
 label AtticInventoryUseSoap(item_id="", return_context="attic", room_code="TavernAtic"):
-    if player.item_count("soap_001") <= 0:
+    $ renpy.dynamic("_soap_item_id", "_soap_item", "_soap_grade")
+    $ _soap_item_id = str(item_id or "").strip()
+    $ _soap_item = get_game_item(_soap_item_id)
+    if not player_can_use_soap(_soap_item_id):
         $ scene_runtime.text = "У вас больше не осталось мыла."
         $ scene_runtime.location_text = scene_runtime.text
         call AtticInventoryMenu(return_context, room_code)
         return
-    $ player.remove_item("soap_001", 1)
-    $ player.appearance.wash_with_soap(current_game_day(), 10, 1)
+    $ _soap_grade = str(getattr(_soap_item, "custom_properties", {}).get("soap_grade", "ordinary") or "ordinary")
+    $ player.remove_item(_soap_item_id, 1)
+    $ player.appearance.wash_with_soap(current_game_day(), 10 if _soap_grade == "luxury" else 5, 2 if _soap_grade == "luxury" else 1)
     $ player.change_stat("fun", 2)
     call stat
-    $ scene_runtime.text = "Вы тщательно моетесь душистым домашним мылом. Кожа становится чище, запах приятнее, а выглядите вы заметно лучше. Чистота и свежесть еще какое-то время будут работать на ваш вид."
-    if player.item_count("soap_001") <= 0:
-        $ scene_runtime.text = scene_runtime.text + "\n\nЭто был последний кусок обычного мыла."
+    $ scene_runtime.text = "Вы тщательно моетесь, используя {}. Кожа становится чище, запах приятнее, а выглядите вы заметно лучше. Чистота и свежесть еще какое-то время будут работать на ваш вид.".format(str(getattr(_soap_item, "name", "душистое мыло") or "душистое мыло"))
+    if player.item_count(_soap_item_id) <= 0:
+        $ scene_runtime.text = scene_runtime.text + "\n\nЭто был последний такой кусок мыла."
     $ scene_runtime.location_text = scene_runtime.text
     call AtticInventoryMenu(return_context, room_code)
     return
@@ -1546,6 +1616,31 @@ label BackyardCookSoap(recipe_id="soap_recipe"):
     $ scene_runtime.text = str(_soap_craft_result.get("text", "") or "Вы варите мыло.")
     $ scene_runtime.location_text = scene_runtime.text
     call BackyardObjectMenu("backyard_ash_barrel", True)
+    return
+
+
+label BackyardChooseSoapRecipe:
+    $ scene_runtime.text = "Вы раскрываете старую книгу на записях о мыловарении и выбираете, какую именно партию сварить. Каждый запах требует своих добавок; ничего из сумки не будет взято без вашего выбора."
+    $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Лавандовое хозяйственное мыло":
+            call BackyardCookSoap("soap_recipe")
+
+        "Лавандово-травяное мыло":
+            call BackyardCookSoap("lavender_herbal_soap_recipe")
+
+        "Лавандово-розовое мыло":
+            call BackyardCookSoap("lavender_rose_soap_recipe")
+
+        "Розово-медовое мыло":
+            call BackyardCookSoap("rose_honey_soap_recipe")
+
+        "Лавандовое туалетное мыло с оливковым маслом":
+            call BackyardCookSoap("luxury_soap_recipe")
+
+        "Назад":
+            call BackyardObjectMenu("backyard_ash_barrel", True)
     return
 
 

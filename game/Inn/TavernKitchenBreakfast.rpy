@@ -799,7 +799,7 @@ init python:
 
         if not tavern_breakfast_can_give_first_soap_samples():
             return ""
-        player.remove_item("soap_001", 3)
+        player_remove_soap_pieces(3, False)
         for npc_id in ("sandra", "melissa", "amanda"):
             crafting.soap_sample_given[npc_id] = 1
             crafting.soap_requests[npc_id] = 1

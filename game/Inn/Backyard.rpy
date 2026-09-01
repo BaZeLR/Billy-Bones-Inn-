@@ -108,8 +108,7 @@ init 6 python:
         picture="images/tavern/backyard/soap_backyard.png",
         actions=[
             ObjectAction(action_id="inspect_ash_barrel", label="Осмотреть зольную бочку", hook="call", target="BackyardInspectAshBarrel"),
-            ObjectAction(action_id="cook_soap", label="Варить хозяйственное мыло", hook="call", target="BackyardCookSoap", args=("soap_recipe",), condition=soap_can_cook_at_backyard),
-            ObjectAction(action_id="cook_luxury_soap", label="Варить туалетное мыло с оливковым маслом", hook="call", target="BackyardCookSoap", args=("luxury_soap_recipe",), condition=soap_can_cook_luxury_at_backyard),
+            ObjectAction(action_id="cook_soap", label="Варить мыло", hook="call", target="BackyardChooseSoapRecipe", condition=soap_can_cook_at_backyard),
         ],
         condition=backyard_has_ash_barrel,
     )

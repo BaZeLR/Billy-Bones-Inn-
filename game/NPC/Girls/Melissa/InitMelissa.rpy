@@ -20,7 +20,7 @@ init python:
                 dative="Мелиссе",
                 portrait="images/melissa/melissa_portrait_0.jpg",
                 description="Мелисса - молодая девушка. В ее сложении немного проступают восточные черты. Она немного отличается от остальных работниц трактира. У нее оливкового цвета кожа, черные глаза, волосы цвета вороньего крыла и полные, похожие на мячи груди размера С.",
-                gift_preferences=["soap_001", "lavender_001", "wild_rose_001", "energy_tea_001", "drink_ale_001", "libido_tincture_001"],
+                gift_preferences=["lavender_rose_soap_001", "soap_001", "lavender_001", "wild_rose_001", "energy_tea_001", "drink_ale_001", "libido_tincture_001"],
             )
             self.birth_date = {"day": 25, "period": 6, "cycle": 1082}
             self.card_image = "images/melissa/melissa_card.jpg"

@@ -136,6 +136,12 @@ label IntClaraGiftMenu(girl_name="clara"):
     menu:
         "Кусок мыла" if "soap_001" in _clara_gift_ids:
             call ClaraGiveGift(girl_name, "soap_001")
+        "Лавандово-травяное мыло" if "lavender_herbal_soap_001" in _clara_gift_ids:
+            call ClaraGiveGift(girl_name, "lavender_herbal_soap_001")
+        "Лавандово-розовое мыло" if "lavender_rose_soap_001" in _clara_gift_ids:
+            call ClaraGiveGift(girl_name, "lavender_rose_soap_001")
+        "Розово-медовое мыло" if "rose_honey_soap_001" in _clara_gift_ids:
+            call ClaraGiveGift(girl_name, "rose_honey_soap_001")
         "Особый гриб" if "special_mushroom_001" in _clara_gift_ids:
             call ClaraGiveGift(girl_name, "special_mushroom_001")
         "Лаванда" if "lavender_001" in _clara_gift_ids:

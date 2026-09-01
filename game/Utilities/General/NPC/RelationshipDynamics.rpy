@@ -4,7 +4,7 @@
 init -42 python:
     RELATIONSHIP_HOUSEHOLD_NPCS = ("amanda", "melissa", "sandra")
     RELATIONSHIP_CORE_NPCS = ("amanda", "melissa", "sandra", "clara", "becky", "irma", "inga", "liza", "georgett")
-    RELATIONSHIP_CARE_GIFTS = ("soap_001", "luxury_soap_001", "energy_tea_001", "berries_001", "lavender_001", "wild_rose_001")
+    RELATIONSHIP_CARE_GIFTS = ("energy_tea_001", "berries_001", "lavender_001", "wild_rose_001")
     RELATIONSHIP_ACTION_REQUIREMENTS = {
         "_default": {
             "talk": {"score": 0, "friend": 0, "open": 0, "slut": 0},
@@ -124,9 +124,17 @@ init -42 python:
     def relationship_action_requirement_key(action="", item_id=""):
         action_key = str(action or "").strip().lower()
         item_key = str(item_id or "").strip()
-        if action_key == "gift" and item_key in RELATIONSHIP_CARE_GIFTS:
+        if action_key == "gift" and relationship_is_care_gift(item_key):
             return "care_gift"
         return action_key
+
+    def relationship_is_care_gift(item_id=""):
+        item_key = str(item_id or "").strip()
+        if item_key in RELATIONSHIP_CARE_GIFTS:
+            return True
+        item_obj = get_game_item(item_key)
+        properties = dict(getattr(item_obj, "custom_properties", {}) or {}) if item_obj is not None else {}
+        return str(properties.get("crafted_kind", "") or "").strip() == "soap"
 
     def relationship_action_requirement(person="", action="", item_id=""):
         key = relationship_key(person)

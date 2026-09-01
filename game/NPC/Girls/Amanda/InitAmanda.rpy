@@ -15,7 +15,7 @@ init python:
                 portrait="images/amanda/amanda_portrait.jpg",
                 default_location="",
                 description="Аманда - молодая девушка. У нее очень светлая кожа, белокурые волосы и голубые глаза. Ее груди небольшие, размера А.",
-                gift_preferences=["wild_rose_001", "soap_001", "berries_001", "energy_tea_001", "drink_ale_001"],
+                gift_preferences=["wild_rose_001", "rose_honey_soap_001", "soap_001", "berries_001", "energy_tea_001", "drink_ale_001"],
             )
             self.birth_date = {"day": 10, "period": 9, "cycle": 1082}
             self.card_image = "images/amanda/amanda_card.jpg"

@@ -231,7 +231,7 @@ init python:
         def giftable_entries(self):
             entries = []
 
-            item_ids = ("soap_001", "special_mushroom_001", "lavender_001", "luxury_soap_001", "libido_tincture_001")
+            item_ids = tuple(soap_inventory_item_ids()) + ("special_mushroom_001", "lavender_001", "libido_tincture_001")
             for item_id in item_ids:
                 if player.item_count(item_id) <= 0:
                     continue

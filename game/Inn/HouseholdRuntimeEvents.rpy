@@ -408,6 +408,15 @@ label HouseholdSoapRequestEvent(girl_name=""):
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:
+        "Отдать лавандово-травяное мыло" if int(player.item_count("lavender_herbal_soap_001") or 0) > 0:
+            call HouseholdSoapRequestGiveNow(_soap_girl, "lavender_herbal_soap_001")
+
+        "Отдать лавандово-розовое мыло" if int(player.item_count("lavender_rose_soap_001") or 0) > 0:
+            call HouseholdSoapRequestGiveNow(_soap_girl, "lavender_rose_soap_001")
+
+        "Отдать розово-медовое мыло" if int(player.item_count("rose_honey_soap_001") or 0) > 0:
+            call HouseholdSoapRequestGiveNow(_soap_girl, "rose_honey_soap_001")
+
         "Сразу отдать роскошное мыло" if int(player.item_count("luxury_soap_001") or 0) > 0:
             call HouseholdSoapRequestGiveNow(_soap_girl, "luxury_soap_001")
 

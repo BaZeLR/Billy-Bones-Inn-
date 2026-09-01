@@ -8,7 +8,7 @@ init -46 python:
     _ALE_SHARE_BONUS_TARGETS = ("melissa", "amanda")
 
     SOCIAL_ITEM_EFFECT_RULES = {
-        "soap_001": {
+        "soap": {
             "targets": ("sandra", "melissa", "amanda"),
             "friend_bonus": 3,
             "horny_bonus": 2,
@@ -22,7 +22,7 @@ init -46 python:
             },
             "common_text": "{} сразу заметно хорошеет, становится мягче и послушнее, а чистый запах явно поднимает ей настроение.",
         },
-        "luxury_soap_001": {
+        "luxury_soap": {
             "targets": ("sandra", "melissa", "amanda", "becky", "clara"),
             "friend_bonus": 4,
             "horny_bonus": 2,
@@ -733,6 +733,11 @@ init -46 python:
         item_key = str(item_id or "").strip()
         char_key = str(char_name or "").strip()
         rule = dict(SOCIAL_ITEM_EFFECT_RULES.get(item_key, {}) or {})
+        if not rule:
+            item_obj = get_game_item(item_key)
+            properties = dict(getattr(item_obj, "custom_properties", {}) or {}) if item_obj is not None else {}
+            effect_family = str(properties.get("social_effect_family", "") or "").strip()
+            rule = dict(SOCIAL_ITEM_EFFECT_RULES.get(effect_family, {}) or {})
         targets = tuple(rule.get("targets", ()) or ())
         if targets and char_key not in targets:
             return {}
@@ -752,7 +757,9 @@ init -46 python:
         if effect_text:
             lines.append(effect_text)
         info = people.get_info(key)
-        if item_key == "soap_001" and info is not None and int(info.rel or 0) >= int(rule.get("soap_request_threshold", 999) or 999):
+        item_obj = get_game_item(item_key)
+        crafted_kind = str(getattr(item_obj, "custom_properties", {}).get("crafted_kind", "") or "") if item_obj is not None else ""
+        if crafted_kind == "soap" and "soap_request_threshold" in rule and info is not None and int(info.rel or 0) >= int(rule.get("soap_request_threshold", 999) or 999):
             lines.append("Похоже, ей так нравится это мыло, что потом она наверняка попросит у вас еще.")
         return lines
 
@@ -797,7 +804,7 @@ init -46 python:
                     info.change_social(corruption_delta=int(rule.get("horny_bonus", 0) or 0))
                 if info is not None and int(rule.get("neshlush_delta", 0) or 0) != 0:
                     info.rebel_baseline = max(0, int(info.rebel_baseline or 0) + int(rule.get("neshlush_delta", 0) or 0))
-                if item_key == "soap_001" and info is not None and int(info.rel or 0) >= int(rule.get("soap_request_threshold", 999) or 999):
+                if str(custom_props.get("crafted_kind", "") or "") == "soap" and "soap_request_threshold" in rule and info is not None and int(info.rel or 0) >= int(rule.get("soap_request_threshold", 999) or 999):
                     crafting.soap_requests[key] = 1
 
         effect_lines = []

@@ -767,7 +767,7 @@ testcase external_backyard_barrel_object_actions:
     assert eval (str(rooms.current_code or "") == "Backyard") timeout 5.0
     assert eval (str(scene_runtime.picture or "").endswith("images/tavern/backyard/backyard_1.png")) timeout 5.0
     assert eval ("backyard_water_barrel" in [str(getattr(obj, "object_id", "") or "") for obj in rooms.get("Backyard").visible_objects()]) timeout 5.0
-    assert eval (not any(str(getattr(getattr(i, "action", None), "label", "") or "") == "BackyardCookSoap" for i in main_ui_runtime.action_items)) timeout 5.0
+    assert eval (not any(str(getattr(getattr(i, "action", None), "label", "") or "") == "BackyardChooseSoapRecipe" for i in main_ui_runtime.action_items)) timeout 5.0
 
     run Call("BackyardObjectMenu", "backyard_water_barrel")
     assert eval (str(main_ui_runtime.action_title or "") == "Бочка с дождевой водой") timeout 5.0
@@ -801,14 +801,43 @@ testcase external_backyard_barrel_object_actions:
     run Call("BackyardObjectMenu", "backyard_ash_barrel")
     assert eval (str(main_ui_runtime.action_title or "") == "Зольная бочка") timeout 5.0
     assert eval (str(scene_runtime.picture or "").endswith("images/tavern/backyard/soap_backyard.png")) timeout 5.0
-    assert eval ("BackyardCookSoap" in [str(getattr(getattr(i, "action", None), "label", "") or "") for i in main_ui_runtime.action_items]) timeout 5.0
-    run Call("BackyardCookSoap", "soap_recipe")
-    assert eval (len(crafting.pending_soap_batches) == _soap_batches_before + 1) timeout 5.0
+    assert eval ("BackyardChooseSoapRecipe" in [str(getattr(getattr(i, "action", None), "label", "") or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    run Call("BackyardChooseSoapRecipe")
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Лавандовое хозяйственное мыло", "Лавандово-травяное мыло", "Лавандово-розовое мыло", "Розово-медовое мыло", "Лавандовое туалетное мыло с оливковым маслом", "Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (len(crafting.pending_soap_batches) == _soap_batches_before + 1) timeout 20.0
     assert eval (player.item_count("pig_lard_001") == 0 and player.item_count("lavender_001") == 0) timeout 5.0
     assert eval (player.item_count("bucket_001") == 1) timeout 5.0
     assert eval (len(str(scene_runtime.text or "").strip()) > 0) timeout 5.0
     assert eval (str(main_ui_runtime.action_title or "") == "Зольная бочка") timeout 5.0
     assert eval (len(list(main_ui_runtime.action_items or [])) > 0) timeout 5.0
+
+    $ crafting.ash_barrel_ready_day = int(calendar_v2.daysInGame)
+    $ player.add_item("pig_lard_001", 1)
+    $ player.add_item("lavender_001", 1)
+    $ player.add_item("special_herbs_001", 1)
+    $ player.add_item("honey_comb_001", 1)
+    $ _honey_before = player.item_count("honey_comb_001")
+    run Call("BackyardChooseSoapRecipe")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (len(crafting.pending_soap_batches) == _soap_batches_before + 2) timeout 20.0
+    assert eval (str(crafting.pending_soap_batches[-1].get("item_id", "") or "") == "lavender_herbal_soap_001") timeout 5.0
+    assert eval (player.item_count("pig_lard_001") == 0 and player.item_count("lavender_001") == 0 and player.item_count("special_herbs_001") == 0) timeout 5.0
+    assert eval (player.item_count("honey_comb_001") == _honey_before) timeout 5.0
+
+    $ crafting.pending_soap_batches[-1]["ready_day"] = int(calendar_v2.daysInGame)
+    $ _lavender_herbal_before = player.item_count("lavender_herbal_soap_001")
+    $ crafting_release_ready_soap_batches()
+    assert eval (player.item_count("lavender_herbal_soap_001") == _lavender_herbal_before + 4) timeout 5.0
+    assert eval (player_card_is_gift_item("lavender_herbal_soap_001")) timeout 5.0
+
+    run Call("InitSandra")
+    $ Sandra.gifted_today = 0
+    $ main_ui_runtime.mode = "scene"
+    run Call("PlayerCardGiftToFixedTargetMenu", "sandra")
+    assert eval ("лавандово-травяное мыло x4" in [str(item.caption or "") for item in main_ui_runtime.action_items]) timeout 5.0
+    run Call("PlayerCardGiftItemTo", "lavender_herbal_soap_001", "sandra")
+    assert eval (player.item_count("lavender_herbal_soap_001") == _lavender_herbal_before + 3) timeout 5.0
 '''
 
 
