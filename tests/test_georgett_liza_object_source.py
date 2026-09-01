@@ -549,6 +549,8 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     assert '"after_cermon_walk"' in runtime
     assert '"#Georgett.church_after_sermon_event_available()"' in runtime
     assert '"#Liza.church_after_sermon_event_available()"' in runtime
+    assert '"#church_after_cermon_event_roll() == 1"' in runtime
+    assert '"#church_after_cermon_event_roll() == 2"' in runtime
     georgett_after = runtime.split('"story_georgett_church_after_sermon"', 1)[1].split('define franThreadList', 1)[0]
     liza_after = runtime.split('"story_liza_church_after_sermon"', 1)[1].split('define georgettThreadList', 1)[0]
     assert '"#church_after_cermon_action_visible()"' not in georgett_after
@@ -556,6 +558,7 @@ def test_church_after_sermon_events_are_threaded_from_classes():
 
     assert "church_aftercermon_pick_scene_code" not in church_entry
     assert 'call checkTriggers("Church", "after_cermon_walk", 0)' in church_entry
+    assert 'call story_georgett_church_after_sermon' not in church_entry
     assert "AfterCermonLizett" not in _source(CHURCH_ROOM)
     assert "after_liza" not in _source(CHURCH_ROOM)
 
@@ -697,6 +700,7 @@ def test_georgett_church_service_preserves_the_single_authored_action_flow():
     assert "info = people.get_info(key)" in attendee_text
     assert "info.display_name()" in attendee_text
     assert "people_display_name(key)" not in attendee_text
+    assert 'if bool(Georgett.known) and people_to_int(Georgett.rel, 0) >= 2:' in service_menu
     assert 'MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex"))' not in service_menu
     assert 'MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex"))' in georgett_church_events
     assert 'player.intimacy.can_cum()' in georgett_church_events

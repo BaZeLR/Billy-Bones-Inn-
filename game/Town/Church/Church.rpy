@@ -61,6 +61,11 @@ init python:
     def church_after_cermon_action_visible():
         return int(calendar_v2.week or 0) == 7 and church_minutes_between(11 * 60, 12 * 60 + 59)
 
+    def church_after_cermon_event_roll():
+        if int(Becky.priest_advice_stage or 0) in (1, 2):
+            return 3
+        return procedural_randint(1, 5, "church_after_cermon_event_%s" % int(current_game_day()))
+
     def church_becky_priest_talk_visible():
         return (
             church_confession_action_visible()
@@ -299,7 +304,7 @@ label ChurchServiceMenu(show_attendees=True):
     $ main_ui_runtime.action_items.append(MenuItem("Найти сестричек", Call("ChurchServiceSisters")))
     $ main_ui_runtime.action_items.append(MenuItem("Найти семейство Легаре", Call("ChurchServiceLegare")))
     $ main_ui_runtime.action_items.append(MenuItem("Найти семейство Блэнкеншип", Call("ChurchServiceBlanken")))
-    if people_to_int(Georgett.rel, 0) >= 2:
+    if bool(Georgett.known) and people_to_int(Georgett.rel, 0) >= 2:
         if story_event_available("Church", "georgett_service"):
             $ main_ui_runtime.action_items.append(MenuItem("Найти Жоржетту Брюно", Call("checkTriggers", "Church", "georgett_service", 0)))
         else:

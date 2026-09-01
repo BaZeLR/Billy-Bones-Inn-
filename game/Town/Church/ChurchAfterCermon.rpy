@@ -14,9 +14,6 @@ label ChurchAfterCermon(entry_arg=0):
     call checkTriggers("Church", "after_cermon_walk", 0)
     if _church_after_event is not None:
         return
-    if int(Georgett.story_value("SawChurchAfterCermon", 0) or 0) > 0 and Georgett.church_after_sermon_event_available():
-        call story_georgett_church_after_sermon
-        return
 
     $ scene_runtime.text = scene_runtime.text + "\n\nНичего интересного вы не нашли."
     $ scene_runtime.location_text = scene_runtime.text

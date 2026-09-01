@@ -3310,7 +3310,7 @@ testcase external_church_service_action_links_work:
     $ main_ui_runtime.inventory_dropdown_open = False
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.mode = "scene"
-    $ Georgett.known = True
+    $ Georgett.known = False
     $ Georgett.rel = 2
     $ Georgett.corruption = 0
     $ Georgett.set_sex_stat("sexacts", 3)
@@ -3337,6 +3337,9 @@ testcase external_church_service_action_links_work:
     assert eval (str(main_ui_runtime.action_title or "") == "Прихожане") timeout 5.0
     assert eval ("Найти Сандру" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     assert eval ("Найти сестричек" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    assert eval ("Найти Жоржетту Брюно" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    $ Georgett.known = True
+    run Call("ChurchServiceMenu", False)
     assert eval ("Найти Жоржетту Брюно" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     $ _church_blanken_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Найти семейство Блэнкеншип")
     $ _church_blanken_button = "choice_panel_button_%d" % int(_church_blanken_index)
@@ -3441,7 +3444,7 @@ testcase external_georgett_liza_church_after_sermon_events:
     $ threads["georgettChurchAfterSermon"] = threads["georgettChurch"]
     $ updateSave_V75()
     assert eval (all(name not in threads for name in ("georgettPortStreetClients", "georgettTavernClientRoom", "georgettChurchAfterSermon"))) timeout 5.0
-    $ external_calendar_set_fields(7, 1, 1100, 12, 0)
+    $ external_calendar_set_fields(28, 1, 1100, 12, 0)
     $ rooms.enter("Church")
     $ TodaySexEvents_Clear()
     $ Georgett.known = True
@@ -3449,19 +3452,25 @@ testcase external_georgett_liza_church_after_sermon_events:
     $ Georgett.set_story_value("churchlizaadmit", 0)
     $ TodaySexEvents_Add("georgett", 99, 99, "Priest")
     $ initStoryEventRuntime(True)
+    assert eval (church_after_cermon_event_roll() == 1) timeout 5.0
+    assert eval (church_after_cermon_action_visible()) timeout 5.0
+    assert eval (CheckIfSexEventExist("georgett", 99, "Priest") > 0) timeout 5.0
+    assert eval (Georgett.church_after_sermon_event_available()) timeout 5.0
+    assert eval (threads["georgettChurch"].checkActive() and not threads["georgettChurch"].done[4]) timeout 5.0
     assert eval (story_event_available("Church", "after_cermon_walk")) timeout 5.0
     assert eval (renpy.has_label("story_georgett_church_after_sermon")) timeout 5.0
     assert eval (renpy.has_label("story_georgett_church_after_sermon_look_1")) timeout 5.0
     assert eval (renpy.has_label("story_georgett_church_after_sermon_look_4")) timeout 5.0
     assert eval (not renpy.has_label("AfterCermonGeorgett")) timeout 5.0
 
-    $ external_calendar_set_fields(7, 1, 1100, 12, 0)
+    $ external_calendar_set_fields(28, 4, 1100, 12, 0)
     $ rooms.enter("Church")
     $ TodaySexEvents_Clear()
     $ Georgett.set_story_value("churchgeorgettadmit", 0)
     $ Georgett.set_story_value("churchlizaadmit", 1)
     $ TodaySexEvents_Add("liza", 99, 99, "Priest")
     $ initStoryEventRuntime(True)
+    assert eval (church_after_cermon_event_roll() == 2) timeout 5.0
     assert eval (story_event_available("Church", "after_cermon_walk")) timeout 5.0
     run Call("ChurchAfterCermon", 1)
     advance until screen "choice" timeout 10.0
@@ -3481,19 +3490,20 @@ testcase external_becky_church_after_sermon_uses_daily_event_authority:
     $ TodaySexEvents_Add("becky", 99, 99, "Priest")
     $ _becky_sermon_start_minutes = int(calendar_v2.daysInGame or 0) * 1440 + calendar_v2.clock_minutes()
     $ initStoryEventRuntime(True)
+    assert eval (church_after_cermon_event_roll() == 3) timeout 5.0
     assert eval (story_event_available("Church", "after_cermon_walk")) timeout 5.0
     run Call("story_becky_church_after_sermon")
     advance until screen "choice" timeout 10.0
     assert eval (CheckIfSexEventExist("becky", 99, "Priest") > 0) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 10.0
     assert eval (CheckIfSexEventExist("becky", 99, "Priest") <= 0) timeout 5.0
-    advance until screen "choice" timeout 10.0
+    click pos (960, 900) until screen "choice" timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 10.0
-    advance until screen "choice" timeout 10.0
+    click pos (960, 900) until screen "choice" timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 10.0
-    advance until screen "choice" timeout 10.0
+    click pos (960, 900) until screen "choice" timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 10.0
-    advance until screen "choice" timeout 10.0
+    click pos (960, 900) until screen "choice" timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(calendar_v2.daysInGame or 0) * 1440 + calendar_v2.clock_minutes() >= _becky_sermon_start_minutes + 60) timeout 10.0
     assert eval (not hasattr(Becky, "after_sermon_stage")) timeout 5.0
 
