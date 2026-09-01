@@ -1330,7 +1330,7 @@ define lizaThreadList = [
     ], highlight=False, threaded=False),
 ]
 define georgettThreadList = [
-    LThreadData(0, "georgett", "PortStreetClients", None, [
+    LThreadData(0, "georgett", "PortStreet", None, [
         (
             "story_georgett_portstreet_clients",
             None, None, None,
@@ -1345,7 +1345,7 @@ define georgettThreadList = [
             100,
         ),
     ], highlight=False, threaded=False),
-    LThreadData(0, "georgett", "TavernClientRoom", None, [
+    LThreadData(0, "georgett", "Tavern", None, [
         (
             "TavernProstClients",
             None, (13, 15), None,
@@ -1363,7 +1363,7 @@ define georgettThreadList = [
             100,
         ),
     ], highlight=False, threaded=False),
-    LThreadData(0, "georgett", "ChurchAfterSermon", None, [
+    LThreadData(0, "georgett", "Church", None, [
         (
             "story_georgett_church_after_sermon",
             7, (11, 12), None,

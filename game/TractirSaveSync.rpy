@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 75
+define currentVersion = 76
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -661,6 +661,10 @@ init -100 python:
         if loaded_version < 75:
             updateSave_V74()
             loaded_version = 75
+
+        if loaded_version < 76:
+            updateSave_V75()
+            loaded_version = 76
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2483,6 +2487,18 @@ init -100 python:
         for person in (Amanda, Melissa, Sandra, Becky, Georgett, Liza, Irma, Clara, Inga):
             person.__dict__.pop("gift_preferences", None)
         initThreads()
+
+    def updateSave_V75():
+        # Georgette's board now has one real thread per story area. The old
+        # single-procedure rows never owned progression and must not remain as
+        # duplicate rows in loaded saves.
+        initThreads()
+        for old_name in (
+            "georgettPortStreetClients",
+            "georgettTavernClientRoom",
+            "georgettChurchAfterSermon",
+        ):
+            threads.pop(old_name, None)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

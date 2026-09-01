@@ -3432,6 +3432,14 @@ testcase external_liza_identity_save_migration:
 
 CHURCH_AFTER_SERMON_EVENT_CHECKS = r'''
 testcase external_georgett_liza_church_after_sermon_events:
+    $ initStoryEventRuntime(True)
+    assert eval (all(name in threads for name in ("georgettPortStreet", "georgettTavern", "georgettChurch"))) timeout 5.0
+    assert eval (len([info for info in threads.values() if str(info.data.person or "") == "georgett"]) == 3) timeout 5.0
+    $ threads["georgettPortStreetClients"] = threads["georgettPortStreet"]
+    $ threads["georgettTavernClientRoom"] = threads["georgettTavern"]
+    $ threads["georgettChurchAfterSermon"] = threads["georgettChurch"]
+    $ updateSave_V75()
+    assert eval (all(name not in threads for name in ("georgettPortStreetClients", "georgettTavernClientRoom", "georgettChurchAfterSermon"))) timeout 5.0
     $ external_calendar_set_fields(7, 1, 1100, 12, 0)
     $ rooms.enter("Church")
     $ TodaySexEvents_Clear()

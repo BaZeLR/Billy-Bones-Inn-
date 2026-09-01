@@ -320,7 +320,7 @@ def test_liza_v55_migration_consumes_legacy_state_once():
     migration = _source(MIGRATION)
     block = migration.split("def updateSave_V55():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 75" in migration
+    assert "define currentVersion = 76" in migration
     assert "if loaded_version < 56:" in migration
     assert "updateSave_V55()" in migration
     for old_key, field_name in (
@@ -600,6 +600,39 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     assert "Georgett.can_trigger_after_sermon_event()" in next_day
     assert "Liza.can_trigger_after_sermon_event()" in next_day
     assert "Liza.can_trigger_church_service_event()" not in next_day
+
+
+def test_georgett_has_three_location_story_threads_without_old_rows():
+    runtime = _source(STORY_RUNTIME)
+    migration = _source(MIGRATION)
+    rows = runtime.split("define georgettThreadList = [", 1)[1].split(
+        "define franThreadList", 1
+    )[0]
+
+    assert rows.count('LThreadData(0, "georgett",') == 3
+    assert 'LThreadData(0, "georgett", "PortStreet",' in rows
+    assert 'LThreadData(0, "georgett", "Tavern",' in rows
+    assert 'LThreadData(0, "georgett", "Church",' in rows
+    assert '"story_georgett_portstreet_clients"' in rows
+    assert '"TavernProstClients"' in rows
+    assert '"story_georgett_church_after_sermon"' in rows
+    assert '"PortStreetClients"' not in rows
+    assert '"TavernClientRoom"' not in rows
+    assert '"ChurchAfterSermon"' not in rows
+
+    migration_block = migration.split("def updateSave_V75():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+    assert "define currentVersion = 76" in migration
+    assert "if loaded_version < 76:" in migration
+    assert "updateSave_V75()" in migration
+    for old_name in (
+        "georgettPortStreetClients",
+        "georgettTavernClientRoom",
+        "georgettChurchAfterSermon",
+    ):
+        assert '"%s"' % old_name in migration_block
+    assert "threads.pop(old_name, None)" in migration_block
 
 
 def test_georgett_church_service_preserves_the_single_authored_action_flow():
