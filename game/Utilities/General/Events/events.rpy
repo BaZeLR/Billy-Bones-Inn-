@@ -19,6 +19,7 @@ init -25 python:
             self.location = evt[8]
             self.action = evt[9]
             self.priority = evt[10]
+            self.repeatable = bool(evt[11]) if len(evt) > 11 else False
             self.thread_name = thread_name
             self.threaded = threaded
             self.conds = []

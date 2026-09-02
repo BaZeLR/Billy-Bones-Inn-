@@ -183,6 +183,16 @@ init -20 python:
             candidates = [row for row in tavern_work_events_by_type.get(event_type, []) if row.can_schedule()]
             if len(candidates) <= 0:
                 continue
+            if event_type == "harrass":
+                for event_def in candidates:
+                    periods = list(event_def.periods or [])
+                    if len(periods) <= 0:
+                        continue
+                    first_period_index = procedural_randint(0, len(periods) - 1, "tavern_work_%s_%s_first_period" % (event_def.code, current_day))
+                    for period_offset in range(min(2, len(periods))):
+                        period = periods[(first_period_index + period_offset) % len(periods)]
+                        event_runtime.tavern_work_events.append(tavern_work_plan_row(event_def, period))
+                continue
             type_chance = tavern_work_type_chances.get(event_type, 0)
             if not tavern_work_roll(type_chance, "tavern_work_%s_%s_roll" % (event_type, current_day)):
                 continue

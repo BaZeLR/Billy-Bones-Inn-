@@ -39,14 +39,16 @@ def test_amanda_liza_event_owns_event_title_text_and_native_choices():
     assert '"[result]"' not in followup
 
 
-def test_tavern_room_does_not_reenter_itself_after_called_work_event():
-    source = (ROOT / "game/Inn/TavernMain.rpy").read_text(encoding="utf-8-sig")
-    gate = source.split('if ShouldDispatchTavernEvent:', 1)[1].split('$ GirlNameTS1 = "georgett"', 1)[0]
+def test_bar_stand_triggers_work_event_and_returns_to_its_object_menu():
+    room = (ROOT / "game/Inn/TavernMain.rpy").read_text(encoding="utf-8-sig")
+    bar = (ROOT / "game/Inn/TavernMainBar001.rpy").read_text(encoding="utf-8-sig")
+    listen = bar.split("label TavernMainBarListenEvent:", 1)[1]
 
-    assert 'call checkTriggers("TavernMain", "tavern_work", 0)' in gate
-    assert "if _return:" not in gate
-    assert "return" not in gate
-    assert "jump TavernMain" not in gate
+    assert 'call checkTriggers("TavernMain", "tavern_work", 0)' not in room
+    assert 'if tavern_work_planned_for("", "TavernMain", calendar_v2.time_slot()):' in listen
+    assert 'call checkTriggers("TavernMain", "tavern_work", 0)' in listen
+    assert 'call TavernMainObjectMenu("bar_001")' in listen
+    assert "jump TavernMain" not in listen
 
 
 def test_tavern_room_establishes_scene_context_before_work_event():

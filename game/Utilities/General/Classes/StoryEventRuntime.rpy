@@ -1118,7 +1118,7 @@ define robinThreadList = [
 define sherwoodThreadList = []
 define tavernThreadList = [
     RThreadData(0, "tavern", "WorkRandomEvents", None, [1, [
-        # (target, day, hour, delay, probability, reqs, condition, item, location, action, priority)
+        # (target, day, hour, delay, probability, reqs, condition, item, location, action, priority, repeatable)
         (
             "TavernWorkEventTrigger", None, None, None,
             1,
@@ -1130,6 +1130,7 @@ define tavernThreadList = [
             "TavernMain",
             "tavern_work",
             200,
+            True,
         ),
     ]], highlight=False, threaded=False),
 ]

@@ -112,6 +112,10 @@ label TavernMainBarListenEvent:
     if tavern_bar_clara_melissa_gossip_available():
         call checkTriggers("TavernMain", "clara_tavern_visit", 0)
         return
+    if tavern_work_planned_for("", "TavernMain", calendar_v2.time_slot()):
+        call checkTriggers("TavernMain", "tavern_work", 0)
+        call TavernMainObjectMenu("bar_001")
+        return
     python:
         _bar_events = [
             "Вы задерживаетесь у стойки и ловите себя на мысли, что у бара всегда скапливаются самые удобные слухи: кто с кем поссорился, кто кому должен и у кого язык развязывается после второй кружки.",

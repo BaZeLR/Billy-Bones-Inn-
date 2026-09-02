@@ -222,9 +222,6 @@ label TavernMain:
             ):
                 tavern_work_build_daily_plan()
 
-        if ShouldDispatchTavernEvent:
-            call checkTriggers("TavernMain", "tavern_work", 0)
-    
     $ GirlNameTS1 = "georgett"
     $ GirlNameTS2 = "liza"
     $ kitchenlist = NamesList("jobkitchen", "TavernKitchen")

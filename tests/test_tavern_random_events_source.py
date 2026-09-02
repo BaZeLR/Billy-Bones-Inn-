@@ -26,6 +26,8 @@ def test_tavern_random_events_are_wired_to_thread_runtime():
     runtime = read_rel("game/Utilities/General/Classes/StoryEventRuntime.rpy")
     tavern = read_rel("game/Inn/TavernRandomEvents.rpy")
     main = read_rel("game/Inn/TavernMain.rpy")
+    bar = read_rel("game/Inn/TavernMainBar001.rpy")
+    events = read_rel("game/Utilities/General/Events/events.rpy")
 
     assert "define tavernThreadList = [" in runtime
     assert 'RThreadData(0, "tavern", "WorkRandomEvents"' in runtime
@@ -36,7 +38,10 @@ def test_tavern_random_events_are_wired_to_thread_runtime():
     assert "label TavernWorkEventTrigger:" in tavern
     assert "tavern_work_planned_for('', rooms.current_code, calendar_v2.time_slot())" in runtime
     assert runtime.count('"TavernWorkEventTrigger", None, None, None') == 1
-    assert 'call checkTriggers("TavernMain", "tavern_work", 0)' in main
+    assert 'call checkTriggers("TavernMain", "tavern_work", 0)' not in main
+    assert 'call checkTriggers("TavernMain", "tavern_work", 0)' in bar
+    assert 'self.repeatable = bool(evt[11]) if len(evt) > 11 else False' in events
+    assert '"tavern_work",\n            200,\n            True,' in runtime
     assert "call DisplayTavernEventShort(time, 1)" not in main
 
 
@@ -53,6 +58,19 @@ def test_tavern_daily_plan_appends_random_selection():
 
     assert "event_runtime.tavern_work_events.append(tavern_work_plan_row(selected, period))" in source
     assert "continue\n                event_runtime.tavern_work_events.append" not in source
+
+
+def test_tavern_daily_plan_schedules_two_harassments_per_authored_job():
+    source = read_rel("game/Inn/TavernRandomEvents.rpy")
+    harassment_catalog = source.split('"harrass": [', 1)[1].split('    ],', 1)[0]
+
+    assert 'if event_type == "harrass":' in source
+    assert 'for event_def in candidates:' in source
+    assert 'for period_offset in range(min(2, len(periods))):' in source
+    assert 'periods[(first_period_index + period_offset) % len(periods)]' in source
+    assert 'event_runtime.tavern_work_events.append(tavern_work_plan_row(event_def, period))' in source
+    assert harassment_catalog.count('required_job="jobwaitress"') == 1
+    assert harassment_catalog.count('required_job="jobcleaning"') == 1
 
 
 def test_tavern_work_events_respect_open_work_phase_and_present_assigned_staff():
