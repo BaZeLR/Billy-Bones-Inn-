@@ -3484,15 +3484,22 @@ testcase external_liza_identity_save_migration:
     $ Liza.witnessed_church_after_sermon = False
     $ Georgett.set_story_value("lizasawinchurch", 0)
     $ Georgett.set_story_value("churchlizaadmit", 0)
+    assert eval (people.get_info("liza") is Liza and Liza.known) timeout 5.0
     $ saveVersion = 70
     $ updateSave()
-    assert eval (int(saveVersion or 0) == 71 and not Liza.known) timeout 5.0
+    assert eval (int(saveVersion or 0) == int(currentVersion or 0) and Liza.known) timeout 5.0
+
+    $ Liza.known = False
+    $ Liza.rel = 0
+    $ saveVersion = 70
+    $ updateSave()
+    assert eval (int(saveVersion or 0) == int(currentVersion or 0) and not Liza.known) timeout 5.0
 
     $ Liza.known = False
     $ Liza.rel = 1
     $ saveVersion = 70
     $ updateSave()
-    assert eval (int(saveVersion or 0) == 71 and Liza.known) timeout 5.0
+    assert eval (int(saveVersion or 0) == int(currentVersion or 0) and Liza.known) timeout 5.0
 '''
 
 
@@ -5926,6 +5933,11 @@ label external_player_actual_load_probe:
     $ Melissa.temp_room_code = "TavernAmandaRoom"
     $ Melissa.drawings_found = True
     $ threads["melissaBatProblem"].advanceTo(6, force_active=True)
+    $ Georgett.rel = 20
+    $ Georgett.known = True
+    $ Georgett.set_story_value("askkids", 1)
+    $ Liza.rel = 9
+    $ Liza.known = True
     $ player.economy.money = 2468
     $ player.appearance.days_since_wash = 2
     $ player.appearance.days_since_haircut = 16
@@ -5964,6 +5976,11 @@ label external_player_actual_load_probe:
     $ Melissa.temp_room_code = ""
     $ Melissa.drawings_found = False
     $ threads["melissaBatProblem"].reset()
+    $ Georgett.rel = 0
+    $ Georgett.known = False
+    $ Georgett.set_story_value("askkids", 0)
+    $ Liza.rel = 0
+    $ Liza.known = False
     $ renpy.load("external-player-actual-load")
     return
 
@@ -5980,6 +5997,8 @@ testcase external_player_actual_load_parity:
     assert eval (list(player.combat.party or []) == ["dog"] and player.history.get("external_actual_load_probe") == "saved") timeout 5.0
     assert eval (int(TavernKitchenHearthObject.state.get("chopped_wood_stock", 0) or 0) == 4 and int(TavernKitchenHearthObject.state.get("fire_until_minute", 0) or 0) == 4321) timeout 5.0
     assert eval (int(TavernMainFireplaceObject.state.get("chopped_wood_stock", 0) or 0) == 3 and int(TavernMainFireplaceObject.state.get("fire_until_minute", 0) or 0) == 5432) timeout 5.0
+    assert eval (int(Georgett.rel or 0) == 20 and Georgett.known and int(Georgett.story_value("askkids", 0) or 0) == 1) timeout 5.0
+    assert eval (int(Liza.rel or 0) == 9 and Liza.known) timeout 5.0
     assert eval (household.barber_appointments == {"sandra": 1} and "barber_invite_pending" not in Sandra.var) timeout 5.0
     assert eval (int(saveVersion or 0) == int(currentVersion or 0)) timeout 5.0
     assert eval (people.get_info("amanda") is Amanda and people.get_data("amanda") is AmandaStaticData and Amanda.data is AmandaStaticData) timeout 5.0
@@ -7789,7 +7808,7 @@ def build_temp_project(root: Path, temp_root: Path) -> Path:
     for entry in source_game.iterdir():
         target = temp_game / entry.name
         if entry.is_dir():
-            if entry.name in {"cache", "__pycache__", "saves_test_run"}:
+            if entry.name in {"cache", "__pycache__", "saves", "saves_test_run"}:
                 continue
             junction_dir(entry, target)
         elif entry.suffix.lower() in {".rpy", ".rpym", ".py", ".json", ".png", ".jpg", ".jpeg", ".webp"}:
@@ -7830,9 +7849,13 @@ def remove_temp_tree(path: Path) -> None:
 
 
 def run_renpy(renpy_exe: Path, temp_project: Path, timeout: int, test_name: str) -> int:
+    test_savedir = temp_project / ".test-saves"
+    test_savedir.mkdir(parents=True, exist_ok=True)
     args = [
         str(renpy_exe),
         str(temp_project),
+        "--savedir",
+        str(test_savedir),
         "test",
         test_name,
         "--hide-execution",

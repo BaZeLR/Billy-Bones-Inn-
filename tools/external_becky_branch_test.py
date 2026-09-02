@@ -197,7 +197,7 @@ def build_temp_project(root: Path, temp_root: Path) -> Path:
     for entry in source_game.iterdir():
         target = temp_game / entry.name
         if entry.is_dir():
-            if entry.name in {"cache", "__pycache__", "saves_test_run"}:
+            if entry.name in {"cache", "__pycache__", "saves", "saves_test_run"}:
                 continue
             junction_dir(entry, target)
         elif entry.suffix.lower() in {".rpy", ".rpym", ".py", ".json", ".png", ".jpg", ".jpeg", ".webp"}:
@@ -207,9 +207,13 @@ def build_temp_project(root: Path, temp_root: Path) -> Path:
 
 
 def run_renpy(renpy_exe: Path, temp_project: Path, timeout: int) -> int:
+    test_savedir = temp_project / ".test-saves"
+    test_savedir.mkdir(parents=True, exist_ok=True)
     args = [
         str(renpy_exe),
         str(temp_project),
+        "--savedir",
+        str(test_savedir),
         "test",
         "--hide-execution",
         "no",

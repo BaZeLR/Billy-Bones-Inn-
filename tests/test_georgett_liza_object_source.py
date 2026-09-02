@@ -348,6 +348,7 @@ def test_liza_v55_migration_consumes_legacy_state_once():
     assert "if loaded_version < 71:" in migration
     assert "updateSave_V70()" in migration
     assert "Liza.known = bool(" in identity_migration
+    assert "bool(Liza.known)" in identity_migration
     assert "people_to_int(Liza.rel, 0) > 0" in identity_migration
 
 

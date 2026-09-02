@@ -2432,7 +2432,8 @@ init -100 python:
         # initialized her as known before that scene, so recover identity from
         # the progression that can only exist after the introduction.
         Liza.known = bool(
-            people_to_int(Liza.rel, 0) > 0
+            bool(Liza.known)
+            or people_to_int(Liza.rel, 0) > 0
             or bool(Liza.prostitution_started)
             or bool(Liza.witnessed_church_after_sermon)
             or people_to_int(Georgett.story_value("lizasawinchurch", 0), 0) > 0
