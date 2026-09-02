@@ -81,7 +81,7 @@ def test_tavern_client_room_is_a_transient_projection_not_a_schedule_override():
     assert 'peopleInfo[GirlNameTS1].location =' not in tavern
     assert 'peopleInfo[GirlNameTS2].location =' not in tavern
     assert 'str(people.location("liza") or "") == rooms.current_code and int(Liza.job_value("jobwhore", 0) or 0) == 1' in tavern
-    assert "define currentVersion = 79" in migration
+    assert "define currentVersion = 80" in migration
     assert "def updateSave_V15():" in migration
 
 
@@ -607,3 +607,13 @@ def test_clara_fiance_remains_a_thread_participant_not_a_registered_npc():
     assert "ClaraFianceCaseSolved" not in zimmer + story
     assert '"BarberShop",\n            "clara_fiance",' in events
     assert "столичного жениха" in story
+
+
+def test_interval_location_choices_filter_on_npc_owned_job_conditions():
+    runtime = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
+    selected = runtime.split("class NPCHourScheduleEntry", 1)[1].split("def matches", 1)[0]
+    parser = runtime.split("def interval_location_choices_from_json", 1)[1].split("def interval_schedule_entry_from_json", 1)[0]
+
+    assert 'not room_rule_true(data.get("condition", None))' in selected
+    assert 'explicit_choices = list(data.get("location_choices", []) or [])' in parser
+    assert '"condition": choice.get("condition", None)' in parser

@@ -701,6 +701,9 @@ init python:
                 and self.sex_offer_reaction() in (1, 4)
             )
 
+        def date_intimacy_available(self):
+            return self.can_have_sex_today() and self.sex_offer_reaction() in (1, 4)
+
         def legare_sex_type(self):
             if not self.performed_oral_with_legare:
                 sex_type = 0

@@ -15,7 +15,7 @@ init python:
             return False
         if not player.appearance.has_dress(dress_code):
             return False
-        return int(player_dress_condition_from_age(player_current_dress_age_days(dress_code)) or 0) <= 0
+        return int(player.appearance.dress_condition(dress_code) or 0) <= 0
 
     def dress_shop_can_buy_item(item_obj):
         dress_code = dress_shop_item_code(item_obj)

@@ -99,6 +99,9 @@ def test_georgett_daily_limit_uses_player_authority_and_canonical_text():
     cock = (ROOT / "game/Utilities/General/Sex/ShowCurrentCockState.rpy").read_text(encoding="utf-8-sig")
 
     assert "if not player.intimacy.can_cum():" in sex + talk
+    assert "and Georgett.can_have_sex_today():" in talk
+    assert "if not Georgett.can_have_sex_today():" in talk
+    assert sex.count("Georgett.can_have_sex_today()") >= 7
     assert "PLAYER_DAILY_EXHAUSTION_TEXT" in sex + talk
     assert intimacy.count("То что упало - подняться не может.") == 1
     assert "[PLAYER_DAILY_EXHAUSTION_TEXT]" in cock

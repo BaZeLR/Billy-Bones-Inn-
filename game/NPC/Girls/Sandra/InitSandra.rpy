@@ -195,6 +195,24 @@ init python:
             self.known = True
             return self
 
+        def intimacy_story_ready(self):
+            thread = threads["sandraWeeklyEvaluation"]
+            return bool(thread.completed) or people_to_int(thread.num, 0) == 4
+
+        def relationship_allows(self, action_code="talk"):
+            action_key = str(action_code or "talk").strip().lower()
+            if action_key == "talk":
+                return True
+            if action_key == "gift":
+                return relationship_any_gift_allowed(self.code_name)
+            if action_key in ("intimacy", "sex"):
+                return self.intimacy_story_ready() and self.can_have_sex_today()
+            allowed, reason = relationship_social_action_allowed(self.code_name, action_key)
+            return bool(allowed)
+
+        def date_intimacy_available(self):
+            return self.relationship_allows("intimacy")
+
         def mana_profile(self):
             if self.mana_corrupted:
                 return self.mana_reaction_table["corrupted"]

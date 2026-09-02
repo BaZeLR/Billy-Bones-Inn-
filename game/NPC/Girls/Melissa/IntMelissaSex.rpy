@@ -38,14 +38,8 @@ init python:
         info = people.get_info(girl)
         if info is None:
             return False
-        if girl == "melissa":
+        if girl in ("melissa", "sandra"):
             return bool(info.relationship_allows(action_code))
-        if girl == "sandra":
-            unlocked = (
-                threads["sandraWeeklyEvaluation"].completed
-                or int(threads["sandraWeeklyEvaluation"].num or 0) == 4
-            )
-            return unlocked and info.can_have_sex_today()
         return False
 
     def household_sex_relationship_stage(girl_name=""):

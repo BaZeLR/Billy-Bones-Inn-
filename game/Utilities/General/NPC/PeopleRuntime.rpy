@@ -217,7 +217,7 @@ init -999 python:
             for row in list(self.location_choices or []):
                 data = dict(row or {})
                 loc = str(data.get("location", "") or "").strip()
-                if not loc:
+                if not loc or not room_rule_true(data.get("condition", None)):
                     continue
                 probability = float(data.get("probability", data.get("weight", 1.0)) or 0.0)
                 if probability > 0:
@@ -462,6 +462,20 @@ init -999 python:
             return list(plan)
 
         def interval_location_choices_from_json(self, data):
+            explicit_choices = list(data.get("location_choices", []) or [])
+            if explicit_choices:
+                choices = []
+                for row in explicit_choices:
+                    choice = dict(row or {})
+                    location = str(choice.get("location", "") or "").strip()
+                    if not location:
+                        continue
+                    choices.append({
+                        "location": location,
+                        "weight": float(choice.get("weight", choice.get("probability", 1.0)) or 0.0),
+                        "condition": choice.get("condition", None),
+                    })
+                return choices
             raw_location = data.get("location", "")
             probability_rows = list(data.get("location_probabilities", []) or [])
             if isinstance(raw_location, str):
@@ -1115,6 +1129,9 @@ init -999 python:
 
         def can_have_sex_today(self):
             return people_to_int(self.fucked_today, 0) < max(0, people_to_int(self.daily_sex_limit, 0))
+
+        def date_intimacy_available(self):
+            return False
 
         def getLocation(self, wday=None, hour=None):
             if bool(household.barber_appointments.get(self.name, 0)) and barber_shop_is_open_at(wday, hour):

@@ -58,7 +58,7 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
                 call IntGeorgettSponsorEddieHome(girl_name, girl_loc)
             "Спросить, не приходил ли Эдди" if Becky.eddie_georgett_stage>0 and int(calendar_v2.hour or 0)<=15:
                 call IntGeorgettAskEddieVisit(girl_name, girl_loc)
-            "Снять" if (player.economy.money>=8 or (player.economy.money>=4 and girl_loc=="tavern")) and player.intimacy.can_cum():
+            "Снять" if (player.economy.money>=8 or (player.economy.money>=4 and girl_loc=="tavern")) and player.intimacy.can_cum() and Georgett.can_have_sex_today():
                 call IntGeorgettHire(girl_name, girl_loc)
             "Лапать":
                 call IntGeorgettGrope(girl_name, girl_loc)
@@ -322,6 +322,10 @@ label IntGeorgettAskEddieVisit(girl_name="georgett", girl_loc="street"):
 label IntGeorgettHire(girl_name="georgett", girl_loc="street"):
     if not player.intimacy.can_cum():
         $ scene_runtime.text = PLAYER_DAILY_EXHAUSTION_TEXT
+        $ scene_runtime.location_text = scene_runtime.text
+        return
+    if not Georgett.can_have_sex_today():
+        $ scene_runtime.text = "Сегодня Жоржетта уже дважды была с вами и больше клиентов принимать не станет."
         $ scene_runtime.location_text = scene_runtime.text
         return
     $ main_ui_end_talk_state()

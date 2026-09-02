@@ -1597,6 +1597,7 @@ define georgettThreadList = [
                 "#int(Georgett.story_value('foundinchurch', 0) or 0) > 0",
                 "#int(Georgett.story_value('fuckinchurch', 0) or 0) == 0",
                 "#player.intimacy.can_cum()",
+                "#Georgett.can_have_sex_today()",
                 "#int(Georgett.rel or 0) >= 6",
                 "#int(Georgett.sex_stat('sexacts', 0) or 0) >= 3",
                 "#int(player.economy.money or 0) >= 15",

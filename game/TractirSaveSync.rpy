@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 79
+define currentVersion = 80
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -677,6 +677,10 @@ init -100 python:
         if loaded_version < 79:
             updateSave_V78()
             loaded_version = 79
+
+        if loaded_version < 80:
+            updateSave_V79()
+            loaded_version = 80
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2639,6 +2643,26 @@ init -100 python:
         Becky.__dict__.pop("sandra_kitchen_visit_period", None)
         crafting.__dict__.pop("soap_sample_intro_done", None)
         crafting.__dict__.pop("soap_sample_given", None)
+
+    def updateSave_V79():
+        # Remaining life on each owned dress is the only wear authority.
+        appearance = player.appearance
+        state = appearance.__dict__
+        old_acquired_days = state.get("dress_days", {})
+        if not isinstance(old_acquired_days, dict):
+            old_acquired_days = {}
+        remaining_life = state.get("dress_life_days", {})
+        if not isinstance(remaining_life, dict):
+            remaining_life = {}
+        for dress_code in player_normalize_id_list(state.get("owned_dresses", [])):
+            if dress_code in remaining_life:
+                remaining_life[dress_code] = max(0, player_to_int(remaining_life[dress_code], 0))
+                continue
+            acquired_day = player_to_int(old_acquired_days.get(dress_code, current_game_day()), current_game_day())
+            remaining_life[dress_code] = max(0, appearance.DRESS_LIFE_DAYS - max(0, current_game_day() - acquired_day))
+        appearance.dress_life_days = remaining_life
+        state.pop("dress_days", None)
+        state.pop("costume_condition", None)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

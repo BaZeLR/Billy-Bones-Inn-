@@ -30,8 +30,29 @@ def test_player_appearance_owns_wash_haircut_and_life_timers():
     assert "self.hairCutdays" not in source
     assert "self.haircut_day" not in source
     assert "self.dress_life_days = {\"villagedress\": self.DRESS_LIFE_DAYS}" in source
+    assert "self.dress_days" not in source
+    assert "self.costume_condition" not in source
     assert "self.item_life_days = {}" in source
     assert "def age_daily(self, days=1, item_ids=None):" in source
+
+
+def test_tailor_replacement_renews_the_owned_dress_at_delivery():
+    player_source = read_rel("game/Utilities/General/Player/Player.rpy")
+    shop_source = read_rel("game/Town/Arts/Dress/DressShopDressItems.rpy")
+    next_day_source = read_rel("game/Utilities/Time/NextDay.rpy")
+    stat_source = read_rel("game/Utilities/General/Screens/stat.rpy")
+    town_source = read_rel("game/Town/RandomTownEvents.rpy")
+    migration_source = read_rel("game/TractirSaveSync.rpy")
+
+    replacement = player_source.split("def replace_dress", 1)[1].split("def remove_dress", 1)[0]
+    assert "self.destroyed_dresses" in replacement
+    assert "self.dress_life_days[dress_key] = self.DRESS_LIFE_DAYS" in replacement
+    assert "player.appearance.replace_dress(dress_shop.produced" in next_day_source
+    assert "player.appearance.dress_condition(dress_code)" in shop_source
+    assert "player_dress_condition_from_age" not in stat_source + shop_source
+    assert "player.appearance.damage_dress(" in town_source
+    assert 'state.pop("dress_days", None)' in migration_source
+    assert 'state.pop("costume_condition", None)' in migration_source
 
 
 def test_next_day_ages_player_appearance_once_per_day():

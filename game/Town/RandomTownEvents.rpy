@@ -315,8 +315,7 @@ init -20 python:
             return score >= (self._int(enemy_level, 2) * 30 + 30)
 
         def apply_cloth_damage(self, amount=15):
-            appearance = player.appearance
-            appearance.costume_condition = max(0, self._int(appearance.costume_condition, 100) - self._int(amount, 15))
+            player.appearance.damage_dress(condition_loss=self._int(amount, 15))
 
         def apply_health_damage(self, amount=15):
             amount_int = self._int(amount, 15)

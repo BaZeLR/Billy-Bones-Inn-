@@ -46,7 +46,7 @@ init python:
 
     def player_costume_condition_look_value(condition_value=None):
         appearance = player.appearance
-        condition = _player_clamp_stat(appearance.costume_condition if condition_value is None else condition_value, 0, 100)
+        condition = _player_clamp_stat(appearance.dress_condition() if condition_value is None else condition_value, 0, 100)
         return _player_int(round(float(condition) / 4.0), 0)
 
     def player_haircut_elapsed_days():
@@ -59,18 +59,12 @@ init python:
             return 0
         return appearance.dress_age_days(code, current_game_day())
 
-    def player_dress_condition_from_age(dress_age_days=None):
-        age_days = _player_int(player_current_dress_age_days() if dress_age_days is None else dress_age_days, 0)
-        if age_days >= 42:
-            return 0
-        return max(0, 100 - int(round((float(age_days) / 42.0) * 50.0)))
-
     def player_look_breakdown():
         appearance = player.appearance
         haircut_days = player_haircut_elapsed_days()
         dress_age_days = player_current_dress_age_days(appearance.current_dress)
         dress_value = player_dress_look_value(appearance.current_dress)
-        condition_value = player_costume_condition_look_value(player_dress_condition_from_age(dress_age_days))
+        condition_value = player_costume_condition_look_value(appearance.dress_condition(appearance.current_dress))
         haircut_value = player_haircut_look_value(haircut_days)
         hygiene_value = player_hygiene_look_value(appearance.days_since_wash)
         soap_bonus = _player_int(appearance.soap_look_bonus, 0) if current_game_day() <= int(appearance.soap_look_bonus_until_day or -1) else 0
@@ -94,7 +88,7 @@ init python:
         lines = []
         wash_days = _player_int(appearance.days_since_wash, 0)
         haircut_days = _player_int(player_haircut_elapsed_days(), 0)
-        dress_condition = _player_int(player_dress_condition_from_age(player_current_dress_age_days(appearance.current_dress)), 100)
+        dress_condition = _player_int(appearance.dress_condition(appearance.current_dress), 100)
 
         if wash_days >= 3:
             lines.append("От вас уже ощутимо несет потом и грязью. Это портит внешний вид и мешает нормальному разговору.")
@@ -136,7 +130,7 @@ init python:
         lines = []
         wash_days = _player_int(appearance.days_since_wash, 0)
         haircut_days = _player_int(player_haircut_elapsed_days(), 0)
-        dress_condition = _player_int(player_dress_condition_from_age(player_current_dress_age_days(appearance.current_dress)), 100)
+        dress_condition = _player_int(appearance.dress_condition(appearance.current_dress), 100)
 
         if wash_days >= 3 and not _player_condition_notice_seen("stink"):
             lines.append("От вас уже ощутимо несет грязью. Помыться нужно при первой возможности.")
@@ -259,7 +253,7 @@ init python:
         appearance = player.appearance
         wash_days = _player_int(appearance.days_since_wash, 0)
         haircut_days = _player_int(breakdown.get("haircut_days", 0), 0)
-        dress_condition = _player_int(player_dress_condition_from_age(player_current_dress_age_days(appearance.current_dress)), 100)
+        dress_condition = _player_int(appearance.dress_condition(appearance.current_dress), 100)
 
         score = 0
         reasons = []
@@ -458,8 +452,6 @@ init python:
         }
 
     def update_stat_state():
-        appearance = player.appearance
-        appearance.costume_condition = _player_int(player_dress_condition_from_age(player_current_dress_age_days(appearance.current_dress)), 0)
         player_condition_maybe_notify()
 
 

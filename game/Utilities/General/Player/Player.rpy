@@ -216,13 +216,11 @@ init -998 python:
         def __init__(self):
             self.current_dress = "villagedress"
             self.owned_dresses = ["villagedress"]
-            self.dress_days = {"villagedress": 0}
             self.dress_life_days = {"villagedress": self.DRESS_LIFE_DAYS}
             self.destroyed_dresses = []
             self.item_life_days = {}
             self.days_since_haircut = 0
             self.days_since_wash = 0
-            self.costume_condition = 100
             self.sleep_bottom_layer = "daywear"
             self.girl_dresses_bought = 0
             self.soap_look_bonus = 0
@@ -241,12 +239,25 @@ init -998 python:
             self.owned_dresses = player_normalize_id_list(self.owned_dresses)
             if dress_key not in self.owned_dresses:
                 self.owned_dresses.append(dress_key)
-            if not isinstance(self.dress_days, dict):
-                self.dress_days = {}
-            self.dress_days.setdefault(dress_key, player_to_int(acquired_day, 0))
             if not isinstance(self.dress_life_days, dict):
                 self.dress_life_days = {}
             self.dress_life_days.setdefault(dress_key, self.DRESS_LIFE_DAYS)
+            return True
+
+        def replace_dress(self, dress_code, acquired_day=0):
+            dress_key = str(dress_code or "").strip()
+            if not dress_key:
+                return False
+            self.destroyed_dresses = [
+                row for row in player_normalize_id_list(self.destroyed_dresses)
+                if row != dress_key
+            ]
+            self.owned_dresses = player_normalize_id_list(self.owned_dresses)
+            if dress_key not in self.owned_dresses:
+                self.owned_dresses.append(dress_key)
+            if not isinstance(self.dress_life_days, dict):
+                self.dress_life_days = {}
+            self.dress_life_days[dress_key] = self.DRESS_LIFE_DAYS
             return True
 
         def remove_dress(self, dress_code):
@@ -254,8 +265,6 @@ init -998 python:
             if not dress_key:
                 return False
             self.owned_dresses = [row for row in list(self.owned_dresses or []) if str(row or "").strip() != dress_key]
-            if isinstance(self.dress_days, dict) and dress_key in self.dress_days:
-                del self.dress_days[dress_key]
             if isinstance(self.dress_life_days, dict) and dress_key in self.dress_life_days:
                 del self.dress_life_days[dress_key]
             if str(self.current_dress or "").strip() == dress_key:
@@ -296,10 +305,33 @@ init -998 python:
             dress_key = str(dress_code or self.current_dress or "").strip()
             if not dress_key:
                 return 0
-            if not isinstance(self.dress_days, dict):
-                self.dress_days = {}
-            self.dress_days.setdefault(dress_key, player_to_int(current_day, 0))
-            return max(0, player_to_int(current_day, 0) - player_to_int(self.dress_days.get(dress_key, 0), 0))
+            if not isinstance(self.dress_life_days, dict):
+                self.dress_life_days = {}
+            self.dress_life_days.setdefault(dress_key, self.DRESS_LIFE_DAYS)
+            remaining = max(0, player_to_int(self.dress_life_days.get(dress_key, 0), 0))
+            return max(0, self.DRESS_LIFE_DAYS - remaining)
+
+        def dress_condition(self, dress_code=""):
+            dress_key = str(dress_code or self.current_dress or "").strip()
+            if not dress_key or not self.has_dress(dress_key):
+                return 0
+            remaining = max(0, player_to_int(self.dress_life_days.get(dress_key, 0), 0))
+            if remaining <= 0:
+                return 0
+            elapsed = max(0, self.DRESS_LIFE_DAYS - remaining)
+            return max(0, 100 - int(round((float(elapsed) / float(self.DRESS_LIFE_DAYS)) * 50.0)))
+
+        def damage_dress(self, dress_code="", condition_loss=15):
+            dress_key = str(dress_code or self.current_dress or "").strip()
+            if not dress_key or not self.has_dress(dress_key):
+                return 0
+            loss = max(0, player_to_int(condition_loss, 0))
+            life_loss = max(1, (loss * self.DRESS_LIFE_DAYS + 49) // 50) if loss else 0
+            self.dress_life_days[dress_key] = max(
+                0,
+                player_to_int(self.dress_life_days.get(dress_key, self.DRESS_LIFE_DAYS), self.DRESS_LIFE_DAYS) - life_loss,
+            )
+            return self.dress_condition(dress_key)
 
         def wash(self):
             self.days_since_wash = 0
@@ -367,7 +399,6 @@ init -998 python:
                 self.ensure_item_life(item_id)
                 self.item_life_days[item_id] = max(0, player_to_int(self.item_life_days.get(item_id, 0), 0) - amount)
 
-            self.costume_condition = max(0, player_to_int(self.costume_condition, 100) - amount)
             return self
 
         def ensure_nightwear(self, current_day=0):

@@ -330,6 +330,9 @@ init python:
                 )
             return False
 
+        def date_intimacy_available(self):
+            return self.relationship_allows("intimacy")
+
         def private_context_active(self, room_code=""):
             room_key = str(room_code or rooms.current_code or "").strip()
             return (

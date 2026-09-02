@@ -182,9 +182,10 @@ def test_sandra_story_thread_is_the_only_sex_unlock_authority():
     assert "mc_visit_first_" not in source
     assert "self.weekly_wake_num" not in source
     assert "final_reward_flag" not in source
-    assert 'threads["sandraWeeklyEvaluation"].completed' in room
-    assert 'threads["sandraWeeklyEvaluation"].completed' in sex_engine
-    assert 'threads["sandraWeeklyEvaluation"].completed' in talk
+    assert 'threads["sandraWeeklyEvaluation"]' in source
+    assert 'Sandra.relationship_allows("intimacy")' in room
+    assert 'Sandra.relationship_allows("intimacy")' in talk
+    assert 'threads["sandraWeeklyEvaluation"].completed' not in room + sex_engine + talk
 
 
 def test_sandra_schedule_is_unique_and_hour_based():
@@ -459,3 +460,22 @@ def test_sandra_weekly_rewards_use_player_system_and_story_thread_authorities():
     assert "Sandra.apply" not in chores_source
     assert "Sandra.apply" not in events_source
     assert "Sandra.apply" not in room_source
+
+
+def test_sandra_object_owns_its_intimacy_unlock_and_date_capability():
+    init_source = SANDRA_INIT.read_text(encoding="utf-8-sig")
+    sex_source = HOUSEHOLD_SEX.read_text(encoding="utf-8-sig")
+    breakfast_source = (PROJECT_ROOT / "game/Inn/TavernKitchenBreakfast.rpy").read_text(encoding="utf-8-sig")
+
+    assert "def intimacy_story_ready(self):" in init_source
+    assert 'thread = threads["sandraWeeklyEvaluation"]' in init_source
+    assert "def relationship_allows(self, action_code=\"talk\"):" in init_source
+    assert 'return self.intimacy_story_ready() and self.can_have_sex_today()' in init_source
+    assert 'if girl in ("melissa", "sandra"):' in sex_source
+    assert "threads[\"sandraWeeklyEvaluation\"]" not in sex_source
+    date_gate = breakfast_source.split("def tavern_breakfast_private_date_available", 1)[1].split("def tavern_breakfast_player_perk_score", 1)[0]
+    assert "info.date_intimacy_available()" in date_gate
+    assert "sandraWeeklyEvaluation" not in date_gate
+    outdoor = breakfast_source.split("label TavernKitchenBreakfastOutdoorDate", 1)[1].split("label TavernKitchenBreakfastTalkAbsent", 1)[0]
+    assert '_outdoor_date_info.date_intimacy_available()' in outdoor
+    assert 'call HouseholdSexEngine(_outdoor_date_girl, "ForestLake")' in outdoor

@@ -126,7 +126,7 @@ def test_church_event_rows_show_same_clock_gate_conditions():
     assert '"ChurchServiceBench"' not in runtime
     assert '"ChurchServiceDoggy"' not in runtime
     assert '"ChurchServiceWithLiza"' not in runtime
-    assert 'if player.intimacy.can_cum() and people_to_int(Georgett.rel, 0) >= 2' in georgett_service
+    assert 'if player.intimacy.can_cum() and Georgett.can_have_sex_today() and people_to_int(Georgett.rel, 0) >= 2' in georgett_service
     assert "church_after_cermon_action_visible()" in people_runtime
     assert '"#church_after_cermon_action_visible()"' not in runtime
     assert '7, (11, 12), None' in runtime[runtime.find("define georgettThreadList"):]

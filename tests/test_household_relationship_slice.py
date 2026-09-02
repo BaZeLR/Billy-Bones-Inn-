@@ -76,8 +76,8 @@ def test_sandra_and_melissa_share_one_intimacy_procedure_with_distinct_gates():
     assert "label IntMelissaSex" not in engine
     assert 'if girl == "melissa":' in engine
     assert 'return bool(info.relationship_allows(action_code))' in engine
-    assert 'if girl == "sandra":' in engine
-    assert 'threads["sandraWeeklyEvaluation"].completed' in engine
+    assert 'if girl in ("melissa", "sandra"):' in engine
+    assert 'threads["sandraWeeklyEvaluation"]' not in engine
     assert 'call HouseholdSexEngine("sandra", "TavernSandraRoom")' in sandra_events
     assert "call HouseholdSexEngine" in melissa_talk
     assert "call HouseholdSexEngine" in sandra_talk

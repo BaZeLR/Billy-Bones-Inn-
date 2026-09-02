@@ -351,19 +351,8 @@ init python:
 
     def tavern_breakfast_private_date_available(girl_name=""):
         girl = str(girl_name or "").strip().lower()
-        if girl == "melissa":
-            return Melissa.relationship_allows("intimacy")
-        if girl == "sandra":
-            return (
-                threads["sandraWeeklyEvaluation"].completed
-                and int(Sandra.fucked_today or 0) < 2
-            )
-        if girl == "amanda":
-            return (
-                int(Amanda.fucked_today or 0) == 0
-                and Amanda.sex_offer_reaction() in (1, 4)
-            )
-        return False
+        info = people.get_info(girl)
+        return bool(info is not None and info.date_intimacy_available())
 
     def tavern_breakfast_player_perk_score(npc_id=""):
         key = str(npc_id or "").strip().lower()
@@ -1486,6 +1475,11 @@ label TavernKitchenBreakfastOutdoorDate(girl_name="", date_code="lake"):
     menu:
         "Продолжить прогулку":
             pass
+    if str(date_code or "") == "lake" and _outdoor_date_info.date_intimacy_available():
+        if _outdoor_date_girl == "amanda":
+            call IntAmandaSex(_outdoor_date_girl, "ForestLake")
+        else:
+            call HouseholdSexEngine(_outdoor_date_girl, "ForestLake")
     $ calendar_v2.advance_minutes(90 if str(date_code or "") == "lake" else 60)
     $ _outdoor_date_info.mark_asked()
     $ _outdoor_date_info.mark_talked()

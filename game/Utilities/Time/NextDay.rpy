@@ -113,7 +113,7 @@ label NextDay(retlocname, timepassed):
             if dress_shop.buyer == 'You':
                 dress_name = ShortDressName.get(dress_shop.produced, dress_shop.produced).lower()
                 NewDressCame = f'Утром прибежал посыльный из лавки Фараго и принес вам ваш заказ - {dress_name}.'
-                player.appearance.add_dress(dress_shop.produced, int(current_game_day()))
+                player.appearance.replace_dress(dress_shop.produced, int(current_game_day()))
                 
             if player.economy.money >= 50:
                 NewDressCame += f' Вы поблагодарили мальчишку, дав ему 5 мараведи, и положили обнову в ларь.'

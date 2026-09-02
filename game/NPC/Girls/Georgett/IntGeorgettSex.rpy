@@ -160,21 +160,21 @@ label GeorgettSexMenu:
                 call GeorgettSexGrope
             "Лизать киску" if Georgett.pussy_visible() and not Georgett.sex_busy():
                 call GeorgettSexLick
-            "Предложить отсосать" if player.intimacy.can_cum() and not Georgett.sex_busy():
+            "Предложить отсосать" if player.intimacy.can_cum() and Georgett.can_have_sex_today() and not Georgett.sex_busy():
                 call GeorgettSexBlowjob
-            "Трахать между грудей" if player.intimacy.can_cum() and not Georgett.sex_busy() and player.intimacy.arousal_value() >= 20 and Georgett.tits_visible() and Georgett.pregnancy_days() < 150:
+            "Трахать между грудей" if player.intimacy.can_cum() and Georgett.can_have_sex_today() and not Georgett.sex_busy() and player.intimacy.arousal_value() >= 20 and Georgett.tits_visible() and Georgett.pregnancy_days() < 150:
                 call GeorgettSexTitfuck
-            "Трахать" if player.intimacy.can_cum() and not Georgett.sex_busy() and player.intimacy.arousal_value() >= 20 and Georgett.arousal_value() >= 20 and Georgett.pussy_visible():
+            "Трахать" if player.intimacy.can_cum() and Georgett.can_have_sex_today() and not Georgett.sex_busy() and player.intimacy.arousal_value() >= 20 and Georgett.arousal_value() >= 20 and Georgett.pussy_visible():
                 call GeorgettSexFuck
             "Продолжить" if Georgett.sex_busy():
                 $ Georgett.set_sex_busy(0)
-            "Кончить в ротик" if player.intimacy.can_cum() and player.intimacy.arousal_value() >= 100 and (Georgett.cock_in("mouth") or Georgett.cock_in("tits")):
+            "Кончить в ротик" if player.intimacy.can_cum() and Georgett.can_have_sex_today() and player.intimacy.arousal_value() >= 100 and (Georgett.cock_in("mouth") or Georgett.cock_in("tits")):
                 call GeorgettSexCumMouth
-            "Кончить на лицо" if player.intimacy.can_cum() and player.intimacy.arousal_value() >= 100:
+            "Кончить на лицо" if player.intimacy.can_cum() and Georgett.can_have_sex_today() and player.intimacy.arousal_value() >= 100:
                 call GeorgettSexCumFace
-            "Кончить на груди" if player.intimacy.can_cum() and player.intimacy.arousal_value() >= 100 and Georgett.tits_visible():
+            "Кончить на груди" if player.intimacy.can_cum() and Georgett.can_have_sex_today() and player.intimacy.arousal_value() >= 100 and Georgett.tits_visible():
                 call GeorgettSexCumTits
-            "Кончить внутрь" if player.intimacy.can_cum() and player.intimacy.arousal_value() >= 100 and Georgett.cock_in("pussy"):
+            "Кончить внутрь" if player.intimacy.can_cum() and Georgett.can_have_sex_today() and player.intimacy.arousal_value() >= 100 and Georgett.cock_in("pussy"):
                 call GeorgettSexCumInside
             "Закончить":
                 $ Georgett.set_sex_busy(0)

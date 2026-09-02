@@ -322,7 +322,7 @@ def test_liza_v55_migration_consumes_legacy_state_once():
     migration = _source(MIGRATION)
     block = migration.split("def updateSave_V55():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 79" in migration
+    assert "define currentVersion = 80" in migration
     assert "if loaded_version < 56:" in migration
     assert "updateSave_V55()" in migration
     for old_key, field_name in (
@@ -636,6 +636,7 @@ def test_georgett_has_three_location_story_threads_without_old_rows():
     assert '"ChurchServiceGeorgett"' in rows
     assert '"ChurchGeorgettQuickSex"' in rows
     assert '"#int(Georgett.rel or 0) >= 6"' in rows
+    assert '"#Georgett.can_have_sex_today()"' in rows
     assert '"#int(player.economy.money or 0) >= 15"' in rows
     assert '"story_georgett_church_confession_regular"' in rows
     assert '"story_georgett_church_confession_service"' in rows
@@ -648,7 +649,7 @@ def test_georgett_has_three_location_story_threads_without_old_rows():
     migration_block = migration.split("def updateSave_V75():", 1)[1].split(
         "# Saved objects must be upgraded", 1
     )[0]
-    assert "define currentVersion = 79" in migration
+    assert "define currentVersion = 80" in migration
     assert "if loaded_version < 76:" in migration
     assert "updateSave_V75()" in migration
     for old_name in (
@@ -706,6 +707,7 @@ def test_georgett_church_service_preserves_the_single_authored_action_flow():
     assert 'MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex"))' not in service_menu
     assert 'MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("ChurchGeorgettQuickSex"))' in georgett_church_events
     assert 'player.intimacy.can_cum()' in georgett_church_events
+    assert 'Georgett.can_have_sex_today()' in georgett_church_events
     assert 'people_to_int(Georgett.rel, 0) >= 2' in georgett_church_events
     assert 'people_to_int(Georgett.sex_stat("sexacts", 0), 0) >= 3' in georgett_church_events
     assert 'Georgett.corruption' not in church.split("label ChurchServiceMenu", 1)[1].split("label ChurchServiceMother", 1)[0]

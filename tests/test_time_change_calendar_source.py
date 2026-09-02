@@ -51,7 +51,7 @@ def test_nextday_reports_completed_events_before_current_day_deliveries():
 
     assert event_date < previous_day < event_summary < calendar_roll < new_day_events < delivery
     assert "calendar_v2.day_number_to_parts(_nextday_event_day_number)" in body
-    assert "player.appearance.add_dress(dress_shop.produced, int(current_game_day()))" in body
+    assert "player.appearance.replace_dress(dress_shop.produced, int(current_game_day()))" in body
 
 
 def test_nextday_blocks_time_during_report_then_releases_it_before_room_return():

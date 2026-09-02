@@ -82,11 +82,6 @@ def test_staff_work_schedules_read_current_jobs_from_the_npc_owner():
             "working_kitchen": ("TavernKitchen", ["jobkitchen"]),
             "working_hall": ("TavernMain", ["jobcleaning", "jobwaitress"]),
         },
-        "melissa": {
-            "working_kitchen": ("TavernKitchen", ["jobkitchen"]),
-            "working_waitressing": ("TavernMain", ["jobwaitress"]),
-            "working_cleaning": (["TavernMain", "TavernStorage", "Backyard"], ["jobcleaning"]),
-        },
         "sandra": {
             "working_kitchen": ("TavernKitchen", ["jobkitchen"]),
             "working_waitressing": ("TavernMain", ["jobwaitress"]),
@@ -107,6 +102,26 @@ def test_staff_work_schedules_read_current_jobs_from_the_npc_owner():
             assert condition["rule"] == "any_job_assigned"
             assert condition["people"] == [person]
             assert actual_jobs == jobs
+
+    melissa_schedule = json.loads((ROOT / "game/NPC/Schedules/melissa.json").read_text(encoding="utf-8"))
+    melissa_work_rows = [row for row in melissa_schedule["entries"] if row.get("label") == "working_day"]
+    assert len(melissa_work_rows) == 1
+    melissa_work = melissa_work_rows[0]
+    assert melissa_work["condition"] == {
+        "rule": "any_job_assigned",
+        "people": ["melissa"],
+        "jobs": ["jobkitchen", "jobcleaning", "jobwaitress"],
+    }
+    assert {
+        (choice["location"], choice["condition"]["job"])
+        for choice in melissa_work["location_choices"]
+    } == {
+        ("TavernKitchen", "jobkitchen"),
+        ("TavernMain", "jobwaitress"),
+        ("TavernMain", "jobcleaning"),
+        ("TavernStorage", "jobcleaning"),
+        ("Backyard", "jobcleaning"),
+    }
 
     rule_source = (ROOT / "game/Utilities/General/Classes/GameObjectTemplate.rpy").read_text(encoding="utf-8-sig")
     job_rule = rule_source.split('if rule_name == "any_job_assigned":', 1)[1].split("\n        return False\n        return False", 1)[0]

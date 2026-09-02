@@ -1138,6 +1138,27 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     $ _georgett_exhausted_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
     $ _georgett_exhausted_finish_button_id = "choice_panel_button_%d" % int(_georgett_exhausted_finish_index)
     click id _georgett_exhausted_finish_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+    $ Georgett.fucked_today = Georgett.daily_sex_limit - 1
+    $ player.intimacy.came_today = 0
+    $ player.intimacy.can_cum_daily = 3
+    $ player.intimacy.set_arousal(100)
+    $ Georgett.set_arousal(40)
+    run Call("IntGeorgettSex", "georgett", "street")
+    advance until screen "choice" timeout 20.0
+    $ _georgett_last_session_cum_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Кончить на лицо")
+    click id ("choice_panel_button_%d" % int(_georgett_last_session_cum_index)) pos (0.5, 0.5) until eval (int(Georgett.fucked_today or 0) == int(Georgett.daily_sex_limit or 0) and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (int(player.intimacy.came_today or 0) == 1 and player.intimacy.can_cum()) timeout 5.0
+    assert eval ("Предложить отсосать" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Трахать" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and not any(str(i.caption or "").startswith("Кончить") for i in renpy.get_screen("choice").scope.get("items", []))) timeout 5.0
+    $ _georgett_last_session_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
+    click id ("choice_panel_button_%d" % int(_georgett_last_session_finish_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+    $ Georgett.fucked_today = Georgett.daily_sex_limit
+    $ player.intimacy.came_today = 0
+    $ player.economy.money = 100
+    run Call("IntGeorgettTalk", "georgett", "street")
+    advance until screen "choice" timeout 20.0
+    assert eval ("Снять" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _georgett_limit_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    click id ("choice_panel_button_%d" % int(_georgett_limit_finish_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
 
 testcase external_sexport_finish_does_not_show_advance_time_developer_text:
     $ _history_list = []
@@ -1693,6 +1714,9 @@ testcase external_sandra_breakfast_flirt_date_destination:
     $ Sandra.breakfast_tease_day = -1
     $ player.tavern_management.breakfast.present_ids = ["sandra"]
     assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "sandra") timeout 5.0
+    $ threads["sandraWeeklyEvaluation"].reset()
+    $ threads["sandraWeeklyEvaluation"].advanceTo(4, force_active=True)
+    assert eval (not threads["sandraWeeklyEvaluation"].completed and Sandra.intimacy_story_ready() and tavern_breakfast_private_date_available("sandra")) timeout 5.0
     $ threads["sandraWeeklyEvaluation"].advanceTo(threads["sandraWeeklyEvaluation"].data.length, complete_at_end=True)
     assert eval (SandraStaticData.image_path("breakfast", "flirt") == "images/sandra/thanks/sandra_thanks.webm" and renpy.loadable(SandraStaticData.image_path("breakfast", "flirt"))) timeout 5.0
     $ player.tavern_management.breakfast.present_ids = ["sandra", "amanda", "melissa"]
@@ -1760,6 +1784,23 @@ testcase external_sandra_breakfast_flirt_date_destination:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(rooms.current_code or "") == "TavernMyRoom") timeout 20.0
 
     $ player.tavern_management.breakfast.event_active = True
+    $ Sandra.fucked_today = 1
+    $ player.intimacy.set_arousal(40)
+    $ Sandra.set_arousal(40)
+    $ Sandra.remove_clothing_layer("top")
+    $ Sandra.remove_clothing_layer("bra")
+    $ Sandra.remove_clothing_layer("bottom")
+    $ Sandra.remove_clothing_layer("panties")
+    run Call("TavernKitchenBreakfastOutdoorDate", "sandra", "lake")
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить прогулку"] and str(rooms.current_code or "") == "ForestLake") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Остановиться" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sandra_lake_stop_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Остановиться")
+    click id ("choice_panel_button_%d" % int(_sandra_lake_stop_index)) pos (0.5, 0.5) until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закончить близость"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закончить свидание"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(rooms.current_code or "") == "ForestLake") timeout 20.0
+
+    $ player.tavern_management.breakfast.event_active = True
     $ player.tavern_management.breakfast.present_ids = ["amanda"]
     $ Amanda.fucked_today = 0
     $ Amanda.rel = 11
@@ -1773,6 +1814,7 @@ testcase external_sandra_breakfast_flirt_date_destination:
 
     $ player.tavern_management.breakfast.event_active = True
     $ player.tavern_management.breakfast.present_ids = ["amanda"]
+    $ Amanda.fucked_today = Amanda.daily_sex_limit
     run Call("TavernKitchenBreakfastOutdoorDate", "amanda", "lake")
     advance until screen "choice" timeout 20.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить прогулку"] and str(rooms.current_code or "") == "ForestLake") timeout 5.0
@@ -2287,6 +2329,7 @@ testcase external_next_day_report_releases_time_block:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ threads["sandraWeeklyEvaluation"].advanceTo(threads["sandraWeeklyEvaluation"].data.length, complete_at_end=True)
     $ player.set_money(1000)
     $ player.tavern_management.visitors = 40
     $ player.tavern_management.productnum = 200
@@ -2332,7 +2375,10 @@ testcase external_next_day_report_releases_time_block:
     $ _nextday_today_date = calendar_v2.format_date_ru(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, None, False)
     $ _nextday_previous_parts = calendar_v2.day_number_to_parts(_nextday_current_day - 1)
     $ _nextday_previous_date = calendar_v2.format_date_ru(_nextday_previous_parts["day"], _nextday_previous_parts["month"], _nextday_previous_parts["year"], None, False)
-    $ player.appearance.remove_dress("citydress")
+    $ player.appearance.replace_dress("citydress", _nextday_current_day)
+    $ player.appearance.dress_life_days["citydress"] = 0
+    assert eval (int(player.appearance.dress_condition("citydress") or 0) == 0 and dress_shop_item_depreciated(get_game_item("dress_citydress"))) timeout 5.0
+    $ player.appearance.destroy_dress("citydress")
     $ dress_shop.produced = "citydress"
     $ dress_shop.buyer = "You"
     run Call("NextDay", "TavernMain", 1)
@@ -2341,7 +2387,7 @@ testcase external_next_day_report_releases_time_block:
     assert eval (("События за %s" % _nextday_previous_date) in str(next_day_runtime.report_body or "")) timeout 5.0
     assert eval (("События за %s" % _nextday_today_date) not in str(next_day_runtime.report_body or "")) timeout 5.0
     assert eval ("Утром прибежал посыльный из лавки Фараго" in str(next_day_runtime.report_body or "")) timeout 5.0
-    assert eval (player.appearance.has_dress("citydress") and int(player.appearance.dress_days.get("citydress", -1) or -1) == _nextday_current_day) timeout 5.0
+    assert eval (player.appearance.has_dress("citydress") and player.appearance.owned_dresses.count("citydress") == 1 and "citydress" not in player.appearance.destroyed_dresses and int(player.appearance.dress_life_days.get("citydress", 0) or 0) == int(player.appearance.DRESS_LIFE_DAYS or 0)) timeout 5.0
     click id "nextday_report_back_button" pos (0.5, 0.5) until eval (renpy.get_screen("nextday_report_card_overlay") is None) timeout 20.0
     advance until eval (int(calendar_v2.time_advance_blocked or 0) == 0 and renpy.get_screen("main_ui") is not None) timeout 30.0
 
@@ -3385,7 +3431,7 @@ testcase external_church_service_action_links_work:
     assert eval (str(scene_runtime.picture or "") == "images/georgett/church/withLiza.jpg/withliza1.jpg") timeout 5.0
     assert eval (int(player.economy.money or 0) == 85) timeout 5.0
     assert eval (int(player.intimacy.came_today or 0) == 1) timeout 5.0
-    assert eval (Georgett.story_value("fuckinchurch", 0) == 1 and Georgett.story_value("lizasawinchurch", 0) == 1 and int(Liza.rel or 0) == 1 and Liza.known) timeout 5.0
+    assert eval (Georgett.story_value("fuckinchurch", 0) == 1 and Georgett.story_value("lizasawinchurch", 0) == 1 and int(Liza.rel or 0) == 1 and Liza.known and int(Georgett.fucked_today or 0) == 1) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza2.jpg")) timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza3.jpg")) timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza4.jpg")) timeout 20.0
@@ -3393,6 +3439,10 @@ testcase external_church_service_action_links_work:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").endswith("withliza6.jpg")) timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "Church" and int(calendar_v2.hour or 0) == 9) timeout 20.0
     assert eval (Georgett.story_value("foundinchurch", 0) == 0 and str(main_ui_runtime.action_title or "") == "Действия") timeout 5.0
+    $ Georgett.fucked_today = Georgett.daily_sex_limit
+    $ player.intimacy.came_today = 0
+    run Call("ChurchServiceGeorgett")
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"]) timeout 5.0
 
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 10, 0)
     run Jump("Church")
@@ -6723,7 +6773,7 @@ testcase external_npc_schedule_room_visibility_agreement:
     assert eval ("melissa" in list(people.ids_at("TavernAmandaRoom") or []) and "melissa" not in list(people.ids_at("TavernKitchen") or [])) timeout 5.0
     $ external_calendar_set_fields(3, 1, 1100, 13, 0)
     $ external_calendar_set_weekday(1)
-    assert eval (str(people.location("melissa") or "") in ("TavernMain", "TavernKitchen", "TavernStorage", "Backyard")) timeout 5.0
+    assert eval (str(people.location("melissa") or "") in ("TavernMain", "TavernStorage", "Backyard")) timeout 5.0
     assert eval ("melissa" not in list(people.ids_at("TavernMelissaRoom") or [])) timeout 5.0
     $ Melissa.temp_room_code = ""
     $ external_calendar_set_fields(3, 1, 1100, 8, 30)

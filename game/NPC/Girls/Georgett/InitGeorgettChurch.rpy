@@ -19,7 +19,7 @@ label ChurchServiceGeorgett:
     $ main_ui_runtime.action_title = "Жоржетта"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
-    if player.intimacy.can_cum() and people_to_int(Georgett.rel, 0) >= 2 and people_to_int(Georgett.sex_stat("sexacts", 0), 0) >= 3:
+    if player.intimacy.can_cum() and Georgett.can_have_sex_today() and people_to_int(Georgett.rel, 0) >= 2 and people_to_int(Georgett.sex_stat("sexacts", 0), 0) >= 3:
         if story_event_available("Church", "georgett_quick_sex"):
             $ main_ui_runtime.action_items.append(MenuItem("Предложить Жоржетте перепихнуться по быстрому", Call("checkTriggers", "Church", "georgett_quick_sex", 0)))
         else:

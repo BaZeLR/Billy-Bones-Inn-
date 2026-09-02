@@ -100,7 +100,7 @@ def test_robin_v58_migration_consumes_old_map_once():
     migration = _source(MIGRATION)
     block = migration.split("def updateSave_V58():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 79" in migration
+    assert "define currentVersion = 80" in migration
     assert "if loaded_version < 59:" in migration
     assert "updateSave_V58()" in migration
     for old_key, field_name in (
