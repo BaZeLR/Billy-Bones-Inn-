@@ -36,11 +36,7 @@ init python:
         )
 
     def npc_schedule_becky_sandra_kitchen_visit_active():
-        if int(Becky.sandra_kitchen_visit_period or 0) == int(calendar_v2.period or 0):
-            return False
-        if int(Becky.home_visit_stage or 0) < 2:
-            return False
-        return int(calendar_v2.hour or 0) >= 12 and int(calendar_v2.hour or 0) < 18
+        return Becky.sandra_friendship_stage() >= 1
 
     def tavern_breakfast_present_ids():
         present = []
@@ -786,31 +782,6 @@ init python:
                 rows.append(npc_id)
         return rows
 
-    def tavern_breakfast_can_give_first_soap_samples():
-        required_ids = set(("sandra", "melissa", "amanda"))
-        present_ids = set(tavern_breakfast_present_ids() or [])
-        return (
-            not crafting.soap_sample_intro_done
-            and soap_available_piece_count() >= 3
-            and required_ids.issubset(present_ids)
-        )
-
-    def tavern_breakfast_apply_first_soap_samples():
-
-        if not tavern_breakfast_can_give_first_soap_samples():
-            return ""
-        player_remove_soap_pieces(3, False)
-        for npc_id in ("sandra", "melissa", "amanda"):
-            crafting.soap_sample_given[npc_id] = 1
-            crafting.soap_requests[npc_id] = 1
-            info = people.get_info(npc_id)
-            if info is not None:
-                info.change_social(friend_delta=1)
-        crafting.soap_sample_intro_done = True
-        player.tavern_management.breakfast.soap_announced_day = current_game_day()
-        player.change_stat("fun", 3)
-        return "За завтраком вы объявляете, что партия мыла наконец вылежалась, и тут же раздаете по куску Сандре, Мелиссе и Аманде на пробу. Дом сразу оживляется: всем любопытно, как поведет себя новое %s мыло, когда его наконец пустят в ход." % soap_last_batch_label()
-
     def tavern_breakfast_can_serve_spicy_tincture():
         return (
             int(player.item_count("libido_tincture_001") or 0) > 0
@@ -1002,10 +973,7 @@ init python:
             player.tavern_management.breakfast.dance_sponsor_announced_day = current_game_day()
             lines.append("За завтраком вы объявляете, что трактир уже выставит вино и закуски к пятничным танцам. Сандра довольно кивает: такой взнос сразу делает дом заметнее в городе, а девки начинают переглядываться куда живее обычного.")
         if soap_available_piece_count() > 0 and int(player.tavern_management.breakfast.soap_announced_day or -1) != current_game_day():
-            if not crafting.soap_sample_intro_done:
-                lines.append("За столом вы объявляете, что новая партия %s мыла наконец вылежалась и уже готова. Домашние заметно оживляются от этой новости." % soap_last_batch_label())
-            else:
-                lines.append("За столом вы напоминаете, что у вас снова есть %s мыло. После прошлой пробы за такой новостью следят уже куда внимательнее." % soap_last_batch_label())
+            lines.append("За столом вы объявляете, что новая партия %s мыла наконец вылежалась и уже готова. Домашние заметно оживляются от этой новости." % soap_last_batch_label())
             if "sandra" in present_ids:
                 lines.append("Сандра сразу замечает, что в доме наконец будет пахнуть по-человечески, а не только кухней, дымом и работой.")
             if "melissa" in present_ids:
@@ -1115,11 +1083,7 @@ label TavernKitchenBreakfast:
     $ _breakfast_social_ids = tavern_breakfast_apply_social_bonus()
     if len(list(_breakfast_social_ids or [])) > 0:
         $ _breakfast_lines.append("Совместный завтрак заметно сближает вас с теми, кто сидит с вами за столом.")
-    if tavern_breakfast_can_give_first_soap_samples():
-        $ _soap_intro_text = tavern_breakfast_apply_first_soap_samples()
-        if str(_soap_intro_text or "").strip():
-            $ _breakfast_lines.append(str(_soap_intro_text or "").strip())
-    elif soap_available_piece_count() > 0 and int(player.tavern_management.breakfast.soap_announced_day or -1) != current_game_day():
+    if soap_available_piece_count() > 0 and int(player.tavern_management.breakfast.soap_announced_day or -1) != current_game_day():
         $ player.tavern_management.breakfast.soap_announced_day = current_game_day()
         $ player.change_stat("fun", 3)
     if len(list(tavern_recent_barber_ids() or [])) > 0:

@@ -12,6 +12,16 @@
       "priority": 900
     },
     {
+      "label": "sunday_morning",
+      "weekdays": [7],
+      "start": "06:00",
+      "end": "07:59",
+      "location": "TavernMelissaRoom",
+      "awake": true,
+      "talkable": true,
+      "priority": 640
+    },
+    {
       "label": "sunday_church",
       "weekdays": [7],
       "start": "08:00",
@@ -22,6 +32,16 @@
       "priority": 800
     },
     {
+      "label": "sunday_after_church",
+      "weekdays": [7],
+      "start": "09:30",
+      "end": "12:29",
+      "location": "TavernMain",
+      "awake": true,
+      "talkable": true,
+      "priority": 640
+    },
+    {
       "label": "sunday_dinner",
       "weekdays": [7],
       "start": "12:30",
@@ -30,6 +50,16 @@
       "awake": true,
       "talkable": true,
       "priority": 600
+    },
+    {
+      "label": "sunday_afternoon",
+      "weekdays": [7],
+      "start": "13:31",
+      "end": "20:29",
+      "location": "TavernMain",
+      "awake": true,
+      "talkable": true,
+      "priority": 610
     },
     {
       "label": "morning_household",

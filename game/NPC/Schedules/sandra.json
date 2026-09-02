@@ -12,6 +12,16 @@
       "priority": 700
     },
     {
+      "label": "sunday_morning",
+      "weekdays": [7],
+      "start": "06:00",
+      "end": "07:59",
+      "location": "TavernKitchen",
+      "awake": true,
+      "talkable": true,
+      "priority": 610
+    },
+    {
       "label": "morning_household1",
       "weekdays": [1, 2, 3, 4, 5, 6],
       "start": "06:00",
@@ -101,6 +111,16 @@
       "priority": 650
     },
     {
+      "label": "sunday_after_church",
+      "weekdays": [7],
+      "start": "09:30",
+      "end": "12:29",
+      "location": "TavernKitchen",
+      "awake": true,
+      "talkable": true,
+      "priority": 620
+    },
+    {
       "label": "evening_room",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],
       "start": "20:30",
@@ -119,6 +139,16 @@
       "awake": true,
       "talkable": true,
       "priority": 500
+    },
+    {
+      "label": "sunday_afternoon",
+      "weekdays": [7],
+      "start": "13:31",
+      "end": "20:29",
+      "location": "TavernKitchen",
+      "awake": true,
+      "talkable": true,
+      "priority": 610
     }
   ]
 }

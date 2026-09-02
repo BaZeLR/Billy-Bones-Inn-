@@ -14,9 +14,9 @@ label IntBeckyTalk(girl_name="becky"):
             vscene _becky_picture
     if str(rooms.current_code or "") == "GroceryStore":
         $ scene_runtime.text = "За прилавком стоит сама Бекки Блэнкеншип. Это высокая рыжая женщина с полной грудью, ей на вид немного меньше сорока. Ее муж умер от болезни примерно за год до того, как ваш отец купил \"Дикого Жеребца\"."
-        if current_game_day() > 30 and current_game_day() <= 70:
+        if Becky.sandra_friendship_stage() == 1:
             $ scene_runtime.text += "\n\nВы знаете, что ваша мама с ней недавно подружилась."
-        elif current_game_day() > 70:
+        elif Becky.sandra_friendship_stage() == 2:
             $ scene_runtime.text += "\n\nОна с вашей мамой - лучшие подруги."
         $ _grocery_breastfeeding_text = DescribeBreastFeeding("becky", 3)
         $ _grocery_kids_text = ShowFullKidsListByAge("becky", "inga")

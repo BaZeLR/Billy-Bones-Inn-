@@ -63,7 +63,6 @@ init python:
             self.admitted_sherwood_stage = 0
             self.robin_robbery_stage = 0
             self.robbery_consolation_count = 0
-            self.sandra_kitchen_visit_period = 0
             self.last_store_orgasm_day = -1
             self.energy = 100
             self.energy_max = 100
@@ -259,6 +258,14 @@ init python:
         def mark_store_orgasm_today(self):
             self.last_store_orgasm_day = people_to_int(current_game_day(), 0)
             return self.last_store_orgasm_day
+
+        def sandra_friendship_stage(self):
+            day_value = people_to_int(current_game_day(), 0)
+            if day_value > 70:
+                return 2
+            if day_value > 30:
+                return 1
+            return 0
 
         def has_bra(self):
             return str(self.wardrobe.get("current_underwear", {}).get("bra", "") or "") != ""

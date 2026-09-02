@@ -176,7 +176,7 @@ label TavernSandraNightThanksScene:
         $ scene_runtime.picture = SandraStaticData.image_path("outfit_reward", "handjob_finish")
         if str(scene_runtime.picture or "").strip():
             vscene scene_runtime.picture
-        $ scene_runtime.text = "После первого выдержанного месяца Сандра явно понимает, что может закрепиться рядом с вами не только через кухню и счета. Она мягко, но очень уверенно забирает часть вашего внимания на себя, и это уже чувствуется даже телом: на чужие постели сил остается меньше."
+        $ scene_runtime.text = "После первого выдержанного месяца Сандра явно понимает, что может закрепиться рядом с вами не только через кухню и счета. Она мягко, но очень уверенно дает понять, что теперь видит свое будущее рядом с вами."
         $ scene_runtime.location_text = scene_runtime.text
         menu:
             "Закончить вечер":

@@ -11,7 +11,8 @@ def test_francheska_talk_uses_native_menu_and_restores_caller_context():
 
     assert "\n    menu:\n" in talk
     assert "while True:" not in talk
-    assert "jump FrancheskaTalk" not in talk
+    assert talk.count("jump FrancheskaTalk") == 12
+    assert "call FrancheskaTalk" not in talk
     assert "label FrancheskaTalkEnd" not in source
     assert "call FrancheskaTalkApply" not in talk
     assert "label FrancheskaTalkApply" not in source

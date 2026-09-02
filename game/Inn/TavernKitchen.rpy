@@ -61,7 +61,7 @@ init python:
         return ""
 
     def tavern_kitchen_can_share_tea_with_sandra_and_becky():
-        return npc_schedule_becky_sandra_kitchen_visit_active() and str(people.location("sandra") or "") == "TavernKitchen" and int(player.item_count("energy_tea_001") or 0) > 0
+        return str(people.location("becky") or "") == "TavernKitchen" and str(people.location("sandra") or "") == "TavernKitchen" and int(player.item_count("energy_tea_001") or 0) > 0
 
     def tavern_kitchen_depositable_food_ids():
         item_ids = []
@@ -360,7 +360,7 @@ init python:
                 text_parts.append("После службы здесь наверняка соберутся и на более основательную воскресную трапезу, но пока речь идет только о спокойном утреннем сборе.")
         else:
             text_parts.append("На кухне работают: " + crew_names + ".")
-        if npc_schedule_becky_sandra_kitchen_visit_active():
+        if str(people.location("becky") or "") == "TavernKitchen":
             text_parts.append("Сегодня сюда заглянула Бекки Блэнкеншип. Она что-то негромко обсуждает с Сандрой у разделочного стола.")
         if tavern_sunday_dinner_available():
             text_parts.append("Судя по запахам и приготовленным блюдам, Сандра решила устроить для всей трактирной челяди воскресный обед поосновательнее обычного.")
@@ -415,9 +415,6 @@ label TavernKitchen:
             $ scene_runtime.text = "Вы все еще сидите за общим утренним столом."
         $ scene_runtime.location_text = scene_runtime.text
         jump TavernKitchenBreakfastMenu
-    if npc_schedule_becky_sandra_kitchen_visit_active():
-        $ Becky.sandra_kitchen_visit_period = int(calendar_v2.period or 0)
-
     $ _kitchen_pending_event = tavern_kitchen_pending_mandatory_event_code()
     if str(_kitchen_pending_event or "") == "WineForDance" and not tavern_breakfast_available():
         $ _kitchen_event_picture = tavern_kitchen_wine_donation_picture()

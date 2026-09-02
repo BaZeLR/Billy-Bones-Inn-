@@ -101,5 +101,6 @@ def test_household_preferences_requests_and_breakfast_use_the_same_soap_items():
         assert f'player.item_count("{item_id}")' in HOUSEHOLD
         assert f'HouseholdSoapRequestGiveNow(_soap_girl, "{item_id}")' in HOUSEHOLD
 
-    assert "player_remove_soap_pieces(3, False)" in BREAKFAST
+    assert "player_remove_soap_pieces(3, False)" not in BREAKFAST
+    assert "tavern_breakfast_apply_first_soap_samples" not in BREAKFAST
     assert 'player.remove_item("soap_001", 3)' not in BREAKFAST

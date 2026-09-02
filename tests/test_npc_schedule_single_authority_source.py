@@ -81,7 +81,7 @@ def test_tavern_client_room_is_a_transient_projection_not_a_schedule_override():
     assert 'peopleInfo[GirlNameTS1].location =' not in tavern
     assert 'peopleInfo[GirlNameTS2].location =' not in tavern
     assert 'str(people.location("liza") or "") == rooms.current_code and int(Liza.job_value("jobwhore", 0) or 0) == 1' in tavern
-    assert "define currentVersion = 78" in migration
+    assert "define currentVersion = 79" in migration
     assert "def updateSave_V15():" in migration
 
 

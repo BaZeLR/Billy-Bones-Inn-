@@ -38,10 +38,12 @@ def test_becky_personal_story_facts_are_explicit_object_properties():
         "admitted_sherwood_stage",
         "robin_robbery_stage",
         "robbery_consolation_count",
-        "sandra_kitchen_visit_period",
         "last_store_orgasm_day",
     ):
         assert f"self.{field} =" in info
+
+    assert "def sandra_friendship_stage(self):" in info
+    assert "self.sandra_kitchen_visit_period" not in info
 
     assert "STORY_DEFAULTS = {" not in info
     assert "uses_own_var_state" not in info
@@ -89,11 +91,13 @@ def test_v52_migrates_becky_map_once_and_every_load_does_not_clean_it():
     ):
         assert f'becky_var.pop("{key}"' in migration
 
+    assert "Becky.sandra_kitchen_visit_period =" not in migration
+
     always_cleanup = MIGRATION.split("def tractir_save_clear_retired_npc_state():", 1)[1].split(
         "def tractir_save_normalize_sex_positions", 1
     )[0]
     assert "becky_var" not in always_cleanup
     assert "BeckyAdmit" not in always_cleanup
-    assert "define currentVersion = 78" in MIGRATION
+    assert "define currentVersion = 79" in MIGRATION
     assert "if loaded_version < 53:" in MIGRATION
     assert "updateSave_V52()" in MIGRATION

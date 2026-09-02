@@ -13,6 +13,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.met = True
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Порасспрашивать Франческу о богине Эллоне" if Francheska.met and not Francheska.asked_about_ellona and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/stories.png"
@@ -20,6 +21,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.asked_about_ellona = True
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Порасспрашивать Франческу о грациях" if Francheska.asked_about_ellona and Francheska.graces_stage == 0 and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/stories.png"
@@ -27,6 +29,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.graces_stage = 1
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Узнать больше о грациях" if Francheska.graces_stage == 1 and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/agla1.jpg"
@@ -34,6 +37,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.graces_stage = 2
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Порасспрашивать Франческу о герцогине" if Francheska.met and not Francheska.asked_about_duchess and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/Fran4.jpg"
@@ -41,6 +45,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.asked_about_duchess = True
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Спросить Франческу о герцоге" if Francheska.asked_about_duchess and not Francheska.asked_about_duke and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/Fran4.jpg"
@@ -48,6 +53,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.asked_about_duke = True
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Узнать больше о предателе" if Francheska.asked_about_duke and not Francheska.asked_about_stark and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/Fran4.jpg"
@@ -55,6 +61,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.asked_about_stark = True
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Порасспрашивать Франческу о герцогстве" if Francheska.asked_about_duchess and not Francheska.asked_about_duchy and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/Fran4.jpg"
@@ -62,6 +69,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.asked_about_duchy = True
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Узнать больше о короле" if Francheska.asked_about_duchy and not Francheska.asked_about_king and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/Fran4.jpg"
@@ -69,6 +77,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.asked_about_king = True
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Узнать больше об отношениях с королевством" if Francheska.asked_about_king and not Francheska.asked_about_kingdom_relations and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/Fran4.jpg"
@@ -76,6 +85,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.asked_about_kingdom_relations = True
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Расспросить про нелюдей" if Francheska.asked_about_duchy and not Francheska.asked_about_aliens and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/aliens.png"
@@ -83,6 +93,7 @@ label FrancheskaTalk:
             "[_fran_text]"
             $ Francheska.asked_about_aliens = True
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Поболтать с Франческой" if Francheska.asked_about_kingdom_relations and Francheska.asked_about_aliens and Francheska.asked_about_stark and Francheska.graces_stage == 2 and int(Francheska.talked_today or 0) < 3:
             vscene "images/ellona/Fran4.jpg"
@@ -90,6 +101,7 @@ label FrancheskaTalk:
             $ _fran_text = FRANCHESKA_TALK_SECOND[_fran_topic_index] + "\n\n" + FRANCHESKA_TALK_MAIN[_fran_topic_index]
             "[_fran_text]"
             $ Francheska.mark_talked(1)
+            jump FrancheskaTalk
 
         "Закончить разговор":
             pass

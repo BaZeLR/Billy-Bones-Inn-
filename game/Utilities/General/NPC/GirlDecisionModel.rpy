@@ -207,11 +207,6 @@ init -34 python:
         girl = str(girl_name or "").strip().lower()
         score = 0.0
         try:
-            if int(crafting.soap_sample_given.get(girl, 0) or 0) > 0:
-                score += 0.35
-        except Exception:
-            pass
-        try:
             if int(crafting.soap_requests.get(girl, 0) or 0) > 0:
                 score += 0.25
         except Exception:

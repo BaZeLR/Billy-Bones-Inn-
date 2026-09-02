@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 78
+define currentVersion = 79
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -673,6 +673,10 @@ init -100 python:
         if loaded_version < 78:
             updateSave_V77()
             loaded_version = 78
+
+        if loaded_version < 79:
+            updateSave_V78()
+            loaded_version = 79
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -1823,9 +1827,7 @@ init -100 python:
         Becky.robbery_consolation_count = max(0, people_to_int(
             becky_var.pop("ConsoleRobbery", getattr(Becky, "robbery_consolation_count", 0)), 0
         ))
-        Becky.sandra_kitchen_visit_period = max(0, people_to_int(
-            becky_var.pop("SandraKitchenVisitMonth", getattr(Becky, "sandra_kitchen_visit_period", 0)), 0
-        ))
+        becky_var.pop("SandraKitchenVisitMonth", None)
         Becky.last_store_orgasm_day = people_to_int(
             becky_var.pop("last_store_orgasm_day", getattr(Becky, "last_store_orgasm_day", -1)), -1
         )
@@ -2621,6 +2623,22 @@ init -100 python:
                 player.horse.stolen_purchase_price = max(0, int(Mongol.horse_price or 1000))
             else:
                 player.horse.stolen_purchase_price = 0
+
+    def updateSave_V78():
+        # Reverse the unsupported Sandra capacity penalty once for saves that
+        # already played that scene. New games never apply the penalty.
+        if _tractir_progress_int(tractir_progress.sandra_secured_future_day, -1) >= 0:
+            if bool(player.intimacy.ellona_cursed):
+                player.intimacy.can_cum_daily = 0
+                player.intimacy.ellona_curse_reduction = max(0, _tractir_progress_int(player.intimacy.ellona_curse_reduction, 0) + 1)
+            else:
+                player.intimacy.can_cum_daily = max(2, _tractir_progress_int(player.intimacy.can_cum_daily, 1) + 1)
+
+        # These fields drove accidental parallel behavior: the schedule now
+        # reads Becky's authored friendship rule, and soap gifts remain chosen.
+        Becky.__dict__.pop("sandra_kitchen_visit_period", None)
+        crafting.__dict__.pop("soap_sample_intro_done", None)
+        crafting.__dict__.pop("soap_sample_given", None)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

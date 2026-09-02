@@ -68,7 +68,7 @@ def test_retired_ui_globals_are_consumed_only_by_one_save_migration():
         "label before_load:", 1
     )[0]
 
-    assert "define currentVersion = 78" in migration
+    assert "define currentVersion = 79" in migration
     for retired_name in RETIRED_UI_GLOBALS:
         assert '"%s"' % retired_name in migration_block
     assert "globals().pop(old_name, default_value)" in migration_block

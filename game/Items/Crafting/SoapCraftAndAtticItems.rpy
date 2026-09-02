@@ -8,8 +8,6 @@ init 4 python:
             self.ash_barrel_ready_day = 0
             self.pending_soap_batches = []
             self.soap_requests = {}
-            self.soap_sample_intro_done = False
-            self.soap_sample_given = {}
             self.last_soap_batch_profile = {}
             self.special_cream_recipe_unlocked = False
 
@@ -183,21 +181,6 @@ init 4 python:
 
     def soap_total_piece_count():
         return sum(max(0, int(player.item_count(item_id) or 0)) for item_id in soap_inventory_item_ids())
-
-    def player_remove_soap_pieces(quantity=1, include_luxury=False):
-        remaining = max(0, int(quantity or 0))
-        available = soap_total_piece_count() if bool(include_luxury) else soap_available_piece_count()
-        if remaining <= 0 or available < remaining:
-            return False
-        for item_id in soap_inventory_item_ids(include_luxury):
-            owned = max(0, int(player.item_count(item_id) or 0))
-            take = min(owned, remaining)
-            if take > 0:
-                player.remove_item(item_id, take)
-                remaining -= take
-            if remaining <= 0:
-                return True
-        return False
 
     def household_soap_preferred_aroma_text(girl_name=""):
         girl = str(girl_name or "").strip().lower()

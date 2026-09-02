@@ -6116,7 +6116,32 @@ testcase external_francheska_secondary_and_birth_thread:
     $ _fran_meet_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Порасспрашивать об этом месте")
     $ _fran_meet_button_id = "choice_panel_button_%d" % int(_fran_meet_index)
     click id _fran_meet_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
-    advance until eval (Francheska.met and int(Francheska.talked_today or 0) == 1 and str(main_ui_runtime.mode or "") == "scene") timeout 30.0
+    click pos (960, 560) until eval (Francheska.met and int(Francheska.talked_today or 0) == 1 and str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 30.0
+    $ _fran_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    $ _fran_finish_button_id = "choice_panel_button_%d" % int(_fran_finish_index)
+    click id _fran_finish_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+
+testcase external_v78_current_correction_migration:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ tractir_progress.sandra_secured_future_day = 31
+    $ player.intimacy.can_cum_daily = 1
+    $ player.intimacy.ellona_cursed = 0
+    $ player.intimacy.ellona_curse_reduction = 0
+    python:
+        Becky.sandra_kitchen_visit_period = 9
+        crafting.soap_sample_intro_done = True
+        crafting.soap_sample_given = {"sandra": 1}
+    $ updateSave_V78()
+    assert eval (player.intimacy.can_cum_daily == 2) timeout 5.0
+    assert eval (not hasattr(Becky, "sandra_kitchen_visit_period")) timeout 5.0
+    assert eval (not hasattr(crafting, "soap_sample_intro_done") and not hasattr(crafting, "soap_sample_given")) timeout 5.0
+    $ player.intimacy.can_cum_daily = 1
+    $ player.intimacy.ellona_cursed = 1
+    $ player.intimacy.ellona_curse_reduction = 1
+    $ updateSave_V78()
+    assert eval (player.intimacy.can_cum_daily == 0 and player.intimacy.ellona_curse_reduction == 2) timeout 5.0
 
 testcase external_kids_birth_history_single_authority:
     run Jump("Intro")
@@ -6308,7 +6333,7 @@ testcase external_becky_v52_migration:
             "eddie_join_failures", "eddie_robbed_day", "knows_blackwood", "sherwood_suspicion",
             "trade_offer_stage", "sherwood_warning_stage", "asked_about_elf_trade",
             "fingal_connection_clarified", "admitted_sherwood_stage", "robin_robbery_stage",
-            "robbery_consolation_count", "sandra_kitchen_visit_period", "last_store_orgasm_day",
+            "robbery_consolation_count", "last_store_orgasm_day",
         ):
             Becky.__dict__.pop(_becky_field, None)
         globals()["BeckyAdmit"] = 1
@@ -6319,7 +6344,7 @@ testcase external_becky_v52_migration:
     assert eval (Becky.asked_about_eddie_sex_stage == 2 and Becky.eddie_join_stage == 4 and Becky.eddie_join_failures == 3 and Becky.eddie_robbed_day == 41) timeout 5.0
     assert eval (Becky.knows_blackwood and Becky.sherwood_suspicion == 17 and Becky.trade_offer_stage == 1 and Becky.sherwood_warning_stage == 2 and Becky.asked_about_elf_trade) timeout 5.0
     assert eval (Becky.fingal_connection_clarified and Becky.admitted_sherwood_stage == 2 and Becky.robin_robbery_stage == 2 and Becky.robbery_consolation_count == 1) timeout 5.0
-    assert eval (Becky.sandra_kitchen_visit_period == 7 and Becky.last_store_orgasm_day == 39 and not Becky.var and "BeckyAdmit" not in globals()) timeout 5.0
+    assert eval (not hasattr(Becky, "sandra_kitchen_visit_period") and Becky.last_store_orgasm_day == 39 and not Becky.var and "BeckyAdmit" not in globals()) timeout 5.0
 
 testcase external_becky_classes_are_initialized:
     run Jump("Intro")
@@ -6638,6 +6663,17 @@ testcase external_npc_schedule_room_visibility_agreement:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("melissa") is not None) timeout 20.0
+    $ external_calendar_set_fields(5, 2, 1100, 10, 0)
+    $ external_calendar_set_weekday(7)
+    assert eval (str(people.location("amanda") or "") == "TavernStable") timeout 5.0
+    assert eval (str(people.location("melissa") or "") == "TavernMain") timeout 5.0
+    assert eval (str(people.location("sandra") or "") == "TavernKitchen") timeout 5.0
+    $ external_calendar_set_fields(5, 2, 1100, 13, 0)
+    $ external_calendar_set_weekday(7)
+    assert eval (all(str(people.location(npc_id) or "") == "TavernKitchen" for npc_id in ("amanda", "melissa", "sandra"))) timeout 5.0
+    $ external_calendar_set_fields(5, 2, 1100, 13, 0)
+    $ external_calendar_set_weekday(2)
+    assert eval (Becky.sandra_friendship_stage() >= 1 and str(people.location("becky") or "") == "TavernKitchen") timeout 5.0
     $ external_calendar_set_fields(3, 1, 1100, 6, 0)
     $ external_calendar_set_weekday(1)
     $ rooms.enter("TavernKitchen")
@@ -7779,6 +7815,7 @@ def main() -> int:
             "external_inga_v53_migration",
             "external_inga_secondary_npc_source",
             "external_francheska_secondary_and_birth_thread",
+            "external_v78_current_correction_migration",
             "external_kids_birth_history_single_authority",
             "external_player_derived_stats_direct_owners",
             "external_church_ellona_player_owned_state",
@@ -7965,6 +8002,7 @@ def main() -> int:
             "external_inga_v53_migration",
             "external_inga_secondary_npc_source",
             "external_francheska_secondary_and_birth_thread",
+            "external_v78_current_correction_migration",
             "external_kids_birth_history_single_authority",
             "external_player_derived_stats_direct_owners",
             "external_church_ellona_player_owned_state",

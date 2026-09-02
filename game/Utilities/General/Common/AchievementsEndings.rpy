@@ -133,9 +133,7 @@ init -20 python:
         if _tractir_progress_int(tractir_progress.sandra_secured_future_day, -1) >= 0:
             return False
         tractir_progress.sandra_secured_future_day = _tractir_progress_int(calendar_v2.daysInGame, 0)
-        player.intimacy.can_cum_daily = max(1, _tractir_progress_int(player.intimacy.can_cum_daily, 2) - 1)
         tractir_activate_achievement("sandra_secured_future")
-        renpy.notify("После ночи с Сандрой сил на чужие постели стало меньше.")
         return True
 
     def tractir_progress_rows(mode="achievements"):

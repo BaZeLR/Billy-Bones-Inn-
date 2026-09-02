@@ -64,6 +64,16 @@
       "priority": 650
     },
     {
+      "label": "sunday_morning",
+      "weekdays": [7],
+      "start": "06:00",
+      "end": "07:59",
+      "location": "TavernAmandaRoom",
+      "awake": true,
+      "talkable": true,
+      "priority": 540
+    },
+    {
       "label": "sunday_church",
       "weekdays": [7],
       "start": "08:00",
@@ -72,6 +82,16 @@
       "awake": true,
       "talkable": false,
       "priority": 650
+    },
+    {
+      "label": "sunday_after_church",
+      "weekdays": [7],
+      "start": "09:30",
+      "end": "12:29",
+      "location": "TavernStable",
+      "awake": true,
+      "talkable": true,
+      "priority": 560
     },
     {
       "label": "sunday_dinner",
@@ -86,7 +106,7 @@
     {
       "label": "sunday_afternoon",
       "weekdays": [7],
-      "start": "14:00",
+      "start": "13:31",
       "end": "20:30",
       "location": ["TavernMain", "TavernStable", "Backyard"],
       "location_probabilities": [0.5, 0.3, 0.2],

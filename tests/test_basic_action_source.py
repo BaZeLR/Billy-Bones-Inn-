@@ -75,7 +75,8 @@ def test_no_removed_becky_kitchen_visit_wrapper_name():
     breakfast_source = (GAME_ROOT / "Inn" / "TavernKitchenBreakfast.rpy").read_text(encoding="utf-8-sig")
 
     assert "becky_kitchen_visit_active" not in kitchen_source
-    assert "npc_schedule_becky_sandra_kitchen_visit_active()" in kitchen_source
+    assert 'people.location("becky")' in kitchen_source
+    assert "npc_schedule_becky_sandra_kitchen_visit_active()" not in kitchen_source
     condition_body = breakfast_source.split("def npc_schedule_becky_sandra_kitchen_visit_active():", 1)[1].split("\n    def ", 1)[0]
     assert 'getLocation("sandra")' not in condition_body
 
