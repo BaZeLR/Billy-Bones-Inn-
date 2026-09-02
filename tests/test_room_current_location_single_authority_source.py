@@ -41,7 +41,7 @@ def test_room_entries_set_location_once_through_registry():
 def test_old_location_names_are_one_way_save_migration_only():
     migration = read_rel("game/TractirSaveSync.rpy")
 
-    assert "define currentVersion = 80" in migration
+    assert "define currentVersion = 81" in migration
     assert "def updateSave_V35():" in migration
     assert 'globals().pop("CurLoc", "")' in migration
     assert 'globals().pop("CurrentRoom", None)' in migration

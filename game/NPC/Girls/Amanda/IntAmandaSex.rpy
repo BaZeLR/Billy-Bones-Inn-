@@ -271,7 +271,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                         if Amanda.cock_in("mouth"):
                             $ _ias_text_parts.append("Вы расселись на кровати и ловите кайф, в то время как [people_display_name(GirlNameASDS)] стоит перед вами на коленях и продолжает.")
                         else:
-                            $ _ias_text_parts.append("Вы уселись поудобней на кровати и расстегнули штаны. Умненькая [people_display_name(GirlNameASDS)] сразу поняла что от нее требуется. Сестричка слезла с кровати, опустилась на колени и стала.")
+                            $ _ias_text_parts.append("Вы уселись поудобней на кровати и расстегнули штаны. Умненькая [people_display_name(GirlNameASDS)] сразу поняла что от нее требуется. Аманда слезла с кровати, опустилась на колени и стала.")
                     if _ias_arousal("You") < 20:
                         $ _ias_text_parts.append("Облизывать ваш вялый член.")
                     elif _ias_arousal("You") < 40:
@@ -483,7 +483,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
                     elif Amanda.sex_stat("orgasms_given", 0) >= CurAmandaOrgasmCount + 3:
                         "Увидев что [people_display_name(GirlNameASDS)], измотанная серией оргазмов, усталая лежит на кровати вы решили что хорошенького понемножку и, чмокнув ее, пошли к выходу."
                         "\"Ну пока, я пошел, а то завтра тебе надо работать, да и мне надо выспаться,\" заметили вы по пути."
-                        "\"Братик, это было просто нечто, дай мне отдохнуть, а завтра приходи еще!\" слабым голосом ответила вам она, слегка привстав на кровати."
+                        "\"Стефан, это было просто нечто, дай мне отдохнуть, а завтра приходи еще!\" слабым голосом ответила вам она, слегка привстав на кровати."
                         "И вы вышли в коридор."
                         $ Amanda.apply_social_chance(20, 1, 1, 50, 1, 2, "amanda_sex_after")
                         $ _amanda_naked_pic = "naked" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Amanda/IntAmandaSex.rpy:procedural_randint:488:5"))

@@ -27,9 +27,9 @@ def test_authored_reconciliation_paths_remain_reachable():
     assert "menu:" in melissa
     assert "call SlutFriendsIncrease(girl_name, 6, 1, 1, 0, 0, 0)" in melissa
     assert "$ Melissa.mark_talked()" in melissa
-    assert "Вы подошли к своей сестренке и извинились" in melissa
-    assert "любимым братом" in melissa
-    assert '"Попробовать помириться с мамой" if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:' in sandra
+    assert "Вы подошли к Мелиссе и извинились" in melissa
+    assert "сказала, что ценит вас и все понимает" in melissa
+    assert '"Попробовать помириться с Сандрой" if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:' in sandra
     assert "call IntSandraReconcile(girl_name)" in sandra
     reconcile = sandra.split('label IntSandraReconcile(girl_name="sandra"):', 1)[1].split("label IntSandraHouseholdInsight", 1)[0]
     assert "Вы подошли к Сандре и извинились" in reconcile

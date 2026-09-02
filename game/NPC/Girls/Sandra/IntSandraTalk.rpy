@@ -25,9 +25,9 @@ label IntSandraTalk(girl_name="sandra"):
             "Отдать Сандре обещанное мыло" if int(crafting.soap_requests.get(girl_name, 0) or 0) > 0 and soap_total_piece_count() > 0:
                 call HouseholdSoapRequestFulfillMenu(girl_name)
                 $ _sandra_repeat_menu = True
-            "Попробовать помириться с мамой" if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:
+            "Попробовать помириться с Сандрой" if int(Sandra.talked_today or 0) < 3 and int(Sandra.rel or 0) < 5:
                 call IntSandraReconcile(girl_name)
-            "Предложить купить мамуле обновку" if sandra_dress_change_can_buy(girl_name):
+            "Предложить купить Сандре обновку" if sandra_dress_change_can_buy(girl_name):
                 call IntSandraOfferBuyDress(girl_name)
             "[_sandra_special_entry.get('label', 'Спросить о чем-то важном')]" if _sandra_special_entry is not None:
                 call IntSandraHouseholdInsight(girl_name)

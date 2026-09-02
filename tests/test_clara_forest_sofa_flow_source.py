@@ -161,7 +161,7 @@ def test_v77_save_migration_maps_existing_clara_threads_and_horse_claim_once():
         "# Saved objects must be upgraded", 1
     )[0]
 
-    assert "define currentVersion = 80" in migration
+    assert "define currentVersion = 81" in migration
     assert "if loaded_version < 78:" in migration
     assert "updateSave_V77()" in migration
     assert "paintings_map = {" in block

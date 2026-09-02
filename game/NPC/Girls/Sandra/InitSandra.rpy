@@ -20,7 +20,7 @@ init python:
                 genitive="Сандры",
                 dative="Сандре",
                 portrait="images/sandra/portrait2.jpg",
-                description="Сандра - женщина в самом соку. У нее темные волосы, зеленые глаза и грудь размера DD.",
+                description="Сандра - женщина в самом соку. У нее темные волосы, зеленые глаза и грудь размера DD. Она была возлюбленной покойного дяди Стефана и опекает своих осиротевших племянниц Мелиссу и Аманду.",
                 gift_preferences=["lavender_herbal_soap_001", "soap_001", "wild_rose_001", "lavender_001", "berries_001", "mushroom_001", "honey_comb_001", "energy_tea_001", "drink_ale_001"],
             )
             self.birth_date = {"day": 1, "period": 1, "cycle": 1066}

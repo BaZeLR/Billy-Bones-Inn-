@@ -88,7 +88,7 @@ def test_draupnir_story_state_is_explicit_and_instance_owned():
 def test_draupnir_v59_migration_consumes_old_map_once():
     block = MIGRATION.split("def updateSave_V59():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 80" in MIGRATION
+    assert "define currentVersion = 81" in MIGRATION
     assert "if loaded_version < 60:" in MIGRATION
     assert "updateSave_V59()" in MIGRATION
     for old_key, field_name in (

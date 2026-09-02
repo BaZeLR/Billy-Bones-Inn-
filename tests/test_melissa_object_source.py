@@ -391,7 +391,7 @@ def test_melissa_courtship_save_upgrade_promotes_only_recorded_sex_history():
     migration_source = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
     migration = migration_source.split("def updateSave_V69():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 80" in migration_source
+    assert "define currentVersion = 81" in migration_source
     assert 'courtship = threads["melissaCourtship"]' in migration
     assert 'Melissa.sex_stat("sexacts", 0)' in migration
     assert "courtship.advanceTo(courtship.data.length, complete_at_end=True)" in migration
@@ -504,7 +504,7 @@ def test_melissa_dress_action_does_not_open_a_duplicate_menu():
     talk_source = MELISSA_TALK.read_text(encoding="utf-8-sig")
     dress_source = MELISSA_DRESS.read_text(encoding="utf-8-sig")
 
-    assert '"Предложить купить сестренке обновку" if' in talk_source
+    assert '"Предложить купить Мелиссе обновку" if' in talk_source
     assert "call IntMelissaDressChange(girl_name)" in talk_source
     assert "menu:" not in dress_source
     assert '"Назад":' not in dress_source

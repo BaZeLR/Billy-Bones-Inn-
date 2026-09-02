@@ -395,8 +395,8 @@ def test_sandra_talk_is_direct_entry_not_refresh_apply_dispatcher():
     assert "jump IntSandraTalk" not in talk_source
     assert "main_ui_runtime.action_items" not in talk_source
     assert "MenuItem(" not in talk_source
-    assert '"Попробовать помириться с мамой"' in talk_source
-    assert '"Предложить купить мамуле обновку"' in talk_source
+    assert '"Попробовать помириться с Сандрой"' in talk_source
+    assert '"Предложить купить Сандре обновку"' in talk_source
     assert "call OldPointSmallTalkMenu" not in talk_source
     assert "call OldPointFlirtAttempt" not in talk_source
     assert "call PlayerCardGiftToFixedTargetMenu" in talk_source

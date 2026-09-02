@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 80
+define currentVersion = 81
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -681,6 +681,10 @@ init -100 python:
         if loaded_version < 80:
             updateSave_V79()
             loaded_version = 80
+
+        if loaded_version < 81:
+            updateSave_V80()
+            loaded_version = 81
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2664,6 +2668,26 @@ init -100 python:
         appearance.dress_life_days = remaining_life
         state.pop("dress_days", None)
         state.pop("costume_condition", None)
+
+    def updateSave_V80():
+        # The live PeopleData definitions own identity, biography, and birth
+        # records. Rebind saved NPCs once without changing their runtime state.
+        for static_data, runtime_object in (
+            (SandraStaticData, Sandra),
+            (MelissaStaticData, Melissa),
+            (AmandaStaticData, Amanda),
+        ):
+            people.register(static_data, runtime_object)
+
+        # Church structure belongs to its live Room definition. Preserve only
+        # saved room state while restoring actions added after the save began.
+        old_room = rooms.get("Church")
+        definition = roomDefinitions.get("Church", None)
+        if definition is not None:
+            upgraded_room = definition.runtime_copy()
+            if old_room is not None:
+                upgraded_room.state.update(dict(getattr(old_room, "state", {}) or {}))
+            rooms.register(upgraded_room)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

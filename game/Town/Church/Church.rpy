@@ -296,7 +296,7 @@ label ChurchServiceMenu(show_attendees=True):
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
     $ main_ui_runtime.action_items.append(MenuItem("Найти Сандру", Call("ChurchServiceMother")))
-    $ main_ui_runtime.action_items.append(MenuItem("Найти сестричек", Call("ChurchServiceSisters")))
+    $ main_ui_runtime.action_items.append(MenuItem("Найти Мелиссу и Аманду", Call("ChurchServiceSisters")))
     $ main_ui_runtime.action_items.append(MenuItem("Найти семейство Легаре", Call("ChurchServiceLegare")))
     $ main_ui_runtime.action_items.append(MenuItem("Найти семейство Блэнкеншип", Call("ChurchServiceBlanken")))
     if bool(Georgett.known) and people_to_int(Georgett.rel, 0) >= 2:

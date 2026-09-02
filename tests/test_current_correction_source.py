@@ -1,4 +1,6 @@
 import json
+import ast
+import re
 from pathlib import Path
 
 
@@ -70,3 +72,82 @@ def test_tavern_team_has_complete_sunday_day_schedule():
             assert entry_at(entries, 7, f"{hour:02d}:00") is not None
         for clock, location in locations.items():
             assert entry_at(entries, 7, clock)["location"] == location
+
+
+def test_church_go_around_action_matches_qsp_and_is_restored_for_loaded_saves():
+    church = read("game/Town/Church/Church.rpy")
+    qsp_reference = read("devdocs/characters/full_logic/clarisse_full_logic.md")
+    migration = read("game/TractirSaveSync.rpy")
+
+    assert "Church.txt:143 | act 'Обойти собор':gt 'ChurchAfterCermon', 1" in qsp_reference
+    assert 'RoomAction(action_id="after_cermon_walk", label="Обойти собор", hook="ui_call", target="ChurchAfterCermon", args=(1,), condition=church_after_cermon_action_visible)' in church
+    assert "return int(calendar_v2.week or 0) == 7 and church_minutes_between(11 * 60, 12 * 60 + 59)" in church
+
+    assert "define currentVersion = 81" in migration
+    assert "if loaded_version < 81:" in migration
+    v80 = migration.split("def updateSave_V80():", 1)[1].split("# Saved objects must be upgraded", 1)[0]
+    assert 'old_room = rooms.get("Church")' in v80
+    assert 'definition = roomDefinitions.get("Church", None)' in v80
+    assert "upgraded_room = definition.runtime_copy()" in v80
+    assert 'upgraded_room.state.update(dict(getattr(old_room, "state", {}) or {}))' in v80
+    assert "rooms.register(upgraded_room)" in v80
+
+
+def test_tavern_household_relationships_and_adult_ages_have_one_definition():
+    intro = read("game/Inn/Intro.rpy")
+    sandra = read("game/NPC/Girls/Sandra/InitSandra.rpy")
+    melissa = read("game/NPC/Girls/Melissa/InitMelissa.rpy")
+    amanda = read("game/NPC/Girls/Amanda/InitAmanda.rpy")
+    migration = read("game/TractirSaveSync.rpy")
+
+    assert "Ваш дядя, Джон Лонгкок" in intro
+    assert "Сандра, возлюбленная вашего покойного дяди" in intro
+    assert "осиротевшие племянницы Мелисса и Аманда" in intro
+    assert "они сестры по матери, но от разных отцов" in intro
+    assert "не состоят с вами в родстве; вы их домовладелец и хозяин трактира" in intro
+
+    sources = {"sandra": sandra, "melissa": melissa, "amanda": amanda}
+    expected_ages = {"sandra": 34, "melissa": 20, "amanda": 18}
+    for name, source in sources.items():
+        match = re.search(r"self\.birth_date = (\{[^\n]+\})", source)
+        assert match is not None, name
+        birth = ast.literal_eval(match.group(1))
+        age = 1100 - birth["cycle"]
+        if (1, 1) < (birth["period"], birth["day"]):
+            age -= 1
+        assert age == expected_ages[name]
+        assert age >= 18
+
+    v80 = migration.split("def updateSave_V80():", 1)[1].split("# Saved objects must be upgraded", 1)[0]
+    assert "(SandraStaticData, Sandra)" in v80
+    assert "(MelissaStaticData, Melissa)" in v80
+    assert "(AmandaStaticData, Amanda)" in v80
+    assert "people.register(static_data, runtime_object)" in v80
+
+
+def test_player_interactions_do_not_describe_tavern_team_as_his_family():
+    interaction_sources = "\n".join([
+        read("game/NPC/Girls/Sandra/IntSandraTalk.rpy"),
+        read("game/NPC/Girls/Sandra/IntSandraDressChange.rpy"),
+        read("game/NPC/Girls/Melissa/IntMelissaTalk.rpy"),
+        read("game/NPC/Girls/Melissa/IntMelissaDressChange.rpy"),
+        read("game/NPC/Girls/Amanda/IntAmandaSex.rpy"),
+    ])
+
+    for forbidden in (
+        "помириться с мамой",
+        "купить мамуле",
+        "Мамочка, дорогая",
+        "хороший сыночек",
+        "к своей сестренке",
+        "любимым братом",
+        "купить сестренке",
+        "спросили вы сестру",
+        "спасибо, братик",
+        "Сестричка слезла",
+        "Братик, это было",
+    ):
+        assert forbidden not in interaction_sources
+
+    church = read("game/Town/Church/Church.rpy")
+    assert 'MenuItem("Найти Мелиссу и Аманду", Call("ChurchServiceSisters"))' in church

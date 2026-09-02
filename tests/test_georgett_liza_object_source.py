@@ -322,7 +322,7 @@ def test_liza_v55_migration_consumes_legacy_state_once():
     migration = _source(MIGRATION)
     block = migration.split("def updateSave_V55():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 80" in migration
+    assert "define currentVersion = 81" in migration
     assert "if loaded_version < 56:" in migration
     assert "updateSave_V55()" in migration
     for old_key, field_name in (
@@ -660,7 +660,7 @@ def test_georgett_has_three_location_story_threads_without_old_rows():
     migration_block = migration.split("def updateSave_V75():", 1)[1].split(
         "# Saved objects must be upgraded", 1
     )[0]
-    assert "define currentVersion = 80" in migration
+    assert "define currentVersion = 81" in migration
     assert "if loaded_version < 76:" in migration
     assert "updateSave_V75()" in migration
     for old_name in (
