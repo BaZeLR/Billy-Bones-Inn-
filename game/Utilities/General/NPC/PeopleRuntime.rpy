@@ -1108,9 +1108,13 @@ init -999 python:
         """Girls with body layers, pregnancy, detailed history, lunar fertility."""
         registry_group = "girl"
         work_socializing_locations = ()
+        daily_sex_limit = 2
         def __init__(self, name, **kwargs):
             super().__init__(name, **kwargs)
             self.detailed_sex_history = []
+
+        def can_have_sex_today(self):
+            return people_to_int(self.fucked_today, 0) < max(0, people_to_int(self.daily_sex_limit, 0))
 
         def getLocation(self, wday=None, hour=None):
             if bool(household.barber_appointments.get(self.name, 0)) and barber_shop_is_open_at(wday, hour):

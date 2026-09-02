@@ -45,7 +45,7 @@ init python:
                 threads["sandraWeeklyEvaluation"].completed
                 or int(threads["sandraWeeklyEvaluation"].num or 0) == 4
             )
-            return unlocked and int(info.fucked_today or 0) < 2
+            return unlocked and info.can_have_sex_today()
         return False
 
     def household_sex_relationship_stage(girl_name=""):
@@ -165,7 +165,7 @@ init python:
 
 
 label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="sex"):
-    $ renpy.dynamic("_hse_girl", "_hse_info", "_hse_data", "_hse_display", "_hse_effect", "_hse_picture", "_hse_stage", "_hse_full_engine", "_hse_can_cum", "_hse_daily_limit", "_hse_inside_container", "_hse_initial_action", "_hse_start_orgasms", "_hse_start_player_cums")
+    $ renpy.dynamic("_hse_girl", "_hse_info", "_hse_data", "_hse_display", "_hse_effect", "_hse_picture", "_hse_stage", "_hse_full_engine", "_hse_can_cum", "_hse_inside_container", "_hse_initial_action", "_hse_start_orgasms", "_hse_start_player_cums")
     $ _hse_girl = str(girl_name or "").strip().lower()
     $ _hse_initial_action = str(initial_action or "sex").strip().lower()
     $ _hse_info = people.get_info(_hse_girl)
@@ -186,7 +186,6 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
         _hse_start_orgasms = int(_hse_info.sex_stat("orgasms_given", 0) or 0)
         _hse_start_player_cums = int(player.intimacy.came_today or 0)
         _hse_full_engine = household_sex_available(_hse_girl, "sex")
-        _hse_daily_limit = 1 if _hse_girl == "melissa" else 2
         _hse_info.set_cock_position("none")
     $ main_ui_begin_native_scene_state(_hse_display)
     $ _hse_picture = _hse_data.image_path("portrait", "default")
@@ -212,7 +211,7 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
     label household_sex_menu:
         while True:
             $ _hse_stage = household_sex_relationship_stage(_hse_girl)
-            $ _hse_can_cum = _hse_full_engine and int(_hse_info.fucked_today or 0) < _hse_daily_limit and player.intimacy.arousal_value() >= 100 and player.intimacy.can_cum()
+            $ _hse_can_cum = _hse_full_engine and _hse_info.can_have_sex_today() and player.intimacy.arousal_value() >= 100 and player.intimacy.can_cum()
             menu:
                 "Осмотреть её":
                     $ scene_runtime.text = household_sex_scene_summary(_hse_girl, _hse_full_engine)

@@ -81,14 +81,19 @@ init -50 python:
             thread_info = threads.get(thread_name, None) if isinstance(threads, dict) else None
             return thread_info is not None and int(thread_info.num or 0) == int(row.get("step", -1) or -1)
         if rule_name == "any_job_assigned":
+            job_names = [str(item or "").strip() for item in list(row.get("jobs", []) or []) if str(item or "").strip()]
             job_name = str(row.get("job", "") or "").strip()
+            if job_name:
+                job_names.append(job_name)
             person_ids = [str(item or "").strip().lower() for item in list(row.get("people", []) or [])]
-            if not job_name or not person_ids:
+            if not job_names or not person_ids:
                 return False
             for person in person_ids:
                 info = people.get_info(person)
-                if info is not None and int(getattr(info, "jobs", {}).get(job_name, 0) or 0) > 0:
-                    return True
+                if info is not None:
+                    for current_job in job_names:
+                        if int(info.job_value(current_job, 0) or 0) > 0:
+                            return True
             return False
         return False
 

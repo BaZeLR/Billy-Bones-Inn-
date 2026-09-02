@@ -5108,7 +5108,7 @@ testcase external_melissa_courtship_is_slow_and_daily:
     click id ("choice_panel_button_%d" % int(_melissa_wait_index)) pos (0.5, 0.5) until eval (renpy.get_screen("say") is not None) timeout 20.0
     advance until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
 
-testcase external_melissa_finished_intimacy_returns_to_room_and_closes_for_day:
+testcase external_melissa_finished_intimacy_returns_to_room_and_allows_second_visit:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
@@ -5138,7 +5138,9 @@ testcase external_melissa_finished_intimacy_returns_to_room_and_closes_for_day:
     $ _melissa_stop_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Остановиться")
     click id ("choice_panel_button_%d" % int(_melissa_stop_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закончить близость"]) timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
-    assert eval (int(Melissa.fucked_today or 0) == 1 and not Melissa.relationship_allows("intimacy")) timeout 5.0
+    assert eval (int(Melissa.fucked_today or 0) == 1 and Melissa.relationship_allows("intimacy") and Melissa.relationship_allows("sex")) timeout 5.0
+    $ Melissa.fucked_today = 2
+    assert eval (not Melissa.can_have_sex_today() and not Melissa.relationship_allows("intimacy") and not Melissa.relationship_allows("sex")) timeout 5.0
     $ Melissa.gift_preferences = ["legacy_mirror"]
     $ Sandra.gift_preferences = ["legacy_mirror"]
     $ threads.pop("sandraKitchenHouseholdRespect", None)
@@ -6571,6 +6573,11 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     assert eval (int(Becky.rel or 0) == 1 and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
     assert eval ("занята работой" not in str(scene_runtime.text or "")) timeout 5.0
     $ Becky.talked_today = 0
+    $ Becky.georgett_mentioned = True
+    $ Becky.home_visit_stage = 3
+    $ Becky.corruption = 0
+    $ Becky.priest_advice_stage = 0
+    $ Becky.eddie_intervention_reaction = 0
     $ _becky_inspect_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Осмотреть")
     $ _becky_inspect_button_id = "choice_panel_button_%d" % int(_becky_inspect_index)
     click id _becky_inspect_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "char" and str(main_ui_runtime.selected_char or "") == "becky") timeout 20.0
@@ -6582,6 +6589,12 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     click id _becky_offer_button_id pos (0.5, 0.5) until eval (int(Becky.trade_offer_stage or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "talk" and int(Becky.talked_today or 0) == 1) timeout 5.0
     assert eval ("А чего ты сама с эльфами не торгуешь?" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Насчет твоего предложения, в чем там все-таки дело?" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval (Becky.georgett_mentioned and Becky.home_visit_stage < 7 and Becky.talk_count() < 2 and Becky.corruption <= 35 and Becky.priest_advice_stage == 0) timeout 5.0
+    $ _becky_eddie_advice_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Посоветовать Бекки быть повнимательнее к нуждам Эдди")
+    $ _becky_eddie_advice_button_id = "choice_panel_button_%d" % int(_becky_eddie_advice_index)
+    click id _becky_eddie_advice_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "GroceryStore" and str(main_ui_runtime.mode or "") == "talk" and int(Becky.talked_today or 0) == 2 and renpy.get_screen("choice") is not None) timeout 30.0
+    assert eval ("Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _becky_exit_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
     $ _becky_exit_button_id = "choice_panel_button_%d" % int(_becky_exit_index)
     click id _becky_exit_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
@@ -6682,6 +6695,28 @@ testcase external_npc_schedule_room_visibility_agreement:
     assert eval (str(people.location("melissa") or "") in ("TavernKitchen", "TavernStorage", "TavernMain", "Backyard", "TavernMelissaRoom")) timeout 5.0
     assert eval (set(_kitchen_ids) == set(people.ids_at("TavernKitchen"))) timeout 5.0
     assert eval (set(_main_ids) == set(people.ids_at("TavernMain"))) timeout 5.0
+    $ external_calendar_set_fields(3, 1, 1100, 18, 0)
+    $ external_calendar_set_weekday(1)
+    python:
+        for _staff_info in (Amanda, Melissa, Sandra):
+            for _staff_job in ("jobkitchen", "jobcleaning", "jobwaitress"):
+                _staff_info.set_job_value(_staff_job, 0)
+        Amanda.set_job_value("jobkitchen", 1)
+        Melissa.set_job_value("jobkitchen", 1)
+        Sandra.set_job_value("jobwaitress", 1)
+    assert eval (str(people.location("amanda") or "") == "TavernKitchen") timeout 5.0
+    assert eval (str(people.location("melissa") or "") == "TavernKitchen") timeout 5.0
+    assert eval (str(people.location("sandra") or "") == "TavernMain") timeout 5.0
+    python:
+        Amanda.set_job_value("jobkitchen", 0)
+        Amanda.set_job_value("jobcleaning", 1)
+        Amanda.set_job_value("jobwaitress", 1)
+        Melissa.set_job_value("jobkitchen", 0)
+        Melissa.set_job_value("jobcleaning", 1)
+        Melissa.set_job_value("jobwaitress", 1)
+        Sandra.set_job_value("jobkitchen", 1)
+        Sandra.set_job_value("jobwaitress", 0)
+    $ external_calendar_set_fields(3, 1, 1100, 9, 0)
     $ threads["melissaBatProblem"].advanceTo(6, force_active=True)
     $ Melissa.temp_room_code = "TavernAmandaRoom"
     assert eval (str(people.location("melissa") or "") == "TavernAmandaRoom") timeout 5.0
@@ -7936,7 +7971,7 @@ def main() -> int:
             "external_sandra_weekly_thread_progression",
             "external_sandra_night_thanks_hours_work",
             "external_melissa_courtship_is_slow_and_daily",
-            "external_melissa_finished_intimacy_returns_to_room_and_closes_for_day",
+            "external_melissa_finished_intimacy_returns_to_room_and_allows_second_visit",
             "external_amanda_sex_scene_keeps_text_picture_and_finish_menu",
             "external_player_intimacy_state_sleep_arousal_and_help",
             "external_clara_evening_follow_finishes_in_melissa_room",
@@ -8122,7 +8157,7 @@ def main() -> int:
             "external_sandra_weekly_thread_progression",
             "external_sandra_night_thanks_hours_work",
             "external_melissa_courtship_is_slow_and_daily",
-            "external_melissa_finished_intimacy_returns_to_room_and_closes_for_day",
+            "external_melissa_finished_intimacy_returns_to_room_and_allows_second_visit",
             "external_player_intimacy_state_sleep_arousal_and_help",
             "external_clara_evening_follow_finishes_in_melissa_room",
             "external_household_ai_kitchen_event_fires",

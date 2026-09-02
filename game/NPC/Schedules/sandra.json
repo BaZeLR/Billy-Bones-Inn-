@@ -63,7 +63,12 @@
       "awake": true,
       "talkable": true,
       "working": true,
-      "priority": 600
+      "priority": 640,
+      "condition": {
+        "rule": "any_job_assigned",
+        "people": ["sandra"],
+        "job": "jobkitchen"
+      }
     },
     {
       "label": "becky_visit_kitchen",
@@ -87,7 +92,29 @@
       "awake": true,
       "talkable": true,
       "working": true,
-      "priority": 600
+      "priority": 630,
+      "condition": {
+        "rule": "any_job_assigned",
+        "people": ["sandra"],
+        "job": "jobwaitress"
+      }
+    },
+    {
+      "label": "working_cleaning",
+      "weekdays": [1, 2, 3, 4, 5, 6],
+      "start": "12:00",
+      "end": "18:30",
+      "location": ["TavernMain", "TavernStorage", "Backyard"],
+      "location_probabilities": [0.6, 0.25, 0.15],
+      "awake": true,
+      "talkable": true,
+      "working": true,
+      "priority": 620,
+      "condition": {
+        "rule": "any_job_assigned",
+        "people": ["sandra"],
+        "job": "jobcleaning"
+      }
     },
     {
       "label": "friday_dance",

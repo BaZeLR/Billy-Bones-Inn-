@@ -319,14 +319,14 @@ init python:
                     self.intimacy_story_ready()
                     and threads["melissaCourtship"].completed
                     and self.relationship_stage() >= 3
-                    and people_to_int(self.fucked_today, 0) == 0
+                    and self.can_have_sex_today()
                 )
             if action_key == "sex":
                 return (
                     self.intimacy_story_ready()
                     and threads["melissaCourtship"].completed
                     and self.relationship_stage() >= 4
-                    and people_to_int(self.fucked_today, 0) == 0
+                    and self.can_have_sex_today()
                 )
             return False
 

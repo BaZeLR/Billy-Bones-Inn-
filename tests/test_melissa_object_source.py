@@ -350,7 +350,9 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
         assert removed_parallel_flow not in init_source + talk_source
     assert 'and threads["melissaCourtship"].completed' in init_source
     assert 'self.intimacy_story_ready()' in init_source
-    assert 'people_to_int(self.fucked_today, 0) == 0' in init_source
+    assert 'self.can_have_sex_today()' in init_source
+    assert '_hse_info.can_have_sex_today()' in sex_source
+    assert '_hse_daily_limit' not in sex_source
     assert 'Melissa.relationship_allows("intimacy")' in talk_source
     assert "Melissa.private_place_offer(" in talk_source
     assert 'story_event_available("talk_melissa", "melissa_intimacy")' in talk_source

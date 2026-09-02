@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 
@@ -73,3 +74,41 @@ def test_each_hall_job_uses_one_three_worker_capacity_rule():
     assert "max_slots" not in report_source
     assert '"hall_job_capacity": TAVERN_HALL_JOB_CAPACITY' in report_source
     assert "toggle_hall_job_with_limit, \"jobkitchentomorrow\", _worker, 2" not in layout_source
+
+
+def test_staff_work_schedules_read_current_jobs_from_the_npc_owner():
+    expected = {
+        "amanda": {
+            "working_kitchen": ("TavernKitchen", ["jobkitchen"]),
+            "working_hall": ("TavernMain", ["jobcleaning", "jobwaitress"]),
+        },
+        "melissa": {
+            "working_kitchen": ("TavernKitchen", ["jobkitchen"]),
+            "working_waitressing": ("TavernMain", ["jobwaitress"]),
+            "working_cleaning": (["TavernMain", "TavernStorage", "Backyard"], ["jobcleaning"]),
+        },
+        "sandra": {
+            "working_kitchen": ("TavernKitchen", ["jobkitchen"]),
+            "working_waitressing": ("TavernMain", ["jobwaitress"]),
+            "working_cleaning": (["TavernMain", "TavernStorage", "Backyard"], ["jobcleaning"]),
+        },
+    }
+
+    for person, work_rows in expected.items():
+        schedule = json.loads((ROOT / "game/NPC/Schedules" / f"{person}.json").read_text(encoding="utf-8"))
+        entries = {row["label"]: row for row in schedule["entries"]}
+        for label, (location, jobs) in work_rows.items():
+            row = entries[label]
+            condition = row["condition"]
+            actual_jobs = list(condition.get("jobs", []))
+            if condition.get("job"):
+                actual_jobs.append(condition["job"])
+            assert row["location"] == location
+            assert condition["rule"] == "any_job_assigned"
+            assert condition["people"] == [person]
+            assert actual_jobs == jobs
+
+    rule_source = (ROOT / "game/Utilities/General/Classes/GameObjectTemplate.rpy").read_text(encoding="utf-8-sig")
+    job_rule = rule_source.split('if rule_name == "any_job_assigned":', 1)[1].split("\n        return False\n        return False", 1)[0]
+    assert "info.job_value(current_job, 0)" in job_rule
+    assert 'getattr(info, "jobs"' not in job_rule

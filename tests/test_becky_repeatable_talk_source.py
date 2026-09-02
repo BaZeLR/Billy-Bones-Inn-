@@ -92,6 +92,16 @@ def test_both_eddie_opinion_choices_use_the_same_qsp_gate():
     assert 'call story_becky_talk_eddie_reaction_1(_becky_name)' in TALK
 
 
+def test_eddie_advice_returns_to_the_active_talk_instead_of_navigating_rooms():
+    advice = TOPICS.split("label story_becky_talk_eddie_reaction_1", 1)[1].split(
+        "label story_becky_talk_eddie_after_sex_0", 1
+    )[0]
+
+    assert "$ Becky.finish_talk()" in advice
+    assert "jump MarketPlace" not in advice
+    assert advice.count("return") >= 1
+
+
 def test_repeatable_topic_labels_do_not_mutate_active_thread():
     repeatable = TOPICS.split("label story_becky_home_invite_talk_0", 1)[1]
 

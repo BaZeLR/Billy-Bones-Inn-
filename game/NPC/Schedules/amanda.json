@@ -45,6 +45,22 @@
       "priority": 100
     },
     {
+      "label": "working_kitchen",
+      "weekdays": [1, 2, 3, 4, 5, 6],
+      "start": "12:00",
+      "end": "20:30",
+      "location": "TavernKitchen",
+      "awake": true,
+      "talkable": true,
+      "working": true,
+      "priority": 620,
+      "condition": {
+        "rule": "any_job_assigned",
+        "people": ["amanda"],
+        "job": "jobkitchen"
+      }
+    },
+    {
       "label": "working_hall",
       "weekdays": [1, 2, 3, 4, 5, 6],
       "start": "12:00",
@@ -53,7 +69,12 @@
       "awake": true,
       "talkable": true,
       "working": true,
-      "priority": 600
+      "priority": 610,
+      "condition": {
+        "rule": "any_job_assigned",
+        "people": ["amanda"],
+        "jobs": ["jobcleaning", "jobwaitress"]
+      }
     },
     {
       "label": "friday_dance",
