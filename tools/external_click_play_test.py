@@ -1442,18 +1442,34 @@ testcase external_tavern_random_event_plan_consumes_once:
     $ rooms.enter("TavernMain")
     $ TavernEventOngoing = ""
     run Call("InitAmanda")
+    run Call("InitMelissa")
+    $ AmandaStaticData.set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999, working=True)])
+    $ MelissaStaticData.set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999, working=True)])
     $ Amanda.set_job_value("jobwaitress", 1)
     $ Amanda.set_job_value("jobcleaning", 0)
+    $ Melissa.set_job_value("jobwaitress", 0)
+    $ Melissa.set_job_value("jobcleaning", 1)
     assert eval (int(Amanda.job_value("jobwaitress", 0) or 0) == 1) timeout 5.0
     assert eval ("amanda" in list(girls_by_job("jobwaitress") or [])) timeout 5.0
     assert eval (str(get_random_girl_by_job("jobwaitress") or "") != "") timeout 5.0
-    $ event_runtime.tavern_work_events = [{"code": "WaitressHarass", "type": "harrass", "label": "event_waitress_harrass", "period": calendar_v2.time_slot(), "mandatory": False, "priority": 20}]
+    $ tavern_work_build_daily_plan()
+    $ _waitress_harass_rows = [row for row in event_runtime.tavern_work_events if str(row.get("code", "") or "") == "WaitressHarass"]
+    $ _cleaning_harass_rows = [row for row in event_runtime.tavern_work_events if str(row.get("code", "") or "") == "CleaningHarass"]
+    assert eval (len(_waitress_harass_rows) == 2 and len(set(int(row.get("period", -1)) for row in _waitress_harass_rows)) == 2) timeout 5.0
+    assert eval (len(_cleaning_harass_rows) == 2 and len(set(int(row.get("period", -1)) for row in _cleaning_harass_rows)) == 2) timeout 5.0
+    $ event_runtime.tavern_work_events = [{"code": "WaitressHarass", "type": "harrass", "label": "event_waitress_harrass", "period": 3, "mandatory": False, "priority": 20}, {"code": "CleaningHarass", "type": "harrass", "label": "event_cleaning_harrass", "period": 4, "mandatory": False, "priority": 30}]
     $ event_runtime.tavern_played_today = []
     $ event_runtime.tavern_report_rows = []
     assert eval (tavern_work_codes_for_period(calendar_v2.time_slot(), False) == ["WaitressHarass"]) timeout 5.0
-    $ findAvailableEvents(True)
-    assert eval ("TavernMain" in event_runtime.available and "tavern_work" in event_runtime.available["TavernMain"] and str(event_runtime.available["TavernMain"]["tavern_work"].target or "") == "TavernWorkEventTrigger") timeout 5.0
     run Jump("TavernMain")
+    advance until screen "main_ui" timeout 20.0
+    $ findAvailableEvents(True)
+    $ assert "TavernMain" in event_runtime.available and "tavern_work" in event_runtime.available["TavernMain"] and str(event_runtime.available["TavernMain"]["tavern_work"].target or "") == "TavernWorkEventTrigger", repr({"available": dict(event_runtime.available or {}), "planned": list(event_runtime.tavern_work_events or []), "waitresses": list(girls_by_job("jobwaitress", "TavernMain") or []), "room": rooms.current_code, "open": rooms.get("TavernMain").is_open(), "fired": list(event_runtime.fired_keys_today or [])})
+    run Call("TavernMainObjectMenu", "bar_001")
+    advance until screen "main_ui" timeout 20.0
+    $ _bar_event_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Задержаться у стойки в ожидании истории")
+    $ _bar_event_button = "choice_panel_button_%d" % int(_bar_event_index)
+    click id _bar_event_button pos (0.5, 0.5) until screen "choice" timeout 20.0
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("say") is None and "Что вы будете делать?" in str(scene_runtime.text or "")) timeout 5.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Не обращать внимания", "Стоять и смотреть", "[_help_caption]"]) timeout 5.0
@@ -1467,8 +1483,25 @@ testcase external_tavern_random_event_plan_consumes_once:
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
     assert eval ("WaitressHarass" in list(event_runtime.tavern_played_today or [])) timeout 5.0
-    assert eval (len(list(event_runtime.tavern_work_events or [])) == 0 and not tavern_work_has_period(calendar_v2.time_slot(), False)) timeout 5.0
-    assert eval (str(scene_runtime.picture or "") in AmandaStaticData.image_sequence("tavern", "waitress") and "Действия в трактире" == str(main_ui_runtime.action_title or "")) timeout 5.0
+    assert eval (len(list(event_runtime.tavern_work_events or [])) == 1 and not tavern_work_has_period(calendar_v2.time_slot(), False)) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/tavern/mainhall/bar_mainHall.png" and "Барная стойка" == str(main_ui_runtime.action_title or "")) timeout 5.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 16, 0)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernMain", "tavern_work")) timeout 5.0
+    run Call("TavernMainObjectMenu", "bar_001")
+    advance until screen "main_ui" timeout 20.0
+    $ _bar_event_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Задержаться у стойки в ожидании истории")
+    $ _bar_event_button = "choice_panel_button_%d" % int(_bar_event_index)
+    click id _bar_event_button pos (0.5, 0.5) until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and "Что вы будете делать?" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Промолчать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _harass_silence_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Промолчать")
+    $ _harass_silence_button = "choice_panel_button_%d" % int(_harass_silence_index)
+    click id _harass_silence_button pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к делам"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (len(list(event_runtime.tavern_work_events or [])) == 0 and list(event_runtime.tavern_played_today or []).count("CleaningHarass") == 1) timeout 5.0
 
 testcase external_melissa_waitress_fall_event_lifecycle:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 13, 0)
@@ -2195,6 +2228,7 @@ testcase external_actual_random_town_click:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 22, 0)
     run Call("TownStreetPatrolEvent")
     advance until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/fight/patrol_guard.png") timeout 5.0
     click id "choice_panel_button_1" pos (0.5, 0.5)
     advance until eval (player.stats.exploration >= 308) timeout 20.0
     assert eval (TownStreet.patrols_today >= 1 and player.stats.exploration >= 308 and len(list(TownStreet.story_seen_keys or [])) >= 1 and event_runtime.evaluation_time is None) timeout 5.0
@@ -7224,6 +7258,11 @@ testcase external_clara_forest_sofa_story_flow:
     $ external_calendar_set_fields(3, 1, 1100, 15, 0)
     $ external_calendar_set_weekday(1)
     $ rooms.enter("ForestClearing")
+    $ player.stats.exploration = 99
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("ForestClearing", "clara_follow")) timeout 5.0
+    $ player.stats.exploration = 100
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     $ _sofa_follow_event = threads["claraForestSofa"].getevent(0)
@@ -7236,6 +7275,23 @@ testcase external_clara_forest_sofa_story_flow:
     run Call("checkTriggers", "ForestClearing", "clara_follow", 0)
     advance until screen "choice" timeout 20.0
     assert eval (any("тихо проследить" in str(i.caption or "").lower() for i in renpy.get_screen("choice").scope.get("items", []))) timeout 5.0
+    assert eval (any("заговорить с клариссой" in str(i.caption or "").lower() for i in renpy.get_screen("choice").scope.get("items", []))) timeout 5.0
+    $ _clara_forest_talk_index = [str(i.caption or "").lower() for i in renpy.get_screen("choice").scope.get("items", [])].index("заговорить с клариссой")
+    $ _clara_forest_talk_button_id = "choice_panel_button_%d" % int(_clara_forest_talk_index)
+    click id _clara_forest_talk_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
+    $ _clara_forest_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
+    $ _clara_forest_back_button_id = "choice_panel_button_%d" % int(_clara_forest_back_index)
+    click id _clara_forest_back_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (int(threads["claraForestSofa"].num or 0) == 0) timeout 5.0
+    $ _clara_forest_retry_day = calendar_v2.day_number_to_parts(int(calendar_v2.daysInGame or 0) + 1)
+    $ external_calendar_set_fields(_clara_forest_retry_day["day"], _clara_forest_retry_day["month"], _clara_forest_retry_day["year"], 15, 0)
+    $ threads["claraForestSofa"].day = int(calendar_v2.daysInGame or 0) - 1
+    $ rooms.enter("ForestClearing")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("ForestClearing", "clara_follow")) timeout 5.0
+    run Call("checkTriggers", "ForestClearing", "clara_follow", 0)
+    advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraForestSofa"].num or 0) == 1) timeout 20.0
