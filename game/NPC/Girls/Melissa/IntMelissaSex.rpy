@@ -329,66 +329,71 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
                         $ scene_runtime.text = "Вы входите сзади медленно и без спешки. Она сама показывает, когда можно продолжить, и не позволяет вам торопиться."
                     call HouseholdSexState(_hse_girl, _hse_full_engine)
 
-                "Кончить в рот" if _hse_can_cum and _hse_info.cock_in("mouth"):
-                    $ scene_runtime.text = "Поймав ее взгляд, вы больше не сдерживаетесь и кончаете ей в рот."
-                    $ pregnancy_check(_hse_girl, "mouth", 1, "Вы")
-                    $ player.intimacy.set_arousal(0)
-                    $ _hse_info.set_cum_state("cum_mouth_you", 1)
-                    $ _hse_info.set_sex_busy(True)
-                    $ _hse_info.set_cock_position("none")
-                    $ scene_runtime.picture = _hse_data.image_path("sexy_times", "blowjob_finish")
-                    call HouseholdSexAfterCum
-                    if _return:
-                        return
+                "Кончить..." if _hse_can_cum:
+                    menu:
+                        "Кончить в рот" if _hse_info.cock_in("mouth"):
+                            $ scene_runtime.text = "Поймав ее взгляд, вы больше не сдерживаетесь и кончаете ей в рот."
+                            $ pregnancy_check(_hse_girl, "mouth", 1, "Вы")
+                            $ player.intimacy.set_arousal(0)
+                            $ _hse_info.set_cum_state("cum_mouth_you", 1)
+                            $ _hse_info.set_sex_busy(True)
+                            $ _hse_info.set_cock_position("none")
+                            $ scene_runtime.picture = _hse_data.image_path("sexy_times", "blowjob_finish")
+                            call HouseholdSexAfterCum
+                            if _return:
+                                return
 
-                "Кончить на грудь" if _hse_can_cum:
-                    $ scene_runtime.text = "Вы выходите в последний момент и кончаете ей на грудь."
-                    $ pregnancy_check(_hse_girl, "tits", 1, "Вы")
-                    $ player.intimacy.set_arousal(0)
-                    $ _hse_info.set_cum_state("cum_tits_you", 1)
-                    $ _hse_info.set_sex_busy(True)
-                    $ _hse_info.set_cock_position("none")
-                    $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
-                    call HouseholdSexAfterCum
-                    if _return:
-                        return
+                        "Кончить на грудь":
+                            $ scene_runtime.text = "Вы выходите в последний момент и кончаете ей на грудь."
+                            $ pregnancy_check(_hse_girl, "tits", 1, "Вы")
+                            $ player.intimacy.set_arousal(0)
+                            $ _hse_info.set_cum_state("cum_tits_you", 1)
+                            $ _hse_info.set_sex_busy(True)
+                            $ _hse_info.set_cock_position("none")
+                            $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
+                            call HouseholdSexAfterCum
+                            if _return:
+                                return
 
-                "Кончить на лицо" if _hse_can_cum:
-                    $ scene_runtime.text = "Вы выходите в последний момент и кончаете ей на лицо."
-                    $ pregnancy_check(_hse_girl, "face", 1, "Вы")
-                    $ player.intimacy.set_arousal(0)
-                    $ _hse_info.set_cum_state("cum_face_you", 1)
-                    $ _hse_info.set_sex_busy(True)
-                    $ _hse_info.set_cock_position("none")
-                    $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
-                    call HouseholdSexAfterCum
-                    if _return:
-                        return
+                        "Кончить на лицо":
+                            $ scene_runtime.text = "Вы выходите в последний момент и кончаете ей на лицо."
+                            $ pregnancy_check(_hse_girl, "face", 1, "Вы")
+                            $ player.intimacy.set_arousal(0)
+                            $ _hse_info.set_cum_state("cum_face_you", 1)
+                            $ _hse_info.set_sex_busy(True)
+                            $ _hse_info.set_cock_position("none")
+                            $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
+                            call HouseholdSexAfterCum
+                            if _return:
+                                return
 
-                "Кончить в киску" if _hse_can_cum and _hse_info.cock_in("pussy"):
-                    $ _hse_inside_container = "pussy"
-                    $ scene_runtime.text = household_sex_finish_inside_text(_hse_girl, _hse_inside_container)
-                    $ pregnancy_check(_hse_girl, "inside", 1, "Вы")
-                    $ player.intimacy.set_arousal(0)
-                    $ _hse_info.set_cum_state("cum_inside_you", 1)
-                    $ _hse_info.set_sex_busy(True)
-                    $ _hse_info.set_cock_position("none")
-                    $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
-                    call HouseholdSexAfterCum
-                    if _return:
-                        return
+                        "Кончить в киску" if _hse_info.cock_in("pussy"):
+                            $ _hse_inside_container = "pussy"
+                            $ scene_runtime.text = household_sex_finish_inside_text(_hse_girl, _hse_inside_container)
+                            $ pregnancy_check(_hse_girl, "inside", 1, "Вы")
+                            $ player.intimacy.set_arousal(0)
+                            $ _hse_info.set_cum_state("cum_inside_you", 1)
+                            $ _hse_info.set_sex_busy(True)
+                            $ _hse_info.set_cock_position("none")
+                            $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
+                            call HouseholdSexAfterCum
+                            if _return:
+                                return
 
-                "Кончить в попку" if _hse_can_cum and _hse_info.cock_in("ass"):
-                    $ _hse_inside_container = "ass"
-                    $ scene_runtime.text = household_sex_finish_inside_text(_hse_girl, _hse_inside_container)
-                    $ pregnancy_check(_hse_girl, "ass", 1, "Вы")
-                    $ player.intimacy.set_arousal(0)
-                    $ _hse_info.set_sex_busy(True)
-                    $ _hse_info.set_cock_position("none")
-                    $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
-                    call HouseholdSexAfterCum
-                    if _return:
-                        return
+                        "Кончить в попку" if _hse_info.cock_in("ass"):
+                            $ _hse_inside_container = "ass"
+                            $ scene_runtime.text = household_sex_finish_inside_text(_hse_girl, _hse_inside_container)
+                            $ pregnancy_check(_hse_girl, "ass", 1, "Вы")
+                            $ player.intimacy.set_arousal(0)
+                            $ _hse_info.set_sex_busy(True)
+                            $ _hse_info.set_cock_position("none")
+                            $ scene_runtime.picture = _hse_data.image_path("sexy_times", "finish")
+                            call HouseholdSexAfterCum
+                            if _return:
+                                return
+
+                        "Назад":
+                            pass
 
                 "Попросить ее помочь вам" if (not _hse_full_engine) and player_can_ask_intimacy_help(_hse_girl):
                     call PlayerIntimacyHelpAsk(_hse_girl, "HouseholdSexState")

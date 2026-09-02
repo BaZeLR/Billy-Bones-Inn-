@@ -266,7 +266,7 @@ init python:
             return False
         if soap_total_piece_count() > 0:
             return False
-        last_day = int(getattr(girl_info, "var", {}).get("soap_request_last_day", -14) or -14)
+        last_day = int(household.soap_request_last_day.get(girl, -14) or -14)
         return current_game_day() - last_day >= 5
 
     def household_warm_drink_ready(girl_name=""):
@@ -408,21 +408,6 @@ label HouseholdSoapRequestEvent(girl_name=""):
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:
-        "Отдать лавандово-травяное мыло" if int(player.item_count("lavender_herbal_soap_001") or 0) > 0:
-            call HouseholdSoapRequestGiveNow(_soap_girl, "lavender_herbal_soap_001")
-
-        "Отдать лавандово-розовое мыло" if int(player.item_count("lavender_rose_soap_001") or 0) > 0:
-            call HouseholdSoapRequestGiveNow(_soap_girl, "lavender_rose_soap_001")
-
-        "Отдать розово-медовое мыло" if int(player.item_count("rose_honey_soap_001") or 0) > 0:
-            call HouseholdSoapRequestGiveNow(_soap_girl, "rose_honey_soap_001")
-
-        "Сразу отдать роскошное мыло" if int(player.item_count("luxury_soap_001") or 0) > 0:
-            call HouseholdSoapRequestGiveNow(_soap_girl, "luxury_soap_001")
-
-        "Сразу отдать обычное мыло" if int(player.item_count("soap_001") or 0) > 0:
-            call HouseholdSoapRequestGiveNow(_soap_girl, "soap_001")
-
         "Пообещать достать мыло позже":
             $ scene_runtime.text = "Вы обещаете, что не забудете о просьбе. Похоже, это заметно поднимает ей настроение."
             if _soap_info is not None:
@@ -452,11 +437,38 @@ label HouseholdSoapRequestGiveNow(girl_name="", item_id="soap_001"):
         return
     $ player.remove_item(_soap_item, 1)
     $ _soap_effect = player_apply_item_social_effects(_soap_girl, _soap_item, True)
+    $ crafting.soap_requests.pop(_soap_girl, None)
     $ scene_runtime.text = "{} принимает подарок сразу, не скрывая удовольствия. {}".format(str(people_display_name(_soap_girl) or _soap_girl), str(_soap_effect.get("text", "") or "").strip())
     $ scene_runtime.location_text = scene_runtime.text
     call stat
     if player.tavern_management.breakfast.event_active:
         call TavernKitchenBreakfastShowText(scene_runtime.text)
+    return
+
+
+label HouseholdSoapRequestFulfillMenu(girl_name=""):
+    $ renpy.dynamic("_soap_girl")
+    $ _soap_girl = str(girl_name or "").strip().lower()
+    $ scene_runtime.text = "Вы достаете обещанное мыло и предлагаете выбрать подходящий кусок."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Отдать лавандово-травяное мыло" if int(player.item_count("lavender_herbal_soap_001") or 0) > 0:
+            call HouseholdSoapRequestGiveNow(_soap_girl, "lavender_herbal_soap_001")
+
+        "Отдать лавандово-розовое мыло" if int(player.item_count("lavender_rose_soap_001") or 0) > 0:
+            call HouseholdSoapRequestGiveNow(_soap_girl, "lavender_rose_soap_001")
+
+        "Отдать розово-медовое мыло" if int(player.item_count("rose_honey_soap_001") or 0) > 0:
+            call HouseholdSoapRequestGiveNow(_soap_girl, "rose_honey_soap_001")
+
+        "Отдать роскошное мыло" if int(player.item_count("luxury_soap_001") or 0) > 0:
+            call HouseholdSoapRequestGiveNow(_soap_girl, "luxury_soap_001")
+
+        "Отдать обычное мыло" if int(player.item_count("soap_001") or 0) > 0:
+            call HouseholdSoapRequestGiveNow(_soap_girl, "soap_001")
+
+        "Назад":
+            pass
     return
 
 

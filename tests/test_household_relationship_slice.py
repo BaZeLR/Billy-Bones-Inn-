@@ -83,11 +83,12 @@ def test_sandra_and_melissa_share_one_intimacy_procedure_with_distinct_gates():
     assert "call HouseholdSexEngine" in sandra_talk
     assert '"Попросить помочь рукой" if _hse_full_engine' in engine
     assert '"Попросить сделать минет" if _hse_full_engine' in engine
-    assert '"Кончить в рот" if _hse_can_cum' in engine
-    assert '"Кончить в киску" if _hse_can_cum' in engine
-    assert '"Кончить в попку" if _hse_can_cum' in engine
-    assert '"Кончить на грудь" if _hse_can_cum' in engine
-    assert '"Кончить на лицо" if _hse_can_cum' in engine
+    assert '"Кончить..." if _hse_can_cum' in engine
+    assert '"Кончить в рот" if _hse_info.cock_in("mouth")' in engine
+    assert '"Кончить в киску" if _hse_info.cock_in("pussy")' in engine
+    assert '"Кончить в попку" if _hse_info.cock_in("ass")' in engine
+    assert '"Кончить на грудь":' in engine
+    assert '"Кончить на лицо":' in engine
 
 
 def test_anal_finish_is_recorded_without_using_vaginal_conception_state():

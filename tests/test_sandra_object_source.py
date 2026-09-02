@@ -300,8 +300,9 @@ def test_sandra_sex_engine_uses_native_choices_and_pregnancy_authority_once():
     assert '_hse_data.image_path("portrait", "default")' in engine
     assert '"Попросить помочь рукой" if _hse_full_engine' in engine
     assert '"Попросить сделать минет" if _hse_full_engine' in engine
-    assert '"Кончить в киску" if _hse_can_cum' in engine
-    assert '"Кончить в попку" if _hse_can_cum' in engine
+    assert '"Кончить..." if _hse_can_cum' in engine
+    assert '"Кончить в киску" if _hse_info.cock_in("pussy")' in engine
+    assert '"Кончить в попку" if _hse_info.cock_in("ass")' in engine
     assert '$ pregnancy_check(_hse_girl, "tits", 1, "Вы")' in engine
     assert '$ pregnancy_check(_hse_girl, "face", 1, "Вы")' in engine
     assert '$ pregnancy_check(_hse_girl, "inside", 1, "Вы")' in engine

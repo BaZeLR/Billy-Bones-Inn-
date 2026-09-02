@@ -15,6 +15,7 @@ RELATIONSHIPS = source("game/Utilities/General/NPC/RelationshipDynamics.rpy")
 SOCIAL = source("game/Utilities/General/NPC/SocialTalkTopics.rpy")
 HOUSEHOLD = source("game/Inn/HouseholdRuntimeEvents.rpy")
 BREAKFAST = source("game/Inn/TavernKitchenBreakfast.rpy")
+SANDRA_TALK = source("game/NPC/Girls/Sandra/IntSandraTalk.rpy")
 
 
 SOAP_VARIANTS = {
@@ -104,3 +105,24 @@ def test_household_preferences_requests_and_breakfast_use_the_same_soap_items():
     assert "player_remove_soap_pieces(3, False)" not in BREAKFAST
     assert "tavern_breakfast_apply_first_soap_samples" not in BREAKFAST
     assert 'player.remove_item("soap_001", 3)' not in BREAKFAST
+
+
+def test_sandra_can_fulfill_one_pending_soap_request_from_her_talk_menu():
+    assert '"Отдать Сандре обещанное мыло" if int(crafting.soap_requests.get(girl_name, 0) or 0) > 0 and soap_total_piece_count() > 0:' in SANDRA_TALK
+    assert "call HouseholdSoapRequestFulfillMenu(girl_name)" in SANDRA_TALK
+    fulfill = HOUSEHOLD.split("label HouseholdSoapRequestFulfillMenu", 1)[1].split(
+        "label HouseholdBarberRequestEvent", 1
+    )[0]
+    assert '"Назад":' in fulfill
+    for _, (item_id, _) in SOAP_VARIANTS.items():
+        assert f'player.item_count("{item_id}")' in fulfill
+        assert f'HouseholdSoapRequestGiveNow(_soap_girl, "{item_id}")' in fulfill
+
+    transaction = HOUSEHOLD.split("label HouseholdSoapRequestGiveNow", 1)[1].split(
+        "label HouseholdSoapRequestFulfillMenu", 1
+    )[0]
+    assert transaction.index("player.remove_item(_soap_item, 1)") < transaction.index(
+        "player_apply_item_social_effects(_soap_girl, _soap_item, True)"
+    ) < transaction.index("crafting.soap_requests.pop(_soap_girl, None)")
+    assert 'household.soap_request_last_day.get(girl, -14)' in HOUSEHOLD
+    assert 'getattr(girl_info, "var", {}).get("soap_request_last_day"' not in HOUSEHOLD

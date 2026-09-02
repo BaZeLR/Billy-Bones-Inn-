@@ -1754,14 +1754,20 @@ testcase external_sandra_breakfast_flirt_date_destination:
     assert eval (str(rooms.current_code or "") == "TavernMyRoom" and not bool(player.tavern_management.breakfast.event_active)) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5)
     advance until eval (renpy.get_screen("choice") is not None and "Войти в нее" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
-    assert eval (all(option in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] for option in ["Попросить помочь рукой", "Попросить сделать минет", "Кончить на грудь", "Кончить на лицо"])) timeout 5.0
+    assert eval (all(option in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] for option in ["Попросить помочь рукой", "Попросить сделать минет", "Кончить..."])) timeout 5.0
     $ _sandra_hand_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Попросить помочь рукой")
     click id ("choice_panel_button_%d" % int(_sandra_hand_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "обхватывает ваш член ладонью" in str(scene_runtime.text or "")) timeout 20.0
     $ _sandra_oral_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Попросить сделать минет")
-    click id ("choice_panel_button_%d" % int(_sandra_oral_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and Sandra.cock_in("mouth") and "Кончить в рот" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id ("choice_panel_button_%d" % int(_sandra_oral_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and Sandra.cock_in("mouth") and "Кончить..." in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     $ _sandra_enter_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Войти в нее")
     $ _sandra_enter_button = "choice_panel_button_%d" % int(_sandra_enter_index)
-    click id _sandra_enter_button pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Кончить в киску" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id _sandra_enter_button pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and Sandra.cock_in("pussy") and "Кончить..." in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sandra_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Кончить...")
+    click id ("choice_panel_button_%d" % int(_sandra_finish_index)) pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and "Кончить..." not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Назад" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval ("Кончить на грудь" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Кончить на лицо" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Кончить в киску" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _sandra_inside_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Кончить в киску")
     $ _sandra_inside_button = "choice_panel_button_%d" % int(_sandra_inside_index)
     click id _sandra_inside_button pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить", "Закончить"]) timeout 20.0
@@ -1788,7 +1794,13 @@ testcase external_sandra_breakfast_flirt_date_destination:
     $ _sandra_anal_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Войти сзади")
     click id ("choice_panel_button_%d" % int(_sandra_anal_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and Sandra.cock_in("ass")) timeout 20.0
     assert eval (player.intimacy.arousal_value() >= 100 and player.intimacy.can_cum() and int(Sandra.fucked_today or 0) < 2) timeout 5.0
-    advance until eval (renpy.get_screen("choice") is not None and "Кончить в попку" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    advance until eval (renpy.get_screen("choice") is not None and "Кончить..." in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sandra_anal_menu_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Кончить...")
+    click id ("choice_panel_button_%d" % int(_sandra_anal_menu_index)) pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and "Кончить..." not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Назад" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval ("Кончить на грудь" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Кончить на лицо" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Кончить в попку" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _sandra_anal_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Кончить в попку")
     click id ("choice_panel_button_%d" % int(_sandra_anal_finish_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить", "Закончить"]) timeout 20.0
     assert eval (int(Sandra.sex_stat("cuminside", 0) or 0) == _sandra_anal_inside and len(Sandra.detailed_sex_history) == _sandra_anal_history + 1 and str(Sandra.detailed_sex_history[-1].get("CumTarget", "") or "") == "ass") timeout 5.0
@@ -4897,6 +4909,35 @@ testcase external_sandra_talk_opens_from_npc_button:
     $ _sandra_reconcile_button_id = "choice_panel_button_%d" % int(_sandra_reconcile_index)
     click id _sandra_reconcile_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and "Вы подошли к Сандре и извинились" in str(scene_runtime.text or "")) timeout 20.0
     assert eval ("Сандра" in str(scene_runtime.text or "") and "мам" not in str(scene_runtime.text or "").lower()) timeout 5.0
+
+testcase external_sandra_pending_soap_request_can_be_fulfilled:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("sandra") is not None) timeout 20.0
+    $ external_calendar_set_fields(3, 1, 1100, 10, 0)
+    $ external_calendar_set_weekday(1)
+    $ Sandra.known = True
+    $ Sandra.rel = 15
+    $ people.get_data("sandra").set_schedule([NPCScheduleEntry(location="TavernKitchen", start_minute=0, end_minute=1440, priority=999)])
+    $ rooms.enter("TavernKitchen")
+    $ crafting.soap_requests["sandra"] = 1
+    $ player.add_item("lavender_herbal_soap_001", 2)
+    $ _sandra_soap_before = int(player.item_count("lavender_herbal_soap_001") or 0)
+    run Call("IntSandraTalk", "sandra")
+    advance until eval (renpy.get_screen("choice") is not None and "Отдать Сандре обещанное мыло" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sandra_soap_action_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Отдать Сандре обещанное мыло")
+    click id ("choice_panel_button_%d" % int(_sandra_soap_action_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Отдать лавандово-травяное мыло" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Назад" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sandra_soap_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
+    click id ("choice_panel_button_%d" % int(_sandra_soap_back_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Отдать Сандре обещанное мыло" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (int(player.item_count("lavender_herbal_soap_001") or 0) == _sandra_soap_before and int(crafting.soap_requests.get("sandra", 0) or 0) == 1) timeout 5.0
+    $ _sandra_soap_action_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Отдать Сандре обещанное мыло")
+    click id ("choice_panel_button_%d" % int(_sandra_soap_action_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Отдать лавандово-травяное мыло" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sandra_soap_give_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Отдать лавандово-травяное мыло")
+    click id ("choice_panel_button_%d" % int(_sandra_soap_give_index)) pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and "Назад" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Отдать Сандре обещанное мыло" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (int(player.item_count("lavender_herbal_soap_001") or 0) == _sandra_soap_before - 1) timeout 5.0
+    assert eval ("sandra" not in crafting.soap_requests) timeout 5.0
+    assert eval ("принимает подарок" in str(scene_runtime.text or "")) timeout 5.0
 
 testcase external_sandra_weekly_thread_progression:
     run Jump("Intro")
@@ -8068,6 +8109,7 @@ def main() -> int:
             "external_amanda_talk_opens_from_npc_button",
             "external_amanda_daily_talk_actions",
             "external_sandra_talk_opens_from_npc_button",
+            "external_sandra_pending_soap_request_can_be_fulfilled",
             "external_sandra_weekly_thread_progression",
             "external_sandra_night_thanks_hours_work",
             "external_melissa_courtship_is_slow_and_daily",
@@ -8254,6 +8296,7 @@ def main() -> int:
             "external_amanda_talk_opens_from_npc_button",
             "external_amanda_daily_talk_actions",
             "external_sandra_talk_opens_from_npc_button",
+            "external_sandra_pending_soap_request_can_be_fulfilled",
             "external_sandra_weekly_thread_progression",
             "external_sandra_night_thanks_hours_work",
             "external_melissa_courtship_is_slow_and_daily",

@@ -13,6 +13,7 @@ def test_household_authored_requests_use_native_label_menus():
     source = SOURCE.read_text(encoding="utf-8-sig")
     slices = (
         ("HouseholdSoapRequestEvent", "HouseholdSoapRequestGiveNow"),
+        ("HouseholdSoapRequestFulfillMenu", "HouseholdBarberRequestEvent"),
         ("HouseholdBarberRequestEvent", "HouseholdOutfitRequestTerms"),
         ("HouseholdOutfitRequestTerms", "SandraDressInitiativeEvent"),
         ("HouseholdOutfitRewardEvent", "HouseholdOutfitRewardShowScene"),
