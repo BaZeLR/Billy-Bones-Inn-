@@ -484,6 +484,16 @@ def test_portstreets_explains_georgett_client_absence_from_npc_authority():
     assert "Почему-то Жоржетты сейчас нет на ее обычном месте. Где же она может быть?" in entry
 
 
+def test_portstreets_bottle_uses_saved_room_state_and_returns_through_back():
+    port = _source(PORT_STREETS)
+    take = port.split("label PortStreetsTakeEmptyBottle:", 1)[1]
+
+    assert 'rooms.get("PortStreets").state["bottle_spawn_day"]' in port
+    assert 'rooms.get("PortStreets").state["bottle_present"]' in port
+    assert 'custom_properties["bottle_present"]' not in port
+    assert 'main_ui_runtime.action_items = [MenuItem("Назад", Jump("PortStreets"))]' in take
+
+
 def test_georgett_and_liza_extend_the_shared_sex_state_schema():
     georgett = _source(GEORGETT_INIT)
     liza = _source(LIZA_INIT)

@@ -1008,6 +1008,18 @@ testcase external_port_streets_georgette_liza_flow:
     assert eval (str(people.location("dog") or "") in list(DogStaticData.stray_roam_locations)) timeout 5.0
     assert eval (("dog" in list(people.ids_at("PortStreets") or [])) == (str(people.location("dog") or "") == "PortStreets")) timeout 5.0
 
+    $ rooms.get("PortStreets").state["bottle_spawn_day"] = int(current_game_day())
+    $ rooms.get("PortStreets").state["bottle_present"] = 1
+    run Jump("PortStreets")
+    advance until screen "main_ui" timeout 20.0
+    $ _port_bottle_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Пустая бутылка")
+    click id ("choice_panel_button_%d" % int(_port_bottle_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Пустая бутылка") timeout 20.0
+    $ _port_take_bottle_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Подобрать бутылку")
+    click id ("choice_panel_button_%d" % int(_port_take_bottle_index)) pos (0.5, 0.5) until eval (int(rooms.get("PortStreets").state.get("bottle_present", 0) or 0) == 0) timeout 20.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"] and "Вы подбираете пустую бутылку" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Действия") timeout 20.0
+    assert eval ("Пустая бутылка" not in [str(i.caption or "") for i in main_ui_runtime.action_items] and "Осмотреть переулки" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+
 testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0

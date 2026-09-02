@@ -6,13 +6,13 @@
 init python:
     def port_streets_prepare_bottle_spawn():
         current_day = int(current_game_day())
-        if int(rooms.get("PortStreets").custom_properties.get("bottle_spawn_day", -1) or -1) == current_day:
+        if people_to_int(rooms.get("PortStreets").state.get("bottle_spawn_day", -1), -1) == current_day:
             return
-        rooms.get("PortStreets").custom_properties["bottle_spawn_day"] = current_day
-        rooms.get("PortStreets").custom_properties["bottle_present"] = 1 if procedural_randint(1, 3, key="procedural:Town/PortStreets.rpy:procedural_randint:18:1") == 1 else 0
+        rooms.get("PortStreets").state["bottle_spawn_day"] = current_day
+        rooms.get("PortStreets").state["bottle_present"] = 1 if procedural_randint(1, 3, key="procedural:Town/PortStreets.rpy:procedural_randint:18:1") == 1 else 0
 
     def port_streets_empty_bottle_visible():
-        return int(rooms.get("PortStreets").custom_properties.get("bottle_present", 0) or 0) == 1
+        return int(rooms.get("PortStreets").state.get("bottle_present", 0) or 0) == 1
 
     def port_streets_client_event_available():
         return story_event_available("PortStreets", "street_clients") or port_streets_repeat_georgett_client_event_available()
@@ -81,8 +81,8 @@ init python:
             ),
         ],
         schedule=None,
-        custom_properties={
-            "street_prostitution_location": True,
+        custom_properties={"street_prostitution_location": True},
+        state={
             "bottle_spawn_day": -1,
             "bottle_present": 0,
         },
@@ -186,10 +186,10 @@ label PortStreetsTakeEmptyBottle:
     if not port_streets_empty_bottle_visible():
         $ main_ui_runtime.action_items = rooms.current.build_action_items() + rooms.current.build_exit_items()
         return
-    $ rooms.get("PortStreets").custom_properties["bottle_present"] = 0
+    $ rooms.get("PortStreets").state["bottle_present"] = 0
     $ player.add_item("empty_bottle_001", 1)
     $ scene_runtime.text = "Вы подбираете пустую бутылку. Стекло цело, и если ее как следует отмыть, она еще пригодится."
     $ scene_runtime.location_text = scene_runtime.text
-    $ main_ui_runtime.action_title = "Действия"
-    $ main_ui_runtime.action_items = rooms.current.build_action_items() + rooms.current.build_exit_items()
+    $ main_ui_runtime.action_title = "Пустая бутылка"
+    $ main_ui_runtime.action_items = [MenuItem("Назад", Jump("PortStreets"))]
     return
