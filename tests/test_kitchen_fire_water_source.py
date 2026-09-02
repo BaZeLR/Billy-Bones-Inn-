@@ -4,6 +4,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CHORES_PATH = PROJECT_ROOT / "game" / "Inn" / "PlayerChoresSystem.rpy"
 CAULDRON_PATH = PROJECT_ROOT / "game" / "Inn" / "TavernKitchenCauldron001.rpy"
+HEARTH_PATH = PROJECT_ROOT / "game" / "Inn" / "TavernKitchenHearth001.rpy"
+FIREPLACE_PATH = PROJECT_ROOT / "game" / "Inn" / "TavernMainFireplace001.rpy"
 
 
 def test_kitchen_cauldron_resolves_to_kitchen_hearth_fire():
@@ -61,3 +63,13 @@ def test_fire_consumes_the_local_wood_stock_before_carried_wood():
     assert stock_check in fire_branch
     assert carried_check in fire_branch
     assert fire_branch.index(stock_check) < fire_branch.index(carried_check)
+
+
+def test_fire_objects_are_saved_defaults_not_init_only_catalog_objects():
+    hearth_source = HEARTH_PATH.read_text(encoding="utf-8-sig")
+    fireplace_source = FIREPLACE_PATH.read_text(encoding="utf-8-sig")
+
+    assert "default TavernKitchenHearthObject = GameObject(" in hearth_source
+    assert "default TavernMainFireplaceObject = GameObject(" in fireplace_source
+    assert "    TavernKitchenHearthObject = GameObject(" not in hearth_source
+    assert "    TavernMainFireplaceObject = GameObject(" not in fireplace_source

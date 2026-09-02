@@ -31,39 +31,39 @@ init python:
             description += "\nПри себе у вас колотые дрова: {b}%s{/b} шт." % str(carried_wood)
         return description
 
-    TavernMainFireplaceObject = GameObject(
-        object_id="fireplace_001",
-        name="Камин",
-        description="Небольшой камин, который помогает держать главный зал в тепле.",
-        picture="images/tavern/mainhall/camin_mainHall.png",
-        container=True,
-        actions=[
-            ObjectAction(
-                action_id="make_fire",
-                label="Разжечь огонь",
-                hook="call",
-                target="MakeFire",
-                args=("chopped_wood_001", "TavernMain", "", "fireplace_001"),
-            ),
-            ObjectAction(
-                action_id="drop_chopped_wood_fireplace",
-                label="Сложить рядом дрова",
-                hook="call",
-                target="TavernMainFireplaceDepositWood",
-                condition=tavern_main_fireplace_drop_wood_visible,
-            ),
-            ObjectAction(
-                action_id="clean_ashes",
-                label="Вычистить золу",
-                hook="call",
-                target="Clean",
-                args=("ashes", "TavernMain", "", "fireplace_001"),
-            ),
-        ],
-        state={"fire_started_minute": 0, "fire_until_minute": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0},
-        carriable=False,
-        stackable=False,
-    )
+default TavernMainFireplaceObject = GameObject(
+    object_id="fireplace_001",
+    name="Камин",
+    description="Небольшой камин, который помогает держать главный зал в тепле.",
+    picture="images/tavern/mainhall/camin_mainHall.png",
+    container=True,
+    actions=[
+        ObjectAction(
+            action_id="make_fire",
+            label="Разжечь огонь",
+            hook="call",
+            target="MakeFire",
+            args=("chopped_wood_001", "TavernMain", "", "fireplace_001"),
+        ),
+        ObjectAction(
+            action_id="drop_chopped_wood_fireplace",
+            label="Сложить рядом дрова",
+            hook="call",
+            target="TavernMainFireplaceDepositWood",
+            condition=tavern_main_fireplace_drop_wood_visible,
+        ),
+        ObjectAction(
+            action_id="clean_ashes",
+            label="Вычистить золу",
+            hook="call",
+            target="Clean",
+            args=("ashes", "TavernMain", "", "fireplace_001"),
+        ),
+    ],
+    state={"fire_started_minute": 0, "fire_until_minute": 0, "fire_adds": 0, "ash_dirty": 0, "chopped_wood_stock": 0},
+    carriable=False,
+    stackable=False,
+)
 
 
 label TavernMainFireplaceDepositWood:

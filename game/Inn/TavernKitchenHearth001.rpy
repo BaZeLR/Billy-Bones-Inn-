@@ -31,47 +31,47 @@ init python:
             description += "\nПри себе у вас колотые дрова: {b}%s{/b} шт." % str(carried_wood)
         return description
 
-    TavernKitchenHearthObject = GameObject(
-        object_id="hearth_001",
-        name="Очаг",
-        description="Большой очаг, на котором готовят пищу.",
-        picture="images/tavern/kitchen/kitchen_stove.png",
-        container=True,
-        actions=[
-            ObjectAction(
-                action_id="make_fire",
-                label="Разжечь огонь",
-                hook="call",
-                target="MakeFire",
-                args=("chopped_wood_001", "TavernKitchen", "", "hearth_001"),
-            ),
-            ObjectAction(
-                action_id="drop_chopped_wood_hearth",
-                label="Сложить рядом дрова",
-                hook="call",
-                target="TavernKitchenHearthDepositWood",
-                condition=tavern_kitchen_hearth_drop_wood_visible,
-            ),
-            ObjectAction(
-                action_id="clean_ashes",
-                label="Вычистить золу",
-                hook="call",
-                target="Clean",
-                args=("ashes", "TavernKitchen", "", "hearth_001"),
-            ),
-        ],
-        state={
-            "madeFireToday": 0,
-            "fire_started_minute": 0,
-            "fire_until_minute": 0,
-            "fire_adds": 0,
-            "ash_dirty": 0,
-            "chopped_wood_stock": 0,
-        },
-        carriable=False,
-        stackable=False,
-        custom_properties={"object_menu_label": "TavernKitchenHearthMenu"},
-    )
+default TavernKitchenHearthObject = GameObject(
+    object_id="hearth_001",
+    name="Очаг",
+    description="Большой очаг, на котором готовят пищу.",
+    picture="images/tavern/kitchen/kitchen_stove.png",
+    container=True,
+    actions=[
+        ObjectAction(
+            action_id="make_fire",
+            label="Разжечь огонь",
+            hook="call",
+            target="MakeFire",
+            args=("chopped_wood_001", "TavernKitchen", "", "hearth_001"),
+        ),
+        ObjectAction(
+            action_id="drop_chopped_wood_hearth",
+            label="Сложить рядом дрова",
+            hook="call",
+            target="TavernKitchenHearthDepositWood",
+            condition=tavern_kitchen_hearth_drop_wood_visible,
+        ),
+        ObjectAction(
+            action_id="clean_ashes",
+            label="Вычистить золу",
+            hook="call",
+            target="Clean",
+            args=("ashes", "TavernKitchen", "", "hearth_001"),
+        ),
+    ],
+    state={
+        "madeFireToday": 0,
+        "fire_started_minute": 0,
+        "fire_until_minute": 0,
+        "fire_adds": 0,
+        "ash_dirty": 0,
+        "chopped_wood_stock": 0,
+    },
+    carriable=False,
+    stackable=False,
+    custom_properties={"object_menu_label": "TavernKitchenHearthMenu"},
+)
 
 
 label TavernKitchenHearthMenu(object_id="hearth_001"):

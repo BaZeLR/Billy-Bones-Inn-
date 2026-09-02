@@ -5919,10 +5919,19 @@ label external_player_actual_load_probe:
     $ player.appearance.days_since_haircut = 16
     $ player.combat.party = ["dog"]
     $ player.history["external_actual_load_probe"] = "saved"
+    $ TavernKitchenHearthObject.state["chopped_wood_stock"] = 4
+    $ TavernKitchenHearthObject.state["fire_until_minute"] = 4321
+    $ TavernMainFireplaceObject.state["chopped_wood_stock"] = 3
+    $ TavernMainFireplaceObject.state["fire_until_minute"] = 5432
     $ household.__dict__.pop("barber_appointments", None)
     $ Sandra.var["barber_invite_pending"] = 1
     $ saveVersion = currentVersion
     $ renpy.save("external-player-actual-load")
+    $ _saved_fire_data = renpy.get_save_data("external-player-actual-load")
+    $ _saved_hearth = _saved_fire_data.get("TavernKitchenHearthObject")
+    $ _saved_fireplace = _saved_fire_data.get("TavernMainFireplaceObject")
+    $ assert isinstance(_saved_hearth, GameObject) and int(_saved_hearth.state.get("chopped_wood_stock", 0) or 0) == 4 and int(_saved_hearth.state.get("fire_until_minute", 0) or 0) == 4321
+    $ assert isinstance(_saved_fireplace, GameObject) and int(_saved_fireplace.state.get("chopped_wood_stock", 0) or 0) == 3 and int(_saved_fireplace.state.get("fire_until_minute", 0) or 0) == 5432
     if external_player_load_marker_exists():
         return
     $ external_player_mark_load()
@@ -5931,6 +5940,10 @@ label external_player_actual_load_probe:
     $ player.appearance.days_since_haircut = 99
     $ player.combat.party = []
     $ player.history["external_actual_load_probe"] = "mutated"
+    $ TavernKitchenHearthObject.state["chopped_wood_stock"] = 0
+    $ TavernKitchenHearthObject.state["fire_until_minute"] = 0
+    $ TavernMainFireplaceObject.state["chopped_wood_stock"] = 0
+    $ TavernMainFireplaceObject.state["fire_until_minute"] = 0
     $ Sandra.rel = 1
     $ Sandra.set_var_int("knowmolodost", 0)
     $ Sandra.set_sex_stat("pregnancy", 0)
@@ -5953,6 +5966,8 @@ testcase external_player_actual_load_parity:
     assert eval (int(player.economy.money or 0) == 2468) timeout 5.0
     assert eval (int(player.appearance.days_since_wash or 0) == 2 and int(player.appearance.days_since_haircut or 0) == 16) timeout 5.0
     assert eval (list(player.combat.party or []) == ["dog"] and player.history.get("external_actual_load_probe") == "saved") timeout 5.0
+    assert eval (int(TavernKitchenHearthObject.state.get("chopped_wood_stock", 0) or 0) == 4 and int(TavernKitchenHearthObject.state.get("fire_until_minute", 0) or 0) == 4321) timeout 5.0
+    assert eval (int(TavernMainFireplaceObject.state.get("chopped_wood_stock", 0) or 0) == 3 and int(TavernMainFireplaceObject.state.get("fire_until_minute", 0) or 0) == 5432) timeout 5.0
     assert eval (household.barber_appointments == {"sandra": 1} and "barber_invite_pending" not in Sandra.var) timeout 5.0
     assert eval (int(saveVersion or 0) == int(currentVersion or 0)) timeout 5.0
     assert eval (people.get_info("amanda") is Amanda and people.get_data("amanda") is AmandaStaticData and Amanda.data is AmandaStaticData) timeout 5.0
