@@ -6247,18 +6247,28 @@ testcase external_francheska_secondary_and_birth_thread:
     assert eval (str(event_runtime.available["BeckyHome"]["enter"].target or "") == "story_give_birth_inga") timeout 5.0
     $ Inga.set_sex_stat("pregnancy", 0)
     $ Inga.set_sex_stat("pregfather", "")
-    $ calendar_v2.daysInGame = 0
+    $ external_calendar_set_fields(day_value=1, month_value=1, year_value=CALENDAR_START_CYCLE, hour_value=10, minute_value=0)
+    $ external_calendar_set_weekday(1)
+    $ people.get_data("fran").set_schedule([NPCScheduleEntry(location="EllonaTemple", start_minute=0, end_minute=1440, awake=True, talkable=True, priority=999, label="test_temple_talk")])
     $ Francheska.met = False
     $ Francheska.talked_today = 0
-    run Call("FrancheskaTalk")
-    advance until screen "choice" timeout 20.0
+    $ initStoryEventRuntime(True)
+    run Jump("EllonaTemple")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(rooms.current_code or "") == "EllonaTemple" and people.action_data_for_room("fran", "EllonaTemple") is not None) timeout 5.0
+    $ _fran_room_picture = str(scene_runtime.picture or "")
+    $ _fran_room_text = str(scene_runtime.text or "")
+    click id "main_ui_entity_button_npc_fran" pos (0.5, 0.5) until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "talk" and str(main_ui_runtime.selected_char or "") == "fran") timeout 5.0
     $ _fran_meet_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Порасспрашивать об этом месте")
     $ _fran_meet_button_id = "choice_panel_button_%d" % int(_fran_meet_index)
     click id _fran_meet_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/ellona/Fran2.jpg" and str(scene_runtime.text or "") == str(FRANCHESKA_TALK_START[0] + "\n\n" + FRANCHESKA_TALK_MAIN[0])) timeout 5.0
     click pos (960, 560) until eval (Francheska.met and int(Francheska.talked_today or 0) == 1 and str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 30.0
     $ _fran_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
     $ _fran_finish_button_id = "choice_panel_button_%d" % int(_fran_finish_index)
-    click id _fran_finish_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    click id _fran_finish_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and str(rooms.current_code or "") == "EllonaTemple") timeout 20.0
+    assert eval (str(scene_runtime.text or "") == _fran_room_text and str(scene_runtime.location_text or "") == _fran_room_text and str(scene_runtime.picture or "") == _fran_room_picture) timeout 5.0
 
 testcase external_v78_current_correction_migration:
     run Jump("Intro")
@@ -6405,10 +6415,14 @@ testcase external_ellona_temple_sunday_story_event:
     assert eval (story_event_available("EllonaTemple", "enter")) timeout 5.0
     assert eval (str(event_runtime.available["EllonaTemple"]["enter"].target or "") == "story_ellona_temple_sunday_stories") timeout 5.0
     run Jump("EllonaTemple")
-    advance until screen "choice" timeout 20.0
+    advance until screen "say" timeout 20.0
     assert eval (renpy.get_screen("main_ui") is not None and str(main_ui_runtime.mode or "") == "event") timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/ellona/Fran5.png" and str(scene_runtime.text or "").startswith("Во дворике храма Франческа сегодня не одна")) timeout 5.0
+    click pos (960, 560) until eval (renpy.get_screen("say") is not None and "...и звали их пионеры..." in str(scene_runtime.text or "")) timeout 20.0
+    click pos (960, 560) until eval (renpy.get_screen("say") is not None and str(scene_runtime.text or "") == "Вы решили не мешать Франческе.") timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Осмотреться в храме"]) timeout 5.0
-    assert eval (str(scene_runtime.picture or "") == "images/ellona/Fran5.png" and "Во дворике храма Франческа сегодня не одна" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/ellona/Fran5.png" and str(scene_runtime.text or "") == "Вы решили не мешать Франческе.") timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
     assert eval (str(rooms.current_code or "") == "EllonaTemple") timeout 5.0
     assert eval (Francheska.sunday_stories_seen_day == int(calendar_v2.daysInGame or 0)) timeout 5.0

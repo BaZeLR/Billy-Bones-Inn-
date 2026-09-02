@@ -13,7 +13,7 @@ def test_secondary_talk_scratch_is_label_local():
     robin = read("game/NPC/Secondary/IntRobinTalk.rpy")
     mongol = read("game/NPC/Secondary/IntMongolTalk.rpy")
 
-    assert 'renpy.dynamic("_fran_text", "_fran_topic_index")' in francheska
+    assert 'renpy.dynamic("_fran_text", "_fran_topic_index", "_fran_talking")' in francheska
     assert 'renpy.dynamic("_robin_tmp_desc")' in robin
     assert "RobinTmpDesc" not in robin
     assert 'renpy.dynamic("_secret_item", "_secret_price")' in mongol

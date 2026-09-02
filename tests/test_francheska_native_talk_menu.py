@@ -9,9 +9,9 @@ def test_francheska_talk_uses_native_menu_and_restores_caller_context():
     source = SOURCE.read_text(encoding="utf-8-sig")
     talk = source.split("label FrancheskaTalk:", 1)[1]
 
-    assert "\n    menu:\n" in talk
-    assert "while True:" not in talk
-    assert talk.count("jump FrancheskaTalk") == 12
+    assert "\n        menu:\n" in talk
+    assert "while _fran_talking:" in talk
+    assert "jump FrancheskaTalk" not in talk
     assert "call FrancheskaTalk" not in talk
     assert "label FrancheskaTalkEnd" not in source
     assert "call FrancheskaTalkApply" not in talk
@@ -22,6 +22,7 @@ def test_francheska_talk_uses_native_menu_and_restores_caller_context():
     assert "FRANCHESKA_TALK_START[0]" in talk
     assert "FRANCHESKA_TALK_MAIN[10]" in talk
     assert "FRANCHESKA_TALK_SECOND[_fran_topic_index]" in talk
+    assert talk.count("scene_runtime.text = _fran_text") == 12
     assert "BuildFrancheskaTalkMenu" not in source
     assert "queue_paged_panel_text" not in source
     assert "ReturnToMainUI" not in source
