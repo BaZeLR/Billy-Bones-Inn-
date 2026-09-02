@@ -509,7 +509,7 @@ label TownStreetPatrolEvent:
     $ TownStreet.events_today += 1
     $ TownStreet.patrols_today += 1
     $ TownStreet.mark_seen(rooms.current_code, "TownStreetPatrolEvent")
-    $ scene_runtime.picture = "images/general/cityguard.jpg"
+    $ scene_runtime.picture = "images/fight/patrol_guard.png"
     vscene scene_runtime.picture
     $ scene_runtime.text = "Из темноты выступает ночной патруль капитана Циммера. Старший лениво поднимает фонарь к вашему лицу: «Комендантский час, добрый человек. Документы, пропуск или деньги. А если нет - пройдем до колодок»."
     $ scene_runtime.location_text = scene_runtime.text

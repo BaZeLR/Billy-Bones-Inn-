@@ -26,6 +26,14 @@ def test_town_street_thugs_shout_renders_result_as_native_menu():
     assert "call screen main_ui" not in body
 
 
+def test_town_street_patrol_uses_its_dedicated_picture():
+    source = (PROJECT_ROOT / "game" / "Town" / "RandomTownEvents.rpy").read_text(encoding="utf-8-sig")
+    body = source.split("label TownStreetPatrolEvent:", 1)[1].split("label TownStreetPatrolPass:", 1)[0]
+
+    assert 'scene_runtime.picture = "images/fight/patrol_guard.png"' in body
+    assert 'scene_runtime.picture = "images/general/cityguard.jpg"' not in body
+
+
 def test_street_tavern_objects_use_main_ui_without_recursive_overlay_menu():
     source = (PROJECT_ROOT / "game" / "Town" / "StreetTavern.rpy").read_text(encoding="utf-8-sig")
 
