@@ -549,10 +549,10 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     assert '"after_cermon_walk"' in runtime
     assert '"#Georgett.church_after_sermon_event_available()"' in runtime
     assert '"#Liza.church_after_sermon_event_available()"' in runtime
-    assert '"#church_after_cermon_event_roll() == 1"' in runtime
-    assert '"#church_after_cermon_event_roll() == 2"' in runtime
+    assert "church_after_cermon_event_roll" not in runtime
     georgett_after = runtime.split('"story_georgett_church_after_sermon"', 1)[1].split('define franThreadList', 1)[0]
     liza_after = runtime.split('"story_liza_church_after_sermon"', 1)[1].split('define georgettThreadList', 1)[0]
+    assert '"#int(Georgett.story_value(\'SawChurchAfterCermon\', 0) or 0) == 0"' in georgett_after
     assert '"#church_after_cermon_action_visible()"' not in georgett_after
     assert '"#church_after_cermon_action_visible()"' not in liza_after
 
@@ -605,6 +605,8 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     assert 'Georgett.set_story_value("georgettadmit", 1)' in confession
     assert 'Georgett.set_story_value("churchgeorgettadmit", 1)' in confession
     assert 'Georgett.set_story_value("churchlizaadmit", 1)' in confession
+    assert 'Georgett.story_value("churchgeorgettadmit", 0):' in confession
+    assert 'Georgett.story_value("churchgeorgettadmit", 0) == 0:' not in confession
     assert "Georgett.can_trigger_after_sermon_event()" in next_day
     assert "Liza.can_trigger_after_sermon_event()" in next_day
     assert "Liza.can_trigger_church_service_event()" not in next_day

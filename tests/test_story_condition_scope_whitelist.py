@@ -18,12 +18,12 @@ def test_story_condition_scope_is_explicit_and_has_no_global_dump():
         '"event_runtime": event_runtime',
         '"threads": threads',
         '"current_game_day": current_game_day',
-        '"church_after_cermon_event_roll": church_after_cermon_event_roll',
         '"effective_player_exploration": effective_player_exploration',
         '"people": people',
         '"werecat_state": werecat_state',
     ):
         assert required in scope
+    assert "church_after_cermon_event_roll" not in scope
     assert "amanda_tavern_seduction_ready" not in scope
     assert "tavern_amanda_bed_action_available" not in scope
     assert "Unknown story condition name" in source

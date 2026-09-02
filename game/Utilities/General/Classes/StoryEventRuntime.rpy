@@ -1082,7 +1082,6 @@ define beckyThreadList = [
             None,
             [
                 "#Becky.church_after_sermon_event_available()",
-                "#church_after_cermon_event_roll() == 3",
             ],
             None,
             "Church",
@@ -1395,7 +1394,6 @@ define lizaThreadList = [
             None,
             [
                 "#Liza.church_after_sermon_event_available()",
-                "#church_after_cermon_event_roll() == 2",
             ],
             None,
             "Church",
@@ -1647,7 +1645,7 @@ define georgettThreadList = [
             None,
             [
                 "#Georgett.church_after_sermon_event_available()",
-                "#church_after_cermon_event_roll() == 1",
+                "#int(Georgett.story_value('SawChurchAfterCermon', 0) or 0) == 0",
             ],
             None,
             "Church",

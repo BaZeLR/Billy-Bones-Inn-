@@ -3444,7 +3444,7 @@ testcase external_georgett_liza_church_after_sermon_events:
     $ threads["georgettChurchAfterSermon"] = threads["georgettChurch"]
     $ updateSave_V75()
     assert eval (all(name not in threads for name in ("georgettPortStreetClients", "georgettTavernClientRoom", "georgettChurchAfterSermon"))) timeout 5.0
-    $ external_calendar_set_fields(28, 1, 1100, 12, 0)
+    $ external_calendar_set_fields(41, 1, 1100, 12, 0)
     $ rooms.enter("Church")
     $ TodaySexEvents_Clear()
     $ Georgett.known = True
@@ -3452,7 +3452,6 @@ testcase external_georgett_liza_church_after_sermon_events:
     $ Georgett.set_story_value("churchlizaadmit", 0)
     $ TodaySexEvents_Add("georgett", 99, 99, "Priest")
     $ initStoryEventRuntime(True)
-    assert eval (church_after_cermon_event_roll() == 1) timeout 5.0
     assert eval (church_after_cermon_action_visible()) timeout 5.0
     assert eval (CheckIfSexEventExist("georgett", 99, "Priest") > 0) timeout 5.0
     assert eval (Georgett.church_after_sermon_event_available()) timeout 5.0
@@ -3462,6 +3461,11 @@ testcase external_georgett_liza_church_after_sermon_events:
     assert eval (renpy.has_label("story_georgett_church_after_sermon_look_1")) timeout 5.0
     assert eval (renpy.has_label("story_georgett_church_after_sermon_look_4")) timeout 5.0
     assert eval (not renpy.has_label("AfterCermonGeorgett")) timeout 5.0
+    assert eval (str(event_runtime.available["Church"]["after_cermon_walk"].target or "") == "story_georgett_church_after_sermon") timeout 5.0
+    run Call("ChurchAfterCermon", 1)
+    advance until screen "choice" timeout 10.0
+    assert eval ("замочную скважину" in str(scene_runtime.location_text or "")) timeout 5.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 10.0
 
     $ external_calendar_set_fields(28, 4, 1100, 12, 0)
     $ rooms.enter("Church")
@@ -3470,7 +3474,6 @@ testcase external_georgett_liza_church_after_sermon_events:
     $ Georgett.set_story_value("churchlizaadmit", 1)
     $ TodaySexEvents_Add("liza", 99, 99, "Priest")
     $ initStoryEventRuntime(True)
-    assert eval (church_after_cermon_event_roll() == 2) timeout 5.0
     assert eval (story_event_available("Church", "after_cermon_walk")) timeout 5.0
     run Call("ChurchAfterCermon", 1)
     advance until screen "choice" timeout 10.0
@@ -3490,7 +3493,6 @@ testcase external_becky_church_after_sermon_uses_daily_event_authority:
     $ TodaySexEvents_Add("becky", 99, 99, "Priest")
     $ _becky_sermon_start_minutes = int(calendar_v2.daysInGame or 0) * 1440 + calendar_v2.clock_minutes()
     $ initStoryEventRuntime(True)
-    assert eval (church_after_cermon_event_roll() == 3) timeout 5.0
     assert eval (story_event_available("Church", "after_cermon_walk")) timeout 5.0
     run Call("story_becky_church_after_sermon")
     advance until screen "choice" timeout 10.0

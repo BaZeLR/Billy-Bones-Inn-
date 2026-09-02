@@ -61,11 +61,6 @@ init python:
     def church_after_cermon_action_visible():
         return int(calendar_v2.week or 0) == 7 and church_minutes_between(11 * 60, 12 * 60 + 59)
 
-    def church_after_cermon_event_roll():
-        if int(Becky.priest_advice_stage or 0) in (1, 2):
-            return 3
-        return procedural_randint(1, 5, "church_after_cermon_event_%s" % int(current_game_day()))
-
     def church_becky_priest_talk_visible():
         return (
             church_confession_action_visible()

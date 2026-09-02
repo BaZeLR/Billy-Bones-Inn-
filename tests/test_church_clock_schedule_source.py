@@ -149,10 +149,8 @@ def test_becky_after_ceremony_is_thread_event_with_clock_conditions():
     assert '7, (11, 12), None' in becky_thread
     assert "clock_minutes" not in becky_thread
     assert '"#Becky.church_after_sermon_event_available()"' in runtime
-    assert '"#church_after_cermon_event_roll() == 3"' in becky_thread
-    assert 'def church_after_cermon_event_roll():' in _source(CHURCH_ROOM)
-    assert 'if int(Becky.priest_advice_stage or 0) in (1, 2):' in _source(CHURCH_ROOM)
-    assert 'procedural_randint(1, 5, "church_after_cermon_event_' in _source(CHURCH_ROOM)
+    assert "church_after_cermon_event_roll" not in runtime
+    assert "church_after_cermon_event_roll" not in _source(CHURCH_ROOM)
     assert "#CheckIfSexEventExist('becky', 99, 'Priest') > 0" not in becky_thread
     assert "after_sermon_stage" not in runtime
     assert "after_sermon_stage" not in becky_init
