@@ -31,15 +31,10 @@ init 6 python:
 
 
 label ForestSpring:
-    $ renpy.dynamic("_clara_forest_picture", "_forest_spawned")
+    $ renpy.dynamic("_forest_spawned")
     $ rooms.enter("ForestSpring")
     $ scene_runtime.picture = rooms.current.bg_picture or None
     $ scene_runtime.text = rooms.get("ForestSpring").descriptions[0].text
-    if str(people.location("clara") or "") == "ForestSpring":
-        $ _clara_forest_picture = Clara.forest_picture("ForestSpring")
-        if str(_clara_forest_picture or "").strip():
-            $ scene_runtime.picture = _clara_forest_picture
-        $ scene_runtime.text = scene_runtime.text + "\n\nУ родника вы замечаете Клариссу, которая явно наслаждается прохладой и тишиной этого места."
     $ scene_runtime.location_text = scene_runtime.text
     $ forest_room_set_saved_text(scene_runtime.text, rooms.current)
     $ _forest_spawned = forest_room_spawn(rooms.get("ForestSpring"))

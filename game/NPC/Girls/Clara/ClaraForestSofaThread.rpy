@@ -14,6 +14,11 @@ label story_clara_forest_follow_0:
         "Тихо проследить за Клариссой":
             pass
 
+        "Заговорить с Клариссой" if int(Clara.rel or 0) >= 5:
+            call IntClaraTalk("clara")
+            $ main_ui_end_native_scene_state()
+            return True
+
     vscene "images/clara/forest_clara_encounter_2.png"
     $ scene_runtime.text = "Кларисса долго идет через заросли, собирает в мешок травы и несколько раз проверяет след за спиной. У старой водокачки она исчезает между деревьями так уверенно, словно знает скрытую тропу наизусть. Сегодня вы не находите ни тайника, ни сообщников, но теперь знаете: ее лесные прогулки продолжатся."
     $ scene_runtime.location_text = scene_runtime.text

@@ -36,6 +36,36 @@ def test_clara_continuation_has_one_ordered_story_authority():
     assert "#bool(dog.is_alive())" in block
 
 
+def test_clara_forest_presence_is_event_owned_and_exploration_gated():
+    runtime = source("game/Utilities/General/Classes/StoryEventRuntime.rpy")
+    schedule = source("game/NPC/Schedules/clara.json")
+    forest = source("game/Forest/Forest.rpy")
+    clearing = source("game/Forest/ForestClearing.rpy")
+    spring = source("game/Forest/ForestSpring.rpy")
+    lake = source("game/Forest/ForestLake.rpy")
+    labels = source("game/NPC/Girls/Clara/ClaraForestSofaThread.rpy")
+
+    forest_thread = runtime.split('LThreadData(1, "clara", "ForestSofa"', 1)[1].split(
+        'LThreadData(2, "clara", "TavernVisit"', 1
+    )[0]
+    follow_event = forest_thread.split('"story_clara_forest_follow_0"', 1)[1].split(
+        '"story_clara_forest_horse_prank_1"', 1
+    )[0]
+    follow_label = labels.split("label story_clara_forest_follow_0:", 1)[1].split(
+        "label story_clara_forest_horse_prank_1:", 1
+    )[0]
+
+    assert '"#int(player.stats.exploration or 0) >= 100"' in follow_event
+    assert '"ForestClearing"' in follow_event
+    assert '"ForestLake"' in forest_thread
+    assert '"ForestHiddenPath"' in forest_thread
+    assert '"forest_walk"' not in schedule
+    assert 'people.location("clara")' not in "\n".join((forest, clearing, spring, lake))
+    assert 'story_event_available("ForestClearing", "clara_follow")' in clearing
+    assert '"Заговорить с Клариссой" if int(Clara.rel or 0) >= 5:' in follow_label
+    assert 'call IntClaraTalk("clara")' in follow_label
+
+
 def test_planned_entry_event_can_run_after_a_location_closes():
     events = source("game/Utilities/General/Events/events.rpy")
 

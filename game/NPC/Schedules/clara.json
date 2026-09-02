@@ -112,15 +112,6 @@
       "awake": true,
       "talkable": true,
       "priority": 200
-    },
-    {
-      "label": "forest_walk",
-      "weekdays": [1, 2, 3, 4, 5, 6],
-      "start": "12:00",
-      "end": "20:30",
-      "location": "Forest",
-      "location_probabilities": [0.30],
-      "priority":250
     }
   ]
 }

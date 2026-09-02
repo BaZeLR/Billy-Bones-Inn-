@@ -308,8 +308,6 @@ init python:
             items.append(MenuItem("Искупаться в озере", Call("ForestLakeBath")))
             if forest_has_horse():
                 items.append(MenuItem("Искупать коня", Call("ForestLakeWashHorse")))
-        if str(people.location("clara") or "") == room_code:
-            items.append(MenuItem("Кларисса", Call("IntClaraTalk", "clara")))
         for spawn_entry in forest_room_get_spawned_items(room_obj):
             item_id = str(spawn_entry.get("item_id", "") or "")
             units = max(1, int(spawn_entry.get("units", 1) or 1))

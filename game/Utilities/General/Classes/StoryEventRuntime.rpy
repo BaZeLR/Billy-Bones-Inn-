@@ -784,7 +784,9 @@ define claraThreadList = [
             [1, 2, 3, 4, 5, 6], (12, 19), None,
             1,
             None,
-            None,
+            [
+                "#int(player.stats.exploration or 0) >= 100",
+            ],
             None,
             "ForestClearing",
             "clara_follow",
