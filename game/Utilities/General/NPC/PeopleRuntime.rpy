@@ -1180,7 +1180,6 @@ init -999 python:
             return (
                 church_after_cermon_action_visible()
                 and self.can_trigger_after_sermon_event()
-                and CheckIfSexEventExist(self.code_name, 99, "Priest") > 0
             )
 
         def sex_clothing_state(self):

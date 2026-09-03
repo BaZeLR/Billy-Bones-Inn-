@@ -551,7 +551,8 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     assert "def can_trigger_after_sermon_event" in georgett
     assert "def can_trigger_after_sermon_event" in liza
     assert "def can_trigger_church_service_event" not in liza
-    assert 'CheckIfSexEventExist(self.code_name, 99, "Priest")' in people_runtime
+    after_sermon_availability = people_runtime.split("def church_after_sermon_event_available", 1)[1].split("def sex_clothing_state", 1)[0]
+    assert "CheckIfSexEventExist" not in after_sermon_availability
     assert 'CheckIfSexEventExist(self.code_name, 99, "Priest")' not in georgett
     assert 'CheckIfSexEventExist(self.code_name, 99, "Priest")' not in liza
 

@@ -3652,10 +3652,9 @@ testcase external_georgett_liza_church_after_sermon_events:
     $ Georgett.known = True
     $ Georgett.set_story_value("churchgeorgettadmit", 1)
     $ Georgett.set_story_value("churchlizaadmit", 0)
-    $ TodaySexEvents_Add("georgett", 99, 99, "Priest")
     $ initStoryEventRuntime(True)
     assert eval (church_after_cermon_action_visible()) timeout 5.0
-    assert eval (CheckIfSexEventExist("georgett", 99, "Priest") > 0) timeout 5.0
+    assert eval (CheckIfSexEventExist("georgett", 99, "Priest") <= 0) timeout 5.0
     assert eval (Georgett.church_after_sermon_event_available()) timeout 5.0
     assert eval (threads["georgettChurch"].checkActive() and not threads["georgettChurch"].done[4]) timeout 5.0
     assert eval (story_event_available("Church", "after_cermon_walk")) timeout 5.0
@@ -3674,13 +3673,14 @@ testcase external_georgett_liza_church_after_sermon_events:
     $ TodaySexEvents_Clear()
     $ Georgett.set_story_value("churchgeorgettadmit", 0)
     $ Georgett.set_story_value("churchlizaadmit", 1)
-    $ TodaySexEvents_Add("liza", 99, 99, "Priest")
     $ initStoryEventRuntime(True)
+    assert eval (CheckIfSexEventExist("liza", 99, "Priest") <= 0) timeout 5.0
     assert eval (story_event_available("Church", "after_cermon_walk")) timeout 5.0
     run Call("ChurchAfterCermon", 1)
     advance until screen "choice" timeout 10.0
     assert eval ("замочную скважину" in str(scene_runtime.location_text or "")) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (CheckIfSexEventExist("liza", 99, "Priest") <= 0) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Лизетту" in str(scene_runtime.location_text or "")) timeout 10.0
+    assert eval (CheckIfSexEventExist("liza", 99, "Priest") <= 0) timeout 5.0
     assert eval (not hasattr(Liza, "after_sermon_stage")) timeout 5.0
     assert eval ("Лизетту" in str(scene_runtime.location_text or "")) timeout 5.0
 
