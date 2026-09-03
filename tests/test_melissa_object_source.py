@@ -7,6 +7,7 @@ MELISSA_TALK = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissa
 MELISSA_DRESS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissaDressChange.rpy"
 MELISSA_SEX = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "IntMelissaSex.rpy"
 MELISSA_EVENTS = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "MelissaEvents.rpy"
+MELISSA_EVENT_MODEL = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Melissa" / "MelissaEventModel.rpy"
 WERECAT_QUEST = PROJECT_ROOT / "game" / "NPC" / "Secondary" / "MelissaWerecatQuest.rpy"
 HOUSEHOLD_EVENTS = PROJECT_ROOT / "game" / "Inn" / "HouseholdRuntimeEvents.rpy"
 MELISSA_ROOM = PROJECT_ROOT / "game" / "Inn" / "TavernMelissaRoom.rpy"
@@ -581,6 +582,7 @@ def test_melissa_bat_progress_uses_the_story_thread_directly():
 def test_melissa_booklet_aftermath_is_one_ordered_thread_flow():
     runtime_source = (PROJECT_ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
     event_source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")
+    event_model_source = MELISSA_EVENT_MODEL.read_text(encoding="utf-8-sig")
     talk_source = MELISSA_TALK.read_text(encoding="utf-8-sig")
     amanda_room_source = (PROJECT_ROOT / "game/Inn/TavernAmandaRoom.rpy").read_text(encoding="utf-8-sig")
     migration_source = (PROJECT_ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
@@ -601,5 +603,15 @@ def test_melissa_booklet_aftermath_is_one_ordered_thread_flow():
     assert '"Попросить Мелиссу прийти завтра на общий завтрак"' in talk_source
     assert 'call checkTriggers(rooms.current_code, "melissa_talk", 0)' in talk_source
     assert "tavern_amanda_room_locked_for_melissa_booklet" not in amanda_room_source
+    assert 'LThreadData(0, "melissa", "AmandaRoomShare"' in runtime_source
+    assert "MelissaAmandaRoomShare," in runtime_source
+    assert "class MelissaAmandaRoomShareEvent(Event):" in event_model_source
+    assert '"TavernAmandaRoom"' in event_model_source
+    assert '"melissa_amanda_locked"' in event_model_source
+    assert "self.repeatable = True" in event_model_source
+    assert 'story_event_available("TavernAmandaRoom", "melissa_amanda_locked")' in amanda_room_source
+    assert 'call checkTriggers("TavernAmandaRoom", "melissa_amanda_locked", 0)' in amanda_room_source
+    assert "label story_melissa_amanda_room_locked:" in event_source
+    assert "Дверь заперта изнутри" in event_source
     assert "breakfast_invited" not in runtime_source + event_source + migration_source
     assert "def updateSave_V72():" in migration_source

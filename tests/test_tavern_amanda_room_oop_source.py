@@ -104,6 +104,12 @@ def test_called_morning_episode_returns_without_overriding_schedule_location():
     assert 'Amanda.location = "TavernAmandaRoom"' not in block
     assert "tavern_amanda_morning_window_episode_ready" not in SOURCE
     assert "attic_window_morning_day" not in SOURCE
+    assert 'main_ui_begin_native_scene_state("Аманда у окна")' in block
+    assert "vscene _amanda_room_picture" in block
+    assert block.count("menu:") == 2
+    assert '"Продолжить":' in block
+    assert '"Оставить Аманду собираться":' in block
+    assert "main_ui_end_native_scene_state()" in block
     assert "main_ui_runtime.action_items = tavern_amanda_room_action_items()" in block
 
 

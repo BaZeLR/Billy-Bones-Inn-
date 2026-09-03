@@ -178,7 +178,7 @@ init python:
             return procedural_choice(loadable, key="procedural:NPC/Girls/Clara/InitClara.rpy:clara_forest_picture:%s" % location_key) if len(loadable) > 0 else ""
 
         def visible_at_friday_dance(self):
-            return CheckIfDanceExist("amanda", "legare", rooms.get("FridayDance").dance_count) <= 0
+            return str(people.location(self.code_name) or "") == "FridayDance"
 
         def set_day_location_override(self, location_code=""):
             location_key = str(location_code or "").strip()
@@ -205,6 +205,8 @@ init python:
             return int(player_charisma_breakdown().get("charisma", 0) or 0) >= 70 and int(self.rel or 0) >= 5
 
         def tavern_visit_active(self):
+            if int(threads["claraTavernVisit"].num or 0) not in (0, 1, 2):
+                return False
             clock_value = (int(calendar_v2.hour or 0) * 60 + int(calendar_v2.minute or 0)) % 1440
             if clock_value < 720 or clock_value > 1079:
                 return False
@@ -212,6 +214,9 @@ init python:
             if week_value == 7:
                 return False
             return ((current_game_day() + week_value) % 4) == 0
+
+        def melissa_room_visit_active(self):
+            return int(threads["claraTavernVisit"].num or 0) in (3, 4, 5)
 
         def can_receive_gifts(self):
             update_stat_state()

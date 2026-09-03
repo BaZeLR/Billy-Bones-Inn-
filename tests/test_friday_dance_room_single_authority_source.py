@@ -223,3 +223,13 @@ def test_amanda_legare_dance_builder_uses_label_local_scratch():
         assert retired_name not in dance
         assert '"%s"' % retired_name in migration
     assert "def updateSave_V44():" in migration
+
+
+def test_daily_plan_builds_friday_dances_and_pair_button_uses_actual_schedules():
+    create_events = (GAME / "Inn" / "CreateTavernEvents.rpy").read_text(encoding="utf-8-sig")
+    friday = FRIDAY_DANCE.read_text(encoding="utf-8-sig")
+    clara = (GAME / "NPC" / "Girls" / "Clara" / "InitClara.rpy").read_text(encoding="utf-8-sig")
+
+    assert "call AmandaLegareDanceSequence" in create_events
+    assert 'return str(people.location(self.code_name) or "") == "FridayDance"' in clara
+    assert 'Clara.visible_at_friday_dance() and str(people.location("melissa") or "") == "FridayDance"' in friday

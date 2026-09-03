@@ -132,7 +132,7 @@ label FridayDance(add_dance_phrase_tmp=""):
                         call checkTriggers("FridayDance", "amanda_dance_mc", 0)
                 "Найти Бекки Блэнкеншип" if story_event_available("FridayDance", "becky_dance_mc"):
                     call checkTriggers("FridayDance", "becky_dance_mc", 0)
-                "Заметить Мелиссу и Клариссу среди танцующих" if rooms.get("FridayDance").dance_count < 5 and rooms.get("FridayDance").step == 0 and Clara.visible_at_friday_dance():
+                "Заметить Мелиссу и Клариссу среди танцующих" if rooms.get("FridayDance").dance_count < 5 and rooms.get("FridayDance").step == 0 and Clara.visible_at_friday_dance() and str(people.location("melissa") or "") == "FridayDance":
                     $ rooms.get("FridayDance").dance_count += 1
                     if Clara.can_start_social_events():
                         $ result = "Среди танцующих вы замечаете Мелиссу и Клариссу. Девушки смеются, кружатся под музыку и явно чувствуют себя на празднике совершенно свободно. Кларисса, заметив ваш взгляд, на миг улыбается вам поверх плеча подруги."

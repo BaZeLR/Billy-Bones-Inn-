@@ -92,6 +92,9 @@ define melissaCourtshipBaseConditions = [
 ]
 
 define melissaThreadList = [
+    LThreadData(0, "melissa", "AmandaRoomShare", None, [[
+        MelissaAmandaRoomShare,
+    ]], highlight=False, threaded=False),
     LThreadData(0, "melissa", "RevealingDressRequest", None, [[
         (
             "MelissaDressRequestEvent",

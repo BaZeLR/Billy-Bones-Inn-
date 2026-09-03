@@ -2684,6 +2684,93 @@ testcase external_debug_builder_room_visual_surfaces:
 '''
 
 
+REGRESSION_RESTORE_CHECKS = r'''
+testcase external_melissa_amanda_locked_room_event:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 23, 0)
+    $ external_calendar_set_weekday(1)
+    $ threads["melissaBatProblem"].advanceTo(6, force_active=True)
+    $ Melissa.temp_room_code = "TavernAmandaRoom"
+    $ Melissa.drawings_found = False
+    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernAmandaRoom", start_minute=0, end_minute=1440, awake=False, talkable=False, priority=999)])
+    $ event_runtime.fired_day = -1
+    $ event_runtime.fired_keys_today = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernAmandaRoom", "melissa_amanda_locked")) timeout 5.0
+    $ rooms.enter("TavernUpstairs")
+    run Call("TavernAmandaRoomDoor")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event") timeout 5.0
+    assert eval ("Дверь заперта изнутри" in str(scene_runtime.text or "") and "Аманды и Мелиссы" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") != "" and renpy.loadable(str(scene_runtime.picture or ""))) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernUpstairs" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (story_event_available("TavernAmandaRoom", "melissa_amanda_locked")) timeout 5.0
+
+testcase external_amanda_morning_window_event_keeps_media_until_continue:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 6, 0)
+    $ external_calendar_set_weekday(1)
+    $ rooms.enter("TavernAmandaRoom")
+    $ threads["melissaBatProblem"].advanceTo(6, force_active=True)
+    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernAmandaRoom", start_minute=0, end_minute=1440, awake=True, talkable=True, priority=999)])
+    $ Amanda.rel = 0
+    $ Amanda.openness = 0
+    $ Amanda.corruption = 0
+    $ Amanda.var["suckyou"] = 0
+    $ Amanda.var["fuckyou"] = 0
+    $ _amanda_morning_entry = _ensure_household_morning_state("amanda")
+    $ _amanda_morning_entry["issue"] = "sleepy"
+    $ _amanda_morning_entry["resolved"] = 0
+    $ _amanda_morning_entry["indecent"] = 0
+    assert eval (household_morning_issue_type("amanda") == "sleepy") timeout 5.0
+    $ event_runtime.fired_day = -1
+    $ event_runtime.fired_keys_today = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernAmandaRoom", "amanda_morning_window")) timeout 5.0
+    run Call("checkTriggers", "TavernAmandaRoom", "amanda_morning_window", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and "Аманда не спит" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/amanda/Room/wakedress.jpg") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Оставить Аманду собираться" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval ("Аманда не спит" not in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") != "event") timeout 20.0
+    assert eval (str(scene_runtime.text or "") == str(tavern_amanda_room_main_text(rooms.get("TavernAmandaRoom"), tavern_amanda_room_sleep_dress()) or "")) timeout 5.0
+
+testcase external_clara_room_schedule_and_friday_dance_restore:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+
+    $ npc_interval_schedule_load_all(True)
+    $ threads["claraTavernVisit"].advanceTo(3, force_active=True)
+    $ external_calendar_set_weekday(7)
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 20, 0)
+    assert eval (Clara.melissa_room_visit_active()) timeout 5.0
+    assert eval (str(people.location("clara") or "") == "TavernMelissaRoom" and str(people.location("melissa") or "") == "TavernMelissaRoom") timeout 5.0
+    assert eval (str(people.schedule_state("clara").get("label", "") or "") == "melissa_room_visit") timeout 5.0
+    assert eval (str(people.schedule_state("melissa").get("label", "") or "") == "clara_room_visit") timeout 5.0
+
+    $ external_calendar_set_weekday(5)
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 6, 0)
+    $ Amanda.legare_affection = 8
+    $ Amanda.corruption = 20
+    $ GirlDance_Clear()
+    run Call("CreateTavernEvents")
+    assert eval (CheckIfDanceExist("amanda", "legare", 0) > 0) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 20, 0)
+    assert eval (not Clara.visible_at_friday_dance()) timeout 5.0
+    assert eval (not (Clara.visible_at_friday_dance() and str(people.location("melissa") or "") == "FridayDance")) timeout 5.0
+'''
+
+
 AMANDA_ROOM_NIGHT_EVENT_CHECKS = r'''
 testcase external_amanda_room_state_picture_series_and_wake_images:
     run Jump("Intro")
@@ -5872,7 +5959,9 @@ testcase external_hour_based_room_and_npc_schedule_adjustment:
     assert eval (str(people.location("clara") or "") in ("FridayDance", "WineStore") and str(people.schedule_state("clara").get("label", "") or "") == "friday_dance") timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 22, 0)
     $ external_calendar_set_weekday(5)
+    $ threads["claraTavernVisit"].advanceTo(3, force_active=True)
     assert eval (str(people.location("melissa") or "") == "TavernMelissaRoom" and str(people.location("clara") or "") == "TavernMelissaRoom") timeout 5.0
+    $ threads["claraTavernVisit"].advanceTo(0, force_active=True)
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 30)
     $ external_calendar_set_weekday(2)
     assert eval (str(people.location("irma") or "") == "DressShop" and bool(people.schedule_state("irma").get("talkable", False)) == True) timeout 5.0
@@ -6449,12 +6538,11 @@ testcase external_ellona_temple_sunday_story_event:
     assert eval (story_event_available("EllonaTemple", "enter")) timeout 5.0
     assert eval (str(event_runtime.available["EllonaTemple"]["enter"].target or "") == "story_ellona_temple_sunday_stories") timeout 5.0
     run Jump("EllonaTemple")
-    advance until screen "say" timeout 20.0
+    advance until screen "choice" timeout 20.0
     assert eval (renpy.get_screen("main_ui") is not None and str(main_ui_runtime.mode or "") == "event") timeout 5.0
-    assert eval (str(scene_runtime.picture or "") == "images/ellona/Fran5.png" and str(scene_runtime.text or "").startswith("Во дворике храма Франческа сегодня не одна")) timeout 5.0
-    click pos (960, 560) until eval (renpy.get_screen("say") is not None and "...и звали их пионеры..." in str(scene_runtime.text or "")) timeout 20.0
-    click pos (960, 560) until eval (renpy.get_screen("say") is not None and str(scene_runtime.text or "") == "Вы решили не мешать Франческе.") timeout 20.0
-    click pos (960, 560) until screen "choice" timeout 20.0
+    assert eval (renpy.get_screen("say") is None and str(scene_runtime.picture or "") == "images/ellona/Fran5.png" and str(scene_runtime.text or "").startswith("Во дворике храма Франческа сегодня не одна") and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("...и звали их пионеры..." in str(scene_runtime.text or "") and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.text or "") == "Вы решили не мешать Франческе." and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Осмотреться в храме"]) timeout 20.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Осмотреться в храме"]) timeout 5.0
     assert eval (str(scene_runtime.picture or "") == "images/ellona/Fran5.png" and str(scene_runtime.text or "") == "Вы решили не мешать Франческе.") timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
@@ -7879,7 +7967,7 @@ def build_test_rpy() -> str:
     )
     return TEST_HEADER + "".join(
         ROOM_CHECK_TEMPLATE.format(room_name=room_name) for room_name in ROOM_LABELS
-    ) + "\n\n" + SHOP_ACTION_CHECKS + "\n\n" + TAVERN_REPORT_STATE_CHECKS + "\n\n" + TAILOR_PURCHASE_FLOW_CHECKS + "\n\n" + DOG_ENTITY_ACTION_CHECKS + "\n\n" + BACKYARD_BARREL_OBJECT_CHECKS + "\n\n" + GROCERY_STORE_OBJECT_PURCHASE_CHECKS + "\n\n" + FIGHT_SYSTEM_RUNTIME_CHECKS + "\n\n" + SMALLTALK_MAIN_UI_CHECKS + "\n\n" + PORT_STREETS_FLOW_CHECKS + "\n\n" + CALENDAR_TIME_CHECKS + "\n\n" + ROOM_REGISTRY_SAVE_CHECKS + "\n\n" + PLAYER_SAVE_PARITY_CHECKS + "\n\n" + TAVERN_HELP_FLOW_CHECKS + "\n\n" + MEDIA_RESOLUTION_CHECKS + "\n\n" + HARASSMENT_IMAGE_CHECKS + "\n\n" + GIRL_OBJECT_RUNTIME_CHECKS + "\n\n" + ACTUAL_ACTION_BUTTON_CLICK_CHECKS + "\n\n" + ACTUAL_RANDOM_TOWN_CLICK_CHECKS + "\n\n" + TARGETED_CURRENT_BUG_CHECKS + "\n\n" + DEBUG_BUILDER_ROOM_CHECKS + "\n\n" + AMANDA_ROOM_NIGHT_EVENT_CHECKS + "\n\n" + MY_ROOM_RECIPE_BOOK_ACTION_CHECKS + "\n\n" + MY_ROOM_WINDOW_ACTION_CHECKS + "\n\n" + TAVERN_ROOM_PICTURE_STATE_CHECKS + "\n\n" + MELISSA_BATS_DRAWINGS_CHECKS + "\n\n" + MELISSA_WERECAT_FOREST_ACTION_CHECKS + "\n\n" + CHURCH_LINK_CHECKS + "\n\n" + CHURCH_AFTER_SERMON_EVENT_CHECKS + "\n\n" + CLARA_MELISSA_TAVERN_BAR_GOSSIP_CHECKS + "\n\n" + FRIDAY_DANCE_AMANDA_CHECKS + "\n\n" + SANDRA_NIGHT_THANKS_CHECKS + "\n\n" + MELISSA_SEX_ENGINE_CHECKS + "\n\n" + AMANDA_SEX_ENGINE_CHECKS + "\n\n" + PLAYER_INTIMACY_STATE_CHECKS + "\n\n" + CLARA_AMANDA_SCHEDULE_FLOW_CHECKS + "\n\n" + HOUSEHOLD_AI_EVENT_CHECKS + "\n\n" + all_room_action_click_checks + "\n\n" + BECKY_HOME_GUEST_CHECKS
+    ) + "\n\n" + SHOP_ACTION_CHECKS + "\n\n" + TAVERN_REPORT_STATE_CHECKS + "\n\n" + TAILOR_PURCHASE_FLOW_CHECKS + "\n\n" + DOG_ENTITY_ACTION_CHECKS + "\n\n" + BACKYARD_BARREL_OBJECT_CHECKS + "\n\n" + GROCERY_STORE_OBJECT_PURCHASE_CHECKS + "\n\n" + FIGHT_SYSTEM_RUNTIME_CHECKS + "\n\n" + SMALLTALK_MAIN_UI_CHECKS + "\n\n" + PORT_STREETS_FLOW_CHECKS + "\n\n" + CALENDAR_TIME_CHECKS + "\n\n" + ROOM_REGISTRY_SAVE_CHECKS + "\n\n" + PLAYER_SAVE_PARITY_CHECKS + "\n\n" + TAVERN_HELP_FLOW_CHECKS + "\n\n" + MEDIA_RESOLUTION_CHECKS + "\n\n" + HARASSMENT_IMAGE_CHECKS + "\n\n" + GIRL_OBJECT_RUNTIME_CHECKS + "\n\n" + ACTUAL_ACTION_BUTTON_CLICK_CHECKS + "\n\n" + ACTUAL_RANDOM_TOWN_CLICK_CHECKS + "\n\n" + TARGETED_CURRENT_BUG_CHECKS + "\n\n" + DEBUG_BUILDER_ROOM_CHECKS + "\n\n" + REGRESSION_RESTORE_CHECKS + "\n\n" + AMANDA_ROOM_NIGHT_EVENT_CHECKS + "\n\n" + MY_ROOM_RECIPE_BOOK_ACTION_CHECKS + "\n\n" + MY_ROOM_WINDOW_ACTION_CHECKS + "\n\n" + TAVERN_ROOM_PICTURE_STATE_CHECKS + "\n\n" + MELISSA_BATS_DRAWINGS_CHECKS + "\n\n" + MELISSA_WERECAT_FOREST_ACTION_CHECKS + "\n\n" + CHURCH_LINK_CHECKS + "\n\n" + CHURCH_AFTER_SERMON_EVENT_CHECKS + "\n\n" + CLARA_MELISSA_TAVERN_BAR_GOSSIP_CHECKS + "\n\n" + FRIDAY_DANCE_AMANDA_CHECKS + "\n\n" + SANDRA_NIGHT_THANKS_CHECKS + "\n\n" + MELISSA_SEX_ENGINE_CHECKS + "\n\n" + AMANDA_SEX_ENGINE_CHECKS + "\n\n" + PLAYER_INTIMACY_STATE_CHECKS + "\n\n" + CLARA_AMANDA_SCHEDULE_FLOW_CHECKS + "\n\n" + HOUSEHOLD_AI_EVENT_CHECKS + "\n\n" + all_room_action_click_checks + "\n\n" + BECKY_HOME_GUEST_CHECKS
 
 
 def project_root() -> Path:
@@ -8019,6 +8107,9 @@ def main() -> int:
         "--only",
         action="append",
         choices=[
+            "external_melissa_amanda_locked_room_event",
+            "external_amanda_morning_window_event_keeps_media_until_continue",
+            "external_clara_room_schedule_and_friday_dance_restore",
             "external_room_clock_clicks",
             "external_shop_action_logic",
             "external_tavern_report_state_defaults",

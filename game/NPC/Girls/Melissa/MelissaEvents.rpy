@@ -336,6 +336,21 @@ label story_melissa_bat_problem_fall:
     return True
 
 
+label story_melissa_amanda_room_locked:
+    $ main_ui_begin_native_scene_state("За дверью комнаты Аманды")
+    show screen main_ui
+    $ scene_runtime.picture = tavern_amanda_room_picture(tavern_amanda_room_sleep_dress())
+    if str(scene_runtime.picture or "").strip():
+        vscene scene_runtime.picture
+    $ scene_runtime.text = "Дверь заперта изнутри. За ней слышны приглушенные голоса Аманды и Мелиссы, тихий шепот, возня и короткие смешки. Похоже, девушки не собираются открывать и хотят, чтобы их оставили одних."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Вернуться в коридор":
+            pass
+    $ main_ui_end_native_scene_state()
+    return True
+
+
 label story_melissa_bat_problem_breakfast_invite:
     show screen main_ui
     vscene MelissaStaticData.image_path("portrait", "default")

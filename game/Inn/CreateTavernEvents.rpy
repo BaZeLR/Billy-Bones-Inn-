@@ -3,4 +3,5 @@
 # ================================================================================
 label CreateTavernEvents:
     $ tavern_work_build_daily_plan()
+    call AmandaLegareDanceSequence
     return

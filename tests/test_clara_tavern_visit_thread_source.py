@@ -67,16 +67,27 @@ def test_clara_visit_conditions_use_clock_schedule_and_classes():
     assert "Clara.sync_clara_maps()" not in labels
     assert "Clara.change_social(" in labels
     assert "def tavern_visit_active(self):" in clara_init
+    assert 'threads["claraTavernVisit"].num or 0) not in (0, 1, 2)' in clara_init
     assert "return ((current_game_day() + week_value) % 4) == 0" in clara_init
+    assert "def melissa_room_visit_active(self):" in clara_init
+    assert 'threads["claraTavernVisit"].num or 0) in (3, 4, 5)' in clara_init
     assert "def clara_tavern_visit_active" not in clara_init
     assert "def clara_melissa_visit_active" not in clara_init
     assert "return bool(Clara.tavern_visit_active())" in schedule_rules
+    assert "return bool(Clara.melissa_room_visit_active())" in schedule_rules
     for schedule_path in (CLARA_SCHEDULE, MELISSA_SCHEDULE):
         schedule = read(schedule_path)
         assert '"rule": "clara_tavern_visit"' in schedule
+        assert '"rule": "clara_melissa_room_visit"' in schedule
         assert '"location": "TavernMain"' in schedule
         assert '"start": "12:00"' in schedule
         assert '"end": "17:59"' in schedule
+        assert '"weekdays": [1, 2, 3, 4, 5, 6, 7]' in schedule
+        assert '"start": "16:00"' in schedule
+        assert '"end": "22:59"' in schedule
+        assert '"priority": 860' in schedule
+        assert '"clarissa_visit_room_window"' not in schedule
+        assert '"evening_tavern_late_event"' not in schedule
 
 
 def test_room_files_no_longer_own_clara_visit_state():

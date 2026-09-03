@@ -38,6 +38,7 @@ def test_ellona_sunday_event_uses_main_ui_event_text_and_native_continue():
     assert 'main_ui_begin_native_scene_state("Воскресные истории")' in source
     assert 'vscene "images/ellona/Fran5.png"' in source
     assert 'show screen main_ui' in source
+    assert source.count('"Продолжить"') == 2
     assert '"Осмотреться в храме"' in source
     assert 'main_ui_end_native_scene_state()' in source
     assert source.count('"[scene_runtime.text]"') == 0

@@ -187,14 +187,17 @@
       }
     },
     {
-      "label": "clarissa_visit_room_window",
-      "weekdays": [5, 6, 7],
-      "start": "22:00",
+      "label": "clara_room_visit",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "16:00",
       "end": "22:59",
       "location": "TavernMelissaRoom",
       "awake": true,
-      "talkable": true,
-      "priority": 780
+      "talkable": false,
+      "priority": 860,
+      "condition": {
+        "rule": "clara_melissa_room_visit"
+      }
     }
   ]
 }

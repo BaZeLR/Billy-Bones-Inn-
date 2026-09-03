@@ -583,8 +583,8 @@ def test_amanda_legare_thread_is_wired_to_event_runtime():
     assert "label story_amanda_legare_dance_4:" in legare
     amanda_init = _source(AMANDA_INIT)
     assert "def legare_claims_first_friday_dance(self):" in amanda_init
-    assert 'str(people.location("alber") or "") == "FridayDance"' in amanda_init
-    assert 'str(people.location("clara") or "") != "FridayDance"' in amanda_init
+    assert 'str(people.location("alber", calendar_v2.week, dance_minute) or "") == "FridayDance"' in amanda_init
+    assert 'str(people.location("clara", calendar_v2.week, dance_minute) or "") != "FridayDance"' in amanda_init
     assert "force_legare_first_dance = Amanda.legare_claims_first_friday_dance()" in legare
     assert "if force_legare_first_dance and dance_index == 0:" in legare
     assert "GirlDance_Add('amanda', 'legare', 1" in legare

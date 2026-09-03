@@ -49,6 +49,7 @@ def test_create_tavern_events_has_no_forced_waitress_fallback():
     source = read_rel("game/Inn/CreateTavernEvents.rpy")
 
     assert "$ tavern_work_build_daily_plan()" in source
+    assert "call AmandaLegareDanceSequence" in source
     assert ("New" + "Events") not in source
     assert "if _total_random <= 0" not in source
 

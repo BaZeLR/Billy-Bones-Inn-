@@ -273,6 +273,9 @@ label TavernAmandaRoom:
 
 label TavernAmandaRoomDoor:
     $ rooms.enter("TavernUpstairs")
+    if story_event_available("TavernAmandaRoom", "melissa_amanda_locked"):
+        call checkTriggers("TavernAmandaRoom", "melissa_amanda_locked", 0)
+        jump TavernUpstairs
     $ scene_runtime.picture = rooms.current.bg_picture or None
     $ scene_runtime.text = "Вы стоите перед дверью комнаты Аманды."
     $ scene_runtime.location_text = scene_runtime.text
@@ -413,31 +416,51 @@ label TavernAmandaRoomWindowLook:
 label story_amanda_room_morning_window_0:
     $ renpy.dynamic("_amanda_window_outcome", "_amanda_sleep_dress", "_amanda_room_picture")
     $ _amanda_window_outcome = tavern_amanda_morning_window_outcome()
+    $ _amanda_sleep_dress = tavern_amanda_room_sleep_dress()
+    $ main_ui_begin_native_scene_state("Аманда у окна")
+    show screen main_ui
+    $ _amanda_room_picture = tavern_amanda_room_wake_picture(_amanda_sleep_dress)
+    $ scene_runtime.picture = _amanda_room_picture
+    vscene _amanda_room_picture
     $ calendar_v2.advance_minutes(20)
     $ household_clear_morning_issue("amanda")
     $ scene_runtime.text = "Аманда не спит. Вы застаете ее у окна ровно в тот момент, когда она резко отдергивает руку от занавески и пытается сделать вид, будто просто смотрела во двор.\n\n\"Ну что, Аманда? Кто у нас теперь извращенец?\" спрашиваете вы.\n\nОна вспыхивает, но не уходит от ответа: \"Ничего не могу поделать... иногда так зудит, что хоть на стену лезь.\" Вы спокойно отвечаете: \"Могу помочь, если хочешь.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
     if _amanda_window_outcome == "oral":
         $ player.intimacy.set_arousal(max(35, int(player.intimacy.arousal_value() or 0)))
         $ Amanda.set_arousal(max(35, Amanda.arousal_value()))
         $ Amanda.change_social(open_delta=1, corruption_delta=2)
-        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_end_native_scene_state()
         call IntAmandaSex("amanda", "home", "minet")
+        $ main_ui_begin_native_scene_state("Аманда у окна")
+        show screen main_ui
+        $ scene_runtime.picture = _amanda_room_picture
+        vscene _amanda_room_picture
         $ scene_runtime.text = "После этого Аманда уже не спорит насчет окна. Она только быстро приводит себя в порядок и, все еще краснея, просит не разносить эту сцену по всему дому."
     elif _amanda_window_outcome == "mutual":
         $ player.intimacy.set_arousal(max(30, int(player.intimacy.arousal_value() or 0) + 10))
         $ Amanda.add_arousal(10, 100)
         $ Amanda.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда долго смотрит на вас, потом сама делает шаг ближе. Дальше все остается на грани игры и взаимной смелости: достаточно, чтобы обоим стало трудно делать вид, будто это обычное утро, но недостаточно, чтобы она потом могла назвать это чем-то большим.\n\nЧерез несколько минут она уже торопливо поправляет платье и шепчет, что на сегодня с нее хватит."
+        $ scene_runtime.text = "Аманда долго смотрит на вас, потом сама делает шаг ближе. Дальше все остается на грани игры и взаимной смелости: достаточно, чтобы обоим стало трудно делать вид, будто это обычное утро, но недостаточно, чтобы она потом могла назвать это чем-то большим.\n\nЧерез несколько минут она уже торопливо поправляет платье и шепчет, что на сегодня с нее хватит."
     else:
         $ Amanda.change_social(friend_delta=1)
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n\nАманда кусает губу, но все же качает головой. \"Не сейчас. Увидимся позже, если ты умеешь держать язык за зубами.\" На этом она быстро собирается и делает вид, будто вы разбудили ее самым обычным способом."
+        $ scene_runtime.text = "Аманда кусает губу, но все же качает головой. \"Не сейчас. Увидимся позже, если ты умеешь держать язык за зубами.\" На этом она быстро собирается и делает вид, будто вы разбудили ее самым обычным способом."
     if int(Amanda.attic_window_favor_stage or 0) == 0:
         $ Amanda.attic_window_favor_stage = 1
     $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Оставить Аманду собираться":
+            pass
     call stat
+    $ main_ui_end_native_scene_state()
     $ _amanda_sleep_dress = tavern_amanda_room_sleep_dress()
     $ _amanda_room_picture = tavern_amanda_room_picture(_amanda_sleep_dress)
     $ scene_runtime.picture = _amanda_room_picture or ""
+    if str(_amanda_room_picture or "").strip():
+        vscene _amanda_room_picture
     $ scene_runtime.text = tavern_amanda_room_main_text(rooms.get("TavernAmandaRoom"), _amanda_sleep_dress)
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_items = tavern_amanda_room_action_items()

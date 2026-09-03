@@ -77,16 +77,19 @@
         "talkable": true,
         "priority": 760
       },
-      {
-        "label": "evening_tavern_late_event",
-        "weekdays": [ 5, 6, 7],
-        "start": "22:00",
-        "end": "22:59",
-        "location": "TavernMelissaRoom",
-        "location_probabilities": [1.0],
-        "awake": true,
-        "talkable": false
-      },
+    {
+      "label": "melissa_room_visit",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "16:00",
+      "end": "22:59",
+      "location": "TavernMelissaRoom",
+      "awake": true,
+      "talkable": false,
+      "priority": 860,
+      "condition": {
+        "rule": "clara_melissa_room_visit"
+      }
+    },
     {
       "label": "paintings_confession",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],

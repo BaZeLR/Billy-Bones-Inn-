@@ -52,6 +52,8 @@ init -50 python:
             return bool(npc_schedule_becky_sandra_kitchen_visit_active())
         if rule_name == "clara_tavern_visit":
             return bool(Clara.tavern_visit_active())
+        if rule_name == "clara_melissa_room_visit":
+            return bool(Clara.melissa_room_visit_active())
         if rule_name == "liza_church_with_georgett_visible":
             return bool(Liza.can_trigger_after_sermon_event())
         if rule_name == "georgett_church_visible":

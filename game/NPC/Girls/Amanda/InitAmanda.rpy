@@ -484,7 +484,11 @@ init python:
             return self.rel > 8 and daily_events.exists("", "BuyDressTom") == 0 and daily_events.exists("amanda", "BuyDress") == 0 and int(calendar_v2.week or 0) != 6
 
         def legare_claims_first_friday_dance(self):
-            return str(people.location("alber") or "") == "FridayDance" and str(people.location("clara") or "") != "FridayDance"
+            dance_minute = 19 * 60
+            return (
+                str(people.location("alber", calendar_v2.week, dance_minute) or "") == "FridayDance"
+                and str(people.location("clara", calendar_v2.week, dance_minute) or "") != "FridayDance"
+            )
 
         def dress_change_other_saw_text(self, girl_name="amanda", agreed_to_redress=0):
             if int(agreed_to_redress or 0) != 1 or self.corruption < 50:
