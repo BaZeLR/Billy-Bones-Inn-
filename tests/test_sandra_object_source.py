@@ -329,18 +329,23 @@ def test_sandra_post_sex_breakfast_talk_uses_story_thread_not_mirror_flag():
 
 
 def test_sandra_weekly_visit_uses_canonical_portraits_and_native_event_beats():
+    init_source = SANDRA_INIT.read_text(encoding="utf-8-sig")
     source = SANDRA_EVENTS.read_text(encoding="utf-8-sig")
-    pictures = source.split("SANDRA_WEEKLY_EVALUATION_PICTURES = (", 1)[1].split(")", 1)[0]
     scene = source.split("label SandraWeeklyEvaluationScene", 1)[1].split(
         "label sandraWeeklyEvaluation_0", 1
     )[0]
+    night_thanks = source.split("label TavernSandraNightThanksScene:", 1)[1]
 
-    assert '"images/sandra/portrait2.jpg"' in pictures
-    assert '"images/sandra/portrait3.jpg"' in pictures
-    assert '"images/sandra/portrait4.jpg"' in pictures
-    assert "player_room_sandra" not in pictures
+    assert '"standing": ["images/sandra/player_room_sandra_0.jpg"]' in init_source
+    assert '"leaning": ["images/sandra/thanks/player_room_1.jpg"]' in init_source
+    assert '"thanks": ["images/sandra/thanks/sandra_thanks.webm"]' in init_source
+    assert 'SandraStaticData.image_path("weekly_evaluation", _sandra_media_key)' in scene
+    assert '("standing", "leaning", "leaning", "thanks")' in scene
     assert "main_ui_begin_native_scene_state(\"Визит Сандры\")" in scene
     assert "vscene _sandra_picture" in scene
+    assert "tractir_apply_sandra_secured_future()" in scene
+    assert "call TractirShowPendingAchievements" in scene
+    assert "tractir_apply_sandra_secured_future()" not in night_thanks
     assert scene.count('"Продолжить":') >= 4
     assert "call ShowImage" not in scene
 

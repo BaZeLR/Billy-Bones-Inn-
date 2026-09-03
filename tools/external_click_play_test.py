@@ -1714,13 +1714,27 @@ testcase external_sandra_weekly_visit_native_beats:
     $ player.chores.last_score = 0
     run Call("SandraWeeklyEvaluationScene", 0, "TavernMain")
     advance until screen "choice" timeout 20.0
-    assert eval (str(scene_runtime.picture or "") == "images/sandra/portrait2.jpg") timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/sandra/player_room_sandra_0.jpg") timeout 5.0
     assert eval ("осторожный стук" in str(scene_runtime.text or "")) timeout 5.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("держал хозяйство" in str(scene_runtime.text or "")) timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Если вечером захочешь" in str(scene_runtime.text or "")) timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("День уже начинается" in str(scene_runtime.text or "")) timeout 10.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") != "event" and renpy.get_screen("choice") is None) timeout 10.0
+    run Call("SandraWeeklyEvaluationScene", 1, "TavernMain")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/sandra/thanks/player_room_1.jpg") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Опять вытянул неделю" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Вечером можешь зайти" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("не опаздывай" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") != "event" and renpy.get_screen("choice") is None) timeout 10.0
+    $ tractir_progress.sandra_secured_future_day = -1
+    $ tractir_progress.activated_achievements.discard("sandra_secured_future")
+    $ tractir_progress.achieved.discard("sandra_secured_future")
+    run Call("SandraWeeklyEvaluationScene", 3, "TavernMain")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/sandra/thanks/sandra_thanks.webm" and bool(scene_runtime.movie)) timeout 5.0
+    assert eval ("sandra_secured_future" in tractir_progress.achieved and int(tractir_progress.sandra_secured_future_day) == int(current_game_day() or 0)) timeout 5.0
     $ threads["sandraKitchenHouseholdRespect"].reset()
     $ event_runtime.active_thread = threads["sandraKitchenHouseholdRespect"]
     run Call("story_sandra_kitchen_household_respect_0")
@@ -5240,7 +5254,12 @@ testcase external_sandra_weekly_thread_progression:
     $ external_calendar_set_weekday(1)
     assert eval (story_event_available("TavernMyRoom", "sleep")) timeout 5.0
     run Call("checkTriggers", "TavernMyRoom", "sleep", 0)
-    advance until eval (int(threads["sandraWeeklyEvaluation"].num or 0) == 1 and not threads["sandraWeeklyEvaluation"].enabled) timeout 30.0
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("держал хозяйство" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("особенно крепко" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Если вечером захочешь" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("День уже начинается" in str(scene_runtime.text or "")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["sandraWeeklyEvaluation"].num or 0) == 1 and not threads["sandraWeeklyEvaluation"].enabled) timeout 20.0
     assert eval (tavern_upstairs_can_enter_sandra_room()) timeout 5.0
 
 testcase external_sandra_night_thanks_hours_work:

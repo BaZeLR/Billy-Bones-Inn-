@@ -128,8 +128,6 @@ init -20 python:
         return True
 
     def tractir_apply_sandra_secured_future():
-        if _tractir_progress_int(calendar_v2.daysInGame, 0) < 28:
-            return False
         if _tractir_progress_int(tractir_progress.sandra_secured_future_day, -1) >= 0:
             return False
         tractir_progress.sandra_secured_future_day = _tractir_progress_int(calendar_v2.daysInGame, 0)

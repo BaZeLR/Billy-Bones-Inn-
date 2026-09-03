@@ -51,6 +51,11 @@ init python:
                 "breakfast": {
                     "flirt": ["images/sandra/thanks/sandra_thanks.webm"],
                 },
+                "weekly_evaluation": {
+                    "standing": ["images/sandra/player_room_sandra_0.jpg"],
+                    "leaning": ["images/sandra/thanks/player_room_1.jpg"],
+                    "thanks": ["images/sandra/thanks/sandra_thanks.webm"],
+                },
                 "grope": {
                     "ass_ok": ["images/sandra/thanks/player_room_1.jpg"],
                     "tit_ok": ["images/sandra/thanks/player_room_1.jpg"],

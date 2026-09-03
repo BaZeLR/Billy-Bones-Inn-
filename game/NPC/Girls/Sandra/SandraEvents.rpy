@@ -11,12 +11,6 @@ init python:
         {"rel": 1, "openness": 2, "corruption": 3},
         {"rel": 2, "openness": 2, "corruption": 4},
     )
-    SANDRA_WEEKLY_EVALUATION_PICTURES = (
-        "images/sandra/portrait2.jpg",
-        "images/sandra/portrait3.jpg",
-        "images/sandra/portrait4.jpg",
-        "images/sandra/portrait4.jpg",
-    )
     SANDRA_WEEKLY_EVALUATION_TEXTS = (
         (
             "Сквозь остатки сна вы слышите осторожный стук в дверь, а затем в комнату заглядывает Сандра.",
@@ -46,17 +40,22 @@ init python:
 
 
 label SandraWeeklyEvaluationScene(step_index=0, return_label="TavernMain"):
-    $ renpy.dynamic("_sandra_step", "_sandra_gains", "_sandra_picture", "_sandra_lines")
+    $ renpy.dynamic("_sandra_step", "_sandra_gains", "_sandra_media_key", "_sandra_picture", "_sandra_lines", "_sandra_achievement_now")
     $ _sandra_step = max(0, min(int(step_index or 0), len(SANDRA_WEEKLY_EVALUATION_TEXTS) - 1))
     $ _sandra_gains = dict(SANDRA_WEEKLY_EVALUATION_STAT_GAINS[_sandra_step] or {})
     $ Sandra.rel = max(0, min(20, int(Sandra.rel or 0) + int(_sandra_gains.get("rel", 0) or 0)))
     $ Sandra.openness = max(0, min(20, int(Sandra.openness or 0) + int(_sandra_gains.get("openness", 0) or 0)))
     $ Sandra.corruption = max(0, min(100, int(Sandra.corruption or 0) + int(_sandra_gains.get("corruption", 0) or 0)))
-    $ _sandra_picture = SANDRA_WEEKLY_EVALUATION_PICTURES[_sandra_step]
+    $ _sandra_media_key = ("standing", "leaning", "leaning", "thanks")[_sandra_step]
+    $ _sandra_picture = SandraStaticData.image_path("weekly_evaluation", _sandra_media_key)
     $ _sandra_lines = list(SANDRA_WEEKLY_EVALUATION_TEXTS[_sandra_step] or [])
     $ main_ui_begin_native_scene_state("Визит Сандры")
     show screen main_ui
     vscene _sandra_picture
+    if _sandra_media_key == "thanks":
+        $ _sandra_achievement_now = tractir_apply_sandra_secured_future()
+        if _sandra_achievement_now:
+            call TractirShowPendingAchievements
     $ scene_runtime.text = _sandra_lines[0]
     $ scene_runtime.location_text = scene_runtime.text
     menu:
@@ -157,7 +156,6 @@ label story_sandra_kitchen_household_respect_0:
 
 
 label TavernSandraNightThanksScene:
-    $ renpy.dynamic("_sandra_secured_future_now")
     if int(threads["sandraWeeklyEvaluation"].num or 0) != 4 or int(calendar_v2.hour or 0) < 22 or int(calendar_v2.hour or 0) > 23:
         $ main_ui_runtime.action_title = "Комната Сандры"
         $ main_ui_runtime.action_content = None
@@ -168,20 +166,8 @@ label TavernSandraNightThanksScene:
     $ Sandra.corruption = max(0, min(100, int(Sandra.corruption or 0) + 3))
     $ Sandra.mark_asked()
     $ Sandra.mark_talked()
-    $ _sandra_secured_future_now = tractir_apply_sandra_secured_future()
     $ player.change_stat("fun", 8)
     call HouseholdSexEngine("sandra", "TavernSandraRoom")
-    if _sandra_secured_future_now:
-        $ main_ui_begin_native_scene_state("Сандра")
-        $ scene_runtime.picture = SandraStaticData.image_path("outfit_reward", "handjob_finish")
-        if str(scene_runtime.picture or "").strip():
-            vscene scene_runtime.picture
-        $ scene_runtime.text = "После первого выдержанного месяца Сандра явно понимает, что может закрепиться рядом с вами не только через кухню и счета. Она мягко, но очень уверенно дает понять, что теперь видит свое будущее рядом с вами."
-        $ scene_runtime.location_text = scene_runtime.text
-        menu:
-            "Закончить вечер":
-                pass
-        $ main_ui_end_native_scene_state()
     $ threads["sandraWeeklyEvaluation"].advance()
     $ main_ui_runtime.action_title = "Комната Сандры"
     $ main_ui_runtime.action_content = None
