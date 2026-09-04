@@ -210,7 +210,10 @@ label IntGeorgettInviteTavern(girl_name="georgett", girl_loc="street"):
             $ event_runtime.evaluation_time = None
             $ findAvailableEvents(True)
         $ Georgett.finish_talk()
-        call NextDay("TavernMain", 1)
+        "[scene_runtime.text]"
+        menu:
+            "Вернуться в трактир":
+                call NextDay("TavernMain", 1)
     return
 
 
