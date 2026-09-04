@@ -468,15 +468,19 @@ screen main_menu():
 
     style_prefix "main_menu"
 
-    if renpy.loadable("images/intro.jpg"):
-        add "images/intro.jpg"
-    elif renpy.loadable("images/general/intro.jpg"):
-        add "images/general/intro.jpg"
+    if renpy.loadable("images/tavern/mainhall/tavern_crew.jpg"):
+        add "images/tavern/mainhall/tavern_crew.jpg":
+            xysize (config.screen_width, config.screen_height)
+            fit "cover"
+            xalign 0.5
+            yalign 0.5
     else:
-        add Solid("#101010")
+        add gui.main_menu_background:
+            xysize (config.screen_width, config.screen_height)
+            fit "cover"
 
     frame:
-        background Solid("#0008")
+        background Solid("#080604b8")
         xalign 1.0
         yalign 1.0
         xsize 520
@@ -485,7 +489,7 @@ screen main_menu():
 
         vbox:
             spacing 8
-            text "Billy Bones Inn" size 36 color "#f0d000"
+            text "Billy Bones Inn" style "main_menu_title"
             textbutton "Start" action Start()
             textbutton "Introduction" action Start("introduction")
             textbutton "Tutorial" action Start("tutorial")
@@ -504,6 +508,8 @@ screen main_menu():
 
 style main_menu_frame is empty
 style main_menu_vbox is vbox
+style main_menu_button is button
+style main_menu_button_text is button_text
 style main_menu_text is gui_text
 style main_menu_title is main_menu_text
 style main_menu_version is main_menu_text
@@ -513,6 +519,23 @@ style main_menu_frame:
     yfill True
 
     background "gui/overlay/main_menu.png"
+
+style main_menu_button:
+    background None
+    hover_background Solid("#0008")
+    xfill True
+    left_padding 12
+    right_padding 12
+    top_padding 3
+    bottom_padding 3
+
+style main_menu_button_text:
+    color "#f7f0df"
+    hover_color "#ffd85a"
+    selected_color "#ffd85a"
+    insensitive_color "#aaa49a"
+    size 30
+    outlines [(2, "#000d", 0, 0)]
 
 style main_menu_vbox:
     xalign 1.0
@@ -526,6 +549,9 @@ style main_menu_text:
 
 style main_menu_title:
     properties gui.text_properties("title")
+    color "#ffd85a"
+    size 42
+    outlines [(3, "#000e", 0, 0)]
 
 style main_menu_version:
     properties gui.text_properties("version")
