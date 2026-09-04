@@ -177,6 +177,7 @@ label HouseholdSexEngine(girl_name="melissa", source_room="", initial_action="se
     python:
         _hse_display = people_display_name(_hse_girl)
         _hse_info.ensure_sex_state()
+        _hse_info.set_sex_busy(False)
         _hse_start_orgasms = int(_hse_info.sex_stat("orgasms_given", 0) or 0)
         _hse_start_player_cums = int(player.intimacy.came_today or 0)
         _hse_full_engine = household_sex_available(_hse_girl, "sex")

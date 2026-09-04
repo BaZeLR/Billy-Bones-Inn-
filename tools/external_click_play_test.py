@@ -1922,8 +1922,8 @@ testcase external_sandra_breakfast_flirt_date_destination:
     $ Amanda.openness = 7
     $ Amanda.corruption = 45
     $ Amanda.breakfast_tease_day = -1
-    $ Melissa.rel = 11
-    $ Melissa.openness = 7
+    $ Melissa.rel = 18
+    $ Melissa.openness = 14
     $ Melissa.corruption = 45
     $ Melissa.breakfast_tease_day = current_game_day()
     $ Sandra.rel = 11
@@ -1935,13 +1935,21 @@ testcase external_sandra_breakfast_flirt_date_destination:
     $ Amanda.breakfast_tease_day = current_game_day()
     $ Melissa.breakfast_tease_day = -1
     $ player.tavern_management.breakfast.present_ids = ["melissa"]
+    assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "") timeout 5.0
+    $ Melissa.storage_rat_help_day = 1
+    $ Melissa.roof_repair_complete_day = 1
+    $ Melissa.drawings_returned = True
+    $ Melissa.drawings_booklet_left = True
+    $ threads["melissaBatProblem"].advanceTo(threads["melissaBatProblem"].data.length, complete_at_end=True)
+    $ threads["melissaCourtship"].advanceTo(threads["melissaCourtship"].data.length, complete_at_end=True)
     assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "melissa") timeout 5.0
     $ Melissa.breakfast_tease_day = current_game_day()
     $ Sandra.breakfast_tease_day = -1
     $ player.tavern_management.breakfast.present_ids = ["sandra"]
-    assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "sandra") timeout 5.0
     $ threads["sandraWeeklyEvaluation"].reset()
+    assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "") timeout 5.0
     $ threads["sandraWeeklyEvaluation"].advanceTo(4, force_active=True)
+    assert eval (str(tavern_breakfast_tease_candidate().get("girl", "") or "") == "sandra") timeout 5.0
     assert eval (not threads["sandraWeeklyEvaluation"].completed and Sandra.intimacy_story_ready() and tavern_breakfast_private_date_available("sandra")) timeout 5.0
     $ threads["sandraWeeklyEvaluation"].advanceTo(threads["sandraWeeklyEvaluation"].data.length, complete_at_end=True)
     assert eval (SandraStaticData.image_path("breakfast", "flirt") == "images/sandra/thanks/sandra_thanks.webm" and renpy.loadable(SandraStaticData.image_path("breakfast", "flirt"))) timeout 5.0
@@ -5724,6 +5732,7 @@ testcase external_melissa_finished_intimacy_returns_to_room_and_allows_second_vi
     $ threads["melissaCourtship"].advanceTo(5, complete_at_end=True)
     $ Melissa.reset_daily()
     $ initStoryEventRuntime(True)
+    $ Melissa.set_sex_busy(True)
     assert eval (Melissa.relationship_allows("intimacy") and Melissa.relationship_allows("sex")) timeout 5.0
 
     run Call("IntMelissaTalk", "melissa")
@@ -5731,6 +5740,7 @@ testcase external_melissa_finished_intimacy_returns_to_room_and_allows_second_vi
     assert eval ("Попросить Мелиссу о сексуальном одолжении" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _melissa_intimacy_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Попросить Мелиссу о сексуальном одолжении")
     click id ("choice_panel_button_%d" % int(_melissa_intimacy_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("choice") is not None and "Остановиться" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (not Melissa.sex_busy()) timeout 5.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Мелисса") timeout 5.0
     $ _melissa_stop_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Остановиться")
     click id ("choice_panel_button_%d" % int(_melissa_stop_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закончить близость"]) timeout 20.0
@@ -5757,12 +5767,13 @@ testcase external_amanda_sex_scene_keeps_text_picture_and_finish_menu:
     $ player.intimacy.set_arousal(82)
     $ Amanda.set_arousal(0)
     $ Amanda.set_cock_position("none")
-    $ Amanda.set_sex_busy(False)
+    $ Amanda.set_sex_busy(True)
 
     run Call("IntAmandaSex", "amanda", "home", "minet")
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Аманда") timeout 5.0
     assert eval ("Минет" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval (not Amanda.sex_busy()) timeout 5.0
 
     $ _amanda_blowjob_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Минет")
     click id ("choice_panel_button_%d" % int(_amanda_blowjob_index)) pos (0.5, 0.5) until eval (Amanda.cock_in("mouth") and player.intimacy.arousal_value() == 100) timeout 20.0

@@ -29,6 +29,7 @@ label IntAmandaSex(GirlNameASDS="amanda", GirlLocASDS="home", GirlModeASDS=""):
     $ renpy.dynamic("_amanda_cumpussy_pic", "_amanda_naked_pic", "_was_fucking_amanda", "_amanda_street_fuck_pic", "_amanda_room_fuck_pic", "tmpCumInside", "CurAmandaOrgasmCount", "_cametoday", "_cancumdaily", "_ias_started_native_scene", "_ias_parent_title", "_ias_text_parts", "_ias_scene_active")
     python:
         Amanda.ensure_sex_state()
+        Amanda.set_sex_busy(False)
         CurAmandaOrgasmCount = Amanda.sex_stat("orgasms_given", 0)
         _ias_started_native_scene = main_ui_runtime.scene_origin is None
         _ias_parent_title = str(main_ui_runtime.action_title or "")

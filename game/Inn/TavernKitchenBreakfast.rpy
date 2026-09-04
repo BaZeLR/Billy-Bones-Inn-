@@ -317,6 +317,8 @@ init python:
             if npc_id not in ("sandra", "amanda", "melissa"):
                 continue
             info = people.get_info(npc_id)
+            if info is None or not info.date_intimacy_available():
+                continue
             last_tease_day = people_to_int(getattr(info, "breakfast_tease_day", -1), -1)
             if last_tease_day == current_game_day():
                 continue

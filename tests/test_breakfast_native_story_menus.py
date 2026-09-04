@@ -119,6 +119,7 @@ def test_breakfast_flirts_cover_household_girls_and_complete_at_chosen_place():
     )
 
     assert 'npc_id not in ("sandra", "amanda", "melissa")' in candidate
+    assert "if info is None or not info.date_intimacy_available():" in candidate
     assert 'getattr(info, "breakfast_tease_day", -1)' in candidate
     tease = _label_block(source, "TavernKitchenBreakfastTease:", "TavernKitchenBreakfastTeasePrivate")
     assert "_tease_private_unlocked" not in tease

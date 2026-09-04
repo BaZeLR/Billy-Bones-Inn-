@@ -1064,6 +1064,7 @@ init -999 python:
             self.gifted_today = 0
             self.asked_today = 0
             self.fucked_today = 0
+            self.set_sex_busy(False)
 
             if full:
                 # Future: reset other daily per-girl state here if needed (e.g. some girl-specific today flags)
