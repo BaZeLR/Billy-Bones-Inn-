@@ -11,6 +11,21 @@ init 6 python:
         except Exception:
             return True
 
+    def tavern_upstairs_bedroom_sound_lines():
+        lines = []
+        for npc_id in ("sandra", "melissa", "amanda"):
+            room_code = "Tavern%sRoom" % npc_id.capitalize()
+            info = people.get_info(npc_id)
+            if str(people.location(npc_id) or "") != room_code or info is None or int(info.arousal_value() or 0) < 65:
+                continue
+            lines.append("За дверью комнаты, где сейчас находится {}, слышится размеренный скрип кровати. Похоже, сегодня ей слишком трудно лежать спокойно.".format(_action_display_name(npc_id)))
+        return lines
+
+    def tavern_upstairs_description():
+        lines = [rooms.get("TavernUpstairs").descriptions[0].text]
+        lines.extend(tavern_upstairs_bedroom_sound_lines())
+        return "\n\n".join([str(row or "").strip() for row in lines if str(row or "").strip()])
+
     def tavern_upstairs_action_items():
         items = []
         if tavern_upstairs_can_clean_rooms():
@@ -56,7 +71,7 @@ label TavernUpstairs:
     $ rooms.enter("TavernUpstairs")
     $ scene_runtime.picture = rooms.current.bg_picture or None
     call RoomEnterEventGate(rooms.current_code, False)
-    $ scene_runtime.text = rooms.get("TavernUpstairs").descriptions[0].text
+    $ scene_runtime.text = tavern_upstairs_description()
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = "Наверху"
     $ main_ui_runtime.action_content = None

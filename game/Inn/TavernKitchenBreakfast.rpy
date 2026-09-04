@@ -999,13 +999,35 @@ init python:
             except Exception:
                 _tavern_rep = 50
             if _tavern_rep >= 70:
-                lines.append("Сандра за ужином подводит итог недели заметно мягче обычного: трактир держится крепко, гости идут охотнее, а значит можно думать не только о выживании, но и о мелких приятностях для дома.")
+                lines.append("Сандра за обедом подводит итог недели заметно мягче обычного: трактир держится крепко, гости идут охотнее, а значит можно думать не только о выживании, но и о мелких приятностях для дома.")
             elif _tavern_rep <= 40:
                 lines.append("Сандра напоминает за столом без особой деликатности, что неделя вышла слабой. Пока трактир не начнет приносить больше пользы, о лишних тратах и домашних поблажках лучше не мечтать.")
             else:
                 lines.append("Сандра спокойно замечает, что неделя закрылась без позора, но и без особого размаха. Дом держится ровно, а значит хорошие привычки и аккуратная работа по-прежнему важнее красивых обещаний.")
         lines.extend(list(tavern_barber_sunday_dinner_lines() or []))
         return lines
+
+    def tavern_sunday_dinner_church_joke_lines(present_ids=None):
+        dinner_ids = list(tavern_sunday_dinner_present_ids() if present_ids is None else present_ids)
+        lines = []
+        if "sandra" in dinner_ids:
+            lines.append("Разговор сам собой возвращается к летучим мышам. Сандра мрачно замечает: \"Летучие мыши — дурной знак. Где они заводятся, там и злые духи рядом. А к девицам, которые сами себя ублажают и слишком этим увлекаются, нечисть особенно легко цепляется.\"")
+        if "melissa" in dinner_ids:
+            lines.append("Мелисса прячет улыбку и возражает: \"А брат Герхард сегодня сам выглядел странно. Всю службу глаза от наших грудей отвести не мог.\"")
+        elif "amanda" in dinner_ids:
+            lines.append("Аманда хихикает: \"А брат Герхард сегодня сам выглядел странно. Всю службу на наши груди смотрел.\"")
+        if "amanda" in dinner_ids:
+            lines.append("Аманда тут же невинно спрашивает: \"А хозяину Стефану так смотреть можно?\"")
+        if "sandra" in dinner_ids and ("melissa" in dinner_ids or "amanda" in dinner_ids):
+            lines.append("Сандра стучит ладонью по столу: \"Стыдитесь обе! Поймаю вас за рукоблудием — будете серьезно беседовать с братом Герхардом.\"")
+        if "melissa" in dinner_ids and "amanda" in dinner_ids:
+            lines.append("Мелисса с Амандой переглядываются и тихо хихикают, изо всех сил делая вид, будто предупреждение их напугало.")
+        return lines
+
+    def tavern_sunday_dinner_can_gift_soap_to(npc_id="", present_ids=None):
+        key = str(npc_id or "").strip().lower()
+        dinner_ids = list(tavern_sunday_dinner_present_ids() if present_ids is None else present_ids)
+        return key in dinner_ids and soap_total_piece_count() > 0 and social_gifted_today_value(key) <= 0 and bool(relationship_any_gift_allowed(key))
 
     def tavern_sunday_dinner_apply_social_bonus(present_ids=None):
         present_ids = list(tavern_sunday_dinner_present_ids() if present_ids is None else present_ids)
@@ -1745,40 +1767,148 @@ label TavernKitchenSundayDinnerMenu:
 
 
 label TavernKitchenSundayDinner(serve_spicy=0):
-    $ renpy.dynamic("_eat_result", "_sunday_present_ids", "_sunday_social_ids", "_sunday_lines")
+    $ renpy.dynamic("_eat_result", "_sunday_present_ids", "_sunday_social_ids", "_sunday_intro_lines", "_sunday_line_index", "_sunday_dinner_active", "_sunday_table_talk_played", "_sunday_church_talk_played", "_sunday_topic_lines", "_sunday_topic_line_index", "_sunday_gift_target", "_sunday_gift_target_name", "_sunday_gift_item", "_sunday_gift_text", "_sunday_finish_lines")
     if not tavern_sunday_dinner_available():
         $ scene_runtime.text = "Сегодня вы уже сидели за воскресным обедом."
         $ scene_runtime.location_text = scene_runtime.text
         $ main_ui_runtime.action_items = tavern_kitchen_action_items()
         return
     $ _sunday_present_ids = list(tavern_sunday_dinner_present_ids() or [])
-    $ player.tavern_management.breakfast.sunday_dinner_last_day = current_game_day()
-    vscene tavern_kitchen_sunday_dinner_picture()
+    $ main_ui_begin_native_scene_state("Воскресный обед")
+    $ scene_runtime.picture = tavern_kitchen_sunday_dinner_picture()
+    vscene scene_runtime.picture
+    show screen main_ui
     python:
-        _sunday_lines = [
+        _sunday_intro_lines = [
             "К полудню кухня собирает всех на более основательную воскресную трапезу.",
             "За столом сидят: " + (", ".join(tavern_sunday_dinner_present_names()) if len(tavern_sunday_dinner_present_names()) > 0 else "пока что только вы сами") + ".",
             "На некоторое время трактирная суета отступает, и весь дом живет одним общим столом.",
         ]
-        _sunday_lines.extend(tavern_sunday_dinner_dialogue_lines())
-        scene_runtime.text = "\n\n".join([row for row in _sunday_lines if str(row or "").strip()])
-        scene_runtime.location_text = scene_runtime.text
-    $ _eat_result = player_eat_meal("воскресный обед для всей челяди", 22, 45)
-    if str(_eat_result.get("text", "") or "").strip():
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n" + str(_eat_result.get("text", "") or "")
+        _sunday_intro_lines = [str(row or "").strip() for row in _sunday_intro_lines if str(row or "").strip()]
+    $ _sunday_line_index = 0
+    while _sunday_line_index < len(_sunday_intro_lines):
+        $ scene_runtime.text = _sunday_intro_lines[_sunday_line_index]
         $ scene_runtime.location_text = scene_runtime.text
-    $ _sunday_social_ids = tavern_sunday_dinner_apply_social_bonus(_sunday_present_ids)
-    if len(list(tavern_recent_barber_ids() or [])) > 0:
-        $ player.tavern_management.breakfast.sunday_dinner_barber_talk_day = current_game_day()
-    if len(list(_sunday_social_ids or [])) > 0:
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\nСпокойный воскресный стол немного сближает вас с теми, кто сейчас обедает вместе с вами."
-        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Продолжить":
+                $ _sunday_line_index += 1
     if int(serve_spicy or 0) == 1 and tavern_sunday_dinner_can_serve_spicy_tincture(_sunday_present_ids):
         $ player.tavern_management.breakfast.sunday_dinner_spicy_drink_day = current_game_day()
-        $ scene_runtime.text = str(scene_runtime.text or "") + "\n" + tavern_kitchen_spicy_tincture_apply(_sunday_present_ids)
+        $ _sunday_topic_lines = [str(row or "").strip() for row in tavern_kitchen_spicy_tincture_apply(_sunday_present_ids).split("\n\n") if str(row or "").strip()]
+        $ _sunday_topic_line_index = 0
+        while _sunday_topic_line_index < len(_sunday_topic_lines):
+            $ scene_runtime.text = _sunday_topic_lines[_sunday_topic_line_index]
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Продолжить":
+                    $ _sunday_topic_line_index += 1
+    $ _sunday_dinner_active = True
+    $ _sunday_table_talk_played = False
+    $ _sunday_church_talk_played = False
+    while _sunday_dinner_active:
+        $ _sunday_gift_target = ""
+        menu:
+            "Воскресный обед"
+
+            "Послушать разговор за столом" if not _sunday_table_talk_played:
+                $ _sunday_table_talk_played = True
+                $ _sunday_topic_lines = list(tavern_sunday_dinner_dialogue_lines() or [])
+                $ _sunday_topic_line_index = 0
+                while _sunday_topic_line_index < len(_sunday_topic_lines):
+                    $ scene_runtime.text = _sunday_topic_lines[_sunday_topic_line_index]
+                    $ scene_runtime.location_text = scene_runtime.text
+                    menu:
+                        "Продолжить":
+                            $ _sunday_topic_line_index += 1
+                if len(list(tavern_recent_barber_ids() or [])) > 0:
+                    $ player.tavern_management.breakfast.sunday_dinner_barber_talk_day = current_game_day()
+
+            "Послушать воскресные шутки" if not _sunday_church_talk_played:
+                $ _sunday_church_talk_played = True
+                $ _sunday_topic_lines = list(tavern_sunday_dinner_church_joke_lines(_sunday_present_ids) or [])
+                $ _sunday_topic_line_index = 0
+                while _sunday_topic_line_index < len(_sunday_topic_lines):
+                    $ scene_runtime.text = _sunday_topic_lines[_sunday_topic_line_index]
+                    $ scene_runtime.location_text = scene_runtime.text
+                    menu:
+                        "Продолжить":
+                            $ _sunday_topic_line_index += 1
+
+            "Подарить мыло Сандре" if tavern_sunday_dinner_can_gift_soap_to("sandra", _sunday_present_ids):
+                $ _sunday_gift_target = "sandra"
+
+            "Подарить мыло Мелиссе" if tavern_sunday_dinner_can_gift_soap_to("melissa", _sunday_present_ids):
+                $ _sunday_gift_target = "melissa"
+
+            "Подарить мыло Аманде" if tavern_sunday_dinner_can_gift_soap_to("amanda", _sunday_present_ids):
+                $ _sunday_gift_target = "amanda"
+
+            "Подарить мыло Бекки" if tavern_sunday_dinner_can_gift_soap_to("becky", _sunday_present_ids):
+                $ _sunday_gift_target = "becky"
+
+            "Закончить воскресный обед":
+                $ _sunday_dinner_active = False
+        if _sunday_gift_target != "":
+            $ _sunday_gift_item = ""
+            $ _sunday_gift_target_name = _action_display_name(_sunday_gift_target)
+            menu:
+                "Какое мыло подарить [_sunday_gift_target_name]?"
+
+                "Подарить лавандовое хозяйственное мыло" if int(player.item_count("soap_001") or 0) > 0:
+                    $ _sunday_gift_item = "soap_001"
+
+                "Подарить лавандово-травяное мыло" if int(player.item_count("lavender_herbal_soap_001") or 0) > 0:
+                    $ _sunday_gift_item = "lavender_herbal_soap_001"
+
+                "Подарить лавандово-розовое мыло" if int(player.item_count("lavender_rose_soap_001") or 0) > 0:
+                    $ _sunday_gift_item = "lavender_rose_soap_001"
+
+                "Подарить розово-медовое мыло" if int(player.item_count("rose_honey_soap_001") or 0) > 0:
+                    $ _sunday_gift_item = "rose_honey_soap_001"
+
+                "Подарить лавандовое туалетное мыло с оливковым маслом" if int(player.item_count("luxury_soap_001") or 0) > 0:
+                    $ _sunday_gift_item = "luxury_soap_001"
+
+                "Назад к воскресному обеду":
+                    pass
+            if _sunday_gift_item != "":
+                call PlayerCardGiftItemTo(_sunday_gift_item, _sunday_gift_target)
+                $ _sunday_gift_text = str(scene_runtime.text or "")
+                $ main_ui_begin_native_scene_state("Воскресный обед")
+                $ scene_runtime.picture = tavern_kitchen_sunday_dinner_picture()
+                vscene scene_runtime.picture
+                show screen main_ui
+                $ scene_runtime.text = _sunday_gift_text
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Продолжить":
+                        pass
+    $ _eat_result = player_eat_meal("воскресный обед для всей челяди", 22, 45)
+    $ player.tavern_management.breakfast.sunday_dinner_last_day = current_game_day()
+    $ _sunday_social_ids = tavern_sunday_dinner_apply_social_bonus(_sunday_present_ids)
+    python:
+        _sunday_finish_lines = []
+        if str(_eat_result.get("text", "") or "").strip():
+            _sunday_finish_lines.append(str(_eat_result.get("text", "") or "").strip())
+        if len(list(_sunday_social_ids or [])) > 0:
+            _sunday_finish_lines.append("Спокойный воскресный стол немного сближает вас с теми, кто сейчас обедает вместе с вами.")
+    $ _sunday_line_index = 0
+    while _sunday_line_index < len(_sunday_finish_lines):
+        $ scene_runtime.text = _sunday_finish_lines[_sunday_line_index]
         $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
+        menu:
+            "Продолжить":
+                $ _sunday_line_index += 1
     call stat
+    $ main_ui_end_native_scene_state()
+    $ scene_runtime.picture = tavern_kitchen_picture() or rooms.get("TavernKitchen").bg_picture or None
+    if str(scene_runtime.picture or "").strip():
+        vscene scene_runtime.picture
+    $ scene_runtime.text = build_kitchen_description()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ tavern_kitchen_set_saved_text(scene_runtime.text)
+    $ main_ui_runtime.action_title = "Кухня"
+    $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = tavern_kitchen_action_items()
     show screen main_ui
     return

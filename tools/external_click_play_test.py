@@ -378,21 +378,54 @@ testcase external_tavern_sunday_dinner_schedule_and_stats:
     assert eval (tavern_sunday_dinner_present_ids() == ["sandra", "melissa", "amanda"]) timeout 5.0
     assert eval ("Сесть за воскресный обед" in [str(item.caption or "") for item in tavern_kitchen_action_items()]) timeout 5.0
 
-    $ Sandra.rel = 5
-    $ Melissa.rel = 5
-    $ Amanda.rel = 5
-    $ _sunday_open_before = (Sandra.openness, Melissa.openness, Amanda.openness)
-    $ _sunday_corruption_before = (Sandra.corruption, Melissa.corruption, Amanda.corruption)
+    $ Sandra.rel = 12
+    $ Melissa.rel = 12
+    $ Amanda.rel = 12
+    $ Sandra.gifted_today = 0
+    $ Melissa.gifted_today = 0
+    $ Amanda.gifted_today = 0
+    $ player.add_item("soap_001", 1)
+    $ _sunday_soap_before = int(player.item_count("soap_001") or 0)
     $ external_calendar_set_fields(7, 1, 1100, 13, 30)
     assert eval (tavern_sunday_dinner_available() and tavern_sunday_dinner_present_ids() == ["sandra", "melissa", "amanda"]) timeout 5.0
     run Call("TavernKitchenSundayDinner", 0)
-    advance until screen "say" timeout 20.0
-    assert eval ((Sandra.rel, Melissa.rel, Amanda.rel) == (6, 6, 6)) timeout 5.0
-    assert eval ((Sandra.openness, Melissa.openness, Amanda.openness) == _sunday_open_before) timeout 5.0
-    assert eval ((Sandra.corruption, Melissa.corruption, Amanda.corruption) == _sunday_corruption_before) timeout 5.0
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    assert eval ((Sandra.rel, Melissa.rel, Amanda.rel) == (12, 12, 12)) timeout 5.0
+    assert eval (int(calendar_v2.hour or 0) == 13 and int(calendar_v2.minute or 0) == 30) timeout 5.0
+    assert eval (int(player.tavern_management.breakfast.sunday_dinner_last_day or -1) != current_game_day()) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Послушать воскресные шутки" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sunday_church_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Послушать воскресные шутки")
+    click id ("choice_panel_button_%d" % int(_sunday_church_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Летучие мыши — дурной знак" in str(scene_runtime.text or "") and [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Всю службу глаза от наших грудей отвести не мог" in str(scene_runtime.text or "")) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("А хозяину Стефану так смотреть можно?" in str(scene_runtime.text or "")) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Поймаю вас за рукоблудием" in str(scene_runtime.text or "")) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("тихо хихикают" in str(scene_runtime.text or "")) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Послушать воскресные шутки" not in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] and "Закончить воскресный обед" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sunday_gift_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Подарить мыло Сандре")
+    click id ("choice_panel_button_%d" % int(_sunday_gift_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Подарить лавандовое хозяйственное мыло" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sunday_soap_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Подарить лавандовое хозяйственное мыло")
+    click id ("choice_panel_button_%d" % int(_sunday_soap_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and int(player.item_count("soap_001") or 0) == _sunday_soap_before - 1 and [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 20.0
+    assert eval (int(Sandra.gifted_today or 0) == 1 and str(main_ui_runtime.mode or "") == "event") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Закончить воскресный обед" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] and "Подарить мыло Сандре" not in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sunday_rel_before_finish = (Sandra.rel, Melissa.rel, Amanda.rel)
+    $ _sunday_open_before_finish = (Sandra.openness, Melissa.openness, Amanda.openness)
+    $ _sunday_corruption_before_finish = (Sandra.corruption, Melissa.corruption, Amanda.corruption)
+    $ _sunday_finish_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Закончить воскресный обед")
+    click id ("choice_panel_button_%d" % int(_sunday_finish_index)) pos (0.5, 0.5) until eval (int(player.tavern_management.breakfast.sunday_dinner_last_day or -1) == current_game_day() and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    assert eval ((Sandra.rel, Melissa.rel, Amanda.rel) == tuple(value + 1 for value in _sunday_rel_before_finish)) timeout 5.0
+    assert eval ((Sandra.openness, Melissa.openness, Amanda.openness) == _sunday_open_before_finish) timeout 5.0
+    assert eval ((Sandra.corruption, Melissa.corruption, Amanda.corruption) == _sunday_corruption_before_finish) timeout 5.0
     assert eval (int(calendar_v2.hour or 0) == 14 and int(calendar_v2.minute or 0) == 15) timeout 5.0
-    assert eval (int(player.tavern_management.breakfast.sunday_dinner_last_day or -1) == current_game_day()) timeout 5.0
     assert eval (not tavern_sunday_dinner_available()) timeout 5.0
+    $ external_calendar_set_fields(7, 1, 1100, 23, 0)
+    $ Sandra.set_arousal(65)
+    $ Melissa.set_arousal(64)
+    $ Amanda.set_arousal(80)
+    assert eval (all(str(people.location(npc_id) or "") == "Tavern%sRoom" % npc_id.capitalize() for npc_id in ("sandra", "melissa", "amanda"))) timeout 5.0
+    assert eval (len(tavern_upstairs_bedroom_sound_lines()) == 2 and any("Сандра" in line for line in tavern_upstairs_bedroom_sound_lines()) and any("Аманда" in line for line in tavern_upstairs_bedroom_sound_lines()) and not any("Мелисса" in line for line in tavern_upstairs_bedroom_sound_lines())) timeout 5.0
 
 testcase external_boar_meat_kitchen_deposit_rewards:
     run Call("InitGameNPCs")

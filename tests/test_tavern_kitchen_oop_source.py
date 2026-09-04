@@ -102,3 +102,25 @@ def test_sunday_dinner_uses_schedule_attendance_and_applies_each_girls_planned_r
     assert "tavern_sunday_dinner_apply_social_bonus(_sunday_present_ids)" in dinner
     assert 'player_eat_meal("воскресный обед для всей челяди", 22, 45)' in dinner
     assert "calendar_v2.advance_minutes(45)" not in dinner
+    assert 'main_ui_begin_native_scene_state("Воскресный обед")' in dinner
+    assert "while _sunday_dinner_active:" in dinner
+    assert '"Закончить воскресный обед"' in dinner
+    assert dinner.index("sunday_dinner_last_day = current_game_day()") > dinner.index('"Закончить воскресный обед"')
+    assert '"[scene_runtime.text]"' not in dinner
+
+
+def test_sunday_dinner_keeps_church_jokes_and_soap_gifts_inside_its_native_event_menu():
+    dinner = BREAKFAST.split("label TavernKitchenSundayDinner(serve_spicy=0):", 1)[1]
+
+    assert '"Послушать воскресные шутки"' in dinner
+    assert "Летучие мыши — дурной знак" in BREAKFAST
+    assert "Всю службу глаза от наших грудей отвести не мог" in BREAKFAST
+    assert "А хозяину Стефану так смотреть можно?" in BREAKFAST
+    assert "Поймаю вас за рукоблудием" in BREAKFAST
+    assert "Спросить, как прошла служба" not in dinner
+    for npc_id, name in (("sandra", "Сандре"), ("melissa", "Мелиссе"), ("amanda", "Аманде"), ("becky", "Бекки")):
+        assert '"Подарить мыло %s" if tavern_sunday_dinner_can_gift_soap_to("%s", _sunday_present_ids)' % (name, npc_id) in dinner
+    assert "soap_total_piece_count() > 0" in BREAKFAST
+    assert "social_gifted_today_value(key) <= 0" in BREAKFAST
+    assert "call PlayerCardGiftItemTo(_sunday_gift_item, _sunday_gift_target)" in dinner
+    assert 'main_ui_end_native_scene_state()' in dinner
