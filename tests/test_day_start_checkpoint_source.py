@@ -15,13 +15,16 @@ def test_day_start_checkpoint_freezes_state_after_report_without_reinitializing(
     report = body.index("call screen nextday_report_card_overlay")
     release = body.index("$ calendar_v2.time_advance_blocked = 0")
     clear_stack = body.index("$ renpy.set_return_stack([])")
+    inspect_existing = body.index('$ _day_start_existing_name = str((renpy.slot_json("quick-1") or {})')
+    new_day = body.index("if _day_start_existing_name != _day_start_save_name:")
     rotate = body.index('$ renpy.loadsave.cycle_saves("quick-", config.quicksave_slots)')
     save = body.index('$ renpy.save("quick-1"')
     room_entry = body.index("jump TavernMyRoom")
     checkpoint_tail = body[report:]
 
-    assert report < release < clear_stack < rotate < save < room_entry
+    assert report < release < clear_stack < inspect_existing < new_day < rotate < save < room_entry
     assert '$ _day_start_save_name = "Начало дня — " + calendar_v2.format_date_ru()' in checkpoint_tail
+    assert 'if _day_start_existing_name != _day_start_save_name:' in checkpoint_tail
     assert '_nextday_return_label' not in checkpoint_tail
     assert 'extra_info=_day_start_save_name' in checkpoint_tail
     assert "include_screenshot=False" in checkpoint_tail

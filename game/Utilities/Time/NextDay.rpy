@@ -24,7 +24,7 @@ init python:
         return 0 <= current_hour < 6
 
 label NextDay(retlocname, timepassed):
-    $ renpy.dynamic("visitorshappy", "_nextday_skip_first_calendar_roll", "TotalEventsSummary", "ExtraEvents", "iDaysCount", "_nextday_girl", "TotalDay", "TotalWhoreClients", "TotalGloryHoleClients", "_weekly_msg", "CurDay", "_nextday_event_day_number", "_nextday_event_date", "_nextday_summary_text", "_nextday_money_delta", "NewDressCame", "dress_name", "avg_happy", "tavernlevel", "_nextday_lines", "_geo_name", "_liza_name", "_tractir_game_over_ending", "_day_start_save_name", "_girl")
+    $ renpy.dynamic("visitorshappy", "_nextday_skip_first_calendar_roll", "TotalEventsSummary", "ExtraEvents", "iDaysCount", "_nextday_girl", "TotalDay", "TotalWhoreClients", "TotalGloryHoleClients", "_weekly_msg", "CurDay", "_nextday_event_day_number", "_nextday_event_date", "_nextday_summary_text", "_nextday_money_delta", "NewDressCame", "dress_name", "avg_happy", "tavernlevel", "_nextday_lines", "_geo_name", "_liza_name", "_tractir_game_over_ending", "_day_start_save_name", "_day_start_existing_name", "_girl")
     $ next_day_runtime.update()
     $ visitorshappy = 0
     $ _nextday_skip_first_calendar_roll = nextday_started_after_midnight()
@@ -258,7 +258,9 @@ label NextDay(retlocname, timepassed):
         $ calendar_v2.time_advance_blocked = 0
         $ _day_start_save_name = "Начало дня — " + calendar_v2.format_date_ru()
         $ renpy.set_return_stack([])
-        $ renpy.loadsave.cycle_saves("quick-", config.quicksave_slots)
+        $ _day_start_existing_name = str((renpy.slot_json("quick-1") or {}).get("_save_name", "") or "")
+        if _day_start_existing_name != _day_start_save_name:
+            $ renpy.loadsave.cycle_saves("quick-", config.quicksave_slots)
         $ renpy.save("quick-1", extra_info=_day_start_save_name, include_screenshot=False)
         jump TavernMyRoom
     return

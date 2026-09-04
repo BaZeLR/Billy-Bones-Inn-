@@ -2456,6 +2456,15 @@ testcase external_every_morning_checkpoint_keeps_sunday:
     assert eval (int(calendar_v2.week or 0) == 7 and "Воскресенье" in str((renpy.slot_json("quick-1") or {}).get("_save_name", ""))) timeout 5.0
     $ _sunday_checkpoint = renpy.get_save_data("quick-1")
     assert eval (isinstance(_sunday_checkpoint.get("calendar_v2"), Calendar) and int(_sunday_checkpoint["calendar_v2"].week or 0) == 7) timeout 5.0
+    assert eval (not renpy.can_load("quick-2")) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 1, 20)
+    run Call("NextDay", "TavernMain", 1)
+    advance until screen "nextday_report_card_overlay" timeout 30.0
+    scroll amount 20 pos (960, 500)
+    click id "nextday_report_back_button" pos (0.5, 0.5) until eval (renpy.get_screen("nextday_report_card_overlay") is None) timeout 20.0
+    advance until eval (str(rooms.current_code or "") == "TavernMyRoom" and renpy.get_screen("main_ui") is not None) timeout 30.0
+    assert eval (int(calendar_v2.week or 0) == 7 and "Воскресенье" in str((renpy.slot_json("quick-1") or {}).get("_save_name", ""))) timeout 5.0
+    assert eval (not renpy.can_load("quick-2")) timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 23, 0)
     run Call("NextDay", "TavernMain", 1)
     advance until screen "nextday_report_card_overlay" timeout 30.0
@@ -2464,6 +2473,7 @@ testcase external_every_morning_checkpoint_keeps_sunday:
     advance until eval (str(rooms.current_code or "") == "TavernMyRoom" and renpy.get_screen("main_ui") is not None) timeout 30.0
     assert eval (int(calendar_v2.week or 0) == 1 and "Понедельник" in str((renpy.slot_json("quick-1") or {}).get("_save_name", ""))) timeout 5.0
     assert eval ("Воскресенье" in str((renpy.slot_json("quick-2") or {}).get("_save_name", ""))) timeout 5.0
+    assert eval (not renpy.can_load("quick-3")) timeout 5.0
     $ _preserved_sunday_checkpoint = renpy.get_save_data("quick-2")
     assert eval (isinstance(_preserved_sunday_checkpoint.get("calendar_v2"), Calendar) and int(_preserved_sunday_checkpoint["calendar_v2"].week or 0) == 7) timeout 5.0
 
