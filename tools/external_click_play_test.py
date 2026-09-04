@@ -2463,7 +2463,7 @@ testcase external_legacy_day_save_page_renders:
     run Hide("load")
     advance until not screen "load" timeout 20.0
 
-testcase external_every_morning_checkpoint_keeps_sunday:
+testcase external_morning_checkpoint_keeps_two_latest:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
@@ -2472,6 +2472,8 @@ testcase external_every_morning_checkpoint_keeps_sunday:
     $ player.tavern_management.visitors = 40
     $ player.tavern_management.productnum = 200
     $ player.tavern_management.winenum = 100
+    $ renpy.save("quick-3", extra_info="Устаревшая контрольная точка", include_screenshot=False)
+    assert eval (renpy.can_load("quick-3")) timeout 5.0
     $ external_calendar_set_fields(6, 1, CALENDAR_START_CYCLE, 23, 0)
     run Call("NextDay", "StreetTavern", 1)
     advance until screen "nextday_report_card_overlay" timeout 30.0
@@ -2482,6 +2484,7 @@ testcase external_every_morning_checkpoint_keeps_sunday:
     $ _sunday_checkpoint = renpy.get_save_data("quick-1")
     assert eval (isinstance(_sunday_checkpoint.get("calendar_v2"), Calendar) and int(_sunday_checkpoint["calendar_v2"].week or 0) == 7) timeout 5.0
     assert eval (not renpy.can_load("quick-2")) timeout 5.0
+    assert eval (not renpy.can_load("quick-3")) timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 1, 20)
     run Call("NextDay", "TavernMain", 1)
     advance until screen "nextday_report_card_overlay" timeout 30.0
@@ -2501,6 +2504,15 @@ testcase external_every_morning_checkpoint_keeps_sunday:
     assert eval (not renpy.can_load("quick-3")) timeout 5.0
     $ _preserved_sunday_checkpoint = renpy.get_save_data("quick-2")
     assert eval (isinstance(_preserved_sunday_checkpoint.get("calendar_v2"), Calendar) and int(_preserved_sunday_checkpoint["calendar_v2"].week or 0) == 7) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 23, 0)
+    run Call("NextDay", "TavernMain", 1)
+    advance until screen "nextday_report_card_overlay" timeout 30.0
+    scroll amount 20 pos (960, 500)
+    click id "nextday_report_back_button" pos (0.5, 0.5) until eval (renpy.get_screen("nextday_report_card_overlay") is None) timeout 20.0
+    advance until eval (str(rooms.current_code or "") == "TavernMyRoom" and renpy.get_screen("main_ui") is not None) timeout 30.0
+    assert eval (int(calendar_v2.week or 0) == 2 and "Вторник" in str((renpy.slot_json("quick-1") or {}).get("_save_name", ""))) timeout 5.0
+    assert eval ("Понедельник" in str((renpy.slot_json("quick-2") or {}).get("_save_name", ""))) timeout 5.0
+    assert eval (not renpy.can_load("quick-3")) timeout 5.0
 
 testcase external_next_day_report_releases_time_block:
     run Jump("Intro")
@@ -8411,7 +8423,7 @@ def main() -> int:
             "external_actual_random_town_click",
             "external_sleep_after_midnight_detector",
             "external_legacy_day_save_page_renders",
-            "external_every_morning_checkpoint_keeps_sunday",
+            "external_morning_checkpoint_keeps_two_latest",
             "external_next_day_report_releases_time_block",
             "external_town_thugs_shout_result",
             "external_town_thugs_fight_victory_result",

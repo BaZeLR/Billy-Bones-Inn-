@@ -10,6 +10,7 @@ def source(relative_path):
 
 def test_day_start_checkpoint_freezes_state_after_report_without_reinitializing():
     next_day = source("game/Utilities/Time/NextDay.rpy")
+    options = source("game/options.rpy")
     body = next_day.split("label NextDay(retlocname, timepassed):", 1)[1].split("default next_day_runtime", 1)[0]
 
     report = body.index("call screen nextday_report_card_overlay")
@@ -18,11 +19,15 @@ def test_day_start_checkpoint_freezes_state_after_report_without_reinitializing(
     inspect_existing = body.index('$ _day_start_existing_name = str((renpy.slot_json("quick-1") or {})')
     new_day = body.index("if _day_start_existing_name != _day_start_save_name:")
     rotate = body.index('$ renpy.loadsave.cycle_saves("quick-", config.quicksave_slots)')
+    cleanup = body.index('renpy.list_saved_games(r"^quick-[0-9]+$", fast=True)')
     save = body.index('$ renpy.save("quick-1"')
     room_entry = body.index("jump TavernMyRoom")
     checkpoint_tail = body[report:]
 
-    assert report < release < clear_stack < inspect_existing < new_day < rotate < save < room_entry
+    assert report < release < clear_stack < inspect_existing < new_day < rotate < cleanup < save < room_entry
+    assert "define config.quicksave_slots = 2" in options
+    assert "if _day_start_slot_number > int(config.quicksave_slots):" in checkpoint_tail
+    assert "renpy.unlink_save(_day_start_stale_slot)" in checkpoint_tail
     assert '$ _day_start_save_name = "Начало дня — " + calendar_v2.format_date_ru()' in checkpoint_tail
     assert 'if _day_start_existing_name != _day_start_save_name:' in checkpoint_tail
     assert '_nextday_return_label' not in checkpoint_tail

@@ -65,6 +65,7 @@ define config.has_voice = True
 define config.autosave_frequency = 15
 define config.autosave_on_choice = True
 define config.autosave_on_input = True
+define config.quicksave_slots = 2
 
 
 ## To allow the user to play a test sound on the sound or voice channel,
