@@ -62,6 +62,6 @@ def test_nextday_blocks_time_during_report_then_releases_it_before_room_return()
     report = body.index("call screen nextday_report_card_overlay")
     sleep_events = body.index('call checkTriggers("TavernMyRoom", "sleep", 0)')
     block_end = body.index("$ calendar_v2.time_advance_blocked = 0")
-    room_return = body.index("jump expression _nextday_return_label")
+    room_return = body.index("jump TavernMyRoom")
 
     assert block_start < report < sleep_events < block_end < room_return

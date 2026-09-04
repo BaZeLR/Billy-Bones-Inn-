@@ -17,11 +17,12 @@ def test_day_start_checkpoint_freezes_state_after_report_without_reinitializing(
     clear_stack = body.index("$ renpy.set_return_stack([])")
     rotate = body.index('$ renpy.loadsave.cycle_saves("quick-", config.quicksave_slots)')
     save = body.index('$ renpy.save("quick-1"')
-    room_entry = body.index("jump expression _nextday_return_label")
+    room_entry = body.index("jump TavernMyRoom")
     checkpoint_tail = body[report:]
 
     assert report < release < clear_stack < rotate < save < room_entry
-    assert 'if _nextday_return_label == "TavernMyRoom":' in checkpoint_tail
+    assert '$ _day_start_save_name = "Начало дня — " + calendar_v2.format_date_ru()' in checkpoint_tail
+    assert '_nextday_return_label' not in checkpoint_tail
     assert 'extra_info=_day_start_save_name' in checkpoint_tail
     assert "include_screenshot=False" in checkpoint_tail
     assert 'renpy.save("day-1"' not in checkpoint_tail
@@ -38,7 +39,7 @@ def test_day_start_checkpoint_loads_through_the_real_bedroom_entry():
     checkpoint_tail = next_day.split('$ renpy.save("quick-1"', 1)[1].split("default next_day_runtime", 1)[0]
     bedroom_entry = bedroom.split("label TavernMyRoom:", 1)[1].split("label TavernMyRoomObjectMenu", 1)[0]
 
-    assert "jump expression _nextday_return_label" in checkpoint_tail
+    assert "jump TavernMyRoom" in checkpoint_tail
     assert '$ rooms.enter("TavernMyRoom")' in bedroom_entry
     assert "tavern_my_room_scene_state()" in bedroom_entry
     assert "tavern_my_room_action_items()" in bedroom_entry

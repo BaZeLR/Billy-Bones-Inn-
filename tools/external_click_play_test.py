@@ -2438,6 +2438,35 @@ testcase external_legacy_day_save_page_renders:
     run Hide("load")
     advance until not screen "load" timeout 20.0
 
+testcase external_every_morning_checkpoint_keeps_sunday:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ threads["sandraWeeklyEvaluation"].advanceTo(threads["sandraWeeklyEvaluation"].data.length, complete_at_end=True)
+    $ player.set_money(1000)
+    $ player.tavern_management.visitors = 40
+    $ player.tavern_management.productnum = 200
+    $ player.tavern_management.winenum = 100
+    $ external_calendar_set_fields(6, 1, CALENDAR_START_CYCLE, 23, 0)
+    run Call("NextDay", "StreetTavern", 1)
+    advance until screen "nextday_report_card_overlay" timeout 30.0
+    scroll amount 20 pos (960, 500)
+    click id "nextday_report_back_button" pos (0.5, 0.5) until eval (renpy.get_screen("nextday_report_card_overlay") is None) timeout 20.0
+    advance until eval (str(rooms.current_code or "") == "TavernMyRoom" and renpy.get_screen("main_ui") is not None) timeout 30.0
+    assert eval (int(calendar_v2.week or 0) == 7 and "Воскресенье" in str((renpy.slot_json("quick-1") or {}).get("_save_name", ""))) timeout 5.0
+    $ _sunday_checkpoint = renpy.get_save_data("quick-1")
+    assert eval (isinstance(_sunday_checkpoint.get("calendar_v2"), Calendar) and int(_sunday_checkpoint["calendar_v2"].week or 0) == 7) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 23, 0)
+    run Call("NextDay", "TavernMain", 1)
+    advance until screen "nextday_report_card_overlay" timeout 30.0
+    scroll amount 20 pos (960, 500)
+    click id "nextday_report_back_button" pos (0.5, 0.5) until eval (renpy.get_screen("nextday_report_card_overlay") is None) timeout 20.0
+    advance until eval (str(rooms.current_code or "") == "TavernMyRoom" and renpy.get_screen("main_ui") is not None) timeout 30.0
+    assert eval (int(calendar_v2.week or 0) == 1 and "Понедельник" in str((renpy.slot_json("quick-1") or {}).get("_save_name", ""))) timeout 5.0
+    assert eval ("Воскресенье" in str((renpy.slot_json("quick-2") or {}).get("_save_name", ""))) timeout 5.0
+    $ _preserved_sunday_checkpoint = renpy.get_save_data("quick-2")
+    assert eval (isinstance(_preserved_sunday_checkpoint.get("calendar_v2"), Calendar) and int(_preserved_sunday_checkpoint["calendar_v2"].week or 0) == 7) timeout 5.0
+
 testcase external_next_day_report_releases_time_block:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -3586,7 +3615,7 @@ testcase external_church_service_action_links_work:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Прихожане") timeout 10.0
     assert eval (str(main_ui_runtime.action_title or "") == "Прихожане") timeout 5.0
     assert eval ("Найти Сандру" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
-    assert eval ("Найти сестричек" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    assert eval ("Найти Мелиссу и Аманду" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     assert eval ("Найти Жоржетту Брюно" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     $ Georgett.known = True
     run Call("ChurchServiceMenu", False)
@@ -8273,6 +8302,7 @@ def main() -> int:
             "external_actual_random_town_click",
             "external_sleep_after_midnight_detector",
             "external_legacy_day_save_page_renders",
+            "external_every_morning_checkpoint_keeps_sunday",
             "external_next_day_report_releases_time_block",
             "external_town_thugs_shout_result",
             "external_town_thugs_fight_victory_result",
