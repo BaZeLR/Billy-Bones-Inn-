@@ -46,6 +46,16 @@ def test_day_start_checkpoint_loads_through_the_real_bedroom_entry():
     assert 'textbutton ui_tr("{#quick_page}Q") action FilePage("quick")' in screens
 
 
+def test_legacy_day_page_does_not_construct_numeric_page_actions():
+    screens = source("game/screens.rpy")
+    page_buttons = screens.split("## Buttons to access other pages.", 1)[1].split("style page_label", 1)[0]
+
+    assert 'if persistent._file_page == "day":\n                    text "Утро":' in screens
+    assert 'if persistent._file_page == "day":' in page_buttons
+    assert 'textbutton ui_tr("<") action FilePage("quick")' in page_buttons
+    assert 'textbutton ui_tr(">") action FilePage(1)' in page_buttons
+
+
 def test_checkpoint_repairs_owned_state_before_rebuilding_runtime_views():
     save_sync = source("game/TractirSaveSync.rpy")
     household = source("game/Utilities/General/NPC/HouseholdAI_ren.rpy")

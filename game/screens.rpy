@@ -807,12 +807,16 @@ screen file_slots(title):
             button:
                 style "page_label"
 
-                key_events True
-                action page_name_value.Toggle()
+                if persistent._file_page == "day":
+                    text "Утро":
+                        style "page_label_text"
+                else:
+                    key_events True
+                    action page_name_value.Toggle()
 
-                input:
-                    style "page_label_text"
-                    value page_name_value
+                    input:
+                        style "page_label_text"
+                        value page_name_value
 
             ## The grid of file slots.
             grid gui.file_slot_cols gui.file_slot_rows:
@@ -847,7 +851,10 @@ screen file_slots(title):
 
                 spacing gui.page_spacing
 
-                textbutton ui_tr("<") action FilePagePrevious()
+                if persistent._file_page == "day":
+                    textbutton ui_tr("<") action FilePage("quick")
+                else:
+                    textbutton ui_tr("<") action FilePagePrevious()
 
                 textbutton "Утро" action FilePage("day")
 
@@ -861,7 +868,10 @@ screen file_slots(title):
                 for page in range(1, 10):
                     textbutton "[page]" action FilePage(page)
 
-                textbutton ui_tr(">") action FilePageNext()
+                if persistent._file_page == "day":
+                    textbutton ui_tr(">") action FilePage(1)
+                else:
+                    textbutton ui_tr(">") action FilePageNext()
 
 
 style page_label is gui_label

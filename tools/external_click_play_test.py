@@ -2430,6 +2430,14 @@ testcase external_sleep_after_midnight_detector:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 6, 0)
     assert eval (not nextday_started_after_midnight()) timeout 5.0
 
+testcase external_legacy_day_save_page_renders:
+    $ persistent._file_page = "day"
+    $ renpy.show_screen("load")
+    advance until screen "load" timeout 20.0
+    assert eval (persistent._file_page == "day") timeout 5.0
+    run Hide("load")
+    advance until not screen "load" timeout 20.0
+
 testcase external_next_day_report_releases_time_block:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -8264,6 +8272,7 @@ def main() -> int:
             "external_actual_random_town_continue_click",
             "external_actual_random_town_click",
             "external_sleep_after_midnight_detector",
+            "external_legacy_day_save_page_renders",
             "external_next_day_report_releases_time_block",
             "external_town_thugs_shout_result",
             "external_town_thugs_fight_victory_result",
