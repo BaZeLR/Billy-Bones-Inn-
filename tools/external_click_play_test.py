@@ -2045,6 +2045,7 @@ testcase external_sandra_breakfast_flirt_date_destination:
     $ Amanda.corruption = 45
     run Call("TavernKitchenBreakfastTeasePrivate", "amanda", "player_room")
     advance until screen "choice" timeout 20.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить свидание"] and str(rooms.current_code or "") == "TavernMyRoom") timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Закончить" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     $ _amanda_date_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
     click id ("choice_panel_button_%d" % int(_amanda_date_finish_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закончить свидание"]) timeout 20.0
@@ -5288,11 +5289,11 @@ testcase external_amanda_talk_opens_from_npc_button:
     $ _amanda_flirt_openness = int(Amanda.openness or 0)
     $ _amanda_flirt_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Флиртовать")
     $ _amanda_flirt_button_id = "choice_panel_button_%d" % int(_amanda_flirt_index)
-    click id _amanda_flirt_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and int(Amanda.flirted_today or 0) == _amanda_flirted + 1) timeout 20.0
+    click id _amanda_flirt_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and str(main_ui_runtime.mode or "") == "talk" and int(Amanda.flirted_today or 0) == _amanda_flirted + 1) timeout 20.0
     assert eval (int(calendar_v2.daysInGame or 0) * 1440 + int(calendar_v2.clock_minutes() or 0) == _amanda_flirt_start + 30) timeout 5.0
     assert eval (int(Amanda.talked_today or 0) == _amanda_flirt_talked + 1 and int(player.condition.fun or 0) == 14) timeout 5.0
     assert eval (int(Amanda.openness or 0) == _amanda_flirt_openness and len(str(scene_runtime.text or "")) > 0) timeout 5.0
-    click id "main_ui_entity_button_npc_amanda" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (str(rooms.current_code or "") == "TavernMain" and "Назад" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _amanda_priority_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить, чего ей сейчас хочется больше всего")
     $ _amanda_priority_button_id = "choice_panel_button_%d" % int(_amanda_priority_index)
     click id _amanda_priority_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is None and int(Amanda.asked_today or 0) == 1) timeout 20.0

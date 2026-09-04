@@ -24,6 +24,7 @@ label IntAmandaTalk(girl_name="amanda"):
                 $ _amanda_repeat_menu = True
             "Флиртовать" if old_point_action_unlocked(girl_name, "flirt"):
                 call OldPointFlirtAttempt(girl_name)
+                $ _amanda_repeat_menu = True
             "Подарить маленький подарок" if old_point_action_unlocked(girl_name, "gift"):
                 call PlayerCardGiftToFixedTargetMenu(girl_name)
             "Коснуться ее смелее" if old_point_action_unlocked(girl_name, "kino"):
