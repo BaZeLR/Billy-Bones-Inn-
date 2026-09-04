@@ -6,7 +6,7 @@ label IntEddieBeckySex(GirlNameIBS="becky"):
     $ renpy.dynamic("_cametoday_eddie", "_cancumdaily_eddie")
     python:
         Becky.ensure_sex_state()
-        Eddie.stats.setdefault("group_sex", 0)
+        Eddie.set_sex_stat("group_sex", Eddie.sex_stat("group_sex", 0))
 
         def _iebs_set_arousal(who, value):
             value = min(100, max(0, int(value or 0)))

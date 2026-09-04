@@ -38,10 +38,10 @@ init python:
         info = people.get_info(eddie_name)
         return (
             int(getattr(info, "rel", 0) or 0) >= 3
-            and bool(Becky.home_sex_unlocked)
+            and int(threads["beckySex"].num or 0) >= 1
             and info.saw_mother_sex
             and info.seen_with_georgett
-            and int(Becky.eddie_join_stage or 0) != 1
+            and int(threads["beckyEddieSex"].num or 0) != 1
             and int(getattr(info, "talked_today", 0) or 0) < 2
         )
 

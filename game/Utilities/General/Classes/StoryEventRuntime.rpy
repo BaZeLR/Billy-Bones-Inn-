@@ -452,7 +452,7 @@ define sandraThreadList = [
             1,
             None,
             [
-                "#int(Becky.home_visit_stage or 0) >= 3",
+                "#threads['beckyHome'].completed",
                 "#not str(Sandra.revealing_dress_code or '').strip()",
                 "#daily_events.exists('', 'BuyDressTom', '') == 0",
                 "#daily_events.exists('sandra', 'BuyDress', '') == 0",
@@ -1016,6 +1016,113 @@ define beckyThreadList = [
     LThreadData(0, "becky", "FridayDanceMC", None, [
         BeckyFridayDanceMC,
     ], highlight=False, threaded=False),
+    # The Becky home route has two procedure-owned milestones followed by one
+    # authored talk event.  Empty cells deliberately avoid registering a
+    # second action for scenes already owned by BeckyHomeFront/IntBeckySex.
+    LThreadData(0, "becky", "Home", None, [
+        (
+            "story_becky_home_arrival_0",
+            None, None, None,
+            1,
+            None,
+            [
+                "#str(rooms.get('BeckyHomeFront').state.get('arrival_mode', '') or '') == 'FromDances'",
+            ],
+            None,
+            "BeckyHomeFront",
+            "enter",
+            10,
+        ),
+        [],
+        (
+            "story_becky_home_invite_talk_0",
+            None, None, None,
+            1,
+            None,
+            [
+                "#Becky.rel > 12",
+                "#Becky.talk_count() < 2",
+            ],
+            None,
+            "talk_becky",
+            "becky_home_invite",
+            100,
+        ),
+    ], highlight=False, threaded=True),
+    # Dinner stages are advanced only by their authored outcomes inside
+    # IntBeckyGuest.  The final Georgette crossover is a scheduled event.
+    LThreadData(0, "becky", "Dinner", None, [
+        [],
+        [],
+        (
+            "GeorgettBeckyVisit",
+            None, (18, 23), None,
+            1,
+            None,
+            [
+                "#int(Becky.eddie_home_visit_state or 0) == 4",
+                "#int(threads['beckySex'].num or 0) >= 1",
+                "#Eddie.saw_mother_sex",
+                "#CheckIfSexEventExist('georgett', 99, 'EddieHomeVisit') > 0",
+            ],
+            None,
+            "BeckyHome",
+            "georgett_home_visit",
+            350,
+        ),
+    ], highlight=False, threaded=True),
+    # These are procedure-owned unlock milestones, not duplicate menu events.
+    LThreadData(0, "becky", "Sex", None, [
+        [],
+        [],
+    ], highlight=False, threaded=True),
+    LThreadData(0, "becky", "EddieSex", None, [
+        (
+            "IntEddieTalkMomHelper",
+            None, None, None,
+            1, None,
+            ["#eddie_talk_can_mom_helper('eddie')"],
+            None,
+            "talk_eddie",
+            "becky_eddie_sex",
+            120,
+        ),
+        (
+            "BeckyEddieJoinFirst",
+            None, None, None,
+            1, None,
+            [
+                "#str(rooms.get('BeckyHomeFront').state.get('arrival_mode', '') or '') == 'FromDinner'",
+            ],
+            None,
+            "BeckyHome",
+            "enter",
+            120,
+        ),
+        (
+            "IntEddieTalkMomHelper",
+            None, None, None,
+            1, None,
+            ["#eddie_talk_can_mom_helper('eddie')"],
+            None,
+            "talk_eddie",
+            "becky_eddie_sex",
+            120,
+        ),
+        (
+            "IntEddieTalkMomHelper",
+            None, None, None,
+            1, None,
+            ["#eddie_talk_can_mom_helper('eddie')"],
+            None,
+            "talk_eddie",
+            "becky_eddie_sex",
+            120,
+        ),
+        # The first shared bedroom scene has happened. The final cursor is
+        # completed by the later Becky church follow-up, formerly visitedhome 7.
+        [],
+    ], highlight=False, threaded=True),
     LThreadData(0, "becky", "IngaLucasPath", None, [
         ("becky_homefront_share_with_becky", None, None, None, 1, None, [
             "#str(rooms.get('BeckyHomeFront').state.get('arrival_mode', '') or '') == 'FromDances'",
@@ -1060,25 +1167,6 @@ define beckyThreadList = [
             "#Becky.talk_count() < 2",
         ], None, "talk_becky", "becky_talk_eddie2", 90),
     ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "GeorgettHomeVisit", None, [
-        (
-            "GeorgettBeckyVisit",
-            None, (18, 23), None,
-            1,
-            None,
-            [
-                "#int(Becky.eddie_home_visit_state or 0) == 4",
-                "#int(Becky.home_visit_stage or 0) >= 5",
-                "#bool(Becky.home_sex_unlocked)",
-                "#Eddie.saw_mother_sex",
-                "#CheckIfSexEventExist('georgett', 99, 'EddieHomeVisit') > 0",
-            ],
-            None,
-            "BeckyHome",
-            "georgett_home_visit",
-            350,
-        ),
-    ], highlight=False, threaded=False),
     LThreadData(0, "becky", "ChurchAfterSermon", None, [
         (
             "story_becky_church_after_sermon",

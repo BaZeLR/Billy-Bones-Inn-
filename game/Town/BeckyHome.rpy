@@ -56,7 +56,7 @@ init python:
         code_name="BeckyHome",
         group_name=ROOM_GROUP_CITY,
         display_name="Дом Бекки",
-        bg_picture="images/becky/Home/withbecky.jpg",
+        bg_picture="images/becky/Home/interior.png",
         descriptions=[
             RoomDescription(
                 text="Вы постучали в дверь и через несколько секунд она распахнулась. За ней стояла Ребекка Блэнкеншип.",
@@ -101,7 +101,7 @@ label BeckyHome(arrive_mode=""):
     $ _becky_home_room.mark_visited()
 
     $ _start_becky_sex = False
-    if arrive_mode == 'FromDances' and Becky.home_visit_stage < 5:
+    if arrive_mode == 'FromDances' and int(threads["beckyDinner"].num or 0) < 2:
         "[_becky_home_room.descriptions[1].text] <br>Вы и миссис Блэнкеншип находитесь в ее спальне."
         call ShowImageSeq('becky', 'sex', 'inroom', 3)
         $ _start_becky_sex = True
@@ -112,10 +112,10 @@ label BeckyHome(arrive_mode=""):
         $ _start_becky_sex = True
     elif arrive_mode == 'FromDinner':
         "<br><br>[_becky_home_room.descriptions[2].text] "
-        if Becky.eddie_join_stage == 1 and Becky.home_visit_stage < 7:
-            call BeckyEddieJoinFirst
+        if story_event_available("BeckyHome", "enter"):
+            call checkTriggers("BeckyHome", "enter", 0)
         else:
-            if Becky.home_visit_stage < 7:
+            if not threads["beckyEddieSex"].completed:
                 "Дав вам зайти, вдова закрыла дверь на ключ и обернулась к вам, сказав: 'Если детишки мои развлекаются, то почему в конце концов я не могу себе такого позволить? Иди же ко мне!' "
             else:
                 "Вдова не позаботилась не то, что запереть дверь на ключ, но и даже полностью закрыть ее, и не теряя времени потащила вас к кровати. "
@@ -129,7 +129,7 @@ label BeckyHome(arrive_mode=""):
             $ _becky_admitted = True
         else:
             "[_becky_home_room.descriptions[0].text] "
-            if Becky.home_visit_stage < 3:
+            if int(threads["beckyHome"].num or 0) < 3:
                 if not Becky.uninvited_visit_scolded:
                     "Она не очень-то была рада вашему визиту: 'Стефан, зачем ты пришел?! Мы же договаривались! Надеюсь, тебя никто не видел?' <br> 'Никто,' сказали вы глядя на вдову своими честными глазами. 'Но я просто хотел...' <br> Бекки однако, ваше желание мало интересовало. Она резко прервала вас: 'Не приходи больше, что люди подумают. Все, пока.'<br> И дверь перед вашим носом захлопнулась.  "
                     $ Becky.uninvited_visit_scolded = True
@@ -171,6 +171,7 @@ label BeckyHome(arrive_mode=""):
         call check_visibility(GirlName)
         call IntBeckySex(GirlName)
         return
+    $ scene_runtime.picture = _becky_home_room.bg_picture
     $ scene_runtime.text = becky_home_restore_text()
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = str(rooms.current.display_name or "Дом Бекки")
@@ -181,7 +182,9 @@ label BeckyHome(arrive_mode=""):
 
 
 label BeckyHomeAfterSex:
-    $ Becky.home_visit_stage = max(Becky.home_visit_stage, 2)
+    if int(threads["beckyHome"].num or 0) < 2:
+        $ threads["beckyHome"].advanceTo(2, force_active=True)
+    $ scene_runtime.picture = rooms.get("BeckyHome").bg_picture
     $ scene_runtime.text = becky_home_restore_text()
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = str(rooms.get("BeckyHome").display_name or "Дом Бекки")
@@ -226,7 +229,7 @@ label BeckyHomeObjectMenu(object_id=""):
             elif _becky_action.hook == "jump" and str(_becky_action.target or "") != "":
                 main_ui_runtime.action_items.append(MenuItem(_becky_action.label, Jump(_becky_action.target)))
         main_ui_runtime.action_items.append(MenuItem("Назад", [
-            SetField(scene_runtime, "picture", becky_home_picture(rooms.get("BeckyHomeFront").state["arrival_mode"])),
+            SetField(scene_runtime, "picture", rooms.get("BeckyHome").bg_picture),
             SetField(scene_runtime, "text", becky_home_restore_text()),
             SetField(scene_runtime, "location_text", becky_home_restore_text()),
             SetField(main_ui_runtime, "action_title", str(rooms.get("BeckyHome").display_name or "Дом Бекки")),

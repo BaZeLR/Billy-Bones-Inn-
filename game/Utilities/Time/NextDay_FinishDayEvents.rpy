@@ -28,8 +28,8 @@ init python:
                 if procedural_randint(1, 70, "becky_priest_advice_finish_%s" % dayspassed_val) * 30 <= church_donated_amount:
                     Becky.priest_advice_stage = 3
             if Becky.priest_advice_stage == 3:
-                if Becky.home_visit_stage < 7 and Becky.eddie_join_stage >= 4:
-                    Becky.home_visit_stage = 7
+                if not threads["beckyEddieSex"].completed and int(threads["beckyEddieSex"].num or 0) >= 4:
+                    threads["beckyEddieSex"].advanceTo(5, complete_at_end=True)
 
         while SexEvents.today_events:
             tmpArray = TodaySexEvents_PopFirst()

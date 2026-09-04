@@ -11,6 +11,8 @@ def test_eddie_group_sex_positions_use_becky_owned_actor_state():
     ]
 
     for source in sources:
+        assert "Eddie.stats" not in source
+        assert 'Eddie.sex_stat("group_sex", 0)' in source
         assert "Eddie(1 if Becky.cock_in" not in source
         assert 'Becky.cock_in("pussy", "eddie")' in source
         assert 'Becky.cock_in("mouth", "eddie")' in source

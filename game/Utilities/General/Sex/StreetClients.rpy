@@ -64,7 +64,7 @@ label street_clients_watch(client_type=1, girl_name="", event_time=None):
             $ pregnancy_check(girl_name, "mouthface", 1, "", 1, "Неизвестный горожанин")
             $ _street_client_picture = build_media_ref(girl_name, "portevents", "event3_" + str(procedural_randint(1, 3, "street_client_georgett_3_%s" % int(current_game_day() or 0))))
         elif SexEventType == 99:
-            if Becky.home_visit_stage < 7:
+            if not threads["beckyEddieSex"].completed:
                 if not Eddie.seen_with_georgett:
                     $ scene_runtime.text = "Вы видите голую Жоржетту. Впрочем, зрелищем голой Жоржетты вас не удивишь, а вот тот факт, что она с вашим знакомцем рыжим Эдди, может и достоин внимания. Более того, похоже, они играют в какую-то игру."
                     $ Eddie.seen_with_georgett = True

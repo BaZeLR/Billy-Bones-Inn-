@@ -26,7 +26,7 @@ label GeorgettBeckyVisit:
     "Жоржетта решительно приспустила с парня штаны, обнажив его быстро твердеющий член. Дав возможность всем присутствующим насладиться зрелищем Эддиного члена, Жоржетта сначала ловко облизала головку своим язычком, а потом, после того как член Эдди встал во всей красе, стала профессионально и умело делать ему минет."
     "Происходящее не оставило окружающих безучастными. Лукас шепнул на ушко пару слов Ингенборг, встал, расстегнул штаны. Инга, метнув быстрый взгляд на мать, начала отсасывать своему женишку."
     "Дыхание Ребекки участилось, щеки покрылись румянцем, рука автоматически полезла вниз. Вдова явно была в растерянности."
-    $ Becky.home_visit_stage = max(Becky.home_visit_stage, 6)
+    $ event_runtime.active_thread.advance()
     $ scene_runtime.picture = "images/becky/dinner/AllMinet1.jpg"
     vscene scene_runtime.picture
     "Все присутствующие на мгновение словно забыли про ужин."
@@ -78,7 +78,7 @@ label GeorgettBeckyVisit:
                 $ beckyminetagree = procedural_randint(1, 3, "becky_georgett_minet_agree_%s" % int(current_game_day() or 0))
                 if Becky.corruption < 40:
                     $ beckyminetagree = 3
-                elif Becky.open_oral_stage > 0 and Becky.corruption + dinnerbeckyorgasm * 5 > 44:
+                elif int(threads["beckySex"].num or 0) >= 2 and Becky.corruption + dinnerbeckyorgasm * 5 > 44:
                     $ beckyminetagree = 1
                 elif Becky.corruption + dinnerbeckyorgasm * 5 > 46 and beckyminetagree == 2:
                     $ beckyminetagree = 1
@@ -90,7 +90,7 @@ label GeorgettBeckyVisit:
                     if beckyminetagree > 1:
                         "Однако ее реакция оказалась совсем не такой, как вы надеялись."
                         "\"Да ты что, Стефан, обалдел?!\" - воскликнула вдова."
-                        if Becky.open_oral_stage > 0:
+                        if int(threads["beckySex"].num or 0) >= 2:
                             "\"Если я один раз тебе уступила, это не значит, что я тебе теперь всегда буду отсасывать по мановению твоего пальчика. Ты зарываешься. Так что на сегодня - пока, сейчас тебе пожалуй лучше всего будет уйти.\""
                         else:
                             "\"Да, я сказала Инге и Эдди не стесняться, но к тебе-то это не относилось. Так что сейчас тебе пожалуй лучше всего будет уйти.\""
@@ -118,7 +118,8 @@ label GeorgettBeckyVisit:
                     $ scene_runtime.picture = "images/becky/dinner/BeckyMinet2.jpg"
                     vscene scene_runtime.picture
 
-                $ Becky.open_oral_stage = max(1, Becky.open_oral_stage)
+                if int(threads["beckySex"].num or 0) < 2:
+                    $ threads["beckySex"].advanceTo(2, complete_at_end=True)
                 $ Becky.apply_social_roll(20, 2, 1, 55, 1, 1)
                 call PregnancyCheck("inga", "mouth", 1, "Лукас")
                 call PregnancyCheck("georgett", "mouthface", 1, "eddie")

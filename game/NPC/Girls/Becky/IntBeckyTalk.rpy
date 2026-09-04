@@ -60,19 +60,19 @@ label IntBeckyTalk(girl_name="becky"):
                 call checkTriggers("talk_becky", "becky_talk_eddie1", 0)
             "Рассказать про игру Эдди и Жоржетты" if story_event_available("talk_becky", "becky_talk_eddie2"):
                 call checkTriggers("talk_becky", "becky_talk_eddie2", 0)
-            "Попробовать напросится в гости" if Becky.home_visit_stage == 2 and Becky.rel > 12 and Becky.talk_count() < 2:
-                call story_becky_home_invite_talk_0(_becky_name)
+            "Попробовать напросится в гости" if story_event_available("talk_becky", "becky_home_invite"):
+                call checkTriggers("talk_becky", "becky_home_invite", 0)
             "Спросить о прошлом визите в гости" if Becky.home_visit_count > 0 and Becky.talk_count() < 2:
                 call story_becky_home_last_visit_talk_0(_becky_name)
-            "Указать Бекки на поведение ее управляющего" if Becky.home_visit_stage >= 3 and (Eddie.saw_mother_sex or Becky.home_sex_unlocked) and Becky.home_visit_stage < 7 and Becky.eddie_join_stage < 4 and Becky.talk_count() < 2:
+            "Указать Бекки на поведение ее управляющего" if threads["beckyHome"].completed and (Eddie.saw_mother_sex or int(threads["beckySex"].num or 0) >= 1) and int(threads["beckyEddieSex"].num or 0) < 4 and Becky.talk_count() < 2:
                 call story_becky_talk_eddie_behavior_0(_becky_name)
-            "Рассказать что Эдди требует, чтобы Жоржетта изображала Бекки" if Becky.eddie_georgett_stage > 1 and Becky.home_visit_stage < 7 and Becky.talk_count() < 2:
+            "Рассказать что Эдди требует, чтобы Жоржетта изображала Бекки" if Becky.eddie_georgett_stage > 1 and not threads["beckyEddieSex"].completed and Becky.talk_count() < 2:
                 call story_becky_talk_eddie_georgett_1(_becky_name)
-            "Возмутиться поведением Эдди" if Becky.georgett_mentioned and Becky.home_visit_stage < 7 and Becky.talk_count() < 2:
+            "Возмутиться поведением Эдди" if Becky.georgett_mentioned and not threads["beckyEddieSex"].completed and Becky.talk_count() < 2:
                 call story_becky_talk_eddie_reaction_0(_becky_name)
-            "Посоветовать Бекки быть повнимательнее к нуждам Эдди" if Becky.georgett_mentioned and Becky.home_visit_stage < 7 and Becky.talk_count() < 2:
+            "Посоветовать Бекки быть повнимательнее к нуждам Эдди" if Becky.georgett_mentioned and not threads["beckyEddieSex"].completed and Becky.talk_count() < 2:
                 call story_becky_talk_eddie_reaction_1(_becky_name)
-            "Поговорить с Бекки об Эдди" if ((Becky.eddie_join_stage == 4 and Becky.asked_about_eddie_sex_stage == 0) or (Becky.home_visit_stage >= 7 and Becky.asked_about_eddie_sex_stage < 2)) and Becky.talk_count() < 2:
+            "Поговорить с Бекки об Эдди" if ((int(threads["beckyEddieSex"].num or 0) >= 4 and Becky.asked_about_eddie_sex_stage == 0) or (threads["beckyEddieSex"].completed and Becky.asked_about_eddie_sex_stage < 2)) and Becky.talk_count() < 2:
                 call story_becky_talk_eddie_after_sex_0(_becky_name)
             "Спросить, знает ли она от кого затяжелела" if Becky.talk_count() < 2 and Becky.rel >= 8 and int(Becky.stats.get("pregnancy", 0) or 0) >= 120 and str(DaddyAskBuildPhrase(_becky_name) or "") != "":
                 call story_becky_talk_pregnancy_0(_becky_name)

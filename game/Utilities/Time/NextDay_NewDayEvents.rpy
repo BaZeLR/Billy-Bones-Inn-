@@ -41,7 +41,7 @@ label NextDay_NewDayEvents(retlocname=""):
                 Becky.eddie_home_visit_state = 0
             # Теперь определим успех на сегодня, по пятницам жоржи не приходит
             if procedural_randint(1, Eddie.whore_visit_frequency, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:93:1") == 1 and week_value != 5:
-                if Becky.home_visit_stage >= 5 and Eddie.saw_mother_sex and Becky.home_sex_unlocked:
+                if int(threads["beckyDinner"].num or 0) >= 2 and Eddie.saw_mother_sex and int(threads["beckySex"].num or 0) >= 1:
                     if procedural_randint(1, 10, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:95:2") <= 1 + Becky.eddie_home_visit_state * 5 + (3 if Becky.eddie_georgett_stage > 1 else 0):
                         Becky.eddie_home_visit_state = 4
                     else:
@@ -65,10 +65,10 @@ label NextDay_NewDayEvents(retlocname=""):
         Becky.home_front_checked_today = False
 
         # К Бекки приходят любовники
-        if Becky.corruption >= 35 and (Becky.last_store_orgasm_day + 2) <= day_value and Becky.home_visit_stage >= 2 and week_value != 7:
+        if Becky.corruption >= 35 and (Becky.last_store_orgasm_day + 2) <= day_value and int(threads["beckyHome"].num or 0) >= 2 and week_value != 7:
             if Becky.corruption >= 55 or procedural_randint(1, 2, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:122:5") == 1:
                 TodaySexEvents_Add('becky', 99, procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:123:6"), 'StoreLover')
-        if Becky.home_visit_stage >= 7 and procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:124:7") <= 2 and CheckIfEventAlreadyExist('georgett', 99) <= 0:
+        if threads["beckyEddieSex"].completed and procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:124:7") <= 2 and CheckIfEventAlreadyExist('georgett', 99) <= 0:
             TodaySexEvents_Add('becky', 99, 99, 'EddieMom')
 
         if week_value == 7:
@@ -138,7 +138,7 @@ label NextDay_NewDayEvents(retlocname=""):
             Mongol.will_try_to_steal = True
 
         # Бекки предлагает подзаработать
-        if Becky.home_visit_stage >= 5 and Becky.rel >= 15 and Becky.eddie_robbed_day == 0 and day_value > 0 and procedural_randint(1, 6, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:194:13") == 1:
+        if int(threads["beckyDinner"].num or 0) >= 2 and Becky.rel >= 15 and Becky.eddie_robbed_day == 0 and day_value > 0 and procedural_randint(1, 6, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:194:13") == 1:
             if daily_events.exists('becky', 'SherwoodQuest') == 0:
                 Becky.eddie_robbed_day = day_value
                 daily_events.add("becky", "GroceryStore", 1, ">=", 1, 9999, "SherwoodQuest", "BeckyQuestInit", "none")

@@ -99,6 +99,7 @@ init -25 python:
             "current_game_day": current_game_day,
             "day_delta_ready": day_delta_ready,
             "effective_player_exploration": effective_player_exploration,
+            "eddie_talk_can_mom_helper": eddie_talk_can_mom_helper,
             "household_runtime_event_seen_today": household_runtime_event_seen_today,
             "household_morning_issue_type": household_morning_issue_type,
             "npc_relationship_level": npc_relationship_level,

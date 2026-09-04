@@ -32,7 +32,10 @@ label IntEddieTalk:
             "Поинтересоваться у Эдди как ему ваши девочки." if eddie_talk_can_girls(_eddie_name):
                 call IntEddieTalkGirls
             "Предложить помочь подкатится к хозяйке лавки." if eddie_talk_can_mom_helper(_eddie_name):
-                call IntEddieTalkMomHelper
+                if story_event_available("talk_eddie", "becky_eddie_sex"):
+                    call checkTriggers("talk_eddie", "becky_eddie_sex", 0)
+                else:
+                    call IntEddieTalkMomHelper
             "Спросить о синяке." if eddie_talk_can_bruise(_eddie_name):
                 call IntEddieTalkBruise
             "А все таки расскажи, кто это тебе так вмазал?" if eddie_talk_can_who_hit(_eddie_name):
@@ -95,7 +98,7 @@ label IntEddieTalkGirls:
 
 label IntEddieTalkMomHelper:
     $ Becky.update()
-    if Becky.eddie_join_stage == 0:
+    if int(threads["beckyEddieSex"].num or 0) == 0:
         $ scene_runtime.text = "\"Эй, Эдди, я прекрасно знаю чего тебе хочется,\" сказали вы юному бакалейщику. \"Думаешь я не видел, какие ты взгляды на хозяйку лавки кидаешь? Или не знаю в какие ты игры с Жоржеттой играешься?\""
         if int(Eddie.rel or 0) < 9:
             $ scene_runtime.text += "\n\n\"Не понимаю, мастер Стефан, о чем это вы,\" ответил вам Эдди слегка покраснев. Все ваши дальнейшие попытки разговорить его упирались в стену молчания. Судя по всему он вас плохо знает и не доверяет."
@@ -104,9 +107,9 @@ label IntEddieTalkMomHelper:
             $ scene_runtime.text += "\n\n\"Правда что ли?\" глаза Эдди стали как плошки."
             $ scene_runtime.text += "\n\n\"Точно тебе говорю,\" заверили наивного юношу вы."
             $ scene_runtime.text += "\n\n\"Ну спасибо тебе, не ожидал.\""
-            $ Becky.eddie_join_stage = 1
+            $ event_runtime.active_thread.advance()
         vscene "images/eddie/portraits/surprised.png"
-    elif Becky.eddie_join_stage in [2, 3]:
+    elif int(threads["beckyEddieSex"].num or 0) in [2, 3]:
         $ scene_runtime.text = "\"Эй Эдди, насчет прошлого раза,\" начали вы свою речь."
         if int(Eddie.rel or 0) < 10:
             $ scene_runtime.text += "\n\n\"Да пошел ты,\" ответил вам Эдди, с ненавистью глядя на вас, \"куда подальше. Не поддамся я еще раз на твое издевательство.\""
@@ -116,7 +119,7 @@ label IntEddieTalkMomHelper:
             $ scene_runtime.text += "\n\nС этими словами бакалейщик отвернулся и на дальнейшие попытки завязать разговор не реагировал."
         else:
             $ scene_runtime.text += "\n\n\"Это ты поиздеваться решил надо мной, да?\" ответил вам Эдди смерив вас тяжелым недобрым взглядом."
-            if Becky.eddie_join_stage == 3:
+            if int(threads["beckyEddieSex"].num or 0) == 3:
                 $ scene_runtime.text += "\n\n\"Я сделал все так, как ты сказал, а дверь была заперта.\""
                 $ scene_runtime.text += "\n\n\"Эээ, извини, я просто забыл засов отодвинуть, в следующий раз обязательно открою, это я не специально.\" заверили вы своего нового друга."
             else:
@@ -125,9 +128,9 @@ label IntEddieTalkMomHelper:
             $ scene_runtime.text += "\n\n\"Правда что ли?\""
             $ scene_runtime.text += "\n\n\"Точно тебе говорю\""
             $ scene_runtime.text += "\n\n\"Ну ладно, а я уж подумал было...\""
-            $ Becky.eddie_join_stage = 1
+            $ event_runtime.active_thread.advanceTo(1, force_active=True)
         vscene "images/eddie/portraits/surprised.png"
-    elif Becky.eddie_join_stage >= 4 and Becky.home_visit_stage < 7:
+    elif int(threads["beckyEddieSex"].num or 0) >= 4 and not threads["beckyEddieSex"].completed:
         $ scene_runtime.text = "\"И как тебе ночка с хозяйкой лавки?\" подмигнули вы Эдди, делая рукой неприличный жест."
         $ scene_runtime.text += "\n\n\"Ух, классно, спасибо тебе Стефан, ты настоящий друг. Госпожа Блэнкеншип сказала, что теперь я каждый день могу ее трахать, и даже спать с ней иногда,\" сказал Эдди с блаженной улобкой на лице."
         $ scene_runtime.text += "\n\n\"Но и ты, конечно, всегда будешь желанным гостем в нашем доме,\" быстро поправился он."
@@ -154,7 +157,7 @@ label IntEddieTalkBruise:
 
 label IntEddieTalkWhoHit:
     $ Becky.update()
-    if Becky.home_visit_stage >= 7 and int(Eddie.rel or 0) >= 9:
+    if threads["beckyEddieSex"].completed and int(Eddie.rel or 0) >= 9:
         $ scene_runtime.text = "\"Знаешь, ты мне удружил, и мою хозяйку мы с тобой классно оттрахали. Врядли бы она мне дала, если бы не ты. Так что скажу, хоть она и не велела. Только ты меня не запали, хорошо? В общем меня уроды эти, из Шервудского леса, отмудохали. Обычно нормально можно было проехать, дашь им пару десятков монет и едешь себе. А надысь еду - только их встретил так мне сразу в табло засветили. Хоть бы объяснили, за что. Деньги отобрали, лошадь забрали. Вот пидорасы!\""
         $ Becky.sherwood_suspicion += 10
         $ Eddie.fingal_talk_stage = 2

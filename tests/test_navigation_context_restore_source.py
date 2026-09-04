@@ -85,7 +85,7 @@ def test_object_menus_that_replace_room_pictures_restore_their_room_projection()
         ("game/Inn/TavernStable.rpy", "tavern_stable_object_menu", "tavern_stable_picture()"),
         ("game/Town/Arts/ArtisansQuarter.rpy", "ArtisansQuarterObjectMenu", 'rooms.get("ArtisansQuarter").bg_picture'),
         ("game/Town/Arts/Dress/DressShop.rpy", "DressShopObjectMenu", 'SetField(scene_runtime, "picture", "")'),
-        ("game/Town/BeckyHome.rpy", "BeckyHomeObjectMenu", "becky_home_picture("),
+        ("game/Town/BeckyHome.rpy", "BeckyHomeObjectMenu", 'rooms.get("BeckyHome").bg_picture'),
         ("game/Town/CityGuard.rpy", "CityGuardShowPlacat", "city_guard_room_picture()"),
         ("game/Town/WineStore.rpy", "WineStoreObjectMenu", "wine_store_scene_picture()"),
     )

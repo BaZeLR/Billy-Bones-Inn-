@@ -51,7 +51,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
     python:
         Becky.ensure_sex_state()
         people.get_info("eddie").set_arousal(people.get_info("eddie").arousal_value())
-        Eddie.stats.setdefault("group_sex", 0)
+        Eddie.set_sex_stat("group_sex", Eddie.sex_stat("group_sex", 0))
         CurGiveOrgasms = Becky.stats.get("orgasms_given", 0)
         _ibs_update_visibility(GirlNameIBS)
     call ShowBeckyPortrait
@@ -449,7 +449,8 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                     $ _ibs_set_arousal("You", 0)
                     $ _ibs_set_arousal(GirlNameIBS, 0)
                     $ _ibs_end_cock_state(GirlNameIBS)
-                    $ Becky.home_visit_stage = max(Becky.home_visit_stage, 2)
+                    if int(threads["beckyHome"].num or 0) < 2:
+                        $ threads["beckyHome"].advanceTo(2, force_active=True)
                     call ShowCurrentSex(GirlNameIBS)
                     call DressUp(GirlNameIBS)
                     $ Becky.set_sex_busy(False)

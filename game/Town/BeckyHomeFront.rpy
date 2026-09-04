@@ -93,6 +93,14 @@ init python:
             else:
                 show_image("inga", "streetsex", "cumface")
 
+# First-time dance arrival is the opening event of Becky's home thread.
+label story_becky_home_arrival_0:
+    "[rooms.get('BeckyHomeFront').descriptions[1].text]"
+    call ShowImage("", "", becky_homefront_withbecky_picture())
+    $ event_runtime.active_thread.advance()
+    return
+
+
 # --- MAIN LOCATION LABEL ---
 label BeckyHomeFront(arrive_mode=""):
     $ renpy.dynamic("_becky_front_room")
@@ -110,10 +118,11 @@ label BeckyHomeFront(arrive_mode=""):
         $ pregnancy_check("inga", "inside", 1, "Лукас")
 
     if rooms.get("BeckyHomeFront").state["arrival_mode"] == "FromDances":
-        if Becky.home_visit_stage == 0:
-            $ Becky.home_visit_stage = 1
-        "[_becky_front_room.descriptions[1].text]"
-        call ShowImage("", "", becky_homefront_withbecky_picture())
+        if story_event_available("BeckyHomeFront", "enter"):
+            call checkTriggers("BeckyHomeFront", "enter", 0)
+        else:
+            "[_becky_front_room.descriptions[1].text]"
+            call ShowImage("", "", becky_homefront_withbecky_picture())
     else:
         "[_becky_front_room.descriptions[0].text]"
         call ShowImage("", "", becky_homefront_house_picture())
@@ -239,7 +248,7 @@ label becky_homefront_share_with_becky:
     else:
         "\"Эх доченька бедная моя, тебе же наверное неудобно то, на камне. Ну да дело молодое!\""
     "- сказала Бекки, увидев парочку."
-    if Becky.home_visit_stage < 5:
+    if int(threads["beckyDinner"].num or 0) < 2:
         "\"Но ведь это значит, что дома скорее всего никого нет, так что пошли скорее внутрь, пока они нас не засекли!\" - добавила она."
     $ show_inga_front_fuck_image(rooms.get("BeckyHomeFront").state["inga_scene_roll"], 2)
     $ Inga.acquaintance_stage = max(Inga.acquaintance_stage, 1)
@@ -259,7 +268,7 @@ label becky_homefront_share_with_becky:
 
 label becky_homefront_ignore:
     "Вы вернулись к вдове Блэнкеншип: \"А, кошка пробежала, ерунда\", сказали вы ей."
-    if Becky.home_visit_stage < 5:
+    if int(threads["beckyDinner"].num or 0) < 2:
         "\"А, ну тогда пошли скорее в дом, пока дети мои не вернулись,\" ответила вам Бекки, \"а то увидят, смеяться будут, мол мамке уже [people_age('becky', 36)] лет, а она все с парнями гуляет.\""
     else:
         "\"А, ну тогда пошли скорее в дом, я уже и стол накрыла,\" ответила вам Бекки."
@@ -271,7 +280,7 @@ label becky_homefront_ignore:
     return
 
 label becky_homefront_suggest_approach:
-    if Becky.home_visit_stage < 5:
+    if int(threads["beckyDinner"].num or 0) < 2:
         "Вы обернулись к вдове Блэнкеншип: \"Может подойдем к ним?\" спросили вы ее."
         "\"Да ты что, ведь тогда дочка меня с тобой увидит, вдруг смеяться будет, мол мамке уже [people_age('becky', 36)] лет, а она все с парнями гуляет. Пошли лучше скорее в дом, пока они тут заняты.\""
         "И с этими словами она настойчиво потянула вас в сторону двери."
@@ -290,7 +299,7 @@ label becky_homefront_suggest_approach:
         $ Becky.apply_social_roll(0, 0, 0, 45, 3, 1)
         $ Inga.apply_social_chance(0, 0, 0, 45, 3, 1, "becky_homefront_suggest")
 
-    if Becky.home_visit_stage < 5:
+    if int(threads["beckyDinner"].num or 0) < 2:
         menu:
             "Зайти в дом":
                 call BeckyHome(rooms.get("BeckyHomeFront").state["arrival_mode"])
@@ -348,7 +357,7 @@ label becky_homefront_approach:
         "Однако на ваш заход вы получили обескураживающий ответ: \"Ну, хотя я парней обычно не трахаю, для тебя могу сделать исключение.\""
         "\"Нет, нет, что вы, не надо исключений, будьте верны своим принципам,\" тут же нашлись вы."
         "И тут вы поняли, что разговариваете с пустотой: парень решил сосредоточиться на своей партнерше, а не на дискуссии с вами."
-    elif Becky.home_visit_stage < 5:
+    elif int(threads["beckyDinner"].num or 0) < 2:
         "Вы решили нарушить уединение парочки. Подойдя к Лукасу с Ингой решительным шагом, вы нахально осведомились: \"А что это вы тут делаете, а?\""
         "\"О, привет Стефан,\" - ответил Лукас вам как ни в чем не бывало. \"А сам-то что думаешь, что мы тут делаем?\" - задал он риторический вопрос."
         if rooms.get("BeckyHomeFront").state["inga_scene_roll"] == 1:
@@ -368,7 +377,7 @@ label becky_homefront_approach:
             "При этом он ни на секунду не замедлил темпа, продолжая сношать Ингенборг. Та обернулась к вам и вежливо, хотя и несколько запыхавшись, поприветствовала вас: \"Стефанчик, ах, приветик, ах!\""
     $ Inga.apply_social_chance(0, 0, 0, 45, 3, 1, "becky_homefront_approach")
 
-    if Inga.acquaintance_stage >= 2 and Becky.home_visit_stage >= 5:
+    if Inga.acquaintance_stage >= 2 and int(threads["beckyDinner"].num or 0) >= 2:
         menu:
             "Зайти в дом":
                 call BeckyHome(rooms.get("BeckyHomeFront").state["arrival_mode"])

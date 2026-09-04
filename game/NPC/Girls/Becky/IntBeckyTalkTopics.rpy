@@ -181,8 +181,7 @@ label story_becky_home_invite_talk_0(girl_name="becky", _becky_inga_thread=None,
                 "\"Ну пока нет, но скоро будет\", ничтоже сумнявшись заявили вы. Скромница, однако, отнеслась к вашим уверениям скептически: \"Вот когда будет, тогда и поговорим!\""
         if invite_points >= 4:
             "\"Вот черт языкастый!\", воскликнула в сердцах Бекки. -\"Уболтал, можешь по вечерам в гости ко мне приходить\""
-            if Becky.home_visit_stage < 3:
-                $ Becky.home_visit_stage = 3
+            $ event_runtime.active_thread.advance()
         else:
             "\"Ну вот, сам видишь, что в гости ко мне тебе лучше не приходить.\" - торжествуеще сказала вдовица. Вам ничего не оставалось делать, как с ней согласиться."
     $ Becky.finish_talk()
@@ -198,11 +197,11 @@ label story_becky_talk_pregnancy_0(girl_name="becky"):
 
 
 label story_becky_home_last_visit_talk_0(girl_name="becky", rand_var=0):
-    if Becky.home_visit_stage >= 6:
+    if int(threads["beckyDinner"].num or 0) >= 3:
         "\"Бекки, как тебе завершение ужина?\" - осведомились вы."
-        if procedural_randint(1, max(1, 3 + Becky.open_oral_stage), "becky_lastvisit_inga_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
+        if procedural_randint(1, 3 + (1 if int(threads["beckySex"].num or 0) >= 2 else 0), "becky_lastvisit_inga_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
             "\"А ты заметил, что Ингенборг, доча моя, совсем большая стала?\" ответила вам мать семейства."
-        elif Becky.open_oral_stage > 0:
+        elif int(threads["beckySex"].num or 0) >= 2:
             if Becky.corruption < 48:
                 "\"Ну я не знаю, все-таки как-то неловко мне было на глазах Эдди и Инги.\""
             else:
@@ -221,7 +220,7 @@ label story_becky_home_last_visit_talk_0(girl_name="becky", rand_var=0):
         "\"Бекки, спасибо за ужин и за гостеприимство,\" сказали вы."
         if Becky.home_visit_count <= 2:
             "\"Ой, я так рада что ты к нам зашел, с семьей моей познакомился. У нас уже пару месяцев как гостей не было.\""
-        elif Becky.home_sex_unlocked:
+        elif int(threads["beckySex"].num or 0) >= 1:
             if procedural_randint(1, 2, "becky_lastvisit_homesex_%s_%s" % (current_game_day(), Becky.talk_count())) == 1:
                 if Becky.corruption >= 42:
                     "\"Ну ты приходи почаще, а то я без твоего члена уже и заснуть спокойно не могу,\" игриво заметила Бекки."
@@ -229,7 +228,7 @@ label story_becky_home_last_visit_talk_0(girl_name="becky", rand_var=0):
                     "\"Ох, и подумать только, я с тобой, на глазах у детей, пошла прямо в спальню. Как вспомню, так коленки до сих пор дрожат.\" - поделилась с вами вдова. \"И внизу мокро,\" добавила она приглушенным голосом."
             else:
                 "\"А ты заметил, что Ингенборг, доча моя, совсем большая стала?\" ответила вам мать семейства."
-        elif not Becky.home_sex_unlocked and Becky.home_visit_stage >= 5:
+        elif int(threads["beckySex"].num or 0) < 1 and int(threads["beckyDinner"].num or 0) >= 2:
             "\"А ты заметил, что Ингенборг, доча моя, совсем большая стала?\" ответила вам мать семейства."
         else:
             "\"Хорошо было, ты еще приходи, не стесняйся.\""
@@ -345,7 +344,7 @@ label story_becky_talk_eddie_reaction_1(girl_name="becky", change_mind=0):
 
 
 label story_becky_talk_eddie_after_sex_0(girl_name="becky"):
-    if Becky.home_visit_stage < 7:
+    if not threads["beckyEddieSex"].completed:
         "\"И как тебе прошлая ночь с Эдди?\" осведомились вы у Ребекки."
         "\"Ох, даже не знаю что на меня нашло,\" ответила вам почтенная матрона. \"Отдаться Эдди?! А если я от него затяжелею? Я ведь ему хозяйка, я старше, я не девчонка с танцев. И не такая, как моя непутевая сестрица Грета, нет. Ну и подставил же ты меня, Стефан!\" упрекнула вас скромница Бекки."
         "\"Эй, да ведь ты сама этого хотела,\" возразили вы. \"Я же видел как ты текла когда Эдди тебя трахал.\""

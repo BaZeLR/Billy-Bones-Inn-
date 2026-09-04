@@ -87,105 +87,107 @@ testsuite global:
         exit
 
 testcase becky_home_restore_gate_after_sex:
-    run Jump("Intro")
-    advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
-    python:
-        CurLoc = "BeckyHome"
-        location = CurLoc
-        ArriveMode = "FromDances"
-        Becky.home_visit_stage = 2
-        Becky.eddie_join_stage = 0
-        MyCurDress = "citydress"
-    run Jump("BeckyHome")
+    run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
-    assert eval (str(CurLoc or "") == "BeckyHome") timeout 5.0
-    assert eval (str(ArriveMode or "") == "FromDances") timeout 5.0
-    assert eval ("спальне" in str(MainTxt or "")) timeout 5.0
-    assert eval ("зачем ты пришел" not in str(MainTxt or "")) timeout 5.0
-    assert eval ("постучали" not in str(MainTxt or "")) timeout 5.0
-
-testcase becky_home_front_from_dance_enter_house:
-    run Jump("Intro")
-    advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
     python:
-        week = 5
-        time = 3
-        hour = 20
-        minute = 0
-        Becky.home_visit_stage = 0
+        rooms.enter("BeckyHome")
+        rooms.get("BeckyHomeFront").state["arrival_mode"] = "FromDances"
+        threads["beckyHome"].advanceTo(2, force_active=True)
+        threads["beckyEddieSex"].reset()
+        player.appearance.current_dress = "citydress"
+    run Call("BeckyHomeAfterSex")
+    advance until screen "main_ui" timeout 20.0
+    assert eval (str(rooms.current_code or "") == "BeckyHome") timeout 5.0
+    assert eval (str(rooms.get("BeckyHomeFront").state["arrival_mode"] or "") == "FromDances") timeout 5.0
+    assert eval ("спальне" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ("зачем ты пришел" not in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ("постучали" not in str(scene_runtime.text or "")) timeout 5.0
+
+testcase becky_home_front_from_dance_starts_home_thread:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 5
+        calendar_v2.hour = 20
+        calendar_v2.minute = 0
+        threads["beckyHome"].reset()
         Becky.home_front_checked_today = False
-        MyCurDress = "citydress"
+        player.appearance.current_dress = "citydress"
     run Call("BeckyHomeFront", "FromDances")
     advance until screen "choice" timeout 20.0
-    assert eval (str(CurLoc or "") == "BeckyHomeFront") timeout 5.0
-    assert eval (str(ArriveMode or "") == "FromDances") timeout 5.0
-    assert eval (int(Becky.home_visit_stage or 0) == 1) timeout 5.0
-    click "Зайти в дом" until eval (str(CurLoc or "") == "BeckyHome") timeout 20.0
-    advance until screen "choice" timeout 20.0
-    assert eval (str(CurLoc or "") == "BeckyHome") timeout 5.0
-    assert eval (str(ArriveMode or "") == "FromDances") timeout 5.0
-    assert eval (int(Becky.home_visit_stage or 0) == 1) timeout 5.0
+    assert eval (str(rooms.current_code or "") == "BeckyHomeFront") timeout 5.0
+    assert eval (str(rooms.get("BeckyHomeFront").state["arrival_mode"] or "") == "FromDances") timeout 5.0
+    assert eval (int(threads["beckyHome"].num or 0) == 1) timeout 5.0
     run Jump("StreetTavern")
 
-testcase becky_dance_accept_home_order:
-    run Jump("Intro")
-    advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
+testcase becky_accept_home_invitation_order:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
     python:
-        week = 5
-        time = 3
-        hour = 20
-        minute = 0
-        FridayDanceRoom.state["dance_count"] = 1
-        DanceStep = 3
-        DanceMaxIBD = 6
-        HandsDance = "ass"
-        KissDance = 1
-        TitsDance = 0
+        calendar_v2.week = 5
+        calendar_v2.hour = 20
+        calendar_v2.minute = 0
+        rooms.get("FridayDance").dance_count = 1
+        rooms.get("FridayDance").step = 3
+        rooms.get("FridayDance").max_step = 6
+        rooms.get("FridayDance").hands = "ass"
+        rooms.get("FridayDance").kiss = 1
+        rooms.get("FridayDance").tits = 0
         rooms.get("FridayDance").becky_home_invited = True
-        Becky.home_visit_stage = 0
+        threads["beckyHome"].reset()
         Becky.home_front_checked_today = False
-        Friends["becky"] = 20
-        sluttiness["becky"] = 40
-        HadSex["becky"] = 0
-        MyCurDress = "citydress"
-    run Call("int_becky_dance")
+        Becky.rel = 20
+        Becky.corruption = 40
+        Becky.stats["sexacts"] = 0
+        player.appearance.current_dress = "citydress"
+    run Call("becky_accept_home_invitation")
     advance until screen "choice" timeout 20.0
-    click "Принять предложение вдовы" until eval (str(CurLoc or "") == "BeckyHomeFront") timeout 20.0
-    advance until screen "choice" timeout 20.0
-    assert eval (str(CurLoc or "") == "BeckyHomeFront") timeout 5.0
-    assert eval (str(ArriveMode or "") == "FromDances") timeout 5.0
-    assert eval (int(FridayDanceRoom.state["dance_count"] or 0) == 5) timeout 5.0
-    click "Зайти в дом" until eval (str(CurLoc or "") == "BeckyHome") timeout 20.0
-    advance until screen "choice" timeout 20.0
-    assert eval (str(CurLoc or "") == "BeckyHome") timeout 5.0
-    assert eval (str(ArriveMode or "") == "FromDances") timeout 5.0
+    assert eval (str(rooms.current_code or "") == "BeckyHomeFront") timeout 5.0
+    assert eval (str(rooms.get("BeckyHomeFront").state["arrival_mode"] or "") == "FromDances") timeout 5.0
+    assert eval (int(rooms.get("FridayDance").dance_count or 0) == 5) timeout 5.0
     run Jump("StreetTavern")
 
 testcase friday_dance_find_becky_opens_becky_dance:
-    run Jump("Intro")
-    advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
     python:
-        week = 5
-        time = 3
-        hour = 20
-        minute = 0
-        FridayDanceRoom.state["dance_count"] = 0
-        DanceStep = 0
+        rooms.enter("FridayDance")
+        calendar_v2.week = 5
+        calendar_v2.hour = 20
+        calendar_v2.minute = 0
+        rooms.get("FridayDance").dance_count = 0
+        rooms.get("FridayDance").step = 0
         Becky.left_dances = 0
-        Friends["becky"] = 20
-        sluttiness["becky"] = 40
-    run Jump("FridayDance")
+        Becky.rel = 20
+        Becky.corruption = 40
+    run Call("story_becky_friday_dance_mc_0")
     advance until screen "choice" timeout 20.0
-    click "Найти Бекки Блэнкеншип" until screen "say" timeout 20.0
-    advance until screen "choice" timeout 20.0
-    assert eval (str(CurLoc or "") == "FridayDance") timeout 5.0
-    assert eval (int(DanceStep or 0) == 1) timeout 5.0
-    assert eval (int(FridayDanceRoom.state["dance_count"] or 0) == 1) timeout 5.0
+    assert eval (str(rooms.current_code or "") == "FridayDance") timeout 5.0
+    assert eval (int(rooms.get("FridayDance").step or 0) == 1) timeout 5.0
+    assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1) timeout 5.0
     run Jump("StreetTavern")
+
+testcase becky_legacy_progress_migrates_to_threads:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        threads["beckyHome"].reset()
+        threads["beckyDinner"].reset()
+        threads["beckySex"].reset()
+        threads["beckyEddieSex"].reset()
+        Becky.home_visit_stage = 7
+        Becky.home_sex_unlocked = True
+        Becky.open_oral_stage = 1
+        Becky.eddie_join_stage = 4
+        updateSave_V81()
+    assert eval (threads["beckyHome"].completed and int(threads["beckyHome"].num or 0) == 3) timeout 5.0
+    assert eval (threads["beckyDinner"].completed and int(threads["beckyDinner"].num or 0) == 3) timeout 5.0
+    assert eval (threads["beckySex"].completed and int(threads["beckySex"].num or 0) == 2) timeout 5.0
+    assert eval (threads["beckyEddieSex"].completed and int(threads["beckyEddieSex"].num or 0) == 5) timeout 5.0
+    assert eval (not hasattr(Becky, "home_visit_stage")) timeout 5.0
+    assert eval (not hasattr(Becky, "home_sex_unlocked")) timeout 5.0
+    assert eval (not hasattr(Becky, "open_oral_stage")) timeout 5.0
+    assert eval (not hasattr(Becky, "eddie_join_stage")) timeout 5.0
 '''
 
 

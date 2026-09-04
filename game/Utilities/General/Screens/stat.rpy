@@ -186,7 +186,7 @@ init python:
             score += 10
         if Draupnir.glory_hole_quote_received or _player_int(player.tavern_management.glory_hole, 0) > 0:
             score += 15
-        if _player_int(Becky.home_visit_stage, 0) >= 3:
+        if threads["beckyHome"].completed:
             score += 15
         if _player_int(Becky.admitted_sherwood_stage, 0) > 0 or _player_int(Becky.robin_robbery_stage, 0) >= 2:
             score += 15

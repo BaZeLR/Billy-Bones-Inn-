@@ -83,7 +83,7 @@ def test_church_go_around_action_matches_qsp_and_is_restored_for_loaded_saves():
     assert 'RoomAction(action_id="after_cermon_walk", label="Обойти собор", hook="ui_call", target="ChurchAfterCermon", args=(1,), condition=church_after_cermon_action_visible)' in church
     assert "return int(calendar_v2.week or 0) == 7 and church_minutes_between(11 * 60, 12 * 60 + 59)" in church
 
-    assert "define currentVersion = 81" in migration
+    assert "define currentVersion = 82" in migration
     assert "if loaded_version < 81:" in migration
     v80 = migration.split("def updateSave_V80():", 1)[1].split("# Saved objects must be upgraded", 1)[0]
     assert 'old_room = rooms.get("Church")' in v80

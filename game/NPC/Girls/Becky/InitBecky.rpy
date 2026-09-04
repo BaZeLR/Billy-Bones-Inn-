@@ -36,14 +36,11 @@ init python:
             self.corruption = 25
             self.known = True
             self.left_dances = 0
-            self.home_visit_stage = 0
             self.inga_sex_greeting_seen = False
             self.uninvited_visit_scolded = False
             self.home_front_checked_today = False
-            self.home_sex_unlocked = False
             self.eddie_georgett_stage = 0
             self.eddie_home_visit_state = 0
-            self.open_oral_stage = 0
             self.home_visit_count = 0
             self.talked_about_eddie = False
             self.georgett_mentioned = False
@@ -51,7 +48,6 @@ init python:
             self.priest_advice_stage = 0
             self.gerhard_talk_stage = 0
             self.asked_about_eddie_sex_stage = 0
-            self.eddie_join_stage = 0
             self.eddie_join_failures = 0
             self.eddie_robbed_day = 0
             self.knows_blackwood = False

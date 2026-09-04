@@ -1,6 +1,6 @@
 # ================================================================================
 # First Eddie/Becky bedroom attempt.
-# Called from the live BeckyHome FromDinner branch when Becky.eddie_join_stage == 1.
+# Triggered from the BeckyHome FromDinner branch at beckyEddieSex stage 1.
 # ================================================================================
 
 label BeckyEddieJoinFirst:
@@ -41,7 +41,7 @@ label BeckyEddieJoinFirst:
                     $ Becky.add_corruption(-5, 25)
 
                 "Как вы очутились на улице, вы и сами не очень хорошо поняли, но все-таки вы там очутились. Что-то вы в вашем плане явно не учли..."
-                $ Becky.eddie_join_stage = 2
+                $ event_runtime.active_thread.advanceTo(2, force_active=True)
                 $ Becky.eddie_join_failures += 1
                 $ calendar_v2.advance_minutes(60)
                 jump MarketPlace
@@ -79,7 +79,7 @@ label BeckyEddieJoinFirst_EddieFailureCode:
     else:
         "Бекки тоже услышала шум и хмыкнула: \"Домашние, домашние, вечно пытаются всюду свой нос всунуть,\" - и впилась в ваши губы поцелуем."
 
-    $ Becky.eddie_join_stage = 3
+    $ event_runtime.active_thread.advanceTo(3, force_active=True)
     $ Eddie.change_social(friend_delta=-2)
     $ Becky.apply_social_gate(0, 0, 0, 35, 1, -1)
     "Вы и миссис Блэнкеншип находитесь в ее спальне."
@@ -102,6 +102,6 @@ label BeckyEddieJoinFirst_EddieFirstCumCode:
     $ Becky.add_corruption(5)
     $ Becky.add_relation(1)
     $ Eddie.change_social(friend_delta=5)
-    $ Becky.eddie_join_stage = 4
+    $ event_runtime.active_thread.advanceTo(4, force_active=True)
     $ calendar_v2.advance_minutes(60)
     jump MarketPlace

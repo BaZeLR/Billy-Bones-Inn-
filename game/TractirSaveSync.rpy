@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 81
+define currentVersion = 82
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -685,6 +685,10 @@ init -100 python:
         if loaded_version < 81:
             updateSave_V80()
             loaded_version = 81
+
+        if loaded_version < 82:
+            updateSave_V81()
+            loaded_version = 82
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2688,6 +2692,58 @@ init -100 python:
             if old_room is not None:
                 upgraded_room.state.update(dict(getattr(old_room, "state", {}) or {}))
             rooms.register(upgraded_room)
+
+    def updateSave_V81():
+        # Split the overloaded legacy Becky progression into its canonical
+        # story threads. Preserve cumulative visits/failures and other facts
+        # on the NPC objects; remove only the retired stage mirrors.
+        initThreads()
+
+        old_home = max(0, people_to_int(getattr(Becky, "home_visit_stage", 0), 0))
+        old_home_sex = bool(people_to_int(getattr(Becky, "home_sex_unlocked", False), 0))
+        old_open_oral = max(0, people_to_int(getattr(Becky, "open_oral_stage", 0), 0))
+        old_eddie = max(0, people_to_int(getattr(Becky, "eddie_join_stage", 0), 0))
+
+        home_thread = threads["beckyHome"]
+        home_target = max(int(home_thread.num or 0), 3 if old_home >= 3 else min(old_home, 2))
+        home_thread.advanceTo(
+            home_target,
+            complete_at_end=home_target >= home_thread.data.length,
+            force_active=0 < home_target < home_thread.data.length,
+        )
+
+        dinner_thread = threads["beckyDinner"]
+        old_dinner_target = 3 if old_home >= 6 else 2 if old_home >= 5 else 1 if old_home >= 4 else 0
+        dinner_target = max(int(dinner_thread.num or 0), old_dinner_target)
+        dinner_thread.advanceTo(
+            dinner_target,
+            complete_at_end=dinner_target >= dinner_thread.data.length,
+            force_active=0 < dinner_target < dinner_thread.data.length,
+        )
+
+        sex_thread = threads["beckySex"]
+        old_sex_target = 2 if old_open_oral > 0 else 1 if old_home_sex else 0
+        sex_target = max(int(sex_thread.num or 0), old_sex_target)
+        sex_thread.advanceTo(
+            sex_target,
+            complete_at_end=sex_target >= sex_thread.data.length,
+            force_active=0 < sex_target < sex_thread.data.length,
+        )
+
+        eddie_thread = threads["beckyEddieSex"]
+        old_eddie_target = 5 if old_home >= 7 else min(old_eddie, 4)
+        eddie_target = max(int(eddie_thread.num or 0), old_eddie_target)
+        eddie_thread.advanceTo(
+            eddie_target,
+            complete_at_end=eddie_target >= eddie_thread.data.length,
+            force_active=0 < eddie_target < eddie_thread.data.length,
+        )
+
+        threads.pop("beckyGeorgettHomeVisit", None)
+        Becky.__dict__.pop("home_visit_stage", None)
+        Becky.__dict__.pop("home_sex_unlocked", None)
+        Becky.__dict__.pop("open_oral_stage", None)
+        Becky.__dict__.pop("eddie_join_stage", None)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

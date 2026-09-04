@@ -61,16 +61,16 @@ label IntBeckyGuest:
                 else:
                     "Вы как можно энергичнее работаете челюстями. Надо наесться как можно быстрее, а вдруг не хватит?"
 
-                if Becky.home_visit_stage == 4 and procedural_randint(1, 7, "becky_dinner_home5_%s_%s" % (int(current_game_day() or 0), dinnertime)) == 1:
+                if int(threads["beckyDinner"].num or 0) == 1 and procedural_randint(1, 7, "becky_dinner_home5_%s_%s" % (int(current_game_day() or 0), dinnertime)) == 1:
                     "Вдруг Ребекка прокашлялась, при этом покраснев, и сказала, вроде бы обращаясь к дочке с женихом, но избегая смотреть им в глаза: \"Ингенборг, Лукас, что же вы на улице-то балуетесь? Я ведь все видела. Там же неудобно, а порой и холодно. Не стесняйтесь меня, я же понимаю, дело молодое, так что коль приспичит вам, заходите прямо к нам.\""
                     "\"Ой, мам, спасибо,\" - ответила ей Инга. \"Лукас, милый, ты останешься тогда сегодня в моей комнате ночевать?\""
                     "\"А почему бы и нет? Только чего нам ждать, идем уже.\""
                     "И с этими словами парочка вскочила из-за стола и понеслась к лестнице на второй этаж."
                     "Бекки им вслед лишь промолвила: \"Эх Ингочка, Ингочка... Совсем большая стала.\""
                     "Вернувшись к еде, вы обратили внимание на похотливые огоньки в глазах Эдди."
-                    $ Becky.home_visit_stage = 5
+                    $ threads["beckyDinner"].advanceTo(2, force_active=True)
 
-                if Becky.home_visit_stage >= 5 and dinneringaminet == 0 and dinnertime <= 2 and procedural_randint(1, 6, "becky_dinner_inga_under_%s_%s" % (int(current_game_day() or 0), dinnertime)) == 1:
+                if int(threads["beckyDinner"].num or 0) >= 2 and dinneringaminet == 0 and dinnertime <= 2 and procedural_randint(1, 6, "becky_dinner_inga_under_%s_%s" % (int(current_game_day() or 0), dinnertime)) == 1:
                     "Неожиданно вы услышали звон ножа по полу. Обернувшись, вы увидели, как Инга, сказав: \"Ой, какая я неуклюжая,\" - полезла за ним под стол."
                     $ dinneringaminet += 1
 
@@ -117,7 +117,8 @@ label IntBeckyGuest:
                         "Вдруг по телу Бекки пробежала дрожь наступившего оргазма, она плотно сжала своими ногами вашу руку и прикусила ложку, пытаясь не выпустить наружу сладострастный стон."
                         $ Becky.record_orgasm_given()
                         $ Becky.apply_social_roll(16, 1, 1, 40, 2, 1)
-                        $ Becky.home_visit_stage = max(Becky.home_visit_stage, 4)
+                        if int(threads["beckyDinner"].num or 0) < 1:
+                            $ threads["beckyDinner"].advanceTo(1, force_active=True)
                         if procedural_randint(1, 4, "becky_dinner_eddie_notice_%s_%s" % (int(current_game_day() or 0), dinnerbecky)) == 1:
                             "Но все-таки ваши игры не остались незамеченными. Эдди пристально посмотрел на маму и, как бы нечаянно, уронил нож и сразу нырнул за ним под стол. Вы убрали руку, но вылезший из-под стола Эдди расплылся в улыбке, а его мама покраснела еще больше."
                             $ scene_runtime.picture = "images/becky/dinner/GropeEddie.jpg"
@@ -145,25 +146,26 @@ label IntBeckyGuest:
 
             "Взять Бекки под руку и идти наверх в спальню" if dinnertime == 6 and georgedinnersex == 0:
                 $ dinnertime += 1
-                if Becky.home_visit_stage < 4:
+                if int(threads["beckyDinner"].num or 0) < 1:
                     "Вы решительно подошли к вдове, взяли ее под локоток и повели к лестнице, ведущей на второй этаж. Вернее, попытались повести. Бекки сидела на стуле как влитая."
                     "А когда вы попробовали потянуть ее сильнее, она отвесила вам пинок под столом и сказала: \"Стефан, милый, уже наверное поздно, так что мы будем готовиться ко сну, а тебе тоже наверное пора.\""
                     "Вы отпустили ее руку и направились к двери."
                     $ Becky.apply_social_roll(8, 3, -1, 35, 3, -1)
                     $ scene_runtime.picture = "images/becky/Home/door.jpg"
                     vscene scene_runtime.picture
-                elif Becky.home_visit_stage <= 6 and Becky.home_visit_stage >= 4:
-                    if Becky.home_visit_stage >= 5 and (Becky.corruption + procedural_randint(1, 5, "becky_dinner_bed_gate_%s" % int(current_game_day() or 0)) + dinnerbeckyorgasm * 5 >= 48 or Becky.home_sex_unlocked):
+                elif not threads["beckyEddieSex"].completed:
+                    if int(threads["beckyDinner"].num or 0) >= 2 and (Becky.corruption + procedural_randint(1, 5, "becky_dinner_bed_gate_%s" % int(current_game_day() or 0)) + dinnerbeckyorgasm * 5 >= 48 or int(threads["beckySex"].num or 0) >= 1):
                         $ Becky.apply_social_roll(18, 2, 1, 50, 2, 1)
                         "Вы, как бы невзначай, подошли к вдове, взяли ее за руку и слегка потянули в направлении лестницы, ведущей на второй этаж. Щеки Бекки зарделись, а на лице появилось выражение решимости."
                         "Она встала и направилась с вами наверх, бросив через плечо: \"Ингочка, собери пожалуйста со стола. А мы со Стефаном обсудим некоторые дела в моей комнате.\""
-                        if Becky.eddie_join_stage == 4:
+                        if int(threads["beckyEddieSex"].num or 0) >= 4:
                             "Эдди было дернулся последовать за вами, но Ребекка обожгла его таким взглядом, что он обреченно плюхнулся обратно на стул. Видно, вдова еще не созрела до повторения, а может разволновалась от того, что Эдди в последний момент не послушал ее?"
                         else:
                             "Эдди проводил вас затуманившимся взглядом, а Инга с Лукасом - понимающим."
                         if Becky.eddie_home_visit_state == 4:
                             "Жоржетта же весело подмигнула вам."
-                        $ Becky.home_sex_unlocked = True
+                        if int(threads["beckySex"].num or 0) < 1:
+                            $ threads["beckySex"].advanceTo(1, force_active=True)
                         $ _kids_watch = procedural_randint(1, 8, "becky_dinner_kids_watch_%s" % int(current_game_day() or 0))
                         call BeckyGuestKidsWatchStepsCode(_kids_watch)
                         if _kids_watch > 3 and procedural_randint(1, 2, "becky_dinner_eddie_georg_hint_%s" % int(current_game_day() or 0)) == 1 and Becky.eddie_georgett_stage == 0:
@@ -206,7 +208,7 @@ label IntBeckyGuest:
                     call BeckyHome("FromDinner")
                     return
 
-            "Идти в спальню вместе с Бекки и Эдди" if dinnertime == 6 and georgedinnersex == 0 and Becky.home_visit_stage >= 7:
+            "Идти в спальню вместе с Бекки и Эдди" if dinnertime == 6 and georgedinnersex == 0 and threads["beckyEddieSex"].completed:
                 $ dinnertime += 1
                 "Вы, как обычно, подошли к вдове после ужина, взяли одинокую женщину за руку и повели к спальне. Она с радостью последовала за вами, но уже на втором шаге, что-то видно вспомнив, тихо прошептала вам: \"А Эдди?\""
                 $ _ladder_pic = procedural_randint(1, 2, "becky_dinner_ladder_eddie_%s" % int(current_game_day() or 0))

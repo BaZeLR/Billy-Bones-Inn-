@@ -73,8 +73,8 @@ def test_repeatable_becky_topics_are_native_menu_choices_not_threads():
     for name in RETIRED_THREADS:
         assert 'LThreadData(0, "becky", "' + name + '"' not in RUNTIME
 
+    assert 'call checkTriggers("talk_becky", "becky_home_invite", 0)' in TALK
     for target in (
-        "story_becky_home_invite_talk_0",
         "story_becky_home_last_visit_talk_0",
         "story_becky_talk_eddie_behavior_0",
         "story_becky_talk_eddie_georgett_1",
@@ -87,7 +87,7 @@ def test_repeatable_becky_topics_are_native_menu_choices_not_threads():
 
 
 def test_both_eddie_opinion_choices_use_the_same_qsp_gate():
-    assert TALK.count('Becky.georgett_mentioned and Becky.home_visit_stage < 7 and Becky.talk_count() < 2') == 2
+    assert TALK.count('Becky.georgett_mentioned and not threads["beckyEddieSex"].completed and Becky.talk_count() < 2') == 2
     assert 'call story_becky_talk_eddie_reaction_0(_becky_name)' in TALK
     assert 'call story_becky_talk_eddie_reaction_1(_becky_name)' in TALK
 
@@ -103,7 +103,7 @@ def test_eddie_advice_returns_to_the_active_talk_instead_of_navigating_rooms():
 
 
 def test_repeatable_topic_labels_do_not_mutate_active_thread():
-    repeatable = TOPICS.split("label story_becky_home_invite_talk_0", 1)[1]
+    repeatable = TOPICS.split("label story_becky_talk_pregnancy_0", 1)[1]
 
     assert "event_runtime.active_thread" not in repeatable
     assert "thread.advance()" not in repeatable

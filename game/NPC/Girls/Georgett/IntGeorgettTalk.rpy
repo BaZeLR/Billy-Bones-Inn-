@@ -52,7 +52,7 @@ label IntGeorgettTalk(girl_name="georgett", girl_loc=""):
                 call checkTriggers("talk_georgett", "explain_gloryhole", 0)
             "Договориться об условиях работы у глорихола" if story_event_available("talk_georgett", "agree_gloryhole_terms"):
                 call checkTriggers("talk_georgett", "agree_gloryhole_terms", 0)
-            "Обсудить Эдди" if Georgett.can_talk_today() and ((int(Georgett.story_value("TellAboutEddieMomSex",0) or 0)==0 and (Becky.eddie_join_stage==4 or Becky.home_visit_stage>=7)) or (Becky.eddie_georgett_stage==0 and Eddie.talked_about_georgett and Becky.home_visit_stage>=3 and (Eddie.saw_mother_sex or Becky.home_sex_unlocked))):
+            "Обсудить Эдди" if Georgett.can_talk_today() and ((int(Georgett.story_value("TellAboutEddieMomSex",0) or 0)==0 and int(threads["beckyEddieSex"].num or 0)>=4) or (Becky.eddie_georgett_stage==0 and Eddie.talked_about_georgett and threads["beckyHome"].completed and (Eddie.saw_mother_sex or int(threads["beckySex"].num or 0)>=1))):
                 call IntGeorgettTalkEddie(girl_name, girl_loc)
             "Предложить Жоржетте проспонсировать ее визит к Эдди домой" if Becky.eddie_georgett_stage>0 and Becky.eddie_home_visit_state==0 and (player.economy.money>25 or (Becky.eddie_georgett_stage>1 and player.economy.money>10)) and Georgett.talk_count()<2:
                 call IntGeorgettSponsorEddieHome(girl_name, girl_loc)
@@ -254,7 +254,7 @@ label IntGeorgettGloryholeTerms(girl_name="georgett", girl_loc="street"):
 
 
 label IntGeorgettTalkEddie(girl_name="georgett", girl_loc="street"):
-    if Becky.eddie_join_stage == 4 or Becky.home_visit_stage >= 7:
+    if int(threads["beckyEddieSex"].num or 0) >= 4:
         $ scene_runtime.text = "«Жоржетт, ты была права. Эдди действительно по своей хозяйке сох. Я им все подстроил, дверь в спальню отпер, Бекки раздел и внимание ее отвлек. Ну а Эдди предупредил заранее, что может заходить на огонек. Так он паршивец ни секунды не сомневался, забежал и засадил своей леди-босс!»\n«А она что?»\n«А ничего, подмахивать ему стала как ни в чем не бывало.»\n«Ну, я чего-то в таком роде и ожидала с первого раза как он меня снял. Что ж, теперь, когда его мечта сбылась, наверное ко мне он будет захаживать пореже.»"
         $ Georgett.mark_asked_topic("TellAboutEddieMomSex", 0)
     else:
@@ -269,7 +269,7 @@ label IntGeorgettSponsorEddieHome(girl_name="georgett", girl_loc="street"):
     if Becky.eddie_georgett_stage == 1:
         $ scene_runtime.text = "Вы вручаете Жоржетте 25 мараведи и говорите, что очень бы хотели посмотреть на то, как она займется любовью с Эдди на глазах у Бекки."
         $ player.spend_money(25)
-    elif Becky.eddie_georgett_stage == 2 and Becky.home_visit_stage == 5:
+    elif Becky.eddie_georgett_stage == 2 and int(threads["beckyDinner"].num or 0) == 2:
         $ scene_runtime.text = "Вы вручаете Жоржетте 10 мараведи и говорите, что хотите повторения."
         $ player.spend_money(10)
     else:
@@ -286,7 +286,7 @@ label IntGeorgettSponsorEddieHome(girl_name="georgett", girl_loc="street"):
 label IntGeorgettAskEddieVisit(girl_name="georgett", girl_loc="street"):
     $ scene_runtime.text = "«Эй, Жоржи, наш друг Эдди к тебе случаем не захаживал?» - осведомляетесь вы у своей работницы."
     if Becky.eddie_home_visit_state <= 1:
-        if Becky.home_visit_stage >= 7:
+        if threads["beckyEddieSex"].completed:
             $ scene_runtime.text += "\n\n«Не, он говорит что теперь с хозяйкой своей все больше перепихивается, а на мне экономит.»"
         else:
             $ scene_runtime.text += "\n\n«Не, сегодня его не было. Может завтра зайдет.»"
@@ -294,16 +294,16 @@ label IntGeorgettAskEddieVisit(girl_name="georgett", girl_loc="street"):
         $ scene_runtime.text += "\n\n«Заходил.»"
         if Becky.eddie_georgett_stage == 1:
             if Becky.eddie_home_visit_state == 4:
-                if Becky.home_visit_stage >= 7:
+                if threads["beckyEddieSex"].completed:
                     $ scene_runtime.text += "\n\n«Согласился, говорит что пусть его леди-босс посмотрит, поучится, разогреется.»"
                 else:
                     $ scene_runtime.text += "\n\n«Пришел в восторг от моего предложения, сказал чтобы сегодня я к нему домой на огонек заглянула.»"
                 $ scene_runtime.text += "\n\n«Так что если хочешь посмотреть - заглядывай и ты к вдове на огонек.»"
             else:
                 $ scene_runtime.text += "\n\n«Отказался.»"
-                if Becky.home_visit_stage < 5:
+                if int(threads["beckyDinner"].num or 0) < 2:
                     $ scene_runtime.text += "\n\n«Объяснил, сказал что хозяйка его больно строгая, вышвырнет его за такие шутки.»"
-                elif not Eddie.saw_mother_sex or not Becky.home_sex_unlocked:
+                elif not Eddie.saw_mother_sex or int(threads["beckySex"].num or 0) < 1:
                     $ scene_runtime.text += "\n\n«Объяснил, сказал что хоть Бекки и разрешила домашним водить своих любовников домой, но он все-таки еще стесняется, не хочет быть первым.»"
                 elif Becky.eddie_home_visit_state == 2:
                     $ scene_runtime.text += "\n\n«Объяснил, сказал что идея хорошая, только вот больно дорого я с него запросила, нету у него столько.»"

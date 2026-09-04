@@ -87,9 +87,12 @@ def test_becky_home_invite_preserves_qsp_topic_gate_and_internal_points():
     invite = TOPICS.split("label story_becky_home_invite_talk_0", 1)[1]
     invite = invite.split("label story_becky_talk_pregnancy_0", 1)[0]
 
-    assert 'Becky.home_visit_stage == 2' in TALK
-    assert "Becky.rel > 12" in TALK
-    assert "Becky.talk_count() < 2" in TALK
+    home_thread = RUNTIME.split('LThreadData(0, "becky", "Home"', 1)[1].split(
+        'LThreadData(0, "becky", "Dinner"', 1
+    )[0]
+    assert 'story_event_available("talk_becky", "becky_home_invite")' in TALK
+    assert '"#Becky.rel > 12"' in home_thread
+    assert '"#Becky.talk_count() < 2"' in home_thread
     assert 'LThreadData(0, "becky", "HomeInviteTalk"' not in RUNTIME
     assert "_becky_husband_thread.checkActive() or int(_becky_husband_thread.num or 0) > 0" in invite
     assert 'player.appearance.has_dress("citydress")' in invite

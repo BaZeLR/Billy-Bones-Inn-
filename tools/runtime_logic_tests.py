@@ -38,6 +38,7 @@ KNOWN_NON_ITEM_RECIPE_KEYS = {
     "flower_mix",
     "soap_container",
 }
+PROCEDURE_OWNED_THREADS = {"beckySex"}
 THREAD_RUNTIME_STATE_ASSIGN_RE = re.compile(
     r"\b(?:thread|tinfo|_clara_booklet_thread|_melissa_bat_thread|threads\[[^\]]+\])"
     r"\.(?:done|num|completed|aborted|metconds|blocks|blocked)\s*=(?!=)"
@@ -282,7 +283,7 @@ def parse_story_threads(
                     node for node in ast.walk(call.args[4])
                     if isinstance(node, ast.Call) and ast_name(node.func).endswith("_event")
                 ]
-                if not generated_events and not named_events:
+                if not generated_events and not named_events and thread_name not in PROCEDURE_OWNED_THREADS:
                     report.fail("threads", f"{thread_name} has no event definitions")
             list_events += len(thread_events) + len(named_events)
             threads.append(

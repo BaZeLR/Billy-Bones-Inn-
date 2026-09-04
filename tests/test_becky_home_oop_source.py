@@ -23,8 +23,8 @@ def test_becky_home_preserves_arrival_story_and_objects():
         assert f'"{object_id}"' in SOURCE
         assert f'object_id="{object_id}"' in OBJECTS
     assert "call IntEddieBeckySex" in SOURCE
-    assert "call BeckyEddieJoinFirst" in SOURCE
+    assert 'call checkTriggers("BeckyHome", "enter", 0)' in SOURCE
     assert "call IntBeckyGuest" in SOURCE
     assert "call IntBeckySex(GirlName)" in SOURCE
-    assert "Becky.home_visit_stage = max(Becky.home_visit_stage, 2)" in SOURCE
+    assert 'threads["beckyHome"].advanceTo(2, force_active=True)' in SOURCE
     assert 'SetField(main_ui_runtime, "action_items", becky_home_action_items())' in SOURCE

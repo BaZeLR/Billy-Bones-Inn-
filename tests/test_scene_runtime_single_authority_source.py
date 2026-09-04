@@ -31,7 +31,7 @@ def test_scene_runtime_is_the_only_live_picture_authority():
 def test_old_scene_picture_names_are_one_way_save_migration_only():
     migration = read_rel("game/TractirSaveSync.rpy")
 
-    assert "define currentVersion = 81" in migration
+    assert "define currentVersion = 82" in migration
     assert "def updateSave_V34():" in migration
     assert 'globals().pop("_layout_last_picture", "")' in migration
     assert 'globals().pop("scene_image", "")' in migration

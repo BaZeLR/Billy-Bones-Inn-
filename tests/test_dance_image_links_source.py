@@ -27,6 +27,8 @@ def test_direct_dance_image_paths_exist():
     for path in DANCE_SOURCES:
         source = path.read_text(encoding="utf-8-sig")
         for image_ref in re.findall(r'"(images/(?:amanda|becky)/dance/[^"\n]+\.(?:png|jpg|jpeg|webp|gif|mp4))"', source, re.IGNORECASE):
+            if "%" in image_ref:
+                continue
             assert (GAME / image_ref).is_file(), "Missing dance image: {}".format(image_ref)
 
 
@@ -44,3 +46,10 @@ def test_dynamic_amanda_dance_variants_exist():
     dance_dir = GAME / "images" / "amanda" / "dance"
     for name in ["wait1.png", "wait2.png"] + ["legare_step_{}.png".format(index) for index in range(4)]:
         assert (dance_dir / name).is_file(), "Missing Amanda dance image: {}".format(name)
+
+
+def test_dynamic_becky_dance_variants_exist():
+    dance_dir = GAME / "images" / "becky" / "dance"
+    for index in range(2, 6):
+        name = "you_dance_{}.png".format(index)
+        assert (dance_dir / name).is_file(), "Missing Becky dance image: {}".format(name)

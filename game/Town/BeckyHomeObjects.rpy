@@ -9,7 +9,7 @@ init python:
         object_id="becky_home_bed",
         name="Большая кровать",
         description="Широкая кровать, занимающая центр комнаты Бекки.",
-        picture="images/becky/sex/inroom1.jpg",
+        picture="images/becky/Home/interior.png",
         actions=[
             ObjectAction(
                 action_id="examine_bed",
@@ -26,7 +26,7 @@ init python:
         object_id="becky_home_chests",
         name="Сундуки вдоль стен",
         description="Вдоль стен стоят массивные сундуки, скамья и пара стульев.",
-        picture="images/becky/Home/house1.jpg",
+        picture="images/becky/Home/interior.png",
         actions=[
             ObjectAction(
                 action_id="examine_chests",
