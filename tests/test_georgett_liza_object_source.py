@@ -528,7 +528,9 @@ def test_liza_uses_player_intimacy_authority_without_npc_wrappers():
     assert "_you_arousal = player.intimacy.arousal_value()" in sex
     assert "_can_player_cum = player.intimacy.can_cum()" in sex
     assert "player.intimacy.add_arousal(" in sex
-    assert "player.intimacy.set_arousal(0)" in sex
+    for target in ("mouth", "face", "tits", "inside"):
+        assert 'Liza.player_cum("%s")' % target in sex
+    assert "call PregnancyCheck" not in sex
     assert "or player.intimacy.arousal_value() >= 100" not in liza + sex
 
 

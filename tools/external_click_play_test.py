@@ -1272,6 +1272,112 @@ testcase external_liza_inherited_state_and_native_sex_menu:
     $ _liza_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
     $ _liza_finish_button_id = "choice_panel_button_%d" % int(_liza_finish_index)
     click id _liza_finish_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+
+    run Jump("TavernMain")
+    advance until screen "main_ui" timeout 20.0
+    $ _liza_room_code = str(rooms.current_code or "")
+    $ _liza_room_picture = str(scene_runtime.picture or "")
+    $ _liza_room_text = str(scene_runtime.text or "")
+    $ _liza_room_location_text = str(scene_runtime.location_text or "")
+    $ _liza_room_title = str(main_ui_runtime.action_title or "")
+    $ _liza_room_actions = [str(i.caption or "") for i in list(main_ui_runtime.action_items or [])]
+
+    $ Liza.rel = 5
+    $ Liza.has_seen_clients = True
+    $ Liza.asked_about_clients = False
+    $ Liza.talked_today = 0
+    run Call("IntLizaTalk", "liza", "street")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "talk" and str(main_ui_runtime.talk_picture or "").endswith("images/liza/portraits/naked.jpg") and renpy.loadable(main_ui_runtime.talk_picture)) timeout 5.0
+    assert eval (renpy.get_screen("say") is None and "Спросить о клиентах" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _liza_clients_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить о клиентах")
+    click id ("choice_panel_button_%d" % int(_liza_clients_index)) pos (0.5, 0.5) until eval (bool(Liza.asked_about_clients) and int(Liza.rel or 0) == 6) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None and renpy.get_screen("say") is None) timeout 5.0
+    assert eval ("За вечер меня хотят обычно три-четыре дяденьки" in str(scene_runtime.text or "") and str(scene_runtime.location_text or "") == str(scene_runtime.text or "")) timeout 5.0
+    assert eval ("Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _liza_topic_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    click id ("choice_panel_button_%d" % int(_liza_topic_finish_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    assert eval (str(rooms.current_code or "") == _liza_room_code and str(scene_runtime.picture or "") == _liza_room_picture and str(scene_runtime.text or "") == _liza_room_text and str(scene_runtime.location_text or "") == _liza_room_location_text) timeout 5.0
+    assert eval (str(main_ui_runtime.action_title or "") == _liza_room_title and [str(i.caption or "") for i in list(main_ui_runtime.action_items or [])] == _liza_room_actions) timeout 5.0
+
+    $ Liza.rel = 0
+    run Call("IntLizaTalk", "liza", "street")
+    advance until screen "choice" timeout 20.0
+    $ _liza_grope_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Лапать")
+    click id ("choice_panel_button_%d" % int(_liza_grope_index)) pos (0.5, 0.5) until eval ("сначала заплатить должен" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None and renpy.get_screen("say") is None) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == _liza_room_picture and str(main_ui_runtime.talk_picture or "").endswith("images/liza/portraits/naked.jpg")) timeout 5.0
+    $ _liza_reject_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    click id ("choice_panel_button_%d" % int(_liza_reject_finish_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+
+    $ player.economy.money = 100
+    $ player.intimacy.came_today = 0
+    $ player.intimacy.can_cum_daily = 3
+    $ player.intimacy.set_arousal(0)
+    $ Liza.fucked_today = 0
+    $ Liza.wardrobe["current_dress"] = "minidress"
+    $ Liza.wardrobe["current_underwear"]["bra"] = ""
+    $ Liza.wardrobe["current_underwear"]["panties"] = "simplepanties"
+    $ Liza.clear_cum("cum_face_you", "cum_face_others", "cum_mouth_you", "cum_mouth_others", "cum_tits_you", "cum_tits_others", "cum_inside_you", "cum_inside_others")
+    $ _liza_hire_money_before = int(player.economy.money or 0)
+    $ _liza_hire_clock_before = int(calendar_v2.clock_minutes() or 0)
+    $ _liza_sexacts_before = int(Liza.sex_stat("sexacts", 0) or 0)
+    $ _liza_history_before = len(list(Liza.detailed_sex_history or []))
+    run Call("IntLizaTalk", "liza", "street")
+    advance until screen "choice" timeout 20.0
+    $ _liza_hire_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Снять")
+    click id ("choice_panel_button_%d" % int(_liza_hire_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("choice") is not None and "Снять блузку" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and "Вы заплатили Лизетте восемь мараведи" in str(scene_runtime.text or "") and "Вы находитесь в переулке. Рядом с вами юная Лизетта." in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (int(player.economy.money or 0) == _liza_hire_money_before - 8 and str(main_ui_runtime.action_title or "") == "Лизетта") timeout 5.0
+    assert eval (str(main_ui_runtime.selected_char or "") == "" and str(main_ui_runtime.girl_key or "") == "" and str(main_ui_runtime.talk_picture or "") == "") timeout 5.0
+    assert eval (str(scene_runtime.picture or "").lower().startswith("images/liza/portraits/") and renpy.loadable(scene_runtime.picture)) timeout 5.0
+    assert eval (str(renpy.get_screen("main_ui").scope.get("_picture", "") or "") == str(scene_runtime.picture or "")) timeout 5.0
+
+    $ _liza_remove_top_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Снять блузку")
+    click id ("choice_panel_button_%d" % int(_liza_remove_top_index)) pos (0.5, 0.5) until eval (Liza.tits_visible() and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and "Вы сняли с Лизетты блузку" in str(scene_runtime.text or "") and renpy.loadable(scene_runtime.picture)) timeout 5.0
+    $ _liza_raise_skirt_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Задрать юбочку")
+    click id ("choice_panel_button_%d" % int(_liza_raise_skirt_index)) pos (0.5, 0.5) until eval (Liza.layer_raised("bottom") and renpy.get_screen("choice") is not None) timeout 20.0
+    $ player.intimacy.set_arousal(100)
+    $ _liza_remove_panties_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Снять панталончики")
+    click id ("choice_panel_button_%d" % int(_liza_remove_panties_index)) pos (0.5, 0.5) until eval (Liza.pussy_visible() and renpy.get_screen("choice") is not None) timeout 20.0
+
+    $ _liza_cum_face_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Кончить на лицо")
+    click id ("choice_panel_button_%d" % int(_liza_cum_face_index)) pos (0.5, 0.5) until eval (int(Liza.fucked_today or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (int(player.intimacy.came_today or 0) == 1 and int(Liza.cum_state("cum_face_you") or 0) == 1 and int(Liza.sex_stat("sexacts", 0) or 0) == _liza_sexacts_before + 1) timeout 5.0
+    assert eval (len(list(Liza.detailed_sex_history or [])) == _liza_history_before + 1 and str(Liza.detailed_sex_history[-1].get("cum_target", "")) == "face" and str(Liza.detailed_sex_history[-1].get("place", "")) == "street") timeout 5.0
+    assert eval (Liza.sex_busy() and "Продолжить" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Закончить" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval (renpy.get_screen("say") is None and str(scene_runtime.picture or "").lower().endswith("images/liza/sexstreet/cumface.jpg") and renpy.loadable(scene_runtime.picture)) timeout 5.0
+
+    $ player.intimacy.set_arousal(100)
+    $ _liza_continue_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Продолжить")
+    click id ("choice_panel_button_%d" % int(_liza_continue_index)) pos (0.5, 0.5) until eval (not Liza.sex_busy() and renpy.get_screen("choice") is not None) timeout 20.0
+    $ _liza_cum_tits_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Кончить на груди")
+    click id ("choice_panel_button_%d" % int(_liza_cum_tits_index)) pos (0.5, 0.5) until eval (int(Liza.fucked_today or 0) == int(Liza.daily_sex_limit or 0) and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (int(player.intimacy.came_today or 0) == 2 and int(Liza.cum_state("cum_tits_you") or 0) == 1 and player.intimacy.can_cum()) timeout 5.0
+    assert eval ("Предложить отсосать" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Трахать" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and not any(str(i.caption or "").startswith("Кончить") for i in renpy.get_screen("choice").scope.get("items", []))) timeout 5.0
+    $ _liza_hire_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить")
+    click id ("choice_panel_button_%d" % int(_liza_hire_finish_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    assert eval (int(calendar_v2.clock_minutes() or 0) - _liza_hire_clock_before == 40 and str(rooms.current_code or "") == _liza_room_code) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == _liza_room_picture) timeout 5.0
+    assert eval (str(scene_runtime.text or "") == _liza_room_text) timeout 5.0
+    assert eval (str(scene_runtime.location_text or "") == _liza_room_location_text) timeout 5.0
+    assert eval (str(main_ui_runtime.action_title or "") == _liza_room_title and [str(i.caption or "") for i in list(main_ui_runtime.action_items or [])] == _liza_room_actions) timeout 5.0
+
+    run Call("IntLizaTalk", "liza", "street")
+    advance until screen "choice" timeout 20.0
+    assert eval ("Снять" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _liza_limit_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    click id ("choice_panel_button_%d" % int(_liza_limit_finish_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+
+    $ Liza.set_sex_stat("orgasms_given", 2)
+    $ Liza.rel = 3
+    $ Liza.set_arousal(100)
+    $ Liza.set_sex_busy(False)
+    $ player.intimacy.set_arousal(0)
+    run Call("LizaSexStatus", "street")
+    assert eval (int(Liza.sex_stat("orgasms_given", 0) or 0) == 3 and int(Liza.rel or 0) == 4 and "какой ты добрый и хороший" in str(scene_runtime.text or "")) timeout 5.0
+    $ Liza.set_sex_busy(False)
 '''
 
 

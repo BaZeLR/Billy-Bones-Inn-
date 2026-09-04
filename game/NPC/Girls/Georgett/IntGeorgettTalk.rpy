@@ -351,7 +351,7 @@ label IntGeorgettGrope(girl_name="georgett", girl_loc="street"):
     elif Georgett.cum_state("cum_inside_others") > 0:
         $ scene_runtime.text += "\n\nВаши пальцы заскользили по пещерке %s, похоже кто-то уже кончил в нее." % Georgett.real_name2()
     $ scene_runtime.location_text = scene_runtime.text
-    call ShowCurrentSex(girl_name)
+    call GeorgettSexStatus(girl_loc)
     return
 
 

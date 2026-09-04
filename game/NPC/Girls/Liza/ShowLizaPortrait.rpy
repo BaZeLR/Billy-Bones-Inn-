@@ -17,4 +17,6 @@ label ShowLizaPortrait(girl_name="liza", cur_sperm_face=0, cur_sperm_tits=0, cur
             call ShowImage(girl_name, "portraits", "cumface")
         else:
             call ShowImage(girl_name, "portraits", "naked")
+    else:
+        call ShowImage(girl_name, "portraits", "naked")
     return

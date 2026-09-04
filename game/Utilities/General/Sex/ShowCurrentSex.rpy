@@ -4,6 +4,31 @@
 # ================================================================================
 
 init python:
+    def sex_scene_begin_text():
+        scene_runtime.text = ""
+        scene_runtime.location_text = ""
+
+    def sex_scene_add_text(text_value):
+        text_line = str(text_value or "").strip()
+        if not text_line:
+            return
+        try:
+            text_line = renpy.substitute(text_line)
+        except Exception:
+            pass
+        current_text = str(scene_runtime.text or "").strip()
+        if current_text:
+            current_text += "\n\n" + text_line
+        else:
+            current_text = text_line
+        scene_runtime.text = current_text
+        scene_runtime.location_text = current_text
+
+    def sex_scene_set_picture(folder1="", folder2="", image_name=""):
+        picture_path = build_media_ref(folder1, folder2, image_name)
+        if picture_path:
+            scene_runtime.picture = picture_path
+
     def _show_current_sex_allows_kids_peek(girl_name):
         girl = people.get_info(girl_name)
         if girl is None:
@@ -119,7 +144,6 @@ label ShowCurrentSex(GirlNameSCS=""):
 
         if _scs_key == "liza" and _scs_orgasm_count == 3:
             "\"Ой, дяденька Стефан, какой ты добрый и хороший\", заявила дрожащим от пережитого оргазма голоском [_scs_real_name]. \"Многие дяденьки только о себе и думают, а с тобой всегда так хорошо, всегда мне удается спустить.\""
-            $ _scs_girl.change_social(friend_delta=1)
 
         if _scs_key == "becky" and _scs_orgasm_count == 5:
             "\"Ну ты даешь, Стефанчик, не зря я дала себя уболтать\", томно заявила вам [_scs_real_name]. \"С тобой я все кончаю и кончаю, знаешь ты как к женщине подойти.\""

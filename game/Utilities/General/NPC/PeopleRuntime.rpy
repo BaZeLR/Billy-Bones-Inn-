@@ -929,6 +929,11 @@ init -999 python:
             count = self.add_sex_stat("orgasms_given", 1)
             self.set_sex_stat("last_orgasm_day", people_to_int(calendar_v2.daysInGame, 0))
             friendship_gain = people_to_int(getattr(self, "ORGASM_FRIENDSHIP_GAIN", 0), 0)
+            friendship_milestones = dict(getattr(self, "ORGASM_FRIENDSHIP_MILESTONES", {}) or {})
+            friendship_gain += people_to_int(
+                friendship_milestones.get(count, friendship_milestones.get(str(count), 0)),
+                0,
+            )
             if friendship_gain:
                 self.change_social(friend_delta=friendship_gain)
             return count
@@ -1264,6 +1269,16 @@ init -999 python:
         def record_lick_pussy(self):
             state = self.ensure_sex_state()
             state["lick_pussy"] = people_to_int(state.get("lick_pussy", 0), 0) + 1
+            friendship_milestones = dict(getattr(self, "LICK_FRIENDSHIP_MILESTONES", {}) or {})
+            friendship_gain = people_to_int(
+                friendship_milestones.get(
+                    state["lick_pussy"],
+                    friendship_milestones.get(str(state["lick_pussy"]), 0),
+                ),
+                0,
+            )
+            if friendship_gain:
+                self.change_social(friend_delta=friendship_gain)
             return state["lick_pussy"]
 
         def lick_pussy_count(self):

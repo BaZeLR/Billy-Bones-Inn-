@@ -8,12 +8,17 @@ def test_georgett_sex_session_uses_existing_character_and_scene_owners():
     source = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettSex.rpy").read_text(encoding="utf-8-sig")
     info = (ROOT / "game/NPC/Girls/Georgett/InitGeorgett.rpy").read_text(encoding="utf-8-sig")
     runtime = (ROOT / "game/Utilities/General/Classes/ModuleRuntime.rpy").read_text(encoding="utf-8-sig")
+    shared = (ROOT / "game/Utilities/General/Sex/ShowCurrentSex.rpy").read_text(encoding="utf-8-sig")
 
     assert "module_runtime" not in source + runtime
     assert "def sex_location(self):" in info
     assert 'self.sex_state["location"]' in info
     assert "Georgett.sex_location()" in source
-    assert "scene_runtime.picture = picture_path" in source
+    assert "sex_scene_set_picture(" in source
+    assert "scene_runtime.picture = picture_path" in shared
+    assert "def georgett_sex_begin_text" not in source
+    assert "def georgett_sex_add_text" not in source
+    assert "def georgett_sex_set_picture" not in source
     assert "default module_runtime" not in runtime
     assert "class ModuleRuntimeState" not in runtime
     assert "label BeginPaidSexModule(" in runtime
@@ -89,7 +94,74 @@ def test_georgett_free_grope_rejection_returns_to_talk_owner():
     rejection = grope.split("if Georgett.rel < 10:", 1)[1].split("return", 1)[0]
     assert "ShowCurrentSex" not in rejection
     assert "Сначала заплати, а потом уже лапай!" in rejection
-    assert "call ShowCurrentSex(girl_name)" in grope
+    assert "call GeorgettSexStatus(girl_loc)" in grope
+    assert "ShowCurrentSex" not in grope
+
+
+def test_georgett_and_liza_share_scene_projection_without_state_mirrors():
+    georgett = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettSex.rpy").read_text(encoding="utf-8-sig")
+    liza = (ROOT / "game/NPC/Girls/Liza/IntLizaSex.rpy").read_text(encoding="utf-8-sig")
+    shared = (ROOT / "game/Utilities/General/Sex/ShowCurrentSex.rpy").read_text(encoding="utf-8-sig")
+
+    for helper in ("sex_scene_begin_text", "sex_scene_add_text", "sex_scene_set_picture"):
+        assert "def %s(" % helper in shared
+        assert "def %s(" % helper not in georgett + liza
+        assert "%s(" % helper in georgett
+        assert "%s(" % helper in liza
+
+    for source in (georgett, liza):
+        assert 'main_ui_runtime.mode = "event"' in source
+        assert 'main_ui_runtime.selected_char = ""' in source
+        assert 'main_ui_runtime.girl_key = ""' in source
+        assert 'main_ui_runtime.talk_picture = ""' in source
+        assert "main_ui_runtime.action_items" not in source
+        assert "MenuItem(" not in source
+
+
+def test_liza_paid_sex_uses_native_scene_lifecycle_and_shared_state_owner():
+    talk = (ROOT / "game/NPC/Girls/Liza/IntLizaTalk.rpy").read_text(encoding="utf-8-sig")
+    sex = (ROOT / "game/NPC/Girls/Liza/IntLizaSex.rpy").read_text(encoding="utf-8-sig")
+    port = (ROOT / "game/Utilities/General/Sex/SexPort.rpy").read_text(encoding="utf-8-sig")
+    tavern = (ROOT / "game/Utilities/General/Sex/SexProstTavern.rpy").read_text(encoding="utf-8-sig")
+
+    hire = talk.split('label IntLizaTalkHire(girl_name_ilt="liza", girl_loc_ilt=""):', 1)[1].split(
+        "label IntLizaTalkGrope", 1
+    )[0]
+    assert "main_ui_end_talk_state()" in hire
+    assert 'main_ui_begin_native_scene_state("Лизетта")' in hire
+    assert "main_ui_end_native_scene_state()" in hire
+    assert "if not player.intimacy.can_cum():" in hire
+    assert "if not Liza.can_have_sex_today():" in hire
+    assert "Liza.can_have_sex_today()" in talk.split("while True:", 1)[1].split("label IntLizaTalkSmalltalk", 1)[0]
+
+    assert 'label IntLizaSex(GirlNameILSS="liza", GirlLocILSS="street", SceneTextILSS=""):' in sex
+    assert "while True:" in sex
+    assert "jump int_liza_sex_menu" not in sex
+    assert sex.count("Liza.can_have_sex_today()") >= 6
+    for target in ("mouth", "face", "tits", "inside"):
+        assert 'Liza.player_cum("%s")' % target in sex
+    assert "call PregnancyCheck" not in sex
+    assert 'call IntLizaSex(GirlNameSP, "street", "Вы заплатили Лизетте' in port
+    assert 'call IntLizaSex(GirlNameSP, "tavern", "Вы заплатили Лизетте' in tavern
+    assert '\n        "Вы заплатили Лизетте' not in port + tavern
+
+
+def test_liza_talk_choices_persist_and_refusal_keeps_talk_picture_owner():
+    talk = (ROOT / "game/NPC/Girls/Liza/IntLizaTalk.rpy").read_text(encoding="utf-8-sig")
+    menu = talk.split('label IntLizaTalk(girl_name_ilt="liza", girl_loc_ilt=""):', 1)[1].split(
+        "label IntLizaTalkSmalltalk", 1
+    )[0]
+    grope = talk.split('label IntLizaTalkGrope(girl_name_ilt="liza", girl_loc_ilt=""):', 1)[1].split(
+        "label IntLizaTalkAskDad", 1
+    )[0]
+
+    assert "while True:" in menu
+    assert '"Закончить разговор":' in menu
+    assert "main_ui_end_talk_state()" in menu
+    assert 'Liza.can_ask_topic("pregnancy")' in menu
+    rejection = grope.split("if Liza.rel < 5:", 1)[1].split("return", 1)[0]
+    assert "ShowCurrentSex" not in rejection
+    assert "call LizaSexStatus(girl_loc_ilt)" in grope
 
 
 def test_georgett_daily_limit_uses_player_authority_and_canonical_text():
@@ -180,6 +252,42 @@ def test_georgett_owns_the_friendship_reward_for_every_orgasm():
         'if _scs_key == "liza"', 1
     )[0]
     assert "change_social" not in georgett_shared_branch
+
+
+def test_georgett_and_liza_friendship_milestones_are_class_values_with_one_owner():
+    georgett_info = (ROOT / "game/NPC/Girls/Georgett/InitGeorgett.rpy").read_text(encoding="utf-8-sig")
+    liza_info = (ROOT / "game/NPC/Girls/Liza/InitLiza.rpy").read_text(encoding="utf-8-sig")
+    georgett_sex = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettSex.rpy").read_text(encoding="utf-8-sig")
+    liza_sex = (ROOT / "game/NPC/Girls/Liza/IntLizaSex.rpy").read_text(encoding="utf-8-sig")
+    shared_status = (ROOT / "game/Utilities/General/Sex/ShowCurrentSex.rpy").read_text(encoding="utf-8-sig")
+    people = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
+
+    assert "LICK_FRIENDSHIP_MILESTONES = {4: 1}" in georgett_info
+    assert "LICK_FRIENDSHIP_MILESTONES = {7: 1}" in liza_info
+    assert "ORGASM_FRIENDSHIP_MILESTONES = {3: 1}" in liza_info
+
+    orgasm_owner = people.split("def record_orgasm_given(self):", 1)[1].split("def record_sex_history", 1)[0]
+    lick_owner = people.split("def record_lick_pussy(self):", 1)[1].split("def lick_pussy_count", 1)[0]
+    assert "ORGASM_FRIENDSHIP_MILESTONES" in orgasm_owner
+    assert "LICK_FRIENDSHIP_MILESTONES" in lick_owner
+    assert "self.change_social(friend_delta=friendship_gain)" in orgasm_owner
+    assert "self.change_social(friend_delta=friendship_gain)" in lick_owner
+
+    georgett_lick_text = georgett_sex.split("if _georgett_lick_count == 4:", 1)[1].split(
+        "$ Georgett.add_arousal", 1
+    )[0]
+    liza_lick_text = liza_sex.split("if _liza_licks == 7:", 1)[1].split(
+        "$ Liza.add_arousal", 1
+    )[0]
+    liza_orgasm_text = liza_sex.split("if _liza_orgasm_count == 3:", 1)[1].split(
+        'if Liza.cock_in("pussy")', 1
+    )[0]
+    shared_liza_orgasm_text = shared_status.split('if _scs_key == "liza"', 1)[1].split(
+        'if _scs_key == "becky"', 1
+    )[0]
+    for presentation_only in (georgett_lick_text, liza_lick_text, liza_orgasm_text, shared_liza_orgasm_text):
+        assert "change_social" not in presentation_only
+        assert "add_relation" not in presentation_only
 
 
 def test_georgett_church_continue_beats_do_not_write_dummy_state():

@@ -28,7 +28,7 @@ label IntLizaTalk(girl_name_ilt="liza", girl_loc_ilt=""):
                 call IntLizaTalkAskClients(girl_name_ilt, girl_loc_ilt)
             "Спросить о сексе" if Liza.can_ask_topic("sex"):
                 call IntLizaTalkAskSex(girl_name_ilt, girl_loc_ilt)
-            "Спросить о беременности" if Liza.can_ask_topic("sex"):
+            "Спросить о беременности" if Liza.can_ask_topic("pregnancy"):
                 call IntLizaTalkAskPregnancy(girl_name_ilt, girl_loc_ilt)
             "Рассказать про ее мать и отца Герхарда" if Liza.can_ask_topic("georgett_gerhard"):
                 call IntLizaTalkTellGeorgettGerhard(girl_name_ilt, girl_loc_ilt)
@@ -36,7 +36,7 @@ label IntLizaTalk(girl_name_ilt="liza", girl_loc_ilt=""):
                 call IntLizaTalkAskWork(girl_name_ilt, girl_loc_ilt)
             "Спросить о таинственном 'Холглоре' в 'Пьяном Пирате'" if Liza.can_ask_topic("holglor"):
                 call IntLizaTalkAskHolglor(girl_name_ilt, girl_loc_ilt)
-            "Снять" if (player.economy.money >= 8 or (player.economy.money >= 4 and girl_loc_ilt == "tavern")) and player.intimacy.came_today < player.intimacy.can_cum_daily:
+            "Снять" if (player.economy.money >= 8 or (player.economy.money >= 4 and girl_loc_ilt == "tavern")) and player.intimacy.can_cum() and Liza.can_have_sex_today():
                 call IntLizaTalkHire(girl_name_ilt, girl_loc_ilt)
             "Лапать":
                 call IntLizaTalkGrope(girl_name_ilt, girl_loc_ilt)
@@ -174,12 +174,23 @@ label IntLizaTalkAskHolglor(girl_name_ilt="liza", girl_loc_ilt=""):
 
 
 label IntLizaTalkHire(girl_name_ilt="liza", girl_loc_ilt=""):
+    if not player.intimacy.can_cum():
+        $ scene_runtime.text = PLAYER_DAILY_EXHAUSTION_TEXT
+        $ scene_runtime.location_text = scene_runtime.text
+        return
+    if not Liza.can_have_sex_today():
+        $ scene_runtime.text = "Сегодня Лизетта уже дважды была с вами и больше клиентов принимать не станет."
+        $ scene_runtime.location_text = scene_runtime.text
+        return
+    $ main_ui_end_talk_state()
+    $ main_ui_begin_native_scene_state("Лизетта")
     if girl_loc_ilt == "tavern":
         $ player.spend_money(4)
         call SexProstTavern(1, "liza")
     else:
         $ player.spend_money(8)
         call SexPort(1, "liza")
+    $ main_ui_end_native_scene_state()
     return
 
 
@@ -203,7 +214,9 @@ label IntLizaTalkGrope(girl_name_ilt="liza", girl_loc_ilt=""):
         else:
             scene_runtime.text = "«Эй, дяденка, не так быстро!» останавливает вас %s. «Мамочка говорит, что ты сначала заплатить должен, а потом уже лапать!»" % _liza_name
         scene_runtime.location_text = scene_runtime.text
-    call ShowCurrentSex(girl_name_ilt)
+    if Liza.rel < 5:
+        return
+    call LizaSexStatus(girl_loc_ilt)
     return
 
 
