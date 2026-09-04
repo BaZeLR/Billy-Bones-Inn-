@@ -88,7 +88,14 @@ define melissaRevealingDressRequestConditions = [
 
 define melissaCourtshipBaseConditions = [
     "#Melissa.intimacy_story_ready()",
-    "#int(Melissa.fucked_today or 0) == 0",
+]
+
+define melissaCourtshipOpeningConditions = melissaCourtshipBaseConditions + [
+    "#Melissa.relationship_stage() >= 2",
+    "#Liza.can_work_tavern()",
+    "#Liza.is_working()",
+    "#int(Amanda.var_int('lizafriends', 0)) > 0",
+    "#int(Amanda.sex_stat('sexacts', 0) or 0) > 0",
 ]
 
 define melissaThreadList = [
@@ -110,61 +117,55 @@ define melissaThreadList = [
         ),
     ]], highlight=False, threaded=True),
     LThreadData(0, "melissa", "Courtship", None, [
+        [
+            (
+                "story_melissa_courtship_amanda_talk_0",
+                (1, 6), (12, 18), None,
+                0.25, None,
+                melissaCourtshipOpeningConditions + [
+                    "#str(people.location('amanda') or '') == 'TavernMain'",
+                    "#str(people.location('melissa') or '') == 'TavernMain'",
+                    "#str(people.location('liza') or '') == 'TavernMain'",
+                ],
+                None,
+                "TavernMain", "enter", 15,
+            ),
+            (
+                "story_melissa_courtship_amanda_talk_0",
+                (1, 6), (12, 18), None,
+                0.25, None,
+                melissaCourtshipOpeningConditions + [
+                    "#str(people.location('amanda') or '') == 'TavernKitchen'",
+                    "#str(people.location('melissa') or '') == 'TavernKitchen'",
+                    "#str(people.location('liza') or '') == 'TavernMain'",
+                ],
+                None,
+                "TavernKitchen", "enter", 15,
+            ),
+        ],
         (
-            "story_melissa_courtship_touch_0",
-            None, None, None,
-            1, None,
-            melissaCourtshipBaseConditions + [
-                "#Melissa.relationship_stage() >= 2",
-            ],
-            None,
-            "talk_melissa", "melissa_intimacy", 0,
+            "story_melissa_courtship_storm_1",
+            None, (20, 23), 1,
+            0.25, None, melissaCourtshipBaseConditions, None,
+            "TavernMyRoom", "sleep", 0,
         ),
         (
-            "story_melissa_courtship_kiss_1",
-            None, None, 1,
-            1, None,
-            melissaCourtshipBaseConditions + [
-                "#int(Melissa.rel or 0) >= 13",
-                "#int(Melissa.openness or 0) >= 8",
-            ],
-            None,
-            "talk_melissa", "melissa_intimacy", 0,
+            "story_melissa_courtship_mutual_2",
+            None, (20, 23), 1,
+            1, None, melissaCourtshipBaseConditions, None,
+            "TavernMyRoom", "sleep", 0,
         ),
         (
-            "story_melissa_courtship_deep_kiss_2",
-            None, None, 1,
-            1, None,
-            melissaCourtshipBaseConditions + [
-                "#int(Melissa.rel or 0) >= 14",
-                "#int(Melissa.openness or 0) >= 10",
-                "#int(Melissa.corruption or 0) >= 12",
-            ],
-            None,
-            "talk_melissa", "melissa_intimacy", 0,
+            "story_melissa_courtship_touch_him_3",
+            None, (20, 23), 1,
+            1, None, melissaCourtshipBaseConditions, None,
+            "TavernMyRoom", "sleep", 0,
         ),
         (
-            "story_melissa_courtship_fondle_3",
-            None, None, 1,
-            1, None,
-            melissaCourtshipBaseConditions + [
-                "#int(Melissa.rel or 0) >= 15",
-                "#int(Melissa.corruption or 0) >= 14",
-            ],
-            None,
-            "talk_melissa", "melissa_intimacy", 0,
-        ),
-        (
-            "story_melissa_courtship_underclothes_4",
-            None, None, 1,
-            1, None,
-            melissaCourtshipBaseConditions + [
-                "#int(Melissa.rel or 0) >= 16",
-                "#int(Melissa.openness or 0) >= 12",
-                "#int(Melissa.corruption or 0) >= 18",
-            ],
-            None,
-            "talk_melissa", "melissa_intimacy", 0,
+            "story_melissa_courtship_taste_4",
+            None, (20, 23), 1,
+            1, None, melissaCourtshipBaseConditions, None,
+            "TavernMyRoom", "sleep", 0,
         ),
     ], highlight=False, threaded=True),
     #

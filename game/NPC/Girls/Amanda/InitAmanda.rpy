@@ -634,6 +634,14 @@ init python:
                 p2 = "сказала Аманда, довольная своей маленькой победой. "
             return p1 + p2
 
+        def liza_sex_guidance_received(self):
+            return (
+                self.var_int("lizafriends", 0) > 0
+                or self.var_int("suckyou", 0) > 0
+                or self.var_int("fuckyou", 0) > 0
+                or self.var_int("beddeflower", 0) > 0
+            )
+
         def sex_offer_reaction(self):
             reaction = 0
             rel = people_to_int(self.rel, 0)
@@ -689,11 +697,14 @@ init python:
                         reaction = 1
                     elif rel >= 10 and corr >= 25:
                         reaction = 1
+            if not self.liza_sex_guidance_received() and reaction in (1, 4):
+                return 1
             return reaction
 
         def can_grant_sexual_favor(self):
             return (
-                people_to_int(self.fucked_today, 0) == 0
+                self.liza_sex_guidance_received()
+                and people_to_int(self.fucked_today, 0) == 0
                 and player.intimacy.can_cum()
                 and not self.is_working()
                 and str(rooms.current_code or "") in (
@@ -706,7 +717,11 @@ init python:
             )
 
         def date_intimacy_available(self):
-            return self.can_have_sex_today() and self.sex_offer_reaction() in (1, 4)
+            return (
+                self.liza_sex_guidance_received()
+                and self.can_have_sex_today()
+                and self.sex_offer_reaction() in (1, 4)
+            )
 
         def legare_sex_type(self):
             if not self.performed_oral_with_legare:

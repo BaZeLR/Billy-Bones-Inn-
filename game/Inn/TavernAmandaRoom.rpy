@@ -101,6 +101,8 @@ init python:
         return "Вы осторожно подходите к окну и сразу понимаете, отчего Аманда так поспешно от него отстранилась. Стоит только выбрать угол между рамой и соседней стеной, как взгляд уходит в тот самый соседний двор.\n\n" + attic_neighbor_sex_scene_text() + " Теперь понятно, что именно отсюда она и высматривала ту же самую похабную сцену, что открывалась вам с чердака."
 
     def tavern_amanda_morning_window_outcome():
+        if not Amanda.liza_sex_guidance_received():
+            return "tease"
         friend_value = int(Amanda.rel or 0)
         open_value = int(Amanda.openness or 0)
         corruption_value = int(Amanda.corruption or 0)
@@ -441,6 +443,10 @@ label story_amanda_room_morning_window_0:
         $ scene_runtime.picture = _amanda_room_picture
         vscene _amanda_room_picture
         $ scene_runtime.text = "После этого Аманда уже не спорит насчет окна. Она только быстро приводит себя в порядок и, все еще краснея, просит не разносить эту сцену по всему дому."
+    elif _amanda_window_outcome == "tease":
+        $ Amanda.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
+        $ player.intimacy.add_arousal(10)
+        $ scene_runtime.text = "Аманда замечает ваш стояк и вместо того, чтобы сразу прикрыться, на несколько секунд позволяет одеялу соскользнуть ниже. Затем она сама подходит ближе, исподтишка рассматривает вашу выпуклость и даже тянется к ней рукой — но в последний момент краснеет, упирается ладонями вам в грудь и выталкивает к двери.\n\n\"Не выдумывай лишнего, Стефан. Посмотреть — еще не значит согласиться на все остальное,\" шепчет она и захлопывает дверь."
     elif _amanda_window_outcome == "mutual":
         $ player.intimacy.set_arousal(max(30, int(player.intimacy.arousal_value() or 0) + 10))
         $ Amanda.add_arousal(10, 100)

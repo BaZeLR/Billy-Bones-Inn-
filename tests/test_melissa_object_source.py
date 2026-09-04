@@ -356,8 +356,8 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
     assert '_hse_daily_limit' not in sex_source
     assert 'Melissa.relationship_allows("intimacy")' in talk_source
     assert "Melissa.private_place_offer(" in talk_source
-    assert 'story_event_available("talk_melissa", "melissa_intimacy")' in talk_source
-    assert 'call checkTriggers("talk_melissa", "melissa_intimacy", 0)' in talk_source
+    assert 'story_event_available("talk_melissa", "melissa_intimacy")' not in talk_source
+    assert 'call checkTriggers("talk_melissa", "melissa_intimacy", 0)' not in talk_source
     invite_branch = talk_source.split('"Попросить Мелиссу прийти завтра на общий завтрак"', 1)[1]
     assert '$ _melissa_repeat_menu = True' in invite_branch.split('"Обсудить, где Мелиссе переночевать"', 1)[0]
     intimacy_call = talk_source.split('call HouseholdSexEngine(girl_name, rooms.current_code)', 1)[1]
@@ -370,20 +370,30 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
 def test_melissa_courtship_is_one_ordered_story_thread_without_parallel_counters():
     runtime_source = (PROJECT_ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
     event_source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")
+    runtime_courtship = runtime_source.split('LThreadData(0, "melissa", "Courtship"', 1)[1].split(
+        'LThreadData(0, "melissa", "RatProblem"', 1
+    )[0]
+    courtship_block = event_source.split("label story_melissa_courtship_amanda_talk_0:", 1)[1].split(
+        "label event_melissa_waitress_fall", 1
+    )[0]
 
     assert 'LThreadData(0, "melissa", "Courtship"' in runtime_source
-    assert runtime_source.count('"talk_melissa", "melissa_intimacy", 0') == 5
+    assert '"talk_melissa", "melissa_intimacy", 0' not in runtime_source
+    assert runtime_courtship.count('"TavernMyRoom", "sleep", 0') == 4
     assert runtime_source.count("None, None, 1,") >= 4
     for stage_label in (
-        "story_melissa_courtship_touch_0",
-        "story_melissa_courtship_kiss_1",
-        "story_melissa_courtship_deep_kiss_2",
-        "story_melissa_courtship_fondle_3",
-        "story_melissa_courtship_underclothes_4",
+        "story_melissa_courtship_amanda_talk_0",
+        "story_melissa_courtship_storm_1",
+        "story_melissa_courtship_mutual_2",
+        "story_melissa_courtship_touch_him_3",
+        "story_melissa_courtship_taste_4",
     ):
         assert f"label {stage_label}:" in event_source
-    assert event_source.count("$ event_runtime.active_thread.advance()") >= 5
-    assert event_source.count("$ Melissa.mark_fucked()") == 5
+    assert courtship_block.count("$ event_runtime.active_thread.advance()") == 5
+    assert "$ Melissa.mark_fucked()" not in courtship_block
+    assert "#Liza.is_working()" in runtime_source
+    assert "#int(Amanda.var_int('lizafriends', 0)) > 0" in runtime_source
+    assert "#int(Amanda.sex_stat('sexacts', 0) or 0) > 0" in runtime_source
     for retired_counter in ("intimacy_start_day", "intimacy_start_count", "intimacy_start_total"):
         assert retired_counter not in runtime_source + event_source
 

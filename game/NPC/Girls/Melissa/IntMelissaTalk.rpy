@@ -40,10 +40,6 @@ label IntMelissaTalk(girl_name="melissa"):
                 $ _melissa_repeat_menu = True
             "Обсудить, где Мелиссе переночевать" if melissa_room_problem_available():
                 call IntMelissaRoomProblemAdviceMenu(girl_name)
-            "Сблизиться с Мелиссой" if story_event_available("talk_melissa", "melissa_intimacy"):
-                $ main_ui_end_talk_state()
-                call checkTriggers("talk_melissa", "melissa_intimacy", 0)
-                return
             "Попросить Мелиссу о сексуальном одолжении" if not Melissa.is_working() and Melissa.relationship_allows("intimacy") and Melissa.room_is_private(rooms.current_code):
                 $ main_ui_end_talk_state()
                 call HouseholdSexEngine(girl_name, rooms.current_code)

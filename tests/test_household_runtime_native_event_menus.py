@@ -43,9 +43,7 @@ def test_household_authored_requests_use_native_label_menus():
     assert "label HouseholdSoapRequestAcknowledge" not in source
     assert "label MelissaRoomPestsChoice" not in source
 
-    night_block = source.split("label MelissaNightWakeEvent", 1)[1]
-    assert "\n    menu:\n" in night_block
-    assert "MenuItem(" not in night_block
+    assert "label MelissaNightWakeEvent" not in source
     assert "label MelissaNightWakeChoice" not in source
 
 

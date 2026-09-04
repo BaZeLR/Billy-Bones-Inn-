@@ -377,14 +377,6 @@ init python:
             and not household_runtime_event_seen_today("melissa_storage_rat")
         )
 
-    def melissa_night_wake_event_ready(return_location=""):
-        return (
-            str(return_location or "") == "TavernMyRoom"
-            and current_game_day() >= 21
-            and not household_runtime_event_seen_today("melissa_night_wake")
-            and procedural_randint(1, 4, "melissa_night_wake_%s" % current_game_day()) == 1
-        )
-
 label HouseholdSoapRequestEvent(girl_name=""):
     $ renpy.dynamic("_soap_girl", "_soap_info", "_soap_preferred", "_soap_last_label")
     $ _soap_girl = str(girl_name or "").strip().lower()
@@ -921,26 +913,4 @@ label HouseholdWakeSleepyGirl(girl_name=""):
     if player.tavern_management.breakfast.event_active:
         $ tavern_kitchen_set_saved_text(scene_runtime.text)
         call TavernKitchenBreakfastShowText(scene_runtime.text)
-    return
-label MelissaNightWakeEvent:
-    $ household_mark_runtime_event_seen("melissa_night_wake")
-    $ scene_runtime.text = "Вы уже почти проваливаетесь в сон, когда в дверь осторожно, но настойчиво стучат. На пороге оказывается встревоженная Мелисса: то ли в ее комнате снова шуршит какая-то дрянь под потолком, то ли из темного угла опять выскочила крыса. Одной ей туда возвращаться совсем не хочется."
-    $ scene_runtime.location_text = scene_runtime.text
-    $ main_ui_runtime.action_title = "Ночная просьба Мелиссы"
-    menu:
-        "Спокойно пойти с ней и помочь":
-            $ calendar_v2.advance_minutes(20)
-            $ Melissa.change_social(friend_delta=1)
-            $ scene_runtime.text = "Вы поднимаетесь вместе с Мелиссой, быстро прогоняете ночную дрянь из ее комнаты и помогаете ей успокоиться. На прощание она благодарит вас уже куда мягче обычного: видно, что такая помощь ей важна."
-
-        "Успокоить, прижать к себе и потом помочь":
-            $ calendar_v2.advance_minutes(30)
-            $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
-            $ player.change_stat("fun", 3)
-            $ scene_runtime.text = "Вы сначала притягиваете Мелиссу к себе и даете ей выдохнуть в тишине, а уже потом идете разбираться с шорохами. Когда все заканчивается, она еще ненадолго остается рядом, благодарит вас шепотом и уходит заметно теплее и смелее, чем пришла."
-
-        "Проворчать и отправить ее обратно":
-            $ Melissa.change_social(friend_delta=-1)
-            $ scene_runtime.text = "Вы бурчите, что ночью вам не до таких хлопот, и отправляете Мелиссу разбираться самой. Она ничего не отвечает, но по ее лицу видно, что такой ответ ей очень не по душе."
-    $ scene_runtime.location_text = scene_runtime.text
     return

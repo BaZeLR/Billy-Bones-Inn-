@@ -626,132 +626,186 @@ label story_melissa_bat_problem_6:
     return True
 
 
-label story_melissa_courtship_touch_0:
-    $ main_ui_begin_native_scene_state("Сближение с Мелиссой")
+label story_melissa_courtship_amanda_talk_0:
+    $ main_ui_begin_native_scene_state("Разговор Аманды и Мелиссы")
     show screen main_ui
-    vscene MelissaStaticData.image_path("portrait", "default")
-    $ scene_runtime.text = "После всего, что случилось с ее комнатой и чердаком, Мелисса уже не избегает вашего общества, но по-прежнему внимательно следит, не попытаетесь ли вы торопить ее."
+    vscene MelissaStaticData.image_path("courtship", "amanda_talk")
+    $ scene_runtime.text = "Проходя мимо, вы слышите, как Аманда вполголоса рассказывает Мелиссе о том, чему успела научиться после разговоров с Лизеттой."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Осторожно коснуться Мелиссы":
-            $ Melissa.change_social(open_delta=1, corruption_delta=1)
-            $ player.change_stat("fun", 1)
-            $ Melissa.mark_fucked()
-            $ calendar_v2.advance_minutes(15)
-            $ event_runtime.active_thread.advance()
-            $ event_runtime.evaluation_time = None
-            $ findAvailableEvents(True)
-            $ scene_runtime.text = "Вы осторожно прикасаетесь к Мелиссе, будто заранее давая ей возможность остановить вас. Она тихо выдыхает, смотрит в сторону и почти неслышно говорит, что так можно."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
-        "Не торопить события":
-            $ scene_runtime.text = "Вы не давите на Мелиссу и оставляете решение о следующем шаге на другой день."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
+        "Продолжить слушать":
+            pass
+    $ scene_runtime.text = "\"Я раньше думала, что в этом только стыд и неприятности,\" признается Аманда. \"А оказывается, если сама хочешь и мужчина не думает только о себе, это может быть так хорошо, что потом весь день вспоминаешь.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ scene_runtime.text = "Мелисса сначала отшучивается, но вопросы задает слишком уж подробно. Заметив вас, обе замолкают. Аманда делает невинное лицо, а Мелисса краснеет и торопливо возвращается к работе."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Вернуться к своим делам":
+            pass
+    $ Melissa.change_social(open_delta=1, corruption_delta=1)
+    $ calendar_v2.advance_minutes(10)
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
     $ main_ui_end_native_scene_state()
     return True
 
 
-label story_melissa_courtship_kiss_1:
-    $ main_ui_begin_native_scene_state("Сближение с Мелиссой")
+label story_melissa_courtship_storm_1:
+    $ renpy.dynamic("_melissa_storm_accept")
+    $ _melissa_storm_accept = False
+    $ main_ui_begin_native_scene_state("Ночная просьба Мелиссы")
     show screen main_ui
-    vscene MelissaStaticData.image_path("portrait", "default")
-    $ scene_runtime.text = "Мелисса вспоминает ваше прежнее осторожное прикосновение и сегодня остается рядом чуть дольше, чем нужно для обычного разговора."
+    vscene MelissaStaticData.image_path("courtship", "storm_arrival")
+    $ scene_runtime.text = "За окнами грохочет гроза. Когда вы уже собираетесь лечь, в дверь осторожно стучат. На пороге стоит Мелисса с подушкой и свернутым одеялом. Она признается, что от раскатов и скрипа крыши ей не по себе, и просит разрешить переночевать в вашей комнате."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Осторожно поцеловать Мелиссу":
-            $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
-            $ player.change_stat("fun", 2)
-            $ Melissa.mark_fucked()
-            $ calendar_v2.advance_minutes(15)
-            $ event_runtime.active_thread.advance()
-            $ event_runtime.evaluation_time = None
-            $ findAvailableEvents(True)
-            $ scene_runtime.text = "Вы не спешите и сначала просто касаетесь ее руки. Мелисса не отстраняется, а когда вы осторожно целуете ее, отвечает коротко, неловко, но уже без прежней настороженности."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
-        "Не торопить события":
-            $ scene_runtime.text = "Вы замечаете ее волнение и оставляете поцелуй на другой день. Мелисса благодарно улыбается."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
+        "Разрешить Мелиссе остаться":
+            $ _melissa_storm_accept = True
+        "Сказать, что ей лучше спать у себя":
+            $ Melissa.change_social(friend_delta=-1)
+    if _melissa_storm_accept:
+        vscene MelissaStaticData.cycle_image("courtship", "sleep", 0)
+        $ scene_runtime.text = "Вы уступаете Мелиссе край кровати и гасите свет. Некоторое время она лежит тихо, прислушиваясь к грому, а затем ее дыхание становится неровным."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Притвориться спящим":
+                pass
+        vscene MelissaStaticData.cycle_image("courtship", "sleep", 1)
+        $ scene_runtime.text = "При очередной вспышке вы замечаете, как ее рука движется под одеялом. Мелисса думает, что вы спите, и осторожно ласкает себя, стараясь не издать ни звука. Вы не выдаете себя, а спустя несколько минут она затихает и отворачивается к стене."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Закрыть глаза и уснуть":
+                pass
+        $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
+        $ player.intimacy.add_arousal(10)
+        $ player.change_stat("fun", 2)
+        $ calendar_v2.advance_minutes(30)
+        $ event_runtime.active_thread.advance()
+        $ event_runtime.evaluation_time = None
+        $ findAvailableEvents(True)
+    else:
+        $ scene_runtime.text = "Мелисса поджимает губы, молча забирает свои вещи и возвращается к себе. Возможно, в другую грозовую ночь она решится попросить снова."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Лечь спать":
+                pass
     $ main_ui_end_native_scene_state()
     return True
 
 
-label story_melissa_courtship_deep_kiss_2:
-    $ main_ui_begin_native_scene_state("Сближение с Мелиссой")
+label story_melissa_courtship_mutual_2:
+    $ renpy.dynamic("_melissa_mutual_accept")
+    $ _melissa_mutual_accept = False
+    $ main_ui_begin_native_scene_state("Еще одна ночь с Мелиссой")
     show screen main_ui
-    vscene MelissaStaticData.image_path("portrait", "default")
-    $ scene_runtime.text = "Теперь Мелисса уже понимает, чего вы хотите, и не отступает, когда вы подходите ближе. Но она все еще ждет, что вы позволите ей самой выбрать темп."
+    vscene MelissaStaticData.cycle_image("courtship", "sleep", 1)
+    $ scene_runtime.text = "Следующей ночью Мелисса снова приходит к вам. На этот раз гроза уже ни при чем. Она садится на край кровати и, не поднимая глаз, спрашивает, видели ли вы, чем она занималась прошлой ночью."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Продолжить поцелуй":
-            $ Melissa.change_social(friend_delta=1, open_delta=2, corruption_delta=2)
-            $ player.change_stat("fun", 2)
-            $ Melissa.mark_fucked()
-            $ calendar_v2.advance_minutes(20)
-            $ event_runtime.active_thread.advance()
-            $ event_runtime.evaluation_time = None
-            $ findAvailableEvents(True)
-            $ scene_runtime.text = "Поцелуй становится заметно глубже и дольше. Мелисса отвечает уже не из одной только осторожности: сперва несмело, потом все горячее, будто сама удивляется тому, как быстро перестает считать секунды."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
-        "Остановиться на разговоре":
-            $ scene_runtime.text = "Вы сохраняете теплую близость, но не превращаете ее в новый шаг раньше времени."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
+        "Признаться и предложить не прятаться друг от друга":
+            $ _melissa_mutual_accept = True
+        "Не продолжать этот разговор":
+            pass
+    if _melissa_mutual_accept:
+        vscene MelissaStaticData.cycle_image("courtship", "sleep", 2)
+        $ scene_runtime.text = "Мелисса долго колеблется, а потом забирается под одеяло рядом. Вы не касаетесь друг друга: каждый ласкает себя сам, наблюдая за дыханием и движениями другого. Когда напряжение становится почти невыносимым, она резко останавливается, краснеет и шепчет, что на сегодня этого достаточно."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Дать ей остановиться":
+                pass
+        $ Melissa.change_social(friend_delta=1, open_delta=2, corruption_delta=2)
+        $ Melissa.add_arousal(15)
+        $ player.intimacy.add_arousal(20)
+        $ player.change_stat("fun", 3)
+        $ calendar_v2.advance_minutes(25)
+        $ event_runtime.active_thread.advance()
+        $ event_runtime.evaluation_time = None
+        $ findAvailableEvents(True)
+    else:
+        $ scene_runtime.text = "Вы не торопите ее. Мелисса благодарно кивает и уходит к себе; разговор остается незавершенным до другой ночи."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Лечь спать":
+                pass
     $ main_ui_end_native_scene_state()
     return True
 
 
-label story_melissa_courtship_fondle_3:
-    $ main_ui_begin_native_scene_state("Сближение с Мелиссой")
+label story_melissa_courtship_touch_him_3:
+    $ renpy.dynamic("_melissa_touch_accept")
+    $ _melissa_touch_accept = False
+    $ main_ui_begin_native_scene_state("Любопытство Мелиссы")
     show screen main_ui
-    vscene MelissaStaticData.image_path("portrait", "default")
-    $ scene_runtime.text = "Мелисса отвечает на поцелуй увереннее прежнего и не спешит разрывать объятие, хотя напряжение в ее плечах выдает, насколько важна для нее возможность остановить вас."
+    vscene MelissaStaticData.image_path("courtship", "touch_him")
+    $ scene_runtime.text = "На следующую ночь Мелисса остается рядом увереннее. Увидев вашу эрекцию, она долго смотрит, затем совсем тихо спрашивает, можно ли ей самой коснуться вашего члена."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Позволить себе более смелые ласки":
-            $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
-            $ player.change_stat("fun", 2)
-            $ Melissa.mark_fucked()
-            $ calendar_v2.advance_minutes(20)
-            $ event_runtime.active_thread.advance()
-            $ event_runtime.evaluation_time = None
-            $ findAvailableEvents(True)
-            $ scene_runtime.text = "Вы держитесь мягко, но позволяете себе чуть больше близости, чем раньше. Мелисса краснеет, шепотом просит не давить на нее и все же остается рядом, явно запоминая это как шаг, который она сама разрешила."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
-        "Остановиться на поцелуях":
-            $ scene_runtime.text = "Вы не переходите установленную Мелиссой границу. Она расслабляется и остается рядом еще немного."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
+        "Позволить ей прикоснуться":
+            $ _melissa_touch_accept = True
+        "Не торопить Мелиссу":
+            pass
+    if _melissa_touch_accept:
+        $ scene_runtime.text = "Сначала Мелисса касается вас лишь кончиками пальцев, будто проверяет, не передумаете ли вы. Потом осторожно обхватывает ствол ладонью и делает несколько медленных движений. Почувствовав, как вы напряглись, она сразу отпускает и признается, что пока хотела только понять, каково это."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Поблагодарить ее и остановиться":
+                pass
+        $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=2)
+        $ Melissa.add_arousal(10)
+        $ player.intimacy.add_arousal(20)
+        $ player.change_stat("fun", 3)
+        $ calendar_v2.advance_minutes(20)
+        $ event_runtime.active_thread.advance()
+        $ event_runtime.evaluation_time = None
+        $ findAvailableEvents(True)
+    else:
+        $ scene_runtime.text = "Вы говорите, что спешить незачем. Мелисса заметно расслабляется и оставляет свое любопытство до следующего раза."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Лечь спать":
+                pass
     $ main_ui_end_native_scene_state()
     return True
 
 
-label story_melissa_courtship_underclothes_4:
-    $ main_ui_begin_native_scene_state("Сближение с Мелиссой")
+label story_melissa_courtship_taste_4:
+    $ renpy.dynamic("_melissa_taste_accept")
+    $ _melissa_taste_accept = False
+    $ main_ui_begin_native_scene_state("Следующий шаг Мелиссы")
     show screen main_ui
-    vscene MelissaStaticData.image_path("portrait", "default")
-    $ scene_runtime.text = "Сегодня Мелисса сама сокращает расстояние между вами. В ее движениях еще остается робость, но прежней попытки спрятаться за ней уже нет."
+    vscene MelissaStaticData.cycle_image("courtship", "taste", 0)
+    $ scene_runtime.text = "Когда Мелисса приходит снова, она уже не просит просто посмотреть. Девушка осторожно берет ваш член рукой, подается ближе и признается, что хочет попробовать его на вкус."
     $ scene_runtime.location_text = scene_runtime.text
     menu:
-        "Коснуться ее под одеждой":
-            $ Melissa.change_social(friend_delta=1, open_delta=2, corruption_delta=3)
-            $ player.change_stat("fun", 3)
-            $ Melissa.mark_fucked()
-            $ calendar_v2.advance_minutes(20)
-            $ event_runtime.active_thread.advance()
-            $ event_runtime.evaluation_time = None
-            $ findAvailableEvents(True)
-            $ scene_runtime.text = "Ваши руки скользят уже смелее, под ткань и вдоль теплой кожи. Мелисса вздрагивает, судорожно выдыхает вам в плечо и все же не останавливает, только шепотом просит не заходить дальше, чем она сейчас готова выдержать."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
-        "Не заходить дальше":
-            $ scene_runtime.text = "Вы оставляете последний шаг на другой день. Мелисса не скрывает облегчения от того, что ее границу снова услышали."
-            $ scene_runtime.location_text = scene_runtime.text
-            "[scene_runtime.text]"
+        "Позволить ей попробовать":
+            $ _melissa_taste_accept = True
+        "Сказать, что она может подождать":
+            pass
+    if _melissa_taste_accept:
+        vscene MelissaStaticData.cycle_image("courtship", "taste", 1)
+        $ scene_runtime.text = "Мелисса касается губами головки, осторожно проводит по ней языком и замирает, прислушиваясь к вашей реакции. Затем пробует еще раз, немного увереннее, но вскоре отстраняется. \"Пока хватит,\" шепчет она. \"В следующий раз я уже не буду делать вид, будто не знаю, чего хочу.\""
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Не требовать большего":
+                pass
+        $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=3)
+        $ Melissa.add_arousal(10)
+        $ player.intimacy.add_arousal(25)
+        $ player.change_stat("fun", 4)
+        $ calendar_v2.advance_minutes(20)
+        $ event_runtime.active_thread.advance()
+        $ event_runtime.evaluation_time = None
+        $ findAvailableEvents(True)
+    else:
+        $ scene_runtime.text = "Вы оставляете решение за ней. Мелисса кивает, но по ее взгляду ясно: любопытство никуда не исчезло."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Лечь спать":
+                pass
     $ main_ui_end_native_scene_state()
     return True
 

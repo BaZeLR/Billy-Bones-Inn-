@@ -148,6 +148,23 @@ init python:
                     "blowjob_finish": ["images/melissa/sexyTimes/blowjobFinish.jpg"],
                     "finish": ["images/melissa/thanks.png"],
                 },
+                "courtship": {
+                    "amanda_talk": ["images/amanda/tavern/amanda_liza convo-wench_room.png"],
+                    "storm_arrival": [
+                        "images/player_room/batsProblem/melissa in the room.png",
+                        "images/player_room/batsProblem/melissa in room.png",
+                    ],
+                    "sleep": [
+                        "images/melissa/tavern/melissa_sleeps_0.jpg",
+                        "images/melissa/tavern/melissa_sleeps_1.png",
+                        "images/melissa/tavern/melissa_sleeps_3.png",
+                    ],
+                    "touch_him": ["images/melissa/sexyTimes/blowjob1.jpg"],
+                    "taste": [
+                        "images/melissa/sexyTimes/blowjob3.png",
+                        "images/melissa/sexyTimes/blowjob5.png",
+                    ],
+                },
                 "outfit_reward": {
                     "show": ["images/melissa/thanks.png"],
                     "handjob": ["images/melissa/thanks1.png"],

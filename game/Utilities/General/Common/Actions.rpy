@@ -1251,8 +1251,8 @@ label Sleep(return_location="TavernMain", timepassed=1, fallback_text="", where_
     if str(fallback_text or "").strip() != "":
         $ scene_runtime.text = str(fallback_text or "").strip()
         $ scene_runtime.location_text = scene_runtime.text
-    if melissa_night_wake_event_ready(_sleep_target):
-        call MelissaNightWakeEvent
+    if story_event_available(_sleep_target, "sleep"):
+        call checkTriggers(_sleep_target, "sleep", 0)
     call NextDay(_sleep_target, _sleep_days)
     if renpy.has_label(_sleep_target):
         jump expression _sleep_target
