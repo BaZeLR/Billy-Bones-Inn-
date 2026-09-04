@@ -31,6 +31,8 @@ def test_becky_store_smalltalk_remains_the_authored_friendship_path():
     assert repeatable.count("Becky.interrupt_work()") == 2
     assert "Becky.add_relation(1, 3)" in repeatable
     assert "Becky.add_relation(1, 6)" in repeatable
+    assert repeatable.count("renpy.random.randint(1, 2)") == 2
+    assert "procedural_randint" not in repeatable
     assert repeatable.count("Becky.finish_talk()") == 2
 
 
