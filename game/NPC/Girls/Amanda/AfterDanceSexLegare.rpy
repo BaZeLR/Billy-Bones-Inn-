@@ -278,6 +278,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                         if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                             $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
                         $ calendar_v2.advance_minutes(60)
+                        $ main_ui_end_native_scene_state()
                         jump StreetTavern
 
             elif AmandaNesluh == 1:
@@ -286,6 +287,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                 if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                     $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
                 $ calendar_v2.advance_minutes(60)
+                $ main_ui_end_native_scene_state()
                 jump StreetTavern
 
             else:
@@ -293,6 +295,7 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                 $ Amanda.legare_affection -= 2
                 $ Amanda.change_social(friend_delta=(1 if Amanda.rel >= 3 else -2), corruption_delta=(1 if Amanda.corruption >= 20 else -3))
                 $ calendar_v2.advance_minutes(60)
+                $ main_ui_end_native_scene_state()
                 jump StreetTavern
 
         "Дать знать им о том, что вы наблюдаете за ними" if CurSexStep < MaxStep - 1 and not Amanda.knows_player_is_watching_legare_sex and Amanda.knows_player_saw_legare_sex:
@@ -310,30 +313,35 @@ label AfterDanceSexLegare(CurSexStep=0, tmpLegareSexType=-1, FollowMode=""):
                         if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                             $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
                         $ calendar_v2.advance_minutes(60)
+                        $ main_ui_end_native_scene_state()
                         jump StreetTavern
             else:
                 "После небольшой заминки Аманда заявляет, что так не может, потому что вдруг это действительно Стефан и ей стыдно. С этими словами она утягивает немного ошалевшего Альбера в дом. Почему-то ваша идея обернулась вам не на пользу."
                 if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                     $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
                 $ calendar_v2.advance_minutes(60)
+                $ main_ui_end_native_scene_state()
                 jump StreetTavern
 
         "Я на это смотреть не могу и пойду отсюда" if CurSexStep < MaxStep - 1 and Amanda.knows_player_is_watching_legare_sex:
             if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                 $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
             $ calendar_v2.advance_minutes(60)
+            $ main_ui_end_native_scene_state()
             jump StreetTavern
 
         "Ухожу, даже и не собираюсь на это смотреть" if CurSexStep < MaxStep and not Amanda.knows_player_is_watching_legare_sex:
             if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                 $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
             $ calendar_v2.advance_minutes(60)
+            $ main_ui_end_native_scene_state()
             jump StreetTavern
 
         "Пойду-ка и я" if (CurSexStep == 4 and tmpLegareSexType == 1) or (CurSexStep == 5 and tmpLegareSexType == 0) or (CurSexStep >= 6):
             if (tmpLegareSexType == 0 and CurSexStep < 4) or (tmpLegareSexType == 1 and CurSexStep < 3) or (tmpLegareSexType >= 2 and CurSexStep < 5):
                 $ Amanda.resolve_legare_let_go(1, tmpLegareSexType)
             $ calendar_v2.advance_minutes(60)
+            $ main_ui_end_native_scene_state()
             jump StreetTavern
 
     return

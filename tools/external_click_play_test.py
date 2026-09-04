@@ -5138,10 +5138,15 @@ testcase external_amanda_legare_sex_scene_label_procedures:
     $ Amanda.set_sex_stat("ConceptionChance", 0)
     $ Amanda.set_sex_stat("pregnancy", 0)
     $ Amanda.corruption = 0
+    $ TownStreet.events_today = 2
     run Call("AfterDanceSexLegare", 3, 1, "")
     advance until screen "choice" timeout 20.0
     assert eval (Amanda.performed_oral_with_legare) timeout 5.0
     assert eval (Amanda.legare_affection == 1) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "StreetTavern") timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") != "event" and len(list(main_ui_runtime.action_items or [])) > 0) timeout 5.0
     run Call("AfterDanceSexLegare", 5, 2, "")
     advance until screen "choice" timeout 20.0
     assert eval (Amanda.had_sex_with_legare) timeout 5.0
