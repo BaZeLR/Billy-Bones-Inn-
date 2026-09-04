@@ -172,6 +172,17 @@
       "priority": 620
     },
     {
+      "label": "late_evening",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "start": "22:00",
+      "end": "22:59",
+      "location": ["TavernMelissaRoom", "TavernMain"],
+      "location_probabilities": [0.7, 0.3],
+      "awake": true,
+      "talkable": true,
+      "priority": 620
+    },
+    {
       "label": "clara_paintings_confession",
       "weekdays": [1, 2, 3, 4, 5, 6, 7],
       "start": "22:00",

@@ -2950,11 +2950,12 @@ testcase external_melissa_amanda_locked_room_event:
     $ threads["melissaBatProblem"].advanceTo(6, force_active=True)
     $ Melissa.temp_room_code = "TavernAmandaRoom"
     $ Melissa.drawings_found = False
-    $ people.get_data("amanda").set_schedule([NPCScheduleEntry(location="TavernAmandaRoom", start_minute=0, end_minute=1440, awake=False, talkable=False, priority=999)])
+    $ npc_interval_schedule_load_all(True)
     $ event_runtime.fired_day = -1
     $ event_runtime.fired_keys_today = []
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    assert eval (str(people.location("amanda") or "") == "TavernAmandaRoom" and str(people.location("melissa") or "") == "TavernAmandaRoom") timeout 5.0
     assert eval (story_event_available("TavernAmandaRoom", "melissa_amanda_locked")) timeout 5.0
     $ rooms.enter("TavernUpstairs")
     run Call("TavernAmandaRoomDoor")
@@ -3497,7 +3498,7 @@ testcase external_melissa_bats_room_search_after_wait:
     assert eval (not story_event_available("TavernAmandaRoom", "melissa_bats")) timeout 5.0
 
     $ Melissa.roof_repair_complete_day = int(current_game_day() or 0)
-    $ rooms.enter("TavernMain")
+    $ rooms.enter("TavernKitchen")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     assert eval (story_event_available("talk_melissa", "melissa_breakfast_invite")) timeout 5.0

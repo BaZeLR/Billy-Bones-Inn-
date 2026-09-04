@@ -579,6 +579,16 @@ def test_melissa_bat_progress_uses_the_story_thread_directly():
     assert 'self.var["bats_episode"]' not in source
 
 
+def test_melissa_temporary_bed_does_not_replace_day_schedule():
+    source = MELISSA_INIT.read_text(encoding="utf-8-sig")
+    temp_room = source.split("def temp_room_active(self", 1)[1].split(
+        "def attic_scandal_ready", 1
+    )[0]
+
+    assert 'return scheduled_room == "TavernMelissaRoom"' in temp_room
+    assert "return hour_num < 10" not in temp_room
+
+
 def test_melissa_booklet_aftermath_is_one_ordered_thread_flow():
     runtime_source = (PROJECT_ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
     event_source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")
@@ -598,6 +608,10 @@ def test_melissa_booklet_aftermath_is_one_ordered_thread_flow():
     positions = [bat_thread.index(label) for label in ordered_labels]
     assert positions == sorted(positions)
     assert '"talk_melissa",\n                "melissa_breakfast_invite"' in bat_thread
+    breakfast_invite = bat_thread.split(
+        '"story_melissa_bat_problem_breakfast_invite"', 1
+    )[1].split('"melissa_breakfast_invite"', 1)[0]
+    assert "rooms.current_code" not in breakfast_invite
     assert '"TavernKitchen",\n            "enter"' in bat_thread
     assert '"TavernAmandaRoom",\n            "melissa_bats"' in bat_thread
     assert '"Попросить Мелиссу прийти завтра на общий завтрак"' in talk_source

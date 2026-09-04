@@ -405,9 +405,7 @@ init python:
             if threads["melissaBatProblem"].num >= 10:
                 return False
             scheduled_room = str(self.data.getLocation(week_num, hour_num) or "")
-            if scheduled_room == "TavernMelissaRoom":
-                return True
-            return hour_num < 10
+            return scheduled_room == "TavernMelissaRoom"
 
         def attic_scandal_ready(self):
             return threads["melissaBatProblem"].num == 5

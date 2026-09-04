@@ -371,7 +371,6 @@ define melissaThreadList = [
                 1,
                 None,
                 [
-                    "#str(rooms.current_code or '') == 'TavernMain'",
                     "#people_to_int(Melissa.roof_repair_complete_day, -1) >= 0",
                     "#int(current_game_day() or 0) >= people_to_int(Melissa.roof_repair_complete_day, -1)",
                 ],
