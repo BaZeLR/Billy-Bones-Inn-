@@ -159,6 +159,10 @@ def test_liza_talk_choices_persist_and_refusal_keeps_talk_picture_owner():
     assert '"Закончить разговор":' in menu
     assert "main_ui_end_talk_state()" in menu
     assert 'Liza.can_ask_topic("pregnancy")' in menu
+    smalltalk = talk.split('label IntLizaTalkSmalltalk(girl_name_ilt="liza", girl_loc_ilt="", _liza_busy_text=""):', 1)[1].split(
+        "label IntLizaTalkAskClients", 1
+    )[0]
+    assert 'key="procedural:NPC/Girls/Liza/IntLizaTalk.rpy:smalltalk:%s" % Liza.talk_count()' in smalltalk
     rejection = grope.split("if Liza.rel < 5:", 1)[1].split("return", 1)[0]
     assert "ShowCurrentSex" not in rejection
     assert "call LizaSexStatus(girl_loc_ilt)" in grope
@@ -254,7 +258,7 @@ def test_georgett_owns_the_friendship_reward_for_every_orgasm():
     assert "change_social" not in georgett_shared_branch
 
 
-def test_georgett_and_liza_friendship_milestones_are_class_values_with_one_owner():
+def test_georgett_and_liza_friendship_rewards_are_class_values_with_one_owner():
     georgett_info = (ROOT / "game/NPC/Girls/Georgett/InitGeorgett.rpy").read_text(encoding="utf-8-sig")
     liza_info = (ROOT / "game/NPC/Girls/Liza/InitLiza.rpy").read_text(encoding="utf-8-sig")
     georgett_sex = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettSex.rpy").read_text(encoding="utf-8-sig")
@@ -264,7 +268,8 @@ def test_georgett_and_liza_friendship_milestones_are_class_values_with_one_owner
 
     assert "LICK_FRIENDSHIP_MILESTONES = {4: 1}" in georgett_info
     assert "LICK_FRIENDSHIP_MILESTONES = {7: 1}" in liza_info
-    assert "ORGASM_FRIENDSHIP_MILESTONES = {3: 1}" in liza_info
+    assert "ORGASM_FRIENDSHIP_GAIN = 1" in liza_info
+    assert "ORGASM_FRIENDSHIP_MILESTONES" not in liza_info
 
     orgasm_owner = people.split("def record_orgasm_given(self):", 1)[1].split("def record_sex_history", 1)[0]
     lick_owner = people.split("def record_lick_pussy(self):", 1)[1].split("def lick_pussy_count", 1)[0]

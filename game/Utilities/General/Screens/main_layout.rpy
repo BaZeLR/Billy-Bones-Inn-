@@ -183,6 +183,7 @@ init python:
         main_ui_runtime.mode = "event"
         main_ui_runtime.selected_char = ""
         main_ui_runtime.girl_key = ""
+        main_ui_runtime.object_id = ""
         main_ui_runtime.talk_picture = ""
         main_ui_runtime.action_content = None
         main_ui_runtime.action_items = []

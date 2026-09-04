@@ -1254,6 +1254,13 @@ testcase external_liza_inherited_state_and_native_sex_menu:
     click id _liza_look_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "char") timeout 20.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Назад"] and list(main_ui_runtime.action_items or []) == []) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and "Болтать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _liza_smalltalk_key = "procedural:NPC/Girls/Liza/IntLizaTalk.rpy:smalltalk:%s"
+    $ _liza_smalltalk_attempt = 0 if procedural_randint(1, 2, key=_liza_smalltalk_key % 0) == 1 else 1
+    $ Liza.talked_today = _liza_smalltalk_attempt
+    $ Liza.rel = 0
+    $ _liza_smalltalk_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Болтать")
+    click id ("choice_panel_button_%d" % int(_liza_smalltalk_index)) pos (0.5, 0.5) until eval (int(Liza.rel or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval ("Вы чуть лучше узнали Лизетту." in str(scene_runtime.text or "") and int(Liza.talk_count() or 0) == int(_liza_smalltalk_attempt or 0) + 1 and int(npc_friend_value("liza") or 0) == 1) timeout 5.0
     $ _liza_talk_end_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
     $ _liza_talk_end_button_id = "choice_panel_button_%d" % int(_liza_talk_end_index)
     click id _liza_talk_end_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") != "talk") timeout 20.0
@@ -1377,6 +1384,10 @@ testcase external_liza_inherited_state_and_native_sex_menu:
     $ player.intimacy.set_arousal(0)
     run Call("LizaSexStatus", "street")
     assert eval (int(Liza.sex_stat("orgasms_given", 0) or 0) == 3 and int(Liza.rel or 0) == 4 and "какой ты добрый и хороший" in str(scene_runtime.text or "")) timeout 5.0
+    $ Liza.set_sex_busy(False)
+    $ Liza.set_arousal(100)
+    run Call("LizaSexStatus", "street")
+    assert eval (int(Liza.sex_stat("orgasms_given", 0) or 0) == 4 and int(Liza.rel or 0) == 5) timeout 5.0
     $ Liza.set_sex_busy(False)
 '''
 
@@ -1625,9 +1636,10 @@ testcase external_tavern_random_event_plan_consumes_once:
     $ _bar_event_button = "choice_panel_button_%d" % int(_bar_event_index)
     click id _bar_event_button pos (0.5, 0.5) until screen "choice" timeout 20.0
     advance until screen "choice" timeout 20.0
-    assert eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("say") is None and "Что вы будете делать?" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.object_id or "") == "" and renpy.get_screen("say") is None and "Что вы будете делать?" in str(scene_runtime.text or "")) timeout 5.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Не обращать внимания", "Стоять и смотреть", "[_help_caption]"]) timeout 5.0
     assert eval (str(scene_runtime.picture or "") != "images/tavern/mainhall/main_hall.png" and _media_asset_exists(scene_runtime.picture)) timeout 5.0
+    assert eval (str(resolve_main_ui_picture(rooms.current) or "") == str(media_displayable(scene_runtime.picture) or "")) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Промолчать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("say") is None and "Вы отвернулись от происходящего" in str(scene_runtime.text or "")) timeout 5.0
     $ _harass_silence_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Промолчать")
@@ -1866,9 +1878,10 @@ testcase external_sandra_weekly_visit_native_beats:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("sandra") is not None) timeout 20.0
     $ rooms.enter("TavernMyRoom")
     $ player.chores.last_score = 0
+    $ main_ui_runtime.object_id = "bed_001"
     run Call("SandraWeeklyEvaluationScene", 0, "TavernMain")
     advance until screen "choice" timeout 20.0
-    assert eval (str(scene_runtime.picture or "") == "images/sandra/player_room_sandra_0.jpg") timeout 5.0
+    assert eval (str(main_ui_runtime.object_id or "") == "" and str(scene_runtime.picture or "") == "images/sandra/player_room_sandra_0.jpg" and str(resolve_main_ui_picture(rooms.current) or "") == str(media_displayable(scene_runtime.picture) or "")) timeout 5.0
     assert eval ("осторожный стук" in str(scene_runtime.text or "")) timeout 5.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("держал хозяйство" in str(scene_runtime.text or "")) timeout 10.0
@@ -3274,6 +3287,7 @@ testcase external_tavern_room_movement_resets_picture_state:
     $ _tavern_main_back_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Назад")
     click id ("choice_panel_button_%d" % int(_tavern_main_back_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Действия в трактире") timeout 20.0
     assert eval (str(scene_runtime.picture or "") == _tavern_main_room_picture and str(scene_runtime.text or "") == _tavern_main_room_text and str(scene_runtime.location_text or "") == _tavern_main_room_text) timeout 5.0
+    assert eval (str(resolve_main_ui_picture(rooms.current) or "") == str(media_displayable(_tavern_main_room_picture) or "")) timeout 5.0
 
     run movement_actions("TavernKitchen", 5)
     advance until screen "main_ui" timeout 20.0
@@ -3416,6 +3430,23 @@ testcase external_melissa_bats_room_search_after_wait:
     $ event_runtime.available.clear()
     $ event_runtime.evaluation_time = None
     $ initStoryEventRuntime(True)
+    $ threads["melissaBatProblem"].advanceTo(1, force_active=True)
+    $ player.add_item("bat_repellent_001", 3)
+    $ rooms.enter("TavernAtic")
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("TavernAtic", "melissa_bats")) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 16, 0)
+    $ rooms.enter("TavernUpstairs")
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (str(event_runtime.available["TavernUpstairs"]["enter"].target or "") == "story_melissa_bat_problem_1") timeout 5.0
+    run Call("checkTriggers", "TavernUpstairs", "enter", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.picture or "") == str(tavern_melissa_room_picture() or "") and str(resolve_main_ui_picture(rooms.current) or "") == str(media_displayable(scene_runtime.picture) or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Вы обещаете" in str(scene_runtime.text or "")) timeout 20.0
+    click pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 2 and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    assert eval (int(Melissa.bat_attic_check_day or -1) == int(current_game_day() or 0)) timeout 5.0
+    $ player.remove_item("bat_repellent_001", 3)
     $ Melissa.var["bats_episode"] = 5
     $ updateSave_V22()
     assert eval (int(threads["melissaBatProblem"].num or 0) == 5 and "bats_episode" not in Melissa.var) timeout 5.0
@@ -3432,8 +3463,12 @@ testcase external_melissa_bats_room_search_after_wait:
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     assert eval (str(event_runtime.available["TavernAtic"]["melissa_bats"].target or "") == "story_melissa_bat_problem_4") timeout 5.0
+    assert eval ("Выжечь гнездо дымной смесью" in [str(item.caption or "") for item in tavern_atic_action_items()]) timeout 5.0
     run Call("checkTriggers", "TavernAtic", "melissa_bats", 0)
-    click pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 7) timeout 10.0
+    advance until screen "choice" timeout 10.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.picture or "") == "images/player_room/player_room_attic_1.png" and str(resolve_main_ui_picture(rooms.current) or "") == str(media_displayable(scene_runtime.picture) or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 7) timeout 10.0
+    advance until eval (str(main_ui_runtime.mode or "") == "scene") timeout 10.0
     assert eval (int(threads["melissaBatProblem"].num or 0) == 7) timeout 5.0
 
     $ player.set_money(1999)
@@ -3441,14 +3476,20 @@ testcase external_melissa_bats_room_search_after_wait:
     $ findAvailableEvents(True)
     assert eval (str(event_runtime.available["TavernAtic"]["melissa_bats"].target or "") == "story_melissa_bat_problem_roof") timeout 5.0
     run Call("checkTriggers", "TavernAtic", "melissa_bats", 0)
-    click pos (0.5, 0.5) until eval (str(scene_runtime.text or "").startswith("Летучих мышей")) timeout 10.0
-    assert eval (int(Melissa.roof_repair_complete_day or -1) < 0 and int(player.economy.money or 0) == 1999) timeout 5.0
+    advance until screen "choice" timeout 10.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.text or "").startswith("Летучих мышей") and int(Melissa.roof_repair_complete_day or -1) < 0 and int(player.economy.money or 0) == 1999) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene") timeout 10.0
 
+    $ _melissa_roof_retry_date = calendar_v2.day_number_to_parts(int(current_game_day() or 0) + 1)
+    $ external_calendar_set_fields(int(_melissa_roof_retry_date.get("day", 1) or 1), int(_melissa_roof_retry_date.get("month", 1) or 1), int(_melissa_roof_retry_date.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 16, 0)
     $ player.set_money(2000)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     run Call("checkTriggers", "TavernAtic", "melissa_bats", 0)
-    click pos (0.5, 0.5) until eval (int(Melissa.roof_repair_complete_day or -1) >= 0) timeout 10.0
+    advance until screen "choice" timeout 10.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.text or "").startswith("Вы договариваетесь")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(Melissa.roof_repair_complete_day or -1) >= 0) timeout 10.0
+    $ assert str(main_ui_runtime.mode or "") == "scene", repr({"mode": main_ui_runtime.mode, "scene_origin": main_ui_runtime.scene_origin})
     assert eval (int(threads["melissaBatProblem"].num or 0) == 7) timeout 5.0
     assert eval (int(player.economy.money or 0) == 0) timeout 5.0
     assert eval (int(Melissa.roof_repair_complete_day or -1) == int(current_game_day() or 0) + 2) timeout 5.0
@@ -3462,6 +3503,7 @@ testcase external_melissa_bats_room_search_after_wait:
     run Call("checkTriggers", "talk_melissa", "melissa_breakfast_invite", 0)
     advance until screen "choice" timeout 20.0
     assert eval ("прийти на общий завтрак" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Договорились"]) timeout 15.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 8) timeout 15.0
 
     $ _melissa_breakfast_date = calendar_v2.day_number_to_parts(int(current_game_day() or 0) + 1)
@@ -5866,8 +5908,10 @@ testcase external_household_ai_kitchen_event_fires:
     assert eval (household_ai_pick_event("TavernKitchen", "room") == "household_event_kitchen_amanda_sandra_spark") timeout 5.0
     run Call("HouseholdEvent_Try", "TavernKitchen", "room")
     advance until screen "choice" timeout 20.0
-    click pos (960, 560)
-    advance until eval (str(household.meta.get("last_event_code", "") or "") == "household_event_kitchen_amanda_sandra_spark") timeout 10.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.picture or "") == "images/amanda/kitchen_help.png" and str(resolve_main_ui_picture(rooms.current) or "") == str(media_displayable("images/amanda/kitchen_help.png") or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    assert eval (str(household.meta.get("last_event_code", "") or "") == "household_event_kitchen_amanda_sandra_spark") timeout 5.0
     assert eval (household_ai_seen("household_event_kitchen_amanda_sandra_spark", "TavernKitchen")) timeout 5.0
 '''
 

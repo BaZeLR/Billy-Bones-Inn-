@@ -30,7 +30,7 @@ init python:
         """Lizette runtime: port work, tavern relocation, church story, pregnancy state."""
 
         talk_label = "IntLizaTalk"
-        ORGASM_FRIENDSHIP_MILESTONES = {3: 1}
+        ORGASM_FRIENDSHIP_GAIN = 1
         LICK_FRIENDSHIP_MILESTONES = {7: 1}
         OPENNESS_RELATIONSHIP_STEPS = ((4, 3), (7, 5), (6, 6), (8, 7))
 

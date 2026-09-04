@@ -60,7 +60,7 @@ label IntLizaTalkSmalltalk(girl_name_ilt="liza", girl_loc_ilt="", _liza_busy_tex
         return
     python:
         scene_runtime.text = "Вы некоторое время болтаете с Лизеттой о разных вещах."
-        if Liza.talk_count() <= 2 and procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaTalk.rpy:procedural_randint:86:1") == 1:
+        if Liza.talk_count() <= 2 and procedural_randint(1, 2, key="procedural:NPC/Girls/Liza/IntLizaTalk.rpy:smalltalk:%s" % Liza.talk_count()) == 1:
             girl_friends = Liza.rel
             lick_pussy_count = Liza.lick_pussy_count()
             give_orgasms_count = Liza.sex_stat("orgasms_given", 0)

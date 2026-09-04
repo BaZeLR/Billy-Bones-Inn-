@@ -232,6 +232,7 @@ label story_melissa_bat_problem_0:
 
 label story_melissa_bat_problem_1:
     $ renpy.dynamic("_melissa_bat_problem_1_choice")
+    $ main_ui_begin_native_scene_state("Шум над комнатой Мелиссы")
     show screen main_ui
     $ _melissa_bat_problem_1_choice = ""
     vscene tavern_melissa_room_picture()
@@ -258,10 +259,13 @@ label story_melissa_bat_problem_1:
         $ findAvailableEvents(True)
     elif _melissa_bat_problem_1_choice == "comfort":
         $ Melissa.change_social(friend_delta=1)
+    $ main_ui_end_native_scene_state()
     return True
 
 
 label story_melissa_bat_problem_room_inspect:
+    $ main_ui_begin_native_scene_state("Осмотр комнаты Мелиссы")
+    show screen main_ui
     vscene tavern_melissa_room_picture()
     $ scene_runtime.text = "Вы внимательно осматриваете потолок и верхние балки в комнате Мелиссы. Под самым потолком обнаруживаются мелкие щели и темные норки в старом дереве, а сверху тянет пылью и затхлым чердаком. Теперь ясно: шум идет не из самой комнаты — дрянь пробирается сюда через старую крышу. Утром придется подняться наверх и проверить все над ее потолком."
     $ scene_runtime.location_text = scene_runtime.text
@@ -270,10 +274,13 @@ label story_melissa_bat_problem_room_inspect:
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     return True
 
 
 label story_melissa_bat_problem_2:
+    $ main_ui_begin_native_scene_state("Гнездовище на чердаке")
+    show screen main_ui
     vscene "images/player_room/player_room_attic_1.png"
     $ scene_runtime.text = "Вы медленно обходите чердак вдоль стропил и почти сразу замечаете над той частью дома, где спит Мелисса, старые щели между досками и темные ходы в подгнившей обшивке.\n\nЕще через пару шагов находится и главная причина ночного шума. Под самой кровлей набилось сухое гнездовое тряпье, комки мха, помет и целая дрянная колония, давно обжившая балки и пустоты под крышей. Одним веником тут не обойтись: сначала эту пакость придется выкурить дымом, а потом уже по-настоящему заделывать щели."
     $ scene_runtime.location_text = scene_runtime.text
@@ -282,11 +289,13 @@ label story_melissa_bat_problem_2:
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     return True
 
 
 label story_melissa_bat_problem_3:
     $ renpy.dynamic("_melissa_bat_problem_3_choice")
+    $ main_ui_begin_native_scene_state("Слуховое окно на чердаке")
     show screen main_ui
     $ _melissa_bat_problem_3_choice = ""
     vscene "images/player_room/player_room_attic.png"
@@ -308,10 +317,13 @@ label story_melissa_bat_problem_3:
         $ calendar_v2.advance_minutes(45)
         $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     return True
 
 
 label story_melissa_bat_problem_fall:
+    $ main_ui_begin_native_scene_state("Падение с чердака")
+    show screen main_ui
     vscene "images/player_room/batsProblem/fell_from_attic.png"
     "Вы тянетесь вперед еще на полшага, но старое дерево под ногами не выдерживает. Доска жалобно трещит, потом ломается, и в следующий миг вас с грохотом несет вниз вместе с пылью, щепками и куском прогнившего настила."
     "Несколько тяжелых мгновений вы лежите среди пыли и щепок, пытаясь понять, куда именно вас выбросило. С потолка свисают обломки, над головой зияет пролом, а вокруг слишком хорошо знакомые вещи из вашей комнаты."
@@ -333,6 +345,7 @@ label story_melissa_bat_problem_fall:
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -352,6 +365,7 @@ label story_melissa_amanda_room_locked:
 
 
 label story_melissa_bat_problem_breakfast_invite:
+    $ main_ui_begin_native_scene_state("Приглашение Мелиссы на завтрак")
     show screen main_ui
     vscene MelissaStaticData.image_path("portrait", "default")
     $ scene_runtime.text = "Вы просите Мелиссу завтра утром прийти на общий завтрак. Теперь, когда крыша починена, пора спокойно обсудить возвращение в ее комнату и закончить эту историю всем вместе."
@@ -369,6 +383,7 @@ label story_melissa_bat_problem_breakfast_invite:
     $ event_runtime.active_thread.advance()
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     return True
 
 
@@ -548,30 +563,39 @@ label MelissaBookletContinueSearch:
 
 
 label story_melissa_bat_problem_4:
+    $ main_ui_begin_native_scene_state("Дымная смесь на чердаке")
+    show screen main_ui
     vscene "images/player_room/player_room_attic_1.png"
     if int(player.item_count("bat_repellent_001") or 0) > 0:
         $ scene_runtime.text = "Вы раскладываете дымную смесь между балок, даете ей как следует разгореться и быстро отступаете. Чердак наполняется густым едким дымом из мха, лаванды и трав. Из-под крыши с писком и хлопаньем вырываются летучие мыши.\n\nГнездовище вы наконец выкурили, но на одном дыме дело не закончится: пока крышу не заделают как следует, щели останутся и вся пакость со временем полезет обратно."
     else:
         $ scene_runtime.text = "Теперь уже ясно, что под крышей свилось настоящее гнездовище. Просто так его не вымести: сначала нужна едкая дымная смесь, чтобы выгнать всю эту дрянь из-под кровли."
     $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
+    menu:
+        "Продолжить":
+            pass
     $ calendar_v2.advance_minutes(45)
     if int(player.item_count("bat_repellent_001") or 0) > 0:
         $ player.remove_item("bat_repellent_001", 1)
         $ event_runtime.active_thread.advance()
         $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     return True
 
 
 label story_melissa_bat_problem_roof:
+    $ main_ui_begin_native_scene_state("Починка крыши")
+    show screen main_ui
     vscene "images/player_room/player_room_attic_1.png"
     if int(player.economy.money or 0) >= 2000:
         $ scene_runtime.text = "Вы договариваетесь о починке старой крыши и отдаете за работу две тысячи монет. Теперь остается только дождаться, пока мастера перетянут гнилые доски, забьют щели и приведут верх трактира в порядок. Обещают управиться за пару дней."
     else:
         $ scene_runtime.text = "Летучих мышей вы уже выкурили, но без починки крыши дело не закончить. Денег на мастеров пока не хватает."
     $ scene_runtime.location_text = scene_runtime.text
-    "[scene_runtime.text]"
+    menu:
+        "Продолжить":
+            pass
     $ calendar_v2.advance_minutes(45)
     if int(player.economy.money or 0) >= 2000:
         $ player.spend_money(2000)
@@ -579,10 +603,12 @@ label story_melissa_bat_problem_roof:
         $ event_runtime.evaluation_time = None
         $ findAvailableEvents(True)
         call stat
+    $ main_ui_end_native_scene_state()
     return True
 
 
 label story_melissa_bat_problem_6:
+    $ main_ui_begin_native_scene_state("Мелисса благодарит вас")
     show screen main_ui
     vscene MelissaStaticData.image_path("portrait", "thanks")
     $ scene_runtime.text = "Вы говорите Мелиссе, что на этот раз все действительно закончено: чердачное гнездовище выжжено, щели под крышей забиты, а над ее комнатой теперь наконец тихо. Она сперва смотрит на вас с привычной настороженностью, будто все еще ждет подвоха, но потом сама коротко выдыхает и впервые за все это время заметно расслабляется.\n\n\"Значит, можно снова спать у себя и не ждать, что ночью над головой начнут бегать, пищать и сыпать трухой...\" Она качает головой, будто сама до конца не верит в удачу, а потом уже тише добавляет: \"Спасибо. Не за слова — за то, что ты и правда довел дело до конца.\"\n\nПохоже, история с летучими мышами и чердаком для Мелиссы наконец действительно закрыта."
@@ -596,6 +622,7 @@ label story_melissa_bat_problem_6:
     $ Melissa.change_social(friend_delta=3, open_delta=2)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
     return True
 
 

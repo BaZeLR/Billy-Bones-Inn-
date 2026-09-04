@@ -275,16 +275,6 @@ init python:
     def resolve_main_ui_picture(room_obj=None):
         room_base_picture = _normalize_media_ref(getattr(room_obj, "bg_picture", "") if room_obj is not None else "")
         explicit_picture = _normalize_media_ref(scene_runtime.picture)
-        current_object_picture = ""
-
-        current_object_key = str(main_ui_runtime.object_id or "").strip()
-        if current_object_key:
-            current_object = get_game_object(current_object_key)
-            if current_object is None:
-                current_object = get_game_item(current_object_key)
-            current_object_picture = _normalize_media_ref(getattr(current_object, "picture", "") if current_object is not None else "")
-            if current_object_picture:
-                return media_displayable(current_object_picture)
 
         uses_room_seed = bool(room_base_picture) and (
             not explicit_picture or explicit_picture == room_base_picture

@@ -21,8 +21,13 @@ label HouseholdEvent_Try(location_code="", mode="room"):
 
 
 label HouseholdEvent_KitchenAmandaSandraSpark:
+    $ main_ui_begin_native_scene_state("Аманда и Сандра на кухне")
+    show screen main_ui
+    vscene "images/amanda/kitchen_help.png"
 
-    "На кухне и без того жарко, и не только из-за огня в очаге."
+    $ scene_runtime.text = "На кухне и без того жарко, и не только из-за огня в очаге."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
 
     "Сандра стоит у стола и что-то записывает с таким лицом, будто до конца завтрака всем еще прибавится работы."
 
@@ -60,12 +65,18 @@ label HouseholdEvent_KitchenAmandaSandraSpark:
             $ household_ai_reduce_drive("amanda", 0.12)
             $ household_ai_reduce_drive("sandra", 0.12)
 
+    $ main_ui_end_native_scene_state()
     return
 
 
 label HouseholdEvent_KitchenMelissaPracticalComplaint:
+    $ main_ui_begin_native_scene_state("Мелисса на кухне")
+    show screen main_ui
+    vscene MelissaStaticData.image_path("kitchen", "work")
 
-    "Мелисса оглядывает кухню так, будто считает каждую недостающую монету и каждую грязную тарелку."
+    $ scene_runtime.text = "Мелисса оглядывает кухню так, будто считает каждую недостающую монету и каждую грязную тарелку."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
 
     "Мелисса: Нельзя бесконечно делать вид, будто все в порядке."
 
@@ -93,12 +104,18 @@ label HouseholdEvent_KitchenMelissaPracticalComplaint:
             "Мелисса: Сначала безопасность. Потом удобство. После этого со всеми становится куда проще иметь дело."
             $ household_ai_raise_convergence(0.04)
 
+    $ main_ui_end_native_scene_state()
     return
 
 
 label HouseholdEvent_BreakfastSquirrelMockery:
+    $ main_ui_begin_native_scene_state("Разговор за завтраком")
+    show screen main_ui
+    vscene BREAKFAST_GIRLS_TEASE_PICTURE
 
-    "Завтрак начинается с мелких звуков, коротких взглядов и такой тишины, которую никак не назовешь мирной."
+    $ scene_runtime.text = "Завтрак начинается с мелких звуков, коротких взглядов и такой тишины, которую никак не назовешь мирной."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
 
     "Аманда: Ну что, кто сегодня притворяется невинной?"
 
@@ -130,12 +147,18 @@ label HouseholdEvent_BreakfastSquirrelMockery:
             "Они ворчат, но разговор становится полезнее."
             $ household_ai_raise_convergence(0.08)
 
+    $ main_ui_end_native_scene_state()
     return
 
 
 label HouseholdEvent_AmandaPrivatePressure:
+    $ main_ui_begin_native_scene_state("Разговор с Амандой")
+    show screen main_ui
+    vscene "images/amanda/amanda_portrait.jpg"
 
-    "Аманда находит повод оказаться рядом, когда поблизости больше никого нет."
+    $ scene_runtime.text = "Аманда находит повод оказаться рядом, когда поблизости больше никого нет."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
 
     "Прямо она не просит. Это было бы слишком просто."
 
@@ -159,12 +182,18 @@ label HouseholdEvent_AmandaPrivatePressure:
             "Она принимает это плохо, но все-таки принимает."
             $ household_ai_raise_friction(0.04)
 
+    $ main_ui_end_native_scene_state()
     return
 
 
 label HouseholdEvent_SandraPrivateCheck:
+    $ main_ui_begin_native_scene_state("Разговор с Сандрой")
+    show screen main_ui
+    vscene "images/sandra/portrait2.jpg"
 
-    "Сандра появляется в самый неподходящий момент и с лицом человека, который прекрасно это понимает."
+    $ scene_runtime.text = "Сандра появляется в самый неподходящий момент и с лицом человека, который прекрасно это понимает."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
 
     "Сандра: Я хотела посмотреть, ты управляешь домом или дом уже управляет тобой."
 
@@ -185,12 +214,18 @@ label HouseholdEvent_SandraPrivateCheck:
             "Сандра: Тогда перестань награждать беспорядок."
             $ household_ai_raise_convergence(0.06)
 
+    $ main_ui_end_native_scene_state()
     return
 
 
 label HouseholdEvent_ThreeWomenConverge:
+    $ main_ui_begin_native_scene_state("Трактирная команда")
+    show screen main_ui
+    vscene "images/tavern/mainhall/tavern_crew.jpg"
 
-    "На этот раз никто не начинает утро со ссоры."
+    $ scene_runtime.text = "На этот раз никто не начинает утро со ссоры."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
 
     "У Сандры есть записи, у Мелиссы — цифры, у Аманды — возражения, но все трое смотрят на одну и ту же проблему."
 
@@ -213,4 +248,5 @@ label HouseholdEvent_ThreeWomenConverge:
             "Аманде нравится слово «награды». Мелиссе нравится слово «когда». Сандре нравится слово «поднимется»."
             $ household_ai_raise_convergence(0.10)
 
+    $ main_ui_end_native_scene_state()
     return
