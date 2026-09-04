@@ -3079,6 +3079,21 @@ testcase external_my_room_recipe_book_table_link:
     assert eval ("Читать книгу рецептов" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
     assert eval ("Создать предмет" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
 
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "recipe_book_page_list" timeout 20.0
+    assert eval (len(visible_recipe_pages()) > 6) timeout 5.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"]) timeout 5.0
+    assert eval (all(renpy.get_widget("recipe_book_page_list", "recipe_book_list_button_" + recipe_id) is not None for recipe_id in visible_recipe_pages())) timeout 5.0
+    $ _recipe_to_read = str(visible_recipe_pages()[-1] or "")
+    click id ("recipe_book_list_button_" + _recipe_to_read) pos (0.5, 0.5) until eval (renpy.get_screen("recipe_book_page_list") is None and str(recipe_book.selected_id or "") == _recipe_to_read) timeout 20.0
+    assert eval (recipe_book_selected_title(_recipe_to_read) == str(main_ui_runtime.action_title or "")) timeout 5.0
+    assert eval (str(main_ui_runtime.action_items[-1].caption or "") == "Назад") timeout 5.0
+    assert eval (len(main_ui_runtime.action_items) < len(visible_recipe_pages())) timeout 5.0
+    $ _recipe_back_index = len(main_ui_runtime.action_items) - 1
+    click id ("choice_panel_button_%s" % _recipe_back_index) pos (0.5, 0.5) until screen "recipe_book_page_list" timeout 20.0
+    assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("recipe_book_page_list") is None and str(main_ui_runtime.action_title or "") == "Стол") timeout 20.0
+    assert eval ("Читать книгу рецептов" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+
     $ _moss_before = int(player.item_count("moss_001") or 0)
     $ _dried_moss_before = int(player.item_count("dried_moss_001") or 0)
     $ _craft_clock_before = int(calendar_v2.clock_minutes() or 0)

@@ -425,7 +425,6 @@ init 4 python:
     def recipe_book_action_state(selected_id, where_id="", object_id=""):
         resolved_id = str(selected_id or recipe_book_resolved_selected_id() or "").strip()
         action_rows = []
-        action_rows.append(MenuItem("Читать книгу", Call("ReadRecipeBook", "recipe_book_001", where_id, "", object_id or "recipe_book_001", resolved_id)))
         if len(list(craftable_recipe_pages() or [])) > 0:
             action_rows.append(MenuItem("Создать предмет", Call("RecipeBookCraftMenu", where_id, object_id or "recipe_book_001")))
 
@@ -434,6 +433,7 @@ init 4 python:
         elif bool(recipe_book_item_state().get("tiny_note_found", False)) and not recipe_book_hidden_recipes_revealed():
             action_rows.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "book")))
         action_rows.append(MenuItem("Закрыть книгу", Call("RecipeBookClose", where_id, object_id or "recipe_book_001")))
+        action_rows.append(MenuItem("Назад", Call("RecipeBookList", where_id, object_id or "recipe_book_001")))
         return {
             "title": recipe_book_selected_title(resolved_id) if resolved_id else "Рецепты",
             "items": action_rows,
@@ -496,14 +496,98 @@ init 4 python:
 default recipe_book = RecipeBookSession()
 
 
+init -5:
+    style recipe_book_list_button is button:
+        background Solid("#f5ead3d9")
+        hover_background Solid("#dfc79ad9")
+        padding (14, 8)
+        xfill True
+        yminimum 48
+
+    style recipe_book_list_button_text is button_text:
+        size 19
+        color "#1e130c"
+        hover_color "#6b3415"
+
+
+screen recipe_book_page_list(where_id="", object_id="recipe_book_001"):
+    zorder 120
+
+    $ _visible_ids = list(visible_recipe_pages() or [])
+    $ _split_index = (len(_visible_ids) + 1) // 2
+    $ _recipe_columns = (_visible_ids[:_split_index], _visible_ids[_split_index:])
+    $ _textbox_h = int(getattr(gui, "textbox_height", 278))
+    $ _usable_h = max(360, int(config.screen_height) - _textbox_h)
+    $ _left_w = int((config.screen_width - 36) * 0.72)
+    $ _left_h = _usable_h - 24
+
+    fixed:
+        xpos 12
+        ypos 12
+        xsize _left_w
+        ysize _left_h
+
+        add Transform("images/rpg_message_bg.png", fit="cover")
+
+        vbox:
+            xpos 28
+            ypos 22
+            xsize _left_w - 56
+            ysize _left_h - 44
+            spacing 12
+
+            text "КНИГА РЕЦЕПТОВ" size 30 color "#1e130c" xalign 0.5
+            text "Выберите рецепт, чтобы открыть его страницу." size 18 color "#5a3a24" xalign 0.5
+
+            if _visible_ids:
+                hbox:
+                    xfill True
+                    spacing 16
+
+                    for _column_ids in _recipe_columns:
+                        vbox:
+                            xsize int((_left_w - 72) / 2)
+                            spacing 8
+
+                            for _recipe_id in _column_ids:
+                                $ _page = recipe_catalog.get(_recipe_id)
+                                if _page is not None:
+                                    textbutton str(getattr(_page, "title", _recipe_id) or _recipe_id):
+                                        id "recipe_book_list_button_" + _recipe_id
+                                        alt "recipe_book_list_button_" + _recipe_id
+                                        style "recipe_book_list_button"
+                                        text_style "recipe_book_list_button_text"
+                                        action [
+                                            Hide("recipe_book_page_list"),
+                                            Call("ReadRecipeBook", "recipe_book_001", where_id, "", object_id or "recipe_book_001", _recipe_id),
+                                        ]
+            else:
+                text "Пока вы не можете разобрать ни одного полезного рецепта." size 21 color "#2d1d12" xalign 0.5
+
+
+label RecipeBookList(where_id="", object_id=""):
+    hide screen recipe_book_page_list
+    $ recipe_book.selected_id = ""
+    $ scene_runtime.text = "Вы раскрываете старую книгу. Выберите рецепт, который хотите прочитать."
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_title = "Книга рецептов"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = [MenuItem("Назад", [Hide("recipe_book_page_list"), Call("RecipeBookClose", where_id, object_id or "recipe_book_001")])]
+    show screen recipe_book_page_list(where_id, object_id or "recipe_book_001")
+    $ renpy.restart_interaction()
+    return
+
+
 label ReadRecipeBook(what_id="", where_id="", fallback_text="", object_id="", recipe_id=""):
     $ renpy.dynamic("_recipe_picture", "_recipe_action_state")
+    hide screen recipe_book_page_list
+    if not str(recipe_id or "").strip():
+        call RecipeBookList(where_id, object_id or what_id or "recipe_book_001")
+        return
     $ recipe_book_item_state()["read_count"] = max(0, int(recipe_book_item_state().get("read_count", 0) or 0)) + 1
-    $ recipe_book.selected_id = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()
-    if not recipe_book.selected_id:
-        $ scene_runtime.text = recipe_book_read_text()
-        $ scene_runtime.location_text = scene_runtime.text
-        call TavernAticObjectMenu(object_id or what_id or "recipe_book_001")
+    $ recipe_book.selected_id = str(recipe_id or "").strip()
+    if not recipe_page_is_unlocked(recipe_book.selected_id):
+        call RecipeBookList(where_id, object_id or what_id or "recipe_book_001")
         return
     $ _recipe_picture = recipe_book_apply_picture(recipe_book.selected_id)
     if _recipe_picture:
@@ -533,7 +617,7 @@ label RecipeBookFindTinyNote(where_id="", object_id="", return_context="book"):
             $ main_ui_runtime.action_items.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", where_id, object_id or "recipe_book_001", "table")))
         elif bool(recipe_book_item_state().get("tiny_note_found", False)) and not recipe_book_hidden_recipes_revealed():
             $ main_ui_runtime.action_items.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "table")))
-        $ main_ui_runtime.action_items.append(MenuItem("Вернуться к записям", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
+        $ main_ui_runtime.action_items.append(MenuItem("Вернуться к записям", Call("RecipeBookList", where_id, object_id or "recipe_book_001")))
         $ main_ui_runtime.action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
     else:
         $ _recipe_action_state = recipe_book_action_state(recipe_book.selected_id, where_id, object_id or "recipe_book_001")
@@ -565,14 +649,14 @@ label RecipeBookRevealHiddenRecipes(where_id="", object_id="", return_context="b
             $ _recipe_picture = recipe_book_apply_picture(recipe_book.selected_id)
             if _recipe_picture:
                 $ scene_runtime.picture = _recipe_picture
-            $ main_ui_runtime.action_items.append(MenuItem("Читать проявленный рецепт", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
+            $ main_ui_runtime.action_items.append(MenuItem("Читать проявленный рецепт", Call("ReadRecipeBook", "recipe_book_001", where_id, "", object_id or "recipe_book_001", recipe_book.selected_id)))
             $ main_ui_runtime.action_items.append(MenuItem("Продолжить работу", Call("TavernMyRoomTableCraftMenu")))
         else:
             if recipe_book_can_notice_hidden_note():
                 $ main_ui_runtime.action_items.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", where_id, object_id or "recipe_book_001", "table")))
             elif bool(recipe_book_item_state().get("tiny_note_found", False)) and not recipe_book_hidden_recipes_revealed():
                 $ main_ui_runtime.action_items.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", where_id, object_id or "recipe_book_001", "table")))
-            $ main_ui_runtime.action_items.append(MenuItem("Вернуться к записям", Call("TavernMyRoomTableRead", recipe_book.selected_id)))
+            $ main_ui_runtime.action_items.append(MenuItem("Вернуться к записям", Call("RecipeBookList", where_id, object_id or "recipe_book_001")))
         $ main_ui_runtime.action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
     else:
         $ _recipe_picture = recipe_book_apply_picture(recipe_book.selected_id)
@@ -604,8 +688,8 @@ label RecipeBookCraftMenu(where_id="", object_id=""):
     if int(_craftable_count or 0) <= 0:
         $ scene_runtime.text = "Сейчас ни один рецепт не готов полностью. Прочитайте нужную страницу, чтобы увидеть, чего не хватает."
         $ scene_runtime.location_text = scene_runtime.text
-    $ main_ui_runtime.action_items.append(MenuItem("Читать книгу", Call("ReadRecipeBook", "recipe_book_001", where_id, "", object_id or "recipe_book_001", recipe_book.selected_id)))
     $ main_ui_runtime.action_items.append(MenuItem("Закрыть книгу", Call("RecipeBookClose", where_id, object_id or "recipe_book_001")))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", Call("RecipeBookList", where_id, object_id or "recipe_book_001")))
     return
 
 
@@ -635,6 +719,10 @@ label RecipeBookCraftItem(recipe_id="", where_id="", object_id=""):
 
 
 label RecipeBookClose(where_id="", object_id=""):
+    hide screen recipe_book_page_list
     $ recipe_book.selected_id = ""
-    call TavernAticObjectMenu(object_id or "recipe_book_001")
+    if str(where_id or "") == "TavernMyRoom":
+        call TavernMyRoomTableMenu
+    else:
+        call TavernAticObjectMenu(object_id or "recipe_book_001")
     return

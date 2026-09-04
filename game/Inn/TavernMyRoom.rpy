@@ -372,55 +372,11 @@ label TavernMyRoomTableMenu:
         $ main_ui_runtime.action_title = "Стол"
         $ main_ui_runtime.action_content = None
         $ main_ui_runtime.action_items = []
-        $ main_ui_runtime.action_items.append(MenuItem("Читать книгу рецептов", Call("TavernMyRoomTableRead")))
+        $ main_ui_runtime.action_items.append(MenuItem("Читать книгу рецептов", Call("RecipeBookList", "TavernMyRoom", "recipe_book_001")))
         $ main_ui_runtime.action_items.append(MenuItem("Создать предмет", Call("TavernMyRoomTableCraftMenu")))
         $ main_ui_runtime.action_items.append(MenuItem("Назад", Jump("TavernMyRoom")))
     $ renpy.restart_interaction()
     return
-
-
-
-label TavernMyRoomTableRead(recipe_id=""):
-    $ renpy.dynamic("_table_recipe_id", "_table_picture", "_page", "_recipe_id", "_title")
-    if not tavern_my_room_has_recipe_book_access():
-        call TavernMyRoomTableMenu
-        return
-    $ recipe_book_item_state()["read_count"] = max(0, int(recipe_book_item_state().get("read_count", 0) or 0)) + 1
-    $ _table_recipe_id = str(recipe_id or recipe_book_resolved_selected_id() or "").strip()
-    $ _table_picture = recipe_page_image_path(_table_recipe_id) or tavern_my_room_table_picture()
-    $ scene_runtime.picture = _table_picture or None
-    if _table_picture:
-        $ scene_runtime.picture = _table_picture
-    if len(list(visible_recipe_pages() or [])) <= 0:
-        $ scene_runtime.text = "Вы раскрываете записи на столе, но пока не можете разобрать ни одного полезного рецепта."
-        $ scene_runtime.location_text = scene_runtime.text
-        $ main_ui_runtime.action_title = "Рецепты"
-        $ main_ui_runtime.action_content = None
-        $ main_ui_runtime.action_items = [MenuItem("Назад к столу", Call("TavernMyRoomTableMenu"))]
-        return
-    $ scene_runtime.text = recipe_book_page_text(_table_recipe_id)
-    $ scene_runtime.location_text = scene_runtime.text
-    $ main_ui_runtime.action_title = recipe_book_selected_title(_table_recipe_id)
-    $ main_ui_runtime.action_content = None
-    $ main_ui_runtime.action_items = []
-    python:
-        for _recipe_id in list(visible_recipe_pages() or []):
-            _page = recipe_catalog.get(_recipe_id)
-            if _page is None:
-                continue
-            _title = str(getattr(_page, "title", _recipe_id) or _recipe_id)
-            if str(_recipe_id or "") == str(_table_recipe_id or ""):
-                _title += " (открыто)"
-            main_ui_runtime.action_items.append(MenuItem(_title, Call("TavernMyRoomTableRead", _recipe_id)))
-        if recipe_book_can_notice_hidden_note():
-            main_ui_runtime.action_items.append(MenuItem("Достать тонкую вкладку между страницами", Call("RecipeBookFindTinyNote", "TavernMyRoom", "recipe_book_001", "table")))
-        elif bool(recipe_book_item_state().get("tiny_note_found", False)) and not recipe_book_hidden_recipes_revealed():
-            main_ui_runtime.action_items.append(MenuItem("Нагреть пергамент и смазать вином", Call("RecipeBookRevealHiddenRecipes", "TavernMyRoom", "recipe_book_001", "table")))
-    $ main_ui_runtime.action_items.append(MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")))
-    $ renpy.restart_interaction()
-    return
-
-
 label TavernMyRoomTableCraftMenu:
     $ renpy.dynamic("_table_picture", "_craftable_count", "_page", "_recipe_id")
     if not tavern_my_room_has_recipe_book_access():
@@ -470,7 +426,7 @@ label TavernMyRoomTableCraftItem(recipe_id=""):
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = [
         MenuItem("Продолжить работу", Call("TavernMyRoomTableCraftMenu")),
-        MenuItem("Читать записи", Call("TavernMyRoomTableRead", _table_recipe_id)),
+        MenuItem("Читать записи", Call("ReadRecipeBook", "recipe_book_001", "TavernMyRoom", "", "recipe_book_001", _table_recipe_id)),
         MenuItem("Назад к столу", Call("TavernMyRoomTableMenu")),
     ]
     return

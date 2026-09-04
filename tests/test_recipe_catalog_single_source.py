@@ -32,3 +32,26 @@ def test_recipe_pages_own_standard_craft_behavior_without_handler_callbacks():
         "class LibidoTinctureRecipePage(RecipePage):",
     ):
         assert token in recipes
+
+
+def test_recipe_book_list_uses_catalog_buttons_and_keeps_back_in_actions():
+    core = (ROOT / "game/Items/Core/CraftingRecipes.rpy").read_text(encoding="utf-8-sig")
+    room = (ROOT / "game/Inn/TavernMyRoom.rpy").read_text(encoding="utf-8-sig")
+
+    screen_block = core.split("screen recipe_book_page_list", 1)[1].split("\n\nlabel RecipeBookList", 1)[0]
+    list_block = core.split("label RecipeBookList", 1)[1].split("\n\nlabel ReadRecipeBook", 1)[0]
+    read_block = core.split("label ReadRecipeBook", 1)[1].split("\n\nlabel RecipeBookFindTinyNote", 1)[0]
+
+    assert "visible_recipe_pages()" in screen_block
+    assert "recipe_catalog.get(_recipe_id)" in screen_block
+    assert "_recipe_columns" in screen_block
+    assert "viewport" not in screen_block
+    assert "vscrollbar" not in screen_block
+    assert 'id "recipe_book_list_button_" + _recipe_id' in screen_block
+    assert 'Call("ReadRecipeBook"' in screen_block
+    assert 'main_ui_runtime.action_items = [MenuItem("Назад"' in list_block
+    assert 'show screen recipe_book_page_list' in list_block
+    assert 'hide screen recipe_book_page_list' in read_block
+
+    assert "label TavernMyRoomTableRead" not in room
+    assert 'Call("RecipeBookList", "TavernMyRoom", "recipe_book_001")' in room

@@ -120,6 +120,8 @@ def test_recipe_book_closes_to_its_object_without_return_state_mirrors():
     assert "recipe_book_restore_picture" not in source
     assert "jump expression where_id" not in source
     close_block = source.split("label RecipeBookClose", 1)[1]
+    assert 'if str(where_id or "") == "TavernMyRoom":' in close_block
+    assert "call TavernMyRoomTableMenu" in close_block
     assert 'call TavernAticObjectMenu(object_id or "recipe_book_001")' in close_block
     assert "jump expression" not in close_block
 
