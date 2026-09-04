@@ -226,6 +226,7 @@ label BeckyHomeObjectMenu(object_id=""):
             elif _becky_action.hook == "jump" and str(_becky_action.target or "") != "":
                 main_ui_runtime.action_items.append(MenuItem(_becky_action.label, Jump(_becky_action.target)))
         main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "picture", becky_home_picture(rooms.get("BeckyHomeFront").state["arrival_mode"])),
             SetField(scene_runtime, "text", becky_home_restore_text()),
             SetField(scene_runtime, "location_text", becky_home_restore_text()),
             SetField(main_ui_runtime, "action_title", str(rooms.get("BeckyHome").display_name or "Дом Бекки")),

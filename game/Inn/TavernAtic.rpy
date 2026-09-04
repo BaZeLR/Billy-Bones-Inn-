@@ -139,6 +139,7 @@ label TavernAticObjectMenu(object_id=""):
         if bool(getattr(_atic_item, "carriable", False)) and not _atic_has_take_action:
             main_ui_runtime.action_items.append(MenuItem("Взять", Call("Take", object_id, "TavernAtic", "", object_id)))
     $ main_ui_runtime.action_items.append(MenuItem("Назад", [
+        SetField(scene_runtime, "picture", attic_room_picture_path() or rooms.get("TavernAtic").bg_picture or None),
         SetField(scene_runtime, "text", rooms.get("TavernAtic").descriptions[0].text),
         SetField(scene_runtime, "location_text", rooms.get("TavernAtic").descriptions[0].text),
         SetField(main_ui_runtime, "action_title", "Чердак"),

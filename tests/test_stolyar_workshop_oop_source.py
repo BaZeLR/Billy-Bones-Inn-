@@ -45,6 +45,10 @@ def test_workshop_preserves_every_order_and_lockpick_event():
         assert f'target="{action}"' in SOURCE
         assert f"label {action}:" in SOURCE
         assert f"call {action}" not in TALK
+        block = SOURCE.split(f"label {action}:", 1)[1].split("\nlabel ", 1)[0]
+        assert "main_ui_begin_native_scene_state(" in block
+        assert 'menu:\n        "Назад":' in block
+        assert "$ main_ui_end_native_scene_state()" in block
     assert "StolyarWorkshopApply" not in SOURCE
     assert "choice_code" not in SOURCE
     assert 'target="checkTriggers", args=("StolyarWorkshop", "enter", 0)' in SOURCE

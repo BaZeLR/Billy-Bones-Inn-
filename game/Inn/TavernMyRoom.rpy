@@ -222,6 +222,7 @@ label TavernMyRoomObjectMenu(object_id="", display_text=""):
                 main_ui_runtime.action_items.append(MenuItem("Сесть за стол", Call("TavernMyRoomTableMenu")))
             main_ui_runtime.action_items.append(MenuItem("Взять", Call("TavernMyRoomTakeFloorItem", object_id)))
         main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "picture", tavern_my_room_dynamic_picture() or None),
             SetField(scene_runtime, "text", tavern_my_room_dynamic_text()),
             SetField(scene_runtime, "location_text", tavern_my_room_dynamic_text()),
             SetField(main_ui_runtime, "action_title", "Ваша комната"),

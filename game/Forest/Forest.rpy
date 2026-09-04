@@ -405,6 +405,7 @@ label ForestObjectMenu(object_id=""):
                 main_ui_runtime.action_items.append(MenuItem(_forest_action.label, Jump(_forest_action.target)))
 
     $ main_ui_runtime.action_items.append(MenuItem("Назад", [
+        SetField(scene_runtime, "picture", forest_pick_background()),
         SetField(scene_runtime, "text", forest_room_saved_text(rooms.get("Forest"))),
         SetField(scene_runtime, "location_text", forest_room_saved_text(rooms.get("Forest"))),
         SetField(main_ui_runtime, "action_title", "Действия"),
@@ -489,6 +490,7 @@ label ForestSpawnedItemMenu(item_id=""):
     $ main_ui_runtime.action_items = [
         MenuItem("Подобрать (" + str(_spawn_units) + ")", Call("ForestTakeSpawnedItem", item_id)),
         MenuItem("Назад", [
+            SetField(scene_runtime, "picture", forest_pick_background()),
             SetField(scene_runtime, "text", forest_room_saved_text(rooms.get("Forest"))),
             SetField(scene_runtime, "location_text", forest_room_saved_text(rooms.get("Forest"))),
             SetField(main_ui_runtime, "action_title", "Действия"),
@@ -564,6 +566,7 @@ label ForestSubroomSpawnedItemMenu(item_id=""):
     $ main_ui_runtime.action_items = [
         MenuItem("Подобрать (" + str(_spawn_units) + ")", Call("ForestSubroomTakeSpawnedItem", item_id)),
         MenuItem("Назад", [
+            SetField(scene_runtime, "picture", forest_cave_picture() if str(rooms.current_code or "") == "ForestCave" else rooms.current.bg_picture or None),
             SetField(scene_runtime, "text", forest_room_saved_text(rooms.current)),
             SetField(scene_runtime, "location_text", forest_room_saved_text(rooms.current)),
             SetField(main_ui_runtime, "action_title", str(getattr(rooms.current, "display_name", "Действия") or "Действия")),

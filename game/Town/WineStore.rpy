@@ -167,7 +167,7 @@ label WineStore:
 
 label WineStoreObjectMenu(object_id="", preserve_text=False):
     $ renpy.dynamic("_wine_object")
-    $ renpy.dynamic("_wine_action", "_wine_item")
+    $ renpy.dynamic("_wine_action", "_wine_item", "_wine_return_text")
     $ _wine_object = wine_store_find_object(object_id)
     if _wine_object is None:
         $ main_ui_runtime.action_items = wine_store_action_items()
@@ -187,7 +187,8 @@ label WineStoreObjectMenu(object_id="", preserve_text=False):
                 _wine_item = room_action_menu_item(_wine_action)
                 if _wine_item is not None:
                     main_ui_runtime.action_items.append(_wine_item)
-    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", wine_store_action_items()), Function(main_ui_restart_interaction)]))
+    $ _wine_return_text = wine_store_entry_text()
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(scene_runtime, "picture", wine_store_scene_picture()), SetField(scene_runtime, "text", _wine_return_text), SetField(scene_runtime, "location_text", _wine_return_text), SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", wine_store_action_items()), Function(main_ui_restart_interaction)]))
     return
 
 

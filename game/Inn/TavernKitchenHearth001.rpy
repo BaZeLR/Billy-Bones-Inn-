@@ -98,6 +98,7 @@ label TavernKitchenHearthMenu(object_id="hearth_001"):
             elif _hearth_action.hook == "jump" and str(_hearth_action.target or "") != "":
                 main_ui_runtime.action_items.append(MenuItem(_hearth_label, Jump(_hearth_action.target)))
         main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "picture", tavern_kitchen_picture() or rooms.get("TavernKitchen").bg_picture or None),
             SetField(scene_runtime, "text", tavern_kitchen_saved_text()),
             SetField(scene_runtime, "location_text", tavern_kitchen_saved_text()),
             SetField(main_ui_runtime, "action_title", "Кухня"),

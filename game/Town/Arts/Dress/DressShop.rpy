@@ -291,6 +291,7 @@ label DressShopOpenCatalog(rack_type=""):
             SetField(main_ui_runtime, "action_title", "Действия"),
             SetField(main_ui_runtime, "action_content", None),
             SetField(main_ui_runtime, "action_items", dress_shop_room_action_items()),
+            SetField(scene_runtime, "picture", ""),
             SetField(scene_runtime, "text", dress_shop_room_text()),
             SetField(scene_runtime, "location_text", dress_shop_room_text()),
             Function(main_ui_restart_interaction),
@@ -344,5 +345,5 @@ label DressShopObjectMenu(object_id=""):
             if _menu_item is not None:
                 main_ui_runtime.action_items.append(_menu_item)
 
-    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "object_id", ""), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", dress_shop_room_action_items()), Function(main_ui_restart_interaction)]))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(scene_runtime, "picture", ""), SetField(scene_runtime, "text", dress_shop_room_text()), SetField(scene_runtime, "location_text", dress_shop_room_text()), SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "object_id", ""), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", dress_shop_room_action_items()), Function(main_ui_restart_interaction)]))
     return

@@ -57,6 +57,26 @@ def test_hunter_trade_catalog_uses_dedicated_shop_page_without_scrollbar():
         assert caption in buy_menu
     for caption in ("Подтвердить продажу", "Сбросить выбор", "Назад"):
         assert caption in sell_menu
+    for menu_block in (buy_menu, sell_menu):
+        back = menu_block.split('MenuItem("Назад", [', 1)[1].split("]))", 1)[0]
+        assert 'SetField(scene_runtime, "picture", rooms.get("HunterClub").bg_picture or None)' in back
+        assert 'SetField(scene_runtime, "text", hunter_club_main_text())' in back
+        assert 'SetField(scene_runtime, "location_text", hunter_club_main_text())' in back
+
+
+def test_hunter_submenu_back_actions_restore_room_picture_and_text():
+    hunter = source("game/Town/HunterClub.rpy")
+
+    for start, end in (
+        ("def hunter_club_challenge_items():", "def hunter_club_apply_challenge"),
+        ("label HunterClubLuiseTalk:", "label HunterClubNewsMenu:"),
+        ("label HunterClubNewsMenu:", "label HunterClubChallengesMenu"),
+    ):
+        block = hunter.split(start, 1)[1].split(end, 1)[0]
+        back = block.split('MenuItem("Назад", [', 1)[1].split("]))", 1)[0]
+        assert 'SetField(scene_runtime, "picture", rooms.get("HunterClub").bg_picture or None)' in back
+        assert 'SetField(scene_runtime, "text", hunter_club_main_text())' in back
+        assert 'SetField(scene_runtime, "location_text", hunter_club_main_text())' in back
 
 
 def test_werecat_hunter_quest_is_authored_in_event_label():

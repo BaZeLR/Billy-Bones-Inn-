@@ -292,6 +292,9 @@ init python:
         if len(items) <= 0:
             items.append(MenuItem("Все доступные вызовы уже закрыты", Call("HunterClubNewsMenu")))
         items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "picture", rooms.get("HunterClub").bg_picture or None),
+            SetField(scene_runtime, "text", hunter_club_main_text()),
+            SetField(scene_runtime, "location_text", hunter_club_main_text()),
             SetField(main_ui_runtime, "action_title", "Действия"),
             SetField(main_ui_runtime, "action_content", None),
             SetField(main_ui_runtime, "action_items", rooms.get("HunterClub").build_action_items() + rooms.get("HunterClub").build_exit_items()),
@@ -554,6 +557,9 @@ label HunterClubLuiseTalk:
         MenuItem("Закупиться для охоты", Call("HunterClubBuyMenu")),
         MenuItem("Подать добычу", Call("HunterClubSellMenu")),
         MenuItem("Назад", [
+            SetField(scene_runtime, "picture", rooms.get("HunterClub").bg_picture or None),
+            SetField(scene_runtime, "text", hunter_club_main_text()),
+            SetField(scene_runtime, "location_text", hunter_club_main_text()),
             SetField(main_ui_runtime, "action_title", "Действия"),
             SetField(main_ui_runtime, "action_content", None),
             SetField(main_ui_runtime, "action_items", rooms.get("HunterClub").build_action_items() + rooms.get("HunterClub").build_exit_items()),
@@ -571,6 +577,9 @@ label HunterClubNewsMenu:
     $ main_ui_runtime.action_items = [
         MenuItem("Посмотреть охотничьи вызовы", Call("HunterClubChallengesMenu")),
         MenuItem("Назад", [
+            SetField(scene_runtime, "picture", rooms.get("HunterClub").bg_picture or None),
+            SetField(scene_runtime, "text", hunter_club_main_text()),
+            SetField(scene_runtime, "location_text", hunter_club_main_text()),
             SetField(main_ui_runtime, "action_title", "Действия"),
             SetField(main_ui_runtime, "action_content", None),
             SetField(main_ui_runtime, "action_items", rooms.get("HunterClub").build_action_items() + rooms.get("HunterClub").build_exit_items()),
@@ -623,6 +632,7 @@ label HunterClubBuyMenu:
         MenuItem("Сбросить выбор", Function(hunter_club_trade_reset, "buy")),
         MenuItem("Назад", [
             Hide("hunter_club_trade_overlay"),
+            SetField(scene_runtime, "picture", rooms.get("HunterClub").bg_picture or None),
             SetField(main_ui_runtime, "action_title", "Действия"),
             SetField(main_ui_runtime, "action_content", None),
             SetField(main_ui_runtime, "action_items", rooms.get("HunterClub").build_action_items() + rooms.get("HunterClub").build_exit_items()),
@@ -646,6 +656,7 @@ label HunterClubSellMenu:
         MenuItem("Сбросить выбор", Function(hunter_club_trade_reset, "sell")),
         MenuItem("Назад", [
             Hide("hunter_club_trade_overlay"),
+            SetField(scene_runtime, "picture", rooms.get("HunterClub").bg_picture or None),
             SetField(main_ui_runtime, "action_title", "Действия"),
             SetField(main_ui_runtime, "action_content", None),
             SetField(main_ui_runtime, "action_items", rooms.get("HunterClub").build_action_items() + rooms.get("HunterClub").build_exit_items()),

@@ -799,6 +799,8 @@ testcase external_backyard_barrel_object_actions:
     advance until screen "main_ui" timeout 20.0
     assert eval (str(rooms.current_code or "") == "Backyard") timeout 5.0
     assert eval (str(scene_runtime.picture or "").endswith("images/tavern/backyard/backyard_1.png")) timeout 5.0
+    $ _backyard_room_picture = str(scene_runtime.picture or "")
+    $ _backyard_room_text = str(scene_runtime.text or "")
     assert eval ("backyard_water_barrel" in [str(getattr(obj, "object_id", "") or "") for obj in rooms.get("Backyard").visible_objects()]) timeout 5.0
     assert eval (not any(str(getattr(getattr(i, "action", None), "label", "") or "") == "BackyardChooseSoapRecipe" for i in main_ui_runtime.action_items)) timeout 5.0
 
@@ -818,6 +820,10 @@ testcase external_backyard_barrel_object_actions:
     assert eval (int(player.appearance.soap_look_bonus or 0) == 5) timeout 5.0
     assert eval (int(player_look_breakdown().get("look", 0) or 0) == min(100, _look_before + 5)) timeout 5.0
     assert eval (str(main_ui_runtime.action_title or "") == "Бочка с дождевой водой") timeout 5.0
+    assert eval (str(scene_runtime.picture or "").endswith("images/tavern/backyard/washing_MC.png")) timeout 5.0
+    $ _backyard_back_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Назад")
+    click id ("choice_panel_button_%d" % int(_backyard_back_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Задний двор") timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _backyard_room_picture and str(scene_runtime.text or "") == _backyard_room_text and str(scene_runtime.location_text or "") == _backyard_room_text) timeout 5.0
 
     $ crafting.ash_barrel_installed = True
     $ crafting.ash_barrel_ready_day = int(calendar_v2.daysInGame)
@@ -1052,6 +1058,15 @@ testcase external_port_streets_georgette_liza_flow:
     assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"] and "Вы подбираете пустую бутылку" in str(scene_runtime.text or "")) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Действия") timeout 20.0
     assert eval ("Пустая бутылка" not in [str(i.caption or "") for i in main_ui_runtime.action_items] and "Осмотреть переулки" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    $ _port_room_picture = str(scene_runtime.picture or "")
+    $ _port_room_text = str(scene_runtime.text or "")
+    $ _port_lanes_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Осмотреть переулки")
+    click id ("choice_panel_button_%d" % int(_port_lanes_index)) pos (0.5, 0.5) until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Осмотр переулков") timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Назад"]) timeout 5.0
+    assert eval ("В этих темных углах" in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and str(main_ui_runtime.action_title or "") == "Действия") timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _port_room_picture and str(scene_runtime.text or "") == _port_room_text and str(scene_runtime.location_text or "") == _port_room_text) timeout 5.0
 
 testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     run Jump("Intro")
@@ -2103,14 +2118,24 @@ testcase external_actual_draupnir_talk_menu:
     $ _draupnir_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
     $ _draupnir_back_button = "choice_panel_button_%d" % int(_draupnir_back_index)
     click id _draupnir_back_button pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    $ _draupnir_room_picture = str(scene_runtime.picture or "")
+    $ _draupnir_room_text = str(scene_runtime.text or "")
     $ _draupnir_slogan_index = [str(i.caption or "") for i in build_room_action_items(rooms.current)].index("Спросить о ремонте вывески")
     $ _draupnir_slogan_button = "choice_panel_button_%d" % int(_draupnir_slogan_index)
-    click id _draupnir_slogan_button pos (0.5, 0.5) until eval (Draupnir.slogan_quote_received) timeout 20.0
+    click id _draupnir_slogan_button pos (0.5, 0.5) until screen "choice" timeout 20.0
+    assert eval (Draupnir.slogan_quote_received and str(main_ui_runtime.mode or "") == "event" and "Двести мараведи" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _draupnir_room_picture and str(scene_runtime.text or "") == _draupnir_room_text and str(scene_runtime.location_text or "") == _draupnir_room_text) timeout 5.0
     assert eval ("Заплатить 200 мараведи за ремонт вывески" in [str(i.caption or "") for i in build_room_action_items(rooms.current)]) timeout 5.0
     $ _draupnir_pay_index = [str(i.caption or "") for i in build_room_action_items(rooms.current)].index("Заплатить 200 мараведи за ремонт вывески")
     $ _draupnir_pay_button = "choice_panel_button_%d" % int(_draupnir_pay_index)
-    click id _draupnir_pay_button pos (0.5, 0.5) until eval (int(player.tavern_management.slogan_state or 0) == 1) timeout 20.0
-    assert eval (int(player.economy.money or 0) == 300 and people.get_data("draupnir").getLocation() == "StreetTavern") timeout 5.0
+    click id _draupnir_pay_button pos (0.5, 0.5) until screen "choice" timeout 20.0
+    assert eval (int(player.tavern_management.slogan_state or 0) == 1 and str(main_ui_runtime.mode or "") == "event") timeout 5.0
+    assert eval (int(player.economy.money or 0) == 300 and people.get_data("draupnir").getLocation() == "StreetTavern" and "отсчитали 200 мараведи" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _draupnir_room_picture and str(scene_runtime.text or "") == _draupnir_room_text and str(scene_runtime.location_text or "") == _draupnir_room_text) timeout 5.0
     assert eval ("Заплатить 200 мараведи за ремонт вывески" not in [str(i.caption or "") for i in build_room_action_items(rooms.current)]) timeout 5.0
 
 testcase external_actual_market_click:
@@ -3106,11 +3131,16 @@ testcase external_tavern_room_movement_resets_picture_state:
     run Jump("TavernMain")
     advance until screen "main_ui" timeout 20.0
     assert eval (str(rooms.current_code or "") == "TavernMain") timeout 5.0
-    assert eval (str(scene_runtime.picture or "") == "images/tavern/mainhall/main_hall.png") timeout 5.0
+    assert eval (str(scene_runtime.picture or "") != "" and str(scene_runtime.picture or "") != "images/tavern/mainhall/bar_mainHall.png" and renpy.loadable(str(scene_runtime.picture or ""))) timeout 5.0
+    $ _tavern_main_room_picture = str(scene_runtime.picture or "")
+    $ _tavern_main_room_text = str(scene_runtime.text or "")
 
     run Call("TavernMainObjectMenu", "bar_001")
     assert eval (str(main_ui_runtime.object_id or "") == "bar_001") timeout 5.0
     assert eval (str(scene_runtime.picture or "") == "images/tavern/mainhall/bar_mainHall.png") timeout 5.0
+    $ _tavern_main_back_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Назад")
+    click id ("choice_panel_button_%d" % int(_tavern_main_back_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Действия в трактире") timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _tavern_main_room_picture and str(scene_runtime.text or "") == _tavern_main_room_text and str(scene_runtime.location_text or "") == _tavern_main_room_text) timeout 5.0
 
     run movement_actions("TavernKitchen", 5)
     advance until screen "main_ui" timeout 20.0
@@ -3127,6 +3157,47 @@ testcase external_tavern_room_movement_resets_picture_state:
     assert eval (str(main_ui_runtime.object_id or "") == "") timeout 5.0
     assert eval (str(scene_runtime.picture or "") == "images/tavern/mainhall/main_hall_night.png") timeout 5.0
     assert eval (str(tavern_main_closed_text() or "") == "" and str(scene_runtime.location_text or "") == str(tavern_main_build_description() or "")) timeout 5.0
+
+testcase external_location_object_back_restores_picture_and_text:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 0)
+    $ external_calendar_set_weekday(1)
+    $ threads["cityBlindPirateFall"].advanceTo(threads["cityBlindPirateFall"].data.length, complete_at_end=True)
+    $ TownStreet.events_today = 2
+    $ TownStreet.story_seen_keys.append("%s:StreetTavern:%s" % (calendar_v2.daysInGame, calendar_v2.time_slot()))
+    run Jump("StreetTavern")
+    advance until screen "main_ui" timeout 20.0
+    $ _street_parent_picture = str(scene_runtime.picture or "")
+    $ _street_parent_text = str(scene_runtime.text or "")
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (str(scene_runtime.text or "") == str(street_tavern_get_object("street_view").description or "")) timeout 20.0
+    $ _street_back_index = len(main_ui_runtime.action_items) - 1
+    click id ("choice_panel_button_%d" % int(_street_back_index)) pos (0.5, 0.5) until eval (str(scene_runtime.text or "") == _street_parent_text) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _street_parent_picture and str(scene_runtime.text or "") == _street_parent_text and str(scene_runtime.location_text or "") == _street_parent_text) timeout 5.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 11, 0)
+    $ external_calendar_set_weekday(2)
+    run Jump("CityGuard")
+    advance until screen "main_ui" timeout 20.0
+    $ _guard_parent_picture = str(scene_runtime.picture or "")
+    $ _guard_parent_text = str(scene_runtime.text or "")
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(scene_runtime.picture or "").startswith("images/zimmer/soldierplakat/")) timeout 20.0
+    $ _guard_back_index = len(main_ui_runtime.action_items) - 1
+    click id ("choice_panel_button_%d" % int(_guard_back_index)) pos (0.5, 0.5) until eval (str(scene_runtime.text or "") == _guard_parent_text) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _guard_parent_picture and str(scene_runtime.text or "") == _guard_parent_text and str(scene_runtime.location_text or "") == _guard_parent_text) timeout 5.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 12, 0)
+    $ external_calendar_set_weekday(1)
+    run Jump("WineStore")
+    advance until screen "main_ui" timeout 20.0
+    $ _wine_parent_picture = str(scene_runtime.picture or "")
+    $ _wine_parent_text = str(scene_runtime.text or "")
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (str(scene_runtime.text or "") == str(wine_store_find_object("cellar").description or "")) timeout 20.0
+    $ _wine_back_index = len(main_ui_runtime.action_items) - 1
+    click id ("choice_panel_button_%d" % int(_wine_back_index)) pos (0.5, 0.5) until eval (str(scene_runtime.text or "") == _wine_parent_text) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _wine_parent_picture and str(scene_runtime.text or "") == _wine_parent_text and str(scene_runtime.location_text or "") == _wine_parent_text) timeout 5.0
 
 testcase external_room_exit_time_costs:
     run Jump("Intro")
@@ -3630,12 +3701,17 @@ testcase external_church_service_action_links_work:
     $ Georgett.known = True
     run Call("ChurchServiceMenu", False)
     assert eval ("Найти Жоржетту Брюно" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    $ _church_parent_picture = str(scene_runtime.picture or "")
+    $ _church_parent_text = str(scene_runtime.text or "")
     $ _church_blanken_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Найти семейство Блэнкеншип")
     $ _church_blanken_button = "choice_panel_button_%d" % int(_church_blanken_index)
-    click id _church_blanken_button pos (0.5, 0.5) until eval ("Вдова Блэнкеншип" in str(scene_runtime.text or "")) timeout 20.0
+    click id _church_blanken_button pos (0.5, 0.5) until screen "choice" timeout 20.0
+    assert eval ("Вдова Блэнкеншип" in str(scene_runtime.text or "") and str(main_ui_runtime.mode or "") == "event") timeout 5.0
     assert eval (str(scene_runtime.picture or "") in ("images/becky/church/cermon.png", "images/becky/church/talk1.jpg", "images/becky/church/talk2.jpg")) timeout 5.0
-    assert eval (str(main_ui_runtime.action_title or "") == "Прихожане") timeout 5.0
+    assert eval (str(main_ui_runtime.action_title or "") == "Семейство Блэнкеншип" and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Назад"]) timeout 5.0
     assert eval (not Georgett.story_value("foundinchurch", 0)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and str(main_ui_runtime.action_title or "") == "Прихожане") timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _church_parent_picture and str(scene_runtime.text or "") == _church_parent_text and str(scene_runtime.location_text or "") == _church_parent_text) timeout 5.0
     $ _church_georgett_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Найти Жоржетту Брюно")
     $ _church_georgett_button = "choice_panel_button_%d" % int(_church_georgett_index)
     click id _church_georgett_button pos (0.5, 0.5) until eval (people_to_int(Georgett.story_value("foundinchurch", 0), 0) == 1) timeout 20.0
@@ -3703,9 +3779,14 @@ testcase external_church_service_action_links_work:
     run Jump("Church")
     advance until screen "main_ui" timeout 20.0
     assert eval ("Обойти собор" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    $ _empty_church_walk_parent_picture = str(scene_runtime.picture or "")
+    $ _empty_church_walk_parent_text = str(scene_runtime.text or "")
     run Call("ChurchAfterCermon", 1)
-    advance until screen "say" timeout 20.0
-    assert eval ("Ничего интересного" in str(scene_runtime.text or "")) timeout 5.0
+    advance until screen "choice" timeout 20.0
+    assert eval ("Ничего интересного" in str(scene_runtime.text or "") and str(main_ui_runtime.mode or "") == "event") timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and str(main_ui_runtime.action_title or "") == "Действия") timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == _empty_church_walk_parent_picture and str(scene_runtime.text or "") == _empty_church_walk_parent_text and str(scene_runtime.location_text or "") == _empty_church_walk_parent_text) timeout 5.0
 
 testcase external_liza_identity_save_migration:
     run Call("InitGameNPCs")
@@ -5961,6 +6042,9 @@ testcase external_hunter_club_reputation_challenge_and_trade:
     click id _hunter_luisa_buy_button pos (0.5, 0.5) until screen "hunter_club_trade_overlay" timeout 20.0
     assert eval (renpy.get_screen("main_ui") is not None and renpy.get_screen("hunter_club_trade_overlay") is not None and str(main_ui_runtime.action_title or "") == "Покупка" and main_ui_runtime.action_content is None) timeout 5.0
     assert eval ([str(i.caption or "") for i in main_ui_runtime.action_items] == ["Подтвердить покупку", "Сбросить выбор", "Назад"]) timeout 5.0
+    $ _hunter_buy_back_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Назад")
+    click id ("choice_panel_button_%d" % int(_hunter_buy_back_index)) pos (0.5, 0.5) until eval (renpy.get_screen("hunter_club_trade_overlay") is None and str(main_ui_runtime.action_title or "") == "Действия") timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == str(rooms.get("HunterClub").bg_picture or "") and str(scene_runtime.text or "") == str(hunter_club_main_text() or "") and str(scene_runtime.location_text or "") == str(hunter_club_main_text() or "")) timeout 5.0
     assert eval (len(list(hunter_club_trade_entries("buy") or [])) > 0 and rooms.get("HunterClub").state.get("trade_mode", "") == "buy") timeout 5.0
     $ rooms.get("HunterClub").state["completed_challenges"] = {}
     $ rooms.get("HunterClub").state["reputation"] = 0
@@ -8324,6 +8408,7 @@ def main() -> int:
             "external_my_room_recipe_book_table_link",
             "external_my_room_window_day_night_amanda_pictures",
             "external_tavern_room_movement_resets_picture_state",
+            "external_location_object_back_restores_picture_and_text",
             "external_melissa_bats_room_search_after_wait",
             "external_melissa_bats_existing_booklet_after_roof",
             "external_melissa_v72_breakfast_stage_migration",

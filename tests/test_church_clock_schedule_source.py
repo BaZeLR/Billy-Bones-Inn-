@@ -170,11 +170,14 @@ def test_becky_after_ceremony_is_thread_event_with_clock_conditions():
     assert "calendar_v2.advance_minutes(60)" in becky_scene
 
 
-def test_church_after_ceremony_returns_without_action_panel_or_room_jump():
+def test_church_after_ceremony_uses_native_back_and_returns_without_room_jump():
     source = _source(CHURCH_AFTER)
 
     assert "main_ui_runtime.action_items" not in source
     assert "MenuItem(" not in source
     assert "jump Church" not in source
     assert "renpy.restart_interaction" not in source
-    assert '"[scene_runtime.text]"' in source
+    assert '$ main_ui_begin_native_scene_state("Обход собора")' in source
+    assert 'menu:\n        "Назад":' in source
+    assert "$ main_ui_end_native_scene_state()" in source
+    assert '"[scene_runtime.text]"' not in source

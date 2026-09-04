@@ -124,6 +124,7 @@ label TavernMelissaRoomObjectMenu(object_id="", preserve_text=False):
         if bool(getattr(_room_object, "carriable", False)) and not _melissa_room_has_take_action:
             main_ui_runtime.action_items.append(MenuItem("Взять", Call("Take", object_id, "TavernMelissaRoom", "", object_id)))
         main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "picture", tavern_melissa_room_picture() or rooms.get("TavernMelissaRoom").bg_picture or None),
             SetField(scene_runtime, "text", tavern_melissa_room_text()),
             SetField(scene_runtime, "location_text", tavern_melissa_room_text()),
             SetField(main_ui_runtime, "action_title", "Комната Мелиссы"),

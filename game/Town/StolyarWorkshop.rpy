@@ -201,83 +201,149 @@ label StolyarWorkshop:
 
 
 label StolyarWorkshopLook:
+    $ main_ui_begin_native_scene_state("Осмотр Драупнира")
     $ scene_runtime.text = "Мастер Драупнир - типичный гном, невысокий и коренастый. Он около полутора метров роста и почти такой же в плечах, с окладистой рыжей бородой и огненными волосами. Он одет в штаны, кожаную жилетку с множеством ремешков и карманов, из которых торчат разнообразные инструменты, и деревяные башмаки. Он постоянно что-то пилит и строгает, отвлекаясь только на то, чтобы произвести в уме или на пальцах подсчеты будущих барышей. Вам ничего не известно о его семье или родне."
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label StolyarWorkshopAskSlogan:
+    $ main_ui_begin_native_scene_state("Ремонт вывески")
     $ scene_runtime.text = "Вы рассказали мастеру Драупниру что вывеска на вашем трактире совсем обветшала. Что, в свою очередь, приводит к неисчислимым бедствиям для вас, а конкретно к тому, что далеко не все, кто зашел бы именно в ваш трактир действительно туда заходят. Из чего проистекает ваше текущее стесненное в средствах положение. После этого жалобного рассказа вы осторожно поинтересовались у мастера Драупнира, сколько будет стоить починить вывеску и нельзя ли это сделать в рассрочку. Мастер Драупнир внимательно выслушал вашу историю, но только и соизволил ответить: 'Двести мараведи. Вперед.' Дальнейшие уточнения на предмет не оговорился ли он и обязательно ли платить вперед ни к чему не привели."
     $ Draupnir.slogan_quote_received = True
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label StolyarWorkshopPaySlogan:
+    $ main_ui_begin_native_scene_state("Ремонт вывески")
     $ scene_runtime.text = "Скрепя сердце вы отсчитали 200 мараведи мастеру Драупниру. Собрав свои инструменты работящий гном направил свои стопы к вашему трактиру."
     $ player.tavern_management.slogan_state = 1
     $ player.spend_money(200)
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label StolyarWorkshopAskHole:
+    $ main_ui_begin_native_scene_state("Потайное окошко")
     $ scene_runtime.text = "Вы рассказали мастеру Драупниру что, после появления в вашем заведении веселых девушек, в задней комнате стали происходить интересные вещи. Однако полностью оценить их интересность вы не можете, по причине досадного наличия отстутствия хорошего обзора. После этого вы поинтересовались, не имеется ли у мастера Драупнира длинного сверла, а также не хочет ли он, в компании с оным сверлом, навестить ваше заведение. Мастер Драупнир внимательно выслушал вашу историю, но только и соизволил ответить: 'Сто мараведи. И делать это, как ты сам понимаешь, надо с утра.'"
     $ Draupnir.peep_hole_quote_received = True
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label StolyarWorkshopPayHole:
+    $ main_ui_begin_native_scene_state("Потайное окошко")
     $ scene_runtime.text = "Скрепя сердце вы отсчитали 100 мараведи мастеру Драупниру. Взяв с собой дрель, стамески, пилу и еще пару инструментов, работящий гном отправился к вашему трактиру. Впрочем, долго он там не задержался, вернувшись и отрапортовав что все сделанно, потайное окошко готово."
     $ player.tavern_management.client_room_hole = 1
     $ player.spend_money(100)
     $ calendar_v2.hour = 8
     $ calendar_v2.minute = 0
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label StolyarWorkshopAskGlory:
+    $ main_ui_begin_native_scene_state("Глорихол")
     $ scene_runtime.text = "Вы рассказали мастеру Драупниру об новинке про которую вы слышали - глорихоле. Ну и о том, что вы хотели бы устроить таковую в своем трактире. Ну и что работы там всего чуть-чуть - сделать ширмочку, занавески, просверлить дырки, отполировать, покрасить и еще кое-чего по мелочи, может можно мараведи в 20 уложиться? А, да, еще и сделать так чтобы вы могли незаметно проверить, что там делается, ведь это совсем просто. Может еще 5 или даже 7 мараведи сверх. Вместе с материалами? Мастер Драупнир внимательно выслушал вашу историю, судя по всему на этот раз идея гному понравилась. Но все таки цену он заломил немножко выше предложенной: 'Семьсот мараведи. Ну и да, работа на весь день, начинать надо с утра.'"
     $ Draupnir.glory_hole_quote_received = True
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label StolyarWorkshopPayGlory:
+    $ main_ui_begin_native_scene_state("Глорихол")
     $ scene_runtime.text = "Жестоко задавив в себе жабу пока она еще была в состоянии головастика, вы отсчитали 700 мараведи мастеру Драупниру. Загрузив ослика досками, собрав в ящичек разнообразные инструменты, а в специальный мешок ткани для занавески, трудолюбивый гном потопал к вашему трактиру."
     $ player.tavern_management.glory_hole = 1
     $ player.spend_money(700)
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label StolyarWorkshopAskSoapBarrel:
+    $ main_ui_begin_native_scene_state("Зольная бочка")
     $ scene_runtime.text = "Вы расспросили мастера Драупнира о бочке с дырчатым дном, через которую можно готовить щелок для мыла. Гном почесал бороду, прикинул доски и буркнул: 'Сделаю. Семьдесят пять мараведи. Но ставить надо с утра, а потом жди, пока зола настоится.'"
     $ Draupnir.soap_barrel_quote_received = True
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label StolyarWorkshopPaySoapBarrel:
+    $ main_ui_begin_native_scene_state("Зольная бочка")
     $ scene_runtime.text = "Вы отсчитали мастеру Драупниру 75 мараведи. Ворча себе под нос, он собрал инструменты, дошел до вашего заднего двора и поставил там зольную бочку для щелока."
     $ crafting.ash_barrel_installed = True
     $ crafting.ash_barrel_ready_day = int(current_game_day() or 0) + 7
     $ Draupnir.soap_barrel_quote_received = False
     $ player.spend_money(75)
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label StolyarWorkshopAskDogBooth:
+    $ main_ui_begin_native_scene_state("Собачья будка")
     $ scene_runtime.text = "Вы спрашиваете мастера Драупнира, не сможет ли он сколотить простую, но крепкую собачью будку для заднего двора. Гном прикидывает расход досок и бурчит: 'Сто мараведи. И ставить буду с утра.'"
     $ Draupnir.dog_booth_quote_received = True
     $ scene_runtime.location_text = scene_runtime.text
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label StolyarWorkshopPayDogBooth:
+    $ main_ui_begin_native_scene_state("Собачья будка")
     $ player.spend_money(100)
     call DogBackyardBuildBooth
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return

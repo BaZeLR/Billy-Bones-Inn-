@@ -215,6 +215,7 @@ label BackyardObjectMenu(object_id="", display_text=""):
             elif _yard_action.hook == "jump" and str(_yard_action.target or "") != "":
                 main_ui_runtime.action_items.append(MenuItem(_yard_action.label, Jump(_yard_action.target)))
     $ main_ui_runtime.action_items.append(MenuItem("Назад", [
+        SetField(scene_runtime, "picture", backyard_dynamic_picture()),
         SetField(scene_runtime, "text", backyard_dynamic_text()),
         SetField(scene_runtime, "location_text", backyard_dynamic_text()),
         SetField(main_ui_runtime, "action_title", "Задний двор"),

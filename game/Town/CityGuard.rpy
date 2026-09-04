@@ -13,6 +13,17 @@ init python:
     def city_guard_closed_now():
         return not city_guard_open_now()
 
+    def city_guard_room_text():
+        rows = rooms.get("CityGuard").visible_descriptions()
+        if len(rows) > 0:
+            return str(rows[0].text or "")
+        return "Вы зашли в приемную городской стражи."
+
+    def city_guard_room_picture():
+        if rooms.get("CityGuard").is_open():
+            return "images/zimmer/portrait1.png"
+        return str(rooms.get("CityGuard").bg_picture or "")
+
     CityGuardPlacat = {
         1: "Падонак: Помни-\nРубить рыцаря - МАЛО!\nКоли рыцарюгу алебардой в хлебало!",
         2: "Строй, МЛЯ, имеет значение!",
@@ -78,26 +89,18 @@ init python:
 
 
 label CityGuard:
-    $ renpy.dynamic("_city_guard_desc_rows")
     $ rooms.enter("CityGuard")
     $ main_ui_runtime.action_title = "Действия"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
     $ main_ui_runtime.object_id = ""
-    $ _city_guard_desc_rows = rooms.get("CityGuard").visible_descriptions()
-    if len(_city_guard_desc_rows) > 0:
-        $ scene_runtime.text = _city_guard_desc_rows[0].text
-    else:
-        $ scene_runtime.text = "Вы зашли в приемную городской стражи."
+    $ scene_runtime.text = city_guard_room_text()
     $ scene_runtime.location_text = scene_runtime.text
     $ rooms.get("CityGuard").mark_visited()
 
     call RoomEnterEventGate(rooms.current_code, False)
 
-    if rooms.get("CityGuard").is_open():
-        vscene "images/zimmer/portrait1.png"
-    else:
-        vscene "images/general/cityguard.jpg"
+    vscene city_guard_room_picture()
 
     $ main_ui_runtime.action_items = city_guard_action_items()
     while True:
@@ -115,5 +118,5 @@ label CityGuardShowPlacat:
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
     $ main_ui_runtime.action_items.append(MenuItem("Посмотреть на другую доску", Call("CityGuardShowPlacat")))
-    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", city_guard_action_items()), Function(main_ui_restart_interaction)]))
+    $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(scene_runtime, "picture", city_guard_room_picture()), SetField(scene_runtime, "text", city_guard_room_text()), SetField(scene_runtime, "location_text", city_guard_room_text()), SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", city_guard_action_items()), Function(main_ui_restart_interaction)]))
     return

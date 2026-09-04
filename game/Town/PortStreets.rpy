@@ -164,14 +164,18 @@ label PortStreetsBottleMenu(object_id="port_empty_bottle"):
 
 label PortStreetsExamineLanes:
     $ renpy.dynamic("_port_lanes_pictures", "_port_lanes_picture")
+    $ main_ui_begin_native_scene_state("Осмотр переулков")
     $ _port_lanes_pictures = ["images/general/port_streets.png", "images/general/port_streets1.png", "images/general/port_streets2.png", "images/general/port_streets4.png", "images/general/port_streets5.png"]
     $ _port_lanes_picture = _port_lanes_pictures[procedural_randint(0, len(_port_lanes_pictures) - 1, key="procedural:Town/PortStreets.rpy:procedural_randint:292:5")]
     $ scene_runtime.picture = _port_lanes_picture
     vscene _port_lanes_picture
     $ scene_runtime.text = "В этих темных углах любой искатель приключений может найти острые ощущения, которые удовлетворят его вкусы, а при неудаче, возможно, и его смерть."
     $ scene_runtime.location_text = scene_runtime.text
-    $ main_ui_runtime.action_title = "Действия"
-    $ main_ui_runtime.action_items = rooms.current.build_action_items() + rooms.current.build_exit_items()
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 

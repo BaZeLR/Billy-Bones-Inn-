@@ -104,6 +104,7 @@ label TavernEmptyRoomObjectMenu(object_id=""):
             if _peephole_action.hook == "call" and str(_peephole_action.target or ""):
                 main_ui_runtime.action_items.append(MenuItem(_peephole_action.label, Call(_peephole_action.target, *tuple(getattr(_peephole_action, "args", ()) or ()))))
         main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "picture", rooms.get("TavernEmptyRoom").bg_picture or None),
             SetField(scene_runtime, "text", rooms.get("TavernEmptyRoom").descriptions[0].text),
             SetField(scene_runtime, "location_text", rooms.get("TavernEmptyRoom").descriptions[0].text),
             SetField(main_ui_runtime, "action_title", "Пустая комната"),
@@ -132,6 +133,7 @@ label TavernEmptyRoomPeekEmpty:
     show screen main_ui
     menu:
         "Вернуться в комнату":
+            $ scene_runtime.picture = rooms.get("TavernEmptyRoom").bg_picture or None
             $ scene_runtime.text = rooms.get("TavernEmptyRoom").descriptions[0].text
             $ scene_runtime.location_text = scene_runtime.text
             $ main_ui_runtime.action_title = "Пустая комната"

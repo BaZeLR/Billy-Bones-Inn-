@@ -199,6 +199,7 @@ label tavern_stable_object_menu(object_id=""):
             elif _room_action.hook == "jump" and str(_room_action.target or "") != "":
                 main_ui_runtime.action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
         main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "picture", tavern_stable_picture() or rooms.get("TavernStable").bg_picture or None),
             SetField(scene_runtime, "text", tavern_stable_scene_text()),
             SetField(scene_runtime, "location_text", tavern_stable_scene_text()),
             SetField(main_ui_runtime, "action_title", "Конюшня"),

@@ -374,6 +374,7 @@ label tavern_amanda_room_object_menu(object_id=""):
             elif _room_action.hook == "jump" and str(_room_action.target or "") != "":
                 main_ui_runtime.action_items.append(MenuItem(_room_action.label, Jump(_room_action.target)))
         main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "picture", tavern_amanda_room_picture(tavern_amanda_room_sleep_dress()) or None),
             SetField(scene_runtime, "text", tavern_amanda_room_main_text(rooms.get("TavernAmandaRoom"), tavern_amanda_room_sleep_dress())),
             SetField(scene_runtime, "location_text", tavern_amanda_room_main_text(rooms.get("TavernAmandaRoom"), tavern_amanda_room_sleep_dress())),
             SetField(main_ui_runtime, "action_title", "Комната Аманды"),

@@ -537,6 +537,7 @@ label TavernKitchenDepositMenu:
             scene_runtime.text = "Сейчас у вас при себе нет ничего подходящего для кухонных запасов."
             scene_runtime.location_text = scene_runtime.text
         main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "picture", tavern_kitchen_picture() or rooms.get("TavernKitchen").bg_picture or None),
             SetField(scene_runtime, "text", tavern_kitchen_saved_text()),
             SetField(scene_runtime, "location_text", tavern_kitchen_saved_text()),
             SetField(main_ui_runtime, "action_title", "Кухня"),

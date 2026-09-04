@@ -127,6 +127,7 @@ label ArtisansQuarterObjectMenu(object_id=""):
                 main_ui_runtime.action_items.append(MenuItem(_artisans_action.label, Jump(_artisans_action.target)))
 
     $ main_ui_runtime.action_items.append(MenuItem("Назад", [
+        SetField(scene_runtime, "picture", rooms.get("ArtisansQuarter").bg_picture or None),
         SetField(scene_runtime, "text", str(rooms.get("ArtisansQuarter").state.get("display_text", "") or "")),
         SetField(scene_runtime, "location_text", str(rooms.get("ArtisansQuarter").state.get("display_text", "") or "")),
         SetField(main_ui_runtime, "action_title", "Действия"),

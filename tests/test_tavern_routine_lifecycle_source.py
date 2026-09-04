@@ -16,7 +16,8 @@ def test_tavern_routine_visuals_come_from_present_assigned_jobs():
     assert 'person_data.image_sequence("tavern", image_key)' in source
     assert '(("jobcleaning", "hall_cleaning"), ("jobwaitress", "waitress"))' in source
     assert '"preopening" if preopening else "open"' in source
-    assert 'scene_runtime.picture = str(_tavern_routine_visual.get("picture", "") or scene_runtime.picture)' in source
+    assert 'return str(tavern_main_routine_visual_data().get("picture", "") or default_picture)' in source
+    assert "$ scene_runtime.picture = tavern_main_picture()" in source
     assert not (ROOT / "game/Inn/TavernShowImage.rpy").exists()
 
 

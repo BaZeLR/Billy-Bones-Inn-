@@ -111,8 +111,18 @@ init python:
             items.append(MenuItem(room_exit.label, movement_actions(room_exit.target, street_tavern_exit_minutes(room_exit.target))))
         return items
 
+    def street_tavern_location_text():
+        parts = [
+            str(row.text or "")
+            for row in rooms.get("StreetTavern").visible_descriptions()
+            if str(row.text or "").strip()
+        ]
+        if dog.is_stray_here("StreetTavern"):
+            parts.append("Неподалеку от входа крутится бродячий пес, время от времени принюхиваясь к прохожим.")
+        return "\n\n".join(parts)
+
 label StreetTavern:
-    $ renpy.dynamic("_street_tavern_event_check_block", "_desc_row", "_street_desc_parts", "_street_desc_rows")
+    $ renpy.dynamic("_street_tavern_event_check_block")
     scene black
     show bg StreetTavern at master
     $ rooms.enter("StreetTavern")
@@ -133,16 +143,9 @@ label StreetTavern:
     if _street_tavern_event_check_block != "EventCheckBlock":
         call RoomEnterEventGate(rooms.current_code, False)
 
-    python:
-        _street_desc_rows = rooms.get("StreetTavern").visible_descriptions()
-        _street_desc_parts = []
-        for _desc_row in _street_desc_rows:
-            _street_desc_parts.append(str(_desc_row.text or ""))
-        scene_runtime.location_text = "\n\n".join([part for part in _street_desc_parts if str(part or "").strip()])
-        if dog.is_stray_here("StreetTavern"):
-            scene_runtime.location_text += "\n\nНеподалеку от входа крутится бродячий пес, время от времени принюхиваясь к прохожим."
-        scene_runtime.text = scene_runtime.location_text
-        main_ui_runtime.action_items = street_tavern_action_items()
+    $ scene_runtime.text = street_tavern_location_text()
+    $ scene_runtime.location_text = scene_runtime.text
+    $ main_ui_runtime.action_items = street_tavern_action_items()
     $ rooms.get("StreetTavern").mark_visited()
 
     while True:
@@ -168,6 +171,8 @@ label StreetTavernObjectMenu(object_id=""):
             if _street_menu_item is not None:
                 main_ui_runtime.action_items.append(_street_menu_item)
         main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "text", street_tavern_location_text()),
+            SetField(scene_runtime, "location_text", street_tavern_location_text()),
             SetField(main_ui_runtime, "action_title", "Куда идти"),
             SetField(main_ui_runtime, "action_items", street_tavern_action_items()),
             Function(main_ui_restart_interaction),

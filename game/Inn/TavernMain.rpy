@@ -39,6 +39,12 @@ init python:
             text = "%s работает в зале, разнося посетителям еду и выпивку между заполненными столами." % name
         return {"picture": str(picture or ""), "text": text}
 
+    def tavern_main_picture():
+        default_picture = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
+        if tavern_main_closed_text() != "":
+            return default_picture
+        return str(tavern_main_routine_visual_data().get("picture", "") or default_picture)
+
     def tavern_preopening_mode():
         return tavern_main_closed_text() == "" and int(calendar_v2.week or 0) != 7 and 6 <= int(calendar_v2.hour or 0) < 12
 
@@ -172,16 +178,13 @@ init python:
 
 label TavernMain:
     $ renpy.dynamic("_household_request_girl", "_household_request_type")
-    $ renpy.dynamic("_tavern_main_base_desc", "_tavern_routine_visual", "_glory_quest_started", "_cur_desc_low", "_draupnir_gh_asked", "ShouldDispatchTavernEvent", "GirlNameTS1", "GirlNameTS2", "kitchenlist", "cleaninglist", "waitresslist", "_liza_whore_work", "_georgett_whore_work", "randvarPS", "_tavern_kids_description", "_tmp_bf_sandra", "_tmp_bf_amanda", "_tmp_bf_melissa", "_tmp_bf_georgett", "_tmp_bf_liza", "_tmp_kids_list")
+    $ renpy.dynamic("_tavern_main_base_desc", "_glory_quest_started", "_cur_desc_low", "_draupnir_gh_asked", "ShouldDispatchTavernEvent", "GirlNameTS1", "GirlNameTS2", "kitchenlist", "cleaninglist", "waitresslist", "_liza_whore_work", "_georgett_whore_work", "randvarPS", "_tavern_kids_description", "_tmp_bf_sandra", "_tmp_bf_amanda", "_tmp_bf_melissa", "_tmp_bf_georgett", "_tmp_bf_liza", "_tmp_kids_list")
     $ _tavern_main_base_desc = rooms.get("TavernMain").descriptions[0].text
     $ scene_runtime.text = _tavern_main_base_desc
     $ scene_runtime.location_text = _tavern_main_base_desc
     $ rooms.enter("TavernMain")
     $ tavern_main_fireplace_wood_stock()
-    $ scene_runtime.picture = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
-    if tavern_main_closed_text() == "":
-        $ _tavern_routine_visual = tavern_main_routine_visual_data()
-        $ scene_runtime.picture = str(_tavern_routine_visual.get("picture", "") or scene_runtime.picture)
+    $ scene_runtime.picture = tavern_main_picture()
     $ main_ui_runtime.mode = "scene"
     $ main_ui_runtime.selected_char = ""
     $ main_ui_runtime.talk_picture = ""
@@ -253,8 +256,7 @@ label TavernMain:
                     randvarPS = procedural_randint(1, 3, key="procedural:Inn/TavernMain.rpy:procedural_randint:351:3")
                 if randvarPS == 1 and CheckIfSexEventExist(GirlNameTS1, calendar_v2.time_slot()) > 0:
                     $ rooms.get("TavernMain").state["client_room_girl"] = "georgett"
-        $ _tavern_routine_visual = tavern_main_routine_visual_data()
-        $ scene_runtime.picture = str(_tavern_routine_visual.get("picture", "") or "images/tavern/mainhall/main_hall.png")
+        $ scene_runtime.picture = tavern_main_picture()
 
     call RoomEnterEventGate(rooms.current_code, False)
     $ _tavern_kids_description = []
@@ -359,6 +361,7 @@ label TavernMainObjectMenu(object_id=""):
             elif _tavern_action.hook == "jump" and str(_tavern_action.target or "") != "":
                 main_ui_runtime.action_items.append(MenuItem(_tavern_label, Jump(_tavern_action.target)))
         main_ui_runtime.action_items.append(MenuItem("Назад", [
+            SetField(scene_runtime, "picture", tavern_main_picture()),
             SetField(scene_runtime, "text", tavern_main_build_description()),
             SetField(scene_runtime, "location_text", tavern_main_build_description()),
             SetField(main_ui_runtime, "action_title", "Действия в трактире"),

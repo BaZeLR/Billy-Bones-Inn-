@@ -311,6 +311,7 @@ label ChurchServiceMenu(show_attendees=True):
 
 label ChurchServiceMother:
     $ renpy.dynamic("_church_picture")
+    $ main_ui_begin_native_scene_state("Сандра")
     $ scene_runtime.text = "Сандра, одетая в своё строгое платье, внимательно слушает службу."
     $ scene_runtime.location_text = scene_runtime.text
     $ _church_picture = church_sandra_picture()
@@ -318,12 +319,17 @@ label ChurchServiceMother:
         call ShowImage("", "", _church_picture)
     else:
         call ShowImage("sandra", "church", "cermon")
-    call ChurchServiceMenu(False)
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label ChurchServiceSisters:
     $ renpy.dynamic("_church_picture")
+    $ main_ui_begin_native_scene_state("Мелисса и Аманда")
     $ scene_runtime.text = "Мелисса и Аманда тихо щебечут между собой, уделяя происходящему куда меньше внимания, чем хотелось бы святому отцу."
     $ scene_runtime.location_text = scene_runtime.text
     $ _church_picture = church_sisters_picture()
@@ -331,7 +337,11 @@ label ChurchServiceSisters:
         call ShowImage("", "", _church_picture)
     else:
         call ShowImage("amanda", "church", "cermon")
-    call ChurchServiceMenu(False)
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
@@ -339,15 +349,21 @@ label ChurchServiceLegare:
     if story_event_available("Church", "clara_paintings"):
         call checkTriggers("Church", "clara_paintings", 0)
         return
+    $ main_ui_begin_native_scene_state("Семейство Легаре")
     $ scene_runtime.text = "Мессир Легаре в черном камзоле стоит около одной из колонн и внимательно слушает службу. Рядом с ним стоит его жена Элоиза, маленькая шатенка средних лет, а за ними все их дети - Кларисса, Жерар, Жан-Жак, Полина и малыш Реми."
     $ scene_runtime.location_text = scene_runtime.text
     call ShowImageSeq("alber", "church", "cermon", 2)
-    call ChurchServiceMenu(False)
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label ChurchServiceBlanken:
     $ renpy.dynamic("_church_picture")
+    $ main_ui_begin_native_scene_state("Семейство Блэнкеншип")
     $ scene_runtime.text = "Вдова Блэнкеншип, высокая рыжая женщина с полной грудью, чуть младше сорока лет. Она на первый взгляд слушает отца Герхарда, но если присмотреться, то видно, что ее мысли витают где-то далеко. Рядом с ней стоит Эдди, ее рыжий управляющий лавкой и ваш ровесник. Поблизости ее дети - Ингенборг, Ивар, Эмма и Лаура."
     $ scene_runtime.location_text = scene_runtime.text
     $ _church_picture = church_blanken_picture()
@@ -355,11 +371,16 @@ label ChurchServiceBlanken:
         call ShowImage("", "", _church_picture)
     else:
         call ShowImage("becky", "church", "cermon")
-    call ChurchServiceMenu(False)
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 
 label becky_church_talk:
+    $ main_ui_begin_native_scene_state("Разговор с отцом Герхардом")
     if Becky.gerhard_talk_stage == 0:
         $ scene_runtime.text = "После службы вы подошли к отцу Герхарду: \"Падре, одна из ваших прихожанок, торговка с рынка, может обратиться к вам за советом. Снедает ее мысль о том, большой ли грех то, что она собирается совершить. Не могли ли бы вы сказать ей, что то невеликое дело?\""
     else:
@@ -375,4 +396,9 @@ label becky_church_talk:
     $ scene_runtime.location_text = scene_runtime.text
     vscene "images/gerhard/talkTogerhardt.png"
     $ Becky.gerhard_talk_stage = 2
+    show screen main_ui
+    menu:
+        "Назад":
+            pass
+    $ main_ui_end_native_scene_state()
     return

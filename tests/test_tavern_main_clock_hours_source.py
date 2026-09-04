@@ -33,7 +33,10 @@ def test_tavern_main_sets_day_night_room_picture_explicitly_for_main_ui():
     source = (PROJECT_ROOT / "game" / "Inn" / "TavernMain.rpy").read_text(encoding="utf-8-sig")
 
     assert 'bg_picture="images/tavern/mainhall/main_hall.png"' in source
-    assert 'scene_runtime.picture = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"' in source
+    picture_resolver = source.split("def tavern_main_picture():", 1)[1].split("def tavern_preopening_mode():", 1)[0]
+    assert 'default_picture = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"' in picture_resolver
+    assert 'return str(tavern_main_routine_visual_data().get("picture", "") or default_picture)' in picture_resolver
+    assert "$ scene_runtime.picture = tavern_main_picture()" in source
     assert 'show bg TavernMain' not in source
     assert "call TavernShowImage" not in source
     assert "def tavern_main_room_picture" not in source
