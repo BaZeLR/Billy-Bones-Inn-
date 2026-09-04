@@ -2420,7 +2420,7 @@ label external_day_start_actual_load_probe:
     $ _room_add_item_by_id(rooms.get("Shed"), "old_axe_001")
     $ TodaySexEvents_Add("georgett", 3, 4, "Prostitution")
     $ main_ui_runtime.action_items.append(MenuItem("ДУБЛИКАТ", NullAction()))
-    $ renpy.load("day-1")
+    $ renpy.load("quick-1")
     return
 
 
@@ -2452,11 +2452,13 @@ testcase external_next_day_report_releases_time_block:
     assert eval (int(calendar_v2.time_advance_blocked or 0) == 1) timeout 5.0
     assert eval (int(calendar_v2.daysInGame or 0) == _nextday_test_day + 1 and int(calendar_v2.hour or 0) == 6 and int(calendar_v2.minute or 0) == 0) timeout 5.0
     assert eval (str(next_day_runtime.report_title or "") == "ОТЧЕТ ЗА ДЕНЬ" and "Новый день настал!" in str(next_day_runtime.report_body or "")) timeout 5.0
+    scroll amount 20 pos (960, 500)
     click id "nextday_report_back_button" pos (0.5, 0.5) until eval (renpy.get_screen("nextday_report_card_overlay") is None) timeout 20.0
     advance until eval (str(rooms.current_code or "") == "TavernMyRoom" and renpy.get_screen("main_ui") is not None) timeout 30.0
     assert eval (int(calendar_v2.time_advance_blocked or 0) == 0) timeout 5.0
-    assert eval (renpy.can_load("day-1")) timeout 5.0
-    $ _day_start_save_data = renpy.get_save_data("day-1")
+    assert eval (renpy.call_stack_depth() == 0) timeout 5.0
+    assert eval (renpy.can_load("quick-1")) timeout 5.0
+    $ _day_start_save_data = renpy.get_save_data("quick-1")
     $ _day_start_saved_player = _day_start_save_data.get("player")
     $ _day_start_saved_rooms = _day_start_save_data.get("rooms")
     $ _day_start_saved_calendar = _day_start_save_data.get("calendar_v2")
@@ -2467,8 +2469,9 @@ testcase external_next_day_report_releases_time_block:
     assert eval (len([str(i.caption or "") for i in main_ui_runtime.action_items]) == len(set(str(i.caption or "") for i in main_ui_runtime.action_items))) timeout 5.0
     run Call("external_day_start_actual_load_probe")
     advance until eval (str(rooms.current_code or "") == "TavernMyRoom" and renpy.get_screen("main_ui") is not None) timeout 30.0
+    assert eval (renpy.call_stack_depth() == 0) timeout 5.0
     assert eval (int(player.item_count("old_axe_001") or 0) == 1 and not _room_has_item_by_id(rooms.get("Shed"), "old_axe_001")) timeout 5.0
-    $ _day_start_reloaded_data = renpy.get_save_data("day-1")
+    $ _day_start_reloaded_data = renpy.get_save_data("quick-1")
     $ _day_start_reloaded_sex_events = _day_start_reloaded_data.get("SexEvents")
     assert eval (isinstance(_day_start_reloaded_sex_events, SexEventRuntime) and list(SexEvents.today_events or []) == list(_day_start_reloaded_sex_events.today_events or [])) timeout 5.0
     assert eval ("ДУБЛИКАТ" not in [str(i.caption or "") for i in main_ui_runtime.action_items] and len([str(i.caption or "") for i in main_ui_runtime.action_items]) == len(set(str(i.caption or "") for i in main_ui_runtime.action_items))) timeout 5.0
@@ -2493,6 +2496,7 @@ testcase external_next_day_report_releases_time_block:
     assert eval (("События за %s" % _nextday_today_date) not in str(next_day_runtime.report_body or "")) timeout 5.0
     assert eval ("Утром прибежал посыльный из лавки Фараго" in str(next_day_runtime.report_body or "")) timeout 5.0
     assert eval (player.appearance.has_dress("citydress") and player.appearance.owned_dresses.count("citydress") == 1 and "citydress" not in player.appearance.destroyed_dresses and int(player.appearance.dress_life_days.get("citydress", 0) or 0) == int(player.appearance.DRESS_LIFE_DAYS or 0)) timeout 5.0
+    scroll amount 20 pos (960, 500)
     click id "nextday_report_back_button" pos (0.5, 0.5) until eval (renpy.get_screen("nextday_report_card_overlay") is None) timeout 20.0
     advance until eval (int(calendar_v2.time_advance_blocked or 0) == 0 and renpy.get_screen("main_ui") is not None) timeout 30.0
 

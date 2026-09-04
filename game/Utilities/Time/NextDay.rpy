@@ -261,7 +261,9 @@ label NextDay(retlocname, timepassed):
         $ calendar_v2.time_advance_blocked = 0
         if _nextday_return_label == "TavernMyRoom":
             $ _day_start_save_name = "Начало дня — " + calendar_v2.format_date_ru(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, None, False)
-            $ renpy.save("day-1", extra_info=_day_start_save_name, include_screenshot=False)
+            $ renpy.set_return_stack([])
+            $ renpy.loadsave.cycle_saves("quick-", config.quicksave_slots)
+            $ renpy.save("quick-1", extra_info=_day_start_save_name, include_screenshot=False)
         jump expression _nextday_return_label
     return
 
