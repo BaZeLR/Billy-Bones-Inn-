@@ -25,6 +25,7 @@ init python:
         """Becky runtime: grocery work, home visits, Eddie, church, Sherwood trade, pregnancy."""
         talk_label = "IntBeckyTalk"
         unknown_name = "Незнакомка"
+        work_socializing_locations = ("GroceryStore",)
 
         def __init__(self):
             super().__init__("becky")

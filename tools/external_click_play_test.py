@@ -8345,7 +8345,7 @@ testcase external_working_girl_talk_penalty:
     $ Liza.talked_today = 0
     $ people.get_data("liza").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999, working=True)])
     run Call("IntLizaTalkSmalltalk", "liza", "tavern")
-    assert eval (int(Liza.rel or 0) == 8 and int(Liza.talked_today or 0) == 0 and "занята работой" in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (int(Liza.rel or 0) >= 9 and int(Liza.talked_today or 0) == 1 and "занята работой" not in str(scene_runtime.text or "")) timeout 5.0
 
 testcase external_smalltalk_main_ui_portraits:
     run Jump("Intro")

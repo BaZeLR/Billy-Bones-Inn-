@@ -36,6 +36,7 @@ init python:
 
         uses_tavern_client_room = True
         unknown_name = "Молодая женщина"
+        work_socializing_locations = ("TavernMain", "PortStreets")
 
         def __init__(self):
             super().__init__("liza")

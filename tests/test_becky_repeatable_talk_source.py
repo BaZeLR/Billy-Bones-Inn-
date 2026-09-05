@@ -17,7 +17,7 @@ def test_repeatable_becky_talk_random_choices_are_label_local():
     assert "rand_var=0" in TOPICS
 
 
-def test_becky_store_smalltalk_obeys_the_shared_work_interruption_rule():
+def test_becky_store_smalltalk_remains_the_authored_friendship_path():
     repeatable = TOPICS.split("label _int_becky_talk_smalltalk", 1)[1].split(
         "label story_becky_talk_inga_0", 1
     )[0]
@@ -26,9 +26,8 @@ def test_becky_store_smalltalk_obeys_the_shared_work_interruption_rule():
         "def can_work_tavern", 1
     )[0]
 
-    assert "work_socializing_locations" not in BECKY
-    assert "work_socializing_locations" not in interrupt_work
-    assert "self.change_social(friend_delta=-1)" in interrupt_work
+    assert 'work_socializing_locations = ("GroceryStore",)' in BECKY
+    assert "self.work_socializing_locations" in interrupt_work
     assert repeatable.count("Becky.interrupt_work()") == 2
     assert "Becky.add_relation(1, 3)" in repeatable
     assert "Becky.add_relation(1, 6)" in repeatable

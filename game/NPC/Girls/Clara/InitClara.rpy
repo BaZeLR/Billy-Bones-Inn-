@@ -25,6 +25,7 @@ init python:
         """Clara runtime: wine store, market booklet, paintings thread, social state."""
         talk_label = "IntClaraTalk"
         unknown_name = "Незнакомка"
+        work_socializing_locations = ("WineStore",)
         def __init__(self):
             super().__init__("clara")
             self.code_name = "clara"

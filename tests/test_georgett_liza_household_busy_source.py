@@ -9,15 +9,20 @@ def source(relative):
     return (ROOT / relative).read_text(encoding="utf-8-sig")
 
 
-def test_georgett_and_liza_use_shared_work_interruption_rule():
+def test_story_allowed_workers_can_socialize_during_their_shifts():
     people = source("game/Utilities/General/NPC/PeopleRuntime.rpy")
     georgett = json.loads(source("game/NPC/Schedules/georgett.json"))
     liza = source("game/NPC/Girls/Liza/InitLiza.rpy")
+    georgett_info = source("game/NPC/Girls/Georgett/InitGeorgett.rpy")
+    clara = source("game/NPC/Girls/Clara/InitClara.rpy")
 
     port_shift = next(row for row in georgett["entries"] if row["label"] == "portstreets_work")
     assert port_shift["working"] is True
-    assert "work_socializing_locations" not in liza
+    assert 'work_socializing_locations = ("TavernMain", "PortStreets")' in liza
+    assert 'work_socializing_locations = ("TavernMain", "PortStreets")' in georgett_info
+    assert 'work_socializing_locations = ("WineStore",)' in clara
     assert "def interrupt_work(self):" in people
+    assert "self.work_socializing_locations" in people
     assert "self.change_social(friend_delta=-1)" in people
 
 
