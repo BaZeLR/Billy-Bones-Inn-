@@ -1127,7 +1127,6 @@ init -999 python:
     class Girl(BaseNPC):
         """Girls with body layers, pregnancy, detailed history, lunar fertility."""
         registry_group = "girl"
-        work_socializing_locations = ()
         daily_sex_limit = 2
         def __init__(self, name, **kwargs):
             super().__init__(name, **kwargs)
@@ -1152,8 +1151,6 @@ init -999 python:
 
         def interrupt_work(self):
             if not self.is_working():
-                return ""
-            if str(self.getLocation() or "") in tuple(self.work_socializing_locations or ()):
                 return ""
             before = people_to_int(self.rel, 0)
             self.change_social(friend_delta=-1)
