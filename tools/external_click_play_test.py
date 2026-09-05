@@ -8490,6 +8490,79 @@ testcase external_smalltalk_main_ui_portraits:
 '''
 
 
+CURRENT_BREAKFAST_SANDRA_CAT_RAT_CHECKS = r'''
+testcase external_breakfast_finish_resumed_stays_in_kitchen:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("sandra") is not None) timeout 20.0
+    $ rooms.enter("TavernKitchen")
+    $ player.tavern_management.breakfast.today = True
+    $ player.tavern_management.breakfast.event_active = True
+    $ player.tavern_management.breakfast.present_ids = ["sandra", "melissa", "amanda"]
+    $ player.tavern_management.breakfast.base_text = "Завтрак продолжается."
+    run Jump("TavernKitchenBreakfastMenu")
+    advance until screen "choice" timeout 20.0
+    $ _breakfast_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить завтрак")
+    click id ("choice_panel_button_%d" % int(_breakfast_finish_index)) pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernKitchen" and not bool(player.tavern_management.breakfast.event_active) and renpy.get_screen("main_ui") is not None) timeout 20.0
+    assert eval (renpy.get_screen("main_menu") is None and str(main_ui_runtime.action_title or "") == "Кухня") timeout 5.0
+
+testcase external_sandra_weekly_visit_arms_after_monday_midnight:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("sandra") is not None) timeout 20.0
+    $ threads["sandraWeeklyEvaluation"].advanceTo(1, force_active=True)
+    $ threads["sandraWeeklyEvaluation"].disable()
+    $ external_calendar_set_fields(8, 1, 1100, 1, 0)
+    $ external_calendar_set_weekday(1)
+    $ player.tavern_management.weekly_chores_last_eval_stamp = "1100:1:7:7"
+    python:
+        for _chore_key in PLAYER_CHORE_KEYS:
+            player.chores.weekly[_chore_key] = player_chore_target(_chore_key)
+    $ _sandra_weekly_message = evaluate_weekly_chores_and_rewards()
+    assert eval (threads["sandraWeeklyEvaluation"].enabled and int(threads["sandraWeeklyEvaluation"].num or 0) == 1) timeout 5.0
+    assert eval (story_event_available("TavernMyRoom", "sleep")) timeout 5.0
+
+testcase external_adopted_werecat_roams_with_name_and_menu:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("werecat") is not None) timeout 20.0
+    $ werecat_state()["adopted"] = 1
+    $ werecat_state()["adopted_count"] = 1
+    $ werecat_state()["sold"] = 0
+    $ werecat_state()["name"] = "Луна"
+    $ werecat_state()["rats_problem_active"] = 0
+    $ WerecatStaticData.invalidate_daily_schedule()
+    $ external_calendar_set_fields(8, 1, 1100, 10, 0)
+    $ _werecat_test_room = str(people.location("werecat") or "")
+    assert eval (_werecat_test_room in ("TavernKitchen", "TavernStorage", "TavernMain", "Backyard", "TavernMelissaRoom")) timeout 5.0
+    assert eval (people.action_data_for_room("werecat", _werecat_test_room) is not None) timeout 5.0
+    $ rooms.enter(_werecat_test_room)
+    run Call("IntWerecatTalk", _werecat_test_room)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(werecat_display_name() or "") == "Луна" and bool(werecat.known)) timeout 5.0
+    assert eval (all(option in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] for option in ("Осмотреть", "Погладить кошку", "Поиграть с кошкой", "Закончить разговор"))) timeout 5.0
+    $ _werecat_finish_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
+    click id ("choice_panel_button_%d" % int(_werecat_finish_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+
+testcase external_rat_food_loss_is_visible_in_report:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("werecat") is not None) timeout 20.0
+    $ threads["sandraWeeklyEvaluation"].complete()
+    $ player.set_money(1000)
+    $ player.tavern_management.visitors = 40
+    $ player.tavern_management.productnum = 200
+    $ player.tavern_management.winenum = 200
+    $ external_calendar_set_fields(8, 1, 1100, 23, 0)
+    $ werecat_state()["rats_problem_active"] = 1
+    $ werecat_state()["rat_food_loss_next_day"] = int(current_game_day() or 0)
+    run Call("NextDay", "TavernMain", 1)
+    advance until screen "nextday_report_card_overlay" timeout 30.0
+    assert eval (int(TotalDay.get("rat_food_loss", 0) or 0) == 30) timeout 5.0
+    assert eval ("Крысы испортили еще 3 мешка припасов." in str(next_day_runtime.report_body or "")) timeout 5.0
+'''
+
+
 def build_test_rpy() -> str:
     room_action_click_params = [
         (room_name, action_index)
@@ -8501,7 +8574,7 @@ def build_test_rpy() -> str:
     )
     return TEST_HEADER + "".join(
         ROOM_CHECK_TEMPLATE.format(room_name=room_name) for room_name in ROOM_LABELS
-    ) + "\n\n" + SHOP_ACTION_CHECKS + "\n\n" + TAVERN_REPORT_STATE_CHECKS + "\n\n" + TAILOR_PURCHASE_FLOW_CHECKS + "\n\n" + DOG_ENTITY_ACTION_CHECKS + "\n\n" + BACKYARD_BARREL_OBJECT_CHECKS + "\n\n" + GROCERY_STORE_OBJECT_PURCHASE_CHECKS + "\n\n" + FIGHT_SYSTEM_RUNTIME_CHECKS + "\n\n" + SMALLTALK_MAIN_UI_CHECKS + "\n\n" + PORT_STREETS_FLOW_CHECKS + "\n\n" + CALENDAR_TIME_CHECKS + "\n\n" + ROOM_REGISTRY_SAVE_CHECKS + "\n\n" + PLAYER_SAVE_PARITY_CHECKS + "\n\n" + TAVERN_HELP_FLOW_CHECKS + "\n\n" + MEDIA_RESOLUTION_CHECKS + "\n\n" + HARASSMENT_IMAGE_CHECKS + "\n\n" + GIRL_OBJECT_RUNTIME_CHECKS + "\n\n" + ACTUAL_ACTION_BUTTON_CLICK_CHECKS + "\n\n" + ACTUAL_RANDOM_TOWN_CLICK_CHECKS + "\n\n" + TARGETED_CURRENT_BUG_CHECKS + "\n\n" + DEBUG_BUILDER_ROOM_CHECKS + "\n\n" + REGRESSION_RESTORE_CHECKS + "\n\n" + AMANDA_ROOM_NIGHT_EVENT_CHECKS + "\n\n" + MY_ROOM_RECIPE_BOOK_ACTION_CHECKS + "\n\n" + MY_ROOM_WINDOW_ACTION_CHECKS + "\n\n" + TAVERN_ROOM_PICTURE_STATE_CHECKS + "\n\n" + MELISSA_BATS_DRAWINGS_CHECKS + "\n\n" + MELISSA_WERECAT_FOREST_ACTION_CHECKS + "\n\n" + CHURCH_LINK_CHECKS + "\n\n" + CHURCH_AFTER_SERMON_EVENT_CHECKS + "\n\n" + CLARA_MELISSA_TAVERN_BAR_GOSSIP_CHECKS + "\n\n" + FRIDAY_DANCE_AMANDA_CHECKS + "\n\n" + SANDRA_NIGHT_THANKS_CHECKS + "\n\n" + MELISSA_SEX_ENGINE_CHECKS + "\n\n" + AMANDA_SEX_ENGINE_CHECKS + "\n\n" + PLAYER_INTIMACY_STATE_CHECKS + "\n\n" + CLARA_AMANDA_SCHEDULE_FLOW_CHECKS + "\n\n" + HOUSEHOLD_AI_EVENT_CHECKS + "\n\n" + all_room_action_click_checks + "\n\n" + BECKY_HOME_GUEST_CHECKS
+    ) + "\n\n" + SHOP_ACTION_CHECKS + "\n\n" + TAVERN_REPORT_STATE_CHECKS + "\n\n" + TAILOR_PURCHASE_FLOW_CHECKS + "\n\n" + DOG_ENTITY_ACTION_CHECKS + "\n\n" + BACKYARD_BARREL_OBJECT_CHECKS + "\n\n" + GROCERY_STORE_OBJECT_PURCHASE_CHECKS + "\n\n" + FIGHT_SYSTEM_RUNTIME_CHECKS + "\n\n" + SMALLTALK_MAIN_UI_CHECKS + "\n\n" + CURRENT_BREAKFAST_SANDRA_CAT_RAT_CHECKS + "\n\n" + PORT_STREETS_FLOW_CHECKS + "\n\n" + CALENDAR_TIME_CHECKS + "\n\n" + ROOM_REGISTRY_SAVE_CHECKS + "\n\n" + PLAYER_SAVE_PARITY_CHECKS + "\n\n" + TAVERN_HELP_FLOW_CHECKS + "\n\n" + MEDIA_RESOLUTION_CHECKS + "\n\n" + HARASSMENT_IMAGE_CHECKS + "\n\n" + GIRL_OBJECT_RUNTIME_CHECKS + "\n\n" + ACTUAL_ACTION_BUTTON_CLICK_CHECKS + "\n\n" + ACTUAL_RANDOM_TOWN_CLICK_CHECKS + "\n\n" + TARGETED_CURRENT_BUG_CHECKS + "\n\n" + DEBUG_BUILDER_ROOM_CHECKS + "\n\n" + REGRESSION_RESTORE_CHECKS + "\n\n" + AMANDA_ROOM_NIGHT_EVENT_CHECKS + "\n\n" + MY_ROOM_RECIPE_BOOK_ACTION_CHECKS + "\n\n" + MY_ROOM_WINDOW_ACTION_CHECKS + "\n\n" + TAVERN_ROOM_PICTURE_STATE_CHECKS + "\n\n" + MELISSA_BATS_DRAWINGS_CHECKS + "\n\n" + MELISSA_WERECAT_FOREST_ACTION_CHECKS + "\n\n" + CHURCH_LINK_CHECKS + "\n\n" + CHURCH_AFTER_SERMON_EVENT_CHECKS + "\n\n" + CLARA_MELISSA_TAVERN_BAR_GOSSIP_CHECKS + "\n\n" + FRIDAY_DANCE_AMANDA_CHECKS + "\n\n" + SANDRA_NIGHT_THANKS_CHECKS + "\n\n" + MELISSA_SEX_ENGINE_CHECKS + "\n\n" + AMANDA_SEX_ENGINE_CHECKS + "\n\n" + PLAYER_INTIMACY_STATE_CHECKS + "\n\n" + CLARA_AMANDA_SCHEDULE_FLOW_CHECKS + "\n\n" + HOUSEHOLD_AI_EVENT_CHECKS + "\n\n" + all_room_action_click_checks + "\n\n" + BECKY_HOME_GUEST_CHECKS
 
 
 def project_root() -> Path:
@@ -8810,6 +8883,10 @@ def main() -> int:
             "external_amanda_daily_talk_actions",
             "external_sandra_talk_opens_from_npc_button",
             "external_sandra_pending_soap_request_can_be_fulfilled",
+            "external_breakfast_finish_resumed_stays_in_kitchen",
+            "external_sandra_weekly_visit_arms_after_monday_midnight",
+            "external_adopted_werecat_roams_with_name_and_menu",
+            "external_rat_food_loss_is_visible_in_report",
             "external_sandra_weekly_thread_progression",
             "external_sandra_night_thanks_hours_work",
             "external_melissa_courtship_is_slow_and_daily",
@@ -8999,6 +9076,10 @@ def main() -> int:
             "external_amanda_daily_talk_actions",
             "external_sandra_talk_opens_from_npc_button",
             "external_sandra_pending_soap_request_can_be_fulfilled",
+            "external_breakfast_finish_resumed_stays_in_kitchen",
+            "external_sandra_weekly_visit_arms_after_monday_midnight",
+            "external_adopted_werecat_roams_with_name_and_menu",
+            "external_rat_food_loss_is_visible_in_report",
             "external_sandra_weekly_thread_progression",
             "external_sandra_night_thanks_hours_work",
             "external_melissa_courtship_is_slow_and_daily",

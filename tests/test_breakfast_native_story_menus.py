@@ -67,6 +67,20 @@ def test_breakfast_entry_shows_one_paragraph_per_continue_beat():
     assert 'player.tavern_management.breakfast.base_text = str(scene_runtime.text or "")' in entry
 
 
+def test_finishing_resumed_breakfast_reenters_the_kitchen_room():
+    source = SOURCE.read_text(encoding="utf-8-sig")
+    menu = _label_block(
+        source,
+        "TavernKitchenBreakfastMenu:",
+        "TavernKitchenBreakfastShowText",
+    )
+    finish = menu.split('"Закончить завтрак":', 1)[1]
+
+    assert "call TavernKitchenFinishBreakfastEvent" in finish
+    assert "jump TavernKitchen" in finish
+    assert "return" not in finish
+
+
 def test_melissa_amanda_breakfast_story_replaces_each_paragraph_in_main_ui():
     source = SOURCE.read_text(encoding="utf-8-sig")
     opening = _label_block(

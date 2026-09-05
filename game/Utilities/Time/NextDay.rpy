@@ -41,7 +41,7 @@ label NextDay(retlocname, timepassed):
             'whorerevenue': 0, 'gloryholerevenue': 0, 'loyalty': 0,
             'revenue': 0, 'dineout': 0, 'fixedcost': 0, 'KidsMoney': 0,
             'visitors': 0, 'wine': 0, 'products': 0, 'HorseFood': 0,
-            'HorseStolen': False, 'fameaten': 0, 'happy': 0
+            'HorseStolen': False, 'fameaten': 0, 'rat_food_loss': 0, 'happy': 0
         }
         TotalWhoreClients = {'georgett': 0, 'liza': 0}
         TotalGloryHoleClients = {'georgett': 0, 'liza': 0}
@@ -167,6 +167,9 @@ label NextDay(retlocname, timepassed):
                 _nextday_lines.append("%s Пока же он был с вами, он успел сожрать сена на %s мараведи." % (TotalDay['HorseStolen'], TotalDay['HorseFood']))
 
         _nextday_lines.append("Также %s мешка продуктов съели вы и ваши домочадцы." % DispFrac(TotalDay['fameaten']))
+
+        if TotalDay['rat_food_loss'] > 0:
+            _nextday_lines.append("Крысы испортили еще %s мешка припасов." % DispFrac(TotalDay['rat_food_loss']))
 
         if TotalDay['dineout'] > 0:
             _nextday_lines.append("Однако вам не хватило запаса продуктов и вы вынужденны были кушать у конкурентов, потратив на это %s мараведи. Люди обратили внимание на то, что вы предпочитаете не есть собственную еду и рассказали об этом своим знакомым." % TotalDay['dineout'])

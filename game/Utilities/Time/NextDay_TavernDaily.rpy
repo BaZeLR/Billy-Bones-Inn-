@@ -52,17 +52,9 @@ label NextDay_TavernDaily():
         player.tavern_management.productnum -= CurDay['fameaten']
         _rat_food_loss_due_day = int(werecat_state().get('rat_food_loss_next_day', -1) or -1)
         if int(werecat_state().get('rats_problem_active', 0) or 0) == 1 and _rat_food_loss_due_day >= 0 and int(current_game_day()) >= _rat_food_loss_due_day:
-            CurDay['rat_food_loss'] = min(3, int(player.tavern_management.productnum or 0))
+            CurDay['rat_food_loss'] = min(30, int(player.tavern_management.productnum or 0))
             player.tavern_management.productnum = max(0, int(player.tavern_management.productnum or 0) - CurDay['rat_food_loss'])
             werecat_state()['rat_food_loss_next_day'] = int(current_game_day()) + 7
-            if CurDay['rat_food_loss'] == 1:
-                ExtraEvents += '{b}Крысы снова добрались до кладовой и испортили 1 мешок припасов.{/b}\n'
-            elif CurDay['rat_food_loss'] == 2:
-                ExtraEvents += '{b}Крысы снова добрались до кладовой и испортили 2 мешка припасов.{/b}\n'
-            elif CurDay['rat_food_loss'] >= 3:
-                ExtraEvents += '{b}Крысы снова добрались до кладовой и испортили 3 мешка припасов.{/b}\n'
-            else:
-                ExtraEvents += '{b}Крысы опять шуршали в кладовой, но брать там уже почти нечего.{/b}\n'
         CurDay['fixedcost'] = household.member_count() * 1 + 10
         # Service level effects
         if CurDay['happy'] >= 0:
@@ -91,6 +83,7 @@ label NextDay_TavernDaily():
         TotalDay['visitors'] += CurDay['visitors']
         TotalDay['wine'] += CurDay['wine']
         TotalDay['products'] += CurDay['products']
+        TotalDay['rat_food_loss'] += CurDay['rat_food_loss']
         TotalDay['revenue'] += CurDay['revenue']
         TotalDay['fameaten'] += CurDay['fameaten']
         TotalDay['dineout'] += CurDay['dineout']

@@ -1200,7 +1200,7 @@ label TavernKitchenBreakfastMenu:
 
             "Закончить завтрак":
                 call TavernKitchenFinishBreakfastEvent
-                return
+                jump TavernKitchen
 
 
 label TavernKitchenBreakfastShowText(text=""):

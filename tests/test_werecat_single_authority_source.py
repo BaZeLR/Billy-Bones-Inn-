@@ -88,3 +88,23 @@ def test_werecat_roaming_has_one_daily_schedule_definition():
     assert "WERECAT_ROAM_CONDITIONS" not in source
     assert "def werecat_roam_location(" not in source
     assert "def werecat_schedule_" not in source
+
+
+def test_adopted_werecat_has_one_nickname_and_native_interaction_menu():
+    owner = (ROOT / "game/NPC/Secondary/WerecatNPC.rpy").read_text(
+        encoding="utf-8-sig"
+    )
+    quest = (ROOT / "game/NPC/Secondary/MelissaWerecatQuest.rpy").read_text(
+        encoding="utf-8-sig"
+    )
+    interaction = owner.split('label IntWerecatTalk(room_code=""):', 1)[1].split(
+        "label ShowWerecatCard", 1
+    )[0]
+
+    assert 'werecat_state()["name"] = "Луна"' in quest
+    assert 'fullname="Луна"' in owner
+    assert 'talk_label = "IntWerecatTalk"' in owner
+    assert '"Погладить кошку"' in interaction
+    assert '"Дать молока"' in interaction
+    assert '"Поиграть с кошкой"' in interaction
+    assert '"Закончить разговор"' in interaction

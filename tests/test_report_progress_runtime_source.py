@@ -34,7 +34,13 @@ def test_reports_and_progress_have_aggregate_runtime_owners():
     assert "$ CurDay = next_day_runtime.current_day" in runtime
     breakfast = (ROOT / "game/Inn/TavernKitchenBreakfast.rpy").read_text(encoding="utf-8-sig")
     next_day = (ROOT / "game/Utilities/Time/NextDay_TavernDaily.rpy").read_text(encoding="utf-8-sig")
+    report = (ROOT / "game/Utilities/Time/NextDay.rpy").read_text(encoding="utf-8-sig")
     assert "CurDay['rat_food_loss']" in next_day
+    assert "min(30, int(player.tavern_management.productnum or 0))" in next_day
+    assert "TotalDay['rat_food_loss'] += CurDay['rat_food_loss']" in next_day
+    assert "'rat_food_loss': 0" in report
+    assert 'Крысы испортили еще %s мешка припасов.' in report
+    assert "Крысы снова добрались" not in next_day
     assert 'next_day_runtime.current_day.get("rat_food_loss", 0)' not in breakfast
     assert 'werecat_state().get("rats_problem_active", 0)' in breakfast
     assert "class TractirProgressRuntimeState" in runtime

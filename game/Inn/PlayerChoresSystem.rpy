@@ -322,6 +322,8 @@ init -45 python:
 
         week_value = _pc_to_int(week_now, 1)
         time_value = _pc_to_int(time_now, 0)
+        hour_value = _pc_to_int(hour_now, 0)
+        finishing_sunday_after_midnight = hour_now is not None and week_value == 1 and 0 <= hour_value < 6
         stamp = "%s:%s:%s:%s" % (
             _pc_to_int(year_now, 1100),
             _pc_to_int(month_now, 1),
@@ -341,9 +343,9 @@ init -45 python:
             "rebel": next_rebel,
         }
 
-        if week_value != 7:
+        if week_value != 7 and not finishing_sunday_after_midnight:
             return preview
-        if time_value < 3:
+        if week_value == 7 and time_value < 3:
             return preview
         if str(last_stamp or "") == stamp:
             return preview

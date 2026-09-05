@@ -1,4 +1,5 @@
 import json
+import textwrap
 from pathlib import Path
 
 
@@ -33,6 +34,42 @@ def test_sandra_uses_data_info_runtime_shape():
     assert "default Sandra = SandraInfo()" in source
     assert "people.register(SandraStaticData, Sandra)" in source
     assert "register_sandra_runtime" not in source
+
+
+def test_weekly_evaluation_accepts_sunday_finished_just_after_midnight():
+    source = PLAYER_CHORES.read_text(encoding="utf-8-sig")
+    body = source.split("    def weekly_chores_evaluation_preview(", 1)[1].split(
+        "    def evaluate_weekly_chores_and_rewards", 1
+    )[0]
+    namespace = {
+        "PLAYER_CHORE_KEYS": ("a", "b", "c", "d", "e", "f"),
+        "PLAYER_CORE_OTHER_GIRLS": ("melissa", "amanda"),
+        "_pc_to_int": lambda value, fallback=0: int(value),
+        "player_chore_target": lambda key: 1,
+    }
+    exec(textwrap.dedent("def weekly_chores_evaluation_preview(" + body), namespace)
+    preview = namespace["weekly_chores_evaluation_preview"](
+        week_now=1,
+        time_now=7,
+        hour_now=1,
+        year_now=1100,
+        month_now=1,
+        day_now=8,
+        chores_state={key: 1 for key in namespace["PLAYER_CHORE_KEYS"]},
+    )
+    next_morning = namespace["weekly_chores_evaluation_preview"](
+        week_now=1,
+        time_now=0,
+        hour_now=6,
+        year_now=1100,
+        month_now=1,
+        day_now=8,
+        chores_state={key: 1 for key in namespace["PLAYER_CHORE_KEYS"]},
+    )
+
+    assert preview["applied"]
+    assert preview["chore_score"] == 6
+    assert not next_morning["applied"]
 
 
 def test_sandra_data_keeps_only_immutable_identity_references():
