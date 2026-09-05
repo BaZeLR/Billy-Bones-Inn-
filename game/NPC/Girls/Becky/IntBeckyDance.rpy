@@ -39,7 +39,7 @@ label int_becky_dance():
                 "Вы подошли к веселой вдовушке и начали сыпать шутками и прибаутками, веселя ее. За разговором незаметно пролетело время."
                 if Becky.rel >= 7:
                     "Вы подумали, что зря тратите время. Ничего нового вы не узнали, а Бекки и так знает, что вы шутник хоть куда."
-                elif procedural_randint(1, 3, "becky_dance_talk_%s" % int(current_game_day() or 0)) == 1:
+                elif procedural_randint(1, 3, "becky_dance_talk_%s_%s" % (int(current_game_day() or 0), rooms.get("FridayDance").dance_count)) == 1:
                     $ Becky.add_relation(1, cap=100)
                     "Вы очень развеселили Бекки своими шутками!"
                 $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step

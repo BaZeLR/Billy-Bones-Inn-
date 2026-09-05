@@ -48,12 +48,17 @@ def test_becky_friday_dance_uses_thread_event_and_object_state():
     assert '$ rooms.get(\"FridayDance\").dance_count = 5' in dance
     assert 'rooms.get(\"FridayDance\").becky_home_invited' in dance
     assert 'call BeckyInviteHome("becky")' in dance
+    assert '"becky_dance_talk_%s_%s"' in dance
+    assert 'roll_context = "%s_dance_%s_%s"' in init
+    assert 'people_to_int(dance_room.dance_count, 0)' in init
+    assert 'people_to_int(dance_room.step, 0)' in init
     assert "BeckyVar" not in dance
     assert "ensure_story_defaults" not in dance
     assert "sync_from_becky_maps" not in dance
     assert "sync_becky_maps" not in dance
 
     assert 'rooms.get(\"FridayDance\").becky_home_invited = True' in invite
+    assert '"becky_dance_home_invite_%s_%s_%s"' in invite
     assert "player.appearance" not in invite
     assert "charisma" not in invite
     assert "danceinvitehome" not in dance

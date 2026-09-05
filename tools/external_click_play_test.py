@@ -5216,13 +5216,30 @@ testcase external_friday_becky_inner_actions_do_not_spend_extra_dances:
     $ rooms.get("FridayDance").step = 1
     $ player.tavern_management.dance_sponsor = 0
     $ rooms.get("FridayDance").state["becky_home_invited"] = False
-    $ Becky.rel = 0
+    $ Becky.rel = 2
     $ Becky.corruption = 0
     run Call("int_becky_dance")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 560) until screen "choice" timeout 20.0
     assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1 and int(rooms.get("FridayDance").step or 0) == 6) timeout 5.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 0) timeout 20.0
+    $ rooms.get("FridayDance").dance_count = 2
+    $ rooms.get("FridayDance").step = 1
+    run Call("int_becky_dance")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 0) timeout 20.0
+    $ rooms.get("FridayDance").dance_count = 3
+    $ rooms.get("FridayDance").step = 1
+    run Call("int_becky_dance")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    assert eval (int(Becky.rel or 0) == 3 and int(rooms.get("FridayDance").dance_count or 0) == 3) timeout 5.0
 '''
 
 BECKY_HOME_GUEST_CHECKS = r'''
@@ -7290,13 +7307,15 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     assert eval (str(people.location("becky") or "") == "GroceryStore" and renpy.get_displayable("main_ui", "main_ui_entity_button_npc_becky") is not None) timeout 5.0
     click id "main_ui_entity_button_npc_becky" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (str(scene_runtime.picture or "") in [grocery_store_becky_picture(False), grocery_store_becky_picture(True)]) timeout 5.0
-    $ Becky.rel = 0
+    $ Becky.rel = 2
     $ Becky.talked_today = 0
     $ _becky_smalltalk_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Поболтать со вдовой Блэнкеншип о разной фигне")
     $ _becky_smalltalk_button_id = "choice_panel_button_%d" % int(_becky_smalltalk_index)
     click id _becky_smalltalk_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
-    assert eval (int(Becky.rel or 0) == 1 and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+    click id _becky_smalltalk_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (int(Becky.rel or 0) == 3 and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
     assert eval ("занята работой" not in str(scene_runtime.text or "")) timeout 5.0
     $ Becky.talked_today = 0
     $ Becky.georgett_mentioned = True

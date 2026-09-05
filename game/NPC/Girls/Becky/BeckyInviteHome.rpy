@@ -6,7 +6,7 @@
 # All logic, conditions, and dev notes preserved.
 
 label BeckyInviteHome(girl_name="becky"):
-    if Becky.rel >= 10 and Becky.corruption > 20 and int(rooms.get("FridayDance").step or 0) >= 3 and int(rooms.get("FridayDance").step or 0) < int(rooms.get("FridayDance").max_step or 0) and not bool(rooms.get("FridayDance").becky_home_invited) and procedural_randint(1, 5, "becky_dance_home_invite_%s_%s" % (current_game_day(), rooms.get("FridayDance").step)) == 1:
+    if Becky.rel >= 10 and Becky.corruption > 20 and int(rooms.get("FridayDance").step or 0) >= 3 and int(rooms.get("FridayDance").step or 0) < int(rooms.get("FridayDance").max_step or 0) and not bool(rooms.get("FridayDance").becky_home_invited) and procedural_randint(1, 5, "becky_dance_home_invite_%s_%s_%s" % (current_game_day(), rooms.get("FridayDance").dance_count, rooms.get("FridayDance").step)) == 1:
         if int(threads["beckyHome"].num or 0) > 0 and Becky.stats.get("sexacts", 0) > 0 and Becky.corruption > 48:
             "Стефан, милый, чем нам здесь танцевать, пойдем-ка лучше ко мне, я уже вся теку!" # развратная вдовушка
         elif int(threads["beckyHome"].num or 0) > 0 and Becky.stats.get("sexacts", 0) > 0:

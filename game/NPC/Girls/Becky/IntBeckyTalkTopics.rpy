@@ -11,7 +11,7 @@ label _int_becky_talk_smalltalk(girl_name="becky", _becky_busy_text=""):
         $ scene_runtime.location_text = scene_runtime.text
         return
     "Вы некоторое время болтаете со вдовой Блэнкеншип о несущественных вещах."
-    if Becky.talk_count() <= 2 and renpy.random.randint(1, 2) == 1 and Becky.rel < 3:
+    if Becky.talk_count() <= 2 and procedural_randint(1, 2, "%s_becky_smalltalk_%s" % (Becky.talk_count(), current_game_day())) == 1 and Becky.rel < 3:
         "Вы немного сдружились с Бекки."
         $ Becky.add_relation(1, 3)
     if Becky.talk_count() > 2:
@@ -27,7 +27,7 @@ label _int_becky_talk_personal(girl_name="becky", _becky_busy_text=""):
         $ scene_runtime.location_text = scene_runtime.text
         return
     "Вы некоторое время болтаете с Бекки Блэнкеншип о том, как ей живется без мужа."
-    if Becky.talk_count() <= 2 and renpy.random.randint(1, 2) == 1 and Becky.rel <= 5:
+    if Becky.talk_count() <= 2 and procedural_randint(1, 2, "%s_becky_personal_%s" % (Becky.talk_count(), current_game_day())) == 1 and Becky.rel <= 5:
         "Вдова несколько раз заинтересованно поглядывает на вас."
         $ Becky.add_relation(1, 6)
     if Becky.talk_count() > 2:

@@ -178,25 +178,33 @@ init python:
             positive_friend_chance = social_friend_roll_chance(friend_chance, self.code_name, True)
             negative_friend_chance = social_friend_roll_chance(friend_chance, self.code_name, False)
             corruption_roll_chance = max(1, people_to_int(corruption_chance, 1))
+            roll_context = "%s" % people_to_int(current_game_day(), 0)
+            if str(rooms.current_code or "") == "FridayDance":
+                dance_room = rooms.get("FridayDance")
+                roll_context = "%s_dance_%s_%s" % (
+                    people_to_int(current_game_day(), 0),
+                    people_to_int(dance_room.dance_count, 0),
+                    people_to_int(dance_room.step, 0),
+                )
             roll_index = 0
             while friend_delta < 0:
                 roll_index += 1
-                if people_to_int(self.rel, 0) > people_to_int(limit_friend, 0) and procedural_randint(1, negative_friend_chance, "becky_social_friend_down_%s_%s" % (people_to_int(current_game_day(), 0), roll_index)) == 1:
+                if people_to_int(self.rel, 0) > people_to_int(limit_friend, 0) and procedural_randint(1, negative_friend_chance, "becky_social_friend_down_%s_%s" % (roll_context, roll_index)) == 1:
                     self.add_relation(-1, cap=100)
                 friend_delta += 1
             while friend_delta > 0:
                 roll_index += 1
-                if people_to_int(self.rel, 0) < people_to_int(limit_friend, 0) and procedural_randint(1, positive_friend_chance, "becky_social_friend_up_%s_%s" % (people_to_int(current_game_day(), 0), roll_index)) == 1:
+                if people_to_int(self.rel, 0) < people_to_int(limit_friend, 0) and procedural_randint(1, positive_friend_chance, "becky_social_friend_up_%s_%s" % (roll_context, roll_index)) == 1:
                     self.add_relation(1, cap=100)
                 friend_delta -= 1
             while corruption_delta < 0:
                 roll_index += 1
-                if people_to_int(self.corruption, 0) > people_to_int(limit_corruption, 0) and procedural_randint(1, corruption_roll_chance, "becky_social_corruption_down_%s_%s" % (people_to_int(current_game_day(), 0), roll_index)) == 1:
+                if people_to_int(self.corruption, 0) > people_to_int(limit_corruption, 0) and procedural_randint(1, corruption_roll_chance, "becky_social_corruption_down_%s_%s" % (roll_context, roll_index)) == 1:
                     self.add_corruption(-1)
                 corruption_delta += 1
             while corruption_delta > 0:
                 roll_index += 1
-                if people_to_int(self.corruption, 0) < people_to_int(limit_corruption, 0) and procedural_randint(1, corruption_roll_chance, "becky_social_corruption_up_%s_%s" % (people_to_int(current_game_day(), 0), roll_index)) == 1:
+                if people_to_int(self.corruption, 0) < people_to_int(limit_corruption, 0) and procedural_randint(1, corruption_roll_chance, "becky_social_corruption_up_%s_%s" % (roll_context, roll_index)) == 1:
                     self.add_corruption(1)
                 corruption_delta -= 1
             return self
