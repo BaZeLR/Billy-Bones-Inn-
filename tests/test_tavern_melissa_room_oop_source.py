@@ -18,8 +18,8 @@ def test_melissa_room_preserves_actions_events_objects_and_exits():
     assert 'household_room_issue_action_specs("melissa")' in ROOM
     assert 'Call("DoChore", "clean_upstairs_rooms", "TavernMelissaRoom", "", "")' in ROOM
     assert 'Call("UpstairsRoomSearch", "TavernMelissaRoom")' in ROOM
-    assert 'story_event_available("TavernMelissaRoom", "clara_room_visit")' in ROOM
-    assert 'story_event_available("TavernMelissaRoom", "clara_paintings")' in ROOM
+    assert "Прислушаться к Клариссе и Мелиссе" not in ROOM
+    assert "Выслушать Клариссу и Мелиссу" not in ROOM
     assert "rooms.get(\"TavernMelissaRoom\").visible_game_items()" in ROOM
     assert "rooms.get(\"TavernMelissaRoom\").visible_exits()" in ROOM
     assert EVENTS.count("tavern_melissa_room_action_items()") == 3

@@ -9,16 +9,20 @@ def test_tavern_main_closed_state_uses_clock_hours_not_day_slot():
 
     assert "def tavern_main_late_closed()" in source
     assert "current_hour >= 23 or current_hour < 6" in source
-    assert "def tavern_main_sunday_service_closed()" in source
+    assert "def tavern_main_sunday_closed()" in source
     assert "return int(calendar_v2.week or 0) == 7" in source
-    assert "return int(calendar_v2.week or 0) != 7 and not tavern_main_late_closed()" in source
+    player_source = (PROJECT_ROOT / "game" / "Utilities" / "General" / "Player" / "Player.rpy").read_text(encoding="utf-8-sig")
+    open_state = player_source.split("def isTavernOpen(self):", 1)[1].split("class PlayerHorse", 1)[0]
+    assert "weekday == 7" in open_state
+    assert "weekday == 5 and (18 * 60) <= clock < (22 * 60)" in open_state
+    assert "(12 * 60) <= clock <= ((20 * 60) + 30)" in open_state
     assert "def tavern_main_friday_dance_closed()" in source
     assert "18 <= int(calendar_v2.hour or 0) < 22" in source
     assert 'state["closed_text"]' not in source
     assert 'closed_text = tavern_main_closed_text()' in source
     assert "elif time > 3" not in source
     assert "time_slots=[0, 1, 2, 3, 4]" not in source
-    assert 'start="06:00", end="22:59"' in source
+    assert "schedule=None" in source
 
 
 def test_tavern_preopening_is_before_noon_by_clock():

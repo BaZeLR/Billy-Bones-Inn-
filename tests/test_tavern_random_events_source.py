@@ -26,22 +26,21 @@ def test_tavern_random_events_are_wired_to_thread_runtime():
     runtime = read_rel("game/Utilities/General/Classes/StoryEventRuntime.rpy")
     tavern = read_rel("game/Inn/TavernRandomEvents.rpy")
     main = read_rel("game/Inn/TavernMain.rpy")
-    bar = read_rel("game/Inn/TavernMainBar001.rpy")
     events = read_rel("game/Utilities/General/Events/events.rpy")
 
     assert "define tavernThreadList = [" in runtime
     assert 'RThreadData(0, "tavern", "WorkRandomEvents"' in runtime
     assert '"TavernWorkEventTrigger"' in runtime
-    assert '"TavernMain"' in runtime and '"tavern_work"' in runtime
+    assert '"TavernMain"' in runtime and '"enter"' in runtime
     assert "+ tavernThreadList" in runtime
     assert "def tavern_work_planned_for" in tavern
     assert "label TavernWorkEventTrigger:" in tavern
-    assert "tavern_work_planned_for('', rooms.current_code, calendar_v2.time_slot())" in runtime
+    assert "tavern_work_planned_for('', 'TavernMain', calendar_v2.time_slot())" in runtime
     assert runtime.count('"TavernWorkEventTrigger", None, None, None') == 1
     assert 'call checkTriggers("TavernMain", "tavern_work", 0)' not in main
-    assert 'call checkTriggers("TavernMain", "tavern_work", 0)' in bar
     assert 'self.repeatable = bool(evt[11]) if len(evt) > 11 else False' in events
-    assert '"tavern_work",\n            200,\n            True,' in runtime
+    assert '"enter",\n            200,\n            True,' in runtime
+    assert 'call RoomEnterEventGate(rooms.current_code, False)' in main
     assert "call DisplayTavernEventShort(time, 1)" not in main
 
 
@@ -74,10 +73,20 @@ def test_tavern_daily_plan_schedules_two_harassments_per_authored_job():
     assert harassment_catalog.count('required_job="jobcleaning"') == 1
 
 
+def test_sunday_daily_plan_is_empty_and_cannot_reach_the_next_report():
+    source = read_rel("game/Inn/TavernRandomEvents.rpy")
+    plan = source.split("def tavern_work_build_daily_plan():", 1)[1].split("def tavern_work_pending_mandatory_code", 1)[0]
+
+    assert "event_runtime.tavern_work_plan_day = current_day" in plan
+    assert "if tavern_work_int(calendar_v2.week, 0) == 7:" in plan
+    assert "return []" in plan
+
+
 def test_tavern_work_events_respect_open_work_phase_and_present_assigned_staff():
     source = read_rel("game/Inn/TavernRandomEvents.rpy")
 
     assert 'periods=(2, 3, 4)' in source
+    assert "if not player.tavern_management.isTavernOpen:" in source
     assert 'play_condition=tavern_work_melissa_waitress_fall_playable' in source
     assert 'str(people.location("melissa") or "") == "TavernMain"' in source
     assert "event_def.can_play(loc_key)" in source

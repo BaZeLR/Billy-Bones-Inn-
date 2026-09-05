@@ -6,7 +6,7 @@ init 6 python:
         return int(player.tavern_management.client_room_hole or 0) > 0
 
     def tavern_empty_room_peephole_has_client():
-        if tavern_main_closed_text() != "" or int(player.tavern_management.client_room_hole or 0) <= 0:
+        if not player.tavern_management.isTavernOpen or int(player.tavern_management.client_room_hole or 0) <= 0:
             return False
         girl_name = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
         if girl_name == "georgett":

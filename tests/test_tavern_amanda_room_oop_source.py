@@ -79,8 +79,6 @@ def test_amanda_sleep_dress_is_one_scene_local_value_across_the_authored_call_ch
 
 def test_amanda_room_preserves_events_issues_search_objects_and_exits():
     for token in (
-        'story_event_available("TavernAmandaRoom", "amanda_morning_window")',
-        'Call("checkTriggers", "TavernAmandaRoom", "amanda_morning_window", 0)',
         'household_room_issue_action_specs("amanda")',
         'Call("DoChore", "clean_upstairs_rooms", "TavernAmandaRoom", "", "")',
         'Call("UpstairsRoomSearch", "TavernAmandaRoom")',
@@ -93,6 +91,7 @@ def test_amanda_room_preserves_events_issues_search_objects_and_exits():
         assert token in SOURCE
 
     action_builder = SOURCE.split("def tavern_amanda_room_action_items():", 1)[1].split("label TavernAmandaRoom:", 1)[0]
+    assert "Поймать Аманду у окна" not in action_builder
     assert 'Call("checkTriggers", "TavernAmandaRoom", "melissa_bats", 0)' not in action_builder
     assert "TavernAmandaRoomGropeAction" not in SOURCE
 

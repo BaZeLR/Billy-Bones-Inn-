@@ -47,10 +47,6 @@ init 6 python:
         if tavern_upstairs_can_clean_rooms():
             items.append(MenuItem("Прибрать комнату", Call("DoChore", "clean_upstairs_rooms", "TavernMelissaRoom", "", "")))
         items.append(MenuItem("Осмотреть комнату получше", Call("UpstairsRoomSearch", "TavernMelissaRoom")))
-        if story_event_available("TavernMelissaRoom", "clara_room_visit"):
-            items.append(MenuItem("Прислушаться к Клариссе и Мелиссе", Call("checkTriggers", "TavernMelissaRoom", "clara_room_visit", 0)))
-        if story_event_available("TavernMelissaRoom", "clara_paintings"):
-            items.append(MenuItem("Выслушать Клариссу и Мелиссу", Call("checkTriggers", "TavernMelissaRoom", "clara_paintings", 0)))
         for room_object in rooms.get("TavernMelissaRoom").visible_game_items():
             items.append(MenuItem(room_object.name, Call("TavernMelissaRoomObjectMenu", room_object.object_id)))
         for room_exit in rooms.get("TavernMelissaRoom").visible_exits():

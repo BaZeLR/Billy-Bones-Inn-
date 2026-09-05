@@ -1750,22 +1750,24 @@ label TavernKitchenFinishBreakfastEvent:
 label TavernKitchenSundayDinnerMenu:
     if not tavern_sunday_dinner_available():
         $ main_ui_runtime.action_items = tavern_kitchen_action_items()
-        return
+        return False
     if not tavern_sunday_dinner_can_serve_spicy_tincture():
         call TavernKitchenSundayDinner
-        return
+        return _return
+    $ main_ui_begin_native_scene_state("Воскресный обед")
+    $ scene_runtime.picture = tavern_kitchen_sunday_dinner_picture()
+    vscene scene_runtime.picture
+    show screen main_ui
+    $ scene_runtime.text = "Все уже собрались за воскресным столом. Осталось решить, подавать ли к обеду пряную настойку."
+    $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Воскресный обед"
         "Сесть за воскресный обед":
             call TavernKitchenSundayDinner(0)
-            return
+            return _return
         "Сесть за воскресный обед и подать пряную настойку":
             call TavernKitchenSundayDinner(1)
-            return
-        "Назад":
-            show screen main_ui
-            $ main_ui_runtime.action_items = tavern_kitchen_action_items()
-            return
+            return _return
 
 
 label TavernKitchenSundayDinner(serve_spicy=0):
@@ -1913,4 +1915,4 @@ label TavernKitchenSundayDinner(serve_spicy=0):
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = tavern_kitchen_action_items()
     show screen main_ui
-    return
+    return True

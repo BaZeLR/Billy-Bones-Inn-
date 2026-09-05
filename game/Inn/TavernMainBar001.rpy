@@ -2,14 +2,6 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
-    def tavern_bar_clara_melissa_gossip_available():
-        return (
-            str(rooms.current_code or "") == "TavernMain"
-            and str(people.location("clara") or "") == "TavernMain"
-            and str(people.location("melissa") or "") == "TavernMain"
-            and story_event_available("TavernMain", "clara_tavern_visit")
-        )
-
     def tavern_bar_invite_targets():
         targets = []
         clara_info = people.get_info("clara")
@@ -46,12 +38,6 @@ init python:
                 label="Позвать кого-нибудь выпить",
                 hook="call",
                 target="TavernMainBarInviteMenu",
-            ),
-            ObjectAction(
-                action_id="bar_random_event",
-                label="Задержаться у стойки в ожидании истории",
-                hook="call",
-                target="TavernMainBarListenEvent",
             ),
         ],
         carriable=False,
@@ -103,27 +89,5 @@ label TavernMainBarInviteApply(target_npc=""):
         $ scene_runtime.text = str(scene_runtime.text or "") + "\n\n" + str((_bar_effect or {}).get("text", "") or "")
     $ scene_runtime.location_text = scene_runtime.text
     call stat
-    call TavernMainObjectMenu("bar_001")
-    return
-
-
-label TavernMainBarListenEvent:
-    $ renpy.dynamic("_bar_events", "_bar_index")
-    if tavern_bar_clara_melissa_gossip_available():
-        call checkTriggers("TavernMain", "clara_tavern_visit", 0)
-        return
-    if tavern_work_planned_for("", "TavernMain", calendar_v2.time_slot()):
-        call checkTriggers("TavernMain", "tavern_work", 0)
-        call TavernMainObjectMenu("bar_001")
-        return
-    python:
-        _bar_events = [
-            "Вы задерживаетесь у стойки и ловите себя на мысли, что у бара всегда скапливаются самые удобные слухи: кто с кем поссорился, кто кому должен и у кого язык развязывается после второй кружки.",
-            "Пока вы стоите у стойки, трактир словно ненадолго становится центром всего околотка. Именно отсюда удобнее всего подмечать чужие привычки, обрывки разговоров и назревающие истории.",
-            "У барной стойки легче всего сделать вид, что вы просто заняты делом, и при этом слушать вполуха все, что происходит вокруг. Позже из таких мелочей наверняка будут рождаться новые события.",
-        ]
-        _bar_index = int(current_game_day() + int(calendar_v2.hour or 0) + int(calendar_v2.minute or 0)) % len(_bar_events)
-        scene_runtime.text = _bar_events[_bar_index]
-        scene_runtime.location_text = scene_runtime.text
     call TavernMainObjectMenu("bar_001")
     return

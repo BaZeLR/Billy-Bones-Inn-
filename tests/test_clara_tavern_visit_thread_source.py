@@ -31,8 +31,8 @@ def test_clara_tavern_visit_thread_is_clara_owned():
     assert '"story_clara_melissa_room_visit_1"' in source
     assert '"story_clara_melissa_room_visit_2"' in source
     assert '"story_clara_tavern_protection_lessons_6"' in source
-    assert '"TavernMain",\n            "clara_tavern_visit"' in source
-    assert '"TavernMelissaRoom",\n            "clara_room_visit"' in source
+    assert '"TavernMain",\n            "bar_001"' in source
+    assert '"TavernMelissaRoom",\n            "enter"' in source
     assert "melissaClaraOverheard" not in source
     assert '"melissa", "ClaraOverheard"' not in source
     assert "label story_clara_tavern_visit_bar_0:" not in source
@@ -94,20 +94,24 @@ def test_room_files_no_longer_own_clara_visit_state():
     tavern_main = read(TAVERN_MAIN)
     tavern_bar = read(TAVERN_BAR)
     melissa_room = read(MELISSA_ROOM)
+    upstairs = read(PROJECT_ROOT / "game" / "Inn" / "TavernUpstairs.rpy")
 
     assert "def tavern_main_register_clara_melissa_visit" not in tavern_main
     assert "tavern_melissa_visit_count" not in tavern_main
     assert "story_event_available(\"TavernMain\", \"clara_tavern_visit\")" not in tavern_main
     assert "checkTriggers\", \"TavernMain\", \"clara_tavern_visit\"" not in tavern_main
-    assert "story_event_available(\"TavernMain\", \"clara_tavern_visit\")" in tavern_bar
-    assert "checkTriggers(\"TavernMain\", \"clara_tavern_visit\", 0)" in tavern_bar
+    assert 'story_event_available("TavernMain", str(object_id or ""))' in tavern_main
+    assert 'checkTriggers("TavernMain", str(object_id or ""), 0)' in tavern_main
+    assert "TavernMainBarListenEvent" not in tavern_bar
+    assert "bar_random_event" not in tavern_bar
 
     assert "tavern_melissa_room_clara_scene_paths" not in melissa_room
     assert "tavern_melissa_room_clara_visit_active" not in melissa_room
     assert "tavern_melissa_room_locked_from_inside" not in melissa_room
     assert "tavern_melissa_room_register_clara_visit" not in melissa_room
-    assert "story_event_available(\"TavernMelissaRoom\", \"clara_room_visit\")" in melissa_room
-    assert "checkTriggers\", \"TavernMelissaRoom\", \"clara_room_visit\"" in melissa_room
+    assert "Прислушаться к Клариссе и Мелиссе" not in melissa_room
+    assert "Выслушать Клариссу и Мелиссу" not in melissa_room
+    assert 'story_event_available("TavernMelissaRoom", "enter")' in upstairs
 
 
 def test_clara_thread_stage_replaces_visit_boolean_mirrors():

@@ -374,9 +374,14 @@ testcase external_tavern_sunday_dinner_schedule_and_stats:
 
     $ external_calendar_set_fields(7, 1, 1100, 12, 30)
     assert eval (tavern_sunday_dinner_available()) timeout 5.0
+    assert eval (not player.tavern_management.isTavernOpen and rooms.get("TavernMain").is_open()) timeout 5.0
     assert eval (all(str(people.location(npc_id) or "") == "TavernKitchen" for npc_id in ("sandra", "melissa", "amanda"))) timeout 5.0
     assert eval (tavern_sunday_dinner_present_ids() == ["sandra", "melissa", "amanda"]) timeout 5.0
-    assert eval ("Сесть за воскресный обед" in [str(item.caption or "") for item in tavern_kitchen_action_items()]) timeout 5.0
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernKitchen", "enter")) timeout 5.0
+    assert eval ("Сесть за воскресный обед" not in [str(item.caption or "") for item in tavern_kitchen_action_items()]) timeout 5.0
+    $ tavern_work_build_daily_plan()
+    assert eval (event_runtime.tavern_work_events == []) timeout 5.0
 
     $ Sandra.rel = 12
     $ Melissa.rel = 12
@@ -388,7 +393,7 @@ testcase external_tavern_sunday_dinner_schedule_and_stats:
     $ _sunday_soap_before = int(player.item_count("soap_001") or 0)
     $ external_calendar_set_fields(7, 1, 1100, 13, 30)
     assert eval (tavern_sunday_dinner_available() and tavern_sunday_dinner_present_ids() == ["sandra", "melissa", "amanda"]) timeout 5.0
-    run Call("TavernKitchenSundayDinner", 0)
+    run Jump("TavernKitchen")
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
     assert eval ((Sandra.rel, Melissa.rel, Amanda.rel) == (12, 12, 12)) timeout 5.0
@@ -1633,8 +1638,8 @@ testcase external_amanda_liza_work_conversation_activates:
     $ event_runtime.tavern_report_rows = []
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    assert eval (story_event_available("TavernMain", "tavern_work") and str(event_runtime.available["TavernMain"]["tavern_work"].target or "") == "TavernWorkEventTrigger") timeout 5.0
-    run Call("TavernWorkEventTrigger")
+    assert eval (story_event_available("TavernMain", "enter") and str(event_runtime.available["TavernMain"]["enter"].target or "") == "TavernWorkEventTrigger") timeout 5.0
+    run Jump("TavernMain")
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Событие: Аманда и Лизетта") timeout 5.0
     assert eval ("lizatalk" in str(scene_runtime.picture or "") and len(list(event_runtime.tavern_work_events or [])) == 0) timeout 5.0
@@ -1665,14 +1670,6 @@ testcase external_tavern_random_event_plan_consumes_once:
     $ event_runtime.tavern_report_rows = []
     assert eval (tavern_work_codes_for_period(calendar_v2.time_slot(), False) == ["WaitressHarass"]) timeout 5.0
     run Jump("TavernMain")
-    advance until screen "main_ui" timeout 20.0
-    $ findAvailableEvents(True)
-    $ assert "TavernMain" in event_runtime.available and "tavern_work" in event_runtime.available["TavernMain"] and str(event_runtime.available["TavernMain"]["tavern_work"].target or "") == "TavernWorkEventTrigger", repr({"available": dict(event_runtime.available or {}), "planned": list(event_runtime.tavern_work_events or []), "waitresses": list(girls_by_job("jobwaitress", "TavernMain") or []), "room": rooms.current_code, "open": rooms.get("TavernMain").is_open(), "fired": list(event_runtime.fired_keys_today or [])})
-    run Call("TavernMainObjectMenu", "bar_001")
-    advance until screen "main_ui" timeout 20.0
-    $ _bar_event_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Задержаться у стойки в ожидании истории")
-    $ _bar_event_button = "choice_panel_button_%d" % int(_bar_event_index)
-    click id _bar_event_button pos (0.5, 0.5) until screen "choice" timeout 20.0
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.object_id or "") == "" and renpy.get_screen("say") is None and "Что вы будете делать?" in str(scene_runtime.text or "")) timeout 5.0
     assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Не обращать внимания", "Стоять и смотреть", "[_help_caption]"]) timeout 5.0
@@ -1688,17 +1685,14 @@ testcase external_tavern_random_event_plan_consumes_once:
     advance until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
     assert eval ("WaitressHarass" in list(event_runtime.tavern_played_today or [])) timeout 5.0
     assert eval (len(list(event_runtime.tavern_work_events or [])) == 1 and not tavern_work_has_period(calendar_v2.time_slot(), False)) timeout 5.0
-    assert eval (str(scene_runtime.picture or "") == "images/tavern/mainhall/bar_mainHall.png" and "Барная стойка" == str(main_ui_runtime.action_title or "")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == str(tavern_main_picture() or "") and "Действия в трактире" == str(main_ui_runtime.action_title or "")) timeout 5.0
 
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 16, 0)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    assert eval (story_event_available("TavernMain", "tavern_work")) timeout 5.0
-    run Call("TavernMainObjectMenu", "bar_001")
-    advance until screen "main_ui" timeout 20.0
-    $ _bar_event_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Задержаться у стойки в ожидании истории")
-    $ _bar_event_button = "choice_panel_button_%d" % int(_bar_event_index)
-    click id _bar_event_button pos (0.5, 0.5) until screen "choice" timeout 20.0
+    assert eval (story_event_available("TavernMain", "enter")) timeout 5.0
+    run Jump("TavernMain")
+    advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and "Что вы будете делать?" in str(scene_runtime.text or "")) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Промолчать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     $ _harass_silence_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Промолчать")
@@ -1728,7 +1722,7 @@ testcase external_melissa_waitress_fall_event_lifecycle:
     $ event_runtime.tavern_played_today = []
     $ event_runtime.tavern_report_rows = []
     $ findAvailableEvents(True)
-    assert eval (story_event_available("TavernMain", "tavern_work")) timeout 5.0
+    assert eval (story_event_available("TavernMain", "enter")) timeout 5.0
     run Jump("TavernMain")
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Подойти к Мелиссе"]) timeout 5.0
@@ -3043,8 +3037,8 @@ testcase external_amanda_morning_window_event_keeps_media_until_continue:
     $ event_runtime.fired_keys_today = []
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    assert eval (story_event_available("TavernAmandaRoom", "amanda_morning_window")) timeout 5.0
-    run Call("checkTriggers", "TavernAmandaRoom", "amanda_morning_window", 0)
+    assert eval (story_event_available("TavernAmandaRoom", "enter")) timeout 5.0
+    run Jump("TavernAmandaRoom")
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and "Аманда не спит" in str(scene_runtime.text or "")) timeout 5.0
     assert eval (str(scene_runtime.picture or "") == "images/amanda/Room/wakedress.jpg") timeout 5.0
@@ -3066,6 +3060,23 @@ testcase external_clara_room_schedule_and_friday_dance_restore:
     assert eval (str(people.location("clara") or "") == "TavernMelissaRoom" and str(people.location("melissa") or "") == "TavernMelissaRoom") timeout 5.0
     assert eval (str(people.schedule_state("clara").get("label", "") or "") == "melissa_room_visit") timeout 5.0
     assert eval (str(people.schedule_state("melissa").get("label", "") or "") == "clara_room_visit") timeout 5.0
+    $ relationship_calm("clara", 9)
+    $ Clara.rel = 9
+    $ threads["melissaBatProblem"].advanceTo(11, force_active=True)
+    $ Melissa.drawings_found = True
+    $ household.runtime_event_seen.clear()
+    $ event_runtime.fired_day = -1
+    $ event_runtime.fired_keys_today = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernMelissaRoom", "enter")) timeout 5.0
+    $ rooms.enter("TavernUpstairs")
+    assert eval ("Из-за запертой двери комнаты Мелиссы" in tavern_upstairs_description()) timeout 5.0
+    run Jump("TavernMelissaRoom")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.picture or "") == "images/clara/melissa Pillow fight.png") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and int(threads["claraTavernVisit"].num or 0) == 4) timeout 20.0
+    assert eval (str(rooms.current_code or "") == "TavernMelissaRoom" and str(main_ui_runtime.action_title or "") == "Комната Мелиссы") timeout 5.0
 
     $ external_calendar_set_weekday(5)
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 6, 0)
@@ -4300,6 +4311,9 @@ testcase external_clara_melissa_bar_gossip_click_fires_ready_dialog:
     $ event_runtime.evaluation_time = None
     $ initStoryEventRuntime(True)
     $ _clara_visit_day = external_position_clara_tavern_visit(104)
+    $ event_runtime.tavern_work_events = []
+    $ event_runtime.tavern_played_today = []
+    $ event_runtime.tavern_work_plan_day = current_game_day()
     $ findAvailableEvents(True)
 
     run Jump("TavernMain")
@@ -4307,20 +4321,18 @@ testcase external_clara_melissa_bar_gossip_click_fires_ready_dialog:
     assert eval (str(people.location("clara") or "") == "TavernMain" and str(people.location("melissa") or "") == "TavernMain") timeout 5.0
     $ _clara_visit_thread = threads.get("claraTavernVisit")
     $ _clara_visit_event = _clara_visit_thread.getevent(0) if _clara_visit_thread is not None else None
-    $ assert story_event_available("TavernMain", "clara_tavern_visit"), repr({"level": _story_relationship_level("clara"), "active": _clara_visit_thread.checkActive() if _clara_visit_thread is not None else None, "target": _clara_visit_thread.currentTarget() if _clara_visit_thread is not None else None, "checks": _clara_visit_event.auditChecks(_clara_visit_thread.day) if _clara_visit_event is not None else None, "available": dict(event_runtime.available or {})})
-    run Call("TavernMainObjectMenu", "bar_001")
-    advance until screen "main_ui" timeout 20.0
-    assert eval ("Задержаться у стойки в ожидании истории" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
-    $ _clara_visit_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Задержаться у стойки в ожидании истории")
-    $ _clara_visit_button_id = "choice_panel_button_%d" % int(_clara_visit_index)
+    $ assert story_event_available("TavernMain", "bar_001"), repr({"level": _story_relationship_level("clara"), "active": _clara_visit_thread.checkActive() if _clara_visit_thread is not None else None, "target": _clara_visit_thread.currentTarget() if _clara_visit_thread is not None else None, "checks": _clara_visit_event.auditChecks(_clara_visit_thread.day) if _clara_visit_event is not None else None, "available": dict(event_runtime.available or {})})
+    assert eval ("Задержаться у стойки в ожидании истории" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    $ _clara_bar_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Барная стойка")
+    $ _clara_bar_button_id = "choice_panel_button_%d" % int(_clara_bar_index)
     $ _clara_visit_origin_text = str(scene_runtime.text or "")
     $ _clara_visit_origin_picture = str(scene_runtime.picture or "")
-    click id _clara_visit_button_id pos (0.5, 0.5) until screen "choice" timeout 20.0
+    click id _clara_bar_button_id pos (0.5, 0.5) until screen "choice" timeout 20.0
     assert eval ('Мелисса, едва сдерживая смех' in str(scene_runtime.text or "")) timeout 5.0
     assert eval (str(scene_runtime.picture or "") == "images/clara/tavern_visit.png") timeout 5.0
     assert eval (int(threads["claraTavernVisit"].num or 0) == 0) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (int(threads["claraTavernVisit"].num or 0) == 1) timeout 20.0
-    assert eval (str(scene_runtime.text or "") == _clara_visit_origin_text and str(scene_runtime.picture or "") == _clara_visit_origin_picture) timeout 5.0
+    assert eval (str(scene_runtime.text or "") == _clara_visit_origin_text and str(scene_runtime.picture or "") == _clara_visit_origin_picture and str(main_ui_runtime.action_title or "") == "Действия в трактире") timeout 5.0
     assert eval (threads["claraTavernVisit"].currentTarget() == "story_clara_tavern_visit_bar_1") timeout 5.0
 
     $ threads["melissaBatProblem"].advanceTo(6, force_active=True)
@@ -4329,15 +4341,11 @@ testcase external_clara_melissa_bar_gossip_click_fires_ready_dialog:
     $ rooms.enter("TavernMain")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    assert eval (story_event_available("TavernMain", "clara_tavern_visit")) timeout 5.0
-    run Call("TavernMainObjectMenu", "bar_001")
-    advance until screen "main_ui" timeout 20.0
-    assert eval ("Задержаться у стойки в ожидании истории" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
-    $ _clara_visit_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Задержаться у стойки в ожидании истории")
-    $ _clara_visit_button_id = "choice_panel_button_%d" % int(_clara_visit_index)
+    assert eval (story_event_available("TavernMain", "bar_001")) timeout 5.0
     $ _clara_visit_origin_text = str(scene_runtime.text or "")
     $ _clara_visit_origin_picture = str(scene_runtime.picture or "")
-    click id _clara_visit_button_id pos (0.5, 0.5) until screen "choice" timeout 20.0
+    run Call("TavernMainObjectMenu", "bar_001")
+    advance until screen "choice" timeout 20.0
     assert eval ('Если б я была царица' in str(scene_runtime.text or "")) timeout 5.0
     assert eval (str(scene_runtime.picture or "") == "images/clara/tavern_visit_size.png") timeout 5.0
     assert eval (int(threads["claraTavernVisit"].num or 0) == 1) timeout 5.0
@@ -4351,14 +4359,11 @@ testcase external_clara_melissa_bar_gossip_click_fires_ready_dialog:
     $ rooms.enter("TavernMain")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    assert eval (story_event_available("TavernMain", "clara_tavern_visit")) timeout 5.0
-    run Call("TavernMainObjectMenu", "bar_001")
-    advance until screen "main_ui" timeout 20.0
-    $ _clara_visit_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Задержаться у стойки в ожидании истории")
-    $ _clara_visit_button_id = "choice_panel_button_%d" % int(_clara_visit_index)
+    assert eval (story_event_available("TavernMain", "bar_001")) timeout 5.0
     $ _clara_visit_origin_text = str(scene_runtime.text or "")
     $ _clara_visit_origin_picture = str(scene_runtime.picture or "")
-    click id _clara_visit_button_id pos (0.5, 0.5) until screen "choice" timeout 20.0
+    run Call("TavernMainObjectMenu", "bar_001")
+    advance until screen "choice" timeout 20.0
     assert eval ("тихие стоны и звуки поцелуев" in str(scene_runtime.text or "")) timeout 5.0
     assert eval ("очень близкими подругами" in str(scene_runtime.text or "")) timeout 5.0
     assert eval (str(scene_runtime.picture or "") == "images/clara/melissa_talk.png") timeout 5.0

@@ -384,9 +384,6 @@ init python:
         items = list(sections["movement"]) + list(sections["actions"])
         if tavern_breakfast_available():
             items.append(MenuItem("Позавтракать", Call("TavernKitchenBreakfast")))
-        elif tavern_sunday_dinner_available():
-            target = "TavernKitchenSundayDinnerMenu" if tavern_sunday_dinner_can_serve_spicy_tincture() else "TavernKitchenSundayDinner"
-            items.append(MenuItem("Сесть за воскресный обед", Call(target)))
         else:
             items.append(MenuItem("Перекусить", Call("Eat", "горячую еду с кухни", 18, "Вы перекусываете на кухне горячей едой и немного приходите в себя.", "TavernKitchen", "")))
         if tavern_kitchen_has_depositable_food():

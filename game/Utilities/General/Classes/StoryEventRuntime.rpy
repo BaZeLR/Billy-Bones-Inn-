@@ -751,7 +751,7 @@ define claraThreadList = [
             ],
             None,
             "TavernMelissaRoom",
-            "clara_paintings",
+            "enter",
             11,
         ),
         (
@@ -907,7 +907,7 @@ define claraThreadList = [
             ],
             None,
             "TavernMain",
-            "clara_tavern_visit",
+            "bar_001",
             0,
         ),
         (
@@ -923,7 +923,7 @@ define claraThreadList = [
             ],
             None,
             "TavernMain",
-            "clara_tavern_visit",
+            "bar_001",
             1,
         ),
         (
@@ -939,7 +939,7 @@ define claraThreadList = [
             ],
             None,
             "TavernMain",
-            "clara_tavern_visit",
+            "bar_001",
             2,
         ),
         (
@@ -956,7 +956,7 @@ define claraThreadList = [
             ],
             None,
             "TavernMelissaRoom",
-            "clara_room_visit",
+            "enter",
             3,
         ),
         (
@@ -972,7 +972,7 @@ define claraThreadList = [
             ],
             None,
             "TavernMelissaRoom",
-            "clara_room_visit",
+            "enter",
             4,
         ),
         (
@@ -988,7 +988,7 @@ define claraThreadList = [
             ],
             None,
             "TavernMelissaRoom",
-            "clara_room_visit",
+            "enter",
             5,
         ),
         (
@@ -1004,7 +1004,7 @@ define claraThreadList = [
             ],
             None,
             "TavernMain",
-            "clara_tavern_visit",
+            "bar_001",
             6,
         ),
     ], highlight=False, threaded=True),
@@ -1205,6 +1205,19 @@ define robinThreadList = [
 ]
 define sherwoodThreadList = []
 define tavernThreadList = [
+    RThreadData(0, "tavern", "SundayDinner", None, [1, [
+        (
+            "TavernKitchenSundayDinnerMenu", 7, (12, 13), None,
+            1,
+            None,
+            tavern_sunday_dinner_available,
+            None,
+            "TavernKitchen",
+            "enter",
+            -50,
+            True,
+        ),
+    ]], highlight=False, threaded=False),
     RThreadData(0, "tavern", "WorkRandomEvents", None, [1, [
         # (target, day, hour, delay, probability, reqs, condition, item, location, action, priority, repeatable)
         (
@@ -1212,11 +1225,11 @@ define tavernThreadList = [
             1,
             None,
             [
-                "#tavern_work_planned_for('', rooms.current_code, calendar_v2.time_slot())",
+                "#tavern_work_planned_for('', 'TavernMain', calendar_v2.time_slot())",
             ],
             None,
             "TavernMain",
-            "tavern_work",
+            "enter",
             200,
             True,
         ),

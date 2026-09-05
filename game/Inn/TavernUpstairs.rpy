@@ -23,6 +23,8 @@ init 6 python:
 
     def tavern_upstairs_description():
         lines = [rooms.get("TavernUpstairs").descriptions[0].text]
+        if story_event_available("TavernMelissaRoom", "enter"):
+            lines.append("Из-за запертой двери комнаты Мелиссы доносятся приглушенные голоса, шорохи и девичий смех. Стоит проверить, что там происходит.")
         lines.extend(tavern_upstairs_bedroom_sound_lines())
         return "\n\n".join([str(row or "").strip() for row in lines if str(row or "").strip()])
 

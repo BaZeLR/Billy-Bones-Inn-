@@ -116,7 +116,7 @@ init -20 python:
         loc_key = str(location_name or rooms.current_code or "")
         if loc_key != "TavernMain":
             return False
-        if tavern_work_int(calendar_v2.week, 0) == 7 or tavern_preopening_mode():
+        if not player.tavern_management.isTavernOpen:
             return False
         tp = tavern_work_int(calendar_v2.time_slot() if time_period is None else time_period, 0)
         for row in list(event_runtime.tavern_work_events or []):
@@ -179,6 +179,8 @@ init -20 python:
 
         current_day = current_game_day()
         event_runtime.tavern_work_plan_day = current_day
+        if tavern_work_int(calendar_v2.week, 0) == 7:
+            return []
         for event_type in tavern_work_random_type_order:
             candidates = [row for row in tavern_work_events_by_type.get(event_type, []) if row.can_schedule()]
             if len(candidates) <= 0:

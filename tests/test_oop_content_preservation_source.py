@@ -54,8 +54,8 @@ def test_runtime_contains_no_fake_compatibility_stub_files():
 
     bar = (ROOT / "game/Inn/TavernMainBar001.rpy").read_text(encoding="utf-8-sig")
     assert "TavernMainBarPlaceholderEvent" not in bar
-    assert 'target="TavernMainBarListenEvent"' in bar
-    assert "label TavernMainBarListenEvent:" in bar
+    assert 'target="TavernMainBarListenEvent"' not in bar
+    assert "label TavernMainBarListenEvent:" not in bar
 
 
 def test_media_python_api_has_no_legacy_uppercase_wrapper():

@@ -41,37 +41,36 @@ init python:
 
     def tavern_main_picture():
         default_picture = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
-        if tavern_main_closed_text() != "":
+        if not player.tavern_management.isTavernOpen and not tavern_preopening_mode():
             return default_picture
         return str(tavern_main_routine_visual_data().get("picture", "") or default_picture)
 
     def tavern_preopening_mode():
-        return tavern_main_closed_text() == "" and int(calendar_v2.week or 0) != 7 and 6 <= int(calendar_v2.hour or 0) < 12
+        return int(calendar_v2.week or 0) != 7 and 6 <= int(calendar_v2.hour or 0) < 12
 
     def tavern_main_late_closed():
         current_hour = int(calendar_v2.hour or 0)
         return current_hour >= 23 or current_hour < 6
 
-    def tavern_main_sunday_service_closed():
+    def tavern_main_sunday_closed():
         return int(calendar_v2.week or 0) == 7
 
     def tavern_main_friday_dance_closed():
         return int(calendar_v2.week or 0) == 5 and 18 <= int(calendar_v2.hour or 0) < 22
 
-    def tavern_main_open_hours_visible():
-        return int(calendar_v2.week or 0) != 7 and not tavern_main_late_closed()
-
     def tavern_main_closed_text():
         if tavern_main_late_closed():
             return "Сейчас поздняя ночь и трактир закрыт, все спят. Ну а кто не спит - тот отдыхает. Но не в главной зале."
-        if tavern_main_sunday_service_closed():
-            return "Сейчас трактир закрыт, все ушли на службу в храм. Может вам тоже стоит пойти?"
+        if tavern_main_sunday_closed():
+            if (8 * 60) <= int(calendar_v2.clock_minutes() or 0) <= ((9 * 60) + 29):
+                return "Сейчас трактир закрыт, все ушли на службу в храм. Может вам тоже стоит пойти?"
+            return "Сегодня воскресенье, и трактир не обслуживает посетителей. Домочадцы проводят выходной кто где, а к половине первого собираются на обязательный воскресный обед."
         if tavern_main_friday_dance_closed():
             return "Сейчас трактир закрыт, все ушли пятничное общегородское празднование. Может вам тоже стоит пойти?"
         return ""
 
     def tavern_main_glory_hole_visible():
-        return tavern_main_closed_text() == "" and player.tavern_management.glory_hole == 2
+        return player.tavern_management.isTavernOpen and player.tavern_management.glory_hole == 2
 
     def tavern_main_build_description():
         base_desc = str(rooms.get("TavernMain").descriptions[0].text or "")
@@ -81,21 +80,24 @@ init python:
 
         if closed_text:
             desc_parts.append(closed_text)
+        elif tavern_preopening_mode():
+            desc_parts.append("Утро в трактире еще не перешло в обычный рабочий ритм. До полудня вы и ваши домочадцы только готовите зал, кухню и припасы к дневной суете.")
+            desc_parts.append(str(routine_visual.get("text", "") or ""))
+            desc_parts.append("На кухне с утра возятся: " + str(tavern_household_present_names("TavernKitchen") or "никто") + ".")
+            desc_parts.append("В зале сейчас видны: " + str(tavern_household_present_names("TavernMain") or "никто") + ".")
+            desc_parts.append("По двору и кладовым шныряют: " + str(_tavern_join_names([name for name in ("sandra", "melissa", "amanda") if str(people.location(name) or "") in ("Backyard", "TavernStorage")]) or "никто") + ".")
+            desc_parts.append("Сейчас как раз удобное время перекинуться с домашними парой слов, прежде чем начнется обычная работа.")
+        elif not player.tavern_management.isTavernOpen:
+            desc_parts.append("Рабочие часы закончились. Посетителей больше не обслуживают, но домочадцы и приглашенные гости могут оставаться в зале.")
+            desc_parts.append("В зале сейчас видны: " + str(tavern_household_present_names("TavernMain") or "никто") + ".")
         else:
-            if tavern_preopening_mode():
-                desc_parts.append("Утро в трактире еще не перешло в обычный рабочий ритм. До полудня вы и ваши домочадцы только готовите зал, кухню и припасы к дневной суете.")
-                desc_parts.append(str(routine_visual.get("text", "") or ""))
-                desc_parts.append("На кухне с утра возятся: " + str(tavern_household_present_names("TavernKitchen") or "никто") + ".")
-                desc_parts.append("В зале сейчас видны: " + str(tavern_household_present_names("TavernMain") or "никто") + ".")
-                desc_parts.append("По двору и кладовым шныряют: " + str(_tavern_join_names([name for name in ("sandra", "melissa", "amanda") if str(people.location(name) or "") in ("Backyard", "TavernStorage")]) or "никто") + ".")
-                desc_parts.append("Сейчас как раз удобное время перекинуться с домашними парой слов, прежде чем начнется обычная работа.")
-            else:
-                desc_parts.append("На кухне в вашем трактире работают: " + str(NamesList("jobkitchen", "TavernKitchen") or "никто") + ".")
-                desc_parts.append("За чистоту и порядок отвечают: " + str(NamesList("jobcleaning", "TavernMain") or "никто") + ".")
-                desc_parts.append("Еду и выпивку пьяным, трезвым, похотливым, скромным и прочим посетителям разносят: " + str(NamesList("jobwaitress", "TavernMain") or "никто") + ".")
-                desc_parts.append(str(routine_visual.get("text", "") or ""))
-                desc_parts.append("Вы можете пообщаться с участницами своей команды через список персонажей справа.")
+            desc_parts.append("На кухне в вашем трактире работают: " + str(NamesList("jobkitchen", "TavernKitchen") or "никто") + ".")
+            desc_parts.append("За чистоту и порядок отвечают: " + str(NamesList("jobcleaning", "TavernMain") or "никто") + ".")
+            desc_parts.append("Еду и выпивку пьяным, трезвым, похотливым, скромным и прочим посетителям разносят: " + str(NamesList("jobwaitress", "TavernMain") or "никто") + ".")
+            desc_parts.append(str(routine_visual.get("text", "") or ""))
+            desc_parts.append("Вы можете пообщаться с участницами своей команды через список персонажей справа.")
 
+        if not closed_text:
             if str(people.location("becky") or "") == "TavernMain":
                 desc_parts.append("Бекки Блэнкеншип на этот раз сама заглянула к вам в трактир и присматривается к залу цепким хозяйским взглядом.")
             if str(people.location("georgett") or "") == "TavernMain":
@@ -154,7 +156,7 @@ init python:
             "fireplace_001",
             "bar_001",
         ],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], start="06:00", end="22:59", condition=tavern_main_open_hours_visible),
+        schedule=None,
         custom_properties={
             "hall_staff_jobs": ["jobkitchen", "jobcleaning", "jobwaitress"],
             "object_menu_label": "TavernMainObjectMenu",
@@ -168,7 +170,7 @@ init python:
         tavern_main_fireplace_wood_stock()
         sections = rooms.get("TavernMain").build_menu_sections()
         items = list(sections.get("movement", [])) + list(sections.get("actions", []))
-        if tavern_main_closed_text() == "" and int(player.tavern_management.client_room_hole or 0) > 0 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "":
+        if player.tavern_management.isTavernOpen and int(player.tavern_management.client_room_hole or 0) > 0 and str(rooms.get("TavernMain").state["client_room_girl"] or "") != "":
             items.append(MenuItem("Пойти проверить отдельную комнату", Call("TavernProstClients", rooms.get("TavernMain").state["client_room_girl"])))
         if tavern_main_closed_text() == "" and not tavern_preopening_mode() and story_event_available("TavernMain", "overheard"):
             items.append(MenuItem("Подслушать разговор в зале", Call("checkTriggers", "TavernMain", "overheard", 0)))
@@ -178,7 +180,7 @@ init python:
 
 label TavernMain:
     $ renpy.dynamic("_household_request_girl", "_household_request_type")
-    $ renpy.dynamic("_tavern_main_base_desc", "_glory_quest_started", "_cur_desc_low", "_draupnir_gh_asked", "ShouldDispatchTavernEvent", "GirlNameTS1", "GirlNameTS2", "kitchenlist", "cleaninglist", "waitresslist", "_liza_whore_work", "_georgett_whore_work", "randvarPS", "_tavern_kids_description", "_tmp_bf_sandra", "_tmp_bf_amanda", "_tmp_bf_melissa", "_tmp_bf_georgett", "_tmp_bf_liza", "_tmp_kids_list")
+    $ renpy.dynamic("_tavern_main_base_desc", "_glory_quest_started", "_cur_desc_low", "_draupnir_gh_asked", "GirlNameTS1", "GirlNameTS2", "kitchenlist", "cleaninglist", "waitresslist", "_liza_whore_work", "_georgett_whore_work", "randvarPS", "_tavern_kids_description", "_tmp_bf_sandra", "_tmp_bf_amanda", "_tmp_bf_melissa", "_tmp_bf_georgett", "_tmp_bf_liza", "_tmp_kids_list")
     $ _tavern_main_base_desc = rooms.get("TavernMain").descriptions[0].text
     $ scene_runtime.text = _tavern_main_base_desc
     $ scene_runtime.location_text = _tavern_main_base_desc
@@ -210,16 +212,11 @@ label TavernMain:
             $ player.tavern_management.glory_hole = 0
             $ player.tavern_management.client_room_hole = 0
     # Determine if tavern is closed
-    if tavern_main_closed_text() == "":
+    if player.tavern_management.isTavernOpen:
         python:
             rooms.get("TavernMain").state["client_room_girl"] = ""
-            ShouldDispatchTavernEvent = (
-                int(calendar_v2.week or 0) != 7
-                and not tavern_preopening_mode()
-            )
             if (
-                ShouldDispatchTavernEvent
-                and int(event_runtime.tavern_work_plan_day or -1) != current_game_day()
+                int(event_runtime.tavern_work_plan_day or -1) != current_game_day()
                 and len(list(event_runtime.tavern_work_events or [])) == 0
                 and len(list(event_runtime.tavern_played_today or [])) == 0
             ):
@@ -232,7 +229,7 @@ label TavernMain:
     $ waitresslist = NamesList("jobwaitress", "TavernMain")
 
     # Main event and interaction logic
-    if tavern_main_closed_text() == "":
+    if player.tavern_management.isTavernOpen:
         if str(people.location(GirlNameTS1) or "") == rooms.current_code:
             if calendar_v2.time_slot() == 3:
                 call AddOthersSperm(GirlNameTS1, 7)
@@ -260,7 +257,7 @@ label TavernMain:
 
     call RoomEnterEventGate(rooms.current_code, False)
     $ _tavern_kids_description = []
-    if tavern_main_closed_text() == "" and not tavern_preopening_mode() and int(calendar_v2.week or 0) != 7:
+    if player.tavern_management.isTavernOpen:
         if str(people.location('amanda') or "") == rooms.current_code:
             call check_daily_event('amanda', None, rooms.current_code, calendar_v2.time_slot())
         if str(people.location('sandra') or "") == rooms.current_code:
@@ -335,6 +332,14 @@ label TavernMainObjectMenu(object_id=""):
     if _tavern_object is None:
         $ main_ui_runtime.action_items = tavern_main_action_items()
         return
+
+    if story_event_available("TavernMain", str(object_id or "")):
+        $ main_ui_runtime.object_id = ""
+        $ main_ui_runtime.action_title = "Действия в трактире"
+        $ main_ui_runtime.action_content = None
+        call checkTriggers("TavernMain", str(object_id or ""), 0)
+        if _return:
+            return
 
     $ main_ui_runtime.object_id = object_id
     $ main_ui_runtime.action_title = str(_tavern_object.name or "Действия")

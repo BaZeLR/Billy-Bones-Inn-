@@ -36,16 +36,15 @@ def test_amanda_liza_event_owns_event_title_text_and_native_choices():
     assert '"[result]"' not in followup
 
 
-def test_bar_stand_triggers_work_event_and_returns_to_its_object_menu():
+def test_room_entry_triggers_work_event_without_a_redundant_bar_action():
     room = (ROOT / "game/Inn/TavernMain.rpy").read_text(encoding="utf-8-sig")
     bar = (ROOT / "game/Inn/TavernMainBar001.rpy").read_text(encoding="utf-8-sig")
-    listen = bar.split("label TavernMainBarListenEvent:", 1)[1]
+    runtime = (ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
 
-    assert 'call checkTriggers("TavernMain", "tavern_work", 0)' not in room
-    assert 'if tavern_work_planned_for("", "TavernMain", calendar_v2.time_slot()):' in listen
-    assert 'call checkTriggers("TavernMain", "tavern_work", 0)' in listen
-    assert 'call TavernMainObjectMenu("bar_001")' in listen
-    assert "jump TavernMain" not in listen
+    assert 'call RoomEnterEventGate(rooms.current_code, False)' in room
+    assert "TavernMainBarListenEvent" not in bar
+    assert "bar_random_event" not in bar
+    assert '"TavernMain",\n            "enter",\n            200,\n            True,' in runtime
 
 
 def test_tavern_room_establishes_scene_context_before_work_event():

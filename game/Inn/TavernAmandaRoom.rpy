@@ -237,8 +237,6 @@ init python:
 
     def tavern_amanda_room_action_items():
         items = []
-        if story_event_available("TavernAmandaRoom", "amanda_morning_window"):
-            items.append(MenuItem("Поймать Аманду у окна", Call("checkTriggers", "TavernAmandaRoom", "amanda_morning_window", 0)))
         for issue_action in list(household_room_issue_action_specs("amanda") or []):
             items.append(MenuItem(str(issue_action.get("label", "") or ""), Call(str(issue_action.get("target", "") or ""), *tuple(issue_action.get("args", ()) or ()))))
         if tavern_upstairs_can_clean_rooms():

@@ -116,7 +116,7 @@ init -24 python:
                 (6, 7),
                 1,
                 "TavernAmandaRoom",
-                "amanda_morning_window",
+                "enter",
                 25,
                 source_refs=["TavernAmandaRoom.rpy"],
             )

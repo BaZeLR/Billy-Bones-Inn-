@@ -33,13 +33,13 @@ def test_kitchen_has_one_action_source_without_builder_or_recursive_loop():
 
 def test_kitchen_preserves_meals_storage_tea_sandra_objects_and_breakfast():
     for token in (
-        'Call("TavernKitchenBreakfast")', '"TavernKitchenSundayDinnerMenu"',
+        'Call("TavernKitchenBreakfast")',
         'Call("TavernKitchenDepositMenu")', 'Call("TavernKitchenShareTeaWithSandraAndBecky")',
         'Call("TavernKitchenAskSandraBreakfasts")', 'Call("TavernKitchenAskSandraClients")',
         "rooms.get(\"TavernKitchen\").build_menu_sections()", "tavern_kitchen_hearth_wood_stock()",
     ):
         assert token in KITCHEN
-    assert "Call(target)" in KITCHEN
+    assert "Сесть за воскресный обед" not in KITCHEN
     assert "label TavernKitchenBreakfast:" in BREAKFAST
     assert "label TavernKitchenFinishBreakfastEvent:" in BREAKFAST
 
@@ -107,6 +107,17 @@ def test_sunday_dinner_uses_schedule_attendance_and_applies_each_girls_planned_r
     assert '"Закончить воскресный обед"' in dinner
     assert dinner.index("sunday_dinner_last_day = current_game_day()") > dinner.index('"Закончить воскресный обед"')
     assert '"[scene_runtime.text]"' not in dinner
+
+
+def test_sunday_dinner_is_a_mandatory_scheduled_entry_event():
+    runtime = (GAME / "Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
+    event = runtime.split('RThreadData(0, "tavern", "SundayDinner"', 1)[1].split('RThreadData(0, "tavern", "WorkRandomEvents"', 1)[0]
+    entry_menu = BREAKFAST.split("label TavernKitchenSundayDinnerMenu:", 1)[1].split("label TavernKitchenSundayDinner(serve_spicy=0):", 1)[0]
+
+    assert '"TavernKitchenSundayDinnerMenu", 7, (12, 13)' in event
+    assert "tavern_sunday_dinner_available" in event
+    assert '"TavernKitchen",\n            "enter"' in event
+    assert '"Назад":' not in entry_menu
 
 
 def test_sunday_dinner_keeps_church_jokes_and_soap_gifts_inside_its_native_event_menu():

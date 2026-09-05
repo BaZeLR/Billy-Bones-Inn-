@@ -408,6 +408,7 @@ init -40 python:
 
         def build_action_items(self):
             items = []
+            visible_objects = self.visible_objects()
             items.extend(self.build_object_items())
             room_actions = self.visible_actions()
             for room_action in room_actions:
@@ -415,6 +416,7 @@ init -40 python:
                 if menu_item is not None:
                     items.append(menu_item)
             excluded_actions = [str(getattr(row, "action_id", "") or "").strip() for row in room_actions]
+            excluded_actions.extend([str(getattr(row, "object_id", "") or "").strip() for row in visible_objects])
             items.extend(story_event_action_items(self.code_name, excluded_actions))
             return items
 
