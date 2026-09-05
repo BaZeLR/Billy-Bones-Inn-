@@ -134,6 +134,7 @@ label MarketPlace:
     $ scene_runtime.location_text = scene_runtime.text
 
     # Random encounter with Mongol
+    $ Mongol.prepare_market_roll(True)
     if marketplace_mongol_visible():
         $ Mongol.reset_market_trade()
 

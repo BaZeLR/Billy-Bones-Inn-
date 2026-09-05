@@ -51,11 +51,11 @@ init python:
             self.discount_asked = False
             return self.horse_price
 
-        def prepare_market_roll(self):
+        def prepare_market_roll(self, reroll=False):
             current_day = current_game_day()
-            if self.market_roll_day != current_day:
+            if bool(reroll) or self.market_roll_day != current_day:
                 self.market_roll_day = current_day
-                self.market_roll = procedural_randint(1, 4, "mongol_market_%s" % current_day) == 1
+                self.market_roll = renpy.random.randint(1, 4) == 1
             return self.market_roll
 
         def is_market_visible(self):
