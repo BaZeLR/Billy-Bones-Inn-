@@ -14,6 +14,10 @@ init -100 python:
         """Retired load-only type for saves made with the accidental Sergio pet NPC."""
         pass
 
+    class AmandaLizaWorkTalkEvent(object):
+        """Retired load-only type for saves made before tavern work-plan ownership."""
+        pass
+
     def beforeLoadTractirSave():
         ensure_game_item_registry()
 
@@ -36,6 +40,12 @@ init -100 python:
         people.repair()
         rooms.repair()
         household.repair()
+        globals().pop("AmandaLizaWorkTalk", None)
+        retired_threads = globals().get("threads", {})
+        if isinstance(retired_threads, dict):
+            retired_thread = retired_threads.pop("amandaLizaWorkTalk", None)
+            if getattr(event_runtime, "active_thread", None) is retired_thread:
+                event_runtime.active_thread = None
         player.tavern_management.__dict__.pop("household_members", None)
         tractir_save_normalize_tavern_staff_jobs()
         tractir_save_normalize_werecat_intro_thread()

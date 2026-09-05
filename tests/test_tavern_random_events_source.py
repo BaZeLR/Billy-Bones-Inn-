@@ -22,6 +22,19 @@ def test_tavern_random_events_are_typed_definitions():
         assert code in source
 
 
+def test_retired_amanda_liza_event_type_is_load_only_and_purged_after_load():
+    save_sync = read_rel("game/TractirSaveSync.rpy")
+    event_model = read_rel("game/NPC/Girls/Amanda/AmandaEventModel.rpy")
+    runtime = read_rel("game/Utilities/General/Classes/StoryEventRuntime.rpy")
+
+    assert "class AmandaLizaWorkTalkEvent(object):" in save_sync
+    assert 'globals().pop("AmandaLizaWorkTalk", None)' in save_sync
+    assert 'retired_threads.pop("amandaLizaWorkTalk", None)' in save_sync
+    assert "event_runtime.active_thread = None" in save_sync
+    assert "AmandaLizaWorkTalkEvent" not in event_model
+    assert "amandaLizaWorkTalk" not in runtime
+
+
 def test_tavern_random_events_are_wired_to_thread_runtime():
     runtime = read_rel("game/Utilities/General/Classes/StoryEventRuntime.rpy")
     tavern = read_rel("game/Inn/TavernRandomEvents.rpy")
