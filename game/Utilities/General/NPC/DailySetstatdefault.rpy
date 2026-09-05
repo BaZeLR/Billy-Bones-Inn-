@@ -77,8 +77,9 @@ label DailySetstatdefault(girl_name):
 
     $ _dssd_jobs = getattr(_dssd_info, "jobs", {}) if _dssd_info is not None else {}
     $ _dssd_clients = int(_dssd_info.sex_stat("clients_day_total", 0) or 0) if _dssd_info is not None else 0
-    if int(_dssd_jobs.get("jobwhore", 0) or 0):
-        $ TotalWhoreClients[girl_name] = TotalWhoreClients.get(girl_name, 0) + _dssd_clients
-    if int(_dssd_jobs.get("jobgloryhole", 0) or 0):
-        $ TotalGloryHoleClients[girl_name] = TotalGloryHoleClients.get(girl_name, 0) + _dssd_clients
+    if tavern_sex_work_day_allowed():
+        if int(_dssd_jobs.get("jobwhore", 0) or 0):
+            $ TotalWhoreClients[girl_name] = TotalWhoreClients.get(girl_name, 0) + _dssd_clients
+        if int(_dssd_jobs.get("jobgloryhole", 0) or 0):
+            $ TotalGloryHoleClients[girl_name] = TotalGloryHoleClients.get(girl_name, 0) + _dssd_clients
     return

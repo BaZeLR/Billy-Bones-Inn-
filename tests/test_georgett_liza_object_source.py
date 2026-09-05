@@ -400,10 +400,10 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
     assert "def portstreet_client_event_available" in liza
     georgett_schedule = _source(GEORGETT_SCHEDULE)
     liza_schedule = _source(LIZA_SCHEDULE)
-    assert '"weekdays": [1, 2, 3, 4, 6, 7]' in georgett_schedule
+    assert '"weekdays": [1, 2, 3, 4, 6]' in georgett_schedule
     assert '"start": "19:00"' in georgett_schedule
     assert '"end": "21:30"' in georgett_schedule
-    assert '"weekdays": [1, 2, 3, 4, 6, 7]' in liza_schedule
+    assert '"weekdays": [1, 2, 3, 4, 6]' in liza_schedule
     assert '"start": "19:00"' in liza_schedule
     assert '"end": "21:30"' in liza_schedule
     assert "def portstreet_work_hour" not in georgett

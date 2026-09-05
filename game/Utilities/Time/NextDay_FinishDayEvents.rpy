@@ -37,6 +37,9 @@ init python:
             place = str(tmpArray.get("Place", "") or "")
             event_type = _ndf_int(tmpArray.get("EventType", 0), 0)
 
+            if not tavern_sex_work_day_allowed(week_val) and girl in ("georgett", "liza") and place in ("Prostitution", "Glory"):
+                continue
+
             if girl == "georgett" and event_type == 99 and place == "Prostitution":
                 pregnancy_check(girl, "inside", 1, "eddie")
             elif girl == "georgett" and place == "EddieHomeVisit":

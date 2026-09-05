@@ -1033,8 +1033,20 @@ testcase external_port_streets_georgette_liza_flow:
     $ TodaySexEvents_Clear()
     run Jump("PortStreets")
     advance until screen "main_ui" timeout 20.0
-    assert eval (str(people.location("georgett") or "") == "PortStreets") timeout 5.0
-    assert eval (people.action_data_for_room("georgett", "PortStreets") is not None) timeout 5.0
+    assert eval (str(people.location("georgett") or "") != "PortStreets") timeout 5.0
+    assert eval (str(people.location("liza") or "") != "PortStreets") timeout 5.0
+    assert eval (people.action_data_for_room("georgett", "PortStreets") is None) timeout 5.0
+    $ Georgett.set_sex_stat("clients_day_total", 9)
+    $ TodaySexEvents_Clear()
+    run Call("WhoreNextDayClients", "georgett", 5, 10)
+    assert eval (int(Georgett.sex_stat("clients_day_total", -1) or 0) == 0) timeout 5.0
+    assert eval (not any(str(row.get("GirlName", "") or "") == "georgett" and str(row.get("Place", "") or "") in ("Prostitution", "Glory") for row in list(SexEvents.today_events or []))) timeout 5.0
+    $ TotalWhoreClients = {"georgett": 0, "liza": 0}
+    $ TotalGloryHoleClients = {"georgett": 0, "liza": 0}
+    $ Georgett.set_job_value("jobwhore", 1)
+    $ Georgett.set_sex_stat("clients_day_total", 5)
+    run Call("DailySetstatdefault", "georgett")
+    assert eval (int(TotalWhoreClients.get("georgett", 0) or 0) == 0 and int(TotalGloryHoleClients.get("georgett", 0) or 0) == 0) timeout 5.0
 
     $ external_calendar_set_fields(1, 1, 1100, 13, 0)
     $ dog.met = True

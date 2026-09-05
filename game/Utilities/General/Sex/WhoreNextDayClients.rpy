@@ -2,11 +2,20 @@
 # Daily sex-work event generation.
 # ================================================================================
 
+init python:
+    def tavern_sex_work_day_allowed(week_value=None):
+        if week_value is None:
+            week_value = calendar_v2.week
+        return people_to_int(week_value, 0) != 7
+
 label WhoreNextDayClients(girl_name="", max_clients=0, glory_hole_max=0):
     $ renpy.dynamic("_wnd_girl_name", "_wnd_girl", "max_clients_i", "glory_max_i", "week_val", "current_time", "day_value", "generated_clients", "created", "safety", "event_hour", "event_type", "already_exists", "prostitution_max_type")
     $ _wnd_girl_name = str(girl_name or (_args[0] if _args else "") or "")
     $ _wnd_girl = people.get_info(_wnd_girl_name)
     if _wnd_girl is None:
+        return
+    if not tavern_sex_work_day_allowed():
+        $ _wnd_girl.set_sex_stat("clients_day_total", 0)
         return
 
     python:
@@ -19,8 +28,6 @@ label WhoreNextDayClients(girl_name="", max_clients=0, glory_hole_max=0):
 
         if week_val == 5:
             glory_max_i = glory_max_i // 2
-        if week_val == 7:
-            glory_max_i = (glory_max_i * 3) // 4
 
         if people_to_int(_wnd_girl.job_value("jobgloryholeTommorow", 0), 0) != 0:
             generated_clients = (glory_max_i * (75 + 5 * procedural_randint(1, 10, "glory_clients_%s_%s" % (_wnd_girl_name, day_value)))) // 100
@@ -32,16 +39,12 @@ label WhoreNextDayClients(girl_name="", max_clients=0, glory_hole_max=0):
                 event_hour = procedural_randint(2, 3, "glory_time_%s_%s_%s" % (_wnd_girl_name, day_value, safety))
                 if week_val == 5:
                     event_hour = 2
-                if week_val == 7:
-                    event_hour = 3
 
                 event_type = procedural_randint(1, 11, "glory_type_%s_%s_%s" % (_wnd_girl_name, day_value, safety))
                 if event_type == 1 and current_time == 2:
                     event_type = 6
                 if event_type == 3 and current_time == 2:
                     event_type = 9
-                if event_type == 4 and week_val == 7:
-                    event_type = 11
 
                 try:
                     already_exists = int(CheckIfEventAlreadyExist(_wnd_girl_name, event_type) or 0)
