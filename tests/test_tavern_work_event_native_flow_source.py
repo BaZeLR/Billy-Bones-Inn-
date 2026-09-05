@@ -36,14 +36,20 @@ def test_amanda_liza_event_owns_event_title_text_and_native_choices():
     assert '"[result]"' not in followup
 
 
-def test_room_entry_triggers_work_event_without_a_redundant_bar_action():
+def test_room_entry_and_bar_observation_share_the_work_event_gate():
     room = (ROOT / "game/Inn/TavernMain.rpy").read_text(encoding="utf-8-sig")
     bar = (ROOT / "game/Inn/TavernMainBar001.rpy").read_text(encoding="utf-8-sig")
     runtime = (ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
 
     assert 'call RoomEnterEventGate(rooms.current_code, False)' in room
-    assert "TavernMainBarListenEvent" not in bar
-    assert "bar_random_event" not in bar
+    assert 'action_id="observe_hall"' in bar
+    assert 'target="TavernMainBarObserveHall"' in bar
+    observe = bar.split("label TavernMainBarObserveHall:", 1)[1].split("label TavernMainBarInviteMenu:", 1)[0]
+    assert 'call RoomEnterEventGate("TavernMain", False)' in observe
+    assert "tavern_main_routine_visual_data()" in observe
+    assert "calendar_v2.advance_minutes(60)" in observe
+    assert "event_runtime.tavern_work_events" not in observe
+    assert "DisplayTavernEventShort" not in observe
     assert '"TavernMain",\n            "enter",\n            200,\n            True,' in runtime
 
 

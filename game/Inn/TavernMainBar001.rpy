@@ -2,6 +2,10 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 init python:
+    def tavern_bar_observe_available(_bar_object=None):
+        return bool(player.tavern_management.isTavernOpen)
+
+
     def tavern_bar_invite_targets():
         targets = []
         clara_info = people.get_info("clara")
@@ -27,6 +31,13 @@ init python:
         picture="images/tavern/mainhall/bar_mainHall.png",
         actions=[
             ObjectAction(
+                action_id="observe_hall",
+                label="Наблюдать за происходящим в зале",
+                hook="call",
+                target="TavernMainBarObserveHall",
+                condition=tavern_bar_observe_available,
+            ),
+            ObjectAction(
                 action_id="drink_ale",
                 label="Выпить эля",
                 hook="call",
@@ -43,6 +54,26 @@ init python:
         carriable=False,
         stackable=False,
     )
+
+
+label TavernMainBarObserveHall:
+    $ renpy.dynamic("_tavern_observation", "_tavern_observation_text", "_tavern_observation_event")
+    call RoomEnterEventGate("TavernMain", False)
+    $ _tavern_observation_event = bool(_return)
+    if not _tavern_observation_event:
+        $ _tavern_observation = tavern_main_routine_visual_data()
+        $ scene_runtime.picture = str(_tavern_observation.get("picture", "") or tavern_main_picture())
+        $ _tavern_observation_text = str(_tavern_observation.get("text", "") or "").strip()
+        if _tavern_observation_text:
+            $ scene_runtime.text = "Вы проводите час у барной стойки, наблюдая за работой в главной зале.\n\n" + _tavern_observation_text
+        else:
+            $ scene_runtime.text = "Вы проводите час у барной стойки, наблюдая за тем, что происходит в главной зале."
+        $ scene_runtime.location_text = scene_runtime.text
+        $ main_ui_runtime.action_title = "Наблюдение за залом"
+        $ main_ui_runtime.action_content = None
+        $ main_ui_runtime.action_items = [MenuItem("Назад", Call("TavernMainObjectMenu", "bar_001"))]
+    $ calendar_v2.advance_minutes(60)
+    return
 
 
 label TavernMainBarInviteMenu:

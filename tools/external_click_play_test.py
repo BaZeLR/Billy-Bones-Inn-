@@ -1701,6 +1701,53 @@ testcase external_tavern_random_event_plan_consumes_once:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
     assert eval (len(list(event_runtime.tavern_work_events or [])) == 0 and list(event_runtime.tavern_played_today or []).count("CleaningHarass") == 1) timeout 5.0
 
+testcase external_tavern_bar_observe_work_and_event:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 13, 0)
+    $ external_calendar_set_weekday(1)
+    $ AmandaStaticData.set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999, working=True)])
+    $ MelissaStaticData.set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999, working=True)])
+    $ Amanda.set_job_value("jobwaitress", 1)
+    $ Amanda.set_job_value("jobcleaning", 0)
+    $ Melissa.set_job_value("jobwaitress", 0)
+    $ Melissa.set_job_value("jobcleaning", 1)
+    python:
+        for _thread_name, _thread_info in threads.items():
+            if _thread_name != "tavernWorkRandomEvents":
+                _thread_info.completed = True
+    $ household.meta["convergence"] = 0.0
+    $ event_runtime.tavern_work_events = []
+    $ event_runtime.tavern_played_today = ["BarObserveSetup"]
+    $ event_runtime.tavern_work_plan_day = current_game_day()
+    $ event_runtime.evaluation_time = None
+    run Jump("TavernMain")
+    advance until screen "main_ui" timeout 20.0
+    $ _bar_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Барная стойка")
+    click id ("choice_panel_button_%d" % int(_bar_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Барная стойка") timeout 20.0
+    $ _observe_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Наблюдать за происходящим в зале")
+    click id ("choice_panel_button_%d" % int(_observe_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Наблюдение за залом") timeout 20.0
+    assert eval (int(calendar_v2.hour or 0) == 14 and int(calendar_v2.minute or 0) == 0) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") in (AmandaStaticData.image_sequence("tavern", "waitress") + MelissaStaticData.image_sequence("tavern", "hall_cleaning"))) timeout 5.0
+    assert eval ("наблюдая за работой" in str(scene_runtime.text or "") and [str(i.caption or "") for i in main_ui_runtime.action_items] == ["Назад"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Барная стойка") timeout 20.0
+
+    $ Melissa.set_job_value("jobwaitress", 1)
+    $ Melissa.set_job_value("jobcleaning", 0)
+    $ event_runtime.tavern_work_events = [{"code": "MelissaWaitressFall", "type": "work_mishap", "label": "event_melissa_waitress_fall", "period": calendar_v2.time_slot(), "mandatory": False, "priority": 25}]
+    $ event_runtime.tavern_played_today = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ _observe_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Наблюдать за происходящим в зале")
+    click id ("choice_panel_button_%d" % int(_observe_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Подойти к Мелиссе" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == MelissaStaticData.cycle_image("tavern", "clumsy_waitress", 0)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Помочь Мелиссе подняться" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к работе"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
+    assert eval (int(calendar_v2.hour or 0) == 15 and int(calendar_v2.minute or 0) == 0) timeout 5.0
+    assert eval ("MelissaWaitressFall" in list(event_runtime.tavern_played_today or []) and len(list(event_runtime.tavern_work_events or [])) == 0) timeout 5.0
+
 testcase external_melissa_waitress_fall_event_lifecycle:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 13, 0)
     $ external_calendar_set_weekday(1)
@@ -8670,6 +8717,7 @@ def main() -> int:
             "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
             "external_amanda_liza_work_conversation_activates",
+            "external_tavern_bar_observe_work_and_event",
             "external_tavern_random_event_plan_consumes_once",
             "external_melissa_waitress_fall_event_lifecycle",
             "external_tavern_small_fight_native_event_flow",
@@ -8862,6 +8910,7 @@ def main() -> int:
             "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
             "external_amanda_liza_work_conversation_activates",
+            "external_tavern_bar_observe_work_and_event",
             "external_tavern_random_event_plan_consumes_once",
             "external_melissa_waitress_fall_event_lifecycle",
             "external_tavern_small_fight_native_event_flow",
