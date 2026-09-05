@@ -485,36 +485,24 @@ screen main_menu():
         yalign 0.62
         text_align 0.5
 
-    frame:
-        background Solid("#080604b8")
-        xalign 1.0
-        yalign 1.0
-        xoffset -24
-        yoffset -24
+    vbox:
+        xalign 0.5
+        ypos 0.70
+        yanchor 0.0
         xsize 430
-        ysize 370
-        padding (18, 16)
-
-        vbox:
-            xfill True
-            spacing 10
-            textbutton "Start" action Start()
-            textbutton "Introduction" action Start("introduction")
-            textbutton "Tutorial" action Start("tutorial")
-            textbutton "About" action Start("about_game")
-            textbutton "Load" action ShowMenu("load")
-            textbutton "Quit" action Quit()
-
-    ## This empty frame darkens the main menu.
-    #frame:
-    #    pass
+        spacing 8
+        textbutton "Start" action Start()
+        textbutton "Introduction" action Start("introduction")
+        textbutton "Tutorial" action Start("tutorial")
+        textbutton "About" action Start("about_game")
+        textbutton "Load" action ShowMenu("load")
+        textbutton "Quit" action Quit()
 
     ## The use statement includes another screen inside this one. The actual
     ## contents of the main menu are in the navigation screen.
     #use navigation
 
 
-style main_menu_frame is empty
 style main_menu_vbox is vbox
 style main_menu_button is button
 style main_menu_button_text is button_text
@@ -522,22 +510,16 @@ style main_menu_text is gui_text
 style main_menu_title is main_menu_text
 style main_menu_version is main_menu_text
 
-style main_menu_frame:
-    xsize 420
-    yfill True
-
-    background "gui/overlay/main_menu.png"
-
 style main_menu_button:
-    background Solid("#17100bd9")
-    hover_background Solid("#8a5a24e6")
-    selected_background Solid("#5e3c1de6")
-    insensitive_background Solid("#17100b99")
+    background None
+    hover_background None
+    selected_background None
+    insensitive_background None
     xfill True
-    left_padding 16
-    right_padding 16
-    top_padding 5
-    bottom_padding 5
+    left_padding 8
+    right_padding 8
+    top_padding 2
+    bottom_padding 2
 
 style main_menu_button_text:
     color "#f7f0df"
@@ -545,13 +527,12 @@ style main_menu_button_text:
     selected_color "#ffd85a"
     insensitive_color "#aaa49a"
     size 30
+    xalign 0.5
+    text_align 0.5
     outlines [(2, "#000d", 0, 0)]
 
 style main_menu_vbox:
-    xfill True
-    yalign 0.5
-    xoffset 0
-    yoffset 0
+    xalign 0.5
 
 style main_menu_text:
     properties gui.text_properties("main_menu", accent=True)
