@@ -481,7 +481,7 @@ init python:
                 return False
             if self.rel > 8 and int(self.sex_stat("orgasms_given", 0) or 0) >= 2:
                 return True
-            return self.rel > 8 and daily_events.exists("", "BuyDressTom") == 0 and daily_events.exists("amanda", "BuyDress") == 0 and int(calendar_v2.week or 0) != 6
+            return self.rel > 8 and daily_events.exists("amanda", "BuyDressTom") == 0 and daily_events.exists("amanda", "BuyDress") == 0 and int(calendar_v2.week or 0) != 6
 
         def legare_claims_first_friday_dance(self):
             dance_minute = 19 * 60

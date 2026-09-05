@@ -8,7 +8,7 @@ define amandaRevealingDressRequestConditions = [
     "#bool(str(Sandra.revealing_dress_code or '').strip())",
     "#bool(str(Melissa.revealing_dress_code or '').strip())",
     "#not str(Amanda.revealing_dress_code or '').strip()",
-    "#daily_events.exists('', 'BuyDressTom', '') == 0",
+    "#daily_events.exists('amanda', 'BuyDressTom', '') == 0",
     "#daily_events.exists('amanda', 'BuyDress', '') == 0",
     "#int(Amanda.rel or 0) >= 5",
     "#int(Amanda.talked_today or 0) == 0",
@@ -77,7 +77,7 @@ define amandaThreadList = [
 define melissaRevealingDressRequestConditions = [
     "#bool(str(Sandra.revealing_dress_code or '').strip())",
     "#not str(Melissa.revealing_dress_code or '').strip()",
-    "#daily_events.exists('', 'BuyDressTom', '') == 0",
+    "#daily_events.exists('melissa', 'BuyDressTom', '') == 0",
     "#daily_events.exists('melissa', 'BuyDress', '') == 0",
     "#int(Melissa.rel or 0) >= 6",
     "#int(Melissa.talked_today or 0) == 0",
@@ -451,7 +451,7 @@ define sandraThreadList = [
             [
                 "#threads['beckyHome'].completed",
                 "#not str(Sandra.revealing_dress_code or '').strip()",
-                "#daily_events.exists('', 'BuyDressTom', '') == 0",
+                "#daily_events.exists('sandra', 'BuyDressTom', '') == 0",
                 "#daily_events.exists('sandra', 'BuyDress', '') == 0",
                 "#int(Sandra.rel or 0) >= 7",
                 "#int(Sandra.talked_today or 0) == 0",

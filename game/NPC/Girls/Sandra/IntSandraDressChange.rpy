@@ -4,10 +4,11 @@
 
 init python:
     def sandra_dress_change_can_buy(girl_name="sandra"):
+        girl_key = str(girl_name or "sandra")
         return (
             int(Sandra.rel or 0) > 8
-            and daily_events.exists("", "BuyDressTom", "") == 0
-            and daily_events.exists("sandra", "BuyDress", "") == 0
+            and daily_events.exists(girl_key, "BuyDressTom", "") == 0
+            and daily_events.exists(girl_key, "BuyDress", "") == 0
             and int(Sandra.talked_today or 0) < 2
             and int(calendar_v2.week or 0) != 6
         )

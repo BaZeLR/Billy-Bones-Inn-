@@ -7,7 +7,7 @@ label IntLizaDressChange(GirlNameILT="liza", agreed_to_redress=0):
     python:
         _can_remove_panties = Liza.rel > 8 and Liza.current_underwear("panties", "") != "" and Liza.talk_count() < 2
         _can_shame = Liza.rel > 8 and Liza.talk_count() < 2
-        _can_buy = Liza.rel > 8 and daily_events.exists("", "BuyDressTom", "") == 0 and daily_events.exists(GirlNameILT, "BuyDress", "") == 0 and Liza.talk_count() < 2 and int(calendar_v2.week or 0) != 6
+        _can_buy = Liza.rel > 8 and daily_events.exists(GirlNameILT, "BuyDressTom", "") == 0 and daily_events.exists(GirlNameILT, "BuyDress", "") == 0 and Liza.talk_count() < 2 and int(calendar_v2.week or 0) != 6
 
     if not (_can_remove_panties or _can_shame or _can_buy):
         return

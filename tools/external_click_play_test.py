@@ -632,11 +632,14 @@ testcase external_all_girl_dress_appointments_use_shared_pipeline:
     run Call("InitGameNPCs")
     $ _dress_appointment_names = ("melissa", "sandra", "amanda", "becky", "georgett", "liza")
     $ _dress_appointment_results = {}
+    $ daily_events.rows[:] = []
     python:
         for _dress_girl_name in _dress_appointment_names:
-            daily_events.rows[:] = []
             daily_events.add(_dress_girl_name, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy", "girl_location")
-            daily_events.end_day(1)
+    assert eval (all(daily_events.exists(name, "BuyDressTom", "") == 1 for name in _dress_appointment_names)) timeout 5.0
+    $ daily_events.end_day(1)
+    python:
+        for _dress_girl_name in _dress_appointment_names:
             _dress_row = daily_events.pop_match("", "BuyDress", "DressShop", 0)
             _dress_appointment_results[_dress_girl_name] = (
                 people.get_info(_dress_girl_name) is not None,
@@ -645,6 +648,7 @@ testcase external_all_girl_dress_appointments_use_shared_pipeline:
                 str(_dress_row.get("CallMode", "") or ""),
             )
     assert eval (all(_dress_appointment_results.get(name) == (True, name, "GirlDressBuy", "girl_location") for name in _dress_appointment_names)) timeout 5.0
+    assert eval (all(daily_events.exists(name, "BuyDress", "") == 0 for name in _dress_appointment_names)) timeout 5.0
 
 testcase external_girl_dress_inside_uses_player_intimacy:
     run Call("InitAmanda")

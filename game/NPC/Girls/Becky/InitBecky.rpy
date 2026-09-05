@@ -216,7 +216,7 @@ init python:
             can_shame = self.stats.get("orgasms_given", 0) >= 2 and self.rel > 8 and self.talk_count() < 2
             can_buy = (
                 self.rel > 8
-                and daily_events.exists("", "BuyDressTom", "") == 0
+                and daily_events.exists(girl_key, "BuyDressTom", "") == 0
                 and daily_events.exists(girl_key, "BuyDress", "") == 0
                 and self.talk_count() < 2
                 and int(calendar_v2.week or 0) != 6

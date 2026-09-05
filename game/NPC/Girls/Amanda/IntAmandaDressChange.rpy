@@ -8,7 +8,7 @@ label int_amanda_dress_change(GirlNameIAT="amanda"):
     $ _can_offer_bra = Amanda.rel > 8 and int(Amanda.sex_stat("orgasms_given", 0) or 0) >= 2 and str(Amanda.current_underwear("bra", "") or "") != "" and (Amanda.var_int("suckyou", 0) or Amanda.var_int("fuckyou", 0)) and Amanda.talked_today < 2
     $ _can_offer_panties = Amanda.rel > 8 and int(Amanda.sex_stat("orgasms_given", 0) or 0) >= 2 and str(Amanda.current_underwear("panties", "") or "") != "" and (Amanda.var_int("suckyou", 0) or Amanda.var_int("fuckyou", 0)) and Amanda.talked_today < 2
     $ _can_shame = Amanda.rel > 8 and int(Amanda.sex_stat("orgasms_given", 0) or 0) >= 2 and Amanda.talked_today < 2
-    $ _can_buy = Amanda.rel > 8 and daily_events.exists("", "BuyDressTom") == 0 and daily_events.exists(GirlNameIAT, "BuyDress") == 0 and Amanda.talked_today < 2 and int(calendar_v2.week or 0) != 6
+    $ _can_buy = Amanda.rel > 8 and daily_events.exists(GirlNameIAT, "BuyDressTom") == 0 and daily_events.exists(GirlNameIAT, "BuyDress") == 0 and Amanda.talked_today < 2 and int(calendar_v2.week or 0) != 6
     menu:
         "Предложить Аманде ходить без лифчика" if _can_offer_bra:
             call IntAmandaDressChangeOfferBra(GirlNameIAT)

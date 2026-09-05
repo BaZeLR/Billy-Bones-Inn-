@@ -106,3 +106,25 @@ def test_all_authored_girls_schedule_the_same_dress_purchase_pipeline():
 
     daily_runtime = read(ROOT / "game/Utilities/General/Common/CheckDailyEvent.rpy")
     assert 'self.add(girl_name, "dressshop", 0, "=", 1, 0, "BuyDress", "GirlDressBuy", "girl_location")' in daily_runtime
+
+
+def test_each_girl_owns_her_pending_dress_appointment_gate():
+    appointment_gates = {
+        "game/NPC/Girls/Melissa/IntMelissaTalk.rpy": "girl_name",
+        "game/NPC/Girls/Sandra/IntSandraDressChange.rpy": "girl_key",
+        "game/NPC/Girls/Amanda/InitAmanda.rpy": '"amanda"',
+        "game/NPC/Girls/Amanda/IntAmandaDressChange.rpy": "GirlNameIAT",
+        "game/NPC/Girls/Becky/InitBecky.rpy": "girl_key",
+        "game/NPC/Girls/Georgett/IntGeorgettDressChange.rpy": "GirlNameIGT",
+        "game/NPC/Girls/Liza/IntLizaDressChange.rpy": "GirlNameILT",
+    }
+
+    for path, girl_argument in appointment_gates.items():
+        source = read(ROOT / path)
+        assert f'daily_events.exists({girl_argument}, "BuyDressTom"' in source
+        assert 'daily_events.exists("", "BuyDressTom"' not in source
+
+    story_runtime = read(ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy")
+    assert "daily_events.exists('', 'BuyDressTom'" not in story_runtime
+    for girl_name in ("amanda", "melissa", "sandra"):
+        assert f"daily_events.exists('{girl_name}', 'BuyDressTom', '') == 0" in story_runtime

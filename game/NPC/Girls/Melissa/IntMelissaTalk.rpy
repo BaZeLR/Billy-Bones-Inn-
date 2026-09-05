@@ -70,7 +70,7 @@ label IntMelissaTalk(girl_name="melissa"):
                     $ scene_runtime.text += "\n\nМелисса холодно выслушала вас, презрительно отвернулась и пошла прочь."
                 $ Melissa.mark_talked()
                 $ scene_runtime.location_text = scene_runtime.text
-            "Предложить купить Мелиссе обновку" if int(Melissa.rel or 0) > 8 and daily_events.exists("", "BuyDressTom") == 0 and daily_events.exists(girl_name, "BuyDress") == 0 and int(Melissa.talked_today or 0) < 2 and int(calendar_v2.week or 0) != 6:
+            "Предложить купить Мелиссе обновку" if int(Melissa.rel or 0) > 8 and daily_events.exists(girl_name, "BuyDressTom") == 0 and daily_events.exists(girl_name, "BuyDress") == 0 and int(Melissa.talked_today or 0) < 2 and int(calendar_v2.week or 0) != 6:
                 call IntMelissaDressChange(girl_name)
             "Спросить, что для нее сейчас важнее всего" if int(Melissa.asked_today or 0) == 0 and int(Melissa.rel or 0) >= 15:
                 $ Melissa.mark_asked()

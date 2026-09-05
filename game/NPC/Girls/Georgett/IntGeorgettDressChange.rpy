@@ -7,7 +7,7 @@ label IntGeorgettDressChange(GirlNameIGT="georgett"):
         _can_shame = Georgett.rel > 8 and Georgett.talk_count() < 2
         _can_buy = (
             Georgett.rel > 8
-            and daily_events.exists("", "BuyDressTom", "") == 0
+            and daily_events.exists(GirlNameIGT, "BuyDressTom", "") == 0
             and daily_events.exists(GirlNameIGT, "BuyDress", "") == 0
             and Georgett.talk_count() < 2
             and int(calendar_v2.week or 0) != 6
