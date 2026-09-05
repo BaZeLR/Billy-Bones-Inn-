@@ -45,9 +45,6 @@ define amandaThreadList = [
     LThreadData(0, "amanda", "TavernSeductions", None, [
         AmandaTavernSeduction,
     ], highlight=False, threaded=False),
-    LThreadData(0, "amanda", "LizaWorkTalk", None, [
-        AmandaLizaWorkTalk,
-    ], highlight=False, threaded=False),
     LThreadData(0, "amanda", "RoomNightApproach", None, [
         AmandaRoomNightApproach,
     ], highlight=False, threaded=False),

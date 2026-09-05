@@ -152,11 +152,7 @@ init -44 python:
 
         if MomName in ["amanda", "melissa", "sandra"]:
             player.economy.add_child_support(1)
-            player.tavern_management.household_members = _kids_int(player.tavern_management.household_members, 0) + 1
             player.economy.child_birth_benefit_notice = "Так как " + people_name(MomName, "nominative", MomName) + " родила без мужа, то именем герцогини Кончитты Дель Семени вашей семье, тоесть вам, было выплаченно единовременно 600 мараведи воспоможения. Также вы будете получать дополнительно по 15 мараведи каждое воскресенье."
-        if MomName in ["liza", "georgett"]:
-            if str(people.location("georgett") or "") == "TavernMain":
-                player.tavern_management.household_members = _kids_int(player.tavern_management.household_members, 0) + 1
 
         return kid_id
 

@@ -1105,7 +1105,7 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     $ TodaySexEvents_Clear()
     run Jump("PortStreets")
     advance until screen "main_ui" timeout 20.0
-    assert eval (not Georgett.is_working()) timeout 5.0
+    assert eval (Georgett.is_working()) timeout 5.0
     click id "main_ui_entity_button_npc_georgett" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     assert eval (int(Georgett.rel or 0) == 0 and "Как прошел твой день?" in str(scene_runtime.text or "") and "узнали, что ее зовут" not in str(scene_runtime.text or "")) timeout 5.0
     $ _georgett_known_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Закончить разговор")
@@ -1123,7 +1123,8 @@ testcase external_georgette_portstreet_relationship_talk_and_sex_flow:
     $ Georgett.talked_today = 0
     $ Georgett.sex_state["lick_pussy"] = 4
     run Call("IntGeorgettSmalltalk", "georgett", "street")
-    assert eval (int(Georgett.rel or 0) == 7 and int(Georgett.talked_today or 0) == 1 and "занята работой" not in str(scene_runtime.text or "")) timeout 5.0
+    assert eval (int(Georgett.rel or 0) == 6 and int(Georgett.talked_today or 0) == 0 and "занята работой" in str(scene_runtime.text or "")) timeout 5.0
+    $ Georgett.rel = 7
     $ player.economy.money = 100
     $ player.intimacy.came_today = 0
     $ _georgett_hire_money_before = int(player.economy.money or 0)
@@ -1612,6 +1613,31 @@ testcase external_actual_wine_for_dance_menu:
     assert eval (int(player.tavern_management.dance_sponsor_pledge_day or -1) == int(calendar_v2.daysInGame or 0)) timeout 5.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and renpy.get_screen("say") is None and "Вы соглашаетесь выставить на пятничных танцах" in str(scene_runtime.text or "")) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+
+testcase external_amanda_liza_work_conversation_activates:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(3, 1, 1100, 13, 0)
+    $ external_calendar_set_weekday(1)
+    $ player.history["kids"] = {"list": [], "next_id": 1}
+    $ Georgett.set_hired(False)
+    $ Liza.set_hired(False)
+    assert eval (household.member_count() == 4) timeout 5.0
+    $ Georgett.set_hired(True)
+    $ Liza.set_hired(True)
+    assert eval (household.member_count() == 6) timeout 5.0
+    $ Liza.set_job_value("jobgloryhole", 0)
+    $ event_runtime.tavern_work_events = [{"code": "AmandaLizaTalk", "type": "tavern_story", "label": "EventAmandaLizettTalk", "period": calendar_v2.time_slot(), "mandatory": False, "priority": 50}]
+    $ event_runtime.tavern_played_today = []
+    $ event_runtime.tavern_report_rows = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernMain", "tavern_work") and str(event_runtime.available["TavernMain"]["tavern_work"].target or "") == "TavernWorkEventTrigger") timeout 5.0
+    run Call("TavernWorkEventTrigger")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Событие: Аманда и Лизетта") timeout 5.0
+    assert eval ("lizatalk" in str(scene_runtime.picture or "") and len(list(event_runtime.tavern_work_events or [])) == 0) timeout 5.0
 
 testcase external_tavern_random_event_plan_consumes_once:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 13, 0)
@@ -6851,13 +6877,13 @@ testcase external_kids_birth_history_single_authority:
     $ Amanda.set_sex_stat("pregnancy", 240)
     $ Amanda.set_sex_stat("pregfather", "Вы")
     $ _kids_before = Amanda.sex_stat("kids", 0)
-    $ _household_before = player.tavern_management.household_members
+    $ _household_before = household.member_count()
     $ _support_before = player.economy.child_support_count
     $ _newborn_id = CreateKid("amanda")
     $ _newborn_data = GetKidData(_newborn_id)
     assert eval (_newborn_id == 1 and len(_kids_list()) == 1 and player_children_count() == 1) timeout 5.0
     assert eval (Amanda.sex_stat("kids", 0) == _kids_before + 1 and Amanda.sex_stat("pregnancy", 0) == 0 and Amanda.sex_stat("pregfather", "") == "") timeout 5.0
-    assert eval (player.tavern_management.household_members == _household_before + 1) timeout 5.0
+    assert eval (household.member_count() == _household_before + 1) timeout 5.0
     assert eval (player.economy.child_support_count == _support_before + 1 and "600" in player.economy.child_birth_benefit_notice) timeout 5.0
     assert eval (_newborn_data["KidName"] != "" and _newborn_data["KidGender"] in ("M", "F")) timeout 5.0
     assert eval ("новорожденн" in ShowKidDesc(_newborn_id) and "scratch" not in player.history["kids"]) timeout 5.0
@@ -8290,6 +8316,12 @@ testcase external_working_girl_talk_penalty:
     $ _work_talk_button_id = "choice_panel_button_%d" % int(_work_talk_index)
     click id _work_talk_button_id pos (0.5, 0.5) until eval (len(list(renpy.get_screen("choice").scope.get("items", []) or [])) == 11) timeout 20.0
     assert eval (int(Amanda.rel or 0) == 9 and int(Amanda.talked_today or 0) == 1) timeout 5.0
+    $ Liza.set_hired(True)
+    $ Liza.rel = 9
+    $ Liza.talked_today = 0
+    $ people.get_data("liza").set_schedule([NPCScheduleEntry(location="TavernMain", start_minute=0, end_minute=1440, priority=999, working=True)])
+    run Call("IntLizaTalkSmalltalk", "liza", "tavern")
+    assert eval (int(Liza.rel or 0) == 8 and int(Liza.talked_today or 0) == 0 and "занята работой" in str(scene_runtime.text or "")) timeout 5.0
 
 testcase external_smalltalk_main_ui_portraits:
     run Jump("Intro")
@@ -8613,6 +8645,7 @@ def main() -> int:
             "external_actual_wine_click",
             "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
+            "external_amanda_liza_work_conversation_activates",
             "external_tavern_random_event_plan_consumes_once",
             "external_melissa_waitress_fall_event_lifecycle",
             "external_tavern_small_fight_native_event_flow",
@@ -8804,6 +8837,7 @@ def main() -> int:
             "external_actual_wine_click",
             "external_wine_store_return_restores_market_scene_once",
             "external_actual_wine_for_dance_menu",
+            "external_amanda_liza_work_conversation_activates",
             "external_tavern_random_event_plan_consumes_once",
             "external_melissa_waitress_fall_event_lifecycle",
             "external_tavern_small_fight_native_event_flow",

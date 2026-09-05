@@ -204,7 +204,6 @@ label IntGeorgettInviteTavern(girl_name="georgett", girl_loc="street"):
         $ Georgett.set_hired(True)
         $ Liza.set_hired(True)
         $ player.tavern_management.breakfast.georgett_liza_pending = 1
-        $ player.tavern_management.household_members = int(player.tavern_management.household_members) + 2 + kids_count_for_mothers("georgett", "liza")
         if event_runtime.active_thread is threads.get("georgettPortStreet") and not event_runtime.active_thread.done[7]:
             $ event_runtime.active_thread.seen(7)
             $ event_runtime.evaluation_time = None

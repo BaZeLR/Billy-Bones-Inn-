@@ -46,7 +46,7 @@ def test_tavern_resources_and_construction_have_one_runtime_owner():
         "player.tavern_management.client_room_hole",
         "player.tavern_management.glory_hole",
         "player.tavern_management.breakfast.today",
-        "player.tavern_management.household_members",
+        "household.member_count()",
         "player.horse.stolen_days",
     ):
         assert owner_path in runtime
@@ -94,6 +94,10 @@ def test_save_repair_has_no_legacy_store_import_or_migration_layer():
         "tractir_save_migrate_",
     ):
         assert forbidden not in migration
+
+    runtime = runtime_source()
+    assert "player.tavern_management.household_members" not in runtime
+    assert 'player.tavern_management.__dict__.pop("household_members", None)' in migration
 
     assert "tractir_save_normalize_rooms()" in migration
     assert "tractir_save_remove_owned_unique_items_from_rooms()" in migration

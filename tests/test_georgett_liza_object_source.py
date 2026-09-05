@@ -420,7 +420,7 @@ def test_portstreets_clients_are_repeatable_action_events_from_classes():
         entry for entry in georgett_schedule_data["entries"] if entry["label"] == "portstreets_work"
     )
     assert georgett_port_entry["talkable"] is True
-    assert georgett_port_entry.get("working", False) is False
+    assert georgett_port_entry["working"] is True
 
     assert '"story_georgett_portstreet_clients"' in runtime
     assert '"story_liza_portstreet_clients"' in runtime

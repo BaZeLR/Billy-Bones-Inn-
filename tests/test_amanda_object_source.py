@@ -775,17 +775,14 @@ def test_amanda_liza_work_talk_uses_real_source_event_without_invented_bridge():
     runtime = _source(STORY_RUNTIME)
     event_model = _source(AMANDA_EVENT_MODEL)
     amanda_init = _source(AMANDA_INIT)
-    glory_events = _source(AMANDA_LIZA_GLORY_EVENTS)
     liza_items = _source(AMANDA_LIZA_TALK_ITEMS)
     tavern_random = _source(TAVERN_RANDOM_EVENTS)
     amanda_room = _source(TAVERN_AMANDA_ROOM)
 
-    assert '"LizaWorkTalk"' in runtime
-    assert "AmandaLizaWorkTalk" in runtime
-    assert "class AmandaLizaWorkTalkEvent(AmandaEvent):" in event_model
-    assert '"story_amanda_liza_talk_work_0"' in event_model
-    assert 'tavern_work_pop_planned_code("AmandaLizaTalk", calendar_v2.time_slot(), True, "TavernMain")' in glory_events
-    assert "call EventAmandaLizettTalk(1)" in glory_events
+    assert '"LizaWorkTalk"' not in runtime
+    assert "AmandaLizaWorkTalk" not in event_model
+    assert not AMANDA_LIZA_GLORY_EVENTS.exists()
+    assert 'TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk"' in tavern_random
     amanda_liza_talk = _source(PROJECT_ROOT / "game" / "NPC" / "Girls" / "Amanda" / "EventAmandaLizettTalk.rpy")
     assert "not_to_speak=0" in amanda_liza_talk
     assert "NotToSpeak" not in amanda_liza_talk
@@ -820,11 +817,10 @@ def test_amanda_liza_work_talk_uses_real_source_event_without_invented_bridge():
         "glory_tavern_aftermath_seen_day",
         "night_after_glory_seen_day",
     )
-    live_source = runtime + event_model + amanda_init + glory_events + liza_items
+    live_source = runtime + event_model + amanda_init + liza_items
     for token in invented_tokens:
         assert token not in live_source
 
-    assert "AmandaVar" not in glory_events
     assert "AmandaVar" not in liza_items
     assert "call RoomEnterEventGate(rooms.current_code, False)" in amanda_room
 

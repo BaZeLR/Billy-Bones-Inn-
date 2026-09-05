@@ -36,6 +36,7 @@ init -100 python:
         people.repair()
         rooms.repair()
         household.repair()
+        player.tavern_management.__dict__.pop("household_members", None)
         tractir_save_normalize_tavern_staff_jobs()
         tractir_save_normalize_werecat_intro_thread()
         calendar_v2.time_advance_blocked = 0

@@ -43,7 +43,7 @@ label NextDay_TavernDaily():
         if len(list(_kitchen_effect_lines or [])) > 0:
             ExtraEvents += "{b}" + "\n".join(list(_kitchen_effect_lines or [])) + "{/b}\n"
         CurDay['dineout'] = 0
-        CurDay['fameaten'] = player.tavern_management.household_members
+        CurDay['fameaten'] = household.member_count()
         CurDay['rat_food_loss'] = 0
         if CurDay['fameaten'] > player.tavern_management.productnum:
             CurDay['dineout'] = (CurDay['fameaten'] - player.tavern_management.productnum) * 3
@@ -63,7 +63,7 @@ label NextDay_TavernDaily():
                 ExtraEvents += '{b}Крысы снова добрались до кладовой и испортили 3 мешка припасов.{/b}\n'
             else:
                 ExtraEvents += '{b}Крысы опять шуршали в кладовой, но брать там уже почти нечего.{/b}\n'
-        CurDay['fixedcost'] = player.tavern_management.household_members * 1 + 10
+        CurDay['fixedcost'] = household.member_count() * 1 + 10
         # Service level effects
         if CurDay['happy'] >= 0:
             if player.tavern_management.service.waitress_score < 10 or player.tavern_management.service.cleanliness_score < 10 or player.tavern_management.service.kitchen_score < 10:

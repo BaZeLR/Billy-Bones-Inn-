@@ -11,7 +11,7 @@ def source(relative):
 def test_child_records_have_one_player_history_authority():
     kids = source("game/Utilities/General/Sex/KidsFunctions.rpy")
     stat = source("game/Utilities/General/Screens/stat.rpy")
-    georgett = source("game/NPC/Girls/Georgett/IntGeorgettTalk.rpy")
+    household = source("game/Utilities/General/NPC/HouseholdAI_ren.rpy")
 
     assert 'runtime.history.setdefault("kids", {})' in kids
     assert 'state.setdefault("list", [])' in kids
@@ -19,7 +19,7 @@ def test_child_records_have_one_player_history_authority():
     assert 'mom_info.set_sex_stat("kids"' in kids
     assert "return GetKidData(KidId)[\"KidName\"]" in kids
     assert "return len(_kids_list())" in stat
-    assert 'kids_count_for_mothers("georgett", "liza")' in georgett
+    assert "kids_count_for_mothers(*mothers)" in household
 
 
 def test_kids_runtime_has_no_qsp_scratch_or_parallel_child_maps():
@@ -49,7 +49,7 @@ def test_birth_consequences_write_real_owners_directly():
     finish = source("game/Town/Temple/GiveBirthFinish.rpy")
 
     assert "player.economy.add_child_support(1)" in kids
-    assert "player.tavern_management.household_members =" in kids
+    assert "player.tavern_management.household_members" not in kids
     assert "$ kid_id = CreateKid(girl_name)" in finish
     assert "$ newborn = GetKidData(kid_id)" in finish
     assert 'renpy.dynamic("real_name", "real_name3", "kid_id"' in finish

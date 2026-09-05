@@ -206,6 +206,9 @@ init 5 python:
     def household_ai_raise_convergence(amount=0.1):
         household.meta["convergence"] = household_ai_clamp(household.meta.get("convergence", 0.0) + amount)
     class HouseholdInfo(object):
+        BASE_RESIDENT_IDS = ("you", "sandra", "melissa", "amanda")
+        HIRED_RESIDENT_IDS = ("georgett", "liza")
+
         META_DEFAULTS = {
             "pressure": 0.0,
             "friction": 0.2,
@@ -244,6 +247,19 @@ init 5 python:
                     saved_value = {}
                 setattr(self, field_name, saved_value)
             return self
+
+        def resident_ids(self):
+            residents = list(self.BASE_RESIDENT_IDS)
+            for npc_id in self.HIRED_RESIDENT_IDS:
+                info = people.get_info(npc_id)
+                if info is not None and info.can_work_tavern():
+                    residents.append(npc_id)
+            return residents
+
+        def member_count(self):
+            residents = self.resident_ids()
+            mothers = [npc_id for npc_id in residents if npc_id != "you"]
+            return len(residents) + kids_count_for_mothers(*mothers)
 
     HOUSEHOLD_NPC_DEFAULTS = {
         "amanda": {"drive": 0.0, "resistance": 0.75, "threshold": 0.62, "stability": 0.35, "rivalry": 0.65, "obedience": 0.45, "path": "undecided"},

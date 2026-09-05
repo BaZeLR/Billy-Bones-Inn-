@@ -68,24 +68,6 @@ init -24 python:
             )
 
 
-    class AmandaLizaWorkTalkEvent(AmandaEvent):
-        def __init__(self):
-            super(AmandaLizaWorkTalkEvent, self).__init__(
-                "liza_work_talk",
-                "story_amanda_liza_talk_work_0",
-                (1, 2, 3, 4, 5, 6),
-                (12, 17),
-                1,
-                "TavernMain",
-                "tavern_work",
-                230,
-                source_refs=["EventAmandaLizettTalk.txt"],
-            )
-
-        def checkAmandaConditions(self):
-            return tavern_work_planned_for("AmandaLizaTalk", "TavernMain", calendar_v2.time_slot())
-
-
     class AmandaRoomNightApproachEvent(AmandaEvent):
         def __init__(self):
             super(AmandaRoomNightApproachEvent, self).__init__(
@@ -269,7 +251,6 @@ init -24 python:
 
 
     AmandaTavernSeduction = AmandaTavernSeductionEvent()
-    AmandaLizaWorkTalk = AmandaLizaWorkTalkEvent()
     AmandaRoomNightApproach = AmandaRoomNightApproachEvent()
     AmandaGloryHoleTry = AmandaGloryHoleTryEvent()
     AmandaMorningWindowEpisode = AmandaMorningWindowEpisodeEvent()

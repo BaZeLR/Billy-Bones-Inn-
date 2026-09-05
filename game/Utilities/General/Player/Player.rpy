@@ -620,7 +620,6 @@ init -998 python:
             self.glory_hole_session = PlayerGloryHoleSessionState()
             self.dance_sponsor = 0
             self.dance_sponsor_pledge_day = -1
-            self.household_members = 4
             self.breakfast = PlayerBreakfastState()
             self.cleanliness = 60
             self.upstairs_rooms_dirty = 0
