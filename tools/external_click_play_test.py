@@ -5323,6 +5323,44 @@ testcase external_becky_home_invitation_movie_is_closable:
     assert eval (not bool(scene_runtime.movie) and str(scene_runtime.picture or "") == "images/becky/dance/you_dance_4.png" and renpy.music.get_playing("movie") is None) timeout 5.0
     click pos (960, 560) until eval (bool(rooms.get("FridayDance").becky_home_invited)) timeout 20.0
     $ main_ui_end_native_scene_state()
+
+testcase external_becky_dance_images_match_actions:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ rooms.enter("FridayDance")
+    $ main_ui_begin_native_scene_state("Танец с Бекки")
+    $ rooms.get("FridayDance").dance_count = 1
+    $ rooms.get("FridayDance").step = 1
+    $ rooms.get("FridayDance").max_step = 6
+    $ rooms.get("FridayDance").becky_home_invited = False
+    $ Becky.rel = 10
+    $ Becky.corruption = 22
+    run Call("int_becky_dance")
+    advance until screen "choice" timeout 20.0
+    $ _becky_image_action_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Пригласить потанцевать")
+    click id ("choice_panel_button_%d" % int(_becky_image_action_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/becky/dance/you_dance_2.png") timeout 5.0
+    $ rooms.get("FridayDance").becky_home_invited = True
+    $ _becky_image_action_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Продолжить танцевать")
+    click id ("choice_panel_button_%d" % int(_becky_image_action_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/becky/dance/you dance_3.png") timeout 5.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    $ _becky_image_action_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Положить руки на талию")
+    click id ("choice_panel_button_%d" % int(_becky_image_action_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (str(scene_runtime.picture or "") == "images/becky/dance/you_dance_4.png" and renpy.get_screen("say") is not None) timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    $ _becky_image_action_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Положить руки на попу")
+    click id ("choice_panel_button_%d" % int(_becky_image_action_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (str(scene_runtime.picture or "") == "images/becky/dance/you_dance_5.png" and renpy.get_screen("say") is not None) timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    $ _becky_image_action_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Сжать попу вдовы")
+    click id ("choice_panel_button_%d" % int(_becky_image_action_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (str(scene_runtime.picture or "") == "images/becky/dance/you dance_6.png" and renpy.get_screen("say") is not None) timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    assert eval (int(rooms.get("FridayDance").step or 0) == 6 and not bool(scene_runtime.movie)) timeout 5.0
+    $ main_ui_end_native_scene_state()
 '''
 
 BECKY_HOME_GUEST_CHECKS = r'''
@@ -8912,6 +8950,7 @@ def main() -> int:
             "external_amanda_legare_sex_scene_label_procedures",
             "external_friday_becky_inner_actions_do_not_spend_extra_dances",
             "external_becky_home_invitation_movie_is_closable",
+            "external_becky_dance_images_match_actions",
             "external_clara_flirt_unlocks_paintings_gate",
             "external_amanda_glory_reaction_uses_story_event",
             "external_amanda_liza_talk_rows_use_typed_conditions",
@@ -9106,6 +9145,7 @@ def main() -> int:
             "external_amanda_legare_sex_scene_label_procedures",
             "external_friday_becky_inner_actions_do_not_spend_extra_dances",
             "external_becky_home_invitation_movie_is_closable",
+            "external_becky_dance_images_match_actions",
             "external_clara_flirt_unlocks_paintings_gate",
             "external_amanda_glory_reaction_uses_story_event",
             "external_amanda_liza_talk_rows_use_typed_conditions",

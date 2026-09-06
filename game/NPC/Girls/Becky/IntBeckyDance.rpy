@@ -18,7 +18,7 @@ label story_becky_friday_dance_mc_0:
     return
 
 label int_becky_dance():
-    $ renpy.dynamic("GirlNameIBD", "_dance_pic")
+    $ renpy.dynamic("GirlNameIBD")
     $ GirlNameIBD = "becky"
     $ rooms.get("FridayDance").max_step = 6
     $ scene_runtime.picture = "images/becky/dance/waiting_0.png"
@@ -49,15 +49,15 @@ label int_becky_dance():
                 $ rooms.get("FridayDance").kiss = 0
                 $ rooms.get("FridayDance").tits = 0
                 if Becky.rel >= 7 and Becky.corruption > 18:
-                    $ scene_runtime.picture = "images/becky/dance/waiting_0.png"
+                    $ scene_runtime.picture = "images/becky/dance/you_dance_2.png"
                     vscene scene_runtime.picture
                     "Она с радостью согласилась, вы взяли ее под руку и вскоре вы закружились в танце."
                 elif Becky.rel >= 5 and Becky.corruption >= 8:
-                    $ scene_runtime.picture = "images/becky/dance/waiting_0.png"
+                    $ scene_runtime.picture = "images/becky/dance/you_dance_2.png"
                     vscene scene_runtime.picture
                     "Она сказала: \"Стефан, Стефан, неужели ты действительно хочешь танцевать с такой практически старухой как я? Я же даже постарше вашей Сандры буду. Ну ладно, если ты так настаиваешь,\" - и она взяла вашу руку. Вскоре вы закружились в танце."
                 else:
-                    $ scene_runtime.picture = "images/becky/dance/butt_angy.png"
+                    $ scene_runtime.picture = "images/becky/dance/waiting_0.png"
                     vscene scene_runtime.picture
                     "\"Стефан, если ты хочешь танцевать со старой тетей, то пригласи свою бабушку Сандру, если хочешь!\" - ответила вам вдова. Расстроенный отказом, вы отправились восвояси."
                     $ rooms.get("FridayDance").step = rooms.get("FridayDance").max_step
@@ -66,8 +66,18 @@ label int_becky_dance():
                     "Танец закончился и вы вернулись к колоннаде."
 
             "Продолжить танцевать" if rooms.get("FridayDance").step >= 2 and rooms.get("FridayDance").step < rooms.get("FridayDance").max_step:
-                $ _dance_pic = procedural_randint(2, 5, "becky_dance_continue_%s_%s" % (int(current_game_day() or 0), rooms.get("FridayDance").step))
-                $ scene_runtime.picture = "images/becky/dance/you_dance_%s.png" % _dance_pic
+                if rooms.get("FridayDance").kiss == 2:
+                    $ scene_runtime.picture = "images/becky/dance/french_kiss_2.png"
+                elif rooms.get("FridayDance").kiss == 1:
+                    $ scene_runtime.picture = "images/becky/dance/you_dance_7.png"
+                elif rooms.get("FridayDance").hands == "ass2":
+                    $ scene_runtime.picture = "images/becky/dance/you dance_6.png"
+                elif rooms.get("FridayDance").hands == "ass":
+                    $ scene_runtime.picture = "images/becky/dance/you_dance_5.png"
+                elif rooms.get("FridayDance").hands == "waist":
+                    $ scene_runtime.picture = "images/becky/dance/you_dance_4.png"
+                else:
+                    $ scene_runtime.picture = "images/becky/dance/you dance_3.png"
                 vscene scene_runtime.picture
                 "Вы продолжили кружиться в танце с Бекки."
                 if rooms.get("FridayDance").hands == "waist":
@@ -90,13 +100,13 @@ label int_becky_dance():
             "Положить руки на талию" if rooms.get("FridayDance").step >= 2 and rooms.get("FridayDance").step < rooms.get("FridayDance").max_step and rooms.get("FridayDance").hands != "waist":
                 "Вы положили руки на талию Бекки."
                 if Becky.rel >= 7 and Becky.corruption > 10:
-                    $ scene_runtime.picture = "images/becky/dance/you_dance_2.png"
+                    $ scene_runtime.picture = "images/becky/dance/you_dance_4.png"
                     vscene scene_runtime.picture
                     "Она нежно улыбнулась и придвинулась к вам поближе, продолжая танец."
                     $ Becky.apply_social_roll(8, 5, 1, 14, 5, 1)
                     $ rooms.get("FridayDance").hands = "waist"
                 elif Becky.rel >= 5 and Becky.corruption >= 6:
-                    $ scene_runtime.picture = "images/becky/dance/you_dance_2.png"
+                    $ scene_runtime.picture = "images/becky/dance/you_dance_3.png"
                     vscene scene_runtime.picture
                     "Вдова удивленно приподняла бровь, но возражать не стала."
                     $ Becky.apply_social_roll(8, 5, 1, 14, 5, 1)
@@ -122,7 +132,7 @@ label int_becky_dance():
                     $ Becky.apply_social_roll(9, 3, 1, 18, 3, 1)
                     $ rooms.get("FridayDance").hands = "ass"
                 elif Becky.rel >= 6 and Becky.corruption >= 12:
-                    $ scene_runtime.picture = "images/becky/dance/you_dance_4.png"
+                    $ scene_runtime.picture = "images/becky/dance/you_dance_5.png"
                     vscene scene_runtime.picture
                     "\"Стефан, негодник, что ты делаешь?!\" - прошептала Бекки, улыбаясь. \"Впрочем, продолжай,\" - добавила она."
                     $ Becky.apply_social_roll(9, 3, 1, 18, 3, 1)
@@ -148,14 +158,14 @@ label int_becky_dance():
             "Сжать попу вдовы" if rooms.get("FridayDance").step >= 2 and rooms.get("FridayDance").step < rooms.get("FridayDance").max_step and rooms.get("FridayDance").hands == "ass":
                 "Ваши беспокойные ручки начали гладить и сжимать попку вдовушки."
                 if Becky.rel >= 10 and Becky.corruption > 20:
-                    $ scene_runtime.picture = "images/becky/dance/you_dance_7.png"
+                    $ scene_runtime.picture = "images/becky/dance/you dance_6.png"
                     vscene scene_runtime.picture
                     "Бекки это пришлось по вкусу, она улыбнулась и прижалась вплотную к вам, начав приятно тереться своими дыньками о вашу грудь."
                     $ Becky.apply_social_roll(11, 4, 1, 22, 3, 1)
                     $ rooms.get("FridayDance").hands = "ass2"
                     $ rooms.get("FridayDance").tits = 1
                 elif Becky.rel >= 8 and Becky.corruption >= 16:
-                    $ scene_runtime.picture = "images/becky/dance/you_dance_4.png"
+                    $ scene_runtime.picture = "images/becky/dance/you dance_6.png"
                     vscene scene_runtime.picture
                     "\"Стефанчик, ах наглец, ах шалун!\" - прошептала Бекки с напускным гневом, но не сделала ничего, чтобы остановить вас."
                     $ Becky.apply_social_roll(11, 4, 1, 22, 3, 1)
@@ -189,7 +199,7 @@ label int_becky_dance():
                     $ Becky.apply_social_roll(11, 4, 1, 24, 3, 1)
                     $ rooms.get("FridayDance").kiss = 2
                 elif Becky.rel >= 8 and Becky.corruption >= 16:
-                    $ scene_runtime.picture = "images/becky/dance/french_kiss_1.png"
+                    $ scene_runtime.picture = "images/becky/dance/you_dance_7.png"
                     vscene scene_runtime.picture
                     "Преодолев секундное замешательство, Бекки откликнулась на ваш поцелуй, хотя и, как вам показалось, была несколько шокирована вашей прямотой."
                     $ Becky.apply_social_roll(11, 4, 1, 24, 3, 1)
