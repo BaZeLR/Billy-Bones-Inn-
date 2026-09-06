@@ -18,9 +18,8 @@ label story_becky_friday_dance_mc_0:
     return
 
 label int_becky_dance():
-    $ renpy.dynamic("GirlNameIBD", "_dance_pic", "_dance_finish_media")
+    $ renpy.dynamic("GirlNameIBD", "_dance_pic")
     $ GirlNameIBD = "becky"
-    $ _dance_finish_media = "images/becky/dance/dance_finish.webm"
     $ rooms.get("FridayDance").max_step = 6
     $ scene_runtime.picture = "images/becky/dance/waiting_0.png"
     vscene scene_runtime.picture
@@ -86,7 +85,6 @@ label int_becky_dance():
                 $ rooms.get("FridayDance").step += 1
                 call BeckyInviteHome("becky")
                 if rooms.get("FridayDance").step == rooms.get("FridayDance").max_step:
-                    vscene _dance_finish_media
                     "Танец закончился и вы вернулись к колоннаде."
 
             "Положить руки на талию" if rooms.get("FridayDance").step >= 2 and rooms.get("FridayDance").step < rooms.get("FridayDance").max_step and rooms.get("FridayDance").hands != "waist":
@@ -113,7 +111,6 @@ label int_becky_dance():
                 $ rooms.get("FridayDance").step += 1
                 call BeckyInviteHome("becky")
                 if rooms.get("FridayDance").step == rooms.get("FridayDance").max_step:
-                    vscene _dance_finish_media
                     "Танец закончился и вы вернулись к колоннаде."
 
             "Положить руки на попу" if rooms.get("FridayDance").step >= 2 and rooms.get("FridayDance").step < rooms.get("FridayDance").max_step and rooms.get("FridayDance").hands == "waist":
@@ -146,7 +143,6 @@ label int_becky_dance():
                 $ rooms.get("FridayDance").step += 1
                 call BeckyInviteHome("becky")
                 if rooms.get("FridayDance").step == rooms.get("FridayDance").max_step:
-                    vscene _dance_finish_media
                     "Танец закончился и вы вернулись к колоннаде."
 
             "Сжать попу вдовы" if rooms.get("FridayDance").step >= 2 and rooms.get("FridayDance").step < rooms.get("FridayDance").max_step and rooms.get("FridayDance").hands == "ass":
@@ -180,7 +176,6 @@ label int_becky_dance():
                 $ rooms.get("FridayDance").step += 1
                 call BeckyInviteHome("becky")
                 if rooms.get("FridayDance").step == rooms.get("FridayDance").max_step:
-                    vscene _dance_finish_media
                     "Танец закончился и вы вернулись к колоннаде."
 
             "Поцеловать Бекки" if rooms.get("FridayDance").step >= 2 and rooms.get("FridayDance").step < rooms.get("FridayDance").max_step and rooms.get("FridayDance").kiss == 0:
@@ -215,7 +210,6 @@ label int_becky_dance():
                 $ rooms.get("FridayDance").step += 1
                 call BeckyInviteHome("becky")
                 if rooms.get("FridayDance").step == rooms.get("FridayDance").max_step:
-                    vscene _dance_finish_media
                     "Танец закончился и вы вернулись к колоннаде."
 
             "Принять предложение вдовы" if rooms.get("FridayDance").becky_home_invited:

@@ -5278,7 +5278,7 @@ testcase external_friday_becky_inner_actions_do_not_spend_extra_dances:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 560) until screen "choice" timeout 20.0
-    assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1 and int(rooms.get("FridayDance").step or 0) == 6) timeout 5.0
+    assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1 and int(rooms.get("FridayDance").step or 0) == 6 and not bool(scene_runtime.movie) and str(scene_runtime.picture or "").lower().endswith(".png")) timeout 5.0
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 0) timeout 20.0
     $ rooms.get("FridayDance").dance_count = 2
@@ -5296,6 +5296,33 @@ testcase external_friday_becky_inner_actions_do_not_spend_extra_dances:
     click id "choice_panel_button_1" pos (0.5, 0.5) until screen "say" timeout 20.0
     click pos (960, 560) until screen "choice" timeout 20.0
     assert eval (int(Becky.rel or 0) == 3 and int(rooms.get("FridayDance").dance_count or 0) == 3) timeout 5.0
+
+testcase external_becky_home_invitation_movie_is_closable:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ rooms.enter("FridayDance")
+    $ main_ui_begin_native_scene_state("Танец с Бекки")
+    $ scene_runtime.picture = "images/becky/dance/you_dance_4.png"
+    $ rooms.get("FridayDance").dance_count = 1
+    $ rooms.get("FridayDance").step = 3
+    $ rooms.get("FridayDance").max_step = 6
+    $ rooms.get("FridayDance").becky_home_invited = False
+    $ Becky.rel = 10
+    $ Becky.corruption = 21
+    python:
+        for _becky_invite_day in range(1, 200):
+            calendar_v2.daysInGame = _becky_invite_day
+            if procedural_randint(1, 5, "becky_dance_home_invite_%s_%s_%s" % (current_game_day(), rooms.get("FridayDance").dance_count, rooms.get("FridayDance").step)) == 1:
+                break
+    run Call("BeckyInviteHome", "becky")
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Закрыть видео"]) timeout 5.0
+    assert eval (bool(scene_runtime.movie) and str(scene_runtime.picture or "") == "images/becky/dance/dance_finish.webm" and str(renpy.music.get_playing("movie") or "").endswith("dance_finish.webm")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (not bool(scene_runtime.movie) and str(scene_runtime.picture or "") == "images/becky/dance/you_dance_4.png" and renpy.music.get_playing("movie") is None) timeout 5.0
+    click pos (960, 560) until eval (bool(rooms.get("FridayDance").becky_home_invited)) timeout 20.0
+    $ main_ui_end_native_scene_state()
 '''
 
 BECKY_HOME_GUEST_CHECKS = r'''
@@ -8884,6 +8911,7 @@ def main() -> int:
             "external_friday_amanda_legare_go_phrase_survives_create_dance",
             "external_amanda_legare_sex_scene_label_procedures",
             "external_friday_becky_inner_actions_do_not_spend_extra_dances",
+            "external_becky_home_invitation_movie_is_closable",
             "external_clara_flirt_unlocks_paintings_gate",
             "external_amanda_glory_reaction_uses_story_event",
             "external_amanda_liza_talk_rows_use_typed_conditions",
@@ -9077,6 +9105,7 @@ def main() -> int:
             "external_friday_amanda_legare_go_phrase_survives_create_dance",
             "external_amanda_legare_sex_scene_label_procedures",
             "external_friday_becky_inner_actions_do_not_spend_extra_dances",
+            "external_becky_home_invitation_movie_is_closable",
             "external_clara_flirt_unlocks_paintings_gate",
             "external_amanda_glory_reaction_uses_story_event",
             "external_amanda_liza_talk_rows_use_typed_conditions",
