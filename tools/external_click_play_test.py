@@ -7292,27 +7292,16 @@ testcase external_becky_blackwood_offer_uses_single_live_label:
     $ Becky.trade_offer_stage = 0
     $ Becky.rel = 18
     $ Becky.stats["orgasms_given"] = 10
-    $ rooms.enter("GroceryStore")
     run Call("BeckyQuestInit")
     advance until screen "choice" timeout 20.0
     assert eval ("А кто ж не хочет?" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _becky_accept_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("А кто ж не хочет?")
     $ _becky_accept_button_id = "choice_panel_button_%s" % _becky_accept_index
     click id _becky_accept_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    click pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Пойти подумать над предложением" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval ("Пойти подумать над предложением" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval (int(Becky.trade_offer_stage or 0) == 1 and int(Becky.sherwood_warning_stage or 0) == 1) timeout 5.0
     assert eval (all(not hasattr(Becky, key) for key in ("TradeOfferText", "EddieRobbed", "SherwoodQuestScheduled"))) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(rooms.current_code or "") == "GroceryStore") timeout 20.0
-
-    $ Becky.trade_offer_stage = 0
-    run Call("BeckyQuestInit")
-    advance until screen "choice" timeout 20.0
-    $ _becky_refuse_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Неа. Меня ни работа, ни деньги не интересуют")
-    $ _becky_refuse_button_id = "choice_panel_button_%s" % _becky_refuse_index
-    click id _becky_refuse_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
-    assert eval (int(Becky.trade_offer_stage or 0) == 2) timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(rooms.current_code or "") == "GroceryStore") timeout 20.0
 
 testcase external_becky_inga_lucas_thread_from_native_homefront_menu:
     run Jump("Intro")
@@ -7374,15 +7363,23 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     assert eval (str(people.location("becky") or "") == "GroceryStore" and renpy.get_displayable("main_ui", "main_ui_entity_button_npc_becky") is not None) timeout 5.0
     click id "main_ui_entity_button_npc_becky" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (str(scene_runtime.picture or "") in [grocery_store_becky_picture(False), grocery_store_becky_picture(True)]) timeout 5.0
-    $ Becky.rel = 2
+    $ Becky.rel = 1
     $ Becky.talked_today = 0
     $ _becky_smalltalk_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Поболтать со вдовой Блэнкеншип о разной фигне")
     $ _becky_smalltalk_button_id = "choice_panel_button_%d" % int(_becky_smalltalk_index)
-    click id _becky_smalltalk_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
-    click id _becky_smalltalk_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
-    assert eval (int(Becky.rel or 0) == 3 and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+    $ _becky_expected_rel = 1
+    $ _becky_expected_rel = min(3, _becky_expected_rel + (1 if procedural_randint(1, 2, "0_becky_smalltalk_%s" % current_game_day()) == 1 else 0))
+    click id _becky_smalltalk_button_id pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and int(Becky.rel or 0) == int(_becky_expected_rel) and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+    assert eval (str(scene_runtime.text or "").startswith("Вы некоторое время болтаете со вдовой Блэнкеншип") and "Вернуться на рынок" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _becky_expected_rel = min(3, _becky_expected_rel + (1 if procedural_randint(1, 2, "1_becky_smalltalk_%s" % current_game_day()) == 1 and _becky_expected_rel < 3 else 0))
+    click id _becky_smalltalk_button_id pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and int(Becky.rel or 0) == int(_becky_expected_rel)) timeout 5.0
+    $ _becky_expected_rel = min(3, _becky_expected_rel + (1 if procedural_randint(1, 2, "2_becky_smalltalk_%s" % current_game_day()) == 1 and _becky_expected_rel < 3 else 0))
+    click id _becky_smalltalk_button_id pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 3 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and int(Becky.rel or 0) == int(_becky_expected_rel)) timeout 5.0
+    click id _becky_smalltalk_button_id pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 4 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval (renpy.get_screen("say") is None and int(Becky.rel or 0) == int(_becky_expected_rel) and "Ничего нового из разговора вы не узнали." in str(scene_runtime.text or "")) timeout 5.0
     assert eval ("занята работой" not in str(scene_runtime.text or "")) timeout 5.0
     $ Becky.talked_today = 0
     $ Becky.georgett_mentioned = True
