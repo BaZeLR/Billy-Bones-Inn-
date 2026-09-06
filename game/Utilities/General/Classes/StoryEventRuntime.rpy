@@ -281,10 +281,12 @@ define melissaThreadList = [
         ),
         (
             "story_melissa_bat_problem_1",
-            None, (16, 17), None,
+            None, (21, 22), None,
             1,
             None,
-            None,
+            [
+                "#not bool(player.tavern_management.isTavernOpen)",
+            ],
             None,
             "TavernUpstairs",
             "enter",

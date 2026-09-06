@@ -235,7 +235,7 @@ label story_melissa_bat_problem_1:
     $ main_ui_begin_native_scene_state("Шум над комнатой Мелиссы")
     show screen main_ui
     $ _melissa_bat_problem_1_choice = ""
-    vscene tavern_melissa_room_picture()
+    vscene MelissaStaticData.image_path("bats", "points_to_ceiling")
     $ scene_runtime.text = "Проходя по коридору наверху, вы слышите из комнаты Мелиссы тревожный шум: скрип кровати, злой шепот и какое-то нервное шевеление под самым потолком. Заглянув внутрь, вы видите, что Мелисса не спит и сидит на кровати, зло глядя вверх.\n\n\"О, хорошо, что ты здесь,\" шепчет она почти сразу. \"Опять эта дрянь над головой возится. То шорох, то писк, то будто кто-то бегает по балкам. Я уже не знаю, что хуже: сам шум или то, что после такой ночи утром стоишь как пьяная. Если можешь, помоги мне с этим по-человечески.\""
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
@@ -248,6 +248,7 @@ label story_melissa_bat_problem_1:
             $ scene_runtime.text = "Вы говорите Мелиссе чуть тише и спокойнее, чем обычно, что не отмахнетесь от ее жалоб. От этого она не перестает злиться на потолок, но по голосу слышно, что ей уже легче от одного того, что кто-то наконец воспринимает проблему всерьез."
         "Оставить ее на сегодня в покое":
             $ _melissa_bat_problem_1_choice = "leave"
+            vscene MelissaStaticData.image_path("portrait", "bats_problem")
             $ scene_runtime.text = "Вы решаете пока не затягивать ночной разговор. Мелисса недовольно выдыхает, плотнее кутается в одеяло и снова косится на потолок."
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"

@@ -3556,13 +3556,18 @@ testcase external_melissa_bats_room_search_after_wait:
     $ rooms.enter("TavernUpstairs")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
+    assert eval (not story_event_available("TavernUpstairs", "enter")) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 21, 0)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
     assert eval (str(event_runtime.available["TavernUpstairs"]["enter"].target or "") == "story_melissa_bat_problem_1") timeout 5.0
     run Call("checkTriggers", "TavernUpstairs", "enter", 0)
     advance until screen "choice" timeout 20.0
-    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.picture or "") == str(tavern_melissa_room_picture() or "") and str(resolve_main_ui_picture(rooms.current) or "") == str(media_displayable(scene_runtime.picture) or "")) timeout 5.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.picture or "") == "images/melissa/bats/points_to_ceiling.jpg" and str(resolve_main_ui_picture(rooms.current) or "") == str(media_displayable(scene_runtime.picture) or "")) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Вы обещаете" in str(scene_runtime.text or "")) timeout 20.0
     click pos (0.5, 0.5) until eval (int(threads["melissaBatProblem"].num or 0) == 2 and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
     assert eval (int(Melissa.bat_attic_check_day or -1) == int(current_game_day() or 0)) timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 16, 0)
     $ player.remove_item("bat_repellent_001", 3)
     $ Melissa.var["bats_episode"] = 5
     $ updateSave_V22()
@@ -3682,6 +3687,37 @@ testcase external_melissa_bats_room_search_after_wait:
     assert eval (bool(threads["melissaBatProblem"].completed)) timeout 5.0
     assert eval (not story_event_available("talk_melissa", "melissa_intimacy") and not threads["melissaCourtship"].completed) timeout 5.0
     assert eval (int(Melissa.roof_repair_complete_day or -1) >= 0) timeout 5.0
+
+testcase external_melissa_bat_noise_late_night_visuals:
+    $ _melissa_bat_noise_date = calendar_v2.day_number_to_parts(100)
+    $ external_calendar_set_fields(int(_melissa_bat_noise_date.get("day", 1) or 1), int(_melissa_bat_noise_date.get("month", 1) or 1), int(_melissa_bat_noise_date.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 16, 0)
+    $ BlockTimeAdvance = 0
+    $ TavernEventOngoing = ""
+    $ main_ui_runtime.overlay = ""
+    $ main_ui_runtime.inventory_dropdown_open = False
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.mode = "scene"
+    $ rooms.enter("TavernUpstairs")
+    $ threads.clear()
+    $ event_runtime.available.clear()
+    $ event_runtime.evaluation_time = None
+    $ initStoryEventRuntime(True)
+    $ threads["melissaBatProblem"].advanceTo(1, force_active=True)
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("TavernUpstairs", "enter")) timeout 5.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 21, 0)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not bool(player.tavern_management.isTavernOpen)) timeout 5.0
+    assert eval (str(event_runtime.available["TavernUpstairs"]["enter"].target or "") == "story_melissa_bat_problem_1") timeout 5.0
+    run Call("checkTriggers", "TavernUpstairs", "enter", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "event" and str(scene_runtime.picture or "") == "images/melissa/bats/points_to_ceiling.jpg") timeout 5.0
+    click id "choice_panel_button_2" pos (0.5, 0.5) until eval ("пока не затягивать ночной разговор" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/melissa/bats_problem.png") timeout 5.0
+    click pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    assert eval (int(threads["melissaBatProblem"].num or 0) == 1) timeout 5.0
 
 testcase external_melissa_bats_existing_booklet_after_roof:
     $ _melissa_bats_test_date = calendar_v2.day_number_to_parts(101)
@@ -8905,6 +8941,7 @@ def main() -> int:
             "external_tavern_room_movement_resets_picture_state",
             "external_location_object_back_restores_picture_and_text",
             "external_melissa_bats_room_search_after_wait",
+            "external_melissa_bat_noise_late_night_visuals",
             "external_melissa_bats_existing_booklet_after_roof",
             "external_melissa_v72_breakfast_stage_migration",
             "external_melissa_recipe_unlock_single_authority",
@@ -9100,6 +9137,7 @@ def main() -> int:
             "external_my_room_window_day_night_amanda_pictures",
             "external_tavern_room_movement_resets_picture_state",
             "external_melissa_bats_room_search_after_wait",
+            "external_melissa_bat_noise_late_night_visuals",
             "external_melissa_bats_existing_booklet_after_roof",
             "external_melissa_v72_breakfast_stage_migration",
             "external_melissa_recipe_unlock_single_authority",
