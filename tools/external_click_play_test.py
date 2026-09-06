@@ -7292,16 +7292,27 @@ testcase external_becky_blackwood_offer_uses_single_live_label:
     $ Becky.trade_offer_stage = 0
     $ Becky.rel = 18
     $ Becky.stats["orgasms_given"] = 10
+    $ rooms.enter("GroceryStore")
     run Call("BeckyQuestInit")
     advance until screen "choice" timeout 20.0
     assert eval ("А кто ж не хочет?" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _becky_accept_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("А кто ж не хочет?")
     $ _becky_accept_button_id = "choice_panel_button_%s" % _becky_accept_index
     click id _becky_accept_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
-    click pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Пойти подумать над предложением" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
-    assert eval ("Пойти подумать над предложением" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    click pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     assert eval (int(Becky.trade_offer_stage or 0) == 1 and int(Becky.sherwood_warning_stage or 0) == 1) timeout 5.0
     assert eval (all(not hasattr(Becky, key) for key in ("TradeOfferText", "EddieRobbed", "SherwoodQuestScheduled"))) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(rooms.current_code or "") == "GroceryStore") timeout 20.0
+
+    $ Becky.trade_offer_stage = 0
+    run Call("BeckyQuestInit")
+    advance until screen "choice" timeout 20.0
+    $ _becky_refuse_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Неа. Меня ни работа, ни деньги не интересуют")
+    $ _becky_refuse_button_id = "choice_panel_button_%s" % _becky_refuse_index
+    click id _becky_refuse_button_id pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (int(Becky.trade_offer_stage or 0) == 2) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(rooms.current_code or "") == "GroceryStore") timeout 20.0
 
 testcase external_becky_inga_lucas_thread_from_native_homefront_menu:
     run Jump("Intro")
