@@ -1726,10 +1726,16 @@ testcase external_amanda_liza_work_conversation_activates:
     $ Georgett.set_hired(True)
     $ Liza.set_hired(True)
     assert eval (household.member_count() == 6) timeout 5.0
-    $ Liza.set_job_value("jobgloryhole", 0)
+    $ player.tavern_management.glory_hole = 2
+    $ Liza.set_job_value("jobGloryHoleAvail", 1)
+    $ Liza.assign_tavern_service("gloryhole", False)
     $ event_runtime.tavern_work_events = [{"code": "AmandaLizaTalk", "type": "tavern_story", "label": "EventAmandaLizettTalk", "period": calendar_v2.time_slot(), "mandatory": False, "priority": 50}]
     $ event_runtime.tavern_played_today = []
     $ event_runtime.tavern_report_rows = []
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (not story_event_available("TavernMain", "enter") and len(list(event_runtime.tavern_work_events or [])) == 1) timeout 5.0
+    $ Liza.assign_tavern_service("intimate", False)
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
     assert eval (story_event_available("TavernMain", "enter") and str(event_runtime.available["TavernMain"]["enter"].target or "") == "TavernWorkEventTrigger") timeout 5.0
@@ -5566,11 +5572,21 @@ testcase external_amanda_glory_reaction_uses_story_event:
     $ external_calendar_set_fields(3, 1, 1100, 14, 0)
     $ external_calendar_set_weekday(1)
     $ player.tavern_management.glory_hole = 2
-    $ Liza.jobs["jobgloryhole"] = 1
+    $ Georgett.set_hired(True)
+    $ Georgett.set_job_value("jobGloryHoleAvail", 1)
+    $ Georgett.assign_tavern_service("gloryhole", False)
+    $ Liza.set_hired(True)
+    $ Liza.set_job_value("jobGloryHoleAvail", 1)
+    $ Liza.assign_tavern_service("gloryhole", False)
+    $ SexEvents.add_today("georgett", calendar_v2.time_slot(), 1, "Glory")
     $ TodaySexEvents_Add("amanda", 99, 1, "glorytry")
+    assert eval ("Проверить, что происходит" in [str(item.caption or "") for item in rooms.get("TavernGloryHole").build_action_items()] and tavern_glory_hole_worker() == "liza") timeout 5.0
     run Jump("TavernGloryHole")
+    advance until screen "main_ui" timeout 20.0
+    $ _glory_check_index = [str(item.caption or "") for item in main_ui_runtime.action_items].index("Проверить, что происходит")
+    click id ("choice_panel_button_%d" % int(_glory_check_index)) pos (0.5, 0.5)
     advance until screen "choice" timeout 20.0
-    assert eval (int(player.tavern_management.glory_hole_session.amanda_present or 0) == 1) timeout 5.0
+    assert eval (int(player.tavern_management.glory_hole_session.amanda_present or 0) == 1 and str(player.tavern_management.glory_hole_session.girl_name or "") == "liza") timeout 5.0
     $ Amanda.set_var_int("glory_cur_state", 1)
     assert eval (story_event_available("TavernGloryHole", "amanda_gloryhole_try")) timeout 5.0
     $ _amanda_glory_evt = event_runtime.available["TavernGloryHole"]["amanda_gloryhole_try"]
@@ -7091,6 +7107,7 @@ testcase external_harassment_event_picture_sequence:
     $ Liza.set_hired(True)
     $ Georgett.assign_tavern_service("intimate", False)
     $ Liza.assign_tavern_service("intimate", False)
+    $ player.tavern_management.client_room_hole = 1
     $ SexEvents.delete_girl_today("georgett")
     $ SexEvents.delete_girl_today("liza")
     $ rooms.get("TavernMain").state["client_room_girl"] = ""
@@ -7100,6 +7117,11 @@ testcase external_harassment_event_picture_sequence:
     run Call("PartEventCustomerHarrassmentReaction", "melissa", 1, 0)
     assert eval (CheckIfSexEventExist("liza", calendar_v2.time_slot(), "Prostitution") > 0 and str(rooms.get("TavernMain").state.get("client_room_girl", "") or "") == "liza") timeout 5.0
     assert eval (int(Liza.sex_stat("clients_day_total", 0) or 0) == _liza_redirect_clients_before + 1 and not Liza.can_accept_tavern_client() and people_display_name("liza") in str(_return or "")) timeout 5.0
+    assert eval ("Пойти проверить отдельную комнату" in [str(item.caption or "") for item in tavern_main_action_items()]) timeout 5.0
+    run Call("TavernProstClients", "liza")
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Подсмотреть", "Вернуться"]) timeout 5.0
+    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
 
     $ SexEvents.delete_girl_today("georgett")
     $ SexEvents.delete_girl_today("liza")

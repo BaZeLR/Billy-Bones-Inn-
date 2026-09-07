@@ -18,6 +18,9 @@ def test_amanda_liza_work_event_uses_the_daily_plan_directly():
     source = (ROOT / "game/Inn/TavernRandomEvents.rpy").read_text(encoding="utf-8-sig")
 
     assert 'TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk"' in source
+    assert "play_condition=tavern_work_liza_talk_playable" in source
+    assert 'Liza.tavern_service_target(False) != "gloryhole"' in source
+    assert "not Liza.can_use_gloryhole()" not in source
     assert "story_amanda_liza_talk_work_0" not in source
 
 

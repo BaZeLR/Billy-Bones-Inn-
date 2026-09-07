@@ -31,6 +31,7 @@ def test_completed_glory_hole_is_a_room_with_a_separate_check_scene():
     assert 'RoomAction(action_id="check_glory_hole", label="Проверить, что происходит", hook="call", target="TavernGloryHoleCheck")' in glory
     assert 'label TavernGloryHoleCheck:' in glory
     assert 'girls_by_job("jobgloryhole", "TavernGloryHole")' in glory
+    assert 'SexEvents.today_index("amanda", 99, "glorytry") > 0' in glory
     assert 'tavern_glory_hole_waiting_text(_tgh_worker)' in glory
     assert '$ main_ui_begin_native_scene_state("Глорихол")' in glory
     assert '"Вернуться в комнату":' in glory

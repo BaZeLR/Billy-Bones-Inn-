@@ -10,6 +10,8 @@ init 6 python:
 
     def tavern_glory_hole_worker():
         workers = tavern_glory_hole_workers()
+        if "liza" in workers and SexEvents.today_index("amanda", 99, "glorytry") > 0:
+            return "liza"
         booked_workers = [
             girl_key for girl_key in workers
             if SexEvents.today_index(girl_key, calendar_v2.time_slot(), "Glory") > 0

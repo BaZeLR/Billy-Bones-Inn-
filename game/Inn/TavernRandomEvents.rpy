@@ -61,10 +61,15 @@ init -20 python:
 
 
     def tavern_work_liza_talk_ready():
+        return Liza.can_work_tavern()
+
+
+    def tavern_work_liza_talk_playable(room_code=""):
         return (
-            Liza.can_work_tavern()
+            str(room_code or "") == "TavernMain"
+            and Liza.can_work_tavern()
             and (
-                not Liza.can_use_gloryhole()
+                Liza.tavern_service_target(False) != "gloryhole"
                 or tavern_work_int(calendar_v2.time_slot(), 0) < 2
             )
         )
@@ -338,7 +343,7 @@ define tavern_work_events_by_type = {
         TavernWorkEventDefinition("FightSmall", "small_fight", "EventFightSmall", periods=(3, 4), chance=20, priority=40),
     ],
     "tavern_story": [
-        TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk", periods=(1, 2), chance=25, condition=tavern_work_liza_talk_ready, priority=50),
+        TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk", periods=(1, 2), chance=25, condition=tavern_work_liza_talk_ready, play_condition=tavern_work_liza_talk_playable, priority=50),
     ],
     "theft": [],
     "big_fight": [],
