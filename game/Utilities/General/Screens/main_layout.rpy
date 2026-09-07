@@ -1003,7 +1003,7 @@ screen main_ui_tavern_report_panel():
                                     text_size 18
                                     text_bold True
                                     text_color "#6d1020"
-                                    action Function(toggle_hall_job_with_limit, "jobkitchentomorrow", _worker)
+                                    action Function(toggle_job_assignment, "jobkitchentomorrow", _worker)
 
                                 textbutton _tavern_job_button_caption("jobcleaningtomorrow", _worker, "Уборка"):
                                     id "tavern_schedule_%s_cleaning" % _worker
@@ -1011,7 +1011,7 @@ screen main_ui_tavern_report_panel():
                                     text_size 18
                                     text_bold True
                                     text_color "#6d1020"
-                                    action Function(toggle_hall_job_with_limit, "jobcleaningtomorrow", _worker)
+                                    action Function(toggle_job_assignment, "jobcleaningtomorrow", _worker)
 
                                 textbutton _tavern_job_button_caption("jobwaitresstomorrow", _worker, "Зал"):
                                     id "tavern_schedule_%s_waitress" % _worker
@@ -1019,5 +1019,5 @@ screen main_ui_tavern_report_panel():
                                     text_size 18
                                     text_bold True
                                     text_color "#6d1020"
-                                    action Function(toggle_hall_job_with_limit, "jobwaitresstomorrow", _worker)
+                                    action Function(toggle_job_assignment, "jobwaitresstomorrow", _worker)
 

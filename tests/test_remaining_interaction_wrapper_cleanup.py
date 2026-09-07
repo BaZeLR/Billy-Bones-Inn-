@@ -161,14 +161,14 @@ def test_tavern_report_actions_call_job_owners_without_dispatch_labels():
 
     assert "TavernReportApplyAction" not in source + layout
     assert "TavernReportApplyOverviewAction" not in source + layout
-    assert "Function(toggle_hall_job_with_limit" in source
+    assert "Function(toggle_job_assignment" in source
     assert "Function(assign_special_job" in source
     report_panel = layout.split("screen main_ui_tavern_report_panel():", 1)[1]
     assert 'text "Завтрашняя смена"' in report_panel
-    assert 'Function(toggle_hall_job_with_limit, "jobkitchentomorrow", _worker)' in report_panel
-    assert 'Function(toggle_hall_job_with_limit, "jobcleaningtomorrow", _worker)' in report_panel
-    assert 'Function(toggle_hall_job_with_limit, "jobwaitresstomorrow", _worker)' in report_panel
-    assert 'toggle_hall_job_with_limit, "jobkitchentomorrow", _worker, 2' not in report_panel
+    assert 'Function(toggle_job_assignment, "jobkitchentomorrow", _worker)' in report_panel
+    assert 'Function(toggle_job_assignment, "jobcleaningtomorrow", _worker)' in report_panel
+    assert 'Function(toggle_job_assignment, "jobwaitresstomorrow", _worker)' in report_panel
+    assert "toggle_hall_job_with_limit" not in source + report_panel
 
 
 def test_inga_talk_and_dress_topics_have_no_one_call_alias_labels():
