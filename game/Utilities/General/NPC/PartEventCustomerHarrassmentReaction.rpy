@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 # PartEventCustomerHarrassmentReaction location - converted from legacy script
-label PartEventCustomerHarrassmentReaction(GirlNamePECHR, girl_run_away=0, girl_slapped=0, result="", _girl_info=None, _girl_corruption=0, _girl_name=""):
+label PartEventCustomerHarrassmentReaction(GirlNamePECHR, girl_run_away=0, girl_slapped=0, result="", _girl_info=None, _girl_corruption=0, _girl_name="", _service_candidates=None, _service_girl="", _service_info=None, _service_target=""):
     $ result = '\n'
     $ _girl_info = people.get_info(GirlNamePECHR)
     $ _girl_corruption = int(getattr(_girl_info, "corruption", 0) or 0)
@@ -41,14 +41,24 @@ label PartEventCustomerHarrassmentReaction(GirlNamePECHR, girl_run_away=0, girl_
                 $ _girl_info.change_mana(1, "harass_rejected")
                 $ _girl_info.change_rebellion(-1, "harass_rejected")
     elif girl_run_away == 1 and girl_slapped == 0:
-        if procedural_randint(1,8, key="procedural:Utilities/General/NPC/PartEventCustomerHarrassmentReaction.rpy:procedural_randint:44:6") == 1:
+        $ _service_candidates = [girl_key for girl_key in people.available_tavern_service_workers(("georgett", "liza")) if girl_key != people_normalize_id(GirlNamePECHR)]
+        if _service_candidates:
+            $ _service_girl = procedural_choice(_service_candidates, key="tavern_harassment_service_%s_%s_%s" % (GirlNamePECHR, current_game_day(), calendar_v2.clock_minutes()))
+            $ _service_info = people.get_info(_service_girl)
+            $ _service_target = _service_info.accept_tavern_client(1) if _service_info is not None else ""
+        if _service_target:
+            if _service_target == "gloryhole":
+                $ result += '{} объяснила приставале, что за ширмой у глорихола сейчас свободна {}, и предложила обратиться к ней. Посетитель сразу оставил девушку в покое и направился к глорихолу.'.format(_girl_name, people_display_name(_service_girl))
+            else:
+                $ result += '{} объяснила приставале, что в отдельной комнате сейчас свободна {}, и предложила обратиться к ней. Посетитель сразу оставил девушку в покое и направился туда.'.format(_girl_name, people_display_name(_service_girl))
+        elif procedural_randint(1,8, key="procedural:Utilities/General/NPC/PartEventCustomerHarrassmentReaction.rpy:procedural_randint:44:6") == 1:
             $ result += 'Любителя распускать руки отказ, хотя и спокойный, судя по всему задел за живое, ущемив его нежную и ранимую гордость. Бормоча себе под нос ругательства он в гневе выбежал из трактира. Будьте уверенны, что он не замедлит рассказать о произошедшем своим дружкам, выставя себя в выгодном свете.'
             $ player.change_tavern_fame(-1)
             if _girl_info is not None:
                 $ _girl_info.skills["waitress"] = max(20, int(_girl_info.skills.get("waitress", 0) or 0) - 1)
         else:
             $ result += 'Любитель распускать руки воспринял отказ как само собой разумеющееся и вернулся к трапезе.'
-        if procedural_randint(1,10, key="procedural:Utilities/General/NPC/PartEventCustomerHarrassmentReaction.rpy:procedural_randint:51:7") == 1 and _girl_corruption > 0:
+        if not _service_target and procedural_randint(1,10, key="procedural:Utilities/General/NPC/PartEventCustomerHarrassmentReaction.rpy:procedural_randint:51:7") == 1 and _girl_corruption > 0:
             $ result += '\n' + _girl_name + ', дав отпор охальнику, почуствовала себя более гордой и неприступной.'
             if _girl_info is not None:
                 $ _girl_info.change_social(corruption_delta=-1)

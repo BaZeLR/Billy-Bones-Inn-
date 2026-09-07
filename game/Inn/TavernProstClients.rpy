@@ -1,13 +1,15 @@
 # ================================================================================
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
-label TavernProstClients(girl_name="", client_type=1, return_room=""):
+label TavernProstClients(girl_name="", client_type=1, return_room="", client_time=None):
     if str(return_room or "") == "":
         $ return_room = str(rooms.current_code or "TavernMain")
     if str(girl_name or "") == "":
         $ girl_name = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
     if int(client_type or 0) != 1:
         return
+    if client_time is None:
+        $ client_time = calendar_v2.time_slot()
     if str(girl_name or "") == "":
         $ main_ui_runtime.mode = "event"
         $ scene_runtime.text = "В отдельной комнате сейчас никого нет."
@@ -23,13 +25,13 @@ label TavernProstClients(girl_name="", client_type=1, return_room=""):
     show screen main_ui
     menu:
         "Подсмотреть":
-            call TavernProstClientsWatch(client_type, girl_name, return_room)
+            call TavernProstClientsWatch(client_type, girl_name, return_room, client_time)
         "Вернуться":
             pass
     return
 
 
-label TavernProstClientsWatch(client_type=1, girl_name="", return_room=""):
+label TavernProstClientsWatch(client_type=1, girl_name="", return_room="", client_time=None):
     $ renpy.dynamic("SexEventType", "_client_info", "_client_data", "_client_picture", "_client_name")
     if str(return_room or "") == "":
         $ return_room = str(rooms.current_code or "TavernMain")
@@ -37,13 +39,17 @@ label TavernProstClientsWatch(client_type=1, girl_name="", return_room=""):
         $ girl_name = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
     if int(client_type or 0) != 1:
         return
+    if client_time is None:
+        $ client_time = calendar_v2.time_slot()
 
     $ main_ui_runtime.mode = "event"
     $ main_ui_runtime.action_title = "Потайное окошко"
     $ main_ui_runtime.action_content = None
-    $ SexEventType = int(GetSexEventFromTable(girl_name, 3, "Prostitution") or 0)
+    $ SexEventType = int(GetSexEventFromTable(girl_name, client_time, "Prostitution") or 0)
 
     if SexEventType <= 0:
+        if str(rooms.get("TavernMain").state.get("client_room_girl", "") or "") == girl_name:
+            $ rooms.get("TavernMain").state["client_room_girl"] = ""
         $ scene_runtime.text = "Вы осторожно проверяете потайное окошко, но в комнате сейчас никого нет."
         $ scene_runtime.location_text = scene_runtime.text
         show screen main_ui
@@ -113,11 +119,13 @@ label TavernProstClientsWatch(client_type=1, girl_name="", return_room=""):
 
     $ CleanSpermRandom(girl_name if girl_name else "georgett")
     $ calendar_v2.advance_minutes(40)
+    if CheckIfSexEventExist(girl_name, client_time, "Prostitution") <= 0 and str(rooms.get("TavernMain").state.get("client_room_girl", "") or "") == girl_name:
+        $ rooms.get("TavernMain").state["client_room_girl"] = ""
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:
-        "Смотреть дальше" if CheckIfSexEventExist(girl_name, 3, "Prostitution") > 0:
-            call TavernProstClientsWatch(client_type, girl_name, return_room)
+        "Смотреть дальше" if CheckIfSexEventExist(girl_name, client_time, "Prostitution") > 0:
+            call TavernProstClientsWatch(client_type, girl_name, return_room, client_time)
         "Вернуться":
             pass
     return

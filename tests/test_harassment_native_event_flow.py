@@ -118,3 +118,28 @@ def test_harassment_picture_text_and_choices_share_one_event_context():
 
     assert '"[scene_runtime.text]"' not in reaction + after + discussion
     assert '_event_text + "\\n\\n" + result' in after
+
+
+def test_rejected_customer_can_be_redirected_to_an_available_tavern_worker():
+    people = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
+    customer = CUSTOMER_REACTION.read_text(encoding="utf-8-sig")
+    clients = (ROOT / "game/Inn/TavernProstClients.rpy").read_text(encoding="utf-8-sig")
+    glory = (ROOT / "game/Inn/TavernGloryHole.rpy").read_text(encoding="utf-8-sig")
+
+    assert "def can_accept_tavern_client(self):" in people
+    assert "def tavern_service_busy_now(self):" in people
+    assert "def available_tavern_service_workers(self, person_ids=()):" in people
+    assert 'SexEvents.today_index(self.name, calendar_v2.time_slot(), "Prostitution") > 0' in people
+    assert 'SexEvents.today_index(self.name, calendar_v2.time_slot(), "Glory") > 0' in people
+    assert 'SexEvents.add_today(self.name, calendar_v2.time_slot(), event_type, place)' in people
+    assert 'self.set_sex_stat("clients_day_total", self.sex_stat("clients_day_total", 0) + 1)' in people
+    assert '("georgett", "liza")' in customer
+    assert "people.available_tavern_service_workers" in customer
+    assert "girl_key != people_normalize_id(GirlNamePECHR)" in customer
+    assert "accept_tavern_client(1)" in customer
+    assert 'elif girl_run_away == 1 and girl_slapped == 0:' in customer
+    assert "default " not in customer
+    assert 'GetSexEventFromTable(girl_name, client_time, "Prostitution")' in clients
+    assert 'CheckIfSexEventExist(girl_name, client_time, "Prostitution")' in clients
+    assert 'SexEvents.today_index(girl_key, calendar_v2.time_slot(), "Glory") > 0' in glory
+    assert "candidates = booked_workers or workers" in glory

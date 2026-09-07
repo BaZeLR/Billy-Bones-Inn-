@@ -7080,6 +7080,42 @@ testcase external_harassment_event_picture_sequence:
     click id ("choice_panel_button_%d" % int(_harass_eject_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к делам"]) timeout 20.0
     assert eval (Melissa.harass_instruction() == "notallow" and int(player.economy.tavern_fame or 0) == _harass_eject_fame - 1 and "выставляете за дверь" in str(scene_runtime.text or "")) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 14, 0)
+    $ external_calendar_set_weekday(2)
+    $ rooms.enter("TavernMain")
+    assert eval (player.tavern_management.isTavernOpen) timeout 5.0
+    $ people.get_data("georgett").set_schedule([])
+    $ people.get_data("liza").set_schedule([])
+    $ Georgett.set_hired(True)
+    $ Liza.set_hired(True)
+    $ Georgett.assign_tavern_service("intimate", False)
+    $ Liza.assign_tavern_service("intimate", False)
+    $ SexEvents.delete_girl_today("georgett")
+    $ SexEvents.delete_girl_today("liza")
+    $ rooms.get("TavernMain").state["client_room_girl"] = ""
+    $ SexEvents.add_today("georgett", calendar_v2.time_slot(), 1, "Prostitution")
+    $ _liza_redirect_clients_before = int(Liza.sex_stat("clients_day_total", 0) or 0)
+    assert eval (Georgett.tavern_service_busy_now() and not Georgett.can_accept_tavern_client() and Liza.can_accept_tavern_client()) timeout 5.0
+    run Call("PartEventCustomerHarrassmentReaction", "melissa", 1, 0)
+    assert eval (CheckIfSexEventExist("liza", calendar_v2.time_slot(), "Prostitution") > 0 and str(rooms.get("TavernMain").state.get("client_room_girl", "") or "") == "liza") timeout 5.0
+    assert eval (int(Liza.sex_stat("clients_day_total", 0) or 0) == _liza_redirect_clients_before + 1 and not Liza.can_accept_tavern_client() and people_display_name("liza") in str(_return or "")) timeout 5.0
+
+    $ SexEvents.delete_girl_today("georgett")
+    $ SexEvents.delete_girl_today("liza")
+    $ rooms.get("TavernMain").state["client_room_girl"] = ""
+    $ player.tavern_management.glory_hole = 2
+    $ Georgett.set_job_value("jobGloryHoleAvail", 1)
+    $ Georgett.assign_tavern_service("gloryhole", False)
+    $ Liza.assign_tavern_service("", False)
+    $ _georgett_redirect_clients_before = int(Georgett.sex_stat("clients_day_total", 0) or 0)
+    assert eval (Georgett.can_accept_tavern_client() and not Liza.can_accept_tavern_client()) timeout 5.0
+    run Call("PartEventCustomerHarrassmentReaction", "amanda", 1, 0)
+    assert eval (CheckIfSexEventExist("georgett", calendar_v2.time_slot(), "Glory") > 0 and int(Georgett.sex_stat("clients_day_total", 0) or 0) == _georgett_redirect_clients_before + 1) timeout 5.0
+    assert eval ("глорихол" in str(_return or "") and not Georgett.can_accept_tavern_client()) timeout 5.0
+    $ Liza.set_job_value("jobGloryHoleAvail", 1)
+    $ Liza.assign_tavern_service("gloryhole", False)
+    assert eval (Liza.can_accept_tavern_client() and tavern_glory_hole_worker() == "georgett") timeout 5.0
 '''
 
 

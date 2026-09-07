@@ -78,6 +78,13 @@ init -999 python:
         def girl_items(self):
             return [(key, info) for key, info in self.items() if info.registry_group == "girl"]
 
+        def available_tavern_service_workers(self, person_ids=()):
+            allowed = set([people_normalize_id(person_id) for person_id in list(person_ids or [])])
+            return [
+                key for key, info in self.girl_items()
+                if (not allowed or key in allowed) and info.can_accept_tavern_client()
+            ]
+
         def girl_values(self):
             return [row[1] for row in self.girl_items()]
 
@@ -1165,6 +1172,38 @@ init -999 python:
             if people_to_int(self.job_value("jobwhore" + suffix, 0), 0) > 0:
                 return "intimate"
             return ""
+
+        def tavern_service_busy_now(self):
+            target = self.tavern_service_target(False)
+            if target == "intimate":
+                return SexEvents.today_index(self.name, calendar_v2.time_slot(), "Prostitution") > 0
+            if target == "gloryhole":
+                return SexEvents.today_index(self.name, calendar_v2.time_slot(), "Glory") > 0
+            return False
+
+        def can_accept_tavern_client(self):
+            target = self.tavern_service_target(False)
+            if target == "" or not player.tavern_management.isTavernOpen:
+                return False
+            entry = people.schedule_entry(self.name)
+            expected_location = "TavernGloryHole" if target == "gloryhole" else "TavernMain"
+            return (
+                entry is not None
+                and bool(getattr(entry, "working", False))
+                and str(entry.selected_location() or "") == expected_location
+                and not self.tavern_service_busy_now()
+            )
+
+        def accept_tavern_client(self, event_type=1):
+            if not self.can_accept_tavern_client():
+                return ""
+            target = self.tavern_service_target(False)
+            place = "Glory" if target == "gloryhole" else "Prostitution"
+            SexEvents.add_today(self.name, calendar_v2.time_slot(), event_type, place)
+            self.set_sex_stat("clients_day_total", self.sex_stat("clients_day_total", 0) + 1)
+            if target == "intimate":
+                rooms.get("TavernMain").state["client_room_girl"] = self.name
+            return target
 
         def is_tavern_worker(self):
             for job_key in (

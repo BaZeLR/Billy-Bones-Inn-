@@ -9,7 +9,15 @@ init 6 python:
         return girls_by_job("jobgloryhole", "TavernGloryHole")
 
     def tavern_glory_hole_worker():
-        return str(get_random_girl_by_job("jobgloryhole", "TavernGloryHole") or "")
+        workers = tavern_glory_hole_workers()
+        booked_workers = [
+            girl_key for girl_key in workers
+            if SexEvents.today_index(girl_key, calendar_v2.time_slot(), "Glory") > 0
+        ]
+        candidates = booked_workers or workers
+        if not candidates:
+            return ""
+        return str(procedural_choice(candidates, key="tavern_glory_worker_%s_%s" % (current_game_day(), calendar_v2.clock_minutes())) or "")
 
     def tavern_glory_hole_working_now():
         return player.tavern_management.isTavernOpen and tavern_glory_hole_worker() != ""
