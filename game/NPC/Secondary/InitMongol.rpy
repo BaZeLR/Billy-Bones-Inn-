@@ -59,7 +59,7 @@ init python:
             return self.market_roll
 
         def is_market_visible(self):
-            if str(self.stocks_fate or "") == "convicted":
+            if str(self.stocks_fate or "") in ("released", "convicted"):
                 return False
             if player.horse.owns_horse():
                 return False

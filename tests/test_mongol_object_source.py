@@ -24,7 +24,7 @@ def test_mongol_has_own_data_info_and_explicit_state():
 
     for field_name in (
         "will_try_to_steal", "stocks_food_day", "stocks_arrest_day",
-        "guard_captain_known", "market_roll_day", "market_roll",
+        "stocks_fate", "guard_captain_known", "market_roll_day", "market_roll",
         "asked_about_gypsy", "asked_price_increase",
         "zimmer_knows_horse_theft", "horse_price", "discount_asked",
         "theft_asked", "asked_about_seen_stolen", "seen_with_stolen_horse",
@@ -58,8 +58,10 @@ def test_mongol_uses_class_state_not_old_var_bridge():
 
 
 def test_mongol_market_flow_uses_class_methods():
+    mongol = read_rel("game/NPC/Secondary/InitMongol.rpy")
     source = read_rel("game/Town/Market/MarketPlace.rpy")
 
+    assert 'if str(self.stocks_fate or "") in ("released", "convicted"):' in mongol
     assert "return bool(Mongol.is_market_visible())" in source
     assert "Mongol.reset_market_trade()" in source
     assert "Mongol.horse_price" in source

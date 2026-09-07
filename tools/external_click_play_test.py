@@ -4444,10 +4444,19 @@ testcase external_mongol_market_schedule_rolls_once_per_day:
     $ threads.clear()
     $ event_runtime.available.clear()
     $ event_runtime.evaluation_time = None
+    $ initStoryEventRuntime(True)
     $ Mongol.market_roll_day = int(current_game_day())
     $ Mongol.market_roll = False
     assert eval (not marketplace_mongol_visible()) timeout 5.0
     assert eval (str(people.location("mongol") or "") != "MarketPlace") timeout 5.0
+
+    $ Mongol.stocks_fate = "released"
+    $ Mongol.market_roll_day = int(current_game_day())
+    $ Mongol.market_roll = True
+    assert eval (not marketplace_mongol_visible()) timeout 5.0
+    assert eval (str(people.location("mongol") or "") != "MarketPlace") timeout 5.0
+    $ Mongol.stocks_fate = ""
+
     run Jump("MarketPlace")
     advance until screen "main_ui" timeout 20.0
 
