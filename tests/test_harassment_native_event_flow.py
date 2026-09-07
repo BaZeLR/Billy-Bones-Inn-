@@ -83,6 +83,20 @@ def test_harassment_render_and_discussion_scratch_is_label_local():
     assert "_hdi_picture=\"\"" in discuss_image
     assert 'MelissaStaticData.image_path("grope", "ass_ok")' in show_image
     assert 'MelissaStaticData.image_path("grope", "tits_shy")' in show_image
+    assert 'MelissaStaticData.image_path("grope", "ass_angry")' in show_image
+    assert 'MelissaStaticData.image_path("grope", "tit_angry")' in show_image
+    for amanda_reaction_picture in (
+        "assok",
+        "assshy",
+        "assangry",
+        "titok",
+        "titshy",
+        "titangry",
+        "dressnaked",
+        "dressnakedangry",
+        "dresspanties",
+    ):
+        assert 'build_media_ref(_hsi_girl, "grope", "%s' % amanda_reaction_picture in show_image
     assert 'MelissaStaticData.image_path("grope", "scold_agree")' in discuss_image
     for retired_asset in ("assok1", "assok2", "titshy1", "titshy2", "scoldok"):
         assert retired_asset not in show_image + discuss_image

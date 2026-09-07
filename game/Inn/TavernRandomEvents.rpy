@@ -181,6 +181,11 @@ init -20 python:
         event_runtime.tavern_work_plan_day = current_day
         if tavern_work_int(calendar_v2.week, 0) == 7:
             return []
+        intimate_workers = set(
+            tavern_work_job_candidates("jobwhore")
+            + tavern_work_job_candidates("jobgloryhole")
+        )
+        harassment_events_per_job = 1 if intimate_workers.intersection(("georgett", "liza")) else 2
         for event_type in tavern_work_random_type_order:
             candidates = [row for row in tavern_work_events_by_type.get(event_type, []) if row.can_schedule()]
             if len(candidates) <= 0:
@@ -191,7 +196,7 @@ init -20 python:
                     if len(periods) <= 0:
                         continue
                     first_period_index = procedural_randint(0, len(periods) - 1, "tavern_work_%s_%s_first_period" % (event_def.code, current_day))
-                    for period_offset in range(min(2, len(periods))):
+                    for period_offset in range(min(harassment_events_per_job, len(periods))):
                         period = periods[(first_period_index + period_offset) % len(periods)]
                         event_runtime.tavern_work_events.append(tavern_work_plan_row(event_def, period))
                 continue
