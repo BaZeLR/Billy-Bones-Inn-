@@ -515,9 +515,10 @@ init python:
         if renpy.game.script.has_label("ShowGirlCard"):
             items.append(MenuItem("Осмотреть", Call("ShowGirlCard", person)))
 
-        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobkitchentomorrow"), 1), [Function(toggle_job_assignment, "jobkitchentomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
-        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobcleaningtomorrow"), 2), [Function(toggle_job_assignment, "jobcleaningtomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
-        items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobwaitresstomorrow"), 3), [Function(toggle_job_assignment, "jobwaitresstomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
+        if _girl_job_value(person, "jobHallAvail"):
+            items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobkitchentomorrow"), 1), [Function(toggle_job_assignment, "jobkitchentomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
+            items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobcleaningtomorrow"), 2), [Function(toggle_job_assignment, "jobcleaningtomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
+            items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobwaitresstomorrow"), 3), [Function(toggle_job_assignment, "jobwaitresstomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
 
         if _tavern_can_assign_gloryhole(person):
             items.append(MenuItem("Назначить завтра работать у глорихола", [Function(assign_special_job, person, "gloryhole"), Function(show_tavern_report_main_ui_state, person)]))

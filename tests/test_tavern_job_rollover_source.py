@@ -75,9 +75,28 @@ def test_each_hall_job_allows_all_available_workers():
     assert '"kitchen_assigned": _tavern_job_load("jobkitchentomorrow")' in report_source
     assert '"cleaning_assigned": _tavern_job_load("jobcleaningtomorrow")' in report_source
     assert '"waitress_assigned": _tavern_job_load("jobwaitresstomorrow")' in report_source
+    assert 'if _girl_job_value(person, "jobHallAvail"):' in report_source
+    assert 'if _girl_job_value(_worker, "jobHallAvail"):' in layout_source
     for job_key in ("jobkitchentomorrow", "jobcleaningtomorrow", "jobwaitresstomorrow"):
         assert f'Function(toggle_job_assignment, "{job_key}", person)' in report_source
         assert f'Function(toggle_job_assignment, "{job_key}", _worker)' in layout_source
+
+
+def test_hired_georgett_and_liza_use_the_special_job_schedule():
+    report_source = (ROOT / "game/Inn/menu_tavernstat.rpy").read_text(encoding="utf-8-sig")
+    layout_source = (ROOT / "game/Utilities/General/Screens/main_layout.rpy").read_text(encoding="utf-8-sig")
+    georgett_talk = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy").read_text(encoding="utf-8-sig")
+
+    assert "Georgett.set_hired(True)" in georgett_talk
+    assert "Liza.set_hired(True)" in georgett_talk
+    assert 'Georgett.jobs["jobGloryHoleAvail"] = 1' in georgett_talk
+    assert 'Liza.jobs["jobGloryHoleAvail"] = 1' in georgett_talk
+    assert 'if _tavern_can_assign_whore(_worker) or _girl_job_value(_worker, "jobwhoreTommorow"):' in layout_source
+    assert 'Function(assign_special_job, _worker, "whore")' in layout_source
+    assert 'if _tavern_can_assign_gloryhole(_worker) or _girl_job_value(_worker, "jobgloryholeTommorow"):' in layout_source
+    assert 'Function(assign_special_job, _worker, "gloryhole")' in layout_source
+    assert 'if _tavern_can_assign_whore(person):' in report_source
+    assert 'if _tavern_can_assign_gloryhole(person):' in report_source
 
 
 def test_staff_work_schedules_read_current_jobs_from_the_npc_owner():

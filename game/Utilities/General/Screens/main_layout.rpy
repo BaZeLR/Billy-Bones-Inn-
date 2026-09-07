@@ -997,27 +997,46 @@ screen main_ui_tavern_report_panel():
                                     text_color "#6d1020"
                                     action Call("ShowTavernReportPerson", _worker, "__main_ui__")
 
-                                textbutton _tavern_job_button_caption("jobkitchentomorrow", _worker, "Кухня"):
-                                    id "tavern_schedule_%s_kitchen" % _worker
-                                    xminimum 120
-                                    text_size 18
-                                    text_bold True
-                                    text_color "#6d1020"
-                                    action Function(toggle_job_assignment, "jobkitchentomorrow", _worker)
+                                if _girl_job_value(_worker, "jobHallAvail"):
+                                    textbutton _tavern_job_button_caption("jobkitchentomorrow", _worker, "Кухня"):
+                                        id "tavern_schedule_%s_kitchen" % _worker
+                                        xminimum 120
+                                        text_size 18
+                                        text_bold True
+                                        text_color "#6d1020"
+                                        action Function(toggle_job_assignment, "jobkitchentomorrow", _worker)
 
-                                textbutton _tavern_job_button_caption("jobcleaningtomorrow", _worker, "Уборка"):
-                                    id "tavern_schedule_%s_cleaning" % _worker
-                                    xminimum 130
-                                    text_size 18
-                                    text_bold True
-                                    text_color "#6d1020"
-                                    action Function(toggle_job_assignment, "jobcleaningtomorrow", _worker)
+                                    textbutton _tavern_job_button_caption("jobcleaningtomorrow", _worker, "Уборка"):
+                                        id "tavern_schedule_%s_cleaning" % _worker
+                                        xminimum 130
+                                        text_size 18
+                                        text_bold True
+                                        text_color "#6d1020"
+                                        action Function(toggle_job_assignment, "jobcleaningtomorrow", _worker)
 
-                                textbutton _tavern_job_button_caption("jobwaitresstomorrow", _worker, "Зал"):
-                                    id "tavern_schedule_%s_waitress" % _worker
-                                    xminimum 120
-                                    text_size 18
-                                    text_bold True
-                                    text_color "#6d1020"
-                                    action Function(toggle_job_assignment, "jobwaitresstomorrow", _worker)
+                                    textbutton _tavern_job_button_caption("jobwaitresstomorrow", _worker, "Зал"):
+                                        id "tavern_schedule_%s_waitress" % _worker
+                                        xminimum 120
+                                        text_size 18
+                                        text_bold True
+                                        text_color "#6d1020"
+                                        action Function(toggle_job_assignment, "jobwaitresstomorrow", _worker)
+
+                                if _tavern_can_assign_whore(_worker) or _girl_job_value(_worker, "jobwhoreTommorow"):
+                                    textbutton _tavern_job_button_caption("jobwhoreTommorow", _worker, "Интим"):
+                                        id "tavern_schedule_%s_whore" % _worker
+                                        xminimum 120
+                                        text_size 18
+                                        text_bold True
+                                        text_color "#6d1020"
+                                        action Function(assign_special_job, _worker, "whore")
+
+                                if _tavern_can_assign_gloryhole(_worker) or _girl_job_value(_worker, "jobgloryholeTommorow"):
+                                    textbutton _tavern_job_button_caption("jobgloryholeTommorow", _worker, "Глорихол"):
+                                        id "tavern_schedule_%s_gloryhole" % _worker
+                                        xminimum 140
+                                        text_size 18
+                                        text_bold True
+                                        text_color "#6d1020"
+                                        action Function(assign_special_job, _worker, "gloryhole")
 
