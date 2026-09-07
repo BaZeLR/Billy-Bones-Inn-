@@ -162,7 +162,7 @@ def test_liza_talk_choices_persist_and_refusal_keeps_talk_picture_owner():
     smalltalk = talk.split('label IntLizaTalkSmalltalk(girl_name_ilt="liza", girl_loc_ilt="", _liza_busy_text=""):', 1)[1].split(
         "label IntLizaTalkAskClients", 1
     )[0]
-    assert 'key="procedural:NPC/Girls/Liza/IntLizaTalk.rpy:smalltalk:%s" % Liza.talk_count()' in smalltalk
+    assert 'procedural_randint(1, 2, "liza_smalltalk_%s_%s" % (current_game_day(), Liza.talk_count()))' in smalltalk
     rejection = grope.split("if Liza.rel < 5:", 1)[1].split("return", 1)[0]
     assert "ShowCurrentSex" not in rejection
     assert "call LizaSexStatus(girl_loc_ilt)" in grope

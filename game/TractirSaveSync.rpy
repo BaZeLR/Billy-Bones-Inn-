@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 82
+define currentVersion = 83
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -700,6 +700,10 @@ init -100 python:
         if loaded_version < 82:
             updateSave_V81()
             loaded_version = 82
+
+        if loaded_version < 83:
+            updateSave_V82()
+            loaded_version = 83
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2755,6 +2759,23 @@ init -100 python:
         Becky.__dict__.pop("home_sex_unlocked", None)
         Becky.__dict__.pop("open_oral_stage", None)
         Becky.__dict__.pop("eddie_join_stage", None)
+
+    def updateSave_V82():
+        # Recover the Lizette friendship already earned under the cumulative
+        # orgasm rule before that rule was wired to the shared sex counter.
+        relationship_cap = max(20, people_to_int(getattr(Liza, "relationship_cap", 20), 20))
+        earned_friendship = max(0, people_to_int(Liza.sex_stat("orgasms_given", 0), 0)) * max(
+            0,
+            people_to_int(getattr(Liza, "ORGASM_FRIENDSHIP_GAIN", 0), 0),
+        )
+        lick_count = max(0, people_to_int(Liza.lick_pussy_count(), 0))
+        for milestone, gain in dict(getattr(Liza, "LICK_FRIENDSHIP_MILESTONES", {}) or {}).items():
+            if lick_count >= people_to_int(milestone, 0):
+                earned_friendship += max(0, people_to_int(gain, 0))
+        Liza.rel = max(
+            people_to_int(Liza.rel, 0),
+            min(relationship_cap, earned_friendship),
+        )
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.
