@@ -74,6 +74,13 @@ init python:
                 return room_object
         return None
 
+    def wine_store_clara_pantaloons_available():
+        return (
+            int(threads["claraPaintingsPath"].num or 0) >= 2
+            and int(threads["claraForestSofa"].num or 0) < 6
+            and int(player.item_count("clara_pantaloons_001") or 0) <= 0
+        )
+
     def wine_store_action_items():
         items = []
         for room_object in rooms.get("WineStore").visible_objects():
@@ -98,6 +105,7 @@ init python:
         name="Подвал",
         description="Дальше вглубь уходит еще более тесный и заставленный подвал.",
         actions=[
+            ObjectAction(action_id="find_clara_pantaloons", label="Осмотреть пол между бочками", hook="call", target="WineStoreFindClaraPantaloons", condition=wine_store_clara_pantaloons_available),
             ObjectAction(action_id="examine_cellar", label="Осмотреть подвал", hook="text", target="Подвал забит винными запасами еще плотнее, чем сама лавка."),
         ],
     )
@@ -204,6 +212,18 @@ label WineStoreObjectText(object_id="", action_id=""):
                     scene_runtime.location_text = scene_runtime.text
                     break
     call WineStoreObjectMenu(object_id, True)
+    return
+
+
+label WineStoreFindClaraPantaloons:
+    if not wine_store_clara_pantaloons_available():
+        call WineStoreObjectMenu("cellar")
+        return
+    $ player.add_item("clara_pantaloons_001", 1)
+    $ scene_runtime.picture = "images/clara/panishment/panishment1.jpg"
+    $ scene_runtime.text = "После увиденного вы возвращаетесь в дальний подвал и внимательно осматриваете пол между бочками. В щели у стеллажа лежат смятые панталоны Клариссы, оставленные после сцены с Легаре. Вы подбираете их: сохранившийся запах может пригодиться, если понадобится взять ее след."
+    $ scene_runtime.location_text = scene_runtime.text
+    call WineStoreObjectMenu("cellar", True)
     return
 
 

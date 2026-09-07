@@ -93,12 +93,10 @@ label story_clara_forest_shared_bath_2:
             pass
 
     vscene "images/clara/forest_clara_bath_4.png"
-    $ scene_runtime.text = "Возле воды остаются ее панталоны. На внутренней стороне пояса углем нанесены приметы старой водокачки, скрытой тропы и дерева с особой зарубкой. Это не случайные каракули, а карта к тайнику."
+    $ scene_runtime.text = "Последним вам запоминается ее лукавый взгляд через плечо: Кларисса явно довольна тем, что заставила вас забыть об осторожности. Уходя к скрытой тропе, она не оставляет на берегу ничего из своих вещей."
     $ scene_runtime.location_text = scene_runtime.text
-    if int(player.item_count("clara_pantaloons_001") or 0) <= 0:
-        $ player.add_item("clara_pantaloons_001", 1)
     menu:
-        "Забрать улику":
+        "Вернуться к своим делам":
             pass
 
     $ Clara.change_social(friend_delta=1, open_delta=1)

@@ -83,8 +83,9 @@ def test_clara_clue_tool_and_sofa_use_their_domain_owners():
 
     assert items.count('object_id="clara_pantaloons_001"') == 1
     assert items.count('object_id="shovel_001"') == 1
-    assert 'player.add_item("clara_pantaloons_001", 1)' in forest_story
-    assert 'player.add_item("clara_pantaloons_001", 1)' not in wine_store
+    assert 'player.add_item("clara_pantaloons_001", 1)' not in forest_story
+    assert 'player.add_item("clara_pantaloons_001", 1)' in wine_store
+    assert 'int(threads["claraPaintingsPath"].num or 0) >= 2' in wine_store
     assert 'story_event_available(room_code, "clara_stash")' in forest
     assert '_room_add_item_by_id(rooms.get("TavernMain"), "cursed_sofa_001")' in merchant
     assert 'player.add_item("cursed_sofa_001"' not in merchant

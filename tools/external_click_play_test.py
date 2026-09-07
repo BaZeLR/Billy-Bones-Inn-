@@ -7989,6 +7989,14 @@ testcase external_clara_forest_sofa_story_flow:
     $ Clara.rel = max(5, int(Clara.rel or 0))
     $ external_calendar_set_fields(3, 1, 1100, 15, 0)
     $ external_calendar_set_weekday(1)
+    $ player.remove_item("clara_pantaloons_001", player.item_count("clara_pantaloons_001"))
+    $ rooms.enter("WineStore")
+    run Call("WineStoreObjectMenu", "cellar")
+    assert eval ("Осмотреть пол между бочками" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    run Call("WineStoreFindClaraPantaloons")
+    assert eval (int(player.item_count("clara_pantaloons_001") or 0) == 1) timeout 5.0
+    assert eval ("Осмотреть пол между бочками" not in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    assert eval ("панталоны Клариссы" in str(scene_runtime.text or "")) timeout 5.0
     $ rooms.enter("ForestClearing")
     $ player.stats.exploration = 99
     $ event_runtime.evaluation_time = None
