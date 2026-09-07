@@ -827,7 +827,14 @@ testcase external_backyard_barrel_object_actions:
     run Call("BackyardWashAtBarrelWithSoap", "soap_001")
     assert eval (player.item_count("soap_001") == 0) timeout 5.0
     assert eval (int(player.appearance.soap_look_bonus or 0) == 5) timeout 5.0
+    assert eval (int(player.appearance.soap_look_bonus_until_day or -1) - int(current_game_day()) == 6) timeout 5.0
     assert eval (int(player_look_breakdown().get("look", 0) or 0) == min(100, _look_before + 5)) timeout 5.0
+    $ player.add_item("luxury_soap_001", 1)
+    run Call("BackyardWashAtBarrelWithSoap", "luxury_soap_001")
+    assert eval (player.item_count("luxury_soap_001") == 0) timeout 5.0
+    assert eval (int(player.appearance.soap_look_bonus or 0) == 15) timeout 5.0
+    assert eval (int(player.appearance.soap_look_bonus_until_day or -1) - int(current_game_day()) == 6) timeout 5.0
+    assert eval (int(player_look_breakdown().get("look", 0) or 0) == min(100, _look_before + 15)) timeout 5.0
     assert eval (str(main_ui_runtime.action_title or "") == "Бочка с дождевой водой") timeout 5.0
     assert eval (str(scene_runtime.picture or "").endswith("images/tavern/backyard/washing_MC.png")) timeout 5.0
     $ _backyard_back_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Назад")

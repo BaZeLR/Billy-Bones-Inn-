@@ -276,7 +276,7 @@ label BackyardWashAtBarrelWithSoap(soap_id="soap_001"):
         call BackyardObjectMenu("backyard_water_barrel", scene_runtime.text)
         return
     $ player.remove_item(_soap_id, 1)
-    $ player.appearance.wash_with_soap(current_game_day(), 10 if _soap_id == "luxury_soap_001" else 5, 2 if _soap_id == "luxury_soap_001" else 1)
+    $ player.appearance.wash_with_soap(current_game_day(), 10 if _soap_id == "luxury_soap_001" else 5)
     $ scene_runtime.picture = "images/tavern/backyard/washing_MC.png"
     if _soap_id == "luxury_soap_001":
         $ scene_runtime.text = "Вы тщательно моетесь у бочки, не жалея хорошего душистого мыла. Холодная вода бодрит, кожа пахнет чище, и выглядите вы заметно лучше."

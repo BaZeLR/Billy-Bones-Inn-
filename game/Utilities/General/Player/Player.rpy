@@ -208,6 +208,7 @@ init -998 python:
         WASH_FRESH_DAYS = 3
         HAIRCUT_FRESH_DAYS = 14
         DRESS_LIFE_DAYS = 42
+        SOAP_EFFECT_DAYS = 7
         ITEM_LIFE_DEFAULTS = {
             "soap_001": 3,
             "luxury_soap_001": 7,
@@ -337,10 +338,12 @@ init -998 python:
             self.days_since_wash = 0
             return True
 
-        def wash_with_soap(self, current_day=0, bonus=10, duration_days=1):
+        def wash_with_soap(self, current_day=0, bonus=10):
             self.wash()
-            self.soap_look_bonus = max(0, player_to_int(bonus, 10))
-            self.soap_look_bonus_until_day = player_to_int(current_day, 0) + max(0, player_to_int(duration_days, 1))
+            day_value = player_to_int(current_day, 0)
+            active_bonus = max(0, player_to_int(self.soap_look_bonus, 0)) if day_value <= player_to_int(self.soap_look_bonus_until_day, -1) else 0
+            self.soap_look_bonus = active_bonus + max(0, player_to_int(bonus, 10))
+            self.soap_look_bonus_until_day = day_value + self.SOAP_EFFECT_DAYS - 1
             return self.soap_look_bonus
 
         def increment_wash_days(self, amount=1):

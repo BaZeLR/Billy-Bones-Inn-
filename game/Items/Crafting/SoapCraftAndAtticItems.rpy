@@ -1467,7 +1467,7 @@ label AtticInventoryUseSoap(item_id="", return_context="attic", room_code="Taver
         return
     $ _soap_grade = str(getattr(_soap_item, "custom_properties", {}).get("soap_grade", "ordinary") or "ordinary")
     $ player.remove_item(_soap_item_id, 1)
-    $ player.appearance.wash_with_soap(current_game_day(), 10 if _soap_grade == "luxury" else 5, 2 if _soap_grade == "luxury" else 1)
+    $ player.appearance.wash_with_soap(current_game_day(), 10 if _soap_grade == "luxury" else 5)
     $ player.change_stat("fun", 2)
     call stat
     $ scene_runtime.text = "Вы тщательно моетесь, используя {}. Кожа становится чище, запах приятнее, а выглядите вы заметно лучше. Чистота и свежесть еще какое-то время будут работать на ваш вид.".format(str(getattr(_soap_item, "name", "душистое мыло") or "душистое мыло"))
