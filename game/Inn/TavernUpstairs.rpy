@@ -61,7 +61,7 @@ init 6 python:
             RoomExit(label="Заглянуть в комнату Аманды", target="TavernAmandaRoom", condition=tavern_upstairs_can_enter_amanda_room),
             RoomExit(label="Зайти в комнату Сандры", target="TavernSandraRoom"),
             RoomExit(label="Зайти в комнату Мелиссы", target="TavernMelissaRoom"),
-            RoomExit(label="Осмотреть пустую комнату", target="TavernEmptyRoom"),
+            RoomExit(label="Зайти в гостевую комнату", target="TavernEmptyRoom"),
             RoomExit(label="Спуститься в подвал", target="TavernStorage"),
         ],
         game_items=[],

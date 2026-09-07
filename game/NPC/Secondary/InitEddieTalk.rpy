@@ -19,7 +19,10 @@ init python:
         info = people.get_info(eddie_name)
         return (
             int(getattr(info, "rel", 0) or 0) >= 5
-            and str(people.location("georgett") or "") == "TavernMain"
+            and (
+                _girl_job_value("georgett", "jobwhore") > 0
+                or _girl_job_value("georgett", "jobgloryhole") > 0
+            )
             and not info.told_about_tavern_whores
             and int(getattr(info, "talked_today", 0) or 0) < 2
         )
@@ -28,7 +31,10 @@ init python:
         info = people.get_info(eddie_name)
         return (
             int(getattr(info, "rel", 0) or 0) >= 5
-            and str(people.location("georgett") or "") == "TavernMain"
+            and (
+                _girl_job_value("georgett", "jobwhore") > 0
+                or _girl_job_value("georgett", "jobgloryhole") > 0
+            )
             and info.seen_with_georgett
             and not info.talked_about_georgett
             and int(getattr(info, "talked_today", 0) or 0) < 2

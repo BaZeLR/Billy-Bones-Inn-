@@ -30,12 +30,15 @@ init python:
             self.talked_today = 0
             self.liza_encounter_seen = False
             self.talked_about_liza = False
+            self.told_about_tavern_whores = False
             self.heard_about_wife = False
             self.amanda_conflict_stage = 0
 
         def update(self):
             self.name = people_normalize_id(self.name)
             self.data = AlberStaticData
+            if not hasattr(self, "told_about_tavern_whores"):
+                self.told_about_tavern_whores = False
             return self
 
         def interaction_visible(self, room_code=""):

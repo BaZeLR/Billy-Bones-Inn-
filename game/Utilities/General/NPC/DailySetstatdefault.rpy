@@ -29,7 +29,7 @@ label DailySetstatdefault(girl_name):
         if ((_dssd_pregnancy_days > 240 and procedural_randint(1, 45, "birth_window_%s_%s" % (girl_name, int(current_game_day()))) > max(270 - _dssd_pregnancy_days, 0) + 10 and procedural_randint(1, 3, "birth_confirm_%s_%s" % (girl_name, int(current_game_day()))) == 1)
                 or _dssd_pregnancy_days >= 285):
             $ _dssd_know_about_birth = 1
-            if (girl_name == "liza" or girl_name == "georgett") and str(people.location(girl_name) or "") != "TavernMain":
+            if (girl_name == "liza" or girl_name == "georgett") and str(people.location(girl_name) or "") not in ("TavernMain", "TavernGloryHole"):
                 $ _dssd_know_about_birth = 0
             if (girl_name == "becky" or girl_name == "inga") and Becky.rel < 12:
                 $ _dssd_know_about_birth = 0

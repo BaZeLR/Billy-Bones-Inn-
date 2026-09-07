@@ -47,6 +47,12 @@ label IntAlberTalk:
                 $ Alber.finish_talk()
                 $ scene_runtime.location_text = scene_runtime.text
 
+            "Рассказать мессиру Легаре, что девушки теперь работают в трактире" if _alber_relation >= 5 and (_girl_job_value("georgett", "jobwhore") > 0 or _girl_job_value("georgett", "jobgloryhole") > 0 or _girl_job_value("liza", "jobwhore") > 0 or _girl_job_value("liza", "jobgloryhole") > 0) and not Alber.told_about_tavern_whores and _alber_talked <= 2 and _alber_provoked == 0:
+                $ scene_runtime.text = "Вы сообщаете мессиру Легаре, что Жоржетта и Лизетта теперь принимают клиентов в вашем трактире. Виноторговец довольно улыбается и обещает как-нибудь непременно заглянуть."
+                $ Alber.told_about_tavern_whores = True
+                $ Alber.finish_talk()
+                $ scene_runtime.location_text = scene_runtime.text
+
             "Попробовать помириться" if Alber.amanda_conflict_stage > 0 and _alber_talked <= 2 and _alber_provoked == 0:
                 $ scene_runtime.text = "\"Эй, Альбер, чего ты так надулся?\" примирительно сказали вы. \"Ну увидел я тебя с Амандой, ну вспылил. Ну подрались мы малость, бывает. Все, проехали. \" и вы протянули месье свою руку. Тот немного поколебался, но все-таки ее пожал. \"Ладно, проехали\" согласился он.\n\nВы развернулись, чтобы уйти, но услышали, как месье пробормотал сквозь зубы:"
                 if Amanda.had_sex_with_legare:

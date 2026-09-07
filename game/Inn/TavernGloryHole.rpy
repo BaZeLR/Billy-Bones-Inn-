@@ -5,6 +5,23 @@ init 6 python:
     def tavern_glory_hole_available():
         return int(player.tavern_management.glory_hole or 0) == 2
 
+    def tavern_glory_hole_worker():
+        workers = girls_by_job("jobgloryhole", "TavernGloryHole")
+        return str(workers[0] or "") if workers else ""
+
+    def tavern_glory_hole_working_now():
+        return calendar_v2.time_slot() in (2, 3) and tavern_glory_hole_worker() != ""
+
+    def tavern_glory_hole_waiting_text(girl_name=""):
+        girl_key = str(girl_name or tavern_glory_hole_worker() or "")
+        if girl_key == "":
+            return ""
+        info = people.get_info(girl_key)
+        text = people_display_name(girl_key) + " сидит за ширмой на скамеечке в ожидании клиентов. Подол юбки задран до пояса, полностью открывая киску. Панталончиков прелестница либо не носит, либо сняла как лишнее препятствие."
+        if info is not None and info.pregnancy_days() > 120:
+            text += " Над задранным подолом из под расстегнутой блузки виднеется беременное пузико " + people_name(girl_key, "genitive") + "."
+        return text
+
     TavernGloryHoleRoomDefinition = Room(
         code_name="TavernGloryHole",
         group_name=ROOM_GROUP_TAVERN,
@@ -19,24 +36,49 @@ init 6 python:
         exits=[
             RoomExit(label="Вернуться в главный зал", target="TavernMain"),
         ],
+        action_menus=[
+            RoomAction(action_id="check_glory_hole", label="Проверить, что происходит", hook="call", target="TavernGloryHoleCheck"),
+        ],
         game_items=[],
         custom_properties={},
     )
 
 label TavernGloryHole:
-    $ rooms.enter("TavernGloryHole")
-    $ scene_runtime.picture = rooms.get("TavernGloryHole").bg_picture
     if not tavern_glory_hole_available():
         "Отдельная комната пока недоступна. Сначала закажите и оплатите постройку."
         jump TavernMain
+    $ renpy.dynamic("_tgh_room", "_tgh_desc_parts", "_tgh_desc", "_tgh_worker")
+    scene black
+    $ rooms.enter("TavernGloryHole")
+    $ _tgh_room = rooms.current
+    $ scene_runtime.picture = _tgh_room.bg_picture or None
+    $ _tgh_desc_parts = [str(_tgh_desc.text or "") for _tgh_desc in _tgh_room.visible_descriptions()]
+    $ _tgh_worker = tavern_glory_hole_worker()
+    if tavern_glory_hole_working_now():
+        $ _tgh_desc_parts.append(tavern_glory_hole_waiting_text(_tgh_worker))
+    $ scene_runtime.location_text = "\n\n".join([part for part in _tgh_desc_parts if str(part or "").strip()])
+    $ scene_runtime.text = scene_runtime.location_text
+    $ main_ui_runtime.action_title = "Действия"
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = _tgh_room.build_action_items() + _tgh_room.build_exit_items()
+    $ _tgh_room.mark_visited()
+    while True:
+        call screen main_ui
+
+
+label TavernGloryHoleCheck:
+    if not tavern_glory_hole_available():
+        return
+    $ main_ui_begin_native_scene_state("Глорихол")
+    show screen main_ui
     python hide:
         session = player.tavern_management.glory_hole_session
         session.reset()
-        session.girl_name = get_random_girl_by_job("jobgloryhole")
+        session.girl_name = tavern_glory_hole_worker()
         player.tavern_management.glory_hole_look = 0
 
         _time_now = calendar_v2.time_slot()
-        if _time_now in (2, 3) and session.girl_name != "":
+        if tavern_glory_hole_working_now() and session.girl_name != "":
             session.works = 1
 
         if GetSexEventFromTable("amanda", 99, "glorytry") > 0:
@@ -49,12 +91,10 @@ label TavernGloryHole:
             session.roll_inside(_worker_corruption)
 
             _real_name = people_display_name(session.girl_name)
-            _real_name2 = people_name(session.girl_name, 'genitive')
             _tgh_pregnancy_days = _tgh_info.pregnancy_days() if _tgh_info is not None else 0
 
-            player.tavern_management.glory_hole_session.girl_line0 = _real_name + " сидит за ширмой на скамеечке в ожидании клиентов. Подол юбки задран до пояса, полностью открывая киску. Панталончиков прелестница либо не носит, либо сняла как лишнее препятствие."
-            if _tgh_pregnancy_days > 120:
-                player.tavern_management.glory_hole_session.girl_line0 += " Над задранным подолом из под расстегнутой блузки виднеется беременное пузико " + _real_name2 + "."
+            _real_name2 = people_name(session.girl_name, 'genitive')
+            player.tavern_management.glory_hole_session.girl_line0 = tavern_glory_hole_waiting_text(session.girl_name)
 
             player.tavern_management.glory_hole_session.girl_line1 = _real_name + " обрадованно посмотрела на появившийся в отверстии член, наклонилась к нему, и начала облизывать и обсасывать головку члена, не забывая ласкать себя свободной рукой."
 
@@ -116,13 +156,14 @@ label TavernGloryHole:
         else:
             player.tavern_management.glory_hole_session.girl_line0 = "За ширмой оказалось пусто! Может еще рано, а может быть здесь никто не работает."
 
+    "Вы находитесь в дальнем углу вашего трактира, где, за загородкой сделан глорихол. Посетители, чтобы попасть сюда, должны заплатить 6 мараведи, но к вам, согласно договору, это не относится - под внимательными взглядами ваших матери и сестер вы гордо вошли подошли к глорихолу не платя - это ваше право."
+    "Что вы собираетесь делать?"
+
+    if renpy.has_label("ShowImage"):
+        call ShowImage("gloryhole", "", "glory1")
+    jump TavernGloryHole_menu
+
     label TavernGloryHole_menu:
-        "Вы находитесь в дальнем углу вашего трактира, где, за загородкой сделан глорихол. Посетители, чтобы попасть сюда, должны заплатить 6 мараведи, но к вам, согласно договору, это не относится - под внимательными взглядами ваших матери и сестер вы гордо вошли подошли к глорихолу не платя - это ваше право."
-        "Что вы собираетесь делать?"
-
-        if renpy.has_label("ShowImage"):
-            call ShowImage("gloryhole", "", "glory1")
-
         menu:
             "Смотреть на клиента" if player.tavern_management.glory_hole_look > 0 and player.tavern_management.glory_hole_session.current_step <= 3 and player.tavern_management.glory_hole_session.menu_blocked == 0:
                 if player.tavern_management.glory_hole_session.current_step == 0:
@@ -247,5 +288,6 @@ label TavernGloryHole:
             "Ваша реакция" if player.tavern_management.glory_hole_session.menu_blocked == 1:
                 call checkTriggers("TavernGloryHole", "amanda_gloryhole_try", 0)
 
-            "Идти обратно в трактир":
-                jump TavernMain
+            "Вернуться в комнату":
+                $ main_ui_end_native_scene_state()
+                return

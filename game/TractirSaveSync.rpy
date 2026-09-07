@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 83
+define currentVersion = 84
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -704,6 +704,10 @@ init -100 python:
         if loaded_version < 83:
             updateSave_V82()
             loaded_version = 83
+
+        if loaded_version < 84:
+            updateSave_V83()
+            loaded_version = 84
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2776,6 +2780,21 @@ init -100 python:
             people_to_int(Liza.rel, 0),
             min(relationship_cap, earned_friendship),
         )
+
+    def updateSave_V83():
+        # Restore the live room definitions so existing saves receive the
+        # glory-hole room action and the guest-room identity without losing
+        # any room-owned runtime state.
+        for room_code in ("TavernGloryHole", "TavernEmptyRoom", "TavernUpstairs"):
+            old_room = rooms.get(room_code)
+            definition = roomDefinitions.get(room_code, None)
+            if definition is None:
+                continue
+            upgraded_room = definition.runtime_copy()
+            if old_room is not None:
+                upgraded_room.state.update(dict(getattr(old_room, "state", {}) or {}))
+            rooms.register(upgraded_room)
+        Alber.update()
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

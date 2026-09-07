@@ -48,16 +48,16 @@ label NextDay_NewDayEvents(retlocname=""):
                         Becky.eddie_home_visit_state += 2
                 else:
                     Becky.eddie_home_visit_state += 2
-            if Becky.eddie_home_visit_state in (2, 3) and _georgett_work_location in ("TavernMain", "PortStreets"):
+            if Becky.eddie_home_visit_state in (2, 3) and _georgett_work_location in ("TavernMain", "TavernGloryHole", "PortStreets"):
                 TodaySexEvents_Add('georgett', 3, 99, 'Prostitution')
-        elif Eddie.told_about_tavern_whores and _georgett_work_location in ("TavernMain", "PortStreets"):
+        elif Eddie.told_about_tavern_whores and _georgett_work_location in ("TavernMain", "TavernGloryHole", "PortStreets"):
             if procedural_randint(1, Eddie.whore_visit_frequency, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:104:3") == 1 and week_value != 5:
                 TodaySexEvents_Add('georgett', 3, 99, 'Prostitution')
         if Becky.eddie_home_visit_state == 4:
             TodaySexEvents_Add('georgett', 99, 99, 'EddieHomeVisit')
 
         # Визит Легаре к Лизе
-        if procedural_randint(1, Alber.whore_visit_frequency, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:110:4") == 1 and week_value != 5 and Liza.prostitution_started and _liza_work_location == "PortStreets":
+        if procedural_randint(1, Alber.whore_visit_frequency, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:110:4") == 1 and week_value != 5 and Liza.prostitution_started and (_liza_work_location == "PortStreets" or (Alber.told_about_tavern_whores and _liza_work_location in ("TavernMain", "TavernGloryHole"))):
             TodaySexEvents_Add('liza', 3, 99, 'Prostitution')
 
         if Becky.gerhard_talk_stage == 2:

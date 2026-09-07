@@ -55,11 +55,11 @@ init 6 python:
     TavernEmptyRoomRoomDefinition = Room(
         code_name="TavernEmptyRoom",
         group_name=ROOM_GROUP_TAVERN,
-        display_name="Пустая комната",
+        display_name="Гостевая комната",
         bg_picture="bg amanda_room",
         descriptions=[
             RoomDescription(
-                text="Вы открываете пустующую комнату. Здесь почти ничего нет: голая кровать, голые стены и пыль в углах. Комната пока никем не занята.",
+                text="Вы открываете гостевую комнату. Здесь пока почти ничего нет: голая кровать, голые стены и пыль в углах. Сейчас комната никем не занята.",
                 priority=100,
             ),
         ],
@@ -80,7 +80,7 @@ label TavernEmptyRoom:
     $ scene_runtime.picture = rooms.current.bg_picture or None
     $ scene_runtime.text = rooms.get("TavernEmptyRoom").descriptions[0].text
     $ scene_runtime.location_text = scene_runtime.text
-    $ main_ui_runtime.action_title = "Пустая комната"
+    $ main_ui_runtime.action_title = rooms.get("TavernEmptyRoom").display_name
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = tavern_empty_room_action_items()
     while True:
@@ -107,7 +107,7 @@ label TavernEmptyRoomObjectMenu(object_id=""):
             SetField(scene_runtime, "picture", rooms.get("TavernEmptyRoom").bg_picture or None),
             SetField(scene_runtime, "text", rooms.get("TavernEmptyRoom").descriptions[0].text),
             SetField(scene_runtime, "location_text", rooms.get("TavernEmptyRoom").descriptions[0].text),
-            SetField(main_ui_runtime, "action_title", "Пустая комната"),
+            SetField(main_ui_runtime, "action_title", rooms.get("TavernEmptyRoom").display_name),
             SetField(main_ui_runtime, "action_content", None),
             SetField(main_ui_runtime, "action_items", tavern_empty_room_action_items()),
             Function(main_ui_restart_interaction),
@@ -136,7 +136,7 @@ label TavernEmptyRoomPeekEmpty:
             $ scene_runtime.picture = rooms.get("TavernEmptyRoom").bg_picture or None
             $ scene_runtime.text = rooms.get("TavernEmptyRoom").descriptions[0].text
             $ scene_runtime.location_text = scene_runtime.text
-            $ main_ui_runtime.action_title = "Пустая комната"
+            $ main_ui_runtime.action_title = rooms.get("TavernEmptyRoom").display_name
             $ main_ui_runtime.action_items = tavern_empty_room_action_items()
             $ main_ui_restart_interaction()
             return
