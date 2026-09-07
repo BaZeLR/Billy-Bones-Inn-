@@ -556,6 +556,7 @@ label HunterClubLuiseTalk:
     $ main_ui_runtime.action_items = [
         MenuItem("Закупиться для охоты", Call("HunterClubBuyMenu")),
         MenuItem("Подать добычу", Call("HunterClubSellMenu")),
+        MenuItem("Спросить, где купить лошадь", Call("HunterClubAskHorse")),
         MenuItem("Назад", [
             SetField(scene_runtime, "picture", rooms.get("HunterClub").bg_picture or None),
             SetField(scene_runtime, "text", hunter_club_main_text()),
@@ -566,6 +567,20 @@ label HunterClubLuiseTalk:
             Function(main_ui_restart_interaction),
         ]),
     ]
+    return
+
+
+label HunterClubAskHorse:
+    if player.horse.owns_horse():
+        $ scene_runtime.text = "Луиза кивает: \"Конь у тебя уже есть. Береги его и не оставляй конюшню без присмотра.\""
+    elif int(Luisa.horse_referral_stage or 0) > 0:
+        $ scene_runtime.text = "Луиза напоминает: \"Я же сказала: у городской стражи есть свои конюшни. Поговори с десятником Циммерманом.\""
+    elif hunter_club_reputation() > 5:
+        $ Luisa.horse_referral_stage = 1
+        $ scene_runtime.text = "Луиза одобрительно хмыкает: \"Раз уж охотники тебя знают, подскажу. У городской стражи есть свои конюшни. Поговори с десятником Циммерманом — за вино и монету он может подобрать тебе коня.\""
+    else:
+        $ scene_runtime.text = "Луиза качает головой: \"Сначала заработай имя среди охотников. Когда твоя репутация в клубе будет выше пяти, тогда и поговорим о надежном коне.\""
+    $ scene_runtime.location_text = scene_runtime.text
     return
 
 

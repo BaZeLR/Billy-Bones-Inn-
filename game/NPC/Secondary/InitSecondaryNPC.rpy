@@ -46,6 +46,7 @@ init python:
         """Fat Luisa: secondary female NPC for hunter store and social scenes."""
         talk_label = "HunterClubLuiseTalk"
         unknown_name = "Луиза"
+        horse_referral_stage = 0
         STORY_DEFAULTS = {
             "met": 0,
             "lasttalkday": -1,

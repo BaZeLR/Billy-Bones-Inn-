@@ -2,6 +2,9 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHAANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 
+define ZIMMER_HORSE_WINE_COST = 5
+define ZIMMER_HORSE_MONEY_COST = 500
+
 label IntZimmerTalk:
     $ renpy.dynamic("_zimmer_name", "_clara_booklet_thread", "_zimmer_talk_new")
     $ Zimmer.mark_known()
@@ -34,6 +37,8 @@ label IntZimmerTalk:
                 call IntZimmerTalkHaggle
             "Узнать как там расследование" if int(Zimmer.talked_today or 0) < 2 and Zimmer.robin_complaint_stage == 2:
                 call IntZimmerTalkInvestigation
+            "Спросить о покупке лошади" if int(Zimmer.talked_today or 0) < 2 and int(Luisa.horse_referral_stage or 0) > 0 and not player.horse.owns_horse():
+                call IntZimmerTalkHorsePurchase
             "Похвастаться вином для ночной стражи" if int(Zimmer.talked_today or 0) < 2 and _clara_booklet_thread is not None and int(_clara_booklet_thread.num or 0) == 7 and not Mongol.guard_captain_known and int(player.tavern_management.winenum or 0) > 0:
                 call IntZimmerTalkMongolWineDistraction
             "Закончить разговор":
@@ -154,6 +159,30 @@ label IntZimmerTalkInvestigation:
     vscene "images/zimmer/talk.png"
     $ Zimmer.mark_talked(1)
     $ scene_runtime.location_text = scene_runtime.text
+    return
+
+
+label IntZimmerTalkHorsePurchase:
+    $ scene_runtime.text = "\"Луиза сказала, что у городской стражи есть свои конюшни и вы можете помочь мне купить лошадь,\" объясняете вы.\n\n\"Таки можем договориться, молодой человек,\" кивает Циммерман. \"Пять бочонков вина для моих людей и пятьсот мараведи — и получите доброго коня со сбруей.\""
+    vscene "images/zimmer/talk.png"
+    $ scene_runtime.location_text = scene_runtime.text
+    if int(player.tavern_management.winenum or 0) < ZIMMER_HORSE_WINE_COST or int(player.economy.money or 0) < ZIMMER_HORSE_MONEY_COST or str(player.appearance.current_dress or "") != "nobbledress":
+        $ scene_runtime.text += "\n\nДля сделки у вас должны быть пять бочонков вина, пятьсот мараведи, а явиться к Циммерману нужно в костюме дворянина. Сейчас не все условия выполнены."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Вернуться к разговору":
+                return
+    menu:
+        "Купить лошадь":
+            $ player.tavern_management.winenum = max(0, player.tavern_management.winenum - ZIMMER_HORSE_WINE_COST)
+            $ player.spend_money(ZIMMER_HORSE_MONEY_COST)
+            $ player.horse.acquire(RandomStallionNameCode(), ZIMMER_HORSE_MONEY_COST, True)
+            $ Zimmer.mark_talked(1)
+            $ scene_runtime.text = "Циммерман принимает деньги и распоряжается откатить пять бочонков вина к караулке. Взамен стражники приводят в конюшню вашего трактира оседланного коня по имени %s." % player.horse.name
+            $ scene_runtime.location_text = scene_runtime.text
+            call stat
+        "Вернуться к разговору":
+            pass
     return
 
 

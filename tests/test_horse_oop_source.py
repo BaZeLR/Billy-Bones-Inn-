@@ -41,6 +41,7 @@ def test_horse_consumers_use_player_horse_owner():
         "Utilities/Time/TimeTurnSystem.rpy", "Utilities/Time/NextDay_TavernDaily.rpy",
         "Utilities/Time/NextDay_NewDayEvents.rpy", "NPC/Secondary/IntMongolTalk.rpy",
         "NPC/Secondary/SherwoodTravel.rpy", "NPC/Girls/Clara/InitClara.rpy",
+        "NPC/Secondary/IntZimmerTalk.rpy",
         "Forest/Forest.rpy", "Utilities/General/Screens/stat.rpy",
     ):
         assert "player.horse" in (GAME / relative).read_text(encoding="utf-8-sig")

@@ -79,6 +79,21 @@ def test_hunter_submenu_back_actions_restore_room_picture_and_text():
         assert 'SetField(scene_runtime, "location_text", hunter_club_main_text())' in back
 
 
+def test_luisa_refers_known_hunters_to_zimmer_for_a_horse():
+    hunter = source("game/Town/HunterClub.rpy")
+    luisa = source("game/NPC/Secondary/InitSecondaryNPC.rpy")
+
+    assert 'horse_referral_stage = 0' in luisa
+    assert 'MenuItem("Спросить, где купить лошадь", Call("HunterClubAskHorse"))' in hunter
+    referral = hunter.split("label HunterClubAskHorse:", 1)[1].split(
+        "label HunterClubNewsMenu:", 1
+    )[0]
+    assert "hunter_club_reputation() > 5" in referral
+    assert "$ Luisa.horse_referral_stage = 1" in referral
+    assert "городской стражи есть свои конюшни" in referral
+    assert "Циммерманом" in referral
+
+
 def test_werecat_hunter_quest_is_authored_in_event_label():
     events = source("game/NPC/Girls/Melissa/MelissaEvents.rpy")
     quest = source("game/NPC/Secondary/MelissaWerecatQuest.rpy")

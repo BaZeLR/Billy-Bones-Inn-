@@ -77,6 +77,7 @@ def test_zimmer_dialog_menu_has_reference_choices_and_mongol_distraction():
         "Отдать сотню мараведи",
         "Поторговаться",
         "Узнать как там расследование",
+        "Спросить о покупке лошади",
         "Похвастаться вином для ночной стражи",
     ]:
         assert choice in source
@@ -85,6 +86,23 @@ def test_zimmer_dialog_menu_has_reference_choices_and_mongol_distraction():
     assert "not Mongol.guard_captain_known" in source
     assert "_mongol_var" not in source
     assert "Mongol.guard_captain_known = True" in source
+
+
+def test_zimmer_horse_offer_uses_player_owned_resources_and_horse_state():
+    source = _source(ZIMMER_TALK)
+    purchase = source.split("label IntZimmerTalkHorsePurchase:", 1)[1].split(
+        "label IntZimmerTalkMongolWineDistraction:", 1
+    )[0]
+
+    assert "define ZIMMER_HORSE_WINE_COST = 5" in source
+    assert "define ZIMMER_HORSE_MONEY_COST = 500" in source
+    assert "int(Luisa.horse_referral_stage or 0) > 0" in source
+    assert "not player.horse.owns_horse()" in source
+    assert 'str(player.appearance.current_dress or "") != "nobbledress"' in purchase
+    assert "player.tavern_management.winenum - ZIMMER_HORSE_WINE_COST" in purchase
+    assert "player.spend_money(ZIMMER_HORSE_MONEY_COST)" in purchase
+    assert "player.horse.acquire(RandomStallionNameCode(), ZIMMER_HORSE_MONEY_COST, True)" in purchase
+    assert 'jump TavernStable' not in purchase
 
 
 def test_zimmer_dialog_uses_vscene_and_room_restore_end():

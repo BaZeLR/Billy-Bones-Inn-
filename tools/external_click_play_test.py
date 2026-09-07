@@ -6515,6 +6515,42 @@ testcase external_hunter_club_reputation_challenge_and_trade:
     assert eval (bool(_hunter_trade_result.get("ok", False))) timeout 5.0
     assert eval (int(player.economy.money or 0) == 88 and int(player.item_count("arrows_001") or 0) == _hunter_arrows_before + 2) timeout 5.0
 
+testcase external_luisa_zimmer_horse_purchase:
+    run Call("InitGameNPCs")
+    $ player.horse.remove()
+    $ Luisa.horse_referral_stage = 0
+    $ rooms.get("HunterClub").state["reputation"] = 6
+    $ rooms.get("HunterClub").state["first_visit_seen"] = 1
+    $ external_calendar_set_fields(1, 1, CALENDAR_START_CYCLE, 12, 0)
+    $ external_calendar_set_weekday(1)
+    run Jump("HunterClub")
+    advance until screen "main_ui" timeout 20.0
+    click id "main_ui_entity_button_npc_luisa" pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Толстуха Луиза") timeout 20.0
+    assert eval ("Спросить, где купить лошадь" in [str(i.caption or "") for i in main_ui_runtime.action_items]) timeout 5.0
+    $ _luisa_horse_index = [str(i.caption or "") for i in main_ui_runtime.action_items].index("Спросить, где купить лошадь")
+    click id ("choice_panel_button_%d" % int(_luisa_horse_index)) pos (0.5, 0.5) until eval (int(Luisa.horse_referral_stage or 0) == 1) timeout 20.0
+    $ Zimmer.talked_today = 0
+    $ player.set_money(500)
+    $ player.tavern_management.winenum = 5
+    $ player.appearance.add_dress("nobbledress", calendar_v2.daysInGame)
+    $ player.wear_dress("villagedress")
+    run Call("IntZimmerTalk")
+    advance until screen "choice" timeout 20.0
+    assert eval ("Спросить о покупке лошади" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _zimmer_horse_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить о покупке лошади")
+    click id ("choice_panel_button_%d" % int(_zimmer_horse_index)) pos (0.5, 0.5) until eval ("Вернуться к разговору" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Купить лошадь" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (not player.horse.owns_horse() and int(player.economy.money or 0) == 500 and int(player.tavern_management.winenum or 0) == 5) timeout 5.0
+    $ _zimmer_horse_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Вернуться к разговору")
+    click id ("choice_panel_button_%d" % int(_zimmer_horse_back_index)) pos (0.5, 0.5) until eval ("Спросить о покупке лошади" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ player.wear_dress("nobbledress")
+    $ _zimmer_horse_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить о покупке лошади")
+    click id ("choice_panel_button_%d" % int(_zimmer_horse_index)) pos (0.5, 0.5) until eval ("Купить лошадь" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _zimmer_buy_horse_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Купить лошадь")
+    click id ("choice_panel_button_%d" % int(_zimmer_buy_horse_index)) pos (0.5, 0.5) until eval (player.horse.owns_horse()) timeout 20.0
+    assert eval (player.horse.owns_horse() and bool(player.horse.saddled)) timeout 5.0
+    assert eval (int(player.economy.money or 0) == 0 and int(player.tavern_management.winenum or 0) == 0) timeout 5.0
+    assert eval (int(player.horse.purchase_price or 0) == 500 and str(rooms.current_code or "") != "TavernStable") timeout 5.0
+
 testcase external_hour_based_room_and_npc_schedule_adjustment:
     run Call("InitGameNPCs")
     $ player.tavern_management.breakfast.event_active = False
@@ -8876,6 +8912,7 @@ def main() -> int:
             "external_people_registry_repairs_stale_amanda_data",
             "external_player_appearance_v47_migration",
             "external_hunter_club_reputation_challenge_and_trade",
+            "external_luisa_zimmer_horse_purchase",
             "external_hour_based_room_and_npc_schedule_adjustment",
             "external_context_image_resolution",
             "external_harassment_images_use_exact_existing_paths",
@@ -9076,6 +9113,7 @@ def main() -> int:
             "external_people_registry_repairs_stale_amanda_data",
             "external_player_appearance_v47_migration",
             "external_hunter_club_reputation_challenge_and_trade",
+            "external_luisa_zimmer_horse_purchase",
             "external_hour_based_room_and_npc_schedule_adjustment",
             "external_context_image_resolution",
             "external_harassment_images_use_exact_existing_paths",
