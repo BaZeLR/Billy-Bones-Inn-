@@ -48,7 +48,7 @@ label int_becky_dance():
                 $ rooms.get("FridayDance").hands = ""
                 $ rooms.get("FridayDance").kiss = 0
                 $ rooms.get("FridayDance").tits = 0
-                if Becky.rel >= 7 and Becky.corruption > 18:
+                if int(Becky.drunk or 0) > 0 or (Becky.rel >= 7 and Becky.corruption > 18):
                     $ scene_runtime.picture = "images/becky/dance/you_dance_2.png"
                     vscene scene_runtime.picture
                     "Она с радостью согласилась, вы взяли ее под руку и вскоре вы закружились в танце."

@@ -56,6 +56,8 @@ def test_becky_friday_dance_uses_thread_event_and_object_state():
     assert "ensure_story_defaults" not in dance
     assert "sync_from_becky_maps" not in dance
     assert "sync_becky_maps" not in dance
+    assert "if int(Becky.drunk or 0) > 0 or (Becky.rel >= 7 and Becky.corruption > 18):" in dance
+    assert "elif Becky.rel >= 5 and Becky.corruption >= 8:" in dance
 
     assert 'rooms.get(\"FridayDance\").becky_home_invited = True' in invite
     assert '"becky_dance_home_invite_%s_%s_%s"' in invite

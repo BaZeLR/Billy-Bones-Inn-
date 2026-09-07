@@ -1015,6 +1015,23 @@ define beckyThreadList = [
     LThreadData(0, "becky", "FridayDanceMC", None, [
         BeckyFridayDanceMC,
     ], highlight=False, threaded=False),
+    LThreadData(0, "becky", "SandraKitchenVisit", None, [
+        (
+            "story_becky_sandra_kitchen_visit",
+            None, (18, 20), None,
+            1,
+            None,
+            [
+                "#Becky.sandra_friendship_stage() >= 1",
+                "#str(people.location('becky') or '') == 'TavernKitchen'",
+                "#str(people.location('sandra') or '') == 'TavernKitchen'",
+            ],
+            None,
+            "TavernKitchen",
+            "enter",
+            20,
+        ),
+    ], highlight=False, threaded=False),
     # The Becky home route has two procedure-owned milestones followed by one
     # authored talk event.  Empty cells deliberately avoid registering a
     # second action for scenes already owned by BeckyHomeFront/IntBeckySex.

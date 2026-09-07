@@ -73,8 +73,8 @@
     {
       "label": "becky_visit_kitchen",
       "weekdays": [2, 4],
-      "start": "12:30",
-      "end": "15:59",
+      "start": "18:00",
+      "end": "20:29",
       "location": "TavernKitchen",
       "awake": true,
       "talkable": true,

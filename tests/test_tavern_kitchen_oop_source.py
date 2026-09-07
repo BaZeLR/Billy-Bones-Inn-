@@ -34,11 +34,12 @@ def test_kitchen_has_one_action_source_without_builder_or_recursive_loop():
 def test_kitchen_preserves_meals_storage_tea_sandra_objects_and_breakfast():
     for token in (
         'Call("TavernKitchenBreakfast")',
-        'Call("TavernKitchenDepositMenu")', 'Call("TavernKitchenShareTeaWithSandraAndBecky")',
+        'Call("TavernKitchenDepositMenu")', 'label story_becky_sandra_kitchen_visit:',
         'Call("TavernKitchenAskSandraBreakfasts")', 'Call("TavernKitchenAskSandraClients")',
         "rooms.get(\"TavernKitchen\").build_menu_sections()", "tavern_kitchen_hearth_wood_stock()",
     ):
         assert token in KITCHEN
+    assert 'Call("TavernKitchenShareTeaWithSandraAndBecky")' not in KITCHEN
     assert "Сесть за воскресный обед" not in KITCHEN
     assert "label TavernKitchenBreakfast:" in BREAKFAST
     assert "label TavernKitchenFinishBreakfastEvent:" in BREAKFAST

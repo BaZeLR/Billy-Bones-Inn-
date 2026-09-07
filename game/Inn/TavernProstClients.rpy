@@ -10,16 +10,17 @@ label TavernProstClients(girl_name="", client_type=1, return_room="", client_tim
         return
     if client_time is None:
         $ client_time = calendar_v2.time_slot()
+    $ main_ui_begin_native_scene_state("Потайное окошко")
     if str(girl_name or "") == "":
-        $ main_ui_runtime.mode = "event"
         $ scene_runtime.text = "В отдельной комнате сейчас никого нет."
         $ scene_runtime.location_text = scene_runtime.text
         show screen main_ui
         menu:
             "Вернуться":
-                return
+                pass
+        $ main_ui_end_native_scene_state()
+        return
 
-    $ main_ui_runtime.mode = "event"
     $ scene_runtime.text = "Вы зашли в соседнюю комнату, где у вас было оборудовано специальное потайное окошко. Через него вам открылся прекрасный вид."
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
@@ -28,6 +29,7 @@ label TavernProstClients(girl_name="", client_type=1, return_room="", client_tim
             call TavernProstClientsWatch(client_type, girl_name, return_room, client_time)
         "Вернуться":
             pass
+    $ main_ui_end_native_scene_state()
     return
 
 
@@ -124,8 +126,6 @@ label TavernProstClientsWatch(client_type=1, girl_name="", return_room="", clien
     $ scene_runtime.location_text = scene_runtime.text
     show screen main_ui
     menu:
-        "Смотреть дальше" if CheckIfSexEventExist(girl_name, client_time, "Prostitution") > 0:
-            call TavernProstClientsWatch(client_type, girl_name, return_room, client_time)
         "Вернуться":
             pass
     return

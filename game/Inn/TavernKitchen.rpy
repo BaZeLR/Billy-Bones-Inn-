@@ -388,8 +388,6 @@ init python:
             items.append(MenuItem("Перекусить", Call("Eat", "горячую еду с кухни", 18, "Вы перекусываете на кухне горячей едой и немного приходите в себя.", "TavernKitchen", "")))
         if tavern_kitchen_has_depositable_food():
             items.append(MenuItem("Отнести в кладовую лесную добычу и припасы", Call("TavernKitchenDepositMenu")))
-        if tavern_kitchen_can_share_tea_with_sandra_and_becky():
-            items.append(MenuItem("Угостить Сандру и Бекки чаем", Call("TavernKitchenShareTeaWithSandraAndBecky")))
         if tavern_kitchen_sandra_can_discuss_breakfasts():
             items.append(MenuItem("Попросить Сандру почаще собирать всех на общий завтрак", Call("TavernKitchenAskSandraBreakfasts")))
         if tavern_kitchen_sandra_can_discuss_clients():
@@ -437,27 +435,29 @@ label TavernKitchen:
         call screen main_ui
 
 
-label TavernKitchenShareTeaWithSandraAndBecky:
-    $ renpy.dynamic("_tea_scene")
-    if not tavern_kitchen_can_share_tea_with_sandra_and_becky():
-        $ scene_runtime.text = "Сейчас для этого не время."
-        $ scene_runtime.location_text = scene_runtime.text
-        $ main_ui_runtime.action_items = tavern_kitchen_action_items()
-        return
-    $ player.remove_item("energy_tea_001", 1)
-    $ Sandra.rel = min(20, int(Sandra.rel or 0) + 1)
-    $ Sandra.fun = min(100, int(Sandra.fun or 0) + 1)
-    $ Becky.rel = max(0, min(20, int(Becky.rel or 0) + 1))
-    $ Becky.fun = max(0, min(100, int(Becky.fun or 0) + 1))
-    $ player.change_stat("fun", 1)
-    $ scene_runtime.text = "Вы завариваете бодрящий чай и угощаете им Сандру с Бекки. Разговор за столом быстро теплеет: Сандра благодарит вас за внимание к хозяйству, а Бекки охотно подхватывает кухонные сплетни и делится парой полезных замечаний о трактирных делах."
-    if str(people.location("sandra") or "") == "TavernKitchen":
-        $ _tea_scene = tavern_kitchen_random_sandra_scene()
-        if str(_tea_scene or "").strip():
-            $ scene_runtime.picture = _tea_scene
-    $ scene_runtime.location_text = scene_runtime.text
-    call stat
-    $ main_ui_runtime.action_items = tavern_kitchen_action_items()
+label story_becky_sandra_kitchen_visit:
+    $ main_ui_begin_native_scene_state("Бекки в гостях у Сандры")
+    show screen main_ui
+    vscene "images/tavern/kitchen/becky_visit_0.png"
+    "Зайдя вечером на кухню, вы застаете Сандру и Бекки за негромким разговором у разделочного стола. Бекки явно пришла не по торговому делу: подруги обсуждают дом, трактир и что-то такое, о чем при вашем появлении обе на миг умолкают."
+    menu:
+        "Угостить Сандру и Бекки бодрящим чаем" if tavern_kitchen_can_share_tea_with_sandra_and_becky():
+            $ player.remove_item("energy_tea_001", 1)
+            $ Sandra.change_social(friend_delta=1)
+            $ Sandra.fun = min(100, int(Sandra.fun or 0) + 1)
+            $ Becky.change_social(friend_delta=1)
+            $ Becky.fun = min(100, int(Becky.fun or 0) + 1)
+            $ player.change_stat("fun", 1)
+            vscene "images/tavern/kitchen/becky_visit_1.png"
+            "Вы завариваете бодрящий чай и ставите чашки перед Сандрой и Бекки. Разговор быстро теплеет: Сандра благодарит вас за внимание к хозяйству, а Бекки охотно подхватывает кухонные сплетни и делится парой полезных замечаний о трактирных делах."
+            call stat
+
+        "Не мешать разговору":
+            "Вы не стали мешать старым подругам и оставили их спокойно беседовать."
+    menu:
+        "Вернуться к своим делам":
+            pass
+    $ main_ui_end_native_scene_state()
     return
 
 

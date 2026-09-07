@@ -5263,12 +5263,14 @@ testcase external_friday_public_becky_button_starts_dance:
     $ npc_interval_schedule_load_all(True)
     $ rooms.get("FridayDance").dance_count = 0
     $ rooms.get("FridayDance").step = 0
+    $ player.tavern_management.dance_sponsor = 1
     $ GirlDance_Clear()
     $ Amanda.legare_affection = 1
     $ Amanda.left_friday_dance = True
     $ Becky.left_dances = 0
-    $ Becky.rel = 7
-    $ Becky.corruption = 19
+    $ Becky.rel = 1
+    $ Becky.corruption = 25
+    $ Becky.drunk = 0
     $ event_runtime.fired_keys_today = []
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
@@ -5276,6 +5278,7 @@ testcase external_friday_public_becky_button_starts_dance:
     run Jump("FridayDance")
     advance until screen "choice" timeout 20.0
     assert eval ("Найти Бекки Блэнкеншип" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval (int(Becky.drunk or 0) == 1 and int(Becky.rel or 0) == 3 and int(Becky.corruption or 0) == 29) timeout 5.0
     $ _friday_becky_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Найти Бекки Блэнкеншип")
     click id ("choice_panel_button_%d" % int(_friday_becky_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
     assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1) timeout 5.0
@@ -6790,16 +6793,32 @@ testcase external_hour_based_room_and_npc_schedule_adjustment:
         _becky_visit_day = -1
         for _probe_day in range(31, 420):
             _probe_parts = calendar_v2.day_number_to_parts(_probe_day)
-            external_calendar_set_fields(int(_probe_parts.get("day", 1) or 1), int(_probe_parts.get("month", 1) or 1), int(_probe_parts.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 13, 0)
+            external_calendar_set_fields(int(_probe_parts.get("day", 1) or 1), int(_probe_parts.get("month", 1) or 1), int(_probe_parts.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 19, 0)
             if npc_schedule_becky_sandra_kitchen_visit_active():
                 _becky_visit_day = _probe_day
                 break
         if _becky_visit_day >= 0:
             _becky_visit_parts = calendar_v2.day_number_to_parts(_becky_visit_day)
-            external_calendar_set_fields(int(_becky_visit_parts.get("day", 1) or 1), int(_becky_visit_parts.get("month", 1) or 1), int(_becky_visit_parts.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 13, 0)
+            external_calendar_set_fields(int(_becky_visit_parts.get("day", 1) or 1), int(_becky_visit_parts.get("month", 1) or 1), int(_becky_visit_parts.get("year", CALENDAR_START_CYCLE) or CALENDAR_START_CYCLE), 19, 0)
     assert eval (_becky_visit_day >= 0) timeout 5.0
     assert eval (str(people.location("sandra") or "") == "TavernKitchen") timeout 5.0
     assert eval (str(people.location("becky") or "") == "TavernKitchen" and str(people.schedule_state("becky").get("label", "") or "") == "sandra_kitchen_visit") timeout 5.0
+    $ rooms.enter("TavernKitchen")
+    $ player.add_item("energy_tea_001", 1)
+    $ _becky_kitchen_tea_before = int(player.item_count("energy_tea_001") or 0)
+    $ _becky_kitchen_rel_before = int(Becky.rel or 0)
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    assert eval (story_event_available("TavernKitchen", "enter") and str(event_runtime.available["TavernKitchen"]["enter"].target or "") == "story_becky_sandra_kitchen_visit") timeout 5.0
+    run Call("checkTriggers", "TavernKitchen", "enter", 0)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(main_ui_runtime.action_title or "") == "Бекки в гостях у Сандры" and str(scene_runtime.picture or "") == "images/tavern/kitchen/becky_visit_0.png") timeout 5.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Угостить Сандру и Бекки бодрящим чаем", "Не мешать разговору"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/tavern/kitchen/becky_visit_1.png" and int(Becky.rel or 0) == _becky_kitchen_rel_before + 1 and int(player.item_count("energy_tea_001") or 0) == _becky_kitchen_tea_before - 1) timeout 5.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к своим делам"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
     $ Liza.prostitution_started = True
     $ Liza.set_hired(False)
     python:
@@ -7118,10 +7137,29 @@ testcase external_harassment_event_picture_sequence:
     assert eval (CheckIfSexEventExist("liza", calendar_v2.time_slot(), "Prostitution") > 0 and str(rooms.get("TavernMain").state.get("client_room_girl", "") or "") == "liza") timeout 5.0
     assert eval (int(Liza.sex_stat("clients_day_total", 0) or 0) == _liza_redirect_clients_before + 1 and not Liza.can_accept_tavern_client() and people_display_name("liza") in str(_return or "")) timeout 5.0
     assert eval ("Пойти проверить отдельную комнату" in [str(item.caption or "") for item in tavern_main_action_items()]) timeout 5.0
+    $ SexEvents.delete_girl_today("liza")
+    $ SexEvents.add_today("liza", calendar_v2.time_slot(), 2, "Prostitution")
+    $ rooms.get("TavernMain").state["client_room_girl"] = "liza"
     run Call("TavernProstClients", "liza")
     advance until screen "choice" timeout 20.0
     assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Подсмотреть", "Вернуться"]) timeout 5.0
-    click id "choice_panel_button_1" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться"]) timeout 5.0
+    assert eval (str(scene_runtime.picture or "").lower().startswith("images/liza/traktirevents/event2_") and _media_asset_exists(scene_runtime.picture)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene" and str(rooms.current_code or "") == "TavernMain" and main_ui_runtime.scene_origin is None) timeout 20.0
+
+    $ SexEvents.delete_girl_today("georgett")
+    $ SexEvents.add_today("georgett", calendar_v2.time_slot(), 2, "Prostitution")
+    $ rooms.get("TavernMain").state["client_room_girl"] = "georgett"
+    run Call("TavernProstClients", "georgett")
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Подсмотреть", "Вернуться"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться"]) timeout 5.0
+    assert eval (str(scene_runtime.picture or "").lower().startswith("images/georgett/portevents/event2_") and _media_asset_exists(scene_runtime.picture)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene" and str(rooms.current_code or "") == "TavernMain" and main_ui_runtime.scene_origin is None) timeout 20.0
 
     $ SexEvents.delete_girl_today("georgett")
     $ SexEvents.delete_girl_today("liza")

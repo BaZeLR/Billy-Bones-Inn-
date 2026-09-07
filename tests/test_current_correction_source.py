@@ -44,11 +44,27 @@ def test_becky_kitchen_visit_uses_friendship_and_schedule_as_authority():
     becky = read("game/NPC/Girls/Becky/InitBecky.rpy")
     breakfast = read("game/Inn/TavernKitchenBreakfast.rpy")
     kitchen = read("game/Inn/TavernKitchen.rpy")
+    runtime = read("game/Utilities/General/Classes/StoryEventRuntime.rpy")
+    becky_schedule = schedule("becky")
+    sandra_schedule = schedule("sandra")
 
     assert "def sandra_friendship_stage(self):" in becky
     assert "return Becky.sandra_friendship_stage() >= 1" in breakfast
     assert 'people.location("becky")' in kitchen
-    assert "sandra_kitchen_visit_period" not in becky + breakfast + kitchen
+    assert 'LThreadData(0, "becky", "SandraKitchenVisit"' in runtime
+    visit_event = runtime.split('LThreadData(0, "becky", "SandraKitchenVisit"', 1)[1].split(
+        'LThreadData(0, "becky", "Home"', 1
+    )[0]
+    assert '"story_becky_sandra_kitchen_visit"' in visit_event
+    assert '"TavernKitchen",\n            "enter"' in visit_event
+    assert "#Becky.sandra_friendship_stage() >= 1" in visit_event
+    assert "#str(people.location('becky') or '') == 'TavernKitchen'" in visit_event
+    assert "#str(people.location('sandra') or '') == 'TavernKitchen'" in visit_event
+    assert "label story_becky_sandra_kitchen_visit:" in kitchen
+    assert 'Call("TavernKitchenShareTeaWithSandraAndBecky")' not in kitchen
+    assert entry_at(becky_schedule, 2, "19:00")["label"] == "sandra_kitchen_visit"
+    assert entry_at(sandra_schedule, 2, "19:00")["label"] == "becky_visit_kitchen"
+    assert "sandra_kitchen_visit_period" not in becky + breakfast + kitchen + runtime
 
 
 def test_soap_inventory_changes_only_after_a_chosen_use_or_gift():

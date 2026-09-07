@@ -63,6 +63,9 @@ def test_tavern_client_event_uses_native_menu_and_returns_to_caller():
     source = read_rel("game/Inn/TavernProstClients.rpy")
 
     assert "menu:" in source
+    assert '$ main_ui_begin_native_scene_state("Потайное окошко")' in source
+    assert source.count("$ main_ui_end_native_scene_state()") == 2
+    assert '"Смотреть дальше"' not in source
     assert "call screen main_ui" not in source
     assert "main_ui_runtime.action_items" not in source
     assert "jump expression" not in source
