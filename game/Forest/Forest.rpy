@@ -139,13 +139,15 @@ init python:
         return [MenuItem("Идти в лес", [SetDict(rooms.get("Forest").state, "return_target", target), Call("TravelToForest")])]
 
     def forest_can_depart_now():
+        if forest_has_horse():
+            return True
         try:
             return int(calendar_v2.hour or 0) < 12
         except Exception:
             return True
 
     def forest_departure_block_text():
-        return "После полудня идти в лес уже поздно. На такую вылазку уйдет не меньше часа верхом и двух часов пешком."
+        return "После полудня идти в лес пешком уже поздно. На такую вылазку уйдет не меньше двух часов."
 
     def forest_after_dusk():
         try:

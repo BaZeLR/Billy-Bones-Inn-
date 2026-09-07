@@ -8057,6 +8057,10 @@ testcase external_clara_forest_sofa_story_flow:
     $ Clara.rel = max(5, int(Clara.rel or 0))
     $ external_calendar_set_fields(3, 1, 1100, 15, 0)
     $ external_calendar_set_weekday(1)
+    $ player.horse.remove()
+    assert eval (not forest_can_depart_now()) timeout 5.0
+    $ player.horse.acquire("Тестовый конь", 500, True)
+    assert eval (forest_has_horse() and forest_can_depart_now()) timeout 5.0
     $ player.remove_item("clara_pantaloons_001", player.item_count("clara_pantaloons_001"))
     $ rooms.enter("WineStore")
     run Call("WineStoreObjectMenu", "cellar")
