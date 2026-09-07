@@ -107,16 +107,20 @@ label CityGuard:
         call screen main_ui
 
 
-label CityGuardShowPlacat:
-    $ renpy.dynamic("RandVar", "_placard_picture")
-    $ RandVar = procedural_randint(1, 8, "city_guard_placard_%s_%s" % (current_game_day(), int(calendar_v2.clock_minutes() or 0)))
+label CityGuardShowPlacat(placard_number=None):
+    $ renpy.dynamic("RandVar", "_placard_picture", "_next_placard")
+    if placard_number is None:
+        $ RandVar = procedural_randint(1, len(CityGuardPlacat), "city_guard_placard_%s_%s" % (current_game_day(), int(calendar_v2.clock_minutes() or 0)))
+    else:
+        $ RandVar = max(1, min(len(CityGuardPlacat), int(placard_number)))
     $ scene_runtime.text = CityGuardPlacat[RandVar]
     $ scene_runtime.location_text = scene_runtime.text
     $ _placard_picture = "images/zimmer/soldierplakat/plakat%s.jpg" % RandVar
+    $ _next_placard = 1 if RandVar >= len(CityGuardPlacat) else RandVar + 1
     vscene _placard_picture
     $ main_ui_runtime.action_title = "Расписные доски"
     $ main_ui_runtime.action_content = None
     $ main_ui_runtime.action_items = []
-    $ main_ui_runtime.action_items.append(MenuItem("Посмотреть на другую доску", Call("CityGuardShowPlacat")))
+    $ main_ui_runtime.action_items.append(MenuItem("Посмотреть на другую доску", Call("CityGuardShowPlacat", _next_placard)))
     $ main_ui_runtime.action_items.append(MenuItem("Назад", [SetField(scene_runtime, "picture", city_guard_room_picture()), SetField(scene_runtime, "text", city_guard_room_text()), SetField(scene_runtime, "location_text", city_guard_room_text()), SetField(main_ui_runtime, "action_title", "Действия"), SetField(main_ui_runtime, "action_content", None), SetField(main_ui_runtime, "action_items", city_guard_action_items()), Function(main_ui_restart_interaction)]))
     return

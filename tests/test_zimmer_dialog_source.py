@@ -64,6 +64,16 @@ def test_city_guard_builds_canonical_actions_without_room_loop_label():
     assert "int(clock_minutes or 0)" not in source
 
 
+def test_city_guard_placards_advance_without_duplicate_state():
+    source = _source(CITY_GUARD)
+
+    assert "label CityGuardShowPlacat(placard_number=None):" in source
+    assert "len(CityGuardPlacat)" in source
+    assert 'Call("CityGuardShowPlacat", _next_placard)' in source
+    assert "default CityGuardPlacat" not in source
+    assert "default RandVar" not in source
+
+
 def test_zimmer_dialog_menu_has_reference_choices_and_mongol_distraction():
     source = _source(ZIMMER_TALK)
 
