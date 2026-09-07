@@ -6,7 +6,7 @@
 # Handles daily tavern resource and event logic
 
 label NextDay_TavernDaily():
-    $ renpy.dynamic("_dog_theft_result", "_kitchen_effect_lines", "_kitchen_stock_used", "_rat_food_loss_due_day")
+    $ renpy.dynamic("_dog_theft_result", "_kitchen_effect_lines", "_kitchen_stock_used", "_rat_food_loss_due_day", "_service_worker")
     call SetTavernServiceLevels
     python:
         # Daily visitors and happiness
@@ -113,12 +113,8 @@ label NextDay_TavernDaily():
                 Mongol.seen_with_stolen_horse = False
                 Zimmer.horse_complaint_stage = 0
         TotalDay['whorerevenue'] = 0
-        # Reset jobs
-        Georgett.set_job_value("jobwhore", 0)
-        Georgett.set_job_value("jobgloryhole", 0)
-        Liza.reset_tavern_work_day()
-    $ change_tomorrow_whore_job('georgett')
-    $ change_tomorrow_whore_job('liza')
+        for _service_worker in people.girl_values():
+            _service_worker.apply_tavern_service_plan()
     $ apply_tomorrow_hall_job('sandra')
     $ apply_tomorrow_hall_job('melissa')
     $ apply_tomorrow_hall_job('amanda')

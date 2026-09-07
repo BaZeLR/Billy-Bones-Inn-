@@ -24,7 +24,7 @@ init python:
         return 0 <= current_hour < 6
 
 label NextDay(retlocname, timepassed):
-    $ renpy.dynamic("visitorshappy", "_nextday_skip_first_calendar_roll", "TotalEventsSummary", "ExtraEvents", "iDaysCount", "_nextday_girl", "TotalDay", "TotalWhoreClients", "TotalGloryHoleClients", "_weekly_msg", "CurDay", "_nextday_event_day_number", "_nextday_event_date", "_nextday_summary_text", "_nextday_money_delta", "NewDressCame", "dress_name", "avg_happy", "tavernlevel", "_nextday_lines", "_geo_name", "_liza_name", "_tractir_game_over_ending", "_day_start_save_name", "_day_start_existing_name", "_day_start_stale_slot", "_day_start_slot_number", "_girl")
+    $ renpy.dynamic("visitorshappy", "_nextday_skip_first_calendar_roll", "TotalEventsSummary", "ExtraEvents", "iDaysCount", "_nextday_girl", "TotalDay", "TotalWhoreClients", "TotalGloryHoleClients", "_weekly_msg", "CurDay", "_nextday_event_day_number", "_nextday_event_date", "_nextday_summary_text", "_nextday_money_delta", "NewDressCame", "dress_name", "avg_happy", "tavernlevel", "_nextday_lines", "_geo_name", "_liza_name", "_service_key", "_service_clients", "_service_name", "_tractir_game_over_ending", "_day_start_save_name", "_day_start_existing_name", "_day_start_stale_slot", "_day_start_slot_number", "_girl")
     $ next_day_runtime.update()
     $ visitorshappy = 0
     $ _nextday_skip_first_calendar_roll = nextday_started_after_midnight()
@@ -43,8 +43,8 @@ label NextDay(retlocname, timepassed):
             'visitors': 0, 'wine': 0, 'products': 0, 'HorseFood': 0,
             'HorseStolen': False, 'fameaten': 0, 'rat_food_loss': 0, 'happy': 0
         }
-        TotalWhoreClients = {'georgett': 0, 'liza': 0}
-        TotalGloryHoleClients = {'georgett': 0, 'liza': 0}
+        TotalWhoreClients = {girl.name: 0 for girl in people.girl_values()}
+        TotalGloryHoleClients = {girl.name: 0 for girl in people.girl_values()}
 
     while iDaysCount < timepassed:
         python:
@@ -97,8 +97,8 @@ label NextDay(retlocname, timepassed):
 
     # Calculate revenues
     python:
-        TotalDay['whorerevenue'] = TotalWhoreClients['georgett']*3 + TotalWhoreClients['liza']*3
-        TotalDay['gloryholerevenue'] = TotalGloryHoleClients['georgett']*2 + TotalGloryHoleClients['liza']*2
+        TotalDay['whorerevenue'] = sum(TotalWhoreClients.values()) * 3
+        TotalDay['gloryholerevenue'] = sum(TotalGloryHoleClients.values()) * 2
         
         player.economy.tavern_fame += TotalDay['loyalty']
         _nextday_money_delta = (TotalDay['revenue'] - TotalDay['dineout'] - TotalDay['fixedcost'] +
@@ -184,6 +184,13 @@ label NextDay(retlocname, timepassed):
             _nextday_lines.append("Развратная %s приняла %s клиентов." % (_geo_name, TotalWhoreClients['georgett']))
         if TotalWhoreClients.get('liza', 0) > 0:
             _nextday_lines.append("Юная %s приняла %s клиентов." % (_liza_name, TotalWhoreClients['liza']))
+        for _service_key in sorted(TotalWhoreClients.keys()):
+            if _service_key in ('georgett', 'liza'):
+                continue
+            _service_clients = int(TotalWhoreClients.get(_service_key, 0) or 0)
+            if _service_clients > 0:
+                _service_name = str(people_display_name(_service_key) or _service_key)
+                _nextday_lines.append("%s приняла %s клиентов в отдельной комнате." % (_service_name, _service_clients))
         if TotalDay['whorerevenue'] > 0:
             _nextday_lines.append("Ваша доля, как договоренно, составила %s мараведи." % TotalDay['whorerevenue'])
 
@@ -191,6 +198,13 @@ label NextDay(retlocname, timepassed):
             _nextday_lines.append("Шустрая %s отсосала %s членов через глорихол." % (_geo_name, TotalGloryHoleClients['georgett']))
         if TotalGloryHoleClients.get('liza', 0) > 0:
             _nextday_lines.append("Молодая, да ранняя %s отсосала %s членов через глорихол." % (_liza_name, TotalGloryHoleClients['liza']))
+        for _service_key in sorted(TotalGloryHoleClients.keys()):
+            if _service_key in ('georgett', 'liza'):
+                continue
+            _service_clients = int(TotalGloryHoleClients.get(_service_key, 0) or 0)
+            if _service_clients > 0:
+                _service_name = str(people_display_name(_service_key) or _service_key)
+                _nextday_lines.append("%s обслужила %s клиентов у глорихола." % (_service_name, _service_clients))
         if TotalDay['gloryholerevenue'] > 0:
             _nextday_lines.append("Ваша прибыль с глорихола, как и было договоренно, составила %s мараведи." % TotalDay['gloryholerevenue'])
 

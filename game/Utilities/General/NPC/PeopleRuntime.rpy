@@ -117,10 +117,10 @@ init -999 python:
             return info.action_data(room_key)
 
         def schedule_entry(self, person="", weekday_value=None, time_value=None):
-            data = self.get_data(person)
-            if data is None:
+            info = self.get_info(person)
+            if info is None:
                 return None
-            return data.schedule_resolve(weekday_value, time_value)
+            return info.schedule_entry(weekday_value, time_value)
 
         def is_awake(self, person="", weekday_value=None, time_value=None):
             entry = self.schedule_entry(person, weekday_value, time_value)
@@ -131,10 +131,10 @@ init -999 python:
             return True if entry is None else bool(entry.awake) and bool(entry.talkable)
 
         def schedule_state(self, person="", weekday_value=None, time_value=None):
-            data = self.get_data(person)
-            if data is None:
+            info = self.get_info(person)
+            if info is None:
                 return {"location": "", "awake": True, "talkable": True, "working": False, "label": "", "interval": "", "source": ""}
-            return data.schedule_state(weekday_value, time_value)
+            return info.schedule_state(weekday_value, time_value)
 
         def repair(self):
             for key, info in self.items():
@@ -257,6 +257,25 @@ init -999 python:
                 if not room_obj.is_open(weekday_value, time_value):
                     return False
             return True
+
+    def npc_schedule_entry_state(entry=None):
+        if entry is None:
+            return {"location": "", "awake": True, "talkable": True, "working": False, "label": "", "interval": "", "source": ""}
+        interval_text = "%02d:%02d-%02d:%02d" % (
+            int(getattr(entry, "start_minute", 0) or 0) // 60,
+            int(getattr(entry, "start_minute", 0) or 0) % 60,
+            (int(getattr(entry, "end_minute", 0) or 0) % 1440) // 60,
+            int(getattr(entry, "end_minute", 0) or 0) % 60,
+        )
+        return {
+            "location": str(entry.selected_location() or ""),
+            "awake": bool(getattr(entry, "awake", True)),
+            "talkable": bool(getattr(entry, "talkable", True)),
+            "working": bool(getattr(entry, "working", False)),
+            "label": str(getattr(entry, "label", "") or ""),
+            "interval": interval_text,
+            "source": str(getattr(entry, "source", "rpy") or "rpy"),
+        }
 
     def npc_daily_schedule_interval(start_hour=0, end_hour=24, location="", awake=True, talkable=True, label="", priority=500, working=False):
         return {"start_minute": int(start_hour or 0) * 60, "end_minute": int(end_hour or 0) * 60, "location": str(location or "").strip(), "awake": bool(awake), "talkable": bool(talkable), "working": bool(working), "label": str(label or "").strip(), "priority": int(priority or 500)}
@@ -554,24 +573,7 @@ init -999 python:
             return None
 
         def schedule_state(self, weekday_value=None, time_value=None):
-            entry = self.schedule_resolve(weekday_value, time_value)
-            if entry is None:
-                return {"location": "", "awake": True, "talkable": True, "working": False, "label": "", "interval": "", "source": ""}
-            interval_text = "%02d:%02d-%02d:%02d" % (
-                int(getattr(entry, "start_minute", 0) or 0) // 60,
-                int(getattr(entry, "start_minute", 0) or 0) % 60,
-                (int(getattr(entry, "end_minute", 0) or 0) % 1440) // 60,
-                int(getattr(entry, "end_minute", 0) or 0) % 60,
-            )
-            return {
-                "location": str(entry.selected_location() or ""),
-                "awake": bool(getattr(entry, "awake", True)),
-                "talkable": bool(getattr(entry, "talkable", True)),
-                "working": bool(getattr(entry, "working", False)),
-                "label": str(getattr(entry, "label", "") or ""),
-                "interval": interval_text,
-                "source": str(getattr(entry, "source", "rpy") or "rpy"),
-            }
+            return npc_schedule_entry_state(self.schedule_resolve(weekday_value, time_value))
 
         def isInLocation(self, location, wday=None, hour=None):
             return str(self.getLocation(wday, hour) or "") == str(location or "")
@@ -1072,18 +1074,26 @@ init -999 python:
 
             return self
 
+        def schedule_entry(self, weekday_value=None, time_value=None):
+            data_owner = getattr(self, "data", None)
+            if data_owner is None:
+                return None
+            return data_owner.schedule_resolve(weekday_value, time_value)
+
+        def schedule_state(self, weekday_value=None, time_value=None):
+            return npc_schedule_entry_state(self.schedule_entry(weekday_value, time_value))
+
         def getLocation(self, wday=None, hour=None):
             if bool(player.tavern_management.breakfast.event_active) and player.tavern_management.breakfast.present_ids is not None:
                 breakfast_ids = [people_normalize_id(row) for row in list(player.tavern_management.breakfast.present_ids or [])]
                 if self.name in breakfast_ids:
                     return "TavernKitchen"
-            data_owner = getattr(self, "data", None)
-            if data_owner is None:
-                return ""
-            scheduled_location = str(data_owner.getLocation(wday, hour) or "")
-            if bool(getattr(self, "uses_tavern_client_room", False)) and scheduled_location == "TavernMain":
-                if str(rooms.get("TavernMain").state.get("client_room_girl", "") or "") == self.name:
-                    return "TavernClientRoom"
+            schedule_entry = self.schedule_entry(wday, hour)
+            if schedule_entry is not None:
+                scheduled_location = str(schedule_entry.selected_location() or "")
+            else:
+                data_owner = getattr(self, "data", None)
+                scheduled_location = str(data_owner.getLocation(wday, hour) or "") if data_owner is not None else ""
             return scheduled_location
 
         def isInLocation(self, location, wday=None, hour=None):
@@ -1142,7 +1152,93 @@ init -999 python:
         def getLocation(self, wday=None, hour=None):
             if bool(household.barber_appointments.get(self.name, 0)) and barber_shop_is_open_at(wday, hour):
                 return "BarberShop"
-            return super(Girl, self).getLocation(wday, hour)
+            scheduled_location = super(Girl, self).getLocation(wday, hour)
+            if scheduled_location == "TavernMain" and people_to_int(self.job_value("jobwhore", 0), 0) > 0:
+                if str(rooms.get("TavernMain").state.get("client_room_girl", "") or "") == self.name:
+                    return "TavernClientRoom"
+            return scheduled_location
+
+        def tavern_service_target(self, tomorrow=False):
+            suffix = "Tommorow" if tomorrow else ""
+            if people_to_int(self.job_value("jobgloryhole" + suffix, 0), 0) > 0:
+                return "gloryhole"
+            if people_to_int(self.job_value("jobwhore" + suffix, 0), 0) > 0:
+                return "intimate"
+            return ""
+
+        def tavern_service_available(self, target="intimate"):
+            target_key = str(target or "intimate").strip().lower()
+            if target_key == "gloryhole":
+                return people_to_int(self.job_value("jobGloryHoleAvail", 0), 0) > 0
+            return people_to_int(self.job_value("jobWhoreAvail", 0), 0) > 0
+
+        def enable_tavern_service(self, target="intimate"):
+            target_key = str(target or "intimate").strip().lower()
+            if target_key == "gloryhole":
+                self.set_job_value("jobGloryHoleAvail", 1)
+            else:
+                self.set_job_value("jobWhoreAvail", 1)
+            return self
+
+        def assign_tavern_service(self, target="", tomorrow=True):
+            target_key = str(target or "").strip().lower()
+            suffix = "Tommorow" if tomorrow else ""
+            if target_key == "gloryhole" and self.tavern_service_available("gloryhole") and int(player.tavern_management.glory_hole or 0) == 2:
+                self.set_job_value("jobgloryhole" + suffix, 1)
+                self.set_job_value("jobwhore" + suffix, 0)
+                return
+            if target_key in ("intimate", "whore") and self.tavern_service_available("intimate"):
+                self.set_job_value("jobgloryhole" + suffix, 0)
+                self.set_job_value("jobwhore" + suffix, 1)
+                return
+            self.set_job_value("jobgloryhole" + suffix, 0)
+            self.set_job_value("jobwhore" + suffix, 0)
+            return
+
+        def apply_tavern_service_plan(self):
+            planned = self.tavern_service_target(True)
+            if planned == "":
+                planned = self.tavern_service_target(False)
+            self.assign_tavern_service(planned, False)
+            self.set_job_value("jobwhoreTommorow", self.job_value("jobwhore", 0))
+            self.set_job_value("jobgloryholeTommorow", self.job_value("jobgloryhole", 0))
+            return self.tavern_service_target(False)
+
+        def tavern_service_schedule_entry(self, weekday_value=None, time_value=None):
+            target = self.tavern_service_target(False)
+            if target == "" or not player.tavern_management.is_open_at(weekday_value, time_value):
+                return None
+            return NPCHourScheduleEntry(
+                npc_id=self.name,
+                location="TavernGloryHole" if target == "gloryhole" else "TavernMain",
+                weekdays=[1, 2, 3, 4, 5, 6],
+                start="12:00",
+                end="20:30",
+                awake=True,
+                talkable=target != "gloryhole",
+                working=True,
+                priority=770 if target == "gloryhole" else 760,
+                label="tavern_glory_hole_shift" if target == "gloryhole" else "tavern_intimate_shift",
+                source="npc_job",
+            )
+
+        def schedule_entry(self, weekday_value=None, time_value=None):
+            authored_entry = super(Girl, self).schedule_entry(weekday_value, time_value)
+            service_entry = self.tavern_service_schedule_entry(weekday_value, time_value)
+            if service_entry is None:
+                return authored_entry
+            if authored_entry is None or int(service_entry.priority or 0) > int(authored_entry.priority or 0):
+                return service_entry
+            return authored_entry
+
+        def tavern_client_generation_enabled(self):
+            return self.tavern_service_target(True) != ""
+
+        def tavern_intimate_client_limit(self):
+            return 3
+
+        def tavern_glory_hole_client_limit(self):
+            return max(0, people_to_int(player.tavern_management.visitors, 0) // 6)
 
         def is_working(self, wday=None, hour=None):
             entry = people.schedule_entry(self.name, wday, hour)

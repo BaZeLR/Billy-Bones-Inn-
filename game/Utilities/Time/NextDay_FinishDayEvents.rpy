@@ -37,7 +37,7 @@ init python:
             place = str(tmpArray.get("Place", "") or "")
             event_type = _ndf_int(tmpArray.get("EventType", 0), 0)
 
-            if not tavern_sex_work_day_allowed(week_val) and girl in ("georgett", "liza") and place in ("Prostitution", "Glory"):
+            if not tavern_sex_work_day_allowed(week_val) and place in ("Prostitution", "Glory"):
                 continue
 
             if girl == "georgett" and event_type == 99 and place == "Prostitution":

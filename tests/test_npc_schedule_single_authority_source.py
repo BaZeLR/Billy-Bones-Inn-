@@ -74,8 +74,7 @@ def test_tavern_client_room_is_a_transient_projection_not_a_schedule_override():
     georgett = (ROOT / "game/NPC/Girls/Georgett/InitGeorgett.rpy").read_text(encoding="utf-8-sig")
     migration = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
 
-    assert 'uses_tavern_client_room = True' in liza
-    assert 'uses_tavern_client_room = True' in georgett
+    assert 'uses_tavern_client_room = True' not in liza + georgett
     assert 'rooms.get(\"TavernMain\").state.get("client_room_girl", "")' in runtime
     assert 'return "TavernClientRoom"' in runtime
     assert 'peopleInfo[GirlNameTS1].location =' not in tavern

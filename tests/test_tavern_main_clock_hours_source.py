@@ -12,10 +12,11 @@ def test_tavern_main_closed_state_uses_clock_hours_not_day_slot():
     assert "def tavern_main_sunday_closed()" in source
     assert "return int(calendar_v2.week or 0) == 7" in source
     player_source = (PROJECT_ROOT / "game" / "Utilities" / "General" / "Player" / "Player.rpy").read_text(encoding="utf-8-sig")
-    open_state = player_source.split("def isTavernOpen(self):", 1)[1].split("class PlayerHorse", 1)[0]
+    open_state = player_source.split("def is_open_at(self, weekday_value=None, time_value=None):", 1)[1].split("@property", 1)[0]
     assert "weekday == 7" in open_state
     assert "weekday == 5 and (18 * 60) <= clock < (22 * 60)" in open_state
     assert "(12 * 60) <= clock <= ((20 * 60) + 30)" in open_state
+    assert "def isTavernOpen(self):\n            return self.is_open_at()" in player_source
     assert "def tavern_main_friday_dance_closed()" in source
     assert "18 <= int(calendar_v2.hour or 0) < 22" in source
     assert 'state["closed_text"]' not in source

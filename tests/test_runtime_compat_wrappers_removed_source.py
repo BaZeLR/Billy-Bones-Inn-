@@ -12,10 +12,10 @@ def test_retired_runtime_compatibility_wrapper_file_is_removed():
 def test_next_day_calls_tavern_job_owners_directly():
     source = (ROOT / "game/Utilities/Time/NextDay_TavernDaily.rpy").read_text(encoding="utf-8-sig")
 
-    assert "$ change_tomorrow_whore_job('georgett')" in source
-    assert "$ change_tomorrow_whore_job('liza')" in source
+    assert "for _service_worker in people.girl_values():" in source
+    assert "_service_worker.apply_tavern_service_plan()" in source
     assert "$ apply_tomorrow_hall_job('sandra')" in source
-    assert "call change_tomorrow_whore_job" not in source
+    assert not (ROOT / "game/Utilities/General/NPC/ChangeTommorowWhoreJob.rpy").exists()
     assert "call change_tomorrow_hall_job" not in source
 
 

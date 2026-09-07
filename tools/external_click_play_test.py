@@ -399,6 +399,15 @@ testcase external_tavern_report_state_defaults:
 
 testcase external_tavern_sunday_dinner_schedule_and_stats:
     run Call("InitGameNPCs")
+    $ player.tavern_management.glory_hole = 2
+    $ Sandra.assign_tavern_service("", False)
+    $ Sandra.assign_tavern_service("", True)
+    $ Sandra.set_job_value("jobWhoreAvail", 0)
+    $ Sandra.set_job_value("jobGloryHoleAvail", 0)
+    $ Amanda.assign_tavern_service("", False)
+    $ Amanda.assign_tavern_service("", True)
+    $ Amanda.set_job_value("jobWhoreAvail", 0)
+    $ Amanda.set_job_value("jobGloryHoleAvail", 0)
     $ external_calendar_set_fields(7, 1, 1100, 12, 29)
     $ external_calendar_set_weekday(7)
     $ player.tavern_management.breakfast.sunday_dinner_last_day = -1
@@ -439,6 +448,14 @@ testcase external_tavern_sunday_dinner_schedule_and_stats:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Поймаю вас за рукоблудием" in str(scene_runtime.text or "")) timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("тихо хихикают" in str(scene_runtime.text or "")) timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Послушать воскресные шутки" not in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] and "Закончить воскресный обед" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (tavern_sunday_dinner_service_offer_ids(_sunday_present_ids) == ["sandra", "melissa", "amanda"] and tavern_main_glory_hole_visible() and "Идти к глорихолу" in [str(item.caption or "") for item in rooms.get("TavernMain").build_exit_items()]) timeout 5.0
+    $ _sunday_service_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Спросить, кто хочет дополнительно заработать")
+    click id ("choice_panel_button_%d" % int(_sunday_service_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Предложить Сандре" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _sunday_service_sandra_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Предложить Сандре")
+    click id ("choice_panel_button_%d" % int(_sunday_service_sandra_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"] and "Сандра" in str(scene_runtime.text or "")) timeout 20.0
+    assert eval (Sandra.tavern_service_available("intimate") and Sandra.tavern_service_available("gloryhole") and Sandra.tavern_service_target(False) == "" and Sandra.tavern_service_target(True) == "") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Закончить воскресный обед" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (tavern_sunday_dinner_service_offer_ids(_sunday_present_ids) == ["melissa", "amanda"]) timeout 5.0
     $ _sunday_gift_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Подарить мыло Сандре")
     click id ("choice_panel_button_%d" % int(_sunday_gift_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Подарить лавандовое хозяйственное мыло" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
     $ _sunday_soap_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Подарить лавандовое хозяйственное мыло")
@@ -463,6 +480,35 @@ testcase external_tavern_sunday_dinner_schedule_and_stats:
     $ Amanda.set_arousal(80)
     assert eval (all(str(people.location(npc_id) or "") == "Tavern%sRoom" % npc_id.capitalize() for npc_id in ("sandra", "melissa", "amanda"))) timeout 5.0
     assert eval (len(tavern_upstairs_bedroom_sound_lines()) == 2 and any("Сандра" in line for line in tavern_upstairs_bedroom_sound_lines()) and any("Аманда" in line for line in tavern_upstairs_bedroom_sound_lines()) and not any("Мелисса" in line for line in tavern_upstairs_bedroom_sound_lines())) timeout 5.0
+    $ Amanda.enable_tavern_service("intimate")
+    $ Amanda.enable_tavern_service("gloryhole")
+    $ Sandra.assign_tavern_service("intimate", False)
+    $ Amanda.assign_tavern_service("gloryhole", False)
+    $ external_calendar_set_weekday(1)
+    $ calendar_v2.hour = 11
+    $ calendar_v2.minute = 59
+    assert eval (str(people.location("sandra") or "") != "TavernMain" and str(people.location("amanda") or "") != "TavernGloryHole") timeout 5.0
+    $ calendar_v2.hour = 12
+    $ calendar_v2.minute = 0
+    assert eval (str(people.location("sandra") or "") == "TavernMain" and str(people.location("amanda") or "") == "TavernGloryHole") timeout 5.0
+    assert eval (people.schedule_state("sandra")["source"] == "npc_job" and people.schedule_state("amanda")["source"] == "npc_job") timeout 5.0
+    $ calendar_v2.hour = 20
+    $ calendar_v2.minute = 30
+    assert eval (str(people.location("sandra") or "") == "TavernMain" and str(people.location("amanda") or "") == "TavernGloryHole") timeout 5.0
+    $ calendar_v2.minute = 31
+    assert eval (str(people.location("sandra") or "") != "TavernMain" and str(people.location("amanda") or "") != "TavernGloryHole") timeout 5.0
+    $ TodaySexEvents_Clear()
+    $ Sandra.assign_tavern_service("intimate", True)
+    run Call("WhoreNextDayClients", "sandra", Sandra.tavern_intimate_client_limit(), Sandra.tavern_glory_hole_client_limit())
+    assert eval (len(SexEvents.today_events) >= 1 and all(row["GirlName"] == "sandra" and row["Place"] == "Prostitution" and int(row["Time"]) == 3 for row in SexEvents.today_events)) timeout 5.0
+    $ TodaySexEvents_Clear()
+    $ Amanda.assign_tavern_service("gloryhole", True)
+    run Call("WhoreNextDayClients", "amanda", Amanda.tavern_intimate_client_limit(), Amanda.tavern_glory_hole_client_limit())
+    assert eval (len(SexEvents.today_events) >= 1 and all(row["GirlName"] == "amanda" and row["Place"] == "Glory" and int(row["Time"]) in (2, 3) for row in SexEvents.today_events)) timeout 5.0
+    $ TodaySexEvents_Clear()
+    $ external_calendar_set_weekday(7)
+    run Call("WhoreNextDayClients", "amanda", Amanda.tavern_intimate_client_limit(), Amanda.tavern_glory_hole_client_limit())
+    assert eval (SexEvents.today_events == [] and int(Amanda.sex_stat("clients_day_total", -1) or 0) == 0) timeout 5.0
 
 testcase external_boar_meat_kitchen_deposit_rewards:
     run Call("InitGameNPCs")

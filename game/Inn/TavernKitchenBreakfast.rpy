@@ -881,6 +881,21 @@ init python:
             names.append(_action_display_name(npc_id))
         return names
 
+    def tavern_sunday_dinner_can_offer_service(npc_id="", present_ids=None):
+        key = people_normalize_id(npc_id)
+        if key not in list(present_ids if present_ids is not None else tavern_sunday_dinner_present_ids()):
+            return False
+        info = people.get_info(key)
+        if not isinstance(info, Girl) or key in ("georgett", "liza"):
+            return False
+        if not info.tavern_service_available("intimate"):
+            return True
+        return int(player.tavern_management.glory_hole or 0) == 2 and not info.tavern_service_available("gloryhole")
+
+    def tavern_sunday_dinner_service_offer_ids(present_ids=None):
+        rows = list(present_ids if present_ids is not None else tavern_sunday_dinner_present_ids())
+        return [npc_id for npc_id in rows if tavern_sunday_dinner_can_offer_service(npc_id, rows)]
+
     def tavern_recent_barber_ids():
         rows = []
         for npc_id in ("sandra", "melissa", "amanda"):
@@ -1838,6 +1853,25 @@ label TavernKitchenSundayDinner(serve_spicy=0):
                         "Продолжить":
                             $ _sunday_topic_line_index += 1
 
+            "Спросить, кто хочет дополнительно заработать" if len(tavern_sunday_dinner_service_offer_ids(_sunday_present_ids)) > 0:
+                menu:
+                    "Кому предложить дополнительный заработок?"
+
+                    "Предложить Сандре" if tavern_sunday_dinner_can_offer_service("sandra", _sunday_present_ids):
+                        call TavernKitchenSundayDinnerServiceOffer("sandra")
+
+                    "Предложить Мелиссе" if tavern_sunday_dinner_can_offer_service("melissa", _sunday_present_ids):
+                        call TavernKitchenSundayDinnerServiceOffer("melissa")
+
+                    "Предложить Аманде" if tavern_sunday_dinner_can_offer_service("amanda", _sunday_present_ids):
+                        call TavernKitchenSundayDinnerServiceOffer("amanda")
+
+                    "Предложить Бекки" if tavern_sunday_dinner_can_offer_service("becky", _sunday_present_ids):
+                        call TavernKitchenSundayDinnerServiceOffer("becky")
+
+                    "Назад к воскресному обеду":
+                        pass
+
             "Подарить мыло Сандре" if tavern_sunday_dinner_can_gift_soap_to("sandra", _sunday_present_ids):
                 $ _sunday_gift_target = "sandra"
 
@@ -1916,3 +1950,28 @@ label TavernKitchenSundayDinner(serve_spicy=0):
     $ main_ui_runtime.action_items = tavern_kitchen_action_items()
     show screen main_ui
     return True
+
+
+label TavernKitchenSundayDinnerServiceOffer(girl_name=""):
+    $ renpy.dynamic("_service_offer_info", "_service_offer_name", "_service_offer_intimate", "_service_offer_glory")
+    $ _service_offer_info = people.get_info(girl_name)
+    if not isinstance(_service_offer_info, Girl):
+        return
+    $ _service_offer_name = str(people_display_name(girl_name) or girl_name)
+    $ _service_offer_intimate = not _service_offer_info.tavern_service_available("intimate")
+    $ _service_offer_glory = int(player.tavern_management.glory_hole or 0) == 2 and not _service_offer_info.tavern_service_available("gloryhole")
+    if _service_offer_intimate:
+        $ _service_offer_info.enable_tavern_service("intimate")
+    if _service_offer_glory:
+        $ _service_offer_info.enable_tavern_service("gloryhole")
+    if _service_offer_intimate and _service_offer_glory:
+        $ scene_runtime.text = "Вы предлагаете " + _service_offer_name + " дополнительный заработок на интимных услугах, в том числе у глорихола. Она соглашается, и теперь вы сможете назначать ее на эту работу в расписании следующего дня."
+    elif _service_offer_glory:
+        $ scene_runtime.text = "Вы предлагаете " + _service_offer_name + " дополнительно работать у глорихола. Она соглашается, и теперь это назначение доступно в расписании следующего дня."
+    else:
+        $ scene_runtime.text = "Вы предлагаете " + _service_offer_name + " дополнительный заработок на интимных услугах. Она соглашается, и теперь вы сможете назначать ее на эту работу в расписании следующего дня."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    return

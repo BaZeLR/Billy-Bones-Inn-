@@ -10,7 +10,6 @@ def read(relative):
 
 def test_capitalized_event_scratch_is_dynamically_scoped():
     checks = {
-        "game/Inn/TavernMain.rpy": ("GirlNameTS1", "GirlNameTS2"),
         "game/NPC/Girls/Amanda/AfterDanceLegare.rpy": ("AmandaNesluh", "AmandaArgue1", "AmandaArgue2", "Randvar", "AlberBribe"),
         "game/NPC/Girls/Amanda/AfterDanceSexLegare.rpy": ("AmandaLegareReactionRoll", "MaxStep"),
         "game/NPC/Girls/Becky/GeorgettBeckyVisit.rpy": ("BeckyGuestSexDesc", "KidsWatch"),

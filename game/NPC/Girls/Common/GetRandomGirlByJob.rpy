@@ -14,11 +14,10 @@ init python:
         job_key = str(jobtype or "").strip()
         room_key = str(room_code or "").strip()
         candidates = []
-        for girl in list(AllGirlNames or []):
-            girl_key = str(girl or "").strip().lower()
+        for girl_key, girl_info in people.girl_items():
             if not girl_key:
                 continue
-            if _girl_job_value(girl_key, job_key) <= 0:
+            if people_to_int(girl_info.job_value(job_key, 0), 0) <= 0:
                 continue
             if room_key and str(people.location(girl_key) or "") != room_key:
                 continue

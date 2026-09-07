@@ -34,7 +34,6 @@ init python:
         LICK_FRIENDSHIP_MILESTONES = {7: 1}
         OPENNESS_RELATIONSHIP_STEPS = ((4, 3), (7, 5), (6, 6), (8, 7))
 
-        uses_tavern_client_room = True
         unknown_name = "Молодая женщина"
         work_socializing_locations = ("TavernMain", "PortStreets")
 
@@ -172,6 +171,12 @@ init python:
             self.jobs["jobwhore"] = 0
             self.jobs["jobgloryhole"] = 0
             return self.jobs
+
+        def tavern_client_generation_enabled(self):
+            return bool(self.prostitution_started)
+
+        def tavern_intimate_client_limit(self):
+            return 3 + (1 if self.current_underwear("panties", "") == "" else 0)
 
         def dress_change_other_saw_text(self, agreed_to_redress=0):
             if agreed_to_redress != 1 or int(self.corruption or 0) < 50:

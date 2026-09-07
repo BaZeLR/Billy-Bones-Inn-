@@ -10,28 +10,16 @@ def _source(relative_path):
 
 
 def test_intimate_jobs_place_each_worker_in_the_room_owned_by_that_job():
+    runtime = _source("game/Utilities/General/NPC/PeopleRuntime.rpy")
     for person in ("georgett", "liza"):
         schedule = json.loads(_source("game/NPC/Schedules/%s.json" % person))
-        rows = schedule["entries"]
-        whore_rows = [row for row in rows if row["label"] in ("tavern_whore_shift", "friday_shift", "friday_tavern_whore_shift_before_dance")]
-        glory_rows = [row for row in rows if "glory_hole_shift" in row["label"]]
+        assert all("tavern_whore_shift" not in row["label"] for row in schedule["entries"])
+        assert all("glory_hole_shift" not in row["label"] for row in schedule["entries"])
 
-        assert len(whore_rows) == 2
-        assert len(glory_rows) == 2
-        for row in whore_rows:
-            assert row["location"] == "TavernMain"
-            assert row["condition"] == {
-                "rule": "any_job_assigned",
-                "people": [person],
-                "job": "jobwhore",
-            }
-        for row in glory_rows:
-            assert row["location"] == "TavernGloryHole"
-            assert row["condition"] == {
-                "rule": "any_job_assigned",
-                "people": [person],
-                "job": "jobgloryhole",
-            }
+    schedule_owner = runtime.split("def tavern_service_schedule_entry", 1)[1].split("def schedule_entry", 1)[0]
+    assert 'location="TavernGloryHole" if target == "gloryhole" else "TavernMain"' in schedule_owner
+    assert 'player.tavern_management.is_open_at(weekday_value, time_value)' in schedule_owner
+    assert 'label="tavern_glory_hole_shift" if target == "gloryhole" else "tavern_intimate_shift"' in schedule_owner
 
 
 def test_completed_glory_hole_is_a_room_with_a_separate_check_scene():
@@ -39,6 +27,7 @@ def test_completed_glory_hole_is_a_room_with_a_separate_check_scene():
     main = _source("game/Inn/TavernMain.rpy")
 
     assert 'RoomExit(label="Идти к глорихолу", target="TavernGloryHole", condition=tavern_main_glory_hole_visible)' in main
+    assert 'return player.tavern_management.glory_hole == 2' in main
     assert 'RoomAction(action_id="check_glory_hole", label="Проверить, что происходит", hook="call", target="TavernGloryHoleCheck")' in glory
     assert 'label TavernGloryHoleCheck:' in glory
     assert 'girls_by_job("jobgloryhole", "TavernGloryHole")' in glory
@@ -71,3 +60,25 @@ def test_eddie_and_legare_learn_about_live_npc_owned_service_jobs():
     assert "self.told_about_tavern_whores = False" in alber_data
     assert "Рассказать мессиру Легаре, что девушки теперь работают в трактире" in alber_talk
     assert 'Alber.told_about_tavern_whores and _liza_work_location in ("TavernMain", "TavernGloryHole")' in new_day
+
+
+def test_all_service_workers_share_one_npc_job_and_client_pipeline():
+    runtime = _source("game/Utilities/General/NPC/PeopleRuntime.rpy")
+    lookup = _source("game/NPC/Girls/Common/GetRandomGirlByJob.rpy")
+    rollover = _source("game/Utilities/Time/NextDay_TavernDaily.rpy")
+    clients = _source("game/Utilities/Time/NextDay_NewDayEvents.rpy")
+    report = _source("game/Utilities/Time/NextDay.rpy")
+    dinner = _source("game/Inn/TavernKitchenBreakfast.rpy")
+
+    assert "def assign_tavern_service(self, target=\"\", tomorrow=True):" in runtime
+    assert "def apply_tavern_service_plan(self):" in runtime
+    assert "for girl_key, girl_info in people.girl_items():" in lookup
+    assert "for _service_worker in people.girl_values():" in rollover
+    assert "_service_worker.apply_tavern_service_plan()" in rollover
+    assert "[girl for girl in people.girl_values() if girl.tavern_client_generation_enabled()]" in clients
+    assert "sum(TotalWhoreClients.values()) * 3" in report
+    assert "sum(TotalGloryHoleClients.values()) * 2" in report
+    assert '"Спросить, кто хочет дополнительно заработать"' in dinner
+    assert '_service_offer_info.enable_tavern_service("intimate")' in dinner
+    assert '_service_offer_info.enable_tavern_service("gloryhole")' in dinner
+    assert "sunday_service" not in runtime + dinner

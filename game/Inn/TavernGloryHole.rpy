@@ -5,12 +5,14 @@ init 6 python:
     def tavern_glory_hole_available():
         return int(player.tavern_management.glory_hole or 0) == 2
 
+    def tavern_glory_hole_workers():
+        return girls_by_job("jobgloryhole", "TavernGloryHole")
+
     def tavern_glory_hole_worker():
-        workers = girls_by_job("jobgloryhole", "TavernGloryHole")
-        return str(workers[0] or "") if workers else ""
+        return str(get_random_girl_by_job("jobgloryhole", "TavernGloryHole") or "")
 
     def tavern_glory_hole_working_now():
-        return calendar_v2.time_slot() in (2, 3) and tavern_glory_hole_worker() != ""
+        return player.tavern_management.isTavernOpen and tavern_glory_hole_worker() != ""
 
     def tavern_glory_hole_waiting_text(girl_name=""):
         girl_key = str(girl_name or tavern_glory_hole_worker() or "")
@@ -47,15 +49,17 @@ label TavernGloryHole:
     if not tavern_glory_hole_available():
         "Отдельная комната пока недоступна. Сначала закажите и оплатите постройку."
         jump TavernMain
-    $ renpy.dynamic("_tgh_room", "_tgh_desc_parts", "_tgh_desc", "_tgh_worker")
+    $ renpy.dynamic("_tgh_room", "_tgh_desc_parts", "_tgh_desc", "_tgh_worker", "_tgh_workers")
     scene black
     $ rooms.enter("TavernGloryHole")
     $ _tgh_room = rooms.current
     $ scene_runtime.picture = _tgh_room.bg_picture or None
     $ _tgh_desc_parts = [str(_tgh_desc.text or "") for _tgh_desc in _tgh_room.visible_descriptions()]
-    $ _tgh_worker = tavern_glory_hole_worker()
+    $ _tgh_workers = tavern_glory_hole_workers()
     if tavern_glory_hole_working_now():
-        $ _tgh_desc_parts.append(tavern_glory_hole_waiting_text(_tgh_worker))
+        python:
+            for _tgh_worker in _tgh_workers:
+                _tgh_desc_parts.append(tavern_glory_hole_waiting_text(_tgh_worker))
     $ scene_runtime.location_text = "\n\n".join([part for part in _tgh_desc_parts if str(part or "").strip()])
     $ scene_runtime.text = scene_runtime.location_text
     $ main_ui_runtime.action_title = "Действия"

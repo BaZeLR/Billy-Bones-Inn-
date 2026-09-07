@@ -632,15 +632,24 @@ init -998 python:
             self.breakfast_share_perks = {}
             self.service = PlayerTavernServiceState()
 
-        @property
-        def isTavernOpen(self):
-            weekday = int(calendar_v2.week or 0)
-            clock = int(calendar_v2.clock_minutes() or 0)
+        def is_open_at(self, weekday_value=None, time_value=None):
+            weekday = int(calendar_v2.week if weekday_value is None else weekday_value or 0)
+            if time_value is None:
+                clock = int(calendar_v2.clock_minutes() or 0)
+            else:
+                clock = int(time_value or 0)
+                if 0 <= clock <= 23:
+                    clock *= 60
+                clock %= 1440
             if weekday == 7:
                 return False
             if weekday == 5 and (18 * 60) <= clock < (22 * 60):
                 return False
             return (12 * 60) <= clock <= ((20 * 60) + 30)
+
+        @property
+        def isTavernOpen(self):
+            return self.is_open_at()
 
     class PlayerHorse(object):
         def __init__(self):

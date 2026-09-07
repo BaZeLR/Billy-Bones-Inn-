@@ -30,7 +30,7 @@ label TavernProstClients(girl_name="", client_type=1, return_room=""):
 
 
 label TavernProstClientsWatch(client_type=1, girl_name="", return_room=""):
-    $ renpy.dynamic("SexEventType")
+    $ renpy.dynamic("SexEventType", "_client_info", "_client_data", "_client_picture", "_client_name")
     if str(return_room or "") == "":
         $ return_room = str(rooms.current_code or "TavernMain")
     if str(girl_name or "") == "":
@@ -71,7 +71,7 @@ label TavernProstClientsWatch(client_type=1, girl_name="", return_room=""):
             $ pregnancy_check("liza", "inside", 1, "", 1, "Неизвестный стражник")
             $ pregnancy_check("liza", "face", 1, "", 1, "Неизвестный стражник")
             $ show_image("liza", "traktirevents", "event4_" + str(procedural_randint(1, 6, "tavern_client_liza_event4_%s" % int(current_game_day() or 0))))
-    else:
+    elif girl_name == "georgett":
         $ Georgett.mark_portstreet_clients_seen()
         if SexEventType == 1:
             $ scene_runtime.text = "Вы видите стоящую раком, оперевшись о спинку кровати, Жоржетту. Ее короткая юбчонка задрана до пояса, а сзади ее наяривает огромный мужик, судя по одежде портовый грузчик. Наконец грузчик разряжается прямо в киску Жоржетты."
@@ -101,6 +101,15 @@ label TavernProstClientsWatch(client_type=1, girl_name="", return_room=""):
             $ scene_runtime.text = "Вы видите как Жоржетта лежит на кровати, откинувшись вниз, а городской стражник трахает ее между грудей. Наконец он разряжается прямо на груди шлюхи."
             $ pregnancy_check("georgett", "tits", 1, "", 1, "Неизвестный стражник")
             $ show_image_seq("georgett", "portevents", "event4_", 3)
+    else:
+        $ _client_info = people.get_info(girl_name)
+        $ _client_data = people.get_data(girl_name)
+        $ _client_name = str(people_display_name(girl_name) or girl_name)
+        $ _client_picture = str(getattr(_client_data, "portrait", "") or "") if _client_data is not None else ""
+        if _client_picture and renpy.loadable(_client_picture):
+            $ scene_runtime.picture = _client_picture
+            vscene scene_runtime.picture
+        $ scene_runtime.text = "За потайным окном вы видите, что " + _client_name + " действительно принимает клиента. Вы не мешаете договоренной работе и тихо закрываете заслонку."
 
     $ CleanSpermRandom(girl_name if girl_name else "georgett")
     $ calendar_v2.advance_minutes(40)

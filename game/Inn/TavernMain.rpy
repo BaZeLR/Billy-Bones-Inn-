@@ -70,7 +70,31 @@ init python:
         return ""
 
     def tavern_main_glory_hole_visible():
-        return player.tavern_management.isTavernOpen and player.tavern_management.glory_hole == 2
+        return player.tavern_management.glory_hole == 2
+
+    def tavern_main_intimate_workers():
+        workers = []
+        client_girl = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
+        for girl_key, girl_info in people.girl_items():
+            if people_to_int(girl_info.job_value("jobwhore", 0), 0) <= 0:
+                continue
+            schedule = people.schedule_state(girl_key)
+            if str(schedule.get("label", "") or "") != "tavern_intimate_shift":
+                continue
+            if str(schedule.get("location", "") or "") == "TavernMain" or girl_key == client_girl:
+                workers.append(girl_key)
+        return workers
+
+    def tavern_main_client_room_candidate():
+        candidates = [
+            girl_key for girl_key in tavern_main_intimate_workers()
+            if CheckIfSexEventExist(girl_key, calendar_v2.time_slot(), "Prostitution") > 0
+        ]
+        if not candidates:
+            return ""
+        roll_max = 3 if len(candidates) == 1 else len(candidates) + 3
+        roll = procedural_randint(1, roll_max, "tavern_client_room_%s_%s" % (current_game_day(), calendar_v2.clock_minutes()))
+        return candidates[roll - 1] if roll <= len(candidates) else ""
 
     def tavern_main_build_description():
         base_desc = str(rooms.get("TavernMain").descriptions[0].text or "")
@@ -100,27 +124,32 @@ init python:
         if not closed_text:
             if str(people.location("becky") or "") == "TavernMain":
                 desc_parts.append("Бекки Блэнкеншип на этот раз сама заглянула к вам в трактир и присматривается к залу цепким хозяйским взглядом.")
-            if str(people.location("georgett") or "") == "TavernMain":
-                liza_work = int(Liza.job_value("jobwhore", 0) or 0) == 1
-                georgett_work = int(Georgett.job_value("jobwhore", 0) or 0) == 1
-                client_girl = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
-                if liza_work and georgett_work:
-                    if client_girl == "georgett":
-                        desc_parts.append("В правом углу трактира сидит юная Лизетта и ждет клиентов. А вот ее мамаша клиента уже похоже нашла.")
-                    elif client_girl == "liza":
-                        desc_parts.append("В правом углу трактира сидит Жоржетта и ждет клиентов. А вот ее старшую дочку, судя по всему, уже кто-то снял.")
-                    else:
-                        desc_parts.append("В правом углу трактира сидят Жоржетта со своей дочкой Лизеттой и ждут клиентов.")
-                elif liza_work:
-                    if client_girl == "liza":
-                        desc_parts.append("В правом углу, где обычно сидит Лизетта, пусто. Похоже что ветренную девчонку уже кто-то снял.")
-                    else:
-                        desc_parts.append("В правом углу трактира сидит Лизетта и ждет клиентов.")
-                elif georgett_work:
-                    if client_girl == "georgett":
-                        desc_parts.append("В правом углу, где обычно сидит Жоржетта, пусто. Похоже что шлюшку уже кто-то снял.")
-                    else:
-                        desc_parts.append("В правом углу трактира сидит Жоржетта и ждет клиентов.")
+            service_workers = tavern_main_intimate_workers()
+            liza_work = "liza" in service_workers
+            georgett_work = "georgett" in service_workers
+            client_girl = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
+            if liza_work and georgett_work:
+                if client_girl == "georgett":
+                    desc_parts.append("В правом углу трактира сидит юная Лизетта и ждет клиентов. А вот ее мамаша клиента уже похоже нашла.")
+                elif client_girl == "liza":
+                    desc_parts.append("В правом углу трактира сидит Жоржетта и ждет клиентов. А вот ее старшую дочку, судя по всему, уже кто-то снял.")
+                else:
+                    desc_parts.append("В правом углу трактира сидят Жоржетта со своей дочкой Лизеттой и ждут клиентов.")
+            elif liza_work:
+                if client_girl == "liza":
+                    desc_parts.append("В правом углу, где обычно сидит Лизетта, пусто. Похоже что ветренную девчонку уже кто-то снял.")
+                else:
+                    desc_parts.append("В правом углу трактира сидит Лизетта и ждет клиентов.")
+            elif georgett_work:
+                if client_girl == "georgett":
+                    desc_parts.append("В правом углу, где обычно сидит Жоржетта, пусто. Похоже что шлюшку уже кто-то снял.")
+                else:
+                    desc_parts.append("В правом углу трактира сидит Жоржетта и ждет клиентов.")
+            other_workers = [girl_key for girl_key in service_workers if girl_key not in ("georgett", "liza", client_girl)]
+            if other_workers:
+                desc_parts.append("В стороне от общего зала ждут клиентов: " + _tavern_join_names(other_workers) + ".")
+            if client_girl not in ("", "georgett", "liza"):
+                desc_parts.append(people_display_name(client_girl) + " сейчас принимает клиента в отдельной комнате.")
             glory_quest_started = bool(Draupnir.glory_hole_quote_received)
             if player.tavern_management.glory_hole == 1 and glory_quest_started:
                 desc_parts.append("В дальнем углу трактира мастера Драупнир что-то строгает и пилит. Работа кипит. Еще несколько часов и вы сможете насладиться построенным глорихолом.")
@@ -180,7 +209,7 @@ init python:
 
 label TavernMain:
     $ renpy.dynamic("_household_request_girl", "_household_request_type")
-    $ renpy.dynamic("_tavern_main_base_desc", "_glory_quest_started", "_cur_desc_low", "_draupnir_gh_asked", "GirlNameTS1", "GirlNameTS2", "kitchenlist", "cleaninglist", "waitresslist", "_liza_whore_work", "_georgett_whore_work", "randvarPS", "_tavern_kids_description", "_tmp_bf_sandra", "_tmp_bf_amanda", "_tmp_bf_melissa", "_tmp_bf_georgett", "_tmp_bf_liza", "_tmp_kids_list")
+    $ renpy.dynamic("_tavern_main_base_desc", "_glory_quest_started", "_cur_desc_low", "_draupnir_gh_asked", "kitchenlist", "cleaninglist", "waitresslist", "_client_candidate", "_tavern_kids_description", "_tmp_bf_sandra", "_tmp_bf_amanda", "_tmp_bf_melissa", "_tmp_bf_georgett", "_tmp_bf_liza", "_tmp_kids_list")
     $ _tavern_main_base_desc = rooms.get("TavernMain").descriptions[0].text
     $ scene_runtime.text = _tavern_main_base_desc
     $ scene_runtime.location_text = _tavern_main_base_desc
@@ -211,10 +240,10 @@ label TavernMain:
         if _draupnir_gh_asked == 0:
             $ player.tavern_management.glory_hole = 0
             $ player.tavern_management.client_room_hole = 0
+    $ rooms.get("TavernMain").state["client_room_girl"] = ""
     # Determine if tavern is closed
     if player.tavern_management.isTavernOpen:
         python:
-            rooms.get("TavernMain").state["client_room_girl"] = ""
             if (
                 int(event_runtime.tavern_work_plan_day or -1) != current_game_day()
                 and len(list(event_runtime.tavern_work_events or [])) == 0
@@ -222,37 +251,19 @@ label TavernMain:
             ):
                 tavern_work_build_daily_plan()
 
-    $ GirlNameTS1 = "georgett"
-    $ GirlNameTS2 = "liza"
     $ kitchenlist = NamesList("jobkitchen", "TavernKitchen")
     $ cleaninglist = NamesList("jobcleaning", "TavernMain")
     $ waitresslist = NamesList("jobwaitress", "TavernMain")
 
     # Main event and interaction logic
     if player.tavern_management.isTavernOpen:
-        if str(people.location(GirlNameTS1) or "") == rooms.current_code:
+        if str(people.location("georgett") or "") == rooms.current_code:
             if calendar_v2.time_slot() == 3:
-                call AddOthersSperm(GirlNameTS1, 7)
-                call AddOthersSperm(GirlNameTS2, 8)
-            $ _liza_whore_work = int(Liza.job_value("jobwhore", 0) or 0)
-            $ _georgett_whore_work = int(Georgett.job_value("jobwhore", 0) or 0)
-            if _liza_whore_work == 1 and _georgett_whore_work == 1:
-                python:
-                    randvarPS = procedural_randint(1, 5, key="procedural:Inn/TavernMain.rpy:procedural_randint:311:1")
-                if randvarPS == 1 and CheckIfSexEventExist(GirlNameTS1, calendar_v2.time_slot()) > 0:
-                    $ rooms.get("TavernMain").state["client_room_girl"] = "georgett"
-                elif randvarPS == 2 and CheckIfSexEventExist(GirlNameTS2, calendar_v2.time_slot()) > 0:
-                    $ rooms.get("TavernMain").state["client_room_girl"] = "liza"
-            elif _liza_whore_work == 1:
-                python:
-                    randvarPS = procedural_randint(1, 3, key="procedural:Inn/TavernMain.rpy:procedural_randint:338:2")
-                if randvarPS == 1 and CheckIfSexEventExist(GirlNameTS2, calendar_v2.time_slot()) > 0:
-                    $ rooms.get("TavernMain").state["client_room_girl"] = "liza"
-            elif _georgett_whore_work == 1:
-                python:
-                    randvarPS = procedural_randint(1, 3, key="procedural:Inn/TavernMain.rpy:procedural_randint:351:3")
-                if randvarPS == 1 and CheckIfSexEventExist(GirlNameTS1, calendar_v2.time_slot()) > 0:
-                    $ rooms.get("TavernMain").state["client_room_girl"] = "georgett"
+                call AddOthersSperm("georgett", 7)
+                call AddOthersSperm("liza", 8)
+        $ _client_candidate = tavern_main_client_room_candidate()
+        if _client_candidate:
+            $ rooms.get("TavernMain").state["client_room_girl"] = _client_candidate
         $ scene_runtime.picture = tavern_main_picture()
 
     call RoomEnterEventGate(rooms.current_code, False)

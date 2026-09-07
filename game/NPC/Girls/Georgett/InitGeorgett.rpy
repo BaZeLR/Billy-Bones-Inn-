@@ -57,7 +57,6 @@ init python:
             "GloryHoleAgreed": 0,
         }
 
-        uses_tavern_client_room = True
         unknown_name = "Молодая женщина"
         work_socializing_locations = ("TavernMain", "PortStreets")
 
@@ -156,6 +155,12 @@ init python:
             super(GeorgettInfo, self).reset_daily(full)
             self.var["portstreet_clients_seen_today"] = 0
             return self
+
+        def tavern_client_generation_enabled(self):
+            return True
+
+        def tavern_intimate_client_limit(self):
+            return 5
 
         def real_name(self):
             return self.data.fullname

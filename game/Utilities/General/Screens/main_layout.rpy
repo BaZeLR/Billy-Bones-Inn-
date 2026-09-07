@@ -986,6 +986,7 @@ screen main_ui_tavern_report_panel():
                         spacing 6
 
                         for _worker in _report["team_keys"]:
+                            $ _worker_info = people.get_info(_worker)
                             hbox:
                                 spacing 8
                                 xfill True
@@ -1029,7 +1030,7 @@ screen main_ui_tavern_report_panel():
                                         text_size 18
                                         text_bold True
                                         text_color "#6d1020"
-                                        action Function(assign_special_job, _worker, "whore")
+                                        action Function(_worker_info.assign_tavern_service, "intimate", True)
 
                                 if _tavern_can_assign_gloryhole(_worker) or _girl_job_value(_worker, "jobgloryholeTommorow"):
                                     textbutton _tavern_job_button_caption("jobgloryholeTommorow", _worker, "Глорихол"):
@@ -1038,5 +1039,5 @@ screen main_ui_tavern_report_panel():
                                         text_size 18
                                         text_bold True
                                         text_color "#6d1020"
-                                        action Function(assign_special_job, _worker, "gloryhole")
+                                        action Function(_worker_info.assign_tavern_service, "gloryhole", True)
 

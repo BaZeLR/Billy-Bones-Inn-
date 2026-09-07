@@ -7,7 +7,7 @@
 
 label NextDay_NewDayEvents(retlocname=""):
     $ renpy.dynamic("day_value", "week_value", "_georgett_work_location", "_liza_work_location", "GloryChanceDecrease", "ChanceVar")
-    $ renpy.dynamic("_run_georgett_nextday_clients", "_georgett_nextday_clients_max", "_georgett_nextday_glory_max", "_run_liza_nextday_clients", "_liza_nextday_clients_max", "_liza_nextday_glory_max")
+    $ renpy.dynamic("_service_client_workers", "_service_client_worker", "_service_client_name")
     python:
         # Domain owners carry their own defaults, including on a new game.
         Georgett.ensure_story_defaults()
@@ -82,7 +82,7 @@ label NextDay_NewDayEvents(retlocname=""):
             TodaySexEvents_Add('inga', 99, 99, 'Lucas')
 
         # Аманда
-        if Amanda.corruption >= 22 and player.tavern_management.glory_hole == 2 and get_random_girl_by_job('jobgloryhole') == 'liza':
+        if Amanda.corruption >= 22 and player.tavern_management.glory_hole == 2 and _girl_job_value('liza', 'jobgloryhole') == 1:
             if Amanda.var_int("glorytried", 0) == 0:
                 if procedural_randint(1, 3, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:140:8") == 1:
                     TodaySexEvents_Add('amanda', 99, 99, 'glorytry')
@@ -146,18 +146,9 @@ label NextDay_NewDayEvents(retlocname=""):
         # Francheska's exact-hour daily schedule is derived anew for the new day.
         FranStaticData.invalidate_daily_schedule()
 
-        _run_georgett_nextday_clients = 1
-        _georgett_nextday_clients_max = 5
-        _georgett_nextday_glory_max = player.tavern_management.visitors // 6
-
-        _run_liza_nextday_clients = 0
-        _liza_nextday_clients_max = 0
-        _liza_nextday_glory_max = player.tavern_management.visitors // 6
-        if Liza.prostitution_started:
-            _run_liza_nextday_clients = 1
-            _liza_nextday_clients_max = 3 + (1 if Liza.current_underwear("panties", "") == "" else 0)
-    if _run_georgett_nextday_clients:
-        call WhoreNextDayClients('georgett', _georgett_nextday_clients_max, _georgett_nextday_glory_max)
-    if _run_liza_nextday_clients:
-        call WhoreNextDayClients('liza', _liza_nextday_clients_max, _liza_nextday_glory_max)
+        _service_client_workers = [girl for girl in people.girl_values() if girl.tavern_client_generation_enabled()]
+    while len(_service_client_workers) > 0:
+        $ _service_client_worker = _service_client_workers.pop(0)
+        $ _service_client_name = str(_service_client_worker.name or "")
+        call WhoreNextDayClients(_service_client_name, _service_client_worker.tavern_intimate_client_limit(), _service_client_worker.tavern_glory_hole_client_limit())
     return

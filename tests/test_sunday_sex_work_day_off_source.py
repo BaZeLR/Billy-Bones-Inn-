@@ -19,8 +19,8 @@ def test_sunday_sex_work_uses_one_day_off_rule():
     assert "if not tavern_sex_work_day_allowed():" in clients
     assert '_wnd_girl.set_sex_stat("clients_day_total", 0)' in clients
 
-    assert 'girl in ("georgett", "liza")' in finish_day
     assert 'place in ("Prostitution", "Glory")' in finish_day
+    assert 'girl in ("georgett", "liza")' not in finish_day
     assert "if tavern_sex_work_day_allowed():" in report
 
     assert "glory_max_i = (glory_max_i * 3) // 4" not in clients
