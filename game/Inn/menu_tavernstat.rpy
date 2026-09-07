@@ -5,6 +5,14 @@
 init python:
     import renpy.exports as renpy_module
 
+    TAVERN_JOB_OPTIONS = (
+        ("jobkitchentomorrow", "Кухня", 1, "kitchen"),
+        ("jobcleaningtomorrow", "Уборка", 2, "cleaning"),
+        ("jobwaitresstomorrow", "Зал", 3, "waitress"),
+        ("jobgloryholeTommorow", "Глорихол", 0, "gloryhole"),
+        ("jobwhoreTommorow", "Интим", 0, "whore"),
+    )
+
     def _tavern_dict_value(value):
         return value if isinstance(value, dict) else {}
 
@@ -347,54 +355,20 @@ init python:
         return prefix + title
 
     def _tavern_team_keys():
-        ordered = []
-        roster = [person for person, info in people.girl_items()]
-        hall_tomorrow = ("jobkitchentomorrow", "jobcleaningtomorrow", "jobwaitresstomorrow")
-        special_tomorrow_keys = ("jobwhoreTommorow", "jobgloryholeTommorow")
-
-        def add(person):
-            if person and person not in ordered:
-                ordered.append(person)
-
-        def in_any_job(person, job_keys):
-            for job_key in job_keys:
-                if _girl_job_value(person, job_key):
-                    return True
-            return False
-
-        for person in roster:
-            info = _tavern_person_info(person)
-            jobs = getattr(info, "jobs", {}) if info is not None else {}
-            if _tavern_int(jobs.get("jobHallAvail", 0), 0) != 0:
-                add(person)
-                continue
-            if _girl_job_value(person, "jobkitchen") or _girl_job_value(person, "jobcleaning") or _girl_job_value(person, "jobwaitress") or in_any_job(person, hall_tomorrow):
-                add(person)
-                continue
-            if _tavern_int(jobs.get("jobWhoreAvail", 0), 0) != 0 or _tavern_int(jobs.get("jobGloryHoleAvail", 0), 0) != 0 or _girl_job_value(person, "jobwhore") or _girl_job_value(person, "jobgloryhole") or in_any_job(person, special_tomorrow_keys):
-                add(person)
-
-        for person in roster:
-            if in_any_job(person, special_tomorrow_keys):
-                add(person)
-
-        return ordered
-
-    def _tavern_can_assign_gloryhole(person):
-        avail = _girl_job_value(person, "jobGloryHoleAvail")
-        tomorrow = _girl_job_value(person, "jobgloryholeTommorow")
-        return bool(avail and tomorrow == 0 and int(player.tavern_management.glory_hole or 0) == 2)
-
-    def _tavern_can_assign_whore(person):
-        avail = _girl_job_value(person, "jobWhoreAvail")
-        tomorrow = _girl_job_value(person, "jobwhoreTommorow")
-        return bool(avail and tomorrow == 0)
+        return [person for person, info in people.girl_items() if info.is_tavern_worker()]
 
     def toggle_job_assignment(job_key, person):
         info = _tavern_person_info(person)
-        if info is None:
+        key = str(job_key or "").strip()
+        if info is None or not info.tavern_job_available(key):
             return
-        info.set_job_value(job_key, (people_to_int(info.job_value(job_key, 0), 0) + 1) % 2)
+        current = people_to_int(info.job_value(key, 0), 0)
+        if key == "jobwhoreTommorow":
+            info.assign_tavern_service("" if current else "intimate", True)
+        elif key == "jobgloryholeTommorow":
+            info.assign_tavern_service("" if current else "gloryhole", True)
+        else:
+            info.set_job_value(key, (current + 1) % 2)
         _tavern_restart_interaction()
 
     def _tavern_job_load(job_key):
@@ -492,15 +466,13 @@ init python:
         if renpy.game.script.has_label("ShowGirlCard"):
             items.append(MenuItem("Осмотреть", Call("ShowGirlCard", person)))
 
-        if _girl_job_value(person, "jobHallAvail"):
-            items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobkitchentomorrow"), 1), [Function(toggle_job_assignment, "jobkitchentomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
-            items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobcleaningtomorrow"), 2), [Function(toggle_job_assignment, "jobcleaningtomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
-            items.append(MenuItem(JobMenuDesc(_girl_job_value(person, "jobwaitresstomorrow"), 3), [Function(toggle_job_assignment, "jobwaitresstomorrow", person), Function(show_tavern_report_main_ui_state, person)]))
-
-        if info is not None and _tavern_can_assign_gloryhole(person):
-            items.append(MenuItem("Назначить завтра работать у глорихола", [Function(info.assign_tavern_service, "gloryhole", True), Function(show_tavern_report_main_ui_state, person)]))
-        if info is not None and _tavern_can_assign_whore(person):
-            items.append(MenuItem("Назначить завтра на интимные услуги", [Function(info.assign_tavern_service, "intimate", True), Function(show_tavern_report_main_ui_state, person)]))
+        if info is not None:
+            for job_key, title, description_index, button_id in TAVERN_JOB_OPTIONS:
+                if description_index:
+                    caption = JobMenuDesc(_girl_job_value(person, job_key), description_index)
+                else:
+                    caption = _tavern_job_button_caption(job_key, person, title)
+                items.append(MenuItem(caption, [SensitiveIf(info.tavern_job_available(job_key)), Function(toggle_job_assignment, job_key, person), Function(show_tavern_report_main_ui_state, person)]))
 
         items.append(MenuItem("Общий отчет", Call("ShowTavernReport", return_label)))
         items.append(MenuItem("Назад", Call("HideTavernReport", return_label)))

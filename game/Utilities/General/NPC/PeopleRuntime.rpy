@@ -1166,6 +1166,28 @@ init -999 python:
                 return "intimate"
             return ""
 
+        def is_tavern_worker(self):
+            for job_key in (
+                "jobHallAvail", "jobWhoreAvail", "jobGloryHoleAvail",
+                "jobkitchen", "jobcleaning", "jobwaitress", "jobwhore", "jobgloryhole",
+                "jobkitchentomorrow", "jobcleaningtomorrow", "jobwaitresstomorrow",
+                "jobwhoreTommorow", "jobgloryholeTommorow",
+            ):
+                if people_to_int(self.job_value(job_key, 0), 0) > 0:
+                    return True
+            return False
+
+        def tavern_job_available(self, job_key):
+            key = str(job_key or "").strip()
+            if not self.is_tavern_worker():
+                return False
+            if key == "jobgloryholeTommorow":
+                return int(player.tavern_management.glory_hole or 0) == 2
+            return key in (
+                "jobkitchentomorrow", "jobcleaningtomorrow", "jobwaitresstomorrow",
+                "jobwhoreTommorow",
+            )
+
         def tavern_service_available(self, target="intimate"):
             target_key = str(target or "intimate").strip().lower()
             if target_key == "gloryhole":
@@ -1183,11 +1205,11 @@ init -999 python:
         def assign_tavern_service(self, target="", tomorrow=True):
             target_key = str(target or "").strip().lower()
             suffix = "Tommorow" if tomorrow else ""
-            if target_key == "gloryhole" and self.tavern_service_available("gloryhole") and int(player.tavern_management.glory_hole or 0) == 2:
+            if target_key == "gloryhole" and self.is_tavern_worker() and int(player.tavern_management.glory_hole or 0) == 2:
                 self.set_job_value("jobgloryhole" + suffix, 1)
                 self.set_job_value("jobwhore" + suffix, 0)
                 return
-            if target_key in ("intimate", "whore") and self.tavern_service_available("intimate"):
+            if target_key in ("intimate", "whore") and self.is_tavern_worker():
                 self.set_job_value("jobgloryhole" + suffix, 0)
                 self.set_job_value("jobwhore" + suffix, 1)
                 return
@@ -1195,14 +1217,46 @@ init -999 python:
             self.set_job_value("jobwhore" + suffix, 0)
             return
 
-        def apply_tavern_service_plan(self):
+        def apply_tavern_job_plan(self):
+            if not self.is_tavern_worker():
+                return ""
+            for current_key, tomorrow_key in (
+                ("jobkitchen", "jobkitchentomorrow"),
+                ("jobcleaning", "jobcleaningtomorrow"),
+                ("jobwaitress", "jobwaitresstomorrow"),
+            ):
+                self.set_job_value(current_key, people_to_int(self.job_value(tomorrow_key, 0), 0))
             planned = self.tavern_service_target(True)
-            if planned == "":
-                planned = self.tavern_service_target(False)
             self.assign_tavern_service(planned, False)
             self.set_job_value("jobwhoreTommorow", self.job_value("jobwhore", 0))
             self.set_job_value("jobgloryholeTommorow", self.job_value("jobgloryhole", 0))
             return self.tavern_service_target(False)
+
+        def tavern_regular_job_schedule_entry(self, weekday_value=None, time_value=None):
+            if people_to_int(self.job_value("jobHallAvail", 0), 0) > 0:
+                return None
+            if not self.is_tavern_worker() or not player.tavern_management.is_open_at(weekday_value, time_value):
+                return None
+            for job_key, location, label in (
+                ("jobkitchen", "TavernKitchen", "tavern_kitchen_shift"),
+                ("jobwaitress", "TavernMain", "tavern_hall_shift"),
+                ("jobcleaning", "TavernMain", "tavern_cleaning_shift"),
+            ):
+                if people_to_int(self.job_value(job_key, 0), 0) > 0:
+                    return NPCHourScheduleEntry(
+                        npc_id=self.name,
+                        location=location,
+                        weekdays=[1, 2, 3, 4, 5, 6],
+                        start="12:00",
+                        end="20:30",
+                        awake=True,
+                        talkable=True,
+                        working=True,
+                        priority=600,
+                        label=label,
+                        source="npc_job",
+                    )
+            return None
 
         def tavern_service_schedule_entry(self, weekday_value=None, time_value=None):
             target = self.tavern_service_target(False)
@@ -1223,13 +1277,14 @@ init -999 python:
             )
 
         def schedule_entry(self, weekday_value=None, time_value=None):
-            authored_entry = super(Girl, self).schedule_entry(weekday_value, time_value)
-            service_entry = self.tavern_service_schedule_entry(weekday_value, time_value)
-            if service_entry is None:
-                return authored_entry
-            if authored_entry is None or int(service_entry.priority or 0) > int(authored_entry.priority or 0):
-                return service_entry
-            return authored_entry
+            selected_entry = super(Girl, self).schedule_entry(weekday_value, time_value)
+            for job_entry in (
+                self.tavern_regular_job_schedule_entry(weekday_value, time_value),
+                self.tavern_service_schedule_entry(weekday_value, time_value),
+            ):
+                if job_entry is not None and (selected_entry is None or int(job_entry.priority or 0) > int(selected_entry.priority or 0)):
+                    selected_entry = job_entry
+            return selected_entry
 
         def tavern_client_generation_enabled(self):
             return self.tavern_service_target(True) != ""
@@ -1266,6 +1321,7 @@ init -999 python:
             hired_value = bool(hired)
             self.jobs["jobWhoreAvail"] = 1 if hired_value else 0
             self.jobs["jobwhore"] = 1 if hired_value else 0
+            self.jobs["jobwhoreTommorow"] = 1 if hired_value else 0
             return hired_value
 
         def can_use_gloryhole(self):

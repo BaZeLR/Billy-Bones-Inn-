@@ -5,20 +5,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_hall_job_rollover_is_owned_by_npc_jobs():
-    source = (ROOT / "game/Utilities/General/NPC/ChangeTommorowHallJob.rpy").read_text(encoding="utf-8")
+def test_all_tavern_job_rollover_is_owned_by_each_npc():
+    runtime = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
+    next_day = (ROOT / "game/Utilities/Time/NextDay_TavernDaily.rpy").read_text(encoding="utf-8-sig")
+    apply_plan = runtime.split("def apply_tavern_job_plan(self):", 1)[1].split("def tavern_regular_job_schedule_entry", 1)[0]
 
-    assert "jobkitchentomorrow[GirlName]" not in source
-    assert "jobcleaningtomorrow[GirlName]" not in source
-    assert "jobwaitresstomorrow[GirlName]" not in source
-
-    assert 'info.job_value(tomorrow_key, 0)' in source
-    assert 'info.job_value(tomorrow_key, info.job_value(current_key, 0))' not in source
-    assert 'info.set_job_value(current_key, value)' in source
-    assert 'info.set_job_value(tomorrow_key, value)' in source
-    for legacy_map in ("jobkitchen", "jobcleaning", "jobwaitress", "jobkitchentomorrow", "jobcleaningtomorrow", "jobwaitresstomorrow"):
-        assert f"{legacy_map}.get(" not in source
-        assert f"{legacy_map}[" not in source
+    for current_key, tomorrow_key in (
+        ("jobkitchen", "jobkitchentomorrow"),
+        ("jobcleaning", "jobcleaningtomorrow"),
+        ("jobwaitress", "jobwaitresstomorrow"),
+    ):
+        assert '("%s", "%s")' % (current_key, tomorrow_key) in apply_plan
+    assert "self.set_job_value(current_key" in apply_plan
+    assert "for _tavern_worker in people.girl_values():" in next_day
+    assert "_tavern_worker.apply_tavern_job_plan()" in next_day
+    assert "apply_tomorrow_hall_job" not in next_day
+    assert not (ROOT / "game/Utilities/General/NPC/ChangeTommorowHallJob.rpy").exists()
 
 
 def test_tavern_report_does_not_initialize_or_sync_job_state_while_reading():
@@ -64,7 +66,7 @@ def test_report_and_staff_cards_share_job_text_projection():
     assert '("Работа завтра", _tavern_worker_tomorrow_jobs(key))' in card_source
 
 
-def test_each_hall_job_allows_all_available_workers():
+def test_scheduler_offers_all_five_jobs_to_every_tavern_worker():
     report_source = (ROOT / "game/Inn/menu_tavernstat.rpy").read_text(encoding="utf-8-sig")
     layout_source = (ROOT / "game/Utilities/General/Screens/main_layout.rpy").read_text(encoding="utf-8-sig")
 
@@ -75,14 +77,19 @@ def test_each_hall_job_allows_all_available_workers():
     assert '"kitchen_assigned": _tavern_job_load("jobkitchentomorrow")' in report_source
     assert '"cleaning_assigned": _tavern_job_load("jobcleaningtomorrow")' in report_source
     assert '"waitress_assigned": _tavern_job_load("jobwaitresstomorrow")' in report_source
-    assert 'if _girl_job_value(person, "jobHallAvail"):' in report_source
-    assert 'if _girl_job_value(_worker, "jobHallAvail"):' in layout_source
-    for job_key in ("jobkitchentomorrow", "jobcleaningtomorrow", "jobwaitresstomorrow"):
-        assert f'Function(toggle_job_assignment, "{job_key}", person)' in report_source
-        assert f'Function(toggle_job_assignment, "{job_key}", _worker)' in layout_source
+    assert "return [person for person, info in people.girl_items() if info.is_tavern_worker()]" in report_source
+    for job_key in (
+        "jobkitchentomorrow", "jobcleaningtomorrow", "jobwaitresstomorrow",
+        "jobgloryholeTommorow", "jobwhoreTommorow",
+    ):
+        assert '("%s",' % job_key in report_source
+    assert "for job_key, title, description_index, button_id in TAVERN_JOB_OPTIONS:" in report_source
+    assert "for _job_key, _job_title, _job_description_index, _job_button_id in TAVERN_JOB_OPTIONS:" in layout_source
+    assert "jobHallAvail\")" not in layout_source
 
 
-def test_hired_georgett_and_liza_use_the_npc_owned_special_job_schedule():
+def test_all_tavern_workers_use_the_npc_owned_job_schedule():
+    runtime = (ROOT / "game/Utilities/General/NPC/PeopleRuntime.rpy").read_text(encoding="utf-8-sig")
     report_source = (ROOT / "game/Inn/menu_tavernstat.rpy").read_text(encoding="utf-8-sig")
     layout_source = (ROOT / "game/Utilities/General/Screens/main_layout.rpy").read_text(encoding="utf-8-sig")
     georgett_talk = (ROOT / "game/NPC/Girls/Georgett/IntGeorgettTalk.rpy").read_text(encoding="utf-8-sig")
@@ -91,12 +98,15 @@ def test_hired_georgett_and_liza_use_the_npc_owned_special_job_schedule():
     assert "Liza.set_hired(True)" in georgett_talk
     assert 'Georgett.jobs["jobGloryHoleAvail"] = 1' in georgett_talk
     assert 'Liza.jobs["jobGloryHoleAvail"] = 1' in georgett_talk
-    assert 'if _tavern_can_assign_whore(_worker) or _girl_job_value(_worker, "jobwhoreTommorow"):' in layout_source
-    assert 'Function(_worker_info.assign_tavern_service, "intimate", True)' in layout_source
-    assert 'if _tavern_can_assign_gloryhole(_worker) or _girl_job_value(_worker, "jobgloryholeTommorow"):' in layout_source
-    assert 'Function(_worker_info.assign_tavern_service, "gloryhole", True)' in layout_source
-    assert 'info.assign_tavern_service, "intimate", True' in report_source
-    assert 'info.assign_tavern_service, "gloryhole", True' in report_source
+    assert "def is_tavern_worker(self):" in runtime
+    assert "def tavern_job_available(self, job_key):" in runtime
+    assert "def tavern_regular_job_schedule_entry(self, weekday_value=None, time_value=None):" in runtime
+    assert 'if people_to_int(self.job_value("jobHallAvail", 0), 0) > 0:' in runtime
+    assert 'self.tavern_regular_job_schedule_entry(weekday_value, time_value)' in runtime
+    assert 'info.assign_tavern_service("" if current else "intimate", True)' in report_source
+    assert 'info.assign_tavern_service("" if current else "gloryhole", True)' in report_source
+    assert "_tavern_can_assign_whore" not in report_source + layout_source
+    assert "_tavern_can_assign_gloryhole" not in report_source + layout_source
     assert "def assign_special_job(" not in report_source
 
 

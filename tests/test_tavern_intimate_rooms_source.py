@@ -71,10 +71,10 @@ def test_all_service_workers_share_one_npc_job_and_client_pipeline():
     dinner = _source("game/Inn/TavernKitchenBreakfast.rpy")
 
     assert "def assign_tavern_service(self, target=\"\", tomorrow=True):" in runtime
-    assert "def apply_tavern_service_plan(self):" in runtime
+    assert "def apply_tavern_job_plan(self):" in runtime
     assert "for girl_key, girl_info in people.girl_items():" in lookup
-    assert "for _service_worker in people.girl_values():" in rollover
-    assert "_service_worker.apply_tavern_service_plan()" in rollover
+    assert "for _tavern_worker in people.girl_values():" in rollover
+    assert "_tavern_worker.apply_tavern_job_plan()" in rollover
     assert "[girl for girl in people.girl_values() if girl.tavern_client_generation_enabled()]" in clients
     assert "sum(TotalWhoreClients.values()) * 3" in report
     assert "sum(TotalGloryHoleClients.values()) * 2" in report

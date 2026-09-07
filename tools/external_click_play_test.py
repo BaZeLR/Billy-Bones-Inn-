@@ -356,17 +356,18 @@ testcase external_tavern_report_state_defaults:
     $ Liza.set_job_value("jobGloryHoleAvail", 0)
     $ show_tavern_report_main_ui_state("")
     assert eval ("georgett" in BuildTavernReport()["team_keys"] and "liza" in BuildTavernReport()["team_keys"]) timeout 5.0
+    assert eval (renpy.get_displayable("main_ui", "tavern_schedule_sandra_whore") is not None and renpy.get_displayable("main_ui", "tavern_schedule_sandra_gloryhole") is not None) timeout 5.0
     assert eval (renpy.get_displayable("main_ui", "tavern_schedule_georgett_whore") is not None and renpy.get_displayable("main_ui", "tavern_schedule_liza_whore") is not None) timeout 5.0
-    assert eval (renpy.get_displayable("main_ui", "tavern_schedule_georgett_kitchen") is None and renpy.get_displayable("main_ui", "tavern_schedule_liza_kitchen") is None) timeout 5.0
-    assert eval (renpy.get_displayable("main_ui", "tavern_schedule_georgett_gloryhole") is None and renpy.get_displayable("main_ui", "tavern_schedule_liza_gloryhole") is None) timeout 5.0
+    assert eval (renpy.get_displayable("main_ui", "tavern_schedule_georgett_kitchen") is not None and renpy.get_displayable("main_ui", "tavern_schedule_liza_kitchen") is not None) timeout 5.0
+    assert eval (renpy.get_displayable("main_ui", "tavern_schedule_georgett_gloryhole") is not None and renpy.get_displayable("main_ui", "tavern_schedule_liza_gloryhole") is not None) timeout 5.0
     $ player.tavern_management.glory_hole = 2
     run Call("IntGeorgettGloryholeTerms", "georgett", "tavern")
     $ show_tavern_report_main_ui_state("")
     assert eval (renpy.get_displayable("main_ui", "tavern_schedule_georgett_gloryhole") is not None and renpy.get_displayable("main_ui", "tavern_schedule_liza_gloryhole") is not None) timeout 5.0
-    $ assign_special_job("georgett", "gloryhole")
+    $ toggle_job_assignment("jobgloryholeTommorow", "georgett")
     assert eval (int(Georgett.job_value("jobgloryholeTommorow", 0) or 0) == 1 and int(Georgett.job_value("jobwhoreTommorow", 0) or 0) == 0) timeout 5.0
-    assert eval (not _tavern_can_assign_gloryhole("liza")) timeout 5.0
-    $ change_tomorrow_whore_job("georgett")
+    assert eval (Liza.tavern_job_available("jobgloryholeTommorow")) timeout 5.0
+    $ Georgett.apply_tavern_job_plan()
     assert eval (int(Georgett.job_value("jobgloryhole", 0) or 0) == 1 and int(Georgett.job_value("jobwhore", 0) or 0) == 0) timeout 5.0
     $ Georgett.set_hired(False)
     $ Liza.set_hired(False)
@@ -379,10 +380,14 @@ testcase external_tavern_report_state_defaults:
     $ show_tavern_report_main_ui_state("")
     click id "tavern_schedule_sandra_cleaning" pos (0.5, 0.5) until eval (int(Sandra.job_value("jobcleaningtomorrow", 0) or 0) == 1) timeout 20.0
     assert eval (int(Sandra.job_value("jobcleaning", 0) or 0) == 0 and int(BuildTavernReport()["cleaning_assigned"] or 0) == 3) timeout 5.0
-    $ Georgett.set_job_value("jobHallAvail", 1)
+    $ Georgett.set_hired(True)
+    $ Georgett.assign_tavern_service("", True)
     $ Georgett.set_job_value("jobcleaningtomorrow", 0)
     $ toggle_job_assignment("jobcleaningtomorrow", "georgett")
     assert eval (int(Georgett.job_value("jobcleaningtomorrow", 0) or 0) == 1 and int(BuildTavernReport()["cleaning_assigned"] or 0) == 4) timeout 5.0
+    $ Georgett.apply_tavern_job_plan()
+    assert eval (int(Georgett.job_value("jobcleaning", 0) or 0) == 1 and int(Georgett.job_value("jobwhore", 0) or 0) == 0) timeout 5.0
+    assert eval (str(people.location("georgett") or "") == "TavernMain" and Georgett.is_working()) timeout 5.0
     $ _sandra_kitchen_tomorrow_before = int(Sandra.job_value("jobkitchentomorrow", 0) or 0)
     click id "tavern_schedule_sandra_kitchen" pos (0.5, 0.5) until eval (int(Sandra.job_value("jobkitchentomorrow", 0) or 0) != _sandra_kitchen_tomorrow_before) timeout 20.0
     assert eval (int(Sandra.job_value("jobkitchen", 0) or 0) == 1 and int(Sandra.job_value("jobkitchentomorrow", 0) or 0) == 0) timeout 5.0
@@ -390,7 +395,7 @@ testcase external_tavern_report_state_defaults:
     assert eval (renpy.get_screen("main_ui") is not None and renpy.get_screen("say") is None) timeout 5.0
     $ hide_tavern_report_main_ui_state()
     assert eval (str(main_ui_runtime.mode or "") == "scene") timeout 5.0
-    $ apply_tomorrow_hall_job("sandra")
+    $ Sandra.apply_tavern_job_plan()
     assert eval (int(Sandra.job_value("jobkitchen", 0) or 0) == 0 and int(Sandra.job_value("jobkitchentomorrow", 0) or 0) == 0) timeout 5.0
     $ Sandra.set_job_value("jobcleaning", 1)
     $ Sandra.jobs.pop("jobcleaningtomorrow", None)
