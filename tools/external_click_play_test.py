@@ -6666,11 +6666,17 @@ testcase external_hour_based_room_and_npc_schedule_adjustment:
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 13, 0)
     $ external_calendar_set_weekday(7)
     assert eval ((not rooms.get("Church").is_open()) and people.location("gerhard") == "") timeout 5.0
-    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 6, 0)
-    $ external_calendar_set_weekday(5)
-    assert eval (city_guard_open_now() and people.location("zimmer") == "CityGuard") timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 8, 0)
     $ external_calendar_set_weekday(5)
+    assert eval (city_guard_open_now() and people.location("zimmer") == "CityGuard") timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 11, 0)
+    $ external_calendar_set_weekday(5)
+    assert eval ((not city_guard_open_now()) and people.location("zimmer") == "") timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 16, 45)
+    $ external_calendar_set_weekday(2)
+    assert eval (city_guard_open_now() and people.location("zimmer") == "CityGuard") timeout 5.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 18, 0)
+    $ external_calendar_set_weekday(2)
     assert eval ((not city_guard_open_now()) and people.location("zimmer") == "") timeout 5.0
     $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 8, 0)
     $ external_calendar_set_weekday(6)
@@ -6940,6 +6946,7 @@ testcase external_player_actual_load_parity:
         }
     assert eval (set(people.ids()) == set(_expected_people_after_load.keys()) and len(people.runtime) == len(people.definitions) == 21) timeout 5.0
     assert eval (all(people.get_info(key) is pair[0] and people.get_data(key) is pair[1] and pair[0].data is pair[1] for key, pair in _expected_people_after_load.items())) timeout 5.0
+    assert eval ([(int(row.start_minute), int(row.end_minute), list(row.weekdays)) for row in Zimmer.data.schedule_entries] == [(960, 1080, [2]), (480, 660, [5])]) timeout 5.0
     assert eval (not hasattr(Melissa, "location")) timeout 5.0
     assert eval (int(Amanda.rel or 0) == 17 and Eddie.fingal_talk_stage == 2) timeout 5.0
     assert eval (int(Sandra.rel or 0) == 13 and Sandra.var_int("knowmolodost", 0) == 1 and int(Sandra.pregnancy_days() or 0) == 44) timeout 5.0

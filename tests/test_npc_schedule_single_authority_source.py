@@ -522,8 +522,14 @@ def test_static_venue_npcs_own_exact_hour_schedules_without_permanent_location_f
 
     assert zimmer_data.count('location="CityGuard"') == 2
     assert "weekdays=[2]" in zimmer_data and "weekdays=[5]" in zimmer_data
-    assert "start_hour=11" in zimmer_data and "end_hour=13" in zimmer_data
-    assert "start_hour=6" in zimmer_data and "end_hour=8" in zimmer_data
+    assert "start_hour=16" in zimmer_data and "end_hour=18" in zimmer_data
+    assert "start_hour=8" in zimmer_data and "end_hour=11" in zimmer_data
+
+    city_guard = (ROOT / "game/Town/CityGuard.rpy").read_text(encoding="utf-8-sig")
+    city_guard_open = city_guard.split("def city_guard_open_now():", 1)[1].split("def city_guard_closed_now():", 1)[0]
+    assert "people.location" not in city_guard_open
+    assert "calendar_v2.is_between_clock(16, 0, 17, 59)" in city_guard_open
+    assert "calendar_v2.is_between_clock(8, 0, 10, 59)" in city_guard_open
 
     assert 'location="Church"' in gerhard_data
     assert "weekdays=[7]" in gerhard_data

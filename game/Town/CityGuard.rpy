@@ -5,9 +5,9 @@ init python:
     def city_guard_open_now():
         current_weekday = int(calendar_v2.week or 0)
         if current_weekday == 2:
-            return calendar_v2.is_between_clock(11, 0, 12, 59)
+            return calendar_v2.is_between_clock(16, 0, 17, 59)
         if current_weekday == 5:
-            return calendar_v2.is_between_clock(6, 0, 7, 59)
+            return calendar_v2.is_between_clock(8, 0, 10, 59)
         return False
 
     def city_guard_closed_now():
