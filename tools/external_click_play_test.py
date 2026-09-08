@@ -7176,6 +7176,56 @@ testcase external_harassment_event_picture_sequence:
     $ Liza.set_job_value("jobGloryHoleAvail", 1)
     $ Liza.assign_tavern_service("gloryhole", False)
     assert eval (Liza.can_accept_tavern_client() and tavern_glory_hole_worker() == "georgett") timeout 5.0
+
+testcase external_tavern_hired_worker_and_client_buttons:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 14, 0)
+    $ external_calendar_set_weekday(2)
+    $ people.get_data("georgett").set_schedule([])
+    $ people.get_data("liza").set_schedule([])
+    $ Georgett.set_hired(True)
+    $ Liza.set_hired(True)
+    $ Georgett.assign_tavern_service("intimate", False)
+    $ Liza.assign_tavern_service("intimate", False)
+    $ player.tavern_management.client_room_hole = 1
+    $ SexEvents.delete_girl_today("georgett")
+    $ SexEvents.delete_girl_today("liza")
+    $ rooms.get("TavernMain").state["client_room_girl"] = ""
+    $ rooms.enter("TavernMain")
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.action_title = "Действия в трактире"
+    $ main_ui_runtime.action_items = tavern_main_action_items()
+    $ scene_runtime.picture = tavern_main_picture()
+    $ scene_runtime.location_text = tavern_main_build_description()
+    $ scene_runtime.text = scene_runtime.location_text
+    $ renpy.show_screen("main_ui")
+    $ renpy.restart_interaction()
+    advance until eval (all(girl in [str(row.get("id", "") or "") for row in renpy.get_screen("main_ui").scope.get("_char_entries", [])] for girl in ("georgett", "liza"))) timeout 20.0
+    assert eval ("Пойти проверить отдельную комнату" not in [str(item.caption or "") for item in main_ui_runtime.action_items]) timeout 5.0
+
+    $ SexEvents.add_today("liza", calendar_v2.time_slot(), 2, "Prostitution")
+    python:
+        _client_projection_results = []
+        for _client_probe_minute in range(60):
+            external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 14, _client_probe_minute)
+            rooms.get("TavernMain").state["client_room_girl"] = ""
+            _client_projection_results.append(tavern_main_client_room_candidate())
+        external_calendar_set_fields(calendar_v2.day, calendar_v2.period, calendar_v2.cycle, 14, 0)
+    assert eval (all(result == "liza" for result in _client_projection_results)) timeout 5.0
+    $ rooms.get("TavernMain").state["client_room_girl"] = tavern_main_client_room_candidate()
+    $ main_ui_runtime.action_items = tavern_main_action_items()
+    $ scene_runtime.location_text = tavern_main_build_description()
+    $ scene_runtime.text = scene_runtime.location_text
+    $ renpy.restart_interaction()
+    advance until eval ("liza" not in [str(row.get("id", "") or "") for row in renpy.get_screen("main_ui").scope.get("_char_entries", [])] and "georgett" in [str(row.get("id", "") or "") for row in renpy.get_screen("main_ui").scope.get("_char_entries", [])]) timeout 20.0
+    assert eval ("Пойти проверить отдельную комнату" in [str(item.caption or "") for item in main_ui_runtime.action_items]) timeout 5.0
+    $ _client_check_index = [str(item.caption or "") for item in main_ui_runtime.action_items].index("Пойти проверить отдельную комнату")
+    click id ("choice_panel_button_%d" % int(_client_check_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Подсмотреть", "Вернуться"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться"]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "").lower().startswith("images/liza/traktirevents/event2_") and _media_asset_exists(scene_runtime.picture)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene" and str(rooms.current_code or "") == "TavernMain") timeout 20.0
 '''
 
 
@@ -9116,6 +9166,7 @@ def main() -> int:
             "external_context_image_resolution",
             "external_harassment_images_use_exact_existing_paths",
             "external_harassment_event_picture_sequence",
+            "external_tavern_hired_worker_and_client_buttons",
             "external_inga_v53_migration",
             "external_inga_secondary_npc_source",
             "external_francheska_secondary_and_birth_thread",
@@ -9317,6 +9368,7 @@ def main() -> int:
             "external_context_image_resolution",
             "external_harassment_images_use_exact_existing_paths",
             "external_harassment_event_picture_sequence",
+            "external_tavern_hired_worker_and_client_buttons",
             "external_inga_v53_migration",
             "external_inga_secondary_npc_source",
             "external_francheska_secondary_and_birth_thread",

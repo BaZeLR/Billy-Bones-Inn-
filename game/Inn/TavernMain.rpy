@@ -92,9 +92,10 @@ init python:
         ]
         if not candidates:
             return ""
-        roll_max = 3 if len(candidates) == 1 else len(candidates) + 3
-        roll = procedural_randint(1, roll_max, "tavern_client_room_%s_%s" % (current_game_day(), calendar_v2.clock_minutes()))
-        return candidates[roll - 1] if roll <= len(candidates) else ""
+        current = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
+        if current in candidates:
+            return current
+        return str(procedural_choice(candidates, "tavern_client_room_%s_%s" % (current_game_day(), calendar_v2.time_slot())) or "")
 
     def tavern_main_build_description():
         base_desc = str(rooms.get("TavernMain").descriptions[0].text or "")
@@ -240,7 +241,6 @@ label TavernMain:
         if _draupnir_gh_asked == 0:
             $ player.tavern_management.glory_hole = 0
             $ player.tavern_management.client_room_hole = 0
-    $ rooms.get("TavernMain").state["client_room_girl"] = ""
     # Determine if tavern is closed
     if player.tavern_management.isTavernOpen:
         python:
@@ -262,8 +262,7 @@ label TavernMain:
                 call AddOthersSperm("georgett", 7)
                 call AddOthersSperm("liza", 8)
         $ _client_candidate = tavern_main_client_room_candidate()
-        if _client_candidate:
-            $ rooms.get("TavernMain").state["client_room_girl"] = _client_candidate
+        $ rooms.get("TavernMain").state["client_room_girl"] = _client_candidate
         $ scene_runtime.picture = tavern_main_picture()
 
     call RoomEnterEventGate(rooms.current_code, False)
