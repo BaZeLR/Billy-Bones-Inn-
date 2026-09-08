@@ -39,6 +39,7 @@ init python:
             self.inga_sex_greeting_seen = False
             self.uninvited_visit_scolded = False
             self.home_front_checked_today = False
+            self.sandra_kitchen_friendship_progress = 0
             self.eddie_georgett_stage = 0
             self.eddie_home_visit_state = 0
             self.home_visit_count = 0
@@ -265,7 +266,7 @@ init python:
 
         def sandra_friendship_stage(self):
             day_value = people_to_int(current_game_day(), 0)
-            if day_value > 70:
+            if people_to_int(self.sandra_kitchen_friendship_progress, 0) >= 3:
                 return 2
             if day_value > 30:
                 return 1

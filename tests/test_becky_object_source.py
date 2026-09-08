@@ -14,6 +14,7 @@ def test_becky_personal_story_facts_are_explicit_object_properties():
         "inga_sex_greeting_seen",
         "uninvited_visit_scolded",
         "home_front_checked_today",
+        "sandra_kitchen_friendship_progress",
         "eddie_georgett_stage",
         "eddie_home_visit_state",
         "home_visit_count",
@@ -47,6 +48,8 @@ def test_becky_personal_story_facts_are_explicit_object_properties():
         assert f"self.{retired_stage} =" not in info
 
     assert "def sandra_friendship_stage(self):" in info
+    assert "self.sandra_kitchen_friendship_progress" in info
+    assert "day_value > 70" not in info
     assert "self.sandra_kitchen_visit_period" not in info
 
     assert "STORY_DEFAULTS = {" not in info
@@ -102,7 +105,7 @@ def test_v52_migrates_becky_map_once_and_every_load_does_not_clean_it():
     )[0]
     assert "becky_var" not in always_cleanup
     assert "BeckyAdmit" not in always_cleanup
-    assert "define currentVersion = 85" in MIGRATION
+    assert "define currentVersion = 86" in MIGRATION
     assert "if loaded_version < 53:" in MIGRATION
     assert "updateSave_V52()" in MIGRATION
 
@@ -134,3 +137,14 @@ def test_v84_repairs_becky_corruption_from_retired_church_purity_state():
     assert 'church_state.pop("purity_report", None)' in migration
     assert "if loaded_version < 85:" in MIGRATION
     assert "updateSave_V84()" in MIGRATION
+
+
+def test_v85_adds_becky_sandra_visit_progress_to_existing_saves():
+    migration = MIGRATION.split("def updateSave_V85():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+
+    assert 'getattr(Becky, "sandra_kitchen_friendship_progress", 0)' in migration
+    assert "Becky.sandra_kitchen_friendship_progress =" in migration
+    assert "if loaded_version < 86:" in MIGRATION
+    assert "updateSave_V85()" in MIGRATION

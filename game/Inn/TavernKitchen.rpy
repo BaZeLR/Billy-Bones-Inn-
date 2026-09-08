@@ -61,7 +61,7 @@ init python:
         return ""
 
     def tavern_kitchen_can_share_tea_with_sandra_and_becky():
-        return str(people.location("becky") or "") == "TavernKitchen" and str(people.location("sandra") or "") == "TavernKitchen" and int(player.item_count("energy_tea_001") or 0) > 0
+        return people_to_int(Becky.sandra_kitchen_friendship_progress, 0) >= 2 and str(people.location("becky") or "") == "TavernKitchen" and str(people.location("sandra") or "") == "TavernKitchen" and int(player.item_count("energy_tea_001") or 0) > 0
 
     def tavern_kitchen_depositable_food_ids():
         item_ids = []
@@ -436,6 +436,7 @@ label TavernKitchen:
 
 
 label story_becky_sandra_kitchen_visit:
+    $ Becky.sandra_kitchen_friendship_progress = min(2, people_to_int(Becky.sandra_kitchen_friendship_progress, 0) + 1)
     $ main_ui_begin_native_scene_state("Бекки в гостях у Сандры")
     show screen main_ui
     vscene "images/tavern/kitchen/becky_visit_0.png"
@@ -443,6 +444,7 @@ label story_becky_sandra_kitchen_visit:
     menu:
         "Угостить Сандру и Бекки бодрящим чаем" if tavern_kitchen_can_share_tea_with_sandra_and_becky():
             $ player.remove_item("energy_tea_001", 1)
+            $ Becky.sandra_kitchen_friendship_progress = 3
             $ Sandra.change_social(friend_delta=1)
             $ Sandra.fun = min(100, int(Sandra.fun or 0) + 1)
             $ Becky.change_social(friend_delta=1)
@@ -453,7 +455,7 @@ label story_becky_sandra_kitchen_visit:
             call stat
 
         "Не мешать разговору":
-            "Вы не стали мешать старым подругам и оставили их спокойно беседовать."
+            "Вы не стали мешать подругам и оставили их спокойно беседовать."
     menu:
         "Вернуться к своим делам":
             pass

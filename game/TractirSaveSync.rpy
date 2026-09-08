@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 85
+define currentVersion = 86
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -712,6 +712,10 @@ init -100 python:
         if loaded_version < 85:
             updateSave_V84()
             loaded_version = 85
+
+        if loaded_version < 86:
+            updateSave_V85()
+            loaded_version = 86
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2812,6 +2816,14 @@ init -100 python:
             Becky.corruption = max(25, people_to_int(Becky.corruption, 0))
         church_state.pop("purity_last_day", None)
         church_state.pop("purity_report", None)
+
+    def updateSave_V85():
+        # Becky owns the progress of her visits with Sandra. Older saves had
+        # only a calendar shortcut and therefore no completed-visit fact.
+        Becky.sandra_kitchen_friendship_progress = max(
+            0,
+            min(3, people_to_int(getattr(Becky, "sandra_kitchen_friendship_progress", 0), 0)),
+        )
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

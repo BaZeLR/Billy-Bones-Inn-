@@ -6827,6 +6827,7 @@ testcase external_hour_based_room_and_npc_schedule_adjustment:
     assert eval (str(people.location("sandra") or "") == "TavernKitchen") timeout 5.0
     assert eval (str(people.location("becky") or "") == "TavernKitchen" and str(people.schedule_state("becky").get("label", "") or "") == "sandra_kitchen_visit") timeout 5.0
     $ rooms.enter("TavernKitchen")
+    $ Becky.sandra_kitchen_friendship_progress = 1
     $ player.add_item("energy_tea_001", 1)
     $ _becky_kitchen_tea_before = int(player.item_count("energy_tea_001") or 0)
     $ _becky_kitchen_rel_before = int(Becky.rel or 0)
@@ -6838,7 +6839,7 @@ testcase external_hour_based_room_and_npc_schedule_adjustment:
     assert eval (str(main_ui_runtime.action_title or "") == "Бекки в гостях у Сандры" and str(scene_runtime.picture or "") == "images/tavern/kitchen/becky_visit_0.png") timeout 5.0
     assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Угостить Сандру и Бекки бодрящим чаем", "Не мешать разговору"]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until screen "say" timeout 20.0
-    assert eval (str(scene_runtime.picture or "") == "images/tavern/kitchen/becky_visit_1.png" and int(Becky.rel or 0) == _becky_kitchen_rel_before + 1 and int(player.item_count("energy_tea_001") or 0) == _becky_kitchen_tea_before - 1) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/tavern/kitchen/becky_visit_1.png" and int(Becky.rel or 0) == _becky_kitchen_rel_before + 1 and int(player.item_count("energy_tea_001") or 0) == _becky_kitchen_tea_before - 1 and Becky.sandra_kitchen_friendship_progress == 3 and Becky.sandra_friendship_stage() == 2) timeout 5.0
     click pos (960, 560) until screen "choice" timeout 20.0
     assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к своим делам"]) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
@@ -7558,6 +7559,9 @@ testcase external_becky_v52_migration:
     assert eval (Becky.knows_blackwood and Becky.sherwood_suspicion == 17 and Becky.trade_offer_stage == 1 and Becky.sherwood_warning_stage == 2 and Becky.asked_about_elf_trade) timeout 5.0
     assert eval (Becky.fingal_connection_clarified and Becky.admitted_sherwood_stage == 2 and Becky.robin_robbery_stage == 2 and Becky.robbery_consolation_count == 1) timeout 5.0
     assert eval (not hasattr(Becky, "sandra_kitchen_visit_period") and Becky.last_store_orgasm_day == 39 and not Becky.var and "BeckyAdmit" not in globals()) timeout 5.0
+    $ Becky.__dict__.pop("sandra_kitchen_friendship_progress", None)
+    $ updateSave_V85()
+    assert eval (Becky.sandra_kitchen_friendship_progress == 0) timeout 5.0
 
 testcase external_becky_classes_are_initialized:
     run Jump("Intro")
