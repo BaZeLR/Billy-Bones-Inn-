@@ -90,12 +90,15 @@ init python:
     )
 
 label BeckyHome(arrive_mode=""):
-    $ renpy.dynamic("_becky_home_room", "GirlName", "_start_becky_sex", "_becky_admitted")
+    $ renpy.dynamic("_becky_home_room", "_becky_home_text", "GirlName", "_start_becky_sex", "_becky_admitted")
     $ rooms.get("BeckyHomeFront").state["arrival_mode"] = arrive_mode
     $ _becky_home_room = rooms.get("BeckyHome")
     $ rooms.enter("BeckyHome")
     $ Eddie.set_sex_stat("group_sex", 1 if arrive_mode == "SvalnyiGreh" else 0)
     $ scene_runtime.picture = becky_home_picture(rooms.get("BeckyHomeFront").state["arrival_mode"])
+    $ _becky_home_text = _becky_home_room.visible_descriptions()[0].text
+    $ scene_runtime.text = _becky_home_text
+    $ scene_runtime.location_text = _becky_home_text
     $ GirlName = 'becky'
     python:
         Becky.stats.setdefault("PussyWetStart", Becky.arousal_value())

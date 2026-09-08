@@ -120,6 +120,27 @@ testcase becky_home_front_from_dance_starts_home_thread:
     assert eval (int(threads["beckyHome"].num or 0) == 1) timeout 5.0
     run Jump("StreetTavern")
 
+testcase becky_front_and_home_replace_foreign_location_text:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        scene_runtime.text = "FOREIGN MARKET DESCRIPTION"
+        scene_runtime.location_text = "FOREIGN MARKET DESCRIPTION"
+        Becky.home_front_checked_today = True
+        threads["beckyHome"].advanceTo(3, complete_at_end=True)
+        player.appearance.current_dress = "citydress"
+    run Call("BeckyHomeFront", "")
+    advance until screen "say" timeout 20.0
+    assert eval (str(rooms.current_code or "") == "BeckyHomeFront") timeout 5.0
+    assert eval (str(scene_runtime.text or "") == str(rooms.get("BeckyHomeFront").visible_descriptions()[0].text or "")) timeout 5.0
+    assert eval ("FOREIGN MARKET DESCRIPTION" not in str(scene_runtime.text or "") and "FOREIGN MARKET DESCRIPTION" not in str(scene_runtime.location_text or "")) timeout 5.0
+    advance until screen "choice" timeout 20.0
+    $ _becky_enter_home_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Зайти в дом")
+    click id ("choice_panel_button_%d" % int(_becky_enter_home_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (str(rooms.current_code or "") == "BeckyHome") timeout 5.0
+    assert eval (str(scene_runtime.text or "") == str(rooms.get("BeckyHome").visible_descriptions()[0].text or "")) timeout 5.0
+    assert eval ("FOREIGN MARKET DESCRIPTION" not in str(scene_runtime.text or "") and "FOREIGN MARKET DESCRIPTION" not in str(scene_runtime.location_text or "")) timeout 5.0
+
 testcase becky_accept_home_invitation_order:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0

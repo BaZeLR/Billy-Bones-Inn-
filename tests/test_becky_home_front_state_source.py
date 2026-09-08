@@ -68,3 +68,23 @@ def test_becky_home_arrivals_have_one_live_label_not_duplicate_threads():
     assert "HomeEnterCheckedDay" not in home + init_becky
     assert "becky_home_after_sex_text" not in home
     assert home.count("becky_home_restore_text()") >= 3
+
+
+def test_becky_home_entries_replace_foreign_scene_text_before_authored_dialogue():
+    front = (ROOT / "game/Town/BeckyHomeFront.rpy").read_text(encoding="utf-8-sig")
+    home = (ROOT / "game/Town/BeckyHome.rpy").read_text(encoding="utf-8-sig")
+
+    front_entry = front.split('label BeckyHomeFront(arrive_mode=""):', 1)[1].split("\nlabel ", 1)[0]
+    home_entry = home.split('label BeckyHome(arrive_mode=""):', 1)[1].split("\nlabel ", 1)[0]
+    arrival_event = front.split("label story_becky_home_arrival_0:", 1)[1].split("\nlabel ", 1)[0]
+
+    assert front_entry.index("$ scene_runtime.text = _becky_front_text") < front_entry.index(
+        'if rooms.get("BeckyHomeFront").state["arrival_mode"] == "FromDances":'
+    )
+    assert "$ scene_runtime.location_text = _becky_front_text" in front_entry
+    assert home_entry.index("$ scene_runtime.text = _becky_home_text") < home_entry.index(
+        "if arrive_mode == 'FromDances'"
+    )
+    assert "$ scene_runtime.location_text = _becky_home_text" in home_entry
+    assert "$ scene_runtime.text = rooms.get(\"BeckyHomeFront\").descriptions[1].text" in arrival_event
+    assert "$ scene_runtime.location_text = scene_runtime.text" in arrival_event

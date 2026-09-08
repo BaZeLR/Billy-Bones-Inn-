@@ -95,7 +95,9 @@ init python:
 
 # First-time dance arrival is the opening event of Becky's home thread.
 label story_becky_home_arrival_0:
-    "[rooms.get('BeckyHomeFront').descriptions[1].text]"
+    $ scene_runtime.text = rooms.get("BeckyHomeFront").descriptions[1].text
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     call ShowImage("", "", becky_homefront_withbecky_picture())
     $ event_runtime.active_thread.advance()
     return
@@ -103,7 +105,7 @@ label story_becky_home_arrival_0:
 
 # --- MAIN LOCATION LABEL ---
 label BeckyHomeFront(arrive_mode=""):
-    $ renpy.dynamic("_becky_front_room")
+    $ renpy.dynamic("_becky_front_room", "_becky_front_text")
     python:
         _becky_front_room = rooms.get("BeckyHomeFront")
         rooms.enter("BeckyHomeFront")
@@ -116,6 +118,10 @@ label BeckyHomeFront(arrive_mode=""):
         $ pregnancy_check("inga", "mouthface", 1, "Лукас")
     elif rooms.get("BeckyHomeFront").state["inga_scene_roll"] == 2:
         $ pregnancy_check("inga", "inside", 1, "Лукас")
+
+    $ _becky_front_text = _becky_front_room.visible_descriptions()[0].text
+    $ scene_runtime.text = _becky_front_text
+    $ scene_runtime.location_text = _becky_front_text
 
     if rooms.get("BeckyHomeFront").state["arrival_mode"] == "FromDances":
         if story_event_available("BeckyHomeFront", "enter"):
