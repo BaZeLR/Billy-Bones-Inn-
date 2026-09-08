@@ -51,7 +51,6 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
     python:
         Becky.ensure_sex_state()
         people.get_info("eddie").set_arousal(people.get_info("eddie").arousal_value())
-        Eddie.set_sex_stat("group_sex", Eddie.sex_stat("group_sex", 0))
         CurGiveOrgasms = Becky.stats.get("orgasms_given", 0)
         _ibs_update_visibility(GirlNameIBS)
     call ShowBeckyPortrait
@@ -289,7 +288,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                         "Заглатывать ваш член по самые яйца."
                         call ShowImage(GirlNameIBS, "sex", "minet4")
                     $ Becky.set_cock_position("mouth")
-                    if Becky.cock_in("pussy", "eddie") == 0 and GrupenSex.get("eddie", 0) > 0:
+                    if Becky.cock_in("pussy", "eddie") == 0 and int(Eddie.sex_stat("group_sex", 0) or 0) > 0:
                         $ _becky_minetalone_pic = "minetalone" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:338:2"))
                         call ShowImage(GirlNameIBS, "sex", _becky_minetalone_pic)
                     if Becky.corruption < 40:
@@ -318,7 +317,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                     call ShowCurrentSex(GirlNameIBS)
 
                 "Трахать" if _cametoday < _cancumdaily and not Becky.sex_busy() and _ibs_arousal("You") >= 20 and _ibs_arousal(GirlNameIBS) >= 20 and Becky.pussy_visible() and Becky.cock_in("pussy", "eddie") == 0:
-                    if Becky.pregnancy_days() < 130 and GrupenSex.get("eddie", 0) == 0:
+                    if Becky.pregnancy_days() < 130 and int(Eddie.sex_stat("group_sex", 0) or 0) == 0:
                         if Becky.cock_in("pussy", "You") == 0:
                             "Вы страстно впились поцелуем в губы [people_name(GirlNameIBS, 'genitive')]. Не прекращая целовать ее вы с некоторым трудом приподняли ее в воздух и насадили прямо на свой вздыбленный член. [people_display_name(GirlNameIBS)] сладко охнула и, обхватив вас руками и ногами, стала подниматься и опускаться на вашем друге."
                             $ _becky_fuckstart_pic = "fuckstart" + str(procedural_randint(1, 8, key="procedural:NPC/Girls/Becky/IntBeckySex.rpy:procedural_randint:373:3"))
@@ -427,7 +426,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                         "Вы сказали [people_display_name(GirlNameIBS)] что вам нужно идти. Она была поражена:"
                         "\"Стефанчик, но мы же ведь только начали! Что случилось?! Я что, тебе разонравилась?!\""
                         "Но вы были непреклонны и направились к выходу, оставив за спиной неудовлетворенную вдову."
-                        if GrupenSex.get("eddie", 0) > 0:
+                        if int(Eddie.sex_stat("group_sex", 0) or 0) > 0:
                             "\"Впрочем,\" услышали вы уже в дверях, \"у меня еще управляющий мой рыжий есть,\" и, оглянувшись перед тем как закрыть за собой дверь, вы увидели что Бекки тянет Эдди поближе к себе. \"Ты ведь не оставишь хозяйку мучаться как этот мужлан, нет?\""
                             call PregnancyCheck("becky", "inside", 1, "eddie")
                         $ Becky.apply_social_roll(3, 1, -1, 0, 0, 0)
@@ -437,7 +436,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                         "Вы поцеловали [people_display_name(GirlNameIBS)], удовлетворенно развалившуюся на кровати, заверили ее что она была бесподобна, но сейчас вам надо возвращаться домой."
                         "\"Стефанчик, жаль, но раз надо то надо. Спасибо тебе, что порадовал меня, не побрезговал мной старой.\""
                         "Вы заверили ее что отнюдь не считаете ее старой, наоборот, она в самом соку, и, получив приглашение заходить еще, отправились к выходу."
-                        if GrupenSex.get("eddie", 0) > 0:
+                        if int(Eddie.sex_stat("group_sex", 0) or 0) > 0:
                             if int(Eddie.sex_stat("came_today", 0) or 0) < int(Eddie.sex_stat("can_cum_daily", 1) or 1):
                                 "Эдди помахал вам вслед рукой, он-то еще уходить явно не собирался."
                             else:
@@ -449,6 +448,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                     $ _ibs_set_arousal("You", 0)
                     $ _ibs_set_arousal(GirlNameIBS, 0)
                     $ _ibs_end_cock_state(GirlNameIBS)
+                    $ Eddie.set_sex_stat("group_sex", 0)
                     if int(threads["beckyHome"].num or 0) < 2:
                         $ threads["beckyHome"].advanceTo(2, force_active=True)
                     call ShowCurrentSex(GirlNameIBS)
@@ -468,6 +468,9 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
                             return
 
                 "Закончить":
+                    $ _ibs_end_cock_state(GirlNameIBS)
+                    $ Becky.set_sex_busy(False)
+                    $ Eddie.set_sex_stat("group_sex", 0)
                     return
 
     label int_becky_sex_after_cum:
@@ -478,6 +481,7 @@ label IntBeckySex(GirlNameIBS="becky", GirlLocIBS="home", GirlModeIBS=""):
 
             "Закончить":
                 $ Becky.set_sex_busy(False)
+                $ Eddie.set_sex_stat("group_sex", 0)
                 if str(GirlLocIBS or "").strip().lower() == "home":
                     jump BeckyHomeAfterSex
                 return True

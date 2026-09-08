@@ -94,6 +94,7 @@ label BeckyHome(arrive_mode=""):
     $ rooms.get("BeckyHomeFront").state["arrival_mode"] = arrive_mode
     $ _becky_home_room = rooms.get("BeckyHome")
     $ rooms.enter("BeckyHome")
+    $ Eddie.set_sex_stat("group_sex", 1 if arrive_mode == "SvalnyiGreh" else 0)
     $ scene_runtime.picture = becky_home_picture(rooms.get("BeckyHomeFront").state["arrival_mode"])
     $ GirlName = 'becky'
     python:
@@ -106,7 +107,6 @@ label BeckyHome(arrive_mode=""):
         call ShowImageSeq('becky', 'sex', 'inroom', 3)
         $ _start_becky_sex = True
     elif arrive_mode == 'SvalnyiGreh':
-        $ GrupenSex['eddie'] = 1
         call IntEddieBeckySex
         "[_becky_home_room.descriptions[2].text] <br>Вы и миссис Блэнкеншип находитесь в ее спальне.<br>Вместе с вами находится Эдди, ее управляющий лавкой. Им движут к хозяйке отнюдь не деловые чувства."
         $ _start_becky_sex = True

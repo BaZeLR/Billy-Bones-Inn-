@@ -147,6 +147,49 @@ testcase becky_accept_home_invitation_order:
     assert eval (int(rooms.get("FridayDance").dance_count or 0) == 5) timeout 5.0
     run Jump("StreetTavern")
 
+testcase becky_from_dance_blowjob_uses_oop_group_state:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 5
+        calendar_v2.hour = 20
+        calendar_v2.minute = 0
+        rooms.get("BeckyHomeFront").state["arrival_mode"] = "FromDances"
+        threads["beckyDinner"].reset()
+        Becky.home_front_checked_today = True
+        Eddie.set_sex_stat("group_sex", 1)
+        Becky.set_sex_busy(False)
+        Becky.set_cock_position("none", "You")
+        Becky.set_cock_position("none", "eddie")
+        player.intimacy.came_today = 0
+    run Call("BeckyHomeFront", "FromDances")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(rooms.current_code or "") == "BeckyHomeFront") timeout 5.0
+    $ _becky_enter_home_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Зайти в дом")
+    click id ("choice_panel_button_%d" % int(_becky_enter_home_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until screen "choice" timeout 20.0
+    assert eval (str(rooms.current_code or "") == "BeckyHome") timeout 5.0
+    assert eval (int(Eddie.sex_stat("group_sex", 0) or 0) == 0) timeout 5.0
+    assert eval ("Предложить отсосать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _becky_blowjob_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Предложить отсосать")
+    click id ("choice_panel_button_%d" % int(_becky_blowjob_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    advance until screen "choice" timeout 20.0
+    assert eval (Becky.cock_in("mouth", "You") and int(Eddie.sex_stat("group_sex", 0) or 0) == 0) timeout 5.0
+
+testcase becky_group_session_exit_clears_oop_state:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        Eddie.set_sex_stat("group_sex", 1)
+        Becky.set_sex_busy(False)
+        Becky.set_cock_position("none", "You")
+        Becky.set_cock_position("none", "eddie")
+    run Call("IntBeckySex", "becky", "home")
+    advance until screen "choice" timeout 20.0
+    assert eval (int(Eddie.sex_stat("group_sex", 0) or 0) == 1) timeout 5.0
+    $ _becky_finish_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Закончить")
+    click id ("choice_panel_button_%d" % int(_becky_finish_index)) pos (0.5, 0.5) until eval (int(Eddie.sex_stat("group_sex", 0) or 0) == 0) timeout 20.0
+
 testcase friday_dance_find_becky_opens_becky_dance:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
