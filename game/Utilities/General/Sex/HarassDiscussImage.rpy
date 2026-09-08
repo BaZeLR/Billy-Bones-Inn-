@@ -7,7 +7,9 @@ label HarassDiscussImage(girl="", value=0, _hdi_girl="", _hdi_value=0, _hdi_pict
     $ _hdi_value = int(value or 0)
     $ _hdi_picture = ""
     if _hdi_girl == "melissa":
-        if _hdi_value == 0:
+        if _hdi_value == 3:
+            $ _hdi_picture = MelissaStaticData.image_path("grope", "throw_delinquent")
+        elif _hdi_value == 0:
             $ _hdi_picture = MelissaStaticData.image_path("grope", "scold_angry")
         elif _hdi_value == 1:
             $ _hdi_picture = MelissaStaticData.image_path("grope", "scold_neutral")

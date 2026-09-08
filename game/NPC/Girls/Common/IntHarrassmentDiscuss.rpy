@@ -121,7 +121,7 @@ label IntHarrassmentDiscussOutcome(GirlNameMHD, YourReaction1, choice_code=5, _d
             $ _girl_info.change_anger(-1, "harass_promised_solution")
     elif choice_code == 7:
         $ _discussion_text = "Вы находите наглого посетителя, отрываете его от стола и выставляете за дверь. Затем вы говорите {}, что в вашем трактире никто не покупает право унижать ее вместе с кружкой эля.".format(people_name(GirlNameMHD, 'dative'))
-        call HarassDiscussImage(GirlNameMHD, 2)
+        call HarassDiscussImage(GirlNameMHD, 3)
         if _girl_info is not None:
             $ _girl_info.set_harass_instruction("notallow")
             $ _girl_info.change_social(friend_delta=1)

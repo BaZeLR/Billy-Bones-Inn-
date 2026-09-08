@@ -98,6 +98,8 @@ def test_harassment_render_and_discussion_scratch_is_label_local():
     ):
         assert 'build_media_ref(_hsi_girl, "grope", "%s' % amanda_reaction_picture in show_image
     assert 'MelissaStaticData.image_path("grope", "scold_agree")' in discuss_image
+    assert 'MelissaStaticData.image_path("grope", "throw_delinquent")' in discuss_image
+    assert 'call HarassDiscussImage(GirlNameMHD, 3)' in discussion
     for retired_asset in ("assok1", "assok2", "titshy1", "titshy2", "scoldok"):
         assert retired_asset not in show_image + discuss_image
 

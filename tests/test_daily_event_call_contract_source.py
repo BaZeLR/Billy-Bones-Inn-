@@ -57,3 +57,11 @@ def test_morning_sickness_queries_the_daily_event_owner_without_a_global_mirror(
     assert "def exists(self, girl_name=\"\", event_type=\"\", location_name=\"\", current_time=None):" in runtime
     assert "daily_events.exists(" in morning
     assert "def morning_sickness_daily_event_ready(" not in morning
+
+
+def test_morning_sickness_uses_tavern_worker_ownership_instead_of_a_fixed_roster():
+    morning = (ROOT / "game/NPC/Girls/Common/MorningSickness.rpy").read_text(encoding="utf-8-sig")
+
+    assert "for girl_key, girl_info in people.girl_items():" in morning
+    assert "not girl_info.is_tavern_worker()" in morning
+    assert 'for girl in ("sandra", "melissa", "amanda")' not in morning
