@@ -85,20 +85,6 @@ init python:
         info = girl_card_info_object(key)
         lines = []
 
-        church_state = rooms.get("Church").state
-        if int(church_state.get("purity_last_day", -1) or -1) == int(current_game_day() or 0):
-            row = dict(church_state.get("purity_report", {}).get(key, {}) or {})
-            before_value = int(row.get("before", 0) or 0)
-            after_value = int(row.get("after", 0) or 0)
-            reduction = max(0, before_value - after_value)
-            if reduction > 0:
-                if reduction >= 18 or after_value <= before_value // 2:
-                    lines.append("Последняя воскресная служба заметно укрепила ее сдержанность.")
-                elif reduction >= 8:
-                    lines.append("После последней воскресной службы она держится строже обычного.")
-                else:
-                    lines.append("Последняя воскресная служба слегка остудила ее порывистость.")
-
         if info is not None and (info.cum_state("cum_face_you") or info.cum_state("cum_face_others")):
             lines.append("На лице заметны следы спермы.")
 

@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 84
+define currentVersion = 85
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -708,6 +708,10 @@ init -100 python:
         if loaded_version < 84:
             updateSave_V83()
             loaded_version = 84
+
+        if loaded_version < 85:
+            updateSave_V84()
+            loaded_version = 85
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2795,6 +2799,19 @@ init -100 python:
                 upgraded_room.state.update(dict(getattr(old_room, "state", {}) or {}))
             rooms.register(upgraded_room)
         Alber.update()
+
+    def updateSave_V84():
+        # Church attendance never changes NPC relationship stats in the authored
+        # story. Repair Becky saves touched by the retired purity routine, then
+        # discard its room-owned report so no parallel progression state remains.
+        church_state = getattr(rooms.get("Church"), "state", None)
+        if not hasattr(church_state, "get") or not hasattr(church_state, "pop"):
+            return
+        purity_report = church_state.get("purity_report", {})
+        if hasattr(purity_report, "get") and purity_report.get("becky", None) is not None:
+            Becky.corruption = max(25, people_to_int(Becky.corruption, 0))
+        church_state.pop("purity_last_day", None)
+        church_state.pop("purity_report", None)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

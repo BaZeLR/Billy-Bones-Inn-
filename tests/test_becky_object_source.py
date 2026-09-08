@@ -102,7 +102,7 @@ def test_v52_migrates_becky_map_once_and_every_load_does_not_clean_it():
     )[0]
     assert "becky_var" not in always_cleanup
     assert "BeckyAdmit" not in always_cleanup
-    assert "define currentVersion = 84" in MIGRATION
+    assert "define currentVersion = 85" in MIGRATION
     assert "if loaded_version < 53:" in MIGRATION
     assert "updateSave_V52()" in MIGRATION
 
@@ -121,3 +121,16 @@ def test_v81_moves_retired_becky_stages_to_threads_and_deletes_mirrors():
         "eddie_join_stage",
     ):
         assert f'Becky.__dict__.pop("{retired_stage}", None)' in migration
+
+
+def test_v84_repairs_becky_corruption_from_retired_church_purity_state():
+    migration = MIGRATION.split("def updateSave_V84():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+
+    assert 'purity_report.get("becky", None) is not None' in migration
+    assert "Becky.corruption = max(25, people_to_int(Becky.corruption, 0))" in migration
+    assert 'church_state.pop("purity_last_day", None)' in migration
+    assert 'church_state.pop("purity_report", None)' in migration
+    assert "if loaded_version < 85:" in MIGRATION
+    assert "updateSave_V84()" in MIGRATION

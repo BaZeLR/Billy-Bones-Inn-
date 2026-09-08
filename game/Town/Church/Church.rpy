@@ -71,113 +71,6 @@ init python:
     def church_draupnir_note_visible():
         return church_confession_action_visible() and Becky.gerhard_talk_stage > 0
 
-    def _church_to_int(value, default=0):
-        try:
-            return int(value)
-        except Exception:
-            return int(default or 0)
-
-    def church_purity_player_pressure_resistance():
-        try:
-            update_stat_state()
-        except Exception:
-            pass
-
-        fight_value = fight_player_level()
-
-        resistance = 0
-        resistance += min(10, max(0, _church_to_int(player_charisma_breakdown().get("charisma", 0), 0) // 10))
-        resistance += min(8, max(0, _church_to_int(player.stats.notoriety, 0) // 12))
-        resistance += min(8, max(0, _church_to_int(player.stats.exploration, 0) // 12))
-        resistance += min(6, max(0, fight_value - 1))
-        return min(24, resistance)
-
-    def church_purity_girl_keys():
-        keys = []
-        for raw_key in people.ids():
-            key = str(raw_key or "").strip().lower()
-            if key == "" or key == "you":
-                continue
-            info = people.get_info(key)
-            if info is None or not hasattr(info, "corruption"):
-                continue
-            if _church_to_int(getattr(info, "corruption", 0), 0) <= 0:
-                continue
-            keys.append(key)
-        return sorted(keys)
-
-    def church_apply_sunday_purity():
-        if not church_open_hours_visible():
-            return {}
-
-        today = int(current_game_day())
-        if _church_to_int(rooms.get("Church").state.get("purity_last_day", -1), -1) == today:
-            return dict(rooms.get("Church").state.get("purity_report", {}) or {})
-
-        rooms.get("Church").state["purity_last_day"] = today
-        report = {}
-        player_resistance = church_purity_player_pressure_resistance()
-
-        for key in church_purity_girl_keys():
-            info = people.get_info(key)
-            if info is None:
-                continue
-            before_value = _church_to_int(getattr(info, "corruption", 0), 0)
-            base_percent = procedural_randint(20, 60, "church_purity_%s_%s" % (key, today))
-            openness_value = _church_to_int(getattr(info, "openness", 0), 0)
-            friend_value = _church_to_int(getattr(info, "rel", 0), 0)
-            relation_resistance = min(16, max(0, openness_value // 2) + max(0, friend_value // 3))
-            effective_percent = max(20, min(60, base_percent - player_resistance - relation_resistance))
-            reduction = max(1, int(round(float(before_value) * float(effective_percent) / 100.0)))
-            after_value = max(0, before_value - reduction)
-            info.corruption = after_value
-            report[key] = {
-                "before": before_value,
-                "after": after_value,
-                "base_percent": base_percent,
-                "effective_percent": effective_percent,
-                "reduction": before_value - after_value,
-            }
-
-        rooms.get("Church").state["purity_report"] = dict(report)
-        if len(report) > 0:
-            renpy.notify("Воскресная служба охладила пыл прихожанок.")
-        return dict(report)
-
-    def church_purity_report_text():
-        report = dict(rooms.get("Church").state.get("purity_report", {}) or {})
-        if len(report) <= 0:
-            return ""
-        if _church_to_int(rooms.get("Church").state.get("purity_last_day", -1), -1) != int(current_game_day()):
-            return ""
-
-        changed = []
-        for key in sorted(list(report.keys())):
-            row = dict(report.get(key, {}) or {})
-            before_value = _church_to_int(row.get("before", 0), 0)
-            after_value = _church_to_int(row.get("after", 0), 0)
-            if before_value <= after_value:
-                continue
-            info = people.get_info(key)
-            if info is not None and hasattr(info, "display_name"):
-                name = str(info.display_name() or key)
-            elif info is not None and hasattr(info, "data"):
-                name = str(getattr(info.data, "fullname", key) or key)
-            else:
-                name = str(key or "")
-            reduction = max(0, before_value - after_value)
-            if reduction >= 18 or after_value <= before_value // 2:
-                change_text = "заметно строже держит себя после службы"
-            elif reduction >= 8:
-                change_text = "держится сдержаннее после службы"
-            else:
-                change_text = "слегка одумалась после службы"
-            changed.append("%s %s" % (name, change_text))
-
-        if len(changed) <= 0:
-            return ""
-        return "Воскресная служба укрепила нравственный настрой прихожанок. " + "; ".join(changed) + "."
-
     def church_service_attendees_text():
         lines = [
             "Вы осматриваете собор во время воскресной службы.",
@@ -198,9 +91,6 @@ init python:
             if len(names) > 0:
                 lines.append("Среди тех, кого вы можете узнать: " + ", ".join(names) + ".")
         lines.append("Если хотите присмотреться внимательнее, выберите кого искать среди прихожан.")
-        purity_text = church_purity_report_text()
-        if str(purity_text or "").strip():
-            lines.append(str(purity_text or ""))
         return "\n\n".join(lines)
 
     ChurchRoomDefinition = Room(
@@ -235,7 +125,6 @@ init python:
             end="12:59",
             closed_text="Перед вами возвышается величественное здание городского собора, посвященного великому богу Ильматеру. Величественными башенками, шпилями, колоннами собор устремляется вверх, в небо. По воскресным утрам здесь собирается почти весь город. Однако сейчас собор закрыт.",
         ),
-        state={"purity_last_day": -1, "purity_report": {}},
         custom_properties={"service_location": True},
     )
 
@@ -252,8 +141,6 @@ label Church:
     $ main_ui_runtime.action_items = []
     $ main_ui_runtime.girl_key = ""
     $ main_ui_runtime.object_id = ""
-    $ church_apply_sunday_purity()
-
     if not rooms.get("Church").is_open():
         $ scene_runtime.text = rooms.get("Church").schedule.closed_text
         $ scene_runtime.location_text = scene_runtime.text

@@ -5290,6 +5290,29 @@ testcase external_friday_public_becky_button_starts_dance:
     click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval ("Продолжить танцевать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
 
+testcase external_becky_v84_purity_repair_unlocks_dance:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ Becky.rel = 7
+    $ Becky.corruption = 4
+    $ rooms.get("Church").state["purity_last_day"] = 62
+    $ rooms.get("Church").state["purity_report"] = {"becky": {"before": 10, "after": 8}}
+    $ updateSave_V84()
+    assert eval (int(Becky.corruption or 0) == 25) timeout 5.0
+    assert eval ("purity_last_day" not in rooms.get("Church").state and "purity_report" not in rooms.get("Church").state) timeout 5.0
+    $ player.tavern_management.dance_sponsor = 0
+    $ rooms.enter("FridayDance")
+    $ rooms.get("FridayDance").dance_count = 0
+    $ rooms.get("FridayDance").step = 0
+    run Call("story_becky_friday_dance_mc_0")
+    advance until screen "say" timeout 20.0
+    click pos (960, 560) until eval (renpy.get_screen("choice") is not None and "Пригласить потанцевать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _becky_repaired_invite_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Пригласить потанцевать")
+    click id ("choice_panel_button_%d" % int(_becky_repaired_invite_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (960, 560) until eval (int(rooms.get("FridayDance").step or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval ("Продолжить танцевать" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+
 testcase external_friday_amanda_bad_invite_uses_one_dance:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -9284,6 +9307,7 @@ def main() -> int:
             "external_friday_dance_reopens_with_both_partners",
             "external_friday_public_amanda_button_starts_dance",
             "external_friday_public_becky_button_starts_dance",
+            "external_becky_v84_purity_repair_unlocks_dance",
             "external_friday_amanda_bad_invite_uses_one_dance",
             "external_friday_amanda_legare_go_phrase_survives_create_dance",
             "external_amanda_legare_sex_scene_label_procedures",
@@ -9482,6 +9506,7 @@ def main() -> int:
             "external_friday_dance_reopens_with_both_partners",
             "external_friday_public_amanda_button_starts_dance",
             "external_friday_public_becky_button_starts_dance",
+            "external_becky_v84_purity_repair_unlocks_dance",
             "external_friday_amanda_bad_invite_uses_one_dance",
             "external_friday_amanda_legare_go_phrase_survives_create_dance",
             "external_amanda_legare_sex_scene_label_procedures",

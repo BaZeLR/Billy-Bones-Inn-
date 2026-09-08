@@ -32,19 +32,16 @@ def test_church_uses_calendar_hour_minute_for_open_service_confession_and_after_
     assert "return int(calendar_v2.week or 0) == 7 and church_minutes_between(11 * 60, 12 * 60 + 59)" in source
     assert 'start="08:00"' in source
     assert 'end="12:59"' in source
-    assert "$ church_apply_sunday_purity()" in source
+    assert "church_apply_sunday_purity" not in source
 
 
-def test_church_purity_state_has_one_room_owner():
+def test_church_attendance_does_not_mutate_npc_relationship_stats():
     source = _source(CHURCH_ROOM)
     girl_card = _source(PROJECT_ROOT / "game" / "NPC" / "Girls" / "Common" / "GirlCard.rpy")
 
-    assert 'state={"purity_last_day": -1, "purity_report": {}}' in source
-    assert 'rooms.get(\"Church\").state["purity_last_day"] = today' in source
-    assert 'rooms.get(\"Church\").state["purity_report"] = dict(report)' in source
-    assert "church_state = rooms.get(\"Church\").state" in girl_card
-    assert "ChurchPurityLastDay" not in source + girl_card
-    assert "ChurchPurityReport" not in source + girl_card
+    assert "purity_last_day" not in source + girl_card
+    assert "purity_report" not in source + girl_card
+    assert "info.corruption =" not in source
 
 
 def test_sunday_service_npc_schedules_match_the_church_clock_phase():
