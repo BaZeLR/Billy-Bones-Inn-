@@ -136,6 +136,19 @@ init -25 python:
                 str(self.item),
             )
 
+    def story_event_location_keys(evt):
+        raw_location = getattr(evt, "location", "")
+        if isinstance(raw_location, (list, tuple, set)):
+            values = list(raw_location)
+        else:
+            values = [raw_location]
+        result = []
+        for value in values:
+            location_key = str(value or "").strip()
+            if location_key and location_key not in result:
+                result.append(location_key)
+        return result
+
     def story_event_day_key(evt):
         daily_key = str(getattr(evt, "daily_key", "") or "").strip()
         if daily_key:
@@ -199,7 +212,12 @@ init -25 python:
         return ""
 
     def _story_event_projection_location(evt):
-        location_key = str(getattr(evt, "location", "") or "").strip()
+        location_keys = story_event_location_keys(evt)
+        current_location = str(rooms.current_code or "").strip()
+        if current_location in location_keys:
+            location_key = current_location
+        else:
+            location_key = location_keys[0] if location_keys else ""
         action_key = str(getattr(evt, "action", "") or "").strip()
         person_key = _story_event_person(evt)
         if location_key.startswith("talk_") or location_key in ("talk", "gift"):
@@ -333,16 +351,17 @@ init -25 python:
 
         event_runtime.available = {}
         for evt in tmp_events:
-            location_key = str(evt.location or "").strip()
             action_key = str(evt.action or "").strip()
-            if location_key == "" or action_key == "":
+            location_keys = story_event_location_keys(evt)
+            if len(location_keys) <= 0 or action_key == "":
                 continue
-            if location_key not in event_runtime.available:
-                event_runtime.available[location_key] = {action_key: [evt]}
-            elif action_key not in event_runtime.available[location_key]:
-                event_runtime.available[location_key][action_key] = [evt]
-            else:
-                event_runtime.available[location_key][action_key].append(evt)
+            for location_key in location_keys:
+                if location_key not in event_runtime.available:
+                    event_runtime.available[location_key] = {action_key: [evt]}
+                elif action_key not in event_runtime.available[location_key]:
+                    event_runtime.available[location_key][action_key] = [evt]
+                else:
+                    event_runtime.available[location_key][action_key].append(evt)
 
         for location_name in list(event_runtime.available.keys()):
             for action_name in list(event_runtime.available[location_name].keys()):

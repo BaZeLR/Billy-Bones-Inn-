@@ -156,6 +156,7 @@ label TavernStable:
     $ renpy.dynamic("_room")
     $ _room = rooms.get("TavernStable")
     $ rooms.enter("TavernStable")
+    call RoomEnterEventGate(rooms.current_code, False)
     $ scene_runtime.picture = tavern_stable_picture() or _room.bg_picture or None
     $ Mongol.ensure_story_defaults()
     $ scene_runtime.text = tavern_stable_scene_text()

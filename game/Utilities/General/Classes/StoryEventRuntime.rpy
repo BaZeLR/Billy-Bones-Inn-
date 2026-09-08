@@ -1244,10 +1244,10 @@ define tavernThreadList = [
             1,
             None,
             [
-                "#tavern_work_planned_for('', 'TavernMain', calendar_v2.time_slot())",
+                "#tavern_work_planned_for('', rooms.current_code, calendar_v2.time_slot())",
             ],
             None,
-            "TavernMain",
+            TAVERN_AMANDA_LIZA_TALK_ROOMS,
             "enter",
             200,
             True,

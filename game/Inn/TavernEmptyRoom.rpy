@@ -77,6 +77,7 @@ init 6 python:
 
 label TavernEmptyRoom:
     $ rooms.enter("TavernEmptyRoom")
+    call RoomEnterEventGate(rooms.current_code, False)
     $ scene_runtime.picture = rooms.current.bg_picture or None
     $ scene_runtime.text = rooms.get("TavernEmptyRoom").descriptions[0].text
     $ scene_runtime.location_text = scene_runtime.text

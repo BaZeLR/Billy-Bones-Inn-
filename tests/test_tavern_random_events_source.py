@@ -48,7 +48,8 @@ def test_tavern_random_events_are_wired_to_thread_runtime():
     assert "+ tavernThreadList" in runtime
     assert "def tavern_work_planned_for" in tavern
     assert "label TavernWorkEventTrigger:" in tavern
-    assert "tavern_work_planned_for('', 'TavernMain', calendar_v2.time_slot())" in runtime
+    assert "tavern_work_planned_for('', rooms.current_code, calendar_v2.time_slot())" in runtime
+    assert "TAVERN_AMANDA_LIZA_TALK_ROOMS" in runtime
     assert runtime.count('"TavernWorkEventTrigger", None, None, None') == 1
     assert 'call checkTriggers("TavernMain", "tavern_work", 0)' not in main
     assert 'self.repeatable = bool(evt[11]) if len(evt) > 11 else False' in events
@@ -102,11 +103,31 @@ def test_tavern_work_events_respect_open_work_phase_and_present_assigned_staff()
     source = read_rel("game/Inn/TavernRandomEvents.rpy")
 
     assert 'periods=(2, 3, 4)' in source
-    assert "if not player.tavern_management.isTavernOpen:" in source
+    assert "if self.requires_open and not player.tavern_management.isTavernOpen:" in source
     assert 'play_condition=tavern_work_melissa_waitress_fall_playable' in source
     assert 'str(people.location("melissa") or "") == "TavernMain"' in source
     assert "event_def.can_play(loc_key)" in source
     assert "event_def.can_play(room_key)" in source
+
+
+def test_amanda_liza_conversation_is_one_after_breakfast_multi_room_event():
+    source = read_rel("game/Inn/TavernRandomEvents.rpy")
+    runtime = read_rel("game/Utilities/General/Classes/StoryEventRuntime.rpy")
+    events = read_rel("game/Utilities/General/Events/events.rpy")
+
+    room_block = source.split("TAVERN_AMANDA_LIZA_TALK_ROOMS = (", 1)[1].split(")", 1)[0]
+    for room_code in ("TavernMain", "TavernEmptyRoom", "Shed", "Backyard", "TavernStable", "TavernStorage"):
+        assert f'"{room_code}"' in room_block
+    assert "Georgett.can_work_tavern() and Liza.can_work_tavern()" in source
+    assert "bool(player.tavern_management.breakfast.today)" in source
+    assert "not bool(player.tavern_management.breakfast.event_active)" in source
+    assert "tavern_work_person_on_property(\"amanda\")" in source
+    assert "tavern_work_person_on_property(\"liza\")" in source
+    assert "not Liza.tavern_service_busy_now()" in source
+    assert "requires_open=False, after_breakfast=True" in source
+    assert "TAVERN_AMANDA_LIZA_TALK_ROOMS" in runtime
+    assert "def story_event_location_keys(evt):" in events
+    assert "for location_key in location_keys:" in events
 
 
 def test_tavern_dispatch_uses_planned_event_pop():

@@ -1717,7 +1717,7 @@ testcase external_amanda_liza_work_conversation_activates:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
-    $ external_calendar_set_fields(3, 1, 1100, 13, 0)
+    $ external_calendar_set_fields(3, 1, 1100, 10, 0)
     $ external_calendar_set_weekday(1)
     $ player.history["kids"] = {"list": [], "next_id": 1}
     $ Georgett.set_hired(False)
@@ -1726,20 +1726,24 @@ testcase external_amanda_liza_work_conversation_activates:
     $ Georgett.set_hired(True)
     $ Liza.set_hired(True)
     assert eval (household.member_count() == 6) timeout 5.0
+    $ player.tavern_management.breakfast.today = False
+    $ player.tavern_management.breakfast.event_active = False
     $ player.tavern_management.glory_hole = 2
     $ Liza.set_job_value("jobGloryHoleAvail", 1)
-    $ Liza.assign_tavern_service("gloryhole", False)
-    $ event_runtime.tavern_work_events = [{"code": "AmandaLizaTalk", "type": "tavern_story", "label": "EventAmandaLizettTalk", "period": calendar_v2.time_slot(), "mandatory": False, "priority": 50}]
+    $ Liza.assign_tavern_service("intimate", False)
+    $ event_runtime.tavern_work_events = [{"code": "AmandaLizaTalk", "type": "tavern_story", "label": "EventAmandaLizettTalk", "period": 2, "mandatory": False, "priority": 50}]
     $ event_runtime.tavern_played_today = []
     $ event_runtime.tavern_report_rows = []
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    assert eval (not story_event_available("TavernMain", "enter") and len(list(event_runtime.tavern_work_events or [])) == 1) timeout 5.0
-    $ Liza.assign_tavern_service("intimate", False)
+    assert eval (not story_event_available("Shed", "enter") and len(list(event_runtime.tavern_work_events or [])) == 1) timeout 5.0
+    $ player.tavern_management.breakfast.today = True
+    $ rooms.enter("Shed")
     $ event_runtime.evaluation_time = None
     $ findAvailableEvents(True)
-    assert eval (story_event_available("TavernMain", "enter") and str(event_runtime.available["TavernMain"]["enter"].target or "") == "TavernWorkEventTrigger") timeout 5.0
-    run Jump("TavernMain")
+    assert eval (all(story_event_available(_room_code, "enter") for _room_code in TAVERN_AMANDA_LIZA_TALK_ROOMS)) timeout 5.0
+    assert eval (story_event_available("Shed", "enter") and str(event_runtime.available["Shed"]["enter"].target or "") == "TavernWorkEventTrigger") timeout 5.0
+    run Jump("Shed")
     advance until screen "choice" timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event" and str(main_ui_runtime.action_title or "") == "Событие: Аманда и Лизетта") timeout 5.0
     assert eval ("lizatalk" in str(scene_runtime.picture or "") and len(list(event_runtime.tavern_work_events or [])) == 0) timeout 5.0

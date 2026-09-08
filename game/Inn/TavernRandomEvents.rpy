@@ -1,7 +1,17 @@
 
 init -20 python:
+    TAVERN_AMANDA_LIZA_TALK_ROOMS = (
+        "TavernMain",
+        "TavernEmptyRoom",
+        "Shed",
+        "Backyard",
+        "TavernStable",
+        "TavernStorage",
+    )
+
+
     class TavernWorkEventDefinition(object):
-        def __init__(self, code, event_type, label, periods=None, chance=0, mandatory=False, priority=0, required_job="", condition=None, play_condition=None, report_label=None):
+        def __init__(self, code, event_type, label, periods=None, chance=0, mandatory=False, priority=0, required_job="", condition=None, play_condition=None, report_label=None, locations=None, requires_open=True, after_breakfast=False):
             self.code = str(code or "")
             self.event_type = str(event_type or "")
             self.label = str(label or self.code)
@@ -13,6 +23,9 @@ init -20 python:
             self.condition = condition
             self.play_condition = play_condition
             self.report_label = str(report_label or self.label)
+            self.locations = tuple(locations or ("TavernMain",))
+            self.requires_open = bool(requires_open)
+            self.after_breakfast = bool(after_breakfast)
             self.event = Event(
                 (
                     self.label,
@@ -23,7 +36,7 @@ init -20 python:
                     None,
                     None,
                     None,
-                    "TavernMain",
+                    self.locations,
                     "tavern_work",
                     self.priority,
                 ),
@@ -39,11 +52,21 @@ init -20 python:
             return True
 
         def can_play(self, room_code=""):
+            room_key = str(room_code or "")
+            if room_key not in self.locations:
+                return False
+            if self.requires_open and not player.tavern_management.isTavernOpen:
+                return False
             if self.required_job and len(tavern_work_job_candidates(self.required_job, room_code)) <= 0:
                 return False
             if callable(self.play_condition):
-                return bool(self.play_condition(str(room_code or "")))
+                return bool(self.play_condition(room_key))
             return True
+
+        def period_matches(self, planned_period, current_period, live_play=False):
+            if live_play and self.after_breakfast:
+                return True
+            return tavern_work_int(planned_period, 0) == tavern_work_int(current_period, 0)
 
 
     def tavern_work_int(value, default=0):
@@ -61,17 +84,28 @@ init -20 python:
 
 
     def tavern_work_liza_talk_ready():
-        return Liza.can_work_tavern()
+        return Georgett.can_work_tavern() and Liza.can_work_tavern()
+
+
+    def tavern_work_person_on_property(person=""):
+        person_key = str(person or "").strip().lower()
+        location_key = str(people.location(person_key) or "")
+        if location_key:
+            return room_in_group(location_key, ROOM_GROUP_TAVERN)
+        return person_key == "liza" and Liza.can_work_tavern()
 
 
     def tavern_work_liza_talk_playable(room_code=""):
         return (
-            str(room_code or "") == "TavernMain"
-            and Liza.can_work_tavern()
-            and (
-                Liza.tavern_service_target(False) != "gloryhole"
-                or tavern_work_int(calendar_v2.time_slot(), 0) < 2
-            )
+            str(room_code or "") in TAVERN_AMANDA_LIZA_TALK_ROOMS
+            and tavern_work_liza_talk_ready()
+            and bool(player.tavern_management.breakfast.today)
+            and not bool(player.tavern_management.breakfast.event_active)
+            and people.is_awake("amanda")
+            and people.is_awake("liza")
+            and tavern_work_person_on_property("amanda")
+            and tavern_work_person_on_property("liza")
+            and not Liza.tavern_service_busy_now()
         )
 
 
@@ -119,21 +153,20 @@ init -20 python:
     def tavern_work_planned_for(code="", location_name="", time_period=None):
         code_key = str(code or "")
         loc_key = str(location_name or rooms.current_code or "")
-        if loc_key != "TavernMain":
-            return False
-        if not player.tavern_management.isTavernOpen:
-            return False
         tp = tavern_work_int(calendar_v2.time_slot() if time_period is None else time_period, 0)
         for row in list(event_runtime.tavern_work_events or []):
             if bool(row.get("mandatory", False)):
                 continue
             if code_key and str(row.get("code", "") or "") != code_key:
                 continue
-            if tavern_work_int(row.get("period", 0), 0) == tp:
-                event_def = tavern_work_definition(str(row.get("code", "") or ""))
-                if event_def is not None and not event_def.can_play(loc_key):
-                    continue
-                return True
+            event_def = tavern_work_definition(str(row.get("code", "") or ""))
+            if event_def is None:
+                continue
+            if not event_def.period_matches(row.get("period", 0), tp, True):
+                continue
+            if not event_def.can_play(loc_key):
+                continue
+            return True
         return False
 
 
@@ -276,10 +309,13 @@ init -20 python:
         for index, row in enumerate(list(event_runtime.tavern_work_events or [])):
             if bool(row.get("mandatory", False)):
                 continue
-            if tavern_work_int(row.get("period", 0), 0) != tp:
+            event_def = tavern_work_definition(str(row.get("code", "") or ""))
+            if event_def is not None:
+                if not event_def.period_matches(row.get("period", 0), tp, require_room_match):
+                    continue
+            elif tavern_work_int(row.get("period", 0), 0) != tp:
                 continue
             if require_room_match:
-                event_def = tavern_work_definition(str(row.get("code", "") or ""))
                 if event_def is not None and not event_def.can_play(room_key):
                     continue
             popped = event_runtime.tavern_work_events.pop(index)
@@ -343,7 +379,7 @@ define tavern_work_events_by_type = {
         TavernWorkEventDefinition("FightSmall", "small_fight", "EventFightSmall", periods=(3, 4), chance=20, priority=40),
     ],
     "tavern_story": [
-        TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk", periods=(1, 2), chance=25, condition=tavern_work_liza_talk_ready, play_condition=tavern_work_liza_talk_playable, priority=50),
+        TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk", periods=(1, 2), chance=25, condition=tavern_work_liza_talk_ready, play_condition=tavern_work_liza_talk_playable, priority=50, locations=TAVERN_AMANDA_LIZA_TALK_ROOMS, requires_open=False, after_breakfast=True),
     ],
     "theft": [],
     "big_fight": [],

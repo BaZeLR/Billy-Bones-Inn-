@@ -19,7 +19,9 @@ def test_amanda_liza_work_event_uses_the_daily_plan_directly():
 
     assert 'TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk"' in source
     assert "play_condition=tavern_work_liza_talk_playable" in source
-    assert 'Liza.tavern_service_target(False) != "gloryhole"' in source
+    assert "TAVERN_AMANDA_LIZA_TALK_ROOMS" in source
+    assert "after_breakfast=True" in source
+    assert "not Liza.tavern_service_busy_now()" in source
     assert "not Liza.can_use_gloryhole()" not in source
     assert "story_amanda_liza_talk_work_0" not in source
 
@@ -53,7 +55,10 @@ def test_room_entry_and_bar_observation_share_the_work_event_gate():
     assert "calendar_v2.advance_minutes(60)" in observe
     assert "event_runtime.tavern_work_events" not in observe
     assert "DisplayTavernEventShort" not in observe
-    assert '"TavernMain",\n            "enter",\n            200,\n            True,' in runtime
+    assert 'TAVERN_AMANDA_LIZA_TALK_ROOMS,\n            "enter",\n            200,\n            True,' in runtime
+    for path in ("game/Inn/TavernEmptyRoom.rpy", "game/Inn/TavernStable.rpy"):
+        entry_room = (ROOT / path).read_text(encoding="utf-8-sig")
+        assert 'call RoomEnterEventGate(rooms.current_code, False)' in entry_room
 
 
 def test_tavern_room_establishes_scene_context_before_work_event():
