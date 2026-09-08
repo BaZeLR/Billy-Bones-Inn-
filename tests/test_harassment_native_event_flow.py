@@ -100,6 +100,7 @@ def test_harassment_render_and_discussion_scratch_is_label_local():
     assert 'MelissaStaticData.image_path("grope", "scold_agree")' in discuss_image
     assert 'MelissaStaticData.image_path("grope", "throw_delinquent")' in discuss_image
     assert 'call HarassDiscussImage(GirlNameMHD, 3)' in discussion
+    assert discuss_image.index("if _hdi_value == 3:") < discuss_image.index('elif _hdi_girl == "melissa":')
     for retired_asset in ("assok1", "assok2", "titshy1", "titshy2", "scoldok"):
         assert retired_asset not in show_image + discuss_image
 
