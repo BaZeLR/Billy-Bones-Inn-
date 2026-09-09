@@ -36,6 +36,7 @@ def test_becky_store_smalltalk_remains_the_authored_friendship_path():
     assert '"%s_becky_personal_%s" % (Becky.talk_count(), current_game_day())' in repeatable
     assert "renpy.random" not in repeatable
     assert repeatable.count("Becky.finish_talk()") == 2
+    assert repeatable.count('"Продолжить разговор":') == 2
 
 
 def test_becky_talk_repeats_the_same_native_menu_until_explicit_exit():

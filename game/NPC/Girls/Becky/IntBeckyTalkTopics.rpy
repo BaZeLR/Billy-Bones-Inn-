@@ -18,7 +18,9 @@ label _int_becky_talk_smalltalk(girl_name="becky", _becky_busy_text=""):
         $ scene_runtime.text += "\n\nНичего нового из разговора вы не узнали."
     $ Becky.finish_talk()
     $ scene_runtime.location_text = scene_runtime.text
-    return
+    menu:
+        "Продолжить разговор":
+            return
 
 
 label _int_becky_talk_personal(girl_name="becky", _becky_busy_text=""):
@@ -35,7 +37,9 @@ label _int_becky_talk_personal(girl_name="becky", _becky_busy_text=""):
         $ scene_runtime.text += "\n\nНичего нового из разговора вы не узнали."
     $ Becky.finish_talk()
     $ scene_runtime.location_text = scene_runtime.text
-    return
+    menu:
+        "Продолжить разговор":
+            return
 
 
 label story_becky_talk_inga_0(girl_name="becky"):

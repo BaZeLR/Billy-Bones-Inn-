@@ -7796,18 +7796,47 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     $ _becky_smalltalk_button_id = "choice_panel_button_%d" % int(_becky_smalltalk_index)
     $ _becky_expected_rel = 1
     $ _becky_expected_rel = min(3, _becky_expected_rel + (1 if procedural_randint(1, 2, "0_becky_smalltalk_%s" % current_game_day()) == 1 else 0))
-    click id _becky_smalltalk_button_id pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
-    assert eval (renpy.get_screen("say") is None and int(Becky.rel or 0) == int(_becky_expected_rel) and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+    click id _becky_smalltalk_button_id pos (0.5, 0.5)
+    pause 0.1
+    assert eval (int(Becky.talked_today or 0) == 1 and int(Becky.rel or 0) == int(_becky_expected_rel) and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+    assert eval (renpy.get_screen("say") is None and renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить разговор"]) timeout 5.0
     assert eval (str(scene_runtime.text or "").startswith("Вы некоторое время болтаете со вдовой Блэнкеншип") and "Вернуться на рынок" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    pause 0.1
+    assert eval (renpy.get_screen("choice") is not None and "Поболтать со вдовой Блэнкеншип о разной фигне" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _becky_expected_rel = min(3, _becky_expected_rel + (1 if procedural_randint(1, 2, "1_becky_smalltalk_%s" % current_game_day()) == 1 and _becky_expected_rel < 3 else 0))
-    click id _becky_smalltalk_button_id pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 2 and renpy.get_screen("choice") is not None) timeout 20.0
-    assert eval (renpy.get_screen("say") is None and int(Becky.rel or 0) == int(_becky_expected_rel)) timeout 5.0
+    click id _becky_smalltalk_button_id pos (0.5, 0.5)
+    pause 0.1
+    assert eval (int(Becky.talked_today or 0) == 2 and int(Becky.rel or 0) == int(_becky_expected_rel) and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить разговор"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    pause 0.1
+    assert eval (renpy.get_screen("choice") is not None and "Поболтать со вдовой Блэнкеншип о разной фигне" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _becky_expected_rel = min(3, _becky_expected_rel + (1 if procedural_randint(1, 2, "2_becky_smalltalk_%s" % current_game_day()) == 1 and _becky_expected_rel < 3 else 0))
-    click id _becky_smalltalk_button_id pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 3 and renpy.get_screen("choice") is not None) timeout 20.0
-    assert eval (renpy.get_screen("say") is None and int(Becky.rel or 0) == int(_becky_expected_rel)) timeout 5.0
-    click id _becky_smalltalk_button_id pos (0.5, 0.5) until eval (int(Becky.talked_today or 0) == 4 and renpy.get_screen("choice") is not None) timeout 20.0
-    assert eval (renpy.get_screen("say") is None and int(Becky.rel or 0) == int(_becky_expected_rel) and "Ничего нового из разговора вы не узнали." in str(scene_runtime.text or "")) timeout 5.0
+    click id _becky_smalltalk_button_id pos (0.5, 0.5)
+    pause 0.1
+    assert eval (int(Becky.talked_today or 0) == 3 and int(Becky.rel or 0) == int(_becky_expected_rel) and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить разговор"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    pause 0.1
+    assert eval (renpy.get_screen("choice") is not None and "Поболтать со вдовой Блэнкеншип о разной фигне" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    click id _becky_smalltalk_button_id pos (0.5, 0.5)
+    pause 0.1
+    assert eval (int(Becky.talked_today or 0) == 4 and int(Becky.rel or 0) == int(_becky_expected_rel) and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить разговор"] and "Ничего нового из разговора вы не узнали." in str(scene_runtime.text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    pause 0.1
+    assert eval (renpy.get_screen("choice") is not None and "Поболтать со вдовой Блэнкеншип о разной фигне" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("занята работой" not in str(scene_runtime.text or "")) timeout 5.0
+    $ Becky.talked_today = 0
+    $ Becky.rel = 3
+    $ _becky_personal_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Поболтать с Бекки о более личных вещах")
+    $ _becky_personal_button_id = "choice_panel_button_%d" % int(_becky_personal_index)
+    $ _becky_expected_rel = min(6, 3 + (1 if procedural_randint(1, 2, "0_becky_personal_%s" % current_game_day()) == 1 else 0))
+    click id _becky_personal_button_id pos (0.5, 0.5)
+    pause 0.1
+    assert eval (int(Becky.talked_today or 0) == 1 and int(Becky.rel or 0) == int(_becky_expected_rel) and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить разговор"]) timeout 5.0
+    assert eval (str(scene_runtime.text or "").startswith("Вы некоторое время болтаете с Бекки Блэнкеншип") and "Вернуться на рынок" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    pause 0.1
+    assert eval (renpy.get_screen("choice") is not None and "Поболтать с Бекки о более личных вещах" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ Becky.talked_today = 0
     $ Becky.georgett_mentioned = True
     $ threads["beckyHome"].advanceTo(3, complete_at_end=True)
