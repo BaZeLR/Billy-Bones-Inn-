@@ -5641,6 +5641,16 @@ testcase external_amanda_liza_talk_rows_use_typed_conditions:
     $ Amanda.room_rescue_called = False
     assert eval (not bool(_amanda_liza_kick_row["Condition"]())) timeout 5.0
 
+
+testcase external_init_rule_catalogs_are_save_safe:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and people.get_info("amanda") is not None and people.get_info("liza") is not None) timeout 20.0
+    $ next_day_runtime.current_day["_save_rule_probe"] = {"amanda_liza": list(AmandaLizaTalkRows), "special_cream": SpecialCreamRecipePage, "ellona": EllonaTempleRoomDefinition}
+    $ renpy.save("external-init-rule-catalogs", include_screenshot=False)
+    assert eval (renpy.can_load("external-init-rule-catalogs")) timeout 5.0
+    $ next_day_runtime.current_day.pop("_save_rule_probe", None)
+
 testcase external_amanda_talk_opens_from_npc_button:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -9322,6 +9332,7 @@ def main() -> int:
             "external_clara_flirt_unlocks_paintings_gate",
             "external_amanda_glory_reaction_uses_story_event",
             "external_amanda_liza_talk_rows_use_typed_conditions",
+            "external_init_rule_catalogs_are_save_safe",
             "external_amanda_talk_opens_from_npc_button",
             "external_amanda_daily_talk_actions",
             "external_sandra_talk_opens_from_npc_button",

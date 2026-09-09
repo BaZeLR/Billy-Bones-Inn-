@@ -423,6 +423,9 @@ init 4 python:
             ingredients[str(item_id)] = {"quantity": 1, "unit": "порция"}
         return ingredients
 
+    def special_cream_recipe_available():
+        return bool(crafting.special_cream_recipe_unlocked)
+
     class SoapBatchRecipePage(RecipePage):
         def craft(self, resolved_rows=None):
             rows = list(resolved_rows if resolved_rows is not None else recipe_page_requirement_status(self.recipe_id))
@@ -1161,7 +1164,7 @@ init 4 python:
                 "note": "Для запаха и мягкости подойдет лаванда, дикая роза или редкие травы.",
             },
         },
-        unlock_condition=lambda: bool(crafting.special_cream_recipe_unlocked),
+        unlock_condition=special_cream_recipe_available,
         result_quantity=1,
         notes=[
             "Серджио записал рецепт после того, как его отпустили по делу столичного жениха.",
