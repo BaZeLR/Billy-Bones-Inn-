@@ -65,8 +65,7 @@ def test_home_front_has_no_synthetic_duplicate_objects():
 
     assert "becky_home_back_door" not in FRONT
     assert "becky_home_dark_corner" not in FRONT
-    assert "becky_home_back_door" not in objects
-    assert "becky_home_dark_corner" not in objects
+    assert "GameObject(" not in objects
 
 
 def test_home_front_exterior_has_no_invented_opening_hours():

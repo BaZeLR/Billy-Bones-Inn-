@@ -24,18 +24,24 @@ def test_becky_friday_dance_uses_thread_event_and_object_state():
     invite = _source(BECKY_INVITE)
 
     assert 'LThreadData(0, "becky", "FridayDanceMC"' in runtime
-    assert "BeckyFridayDanceMC" in runtime
-    assert 'BeckyFridayDanceMC = BeckyDanceEvent(' in model
+    becky_thread = runtime.split('LThreadData(0, "becky", "FridayDanceMC"', 1)[1].split(
+        'LThreadData(0, "becky", "SandraKitchenVisit"', 1
+    )[0]
+    assert '"story_becky_friday_dance_mc_0"' in becky_thread
+    assert '["#Becky.friday_dance_base_ready()"]' in becky_thread
+    assert '"FridayDance"' in becky_thread
+    assert '"becky_dance_mc"' in becky_thread
+    assert "True," in becky_thread
     assert 'call checkTriggers("FridayDance", "becky_dance_mc", 0)' in friday
     assert "call int_becky_dance" not in friday
     assert "BeckyVar" not in friday
 
-    assert "class BeckyDanceEvent(Event):" in model
-    assert "return bool(Becky.dance_event_conditions_met(self))" in model
+    assert "class BeckyDanceEvent" not in model
+    assert "define BeckyDanceEvent = Event" in model
     assert "def friday_dance_base_ready(self):" in init
     assert 'location_now == "FridayDance"' in init
     assert 'people_to_int(self.left_dances, 0) == 0' in init
-    assert "def dance_event_conditions_met(self, event_obj):" in init
+    assert "def dance_event_conditions_met" not in init
 
     assert "label story_becky_friday_dance_mc_0:" in dance
     becky_scene = dance.split("label story_becky_friday_dance_mc_0:", 1)[1].split("label int_becky_dance", 1)[0]
@@ -68,6 +74,8 @@ def test_becky_friday_dance_uses_thread_event_and_object_state():
     assert "BeckyVar" not in invite
     assert "setdefault" not in invite
     assert "Becky.update()" not in invite
+    assert 'Becky.stats.get("sexacts"' not in invite
+    assert 'int(threads["beckyHome"].num or 0) >= 2' in invite
 
     accept_branch = dance.split('"Принять предложение вдовы"', 1)[1].split('"Отойти"', 1)[0]
     assert accept_branch.index("main_ui_end_native_scene_state()") < accept_branch.index("call becky_accept_home_invitation")

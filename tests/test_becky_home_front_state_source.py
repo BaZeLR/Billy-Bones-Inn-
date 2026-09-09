@@ -88,3 +88,7 @@ def test_becky_home_entries_replace_foreign_scene_text_before_authored_dialogue(
     assert "$ scene_runtime.location_text = _becky_home_text" in home_entry
     assert "$ scene_runtime.text = rooms.get(\"BeckyHomeFront\").descriptions[1].text" in arrival_event
     assert "$ scene_runtime.location_text = scene_runtime.text" in arrival_event
+    assert arrival_event.index("vscene scene_runtime.picture") < arrival_event.index('"[scene_runtime.text]"')
+    assert front_entry.index("vscene scene_runtime.picture") < front_entry.index(
+        '"[_becky_front_room.descriptions[0].text]"'
+    )

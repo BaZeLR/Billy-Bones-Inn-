@@ -4904,7 +4904,6 @@ testcase external_eddie_fingal_talk_progression:
     $ Eddie.asked_fingal_destination = False
     $ Eddie.asked_fingal_guard_complaint = False
     $ Becky.eddie_robbed_day = max(1, int(current_game_day() or 0))
-    $ Becky.home_visit_stage = 7
     run Call("IntEddieTalk")
     advance until screen "choice" timeout 20.0
     assert eval ("Спросить о синяке." in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
@@ -5548,7 +5547,7 @@ testcase external_becky_home_guest_citydress_gate_and_arrival:
     $ rooms.enter("FridayDance"
 )
     $ rooms.get("FridayDance").state["becky_home_invited"] = True
-    $ Becky.home_visit_stage = 0
+    $ threads["beckyHome"].reset()
     $ player.appearance.current_dress = "citydress"
     $ player.appearance.add_dress("citydress", calendar_v2.daysInGame)
     $ Becky.rel = 15
@@ -5921,7 +5920,7 @@ testcase external_sandra_weekly_thread_progression:
     assert eval (Clara.old_water_pump_hint_seen and Clara.commission_followup_day == 35 and Clara.murder_day == 36 and crafting.special_cream_recipe_unlocked and tractir_progress.sergio_discount_percent == 25) timeout 5.0
     assert eval (not any(key in Clara.var for key in ("flirt", "drawings_secret_known", "market_intro_seen", "market_follow_failed_day", "market_follow_failed_hour", "market_day_roll_day", "market_day_roll", "market_evening_roll_day", "market_evening_roll", "day_location_override", "merchant_contact_unlocked", "merchant_contact_month_key", "old_water_pump_hint_seen", "commission_followup_day", "murder_day", "special_cream_recipe_unlocked", "sergio_discount"))) timeout 5.0
     $ threads["sandraRevealingDressInitiative"].reset()
-    $ Becky.home_visit_stage = 3
+    $ threads["beckyHome"].advanceTo(3, complete_at_end=True)
     $ Sandra.revealing_dress_code = ""
     $ Sandra.rel = 7
     $ Sandra.talked_today = 0
@@ -6814,8 +6813,8 @@ testcase external_hour_based_room_and_npc_schedule_adjustment:
     assert eval (int(_alber_overlap_entry.start_minute or 0) == 11 * 60 and int(_alber_overlap_entry.end_minute or 0) == 12 * 60) timeout 5.0
     $ Becky.rel = 15
     $ Sandra.rel = 15
-    $ Becky.home_sex_unlocked = True
-    $ Becky.home_visit_stage = 2
+    $ threads["beckyHome"].advanceTo(2, force_active=True)
+    $ threads["beckySex"].advanceTo(1, force_active=True)
     python:
         _becky_visit_day = -1
         for _probe_day in range(31, 420):
@@ -7592,17 +7591,18 @@ testcase external_becky_classes_are_initialized:
     assert eval (Becky.cock_in("pussy", "You") and "CockInPussy" not in globals() and "YouCockInMouth" not in globals()) timeout 5.0
     $ Becky.set_cock_position("none", "You")
     assert eval (Becky.wardrobe["current_dress"] == "openworkdress" and Becky.wardrobe["current_underwear"]["bra"] == "simplebra" and Becky.wardrobe["current_underwear"]["panties"] == "simplepanties") timeout 5.0
-    assert eval (all(hasattr(Becky, key) for key in ["home_visit_stage", "home_sex_unlocked", "eddie_home_visit_state", "trade_offer_stage", "knows_blackwood"])) timeout 5.0
-    assert eval (int(Becky.home_visit_stage or 0) == 0 and not Becky.home_sex_unlocked and int(Becky.trade_offer_stage or 0) == 0) timeout 5.0
+    assert eval (all(hasattr(Becky, key) for key in ["eddie_home_visit_state", "trade_offer_stage", "knows_blackwood"])) timeout 5.0
+    assert eval (all(not hasattr(Becky, key) for key in ["home_visit_stage", "home_sex_unlocked", "open_oral_stage", "eddie_join_stage"])) timeout 5.0
+    assert eval (int(threads["beckyHome"].num or 0) == 0 and int(threads["beckySex"].num or 0) == 0 and int(Becky.trade_offer_stage or 0) == 0) timeout 5.0
     assert eval (Becky.getLocation(1, 13 * 60) == "GroceryStore") timeout 5.0
     $ initStoryEventRuntime(True)
-    assert eval (Becky.home_visit_stage == 0) timeout 5.0
+    assert eval (int(threads["beckyHome"].num or 0) == 0) timeout 5.0
     assert eval (str(player.appearance.current_dress or "") != "citydress") timeout 5.0
-    assert eval (not (Becky.home_visit_stage == 2 and Becky.rel > 12 and Becky.talk_count() < 2)) timeout 5.0
-    $ Becky.home_visit_stage = 2
+    assert eval (not (int(threads["beckyHome"].num or 0) >= 2 and Becky.rel > 12 and Becky.talk_count() < 2)) timeout 5.0
+    $ threads["beckyHome"].advanceTo(2, force_active=True)
     $ Becky.rel = 13
     $ Becky.update()
-    assert eval (Becky.home_visit_stage == 2 and Becky.rel > 12 and Becky.talk_count() < 2) timeout 5.0
+    assert eval (int(threads["beckyHome"].num or 0) == 2 and Becky.rel > 12 and Becky.talk_count() < 2) timeout 5.0
     $ Becky.stats["orgasms_given"] = 1
     $ Becky.rel = 14
     $ Becky.talked_today = 0
@@ -7668,7 +7668,7 @@ testcase external_becky_eddie_opinions_remain_parallel_repeatable_topics:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
     $ Becky.georgett_mentioned = True
-    $ Becky.home_visit_stage = 3
+    $ threads["beckyHome"].advanceTo(3, complete_at_end=True)
     $ Becky.corruption = 60
     $ Becky.talked_today = 0
     run Call("IntBeckyTalk", "becky")
@@ -7698,10 +7698,7 @@ testcase external_becky_sherwood_followups_use_branch_state_not_threads:
     assert eval ("Насчет твоего предложения, в чем там все-таки дело?" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _becky_offer_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Насчет твоего предложения, в чем там все-таки дело?")
     $ _becky_offer_button_id = "choice_panel_button_%s" % _becky_offer_index
-    click id _becky_offer_button_id pos (0.5, 0.5) until eval (int(Becky.trade_offer_stage or 0) == 1 and renpy.get_screen("choice") is None) timeout 20.0
-    $ Becky.talked_today = 0
-    run Call("IntBeckyTalk", "becky")
-    advance until screen "choice" timeout 20.0
+    click id _becky_offer_button_id pos (0.5, 0.5) until eval (int(Becky.trade_offer_stage or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval ("А чего ты сама с эльфами не торгуешь?" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval (all(name not in threads for name in ("beckySherwoodOfferTalk", "beckySherwoodElvesTalk", "beckySherwoodRoadTalk", "beckySherwoodRobbedTalk"))) timeout 5.0
 
@@ -7729,7 +7726,7 @@ testcase external_becky_inga_lucas_thread_from_native_homefront_menu:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
     $ external_calendar_set_fields(2, 1, CALENDAR_START_CYCLE, 20, 0)
     $ Becky.home_front_checked_today = False
-    $ Becky.home_visit_stage = 1
+    $ threads["beckyHome"].advanceTo(1, force_active=True)
     $ Becky.talked_today = 0
     $ initStoryEventRuntime(True)
     assert eval (int(threads["beckyIngaLucasPath"].num or 0) == 0) timeout 5.0
@@ -7803,7 +7800,7 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     assert eval ("занята работой" not in str(scene_runtime.text or "")) timeout 5.0
     $ Becky.talked_today = 0
     $ Becky.georgett_mentioned = True
-    $ Becky.home_visit_stage = 3
+    $ threads["beckyHome"].advanceTo(3, complete_at_end=True)
     $ Becky.corruption = 0
     $ Becky.priest_advice_stage = 0
     $ Becky.eddie_intervention_reaction = 0
@@ -7818,7 +7815,7 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     click id _becky_offer_button_id pos (0.5, 0.5) until eval (int(Becky.trade_offer_stage or 0) == 1 and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "talk" and int(Becky.talked_today or 0) == 1) timeout 5.0
     assert eval ("А чего ты сама с эльфами не торгуешь?" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Насчет твоего предложения, в чем там все-таки дело?" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    assert eval (Becky.georgett_mentioned and Becky.home_visit_stage < 7 and Becky.talk_count() < 2 and Becky.corruption <= 35 and Becky.priest_advice_stage == 0) timeout 5.0
+    assert eval (Becky.georgett_mentioned and not threads["beckyEddieSex"].completed and Becky.talk_count() < 2 and Becky.corruption <= 35 and Becky.priest_advice_stage == 0) timeout 5.0
     $ _becky_eddie_advice_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Посоветовать Бекки быть повнимательнее к нуждам Эдди")
     $ _becky_eddie_advice_button_id = "choice_panel_button_%d" % int(_becky_eddie_advice_index)
     click id _becky_eddie_advice_button_id pos (0.5, 0.5) until screen "say" timeout 20.0

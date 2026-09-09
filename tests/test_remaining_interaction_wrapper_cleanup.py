@@ -85,7 +85,6 @@ def test_called_object_menus_restore_hud_without_reentering_rooms():
         ("game/Inn/TavernSandraRoom.rpy", "TavernSandraRoomObjectMenu", "TavernSandraRoom"),
         ("game/Inn/TavernStable.rpy", "tavern_stable_object_menu", "TavernStable"),
         ("game/Town/Arts/ArtisansQuarter.rpy", "ArtisansQuarterObjectMenu", "ArtisansQuarter"),
-        ("game/Town/BeckyHome.rpy", "BeckyHomeObjectMenu", "BeckyHome"),
     )
 
     for relative, label_name, room_label in cases:

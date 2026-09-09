@@ -28,7 +28,7 @@ def test_literal_game_object_ids_are_globally_unique():
     assert duplicates == {}, duplicates
 
 
-def test_becky_rooms_reference_their_registered_object_owners():
+def test_becky_rooms_do_not_register_invented_object_actions():
     home = (GAME / "Town" / "BeckyHome.rpy").read_text(encoding="utf-8-sig")
     front = (GAME / "Town" / "BeckyHomeFront.rpy").read_text(encoding="utf-8-sig")
     objects = (GAME / "Town" / "BeckyHomeObjects.rpy").read_text(encoding="utf-8-sig")
@@ -38,14 +38,12 @@ def test_becky_rooms_reference_their_registered_object_owners():
         "becky_home_chests",
         "becky_home_dinner_table",
     ):
-        assert f'"{object_id}"' in home
-        assert f'object_id="{object_id}"' in objects
+        assert object_id not in home
 
     for object_id in ("becky_home_back_door", "becky_home_dark_corner"):
         assert f'"{object_id}"' not in front
-        assert f'object_id="{object_id}"' not in objects
+    assert "GameObject(" not in objects
 
     assert "GameObject(" not in home
     assert "GameObject(" not in front
     assert "becky_homefront_peek_available" not in front
-    assert "condition=becky_homefront_peek_available" not in objects

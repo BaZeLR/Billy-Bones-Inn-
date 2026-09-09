@@ -15,9 +15,9 @@ label BeckyInviteHome(girl_name="becky"):
             "Закрыть видео":
                 pass
         vscene _becky_dance_picture_before_invite
-        if int(threads["beckyHome"].num or 0) > 0 and Becky.stats.get("sexacts", 0) > 0 and Becky.corruption > 48:
+        if int(threads["beckyHome"].num or 0) >= 2 and Becky.corruption > 48:
             "Стефан, милый, чем нам здесь танцевать, пойдем-ка лучше ко мне, я уже вся теку!" # развратная вдовушка
-        elif int(threads["beckyHome"].num or 0) > 0 and Becky.stats.get("sexacts", 0) > 0:
+        elif int(threads["beckyHome"].num or 0) >= 2:
             "Стефан, милый, а может пойдем ко мне, ну, помнишь, как в прошлый раз?" # Бекки, глядя прямо в глаза
         else:
             "Стефан, а может ко мне в гости зайдешь, вина немного выпьем?" # неожиданно приглашает вдовушка

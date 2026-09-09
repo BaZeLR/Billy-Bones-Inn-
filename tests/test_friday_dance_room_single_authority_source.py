@@ -175,12 +175,19 @@ def test_npc_room_schedule_relationship_uses_the_room_api_directly():
 def test_friday_dance_venue_schedule_is_the_only_event_time_authority():
     amanda_model = AMANDA_DANCE_MODEL.read_text(encoding="utf-8-sig")
     becky_model = BECKY_DANCE_MODEL.read_text(encoding="utf-8-sig")
+    runtime = (GAME / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
 
-    for model in (amanda_model, becky_model):
-        event_tuple = model.split("super(", 1)[1].split("self.event_name", 1)[0]
-        assert "                    None,\n                    None," in event_tuple
-        assert "(18, 21)" not in model
-        assert "def canTrigger(" not in model
+    amanda_event_tuple = amanda_model.split("super(", 1)[1].split("self.event_name", 1)[0]
+    assert "                    None,\n                    None," in amanda_event_tuple
+    assert "(18, 21)" not in amanda_model
+    assert "def canTrigger(" not in amanda_model
+
+    becky_event = runtime.split('LThreadData(0, "becky", "FridayDanceMC"', 1)[1].split(
+        'LThreadData(0, "becky", "SandraKitchenVisit"', 1
+    )[0]
+    assert "None, None, None," in becky_event
+    assert "(18, 21)" not in becky_event
+    assert "class BeckyDanceEvent" not in becky_model
 
     assert "def becky_dance_event(" not in becky_model
 
@@ -189,7 +196,7 @@ def test_friday_dance_partner_objects_own_only_personal_eligibility():
     amanda = AMANDA_INFO.read_text(encoding="utf-8-sig")
     becky = BECKY_INFO.read_text(encoding="utf-8-sig")
     amanda_ready = amanda.split("def friday_dance_base_ready(self):", 1)[1].split("def friday_dance_legare_row", 1)[0]
-    becky_ready = becky.split("def friday_dance_base_ready(self):", 1)[1].split("def dance_event_conditions_met", 1)[0]
+    becky_ready = becky.split("def friday_dance_base_ready(self):", 1)[1].split("define BeckyStaticData", 1)[0]
 
     for ready in (amanda_ready, becky_ready):
         assert 'rooms.get("FridayDance").is_open()' not in ready

@@ -69,6 +69,7 @@ class StoryEvent:
     action: str
     item: str
     priority: int
+    repeatable: object
     raw_len: int
 
 
@@ -212,6 +213,7 @@ def event_from_tuple(node: ast.Tuple, list_name: str, thread_name: str, construc
     location = ast_const(node.elts[8], "")
     action = ast_const(node.elts[9], "")
     priority = ast_const(node.elts[10], 0)
+    repeatable = ast_literal(node.elts[11], False) if len(node.elts) > 11 else False
     return StoryEvent(
         list_name=list_name,
         thread=thread_name,
@@ -227,6 +229,7 @@ def event_from_tuple(node: ast.Tuple, list_name: str, thread_name: str, construc
         action=str(action or ""),
         item=str(item or ""),
         priority=int(priority or 0),
+        repeatable=repeatable,
         raw_len=len(node.elts),
     )
 
@@ -368,8 +371,8 @@ def valid_reqs(value: object) -> bool:
 def validate_event_schema(events: list[StoryEvent], report: RuntimeLogicReport) -> None:
     for event in events:
         name = event_type_name(event)
-        if event.raw_len != 11:
-            report.fail("event_schema", f"{name}: event tuple has {event.raw_len} fields, expected exactly 11")
+        if event.raw_len not in (11, 12):
+            report.fail("event_schema", f"{name}: event tuple has {event.raw_len} fields, expected 11 or 12")
         if not event.target:
             report.fail("event_schema", f"{name}: empty target label")
         if not valid_time_spec(event.day):
@@ -390,6 +393,8 @@ def validate_event_schema(events: list[StoryEvent], report: RuntimeLogicReport) 
             report.fail("event_schema", f"{name}: action must be a string")
         if not isinstance(event.priority, int):
             report.fail("event_schema", f"{name}: priority must be an int")
+        if not isinstance(event.repeatable, bool):
+            report.fail("event_schema", f"{name}: repeatable must be a bool")
     report.pass_("event_schema", f"validated {len(events)} event tuple field sets")
 
 

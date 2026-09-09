@@ -58,6 +58,19 @@ def test_becky_personal_story_facts_are_explicit_object_properties():
     assert "self.ensure_story_defaults()" not in info
 
 
+def test_becky_authored_gift_preferences_include_furs_and_soap():
+    data = INIT.split("class BeckyData", 1)[1].split("class BeckyInfo", 1)[0]
+
+    for item_code in (
+        "soap_001",
+        "wolf_skin_001",
+        "white_wolf_skin_001",
+        "bear_fur_brown_001",
+        "bear_fur_grizzly_001",
+    ):
+        assert f'"{item_code}"' in data
+
+
 def test_live_runtime_has_no_becky_story_map_or_generic_map_access():
     live_source = "\n".join(
         path.read_text(encoding="utf-8-sig")

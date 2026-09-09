@@ -45,13 +45,6 @@ init python:
     def becky_home_desc_special():
         return rooms.get("BeckyHomeFront").state["arrival_mode"] in ("SvalnyiGreh", "FromDinner")
 
-    def becky_home_table_visible():
-        return rooms.get("BeckyHomeFront").state["arrival_mode"] == ""
-
-    def becky_home_action_items():
-        sections = rooms.get("BeckyHome").build_menu_sections()
-        return list(sections.get("movement", [])) + list(sections.get("actions", []))
-
     BeckyHomeRoomDefinition = Room(
         code_name="BeckyHome",
         group_name=ROOM_GROUP_CITY,
@@ -77,15 +70,9 @@ init python:
         exits=[
             RoomExit(label="Вернуться к трактиру", target="StreetTavern"),
         ],
-        game_items=[
-            "becky_home_bed",
-            "becky_home_chests",
-            "becky_home_dinner_table",
-        ],
-        schedule=RoomSchedule(weekdays=[1, 2, 3, 4, 5, 6, 7], start="06:00", end="17:59"),
+        game_items=[],
         custom_properties={
             "becky_house": True,
-            "object_menu_label": "BeckyHomeObjectMenu",
         },
     )
 
@@ -96,6 +83,7 @@ label BeckyHome(arrive_mode=""):
     $ rooms.enter("BeckyHome")
     $ Eddie.set_sex_stat("group_sex", 1 if arrive_mode == "SvalnyiGreh" else 0)
     $ scene_runtime.picture = becky_home_picture(rooms.get("BeckyHomeFront").state["arrival_mode"])
+    vscene scene_runtime.picture
     $ _becky_home_text = _becky_home_room.visible_descriptions()[0].text
     $ scene_runtime.text = _becky_home_text
     $ scene_runtime.location_text = _becky_home_text
@@ -106,15 +94,15 @@ label BeckyHome(arrive_mode=""):
 
     $ _start_becky_sex = False
     if arrive_mode == 'FromDances' and int(threads["beckyDinner"].num or 0) < 2:
-        "[_becky_home_room.descriptions[1].text] <br>Вы и миссис Блэнкеншип находитесь в ее спальне."
+        "[_becky_home_room.descriptions[1].text]\nВы и миссис Блэнкеншип находитесь в ее спальне."
         call ShowImageSeq('becky', 'sex', 'inroom', 3)
         $ _start_becky_sex = True
     elif arrive_mode == 'SvalnyiGreh':
         call IntEddieBeckySex
-        "[_becky_home_room.descriptions[2].text] <br>Вы и миссис Блэнкеншип находитесь в ее спальне.<br>Вместе с вами находится Эдди, ее управляющий лавкой. Им движут к хозяйке отнюдь не деловые чувства."
+        "[_becky_home_room.descriptions[2].text]\nВы и миссис Блэнкеншип находитесь в ее спальне.\nВместе с вами находится Эдди, ее управляющий лавкой. Им движут к хозяйке отнюдь не деловые чувства."
         $ _start_becky_sex = True
     elif arrive_mode == 'FromDinner':
-        "<br><br>[_becky_home_room.descriptions[2].text] "
+        "[_becky_home_room.descriptions[2].text]"
         if story_event_available("BeckyHome", "enter"):
             call checkTriggers("BeckyHome", "enter", 0)
         else:
@@ -128,17 +116,17 @@ label BeckyHome(arrive_mode=""):
     else:
         $ _becky_admitted = False
         if arrive_mode == 'FromDances':
-            "Ребекка завозилась с ключами, отпирая дверь. Это у нее заняло немного дольше времени, чем должно бы, так как вы все время игриво залазили ей под юбку, отвлекая ее от поисков нужного ключа. Наконец дверь отворилась и Бекки пригласила вас в дом: <br>'Заходи, Стефан, и пожалуй за стол.' "
+            "Ребекка завозилась с ключами, отпирая дверь. Это у нее заняло немного дольше времени, чем должно бы, так как вы все время игриво залазили ей под юбку, отвлекая ее от поисков нужного ключа. Наконец дверь отворилась и Бекки пригласила вас в дом:\n'Заходи, Стефан, и пожалуй за стол.' "
             $ _becky_admitted = True
         else:
             "[_becky_home_room.descriptions[0].text] "
             if int(threads["beckyHome"].num or 0) < 3:
                 if not Becky.uninvited_visit_scolded:
-                    "Она не очень-то была рада вашему визиту: 'Стефан, зачем ты пришел?! Мы же договаривались! Надеюсь, тебя никто не видел?' <br> 'Никто,' сказали вы глядя на вдову своими честными глазами. 'Но я просто хотел...' <br> Бекки однако, ваше желание мало интересовало. Она резко прервала вас: 'Не приходи больше, что люди подумают. Все, пока.'<br> И дверь перед вашим носом захлопнулась.  "
+                    "Она не очень-то была рада вашему визиту: 'Стефан, зачем ты пришел?! Мы же договаривались! Надеюсь, тебя никто не видел?'\n'Никто,' сказали вы глядя на вдову своими честными глазами. 'Но я просто хотел...'\nБекки однако, ваше желание мало интересовало. Она резко прервала вас: 'Не приходи больше, что люди подумают. Все, пока.'\nИ дверь перед вашим носом захлопнулась.  "
                     $ Becky.uninvited_visit_scolded = True
                     $ Becky.apply_social_roll(8, 3, -1, 35, 3, -1)
                 else:
-                    "Увидев вас она рассердилась не на шутку: 'Стефан, тебе что, все нужно по 20 раз повторять?! Не приходи пока ко мне домой.' <br> 'Но я,' начали оправдываться вы, но поняли, что разговариваете с закрытой дубовой дверью. Изнутри послышался звук запираемого засова. Похоже, сейчас вам здесь не очень-то рады. "
+                    "Увидев вас она рассердилась не на шутку: 'Стефан, тебе что, все нужно по 20 раз повторять?! Не приходи пока ко мне домой.'\n'Но я,' начали оправдываться вы, но поняли, что разговариваете с закрытой дубовой дверью. Изнутри послышался звук запираемого засова. Похоже, сейчас вам здесь не очень-то рады. "
                     $ Becky.apply_social_roll(8, 1, -1, 35, 1, -1)
                 menu:
                     "В печали вернуться к трактиру":
@@ -179,7 +167,7 @@ label BeckyHome(arrive_mode=""):
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = str(rooms.current.display_name or "Дом Бекки")
     $ main_ui_runtime.action_content = None
-    $ main_ui_runtime.action_items = becky_home_action_items()
+    $ main_ui_runtime.action_items = _becky_home_room.build_exit_items()
     while True:
         call screen main_ui
 
@@ -192,75 +180,7 @@ label BeckyHomeAfterSex:
     $ scene_runtime.location_text = scene_runtime.text
     $ main_ui_runtime.action_title = str(rooms.get("BeckyHome").display_name or "Дом Бекки")
     $ main_ui_runtime.action_content = None
-    $ main_ui_runtime.action_items = becky_home_action_items()
+    $ main_ui_runtime.action_items = rooms.get("BeckyHome").build_exit_items()
     while True:
         call screen main_ui
-
-
-label BeckyHomeObjectMenu(object_id=""):
-    $ renpy.dynamic("_becky_home_object", "_room_object", "_becky_action", "_becky_args")
-    if str(object_id or "") != "":
-        $ main_ui_runtime.object_id = object_id
-    $ object_id = main_ui_runtime.object_id
-    $ _becky_home_object = None
-    python:
-        for _room_object in rooms.get("BeckyHome").visible_objects():
-            if getattr(_room_object, "object_id", "") == str(object_id or ""):
-                _becky_home_object = _room_object
-                break
-
-    if _becky_home_object is None:
-        $ scene_runtime.text = becky_home_restore_text()
-        $ scene_runtime.location_text = scene_runtime.text
-        $ main_ui_runtime.action_title = str(rooms.get("BeckyHome").display_name or "Дом Бекки")
-        $ main_ui_runtime.action_content = None
-        $ main_ui_runtime.action_items = becky_home_action_items()
-        return
-
-    $ main_ui_runtime.action_title = str(_becky_home_object.name or "Дом Бекки")
-    $ main_ui_runtime.action_content = None
-    $ main_ui_runtime.action_items = []
-    $ scene_runtime.text = str(_becky_home_object.description or "")
-    $ scene_runtime.location_text = scene_runtime.text
-    python:
-        for _becky_action in _becky_home_object.visible_actions():
-            _becky_args = tuple(getattr(_becky_action, "args", ()) or ())
-            if _becky_action.hook == "text":
-                main_ui_runtime.action_items.append(MenuItem(_becky_action.label, Call("BeckyHomeObjectText", object_id, _becky_action.action_id)))
-            elif _becky_action.hook == "call" and str(_becky_action.target or "") != "":
-                main_ui_runtime.action_items.append(MenuItem(_becky_action.label, Call(_becky_action.target, *_becky_args)))
-            elif _becky_action.hook == "jump" and str(_becky_action.target or "") != "":
-                main_ui_runtime.action_items.append(MenuItem(_becky_action.label, Jump(_becky_action.target)))
-        main_ui_runtime.action_items.append(MenuItem("Назад", [
-            SetField(scene_runtime, "picture", rooms.get("BeckyHome").bg_picture),
-            SetField(scene_runtime, "text", becky_home_restore_text()),
-            SetField(scene_runtime, "location_text", becky_home_restore_text()),
-            SetField(main_ui_runtime, "action_title", str(rooms.get("BeckyHome").display_name or "Дом Бекки")),
-            SetField(main_ui_runtime, "action_content", None),
-            SetField(main_ui_runtime, "action_items", becky_home_action_items()),
-            Function(main_ui_restart_interaction),
-        ]))
-    return
-
-
-label BeckyHomeObjectText(object_id="", action_id=""):
-    $ renpy.dynamic("_becky_name", "_becky_text", "_room_action", "_room_object")
-    python:
-        _becky_text = ""
-        _becky_name = ""
-        for _room_object in rooms.get("BeckyHome").visible_objects():
-            if getattr(_room_object, "object_id", "") != str(object_id or ""):
-                continue
-            _becky_name = str(getattr(_room_object, "name", "") or "")
-            for _room_action in _room_object.visible_actions():
-                if getattr(_room_action, "action_id", "") == str(action_id or ""):
-                    _becky_text = str(_room_action.target or "")
-                    break
-            break
-        if _becky_text:
-            scene_runtime.text = _becky_text
-            scene_runtime.location_text = _becky_text
-            main_ui_runtime.action_title = _becky_name or "Дом Бекки"
-    call BeckyHomeObjectMenu(object_id)
-    return
 

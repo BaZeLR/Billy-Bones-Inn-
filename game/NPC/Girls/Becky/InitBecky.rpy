@@ -14,7 +14,17 @@ init python:
                 dative="Бекки",
                 default_location="",
                 description="Вдова Блэнкеншип, для друзей Бекки, высокая рыжеволосая женщина с полной грудью, чуть младше сорока лет.",
-                gift_preferences=["soap_001", "wild_rose_001", "pig_lard_001", "libido_tincture_001", "drink_ale_001"],
+                gift_preferences=[
+                    "soap_001",
+                    "wolf_skin_001",
+                    "white_wolf_skin_001",
+                    "bear_fur_brown_001",
+                    "bear_fur_grizzly_001",
+                    "wild_rose_001",
+                    "pig_lard_001",
+                    "libido_tincture_001",
+                    "drink_ale_001",
+                ],
             )
             # Original Becky init only defines age 36. This keeps that age at game start until a canonical birthday is written.
             self.birth_date = {"day": 1, "period": 1, "cycle": 1064}
@@ -291,12 +301,6 @@ init python:
                 and people_to_int(rooms.get("FridayDance").dance_count, 0) < 5
                 and people_to_int(rooms.get("FridayDance").step, 0) == 0
             )
-
-        def dance_event_conditions_met(self, event_obj):
-            partner = str(getattr(event_obj, "partner", "") or "")
-            if partner == "mc":
-                return self.friday_dance_base_ready()
-            return False
 
 define BeckyStaticData = BeckyData()
 default Becky = BeckyInfo()

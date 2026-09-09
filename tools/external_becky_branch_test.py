@@ -231,6 +231,26 @@ testcase friday_dance_find_becky_opens_becky_dance:
     assert eval (int(rooms.get("FridayDance").dance_count or 0) == 1) timeout 5.0
     run Jump("StreetTavern")
 
+testcase becky_evening_georgette_visit_is_reachable:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 2
+        calendar_v2.hour = 20
+        calendar_v2.minute = 0
+        rooms.enter("BeckyHome")
+        threads["beckyDinner"].reset()
+        threads["beckyDinner"].advanceTo(2, force_active=True)
+        threads["beckySex"].reset()
+        threads["beckySex"].advanceTo(1, force_active=True)
+        Becky.eddie_home_visit_state = 4
+        Eddie.saw_mother_sex = True
+        TodaySexEvents_Clear()
+        TodaySexEvents_Add("georgett", 99, 99, "EddieHomeVisit")
+        initStoryEventRuntime(True)
+    assert eval (rooms.get("BeckyHome").is_open()) timeout 5.0
+    assert eval (story_event_available("BeckyHome", "georgett_home_visit")) timeout 5.0
+
 testcase becky_legacy_progress_migrates_to_threads:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0

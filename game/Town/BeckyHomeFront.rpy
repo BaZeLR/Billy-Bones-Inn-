@@ -34,9 +34,6 @@ init python:
     def becky_homefront_dance_desc():
         return rooms.get("BeckyHomeFront").state["arrival_mode"] == "FromDances"
 
-    def becky_homefront_guest_exit():
-        return rooms.get("BeckyHomeFront").state["arrival_mode"] == "guest"
-
     BeckyHomeFrontRoomDefinition = Room(
         code_name="BeckyHomeFront",
         group_name=ROOM_GROUP_CITY,
@@ -54,10 +51,7 @@ init python:
                 priority=210,
             ),
         ],
-        exits=[
-            RoomExit(label="Зайти в дом", target="BeckyHome"),
-            RoomExit(label="Вернуться к трактиру", target="StreetTavern", condition=becky_homefront_guest_exit),
-        ],
+        exits=[],
         game_items=[],
         custom_properties={
             "house_front": True,
@@ -95,10 +89,11 @@ init python:
 
 # First-time dance arrival is the opening event of Becky's home thread.
 label story_becky_home_arrival_0:
+    $ scene_runtime.picture = becky_homefront_withbecky_picture()
+    vscene scene_runtime.picture
     $ scene_runtime.text = rooms.get("BeckyHomeFront").descriptions[1].text
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
-    call ShowImage("", "", becky_homefront_withbecky_picture())
     $ event_runtime.active_thread.advance()
     return
 
@@ -127,11 +122,13 @@ label BeckyHomeFront(arrive_mode=""):
         if story_event_available("BeckyHomeFront", "enter"):
             call checkTriggers("BeckyHomeFront", "enter", 0)
         else:
+            $ scene_runtime.picture = becky_homefront_withbecky_picture()
+            vscene scene_runtime.picture
             "[_becky_front_room.descriptions[1].text]"
-            call ShowImage("", "", becky_homefront_withbecky_picture())
     else:
+        $ scene_runtime.picture = becky_homefront_house_picture()
+        vscene scene_runtime.picture
         "[_becky_front_room.descriptions[0].text]"
-        call ShowImage("", "", becky_homefront_house_picture())
     $ _becky_front_room.mark_visited()
 
     if rooms.get("BeckyHomeFront").state["inga_scene_roll"] <= 3:

@@ -1013,7 +1013,18 @@ define claraThreadList = [
 ]
 define beckyThreadList = [
     LThreadData(0, "becky", "FridayDanceMC", None, [
-        BeckyFridayDanceMC,
+        (
+            "story_becky_friday_dance_mc_0",
+            None, None, None,
+            1,
+            None,
+            ["#Becky.friday_dance_base_ready()"],
+            None,
+            "FridayDance",
+            "becky_dance_mc",
+            10,
+            True,
+        ),
     ], highlight=False, threaded=False),
     LThreadData(0, "becky", "SandraKitchenVisit", None, [
         (
@@ -1155,7 +1166,7 @@ define beckyThreadList = [
     ], highlight=False, threaded=True),
     LThreadData(0, "becky", "HusbandBackstory", [
         "#int(Becky.stats.get('orgasms_given', 0) or 0) > 0",
-        "#int(Becky.stats.get('sexacts', 0) or 0) > 0",
+        "#int(threads['beckyHome'].num or 0) >= 2",
     ], [
         ("story_becky_talk_husband_0", None, None, None, 1, None, [
             "#Becky.rel > 13",
