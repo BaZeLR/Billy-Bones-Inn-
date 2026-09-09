@@ -161,7 +161,7 @@ label BeckyHome(arrive_mode=""):
         call CockPosition(GirlName, 0)
         call check_visibility(GirlName)
         call IntBeckySex(GirlName)
-        return
+        jump BeckyHomeAfterSex
     $ scene_runtime.picture = _becky_home_room.bg_picture
     $ scene_runtime.text = becky_home_restore_text()
     $ scene_runtime.location_text = scene_runtime.text

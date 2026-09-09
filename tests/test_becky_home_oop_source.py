@@ -26,6 +26,7 @@ def test_becky_home_preserves_arrival_story_without_invented_objects():
     assert 'call checkTriggers("BeckyHome", "enter", 0)' in SOURCE
     assert "call IntBeckyGuest" in SOURCE
     assert "call IntBeckySex(GirlName)" in SOURCE
+    assert "call IntBeckySex(GirlName)\n        jump BeckyHomeAfterSex" in SOURCE
     assert 'threads["beckyHome"].advanceTo(2, force_active=True)' in SOURCE
     assert 'rooms.get("BeckyHome").build_exit_items()' in SOURCE
     assert "label BeckyHomeObjectMenu" not in SOURCE

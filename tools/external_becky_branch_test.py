@@ -197,6 +197,27 @@ testcase becky_from_dance_blowjob_uses_oop_group_state:
     advance until screen "choice" timeout 20.0
     assert eval (Becky.cock_in("mouth", "You") and int(Eddie.sex_stat("group_sex", 0) or 0) == 0) timeout 5.0
 
+testcase becky_from_dance_sex_finish_stays_in_becky_home:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 5
+        calendar_v2.hour = 20
+        calendar_v2.minute = 0
+        threads["beckyDinner"].reset()
+        rooms.get("BeckyHomeFront").state["arrival_mode"] = "FromDances"
+        Becky.set_sex_busy(False)
+        Becky.set_cock_position("none", "You")
+        Becky.set_cock_position("none", "eddie")
+        Eddie.set_sex_stat("group_sex", 0)
+    run Call("BeckyHome", "FromDances")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(rooms.current_code or "") == "BeckyHome") timeout 5.0
+    $ _becky_finish_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Закончить")
+    click id ("choice_panel_button_%d" % int(_becky_finish_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(rooms.current_code or "") == "BeckyHome" and str(scene_runtime.text or "") == str(becky_home_restore_text() or "")) timeout 20.0
+    assert eval (str(rooms.current_code or "") == "BeckyHome") timeout 5.0
+    assert eval (str(scene_runtime.text or "") == str(becky_home_restore_text() or "")) timeout 5.0
+
 testcase becky_group_session_exit_clears_oop_state:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
