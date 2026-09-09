@@ -47,7 +47,7 @@ def test_church_attendance_does_not_mutate_npc_relationship_stats():
 def test_sunday_service_npc_schedules_match_the_church_clock_phase():
     schedule_dir = PROJECT_ROOT / "game" / "NPC" / "Schedules"
 
-    for npc_id in ("amanda", "melissa", "sandra", "becky", "alber", "georgett", "liza"):
+    for npc_id in ("amanda", "melissa", "sandra", "becky", "alber", "eddie", "georgett", "liza"):
         payload = json.loads((schedule_dir / (npc_id + ".json")).read_text(encoding="utf-8-sig"))
         church_entries = [
             row for row in payload["entries"]
@@ -98,9 +98,13 @@ def test_church_room_phase_pictures_use_church_folder_vscene_assets():
 def test_blanken_family_service_action_uses_its_defined_picture_resolver():
     source = _source(CHURCH_ROOM)
     service = source.split("label ChurchServiceBlanken:", 1)[1].split("label becky_church_talk:", 1)[0]
+    resolver = source.split("def church_blanken_picture():", 1)[1].split("\n    def ", 1)[0]
 
     assert "$ _church_picture = church_blanken_picture()" in service
     assert "church_blacken_picture" not in source
+    assert '"images/becky/church/cermon.png"' in resolver
+    assert '"images/becky/church/cermon.jpg"' not in resolver
+    assert '"images/becky/church/talk1.jpg"' not in resolver
 
 
 def test_church_location_files_do_not_use_old_general_church_pictures():
@@ -124,8 +128,10 @@ def test_church_event_rows_show_same_clock_gate_conditions():
     assert '"ChurchServiceDoggy"' not in runtime
     assert '"ChurchServiceWithLiza"' not in runtime
     assert 'if player.intimacy.can_cum() and Georgett.can_have_sex_today() and people_to_int(Georgett.rel, 0) >= 2' in georgett_service
-    assert "church_after_cermon_action_visible()" in people_runtime
+    assert "church_after_sermon_event_available" not in people_runtime
     assert '"#church_after_cermon_action_visible()"' not in runtime
+    assert '"#Georgett.can_trigger_after_sermon_event()"' in runtime
+    assert '"#Liza.can_trigger_after_sermon_event()"' in runtime
     assert '7, (11, 12), None' in runtime[runtime.find("define georgettThreadList"):]
     assert '7, (6, 7), None' not in runtime[runtime.find("define georgettThreadList"):]
 
@@ -138,14 +144,15 @@ def test_becky_after_ceremony_is_thread_event_with_clock_conditions():
     people_runtime = _source(PEOPLE_RUNTIME)
     finish_day = _source(FINISH_DAY)
 
-    assert "def church_after_sermon_event_available" in people_runtime
+    assert "def church_after_sermon_event_available" not in people_runtime
     assert "def church_after_sermon_event_available" not in becky_init
     assert "def can_trigger_after_sermon_event" in becky_init
     assert '"story_becky_church_after_sermon"' in runtime
     becky_thread = runtime.split('"story_becky_church_after_sermon"', 1)[1].split('define eddieThreadList', 1)[0]
     assert '7, (11, 12), None' in becky_thread
     assert "clock_minutes" not in becky_thread
-    assert '"#Becky.church_after_sermon_event_available()"' in runtime
+    assert '"#Becky.can_trigger_after_sermon_event()"' in runtime
+    assert '"#int(Becky.priest_advice_stage or 0) not in (1, 2)"' in runtime
     assert "church_after_cermon_event_roll" not in runtime
     assert "church_after_cermon_event_roll" not in _source(CHURCH_ROOM)
     assert "#CheckIfSexEventExist('becky', 99, 'Priest') > 0" not in becky_thread

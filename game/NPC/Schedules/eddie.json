@@ -41,6 +41,19 @@
       }
     },
     {
+      "label": "sunday_service",
+      "weekdays": [7],
+      "start": "08:00",
+      "end": "09:29",
+      "location": "Church",
+      "awake": true,
+      "talkable": false,
+      "priority": 760,
+      "condition": {
+        "rule": "eddie_in_town"
+      }
+    },
+    {
       "label": "port_whores_evening",
       "weekdays": [2, 4],
       "start": "20:00",

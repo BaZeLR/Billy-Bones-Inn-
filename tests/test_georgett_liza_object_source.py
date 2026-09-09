@@ -545,7 +545,7 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     confession = _source(CHURCH_ISPOVED)
     next_day = _source(NEXT_DAY_NEW_EVENTS)
 
-    assert "def church_after_sermon_event_available" in people_runtime
+    assert "def church_after_sermon_event_available" not in people_runtime
     assert "def church_after_sermon_event_available" not in georgett
     assert "def church_after_sermon_event_available" not in liza
     assert "after_sermon_stage" not in georgett
@@ -553,16 +553,15 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     assert "def can_trigger_after_sermon_event" in georgett
     assert "def can_trigger_after_sermon_event" in liza
     assert "def can_trigger_church_service_event" not in liza
-    after_sermon_availability = people_runtime.split("def church_after_sermon_event_available", 1)[1].split("def sex_clothing_state", 1)[0]
-    assert "CheckIfSexEventExist" not in after_sermon_availability
     assert 'CheckIfSexEventExist(self.code_name, 99, "Priest")' not in georgett
     assert 'CheckIfSexEventExist(self.code_name, 99, "Priest")' not in liza
 
     assert '"story_georgett_church_after_sermon"' in runtime
     assert '"story_liza_church_after_sermon"' in runtime
     assert '"after_cermon_walk"' in runtime
-    assert '"#Georgett.church_after_sermon_event_available()"' in runtime
-    assert '"#Liza.church_after_sermon_event_available()"' in runtime
+    assert '"#Georgett.can_trigger_after_sermon_event()"' in runtime
+    assert '"#Liza.can_trigger_after_sermon_event()"' in runtime
+    assert runtime.count('"#int(Becky.priest_advice_stage or 0) not in (1, 2)"') == 2
     assert "church_after_cermon_event_roll" not in runtime
     georgett_after = runtime.split('"story_georgett_church_after_sermon"', 1)[1].split('define franThreadList', 1)[0]
     liza_after = runtime.split('"story_liza_church_after_sermon"', 1)[1].split('define georgettThreadList', 1)[0]

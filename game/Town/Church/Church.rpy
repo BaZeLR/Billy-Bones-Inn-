@@ -24,9 +24,7 @@ init python:
 
     def church_blanken_picture():
         return church_pick_picture([
-            "images/becky/church/cermon.jpg",
-            "images/becky/church/talk1.jpg",
-            "images/becky/church/talk2.jpg",
+            "images/becky/church/cermon.png",
         ])
 
     def church_minutes_now():
@@ -251,7 +249,10 @@ label ChurchServiceLegare:
 label ChurchServiceBlanken:
     $ renpy.dynamic("_church_picture")
     $ main_ui_begin_native_scene_state("Семейство Блэнкеншип")
-    $ scene_runtime.text = "Вдова Блэнкеншип, высокая рыжая женщина с полной грудью, чуть младше сорока лет. Она на первый взгляд слушает отца Герхарда, но если присмотреться, то видно, что ее мысли витают где-то далеко. Рядом с ней стоит Эдди, ее рыжий управляющий лавкой и ваш ровесник. Поблизости ее дети - Ингенборг, Ивар, Эмма и Лаура."
+    $ scene_runtime.text = "Вдова Блэнкеншип, высокая рыжая женщина с полной грудью, чуть младше сорока лет. Она на первый взгляд слушает отца Герхарда, но если присмотреться, то видно, что ее мысли витают где-то далеко."
+    if str(people.location("eddie") or "") == "Church":
+        $ scene_runtime.text += " Рядом с ней стоит Эдди, ее рыжий управляющий лавкой и ваш ровесник."
+    $ scene_runtime.text += " Поблизости ее дети - Ингенборг, Ивар, Эмма и Лаура."
     $ scene_runtime.location_text = scene_runtime.text
     $ _church_picture = church_blanken_picture()
     if str(_church_picture or "").strip():

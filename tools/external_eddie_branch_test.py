@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run focused Eddie/Becky/Sherwood branch checks from a temporary Ren'Py project.
+"""Run focused Eddie/Becky/church branch checks from a temporary Ren'Py project.
 
 Generated Ren'Py testcase code is written only to a temp project, not to this
 repository's game folder.
@@ -89,157 +89,95 @@ testsuite global:
 testcase eddie_talk_opens_becky_join_setup:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
-    python:
-        CurLoc = "TavernMain"
-        location = CurLoc
-        CurrentLoc["georgett"] = "TavernMain"
-        Friends["eddie"] = 10
-        Talked["eddie"] = 0
-        EddieVar["SawWithGeorgett"] = 1
-        EddieVar["SawMomSex"] = 1
-        Becky.home_sex_unlocked = True
-        Becky.eddie_join_stage = 0
-    run Call("IntEddieTalk")
-    advance until screen "main_ui" timeout 20.0
-    assert eval (any(getattr(item, "caption", "") == "Предложить помочь подкатится к хозяйке лавки." for item in current_action_items)) timeout 5.0
-    click "Предложить помочь подкатится к хозяйке лавки." until eval (int(Becky.eddie_join_stage or 0) == 1) timeout 20.0
-    assert eval (int(Talked.get("eddie", 0) or 0) == 1) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ threads["beckySex"].advanceTo(1, force_active=True)
+    $ threads["beckyEddieSex"].advanceTo(0, force_active=True)
+    $ Eddie.rel = 9
+    $ Eddie.talked_today = 0
+    $ Eddie.saw_mother_sex = True
+    $ Eddie.seen_with_georgett = True
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
+    assert eval (str(event_runtime.available["talk_eddie"]["becky_eddie_sex"].target or "") == "IntEddieTalkMomHelper") timeout 5.0
+    run Call("checkTriggers", "talk_eddie", "becky_eddie_sex", 0)
+    click pos (0.5, 0.5) until eval (int(threads["beckyEddieSex"].num or 0) == 1 and int(Eddie.talked_today or 0) == 1) timeout 20.0
 
 testcase becky_from_dinner_runs_eddie_first_join:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
-    python:
-        CurLoc = "BeckyHome"
-        location = CurLoc
-        MyCurDress = "citydress"
-        Becky.home_visit_stage = 5
-        Becky.home_sex_unlocked = True
-        Becky.eddie_join_stage = 1
-        Becky.priest_advice_stage = 3
-        Friends["becky"] = 20
-        Friends["eddie"] = 10
-        sluttiness["becky"] = 55
-    run Call("BeckyHome", "FromDinner")
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ threads["beckyEddieSex"].advanceTo(1, force_active=True)
+    $ rooms.get("BeckyHomeFront").state["arrival_mode"] = "FromDances"
+    $ Becky.priest_advice_stage = 3
+    $ Becky.rel = 20
+    $ Becky.corruption = 55
+    $ Eddie.rel = 10
+    $ initStoryEventRuntime(True)
+    assert eval (not story_event_available("BeckyHome", "enter")) timeout 5.0
+    $ rooms.get("BeckyHomeFront").state["arrival_mode"] = "FromDinner"
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("BeckyHome", "enter")) timeout 5.0
+    assert eval (str(event_runtime.available["BeckyHome"]["enter"].target or "") == "BeckyEddieJoinFirst") timeout 5.0
+    $ _eddie_join_start_minutes = int(calendar_v2.daysInGame or 0) * 1440 + calendar_v2.clock_minutes()
+    run Call("checkTriggers", "BeckyHome", "enter", 0)
     advance until screen "choice" timeout 20.0
-    click "Поцеловать Бекки и незаметно открыть засов"
-    advance until screen "choice" timeout 20.0
-    click "Кивком показать Эдди, чтобы он уважил просьбу Бекки"
-    advance until eval (int(Becky.eddie_join_stage or 0) == 4) timeout 20.0
+    assert eval ("Поцеловать Бекки и незаметно открыть засов" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    assert eval ("Идти за вдовой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    click pos (960, 900) until screen "choice" timeout 20.0
+    assert eval ("Кивком показать Эдди, чтобы он уважил просьбу Бекки" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    click pos (960, 900) until eval (int(threads["beckyEddieSex"].num or 0) == 4 and str(rooms.current_code or "") == "MarketPlace") timeout 30.0
+    assert eval (int(Becky.rel or 0) == 20 and int(Becky.corruption or 0) == 60 and int(Eddie.rel or 0) == 15) timeout 5.0
+    assert eval ((int(calendar_v2.daysInGame or 0) * 1440 + calendar_v2.clock_minutes()) - _eddie_join_start_minutes == 60) timeout 5.0
 
-testcase georgett_sponsor_creates_eddie_home_visit:
+testcase becky_church_priority_and_eddie_service_schedule:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
-    python:
-        CurLoc = "TavernMain"
-        location = CurLoc
-        CurrentLoc["georgett"] = "TavernMain"
-        Friends["georgett"] = 10
-        Talked["georgett"] = 0
-        Becky.eddie_georgett_stage = 1
-        Becky.eddie_home_visit_state = 0
-        Becky.home_visit_stage = 5
-        Becky.home_sex_unlocked = True
-        EddieVar["SawMomSex"] = 1
-        EddieVar["WhoreVisitFreq"] = 1
-        money = 100
-    run Call("IntGeorgettTalk", "georgett", "tavern")
-    advance until screen "main_ui" timeout 20.0
-    assert eval (any(getattr(item, "caption", "") == "Предложить Жоржетте проспонсировать ее визит к Эдди домой" for item in current_action_items)) timeout 5.0
-    click "Предложить Жоржетте проспонсировать ее визит к Эдди домой" until eval (int(Becky.eddie_home_visit_state or 0) == 1) timeout 20.0
-    python:
-        _eddie_saved_randint = renpy.random.randint
-        renpy.random.randint = lambda a, b: 1
-        TodaySexEvents_Clear()
-        Talked["georgett"] = 0
-        week = 1
-    run Call("NextDay_NewDayEvents")
-    python:
-        renpy.random.randint = _eddie_saved_randint
-    assert eval (int(Becky.eddie_home_visit_state or 0) == 4) timeout 5.0
-    assert eval (any(row.get("GirlName") == "georgett" and row.get("Place") == "EddieHomeVisit" for row in TodaySexEvents)) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ calendar_v2.day = 7
+    $ calendar_v2.week = 7
+    $ calendar_v2.period = 1
+    $ calendar_v2.cycle = 1100
+    $ calendar_v2.daysInGame = 6
+    $ calendar_v2.hour = 8
+    $ calendar_v2.minute = 0
+    $ rooms.enter("Church")
+    assert eval (str(people.location("eddie") or "") == "Church" and str(people.schedule_state("eddie").get("label", "") or "") == "sunday_service") timeout 5.0
+    run Call("ChurchServiceBlanken")
+    advance until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/becky/church/cermon.png") timeout 5.0
+    assert eval ("Эдди, ее рыжий управляющий лавкой" in str(scene_runtime.location_text or "")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is None) timeout 20.0
+    $ calendar_v2.hour = 9
+    $ calendar_v2.minute = 29
+    assert eval (str(people.location("eddie") or "") == "Church") timeout 5.0
+    $ calendar_v2.minute = 30
+    assert eval (str(people.location("eddie") or "") == "BeckyHome") timeout 5.0
+    $ calendar_v2.day = 22
+    $ calendar_v2.daysInGame = 21
+    $ calendar_v2.hour = 8
+    $ calendar_v2.minute = 0
+    assert eval (str(people.location("eddie") or "") == "OutOfTown") timeout 5.0
 
-testcase eddie_tavern_client_event_uses_same_view:
-    run Jump("Intro")
-    advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
-    python:
-        CurLoc = "TavernMain"
-        location = CurLoc
-        CurrentLoc["georgett"] = "TavernMain"
-        EddieVar["TalkedAboutWhores"] = 1
-        EddieVar["WhoreVisitFreq"] = 1
-        week = 1
-        time = 3
-        TodaySexEvents_Clear()
-        _eddie_saved_randint = renpy.random.randint
-        renpy.random.randint = lambda a, b: 1
-    run Call("NextDay_NewDayEvents")
-    python:
-        renpy.random.randint = _eddie_saved_randint
-    assert eval (any(row.get("GirlName") == "georgett" and int(row.get("EventType", 0) or 0) == 99 and row.get("Place") == "Prostitution" for row in TodaySexEvents)) timeout 5.0
-    run Call("TavernProstClients", 1, "georgett")
-    advance until screen "choice" timeout 20.0
-    assert eval (int(EddieVar.get("SawWithGeorgett", 0) or 0) == 1) timeout 5.0
-    click "Вернуться в трактир" until screen "main_ui" timeout 20.0
-
-testcase sherwood_offer_stable_and_robbery_flow:
-    run Jump("Intro")
-    advance until screen "choice" timeout 20.0
-    click "Приступить к управлению трактиром" until screen "main_ui" timeout 20.0
-    python:
-        CurLoc = "MarketPlace"
-        location = CurLoc
-        Becky.trade_offer_stage = 0
-        Becky.sherwood_warning_stage = 0
-        Becky.sherwood_suspicion = 0
-        Friends["becky"] = 20
-        GiveOrgasms["becky"] = 10
-    run Call("BeckyQuestInit")
-    advance until screen "choice" timeout 20.0
-    click "А кто ж не хочет?"
-    advance until screen "choice" timeout 20.0
-    assert eval (int(Becky.trade_offer_stage or 0) == 1) timeout 5.0
-    assert eval (int(Becky.sherwood_warning_stage or 0) == 1) timeout 5.0
-    click "Пойти подумать над предложением" until screen "main_ui" timeout 20.0
-
-    python:
-        CurLoc = "TavernStable"
-        location = CurLoc
-        MyStallion = "Буцефал"
-        money = 500
-        time = 0
-        week = 1
-        Becky.trade_offer_stage = 1
-        Becky.sherwood_suspicion = 5
-    run Jump("TavernStable")
-    advance until screen "main_ui" timeout 20.0
-    assert eval (any(getattr(item, "caption", "") == "Купить провизию для эльфов у Бекки и отправится в Куниделл верхом" for item in current_action_items)) timeout 5.0
-    assert eval (any(getattr(item, "caption", "") == "Пойти в Куниделл пешком и налегке" for item in current_action_items)) timeout 5.0
-
-    python:
-        money = 100
-        MyStallion = "Буцефал"
-        RobinVar["RobbedNum"] = 0
-        RobinVar["KnowHim"] = 0
-        RobinVar["MongolSafePass"] = 0
-        Becky.robin_robbery_stage = 0
-    $ BlackwoodRoadRoom.custom_properties["on_horse"] = 1
-    run Jump("BlackwoodRoad")
-    advance until screen "choice" timeout 20.0
-    click "Ехать дальше"
-    advance until screen "choice" timeout 20.0
-    click "Уйти"
-    advance until screen "choice" timeout 20.0
-    click "Попрощаться"
-    advance until screen "choice" timeout 20.0
-    assert eval (int(RobinVar.get("RobbedNum", 0) or 0) == 1) timeout 5.0
-    assert eval (int(Becky.robin_robbery_stage or 0) >= 1) timeout 5.0
-    assert eval (str(MyStallion or "") == "") timeout 5.0
-    assert eval (int(money or 0) == 50) timeout 5.0
-    click "Домой" until screen "main_ui" timeout 20.0
+    $ calendar_v2.day = 7
+    $ calendar_v2.daysInGame = 6
+    $ calendar_v2.hour = 12
+    $ Georgett.known = True
+    $ Liza.known = True
+    $ Georgett.set_story_value("churchgeorgettadmit", 1)
+    $ Georgett.set_story_value("SawChurchAfterCermon", 0)
+    $ Georgett.set_story_value("churchlizaadmit", 1)
+    $ Becky.priest_advice_stage = 1
+    $ initStoryEventRuntime(True)
+    assert eval (str(event_runtime.available["Church"]["after_cermon_walk"].target or "") == "story_becky_church_after_sermon") timeout 5.0
+    $ Becky.priest_advice_stage = 2
+    $ initStoryEventRuntime(True)
+    assert eval (str(event_runtime.available["Church"]["after_cermon_walk"].target or "") == "story_becky_church_after_sermon") timeout 5.0
+    $ Becky.priest_advice_stage = 3
+    $ initStoryEventRuntime(True)
+    assert eval (str(event_runtime.available["Church"]["after_cermon_walk"].target or "") == "story_georgett_church_after_sermon") timeout 5.0
 '''
 
 

@@ -1373,12 +1373,6 @@ init -999 python:
             self.var["portstreet_clients_seen_today"] = 1
             return self.set_story_value("seeclients", 1)
 
-        def church_after_sermon_event_available(self):
-            return (
-                church_after_cermon_action_visible()
-                and self.can_trigger_after_sermon_event()
-            )
-
         def sex_clothing_state(self):
             state = getattr(self, "sex_state", None)
             return state if isinstance(state, dict) else {}

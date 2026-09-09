@@ -10,14 +10,14 @@ init python:
                 genitive="Эдди",
                 dative="Эдди",
                 default_location="",
-                description="Эдди - сын Ребекки, подросток и помощник в бакалейной лавке. Связан с событиями Бекки, Жоржетты и Лукаса.",
-                birth_date={"day": 1, "period": 1, "cycle": 1083},
+                description="Эдди - молодой взрослый сирота, которого Ребекка Блэнкеншип приютила и выучила делу. Он управляет ее бакалейной лавкой и живет в ее доме.",
+                birth_date={"day": 1, "period": 1, "cycle": 1081},
                 portrait="images/eddie/portraits/portrait_0.png",
             )
             self.schedule_source = "schedules/eddie.json"
 
     class EddieInfo(BaseNPC):
-        """Eddie: Becky's son, group scenes, Georgett crossover."""
+        """Eddie: Becky's adult ward and store manager; Georgett crossover."""
         talk_label = "IntEddieTalk"
         unknown_name = "Незнакомец"
         whore_visit_frequency = 6

@@ -80,7 +80,7 @@ label IntBeckyTalk(girl_name="becky"):
                 call story_becky_sherwood_offer_0(_becky_name)
             "А чего ты сама с эльфами не торгуешь?" if Becky.talk_count() < 2 and Becky.trade_offer_stage == 1 and not Becky.asked_about_elf_trade:
                 call story_becky_sherwood_elves_0(_becky_name)
-            "А твое предложеньице с фингалом у твоего сынка не связанно, случаем?" if Becky.trade_offer_stage == 1 and Eddie.fingal_talk_stage > 0 and not Becky.fingal_connection_clarified and Becky.admitted_sherwood_stage == 0:
+            "А твое предложеньице с фингалом у Эдди не связанно, случаем?" if Becky.trade_offer_stage == 1 and Eddie.fingal_talk_stage > 0 and not Becky.fingal_connection_clarified and Becky.admitted_sherwood_stage == 0:
                 call story_becky_sherwood_fingal_0(_becky_name)
             "О какой-такой загвоздке ты говорила?" if Becky.trade_offer_stage == 1 and Becky.sherwood_warning_stage == 1 and Becky.admitted_sherwood_stage == 0:
                 call story_becky_sherwood_warn_0(_becky_name)

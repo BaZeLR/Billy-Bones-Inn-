@@ -168,7 +168,8 @@ def test_grocery_talk_identifies_eddie_and_becky():
     becky_source = _source(BECKY_TALK)
 
     assert "Сейчас за прилавком стоит Эдди" in eddie_source
-    assert "старший сын вдовы Блэнкеншип" in eddie_source
+    assert "молодой управляющий лавкой вдовы Блэнкеншип" in eddie_source
+    assert "приютила его сиротой" in eddie_source
     assert "За прилавком стоит сама Бекки Блэнкеншип" in becky_source
 
 

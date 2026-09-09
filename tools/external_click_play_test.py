@@ -4135,7 +4135,7 @@ testcase external_church_service_action_links_work:
     $ _church_blanken_button = "choice_panel_button_%d" % int(_church_blanken_index)
     click id _church_blanken_button pos (0.5, 0.5) until screen "choice" timeout 20.0
     assert eval ("Вдова Блэнкеншип" in str(scene_runtime.text or "") and str(main_ui_runtime.mode or "") == "event") timeout 5.0
-    assert eval (str(scene_runtime.picture or "") in ("images/becky/church/cermon.png", "images/becky/church/talk1.jpg", "images/becky/church/talk2.jpg")) timeout 5.0
+    assert eval (str(scene_runtime.picture or "") == "images/becky/church/cermon.png") timeout 5.0
     assert eval (str(main_ui_runtime.action_title or "") == "Семейство Блэнкеншип" and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Назад"]) timeout 5.0
     assert eval (not Georgett.story_value("foundinchurch", 0)) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and str(main_ui_runtime.action_title or "") == "Прихожане") timeout 20.0
@@ -4262,7 +4262,7 @@ testcase external_georgett_liza_church_after_sermon_events:
     $ initStoryEventRuntime(True)
     assert eval (church_after_cermon_action_visible()) timeout 5.0
     assert eval (CheckIfSexEventExist("georgett", 99, "Priest") <= 0) timeout 5.0
-    assert eval (Georgett.church_after_sermon_event_available()) timeout 5.0
+    assert eval (Georgett.can_trigger_after_sermon_event()) timeout 5.0
     assert eval (threads["georgettChurch"].checkActive() and not threads["georgettChurch"].done[4]) timeout 5.0
     assert eval (story_event_available("Church", "after_cermon_walk")) timeout 5.0
     assert eval (renpy.has_label("story_georgett_church_after_sermon")) timeout 5.0
