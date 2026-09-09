@@ -302,7 +302,7 @@ screen current_action_panel(native_choice=None):
             style "mui_hud_button"
             text_style "mui_hud_button_text"
             action Function(main_ui_end_card_state)
-    elif str(main_ui_runtime.mode or "") == "event":
+    elif str(main_ui_runtime.mode or "") in ("event", "talk"):
         null
     elif main_ui_runtime.action_content:
         use expression main_ui_runtime.action_content

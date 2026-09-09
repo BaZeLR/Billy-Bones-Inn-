@@ -7879,6 +7879,7 @@ testcase external_becky_story_topic_returns_to_talk_menu:
     assert eval ("Спросить Бекки про дочку с женихом" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _becky_inga_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить Бекки про дочку с женихом")
     click id ("choice_panel_button_%d" % int(_becky_inga_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    assert eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is None and renpy.get_displayable("main_ui", "choice_panel_button_0") is None) timeout 5.0
     click pos (0.5, 0.5) until eval (int(threads["beckyIngaLucasPath"].num or 0) == 2 and str(rooms.current_code or "") == "GroceryStore" and str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 30.0
     assert eval ("Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Вернуться на рынок" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
 

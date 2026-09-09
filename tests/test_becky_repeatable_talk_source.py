@@ -60,6 +60,16 @@ def test_talk_text_viewport_starts_at_the_first_line():
     assert "viewport:" in talk_panel
     assert 'id ("main_ui_talk_text_%s" % hash(_text))' in talk_panel
     assert "yinitial 0.0" in talk_panel
+
+
+def test_talk_dialogue_does_not_fall_through_to_room_navigation():
+    action_panel = MAIN_LAYOUT.split("screen current_action_panel(native_choice=None):", 1)[1].split(
+        "screen main_ui_status_item", 1
+    )[0]
+
+    talk_guard = 'elif str(main_ui_runtime.mode or "") in ("event", "talk"):'
+    assert talk_guard in action_panel
+    assert action_panel.index(talk_guard) < action_panel.index("elif rooms.current is not None:")
 MIGRATION = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
 
 
