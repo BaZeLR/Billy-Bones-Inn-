@@ -7865,6 +7865,55 @@ testcase external_becky_talk_action_returns_without_duplicate_menu:
     click id _becky_exit_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "scene" and renpy.get_screen("choice") is None) timeout 20.0
     assert eval (str(scene_runtime.picture or "") == str(rooms.get("GroceryStore").bg_picture or "") and str(scene_runtime.text or "") == str(rooms.get("GroceryStore").descriptions[0].text or "")) timeout 5.0
 
+testcase external_becky_story_topic_returns_to_talk_menu:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(3, 1, 1100, 16, 0)
+    $ external_calendar_set_weekday(1)
+    $ threads["beckyIngaLucasPath"].advanceTo(1, force_active=True)
+    $ Becky.talked_today = 0
+    run Jump("GroceryStore")
+    advance until eval (str(rooms.current_code or "") == "GroceryStore" and renpy.get_screen("main_ui") is not None) timeout 20.0
+    click id "main_ui_entity_button_npc_becky" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval ("Спросить Бекки про дочку с женихом" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _becky_inga_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить Бекки про дочку с женихом")
+    click id ("choice_panel_button_%d" % int(_becky_inga_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until eval (int(threads["beckyIngaLucasPath"].num or 0) == 2 and str(rooms.current_code or "") == "GroceryStore" and str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 30.0
+    assert eval ("Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Вернуться на рынок" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+
+testcase external_becky_gift_and_dress_return_to_talk_menu:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ external_calendar_set_fields(3, 1, 1100, 16, 0)
+    $ external_calendar_set_weekday(1)
+    $ Becky.rel = 10
+    $ Becky.flirted_today = 1
+    $ Becky.gifted_today = 0
+    $ Becky.talked_today = 0
+    $ Becky.stats["orgasms_given"] = 2
+    $ Becky.wardrobe["current_underwear"]["bra"] = "simplebra"
+    $ player.add_item("soap_001", 1)
+    run Jump("GroceryStore")
+    advance until eval (str(rooms.current_code or "") == "GroceryStore" and renpy.get_screen("main_ui") is not None) timeout 20.0
+    click id "main_ui_entity_button_npc_becky" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
+    assert eval ("Подарить маленький подарок" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and "Поговорить с Бекки об одежде" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _becky_gift_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Подарить маленький подарок")
+    click id ("choice_panel_button_%d" % int(_becky_gift_index)) pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == "Подарок" and any("мыло" in str(i.caption or "") for i in main_ui_runtime.action_items)) timeout 20.0
+    advance until eval (renpy.get_screen("player_card_fixed_target_interaction") is not None and renpy.get_screen("choice") is None) timeout 20.0
+    $ _becky_soap_index = next(i for i, row in enumerate(main_ui_runtime.action_items) if "мыло" in str(row.caption or ""))
+    click id ("choice_panel_button_%d" % int(_becky_soap_index)) pos (0.5, 0.5)
+    pause 0.2
+    assert eval (str(rooms.current_code or "") == "GroceryStore" and str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] and int(player.item_count("soap_001") or 0) == 0) timeout 5.0
+    assert eval ("Вернуться на рынок" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _becky_dress_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Поговорить с Бекки об одежде")
+    click id ("choice_panel_button_%d" % int(_becky_dress_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Предложить купить вдовушке обновку" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _becky_buy_dress_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Предложить купить вдовушке обновку")
+    click id ("choice_panel_button_%d" % int(_becky_buy_dress_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "GroceryStore" and str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 30.0
+    assert eval ("Вернуться на рынок" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+
 testcase external_people_objects_are_single_source:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -9254,6 +9303,8 @@ def main() -> int:
             "external_becky_blackwood_offer_uses_single_live_label",
             "external_becky_inga_lucas_thread_from_native_homefront_menu",
             "external_becky_talk_action_returns_without_duplicate_menu",
+            "external_becky_story_topic_returns_to_talk_menu",
+            "external_becky_gift_and_dress_return_to_talk_menu",
             "external_people_objects_are_single_source",
             "external_registry_girl_daily_processing_once",
             "external_npc_schedule_room_visibility_agreement",
