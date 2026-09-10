@@ -222,8 +222,9 @@ init python:
 
         def dress_change_flags(self, girl_name="becky"):
             girl_key = str(girl_name or self.code_name)
+            post_dance_intimacy = int(threads["beckyHome"].num or 0) >= 2
             can_offer_bra_off = self.stats.get("orgasms_given", 0) >= 2 and self.rel > 8 and self.has_bra() and self.talk_count() < 2
-            can_offer_panties_off = self.stats.get("orgasms_given", 0) >= 2 and self.rel > 8 and self.has_panties() and self.talk_count() < 2
+            can_offer_panties_off = (self.stats.get("orgasms_given", 0) >= 2 or post_dance_intimacy) and self.rel > 8 and self.has_panties() and self.talk_count() < 2
             can_shame = self.stats.get("orgasms_given", 0) >= 2 and self.rel > 8 and self.talk_count() < 2
             can_buy = (
                 self.rel > 8

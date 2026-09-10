@@ -52,3 +52,14 @@ def test_becky_and_liza_own_their_custom_dress_reactions():
     assert "def dress_change_other_saw_text(self" in liza_info
     assert "OtherSawLizaCode" not in liza_labels
     assert "Liza.dress_change_other_saw_text(agreed_to_redress)" in liza_labels
+
+
+def test_becky_post_dance_intimacy_unlocks_only_the_easier_panties_request():
+    becky_info = read_rel("game/NPC/Girls/Becky/InitBecky.rpy")
+    becky_labels = read_rel("game/NPC/Girls/Becky/IntBeckyDressChange.rpy")
+
+    assert 'post_dance_intimacy = int(threads["beckyHome"].num or 0) >= 2' in becky_info
+    assert 'can_offer_bra_off = self.stats.get("orgasms_given", 0) >= 2' in becky_info
+    assert 'can_offer_panties_off = (self.stats.get("orgasms_given", 0) >= 2 or post_dance_intimacy)' in becky_info
+    assert 'if Becky.corruption < 35 and int(threads["beckyHome"].num or 0) < 2:' in becky_labels
+    assert 'if Becky.corruption < 35:' in becky_labels

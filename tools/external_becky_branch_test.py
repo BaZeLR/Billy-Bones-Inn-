@@ -232,6 +232,33 @@ testcase becky_group_session_exit_clears_oop_state:
     $ _becky_finish_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Закончить")
     click id ("choice_panel_button_%d" % int(_becky_finish_index)) pos (0.5, 0.5) until eval (int(Eddie.sex_stat("group_sex", 0) or 0) == 0) timeout 20.0
 
+testcase becky_post_dance_panties_request_is_easier_than_bra:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        rooms.enter("GroceryStore")
+        threads["beckyHome"].advanceTo(2, force_active=True)
+        Becky.rel = 9
+        Becky.corruption = 30
+        Becky.talked_today = 0
+        Becky.set_sex_stat("orgasms_given", 2)
+        Becky.set_default_bra("simplebra")
+        Becky.set_default_panties("simplepanties")
+    run Call("IntBeckyTalk", "becky")
+    advance until screen "choice" timeout 20.0
+    $ _becky_clothes_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Поговорить с Бекки об одежде")
+    click id ("choice_panel_button_%d" % int(_becky_clothes_index)) pos (0.5, 0.5) until eval ("Предложить вдове ходить без лифа" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _becky_bra_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Предложить вдове ходить без лифа")
+    click id ("choice_panel_button_%d" % int(_becky_bra_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    advance until screen "choice" timeout 20.0
+    assert eval (Becky.has_bra() and Becky.has_panties() and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+    $ _becky_clothes_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Поговорить с Бекки об одежде")
+    click id ("choice_panel_button_%d" % int(_becky_clothes_index)) pos (0.5, 0.5) until eval ("Предложить вдове снять панталоны" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    $ _becky_panties_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Предложить вдове снять панталоны")
+    click id ("choice_panel_button_%d" % int(_becky_panties_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    advance until screen "choice" timeout 20.0
+    assert eval (Becky.has_bra() and not Becky.has_panties() and str(main_ui_runtime.mode or "") == "talk") timeout 5.0
+
 testcase friday_dance_find_becky_opens_becky_dance:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
