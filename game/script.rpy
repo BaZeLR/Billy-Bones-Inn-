@@ -168,7 +168,16 @@ init python:
         return values[procedural_index(len(values), key)]
 
     def procedural_random(key=""):
-        return procedural_index(1000000, key) / 1000000.0
+        # Mix the stable calendar/key seed before projecting it to [0, 1).
+        # Using the raw seed made probability rolls move by only ~0.001 per
+        # day, so a 25% event could remain unavailable for hundreds of days.
+        value = abs(int(procedural_seed(key))) & 0xffffffff
+        value ^= value >> 16
+        value = (value * 0x7feb352d) & 0xffffffff
+        value ^= value >> 15
+        value = (value * 0x846ca68b) & 0xffffffff
+        value ^= value >> 16
+        return float(value & 0xffffffff) / 4294967296.0
 
     def procedural_shuffle(seq, key=""):
         if seq is None:

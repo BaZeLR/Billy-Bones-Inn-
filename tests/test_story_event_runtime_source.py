@@ -101,3 +101,15 @@ def test_story_events_are_blocked_after_firing_today():
     assert "event_runtime.fired_keys_today = []" in source
     assert "event_runtime.fired_day or -1" not in source
     assert "fired_day_value if fired_day_value is not None else -1" in source
+
+
+def test_probability_roll_is_stable_and_unique_per_event():
+    source = EVENTS_PATH.read_text(encoding="utf-8-sig")
+    body = function_body(source, "checkProb")
+
+    assert 'probability_key = "story_event:%s:%s:%s:%s"' in body
+    assert "str(self.thread_name or \"\")" in body
+    assert "str(self.target or \"\")" in body
+    assert "story_event_location_keys(self)" in body
+    assert "str(self.action or \"\")" in body
+    assert "procedural_random(key=probability_key)" in body

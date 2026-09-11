@@ -114,7 +114,13 @@ init -25 python:
             probability = self.prob
             if probability in (None, 1, 1.0):
                 return True
-            return procedural_random(key="procedural:Utilities/General/Events/events.rpy:procedural_random:140:1") < float(probability)
+            probability_key = "story_event:%s:%s:%s:%s" % (
+                str(self.thread_name or ""),
+                str(self.target or ""),
+                ",".join(story_event_location_keys(self)),
+                str(self.action or ""),
+            )
+            return procedural_random(key=probability_key) < float(probability)
 
         def checkItem(self):
             if not self.item:
