@@ -13,6 +13,8 @@ BECKY_TOPICS = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkTopics.r
 BECKY_SHERWOOD = ROOT / "game" / "NPC" / "Girls" / "Becky" / "IntBeckyTalkSherwood.rpy"
 BECKY_SCHEDULE = ROOT / "game" / "NPC" / "Schedules" / "becky.json"
 GROCERY_ROOM_PICTURE = ROOT / "game" / "images" / "general" / "grocery_shop.png"
+INGA_TALK = ROOT / "game" / "NPC" / "Girls" / "Inga" / "IntIngaTalk.rpy"
+INGA_STORE_ASSETS = ROOT / "game" / "images" / "inga" / "newInga"
 GROCERY_NPC_OWNERS = [
     ROOT / "game" / "NPC" / "Secondary" / "InitEddie.rpy",
     ROOT / "game" / "NPC" / "Girls" / "Becky" / "InitBecky.rpy",
@@ -58,6 +60,38 @@ def test_grocery_uses_merchant_picture_sequences_not_hunter_store():
     assert '"images/eddie/portraits/portrait_2.png"' in source
     assert '"images/becky/portraits/portrait_1.png"' in source
     assert '"images/becky/portraits/portrait_4.png"' in source
+
+
+def test_inga_store_talk_uses_owned_relationship_and_intimacy_state():
+    grocery_source = _source(GROCERY)
+    talk_source = _source(INGA_TALK)
+
+    for filename in (
+        "inga_store_openworkdress.png",
+        "inga_store_closeup_clean.png",
+        "inga_store_closeup_breakfast.png",
+        "inga_store_closeup_unlaced_clean.png",
+        "inga_store_closeup_unlaced_breakfast.png",
+    ):
+        assert (INGA_STORE_ASSETS / filename).is_file()
+
+    for filename in (
+        "inga_store_openworkdress.png",
+        "inga_store_closeup_unlaced_clean.png",
+        "inga_store_closeup_unlaced_breakfast.png",
+    ):
+        assert f'images/inga/newInga/{filename}' in grocery_source + talk_source
+
+    inga_picture = grocery_source.split("def grocery_store_inga_picture", 1)[1].split(
+        "def grocery_store_grocer_picture", 1
+    )[0]
+    assert "images/inga/StreetSex" not in inga_picture
+    assert 'npc_friend_level("inga") >= 2' in talk_source
+    assert "player.intimacy.can_cum()" in talk_source
+    assert "Inga.can_have_sex_today()" in talk_source
+    assert 'Inga.player_cum("mouth")' in talk_source
+    assert "default " not in talk_source
+    assert "main_ui_runtime.action_items" not in talk_source
 
 
 def test_grocery_merchant_state_comes_from_npc_schedule_not_room_mirror():

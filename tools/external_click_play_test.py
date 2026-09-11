@@ -1601,6 +1601,44 @@ testcase external_actual_grocery_click:
     click id _grocery_object_back_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.action_title or "") == 'Действия') timeout 20.0
     assert eval (str(scene_runtime.picture or "") == _grocery_room_picture and str(scene_runtime.text or "") == _grocery_room_text and str(main_ui_runtime.object_id or "") == "") timeout 5.0
 
+testcase external_inga_grocery_talk_and_favor:
+    run Call("InitGameNPCs")
+    $ external_calendar_set_fields(1, 1, CALENDAR_START_CYCLE, 7, 0)
+    $ external_calendar_set_weekday(1)
+    $ people.get_data("eddie").set_schedule([])
+    $ people.get_data("becky").set_schedule([])
+    $ people.get_data("inga").set_schedule([NPCScheduleEntry(location="GroceryStore", weekdays=[1], start_hour=0, end_hour=24, awake=True, talkable=True, working=True, priority=999, label="external_inga_store")])
+    $ rooms.enter("GroceryStore")
+    $ Inga.rel = 8
+    $ Inga.fucked_today = 0
+    $ player.intimacy.came_today = 0
+    $ player.intimacy.set_arousal(0)
+    $ _inga_sexacts_before = int(Inga.sex_stat("sexacts", 0) or 0)
+    run Call("IntIngaTalk", True)
+    advance until screen "choice" timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/inga/newInga/inga_store_closeup_unlaced_breakfast.png") timeout 5.0
+    assert eval ([str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить разговор"]) timeout 20.0
+    assert eval (int(player.intimacy.arousal_value() or 0) >= 40) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and "Попросить Ингу позаботиться и о вас" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/inga/newInga/inga_store_closeup_unlaced_clean.png") timeout 5.0
+    $ _inga_favor_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Попросить Ингу позаботиться и о вас")
+    $ _inga_favor_button_id = "choice_panel_button_%d" % int(_inga_favor_index)
+    click id _inga_favor_button_id pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Продолжить"]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/inga/newInga/inga_store_openworkdress.png" and Inga.cock_in("mouth")) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Кончить"]) timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])] == ["Вернуться к разговору"]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/inga/newInga/inga_store_closeup_unlaced_breakfast.png") timeout 5.0
+    assert eval (int(Inga.fucked_today or 0) == 1 and int(player.intimacy.came_today or 0) == 1 and int(Inga.sex_stat("sexacts", 0) or 0) == _inga_sexacts_before + 1) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until eval (renpy.get_screen("choice") is not None and "Закончить разговор" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 20.0
+    assert eval (str(scene_runtime.picture or "") == "images/inga/newInga/inga_store_closeup_unlaced_clean.png") timeout 5.0
+
 testcase external_becky_store_event_replaces_room_text:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -9328,6 +9366,7 @@ def main() -> int:
             "external_story_event_audit_methods_cover_tuple_attributes",
             "external_main_ui_does_not_repeat_active_dialogue_text",
             "external_actual_grocery_click",
+            "external_inga_grocery_talk_and_favor",
             "external_becky_store_event_replaces_room_text",
             "external_actual_wine_click",
             "external_wine_store_return_restores_market_scene_once",
@@ -9532,6 +9571,7 @@ def main() -> int:
             "external_story_event_audit_methods_cover_tuple_attributes",
             "external_main_ui_does_not_repeat_active_dialogue_text",
             "external_actual_grocery_click",
+            "external_inga_grocery_talk_and_favor",
             "external_becky_store_event_replaces_room_text",
             "external_actual_wine_click",
             "external_wine_store_return_restores_market_scene_once",

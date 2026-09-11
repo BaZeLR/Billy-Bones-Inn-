@@ -76,8 +76,7 @@ init python:
 
     def grocery_store_inga_picture(randomize=False):
         candidates = [
-            str(girl_card_portrait_path("inga") or ""),
-            "images/inga/StreetSex/minet1.jpg",
+            "images/inga/newInga/inga_store_openworkdress.png",
         ]
         return grocery_store_pick_picture(candidates, randomize)
 
