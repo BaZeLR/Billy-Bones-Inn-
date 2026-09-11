@@ -32,6 +32,13 @@ init python:
                     "wench_serving": ["images/Liza/lizaNew/liza_wench_serving_floor.png"],
                     "wench_tip": ["images/Liza/lizaNew/liza_wench_customer_tip.png"],
                     "wench_corner": ["images/Liza/lizaNew/liza_wench_corner_minidress_pantaloons.png"],
+                    "wench_angry": ["images/Liza/lizaNew/liza_work_angry.png"],
+                    "wench_happy": ["images/Liza/lizaNew/liza_work_happy.png"],
+                    "amanda_work_talk": ["images/Liza/lizaNew/liza_amanda_work_talk.png"],
+                    "intimate_waiting_with_georgett": ["images/Liza/lizaNew/liza_georgett_tavern_waiting.png"],
+                },
+                "tailor": {
+                    "measure": ["images/Liza/lizaNew/liza_tailor_measure.png"],
                 },
             }
 

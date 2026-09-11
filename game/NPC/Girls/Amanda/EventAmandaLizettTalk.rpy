@@ -37,7 +37,7 @@ label EventAmandaLizettTalk(eyewitness=0, result="", not_to_speak=0):
 
     if eyewitness > 0:
         $ main_ui_begin_native_scene_state("Событие: Аманда и Лизетта")
-        call ShowImage("amanda", "tavern", "lizatalk{}".format(procedural_randint(1, 2, key="procedural:NPC/Girls/Amanda/EventAmandaLizettTalk.rpy:procedural_randint:41:5")))
+        vscene LizaStaticData.image_path("tavern", "amanda_work_talk")
         $ scene_runtime.text = result
         $ scene_runtime.location_text = result
         $ result = ""

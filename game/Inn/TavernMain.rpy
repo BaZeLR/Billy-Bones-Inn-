@@ -18,7 +18,17 @@ init python:
                     })
 
         client_girl = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
-        for person in tavern_main_intimate_workers():
+        intimate_workers = tavern_main_intimate_workers()
+        if "liza" in intimate_workers and "georgett" in intimate_workers and client_girl not in ("liza", "georgett"):
+            pair_pictures = LizaStaticData.image_sequence("tavern", "intimate_waiting_with_georgett")
+            if pair_pictures:
+                assignments.append({
+                    "person": "liza",
+                    "job": "jobwhore_pair",
+                    "pictures": list(pair_pictures),
+                })
+
+        for person in intimate_workers:
             if person == client_girl:
                 continue
             person_data = people.get_data(person)
@@ -48,6 +58,8 @@ init python:
             text = "%s готовит зал к открытию: расставляет кружки, проверяет столы и собирает все необходимое для обслуживания гостей." % name
         elif job_key == "jobcleaning":
             text = "%s поддерживает порядок в зале, убирая со столов и не давая трактирной суете превратиться в полный беспорядок." % name
+        elif job_key == "jobwhore_pair":
+            text = "Жоржетта и Лизетта сидят вместе в правом углу зала, присматриваясь к посетителям и ожидая клиентов."
         elif job_key == "jobwhore":
             text = "%s сидит в углу зала и ждет клиентов." % name
         else:
