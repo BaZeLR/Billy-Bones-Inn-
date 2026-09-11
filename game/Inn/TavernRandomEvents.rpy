@@ -125,6 +125,20 @@ init -20 python:
         )
 
 
+    def tavern_work_liza_wench_scheduled():
+        return Liza.can_work_tavern() and int(Liza.job_value("jobwaitress", 0) or 0) > 0
+
+
+    def tavern_work_liza_wench_playable(room_code=""):
+        return (
+            str(room_code or "") == "TavernMain"
+            and tavern_work_liza_wench_scheduled()
+            and str(people.location("liza") or "") == "TavernMain"
+            and player.tavern_management.isTavernOpen
+            and not Liza.tavern_service_busy_now()
+        )
+
+
     def tavern_work_roll(chance, key):
         chance_value = max(0, min(100, tavern_work_int(chance, 0)))
         if chance_value <= 0:
@@ -380,6 +394,7 @@ define tavern_work_events_by_type = {
     ],
     "tavern_story": [
         TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk", periods=(1, 2), chance=25, condition=tavern_work_liza_talk_ready, play_condition=tavern_work_liza_talk_playable, priority=50, locations=TAVERN_AMANDA_LIZA_TALK_ROOMS, requires_open=False, after_breakfast=True),
+        TavernWorkEventDefinition("LizaWenchStory", "tavern_story", "EventLizaWenchStory", periods=(2, 3, 4, 5), chance=25, required_job="jobwaitress", condition=tavern_work_liza_wench_scheduled, play_condition=tavern_work_liza_wench_playable, priority=55),
     ],
     "theft": [],
     "big_fight": [],

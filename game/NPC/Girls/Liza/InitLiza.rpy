@@ -29,6 +29,9 @@ init python:
                 "tavern": {
                     "waitress": ["images/Liza/lizaNew/liza_waitress_main_hall_minidress.png"],
                     "intimate_waiting": ["images/Liza/lizaNew/liza_wench_corner_minidress_pantaloons.png"],
+                    "wench_serving": ["images/Liza/lizaNew/liza_wench_serving_floor.png"],
+                    "wench_tip": ["images/Liza/lizaNew/liza_wench_customer_tip.png"],
+                    "wench_corner": ["images/Liza/lizaNew/liza_wench_corner_minidress_pantaloons.png"],
                 },
             }
 
