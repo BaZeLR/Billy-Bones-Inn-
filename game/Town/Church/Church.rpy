@@ -67,7 +67,7 @@ init python:
         )
 
     def church_draupnir_note_visible():
-        return church_confession_action_visible() and Becky.gerhard_talk_stage > 0
+        return church_open_hours_visible() and Becky.gerhard_talk_stage > 0
 
     def church_service_attendees_text():
         lines = [

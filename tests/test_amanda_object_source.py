@@ -38,6 +38,8 @@ TAVERN_MY_ROOM = PROJECT_ROOT / "game" / "Inn" / "TavernMyRoom.rpy"
 TAVERN_STORAGE = PROJECT_ROOT / "game" / "Inn" / "TavernStorage.rpy"
 CHARACTER_ACTION_HUB = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "CharacterActionHub.rpy"
 PEOPLE_RUNTIME = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "PeopleRuntime.rpy"
+PREGNANCY_CHECK = PROJECT_ROOT / "game" / "NPC" / "Girls" / "Common" / "PregnancyCheck.rpy"
+GIRL_DECISION_MODEL = PROJECT_ROOT / "game" / "Utilities" / "General" / "NPC" / "GirlDecisionModel.rpy"
 
 
 def _source(path):
@@ -108,11 +110,10 @@ def test_amanda_info_owns_runtime_state_and_story_defaults():
         "\"jobwaitress\": 1",
         "def mana_profile",
         "def reaction_score",
-        "def cycle_state",
-        "def fertility_state",
-        "def pregnancy_state",
-        "def pregnancy_check",
-        "def birth_ready",
+            "def cycle_state",
+            "def fertility_state",
+            "def pregnancy_state",
+            "def birth_ready",
         "def apply_body_state",
         "def body_state_line",
         "def legare_intro_ready",
@@ -438,9 +439,9 @@ def test_amanda_legare_mechanic_is_direct_object_state_without_wrapper_plan():
     assert "def resolve_legare_let_go(self, use_forced_type=0, forced_type=0):" in init_source
     assert "sex_type = self.legare_sex_type()" in init_source
     assert 'self.dynamic_roll(1, 6, "legare_let_go_type_2") <= 5' in init_source
-    assert 'self.pregnancy_check("mouth", 1, "legare")' in init_source
-    assert 'self.pregnancy_check("inside", 1, "legare")' in init_source
-    assert 'self.pregnancy_check("outside", 1, "legare")' in init_source
+    assert 'pregnancy_check("amanda", "mouth", 1, "legare")' in init_source
+    assert 'pregnancy_check("amanda", "inside", 1, "legare")' in init_source
+    assert 'pregnancy_check("amanda", "outside", 1, "legare")' in init_source
     assert "build_legare_amanda_let_go_plan" not in live_sources
     assert "apply_legare_amanda_let_go_code" not in live_sources
     assert "label LegareAmandaLetGoCode" not in legare_source
@@ -506,6 +507,7 @@ def test_amanda_revealing_dress_request_is_thread_owned_and_code_backed():
 def test_amanda_inherits_common_decision_state_and_keeps_custom_fertility_model():
     source = _source(AMANDA_INIT)
     people_runtime = _source(PEOPLE_RUNTIME)
+    pregnancy = _source(PREGNANCY_CHECK)
 
     for token in [
         "return build_girl_decision_profile(self.code_name)",
@@ -530,7 +532,7 @@ def test_amanda_inherits_common_decision_state_and_keeps_custom_fertility_model(
     assert "def morning_issue" not in source
     assert "def morning_sickness_active" not in source
     assert "callable(tavern_kitchen_fertility_bonus_active)" not in source
-    assert "if tavern_kitchen_fertility_bonus_active():" in source
+    assert 'girl in ("sandra", "melissa", "amanda") and tavern_kitchen_fertility_bonus_active()' in pregnancy
 
 
 def test_amanda_legare_thread_is_wired_to_event_runtime():
@@ -788,7 +790,8 @@ def test_amanda_liza_work_talk_uses_real_source_event_without_invented_bridge():
     assert "NotToSpeak" not in amanda_liza_talk
     assert "YourReaction1" not in amanda_liza_talk
     assert "def tavern_work_pop_planned_code" in tavern_random
-    assert '"Condition": lambda:' in liza_items
+    assert '"Condition": amanda_liza_' in liza_items
+    assert '"Condition": lambda:' not in liza_items
     assert '"Reaction": (' in liza_items
     assert '"Condition": "' not in liza_items
     assert '"Code":' not in liza_items
@@ -870,7 +873,8 @@ def test_amanda_talk_and_dress_are_direct_menus_while_room_actions_use_events():
     assert 'label IntAmandaTalk(girl_name="amanda"):' in talk
     assert "while True:" not in talk
     assert "call int_amanda_dress_change(girl_name)" in talk
-    assert "jump IntAmandaTalk" not in talk
+    assert "jump IntAmandaTalk" in talk
+    assert "_amanda_repeat_menu" not in talk
     assert "label IntAmandaTalkApply" not in talk
     assert "choice_code" not in talk
     assert "main_ui_runtime.action_items" not in talk
@@ -939,12 +943,15 @@ def test_amanda_external_intent_layer_is_removed_from_runtime_flow():
         assert token not in room_sources
 
 
-def test_amanda_birth_and_pregnancy_check_are_owned_by_amanda_thread():
+def test_amanda_birth_is_thread_owned_and_conception_uses_the_shared_girl_owner():
     runtime = _source(STORY_RUNTIME)
     event_model = _source(AMANDA_EVENT_MODEL)
     amanda_init = _source(AMANDA_INIT)
     pregnancy_events = _source(AMANDA_PREGNANCY_EVENTS)
     at_home = _source(AMANDA_AT_HOME)
+    pregnancy = _source(PREGNANCY_CHECK)
+    decision_model = _source(GIRL_DECISION_MODEL)
+    people_runtime = _source(PEOPLE_RUNTIME)
 
     for token in [
         '"Birth"',
@@ -958,16 +965,22 @@ def test_amanda_birth_and_pregnancy_check_are_owned_by_amanda_thread():
     assert "class AmandaBirthEvent(AmandaEvent):" in event_model
     assert '"story_amanda_give_birth_0"' in event_model
     assert "def pregnancy_state(self):" in amanda_init
-    assert "def pregnancy_check(self, cum_place" in amanda_init
+    assert "def pregnancy_check(self, cum_place" not in amanda_init
     assert "def birth_ready(self):" in amanda_init
-    assert 'self.set_sex_stat("pregnancy", 1)' in amanda_init
-    assert 'self.set_sex_stat("pregfather", dad)' in amanda_init
-    assert 'self.detailed_sex_history.append({' in amanda_init
+    assert "def pregnancy_conception_chance(" in pregnancy
+    assert 'girl_info.set_sex_stat("pregnancy", 1)' in pregnancy
+    assert 'girl_info.set_sex_stat("pregfather", dad)' in pregnancy
+    assert 'girl_info.detailed_sex_history.append({' in pregnancy
+    assert "girl_decision_cycle_state(girl)" in pregnancy
+    assert 'getattr(girl_info, "mood", "neutral")' in pregnancy
+    assert "girl_info.arousal_value()" in pregnancy
+    assert 'registry_group = "girl"' in people_runtime
+    assert "GIRL_DECISION_CYCLE_IDS" not in decision_model
     assert "self.sync_from_amanda_maps()" not in amanda_init
     assert "label story_amanda_give_birth_0:" in pregnancy_events
     assert 'call GiveBirth("amanda")' in pregnancy_events
     assert "def amanda_birth_ready():" not in pregnancy_events
     assert "def amanda_pregnancy_check(cum_place" not in pregnancy_events
-    assert 'Amanda.pregnancy_check("inside", 1, "Вы")' in at_home
-    assert 'Amanda.pregnancy_check("mouthface", 1, "Вы")' in at_home
+    assert 'pregnancy_check("amanda", "inside", 1, "Вы")' in at_home
+    assert 'pregnancy_check("amanda", "mouthface", 1, "Вы")' in at_home
     assert "_aah_pregnancy_check" not in at_home

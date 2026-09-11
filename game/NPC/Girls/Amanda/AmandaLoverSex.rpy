@@ -202,13 +202,13 @@ label amanda_lover_show_sex_scene(scene_type, guy_name):
     
     # Pregnancy check based on cum location
     if amanda_lover_build_cum_in == 3:
-        $ Amanda.pregnancy_check("outside", 1, guy_name, 0, "Соседский парень")
+        $ pregnancy_check("amanda", "outside", 1, guy_name, 0, "Соседский парень")
         $ Amanda.change_social(corruption_delta=1)
     elif amanda_lover_build_cum_in == 2:
-        $ Amanda.pregnancy_check("inside", 1, guy_name, 0, "Соседский парень")
+        $ pregnancy_check("amanda", "inside", 1, guy_name, 0, "Соседский парень")
         $ Amanda.change_social(corruption_delta=1)
     else:
-        $ Amanda.pregnancy_check("mouth", 1, guy_name, 0, "Соседский парень")
+        $ pregnancy_check("amanda", "mouth", 1, guy_name, 0, "Соседский парень")
         $ Amanda.change_social(corruption_delta=1)
     
     # Potential arrest scenario

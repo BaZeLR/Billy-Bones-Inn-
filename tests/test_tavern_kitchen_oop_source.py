@@ -97,6 +97,8 @@ def test_sunday_dinner_uses_schedule_attendance_and_applies_each_girls_planned_r
     assert 'kitchen_ids = set(people.ids_at("TavernKitchen") or [])' in attendance
     assert 'if npc_id not in kitchen_ids:' in attendance
     assert 'if "becky" in kitchen_ids:' in attendance
+    assert "isinstance(info, Girl)" in attendance
+    assert "info.is_tavern_worker()" in attendance
     assert 'people.location("becky")' not in attendance
     assert "info.change_social(friend_delta=1)" in reward
     assert "_sunday_present_ids = list(tavern_sunday_dinner_present_ids() or [])" in dinner
@@ -104,6 +106,8 @@ def test_sunday_dinner_uses_schedule_attendance_and_applies_each_girls_planned_r
     assert 'player_eat_meal("воскресный обед для всей челяди", 22, 45)' in dinner
     assert "calendar_v2.advance_minutes(45)" not in dinner
     assert 'main_ui_begin_native_scene_state("Воскресный обед")' in dinner
+    assert 'call TavernKitchenBreakfastOutdoorDate(_sunday_lake_girl, "lake", "sunday_dinner")' in dinner
+    assert "label TavernSundayLakeWalk" not in BREAKFAST
     assert "while _sunday_dinner_active:" in dinner
     assert '"Закончить воскресный обед"' in dinner
     assert dinner.index("sunday_dinner_last_day = current_game_day()") > dinner.index('"Закончить воскресный обед"')

@@ -194,6 +194,6 @@ def test_amanda_and_melissa_favors_are_owned_by_their_talk_flows():
     assert "def can_grant_sexual_favor(self):" in amanda_info
     assert '"Попросить Аманду о сексуальном одолжении" if Amanda.can_grant_sexual_favor():' in amanda_talk
     assert '"Подарить маленький подарок" if social_interaction_allowed_for_npc(girl_name, "gift"):' in melissa_talk
-    assert 'call PlayerCardGiftToFixedTargetMenu(girl_name)\n                $ _melissa_repeat_menu = True' in melissa_talk
+    assert 'call PlayerCardGiftToFixedTargetMenu(girl_name)\n            jump IntMelissaTalk' in melissa_talk
     assert melissa_talk.count('"Попросить Мелиссу о сексуальном одолжении"') == 1
     assert "not Melissa.is_working()" in melissa_talk

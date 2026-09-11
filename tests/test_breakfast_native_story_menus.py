@@ -157,6 +157,8 @@ def test_breakfast_flirts_cover_household_girls_and_complete_at_chosen_place():
     assert "calendar_v2.advance_minutes(30 - _tease_private_elapsed_minutes)" in private_date
     assert '"Продолжить свидание":' in private_date
     assert '"Закончить свидание":' in private_date
-    assert 'label TavernKitchenBreakfastOutdoorDate(girl_name="", date_code="lake"):' in private_date
+    assert 'label TavernKitchenBreakfastOutdoorDate(girl_name="", date_code="lake", date_origin="breakfast"):' in private_date
+    assert 'if _outdoor_date_origin == "breakfast":' in private_date
+    assert 'if _outdoor_date_origin == "sunday_dinner":' in private_date
     assert 'player.horse.owns_horse()' in private_date
     assert "daily_events" not in private_date

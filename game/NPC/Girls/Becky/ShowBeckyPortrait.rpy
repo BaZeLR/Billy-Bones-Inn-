@@ -9,5 +9,5 @@ label ShowBeckyPortrait(girl_name="becky"):
     elif Becky.pussy_visible():
         call ShowImage(girl_name, "portraits", "nakedpussy" + str(procedural_randint(1, 2, key="procedural:NPC/Girls/Becky/ShowBeckyPortrait.rpy:procedural_randint:16:3")))
     else:
-        call ShowImage(girl_name, "portraits", "portrait" + str(procedural_randint(1, 3, key="procedural:NPC/Girls/Becky/ShowBeckyPortrait.rpy:procedural_randint:18:4")))
+        call ShowImageSeq(girl_name, "portraits", "portrait_", 4)
     return

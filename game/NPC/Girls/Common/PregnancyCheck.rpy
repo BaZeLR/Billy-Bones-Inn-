@@ -8,18 +8,36 @@
 init python:
     import renpy
 
-    def pregnancy_conception_bonus(girl_name=""):
+    def pregnancy_conception_chance(girl_name="", dad_name="", is_dude_random=0):
         girl = str(girl_name or "").strip().lower()
-        if girl not in ("sandra", "melissa", "amanda"):
+        girl_info = people.get_info(girl)
+        if girl_info is None or str(getattr(girl_info, "registry_group", "") or "") != "girl":
             return 0
-        try:
-            if callable(tavern_kitchen_fertility_bonus_active) and tavern_kitchen_fertility_bonus_active():
-                info = people.get_info(girl)
-                base_chance = int(info.sex_stat("ConceptionChance", 0) or 0) if info is not None else 0
-                return max(4, int(base_chance * 0.5))
-        except Exception:
+
+        chance = max(0.0, float(girl_info.sex_stat("ConceptionChance", 0) or 0))
+        if chance <= 0.0:
             return 0
-        return 0
+        if str(dad_name or "").strip().lower() in ("you", "вы"):
+            chance *= 3.0
+        if int(is_dude_random or 0) != 0:
+            chance /= 10.0
+
+        if girl in ("sandra", "melissa", "amanda") and tavern_kitchen_fertility_bonus_active():
+            chance += max(4.0, float(girl_info.sex_stat("ConceptionChance", 0) or 0) * 0.5)
+
+        cycle = girl_decision_cycle_state(girl)
+        cycle_fertility = max(0.0, min(1.0, float(cycle.get("fertility", 0.45) or 0.0)))
+        chance *= 0.55 + cycle_fertility
+
+        mood = str(getattr(girl_info, "mood", "neutral") or "neutral").strip().lower()
+        mood_multiplier = 1.0
+        if mood in ("softened", "warm", "happy", "eager", "trusting", "affectionate", "relaxed", "horny"):
+            mood_multiplier += 0.15
+        elif mood in ("cold", "angry", "hostile", "afraid", "sick", "exhausted"):
+            mood_multiplier -= 0.20
+        mood_multiplier += max(0.0, min(100.0, float(girl_info.arousal_value() or 0))) / 500.0
+        chance *= max(0.5, mood_multiplier)
+        return min(800, max(0, int(round(chance))))
 
     def pregnancy_check(girl_name, cum_place, repeat_count, dad_name='', is_dude_random=0, dad_name_type=''):
         """
@@ -91,9 +109,8 @@ init python:
                 else:
                     cum_place = 'mouthface'
             girl_info.add_sex_stat("sexacts", 1)
-            cur_conc = girl_info.sex_stat("ConceptionChance", 0)
+            cur_conc = pregnancy_conception_chance(girl, dad, is_random)
             if dad == 'Вы':
-                cur_conc *= 3
                 girl_info.mark_fucked(1)
                 if fun_awarded == 0:
                     player.condition.change("fun", 30)
@@ -126,12 +143,9 @@ init python:
             Zalet = 0
             if procedural_randint(1, Max(getattr(girl_info, "corruption", 1), 1)*3, key="procedural:NPC/Girls/Common/PregnancyCheck.rpy:procedural_randint:138:3") <= 1 * (2 if cum_place == 'inside' else 1) and getattr(girl_info, "corruption", 0) <= 70:
                 girl_info.change_social(corruption_delta=1)
-            if is_random:
-                cur_conc = cur_conc / 10
             if cum_place == 'inside':
                 girl_info.add_sex_stat("cuminside", 1)
                 if girl_info.pregnancy_days() == 0:
-                    cur_conc += int(pregnancy_conception_bonus(girl) or 0)
                     cur_conc = Min(cur_conc, 800)
                     if procedural_randint(1, 1000, key="procedural:NPC/Girls/Common/PregnancyCheck.rpy:procedural_randint:147:4") <= cur_conc:
                         girl_info.set_sex_stat("pregnancy", 1)

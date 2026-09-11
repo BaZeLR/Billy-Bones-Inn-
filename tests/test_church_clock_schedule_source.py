@@ -44,6 +44,15 @@ def test_church_attendance_does_not_mutate_npc_relationship_stats():
     assert "info.corruption =" not in source
 
 
+def test_draupnir_note_stays_visible_through_open_church_hours_after_discovery():
+    source = _source(CHURCH_ROOM)
+    visibility = source.split("def church_draupnir_note_visible():", 1)[1].split("\n    def ", 1)[0]
+
+    assert "church_open_hours_visible()" in visibility
+    assert "Becky.gerhard_talk_stage > 0" in visibility
+    assert "church_confession_action_visible()" not in visibility
+
+
 def test_sunday_service_npc_schedules_match_the_church_clock_phase():
     schedule_dir = PROJECT_ROOT / "game" / "NPC" / "Schedules"
 

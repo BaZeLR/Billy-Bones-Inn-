@@ -132,7 +132,7 @@ label AmandaAtGloryHole_menu:
             "Лизетта, которая надрачивала себя глядя на вас, подскочила, слизала несколько капель с лица Аманды, сказав \"ням-ням\"."
             if Amanda.corruption >= 40 and int(Amanda.sex_stat("sexacts", 0) or 0) > 10:
                 "Не отстала от нее и сама Аманда, сначала собрав часть вашего семени пальцами у себя с лица, а потом, с пошлой улыбочкой, эти пальцы облизав."
-            $ Amanda.pregnancy_check("mouthface", 1, "Вы")
+            $ pregnancy_check("amanda", "mouthface", 1, "Вы")
             $ Amanda.set_var_int("glorysuck", 1)
             $ Amanda.set_var_int("suckyou", 1)
             $ Amanda.set_var_int("glory_cur_state", 4)
@@ -151,7 +151,7 @@ label AmandaAtGloryHole_menu:
                 "Та не растерялась и ответила на поцелуй подружки, передав ей язычком часть спермы. Улыбнувшись как две довольных кошечки девчушки скушали вкусняшку."
             else:
                 "Лизетта забрала у нее часть вашей спермы и не замедлила проглотить, сказав \"ням-ням\"."
-            $ Amanda.pregnancy_check("mouthface", 1, "Вы")
+            $ pregnancy_check("amanda", "mouthface", 1, "Вы")
             $ Amanda.set_var_int("glorysuck", 1)
             $ Amanda.set_var_int("suckyou", 1)
             $ Amanda.set_var_int("glory_cur_state", 4)
@@ -255,7 +255,7 @@ label AmandaAtGloryHole_menu:
             $ Amanda.apply_social_chance(18, 1, 2, 55, 1, 2, "glory_hole_first_sex")
             if Amanda.sex_stat("virginity", True):
                 $ Amanda.apply_social_chance(0, 0, 0, 55, 1, 2, "glory_hole_first_sex")
-            $ Amanda.pregnancy_check("inside", 1, "Вы")
+            $ pregnancy_check("amanda", "inside", 1, "Вы")
             $ Amanda.clear_cum("cum_face_you")
             $ Amanda.set_sex_stat("virginity", False)
             $ Amanda.set_var_int("glory_cur_state", 10)
@@ -295,7 +295,7 @@ label AmandaAtGloryHole_menu:
             if Amanda.sex_stat("virginity", True):
                 $ Amanda.apply_social_chance(18, 1, 1, 45, 1, 1, "glory_hole_sex")
             $ Amanda.set_var_int("glory_cur_state", 10)
-            $ Amanda.pregnancy_check("outside", 1, "Вы")
+            $ pregnancy_check("amanda", "outside", 1, "Вы")
             $ Amanda.clear_cum("cum_face_you")
             $ Amanda.set_sex_stat("virginity", False)
             jump TavernMain

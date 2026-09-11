@@ -11,7 +11,7 @@ init -20 python:
 
 
     class TavernWorkEventDefinition(object):
-        def __init__(self, code, event_type, label, periods=None, chance=0, mandatory=False, priority=0, required_job="", condition=None, play_condition=None, report_label=None, locations=None, requires_open=True, after_breakfast=False):
+        def __init__(self, code, event_type, label, periods=None, chance=0, mandatory=False, priority=0, required_job="", condition=None, play_condition=None, report_label=None, locations=None, requires_open=True, after_breakfast=False, rolls=1):
             self.code = str(code or "")
             self.event_type = str(event_type or "")
             self.label = str(label or self.code)
@@ -26,23 +26,7 @@ init -20 python:
             self.locations = tuple(locations or ("TavernMain",))
             self.requires_open = bool(requires_open)
             self.after_breakfast = bool(after_breakfast)
-            self.event = Event(
-                (
-                    self.label,
-                    None,
-                    None,
-                    None,
-                    1,
-                    None,
-                    None,
-                    None,
-                    self.locations,
-                    "tavern_work",
-                    self.priority,
-                ),
-                "tavern_work_random",
-                False,
-            )
+            self.rolls = max(1, int(rolls or 1))
 
         def can_schedule(self):
             if self.required_job and len(tavern_work_job_candidates(self.required_job)) <= 0:
@@ -252,6 +236,13 @@ init -20 python:
                         period = periods[(first_period_index + period_offset) % len(periods)]
                         event_runtime.tavern_work_events.append(tavern_work_plan_row(event_def, period))
                 continue
+            if event_type == "tavern_story":
+                for event_def in candidates:
+                    for period in list(event_def.periods or []):
+                        for roll_index in range(event_def.rolls):
+                            if tavern_work_roll(event_def.chance, "tavern_work_%s_%s_%s_roll_%s" % (event_def.code, current_day, period, roll_index)):
+                                event_runtime.tavern_work_events.append(tavern_work_plan_row(event_def, period))
+                continue
             type_chance = tavern_work_type_chances.get(event_type, 0)
             if not tavern_work_roll(type_chance, "tavern_work_%s_%s_roll" % (event_type, current_day)):
                 continue
@@ -393,7 +384,7 @@ define tavern_work_events_by_type = {
         TavernWorkEventDefinition("FightSmall", "small_fight", "EventFightSmall", periods=(3, 4), chance=20, priority=40),
     ],
     "tavern_story": [
-        TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk", periods=(1, 2), chance=25, condition=tavern_work_liza_talk_ready, play_condition=tavern_work_liza_talk_playable, priority=50, locations=TAVERN_AMANDA_LIZA_TALK_ROOMS, requires_open=False, after_breakfast=True),
+        TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk", periods=(1, 2), chance=15, condition=tavern_work_liza_talk_ready, play_condition=tavern_work_liza_talk_playable, priority=50, locations=TAVERN_AMANDA_LIZA_TALK_ROOMS, requires_open=False, after_breakfast=True, rolls=3),
         TavernWorkEventDefinition("LizaWenchStory", "tavern_story", "EventLizaWenchStory", periods=(2, 3, 4, 5), chance=25, required_job="jobwaitress", condition=tavern_work_liza_wench_scheduled, play_condition=tavern_work_liza_wench_playable, priority=55),
     ],
     "theft": [],

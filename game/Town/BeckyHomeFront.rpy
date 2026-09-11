@@ -101,9 +101,22 @@ label story_becky_home_arrival_0:
 # --- MAIN LOCATION LABEL ---
 label BeckyHomeFront(arrive_mode=""):
     $ renpy.dynamic("_becky_front_room", "_becky_front_text")
+    # Market navigation has no label arguments. Keep an accepted Friday
+    # invitation when arriving through that room-owned exit as well.
+    if not arrive_mode and rooms.current_code == "MarketPlace" and calendar_v2.week == 5 and rooms.get("FridayDance").dance_count >= 5 and rooms.get("FridayDance").becky_home_invited:
+        $ arrive_mode = "FromDances"
     python:
         _becky_front_room = rooms.get("BeckyHomeFront")
         rooms.enter("BeckyHomeFront")
+    $ main_ui_runtime.mode = "scene"
+    $ main_ui_runtime.selected_char = ""
+    $ main_ui_runtime.talk_picture = ""
+    $ main_ui_runtime.clear_contexts()
+    $ main_ui_runtime.action_title = _becky_front_room.display_name
+    $ main_ui_runtime.action_content = None
+    $ main_ui_runtime.action_items = []
+    $ main_ui_runtime.girl_key = ""
+    $ main_ui_runtime.object_id = ""
     $ rooms.get("BeckyHomeFront").state["arrival_mode"] = str(arrive_mode or "")
     $ rooms.get("BeckyHomeFront").state["inga_scene_roll"] = procedural_randint(1, 4, key="procedural:Town/BeckyHomeFront.rpy:entry_roll")
     if Becky.home_front_checked_today and rooms.get("BeckyHomeFront").state["inga_scene_roll"] <= 2:
@@ -145,6 +158,10 @@ label BeckyHomeFront(arrive_mode=""):
         "Осторожно заглянуть за угол" if rooms.get("BeckyHomeFront").state["inga_scene_roll"] <= 3:
             call becky_homefront_peek
             return
+
+        "Вернуться на рынок":
+            $ apply_movement_time(10, "MarketPlace")
+            jump MarketPlace
 
 # --- SUBLABELS FOR MENU OPTIONS ---
 label becky_homefront_peek:

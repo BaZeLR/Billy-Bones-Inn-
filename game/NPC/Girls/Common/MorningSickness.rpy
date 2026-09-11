@@ -3,14 +3,12 @@
 # ================================================================================
 init python:
     def tavern_breakfast_morning_sickness_girl():
-        if int(calendar_v2.time_slot() or 0) != 0:
+        if int(calendar_v2.hour or 0) >= 12:
             return ""
         for girl_key, girl_info in people.girl_items():
             if girl_info is None or not girl_info.is_tavern_worker():
                 continue
-            if str(people.location(girl_key) or "") != "TavernKitchen":
-                continue
-            if daily_events.exists(girl_key, "MorningSickness", "TavernKitchen", calendar_v2.time_slot()):
+            if daily_events.exists(girl_key, "MorningSickness", "TavernKitchen"):
                 return girl_key
         return ""
 

@@ -287,109 +287,6 @@ init python:
                 count += 1
             return count
 
-        def pregnancy_check(self, cum_place, repeat_count=1, dad_name="Вы", is_dude_random=0, dad_name_type=""):
-            dad = str(dad_name or "").strip()
-            dad_type = str(dad_name_type or "").strip()
-            is_random = people_to_int(is_dude_random, 0)
-            place = str(cum_place or "").strip().lower()
-            if dad.lower() == "you" or dad == "вы":
-                dad = "Вы"
-            if dad == "":
-                is_random = 1
-            if dad_type == "" and not is_random:
-                dad_type = "NPC"
-            dad_type_reset = 1 if is_random and dad_type == "" else 0
-            dad_name_reset = 1 if dad == "" else 0
-            place_reset = 1 if place not in ("inside", "mouth", "tits", "mouthface", "face", "outside") else 0
-            fun_awarded = 0
-            for _unused_amanda_pregnancy_check in range(max(1, people_to_int(repeat_count, 1))):
-                if dad_type_reset:
-                    dad_type = [
-                        "Неизвестный моряк",
-                        "Неизвестный грузчик",
-                        "Неизвестный негр",
-                        "Неизвестный стражник",
-                        "Неизвестный горожанин",
-                        "Неизвестный крестьянин",
-                        "Неизвестный торговец",
-                    ][procedural_randint(1, 7, key="procedural:NPC/Girls/Amanda/InitAmanda.rpy:procedural_randint:475:1") - 1]
-                if dad_name_reset:
-                    dad = "Случайный негр" if dad_type == "Неизвестный негр" else "Случайный мужчина"
-                if place_reset:
-                    rand_place = procedural_randint(1, 6, key="procedural:NPC/Girls/Amanda/InitAmanda.rpy:procedural_randint:479:2")
-                    if rand_place <= 3:
-                        place = "inside"
-                    elif rand_place == 4:
-                        place = "mouth"
-                    elif rand_place == 5:
-                        place = "tits"
-                    else:
-                        place = "mouthface"
-                self.add_sex_stat("sexacts", 1)
-                cur_conc = people_to_int(self.sex_stat("ConceptionChance", 0), 0)
-                if dad == "Вы":
-                    cur_conc *= 3
-                    self.mark_fucked(1)
-                    if fun_awarded == 0:
-                        player.condition.change("fun", 30)
-                        fun_awarded = 1
-                    player.intimacy.record_cum(current_game_day())
-                    if place == "inside":
-                        self.set_cum_state("cum_inside_you", 1)
-                    elif place == "tits":
-                        self.set_cum_state("cum_tits_you", 1)
-                    elif place in ("face", "mouthface"):
-                        self.set_cum_state("cum_face_you", 1)
-                    elif place == "mouth":
-                        self.set_cum_state("cum_mouth_you", 1)
-                else:
-                    if place == "inside":
-                        self.set_cum_state("cum_inside_others", 1)
-                    elif place == "tits":
-                        self.set_cum_state("cum_tits_others", 1)
-                    elif place in ("face", "mouthface"):
-                        self.set_cum_state("cum_face_others", 1)
-                    elif place == "mouth":
-                        self.set_cum_state("cum_mouth_others", 1)
-                    dad_info = people.get_info(dad)
-                    if dad_info is not None:
-                        dad_state = dad_info.ensure_sex_state()
-                        dad_state["came_today"] = people_to_int(dad_state.get("came_today", 0), 0) + 1
-                if procedural_randint(1, max(1, self.corruption * 3), key="procedural:NPC/Girls/Amanda/InitAmanda.rpy:procedural_randint:520:3") <= (2 if place == "inside" else 1) and self.corruption <= 70:
-                    self.change_social(corruption_delta=1)
-                if is_random:
-                    cur_conc = int(cur_conc / 10)
-                zalet = 0
-                if place == "inside":
-                    self.add_sex_stat("cuminside", 1)
-                    if self.pregnancy_days() == 0:
-                        if tavern_kitchen_fertility_bonus_active():
-                            cur_conc += max(4, int(people_to_int(self.sex_stat("ConceptionChance", 0), 0) * 0.5))
-                        cur_conc = min(cur_conc, 800)
-                        if cur_conc > 0 and procedural_randint(1, 1000, key="procedural:NPC/Girls/Amanda/InitAmanda.rpy:procedural_randint:534:4") <= cur_conc:
-                            self.set_sex_stat("pregnancy", 1)
-                            self.set_sex_stat("pregfather", dad)
-                            zalet = 1
-                if str(dad).lower() == "eddie" and dad_type == "NPC":
-                    dad_record = "Эдди"
-                elif str(dad).lower() in ("legare", "месье легаре") and dad_type == "NPC":
-                    dad_record = "Мессир Легаре"
-                else:
-                    dad_record = dad
-                if not isinstance(getattr(self, "detailed_sex_history", None), list):
-                    self.detailed_sex_history = []
-                self.detailed_sex_history.append({
-                    "RowId": len(self.detailed_sex_history) + 1,
-                    "Day": people_to_int(current_game_day(), 0) + 1,
-                    "GirlName": self.code_name,
-                    "DudeName": str(dad_record or ""),
-                    "DudeNameType": str(dad_type or ""),
-                    "IsDudeRandom": is_random,
-                    "CumTarget": place,
-                    "Zalet": zalet,
-                })
-            return self.pregnancy_state()
-
         def birth_ready(self):
             state = self.pregnancy_state()
             return (
@@ -758,7 +655,7 @@ init python:
                 self.performed_oral_with_legare = True
                 self.legare_affection += 1
                 self.apply_social_chance(0, 0, 0, 40, 1, 1, "legare_dance_outcome")
-                self.pregnancy_check("mouth", 1, "legare")
+                pregnancy_check("amanda", "mouth", 1, "legare")
             elif sex_type == 2:
                 self.had_sex_with_legare = True
                 self.lost_virginity_to_legare = True
@@ -767,19 +664,19 @@ init python:
                 self.apply_social_chance(0, 0, 0, 50, 1, 4, "legare_dance_outcome")
                 if self.dynamic_roll(1, 3, "legare_let_go_first_sex_finish") <= 2:
                     self.legare_affection += 1
-                    self.pregnancy_check("inside", 1, "legare")
+                    pregnancy_check("amanda", "inside", 1, "legare")
                 else:
                     self.legare_affection += 2
-                    self.pregnancy_check("outside", 1, "legare")
+                    pregnancy_check("amanda", "outside", 1, "legare")
             else:
                 self.had_sex_with_legare = True
                 self.apply_social_chance(0, 0, 0, 50, 1, 2, "legare_dance_outcome")
                 if self.dynamic_roll(1, 3, "legare_let_go_sex_finish") <= 2:
                     self.legare_affection += 1
-                    self.pregnancy_check("inside", 1, "legare")
+                    pregnancy_check("amanda", "inside", 1, "legare")
                 else:
                     self.legare_affection += 2
-                    self.pregnancy_check("outside", 1, "legare")
+                    pregnancy_check("amanda", "outside", 1, "legare")
             return sex_type
 
         def nesluh_value(self):
@@ -848,13 +745,13 @@ init python:
                 sex_type = 3
 
             if sex_type == 3:
-                self.pregnancy_check("outside", 1, guy, 0, "Соседский парень")
+                pregnancy_check("amanda", "outside", 1, guy, 0, "Соседский парень")
                 self.change_social(corruption_delta=1)
             elif sex_type == 2:
-                self.pregnancy_check("inside", 1, guy, 0, "Соседский парень")
+                pregnancy_check("amanda", "inside", 1, guy, 0, "Соседский парень")
                 self.change_social(corruption_delta=1)
             elif sex_type == 1:
-                self.pregnancy_check("mouth", 1, guy, 0, "Соседский парень")
+                pregnancy_check("amanda", "mouth", 1, guy, 0, "Соседский парень")
                 self.change_social(corruption_delta=1)
             return sex_type
 

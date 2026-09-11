@@ -434,7 +434,8 @@ def test_sandra_talk_is_direct_entry_not_refresh_apply_dispatcher():
     assert "social_topic_return_label" not in social_source
     assert 'return "IntSandraTalkRefresh"' not in social_source
     assert "while True:" not in talk_source
-    assert "jump IntSandraTalk" not in talk_source
+    assert "jump IntSandraTalk" in talk_source
+    assert "_sandra_repeat_menu" not in talk_source
     assert "main_ui_runtime.action_items" not in talk_source
     assert "MenuItem(" not in talk_source
     assert '"Попробовать помириться с Сандрой"' in talk_source

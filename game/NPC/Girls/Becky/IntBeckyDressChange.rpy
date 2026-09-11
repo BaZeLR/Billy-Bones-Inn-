@@ -131,9 +131,23 @@ label IntBeckyDressChange(GirlName="becky", agreed_to_redress=0):
             return
 
         "Предложить купить вдовушке обновку" if _can_buy:
-            "\"Бекки, а давай к портнихе сходим и я тебе чего-нибудь подарю там?\" - обратились вы к вдовушке.\n\"Прямо аттракцион невиданной щедрости!\" засмеялась та. \"Ну давай! Завтра с утра?\"\n\"Да, давай завтра с утра пораньше. У Ирмы Фараго, я буду тебя там ждать, вместе и выберем!\" заверили вы Бекки."
+            $ scene_runtime.text = "\"Бекки, а давай к портнихе сходим и я тебе чего-нибудь подарю там?\" - обратились вы к вдовушке."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
+            $ scene_runtime.text = "\"Прямо аттракцион невиданной щедрости!\" засмеялась та. \"Ну давай! Завтра с утра?\""
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
+            $ scene_runtime.text = "\"Да, давай завтра с утра пораньше. У Ирмы Фараго, я буду тебя там ждать, вместе и выберем!\" заверили вы Бекки."
+            $ scene_runtime.location_text = scene_runtime.text
             $ daily_events.add(GirlName, "dressshop", 0, "=", 1, 1, "BuyDressTom", "GirlDressBuy", "girl_location")
             $ Becky.finish_talk()
+            menu:
+                "Вернуться к разговору":
+                    pass
             return
 
         "Назад":

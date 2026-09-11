@@ -436,11 +436,13 @@ label TavernKitchen:
 
 
 label story_becky_sandra_kitchen_visit:
-    $ Becky.sandra_kitchen_friendship_progress = min(2, people_to_int(Becky.sandra_kitchen_friendship_progress, 0) + 1)
+    if Becky.sandra_kitchen_friendship_progress < 2:
+        $ Becky.sandra_kitchen_friendship_progress += 1
     $ main_ui_begin_native_scene_state("Бекки в гостях у Сандры")
     show screen main_ui
     vscene "images/tavern/kitchen/becky_visit_0.png"
-    "Зайдя вечером на кухню, вы застаете Сандру и Бекки за негромким разговором у разделочного стола. Бекки явно пришла не по торговому делу: подруги обсуждают дом, трактир и что-то такое, о чем при вашем появлении обе на миг умолкают."
+    $ scene_runtime.text = "Зайдя вечером на кухню, вы застаете Сандру и Бекки за негромким разговором у разделочного стола. Бекки явно пришла не по торговому делу: подруги обсуждают дом, трактир и что-то такое, о чем при вашем появлении обе на миг умолкают."
+    $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Угостить Сандру и Бекки бодрящим чаем" if tavern_kitchen_can_share_tea_with_sandra_and_becky():
             $ player.remove_item("energy_tea_001", 1)
@@ -451,11 +453,13 @@ label story_becky_sandra_kitchen_visit:
             $ Becky.fun = min(100, int(Becky.fun or 0) + 1)
             $ player.change_stat("fun", 1)
             vscene "images/tavern/kitchen/becky_visit_1.png"
-            "Вы завариваете бодрящий чай и ставите чашки перед Сандрой и Бекки. Разговор быстро теплеет: Сандра благодарит вас за внимание к хозяйству, а Бекки охотно подхватывает кухонные сплетни и делится парой полезных замечаний о трактирных делах."
+            $ scene_runtime.text = "Вы завариваете бодрящий чай и ставите чашки перед Сандрой и Бекки. Разговор быстро теплеет: Сандра благодарит вас за внимание к хозяйству, а Бекки охотно подхватывает кухонные сплетни и делится парой полезных замечаний о трактирных делах."
+            $ scene_runtime.location_text = scene_runtime.text
             call stat
 
         "Не мешать разговору":
-            "Вы не стали мешать подругам и оставили их спокойно беседовать."
+            $ scene_runtime.text = "Вы не стали мешать подругам и оставили их спокойно беседовать."
+            $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Вернуться к своим делам":
             pass

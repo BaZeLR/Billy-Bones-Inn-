@@ -150,46 +150,122 @@ label story_becky_home_invite_talk_0(girl_name="becky", _becky_inga_thread=None,
     $ _becky_eddie_thread = threads.get("beckyEddieBackstory", None)
     $ _becky_husband_unlocked = _becky_husband_thread is not None and (_becky_husband_thread.checkActive() or int(_becky_husband_thread.num or 0) > 0)
     $ _becky_husband_stage = int(_becky_husband_thread.num or 0) if _becky_husband_thread is not None else 0
-    "Вы решили попробовать напросится в гости к вдовушке: \"Бекки, сладкая моя, может я к тебе домой зайду как-нибудь вечерком?\" - предложили вы."
+    $ scene_runtime.text = "Вы решили попробовать напросится в гости к вдовушке: \"Бекки, сладкая моя, может я к тебе домой зайду как-нибудь вечерком?\" - предложили вы."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Далее":
+            pass
     if not _becky_husband_unlocked:
-        "\"Да нет, Стефанчик, я же тебя почти совсем не знаю, люди еще увидят, говорить будут, не, извини, но нет!\" - ответила вам вдова."
+        $ scene_runtime.text = "\"Да нет, Стефанчик, я же тебя почти совсем не знаю, люди еще увидят, говорить будут, не, извини, но нет!\" - ответила вам вдова."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Далее":
+                pass
     else:
         $ invite_points = 0
-        "\"Стефанчик, я бы и рада тебя пригласить, но что мои домашние скажут, как я им тебя представлю? Они же не маленькие, все поймут. Вот Эдди, мой управляющий, как я ему в глаза буду смотреть?\" - спросила вас вдова."
+        $ scene_runtime.text = "\"Стефанчик, я бы и рада тебя пригласить, но что мои домашние скажут, как я им тебя представлю? Они же не маленькие, все поймут. Вот Эдди, мой управляющий, как я ему в глаза буду смотреть?\" - спросила вас вдова."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Далее":
+                pass
         if _becky_eddie_thread is not None and int(_becky_eddie_thread.num or 0) >= 2:
-            "\"Вот именно что не маленькие\", ответили вы не растерявшись."
-            "\"Я же тебе рассказывал, что Эдди в моем трактире девиц снимает. Что ему, если хозяйка лавки своего любовника к себе приведет, не удивишь его этим.\""
+            $ scene_runtime.text = "\"Вот именно что не маленькие\", ответили вы не растерявшись."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
+            $ scene_runtime.text = "\"Я же тебе рассказывал, что Эдди в моем трактире девиц снимает. Что ему, если хозяйка лавки своего любовника к себе приведет, не удивишь его этим.\""
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
             $ invite_points += 1
         else:
-            "Вы не нашлись с ответом и промолчали."
-        "\"А дочка моя старшая, Ингеборг, что я ей скажу?\" - смотря вам в глаза спросила Бекки."
+            $ scene_runtime.text = "Вы не нашлись с ответом и промолчали."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
+        $ scene_runtime.text = "\"А дочка моя старшая, Ингеборг, что я ей скажу?\" - смотря вам в глаза спросила Бекки."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Далее":
+                pass
         if _becky_inga_thread is not None and int(_becky_inga_thread.num or 0) >= 4:
-            "\"Как что? Чтобы она с мамы пример брала и не по подворотням со своим парнем пряталась, а домой его приглашала.\" - нашлись вы с ответом. Ребекка не нашлась как вам возразить."
+            $ scene_runtime.text = "\"Как что? Чтобы она с мамы пример брала и не по подворотням со своим парнем пряталась, а домой его приглашала.\" - нашлись вы с ответом. Ребекка не нашлась как вам возразить."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
             $ invite_points += 1
         else:
-            "Вы попытались заговорить Бекки зубы, но поняв, что говорите неубедительно, замолкли на полуслове."
-        "\"А муж мой покойный, он бы как на это посмотрел?\" - всплеснув руками заявила вдовица."
+            $ scene_runtime.text = "Вы попытались заговорить Бекки зубы, но поняв, что говорите неубедительно, замолкли на полуслове."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
+        $ scene_runtime.text = "\"А муж мой покойный, он бы как на это посмотрел?\" - всплеснув руками заявила вдовица."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Далее":
+                pass
         if _becky_husband_stage >= 2:
-            "\"Ну, судя по тому, что ты о нем рассказывала, посмотрел бы он на это с интересом, вожделением и стремлением принять участие.\" - отетили вы."
-            "\"И то правда!\", засмеялась Бекки."
+            $ scene_runtime.text = "\"Ну, судя по тому, что ты о нем рассказывала, посмотрел бы он на это с интересом, вожделением и стремлением принять участие.\" - отетили вы."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
+            $ scene_runtime.text = "\"И то правда!\", засмеялась Бекки."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
             $ invite_points += 1
         else:
-            "Вам представился суровый дух усопшего мужа и вы пристыженно примолкли."
+            $ scene_runtime.text = "Вам представился суровый дух усопшего мужа и вы пристыженно примолкли."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
         if str(player.appearance.current_dress or "") == "citydress":
-            "\"Одно хорошо\", отметила Бекки. - \"Ты хотя бы прилично одет.\""
+            $ scene_runtime.text = "\"Одно хорошо\", отметила Бекки. - \"Ты хотя бы прилично одет.\""
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
             $ invite_points += 1
         else:
-            "\"А костюмчик-то у тебя приличный и в меру скромный есть?\" поинтересовалась благонравная вдовица."
+            $ scene_runtime.text = "\"А костюмчик-то у тебя приличный и в меру скромный есть?\" поинтересовалась благонравная вдовица."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
             if player.appearance.has_dress("citydress"):
-                "\"За кого ты меня принимаешь?! Конечно есть.\" ответили вы."
+                $ scene_runtime.text = "\"За кого ты меня принимаешь?! Конечно есть.\" ответили вы."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Далее":
+                        pass
                 $ invite_points += 1
             else:
-                "\"Ну пока нет, но скоро будет\", ничтоже сумнявшись заявили вы. Скромница, однако, отнеслась к вашим уверениям скептически: \"Вот когда будет, тогда и поговорим!\""
+                $ scene_runtime.text = "\"Ну пока нет, но скоро будет\", ничтоже сумнявшись заявили вы. Скромница, однако, отнеслась к вашим уверениям скептически: \"Вот когда будет, тогда и поговорим!\""
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Далее":
+                        pass
         if invite_points >= 4:
-            "\"Вот черт языкастый!\", воскликнула в сердцах Бекки. -\"Уболтал, можешь по вечерам в гости ко мне приходить\""
+            $ scene_runtime.text = "\"Вот черт языкастый!\", воскликнула в сердцах Бекки. -\"Уболтал, можешь по вечерам в гости ко мне приходить\""
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
             $ event_runtime.active_thread.advance()
         else:
-            "\"Ну вот, сам видишь, что в гости ко мне тебе лучше не приходить.\" - торжествуеще сказала вдовица. Вам ничего не оставалось делать, как с ней согласиться."
+            $ scene_runtime.text = "\"Ну вот, сам видишь, что в гости ко мне тебе лучше не приходить.\" - торжествуеще сказала вдовица. Вам ничего не оставалось делать, как с ней согласиться."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Далее":
+                    pass
     $ Becky.finish_talk()
     return
 

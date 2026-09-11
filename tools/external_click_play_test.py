@@ -473,7 +473,10 @@ testcase external_tavern_sunday_dinner_schedule_and_stats:
     $ _sunday_finish_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Закончить воскресный обед")
     click id ("choice_panel_button_%d" % int(_sunday_finish_index)) pos (0.5, 0.5) until eval (int(player.tavern_management.breakfast.sunday_dinner_last_day or -1) == current_game_day() and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval (str(main_ui_runtime.mode or "") == "event") timeout 5.0
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and any(str(item.caption or "").startswith("Согласиться на прогулку с ") for item in renpy.get_screen("choice").scope.get("items", []))) timeout 20.0
+    assert eval (any(str(item.caption or "").startswith("Согласиться на прогулку с ") for item in renpy.get_screen("choice").scope.get("items", [])) and "Сегодня остаться в трактире" in [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _sunday_stay_index = [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])].index("Сегодня остаться в трактире")
+    click id ("choice_panel_button_%d" % int(_sunday_stay_index)) pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and str(main_ui_runtime.mode or "") == "scene") timeout 20.0
     assert eval ((Sandra.rel, Melissa.rel, Amanda.rel) == tuple(value + 1 for value in _sunday_rel_before_finish)) timeout 5.0
     assert eval ((Sandra.openness, Melissa.openness, Amanda.openness) == _sunday_open_before_finish) timeout 5.0
     assert eval ((Sandra.corruption, Melissa.corruption, Amanda.corruption) == _sunday_corruption_before_finish) timeout 5.0
@@ -5724,13 +5727,12 @@ testcase external_amanda_daily_talk_actions:
     assert eval ("Спросить не боиться ли она залететь" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _amanda_break_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Сказать Аманде что она может иногда брать перерывы")
     $ _amanda_break_button_id = "choice_panel_button_%d" % int(_amanda_break_index)
-    click id _amanda_break_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and not Amanda.warned_about_not_working) timeout 20.0
-    click id "main_ui_entity_button_npc_amanda" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
+    click id _amanda_break_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and not Amanda.warned_about_not_working) timeout 20.0
     assert eval ("Сказать Аманде что она может иногда брать перерывы" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     assert eval ("Спросить не боиться ли она залететь" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _amanda_pregnancy_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить не боиться ли она залететь")
     $ _amanda_pregnancy_button_id = "choice_panel_button_%d" % int(_amanda_pregnancy_index)
-    click id _amanda_pregnancy_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and Amanda.pregnancy_risk_asked_today and int(Amanda.asked_today or 0) == 1) timeout 20.0
+    click id _amanda_pregnancy_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and Amanda.pregnancy_risk_asked_today and int(Amanda.asked_today or 0) == 1) timeout 20.0
 
 testcase external_sandra_talk_opens_from_npc_button:
     run Jump("Intro")
@@ -5757,9 +5759,8 @@ testcase external_sandra_talk_opens_from_npc_button:
     assert eval ("Спросить, что для нее сейчас важнее всего по хозяйству" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _sandra_priority_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Спросить, что для нее сейчас важнее всего по хозяйству")
     $ _sandra_priority_button_id = "choice_panel_button_%d" % int(_sandra_priority_index)
-    click id _sandra_priority_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is None and int(Sandra.asked_today or 0) == 1) timeout 20.0
+    click id _sandra_priority_button_id pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None and int(Sandra.asked_today or 0) == 1) timeout 20.0
     assert eval ("Чтобы в трактире был порядок" in str(scene_runtime.text or "")) timeout 5.0
-    click id "main_ui_entity_button_npc_sandra" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
     assert eval ("Спросить, что для нее сейчас важнее всего по хозяйству" not in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
     $ _sandra_back_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Назад")
     $ _sandra_back_button_id = "choice_panel_button_%d" % int(_sandra_back_index)
@@ -5767,10 +5768,10 @@ testcase external_sandra_talk_opens_from_npc_button:
     $ Sandra.rel = 0
     $ Sandra.talked_today = 0
     click id "main_ui_entity_button_npc_sandra" pos (0.5, 0.5) until eval (str(main_ui_runtime.mode or "") == "talk" and renpy.get_screen("choice") is not None) timeout 20.0
-    assert eval ("Попробовать помириться с мамой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
-    $ _sandra_reconcile_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Попробовать помириться с мамой")
+    assert eval ("Попробовать помириться с Сандрой" in [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])]) timeout 5.0
+    $ _sandra_reconcile_index = [str(i.caption or "") for i in renpy.get_screen("choice").scope.get("items", [])].index("Попробовать помириться с Сандрой")
     $ _sandra_reconcile_button_id = "choice_panel_button_%d" % int(_sandra_reconcile_index)
-    click id _sandra_reconcile_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is None and "Вы подошли к Сандре и извинились" in str(scene_runtime.text or "")) timeout 20.0
+    click id _sandra_reconcile_button_id pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and "Вы подошли к Сандре и извинились" in str(scene_runtime.text or "")) timeout 20.0
     assert eval ("Сандра" in str(scene_runtime.text or "") and "мам" not in str(scene_runtime.text or "").lower()) timeout 5.0
 
 testcase external_sandra_pending_soap_request_can_be_fulfilled:
@@ -6053,13 +6054,21 @@ testcase external_melissa_courtship_is_slow_and_daily:
     $ threads["melissaCourtship"].reset()
     $ Melissa.reset_daily()
     $ threads["melissaCourtship"].data.triggers[0][0].prob = 1.0
-    $ threads["melissaCourtship"].data.triggers[0][1].prob = 1.0
     $ threads["melissaCourtship"].data.triggers[1][0].prob = 1.0
     $ initStoryEventRuntime(True)
     assert eval (not story_event_available("talk_melissa", "melissa_intimacy")) timeout 5.0
 
     $ Melissa.drawings_booklet_left = True
     $ initStoryEventRuntime(True)
+    assert eval (Melissa.intimacy_story_ready() and Melissa.relationship_stage() >= 2 and Liza.can_work_tavern() and Liza.is_working()) timeout 5.0
+    assert eval (all(room_in_group(str(people.location(npc_id) or ""), ROOM_GROUP_TAVERN) for npc_id in ("amanda", "melissa", "liza"))) timeout 5.0
+    assert eval (str(threads["melissaCourtship"].data.triggers[0][0].target or "") == "story_melissa_courtship_amanda_talk_0" and not story_event_fired_today(threads["melissaCourtship"].data.triggers[0][0])) timeout 5.0
+    assert eval (threads["melissaCourtship"].data.triggers[0][0].checkDay() and threads["melissaCourtship"].data.triggers[0][0].checkHour()) timeout 5.0
+    assert eval (threads["melissaCourtship"].data.triggers[0][0].checkConditions()) timeout 5.0
+    assert eval (threads["melissaCourtship"].data.triggers[0][0].checkNumDay(threads["melissaCourtship"].day)) timeout 5.0
+    assert eval (threads["melissaCourtship"].data.triggers[0][0].checkReqs()) timeout 5.0
+    assert eval (threads["melissaCourtship"].data.triggers[0][0].checkProb()) timeout 5.0
+    assert eval (threads["melissaCourtship"].data.triggers[0][0].canTrigger(threads["melissaCourtship"].day)) timeout 5.0
     assert eval (story_event_available("TavernMain", "enter")) timeout 5.0
     assert eval (not Melissa.relationship_allows("intimacy") and not Melissa.relationship_allows("sex")) timeout 5.0
 

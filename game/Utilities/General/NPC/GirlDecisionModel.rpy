@@ -5,7 +5,6 @@ init -34 python:
     import math
 
     GIRL_DECISION_CORE_IDS = ("amanda", "melissa", "sandra")
-    GIRL_DECISION_CYCLE_IDS = ("amanda", "melissa", "sandra", "clara", "irma", "inga", "becky")
 
     GIRL_DECISION_PREFS = {
         "amanda": {
@@ -182,7 +181,8 @@ init -34 python:
 
     def girl_decision_cycle_state(girl_name=""):
         girl = str(girl_name or "").strip().lower()
-        if girl not in GIRL_DECISION_CYCLE_IDS:
+        girl_info = people.get_info(girl)
+        if girl_info is None or str(getattr(girl_info, "registry_group", "") or "") != "girl":
             return {"phase": "none", "horny": 0.0, "critical": 0.0, "fertility": 0.0}
         offset = (sum([ord(ch) for ch in girl]) + girl_decision_int(people_birth_date(girl).get("day", 0), 0)) % 28
         day_index = (current_game_day() + offset) % 28

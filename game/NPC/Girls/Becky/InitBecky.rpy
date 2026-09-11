@@ -152,6 +152,10 @@ init python:
                 return rooms.get("BeckyHomeFront").state["arrival_mode"] == "FromDances"
             return super(BeckyInfo, self).interaction_visible(room_key)
 
+        def is_home_for_evening_visit(self):
+            minute_now = int(calendar_v2.clock_minutes()) % 1440
+            return minute_now >= 18 * 60 and self.getLocation() == "BeckyHome" and bool(self.schedule_state()["awake"])
+
         def action_data(self, where_id=""):
             data = super(BeckyInfo, self).action_data(where_id)
             if str(where_id or "").strip() == "GroceryStore":

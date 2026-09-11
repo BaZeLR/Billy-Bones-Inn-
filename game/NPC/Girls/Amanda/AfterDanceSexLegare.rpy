@@ -29,7 +29,7 @@ label AmandaLegareMinetFinish:
     $ Amanda.performed_oral_with_legare = True
     $ Amanda.legare_affection += 1
     $ Amanda.change_social(corruption_delta=1)
-    $ Amanda.pregnancy_check("mouthface", 1, "legare")
+    $ pregnancy_check("amanda", "mouthface", 1, "legare")
     return
 
 
@@ -54,7 +54,7 @@ label AmandaLegareSexFinish(tmpLegareSexType):
         else:
             call ShowImage("amanda", "albersex", "spermpussy")
 
-        $ Amanda.pregnancy_check("inside", 1, "legare")
+        $ pregnancy_check("amanda", "inside", 1, "legare")
         $ Amanda.legare_affection += 1
         $ Amanda.change_social(corruption_delta=2)
     else:
@@ -68,7 +68,7 @@ label AmandaLegareSexFinish(tmpLegareSexType):
         else:
             "Она радуется, что Легаре не кончил внутрь."
 
-        $ Amanda.pregnancy_check("outside", 1, "legare")
+        $ pregnancy_check("amanda", "outside", 1, "legare")
         $ Amanda.legare_affection += 2
         $ Amanda.change_social(corruption_delta=2)
 

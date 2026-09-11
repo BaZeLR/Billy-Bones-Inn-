@@ -4,6 +4,21 @@
 # and immediate class-state mutations for the Clara/Melissa visit scenes.
 # ================================================================================
 
+label story_clara_warns_amanda_about_legare_0:
+    $ main_ui_begin_native_scene_state("Предупреждение Клариссы")
+    show screen main_ui
+    vscene "images/clara/tavern_visit.png"
+    $ scene_runtime.text = "Зайдя в общий зал, вы замечаете Клариссу рядом с Амандой. Кларисса говорит тихо и не пытается изображать вашу союзницу.\n\n\"Я не друг вашему хозяину и не собираюсь им становиться,\" предупреждает она, бросив короткий взгляд в вашу сторону. \"Но Альбер опаснее, чем кажется. Он умеет говорить именно то, что девушка хочет услышать, а потом превращает ее доверие в свой товар. Не оставайся с ним наедине и не верь обещаниям только потому, что они красиво звучат.\"\n\nАманда сперва хочет отшутиться, но выражение лица Клариссы заставляет ее замолчать и выслушать предупреждение до конца."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить":
+            pass
+    $ event_runtime.active_thread.advance()
+    $ event_runtime.evaluation_time = None
+    $ findAvailableEvents(True)
+    $ main_ui_end_native_scene_state()
+    return True
+
 label story_clara_tavern_visit_bar_0:
     $ main_ui_begin_native_scene_state("Кларисса и Мелисса у стойки")
     show screen main_ui

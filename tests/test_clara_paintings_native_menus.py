@@ -24,6 +24,7 @@ def test_clara_paintings_story_choices_are_native_label_menus():
     assert "label story_clara_paintings_first_ask_3:" in source
     assert "label story_clara_paintings_second_ask_4:" in source
     assert "label story_clara_paintings_legare_5:" in source
+    assert 'vscene "images/Alber/church/cermon_fiance_clara.png"' in source
     assert "Альбер Легаре не ее настоящий отец" in source
     talk = (ROOT / "game" / "NPC" / "Girls" / "Clara" / "IntClaraTalk.rpy").read_text(encoding="utf-8-sig")
     assert '"Спросить Клариссу о Легаре" if story_event_available' in talk

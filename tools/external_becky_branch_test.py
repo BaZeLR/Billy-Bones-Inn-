@@ -124,6 +124,9 @@ testcase becky_front_and_home_replace_foreign_location_text:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
     python:
+        calendar_v2.week = 1
+        calendar_v2.hour = 19
+        calendar_v2.minute = 0
         scene_runtime.text = "FOREIGN MARKET DESCRIPTION"
         scene_runtime.location_text = "FOREIGN MARKET DESCRIPTION"
         Becky.home_front_checked_today = True
@@ -136,7 +139,7 @@ testcase becky_front_and_home_replace_foreign_location_text:
     assert eval ("FOREIGN MARKET DESCRIPTION" not in str(scene_runtime.text or "") and "FOREIGN MARKET DESCRIPTION" not in str(scene_runtime.location_text or "")) timeout 5.0
     advance until screen "choice" timeout 20.0
     $ _becky_enter_home_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope.get("items", [])) if str(item.caption or "") == "Зайти в дом")
-    click id ("choice_panel_button_%d" % int(_becky_enter_home_index)) pos (0.5, 0.5) until screen "say" timeout 20.0
+    click id ("choice_panel_button_%d" % int(_becky_enter_home_index)) pos (0.5, 0.5) until eval (rooms.current_code == "BeckyHome") timeout 20.0
     assert eval (str(rooms.current_code or "") == "BeckyHome") timeout 5.0
     assert eval (str(scene_runtime.text or "") == str(rooms.get("BeckyHome").visible_descriptions()[0].text or "")) timeout 5.0
     assert eval ("FOREIGN MARKET DESCRIPTION" not in str(scene_runtime.text or "") and "FOREIGN MARKET DESCRIPTION" not in str(scene_runtime.location_text or "")) timeout 5.0
@@ -299,6 +302,136 @@ testcase becky_evening_georgette_visit_is_reachable:
     assert eval (rooms.get("BeckyHome").is_open()) timeout 5.0
     assert eval (story_event_available("BeckyHome", "georgett_home_visit")) timeout 5.0
 
+testcase becky_visit_clock_and_market_invitation:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 1
+        calendar_v2.hour = 13
+        calendar_v2.minute = 0
+        threads["beckyHome"].advanceTo(3, complete_at_end=True)
+    assert eval (people.location("becky") == "GroceryStore" and not marketplace_becky_home_visible())
+    $ calendar_v2.hour = 19
+    assert eval (people.location("becky") == "BeckyHome" and marketplace_becky_home_visible())
+    python:
+        calendar_v2.week = 2
+        Becky.sandra_kitchen_friendship_progress = 3
+    assert eval (people.location("becky") == "TavernKitchen" and not marketplace_becky_home_visible())
+    python:
+        calendar_v2.hour = 20
+        calendar_v2.minute = 30
+    assert eval (people.location("becky") == "BeckyHome" and marketplace_becky_home_visible())
+    $ calendar_v2.hour = 23
+    assert eval (not marketplace_becky_home_visible())
+    python:
+        calendar_v2.week = 5
+        calendar_v2.hour = 22
+        calendar_v2.minute = 0
+        rooms.get("FridayDance").dance_count = 5
+        rooms.get("FridayDance").becky_home_invited = True
+        threads["beckyHome"].reset()
+        rooms.enter("MarketPlace")
+        event_runtime.fired_keys_today = []
+    assert eval (marketplace_becky_home_visible())
+    run movement_actions("BeckyHomeFront", 10)
+    advance until screen "choice" timeout 20.0
+    assert eval (rooms.current_code == "BeckyHomeFront")
+    assert eval (rooms.get("BeckyHomeFront").state["arrival_mode"] == "FromDances")
+    assert eval (threads["beckyHome"].num == 1)
+    assert eval (calendar_v2.hour == 22 and calendar_v2.minute == 10)
+    assert eval (any(item.caption == "Вернуться на рынок" for item in renpy.get_screen("choice").scope["items"]))
+
+testcase inga_grocery_morning_event_cycle:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 1
+        calendar_v2.hour = 7
+        calendar_v2.minute = 0
+        threads["beckyIngaLucasPath"].reset()
+        Inga.known = False
+        Inga.acquaintance_stage = 0
+        Becky.talked_today = 0
+        event_runtime.fired_keys_today = []
+        initStoryEventRuntime(True)
+    assert eval (grocery_store_active_grocer_id() == "inga")
+    assert eval (story_event_available("GroceryStore", "enter"))
+    assert eval (event_runtime.available["GroceryStore"]["enter"].target == "story_inga_grocery_morning_0")
+    run Jump("GroceryStore")
+    advance until screen "choice" timeout 20.0
+    assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == [])
+    assert eval ("Лавка уже открыта" in scene_runtime.text)
+    screenshot "inga_grocery_morning_start.png"
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("мгновенно становится тихо" in scene_runtime.text) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Я Ингенборг" in scene_runtime.text) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval ("Хороший завтрак" in scene_runtime.text) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (threads["beckyIngaLucasPath"].num == 1) timeout 10.0
+    assert eval (rooms.current_code == "GroceryStore" and main_ui_runtime.mode == "scene") timeout 5.0
+    assert eval (scene_runtime.picture == rooms.get("GroceryStore").bg_picture)
+    screenshot "inga_grocery_morning_return.png"
+    assert eval (Inga.known and Inga.acquaintance_stage >= 1)
+    assert eval (story_event_available("talk_becky", "becky_talk_inga1"))
+    assert eval (not story_event_available("GroceryStore", "enter") or event_runtime.available["GroceryStore"]["enter"].target != "story_inga_grocery_morning_0")
+
+testcase becky_regular_evening_visit_enters_dinner:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 1
+        calendar_v2.hour = 19
+        calendar_v2.minute = 0
+        threads["beckyHome"].advanceTo(3, complete_at_end=True)
+        player.appearance.current_dress = "citydress"
+        Becky.home_front_checked_today = True
+        _home_visits_before = Becky.home_visit_count
+        rooms.enter("MarketPlace")
+    run movement_actions("BeckyHomeFront", 10)
+    advance until screen "choice" timeout 20.0
+    assert eval (rooms.get("BeckyHomeFront").state["arrival_mode"] == "")
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (rooms.current_code == "BeckyHome") timeout 10.0
+    screenshot "becky_home_admission.png"
+    assert eval (main_ui_runtime.action_items == [] and main_ui_runtime.action_title == rooms.get("BeckyHome").display_name)
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.picture == "images/becky/dinner/DinnerStart.jpg") timeout 20.0
+    assert eval (rooms.current_code == "BeckyHome")
+    assert eval (Becky.home_visit_count == _home_visits_before + 1)
+    assert eval (scene_runtime.picture == "images/becky/dinner/DinnerStart.jpg")
+    assert eval (any(item.caption == "Осмотреть Ребекку" for item in renpy.get_screen("choice").scope["items"]))
+
+testcase inga_grocery_morning_clock_gates:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        threads["beckyIngaLucasPath"].reset()
+        initStoryEventRuntime(True)
+        _morning_event = next(evt for evt in threads["beckyIngaLucasPath"].data.triggers[0] if evt.target == "story_inga_grocery_morning_0")
+        calendar_v2.week = 1
+        calendar_v2.hour = 5
+    assert eval (not _morning_event.checkHour())
+    $ calendar_v2.hour = 6
+    assert eval (_morning_event.checkHour() and _morning_event.checkDay() and _morning_event.checkConditions())
+    $ calendar_v2.hour = 8
+    assert eval (not _morning_event.checkHour())
+    python:
+        calendar_v2.week = 7
+        calendar_v2.hour = 7
+    assert eval (not _morning_event.checkDay())
+
+testcase inga_grocery_morning_leave_keeps_progress:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 1
+        calendar_v2.hour = 7
+        calendar_v2.minute = 0
+        threads["beckyIngaLucasPath"].reset()
+        event_runtime.fired_keys_today = []
+        initStoryEventRuntime(True)
+    run Jump("GroceryStore")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_2" pos (0.5, 0.5) until eval (rooms.current_code == "MarketPlace") timeout 10.0
+    assert eval (threads["beckyIngaLucasPath"].num == 0)
+    assert eval (main_ui_runtime.scene_origin is None)
+
 testcase becky_legacy_progress_migrates_to_threads:
     run Jump("dev_after_report_checkpoint")
     advance until screen "main_ui" timeout 20.0
@@ -320,6 +453,154 @@ testcase becky_legacy_progress_migrates_to_threads:
     assert eval (not hasattr(Becky, "home_sex_unlocked")) timeout 5.0
     assert eval (not hasattr(Becky, "open_oral_stage")) timeout 5.0
     assert eval (not hasattr(Becky, "eddie_join_stage")) timeout 5.0
+
+testcase becky_kitchen_friendship_survives_repeat_visit:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 2
+        calendar_v2.hour = 19
+        calendar_v2.minute = 0
+        Becky.sandra_kitchen_friendship_progress = 3
+        rooms.enter("TavernKitchen")
+    run Call("story_becky_sandra_kitchen_visit")
+    advance until screen "choice" timeout 20.0
+    assert eval (Becky.sandra_kitchen_friendship_progress == 3)
+    assert eval (Becky.sandra_friendship_stage() == 2)
+    assert eval (scene_runtime.text.startswith("Зайдя вечером на кухню") and scene_runtime.text == scene_runtime.location_text)
+    screenshot "becky_kitchen_visit.png"
+    $ _leave_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Не мешать разговору")
+    click id ("choice_panel_button_%d" % _leave_index) pos (0.5, 0.5) until eval (scene_runtime.text.startswith("Вы не стали мешать")) timeout 10.0
+    assert eval (renpy.get_screen("choice").scope["items"][0].caption == "Вернуться к своим делам")
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode != "event") timeout 10.0
+
+testcase becky_clothes_offer_schedules_one_appointment:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 1
+        calendar_v2.hour = 14
+        calendar_v2.minute = 0
+        Becky.rel = 9
+        Becky.talked_today = 0
+        daily_events.delete("becky", "BuyDressTom")
+        daily_events.delete("becky", "BuyDress")
+        rooms.enter("GroceryStore")
+    run Call("IntBeckyTalk", "becky")
+    advance until screen "choice" timeout 20.0
+    $ _clothes_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Поговорить с Бекки об одежде")
+    click id ("choice_panel_button_%d" % _clothes_index) pos (0.5, 0.5) until eval (any(item.caption == "Предложить купить вдовушке обновку" for item in renpy.get_screen("choice").scope["items"])) timeout 10.0
+    $ _clothes_buy_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Предложить купить вдовушке обновку")
+    click id ("choice_panel_button_%d" % _clothes_buy_index) pos (0.5, 0.5) until eval (scene_runtime.text.startswith('\"Бекки, а давай к портнихе')) timeout 10.0
+    screenshot "becky_clothes_offer.png"
+    assert eval (scene_runtime.text == scene_runtime.location_text and not renpy.get_screen("say"))
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text.startswith('\"Прямо аттракцион')) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text.startswith('\"Да, давай завтра')) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (any(item.caption == "Закончить разговор" for item in renpy.get_screen("choice").scope["items"])) timeout 10.0
+    assert eval (rooms.current_code == "GroceryStore" and main_ui_runtime.mode == "talk")
+    assert eval (daily_events.exists("becky", "BuyDressTom") == 1)
+    assert eval (sum(row["GirlName"] == "becky" and row["EventType"] == "BuyDressTom" for row in daily_events.rows) == 1)
+    assert eval (Becky.talk_count() == 1 and not Becky.dress_change_flags()["can_buy"])
+    python:
+        daily_events.end_day(2)
+        calendar_v2.week = 2
+        calendar_v2.hour = 9
+        calendar_v2.minute = 0
+        Becky.reset_daily()
+    assert eval (daily_events.exists("becky", "BuyDressTom") == 0 and daily_events.exists("becky", "BuyDress") == 1)
+    run Jump("DressShop")
+    advance until screen "dress_shop_catalog_page" timeout 20.0
+    assert eval (rooms.current_code == "DressShop" and renpy.get_screen("dress_shop_catalog_page").scope["girl_name"] == "becky")
+    assert eval (daily_events.exists("becky", "BuyDress") == 0 and daily_events.exists("becky", "DressNoShow") == 0)
+    screenshot "becky_tailor_appointment.png"
+    run Hide("dress_shop_catalog_page")
+
+testcase becky_kitchen_visits_then_honey_tea:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.daysInGame = 31
+        calendar_v2.week = 2
+        calendar_v2.hour = 19
+        calendar_v2.minute = 0
+        Becky.sandra_kitchen_friendship_progress = 0
+        player.add_item("energy_tea_001", 1)
+        _tea_before = player.item_count("energy_tea_001")
+        rooms.enter("TavernKitchen")
+    assert eval (people.location("becky") == "TavernKitchen" and people.location("sandra") == "TavernKitchen")
+    run Call("story_becky_sandra_kitchen_visit")
+    advance until screen "choice" timeout 20.0
+    assert eval (Becky.sandra_kitchen_friendship_progress == 1 and not tavern_kitchen_can_share_tea_with_sandra_and_becky())
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text.startswith("Вы не стали мешать")) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode != "event") timeout 10.0
+    run Call("story_becky_sandra_kitchen_visit")
+    advance until screen "choice" timeout 20.0
+    assert eval (Becky.sandra_kitchen_friendship_progress == 2 and tavern_kitchen_can_share_tea_with_sandra_and_becky())
+    $ _tea_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Угостить Сандру и Бекки бодрящим чаем")
+    click id ("choice_panel_button_%d" % _tea_index) pos (0.5, 0.5) until eval (Becky.sandra_kitchen_friendship_progress == 3) timeout 10.0
+    assert eval (player.item_count("energy_tea_001") == _tea_before - 1 and Becky.sandra_friendship_stage() == 2)
+    assert eval (str(scene_runtime.picture).endswith("becky_visit_1.png"))
+    screenshot "becky_kitchen_tea.png"
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (main_ui_runtime.mode != "event") timeout 10.0
+
+testcase becky_regular_invitation_reads_objections_before_unlock:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 1
+        calendar_v2.hour = 14
+        calendar_v2.minute = 0
+        Becky.rel = 13
+        Becky.talked_today = 0
+        threads["beckyHome"].reset()
+        threads["beckyHome"].advanceTo(2)
+        threads["beckyIngaLucasPath"].advanceTo(4, complete_at_end=True)
+        threads["beckyEddieBackstory"].advanceTo(2, complete_at_end=True)
+        threads["beckyHusbandBackstory"].advanceTo(2)
+        player.appearance.current_dress = "citydress"
+        event_runtime.fired_keys_today = []
+        rooms.enter("GroceryStore")
+    run Call("IntBeckyTalk", "becky")
+    advance until screen "choice" timeout 20.0
+    $ _invite_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Попробовать напросится в гости")
+    click id ("choice_panel_button_%d" % _invite_index) pos (0.5, 0.5) until eval (scene_runtime.text.startswith("Вы решили попробовать напросится")) timeout 10.0
+    assert eval (scene_runtime.text == scene_runtime.location_text and not renpy.get_screen("say"))
+    assert eval (threads["beckyHome"].num == 2)
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text.startswith('\"Вот черт языкастый!')) timeout 20.0
+    assert eval (threads["beckyHome"].num == 2 and Becky.talk_count() == 0)
+    screenshot "becky_invitation_consent.png"
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (Becky.talk_count() == 1) timeout 10.0
+    assert eval (threads["beckyHome"].num == 3 and rooms.current_code == "GroceryStore")
+    assert eval (any(item.caption == "Закончить разговор" for item in renpy.get_screen("choice").scope["items"]))
+
+testcase becky_sherwood_disclosure_returns_to_talk:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        calendar_v2.week = 1
+        calendar_v2.hour = 14
+        Becky.rel = 17
+        Becky.talked_today = 0
+        Becky.trade_offer_stage = 1
+        Becky.admitted_sherwood_stage = 0
+        Becky.knows_blackwood = True
+        rooms.enter("GroceryStore")
+    run Call("IntBeckyTalk", "becky")
+    advance until screen "choice" timeout 20.0
+    $ _sherwood_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Насчет дороги в Куниделл")
+    click id ("choice_panel_button_%d" % _sherwood_index) pos (0.5, 0.5) until eval (scene_runtime.text.startswith('\"Дорожка в Куниделл')) timeout 10.0
+    assert eval (Becky.admitted_sherwood_stage == 0 and Becky.talk_count() == 0)
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text.startswith('\"Через него')) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text.startswith('\"А там никто')) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text.startswith('\"Ну как тебе сказать')) timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.text == '\"И что?\"') timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (Becky.admitted_sherwood_stage == 1) timeout 10.0
+    screenshot "becky_sherwood_disclosure.png"
+    assert eval (renpy.get_screen("choice").scope["items"][0].caption == "Вернуться к разговору")
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (any(item.caption == "Закончить разговор" for item in renpy.get_screen("choice").scope["items"])) timeout 10.0
+    assert eval (rooms.current_code == "GroceryStore" and main_ui_runtime.mode == "talk")
+    assert eval (Becky.talk_count() == 1)
+    assert eval (any(item.caption == "Так что же ты меня дурила-то?" for item in renpy.get_screen("choice").scope["items"]))
 '''
 
 
@@ -340,7 +621,7 @@ def build_temp_project(root: Path, temp_root: Path) -> Path:
     return temp_project
 
 
-def run_renpy(renpy_exe: Path, temp_project: Path, timeout: int) -> int:
+def run_renpy(renpy_exe: Path, temp_project: Path, timeout: int, only: str = "global") -> int:
     test_savedir = temp_project / ".test-saves"
     test_savedir.mkdir(parents=True, exist_ok=True)
     args = [
@@ -349,6 +630,7 @@ def run_renpy(renpy_exe: Path, temp_project: Path, timeout: int) -> int:
         "--savedir",
         str(test_savedir),
         "test",
+        only,
         "--hide-execution",
         "no",
         "--report-detailed",
@@ -381,6 +663,7 @@ def main() -> int:
     parser.add_argument("--renpy", default=RENpy_DEFAULT)
     parser.add_argument("--timeout", type=int, default=420)
     parser.add_argument("--keep-temp", action="store_true")
+    parser.add_argument("--only", default="global", help="Ren'Py testcase or suite name")
     args = parser.parse_args()
 
     root = project_root()
@@ -392,7 +675,7 @@ def main() -> int:
     try:
         temp_project = build_temp_project(root, temp_root)
         print(f"Temporary Becky test project: {temp_project}")
-        return run_renpy(renpy_exe, temp_project, args.timeout)
+        return run_renpy(renpy_exe, temp_project, args.timeout, args.only)
     finally:
         if args.keep_temp:
             print(f"Keeping temporary Becky test project: {temp_root}")

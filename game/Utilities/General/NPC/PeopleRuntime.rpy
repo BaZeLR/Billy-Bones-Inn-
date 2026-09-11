@@ -965,24 +965,7 @@ init -999 python:
             if place_key not in ("inside", "mouth", "tits", "face"):
                 place_key = "outside"
             state = self.ensure_sex_state()
-            player.intimacy.record_cum(calendar_v2.daysInGame)
-            self.add_sex_stat("sexacts", 1)
-            self.mark_fucked(1)
-            if place_key == "inside":
-                state["cum_inside_you"] = 1
-                self.add_sex_stat("cuminside", 1)
-                if self.pregnancy_days() == 0:
-                    chance = min(800, people_to_int(self.sex_stat("ConceptionChance", 0), 0) * 3)
-                    if chance > 0 and procedural_randint(1, 1000, "pregnancy_%s_%s" % (self.code_name, people_to_int(calendar_v2.daysInGame, 0))) <= chance:
-                        self.set_sex_stat("pregnancy", 1)
-                        self.set_sex_stat("pregfather", "Вы")
-            elif place_key == "mouth":
-                state["cum_mouth_you"] = 1
-            elif place_key == "tits":
-                state["cum_tits_you"] = 1
-            elif place_key == "face":
-                state["cum_face_you"] = 1
-            self.record_sex_history("You", str(state.get("location", "") or ""), place_key)
+            pregnancy_check(self.name, place_key, 1, "Вы")
             self.set_cock_position("none")
             self.set_sex_busy(True)
             return state
@@ -1146,6 +1129,7 @@ init -999 python:
         registry_group = "girl"
         work_socializing_locations = ()
         daily_sex_limit = 2
+        mood = "neutral"
         def __init__(self, name, **kwargs):
             super().__init__(name, **kwargs)
             self.detailed_sex_history = []

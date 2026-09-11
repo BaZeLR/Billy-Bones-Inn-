@@ -114,32 +114,18 @@ define melissaThreadList = [
         ),
     ]], highlight=False, threaded=True),
     LThreadData(0, "melissa", "Courtship", None, [
-        [
-            (
-                "story_melissa_courtship_amanda_talk_0",
-                (1, 6), (12, 18), None,
-                0.25, None,
-                melissaCourtshipOpeningConditions + [
-                    "#str(people.location('amanda') or '') == 'TavernMain'",
-                    "#str(people.location('melissa') or '') == 'TavernMain'",
-                    "#str(people.location('liza') or '') == 'TavernMain'",
-                ],
-                None,
-                "TavernMain", "enter", 15,
-            ),
-            (
-                "story_melissa_courtship_amanda_talk_0",
-                (1, 6), (12, 18), None,
-                0.25, None,
-                melissaCourtshipOpeningConditions + [
-                    "#str(people.location('amanda') or '') == 'TavernKitchen'",
-                    "#str(people.location('melissa') or '') == 'TavernKitchen'",
-                    "#str(people.location('liza') or '') == 'TavernMain'",
-                ],
-                None,
-                "TavernKitchen", "enter", 15,
-            ),
-        ],
+        (
+            "story_melissa_courtship_amanda_talk_0",
+            (1, 6), (12, 18), None,
+            0.25, None,
+            melissaCourtshipOpeningConditions + [
+                "#room_in_group(str(people.location('amanda') or ''), ROOM_GROUP_TAVERN)",
+                "#room_in_group(str(people.location('melissa') or ''), ROOM_GROUP_TAVERN)",
+                "#room_in_group(str(people.location('liza') or ''), ROOM_GROUP_TAVERN)",
+            ],
+            None,
+            TAVERN_AMANDA_LIZA_TALK_ROOMS, "enter", 15,
+        ),
         (
             "story_melissa_courtship_storm_1",
             None, (20, 23), 1,
@@ -1151,9 +1137,14 @@ define beckyThreadList = [
         [],
     ], highlight=False, threaded=True),
     LThreadData(0, "becky", "IngaLucasPath", None, [
-        ("becky_homefront_share_with_becky", None, None, None, 1, None, [
-            "#str(rooms.get('BeckyHomeFront').state.get('arrival_mode', '') or '') == 'FromDances'",
-        ], None, "BeckyHomeFront", "inga_discovery", 10),
+        [
+            ("becky_homefront_share_with_becky", None, None, None, 1, None, [
+                "#str(rooms.get('BeckyHomeFront').state.get('arrival_mode', '') or '') == 'FromDances'",
+            ], None, "BeckyHomeFront", "inga_discovery", 10),
+            ("story_inga_grocery_morning_0", (1, 6), (6, 7), None, 1, None, [
+                "#people.location('inga') == 'GroceryStore'",
+            ], None, "GroceryStore", "enter", 30),
+        ],
         ("story_becky_talk_inga_0", None, None, None, 1, None, [
             "#Becky.talk_count() < 2",
         ], None, "talk_becky", "becky_talk_inga1", 20),
@@ -1803,6 +1794,28 @@ define georgettThreadList = [
             "talk_georgett",
             "ask_gerhard",
             30,
+        ),
+    ], highlight=False, threaded=True),
+    #
+    # clara_amanda_warning
+    #
+    # The event is independent from Clara's ordered Melissa-visit sequence.
+    LThreadData(0, "clara", "AmandaWarning", None, [
+        (
+            "story_clara_warns_amanda_about_legare_0",
+            [1, 2, 3, 4, 5, 6], (12, 17), None,
+            1,
+            None,
+            [
+                "#int(threads['claraPaintingsPath'].num or 0) >= 2",
+                "#Clara.tavern_visit_active()",
+                "#str(people.location('clara') or '') == 'TavernMain'",
+                "#room_in_group(str(people.location('amanda') or ''), ROOM_GROUP_TAVERN)",
+            ],
+            None,
+            "TavernMain",
+            "enter",
+            5,
         ),
     ], highlight=False, threaded=True),
 ]

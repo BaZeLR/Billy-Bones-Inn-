@@ -274,7 +274,7 @@ label TavernGloryHoleCheck:
                     $ player.tavern_management.glory_hole_session.menu_blocked = 1
                     "Ваша реакция?"
                     python:
-                        Amanda.pregnancy_check("mouthface", 1, "Вы")
+                        pregnancy_check("amanda", "mouthface", 1, "Вы")
                     $ Amanda.set_var_int("glorysuck", 1)
                     $ Amanda.set_var_int("glory_cur_state", 4)
                 else:

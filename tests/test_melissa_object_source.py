@@ -312,7 +312,8 @@ def test_melissa_talk_keeps_native_flow_and_room_problem_choices_reachable():
     assert '"Предложить перебраться к Аманде":' in talk_source
     assert '"Предложить занять пустую комнату":' in talk_source
     assert "if _melissa_talk_new:" in talk_menu
-    assert "jump IntMelissaTalk" not in talk_menu
+    assert "jump IntMelissaTalk" in talk_menu
+    assert "_melissa_repeat_menu" not in talk_menu
     assert talk_menu.rstrip().endswith("return")
     assert "jump IntMelissaStartMenu" not in talk_source
     assert "call OldPointSmallTalkMenu" not in talk_menu
@@ -359,7 +360,7 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
     assert 'story_event_available("talk_melissa", "melissa_intimacy")' not in talk_source
     assert 'call checkTriggers("talk_melissa", "melissa_intimacy", 0)' not in talk_source
     invite_branch = talk_source.split('"Попросить Мелиссу прийти завтра на общий завтрак"', 1)[1]
-    assert '$ _melissa_repeat_menu = True' in invite_branch.split('"Обсудить, где Мелиссе переночевать"', 1)[0]
+    assert "jump IntMelissaTalk" in invite_branch.split('"Обсудить, где Мелиссе переночевать"', 1)[0]
     intimacy_call = talk_source.split('call HouseholdSexEngine(girl_name, rooms.current_code)', 1)[1]
     assert intimacy_call.split("\n", 2)[1].strip() == "return"
     assert 'return bool(info.relationship_allows(action_code))' in sex_source
@@ -394,6 +395,10 @@ def test_melissa_courtship_is_one_ordered_story_thread_without_parallel_counters
     assert "#Liza.is_working()" in runtime_source
     assert "#int(Amanda.var_int('lizafriends', 0)) > 0" in runtime_source
     assert "#int(Amanda.sex_stat('sexacts', 0) or 0) > 0" in runtime_source
+    assert "#room_in_group(str(people.location('amanda') or ''), ROOM_GROUP_TAVERN)" in runtime_courtship
+    assert "#room_in_group(str(people.location('melissa') or ''), ROOM_GROUP_TAVERN)" in runtime_courtship
+    assert "#room_in_group(str(people.location('liza') or ''), ROOM_GROUP_TAVERN)" in runtime_courtship
+    assert "TAVERN_AMANDA_LIZA_TALK_ROOMS" in runtime_courtship
     for retired_counter in ("intimacy_start_day", "intimacy_start_count", "intimacy_start_total"):
         assert retired_counter not in runtime_source + event_source
 

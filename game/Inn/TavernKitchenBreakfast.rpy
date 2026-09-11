@@ -873,6 +873,15 @@ init python:
             rows.append(npc_id)
         if "becky" in kitchen_ids:
             rows.append("becky")
+        for npc_id in sorted(kitchen_ids):
+            if npc_id in rows:
+                continue
+            info = people.get_info(npc_id)
+            if not isinstance(info, Girl) or not info.is_tavern_worker():
+                continue
+            if household_morning_issue_type(npc_id) in ("sick", "sleepy"):
+                continue
+            rows.append(npc_id)
         return rows
 
     def tavern_sunday_dinner_present_names():
@@ -880,6 +889,20 @@ init python:
         for npc_id in tavern_sunday_dinner_present_ids():
             names.append(_action_display_name(npc_id))
         return names
+
+    def tavern_sunday_lake_walk_candidate(present_ids=None):
+        candidates = []
+        for npc_id in list(present_ids if present_ids is not None else tavern_sunday_dinner_present_ids()):
+            info = people.get_info(npc_id)
+            if not isinstance(info, Girl) or not info.is_tavern_worker():
+                continue
+            if int(info.rel or 0) < 5 or not people.is_awake(npc_id):
+                continue
+            candidates.append(str(npc_id or ""))
+        if len(candidates) <= 0:
+            return ""
+        candidates.sort()
+        return candidates[procedural_randint(0, len(candidates) - 1, "sunday_lake_walk_%s" % current_game_day())]
 
     def tavern_sunday_dinner_can_offer_service(npc_id="", present_ids=None):
         key = people_normalize_id(npc_id)
@@ -1486,24 +1509,27 @@ label TavernKitchenBreakfastTeasePrivate(girl_name="", place_code="storage"):
     jump TavernMyRoom
 
 
-label TavernKitchenBreakfastOutdoorDate(girl_name="", date_code="lake"):
-    $ renpy.dynamic("_outdoor_date_girl", "_outdoor_date_info", "_outdoor_date_picture")
+label TavernKitchenBreakfastOutdoorDate(girl_name="", date_code="lake", date_origin="breakfast"):
+    $ renpy.dynamic("_outdoor_date_girl", "_outdoor_date_info", "_outdoor_date_picture", "_outdoor_date_origin")
     $ _outdoor_date_girl = str(girl_name or "").strip().lower()
-    if _outdoor_date_girl not in ("sandra", "amanda", "melissa") or str(date_code or "") not in ("lake", "horse"):
+    $ _outdoor_date_info = people.get_info(_outdoor_date_girl)
+    $ _outdoor_date_origin = str(date_origin or "breakfast").strip().lower()
+    if not isinstance(_outdoor_date_info, Girl) or not _outdoor_date_info.is_tavern_worker() or str(date_code or "") not in ("lake", "horse"):
         return
     if str(date_code or "") == "horse" and not player.horse.owns_horse():
         return
-    $ _outdoor_date_info = people.get_info(_outdoor_date_girl)
-    if _outdoor_date_info is None:
-        return
-    call TavernKitchenFinishBreakfastEvent
-    $ main_ui_begin_native_scene_state("Свидание")
+    if _outdoor_date_origin == "breakfast":
+        call TavernKitchenFinishBreakfastEvent
+    $ main_ui_begin_native_scene_state("Воскресная прогулка" if _outdoor_date_origin == "sunday_dinner" else "Свидание")
     if str(date_code or "") == "lake":
         $ rooms.enter("ForestLake")
         $ _outdoor_date_picture = str(rooms.get("ForestLake").bg_picture or "")
         if str(_outdoor_date_picture or "").strip():
             vscene _outdoor_date_picture
-        $ scene_runtime.text = "После завтрака {} сама возвращается к вашему флирту и предлагает выбраться к уединенному лесному озеру. Вы уходите из трактира вместе, добираетесь до тихого берега и наконец разговариваете без работы, посетителей и чужих ушей.".format(people_display_name(_outdoor_date_girl))
+        if _outdoor_date_origin == "sunday_dinner":
+            $ scene_runtime.text = "После воскресного обеда {} предлагает выбраться к уединенному лесному озеру. Вы уходите из трактира вместе, добираетесь до тихого берега и наконец разговариваете без работы, посетителей и чужих ушей.".format(people_display_name(_outdoor_date_girl))
+        else:
+            $ scene_runtime.text = "После завтрака {} сама возвращается к вашему флирту и предлагает выбраться к уединенному лесному озеру. Вы уходите из трактира вместе, добираетесь до тихого берега и наконец разговариваете без работы, посетителей и чужих ушей.".format(people_display_name(_outdoor_date_girl))
     else:
         $ rooms.enter("TavernStable")
         $ _outdoor_date_picture = tavern_stable_picture()
@@ -1786,7 +1812,7 @@ label TavernKitchenSundayDinnerMenu:
 
 
 label TavernKitchenSundayDinner(serve_spicy=0):
-    $ renpy.dynamic("_eat_result", "_sunday_present_ids", "_sunday_social_ids", "_sunday_intro_lines", "_sunday_line_index", "_sunday_dinner_active", "_sunday_table_talk_played", "_sunday_church_talk_played", "_sunday_topic_lines", "_sunday_topic_line_index", "_sunday_gift_target", "_sunday_gift_target_name", "_sunday_gift_item", "_sunday_gift_text", "_sunday_finish_lines")
+    $ renpy.dynamic("_eat_result", "_sunday_present_ids", "_sunday_social_ids", "_sunday_intro_lines", "_sunday_line_index", "_sunday_dinner_active", "_sunday_table_talk_played", "_sunday_church_talk_played", "_sunday_topic_lines", "_sunday_topic_line_index", "_sunday_gift_target", "_sunday_gift_target_name", "_sunday_gift_item", "_sunday_gift_text", "_sunday_finish_lines", "_sunday_lake_girl", "_sunday_lake_name")
     if not tavern_sunday_dinner_available():
         $ scene_runtime.text = "Сегодня вы уже сидели за воскресным обедом."
         $ scene_runtime.location_text = scene_runtime.text
@@ -1938,6 +1964,19 @@ label TavernKitchenSundayDinner(serve_spicy=0):
             "Продолжить":
                 $ _sunday_line_index += 1
     call stat
+    $ _sunday_lake_girl = tavern_sunday_lake_walk_candidate(_sunday_present_ids)
+    if str(_sunday_lake_girl or "") != "":
+        $ _sunday_lake_name = people_display_name(_sunday_lake_girl)
+        $ scene_runtime.text = "Когда стол уже начинают убирать, {} задерживается рядом и предлагает провести остаток выходного у лесного озера, подальше от трактира и городского шума.".format(_sunday_lake_name)
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Согласиться на прогулку с [_sunday_lake_name]":
+                $ main_ui_end_native_scene_state()
+                call TavernKitchenBreakfastOutdoorDate(_sunday_lake_girl, "lake", "sunday_dinner")
+                return True
+
+            "Сегодня остаться в трактире":
+                pass
     $ main_ui_end_native_scene_state()
     $ scene_runtime.picture = tavern_kitchen_picture() or rooms.get("TavernKitchen").bg_picture or None
     if str(scene_runtime.picture or "").strip():

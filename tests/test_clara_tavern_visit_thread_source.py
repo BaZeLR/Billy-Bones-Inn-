@@ -164,15 +164,33 @@ def test_clara_visit_media_remains_until_native_continue_then_restores_room():
         "images/clara/melissa_doodles.png",
     )
 
-    assert labels.count("main_ui_begin_native_scene_state(") == 7
-    assert labels.count("main_ui_end_native_scene_state()") == 7
-    assert labels.count("show screen main_ui") == 7
-    assert labels.count("menu:") == 9
+    assert labels.count("main_ui_begin_native_scene_state(") == 8
+    assert labels.count("main_ui_end_native_scene_state()") == 8
+    assert labels.count("show screen main_ui") == 8
+    assert labels.count("menu:") == 10
     for picture in expected_pictures:
         assert f'vscene "{picture}"' in labels
 
     for block in labels.split("\nlabel story_clara_")[1:]:
         assert block.index("vscene ") < block.index("menu:") < block.index("main_ui_end_native_scene_state()") < block.index("return True")
+
+
+def test_clara_warns_amanda_through_an_owned_story_event():
+    runtime = read(STORY_RUNTIME)
+    labels = read(CLARA_TAVERN_VISIT)
+    event = runtime.split('LThreadData(0, "clara", "AmandaWarning"', 1)[1].split(
+        'LThreadData(2, "clara", "TavernVisit"', 1
+    )[0]
+
+    assert '"story_clara_warns_amanda_about_legare_0"' in event
+    assert "#int(threads['claraPaintingsPath'].num or 0) >= 2" in event
+    assert "#Clara.tavern_visit_active()" in event
+    assert "#room_in_group(str(people.location('amanda') or ''), ROOM_GROUP_TAVERN)" in event
+    assert "label story_clara_warns_amanda_about_legare_0:" in labels
+    assert 'vscene "images/clara/tavern_visit.png"' in labels
+    assert "$ event_runtime.active_thread.advance()" in labels.split(
+        "label story_clara_warns_amanda_about_legare_0:", 1
+    )[1].split("\nlabel ", 1)[0]
 
 
 def test_third_bar_talk_reveals_clara_and_melissa_as_close_friends():

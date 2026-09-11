@@ -171,6 +171,7 @@ label story_clara_paintings_legare_5:
 label story_clara_paintings_church_6:
     $ main_ui_begin_native_scene_state("Семья Легаре в церкви")
     show screen main_ui
+    vscene "images/Alber/church/cermon_fiance_clara.png"
     $ scene_runtime.text = "У колонны рядом с семьей Легаре сегодня стоит незнакомый молодой дворянин из столицы. Кларисса держится рядом с ним так ровно, что это выглядит почти болезненно. Легаре, напротив, доволен: он представляет гостя как человека из хорошего дома и будущего союзника семьи.\n\nКларисса не произносит слова \"жених\", но оно и так висит между ними. Теперь понятно, что столичная договоренность уже не слух и не отдаленная угроза."
     $ scene_runtime.location_text = scene_runtime.text
     menu:

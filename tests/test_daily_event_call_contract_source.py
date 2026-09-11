@@ -64,4 +64,8 @@ def test_morning_sickness_uses_tavern_worker_ownership_instead_of_a_fixed_roster
 
     assert "for girl_key, girl_info in people.girl_items():" in morning
     assert "not girl_info.is_tavern_worker()" in morning
+    assert "calendar_v2.hour" in morning
+    assert "calendar_v2.time_slot()" not in morning
+    assert "people.location(girl_key)" not in morning
+    assert 'daily_events.exists(girl_key, "MorningSickness", "TavernKitchen")' in morning
     assert 'for girl in ("sandra", "melissa", "amanda")' not in morning

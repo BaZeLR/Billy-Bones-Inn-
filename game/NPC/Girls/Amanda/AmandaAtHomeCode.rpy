@@ -239,7 +239,7 @@ label CodeAmandaSexBedDeflower(tmpCurSexStep=0):
                 "\"Молодец, что сдержался и в меня не кончил. А то бы я могла залететь, и что бы мы сказали дома?\" — мудро заметила девушка."
                 python:
                     Amanda.apply_social_chance(20, 1, 1, 0, 0, 0, "amanda_home")
-                    Amanda.pregnancy_check("mouthface", 1, "Вы")
+                    pregnancy_check("amanda", "mouthface", 1, "Вы")
                 if tmpCurSexStep == 3:
                     call CodeAmandaSexBedDeflower(7)
                 else:
@@ -254,7 +254,7 @@ label CodeAmandaSexBedDeflower(tmpCurSexStep=0):
                 "\"Ну и ну, сколько же ты в меня спустил!\" — недовольно заявила она. \"А если я залечу, ты об этом подумал? Нет? Ну-ну, можешь уже начинать думать, что мы скажем дома.\""
                 python:
                     Amanda.apply_social_chance(10, 1, -1, 55, 1, 1, "amanda_home")
-                    Amanda.pregnancy_check("inside", 1, "Вы")
+                    pregnancy_check("amanda", "inside", 1, "Вы")
                 if tmpCurSexStep == 3:
                     call CodeAmandaSexBedDeflower(5)
                 else:

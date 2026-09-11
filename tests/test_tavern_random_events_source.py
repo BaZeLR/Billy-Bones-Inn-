@@ -12,7 +12,7 @@ def test_tavern_random_events_are_typed_definitions():
     source = read_rel("game/Inn/TavernRandomEvents.rpy")
 
     assert "class TavernWorkEventDefinition" in source
-    assert "self.event = Event(" in source
+    assert "self.event = Event(" not in source
     assert 'define tavern_work_events_by_type = {' in source
 
     for event_type in ("harrass", "work_mishap", "small_fight", "tavern_story", "theft", "big_fight", "mandatory"):
@@ -125,6 +125,19 @@ def test_amanda_liza_conversation_is_one_after_breakfast_multi_room_event():
     assert "tavern_work_person_on_property(\"liza\")" in source
     assert "not Liza.tavern_service_busy_now()" in source
     assert "requires_open=False, after_breakfast=True" in source
+    assert 'TavernWorkEventDefinition("AmandaLizaTalk", "tavern_story", "EventAmandaLizettTalk", periods=(1, 2), chance=15' in source
+    assert "rolls=3" in source
+    planner = source.split("def tavern_work_build_daily_plan():", 1)[1].split(
+        "def tavern_work_pending_mandatory_code", 1
+    )[0]
+    story_planner = planner.split('if event_type == "tavern_story":', 1)[1].split(
+        "type_chance =", 1
+    )[0]
+    assert "for event_def in candidates:" in story_planner
+    assert "for roll_index in range(event_def.rolls):" in story_planner
+    assert "for period in list(event_def.periods or []):" in story_planner
+    assert "tavern_work_roll(event_def.chance" in story_planner
+    assert "event_runtime.tavern_work_events.append(tavern_work_plan_row(event_def, period))" in story_planner
     assert "TAVERN_AMANDA_LIZA_TALK_ROOMS" in runtime
     assert "def story_event_location_keys(evt):" in events
     assert "for location_key in location_keys:" in events
