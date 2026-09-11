@@ -25,6 +25,12 @@ init python:
             )
             self.birth_date = {"day": 1, "period": 1, "cycle": 1082}
             self.schedule_source = "schedules/liza.json"
+            self.image_manifest = {
+                "tavern": {
+                    "waitress": ["images/Liza/lizaNew/liza_waitress_main_hall.png"],
+                    "intimate_waiting": ["images/Liza/lizaNew/liza_wench_corner_pantaloons.png"],
+                },
+            }
 
     class LizaInfo(Girl):
         """Lizette runtime: port work, tavern relocation, church story, pregnancy state."""

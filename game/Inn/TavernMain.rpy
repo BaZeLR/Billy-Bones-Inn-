@@ -17,6 +17,19 @@ init python:
                         "pictures": list(pictures),
                     })
 
+        client_girl = str(rooms.get("TavernMain").state.get("client_room_girl", "") or "")
+        for person in tavern_main_intimate_workers():
+            if person == client_girl:
+                continue
+            person_data = people.get_data(person)
+            pictures = person_data.image_sequence("tavern", "intimate_waiting") if person_data is not None else []
+            if pictures:
+                assignments.append({
+                    "person": str(person or ""),
+                    "job": "jobwhore",
+                    "pictures": list(pictures),
+                })
+
         assignment = procedural_choice(assignments, "tavern_main_routine_%s_assignment" % phase_key)
         if assignment is None:
             default_picture = "images/tavern/mainhall/main_hall_night.png" if int(calendar_v2.hour or 0) >= 18 or int(calendar_v2.hour or 0) < 6 else "images/tavern/mainhall/main_hall.png"
@@ -35,6 +48,8 @@ init python:
             text = "%s готовит зал к открытию: расставляет кружки, проверяет столы и собирает все необходимое для обслуживания гостей." % name
         elif job_key == "jobcleaning":
             text = "%s поддерживает порядок в зале, убирая со столов и не давая трактирной суете превратиться в полный беспорядок." % name
+        elif job_key == "jobwhore":
+            text = "%s сидит в углу зала и ждет клиентов." % name
         else:
             text = "%s работает в зале, разнося посетителям еду и выпивку между заполненными столами." % name
         return {"picture": str(picture or ""), "text": text}
