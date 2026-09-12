@@ -1160,7 +1160,7 @@ label TavernKitchenBreakfast:
 
 
 label TavernKitchenBreakfastMenu:
-    $ renpy.dynamic("_breakfast_soap_girl", "_breakfast_dress_girl", "_breakfast_issue_girl", "_breakfast_issue_name", "_breakfast_team_workers", "_breakfast_premium_total")
+    $ renpy.dynamic("_breakfast_soap_girl", "_breakfast_dress_girl", "_breakfast_issue_girl", "_breakfast_issue_name")
     if not player.tavern_management.breakfast.event_active:
         $ main_ui_runtime.action_items = tavern_kitchen_action_items()
         return
@@ -1169,8 +1169,6 @@ label TavernKitchenBreakfastMenu:
         $ _breakfast_dress_girl = str(tavern_breakfast_dress_request_girl() or "")
         $ _breakfast_issue_girl = str(tavern_breakfast_morning_issue_girl() or "")
         $ _breakfast_issue_name = _action_display_name(_breakfast_issue_girl)
-        $ _breakfast_team_workers = list(_tavern_team_keys() or [])
-        $ _breakfast_premium_total = 200 * len(_breakfast_team_workers)
         menu:
             "Послушать разговор за столом" if tavern_breakfast_can_listen() and int(player.tavern_management.breakfast.listen_day or -1) != current_game_day():
                 call TavernKitchenBreakfastHearDialogue
@@ -1180,9 +1178,6 @@ label TavernKitchenBreakfastMenu:
 
             "Сказать пару слов перед работой" if tavern_breakfast_can_make_speech() and int(player.tavern_management.breakfast.motivation_day or -1) != current_game_day():
                 call TavernKitchenBreakfastMotivation
-
-            "Объявить премии по 200 мараведи всей команде ([_breakfast_premium_total])" if int(calendar_v2.week or 0) == 1 and int(player.chores.last_score or 0) >= 4 and len(_breakfast_team_workers) > 0 and int(player.economy.money or 0) >= _breakfast_premium_total and not household_runtime_event_seen_today("tavern_team_premium"):
-                call TavernKitchenBreakfastTeamPremium
 
             "Поделиться едой и напитками" if tavern_breakfast_can_offer_perk_menu():
                 call TavernKitchenBreakfastPerkMenu
@@ -1629,97 +1624,6 @@ label TavernKitchenBreakfastMotivation:
     $ scene_runtime.location_text = scene_runtime.text
     call stat
     call TavernKitchenBreakfastShowText(scene_runtime.text)
-    return
-
-
-label TavernKitchenBreakfastTeamPremium:
-    $ renpy.dynamic("_premium_workers", "_premium_total", "_premium_index", "_premium_girl", "_premium_info", "_premium_name", "_premium_corruption", "_premium_picture", "_premium_text", "_premium_started_scene")
-    $ _premium_workers = list(_tavern_team_keys() or [])
-    $ _premium_total = 200 * len(_premium_workers)
-    if int(calendar_v2.week or 0) != 1 or int(player.chores.last_score or 0) < 4 or len(_premium_workers) == 0 or int(player.economy.money or 0) < _premium_total or household_runtime_event_seen_today("tavern_team_premium"):
-        return
-    $ _premium_started_scene = main_ui_runtime.scene_origin is None
-    if _premium_started_scene:
-        $ main_ui_begin_native_scene_state("Премии трактирной команде")
-    show screen main_ui
-    $ household_mark_runtime_event_seen("tavern_team_premium")
-    $ player.spend_money(_premium_total)
-    $ scene_runtime.text = "Вы просите всю трактирную команду задержаться после завтрака и объявляете, что успешная работа прошлой недели не останется только строкой в отчете. Каждому работнику полагается премия в двести мараведи — всего [_premium_total]."
-    $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "Раздать премии":
-            pass
-    $ _premium_index = 0
-    while _premium_index < len(_premium_workers):
-        $ _premium_girl = str(_premium_workers[_premium_index] or "").strip().lower()
-        $ _premium_info = people.get_info(_premium_girl)
-        $ _premium_name = people_display_name(_premium_girl)
-        $ _premium_corruption = int(getattr(_premium_info, "corruption", 0) or 0) if _premium_info is not None else 0
-        $ _premium_picture = girl_card_portrait_path(_premium_girl)
-        if str(_premium_picture or "").strip():
-            vscene _premium_picture
-        if _premium_girl == "sandra":
-            if _premium_corruption < 15:
-                $ _premium_text = "Сандра дважды пересчитывает монеты и строго кивает. \"Вот это хозяйский поступок. Спасибо, Стефан. Когда труд замечают, и спрашивать с людей можно по совести.\""
-            elif _premium_corruption < 35:
-                $ _premium_text = "Сандра прячет редкую улыбку, крепко сжимает ваше предплечье и благодарит уже без обычной хозяйской сухости. Перед тем как отойти, она на миг прижимается плечом теснее, чем требовала бы простая благодарность."
-            elif _premium_corruption < 60:
-                $ _premium_text = "Сандра подходит вплотную, поправляет вам ворот и неожиданно целует в щеку. Ее грудь на мгновение прижимается к вам, а тихое \"спасибо, хозяин\" звучит гораздо теплее любого делового отчета."
-            else:
-                $ _premium_text = "Сандра без стеснения обнимает вас, медленно прижимаясь всем телом. \"Щедрого хозяина надо благодарить так, чтобы он это запомнил,\" шепчет она на ухо, прежде чем с довольной улыбкой вернуться к столу."
-        elif _premium_girl == "melissa":
-            if _premium_corruption < 15:
-                $ _premium_text = "Мелисса сначала решает, что ослышалась, потом крепко зажимает монеты в ладони и тихо благодарит. Ее смущенная улыбка говорит яснее слов: такого признания своего труда она не ожидала."
-            elif _premium_corruption < 35:
-                $ _premium_text = "Мелисса радостно обнимает вас, а поняв, насколько тесно прижалась, вспыхивает и отскакивает. \"Это за премию, не воображай лишнего,\" предупреждает она, хотя улыбку спрятать уже не может."
-            elif _premium_corruption < 60:
-                $ _premium_text = "Мелисса обвивает руками вашу шею и оставляет быстрый поцелуй у самого уголка губ. Отстраняясь, она проводит ладонью по вашей груди и шепчет, что хорошего хозяина иногда хочется награждать особенно старательно."
-            else:
-                $ _premium_text = "Мелисса смеется, на несколько мгновений устраивается у вас на колене и прячет премию за вырезом платья. \"Теперь попробуй забрать обратно,\" поддразнивает она, медленно поднимаясь и позволяя вашему взгляду задержаться."
-        elif _premium_girl == "amanda":
-            if _premium_corruption < 15:
-                $ _premium_text = "Аманда восторженно вскрикивает, бросается вам на шею и едва не опрокидывает лавку. Получив монеты, она обещает отработать каждую — правда, тут же добавляет, что сегодня праздновать все равно важнее."
-            elif _premium_corruption < 35:
-                $ _premium_text = "Аманда звонко целует вас в щеку и с озорной улыбкой прячет монеты за пазуху. \"За хорошую работу — хорошая премия. А за очень хорошую благодарность что полагается?\" — спрашивает она и сама же убегает от ответа."
-            elif _premium_corruption < 60:
-                $ _premium_text = "Аманда неожиданно целует вас уже в губы, а отступая, нарочно проводит бедром по вашей ноге. \"Это только официальное спасибо,\" заявляет она с совершенно неофициальной улыбкой."
-            else:
-                $ _premium_text = "Аманда усаживается к вам на колено, пересчитывает деньги прямо перед вашим лицом и шепчет на ухо такую непристойную версию благодарности, что сама начинает хихикать. Поднявшись, она еще раз дразняще прижимается бедрами."
-        elif _premium_girl == "liza":
-            if _premium_corruption < 15:
-                $ _premium_text = "Лизетта принимает монеты с изящным поклоном и благодарит так серьезно, будто вы вручаете ей награду перед всем городом. Только лукавый блеск в глазах выдает, насколько она довольна."
-            elif _premium_corruption < 35:
-                $ _premium_text = "Лизетта целует кончики пальцев и переносит поцелуй на вашу щеку. \"За щедрость надо платить хорошим настроением,\" говорит она и демонстративно поправляет вырез рабочего платья."
-            elif _premium_corruption < 60:
-                $ _premium_text = "Лизетта прижимается грудью к вашей руке и медленно целует вас в губы. \"Вот теперь девушки точно поймут, за какого хозяина стоит стараться,\" шепчет она, не спеша отстраняться."
-            else:
-                $ _premium_text = "Лизетта садится рядом так тесно, что ее бедро оказывается поверх вашего, и с улыбкой вкладывает одну монету вам за ворот. \"На счастье, хозяин. Остальное я сохраню для нарядов, которые помогут заработать следующую премию.\""
-        elif _premium_girl == "georgett":
-            if _premium_corruption < 15:
-                $ _premium_text = "Жоржетта удивленно вскидывает брови, затем благодарит вас с непривычной искренностью. Для женщины, привыкшей заранее договариваться о каждой монете, такая премия оказывается настоящим сюрпризом."
-            elif _premium_corruption < 35:
-                $ _premium_text = "Жоржетта весело целует вас в щеку и обещает, что клиенты сегодня увидят самую приветливую улыбку во всем городе. На прощание она легонько щиплет вас за бок — уже как знакомого, а не нанимателя."
-            elif _premium_corruption < 60:
-                $ _premium_text = "Жоржетта обнимает вас и медленно проводит ладонью по груди. \"Умный хозяин знает, что довольная работница особенно убедительна,\" мурлычет она, оставляя долгий поцелуй у вашего уха."
-            else:
-                $ _premium_text = "Жоржетта прижимается бедрами, целует вас в губы и шепчет, что двести мараведи — отличный повод весь день вспоминать о щедром хозяине. Ее ладонь скользит почти неприлично низко, прежде чем она смеясь отступает."
-        else:
-            if _premium_corruption < 35:
-                $ _premium_text = "[_premium_name] принимает двести мараведи с искренней благодарностью и обещает, что на этой неделе команда постарается не хуже прежнего."
-            else:
-                $ _premium_text = "[_premium_name] благодарит вас теплым объятием и неожиданно смелым поцелуем, превращая деловую раздачу денег в куда более личный момент."
-        $ scene_runtime.text = _premium_text
-        $ scene_runtime.location_text = scene_runtime.text
-        if _premium_info is not None:
-            $ _premium_info.change_social(friend_delta=1)
-            $ _premium_info.reward_need_fulfilled(1, "team_premium")
-        menu:
-            "Продолжить":
-                $ _premium_index += 1
-    $ player.change_stat("fun", 3)
-    if _premium_started_scene:
-        $ main_ui_end_native_scene_state()
-    $ tavern_breakfast_restore_ui_state()
     return
 
 

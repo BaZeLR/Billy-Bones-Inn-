@@ -48,25 +48,12 @@ def test_breakfast_hub_has_one_native_choice_authority_without_paging_state():
     assert "\n    return\n" in show_text
 
 
-def test_successful_week_team_premium_uses_live_roster_and_owned_state():
+def test_team_premium_is_not_owned_by_breakfast():
     source = SOURCE.read_text(encoding="utf-8-sig")
-    hub = _label_block(source, "TavernKitchenBreakfastMenu:", "TavernKitchenBreakfastShowText")
-    scene = _label_block(source, "TavernKitchenBreakfastTeamPremium:", "TavernKitchenBreakfastPerkMenu:")
-
-    assert "$ _breakfast_team_workers = list(_tavern_team_keys() or [])" in hub
-    assert "$ _breakfast_premium_total = 200 * len(_breakfast_team_workers)" in hub
-    assert "int(calendar_v2.week or 0) == 1" in hub
-    assert "int(player.chores.last_score or 0) >= 4" in hub
-    assert "int(player.economy.money or 0) >= _breakfast_premium_total" in hub
-    assert "$ _premium_workers = list(_tavern_team_keys() or [])" in scene
-    assert "$ player.spend_money(_premium_total)" in scene
-    assert '$ _premium_info.change_social(friend_delta=1)' in scene
-    assert '$ _premium_info.reward_need_fulfilled(1, "team_premium")' in scene
-    assert "_premium_info.corruption =" not in scene
-    assert 'not household_runtime_event_seen_today("tavern_team_premium")' in hub
-    assert '$ household_mark_runtime_event_seen("tavern_team_premium")' in scene
-    assert "$ player.tavern_management.breakfast.motivation_day = current_game_day()" not in scene
-    assert "new premium" not in scene.lower()
+    assert "TavernKitchenBreakfastTeamPremium" not in source
+    assert "_breakfast_premium_total" not in source
+    assert 'household_runtime_event_seen_today("tavern_team_premium")' not in source
+    assert 'household_mark_runtime_event_seen("tavern_team_premium")' not in source
 
     player_source = (ROOT / "game/Utilities/General/Player/Player.rpy").read_text(encoding="utf-8-sig")
     sync_source = (ROOT / "game/TractirSaveSync.rpy").read_text(encoding="utf-8-sig")

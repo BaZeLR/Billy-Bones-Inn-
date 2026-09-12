@@ -47,6 +47,52 @@ init -100 python:
             if getattr(event_runtime, "active_thread", None) is retired_thread:
                 event_runtime.active_thread = None
         player.tavern_management.__dict__.pop("household_members", None)
+        premium_event_seen = getattr(household, "runtime_event_seen", {})
+        if not isinstance(premium_event_seen, dict):
+            premium_event_seen = {}
+            household.runtime_event_seen = premium_event_seen
+        premium_eval_stamp = str(getattr(player.tavern_management, "weekly_chores_last_eval_stamp", "") or "")
+        old_premium_paid_for_eval = False
+        premium_stamp_parts = premium_eval_stamp.split(":")
+        if len(premium_stamp_parts) == 4:
+            try:
+                premium_stamp_cycle, premium_stamp_period, premium_stamp_day, premium_stamp_week = [int(value) for value in premium_stamp_parts]
+                premium_stamp_date = {
+                    "year": premium_stamp_cycle,
+                    "month": premium_stamp_period,
+                    "day": premium_stamp_day,
+                    "week": premium_stamp_week,
+                }
+                for event_key, event_value in list(premium_event_seen.items()):
+                    event_key_text = str(event_key or "")
+                    if not event_key_text.startswith("tavern_team_premium:"):
+                        continue
+                    try:
+                        premium_marker_paid = int(event_value or 0) == 1
+                        premium_marker_day = int(event_key_text.rsplit(":", 1)[1])
+                    except (TypeError, ValueError):
+                        continue
+                    if not premium_marker_paid:
+                        continue
+                    premium_marker_dates = (
+                        calendar_v2.day_number_to_parts(premium_marker_day),
+                        calendar_v2.day_number_to_parts(max(0, premium_marker_day - 1)),
+                    )
+                    if premium_stamp_date in premium_marker_dates:
+                        old_premium_paid_for_eval = True
+                        break
+            except (TypeError, ValueError):
+                old_premium_paid_for_eval = False
+        premium_last_eval_stamp = getattr(player.tavern_management, "team_premium_last_eval_stamp", "")
+        if not hasattr(player.tavern_management, "team_premium_last_eval_stamp"):
+            player.tavern_management.team_premium_last_eval_stamp = premium_eval_stamp if old_premium_paid_for_eval else ""
+        elif old_premium_paid_for_eval and not str(premium_last_eval_stamp or ""):
+            player.tavern_management.team_premium_last_eval_stamp = premium_eval_stamp
+        elif not isinstance(premium_last_eval_stamp, str):
+            player.tavern_management.team_premium_last_eval_stamp = str(premium_last_eval_stamp or "")
+        for event_key in list(premium_event_seen.keys()):
+            if str(event_key or "").startswith("tavern_team_premium:"):
+                premium_event_seen.pop(event_key, None)
         tractir_save_normalize_tavern_staff_jobs()
         tractir_save_normalize_werecat_intro_thread()
         calendar_v2.time_advance_blocked = 0

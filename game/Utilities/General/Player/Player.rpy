@@ -629,6 +629,7 @@ init -998 python:
             self.ashes_dirty_days = 0
             self.weekly_visitors = {"sum": 0, "days": 0, "prev_avg": 0.0}
             self.weekly_chores_last_eval_stamp = ""
+            self.team_premium_last_eval_stamp = ""
             self.breakfast_share_perks = {}
             self.service = PlayerTavernServiceState()
 
