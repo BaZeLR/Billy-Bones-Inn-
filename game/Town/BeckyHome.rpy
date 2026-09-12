@@ -108,6 +108,7 @@ label BeckyHome(arrive_mode=""):
     python:
         Becky.stats.setdefault("PussyWetStart", Becky.arousal_value())
     $ _becky_home_room.mark_visited()
+    $ main_ui_begin_native_scene_state("Дом Бекки")
 
     $ _start_becky_sex = False
     if arrive_mode == 'FromDances' and int(threads["beckyDinner"].num or 0) < 2:
@@ -119,7 +120,7 @@ label BeckyHome(arrive_mode=""):
         "[_becky_home_room.descriptions[2].text]\nВы и миссис Блэнкеншип находитесь в ее спальне.\nВместе с вами находится Эдди, ее управляющий лавкой. Им движут к хозяйке отнюдь не деловые чувства."
         $ _start_becky_sex = True
     elif arrive_mode == 'FromDinner':
-        "[_becky_home_room.descriptions[2].text]"
+        "Вы зашли вслед за Бекки в ее спальню. Вдоль стен стояло несколько массивных сундуков, скамья, пара стульев. А весь центр комнаты занимала большая кровать."
         if story_event_available("BeckyHome", "enter"):
             call checkTriggers("BeckyHome", "enter", 0)
         else:
@@ -155,12 +156,14 @@ label BeckyHome(arrive_mode=""):
                     $ Becky.apply_social_roll(8, 1, -1, 35, 1, -1)
                 menu:
                     "В печали вернуться к трактиру":
+                        $ main_ui_end_native_scene_state()
                         jump StreetTavern
             elif player.appearance.current_dress != 'citydress':
                 $ scene_runtime.text = "Она тщательно осмотрела вас и строго сказала: 'Стефан, я же тебе говорила, ты должен быть одет скромно но прилично. А ты в чем пришел? Беги переодевайся!'\nС этими словами она захлопнула дверь перед вашим носом. Отчего-то вы почувствовали себя нашкодничавшим школьником."
                 $ scene_runtime.location_text = scene_runtime.text
                 menu:
                     "Вернуться к трактиру переодеться":
+                        $ main_ui_end_native_scene_state()
                         jump StreetTavern
             else:
                 $ scene_runtime.text = "Она тщательно осмотрела вас и сказала: 'Что же ты встал на пороге, проходи скорей!'\nВы не замедлили воспользоваться приглашением и прошли в дом, прямо к накрытому столу. К вашей скромной трапезе из 6 блюд присоединился и Эдди.\nНе успели вы приступить к поглощению пищи, как услышали как хлопнула входная дверь"
@@ -198,15 +201,16 @@ label BeckyHome(arrive_mode=""):
                 menu:
                     "Продолжить":
                         pass
-            call IntBeckyGuest
-            $ scene_runtime.text = " Итак, вы сидите за столом в гостях у вдовы Блэнкеншип и наслаждаетесь аппетитной домашней кухней."
+            $ scene_runtime.text = "Итак, вы сидите за столом в гостях у вдовы Блэнкеншип и наслаждаетесь аппетитной домашней кухней."
             $ scene_runtime.location_text = scene_runtime.text
+            call IntBeckyGuest
     if _start_becky_sex:
         $ Becky.set_arousal(Becky.sex_stat("PussyWetStart", 0))
         call CockPosition(GirlName, 0)
         call check_visibility(GirlName)
         call IntBeckySex(GirlName)
         jump BeckyHomeAfterSex
+    $ main_ui_end_native_scene_state()
     $ scene_runtime.picture = _becky_home_room.bg_picture
     $ scene_runtime.text = becky_home_restore_text()
     $ scene_runtime.location_text = scene_runtime.text
@@ -220,6 +224,7 @@ label BeckyHome(arrive_mode=""):
 label BeckyHomeAfterSex:
     if int(threads["beckyHome"].num or 0) < 2:
         $ threads["beckyHome"].advanceTo(2, force_active=True)
+    $ main_ui_end_native_scene_state()
     $ scene_runtime.picture = rooms.get("BeckyHome").bg_picture
     $ scene_runtime.text = becky_home_restore_text()
     $ scene_runtime.location_text = scene_runtime.text

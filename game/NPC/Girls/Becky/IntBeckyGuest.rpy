@@ -5,6 +5,7 @@
 
 label IntBeckyGuest:
     $ renpy.dynamic("dinnertime", "dinnerbecky", "dinnerbeckyorgasm", "dinneringaminet", "georgedinnersex", "GirlName", "_eat_roll", "_eat_roll_alt", "_drink_pic", "_kids_watch", "_ladder_pic")
+    $ main_ui_begin_native_scene_state("Ужин у Бекки")
     show screen main_ui
     $ dinnertime = 0
     $ dinnerbecky = 0
@@ -12,11 +13,9 @@ label IntBeckyGuest:
     $ dinneringaminet = 0
     $ georgedinnersex = 0
     $ GirlName = "becky"
-    $ scene_runtime.picture = "images/becky/dinner/DinnerStart.jpg"
-    vscene scene_runtime.picture
-
     while True:
-        if dinnertime > 6 or georgedinnersex != 0:
+        if georgedinnersex != 0:
+            $ main_ui_end_native_scene_state()
             return
 
         menu:
@@ -32,12 +31,12 @@ label IntBeckyGuest:
                 "Если закуски смотрелись на фоне угощений вдовы немного бледно, если даже не сказать жалко, то вино явно пришлось по вкусу присутствующим. Лукас с Эдди сразу жахнули по стакану."
                 if Becky.can_drink_wine():
                     "Вместе с ними накатила и вдовушка, ее лицо сразу раскраснелось от принятого, а настроение улучшилось."
-                    $ Becky.drunk = 1
+                    $ get_girl_drunk("becky")
                 else:
                     "Бекки же от вина воздержалась, лишь слегка пригубив свой бокал."
                 if Inga.pregnancy_days() <= 30:
                     "Ингенборг, игнорируя укоризненный взгляд своей мамочки, тоже налила себе стакан и подняла тост за здоровье всех присутствующих."
-                    $ Inga.drunk = 1
+                    $ get_girl_drunk("inga")
                 else:
                     "Инга отодвинула предложенный ей стакан, заметив что ей и так весело, да и дури у нее своей хватает, поэтому она разве что для запаха может чуток выпить."
                 $ Becky.apply_social_roll(11, 1, 2, 0, 0, 0)
@@ -170,6 +169,7 @@ label IntBeckyGuest:
                         call BeckyGuestKidsWatchStepsCode(_kids_watch)
                         if _kids_watch > 3 and procedural_randint(1, 2, "becky_dinner_eddie_georg_hint_%s" % int(current_game_day() or 0)) == 1 and Becky.eddie_georgett_stage == 0:
                             "\"Хм, что-то Эдди изрядно возбужден тем, что я с его хозяйкой в спальню иду. Может с Жоржи стоит это обсудить?\" - подумали вы."
+                        $ main_ui_end_native_scene_state()
                         call BeckyHome("FromDinner")
                         return
                     else:
@@ -184,27 +184,25 @@ label IntBeckyGuest:
                         "Ребекка пребывала в явной растеренности, вы же строго отшили нахала: \"Спасибо, Эдди, но мы уж сами. Может я запамятовал чего, но мне кажется, что ни я ни миссис Блэнкеншип тебя не звали. Или ты услыхал чего? Или просто нафантазировал невесть что?\""
                         if procedural_randint(1, 3, "becky_dinner_eddie_ridicule_%s" % int(current_game_day() or 0)) == 1:
                             "Эдди такая отповедь не на шутку расстроила. Он едва не разрыдался от нанесенной обиды и выбежал из комнаты, хлопнув дверью."
-                            $ Eddie.change_social(friend_delta=-1)
+                            $ slut_friends_increase("eddie", 5, 1, -1, 0, 0, 0)
                         else:
                             "Эдди от такой отповеди закусил губу и плюхнулся обратно на стул."
-                            if procedural_randint(1, 2, "becky_dinner_eddie_ridicule_friend_%s" % int(current_game_day() or 0)) == 1:
-                                $ Eddie.change_social(friend_delta=-1)
+                            $ slut_friends_increase("eddie", 5, 2, -1, 0, 0, 0)
                         "Лукас и Инга заулыбались от постигшего Эдди облома."
                         if Becky.eddie_home_visit_state == 4:
                             "А Жоржетта так и вовсе невежливо заржала в голос."
-                            if procedural_randint(1, 2, "becky_dinner_eddie_georgett_laugh_%s" % int(current_game_day() or 0)) == 1:
-                                $ Eddie.change_social(friend_delta=-1)
+                            $ slut_friends_increase("eddie", 5, 2, -1, 0, 0, 0)
                         $ Eddie.ridiculed_follow_attempt = True
                     else:
                         "Эдди, похоже, малость огорчился, что его с собой не взяли, но за вами последовать не попытался, наверное решил, что возьмет свое позже."
-                        if procedural_randint(1, 5, "becky_dinner_eddie_left_behind_%s" % int(current_game_day() or 0)) == 1:
-                            $ Eddie.change_social(friend_delta=-1)
+                        $ slut_friends_increase("eddie", 5, 5, -1, 0, 0, 0)
                     "Вы невозбранно последовали со вдовой вдвоем наверх, в ее уютненькую спальню."
                     $ _kids_watch = procedural_randint(1, 8, "becky_dinner_kids_watch_late_%s" % int(current_game_day() or 0))
                     call BeckyGuestKidsWatchStepsCode(_kids_watch)
                     $ _ladder_pic = procedural_randint(1, 2, "becky_dinner_ladder_%s" % int(current_game_day() or 0))
                     $ scene_runtime.picture = "images/becky/Home/ladder%s.jpg" % _ladder_pic
                     vscene scene_runtime.picture
+                    $ main_ui_end_native_scene_state()
                     call BeckyHome("FromDinner")
                     return
 
@@ -234,12 +232,14 @@ label IntBeckyGuest:
                     "Втроем вы ввалились в спальню миссис Блэнкеншип, нетерпеливый Эдди только переступил порог, как сбросил с себя всю одежду."
                 else:
                     "Вы поднялись по лестнице в спальню Бекки и стали страстно в засос целоваться, не то что не запирая, но даже и не закрывая дверь. Не отрывая своих губ от губ Бекки, вы успели малость потискать ее груди, а она - погладить вам член и даже развязать завязки на штанах. Ваши милые развлечения прервал звук закрывающейся двери. Тут вы увидели Эдди: сорванец успел уже раздеться и голый присоединился к вам."
+                $ main_ui_end_native_scene_state()
                 call BeckyHome("SvalnyiGreh")
                 return
 
             "Попрощаться и идти домой" if dinnertime > 5 and georgedinnersex == 0:
                 "Вы вежливо, отнюдь не по-английски, попрощались с семейством Блэнкеншип, поцеловали в щечку Ингу, погладили попку Бекки и направились на улицу."
                 $ calendar_v2.advance_minutes(60)
+                $ main_ui_end_native_scene_state()
                 jump MarketPlace
 
 

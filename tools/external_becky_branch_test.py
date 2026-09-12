@@ -339,7 +339,8 @@ testcase becky_visit_clock_and_market_invitation:
     assert eval (rooms.get("BeckyHomeFront").state["arrival_mode"] == "FromDances")
     assert eval (threads["beckyHome"].num == 1)
     assert eval (calendar_v2.hour == 22 and calendar_v2.minute == 10)
-    assert eval (any(item.caption == "Вернуться на рынок" for item in renpy.get_screen("choice").scope["items"]))
+    assert eval (any(item.caption == "Зайти в дом" for item in renpy.get_screen("choice").scope["items"]))
+    assert eval (not any(item.caption == "Вернуться на рынок" for item in renpy.get_screen("choice").scope["items"]))
 
 testcase inga_grocery_morning_event_cycle:
     run Jump("dev_after_report_checkpoint")
@@ -391,11 +392,41 @@ testcase becky_regular_evening_visit_enters_dinner:
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (rooms.current_code == "BeckyHome") timeout 10.0
     screenshot "becky_home_admission.png"
     assert eval (main_ui_runtime.action_items == [] and main_ui_runtime.action_title == rooms.get("BeckyHome").display_name)
-    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (scene_runtime.picture == "images/becky/dinner/DinnerStart.jpg") timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice") is not None and any(item.caption == "Осмотреть Ребекку" for item in renpy.get_screen("choice").scope.get("items", []))) timeout 20.0
     assert eval (rooms.current_code == "BeckyHome")
     assert eval (Becky.home_visit_count == _home_visits_before + 1)
-    assert eval (scene_runtime.picture == "images/becky/dinner/DinnerStart.jpg")
+    assert eval (scene_runtime.picture == "images/becky/dinner/DinnerInga.jpg")
+    assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.scene_origin is not None and main_ui_runtime.action_items == [])
     assert eval (any(item.caption == "Осмотреть Ребекку" for item in renpy.get_screen("choice").scope["items"]))
+
+testcase becky_dinner_refusal_keeps_authored_farewell:
+    run Jump("dev_after_report_checkpoint")
+    advance until screen "main_ui" timeout 20.0
+    python:
+        rooms.enter("BeckyHome")
+        threads["beckyDinner"].reset()
+        calendar_v2.week = 1
+        calendar_v2.hour = 19
+        calendar_v2.minute = 0
+        main_ui_runtime.mode = "scene"
+        main_ui_runtime.scene_origin = None
+        main_ui_runtime.action_items = rooms.get("BeckyHome").build_exit_items()
+    run Call("IntBeckyGuest")
+    advance until screen "choice" timeout 20.0
+    assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == [])
+    $ dinnertime = 5
+    $ _eat_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Кушать")
+    click id ("choice_panel_button_%d" % _eat_index) pos (0.5, 0.5)
+    click pos (960, 900) until eval (renpy.get_screen("choice") is not None and any(item.caption == "Взять Бекки под руку и идти наверх в спальню" for item in renpy.get_screen("choice").scope.get("items", []))) timeout 20.0
+    $ _upstairs_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Взять Бекки под руку и идти наверх в спальню")
+    click id ("choice_panel_button_%d" % _upstairs_index) pos (0.5, 0.5)
+    advance until screen "say" timeout 20.0
+    assert eval (rooms.current_code == "BeckyHome" and main_ui_runtime.mode == "event" and main_ui_runtime.action_items == [])
+    click pos (960, 900) until eval (renpy.get_screen("choice") is not None and [str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Попрощаться и идти домой"]) timeout 20.0
+    assert eval (rooms.current_code == "BeckyHome" and main_ui_runtime.mode == "event" and main_ui_runtime.action_items == [])
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    click pos (960, 900) until eval (rooms.current_code == "MarketPlace") timeout 20.0
+    assert eval (calendar_v2.hour == 20 and calendar_v2.minute == 0 and main_ui_runtime.scene_origin is None)
 
 testcase becky_dinner_reads_current_wear_panties:
     run Jump("dev_after_report_checkpoint")
@@ -406,6 +437,7 @@ testcase becky_dinner_reads_current_wear_panties:
         Becky.set_current_underwear("panties", "simplepanties")
     run Call("IntBeckyGuest")
     advance until screen "choice" timeout 20.0
+    assert eval (main_ui_runtime.mode == "event" and main_ui_runtime.action_items == [])
     $ _grope_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Полапать под столом Бекки")
     click id ("choice_panel_button_%d" % _grope_index) pos (0.5, 0.5)
     click pos (960, 900) until eval (int(dinnerbecky or 0) == 1 and renpy.get_screen("choice") is not None) timeout 10.0

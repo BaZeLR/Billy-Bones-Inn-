@@ -159,10 +159,6 @@ label BeckyHomeFront(arrive_mode=""):
             call becky_homefront_peek
             return
 
-        "Вернуться на рынок":
-            $ apply_movement_time(10, "MarketPlace")
-            jump MarketPlace
-
 # --- SUBLABELS FOR MENU OPTIONS ---
 label becky_homefront_peek:
     if rooms.get("BeckyHomeFront").state["inga_scene_roll"] == 1:
@@ -181,8 +177,6 @@ label becky_homefront_peek:
         else:
             "Ингенборг, старшей дочки вдовы, стояла перед ним на коленях и увлеченно у него отсасывала. "
         $ show_inga_front_fuck_image(1, 1)
-        $ Inga.saw_lucas_sex = True
-        $ Inga.acquaintance_stage = max(Inga.acquaintance_stage, 1)
     elif rooms.get("BeckyHomeFront").state["inga_scene_roll"] == 2:
         if not Inga.saw_lucas_sex:
             "Ваше любопытство оказалось вознагражденным интересной сценой: "
@@ -203,8 +197,6 @@ label becky_homefront_peek:
         else:
             ", завернул ей юбку, спустил панталончики, приподнял и насадил на свой член."
         $ show_inga_front_fuck_image(2, 1)
-        $ Inga.saw_lucas_sex = True
-        $ Inga.acquaintance_stage = max(Inga.acquaintance_stage, 1)
     else:
         "Наверное, показалось: вы заглянули за крыльцо, но там никого не было."
         call ShowImage("", "", becky_homefront_house_picture())
