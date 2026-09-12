@@ -1,19 +1,105 @@
 label story_amanda_tavern_seduction_0:
+    $ renpy.dynamic("_amanda_seduction_finish", "_amanda_seduction_profile")
+    $ main_ui_begin_native_scene_state("Флирт Аманды")
     show screen main_ui
     call ShowImage("", "", AmandaStaticData.portrait)
-    "В зале Аманда задержалась у стойки дольше обычного. Она будто ждала, пока вы заметите ее новое платье, поправила волосы и улыбнулась слишком невинно."
-    "Это еще не прямое приглашение, но уже и не простая болтовня работницы с хозяином."
+    $ scene_runtime.text = "В зале Аманда задержалась у стойки дольше обычного. Она будто ждала, пока вы заметите ее новое платье, поправила волосы и улыбнулась слишком невинно."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
+    $ scene_runtime.text = "Это еще не прямое приглашение, но уже и не простая болтовня работницы с хозяином."
+    $ scene_runtime.location_text = scene_runtime.text
+    "[scene_runtime.text]"
     menu:
         "Подыграть":
-            "Вы ответили ей в том же тоне. Аманда вспыхнула, но не отступила, только ниже опустила голос и пообещала вечером быть послушнее, если вы тоже будете к ней внимательнее."
+            $ scene_runtime.text = "Вы ответили ей в том же тоне. Аманда вспыхнула, но не отступила, только ниже опустила голос и пообещала вечером быть послушнее, если вы тоже будете к ней внимательнее."
+            $ scene_runtime.location_text = scene_runtime.text
+            "[scene_runtime.text]"
             $ Amanda.change_mana(1, "tavern_seduction_attention")
             $ Amanda.apply_social_chance(0, 0, 1, 2, 0, 0, "tavern_seduction_attention")
+            $ main_ui_end_native_scene_state()
             return True
-        "Позвать наверх" if int(Amanda.rel or 0) >= 12 and int(Amanda.corruption or 0) >= 35:
-            "Вы тихо предложили ей оставить зал на пару минут. Аманда посмотрела на лестницу, прикусила губу и пошла первой."
-            jump TavernAmandaRoom
+        "Позвать наверх" if int(Amanda.rel or 0) >= 12 and int(Amanda.corruption or 0) >= 35 and not bool(Amanda.sex_stat("virginity", True)) and Amanda.date_intimacy_available() and player.intimacy.can_cum():
+            $ scene_runtime.text = "Вы тихо предложили ей оставить зал на пару минут. Аманда посмотрела на лестницу, прикусила губу и пошла первой."
+            $ scene_runtime.location_text = scene_runtime.text
+            "[scene_runtime.text]"
+
+            $ main_ui_runtime.action_title = "Аманда у окна"
+            vscene "NPC/Girls/Amanda/flirts_new room.jpg"
+            $ scene_runtime.text = "Едва дверь закрылась, Аманда подвела вас к окну и чуть раздвинула занавеску. Во дворе снова разыгрывалось знакомое представление.\n\n" + attic_neighbor_sex_scene_text()
+            $ scene_runtime.location_text = scene_runtime.text
+            "[scene_runtime.text]"
+
+            $ scene_runtime.text = "Аманда смотрела не отрываясь. Потом она обернулась, задрала подол до пояса и, опершись ладонями о подоконник, вызывающе подалась к вам бедрами."
+            $ scene_runtime.location_text = scene_runtime.text
+            menu:
+                "Подойти к Аманде сзади":
+                    pass
+
+            call BeginPaidSexModule("amanda", "TavernAmandaRoom")
+            $ Amanda.set_layer_raised("bottom", 1)
+            $ Amanda.remove_clothing_layer("panties")
+            $ Amanda.set_cock_position("pussy")
+            $ Amanda.set_var_int("knownotvirgin", 1)
+            $ Amanda.set_var_int("fuckyou", 1)
+            $ player.intimacy.set_arousal(100)
+            $ Amanda.set_arousal(100)
+            $ scene_runtime.text = "Вы вошли в Аманду одним уверенным движением и быстро взяли жесткий ритм. Она не отводила взгляда от соседнего двора и двигалась вам навстречу, будто старалась попасть в такт доносившимся оттуда ударам и стонам."
+            $ scene_runtime.location_text = scene_runtime.text
+            "[scene_runtime.text]"
+
+            menu:
+                "Шлепнуть Аманду по ягодицам":
+                    $ scene_runtime.text = "Ваша ладонь звонко опустилась на ее ягодицу. Аманда вскрикнула, тут же прикусила край занавески, но уже через мгновение сама подставилась под следующий шлепок."
+                    $ scene_runtime.location_text = scene_runtime.text
+                    "[scene_runtime.text]"
+
+            $ scene_runtime.text = "Вы ускорились. Аманда больше не пыталась сдерживаться: ее громкие стоны смешались со стонами женщины за окном, и на несколько минут обе пары словно устроили негласное соревнование. Наконец Аманда задрожала всем телом и шумно кончила, продолжая прижиматься к вам."
+            $ scene_runtime.location_text = scene_runtime.text
+            "[scene_runtime.text]"
+            $ Amanda.record_orgasm_given()
+            $ Amanda.set_arousal(20)
+
+            menu:
+                "Кончить в Аманду":
+                    $ _amanda_seduction_finish = "inside"
+                    $ scene_runtime.text = "Вы крепко удержали Аманду за бедра и кончили глубоко внутри. Она тихо охнула, почувствовав, как горячее семя наполняет ее, а затем еще раз вздрогнула у вас в руках."
+                    $ scene_runtime.location_text = scene_runtime.text
+                    "[scene_runtime.text]"
+                    $ Amanda.player_cum("inside")
+
+                "Вытащить и кончить на ягодицы":
+                    $ _amanda_seduction_finish = "outside"
+                    $ scene_runtime.text = "В последний момент вы вышли из Аманды и густо залили ее разгоряченные ягодицы. Она оглянулась через плечо, тяжело дыша и довольно улыбаясь."
+                    $ scene_runtime.location_text = scene_runtime.text
+                    "[scene_runtime.text]"
+                    $ Amanda.player_cum("outside")
+
+            $ _amanda_seduction_profile = build_girl_decision_profile("amanda")
+            if bool(_amanda_seduction_profile.get("likes_player", 0.0)):
+                vscene "images/amanda/sexroom/minet9.jpg"
+                $ scene_runtime.text = "Когда вы отступили, Аманда развернулась, опустилась перед вами на колени и с неожиданной заботой взяла ваш обмякший член в рот. Она медленно очистила его губами и языком, не оставив ни капли, а потом подняла на вас довольный взгляд."
+                $ scene_runtime.location_text = scene_runtime.text
+                "[scene_runtime.text]"
+                $ Amanda.set_var_int("suckyou", 1)
+            else:
+                vscene "NPC/Girls/Amanda/flirts_new room.jpg"
+                $ scene_runtime.text = "Аманда торопливо привела себя в порядок и протянула вам кусок ткани, чтобы вытереться."
+                $ scene_runtime.location_text = scene_runtime.text
+                "[scene_runtime.text]"
+
+            $ scene_runtime.text = "Вы оба быстро оделись и вернулись в зал по одному, стараясь не привлекать внимания посетителей."
+            $ scene_runtime.location_text = scene_runtime.text
+            "[scene_runtime.text]"
+            $ Amanda.set_arousal(0)
+            $ Amanda.set_sex_busy(False)
+            call FinishPaidSexModule("amanda", "TavernAmandaRoom")
+            $ main_ui_end_native_scene_state()
+            return True
         "Вернуть к работе":
+            $ scene_runtime.text = ""
+            $ scene_runtime.location_text = ""
             $ Amanda.yell_not_work()
+            $ main_ui_end_native_scene_state()
             return True
 
 

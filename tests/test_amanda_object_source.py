@@ -776,6 +776,33 @@ def test_amanda_legare_street_and_tavern_events_use_thread_model_and_txt_logic()
     assert 'Amanda.lover_sex_calc()' in finish_day
 
 
+def test_amanda_tavern_seduction_upstairs_stays_in_the_event_and_uses_owned_sex_state():
+    source = _source(AMANDA_STREET_EVENTS)
+    event = source.split("label story_amanda_tavern_seduction_0:", 1)[1].split(
+        "label story_amanda_legare_tavern_visit_0:", 1
+    )[0]
+
+    assert 'main_ui_begin_native_scene_state("Флирт Аманды")' in event
+    assert '"Позвать наверх" if int(Amanda.rel or 0) >= 12' in event
+    assert 'not bool(Amanda.sex_stat("virginity", True))' in event
+    assert "Amanda.date_intimacy_available()" in event
+    assert "player.intimacy.can_cum()" in event
+    assert "jump TavernAmandaRoom" not in event
+    assert 'vscene "NPC/Girls/Amanda/flirts_new room.jpg"' in event
+    assert "attic_neighbor_sex_scene_text()" in event
+    assert '"Шлепнуть Аманду по ягодицам"' in event
+    assert "Amanda.record_orgasm_given()" in event
+    assert 'Amanda.player_cum("inside")' in event
+    assert 'Amanda.player_cum("outside")' in event
+    assert 'build_girl_decision_profile("amanda")' in event
+    assert '_amanda_seduction_profile.get("likes_player", 0.0)' in event
+    assert 'Amanda.set_var_int("suckyou", 1)' in event
+    assert 'call FinishPaidSexModule("amanda", "TavernAmandaRoom")' in event
+    assert "Amanda.room_entry_blocked_today" not in event
+    assert event.count("main_ui_end_native_scene_state()") == 3
+    assert "default " not in event
+
+
 def test_amanda_liza_work_talk_uses_real_source_event_without_invented_bridge():
     runtime = _source(STORY_RUNTIME)
     event_model = _source(AMANDA_EVENT_MODEL)
