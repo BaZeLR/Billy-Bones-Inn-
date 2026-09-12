@@ -36,6 +36,31 @@ init python:
                         "images/amanda/tavern/waitress5.jpg",
                     ],
                 },
+                "grope": {
+                    "intro": ["images/amanda/grope/inter.jpg"],
+                    "ass_angry": ["images/amanda/grope/assangry.jpg"],
+                    "ass_shy": ["images/amanda/grope/assshy.jpg"],
+                    "ass_ok": [
+                        "images/amanda/grope/assok1.jpg",
+                        "images/amanda/grope/assok2.jpg",
+                    ],
+                    "tit_angry": ["images/amanda/grope/titangry.jpg"],
+                    "tits_shy": [
+                        "images/amanda/grope/titshy1.jpg",
+                        "images/amanda/grope/titshy2.jpg",
+                    ],
+                    "tit_ok": [
+                        "images/amanda/grope/titok1.jpg",
+                        "images/amanda/grope/titok2.jpg",
+                    ],
+                    "dress_panties": ["images/amanda/grope/dresspanties.jpg"],
+                    "dress_naked_angry": ["images/amanda/grope/dressnakedangry.jpg"],
+                    "dress_naked": [
+                        "images/amanda/grope/dressnaked1.jpg",
+                        "images/amanda/grope/dressnaked2.jpg",
+                    ],
+                    "scold": ["images/amanda/grope/scold.jpg"],
+                },
                 "outfit_reward": {
                     "show": ["images/amanda/grope/dressFlirt1.png"],
                     "handjob": ["images/amanda/grope/handjob1.jpg"],

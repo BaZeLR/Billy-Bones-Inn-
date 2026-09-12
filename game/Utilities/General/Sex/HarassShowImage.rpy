@@ -31,29 +31,29 @@ label HarassShowImage(GirlNameHSI="", ActionHSI="", ReactionHSI=0, EyewitnessHSI
                     $ _hsi_picture = MelissaStaticData.image_path("grope", "tit_angry")
         elif _hsi_girl == "amanda":
             if _hsi_reaction == 0:
-                $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "inter")
+                $ _hsi_picture = AmandaStaticData.image_path("grope", "intro")
             elif _hsi_action == "ass":
                 if _hsi_reaction >= 3:
-                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "assok" + str(procedural_randint(1, 2, "harass_amanda_ass_ok_%s" % int(current_game_day() or 0))))
+                    $ _hsi_picture = AmandaStaticData.cycle_image("grope", "ass_ok", procedural_randint(1, 2, "harass_amanda_ass_ok_%s" % int(current_game_day() or 0)) - 1)
                 elif _hsi_reaction == 2:
-                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "assshy")
+                    $ _hsi_picture = AmandaStaticData.image_path("grope", "ass_shy")
                 else:
-                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "assangry")
+                    $ _hsi_picture = AmandaStaticData.image_path("grope", "ass_angry")
             elif _hsi_action == "tits":
                 if _hsi_reaction >= 3:
-                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "titok" + str(procedural_randint(1, 2, "harass_amanda_tit_ok_%s" % int(current_game_day() or 0))))
+                    $ _hsi_picture = AmandaStaticData.cycle_image("grope", "tit_ok", procedural_randint(1, 2, "harass_amanda_tit_ok_%s" % int(current_game_day() or 0)) - 1)
                 elif _hsi_reaction == 2:
-                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "titshy" + str(procedural_randint(1, 2, "harass_amanda_tit_shy_%s" % int(current_game_day() or 0))))
+                    $ _hsi_picture = AmandaStaticData.cycle_image("grope", "tits_shy", procedural_randint(1, 2, "harass_amanda_tit_shy_%s" % int(current_game_day() or 0)) - 1)
                 else:
-                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "titangry")
+                    $ _hsi_picture = AmandaStaticData.image_path("grope", "tit_angry")
             else:
                 if _hsi_info is not None and not _hsi_info.has_panties():
                     if _hsi_reaction >= 2:
-                        $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "dressnaked" + str(procedural_randint(1, 2, "harass_amanda_dress_naked_%s" % int(current_game_day() or 0))))
+                        $ _hsi_picture = AmandaStaticData.cycle_image("grope", "dress_naked", procedural_randint(1, 2, "harass_amanda_dress_naked_%s" % int(current_game_day() or 0)) - 1)
                     else:
-                        $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "dressnakedangry")
+                        $ _hsi_picture = AmandaStaticData.image_path("grope", "dress_naked_angry")
                 else:
-                    $ _hsi_picture = build_media_ref(_hsi_girl, "grope", "dresspanties")
+                    $ _hsi_picture = AmandaStaticData.image_path("grope", "dress_panties")
         elif _hsi_girl == "sandra":
             if JobTypeHSI == "waitress":
                 $ _hsi_picture = build_media_ref(_hsi_girl, "tavern", "waitress" + str(procedural_randint(1, 4, "harass_sandra_waitress_%s" % int(current_game_day() or 0))))

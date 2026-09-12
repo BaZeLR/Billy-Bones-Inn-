@@ -52,8 +52,6 @@ label PartEventAfterHarrassment(GirlNamePEAH, GirlSlapped, YourReaction1, result
             call HarassDiscussImage(GirlNamePEAH, 0)
         else:
             call HarassDiscussImage(GirlNamePEAH, 1)
-    elif GirlNamePEAH == "amanda":
-        call HarassDiscussImage(GirlNamePEAH, 1)
 
     $ scene_runtime.text = format_tavern_event_text(_event_text + "\n\n" + result)
     $ scene_runtime.location_text = scene_runtime.text

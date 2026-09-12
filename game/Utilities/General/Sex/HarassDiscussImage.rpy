@@ -16,7 +16,7 @@ label HarassDiscussImage(girl="", value=0, _hdi_girl="", _hdi_value=0, _hdi_pict
         else:
             $ _hdi_picture = MelissaStaticData.image_path("grope", "scold_agree")
     elif _hdi_girl == "amanda":
-        $ _hdi_picture = build_media_ref(_hdi_girl, "grope", "scold")
+        $ _hdi_picture = AmandaStaticData.image_path("grope", "scold")
 
     if str(_hdi_picture or "").strip():
         $ scene_runtime.picture = str(_hdi_picture or "")

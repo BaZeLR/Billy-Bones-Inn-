@@ -67,6 +67,9 @@ def test_harassment_event_state_is_passed_between_returnable_labels():
 
 
 def test_harassment_render_and_discussion_scratch_is_label_local():
+    amanda_data = (ROOT / "game/NPC/Girls/Amanda/InitAmanda.rpy").read_text(
+        encoding="utf-8-sig"
+    )
     discussion = (ROOT / "game/NPC/Girls/Common/IntHarrassmentDiscuss.rpy").read_text(
         encoding="utf-8-sig"
     )
@@ -85,18 +88,36 @@ def test_harassment_render_and_discussion_scratch_is_label_local():
     assert 'MelissaStaticData.image_path("grope", "tits_shy")' in show_image
     assert 'MelissaStaticData.image_path("grope", "ass_angry")' in show_image
     assert 'MelissaStaticData.image_path("grope", "tit_angry")' in show_image
-    for amanda_reaction_picture in (
-        "assok",
-        "assshy",
-        "assangry",
-        "titok",
-        "titshy",
-        "titangry",
-        "dressnaked",
-        "dressnakedangry",
-        "dresspanties",
+    for amanda_single_picture in (
+        "intro",
+        "ass_shy",
+        "ass_angry",
+        "tit_angry",
+        "dress_naked_angry",
+        "dress_panties",
     ):
-        assert 'build_media_ref(_hsi_girl, "grope", "%s' % amanda_reaction_picture in show_image
+        assert 'AmandaStaticData.image_path("grope", "%s")' % amanda_single_picture in show_image
+    for amanda_sequence in ("ass_ok", "tit_ok", "tits_shy", "dress_naked"):
+        assert 'AmandaStaticData.cycle_image("grope", "%s"' % amanda_sequence in show_image
+    for amanda_asset in (
+        "inter.jpg",
+        "assangry.jpg",
+        "assshy.jpg",
+        "assok1.jpg",
+        "assok2.jpg",
+        "titangry.jpg",
+        "titshy1.jpg",
+        "titshy2.jpg",
+        "titok1.jpg",
+        "titok2.jpg",
+        "dresspanties.jpg",
+        "dressnakedangry.jpg",
+        "dressnaked1.jpg",
+        "dressnaked2.jpg",
+        "scold.jpg",
+    ):
+        assert '"images/amanda/grope/%s"' % amanda_asset in amanda_data
+    assert 'AmandaStaticData.image_path("grope", "scold")' in discuss_image
     assert 'MelissaStaticData.image_path("grope", "scold_agree")' in discuss_image
     assert 'MelissaStaticData.image_path("grope", "throw_delinquent")' in discuss_image
     assert 'call HarassDiscussImage(GirlNameMHD, 3)' in discussion
@@ -121,6 +142,7 @@ def test_harassment_picture_text_and_choices_share_one_event_context():
 
     assert '"[scene_runtime.text]"' not in reaction + after + discussion
     assert '_event_text + "\\n\\n" + result' in after
+    assert 'elif GirlNamePEAH == "amanda":' not in after
 
 
 def test_rejected_customer_can_be_redirected_to_an_available_tavern_worker():
