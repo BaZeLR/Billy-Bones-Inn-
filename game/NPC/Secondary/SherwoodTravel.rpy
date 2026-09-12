@@ -111,6 +111,7 @@ label story_robin_blackwood_approach:
 
 
 label story_robin_blackwood_mongol_pass:
+    show screen main_ui
     vscene "images/Robin/mongolAndRobin1.png"
     $ scene_runtime.text = "Вы уже приготовились к привычному разговору о добровольных пожертвованиях, но один из разбойников вдруг прищурился и дернул Робина за рукав.\n\n\"Йо, браза,\" сказал он. \"Это тот самый трактирщик. Монгол велел своих предупредить: этот чувак не мазафака, он его из колодок вытащил.\"\n\nРобин некоторое время смотрит на вас с новым интересом, потом широко улыбается.\n\n\"Вот это другое дело, бразар. За Монгола уважуха. Раз наш человек сказал, что ты браза, значит сегодня ты едешь как браза. Деньги при себе оставь, коняшку тоже. Но если кто спросит - мы тебя не пропускали. Социяльная ответственность, понимаешь?\""
     $ scene_runtime.location_text = scene_runtime.text
@@ -123,7 +124,9 @@ label story_robin_blackwood_mongol_pass:
     $ scene_runtime.location_text = scene_runtime.text
     "[scene_runtime.text]"
     $ main_ui_runtime.mode = "scene"
-    return True
+    menu:
+        "Домой":
+            jump TavernMain
 
 
 label story_robin_blackwood_first_robbery:
@@ -161,6 +164,7 @@ label story_robin_blackwood_repeat_robbery:
 
 
 label story_robin_blackwood_robbed_return:
+    show screen main_ui
     $ scene_runtime.text = "Вы пытаетесь сохранить лицо, но трудовые мозолистые руки быстро разлучают вас с кошельком."
     if int(player.economy.money or 0) >= 50:
         $ scene_runtime.text += "\n\nХорошо еще, что вы взяли с собой только 50 мараведи."
@@ -171,10 +175,13 @@ label story_robin_blackwood_robbed_return:
     "[scene_runtime.text]"
     call SherwoodRobbedAndGoCode
     $ main_ui_runtime.mode = "scene"
-    return True
+    menu:
+        "Домой":
+            jump TavernMain
 
 
 label story_robin_blackwood_return_to_city:
+    show screen main_ui
     vscene "images/Robin/robin.png"
     if Robin.robbery_count == 0:
         $ Becky.sherwood_suspicion = int(Becky.sherwood_suspicion or 0) + 2
@@ -190,4 +197,6 @@ label story_robin_blackwood_return_to_city:
     $ calendar_v2.hour = 16
     $ calendar_v2.minute = 0
     $ main_ui_runtime.mode = "scene"
-    return True
+    menu:
+        "Домой":
+            jump TavernMain

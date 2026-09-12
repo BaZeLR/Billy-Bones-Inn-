@@ -15,7 +15,7 @@ label story_becky_church_after_sermon:
     menu:
         "Посмотреть":
             jump story_becky_church_after_sermon_look
-        "Вернуться в собор":
+        "Вернуться в собор" if not (threads["beckyGerhardAdvice"].enabled and not threads["beckyGerhardAdvice"].completed):
             $ main_ui_end_native_scene_state()
             jump Church
 

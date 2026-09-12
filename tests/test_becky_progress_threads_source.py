@@ -15,6 +15,7 @@ INVITE = (GAME / "NPC/Girls/Becky/BeckyInviteHome.rpy").read_text(encoding="utf-
 EDDIE_TALK = (GAME / "NPC/Secondary/IntEddieTalk.rpy").read_text(encoding="utf-8-sig")
 SHERWOOD = (GAME / "NPC/Secondary/SherwoodTravel.rpy").read_text(encoding="utf-8-sig")
 NEXT_DAY = (GAME / "Utilities/Time/NextDay_NewDayEvents.rpy").read_text(encoding="utf-8-sig")
+FINISH_DAY = (GAME / "Utilities/Time/NextDay_FinishDayEvents.rpy").read_text(encoding="utf-8-sig")
 KITCHEN = (GAME / "Inn/TavernKitchen.rpy").read_text(encoding="utf-8-sig")
 MIGRATION = (GAME / "TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
 
@@ -65,9 +66,31 @@ def test_becky_eddie_abort_and_sherwood_handoff_use_thread_lifecycle():
     assert '"beckySandraKitchenVisitDone"' in eddie_thread
     assert '"beckyGerhardAdviceDone"' in eddie_thread
     assert '"beckyEddieSexDone"' in sherwood_thread
-    assert EDDIE_TALK.count("event_runtime.active_thread.abort()") == 2
+    retry = EDDIE_TALK.split('if int(Eddie.rel or 0) < 10:', 1)[1].split(
+        'elif Becky.eddie_join_failures > 2:', 1
+    )[0]
+    terminal_refusal = EDDIE_TALK.split('elif Becky.eddie_join_failures > 2:', 1)[1].split(
+        'else:', 1
+    )[0]
+    assert "event_runtime.active_thread.abort()" not in retry
+    assert "event_runtime.active_thread.abort()" in terminal_refusal
+    assert EDDIE_TALK.count("event_runtime.active_thread.abort()") == 1
     assert 'threads["beckySherwoodTrade"].checkActive()' in NEXT_DAY
     assert 'threads["beckySherwoodTrade"].enable()' in NEXT_DAY
+
+
+def test_unseen_sunday_priest_event_advances_the_same_becky_threads():
+    priest = FINISH_DAY.split('elif place == "Priest":', 1)[1].split(
+        'elif girl == "becky":', 1
+    )[0]
+
+    assert 'becky_advice_thread = threads["beckyGerhardAdvice"]' in priest
+    assert "if week_val == 7 and becky_advice_thread.enabled" in priest
+    assert "becky_advice_thread.advance()" in priest
+    assert "* 30 <= player.economy.church_donated_amount" in priest
+    assert "becky_advice_thread.advanceTo(becky_advice_thread.data.length, complete_at_end=True)" in priest
+    assert 'becky_eddie_thread = threads["beckyEddieSex"]' in priest
+    assert "becky_eddie_thread.advanceTo(becky_eddie_thread.data.length, complete_at_end=True)" in priest
 
 
 def test_kitchen_event_solely_owns_advice_transition_and_tea_availability():

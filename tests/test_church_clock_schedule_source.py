@@ -184,6 +184,10 @@ def test_becky_after_ceremony_is_thread_event_with_clock_conditions():
     assert "event_runtime.active_thread.complete()" in becky_scene
     assert "call AdvanceTime(\"Church\")" not in becky_scene
     assert "calendar_v2.advance_minutes(60)" in becky_scene
+    intro = becky_scene.split("label story_becky_church_after_sermon:", 1)[1].split(
+        "label story_becky_church_after_sermon_look:", 1
+    )[0]
+    assert '"Вернуться в собор" if not (threads["beckyGerhardAdvice"].enabled and not threads["beckyGerhardAdvice"].completed):' in intro
 
 
 def test_church_after_ceremony_uses_native_back_and_returns_without_room_jump():

@@ -102,6 +102,23 @@ def test_robin_thread_and_mongol_escape_unlock_use_objects():
     assert "event_runtime.active_thread" not in mongol_pass
 
 
+def test_blackwood_terminal_outcomes_return_directly_to_tavern():
+    source = _source(BLACKWOOD)
+    terminal_labels = (
+        ("story_robin_blackwood_mongol_pass", "story_robin_blackwood_first_robbery"),
+        ("story_robin_blackwood_robbed_return", "story_robin_blackwood_return_to_city"),
+        ("story_robin_blackwood_return_to_city", None),
+    )
+
+    for label, next_label in terminal_labels:
+        block = source.split("label %s:" % label, 1)[1]
+        if next_label is not None:
+            block = block.split("label %s:" % next_label, 1)[0]
+        assert '"Домой":' in block
+        assert "jump TavernMain" in block
+        assert "return True" not in block
+
+
 def test_robin_v58_migration_consumes_old_map_once():
     migration = _source(MIGRATION)
     block = migration.split("def updateSave_V58():", 1)[1].split("label before_load:", 1)[0]

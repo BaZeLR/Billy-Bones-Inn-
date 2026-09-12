@@ -130,7 +130,7 @@ testcase eddie_failed_offer_allows_the_second_authored_attempt:
     click pos (0.5, 0.5) until eval (int(Eddie.talked_today or 0) == 2) timeout 20.0
     assert eval (not story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
 
-testcase eddie_permanent_refusal_aborts_the_branch:
+testcase eddie_low_relationship_refusal_keeps_the_branch_retryable:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
@@ -144,8 +144,35 @@ testcase eddie_permanent_refusal_aborts_the_branch:
         initStoryEventRuntime(True)
     assert eval (story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
     run Call("checkTriggers", "talk_eddie", "becky_eddie_sex", 0)
-    click pos (0.5, 0.5) until eval (threads["beckyEddieSex"].aborted and int(Eddie.talked_today or 0) == 1) timeout 20.0
-    assert eval (not story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
+    click pos (0.5, 0.5) until eval (int(Eddie.talked_today or 0) == 1) timeout 20.0
+    assert eval (not threads["beckyEddieSex"].aborted and int(threads["beckyEddieSex"].num or 0) == 2)
+    $ Eddie.rel = 10
+    $ Eddie.talked_today = 0
+    $ event_runtime.fired_keys_today = []
+    $ initStoryEventRuntime(True)
+    assert eval (story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
+
+testcase becky_unseen_sunday_priest_event_advances_threads:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    python:
+        calendar_v2.week = 7
+        threads["beckyGerhardAdvice"].reset()
+        threads["beckyGerhardAdvice"].enable()
+        threads["beckyEddieSex"].advanceTo(4, force_active=True)
+        TodaySexEvents_Clear()
+        TodaySexEvents_Add("becky", 99, 99, "Priest")
+        player.economy.church_donated_amount = 0
+        next_day_finish_day_events()
+    assert eval (int(threads["beckyGerhardAdvice"].num or 0) == 1 and not threads["beckyGerhardAdvice"].completed) timeout 5.0
+    assert eval (not threads["beckyEddieSex"].completed) timeout 5.0
+    python:
+        TodaySexEvents_Add("becky", 99, 99, "Priest")
+        player.economy.church_donated_amount = 2100
+        next_day_finish_day_events()
+    assert eval (threads["beckyGerhardAdvice"].completed and threads["beckyGerhardAdvice"].num == threads["beckyGerhardAdvice"].data.length) timeout 5.0
+    assert eval (threads["beckyEddieSex"].completed and threads["beckyEddieSex"].num == threads["beckyEddieSex"].data.length) timeout 5.0
 
 testcase becky_from_dinner_runs_eddie_first_join:
     run Jump("Intro")
@@ -231,6 +258,22 @@ testcase becky_church_priority_and_eddie_service_schedule:
     $ initStoryEventRuntime(True)
     assert eval (str(event_runtime.available["Church"]["after_cermon_walk"].target or "") == "story_becky_church_after_sermon") timeout 5.0
 
+testcase becky_pending_gerhardt_advice_cannot_be_skipped:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    python:
+        calendar_v2.week = 7
+        calendar_v2.hour = 12
+        calendar_v2.minute = 0
+        rooms.enter("Church")
+        threads["beckyGerhardAdvice"].reset()
+        threads["beckyGerhardAdvice"].enable()
+        initStoryEventRuntime(True)
+    run Call("story_becky_church_after_sermon")
+    advance until screen "choice" timeout 20.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Посмотреть"]) timeout 5.0
+
 testcase becky_final_church_event_completes_before_sherwood_starts:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
@@ -270,6 +313,23 @@ testcase becky_final_church_event_completes_before_sherwood_starts:
     assert eval (threads["beckyEddieSex"].completed and threads["beckyEddieSex"].num == threads["beckyEddieSex"].data.length) timeout 5.0
     assert eval (threads["beckySherwoodTrade"].checkActive() and not threads["beckySherwoodTrade"].enabled) timeout 5.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "Church") timeout 20.0
+
+testcase sherwood_terminal_return_has_no_extra_room_exit_cost:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    python:
+        rooms.enter("BlackwoodRoad")
+        rooms.get("BlackwoodRoad").custom_properties["on_horse"] = 0
+        Robin.mongol_safe_pass = True
+        threads["beckySherwoodTrade"].advanceTo(2, force_active=True)
+    run Call("story_robin_blackwood_mongol_pass")
+    advance until screen "say" timeout 20.0
+    click pos (960, 900) until screen "say" timeout 20.0
+    click pos (960, 900) until screen "choice" timeout 20.0
+    assert eval ([str(item.caption or "") for item in renpy.get_screen("choice").scope.get("items", [])] == ["Домой"]) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain") timeout 20.0
+    assert eval (int(calendar_v2.hour or 0) == 16 and int(calendar_v2.minute or 0) == 0) timeout 5.0
 '''
 
 

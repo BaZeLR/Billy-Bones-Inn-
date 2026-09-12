@@ -28,7 +28,7 @@ def test_completed_church_events_jump_to_the_real_room_without_wrappers():
     assert '$ calendar_v2.advance_minutes(60)' in combined
 
     becky_scene = _source(Path("game") / "NPC" / "Girls" / "Becky" / "IntBeckyAfterCermon.rpy")
-    assert '"Вернуться в собор":\n            $ main_ui_end_native_scene_state()\n            jump Church' in becky_scene
+    assert '"Вернуться в собор" if not (threads["beckyGerhardAdvice"].enabled and not threads["beckyGerhardAdvice"].completed):\n            $ main_ui_end_native_scene_state()\n            jump Church' in becky_scene
     assert '"Вернуться":\n            $ main_ui_end_native_scene_state()\n            $ calendar_v2.advance_minutes(60)\n            jump Church' in becky_scene
 
 
