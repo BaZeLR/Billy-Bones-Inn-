@@ -365,6 +365,25 @@ def test_sandra_post_sex_breakfast_talk_uses_story_thread_not_mirror_flag():
     assert "sandra_free_love" not in breakfast
 
 
+def test_sandra_completed_night_thanks_leads_to_authored_amanda_melissa_gossip():
+    runtime = (PROJECT_ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
+    events = SANDRA_EVENTS.read_text(encoding="utf-8-sig")
+    thread = runtime.split('LThreadData(0, "sandra", "KitchenHouseholdRespect"', 1)[1].split(
+        "], highlight=False, threaded=True)", 1
+    )[0]
+    scene = events.split("label story_sandra_kitchen_household_respect_0:", 1)[1].split(
+        "label TavernSandraNightThanksScene:", 1
+    )[0]
+
+    assert "#threads['sandraWeeklyEvaluation'].completed" in thread
+    assert "vscene BREAKFAST_GIRLS_TEASE_PICTURE" in scene
+    assert "Из комнаты Сандры такие крики неслись" in scene
+    assert "Да у меня кружка на табурете подпрыгивала" in scene
+    assert '"Продолжить слушать":' in scene
+    assert '"Войти на кухню":' in scene
+    assert "$ event_runtime.active_thread.complete()" in scene
+
+
 def test_sandra_weekly_visit_uses_canonical_portraits_and_native_event_beats():
     init_source = SANDRA_INIT.read_text(encoding="utf-8-sig")
     source = SANDRA_EVENTS.read_text(encoding="utf-8-sig")

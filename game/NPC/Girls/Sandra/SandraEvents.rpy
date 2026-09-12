@@ -123,6 +123,17 @@ label story_sandra_kitchen_household_respect_0:
     $ renpy.dynamic("_sandra_kitchen_respect_picture")
     $ main_ui_begin_native_scene_state("Разговор на кухне")
     show screen main_ui
+    vscene BREAKFAST_GIRLS_TEASE_PICTURE
+    $ scene_runtime.text = "У самой кухни вы слышите приглушенный смех. Аманда шепчет Мелиссе: \"Ты ночью тоже слышала? Из комнаты Сандры такие крики неслись, что я сперва решила — на нее шкаф упал. Потом кровать заскрипела, и все стало куда понятнее.\""
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Продолжить слушать":
+            pass
+    $ scene_runtime.text = "Мелисса зажимает рот ладонью, но все равно прыскает со смеху. \"Слышала? Да у меня кружка на табурете подпрыгивала. Наша строгая Сандра, оказывается, умеет не только приказы раздавать.\" Аманда изображает особенно протяжный ночной стон, и обе едва не складываются пополам от хохота."
+    $ scene_runtime.location_text = scene_runtime.text
+    menu:
+        "Войти на кухню":
+            pass
     $ _sandra_kitchen_respect_picture = SandraStaticData.image_path("kitchen", "work")
     if str(_sandra_kitchen_respect_picture or "").strip():
         vscene _sandra_kitchen_respect_picture
