@@ -368,6 +368,28 @@ def test_melissa_custom_relationship_and_intimacy_policy_is_object_owned():
     assert 'if int(player.intimacy.came_today or 0) == _hse_start_player_cums:' in sex_source
 
 
+def test_melissa_sleepy_wake_tickle_uses_thread_owned_handjob_gate():
+    init_source = MELISSA_INIT.read_text(encoding="utf-8-sig")
+    household_source = HOUSEHOLD_EVENTS.read_text(encoding="utf-8-sig")
+    gate = init_source.split("def handjob_story_ready(self):", 1)[1].split(
+        "def relationship_allows", 1
+    )[0]
+    wake = household_source.split('label HouseholdWakeSleepyGirl(girl_name=""):', 1)[1]
+
+    assert 'threads["melissaRatProblem"].completed' in gate
+    assert 'threads["melissaBatProblem"].completed' in gate
+    assert 'threads["claraPaintingsPath"].completed' in gate
+    assert 'main_ui_begin_native_scene_state("Разбудить Мелиссу")' in wake
+    assert '"Пощекотать ее под грудью" if _wake_indecent:' in wake
+    assert 'MelissaStaticData.cycle_image("tavern", "sleep", 4)' in wake
+    assert 'player_apply_arousal_trigger("melissa_wake_tickle"' in wake
+    assert '"Предложить помочь рукой" if Melissa.handjob_story_ready() and Melissa.can_have_sex_today() and not Melissa.sex_busy() and player.intimacy.can_cum():' in wake
+    assert 'Melissa.player_cum("outside")' in wake
+    assert 'player.intimacy.set_arousal(0)' in wake
+    assert "_wake_started_scene = main_ui_runtime.scene_origin is None" in wake
+    assert "jump " not in wake
+
+
 def test_melissa_courtship_is_one_ordered_story_thread_without_parallel_counters():
     runtime_source = (PROJECT_ROOT / "game/Utilities/General/Classes/StoryEventRuntime.rpy").read_text(encoding="utf-8-sig")
     event_source = MELISSA_EVENTS.read_text(encoding="utf-8-sig")

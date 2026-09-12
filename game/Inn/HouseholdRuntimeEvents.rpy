@@ -854,7 +854,7 @@ label HouseholdAmandaFakeSicknessWake:
         call TavernKitchenBreakfastShowText(scene_runtime.text)
     return
 label HouseholdWakeSleepyGirl(girl_name=""):
-    $ renpy.dynamic("_wake_girl", "_wake_indecent", "_wake_bulge", "_wake_info", "_wake_amanda_sleep_dress", "_wake_amanda_picture")
+    $ renpy.dynamic("_wake_girl", "_wake_indecent", "_wake_bulge", "_wake_info", "_wake_amanda_sleep_dress", "_wake_amanda_picture", "_wake_melissa_picture", "_wake_started_scene")
     $ _wake_girl = str(girl_name or "").strip().lower()
     if household_morning_issue_type(_wake_girl) != "sleepy":
         if player.tavern_management.breakfast.event_active:
@@ -862,6 +862,83 @@ label HouseholdWakeSleepyGirl(girl_name=""):
             call TavernKitchenBreakfastShowText(scene_runtime.text)
         return
     $ _wake_indecent = household_morning_issue_indecent(_wake_girl)
+    if _wake_girl == "melissa":
+        $ _wake_started_scene = main_ui_runtime.scene_origin is None
+        if _wake_started_scene:
+            $ main_ui_begin_native_scene_state("Разбудить Мелиссу")
+        show screen main_ui
+        $ _wake_melissa_picture = MelissaStaticData.cycle_image("tavern", "sleep", 4 if _wake_indecent else 2)
+        if str(_wake_melissa_picture or "").strip():
+            vscene _wake_melissa_picture
+        $ calendar_v2.advance_minutes(20)
+        $ household_clear_morning_issue("melissa")
+        $ Melissa.change_social(friend_delta=1)
+        $ scene_runtime.text = "Вы входите тихо и зовете Мелиссу по имени. Она сонно морщится и натягивает короткую ночную рубашку пониже, но вставать явно не спешит."
+        $ scene_runtime.location_text = scene_runtime.text
+        menu:
+            "Разбудить Мелиссу как обычно":
+                $ scene_runtime.text = "Вы еще раз напоминаете Мелиссе, который час. Она нехотя садится, убирает волосы с лица и обещает спуститься, как только приведет себя в порядок."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Оставить Мелиссу собираться":
+                        pass
+
+            "Пощекотать ее под грудью" if _wake_indecent:
+                vscene MelissaStaticData.cycle_image("tavern", "sleep", 4)
+                $ scene_runtime.text = "Вместо второго окрика вы проводите пальцами под ее грудью. Мелисса взвизгивает, пытается перехватить вашу руку и, не удержавшись, валится обратно на кровать. Еще миг она сердито смотрит на вас, а потом не выдерживает и смеется, подтянув ноги к животу."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Продолжить":
+                        pass
+                $ Melissa.change_social(open_delta=1)
+                $ Melissa.add_arousal(8)
+                $ player_apply_arousal_trigger("melissa_wake_tickle", max(0, 75 - int(player.intimacy.arousal_value() or 0)))
+                $ scene_runtime.text = "Короткая ночная рубашка задирается выше бедер. Мелисса слишком занята смехом, чтобы сразу это заметить, и на несколько мгновений перед вами открывается ее голая киска. Под штанами мгновенно твердеет член; когда девушка наконец замечает и ваш взгляд, и отчетливую выпуклость, ее смех обрывается, но ноги она опускает не сразу."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Продолжить":
+                        pass
+                if bool(Melissa.sex_stat("virginity", True)):
+                    $ scene_runtime.text = "Мелисса краснеет и тихо признается, что лечь с мужчиной пока не может: девственность для нее все еще слишком серьезная черта. Но от любопытства она уже не отказывается. Ее взгляд снова опускается к вашему стояку под штанами, и она предлагает начать с того, что просто рассмотрит его поближе."
+                else:
+                    $ scene_runtime.text = "Мелисса краснеет и признается, что сейчас не готова заходить дальше, но любопытства уже не скрывает. Ее взгляд снова опускается к вашему стояку под штанами, и она предлагает начать с того, что просто рассмотрит его поближе."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Позволить Мелиссе посмотреть":
+                        $ scene_runtime.text = "Вы не расстегиваете штаны и не торопите ее. Мелисса придвигается ближе, внимательно разглядывает туго натянутую ткань и, смутившись собственной смелости, наконец одергивает ночную рубашку. \"Для первого раза хватит,\" шепчет она, но улыбается уже без прежней испуганности."
+                        $ scene_runtime.location_text = scene_runtime.text
+                        $ Melissa.change_social(open_delta=1)
+                        menu:
+                            "Оставить Мелиссу собираться":
+                                pass
+
+                    "Предложить помочь рукой" if Melissa.handjob_story_ready() and Melissa.can_have_sex_today() and not Melissa.sex_busy() and player.intimacy.can_cum():
+                        vscene MelissaStaticData.image_path("outfit_reward", "handjob")
+                        $ scene_runtime.text = "Вы напоминаете, сколько всего уже осталось позади: крысы больше не хозяйничают в кладовой, летучие мыши изгнаны, а история с рисунками Клариссы доведена до конца. Мелисса долго смотрит на выпуклость под вашими штанами, потом решительно расстегивает их и осторожно обхватывает твердый член ладонью."
+                        $ scene_runtime.location_text = scene_runtime.text
+                        menu:
+                            "Позволить ей продолжить":
+                                pass
+                        vscene MelissaStaticData.image_path("outfit_reward", "handjob_finish")
+                        $ scene_runtime.text = "Поначалу ее рука движется робко, но Мелисса быстро находит ритм. Она следит за вашей реакцией, ускоряется и с удивленной улыбкой принимает на пальцы горячую сперму. Потом вытирает ладонь краем простыни и, все еще краснея, заявляет, что к завтраку вы оба теперь точно проснулись."
+                        $ scene_runtime.location_text = scene_runtime.text
+                        $ Melissa.player_cum("outside")
+                        $ player.intimacy.set_arousal(0)
+                        $ Melissa.change_social(friend_delta=1, open_delta=1, corruption_delta=1)
+                        $ calendar_v2.advance_minutes(15)
+                        menu:
+                            "Оставить Мелиссу собираться":
+                                pass
+
+                    "Не торопить ее":
+                        $ scene_runtime.text = "Вы говорите, что одного признания на сегодня достаточно. Мелисса благодарно выдыхает, поправляет задравшуюся рубашку и обещает вскоре спуститься."
+                        $ scene_runtime.location_text = scene_runtime.text
+                        menu:
+                            "Оставить Мелиссу собираться":
+                                pass
+        if _wake_started_scene:
+            $ main_ui_end_native_scene_state()
+        return
     $ _wake_bulge = 1 if _wake_indecent and player_has_visible_morning_bulge() else 0
     $ _wake_amanda_sleep_dress = tavern_amanda_room_sleep_dress() if _wake_girl == "amanda" else 0
     $ calendar_v2.advance_minutes(20)

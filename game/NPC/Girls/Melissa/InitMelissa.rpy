@@ -322,6 +322,13 @@ init python:
                 and booklet_resolved
             )
 
+        def handjob_story_ready(self):
+            return (
+                threads["melissaRatProblem"].completed
+                and threads["melissaBatProblem"].completed
+                and threads["claraPaintingsPath"].completed
+            )
+
         def relationship_allows(self, action_code="talk"):
             action_key = str(action_code or "talk").strip().lower()
             if action_key == "talk":
