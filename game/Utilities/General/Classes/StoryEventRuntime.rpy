@@ -1012,14 +1012,18 @@ define beckyThreadList = [
             True,
         ),
     ], highlight=False, threaded=False),
-    LThreadData(0, "becky", "SandraKitchenVisit", None, [
+    # Two ordinary visits establish Sandra and Becky as friends. Their third
+    # meeting owns the honey-tea advice that can move the Eddie dilemma to
+    # the church. The thread cursor is the only visit-stage authority.
+    LThreadData(0, "becky", "SandraKitchenVisit", [
+        "#int(current_game_day() or 0) > 30",
+    ], [
         (
             "story_becky_sandra_kitchen_visit",
             None, (18, 20), None,
             1,
             None,
             [
-                "#Becky.sandra_friendship_stage() >= 1",
                 "#str(people.location('becky') or '') == 'TavernKitchen'",
                 "#str(people.location('sandra') or '') == 'TavernKitchen'",
             ],
@@ -1028,7 +1032,37 @@ define beckyThreadList = [
             "enter",
             20,
         ),
-    ], highlight=False, threaded=False),
+        (
+            "story_becky_sandra_kitchen_visit",
+            None, (18, 20), None,
+            1,
+            None,
+            [
+                "#str(people.location('becky') or '') == 'TavernKitchen'",
+                "#str(people.location('sandra') or '') == 'TavernKitchen'",
+            ],
+            None,
+            "TavernKitchen",
+            "enter",
+            20,
+        ),
+        (
+            "story_becky_sandra_kitchen_visit",
+            None, (18, 20), None,
+            1,
+            None,
+            [
+                "#str(people.location('becky') or '') == 'TavernKitchen'",
+                "#str(people.location('sandra') or '') == 'TavernKitchen'",
+                "#bool(Becky.georgett_mentioned)",
+                "#int(player.item_count('energy_tea_001') or 0) > 0",
+            ],
+            None,
+            "TavernKitchen",
+            "enter",
+            20,
+        ),
+    ], highlight=False, threaded=True),
     # The Becky home route has two procedure-owned milestones followed by one
     # authored talk event.  Empty cells deliberately avoid registering a
     # second action for scenes already owned by BeckyHomeFront/IntBeckySex.
@@ -1089,7 +1123,39 @@ define beckyThreadList = [
         [],
         [],
     ], highlight=False, threaded=True),
-    LThreadData(0, "becky", "EddieSex", None, [
+    LThreadData(0, "becky", "GerhardAdvice", [
+        "beckySandraKitchenVisitDone",
+        "beckyGerhardAdviceEnabled",
+    ], [
+        (
+            "story_becky_church_after_sermon",
+            7, (11, 12), None,
+            1,
+            None,
+            None,
+            None,
+            "Church",
+            "after_cermon_walk",
+            90,
+        ),
+        (
+            "story_becky_church_after_sermon",
+            7, (11, 12), None,
+            1,
+            None,
+            None,
+            None,
+            "Church",
+            "after_cermon_walk",
+            90,
+        ),
+    ], highlight=False, threaded=True),
+    LThreadData(0, "becky", "EddieSex", [
+        "beckySandraKitchenVisitDone",
+        "#int(threads['beckySex'].num or 0) >= 1",
+        "#bool(Eddie.saw_mother_sex)",
+        "#bool(Eddie.seen_with_georgett)",
+    ], [
         (
             "IntEddieTalkMomHelper",
             None, None, None,
@@ -1135,9 +1201,21 @@ define beckyThreadList = [
             120,
             True,
         ),
-        # The first shared bedroom scene has happened. The final cursor is
-        # completed by the later Becky church follow-up, formerly visitedhome 7.
-        [],
+        # The first shared bedroom scene has happened. The later church
+        # follow-up is the final event and completes this thread.
+        (
+            "story_becky_church_after_sermon",
+            7, (11, 12), None,
+            1,
+            None,
+            [
+                "beckyGerhardAdviceDone",
+            ],
+            None,
+            "Church",
+            "after_cermon_walk",
+            100,
+        ),
     ], highlight=False, threaded=True),
     LThreadData(0, "becky", "IngaLucasPath", None, [
         [
@@ -1195,7 +1273,7 @@ define beckyThreadList = [
             1,
             None,
             [
-                "#Becky.can_trigger_after_sermon_event()",
+                "beckyGerhardAdviceDone",
             ],
             None,
             "Church",
@@ -1217,7 +1295,7 @@ define robinThreadList = [
             1,
             None,
             [
-                "#int(Becky.trade_offer_stage or 0) == 1",
+                "#int(threads['beckySherwoodTrade'].num or 0) >= 2",
                 "#str(rooms.current_code or '') == 'BlackwoodRoad'",
             ],
             None,
@@ -1227,7 +1305,44 @@ define robinThreadList = [
         ),
     ], highlight=False, threaded=False),
 ]
-define sherwoodThreadList = []
+define sherwoodThreadList = [
+    # This thread becomes active only after the Becky/Eddie conclusion. A
+    # successful new-day roll enables its first Grocery event; refusal advances
+    # to the authored reconsideration, while acceptance opens travel.
+    LThreadData(0, "becky", "SherwoodTrade", [
+        "beckyEddieSexDone",
+        "#int(Becky.rel or 0) >= 15",
+    ], [
+        (
+            "BeckyQuestInit",
+            None, None, None,
+            1,
+            None,
+            [
+                "beckySherwoodTradeEnabled",
+                "#str(people.location('becky') or '') == 'GroceryStore'",
+            ],
+            None,
+            "GroceryStore",
+            "enter",
+            5,
+        ),
+        (
+            "story_becky_sherwood_offer_0",
+            None, None, None,
+            1,
+            None,
+            [
+                "#Becky.talk_count() < 2",
+            ],
+            None,
+            "talk_becky",
+            "becky_sherwood_offer_retry",
+            100,
+        ),
+        [],
+    ], highlight=False, threaded=True),
+]
 define tavernThreadList = [
     RThreadData(0, "tavern", "SundayDinner", None, [1, [
         (
@@ -1522,7 +1637,7 @@ define lizaThreadList = [
             None,
             [
                 "#Liza.can_trigger_after_sermon_event()",
-                "#int(Becky.priest_advice_stage or 0) not in (1, 2)",
+                "#not (threads['beckyGerhardAdvice'].enabled and not threads['beckyGerhardAdvice'].completed)",
             ],
             None,
             "Church",
@@ -1776,7 +1891,7 @@ define georgettThreadList = [
             [
                 "#Georgett.can_trigger_after_sermon_event()",
                 "#int(Georgett.story_value('SawChurchAfterCermon', 0) or 0) == 0",
-                "#int(Becky.priest_advice_stage or 0) not in (1, 2)",
+                "#not (threads['beckyGerhardAdvice'].enabled and not threads['beckyGerhardAdvice'].completed)",
             ],
             None,
             "Church",

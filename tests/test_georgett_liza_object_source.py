@@ -322,7 +322,7 @@ def test_liza_v55_migration_consumes_legacy_state_once():
     migration = _source(MIGRATION)
     block = migration.split("def updateSave_V55():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 87" in migration
+    assert "define currentVersion = 88" in migration
     assert "if loaded_version < 56:" in migration
     assert "updateSave_V55()" in migration
     for old_key, field_name in (
@@ -561,7 +561,7 @@ def test_church_after_sermon_events_are_threaded_from_classes():
     assert '"after_cermon_walk"' in runtime
     assert '"#Georgett.can_trigger_after_sermon_event()"' in runtime
     assert '"#Liza.can_trigger_after_sermon_event()"' in runtime
-    assert runtime.count('"#int(Becky.priest_advice_stage or 0) not in (1, 2)"') == 2
+    assert runtime.count('"#not (threads[\'beckyGerhardAdvice\'].enabled and not threads[\'beckyGerhardAdvice\'].completed)"') == 2
     assert "church_after_cermon_event_roll" not in runtime
     georgett_after = runtime.split('"story_georgett_church_after_sermon"', 1)[1].split('define franThreadList', 1)[0]
     liza_after = runtime.split('"story_liza_church_after_sermon"', 1)[1].split('define georgettThreadList', 1)[0]
@@ -662,7 +662,7 @@ def test_georgett_has_three_location_story_threads_without_old_rows():
     migration_block = migration.split("def updateSave_V75():", 1)[1].split(
         "# Saved objects must be upgraded", 1
     )[0]
-    assert "define currentVersion = 87" in migration
+    assert "define currentVersion = 88" in migration
     assert "if loaded_version < 76:" in migration
     assert "updateSave_V75()" in migration
     for old_name in (

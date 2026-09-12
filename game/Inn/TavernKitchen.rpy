@@ -60,9 +60,6 @@ init python:
                 return picture_path
         return ""
 
-    def tavern_kitchen_can_share_tea_with_sandra_and_becky():
-        return people_to_int(Becky.sandra_kitchen_friendship_progress, 0) >= 2 and str(people.location("becky") or "") == "TavernKitchen" and str(people.location("sandra") or "") == "TavernKitchen" and int(player.item_count("energy_tea_001") or 0) > 0
-
     def tavern_kitchen_depositable_food_ids():
         item_ids = []
         for item_id, item_obj in dict(game_item_registry or {}).items():
@@ -436,30 +433,55 @@ label TavernKitchen:
 
 
 label story_becky_sandra_kitchen_visit:
-    if Becky.sandra_kitchen_friendship_progress < 2:
-        $ Becky.sandra_kitchen_friendship_progress += 1
+    $ renpy.dynamic("_becky_sandra_visit_thread", "_becky_sandra_visit_stage")
+    $ _becky_sandra_visit_thread = event_runtime.active_thread
+    $ _becky_sandra_visit_stage = int(_becky_sandra_visit_thread.num or 0)
     $ main_ui_begin_native_scene_state("Бекки в гостях у Сандры")
     show screen main_ui
     vscene "images/tavern/kitchen/becky_visit_0.png"
     $ scene_runtime.text = "Зайдя вечером на кухню, вы застаете Сандру и Бекки за негромким разговором у разделочного стола. Бекки явно пришла не по торговому делу: подруги обсуждают дом, трактир и что-то такое, о чем при вашем появлении обе на миг умолкают."
     $ scene_runtime.location_text = scene_runtime.text
-    menu:
-        "Угостить Сандру и Бекки бодрящим чаем" if tavern_kitchen_can_share_tea_with_sandra_and_becky():
-            $ player.remove_item("energy_tea_001", 1)
-            $ Becky.sandra_kitchen_friendship_progress = 3
-            $ Sandra.change_social(friend_delta=1)
-            $ Sandra.fun = min(100, int(Sandra.fun or 0) + 1)
-            $ Becky.change_social(friend_delta=1)
-            $ Becky.fun = min(100, int(Becky.fun or 0) + 1)
-            $ player.change_stat("fun", 1)
-            vscene "images/tavern/kitchen/becky_visit_1.png"
-            $ scene_runtime.text = "Вы завариваете бодрящий чай и ставите чашки перед Сандрой и Бекки. Разговор быстро теплеет: Сандра благодарит вас за внимание к хозяйству, а Бекки охотно подхватывает кухонные сплетни и делится парой полезных замечаний о трактирных делах."
-            $ scene_runtime.location_text = scene_runtime.text
-            call stat
+    if _becky_sandra_visit_stage < 2:
+        menu:
+            "Не мешать разговору":
+                $ scene_runtime.text = "Вы не стали мешать подругам и оставили их спокойно беседовать."
+                $ scene_runtime.location_text = scene_runtime.text
+                $ _becky_sandra_visit_thread.advance()
+    else:
+        menu:
+            "Угостить Сандру и Бекки бодрящим чаем":
+                $ player.remove_item("energy_tea_001", 1)
+                $ Sandra.change_social(friend_delta=1)
+                $ Sandra.fun = min(100, int(Sandra.fun or 0) + 1)
+                $ Becky.change_social(friend_delta=1)
+                $ Becky.fun = min(100, int(Becky.fun or 0) + 1)
+                $ player.change_stat("fun", 1)
+                vscene "images/tavern/kitchen/becky_visit_1.png"
+                $ scene_runtime.text = "Вы завариваете бодрящий чай и ставите чашки перед Сандрой и Бекки. Разговор быстро теплеет: Сандра благодарит вас за внимание к хозяйству, а Бекки охотно подхватывает кухонные сплетни и делится парой полезных замечаний о трактирных делах."
+                $ scene_runtime.location_text = scene_runtime.text
+                call stat
+                menu:
+                    "Продолжить разговор":
+                        pass
+                $ scene_runtime.text = "Сандра мягко напоминает Бекки, что спокойствие в доме держится не только на порядке, но и на доверии. Эдди давно верен ей, помогает с домом и лавкой, а бесконечно отталкивая его, Бекки однажды может потерять и помощника, и близкого человека. Хорошие отношения в семье, добавляет Сандра, укрепляют и хозяйство, и торговые связи."
+                $ scene_runtime.location_text = scene_runtime.text
+                menu:
+                    "Выслушать ответ Бекки":
+                        pass
+                if Becky.corruption <= 35:
+                    $ scene_runtime.text = "Бекки хмурится и возражает, что хозяйке нельзя потакать каждому желанию управляющего. Но слова Сандры ее явно задели: вдова решает спросить отца Герхарда, действительно ли ее сомнения так уж основательны."
+                elif Becky.corruption <= 52:
+                    $ scene_runtime.text = "Бекки долго греет ладони о чашку и признается, что сама уже не знает, чего боится сильнее: потерять власть в доме или оттолкнуть Эдди окончательно. За окончательным советом она решает обратиться к отцу Герхарду."
+                else:
+                    $ scene_runtime.text = "Бекки соглашается, что Сандра права: Эдди давно стал частью ее дома, и делать вид, будто его чувства ничего не значат, опаснее откровенного разговора. Для успокоения совести она все же решает спросить совета у отца Герхарда."
+                $ scene_runtime.location_text = scene_runtime.text
+                if not threads["beckyGerhardAdvice"].enabled:
+                    $ threads["beckyGerhardAdvice"].enable()
+                $ _becky_sandra_visit_thread.complete()
 
-        "Не мешать разговору":
-            $ scene_runtime.text = "Вы не стали мешать подругам и оставили их спокойно беседовать."
-            $ scene_runtime.location_text = scene_runtime.text
+            "Не мешать разговору":
+                $ scene_runtime.text = "Вы не стали мешать подругам и оставили их спокойно беседовать."
+                $ scene_runtime.location_text = scene_runtime.text
     menu:
         "Вернуться к своим делам":
             pass

@@ -37,10 +37,11 @@ def test_robin_is_default_secondary_npc_object():
     for field_name in (
         "identity_known", "complaint_explained", "place_explained",
         "weapon_source_explained", "robbery_count", "negotiation_stage",
-        "knows_big_tits_village", "mongol_safe_pass", "kunidell_opened",
+        "knows_big_tits_village", "mongol_safe_pass",
         "kunidell_deliveries", "blackwood_road_open",
     ):
         assert "self.%s =" % field_name in info_class
+    assert "self.kunidell_opened =" not in info_class
 
     live_source = "\n".join((source, _source(ROBIN_TALK), _source(BLACKWOOD)))
     for legacy_access in (
@@ -105,7 +106,7 @@ def test_robin_v58_migration_consumes_old_map_once():
     migration = _source(MIGRATION)
     block = migration.split("def updateSave_V58():", 1)[1].split("label before_load:", 1)[0]
 
-    assert "define currentVersion = 87" in migration
+    assert "define currentVersion = 88" in migration
     assert "if loaded_version < 59:" in migration
     assert "updateSave_V58()" in migration
     for old_key, field_name in (
@@ -124,3 +125,9 @@ def test_robin_v58_migration_consumes_old_map_once():
         assert 'robin_var.pop("%s"' % old_key in block
         assert "Robin.%s =" % field_name in block
     assert 'globals().pop("RobinVar", None)' in block
+
+    v87 = migration.split("def updateSave_V87():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+    assert 'getattr(Robin, "kunidell_opened", False)' in v87
+    assert 'Robin.__dict__.pop("kunidell_opened", None)' in v87

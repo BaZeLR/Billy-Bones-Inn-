@@ -16,20 +16,10 @@ init python:
         Amanda.ensure_story_defaults()
         week_val = _ndf_int(calendar_v2.week, 1)
         dayspassed_val = int(current_game_day())
-        church_donated_amount = _ndf_int(player.economy.church_donated_amount, 0)
         glory_hole_look = _ndf_int(player.tavern_management.glory_hole_look, 0)
 
         if Georgett.story_value("TalkChurchAfterCermonLiza", 0) and not Liza.prostitution_started:
             Liza.prostitution_started = True
-
-        if week_val == 7 and Becky.priest_advice_stage > 0 and CheckIfSexEventExist("becky", 99, "Priest") > 0:
-            if Becky.priest_advice_stage in (1, 2):
-                Becky.priest_advice_stage = 2
-                if procedural_randint(1, 70, "becky_priest_advice_finish_%s" % dayspassed_val) * 30 <= church_donated_amount:
-                    Becky.priest_advice_stage = 3
-            if Becky.priest_advice_stage == 3:
-                if not threads["beckyEddieSex"].completed and int(threads["beckyEddieSex"].num or 0) >= 4:
-                    threads["beckyEddieSex"].advanceTo(5, complete_at_end=True)
 
         while SexEvents.today_events:
             tmpArray = TodaySexEvents_PopFirst()

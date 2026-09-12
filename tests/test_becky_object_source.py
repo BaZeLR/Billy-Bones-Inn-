@@ -14,21 +14,18 @@ def test_becky_personal_story_facts_are_explicit_object_properties():
         "inga_sex_greeting_seen",
         "uninvited_visit_scolded",
         "home_front_checked_today",
-        "sandra_kitchen_friendship_progress",
         "eddie_georgett_stage",
         "eddie_home_visit_state",
         "home_visit_count",
         "talked_about_eddie",
         "georgett_mentioned",
         "eddie_intervention_reaction",
-        "priest_advice_stage",
         "gerhard_talk_stage",
         "asked_about_eddie_sex_stage",
         "eddie_join_failures",
         "eddie_robbed_day",
         "knows_blackwood",
         "sherwood_suspicion",
-        "trade_offer_stage",
         "sherwood_warning_stage",
         "asked_about_elf_trade",
         "fingal_connection_clarified",
@@ -43,11 +40,13 @@ def test_becky_personal_story_facts_are_explicit_object_properties():
         "home_sex_unlocked",
         "open_oral_stage",
         "eddie_join_stage",
+        "sandra_kitchen_friendship_progress",
+        "priest_advice_stage",
+        "trade_offer_stage",
     ):
         assert f"self.{retired_stage} =" not in info
 
-    assert "def sandra_friendship_stage(self):" in info
-    assert "self.sandra_kitchen_friendship_progress" in info
+    assert "def sandra_friendship_stage(self):" not in info
     assert "day_value > 70" not in info
     assert "self.sandra_kitchen_visit_period" not in info
     assert '"last_orgasm_day": -1' in info
@@ -119,7 +118,7 @@ def test_v52_migrates_becky_map_once_and_every_load_does_not_clean_it():
     )[0]
     assert "becky_var" not in always_cleanup
     assert "BeckyAdmit" not in always_cleanup
-    assert "define currentVersion = 87" in MIGRATION
+    assert "define currentVersion = 88" in MIGRATION
     assert "if loaded_version < 53:" in MIGRATION
     assert "updateSave_V52()" in MIGRATION
 
@@ -174,3 +173,29 @@ def test_v86_moves_becky_store_cooldown_to_generic_sex_stats():
     assert 'Becky.__dict__.pop("last_store_orgasm_day", None)' in migration
     assert "if loaded_version < 87:" in MIGRATION
     assert "updateSave_V86()" in MIGRATION
+
+
+def test_v87_moves_remaining_becky_stage_cursors_to_threads_and_deletes_mirrors():
+    migration = MIGRATION.split("def updateSave_V87():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+
+    for thread_name in (
+        "beckySandraKitchenVisit",
+        "beckyGerhardAdvice",
+        "beckyEddieSex",
+        "beckySherwoodTrade",
+    ):
+        assert f'threads["{thread_name}"]' in migration
+
+    for retired_stage in (
+        "sandra_kitchen_friendship_progress",
+        "priest_advice_stage",
+        "trade_offer_stage",
+    ):
+        assert f'getattr(Becky, "{retired_stage}", 0)' in migration
+        assert f'Becky.__dict__.pop("{retired_stage}", None)' in migration
+
+    assert 'daily_events.delete("becky", "SherwoodQuest")' in migration
+    assert "if loaded_version < 88:" in MIGRATION
+    assert "updateSave_V87()" in MIGRATION

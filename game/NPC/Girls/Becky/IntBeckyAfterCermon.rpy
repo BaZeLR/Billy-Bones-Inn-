@@ -4,8 +4,11 @@
 # ================================================================================
 
 label story_becky_church_after_sermon:
+    $ renpy.dynamic("_becky_church_intro")
+    $ main_ui_begin_native_scene_state("Бекки после службы")
     show screen main_ui
-    $ scene_runtime.text = scene_runtime.text + "\n\nВы заметили, как миссис Блэнкеншип направилась было к кабинке для исповеди, но отец Герхард взял ее за руку и повел к неприметной двери, которую он отпер висящим у него на поясе ключом. Как только вдова проследовала за ним, дверь захлопнулась и послышался стук задвигаемого засова. Хотя вы можете попробовать посмотреть, что там происходит через замочную скважину."
+    $ _becky_church_intro = "\n\nВы заметили, как миссис Блэнкеншип направилась было к кабинке для исповеди, но отец Герхард взял ее за руку и повел к неприметной двери, которую он отпер висящим у него на поясе ключом. Как только вдова проследовала за ним, дверь захлопнулась и послышался стук задвигаемого засова. Хотя вы можете попробовать посмотреть, что там происходит через замочную скважину."
+    $ scene_runtime.text = _becky_church_intro.lstrip()
     $ scene_runtime.location_text = scene_runtime.text
     vscene "images/church/confessionEntry.png"
 
@@ -13,18 +16,21 @@ label story_becky_church_after_sermon:
         "Посмотреть":
             jump story_becky_church_after_sermon_look
         "Вернуться в собор":
+            $ main_ui_end_native_scene_state()
             jump Church
 
 
 label story_becky_church_after_sermon_look:
-    $ renpy.dynamic("GirlNameAC", "_becky_priest_incest_agree")
+    $ renpy.dynamic("GirlNameAC", "_becky_priest_incest_agree", "_becky_advice_thread", "_becky_advice_stage")
     show screen main_ui
     $ GirlNameAC = "becky"
+    $ _becky_advice_thread = threads["beckyGerhardAdvice"]
+    $ _becky_advice_stage = int(_becky_advice_thread.num or 0)
 
     $ GetSexEventFromTable(GirlNameAC, 99, "Priest")
     call PregnancyCheck(GirlNameAC, "inside", 1, "Отец Герхард")
     $ scene_runtime.text = "Посмотрев в замочную скважину вы, как и ожидали, увидели Ребекку Блэнкеншип и отца Герхарда."
-    if Becky.priest_advice_stage == 1:
+    if _becky_advice_thread.enabled and not _becky_advice_thread.completed and _becky_advice_stage == 0:
         $ scene_runtime.text = scene_runtime.text + "\n\n\"Приветствую тебя, дочь моя,\" смиренно сказал жрец. \"Что-то ты давно на исповедь не захаживала, а ведь грех это, исповедь пропускать.\"\n\"Знаю, падре, знаю.\""
         if Becky.pregnancy_days() < 120:
             $ scene_runtime.text = scene_runtime.text + "\n\n\"Уверен, за все то время, что прошло с нашей прошлой встречи, ты не смогла удержаться от греха,\" напористо заявил святой отец, \"не правда ли? И помни, что самый большой грех - это лгать на исповеди.\""
@@ -46,7 +52,9 @@ label story_becky_church_after_sermon_look:
     $ scene_runtime.location_text = scene_runtime.text
     $ scene_runtime.picture = "images/becky/church/talk1.jpg"
     vscene scene_runtime.picture
-    "[scene_runtime.text]"
+    menu:
+        "Продолжить":
+            pass
     $ scene_runtime.picture = "images/becky/church/talk2.jpg"
     vscene scene_runtime.picture
     menu:
@@ -54,11 +62,11 @@ label story_becky_church_after_sermon_look:
             pass
 
     $ scene_runtime.text = "Вы продолжаете наблюдать за вдовой Блэнкеншип и отцом Герхардом через замочную скважину."
-    if Becky.priest_advice_stage == 1:
+    if _becky_advice_thread.enabled and not _becky_advice_thread.completed and _becky_advice_stage == 0:
         $ scene_runtime.text = scene_runtime.text + "\n\n\"Ну, дочь моя, расскажи мне, что за сомнения тебя мучают,\" спросил отец Герхард, входя в Бекки.\n\"Ох, падре, даже и не знаю как сказать, стыдно-то как. Управляющий мой, Эдди, на меня как на женщину посматривать начал. А я ведь после смерти мужа одинокая, да и он в доме и лавке давно помогает,\" - при этих словах отец Герхард несколько увеличил темп, так что вдове пришлось взять временную паузу, но вскоре она приноровилась, и, подмахивая жрецу, продолжила с того же места:\n\"Только он моложе, а я ему хозяйка. Боюсь, если дам ему, то и авторитет потеряю, и сама перед ним глупой старой вдовой покажусь. Вот я и думаю, большой то грех будет али малый.\""
-    elif Becky.priest_advice_stage == 2:
+    elif _becky_advice_thread.enabled and not _becky_advice_thread.completed and _becky_advice_stage == 1:
         $ scene_runtime.text = scene_runtime.text + "\n\n\"Ну, дочь моя, допускала ли ты опять нескромные мысли о своем управляющем?\" спросил отец Герхард. То ли эта мысль, то ли вид бесстыдно обнаженной киски Бекки изрядно возбудили жреца, его член стоял колом.\n\"Ох, падре, как же вы проницательны, ааах,\" последний возглас вырвался из уст вдовы непроизвольно, так как в этот момент в нее вошел член отца Герхарда.\nПриноровившись к его толчкам она продолжила: \"Да, Эдди на меня все так же сладострастно смотрит. А я ведь после смерти мужа одинокая, выдержка у меня не железная, а помощник мой все так мучается. Только я ему хозяйка дома и лавки, мне нельзя выглядеть девчонкой, которая сама не знает, чего хочет.\""
-    elif Becky.priest_advice_stage == 3 and not threads["beckyEddieSex"].completed:
+    elif _becky_advice_thread.completed and not threads["beckyEddieSex"].completed:
         $ scene_runtime.text = scene_runtime.text + "\n\n\"Дочь моя, отдалась ли ты своему Эдди, как собиралась в прошлый раз?\" спросил отец Герхард, поднимая сутану. То ли эта мысль, то ли вид бесстыдно обнаженной киски Бекки изрядно возбудили жреца, его член стоял колом."
         if int(threads["beckyEddieSex"].num or 0) < 4:
             $ scene_runtime.text = scene_runtime.text + "\n\"Ох, падре, нет еще, не решилась я да и случая подходящего не представилось, ааах,\" последний возглас вырвался из уст вдовы непроизвольно, так как в этот момент в нее вошел член отца Герхарда.\nПриноровившись к его толчкам она продолжила: \"Но скоро решусь наверное, я ведь вдова одинокая, а Эдди так мучается. Только я старше, я хозяйка, и страшно мне потерять перед ним власть в собственном доме.\""
@@ -69,7 +77,9 @@ label story_becky_church_after_sermon_look:
     $ scene_runtime.location_text = scene_runtime.text
     $ scene_runtime.picture = "images/becky/church/fuckstart1.jpg"
     vscene scene_runtime.picture
-    "[scene_runtime.text]"
+    menu:
+        "Продолжить":
+            pass
     $ scene_runtime.picture = "images/becky/church/fuckstart2.jpg"
     vscene scene_runtime.picture
     menu:
@@ -78,18 +88,19 @@ label story_becky_church_after_sermon_look:
 
     $ scene_runtime.text = "Вы продолжаете наблюдать за Ребеккой и отцом Герхардом через замочную скважину."
     $ _becky_priest_incest_agree = False
-    if Becky.priest_advice_stage <= 2:
+    if _becky_advice_thread.enabled and not _becky_advice_thread.completed:
         if procedural_randint(1, 70, "becky_church_priest_advice_%s" % int(calendar_v2.daysInGame or 0)) * 20 <= player.economy.church_donated_amount:
-            $ Becky.priest_advice_stage = 3
+            $ _becky_advice_thread.advanceTo(_becky_advice_thread.data.length, complete_at_end=True)
             $ _becky_priest_incest_agree = True
             $ scene_runtime.text = scene_runtime.text + "\n\n\"Сказать по правде, то грех небольшой.\"\n\"Правда, падре?\" не смогла сдержать вздоха удивления Ребекка. Хотя может это был вздох вовсе и не удивления: ведь в тот момент отец Герхард в очередной раз задвинул свой член во вдову по самые яйца.\n\"Да, даже я, грешник, не удержался в свое время. Ведь матушка моя, достопочтенная Франческа, - жрица богини Эллоны. А жрицы Эллоны каждый праздник должны отдаваться всем прихожанам, кто того пожелает. Нельзя им отказывать, ведь тогда великая Эллона, богиня плодородия, может обидется, урожай пропадет, земля родить не будет.\n\nСовсем мальчонкой я был, когда дружки мои подговорили меня прийти в праздник в храм. А там, на ложе из цветов, и лежала мама, раздвинув ноги и чье-то семя стекало из ее лона.\""
         else:
-            if Becky.priest_advice_stage == 1:
+            if _becky_advice_stage == 0:
                 $ scene_runtime.text = scene_runtime.text + "\n\n\"Ах ты греховодница, да как тебе только мысль такая в голову прийти могла?\" вскричал в негодовании отец Герхард, впрочем не сбавляя темпа."
+                $ _becky_advice_thread.advance()
             else:
                 $ scene_runtime.text = scene_runtime.text + "\n\n\"Ах ты греховодница, я ж тебе уже объяснил, а ты все срамные мысли из головы выгнать не можешь?\" вскричал в негодовании отец Герхард, впрочем не сбавляя темпа."
             $ scene_runtime.text = scene_runtime.text + "\n\n\"И думать не смей о таком позоре,\" добавил он, задвигая в нее член по самые яйца."
-    elif Becky.priest_advice_stage == 3 and not threads["beckyEddieSex"].completed:
+    elif _becky_advice_thread.completed and not threads["beckyEddieSex"].completed:
         if int(threads["beckyEddieSex"].num or 0) < 4:
             $ scene_runtime.text = scene_runtime.text + "\n\n\"Ну, не спеши, но и не сдерживай себя, я ведь уже растолковал тебе, что то грех невеликий,\" сказал жрец, задвинув во вдову свой член по самые яйца."
         else:
@@ -99,11 +110,19 @@ label story_becky_church_after_sermon_look:
     $ scene_runtime.location_text = scene_runtime.text
     $ scene_runtime.picture = "images/becky/church/fuck1.jpg"
     vscene scene_runtime.picture
-    "[scene_runtime.text]"
+    menu:
+        "Смотреть дальше":
+            pass
     $ scene_runtime.picture = "images/becky/church/fuck2.jpg"
     vscene scene_runtime.picture
+    menu:
+        "Смотреть дальше":
+            pass
     $ scene_runtime.picture = "images/becky/church/fuck3.jpg"
     vscene scene_runtime.picture
+    menu:
+        "Смотреть дальше":
+            pass
     $ scene_runtime.picture = "images/becky/church/fuck4.jpg"
     vscene scene_runtime.picture
     menu:
@@ -112,13 +131,12 @@ label story_becky_church_after_sermon_look:
 
     if _becky_priest_incest_agree:
         $ scene_runtime.text = "Увидела она меня, но ничего не сказала, праздник есть праздник, порядок есть порядок. А через неделю другой праздник был, а потом еще. А вскоре и вовсе разохотилась Франческа моя и без праздников всяких стала меня приглашать в себя. Так что, дочь моя, сама посуди, это грех небольшой, раз даже столь святой человек как я ему поддался.\" и с этими словами старый жрец закряхтел и кончил прямо внутрь вдовушки.\n\"Ах, святой отец, спасибо вам, значит не столь греховны мои мысли, как я неразумная считала,\" содрогаясь в оргазме счастливо выдохнула вдова."
-    elif Becky.priest_advice_stage <= 2:
+    elif _becky_advice_thread.enabled and not _becky_advice_thread.completed:
         $ scene_runtime.text = "\"Ах, святой отец, спасибо что остановили меня, неразумную, от греха такого уберегли,\" послушно ответила ему вдова, подмахивая его толчкам.\n\"То-то же,\" и тут старый жрец закряхтел и кончил прямо внутрь вдовушки."
-        $ Becky.priest_advice_stage = 2
     else:
-        if not threads["beckyEddieSex"].completed and int(threads["beckyEddieSex"].num or 0) >= 4:
+        if event_runtime.active_thread is threads["beckyEddieSex"] and int(event_runtime.active_thread.num or 0) == 4:
             $ scene_runtime.text = "\"Ах, святой отец, спасибо вам, успокоили вы меня, тяжесть с души сняли,\" послушно ответила ему вдова, подмахивая его толчкам."
-            $ threads["beckyEddieSex"].advanceTo(5, complete_at_end=True)
+            $ event_runtime.active_thread.complete()
         else:
             $ scene_runtime.text = "\"Ах, святой отец, спасибо вам на добром слове, за совет и участие спасибо,\" послушно ответила ему вдова, подмахивая его толчкам."
         $ scene_runtime.text = scene_runtime.text + "\n\"Так я же слуга великого Ильматера, как же я мог тебя, прихожанку свою, участием обделить,\" и тут старый жрец закряхтел и не обделил вдовушку не только участием, но и спермой, начав заполнять ею влагалище Бекки."
@@ -133,5 +151,6 @@ label story_becky_church_after_sermon_look:
     "[scene_runtime.text]"
     menu:
         "Вернуться":
+            $ main_ui_end_native_scene_state()
             $ calendar_v2.advance_minutes(60)
             jump Church

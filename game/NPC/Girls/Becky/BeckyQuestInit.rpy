@@ -22,7 +22,7 @@ label BeckyQuestInit():
                 $ scene_runtime.location_text = scene_runtime.text
                 $ Becky.sherwood_warning_stage = 1
                 $ Becky.sherwood_suspicion += 1
-            $ Becky.trade_offer_stage = 1
+            $ event_runtime.active_thread.advanceTo(2, force_active=True)
             menu:
                 "Пойти подумать над предложением":
                     $ main_ui_end_native_scene_state()
@@ -30,7 +30,7 @@ label BeckyQuestInit():
         "Неа. Меня ни работа, ни деньги не интересуют":
             $ scene_runtime.text = "\"Ну ладно, раз так. Но если передумаешь, то не стесняйся, спроси,\" разочарованно сказала вдовушка.\n\n\"Я хоть и не стесняюсь, но спрашивать пока не буду,\" гордо сказали вы."
             $ scene_runtime.location_text = scene_runtime.text
-            $ Becky.trade_offer_stage = 2
+            $ event_runtime.active_thread.advance()
             menu:
                 "Вернуться на рыночную площадь":
                     $ main_ui_end_native_scene_state()

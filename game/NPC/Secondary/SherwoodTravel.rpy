@@ -48,13 +48,14 @@ label SherwoodRobbedAndGoCode:
 
 label SherwoodKunidellOpenedCode(OnHorse=0):
     $ renpy.dynamic("_blackwood_trade_profit")
-    $ Robin.kunidell_opened = True
     $ calendar_v2.hour = 16
     $ calendar_v2.minute = 0
     if int(OnHorse or 0) == 1:
         $ _blackwood_trade_profit = procedural_randint(50, 300, "blackwood_kunidell_trade_%s" % int(current_game_day() or 0))
         $ player.add_money(200 + _blackwood_trade_profit)
         $ Robin.kunidell_deliveries += 1
+    if not threads["beckySherwoodTrade"].completed and int(threads["beckySherwoodTrade"].num or 0) >= 2:
+        $ threads["beckySherwoodTrade"].complete()
     call stat
     return
 

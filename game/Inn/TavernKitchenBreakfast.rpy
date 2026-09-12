@@ -36,7 +36,8 @@ init python:
         )
 
     def npc_schedule_becky_sandra_kitchen_visit_active():
-        return Becky.sandra_friendship_stage() >= 1
+        visit_thread = threads.get("beckySandraKitchenVisit", None)
+        return visit_thread is not None and (visit_thread.completed or visit_thread.checkActive())
 
     def tavern_breakfast_present_ids():
         present = []

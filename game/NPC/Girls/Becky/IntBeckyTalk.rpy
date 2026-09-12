@@ -2,7 +2,7 @@
 # YOU ARE NOT ALLOWED TO CHANGE THE STRUCTURE THE MECHANICS THE WORDING OF CODE BASE FILE WHITOUOUT EXPLICIT PERMISSION IN PERMISSION YOU WILL ARGUMENT WHY THIS CHANGE IS GOOD FOR CODE QUAITY IMPROVEMENT ! ! ! OR PRESENTING A BETTER SOLUTION
 # ================================================================================
 label IntBeckyTalk(girl_name="becky"):
-    $ renpy.dynamic("_becky_name", "_becky_picture", "_grocery_breastfeeding_text", "_grocery_kids_text")
+    $ renpy.dynamic("_becky_name", "_becky_picture", "_becky_sandra_thread", "_grocery_breastfeeding_text", "_grocery_kids_text")
     $ _becky_name = str(girl_name or "becky").lower()
     $ Becky.update()
     $ main_ui_begin_talk_state("Разговор с Бекки", _becky_name)
@@ -14,9 +14,10 @@ label IntBeckyTalk(girl_name="becky"):
             vscene _becky_picture
     if str(rooms.current_code or "") == "GroceryStore":
         $ scene_runtime.text = "За прилавком стоит сама Бекки Блэнкеншип. Это высокая рыжая женщина с полной грудью, ей на вид немного меньше сорока. Ее муж умер от болезни примерно за год до того, как ваш отец купил \"Дикого Жеребца\"."
-        if Becky.sandra_friendship_stage() == 1:
+        $ _becky_sandra_thread = threads["beckySandraKitchenVisit"]
+        if not _becky_sandra_thread.completed and _becky_sandra_thread.checkActive():
             $ scene_runtime.text += "\n\nВы знаете, что Бекки и Сандра недавно стали подругами."
-        elif Becky.sandra_friendship_stage() == 2:
+        elif _becky_sandra_thread.completed:
             $ scene_runtime.text += "\n\nВы знаете, что Сандра и Бекки — лучшие подруги."
         $ _grocery_breastfeeding_text = DescribeBreastFeeding("becky", 3)
         $ _grocery_kids_text = ShowFullKidsListByAge("becky", "inga")
@@ -76,17 +77,17 @@ label IntBeckyTalk(girl_name="becky"):
                 call story_becky_talk_eddie_after_sex_0(_becky_name)
             "Спросить, знает ли она от кого затяжелела" if Becky.talk_count() < 2 and Becky.rel >= 8 and int(Becky.stats.get("pregnancy", 0) or 0) >= 120 and str(DaddyAskBuildPhrase(_becky_name) or "") != "":
                 call story_becky_talk_pregnancy_0(_becky_name)
-            "Насчет твоего предложения, в чем там все-таки дело?" if Becky.talk_count() < 2 and Becky.trade_offer_stage == 2:
-                call story_becky_sherwood_offer_0(_becky_name)
-            "А чего ты сама с эльфами не торгуешь?" if Becky.talk_count() < 2 and Becky.trade_offer_stage == 1 and not Becky.asked_about_elf_trade:
+            "Насчет твоего предложения, в чем там все-таки дело?" if story_event_available("talk_becky", "becky_sherwood_offer_retry"):
+                call checkTriggers("talk_becky", "becky_sherwood_offer_retry", 0)
+            "А чего ты сама с эльфами не торгуешь?" if Becky.talk_count() < 2 and int(threads["beckySherwoodTrade"].num or 0) >= 2 and not Becky.asked_about_elf_trade:
                 call story_becky_sherwood_elves_0(_becky_name)
-            "А твое предложеньице с фингалом у Эдди не связанно, случаем?" if Becky.trade_offer_stage == 1 and Eddie.fingal_talk_stage > 0 and not Becky.fingal_connection_clarified and Becky.admitted_sherwood_stage == 0:
+            "А твое предложеньице с фингалом у Эдди не связанно, случаем?" if int(threads["beckySherwoodTrade"].num or 0) >= 2 and Eddie.fingal_talk_stage > 0 and not Becky.fingal_connection_clarified and Becky.admitted_sherwood_stage == 0:
                 call story_becky_sherwood_fingal_0(_becky_name)
-            "О какой-такой загвоздке ты говорила?" if Becky.trade_offer_stage == 1 and Becky.sherwood_warning_stage == 1 and Becky.admitted_sherwood_stage == 0:
+            "О какой-такой загвоздке ты говорила?" if int(threads["beckySherwoodTrade"].num or 0) >= 2 and Becky.sherwood_warning_stage == 1 and Becky.admitted_sherwood_stage == 0:
                 call story_becky_sherwood_warn_0(_becky_name)
-            "Насчет дороги в Куниделл" if Becky.talk_count() < 2 and Becky.trade_offer_stage == 1 and Becky.admitted_sherwood_stage == 0 and Becky.knows_blackwood:
+            "Насчет дороги в Куниделл" if Becky.talk_count() < 2 and int(threads["beckySherwoodTrade"].num or 0) >= 2 and Becky.admitted_sherwood_stage == 0 and Becky.knows_blackwood:
                 call story_becky_sherwood_road_0(_becky_name)
-            "Так что же ты меня дурила-то?" if Becky.trade_offer_stage == 1 and Becky.admitted_sherwood_stage == 1:
+            "Так что же ты меня дурила-то?" if int(threads["beckySherwoodTrade"].num or 0) >= 2 and Becky.admitted_sherwood_stage == 1:
                 call story_becky_sherwood_lied_0(_becky_name)
             "Меня ограбили!!!" if Becky.talk_count() < 2 and Becky.robin_robbery_stage == 1:
                 call story_becky_sherwood_robbed_0(_becky_name)

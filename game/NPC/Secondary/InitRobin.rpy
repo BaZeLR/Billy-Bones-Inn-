@@ -31,7 +31,6 @@ init python:
             self.negotiation_stage = 0
             self.knows_big_tits_village = False
             self.mongol_safe_pass = False
-            self.kunidell_opened = False
             self.kunidell_deliveries = 0
             self.blackwood_road_open = False
 

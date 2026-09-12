@@ -12,11 +12,18 @@ TOPICS = (GAME / "NPC/Girls/Becky/IntBeckyTalkTopics.rpy").read_text(encoding="u
 EDDIE_SCENE = (GAME / "NPC/Girls/Becky/BeckyEddieJoinFirst.rpy").read_text(encoding="utf-8-sig")
 CHURCH = (GAME / "NPC/Girls/Becky/IntBeckyAfterCermon.rpy").read_text(encoding="utf-8-sig")
 INVITE = (GAME / "NPC/Girls/Becky/BeckyInviteHome.rpy").read_text(encoding="utf-8-sig")
+EDDIE_TALK = (GAME / "NPC/Secondary/IntEddieTalk.rpy").read_text(encoding="utf-8-sig")
+SHERWOOD = (GAME / "NPC/Secondary/SherwoodTravel.rpy").read_text(encoding="utf-8-sig")
+NEXT_DAY = (GAME / "Utilities/Time/NextDay_NewDayEvents.rpy").read_text(encoding="utf-8-sig")
+KITCHEN = (GAME / "Inn/TavernKitchen.rpy").read_text(encoding="utf-8-sig")
+MIGRATION = (GAME / "TractirSaveSync.rpy").read_text(encoding="utf-8-sig")
 
 
 def test_becky_progress_has_one_thread_owner_per_story_sequence():
-    for subname in ("Home", "Dinner", "Sex", "EddieSex"):
+    for subname in ("SandraKitchenVisit", "Home", "Dinner", "Sex", "GerhardAdvice", "EddieSex"):
         assert RUNTIME.count(f'LThreadData(0, "becky", "{subname}"') == 1
+
+    assert RUNTIME.count('LThreadData(0, "becky", "SherwoodTrade"') == 1
 
     assert 'LThreadData(0, "becky", "GeorgettHomeVisit"' not in RUNTIME
     assert "default becky_home" not in RUNTIME.lower()
@@ -38,7 +45,44 @@ def test_becky_labels_advance_their_authoritative_story_threads():
     assert 'threads["beckyDinner"].advanceTo(1, force_active=True)' in DINNER
     assert 'threads["beckyDinner"].advanceTo(2, force_active=True)' in DINNER
     assert 'event_runtime.active_thread.advanceTo(4, force_active=True)' in EDDIE_SCENE
-    assert 'threads["beckyEddieSex"].advanceTo(5, complete_at_end=True)' in CHURCH
+    assert 'event_runtime.active_thread.complete()' in CHURCH
+    assert 'threads["beckySherwoodTrade"].complete()' in SHERWOOD
+
+
+def test_becky_eddie_abort_and_sherwood_handoff_use_thread_lifecycle():
+    advice_thread = RUNTIME.split('LThreadData(0, "becky", "GerhardAdvice"', 1)[1].split(
+        'LThreadData(0, "becky", "EddieSex"', 1
+    )[0]
+    eddie_thread = RUNTIME.split('LThreadData(0, "becky", "EddieSex"', 1)[1].split(
+        'LThreadData(0, "becky", "IngaLucasPath"', 1
+    )[0]
+    sherwood_thread = RUNTIME.split('LThreadData(0, "becky", "SherwoodTrade"', 1)[1].split(
+        "define tavernThreadList", 1
+    )[0]
+
+    assert '"beckySandraKitchenVisitDone"' in advice_thread
+    assert '"beckyGerhardAdviceEnabled"' in advice_thread
+    assert '"beckySandraKitchenVisitDone"' in eddie_thread
+    assert '"beckyGerhardAdviceDone"' in eddie_thread
+    assert '"beckyEddieSexDone"' in sherwood_thread
+    assert EDDIE_TALK.count("event_runtime.active_thread.abort()") == 2
+    assert 'threads["beckySherwoodTrade"].checkActive()' in NEXT_DAY
+    assert 'threads["beckySherwoodTrade"].enable()' in NEXT_DAY
+
+
+def test_kitchen_event_solely_owns_advice_transition_and_tea_availability():
+    assert 'threads["beckyGerhardAdvice"].enable()' not in TOPICS
+    assert KITCHEN.count('threads["beckyGerhardAdvice"].enable()') == 1
+    assert "def tavern_kitchen_can_share_tea_with_sandra_and_becky" not in KITCHEN
+    assert '"Угостить Сандру и Бекки бодрящим чаем":' in KITCHEN
+
+
+def test_v87_rechecks_new_thread_conditions_for_untouched_old_save_stages():
+    migration = MIGRATION.split("def updateSave_V87():", 1)[1].split(
+        "# Saved objects must be upgraded", 1
+    )[0]
+    assert "kitchen_thread.metconds = False" in migration
+    assert "eddie_thread.metconds = False" in migration
 
 
 def test_retired_becky_stage_fields_are_load_migration_only():
@@ -52,6 +96,9 @@ def test_retired_becky_stage_fields_are_load_migration_only():
         "home_sex_unlocked",
         "open_oral_stage",
         "eddie_join_stage",
+        "sandra_kitchen_friendship_progress",
+        "priest_advice_stage",
+        "trade_offer_stage",
     ):
         assert retired_stage not in live
 

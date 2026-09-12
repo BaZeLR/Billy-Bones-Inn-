@@ -47,7 +47,9 @@ init python:
             and int(threads["beckySex"].num or 0) >= 1
             and info.saw_mother_sex
             and info.seen_with_georgett
+            and (threads["beckyEddieSex"].completed or threads["beckyEddieSex"].checkActive())
             and int(threads["beckyEddieSex"].num or 0) != 1
+            and not threads["beckyEddieSex"].aborted
             and int(getattr(info, "talked_today", 0) or 0) < 2
         )
 

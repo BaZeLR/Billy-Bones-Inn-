@@ -7,7 +7,7 @@ label story_becky_sherwood_offer_0(girl_name="becky"):
     $ scene_runtime.text = "\"Ага передумал,\" радостно воскликнула вдова. \"Так я и знала, что жадность твою лень пересилит! Рада, что в тебе не ошиблась.\""
     $ scene_runtime.text += "\n\n" + BECKY_TRADE_OFFER_TEXT
     $ scene_runtime.location_text = scene_runtime.text
-    $ Becky.trade_offer_stage = 1
+    $ event_runtime.active_thread.advance()
     $ Becky.finish_talk()
     return
 

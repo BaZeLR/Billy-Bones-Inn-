@@ -10,6 +10,10 @@ label ChurchAfterCermon(entry_arg=0):
     $ scene_runtime.text = "Вы решили пройтись по опустевшему собору. Вы обошли огромное здание по периметру, заглянули в несколько коридоров и залов, затем прошли через галлерею с кабинками для исповеди."
     $ scene_runtime.location_text = scene_runtime.text
     vscene "images/church/confessionEntry.png"
+    show screen main_ui
+    menu:
+        "Продолжить обход":
+            pass
     $ findAvailableEvents(True)
     $ _church_after_event = dict(event_runtime.available.get("Church", {}) or {}).get("after_cermon_walk", None)
     if _church_after_event is not None:

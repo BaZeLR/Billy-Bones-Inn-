@@ -14,7 +14,6 @@ NEXT_DAY = (ROOT / "game/Utilities/Time/NextDay_NewDayEvents.rpy").read_text(enc
 
 
 TOPICS = (
-    ("SherwoodOfferTalk", "story_becky_sherwood_offer_0"),
     ("SherwoodElvesTalk", "story_becky_sherwood_elves_0"),
     ("SherwoodFingalTalk", "story_becky_sherwood_fingal_0"),
     ("SherwoodWarnTalk", "story_becky_sherwood_warn_0"),
@@ -31,13 +30,21 @@ def test_sherwood_followups_are_direct_native_topics_not_false_threads():
         assert 'LThreadData(0, "becky", "' + thread_name + '"' not in RUNTIME
         assert "call " + target + "(_becky_name)" in TALK
 
+    assert RUNTIME.count('LThreadData(0, "becky", "SherwoodTrade"') == 1
+    assert 'story_event_available("talk_becky", "becky_sherwood_offer_retry")' in TALK
+    assert 'call checkTriggers("talk_becky", "becky_sherwood_offer_retry", 0)' in TALK
 
-def test_sherwood_labels_change_only_branch_facts_not_thread_state():
-    assert "event_runtime.active_thread" not in LABELS
-    assert "thread.advance()" not in LABELS
+
+def test_sherwood_offer_advances_thread_and_followups_change_only_branch_facts():
+    offer = LABELS.split("label story_becky_sherwood_offer_0", 1)[1].split(
+        "label story_becky_sherwood_elves_0", 1
+    )[0]
+    followups = LABELS.split("label story_becky_sherwood_elves_0", 1)[1]
+
+    assert "event_runtime.active_thread.advance()" in offer
+    assert "event_runtime.active_thread" not in followups
     assert "thread.complete()" not in LABELS
     for fact in (
-        'Becky.trade_offer_stage = 1',
         'Becky.asked_about_elf_trade = True',
         'Becky.fingal_connection_clarified = True',
         'Becky.sherwood_warning_stage = 2',
@@ -49,7 +56,7 @@ def test_sherwood_labels_change_only_branch_facts_not_thread_state():
 
 
 def test_sherwood_topic_conditions_preserve_qsp_branch_gates():
-    assert 'Becky.trade_offer_stage == 2' in TALK
+    assert 'int(threads["beckySherwoodTrade"].num or 0) >= 2' in TALK
     assert 'not Becky.asked_about_elf_trade' in TALK
     assert "Eddie.fingal_talk_stage > 0" in TALK
     assert 'Becky.sherwood_warning_stage == 1' in TALK
@@ -73,15 +80,23 @@ def test_blackwood_quest_has_one_live_offer_label_and_one_static_text_source():
     assert "TradeOfferText" not in BECKY_INIT
 
 
-def test_blackwood_trigger_uses_robbery_day_as_its_single_one_time_state():
+def test_blackwood_offer_uses_thread_state_as_its_single_one_time_authority():
     trigger = NEXT_DAY.split("# Бекки предлагает подзаработать", 1)[1]
     trigger = trigger.split("# Francheska", 1)[0]
 
-    assert "Becky.eddie_robbed_day == 0" in trigger
+    assert 'threads["beckySherwoodTrade"].checkActive()' in trigger
+    assert 'not threads["beckySherwoodTrade"].enabled' in trigger
+    assert 'threads["beckySherwoodTrade"].enable()' in trigger
     assert "Becky.eddie_robbed_day = day_value" in trigger
     assert "EddieRobbed'" not in trigger
     assert '"EddieRobbed"' not in BECKY_INIT
     assert '"SherwoodQuestScheduled"' not in BECKY_INIT
+
+    sherwood = RUNTIME.split('LThreadData(0, "becky", "SherwoodTrade"', 1)[1].split(
+        "define tavernThreadList", 1
+    )[0]
+    assert '"beckyEddieSexDone"' in sherwood
+    assert "#str(people.location('becky') or '') == 'GroceryStore'" in sherwood
 
 
 def test_unreachable_future_blackwood_outcome_flags_are_not_live_defaults():

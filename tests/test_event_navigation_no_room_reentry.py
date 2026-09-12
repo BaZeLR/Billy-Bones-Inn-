@@ -62,7 +62,7 @@ def test_becky_church_paths_reenter_the_canonical_room():
     event_scene = becky_event.split("label story_becky_church_after_sermon_look:", 1)[1].split("\nlabel ", 1)[0]
 
     assert becky_talk.rstrip().endswith("jump Church")
-    assert '"Вернуться в собор":\n            jump Church' in event_intro
+    assert '"Вернуться в собор":\n            $ main_ui_end_native_scene_state()\n            jump Church' in event_intro
     assert event_scene.rstrip().endswith("jump Church")
 
 

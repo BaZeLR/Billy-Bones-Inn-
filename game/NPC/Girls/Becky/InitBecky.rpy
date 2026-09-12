@@ -49,21 +49,18 @@ init python:
             self.inga_sex_greeting_seen = False
             self.uninvited_visit_scolded = False
             self.home_front_checked_today = False
-            self.sandra_kitchen_friendship_progress = 0
             self.eddie_georgett_stage = 0
             self.eddie_home_visit_state = 0
             self.home_visit_count = 0
             self.talked_about_eddie = False
             self.georgett_mentioned = False
             self.eddie_intervention_reaction = 0
-            self.priest_advice_stage = 0
             self.gerhard_talk_stage = 0
             self.asked_about_eddie_sex_stage = 0
             self.eddie_join_failures = 0
             self.eddie_robbed_day = 0
             self.knows_blackwood = False
             self.sherwood_suspicion = 0
-            self.trade_offer_stage = 0
             self.sherwood_warning_stage = 0
             self.asked_about_elf_trade = False
             self.fingal_connection_clarified = False
@@ -263,9 +260,6 @@ init python:
                 self.apply_social_roll(0, 0, 0, 60, 2, 1)
             return text
 
-        def can_trigger_after_sermon_event(self):
-            return people_to_int(self.priest_advice_stage, 0) > 0
-
         def is_visibly_pregnant(self):
             return self.pregnancy_days() >= 120
 
@@ -274,14 +268,6 @@ init python:
 
         def store_lover_modest_reaction(self):
             return (people_to_int(self.corruption, 0) <= 45 or people_to_int(self.rel, 0) < 10) and people_to_int(self.corruption, 0) <= 55
-
-        def sandra_friendship_stage(self):
-            day_value = people_to_int(current_game_day(), 0)
-            if people_to_int(self.sandra_kitchen_friendship_progress, 0) >= 3:
-                return 2
-            if day_value > 30:
-                return 1
-            return 0
 
         def has_bra(self):
             return str(self.wardrobe.get("current_underwear", {}).get("bra", "") or "") != ""

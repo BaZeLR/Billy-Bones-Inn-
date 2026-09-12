@@ -11,7 +11,7 @@ label BeckyEddieJoinFirst:
 
     menu:
         "Поцеловать Бекки и незаметно открыть засов":
-            if Becky.priest_advice_stage < 3 and procedural_randint(1, 2, "becky_eddie_join_latch_%s" % int(current_game_day() or 0)) == 1:
+            if not threads["beckyGerhardAdvice"].completed and procedural_randint(1, 2, "becky_eddie_join_latch_%s" % int(current_game_day() or 0)) == 1:
                 "Одной рукой вы обняли вдовушку, а другой попробовали незаметно отодвинуть засов. Однако Ребекка засекла ваше движение, погрозила вам пальчиком и задвинула его обратно: \"Ай-ай озорник, я все-таки еще не готова заниматься с тобой любовью с дверью настежь. А вдруг кто-то из домашних зайдет?\""
                 call BeckyEddieJoinFirst_EddieFailureCode
                 return
@@ -24,7 +24,7 @@ label BeckyEddieJoinFirst:
             $ scene_runtime.picture = "images/becky/sexeddie/eddieentry.jpg"
             vscene scene_runtime.picture
 
-            if Becky.priest_advice_stage < 3:
+            if not threads["beckyGerhardAdvice"].completed:
                 if Becky.eddie_join_failures == 0:
                     "Бекки отпустила ваш орган и подскочила от неожиданности. Увидев же голого управляющего, она аж взвизгнула: \"Ты что здесь делаешь?! Что это ты такое себе вообразил? Ты что себе позволяешь?! Ах ты козел, урод, после всего, что я для тебя сделала?!\""
                     "От такого напора Эдди аж попятился. А хозяйка лавки налетела на него как тигрица и в мгновение ока вытолкала за дверь."

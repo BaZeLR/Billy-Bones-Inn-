@@ -30,7 +30,7 @@ def test_becky_quest_offer_preserves_reference_choices_and_market_exits():
 
     assert QUEST.count("$ main_ui_end_native_scene_state()") == 2
     assert QUEST.count("jump MarketPlace") == 2
-    assert "$ Becky.trade_offer_stage = 1" in QUEST
-    assert "$ Becky.trade_offer_stage = 2" in QUEST
+    assert "$ event_runtime.active_thread.advanceTo(2, force_active=True)" in QUEST
+    assert "$ event_runtime.active_thread.advance()" in QUEST
     assert "$ Becky.sherwood_warning_stage = 1" in QUEST
     assert "$ Becky.sherwood_suspicion += 1" in QUEST

@@ -49,14 +49,14 @@ def test_becky_kitchen_visit_uses_friendship_and_schedule_as_authority():
     becky_schedule = schedule("becky")
     sandra_schedule = schedule("sandra")
 
-    assert "def sandra_friendship_stage(self):" in becky
-    assert "self.sandra_kitchen_friendship_progress = 0" in becky
-    assert "if people_to_int(self.sandra_kitchen_friendship_progress, 0) >= 3:" in becky
+    assert "def sandra_friendship_stage(self):" not in becky
+    assert "self.sandra_kitchen_friendship_progress" not in becky
     assert "day_value > 70" not in becky
     assert "Вы знаете, что Бекки и Сандра недавно стали подругами." in becky_talk
     assert "Вы знаете, что Сандра и Бекки — лучшие подруги." in becky_talk
     assert "ваша мама" not in becky_talk
-    assert "return Becky.sandra_friendship_stage() >= 1" in breakfast
+    assert 'visit_thread = threads.get("beckySandraKitchenVisit", None)' in breakfast
+    assert "visit_thread.completed or visit_thread.checkActive()" in breakfast
     assert 'people.location("becky")' in kitchen
     assert 'LThreadData(0, "becky", "SandraKitchenVisit"' in runtime
     visit_event = runtime.split('LThreadData(0, "becky", "SandraKitchenVisit"', 1)[1].split(
@@ -64,14 +64,15 @@ def test_becky_kitchen_visit_uses_friendship_and_schedule_as_authority():
     )[0]
     assert '"story_becky_sandra_kitchen_visit"' in visit_event
     assert '"TavernKitchen",\n            "enter"' in visit_event
-    assert "#Becky.sandra_friendship_stage() >= 1" in visit_event
+    assert visit_event.count('"story_becky_sandra_kitchen_visit"') == 3
     assert "#str(people.location('becky') or '') == 'TavernKitchen'" in visit_event
     assert "#str(people.location('sandra') or '') == 'TavernKitchen'" in visit_event
     assert "label story_becky_sandra_kitchen_visit:" in kitchen
-    assert "if Becky.sandra_kitchen_friendship_progress < 2:" in kitchen
-    assert "$ Becky.sandra_kitchen_friendship_progress += 1" in kitchen
-    assert "people_to_int(Becky.sandra_kitchen_friendship_progress, 0) >= 2" in kitchen
-    assert "Becky.sandra_kitchen_friendship_progress = 3" in kitchen
+    assert "_becky_sandra_visit_stage = int(_becky_sandra_visit_thread.num or 0)" in kitchen
+    assert "if _becky_sandra_visit_stage < 2:" in kitchen
+    assert "$ _becky_sandra_visit_thread.advance()" in kitchen
+    assert '$ threads["beckyGerhardAdvice"].enable()' in kitchen
+    assert "$ _becky_sandra_visit_thread.complete()" in kitchen
     assert 'Call("TavernKitchenShareTeaWithSandraAndBecky")' not in kitchen
     assert entry_at(becky_schedule, 2, "19:00")["label"] == "sandra_kitchen_visit"
     assert entry_at(sandra_schedule, 2, "19:00")["label"] == "becky_visit_kitchen"
@@ -110,7 +111,7 @@ def test_church_go_around_action_matches_qsp_and_is_restored_for_loaded_saves():
     assert 'RoomAction(action_id="after_cermon_walk", label="Обойти собор", hook="ui_call", target="ChurchAfterCermon", args=(1,), condition=church_after_cermon_action_visible)' in church
     assert "return int(calendar_v2.week or 0) == 7 and church_minutes_between(11 * 60, 12 * 60 + 59)" in church
 
-    assert "define currentVersion = 87" in migration
+    assert "define currentVersion = 88" in migration
     assert "if loaded_version < 81:" in migration
     v80 = migration.split("def updateSave_V80():", 1)[1].split("# Saved objects must be upgraded", 1)[0]
     assert 'old_room = rooms.get("Church")' in v80

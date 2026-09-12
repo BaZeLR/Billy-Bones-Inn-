@@ -77,6 +77,7 @@ def test_eddie_dialog_uses_vscene_and_room_restore_end():
 
 def test_eddie_mom_story_uses_event_for_progress_and_direct_label_only_for_status():
     source = _source(EDDIE_TALK)
+    init_source = _source(ROOT / "game" / "NPC" / "Secondary" / "InitEddieTalk.rpy")
     runtime = _source(ROOT / "game" / "Utilities" / "General" / "Classes" / "StoryEventRuntime.rpy")
 
     menu_block = source.split('"Предложить помочь подкатится к хозяйке лавки."', 1)[1].split(
@@ -86,6 +87,10 @@ def test_eddie_mom_story_uses_event_for_progress_and_direct_label_only_for_statu
     assert "call IntEddieTalkMomStatus" in menu_block
     assert 'call checkTriggers("talk_eddie", "becky_eddie_sex", 0)' in menu_block
     assert "call IntEddieTalkMomHelper" not in menu_block
+    helper = init_source.split("def eddie_talk_can_mom_helper", 1)[1].split(
+        "def eddie_talk_can_bruise", 1
+    )[0]
+    assert 'threads["beckyEddieSex"].completed or threads["beckyEddieSex"].checkActive()' in helper
     eddie_thread = runtime.split('LThreadData(0, "becky", "EddieSex"', 1)[1].split(
         'LThreadData(0, "becky", "IngaLucasPath"', 1
     )[0]

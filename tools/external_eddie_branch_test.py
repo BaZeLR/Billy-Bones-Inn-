@@ -91,11 +91,16 @@ testcase eddie_talk_opens_becky_join_setup:
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
     $ threads["beckySex"].advanceTo(1, force_active=True)
-    $ threads["beckyEddieSex"].advanceTo(0, force_active=True)
+    $ threads["beckyEddieSex"].reset()
+    $ threads["beckySandraKitchenVisit"].reset()
     $ Eddie.rel = 9
     $ Eddie.talked_today = 0
     $ Eddie.saw_mother_sex = True
     $ Eddie.seen_with_georgett = True
+    $ initStoryEventRuntime(True)
+    assert eval (not eddie_talk_can_mom_helper("eddie") and not story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
+    $ threads["beckySandraKitchenVisit"].forceEnable()
+    $ threads["beckySandraKitchenVisit"].advanceTo(threads["beckySandraKitchenVisit"].data.length, complete_at_end=True)
     $ initStoryEventRuntime(True)
     assert eval (story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
     assert eval (str(event_runtime.available["talk_eddie"]["becky_eddie_sex"].target or "") == "IntEddieTalkMomHelper") timeout 5.0
@@ -106,8 +111,10 @@ testcase eddie_failed_offer_allows_the_second_authored_attempt:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    $ threads["beckySandraKitchenVisit"].forceEnable()
+    $ threads["beckySandraKitchenVisit"].advanceTo(threads["beckySandraKitchenVisit"].data.length, complete_at_end=True)
     $ threads["beckySex"].advanceTo(1, force_active=True)
-    $ threads["beckyEddieSex"].advanceTo(0, force_active=True)
+    $ threads["beckyEddieSex"].reset()
     $ Eddie.rel = 3
     $ Eddie.talked_today = 0
     $ Eddie.saw_mother_sex = True
@@ -123,13 +130,31 @@ testcase eddie_failed_offer_allows_the_second_authored_attempt:
     click pos (0.5, 0.5) until eval (int(Eddie.talked_today or 0) == 2) timeout 20.0
     assert eval (not story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
 
+testcase eddie_permanent_refusal_aborts_the_branch:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    python:
+        threads["beckyEddieSex"].advanceTo(2, force_active=True)
+        Eddie.rel = 9
+        Eddie.talked_today = 0
+        Eddie.saw_mother_sex = True
+        Eddie.seen_with_georgett = True
+        event_runtime.fired_keys_today = []
+        initStoryEventRuntime(True)
+    assert eval (story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
+    run Call("checkTriggers", "talk_eddie", "becky_eddie_sex", 0)
+    click pos (0.5, 0.5) until eval (threads["beckyEddieSex"].aborted and int(Eddie.talked_today or 0) == 1) timeout 20.0
+    assert eval (not story_event_available("talk_eddie", "becky_eddie_sex")) timeout 5.0
+
 testcase becky_from_dinner_runs_eddie_first_join:
     run Jump("Intro")
     advance until screen "choice" timeout 20.0
     click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
     $ threads["beckyEddieSex"].advanceTo(1, force_active=True)
     $ rooms.get("BeckyHomeFront").state["arrival_mode"] = "FromDances"
-    $ Becky.priest_advice_stage = 3
+    $ threads["beckyGerhardAdvice"].forceEnable()
+    $ threads["beckyGerhardAdvice"].advanceTo(threads["beckyGerhardAdvice"].data.length, complete_at_end=True)
     $ Becky.rel = 20
     $ Becky.corruption = 55
     $ Eddie.rel = 10
@@ -190,15 +215,61 @@ testcase becky_church_priority_and_eddie_service_schedule:
     $ Georgett.set_story_value("churchgeorgettadmit", 1)
     $ Georgett.set_story_value("SawChurchAfterCermon", 0)
     $ Georgett.set_story_value("churchlizaadmit", 1)
-    $ Becky.priest_advice_stage = 1
+    $ threads["beckyGerhardAdvice"].reset()
+    $ threads["beckyGerhardAdvice"].enable()
+    $ threads["beckyEddieSex"].reset()
     $ initStoryEventRuntime(True)
     assert eval (str(event_runtime.available["Church"]["after_cermon_walk"].target or "") == "story_becky_church_after_sermon") timeout 5.0
-    $ Becky.priest_advice_stage = 2
+    $ threads["beckyGerhardAdvice"].advanceTo(1, force_active=True)
     $ initStoryEventRuntime(True)
     assert eval (str(event_runtime.available["Church"]["after_cermon_walk"].target or "") == "story_becky_church_after_sermon") timeout 5.0
-    $ Becky.priest_advice_stage = 3
+    $ threads["beckyGerhardAdvice"].forceEnable()
+    $ threads["beckyGerhardAdvice"].advanceTo(threads["beckyGerhardAdvice"].data.length, complete_at_end=True)
     $ initStoryEventRuntime(True)
     assert eval (str(event_runtime.available["Church"]["after_cermon_walk"].target or "") == "story_georgett_church_after_sermon") timeout 5.0
+    $ threads["beckyEddieSex"].advanceTo(4, force_active=True)
+    $ initStoryEventRuntime(True)
+    assert eval (str(event_runtime.available["Church"]["after_cermon_walk"].target or "") == "story_becky_church_after_sermon") timeout 5.0
+
+testcase becky_final_church_event_completes_before_sherwood_starts:
+    run Jump("Intro")
+    advance until screen "choice" timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "TavernMain" and len(people) > 0) timeout 20.0
+    python:
+        calendar_v2.day = 7
+        calendar_v2.week = 7
+        calendar_v2.daysInGame = 6
+        calendar_v2.hour = 12
+        calendar_v2.minute = 0
+        Becky.rel = 20
+        threads["beckyGerhardAdvice"].forceEnable()
+        threads["beckyGerhardAdvice"].advanceTo(threads["beckyGerhardAdvice"].data.length, complete_at_end=True)
+        threads["beckyEddieSex"].advanceTo(4, force_active=True)
+        threads["beckySherwoodTrade"].reset()
+        event_runtime.fired_keys_today = []
+        rooms.enter("Church")
+        initStoryEventRuntime(True)
+    assert eval (not threads["beckyEddieSex"].completed and not threads["beckySherwoodTrade"].checkActive()) timeout 5.0
+    assert eval (event_runtime.available["Church"]["after_cermon_walk"].thread_name == "beckyEddieSex") timeout 5.0
+    run Call("ChurchAfterCermon", 1)
+    advance until screen "choice" timeout 20.0
+    assert eval (renpy.get_screen("choice").scope["items"][0].caption == "Продолжить обход") timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (any(item.caption == "Посмотреть" for item in renpy.get_screen("choice").scope.get("items", []))) timeout 10.0
+    $ _look_index = next(i for i, item in enumerate(renpy.get_screen("choice").scope["items"]) if item.caption == "Посмотреть")
+    click id ("choice_panel_button_%d" % _look_index) pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Продолжить") timeout 20.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Посмотреть еще") timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Продолжить") timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Смотреть дальше") timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (renpy.get_screen("choice").scope["items"][0].caption == "Смотреть не отрываясь") timeout 10.0
+    click id "choice_panel_button_0" pos (0.5, 0.5)
+    advance until screen "say" timeout 20.0
+    click pos (960, 900) until eval (renpy.get_screen("choice") is not None and renpy.get_screen("choice").scope["items"][0].caption == "Вернуться") timeout 10.0
+    assert eval (threads["beckyEddieSex"].completed and threads["beckyEddieSex"].num == threads["beckyEddieSex"].data.length) timeout 5.0
+    assert eval (threads["beckySherwoodTrade"].checkActive() and not threads["beckySherwoodTrade"].enabled) timeout 5.0
+    click id "choice_panel_button_0" pos (0.5, 0.5) until eval (str(rooms.current_code or "") == "Church") timeout 20.0
 '''
 
 

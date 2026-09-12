@@ -1,5 +1,5 @@
 default saveVersion = 1
-define currentVersion = 87
+define currentVersion = 88
 
 init -100 python:
     class ModuleRuntimeState(object):
@@ -720,6 +720,10 @@ init -100 python:
         if loaded_version < 87:
             updateSave_V86()
             loaded_version = 87
+
+        if loaded_version < 88:
+            updateSave_V87()
+            loaded_version = 88
 
         tractir_save_patch_loaded_state()
         saveVersion = int(currentVersion or loaded_version)
@@ -2838,6 +2842,71 @@ init -100 python:
             people_to_int(getattr(Becky, "last_store_orgasm_day", -1), -1),
         ))
         Becky.__dict__.pop("last_store_orgasm_day", None)
+
+    def updateSave_V87():
+        # Move the remaining Becky branch cursors into their event threads.
+        # Existing saves keep reached outcomes; retired NPC fields and the old
+        # queued Sherwood offer are consumed once and then removed.
+        initThreads()
+
+        kitchen_thread = threads["beckySandraKitchenVisit"]
+        advice_thread = threads["beckyGerhardAdvice"]
+        eddie_thread = threads["beckyEddieSex"]
+        sherwood_thread = threads["beckySherwoodTrade"]
+
+        old_kitchen_stage = max(0, min(3, people_to_int(
+            getattr(Becky, "sandra_kitchen_friendship_progress", 0), 0
+        )))
+        old_advice_stage = max(0, min(3, people_to_int(
+            getattr(Becky, "priest_advice_stage", 0), 0
+        )))
+        old_trade_stage = max(0, min(2, people_to_int(
+            getattr(Becky, "trade_offer_stage", 0), 0
+        )))
+        kunidell_was_open = bool(getattr(Robin, "kunidell_opened", False))
+
+        if not kitchen_thread.completed and not kitchen_thread.aborted and int(kitchen_thread.num or 0) == 0:
+            kitchen_thread.metconds = False
+        if not eddie_thread.completed and not eddie_thread.aborted and int(eddie_thread.num or 0) == 0:
+            eddie_thread.metconds = False
+
+        if old_kitchen_stage >= 3 or old_advice_stage > 0 or eddie_thread.completed or eddie_thread.aborted or int(eddie_thread.num or 0) > 0:
+            kitchen_thread.forceEnable()
+            kitchen_thread.advanceTo(kitchen_thread.data.length, complete_at_end=True)
+        elif old_kitchen_stage > 0:
+            kitchen_thread.forceEnable()
+            kitchen_thread.advanceTo(old_kitchen_stage)
+
+        if old_advice_stage >= 3:
+            advice_thread.forceEnable()
+            advice_thread.advanceTo(advice_thread.data.length, complete_at_end=True)
+        elif old_advice_stage == 2:
+            advice_thread.forceEnable()
+            advice_thread.advanceTo(1)
+        elif old_advice_stage == 1:
+            advice_thread.enable()
+
+        sherwood_was_queued = daily_events.exists("becky", "SherwoodQuest") > 0
+        daily_events.delete("becky", "SherwoodQuest")
+        if kunidell_was_open:
+            sherwood_thread.forceEnable()
+            sherwood_thread.advanceTo(sherwood_thread.data.length, complete_at_end=True)
+        elif old_trade_stage == 1:
+            sherwood_thread.forceEnable()
+            sherwood_thread.advanceTo(2)
+        elif old_trade_stage == 2:
+            sherwood_thread.forceEnable()
+            sherwood_thread.advanceTo(1)
+        elif sherwood_was_queued and eddie_thread.completed:
+            sherwood_thread.enable()
+            Becky.eddie_robbed_day = int(current_game_day() or 0)
+        elif sherwood_was_queued:
+            Becky.eddie_robbed_day = 0
+
+        Becky.__dict__.pop("sandra_kitchen_friendship_progress", None)
+        Becky.__dict__.pop("priest_advice_stage", None)
+        Becky.__dict__.pop("trade_offer_stage", None)
+        Robin.__dict__.pop("kunidell_opened", None)
 
     # Saved objects must be upgraded before Ren'Py evaluates any loaded
     # statement or another subsystem reads their current schema.

@@ -16,7 +16,7 @@ init python:
 
     def tavern_stable_can_start_becky_trade(_obj=None):
         hour_now = int(calendar_v2.hour or 0) % 24
-        return int(Becky.trade_offer_stage or 0) == 1 and int(calendar_v2.week or 0) != 7 and 6 <= hour_now < 12
+        return int(threads["beckySherwoodTrade"].num or 0) >= 2 and int(calendar_v2.week or 0) != 7 and 6 <= hour_now < 12
 
     def tavern_stable_can_ride_to_kunidell(_obj=None):
         return tavern_stable_can_start_becky_trade() and player.horse.owns_horse() and int(player.economy.money or 0) >= 200

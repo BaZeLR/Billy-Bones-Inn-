@@ -155,20 +155,20 @@ def test_becky_after_ceremony_is_thread_event_with_clock_conditions():
 
     assert "def church_after_sermon_event_available" not in people_runtime
     assert "def church_after_sermon_event_available" not in becky_init
-    assert "def can_trigger_after_sermon_event" in becky_init
+    assert "def can_trigger_after_sermon_event" not in becky_init
+    assert 'LThreadData(0, "becky", "GerhardAdvice"' in runtime
     assert '"story_becky_church_after_sermon"' in runtime
     becky_thread = runtime.split('"story_becky_church_after_sermon"', 1)[1].split('define eddieThreadList', 1)[0]
     assert '7, (11, 12), None' in becky_thread
     assert "clock_minutes" not in becky_thread
-    assert '"#Becky.can_trigger_after_sermon_event()"' in runtime
-    assert '"#int(Becky.priest_advice_stage or 0) not in (1, 2)"' in runtime
+    assert '"beckyGerhardAdviceEnabled"' in runtime
     assert "church_after_cermon_event_roll" not in runtime
     assert "church_after_cermon_event_roll" not in _source(CHURCH_ROOM)
     assert "#CheckIfSexEventExist('becky', 99, 'Priest') > 0" not in becky_thread
     assert "after_sermon_stage" not in runtime
     assert "after_sermon_stage" not in becky_init
     assert "after_sermon_stage" not in becky_scene
-    assert 'CheckIfSexEventExist("becky", 99, "Priest") > 0' in finish_day
+    assert 'CheckIfSexEventExist("becky", 99, "Priest") > 0' not in finish_day
     assert "Becky.after_sermon_stage()" not in finish_day
 
     assert "call IntBeckyAfterCermon" not in church_after
@@ -179,6 +179,9 @@ def test_becky_after_ceremony_is_thread_event_with_clock_conditions():
     assert "label story_becky_church_after_sermon_look:" in becky_scene
     assert "BeckyVar" not in becky_scene
     assert 'Becky.var["priest_incest_agree"]' not in becky_scene
+    assert "_becky_advice_thread.advance()" in becky_scene
+    assert "_becky_advice_thread.advanceTo(_becky_advice_thread.data.length, complete_at_end=True)" in becky_scene
+    assert "event_runtime.active_thread.complete()" in becky_scene
     assert "call AdvanceTime(\"Church\")" not in becky_scene
     assert "calendar_v2.advance_minutes(60)" in becky_scene
 

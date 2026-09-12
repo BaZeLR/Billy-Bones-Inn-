@@ -72,7 +72,7 @@ label NextDay_NewDayEvents(retlocname=""):
             TodaySexEvents_Add('becky', 99, 99, 'EddieMom')
 
         if week_value == 7:
-            if Becky.can_trigger_after_sermon_event():
+            if threads["beckyGerhardAdvice"].enabled:
                 TodaySexEvents_Add('becky', 99, 99, 'Priest')
             if Georgett.can_trigger_after_sermon_event():
                 TodaySexEvents_Add('georgett', 99, 99, 'Priest')
@@ -138,10 +138,9 @@ label NextDay_NewDayEvents(retlocname=""):
             Mongol.will_try_to_steal = True
 
         # Бекки предлагает подзаработать
-        if int(threads["beckyDinner"].num or 0) >= 2 and Becky.rel >= 15 and Becky.eddie_robbed_day == 0 and day_value > 0 and procedural_randint(1, 6, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:194:13") == 1:
-            if daily_events.exists('becky', 'SherwoodQuest') == 0:
-                Becky.eddie_robbed_day = day_value
-                daily_events.add("becky", "GroceryStore", 1, ">=", 1, 9999, "SherwoodQuest", "BeckyQuestInit", "none")
+        if threads["beckySherwoodTrade"].checkActive() and not threads["beckySherwoodTrade"].enabled and day_value > 0 and procedural_randint(1, 6, key="procedural:Utilities/Time/NextDay_NewDayEvents.rpy:procedural_randint:194:13") == 1:
+            threads["beckySherwoodTrade"].enable()
+            Becky.eddie_robbed_day = day_value
 
         # Francheska's exact-hour daily schedule is derived anew for the new day.
         FranStaticData.invalidate_daily_schedule()
